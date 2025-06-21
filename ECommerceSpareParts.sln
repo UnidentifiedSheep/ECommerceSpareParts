@@ -1,0 +1,34 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MonoliteUnicorn", "MonoliteUnicorn\MonoliteUnicorn.csproj", "{AE60E608-C5D3-477F-AADF-506E86814124}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Core", "Core", "{DDCFCB24-23D0-4E13-BF17-790BD086B7F2}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Core", "Core\Core\Core.csproj", "{2B183898-5CCF-4751-A5F5-40533AF5E88B}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "IntervalMap", "Core\IntervalMap\IntervalMap.csproj", "{2E6A3D58-D73D-4EE0-BECE-9D675F9DBBFC}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{AE60E608-C5D3-477F-AADF-506E86814124}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{AE60E608-C5D3-477F-AADF-506E86814124}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{AE60E608-C5D3-477F-AADF-506E86814124}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{AE60E608-C5D3-477F-AADF-506E86814124}.Release|Any CPU.Build.0 = Release|Any CPU
+		{2B183898-5CCF-4751-A5F5-40533AF5E88B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{2B183898-5CCF-4751-A5F5-40533AF5E88B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{2B183898-5CCF-4751-A5F5-40533AF5E88B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{2B183898-5CCF-4751-A5F5-40533AF5E88B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{2E6A3D58-D73D-4EE0-BECE-9D675F9DBBFC}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{2E6A3D58-D73D-4EE0-BECE-9D675F9DBBFC}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{2E6A3D58-D73D-4EE0-BECE-9D675F9DBBFC}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{2E6A3D58-D73D-4EE0-BECE-9D675F9DBBFC}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{2B183898-5CCF-4751-A5F5-40533AF5E88B} = {DDCFCB24-23D0-4E13-BF17-790BD086B7F2}
+		{2E6A3D58-D73D-4EE0-BECE-9D675F9DBBFC} = {DDCFCB24-23D0-4E13-BF17-790BD086B7F2}
+	EndGlobalSection
+EndGlobal
