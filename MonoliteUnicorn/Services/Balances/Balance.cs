@@ -162,13 +162,13 @@ public class Balance(DContext context) : IBalance
     
     public async Task ChangeUsersDiscount(string userId, decimal discount, CancellationToken cancellationToken = default)
     {
-        var user = await context.AspNetUsers.AsNoTracking().FirstOrDefaultAsync(x => x.Id == userId, cancellationToken);
-        if (user == null) throw new UserNotFoundException(userId);
+        var userFound = await context.AspNetUsers.AsNoTracking().AnyAsync(x => x.Id == userId, cancellationToken);
+        if (!userFound) throw new UserNotFoundException(userId);
         if (discount < 0) throw new ArgumentOutOfRangeException(nameof(discount), "Скидка не может быть меньше 0");
         if (discount > 100) throw new ArgumentOutOfRangeException(nameof(discount), "Скидка не может быть больше 100");
         await context.Database.ExecuteSqlAsync($"""
                                              INSERT INTO user_discounts (user_id, discount)
-                                             VALUES ('{userId}', {discount})
+                                             VALUES ({userId}, {discount})
                                              ON CONFLICT (user_id)
                                              DO UPDATE SET discount = EXCLUDED.discount;
                                              """, cancellationToken);

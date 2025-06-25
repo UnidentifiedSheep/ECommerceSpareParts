@@ -31,11 +31,10 @@ public partial class StorageMovement
     public virtual Storage StorageNameNavigation { get; set; } = null!;
 
     public virtual AspNetUser WhoMovedNavigation { get; set; } = null!;
-    
-    
+
     public StorageMovement SetActionType(StorageMovementType type)
     {
-        ActionType = type.ToString();
+        ActionType = type.ToString();    
         return this;
     }
 }

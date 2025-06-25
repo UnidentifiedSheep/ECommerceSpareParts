@@ -18,7 +18,7 @@ public class CreateTransactionValidation : AbstractValidator<CreateTransactionCo
         RuleFor(command => command.Amount).GreaterThan(0).WithMessage("Сумма транзакции должна больше 0");
         RuleFor(command => command.TransactionDateTime)
             .GreaterThanOrEqualTo(DateTime.Now.AddMonths(-2))
-            .LessThanOrEqualTo(DateTime.Now.AddMonths(2))
+            .LessThanOrEqualTo(DateTime.Now.AddHours(1))
             .WithMessage("Дата транзакции не может отличаться более чем на 2 месяца от текущей даты");
     }
 }

@@ -35,15 +35,15 @@ public static class MapsterConfig
             .Map(dest => dest.CurrentStock, src => src.TotalCount);
             //AMW
         TypeAdapterConfig<NewArticleDto, Article>.NewConfig()
-            .Map(d => d.ArticleName, s => s.Name)
+            .Map(d => d.ArticleName, s => s.Name.Trim())
             .Map(d => d.ProducerId, s => s.ProducerId)
-            .Map(d => d.Description, s => s.Description)
-            .Map(d => d.ArticleNumber, s => s.ArticleNumber)
+            .Map(d => d.Description, s => s.Description == null ? null : s.Description.Trim())
+            .Map(d => d.ArticleNumber, s => s.ArticleNumber.Trim())
             .Map(d => d.NormalizedArticleNumber, s => s.ArticleNumber.ToNormalizedArticleNumber())
             .Map(d => d.IsOe, s => s.IsOe)
             .Map(d => d.IsValid, s => true)
             .Map(d => d.PackingUnit, s => s.PackingUnit)
-            .Map(d => d.Indicator, s => s.Indicator)
+            .Map(d => d.Indicator, s => s.Indicator == null ? null : s.Indicator.Trim())
             .Map(d => d.CategoryId, s => s.CategoryId);
         TypeAdapterConfig<Article, AmwArticleDto>.NewConfig()
             .Map(d => d.Id, s => s.Id)
@@ -179,8 +179,8 @@ public static class MapsterConfig
         
         TypeAdapterConfig<PatchStorageDto, Storage>.NewConfig()
             .IgnorePatchIfNotSet()
-            .Map(d => d.Location, s => s.Location.Value)
-            .Map(d => d.Description, s => s.Description.Value);
+            .Map(d => d.Location, s => s.Location.Value == null ? null : s.Location.Value.Trim())
+            .Map(d => d.Description, s => s.Description.Value == null ? null : s.Description.Value.Trim());
 
         TypeAdapterConfig<StorageContent, StorageContentDto>.NewConfig()
             .Map(dest => dest.Id, src => src.Id)

@@ -8,7 +8,7 @@ using MonoliteUnicorn.PostGres.Main;
 
 namespace MonoliteUnicorn.EndPoints.Articles.GetArticleViaExecNumber;
 
-public record GetArticleViaExecNumberQuery(string ArticleNumber, int ViewCount, int Page, string? SortBy,IEnumerable<int> ProducerIds) : IQuery<GetArticleViaExecNumberResult>;
+public record GetArticleViaExecNumberQuery(string ArticleNumber, int ViewCount, int Page, string? SortBy, IEnumerable<int> ProducerIds) : IQuery<GetArticleViaExecNumberResult>;
 public record GetArticleViaExecNumberResult(IEnumerable<ArticleDto> Articles);
 
 public class GetArticleViaExecNumberValidation : AbstractValidator<GetArticleViaExecNumberQuery>

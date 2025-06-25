@@ -92,11 +92,7 @@ public partial class DContext : DbContext
     public virtual DbSet<UserMail> UserMails { get; set; }
 
     public virtual DbSet<UserVehicle> UserVehicles { get; set; }
-
-    protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
-#warning To protect potentially sensitive information in your connection string, you should move it out of source code. You can avoid scaffolding the connection string by using the Name= syntax to read it from configuration - see https://go.microsoft.com/fwlink/?linkid=2131148. For more guidance on storing connection strings, see https://go.microsoft.com/fwlink/?LinkId=723263.
-        => optionsBuilder.UseNpgsql("Host=localhost;Database=mono_unicorn;Username=postgres;Password=PleasKillMe21");
-
+    
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         modelBuilder
@@ -105,6 +101,8 @@ public partial class DContext : DbContext
             .HasPostgresExtension("pg_trgm")
             .HasPostgresExtension("pgcrypto");
 
+        modelBuilder.HasSequence<int>("table_name_id_seq"); 
+        
         modelBuilder.Entity<Article>(entity =>
         {
             entity.HasKey(e => e.Id).HasName("articles_id_pk");
@@ -193,18 +191,16 @@ public partial class DContext : DbContext
 
         modelBuilder.Entity<ArticleCross>(entity =>
         {
-            entity
-                .HasNoKey()
-                .ToTable("article_crosses");
+            entity.HasKey(e => new { e.ArticleId, e.ArticleCrossId }).HasName("article_crosses_pk");
 
-            entity.HasIndex(e => new { e.ArticleCrossId, e.ArticleId }, "article_crosses_article_cross_id_article_id_uindex").IsUnique();
+            entity.ToTable("article_crosses");
 
             entity.HasIndex(e => e.ArticleCrossId, "article_crosses_article_cross_id_index");
 
             entity.HasIndex(e => e.ArticleId, "article_crosses_article_id_index");
 
-            entity.Property(e => e.ArticleCrossId).HasColumnName("article_cross_id");
             entity.Property(e => e.ArticleId).HasColumnName("article_id");
+            entity.Property(e => e.ArticleCrossId).HasColumnName("article_cross_id");
         });
 
         modelBuilder.Entity<ArticleEan>(entity =>

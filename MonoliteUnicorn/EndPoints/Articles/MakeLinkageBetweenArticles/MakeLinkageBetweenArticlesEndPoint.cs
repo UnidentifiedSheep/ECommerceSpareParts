@@ -4,17 +4,17 @@ using Mapster;
 using MediatR;
 using MonoliteUnicorn.Dtos.Amw.Articles;
 
-namespace MonoliteUnicorn.EndPoints.Articles.ChangeArticleLinkage;
+namespace MonoliteUnicorn.EndPoints.Articles.MakeLinkageBetweenArticles;
 
-public record ChangeArticleLinkageRequest(IEnumerable<NewArticleLinkageDto> Linkages);
+public record MakeLinkageBetweenArticlesRequest(NewArticleLinkageDto Linkage);
 
-public class ChangeArticleLinkageEndPoint : ICarterModule
+public class MakeLinkageBetweenArticlesEndPoint : ICarterModule
 {
     public void AddRoutes(IEndpointRouteBuilder app)
     {
-        app.MapPost("/articles/crosses", async (ISender sender, ChangeArticleLinkageRequest request, CancellationToken token) =>
+        app.MapPost("/articles/crosses", async (ISender sender, MakeLinkageBetweenArticlesRequest request, CancellationToken token) =>
         {
-            var command = request.Adapt<ChangeArticleLinkageCommand>();
+            var command = request.Adapt<MakeLinkageBetweenArticlesCommand>();
             await sender.Send(command, token);
             return Results.Ok();
         }).RequireAuthorization("AMW")

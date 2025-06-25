@@ -1,4 +1,5 @@
 using Core.Interface;
+using FluentValidation;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 using MonoliteUnicorn.Enums;
@@ -10,6 +11,16 @@ namespace MonoliteUnicorn.EndPoints.Balances.DeleteTransaction;
 
 public record DeleteTransactionCommand(string TransactionId, string WhoDeleteUserId) : ICommand<Unit>;
 
+public class DeleteTransactionValidation : AbstractValidator<DeleteTransactionCommand>
+{
+    public DeleteTransactionValidation()
+    {
+        RuleFor(x => x.TransactionId).NotEmpty()
+            .WithMessage("Id Транзакции не может быть пуст.");
+        RuleFor(x => x.WhoDeleteUserId).NotEmpty()
+            .WithMessage("Id пользователя который удаляет транзакцию не может быть пуст.");
+    }
+}
 public class DeleteTransactionHandler(IBalance balance, DContext context) : ICommandHandler<DeleteTransactionCommand, Unit>
 {
     public async Task<Unit> Handle(DeleteTransactionCommand request, CancellationToken cancellationToken)

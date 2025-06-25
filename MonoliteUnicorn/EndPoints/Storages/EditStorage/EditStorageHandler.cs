@@ -1,5 +1,4 @@
 using Core.Interface;
-using Core.StaticFunctions;
 using FluentValidation;
 using Mapster;
 using MediatR;
@@ -17,10 +16,12 @@ public class EditStorageValidation : AbstractValidator<EditStorageCommand>
     public EditStorageValidation()
     {
         RuleFor(x => x.EditStorage.Description.Value)
-            .MaxLengthIfSet(x => x.EditStorage.Description, 256, message: "Максимальная длина описания 256 символов");
+            .Must(x => x?.Trim().Length <= 256)
+            .WithMessage("Максимальная длина описания 256 символов");
 
         RuleFor(x => x.EditStorage.Location.Value)
-            .MaxLengthIfSet(x => x.EditStorage.Location, 256, message: "Максимальная длина локации 256 символов");
+            .Must(x => x?.Trim().Length <= 256)
+            .WithMessage("Максимальная длина локации 256 символов");
     }
 }
 

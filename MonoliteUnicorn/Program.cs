@@ -191,9 +191,8 @@ app.UseHttpsRedirection();
 
 RecurringJob.AddOrUpdate<UpdateCurrencyRate>("UpdateCurrencyTask", 
     x => x.Run(), Cron.Daily);
-//TODO: TURN ON UPDATE MARKUP
-/*RecurringJob.AddOrUpdate<UpdateMarkUp>("UpdateMarkUp", 
-    x => x.Run(), Cron.Weekly);*/
+RecurringJob.AddOrUpdate<UpdateMarkUp>("UpdateMarkUp", 
+    x => x.Run(), Cron.Weekly);
 
 
 

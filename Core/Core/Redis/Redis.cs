@@ -28,5 +28,18 @@ public static class Redis
         if (!IsConfigured) throw new InvalidOperationException("Redis is not configured");
         return Multiplexers[name].GetDatabase();
     }
+
+    public static async Task CloseAllConnections(CancellationToken token = default)
+    {
+        var keysToRemove = new List<string>();
+        foreach (var (key, connection) in Multiplexers)
+        {
+            await connection.CloseAsync();
+            keysToRemove.Add(key);
+            if(token.IsCancellationRequested) break;
+        }
+        foreach (var key in keysToRemove)
+            Multiplexers.Remove(key);
+    }
     
 }
