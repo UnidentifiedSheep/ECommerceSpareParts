@@ -1,6 +1,7 @@
 using System.Drawing;
 using Bogus;
 using MonoliteUnicorn.Dtos.Amw.Articles;
+using MonoliteUnicorn.Dtos.Amw.Producers;
 using MonoliteUnicorn.PostGres.Main;
 
 namespace Tests.MockData;
@@ -13,6 +14,13 @@ public static class MockData
         "505 213", "701 202 412", "AKBA/123-00.2",
         "ARB 199909", "A 152", "213.213-01", "A 909 99 0089",
         "БЕЛОРУСЬАВТО.2133", "БК.21388"
+    ];
+
+    public static readonly List<string> ProducerNames =
+    [
+        "БЕЛ.АВТО", "Sampa", "Febi", "Stellox",
+        "Sachs", "Frundel", "JMC", "GTR", "RVI",
+        "MB", "MAN", "IVECO", "DAF"
     ];
     
     public static readonly List<string> Colors = Enum.GetNames(typeof(KnownColor)).ToList();
@@ -30,6 +38,14 @@ public static class MockData
         return f.Generate(count);
     }
 
+    public static List<AmwNewProducerDto> CreateNewProducerDto(int count)
+    {
+        var f = new Faker<AmwNewProducerDto>(Locale)
+            .RuleFor(x => x.ProducerName, f => f.PickRandom(ProducerNames))
+            .RuleFor(x => x.Description, f => f.Commerce.ProductDescription())
+            .RuleFor(x => x.IsOe, f => f.Random.Bool());
+        return f.Generate(count);
+    }
     public static List<AspNetUser> CreateNewUser(int count)
     {
         var f = new Faker<AspNetUser>(Locale)

@@ -5,7 +5,6 @@ using Microsoft.Extensions.DependencyInjection;
 using MonoliteUnicorn.Configs;
 using MonoliteUnicorn.EndPoints.Balances.ChangeDiscountOfUser;
 using MonoliteUnicorn.PostGres.Main;
-using MonoliteUnicorn.Services.Balances;
 using Tests.MockData;
 using Tests.testContainers.Combined;
 

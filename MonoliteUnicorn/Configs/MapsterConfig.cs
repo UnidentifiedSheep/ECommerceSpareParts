@@ -1,5 +1,4 @@
 using Core.Extensions;
-using Core.Json;
 using Core.StaticFunctions;
 using Mapster;
 using MonoliteUnicorn.Dtos.Amw.Articles;
@@ -12,7 +11,6 @@ using MonoliteUnicorn.Dtos.Amw.Users;
 using MonoliteUnicorn.Dtos.Member.Vehicles;
 using MonoliteUnicorn.Dtos.Producers;
 using MonoliteUnicorn.PostGres.Main;
-using MonoliteUnicorn.Services.Prices.PriceGenerator;
 using AmwArticleDto = MonoliteUnicorn.Dtos.Amw.Articles.ArticleFullDto;
 using MemberArticleDto = MonoliteUnicorn.Dtos.Member.Articles.ArticleFullDto;
 
@@ -37,13 +35,13 @@ public static class MapsterConfig
         TypeAdapterConfig<NewArticleDto, Article>.NewConfig()
             .Map(d => d.ArticleName, s => s.Name.Trim())
             .Map(d => d.ProducerId, s => s.ProducerId)
-            .Map(d => d.Description, s => s.Description == null ? null : s.Description.Trim())
+            .Map(d => d.Description, s => string.IsNullOrWhiteSpace(s.Description) ? null : s.Description.Trim())
             .Map(d => d.ArticleNumber, s => s.ArticleNumber.Trim())
             .Map(d => d.NormalizedArticleNumber, s => s.ArticleNumber.ToNormalizedArticleNumber())
             .Map(d => d.IsOe, s => s.IsOe)
             .Map(d => d.IsValid, s => true)
             .Map(d => d.PackingUnit, s => s.PackingUnit)
-            .Map(d => d.Indicator, s => s.Indicator == null ? null : s.Indicator.Trim())
+            .Map(d => d.Indicator, s => string.IsNullOrWhiteSpace(s.Indicator) ? null : s.Indicator.Trim())
             .Map(d => d.CategoryId, s => s.CategoryId);
         TypeAdapterConfig<Article, AmwArticleDto>.NewConfig()
             .Map(d => d.Id, s => s.Id)
@@ -85,17 +83,17 @@ public static class MapsterConfig
             .Map(dest => dest.Name, src => src.Name)
             .Map(dest => dest.Description, src => src.Description);
         TypeAdapterConfig<AmwNewProducerDto, Producer>.NewConfig()
-            .Map(d => d.Name, s => s.ProducerName)
+            .Map(d => d.Name, s => s.ProducerName.Trim())
             .Map(d => d.IsOe, s => s.IsOe)
-            .Map(d => d.Description, s => s.Description);
+            .Map(d => d.Description, s => string.IsNullOrWhiteSpace(s.Description) ? null : s.Description.Trim());
         TypeAdapterConfig<ProducersOtherName, ProducerOtherNameDto>.NewConfig()
             .Map(d => d.ProducerId, s => s.ProducerId)
             .Map(d => d.OtherName, s => s.ProducerOtherName)
             .Map(d => d.WhereUsed, s => s.WhereUsed);
         TypeAdapterConfig<PatchProducerDto, Producer>.NewConfig()
             .IgnorePatchIfNotSet()
-            .Map(d => d.Name, s => s.Name.Value)
-            .Map(d => d.Description, s => s.Description.Value)
+            .Map(d => d.Name, s => s.Name.Value == null ? null : s.Name.Value.Trim())
+            .Map(d => d.Description, s => s.Description.Value == null ? null : s.Description.Value.Trim())
             .Map(d => d.IsOe, s => s.IsOe.Value);
             
         //Purchases
@@ -179,8 +177,8 @@ public static class MapsterConfig
         
         TypeAdapterConfig<PatchStorageDto, Storage>.NewConfig()
             .IgnorePatchIfNotSet()
-            .Map(d => d.Location, s => s.Location.Value == null ? null : s.Location.Value.Trim())
-            .Map(d => d.Description, s => s.Description.Value == null ? null : s.Description.Value.Trim());
+            .Map(d => d.Location, s => string.IsNullOrWhiteSpace(s.Location.Value) ? null : s.Location.Value.Trim())
+            .Map(d => d.Description, s => string.IsNullOrWhiteSpace(s.Description.Value) ? null : s.Description.Value.Trim());
 
         TypeAdapterConfig<StorageContent, StorageContentDto>.NewConfig()
             .Map(dest => dest.Id, src => src.Id)

@@ -14,8 +14,10 @@ public class DeleteProducerHandler(DContext context) : ICommandHandler<DeletePro
     {
         var producer = await context.Producers.FirstOrDefaultAsync(x => x.Id == request.Id, cancellationToken)
             ?? throw new  ProducerNotFoundException(request.Id);
-        _ = await context.Articles.AsNoTracking().FirstOrDefaultAsync(x => x.ProducerId == request.Id, cancellationToken)
-            ?? throw new CannotDeleteProducerWithArticlesException();
+        var articleWithThatProducerExists = await context.Articles.AsNoTracking()
+            .AnyAsync(x => x.ProducerId == request.Id, cancellationToken);
+        if (articleWithThatProducerExists)
+            throw new CannotDeleteProducerWithArticlesException();
         context.Producers.Remove(producer);
         await context.SaveChangesAsync(cancellationToken);
         return Unit.Value;

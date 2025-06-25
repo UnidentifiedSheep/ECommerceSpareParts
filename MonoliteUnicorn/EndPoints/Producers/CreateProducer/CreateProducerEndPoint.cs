@@ -6,7 +6,7 @@ using MonoliteUnicorn.Dtos.Amw.Producers;
 
 namespace MonoliteUnicorn.EndPoints.Producers.CreateProducer;
 
-public record CreateProducerRequest(IEnumerable<AmwNewProducerDto> NewProducers);
+public record CreateProducerRequest(AmwNewProducerDto NewProducer);
 
 public class CreateProducerEndPoint : ICarterModule
 {
@@ -15,8 +15,8 @@ public class CreateProducerEndPoint : ICarterModule
         app.MapPost("/producers", async (ISender sender, CreateProducerRequest request, CancellationToken token) =>
             {
                 var command = request.Adapt<CreateProducerCommand>();
-                await sender.Send(command, token);
-                return Results.Ok();
+                var result = await sender.Send(command, token);
+                return Results.Created("/producers", result.ProducerId);
             }).RequireAuthorization("AMW")
         .WithGroup("Producers")
         .WithDescription("Добавление новых производителей в бд")
