@@ -9,5 +9,6 @@ public enum StorageMovementType
     SaleEditing,
     SaleDeletion,
     StorageContentEditing,
+    StorageContentAddition,
     StorageContentDeletion
 }

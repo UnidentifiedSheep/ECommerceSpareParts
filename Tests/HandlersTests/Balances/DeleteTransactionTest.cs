@@ -11,7 +11,7 @@ using MonoliteUnicorn.Services.Balances;
 using Tests.MockData;
 using Tests.testContainers.Combined;
 
-namespace Tests.Balances;
+namespace Tests.HandlersTests.Balances;
 
 [Collection("Combined collection")]
 public class DeleteTransactionTest : IAsyncLifetime

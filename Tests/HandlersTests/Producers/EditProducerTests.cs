@@ -11,7 +11,7 @@ using Tests.MockData;
 using Tests.testContainers.Combined;
 using static Tests.MockData.MockData;
 
-namespace Tests.Producers;
+namespace Tests.HandlersTests.Producers;
 
 [Collection("Combined collection")]
 public class EditProducerTests : IAsyncLifetime

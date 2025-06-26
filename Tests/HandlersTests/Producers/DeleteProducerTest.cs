@@ -1,4 +1,3 @@
-using Bogus;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
@@ -8,14 +7,12 @@ using MonoliteUnicorn.Exceptions.Producers;
 using MonoliteUnicorn.PostGres.Main;
 using Tests.MockData;
 using Tests.testContainers.Combined;
-using static Tests.MockData.MockData;
 
-namespace Tests.Producers;
+namespace Tests.HandlersTests.Producers;
 
 [Collection("Combined collection")]
 public class DeleteProducerTest : IAsyncLifetime
 {
-    private readonly Faker _faker = new(Locale);
     private readonly DContext _context;
     private readonly IMediator _mediator;
     

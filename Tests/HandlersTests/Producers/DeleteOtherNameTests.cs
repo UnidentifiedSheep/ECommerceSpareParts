@@ -9,7 +9,7 @@ using MonoliteUnicorn.PostGres.Main;
 using Tests.MockData;
 using Tests.testContainers.Combined;
 
-namespace Tests.Producers;
+namespace Tests.HandlersTests.Producers;
 
 [Collection("Combined collection")]
 public class DeleteOtherNameTests : IAsyncLifetime

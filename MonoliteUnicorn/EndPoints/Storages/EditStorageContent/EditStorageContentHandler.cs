@@ -1,17 +1,13 @@
 using Core.Interface;
 using Core.StaticFunctions;
 using FluentValidation;
-using Mapster;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 using MonoliteUnicorn.Dtos.Amw.Storage;
-using MonoliteUnicorn.Enums;
 using MonoliteUnicorn.Exceptions;
-using MonoliteUnicorn.Exceptions.Currencies;
-using MonoliteUnicorn.Exceptions.Storages;
+using MonoliteUnicorn.Extensions;
 using MonoliteUnicorn.PostGres.Main;
 using MonoliteUnicorn.Services.Inventory;
-using MonoliteUnicorn.Services.Prices.PriceGenerator;
 
 namespace MonoliteUnicorn.EndPoints.Storages.EditStorageContent;
 
@@ -54,9 +50,8 @@ public class EditStorageContentHandler(DContext context, IInventory inventory) :
     {
         await using var dbTransaction = await context.Database.BeginTransactionAsync(cancellationToken);
         var storageContentIds = request.EditedFields.Keys;
-        var storageContents = await context.StorageContents
-            .FromSql($"Select * from storage_content where id in Any({storageContentIds.ToArray()}) for update")
-            .ToDictionaryAsync(x => x.Id, cancellationToken);
+        var storageContents = 
+            await context.EnsureStorageContentsExistForUpdate(storageContentIds, cancellationToken);
 
         foreach (var item in request.EditedFields)
         {

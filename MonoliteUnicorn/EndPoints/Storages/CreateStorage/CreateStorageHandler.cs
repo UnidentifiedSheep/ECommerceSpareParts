@@ -13,11 +13,19 @@ public class CreateStorageValidation : AbstractValidator<CreateStorageCommand>
 {
     public CreateStorageValidation()
     {
-        RuleFor(x => x.Name).NotEmpty().WithMessage("Название не может быть пустым");
-        RuleFor(x => x.Name).MinimumLength(6).WithMessage("Минимальная длина названия 6 символов");
-        RuleFor(x => x.Name).MaximumLength(128).WithMessage("Максимальная длина названия 128 символов");
-        RuleFor(x => x.Description).MaximumLength(256).WithMessage("Максимальная длина описания 256 символов");
-        RuleFor(x => x.Location).MaximumLength(256).WithMessage("Максимальная длина локации 256 символов");
+        RuleFor(x => x.Name)
+            .NotEmpty()
+            .WithMessage("Название не может быть пустым")
+            .MinimumLength(6)
+            .WithMessage("Минимальная длина названия 6 символов")
+            .MaximumLength(128)
+            .WithMessage("Максимальная длина названия 128 символов");
+        RuleFor(x => x.Description)
+            .MaximumLength(256)
+            .WithMessage("Максимальная длина описания 256 символов");
+        RuleFor(x => x.Location)
+            .MaximumLength(256)
+            .WithMessage("Максимальная длина локации 256 символов");
     }
 }
 
@@ -28,8 +36,9 @@ public class CreateStorageHandler(DContext context) : ICommandHandler<CreateStor
         var trimmedName = request.Name.Trim();
         var foundStorage = await context.Storages
             .AsNoTracking()
-            .FirstOrDefaultAsync(x => x.Name == trimmedName, cancellationToken);
-        if (foundStorage != null) throw new StorageNameIsTakenException(trimmedName);
+            .AnyAsync(x => x.Name == trimmedName, cancellationToken);
+        if (foundStorage) 
+            throw new StorageNameIsTakenException(trimmedName);
         var model = new Storage
         {
             Name = trimmedName,

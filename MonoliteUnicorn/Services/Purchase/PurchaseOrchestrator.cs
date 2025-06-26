@@ -29,7 +29,7 @@ public class PurchaseOrchestrator(IServiceProvider serviceProvider) : IPurchaseO
             var transaction = await balanceService.CreateTransactionAsync(supplierId, "SYSTEM", totalSum, TransactionStatus.Purchase, currencyId, createdUserId, purchaseDate, cancellationToken);
             await purchaseService.CreatePurchaseAsync(contentAsTuple, currencyId, createdUserId, transaction.Id, storageName, supplierId, purchaseDate, comment, cancellationToken);
             var inventoryItems = await inventoryService.AddContentToStorage(
-                purchaseContentList.Select(x => (x.ArticleId, x.Count, x.Price)), currencyId, storageName, createdUserId,
+                purchaseContentList.Select(x => (x.ArticleId, x.Count, x.Price, currencyId)), storageName, createdUserId,
                 StorageContentStatus.Ok, StorageMovementType.Purchase, cancellationToken);
             if (payedSum is > 0)
                 await balanceService.CreateTransactionAsync("SYSTEM", supplierId, payedSum.Value, TransactionStatus.Normal, currencyId, createdUserId, purchaseDate.AddMicroseconds(1), cancellationToken);

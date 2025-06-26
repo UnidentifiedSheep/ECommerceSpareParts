@@ -100,9 +100,9 @@ public partial class DContext : DbContext
             .HasPostgresExtension("dblink")
             .HasPostgresExtension("pg_trgm")
             .HasPostgresExtension("pgcrypto");
-
-        modelBuilder.HasSequence<int>("table_name_id_seq"); 
         
+        modelBuilder.HasSequence<int>("table_name_id_seq"); 
+
         modelBuilder.Entity<Article>(entity =>
         {
             entity.HasKey(e => e.Id).HasName("articles_id_pk");
@@ -1034,9 +1034,7 @@ public partial class DContext : DbContext
 
             entity.HasIndex(e => e.WhoMoved, "storage_movement_who_moved_index");
 
-            entity.Property(e => e.Id)
-                .ValueGeneratedNever()
-                .HasColumnName("id");
+            entity.Property(e => e.Id).HasColumnName("id");
             entity.Property(e => e.ActionType)
                 .HasMaxLength(24)
                 .HasColumnName("action_type");
@@ -1336,6 +1334,7 @@ public partial class DContext : DbContext
                 .HasForeignKey(d => d.UserId)
                 .HasConstraintName("user_vehicles_aspnetusers_id_fk");
         });
+        modelBuilder.HasSequence<int>("storage_movement_id_seq");
 
         OnModelCreatingPartial(modelBuilder);
     }

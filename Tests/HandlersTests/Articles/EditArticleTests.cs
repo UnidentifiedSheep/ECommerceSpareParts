@@ -9,7 +9,7 @@ using MonoliteUnicorn.PostGres.Main;
 using Tests.MockData;
 using Tests.testContainers.Combined;
 
-namespace Tests.Articles;
+namespace Tests.HandlersTests.Articles;
 
 [Collection("Combined collection")]
 public class EditArticleTests : IAsyncLifetime

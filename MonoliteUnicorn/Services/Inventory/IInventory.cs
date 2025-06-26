@@ -9,7 +9,7 @@ namespace MonoliteUnicorn.Services.Inventory;
 public interface IInventory
 {
     Task<IEnumerable<StorageContent>> AddContentToStorage(
-        IEnumerable<(int ArticleId, int Count, decimal Price)> content, int currencyId,
+        IEnumerable<(int ArticleId, int Count, decimal Price, int currencyId)> content,
         string storageName, string userId, StorageContentStatus status,
         StorageMovementType movementType, CancellationToken cancellationToken = default);
 

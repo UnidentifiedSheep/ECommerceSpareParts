@@ -44,7 +44,7 @@ public class SaleOrchestrator(IServiceProvider serviceProvider) : ISaleOrchestra
                 var avrgBuyPrice = articleBuyPrices[content.ArticleId];
                 var buySellPrices = new BuySellPrice
                 {
-                    BuyPrice = Math.Round(PriceGenerator.ConvertToNeededCurrency(avrgBuyPrice, Global.UsdId, currencyId), 2),
+                    BuyPrice = Math.Round(CurrencyConverter.ConvertTo(avrgBuyPrice, Global.UsdId, currencyId), 2),
                     SellPrice = Math.Round(content.Price, 2),
                     ArticleId = content.ArticleId,
                     CurrencyId = currencyId,

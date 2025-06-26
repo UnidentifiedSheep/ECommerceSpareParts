@@ -4,6 +4,7 @@ using Microsoft.EntityFrameworkCore;
 using MonoliteUnicorn.Enums;
 using MonoliteUnicorn.Models;
 using MonoliteUnicorn.PostGres.Main;
+using MonoliteUnicorn.Services.Prices.PriceGenerator;
 using StackExchange.Redis;
 
 namespace MonoliteUnicorn.Services.Prices.Price;
@@ -20,7 +21,7 @@ public class Price(DContext context, ILogger<Price> logger) : IPrice
         var prices = await GetOrRecalculateUsablePrice(articleIds, redis, cancellationToken);
         foreach (var (articleId, usablePrice) in prices)
         {
-            var converted = PriceGenerator.PriceGenerator.ConvertToNeededCurrency(usablePrice, Global.UsdId, currencyId);
+            var converted = CurrencyConverter.ConvertTo(usablePrice, Global.UsdId, currencyId);
             var sellPrice = PriceGenerator.PriceGenerator.GetSellPrice(converted, userDiscount, currencyId);
             results[articleId] = sellPrice;
         }
@@ -35,7 +36,7 @@ public class Price(DContext context, ILogger<Price> logger) : IPrice
         var prices = await GetOrRecalculateUsablePrice(articleIds, redis, cancellationToken);
         foreach (var (articleId, usablePrice) in prices)
         {
-            var converted = PriceGenerator.PriceGenerator.ConvertToNeededCurrency(usablePrice, Global.UsdId, currencyId);
+            var converted = CurrencyConverter.ConvertTo(usablePrice, Global.UsdId, currencyId);
             results[articleId] = new DetailedPriceModel
             {
                 Id = articleId,

@@ -7,6 +7,7 @@ using MonoliteUnicorn.Exceptions.Articles;
 using MonoliteUnicorn.Exceptions.Currencies;
 using MonoliteUnicorn.Exceptions.Storages;
 using MonoliteUnicorn.Exceptions.Users;
+using MonoliteUnicorn.Extensions;
 using MonoliteUnicorn.Models;
 using MonoliteUnicorn.PostGres.Main;
 using MonoliteUnicorn.Services.Prices.PriceGenerator;
@@ -15,81 +16,71 @@ namespace MonoliteUnicorn.Services.Inventory;
 
 public class Inventory(DContext context) : IInventory
 {
-    public async Task<IEnumerable<StorageContent>> AddContentToStorage(IEnumerable<(int ArticleId, int Count, decimal Price)> content, int currencyId, 
+    public async Task<IEnumerable<StorageContent>> AddContentToStorage(IEnumerable<(int ArticleId, int Count, decimal Price, int currencyId)> content, 
         string storageName, string userId, StorageContentStatus status, 
         StorageMovementType movementType, CancellationToken cancellationToken = default)
     {
-        _ = await context.Currencies.AsNoTracking()
-            .FirstOrDefaultAsync(x => x.Id == currencyId, cancellationToken) ?? throw new CurrencyNotFoundException(currencyId);
-        _ = await context.Storages.AsNoTracking()
-            .FirstOrDefaultAsync(x => x.Name == storageName, cancellationToken) ?? throw new StorageNotFoundException(storageName);
-        _ = await context.AspNetUsers.AsNoTracking()
-            .FirstOrDefaultAsync(x => x.Id == userId, cancellationToken) ?? throw new UserNotFoundException(userId);
+        var contentList = content.ToList();
+        if (contentList.Count == 0)
+            throw new ArgumentException("Список content пустой");
+        if (contentList.Any(x => Math.Round(x.Price, 2) <= 0))
+            throw new StorageContentPriceCannotBeNegativeException();
+        if (contentList.Any(x => x.Count <= 0))
+            throw new StorageContentCountCantBeNegativeException();
         
-        bool isLocalDbTransaction = context.Database.CurrentTransaction == null;
+        var currencyIds = contentList.Select(x => x.currencyId).ToHashSet();
         
-        try
+        await context.EnsureCurrenciesExist(currencyIds, cancellationToken);
+        await context.EnsureStorageExists(storageName, cancellationToken);
+        await context.EnsureUserExists(userId, cancellationToken);
+        
+        return await context.WithTransactionAsync(async () =>
         {
-            var dbTransaction = context.Database.CurrentTransaction ?? await context.Database.BeginTransactionAsync(cancellationToken);
-            
-            var contentList = content.ToList();
-            var storageContent = contentList.Select(x => new StorageContent
+            var articleIds = contentList
+                .Select(x => x.ArticleId).ToHashSet();
+            var articles = await context.EnsureArticlesExistForUpdate(articleIds, cancellationToken);
+
+            var storageContents = new List<StorageContent>();
+            var storageMovements = new List<StorageMovement>();
+            foreach (var (articleId, count, price, currencyId) in contentList)
             {
-                StorageName = storageName,
-                ArticleId = x.ArticleId,
-                BuyPrice = x.Price,
-                CurrencyId = currencyId,
-                Status = status.ToString(),
-                BuyPriceInUsd = PriceGenerator.ConvertToNeededCurrency(x.Price, currencyId, Global.UsdId),
-                Count = x.Count
-            }).ToList();
-            var storageMovement = contentList.Select(x =>
-            {
-                var k = x.Adapt<StorageMovement>().SetActionType(movementType);
-                k.WhoMoved = userId;
-                return k;
-            });
-            await context.StorageMovements.AddRangeAsync(storageMovement, cancellationToken);
-            await context.StorageContents.AddRangeAsync(storageContent, cancellationToken);
-            foreach (var item in storageContent)
-            {
-                var article = await context.Articles
-                    .FromSql($"select * from articles where id = {item.ArticleId} for update")
-                    .FirstOrDefaultAsync(cancellationToken) ?? throw new ArticleNotFoundException(item.ArticleId);
-                article.TotalCount += item.Count;
+                var storageContent = new StorageContent
+                {
+                    StorageName = storageName,
+                    ArticleId = articleId,
+                    BuyPrice = price,
+                    CurrencyId = currencyId,
+                    Status = status.ToString(),
+                    BuyPriceInUsd = CurrencyConverter.ConvertToUsd(price, currencyId),
+                    PurchaseDatetime = DateTime.Now,
+                    Count = count
+                };
+                storageContents.Add(storageContent);
+                var storageMovement = storageContent
+                    .Adapt<StorageMovement>()
+                    .SetActionType(movementType);
+                storageMovement.WhoMoved = userId;
+                storageMovements.Add(storageMovement);
+                articles[articleId].TotalCount += count;
             }
+            await context.StorageMovements.AddRangeAsync(storageMovements, cancellationToken);
+            await context.StorageContents.AddRangeAsync(storageContents, cancellationToken);
             await context.SaveChangesAsync(cancellationToken);
-            if (!isLocalDbTransaction) return storageContent;
-            await dbTransaction.CommitAsync(cancellationToken);
-            await dbTransaction.DisposeAsync();
-            return storageContent;
-        }
-        catch (Exception)
-        {
-            if (!isLocalDbTransaction || context.Database.CurrentTransaction == null) throw;
-            await context.Database.CurrentTransaction!.RollbackAsync(cancellationToken);
-            await context.Database.CurrentTransaction.DisposeAsync();
-            throw;
-        }
+            return storageContents;
+        }, cancellationToken);
     }
 
     public async Task AddContentToStorage(IEnumerable<(SaleContentDetail, int)> contentDetails, StorageMovementType movementType, string userId,
         CancellationToken cancellationToken = default)
     {
+        await context.EnsureUserExists(userId, cancellationToken);
         await context.WithTransactionAsync(async () =>
         {
-            _ = await context.AspNetUsers.AsNoTracking()
-                .FirstOrDefaultAsync(x => x.Id == userId, cancellationToken) ?? throw new UserNotFoundException(userId);
             var contentDetailsList = contentDetails.ToList();
             var articleIds = contentDetailsList
                 .Select(x => x.Item2)
                 .ToHashSet();
-            var articles = await context.Articles
-                .FromSql($"SELECT * from articles where id = ANY ({articleIds.ToArray()}) for update")
-                .ToDictionaryAsync(x => x.Id,cancellationToken);
-            var notFoundArticles = articleIds.Except(articles.Select(x => x.Key)).ToList();
-            if (notFoundArticles.Count != 0)
-                throw new ArticleNotFoundException(notFoundArticles);
+            var articles = await context.EnsureArticlesExistForUpdate(articleIds, cancellationToken);
             foreach (var (contentDetail, articleId) in contentDetailsList)
             {
                 var article = articles[articleId];
@@ -108,7 +99,7 @@ public class Inventory(DContext context) : IInventory
                 {
                     storageContent = contentDetail.Adapt<StorageContent>();
                     storageContent.Status = nameof(StorageContentStatus.Ok);
-                    storageContent.BuyPriceInUsd = PriceGenerator.ConvertToUsd(storageContent.BuyPrice, storageContent.CurrencyId);
+                    storageContent.BuyPriceInUsd = CurrencyConverter.ConvertToUsd(storageContent.BuyPrice, storageContent.CurrencyId);
                     storageContent.ArticleId = articleId;
                     await context.AddAsync(storageContent, cancellationToken);
                 }
@@ -127,11 +118,9 @@ public class Inventory(DContext context) : IInventory
     public async Task DeleteContentFromStorage(int contentId, string userId, StorageMovementType movementType,
         CancellationToken cancellationToken = default)
     {
+        await context.EnsureUserExists(userId, cancellationToken);
         await context.WithTransactionAsync(async () =>
         {
-            var user = await context.AspNetUsers.AnyAsync(x => x.Id == userId, cancellationToken);
-            if (!user) 
-                throw new UserNotFoundException(userId);
             var content = await context.StorageContents
                 .FromSql($"select * from storage_content where id = {contentId} for update")
                 .FirstOrDefaultAsync(cancellationToken) ?? throw new StorageContentNotFoundException(contentId);
@@ -159,16 +148,22 @@ public class Inventory(DContext context) : IInventory
         string userId, string? storageName, bool takeFromOtherStorages, 
         StorageMovementType movementType, CancellationToken cancellationToken = default)
     {
+        if (!takeFromOtherStorages && string.IsNullOrWhiteSpace(storageName)) 
+            throw new StorageIsUnknownException();
+        if(!takeFromOtherStorages && !string.IsNullOrWhiteSpace(storageName))
+            await context.EnsureStorageExists(storageName, cancellationToken);
+        
+        await context.EnsureUserExists(userId, cancellationToken);
+        var contentList = content.ToList();
+        
         return await context.WithTransactionAsync(async () =>
         {
-            if (!takeFromOtherStorages && string.IsNullOrWhiteSpace(storageName)) 
-                throw new StorageIsUnknownException();
-            _ = await context.AspNetUsers.AsNoTracking()
-                    .FirstOrDefaultAsync(x => x.Id == userId, cancellationToken) ?? throw new UserNotFoundException(userId);
-           var result = new List<PrevAndNewValue<StorageContent>>();
+            var articleIds = contentList.Select(x => x.ArticleId);
+            var articles = await context.EnsureArticlesExistForUpdate(articleIds, cancellationToken);
+            var result = new List<PrevAndNewValue<StorageContent>>();
             var mergedContent = new Dictionary<int, int>();
 
-            foreach (var ck in content)
+            foreach (var ck in contentList)
             {
                 if (ck.Count < 0) throw new ArgumentException("Количество для удаления со склада не может быть отрицательным");
                 if (!mergedContent.TryAdd(ck.ArticleId, ck.Count))
@@ -179,9 +174,7 @@ public class Inventory(DContext context) : IInventory
                 List<StorageContent> storageContents = [];
                 
                 int availableCount = 0;
-                var article = await context.Articles
-                    .FromSql($"select * from articles where id = {articleId} for update")
-                    .FirstOrDefaultAsync(cancellationToken) ?? throw new ArticleNotFoundException(articleId);
+                var article = articles[articleId];
                 if (!string.IsNullOrWhiteSpace(storageName))
                 {
                     await foreach (var item in context.StorageContents
@@ -251,22 +244,21 @@ public class Inventory(DContext context) : IInventory
         DateTime prevPurchaseDateTime, DateTime newPurchaseDateTime, string userId,
         StorageMovementType movementType, CancellationToken cancellationToken = default)
     {
+        if (addRemoveDict.Count == 0) return;
+        await context.EnsureUserExists(userId, cancellationToken);
+        await context.EnsureStorageExists(storageName, cancellationToken);
+        await context.EnsureCurrencyExists(currencyId, cancellationToken);
+        
         await context.WithTransactionAsync(async () =>
         {
-            if (addRemoveDict.Count == 0) return;
             prevPurchaseDateTime = DateTime.SpecifyKind(prevPurchaseDateTime, DateTimeKind.Unspecified);
             newPurchaseDateTime = DateTime.SpecifyKind(newPurchaseDateTime, DateTimeKind.Unspecified);
         
-            _ = await context.AspNetUsers.AsNoTracking()
-                .FirstOrDefaultAsync(x => x.Id == userId, cancellationToken) ?? throw new UserNotFoundException(userId);
-        
-            foreach (var item in addRemoveDict) 
+            var articles = await context.EnsureArticlesExistForUpdate(addRemoveDict.Keys, cancellationToken);
+            
+            foreach (var (articleId, ls) in addRemoveDict) 
             {
-                var articleId = item.Key;
-                var ls = item.Value;
-                var article = await context.Articles
-                    .FromSql($"select * from articles where id = {articleId} for update")
-                    .FirstOrDefaultAsync(cancellationToken) ?? throw new ArticleNotFoundException(articleId);
+                var article = articles[articleId];
                 //Количество которое нам надо. Положительное значит надо добавить на склад, отрицательное значит вычесть со склада.
                 int neededCount = ls.Sum(x => x.Value); 
                 article.TotalCount += neededCount;
@@ -304,7 +296,7 @@ public class Inventory(DContext context) : IInventory
                                 BuyPrice = price,
                                 CurrencyId = currencyId,
                                 Status = nameof(StorageContentStatus.Ok),
-                                BuyPriceInUsd = PriceGenerator.ConvertToNeededCurrency(price, currencyId, Global.UsdId),
+                                BuyPriceInUsd = CurrencyConverter.ConvertToUsd(price, currencyId),
                                 Count = 0
                             };
                             await context.StorageContents.AddAsync(storageItem, cancellationToken);
@@ -363,55 +355,36 @@ public class Inventory(DContext context) : IInventory
         string userId,
         CancellationToken cancellationToken = default)
     {
+        foreach (var (key, value) in editedFields)
+        {
+            if (value.Count.IsSet && value.Count < 0)
+                throw new StorageContentCountCantBeNegativeException(key);
+
+            if (value.BuyPrice.IsSet && Math.Round(value.BuyPrice, 2) <= 0)
+                throw new StorageContentPriceCannotBeNegativeException(key);
+        }
+        
+        var storageContentIds = editedFields.Keys;
+
+        var currencyIds = new HashSet<int>(); 
+        var storageNames = new HashSet<string>();
+            
+        foreach (var value in editedFields.Values)
+        {
+            if (value.CurrencyId.IsSet) currencyIds.Add(value.CurrencyId);
+            if (value.StorageName.IsSet) storageNames.Add(value.StorageName!);
+        }
+            
+        await context.EnsureCurrenciesExist(currencyIds, cancellationToken);
+        await context.EnsureStoragesExist(storageNames, cancellationToken);
+        
         await context.WithTransactionAsync(async () =>
         {
-            foreach (var (key, value) in editedFields)
-            {
-                if (value.Count.IsSet && value.Count < 0)
-                    throw new StorageContentCountCantBeNegativeException(key);
-
-                if (value.BuyPrice.IsSet && Math.Round(value.BuyPrice, 2) <= 0)
-                    throw new StorageContentPriceCannotBeNegativeException(key);
-            }
-        
-            var storageContentIds = editedFields.Keys;
-
-            var currencyIds = new HashSet<int>(); 
-            var storageNames = new HashSet<string>();
-            
-            foreach (var value in editedFields.Values)
-            {
-                if (value.CurrencyId.IsSet) currencyIds.Add(value.CurrencyId);
-                if (value.StorageName.IsSet) storageNames.Add(value.StorageName!);
-            }
-            var currencies = await context.Currencies
-                .AsNoTracking()
-                .Where(x => currencyIds.Contains(x.Id))
-                .Select(x => x.Id)
-                .ToListAsync(cancellationToken);
-            
-            var missedCurrencies = currencyIds.Except(currencies).ToList();
-            if (missedCurrencies.Count > 0) throw new CurrencyNotFoundException(missedCurrencies);
-            
-            var storages = await context.Storages
-                .AsNoTracking()
-                .Where(x => storageNames.Contains(x.Name))
-                .Select(x => x.Name)
-                .ToListAsync(cancellationToken);
-            var missedStorages = storageNames.Except(storages).ToList();
-            if (missedStorages.Count > 0) throw new StorageNotFoundException(missedStorages);
-            
-            var storageContents = await context.StorageContents
-                .FromSql($"Select * from storage_content where id = Any({storageContentIds.ToArray()}) for update")
-                .ToDictionaryAsync(x => x.Id, cancellationToken);
-
-            var missingIds = storageContentIds.Except(storageContents.Keys).ToList();
-            if (missingIds.Count != 0) throw new StorageContentNotFoundException(missingIds);
+            var storageContents = 
+                await context.EnsureStorageContentsExistForUpdate(storageContentIds, cancellationToken);
 
             var articleIds = storageContents.Values.Select(x => x.ArticleId);
-            var articles = await context.Articles
-                .FromSql($"Select * from articles where id = ANY({articleIds.ToArray()}) for update")
-                .ToDictionaryAsync(x => x.Id, cancellationToken);
+            var articles = await context.EnsureArticlesExistForUpdate(articleIds, cancellationToken);
             
             foreach (var item in editedFields)
             {
@@ -430,7 +403,7 @@ public class Inventory(DContext context) : IInventory
                 
                 newVersion.Adapt(content);
                 if (newVersion.BuyPrice.IsSet)
-                    content.BuyPriceInUsd = PriceGenerator.ConvertToUsd(content.BuyPrice, content.CurrencyId);
+                    content.BuyPriceInUsd = CurrencyConverter.ConvertToUsd(content.BuyPrice, content.CurrencyId);
 
             }
             

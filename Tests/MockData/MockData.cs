@@ -2,6 +2,7 @@ using System.Drawing;
 using Bogus;
 using MonoliteUnicorn.Dtos.Amw.Articles;
 using MonoliteUnicorn.Dtos.Amw.Producers;
+using MonoliteUnicorn.Dtos.Amw.Storage;
 using MonoliteUnicorn.PostGres.Main;
 
 namespace Tests.MockData;
@@ -61,6 +62,43 @@ public static class MockData
             .RuleFor(x => x.EmailConfirmed, f => f.Random.Bool())
             .RuleFor(x => x.LockoutEnabled, f => f.Random.Bool())
             .RuleFor(x => x.TwoFactorEnabled, f => f.Random.Bool());
+        return f.Generate(count);
+    }
+
+    public static List<Storage> CreateNewStorage(int count)
+    {
+        var f = new Faker<Storage>(Locale)
+            .RuleFor(x => x.Location, f => Random.Shared.Next(1, 2) == 1 ? f.Address.FullAddress() : null)
+            .RuleFor(x => x.Description, f => Random.Shared.Next(1, 2) == 1 ? f.Commerce.ProductDescription() : null)
+            .RuleFor(x => x.Name, f => f.Company.CompanyName());
+        return f.Generate(count);
+    }
+
+    public static List<StorageContent> CreateStorageContent(IEnumerable<int> availableArticlesIds,
+        IEnumerable<string> availableStorages, IEnumerable<int> availableCurrencyIds, int count)
+    {
+        var articleIds = availableArticlesIds.Distinct().ToList();
+        var storages = availableStorages.Distinct().ToList();
+        var currencyIds = availableCurrencyIds.Distinct().ToList();
+        var f = new Faker<StorageContent>(Locale)
+            .RuleFor(x => x.ArticleId, f => f.PickRandom(articleIds))
+            .RuleFor(x => x.StorageName, f => f.PickRandom(storages))
+            .RuleFor(x => x.BuyPrice, f => f.Random.Decimal(0.01m, 2000000))
+            .RuleFor(x => x.Count, f => f.Random.Int(1,1200))
+            .RuleFor(x => x.CurrencyId, f => f.PickRandom(currencyIds));
+        return f.Generate(count);
+    }
+    
+    public static List<NewStorageContentDto> CreateNewStorageContentDto(IEnumerable<int> availableArticlesIds, 
+        IEnumerable<int> availableCurrencyIds, int count)
+    {
+        var articleIds = availableArticlesIds.Distinct().ToList();
+        var currencyIds = availableCurrencyIds.Distinct().ToList();
+        var f = new Faker<NewStorageContentDto>(Locale)
+            .RuleFor(x => x.ArticleId, f => f.PickRandom(articleIds))
+            .RuleFor(x => x.BuyPrice, f => f.Random.Decimal(0.01m, 2000000))
+            .RuleFor(x => x.Count, f => f.Random.Int(1,1200))
+            .RuleFor(x => x.CurrencyId, f => f.PickRandom(currencyIds));
         return f.Generate(count);
     }
 }

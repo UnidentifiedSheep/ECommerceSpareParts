@@ -41,7 +41,7 @@ public class GetSaleChartHandler(DContext context) : IQueryHandler<GetSaleChartQ
             
             foreach (var sale in group)
             {
-                var usdValue = PriceGenerator.ConvertToNeededCurrency(sale.TotalSum, sale.Sale.CurrencyId, Global.UsdId);
+                var usdValue = CurrencyConverter.ConvertTo(sale.TotalSum, sale.Sale.CurrencyId, Global.UsdId);
                 totalUsd += usdValue;
                 minUsd = Math.Min(minUsd, usdValue);
                 maxUsd = Math.Max(maxUsd, usdValue);
@@ -61,10 +61,10 @@ public class GetSaleChartHandler(DContext context) : IQueryHandler<GetSaleChartQ
             if (targetCurrency == null) continue;
             var currencyModel = new ChartDto
             {
-                TotalSum = Math.Round(PriceGenerator.ConvertToNeededCurrency(usdModel.TotalSum ?? 0, Global.UsdId, targetCurrency.Id), 2),
-                Average = Math.Round(PriceGenerator.ConvertToNeededCurrency(usdModel.Average ?? 0, Global.UsdId, targetCurrency.Id), 2),
-                Minimum = Math.Round(PriceGenerator.ConvertToNeededCurrency(usdModel.Minimum ?? 0, Global.UsdId, targetCurrency.Id), 2),
-                Maximum = Math.Round(PriceGenerator.ConvertToNeededCurrency(usdModel.Maximum ?? 0, Global.UsdId, targetCurrency.Id), 2),
+                TotalSum = Math.Round(CurrencyConverter.ConvertTo(usdModel.TotalSum ?? 0, Global.UsdId, targetCurrency.Id), 2),
+                Average = Math.Round(CurrencyConverter.ConvertTo(usdModel.Average ?? 0, Global.UsdId, targetCurrency.Id), 2),
+                Minimum = Math.Round(CurrencyConverter.ConvertTo(usdModel.Minimum ?? 0, Global.UsdId, targetCurrency.Id), 2),
+                Maximum = Math.Round(CurrencyConverter.ConvertTo(usdModel.Maximum ?? 0, Global.UsdId, targetCurrency.Id), 2),
                 CurrencyId = targetCurrency.Id,
             };
             result[group.Key].Add(currencyModel);

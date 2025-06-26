@@ -1,3 +1,4 @@
+using Core.Redis;
 using FluentValidation;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
@@ -8,7 +9,7 @@ using MonoliteUnicorn.PostGres.Main;
 using Tests.MockData;
 using Tests.testContainers.Combined;
 
-namespace Tests.Balances;
+namespace Tests.HandlersTests.Balances;
 
 [Collection("Combined collection")]
 public class ChangeDiscountForUserTests : IAsyncLifetime
@@ -68,6 +69,9 @@ public class ChangeDiscountForUserTests : IAsyncLifetime
             .AsNoTracking()
             .FirstOrDefaultAsync(x => x.UserId == _mockUser.Id);
         Assert.NotNull(userDiscount);
-        Assert.Equal(userDiscount.Discount, 20);
+        Assert.Equal(20, userDiscount.Discount);
+        var redis = Redis.GetRedis();
+        var redisValue = redis.StringGet($"userDiscount:{_mockUser.Id}");
+        Assert.Equal(20, redisValue);
     }
 }

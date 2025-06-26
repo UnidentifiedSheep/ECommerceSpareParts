@@ -2,7 +2,7 @@
 
 namespace MonoliteUnicorn.Exceptions.Users
 {
-	internal class UserNotFoundException : NotFoundException
+	public class UserNotFoundException : NotFoundException
 	{
 		public UserNotFoundException() : base("User not found")
 		{

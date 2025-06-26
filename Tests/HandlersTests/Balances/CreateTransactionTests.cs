@@ -7,9 +7,8 @@ using MonoliteUnicorn.EndPoints.Balances.CreateTransaction;
 using MonoliteUnicorn.PostGres.Main;
 using Tests.MockData;
 using Tests.testContainers.Combined;
-using Tests.testContainers.Pg;
 
-namespace Tests.Balances;
+namespace Tests.HandlersTests.Balances;
 
 [Collection("Combined collection")]
 public class CreateTransactionTests : IAsyncLifetime

@@ -1,5 +1,6 @@
 using Microsoft.EntityFrameworkCore;
 using MonoliteUnicorn.PostGres.Main;
+using MonoliteUnicorn.Services.Prices.PriceGenerator;
 
 namespace Tests.MockData;
 
@@ -55,17 +56,39 @@ public static class MockDContext
         return user;
     }
 
+    public static async Task<Storage> AddMockStorage(this DContext context)
+    {
+        var storage = MockData.CreateNewStorage(1)[0];
+        await context.Storages.AddAsync(storage);
+        await context.SaveChangesAsync();
+        return storage;
+    }
+
+    public static async Task<IEnumerable<Storage>> AddMockStorages(this DContext context, int count)
+    {
+        var storages = MockData.CreateNewStorage(count);
+        await context.Storages.AddRangeAsync(storages);
+        await context.SaveChangesAsync();
+        return storages;
+    }
+
     public static async Task<Currency> AddMockCurrency(this DContext context)
     {
         var currency = new Currency
         {
-            Code = "USD",
-            Name = "Доллар",
-            CurrencySign = "$",
-            ShortName = "Дол."
+            Code = "РУБ",
+            Name = "Рубль",
+            CurrencySign = "Р",
+            ShortName = "Руб."
         };
         await context.Currencies.AddAsync(currency);
         await context.SaveChangesAsync();
+        var dict = new Dictionary<int, decimal>
+        {
+            { currency.Id, 12.32m },
+            { 3, 1m }
+        };
+        CurrencyConverter.LoadRates(dict);
         return currency;
     }
 
