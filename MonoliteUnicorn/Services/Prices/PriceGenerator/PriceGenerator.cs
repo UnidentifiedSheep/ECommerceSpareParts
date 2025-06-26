@@ -6,51 +6,11 @@ namespace MonoliteUnicorn.Services.Prices.PriceGenerator;
 public static class PriceGenerator
 {
     public static readonly Dictionary<int, AdaptiveIntervalMap<MarkupModel>> MarkUps = new();
-    public static readonly Dictionary<int, decimal> ToUsd = new();
     public static int DefaultMarkUpCurrencyId { get; private set; }
-    public static double DefaultMarkUp { get; private set; } = 20;
+    private static double DefaultMarkUp { get; set; } = 20;
     public static double MinimalMarkUp { get; private set; } = 6;
 
-    private static double RoundToNearestUp(this double value) => ((int)(value * 100 + 0.5)) / 100.0;
-
-    /// <summary>
-    /// Конвертация из выбранной валюты в нужную.
-    /// </summary>
-    /// <param name="value">Число которое надо конвертировать.</param>
-    /// <param name="from">Id валюты из которой нужно конвертировать.</param>
-    /// <param name="to">Id валюты в которую нужно конвертировать.</param>
-    /// <returns></returns>
-    public static double ConvertToNeededCurrency(double value, int from, int to)
-    {
-        if (from == to) return value;
-        var valueInUsd = value / (double)ToUsd[from];
-        var converted = valueInUsd * (double)ToUsd[to];
-        return converted;
-    }
-    
-    public static double ConvertToUsd(double value, int from)
-    {
-        if (from == Global.UsdId) return value;
-        var valueInUsd = value / (double)ToUsd[from];
-        var converted = valueInUsd * (double)ToUsd[Global.UsdId];
-        return converted;
-    }
-    
-    public static decimal ConvertToNeededCurrency(decimal value, int from, int to)
-    {
-        if (from == to) return value;
-        var valueInUsd = value / ToUsd[from];
-        var converted = valueInUsd * ToUsd[to];
-        return converted;
-    }
-    
-    public static decimal ConvertToUsd(decimal value, int from)
-    {
-        if (from == Global.UsdId) return value;
-        var valueInUsd = value / ToUsd[from];
-        var converted = valueInUsd * ToUsd[Global.UsdId];
-        return converted;
-    }
+    private static double RoundToNearestUp(this double value) => (int)(value * 100 + 0.5) / 100.0;
     
     public static double GetSellPriceWithMinimalMarkUp(double buyPrice)
     {
@@ -89,7 +49,7 @@ public static class PriceGenerator
             var value = price;
             if (res.ContainsKey(value)) continue;
             if (!foundMap)
-                value = ConvertToNeededCurrency(value, currencyId, DefaultMarkUpCurrencyId);
+                value = CurrencyConverter.ConvertTo(value, currencyId, DefaultMarkUpCurrencyId);
             var markup = GetMarkup(value, map!);
             var sellPrice = GetSellPrice(value, discount, markup);
             res.Add(value, sellPrice);
@@ -115,7 +75,7 @@ public static class PriceGenerator
         if (!foundMap)
         {
             map = MarkUps[DefaultMarkUpCurrencyId];
-            value = ConvertToNeededCurrency(value, currencyId, DefaultMarkUpCurrencyId);
+            value = CurrencyConverter.ConvertTo(value, currencyId, DefaultMarkUpCurrencyId);
         }
 
         var markup = map!.GetInterval(value);

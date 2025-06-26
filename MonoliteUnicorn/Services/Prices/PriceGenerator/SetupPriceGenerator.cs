@@ -34,9 +34,8 @@ public static class SetupPriceGenerator
     private static async Task SetToUsdAsync(CancellationToken cancellationToken = default)
     {
         var toUsdDict = await _context.CurrencyToUsds.AsNoTracking()
-            .ToDictionaryAsync(x => x.CurrencyId, cancellationToken);
-        foreach (var value in toUsdDict)
-            PriceGenerator.ToUsd.Add(value.Key, value.Value.ToUsd);
+            .ToDictionaryAsync(x => x.CurrencyId, x => x.ToUsd, cancellationToken);
+        CurrencyConverter.LoadRates(toUsdDict);
     }
 
     private static async Task SetMarkupsAsync(CancellationToken cancellationToken = default)
@@ -54,7 +53,7 @@ public static class SetupPriceGenerator
             .OrderBy(x => x.Id)
             .LastOrDefaultAsync(cancellationToken);
         if (generatedMarkup == null) return;
-        foreach (var toUsd in PriceGenerator.ToUsd)
+        foreach (var toUsd in CurrencyConverter.ToUsd)
         {
             var newInterval = new AdaptiveIntervalMap<MarkupModel>(intersection: Intersection.CanIntersect);
             double lastRangeEnd = double.NaN;
@@ -63,7 +62,7 @@ public static class SetupPriceGenerator
                 var rangeStart = double.IsNaN(lastRangeEnd)
                     ? Math.Round(Convert.ToDouble(markup.RangeStart), 2)
                     : Math.Round(lastRangeEnd + 0.01, 2);
-                var exchangedValue = markup.RangeEnd / PriceGenerator.ToUsd[generatedMarkup.CurrencyId] * toUsd.Value;
+                var exchangedValue = markup.RangeEnd / CurrencyConverter.ToUsd[generatedMarkup.CurrencyId] * toUsd.Value;
                 var rangeEnd = (double)Math.Round(exchangedValue, 2);
                 var markupModel = new MarkupModel(Math.Round(Convert.ToDouble(markup.Markup), 2));
                 newInterval.AddInterval(new Interval<MarkupModel>(rangeStart, rangeEnd, markupModel));
@@ -71,7 +70,6 @@ public static class SetupPriceGenerator
             }
             PriceGenerator.MarkUps.Add(toUsd.Key, newInterval);
         }
-        GC.Collect();
     }
 
     private static async Task SetUserMarkupsAsync(CancellationToken cancellationToken = default)
