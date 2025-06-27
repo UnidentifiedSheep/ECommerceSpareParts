@@ -15,7 +15,6 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.Routing;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
@@ -30,6 +29,8 @@ using MonoliteUnicorn.Services.Prices.Price;
 using MonoliteUnicorn.Services.Prices.PriceGenerator;
 using MonoliteUnicorn.Services.Purchase;
 using MonoliteUnicorn.Services.Sale;
+using MonoliteUnicorn.Services.SearchLog;
+using Prometheus;
 using Purchase = MonoliteUnicorn.Services.Purchase.Purchase;
 using Sale = MonoliteUnicorn.Services.Sale.Sale;
 
@@ -74,7 +75,7 @@ builder.Services.AddSwaggerGen(c =>
                     Id = "Bearer"
                 }
             },
-            Array.Empty<string>()
+            []
         }
     });
 });
@@ -166,6 +167,11 @@ builder.Services.AddTransient<ITimeWebMail>(sp => new TimeWebMail(sp.GetService<
 builder.Services.Configure<MailOptions>(builder.Configuration.GetSection("Mail"));
 builder.Services.AddTransient<IMail, Mail>();
 builder.Services.AddTransient<IJwtGenerator, JwtGenerator>();
+builder.Services.AddSingleton<ISearchLogger, SearchLogger>();
+
+builder.Services.AddHostedService<SearchLogBackgroundWorker>();
+
+builder.Services.UseHttpClientMetrics(); 
 
 var app = builder.Build();
 
@@ -188,6 +194,7 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
+
 
 RecurringJob.AddOrUpdate<UpdateCurrencyRate>("UpdateCurrencyTask", 
     x => x.Run(), Cron.Daily);

@@ -1,4 +1,5 @@
-﻿using Carter;
+﻿using System.Security.Claims;
+using Carter;
 using Core.StaticFunctions;
 using Mapster;
 using MediatR;
@@ -11,18 +12,21 @@ public class GetArticleViaExecNumberEndPoint : ICarterModule
 {
     public void AddRoutes(IEndpointRouteBuilder app)
     {
-        app.MapGet("/amw/articles/search/exec/{article}", async (ISender sender, HttpContext context, string article, int viewCount, int page, string? sortBy, CancellationToken token) => 
+        app.MapGet("/articles/search/exec/{article}", async (ISender sender, HttpContext context, ClaimsPrincipal user, string article, int viewCount, int page, string? sortBy, CancellationToken token) => 
         {
+            var userId = user.FindFirstValue(ClaimTypes.NameIdentifier);
+            
             var producerIds = context.Request.Query["producerId"]
                 .Select(x => int.TryParse(x, out var id) ? id : (int?)null)
                 .Where(x => x.HasValue)
                 .Select(x => x!.Value)
                 .ToList();
-            var result = await sender.Send(new GetArticleViaExecNumberQuery(article, viewCount, page, sortBy, producerIds), token);
+            
+            var query = new GetArticleViaExecNumberQuery(article, viewCount, page, sortBy, producerIds, userId);
+            var result = await sender.Send(query, token);
             var response = result.Adapt<GetArticlesViaExecResponse>();
             return Results.Ok(response); 
-        }).RequireAuthorization("AMW")
-            .WithGroup("Articles")
+        }).WithGroup("Articles")
             .WithDescription("Поиск артикула по точному номеру")
             .Produces<GetArticlesViaExecResponse>(StatusCodes.Status200OK)
             .ProducesProblem(StatusCodes.Status400BadRequest)

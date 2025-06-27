@@ -1,4 +1,5 @@
-﻿using Carter;
+﻿using System.Security.Claims;
+using Carter;
 using Core.StaticFunctions;
 using Mapster;
 using MediatR;
@@ -11,19 +12,20 @@ public class GetArticleViaStartNumberEndPoint : ICarterModule
 {
     public void AddRoutes(IEndpointRouteBuilder app)
     {
-        app.MapGet("/amw/articles/search/start", async (ISender sender, HttpContext context, string searchTerm, int viewCount, int page, string? sortBy, CancellationToken token) =>
+        app.MapGet("/articles/search/start", async (ISender sender, HttpContext context, ClaimsPrincipal user, string searchTerm, int viewCount, int page, string? sortBy, CancellationToken token) =>
         {
+            var userId = user.FindFirstValue(ClaimTypes.NameIdentifier);
             var producerIds = context.Request.Query["producerId"]
                 .Select(x => int.TryParse(x, out var id) ? id : (int?)null)
                 .Where(x => x.HasValue)
                 .Select(x => x!.Value)
                 .ToList();
-            var command = new GetArticleViaStartNumberQuery(searchTerm, viewCount, page, sortBy, producerIds);
+            
+            var command = new GetArticleViaStartNumberQuery(searchTerm, viewCount, page, sortBy, producerIds, userId);
             var result = await sender.Send(command, token);
             var response = result.Adapt<GetArticleViaStartNumberResponse>();
             return Results.Ok(response);    
-        }).RequireAuthorization("AMW")
-            .WithGroup("Articles")
+        }).WithGroup("Articles")
             .WithDescription("Поиск артикула с начала номера")
             .Produces<GetArticleViaStartNumberResponse>(StatusCodes.Status200OK)
             .ProducesProblem(StatusCodes.Status400BadRequest)

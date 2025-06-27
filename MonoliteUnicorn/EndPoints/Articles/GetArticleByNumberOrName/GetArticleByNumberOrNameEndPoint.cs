@@ -13,15 +13,16 @@ public class GetArticleByNumberOrNameEndPoint : ICarterModule
 {
     public void AddRoutes(IEndpointRouteBuilder app)
     {
-        app.MapGet("/articles/search", 
-            async (ISender sender, string searchTerm, int? page, int? viewCount, string? sortBy, HttpContext context, CancellationToken token) =>
+        app.MapGet("/articles/search/full", 
+            async (ISender sender, string searchTerm, int? page, int? viewCount, string? sortBy, ClaimsPrincipal user, HttpContext context, CancellationToken token) =>
         {
+            var userId = user.FindFirstValue(ClaimTypes.NameIdentifier);
             var producerIds = context.Request.Query["producerId"]
                 .Select(x => int.TryParse(x, out var id) ? id : (int?)null)
                 .Where(x => x.HasValue)
                 .Select(x => x!.Value)
                 .ToList();
-            var query = new GetArticleByNumberOrNameQuery(searchTerm, page ?? 0, viewCount ?? 24, sortBy, producerIds);
+            var query = new GetArticleByNumberOrNameQuery(searchTerm, page ?? 0, viewCount ?? 24, sortBy, producerIds, userId);
             var result = await sender.Send(query, token);
             var response = result.Adapt<GetArticleByNumberOrNameResponse>();
             return Results.Ok(response);

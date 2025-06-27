@@ -5,13 +5,15 @@ using Mapster;
 using Microsoft.EntityFrameworkCore;
 using MonoliteUnicorn.Dtos.Amw.Articles;
 using MonoliteUnicorn.Exceptions.Articles;
+using MonoliteUnicorn.Models;
 using MonoliteUnicorn.PostGres.Main;
 using MonoliteUnicorn.Services.Prices.Price;
+using MonoliteUnicorn.Services.SearchLog;
 
 namespace MonoliteUnicorn.EndPoints.Articles.GetArticleCrosses;
 
 
-public record GetArticleCrossesAmwQuery(int ArticleId, int ViewCount, int Page, string? SortBy, int? CurrencyId) : IQuery<GetArticleCrossesAmwResult>;
+public record GetArticleCrossesAmwQuery(int ArticleId, int ViewCount, int Page, string? SortBy, int? CurrencyId, string UserId) : IQuery<GetArticleCrossesAmwResult>;
 public record GetArticleCrossesAmwResult(IEnumerable<ArticleFullDto> Crosses, ArticleFullDto RequestedArticle);
 
 public class GetArticleCrossesAmwValidation : AbstractValidator<GetArticleCrossesAmwQuery>
@@ -28,10 +30,13 @@ public class GetArticleCrossesAmwValidation : AbstractValidator<GetArticleCrosse
     }
 }
 
-public class GetArticleCrossesAmwHandler(DContext context, IPrice priceService) : IQueryHandler<GetArticleCrossesAmwQuery, GetArticleCrossesAmwResult>
+public class GetArticleCrossesAmwHandler(DContext context, IPrice priceService, ISearchLogger searchLogger) : IQueryHandler<GetArticleCrossesAmwQuery, GetArticleCrossesAmwResult>
 {
     public async Task<GetArticleCrossesAmwResult> Handle(GetArticleCrossesAmwQuery request, CancellationToken cancellationToken)
     {
+        var searchModel = new SearchLogModel(request.UserId, "ArticleCrosses", request);
+        searchLogger.Enqueue(searchModel);
+        
         var requestedArticle = await context.Articles.AsNoTracking()
             .Include(a => a.Producer)
             .Include(x => x.ArticleImages)

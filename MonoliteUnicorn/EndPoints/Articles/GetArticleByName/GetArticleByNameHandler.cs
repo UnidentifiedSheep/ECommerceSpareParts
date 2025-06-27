@@ -1,4 +1,5 @@
-﻿using Core.Extensions;
+using System.Diagnostics;
+using Core.Extensions;
 using Core.Interface;
 using FluentValidation;
 using Mapster;
@@ -8,14 +9,14 @@ using MonoliteUnicorn.Models;
 using MonoliteUnicorn.PostGres.Main;
 using MonoliteUnicorn.Services.SearchLog;
 
-namespace MonoliteUnicorn.EndPoints.Articles.GetArticleByNumberOrName;
+namespace MonoliteUnicorn.EndPoints.Articles.GetArticleByName;
 
-public record GetArticleByNumberOrNameQuery(string SearchTerm, int Page, int ViewCount, string? SortBy, IEnumerable<int> ProducerIds, string? UserId) : IQuery<GetArticleByNumberOrNameResult>;
-public record GetArticleByNumberOrNameResult(IEnumerable<ArticleDto> Articles);
+public record GetArticleByNameQuery(string SearchTerm, int Page, int ViewCount, string? SortBy, IEnumerable<int> ProducerIds, string? UserId) : IQuery<GetArticleByNameResult>;
+public record GetArticleByNameResult(IEnumerable<ArticleDto> Articles);
 
-public class GetArticleByNumberOrNameValidation : AbstractValidator<GetArticleByNumberOrNameQuery>
+public class GetArticleByNameValidation : AbstractValidator<GetArticleByNameQuery>
 {
-    public GetArticleByNumberOrNameValidation()
+    public GetArticleByNameValidation()
     {
         RuleFor(x => x.SearchTerm)
             .NotEmpty()
@@ -31,13 +32,15 @@ public class GetArticleByNumberOrNameValidation : AbstractValidator<GetArticleBy
             .WithMessage("Количество элементов должно быть от 1 до 100");
     }
 }
-public class GetArticleByNumberOrNameHandler(DContext context, ISearchLogger searchLogger) : IQueryHandler<GetArticleByNumberOrNameQuery, GetArticleByNumberOrNameResult>
+
+public class GetArticleByNameHandler(DContext context, ISearchLogger searchLogger) : IQueryHandler<GetArticleByNameQuery, GetArticleByNameResult>
 {
-    public async Task<GetArticleByNumberOrNameResult> Handle(GetArticleByNumberOrNameQuery request, CancellationToken cancellationToken)
+    public async Task<GetArticleByNameResult> Handle(GetArticleByNameQuery request, CancellationToken cancellationToken)
     {
+        var timer = Stopwatch.StartNew();
         if (!string.IsNullOrWhiteSpace(request.UserId))
         {
-            var searchModel = new SearchLogModel(request.UserId, "Articles_FullSearch", request);
+            var searchModel = new SearchLogModel(request.UserId, "Articles_ByName", request);
             searchLogger.Enqueue(searchModel);
         }
         
@@ -47,8 +50,7 @@ public class GetArticleByNumberOrNameHandler(DContext context, ISearchLogger sea
             .AsNoTracking()
             .Where(x =>
                 EF.Functions.ToTsVector("russian", x.ArticleName)
-                    .Matches(EF.Functions.PlainToTsQuery("russian", request.SearchTerm)) ||
-                EF.Functions.ILike(x.NormalizedArticleNumber, $"%{normalizedSearchTerm}%"))
+                    .Matches(EF.Functions.PlainToTsQuery("russian", request.SearchTerm)))
             .Select(x => new
             {
                 Article = x,
@@ -86,6 +88,9 @@ public class GetArticleByNumberOrNameHandler(DContext context, ISearchLogger sea
             .Include(x => x.Producer)
             .ToListAsync(cancellationToken);
         
-        return new GetArticleByNumberOrNameResult(articles.Adapt<List<ArticleDto>>());
+        var totalElapsed = timer.ElapsedMilliseconds;
+        Console.WriteLine($"Total elapsed time: {totalElapsed}ms");
+        timer.Reset();
+        return new GetArticleByNameResult(articles.Adapt<List<ArticleDto>>());
     }
 }

@@ -4,11 +4,13 @@ using FluentValidation;
 using Mapster;
 using Microsoft.EntityFrameworkCore;
 using MonoliteUnicorn.Dtos.Amw.Articles;
+using MonoliteUnicorn.Models;
 using MonoliteUnicorn.PostGres.Main;
+using MonoliteUnicorn.Services.SearchLog;
 
 namespace MonoliteUnicorn.EndPoints.Articles.GetArticleViaExecNumber;
 
-public record GetArticleViaExecNumberQuery(string ArticleNumber, int ViewCount, int Page, string? SortBy, IEnumerable<int> ProducerIds) : IQuery<GetArticleViaExecNumberResult>;
+public record GetArticleViaExecNumberQuery(string ArticleNumber, int ViewCount, int Page, string? SortBy, IEnumerable<int> ProducerIds, string? UserId) : IQuery<GetArticleViaExecNumberResult>;
 public record GetArticleViaExecNumberResult(IEnumerable<ArticleDto> Articles);
 
 public class GetArticleViaExecNumberValidation : AbstractValidator<GetArticleViaExecNumberQuery>
@@ -29,10 +31,16 @@ public class GetArticleViaExecNumberValidation : AbstractValidator<GetArticleVia
             .WithMessage("Количество элементов должно быть от 1 до 100");
     }
 }
-public class GetArticleViaExecNumberHandler(DContext context) : IQueryHandler<GetArticleViaExecNumberQuery, GetArticleViaExecNumberResult>    
+public class GetArticleViaExecNumberHandler(DContext context, ISearchLogger searchLogger) : IQueryHandler<GetArticleViaExecNumberQuery, GetArticleViaExecNumberResult>    
 {
     public async Task<GetArticleViaExecNumberResult> Handle(GetArticleViaExecNumberQuery request, CancellationToken cancellationToken)
     {
+        if (!string.IsNullOrWhiteSpace(request.UserId))
+        {
+            var searchModel = new SearchLogModel(request.UserId, "Articles_ExecNumber", request);
+            searchLogger.Enqueue(searchModel);
+        }
+        
         var normalizerArticle = request.ArticleNumber.ToNormalizedArticleNumber();
         
         var queryWithRank = context.Articles

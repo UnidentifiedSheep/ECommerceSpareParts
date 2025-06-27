@@ -5,8 +5,10 @@ using Mapster;
 using Microsoft.EntityFrameworkCore;
 using MonoliteUnicorn.Dtos.Member.Articles;
 using MonoliteUnicorn.Exceptions.Articles;
+using MonoliteUnicorn.Models;
 using MonoliteUnicorn.PostGres.Main;
 using MonoliteUnicorn.Services.Prices.Price;
+using MonoliteUnicorn.Services.SearchLog;
 
 namespace MonoliteUnicorn.EndPoints.Articles.GetArticleCrosses;
 
@@ -27,10 +29,12 @@ public class GetArticleCrossesMemberValidation : AbstractValidator<GetArticleCro
     }
 }
 
-public class GetArticleCrossesMemberHandler(DContext context, IPrice priceService) : IQueryHandler<GetArticleCrossesMemberQuery, GetArticleCrossesMemberResult>
+public class GetArticleCrossesMemberHandler(DContext context, IPrice priceService, ISearchLogger searchLogger) : IQueryHandler<GetArticleCrossesMemberQuery, GetArticleCrossesMemberResult>
 {
     public async Task<GetArticleCrossesMemberResult> Handle(GetArticleCrossesMemberQuery request, CancellationToken cancellationToken)
     {
+        var searchModel = new SearchLogModel(request.UserId, "ArticleCrosses", request);
+        searchLogger.Enqueue(searchModel);
         var requestedArticle = await context.Articles.AsNoTracking()
             .Include(a => a.Producer)
             .Include(x => x.ArticleImages)

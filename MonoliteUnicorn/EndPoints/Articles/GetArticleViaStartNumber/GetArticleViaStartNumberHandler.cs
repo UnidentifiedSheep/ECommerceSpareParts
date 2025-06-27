@@ -4,11 +4,13 @@ using FluentValidation;
 using Mapster;
 using Microsoft.EntityFrameworkCore;
 using MonoliteUnicorn.Dtos.Amw.Articles;
+using MonoliteUnicorn.Models;
 using MonoliteUnicorn.PostGres.Main;
+using MonoliteUnicorn.Services.SearchLog;
 
 namespace MonoliteUnicorn.EndPoints.Articles.GetArticleViaStartNumber;
 
-public partial record GetArticleViaStartNumberQuery(string ArticleNumber, int ViewCount, int Page, string? SortBy, IEnumerable<int> ProducerIds) : IQuery<GetArticleViaStartNumberResult>;
+public partial record GetArticleViaStartNumberQuery(string ArticleNumber, int ViewCount, int Page, string? SortBy, IEnumerable<int> ProducerIds, string? UserId) : IQuery<GetArticleViaStartNumberResult>;
 public record GetArticleViaStartNumberResult(IEnumerable<ArticleDto> Articles);
 public class GetArticleViaExecNumberValidation : AbstractValidator<GetArticleViaStartNumberQuery>
 {
@@ -29,10 +31,16 @@ public class GetArticleViaExecNumberValidation : AbstractValidator<GetArticleVia
     }
 }
 
-public class GetArticleViaStartNumberHandler(DContext context) : IQueryHandler<GetArticleViaStartNumberQuery, GetArticleViaStartNumberResult>
+public class GetArticleViaStartNumberHandler(DContext context, ISearchLogger searchLogger) : IQueryHandler<GetArticleViaStartNumberQuery, GetArticleViaStartNumberResult>
 {
     public async Task<GetArticleViaStartNumberResult> Handle(GetArticleViaStartNumberQuery request, CancellationToken cancellationToken)
     {
+        if (!string.IsNullOrWhiteSpace(request.UserId))
+        {
+            var searchModel = new SearchLogModel(request.UserId, "Articles_ExecNumber", request);
+            searchLogger.Enqueue(searchModel);
+        }
+        
         var normalizerArticle = request.ArticleNumber.ToNormalizedArticleNumber();
         
         var queryWithRank = context.Articles

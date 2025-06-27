@@ -167,6 +167,7 @@ public class Price(DContext context, ILogger<Price> logger) : IPrice
     {
         try
         {
+            
             // TODO: логика запроса к поставщикам
             return;
         }

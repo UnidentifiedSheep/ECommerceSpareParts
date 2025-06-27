@@ -79,6 +79,8 @@ public partial class DContext : DbContext
 
     public virtual DbSet<StorageContent> StorageContents { get; set; }
 
+    public virtual DbSet<StorageContentReservation> StorageContentReservations { get; set; }
+
     public virtual DbSet<StorageMovement> StorageMovements { get; set; }
 
     public virtual DbSet<Transaction> Transactions { get; set; }
@@ -90,6 +92,8 @@ public partial class DContext : DbContext
     public virtual DbSet<UserDiscount> UserDiscounts { get; set; }
 
     public virtual DbSet<UserMail> UserMails { get; set; }
+
+    public virtual DbSet<UserSearchHistory> UserSearchHistories { get; set; }
 
     public virtual DbSet<UserVehicle> UserVehicles { get; set; }
     
@@ -1012,6 +1016,39 @@ public partial class DContext : DbContext
                 .HasConstraintName("storage_content_storages_name_fk");
         });
 
+        modelBuilder.Entity<StorageContentReservation>(entity =>
+        {
+            entity.HasKey(e => new { e.UserId, e.ArticleId }).HasName("storage_content_reservations_pk");
+
+            entity.ToTable("storage_content_reservations");
+
+            entity.HasIndex(e => e.ArticleId, "storage_content_reservations_article_id_index");
+
+            entity.HasIndex(e => e.UserId, "storage_content_reservations_user_id_index");
+
+            entity.Property(e => e.UserId).HasColumnName("user_id");
+            entity.Property(e => e.ArticleId).HasColumnName("article_id");
+            entity.Property(e => e.CreateAt)
+                .HasDefaultValueSql("now()")
+                .HasColumnType("timestamp without time zone")
+                .HasColumnName("create_at");
+            entity.Property(e => e.CurrentCount).HasColumnName("current_count");
+            entity.Property(e => e.InitialCount).HasColumnName("initial_count");
+            entity.Property(e => e.UpdatedAt)
+                .HasColumnType("timestamp without time zone")
+                .HasColumnName("updated_at");
+
+            entity.HasOne(d => d.Article).WithMany(p => p.StorageContentReservations)
+                .HasForeignKey(d => d.ArticleId)
+                .OnDelete(DeleteBehavior.Restrict)
+                .HasConstraintName("storage_content_reservations_articles_id_fk");
+
+            entity.HasOne(d => d.User).WithMany(p => p.StorageContentReservations)
+                .HasForeignKey(d => d.UserId)
+                .OnDelete(DeleteBehavior.Restrict)
+                .HasConstraintName("storage_content_reservations_aspnetusers_id_fk");
+        });
+
         modelBuilder.Entity<StorageMovement>(entity =>
         {
             entity.HasKey(e => e.Id).HasName("storage_movement_pk");
@@ -1281,6 +1318,37 @@ public partial class DContext : DbContext
             entity.HasOne(d => d.User).WithMany(p => p.UserMails)
                 .HasForeignKey(d => d.UserId)
                 .HasConstraintName("user_mails_aspnetusers_id_fk");
+        });
+
+        modelBuilder.Entity<UserSearchHistory>(entity =>
+        {
+            entity.HasKey(e => e.Id).HasName("user_search_history_pk");
+
+            entity.ToTable("user_search_history");
+
+            entity.HasIndex(e => new { e.UserId, e.SearchPlace }, "user_search_history_user_id_search_place_index");
+
+            entity.HasIndex(e => e.SearchDateTime, "user_search_history_search_date_time_index");
+
+            entity.HasIndex(e => e.SearchPlace, "user_search_history_search_place_index");
+
+            entity.HasIndex(e => e.UserId, "user_search_history_user_id_index");
+
+            entity.Property(e => e.Id).HasColumnName("id");
+            entity.Property(e => e.Query)
+                .HasColumnType("jsonb")
+                .HasColumnName("query");
+            entity.Property(e => e.SearchDateTime)
+                .HasDefaultValueSql("now()")
+                .HasColumnType("timestamp without time zone")
+                .HasColumnName("search_date_time");
+            entity.Property(e => e.SearchPlace).HasColumnName("search_place");
+            entity.Property(e => e.UserId).HasColumnName("user_id");
+
+            entity.HasOne(d => d.User).WithMany(p => p.UserSearchHistories)
+                .HasForeignKey(d => d.UserId)
+                .OnDelete(DeleteBehavior.Cascade)
+                .HasConstraintName("user_search_history_aspnetusers_id_fk");
         });
 
         modelBuilder.Entity<UserVehicle>(entity =>

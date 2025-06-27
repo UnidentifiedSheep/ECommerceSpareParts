@@ -10,6 +10,7 @@ using MonoliteUnicorn.Dtos.Amw.Storage;
 using MonoliteUnicorn.Dtos.Amw.Users;
 using MonoliteUnicorn.Dtos.Member.Vehicles;
 using MonoliteUnicorn.Dtos.Producers;
+using MonoliteUnicorn.Models;
 using MonoliteUnicorn.PostGres.Main;
 using AmwArticleDto = MonoliteUnicorn.Dtos.Amw.Articles.ArticleFullDto;
 using MemberArticleDto = MonoliteUnicorn.Dtos.Member.Articles.ArticleFullDto;
@@ -234,5 +235,13 @@ public static class MapsterConfig
             .Map(dest => dest.BuyPrice, src => src.BuyPrice)
             .Map(dest => dest.PurchaseDatetime, src => src.PurchaseDatetime)
             .Map(dest => dest.Count, src => src.Count);
+        
+        //User Search History
+
+        TypeAdapterConfig<SearchLogModel, UserSearchHistory>.NewConfig()
+            .Map(dest => dest.UserId, src => src.UserId)
+            .Map(dest => dest.Query, src => src.Query.ToString(Newtonsoft.Json.Formatting.None))
+            .Map(dest => dest.SearchDateTime, src => src.SearchDateTime)
+            .Map(dest => dest.SearchPlace, src => src.SearchPlace);
     }
 }

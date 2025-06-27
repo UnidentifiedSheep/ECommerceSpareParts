@@ -45,6 +45,8 @@ public partial class Article
 
     public virtual ICollection<SaleContent> SaleContents { get; set; } = new List<SaleContent>();
 
+    public virtual ICollection<StorageContentReservation> StorageContentReservations { get; set; } = new List<StorageContentReservation>();
+
     public virtual ICollection<StorageContent> StorageContents { get; set; } = new List<StorageContent>();
 
     public virtual ICollection<StorageMovement> StorageMovements { get; set; } = new List<StorageMovement>();

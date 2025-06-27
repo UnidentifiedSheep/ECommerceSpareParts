@@ -65,6 +65,8 @@ public partial class AspNetUser
 
     public virtual ICollection<Sale> SaleUpdatedUsers { get; set; } = new List<Sale>();
 
+    public virtual ICollection<StorageContentReservation> StorageContentReservations { get; set; } = new List<StorageContentReservation>();
+
     public virtual ICollection<StorageMovement> StorageMovements { get; set; } = new List<StorageMovement>();
 
     public virtual ICollection<Transaction> TransactionDeletedByNavigations { get; set; } = new List<Transaction>();
@@ -84,6 +86,8 @@ public partial class AspNetUser
     public virtual UserDiscount? UserDiscount { get; set; }
 
     public virtual ICollection<UserMail> UserMails { get; set; } = new List<UserMail>();
+
+    public virtual ICollection<UserSearchHistory> UserSearchHistories { get; set; } = new List<UserSearchHistory>();
 
     public virtual ICollection<UserVehicle> UserVehicles { get; set; } = new List<UserVehicle>();
 

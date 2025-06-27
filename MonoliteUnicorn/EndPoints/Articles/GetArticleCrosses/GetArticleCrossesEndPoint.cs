@@ -19,19 +19,24 @@ public class GetArticleCrossesEndPoint : ICarterModule
         app.MapGet("/articles/crosses/{articleId}", async (ISender sender, ClaimsPrincipal user, int articleId, int? currencyId, int viewCount, int page, string? sortBy, CancellationToken token) =>
         {
             var roles = user.FindAll(ClaimTypes.Role).Select(r => r.Value).ToList();
-            var userId = user.FindFirstValue(ClaimTypes.NameIdentifier) ?? "";
+            var userId = user.FindFirstValue(ClaimTypes.NameIdentifier);
+            if (userId == null) return Results.Unauthorized();
+            
             if (roles.IsAnyMatchInvariant("admin", "moderator", "worker")) 
-                return await GetAmw(sender, articleId, viewCount, page, sortBy, currencyId, token);
-            return await GetMember(sender, articleId, viewCount, page, sortBy, currencyId, userId, token);
+                return await GetAmw(sender, articleId, viewCount, page, sortBy, currencyId, userId, token);
+            if (roles.IsAnyMatchInvariant("member"))
+                return await GetMember(sender, articleId, viewCount, page, sortBy, currencyId, userId, token);
+            
+            return Results.Unauthorized();
         })
         .WithGroup("Articles")
         .WithDescription("Получение кросс номеров по id артикула")
         .WithDisplayName("Поиск по кросс номерам");
     }
 
-    private async Task<IResult> GetAmw(ISender sender, int articleId, int viewCount, int page, string? sortBy, int? currencyId, CancellationToken token)
+    private async Task<IResult> GetAmw(ISender sender, int articleId, int viewCount, int page, string? sortBy, int? currencyId, string userId, CancellationToken token)
     {
-        var query = new GetArticleCrossesAmwQuery(articleId, viewCount, page, sortBy, currencyId);
+        var query = new GetArticleCrossesAmwQuery(articleId, viewCount, page, sortBy, currencyId, userId);
         var result = await sender.Send(query, token);
         var response = result.Adapt<GetArticleCrossesAmwResponse>();
         return Results.Ok(response);
