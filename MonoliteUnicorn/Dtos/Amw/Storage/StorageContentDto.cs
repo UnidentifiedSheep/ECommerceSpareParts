@@ -8,6 +8,5 @@ public class StorageContentDto
     public int Count { get; set; }
     public decimal BuyPrice { get; set; }
     public int CurrencyId { get; set; }
-    public string Status { get; set; } = null!;
     public string ConcurrencyCode { get; set; } = null!;
 }

@@ -973,8 +973,6 @@ public partial class DContext : DbContext
 
             entity.HasIndex(e => e.PurchaseDatetime, "storage_content_purchase_datetime_index");
 
-            entity.HasIndex(e => e.Status, "storage_content_status_index");
-
             entity.HasIndex(e => e.StorageName, "storage_content_storage_name_index")
                 .HasMethod("gin")
                 .HasOperators(new[] { "gin_trgm_ops" });
@@ -992,10 +990,6 @@ public partial class DContext : DbContext
             entity.Property(e => e.PurchaseDatetime)
                 .HasColumnType("timestamp without time zone")
                 .HasColumnName("purchase_datetime");
-            entity.Property(e => e.Status)
-                .HasMaxLength(26)
-                .HasDefaultValueSql("'Ok'::character varying")
-                .HasColumnName("status");
             entity.Property(e => e.StorageName)
                 .HasMaxLength(128)
                 .HasColumnName("storage_name");

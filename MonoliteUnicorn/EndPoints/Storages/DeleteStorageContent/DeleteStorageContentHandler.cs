@@ -24,12 +24,10 @@ public class DeleteStorageContentHandler(DContext context, IInventory inventoryS
         
         var currConcurrencyCode = ConcurrencyStatic.GetConcurrencyCode(content.Id, content.ArticleId,
             content.BuyPrice, content.CurrencyId, content.StorageName, 
-            content.BuyPriceInUsd, content.Count, content.PurchaseDatetime, content.Status);
+            content.BuyPriceInUsd, content.Count, content.PurchaseDatetime);
 
         if (currConcurrencyCode != request.ConcurrencyCode)
             throw new ConcurrencyCodeMismatchException(request.ConcurrencyCode, currConcurrencyCode);
-        if (content.Status != nameof(StorageContentStatus.Ok))
-            throw new BadStorageContentStatusException(content.Status);
 
         await inventoryService.DeleteContentFromStorage(content.Id, request.UserId,
             StorageMovementType.StorageContentDeletion, cancellationToken);

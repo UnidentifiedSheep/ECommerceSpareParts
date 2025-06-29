@@ -193,10 +193,9 @@ public static class MapsterConfig
             .Map(dest => dest.BuyPrice, src => src.BuyPrice)
             .Map(dest => dest.CurrencyId, src => src.CurrencyId)
             .Map(dest => dest.StorageName, src => src.StorageName)
-            .Map(dest => dest.Status, src => src.Status)
             .Map(dest => dest.ConcurrencyCode, src => 
                     ConcurrencyStatic.GetConcurrencyCode(src.Id, src.ArticleId, src.BuyPrice, src.CurrencyId, src.StorageName, 
-                        src.BuyPriceInUsd, src.Count, src.PurchaseDatetime, src.Status));
+                        src.BuyPriceInUsd, src.Count, src.PurchaseDatetime));
 
         TypeAdapterConfig<PatchStorageContentDto, StorageContent>.NewConfig()
             .IgnorePatchIfNotSet()

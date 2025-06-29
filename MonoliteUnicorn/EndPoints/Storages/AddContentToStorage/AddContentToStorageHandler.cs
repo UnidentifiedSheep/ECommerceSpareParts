@@ -41,7 +41,7 @@ public class AddContentToStorageHandler(IInventory inventoryService) : ICommandH
         var asTupleList = request.StorageContent
             .Select(x => (x.ArticleId, x.Count, x.BuyPrice, x.CurrencyId));
         await inventoryService.AddContentToStorage(asTupleList, request.StorageName, 
-            request.UserId, StorageContentStatus.Ok, StorageMovementType.StorageContentAddition, cancellationToken);
+            request.UserId, StorageMovementType.StorageContentAddition, cancellationToken);
         return Unit.Value;
     }
 }

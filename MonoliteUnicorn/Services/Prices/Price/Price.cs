@@ -80,7 +80,7 @@ public class Price(DContext context, ILogger<Price> logger) : IPrice
 
     private async Task<List<decimal>> GetHighestBuyPrices(int articleId, CancellationToken cancellationToken)
         => await context.StorageContents.AsNoTracking()
-            .Where(x => x.ArticleId == articleId && x.Count > 0 && x.Status == nameof(StorageContentStatus.Ok))
+            .Where(x => x.ArticleId == articleId && x.Count > 0)
             .OrderByDescending(x => x.BuyPriceInUsd)
             .Select(x => x.BuyPriceInUsd)
             .Take(5)

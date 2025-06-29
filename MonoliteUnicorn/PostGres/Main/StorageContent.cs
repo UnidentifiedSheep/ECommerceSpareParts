@@ -16,9 +16,7 @@ public partial class StorageContent
     public decimal BuyPrice { get; set; }
 
     public int CurrencyId { get; set; }
-
-    public string Status { get; set; } = null!;
-
+    
     public decimal BuyPriceInUsd { get; set; }
 
     public DateTime CreatedDatetime { get; set; }

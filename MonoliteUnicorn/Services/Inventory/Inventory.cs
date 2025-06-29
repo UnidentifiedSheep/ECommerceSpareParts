@@ -14,8 +14,8 @@ namespace MonoliteUnicorn.Services.Inventory;
 public class Inventory(DContext context) : IInventory
 {
     public async Task<IEnumerable<StorageContent>> AddContentToStorage(IEnumerable<(int ArticleId, int Count, decimal Price, int currencyId)> content, 
-        string storageName, string userId, StorageContentStatus status, 
-        StorageMovementType movementType, CancellationToken cancellationToken = default)
+        string storageName, string userId, StorageMovementType movementType, 
+        CancellationToken cancellationToken = default)
     {
         var contentList = content.ToList();
         if (contentList.Count == 0)
@@ -37,7 +37,10 @@ public class Inventory(DContext context) : IInventory
         {
             var articleIds = contentList
                 .Select(x => x.ArticleId).ToHashSet();
-            var articles = await context.EnsureArticlesExistForUpdate(articleIds, cancellationToken);
+            //Блокируем артикулы для конкурентного обновления количества
+            _ = await context.EnsureArticlesExistForUpdate(articleIds, cancellationToken);
+            
+            var toIncrement = new Dictionary<int, int>();
 
             var storageContents = new List<StorageContent>();
             var storageMovements = new List<StorageMovement>();
@@ -49,7 +52,6 @@ public class Inventory(DContext context) : IInventory
                     ArticleId = articleId,
                     BuyPrice = price,
                     CurrencyId = currencyId,
-                    Status = status.ToString(),
                     BuyPriceInUsd = CurrencyConverter.ConvertToUsd(price, currencyId),
                     PurchaseDatetime = DateTime.Now,
                     Count = count
@@ -60,8 +62,17 @@ public class Inventory(DContext context) : IInventory
                     .SetActionType(movementType);
                 storageMovement.WhoMoved = userId;
                 storageMovements.Add(storageMovement);
-                articles[articleId].TotalCount += count;
+                
+                if(!toIncrement.TryAdd(articleId, count))
+                    toIncrement[articleId] += count;
             }
+            
+            var expectedCount = toIncrement.Count;
+            var updatedRows = await context.UpdateArticlesCount(toIncrement, cancellationToken);
+            
+            if (updatedRows != expectedCount)
+                throw new InvalidOperationException("Не все артикулы найдены для обновления");
+            
             await context.StorageMovements.AddRangeAsync(storageMovements, cancellationToken);
             await context.StorageContents.AddRangeAsync(storageContents, cancellationToken);
             await context.SaveChangesAsync(cancellationToken);
@@ -109,8 +120,7 @@ public class Inventory(DContext context) : IInventory
                                                                                 FROM storage_content 
                                                                                 where id = {contentDetail.StorageContentId} and 
                                                                                       article_id = {articleId} and 
-                                                                                      storage_name = {contentDetail.Storage} and 
-                                                                                      status = {nameof(StorageContentStatus.Ok)}
+                                                                                      storage_name = {contentDetail.Storage}
                                                                                 for update
                                                                                 """).FirstOrDefaultAsync(cancellationToken);
                     if (storageContent != null)
@@ -118,7 +128,6 @@ public class Inventory(DContext context) : IInventory
                     else
                     {
                         storageContent = contentDetail.Adapt<StorageContent>();
-                        storageContent.Status = nameof(StorageContentStatus.Ok);
                         storageContent.BuyPriceInUsd = CurrencyConverter.ConvertToUsd(storageContent.BuyPrice, storageContent.CurrencyId);
                         storageContent.ArticleId = articleId;
                         await context.AddAsync(storageContent, cancellationToken);
@@ -148,29 +157,26 @@ public class Inventory(DContext context) : IInventory
     {
         await context.EnsureUserExists(userId, cancellationToken);
         await context.WithDefaultTransactionSettings("normal-with-isolation")
-            .ExecuteWithTransaction(async () =>
-        {
-            var content = await context.StorageContents
-                .FromSql($"select * from storage_content where id = {contentId} for update")
-                .FirstOrDefaultAsync(cancellationToken) ?? throw new StorageContentNotFoundException(contentId);
-            
-            if (content.Status != nameof(StorageContentStatus.Ok))
-                throw new BadStorageContentStatusException(content.Status);
+            .ExecuteWithTransaction(async () => 
+            {
+                var content = await context.StorageContents
+                    .FromSql($"select * from storage_content where id = {contentId} for update")
+                    .FirstOrDefaultAsync(cancellationToken) ?? throw new StorageContentNotFoundException(contentId);
 
-            var article = await context.Articles
-                .FromSql($"select * from articles where id = {content.ArticleId} for update")
-                .FirstAsync(cancellationToken);
-            
-            var tempMovement = content.Adapt<StorageMovement>().SetActionType(movementType);
-            tempMovement.Count = content.Count;
-            tempMovement.WhoMoved = userId;
-            await context.StorageMovements.AddAsync(tempMovement, cancellationToken);
-            
-            article.TotalCount -= content.Count;
-            context.StorageContents.Remove(content);
+                var article = await context.Articles
+                    .FromSql($"select * from articles where id = {content.ArticleId} for update")
+                    .FirstAsync(cancellationToken);
+                
+                var tempMovement = content.Adapt<StorageMovement>().SetActionType(movementType);
+                tempMovement.Count = content.Count;
+                tempMovement.WhoMoved = userId;
+                await context.StorageMovements.AddAsync(tempMovement, cancellationToken);
+                
+                article.TotalCount -= content.Count;
+                context.StorageContents.Remove(content);
 
-            await context.SaveChangesAsync(cancellationToken);
-        }, cancellationToken);
+                await context.SaveChangesAsync(cancellationToken); 
+            }, cancellationToken);
     }
 
     public async Task<IEnumerable<PrevAndNewValue<StorageContent>>> RemoveContentFromStorage(IEnumerable<(int ArticleId, int Count)> content, 
@@ -210,8 +216,7 @@ public class Inventory(DContext context) : IInventory
                     await foreach (var item in context.StorageContents
                                        .FromSql($"""
                                                  select * from storage_content 
-                                                 where article_id = {articleId} 
-                                                   and status = {nameof(StorageContentStatus.Ok)} 
+                                                 where article_id = {articleId}
                                                    and storage_name = {storageName} 
                                                    and count > 0
                                                  ORDER BY purchase_datetime ASC, count DESC
@@ -231,7 +236,6 @@ public class Inventory(DContext context) : IInventory
                                                   SELECT * 
                                                   FROM storage_content
                                                   WHERE article_id = {articleId}
-                                                    AND status = {nameof(StorageContentStatus.Ok)}
                                                     AND storage_name != {storageName}
                                                     AND count > 0
                                                   ORDER BY purchase_datetime ASC, count DESC
@@ -299,8 +303,7 @@ public class Inventory(DContext context) : IInventory
                 if (neededCount < 0)
                     totalCount = await context.StorageContents.AsNoTracking()
                         .Where(x => x.ArticleId == articleId && 
-                                    x.Count > 0 && x.StorageName == storageName &&
-                                    x.Status == nameof(StorageContentStatus.Ok))
+                                    x.Count > 0 && x.StorageName == storageName)
                         .SumAsync(x => x.Count, cancellationToken);
                 if (-neededCount > totalCount) throw new NotEnoughCountOnStorageException(storageName, articleId, totalCount);
 
@@ -311,8 +314,7 @@ public class Inventory(DContext context) : IInventory
                         var tempPrice = Math.Round(price, 2);
                         var storageItem = await context.StorageContents.FromSqlRaw($"""
                              SELECT * FROM storage_content
-                             WHERE article_id = {articleId} AND 
-                                   status = '{nameof(StorageContentStatus.Ok)}' AND
+                             WHERE article_id = {articleId} AND
                                    currency_id = {currencyId} AND
                                    storage_name = '{storageName}'
                              ORDER BY purchase_datetime - '{prevPurchaseDateTime:yyyy-MM-dd HH:mm:ss.ffffff}' ASC, buy_price - {tempPrice} ASC
@@ -326,7 +328,6 @@ public class Inventory(DContext context) : IInventory
                                 ArticleId = articleId,
                                 BuyPrice = price,
                                 CurrencyId = currencyId,
-                                Status = nameof(StorageContentStatus.Ok),
                                 BuyPriceInUsd = CurrencyConverter.ConvertToUsd(price, currencyId),
                                 Count = 0
                             };
@@ -348,7 +349,6 @@ public class Inventory(DContext context) : IInventory
                                            .FromSqlRaw($"""
                                                             SELECT * FROM storage_content
                                                             WHERE article_id = {articleId}
-                                                              AND status = '{nameof(StorageContentStatus.Ok)}'
                                                               AND storage_name = '{storageName}'
                                                               AND count > 0
                                                             ORDER BY purchase_datetime - '{prevPurchaseDateTime:yyyy-MM-dd HH:mm:ss.ffffff}' ASC, count DESC

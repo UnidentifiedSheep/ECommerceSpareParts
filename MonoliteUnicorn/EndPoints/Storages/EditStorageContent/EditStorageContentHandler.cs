@@ -58,7 +58,7 @@ public class EditStorageContentHandler(DContext context, IInventory inventory) :
             var content = storageContents[item.Key];
             var currentConcurrencyCode = ConcurrencyStatic.GetConcurrencyCode(content.Id, content.ArticleId,
                 content.BuyPrice, content.CurrencyId, content.StorageName, 
-                content.BuyPriceInUsd, content.Count, content.PurchaseDatetime, content.Status);
+                content.BuyPriceInUsd, content.Count, content.PurchaseDatetime);
             var clientConcurrencyCode = item.Value.concurrencyCode;
             if (clientConcurrencyCode != currentConcurrencyCode) 
                 throw new ConcurrencyCodeMismatchException(clientConcurrencyCode, currentConcurrencyCode);

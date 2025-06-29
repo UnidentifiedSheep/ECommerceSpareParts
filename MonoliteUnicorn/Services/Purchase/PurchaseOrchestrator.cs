@@ -34,8 +34,7 @@ public class PurchaseOrchestrator(IServiceProvider serviceProvider) : IPurchaseO
                     storageName, supplierId, purchaseDate, comment, cancellationToken);
                 var inventoryItems = await inventoryService.AddContentToStorage(
                     purchaseContentList.Select(x => (x.ArticleId, x.Count, x.Price, currencyId)), storageName,
-                    createdUserId,
-                    StorageContentStatus.Ok, StorageMovementType.Purchase, cancellationToken);
+                    createdUserId, StorageMovementType.Purchase, cancellationToken);
                 if (payedSum is > 0)
                     await balanceService.CreateTransactionAsync("SYSTEM", supplierId, payedSum.Value,
                         TransactionStatus.Normal, currencyId, createdUserId, purchaseDate.AddMicroseconds(1),

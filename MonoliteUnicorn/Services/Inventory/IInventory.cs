@@ -10,8 +10,8 @@ public interface IInventory
 {
     Task<IEnumerable<StorageContent>> AddContentToStorage(
         IEnumerable<(int ArticleId, int Count, decimal Price, int currencyId)> content,
-        string storageName, string userId, StorageContentStatus status,
-        StorageMovementType movementType, CancellationToken cancellationToken = default);
+        string storageName, string userId, StorageMovementType movementType,
+        CancellationToken cancellationToken = default);
 
     Task RestoreContentToStorage(IEnumerable<(SaleContentDetail, int)> contentDetails, StorageMovementType movementType,
         string userId, CancellationToken cancellationToken = default);

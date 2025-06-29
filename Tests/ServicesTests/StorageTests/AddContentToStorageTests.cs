@@ -57,8 +57,7 @@ public class AddContentToStorageTests : IAsyncLifetime
     public async Task AddContentToStorage_WithEmptyContentList_ThrowsArgumentException()
     {
         await Assert.ThrowsAsync<ArgumentException>(async () =>
-            await _inventory.AddContentToStorage([], _storage.Name, _user.Id, StorageContentStatus.Ok,
-                StorageMovementType.StorageContentAddition));
+            await _inventory.AddContentToStorage([], _storage.Name, _user.Id, StorageMovementType.StorageContentAddition));
     }
     
     [Theory]
@@ -73,8 +72,7 @@ public class AddContentToStorageTests : IAsyncLifetime
         storageContent.Last().BuyPrice = price;
         var asTupleList = storageContent.Select(x => (x.ArticleId, x.Count, x.BuyPrice, _currency.Id));
         await Assert.ThrowsAsync<StorageContentPriceCannotBeNegativeException>(async () =>
-            await _inventory.AddContentToStorage(asTupleList, _storage.Name, _user.Id, StorageContentStatus.Ok,
-                StorageMovementType.StorageContentAddition));
+            await _inventory.AddContentToStorage(asTupleList, _storage.Name, _user.Id, StorageMovementType.StorageContentAddition));
     }
     
     [Theory]
@@ -89,8 +87,7 @@ public class AddContentToStorageTests : IAsyncLifetime
         storageContent.Last().Count = count;
         var asTupleList = storageContent.Select(x => (x.ArticleId, x.Count, x.BuyPrice, _currency.Id));
         await Assert.ThrowsAsync<StorageContentCountCantBeNegativeException>(async () =>
-            await _inventory.AddContentToStorage(asTupleList, _storage.Name, _user.Id, StorageContentStatus.Ok,
-                StorageMovementType.StorageContentAddition));
+            await _inventory.AddContentToStorage(asTupleList, _storage.Name, _user.Id, StorageMovementType.StorageContentAddition));
     }
     
     [Fact]
@@ -103,8 +100,7 @@ public class AddContentToStorageTests : IAsyncLifetime
         storageContent.Last().CurrencyId = int.MaxValue;
         var asTupleList = storageContent.Select(x => (x.ArticleId, x.Count, x.BuyPrice, x.CurrencyId));
         await Assert.ThrowsAsync<CurrencyNotFoundException>(async () =>
-            await _inventory.AddContentToStorage(asTupleList, _storage.Name, _user.Id, StorageContentStatus.Ok,
-                StorageMovementType.StorageContentAddition));
+            await _inventory.AddContentToStorage(asTupleList, _storage.Name, _user.Id, StorageMovementType.StorageContentAddition));
     }
     
     [Fact]
@@ -116,8 +112,7 @@ public class AddContentToStorageTests : IAsyncLifetime
             .ToList();
         var asTupleList = storageContent.Select(x => (x.ArticleId, x.Count, x.BuyPrice, _currency.Id));
         await Assert.ThrowsAsync<StorageNotFoundException>(async () =>
-            await _inventory.AddContentToStorage(asTupleList, _faker.Lorem.Letter(100), _user.Id, StorageContentStatus.Ok,
-                StorageMovementType.StorageContentAddition));
+            await _inventory.AddContentToStorage(asTupleList, _faker.Lorem.Letter(100), _user.Id, StorageMovementType.StorageContentAddition));
     }
     
     [Fact]
@@ -129,8 +124,7 @@ public class AddContentToStorageTests : IAsyncLifetime
             .ToList();
         var asTupleList = storageContent.Select(x => (x.ArticleId, x.Count, x.BuyPrice, _currency.Id));
         await Assert.ThrowsAsync<UserNotFoundException>(async () =>
-            await _inventory.AddContentToStorage(asTupleList, _storage.Name, _faker.Lorem.Letter(100), StorageContentStatus.Ok,
-                StorageMovementType.StorageContentAddition));
+            await _inventory.AddContentToStorage(asTupleList, _storage.Name, _faker.Lorem.Letter(100), StorageMovementType.StorageContentAddition));
     }
     
     [Fact]
@@ -143,8 +137,7 @@ public class AddContentToStorageTests : IAsyncLifetime
         storageContent.Last().ArticleId = int.MaxValue;
         var asTupleList = storageContent.Select(x => (x.ArticleId, x.Count, x.BuyPrice, _currency.Id));
         await Assert.ThrowsAsync<ArticleNotFoundException>(async () =>
-            await _inventory.AddContentToStorage(asTupleList, _storage.Name, _user.Id, StorageContentStatus.Ok,
-                StorageMovementType.StorageContentAddition));
+            await _inventory.AddContentToStorage(asTupleList, _storage.Name, _user.Id, StorageMovementType.StorageContentAddition));
     }
     
     [Fact]
@@ -181,8 +174,7 @@ public class AddContentToStorageTests : IAsyncLifetime
             .Select(x => (x.ArticleId, x.Count, x.BuyPrice, x.CurrencyId));
 
         await inventory.AddContentToStorage(
-            asTuples, _storage.Name, _user.Id,
-            StorageContentStatus.Ok, StorageMovementType.StorageContentAddition);
+            asTuples, _storage.Name, _user.Id, StorageMovementType.StorageContentAddition);
 
         var totalPerArticle = dtoList
             .GroupBy(x => x.ArticleId)
@@ -196,7 +188,7 @@ public class AddContentToStorageTests : IAsyncLifetime
         var allInputs = results.SelectMany(r => r.Inputs).ToList();
 
         var expectedTotals = new Dictionary<int,int>();
-        foreach (var (inputs, totals) in results)
+        foreach (var (_, totals) in results)
         {
             foreach (var kv in totals)
             {
@@ -241,7 +233,6 @@ public class AddContentToStorageTests : IAsyncLifetime
 
             Assert.NotNull(actual);
             Assert.Equal(exp.Count, actual.Count);
-            Assert.Equal(nameof(StorageContentStatus.Ok), actual.Status);
             Assert.Equal(_storage.Name, actual.StorageName);
         }
 
