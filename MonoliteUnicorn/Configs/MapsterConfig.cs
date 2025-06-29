@@ -179,7 +179,21 @@ public static class MapsterConfig
             .Map(dest => dest.Count, s => s.Count)
             .Map(dest => dest.StorageName, s => s.StorageName)
             .Map(dest => dest.ArticleId, s => s.ArticleId);
-        
+
+        TypeAdapterConfig<StorageContent, StorageContent>.NewConfig()
+            .Ignore(x => x.Article)
+            .Ignore(x => x.Currency)
+            .Ignore(x => x.StorageNameNavigation)
+            .Ignore(x => x.SaleContentDetails)
+            .Map(dest => dest.Id, src => src.Id)
+            .Map(dest => dest.StorageName, s => s.StorageName)
+            .Map(dest => dest.ArticleId, s => s.ArticleId)
+            .Map(dest => dest.CurrencyId, s => s.CurrencyId)
+            .Map(dest => dest.Count, s => s.Count)
+            .Map(dest => dest.BuyPrice, s => s.BuyPrice)
+            .Map(dest => dest.BuyPriceInUsd, s => s.BuyPriceInUsd)
+            .Map(dest => dest.CreatedDatetime, s => s.CreatedDatetime)
+            .Map(dest => dest.PurchaseDatetime, s => s.PurchaseDatetime);
         
         TypeAdapterConfig<PatchStorageDto, Storage>.NewConfig()
             .IgnorePatchIfNotSet()

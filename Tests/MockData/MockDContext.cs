@@ -11,11 +11,11 @@ public static class MockDContext
     public static async Task AddMockProducersAndArticles(this DContext context)
     {
         await context.Producers.AddRangeAsync(
-            new Producer { Name = "Sampa" },
-            new Producer { Name = "Febi" },
-            new Producer { Name = "KS" },
-            new Producer { Name = "MAN" },
-            new Producer { Name = "Peters" });
+            new Producer { Name = Faker.Lorem.Letter(30) },
+            new Producer { Name = Faker.Lorem.Letter(30) },
+            new Producer { Name = Faker.Lorem.Letter(30) },
+            new Producer { Name = Faker.Lorem.Letter(30) },
+            new Producer { Name = Faker.Lorem.Letter(30) });
         await context.SaveChangesAsync();
         var producers = await context.Producers.ToListAsync();
         var producerIds = producers.Select(x => x.Id).ToList();
@@ -82,6 +82,11 @@ public static class MockDContext
         var storages = await context.Storages.Select(x => x.Name).ToListAsync();
         var currencies = await context.Currencies.Select(x => x.Id).ToListAsync();
         var storageContent = MockData.CreateStorageContent(articleIds, storages, currencies, count);
+        foreach (var item in storageContent)
+        {
+            var article = await context.Articles.FirstAsync(x => x.Id == item.ArticleId);
+            article.TotalCount += item.Count;
+        }
         await context.StorageContents.AddRangeAsync(storageContent);
         await context.SaveChangesAsync();
         return storageContent;

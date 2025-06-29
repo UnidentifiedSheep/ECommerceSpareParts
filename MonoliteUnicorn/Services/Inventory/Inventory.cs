@@ -180,16 +180,17 @@ public class Inventory(DContext context) : IInventory
     }
 
     public async Task<IEnumerable<PrevAndNewValue<StorageContent>>> RemoveContentFromStorage(IEnumerable<(int ArticleId, int Count)> content, 
-        string userId, string? storageName, bool takeFromOtherStorages, 
-        StorageMovementType movementType, CancellationToken cancellationToken = default)
+        string userId, string? storageName, bool takeFromOtherStorages, StorageMovementType movementType, CancellationToken cancellationToken = default)
     {
+        var contentList = content.ToList();
+        if(contentList.Count == 0)
+            throw new ArgumentException("Пустой content список");
         if (!takeFromOtherStorages && string.IsNullOrWhiteSpace(storageName)) 
             throw new StorageIsUnknownException();
         if(!takeFromOtherStorages && !string.IsNullOrWhiteSpace(storageName))
             await context.EnsureStorageExists(storageName, cancellationToken);
         
         await context.EnsureUserExists(userId, cancellationToken);
-        var contentList = content.ToList();
         
         return await context.WithDefaultTransactionSettings("normal-with-isolation")
             .ExecuteWithTransaction(async () =>
@@ -201,7 +202,8 @@ public class Inventory(DContext context) : IInventory
 
             foreach (var ck in contentList)
             {
-                if (ck.Count < 0) throw new ArgumentException("Количество для удаления со склада не может быть отрицательным");
+                if (ck.Count <= 0) 
+                    throw new ArgumentException("Количество для удаления со склада не может быть отрицательным или 0");
                 if (!mergedContent.TryAdd(ck.ArticleId, ck.Count))
                     mergedContent[ck.ArticleId] += ck.Count;
             }
@@ -236,7 +238,7 @@ public class Inventory(DContext context) : IInventory
                                                   SELECT * 
                                                   FROM storage_content
                                                   WHERE article_id = {articleId}
-                                                    AND storage_name != {storageName}
+                                                    AND (storage_name != {storageName} OR {string.IsNullOrWhiteSpace(storageName)})
                                                     AND count > 0
                                                   ORDER BY purchase_datetime ASC, count DESC
                                                   FOR UPDATE

@@ -47,9 +47,6 @@ public class RestoreContentToStorageTests : IAsyncLifetime
         _user = await _context.AddMockUser();
         _storageContent = (await _context.AddMockStorageContent(40))
             .ToDictionary(x => x.Id);
-        foreach (var content in _storageContent)
-            _articles.First(x => x.Id == content.Value.ArticleId)
-                .TotalCount += content.Value.Count;
         await _context.SaveChangesAsync();
     }
 
@@ -163,6 +160,8 @@ public class RestoreContentToStorageTests : IAsyncLifetime
         var articles = await _context.Articles
             .AsNoTracking()
             .ToDictionaryAsync(x => x.Id);
+        
+        
         
         Assert.Equal(_storageContent.Count + nullIdsCount, storageContents.Count);
         foreach (var (saleContent, articleId) in content)
