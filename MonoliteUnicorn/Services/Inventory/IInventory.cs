@@ -13,7 +13,7 @@ public interface IInventory
         string storageName, string userId, StorageContentStatus status,
         StorageMovementType movementType, CancellationToken cancellationToken = default);
 
-    Task AddContentToStorage(IEnumerable<(SaleContentDetail, int)> contentDetails, StorageMovementType movementType,
+    Task RestoreContentToStorage(IEnumerable<(SaleContentDetail, int)> contentDetails, StorageMovementType movementType,
         string userId, CancellationToken cancellationToken = default);
 
     Task DeleteContentFromStorage(int contentId, string userId, StorageMovementType movementType,

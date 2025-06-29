@@ -5,6 +5,7 @@ using MediatR;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
+using MonoliteUnicorn.Configs;
 using MonoliteUnicorn.EndPoints.Articles.CreateArticle;
 using MonoliteUnicorn.HangFireTasks;
 using MonoliteUnicorn.PostGres.Main;
@@ -22,6 +23,7 @@ namespace Tests;
 
 public static class ServiceProviderForTests
 {
+    public static bool IsConfiguredBefore = false;
     public static ServiceProvider Build(string postgresConnectionString, string redisConnectionString)
     {
         var services = new ServiceCollection();
@@ -51,7 +53,14 @@ public static class ServiceProviderForTests
         services.AddScoped<ISaleOrchestrator, SaleOrchestrator>();
         services.AddTransient(typeof(IPipelineBehavior<,>), typeof(ValidationBehavior<,>));
 
+        if (!IsConfiguredBefore)
+        {
+            MapsterConfig.Configure();
+            DbTransactionConfig.Configure();
+        }
+
         var serviceProvider = services.BuildServiceProvider();
+        IsConfiguredBefore = true;
         return serviceProvider;
     }
 }

@@ -1,3 +1,4 @@
+using Core.TransactionBuilder;
 using Mapster;
 using Microsoft.EntityFrameworkCore;
 using MonoliteUnicorn.Dtos.Amw.Sales;
@@ -20,46 +21,42 @@ public class SaleOrchestrator(IServiceProvider serviceProvider) : ISaleOrchestra
         var saleService = scope.ServiceProvider.GetRequiredService<ISale>();
         var balanceService = scope.ServiceProvider.GetRequiredService<IBalance>();
         var inventoryService = scope.ServiceProvider.GetRequiredService<IInventory>();
-        await using var dbTransaction = await context.Database.BeginTransactionAsync(cancellationToken);
-        try
-        {
-            var saleContentList = saleContent.ToList();
-            var totalSum = saleContentList.Sum(x => x.Count * x.PriceWithDiscount);
-            var transaction = await balanceService.CreateTransactionAsync("SYSTEM", buyerId, totalSum, TransactionStatus.Sale, currencyId, createdUserId, saleDateTime, cancellationToken);
-            var storageContentValues = await inventoryService.RemoveContentFromStorage(saleContentList.Select(x => (x.ArticleId, x.Count)), 
-                createdUserId, storageName, sellFromOtherStorages, StorageMovementType.Sale, cancellationToken);
-            var storageContents = storageContentValues.ToList();
-            var sale = await saleService.CreateSale(saleContentList, storageContents, currencyId, buyerId, 
-                createdUserId, transaction.Id, saleDateTime, comment, cancellationToken);
-            
-            if (payedSum is > 0)
-                await balanceService.CreateTransactionAsync(buyerId, "SYSTEM", payedSum.Value, TransactionStatus.Normal, 
-                    currencyId, createdUserId, saleDateTime.AddMicroseconds(1), cancellationToken);
 
-            var articleBuyPrices = storageContents
-                .GroupBy(x => x.Prev.ArticleId, x => x.Prev.BuyPriceInUsd)
-                .ToDictionary(x => x.Key, x => x.Average());
-            foreach (var content in sale.SaleContents)
+        await context
+            .WithDefaultTransactionSettings("orchestrator-with-isolation")
+            .ExecuteWithTransaction(async () =>
             {
-                var avrgBuyPrice = articleBuyPrices[content.ArticleId];
-                var buySellPrices = new BuySellPrice
+                var saleContentList = saleContent.ToList();
+                var totalSum = saleContentList.Sum(x => x.Count * x.PriceWithDiscount);
+                var transaction = await balanceService.CreateTransactionAsync("SYSTEM", buyerId, totalSum, TransactionStatus.Sale, currencyId, createdUserId, saleDateTime, cancellationToken);
+                var storageContentValues = await inventoryService.RemoveContentFromStorage(saleContentList.Select(x => (x.ArticleId, x.Count)), 
+                    createdUserId, storageName, sellFromOtherStorages, StorageMovementType.Sale, cancellationToken);
+                var storageContents = storageContentValues.ToList();
+                var sale = await saleService.CreateSale(saleContentList, storageContents, currencyId, buyerId, 
+                    createdUserId, transaction.Id, saleDateTime, comment, cancellationToken);
+                
+                if (payedSum is > 0)
+                    await balanceService.CreateTransactionAsync(buyerId, "SYSTEM", payedSum.Value, TransactionStatus.Normal, 
+                        currencyId, createdUserId, saleDateTime.AddMicroseconds(1), cancellationToken);
+
+                var articleBuyPrices = storageContents
+                    .GroupBy(x => x.Prev.ArticleId, x => x.Prev.BuyPriceInUsd)
+                    .ToDictionary(x => x.Key, x => x.Average());
+                foreach (var content in sale.SaleContents)
                 {
-                    BuyPrice = Math.Round(CurrencyConverter.ConvertTo(avrgBuyPrice, Global.UsdId, currencyId), 2),
-                    SellPrice = Math.Round(content.Price, 2),
-                    ArticleId = content.ArticleId,
-                    CurrencyId = currencyId,
-                    SaleContentId = content.Id
-                };
-                await context.BuySellPrices.AddAsync(buySellPrices, cancellationToken);
-            }
-            await context.SaveChangesAsync(cancellationToken);
-            await dbTransaction.CommitAsync(cancellationToken);
-        }
-        catch (Exception)
-        {
-            await dbTransaction.RollbackAsync(cancellationToken);
-            throw;
-        }
+                    var avrgBuyPrice = articleBuyPrices[content.ArticleId];
+                    var buySellPrices = new BuySellPrice
+                    {
+                        BuyPrice = Math.Round(CurrencyConverter.ConvertTo(avrgBuyPrice, Global.UsdId, currencyId), 2),
+                        SellPrice = Math.Round(content.Price, 2),
+                        ArticleId = content.ArticleId,
+                        CurrencyId = currencyId,
+                        SaleContentId = content.Id
+                    };
+                    await context.BuySellPrices.AddAsync(buySellPrices, cancellationToken);
+                }
+                await context.SaveChangesAsync(cancellationToken);
+            }, cancellationToken);
     }
 
     public async Task DeleteSale(string saleId, string userId, CancellationToken cancellationToken = default)
@@ -69,26 +66,23 @@ public class SaleOrchestrator(IServiceProvider serviceProvider) : ISaleOrchestra
         var saleService = scope.ServiceProvider.GetRequiredService<ISale>();
         var balanceService = scope.ServiceProvider.GetRequiredService<IBalance>();
         var inventoryService = scope.ServiceProvider.GetRequiredService<IInventory>();
-        await using var dbTransaction = await context.Database.BeginTransactionAsync(cancellationToken);
-        try
-        {
-            var sale = await saleService.DeleteSale(saleId, userId, cancellationToken);
-            var transactionId = sale.TransactionId;
-            var saleContentDetails = sale.SaleContents
-                .SelectMany(x => x.SaleContentDetails.Select(detail => (detail, x.ArticleId)))
-                .ToList();
-            
-            await balanceService.DeleteTransaction(transactionId, userId, cancellationToken);
-            await inventoryService.AddContentToStorage(saleContentDetails, StorageMovementType.SaleDeletion, userId, cancellationToken);
-            
-            await context.SaveChangesAsync(cancellationToken);
-            await dbTransaction.CommitAsync(cancellationToken);
-        }
-        catch (Exception)
-        {
-            await dbTransaction.RollbackAsync(cancellationToken);
-            throw;
-        }
+
+        await context
+            .WithDefaultTransactionSettings("orchestrator-with-isolation")
+            .ExecuteWithTransaction(async () =>
+            {
+                var sale = await saleService.DeleteSale(saleId, userId, cancellationToken);
+                var transactionId = sale.TransactionId;
+                var saleContentDetails = sale.SaleContents
+                    .SelectMany(x => x.SaleContentDetails.Select(detail => (detail, x.ArticleId)))
+                    .ToList();
+
+                await balanceService.DeleteTransaction(transactionId, userId, cancellationToken);
+                await inventoryService.RestoreContentToStorage(saleContentDetails, StorageMovementType.SaleDeletion,
+                    userId, cancellationToken);
+
+                await context.SaveChangesAsync(cancellationToken);
+            }, cancellationToken);
     }
     
     public async Task EditSale(IEnumerable<EditSaleContentDto> editedContent, string saleId,
@@ -105,42 +99,42 @@ public class SaleOrchestrator(IServiceProvider serviceProvider) : ISaleOrchestra
         var saleService = scope.ServiceProvider.GetRequiredService<ISale>();
         var balanceService = scope.ServiceProvider.GetRequiredService<IBalance>();
         var inventoryService = scope.ServiceProvider.GetRequiredService<IInventory>();
-        await using var dbTransaction = await context.Database.BeginTransactionAsync(cancellationToken);
-        
-        try
-        {
-            var sale = await GetSaleForUpdateAsync(context, saleId, cancellationToken);
-            var saleContent = await GetSaleContentForUpdateAsDictAsync(context, saleId, cancellationToken);
-            var saleContentIds = saleContent.Keys.ToHashSet();
-            var saleContentDetails = await context.SaleContentDetails
-                .FromSql($"SELECT * FROM sale_content_details where sale_content_id = ANY({saleContentIds.ToArray()}) for update")
-                .ToListAsync(cancellationToken);
 
-            var totalSum = editedContentList.Sum(x => x.Count * x.PriceWithDiscount);
-            var (contentGreaterCount, contentLessCount) = 
-                CalculateInventoryDeltas(editedContentList, saleContent, saleContentDetails, seenIds);
-            
-            //Оставшиеся Id убираем из продажи
-            contentLessCount.AddRange(GetRemovedContentDetails(seenIds, saleContent, saleContentDetails));
-            //Возвращаем на склад
-            await inventoryService.AddContentToStorage(contentLessCount, StorageMovementType.SaleEditing, updatedUserId, cancellationToken);
-            //Добавленные значения для позиций чьи количества были увеличены ЗАБИРАЕМ СО СКЛАДА
-            var takenStorageContents = await inventoryService.RemoveContentFromStorage(contentGreaterCount, 
-                updatedUserId, sale.MainStorageName, sellFromOtherStorages, StorageMovementType.SaleEditing, cancellationToken);
-            //Редактируем транзакцию
-            await balanceService.EditTransaction(sale.TransactionId, currencyId, totalSum, TransactionStatus.Sale, saleDateTime, cancellationToken);
-            //Редактируем саму продажу
-            var movedToStorage = contentLessCount
-                .GroupBy(x => x.Item1.SaleContentId, x => x.Item1)
-                .ToDictionary(x => x.Key, x => x.ToList());
-            await saleService.EditSale(editedContentList, takenStorageContents, movedToStorage, saleId, currencyId, updatedUserId, saleDateTime, comment, cancellationToken);
-            await dbTransaction.CommitAsync(cancellationToken);
-        }
-        catch (Exception)
-        {
-            await dbTransaction.RollbackAsync(cancellationToken);
-            throw;
-        }
+        await context
+            .WithDefaultTransactionSettings("orchestrator-with-isolation")
+            .ExecuteWithTransaction(async () =>
+            {
+                var sale = await GetSaleForUpdateAsync(context, saleId, cancellationToken);
+                var saleContent = await GetSaleContentForUpdateAsDictAsync(context, saleId, cancellationToken);
+                var saleContentIds = saleContent.Keys.ToHashSet();
+                var saleContentDetails = await context.SaleContentDetails
+                    .FromSql(
+                        $"SELECT * FROM sale_content_details where sale_content_id = ANY({saleContentIds.ToArray()}) for update")
+                    .ToListAsync(cancellationToken);
+
+                var totalSum = editedContentList.Sum(x => x.Count * x.PriceWithDiscount);
+                var (contentGreaterCount, contentLessCount) =
+                    CalculateInventoryDeltas(editedContentList, saleContent, saleContentDetails, seenIds);
+
+                //Оставшиеся Id убираем из продажи
+                contentLessCount.AddRange(GetRemovedContentDetails(seenIds, saleContent, saleContentDetails));
+                //Возвращаем на склад
+                await inventoryService.RestoreContentToStorage(contentLessCount, StorageMovementType.SaleEditing,
+                    updatedUserId, cancellationToken);
+                //Добавленные значения для позиций чьи количества были увеличены ЗАБИРАЕМ СО СКЛАДА
+                var takenStorageContents = await inventoryService.RemoveContentFromStorage(contentGreaterCount,
+                    updatedUserId, sale.MainStorageName, sellFromOtherStorages, StorageMovementType.SaleEditing,
+                    cancellationToken);
+                //Редактируем транзакцию
+                await balanceService.EditTransaction(sale.TransactionId, currencyId, totalSum, TransactionStatus.Sale,
+                    saleDateTime, cancellationToken);
+                //Редактируем саму продажу
+                var movedToStorage = contentLessCount
+                    .GroupBy(x => x.Item1.SaleContentId, x => x.Item1)
+                    .ToDictionary(x => x.Key, x => x.ToList());
+                await saleService.EditSale(editedContentList, takenStorageContents, movedToStorage, saleId, currencyId,
+                    updatedUserId, saleDateTime, comment, cancellationToken);
+            }, cancellationToken);
     }
     
     /// <summary>

@@ -86,11 +86,24 @@ public static class EntityExistenceValidator
     {
         var ids = articleIds.ToHashSet();
         var articles = await context.Articles
-            .FromSql($"SELECT * from articles where id = ANY ({ids.ToArray()}) for update")
+            .FromSql($"SELECT * from articles where id = ANY ({ids.ToArray()}) for update;")
             .ToDictionaryAsync(x => x.Id,cancellationToken);
         var notFoundArticles = ids.Except(articles.Select(x => x.Key)).ToList();
         if (notFoundArticles.Count != 0)
             throw new ArticleNotFoundException(notFoundArticles);
         return articles;
+    }
+
+    public static async Task<int> UpdateArticlesCount(this DContext context, Dictionary<int, int> toIncrement, CancellationToken cancellationToken = default)
+    {
+        var valuesSql = string.Join(", ", toIncrement.Select(i => $"({i.Key}, {i.Value})"));
+            
+        var query = $"""
+                     UPDATE articles a
+                     SET total_count = a.total_count + data.increment
+                     FROM (VALUES {valuesSql}) AS data(article_id, increment)
+                     WHERE a.id = data.article_id
+                     """;
+        return await context.Database.ExecuteSqlRawAsync(query, cancellationToken);
     }
 }

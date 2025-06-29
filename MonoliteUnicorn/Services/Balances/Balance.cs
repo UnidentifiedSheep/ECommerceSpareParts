@@ -1,5 +1,5 @@
 using System.Collections.Immutable;
-using Core.Extensions;
+using Core.TransactionBuilder;
 using Mapster;
 using Microsoft.EntityFrameworkCore;
 using MonoliteUnicorn.Enums;
@@ -22,7 +22,8 @@ public class Balance(DContext context) : IBalance
     public async Task<Transaction> CreateTransactionAsync(string senderId, string receiverId, decimal amount, TransactionStatus status, 
         int currencyId, string whoCreatedTransaction, DateTime transactionDateTime, CancellationToken cancellationToken = default)
     {
-        return await context.WithTransactionAsync(async () =>
+        return await context.WithDefaultTransactionSettings("normal-with-isolation")
+            .ExecuteWithTransaction(async () =>
         {
             transactionDateTime = DateTime.SpecifyKind(transactionDateTime, DateTimeKind.Unspecified);
 
@@ -176,7 +177,8 @@ public class Balance(DContext context) : IBalance
 
     public async Task DeleteTransaction(string transactionId, string whoDeleteUserId, CancellationToken cancellationToken = default)
     {
-        await context.WithTransactionAsync(async () =>
+        await context.WithDefaultTransactionSettings("normal-with-isolation")
+            .ExecuteWithTransaction(async () =>
         {
             var transactionEntity = await context.Transactions
                 .FromSql($"SELECT * FROM transactions WHERE id = {transactionId} FOR UPDATE")
@@ -200,7 +202,8 @@ public class Balance(DContext context) : IBalance
 
     public async Task EditTransaction(string transactionId, int currencyId, decimal amount, TransactionStatus status, DateTime transactionDateTime, CancellationToken cancellationToken = default)
     {
-        await context.WithTransactionAsync(async () =>
+        await context.WithDefaultTransactionSettings("normal-with-isolation")
+            .ExecuteWithTransaction(async () =>
         {
             var transaction = await context.Transactions
                 .FromSql($"SELECT * FROM transactions WHERE id = {transactionId} for update")

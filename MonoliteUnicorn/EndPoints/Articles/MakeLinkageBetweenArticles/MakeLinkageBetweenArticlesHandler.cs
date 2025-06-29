@@ -28,9 +28,11 @@ public class MakeLinkageBetweenArticlesHandler(DContext context) : ICommandHandl
         var linkage = request.Linkage;
         await using var dbTransaction = await context.Database.BeginTransactionAsync(cancellationToken);
         var queryBuilder = new StringBuilder("INSERT INTO article_crosses (article_id, article_cross_id) VALUES ");
-        var leftArticle = await context.Articles.AsNoTracking().FirstOrDefaultAsync(x => x.Id == linkage.ArticleId, cancellationToken) 
+        var leftArticle = await context.Articles.AsNoTracking()
+                              .FirstOrDefaultAsync(x => x.Id == linkage.ArticleId, cancellationToken) 
                           ?? throw new ArticleNotFoundException(linkage.ArticleId);
-        var rightArticle = await context.Articles.AsNoTracking().FirstOrDefaultAsync(x => x.Id == linkage.CrossArticleId, cancellationToken) 
+        var rightArticle = await context.Articles.AsNoTracking()
+                               .FirstOrDefaultAsync(x => x.Id == linkage.CrossArticleId, cancellationToken) 
                            ?? throw new ArticleNotFoundException(linkage.CrossArticleId);
         switch (linkage.LinkageType)
         {

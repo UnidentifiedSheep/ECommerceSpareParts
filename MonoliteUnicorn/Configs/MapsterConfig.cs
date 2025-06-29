@@ -169,6 +169,11 @@ public static class MapsterConfig
         //STORAGES
 
         TypeAdapterConfig<StorageContent, StorageMovement>.NewConfig()
+            .Ignore(x => x.WhoMovedNavigation)
+            .Ignore(x => x.StorageNameNavigation)
+            .Ignore(x => x.Article)
+            .Ignore(x => x.Currency)
+            .Ignore(x => x.Id)
             .Map(dest => dest.CurrencyId, src => src.CurrencyId)
             .Map(dest => dest.Price, s => s.BuyPrice)
             .Map(dest => dest.Count, s => s.Count)
@@ -227,9 +232,8 @@ public static class MapsterConfig
             .Map(dest => dest.BuyPrice, src => src.BuyPrice)
             .Map(dest => dest.PurchaseDatetime, src => src.PurchaseDatetime);
 
-        //Остальные поля мануально прописываются BuyPriceInUsd, ArticleId, Status
+        //Остальные поля мануально прописываются BuyPriceInUsd, ArticleId, Status, Id
         TypeAdapterConfig<SaleContentDetail, StorageContent>.NewConfig()
-            .Map(dest => dest.Id, src => src.StorageContentId)
             .Map(dest => dest.StorageName, src => src.Storage)
             .Map(dest => dest.CurrencyId, src => src.CurrencyId)
             .Map(dest => dest.BuyPrice, src => src.BuyPrice)

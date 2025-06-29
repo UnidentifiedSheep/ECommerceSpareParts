@@ -35,7 +35,8 @@ public class DeleteTransactionTest : IAsyncLifetime
         
     public async Task InitializeAsync()
     {
-        _currency = await _context.AddMockCurrency();
+        var currencies = await _context.AddMockCurrency(1);
+        _currency = currencies.Single();
         _systemUser = await _context.CreateSystemUser();
         _mockUser = await _context.AddMockUser();
         

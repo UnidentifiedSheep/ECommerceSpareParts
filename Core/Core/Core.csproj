@@ -28,6 +28,7 @@
     <PackageReference Include="MassTransit.RabbitMQ" Version="8.3.5-develop.2185" />
     <PackageReference Include="MediatR" Version="12.4.1" />
     <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
+    <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="9.0.4" />
     <PackageReference Include="Serilog.AspNetCore" Version="8.0.3" />
     <PackageReference Include="Serilog.Enrichers.Environment" Version="3.0.1" />
     <PackageReference Include="Serilog.Sinks.Debug" Version="3.0.0" />

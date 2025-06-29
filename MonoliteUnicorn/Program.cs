@@ -179,6 +179,7 @@ app.UseHangfireDashboard();
 Redis.Configure(builder.Configuration["ConnectionStrings:RedisConnection"]!);
 MapsterConfig.Configure();
 SortByConfig.Configure();
+DbTransactionConfig.Configure();
 await SetupPriceGenerator.SetupPricesAsync(app.Services);
 
 app.UseExceptionHandler(_ => { });

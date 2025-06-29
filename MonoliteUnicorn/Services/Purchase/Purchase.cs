@@ -1,4 +1,4 @@
-using Core.Extensions;
+using Core.TransactionBuilder;
 using Mapster;
 using Microsoft.EntityFrameworkCore;
 using MonoliteUnicorn.Dtos.Amw.Purchase;
@@ -18,7 +18,8 @@ public class Purchase(DContext context) : IPurchase
         string createdUserId, string transactionId, string storageName,
         string supplierId, DateTime purchaseDateTime, string? comment = null, CancellationToken cancellationToken = default)
     {
-        return await context.WithTransactionAsync(async () =>
+        return await context.WithDefaultTransactionSettings("normal")
+            .ExecuteWithTransaction(async () =>
         {
             var contentList = content.ToList();
             if (contentList.Count == 0) throw new PurchaseContentEmptyException();
@@ -69,7 +70,9 @@ public class Purchase(DContext context) : IPurchase
     public async Task<Dictionary<int, Dictionary<decimal, int>>> EditPurchaseAsync(IEnumerable<EditPurchaseDto> content, string purchaseId, int currencyId, 
         string? comment, string updatedUserId, DateTime purchaseDateTime, CancellationToken cancellationToken = default)
     {
-        return await context.WithTransactionAsync(async () =>
+        return await context
+            .WithDefaultTransactionSettings("normal")
+            .ExecuteWithTransaction(async () =>
         {
             var result = new Dictionary<int, Dictionary<decimal, int>>();
             var contentList = content.ToList();
@@ -146,7 +149,8 @@ public class Purchase(DContext context) : IPurchase
 
     public async Task DeletePurchase(string purchaseId, CancellationToken cancellationToken = default)
     {
-        await context.WithTransactionAsync(async () =>
+        await context.WithDefaultTransactionSettings("normal")
+            .ExecuteWithTransaction(async () =>
         {
             var purchase = await context.Purchases
                 .FromSql($"select * from purchase where id = {purchaseId} for update")

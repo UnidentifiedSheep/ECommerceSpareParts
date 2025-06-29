@@ -1,4 +1,5 @@
 using System.Drawing;
+using System.Numerics;
 using Bogus;
 using MonoliteUnicorn.Dtos.Amw.Articles;
 using MonoliteUnicorn.Dtos.Amw.Producers;
@@ -10,26 +11,13 @@ namespace Tests.MockData;
 public static class MockData
 {
     public const string Locale = "ru";
-    public static readonly List<string> ArticleNumbers =
-    [
-        "505 213", "701 202 412", "AKBA/123-00.2",
-        "ARB 199909", "A 152", "213.213-01", "A 909 99 0089",
-        "БЕЛОРУСЬАВТО.2133", "БК.21388"
-    ];
-
-    public static readonly List<string> ProducerNames =
-    [
-        "БЕЛ.АВТО", "Sampa", "Febi", "Stellox",
-        "Sachs", "Frundel", "JMC", "GTR", "RVI",
-        "MB", "MAN", "IVECO", "DAF"
-    ];
     
     public static readonly List<string> Colors = Enum.GetNames(typeof(KnownColor)).ToList();
 
     public static List<NewArticleDto> CreateNewArticleDto(int count)
     {
         var f = new Faker<NewArticleDto>(Locale)
-            .RuleFor(x => x.ArticleNumber, f => f.PickRandom(ArticleNumbers))
+            .RuleFor(x => x.ArticleNumber, f => f.Lorem.Letter(28))
             .RuleFor(x => x.Name, f => string.Join(" ", f.Lorem.Words(4)))
             .RuleFor(x => x.Description, f => Random.Shared.Next(1, 2) == 1 ? string.Join(" ", f.Lorem.Words(9)) : null)
             .RuleFor(x => x.ProducerId, f => f.PickRandom(f.Random.Int(1, 5)))
@@ -42,7 +30,7 @@ public static class MockData
     public static List<AmwNewProducerDto> CreateNewProducerDto(int count)
     {
         var f = new Faker<AmwNewProducerDto>(Locale)
-            .RuleFor(x => x.ProducerName, f => f.PickRandom(ProducerNames))
+            .RuleFor(x => x.ProducerName, f => f.Lorem.Letter(28))
             .RuleFor(x => x.Description, f => f.Commerce.ProductDescription())
             .RuleFor(x => x.IsOe, f => f.Random.Bool());
         return f.Generate(count);
@@ -99,6 +87,34 @@ public static class MockData
             .RuleFor(x => x.BuyPrice, f => f.Random.Decimal(0.01m, 2000000))
             .RuleFor(x => x.Count, f => f.Random.Int(1,1200))
             .RuleFor(x => x.CurrencyId, f => f.PickRandom(currencyIds));
+        return f.Generate(count);
+    }
+
+    public static List<SaleContentDetail> CreateSaleContentDetails(IEnumerable<int> availableStorageContentIds,
+        IEnumerable<string> availableStorages, IEnumerable<int> availableCurrencyIds, int count)
+    {
+        var storageContentIds = availableStorageContentIds.Distinct().ToList();
+        var storages = availableStorages.Distinct().ToList();
+        var currencyIds = availableCurrencyIds.Distinct().ToList();
+        
+        var f = new Faker<SaleContentDetail>(Locale)
+            .RuleFor(x => x.StorageContentId, f => f.Random.Int(1, 100) <= 50 ? f.PickRandom(storageContentIds) : null)
+            .RuleFor(x => x.BuyPrice, f => f.Random.Decimal(0.01m, 2_000_000))
+            .RuleFor(x => x.Count, f => f.Random.Int(1, 1200))
+            .RuleFor(x => x.CurrencyId, f => f.PickRandom(currencyIds))
+            .RuleFor(x => x.Storage, f => f.PickRandom(storages))
+            .RuleFor(x => x.PurchaseDatetime,
+                f => f.Date.Between(DateTime.Now.AddYears(-2), DateTime.Now.AddMonths(2)));
+        return f.Generate(count);
+    }
+
+    public static List<Currency> CreateCurrency(int count)
+    {
+        var f = new Faker<Currency>(Locale)
+            .RuleFor(x => x.Name, f => f.Person.UserName)
+            .RuleFor(x => x.ShortName, f => f.Lorem.Letter(3))
+            .RuleFor(x => x.CurrencySign, f => f.Lorem.Letter())
+            .RuleFor(x => x.Code, f => f.Lorem.Letter(3));
         return f.Generate(count);
     }
 }

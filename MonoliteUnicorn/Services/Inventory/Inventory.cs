@@ -1,12 +1,9 @@
-using Core.Extensions;
+using Core.TransactionBuilder;
 using Mapster;
 using Microsoft.EntityFrameworkCore;
 using MonoliteUnicorn.Dtos.Amw.Storage;
 using MonoliteUnicorn.Enums;
-using MonoliteUnicorn.Exceptions.Articles;
-using MonoliteUnicorn.Exceptions.Currencies;
 using MonoliteUnicorn.Exceptions.Storages;
-using MonoliteUnicorn.Exceptions.Users;
 using MonoliteUnicorn.Extensions;
 using MonoliteUnicorn.Models;
 using MonoliteUnicorn.PostGres.Main;
@@ -34,7 +31,9 @@ public class Inventory(DContext context) : IInventory
         await context.EnsureStorageExists(storageName, cancellationToken);
         await context.EnsureUserExists(userId, cancellationToken);
         
-        return await context.WithTransactionAsync(async () =>
+        return await context
+            .WithDefaultTransactionSettings("normal-with-isolation")
+            .ExecuteWithTransaction(async () =>
         {
             var articleIds = contentList
                 .Select(x => x.ArticleId).ToHashSet();
@@ -70,56 +69,86 @@ public class Inventory(DContext context) : IInventory
         }, cancellationToken);
     }
 
-    public async Task AddContentToStorage(IEnumerable<(SaleContentDetail, int)> contentDetails, StorageMovementType movementType, string userId,
+    public async Task RestoreContentToStorage(IEnumerable<(SaleContentDetail, int)> contentDetails, StorageMovementType movementType, string userId,
         CancellationToken cancellationToken = default)
     {
+        var contentDetailsList = contentDetails.ToList();
+        
+        if (contentDetailsList.Count == 0)
+            throw new ArgumentException("Список content пустой");
+        if (contentDetailsList.Any(x => Math.Round(x.Item1.BuyPrice, 2) <= 0))
+            throw new StorageContentPriceCannotBeNegativeException();
+        if (contentDetailsList.Any(x => x.Item1.Count <= 0))
+            throw new StorageContentCountCantBeNegativeException();
+        
+        var currencyIds = contentDetailsList.Select(x => x.Item1.CurrencyId).ToHashSet();
+        await context.EnsureCurrenciesExist(currencyIds, cancellationToken);
         await context.EnsureUserExists(userId, cancellationToken);
-        await context.WithTransactionAsync(async () =>
-        {
-            var contentDetailsList = contentDetails.ToList();
-            var articleIds = contentDetailsList
+        var storageIds = contentDetailsList
+            .Select(x => x.Item1.Storage)
+            .ToHashSet();
+        await context.EnsureStoragesExist(storageIds, cancellationToken);
+        
+        await context
+            .WithDefaultTransactionSettings("normal-with-isolation")
+            .ExecuteWithTransaction(async () =>
+            {
+                var articleIds = contentDetailsList
                 .Select(x => x.Item2)
                 .ToHashSet();
-            var articles = await context.EnsureArticlesExistForUpdate(articleIds, cancellationToken);
-            foreach (var (contentDetail, articleId) in contentDetailsList)
-            {
-                var article = articles[articleId];
-                var storageContent = await context.StorageContents.FromSql($"""
-                                                                            SELECT * 
-                                                                            FROM storage_content 
-                                                                            where id = {contentDetail.StorageContentId} and 
-                                                                                  article_id = {articleId} and 
-                                                                                  storage_name = {contentDetail.Storage} and 
-                                                                                  status = {nameof(StorageContentStatus.Ok)}
-                                                                            for update
-                                                                            """).FirstOrDefaultAsync(cancellationToken);
-                if (storageContent != null)
-                    storageContent.Count += contentDetail.Count;
-                else
-                {
-                    storageContent = contentDetail.Adapt<StorageContent>();
-                    storageContent.Status = nameof(StorageContentStatus.Ok);
-                    storageContent.BuyPriceInUsd = CurrencyConverter.ConvertToUsd(storageContent.BuyPrice, storageContent.CurrencyId);
-                    storageContent.ArticleId = articleId;
-                    await context.AddAsync(storageContent, cancellationToken);
-                }
-                var tempMovement = storageContent.Adapt<StorageMovement>().SetActionType(movementType);
-                tempMovement.Count = contentDetail.Count;
-                tempMovement.WhoMoved = userId;
-                await context.StorageMovements.AddAsync(tempMovement, cancellationToken);
-                
-                article.TotalCount += contentDetail.Count;
-            }
             
-            await context.SaveChangesAsync(cancellationToken);
-        }, cancellationToken);
+                //Блокируем артикулы для конкурентного обновления количества
+                _ = await context.EnsureArticlesExistForUpdate(articleIds, cancellationToken);
+            
+                var toIncrement = new Dictionary<int, int>();
+                
+                foreach (var (contentDetail, articleId) in contentDetailsList)
+                {
+                    var storageContent = await context.StorageContents.FromSql($"""
+                                                                                SELECT * 
+                                                                                FROM storage_content 
+                                                                                where id = {contentDetail.StorageContentId} and 
+                                                                                      article_id = {articleId} and 
+                                                                                      storage_name = {contentDetail.Storage} and 
+                                                                                      status = {nameof(StorageContentStatus.Ok)}
+                                                                                for update
+                                                                                """).FirstOrDefaultAsync(cancellationToken);
+                    if (storageContent != null)
+                        storageContent.Count += contentDetail.Count;
+                    else
+                    {
+                        storageContent = contentDetail.Adapt<StorageContent>();
+                        storageContent.Status = nameof(StorageContentStatus.Ok);
+                        storageContent.BuyPriceInUsd = CurrencyConverter.ConvertToUsd(storageContent.BuyPrice, storageContent.CurrencyId);
+                        storageContent.ArticleId = articleId;
+                        await context.AddAsync(storageContent, cancellationToken);
+                    }
+                    var tempMovement = storageContent.Adapt<StorageMovement>()
+                        .SetActionType(movementType);
+                    tempMovement.Count = contentDetail.Count;
+                    tempMovement.WhoMoved = userId;
+                    await context.StorageMovements.AddAsync(tempMovement, cancellationToken);
+                    
+                    if(!toIncrement.TryAdd(articleId, contentDetail.Count))
+                        toIncrement[articleId] += contentDetail.Count;
+                }
+                
+                var expectedCount = toIncrement.Count;
+                var updatedRows = await context.UpdateArticlesCount(toIncrement, cancellationToken);
+            
+                if (updatedRows != expectedCount)
+                    throw new InvalidOperationException("Не все артикулы найдены для обновления");
+                
+                await context.SaveChangesAsync(cancellationToken);
+            }, cancellationToken);
     }
 
     public async Task DeleteContentFromStorage(int contentId, string userId, StorageMovementType movementType,
         CancellationToken cancellationToken = default)
     {
         await context.EnsureUserExists(userId, cancellationToken);
-        await context.WithTransactionAsync(async () =>
+        await context.WithDefaultTransactionSettings("normal-with-isolation")
+            .ExecuteWithTransaction(async () =>
         {
             var content = await context.StorageContents
                 .FromSql($"select * from storage_content where id = {contentId} for update")
@@ -156,7 +185,8 @@ public class Inventory(DContext context) : IInventory
         await context.EnsureUserExists(userId, cancellationToken);
         var contentList = content.ToList();
         
-        return await context.WithTransactionAsync(async () =>
+        return await context.WithDefaultTransactionSettings("normal-with-isolation")
+            .ExecuteWithTransaction(async () =>
         {
             var articleIds = contentList.Select(x => x.ArticleId);
             var articles = await context.EnsureArticlesExistForUpdate(articleIds, cancellationToken);
@@ -249,7 +279,8 @@ public class Inventory(DContext context) : IInventory
         await context.EnsureStorageExists(storageName, cancellationToken);
         await context.EnsureCurrencyExists(currencyId, cancellationToken);
         
-        await context.WithTransactionAsync(async () =>
+        await context.WithDefaultTransactionSettings("normal-with-isolation")
+            .ExecuteWithTransaction(async () =>
         {
             prevPurchaseDateTime = DateTime.SpecifyKind(prevPurchaseDateTime, DateTimeKind.Unspecified);
             newPurchaseDateTime = DateTime.SpecifyKind(newPurchaseDateTime, DateTimeKind.Unspecified);
@@ -378,7 +409,8 @@ public class Inventory(DContext context) : IInventory
         await context.EnsureCurrenciesExist(currencyIds, cancellationToken);
         await context.EnsureStoragesExist(storageNames, cancellationToken);
         
-        await context.WithTransactionAsync(async () =>
+        await context.WithDefaultTransactionSettings("normal-with-isolation")
+            .ExecuteWithTransaction(async () =>
         {
             var storageContents = 
                 await context.EnsureStorageContentsExistForUpdate(storageContentIds, cancellationToken);

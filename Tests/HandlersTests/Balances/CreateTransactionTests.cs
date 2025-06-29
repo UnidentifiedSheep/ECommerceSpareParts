@@ -34,7 +34,8 @@ public class CreateTransactionTests : IAsyncLifetime
         _systemUser = await _context.CreateSystemUser();
         _mockUser = await _context.AddMockUser();
         _adminUser = await _context.AddMockUser();
-        _currency = await _context.AddMockCurrency();
+        var currencies = await _context.AddMockCurrency(1);
+        _currency = currencies.Single();
     }
 
     public async Task DisposeAsync()

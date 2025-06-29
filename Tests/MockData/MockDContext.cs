@@ -1,3 +1,4 @@
+using Bogus;
 using Microsoft.EntityFrameworkCore;
 using MonoliteUnicorn.PostGres.Main;
 using MonoliteUnicorn.Services.Prices.PriceGenerator;
@@ -6,6 +7,7 @@ namespace Tests.MockData;
 
 public static class MockDContext
 {
+    public static Faker Faker => new(MockData.Locale); 
     public static async Task AddMockProducersAndArticles(this DContext context)
     {
         await context.Producers.AddRangeAsync(
@@ -15,13 +17,15 @@ public static class MockDContext
             new Producer { Name = "MAN" },
             new Producer { Name = "Peters" });
         await context.SaveChangesAsync();
+        var producers = await context.Producers.ToListAsync();
+        var producerIds = producers.Select(x => x.Id).ToList();
         await context.Articles.AddRangeAsync(
-            new Article { ArticleNumber = "202.213", NormalizedArticleNumber = "202213", ArticleName = "Диск выжим", ProducerId = 1},
-            new Article { ArticleNumber = "50555", NormalizedArticleNumber = "50555", ArticleName = "сальник 239x88", ProducerId = 2},
-            new Article { ArticleNumber = "505 523 99 00", NormalizedArticleNumber = "5055239900", ArticleName = "подшипник 239x88", ProducerId = 3},
-            new Article { ArticleNumber = "aKb.21-12", NormalizedArticleNumber = "AKB2112", ArticleName = "рессора 239x88", ProducerId = 4},
-            new Article { ArticleNumber = "aKb.21-11", NormalizedArticleNumber = "AKB2111", ArticleName = "рессора 239x78", ProducerId = 5},
-            new Article { ArticleNumber = "202.213", NormalizedArticleNumber = "202213", ArticleName = "Диск выжим", ProducerId = 4});
+            new Article { ArticleNumber = "202.213", NormalizedArticleNumber = "202213", ArticleName = "Диск выжим", ProducerId = Faker.PickRandom(producerIds)},
+            new Article { ArticleNumber = "50555", NormalizedArticleNumber = "50555", ArticleName = "сальник 239x88", ProducerId = Faker.PickRandom(producerIds)},
+            new Article { ArticleNumber = "505 523 99 00", NormalizedArticleNumber = "5055239900", ArticleName = "подшипник 239x88", ProducerId = Faker.PickRandom(producerIds)},
+            new Article { ArticleNumber = "aKb.21-12", NormalizedArticleNumber = "AKB2112", ArticleName = "рессора 239x88", ProducerId = Faker.PickRandom(producerIds)},
+            new Article { ArticleNumber = "aKb.21-11", NormalizedArticleNumber = "AKB2111", ArticleName = "рессора 239x78", ProducerId = Faker.PickRandom(producerIds)},
+            new Article { ArticleNumber = "202.213", NormalizedArticleNumber = "202213", ArticleName = "Диск выжим", ProducerId = Faker.PickRandom(producerIds)});
         await context.SaveChangesAsync();
     }
 
@@ -72,24 +76,28 @@ public static class MockDContext
         return storages;
     }
 
-    public static async Task<Currency> AddMockCurrency(this DContext context)
+    public static async Task<IEnumerable<StorageContent>> AddMockStorageContent(this DContext context, int count)
     {
-        var currency = new Currency
-        {
-            Code = "РУБ",
-            Name = "Рубль",
-            CurrencySign = "Р",
-            ShortName = "Руб."
-        };
-        await context.Currencies.AddAsync(currency);
+        var articleIds = await context.Articles.Select(x => x.Id).ToListAsync();
+        var storages = await context.Storages.Select(x => x.Name).ToListAsync();
+        var currencies = await context.Currencies.Select(x => x.Id).ToListAsync();
+        var storageContent = MockData.CreateStorageContent(articleIds, storages, currencies, count);
+        await context.StorageContents.AddRangeAsync(storageContent);
         await context.SaveChangesAsync();
-        var dict = new Dictionary<int, decimal>
-        {
-            { currency.Id, 12.32m },
-            { 3, 1m }
-        };
+        return storageContent;
+    }
+
+    public static async Task<IEnumerable<Currency>> AddMockCurrency(this DContext context, int count)
+    {
+        var currencies = MockData.CreateCurrency(count);
+        await context.Currencies.AddRangeAsync(currencies);
+        await context.SaveChangesAsync();
+        var dict = new Dictionary<int, decimal>();
+        foreach (var currency in currencies)
+            dict[currency.Id] = Math.Round(Faker.Random.Decimal(1.01m, 200));
+        dict[3] = 1m;
         CurrencyConverter.LoadRates(dict);
-        return currency;
+        return currencies;
     }
 
     private static readonly string[] Tables =
@@ -103,7 +111,7 @@ public static class MockDContext
         "default_settings", "markup_group", "markup_ranges", "purchase", "purchase_content",
         "buy_sell_prices", "sale_content", "categories", "sale",
         "article_crosses", "article_ean", "article_supplier_buy_info", "transaction_versions",
-        "user_mails", "user_vehicles", "sale_content_details", "storage_movement"
+        "user_mails", "user_vehicles", "sale_content_details", "storage_movement", "user_search_history", "storage_content_reservations",
     ];
     public static async Task ClearDatabaseFull(this DContext context)
     {
