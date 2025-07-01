@@ -20,5 +20,12 @@ public static class SortByConfig
             .Map("dateTime", x => x.PurchaseDatetime)
             .Map("totalSum", x => x.Transaction.TransactionSum)
             .Map("id", x => x.Id);
+
+        new StorageContentReservation()
+            .MapDefault(x => x.CreateAt)
+            .Map("id", x => x.Id)
+            .Map("createAt", x => x.CreateAt)
+            .Map("updatedAt", x => x.UpdatedAt)
+            .Map("isDone", x => x.IsDone);
     }
 }

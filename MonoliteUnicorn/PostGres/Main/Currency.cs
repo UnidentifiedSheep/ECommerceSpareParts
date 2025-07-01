@@ -31,6 +31,8 @@ public partial class Currency
 
     public virtual ICollection<Sale> Sales { get; set; } = new List<Sale>();
 
+    public virtual ICollection<StorageContentReservation> StorageContentReservations { get; set; } = new List<StorageContentReservation>();
+
     public virtual ICollection<StorageContent> StorageContents { get; set; } = new List<StorageContent>();
 
     public virtual ICollection<StorageMovement> StorageMovements { get; set; } = new List<StorageMovement>();

@@ -194,87 +194,97 @@ public class Inventory(DContext context) : IInventory
         
         return await context.WithDefaultTransactionSettings("normal-with-isolation")
             .ExecuteWithTransaction(async () =>
-        {
-            var articleIds = contentList.Select(x => x.ArticleId);
-            var articles = await context.EnsureArticlesExistForUpdate(articleIds, cancellationToken);
-            var result = new List<PrevAndNewValue<StorageContent>>();
-            var mergedContent = new Dictionary<int, int>();
-
-            foreach (var ck in contentList)
             {
-                if (ck.Count <= 0) 
-                    throw new ArgumentException("Количество для удаления со склада не может быть отрицательным или 0");
-                if (!mergedContent.TryAdd(ck.ArticleId, ck.Count))
-                    mergedContent[ck.ArticleId] += ck.Count;
-            }
-            foreach (var (articleId, count) in mergedContent)
-            {
-                List<StorageContent> storageContents = [];
+                var articleIds = contentList.Select(x => x.ArticleId);
+                //Блокируем артикулы для конкурентного обновления количества
+                _ = await context.EnsureArticlesExistForUpdate(articleIds, cancellationToken);
                 
-                int availableCount = 0;
-                var article = articles[articleId];
-                if (!string.IsNullOrWhiteSpace(storageName))
-                {
-                    await foreach (var item in context.StorageContents
-                                       .FromSql($"""
-                                                 select * from storage_content 
-                                                 where article_id = {articleId}
-                                                   and storage_name = {storageName} 
-                                                   and count > 0
-                                                 ORDER BY purchase_datetime ASC, count DESC
-                                                 for update
-                                                 """).AsAsyncEnumerable().WithCancellation(cancellationToken))
-                    {
-                        storageContents.Add(item);
-                        availableCount += item.Count;
-                        if (availableCount >= count) break;
-                    }
-                }
+                var toIncrement = new Dictionary<int, int>();
+                var result = new List<PrevAndNewValue<StorageContent>>();
+                var mergedContent = new Dictionary<int, int>();
 
-                if (takeFromOtherStorages)
+                foreach (var ck in contentList)
                 {
-                    await foreach (var item in context.StorageContents
-                                       .FromSql($"""
-                                                  SELECT * 
-                                                  FROM storage_content
-                                                  WHERE article_id = {articleId}
-                                                    AND (storage_name != {storageName} OR {string.IsNullOrWhiteSpace(storageName)})
-                                                    AND count > 0
-                                                  ORDER BY purchase_datetime ASC, count DESC
-                                                  FOR UPDATE
-                                                  """).AsAsyncEnumerable().WithCancellation(cancellationToken))
+                    if (ck.Count <= 0) 
+                        throw new ArgumentException("Количество для удаления со склада не может быть отрицательным или 0");
+                    if (!mergedContent.TryAdd(ck.ArticleId, ck.Count))
+                        mergedContent[ck.ArticleId] += ck.Count;
+                }
+                foreach (var (articleId, count) in mergedContent)
+                {
+                    List<StorageContent> storageContents = [];
+                    
+                    int availableCount = 0;
+                    if (!string.IsNullOrWhiteSpace(storageName))
                     {
-                        if (availableCount >= count) break;
-                        storageContents.Add(item);
-                        availableCount += item.Count;
+                        await foreach (var item in context.StorageContents
+                                           .FromSql($"""
+                                                     select * from storage_content 
+                                                     where article_id = {articleId}
+                                                       and storage_name = {storageName} 
+                                                       and count > 0
+                                                     ORDER BY purchase_datetime ASC, count DESC
+                                                     for update
+                                                     """).AsAsyncEnumerable().WithCancellation(cancellationToken))
+                        {
+                            storageContents.Add(item);
+                            availableCount += item.Count;
+                            if (availableCount >= count) break;
+                        }
                     }
+
+                    if (takeFromOtherStorages)
+                    {
+                        await foreach (var item in context.StorageContents
+                                           .FromSql($"""
+                                                      SELECT * 
+                                                      FROM storage_content
+                                                      WHERE article_id = {articleId}
+                                                        AND (storage_name != {storageName} OR {string.IsNullOrWhiteSpace(storageName)})
+                                                        AND count > 0
+                                                      ORDER BY purchase_datetime ASC, count DESC
+                                                      FOR UPDATE
+                                                      """).AsAsyncEnumerable().WithCancellation(cancellationToken))
+                        {
+                            if (availableCount >= count) break;
+                            storageContents.Add(item);
+                            availableCount += item.Count;
+                        }
+                    }
+                    if (availableCount < count) throw new NotEnoughCountOnStorageException(articleId, availableCount);
+                    int counter = count;
+                    
+                    foreach (var item in storageContents)
+                    {
+                        var prevValue = item.Adapt<StorageContent>();
+                        var temp = Math.Min(counter, item.Count);
+                        item.Count -= temp;
+                        counter -= temp;
+                        var newValue = item.Adapt<StorageContent>();
+                        
+                        var tempMovement = item.Adapt<StorageMovement>().SetActionType(movementType);
+                        tempMovement.Count = -temp;
+                        tempMovement.WhoMoved = userId;
+                        await context.StorageMovements.AddAsync(tempMovement, cancellationToken);
+                        
+                        result.Add(new (prevValue, newValue));
+                        if (counter <= 0) break;
+                    }
+                    if(!toIncrement.TryAdd(articleId, -count))
+                        toIncrement[articleId] -= count;
                 }
-                if (availableCount < count) throw new NotEnoughCountOnStorageException(articleId, availableCount);
-                int counter = count;
                 
-                foreach (var item in storageContents)
-                {
-                    var prevValue = item.Adapt<StorageContent>();
-                    var temp = Math.Min(counter, item.Count);
-                    item.Count -= temp;
-                    counter -= temp;
-                    var newValue = item.Adapt<StorageContent>();
-                    
-                    var tempMovement = item.Adapt<StorageMovement>().SetActionType(movementType);
-                    tempMovement.Count = -temp;
-                    tempMovement.WhoMoved = userId;
-                    await context.StorageMovements.AddAsync(tempMovement, cancellationToken);
-                    
-                    result.Add(new (prevValue, newValue));
-                    if (counter <= 0) break;
-                }
-                article.TotalCount -= count;
-            }
-            
-            await context.SaveChangesAsync(cancellationToken);
-            return result;
-        }, cancellationToken);
+                var expectedCount = toIncrement.Count;
+                var updatedRows = await context.UpdateArticlesCount(toIncrement, cancellationToken);
+                
+                if (updatedRows != expectedCount)
+                    throw new InvalidOperationException("Не все артикулы найдены для обновления");
+                
+                await context.SaveChangesAsync(cancellationToken);
+                return result;
+            }, cancellationToken);
     }
+    //TODO: Переделать так чтобы добавление и вычитание происхлдило только двумя методами
 
     public async Task AddOrRemoveContentFromStorage(Dictionary<int, Dictionary<decimal, int>> addRemoveDict, int currencyId, string storageName,
         DateTime prevPurchaseDateTime, DateTime newPurchaseDateTime, string userId,
@@ -413,35 +423,35 @@ public class Inventory(DContext context) : IInventory
         
         await context.WithDefaultTransactionSettings("normal-with-isolation")
             .ExecuteWithTransaction(async () =>
-        {
-            var storageContents = 
-                await context.EnsureStorageContentsExistForUpdate(storageContentIds, cancellationToken);
-
-            var articleIds = storageContents.Values.Select(x => x.ArticleId);
-            var articles = await context.EnsureArticlesExistForUpdate(articleIds, cancellationToken);
-            
-            foreach (var item in editedFields)
             {
-                var content = storageContents[item.Key];
-                var article = articles[content.ArticleId];
-                var newVersion = item.Value;
-                if (newVersion.Count.IsSet)
-                {
-                    var diff = newVersion.Count.Value - content.Count;
-                    article.TotalCount += diff;
-                    var tempMovement = content.Adapt<StorageMovement>().SetActionType(StorageMovementType.StorageContentEditing);
-                    tempMovement.Count = diff;
-                    tempMovement.WhoMoved = userId;
-                    await context.AddAsync(tempMovement, cancellationToken);
-                }
-                
-                newVersion.Adapt(content);
-                if (newVersion.BuyPrice.IsSet)
-                    content.BuyPriceInUsd = CurrencyConverter.ConvertToUsd(content.BuyPrice, content.CurrencyId);
-
-            }
+                var storageContents = 
+                    await context.EnsureStorageContentsExistForUpdate(storageContentIds, cancellationToken);
+                var contentMovements = new List<StorageMovement>();
+                var articleIds = storageContents.Values.Select(x => x.ArticleId);
+                var articles = await context.EnsureArticlesExistForUpdate(articleIds, cancellationToken);
             
-            await context.SaveChangesAsync(cancellationToken);
-        }, cancellationToken);
+                foreach (var item in editedFields)
+                {
+                    var content = storageContents[item.Key];
+                    var article = articles[content.ArticleId];
+                    var newVersion = item.Value;
+                    if (newVersion.Count.IsSet)
+                    {
+                        var diff = newVersion.Count.Value - content.Count;
+                        article.TotalCount += diff;
+                        var tempMovement = content.Adapt<StorageMovement>()
+                            .SetActionType(StorageMovementType.StorageContentEditing);
+                        tempMovement.Count = diff;
+                        tempMovement.WhoMoved = userId;
+                        contentMovements.Add(tempMovement);
+                    }
+                
+                    newVersion.Adapt(content);
+                    if (newVersion.BuyPrice.IsSet)
+                        content.BuyPriceInUsd = Math.Round(CurrencyConverter.ConvertToUsd(content.BuyPrice, content.CurrencyId), 2);
+                }
+                await context.AddRangeAsync(contentMovements, cancellationToken);
+                await context.SaveChangesAsync(cancellationToken);
+            }, cancellationToken);
     }
 }

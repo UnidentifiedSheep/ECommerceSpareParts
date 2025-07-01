@@ -11,5 +11,9 @@ namespace MonoliteUnicorn.Exceptions.Users
 		public UserNotFoundException(string key) : base($"Не удалось найти пользователя {key}")
 		{
 		}
+		
+		public UserNotFoundException(IEnumerable<string> ids) : base($"Не удалось найти пользователя {string.Join(',', ids)}")
+		{
+		}
 	}
 }

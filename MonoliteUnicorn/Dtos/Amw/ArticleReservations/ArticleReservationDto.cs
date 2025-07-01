@@ -1,9 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
+namespace MonoliteUnicorn.Dtos.Amw.ArticleReservations;
 
-namespace MonoliteUnicorn.PostGres.Main;
-
-public partial class StorageContentReservation
+public class ArticleReservationDto
 {
     public string UserId { get; set; } = null!;
 
@@ -30,14 +27,4 @@ public partial class StorageContentReservation
     public string WhoCreated { get; set; } = null!;
 
     public string? WhoUpdated { get; set; }
-
-    public virtual Article Article { get; set; } = null!;
-
-    public virtual Currency? GivenCurrency { get; set; }
-
-    public virtual AspNetUser User { get; set; } = null!;
-
-    public virtual AspNetUser WhoCreatedNavigation { get; set; } = null!;
-
-    public virtual AspNetUser? WhoUpdatedNavigation { get; set; }
 }

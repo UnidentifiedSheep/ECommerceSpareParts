@@ -71,7 +71,7 @@ public static class MockData
         var f = new Faker<StorageContent>(Locale)
             .RuleFor(x => x.ArticleId, f => f.PickRandom(articleIds))
             .RuleFor(x => x.StorageName, f => f.PickRandom(storages))
-            .RuleFor(x => x.BuyPrice, f => f.Random.Decimal(0.01m, 2000000))
+            .RuleFor(x => x.BuyPrice, f => Math.Round(f.Random.Decimal(0.01m, 2000000), 2))
             .RuleFor(x => x.Count, f => f.Random.Int(1,1200))
             .RuleFor(x => x.CurrencyId, f => f.PickRandom(currencyIds));
         return f.Generate(count);

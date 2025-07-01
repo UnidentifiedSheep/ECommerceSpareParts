@@ -1,6 +1,7 @@
 using Core.Extensions;
 using Core.StaticFunctions;
 using Mapster;
+using MonoliteUnicorn.Dtos.Amw.ArticleReservations;
 using MonoliteUnicorn.Dtos.Amw.Articles;
 using MonoliteUnicorn.Dtos.Amw.Balances;
 using MonoliteUnicorn.Dtos.Amw.Producers;
@@ -260,5 +261,25 @@ public static class MapsterConfig
             .Map(dest => dest.Query, src => src.Query.ToString(Newtonsoft.Json.Formatting.None))
             .Map(dest => dest.SearchDateTime, src => src.SearchDateTime)
             .Map(dest => dest.SearchPlace, src => src.SearchPlace);
+
+        //Article Reservation 
+        TypeAdapterConfig<EditArticleReservationDto, StorageContentReservation>.NewConfig()
+            .IgnorePatchIfNotSet()
+            .Map(dest => dest.ArticleId, src => src.ArticleId)
+            .Map(dest => dest.Comment, src => src.Comment == null ? null : src.Comment.Trim())
+            .Map(dest => dest.InitialCount, src => src.InitialCount)
+            .Map(dest => dest.CurrentCount, src => src.CurrentCount)
+            .Map(dest => dest.GivenCurrencyId, src => src.GivenCurrencyId)
+            .Map(dest => dest.GivenPrice, src => src.GivenPrice);
+        
+        TypeAdapterConfig<NewArticleReservationDto, StorageContentReservation>.NewConfig()
+            .Map(dest => dest.ArticleId, src => src.ArticleId)
+            .Map(dest => dest.Comment, src => src.Comment)
+            .Map(dest => dest.GivenCurrencyId, src => src.GivenCurrencyId)
+            .Map(dest => dest.GivenPrice, src => src.GivenPrice)
+            .Map(dest => dest.CurrentCount, src => src.CurrentCount)
+            .Map(dest => dest.InitialCount, src => src.InitialCount)
+            .Map(dest => dest.UserId, src => src.UserId);
+
     }
 }

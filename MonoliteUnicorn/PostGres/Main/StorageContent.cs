@@ -16,7 +16,7 @@ public partial class StorageContent
     public decimal BuyPrice { get; set; }
 
     public int CurrencyId { get; set; }
-    
+
     public decimal BuyPriceInUsd { get; set; }
 
     public DateTime CreatedDatetime { get; set; }
@@ -26,6 +26,8 @@ public partial class StorageContent
     public virtual Article Article { get; set; } = null!;
 
     public virtual Currency Currency { get; set; } = null!;
+
+    public virtual ICollection<PurchaseContent> PurchaseContents { get; set; } = new List<PurchaseContent>();
 
     public virtual ICollection<SaleContentDetail> SaleContentDetails { get; set; } = new List<SaleContentDetail>();
 

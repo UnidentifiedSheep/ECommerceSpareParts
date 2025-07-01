@@ -22,6 +22,7 @@ using MonoliteUnicorn.Configs;
 using MonoliteUnicorn.HangFireTasks;
 using MonoliteUnicorn.PostGres.Identity;
 using MonoliteUnicorn.PostGres.Main;
+using MonoliteUnicorn.Services.ArticleReservations;
 using MonoliteUnicorn.Services.Balances;
 using MonoliteUnicorn.Services.Inventory;
 using MonoliteUnicorn.Services.JWT;
@@ -93,6 +94,7 @@ builder.Services.AddScoped<IBalance, Balance>();
 builder.Services.AddScoped<IInventory, Inventory>();
 builder.Services.AddScoped<IPurchaseOrchestrator, PurchaseOrchestrator>();
 builder.Services.AddScoped<ISaleOrchestrator, SaleOrchestrator>();
+builder.Services.AddScoped<IArticleReservation, ArticleReservation>();
 builder.Services.AddDbContext<IdentityContext>(options => options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection")));
 builder.Services.AddDbContext<DContext>(options => options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection")));
 

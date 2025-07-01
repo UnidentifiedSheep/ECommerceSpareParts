@@ -19,7 +19,11 @@ public partial class PurchaseContent
 
     public string? Comment { get; set; }
 
+    public int? StorageContentId { get; set; }
+
     public virtual Article Article { get; set; } = null!;
 
     public virtual Purchase Purchase { get; set; } = null!;
+
+    public virtual StorageContent? StorageContent { get; set; }
 }

@@ -1,4 +1,5 @@
 using Microsoft.EntityFrameworkCore;
+using MonoliteUnicorn.Exceptions.ArticleReservations;
 using MonoliteUnicorn.Exceptions.Articles;
 using MonoliteUnicorn.Exceptions.Currencies;
 using MonoliteUnicorn.Exceptions.Producers;
@@ -22,6 +23,17 @@ public static class EntityExistenceValidator
         var userExists = await context.AspNetUsers.AsNoTracking()
             .AnyAsync(x => x.Id == userId, cancellationToken);
         if (!userExists) throw new UserNotFoundException(userId);
+    }
+    
+    public static async Task EnsureUserExists(this DContext context, IEnumerable<string> userIds, CancellationToken cancellationToken = default)
+    {
+        var ids = userIds.ToHashSet();
+        var users = await context.AspNetUsers.AsNoTracking()
+            .Where(x => ids.Contains(x.Id))
+            .Select(x => x.Id)
+            .ToListAsync(cancellationToken);
+        var missedUsers= ids.Except(users).ToList();
+        if (missedUsers.Count != 0) throw new UserNotFoundException(missedUsers);
     }
 
     public static async Task EnsureStorageExists(this DContext context, string storageName,
@@ -93,6 +105,28 @@ public static class EntityExistenceValidator
             throw new ArticleNotFoundException(notFoundArticles);
         return articles;
     }
+    
+    public static async Task EnsureArticlesExist(this DContext context, IEnumerable<int> articleIds, 
+        CancellationToken cancellationToken = default)
+    {
+        var ids = articleIds.ToHashSet();
+        var articles = await context.Articles
+            .Where(x => ids.Contains(x.Id))
+            .Select(x => x.Id)
+            .ToListAsync(cancellationToken: cancellationToken);
+        var notFoundArticles = ids.Except(articles).ToList();
+        if (notFoundArticles.Count != 0)
+            throw new ArticleNotFoundException(notFoundArticles);
+    }
+    
+    public static async Task EnsureArticlesExist(this DContext context, int articleId, 
+        CancellationToken cancellationToken = default)
+    {
+        var exists = await context.Articles
+            .AnyAsync(x => x.Id == articleId, cancellationToken);
+        if (!exists)
+            throw new ArticleNotFoundException(articleId);
+    }
 
     public static async Task<int> UpdateArticlesCount(this DContext context, Dictionary<int, int> toIncrement, CancellationToken cancellationToken = default)
     {
@@ -105,5 +139,15 @@ public static class EntityExistenceValidator
                      WHERE a.id = data.article_id
                      """;
         return await context.Database.ExecuteSqlRawAsync(query, cancellationToken);
+    }
+
+    public static async Task EnsureReservationExists(this DContext context, int reservationId,
+        CancellationToken cancellationToken = default)
+    {
+        var reservationExists = await context.StorageContentReservations
+            .AsNoTracking()
+            .AnyAsync(x => x.Id == reservationId, cancellationToken);
+        if (!reservationExists)
+            throw new ReservationNotExistsException(reservationId);
     }
 }

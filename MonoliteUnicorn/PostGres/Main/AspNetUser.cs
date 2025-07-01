@@ -65,7 +65,11 @@ public partial class AspNetUser
 
     public virtual ICollection<Sale> SaleUpdatedUsers { get; set; } = new List<Sale>();
 
-    public virtual ICollection<StorageContentReservation> StorageContentReservations { get; set; } = new List<StorageContentReservation>();
+    public virtual ICollection<StorageContentReservation> StorageContentReservationUsers { get; set; } = new List<StorageContentReservation>();
+
+    public virtual ICollection<StorageContentReservation> StorageContentReservationWhoCreatedNavigations { get; set; } = new List<StorageContentReservation>();
+
+    public virtual ICollection<StorageContentReservation> StorageContentReservationWhoUpdatedNavigations { get; set; } = new List<StorageContentReservation>();
 
     public virtual ICollection<StorageMovement> StorageMovements { get; set; } = new List<StorageMovement>();
 
