@@ -67,25 +67,22 @@ public class TransactionConfig(DbContext context)
             {
                 if(isLocalTransaction)
                     await SetIsolationLevelOfDbTransaction();
+                if(attempt > 0)
+                    context.ChangeTracker.Clear();
                 T result = await action();
 
                 if (isLocalTransaction)
                     await transaction.CommitAsync(cancellationToken);
-
                 return result;
             }
-            catch (PostgresException ex) when (_retryOn.Contains(ex.SqlState))
+            catch (Exception ex)
             {
                 if (!isLocalTransaction) throw;
                 await transaction.RollbackAsync(cancellationToken);
 
+                var pgEx = GetException(ex);
+                if (pgEx == null || !_retryOn.Contains(pgEx.SqlState)) throw;
                 await Task.Delay(RetryDelay, cancellationToken);
-            }
-            catch
-            {
-                if (isLocalTransaction)
-                    await transaction.RollbackAsync(cancellationToken);
-                throw;
             }
             finally
             {
@@ -120,7 +117,7 @@ public class TransactionConfig(DbContext context)
                 if (!isLocalTransaction) throw;
                 await transaction.RollbackAsync(cancellationToken);
 
-                var pgEx = ex as PostgresException ?? ex.InnerException as PostgresException;
+                var pgEx = GetException(ex);
                 if (pgEx == null || !_retryOn.Contains(pgEx.SqlState)) throw;
                 await Task.Delay(RetryDelay, cancellationToken);
             }
@@ -132,6 +129,20 @@ public class TransactionConfig(DbContext context)
                 
         }
         throw new InvalidOperationException("Out of attempts");
+    }
+
+    private PostgresException? GetException(Exception? ex)
+    {
+        int deepness = 0;
+        var tempEx = ex;
+        
+        while (tempEx != null && !(tempEx is PostgresException) && deepness < 4)
+        {
+            tempEx = tempEx.InnerException;
+            deepness++;
+        }
+        
+        return tempEx as PostgresException;
     }
 
     private async Task SetIsolationLevelOfDbTransaction()

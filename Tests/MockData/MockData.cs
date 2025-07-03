@@ -117,4 +117,18 @@ public static class MockData
             .RuleFor(x => x.Code, f => f.Lorem.Letter(3));
         return f.Generate(count);
     }
+
+    public static List<Transaction> CreateTransaction(IEnumerable<string> receiverIds, IEnumerable<string> senderIds, IEnumerable<int> currencyIds, int count)
+    {
+        //TODO Дописать 
+        var f = new Faker<Transaction>(Locale)
+            .RuleFor(x => x.TransactionSum, f => Math.Round(f.Random.Decimal(1, 100000), 2))
+            .RuleFor(x => x.SenderId, f => f.PickRandom(senderIds))
+            .RuleFor(x => x.ReceiverId, f => f.PickRandom(receiverIds))
+            .RuleFor(x => x.TransactionDatetime,
+                f => f.Date.Between(DateTime.Now.AddMonths(-2), DateTime.Now.AddMonths(2)))
+            .RuleFor(x => x.CurrencyId, f => f.PickRandom(currencyIds));
+        
+        return f.Generate(count);
+    }
 }

@@ -1,8 +1,10 @@
 using System.Net.Http.Headers;
+using System.Reflection;
 using System.Text;
 using Carter;
 using Core.Behavior;
 using Core.Exceptions.ExceptionHandlers;
+using Core.Logger;
 using Core.Mail;
 using Core.Mail.Models;
 using Core.Redis;
@@ -11,6 +13,7 @@ using Core.Services.TimeWebCloud.Interfaces;
 using FluentValidation;
 using Hangfire;
 using Hangfire.PostgreSql;
+using MassTransit;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
@@ -19,6 +22,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using MonoliteUnicorn.Configs;
+using MonoliteUnicorn.Consumers;
 using MonoliteUnicorn.HangFireTasks;
 using MonoliteUnicorn.PostGres.Identity;
 using MonoliteUnicorn.PostGres.Main;
@@ -31,7 +35,9 @@ using MonoliteUnicorn.Services.Prices.PriceGenerator;
 using MonoliteUnicorn.Services.Purchase;
 using MonoliteUnicorn.Services.Sale;
 using MonoliteUnicorn.Services.SearchLog;
-using Prometheus;
+using OpenTelemetry.Metrics;
+using Serilog;
+using Serilog.Sinks.Loki;
 using Purchase = MonoliteUnicorn.Services.Purchase.Purchase;
 using Sale = MonoliteUnicorn.Services.Sale.Sale;
 
@@ -39,6 +45,21 @@ var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
+
+Log.Logger = new LoggerConfiguration()
+    .MinimumLevel.Debug()
+    .Enrich.FromLogContext()
+    .WriteTo.Console()
+    .WriteTo.LokiHttp(() => new LokiSinkConfiguration
+    {
+        LokiUrl = builder.Configuration["Loki:Url"],
+        LogLabelProvider = new CustomLogLableProvider(),
+    })
+    .CreateLogger();
+
+
+builder.Host.UseSerilog();
+
 builder.Services.AddOpenApi();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen(c =>
@@ -171,9 +192,39 @@ builder.Services.AddTransient<IMail, Mail>();
 builder.Services.AddTransient<IJwtGenerator, JwtGenerator>();
 builder.Services.AddSingleton<ISearchLogger, SearchLogger>();
 
+builder.Services.AddMassTransit(conf =>
+{
+    conf.SetKebabCaseEndpointNameFormatter();
+    conf.AddConsumers(Assembly.GetExecutingAssembly());
+    conf.UsingRabbitMq((context, configurator) =>
+    {
+        configurator.Host(new Uri(builder.Configuration.GetValue<string>("RabbitMqSettings:Host")!), x =>
+        {
+            x.Username(builder.Configuration.GetValue<string>("RabbitMqSettings:Username")!);
+            x.Password(builder.Configuration.GetValue<string>("RabbitMqSettings:Password")!);
+        });
+        var queueName = $"currency-rates-updated-{Environment.MachineName}";
+        configurator.ReceiveEndpoint(queueName, e =>
+        {
+            e.ConfigureConsumer<CurrencyRatesChangedConsumer>(context);
+            e.ConfigureConsumer<MarkupGroupChangedConsumer>(context);
+        });
+    });
+});
+
 builder.Services.AddHostedService<SearchLogBackgroundWorker>();
 
-builder.Services.UseHttpClientMetrics(); 
+
+builder.Services.AddOpenTelemetry()
+    .WithMetrics(metrics =>
+    {
+        metrics
+            .AddAspNetCoreInstrumentation()
+            .AddProcessInstrumentation()
+            .AddRuntimeInstrumentation()
+            .AddPrometheusExporter();
+    });
+
 
 var app = builder.Build();
 
@@ -204,6 +255,7 @@ RecurringJob.AddOrUpdate<UpdateCurrencyRate>("UpdateCurrencyTask",
 RecurringJob.AddOrUpdate<UpdateMarkUp>("UpdateMarkUp", 
     x => x.Run(), Cron.Weekly);
 
+app.UseOpenTelemetryPrometheusScrapingEndpoint();
 
 
 app.Run();

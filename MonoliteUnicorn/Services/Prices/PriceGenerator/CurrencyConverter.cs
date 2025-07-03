@@ -6,6 +6,7 @@ public static class CurrencyConverter
     private static readonly Dictionary<int, double> ToUsdDouble = new();
 
     public static Dictionary<int, decimal> ToUsd => ToUsdDecimal;
+    public static Dictionary<int, double> ToUsdDoub => ToUsdDouble;
 
     public static void LoadRates(Dictionary<int, decimal> rawRates)
     {

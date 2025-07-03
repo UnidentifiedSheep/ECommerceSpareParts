@@ -48,12 +48,11 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="RabbitMq\Contracts\Transactions\" />
-  </ItemGroup>
-
-  <ItemGroup>
     <Reference Include="Microsoft.EntityFrameworkCore">
       <HintPath>..\..\..\..\..\.nuget\packages\microsoft.entityframeworkcore\8.0.10\lib\net8.0\Microsoft.EntityFrameworkCore.dll</HintPath>
+    </Reference>
+    <Reference Include="Serilog.Sinks.Loki">
+      <HintPath>..\..\..\..\..\.nuget\packages\serilog.sinks.loki\4.0.0-beta3\lib\netstandard2.0\Serilog.Sinks.Loki.dll</HintPath>
     </Reference>
   </ItemGroup>
 

@@ -69,9 +69,8 @@ public class PurchaseOrchestrator(IServiceProvider serviceProvider) : IPurchaseO
                 await balanceService.EditTransaction(purchase.TransactionId, currencyId, newTotalSum,
                     TransactionStatus.Purchase, purchaseDateTime, cancellationToken);
                 await inventoryService.AddOrRemoveContentFromStorage(editArticleCounts, purchase.CurrencyId,
-                    purchase.Storage,
-                    purchase.PurchaseDatetime, purchaseDateTime, updatedUserId, StorageMovementType.PurchaseEditing,
-                    cancellationToken);
+                    purchase.Storage, purchase.PurchaseDatetime, purchaseDateTime, 
+                    updatedUserId, StorageMovementType.PurchaseEditing, cancellationToken);
             }, cancellationToken);
     }
 

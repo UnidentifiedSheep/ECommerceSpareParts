@@ -284,7 +284,6 @@ public class Inventory(DContext context) : IInventory
                 return result;
             }, cancellationToken);
     }
-    //TODO: Переделать так чтобы добавление и вычитание происхлдило только двумя методами
 
     public async Task AddOrRemoveContentFromStorage(Dictionary<int, Dictionary<decimal, int>> addRemoveDict, int currencyId, string storageName,
         DateTime prevPurchaseDateTime, DateTime newPurchaseDateTime, string userId,

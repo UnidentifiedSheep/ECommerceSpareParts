@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Diagnostics;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
+using Serilog;
 
 namespace Core.Exceptions.ExceptionHandlers
 {
@@ -10,9 +11,8 @@ namespace Core.Exceptions.ExceptionHandlers
 	{
 		public async ValueTask<bool> TryHandleAsync(HttpContext context, Exception exception, CancellationToken cancellationToken)
 		{
-			logger.LogError(
-				"Error Message: {exceptionMessage}, Time of occurrence {time}",
-				exception.Message, DateTime.UtcNow);
+			Log.ForContext("traceId", context.TraceIdentifier)
+				.Error(exception, "Error occurred at {time}", DateTime.UtcNow);
 
 			var showDetails = exception is ValidationException or BadRequestException or UnauthorizedAccessException or NotFoundException;
 

@@ -1,3 +1,5 @@
+using Core.RabbitMq.Contracts;
+using MassTransit;
 using Microsoft.EntityFrameworkCore;
 using MonoliteUnicorn.Exceptions;
 using MonoliteUnicorn.HangFireTasks.Models;
@@ -13,12 +15,14 @@ public class UpdateCurrencyRate
     private readonly string _apiKey;
     private readonly HttpClient _httpClient;
     private readonly DContext _context;
+    private readonly IPublishEndpoint _publishEndpoint;
 
-    public UpdateCurrencyRate(ILogger<UpdateCurrencyRate> logger, IConfiguration config, DContext context, HttpClient httpClient)
+    public UpdateCurrencyRate(IConfiguration config, DContext context, HttpClient httpClient, IPublishEndpoint publishEndpoint)
     {
-        _apiKey = config!.GetValue<string>("ExchangeApiKey")!;
+        _apiKey = config.GetValue<string>("ExchangeApiKey")!;
         _httpClient = httpClient;
         _context = context;
+        _publishEndpoint = publishEndpoint;
     }
 
     
@@ -70,6 +74,8 @@ public class UpdateCurrencyRate
             await _context.CurrencyHistories.AddAsync(currencyHistory);
             await _context.SaveChangesAsync();
         }
+
+        await _publishEndpoint.Publish(new CurrencyRateChangedEvent());
     }
     
     private async Task<LatestCurrencyModel> GetNewValues()

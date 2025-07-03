@@ -6,6 +6,7 @@ using MonoliteUnicorn.Enums;
 using MonoliteUnicorn.Exceptions.Balances;
 using MonoliteUnicorn.Exceptions.Currencies;
 using MonoliteUnicorn.Exceptions.Users;
+using MonoliteUnicorn.Extensions;
 using MonoliteUnicorn.PostGres.Main;
 
 namespace MonoliteUnicorn.Services.Balances;
@@ -22,65 +23,63 @@ public class Balance(DContext context) : IBalance
     public async Task<Transaction> CreateTransactionAsync(string senderId, string receiverId, decimal amount, TransactionStatus status, 
         int currencyId, string whoCreatedTransaction, DateTime transactionDateTime, CancellationToken cancellationToken = default)
     {
+        amount = Math.Round(amount, 2);
+        if (amount <= 0) throw new ZeroOrNegativeTransactionAmountException();
+        if (senderId == receiverId) throw new SameSenderAndReceiverException();
+        var sameTransactionExists = await context.Transactions.AsNoTracking()
+            .AnyAsync(x => x.SenderId == senderId &&
+                           x.ReceiverId == receiverId &&
+                           x.TransactionDatetime == transactionDateTime, cancellationToken);
+        if (sameTransactionExists) throw new SameTransactionExists();
+        await context.EnsureCurrencyExists(currencyId, cancellationToken);
+        await context.EnsureUserExists([senderId, receiverId, whoCreatedTransaction], cancellationToken);
+        
         return await context.WithDefaultTransactionSettings("normal-with-isolation")
-            .ExecuteWithTransaction(async () =>
-        {
-            transactionDateTime = DateTime.SpecifyKind(transactionDateTime, DateTimeKind.Unspecified);
-
-            if (amount <= 0) throw new ZeroOrNegativeTransactionAmountException();
-            if (senderId == receiverId) throw new SameSenderAndReceiverException();
-            var sameTransactionExists = await context.Transactions.AsNoTracking()
-                .AnyAsync(x => x.SenderId == senderId &&
-                               x.ReceiverId == receiverId &&
-                               x.TransactionDatetime == transactionDateTime, cancellationToken);
-            if (sameTransactionExists) throw new SameTransactionExists();
-            _ = await context.Currencies.AsNoTracking()
-                    .FirstOrDefaultAsync(x => x.Id == currencyId, cancellationToken) ??
-                throw new CurrencyNotFoundException(currencyId);
-            _ = await context.AspNetUsers.AsNoTracking()
-                    .FirstOrDefaultAsync(x => x.Id == senderId, cancellationToken) ??
-                throw new UserNotFoundException(senderId);
-            _ = await context.AspNetUsers.AsNoTracking()
-                    .FirstOrDefaultAsync(x => x.Id == receiverId, cancellationToken) ??
-                throw new UserNotFoundException(receiverId);
-            _ = await context.AspNetUsers.AsNoTracking()
-                    .FirstOrDefaultAsync(x => x.Id == whoCreatedTransaction, cancellationToken) ??
-                throw new UserNotFoundException(whoCreatedTransaction);
-            var prevSenderTransaction = await context.Transactions.AsNoTracking()
-                .OrderByDescending(x => x.TransactionDatetime)
-                .FirstOrDefaultAsync(x => x.TransactionDatetime < transactionDateTime &&
-                                          (x.SenderId == senderId || x.ReceiverId == senderId), cancellationToken);
-            var prevReceiverTransaction = await context.Transactions.AsNoTracking()
-                .OrderByDescending(x => x.TransactionDatetime)
-                .FirstOrDefaultAsync(x => x.TransactionDatetime < transactionDateTime &&
-                                          (x.SenderId == receiverId || x.ReceiverId == receiverId), cancellationToken);
-            var transaction = new Transaction
+            .ExecuteWithTransaction(async () => 
             {
-                SenderId = senderId,
-                ReceiverId = receiverId,
-                CurrencyId = currencyId,
-                WhoMadeUserId = whoCreatedTransaction,
-                TransactionSum = amount,
-                TransactionDatetime = transactionDateTime,
-                ReceiverBalanceAfterTransaction = prevReceiverTransaction?.ReceiverId == receiverId
-                    ? (prevReceiverTransaction.ReceiverBalanceAfterTransaction) + amount
-                    : (prevReceiverTransaction?.SenderBalanceAfterTransaction ?? 0) + amount,
-                SenderBalanceAfterTransaction = prevSenderTransaction?.SenderId == senderId
-                    ? (prevSenderTransaction.SenderBalanceAfterTransaction) - amount
-                    : (prevSenderTransaction?.ReceiverBalanceAfterTransaction ?? 0) - amount,
-                Status = status.ToString()
-            };
-            await context.Transactions.AddAsync(transaction, cancellationToken);
-            await RecalculateBalanceAsync(transaction, null, cancellationToken);
-            await ChangeSenderReceiverBalancesAsync(transaction, cancellationToken);
-            await context.SaveChangesAsync(cancellationToken);
-            return transaction;
-        }, cancellationToken);
+                transactionDateTime = DateTime.SpecifyKind(transactionDateTime, DateTimeKind.Unspecified);
+                var sqlQuery = """
+                               Select * 
+                               from transactions
+                               where transaction_datetime < '{0}' and
+                               (sender_id = '{1}' or receiver_id = '{1}')
+                               order by transaction_datetime desc
+                               for update
+                               limit 1
+                               """;
+                var prevSenderTransaction = await context.Transactions
+                    .FromSqlRaw(string.Format(sqlQuery, transactionDateTime.ToString("yyyy-MM-dd HH:mm:ss.ffffff"), senderId))
+                    .FirstOrDefaultAsync(cancellationToken);
+                var prevReceiverTransaction = await context.Transactions
+                    .FromSqlRaw(string.Format(sqlQuery, transactionDateTime.ToString("yyyy-MM-dd HH:mm:ss.ffffff"), receiverId))
+                    .FirstOrDefaultAsync(cancellationToken);
+                var transaction = new Transaction
+                {
+                    SenderId = senderId,
+                    ReceiverId = receiverId,
+                    CurrencyId = currencyId,
+                    WhoMadeUserId = whoCreatedTransaction,
+                    TransactionSum = amount,
+                    TransactionDatetime = transactionDateTime,
+                    ReceiverBalanceAfterTransaction = prevReceiverTransaction?.ReceiverId == receiverId
+                        ? (prevReceiverTransaction.ReceiverBalanceAfterTransaction) + amount
+                        : (prevReceiverTransaction?.SenderBalanceAfterTransaction ?? 0) + amount,
+                    SenderBalanceAfterTransaction = prevSenderTransaction?.SenderId == senderId
+                        ? (prevSenderTransaction.SenderBalanceAfterTransaction) - amount
+                        : (prevSenderTransaction?.ReceiverBalanceAfterTransaction ?? 0) - amount,
+                    Status = status.ToString()
+                };
+                await context.Transactions.AddAsync(transaction, cancellationToken);
+                await ChangeSenderReceiverBalancesAsync(transaction, cancellationToken);
+                await RecalculateBalanceAsync(transaction, null, cancellationToken);
+                await context.SaveChangesAsync(cancellationToken);
+                return transaction; 
+            }, cancellationToken);
     }
 
     private async Task RecalculateBalanceAsync(Transaction transaction, string? withOut = null, CancellationToken cancellationToken = default)
     {
-        await foreach (var tr in GetAffectedTransactions(transaction.ReceiverId, transaction.CurrencyId, transaction.TransactionDatetime)
+        await foreach (var tr in GetAffectedTransactions(transaction.ReceiverId, transaction.CurrencyId, transaction.TransactionDatetime, withOut)
                            .WithCancellation(cancellationToken))
         {
             var amountDelta = transaction.IsDeleted ? -transaction.TransactionSum : transaction.TransactionSum;
@@ -90,7 +89,7 @@ public class Balance(DContext context) : IBalance
             
         }
         
-        await foreach (var tr in GetAffectedTransactions(transaction.SenderId, transaction.CurrencyId, transaction.TransactionDatetime)
+        await foreach (var tr in GetAffectedTransactions(transaction.SenderId, transaction.CurrencyId, transaction.TransactionDatetime, withOut)
                            .WithCancellation(cancellationToken))
         {
             var amountDelta = transaction.IsDeleted ? transaction.TransactionSum : -transaction.TransactionSum;
@@ -103,7 +102,7 @@ public class Balance(DContext context) : IBalance
     
     private IAsyncEnumerable<Transaction> GetAffectedTransactions(string userId, int currencyId, DateTime datetime, string? withOut = null)
     {
-        var additional = string.IsNullOrWhiteSpace(withOut) ? "" : $"AND transaction_id != '{withOut}'";
+        var additional = string.IsNullOrWhiteSpace(withOut) ? "" : $"AND id != '{withOut}'";
         return context.Transactions
             .FromSqlRaw($"""
                              SELECT * FROM transactions 
@@ -163,8 +162,7 @@ public class Balance(DContext context) : IBalance
     
     public async Task ChangeUsersDiscount(string userId, decimal discount, CancellationToken cancellationToken = default)
     {
-        var userFound = await context.AspNetUsers.AsNoTracking().AnyAsync(x => x.Id == userId, cancellationToken);
-        if (!userFound) throw new UserNotFoundException(userId);
+        await context.EnsureUserExists(userId, cancellationToken);
         if (discount < 0) throw new ArgumentOutOfRangeException(nameof(discount), "Скидка не может быть меньше 0");
         if (discount > 100) throw new ArgumentOutOfRangeException(nameof(discount), "Скидка не может быть больше 100");
         await context.Database.ExecuteSqlAsync($"""
@@ -177,27 +175,26 @@ public class Balance(DContext context) : IBalance
 
     public async Task DeleteTransaction(string transactionId, string whoDeleteUserId, CancellationToken cancellationToken = default)
     {
+        await context.EnsureUserExists(whoDeleteUserId, cancellationToken);
         await context.WithDefaultTransactionSettings("normal-with-isolation")
             .ExecuteWithTransaction(async () =>
-        {
-            var transactionEntity = await context.Transactions
-                .FromSql($"SELECT * FROM transactions WHERE id = {transactionId} FOR UPDATE")
-                .FirstOrDefaultAsync(cancellationToken) ?? throw new TransactionNotFount(transactionId);
-            var whoDeleted = await context.AspNetUsers.AsNoTracking().FirstOrDefaultAsync(x => x.Id == whoDeleteUserId, cancellationToken);
-            if (whoDeleted == null) throw new UserNotFoundException(whoDeleteUserId);
-            if (transactionEntity.IsDeleted) throw new TransactionAlreadyDeletedException(transactionId);
-            if (!AllowedStatuses.Contains(transactionEntity.Status)) 
-                throw new BadTransactionStatusException(transactionEntity.Status);
+            {
+                var transactionEntity = await context.Transactions
+                    .FromSql($"SELECT * FROM transactions WHERE id = {transactionId} FOR UPDATE")
+                    .FirstOrDefaultAsync(cancellationToken) ?? throw new TransactionNotFount(transactionId);
+                if (transactionEntity.IsDeleted) throw new TransactionAlreadyDeletedException(transactionId);
+                if (!AllowedStatuses.Contains(transactionEntity.Status)) 
+                    throw new BadTransactionStatusException(transactionEntity.Status);
 
-            transactionEntity.IsDeleted = true;
-            transactionEntity.DeletedAt = DateTime.SpecifyKind(DateTime.Now, DateTimeKind.Unspecified);
-            transactionEntity.DeletedBy = whoDeleteUserId;
+                transactionEntity.IsDeleted = true;
+                transactionEntity.DeletedAt = DateTime.SpecifyKind(DateTime.Now, DateTimeKind.Unspecified);
+                transactionEntity.DeletedBy = whoDeleteUserId;
             
-            await RecalculateBalanceAsync(transactionEntity, transactionEntity.Id, cancellationToken);
-            await ChangeSenderReceiverBalancesAsync(transactionEntity, cancellationToken);
+                await RecalculateBalanceAsync(transactionEntity, transactionEntity.Id, cancellationToken);
+                await ChangeSenderReceiverBalancesAsync(transactionEntity, cancellationToken);
             
-            await context.SaveChangesAsync(cancellationToken);
-        }, cancellationToken);
+                await context.SaveChangesAsync(cancellationToken);
+            }, cancellationToken);
     }
 
     public async Task EditTransaction(string transactionId, int currencyId, decimal amount, TransactionStatus status, DateTime transactionDateTime, CancellationToken cancellationToken = default)
