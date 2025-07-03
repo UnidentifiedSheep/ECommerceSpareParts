@@ -26,7 +26,7 @@ public class DeleteTransactionHandler(IBalance balance, DContext context) : ICom
     public async Task<Unit> Handle(DeleteTransactionCommand request, CancellationToken cancellationToken)
     {
         var transaction = await context.Transactions.AsNoTracking()
-            .FirstOrDefaultAsync(x => x.Id == request.TransactionId, cancellationToken) ?? throw new TransactionNotFount(request.TransactionId);
+            .FirstOrDefaultAsync(x => x.Id == request.TransactionId, cancellationToken) ?? throw new TransactionNotFound(request.TransactionId);
         if (transaction.Status != nameof(TransactionStatus.Normal)) throw new BadTransactionStatusException(transaction.Status);
         await balance.DeleteTransaction(request.TransactionId, request.WhoDeleteUserId, cancellationToken);
         return Unit.Value;

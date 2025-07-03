@@ -124,4 +124,46 @@ public static class MockDContext
         var sql = $@"TRUNCATE TABLE {tablesList} RESTART IDENTITY CASCADE";
         await context.Database.ExecuteSqlRawAsync(sql);
     }
+
+    public static async Task<IEnumerable<Transaction>> AddMockTransaction(this DContext context,
+        IEnumerable<string> receiverIds, IEnumerable<string> senderIds, string whoMade, IEnumerable<int> currencyIds,
+        int count)
+    {
+        var transactions = MockData.CreateTransaction(receiverIds, senderIds, whoMade, currencyIds, count);
+        await context.Transactions.AddRangeAsync(transactions);
+        foreach (var item in transactions)
+        {
+            var receiverBalance = await context.UserBalances
+                .FirstOrDefaultAsync(x => x.UserId == item.ReceiverId && x.CurrencyId == item.CurrencyId);
+            var senderBalance = await context.UserBalances
+                .FirstOrDefaultAsync(x => x.UserId == item.ReceiverId && x.CurrencyId == item.CurrencyId);
+
+            if (receiverBalance == null)
+            {
+                receiverBalance = new UserBalance
+                {
+                    UserId = item.ReceiverId,
+                    CurrencyId = item.CurrencyId,
+                    Balance = 0
+                };
+                await context.UserBalances.AddAsync(receiverBalance);
+            }
+
+            if (senderBalance == null)
+            {
+                senderBalance = new UserBalance
+                {
+                    UserId = item.SenderId,
+                    CurrencyId = item.CurrencyId,
+                    Balance = 0
+                };
+                await context.UserBalances.AddAsync(senderBalance);
+            }
+            
+            senderBalance.Balance -= item.TransactionSum;
+            receiverBalance.Balance += item.TransactionSum;
+            await context.SaveChangesAsync();
+        }
+        return transactions;
+    }
 }

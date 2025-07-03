@@ -20,6 +20,18 @@ public class Balance(DContext context) : IBalance
         nameof(TransactionStatus.Purchase),
         nameof(TransactionStatus.Sale)
     ];
+
+    private const string GetPrevTransaction = """
+                                              Select * 
+                                              from transactions
+                                              where transaction_datetime < '{0}' and
+                                              (sender_id = '{1}' or receiver_id = '{1}') and
+                                              currency_id = {2}
+                                              order by transaction_datetime desc
+                                              for update
+                                              limit 1
+                                              """;
+
     public async Task<Transaction> CreateTransactionAsync(string senderId, string receiverId, decimal amount, TransactionStatus status, 
         int currencyId, string whoCreatedTransaction, DateTime transactionDateTime, CancellationToken cancellationToken = default)
     {
@@ -38,21 +50,9 @@ public class Balance(DContext context) : IBalance
             .ExecuteWithTransaction(async () => 
             {
                 transactionDateTime = DateTime.SpecifyKind(transactionDateTime, DateTimeKind.Unspecified);
-                var sqlQuery = """
-                               Select * 
-                               from transactions
-                               where transaction_datetime < '{0}' and
-                               (sender_id = '{1}' or receiver_id = '{1}')
-                               order by transaction_datetime desc
-                               for update
-                               limit 1
-                               """;
-                var prevSenderTransaction = await context.Transactions
-                    .FromSqlRaw(string.Format(sqlQuery, transactionDateTime.ToString("yyyy-MM-dd HH:mm:ss.ffffff"), senderId))
-                    .FirstOrDefaultAsync(cancellationToken);
-                var prevReceiverTransaction = await context.Transactions
-                    .FromSqlRaw(string.Format(sqlQuery, transactionDateTime.ToString("yyyy-MM-dd HH:mm:ss.ffffff"), receiverId))
-                    .FirstOrDefaultAsync(cancellationToken);
+                
+                var prevSenderTransaction = await GetPreviousTransactionForUpdate(transactionDateTime, senderId, currencyId, cancellationToken);
+                var prevReceiverTransaction = await GetPreviousTransactionForUpdate(transactionDateTime, receiverId, currencyId, cancellationToken);
                 var transaction = new Transaction
                 {
                     SenderId = senderId,
@@ -181,7 +181,7 @@ public class Balance(DContext context) : IBalance
             {
                 var transactionEntity = await context.Transactions
                     .FromSql($"SELECT * FROM transactions WHERE id = {transactionId} FOR UPDATE")
-                    .FirstOrDefaultAsync(cancellationToken) ?? throw new TransactionNotFount(transactionId);
+                    .FirstOrDefaultAsync(cancellationToken) ?? throw new TransactionNotFound(transactionId);
                 if (transactionEntity.IsDeleted) throw new TransactionAlreadyDeletedException(transactionId);
                 if (!AllowedStatuses.Contains(transactionEntity.Status)) 
                     throw new BadTransactionStatusException(transactionEntity.Status);
@@ -197,42 +197,79 @@ public class Balance(DContext context) : IBalance
             }, cancellationToken);
     }
 
-    public async Task EditTransaction(string transactionId, int currencyId, decimal amount, TransactionStatus status, DateTime transactionDateTime, CancellationToken cancellationToken = default)
-    {
+   public async Task EditTransaction(string transactionId, int currencyId, decimal amount, TransactionStatus status, DateTime transactionDateTime, CancellationToken cancellationToken = default)
+   {
         await context.WithDefaultTransactionSettings("normal-with-isolation")
             .ExecuteWithTransaction(async () =>
-        {
-            var transaction = await context.Transactions
-                .FromSql($"SELECT * FROM transactions WHERE id = {transactionId} for update")
-                .FirstOrDefaultAsync(cancellationToken) ?? throw new TransactionNotFount(transactionId);
-            if (amount <= 0) throw new ZeroOrNegativeTransactionAmountException();
-            if (transaction.IsDeleted) throw new EditingDeletedTransactionException(transactionId);
-            var lastVersion = await context.TransactionVersions
-                .AsNoTracking()
-                .OrderByDescending(x => x.Version)
-                .FirstOrDefaultAsync(x => x.TransactionId == transactionId, cancellationToken);
-            var transactionVersion = transaction.Adapt<TransactionVersion>();
-            transactionVersion.Version = lastVersion == null ? 0 : lastVersion.Version + 1;
-            await context.AddAsync(transactionVersion, cancellationToken);
-
-            if (transaction.CurrencyId != currencyId)
             {
+                amount = Math.Round(amount, 2);
+                transactionDateTime = DateTime.SpecifyKind(transactionDateTime, DateTimeKind.Unspecified);
+
+                var transaction = await context.Transactions
+                    .FromSqlInterpolated($"""
+                        SELECT * FROM transactions 
+                        WHERE id = {transactionId} 
+                        FOR UPDATE
+                    """)
+                    .IgnoreQueryFilters()
+                    .FirstOrDefaultAsync(cancellationToken) ?? throw new TransactionNotFound(transactionId);
+
+                if (amount <= 0) throw new ZeroOrNegativeTransactionAmountException();
+                if (transaction.IsDeleted) throw new EditingDeletedTransactionException(transactionId);
+
+                var sameTransactionExists = await context.Transactions.AsNoTracking()
+                    .AnyAsync(x => x.SenderId == transaction.SenderId &&
+                                   x.ReceiverId == transaction.ReceiverId &&
+                                   x.TransactionDatetime == transactionDateTime && x.Id != transactionId, cancellationToken);
+                if (sameTransactionExists) throw new SameTransactionExists();
+                
+                // Создаём версию до изменений
+                var lastVersion = await context.TransactionVersions
+                    .AsNoTracking()
+                    .OrderByDescending(x => x.Version)
+                    .FirstOrDefaultAsync(x => x.TransactionId == transactionId, cancellationToken);
+
+                var transactionVersion = transaction.Adapt<TransactionVersion>();
+                transactionVersion.Version = lastVersion?.Version + 1 ?? 0;
+                await context.AddAsync(transactionVersion, cancellationToken);
+
+                // Откат текущей транзакции
                 transaction.IsDeleted = true;
                 await RecalculateBalanceAsync(transaction, transaction.Id, cancellationToken);
                 await ChangeSenderReceiverBalancesAsync(transaction, cancellationToken);
+
+                // Применение новых параметров
                 transaction.IsDeleted = false;
-            }
-            
-            transaction.Status = status.ToString();
-            transaction.TransactionDatetime = transactionDateTime;
-            transaction.TransactionSum = amount;
-            transaction.CurrencyId = currencyId;
-        
-            await RecalculateBalanceAsync(transaction, transaction.Id, cancellationToken);
-            await ChangeSenderReceiverBalancesAsync(transaction, cancellationToken);
-        
-            await context.SaveChangesAsync(cancellationToken);
-        }, cancellationToken);
+                transaction.TransactionDatetime = transactionDateTime;
+                transaction.TransactionSum = amount;
+                transaction.Status = status.ToString();
+                transaction.CurrencyId = currencyId;
+
+                // Получение предыдущих транзакций
+                var prevSenderTransaction = await GetPreviousTransactionForUpdate(transactionDateTime, transaction.SenderId, currencyId, cancellationToken);
+                var prevReceiverTransaction = await GetPreviousTransactionForUpdate(transactionDateTime, transaction.ReceiverId, currencyId, cancellationToken);
+
+                transaction.SenderBalanceAfterTransaction = prevSenderTransaction?.SenderId == transaction.SenderId
+                    ? prevSenderTransaction.SenderBalanceAfterTransaction - amount
+                    : (prevSenderTransaction?.ReceiverBalanceAfterTransaction ?? 0) - amount;
+
+                transaction.ReceiverBalanceAfterTransaction = prevReceiverTransaction?.ReceiverId == transaction.ReceiverId
+                    ? prevReceiverTransaction.ReceiverBalanceAfterTransaction + amount
+                    : (prevReceiverTransaction?.SenderBalanceAfterTransaction ?? 0) + amount;
+
+                // Применение новой версии транзакции
+                await RecalculateBalanceAsync(transaction, transaction.Id, cancellationToken);
+                await ChangeSenderReceiverBalancesAsync(transaction, cancellationToken);
+
+                await context.SaveChangesAsync(cancellationToken);
+            }, cancellationToken);
+   }
+
+    private async Task<Transaction?> GetPreviousTransactionForUpdate(DateTime transactionDateTime, string userId, int currencyId, CancellationToken cancellationToken)
+    {
+        return await context.Transactions
+            .FromSqlRaw(string.Format(GetPrevTransaction, transactionDateTime.ToString("yyyy-MM-dd HH:mm:ss.ffffff"), userId, currencyId))
+            .FirstOrDefaultAsync(cancellationToken);
     }
 
 }

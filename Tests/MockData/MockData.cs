@@ -4,6 +4,7 @@ using Bogus;
 using MonoliteUnicorn.Dtos.Amw.Articles;
 using MonoliteUnicorn.Dtos.Amw.Producers;
 using MonoliteUnicorn.Dtos.Amw.Storage;
+using MonoliteUnicorn.Enums;
 using MonoliteUnicorn.PostGres.Main;
 
 namespace Tests.MockData;
@@ -118,17 +119,40 @@ public static class MockData
         return f.Generate(count);
     }
 
-    public static List<Transaction> CreateTransaction(IEnumerable<string> receiverIds, IEnumerable<string> senderIds, IEnumerable<int> currencyIds, int count)
+    public static List<Transaction> CreateTransaction(IEnumerable<string> receiverIds, IEnumerable<string> senderIds, string whoMade, IEnumerable<int> currencyIds, int count)
     {
-        //TODO Дописать 
+        var balanceCounter = new Dictionary<string, decimal>();
         var f = new Faker<Transaction>(Locale)
             .RuleFor(x => x.TransactionSum, f => Math.Round(f.Random.Decimal(1, 100000), 2))
             .RuleFor(x => x.SenderId, f => f.PickRandom(senderIds))
-            .RuleFor(x => x.ReceiverId, f => f.PickRandom(receiverIds))
+            .RuleFor(x => x.ReceiverId, (f, t) => {
+                string receiver;
+                do {
+                    receiver = f.PickRandom(receiverIds);
+                } while (receiver == t.SenderId);
+                return receiver;
+            })
             .RuleFor(x => x.TransactionDatetime,
                 f => f.Date.Between(DateTime.Now.AddMonths(-2), DateTime.Now.AddMonths(2)))
-            .RuleFor(x => x.CurrencyId, f => f.PickRandom(currencyIds));
+            .RuleFor(x => x.CurrencyId, f => f.PickRandom(currencyIds))
+            .RuleFor(x => x.Status, _ => nameof(TransactionStatus.Normal))
+            .RuleFor(x => x.WhoMadeUserId, _ => whoMade);
         
-        return f.Generate(count);
+        var tr = f.Generate(count);
+
+        foreach (var item in tr.OrderBy(x => x.TransactionDatetime))
+        {
+            if(!balanceCounter.TryGetValue(item.SenderId + item.CurrencyId, out var senderBalance))
+                senderBalance = 0;
+            if(!balanceCounter.TryGetValue(item.ReceiverId + item.CurrencyId, out var receiverBalance))
+                receiverBalance = 0;
+            item.SenderBalanceAfterTransaction = senderBalance;
+            item.ReceiverBalanceAfterTransaction = receiverBalance;
+            item.SenderBalanceAfterTransaction -= item.TransactionSum;
+            item.ReceiverBalanceAfterTransaction += item.TransactionSum;
+            balanceCounter[item.SenderId + item.CurrencyId] = item.SenderBalanceAfterTransaction;
+            balanceCounter[item.ReceiverId + item.CurrencyId] = item.ReceiverBalanceAfterTransaction;
+        }
+        return tr;
     }
 }

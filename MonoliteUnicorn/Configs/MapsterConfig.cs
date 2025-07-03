@@ -160,12 +160,13 @@ public static class MapsterConfig
             .Map(dest => dest.CurrencyId, s => s.CurrencyId);
 
         TypeAdapterConfig<Transaction, TransactionVersion>.NewConfig()
+            .IgnoreNonMapped(true)
             .Map(dest => dest.TransactionId, src => src.Id)
             .Map(dest => dest.SenderId, s => s.SenderId)
             .Map(dest => dest.ReceiverId, s => s.ReceiverId)
             .Map(dest => dest.CurrencyId, s => s.CurrencyId)
             .Map(dest => dest.Status, s => s.Status)
-            .Map(dest => dest.TransactionDatetime, dest => dest.TransactionDatetime)
+            .Map(dest => dest.TransactionDatetime, dest => DateTime.SpecifyKind(dest.TransactionDatetime, DateTimeKind.Unspecified))
             .Map(dest => dest.TransactionSum, dest => dest.TransactionSum);
         
         //STORAGES
