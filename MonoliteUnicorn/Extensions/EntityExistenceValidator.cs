@@ -1,6 +1,7 @@
 using Microsoft.EntityFrameworkCore;
 using MonoliteUnicorn.Exceptions.ArticleReservations;
 using MonoliteUnicorn.Exceptions.Articles;
+using MonoliteUnicorn.Exceptions.Balances;
 using MonoliteUnicorn.Exceptions.Currencies;
 using MonoliteUnicorn.Exceptions.Producers;
 using MonoliteUnicorn.Exceptions.Storages;
@@ -149,5 +150,26 @@ public static class EntityExistenceValidator
             .AnyAsync(x => x.Id == reservationId, cancellationToken);
         if (!reservationExists)
             throw new ReservationNotExistsException(reservationId);
+    }
+
+    public static async Task EnsureSupplierUserExists(this DContext context, IEnumerable<string> userIds,
+        CancellationToken cancellationToken = default)
+    {
+        var ids = userIds.ToHashSet();
+        var users = await context.AspNetUsers.AsNoTracking()
+            .Where(x => ids.Contains(x.Id))
+            .Select(x => x.Id)
+            .ToListAsync(cancellationToken);
+        var missedUsers= ids.Except(users).ToList();
+        if (missedUsers.Count != 0) throw new SupplierNotFoundException(missedUsers);
+    }
+
+    public static async Task EnsureTransactionExists(this DContext context, string transactionId,
+        CancellationToken cancellationToken = default)
+    {
+        var exists = await context.Transactions.AsNoTracking()
+            .AnyAsync(x => x.Id == transactionId, cancellationToken);
+        if (!exists)
+            throw new TransactionNotFound(transactionId);
     }
 }

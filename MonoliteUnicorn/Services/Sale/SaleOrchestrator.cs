@@ -13,7 +13,7 @@ namespace MonoliteUnicorn.Services.Sale;
 
 public class SaleOrchestrator(IServiceProvider serviceProvider) : ISaleOrchestrator
 {
-    public async Task CreateFullSale(string createdUserId, string buyerId, int currencyId, string? storageName, bool sellFromOtherStorages,
+    public async Task CreateFullSale(string createdUserId, string buyerId, int currencyId, string storageName, bool sellFromOtherStorages,
         DateTime saleDateTime, IEnumerable<NewSaleContentDto> saleContent, string? comment, decimal? payedSum, CancellationToken cancellationToken = default)
     {
         using var scope = serviceProvider.CreateScope();
@@ -33,7 +33,7 @@ public class SaleOrchestrator(IServiceProvider serviceProvider) : ISaleOrchestra
                     createdUserId, storageName, sellFromOtherStorages, StorageMovementType.Sale, cancellationToken);
                 var storageContents = storageContentValues.ToList();
                 var sale = await saleService.CreateSale(saleContentList, storageContents, currencyId, buyerId, 
-                    createdUserId, transaction.Id, saleDateTime, comment, cancellationToken);
+                    createdUserId, transaction.Id, storageName, saleDateTime, comment, cancellationToken);
                 
                 if (payedSum is > 0)
                     await balanceService.CreateTransactionAsync(buyerId, "SYSTEM", payedSum.Value, TransactionStatus.Normal, 

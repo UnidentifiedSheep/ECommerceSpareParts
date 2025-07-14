@@ -2,6 +2,7 @@ using Core.Interface;
 using FluentValidation;
 using MediatR;
 using MonoliteUnicorn.Dtos.Amw.Purchase;
+using MonoliteUnicorn.Services.CacheService;
 using MonoliteUnicorn.Services.Purchase;
 
 namespace MonoliteUnicorn.EndPoints.Purchase.CreatePurchase;
@@ -28,13 +29,21 @@ public class CreatePurchaseValidator : AbstractValidator<CreatePurchaseCommand>
     }
 }
 
-public class CreatePurchaseHandler(IPurchaseOrchestrator purchaseOrchestrator) : ICommandHandler<CreatePurchaseCommand, Unit>
+public class CreatePurchaseHandler(IPurchaseOrchestrator purchaseOrchestrator, CacheQueue cacheQueue) : ICommandHandler<CreatePurchaseCommand, Unit>
 {
     public async Task<Unit> Handle(CreatePurchaseCommand request, CancellationToken cancellationToken)
     {
         var dateTimeWithoutTimeZone = DateTime.SpecifyKind(request.PurchaseDate, DateTimeKind.Unspecified);
         await purchaseOrchestrator.CreateFullPurchase(request.CreatedUserId, request.SupplierId, 
             request.CurrencyId, request.StorageName, dateTimeWithoutTimeZone, request.PurchaseContent, request.Comment, request.PayedSum, cancellationToken);
+        var articleIds = request.PurchaseContent
+            .Select(x => x.ArticleId)
+            .ToHashSet();
+        cacheQueue.Enqueue(async sp =>
+        {
+            var cache = sp.GetRequiredService<IArticleCache>();
+            await cache.ReCacheArticleModelsAsync(articleIds);
+        });
         return Unit.Value;
     }
 }

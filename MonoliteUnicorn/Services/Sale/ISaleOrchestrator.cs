@@ -4,7 +4,7 @@ namespace MonoliteUnicorn.Services.Sale;
 
 public interface ISaleOrchestrator
 {
-    Task CreateFullSale(string createdUserId, string buyerId, int currencyId, string? storageName, bool sellFromOtherStorages,
+    Task CreateFullSale(string createdUserId, string buyerId, int currencyId, string storageName, bool sellFromOtherStorages,
         DateTime saleDateTime, IEnumerable<NewSaleContentDto> saleContent, string? comment, decimal? payedSum,
         CancellationToken cancellationToken = default);
 

@@ -7,6 +7,7 @@ using MonoliteUnicorn.Dtos.Amw.Storage;
 using MonoliteUnicorn.Exceptions;
 using MonoliteUnicorn.Extensions;
 using MonoliteUnicorn.PostGres.Main;
+using MonoliteUnicorn.Services.CacheService;
 using MonoliteUnicorn.Services.Inventory;
 
 namespace MonoliteUnicorn.EndPoints.Storages.EditStorageContent;
@@ -44,7 +45,7 @@ public class EditStorageContentValidation : AbstractValidator<EditStorageContent
     }
 }
 
-public class EditStorageContentHandler(DContext context, IInventory inventory) : ICommandHandler<EditStorageContentCommand>
+public class EditStorageContentHandler(DContext context, IInventory inventory, CacheQueue cacheQueue) : ICommandHandler<EditStorageContentCommand>
 {
     public async Task<Unit> Handle(EditStorageContentCommand request, CancellationToken cancellationToken)
     {
@@ -53,9 +54,11 @@ public class EditStorageContentHandler(DContext context, IInventory inventory) :
         var storageContents = 
             await context.EnsureStorageContentsExistForUpdate(storageContentIds, cancellationToken);
 
+        var articleIds = new HashSet<int>();
         foreach (var item in request.EditedFields)
         {
             var content = storageContents[item.Key];
+            articleIds.Add(content.ArticleId);
             var currentConcurrencyCode = ConcurrencyStatic.GetConcurrencyCode(content.Id, content.ArticleId,
                 content.BuyPrice, content.CurrencyId, content.StorageName, 
                 content.BuyPriceInUsd, content.Count, content.PurchaseDatetime);
@@ -69,6 +72,13 @@ public class EditStorageContentHandler(DContext context, IInventory inventory) :
         await inventory.EditStorageContent(dict, request.UserId, cancellationToken);
         
         await dbTransaction.CommitAsync(cancellationToken);
+        
+        cacheQueue.Enqueue(async sp =>
+        {
+            var cache = sp.GetRequiredService<IArticleCache>();
+            await cache.ReCacheArticleModelsAsync(articleIds);
+        });
+        
         return Unit.Value;
     }
 }

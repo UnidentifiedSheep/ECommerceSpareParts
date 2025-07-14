@@ -6,13 +6,14 @@ using MonoliteUnicorn.Enums;
 using MonoliteUnicorn.Exceptions;
 using MonoliteUnicorn.Exceptions.Storages;
 using MonoliteUnicorn.PostGres.Main;
+using MonoliteUnicorn.Services.CacheService;
 using MonoliteUnicorn.Services.Inventory;
 
 namespace MonoliteUnicorn.EndPoints.Storages.DeleteStorageContent;
 
 public record DeleteStorageContentCommand(int ContentId, string ConcurrencyCode, string UserId) : ICommand;
 
-public class DeleteStorageContentHandler(DContext context, IInventory inventoryService) : ICommandHandler<DeleteStorageContentCommand>
+public class DeleteStorageContentHandler(DContext context, IInventory inventoryService, CacheQueue cacheQueue) : ICommandHandler<DeleteStorageContentCommand>
 {
     public async Task<Unit> Handle(DeleteStorageContentCommand request, CancellationToken cancellationToken)
     {
@@ -33,6 +34,13 @@ public class DeleteStorageContentHandler(DContext context, IInventory inventoryS
             StorageMovementType.StorageContentDeletion, cancellationToken);
         
         await transaction.CommitAsync(cancellationToken);
+        
+        cacheQueue.Enqueue(async sp =>
+        {
+            var cache = sp.GetRequiredService<IArticleCache>();
+            await cache.ReCacheArticleModelsAsync([content.ArticleId]);
+        });
+        
         return Unit.Value;
     }
 }

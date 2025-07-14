@@ -1,7 +1,10 @@
 using Core.Interface;
 using FluentValidation;
 using MediatR;
+using Microsoft.EntityFrameworkCore;
 using MonoliteUnicorn.Dtos.Amw.Sales;
+using MonoliteUnicorn.PostGres.Main;
+using MonoliteUnicorn.Services.CacheService;
 using MonoliteUnicorn.Services.Sale;
 
 namespace MonoliteUnicorn.EndPoints.Sales.EditSale;
@@ -54,14 +57,24 @@ public class EditSaleValidation : AbstractValidator<EditSaleCommand>
     }
 }
 
-public class EditSaleHandler(ISaleOrchestrator orchestrator) : ICommandHandler<EditSaleCommand>
+public class EditSaleHandler(DContext context, ISaleOrchestrator orchestrator, CacheQueue cacheQueue) : ICommandHandler<EditSaleCommand>
 {
     public async Task<Unit> Handle(EditSaleCommand request, CancellationToken cancellationToken)
     {
+        var articleIds = await context.SaleContents.AsNoTracking()
+            .Select(x => x.ArticleId)
+            .ToHashSetAsync(cancellationToken);
         await orchestrator.EditSale(request.EditedContent, request.SaleId, 
             request.CurrencyId, request.UpdatedUserId, 
             request.SaleDateTime, request.Comment, 
             request.SellFromOtherStorages, cancellationToken);
+        articleIds.UnionWith(request.EditedContent.Select(x => x.ArticleId));
+        
+        cacheQueue.Enqueue(async sp =>
+        {
+            var cache = sp.GetRequiredService<IArticleCache>();
+            await cache.ReCacheArticleModelsAsync(articleIds);
+        });
         return Unit.Value;
     }
 }

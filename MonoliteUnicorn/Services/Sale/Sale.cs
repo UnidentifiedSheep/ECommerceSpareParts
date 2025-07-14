@@ -1,13 +1,11 @@
-using Core.Extensions;
 using Core.TransactionBuilder;
 using Mapster;
 using Microsoft.EntityFrameworkCore;
 using MonoliteUnicorn.Dtos.Amw.Sales;
-using MonoliteUnicorn.Exceptions.Articles;
-using MonoliteUnicorn.Exceptions.Balances;
 using MonoliteUnicorn.Exceptions.Currencies;
 using MonoliteUnicorn.Exceptions.Sales;
 using MonoliteUnicorn.Exceptions.Users;
+using MonoliteUnicorn.Extensions;
 using MonoliteUnicorn.Models;
 using MonoliteUnicorn.PostGres.Main;
 
@@ -16,49 +14,39 @@ namespace MonoliteUnicorn.Services.Sale;
 public class Sale(DContext context) : ISale
 {
     public async Task<PostGres.Main.Sale> CreateSale(IEnumerable<NewSaleContentDto> sellContent, IEnumerable<PrevAndNewValue<StorageContent>> storageContentValues, 
-        int currencyId, string buyerId, string createdUserId, string transactionId, 
+        int currencyId, string buyerId, string createdUserId, string transactionId, string mainStorage,
         DateTime saleDateTime, string? comment, CancellationToken cancellationToken = default) 
     {
+        var saleContentList = sellContent
+            .OrderByDescending(x => x.ArticleId)
+            .ThenByDescending(x => x.Count)
+            .ThenByDescending(x => x.PriceWithDiscount)
+            .ToList();
+
+        if (saleContentList.Count == 0)
+            throw new SalesContentEmptyException();
+        if (saleContentList.Any(x => Math.Round(x.PriceWithDiscount, 2) <= 0))
+            throw new SaleContentPriceOrCountException();
+                
+        var articleNeededCounts = new Dictionary<int, int>();
+        var saleContents = new List<SaleContent>();
+        var articleIds = new HashSet<int>();
+        foreach (var item in saleContentList)
+            articleIds.Add(item.ArticleId);
+
+
+        var detailGroups = GetDetailsGroup(storageContentValues);
+
+        await context.EnsureArticlesExist(articleIds, cancellationToken);
+        await context.EnsureCurrencyExists(currencyId, cancellationToken);
+        await context.EnsureUserExists([buyerId, createdUserId], cancellationToken);
+        await context.EnsureTransactionExists(transactionId, cancellationToken);
+        await context.EnsureStorageExists(mainStorage, cancellationToken);
+        
         return await context
             .WithDefaultTransactionSettings("normal")
             .ExecuteWithTransaction(async () => 
             { 
-                var saleContentList = sellContent
-                .OrderByDescending(x => x.ArticleId)
-                .ThenByDescending(x => x.Count)
-                .ThenByDescending(x => x.PriceWithDiscount)
-                .ToList();
-
-                if (saleContentList.Count == 0)
-                    throw new SalesContentEmptyException();
-                if (saleContentList.Any(x => Math.Round(x.PriceWithDiscount, 2) <= 0))
-                    throw new SaleContentPriceOrCountException();
-                
-                var articleNeededCounts = new Dictionary<int, int>();
-                var saleContents = new List<SaleContent>();
-                var articleIds = new HashSet<int>();
-                foreach (var item in saleContentList)
-                    articleIds.Add(item.ArticleId);
-
-
-                var detailGroups = GetDetailsGroup(storageContentValues);
-                
-                var articleCount = await context.Articles.CountAsync(x => articleIds.Contains(x.Id), cancellationToken);
-                if (articleCount != articleIds.Count)
-                    throw new ArticleNotFoundException();
-
-                _ = await context.Currencies.AsNoTracking()
-                    .FirstOrDefaultAsync(x => x.Id == currencyId, cancellationToken) ?? throw new CurrencyNotFoundException(currencyId);
-
-                _ = await context.AspNetUsers.AsNoTracking()
-                    .FirstOrDefaultAsync(x => x.Id == buyerId, cancellationToken) ?? throw new SupplierNotFoundException(buyerId);
-
-                _ = await context.AspNetUsers.AsNoTracking()
-                    .FirstOrDefaultAsync(x => x.Id == createdUserId, cancellationToken) ?? throw new UserNotFoundException(createdUserId);
-
-                _ = await context.Transactions.AsNoTracking()
-                    .FirstOrDefaultAsync(x => x.Id == transactionId, cancellationToken) ?? throw new TransactionDoesntExistsException(transactionId);
-            
                 foreach (var item in saleContentList)
                 {
                     if (item.Price <= 0 || item.PriceWithDiscount <= 0 || item.Count <= 0 || item.Price < item.PriceWithDiscount)
@@ -110,6 +98,7 @@ public class Sale(DContext context) : ISale
                     Comment = comment,
                     SaleContents = saleContents,
                     CurrencyId = currencyId,
+                    MainStorageName = mainStorage,
                 };
 
                 await context.Sales.AddAsync(saleModel, cancellationToken);

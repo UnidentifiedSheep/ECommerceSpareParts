@@ -46,6 +46,16 @@ public static class QueryableSortBy
         if(value == null) throw new MappingDoesntExists(type);
         return (Expression<Func<TEntity,object>>)value;
     }
+    
+    public static Expression<Func<TEntity,object>>? GetExpression<TEntity>(string source)
+    {
+        source = source.ToLowerInvariant();
+        var type = typeof(TEntity);
+        var primaryExists = _mapDictionary.TryGetValue(type, out var primary);
+        if (!primaryExists) throw new MappingDoesntExists(type);
+        primary!.TryGetValue(source, out var value);
+        return (Expression<Func<TEntity,object>>?)value;
+    }
 
     public static IOrderedQueryable<TSource> SortBy<TSource>(this IQueryable<TSource> src, string? sortParam)
     {

@@ -14,6 +14,7 @@ using MonoliteUnicorn.Dtos.Member.Vehicles;
 using MonoliteUnicorn.Dtos.Producers;
 using MonoliteUnicorn.Models;
 using MonoliteUnicorn.PostGres.Main;
+using MonoliteUnicorn.RedisFunctions.Models;
 using AmwArticleDto = MonoliteUnicorn.Dtos.Amw.Articles.ArticleFullDto;
 using MemberArticleDto = MonoliteUnicorn.Dtos.Member.Articles.ArticleFullDto;
 
@@ -56,6 +57,21 @@ public static class MapsterConfig
             .Map(d => d.Images, s => s.ArticleImages.Select(x => x.Path))
             .Map(d => d.CurrentStock, s => s.TotalCount)
             .Map(d => d.IndicatorColor, s => s.Indicator);
+
+        TypeAdapterConfig<Article, Versioned<AmwArticleDto>>.NewConfig()
+            .ConstructUsing(src => new Versioned<AmwArticleDto>(src.Adapt<AmwArticleDto>()));
+        
+        TypeAdapterConfig<AmwArticleDto, MemberArticleDto>.NewConfig()
+            .IgnoreNonMapped(true)
+            .Map(d => d.Id, s => s.Id)
+            .Map(d => d.ArticleNumber, s => s.ArticleNumber)
+            .Map(d => d.Title, s => s.Title)
+            .Map(d => d.Description, s => s.Description)
+            .Map(d => d.ProducerName, s => s.ProducerName)
+            .Map(d => d.ProducerId, s => s.ProducerId)
+            .Map(d => d.Images, s => s.Images)
+            .Map(d => d.CurrentStock, s => s.CurrentStock);
+        
         TypeAdapterConfig<PatchArticleDto, Article>.NewConfig()
             .IgnorePatchIfNotSet()
             .IgnoreIf((src, dest) => !src.ArticleNumber.IsSet, dest => dest.NormalizedArticleNumber)

@@ -7,6 +7,7 @@ using MonoliteUnicorn.Dtos.Amw.Articles;
 using MonoliteUnicorn.Enums;
 using MonoliteUnicorn.Exceptions.Articles;
 using MonoliteUnicorn.PostGres.Main;
+using MonoliteUnicorn.Services.CacheService;
 
 namespace MonoliteUnicorn.EndPoints.Articles.MakeLinkageBetweenArticles;
 
@@ -21,7 +22,7 @@ public class MakeLinkageBetweenArticlesValidation : AbstractValidator<MakeLinkag
             .WithMessage("Артикул не может быть таким же как кросс артикул");
     }
 }
-public class MakeLinkageBetweenArticlesHandler(DContext context) : ICommandHandler<MakeLinkageBetweenArticlesCommand, Unit>
+public class MakeLinkageBetweenArticlesHandler(DContext context, CacheQueue cacheQueue) : ICommandHandler<MakeLinkageBetweenArticlesCommand, Unit>
 {
     public async Task<Unit> Handle(MakeLinkageBetweenArticlesCommand request, CancellationToken cancellationToken)
     {
@@ -127,6 +128,14 @@ public class MakeLinkageBetweenArticlesHandler(DContext context) : ICommandHandl
         queryBuilder.Append($" ON CONFLICT DO NOTHING");
         await context.Database.ExecuteSqlRawAsync(queryBuilder.ToString(), cancellationToken);
         await dbTransaction.CommitAsync(cancellationToken);
+        
+        cacheQueue.Enqueue(async sp =>
+        {
+            var cache = sp.GetRequiredService<IArticleCache>();
+            await cache.CacheArticleFromZeroIfExistAsync(request.Linkage.ArticleId);
+            await cache.CacheArticleFromZeroIfExistAsync(request.Linkage.CrossArticleId);
+        });
+        
         return Unit.Value;
     }
 }

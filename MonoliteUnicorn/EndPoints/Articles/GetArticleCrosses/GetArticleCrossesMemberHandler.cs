@@ -1,5 +1,6 @@
 using Core.Extensions;
 using Core.Interface;
+using Core.StaticFunctions;
 using FluentValidation;
 using Mapster;
 using Microsoft.EntityFrameworkCore;
@@ -7,8 +8,11 @@ using MonoliteUnicorn.Dtos.Member.Articles;
 using MonoliteUnicorn.Exceptions.Articles;
 using MonoliteUnicorn.Models;
 using MonoliteUnicorn.PostGres.Main;
+using MonoliteUnicorn.Services.CacheService;
 using MonoliteUnicorn.Services.Prices.Price;
 using MonoliteUnicorn.Services.SearchLog;
+
+using AmwArticleDto = MonoliteUnicorn.Dtos.Amw.Articles.ArticleFullDto;
 
 namespace MonoliteUnicorn.EndPoints.Articles.GetArticleCrosses;
 
@@ -29,7 +33,7 @@ public class GetArticleCrossesMemberValidation : AbstractValidator<GetArticleCro
     }
 }
 
-public class GetArticleCrossesMemberHandler(DContext context, IPrice priceService, ISearchLogger searchLogger) : IQueryHandler<GetArticleCrossesMemberQuery, GetArticleCrossesMemberResult>
+public class GetArticleCrossesMemberHandler(DContext context, IPrice priceService, ISearchLogger searchLogger, IArticleCache articleCache, CacheQueue cacheQueue) : IQueryHandler<GetArticleCrossesMemberQuery, GetArticleCrossesMemberResult>
 {
     public async Task<GetArticleCrossesMemberResult> Handle(GetArticleCrossesMemberQuery request, CancellationToken cancellationToken)
     {
@@ -40,23 +44,53 @@ public class GetArticleCrossesMemberHandler(DContext context, IPrice priceServic
             .Include(x => x.ArticleImages)
             .FirstOrDefaultAsync(x => x.Id == request.ArticleId, cancellationToken);
         if (requestedArticle == null) throw new ArticleNotFoundException(request.ArticleId);
-        var crosses = await context.Articles
-            .FromSql($"""
-                      SELECT Distinct on (a.id) a.* 
-                      FROM articles a 
-                      JOIN article_crosses c ON a.id = c.article_id OR a.id = c.article_cross_id 
-                                             WHERE c.article_id = {request.ArticleId} OR 
-                                                 c.article_cross_id = {request.ArticleId} 
-                      """)
-            .SortBy(request.SortBy)
-            .Include(x => x.ArticleImages)
-            .Skip(request.Page * request.ViewCount)
-            .Take(request.ViewCount)
-            .AsNoTracking()
-            .Include(x => x.Producer)
-            .ToListAsync(cancellationToken);
-        var crossArticles = crosses.Adapt<List<ArticleFullDto>>();
         var requestedArt = requestedArticle.Adapt<ArticleFullDto>();
+        var (sortName, sortDirection) = request.SortBy.GetSortNameNDirection();
+        var sortExpression = QueryableSortBy.GetExpression<AmwArticleDto>(sortName ?? "");
+        var offset = request.Page * request.ViewCount;
+        var (crossArticles, notFound) = string.IsNullOrWhiteSpace(request.SortBy)
+            ? await articleCache.GetAndAdaptFullArticleCrossesAsync<ArticleFullDto>(request.ArticleId, null, 
+                offset, request.ViewCount) 
+            : await articleCache.GetAndAdaptFullArticleCrossesAsync<ArticleFullDto>(request.ArticleId, sortExpression, 
+                offset, request.ViewCount, sortDirection);
+        
+        if (crossArticles.Count == 0)
+        {
+            var crosses = await context.Articles
+                .FromSql($"""
+                          SELECT Distinct on (a.id) a.* 
+                          FROM articles a 
+                          JOIN article_crosses c ON a.id = c.article_id OR a.id = c.article_cross_id 
+                                                 WHERE c.article_id = {request.ArticleId} OR 
+                                                     c.article_cross_id = {request.ArticleId} 
+                          """)
+                .SortBy(request.SortBy)
+                .Skip(request.Page * request.ViewCount)
+                .Include(x => x.ArticleImages)
+                .Take(request.ViewCount)
+                .AsNoTracking()
+                .Include(x => x.Producer)
+                .ToListAsync(cancellationToken: cancellationToken);
+            crossArticles = crosses.Adapt<List<ArticleFullDto>>();
+            cacheQueue.Enqueue(async sp =>
+            {
+                var cache = sp.GetRequiredService<IArticleCache>();
+                await cache.CacheArticleFromZeroAsync(request.ArticleId);
+            });
+        }
+
+        if (notFound.Count != 0)
+        {
+            var articles = await context.Articles.AsNoTracking()
+                .Where(x => notFound.Contains(x.Id))
+                .ToListAsync(cancellationToken);
+            crossArticles.AddRange(articles.Adapt<List<ArticleFullDto>>());
+            cacheQueue.Enqueue(async sp =>
+            {
+                var cache = sp.GetRequiredService<IArticleCache>();
+                await cache.CacheOnlyArticleModels(notFound);
+            });
+        }
         
         if (request.CurrencyId == null) return new GetArticleCrossesMemberResult(crossArticles, requestedArt);
         

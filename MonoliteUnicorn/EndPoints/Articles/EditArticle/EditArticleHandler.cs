@@ -6,6 +6,7 @@ using Microsoft.EntityFrameworkCore;
 using MonoliteUnicorn.Dtos.Amw.Articles;
 using MonoliteUnicorn.Exceptions.Articles;
 using MonoliteUnicorn.PostGres.Main;
+using MonoliteUnicorn.Services.CacheService;
 
 namespace MonoliteUnicorn.EndPoints.Articles.EditArticle;
 
@@ -47,7 +48,7 @@ public class EditArticleValidation : AbstractValidator<EditArticleCommand>
             .WithMessage("Максимальная длина названия артикула 255 символов");
     }
 }
-public class EditArticleHandler(DContext context) : ICommandHandler<EditArticleCommand, Unit>
+public class EditArticleHandler(DContext context, CacheQueue cacheQueue) : ICommandHandler<EditArticleCommand, Unit>
 {
     public async Task<Unit> Handle(EditArticleCommand request, CancellationToken cancellationToken)
     {
@@ -55,6 +56,11 @@ public class EditArticleHandler(DContext context) : ICommandHandler<EditArticleC
             .FirstOrDefaultAsync(x => x.Id == request.ArticleId, cancellationToken) ?? throw new ArticleNotFoundException(request.ArticleId);
         request.PatchArticle.Adapt(article);
         await context.SaveChangesAsync(cancellationToken);
+        cacheQueue.Enqueue(async sp =>
+        {
+            var cache = sp.GetRequiredService<IArticleCache>();
+            await cache.ReCacheArticleModelsAsync([request.ArticleId]);
+        });
         return Unit.Value;
     }
 }

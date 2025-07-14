@@ -8,7 +8,6 @@ namespace MonoliteUnicorn.EndPoints.Purchase.EditPurchase;
 
 public record EditPurchaseRequest(
     IEnumerable<EditPurchaseDto> Content,
-    string PurchaseId,
     int CurrencyId,
     string? Comment,
     DateTime PurchaseDateTime);
@@ -17,11 +16,11 @@ public class EditPurchaseEndPoint : ICarterModule
 {
     public void AddRoutes(IEndpointRouteBuilder app)
     {
-        app.MapPost("/purchase/edit", async (ISender sender, EditPurchaseRequest request, 
+        app.MapPut("/purchase/{purchaseId}", async (ISender sender, string purchaseId, EditPurchaseRequest request, 
             CancellationToken cancellationToken, ClaimsPrincipal claims) =>
         {
             var userId = claims.FindFirstValue(ClaimTypes.NameIdentifier) ?? "";
-            var command = new EditPurchaseCommand(request.Content, request.PurchaseId, request.CurrencyId, 
+            var command = new EditPurchaseCommand(request.Content, purchaseId, request.CurrencyId, 
                 request.Comment, request.PurchaseDateTime, userId);
             await sender.Send(command, cancellationToken);
             return Results.NoContent();

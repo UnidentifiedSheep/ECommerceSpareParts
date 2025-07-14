@@ -9,7 +9,7 @@ namespace MonoliteUnicorn.EndPoints.Sales.CreateSale;
 public record CreateSaleRequest(
     string BuyerId,
     int CurrencyId,
-    string? StorageName,
+    string StorageName,
     bool SellFromOtherStorages,
     DateTime SaleDateTime,
     IEnumerable<NewSaleContentDto> SaleContent,

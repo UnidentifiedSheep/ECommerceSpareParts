@@ -2,11 +2,12 @@ using Core.Interface;
 using FluentValidation;
 using MediatR;
 using MonoliteUnicorn.Dtos.Amw.Sales;
+using MonoliteUnicorn.Services.CacheService;
 using MonoliteUnicorn.Services.Sale;
 
 namespace MonoliteUnicorn.EndPoints.Sales.CreateSale;
 
-public record CreateSaleCommand(string CreatedUserId, string BuyerId, int CurrencyId, string? StorageName, bool SellFromOtherStorages,
+public record CreateSaleCommand(string CreatedUserId, string BuyerId, int CurrencyId, string StorageName, bool SellFromOtherStorages,
     DateTime SaleDateTime, IEnumerable<NewSaleContentDto> SaleContent, string? Comment, decimal? PayedSum) : ICommand<Unit>;
 
 public class CreateSaleValidation : AbstractValidator<CreateSaleCommand>
@@ -27,13 +28,19 @@ public class CreateSaleValidation : AbstractValidator<CreateSaleCommand>
     }
 }
 
-public class CreateSaleHandler(ISaleOrchestrator saleOrchestrator) : ICommandHandler<CreateSaleCommand, Unit>
+public class CreateSaleHandler(ISaleOrchestrator saleOrchestrator, CacheQueue cacheQueue) : ICommandHandler<CreateSaleCommand, Unit>
 {
     public async Task<Unit> Handle(CreateSaleCommand request, CancellationToken cancellationToken)
     {
         var dateTimeWithoutTimeZone = DateTime.SpecifyKind(request.SaleDateTime, DateTimeKind.Unspecified);
+        var articleIds = request.SaleContent.Select(x => x.ArticleId).ToHashSet();
         await saleOrchestrator.CreateFullSale(request.CreatedUserId, request.BuyerId, request.CurrencyId, request.StorageName, 
             request.SellFromOtherStorages, dateTimeWithoutTimeZone, request.SaleContent, request.Comment, request.PayedSum, cancellationToken);
+        cacheQueue.Enqueue(async sp =>
+        {
+            var cache = sp.GetRequiredService<IArticleCache>();
+            await cache.ReCacheArticleModelsAsync(articleIds);
+        });
         return Unit.Value;
     }
 }

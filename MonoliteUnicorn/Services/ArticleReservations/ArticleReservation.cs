@@ -86,4 +86,9 @@ public class ArticleReservation(DContext context) : IArticleReservation
                                                    where id = {reservationId};
                                                    """, cancellationToken);
     }
+
+    public async Task IsCountEnoughForUser(int articleId, string userId, int neededCount,  CancellationToken cancellationToken = default)
+    {
+        
+    }
 }

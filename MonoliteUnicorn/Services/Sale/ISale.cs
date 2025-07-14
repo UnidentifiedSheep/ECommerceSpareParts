@@ -8,7 +8,7 @@ public interface ISale
 {
     Task<PostGres.Main.Sale> CreateSale(IEnumerable<NewSaleContentDto> sellContent,
         IEnumerable<PrevAndNewValue<StorageContent>> storageContentValues,
-        int currencyId, string buyerId, string createdUserId, string transactionId,
+        int currencyId, string buyerId, string createdUserId, string transactionId, string mainStorage,
         DateTime saleDateTime, string? comment, CancellationToken cancellationToken = default);
 
     /// <summary>

@@ -26,8 +26,10 @@ using MonoliteUnicorn.Consumers;
 using MonoliteUnicorn.HangFireTasks;
 using MonoliteUnicorn.PostGres.Identity;
 using MonoliteUnicorn.PostGres.Main;
+using MonoliteUnicorn.RedisFunctions;
 using MonoliteUnicorn.Services.ArticleReservations;
 using MonoliteUnicorn.Services.Balances;
+using MonoliteUnicorn.Services.CacheService;
 using MonoliteUnicorn.Services.Inventory;
 using MonoliteUnicorn.Services.JWT;
 using MonoliteUnicorn.Services.Prices.Price;
@@ -190,7 +192,15 @@ builder.Services.AddTransient<ITimeWebMail>(sp => new TimeWebMail(sp.GetService<
 builder.Services.Configure<MailOptions>(builder.Configuration.GetSection("Mail"));
 builder.Services.AddTransient<IMail, Mail>();
 builder.Services.AddTransient<IJwtGenerator, JwtGenerator>();
+builder.Services.AddTransient<IRedisArticleRepository, RedisArticleRepository>(_ =>
+{
+    var redis = Redis.GetRedis();
+    var ttl = TimeSpan.FromHours(8);
+    return new RedisArticleRepository(redis, ttl);
+});
+builder.Services.AddScoped<IArticleCache, ArticleCache>();
 builder.Services.AddSingleton<ISearchLogger, SearchLogger>();
+builder.Services.AddSingleton<CacheQueue>();
 
 builder.Services.AddMassTransit(conf =>
 {
@@ -213,6 +223,7 @@ builder.Services.AddMassTransit(conf =>
 });
 
 builder.Services.AddHostedService<SearchLogBackgroundWorker>();
+builder.Services.AddHostedService(p => p.GetRequiredService<CacheQueue>());
 
 
 builder.Services.AddOpenTelemetry()

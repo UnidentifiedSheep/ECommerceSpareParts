@@ -3,6 +3,7 @@ using FluentValidation;
 using MediatR;
 using MonoliteUnicorn.Dtos.Amw.Storage;
 using MonoliteUnicorn.Enums;
+using MonoliteUnicorn.Services.CacheService;
 using MonoliteUnicorn.Services.Inventory;
 
 namespace MonoliteUnicorn.EndPoints.Storages.AddContentToStorage;
@@ -34,14 +35,24 @@ public class AddContentToStorageValidation : AbstractValidator<AddContentToStora
     }
 }
 
-public class AddContentToStorageHandler(IInventory inventoryService) : ICommandHandler<AddContentToStorageCommand, Unit>
+public class AddContentToStorageHandler(IInventory inventoryService, CacheQueue cacheQueue) : ICommandHandler<AddContentToStorageCommand, Unit>
 {
     public async Task<Unit> Handle(AddContentToStorageCommand request, CancellationToken cancellationToken)
     {
-        var asTupleList = request.StorageContent
-            .Select(x => (x.ArticleId, x.Count, x.BuyPrice, x.CurrencyId));
+        var asTupleList = new List<(int, int, decimal, int)>();
+        var articleIds = new HashSet<int>();
+        foreach (var item in request.StorageContent)
+        {
+            asTupleList.Add((item.ArticleId, item.Count, item.BuyPrice, item.CurrencyId));
+            articleIds.Add(item.ArticleId);
+        }
         await inventoryService.AddContentToStorage(asTupleList, request.StorageName, 
             request.UserId, StorageMovementType.StorageContentAddition, cancellationToken);
+        cacheQueue.Enqueue(async sp =>
+        {
+            var cache = sp.GetRequiredService<IArticleCache>();
+            await cache.ReCacheArticleModelsAsync(articleIds);
+        });
         return Unit.Value;
     }
 }
