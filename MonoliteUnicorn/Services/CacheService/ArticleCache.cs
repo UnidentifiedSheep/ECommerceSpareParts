@@ -39,6 +39,7 @@ public class ArticleCache : IArticleCache
         var articles = await _context.Articles.AsNoTracking()
             .Where(x => ids.Contains(x.Id))
             .Include(x => x.ArticleImages)
+            .Include(x => x.Producer)
             .ToListAsync();
         if (articles.Count == 0) return;
         await RetryPolicy.ExecuteAsync(() => _redisArticles.UpdateArticlesWhichContains(articles));
@@ -68,6 +69,7 @@ public class ArticleCache : IArticleCache
                       """)
             .AsNoTracking()
             .Include(x => x.ArticleImages)
+            .Include(x => x.Producer)
             .ToListAsync();
         var crossIds = fullCrosses
             .Select(x => x.Id)
@@ -94,6 +96,7 @@ public class ArticleCache : IArticleCache
         var ids = articleIds.Distinct().ToList();
         var articles = await _context.Articles.Where(x => ids.Contains(x.Id))
             .AsNoTracking()
+            .Include(x => x.Producer)
             .Include(x => x.ArticleImages)
             .ToListAsync();
         await RetryPolicy.ExecuteAsync(async () =>
