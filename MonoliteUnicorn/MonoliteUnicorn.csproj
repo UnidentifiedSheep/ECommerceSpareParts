@@ -52,7 +52,6 @@
     </ItemGroup>
 
     <ItemGroup>
-      <Folder Include="Dtos\Anonymous\Articles\" />
       <Folder Include="Dtos\Member\Users\" />
       <Folder Include="EndPoints\Producers\EditOtherProducerNames\" />
       <Folder Include="EndPoints\Users\DeleteMailOfUser\" />

@@ -1,4 +1,4 @@
-namespace MonoliteUnicorn.Dtos.Amw.Articles;
+namespace MonoliteUnicorn.Dtos.Anonymous.Articles;
 
 public class ArticleDto
 {
@@ -7,5 +7,4 @@ public class ArticleDto
     public string ArticleNumber { get; set; } = null!;
     public string ProducerName { get; set; } = null!;		
     public int CurrentStock { get; set; }
-    public string Indicator { get; set; } = null!;
 }

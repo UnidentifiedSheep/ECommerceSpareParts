@@ -9,7 +9,9 @@ using MonoliteUnicorn.Configs;
 using MonoliteUnicorn.EndPoints.Articles.CreateArticle;
 using MonoliteUnicorn.HangFireTasks;
 using MonoliteUnicorn.PostGres.Main;
+using MonoliteUnicorn.RedisFunctions;
 using MonoliteUnicorn.Services.Balances;
+using MonoliteUnicorn.Services.CacheService;
 using MonoliteUnicorn.Services.Inventory;
 using MonoliteUnicorn.Services.Prices.Price;
 using MonoliteUnicorn.Services.Prices.PriceGenerator;
@@ -52,7 +54,14 @@ public static class ServiceProviderForTests
         services.AddScoped<IPurchaseOrchestrator, PurchaseOrchestrator>();
         services.AddScoped<ISaleOrchestrator, SaleOrchestrator>();
         services.AddTransient(typeof(IPipelineBehavior<,>), typeof(ValidationBehavior<,>));
-
+        services.AddSingleton<CacheQueue>();
+        services.AddScoped<IArticleCache, ArticleCache>();
+        services.AddTransient<IRedisArticleRepository, RedisArticleRepository>(_ =>
+        {
+            var redis = Redis.GetRedis();
+            var ttl = TimeSpan.FromHours(8);
+            return new RedisArticleRepository(redis, ttl);
+        });
         if (!IsConfiguredBefore)
         {
             MapsterConfig.Configure();

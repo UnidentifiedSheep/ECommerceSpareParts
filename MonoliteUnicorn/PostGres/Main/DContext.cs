@@ -903,9 +903,7 @@ public partial class DContext : DbContext
 
             entity.HasIndex(e => e.Storage, "sale_content_details_storage_index");
 
-            entity.Property(e => e.Id)
-                .ValueGeneratedNever()
-                .HasColumnName("id");
+            entity.Property(e => e.Id).HasColumnName("id");
             entity.Property(e => e.BuyPrice).HasColumnName("buy_price");
             entity.Property(e => e.Count).HasColumnName("count");
             entity.Property(e => e.CurrencyId).HasColumnName("currency_id");
@@ -1030,14 +1028,15 @@ public partial class DContext : DbContext
                 .HasMethod("gin")
                 .HasOperators(new[] { "gin_trgm_ops" });
 
+            entity.HasIndex(e => e.CreateAt, "storage_content_reservations_create_at_index");
+
             entity.HasIndex(e => e.IsDone, "storage_content_reservations_is_done_index");
+
+            entity.HasIndex(e => e.UpdatedAt, "storage_content_reservations_updated_at_index");
 
             entity.HasIndex(e => e.UserId, "storage_content_reservations_user_id_index");
 
             entity.HasIndex(e => new { e.UserId, e.IsDone }, "storage_content_reservations_user_id_is_done_index");
-
-            entity.HasIndex(e => e.CreateAt, "storage_content_reservations_create_at_index");
-            entity.HasIndex(e => e.UpdatedAt, "storage_content_reservations_updated_at_index");
 
             entity.Property(e => e.Id).HasColumnName("id");
             entity.Property(e => e.ArticleId).HasColumnName("article_id");
@@ -1167,6 +1166,8 @@ public partial class DContext : DbContext
 
             entity.HasIndex(e => e.TransactionDatetime, "transactions_transaction_datetime_index");
 
+            entity.HasIndex(e => e.TransactionDatetime, "transactions_transaction_datetime_sender_id_receiver_id_idx").IsDescending();
+
             entity.HasIndex(e => e.WhoMadeUserId, "transactions_who_made_user_id_index");
 
             entity.Property(e => e.Id)
@@ -1242,6 +1243,8 @@ public partial class DContext : DbContext
             entity.HasIndex(e => e.TransactionDatetime, "transaction_versions_transaction_datetime_index");
 
             entity.HasIndex(e => e.TransactionId, "transaction_versions_transaction_id_index");
+
+            entity.HasIndex(e => new { e.TransactionId, e.Version }, "transaction_versions_transaction_id_version_uindex").IsUnique();
 
             entity.HasIndex(e => e.VersionCreatedDatetime, "transaction_versions_version_created_datetime_index");
 

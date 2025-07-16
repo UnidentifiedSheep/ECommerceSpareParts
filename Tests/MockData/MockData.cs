@@ -121,6 +121,7 @@ public static class MockData
 
     public static List<Transaction> CreateTransaction(IEnumerable<string> receiverIds, IEnumerable<string> senderIds, string whoMade, IEnumerable<int> currencyIds, int count)
     {
+        var r = receiverIds.ToList();
         var balanceCounter = new Dictionary<string, decimal>();
         var f = new Faker<Transaction>(Locale)
             .RuleFor(x => x.TransactionSum, f => Math.Round(f.Random.Decimal(1, 100000), 2))
@@ -128,7 +129,7 @@ public static class MockData
             .RuleFor(x => x.ReceiverId, (f, t) => {
                 string receiver;
                 do {
-                    receiver = f.PickRandom(receiverIds);
+                    receiver = f.PickRandom(r);
                 } while (receiver == t.SenderId);
                 return receiver;
             })
@@ -154,5 +155,47 @@ public static class MockData
             balanceCounter[item.ReceiverId + item.CurrencyId] = item.ReceiverBalanceAfterTransaction;
         }
         return tr;
+    }
+
+    public static Sale CreateSale(string transactionId, string buyerId, string whoMade, string storageName,
+        int currencyId)
+    {
+        var f = new Faker<Sale>(Locale)
+            .RuleFor(x => x.Comment, f => f.Random.Int(1, 100) < 50 ? f.Lorem.Letter(100) : null)
+            .RuleFor(x => x.CreatedUserId, whoMade)
+            .RuleFor(x => x.BuyerId, buyerId)
+            .RuleFor(x => x.TransactionId, transactionId)
+            .RuleFor(x => x.CurrencyId, currencyId)
+            .RuleFor(x => x.MainStorageName, storageName)
+            .RuleFor(x => x.SaleDatetime, f => f.Date.Between(DateTime.Now.AddMonths(-2), DateTime.Now.AddMonths(2)));
+        return f.Generate(1).Single();
+    }
+
+    public static List<SaleContent> CreateSaleContent(IEnumerable<int> articleIds, int count)
+    {
+        var f = new Faker<SaleContent>(Locale)
+            .RuleFor(x => x.ArticleId, f => f.PickRandom(articleIds))
+            .RuleFor(x => x.Count, f => f.Random.Int(1, 1200))
+            .RuleFor(x => x.Price, f => f.Random.Decimal(0.01m, 2_000_000))
+            .RuleFor(x => x.Discount, f => f.Random.Decimal(0.01m, 100));
+        return f.Generate(count);
+    }
+
+    public static void CreateSaleContentDetail(IEnumerable<SaleContent> saleContents, IEnumerable<int> currencyIds, IEnumerable<string> storageNames)
+    {
+        var faker = new Faker(Locale);
+        var crs = currencyIds.ToList();
+        var strgs = storageNames.ToList();
+        foreach (var content in saleContents)
+        {
+            content.SaleContentDetails.Add(new SaleContentDetail
+            {
+                BuyPrice = faker.Random.Decimal(1, 100),
+                Count = content.Count,
+                CurrencyId = faker.PickRandom(crs),
+                Storage = faker.PickRandom(strgs),
+                PurchaseDatetime = faker.Date.Between(DateTime.Now.AddMonths(-2), DateTime.Now.AddMonths(2))
+            });
+        }
     }
 }

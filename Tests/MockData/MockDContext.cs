@@ -166,4 +166,21 @@ public static class MockDContext
         }
         return transactions;
     }
+
+    public static async Task<Sale> AddMockSale(this DContext context, string transactionId, string buyerId, string whoMade, string storageName,
+        int currencyId)
+    {
+        var articles = await context.Articles.AsNoTracking()
+            .Select(x => x.Id)
+            .ToListAsync();
+        var sale = MockData.CreateSale(transactionId, buyerId, whoMade, storageName, currencyId);
+        var currencyIds = await context.Currencies.AsNoTracking().Select(x => x.Id).ToListAsync();
+        var storageNames = await context.Storages.AsNoTracking().Select(x => x.Name).ToListAsync();
+        var saleContent = MockData.CreateSaleContent(articles, 10);
+        sale.SaleContents = saleContent;
+        MockData.CreateSaleContentDetail(saleContent, currencyIds, storageNames);
+        await context.AddAsync(sale);
+        await context.SaveChangesAsync();
+        return sale;
+    }
 }

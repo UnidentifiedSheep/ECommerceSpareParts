@@ -110,6 +110,7 @@ public class Sale(DContext context) : ISale
 
     public async Task<PostGres.Main.Sale> DeleteSale(string saleId, string whoDeletedUserId, CancellationToken cancellationToken = default)
     {
+        await context.EnsureUserExists(whoDeletedUserId, cancellationToken);
         return await context
             .WithDefaultTransactionSettings("normal")
             .ExecuteWithTransaction(async () => 

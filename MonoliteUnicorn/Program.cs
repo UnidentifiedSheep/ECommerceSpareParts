@@ -1,6 +1,7 @@
 using System.Net.Http.Headers;
 using System.Reflection;
 using System.Text;
+using Amazon.S3;
 using Carter;
 using Core.Behavior;
 using Core.Exceptions.ExceptionHandlers;
@@ -8,6 +9,7 @@ using Core.Logger;
 using Core.Mail;
 using Core.Mail.Models;
 using Core.Redis;
+using Core.Services.S3;
 using Core.Services.TimeWebCloud.Implementations;
 using Core.Services.TimeWebCloud.Interfaces;
 using FluentValidation;
@@ -21,6 +23,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
+using MonoliteUnicorn;
 using MonoliteUnicorn.Configs;
 using MonoliteUnicorn.Consumers;
 using MonoliteUnicorn.HangFireTasks;
@@ -30,6 +33,7 @@ using MonoliteUnicorn.RedisFunctions;
 using MonoliteUnicorn.Services.ArticleReservations;
 using MonoliteUnicorn.Services.Balances;
 using MonoliteUnicorn.Services.CacheService;
+using MonoliteUnicorn.Services.Catalogue;
 using MonoliteUnicorn.Services.Inventory;
 using MonoliteUnicorn.Services.JWT;
 using MonoliteUnicorn.Services.Prices.Price;
@@ -115,6 +119,7 @@ builder.Services.AddScoped<IPurchase, Purchase>();
 builder.Services.AddScoped<ISale, Sale>();
 builder.Services.AddScoped<IBalance, Balance>();
 builder.Services.AddScoped<IInventory, Inventory>();
+builder.Services.AddScoped<ICatalogue, Catalogue>();
 builder.Services.AddScoped<IPurchaseOrchestrator, PurchaseOrchestrator>();
 builder.Services.AddScoped<ISaleOrchestrator, SaleOrchestrator>();
 builder.Services.AddScoped<IArticleReservation, ArticleReservation>();
@@ -187,6 +192,12 @@ builder.Services.AddMediatR(config =>
     config.AddOpenBehavior(typeof(ValidationBehavior<,>));
     config.AddOpenBehavior(typeof(LoggingBehavior<,>));
 });
+
+Global.S3BucketName = builder.Configuration["S3Storage:BucketName"];
+Global.ServiceUrl = builder.Configuration["S3Storage:ServiceURL"];
+
+builder.Services.AddScoped<IS3StorageService, S3StorageService>();
+builder.Services.AddAWSService<IAmazonS3>();
 
 builder.Services.AddTransient<ITimeWebMail>(sp => new TimeWebMail(sp.GetService<IHttpClientFactory>()!.CreateClient("TimewebClient")));
 builder.Services.Configure<MailOptions>(builder.Configuration.GetSection("Mail"));

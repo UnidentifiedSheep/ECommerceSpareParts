@@ -10,13 +10,17 @@ using MonoliteUnicorn.Dtos.Amw.Purchase;
 using MonoliteUnicorn.Dtos.Amw.Sales;
 using MonoliteUnicorn.Dtos.Amw.Storage;
 using MonoliteUnicorn.Dtos.Amw.Users;
+using MonoliteUnicorn.Dtos.Anonymous.Articles;
 using MonoliteUnicorn.Dtos.Member.Vehicles;
 using MonoliteUnicorn.Dtos.Producers;
 using MonoliteUnicorn.Models;
 using MonoliteUnicorn.PostGres.Main;
 using MonoliteUnicorn.RedisFunctions.Models;
-using AmwArticleDto = MonoliteUnicorn.Dtos.Amw.Articles.ArticleFullDto;
-using MemberArticleDto = MonoliteUnicorn.Dtos.Member.Articles.ArticleFullDto;
+
+using AmwArticleFullDto = MonoliteUnicorn.Dtos.Amw.Articles.ArticleFullDto;
+using MemberArticleFullDto = MonoliteUnicorn.Dtos.Member.Articles.ArticleFullDto;
+using AmwArticleDto = MonoliteUnicorn.Dtos.Amw.Articles.ArticleDto;
+using AnonymousArticleDto = MonoliteUnicorn.Dtos.Anonymous.Articles.ArticleDto;
 
 using AmwPurchaseDto = MonoliteUnicorn.Dtos.Amw.Purchase.PurchaseDto;
 using MemberPurchaseDto = MonoliteUnicorn.Dtos.Member.Purchase.PurchaseDto;
@@ -29,12 +33,21 @@ public static class MapsterConfig
     {
         //Articles
             //ALL
-        TypeAdapterConfig<Article, ArticleDto>.NewConfig()
+        TypeAdapterConfig<Article, AmwArticleDto>.NewConfig()
+            .Map(dest => dest.Id, src => src.Id)
+            .Map(dest => dest.ProducerName, src => src.Producer.Name)
+            .Map(dest => dest.Title, src => src.ArticleName)
+            .Map(dest => dest.ArticleNumber, src => src.ArticleNumber)
+            .Map(dest => dest.CurrentStock, src => src.TotalCount)
+            .Map(dest => dest.Indicator, src => src.Indicator);
+        
+        TypeAdapterConfig<Article, AnonymousArticleDto>.NewConfig()
             .Map(dest => dest.Id, src => src.Id)
             .Map(dest => dest.ProducerName, src => src.Producer.Name)
             .Map(dest => dest.Title, src => src.ArticleName)
             .Map(dest => dest.ArticleNumber, src => src.ArticleNumber)
             .Map(dest => dest.CurrentStock, src => src.TotalCount);
+        
             //AMW
         TypeAdapterConfig<NewArticleDto, Article>.NewConfig()
             .Map(d => d.ArticleName, s => s.Name.Trim())
@@ -47,7 +60,7 @@ public static class MapsterConfig
             .Map(d => d.PackingUnit, s => s.PackingUnit)
             .Map(d => d.Indicator, s => string.IsNullOrWhiteSpace(s.Indicator) ? null : s.Indicator.Trim())
             .Map(d => d.CategoryId, s => s.CategoryId);
-        TypeAdapterConfig<Article, AmwArticleDto>.NewConfig()
+        TypeAdapterConfig<Article, AmwArticleFullDto>.NewConfig()
             .Map(d => d.Id, s => s.Id)
             .Map(d => d.ArticleNumber, s => s.ArticleNumber)
             .Map(d => d.Title, s => s.ArticleName)
@@ -58,10 +71,10 @@ public static class MapsterConfig
             .Map(d => d.CurrentStock, s => s.TotalCount)
             .Map(d => d.IndicatorColor, s => s.Indicator);
 
-        TypeAdapterConfig<Article, Versioned<AmwArticleDto>>.NewConfig()
-            .ConstructUsing(src => new Versioned<AmwArticleDto>(src.Adapt<AmwArticleDto>()));
+        TypeAdapterConfig<Article, Versioned<AmwArticleFullDto>>.NewConfig()
+            .ConstructUsing(src => new Versioned<AmwArticleFullDto>(src.Adapt<AmwArticleFullDto>()));
         
-        TypeAdapterConfig<AmwArticleDto, MemberArticleDto>.NewConfig()
+        TypeAdapterConfig<AmwArticleFullDto, MemberArticleFullDto>.NewConfig()
             .IgnoreNonMapped(true)
             .Map(d => d.Id, s => s.Id)
             .Map(d => d.ArticleNumber, s => s.ArticleNumber)
@@ -86,7 +99,7 @@ public static class MapsterConfig
             .Map(d => d.CategoryId, s => s.CategoryId.Value);
         
             //MEMBER
-        TypeAdapterConfig<Article, MemberArticleDto>.NewConfig()
+        TypeAdapterConfig<Article, MemberArticleFullDto>.NewConfig()
             .Map(d => d.Id, s => s.Id)
             .Map(d => d.ArticleNumber, s => s.ArticleNumber)
             .Map(d => d.Title, s => s.ArticleName)

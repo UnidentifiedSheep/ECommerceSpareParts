@@ -27,7 +27,7 @@ public class GetTransactionsEndPoint : ICarterModule
             {
                 var roles = user.FindAll(ClaimTypes.Role).Select(r => r.Value).ToList();
 
-                if (StaticString.IsAnyMatchInvariant(roles, "admin", "moderator", "worker"))
+                if (roles.IsAnyMatchInvariant("admin", "moderator", "worker"))
                     return await GetAmw(sender, request, token);
                 return null;
             }).RequireAuthorization()
