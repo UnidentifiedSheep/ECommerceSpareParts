@@ -20,4 +20,6 @@ public interface ICatalogue
 
     Task AddArticlesContent(int articleId, Dictionary<int, int> content, CancellationToken token = default);
     Task RemoveArticlesContent(int articleId, IEnumerable<int> insideIds, CancellationToken token = default);
+
+    Task SetArticleContentCount(int articleId, int insideArticleId, int count, CancellationToken token = default);
 }

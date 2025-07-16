@@ -246,4 +246,16 @@ public class Catalogue : ICatalogue
 
         await _context.Database.ExecuteSqlRawAsync(sql, token);
     }
+
+    public async Task SetArticleContentCount(int articleId, int insideArticleId, int count,
+        CancellationToken token = default)
+    {
+        var content = await _context.ArticlesContents
+            .FirstOrDefaultAsync(x => x.MainArticleId == articleId &&
+                x.InsideArticleId == insideArticleId, token);
+        if (content == null)
+            throw new ArticleContentNotFoundException(new {articleId, insideArticleId});
+        content.Quantity = count;
+        await _context.SaveChangesAsync(token);
+    }
 }

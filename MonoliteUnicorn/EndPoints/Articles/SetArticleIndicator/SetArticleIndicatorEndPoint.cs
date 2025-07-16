@@ -10,7 +10,7 @@ public class SetArticleIndicatorEndPoint : ICarterModule
 {
     public void AddRoutes(IEndpointRouteBuilder app)
     {
-        app.MapPost("/articles/{articleId}/indicator", async (ISender sender, int articleId, 
+        app.MapPatch("/articles/{articleId}/indicator", async (ISender sender, int articleId, 
             SetArticleIndicatorRequest request, CancellationToken token) =>
         {
             var command = new SetArticleIndicatorCommand(articleId, request.Indicator);
