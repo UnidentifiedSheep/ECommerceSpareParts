@@ -1,6 +1,6 @@
 namespace Core.Exceptions;
 
-public class ConflictException : Exception
+public class ConflictException : BaseValuedException
 {
     public ConflictException(string message) : base(message) { }
 
@@ -8,6 +8,7 @@ public class ConflictException : Exception
     {
         Details = details;
     }
+    public ConflictException(string message, object relatedData) : base(message, relatedData) { }
 
     public string? Details { get; }
 }

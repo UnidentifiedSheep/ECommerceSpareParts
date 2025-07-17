@@ -21,7 +21,9 @@ public class ArticleReservation(DContext context) : IArticleReservation
         {
             if (item.InitialCount < 0)
                 throw new InitialCountMustBeGreaterThenZeroException();
-            if (item.InitialCount <= item.CurrentCount)
+            if (item.InitialCount < item.CurrentCount)
+                throw new InitialCountLessOrEqualToCurrentException();
+            if (item.CurrentCount <= 0)
                 throw new InitialCountLessOrEqualToCurrentException();
             if (item.GivenPrice != null)
             {
@@ -87,8 +89,59 @@ public class ArticleReservation(DContext context) : IArticleReservation
                                                    """, cancellationToken);
     }
 
-    public async Task IsCountEnoughForUser(int articleId, string userId, int neededCount,  CancellationToken cancellationToken = default)
+    public async Task<(Dictionary<int, int>, Dictionary<int, int>)> GetArticlesWithNotEnoughStock(string userId, string storageName, bool takeFromOtherStorages, 
+        Dictionary<int, int> neededCounts,  CancellationToken cancellationToken = default)
     {
+        if (neededCounts.Count == 0) return ([], []);
+        var articleIds = neededCounts.Keys.ToList();
+        if (neededCounts.Values.Any(x => x <= 0))
+            throw new NeededCountCannotBeNegativeException();
+        await context.EnsureUserExists(userId, cancellationToken);
+        await context.EnsureStorageExists(storageName, cancellationToken);
+        await context.EnsureArticlesExist(articleIds, cancellationToken);
         
+        //Id артикула и количество которого не хватает, для того чтобы продать не затрагивая чужие резервации
+        var resultIncludingReservation = new Dictionary<int, int>();
+        var notEnoughStock = new Dictionary<int, int>();
+        
+        var otherUsersReservations = await context.StorageContentReservations
+            .AsNoTracking()
+            .Where(x => x.UserId != userId &&
+                        articleIds.Contains(x.ArticleId) &&
+                        !x.IsDone)
+            .GroupBy(x => x.ArticleId)
+            .Select(x => new
+            {
+                ArticleId = x.Key,
+                TotalCount = x.Sum(y => y.CurrentCount)
+            })
+            .ToDictionaryAsync(x => x.ArticleId, 
+                x => x.TotalCount, cancellationToken);
+        var storageCounts = await context.StorageContents
+            .AsNoTracking()
+            .Where(x => x.Count > 0 && articleIds.Contains(x.ArticleId) &&
+                        (takeFromOtherStorages || x.StorageName == storageName))
+            .GroupBy(x => x.ArticleId)
+            .Select(g => new
+            {
+                ArticleId = g.Key,
+                TotalCount = g.Sum(x => x.Count)
+            })
+            .ToDictionaryAsync(x => x.ArticleId, 
+                x => x.TotalCount, cancellationToken);
+        foreach (var (id, count) in neededCounts)
+        {
+            storageCounts.TryGetValue(id, out var storageCount);
+            otherUsersReservations.TryGetValue(id, out var reservationsCount);
+            var stockDiff = storageCount - count;
+            if (stockDiff < 0)
+            {
+                notEnoughStock.Add(id, Math.Abs(stockDiff));
+                continue;
+            }
+            var reservationsDiff = stockDiff - reservationsCount;
+            if(reservationsDiff < 0) resultIncludingReservation.Add(id, Math.Abs(reservationsDiff));
+        }
+        return (resultIncludingReservation, notEnoughStock);
     }
 }

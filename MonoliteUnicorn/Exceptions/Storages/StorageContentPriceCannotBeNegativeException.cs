@@ -4,7 +4,7 @@ namespace MonoliteUnicorn.Exceptions.Storages;
 
 public class StorageContentPriceCannotBeNegativeException : BadRequestException
 {
-    public StorageContentPriceCannotBeNegativeException(int key) : base($"Элемент ID={key} Цена должна быть больше 0")
+    public StorageContentPriceCannotBeNegativeException(int id) : base($"Цена должна быть больше 0", new { Id = id })
     {
     }
     public StorageContentPriceCannotBeNegativeException() : base($"Цена должна быть больше 0")

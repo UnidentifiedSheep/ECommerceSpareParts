@@ -2,7 +2,8 @@ using Core.Exceptions;
 
 namespace MonoliteUnicorn.Exceptions.Articles;
 
-public class ArticleContentCannotBeSameAsArticleException(int articleId) : BadRequestException($"Артикул не может быть частью самого себя. Id = '{articleId}'.")
+public class ArticleContentCannotBeSameAsArticleException(int id) : 
+    BadRequestException("Артикул не может быть частью самого себя.", new {Id = id})
 {
     
 }

@@ -16,8 +16,8 @@ public class GetArticleReservationsValidation : AbstractValidator<GetArticleRese
     public GetArticleReservationsValidation()
     {
         RuleFor(x => x.SearchTerm)
-            .NotEmpty()
             .MinimumLength(3)
+            .When(x => !string.IsNullOrWhiteSpace(x.SearchTerm))
             .WithMessage("Минимальная длинна строки поиска 3");
         
         RuleFor(query => query.Page)
@@ -38,7 +38,7 @@ public class GetArticleReservationsHandler(DContext context) : IQueryHandler<Get
             .AsNoTracking();
         if(request.UserId != null)
             query = query.Where(x => x.UserId == request.UserId);
-        if (request.SearchTerm != null)
+        if (!string.IsNullOrWhiteSpace(request.SearchTerm))
         {
             var normalizedSearchTerm = request.SearchTerm.ToNormalizedArticleNumber();
             query = query.Include(x => x.Article)

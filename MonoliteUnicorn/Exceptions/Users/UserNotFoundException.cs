@@ -8,11 +8,11 @@ namespace MonoliteUnicorn.Exceptions.Users
 		{
 			
 		}
-		public UserNotFoundException(string key) : base($"Не удалось найти пользователя {key}")
+		public UserNotFoundException(string id) : base($"Не удалось найти пользователя", new { Id = id })
 		{
 		}
 		
-		public UserNotFoundException(IEnumerable<string> ids) : base($"Не удалось найти пользователя {string.Join(',', ids)}")
+		public UserNotFoundException(IEnumerable<string> ids) : base($"Не удалось найти пользователя", new { Ids = ids })
 		{
 		}
 	}

@@ -4,7 +4,7 @@ namespace MonoliteUnicorn.Exceptions.Producers
 {
 	public class ProducerDetailsNotFoundException : NotFoundException
 	{
-		public ProducerDetailsNotFoundException(object key) : base("Детали производителя не найдены", key)
+		public ProducerDetailsNotFoundException(object id) : base("Детали производителя не найдены", new { Id = id })
 		{
 		}
 	}

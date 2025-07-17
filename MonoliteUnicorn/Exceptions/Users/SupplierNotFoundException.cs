@@ -4,10 +4,10 @@ namespace MonoliteUnicorn.Exceptions.Users;
 
 public class SupplierNotFoundException : NotFoundException
 {
-    public SupplierNotFoundException(string key) : base($"Не удалось найти поставщика {key}")
+    public SupplierNotFoundException(string id) : base($"Не удалось найти поставщика", new { Id = id })
     {
     }
-    public SupplierNotFoundException(IEnumerable<string> ids) : base($"Не удалось найти поставщиков {string.Join(',', ids)}")
+    public SupplierNotFoundException(IEnumerable<string> ids) : base($"Не удалось найти поставщиков", new { Ids = ids })
     {
     }
 }

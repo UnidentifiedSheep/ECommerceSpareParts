@@ -19,15 +19,21 @@ public class CreateArticleReservationValidation : AbstractValidator<CreateArticl
             .ChildRules(x =>
             {
                 x.RuleFor(z => z.GivenPrice)
-                    .Must(z => Math.Round(z!.Value, 2) > 0)
-                    .When(z => z.GivenPrice != null)
+                    .GreaterThan(0)
+                    .When(z => z.GivenPrice.HasValue)
                     .WithMessage("Предложенная цена должна быть больше 0");
-                x.RuleFor(z => new {z.InitialCount, z.CurrentCount})
-                    .Must(z => z.InitialCount > z.CurrentCount)
-                    .WithMessage("Количество которое было зарезервировано, не может быть меньше или равно текущему, при создании резервации.");
+
                 x.RuleFor(z => z.InitialCount)
                     .GreaterThan(0)
                     .WithMessage("Общее количество для резервации должно быть больше 0");
+                
+                x.RuleFor(z => z.CurrentCount)
+                    .GreaterThan(0)
+                    .WithMessage("Текущее количество для резервации должно быть больше 0");
+
+                x.RuleFor(z => z.InitialCount)
+                    .GreaterThanOrEqualTo(z => z.CurrentCount)
+                    .WithMessage("Начальное количество не может быть меньше текущего количества");
             });
     }
 }

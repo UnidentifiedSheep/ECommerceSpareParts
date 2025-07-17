@@ -2,7 +2,7 @@ using Core.Exceptions;
 
 namespace MonoliteUnicorn.Exceptions.Purchase;
 
-public class ArticleDoesntMatchContentException(int articleId) : BadRequestException($"Артикул '{articleId}' не соответствует позиции в продаже")
+public class ArticleDoesntMatchContentException(int id) : BadRequestException($"Артикул не соответствует позиции в продаже", new { Id = id })
 {
     
 }

@@ -1,6 +1,7 @@
 using System.Security.Claims;
 using Carter;
 using Core.StaticFunctions;
+using Mapster;
 using MediatR;
 using MonoliteUnicorn.Dtos.Amw.Sales;
 
@@ -14,7 +15,8 @@ public record CreateSaleRequest(
     DateTime SaleDateTime,
     IEnumerable<NewSaleContentDto> SaleContent,
     string? Comment,
-    decimal? PayedSum); 
+    decimal? PayedSum,
+    string? ConfirmationCode);
 
 public class CreateSaleEndPoint : ICarterModule
 {
@@ -27,7 +29,7 @@ public class CreateSaleEndPoint : ICarterModule
                 if (userId == null) return Results.Unauthorized();
                 var command = new CreateSaleCommand(userId, request.BuyerId, request.CurrencyId, 
                     request.StorageName, request.SellFromOtherStorages, 
-                    request.SaleDateTime, request.SaleContent, request.Comment, request.PayedSum);
+                    request.SaleDateTime, request.SaleContent, request.Comment, request.PayedSum, request.ConfirmationCode);
                 await sender.Send(command, token);
                 return Results.Ok();
             }).RequireAuthorization("AMW")

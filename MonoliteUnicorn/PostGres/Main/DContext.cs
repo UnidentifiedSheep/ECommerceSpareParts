@@ -104,9 +104,9 @@ public partial class DContext : DbContext
             .HasPostgresExtension("dblink")
             .HasPostgresExtension("pg_trgm")
             .HasPostgresExtension("pgcrypto");
-        
-        modelBuilder.HasSequence<int>("table_name_id_seq");
 
+        modelBuilder.HasSequence<int>("table_name_id_seq");
+        
         modelBuilder.Entity<Article>(entity =>
         {
             entity.HasKey(e => e.Id).HasName("articles_id_pk");
@@ -287,27 +287,25 @@ public partial class DContext : DbContext
 
         modelBuilder.Entity<ArticlesContent>(entity =>
         {
-            entity
-                .HasNoKey()
-                .ToTable("articles_content");
+            entity.HasKey(e => new { e.MainArticleId, e.InsideArticleId }).HasName("articles_content_pk");
+
+            entity.ToTable("articles_content");
 
             entity.HasIndex(e => e.InsideArticleId, "article_main_inside_index");
 
             entity.HasIndex(e => e.MainArticleId, "articles_content_main_article_id_index");
 
-            entity.HasIndex(e => new { e.MainArticleId, e.InsideArticleId }, "articles_content_main_article_id_inside_article_id_uindex").IsUnique();
-
-            entity.Property(e => e.InsideArticleId).HasColumnName("inside_article_id");
             entity.Property(e => e.MainArticleId).HasColumnName("main_article_id");
+            entity.Property(e => e.InsideArticleId).HasColumnName("inside_article_id");
             entity.Property(e => e.Quantity)
-                .HasDefaultValue(1)
+                .HasDefaultValue(0)
                 .HasColumnName("quantity");
 
-            entity.HasOne(d => d.InsideArticle).WithMany()
+            entity.HasOne(d => d.InsideArticle).WithMany(p => p.ArticlesContentInsideArticles)
                 .HasForeignKey(d => d.InsideArticleId)
                 .HasConstraintName("articles_content_in_id___fk");
 
-            entity.HasOne(d => d.MainArticle).WithMany()
+            entity.HasOne(d => d.MainArticle).WithMany(p => p.ArticlesContentMainArticles)
                 .HasForeignKey(d => d.MainArticleId)
                 .HasConstraintName("articles_content_out_id___fk");
         });
@@ -979,6 +977,8 @@ public partial class DContext : DbContext
 
             entity.HasIndex(e => e.PurchaseDatetime, "storage_content_purchase_datetime_index");
 
+            entity.HasIndex(e => new { e.StorageName, e.ArticleId }, "storage_content_storage_name_article_id_index");
+
             entity.HasIndex(e => e.StorageName, "storage_content_storage_name_index")
                 .HasMethod("gin")
                 .HasOperators(new[] { "gin_trgm_ops" });
@@ -1023,6 +1023,8 @@ public partial class DContext : DbContext
             entity.ToTable("storage_content_reservations");
 
             entity.HasIndex(e => e.ArticleId, "storage_content_reservations_article_id_index");
+
+            entity.HasIndex(e => new { e.ArticleId, e.IsDone }, "storage_content_reservations_article_id_is_done_index");
 
             entity.HasIndex(e => e.Comment, "storage_content_reservations_comment_index")
                 .HasMethod("gin")

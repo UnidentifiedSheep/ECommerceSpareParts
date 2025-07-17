@@ -35,6 +35,10 @@ public partial class Article
 
     public virtual ICollection<ArticleSupplierBuyInfo> ArticleSupplierBuyInfos { get; set; } = new List<ArticleSupplierBuyInfo>();
 
+    public virtual ICollection<ArticlesContent> ArticlesContentInsideArticles { get; set; } = new List<ArticlesContent>();
+
+    public virtual ICollection<ArticlesContent> ArticlesContentMainArticles { get; set; } = new List<ArticlesContent>();
+
     public virtual ICollection<BuySellPrice> BuySellPrices { get; set; } = new List<BuySellPrice>();
 
     public virtual Category? Category { get; set; }

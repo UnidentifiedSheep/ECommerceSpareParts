@@ -112,7 +112,7 @@ public class Purchase(DContext context) : IPurchase
             {
                 PurchaseContent? samePurchaseContent = null;
                 if (item.Id != null && !purchaseContent.TryGetValue(item.Id.Value, out samePurchaseContent))
-                    throw new PurchaseContentNotFoundException(item.Id);
+                    throw new PurchaseContentNotFoundException(item.Id.Value);
                 if (item.Id == null)
                 {
                     if(!result[item.ArticleId].TryAdd(item.Price, item.Count))

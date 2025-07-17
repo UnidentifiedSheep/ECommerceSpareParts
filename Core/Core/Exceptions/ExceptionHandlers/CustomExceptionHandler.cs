@@ -24,6 +24,7 @@ namespace Core.Exceptions.ExceptionHandlers
 				UnauthorizedAccessException => StatusCodes.Status401Unauthorized,
 				NotFoundException => StatusCodes.Status404NotFound,
 				ConflictException => StatusCodes.Status409Conflict,
+				PreconditionRequiredException => StatusCodes.Status428PreconditionRequired,
 				_ => StatusCodes.Status500InternalServerError
 			};
 
@@ -41,6 +42,13 @@ namespace Core.Exceptions.ExceptionHandlers
 					["traceId"] = context.TraceIdentifier
 				}
 			};
+			
+			if (exception is IValuedException valuedEx)
+			{
+				var errorValues = valuedEx.GetErrorValues();
+				if (errorValues != null)
+					problemDetails.Extensions["errorRelatedData"] = errorValues;
+			}
 
 			if (exception is ValidationException validationException)
 			{

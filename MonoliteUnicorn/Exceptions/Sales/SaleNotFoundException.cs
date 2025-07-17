@@ -2,7 +2,7 @@ using Core.Exceptions;
 
 namespace MonoliteUnicorn.Exceptions.Sales;
 
-public class SaleNotFoundException(string saleId) : NotFoundException($"Не удалось найти продажу {saleId}")
+public class SaleNotFoundException(string id) : NotFoundException($"Не удалось найти продажу", new { Id = id })
 {
     
 }
