@@ -15,11 +15,7 @@ public partial class BuySellPrice
 
     public bool IsOutLiner { get; set; }
 
-    public int ArticleId { get; set; }
-
     public int SaleContentId { get; set; }
-
-    public virtual Article Article { get; set; } = null!;
 
     public virtual Currency Currency { get; set; } = null!;
 

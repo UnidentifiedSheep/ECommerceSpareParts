@@ -48,7 +48,7 @@ public class GetArticleViaExecNumberEndPoint : ICarterModule
     private async Task<IResult> GetAmw(ISender sender, GetArticlesViaExecRequest request, string? userId, IEnumerable<int> producerIds,
         CancellationToken token)
     {
-        var query = new GetArticleViaExecNumberAmwQuery(request.SearchTerm, request.Page, request.ViewCount, request.SortBy, producerIds, userId);
+        var query = new GetArticleViaExecNumberAmwQuery(request.SearchTerm, request.ViewCount, request.Page, request.SortBy, producerIds, userId);
         var result = await sender.Send(query, token);
         var response = result.Adapt<GetArticlesViaExecAmwResponse>();
         return Results.Ok(response);
@@ -57,7 +57,7 @@ public class GetArticleViaExecNumberEndPoint : ICarterModule
     private async Task<IResult> GetAnonymous(ISender sender, GetArticlesViaExecRequest request, string? userId, IEnumerable<int> producerIds,
         CancellationToken token)
     {
-        var query = new GetArticleViaExecNumberAnonymousQuery(request.SearchTerm, request.Page, request.ViewCount, request.SortBy, producerIds, userId);
+        var query = new GetArticleViaExecNumberAnonymousQuery(request.SearchTerm, request.ViewCount, request.Page, request.SortBy, producerIds, userId);
         var result = await sender.Send(query, token);
         var response = result.Adapt<GetArticlesViaExecAnonymousResponse>();
         return Results.Ok(response);

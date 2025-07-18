@@ -21,4 +21,7 @@ public interface IArticleReservation
     /// список артикулов которых не хватает на складе для продажи без учета резерваций.</returns>
     Task<(Dictionary<int, int>, Dictionary<int, int>)> GetArticlesWithNotEnoughStock(string userId, string storageName, bool takeFromOtherStorages,
         Dictionary<int, int> neededCounts, CancellationToken cancellationToken = default);
+
+    Task SubtractCountFromReservations(string userId, string whoUpdated, Dictionary<int, int> contents,
+        CancellationToken cancellationToken = default);
 }

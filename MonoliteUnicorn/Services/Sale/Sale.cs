@@ -154,14 +154,15 @@ public class Sale(DContext context) : ISale
                     .FromSql($"SELECT * FROM sale_content where sale_id = {saleId} for update")
                     .ToDictionaryAsync(x => x.Id, cancellationToken);
                 var saleContentDetails = await context.SaleContentDetails
-                    .FromSql($"SELECT * FROM sale_content_details where sale_content_id = ANY({saleContents.Keys.ToHashSet().ToArray()}) for update")
+                    .FromSql($"SELECT * FROM sale_content_details where sale_content_id = ANY({saleContents.Keys}) for update")
                     .ToDictionaryAsync(x => x.Id, cancellationToken);
                 var detailGroups = GetDetailsGroup(storageContentValues);
-
+                var deletedContentIds = new HashSet<int>(saleContents.Keys);
                 foreach (var item in editedContent)
                 {
                     if (item.Id != null)
                     {
+                        deletedContentIds.Remove(item.Id.Value);
                         if(!saleContents.TryGetValue(item.Id.Value, out var saleContent))
                             throw new SaleContentNotFoundException(item.Id.Value);
                         
@@ -181,7 +182,7 @@ public class Sale(DContext context) : ISale
                                 if (detail.Count <= counter)
                                 {
                                     counter -= detail.Count;
-                                    await context.SaleContentDetails.AddAsync(detail, cancellationToken);
+                                    saleContent.SaleContentDetails.Add(detail);
                                     queue.Dequeue();
                                 }
                                 else
@@ -190,14 +191,14 @@ public class Sale(DContext context) : ISale
                                     partial.Count = counter;
                                     detail.Count -= counter;
                                     counter = 0;
-                                    await context.SaleContentDetails.AddAsync(partial, cancellationToken);
+                                    saleContent.SaleContentDetails.Add(partial);
                                 }
                             }
 
                             if (counter > 0)
                                 throw new ArgumentException($"Недостаточно деталей для артикула {item.ArticleId}");
                         }
-                        else
+                        else if(saleContent.Count > item.Count)
                         {
                             foreach (var tempDetail in movedToStorage[item.Id.Value])
                             {
@@ -209,9 +210,13 @@ public class Sale(DContext context) : ISale
                                     context.Remove(realDetail);
                             }
                         }
+                        
+                        saleContent.Count = item.Count;
                     }
                     else
                     {
+                        var saleContent = item.Adapt<SaleContent>();
+                        sale.SaleContents.Add(saleContent);
                         if (!detailGroups.TryGetValue(item.ArticleId, out var queue))
                             throw new ArgumentException($"Нет деталей по артикулу {item.ArticleId}");
                         
@@ -222,7 +227,7 @@ public class Sale(DContext context) : ISale
                             if (detail.Count <= counter)
                             {
                                 counter -= detail.Count;
-                                await context.SaleContentDetails.AddAsync(detail, cancellationToken);
+                                saleContent.SaleContentDetails.Add(detail);
                                 queue.Dequeue();
                             }
                             else
@@ -231,7 +236,7 @@ public class Sale(DContext context) : ISale
                                 partial.Count = counter;
                                 detail.Count -= counter;
                                 counter = 0;
-                                await context.SaleContentDetails.AddAsync(partial, cancellationToken);
+                                saleContent.SaleContentDetails.Add(partial);
                             }
                         }
                         
@@ -242,7 +247,11 @@ public class Sale(DContext context) : ISale
                 
                 if (detailGroups.Any(x => x.Value.Count > 0))
                     throw new ArgumentException("Несовпадение количества в деталях и продажах");
-                
+                var deletedContents = saleContents
+                    .Where(kvp => deletedContentIds.Contains(kvp.Key))
+                    .Select(x => x.Value)
+                    .ToList();
+                context.RemoveRange(deletedContents);
                 await context.SaveChangesAsync(cancellationToken); 
             }, cancellationToken);
     }

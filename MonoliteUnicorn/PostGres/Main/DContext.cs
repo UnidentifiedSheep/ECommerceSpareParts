@@ -402,8 +402,6 @@ public partial class DContext : DbContext
 
             entity.ToTable("buy_sell_prices");
 
-            entity.HasIndex(e => e.ArticleId, "buy_sell_prices_article_id_index");
-
             entity.HasIndex(e => e.BuyPrice, "buy_sell_prices_buy_price_index");
 
             entity.HasIndex(e => e.SellPrice, "buy_sell_prices_sell_price_index");
@@ -411,7 +409,6 @@ public partial class DContext : DbContext
             entity.Property(e => e.SaleContentId)
                 .ValueGeneratedNever()
                 .HasColumnName("sale_content_id");
-            entity.Property(e => e.ArticleId).HasColumnName("article_id");
             entity.Property(e => e.BuyPrice).HasColumnName("buy_price");
             entity.Property(e => e.CurrencyId).HasColumnName("currency_id");
             entity.Property(e => e.IsOutLiner)
@@ -419,11 +416,6 @@ public partial class DContext : DbContext
                 .HasColumnName("is_out_liner");
             entity.Property(e => e.Markup).HasColumnName("markup");
             entity.Property(e => e.SellPrice).HasColumnName("sell_price");
-
-            entity.HasOne(d => d.Article).WithMany(p => p.BuySellPrices)
-                .HasForeignKey(d => d.ArticleId)
-                .OnDelete(DeleteBehavior.Restrict)
-                .HasConstraintName("buy_sell_prices_articles_id_fk");
 
             entity.HasOne(d => d.Currency).WithMany(p => p.BuySellPrices)
                 .HasForeignKey(d => d.CurrencyId)

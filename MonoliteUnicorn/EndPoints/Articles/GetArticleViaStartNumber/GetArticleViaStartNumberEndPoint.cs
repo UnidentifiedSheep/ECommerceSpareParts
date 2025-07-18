@@ -32,8 +32,9 @@ public class GetArticleViaStartNumberEndPoint : ICarterModule
                     .Where(x => x.HasValue)
                     .Select(x => x!.Value)
                     .ToList();
-                
-                
+                if (roles.IsAnyMatchInvariant("admin", "moderator", "worker"))
+                    return await GetAmw(sender, request, userId, producerIds, token);
+                return await GetAnonymous(sender, request, userId, producerIds, token);
             }).WithGroup("Articles")
                 .WithDescription("Поиск артикула с начала номера")
                 .ProducesProblem(StatusCodes.Status400BadRequest)
@@ -44,7 +45,7 @@ public class GetArticleViaStartNumberEndPoint : ICarterModule
     private async Task<IResult> GetAmw(ISender sender, GetArticleViaStartNumberRequest request, string? userId, IEnumerable<int> producerIds,
         CancellationToken token)
     {
-        var query = new GetArticleViaStartNumberAmwQuery(request.SearchTerm, request.Page, request.ViewCount, request.SortBy, producerIds, userId);
+        var query = new GetArticleViaStartNumberAmwQuery(request.SearchTerm, request.ViewCount, request.Page, request.SortBy, producerIds, userId);
         var result = await sender.Send(query, token);
         var response = result.Adapt<GetArticleViaStartNumberAmwResponse>();
         return Results.Ok(response);
@@ -53,7 +54,7 @@ public class GetArticleViaStartNumberEndPoint : ICarterModule
     private async Task<IResult> GetAnonymous(ISender sender, GetArticleViaStartNumberRequest request, string? userId, IEnumerable<int> producerIds,
         CancellationToken token)
     {
-        var query = new GetArticleViaStartNumberAnonymousQuery(request.SearchTerm, request.Page, request.ViewCount, request.SortBy, producerIds, userId);
+        var query = new GetArticleViaStartNumberAnonymousQuery(request.SearchTerm, request.ViewCount, request.Page, request.SortBy, producerIds, userId);
         var result = await sender.Send(query, token);
         var response = result.Adapt<GetArticleViaStartNumberAnonymousResponse>();
         return Results.Ok(response);

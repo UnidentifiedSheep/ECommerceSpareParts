@@ -268,9 +268,19 @@ public static class MapsterConfig
             .Map(dest => dest.Price, src => src.PriceWithDiscount)
             .Map(dest => dest.TotalSum, src => src.PriceWithDiscount * src.Count)
             .Map(dest => dest.Discount, src => (src.Price - src.PriceWithDiscount) / src.Price * 100);
+        
+        TypeAdapterConfig<EditSaleContentDto, SaleContent>.NewConfig()
+            .Map(dest => dest.ArticleId, src => src.ArticleId)
+            .Map(dest => dest.Comment, src => src.Comment)
+            .Map(dest => dest.Count, src => src.Count)
+            .Map(dest => dest.Price, src => src.PriceWithDiscount)
+            .Map(dest => dest.TotalSum, src => src.PriceWithDiscount * src.Count)
+            .Map(dest => dest.Discount, src => (src.Price - src.PriceWithDiscount) / src.Price * 100);
 
+        
         //Остальные поля прописываются мануально
         TypeAdapterConfig<StorageContent, SaleContentDetail>.NewConfig()
+            .IgnoreNonMapped(true)
             .Map(dest => dest.StorageContentId, src => src.Id)
             .Map(dest => dest.Storage, src => src.StorageName)
             .Map(dest => dest.CurrencyId, src => src.CurrencyId)
@@ -284,6 +294,10 @@ public static class MapsterConfig
             .Map(dest => dest.BuyPrice, src => src.BuyPrice)
             .Map(dest => dest.PurchaseDatetime, src => src.PurchaseDatetime)
             .Map(dest => dest.Count, src => src.Count);
+
+        TypeAdapterConfig<SaleContentDetail, SaleContentDetail>.NewConfig()
+            .Ignore(x => x.SaleContent)
+            .Ignore(x => x.StorageNavigation);
         
         //User Search History
 

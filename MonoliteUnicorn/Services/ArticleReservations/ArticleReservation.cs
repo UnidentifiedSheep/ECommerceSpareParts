@@ -144,4 +144,43 @@ public class ArticleReservation(DContext context) : IArticleReservation
         }
         return (resultIncludingReservation, notEnoughStock);
     }
+
+    public async Task SubtractCountFromReservations(string userId, string whoUpdated, Dictionary<int, int> contents, 
+        CancellationToken cancellationToken = default)
+    {
+        if (contents.Count == 0) return;
+        await context.EnsureUserExists([userId, whoUpdated], cancellationToken);
+        var articleIds = contents.Keys.ToHashSet();
+        await context.WithDefaultTransactionSettings("normal")
+            .ExecuteWithTransaction(async () =>
+            {
+                foreach (var articleId in articleIds)
+                {
+                    if (contents[articleId] <= 0) continue;
+                    
+                    await foreach (var reservation in context.StorageContentReservations
+                                       .FromSql($"""
+                                                 Select * from storage_content_reservations where user_id = {userId} and
+                                                 article_id = {articleId} and is_done = {false}
+                                                 order by create_at asc 
+                                                 for update
+                                                 """).AsAsyncEnumerable().WithCancellation(cancellationToken))
+                    {
+                        var subtractCount = contents[articleId];
+                        if (subtractCount <= 0)
+                            break;
+
+                        var min = Math.Min(subtractCount, reservation.CurrentCount);
+                        reservation.CurrentCount -= min;
+                        contents[articleId] -= min;
+
+                        if (reservation.CurrentCount == 0)
+                            reservation.IsDone = true;
+                        reservation.WhoUpdated = whoUpdated;
+                        reservation.UpdatedAt = DateTime.SpecifyKind(DateTime.Now, DateTimeKind.Unspecified);
+                    }
+                }
+                await context.SaveChangesAsync(cancellationToken);
+            }, cancellationToken);
+    }
 }

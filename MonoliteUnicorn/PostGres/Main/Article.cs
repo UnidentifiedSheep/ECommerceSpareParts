@@ -39,8 +39,6 @@ public partial class Article
 
     public virtual ICollection<ArticlesContent> ArticlesContentMainArticles { get; set; } = new List<ArticlesContent>();
 
-    public virtual ICollection<BuySellPrice> BuySellPrices { get; set; } = new List<BuySellPrice>();
-
     public virtual Category? Category { get; set; }
 
     public virtual Producer Producer { get; set; } = null!;

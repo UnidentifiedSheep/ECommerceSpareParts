@@ -4,10 +4,12 @@ using Microsoft.EntityFrameworkCore;
 using MonoliteUnicorn.Dtos.Amw.Sales;
 using MonoliteUnicorn.Enums;
 using MonoliteUnicorn.Exceptions.Sales;
+using MonoliteUnicorn.Models;
 using MonoliteUnicorn.PostGres.Main;
+using MonoliteUnicorn.Services.ArticleReservations;
 using MonoliteUnicorn.Services.Balances;
+using MonoliteUnicorn.Services.BuySellPriceService;
 using MonoliteUnicorn.Services.Inventory;
-using MonoliteUnicorn.Services.Prices.PriceGenerator;
 
 namespace MonoliteUnicorn.Services.Sale;
 
@@ -21,12 +23,19 @@ public class SaleOrchestrator(IServiceProvider serviceProvider) : ISaleOrchestra
         var saleService = scope.ServiceProvider.GetRequiredService<ISale>();
         var balanceService = scope.ServiceProvider.GetRequiredService<IBalance>();
         var inventoryService = scope.ServiceProvider.GetRequiredService<IInventory>();
-
+        var articleReservationService = scope.ServiceProvider.GetRequiredService<IArticleReservation>();
+        var buySellPriceService = scope.ServiceProvider.GetRequiredService<IBuySellPriceService>();
+        
         await context
             .WithDefaultTransactionSettings("orchestrator-with-isolation")
             .ExecuteWithTransaction(async () =>
             {
                 var saleContentList = saleContent.ToList();
+                foreach (var item in saleContentList)
+                {
+                    item.Price = Math.Round(item.Price, 2);
+                    item.PriceWithDiscount = Math.Round(item.PriceWithDiscount, 2);
+                }
                 var totalSum = saleContentList.Sum(x => x.Count * x.PriceWithDiscount);
                 var transaction = await balanceService.CreateTransactionAsync("SYSTEM", buyerId, totalSum, TransactionStatus.Sale, currencyId, createdUserId, saleDateTime, cancellationToken);
                 var storageContentValues = await inventoryService.RemoveContentFromStorage(saleContentList.Select(x => (x.ArticleId, x.Count)), 
@@ -38,23 +47,16 @@ public class SaleOrchestrator(IServiceProvider serviceProvider) : ISaleOrchestra
                 if (payedSum is > 0)
                     await balanceService.CreateTransactionAsync(buyerId, "SYSTEM", payedSum.Value, TransactionStatus.Normal, 
                         currencyId, createdUserId, saleDateTime.AddMicroseconds(1), cancellationToken);
+                
+                await buySellPriceService.AddBuySellPrices(storageContents.Select(x => x.NewValue), 
+                    sale.SaleContents, currencyId, cancellationToken);
+                
+                var saleCounts = sale.SaleContents
+                    .GroupBy(x => x.ArticleId)
+                    .ToDictionary(x => x.Key, x => x.Sum(z => z.Count));
 
-                var articleBuyPrices = storageContents
-                    .GroupBy(x => x.Prev.ArticleId, x => x.Prev.BuyPriceInUsd)
-                    .ToDictionary(x => x.Key, x => x.Average());
-                foreach (var content in sale.SaleContents)
-                {
-                    var avrgBuyPrice = articleBuyPrices[content.ArticleId];
-                    var buySellPrices = new BuySellPrice
-                    {
-                        BuyPrice = Math.Round(CurrencyConverter.ConvertTo(avrgBuyPrice, Global.UsdId, currencyId), 2),
-                        SellPrice = Math.Round(content.Price, 2),
-                        ArticleId = content.ArticleId,
-                        CurrencyId = currencyId,
-                        SaleContentId = content.Id
-                    };
-                    await context.BuySellPrices.AddAsync(buySellPrices, cancellationToken);
-                }
+                await articleReservationService.SubtractCountFromReservations(buyerId, createdUserId, 
+                    saleCounts, cancellationToken);
                 await context.SaveChangesAsync(cancellationToken);
             }, cancellationToken);
     }
@@ -93,20 +95,21 @@ public class SaleOrchestrator(IServiceProvider serviceProvider) : ISaleOrchestra
         var editedContentList = editedContent.ToList();
         
         var seenIds = ValidateEditSaleInput(editedContentList);
-        
         using var scope = serviceProvider.CreateScope();
         var context = scope.ServiceProvider.GetRequiredService<DContext>();
         var saleService = scope.ServiceProvider.GetRequiredService<ISale>();
         var balanceService = scope.ServiceProvider.GetRequiredService<IBalance>();
         var inventoryService = scope.ServiceProvider.GetRequiredService<IInventory>();
-
+        var articleReservationService = scope.ServiceProvider.GetRequiredService<IArticleReservation>();
+        var buySellPriceService = scope.ServiceProvider.GetRequiredService<IBuySellPriceService>();
+        
         await context
             .WithDefaultTransactionSettings("orchestrator-with-isolation")
             .ExecuteWithTransaction(async () =>
             {
                 var sale = await GetSaleForUpdateAsync(context, saleId, cancellationToken);
                 var saleContent = await GetSaleContentForUpdateAsDictAsync(context, saleId, cancellationToken);
-                var saleContentIds = saleContent.Keys.ToHashSet();
+                var saleContentIds = saleContent.Keys;
                 var saleContentDetails = await context.SaleContentDetails
                     .FromSql(
                         $"SELECT * FROM sale_content_details where sale_content_id = ANY({saleContentIds.ToArray()}) for update")
@@ -114,17 +117,21 @@ public class SaleOrchestrator(IServiceProvider serviceProvider) : ISaleOrchestra
 
                 var totalSum = editedContentList.Sum(x => x.Count * x.PriceWithDiscount);
                 var (contentGreaterCount, contentLessCount) =
-                    CalculateInventoryDeltas(editedContentList, saleContent, saleContentDetails, seenIds);
+                    CalculateInventoryDeltas(editedContentList, saleContent, saleContentDetails);
 
                 //Оставшиеся Id убираем из продажи
                 contentLessCount.AddRange(GetRemovedContentDetails(seenIds, saleContent, saleContentDetails));
                 //Возвращаем на склад
-                await inventoryService.RestoreContentToStorage(contentLessCount, StorageMovementType.SaleEditing,
-                    updatedUserId, cancellationToken);
+                if(contentLessCount.Count != 0)
+                    await inventoryService.RestoreContentToStorage(contentLessCount, StorageMovementType.SaleEditing,
+                        updatedUserId, cancellationToken);
                 //Добавленные значения для позиций чьи количества были увеличены ЗАБИРАЕМ СО СКЛАДА
-                var takenStorageContents = await inventoryService.RemoveContentFromStorage(contentGreaterCount,
-                    updatedUserId, sale.MainStorageName, sellFromOtherStorages, StorageMovementType.SaleEditing,
-                    cancellationToken);
+                var takenStorageContents = new List<PrevAndNewValue<StorageContent>>();
+                if(contentGreaterCount.Count != 0)
+                    takenStorageContents = (await inventoryService.RemoveContentFromStorage(contentGreaterCount,
+                        updatedUserId, sale.MainStorageName, sellFromOtherStorages, StorageMovementType.SaleEditing,
+                        cancellationToken)).ToList();
+                
                 //Редактируем транзакцию
                 await balanceService.EditTransaction(sale.TransactionId, currencyId, totalSum, TransactionStatus.Sale,
                     saleDateTime, cancellationToken);
@@ -134,6 +141,22 @@ public class SaleOrchestrator(IServiceProvider serviceProvider) : ISaleOrchestra
                     .ToDictionary(x => x.Key, x => x.ToList());
                 await saleService.EditSale(editedContentList, takenStorageContents, movedToStorage, saleId, currencyId,
                     updatedUserId, saleDateTime, comment, cancellationToken);
+                var toTakeFromReservations = contentGreaterCount
+                    .GroupBy(x => x.ArticleId)
+                    .ToDictionary(x => x.Key, 
+                        x => x.Sum(z => z.Count));
+                
+                await articleReservationService.SubtractCountFromReservations(sale.BuyerId, updatedUserId,
+                    toTakeFromReservations, cancellationToken);
+                var newSaleContents = sale.SaleContents
+                    .Where(x => !seenIds.Contains(x.Id))
+                    .ToList();
+                var oldSaleContents = sale.SaleContents
+                    .Where(x => seenIds.Contains(x.Id))
+                    .ToList();
+                await buySellPriceService.AddBuySellPrices(takenStorageContents.Select(x => x.NewValue), 
+                    newSaleContents, sale.CurrencyId, cancellationToken);
+                await buySellPriceService.EditBuySellPrices(oldSaleContents, sale.CurrencyId, cancellationToken);
             }, cancellationToken);
     }
     
@@ -149,17 +172,15 @@ public class SaleOrchestrator(IServiceProvider serviceProvider) : ISaleOrchestra
     private (List<(int ArticleId, int Count)> toTake, List<(SaleContentDetail Detail, int ArticleId)> toReturn) CalculateInventoryDeltas(
             List<EditSaleContentDto> editedContentList,
             Dictionary<int, SaleContent> saleContent,
-            List<SaleContentDetail> saleContentDetails,
-            HashSet<int> seenIds)
+            List<SaleContentDetail> saleContentDetails)
     {
         var contentGreaterCount = new List<(int, int)>();
         var contentLessCount = new List<(SaleContentDetail, int)>();
-
+        
         foreach (var content in editedContentList)
         {
             if (content.Id != null)
             {
-                seenIds.Remove(content.Id.Value);
                 var existingSaleContent = saleContent[content.Id.Value];
 
                 if (existingSaleContent.Count < content.Count)
@@ -194,24 +215,17 @@ public class SaleOrchestrator(IServiceProvider serviceProvider) : ISaleOrchestra
 
     
     private List<(SaleContentDetail Detail, int ArticleId)> GetRemovedContentDetails(
-        HashSet<int> removedIds,
+        HashSet<int> seenIds,
         Dictionary<int, SaleContent> saleContent,
         List<SaleContentDetail> saleContentDetails)
     {
         var removedDetails = new List<(SaleContentDetail, int)>();
 
-        foreach (var deletedId in removedIds)
+        foreach (var (id, deletedContent) in saleContent.Where(x => !seenIds.Contains(x.Key)))
         {
-            var content = saleContent[deletedId];
             var details = saleContentDetails
-                .Where(x => x.SaleContentId == content.Id)
-                .Select(x =>
-                {
-                    var newDetail = x.Adapt<SaleContentDetail>();
-                    return (newDetail, content.ArticleId);
-                });
-
-            removedDetails.AddRange(details);
+                .Where(x => x.SaleContentId == id).ToList();
+            removedDetails.AddRange(details.Select(detail => (detail, deletedContent.ArticleId)));
         }
 
         return removedDetails;
