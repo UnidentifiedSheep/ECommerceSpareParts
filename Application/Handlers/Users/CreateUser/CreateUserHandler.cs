@@ -2,9 +2,9 @@ using Application.Interfaces;
 using Core.Attributes;
 using Core.Dtos.Amw.Users;
 using Core.Entities;
-using Core.Exceptions.Users;
 using Core.Interfaces.DbRepositories;
 using Core.Interfaces.Services;
+using Exceptions.Exceptions.Users;
 using Mapster;
 
 namespace Application.Handlers.Users.CreateUser;

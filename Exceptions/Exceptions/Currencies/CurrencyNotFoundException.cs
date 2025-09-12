@@ -1,7 +1,6 @@
 ﻿using Exceptions.Base;
-using Exceptions.Exceptions;
 
-namespace Core.Exceptions.Currencies
+namespace Exceptions.Exceptions.Currencies
 {
 	public class CurrencyNotFoundException : NotFoundException
 	{

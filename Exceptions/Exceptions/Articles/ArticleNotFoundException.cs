@@ -1,7 +1,6 @@
 ﻿using Exceptions.Base;
-using Exceptions.Exceptions;
 
-namespace Core.Exceptions.Articles
+namespace Exceptions.Exceptions.Articles
 {
 	public class ArticleNotFoundException : NotFoundException
 	{

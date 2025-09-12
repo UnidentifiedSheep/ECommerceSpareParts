@@ -1,7 +1,6 @@
 using Exceptions.Base;
-using Exceptions.Exceptions;
 
-namespace Core.Exceptions.Storages;
+namespace Exceptions.Exceptions.Storages;
 
 public class StorageNotFoundException : NotFoundException
 {

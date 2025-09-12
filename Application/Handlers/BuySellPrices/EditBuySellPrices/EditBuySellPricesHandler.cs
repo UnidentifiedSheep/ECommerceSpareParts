@@ -1,10 +1,10 @@
 using Application.Interfaces;
 using Core.Attributes;
 using Core.Entities;
-using Core.Exceptions.Currencies;
 using Core.Interfaces;
 using Core.Interfaces.DbRepositories;
 using Core.Interfaces.Services;
+using Exceptions.Exceptions.Currencies;
 using MediatR;
 
 namespace Application.Handlers.BuySellPrices.EditBuySellPrices;

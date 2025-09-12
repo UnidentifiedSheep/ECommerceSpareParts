@@ -1,7 +1,7 @@
 using Core.Entities;
-using Core.Exceptions.Users;
 using Core.Extensions;
 using Core.Interfaces.DbRepositories;
+using Exceptions.Exceptions.Users;
 using Microsoft.EntityFrameworkCore;
 using Persistence.Contexts;
 using Persistence.Extensions;

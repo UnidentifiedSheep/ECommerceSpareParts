@@ -6,11 +6,11 @@ using Core.Attributes;
 using Core.Dtos.Amw.Storage;
 using Core.Entities;
 using Core.Enums;
-using Core.Exceptions.Storages;
 using Core.Interfaces;
 using Core.Interfaces.DbRepositories;
 using Core.Interfaces.Services;
 using Exceptions.Base;
+using Exceptions.Exceptions.Storages;
 using Mapster;
 using MediatR;
 

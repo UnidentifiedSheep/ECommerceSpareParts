@@ -1,7 +1,7 @@
 ﻿using Application.Interfaces;
 using Core.Dtos.Internal;
-using Core.Exceptions.Auth;
 using Core.Interfaces;
+using Exceptions.Exceptions.Auth;
 using Mapster;
 using Microsoft.AspNetCore.Identity;
 using Persistence.Entities;

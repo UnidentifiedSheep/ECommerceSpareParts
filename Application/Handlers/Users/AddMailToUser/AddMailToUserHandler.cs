@@ -1,10 +1,10 @@
 using Application.Interfaces;
 using Core.Entities;
-using Core.Exceptions.Users;
 using Core.Interfaces;
 using Core.Interfaces.DbRepositories;
 using Core.Interfaces.Services;
 using Core.Models;
+using Exceptions.Exceptions.Users;
 using Mapster;
 using MediatR;
 

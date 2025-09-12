@@ -4,9 +4,9 @@ using Application.Extensions;
 using Application.Interfaces;
 using Core.Attributes;
 using Core.Entities;
-using Core.Exceptions.Balances;
 using Core.Interfaces.DbRepositories;
 using Core.Interfaces.Services;
+using Exceptions.Exceptions.Balances;
 using MediatR;
 using TransactionStatus = Core.Enums.TransactionStatus;
 

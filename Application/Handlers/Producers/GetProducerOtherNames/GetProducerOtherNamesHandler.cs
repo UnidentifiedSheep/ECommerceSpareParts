@@ -1,6 +1,5 @@
 using Application.Interfaces;
 using Core.Dtos.Amw.Producers;
-using Core.Exceptions.Producers;
 using Core.Interfaces.DbRepositories;
 using Core.Models;
 using FluentValidation;

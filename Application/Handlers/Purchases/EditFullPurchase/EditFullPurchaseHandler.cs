@@ -9,8 +9,8 @@ using Core.Attributes;
 using Core.Dtos.Amw.Purchase;
 using Core.Dtos.Amw.Storage;
 using Core.Enums;
-using Core.Exceptions.Purchase;
 using Core.Interfaces.DbRepositories;
+using Exceptions.Exceptions.Purchase;
 using MediatR;
 
 namespace Application.Handlers.Purchases.EditFullPurchase;

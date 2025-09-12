@@ -1,6 +1,6 @@
 using Application.Handlers.Users.CreateUser;
-using Core.Exceptions.Users;
 using Core.Extensions;
+using Exceptions.Exceptions.Users;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;

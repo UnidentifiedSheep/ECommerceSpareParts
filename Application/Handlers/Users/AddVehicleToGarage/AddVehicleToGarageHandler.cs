@@ -2,10 +2,10 @@ using Application.Extensions;
 using Application.Interfaces;
 using Core.Dtos.Member.Vehicles;
 using Core.Entities;
-using Core.Exceptions.Vehicles;
 using Core.Interfaces;
 using Core.Interfaces.DbRepositories;
 using Core.Interfaces.Services;
+using Exceptions.Exceptions.Vehicles;
 using Mapster;
 using MediatR;
 

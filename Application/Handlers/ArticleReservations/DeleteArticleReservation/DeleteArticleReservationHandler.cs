@@ -1,8 +1,8 @@
 using Application.Interfaces;
-using Core.Exceptions.ArticleReservations;
 using Core.Interfaces;
 using Core.Interfaces.DbRepositories;
 using Core.Interfaces.Services;
+using Exceptions.Exceptions.ArticleReservations;
 using MediatR;
 
 namespace Application.Handlers.ArticleReservations.DeleteArticleReservation;

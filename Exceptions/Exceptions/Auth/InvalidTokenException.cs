@@ -1,7 +1,6 @@
 ﻿using Exceptions.Base;
-using Exceptions.Exceptions;
 
-namespace Core.Exceptions.Auth
+namespace Exceptions.Exceptions.Auth
 {
 	public class InvalidTokenException : BadRequestException
 	{

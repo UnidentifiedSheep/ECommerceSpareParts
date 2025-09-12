@@ -1,5 +1,4 @@
 using Core.Entities;
-using Core.Exceptions.Currencies;
 using Core.Interfaces;
 using Core.Interfaces.DbRepositories;
 using Microsoft.EntityFrameworkCore;

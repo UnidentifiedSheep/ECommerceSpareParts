@@ -1,10 +1,9 @@
 using Application.Events;
 using Application.Interfaces;
 using Core.Attributes;
-using Core.Exceptions.Articles;
-using Core.Interfaces;
 using Core.Interfaces.DbRepositories;
 using Core.Interfaces.Services;
+using Exceptions.Exceptions.Articles;
 using MediatR;
 
 namespace Application.Handlers.Articles.SetArticleIndicator;

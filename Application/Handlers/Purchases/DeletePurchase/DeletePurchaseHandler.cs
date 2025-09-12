@@ -1,9 +1,9 @@
 using Application.Interfaces;
 using Core.Attributes;
-using Core.Exceptions.Purchase;
 using Core.Interfaces;
 using Core.Interfaces.DbRepositories;
 using Core.Interfaces.Services;
+using Exceptions.Exceptions.Purchase;
 using MediatR;
 
 namespace Application.Handlers.Purchases.DeletePurchase;

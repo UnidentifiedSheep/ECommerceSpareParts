@@ -2,7 +2,7 @@ using Application.Configs;
 using Application.Handlers.Balance.DeleteTransaction;
 using Core.Entities;
 using Core.Enums;
-using Core.Exceptions.Balances;
+using Exceptions.Exceptions.Balances;
 using FluentValidation;
 using MediatR;
 using Microsoft.EntityFrameworkCore;

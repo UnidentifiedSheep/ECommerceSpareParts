@@ -1,5 +1,4 @@
 ﻿using Application.Interfaces;
-using Core.Exceptions.JwtExceptions;
 using Core.Interfaces;
 using Core.Interfaces.DbRepositories;
 using Microsoft.AspNetCore.Identity;

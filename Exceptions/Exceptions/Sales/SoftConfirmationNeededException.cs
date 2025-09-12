@@ -1,7 +1,6 @@
 using Exceptions.Base;
-using Exceptions.Exceptions;
 
-namespace Core.Exceptions.Sales;
+namespace Exceptions.Exceptions.Sales;
 
 public class SoftConfirmationNeededException : PreconditionRequiredException
 {

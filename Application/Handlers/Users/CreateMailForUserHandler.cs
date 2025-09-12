@@ -1,6 +1,5 @@
 using Application.Interfaces;
 using Core.Entities;
-using Core.Exceptions.Users;
 using Core.Extensions;
 using Core.Interfaces;
 using Core.Interfaces.DbRepositories;

@@ -1,9 +1,9 @@
 using Application.Configs;
 using Application.Handlers.StorageContents.DeleteContent;
 using Core.Entities;
-using Core.Exceptions.Storages;
-using Core.Exceptions.Users;
 using Exceptions.Base;
+using Exceptions.Exceptions.Storages;
+using Exceptions.Exceptions.Users;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;

@@ -3,7 +3,7 @@ using Application.Handlers.Articles.CreateArticles;
 using Application.Handlers.Articles.SetArticleIndicator;
 using Application.Handlers.Producers.CreateProducer;
 using Bogus;
-using Core.Exceptions.Articles;
+using Exceptions.Exceptions.Articles;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;

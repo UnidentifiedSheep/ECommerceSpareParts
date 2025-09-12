@@ -1,9 +1,9 @@
 using Application.Extensions;
 using Application.Interfaces;
 using Core.Attributes;
-using Core.Exceptions.Auth;
-using Core.Exceptions.Users;
 using Core.Interfaces.DbRepositories;
+using Exceptions.Exceptions.Auth;
+using Exceptions.Exceptions.Users;
 using MediatR;
 using Microsoft.AspNetCore.Identity;
 using Persistence.Entities;

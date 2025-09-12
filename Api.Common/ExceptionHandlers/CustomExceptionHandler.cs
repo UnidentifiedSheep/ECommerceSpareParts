@@ -1,6 +1,4 @@
-﻿using Core.Exceptions;
-using Core.Interfaces;
-using Exceptions.Base;
+﻿using Exceptions.Base;
 using Exceptions.Interfaces;
 using FluentValidation;
 using Microsoft.AspNetCore.Diagnostics;

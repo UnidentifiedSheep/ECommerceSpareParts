@@ -1,6 +1,6 @@
 ﻿using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
-using Core.Exceptions.JwtExceptions;
+using Exceptions.Exceptions.JwtExceptions;
 
 namespace Security.Extensions;
 

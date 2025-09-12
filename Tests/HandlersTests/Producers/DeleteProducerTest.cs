@@ -1,6 +1,6 @@
 using Application.Configs;
 using Application.Handlers.Producers.DeleteProducer;
-using Core.Exceptions.Producers;
+using Exceptions.Exceptions.Producers;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;

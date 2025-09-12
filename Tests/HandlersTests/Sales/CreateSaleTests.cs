@@ -1,9 +1,9 @@
 using Application.Handlers.Sales.CreateSale;
 using Core.Dtos.Amw.Sales;
 using Core.Entities;
-using Core.Exceptions.Balances;
-using Core.Exceptions.Storages;
 using Core.Models;
+using Exceptions.Exceptions.Balances;
+using Exceptions.Exceptions.Storages;
 using FluentValidation;
 using Mapster;
 using MediatR;

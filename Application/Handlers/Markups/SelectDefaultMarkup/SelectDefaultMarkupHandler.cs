@@ -1,7 +1,6 @@
 using Application.Interfaces;
 using Core.Attributes;
 using Core.Contracts;
-using Core.Exceptions.Markups;
 using Core.Interfaces;
 using Core.Interfaces.DbRepositories;
 using Core.Interfaces.Services;

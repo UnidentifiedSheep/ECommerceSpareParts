@@ -1,7 +1,6 @@
 ﻿using Exceptions.Base;
-using Exceptions.Exceptions;
 
-namespace Core.Exceptions.Users
+namespace Exceptions.Exceptions.Users
 {
 	public class UserNotFoundException : NotFoundException
 	{

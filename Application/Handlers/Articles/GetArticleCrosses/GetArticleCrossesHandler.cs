@@ -1,7 +1,7 @@
 using Application.Interfaces;
-using Core.Exceptions.Articles;
 using Core.Interfaces.DbRepositories;
 using Core.Models;
+using Exceptions.Exceptions.Articles;
 using Mapster;
 
 

@@ -1,9 +1,9 @@
 using Application.Handlers.Users.GetUserDiscount;
 using Application.Interfaces;
-using Core.Exceptions.Currencies;
 using Core.Interfaces;
 using Core.Interfaces.Services;
 using Core.Models;
+using Exceptions.Exceptions.Currencies;
 using MediatR;
 
 namespace Application.Handlers.Prices.GetDetailedPrices;

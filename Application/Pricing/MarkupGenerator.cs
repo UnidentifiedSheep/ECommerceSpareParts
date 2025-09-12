@@ -1,9 +1,9 @@
 using Core.Entities;
-using Core.Exceptions.Markups;
 using Core.Interfaces;
 using Core.Interfaces.DbRepositories;
 using Core.Interfaces.Services;
 using Core.Models;
+using Exceptions.Exceptions.Markups;
 using MediatR;
 using MarkupRangesUpdatedEvent = Application.Events.MarkupRangesUpdatedEvent;
 

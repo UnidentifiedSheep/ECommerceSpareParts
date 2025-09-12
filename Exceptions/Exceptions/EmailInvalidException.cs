@@ -1,4 +1,3 @@
-using Core.Exceptions;
 using Exceptions.Base;
 
 namespace Exceptions.Exceptions;

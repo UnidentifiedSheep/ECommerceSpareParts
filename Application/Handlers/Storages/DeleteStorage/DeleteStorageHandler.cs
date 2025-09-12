@@ -1,8 +1,8 @@
 using Application.Interfaces;
-using Core.Exceptions.Storages;
 using Core.Interfaces;
 using Core.Interfaces.DbRepositories;
 using Core.Interfaces.Services;
+using Exceptions.Exceptions.Storages;
 using MediatR;
 
 namespace Application.Handlers.Storages.DeleteStorage;

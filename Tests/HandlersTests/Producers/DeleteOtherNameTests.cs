@@ -3,7 +3,7 @@ using Application.Handlers.Producers.CreateProducer;
 using Application.Handlers.Producers.DeleteOtherName;
 using Bogus;
 using Core.Entities;
-using Core.Exceptions.Producers;
+using Exceptions.Exceptions.Producers;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
