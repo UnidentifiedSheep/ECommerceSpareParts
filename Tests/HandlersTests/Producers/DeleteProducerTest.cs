@@ -1,10 +1,10 @@
+using Application.Configs;
+using Application.Handlers.Producers.DeleteProducer;
+using Core.Exceptions.Producers;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
-using MonoliteUnicorn.Configs;
-using MonoliteUnicorn.EndPoints.Producers.DeleteProducer;
-using MonoliteUnicorn.Exceptions.Producers;
-using MonoliteUnicorn.PostGres.Main;
+using Persistence.Contexts;
 using Tests.MockData;
 using Tests.testContainers.Combined;
 
@@ -26,7 +26,7 @@ public class DeleteProducerTest : IAsyncLifetime
         
     public async Task InitializeAsync()
     {
-        await _context.AddMockProducersAndArticles();
+        await _mediator.AddMockProducersAndArticles();
     }
 
     public async Task DisposeAsync()

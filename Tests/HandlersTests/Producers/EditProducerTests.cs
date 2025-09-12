@@ -1,12 +1,12 @@
+using Application.Handlers.Producers.CreateProducer;
+using Application.Handlers.Producers.EditProducer;
 using Bogus;
-using Core.Json;
+using Core.Dtos.Amw.Producers;
+using Core.Models;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
-using MonoliteUnicorn.Configs;
-using MonoliteUnicorn.Dtos.Amw.Producers;
-using MonoliteUnicorn.EndPoints.Producers.EditProducer;
-using MonoliteUnicorn.PostGres.Main;
+using Persistence.Contexts;
 using Tests.MockData;
 using Tests.testContainers.Combined;
 using static Tests.MockData.MockData;
@@ -16,13 +16,12 @@ namespace Tests.HandlersTests.Producers;
 [Collection("Combined collection")]
 public class EditProducerTests : IAsyncLifetime
 {
-    private readonly Faker _faker = new(Locale);
+    private readonly Faker _faker = new(Global.Locale);
     private readonly DContext _context;
     private readonly IMediator _mediator;
     
     public EditProducerTests(CombinedContainerFixture fixture)
     {
-        MapsterConfig.Configure();
         var sp = ServiceProviderForTests.Build(fixture.PostgresConnectionString, fixture.RedisConnectionString);
         _mediator = sp.GetService<IMediator>()!;
         _context = sp.GetRequiredService<DContext>();
@@ -30,7 +29,7 @@ public class EditProducerTests : IAsyncLifetime
         
     public async Task InitializeAsync()
     {
-        await _context.AddMockProducersAndArticles();
+        await _mediator.AddMockProducersAndArticles();
     }
 
     public async Task DisposeAsync()

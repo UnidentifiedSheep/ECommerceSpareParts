@@ -1,20 +1,23 @@
+using Application.Configs;
+using Application.Handlers.Producers.CreateProducer;
+using Application.Handlers.Producers.DeleteOtherName;
 using Bogus;
+using Core.Entities;
+using Core.Exceptions.Producers;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
-using MonoliteUnicorn.Configs;
-using MonoliteUnicorn.EndPoints.Producers.DeleteOtherName;
-using MonoliteUnicorn.Exceptions.Producers;
-using MonoliteUnicorn.PostGres.Main;
+using Persistence.Contexts;
 using Tests.MockData;
 using Tests.testContainers.Combined;
+using static Tests.MockData.MockData;
 
 namespace Tests.HandlersTests.Producers;
 
 [Collection("Combined collection")]
 public class DeleteOtherNameTests : IAsyncLifetime
 {
-    private readonly Faker _faker = new(MockData.MockData.Locale);
+    private readonly Faker _faker = new(Global.Locale);
     private readonly DContext _context;
     private readonly IMediator _mediator;
     private ProducersOtherName _otherName = null!;
@@ -29,14 +32,15 @@ public class DeleteOtherNameTests : IAsyncLifetime
         
     public async Task InitializeAsync()
     {
-        await _context.AddMockProducersAndArticles();
-        
+        await _mediator.AddMockProducersAndArticles();
+
+        var producer = await _context.Producers.AsNoTracking().FirstAsync();
         var otherName = _faker.Lorem.Letter(40);
         var usage = _faker.Lorem.Letter(10);
         await _context.Database
             .ExecuteSqlAsync($"""
                               insert into producers_other_names (producer_id, producer_other_name, where_used) 
-                              values ({1}, {otherName}, {usage});
+                              values ({producer.Id}, {otherName}, {usage});
                               """);
         _otherName = await _context.ProducersOtherNames
             .FirstAsync(x => x.ProducerId == 1 && 
@@ -53,7 +57,7 @@ public class DeleteOtherNameTests : IAsyncLifetime
     public async Task DeleteOtherName_InvalidProducerId_ThrowsProducerNotFound()
     {
         var command = new DeleteOtherNameCommand(int.MaxValue, _otherName.ProducerOtherName, _otherName.WhereUsed);
-        await Assert.ThrowsAsync<ProducerNotFoundException>(async () => await _mediator.Send(command));
+        await Assert.ThrowsAsync<ProducersOtherNameNotFoundException>(async () => await _mediator.Send(command));
     }
     
     [Fact]

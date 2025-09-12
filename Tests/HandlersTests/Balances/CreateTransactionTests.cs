@@ -1,10 +1,12 @@
+using Application.Configs;
+using Application.Handlers.Balance.CreateTransaction;
+using Core.Entities;
+using Core.Enums;
 using FluentValidation;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
-using MonoliteUnicorn.Configs;
-using MonoliteUnicorn.EndPoints.Balances.CreateTransaction;
-using MonoliteUnicorn.PostGres.Main;
+using Persistence.Contexts;
 using Tests.MockData;
 using Tests.testContainers.Combined;
 
@@ -30,12 +32,15 @@ public class CreateTransactionTests : IAsyncLifetime
         
     public async Task InitializeAsync()
     {
-        await _context.AddMockProducersAndArticles();
-        _systemUser = await _context.CreateSystemUser();
-        _mockUser = await _context.AddMockUser();
-        _adminUser = await _context.AddMockUser();
-        var currencies = await _context.AddMockCurrency(1);
-        _currency = currencies.Single();
+        await _mediator.AddMockProducersAndArticles();
+        await _context.AddMockCurrencies();
+        await _context.CreateSystemUser();
+        _systemUser = await _context.AspNetUsers.AsNoTracking().FirstAsync(x => x.Id == "SYSTEM");
+        await _mediator.AddMockUser();
+        await _mediator.AddMockUser();
+        _mockUser = await _context.AspNetUsers.AsNoTracking().FirstAsync(x => x.Id != "SYSTEM");
+        _adminUser = await _context.AspNetUsers.AsNoTracking().FirstAsync(x => x.Id != "SYSTEM" && x.Id != _mockUser.Id);
+        _currency = await _context.Currencies.AsNoTracking().FirstAsync();
     }
 
     public async Task DisposeAsync()
@@ -52,18 +57,18 @@ public class CreateTransactionTests : IAsyncLifetime
             Amount: 100,
             CurrencyId: _currency.Id,
             WhoCreatedTransaction: _adminUser.Id,
-            TransactionDateTime: DateTime.Now
+            TransactionDateTime: DateTime.Now,
+            TransactionStatus.Normal
         );
         
-        var result = await _mediator.Send(command);
+        var createdTransaction = (await _mediator.Send(command)).Transaction;
         
-        Assert.Equal(Unit.Value, result);
         var transaction = await _context.Transactions
             .FirstOrDefaultAsync(x => x.SenderId == _systemUser.Id && 
                                       x.ReceiverId == _mockUser.Id && 
                                       x.TransactionDatetime == command.TransactionDateTime);
         Assert.NotNull(transaction);
-        Assert.Equal(100, transaction.TransactionSum);
+        Assert.Equal(createdTransaction.TransactionSum, transaction.TransactionSum);
     }
 
     [Fact]
@@ -75,7 +80,8 @@ public class CreateTransactionTests : IAsyncLifetime
             Amount: 125,
             CurrencyId: _currency.Id,
             WhoCreatedTransaction: _adminUser.Id,
-            TransactionDateTime: DateTime.Now
+            TransactionDateTime: DateTime.Now,
+            TransactionStatus.Normal
         );
 
         await Assert.ThrowsAsync<ValidationException>(async () => await _mediator.Send(command));
@@ -90,7 +96,8 @@ public class CreateTransactionTests : IAsyncLifetime
             Amount: -100,
             CurrencyId: _currency.Id,
             WhoCreatedTransaction: _adminUser.Id,
-            TransactionDateTime: DateTime.Now
+            TransactionDateTime: DateTime.Now,
+            TransactionStatus.Normal
         );
 
         await Assert.ThrowsAsync<ValidationException>(async () => await _mediator.Send(command));
@@ -105,7 +112,8 @@ public class CreateTransactionTests : IAsyncLifetime
             Amount: 100,
             CurrencyId: _currency.Id,
             WhoCreatedTransaction: _adminUser.Id,
-            TransactionDateTime: DateTime.Now.AddMonths(-4)
+            TransactionDateTime: DateTime.Now.AddMonths(-4),
+            TransactionStatus.Normal
         );
         
         await Assert.ThrowsAsync<ValidationException>(async () => await _mediator.Send(command));
@@ -120,7 +128,8 @@ public class CreateTransactionTests : IAsyncLifetime
             Amount: 100,
             CurrencyId: _currency.Id,
             WhoCreatedTransaction: _adminUser.Id,
-            TransactionDateTime: DateTime.Now.AddMonths(1)
+            TransactionDateTime: DateTime.Now.AddMonths(1),
+            TransactionStatus.Normal
         );
         
         await Assert.ThrowsAsync<ValidationException>(async () => await _mediator.Send(command));
@@ -135,7 +144,30 @@ public class CreateTransactionTests : IAsyncLifetime
             Amount: 100,
             CurrencyId: _currency.Id,
             WhoCreatedTransaction: _adminUser.Id,
-            TransactionDateTime: DateTime.Now
+            TransactionDateTime: DateTime.Now,
+            TransactionStatus.Normal
+        );
+
+        await Assert.ThrowsAsync<ValidationException>(async () => await _mediator.Send(command));
+    }
+
+    [Theory]
+    [InlineData(0)]
+    [InlineData(-1)]
+    [InlineData(-10000000)]
+    [InlineData(0.001)]
+    [InlineData(0.0001)]
+    [InlineData(0.009)]
+    public async Task CreateTransaction_InvalidAmount_ThrowsValidationException(decimal amount)
+    {
+        var command = new CreateTransactionCommand(
+            SenderId: _systemUser.Id,
+            ReceiverId: _mockUser.Id,
+            Amount: amount,
+            CurrencyId: _currency.Id,
+            WhoCreatedTransaction: _adminUser.Id,
+            TransactionDateTime: DateTime.Now,
+            TransactionStatus.Normal
         );
 
         await Assert.ThrowsAsync<ValidationException>(async () => await _mediator.Send(command));

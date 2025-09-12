@@ -1,5 +1,3 @@
-using System.Diagnostics;
-
 namespace Core.StaticFunctions;
 
 public static class ConcurrencyStatic

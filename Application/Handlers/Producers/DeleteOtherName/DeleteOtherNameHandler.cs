@@ -1,0 +1,26 @@
+using Application.Interfaces;
+using Core.Attributes;
+using Core.Exceptions.Producers;
+using Core.Interfaces;
+using Core.Interfaces.DbRepositories;
+using Core.Interfaces.Services;
+using MediatR;
+
+namespace Application.Handlers.Producers.DeleteOtherName;
+
+[Transactional]
+public record DeleteOtherNameCommand(int ProducerId, string OtherName, string? Usage) : ICommand;
+
+public class DeleteOtherNameHandler(IProducerRepository producerRepository, IUnitOfWork unitOfWork) : ICommandHandler<DeleteOtherNameCommand>
+{
+    public async Task<Unit> Handle(DeleteOtherNameCommand request, CancellationToken cancellationToken)
+    {
+        var producerOtherName = await producerRepository.GetOtherName(request.ProducerId, request.OtherName, 
+                                    request.Usage, true, cancellationToken) 
+                                ?? throw new ProducersOtherNameNotFoundException(request.OtherName);
+
+        unitOfWork.Remove(producerOtherName);
+        await unitOfWork.SaveChangesAsync(cancellationToken);
+        return Unit.Value;
+    }
+}

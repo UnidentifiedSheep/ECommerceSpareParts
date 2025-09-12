@@ -1,5 +1,5 @@
 using Microsoft.EntityFrameworkCore;
-using MonoliteUnicorn.PostGres.Main;
+using Persistence.Contexts;
 using Testcontainers.PostgreSql;
 
 namespace Tests.testContainers.Pg;

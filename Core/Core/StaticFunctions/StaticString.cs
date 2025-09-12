@@ -11,9 +11,9 @@ public static class StaticString
         return valueSet.Count != 0 && collection.Any(item => valueSet.Contains(item));
     }
 
-    public static (string? name, string? direction) GetSortNameNDirection(this string? sort)
+    public static (string? name, string? direction) GetSortNameNDirection(this string? value, char delimiter = '_')
     {
-        var sortSplit = sort?.Split(QueryableSortBy.GetDelimiter());
+        var sortSplit = value?.Split(delimiter);
         var sortName = sortSplit?.Length > 0 ? sortSplit[0] : null;
         var sortDirection = sortSplit?.Length > 1 ? sortSplit[1] : null;
         return (sortName, sortDirection);

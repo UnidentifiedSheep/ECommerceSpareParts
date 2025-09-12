@@ -1,11 +1,12 @@
+using Application.Configs;
+using Application.Handlers.Producers.AddOtherName;
+using Application.Handlers.Producers.CreateProducer;
 using Bogus;
+using Core.Exceptions.Producers;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
-using MonoliteUnicorn.Configs;
-using MonoliteUnicorn.EndPoints.Producers.AddOtherNamesToProducer;
-using MonoliteUnicorn.Exceptions.Producers;
-using MonoliteUnicorn.PostGres.Main;
+using Persistence.Contexts;
 using Tests.MockData;
 using Tests.testContainers.Combined;
 using static Tests.MockData.MockData;
@@ -29,7 +30,9 @@ public class AddOtherNameToProducerTests : IAsyncLifetime
         
     public async Task InitializeAsync()
     {
-        await _context.AddMockProducersAndArticles();
+        var newProducerModel = CreateNewProducerDto(1)[0];
+        var command = new CreateProducerCommand(newProducerModel);
+        await _mediator.Send(command);
     }
 
     public async Task DisposeAsync()
@@ -42,7 +45,7 @@ public class AddOtherNameToProducerTests : IAsyncLifetime
     {
         var producer = await _context.Producers.AsNoTracking().FirstOrDefaultAsync();
         Assert.NotNull(producer);
-        var command = new AddOtherNameToProducerCommand(producer.Id, " ", null);
+        var command = new AddOtherNameCommand(producer.Id, " ", null);
         await Assert.ThrowsAsync<FluentValidation.ValidationException>(async () => await _mediator.Send(command));
     }
     
@@ -51,7 +54,7 @@ public class AddOtherNameToProducerTests : IAsyncLifetime
     {
         var producer = await _context.Producers.AsNoTracking().FirstOrDefaultAsync();
         Assert.NotNull(producer);
-        var command = new AddOtherNameToProducerCommand(producer.Id, _faker.Lorem.Letter(200), null);
+        var command = new AddOtherNameCommand(producer.Id, _faker.Lorem.Letter(200), null);
         await Assert.ThrowsAsync<FluentValidation.ValidationException>(async () => await _mediator.Send(command));
     }
     
@@ -60,14 +63,14 @@ public class AddOtherNameToProducerTests : IAsyncLifetime
     {
         var producer = await _context.Producers.AsNoTracking().FirstOrDefaultAsync();
         Assert.NotNull(producer);
-        var command = new AddOtherNameToProducerCommand(producer.Id, _faker.Lorem.Letter(40), _faker.Lorem.Letter(200));
+        var command = new AddOtherNameCommand(producer.Id, _faker.Lorem.Letter(40), _faker.Lorem.Letter(200));
         await Assert.ThrowsAsync<FluentValidation.ValidationException>(async () => await _mediator.Send(command));
     }
     
     [Fact]
     public async Task AddOtherProducerName_InvalidProducerId_ThrowsProducerNotFound()
     {
-        var command = new AddOtherNameToProducerCommand(int.MaxValue, _faker.Lorem.Letter(40), _faker.Lorem.Letter(10));
+        var command = new AddOtherNameCommand(int.MaxValue, _faker.Lorem.Letter(40), _faker.Lorem.Letter(10));
         await Assert.ThrowsAsync<ProducerNotFoundException>(async () => await _mediator.Send(command));
     }
     
@@ -79,7 +82,7 @@ public class AddOtherNameToProducerTests : IAsyncLifetime
 
         var otherName = _faker.Lorem.Letter(40);
         var usage = _faker.Lorem.Letter(10);
-        var command = new AddOtherNameToProducerCommand(producer.Id, otherName, usage);
+        var command = new AddOtherNameCommand(producer.Id, otherName, usage);
         await _mediator.Send(command);
         
         var producerOtherName = await _context.ProducersOtherNames
@@ -97,9 +100,9 @@ public class AddOtherNameToProducerTests : IAsyncLifetime
         Assert.NotNull(producer);
         var otherName = _faker.Lorem.Letter(40);
         var usage = _faker.Lorem.Letter(10);
-        await _mediator.Send(new AddOtherNameToProducerCommand(producer.Id, otherName, usage));
+        await _mediator.Send(new AddOtherNameCommand(producer.Id, otherName, usage));
         
-        var command = new AddOtherNameToProducerCommand(producer.Id, otherName, usage);
+        var command = new AddOtherNameCommand(producer.Id, otherName, usage);
         await Assert.ThrowsAsync<SameProducerOtherNameExistsException>(async () => await _mediator.Send(command));
     }
 }

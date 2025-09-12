@@ -1,13 +1,13 @@
+using Application.Configs;
+using Application.Handlers.Balance.DeleteTransaction;
+using Core.Entities;
+using Core.Enums;
+using Core.Exceptions.Balances;
 using FluentValidation;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
-using MonoliteUnicorn.Configs;
-using MonoliteUnicorn.EndPoints.Balances.DeleteTransaction;
-using MonoliteUnicorn.Enums;
-using MonoliteUnicorn.Exceptions.Balances;
-using MonoliteUnicorn.PostGres.Main;
-using MonoliteUnicorn.Services.Balances;
+using Persistence.Contexts;
 using Tests.MockData;
 using Tests.testContainers.Combined;
 
@@ -18,7 +18,6 @@ public class DeleteTransactionTest : IAsyncLifetime
 {
     private readonly DContext _context;
     private readonly IMediator _mediator;
-    private readonly IBalance _balance;
     private Transaction _transaction = null!;
     private Currency _currency = null!;
     private AspNetUser _systemUser = null!;
@@ -30,28 +29,29 @@ public class DeleteTransactionTest : IAsyncLifetime
         var sp = ServiceProviderForTests.Build(fixture.PostgresConnectionString, fixture.RedisConnectionString);
         _mediator = sp.GetService<IMediator>()!;
         _context = sp.GetRequiredService<DContext>();
-        _balance = sp.GetRequiredService<IBalance>();
     }
         
     public async Task InitializeAsync()
     {
-        var currencies = await _context.AddMockCurrency(1);
-        _currency = currencies.Single();
-        _systemUser = await _context.CreateSystemUser();
-        _mockUser = await _context.AddMockUser();
+        await _context.CreateSystemUser();
+        await _context.AddMockCurrencies();
+        _currency = await _context.Currencies.AsNoTracking().FirstAsync();
+        _systemUser = await _context.AspNetUsers.AsNoTracking().FirstAsync(x => x.Id == "SYSTEM");
+        var mockUserId = await _mediator.AddMockUser();
+        _mockUser = await _context.AspNetUsers.AsNoTracking().FirstAsync(x => x.Id == mockUserId);
         
         //Before test transaction
-        await _balance.CreateTransactionAsync(_mockUser.Id, _systemUser.Id, 100, 
-            TransactionStatus.Normal, _currency.Id, _systemUser.Id, DateTime.Now.AddMinutes(-1));
+        await _mediator.AddMockTransaction(_mockUser.Id, _systemUser.Id, _systemUser.Id, 
+            100, DateTime.Now.AddMinutes(-1));
         
-        _transaction = await _balance.CreateTransactionAsync(_mockUser.Id, _systemUser.Id, 1200, 
-            TransactionStatus.Normal, _currency.Id, _systemUser.Id, DateTime.Now);
+        _transaction = await _mediator.AddMockTransaction(_mockUser.Id, _systemUser.Id, _systemUser.Id, 
+            1200);
         
         //After test transaction
-        await _balance.CreateTransactionAsync(_mockUser.Id, _systemUser.Id, 100, 
-            TransactionStatus.Normal, _currency.Id, _systemUser.Id, DateTime.Now.AddMinutes(1));
-        
-        await _context.AddMockProducersAndArticles();
+        await _mediator.AddMockTransaction(_mockUser.Id, _systemUser.Id, _systemUser.Id, 
+            100, DateTime.Now.AddMinutes(1));
+
+        await _mediator.AddMockProducersAndArticles();
     }
 
     public async Task DisposeAsync()

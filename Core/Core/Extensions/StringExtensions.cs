@@ -10,8 +10,6 @@ public static partial class StringExtensions
     private static partial Regex PhoneNumberRegex();
     [GeneratedRegex(@"\D")]
     private static partial Regex OnlyDigitsRegex();
-    [GeneratedRegex(@"^[^@\s]+@[^@\s]+\.[^@\s]+$", RegexOptions.IgnoreCase)]
-    private static partial Regex EmailRegex();
     /// <summary>
     /// Возвращает нормализованый артикул те состоящий только из букв и цифр.
     /// </summary>
@@ -19,17 +17,14 @@ public static partial class StringExtensions
     /// <returns></returns>
     public static string ToNormalizedArticleNumber(this string source) => OnlyCharacter().Replace(source, "").ToUpper();
     public static string OnlyDigitsCharsWithSpaces(this string source) => OnlyCharacter().Replace(source, " ");
-    public static bool IsValidMail(this string source)
+
+    public static string? ToNormalized(this string? source) => source?.Trim().ToUpperInvariant();
+
+    public static bool IsValidPhoneNumber(this string phoneNumber)
     {
-        if (string.IsNullOrWhiteSpace(source)) return false;
-        if (source.Length > 254) return false;
-        var parts = source.Split('@');
-        if (parts.Length != 2) return false;
-        if (parts[0].Length is 0 or > 64) return false;
-        if (parts[1].Length == 0) return false;
-        return EmailRegex().IsMatch(source);
+        var onlyDigits = OnlyDigitsRegex().Replace(phoneNumber, "");
+        return PhoneNumberRegex().IsMatch(onlyDigits);
     }
-    public static bool IsValidPhoneNumber(this string phoneNumber) => PhoneNumberRegex().IsMatch(phoneNumber);
     public static string ToNormalizedPhoneNumber(this string source) => OnlyDigitsRegex().Replace(source, "");
     //Must contain 11 digits.
     public static string ToBeautifulNumber(this string source)

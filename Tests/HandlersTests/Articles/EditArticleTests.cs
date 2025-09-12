@@ -1,13 +1,16 @@
-using Core.Json;
+using Application.Configs;
+using Application.Handlers.Articles.CreateArticles;
+using Application.Handlers.Articles.PatchArticle;
+using Application.Handlers.Producers.CreateProducer;
+using Core.Dtos.Amw.Articles;
+using Core.Exceptions.Articles;
+using Core.Models;
 using MediatR;
 using Microsoft.Extensions.DependencyInjection;
-using MonoliteUnicorn.Configs;
-using MonoliteUnicorn.Dtos.Amw.Articles;
-using MonoliteUnicorn.EndPoints.Articles.EditArticle;
-using MonoliteUnicorn.Exceptions.Articles;
-using MonoliteUnicorn.PostGres.Main;
+using Persistence.Contexts;
 using Tests.MockData;
 using Tests.testContainers.Combined;
+using static Tests.MockData.MockData;
 
 namespace Tests.HandlersTests.Articles;
 
@@ -27,7 +30,7 @@ public class EditArticleTests : IAsyncLifetime
         
     public async Task InitializeAsync()
     {
-        await _context.AddMockProducersAndArticles();
+        await _mediator.AddMockProducersAndArticles();
     }
 
     public async Task DisposeAsync()
@@ -38,7 +41,7 @@ public class EditArticleTests : IAsyncLifetime
     [Fact]
     public async Task EditArticle_NumberAndName_Succeeds()
     {
-        var command = new EditArticleCommand(1,
+        var command = new PatchArticleCommand(1,
             new PatchArticleDto
             {
                 ArticleNumber = new PatchField<string> { IsSet = true, Value = "67890" },
@@ -57,7 +60,7 @@ public class EditArticleTests : IAsyncLifetime
     [Fact]
     public async Task EditArticle_WithInvalidArticleId_FailsValidation()
     {
-        var command = new EditArticleCommand(
+        var command = new PatchArticleCommand(
             999,
             new PatchArticleDto
             {
@@ -71,7 +74,7 @@ public class EditArticleTests : IAsyncLifetime
     [Fact]
     public async Task EditArticle_WithEmptyArticleNumber_FailsValidation()
     {
-        var command = new EditArticleCommand(
+        var command = new PatchArticleCommand(
             1,
             new PatchArticleDto
             {
@@ -84,7 +87,7 @@ public class EditArticleTests : IAsyncLifetime
     [Fact]
     public async Task EditArticle_WhenNothingEdited_Succeeds()
     {
-        var command = new EditArticleCommand(
+        var command = new PatchArticleCommand(
             1,
             new PatchArticleDto
             {
@@ -99,7 +102,7 @@ public class EditArticleTests : IAsyncLifetime
     [Fact]
     public async Task EditArticle_WhenArticleNumberNull_FailsValidation()
     {
-        var command = new EditArticleCommand(
+        var command = new PatchArticleCommand(
             1,
             new PatchArticleDto
             {

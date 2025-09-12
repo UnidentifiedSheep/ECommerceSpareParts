@@ -29,8 +29,4 @@
       <ProjectReference Include="..\MonoliteUnicorn\MonoliteUnicorn.csproj" />
     </ItemGroup>
 
-    <ItemGroup>
-      <Folder Include="HandlersTests\" />
-    </ItemGroup>
-
 </Project>

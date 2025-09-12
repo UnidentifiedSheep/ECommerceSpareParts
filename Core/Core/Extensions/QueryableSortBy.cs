@@ -1,11 +1,11 @@
 ﻿using System.Linq.Expressions;
-using Core.Exceptions;
+using Exceptions.Exceptions;
 
 namespace Core.Extensions;
 
 public static class QueryableSortBy
 {
-    private static readonly Dictionary<Type, Dictionary<string, object>> _mapDictionary = new();
+    private static readonly Dictionary<Type, Dictionary<string, object>> MapDictionary = new();
     private static char Delimiter { get; set; } = '_';
     public static void SetDelimiter(char delimiter) => Delimiter = delimiter;
     public static char GetDelimiter() => Delimiter;
@@ -14,8 +14,8 @@ public static class QueryableSortBy
     {
         var type = typeof(TSource);
         source = source.ToLowerInvariant();
-        _mapDictionary.TryAdd(type, new Dictionary<string, object>());
-        var primary = _mapDictionary[type];
+        MapDictionary.TryAdd(type, new Dictionary<string, object>());
+        var primary = MapDictionary[type];
         var objectKeySelector = Expression.Lambda<Func<TSource, object>>(
             Expression.Convert(keySelector.Body, typeof(object)), keySelector.Parameters);
         var added = primary.TryAdd(source, objectKeySelector);
@@ -26,8 +26,8 @@ public static class QueryableSortBy
     public static TSource MapDefault<TSource, TKey>(this TSource src, Expression<Func<TSource, TKey>> keySelector)
     {
         var type = typeof(TSource);
-        _mapDictionary.TryAdd(type, new Dictionary<string, object>());
-        var primary = _mapDictionary[type];
+        MapDictionary.TryAdd(type, new Dictionary<string, object>());
+        var primary = MapDictionary[type];
         var objectKeySelector = Expression.Lambda<Func<TSource, object>>(
             Expression.Convert(keySelector.Body, typeof(object)), keySelector.Parameters);
         var added = primary.TryAdd("DEFAULT", objectKeySelector);
@@ -39,7 +39,7 @@ public static class QueryableSortBy
     {
         source = source.ToLowerInvariant();
         var type = typeof(TEntity);
-        var primaryExists = _mapDictionary.TryGetValue(type, out var primary);
+        var primaryExists = MapDictionary.TryGetValue(type, out var primary);
         if (!primaryExists) throw new MappingDoesntExists(type);
         var valueExists = primary!.TryGetValue(source, out var value);
         if (!valueExists) primary.TryGetValue("DEFAULT", out value);
@@ -51,7 +51,7 @@ public static class QueryableSortBy
     {
         source = source.ToLowerInvariant();
         var type = typeof(TEntity);
-        var primaryExists = _mapDictionary.TryGetValue(type, out var primary);
+        var primaryExists = MapDictionary.TryGetValue(type, out var primary);
         if (!primaryExists) throw new MappingDoesntExists(type);
         primary!.TryGetValue(source, out var value);
         return (Expression<Func<TEntity,object>>?)value;

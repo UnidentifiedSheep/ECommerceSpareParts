@@ -1,10 +1,10 @@
+using Application.Configs;
+using Application.Handlers.Producers.CreateProducer;
 using Bogus;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
-using MonoliteUnicorn.Configs;
-using MonoliteUnicorn.EndPoints.Producers.CreateProducer;
-using MonoliteUnicorn.PostGres.Main;
+using Persistence.Contexts;
 using Tests.MockData;
 using Tests.testContainers.Combined;
 
@@ -16,18 +16,16 @@ public class CreateProducerTests : IAsyncLifetime
     private readonly Faker _faker = new(MockData.MockData.Locale);
     private readonly DContext _context;
     private readonly IMediator _mediator;
-    
     public CreateProducerTests(CombinedContainerFixture fixture)
     {
-        MapsterConfig.Configure();
         var sp = ServiceProviderForTests.Build(fixture.PostgresConnectionString, fixture.RedisConnectionString);
         _mediator = sp.GetService<IMediator>()!;
         _context = sp.GetRequiredService<DContext>();
     }
         
-    public async Task InitializeAsync()
+    public Task InitializeAsync()
     {
-        await _context.AddMockProducersAndArticles();
+        return Task.CompletedTask;
     }
 
     public async Task DisposeAsync()
@@ -63,7 +61,7 @@ public class CreateProducerTests : IAsyncLifetime
     }
     
     [Fact]
-    public async Task CreateProducer_TooLargeDescription_Succeeds()
+    public async Task CreateProducer_WithValidData_Succeeds()
     {
         var newProducerModel = MockData.MockData.CreateNewProducerDto(1)[0];
         var command = new CreateProducerCommand(newProducerModel);

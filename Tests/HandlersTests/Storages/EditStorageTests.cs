@@ -1,13 +1,14 @@
+using Application.Configs;
+using Application.Handlers.Storages.EditStorage;
 using Bogus;
-using Core.Json;
+using Core.Dtos.Amw.Storage;
+using Core.Entities;
+using Core.Exceptions.Storages;
+using Core.Models;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
-using MonoliteUnicorn.Configs;
-using MonoliteUnicorn.Dtos.Amw.Storage;
-using MonoliteUnicorn.EndPoints.Storages.EditStorage;
-using MonoliteUnicorn.Exceptions.Storages;
-using MonoliteUnicorn.PostGres.Main;
+using Persistence.Contexts;
 using Tests.MockData;
 using Tests.testContainers.Combined;
 using static Tests.MockData.MockData;
@@ -32,8 +33,9 @@ public class EditStorageTests : IAsyncLifetime
         
     public async Task InitializeAsync()
     {
-        await _context.AddMockProducersAndArticles();
-        _storage = await _context.AddMockStorage();
+        await _mediator.AddMockProducersAndArticles();
+        await _mediator.AddMockStorage();
+        _storage = await _context.Storages.FirstAsync();
     }
 
     public async Task DisposeAsync()

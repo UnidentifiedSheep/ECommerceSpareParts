@@ -1,4 +1,4 @@
-using MonoliteUnicorn.PostGres.Main;
+/*using Core.Entities;
 
 namespace Tests.MockData;
 
@@ -12,4 +12,4 @@ public static class MockExtensions
         );
         await context.SaveChangesAsync();
     }
-}
+}*/

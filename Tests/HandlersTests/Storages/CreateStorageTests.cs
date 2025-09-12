@@ -1,10 +1,10 @@
+using Application.Configs;
+using Application.Handlers.Storages.CreateStorage;
 using Bogus;
+using Core.Exceptions.Storages;
 using MediatR;
 using Microsoft.Extensions.DependencyInjection;
-using MonoliteUnicorn.Configs;
-using MonoliteUnicorn.EndPoints.Storages.CreateStorage;
-using MonoliteUnicorn.Exceptions.Storages;
-using MonoliteUnicorn.PostGres.Main;
+using Persistence.Contexts;
 using Tests.MockData;
 using Tests.testContainers.Combined;
 using static Tests.MockData.MockData;
@@ -28,7 +28,7 @@ public class CreateStorageTests : IAsyncLifetime
         
     public async Task InitializeAsync()
     {
-        await _context.AddMockProducersAndArticles();
+        await _mediator.AddMockProducersAndArticles();
     }
 
     public async Task DisposeAsync()

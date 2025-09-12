@@ -1,14 +1,17 @@
+using Application.Configs;
+using Application.Handlers.Articles.CreateArticles;
+using Application.Handlers.Articles.MakeLinkageBetweenArticles;
+using Application.Handlers.Producers.CreateProducer;
+using Core.Dtos.Amw.Articles;
+using Core.Enums;
 using FluentValidation;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
-using MonoliteUnicorn.Configs;
-using MonoliteUnicorn.Dtos.Amw.Articles;
-using MonoliteUnicorn.EndPoints.Articles.MakeLinkageBetweenArticles;
-using MonoliteUnicorn.Enums;
-using MonoliteUnicorn.PostGres.Main;
+using Persistence.Contexts;
 using Tests.MockData;
 using Tests.testContainers.Combined;
+using static Tests.MockData.MockData;
 
 namespace Tests.HandlersTests.Articles;
 
@@ -28,7 +31,16 @@ public class MakeLinkageBetweenArticlesTests : IAsyncLifetime
         
     public async Task InitializeAsync()
     {
-        await _context.AddMockProducersAndArticles();
+        var newProducerModel = CreateNewProducerDto(1)[0];
+        var producerCommand = new CreateProducerCommand(newProducerModel);
+        var producerId = (await _mediator.Send(producerCommand)).ProducerId;
+        
+        var articleList = CreateNewArticleDto(10);
+        foreach (var article in articleList)
+            article.ProducerId = producerId;
+        
+        var articleCommand = new CreateArticlesCommand(articleList);
+        await _mediator.Send(articleCommand);
     }
 
     public async Task DisposeAsync()

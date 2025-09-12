@@ -1,11 +1,11 @@
 using System.Drawing;
-using System.Numerics;
 using Bogus;
-using MonoliteUnicorn.Dtos.Amw.Articles;
-using MonoliteUnicorn.Dtos.Amw.Producers;
-using MonoliteUnicorn.Dtos.Amw.Storage;
-using MonoliteUnicorn.Enums;
-using MonoliteUnicorn.PostGres.Main;
+using Core.Dtos.Amw.Producers;
+using Core.Dtos.Amw.Storage;
+using Core.Dtos.Amw.Users;
+using Core.Dtos.Services.Articles;
+using Core.Entities;
+using Core.Enums;
 
 namespace Tests.MockData;
 
@@ -15,9 +15,9 @@ public static class MockData
     
     public static readonly List<string> Colors = Enum.GetNames(typeof(KnownColor)).ToList();
 
-    public static List<NewArticleDto> CreateNewArticleDto(int count)
+    public static List<CreateArticleDto> CreateNewArticleDto(int count)
     {
-        var f = new Faker<NewArticleDto>(Locale)
+        var f = new Faker<CreateArticleDto>(Locale)
             .RuleFor(x => x.ArticleNumber, f => f.Lorem.Letter(28))
             .RuleFor(x => x.Name, f => string.Join(" ", f.Lorem.Words(4)))
             .RuleFor(x => x.Description, f => Random.Shared.Next(1, 2) == 1 ? string.Join(" ", f.Lorem.Words(9)) : null)
@@ -28,9 +28,9 @@ public static class MockData
         return f.Generate(count);
     }
 
-    public static List<AmwNewProducerDto> CreateNewProducerDto(int count)
+    public static List<NewProducerDto> CreateNewProducerDto(int count)
     {
-        var f = new Faker<AmwNewProducerDto>(Locale)
+        var f = new Faker<NewProducerDto>(Locale)
             .RuleFor(x => x.ProducerName, f => f.Lorem.Letter(28))
             .RuleFor(x => x.Description, f => f.Commerce.ProductDescription())
             .RuleFor(x => x.IsOe, f => f.Random.Bool());
@@ -53,6 +53,19 @@ public static class MockData
             .RuleFor(x => x.TwoFactorEnabled, f => f.Random.Bool());
         return f.Generate(count);
     }
+    
+    public static NewUserDto GetUserDto()
+    {
+        var f = new Faker<NewUserDto>(Locale)
+            .RuleFor(x => x.Email, f => f.Person.Email)
+            .RuleFor(x => x.UserName, f => f.Person.UserName)
+            .RuleFor(x => x.PhoneNumber, f => "+7" + f.Person.Phone)
+            .RuleFor(x => x.Name, f => f.Person.FirstName)
+            .RuleFor(x => x.Surname, f => f.Person.LastName)
+            .RuleFor(x => x.Description, f => f.Lorem.Sentence())
+            .RuleFor(x => x.Roles, ["Member"]);
+        return f.Generate();
+    }
 
     public static List<Storage> CreateNewStorage(int count)
     {
@@ -72,7 +85,7 @@ public static class MockData
         var f = new Faker<StorageContent>(Locale)
             .RuleFor(x => x.ArticleId, f => f.PickRandom(articleIds))
             .RuleFor(x => x.StorageName, f => f.PickRandom(storages))
-            .RuleFor(x => x.BuyPrice, f => Math.Round(f.Random.Decimal(0.01m, 2000000), 2))
+            .RuleFor(x => x.BuyPrice, f => Math.Round((f.Random.Decimal() * 100000) + 1, 2))
             .RuleFor(x => x.Count, f => f.Random.Int(1,1200))
             .RuleFor(x => x.CurrencyId, f => f.PickRandom(currencyIds));
         return f.Generate(count);
@@ -85,8 +98,9 @@ public static class MockData
         var currencyIds = availableCurrencyIds.Distinct().ToList();
         var f = new Faker<NewStorageContentDto>(Locale)
             .RuleFor(x => x.ArticleId, f => f.PickRandom(articleIds))
-            .RuleFor(x => x.BuyPrice, f => f.Random.Decimal(0.01m, 2000000))
+            .RuleFor(x => x.BuyPrice, f => Math.Round((f.Random.Decimal() * 100000) + 1, 2))
             .RuleFor(x => x.Count, f => f.Random.Int(1,1200))
+            .RuleFor(x => x.PurchaseDate, DateTime.Now)
             .RuleFor(x => x.CurrencyId, f => f.PickRandom(currencyIds));
         return f.Generate(count);
     }
@@ -100,7 +114,7 @@ public static class MockData
         
         var f = new Faker<SaleContentDetail>(Locale)
             .RuleFor(x => x.StorageContentId, f => f.Random.Int(1, 100) <= 50 ? f.PickRandom(storageContentIds) : null)
-            .RuleFor(x => x.BuyPrice, f => f.Random.Decimal(0.01m, 2_000_000))
+            .RuleFor(x => x.BuyPrice, f => Math.Round((f.Random.Decimal() * 100000) + 1, 2))
             .RuleFor(x => x.Count, f => f.Random.Int(1, 1200))
             .RuleFor(x => x.CurrencyId, f => f.PickRandom(currencyIds))
             .RuleFor(x => x.Storage, f => f.PickRandom(storages))

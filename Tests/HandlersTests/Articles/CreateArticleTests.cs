@@ -1,11 +1,12 @@
+using Application.Configs;
+using Application.Handlers.Articles.CreateArticles;
+using Application.Handlers.Producers.CreateProducer;
 using Bogus;
+using Core.Exceptions.Producers;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
-using MonoliteUnicorn.Configs;
-using MonoliteUnicorn.EndPoints.Articles.CreateArticle;
-using MonoliteUnicorn.Exceptions.Producers;
-using MonoliteUnicorn.PostGres.Main;
+using Persistence.Contexts;
 using Tests.MockData;
 using Tests.testContainers.Combined;
 
@@ -27,7 +28,9 @@ public class CreateArticleTests : IAsyncLifetime
         
     public async Task InitializeAsync()
     {
-        await _context.AddMockProducersAndArticles();
+        var newProducerModel = MockData.MockData.CreateNewProducerDto(1)[0];
+        var command = new CreateProducerCommand(newProducerModel);
+        await _mediator.Send(command);
     }
 
     public async Task DisposeAsync()
@@ -39,12 +42,10 @@ public class CreateArticleTests : IAsyncLifetime
     public async Task CreateOneArticle_Succeeds()
     {
         var articleList = MockData.MockData.CreateNewArticleDto(1);
-        
         articleList[0].ProducerId = 1;
+        var command = new CreateArticlesCommand(articleList);
 
-        var command = new CreateArticleCommand(articleList);
-
-        var result = await _mediator.Send(command, CancellationToken.None);
+        var result = await _mediator.Send(command);
 
         Assert.Equal(Unit.Value, result);
         
@@ -56,8 +57,9 @@ public class CreateArticleTests : IAsyncLifetime
     public async Task CreateManyArticles_Succeeds()
     {
         var articleList = MockData.MockData.CreateNewArticleDto(Random.Shared.Next(2, 50));
-
-        var command = new CreateArticleCommand(articleList);
+        foreach (var article in articleList)
+            article.ProducerId = 1;
+        var command = new CreateArticlesCommand(articleList);
 
         var result = await _mediator.Send(command, CancellationToken.None);
 
@@ -77,7 +79,7 @@ public class CreateArticleTests : IAsyncLifetime
     [Fact]
     public async Task CreateArticle_WithEmptyList_FailsValidation()
     {
-        var command = new CreateArticleCommand([]);
+        var command = new CreateArticlesCommand([]);
 
         await Assert.ThrowsAsync<FluentValidation.ValidationException>(() => _mediator.Send(command));
     }
@@ -88,7 +90,7 @@ public class CreateArticleTests : IAsyncLifetime
         var articleList = MockData.MockData.CreateNewArticleDto(1);
         
         articleList[0].Name = string.Join(" ", _faker.Lorem.Words(100));
-        var command = new CreateArticleCommand(articleList);
+        var command = new CreateArticlesCommand(articleList);
 
         await Assert.ThrowsAsync<FluentValidation.ValidationException>(() => 
             _mediator.Send(command));
@@ -98,7 +100,7 @@ public class CreateArticleTests : IAsyncLifetime
     public async Task CreateArticle_WithManyItems_FailsValidation()
     {
         var articleList = MockData.MockData.CreateNewArticleDto(200);
-        var command = new CreateArticleCommand(articleList);
+        var command = new CreateArticlesCommand(articleList);
         await Assert.ThrowsAsync<FluentValidation.ValidationException>(() => 
             _mediator.Send(command));
     }
@@ -109,7 +111,7 @@ public class CreateArticleTests : IAsyncLifetime
         var articleList = MockData.MockData.CreateNewArticleDto(1);
         articleList[0].ProducerId = 9999; // несуществующий ProducerId
 
-        var command = new CreateArticleCommand(articleList);
+        var command = new CreateArticlesCommand(articleList);
 
         await Assert.ThrowsAsync<ProducerNotFoundException>(() => _mediator.Send(command));
     }

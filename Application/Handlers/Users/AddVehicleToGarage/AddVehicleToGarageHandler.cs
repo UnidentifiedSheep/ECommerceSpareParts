@@ -1,0 +1,44 @@
+using Application.Extensions;
+using Application.Interfaces;
+using Core.Dtos.Member.Vehicles;
+using Core.Entities;
+using Core.Exceptions.Vehicles;
+using Core.Interfaces;
+using Core.Interfaces.DbRepositories;
+using Core.Interfaces.Services;
+using Mapster;
+using MediatR;
+
+namespace Application.Handlers.Users.AddVehicleToGarage;
+
+public record AddVehicleToGarageCommand(VehicleDto Vehicle, string UserId) : ICommand<Unit>;
+
+
+
+public class AddVehicleToGarageHandler(IUserVehicleRepository vehicleRepository, 
+    IUnitOfWork unitOfWork, IUsersRepository usersRepository) : ICommandHandler<AddVehicleToGarageCommand, Unit>
+{
+    public async Task<Unit> Handle(AddVehicleToGarageCommand request, CancellationToken cancellationToken)
+    {
+        var vin = request.Vehicle.Vin?.Trim();
+        var plateNumber = request.Vehicle.PlateNumber.Trim();
+        var userId = request.UserId;
+        
+        await ValidateData(vin, plateNumber, userId, cancellationToken);
+        
+        var model = request.Vehicle.Adapt<UserVehicle>();
+        model.UserId = userId;
+        await unitOfWork.AddAsync(model, cancellationToken);
+        await unitOfWork.SaveChangesAsync(cancellationToken);
+        return Unit.Value;
+    }
+
+    private async Task ValidateData(string? vin, string plateNumber, string userId, CancellationToken cancellationToken = default)
+    {
+        await usersRepository.EnsureUsersExists([userId], cancellationToken);
+        if (!string.IsNullOrWhiteSpace(vin) && await vehicleRepository.VehicleVinCodeTaken(vin, cancellationToken))
+            throw new VinCodeAlreadyTakenException(vin);
+        if (await vehicleRepository.VehiclePlateNumberTaken(plateNumber, cancellationToken))
+            throw new PlateNumberAlreadyTakenException(plateNumber);
+    }
+}

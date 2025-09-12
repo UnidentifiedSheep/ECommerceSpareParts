@@ -1,0 +1,22 @@
+using Application.Interfaces;
+using Core.Exceptions.Storages;
+using Core.Interfaces;
+using Core.Interfaces.DbRepositories;
+using Core.Interfaces.Services;
+using MediatR;
+
+namespace Application.Handlers.Storages.DeleteStorage;
+
+public record DeleteStorageCommand(string StorageName) : ICommand;
+
+public class DeleteStorageHandler(IStoragesRepository storagesRepository, IUnitOfWork unitOfWork) : ICommandHandler<DeleteStorageCommand>
+{
+    public async Task<Unit> Handle(DeleteStorageCommand request, CancellationToken cancellationToken)
+    {
+        var storage = await storagesRepository.GetStorageAsync(request.StorageName, true, cancellationToken)
+                      ?? throw new StorageNotFoundException(request.StorageName);
+        unitOfWork.Remove(storage);
+        await unitOfWork.SaveChangesAsync(cancellationToken);
+        return Unit.Value;
+    }
+}
