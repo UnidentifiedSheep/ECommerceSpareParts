@@ -1,6 +1,6 @@
 ﻿namespace Core.Entities;
 
-public class ArticleEan
+public partial class ArticleEan
 {
     public int ArticleId { get; set; }
 

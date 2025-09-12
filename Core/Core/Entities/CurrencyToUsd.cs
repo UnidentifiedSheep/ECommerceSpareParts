@@ -1,6 +1,6 @@
 ﻿namespace Core.Entities;
 
-public class CurrencyToUsd
+public partial class CurrencyToUsd
 {
     public int CurrencyId { get; set; }
 

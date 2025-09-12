@@ -1,6 +1,6 @@
 ﻿namespace Core.Entities;
 
-public class UserBalance
+public partial class UserBalance
 {
     public int Id { get; set; }
 

@@ -1,6 +1,6 @@
 ﻿namespace Core.Entities;
 
-public class ArticleImage
+public partial class ArticleImage
 {
     public int ArticleId { get; set; }
 

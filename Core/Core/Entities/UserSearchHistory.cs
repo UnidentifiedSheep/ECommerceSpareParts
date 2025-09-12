@@ -1,6 +1,6 @@
 ﻿namespace Core.Entities;
 
-public class UserSearchHistory
+public partial class UserSearchHistory
 {
     public int Id { get; set; }
 

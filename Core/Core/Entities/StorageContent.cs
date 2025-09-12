@@ -1,6 +1,6 @@
 ﻿namespace Core.Entities;
 
-public class StorageContent
+public partial class StorageContent
 {
     public int Id { get; set; }
 

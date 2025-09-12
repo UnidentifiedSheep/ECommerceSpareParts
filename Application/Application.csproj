@@ -31,4 +31,9 @@
         </Reference>
     </ItemGroup>
 
+    <ItemGroup>
+      <Folder Include="Handlers\Analytics\GetSaleAnalytics\" />
+      <Folder Include="Handlers\Cart\" />
+    </ItemGroup>
+
 </Project>

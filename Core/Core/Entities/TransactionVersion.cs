@@ -1,6 +1,6 @@
 ﻿namespace Core.Entities;
 
-public class TransactionVersion
+public partial class TransactionVersion
 {
     public string Id { get; set; } = null!;
 

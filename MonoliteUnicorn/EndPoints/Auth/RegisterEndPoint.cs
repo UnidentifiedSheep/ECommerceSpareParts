@@ -1,4 +1,5 @@
 ﻿using Application.Handlers.Auth;
+using Application.Handlers.Auth.Register;
 using Carter;
 using Mapster;
 using MediatR;

@@ -1,6 +1,6 @@
 ﻿namespace Core.Entities;
 
-public class Purchase
+public partial class Purchase
 {
     public string Id { get; set; } = null!;
 

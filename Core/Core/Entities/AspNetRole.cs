@@ -1,6 +1,6 @@
 ﻿namespace Core.Entities;
 
-public class AspNetRole
+public partial class AspNetRole
 {
     public string Id { get; set; } = null!;
 

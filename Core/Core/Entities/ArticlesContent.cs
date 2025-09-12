@@ -1,6 +1,6 @@
 ﻿namespace Core.Entities;
 
-public class ArticlesContent
+public partial class ArticlesContent
 {
     public int MainArticleId { get; set; }
 

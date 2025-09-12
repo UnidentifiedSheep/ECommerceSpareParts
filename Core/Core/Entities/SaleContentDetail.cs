@@ -1,6 +1,6 @@
 ﻿namespace Core.Entities;
 
-public class SaleContentDetail
+public partial class SaleContentDetail
 {
     public int SaleContentId { get; set; }
 

@@ -1,6 +1,6 @@
 ﻿namespace Core.Entities;
 
-public class PurchaseContent
+public partial class PurchaseContent
 {
     public int Id { get; set; }
 

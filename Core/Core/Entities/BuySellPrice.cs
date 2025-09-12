@@ -1,6 +1,6 @@
 ﻿namespace Core.Entities;
 
-public class BuySellPrice
+public partial class BuySellPrice
 {
     public decimal BuyPrice { get; set; }
 

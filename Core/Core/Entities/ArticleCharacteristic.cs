@@ -1,6 +1,6 @@
 ﻿namespace Core.Entities;
 
-public class ArticleCharacteristic
+public partial class ArticleCharacteristic
 {
     public int Id { get; set; }
 

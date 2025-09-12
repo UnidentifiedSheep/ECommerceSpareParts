@@ -1,6 +1,6 @@
 ﻿namespace Core.Entities;
 
-public class ArticleCross
+public partial class ArticleCross
 {
     public int ArticleId { get; set; }
 

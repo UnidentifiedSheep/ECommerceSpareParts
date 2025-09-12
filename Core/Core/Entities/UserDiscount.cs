@@ -1,6 +1,6 @@
 ﻿namespace Core.Entities;
 
-public class UserDiscount
+public partial class UserDiscount
 {
     public string UserId { get; set; } = null!;
 

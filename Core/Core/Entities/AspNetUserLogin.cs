@@ -1,6 +1,6 @@
 ﻿namespace Core.Entities;
 
-public class AspNetUserLogin
+public partial class AspNetUserLogin
 {
     public string LoginProvider { get; set; } = null!;
 
