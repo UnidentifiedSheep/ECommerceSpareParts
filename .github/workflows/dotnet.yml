@@ -33,10 +33,10 @@ jobs:
           ${{ runner.os }}-nuget-
     
     - name: Restore dependencies
-      run: dotnet restore
-  
+      run: dotnet restore ECommerceSpareParts.sln
+
     - name: Build
-      run: dotnet build --no-restore
-  
+      run: dotnet build ECommerceSpareParts.sln --no-restore
+
     - name: Test
-      run: dotnet test --no-build --verbosity normal
+      run: dotnet test ECommerceSpareParts.sln --no-build --verbosity normal
