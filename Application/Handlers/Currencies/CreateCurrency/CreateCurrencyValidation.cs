@@ -21,7 +21,7 @@ public class CreateCurrencyValidation : AbstractValidator<CreateCurrencyCommand>
             .WithMessage("Максимальная длина названия 128 символов")
             .Must(x => x.Trim().Length >= 3)
             .WithMessage("Минимальная длина названия 3 символа");
-        
+
         RuleFor(x => x.CurrencySign)
             .NotEmpty()
             .WithMessage("Знак валюты не может быть пустым")
@@ -29,7 +29,7 @@ public class CreateCurrencyValidation : AbstractValidator<CreateCurrencyCommand>
             .WithMessage("Максимальная длина знака валюты 3 символа")
             .Must(x => x.Trim().Length >= 1)
             .WithMessage("Минимальная длина знака валюты 1 символ");
-        
+
         RuleFor(x => x.ShortName)
             .NotEmpty()
             .WithMessage("Короткое название валюты не может быть пустым")

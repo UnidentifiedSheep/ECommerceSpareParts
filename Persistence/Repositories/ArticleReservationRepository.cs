@@ -17,14 +17,16 @@ public class ArticleReservationRepository(DContext context) : IArticleReservatio
             .AnyAsync(x => x.Id == reservationId, cancellationToken);
     }
 
-    public async Task<StorageContentReservation?> GetReservationAsync(int reservationId, bool track = true, CancellationToken cancellationToken = default)
+    public async Task<StorageContentReservation?> GetReservationAsync(int reservationId, bool track = true,
+        CancellationToken cancellationToken = default)
     {
         return await context.StorageContentReservations
             .ConfigureTracking(track)
             .FirstOrDefaultAsync(x => x.Id == reservationId, cancellationToken);
     }
 
-    public async Task<IEnumerable<StorageContentReservation>> GetReservationsByExecAsync(string? searchTerm, string? userId, 
+    public async Task<IEnumerable<StorageContentReservation>> GetReservationsByExecAsync(string? searchTerm,
+        string? userId,
         int offset, int limit, string? sortBy, bool track = true, CancellationToken cancellationToken = default)
     {
         searchTerm = searchTerm?.Trim();
@@ -38,61 +40,62 @@ public class ArticleReservationRepository(DContext context) : IArticleReservatio
             .ToListAsync(cancellationToken);
     }
 
-    public async Task<IEnumerable<StorageContentReservation>> GetReservationsBySimilarityAsync(string? searchTerm, string? userId, 
-        int offset, int limit, string? sortBy, bool track = true, double similarity = 0.5, CancellationToken cancellationToken = default)
+    public async Task<IEnumerable<StorageContentReservation>> GetReservationsBySimilarityAsync(string? searchTerm,
+        string? userId,
+        int offset, int limit, string? sortBy, bool track = true, double similarity = 0.5,
+        CancellationToken cancellationToken = default)
     {
         var query = GetReservationsInternal(userId, track, sortBy);
         var queryWithRank = query.Where(x => string.IsNullOrWhiteSpace(searchTerm) ||
-                                 ((x.Comment == null || EF.Functions.TrigramsSimilarity(x.Comment.ToUpper(), 
-                                      searchTerm.ToUpper()) >= similarity) ||
-                                  (EF.Functions.TrigramsSimilarity(x.Article.NormalizedArticleNumber, 
-                                      searchTerm.ToNormalizedArticleNumber()) >= similarity) ||
-                                  (EF.Functions.ToTsVector("russian", x.Article.ArticleName)
-                                      .Matches(EF.Functions.PlainToTsQuery("russian", searchTerm)))))
+                                             x.Comment == null || EF.Functions.TrigramsSimilarity(x.Comment.ToUpper(),
+                                                 searchTerm.ToUpper()) >= similarity ||
+                                             EF.Functions.TrigramsSimilarity(x.Article.NormalizedArticleNumber,
+                                                 searchTerm.ToNormalizedArticleNumber()) >= similarity ||
+                                             EF.Functions.ToTsVector("russian", x.Article.ArticleName)
+                                                 .Matches(EF.Functions.PlainToTsQuery("russian", searchTerm)))
             .Select(x => new
             {
                 Reservation = x,
-                Rank = string.IsNullOrWhiteSpace(searchTerm) ? 0 
-                    : (EF.Functions.Greatest(EF.Functions.ToTsVector("russian", x.Article.ArticleName)
+                Rank = string.IsNullOrWhiteSpace(searchTerm)
+                    ? 0
+                    : EF.Functions.Greatest(EF.Functions.ToTsVector("russian", x.Article.ArticleName)
                             .Rank(EF.Functions.PlainToTsQuery("russian", searchTerm)),
                         EF.Functions.TrigramsSimilarity(x.Article.NormalizedArticleNumber,
                             searchTerm.ToNormalizedArticleNumber()),
-                        x.Comment == null ? 0 : EF.Functions.TrigramsSimilarity(x.Comment.ToUpper(), searchTerm.ToUpper()))
-                    )
+                        x.Comment == null
+                            ? 0
+                            : EF.Functions.TrigramsSimilarity(x.Comment.ToUpper(), searchTerm.ToUpper()))
             });
-        
+
         if (string.IsNullOrWhiteSpace(sortBy) || sortBy.Contains("relevance"))
-        {
             queryWithRank = sortBy?.Contains("asc") == true
                 ? queryWithRank.OrderBy(x => x.Rank)
                 : queryWithRank.OrderByDescending(x => x.Rank);
-        }
-        
+
         query = queryWithRank
             .Select(x => x.Reservation);
-        
+
         if (!string.IsNullOrWhiteSpace(sortBy) && !sortBy.Contains("relevance"))
             query = query.SortBy(sortBy);
-        
+
         return await query.Skip(offset)
             .Take(limit)
             .ToListAsync(cancellationToken);
     }
 
-    public async Task<IEnumerable<StorageContentReservation>> GetReservationsFromStartAsync(string? searchTerm, string? userId, 
+    public async Task<IEnumerable<StorageContentReservation>> GetReservationsFromStartAsync(string? searchTerm,
+        string? userId,
         int offset, int limit, string? sortBy, bool track = true, CancellationToken cancellationToken = default)
     {
         searchTerm = searchTerm?.Trim();
         var query = GetReservationsInternal(userId, track, sortBy);
 
         if (!string.IsNullOrWhiteSpace(searchTerm))
-        {
             query = query.Where(x =>
                 (x.Comment != null && EF.Functions.ILike(x.Comment, $"{searchTerm}%")) ||
                 EF.Functions.ILike(x.Article.NormalizedArticleNumber, $"{searchTerm.ToNormalizedArticleNumber()}%") ||
                 EF.Functions.ILike(x.Article.ArticleName, $"{searchTerm}%")
             );
-        }
 
         if (!string.IsNullOrWhiteSpace(sortBy))
             query = query.SortBy(sortBy);
@@ -103,20 +106,19 @@ public class ArticleReservationRepository(DContext context) : IArticleReservatio
             .ToListAsync(cancellationToken);
     }
 
-    public async Task<IEnumerable<StorageContentReservation>> GetReservationsContainsAsync(string? searchTerm, string? userId, 
+    public async Task<IEnumerable<StorageContentReservation>> GetReservationsContainsAsync(string? searchTerm,
+        string? userId,
         int offset, int limit, string? sortBy, bool track = true, CancellationToken cancellationToken = default)
     {
         searchTerm = searchTerm?.Trim();
         var query = GetReservationsInternal(userId, track, sortBy);
 
         if (!string.IsNullOrWhiteSpace(searchTerm))
-        {
             query = query.Where(x =>
-                (x.Comment != null && EF.Functions.ILike(x.Comment, $"%{searchTerm}%") ||
+                (x.Comment != null && EF.Functions.ILike(x.Comment, $"%{searchTerm}%")) ||
                 EF.Functions.ILike(x.Article.NormalizedArticleNumber, $"%{searchTerm.ToNormalizedArticleNumber()}%") ||
-                EF.Functions.ILike(x.Article.ArticleName, $"%{searchTerm}%"))
+                EF.Functions.ILike(x.Article.ArticleName, $"%{searchTerm}%")
             );
-        }
 
         if (!string.IsNullOrWhiteSpace(sortBy))
             query = query.SortBy(sortBy);
@@ -127,7 +129,7 @@ public class ArticleReservationRepository(DContext context) : IArticleReservatio
             .ToListAsync(cancellationToken);
     }
 
-    public Task<Dictionary<int, int>> GetReservationsCountForUserAsync(string userId, IEnumerable<int> articleIds, 
+    public Task<Dictionary<int, int>> GetReservationsCountForUserAsync(string userId, IEnumerable<int> articleIds,
         CancellationToken cancellationToken = default)
     {
         return GetReservationsCountInternalAsync(
@@ -139,21 +141,23 @@ public class ArticleReservationRepository(DContext context) : IArticleReservatio
         string userId, IEnumerable<int> articleIds, CancellationToken cancellationToken = default)
     {
         return GetReservationsCountInternalAsync(
-            r => r.UserId != userId && articleIds.Contains(r.ArticleId) && !r.IsDone, 
+            r => r.UserId != userId && articleIds.Contains(r.ArticleId) && !r.IsDone,
             cancellationToken);
     }
 
-    public async Task<Dictionary<int, List<StorageContentReservation>>> GetUserReservations(string userId, 
-        IEnumerable<int> articleIds, bool isDone = false, bool track = true, CancellationToken cancellationToken = default)
+    public async Task<Dictionary<int, List<StorageContentReservation>>> GetUserReservations(string userId,
+        IEnumerable<int> articleIds, bool isDone = false, bool track = true,
+        CancellationToken cancellationToken = default)
     {
-        return await GetUserReservationsInternalAsync(context.StorageContentReservations, userId, articleIds, isDone, 
+        return await GetUserReservationsInternalAsync(context.StorageContentReservations, userId, articleIds, isDone,
             track, cancellationToken);
     }
 
     public async Task<Dictionary<int, List<StorageContentReservation>>> GetUserReservationsForUpdate(string userId,
-        IEnumerable<int> articleIds, bool isDone = false, bool track = true, CancellationToken cancellationToken = default)
+        IEnumerable<int> articleIds, bool isDone = false, bool track = true,
+        CancellationToken cancellationToken = default)
     {
-        return await GetUserReservationsInternalAsync(context.StorageContentReservations.FromSql($"FROM SQL"), 
+        return await GetUserReservationsInternalAsync(context.StorageContentReservations.FromSql($"FROM SQL"),
             userId, articleIds, isDone, track, cancellationToken);
     }
 
@@ -166,9 +170,9 @@ public class ArticleReservationRepository(DContext context) : IArticleReservatio
             query = query.Where(x => x.UserId == userId);
         return query;
     }
-    
+
     private async Task<Dictionary<int, List<StorageContentReservation>>> GetUserReservationsInternalAsync(
-        IQueryable<StorageContentReservation> baseQuery, string userId, IEnumerable<int> articleIds, bool isDone, 
+        IQueryable<StorageContentReservation> baseQuery, string userId, IEnumerable<int> articleIds, bool isDone,
         bool track, CancellationToken cancellationToken = default)
     {
         var query = baseQuery
@@ -179,7 +183,7 @@ public class ArticleReservationRepository(DContext context) : IArticleReservatio
 
         return await query
             .GroupBy(x => x.ArticleId)
-            .ToDictionaryAsync(g => g.Key, 
+            .ToDictionaryAsync(g => g.Key,
                 g => g.ToList(), cancellationToken);
     }
 
@@ -197,8 +201,8 @@ public class ArticleReservationRepository(DContext context) : IArticleReservatio
                 TotalCount = g.Sum(y => y.CurrentCount)
             })
             .ToDictionaryAsync(
-                x => x.ArticleId, 
-                x => x.TotalCount, 
+                x => x.ArticleId,
+                x => x.TotalCount,
                 cancellationToken);
     }
 }

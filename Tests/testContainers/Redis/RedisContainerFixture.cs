@@ -10,6 +10,7 @@ public class RedisContainerFixture : IAsyncLifetime
         .Build();
 
     public string ConnectionString => $"{_redisContainer.Hostname}:{_redisContainer.GetMappedPublicPort(6379)}";
+
     public async Task InitializeAsync()
     {
         await _redisContainer.StartAsync();
@@ -21,4 +22,3 @@ public class RedisContainerFixture : IAsyncLifetime
         await _redisContainer.DisposeAsync().AsTask();
     }
 }
-

@@ -14,9 +14,9 @@ public static class SortByConfig
             .Map("articleName", x => x.ArticleName)
             .Map("count", x => x.TotalCount)
             .Map("producerName", x => x.Producer.Name);
-        
+
         new ArticleFullDto().Map("count", x => x.CurrentStock);
-        
+
         new Producer().MapDefault(x => x.Id)
             .Map("id", x => x.Id)
             .Map("name", x => x.Name);

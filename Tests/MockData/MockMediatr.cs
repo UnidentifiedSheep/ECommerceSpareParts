@@ -11,7 +11,6 @@ using Core.Enums;
 using Core.Models;
 using Mapster;
 using MediatR;
-using Persistence.Contexts;
 using static Tests.MockData.MockData;
 
 namespace Tests.MockData;
@@ -28,11 +27,11 @@ public static class MockMediatr
             var result = await mediator.Send(producerCommand);
             producerIds.Add(result.ProducerId);
         }
-        
+
         var articleList = CreateNewArticleDto(10);
         foreach (var article in articleList)
             article.ProducerId = Global.Faker.PickRandom(producerIds);
-        
+
         var articleCommand = new CreateArticlesCommand(articleList);
         await mediator.Send(articleCommand);
     }
@@ -41,27 +40,28 @@ public static class MockMediatr
     {
         var user = GetUserDto();
         var command = new CreateUserCommand(user);
-        
+
         var result = await mediator.Send(command);
         return result.UserId;
     }
 
-    public static async Task<Transaction> AddMockTransaction(this IMediator mediator, string sender, string receiver, string whoCreated, 
+    public static async Task<Transaction> AddMockTransaction(this IMediator mediator, string sender, string receiver,
+        string whoCreated,
         decimal amount = 100, DateTime? when = null)
     {
         var command = new CreateTransactionCommand(
-            SenderId: sender,
-            ReceiverId: receiver,
-            Amount: amount,
-            CurrencyId: 1,
-            WhoCreatedTransaction: whoCreated,
-            TransactionDateTime: when ?? DateTime.Now,
+            sender,
+            receiver,
+            amount,
+            1,
+            whoCreated,
+            when ?? DateTime.Now,
             TransactionStatus.Normal
         );
         var result = await mediator.Send(command);
         return result.Transaction;
     }
-    
+
     public static async Task AddMockStorage(this IMediator mediator)
     {
         var storage = CreateNewStorage(1)[0];
@@ -69,7 +69,8 @@ public static class MockMediatr
         await mediator.Send(command);
     }
 
-    public static async Task AddMockStorageContents(this IMediator mediator, IEnumerable<int> articleIds, int currencyId,
+    public static async Task AddMockStorageContents(this IMediator mediator, IEnumerable<int> articleIds,
+        int currencyId,
         string storageName, string userId, int count = 20)
     {
         var dtoList = CreateNewStorageContentDto(articleIds, [currencyId], count)
@@ -79,13 +80,14 @@ public static class MockMediatr
         await mediator.Send(command);
     }
 
-    public static async Task AddMockSale(this IMediator mediator, IEnumerable<StorageContent> storageContents, int currencyId,
+    public static async Task AddMockSale(this IMediator mediator, IEnumerable<StorageContent> storageContents,
+        int currencyId,
         string userId, string transactionId, string storageName, DateTime? when = null)
     {
         var saleContent = new List<NewSaleContentDto>();
         var storageContentValues = new List<PrevAndNewValue<StorageContent>>();
         var articlesTakenCount = new Dictionary<int, int>();
-        
+
         foreach (var content in storageContents)
         {
             var newValue = content.Adapt<StorageContent>();
@@ -98,12 +100,13 @@ public static class MockMediatr
                 Price = content.BuyPrice,
                 PriceWithDiscount = content.BuyPrice
             });
-            articlesTakenCount[content.ArticleId] = articlesTakenCount.GetValueOrDefault(content.ArticleId) + content.Count;
-            
+            articlesTakenCount[content.ArticleId] =
+                articlesTakenCount.GetValueOrDefault(content.ArticleId) + content.Count;
+
             storageContentValues.Add(new PrevAndNewValue<StorageContent>(content.Adapt<StorageContent>(), newValue));
         }
-        
-        var command = new CreateSaleCommand(saleContent, storageContentValues, currencyId, userId, userId, 
+
+        var command = new CreateSaleCommand(saleContent, storageContentValues, currencyId, userId, userId,
             transactionId, storageName, when ?? DateTime.Now, null);
         await mediator.Send(command);
     }

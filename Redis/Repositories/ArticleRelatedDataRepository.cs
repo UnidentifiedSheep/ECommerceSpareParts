@@ -6,8 +6,6 @@ namespace Redis.Repositories;
 
 public class ArticleRelatedDataRepository(IDatabase redis, TimeSpan? ttl = null) : IRelatedDataRepository<Article>
 {
-    private static string GetRelatedDataKey(string id) => $"article-related-data:{id}";
-
     public async Task<IEnumerable<string>> GetRelatedDataKeys(string id)
     {
         var key = GetRelatedDataKey(id);
@@ -31,5 +29,10 @@ public class ArticleRelatedDataRepository(IDatabase redis, TimeSpan? ttl = null)
         var members = relatedKeys.Select(x => new RedisValue(x)).ToArray();
         await redis.SetAddAsync(key, members);
         await redis.KeyExpireAsync(key, ttl);
+    }
+
+    private static string GetRelatedDataKey(string id)
+    {
+        return $"article-related-data:{id}";
     }
 }

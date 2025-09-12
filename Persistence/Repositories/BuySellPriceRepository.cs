@@ -12,7 +12,8 @@ namespace Persistence.Repositories;
 
 public class BuySellPriceRepository(DContext context) : IBuySellPriceRepository
 {
-    public async Task<IEnumerable<BuySellPrice>> GetBsPriceByContentIdsForUpdate(IEnumerable<int> contentIds, bool track = true,
+    public async Task<IEnumerable<BuySellPrice>> GetBsPriceByContentIdsForUpdate(IEnumerable<int> contentIds,
+        bool track = true,
         CancellationToken cancellationToken = default)
     {
         return await context.BuySellPrices
@@ -24,7 +25,8 @@ public class BuySellPriceRepository(DContext context) : IBuySellPriceRepository
             .ToListAsync(cancellationToken);
     }
 
-    public async IAsyncEnumerable<BuySellPrice> GetBuySellPrices(Expression<Func<BuySellPrice, bool>>? where = null, bool track = true,
+    public async IAsyncEnumerable<BuySellPrice> GetBuySellPrices(Expression<Func<BuySellPrice, bool>>? where = null,
+        bool track = true,
         [EnumeratorCancellation] CancellationToken cancellationToken = default)
     {
         var query = context.BuySellPrices.Where(where ?? (_ => true)).ConfigureTracking(track);
@@ -32,7 +34,8 @@ public class BuySellPriceRepository(DContext context) : IBuySellPriceRepository
             yield return item;
     }
 
-    public async Task<List<BuySellPrice>> GetBuySellPricesAsList(Expression<Func<BuySellPrice, bool>>? where = null, bool track = true, CancellationToken cancellationToken = default)
+    public async Task<List<BuySellPrice>> GetBuySellPricesAsList(Expression<Func<BuySellPrice, bool>>? where = null,
+        bool track = true, CancellationToken cancellationToken = default)
     {
         return await context.BuySellPrices
             .ConfigureTracking(track)
@@ -40,7 +43,8 @@ public class BuySellPriceRepository(DContext context) : IBuySellPriceRepository
             .ToListAsync(cancellationToken);
     }
 
-    public async Task UpdateRange(IEnumerable<BuySellPrice> buySellPrices, CancellationToken cancellationToken = default)
+    public async Task UpdateRange(IEnumerable<BuySellPrice> buySellPrices,
+        CancellationToken cancellationToken = default)
     {
         await context.WithDefaultTransactionSettings("normal")
             .ExecuteWithTransaction(async () =>
@@ -51,6 +55,6 @@ public class BuySellPriceRepository(DContext context) : IBuySellPriceRepository
     {
         if (!await context.BuySellPrices.AnyAsync(cancellationToken))
             return null;
-        return await context.BuySellPrices.MaxAsync(x => x.BuyPrice,cancellationToken);
+        return await context.BuySellPrices.MaxAsync(x => x.BuyPrice, cancellationToken);
     }
 }

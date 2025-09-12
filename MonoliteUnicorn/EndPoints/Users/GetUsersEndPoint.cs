@@ -30,19 +30,23 @@ public class GetUsersEndPoint : ICarterModule
 {
     public void AddRoutes(IEndpointRouteBuilder app)
     {
-        app.MapGet("/users/", async (ISender sender, [AsParameters] GetUsersRequest request, ClaimsPrincipal claims, CancellationToken token) =>
-            {
-                var userId = claims.FindFirstValue(ClaimTypes.NameIdentifier);
-                if(userId == null) return Results.Unauthorized();
-                var query = new GetUsersQuery(new PaginationModel(request.Page, request.ViewCount), request.SimilarityLevel,
-                    userId, request.Name, request.Surname, request.Email, request.Phone, request.UserName, request.Id,
-                    request.Description, request.IsSupplier, GeneralSearchStrategy.Similarity);
-                var result = await sender.Send(query, token);
-                var response = result.Adapt<GetUsersResponse>();
-                return Results.Ok(response);
-            }).RequireAuthorization("AMW")
-        .WithTags("Users")
-        .WithDescription("Получение пользователей")
-        .WithDisplayName("Получение пользователей");
+        app.MapGet("/users/",
+                async (ISender sender, [AsParameters] GetUsersRequest request, ClaimsPrincipal claims,
+                    CancellationToken token) =>
+                {
+                    var userId = claims.FindFirstValue(ClaimTypes.NameIdentifier);
+                    if (userId == null) return Results.Unauthorized();
+                    var query = new GetUsersQuery(new PaginationModel(request.Page, request.ViewCount),
+                        request.SimilarityLevel,
+                        userId, request.Name, request.Surname, request.Email, request.Phone, request.UserName,
+                        request.Id,
+                        request.Description, request.IsSupplier, GeneralSearchStrategy.Similarity);
+                    var result = await sender.Send(query, token);
+                    var response = result.Adapt<GetUsersResponse>();
+                    return Results.Ok(response);
+                }).RequireAuthorization("AMW")
+            .WithTags("Users")
+            .WithDescription("Получение пользователей")
+            .WithDisplayName("Получение пользователей");
     }
 }

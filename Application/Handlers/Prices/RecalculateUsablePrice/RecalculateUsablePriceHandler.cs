@@ -6,7 +6,8 @@ namespace Application.Handlers.Prices.RecalculateUsablePrice;
 
 public record RecalculateUsablePriceCommand(IEnumerable<int> ArticleIds) : ICommand;
 
-public class RecalculateUsablePriceHandler(IArticlePricesService pricesService) : ICommandHandler<RecalculateUsablePriceCommand>
+public class RecalculateUsablePriceHandler(IArticlePricesService pricesService)
+    : ICommandHandler<RecalculateUsablePriceCommand>
 {
     public async Task<Unit> Handle(RecalculateUsablePriceCommand request, CancellationToken cancellationToken)
     {

@@ -1,4 +1,3 @@
-using System.Data;
 using Application.Handlers.BaseValidators;
 using FluentValidation;
 

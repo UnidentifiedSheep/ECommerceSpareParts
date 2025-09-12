@@ -11,9 +11,12 @@ namespace Application.Handlers.Users.CreateUser;
 
 [Transactional]
 public record CreateUserCommand(NewUserDto NewUser) : ICommand<CreateUserResult>;
+
 public record CreateUserResult(string UserId);
 
-public class CreateUserHandler(IUsersRepository usersRepository, IUserEmailRepository emailRepository,
+public class CreateUserHandler(
+    IUsersRepository usersRepository,
+    IUserEmailRepository emailRepository,
     IUnitOfWork unitOfWork) : ICommandHandler<CreateUserCommand, CreateUserResult>
 {
     public async Task<CreateUserResult> Handle(CreateUserCommand request, CancellationToken cancellationToken)
@@ -34,13 +37,14 @@ public class CreateUserHandler(IUsersRepository usersRepository, IUserEmailRepos
             };
             await unitOfWork.AddAsync(emailModel, cancellationToken);
         }
-        
+
         await unitOfWork.AddAsync(model, cancellationToken);
         await unitOfWork.SaveChangesAsync(cancellationToken);
         return new CreateUserResult(model.Id);
     }
 
-    private async Task ValidateData(string username, string? email, IEnumerable<string> roles, CancellationToken ct = default)
+    private async Task ValidateData(string username, string? email, IEnumerable<string> roles,
+        CancellationToken ct = default)
     {
         if (await usersRepository.UserNameTaken(username, ct))
             throw new UserNameAlreadyTakenException(username);

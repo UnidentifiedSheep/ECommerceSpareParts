@@ -1,6 +1,6 @@
 ﻿namespace Core.Entities;
 
-public partial class UserMail
+public class UserMail
 {
     public string Email { get; set; } = null!;
 

@@ -12,8 +12,8 @@ public class TransactionConfig(DbContext context) : ICustomTransaction
     public int RetriesCount { get; private set; }
     public TimeSpan RetryDelay { get; private set; } = TimeSpan.Zero;
     public IsolationLevel IsolationLevel { get; private set; } = IsolationLevel.ReadCommitted;
-    
-    
+
+
     public ICustomTransaction WithRetries(int count)
     {
         if (count < 0)
@@ -46,11 +46,6 @@ public class TransactionConfig(DbContext context) : ICustomTransaction
         return this;
     }
 
-    public static void AddDefaultSettings(string variant, TransactionDefaultSettings defaultSettings)
-    {
-        DefaultSettings.Add(variant, defaultSettings);
-    }
-
     public ICustomTransaction AddRetryPgErrorKey(IEnumerable<string> keys)
     {
         _retryOn.UnionWith(keys);
@@ -59,18 +54,19 @@ public class TransactionConfig(DbContext context) : ICustomTransaction
 
     public async Task<T> ExecuteWithTransaction<T>(Func<Task<T>> action, CancellationToken cancellationToken = default)
     {
-        for (int attempt = 0; attempt <= RetriesCount; attempt++)
+        for (var attempt = 0; attempt <= RetriesCount; attempt++)
         {
             var isLocalTransaction = context.Database.CurrentTransaction == null;
-            var transaction = context.Database.CurrentTransaction ?? await context.Database.BeginTransactionAsync(cancellationToken);
+            var transaction = context.Database.CurrentTransaction ??
+                              await context.Database.BeginTransactionAsync(cancellationToken);
 
             try
             {
-                if(isLocalTransaction)
+                if (isLocalTransaction)
                     await SetIsolationLevelOfDbTransaction();
-                if(attempt > 0)
+                if (attempt > 0)
                     context.ChangeTracker.Clear();
-                T result = await action();
+                var result = await action();
 
                 if (isLocalTransaction)
                     await transaction.CommitAsync(cancellationToken);
@@ -91,21 +87,23 @@ public class TransactionConfig(DbContext context) : ICustomTransaction
                     await transaction.DisposeAsync();
             }
         }
+
         throw new InvalidOperationException("Out of attempts");
     }
-    
+
     public async Task ExecuteWithTransaction(Func<Task> action, CancellationToken cancellationToken = default)
     {
-        for (int attempt = 0; attempt <= RetriesCount; attempt++)
+        for (var attempt = 0; attempt <= RetriesCount; attempt++)
         {
             var isLocalTransaction = context.Database.CurrentTransaction == null;
-            var transaction = context.Database.CurrentTransaction ?? await context.Database.BeginTransactionAsync(cancellationToken);
+            var transaction = context.Database.CurrentTransaction ??
+                              await context.Database.BeginTransactionAsync(cancellationToken);
 
             try
             {
-                if(isLocalTransaction)
+                if (isLocalTransaction)
                     await SetIsolationLevelOfDbTransaction();
-                if(attempt > 0)
+                if (attempt > 0)
                     context.ChangeTracker.Clear();
                 await action();
 
@@ -127,22 +125,27 @@ public class TransactionConfig(DbContext context) : ICustomTransaction
                 if (isLocalTransaction)
                     await transaction.DisposeAsync();
             }
-                
         }
+
         throw new InvalidOperationException("Out of attempts");
+    }
+
+    public static void AddDefaultSettings(string variant, TransactionDefaultSettings defaultSettings)
+    {
+        DefaultSettings.Add(variant, defaultSettings);
     }
 
     private PostgresException? GetException(Exception? ex)
     {
-        int deepness = 0;
+        var deepness = 0;
         var tempEx = ex;
-        
+
         while (tempEx != null && !(tempEx is PostgresException) && deepness < 4)
         {
             tempEx = tempEx.InnerException;
             deepness++;
         }
-        
+
         return tempEx as PostgresException;
     }
 
@@ -154,5 +157,4 @@ public class TransactionConfig(DbContext context) : ICustomTransaction
         var sql = $"SET TRANSACTION ISOLATION LEVEL {withSpaces};";
         await context.Database.ExecuteSqlRawAsync(sql);
     }
-    
 }

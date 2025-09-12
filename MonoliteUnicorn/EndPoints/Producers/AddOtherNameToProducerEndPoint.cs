@@ -10,7 +10,7 @@ public class AddOtherNameToProducerEndPoint : ICarterModule
 {
     public void AddRoutes(IEndpointRouteBuilder app)
     {
-        app.MapPost("/producers/{producerId}/names", async (ISender sender, int producerId, 
+        app.MapPost("/producers/{producerId}/names", async (ISender sender, int producerId,
                 AddOtherNameToProducerRequest request, CancellationToken token) =>
             {
                 var command = new AddOtherNameCommand(producerId, request.OtherName, request.WhereUsed);

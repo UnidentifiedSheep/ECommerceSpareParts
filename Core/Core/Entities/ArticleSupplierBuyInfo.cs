@@ -1,6 +1,6 @@
 ﻿namespace Core.Entities;
 
-public partial class ArticleSupplierBuyInfo
+public class ArticleSupplierBuyInfo
 {
     public int Id { get; set; }
 

@@ -5,7 +5,8 @@ namespace Common.Json;
 
 public class StringOrArrayConverter : JsonConverter<List<string>>
 {
-    public override List<string> ReadJson(JsonReader reader, Type objectType, List<string>? existingValue, bool hasExistingValue, JsonSerializer serializer)
+    public override List<string> ReadJson(JsonReader reader, Type objectType, List<string>? existingValue,
+        bool hasExistingValue, JsonSerializer serializer)
     {
         var token = JToken.Load(reader);
 
@@ -24,16 +25,15 @@ public class StringOrArrayConverter : JsonConverter<List<string>>
             writer.WriteNull();
             return;
         }
-        
+
         if (value.Count == 1)
+        {
             writer.WriteValue(value[0]);
+        }
         else
         {
             writer.WriteStartArray();
-            foreach (var str in value)
-            {
-                writer.WriteValue(str);
-            }
+            foreach (var str in value) writer.WriteValue(str);
             writer.WriteEndArray();
         }
     }

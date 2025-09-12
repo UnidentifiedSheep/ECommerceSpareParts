@@ -15,14 +15,14 @@ public class CreateCurrencyTests : IAsyncLifetime
 {
     private readonly DContext _context;
     private readonly IMediator _mediator;
-    
+
     public CreateCurrencyTests(CombinedContainerFixture fixture)
     {
         var sp = ServiceProviderForTests.Build(fixture.PostgresConnectionString, fixture.RedisConnectionString);
         _mediator = sp.GetService<IMediator>()!;
         _context = sp.GetRequiredService<DContext>();
     }
-    
+
     public Task InitializeAsync()
     {
         return Task.CompletedTask;
@@ -32,11 +32,26 @@ public class CreateCurrencyTests : IAsyncLifetime
     {
         await _context.ClearDatabaseFull();
     }
-    
-    private string GetValidName() => Global.Faker.Lorem.Letter(10);
-    private string GetValidCurrencyCode() => Global.Faker.Lorem.Letter(2);
-    private string GetValidCurrencySign() => Global.Faker.Lorem.Letter();
-    private string GetValidShortName() => Global.Faker.Lorem.Letter(3);
+
+    private string GetValidName()
+    {
+        return Global.Faker.Lorem.Letter(10);
+    }
+
+    private string GetValidCurrencyCode()
+    {
+        return Global.Faker.Lorem.Letter(2);
+    }
+
+    private string GetValidCurrencySign()
+    {
+        return Global.Faker.Lorem.Letter();
+    }
+
+    private string GetValidShortName()
+    {
+        return Global.Faker.Lorem.Letter(3);
+    }
 
     [Theory]
     [InlineData("")]
@@ -45,21 +60,24 @@ public class CreateCurrencyTests : IAsyncLifetime
     [InlineData("jjjjjjjjjjjjjjjjjjjjjjjjjjjjjj")]
     public async Task CreateCurrency_WithInvalidShortName_ThrowsValidationException(string shortName)
     {
-        var command = new CreateCurrencyCommand(shortName, GetValidName(), GetValidCurrencySign(), GetValidCurrencyCode());
+        var command =
+            new CreateCurrencyCommand(shortName, GetValidName(), GetValidCurrencySign(), GetValidCurrencyCode());
         await Assert.ThrowsAsync<ValidationException>(async () => await _mediator.Send(command));
     }
-    
+
     [Theory]
     [InlineData("")]
     [InlineData("  ")]
     [InlineData("d")]
-    [InlineData("ddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd")]
+    [InlineData(
+        "ddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd")]
     public async Task CreateCurrency_WithInvalidName_ThrowsValidationException(string name)
     {
-        var command = new CreateCurrencyCommand(GetValidShortName(), name, GetValidCurrencySign(), GetValidCurrencyCode());
+        var command =
+            new CreateCurrencyCommand(GetValidShortName(), name, GetValidCurrencySign(), GetValidCurrencyCode());
         await Assert.ThrowsAsync<ValidationException>(async () => await _mediator.Send(command));
     }
-    
+
     [Theory]
     [InlineData("")]
     [InlineData("  ")]
@@ -69,7 +87,7 @@ public class CreateCurrencyTests : IAsyncLifetime
         var command = new CreateCurrencyCommand(GetValidShortName(), GetValidName(), sign, GetValidCurrencyCode());
         await Assert.ThrowsAsync<ValidationException>(async () => await _mediator.Send(command));
     }
-    
+
     [Theory]
     [InlineData("")]
     [InlineData("  ")]
@@ -90,18 +108,22 @@ public class CreateCurrencyTests : IAsyncLifetime
         var sign = GetValidCurrencySign();
 
         await _mediator.Send(new CreateCurrencyCommand(shortName, name, sign, code));
-        
+
         await Assert.ThrowsAsync<CurrencyCodeTakenException>(async () =>
-            await _mediator.Send(new CreateCurrencyCommand(GetValidShortName(), GetValidName(), GetValidCurrencySign(), code)));
-        
+            await _mediator.Send(new CreateCurrencyCommand(GetValidShortName(), GetValidName(), GetValidCurrencySign(),
+                code)));
+
         await Assert.ThrowsAsync<CurrencyNameTakenException>(async () =>
-            await _mediator.Send(new CreateCurrencyCommand(GetValidShortName(), name, GetValidCurrencySign(), GetValidCurrencyCode())));
-        
+            await _mediator.Send(new CreateCurrencyCommand(GetValidShortName(), name, GetValidCurrencySign(),
+                GetValidCurrencyCode())));
+
         await Assert.ThrowsAsync<CurrencySignTakenException>(async () =>
-            await _mediator.Send(new CreateCurrencyCommand(GetValidShortName(), GetValidName(), sign, GetValidCurrencyCode())));
-        
+            await _mediator.Send(new CreateCurrencyCommand(GetValidShortName(), GetValidName(), sign,
+                GetValidCurrencyCode())));
+
         await Assert.ThrowsAsync<CurrencyShortNameTakenException>(async () =>
-            await _mediator.Send(new CreateCurrencyCommand(shortName, GetValidName(), GetValidCurrencySign(), GetValidCurrencyCode())));
+            await _mediator.Send(new CreateCurrencyCommand(shortName, GetValidName(), GetValidCurrencySign(),
+                GetValidCurrencyCode())));
     }
 
     [Fact]

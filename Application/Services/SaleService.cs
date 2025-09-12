@@ -1,5 +1,4 @@
 using Core.Entities;
-using Core.Interfaces;
 using Core.Interfaces.Services;
 using Core.Models;
 using Mapster;
@@ -8,9 +7,11 @@ namespace Application.Services;
 
 public class SaleService : ISaleService
 {
-    public Dictionary<int, Queue<SaleContentDetail>> GetDetailsGroup(IEnumerable<PrevAndNewValue<StorageContent>> storageContentValues)
+    public Dictionary<int, Queue<SaleContentDetail>> GetDetailsGroup(
+        IEnumerable<PrevAndNewValue<StorageContent>> storageContentValues)
     {
-        return storageContentValues.Select(x => {
+        return storageContentValues.Select(x =>
+            {
                 var taken = x.Prev.Count - x.NewValue.Count;
                 if (taken <= 0 || taken > x.Prev.Count)
                     throw new ArgumentException("Некорректное taken количество");

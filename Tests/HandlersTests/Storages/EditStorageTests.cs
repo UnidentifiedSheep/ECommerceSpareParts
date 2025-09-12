@@ -12,17 +12,18 @@ using Persistence.Contexts;
 using Tests.MockData;
 using Tests.testContainers.Combined;
 using static Tests.MockData.MockData;
+using ValidationException = FluentValidation.ValidationException;
 
 namespace Tests.HandlersTests.Storages;
 
 [Collection("Combined collection")]
 public class EditStorageTests : IAsyncLifetime
 {
-    private readonly Faker _faker = new(Locale);
     private readonly DContext _context;
+    private readonly Faker _faker = new(Locale);
     private readonly IMediator _mediator;
     private Storage _storage = null!;
-    
+
     public EditStorageTests(CombinedContainerFixture fixture)
     {
         MapsterConfig.Configure();
@@ -30,7 +31,7 @@ public class EditStorageTests : IAsyncLifetime
         _mediator = sp.GetService<IMediator>()!;
         _context = sp.GetRequiredService<DContext>();
     }
-        
+
     public async Task InitializeAsync()
     {
         await _mediator.AddMockProducersAndArticles();
@@ -42,7 +43,7 @@ public class EditStorageTests : IAsyncLifetime
     {
         await _context.ClearDatabaseFull();
     }
-    
+
     [Fact]
     public async Task EditStorage_IsNotSetButHasDescriptionValue_Succeeds()
     {
@@ -60,12 +61,12 @@ public class EditStorageTests : IAsyncLifetime
             .AsNoTracking()
             .FirstOrDefaultAsync(x => x.Name == _storage.Name);
         Assert.NotNull(storage);
-        
+
         Assert.Equal(_storage.Name, storage.Name);
         Assert.Equal(_storage.Description, storage.Description);
         Assert.Equal(_storage.Location, storage.Location);
     }
-    
+
     [Fact]
     public async Task EditStorage_IsNotSetButHasLocationValue_Succeeds()
     {
@@ -79,17 +80,17 @@ public class EditStorageTests : IAsyncLifetime
         };
         var command = new EditStorageCommand(_storage.Name, model);
         await _mediator.Send(command);
-        
+
         var storage = await _context.Storages
             .AsNoTracking()
             .FirstOrDefaultAsync(x => x.Name == _storage.Name);
         Assert.NotNull(storage);
-        
+
         Assert.Equal(_storage.Name, storage.Name);
         Assert.Equal(_storage.Description, storage.Description);
         Assert.Equal(_storage.Location, storage.Location);
     }
-    
+
     [Fact]
     public async Task EditStorage_TooLargeLocation_FailsValidation()
     {
@@ -102,9 +103,9 @@ public class EditStorageTests : IAsyncLifetime
             }
         };
         var command = new EditStorageCommand(_storage.Name, model);
-        await Assert.ThrowsAsync<FluentValidation.ValidationException>(async () => await _mediator.Send(command));
+        await Assert.ThrowsAsync<ValidationException>(async () => await _mediator.Send(command));
     }
-    
+
     [Fact]
     public async Task EditStorage_TooLargeDesctiption_FailsValidation()
     {
@@ -117,9 +118,9 @@ public class EditStorageTests : IAsyncLifetime
             }
         };
         var command = new EditStorageCommand(_storage.Name, model);
-        await Assert.ThrowsAsync<FluentValidation.ValidationException>(async () => await _mediator.Send(command));
+        await Assert.ThrowsAsync<ValidationException>(async () => await _mediator.Send(command));
     }
-    
+
     [Fact]
     public async Task EditStorage_Normal_Succeeds()
     {
@@ -138,7 +139,7 @@ public class EditStorageTests : IAsyncLifetime
         };
         var command = new EditStorageCommand(_storage.Name, model);
         await _mediator.Send(command);
-        
+
         var storage = await _context.Storages
             .AsNoTracking()
             .FirstOrDefaultAsync(x => x.Name == _storage.Name);
@@ -146,7 +147,7 @@ public class EditStorageTests : IAsyncLifetime
         Assert.Equal(storage.Description, model.Description);
         Assert.Equal(storage.Location, model.Location);
     }
-    
+
     [Fact]
     public async Task EditStorage_InvalidStorageName_ThrowsStorageNotFound()
     {

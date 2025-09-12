@@ -1,15 +1,13 @@
 using Application.Interfaces;
-using Core.Entities;
-using Core.Extensions;
 using Core.Interfaces;
 using Core.Interfaces.DbRepositories;
-using Core.Interfaces.Services;
-using Core.StaticFunctions;
 using FluentValidation;
 
 namespace Application.Handlers.Users;
 
-public record CreateMailForUserCommand(string UserId, string MailBox, string? Password, string? Comment) : ICommand<CreateMailForUserResult>;
+public record CreateMailForUserCommand(string UserId, string MailBox, string? Password, string? Comment)
+    : ICommand<CreateMailForUserResult>;
+
 public record CreateMailForUserResult(string MailBoxAddress, string Password);
 
 public class CreateMailForUserValidation : AbstractValidator<CreateMailForUserCommand>
@@ -26,9 +24,11 @@ public class CreateMailForUserValidation : AbstractValidator<CreateMailForUserCo
     }
 }
 
-public class CreateMailForUserHandler(IUserEmailRepository emailRepository, ITimeWebMail timeWebMail) : ICommandHandler<CreateMailForUserCommand, CreateMailForUserResult>
+public class CreateMailForUserHandler(IUserEmailRepository emailRepository, ITimeWebMail timeWebMail)
+    : ICommandHandler<CreateMailForUserCommand, CreateMailForUserResult>
 {
-    public async Task<CreateMailForUserResult> Handle(CreateMailForUserCommand request, CancellationToken cancellationToken)
+    public async Task<CreateMailForUserResult> Handle(CreateMailForUserCommand request,
+        CancellationToken cancellationToken)
     {
         throw new NotImplementedException();
         /*var user = await context.AspNetUsers.AsNoTracking().AnyAsync(x => x.Id == request.UserId, cancellationToken);

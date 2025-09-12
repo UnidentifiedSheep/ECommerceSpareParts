@@ -1,16 +1,14 @@
 using Application.Configs;
-using Application.Handlers.Articles.CreateArticles;
 using Application.Handlers.Articles.PatchArticle;
-using Application.Handlers.Producers.CreateProducer;
 using Core.Dtos.Amw.Articles;
 using Core.Models;
 using Exceptions.Exceptions.Articles;
+using FluentValidation;
 using MediatR;
 using Microsoft.Extensions.DependencyInjection;
 using Persistence.Contexts;
 using Tests.MockData;
 using Tests.testContainers.Combined;
-using static Tests.MockData.MockData;
 
 namespace Tests.HandlersTests.Articles;
 
@@ -19,7 +17,7 @@ public class EditArticleTests : IAsyncLifetime
 {
     private readonly DContext _context;
     private readonly IMediator _mediator;
-    
+
     public EditArticleTests(CombinedContainerFixture fixture)
     {
         MapsterConfig.Configure();
@@ -27,7 +25,7 @@ public class EditArticleTests : IAsyncLifetime
         _mediator = sp.GetService<IMediator>()!;
         _context = sp.GetRequiredService<DContext>();
     }
-        
+
     public async Task InitializeAsync()
     {
         await _mediator.AddMockProducersAndArticles();
@@ -37,7 +35,7 @@ public class EditArticleTests : IAsyncLifetime
     {
         await _context.ClearDatabaseFull();
     }
-    
+
     [Fact]
     public async Task EditArticle_NumberAndName_Succeeds()
     {
@@ -56,7 +54,7 @@ public class EditArticleTests : IAsyncLifetime
         Assert.Equal("67890", updatedArticle!.ArticleNumber);
         Assert.Equal("Updated Article", updatedArticle.ArticleName);
     }
-    
+
     [Fact]
     public async Task EditArticle_WithInvalidArticleId_FailsValidation()
     {
@@ -81,7 +79,7 @@ public class EditArticleTests : IAsyncLifetime
                 ArticleNumber = new PatchField<string> { IsSet = true, Value = "" }
             });
 
-        await Assert.ThrowsAsync<FluentValidation.ValidationException>(async () => await _mediator.Send(command));
+        await Assert.ThrowsAsync<ValidationException>(async () => await _mediator.Send(command));
     }
 
     [Fact]
@@ -98,7 +96,7 @@ public class EditArticleTests : IAsyncLifetime
 
         Assert.Equal(Unit.Value, result);
     }
-        
+
     [Fact]
     public async Task EditArticle_WhenArticleNumberNull_FailsValidation()
     {
@@ -108,7 +106,6 @@ public class EditArticleTests : IAsyncLifetime
             {
                 ArticleNumber = new PatchField<string> { IsSet = true, Value = null }
             });
-        await Assert.ThrowsAsync<FluentValidation.ValidationException>(async () => await _mediator.Send(command));
+        await Assert.ThrowsAsync<ValidationException>(async () => await _mediator.Send(command));
     }
-    
 }

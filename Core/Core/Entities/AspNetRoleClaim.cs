@@ -1,6 +1,6 @@
 ﻿namespace Core.Entities;
 
-public partial class AspNetRoleClaim
+public class AspNetRoleClaim
 {
     public int Id { get; set; }
 

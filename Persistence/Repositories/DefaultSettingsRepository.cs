@@ -30,10 +30,10 @@ public class DefaultSettingsRepository(DContext context) : IDefaultSettingsRepos
         return settings;
     }
 
-    public async Task<DefaultSetting?> GetSettingForUpdateAsync(string key, bool track = true, CancellationToken cancellationToken = default)
+    public async Task<DefaultSetting?> GetSettingForUpdateAsync(string key, bool track = true,
+        CancellationToken cancellationToken = default)
     {
         return await context.DefaultSettings.ConfigureTracking(track)
             .FirstOrDefaultAsync(x => x.Key == key, cancellationToken);
-            
     }
 }

@@ -1,7 +1,6 @@
 using Application.Interfaces;
 using Core.Attributes;
 using Core.Dtos.Amw.ArticleCharacteristics;
-using Core.Interfaces;
 using Core.Interfaces.DbRepositories;
 using Core.Interfaces.Services;
 using Exceptions.Exceptions.ArticleCharacteristics;
@@ -13,7 +12,8 @@ namespace Application.Handlers.ArticleCharacteristics.PatchCharacteristics;
 [Transactional]
 public record PatchCharacteristicsCommand(int Id, PatchCharacteristicsDto NewValues) : ICommand;
 
-public class PatchCharacteristicsHandler(IArticleCharacteristicsRepository repository, 
+public class PatchCharacteristicsHandler(
+    IArticleCharacteristicsRepository repository,
     IUnitOfWork unitOfWork) : ICommandHandler<PatchCharacteristicsCommand>
 {
     public async Task<Unit> Handle(PatchCharacteristicsCommand request, CancellationToken cancellationToken)

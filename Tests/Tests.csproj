@@ -8,15 +8,15 @@
     </PropertyGroup>
 
     <ItemGroup>
-        <PackageReference Include="Bogus" Version="35.6.3" />
+        <PackageReference Include="Bogus" Version="35.6.3"/>
         <PackageReference Include="coverlet.collector" Version="6.0.2"/>
-        <PackageReference Include="Microsoft.AspNetCore.Mvc.Testing" Version="9.0.6" />
-        <PackageReference Include="Microsoft.EntityFrameworkCore.InMemory" Version="9.0.6" />
-        <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" Version="9.0.6" />
+        <PackageReference Include="Microsoft.AspNetCore.Mvc.Testing" Version="9.0.6"/>
+        <PackageReference Include="Microsoft.EntityFrameworkCore.InMemory" Version="9.0.6"/>
+        <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" Version="9.0.6"/>
         <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.12.0"/>
-        <PackageReference Include="Moq" Version="4.20.72" />
-        <PackageReference Include="Testcontainers.PostgreSql" Version="4.6.0" />
-        <PackageReference Include="Testcontainers.Redis" Version="4.6.0" />
+        <PackageReference Include="Moq" Version="4.20.72"/>
+        <PackageReference Include="Testcontainers.PostgreSql" Version="4.6.0"/>
+        <PackageReference Include="Testcontainers.Redis" Version="4.6.0"/>
         <PackageReference Include="xunit" Version="2.9.2"/>
         <PackageReference Include="xunit.runner.visualstudio" Version="2.8.2"/>
     </ItemGroup>
@@ -26,7 +26,7 @@
     </ItemGroup>
 
     <ItemGroup>
-      <ProjectReference Include="..\MonoliteUnicorn\MonoliteUnicorn.csproj" />
+        <ProjectReference Include="..\MonoliteUnicorn\MonoliteUnicorn.csproj"/>
     </ItemGroup>
 
 </Project>

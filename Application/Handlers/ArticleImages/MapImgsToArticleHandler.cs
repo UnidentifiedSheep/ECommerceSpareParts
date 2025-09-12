@@ -3,10 +3,9 @@ using MediatR;
 
 namespace Application.Handlers.Articles;
 
-public record MapImgsToArticleCommand(/*IFormFileCollection Imgs, int ArticleId*/) : ICommand;
+public record MapImgsToArticleCommand : ICommand;
 
-
-public class MapImgsToArticleHandler(/*DContext context, IS3StorageService s3Storage, CacheQueue cacheQueue*/) : ICommandHandler<MapImgsToArticleCommand, Unit>
+public class MapImgsToArticleHandler : ICommandHandler<MapImgsToArticleCommand, Unit>
 {
     public async Task<Unit> Handle(MapImgsToArticleCommand request, CancellationToken cancellationToken)
     {

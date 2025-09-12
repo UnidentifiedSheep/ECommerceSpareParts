@@ -22,7 +22,7 @@ public class PatchArticleValidation : AbstractValidator<PatchArticleCommand>
             .Must(x => x != null && x.Trim().Length <= 128)
             .When(x => x.PatchArticle.ArticleNumber.IsSet)
             .WithMessage("Максимальная длина артикула 128 символов");
-        
+
         //ArticleName
         RuleFor(x => x.PatchArticle.ArticleName.Value)
             .NotEmpty()

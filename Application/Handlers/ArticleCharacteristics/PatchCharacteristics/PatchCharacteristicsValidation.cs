@@ -17,7 +17,7 @@ public class PatchCharacteristicsValidation : AbstractValidator<PatchCharacteris
             .MaximumLength(128)
             .When(x => x.NewValues.Value.IsSet)
             .WithMessage("Длина значение не должна быть больше 128 символов");
-                
+
         RuleFor(x => x.NewValues.Name.Value)
             .MaximumLength(128)
             .When(x => x.NewValues.Name.IsSet)

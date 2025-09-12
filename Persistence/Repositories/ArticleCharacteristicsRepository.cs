@@ -14,7 +14,9 @@ public class ArticleCharacteristicsRepository(DContext context) : IArticleCharac
         return await context.ArticleCharacteristics.ConfigureTracking(track).Where(x => x.ArticleId == articleId)
             .ToListAsync(cancellationToken);
     }
-    public async Task<ArticleCharacteristic?> GetCharacteristic(int id, bool track = true, CancellationToken cancellationToken = default)
+
+    public async Task<ArticleCharacteristic?> GetCharacteristic(int id, bool track = true,
+        CancellationToken cancellationToken = default)
     {
         return await context.ArticleCharacteristics.ConfigureTracking(track)
             .FirstOrDefaultAsync(x => x.Id == id, cancellationToken);

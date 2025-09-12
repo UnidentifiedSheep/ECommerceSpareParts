@@ -1,14 +1,14 @@
 ﻿using Exceptions.Base;
 
-namespace Exceptions.Exceptions.Currencies
+namespace Exceptions.Exceptions.Currencies;
+
+public class CurrencyNotFoundException : NotFoundException
 {
-	public class CurrencyNotFoundException : NotFoundException
-	{
-		public CurrencyNotFoundException(object id) : base("Валюта не найдена", new {Id = id})
-		{
-		}
-		public CurrencyNotFoundException(IEnumerable<int> ids) : base($"Не удалось найти валюты", new {Ids = ids})
-		{
-		}
-	}
+    public CurrencyNotFoundException(object id) : base("Валюта не найдена", new { Id = id })
+    {
+    }
+
+    public CurrencyNotFoundException(IEnumerable<int> ids) : base("Не удалось найти валюты", new { Ids = ids })
+    {
+    }
 }

@@ -19,10 +19,10 @@ public class RemoveContentFromStorageTests : IAsyncLifetime
 {
     private readonly DContext _context;
     private readonly IMediator _mediator;
-    private AspNetUser _user = null!;
     private List<StorageContent> _storageContents = null!;
     private List<Storage> _storages = null!;
-    
+    private AspNetUser _user = null!;
+
     public RemoveContentFromStorageTests(CombinedContainerFixture fixture)
     {
         MapsterConfig.Configure();
@@ -30,7 +30,7 @@ public class RemoveContentFromStorageTests : IAsyncLifetime
         _context = sp.GetRequiredService<DContext>();
         _mediator = sp.GetRequiredService<IMediator>();
     }
-        
+
     public async Task InitializeAsync()
     {
         await _mediator.AddMockProducersAndArticles();
@@ -38,7 +38,7 @@ public class RemoveContentFromStorageTests : IAsyncLifetime
         await _mediator.AddMockUser();
         await _mediator.AddMockStorage();
         await _mediator.AddMockStorage();
-        
+
         _storages = await _context.Storages.ToListAsync();
         _user = await _context.AspNetUsers.FirstAsync();
         var articleIds = await _context.Articles.Select(a => a.Id).ToListAsync();
@@ -46,7 +46,7 @@ public class RemoveContentFromStorageTests : IAsyncLifetime
 
         foreach (var storage in _storages)
             await _mediator.AddMockStorageContents(articleIds, currency.Id, storage.Name, _user.Id, 50);
-        
+
         _storageContents = await _context.StorageContents.ToListAsync();
     }
 
@@ -62,7 +62,7 @@ public class RemoveContentFromStorageTests : IAsyncLifetime
         var userId = Global.Faker.Random.Guid().ToString();
         var article = _storageContents.First();
 
-        var content = new Dictionary<int, int>()
+        var content = new Dictionary<int, int>
         {
             [article.Id] = 1
         };
@@ -82,7 +82,7 @@ public class RemoveContentFromStorageTests : IAsyncLifetime
     public async Task RemoveContentFromStorage_WithoutStorageNameAndNoOtherStorages_ThrowsStorageIsUnknownException()
     {
         var article = _storageContents.First();
-        var content = new Dictionary<int, int>()
+        var content = new Dictionary<int, int>
         {
             [article.Id] = 1
         };
@@ -99,13 +99,14 @@ public class RemoveContentFromStorageTests : IAsyncLifetime
     public async Task RemoveContentFromStorage_WithNegativeCount_ThrowsArgumentException(int count)
     {
         var article = _storageContents.First();
-        
-        var content = new Dictionary<int, int>()
+
+        var content = new Dictionary<int, int>
         {
             [article.Id] = count
         };
 
-        var command = new RemoveContentCommand(content, _user.Id, _storages.First().Name, false, StorageMovementType.Sale);
+        var command =
+            new RemoveContentCommand(content, _user.Id, _storages.First().Name, false, StorageMovementType.Sale);
         await Assert.ThrowsAsync<ValidationException>(async () => await _mediator.Send(command));
     }
 
@@ -114,13 +115,14 @@ public class RemoveContentFromStorageTests : IAsyncLifetime
     {
         var storageContent = _storageContents.First();
         var article = await _context.Articles.AsNoTracking().FirstAsync(x => x.Id == storageContent.ArticleId);
-        var content = new Dictionary<int, int>()
+        var content = new Dictionary<int, int>
         {
             [article.Id] = article.TotalCount + 1000
         };
 
-        var command = new RemoveContentCommand(content, _user.Id, storageContent.StorageName, false, StorageMovementType.Sale);
-        
+        var command = new RemoveContentCommand(content, _user.Id, storageContent.StorageName, false,
+            StorageMovementType.Sale);
+
         await Assert.ThrowsAsync<NotEnoughCountOnStorageException>(async () => await _mediator.Send(command));
     }
 
@@ -129,27 +131,28 @@ public class RemoveContentFromStorageTests : IAsyncLifetime
     {
         var storageContent = _storageContents.First();
         var totalCount = _storageContents
-            .Where(x => x.ArticleId == storageContent.ArticleId && 
+            .Where(x => x.ArticleId == storageContent.ArticleId &&
                         x.StorageName == storageContent.StorageName)
             .Sum(x => x.Count);
         var countToRemove = Global.Faker.Random.Int(1, totalCount);
 
-        var content = new Dictionary<int, int>()
+        var content = new Dictionary<int, int>
         {
             [storageContent.ArticleId] = countToRemove
         };
 
-        var command = new RemoveContentCommand(content, _user.Id, storageContent.StorageName, false, StorageMovementType.Sale);
+        var command = new RemoveContentCommand(content, _user.Id, storageContent.StorageName, false,
+            StorageMovementType.Sale);
 
-        
+
         var result = await _mediator.Send(command);
 
         var updatedCount = await _context.StorageContents
             .AsNoTracking()
-            .Where(x => x.StorageName == storageContent.StorageName 
+            .Where(x => x.StorageName == storageContent.StorageName
                         && x.ArticleId == storageContent.ArticleId)
             .SumAsync(x => x.Count);
-        
+
         Assert.NotEmpty(result.Changes);
         Assert.Equal(totalCount - countToRemove, updatedCount);
         Assert.Equal(countToRemove, result.Changes.Sum(r => r.Prev.Count - r.NewValue.Count));
@@ -162,16 +165,14 @@ public class RemoveContentFromStorageTests : IAsyncLifetime
         var totalCount = _storageContents
             .Where(x => x.ArticleId == articleId)
             .Sum(x => x.Count);
-        
-        var content = new Dictionary<int, int>()
+
+        var content = new Dictionary<int, int>
         {
             [articleId] = totalCount
         };
 
         var command = new RemoveContentCommand(content, _user.Id, null, true, StorageMovementType.Sale);
 
-
-        
 
         var result = await _mediator.Send(command);
 
@@ -185,14 +186,15 @@ public class RemoveContentFromStorageTests : IAsyncLifetime
     public async Task RemoveContentFromStorage_SavesMovementWithCorrectData()
     {
         var storageContent = _storageContents.First();
-        var content = new Dictionary<int, int>()
+        var content = new Dictionary<int, int>
         {
             [storageContent.ArticleId] = 1
         };
 
-        var command = new RemoveContentCommand(content, _user.Id, storageContent.StorageName, false, StorageMovementType.Sale);
+        var command = new RemoveContentCommand(content, _user.Id, storageContent.StorageName, false,
+            StorageMovementType.Sale);
         await _mediator.Send(command);
-        
+
         var movement = await _context.StorageMovements
             .Where(m => m.ArticleId == storageContent.ArticleId && m.StorageName == storageContent.StorageName)
             .OrderByDescending(m => m.CreatedAt)

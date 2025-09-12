@@ -9,7 +9,8 @@ public class UserEmailRepository(DContext context) : IUserEmailRepository
 {
     public async Task<bool> EmailTaken(string email, CancellationToken ct = default)
     {
-        var exists = await context.UserMails.AsNoTracking().AnyAsync(x => x.NormalizedEmail == email.ToNormalized(), ct);
+        var exists = await context.UserMails.AsNoTracking()
+            .AnyAsync(x => x.NormalizedEmail == email.ToNormalized(), ct);
         return exists;
     }
 }

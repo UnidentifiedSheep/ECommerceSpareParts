@@ -5,8 +5,16 @@ using FluentValidation;
 
 namespace Application.Handlers.Purchases;
 
-public record GetPurchaseMemberQuery(DateTime RangeStartDate, DateTime RangeEndDate, int Page, int ViewCount, string UserId, 
-    int? CurrencyId, string? SortBy, string? SearchTerm) : IQuery<GetPurchaseMemberResult>;
+public record GetPurchaseMemberQuery(
+    DateTime RangeStartDate,
+    DateTime RangeEndDate,
+    int Page,
+    int ViewCount,
+    string UserId,
+    int? CurrencyId,
+    string? SortBy,
+    string? SearchTerm) : IQuery<GetPurchaseMemberResult>;
+
 public record GetPurchaseMemberResult(IEnumerable<PurchaseDto> Purchases);
 
 public class GetPurchasesMemberValidation : AbstractValidator<GetPurchaseMemberQuery>
@@ -31,9 +39,11 @@ public class GetPurchasesMemberValidation : AbstractValidator<GetPurchaseMemberQ
     }
 }
 
-public class GetPurchaseMemberHandler(IPurchaseRepository purchaseRepository) : IQueryHandler<GetPurchaseMemberQuery, GetPurchaseMemberResult>
+public class GetPurchaseMemberHandler(IPurchaseRepository purchaseRepository)
+    : IQueryHandler<GetPurchaseMemberQuery, GetPurchaseMemberResult>
 {
-    public async Task<GetPurchaseMemberResult> Handle(GetPurchaseMemberQuery request, CancellationToken cancellationToken)
+    public async Task<GetPurchaseMemberResult> Handle(GetPurchaseMemberQuery request,
+        CancellationToken cancellationToken)
     {
         /*var query = context.Sales.AsNoTracking().Where(x => x.BuyerId == request.UserId);
 
@@ -51,7 +61,7 @@ public class GetPurchaseMemberHandler(IPurchaseRepository purchaseRepository) : 
             query = query.Where(x => x.SaleContents
                 .Any(content => (EF.Functions.ToTsVector("russian", content.Article.ArticleName)
                                      .Matches(EF.Functions.PlainToTsQuery("russian", searchTerm)) ||
-                                 EF.Functions.ILike(content.Article.NormalizedArticleNumber, $"%{normalizedSearchTerm}%")) || 
+                                 EF.Functions.ILike(content.Article.NormalizedArticleNumber, $"%{normalizedSearchTerm}%")) ||
                                 (content.Comment != null && EF.Functions.ILike(content.Comment, $"%{searchTerm}%"))));
         }
         var startDate = DateTime.SpecifyKind(request.RangeStartDate.Date, DateTimeKind.Unspecified);

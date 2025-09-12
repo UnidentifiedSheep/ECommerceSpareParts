@@ -5,7 +5,8 @@ using MassTransit;
 
 namespace RabbitMq.Consumers;
 
-public class CurrencyRatesChangedConsumer(ICurrencyRepository currencyRepository, ICurrencyConverter currencyConverter) : IConsumer<CurrencyRateChangedEvent>
+public class CurrencyRatesChangedConsumer(ICurrencyRepository currencyRepository, ICurrencyConverter currencyConverter)
+    : IConsumer<CurrencyRateChangedEvent>
 {
     public async Task Consume(ConsumeContext<CurrencyRateChangedEvent> context)
     {

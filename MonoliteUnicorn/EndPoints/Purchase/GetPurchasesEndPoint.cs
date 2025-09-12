@@ -27,18 +27,18 @@ public class GetPurchasesEndPoint : ICarterModule
 {
     public void AddRoutes(IEndpointRouteBuilder app)
     {
-        app.MapGet("/purchases/", async (ISender sender, [AsParameters] GetPurchasesRequest request, ClaimsPrincipal user, CancellationToken token) =>
-        {
-            var query = new GetPurchasesQuery(request.RangeStartDate, request.RangeEndDate, 
-                new PaginationModel(request.Page, request.ViewCount),
-                request.SupplierId, request.CurrencyId, request.SortBy, request.SearchTerm);
-            var result = await sender.Send(query, token);
-            var response = result.Adapt<GetPurchasesResponse>();
-            return Results.Ok(response);
-        }).RequireAuthorization("AMW")
-        .WithTags("Purchases")
-        .WithDescription("Получение списка покупок")
-        .WithDisplayName("Получение покупок");
+        app.MapGet("/purchases/", async (ISender sender, [AsParameters] GetPurchasesRequest request,
+                ClaimsPrincipal user, CancellationToken token) =>
+            {
+                var query = new GetPurchasesQuery(request.RangeStartDate, request.RangeEndDate,
+                    new PaginationModel(request.Page, request.ViewCount),
+                    request.SupplierId, request.CurrencyId, request.SortBy, request.SearchTerm);
+                var result = await sender.Send(query, token);
+                var response = result.Adapt<GetPurchasesResponse>();
+                return Results.Ok(response);
+            }).RequireAuthorization("AMW")
+            .WithTags("Purchases")
+            .WithDescription("Получение списка покупок")
+            .WithDisplayName("Получение покупок");
     }
-    
 }

@@ -17,14 +17,13 @@ public class EditPurchaseDtoValidation : AbstractValidator<IEnumerable<EditPurch
                 z.RuleFor(x => x.Price)
                     .SetValidator(new PriceValidator());
             });
-        
+
         RuleFor(z => z)
             .Must(z =>
             {
                 var ids = z.Where(x => x.Id != null).Select(x => x.Id!.Value).ToList();
                 var idsSet = ids.ToHashSet();
                 return ids.Count == idsSet.Count;
-                
             })
             .WithMessage("Дубликаты номеров позиций не разрешены.");
     }

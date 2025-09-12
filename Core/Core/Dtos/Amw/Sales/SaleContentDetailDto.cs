@@ -3,7 +3,7 @@ namespace Core.Dtos.Amw.Sales;
 public class SaleContentDetailDto
 {
     public int Id { get; set; }
-    
+
     public int SaleContentId { get; set; }
 
     public int? StorageContentId { get; set; }

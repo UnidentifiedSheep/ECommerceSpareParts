@@ -15,7 +15,7 @@ public class DeleteProducerTest : IAsyncLifetime
 {
     private readonly DContext _context;
     private readonly IMediator _mediator;
-    
+
     public DeleteProducerTest(CombinedContainerFixture fixture)
     {
         MapsterConfig.Configure();
@@ -23,7 +23,7 @@ public class DeleteProducerTest : IAsyncLifetime
         _mediator = sp.GetService<IMediator>()!;
         _context = sp.GetRequiredService<DContext>();
     }
-        
+
     public async Task InitializeAsync()
     {
         await _mediator.AddMockProducersAndArticles();
@@ -33,14 +33,14 @@ public class DeleteProducerTest : IAsyncLifetime
     {
         await _context.ClearDatabaseFull();
     }
-    
+
     [Fact]
     public async Task DeleteProducer_InvalidProducerId_ThrowsProducerNotFound()
     {
         var command = new DeleteProducerCommand(int.MaxValue);
         await Assert.ThrowsAsync<ProducerNotFoundException>(async () => await _mediator.Send(command));
     }
-    
+
     [Fact]
     public async Task DeleteProducer_WhenProducerHasArticle_ThrowsCannotDeleteProducerWithArticles()
     {
@@ -49,7 +49,7 @@ public class DeleteProducerTest : IAsyncLifetime
         var command = new DeleteProducerCommand(article.ProducerId);
         await Assert.ThrowsAsync<CannotDeleteProducerWithArticlesException>(async () => await _mediator.Send(command));
     }
-    
+
     [Fact]
     public async Task DeleteProducer_Normal_Succeeds()
     {
@@ -57,10 +57,10 @@ public class DeleteProducerTest : IAsyncLifetime
             .Include(x => x.Articles)
             .FirstOrDefaultAsync();
         Assert.NotNull(producer);
-        
+
         _context.Articles.RemoveRange(producer.Articles);
         await _context.SaveChangesAsync();
-        
+
         var command = new DeleteProducerCommand(producer.Id);
         await _mediator.Send(command);
     }

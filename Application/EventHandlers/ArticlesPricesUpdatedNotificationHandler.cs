@@ -4,7 +4,8 @@ using MediatR;
 
 namespace Application.EventHandlers;
 
-public class ArticlesPricesUpdatedNotificationHandler(IMediator mediator) : INotificationHandler<ArticlePricesUpdatedEvent>
+public class ArticlesPricesUpdatedNotificationHandler(IMediator mediator)
+    : INotificationHandler<ArticlePricesUpdatedEvent>
 {
     public async Task Handle(ArticlePricesUpdatedEvent notification, CancellationToken cancellationToken)
     {

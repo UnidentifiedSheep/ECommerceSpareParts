@@ -6,8 +6,9 @@ public static class Global
 {
     public const string SystemId = "SYSTEM";
     public const int UsdId = 3;
-    public readonly static JsonSerializerOptions JsonOptions = new JsonSerializerOptions
+
+    public static readonly JsonSerializerOptions JsonOptions = new()
     {
-        PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
+        PropertyNamingPolicy = JsonNamingPolicy.CamelCase
     };
 }

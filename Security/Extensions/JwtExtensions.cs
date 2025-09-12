@@ -15,11 +15,15 @@ public static class JwtExtensions
         var nameId = jwtToken.Claims.FirstOrDefault(claim => claim.Type == "nameid")?.Value;
         return nameId;
     }
-    
-    public static string? GetUserId(this ClaimsPrincipal user) =>
-        user.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+
+    public static string? GetUserId(this ClaimsPrincipal user)
+    {
+        return user.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+    }
 
 
     public static List<string> GetUserRoles(this ClaimsPrincipal user)
-        => user.FindAll(ClaimTypes.Role).Select(r => r.Value).ToList();
+    {
+        return user.FindAll(ClaimTypes.Role).Select(r => r.Value).ToList();
+    }
 }

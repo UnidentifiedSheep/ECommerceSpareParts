@@ -1,6 +1,5 @@
 using Application.Interfaces;
 using Core.Attributes;
-using Core.Interfaces;
 using Core.Interfaces.DbRepositories;
 using Core.Interfaces.Services;
 using Exceptions.Exceptions.Producers;
@@ -11,16 +10,17 @@ namespace Application.Handlers.Producers.DeleteProducer;
 [Transactional]
 public record DeleteProducerCommand(int Id) : ICommand;
 
-public class DeleteProducerHandler(IProducerRepository producerRepository, IUnitOfWork unitOfWork) : ICommandHandler<DeleteProducerCommand>
+public class DeleteProducerHandler(IProducerRepository producerRepository, IUnitOfWork unitOfWork)
+    : ICommandHandler<DeleteProducerCommand>
 {
     public async Task<Unit> Handle(DeleteProducerCommand request, CancellationToken cancellationToken)
     {
         var producerId = request.Id;
         var producer = await producerRepository.GetProducer(producerId, true, cancellationToken)
-            ?? throw new  ProducerNotFoundException(producerId);
-        
+                       ?? throw new ProducerNotFoundException(producerId);
+
         await ValidateData(producerId, cancellationToken);
-        
+
         unitOfWork.Remove(producer);
         await unitOfWork.SaveChangesAsync(cancellationToken);
         return Unit.Value;
@@ -30,6 +30,5 @@ public class DeleteProducerHandler(IProducerRepository producerRepository, IUnit
     {
         if (await producerRepository.ProducerHasAnyArticle(id, cancellationToken))
             throw new CannotDeleteProducerWithArticlesException();
-
     }
 }

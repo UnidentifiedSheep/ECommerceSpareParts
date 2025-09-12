@@ -2,4 +2,4 @@ using MediatR;
 
 namespace Application.Events;
 
-public record MarkupRangesUpdatedEvent() : INotification;
+public record MarkupRangesUpdatedEvent : INotification;

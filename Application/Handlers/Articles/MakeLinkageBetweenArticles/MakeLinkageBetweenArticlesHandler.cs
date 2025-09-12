@@ -13,7 +13,10 @@ namespace Application.Handlers.Articles.MakeLinkageBetweenArticles;
 [Transactional]
 public record MakeLinkageBetweenArticlesCommand(NewArticleLinkageDto Linkage) : ICommand<Unit>;
 
-public class MakeLinkageBetweenArticlesHandler(IMediator mediator, IArticlesRepository articlesRepository, IUnitOfWork unitOfWork) 
+public class MakeLinkageBetweenArticlesHandler(
+    IMediator mediator,
+    IArticlesRepository articlesRepository,
+    IUnitOfWork unitOfWork)
     : ICommandHandler<MakeLinkageBetweenArticlesCommand, Unit>
 {
     public async Task<Unit> Handle(MakeLinkageBetweenArticlesCommand request, CancellationToken cancellationToken)
@@ -22,8 +25,10 @@ public class MakeLinkageBetweenArticlesHandler(IMediator mediator, IArticlesRepo
         var lrArticles = await articlesRepository
             .GetArticlesByIds([linkage.ArticleId, linkage.CrossArticleId], false, cancellationToken);
 
-        var leftArticle = lrArticles.FirstOrDefault(x => x.Id == linkage.ArticleId) ?? throw new ArticleNotFoundException(linkage.ArticleId);
-        var rightArticle = lrArticles.FirstOrDefault(x => x.Id == linkage.CrossArticleId) ?? throw new ArticleNotFoundException(linkage.CrossArticleId);
+        var leftArticle = lrArticles.FirstOrDefault(x => x.Id == linkage.ArticleId) ??
+                          throw new ArticleNotFoundException(linkage.ArticleId);
+        var rightArticle = lrArticles.FirstOrDefault(x => x.Id == linkage.CrossArticleId) ??
+                           throw new ArticleNotFoundException(linkage.CrossArticleId);
 
         var toAdd = new HashSet<(int, int)>();
 
@@ -61,19 +66,21 @@ public class MakeLinkageBetweenArticlesHandler(IMediator mediator, IArticlesRepo
 
         return Unit.Value;
     }
-    
+
     private async Task<HashSet<int>> GetCrossIds(int articleId, CancellationToken ct)
-        => (await articlesRepository.GetArticleCrossIds(articleId, ct)).ToHashSet();
-    
+    {
+        return (await articlesRepository.GetArticleCrossIds(articleId, ct)).ToHashSet();
+    }
+
     private void AddBidirectionalPairs(HashSet<(int, int)> set, IEnumerable<int> leftIds, IEnumerable<int> rightIds)
     {
         var rIds = rightIds.ToList();
         foreach (var l in leftIds)
-            foreach (var r in rIds)
-            {
-                set.Add((l, r));
-                set.Add((r, l));
-            }
+        foreach (var r in rIds)
+        {
+            set.Add((l, r));
+            set.Add((r, l));
+        }
     }
 
     private void AddBidirectionalPairs(HashSet<(int, int)> set, IEnumerable<int> ids, int singleId)

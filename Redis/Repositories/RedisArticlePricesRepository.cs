@@ -3,27 +3,23 @@ using StackExchange.Redis;
 
 namespace Redis.Repositories;
 
-
 public class RedisArticlePricesRepository : IRedisArticlePriceRepository
 {
     private readonly IDatabase _redis;
     private readonly TimeSpan? _ttl;
-    
+
     public RedisArticlePricesRepository(IDatabase redis, TimeSpan? ttl = null)
     {
         _redis = redis;
         _ttl = ttl;
     }
 
-    private static string GetUsablePriceKey(int articleId) => $"article-usable-price:{articleId}";
-    private static string GetPriceUpdateKey(int articleId) => $"article-price-update-date:{articleId}";
-    
     public async Task<Dictionary<int, double?>> GetUsablePricesAsync(IEnumerable<int> articleIds)
     {
         var ids = articleIds.DistinctBy(x => x).ToArray();
         var usablePrices = await _redis.StringGetAsync(ids.Select(x => new RedisKey(GetUsablePriceKey(x))).ToArray());
         var result = new Dictionary<int, double?>();
-        for (int i = 0; i < usablePrices.Length; i++)
+        for (var i = 0; i < usablePrices.Length; i++)
         {
             var id = ids[i];
             var redisValue = usablePrices[i];
@@ -32,6 +28,7 @@ public class RedisArticlePricesRepository : IRedisArticlePriceRepository
                 value = price;
             result.Add(id, value);
         }
+
         return result;
     }
 
@@ -44,6 +41,7 @@ public class RedisArticlePricesRepository : IRedisArticlePriceRepository
             if (price <= 0) continue;
             tasks.Add(batch.StringSetAsync(GetUsablePriceKey(articleId), price, _ttl));
         }
+
         batch.Execute();
         await Task.WhenAll(tasks);
     }
@@ -71,7 +69,7 @@ public class RedisArticlePricesRepository : IRedisArticlePriceRepository
             .ToArray();
         var result = new Dictionary<int, DateTime?>();
         var redisResult = await _redis.StringGetAsync(keys);
-        for (int i = 0; i < redisResult.Length; i++)
+        for (var i = 0; i < redisResult.Length; i++)
         {
             var id = ids[i];
             var redisValue = redisResult[i];
@@ -80,8 +78,10 @@ public class RedisArticlePricesRepository : IRedisArticlePriceRepository
                 result.Add(id, date);
                 continue;
             }
+
             result.Add(id, null);
         }
+
         return result;
     }
 
@@ -99,5 +99,15 @@ public class RedisArticlePricesRepository : IRedisArticlePriceRepository
             tasks.Add(batch.StringSetAsync(GetPriceUpdateKey(id), updateTime.ToString(Global.Culture), _ttl));
         batch.Execute();
         await Task.WhenAll(tasks);
+    }
+
+    private static string GetUsablePriceKey(int articleId)
+    {
+        return $"article-usable-price:{articleId}";
+    }
+
+    private static string GetPriceUpdateKey(int articleId)
+    {
+        return $"article-price-update-date:{articleId}";
     }
 }

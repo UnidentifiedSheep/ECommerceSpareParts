@@ -13,6 +13,5 @@ public class ProducerNameValidator : AbstractValidator<string?>
             .WithMessage("Минимальная длина названия производителя — 2 символа")
             .Must(name => name?.Trim().Length <= 64)
             .WithMessage("Максимальная длина названия производителя — 64 символа");
-
     }
 }

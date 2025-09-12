@@ -1,7 +1,6 @@
 using Application.Interfaces;
 using Core.Attributes;
 using Core.Entities;
-using Core.Interfaces;
 using Core.Interfaces.DbRepositories;
 using Core.Interfaces.Services;
 using Exceptions.Exceptions.Sales;
@@ -10,9 +9,11 @@ namespace Application.Handlers.Sales.DeleteSale;
 
 [Transactional]
 public record DeleteSaleCommand(string SaleId) : ICommand<DeleteSaleResult>;
+
 public record DeleteSaleResult(Sale Sale);
 
-public class DeleteSaleHandler(ISaleRepository saleRepository, IUnitOfWork unitOfWork) : ICommandHandler<DeleteSaleCommand, DeleteSaleResult>
+public class DeleteSaleHandler(ISaleRepository saleRepository, IUnitOfWork unitOfWork)
+    : ICommandHandler<DeleteSaleCommand, DeleteSaleResult>
 {
     public async Task<DeleteSaleResult> Handle(DeleteSaleCommand request, CancellationToken cancellationToken)
     {

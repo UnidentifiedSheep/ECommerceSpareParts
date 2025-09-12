@@ -14,7 +14,6 @@ public class EditBuySellPricesValidation : AbstractValidator<EditBuySellPricesCo
                     .WithMessage("Допустимы только числа с двумя знаками после запятой")
                     .GreaterThan(0)
                     .WithMessage("Цена должна быть больше 0");
-
             });
     }
 }

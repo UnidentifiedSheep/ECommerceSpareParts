@@ -10,8 +10,13 @@ public class BaseValuedException : Exception, IValuedException
     {
         _errorValues = key;
     }
-    
-    protected BaseValuedException(string message) : base(message) { }
 
-    public object? GetErrorValues() => _errorValues;
+    protected BaseValuedException(string message) : base(message)
+    {
+    }
+
+    public object? GetErrorValues()
+    {
+        return _errorValues;
+    }
 }

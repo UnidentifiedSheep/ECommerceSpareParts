@@ -1,6 +1,6 @@
 ﻿namespace Core.Entities;
 
-public partial class Storage
+public class Storage
 {
     public string Name { get; set; } = null!;
 

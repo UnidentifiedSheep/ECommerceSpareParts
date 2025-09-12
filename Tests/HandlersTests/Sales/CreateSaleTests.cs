@@ -20,20 +20,19 @@ public class CreateSaleTests : IAsyncLifetime
 {
     private readonly DContext _context;
     private readonly IMediator _mediator;
-    
+
     private Currency _currency = null!;
-    private AspNetUser _user = null!;
-    private Transaction _transaction = null!;
     private Storage _storage = null!;
-    
+    private Transaction _transaction = null!;
+    private AspNetUser _user = null!;
+
     public CreateSaleTests(CombinedContainerFixture fixture)
     {
         var sp = ServiceProviderForTests.Build(fixture.PostgresConnectionString, fixture.RedisConnectionString);
         _context = sp.GetRequiredService<DContext>();
         _mediator = sp.GetRequiredService<IMediator>();
-        
     }
-        
+
     public async Task InitializeAsync()
     {
         await _mediator.AddMockUser();
@@ -49,7 +48,7 @@ public class CreateSaleTests : IAsyncLifetime
         var currency = await _context.Currencies.FirstAsync();
 
         await _mediator.AddMockStorageContents(articleIds, currency.Id, storage.Name, _user.Id, 10);
-        
+
         var receiver = await _context.AspNetUsers.FirstAsync(x => x.Id != _user.Id);
         await _mediator.AddMockTransaction(_user.Id, receiver.Id, _user.Id, 1212.21m);
         _transaction = await _context.Transactions.FirstAsync();
@@ -60,11 +59,11 @@ public class CreateSaleTests : IAsyncLifetime
     {
         await _context.ClearDatabaseFull();
     }
-    
+
     [Fact]
     public async Task CreateSale_WithEmptySaleContent_ThrowsSalesContentEmptyException()
     {
-        var command = new CreateSaleCommand([], [], _currency.Id, _user.Id, _user.Id, 
+        var command = new CreateSaleCommand([], [], _currency.Id, _user.Id, _user.Id,
             _transaction.Id, _storage.Name, DateTime.Now, null);
         await Assert.ThrowsAsync<ValidationException>(async () => await _mediator.Send(command));
     }
@@ -93,13 +92,13 @@ public class CreateSaleTests : IAsyncLifetime
                 PriceWithDiscount = price
             }
         };
-        
-        var command = new CreateSaleCommand(saleContent, [], currency.Id, buyer.Id, creator.Id, 
+
+        var command = new CreateSaleCommand(saleContent, [], currency.Id, buyer.Id, creator.Id,
             transaction.Id, _storage.Name, DateTime.Now, null);
         await Assert.ThrowsAsync<ValidationException>(async () => await _mediator.Send(command));
     }
-    
-    [Theory] 
+
+    [Theory]
     [InlineData(0)]
     [InlineData(-1)]
     public async Task CreateSale_WithInvalidCount_ThrowsSaleContentPriceOrCountException(int count)
@@ -108,7 +107,7 @@ public class CreateSaleTests : IAsyncLifetime
 
         var saleContent = new List<NewSaleContentDto>
         {
-            new NewSaleContentDto
+            new()
             {
                 ArticleId = article.Id,
                 Count = count,
@@ -116,12 +115,12 @@ public class CreateSaleTests : IAsyncLifetime
                 PriceWithDiscount = 10
             }
         };
-        
-        var command = new CreateSaleCommand(saleContent, [], _currency.Id, _user.Id, _user.Id, 
+
+        var command = new CreateSaleCommand(saleContent, [], _currency.Id, _user.Id, _user.Id,
             _transaction.Id, _storage.Name, DateTime.Now, null);
         await Assert.ThrowsAsync<ValidationException>(async () => await _mediator.Send(command));
     }
-    
+
     [Fact]
     public async Task CreateSale_WithNotEnoughDetails_ThrowsArgumentException()
     {
@@ -129,7 +128,7 @@ public class CreateSaleTests : IAsyncLifetime
 
         var saleContent = new List<NewSaleContentDto>
         {
-            new NewSaleContentDto
+            new()
             {
                 ArticleId = article.Id,
                 Count = 100000,
@@ -137,12 +136,12 @@ public class CreateSaleTests : IAsyncLifetime
                 PriceWithDiscount = 9.5m
             }
         };
-        
-        var command = new CreateSaleCommand(saleContent, [], _currency.Id, _user.Id, _user.Id, 
+
+        var command = new CreateSaleCommand(saleContent, [], _currency.Id, _user.Id, _user.Id,
             _transaction.Id, _storage.Name, DateTime.Now, null);
         await Assert.ThrowsAsync<ArgumentException>(async () => await _mediator.Send(command));
     }
-    
+
     [Fact]
     public async Task CreateSale_WithInvalidTransaction_ThrowsTransactionNotFoundException()
     {
@@ -150,7 +149,7 @@ public class CreateSaleTests : IAsyncLifetime
         var article = await _context.Articles.FirstAsync(x => x.Id == storageContent.ArticleId);
         var saleContent = new List<NewSaleContentDto>
         {
-            new NewSaleContentDto
+            new()
             {
                 ArticleId = article.Id,
                 Count = storageContent.Count,
@@ -165,12 +164,12 @@ public class CreateSaleTests : IAsyncLifetime
         {
             new(storageContent, newValue)
         };
-        
-        var command = new CreateSaleCommand(saleContent, storageContentValues, _currency.Id, _user.Id, _user.Id, 
+
+        var command = new CreateSaleCommand(saleContent, storageContentValues, _currency.Id, _user.Id, _user.Id,
             "non-existent-id", _storage.Name, DateTime.Now, null);
         await Assert.ThrowsAsync<TransactionNotFound>(async () => await _mediator.Send(command));
     }
-    
+
     [Fact]
     public async Task CreateSale_WithInvalidStorageName_ThrowsTransactionDoesntExistsException()
     {
@@ -192,12 +191,12 @@ public class CreateSaleTests : IAsyncLifetime
         {
             new(storageContent, newValue)
         };
-        
-        var command = new CreateSaleCommand(saleContent, storageContentValues, _currency.Id, _user.Id, _user.Id, 
+
+        var command = new CreateSaleCommand(saleContent, storageContentValues, _currency.Id, _user.Id, _user.Id,
             _transaction.Id, "non-existing-storage-name", DateTime.Now, null);
         await Assert.ThrowsAsync<StorageNotFoundException>(async () => await _mediator.Send(command));
     }
-    
+
     [Fact]
     public async Task CreateSale_WithValidData_Succeeds()
     {
@@ -205,7 +204,7 @@ public class CreateSaleTests : IAsyncLifetime
         var saleContent = new List<NewSaleContentDto>();
         var storageContentValues = new List<PrevAndNewValue<StorageContent>>();
         var articlesTakenCount = new Dictionary<int, int>();
-        
+
         foreach (var content in storageContent)
         {
             var newValue = content.Adapt<StorageContent>();
@@ -218,22 +217,23 @@ public class CreateSaleTests : IAsyncLifetime
                 Price = content.BuyPrice,
                 PriceWithDiscount = content.BuyPrice
             });
-            articlesTakenCount[content.ArticleId] = articlesTakenCount.GetValueOrDefault(content.ArticleId) + content.Count;
-            
+            articlesTakenCount[content.ArticleId] =
+                articlesTakenCount.GetValueOrDefault(content.ArticleId) + content.Count;
+
             storageContentValues.Add(new PrevAndNewValue<StorageContent>(content.Adapt<StorageContent>(), newValue));
         }
 
-        var command = new CreateSaleCommand(saleContent, storageContentValues, _currency.Id, _user.Id, _user.Id, 
+        var command = new CreateSaleCommand(saleContent, storageContentValues, _currency.Id, _user.Id, _user.Id,
             _transaction.Id, _storage.Name, DateTime.Now, null);
         await _mediator.Send(command);
-        
-        
+
+
         var sale = await _context.Sales
             .Include(x => x.SaleContents)
             .ThenInclude(x => x.SaleContentDetails)
             .FirstOrDefaultAsync(x => x.TransactionId == _transaction.Id);
-        
-        
+
+
         Assert.NotNull(sale);
         foreach (var content in sale.SaleContents)
         {
@@ -242,6 +242,7 @@ public class CreateSaleTests : IAsyncLifetime
             Assert.Equal(content.Count, countInDetail);
             articlesTakenCount[content.ArticleId] -= countInDetail;
         }
+
         Assert.All(articlesTakenCount, kvp => Assert.Equal(0, kvp.Value));
     }
 }

@@ -14,12 +14,20 @@ using MediatR;
 namespace Application.Handlers.StorageContents.RestoreContent;
 
 [Transactional(IsolationLevel.Serializable, 20, 2)]
-public record RestoreContentCommand(IEnumerable<RestoreContentItem> ContentDetails,
-    StorageMovementType MovementType, string UserId) : ICommand;
+public record RestoreContentCommand(
+    IEnumerable<RestoreContentItem> ContentDetails,
+    StorageMovementType MovementType,
+    string UserId) : ICommand;
 
-public class RestoreContentHandler(ICurrencyRepository currencyRepository, IUsersRepository usersRepository,
-    IStorageContentRepository contentRepository, IArticlesRepository articlesRepository, IStoragesRepository storagesRepository,
-    IArticlesService articlesService, IUnitOfWork unitOfWork, ICurrencyConverter currencyConverter,
+public class RestoreContentHandler(
+    ICurrencyRepository currencyRepository,
+    IUsersRepository usersRepository,
+    IStorageContentRepository contentRepository,
+    IArticlesRepository articlesRepository,
+    IStoragesRepository storagesRepository,
+    IArticlesService articlesService,
+    IUnitOfWork unitOfWork,
+    ICurrencyConverter currencyConverter,
     IMediator mediator) : ICommandHandler<RestoreContentCommand>
 {
     public async Task<Unit> Handle(RestoreContentCommand request, CancellationToken cancellationToken)
@@ -39,20 +47,22 @@ public class RestoreContentHandler(ICurrencyRepository currencyRepository, IUser
             if (detail.StorageContentId == null) continue;
             contentIdStorageIdMix.Add((detail.StorageContentId.Value, detail.Storage));
         }
-        
+
         await ValidateData(userId, articleIds, currencyIds, storageIds, cancellationToken);
-        
+
         var toIncrement = new Dictionary<int, int>();
         var storageContents = await contentRepository
             .GetStorageContentsForUpdateAsync(contentIdStorageIdMix, true, cancellationToken);
-            
+
         foreach (var (detail, articleId) in contentDetailsList)
         {
             StorageContent? content = null;
             if (detail.StorageContentId != null)
                 content = storageContents.GetValueOrDefault((detail.StorageContentId.Value, detail.Storage));
             if (content != null)
+            {
                 content.Count += detail.Count;
+            }
             else
             {
                 content = detail.Adapt<StorageContent>();
@@ -60,11 +70,11 @@ public class RestoreContentHandler(ICurrencyRepository currencyRepository, IUser
                 content.ArticleId = articleId;
                 await unitOfWork.AddAsync(content, cancellationToken);
             }
-            
+
             await AddMovement(content, userId, detail.Count, request.MovementType, cancellationToken);
             toIncrement[articleId] = toIncrement.GetValueOrDefault(articleId) + detail.Count;
         }
-        
+
         await articlesService.UpdateArticlesCount(toIncrement, cancellationToken);
         await unitOfWork.SaveChangesAsync(cancellationToken);
 
@@ -73,7 +83,7 @@ public class RestoreContentHandler(ICurrencyRepository currencyRepository, IUser
         return Unit.Value;
     }
 
-    private async Task ValidateData(string userId, IEnumerable<int> articleIds, IEnumerable<int> currencyIds, 
+    private async Task ValidateData(string userId, IEnumerable<int> articleIds, IEnumerable<int> currencyIds,
         IEnumerable<string> storageIds, CancellationToken cancellationToken = default)
     {
         await currencyRepository.EnsureCurrenciesExists(currencyIds, cancellationToken);
@@ -82,7 +92,8 @@ public class RestoreContentHandler(ICurrencyRepository currencyRepository, IUser
         await articlesRepository.EnsureArticlesExistForUpdate(articleIds, false, cancellationToken);
     }
 
-    private async Task AddMovement(StorageContent content, string userId, int movementCount, StorageMovementType movementType,
+    private async Task AddMovement(StorageContent content, string userId, int movementCount,
+        StorageMovementType movementType,
         CancellationToken cancellationToken = default)
     {
         var tempMovement = content.Adapt<StorageMovement>()

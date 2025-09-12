@@ -12,10 +12,8 @@ using Core.Interfaces.Services;
 using FluentValidation;
 using MediatR;
 using Microsoft.Extensions.DependencyInjection;
-
 using AmwArticleDto = Core.Dtos.Amw.Articles.ArticleDto;
 using AnonymousArticleDto = Core.Dtos.Anonymous.Articles.ArticleDto;
-
 using AmwArticleFullDto = Core.Dtos.Amw.Articles.ArticleFullDto;
 using MemberArticleFullDto = Core.Dtos.Member.Articles.ArticleFullDto;
 
@@ -39,12 +37,20 @@ public static class ServiceProvider
         collection.AddSingleton<IConcurrencyValidator<StorageContent>, StorageContentConcurrencyValidator>();
 
         collection.AddValidatorsFromAssembly(typeof(Global).Assembly);
-        
-        collection.AddScoped<IRequestHandler<GetArticlesQuery<AmwArticleDto>, GetArticlesResult<AmwArticleDto>>, GetArticlesHandler<AmwArticleDto>>();
-        collection.AddScoped<IRequestHandler<GetArticlesQuery<AnonymousArticleDto>, GetArticlesResult<AnonymousArticleDto>>, GetArticlesHandler<AnonymousArticleDto>>();
-        collection.AddScoped<IRequestHandler<GetArticleCrossesQuery<AmwArticleFullDto>, GetArticleCrossesResult<AmwArticleFullDto>>, GetArticleCrossesHandler<AmwArticleFullDto>>();
-        collection.AddScoped<IRequestHandler<GetArticleCrossesQuery<MemberArticleFullDto>, GetArticleCrossesResult<MemberArticleFullDto>>, GetArticleCrossesHandler<MemberArticleFullDto>>();
-        
+
+        collection
+            .AddScoped<IRequestHandler<GetArticlesQuery<AmwArticleDto>, GetArticlesResult<AmwArticleDto>>,
+                GetArticlesHandler<AmwArticleDto>>();
+        collection
+            .AddScoped<IRequestHandler<GetArticlesQuery<AnonymousArticleDto>, GetArticlesResult<AnonymousArticleDto>>,
+                GetArticlesHandler<AnonymousArticleDto>>();
+        collection
+            .AddScoped<IRequestHandler<GetArticleCrossesQuery<AmwArticleFullDto>,
+                GetArticleCrossesResult<AmwArticleFullDto>>, GetArticleCrossesHandler<AmwArticleFullDto>>();
+        collection
+            .AddScoped<IRequestHandler<GetArticleCrossesQuery<MemberArticleFullDto>,
+                GetArticleCrossesResult<MemberArticleFullDto>>, GetArticleCrossesHandler<MemberArticleFullDto>>();
+
         collection.Scan(scan => scan
             .FromAssemblyOf<GetArticlesAmwLogSettings>()
             .AddClasses(classes => classes.Where(type =>
@@ -56,7 +62,7 @@ public static class ServiceProvider
                             i.GetGenericTypeDefinition() == typeof(ILoggableRequest<>)))
             .WithScopedLifetime()
         );
-        
+
         collection.Scan(scan => scan
             .FromAssemblyOf<GetArticlesAmwLogSettings>()
             .AddClasses(classes => classes.Where(type =>
@@ -69,7 +75,7 @@ public static class ServiceProvider
             .WithScopedLifetime()
         );
 
-        
+
         collection.AddMediatR(config =>
         {
             config.RegisterServicesFromAssembly(typeof(Global).Assembly);
@@ -79,7 +85,7 @@ public static class ServiceProvider
             config.AddOpenBehavior(typeof(CacheBehavior<,>));
             config.AddOpenBehavior(typeof(TransactionBehavior<,>));
         });
-        
+
         return collection;
     }
 }

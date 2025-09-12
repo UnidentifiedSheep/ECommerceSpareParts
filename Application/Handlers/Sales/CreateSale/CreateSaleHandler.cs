@@ -4,7 +4,6 @@ using Application.Interfaces;
 using Core.Attributes;
 using Core.Dtos.Amw.Sales;
 using Core.Entities;
-using Core.Interfaces;
 using Core.Interfaces.DbRepositories;
 using Core.Interfaces.Services;
 using Core.Models;
@@ -13,45 +12,58 @@ using Mapster;
 namespace Application.Handlers.Sales.CreateSale;
 
 [Transactional(IsolationLevel.Serializable, 20, 2)]
-public record CreateSaleCommand(IEnumerable<NewSaleContentDto> SellContent, IEnumerable<PrevAndNewValue<StorageContent>> StorageContentValues,
-    int CurrencyId, string BuyerId, string CreatedUserId, string TransactionId, string MainStorage,
-    DateTime SaleDateTime, string? Comment) : ICommand<CreateSaleResult>;
+public record CreateSaleCommand(
+    IEnumerable<NewSaleContentDto> SellContent,
+    IEnumerable<PrevAndNewValue<StorageContent>> StorageContentValues,
+    int CurrencyId,
+    string BuyerId,
+    string CreatedUserId,
+    string TransactionId,
+    string MainStorage,
+    DateTime SaleDateTime,
+    string? Comment) : ICommand<CreateSaleResult>;
 
 public record CreateSaleResult(Sale Sale);
 
-public class CreateSaleHandler(ISaleService saleService, IBalanceRepository balanceRepository,
-    ICurrencyRepository currencyRepository, IStoragesRepository storagesRepository, IUsersRepository usersRepository,
-    IArticlesRepository articlesRepository, IUnitOfWork unitOfWork) : ICommandHandler<CreateSaleCommand, CreateSaleResult>
+public class CreateSaleHandler(
+    ISaleService saleService,
+    IBalanceRepository balanceRepository,
+    ICurrencyRepository currencyRepository,
+    IStoragesRepository storagesRepository,
+    IUsersRepository usersRepository,
+    IArticlesRepository articlesRepository,
+    IUnitOfWork unitOfWork) : ICommandHandler<CreateSaleCommand, CreateSaleResult>
 {
     public async Task<CreateSaleResult> Handle(CreateSaleCommand request, CancellationToken cancellationToken)
     {
-        string transactionId = request.TransactionId;
-        string buyerId = request.BuyerId;
-        string createdUserId = request.CreatedUserId;
-        int currencyId = request.CurrencyId;
-        string mainStorage = request.MainStorage;
-        
+        var transactionId = request.TransactionId;
+        var buyerId = request.BuyerId;
+        var createdUserId = request.CreatedUserId;
+        var currencyId = request.CurrencyId;
+        var mainStorage = request.MainStorage;
+
         var saleContentList = request.SellContent.ToList();
-        
+
         var articleIds = saleContentList.Select(x => x.ArticleId).ToHashSet();
 
-        await ValidateData(transactionId, articleIds, currencyId, buyerId, createdUserId, mainStorage, cancellationToken);
-        
+        await ValidateData(transactionId, articleIds, currencyId, buyerId, createdUserId, mainStorage,
+            cancellationToken);
+
         var detailGroups = saleService.GetDetailsGroup(request.StorageContentValues);
-        
+
         var saleContents = new List<SaleContent>();
-        
+
         foreach (var item in saleContentList)
         {
             var saleContent = item.Adapt<SaleContent>();
             saleContents.Add(saleContent);
-            
+
             DistributeDetails(item.ArticleId, item.Count, saleContent, detailGroups);
         }
-        
+
         if (detailGroups.Any(x => x.Value.Count > 0))
             throw new ArgumentException("Несовпадение количества в деталях и продажах");
-        
+
         var saleModel = new Sale
         {
             TransactionId = transactionId,
@@ -61,20 +73,21 @@ public class CreateSaleHandler(ISaleService saleService, IBalanceRepository bala
             Comment = request.Comment,
             SaleContents = saleContents,
             CurrencyId = currencyId,
-            MainStorageName = mainStorage,
+            MainStorageName = mainStorage
         };
-        
+
         await unitOfWork.AddAsync(saleModel, cancellationToken);
         await unitOfWork.SaveChangesAsync(cancellationToken);
         return new CreateSaleResult(saleModel);
     }
-    
-    private void DistributeDetails(int articleId, int requiredCount, SaleContent saleContent, Dictionary<int, Queue<SaleContentDetail>> detailGroups)
+
+    private void DistributeDetails(int articleId, int requiredCount, SaleContent saleContent,
+        Dictionary<int, Queue<SaleContentDetail>> detailGroups)
     {
         if (!detailGroups.TryGetValue(articleId, out var queue))
             throw new ArgumentException($"Не найдены детали для артикула {articleId}");
 
-        int counter = requiredCount;
+        var counter = requiredCount;
         while (counter > 0 && queue.Count > 0)
         {
             var detail = queue.Peek();
@@ -98,7 +111,7 @@ public class CreateSaleHandler(ISaleService saleService, IBalanceRepository bala
             throw new ArgumentException($"Недостаточно деталей для артикула {articleId}");
     }
 
-    private async Task ValidateData(string transactionId, IEnumerable<int> articleIds, int currencyId, string buyerId, 
+    private async Task ValidateData(string transactionId, IEnumerable<int> articleIds, int currencyId, string buyerId,
         string createdUserId, string storageName, CancellationToken cancellationToken = default)
     {
         await balanceRepository.EnsureTransactionExists(transactionId, cancellationToken);

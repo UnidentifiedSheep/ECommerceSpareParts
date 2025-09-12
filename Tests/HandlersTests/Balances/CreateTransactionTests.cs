@@ -17,10 +17,10 @@ public class CreateTransactionTests : IAsyncLifetime
 {
     private readonly DContext _context;
     private readonly IMediator _mediator;
-    private AspNetUser _mockUser = null!;
-    private AspNetUser _systemUser = null!;
     private AspNetUser _adminUser = null!;
     private Currency _currency = null!;
+    private AspNetUser _mockUser = null!;
+    private AspNetUser _systemUser = null!;
 
     public CreateTransactionTests(CombinedContainerFixture fixture)
     {
@@ -29,7 +29,7 @@ public class CreateTransactionTests : IAsyncLifetime
         _mediator = sp.GetService<IMediator>()!;
         _context = sp.GetRequiredService<DContext>();
     }
-        
+
     public async Task InitializeAsync()
     {
         await _mediator.AddMockProducersAndArticles();
@@ -39,7 +39,8 @@ public class CreateTransactionTests : IAsyncLifetime
         await _mediator.AddMockUser();
         await _mediator.AddMockUser();
         _mockUser = await _context.AspNetUsers.AsNoTracking().FirstAsync(x => x.Id != "SYSTEM");
-        _adminUser = await _context.AspNetUsers.AsNoTracking().FirstAsync(x => x.Id != "SYSTEM" && x.Id != _mockUser.Id);
+        _adminUser = await _context.AspNetUsers.AsNoTracking()
+            .FirstAsync(x => x.Id != "SYSTEM" && x.Id != _mockUser.Id);
         _currency = await _context.Currencies.AsNoTracking().FirstAsync();
     }
 
@@ -47,25 +48,25 @@ public class CreateTransactionTests : IAsyncLifetime
     {
         await _context.ClearDatabaseFull();
     }
-    
+
     [Fact]
     public async Task CreateOneTransaction_Succeeds()
     {
         var command = new CreateTransactionCommand(
-            SenderId: _systemUser.Id,
-            ReceiverId: _mockUser.Id,
-            Amount: 100,
-            CurrencyId: _currency.Id,
-            WhoCreatedTransaction: _adminUser.Id,
-            TransactionDateTime: DateTime.Now,
+            _systemUser.Id,
+            _mockUser.Id,
+            100,
+            _currency.Id,
+            _adminUser.Id,
+            DateTime.Now,
             TransactionStatus.Normal
         );
-        
+
         var createdTransaction = (await _mediator.Send(command)).Transaction;
-        
+
         var transaction = await _context.Transactions
-            .FirstOrDefaultAsync(x => x.SenderId == _systemUser.Id && 
-                                      x.ReceiverId == _mockUser.Id && 
+            .FirstOrDefaultAsync(x => x.SenderId == _systemUser.Id &&
+                                      x.ReceiverId == _mockUser.Id &&
                                       x.TransactionDatetime == command.TransactionDateTime);
         Assert.NotNull(transaction);
         Assert.Equal(createdTransaction.TransactionSum, transaction.TransactionSum);
@@ -75,12 +76,12 @@ public class CreateTransactionTests : IAsyncLifetime
     public async Task CreateTransaction_WithEmptySender_FailsValidation()
     {
         var command = new CreateTransactionCommand(
-            SenderId: "",
-            ReceiverId: _mockUser.Id,
-            Amount: 125,
-            CurrencyId: _currency.Id,
-            WhoCreatedTransaction: _adminUser.Id,
-            TransactionDateTime: DateTime.Now,
+            "",
+            _mockUser.Id,
+            125,
+            _currency.Id,
+            _adminUser.Id,
+            DateTime.Now,
             TransactionStatus.Normal
         );
 
@@ -91,12 +92,12 @@ public class CreateTransactionTests : IAsyncLifetime
     public async Task CreateTransaction_WithNegativeAmount_FailsValidation()
     {
         var command = new CreateTransactionCommand(
-            SenderId: _systemUser.Id,
-            ReceiverId: _mockUser.Id,
-            Amount: -100,
-            CurrencyId: _currency.Id,
-            WhoCreatedTransaction: _adminUser.Id,
-            TransactionDateTime: DateTime.Now,
+            _systemUser.Id,
+            _mockUser.Id,
+            -100,
+            _currency.Id,
+            _adminUser.Id,
+            DateTime.Now,
             TransactionStatus.Normal
         );
 
@@ -107,15 +108,15 @@ public class CreateTransactionTests : IAsyncLifetime
     public async Task CreateTransaction_WithOldDate_ThrowsValidationError()
     {
         var command = new CreateTransactionCommand(
-            SenderId: _systemUser.Id,
-            ReceiverId: _mockUser.Id,
-            Amount: 100,
-            CurrencyId: _currency.Id,
-            WhoCreatedTransaction: _adminUser.Id,
-            TransactionDateTime: DateTime.Now.AddMonths(-4),
+            _systemUser.Id,
+            _mockUser.Id,
+            100,
+            _currency.Id,
+            _adminUser.Id,
+            DateTime.Now.AddMonths(-4),
             TransactionStatus.Normal
         );
-        
+
         await Assert.ThrowsAsync<ValidationException>(async () => await _mediator.Send(command));
     }
 
@@ -123,15 +124,15 @@ public class CreateTransactionTests : IAsyncLifetime
     public async Task CreateTransaction_WithFutureDateBeyondLimit_FailsValidation()
     {
         var command = new CreateTransactionCommand(
-            SenderId: _systemUser.Id,
-            ReceiverId: _mockUser.Id,
-            Amount: 100,
-            CurrencyId: _currency.Id,
-            WhoCreatedTransaction: _adminUser.Id,
-            TransactionDateTime: DateTime.Now.AddMonths(1),
+            _systemUser.Id,
+            _mockUser.Id,
+            100,
+            _currency.Id,
+            _adminUser.Id,
+            DateTime.Now.AddMonths(1),
             TransactionStatus.Normal
         );
-        
+
         await Assert.ThrowsAsync<ValidationException>(async () => await _mediator.Send(command));
     }
 
@@ -139,12 +140,12 @@ public class CreateTransactionTests : IAsyncLifetime
     public async Task CreateTransaction_WithEmptyReceiver_FailsValidation()
     {
         var command = new CreateTransactionCommand(
-            SenderId: _systemUser.Id,
-            ReceiverId: "",
-            Amount: 100,
-            CurrencyId: _currency.Id,
-            WhoCreatedTransaction: _adminUser.Id,
-            TransactionDateTime: DateTime.Now,
+            _systemUser.Id,
+            "",
+            100,
+            _currency.Id,
+            _adminUser.Id,
+            DateTime.Now,
             TransactionStatus.Normal
         );
 
@@ -161,12 +162,12 @@ public class CreateTransactionTests : IAsyncLifetime
     public async Task CreateTransaction_InvalidAmount_ThrowsValidationException(decimal amount)
     {
         var command = new CreateTransactionCommand(
-            SenderId: _systemUser.Id,
-            ReceiverId: _mockUser.Id,
-            Amount: amount,
-            CurrencyId: _currency.Id,
-            WhoCreatedTransaction: _adminUser.Id,
-            TransactionDateTime: DateTime.Now,
+            _systemUser.Id,
+            _mockUser.Id,
+            amount,
+            _currency.Id,
+            _adminUser.Id,
+            DateTime.Now,
             TransactionStatus.Normal
         );
 

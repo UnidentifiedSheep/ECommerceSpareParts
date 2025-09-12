@@ -6,21 +6,26 @@ using Serilog;
 
 namespace Application.Pricing;
 
-public class PriceSetup(IDefaultSettingsRepository defaultSettingsRepository, IMarkupRepository markupRepository, 
-    ICurrencyRepository currencyRepository, ICurrencyConverter currencyConverter, IPriceGenerator priceGenerator) : IPriceSetup
+public class PriceSetup(
+    IDefaultSettingsRepository defaultSettingsRepository,
+    IMarkupRepository markupRepository,
+    ICurrencyRepository currencyRepository,
+    ICurrencyConverter currencyConverter,
+    IPriceGenerator priceGenerator) : IPriceSetup
 {
     private DefaultSettings _defaultSettings = new();
-    
+
     public async Task SetupAsync(CancellationToken cancellationToken = default)
     {
         await defaultSettingsRepository.CreateDefaultSettingsIfNotExist(cancellationToken);
         _defaultSettings = await defaultSettingsRepository.GetDefaultSettingsAsync(cancellationToken);
         await SetupCurrencyConverterAsync(cancellationToken);
-        if(_defaultSettings.SelectedMarkupId != -1)
+        if (_defaultSettings.SelectedMarkupId != -1)
         {
             await SetUserMarkupsAsync(cancellationToken);
             return;
         }
+
         await SetGeneratedMarkupsAsync(cancellationToken);
     }
 
@@ -29,7 +34,7 @@ public class PriceSetup(IDefaultSettingsRepository defaultSettingsRepository, IM
         var rates = await currencyRepository.GetCurrenciesToUsd(cancellationToken);
         currencyConverter.LoadRates(rates);
     }
-    
+
     private async Task SetGeneratedMarkupsAsync(CancellationToken cancellationToken = default)
     {
         var generatedMarkup = await markupRepository.GetGeneratedMarkupsAsync(true, cancellationToken);
@@ -40,7 +45,8 @@ public class PriceSetup(IDefaultSettingsRepository defaultSettingsRepository, IM
 
     private async Task SetUserMarkupsAsync(CancellationToken cancellationToken = default)
     {
-        var generatedMarkup = await markupRepository.GetMarkupByIdAsync(_defaultSettings.SelectedMarkupId, true, cancellationToken)
+        var generatedMarkup =
+            await markupRepository.GetMarkupByIdAsync(_defaultSettings.SelectedMarkupId, true, cancellationToken)
             ?? throw new MarkupGroupNotFoundException(_defaultSettings.SelectedMarkupId);
         priceGenerator.SetUp(generatedMarkup, _defaultSettings);
     }

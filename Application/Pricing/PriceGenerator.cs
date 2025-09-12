@@ -11,9 +11,9 @@ public class PriceGenerator(ICurrencyConverter currencyConverter) : IPriceGenera
 {
     private readonly Dictionary<int, AdaptiveIntervalMap<MarkupModel>> _markUps = new();
     public int DefaultMarkUpCurrencyId { get; private set; }
-    private double DefaultMarkUp { get; set; } = 20;
-    private double MinimalMarkUp { get; set; } = 6;
-    
+    private double DefaultMarkUp { get; } = 20;
+    private double MinimalMarkUp { get; } = 6;
+
     public double GetSellPriceWithMinimalMarkUp(double buyPrice)
     {
         var sellPrice = GetSellPrice(buyPrice, 0, MinimalMarkUp);
@@ -24,11 +24,11 @@ public class PriceGenerator(ICurrencyConverter currencyConverter) : IPriceGenera
     {
         _markUps.Clear();
         DefaultMarkUpCurrencyId = defaultSettings.DefaultCurrency;
-        
+
         foreach (var toUsd in currencyConverter.ToUsdDoub)
         {
             var intervalMap = new AdaptiveIntervalMap<MarkupModel>();
-            double lastRangeEnd = double.NaN;
+            var lastRangeEnd = double.NaN;
 
             foreach (var range in group.MarkupRanges.OrderBy(x => x.RangeStart))
             {
@@ -49,20 +49,21 @@ public class PriceGenerator(ICurrencyConverter currencyConverter) : IPriceGenera
     }
 
     /// <summary>
-    /// return sell price for given buy price.
+    ///     return sell price for given buy price.
     /// </summary>
     /// <param name="buyPrice">buy price</param>
     /// <param name="discount">discount in percentage</param>
     /// <param name="currencyId">the id of currency</param>
     /// <returns></returns>
     public double GetSellPrice(double buyPrice, double discount, int currencyId)
-     {
-         var markup = GetMarkup(buyPrice, currencyId);
-         var sellPrice = GetSellPrice(buyPrice, discount, markup);
-         return sellPrice;
+    {
+        var markup = GetMarkup(buyPrice, currencyId);
+        var sellPrice = GetSellPrice(buyPrice, discount, markup);
+        return sellPrice;
     }
+
     /// <summary>
-    /// Returns list of buy and sell prices, for list of buy prices.
+    ///     Returns list of buy and sell prices, for list of buy prices.
     /// </summary>
     /// <param name="buyPrices">List of buy prices</param>
     /// <param name="discount">Discount in percentage</param>
@@ -74,7 +75,7 @@ public class PriceGenerator(ICurrencyConverter currencyConverter) : IPriceGenera
         var foundMap = _markUps.TryGetValue(currencyId, out var map);
         if (!foundMap)
             map = _markUps[DefaultMarkUpCurrencyId];
-        
+
         foreach (var price in buyPrices)
         {
             var value = price;
@@ -89,11 +90,23 @@ public class PriceGenerator(ICurrencyConverter currencyConverter) : IPriceGenera
         return res;
     }
 
-    private double GetSellPrice(double buyPrice, double discount, double markup) =>
-        buyPrice.GetMarkUppedPrice(markup).GetDiscountedPrice(discount).RoundToNearestUp();
-    
+    public double GetDiscountFromPrices(double withDiscount, double withNoDiscount)
+    {
+        return (withNoDiscount - withDiscount) / withNoDiscount * 100;
+    }
+
+    public decimal GetDiscountFromPrices(decimal withDiscount, decimal withNoDiscount)
+    {
+        return (withNoDiscount - withDiscount) / withNoDiscount * 100;
+    }
+
+    private double GetSellPrice(double buyPrice, double discount, double markup)
+    {
+        return buyPrice.GetMarkUppedPrice(markup).GetDiscountedPrice(discount).RoundToNearestUp();
+    }
+
     /// <summary>
-    /// Get markup from interval map via buy price.
+    ///     Get markup from interval map via buy price.
     /// </summary>
     /// <param name="value">Is buy price</param>
     /// <param name="currencyId">Id of buy price</param>
@@ -109,27 +122,20 @@ public class PriceGenerator(ICurrencyConverter currencyConverter) : IPriceGenera
         }
 
         var markup = map!.GetInterval(value);
-        if(markup == null || markup.Value == null) return DefaultMarkUp;
+        if (markup == null || markup.Value == null) return DefaultMarkUp;
         return markup.Value!.Markup;
     }
 
     /// <summary>
-    /// Get markup from interval map via buy price.
+    ///     Get markup from interval map via buy price.
     /// </summary>
     /// <param name="value">Is buy price</param>
     /// <param name="map">Map in which markup should be found</param>
     /// <returns>Markup for this price</returns>
-    private double GetMarkup(double value,  AdaptiveIntervalMap<MarkupModel> map)
+    private double GetMarkup(double value, AdaptiveIntervalMap<MarkupModel> map)
     {
         var markup = map.GetInterval(value);
-        if(markup == null || markup.Value == null) return DefaultMarkUp;
+        if (markup == null || markup.Value == null) return DefaultMarkUp;
         return markup.Value!.Markup;
     }
-
-    public double GetDiscountFromPrices(double withDiscount, double withNoDiscount)
-        => (withNoDiscount - withDiscount) / withNoDiscount * 100;
-    
-    public decimal GetDiscountFromPrices(decimal withDiscount, decimal withNoDiscount)
-        => (withNoDiscount - withDiscount) / withNoDiscount * 100;
 }
-

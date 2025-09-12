@@ -1,5 +1,4 @@
 using Application.Interfaces;
-using Core.Interfaces;
 using Core.Interfaces.DbRepositories;
 using Core.Interfaces.Services;
 using Exceptions.Exceptions.Storages;
@@ -9,7 +8,8 @@ namespace Application.Handlers.Storages.DeleteStorage;
 
 public record DeleteStorageCommand(string StorageName) : ICommand;
 
-public class DeleteStorageHandler(IStoragesRepository storagesRepository, IUnitOfWork unitOfWork) : ICommandHandler<DeleteStorageCommand>
+public class DeleteStorageHandler(IStoragesRepository storagesRepository, IUnitOfWork unitOfWork)
+    : ICommandHandler<DeleteStorageCommand>
 {
     public async Task<Unit> Handle(DeleteStorageCommand request, CancellationToken cancellationToken)
     {

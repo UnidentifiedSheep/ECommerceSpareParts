@@ -12,7 +12,7 @@ namespace Tests.MockData;
 public static class MockData
 {
     public const string Locale = "ru";
-    
+
     public static readonly List<string> Colors = Enum.GetNames(typeof(KnownColor)).ToList();
 
     public static List<CreateArticleDto> CreateNewArticleDto(int count)
@@ -36,6 +36,7 @@ public static class MockData
             .RuleFor(x => x.IsOe, f => f.Random.Bool());
         return f.Generate(count);
     }
+
     public static List<AspNetUser> CreateNewUser(int count)
     {
         var f = new Faker<AspNetUser>(Locale)
@@ -53,7 +54,7 @@ public static class MockData
             .RuleFor(x => x.TwoFactorEnabled, f => f.Random.Bool());
         return f.Generate(count);
     }
-    
+
     public static NewUserDto GetUserDto()
     {
         var f = new Faker<NewUserDto>(Locale)
@@ -85,21 +86,21 @@ public static class MockData
         var f = new Faker<StorageContent>(Locale)
             .RuleFor(x => x.ArticleId, f => f.PickRandom(articleIds))
             .RuleFor(x => x.StorageName, f => f.PickRandom(storages))
-            .RuleFor(x => x.BuyPrice, f => Math.Round((f.Random.Decimal() * 100000) + 1, 2))
-            .RuleFor(x => x.Count, f => f.Random.Int(1,1200))
+            .RuleFor(x => x.BuyPrice, f => Math.Round(f.Random.Decimal() * 100000 + 1, 2))
+            .RuleFor(x => x.Count, f => f.Random.Int(1, 1200))
             .RuleFor(x => x.CurrencyId, f => f.PickRandom(currencyIds));
         return f.Generate(count);
     }
-    
-    public static List<NewStorageContentDto> CreateNewStorageContentDto(IEnumerable<int> availableArticlesIds, 
+
+    public static List<NewStorageContentDto> CreateNewStorageContentDto(IEnumerable<int> availableArticlesIds,
         IEnumerable<int> availableCurrencyIds, int count)
     {
         var articleIds = availableArticlesIds.Distinct().ToList();
         var currencyIds = availableCurrencyIds.Distinct().ToList();
         var f = new Faker<NewStorageContentDto>(Locale)
             .RuleFor(x => x.ArticleId, f => f.PickRandom(articleIds))
-            .RuleFor(x => x.BuyPrice, f => Math.Round((f.Random.Decimal() * 100000) + 1, 2))
-            .RuleFor(x => x.Count, f => f.Random.Int(1,1200))
+            .RuleFor(x => x.BuyPrice, f => Math.Round(f.Random.Decimal() * 100000 + 1, 2))
+            .RuleFor(x => x.Count, f => f.Random.Int(1, 1200))
             .RuleFor(x => x.PurchaseDate, DateTime.Now)
             .RuleFor(x => x.CurrencyId, f => f.PickRandom(currencyIds));
         return f.Generate(count);
@@ -111,10 +112,10 @@ public static class MockData
         var storageContentIds = availableStorageContentIds.Distinct().ToList();
         var storages = availableStorages.Distinct().ToList();
         var currencyIds = availableCurrencyIds.Distinct().ToList();
-        
+
         var f = new Faker<SaleContentDetail>(Locale)
             .RuleFor(x => x.StorageContentId, f => f.Random.Int(1, 100) <= 50 ? f.PickRandom(storageContentIds) : null)
-            .RuleFor(x => x.BuyPrice, f => Math.Round((f.Random.Decimal() * 100000) + 1, 2))
+            .RuleFor(x => x.BuyPrice, f => Math.Round(f.Random.Decimal() * 100000 + 1, 2))
             .RuleFor(x => x.Count, f => f.Random.Int(1, 1200))
             .RuleFor(x => x.CurrencyId, f => f.PickRandom(currencyIds))
             .RuleFor(x => x.Storage, f => f.PickRandom(storages))
@@ -133,18 +134,22 @@ public static class MockData
         return f.Generate(count);
     }
 
-    public static List<Transaction> CreateTransaction(IEnumerable<string> receiverIds, IEnumerable<string> senderIds, string whoMade, IEnumerable<int> currencyIds, int count)
+    public static List<Transaction> CreateTransaction(IEnumerable<string> receiverIds, IEnumerable<string> senderIds,
+        string whoMade, IEnumerable<int> currencyIds, int count)
     {
         var r = receiverIds.ToList();
         var balanceCounter = new Dictionary<string, decimal>();
         var f = new Faker<Transaction>(Locale)
             .RuleFor(x => x.TransactionSum, f => Math.Round(f.Random.Decimal(1, 100000), 2))
             .RuleFor(x => x.SenderId, f => f.PickRandom(senderIds))
-            .RuleFor(x => x.ReceiverId, (f, t) => {
+            .RuleFor(x => x.ReceiverId, (f, t) =>
+            {
                 string receiver;
-                do {
+                do
+                {
                     receiver = f.PickRandom(r);
                 } while (receiver == t.SenderId);
+
                 return receiver;
             })
             .RuleFor(x => x.TransactionDatetime,
@@ -152,14 +157,14 @@ public static class MockData
             .RuleFor(x => x.CurrencyId, f => f.PickRandom(currencyIds))
             .RuleFor(x => x.Status, _ => nameof(TransactionStatus.Normal))
             .RuleFor(x => x.WhoMadeUserId, _ => whoMade);
-        
+
         var tr = f.Generate(count);
 
         foreach (var item in tr.OrderBy(x => x.TransactionDatetime))
         {
-            if(!balanceCounter.TryGetValue(item.SenderId + item.CurrencyId, out var senderBalance))
+            if (!balanceCounter.TryGetValue(item.SenderId + item.CurrencyId, out var senderBalance))
                 senderBalance = 0;
-            if(!balanceCounter.TryGetValue(item.ReceiverId + item.CurrencyId, out var receiverBalance))
+            if (!balanceCounter.TryGetValue(item.ReceiverId + item.CurrencyId, out var receiverBalance))
                 receiverBalance = 0;
             item.SenderBalanceAfterTransaction = senderBalance;
             item.ReceiverBalanceAfterTransaction = receiverBalance;
@@ -168,6 +173,7 @@ public static class MockData
             balanceCounter[item.SenderId + item.CurrencyId] = item.SenderBalanceAfterTransaction;
             balanceCounter[item.ReceiverId + item.CurrencyId] = item.ReceiverBalanceAfterTransaction;
         }
+
         return tr;
     }
 
@@ -195,13 +201,13 @@ public static class MockData
         return f.Generate(count);
     }
 
-    public static void CreateSaleContentDetail(IEnumerable<SaleContent> saleContents, IEnumerable<int> currencyIds, IEnumerable<string> storageNames)
+    public static void CreateSaleContentDetail(IEnumerable<SaleContent> saleContents, IEnumerable<int> currencyIds,
+        IEnumerable<string> storageNames)
     {
         var faker = new Faker(Locale);
         var crs = currencyIds.ToList();
         var strgs = storageNames.ToList();
         foreach (var content in saleContents)
-        {
             content.SaleContentDetails.Add(new SaleContentDetail
             {
                 BuyPrice = faker.Random.Decimal(1, 100),
@@ -210,6 +216,5 @@ public static class MockData
                 Storage = faker.PickRandom(strgs),
                 PurchaseDatetime = faker.Date.Between(DateTime.Now.AddMonths(-2), DateTime.Now.AddMonths(2))
             });
-        }
     }
 }

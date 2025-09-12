@@ -3,7 +3,6 @@ using Application.Interfaces;
 using Core.Attributes;
 using Core.Dtos.Amw.ArticleReservations;
 using Core.Entities;
-using Core.Interfaces;
 using Core.Interfaces.DbRepositories;
 using Core.Interfaces.Services;
 using Mapster;
@@ -12,10 +11,14 @@ using MediatR;
 namespace Application.Handlers.ArticleReservations.CreateArticleReservation;
 
 [Transactional]
-public record CreateArticleReservationCommand(List<NewArticleReservationDto> Reservations, string WhoCreated) : ICommand;
+public record CreateArticleReservationCommand(List<NewArticleReservationDto> Reservations, string WhoCreated)
+    : ICommand;
 
-public class CreateArticleReservationHandler(IArticlesRepository articlesRepository,
-    IUsersRepository usersRepository, ICurrencyRepository currencyRepository, IUnitOfWork unitOfWork) : ICommandHandler<CreateArticleReservationCommand>
+public class CreateArticleReservationHandler(
+    IArticlesRepository articlesRepository,
+    IUsersRepository usersRepository,
+    ICurrencyRepository currencyRepository,
+    IUnitOfWork unitOfWork) : ICommandHandler<CreateArticleReservationCommand>
 {
     public async Task<Unit> Handle(CreateArticleReservationCommand request, CancellationToken cancellationToken)
     {
@@ -26,20 +29,20 @@ public class CreateArticleReservationHandler(IArticlesRepository articlesReposit
 
         foreach (var item in reservations)
         {
-            if(item.GivenCurrencyId != null) 
+            if (item.GivenCurrencyId != null)
                 currencyIds.Add(item.GivenCurrencyId.Value);
             articleIds.Add(item.ArticleId);
             userIds.Add(item.UserId);
         }
-        
+
         await CheckIfNeededExists(currencyIds, articleIds, userIds, cancellationToken);
-        
+
         var adaptedReservations = reservations.Adapt<List<StorageContentReservation>>();
         foreach (var item in adaptedReservations)
             item.WhoCreated = request.WhoCreated;
         await unitOfWork.AddRangeAsync(adaptedReservations, cancellationToken);
         await unitOfWork.SaveChangesAsync(cancellationToken);
-        
+
         return Unit.Value;
     }
 

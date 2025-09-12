@@ -1,4 +1,3 @@
-using Application.Handlers.Producers.CreateProducer;
 using Application.Handlers.Producers.EditProducer;
 using Bogus;
 using Core.Dtos.Amw.Producers;
@@ -9,24 +8,24 @@ using Microsoft.Extensions.DependencyInjection;
 using Persistence.Contexts;
 using Tests.MockData;
 using Tests.testContainers.Combined;
-using static Tests.MockData.MockData;
+using ValidationException = FluentValidation.ValidationException;
 
 namespace Tests.HandlersTests.Producers;
 
 [Collection("Combined collection")]
 public class EditProducerTests : IAsyncLifetime
 {
-    private readonly Faker _faker = new(Global.Locale);
     private readonly DContext _context;
+    private readonly Faker _faker = new(Global.Locale);
     private readonly IMediator _mediator;
-    
+
     public EditProducerTests(CombinedContainerFixture fixture)
     {
         var sp = ServiceProviderForTests.Build(fixture.PostgresConnectionString, fixture.RedisConnectionString);
         _mediator = sp.GetService<IMediator>()!;
         _context = sp.GetRequiredService<DContext>();
     }
-        
+
     public async Task InitializeAsync()
     {
         await _mediator.AddMockProducersAndArticles();
@@ -36,7 +35,7 @@ public class EditProducerTests : IAsyncLifetime
     {
         await _context.ClearDatabaseFull();
     }
-    
+
     [Fact]
     public async Task EditProducer_TooLargeName_FailsValidation()
     {
@@ -51,9 +50,9 @@ public class EditProducerTests : IAsyncLifetime
             }
         };
         var command = new EditProducerCommand(producer.Id, model);
-        await Assert.ThrowsAsync<FluentValidation.ValidationException>(async () => await _mediator.Send(command));
+        await Assert.ThrowsAsync<ValidationException>(async () => await _mediator.Send(command));
     }
-    
+
     [Fact]
     public async Task EditProducer_TooSmallName_FailsValidation()
     {
@@ -68,9 +67,9 @@ public class EditProducerTests : IAsyncLifetime
             }
         };
         var command = new EditProducerCommand(producer.Id, model);
-        await Assert.ThrowsAsync<FluentValidation.ValidationException>(async () => await _mediator.Send(command));
+        await Assert.ThrowsAsync<ValidationException>(async () => await _mediator.Send(command));
     }
-    
+
     [Fact]
     public async Task EditProducer_IsSetButNullValue_FailsValidation()
     {
@@ -85,9 +84,9 @@ public class EditProducerTests : IAsyncLifetime
             }
         };
         var command = new EditProducerCommand(producer.Id, model);
-        await Assert.ThrowsAsync<FluentValidation.ValidationException>(async () => await _mediator.Send(command));
+        await Assert.ThrowsAsync<ValidationException>(async () => await _mediator.Send(command));
     }
-    
+
     [Fact]
     public async Task EditProducer_DescriptionTooLarge_FailsValidation()
     {
@@ -102,9 +101,9 @@ public class EditProducerTests : IAsyncLifetime
             }
         };
         var command = new EditProducerCommand(producer.Id, model);
-        await Assert.ThrowsAsync<FluentValidation.ValidationException>(async () => await _mediator.Send(command));
+        await Assert.ThrowsAsync<ValidationException>(async () => await _mediator.Send(command));
     }
-    
+
     [Fact]
     public async Task EditProducer_NoValuesSet_Succeeds()
     {
@@ -113,14 +112,14 @@ public class EditProducerTests : IAsyncLifetime
         var model = new PatchProducerDto();
         var command = new EditProducerCommand(producer.Id, model);
         await _mediator.Send(command);
-        
+
         var afterEditing = await _context.Producers.AsNoTracking().FirstOrDefaultAsync(x => x.Id == producer.Id);
         Assert.NotNull(afterEditing);
         Assert.Equal(producer.Name, afterEditing.Name);
         Assert.Equal(producer.Description, afterEditing.Description);
         Assert.Equal(producer.IsOe, afterEditing.IsOe);
     }
-    
+
     [Fact]
     public async Task EditProducer_Normal_Succeeds()
     {
@@ -141,7 +140,7 @@ public class EditProducerTests : IAsyncLifetime
         };
         var command = new EditProducerCommand(producer.Id, model);
         await _mediator.Send(command);
-        
+
         var afterEditing = await _context.Producers.AsNoTracking().FirstOrDefaultAsync(x => x.Id == producer.Id);
         Assert.NotNull(afterEditing);
         Assert.Equal(model.Name, afterEditing.Name);

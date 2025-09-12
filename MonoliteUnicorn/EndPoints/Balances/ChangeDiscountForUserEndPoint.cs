@@ -4,14 +4,15 @@ using MediatR;
 
 namespace MonoliteUnicorn.EndPoints.Balances;
 
-public record ChangeDiscountForUserRequest( decimal NewDiscount);
+public record ChangeDiscountForUserRequest(decimal NewDiscount);
 
 public class ChangeDiscountForUserEndPoint : ICarterModule
 {
     public void AddRoutes(IEndpointRouteBuilder app)
     {
         app.MapPatch("/users/{userId}/discount/",
-                async (ISender sender, string userId, ChangeDiscountForUserRequest request, CancellationToken cancellationToken) =>
+                async (ISender sender, string userId, ChangeDiscountForUserRequest request,
+                    CancellationToken cancellationToken) =>
                 {
                     var command = new ChangeUserDiscountCommand(userId, request.NewDiscount);
                     await sender.Send(command, cancellationToken);

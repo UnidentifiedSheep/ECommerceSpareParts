@@ -11,10 +11,13 @@ using MediatR;
 namespace Application.Handlers.Currencies.UpdateCurrenciesRates;
 
 [Transactional]
-public record UpdateCurrenciesRatesCommand() : ICommand;
+public record UpdateCurrenciesRatesCommand : ICommand;
 
-public class UpdateCurrenciesRatesHandler(IExchangeRates exchange, IMessageBroker messageBroker,
-    ICurrencyRepository currencyRepository, IUnitOfWork unitOfWork) : ICommandHandler<UpdateCurrenciesRatesCommand>
+public class UpdateCurrenciesRatesHandler(
+    IExchangeRates exchange,
+    IMessageBroker messageBroker,
+    ICurrencyRepository currencyRepository,
+    IUnitOfWork unitOfWork) : ICommandHandler<UpdateCurrenciesRatesCommand>
 {
     public async Task<Unit> Handle(UpdateCurrenciesRatesCommand request, CancellationToken cancellationToken)
     {
@@ -22,12 +25,12 @@ public class UpdateCurrenciesRatesHandler(IExchangeRates exchange, IMessageBroke
             .ToList();
         var currencyCodes = currencies.Select(x => x.Code);
         var newRates = await exchange.GetRates(currencyCodes, "USD", cancellationToken);
-        
+
         var historyToAdd = new List<CurrencyHistory>();
         foreach (var rate in newRates.Rates)
         {
             var currency = currencies.FirstOrDefault(x => x.Code == rate.Key);
-            if(currency == null) continue;
+            if (currency == null) continue;
 
             var prevValue = currency.CurrencyToUsd?.ToUsd ?? 0;
             if (currency.CurrencyToUsd == null)
@@ -38,7 +41,7 @@ public class UpdateCurrenciesRatesHandler(IExchangeRates exchange, IMessageBroke
                 };
             else
                 currency.CurrencyToUsd.ToUsd = rate.Value;
-            
+
             var currencyHistory = new CurrencyHistory
             {
                 CurrencyId = currency.Id,
@@ -48,7 +51,7 @@ public class UpdateCurrenciesRatesHandler(IExchangeRates exchange, IMessageBroke
             if (prevValue != rate.Value)
                 historyToAdd.Add(currencyHistory);
         }
-        
+
         await unitOfWork.AddRangeAsync(historyToAdd, cancellationToken);
         await unitOfWork.SaveChangesAsync(cancellationToken);
         await messageBroker.Publish(new CurrencyRateChangedEvent(), cancellationToken);

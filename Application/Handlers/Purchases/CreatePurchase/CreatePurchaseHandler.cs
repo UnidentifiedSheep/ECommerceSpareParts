@@ -1,10 +1,8 @@
-using System.Data;
 using Application.Extensions;
 using Application.Interfaces;
 using Core.Attributes;
 using Core.Dtos.Amw.Purchase;
 using Core.Entities;
-using Core.Interfaces;
 using Core.Interfaces.DbRepositories;
 using Core.Interfaces.Services;
 using Mapster;
@@ -12,14 +10,25 @@ using Mapster;
 namespace Application.Handlers.Purchases.CreatePurchase;
 
 [Transactional]
-public record CreatePurchaseCommand(IEnumerable<NewPurchaseContentDto> Content, int CurrencyId, string? Comment,
-    string CreatedUserId, string TransactionId, string StorageName, string SupplierId, DateTime PurchaseDateTime) : ICommand<CreatePurchaseResult>;
+public record CreatePurchaseCommand(
+    IEnumerable<NewPurchaseContentDto> Content,
+    int CurrencyId,
+    string? Comment,
+    string CreatedUserId,
+    string TransactionId,
+    string StorageName,
+    string SupplierId,
+    DateTime PurchaseDateTime) : ICommand<CreatePurchaseResult>;
 
 public record CreatePurchaseResult(Purchase Purchase);
 
-public class CreatePurchaseHandler(IUsersRepository usersRepository, ICurrencyRepository currencyRepository,
-    IBalanceRepository balanceRepository, IStoragesRepository storagesRepository, 
-    IArticlesRepository articlesRepository, IUnitOfWork unitOfWork) : ICommandHandler<CreatePurchaseCommand, CreatePurchaseResult>
+public class CreatePurchaseHandler(
+    IUsersRepository usersRepository,
+    ICurrencyRepository currencyRepository,
+    IBalanceRepository balanceRepository,
+    IStoragesRepository storagesRepository,
+    IArticlesRepository articlesRepository,
+    IUnitOfWork unitOfWork) : ICommandHandler<CreatePurchaseCommand, CreatePurchaseResult>
 {
     public async Task<CreatePurchaseResult> Handle(CreatePurchaseCommand request, CancellationToken cancellationToken)
     {
@@ -30,10 +39,11 @@ public class CreatePurchaseHandler(IUsersRepository usersRepository, ICurrencyRe
         var storageName = request.StorageName;
         var transactionId = request.TransactionId;
         var articleIds = content.Select(x => x.ArticleId).ToHashSet();
-        
-        await ValidateData([whoCreated, supplierId], currencyId, storageName, transactionId, articleIds, cancellationToken);
-        
-        var purchaseContents = content.Select(x=> x.Adapt<PurchaseContent>()).ToList();
+
+        await ValidateData([whoCreated, supplierId], currencyId, storageName, transactionId, articleIds,
+            cancellationToken);
+
+        var purchaseContents = content.Select(x => x.Adapt<PurchaseContent>()).ToList();
         var purchaseModel = new Purchase
         {
             CurrencyId = currencyId,
@@ -43,7 +53,7 @@ public class CreatePurchaseHandler(IUsersRepository usersRepository, ICurrencyRe
             SupplierId = supplierId,
             PurchaseDatetime = request.PurchaseDateTime,
             PurchaseContents = purchaseContents,
-            TransactionId = transactionId,
+            TransactionId = transactionId
         };
         await unitOfWork.AddAsync(purchaseModel, cancellationToken);
         await unitOfWork.SaveChangesAsync(cancellationToken);

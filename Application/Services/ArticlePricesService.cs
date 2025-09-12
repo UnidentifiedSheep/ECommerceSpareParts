@@ -4,16 +4,19 @@ using Core.Interfaces.Services;
 
 namespace Application.Services;
 
-public class ArticlePricesService(IRedisArticlePriceRepository redisArticlePrice, IStorageContentRepository storageContentRepository) : IArticlePricesService
+public class ArticlePricesService(
+    IRedisArticlePriceRepository redisArticlePrice,
+    IStorageContentRepository storageContentRepository) : IArticlePricesService
 {
-    public async Task<Dictionary<int, double?>> GetUsablePricesAsync(IEnumerable<int> articleIds, CancellationToken cancellationToken)
+    public async Task<Dictionary<int, double?>> GetUsablePricesAsync(IEnumerable<int> articleIds,
+        CancellationToken cancellationToken)
     {
         var foundPrices = await redisArticlePrice.GetUsablePricesAsync(articleIds);
         var notFound = foundPrices.Where(x => x.Value is null or <= 0)
             .Select(x => x.Key).ToHashSet();
-        
+
         if (notFound.Count == 0) return foundPrices;
-        
+
         var updated = await GetAlreadyUpdated(notFound);
         foreach (var id in updated)
             notFound.Remove(id);
@@ -23,10 +26,11 @@ public class ArticlePricesService(IRedisArticlePriceRepository redisArticlePrice
         return foundPrices;
     }
 
-    public async Task<Dictionary<int, double>> RecalculateUsablePrice(IEnumerable<int> articleIds, CancellationToken cancellationToken = default)
+    public async Task<Dictionary<int, double>> RecalculateUsablePrice(IEnumerable<int> articleIds,
+        CancellationToken cancellationToken = default)
     {
         var ids = articleIds.Distinct().ToHashSet();
-        
+
         var highestBuyPrices = await storageContentRepository
             .GetHighestBuyPrices(ids, 5, false, cancellationToken);
         var usablePrices = new Dictionary<int, double>();
@@ -35,6 +39,7 @@ public class ArticlePricesService(IRedisArticlePriceRepository redisArticlePrice
             var avg = Math.Round(buyPrices.Average(), 2);
             usablePrices[articleId] = (double)avg;
         }
+
         await redisArticlePrice.SetUsablePricesAsync(usablePrices);
         await redisArticlePrice.SetPriceUpdateTimeAsync(usablePrices.Keys, DateTime.Now);
         return usablePrices;

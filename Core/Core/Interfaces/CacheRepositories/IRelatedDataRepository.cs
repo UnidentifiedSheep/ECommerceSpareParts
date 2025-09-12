@@ -9,5 +9,4 @@ public interface IRelatedDataRepository
 
 public interface IRelatedDataRepository<TEntity> : IRelatedDataRepository
 {
-    
 }

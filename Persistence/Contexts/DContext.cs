@@ -103,7 +103,7 @@ public partial class DContext : DbContext
             .HasPostgresExtension("dblink")
             .HasPostgresExtension("pg_trgm")
             .HasPostgresExtension("pgcrypto");
-        
+
         modelBuilder.HasSequence<int>("table_name_id_seq");
 
         modelBuilder.Entity<Article>(entity =>
@@ -114,11 +114,11 @@ public partial class DContext : DbContext
 
             entity.HasIndex(e => e.ArticleName, "articles_article_name_index")
                 .HasMethod("gin")
-                .HasOperators(new[] { "gin_trgm_ops" });
+                .HasOperators("gin_trgm_ops");
 
             entity.HasIndex(e => e.ArticleNumber, "articles_article_number_index")
                 .HasMethod("gin")
-                .HasOperators(new[] { "gin_trgm_ops" });
+                .HasOperators("gin_trgm_ops");
 
             entity.HasIndex(e => e.CategoryId, "articles_category_id_index");
 
@@ -128,7 +128,7 @@ public partial class DContext : DbContext
 
             entity.HasIndex(e => e.NormalizedArticleNumber, "normalized_article_number__index")
                 .HasMethod("gin")
-                .HasOperators(new[] { "gin_trgm_ops" });
+                .HasOperators("gin_trgm_ops");
 
             entity.Property(e => e.Id).HasColumnName("id");
             entity.Property(e => e.ArticleName)
@@ -355,29 +355,29 @@ public partial class DContext : DbContext
 
             entity.HasIndex(e => e.Description, "aspnetusers_description_index")
                 .HasMethod("gin")
-                .HasOperators(new[] { "gin_trgm_ops" });
+                .HasOperators("gin_trgm_ops");
 
             entity.HasIndex(e => e.IsSupplier, "aspnetusers_issupplier_index");
 
             entity.HasIndex(e => e.Name, "aspnetusers_name_index")
                 .HasMethod("gin")
-                .HasOperators(new[] { "gin_trgm_ops" });
+                .HasOperators("gin_trgm_ops");
 
             entity.HasIndex(e => e.NormalizedEmail, "aspnetusers_normalizedemail_index")
                 .HasMethod("gin")
-                .HasOperators(new[] { "gin_trgm_ops" });
+                .HasOperators("gin_trgm_ops");
 
             entity.HasIndex(e => e.PhoneNumber, "aspnetusers_phonenumber_index")
                 .HasMethod("gin")
-                .HasOperators(new[] { "gin_trgm_ops" });
+                .HasOperators("gin_trgm_ops");
 
             entity.HasIndex(e => e.Surname, "aspnetusers_surname_index")
                 .HasMethod("gin")
-                .HasOperators(new[] { "gin_trgm_ops" });
+                .HasOperators("gin_trgm_ops");
 
             entity.HasIndex(e => e.NormalizedUserName, "aspnetusers_username_index")
                 .HasMethod("gin")
-                .HasOperators(new[] { "gin_trgm_ops" });
+                .HasOperators("gin_trgm_ops");
 
             entity.Property(e => e.Description).HasMaxLength(256);
             entity.Property(e => e.Email).HasMaxLength(256);
@@ -643,7 +643,8 @@ public partial class DContext : DbContext
 
         modelBuilder.Entity<ProducersOtherName>(entity =>
         {
-            entity.HasKey(e => new { e.ProducerId, e.ProducerOtherName, e.WhereUsed }).HasName("producers_other_names_pk");
+            entity.HasKey(e => new { e.ProducerId, e.ProducerOtherName, e.WhereUsed })
+                .HasName("producers_other_names_pk");
 
             entity.ToTable("producers_other_names");
 
@@ -651,11 +652,11 @@ public partial class DContext : DbContext
 
             entity.HasIndex(e => e.ProducerOtherName, "producers_other_names_producer_other_name_index")
                 .HasMethod("gin")
-                .HasOperators(new[] { "gin_trgm_ops" });
+                .HasOperators("gin_trgm_ops");
 
             entity.HasIndex(e => e.WhereUsed, "producers_other_names_where_used_index")
                 .HasMethod("gin")
-                .HasOperators(new[] { "gin_trgm_ops" });
+                .HasOperators("gin_trgm_ops");
 
             entity.Property(e => e.ProducerId).HasColumnName("producer_id");
             entity.Property(e => e.ProducerOtherName)
@@ -678,7 +679,7 @@ public partial class DContext : DbContext
 
             entity.HasIndex(e => e.Comment, "purchase_comment_index")
                 .HasMethod("gin")
-                .HasOperators(new[] { "gin_trgm_ops" });
+                .HasOperators("gin_trgm_ops");
 
             entity.HasIndex(e => e.CreatedUserId, "purchase_created_user_id_index");
 
@@ -758,7 +759,7 @@ public partial class DContext : DbContext
 
             entity.HasIndex(e => e.Comment, "purchase_content_comment_index")
                 .HasMethod("gin")
-                .HasOperators(new[] { "gin_trgm_ops" });
+                .HasOperators("gin_trgm_ops");
 
             entity.HasIndex(e => e.PurchaseId, "purchase_content_purchase_id_index");
 
@@ -800,7 +801,7 @@ public partial class DContext : DbContext
 
             entity.HasIndex(e => e.Comment, "sale_comment_index")
                 .HasMethod("gin")
-                .HasOperators(new[] { "gin_trgm_ops" });
+                .HasOperators("gin_trgm_ops");
 
             entity.HasIndex(e => e.CreatedUserId, "sale_created_user_id_index");
 
@@ -878,7 +879,7 @@ public partial class DContext : DbContext
 
             entity.HasIndex(e => e.Comment, "sale_content_comment_index")
                 .HasMethod("gin")
-                .HasOperators(new[] { "gin_trgm_ops" });
+                .HasOperators("gin_trgm_ops");
 
             entity.HasIndex(e => e.SaleId, "sale_content_sale_id_index");
 
@@ -956,11 +957,11 @@ public partial class DContext : DbContext
 
             entity.HasIndex(e => e.Description, "storages_description_index")
                 .HasMethod("gin")
-                .HasOperators(new[] { "gin_trgm_ops" });
+                .HasOperators("gin_trgm_ops");
 
             entity.HasIndex(e => e.Location, "storages_location_index")
                 .HasMethod("gin")
-                .HasOperators(new[] { "gin_trgm_ops" });
+                .HasOperators("gin_trgm_ops");
 
             entity.Property(e => e.Name)
                 .HasMaxLength(128)
@@ -997,7 +998,7 @@ public partial class DContext : DbContext
 
             entity.HasIndex(e => e.StorageName, "storage_content_storage_name_index")
                 .HasMethod("gin")
-                .HasOperators(new[] { "gin_trgm_ops" });
+                .HasOperators("gin_trgm_ops");
 
             entity.Property(e => e.Id).HasColumnName("id");
             entity.Property(e => e.ArticleId).HasColumnName("article_id");
@@ -1040,11 +1041,12 @@ public partial class DContext : DbContext
 
             entity.HasIndex(e => e.ArticleId, "storage_content_reservations_article_id_index");
 
-            entity.HasIndex(e => new { e.ArticleId, e.IsDone }, "storage_content_reservations_article_id_is_done_index");
+            entity.HasIndex(e => new { e.ArticleId, e.IsDone },
+                "storage_content_reservations_article_id_is_done_index");
 
             entity.HasIndex(e => e.Comment, "storage_content_reservations_comment_index")
                 .HasMethod("gin")
-                .HasOperators(new[] { "gin_trgm_ops" });
+                .HasOperators("gin_trgm_ops");
 
             entity.HasIndex(e => e.CreateAt, "storage_content_reservations_create_at_index");
 
@@ -1172,7 +1174,8 @@ public partial class DContext : DbContext
 
             entity.HasIndex(e => e.ReceiverId, "transactions_receiver_id_index");
 
-            entity.HasIndex(e => new { e.ReceiverId, e.TransactionDatetime, e.SenderId }, "transactions_receiver_id_transaction_datetime_sender_id_uindex")
+            entity.HasIndex(e => new { e.ReceiverId, e.TransactionDatetime, e.SenderId },
+                    "transactions_receiver_id_transaction_datetime_sender_id_uindex")
                 .IsUnique()
                 .HasFilter("(is_deleted IS FALSE)");
 
@@ -1186,7 +1189,8 @@ public partial class DContext : DbContext
 
             entity.HasIndex(e => e.TransactionDatetime, "transactions_transaction_datetime_index");
 
-            entity.HasIndex(e => e.TransactionDatetime, "transactions_transaction_datetime_sender_id_receiver_id_idx").IsDescending();
+            entity.HasIndex(e => e.TransactionDatetime, "transactions_transaction_datetime_sender_id_receiver_id_idx")
+                .IsDescending();
 
             entity.HasIndex(e => e.WhoMadeUserId, "transactions_who_made_user_id_index");
 
@@ -1242,7 +1246,7 @@ public partial class DContext : DbContext
                 .HasForeignKey(d => d.WhoMadeUserId)
                 .OnDelete(DeleteBehavior.Restrict)
                 .HasConstraintName("transactions_aspnetusers_id_fk_3");
-            
+
             entity.HasQueryFilter(t => !t.IsDeleted);
         });
 
@@ -1264,7 +1268,8 @@ public partial class DContext : DbContext
 
             entity.HasIndex(e => e.TransactionId, "transaction_versions_transaction_id_index");
 
-            entity.HasIndex(e => new { e.TransactionId, e.Version }, "transaction_versions_transaction_id_version_uindex").IsUnique();
+            entity.HasIndex(e => new { e.TransactionId, e.Version },
+                "transaction_versions_transaction_id_version_uindex").IsUnique();
 
             entity.HasIndex(e => e.VersionCreatedDatetime, "transaction_versions_version_created_datetime_index");
 
@@ -1362,11 +1367,11 @@ public partial class DContext : DbContext
 
             entity.HasIndex(e => e.LocalPart, "user_mails_local_part_index")
                 .HasMethod("gin")
-                .HasOperators(new[] { "gin_trgm_ops" });
+                .HasOperators("gin_trgm_ops");
 
             entity.HasIndex(e => e.NormalizedEmail, "user_mails_normalized_email_index")
                 .HasMethod("gin")
-                .HasOperators(new[] { "gin_trgm_ops" });
+                .HasOperators("gin_trgm_ops");
 
             entity.HasIndex(e => e.NormalizedEmail, "user_mails_normalized_email_uindex").IsUnique();
 
@@ -1423,15 +1428,15 @@ public partial class DContext : DbContext
 
             entity.HasIndex(e => e.Comment, "user_vehicles_comment_index")
                 .HasMethod("gin")
-                .HasOperators(new[] { "gin_trgm_ops" });
+                .HasOperators("gin_trgm_ops");
 
             entity.HasIndex(e => e.Manufacture, "user_vehicles_manufacture_index")
                 .HasMethod("gin")
-                .HasOperators(new[] { "gin_trgm_ops" });
+                .HasOperators("gin_trgm_ops");
 
             entity.HasIndex(e => e.Model, "user_vehicles_model_index")
                 .HasMethod("gin")
-                .HasOperators(new[] { "gin_trgm_ops" });
+                .HasOperators("gin_trgm_ops");
 
             entity.HasIndex(e => e.PlateNumber, "user_vehicles_plate_number_uindex").IsUnique();
 

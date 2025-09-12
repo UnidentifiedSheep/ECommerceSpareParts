@@ -6,17 +6,25 @@ using Mapster;
 
 namespace Application.Handlers.Articles.GetArticles;
 
-public record GetArticlesQuery<TDto>(string SearchTerm, PaginationModel Pagination, string? SortBy, IEnumerable<int> ProducerIds,
-    ArticleSearchStrategy Strategy, string? UserId) : IQuery<GetArticlesResult<TDto>>;
+public record GetArticlesQuery<TDto>(
+    string SearchTerm,
+    PaginationModel Pagination,
+    string? SortBy,
+    IEnumerable<int> ProducerIds,
+    ArticleSearchStrategy Strategy,
+    string? UserId) : IQuery<GetArticlesResult<TDto>>;
+
 public record GetArticlesResult<TDto>(IEnumerable<TDto> Articles);
 
-public class GetArticlesHandler<TDto>(IArticlesRepository articlesRepository) : IQueryHandler<GetArticlesQuery<TDto>, GetArticlesResult<TDto>>
+public class GetArticlesHandler<TDto>(IArticlesRepository articlesRepository)
+    : IQueryHandler<GetArticlesQuery<TDto>, GetArticlesResult<TDto>>
 {
-    public async Task<GetArticlesResult<TDto>> Handle(GetArticlesQuery<TDto> request, CancellationToken cancellationToken)
+    public async Task<GetArticlesResult<TDto>> Handle(GetArticlesQuery<TDto> request,
+        CancellationToken cancellationToken)
     {
         var page = request.Pagination.Page;
         var viewCount = request.Pagination.Size;
-        
+
         var articles = request.Strategy switch
         {
             ArticleSearchStrategy.ByStartNumber =>

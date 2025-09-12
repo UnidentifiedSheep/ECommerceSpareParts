@@ -1,6 +1,6 @@
 ﻿namespace Core.Entities;
 
-public partial class ArticlesPair
+public class ArticlesPair
 {
     public int ArticleLeft { get; set; }
 

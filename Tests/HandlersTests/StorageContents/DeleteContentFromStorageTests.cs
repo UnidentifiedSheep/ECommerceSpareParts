@@ -18,9 +18,9 @@ public class DeleteContentFromStorageTests : IAsyncLifetime
 {
     private readonly DContext _context;
     private readonly IMediator _mediator;
-    private AspNetUser _user = null!;
     private List<StorageContent> _storageContents = null!;
-    
+    private AspNetUser _user = null!;
+
     public DeleteContentFromStorageTests(CombinedContainerFixture fixture)
     {
         MapsterConfig.Configure();
@@ -28,7 +28,7 @@ public class DeleteContentFromStorageTests : IAsyncLifetime
         _context = sp.GetRequiredService<DContext>();
         _mediator = sp.GetRequiredService<IMediator>();
     }
-        
+
     public async Task InitializeAsync()
     {
         await _mediator.AddMockProducersAndArticles();
@@ -56,20 +56,20 @@ public class DeleteContentFromStorageTests : IAsyncLifetime
         var command = new DeleteStorageContentCommand(contentId, "", Global.Faker.Lorem.Word());
         await Assert.ThrowsAsync<UserNotFoundException>(async () => await _mediator.Send(command));
     }
-    
+
     [Fact]
     public async Task DeleteContentFromStorage_WithInvalidContentId_ThrowsStorageContentNotFoundException()
     {
         var command = new DeleteStorageContentCommand(99999, "", _user.Id);
         await Assert.ThrowsAsync<StorageContentNotFoundException>(async () => await _mediator.Send(command));
     }
-    
+
     [Fact]
     public async Task DeleteContentFromStorage_WithValidData_Succeeds()
     {
         var content = _storageContents.First();
         var prevStorageMovements = await _context.StorageMovements.CountAsync();
-        
+
         var concurrencyCode = "";
         var command = new DeleteStorageContentCommand(content.Id, concurrencyCode, _user.Id);
         var ex = await Assert.ThrowsAsync<ConcurrencyCodeMismatchException>(async () => await _mediator.Send(command));

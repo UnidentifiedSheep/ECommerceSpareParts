@@ -1,7 +1,6 @@
 using Application.Interfaces;
 using Core.Attributes;
 using Core.Entities;
-using Core.Interfaces;
 using Core.Interfaces.Services;
 using MediatR;
 

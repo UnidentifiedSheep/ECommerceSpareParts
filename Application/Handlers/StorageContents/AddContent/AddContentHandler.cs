@@ -15,11 +15,21 @@ using MediatR;
 namespace Application.Handlers.StorageContents.AddContent;
 
 [Transactional(IsolationLevel.Serializable, 20, 2)]
-public record AddContentCommand(IEnumerable<NewStorageContentDto> StorageContent, string StorageName, string UserId, StorageMovementType MovementType) : ICommand;
+public record AddContentCommand(
+    IEnumerable<NewStorageContentDto> StorageContent,
+    string StorageName,
+    string UserId,
+    StorageMovementType MovementType) : ICommand;
 
-public class AddContentHandler(ICurrencyRepository currencyRepository, IStoragesRepository storagesRepository,
-    IUsersRepository usersRepository, IArticlesRepository articlesRepository, IUnitOfWork unitOfWork,
-    ICurrencyConverter currencyConverter, IArticlesService articlesService, IMediator mediator) : ICommandHandler<AddContentCommand>
+public class AddContentHandler(
+    ICurrencyRepository currencyRepository,
+    IStoragesRepository storagesRepository,
+    IUsersRepository usersRepository,
+    IArticlesRepository articlesRepository,
+    IUnitOfWork unitOfWork,
+    ICurrencyConverter currencyConverter,
+    IArticlesService articlesService,
+    IMediator mediator) : ICommandHandler<AddContentCommand>
 {
     public async Task<Unit> Handle(AddContentCommand request, CancellationToken cancellationToken)
     {
@@ -58,7 +68,8 @@ public class AddContentHandler(ICurrencyRepository currencyRepository, IStorages
         return Unit.Value;
     }
 
-    private async Task ValidateData(IEnumerable<int> articleIds, IEnumerable<int> currencyIds, string storageName, string userId,
+    private async Task ValidateData(IEnumerable<int> articleIds, IEnumerable<int> currencyIds, string storageName,
+        string userId,
         CancellationToken cancellationToken = default)
     {
         await currencyRepository.EnsureCurrenciesExists(currencyIds, cancellationToken);

@@ -8,24 +8,30 @@ using MediatR;
 
 namespace Application.Handlers.Prices.GetDetailedPrices;
 
-public record GetDetailedPricesQuery(IEnumerable<int> ArticleIds, int CurrencyId, string? BuyerId) : IQuery<GetDetailedPriceResult>;
+public record GetDetailedPricesQuery(IEnumerable<int> ArticleIds, int CurrencyId, string? BuyerId)
+    : IQuery<GetDetailedPriceResult>;
+
 public record GetDetailedPriceResult(Dictionary<int, DetailedPriceModel> Prices);
 
-public class GetDetailedPriceHandler(ICurrencyConverter currencyConverter, IArticlePricesService pricesService, 
-    IPriceGenerator priceGenerator, IMediator mediator) : IQueryHandler<GetDetailedPricesQuery, GetDetailedPriceResult>
+public class GetDetailedPriceHandler(
+    ICurrencyConverter currencyConverter,
+    IArticlePricesService pricesService,
+    IPriceGenerator priceGenerator,
+    IMediator mediator) : IQueryHandler<GetDetailedPricesQuery, GetDetailedPriceResult>
 {
-    public async Task<GetDetailedPriceResult> Handle(GetDetailedPricesQuery request, CancellationToken cancellationToken)
+    public async Task<GetDetailedPriceResult> Handle(GetDetailedPricesQuery request,
+        CancellationToken cancellationToken)
     {
         ValidateData(request.CurrencyId);
-        
+
         var buyerId = request.BuyerId;
         var currencyId = request.CurrencyId;
         var articleIds = request.ArticleIds;
-        
+
         var results = new Dictionary<int, DetailedPriceModel>();
         var userDiscount = await GetUserDiscount(buyerId, cancellationToken) ?? 0;
         var prices = await pricesService.GetUsablePricesAsync(articleIds, cancellationToken);
-        
+
         foreach (var (articleId, usablePrice) in prices)
         {
             if (usablePrice == null || usablePrice <= 0) continue;
@@ -39,7 +45,7 @@ public class GetDetailedPriceHandler(ICurrencyConverter currencyConverter, IArti
                 RecommendedPriceWithDiscount = priceGenerator.GetSellPrice(converted, (double)userDiscount, currencyId)
             };
         }
-        
+
         return new GetDetailedPriceResult(results);
     }
 
@@ -52,7 +58,7 @@ public class GetDetailedPriceHandler(ICurrencyConverter currencyConverter, IArti
 
     private void ValidateData(int currencyId)
     {
-        if(!currencyConverter.IsSupportedCurrency(currencyId))
+        if (!currencyConverter.IsSupportedCurrency(currencyId))
             throw new CurrencyNotFoundException(currencyId);
     }
 }

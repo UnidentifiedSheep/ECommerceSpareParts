@@ -26,7 +26,6 @@ using Security;
 using Serilog;
 using Serilog.Sinks.Loki;
 using Serilog.Sinks.Loki.Labels;
-
 using ApplicationServiceProvider = Application.ServiceProvider;
 using CacheServiceProvider = Redis.ServiceProvider;
 
@@ -42,7 +41,9 @@ Log.Logger = new LoggerConfiguration()
     .WriteTo.LokiHttp(() => new LokiSinkConfiguration
     {
         LokiUrl = builder.Configuration["Loki:Url"],
-        LogLabelProvider = new CustomLogLabelProvider([new LokiLabel("app", "app"), new LokiLabel("monolite-unicorn", "monolite-unicorn")]),
+        LogLabelProvider = new CustomLogLabelProvider([
+            new LokiLabel("app", "app"), new LokiLabel("monolite-unicorn", "monolite-unicorn")
+        ])
     })
     .WriteTo.Console()
     .CreateLogger();
@@ -64,7 +65,7 @@ builder.Services.AddSwaggerGen(c =>
         BearerFormat = "JWT",
         Scheme = "Bearer"
     });
-    
+
     c.AddSecurityRequirement(new OpenApiSecurityRequirement
     {
         {
@@ -81,7 +82,7 @@ builder.Services.AddSwaggerGen(c =>
     });
 });
 
-builder.Services.AddHangfire(x => 
+builder.Services.AddHangfire(x =>
     x.UsePostgreSqlStorage(z => z.UseNpgsqlConnection(builder.Configuration
         .GetConnectionString("DefaultConnection"))));
 builder.Services.AddHangfireServer();
@@ -91,7 +92,7 @@ var brokerOptions = new MessageBrokerOptions
 {
     Host = builder.Configuration["RabbitMqSettings:Host"]!,
     Username = builder.Configuration["RabbitMqSettings:Username"]!,
-    Password = builder.Configuration["RabbitMqSettings:Password"]!,
+    Password = builder.Configuration["RabbitMqSettings:Password"]!
 };
 
 ApplicationServiceProvider.AddApplicationLayer(builder.Services)
@@ -119,14 +120,8 @@ builder.Services.AddIdentity<UserModel, IdentityRole>(options =>
 
 builder.Services.AddAuthorization(options =>
 {
-    options.AddPolicy("AMW", policy =>
-    {
-        policy.RequireRole("ADMIN", "MODERATOR", "WORKER");
-    });
-    options.AddPolicy("AM", policy =>
-    {
-        policy.RequireRole("ADMIN", "MODERATOR");
-    });
+    options.AddPolicy("AMW", policy => { policy.RequireRole("ADMIN", "MODERATOR", "WORKER"); });
+    options.AddPolicy("AM", policy => { policy.RequireRole("ADMIN", "MODERATOR"); });
 });
 
 builder.Services.AddAuthentication(options =>
@@ -145,11 +140,13 @@ builder.Services.AddAuthentication(options =>
         ValidateIssuerSigningKey = true,
         ValidIssuer = iss,
         ValidAudience = builder.Configuration["JwtBearer:ValidAudience"],
-        IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration["JwtBearer:IssuerSigningKey"]!))
+        IssuerSigningKey =
+            new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration["JwtBearer:IssuerSigningKey"]!))
     };
 });
 builder.Services.AddAuthorizationBuilder()
-    .SetDefaultPolicy(new AuthorizationPolicyBuilder(JwtBearerDefaults.AuthenticationScheme).RequireAuthenticatedUser().Build());
+    .SetDefaultPolicy(new AuthorizationPolicyBuilder(JwtBearerDefaults.AuthenticationScheme).RequireAuthenticatedUser()
+        .Build());
 
 builder.Services.AddCarter();
 builder.Services.AddExceptionHandler<CustomExceptionHandler>();
@@ -192,9 +189,9 @@ if (app.Environment.IsDevelopment())
 app.UseHttpsRedirection();
 
 
-RecurringJob.AddOrUpdate<UpdateCurrencyRate>("UpdateCurrencyTask", 
+RecurringJob.AddOrUpdate<UpdateCurrencyRate>("UpdateCurrencyTask",
     x => x.Run(), Cron.Daily);
-RecurringJob.AddOrUpdate<UpdateMarkUp>("UpdateMarkUp", 
+RecurringJob.AddOrUpdate<UpdateMarkUp>("UpdateMarkUp",
     x => x.Run(), Cron.Weekly);
 
 app.UseOpenTelemetryPrometheusScrapingEndpoint();

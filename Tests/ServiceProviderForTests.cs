@@ -18,6 +18,7 @@ public static class ServiceProviderForTests
 {
     public static bool IsConfiguredBefore;
     private static ServiceProvider? _serviceProvider;
+
     public static IServiceProvider Build(string postgresConnectionString, string redisConnectionString)
     {
         if (IsConfiguredBefore)
@@ -25,6 +26,7 @@ public static class ServiceProviderForTests
             var scope = _serviceProvider!.CreateScope();
             return scope.ServiceProvider;
         }
+
         var services = new ServiceCollection();
 
         services.AddLogging();
@@ -33,7 +35,7 @@ public static class ServiceProviderForTests
             .Enrich.FromLogContext()
             .WriteTo.Console()
             .CreateLogger();
-        
+
         ApplicationServiceProvider.AddApplicationLayer(services)
             .AddPersistenceLayer(postgresConnectionString);
         CacheServiceProvider.AddCacheLayer(services, redisConnectionString)
@@ -42,18 +44,18 @@ public static class ServiceProviderForTests
             .AddCommonLayer();
         MapsterConfig.Configure();
         SortByConfig.Configure();
-        
+
         var serviceProvider = services.BuildServiceProvider();
         IsConfiguredBefore = true;
         _serviceProvider = serviceProvider;
         SetupPrice(_serviceProvider).Wait();
         return serviceProvider;
     }
-    
+
     private static async Task SetupPrice(IServiceProvider serviceProvider)
     {
         using var scope = serviceProvider.CreateScope();
-        
+
         var context = scope.ServiceProvider.GetRequiredService<DContext>();
         var priceSetup = scope.ServiceProvider.GetRequiredService<IPriceSetup>();
 

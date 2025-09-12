@@ -14,12 +14,22 @@ using MediatR;
 namespace Application.Handlers.Sales.EditSale;
 
 [Transactional]
-public record EditSaleCommand(IEnumerable<EditSaleContentDto> EditedContent, IEnumerable<PrevAndNewValue<StorageContent>> StorageContentValues,
-    Dictionary<int, List<SaleContentDetail>> MovedToStorage, string SaleId, int CurrencyId, string UpdatedUserId, 
-    DateTime SaleDateTime, string? Comment) : ICommand;
+public record EditSaleCommand(
+    IEnumerable<EditSaleContentDto> EditedContent,
+    IEnumerable<PrevAndNewValue<StorageContent>> StorageContentValues,
+    Dictionary<int, List<SaleContentDetail>> MovedToStorage,
+    string SaleId,
+    int CurrencyId,
+    string UpdatedUserId,
+    DateTime SaleDateTime,
+    string? Comment) : ICommand;
 
-public class EditSaleHandler(ICurrencyRepository currencyRepository, IUsersRepository usersRepository,
-    IUnitOfWork unitOfWork, ISaleService saleService, ISaleRepository saleRepository,
+public class EditSaleHandler(
+    ICurrencyRepository currencyRepository,
+    IUsersRepository usersRepository,
+    IUnitOfWork unitOfWork,
+    ISaleService saleService,
+    ISaleRepository saleRepository,
     IPriceGenerator priceGenerator) : ICommandHandler<EditSaleCommand>
 {
     public async Task<Unit> Handle(EditSaleCommand request, CancellationToken cancellationToken)
@@ -29,81 +39,84 @@ public class EditSaleHandler(ICurrencyRepository currencyRepository, IUsersRepos
         var editedContent = request.EditedContent;
         var movedToStorage = request.MovedToStorage;
         await ValidateData(updatedUserId, request.CurrencyId, cancellationToken);
-        
+
         var sale = await saleRepository.GetSaleForUpdate(saleId, true, cancellationToken)
                    ?? throw new SaleNotFoundException(saleId);
-        
+
         sale.Comment = request.Comment;
         sale.SaleDatetime = request.SaleDateTime;
         sale.UpdatedUserId = updatedUserId;
         sale.UpdateDatetime = DateTime.Now;
-        
+
         var saleContents = (await saleRepository.GetSaleContentsForUpdate(saleId, true, cancellationToken))
             .ToDictionary(x => x.Id);
-        var saleContentDetails = (await saleRepository.GetSaleContentDetailsForUpdate(saleContents.Keys, 
+        var saleContentDetails = (await saleRepository.GetSaleContentDetailsForUpdate(saleContents.Keys,
             true, cancellationToken)).ToDictionary(x => x.Id);
-        
+
         var detailGroups = saleService.GetDetailsGroup(request.StorageContentValues);
         var deletedContentIds = new HashSet<int>(saleContents.Keys);
-        
+
         foreach (var item in editedContent)
-        {
             if (item.Id != null)
-                WhenSaleContentExists(item, deletedContentIds, saleContents, detailGroups, movedToStorage, saleContentDetails);
+                WhenSaleContentExists(item, deletedContentIds, saleContents, detailGroups, movedToStorage,
+                    saleContentDetails);
             else
                 WhenSaleContentNotExists(item, sale, detailGroups);
-        }
-                
+
         if (detailGroups.Any(x => x.Value.Count > 0))
             throw new ArgumentException("Несовпадение количества в деталях и продажах");
-        
+
         var deletedContents = saleContents
             .Where(kvp => deletedContentIds.Contains(kvp.Key))
             .Select(x => x.Value)
             .ToList();
         unitOfWork.RemoveRange(deletedContents);
-        await unitOfWork.SaveChangesAsync(cancellationToken); 
+        await unitOfWork.SaveChangesAsync(cancellationToken);
         return Unit.Value;
     }
 
-    private void WhenSaleContentNotExists(EditSaleContentDto item, Sale sale, Dictionary<int,Queue<SaleContentDetail>> detailGroups)
+    private void WhenSaleContentNotExists(EditSaleContentDto item, Sale sale,
+        Dictionary<int, Queue<SaleContentDetail>> detailGroups)
     {
         var saleContent = item.Adapt<SaleContent>();
         sale.SaleContents.Add(saleContent);
         if (!detailGroups.TryGetValue(item.ArticleId, out var queue))
             throw new ArgumentException($"Нет деталей по артикулу {item.ArticleId}");
 
-        int counter = item.Count;
+        var counter = item.Count;
         AssignDetailsToContent(saleContent, queue, counter);
     }
 
-    private void WhenSaleContentExists(EditSaleContentDto item, HashSet<int> deletedContentIds, Dictionary<int, SaleContent> saleContents,
-        Dictionary<int,Queue<SaleContentDetail>> detailGroups, Dictionary<int, List<SaleContentDetail>> movedToStorage,
-        Dictionary<int,SaleContentDetail> saleContentDetails)
+    private void WhenSaleContentExists(EditSaleContentDto item, HashSet<int> deletedContentIds,
+        Dictionary<int, SaleContent> saleContents,
+        Dictionary<int, Queue<SaleContentDetail>> detailGroups, Dictionary<int, List<SaleContentDetail>> movedToStorage,
+        Dictionary<int, SaleContentDetail> saleContentDetails)
     {
         deletedContentIds.Remove(item.Id!.Value);
-        if(!saleContents.TryGetValue(item.Id.Value, out var saleContent))
+        if (!saleContents.TryGetValue(item.Id.Value, out var saleContent))
             throw new SaleContentNotFoundException(item.Id.Value);
-                        
+
         saleContent.Discount = priceGenerator.GetDiscountFromPrices(item.PriceWithDiscount, item.Price);
         saleContent.Price = item.PriceWithDiscount;
         saleContent.TotalSum = item.PriceWithDiscount * item.Count;
-                        
+
         if (saleContent.Count < item.Count)
         {
             if (!detailGroups.TryGetValue(item.ArticleId, out var queue))
                 throw new ArgumentException($"Нет деталей по артикулу {item.ArticleId}");
 
-            int counter = item.Count - saleContent.Count;
+            var counter = item.Count - saleContent.Count;
             AssignDetailsToContent(saleContent, queue, counter);
         }
-        else if(saleContent.Count > item.Count)
+        else if (saleContent.Count > item.Count)
+        {
             ReturnDetailsToStorage(movedToStorage[item.Id.Value], saleContentDetails);
-        
+        }
+
         saleContent.Count = item.Count;
     }
-    
-    private void ReturnDetailsToStorage(IEnumerable<SaleContentDetail> movedDetails, 
+
+    private void ReturnDetailsToStorage(IEnumerable<SaleContentDetail> movedDetails,
         Dictionary<int, SaleContentDetail> saleContentDetails)
     {
         foreach (var tempDetail in movedDetails)
@@ -116,10 +129,10 @@ public class EditSaleHandler(ICurrencyRepository currencyRepository, IUsersRepos
                 unitOfWork.Remove(realDetail);
         }
     }
-    
+
     private void AssignDetailsToContent(SaleContent saleContent, Queue<SaleContentDetail> queue, int requiredCount)
     {
-        int counter = requiredCount;
+        var counter = requiredCount;
         while (counter > 0 && queue.Count > 0)
         {
             var detail = queue.Peek();
@@ -138,6 +151,7 @@ public class EditSaleHandler(ICurrencyRepository currencyRepository, IUsersRepos
                 saleContent.SaleContentDetails.Add(partial);
             }
         }
+
         if (counter > 0)
             throw new ArgumentException($"Недостаточно деталей для артикула {saleContent.ArticleId}");
     }

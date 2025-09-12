@@ -13,13 +13,13 @@ namespace Application.Handlers.Articles.CreateArticles;
 [Transactional]
 public record CreateArticlesCommand(List<CreateArticleDto> NewArticles) : ICommand;
 
-public class CreateArticlesHandler(IProducerRepository producerRepository, IUnitOfWork unitOfWork) 
+public class CreateArticlesHandler(IProducerRepository producerRepository, IUnitOfWork unitOfWork)
     : ICommandHandler<CreateArticlesCommand>
 {
     public async Task<Unit> Handle(CreateArticlesCommand request, CancellationToken cancellationToken)
     {
         var producersIds = request.NewArticles.Select(x => x.ProducerId);
-        
+
         await producerRepository.EnsureProducersExists(producersIds, cancellationToken);
 
         var articles = request.NewArticles.Adapt<List<Article>>();

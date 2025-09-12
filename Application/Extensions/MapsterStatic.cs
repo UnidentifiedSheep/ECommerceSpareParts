@@ -27,7 +27,7 @@ public static class MapsterStatic
             var notIsSet = Expression.Not(isSetProp);
             var lambda = Expression.Lambda<Func<TSource, TDestination, bool>>(notIsSet, srcParam, destParam);
             var destProp = destinationType.GetProperty(propName);
-            
+
             if (destProp == null) continue;
 
             var destParamExpr = Expression.Parameter(destinationType, "dest");

@@ -6,7 +6,13 @@ using MediatR;
 
 namespace MonoliteUnicorn.EndPoints.Sales;
 
-public record EditSaleRequest(IEnumerable<EditSaleContentDto> EditedContent, int CurrencyId, DateTime SaleDateTime, string? Comment, bool SellFromOtherStorages);
+public record EditSaleRequest(
+    IEnumerable<EditSaleContentDto> EditedContent,
+    int CurrencyId,
+    DateTime SaleDateTime,
+    string? Comment,
+    bool SellFromOtherStorages);
+
 public class EditSaleEndPoint : ICarterModule
 {
     public void AddRoutes(IEndpointRouteBuilder app)
@@ -16,7 +22,7 @@ public class EditSaleEndPoint : ICarterModule
             {
                 var userId = claims.FindFirst(ClaimTypes.NameIdentifier)?.Value;
                 if (userId == null) return Results.Unauthorized();
-                var command = new EditFullSaleCommand(request.EditedContent, saleId, request.CurrencyId, userId, 
+                var command = new EditFullSaleCommand(request.EditedContent, saleId, request.CurrencyId, userId,
                     request.SaleDateTime, request.Comment, request.SellFromOtherStorages);
                 await sender.Send(command, cancellationToken);
                 return Results.Ok();

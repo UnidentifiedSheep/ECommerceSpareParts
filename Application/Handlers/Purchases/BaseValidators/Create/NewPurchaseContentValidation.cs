@@ -4,7 +4,7 @@ using FluentValidation;
 
 namespace Application.Handlers.Purchases.BaseValidators.Create;
 
-public class NewPurchaseContentValidation: AbstractValidator<NewPurchaseContentDto>
+public class NewPurchaseContentValidation : AbstractValidator<NewPurchaseContentDto>
 {
     public NewPurchaseContentValidation()
     {

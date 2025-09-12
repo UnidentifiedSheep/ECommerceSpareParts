@@ -1,4 +1,3 @@
-using Application.Handlers.BaseValidators;
 using Application.Handlers.Purchases.BaseValidators;
 using Application.Handlers.Purchases.BaseValidators.Create;
 using FluentValidation;
@@ -17,7 +16,7 @@ public class CreateFullPurchaseValidation : AbstractValidator<CreateFullPurchase
             .WithMessage("Id продавца не может быть пустым");
         RuleFor(x => x.CreatedUserId).NotEmpty()
             .WithMessage("Id пользователя создавшего закупку не может быть пустым");
-        
+
         RuleForEach(x => x.PurchaseContent)
             .SetValidator(new NewPurchaseContentValidation());
 

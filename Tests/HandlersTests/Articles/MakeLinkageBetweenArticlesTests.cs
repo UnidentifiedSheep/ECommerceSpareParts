@@ -20,7 +20,7 @@ public class MakeLinkageBetweenArticlesTests : IAsyncLifetime
 {
     private readonly DContext _context;
     private readonly IMediator _mediator;
-    
+
     public MakeLinkageBetweenArticlesTests(CombinedContainerFixture fixture)
     {
         MapsterConfig.Configure();
@@ -28,17 +28,17 @@ public class MakeLinkageBetweenArticlesTests : IAsyncLifetime
         _mediator = sp.GetService<IMediator>()!;
         _context = sp.GetRequiredService<DContext>();
     }
-        
+
     public async Task InitializeAsync()
     {
         var newProducerModel = CreateNewProducerDto(1)[0];
         var producerCommand = new CreateProducerCommand(newProducerModel);
         var producerId = (await _mediator.Send(producerCommand)).ProducerId;
-        
+
         var articleList = CreateNewArticleDto(10);
         foreach (var article in articleList)
             article.ProducerId = producerId;
-        
+
         var articleCommand = new CreateArticlesCommand(articleList);
         await _mediator.Send(articleCommand);
     }
@@ -71,14 +71,14 @@ public class MakeLinkageBetweenArticlesTests : IAsyncLifetime
             LinkageType = ArticleLinkageTypes.SingleCross
         };
         var command = new MakeLinkageBetweenArticlesCommand(newLinkage);
-        
+
         var result = await _mediator.Send(command);
         Assert.Equal(Unit.Value, result);
 
         var crosses = await _context.ArticleCrosses
-            .Where(x => (x.ArticleId == 1 && x.ArticleCrossId == 2) || x.ArticleId == 2 && x.ArticleCrossId == 1)
+            .Where(x => (x.ArticleId == 1 && x.ArticleCrossId == 2) || (x.ArticleId == 2 && x.ArticleCrossId == 1))
             .CountAsync();
-        
+
         Assert.Equal(2, crosses);
     }
 
@@ -96,9 +96,9 @@ public class MakeLinkageBetweenArticlesTests : IAsyncLifetime
             LinkageType = ArticleLinkageTypes.FullCross
         };
         var command = new MakeLinkageBetweenArticlesCommand(newLinkage);
-    
+
         var result = await _mediator.Send(command);
-    
+
         Assert.Equal(Unit.Value, result);
 
         var expectedLinks = new HashSet<(int ArticleId, int ArticleCrossId)>
@@ -106,7 +106,7 @@ public class MakeLinkageBetweenArticlesTests : IAsyncLifetime
             (1, 2), (1, 4), (3, 2), (3, 4),
             (2, 1), (4, 1), (2, 3), (4, 3)
         };
-    
+
         var actualLinks = await _context.ArticleCrosses
             .AsNoTracking()
             .ToListAsync();
@@ -116,7 +116,7 @@ public class MakeLinkageBetweenArticlesTests : IAsyncLifetime
             .ToList();
 
         Assert.Equal(expectedLinks.Count, matchingLinks.Count);
-        
+
         var missing = expectedLinks.Except(matchingLinks.Select(x => (x.ArticleId, x.ArticleCrossId))).ToList();
         Assert.True(missing.Count == 0, $"Missing expected pairs: {string.Join(", ", missing)}");
     }
@@ -134,16 +134,16 @@ public class MakeLinkageBetweenArticlesTests : IAsyncLifetime
             LinkageType = ArticleLinkageTypes.FullRightToLeftCross
         };
         var command = new MakeLinkageBetweenArticlesCommand(newLinkage);
-        
+
         var result = await _mediator.Send(command);
-        
+
         Assert.Equal(Unit.Value, result);
 
         var expectedLinks = new HashSet<(int, int)>
         {
             (1, 2), (2, 1), (1, 4), (4, 1)
         };
-        
+
         var actualLinks = await _context.ArticleCrosses
             .AsNoTracking()
             .ToListAsync();
@@ -156,7 +156,7 @@ public class MakeLinkageBetweenArticlesTests : IAsyncLifetime
         var missing = expectedLinks.Except(matchingLinks.Select(x => (x.ArticleId, x.ArticleCrossId))).ToList();
         Assert.True(missing.Count == 0, $"Missing expected pairs: {string.Join(", ", missing)}");
     }
-    
+
     [Fact]
     public async Task MakeLinkage_FullLeftToRightCross_Succeeds()
     {
@@ -170,9 +170,9 @@ public class MakeLinkageBetweenArticlesTests : IAsyncLifetime
             LinkageType = ArticleLinkageTypes.FullLeftToRightCross
         };
         var command = new MakeLinkageBetweenArticlesCommand(newLinkage);
-        
+
         var result = await _mediator.Send(command);
-        
+
         Assert.Equal(Unit.Value, result);
 
         var expectedLinks = new HashSet<(int, int)>
@@ -192,5 +192,4 @@ public class MakeLinkageBetweenArticlesTests : IAsyncLifetime
         var missing = expectedLinks.Except(matchingLinks.Select(x => (x.ArticleId, x.ArticleCrossId))).ToList();
         Assert.True(missing.Count == 0, $"Missing expected pairs: {string.Join(", ", missing)}");
     }
-
 }

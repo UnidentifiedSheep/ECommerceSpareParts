@@ -4,12 +4,12 @@ namespace Persistence.TransactionBuilder;
 
 public class TransactionDefaultSettings
 {
-    private readonly HashSet<string> _retryOn = [];
-    public HashSet<string> RetryOn => _retryOn;
+    public HashSet<string> RetryOn { get; } = [];
+
     public int RetriesCount { get; private set; }
     public TimeSpan RetryDelay { get; private set; } = TimeSpan.Zero;
     public IsolationLevel IsolationLevel { get; private set; } = IsolationLevel.ReadCommitted;
-    
+
     public TransactionDefaultSettings SetRetries(int count)
     {
         if (count < 0)
@@ -34,8 +34,8 @@ public class TransactionDefaultSettings
 
     public TransactionDefaultSettings SetPgErrorKeys(IEnumerable<string> keys)
     {
-        _retryOn.Clear();
-        _retryOn.UnionWith(keys);
+        RetryOn.Clear();
+        RetryOn.UnionWith(keys);
         return this;
     }
 }

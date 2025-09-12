@@ -7,7 +7,8 @@ namespace Persistence.Services;
 
 public class UnitOfWork(DContext context) : IUnitOfWork
 {
-    public async Task<T> ExecuteWithTransaction<T>(TransactionalAttribute settings, Func<Task<T>> action, CancellationToken cancellationToken = default)
+    public async Task<T> ExecuteWithTransaction<T>(TransactionalAttribute settings, Func<Task<T>> action,
+        CancellationToken cancellationToken = default)
     {
         return await context.WithIsolationLevel(settings.IsolationLevel)
             .WithRetries(settings.RetryCount)
@@ -16,7 +17,8 @@ public class UnitOfWork(DContext context) : IUnitOfWork
             .ExecuteWithTransaction(action, cancellationToken);
     }
 
-    public async Task ExecuteWithTransaction(TransactionalAttribute settings, Func<Task> action, CancellationToken cancellationToken = default)
+    public async Task ExecuteWithTransaction(TransactionalAttribute settings, Func<Task> action,
+        CancellationToken cancellationToken = default)
     {
         await context.WithIsolationLevel(settings.IsolationLevel)
             .AddRetryPgErrorKey(settings.RetryErrors)

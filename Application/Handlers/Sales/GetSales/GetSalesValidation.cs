@@ -18,5 +18,4 @@ public class GetSalesValidation : AbstractValidator<GetSalesQuery>
         RuleFor(x => x.Pagination)
             .SetValidator(new PaginationValidator());
     }
-    
 }

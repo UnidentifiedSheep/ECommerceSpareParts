@@ -6,14 +6,13 @@ using Newtonsoft.Json;
 
 namespace Integrations.Armtek;
 
-
 public class UserSettingsService
 {
-    private readonly string _baseUrl; 
+    private readonly string _baseUrl;
     private readonly HttpClient _client;
 
     /// <summary>
-    /// Auth must be included to client factory headers.
+    ///     Auth must be included to client factory headers.
     /// </summary>
     /// <param name="clientFactory">The name of client config must be "ArmtekClient".</param>
     /// <param name="config">Parameters should be in "Armtek" field.</param>
@@ -23,9 +22,9 @@ public class UserSettingsService
         _baseUrl = config["Armtek:BaseUrl"] ?? throw new NullReferenceException("BaseUrl not found in Armtek:BaseUrl");
         _client = httpClientFactory.CreateClient("ArmtekClient");
     }
-    
+
     /// <summary>
-    /// Сервис получения сбытовых организаций клиента "getUserVkorgList"
+    ///     Сервис получения сбытовых организаций клиента "getUserVkorgList"
     /// </summary>
     /// <returns>Список vkorg</returns>
     /// <exception cref="HttpRequestException">Если ответ вернулся с каким либо не успешным кодом.</exception>
@@ -36,12 +35,13 @@ public class UserSettingsService
         uri.Query = "?format=json";
         var response = await _client.GetAsync(uri.Uri, cancellationToken);
         var responseString = await response.Content.ReadAsStringAsync(cancellationToken);
-        if (!response.IsSuccessStatusCode) throw new HttpRequestException($"Unable to get user's Vkorg list: {responseString}");
+        if (!response.IsSuccessStatusCode)
+            throw new HttpRequestException($"Unable to get user's Vkorg list: {responseString}");
         return JsonConvert.DeserializeObject<List<VkorgModel>>(responseString)!;
     }
 
     /// <summary>
-    /// Сервис получения структуры клиента
+    ///     Сервис получения структуры клиента
     /// </summary>
     /// <param name="vkorg">Сбытовая организация</param>
     /// <param name="structure">Получить структуру клиента</param>
@@ -50,9 +50,11 @@ public class UserSettingsService
     /// <returns></returns>
     /// <exception cref="ArgumentException">vkorg - либо пустая строка, либо длиннее 4 символов</exception>
     /// <exception cref="HttpRequestException">Запрос завершился безуспешно</exception>
-    public async Task<List<UserInfoModel>> GetUserInfoAsync(string vkorg, bool structure = true, bool getAsFtpData = false, CancellationToken cancellationToken = default)
+    public async Task<List<UserInfoModel>> GetUserInfoAsync(string vkorg, bool structure = true,
+        bool getAsFtpData = false, CancellationToken cancellationToken = default)
     {
-        if (string.IsNullOrWhiteSpace(vkorg) || vkorg.Length > 4) throw new ArgumentException("Vkorg value is invalid.");
+        if (string.IsNullOrWhiteSpace(vkorg) || vkorg.Length > 4)
+            throw new ArgumentException("Vkorg value is invalid.");
         var uri = new UriBuilder(_baseUrl);
         uri.Path = uri.Path.TrimEnd('/') + "/ws_user/getUserInfo";
         var query = HttpUtility.ParseQueryString("format=json");
@@ -66,16 +68,17 @@ public class UserSettingsService
     }
 
     /// <summary>
-    /// Сервис получения списка брендов
+    ///     Сервис получения списка брендов
     /// </summary>
     /// <param name="brandName">Наименование бренда для поиска</param>
     /// <param name="cancellationToken"></param>
     /// <returns>Список брендов</returns>
     /// <exception cref="HttpRequestException">Запрос не завершился успешно.</exception>
     /// <exception cref="ArgumentException">Длина brandName больше 100 символов.</exception>
-    public async Task<List<string>> GetBrandListAsync(string? brandName = null, CancellationToken cancellationToken = default)
+    public async Task<List<string>> GetBrandListAsync(string? brandName = null,
+        CancellationToken cancellationToken = default)
     {
-        string name = brandName?.Trim() ?? "";
+        var name = brandName?.Trim() ?? "";
         if (name.Length > 100) throw new ArgumentException("Brand length must be shorter then 100 characters.");
         var uri = new UriBuilder(_baseUrl);
         uri.Path = uri.Path.TrimEnd('/') + "/ws_user/getBrandList?format=json";

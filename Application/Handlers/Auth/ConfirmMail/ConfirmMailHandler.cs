@@ -1,7 +1,5 @@
-using Application.Extensions;
 using Application.Interfaces;
 using Core.Attributes;
-using Core.Interfaces.DbRepositories;
 using Exceptions.Exceptions.Auth;
 using Exceptions.Exceptions.Users;
 using MediatR;
@@ -12,6 +10,7 @@ namespace Application.Handlers.Auth.ConfirmMail;
 
 [Transactional]
 public record ConfirmMailCommand(string UserId, string ConfirmationToken) : ICommand;
+
 public class ConfirmMailHandler(UserManager<UserModel> manager) : ICommandHandler<ConfirmMailCommand>
 {
     public async Task<Unit> Handle(ConfirmMailCommand request, CancellationToken cancellationToken)

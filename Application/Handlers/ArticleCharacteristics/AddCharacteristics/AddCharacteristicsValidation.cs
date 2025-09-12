@@ -17,7 +17,7 @@ public class AddCharacteristicsValidation : AbstractValidator<AddCharacteristics
                     .WithMessage("Минимальная длина значение 3 символа")
                     .MaximumLength(128)
                     .WithMessage("Длина значение не должна быть больше 128 символов");
-                
+
                 z.RuleFor(x => x.Name)
                     .MaximumLength(128)
                     .WithMessage("Название параметра не должно быть больше 128 символов");

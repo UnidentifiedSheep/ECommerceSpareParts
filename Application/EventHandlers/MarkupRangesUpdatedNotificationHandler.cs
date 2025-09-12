@@ -4,7 +4,8 @@ using MediatR;
 
 namespace Application.EventHandlers;
 
-public class MarkupRangesUpdatedNotificationHandler(IMessageBroker messageBroker, IPriceSetup priceSetup) : INotificationHandler<MarkupRangesUpdatedEvent>
+public class MarkupRangesUpdatedNotificationHandler(IMessageBroker messageBroker, IPriceSetup priceSetup)
+    : INotificationHandler<MarkupRangesUpdatedEvent>
 {
     public async Task Handle(MarkupRangesUpdatedEvent notification, CancellationToken cancellationToken)
     {

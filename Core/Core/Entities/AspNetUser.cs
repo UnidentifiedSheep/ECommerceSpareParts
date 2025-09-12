@@ -1,6 +1,6 @@
 ﻿namespace Core.Entities;
 
-public partial class AspNetUser
+public class AspNetUser
 {
     public string Id { get; set; } = null!;
 
@@ -44,7 +44,8 @@ public partial class AspNetUser
 
     public string? Description { get; set; }
 
-    public virtual ICollection<ArticleSupplierBuyInfo> ArticleSupplierBuyInfos { get; set; } = new List<ArticleSupplierBuyInfo>();
+    public virtual ICollection<ArticleSupplierBuyInfo> ArticleSupplierBuyInfos { get; set; } =
+        new List<ArticleSupplierBuyInfo>();
 
     public virtual ICollection<AspNetUserClaim> AspNetUserClaims { get; set; } = new List<AspNetUserClaim>();
 
@@ -64,11 +65,14 @@ public partial class AspNetUser
 
     public virtual ICollection<Sale> SaleUpdatedUsers { get; set; } = new List<Sale>();
 
-    public virtual ICollection<StorageContentReservation> StorageContentReservationUsers { get; set; } = new List<StorageContentReservation>();
+    public virtual ICollection<StorageContentReservation> StorageContentReservationUsers { get; set; } =
+        new List<StorageContentReservation>();
 
-    public virtual ICollection<StorageContentReservation> StorageContentReservationWhoCreatedNavigations { get; set; } = new List<StorageContentReservation>();
+    public virtual ICollection<StorageContentReservation> StorageContentReservationWhoCreatedNavigations { get; set; } =
+        new List<StorageContentReservation>();
 
-    public virtual ICollection<StorageContentReservation> StorageContentReservationWhoUpdatedNavigations { get; set; } = new List<StorageContentReservation>();
+    public virtual ICollection<StorageContentReservation> StorageContentReservationWhoUpdatedNavigations { get; set; } =
+        new List<StorageContentReservation>();
 
     public virtual ICollection<StorageMovement> StorageMovements { get; set; } = new List<StorageMovement>();
 
@@ -78,9 +82,11 @@ public partial class AspNetUser
 
     public virtual ICollection<Transaction> TransactionSenders { get; set; } = new List<Transaction>();
 
-    public virtual ICollection<TransactionVersion> TransactionVersionReceivers { get; set; } = new List<TransactionVersion>();
+    public virtual ICollection<TransactionVersion> TransactionVersionReceivers { get; set; } =
+        new List<TransactionVersion>();
 
-    public virtual ICollection<TransactionVersion> TransactionVersionSenders { get; set; } = new List<TransactionVersion>();
+    public virtual ICollection<TransactionVersion> TransactionVersionSenders { get; set; } =
+        new List<TransactionVersion>();
 
     public virtual ICollection<Transaction> TransactionWhoMadeUsers { get; set; } = new List<Transaction>();
 

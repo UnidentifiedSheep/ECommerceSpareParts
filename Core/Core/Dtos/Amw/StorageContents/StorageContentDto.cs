@@ -15,7 +15,6 @@ public class StorageContentDto
     public int CurrencyId { get; set; }
 
     public decimal BuyPriceInUsd { get; set; }
-    
-    public DateTime PurchaseDatetime { get; set; }
 
+    public DateTime PurchaseDatetime { get; set; }
 }

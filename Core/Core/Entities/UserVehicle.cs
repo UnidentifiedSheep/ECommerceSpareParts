@@ -1,6 +1,6 @@
 ﻿namespace Core.Entities;
 
-public partial class UserVehicle
+public class UserVehicle
 {
     public string Id { get; set; } = null!;
 

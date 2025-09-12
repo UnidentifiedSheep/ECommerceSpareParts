@@ -20,17 +20,16 @@ namespace Tests.HandlersTests.StorageContents;
 [Collection("Combined collection")]
 public class RestoreContentToStorageTests : IAsyncLifetime
 {
-    private readonly DContext _context;
-    private readonly IMediator _mediator;
-
-    private List<Currency> _currency = null!;
-    private AspNetUser _user = null!;
-    private List<Storage> _storages = null!;
-    private List<Article> _articles = null!;
-    private Dictionary<int, StorageContent> _storageContent = null!;
-
     private const int ContentGenerationCount = 10;
     private const int InvalidStorageNameLength = 100;
+    private readonly DContext _context;
+    private readonly IMediator _mediator;
+    private List<Article> _articles = null!;
+
+    private List<Currency> _currency = null!;
+    private Dictionary<int, StorageContent> _storageContent = null!;
+    private List<Storage> _storages = null!;
+    private AspNetUser _user = null!;
 
     public RestoreContentToStorageTests(CombinedContainerFixture fixture)
     {
@@ -71,7 +70,10 @@ public class RestoreContentToStorageTests : IAsyncLifetime
 
         var storageContent = MockData.MockData
             .CreateSaleContentDetails(_storageContent.Keys, storages, currencies, ContentGenerationCount)
-            .Select(x => new RestoreContentItem(x.Adapt<SaleContentDetailDto>(), x.StorageContentId == null ? Global.Faker.PickRandom(articleIds) : _storageContent[x.StorageContentId.Value].ArticleId))
+            .Select(x => new RestoreContentItem(x.Adapt<SaleContentDetailDto>(),
+                x.StorageContentId == null
+                    ? Global.Faker.PickRandom(articleIds)
+                    : _storageContent[x.StorageContentId.Value].ArticleId))
             .ToList();
         foreach (var (detail, _) in storageContent.Where(x => x.Detail.StorageContentId != null))
             detail.Storage = _storageContent[detail.StorageContentId!.Value].StorageName;
@@ -89,7 +91,8 @@ public class RestoreContentToStorageTests : IAsyncLifetime
     [InlineData(0.001)]
     [InlineData(0)]
     [InlineData(-1)]
-    public async Task RestoreContentToStorage_WithInvalidPrice_ThrowsStorageContentPriceCannotBeNegativeException(decimal invalidPrice)
+    public async Task RestoreContentToStorage_WithInvalidPrice_ThrowsStorageContentPriceCannotBeNegativeException(
+        decimal invalidPrice)
     {
         var content = GenerateValidStorageContent();
         content[^1].Detail.BuyPrice = invalidPrice;
@@ -101,7 +104,8 @@ public class RestoreContentToStorageTests : IAsyncLifetime
     [Theory]
     [InlineData(0)]
     [InlineData(-1)]
-    public async Task RestoreContentToStorage_WithInvalidCount_ThrowsStorageContentCountCantBeNegativeException(int count)
+    public async Task RestoreContentToStorage_WithInvalidCount_ThrowsStorageContentCountCantBeNegativeException(
+        int count)
     {
         var content = GenerateValidStorageContent();
         content[^1].Detail.Count = count;
@@ -148,7 +152,7 @@ public class RestoreContentToStorageTests : IAsyncLifetime
     public async Task RestoreContentToStorage_WithInvalidArticleId_ThrowsArticleNotFoundException(int invalidArticleId)
     {
         var content = GenerateValidStorageContent();
-        content[^1] = new (content[^1].Detail, invalidArticleId);
+        content[^1] = new RestoreContentItem(content[^1].Detail, invalidArticleId);
 
         var command = new RestoreContentCommand(content, StorageMovementType.StorageContentAddition, _user.Id);
         await Assert.ThrowsAsync<ArticleNotFoundException>(async () => await _mediator.Send(command));
@@ -159,38 +163,38 @@ public class RestoreContentToStorageTests : IAsyncLifetime
     {
         var content = GenerateValidStorageContent();
         var nullIdsCount = content.Count(x => x.Detail.StorageContentId == null);
-        
+
         var command = new RestoreContentCommand(content, StorageMovementType.StorageContentAddition, _user.Id);
         await _mediator.Send(command);
 
         var storageContents = await _context.StorageContents
             .AsNoTracking()
             .ToDictionaryAsync(x => x.Id);
-        
+
         var articles = await _context.Articles
             .AsNoTracking()
             .ToDictionaryAsync(x => x.Id);
-        
-        
+
+
         Assert.Equal(_storageContent.Count + nullIdsCount, storageContents.Count);
         foreach (var (saleContent, articleId) in content)
         {
-            var dbStorageContent = saleContent.StorageContentId == null 
+            var dbStorageContent = saleContent.StorageContentId == null
                 ? storageContents.FirstOrDefault(x => x.Value.ArticleId == articleId &&
                                                       x.Value.Count == saleContent.Count &&
-                                                      x.Value.StorageName == saleContent.Storage).Value 
+                                                      x.Value.StorageName == saleContent.Storage).Value
                 : storageContents[saleContent.StorageContentId.Value];
-            
+
             Assert.NotNull(dbStorageContent);
             Assert.Equal(articleId, dbStorageContent.ArticleId);
-            
-            if(saleContent.StorageContentId == null)
+
+            if (saleContent.StorageContentId == null)
                 Assert.Equal(saleContent.BuyPrice, dbStorageContent.BuyPrice);
         }
 
         foreach (var i in storageContents)
             articles[i.Value.ArticleId].TotalCount -= i.Value.Count;
-        
+
         Assert.All(articles, x => Assert.Equal(0, x.Value.TotalCount));
     }
 }

@@ -5,5 +5,6 @@ namespace Core.Interfaces.Services;
 
 public interface ISaleService
 {
-    Dictionary<int, Queue<SaleContentDetail>> GetDetailsGroup(IEnumerable<PrevAndNewValue<StorageContent>> storageContentValues);
+    Dictionary<int, Queue<SaleContentDetail>> GetDetailsGroup(
+        IEnumerable<PrevAndNewValue<StorageContent>> storageContentValues);
 }

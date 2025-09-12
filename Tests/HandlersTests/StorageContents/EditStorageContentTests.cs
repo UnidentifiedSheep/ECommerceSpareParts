@@ -21,9 +21,9 @@ public class EditStorageContentTests : IAsyncLifetime
 {
     private readonly DContext _context;
     private readonly IMediator _mediator;
-    private AspNetUser _user = null!;
     private List<StorageContent> _storageContents = null!;
-    
+    private AspNetUser _user = null!;
+
     public EditStorageContentTests(CombinedContainerFixture fixture)
     {
         MapsterConfig.Configure();
@@ -31,7 +31,7 @@ public class EditStorageContentTests : IAsyncLifetime
         _context = sp.GetRequiredService<DContext>();
         _mediator = sp.GetRequiredService<IMediator>();
     }
-        
+
     public async Task InitializeAsync()
     {
         await _mediator.AddMockUser();
@@ -52,7 +52,7 @@ public class EditStorageContentTests : IAsyncLifetime
     {
         await _context.ClearDatabaseFull();
     }
-    
+
     [Fact]
     public async Task EditStorageContent_WithNegativeCount_ThrowsException()
     {
@@ -65,10 +65,11 @@ public class EditStorageContentTests : IAsyncLifetime
             }
         };
         var concurrentCode = "";
-        var dict = new Dictionary<int, (PatchStorageContentDto, string)> { [_storageContents.First().Id] = (dto, concurrentCode) };
+        var dict = new Dictionary<int, (PatchStorageContentDto, string)>
+            { [_storageContents.First().Id] = (dto, concurrentCode) };
 
         var command = new EditStorageContentCommand(dict, _user.Id);
-        
+
         await Assert.ThrowsAsync<ValidationException>(async () => await _mediator.Send(command));
     }
 
@@ -77,7 +78,8 @@ public class EditStorageContentTests : IAsyncLifetime
     [InlineData(0.001)]
     [InlineData(0.0001)]
     [InlineData(-1)]
-    public async Task EditStorageContent_WithInvalidPrice_ThrowsStorageContentPriceCannotBeNegativeException(decimal price)
+    public async Task EditStorageContent_WithInvalidPrice_ThrowsStorageContentPriceCannotBeNegativeException(
+        decimal price)
     {
         var dto = new PatchStorageContentDto
         {
@@ -88,10 +90,11 @@ public class EditStorageContentTests : IAsyncLifetime
             }
         };
         var concurrentCode = "";
-        var dict = new Dictionary<int, (PatchStorageContentDto, string)> { [_storageContents.First().Id] = (dto, concurrentCode) };
+        var dict = new Dictionary<int, (PatchStorageContentDto, string)>
+            { [_storageContents.First().Id] = (dto, concurrentCode) };
 
         var command = new EditStorageContentCommand(dict, _user.Id);
-        
+
         await Assert.ThrowsAsync<ValidationException>(async () => await _mediator.Send(command));
     }
 
@@ -110,7 +113,7 @@ public class EditStorageContentTests : IAsyncLifetime
         var dict = new Dictionary<int, (PatchStorageContentDto, string)> { [999999] = (dto, concurrentCode) };
 
         var command = new EditStorageContentCommand(dict, _user.Id);
-        
+
         await Assert.ThrowsAsync<StorageContentNotFoundException>(async () => await _mediator.Send(command));
     }
 
@@ -123,48 +126,49 @@ public class EditStorageContentTests : IAsyncLifetime
         var articleBefore = await _context.Articles
             .AsNoTracking()
             .FirstAsync(x => x.Id == content.ArticleId);
-        var dto = new PatchStorageContentDto { 
+        var dto = new PatchStorageContentDto
+        {
             Count = new PatchField<int>
             {
                 IsSet = true,
                 Value = content.Count + 5
-            }, 
+            },
             BuyPrice = new PatchField<decimal>
             {
                 IsSet = true,
                 Value = content.BuyPrice + 10
             }
         };
-        
+
         var concurrentCode = "";
         var dict = new Dictionary<int, (PatchStorageContentDto, string)> { [content.Id] = (dto, concurrentCode) };
 
         var command = new EditStorageContentCommand(dict, _user.Id);
-        
+
         var ex = await Assert.ThrowsAsync<ConcurrencyCodeMismatchException>(async () => await _mediator.Send(command));
 
         concurrentCode = ex.ServerCode!;
         dict = new Dictionary<int, (PatchStorageContentDto, string)> { [content.Id] = (dto, concurrentCode) };
         command = new EditStorageContentCommand(dict, _user.Id);
         await _mediator.Send(command);
-        
+
         var updated = await _context.StorageContents.FindAsync(content.Id);
         var articleAfter = await _context.Articles
             .AsNoTracking()
             .FirstAsync(x => x.Id == content.ArticleId);
         var currMovementCount = await _context.StorageMovements.CountAsync();
         var movement = await _context.StorageMovements.OrderBy(x => x.Id).LastOrDefaultAsync();
-        
+
         Assert.NotNull(movement);
         Assert.Equal(prevMovementCount + 1, currMovementCount);
         Assert.Equal(content.BuyPrice, movement.Price);
-        
+
         Assert.Equal(articleBefore.TotalCount, articleAfter.TotalCount - 5);
         Assert.NotNull(updated);
         Assert.Equal(content.Count + 5, updated.Count);
         Assert.Equal(content.BuyPrice + 10, updated.BuyPrice);
     }
-    
+
     [Fact]
     public async Task EditStorageContent_WithInvalidCurrencyId_ThrowsCurrencyNotFoundException()
     {
@@ -177,7 +181,8 @@ public class EditStorageContentTests : IAsyncLifetime
             }
         };
         var concurrentCode = "";
-        var dict = new Dictionary<int, (PatchStorageContentDto, string)> { [_storageContents.First().Id] = (dto, concurrentCode) };
+        var dict = new Dictionary<int, (PatchStorageContentDto, string)>
+            { [_storageContents.First().Id] = (dto, concurrentCode) };
 
         var command = new EditStorageContentCommand(dict, _user.Id);
         await Assert.ThrowsAsync<CurrencyNotFoundException>(async () => await _mediator.Send(command));
@@ -195,11 +200,11 @@ public class EditStorageContentTests : IAsyncLifetime
             }
         };
         var concurrentCode = "";
-        var dict = new Dictionary<int, (PatchStorageContentDto, string)> { [_storageContents.First().Id] = (dto, concurrentCode) };
+        var dict = new Dictionary<int, (PatchStorageContentDto, string)>
+            { [_storageContents.First().Id] = (dto, concurrentCode) };
 
         var command = new EditStorageContentCommand(dict, _user.Id);
         await Assert.ThrowsAsync<StorageNotFoundException>(async () => await _mediator.Send(command));
-        
     }
 
     [Fact]
@@ -234,11 +239,11 @@ public class EditStorageContentTests : IAsyncLifetime
         var dict = new Dictionary<int, (PatchStorageContentDto, string)> { [content.Id] = (dto, concurrentCode) };
 
         var command = new EditStorageContentCommand(dict, _user.Id);
-        
+
         var ex = await Assert.ThrowsAsync<ConcurrencyCodeMismatchException>(async () => await _mediator.Send(command));
-        
+
         concurrentCode = ex.ServerCode!;
-        dict = new Dictionary<int, (PatchStorageContentDto, string)> { [content.Id] = (dto, concurrentCode) }; 
+        dict = new Dictionary<int, (PatchStorageContentDto, string)> { [content.Id] = (dto, concurrentCode) };
         command = new EditStorageContentCommand(dict, _user.Id);
 
         await _mediator.Send(command);
@@ -248,5 +253,4 @@ public class EditStorageContentTests : IAsyncLifetime
         Assert.Equal(content.Count + 3, updated.Count);
         Assert.Equal(content.BuyPrice + 7, updated.BuyPrice);
     }
-
 }

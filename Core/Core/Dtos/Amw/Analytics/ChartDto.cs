@@ -6,5 +6,5 @@ public class ChartDto
     public decimal? Minimum { get; set; }
     public decimal? Average { get; set; }
     public decimal? Maximum { get; set; }
-    public int CurrencyId { get; set; } 
+    public int CurrencyId { get; set; }
 }

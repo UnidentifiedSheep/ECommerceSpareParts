@@ -23,13 +23,13 @@ public class GetArticleReservationsEndPoint : ICarterModule
     public void AddRoutes(IEndpointRouteBuilder app)
     {
         app.MapGet("/articles/reservations",
-            async (ISender sender, [AsParameters] GetArticleReservationsRequest request, CancellationToken token) =>
-            {
-                var query = request.Adapt<GetArticleReservationsQuery>();
-                var result = await sender.Send(query, token);
-                var response = result.Adapt<GetArticleReservationsResponse>();
-                return Results.Ok(response);
-            }).WithTags("ArticleReservations")
+                async (ISender sender, [AsParameters] GetArticleReservationsRequest request, CancellationToken token) =>
+                {
+                    var query = request.Adapt<GetArticleReservationsQuery>();
+                    var result = await sender.Send(query, token);
+                    var response = result.Adapt<GetArticleReservationsResponse>();
+                    return Results.Ok(response);
+                }).WithTags("ArticleReservations")
             .RequireAuthorization("AMW")
             .WithDisplayName("Создать резервацию")
             .WithDescription("Создать резервацию для пользователя");

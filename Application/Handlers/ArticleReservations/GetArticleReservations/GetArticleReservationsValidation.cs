@@ -10,7 +10,7 @@ public class GetArticleReservationsValidation : AbstractValidator<GetArticleRese
             .MinimumLength(3)
             .When(x => !string.IsNullOrWhiteSpace(x.SearchTerm))
             .WithMessage("Минимальная длинна строки поиска 3");
-        
+
         RuleFor(query => query.Page)
             .GreaterThanOrEqualTo(0)
             .WithMessage("Страница не может быть меньше 0");

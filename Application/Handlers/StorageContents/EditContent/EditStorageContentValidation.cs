@@ -9,7 +9,7 @@ public class EditStorageContentValidation : AbstractValidator<EditStorageContent
     {
         RuleFor(x => x.EditedFields).NotEmpty()
             .WithMessage("Список отредактированных элементов не может быть пустым.");
-        
+
         RuleFor(x => x.EditedFields)
             .Must(x => x.Count < 100)
             .WithMessage("Максимальное количество для редактирования за раз, не может превышать 100 элементов");

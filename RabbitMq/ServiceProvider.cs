@@ -3,18 +3,18 @@ using Core.Interfaces;
 using Core.Models;
 using MassTransit;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Options;
 using RabbitMq.Consumers;
 
 namespace RabbitMq;
 
 public static class ServiceProvider
 {
-    public static IServiceCollection AddMassageBrokerLayer(this IServiceCollection collection, MessageBrokerOptions options)
+    public static IServiceCollection AddMassageBrokerLayer(this IServiceCollection collection,
+        MessageBrokerOptions options)
     {
         var brokerOptions = options;
         collection.AddTransient<IMessageBroker, MessageBroker>();
-        
+
         collection.AddMassTransit(conf =>
         {
             conf.SetKebabCaseEndpointNameFormatter();
@@ -35,7 +35,7 @@ public static class ServiceProvider
                 });
             });
         });
-        
+
         return collection;
     }
 }

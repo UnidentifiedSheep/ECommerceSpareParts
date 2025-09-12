@@ -22,10 +22,10 @@ public class DeleteFullSaleHandler(IMediator mediator) : ICommandHandler<DeleteF
         var sale = await DeleteAndGetSaleAsync(request.SaleId, cancellationToken);
         var transactionId = sale.TransactionId;
         var saleContentDetails = sale.SaleContents
-            .SelectMany(x => x.SaleContentDetails.Select(detail => 
+            .SelectMany(x => x.SaleContentDetails.Select(detail =>
                 new RestoreContentItem(detail.Adapt<SaleContentDetailDto>(), x.ArticleId)))
             .ToList();
-        
+
         await DeleteTransaction(transactionId, request.UserId, cancellationToken);
         await RestoreStorageContents(saleContentDetails, request.UserId, cancellationToken);
         return Unit.Value;
@@ -37,7 +37,8 @@ public class DeleteFullSaleHandler(IMediator mediator) : ICommandHandler<DeleteF
         return (await mediator.Send(command, cancellationToken)).Sale;
     }
 
-    private async Task DeleteTransaction(string transactionId, string userId, CancellationToken cancellationToken = default)
+    private async Task DeleteTransaction(string transactionId, string userId,
+        CancellationToken cancellationToken = default)
     {
         var command = new DeleteTransactionCommand(transactionId, userId, true);
         await mediator.Send(command, cancellationToken);

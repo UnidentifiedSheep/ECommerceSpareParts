@@ -8,16 +8,27 @@ using Mapster;
 
 namespace Application.Handlers.Users.GetUsers;
 
-public record GetUsersQuery(PaginationModel Pagination, double? SimilarityLevel, string? WhoSearchedUserId, 
-    string? Name, string? Surname, string? Email, string? Phone, string? UserName, string? Id,
-    string? Description,  bool? IsSupplier, GeneralSearchStrategy SearchStrategy) : IQuery<GetUsersResult>;
+public record GetUsersQuery(
+    PaginationModel Pagination,
+    double? SimilarityLevel,
+    string? WhoSearchedUserId,
+    string? Name,
+    string? Surname,
+    string? Email,
+    string? Phone,
+    string? UserName,
+    string? Id,
+    string? Description,
+    bool? IsSupplier,
+    GeneralSearchStrategy SearchStrategy) : IQuery<GetUsersResult>;
+
 public record GetUsersResult(IEnumerable<UserDto> Users);
 
 public class GetUsersHandler(IUsersRepository usersRepositoryService) : IQueryHandler<GetUsersQuery, GetUsersResult>
 {
     public async Task<GetUsersResult> Handle(GetUsersQuery request, CancellationToken cancellationToken)
     {
-        List<AspNetUser> users = new List<AspNetUser>();
+        var users = new List<AspNetUser>();
 
         switch (request.SearchStrategy)
         {
@@ -25,7 +36,8 @@ public class GetUsersHandler(IUsersRepository usersRepositoryService) : IQueryHa
                 break;
             case GeneralSearchStrategy.Similarity:
                 var simLevel = request.SimilarityLevel >= 1 ? 0.999 : request.SimilarityLevel;
-                users.AddRange(await usersRepositoryService.GetUsersBySimilarityAsync(simLevel ?? 0.4, request.Pagination.Page, 
+                users.AddRange(await usersRepositoryService.GetUsersBySimilarityAsync(simLevel ?? 0.4,
+                    request.Pagination.Page,
                     request.Pagination.Size,
                     request.Name, request.Surname, request.Email, request.Phone, request.UserName, request.Id,
                     request.Description, request.IsSupplier, cancellationToken));
@@ -37,7 +49,7 @@ public class GetUsersHandler(IUsersRepository usersRepositoryService) : IQueryHa
             default:
                 throw new ArgumentOutOfRangeException();
         }
-        
+
         return new GetUsersResult(users.Adapt<List<UserDto>>());
     }
 }

@@ -10,7 +10,7 @@ public class EditArticleReservationValidation : AbstractValidator<EditArticleRes
             .Must(z => Math.Round(z!.Value, 2) > 0)
             .When(z => z.NewValue.GivenPrice != null)
             .WithMessage("Предложенная цена должна быть больше 0");
-        RuleFor(z => new {z.NewValue.InitialCount, z.NewValue.CurrentCount})
+        RuleFor(z => new { z.NewValue.InitialCount, z.NewValue.CurrentCount })
             .Must(z => z.InitialCount >= z.CurrentCount)
             .WithMessage("Количество которое было зарезервировано, не может быть меньше текущего.");
         RuleFor(z => z.NewValue.InitialCount)

@@ -7,10 +7,13 @@ using Mapster;
 
 namespace Application.Handlers.Currencies.CreateCurrency;
 
-public record CreateCurrencyCommand(string ShortName, string Name, string CurrencySign, string Code) : ICommand<CreateCurrencyResult>;
+public record CreateCurrencyCommand(string ShortName, string Name, string CurrencySign, string Code)
+    : ICommand<CreateCurrencyResult>;
+
 public record CreateCurrencyResult(int Id);
 
-public class CreateCurrencyHandler(ICurrencyRepository currencyRepository, IUnitOfWork unitOfWork) : ICommandHandler<CreateCurrencyCommand, CreateCurrencyResult>
+public class CreateCurrencyHandler(ICurrencyRepository currencyRepository, IUnitOfWork unitOfWork)
+    : ICommandHandler<CreateCurrencyCommand, CreateCurrencyResult>
 {
     public async Task<CreateCurrencyResult> Handle(CreateCurrencyCommand request, CancellationToken cancellationToken)
     {

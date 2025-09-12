@@ -5,23 +5,23 @@ namespace Core.Enums;
 public enum SpamFilterEnum
 {
     /// <summary>
-    /// переместить в паку спам
+    ///     переместить в паку спам
     /// </summary>
     [EnumMember(Value = "move_to_directory")]
     MoveToDirectory,
+
     /// <summary>
-    /// переслать письмо на другой адрес
+    ///     переслать письмо на другой адрес
     /// </summary>
-    [EnumMember(Value = "forward")]
-    Forward,
+    [EnumMember(Value = "forward")] Forward,
+
     /// <summary>
-    /// удалить письмо
+    ///     удалить письмо
     /// </summary>
-    [EnumMember(Value = "delete")]
-    Delete,
+    [EnumMember(Value = "delete")] Delete,
+
     /// <summary>
-    /// пометить письмо
+    ///     пометить письмо
     /// </summary>
-    [EnumMember(Value = "tag")]
-    Tag
+    [EnumMember(Value = "tag")] Tag
 }

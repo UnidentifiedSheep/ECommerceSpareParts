@@ -1,5 +1,3 @@
-using Core.Extensions;
-
 namespace Core.StaticFunctions;
 
 public static class StaticString

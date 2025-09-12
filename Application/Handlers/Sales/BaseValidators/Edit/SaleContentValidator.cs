@@ -1,4 +1,3 @@
-using Application.Handlers.BaseValidators;
 using Core.Dtos.Amw.Sales;
 using FluentValidation;
 
@@ -8,7 +7,6 @@ public class SaleContentValidator : AbstractValidator<IEnumerable<EditSaleConten
 {
     public SaleContentValidator()
     {
-        
         RuleFor(x => x)
             .NotEmpty()
             .WithMessage("Список содержимого продажи не может быть пустым.");
@@ -20,13 +18,12 @@ public class SaleContentValidator : AbstractValidator<IEnumerable<EditSaleConten
                 foreach (var item in list)
                     if (item.Id.HasValue && !seen.Add(item.Id.Value))
                         return false;
-                
+
                 return true;
             })
             .WithMessage("Не может быть две позиции с одинаковым идентификатором");
 
         RuleForEach(x => x)
             .SetValidator(new EditSaleContentDtoValidator());
-        
     }
 }

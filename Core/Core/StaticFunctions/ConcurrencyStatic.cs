@@ -6,7 +6,7 @@ public static class ConcurrencyStatic
     {
         var hc = new HashCode();
         foreach (var arg in args) hc.Add(arg);
-        return hc.ToHashCode().ToString("X8");;
+        return hc.ToHashCode().ToString("X8");
+        ;
     }
-
 }

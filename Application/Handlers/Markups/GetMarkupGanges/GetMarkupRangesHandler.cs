@@ -7,9 +7,11 @@ using Mapster;
 namespace Application.Handlers.Markups.GetMarkupGanges;
 
 public record GetMarkupRangesQuery(int GroupId) : IQuery<GetMarkupRangesResult>;
+
 public record GetMarkupRangesResult(IEnumerable<MarkupRangeDto> Ranges);
 
-public class GetMarkupRangesHandler(IMarkupRepository markupRepository) : IQueryHandler<GetMarkupRangesQuery, GetMarkupRangesResult>
+public class GetMarkupRangesHandler(IMarkupRepository markupRepository)
+    : IQueryHandler<GetMarkupRangesQuery, GetMarkupRangesResult>
 {
     public async Task<GetMarkupRangesResult> Handle(GetMarkupRangesQuery request, CancellationToken cancellationToken)
     {

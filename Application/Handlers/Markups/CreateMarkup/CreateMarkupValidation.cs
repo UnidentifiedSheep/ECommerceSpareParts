@@ -10,11 +10,11 @@ public class CreateMarkupValidation : AbstractValidator<CreateMarkupCommand>
         RuleFor(x => x.Ranges)
             .NotEmpty()
             .WithMessage("Диапазоны не могут быть пустыми");
-        
+
         RuleFor(x => x.MarkupForUnknownRange)
             .GreaterThan(0)
             .WithMessage("Наценка для неизвестного диапазона не может быть отрицательной или нулевой");
-        
+
 
         RuleForEach(x => x.Ranges).ChildRules(context =>
         {

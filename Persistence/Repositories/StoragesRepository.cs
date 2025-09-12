@@ -8,15 +8,20 @@ namespace Persistence.Repositories;
 
 public class StoragesRepository(DContext context) : IStoragesRepository
 {
-    public async Task<Storage?> GetStorageAsync(string name, bool track = true, CancellationToken cancellationToken = default)
-        => await context.Storages.ConfigureTracking(track).FirstOrDefaultAsync(x => x.Name == name.Trim(), cancellationToken);
+    public async Task<Storage?> GetStorageAsync(string name, bool track = true,
+        CancellationToken cancellationToken = default)
+    {
+        return await context.Storages.ConfigureTracking(track)
+            .FirstOrDefaultAsync(x => x.Name == name.Trim(), cancellationToken);
+    }
 
-    public async Task<IEnumerable<Storage>> GetStoragesAsync(string? searchTerm, int page, int viewCount, bool track = true,
+    public async Task<IEnumerable<Storage>> GetStoragesAsync(string? searchTerm, int page, int viewCount,
+        bool track = true,
         CancellationToken cancellationToken = default)
     {
         var query = context.Storages.ConfigureTracking(track);
-        
-        if(!string.IsNullOrWhiteSpace(searchTerm))
+
+        if (!string.IsNullOrWhiteSpace(searchTerm))
             query = query.Select(x => new
                 {
                     Entity = x,
@@ -28,17 +33,20 @@ public class StoragesRepository(DContext context) : IStoragesRepository
                 .Where(x => x.Rank > 0)
                 .OrderByDescending(x => x.Rank)
                 .Select(x => x.Entity);
-        
+
         return await query
             .Skip(page * viewCount)
             .Take(viewCount)
-            .ToListAsync(cancellationToken: cancellationToken);
+            .ToListAsync(cancellationToken);
     }
 
     public async Task<bool> StorageExistsAsync(string name, CancellationToken cancellationToken = default)
-        => await context.Storages.AsNoTracking().AnyAsync(x => x.Name == name.Trim(), cancellationToken);
+    {
+        return await context.Storages.AsNoTracking().AnyAsync(x => x.Name == name.Trim(), cancellationToken);
+    }
 
-    public async Task<IEnumerable<string>> StoragesExistsAsync(IEnumerable<string> names, CancellationToken cancellationToken = default)
+    public async Task<IEnumerable<string>> StoragesExistsAsync(IEnumerable<string> names,
+        CancellationToken cancellationToken = default)
     {
         var namesList = names.Distinct().ToList();
         var foundNames = await context.Storages

@@ -9,7 +9,8 @@ namespace Persistence.Repositories;
 
 public class BalanceRepository(DContext context) : IBalanceRepository
 {
-    public async Task<Transaction?> GetTransactionByIdAsync(string id, bool track = true, CancellationToken ct = default)
+    public async Task<Transaction?> GetTransactionByIdAsync(string id, bool track = true,
+        CancellationToken ct = default)
     {
         return await context.Transactions
             .FromSql($"SELECT * FROM transactions WHERE id = {id} FOR UPDATE")
@@ -17,14 +18,16 @@ public class BalanceRepository(DContext context) : IBalanceRepository
             .FirstOrDefaultAsync(ct);
     }
 
-    public async Task<bool> TransactionExistsAsync(string senderId, string receiverId, DateTime dt, string? exceptId = null, CancellationToken ct = default)
+    public async Task<bool> TransactionExistsAsync(string senderId, string receiverId, DateTime dt,
+        string? exceptId = null, CancellationToken ct = default)
     {
         return await context.Transactions.AsNoTracking()
             .AnyAsync(x => x.SenderId == senderId && x.ReceiverId == receiverId &&
                            x.TransactionDatetime == dt && (exceptId == null || x.Id != exceptId), ct);
     }
 
-    public async Task<Transaction?> GetPreviousTransactionAsync(DateTime dt, string userId, int currencyId, bool track = true, CancellationToken ct = default)
+    public async Task<Transaction?> GetPreviousTransactionAsync(DateTime dt, string userId, int currencyId,
+        bool track = true, CancellationToken ct = default)
     {
         var sql = """
                       SELECT * FROM transactions
@@ -46,7 +49,8 @@ public class BalanceRepository(DContext context) : IBalanceRepository
             .FirstOrDefaultAsync(ct);
     }
 
-    public IAsyncEnumerable<Transaction> GetAffectedTransactions(string userId, int currencyId, DateTime dt, string? excludeId = null, bool track = true)
+    public IAsyncEnumerable<Transaction> GetAffectedTransactions(string userId, int currencyId, DateTime dt,
+        string? excludeId = null, bool track = true)
     {
         var sql = excludeId is null
             ? """
@@ -74,7 +78,7 @@ public class BalanceRepository(DContext context) : IBalanceRepository
             {
                 new NpgsqlParameter("@currencyId", currencyId),
                 new NpgsqlParameter("@dt", dt),
-                new NpgsqlParameter("@userId", userId),
+                new NpgsqlParameter("@userId", userId)
             }
             : new object[]
             {
@@ -89,14 +93,8 @@ public class BalanceRepository(DContext context) : IBalanceRepository
             .AsAsyncEnumerable();
     }
 
-    public async Task AddTransactionAsync(Transaction transaction, CancellationToken ct = default)
-    {
-        await context.Transactions.AddAsync(transaction, ct);
-    }
-
-    public Task SaveChangesAsync(CancellationToken ct = default) => context.SaveChangesAsync(ct);
-
-    public async Task<UserBalance?> GetUserBalanceAsync(string userId, int currencyId, bool track = true, CancellationToken ct = default)
+    public async Task<UserBalance?> GetUserBalanceAsync(string userId, int currencyId, bool track = true,
+        CancellationToken ct = default)
     {
         var sql = """
                       SELECT * FROM user_balances
@@ -113,7 +111,8 @@ public class BalanceRepository(DContext context) : IBalanceRepository
             .FirstOrDefaultAsync(ct);
     }
 
-    public async Task<TransactionVersion?> GetLastTransactionVersionAsync(string transactionId, bool track = true, CancellationToken ct = default)
+    public async Task<TransactionVersion?> GetLastTransactionVersionAsync(string transactionId, bool track = true,
+        CancellationToken ct = default)
     {
         return await context.TransactionVersions
             .AsNoTracking()
@@ -124,20 +123,23 @@ public class BalanceRepository(DContext context) : IBalanceRepository
     }
 
     public async Task<IEnumerable<Transaction>> GetTransactionsAsync(DateTime rangeStart, DateTime rangeEnd,
-        int? currencyId, string? senderId, string? receiverId, int page, int viewCount, bool track = true, CancellationToken ct = default)
+        int? currencyId, string? senderId, string? receiverId, int page, int viewCount, bool track = true,
+        CancellationToken ct = default)
     {
         var query = context.Transactions.ConfigureTracking(track)
-            .Where(x => (rangeStart <= x.TransactionDatetime && rangeEnd >= x.TransactionDatetime) &&
+            .Where(x => rangeStart <= x.TransactionDatetime && rangeEnd >= x.TransactionDatetime &&
                         (currencyId == null || x.CurrencyId == currencyId));
         if (!string.IsNullOrWhiteSpace(senderId) && !string.IsNullOrWhiteSpace(receiverId))
-            query = query.Where(x => (x.SenderId == senderId && x.ReceiverId == receiverId) || 
+            query = query.Where(x => (x.SenderId == senderId && x.ReceiverId == receiverId) ||
                                      (x.SenderId == receiverId && x.ReceiverId == senderId));
         else
-            query = query.Where(x => x.SenderId == senderId || x.ReceiverId == senderId && string.IsNullOrWhiteSpace(senderId))
-                .Where(x => x.SenderId == receiverId || x.ReceiverId == receiverId && string.IsNullOrWhiteSpace(receiverId));
-        
-        
-        query = query.OrderBy(x => new {x.TransactionDatetime, x.Id})
+            query = query.Where(x =>
+                    x.SenderId == senderId || (x.ReceiverId == senderId && string.IsNullOrWhiteSpace(senderId)))
+                .Where(x => x.SenderId == receiverId ||
+                            (x.ReceiverId == receiverId && string.IsNullOrWhiteSpace(receiverId)));
+
+
+        query = query.OrderBy(x => new { x.TransactionDatetime, x.Id })
             .Skip(page * viewCount)
             .Take(viewCount);
         var result = await query.ToListAsync(ct);
@@ -147,5 +149,15 @@ public class BalanceRepository(DContext context) : IBalanceRepository
     public async Task<bool> TransactionExistsAsync(string transactionId, CancellationToken ct = default)
     {
         return await context.Transactions.AsNoTracking().AnyAsync(x => x.Id == transactionId, ct);
+    }
+
+    public async Task AddTransactionAsync(Transaction transaction, CancellationToken ct = default)
+    {
+        await context.Transactions.AddAsync(transaction, ct);
+    }
+
+    public Task SaveChangesAsync(CancellationToken ct = default)
+    {
+        return context.SaveChangesAsync(ct);
     }
 }

@@ -24,7 +24,8 @@ public class GetTransactionsEndPoint : ICarterModule
 {
     public void AddRoutes(IEndpointRouteBuilder app)
     {
-        app.MapGet("/balances/transactions", async (ISender sender, ClaimsPrincipal user, [AsParameters] GetTransactionsRequest request, CancellationToken token) =>
+        app.MapGet("/balances/transactions", async (ISender sender, ClaimsPrincipal user,
+                [AsParameters] GetTransactionsRequest request, CancellationToken token) =>
             {
                 var roles = user.FindAll(ClaimTypes.Role).Select(r => r.Value).ToList();
 

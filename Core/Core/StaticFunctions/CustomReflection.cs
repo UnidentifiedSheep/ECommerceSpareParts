@@ -12,14 +12,15 @@ public static class CustomReflection
         {
             var property = properties.FirstOrDefault(p => p.Name == pr.Key);
             if (property == null) continue;
-            
-            object convertedValue = property.PropertyType.IsEnum 
-                ? Enum.Parse(property.PropertyType, pr.Value) 
+
+            var convertedValue = property.PropertyType.IsEnum
+                ? Enum.Parse(property.PropertyType, pr.Value)
                 : Convert.ChangeType(pr.Value, property.PropertyType);
-            
-            
+
+
             property.SetValue(insertionClass, convertedValue);
         }
+
         return insertionClass;
     }
 }

@@ -8,7 +8,7 @@ public static class Generator
         return new string(Enumerable.Range(0, length)
             .Select(_ =>
             {
-                char c = chars[Random.Shared.Next(chars.Length)];
+                var c = chars[Random.Shared.Next(chars.Length)];
                 return char.IsLetter(c) && Random.Shared.Next(2) == 0 ? char.ToUpper(c) : c;
             })
             .ToArray());

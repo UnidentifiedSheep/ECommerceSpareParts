@@ -3,6 +3,7 @@ using Mail.Models;
 using MailKit.Net.Smtp;
 using Microsoft.Extensions.Options;
 using MimeKit;
+using MimeKit.Text;
 
 namespace Mail.Service;
 
@@ -15,14 +16,15 @@ public class Mail : IMail
         _options = options.Value;
     }
 
-    public async Task SendMailAsync(string receiver ,string body = "" , string subject = "" ,HeaderList? headers = null ,CancellationToken cancellationToken = default)
+    public async Task SendMailAsync(string receiver, string body = "", string subject = "", HeaderList? headers = null,
+        CancellationToken cancellationToken = default)
     {
         var message = new MimeMessage();
         if (headers != null && headers.Any())
             foreach (var header in headers)
                 message.Headers.Add(header);
         message.Subject = subject;
-        message.Body = new TextPart(MimeKit.Text.TextFormat.Html) { Text = body };
+        message.Body = new TextPart(TextFormat.Html) { Text = body };
         //TODO CHANGE ORGANISATION NAME
         message.From.Add(new MailboxAddress(_options.Username, _options.Username));
         message.Sender = new MailboxAddress(_options.Username, _options.Username);

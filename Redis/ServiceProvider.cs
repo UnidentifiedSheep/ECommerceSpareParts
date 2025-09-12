@@ -12,7 +12,7 @@ public static class ServiceProvider
     public static IServiceCollection AddCacheLayer(this IServiceCollection collection, string redisConnectionString)
     {
         Redis.Configure(redisConnectionString);
-        
+
         collection.AddTransient<ICache, Cache>(_ =>
         {
             var redis = Redis.GetRedis();
@@ -38,7 +38,7 @@ public static class ServiceProvider
         });
 
         collection.AddTransient<IRelatedDataRepositoryFactory, RelatedDataRepositoryFactory>();
-        
+
         return collection;
     }
 }

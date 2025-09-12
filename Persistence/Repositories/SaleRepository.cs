@@ -4,13 +4,15 @@ using Core.Interfaces.DbRepositories;
 using Microsoft.EntityFrameworkCore;
 using Persistence.Contexts;
 using Persistence.Extensions;
+
 // ReSharper disable EntityFramework.ClientSideDbFunctionCall
 
 namespace Persistence.Repositories;
 
 public class SaleRepository(DContext context) : ISaleRepository
 {
-    public async Task<Sale?> GetSaleForUpdate(string saleId, bool track = true, CancellationToken cancellationToken = default)
+    public async Task<Sale?> GetSaleForUpdate(string saleId, bool track = true,
+        CancellationToken cancellationToken = default)
     {
         return await context.Sales.FromSql($"SELECT * FROM sale where id = {saleId} for update")
             .Include(x => x.Transaction)
@@ -39,7 +41,8 @@ public class SaleRepository(DContext context) : ISaleRepository
             .ToListAsync(cancellationToken);
     }
 
-    public async Task<IEnumerable<Sale>> GetSales(DateTime rangeStart, DateTime rangeEnd, int page, int viewCount, bool track = true, 
+    public async Task<IEnumerable<Sale>> GetSales(DateTime rangeStart, DateTime rangeEnd, int page, int viewCount,
+        bool track = true,
         string? sortBy = null, string? searchTerm = null, string? buyerId = null, int? currencyId = null,
         CancellationToken cancellationToken = default)
     {
@@ -47,25 +50,24 @@ public class SaleRepository(DContext context) : ISaleRepository
         if (!string.IsNullOrWhiteSpace(buyerId))
             query = query.Where(x => x.BuyerId == buyerId);
 
-        if (currencyId != null)
-        {
-            query = query.Where(x => x.CurrencyId == currencyId);
-        }
+        if (currencyId != null) query = query.Where(x => x.CurrencyId == currencyId);
 
         if (!string.IsNullOrWhiteSpace(searchTerm))
         {
             searchTerm = searchTerm.Trim();
             var normalizedSearchTerm = searchTerm.ToNormalizedArticleNumber();
             query = query.Where(x => x.SaleContents
-                .Any(content => (EF.Functions.ToTsVector("russian", content.Article.ArticleName)
-                                     .Matches(EF.Functions.PlainToTsQuery("russian", searchTerm)) ||
-                                 EF.Functions.ILike(content.Article.NormalizedArticleNumber, $"%{normalizedSearchTerm}%"))) ||
+                                         .Any(content => EF.Functions.ToTsVector("russian", content.Article.ArticleName)
+                                                             .Matches(
+                                                                 EF.Functions.PlainToTsQuery("russian", searchTerm)) ||
+                                                         EF.Functions.ILike(content.Article.NormalizedArticleNumber,
+                                                             $"%{normalizedSearchTerm}%")) ||
                                      (x.Comment != null && EF.Functions.ILike(x.Comment, $"%{searchTerm}%")));
         }
-        
+
         var startDate = DateTime.SpecifyKind(rangeStart.Date, DateTimeKind.Unspecified);
         var endDate = DateTime.SpecifyKind(rangeEnd.Date, DateTimeKind.Unspecified).AddDays(1);
-        return await query.Where(x => (x.CreationDatetime >= startDate && x.CreationDatetime <= endDate))
+        return await query.Where(x => x.CreationDatetime >= startDate && x.CreationDatetime <= endDate)
             .Include(x => x.Transaction)
             .Include(x => x.SaleContents)
             .ThenInclude(x => x.SaleContentDetails)

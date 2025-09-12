@@ -1,7 +1,6 @@
 using Tests.testContainers.Pg;
 using Tests.testContainers.Redis;
 
-using LRedis = Redis;
 namespace Tests.testContainers.Combined;
 
 public class CombinedContainerFixture : IAsyncLifetime

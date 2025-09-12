@@ -21,10 +21,17 @@ using MediatR;
 namespace Application.Handlers.Sales.EditFullSale;
 
 [Transactional(IsolationLevel.Serializable, 20, 2)]
-public record EditFullSaleCommand(IEnumerable<EditSaleContentDto> EditedContent, string SaleId, int CurrencyId, 
-    string UpdatedUserId, DateTime SaleDateTime, string? Comment, bool SellFromOtherStorages) : ICommand;
+public record EditFullSaleCommand(
+    IEnumerable<EditSaleContentDto> EditedContent,
+    string SaleId,
+    int CurrencyId,
+    string UpdatedUserId,
+    DateTime SaleDateTime,
+    string? Comment,
+    bool SellFromOtherStorages) : ICommand;
 
-public class EditFullSaleHandler(IMediator mediator, ISaleRepository saleRepository) : ICommandHandler<EditFullSaleCommand>
+public class EditFullSaleHandler(IMediator mediator, ISaleRepository saleRepository)
+    : ICommandHandler<EditFullSaleCommand>
 {
     public async Task<Unit> Handle(EditFullSaleCommand request, CancellationToken cancellationToken)
     {
@@ -35,7 +42,7 @@ public class EditFullSaleHandler(IMediator mediator, ISaleRepository saleReposit
         var editedContent = request.EditedContent.ToList();
         var saleContentIds = editedContent.Where(x => x.Id.HasValue)
             .Select(x => x.Id!.Value).ToHashSet();
-        
+
         var sale = await saleRepository.GetSaleForUpdate(saleId, true, cancellationToken)
                    ?? throw new SaleNotFoundException(saleId);
         var saleContents = (await saleRepository.GetSaleContentsForUpdate(saleId, true, cancellationToken))
@@ -44,10 +51,10 @@ public class EditFullSaleHandler(IMediator mediator, ISaleRepository saleReposit
             (await saleRepository.GetSaleContentDetailsForUpdate(saleContents.Keys, true, cancellationToken)).ToList();
 
         var totalSum = editedContent.GetTotalSum();
-        
+
         var (contentGreaterCount, contentLessCount) =
             CalculateInventoryDeltas(editedContent, saleContents, saleContentsDetails);
-        
+
         //Оставшиеся Id убираем из продажи
         contentLessCount.AddRange(GetRemovedContentDetails(saleContentIds, saleContents, saleContentsDetails));
         //Возвращаем на склад
@@ -57,37 +64,38 @@ public class EditFullSaleHandler(IMediator mediator, ISaleRepository saleReposit
                 .Select(x => new RestoreContentItem(x.Detail.Adapt<SaleContentDetailDto>(), x.ArticleId));
             await RestoreContentToStorage(details, userId, cancellationToken);
         }
-        
+
         //Добавленные значения для позиций чьи количества были увеличены ЗАБИРАЕМ СО СКЛАДА
         var takenStorageContents = new List<PrevAndNewValue<StorageContent>>();
         if (contentGreaterCount.Count != 0)
-            takenStorageContents.AddRange(await RemoveContentFromStorage(contentGreaterCount, sale.MainStorageName, request.SellFromOtherStorages,
+            takenStorageContents.AddRange(await RemoveContentFromStorage(contentGreaterCount, sale.MainStorageName,
+                request.SellFromOtherStorages,
                 userId, cancellationToken));
-        
+
         //Редактируем транзакцию
         if (sale.Transaction.TransactionSum != totalSum || sale.Transaction.CurrencyId != currencyId)
             await EditTransaction(sale.TransactionId, currencyId, totalSum, saleDateTime, cancellationToken);
-        
-        await EditSale(editedContent, takenStorageContents, contentLessCount, saleId, currencyId, userId, 
+
+        await EditSale(editedContent, takenStorageContents, contentLessCount, saleId, currencyId, userId,
             saleDateTime, request.Comment, cancellationToken);
 
         await SubtractFromReservation(contentGreaterCount, userId, sale.BuyerId, cancellationToken);
-        
+
         await EditBuySellPrices(sale, saleContentIds, currencyId, cancellationToken);
         await AddBuySellPrices(sale, takenStorageContents, saleContentIds, currencyId, cancellationToken);
-        
+
         return Unit.Value;
     }
-    
-    private (Dictionary<int, int> toTake, List<(SaleContentDetail Detail, int ArticleId)> toReturn) CalculateInventoryDeltas(
-        List<EditSaleContentDto> editedContent,
-        Dictionary<int, SaleContent> saleContent, List<SaleContentDetail> saleContentDetails)
+
+    private (Dictionary<int, int> toTake, List<(SaleContentDetail Detail, int ArticleId)> toReturn)
+        CalculateInventoryDeltas(
+            List<EditSaleContentDto> editedContent,
+            Dictionary<int, SaleContent> saleContent, List<SaleContentDetail> saleContentDetails)
     {
         var contentGreaterCount = new Dictionary<int, int>();
         var contentLessCount = new List<(SaleContentDetail, int)>();
-        
+
         foreach (var content in editedContent)
-        {
             if (content.Id != null)
             {
                 var existingSaleContent = saleContent[content.Id.Value];
@@ -96,7 +104,7 @@ public class EditFullSaleHandler(IMediator mediator, ISaleRepository saleReposit
                 {
                     var diff = content.Count - existingSaleContent.Count;
                     contentGreaterCount[existingSaleContent.ArticleId] = contentGreaterCount
-                            .GetValueOrDefault(existingSaleContent.ArticleId) + diff;
+                        .GetValueOrDefault(existingSaleContent.ArticleId) + diff;
                 }
                 else if (existingSaleContent.Count > content.Count)
                 {
@@ -116,16 +124,17 @@ public class EditFullSaleHandler(IMediator mediator, ISaleRepository saleReposit
                 }
             }
             else
+            {
                 contentGreaterCount[content.ArticleId] = contentGreaterCount
                     .GetValueOrDefault(content.ArticleId) + content.Count;
-            
-        }
+            }
 
         return (contentGreaterCount, contentLessCount);
     }
-    
+
     private List<(SaleContentDetail Detail, int ArticleId)> GetRemovedContentDetails(
-        HashSet<int> saleContentIds, Dictionary<int, SaleContent> saleContent, List<SaleContentDetail> saleContentDetails)
+        HashSet<int> saleContentIds, Dictionary<int, SaleContent> saleContent,
+        List<SaleContentDetail> saleContentDetails)
     {
         var removedDetails = new List<(SaleContentDetail, int)>();
 
@@ -146,40 +155,47 @@ public class EditFullSaleHandler(IMediator mediator, ISaleRepository saleReposit
         await mediator.Send(command, cancellationToken);
     }
 
-    private async Task<IEnumerable<PrevAndNewValue<StorageContent>>> RemoveContentFromStorage(Dictionary<int, int> content, string? storageName, bool takeFromOtherStorages, string whoMoved,
+    private async Task<IEnumerable<PrevAndNewValue<StorageContent>>> RemoveContentFromStorage(
+        Dictionary<int, int> content, string? storageName, bool takeFromOtherStorages, string whoMoved,
         CancellationToken cancellationToken = default)
     {
-        var command = new RemoveContentCommand(content, whoMoved, storageName, takeFromOtherStorages, StorageMovementType.SaleEditing);
+        var command = new RemoveContentCommand(content, whoMoved, storageName, takeFromOtherStorages,
+            StorageMovementType.SaleEditing);
         return (await mediator.Send(command, cancellationToken)).Changes;
     }
 
-    private async Task EditTransaction(string transactionId, int currencyId, decimal totalSum, DateTime saleDateTime, 
+    private async Task EditTransaction(string transactionId, int currencyId, decimal totalSum, DateTime saleDateTime,
         CancellationToken cancellationToken = default)
     {
-        var command = new EditTransactionCommand(transactionId, currencyId, totalSum, TransactionStatus.Sale, saleDateTime);
+        var command =
+            new EditTransactionCommand(transactionId, currencyId, totalSum, TransactionStatus.Sale, saleDateTime);
         await mediator.Send(command, cancellationToken);
     }
 
-    private async Task EditSale(List<EditSaleContentDto> editedContent, IEnumerable<PrevAndNewValue<StorageContent>> storageContents,
-        IEnumerable<(SaleContentDetail, int)> contentLessCount, string saleId, int currencyId, string whoUpdated, DateTime saleDateTime, 
+    private async Task EditSale(List<EditSaleContentDto> editedContent,
+        IEnumerable<PrevAndNewValue<StorageContent>> storageContents,
+        IEnumerable<(SaleContentDetail, int)> contentLessCount, string saleId, int currencyId, string whoUpdated,
+        DateTime saleDateTime,
         string? comment, CancellationToken cancellationToken = default)
     {
         var movedToStorage = contentLessCount
             .GroupBy(x => x.Item1.SaleContentId, x => x.Item1)
             .ToDictionary(x => x.Key, x => x.ToList());
-        var command = new EditSaleCommand(editedContent, storageContents, movedToStorage, saleId, currencyId, whoUpdated,
+        var command = new EditSaleCommand(editedContent, storageContents, movedToStorage, saleId, currencyId,
+            whoUpdated,
             saleDateTime, comment);
         await mediator.Send(command, cancellationToken);
     }
 
-    private async Task SubtractFromReservation(Dictionary<int, int> graterCount, string whoUpdated, string userId, 
+    private async Task SubtractFromReservation(Dictionary<int, int> graterCount, string whoUpdated, string userId,
         CancellationToken cancellationToken = default)
     {
         var command = new SubtractCountFromReservationsCommand(userId, whoUpdated, graterCount);
         await mediator.Send(command, cancellationToken);
     }
 
-    private async Task EditBuySellPrices(Sale sale, HashSet<int> seenIds, int currencyId, CancellationToken cancellationToken = default)
+    private async Task EditBuySellPrices(Sale sale, HashSet<int> seenIds, int currencyId,
+        CancellationToken cancellationToken = default)
     {
         var oldSaleContents = sale.SaleContents
             .Where(x => seenIds.Contains(x.Id))
@@ -188,7 +204,7 @@ public class EditFullSaleHandler(IMediator mediator, ISaleRepository saleReposit
         await mediator.Send(command, cancellationToken);
     }
 
-    private async Task AddBuySellPrices(Sale sale, List<PrevAndNewValue<StorageContent>> storageContents, 
+    private async Task AddBuySellPrices(Sale sale, List<PrevAndNewValue<StorageContent>> storageContents,
         HashSet<int> seenIds, int currencyId, CancellationToken cancellationToken = default)
     {
         var takenContents = storageContents.Select(x => x.NewValue);

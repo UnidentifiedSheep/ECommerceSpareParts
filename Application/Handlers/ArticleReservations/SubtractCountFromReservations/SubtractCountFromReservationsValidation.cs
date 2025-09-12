@@ -13,6 +13,5 @@ public class SubtractCountFromReservationsValidation : AbstractValidator<Subtrac
         RuleFor(x => x.WhoUpdated)
             .NotEmpty()
             .WithMessage("Id пользователя который обновляет резервации");
-        
     }
 }

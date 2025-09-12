@@ -22,18 +22,18 @@ public class CreateArticlesValidation : AbstractValidator<CreateArticlesCommand>
             content.RuleFor(x => x.ArticleNumber)
                 .Must(x => x.Trim().Length >= 3)
                 .WithMessage("Минимальная длина артикула 3 символа");
-            
+
             content.RuleFor(x => x.Name).NotEmpty()
                 .WithMessage("Название артикула не может быть пустым");
             content.RuleFor(x => x.Name)
                 .Must(x => x.Trim().Length <= 255)
                 .WithMessage("Максимальная длина названия 255 символов");
-            
+
             content.RuleFor(x => x.Description)
                 .Must(x => x?.Trim().Length <= 255)
                 .When(x => x.Description != null)
                 .WithMessage("Максимальная длина описания 255 символов");
-            
+
             content.RuleFor(x => x.Indicator)
                 .Must(x => x?.Trim().Length <= 24)
                 .When(x => x.Indicator != null)

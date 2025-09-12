@@ -9,6 +9,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Persistence.Contexts;
 using Tests.MockData;
 using Tests.testContainers.Combined;
+using ValidationException = FluentValidation.ValidationException;
 
 namespace Tests.HandlersTests.Articles;
 
@@ -16,8 +17,9 @@ namespace Tests.HandlersTests.Articles;
 public class CreateArticleTests : IAsyncLifetime
 {
     private readonly DContext _context;
-    private readonly IMediator _mediator;
     private readonly Faker _faker = new("ru");
+    private readonly IMediator _mediator;
+
     public CreateArticleTests(CombinedContainerFixture fixture)
     {
         MapsterConfig.Configure();
@@ -25,7 +27,7 @@ public class CreateArticleTests : IAsyncLifetime
         _mediator = sp.GetService<IMediator>()!;
         _context = sp.GetRequiredService<DContext>();
     }
-        
+
     public async Task InitializeAsync()
     {
         var newProducerModel = MockData.MockData.CreateNewProducerDto(1)[0];
@@ -48,11 +50,11 @@ public class CreateArticleTests : IAsyncLifetime
         var result = await _mediator.Send(command);
 
         Assert.Equal(Unit.Value, result);
-        
+
         var saved = await _context.Articles.AnyAsync(a => a.ArticleNumber == articleList[0].ArticleNumber);
         Assert.True(saved);
     }
-    
+
     [Fact]
     public async Task CreateManyArticles_Succeeds()
     {
@@ -68,43 +70,44 @@ public class CreateArticleTests : IAsyncLifetime
         var saved = true;
         foreach (var item in articleList)
         {
-            saved = await _context.Articles.AnyAsync(a => a.ArticleNumber == item.ArticleNumber && 
-                                                          a.ArticleName == item.Name && a.ProducerId == item.ProducerId);
+            saved = await _context.Articles.AnyAsync(a => a.ArticleNumber == item.ArticleNumber &&
+                                                          a.ArticleName == item.Name &&
+                                                          a.ProducerId == item.ProducerId);
             if (!saved) break;
         }
-        
+
         Assert.True(saved);
     }
-    
+
     [Fact]
     public async Task CreateArticle_WithEmptyList_FailsValidation()
     {
         var command = new CreateArticlesCommand([]);
 
-        await Assert.ThrowsAsync<FluentValidation.ValidationException>(() => _mediator.Send(command));
+        await Assert.ThrowsAsync<ValidationException>(() => _mediator.Send(command));
     }
-    
+
     [Fact]
     public async Task CreateArticle_WithLongName_FailsValidation()
     {
         var articleList = MockData.MockData.CreateNewArticleDto(1);
-        
+
         articleList[0].Name = string.Join(" ", _faker.Lorem.Words(100));
         var command = new CreateArticlesCommand(articleList);
 
-        await Assert.ThrowsAsync<FluentValidation.ValidationException>(() => 
+        await Assert.ThrowsAsync<ValidationException>(() =>
             _mediator.Send(command));
     }
-    
+
     [Fact]
     public async Task CreateArticle_WithManyItems_FailsValidation()
     {
         var articleList = MockData.MockData.CreateNewArticleDto(200);
         var command = new CreateArticlesCommand(articleList);
-        await Assert.ThrowsAsync<FluentValidation.ValidationException>(() => 
+        await Assert.ThrowsAsync<ValidationException>(() =>
             _mediator.Send(command));
     }
-    
+
     [Fact]
     public async Task CreateArticle_WithInvalidProducer_ThrowsProducerNotFoundException()
     {

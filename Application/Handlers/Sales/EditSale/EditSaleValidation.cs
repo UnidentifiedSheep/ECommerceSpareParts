@@ -11,8 +11,8 @@ public class EditSaleValidation : AbstractValidator<EditSaleCommand>
         RuleFor(x => x.Comment)
             .Must(x => x?.Trim().Length <= 256)
             .WithMessage("Максимальная длина общего комментария — 256 символов.");
-        
-        
+
+
         RuleFor(x => x.SaleDateTime)
             .SetValidator(new SaleDateTimeValidator());
 

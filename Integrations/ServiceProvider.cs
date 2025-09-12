@@ -16,7 +16,6 @@ public static class ServiceProvider
 {
     public static IServiceCollection AddIntegrations(this IServiceCollection collection, IConfiguration configuration)
     {
-        
         collection.AddHttpClient();
         collection.AddHttpClient("TimewebClient", sp =>
         {
@@ -24,14 +23,14 @@ public static class ServiceProvider
             sp.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer",
                 configuration.GetValue<string>("TimeWebConnect:Token")!);
         });
-        
+
         collection.Configure<ExchangeRatesOptions>(configuration.GetSection("Exchange"));
 
         collection.AddScoped<ITimeWebMail, TimeWebMail>();
         collection.AddScoped<IExchangeRates, ExchangeRates.ExchangeRates>();
-        
+
         var awsOptions = configuration.GetAWSOptions("S3Storage");
-        awsOptions.Credentials = new BasicAWSCredentials(configuration["S3Storage:AccessKey"], 
+        awsOptions.Credentials = new BasicAWSCredentials(configuration["S3Storage:AccessKey"],
             configuration["S3Storage:SecretKey"]);
         collection.AddDefaultAWSOptions(awsOptions);
 

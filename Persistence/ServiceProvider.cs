@@ -1,4 +1,3 @@
-using Core.Interfaces;
 using Core.Interfaces.DbRepositories;
 using Core.Interfaces.Services;
 using Microsoft.EntityFrameworkCore;
@@ -15,7 +14,7 @@ public static class ServiceProvider
     {
         collection.AddDbContext<DContext>(options => options.UseNpgsql(connectionString));
         collection.AddDbContext<IdentityContext>(options => options.UseNpgsql(connectionString));
-        
+
         collection.AddScoped<IUserVehicleRepository, UserVehicleRepository>();
         collection.AddScoped<IUsersRepository, UsersRepository>();
         collection.AddScoped<IUserEmailRepository, UserEmailRepository>();
@@ -37,7 +36,7 @@ public static class ServiceProvider
         collection.AddScoped<IArticleCharacteristicsRepository, ArticleCharacteristicsRepository>();
 
         collection.AddScoped<IUnitOfWork, UnitOfWork>();
-        
+
         return collection;
     }
 }

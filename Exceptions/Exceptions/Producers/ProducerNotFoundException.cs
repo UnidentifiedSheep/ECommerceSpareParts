@@ -1,14 +1,14 @@
 ﻿using Exceptions.Base;
 
-namespace Exceptions.Exceptions.Producers
+namespace Exceptions.Exceptions.Producers;
+
+public class ProducerNotFoundException : NotFoundException
 {
-	public class ProducerNotFoundException : NotFoundException
-	{
-		public ProducerNotFoundException(object id) : base($"Производитель не найден", new { Id = id })
-		{
-		}
-		public ProducerNotFoundException(IEnumerable<int> ids) : base($"Производители не найдены", new { Ids = ids })
-		{
-		}
-	}
+    public ProducerNotFoundException(object id) : base("Производитель не найден", new { Id = id })
+    {
+    }
+
+    public ProducerNotFoundException(IEnumerable<int> ids) : base("Производители не найдены", new { Ids = ids })
+    {
+    }
 }

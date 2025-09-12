@@ -10,9 +10,11 @@ using Microsoft.AspNetCore.Mvc;
 using Security.Extensions;
 using AmwArticleDto = Core.Dtos.Amw.Articles.ArticleDto;
 using AnonymousArticleDto = Core.Dtos.Anonymous.Articles.ArticleDto;
+
 namespace MonoliteUnicorn.EndPoints.Articles;
 
 public record GetArticleViaStartNumberAmwResponse(IEnumerable<AmwArticleDto> Articles);
+
 public record GetArticleViaStartNumberAnonymousResponse(IEnumerable<AnonymousArticleDto> Articles);
 
 public record GetArticleViaStartNumberRequest(
@@ -21,11 +23,12 @@ public record GetArticleViaStartNumberRequest(
     [FromQuery(Name = "viewCount")] int ViewCount,
     [FromQuery(Name = "sortBy")] string? SortBy,
     [FromQuery(Name = "searchStrategy")] ArticleSearchStrategy SearchStrategy);
+
 public class GetArticlesEndPoint : ICarterModule
 {
     public void AddRoutes(IEndpointRouteBuilder app)
     {
-        app.MapGet("/articles", async (ISender sender, HttpContext context, ClaimsPrincipal user, 
+        app.MapGet("/articles", async (ISender sender, HttpContext context, ClaimsPrincipal user,
                 [AsParameters] GetArticleViaStartNumberRequest request, CancellationToken token) =>
             {
                 var userId = user.GetUserId();
@@ -40,22 +43,25 @@ public class GetArticlesEndPoint : ICarterModule
                     return await GetAmw(sender, request, pagination, userId, producerIds, token);
                 return await GetAnonymous(sender, request, pagination, userId, producerIds, token);
             }).WithTags("Articles")
-                .WithDescription("Поиск артикула с начала номера")
-                .ProducesProblem(StatusCodes.Status400BadRequest)
-                .ProducesProblem(StatusCodes.Status404NotFound)
-                .WithSummary("Поиск артикула с начала номера");
+            .WithDescription("Поиск артикула с начала номера")
+            .ProducesProblem(StatusCodes.Status400BadRequest)
+            .ProducesProblem(StatusCodes.Status404NotFound)
+            .WithSummary("Поиск артикула с начала номера");
     }
-    
-    private async Task<IResult> GetAmw(ISender sender, GetArticleViaStartNumberRequest request, PaginationModel pagination, 
+
+    private async Task<IResult> GetAmw(ISender sender, GetArticleViaStartNumberRequest request,
+        PaginationModel pagination,
         string? userId, IEnumerable<int> producerIds, CancellationToken token)
     {
-        var query = new GetArticlesQuery<AmwArticleDto>(request.SearchTerm, pagination, request.SortBy, producerIds, request.SearchStrategy, userId);
+        var query = new GetArticlesQuery<AmwArticleDto>(request.SearchTerm, pagination, request.SortBy, producerIds,
+            request.SearchStrategy, userId);
         var result = await sender.Send(query, token);
         var response = result.Adapt<GetArticleViaStartNumberAmwResponse>();
         return Results.Ok(response);
     }
-    
-    private async Task<IResult> GetAnonymous(ISender sender, GetArticleViaStartNumberRequest request, PaginationModel pagination, 
+
+    private async Task<IResult> GetAnonymous(ISender sender, GetArticleViaStartNumberRequest request,
+        PaginationModel pagination,
         string? userId, IEnumerable<int> producerIds, CancellationToken token)
     {
         var query = new GetArticlesQuery<AnonymousArticleDto>(request.SearchTerm, pagination, request.SortBy,

@@ -18,8 +18,8 @@ public class CreateProducerEndPoint : ICarterModule
                 var result = await sender.Send(command, token);
                 return Results.Created("/producers", result.ProducerId);
             }).RequireAuthorization("AMW")
-        .WithTags("Producers")
-        .WithDescription("Добавление новых производителей в бд")
-        .WithDisplayName("Добавление производителей");
+            .WithTags("Producers")
+            .WithDescription("Добавление новых производителей в бд")
+            .WithDisplayName("Добавление производителей");
     }
 }

@@ -13,7 +13,7 @@ public class SaleContentValidator : AbstractValidator<IEnumerable<NewSaleContent
             {
                 z.RuleFor(x => x.Count)
                     .SetValidator(new CountValidator());
-                
+
                 z.RuleFor(x => x.Price)
                     .GreaterThan(0)
                     .WithMessage("Цена у позиции должна быть больше 0")
@@ -30,7 +30,7 @@ public class SaleContentValidator : AbstractValidator<IEnumerable<NewSaleContent
                     .LessThanOrEqualTo(x => x.Price)
                     .WithMessage("Цена со скидкой не может быть больше чем цена без скидки");
             });
-        
+
         RuleFor(x => x)
             .NotEmpty().WithMessage("Список содержимого продажи не должен быть пуст");
     }

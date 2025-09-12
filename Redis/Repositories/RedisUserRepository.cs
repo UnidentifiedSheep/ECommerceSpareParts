@@ -13,9 +13,7 @@ public class RedisUserRepository : IRedisUserRepository
         _redis = redis;
         _ttl = ttl;
     }
-    
-    private static string GetUserDiscountKey(string userId) => $"user-discount:{userId}";
-    
+
     public async Task<decimal?> GetUserDiscount(string userId)
     {
         var key = GetUserDiscountKey(userId);
@@ -28,5 +26,10 @@ public class RedisUserRepository : IRedisUserRepository
     {
         var key = GetUserDiscountKey(userId);
         await _redis.StringSetAsync(key, discount.ToString(Global.Culture), _ttl);
+    }
+
+    private static string GetUserDiscountKey(string userId)
+    {
+        return $"user-discount:{userId}";
     }
 }

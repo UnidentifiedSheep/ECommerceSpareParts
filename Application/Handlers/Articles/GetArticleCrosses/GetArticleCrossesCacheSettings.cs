@@ -8,24 +8,48 @@ namespace Application.Handlers.Articles.GetArticleCrosses;
 
 public class GetArticleCrossesAmwCacheSettings : ICacheableQuery<GetArticleCrossesQuery<AmwArticleDto>>
 {
-    public string GetCacheKey(GetArticleCrossesQuery<AmwArticleDto> request) 
-        => string.Format(CacheKeys.ArticleCrossesCacheKey, request.ArticleId, request.Pagination.Page, request.Pagination.Size, request.SortBy);
+    public string GetCacheKey(GetArticleCrossesQuery<AmwArticleDto> request)
+    {
+        return string.Format(CacheKeys.ArticleCrossesCacheKey, request.ArticleId, request.Pagination.Page,
+            request.Pagination.Size, request.SortBy);
+    }
 
-    public string GetEntityId(GetArticleCrossesQuery<AmwArticleDto> request) => request.ArticleId.ToString();
+    public string GetEntityId(GetArticleCrossesQuery<AmwArticleDto> request)
+    {
+        return request.ArticleId.ToString();
+    }
 
-    public Type GetRelatedType(GetArticleCrossesQuery<AmwArticleDto> request) => typeof(Article);
+    public Type GetRelatedType(GetArticleCrossesQuery<AmwArticleDto> request)
+    {
+        return typeof(Article);
+    }
 
-    public int GetDurationSeconds(GetArticleCrossesQuery<AmwArticleDto> request) => 600;
+    public int GetDurationSeconds(GetArticleCrossesQuery<AmwArticleDto> request)
+    {
+        return 600;
+    }
 }
 
 public class GetArticleCrossesMemberCacheSettings : ICacheableQuery<GetArticleCrossesQuery<MemberArticleDto>>
 {
-    public string GetCacheKey(GetArticleCrossesQuery<MemberArticleDto> request) 
-        => string.Format(CacheKeys.ArticleCrossesCacheKey, request.ArticleId, request.Pagination.Page, request.Pagination.Size, request.SortBy);
+    public string GetCacheKey(GetArticleCrossesQuery<MemberArticleDto> request)
+    {
+        return string.Format(CacheKeys.ArticleCrossesCacheKey, request.ArticleId, request.Pagination.Page,
+            request.Pagination.Size, request.SortBy);
+    }
 
-    public string GetEntityId(GetArticleCrossesQuery<MemberArticleDto> request) => request.ArticleId.ToString();
+    public string GetEntityId(GetArticleCrossesQuery<MemberArticleDto> request)
+    {
+        return request.ArticleId.ToString();
+    }
 
-    public Type GetRelatedType(GetArticleCrossesQuery<MemberArticleDto> request) => typeof(Article);
+    public Type GetRelatedType(GetArticleCrossesQuery<MemberArticleDto> request)
+    {
+        return typeof(Article);
+    }
 
-    public int GetDurationSeconds(GetArticleCrossesQuery<MemberArticleDto> request) => 600;
+    public int GetDurationSeconds(GetArticleCrossesQuery<MemberArticleDto> request)
+    {
+        return 600;
+    }
 }

@@ -12,12 +12,13 @@ public class EditProducerEndPoint : ICarterModule
     public void AddRoutes(IEndpointRouteBuilder app)
     {
         app.MapPatch("/producers/{producerId}",
-            async (ISender sender, int producerId, EditProducerRequest request, CancellationToken cancellationToken) => 
-            {
-                var command = new EditProducerCommand(producerId, request.EditProducer);
-                await sender.Send(command, cancellationToken);
-                return Results.NoContent(); 
-            }).RequireAuthorization("AMW")
+                async (ISender sender, int producerId, EditProducerRequest request,
+                    CancellationToken cancellationToken) =>
+                {
+                    var command = new EditProducerCommand(producerId, request.EditProducer);
+                    await sender.Send(command, cancellationToken);
+                    return Results.NoContent();
+                }).RequireAuthorization("AMW")
             .WithTags("Producers")
             .WithDescription("Редактирование производителя")
             .WithDisplayName("Редактирование производителя");

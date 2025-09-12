@@ -1,6 +1,6 @@
 ﻿namespace Core.Entities;
 
-public partial class AspNetUserToken
+public class AspNetUserToken
 {
     public string UserId { get; set; } = null!;
 

@@ -19,7 +19,7 @@ public class ChangeDiscountForUserTests : IAsyncLifetime
     private readonly IMediator _mediator;
     private readonly IRedisUserRepository _redisUserRepository;
     private AspNetUser _mockUser = null!;
-    
+
     public ChangeDiscountForUserTests(CombinedContainerFixture fixture)
     {
         MapsterConfig.Configure();
@@ -28,7 +28,7 @@ public class ChangeDiscountForUserTests : IAsyncLifetime
         _context = sp.GetRequiredService<DContext>();
         _redisUserRepository = sp.GetRequiredService<IRedisUserRepository>();
     }
-        
+
     public async Task InitializeAsync()
     {
         await _mediator.AddMockUser();
@@ -46,28 +46,28 @@ public class ChangeDiscountForUserTests : IAsyncLifetime
         var command = new ChangeUserDiscountCommand(_mockUser.Id, -1);
         await Assert.ThrowsAsync<ValidationException>(async () => await _mediator.Send(command));
     }
-    
+
     [Fact]
     public async Task ChangeUsersDiscount_WithTooLargeDiscount_FailsValidation()
     {
         var command = new ChangeUserDiscountCommand(_mockUser.Id, 101);
         await Assert.ThrowsAsync<ValidationException>(async () => await _mediator.Send(command));
     }
-    
+
     [Fact]
     public async Task ChangeUsersDiscount_WithEmptyUserId_FailsValidation()
     {
         var command = new ChangeUserDiscountCommand(" ", 50);
         await Assert.ThrowsAsync<ValidationException>(async () => await _mediator.Send(command));
     }
-    
+
     [Fact]
     public async Task ChangeUsersDiscount_WithNormalDiscount_Succeeds()
     {
         var command = new ChangeUserDiscountCommand(_mockUser.Id, 20);
         var result = await _mediator.Send(command);
         Assert.Equal(Unit.Value, result);
-        
+
         var userDiscount = await _context.UserDiscounts
             .AsNoTracking()
             .FirstOrDefaultAsync(x => x.UserId == _mockUser.Id);

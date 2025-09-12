@@ -1,5 +1,3 @@
-using Core.Entities;
-
 namespace Core.Interfaces.DbRepositories;
 
 public interface IUserEmailRepository

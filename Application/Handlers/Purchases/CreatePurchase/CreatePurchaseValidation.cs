@@ -16,7 +16,7 @@ public class CreatePurchaseValidator : AbstractValidator<CreatePurchaseCommand>
             .WithMessage("Id продавца не может быть пустым");
         RuleFor(x => x.CreatedUserId).NotEmpty()
             .WithMessage("Id пользователя создавшего закупку не может быть пустым");
-        
+
         RuleForEach(x => x.Content)
             .SetValidator(new NewPurchaseContentValidation());
 

@@ -13,7 +13,7 @@ public static class ConvertTo
         using var data = image.Encode(SKEncodedImageFormat.Webp, 100);
         var resultStream = new MemoryStream();
         data.SaveTo(resultStream);
-        resultStream.Seek(0, SeekOrigin.Begin); 
+        resultStream.Seek(0, SeekOrigin.Begin);
         return resultStream;
     }
 }

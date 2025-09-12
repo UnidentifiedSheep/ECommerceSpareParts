@@ -8,11 +8,11 @@ public interface IUsersRepository
         string? name = null, string? surname = null, string? email = null,
         string? phone = null, string? userName = null, string? id = null,
         string? description = null, bool? isSupplier = null, CancellationToken cancellationToken = default);
-    
+
     Task<decimal?> GetUsersDiscountAsync(string userId, CancellationToken cancellationToken = default);
-    
+
     /// <summary>
-    /// Returns the IDs of users that do not exist in the system.
+    ///     Returns the IDs of users that do not exist in the system.
     /// </summary>
     /// <param name="userIds">A collection of user IDs to check.</param>
     /// <param name="cancellationToken">A cancellation token.</param>

@@ -20,7 +20,7 @@ public class CreateArticleReservationValidation : AbstractValidator<CreateArticl
                 x.RuleFor(z => z.InitialCount)
                     .GreaterThan(0)
                     .WithMessage("Общее количество для резервации должно быть больше 0");
-                
+
                 x.RuleFor(z => z.CurrentCount)
                     .GreaterThan(0)
                     .WithMessage("Текущее количество для резервации должно быть больше 0");

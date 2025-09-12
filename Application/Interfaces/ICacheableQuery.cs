@@ -1,5 +1,3 @@
-using MediatR;
-
 namespace Application.Interfaces;
 
 public interface ICacheableQuery<in TRequest>

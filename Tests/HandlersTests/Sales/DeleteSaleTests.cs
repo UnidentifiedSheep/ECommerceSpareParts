@@ -16,13 +16,13 @@ public class DeleteSaleTests : IAsyncLifetime
 {
     private readonly DContext _context;
     private readonly IMediator _mediator;
-    
+
     private Currency _currency = null!;
-    private AspNetUser _user = null!;
-    private Transaction _transaction = null!;
-    private Storage _storage = null!;
     private Sale _saleModel = null!;
-    
+    private Storage _storage = null!;
+    private Transaction _transaction = null!;
+    private AspNetUser _user = null!;
+
     public DeleteSaleTests(CombinedContainerFixture fixture)
     {
         MapsterConfig.Configure();
@@ -30,7 +30,7 @@ public class DeleteSaleTests : IAsyncLifetime
         _context = sp.GetRequiredService<DContext>();
         _mediator = sp.GetRequiredService<IMediator>();
     }
-        
+
     public async Task InitializeAsync()
     {
         await _mediator.AddMockUser();
@@ -48,7 +48,7 @@ public class DeleteSaleTests : IAsyncLifetime
         await _mediator.AddMockStorageContents(articleIds, currency.Id, storage.Name, _user.Id, 10);
 
         var storageContents = await _context.StorageContents.ToListAsync();
-        
+
         var receiver = await _context.AspNetUsers.FirstAsync(x => x.Id != _user.Id);
         await _mediator.AddMockTransaction(_user.Id, receiver.Id, _user.Id, 1212.21m);
         _transaction = await _context.Transactions.FirstAsync();
@@ -56,7 +56,6 @@ public class DeleteSaleTests : IAsyncLifetime
 
         await _mediator.AddMockSale(storageContents, _currency.Id, _user.Id, _transaction.Id, _storage.Name);
         _saleModel = await _context.Sales.FirstAsync();
-
     }
 
     public async Task DisposeAsync()
@@ -70,7 +69,7 @@ public class DeleteSaleTests : IAsyncLifetime
         var command = new DeleteSaleCommand("not-existing-sale");
         await Assert.ThrowsAsync<SaleNotFoundException>(async () => await _mediator.Send(command));
     }
-    
+
     [Fact]
     public async Task DeleteSale_WithValidData_Succeeds()
     {

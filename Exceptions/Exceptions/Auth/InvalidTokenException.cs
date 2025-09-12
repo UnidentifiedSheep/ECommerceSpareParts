@@ -1,12 +1,10 @@
 ﻿using Exceptions.Base;
 
-namespace Exceptions.Exceptions.Auth
+namespace Exceptions.Exceptions.Auth;
+
+public class InvalidTokenException : BadRequestException
 {
-	public class InvalidTokenException : BadRequestException
-	{
-		public InvalidTokenException(string details) : base("Wrong token.", details)
-		{
-			
-		}
-	}
+    public InvalidTokenException(string details) : base("Wrong token.", details)
+    {
+    }
 }

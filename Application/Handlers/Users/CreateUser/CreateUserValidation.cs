@@ -22,7 +22,7 @@ public class CreateUserValidation : AbstractValidator<CreateUserCommand>
         RuleFor(x => x.NewUser.UserName.Length)
             .GreaterThanOrEqualTo(3)
             .WithMessage("Минимальная длина логина пользователя 3 символа");
-        
+
         //Email Rules 
         RuleFor(x => x.NewUser)
             .Must(x => emailValidator.IsValidEmail(x.Email!))

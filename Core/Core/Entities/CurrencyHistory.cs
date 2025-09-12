@@ -1,6 +1,6 @@
 ﻿namespace Core.Entities;
 
-public partial class CurrencyHistory
+public class CurrencyHistory
 {
     public int Id { get; set; }
 

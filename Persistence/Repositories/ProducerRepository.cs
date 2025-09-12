@@ -3,13 +3,15 @@ using Core.Interfaces.DbRepositories;
 using Microsoft.EntityFrameworkCore;
 using Persistence.Contexts;
 using Persistence.Extensions;
+
 // ReSharper disable EntityFramework.ClientSideDbFunctionCall
 
 namespace Persistence.Repositories;
 
 public class ProducerRepository(DContext context) : IProducerRepository
 {
-    public async Task<IEnumerable<int>> ProducersExistsAsync(IEnumerable<int> ids, CancellationToken cancellationToken = default)
+    public async Task<IEnumerable<int>> ProducersExistsAsync(IEnumerable<int> ids,
+        CancellationToken cancellationToken = default)
     {
         var idsSet = ids.ToHashSet();
         var foundProducers = await context.Producers.AsNoTracking()
@@ -19,8 +21,12 @@ public class ProducerRepository(DContext context) : IProducerRepository
         return idsSet.Except(foundProducers);
     }
 
-    public async Task<Producer?> GetProducer(int producerId, bool track = true, CancellationToken cancellationToken = default)
-        => await context.Producers.ConfigureTracking(track).FirstOrDefaultAsync(x => x.Id == producerId, cancellationToken);
+    public async Task<Producer?> GetProducer(int producerId, bool track = true,
+        CancellationToken cancellationToken = default)
+    {
+        return await context.Producers.ConfigureTracking(track)
+            .FirstOrDefaultAsync(x => x.Id == producerId, cancellationToken);
+    }
 
     public async Task<bool> ProducerHasAnyArticle(int producerId, CancellationToken cancellationToken = default)
     {
@@ -42,7 +48,9 @@ public class ProducerRepository(DContext context) : IProducerRepository
     }
 
     public async Task<bool> IsProducerNameTaken(string producerName, CancellationToken cancellationToken = default)
-        => await context.Producers.AsNoTracking().AnyAsync(x => x.Name == producerName, cancellationToken);
+    {
+        return await context.Producers.AsNoTracking().AnyAsync(x => x.Name == producerName, cancellationToken);
+    }
 
     public async Task<ProducersOtherName?> GetOtherName(int producerId, string otherName, string? whereUsed,
         bool track = true,
@@ -55,7 +63,8 @@ public class ProducerRepository(DContext context) : IProducerRepository
             .FirstOrDefaultAsync(cancellationToken);
     }
 
-    public async Task<IEnumerable<Producer>> GetProducers(string? searchTerm, int page, int viewCount, bool track = true,
+    public async Task<IEnumerable<Producer>> GetProducers(string? searchTerm, int page, int viewCount,
+        bool track = true,
         CancellationToken cancellationToken = default)
     {
         var query = context.Producers.ConfigureTracking(track);
@@ -68,14 +77,15 @@ public class ProducerRepository(DContext context) : IProducerRepository
                 Rank = string.IsNullOrWhiteSpace(searchTerm) ? 0 : EF.Functions.TrigramsSimilarity(z.Name, searchTerm)
             })
             .OrderByDescending(x => x.Rank);
-        
+
         return await queryWithRang.Skip(page * viewCount)
             .Select(x => x.Producer)
             .Take(viewCount)
             .ToListAsync(cancellationToken);
     }
 
-    public async Task<IEnumerable<ProducersOtherName>> GetOtherNames(int producerId, int page, int viewCount, bool track = true,
+    public async Task<IEnumerable<ProducersOtherName>> GetOtherNames(int producerId, int page, int viewCount,
+        bool track = true,
         CancellationToken cancellationToken = default)
     {
         return await context.ProducersOtherNames.ConfigureTracking(track)

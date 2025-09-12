@@ -39,8 +39,9 @@ public static class RepositoryExtensions
         if (!await storagesRepository.StorageExistsAsync(storageName, ct))
             throw new StorageNotFoundException(storageName);
     }
-    
-    public static async Task EnsureStoragesExists(this IStoragesRepository storagesRepository, IEnumerable<string> storageIds,
+
+    public static async Task EnsureStoragesExists(this IStoragesRepository storagesRepository,
+        IEnumerable<string> storageIds,
         CancellationToken ct = default)
     {
         var notExisting = (await storagesRepository.StoragesExistsAsync(storageIds, ct))
@@ -67,19 +68,20 @@ public static class RepositoryExtensions
                 throw new ProducerNotFoundException(notExisting);
         }
     }
-    
-    public static async Task<Dictionary<int, Article>> EnsureArticlesExistForUpdate(this IArticlesRepository repository, IEnumerable<int> articleIds,
+
+    public static async Task<Dictionary<int, Article>> EnsureArticlesExistForUpdate(this IArticlesRepository repository,
+        IEnumerable<int> articleIds,
         bool track = true, CancellationToken cancellationToken = default)
     {
         var ids = articleIds.ToList();
         var articles = (await repository.GetArticlesForUpdate(ids, track, cancellationToken))
-                .ToDictionary(x => x.Id);
+            .ToDictionary(x => x.Id);
         var notFoundArticles = ids.Except(articles.Select(x => x.Key)).ToList();
         if (notFoundArticles.Count != 0)
             throw new ArticleNotFoundException(notFoundArticles);
         return articles;
     }
-    
+
     public static async Task EnsureArticlesExist(this IArticlesRepository repository, IEnumerable<int> articleIds,
         CancellationToken cancellationToken = default)
     {

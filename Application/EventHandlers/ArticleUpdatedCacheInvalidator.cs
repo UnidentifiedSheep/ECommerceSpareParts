@@ -5,7 +5,8 @@ using MediatR;
 
 namespace Application.EventHandlers;
 
-public class ArticleUpdatedCacheInvalidator(IRelatedDataRepository<Article> relatedDataRepository, ICache cache) : INotificationHandler<ArticleUpdatedEvent>
+public class ArticleUpdatedCacheInvalidator(IRelatedDataRepository<Article> relatedDataRepository, ICache cache)
+    : INotificationHandler<ArticleUpdatedEvent>
 {
     public async Task Handle(ArticleUpdatedEvent notification, CancellationToken cancellationToken)
     {

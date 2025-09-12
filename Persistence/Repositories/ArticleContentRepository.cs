@@ -8,7 +8,8 @@ namespace Persistence.Repositories;
 
 public class ArticleContentRepository(DContext context) : IArticleContentRepository
 {
-    public async Task<IEnumerable<ArticlesContent>> GetArticleContents(int articleId, bool track = true, CancellationToken cancellationToken = default)
+    public async Task<IEnumerable<ArticlesContent>> GetArticleContents(int articleId, bool track = true,
+        CancellationToken cancellationToken = default)
     {
         return await context.ArticlesContents.ConfigureTracking(track)
             .Where(x => x.MainArticleId == articleId)
@@ -19,6 +20,7 @@ public class ArticleContentRepository(DContext context) : IArticleContentReposit
         CancellationToken cancellationToken = default)
     {
         return await context.ArticlesContents.ConfigureTracking(track)
-            .FirstOrDefaultAsync(x => x.MainArticleId == articleId && x.InsideArticleId == insideArticleId, cancellationToken);
+            .FirstOrDefaultAsync(x => x.MainArticleId == articleId && x.InsideArticleId == insideArticleId,
+                cancellationToken);
     }
 }

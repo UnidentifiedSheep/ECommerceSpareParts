@@ -1,6 +1,6 @@
 ﻿namespace Core.Entities;
 
-public partial class StorageContentReservation
+public class StorageContentReservation
 {
     public string UserId { get; set; } = null!;
 

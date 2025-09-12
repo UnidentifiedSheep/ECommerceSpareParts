@@ -12,10 +12,16 @@ using MediatR;
 namespace Application.Handlers.Balance.EditTransaction;
 
 [Transactional(IsolationLevel.Serializable, 20, 3)]
-public record EditTransactionCommand(string TransactionId, int CurrencyId, decimal Amount, TransactionStatus Status,
+public record EditTransactionCommand(
+    string TransactionId,
+    int CurrencyId,
+    decimal Amount,
+    TransactionStatus Status,
     DateTime TransactionDateTime) : ICommand;
 
-public class EditTransactionHandler(IBalanceRepository balanceRepository, IBalanceService balanceService, 
+public class EditTransactionHandler(
+    IBalanceRepository balanceRepository,
+    IBalanceService balanceService,
     IUnitOfWork unitOfWork) : ICommandHandler<EditTransactionCommand>
 {
     public async Task<Unit> Handle(EditTransactionCommand request, CancellationToken cancellationToken)
@@ -79,12 +85,15 @@ public class EditTransactionHandler(IBalanceRepository balanceRepository, IBalan
         transaction.CurrencyId = request.CurrencyId;
     }
 
-    private async Task RecalculateBalancesAsync(Transaction transaction, EditTransactionCommand request, CancellationToken ct)
+    private async Task RecalculateBalancesAsync(Transaction transaction, EditTransactionCommand request,
+        CancellationToken ct)
     {
         var prevSenderTransaction = await balanceRepository
-            .GetPreviousTransactionAsync(transaction.TransactionDatetime, transaction.SenderId, request.CurrencyId, true, ct);
+            .GetPreviousTransactionAsync(transaction.TransactionDatetime, transaction.SenderId, request.CurrencyId,
+                true, ct);
         var prevReceiverTransaction = await balanceRepository
-            .GetPreviousTransactionAsync(transaction.TransactionDatetime, transaction.ReceiverId, request.CurrencyId, true, ct);
+            .GetPreviousTransactionAsync(transaction.TransactionDatetime, transaction.ReceiverId, request.CurrencyId,
+                true, ct);
 
         transaction.SenderBalanceAfterTransaction = prevSenderTransaction?.SenderId == transaction.SenderId
             ? prevSenderTransaction.SenderBalanceAfterTransaction - request.Amount

@@ -21,6 +21,7 @@ public class RemoveContentValidation : AbstractValidator<RemoveContentCommand>
         RuleFor(x => x.StorageName)
             .NotEmpty()
             .When(x => !x.TakeFromOtherStorages)
-            .WithMessage("Нельзя менять количество артикула, не выбрав склад и не разрешая менять количество на других складах");
+            .WithMessage(
+                "Нельзя менять количество артикула, не выбрав склад и не разрешая менять количество на других складах");
     }
 }

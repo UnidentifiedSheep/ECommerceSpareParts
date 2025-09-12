@@ -1,6 +1,7 @@
 using Core.Entities;
 using Core.Interfaces.DbRepositories;
 using Microsoft.EntityFrameworkCore;
+using Npgsql;
 using Persistence.Contexts;
 using Persistence.Extensions;
 
@@ -8,7 +9,8 @@ namespace Persistence.Repositories;
 
 public class StorageContentRepository(DContext context) : IStorageContentRepository
 {
-    public async Task<Dictionary<int, List<decimal>>> GetHighestBuyPrices(IEnumerable<int> articleIds, int takePerArticle, bool calcWhereZero = false,
+    public async Task<Dictionary<int, List<decimal>>> GetHighestBuyPrices(IEnumerable<int> articleIds,
+        int takePerArticle, bool calcWhereZero = false,
         CancellationToken cancellationToken = default)
     {
         var query = context.StorageContents
@@ -34,7 +36,8 @@ public class StorageContentRepository(DContext context) : IStorageContentReposit
         return result;
     }
 
-    public async Task<IEnumerable<StorageContent>> GetStorageContentsForUpdate(IEnumerable<int> ids, bool track = true, CancellationToken cancellationToken = default)
+    public async Task<IEnumerable<StorageContent>> GetStorageContentsForUpdate(IEnumerable<int> ids, bool track = true,
+        CancellationToken cancellationToken = default)
     {
         return await context.StorageContents
             .FromSql($"SELECT * FROM storage_content where id = ANY({ids}) FOR UPDATE")
@@ -42,14 +45,15 @@ public class StorageContentRepository(DContext context) : IStorageContentReposit
             .ToListAsync(cancellationToken);
     }
 
-    public async Task<IEnumerable<StorageContent>> GetStorageContents(string? storageName, int? articleId, int page, int viewCount, bool showZeroCount,
+    public async Task<IEnumerable<StorageContent>> GetStorageContents(string? storageName, int? articleId, int page,
+        int viewCount, bool showZeroCount,
         bool track = true, CancellationToken cancellationToken = default)
     {
         var query = context.StorageContents
             .ConfigureTracking(true)
-            .Where(c => (string.IsNullOrWhiteSpace(storageName) || c.StorageName == storageName))
-            .Where(x => (articleId == null || x.ArticleId == articleId));
-        if (!showZeroCount) 
+            .Where(c => string.IsNullOrWhiteSpace(storageName) || c.StorageName == storageName)
+            .Where(x => articleId == null || x.ArticleId == articleId);
+        if (!showZeroCount)
             query = query.Where(x => x.Count > 0);
         var result = await query.Take(viewCount)
             .Skip(page * viewCount)
@@ -57,7 +61,7 @@ public class StorageContentRepository(DContext context) : IStorageContentReposit
         return result;
     }
 
-    public async Task<StorageContent?> GetStorageContentForUpdateAsync(int? id, int? articleId, string? storageName, 
+    public async Task<StorageContent?> GetStorageContentForUpdateAsync(int? id, int? articleId, string? storageName,
         bool track = true, CancellationToken cancellationToken = default)
     {
         return await context.StorageContents
@@ -73,20 +77,21 @@ public class StorageContentRepository(DContext context) : IStorageContentReposit
             .FirstOrDefaultAsync(cancellationToken);
     }
 
-    public async Task<Dictionary<(int contentId, string storageId), StorageContent>> GetStorageContentsForUpdateAsync(IEnumerable<(int contentId, string storageId)> ids, bool track = true,
+    public async Task<Dictionary<(int contentId, string storageId), StorageContent>> GetStorageContentsForUpdateAsync(
+        IEnumerable<(int contentId, string storageId)> ids, bool track = true,
         CancellationToken cancellationToken = default)
     {
         var parameters = new List<object>();
         var tupleConditions = new List<string>();
-        int i = 0;
+        var i = 0;
 
         foreach (var (contentId, storageId) in ids)
         {
             var idParamName = $"@p_id{i}";
             var storageParamName = $"@p_storage{i}";
 
-            parameters.Add(new Npgsql.NpgsqlParameter(idParamName, contentId));
-            parameters.Add(new Npgsql.NpgsqlParameter(storageParamName, storageId));
+            parameters.Add(new NpgsqlParameter(idParamName, contentId));
+            parameters.Add(new NpgsqlParameter(storageParamName, storageId));
 
             tupleConditions.Add($"({idParamName}, {storageParamName})");
             i++;
@@ -101,7 +106,7 @@ public class StorageContentRepository(DContext context) : IStorageContentReposit
         FOR UPDATE";
 
         var query = context.StorageContents.FromSqlRaw(sql, parameters.ToArray());
-        
+
         query = query.ConfigureTracking(track);
 
         var rs = await query.ToListAsync(cancellationToken);
@@ -113,7 +118,8 @@ public class StorageContentRepository(DContext context) : IStorageContentReposit
     }
 
     public IAsyncEnumerable<StorageContent> GetStorageContentsForUpdateAsync(int? articleId, string? storageName,
-        IEnumerable<int>? exceptArticleIds = null, IEnumerable<string>? exceptStorages = null, int countGreaterThen = 0, bool track = true)
+        IEnumerable<int>? exceptArticleIds = null, IEnumerable<string>? exceptStorages = null, int countGreaterThen = 0,
+        bool track = true)
     {
         var exceptArticles = exceptArticleIds ?? [];
         var exceptStoragesArray = exceptStorages ?? [];
@@ -132,12 +138,13 @@ public class StorageContentRepository(DContext context) : IStorageContentReposit
             .AsAsyncEnumerable();
     }
 
-    public async Task<Dictionary<int, int>> GetStorageContentCounts(string storageName, IEnumerable<int> articleIds, bool takeFromOtherStorages,
+    public async Task<Dictionary<int, int>> GetStorageContentCounts(string storageName, IEnumerable<int> articleIds,
+        bool takeFromOtherStorages,
         CancellationToken cancellationToken = default)
     {
         return await context.StorageContents
             .AsNoTracking()
-            .Where(x => x.Count > 0 && 
+            .Where(x => x.Count > 0 &&
                         articleIds.Contains(x.ArticleId) &&
                         (takeFromOtherStorages || x.StorageName == storageName))
             .GroupBy(x => x.ArticleId)
@@ -146,7 +153,7 @@ public class StorageContentRepository(DContext context) : IStorageContentReposit
                 ArticleId = g.Key,
                 TotalCount = g.Sum(x => x.Count)
             })
-            .ToDictionaryAsync(x => x.ArticleId, 
+            .ToDictionaryAsync(x => x.ArticleId,
                 x => x.TotalCount, cancellationToken);
     }
 }

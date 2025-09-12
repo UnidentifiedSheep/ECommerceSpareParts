@@ -10,7 +10,7 @@ public class EditFullPurchaseValidation : AbstractValidator<EditFullPurchaseComm
     {
         RuleFor(x => x.PurchaseId)
             .NotEmpty().WithMessage("Id закупки не может быть пуст");
-        
+
         RuleFor(x => x.Content)
             .NotEmpty().WithMessage("Содержимое закупки не может быть пустым");
 

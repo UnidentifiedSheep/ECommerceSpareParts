@@ -10,7 +10,7 @@ public class CreateFullSaleValidation : AbstractValidator<CreateFullSaleCommand>
     {
         RuleFor(x => x.SaleDateTime)
             .SetValidator(new SaleDateTimeValidator());
-        
+
         RuleFor(x => x.SaleContent)
             .SetValidator(new SaleContentValidator());
 
@@ -20,11 +20,11 @@ public class CreateFullSaleValidation : AbstractValidator<CreateFullSaleCommand>
             .WithMessage("Оплаченная сумма должна быть больше или равна 0, если указана")
             .PrecisionScale(18, 2, true)
             .WithMessage("Оплаченная сумма может содержать не более двух знаков после запятой");
-            
-        
+
+
         RuleFor(x => x.BuyerId).NotEmpty()
             .WithMessage("Id покупателя не может быть пустым");
-        
+
         RuleFor(x => x.CreatedUserId).NotEmpty()
             .WithMessage("Id пользователя создавшего закупку не может быть пустым");
     }

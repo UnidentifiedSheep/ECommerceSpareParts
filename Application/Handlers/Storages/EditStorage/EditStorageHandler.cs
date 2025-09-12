@@ -1,6 +1,5 @@
 using Application.Interfaces;
 using Core.Dtos.Amw.Storage;
-using Core.Interfaces;
 using Core.Interfaces.DbRepositories;
 using Core.Interfaces.Services;
 using Exceptions.Exceptions.Storages;
@@ -10,7 +9,9 @@ using MediatR;
 namespace Application.Handlers.Storages.EditStorage;
 
 public record EditStorageCommand(string StorageName, PatchStorageDto EditStorage) : ICommand;
-public class EditStorageHandler(IStoragesRepository repository, IUnitOfWork unitOfWork) : ICommandHandler<EditStorageCommand>
+
+public class EditStorageHandler(IStoragesRepository repository, IUnitOfWork unitOfWork)
+    : ICommandHandler<EditStorageCommand>
 {
     public async Task<Unit> Handle(EditStorageCommand request, CancellationToken cancellationToken)
     {

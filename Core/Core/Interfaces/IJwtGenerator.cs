@@ -1,12 +1,11 @@
 ﻿using System.Security.Claims;
 using Core.Dtos.Internal;
 
-namespace Core.Interfaces
+namespace Core.Interfaces;
+
+public interface IJwtGenerator
 {
-	public interface IJwtGenerator
-	{
-		string CreateToken(UserDto user, IEnumerable<string> roles);
-		string CreateRefreshToken();
-		ClaimsPrincipal GetClaimsPrincipal(string token);
-	}
+    string CreateToken(UserDto user, IEnumerable<string> roles);
+    string CreateRefreshToken();
+    ClaimsPrincipal GetClaimsPrincipal(string token);
 }

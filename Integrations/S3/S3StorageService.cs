@@ -9,14 +9,16 @@ namespace Integrations.S3;
 
 public class S3StorageService : IS3StorageService
 {
-    private readonly IAmazonS3 _s3Client;
     private readonly string _bucketName;
+    private readonly IAmazonS3 _s3Client;
+
     public S3StorageService(IAmazonS3 s3Client, IConfiguration configuration)
     {
         _s3Client = s3Client;
-        _bucketName = configuration["S3Storage:BucketName"] ?? throw new ArgumentNullException(null, "BucketName is missing");
+        _bucketName = configuration["S3Storage:BucketName"] ??
+                      throw new ArgumentNullException(null, "BucketName is missing");
     }
-    
+
     public async Task<string> UploadFileAsync(IFormFile file, string keyName)
     {
         using var memoryStream = new MemoryStream();
@@ -37,7 +39,6 @@ public class S3StorageService : IS3StorageService
 
     public async Task<string> UploadFileAsync(Stream stream, string keyName, string contentType)
     {
-
         var request = new PutObjectRequest
         {
             BucketName = _bucketName,
@@ -56,7 +57,7 @@ public class S3StorageService : IS3StorageService
         var request = new GetObjectRequest
         {
             BucketName = _bucketName,
-            Key = keyName,
+            Key = keyName
         };
 
         using var response = await _s3Client.GetObjectAsync(request);
@@ -79,7 +80,7 @@ public class S3StorageService : IS3StorageService
     {
         var request = new ListObjectsV2Request
         {
-            BucketName = _bucketName,
+            BucketName = _bucketName
         };
 
         var response = await _s3Client.ListObjectsV2Async(request);

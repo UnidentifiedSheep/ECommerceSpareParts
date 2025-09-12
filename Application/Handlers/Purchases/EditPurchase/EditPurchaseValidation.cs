@@ -1,4 +1,3 @@
-using Application.Handlers.BaseValidators;
 using Application.Handlers.Purchases.BaseValidators;
 using Application.Handlers.Purchases.BaseValidators.Edit;
 using FluentValidation;
@@ -11,7 +10,7 @@ public class EditPurchaseValidation : AbstractValidator<EditPurchaseCommand>
     {
         RuleFor(x => x.PurchaseId)
             .NotEmpty().WithMessage("Id закупки не может быть пуст");
-        
+
         RuleFor(x => x.Content)
             .NotEmpty().WithMessage("Содержимое закупки не может быть пустым");
 

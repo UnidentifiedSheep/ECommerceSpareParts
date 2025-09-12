@@ -1,23 +1,25 @@
 using Application.Extensions;
 using Application.Interfaces;
 using Core.Attributes;
-using Core.Interfaces;
 using Core.Interfaces.DbRepositories;
 using Core.Interfaces.Services;
 
 namespace Application.Handlers.ArticleReservations.SubtractCountFromReservations;
 
 [Transactional]
-public record SubtractCountFromReservationsCommand(string UserId, string WhoUpdated, Dictionary<int, int> Contents) : ICommand<SubtractCountFromReservationsResult>;
-
+public record SubtractCountFromReservationsCommand(string UserId, string WhoUpdated, Dictionary<int, int> Contents)
+    : ICommand<SubtractCountFromReservationsResult>;
 
 /// <param name="NotFoundReservations">Id артикулов и количество, которые не были найдены в резервациях у пользователя.</param>
 public record SubtractCountFromReservationsResult(Dictionary<int, int> NotFoundReservations);
 
-public class SubtractCountFromReservationsHandler(IArticleReservationRepository reservationRepository,
-    IUsersRepository usersRepository, IUnitOfWork unitOfWork) : ICommandHandler<SubtractCountFromReservationsCommand, SubtractCountFromReservationsResult>
+public class SubtractCountFromReservationsHandler(
+    IArticleReservationRepository reservationRepository,
+    IUsersRepository usersRepository,
+    IUnitOfWork unitOfWork) : ICommandHandler<SubtractCountFromReservationsCommand, SubtractCountFromReservationsResult>
 {
-    public async Task<SubtractCountFromReservationsResult> Handle(SubtractCountFromReservationsCommand request, CancellationToken cancellationToken)
+    public async Task<SubtractCountFromReservationsResult> Handle(SubtractCountFromReservationsCommand request,
+        CancellationToken cancellationToken)
     {
         if (request.Contents.Count == 0)
             return new SubtractCountFromReservationsResult([]);
@@ -27,13 +29,13 @@ public class SubtractCountFromReservationsHandler(IArticleReservationRepository 
         await EnsureDataExists([userId, whoUpdated], cancellationToken);
 
         var articleIds = remaining.Keys;
-        var reservationsByIds = await reservationRepository.GetUserReservationsForUpdate(userId, articleIds, 
+        var reservationsByIds = await reservationRepository.GetUserReservationsForUpdate(userId, articleIds,
             false, true, cancellationToken);
         foreach (var articleId in articleIds)
         {
             if (!reservationsByIds.TryGetValue(articleId, out var reservations))
                 continue;
-            
+
             foreach (var reservation in reservations)
             {
                 var subtractCount = remaining[articleId];
@@ -50,6 +52,7 @@ public class SubtractCountFromReservationsHandler(IArticleReservationRepository 
                 reservation.UpdatedAt = DateTime.SpecifyKind(DateTime.Now, DateTimeKind.Unspecified);
             }
         }
+
         await unitOfWork.SaveChangesAsync(cancellationToken);
         var notFoundReservations = remaining.Where(x => x.Value > 0)
             .ToDictionary(x => x.Key, x => x.Value);

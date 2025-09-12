@@ -15,24 +15,26 @@ namespace Application.Handlers.Purchases.DeleteFullPurchase;
 [Transactional(IsolationLevel.Serializable, 20, 2)]
 public record DeleteFullPurchaseCommand(string PurchaseId, string WhoDeleted) : ICommand;
 
-public class DeleteFullPurchaseHandler(IPurchaseRepository purchaseRepository, IMediator mediator) : ICommandHandler<DeleteFullPurchaseCommand>
+public class DeleteFullPurchaseHandler(IPurchaseRepository purchaseRepository, IMediator mediator)
+    : ICommandHandler<DeleteFullPurchaseCommand>
 {
     public async Task<Unit> Handle(DeleteFullPurchaseCommand request, CancellationToken cancellationToken)
     {
-        string purchaseId = request.PurchaseId;
+        var purchaseId = request.PurchaseId;
         var purchase = await purchaseRepository.GetPurchaseForUpdate(purchaseId, true, cancellationToken)
                        ?? throw new PurchaseNotFoundException(purchaseId);
-        var purchaseContents = (await purchaseRepository.GetPurchaseContentForUpdate(purchaseId, 
+        var purchaseContents = (await purchaseRepository.GetPurchaseContentForUpdate(purchaseId,
             true, cancellationToken)).ToList();
-        
+
         await RemoveContentFromStorage(purchaseContents, request.WhoDeleted, purchase.Storage, cancellationToken);
         await DeletePurchase(purchaseId, cancellationToken);
         await DeleteTransaction(purchase.TransactionId, request.WhoDeleted, cancellationToken);
-        
+
         return Unit.Value;
     }
 
-    private async Task DeleteTransaction(string transactionId, string whoDeleted, CancellationToken cancellationToken = default)
+    private async Task DeleteTransaction(string transactionId, string whoDeleted,
+        CancellationToken cancellationToken = default)
     {
         var command = new DeleteTransactionCommand(transactionId, whoDeleted, true);
         await mediator.Publish(command, cancellationToken);
@@ -44,7 +46,8 @@ public class DeleteFullPurchaseHandler(IPurchaseRepository purchaseRepository, I
         await mediator.Publish(command, cancellationToken);
     }
 
-    private async Task RemoveContentFromStorage(List<PurchaseContent> purchaseContents, string whoRemoved, string storageName,
+    private async Task RemoveContentFromStorage(List<PurchaseContent> purchaseContents, string whoRemoved,
+        string storageName,
         CancellationToken cancellationToken = default)
     {
         var toRemoveFromStorage = purchaseContents

@@ -1,6 +1,5 @@
 using Application.Handlers.Sales.BaseValidators;
 using Application.Handlers.Sales.BaseValidators.Edit;
-using Application.Handlers.Sales.EditSale;
 using FluentValidation;
 
 namespace Application.Handlers.Sales.EditFullSale;
