@@ -9,7 +9,7 @@ namespace Application.Services;
 public class UserTokenService(IUnitOfWork unitOfWork, IPasswordManager passwordManager) : IUserTokenService
 {
     public async Task AddToken(string token, Guid userId, TokenType type, DateTime exp, IPAddress? ip,
-        string? userAgent, IEnumerable<string> permissions, CancellationToken cancellationToken = default)
+        string? userAgent, string? deviceId, IEnumerable<string> permissions, CancellationToken cancellationToken = default)
     {
         var tokenModel = new UserToken
         {
@@ -20,6 +20,7 @@ public class UserTokenService(IUnitOfWork unitOfWork, IPasswordManager passwordM
             ExpiresAt = exp,
             IpAddress = ip,
             UserAgent = userAgent,
+            DeviceId = deviceId
         };
         await unitOfWork.AddAsync(tokenModel, cancellationToken);
     }

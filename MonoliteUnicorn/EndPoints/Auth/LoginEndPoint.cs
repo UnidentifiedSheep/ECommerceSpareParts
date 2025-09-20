@@ -7,7 +7,7 @@ namespace MonoliteUnicorn.EndPoints.Auth;
 
 public record LoginRequest(string Email, string Password);
 
-public record LoginResponse(string Token, string RefreshToken);
+public record LoginResponse(string Token, string RefreshToken, string DeviceId);
 
 public class LoginEndPoint : ICarterModule
 {

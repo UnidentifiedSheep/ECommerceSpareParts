@@ -47,7 +47,7 @@ public class UserEmailRepository(DContext context) : IUserEmailRepository
         var userEmail = await context.UserEmails.ConfigureTracking(track)
             .Include(x => x.User)
             .ThenInclude(x => x.UserInfo)
-            .FirstOrDefaultAsync(x => x.Email == email.ToNormalizedEmail() && 
+            .FirstOrDefaultAsync(x => x.NormalizedEmail == email.ToNormalizedEmail() && 
                                       x.IsPrimary == true, cancellationToken);
         return userEmail?.User;
     }

@@ -4,6 +4,7 @@ using Core.Enums;
 using Core.Interfaces;
 using Core.Interfaces.DbRepositories;
 using Core.Interfaces.Services;
+using Core.Interfaces.Validators;
 using Exceptions.Exceptions.Auth;
 
 namespace Application.Handlers.Auth.RefreshToken;
@@ -14,11 +15,12 @@ public record RefreshTokenResult(string Token, string RefreshToken);
 
 public class RefreshTokenHandler(IUserTokenRepository tokenRepository, IUserRoleRepository userRoleRepository,
     IUnitOfWork unitOfWork, IJwtGenerator tokenGenerator, IUserTokenService userTokenService, 
-    IUserRepository userRepository) : ICommandHandler<RefreshTokenCommand, RefreshTokenResult>
+    IUserRepository userRepository, IPasswordManager passwordManager) : ICommandHandler<RefreshTokenCommand, RefreshTokenResult>
 {
     public async Task<RefreshTokenResult> Handle(RefreshTokenCommand request, CancellationToken cancellationToken)
     {
-        var userToken = await tokenRepository.GetTokenByHashAsync(request.RefreshToken, true, cancellationToken)
+        var hashOfToken = passwordManager.GetHashOfPassword(request.RefreshToken);
+        var userToken = await tokenRepository.GetTokenByHashAsync(hashOfToken, true, cancellationToken)
             ?? throw new InvalidTokenException(request.RefreshToken);
         if (userToken.ExpiresAt < DateTime.UtcNow || userToken.DeviceId != request.DeviceId)
             throw new InvalidTokenException(request.RefreshToken);
@@ -31,7 +33,7 @@ public class RefreshTokenHandler(IUserTokenRepository tokenRepository, IUserRole
         var refreshToken = tokenGenerator.CreateRefreshToken();
         
         await userTokenService.AddToken(refreshToken, user.Id, TokenType.RefreshToken, DateTime.UtcNow.AddMonths(1), 
-            userToken.IpAddress, userToken.UserAgent, [], cancellationToken);
+            userToken.IpAddress, userToken.UserAgent, request.DeviceId, [], cancellationToken);
         
         await unitOfWork.SaveChangesAsync(cancellationToken);
         return new RefreshTokenResult(token, refreshToken);

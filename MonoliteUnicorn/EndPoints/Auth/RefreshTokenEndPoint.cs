@@ -5,7 +5,7 @@ using MediatR;
 
 namespace MonoliteUnicorn.EndPoints.Auth;
 
-public record RefreshTokenRequest(string RefreshToken);
+public record RefreshTokenRequest(string RefreshToken, string DeviceId);
 
 public record RefreshTokenResponse(string Token, string RefreshToken);
 

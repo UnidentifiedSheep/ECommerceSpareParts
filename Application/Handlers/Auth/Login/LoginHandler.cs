@@ -14,7 +14,7 @@ namespace Application.Handlers.Auth.Login;
 
 public record LoginCommand(string Email, string Password, IPAddress? IpAddress, string? UserAgent) : ICommand<LoginResult>;
 
-public record LoginResult(string Token, string RefreshToken);
+public record LoginResult(string Token, string RefreshToken, string DeviceId);
 
 public class LoginHandler(IPasswordManager passwordManager, IUserEmailRepository userEmailRepository,
     IUserRoleRepository userRoleRepository, IUserTokenService userTokenService,
@@ -40,11 +40,11 @@ public class LoginHandler(IPasswordManager passwordManager, IUserEmailRepository
         var refreshToken = tokenGenerator.CreateRefreshToken();
         
         await userTokenService.AddToken(refreshToken, user.Id, TokenType.RefreshToken, DateTime.UtcNow.AddMonths(1), 
-            ip, userAgent,[], cancellationToken);
+            ip, userAgent, deviceId,[], cancellationToken);
         
         await unitOfWork.SaveChangesAsync(cancellationToken);
 
-        return new LoginResult(token, refreshToken);
+        return new LoginResult(token, refreshToken, deviceId);
     }
 
     private string GenerateDeviceId()

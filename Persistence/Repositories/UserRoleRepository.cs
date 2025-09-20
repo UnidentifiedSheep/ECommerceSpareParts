@@ -12,6 +12,7 @@ public class UserRoleRepository(DContext context) : IUserRoleRepository
         CancellationToken cancellationToken = default)
     {
         var query = context.UserRoles
+            .Include(x => x.Role)
             .Where(x => x.UserId == userId)
             .OrderBy(x => x.RoleId)
             .ConfigureTracking(track);
