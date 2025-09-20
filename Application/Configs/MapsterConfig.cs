@@ -1,3 +1,4 @@
+using System.Globalization;
 using System.Text.Json;
 using Application.Extensions;
 using Application.Handlers.ArticlePairs.CreatePair;
@@ -14,8 +15,10 @@ using Core.Dtos.Amw.Sales;
 using Core.Dtos.Amw.Storage;
 using Core.Dtos.Amw.Users;
 using Core.Dtos.Anonymous.Producers;
+using Core.Dtos.Emails;
 using Core.Dtos.Member.Vehicles;
 using Core.Dtos.Services.Articles;
+using Core.Dtos.Users;
 using Core.Entities;
 using Core.Extensions;
 using Core.Models;
@@ -191,30 +194,25 @@ public static class MapsterConfig
             .Map(d => d.TotalSum, s => s.Price * s.Count);
 
         //Users
-        TypeAdapterConfig<NewUserDto, AspNetUser>.NewConfig()
-            .Ignore(x => x.Roles)
-            .Map(d => d.Name, s => s.Name)
-            .Map(d => d.Surname, s => s.Surname)
-            .Map(d => d.Email, s => s.Email)
-            .Map(d => d.Description, s => s.Description)
-            .Map(d => d.NormalizedEmail, s => (s.Email ?? "").ToNormalized())
+        TypeAdapterConfig<User, UserDto>.NewConfig()
+            .Map(d => d.Name, s => s.UserInfo == null ? "UNKNOWN" : s.UserInfo.Name)
+            .Map(d => d.Surname, s => s.UserInfo == null ? "UNKNOWN" : s.UserInfo.Surname)
             .Map(d => d.UserName, s => s.UserName)
-            .Map(d => d.NormalizedUserName, s => s.UserName.ToNormalized())
-            .Map(d => d.PhoneNumber,
-                s => s.PhoneNumber == null ? s.PhoneNumber : s.PhoneNumber.ToNormalizedPhoneNumber())
-            .Map(d => d.Id, s => Guid.NewGuid().ToString());
-
-        TypeAdapterConfig<AspNetUser, UserDto>.NewConfig()
-            .Map(d => d.PhoneNumber, s => s.PhoneNumber)
-            .Map(d => d.Email, s => s.Email)
-            .Map(d => d.Name, s => s.Name)
-            .Map(d => d.Surname, s => s.Surname)
-            .Map(d => d.UserName, s => s.UserName)
-            .Map(d => d.IsSupplier, s => s.IsSupplier)
-            .Map(d => d.EmailConfirmed, s => s.EmailConfirmed)
-            .Map(d => d.PhoneNumberConfirmed, s => s.PhoneNumberConfirmed)
+            .Map(d => d.IsSupplier, s => s.UserInfo != null && s.UserInfo.IsSupplier)
             .Map(d => d.Id, s => s.Id)
-            .Map(d => d.Description, s => s.Description);
+            .Map(d => d.Description, s => s.UserInfo == null ? null : s.UserInfo.Description);
+
+        TypeAdapterConfig<UserInfoDto, UserInfo>.NewConfig()
+            .Map(d => d.Description, s => s.Description)
+            .Map(d => d.Name, s => s.Name)
+            .Map(d => d.Surname, s => s.Surname)
+            .Map(d => d.IsSupplier, s => s.IsSupplier);
+        
+        TypeAdapterConfig<UserInfo, UserInfoDto>.NewConfig()
+            .Map(d => d.Description, s => s.Description)
+            .Map(d => d.Name, s => s.Name)
+            .Map(d => d.Surname, s => s.Surname)
+            .Map(d => d.IsSupplier, s => s.IsSupplier);
         //Vehicles
         TypeAdapterConfig<VehicleDto, UserVehicle>.NewConfig()
             .Map(d => d.Vin, s => s.Vin)
@@ -359,8 +357,7 @@ public static class MapsterConfig
             .Ignore(x => x.StorageNavigation);
         //User Search History
 
-        TypeAdapterConfig<Email, UserMail>.NewConfig()
-            .Map(dest => dest.LocalPart, src => src.LocalPart)
+        TypeAdapterConfig<Email, UserEmail>.NewConfig()
             .Map(dest => dest.NormalizedEmail, src => src.NormalizedEmail)
             .Map(dest => dest.Email, src => src.FullEmail);
 
@@ -419,5 +416,15 @@ public static class MapsterConfig
             .Map(x => x.Name, src => src.Name.Trim())
             .Map(x => x.CurrencySign, src => src.CurrencySign.Trim())
             .Map(x => x.ShortName, src => src.ShortName.Trim());
+        
+        
+        //Emails
+        TypeAdapterConfig<EmailDto, UserEmail>.NewConfig()
+            .Map(dest => dest.Email, src => src.Email)
+            .Map(dest => dest.NormalizedEmail, src => src.Email.ToNormalizedEmail())
+            .Map(dest => dest.IsPrimary, src => src.IsPrimary)
+            .Map(dest => dest.EmailType, src => src.Type.ToString())
+            .Map(dest => dest.Confirmed, src => src.IsConfirmed)
+            .Map(dest => dest.ConfirmedAt, src => src.IsConfirmed ? DateTime.UtcNow : (DateTime?)null);
     }
 }

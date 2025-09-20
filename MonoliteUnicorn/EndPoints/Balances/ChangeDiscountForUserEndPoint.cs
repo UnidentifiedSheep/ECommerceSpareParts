@@ -11,7 +11,7 @@ public class ChangeDiscountForUserEndPoint : ICarterModule
     public void AddRoutes(IEndpointRouteBuilder app)
     {
         app.MapPatch("/users/{userId}/discount/",
-                async (ISender sender, string userId, ChangeDiscountForUserRequest request,
+                async (ISender sender, Guid userId, ChangeDiscountForUserRequest request,
                     CancellationToken cancellationToken) =>
                 {
                     var command = new ChangeUserDiscountCommand(userId, request.NewDiscount);

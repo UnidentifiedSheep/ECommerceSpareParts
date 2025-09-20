@@ -18,7 +18,7 @@ public class ChangeDiscountForUserTests : IAsyncLifetime
     private readonly DContext _context;
     private readonly IMediator _mediator;
     private readonly IRedisUserRepository _redisUserRepository;
-    private AspNetUser _mockUser = null!;
+    private User _mockUser = null!;
 
     public ChangeDiscountForUserTests(CombinedContainerFixture fixture)
     {
@@ -32,7 +32,7 @@ public class ChangeDiscountForUserTests : IAsyncLifetime
     public async Task InitializeAsync()
     {
         await _mediator.AddMockUser();
-        _mockUser = await _context.AspNetUsers.AsNoTracking().FirstAsync();
+        _mockUser = await _context.Users.AsNoTracking().FirstAsync();
     }
 
     public async Task DisposeAsync()
@@ -51,13 +51,6 @@ public class ChangeDiscountForUserTests : IAsyncLifetime
     public async Task ChangeUsersDiscount_WithTooLargeDiscount_FailsValidation()
     {
         var command = new ChangeUserDiscountCommand(_mockUser.Id, 101);
-        await Assert.ThrowsAsync<ValidationException>(async () => await _mediator.Send(command));
-    }
-
-    [Fact]
-    public async Task ChangeUsersDiscount_WithEmptyUserId_FailsValidation()
-    {
-        var command = new ChangeUserDiscountCommand(" ", 50);
         await Assert.ThrowsAsync<ValidationException>(async () => await _mediator.Send(command));
     }
 

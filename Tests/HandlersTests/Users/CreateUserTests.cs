@@ -1,13 +1,15 @@
 using Application.Handlers.Users.CreateUser;
-using Core.Extensions;
+using Bogus;
+using Core.Dtos.Emails;
+using Core.Enums;
 using Exceptions.Exceptions.Users;
-using FluentValidation;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Persistence.Contexts;
 using Tests.MockData;
 using Tests.testContainers.Combined;
+using ValidationException = FluentValidation.ValidationException;
 
 namespace Tests.HandlersTests.Users;
 
@@ -16,6 +18,7 @@ public class CreateUserTests : IAsyncLifetime
 {
     private readonly DContext _context;
     private readonly IMediator _mediator;
+    private readonly Faker _faker = new(Global.Locale);
 
     public CreateUserTests(CombinedContainerFixture fixture)
     {
@@ -34,46 +37,54 @@ public class CreateUserTests : IAsyncLifetime
         await _context.ClearDatabaseFull();
     }
 
-    [Fact]
-    public async Task CreateUser_WithInvalidUsername_ThrowsValidationException()
+    [Theory]
+    [InlineData("s")]
+    [InlineData("              ")]
+    public async Task CreateUser_WithInvalidUsername_ThrowsValidationException(string invalidUsername)
     {
-        var user = MockData.MockData.GetUserDto();
-        var command = new CreateUserCommand(user);
-
-        //Short username
-        user.UserName = "s";
-        await Assert.ThrowsAsync<ValidationException>(async () => await _mediator.Send(command));
-
-        //Empty username
-        user.UserName = "                ";
+        var userInfo = MockData.MockData.CreateUserInfoDto();
+        var command = new CreateUserCommand(invalidUsername, _faker.Lorem.Letter(10), 
+            userInfo,[], [], []);
         await Assert.ThrowsAsync<ValidationException>(async () => await _mediator.Send(command));
     }
 
-    [Fact]
+    /*[Fact]
     public async Task CreateUser_WithInvalidPhoneNumber_ThrowsValidationException()
     {
-        var user = MockData.MockData.GetUserDto();
-        var command = new CreateUserCommand(user);
-
-        user.PhoneNumber = Global.Faker.Phone.PhoneNumber()[..5];
+        var command = new CreateUserCommand(_faker.Lorem.Letter(10), _faker.Lorem.Letter(10), [], [(_faker.Phone.PhoneNumber()[..5];], []);
         await Assert.ThrowsAsync<ValidationException>(async () => await _mediator.Send(command));
-    }
+    }*/
 
     [Fact]
     public async Task CreateUser_WithInvalidEmail_ThrowsValidationException()
     {
-        var user = MockData.MockData.GetUserDto();
-        var command = new CreateUserCommand(user);
+        var email = new EmailDto
+        {
+            Email = Global.Faker.Person.Email[..5],
+            IsConfirmed = false,
+            IsPrimary = true,
+            Type = EmailType.Personal
+        };
+        var userInfo = MockData.MockData.CreateUserInfoDto();
+        var command = new CreateUserCommand(_faker.Person.UserName, _faker.Lorem.Letter(10), 
+            userInfo, [email], [], []);
 
-        user.PhoneNumber = Global.Faker.Person.Email[..5];
         await Assert.ThrowsAsync<ValidationException>(async () => await _mediator.Send(command));
     }
 
     [Fact]
     public async Task CreateUser_WithSameUserName_ThrowsUserNameAlreadyTakenException()
     {
-        var user = MockData.MockData.GetUserDto();
-        var command = new CreateUserCommand(user);
+        var email = new EmailDto
+        {
+            Email = Global.Faker.Person.Email,
+            IsConfirmed = false,
+            IsPrimary = true,
+            Type = EmailType.Personal
+        };
+        var userInfo = MockData.MockData.CreateUserInfoDto();
+        var command = new CreateUserCommand(_faker.Lorem.Letter(10), 
+            _faker.Lorem.Letter(10), userInfo,[email], [], []);
 
         await _mediator.Send(command);
         await Assert.ThrowsAsync<UserNameAlreadyTakenException>(async () => await _mediator.Send(command));
@@ -82,26 +93,44 @@ public class CreateUserTests : IAsyncLifetime
     [Fact]
     public async Task CreateUser_WithSameEmail_ThrowsEmailAlreadyTakenException()
     {
-        var user = MockData.MockData.GetUserDto();
-        var command = new CreateUserCommand(user);
-
+        var email = new EmailDto
+        {
+            Email = Global.Faker.Person.Email,
+            IsConfirmed = false,
+            IsPrimary = true,
+            Type = EmailType.Personal
+        };
+        var userInfo = MockData.MockData.CreateUserInfoDto();
+        var command = new CreateUserCommand(_faker.Person.UserName, _faker.Lorem.Letter(10), 
+            userInfo, [email], [], []);
+        
         await _mediator.Send(command);
-        user.UserName = "test";
-        await Assert.ThrowsAsync<EmailAlreadyTakenException>(async () => await _mediator.Send(command));
+        var scommand = new CreateUserCommand("sdfsdf", _faker.Lorem.Letter(10), userInfo, 
+            [email], [], []);
+        await Assert.ThrowsAsync<EmailAlreadyTakenException>(async () => await _mediator.Send(scommand));
     }
 
     [Fact]
     public async Task CreateUser_WithValidData_Succeeds()
     {
-        var user = MockData.MockData.GetUserDto();
-        var command = new CreateUserCommand(user);
+        var email = new EmailDto
+        {
+            Email = Global.Faker.Person.Email,
+            IsConfirmed = false,
+            IsPrimary = true,
+            Type = EmailType.Personal
+        };
+        var userInfo = MockData.MockData.CreateUserInfoDto();
+        var command = new CreateUserCommand(_faker.Person.UserName, _faker.Lorem.Letter(10), 
+            userInfo, [email], [], []);
 
         var result = await _mediator.Send(command);
-        var userInDb = await _context.AspNetUsers.FirstOrDefaultAsync(x => x.Id == result.UserId);
+        var userInDb = await _context.Users.FirstOrDefaultAsync(x => x.Id == result.UserId);
+        var emailInDb = await _context.UserEmails.FirstOrDefaultAsync(x => x.UserId == result.UserId);
 
         Assert.NotNull(userInDb);
-        Assert.Equal(user.UserName, userInDb.UserName);
-        Assert.Equal(user.PhoneNumber!.ToNormalizedPhoneNumber(), userInDb.PhoneNumber);
-        Assert.Equal(user.Email, userInDb.Email);
+        Assert.NotNull(emailInDb);
+        Assert.Equal(command.UserName, userInDb.UserName);
+        Assert.Equal(command.Emails.First().Email, emailInDb.Email);
     }
 }

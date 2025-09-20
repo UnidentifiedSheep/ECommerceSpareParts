@@ -20,13 +20,13 @@ public record EditSaleCommand(
     Dictionary<int, List<SaleContentDetail>> MovedToStorage,
     string SaleId,
     int CurrencyId,
-    string UpdatedUserId,
+    Guid UpdatedUserId,
     DateTime SaleDateTime,
     string? Comment) : ICommand;
 
 public class EditSaleHandler(
     ICurrencyRepository currencyRepository,
-    IUsersRepository usersRepository,
+    IUserRepository usersRepository,
     IUnitOfWork unitOfWork,
     ISaleService saleService,
     ISaleRepository saleRepository,
@@ -156,7 +156,7 @@ public class EditSaleHandler(
             throw new ArgumentException($"Недостаточно деталей для артикула {saleContent.ArticleId}");
     }
 
-    private async Task ValidateData(string userId, int currencyId, CancellationToken cancellationToken = default)
+    private async Task ValidateData(Guid userId, int currencyId, CancellationToken cancellationToken = default)
     {
         await usersRepository.EnsureUsersExists([userId], cancellationToken);
         await currencyRepository.EnsureCurrenciesExists([currencyId], cancellationToken);

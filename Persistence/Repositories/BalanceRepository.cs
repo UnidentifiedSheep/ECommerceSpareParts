@@ -18,7 +18,7 @@ public class BalanceRepository(DContext context) : IBalanceRepository
             .FirstOrDefaultAsync(ct);
     }
 
-    public async Task<bool> TransactionExistsAsync(string senderId, string receiverId, DateTime dt,
+    public async Task<bool> TransactionExistsAsync(Guid senderId, Guid receiverId, DateTime dt,
         string? exceptId = null, CancellationToken ct = default)
     {
         return await context.Transactions.AsNoTracking()
@@ -26,7 +26,7 @@ public class BalanceRepository(DContext context) : IBalanceRepository
                            x.TransactionDatetime == dt && (exceptId == null || x.Id != exceptId), ct);
     }
 
-    public async Task<Transaction?> GetPreviousTransactionAsync(DateTime dt, string userId, int currencyId,
+    public async Task<Transaction?> GetPreviousTransactionAsync(DateTime dt, Guid userId, int currencyId,
         bool track = true, CancellationToken ct = default)
     {
         var sql = """
@@ -49,7 +49,7 @@ public class BalanceRepository(DContext context) : IBalanceRepository
             .FirstOrDefaultAsync(ct);
     }
 
-    public IAsyncEnumerable<Transaction> GetAffectedTransactions(string userId, int currencyId, DateTime dt,
+    public IAsyncEnumerable<Transaction> GetAffectedTransactions(Guid userId, int currencyId, DateTime dt,
         string? excludeId = null, bool track = true)
     {
         var sql = excludeId is null
@@ -93,7 +93,7 @@ public class BalanceRepository(DContext context) : IBalanceRepository
             .AsAsyncEnumerable();
     }
 
-    public async Task<UserBalance?> GetUserBalanceAsync(string userId, int currencyId, bool track = true,
+    public async Task<UserBalance?> GetUserBalanceAsync(Guid userId, int currencyId, bool track = true,
         CancellationToken ct = default)
     {
         var sql = """
@@ -122,29 +122,36 @@ public class BalanceRepository(DContext context) : IBalanceRepository
             .FirstOrDefaultAsync(ct);
     }
 
-    public async Task<IEnumerable<Transaction>> GetTransactionsAsync(DateTime rangeStart, DateTime rangeEnd,
-        int? currencyId, string? senderId, string? receiverId, int page, int viewCount, bool track = true,
-        CancellationToken ct = default)
+    public async Task<IEnumerable<Transaction>> GetTransactionsAsync(DateTime rangeStart, DateTime rangeEnd, int? currencyId,
+        Guid? senderId, Guid? receiverId, int page, int viewCount, bool track = true, CancellationToken ct = default)
     {
         var query = context.Transactions.ConfigureTracking(track)
-            .Where(x => rangeStart <= x.TransactionDatetime && rangeEnd >= x.TransactionDatetime &&
-                        (currencyId == null || x.CurrencyId == currencyId));
-        if (!string.IsNullOrWhiteSpace(senderId) && !string.IsNullOrWhiteSpace(receiverId))
-            query = query.Where(x => (x.SenderId == senderId && x.ReceiverId == receiverId) ||
-                                     (x.SenderId == receiverId && x.ReceiverId == senderId));
-        else
+            .Where(x =>
+                x.TransactionDatetime >= rangeStart &&
+                x.TransactionDatetime <= rangeEnd &&
+                (currencyId == null || x.CurrencyId == currencyId));
+
+        if (senderId != null && receiverId != null)
+        {
             query = query.Where(x =>
-                    x.SenderId == senderId || (x.ReceiverId == senderId && string.IsNullOrWhiteSpace(senderId)))
-                .Where(x => x.SenderId == receiverId ||
-                            (x.ReceiverId == receiverId && string.IsNullOrWhiteSpace(receiverId)));
+                (x.SenderId == senderId && x.ReceiverId == receiverId) ||
+                (x.SenderId == receiverId && x.ReceiverId == senderId));
+        }
+        else if (senderId != null)
+            query = query.Where(x => x.SenderId == senderId || x.ReceiverId == senderId);
+        else if (receiverId != null)
+            query = query.Where(x => x.SenderId == receiverId || x.ReceiverId == receiverId);
+        
 
-
-        query = query.OrderBy(x => new { x.TransactionDatetime, x.Id })
+        query = query
+            .OrderBy(x => x.TransactionDatetime)
+            .ThenBy(x => x.Id)
             .Skip(page * viewCount)
             .Take(viewCount);
-        var result = await query.ToListAsync(ct);
-        return result;
+
+        return await query.ToListAsync(ct);
     }
+
 
     public async Task<bool> TransactionExistsAsync(string transactionId, CancellationToken ct = default)
     {

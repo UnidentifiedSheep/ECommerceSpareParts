@@ -16,8 +16,8 @@ public record CreateSaleCommand(
     IEnumerable<NewSaleContentDto> SellContent,
     IEnumerable<PrevAndNewValue<StorageContent>> StorageContentValues,
     int CurrencyId,
-    string BuyerId,
-    string CreatedUserId,
+    Guid BuyerId,
+    Guid CreatedUserId,
     string TransactionId,
     string MainStorage,
     DateTime SaleDateTime,
@@ -30,7 +30,7 @@ public class CreateSaleHandler(
     IBalanceRepository balanceRepository,
     ICurrencyRepository currencyRepository,
     IStoragesRepository storagesRepository,
-    IUsersRepository usersRepository,
+    IUserRepository usersRepository,
     IArticlesRepository articlesRepository,
     IUnitOfWork unitOfWork) : ICommandHandler<CreateSaleCommand, CreateSaleResult>
 {
@@ -111,8 +111,8 @@ public class CreateSaleHandler(
             throw new ArgumentException($"Недостаточно деталей для артикула {articleId}");
     }
 
-    private async Task ValidateData(string transactionId, IEnumerable<int> articleIds, int currencyId, string buyerId,
-        string createdUserId, string storageName, CancellationToken cancellationToken = default)
+    private async Task ValidateData(string transactionId, IEnumerable<int> articleIds, int currencyId, Guid buyerId,
+        Guid createdUserId, string storageName, CancellationToken cancellationToken = default)
     {
         await balanceRepository.EnsureTransactionExists(transactionId, cancellationToken);
         await articlesRepository.EnsureArticlesExist(articleIds, cancellationToken);

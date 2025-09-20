@@ -17,11 +17,11 @@ namespace Application.Handlers.StorageContents.RestoreContent;
 public record RestoreContentCommand(
     IEnumerable<RestoreContentItem> ContentDetails,
     StorageMovementType MovementType,
-    string UserId) : ICommand;
+    Guid UserId) : ICommand;
 
 public class RestoreContentHandler(
     ICurrencyRepository currencyRepository,
-    IUsersRepository usersRepository,
+    IUserRepository usersRepository,
     IStorageContentRepository contentRepository,
     IArticlesRepository articlesRepository,
     IStoragesRepository storagesRepository,
@@ -83,7 +83,7 @@ public class RestoreContentHandler(
         return Unit.Value;
     }
 
-    private async Task ValidateData(string userId, IEnumerable<int> articleIds, IEnumerable<int> currencyIds,
+    private async Task ValidateData(Guid userId, IEnumerable<int> articleIds, IEnumerable<int> currencyIds,
         IEnumerable<string> storageIds, CancellationToken cancellationToken = default)
     {
         await currencyRepository.EnsureCurrenciesExists(currencyIds, cancellationToken);
@@ -92,7 +92,7 @@ public class RestoreContentHandler(
         await articlesRepository.EnsureArticlesExistForUpdate(articleIds, false, cancellationToken);
     }
 
-    private async Task AddMovement(StorageContent content, string userId, int movementCount,
+    private async Task AddMovement(StorageContent content, Guid userId, int movementCount,
         StorageMovementType movementType,
         CancellationToken cancellationToken = default)
     {

@@ -7,7 +7,7 @@ using MediatR;
 namespace MonoliteUnicorn.EndPoints.Purchase;
 
 public record CreatePurchaseRequest(
-    string SupplierId,
+    Guid SupplierId,
     int CurrencyId,
     string StorageName,
     DateTime PurchaseDate,
@@ -20,9 +20,10 @@ public class CreatePurchaseEndPoint : ICarterModule
     public void AddRoutes(IEndpointRouteBuilder app)
     {
         app.MapPost("/purchases/",
-                async (HttpContext context, ISender sender, CreatePurchaseRequest request, CancellationToken token) =>
+                async (ClaimsPrincipal claims, ISender sender, CreatePurchaseRequest request, CancellationToken token) =>
                 {
-                    var userId = context.User.FindFirst(ClaimTypes.NameIdentifier)?.Value ?? "";
+                    if (!Guid.TryParse(claims.FindFirstValue(ClaimTypes.NameIdentifier), out var userId)) 
+                        return Results.Unauthorized();
                     var command = new CreateFullPurchaseCommand(userId, request.SupplierId, request.CurrencyId,
                         request.StorageName, request.PurchaseDate, request.PurchaseContent, request.Comment,
                         request.PayedSum);

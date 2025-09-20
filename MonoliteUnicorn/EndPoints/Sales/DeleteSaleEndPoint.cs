@@ -12,8 +12,8 @@ public class DeleteSaleEndPoint : ICarterModule
         app.MapDelete("/sales/{saleId}",
                 async (ISender sender, ClaimsPrincipal claims, string saleId, CancellationToken token) =>
                 {
-                    var userId = claims.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-                    if (userId == null) return Results.Unauthorized();
+                    if (!Guid.TryParse(claims.FindFirstValue(ClaimTypes.NameIdentifier), out var userId)) 
+                        return Results.Unauthorized();
                     var command = new DeleteFullSaleCommand(saleId, userId);
                     await sender.Send(command, token);
                     return Results.NoContent();

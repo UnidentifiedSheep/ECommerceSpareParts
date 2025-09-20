@@ -2,7 +2,7 @@
 
 public partial class StorageContentReservation
 {
-    public string UserId { get; set; } = null!;
+    public Guid UserId { get; set; }
 
     public int ArticleId { get; set; }
 
@@ -24,17 +24,17 @@ public partial class StorageContentReservation
 
     public int Id { get; set; }
 
-    public string WhoCreated { get; set; } = null!;
+    public Guid WhoCreated { get; set; }
 
-    public string? WhoUpdated { get; set; }
+    public Guid? WhoUpdated { get; set; }
 
     public virtual Article Article { get; set; } = null!;
 
     public virtual Currency? GivenCurrency { get; set; }
 
-    public virtual AspNetUser User { get; set; } = null!;
+    public virtual User User { get; set; } = null!;
 
-    public virtual AspNetUser WhoCreatedNavigation { get; set; } = null!;
+    public virtual User WhoCreatedNavigation { get; set; } = null!;
 
-    public virtual AspNetUser? WhoUpdatedNavigation { get; set; }
+    public virtual User? WhoUpdatedNavigation { get; set; }
 }

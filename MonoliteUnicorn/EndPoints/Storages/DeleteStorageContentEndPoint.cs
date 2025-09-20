@@ -12,8 +12,7 @@ public class DeleteStorageContentEndPoint : ICarterModule
         app.MapDelete("/storages/content/{contentId}", async (ISender sender, int contentId, string concurrencyCode,
                 ClaimsPrincipal claims, CancellationToken cancellationToken) =>
             {
-                var userId = claims.FindFirstValue(ClaimTypes.NameIdentifier);
-                if (userId == null)
+                if (!Guid.TryParse(claims.FindFirstValue(ClaimTypes.NameIdentifier), out var userId)) 
                     return Results.Unauthorized();
                 var command = new DeleteStorageContentCommand(contentId, concurrencyCode, userId);
                 await sender.Send(command, cancellationToken);

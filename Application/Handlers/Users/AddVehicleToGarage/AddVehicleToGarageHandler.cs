@@ -10,12 +10,12 @@ using MediatR;
 
 namespace Application.Handlers.Users.AddVehicleToGarage;
 
-public record AddVehicleToGarageCommand(VehicleDto Vehicle, string UserId) : ICommand<Unit>;
+public record AddVehicleToGarageCommand(VehicleDto Vehicle, Guid UserId) : ICommand<Unit>;
 
 public class AddVehicleToGarageHandler(
     IUserVehicleRepository vehicleRepository,
     IUnitOfWork unitOfWork,
-    IUsersRepository usersRepository) : ICommandHandler<AddVehicleToGarageCommand, Unit>
+    IUserRepository usersRepository) : ICommandHandler<AddVehicleToGarageCommand, Unit>
 {
     public async Task<Unit> Handle(AddVehicleToGarageCommand request, CancellationToken cancellationToken)
     {
@@ -32,7 +32,7 @@ public class AddVehicleToGarageHandler(
         return Unit.Value;
     }
 
-    private async Task ValidateData(string? vin, string plateNumber, string userId,
+    private async Task ValidateData(string? vin, string plateNumber, Guid userId,
         CancellationToken cancellationToken = default)
     {
         await usersRepository.EnsureUsersExists([userId], cancellationToken);

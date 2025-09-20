@@ -13,6 +13,6 @@ public interface ISaleRepository
         bool track = true, CancellationToken cancellationToken = default);
 
     Task<IEnumerable<Sale>> GetSales(DateTime rangeStart, DateTime rangeEnd, int page, int viewCount, bool track = true,
-        string? sortBy = null, string? searchTerm = null, string? buyerId = null,
+        string? sortBy = null, string? searchTerm = null, Guid? buyerId = null,
         int? currencyId = null, CancellationToken cancellationToken = default);
 }

@@ -2,7 +2,7 @@
 using System.Security.Claims;
 using System.Security.Cryptography;
 using System.Text;
-using Core.Dtos.Internal;
+using Core.Entities;
 using Core.Interfaces;
 using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Tokens;
@@ -11,7 +11,7 @@ namespace Security;
 
 public class JwtGenerator(IConfiguration configuration) : IJwtGenerator
 {
-    public string CreateToken(UserDto user, IEnumerable<string> roles)
+    public string CreateToken(User user, UserInfo userInfo, string deviceId, IEnumerable<string> roles)
     {
         var handler = new JwtSecurityTokenHandler();
         var privateKey = Encoding.UTF8.GetBytes(configuration["JwtBearer:IssuerSigningKey"]!);
@@ -23,8 +23,8 @@ public class JwtGenerator(IConfiguration configuration) : IJwtGenerator
         {
             SigningCredentials = credentials,
             Issuer = configuration["JwtBearer:ValidIssuer"],
-            Expires = DateTime.UtcNow.AddMinutes(60),
-            Subject = GetClaims(user, roles)
+            Expires = DateTime.UtcNow.AddMinutes(5),
+            Subject = GetClaims(user, userInfo, deviceId, roles)
         };
         return handler.WriteToken(handler.CreateToken(tokenDescriptor));
     }
@@ -54,17 +54,16 @@ public class JwtGenerator(IConfiguration configuration) : IJwtGenerator
         return new JwtSecurityTokenHandler().ValidateToken(token, validation, out _);
     }
 
-    private ClaimsIdentity GetClaims(UserDto user, IEnumerable<string> roles)
+    private ClaimsIdentity GetClaims(User user, UserInfo userInfo, string deviceId, IEnumerable<string> roles)
     {
         var claims = new ClaimsIdentity();
-        claims.AddClaim(new Claim(ClaimTypes.Email, user.Email ?? ""));
-        claims.AddClaim(new Claim(ClaimTypes.GivenName, user.Name + " " + user.Surname));
-        claims.AddClaim(new Claim(ClaimTypes.Name, user.UserName ?? ""));
-        claims.AddClaim(new Claim(ClaimTypes.NameIdentifier, user.Id));
+        claims.AddClaim(new Claim(ClaimTypes.GivenName, userInfo.Name + " " + userInfo.Surname));
+        claims.AddClaim(new Claim(ClaimTypes.Name, user.UserName));
+        claims.AddClaim(new Claim("device_id", deviceId));
+        claims.AddClaim(new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()));
         foreach (var role in roles)
             claims.AddClaim(new Claim(ClaimTypes.Role, role));
-
-
+        
         return claims;
     }
 }

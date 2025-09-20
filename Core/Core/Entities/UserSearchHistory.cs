@@ -4,7 +4,7 @@ public partial class UserSearchHistory
 {
     public int Id { get; set; }
 
-    public string UserId { get; set; } = null!;
+    public Guid UserId { get; set; }
 
     public string SearchPlace { get; set; } = null!;
 
@@ -12,5 +12,5 @@ public partial class UserSearchHistory
 
     public DateTime SearchDateTime { get; set; }
 
-    public virtual AspNetUser User { get; set; } = null!;
+    public virtual User User { get; set; } = null!;
 }

@@ -4,7 +4,7 @@ public partial class UserBalance
 {
     public int Id { get; set; }
 
-    public string UserId { get; set; } = null!;
+    public Guid UserId { get; set; }
 
     public int CurrencyId { get; set; }
 
@@ -12,5 +12,5 @@ public partial class UserBalance
 
     public virtual Currency Currency { get; set; } = null!;
 
-    public virtual AspNetUser User { get; set; } = null!;
+    public virtual User User { get; set; } = null!;
 }

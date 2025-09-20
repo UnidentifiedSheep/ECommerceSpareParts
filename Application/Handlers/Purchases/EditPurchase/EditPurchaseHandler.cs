@@ -16,7 +16,7 @@ public record EditPurchaseCommand(
     string PurchaseId,
     int CurrencyId,
     string? Comment,
-    string UpdatedUserId,
+    Guid UpdatedUserId,
     DateTime PurchaseDateTime) : ICommand<EditPurchaseResult>;
 
 /// <param name="EditedCounts">
@@ -28,7 +28,7 @@ public record EditPurchaseCommand(
 public record EditPurchaseResult(Dictionary<int, Dictionary<decimal, int>> EditedCounts);
 
 public class EditPurchaseHandler(
-    IUsersRepository usersRepository,
+    IUserRepository usersRepository,
     ICurrencyRepository currencyRepository,
     IPurchaseRepository purchaseRepository,
     IUnitOfWork unitOfWork) : ICommandHandler<EditPurchaseCommand, EditPurchaseResult>
@@ -111,7 +111,7 @@ public class EditPurchaseHandler(
     }
 
     private void SetFields(Purchase purchase, int currencyId, DateTime purchaseDateTime, string? comment,
-        string updatedUserId)
+        Guid updatedUserId)
     {
         purchase.Comment = comment?.Trim();
         purchase.CurrencyId = currencyId;
@@ -120,7 +120,7 @@ public class EditPurchaseHandler(
         purchase.UpdatedUserId = updatedUserId;
     }
 
-    private async Task ValidateData(int currencyId, string updatedUserId, CancellationToken cancellationToken = default)
+    private async Task ValidateData(int currencyId, Guid updatedUserId, CancellationToken cancellationToken = default)
     {
         await usersRepository.EnsureUsersExists([updatedUserId], cancellationToken);
         await currencyRepository.EnsureCurrenciesExists([currencyId], cancellationToken);

@@ -5,11 +5,11 @@ using MediatR;
 
 namespace Application.Handlers.Users.ChangeUserDiscount;
 
-public record ChangeUserDiscountCommand(string UserId, decimal Discount) : ICommand;
+public record ChangeUserDiscountCommand(Guid UserId, decimal Discount) : ICommand;
 
 public class ChangeUserDiscountHandler(
     IRedisUserRepository cacheUserRepository,
-    IUsersRepository usersRepository) : ICommandHandler<ChangeUserDiscountCommand>
+    IUserRepository usersRepository) : ICommandHandler<ChangeUserDiscountCommand>
 {
     public async Task<Unit> Handle(ChangeUserDiscountCommand request, CancellationToken cancellationToken)
     {

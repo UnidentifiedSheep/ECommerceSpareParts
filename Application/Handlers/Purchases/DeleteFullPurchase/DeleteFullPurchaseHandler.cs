@@ -13,7 +13,7 @@ using MediatR;
 namespace Application.Handlers.Purchases.DeleteFullPurchase;
 
 [Transactional(IsolationLevel.Serializable, 20, 2)]
-public record DeleteFullPurchaseCommand(string PurchaseId, string WhoDeleted) : ICommand;
+public record DeleteFullPurchaseCommand(string PurchaseId, Guid WhoDeleted) : ICommand;
 
 public class DeleteFullPurchaseHandler(IPurchaseRepository purchaseRepository, IMediator mediator)
     : ICommandHandler<DeleteFullPurchaseCommand>
@@ -33,7 +33,7 @@ public class DeleteFullPurchaseHandler(IPurchaseRepository purchaseRepository, I
         return Unit.Value;
     }
 
-    private async Task DeleteTransaction(string transactionId, string whoDeleted,
+    private async Task DeleteTransaction(string transactionId, Guid whoDeleted,
         CancellationToken cancellationToken = default)
     {
         var command = new DeleteTransactionCommand(transactionId, whoDeleted, true);
@@ -46,7 +46,7 @@ public class DeleteFullPurchaseHandler(IPurchaseRepository purchaseRepository, I
         await mediator.Publish(command, cancellationToken);
     }
 
-    private async Task RemoveContentFromStorage(List<PurchaseContent> purchaseContents, string whoRemoved,
+    private async Task RemoveContentFromStorage(List<PurchaseContent> purchaseContents, Guid whoRemoved,
         string storageName,
         CancellationToken cancellationToken = default)
     {

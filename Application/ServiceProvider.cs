@@ -9,6 +9,8 @@ using Application.Validators;
 using Core.Entities;
 using Core.Interfaces;
 using Core.Interfaces.Services;
+using Core.Interfaces.Validators;
+using Core.Models;
 using FluentValidation;
 using MediatR;
 using Microsoft.Extensions.DependencyInjection;
@@ -21,8 +23,11 @@ namespace Application;
 
 public static class ServiceProvider
 {
-    public static IServiceCollection AddApplicationLayer(this IServiceCollection collection)
+    public static IServiceCollection AddApplicationLayer(this IServiceCollection collection, 
+        UserEmailOptions? emailOptions = null, UserPhoneOptions? phoneOptions = null)
     {
+        collection.AddSingleton(emailOptions ?? new UserEmailOptions());
+        collection.AddSingleton(phoneOptions ?? new UserPhoneOptions());
         collection.AddSingleton<ICurrencyConverter, CurrencyConverter>(_ => new CurrencyConverter(Global.UsdId));
         collection.AddSingleton<IPriceGenerator, PriceGenerator>();
         collection.AddScoped<IMarkupGenerator, MarkupGenerator>();
@@ -32,6 +37,7 @@ public static class ServiceProvider
         collection.AddScoped<IArticlesService, ArticlesService>();
         collection.AddScoped<IBalanceService, BalanceService>();
         collection.AddScoped<ISaleService, SaleService>();
+        collection.AddScoped<IUserTokenService, UserTokenService>();
 
         collection.AddSingleton<IEmailValidator, EmailValidator>();
         collection.AddSingleton<IConcurrencyValidator<StorageContent>, StorageContentConcurrencyValidator>();

@@ -1,7 +1,9 @@
 using Api.Common;
 using Application.Configs;
 using Core.Interfaces;
+using Core.Models;
 using Mail;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.DependencyInjection;
 using Persistence;
 using Persistence.Contexts;
@@ -38,12 +40,19 @@ public static class ServiceProviderForTests
 
         ApplicationServiceProvider.AddApplicationLayer(services)
             .AddPersistenceLayer(postgresConnectionString);
+        var passwordRules = new PasswordRules
+        {
+            RequireDigit = false,
+            RequireUppercase = false,
+        };
         CacheServiceProvider.AddCacheLayer(services, redisConnectionString)
-            .AddSecurityLayer()
+            .AddSecurityLayer(passwordRules)
             .AddMailLayer()
             .AddCommonLayer();
         MapsterConfig.Configure();
         SortByConfig.Configure();
+        
+        
 
         var serviceProvider = services.BuildServiceProvider();
         IsConfiguredBefore = true;

@@ -19,7 +19,8 @@ public class EditPurchaseEndPoint : ICarterModule
         app.MapPut("/purchase/{purchaseId}", async (ISender sender, string purchaseId, EditPurchaseRequest request,
                 CancellationToken cancellationToken, ClaimsPrincipal claims) =>
             {
-                var userId = claims.FindFirstValue(ClaimTypes.NameIdentifier) ?? "";
+                if (!Guid.TryParse(claims.FindFirstValue(ClaimTypes.NameIdentifier), out var userId)) 
+                    return Results.Unauthorized();
                 var command = new EditFullPurchaseCommand(request.Content, purchaseId, request.CurrencyId,
                     request.Comment, request.PurchaseDateTime, userId);
                 await sender.Send(command, cancellationToken);

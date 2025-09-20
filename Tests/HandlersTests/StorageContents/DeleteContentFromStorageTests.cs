@@ -19,7 +19,7 @@ public class DeleteContentFromStorageTests : IAsyncLifetime
     private readonly DContext _context;
     private readonly IMediator _mediator;
     private List<StorageContent> _storageContents = null!;
-    private AspNetUser _user = null!;
+    private User _user = null!;
 
     public DeleteContentFromStorageTests(CombinedContainerFixture fixture)
     {
@@ -36,7 +36,7 @@ public class DeleteContentFromStorageTests : IAsyncLifetime
         await _context.AddMockCurrencies();
         await _mediator.AddMockUser();
 
-        _user = await _context.AspNetUsers.FirstAsync();
+        _user = await _context.Users.FirstAsync();
         var currency = await _context.Currencies.FirstAsync();
         var storage = await _context.Storages.FirstAsync();
         var articleIds = await _context.Articles.Select(a => a.Id).ToListAsync();
@@ -53,7 +53,7 @@ public class DeleteContentFromStorageTests : IAsyncLifetime
     public async Task DeleteContentFromStorage_WithInvalidUserId_ThrowsUserNotFoundException()
     {
         var contentId = _storageContents.First().Id;
-        var command = new DeleteStorageContentCommand(contentId, "", Global.Faker.Lorem.Word());
+        var command = new DeleteStorageContentCommand(contentId, "", Guid.Empty);
         await Assert.ThrowsAsync<UserNotFoundException>(async () => await _mediator.Send(command));
     }
 

@@ -22,7 +22,7 @@ public class EditStorageContentTests : IAsyncLifetime
     private readonly DContext _context;
     private readonly IMediator _mediator;
     private List<StorageContent> _storageContents = null!;
-    private AspNetUser _user = null!;
+    private User _user = null!;
 
     public EditStorageContentTests(CombinedContainerFixture fixture)
     {
@@ -39,7 +39,7 @@ public class EditStorageContentTests : IAsyncLifetime
         await _mediator.AddMockStorage();
         await _context.AddMockCurrencies();
 
-        _user = await _context.AspNetUsers.FirstAsync();
+        _user = await _context.Users.FirstAsync();
         var articleIds = await _context.Articles.Select(a => a.Id).ToListAsync();
         var storage = await _context.Storages.FirstAsync();
         var currency = await _context.Currencies.FirstAsync();

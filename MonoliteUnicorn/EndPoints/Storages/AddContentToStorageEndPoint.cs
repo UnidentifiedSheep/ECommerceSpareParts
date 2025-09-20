@@ -16,8 +16,8 @@ public class AddContentToStorageEndPoint : ICarterModule
         app.MapPost("/storages/content", async (ISender sender, AddContentToStorageRequest request,
                 ClaimsPrincipal claims, CancellationToken cancellationToken) =>
             {
-                var userId = claims.FindFirstValue(ClaimTypes.NameIdentifier);
-                if (userId == null) return Results.Unauthorized();
+                if (!Guid.TryParse(claims.FindFirstValue(ClaimTypes.NameIdentifier), out var userId)) 
+                    return Results.Unauthorized();
                 var command = new AddContentCommand(request.StorageContent, request.StorageName, userId,
                     StorageMovementType.StorageContentAddition);
                 await sender.Send(command, cancellationToken);

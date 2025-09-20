@@ -7,7 +7,7 @@ using MediatR;
 
 namespace Application.Handlers.Prices.GetPrices;
 
-public record GetPricesQuery(IEnumerable<int> ArticleIds, int CurrencyId, string? BuyerId) : IQuery<GetPricesResult>;
+public record GetPricesQuery(IEnumerable<int> ArticleIds, int CurrencyId, Guid? BuyerId) : IQuery<GetPricesResult>;
 
 public record GetPricesResult(Dictionary<int, double> Prices);
 
@@ -40,10 +40,10 @@ public class GetPricesHandler(
         return new GetPricesResult(results);
     }
 
-    private async Task<decimal?> GetUserDiscount(string? buyerId, CancellationToken cancellationToken)
+    private async Task<decimal?> GetUserDiscount(Guid? buyerId, CancellationToken cancellationToken)
     {
         if (buyerId == null) return null;
-        var query = new GetUserDiscountQuery(buyerId);
+        var query = new GetUserDiscountQuery(buyerId.Value);
         return (await mediator.Send(query, cancellationToken)).Discount;
     }
 

@@ -13,9 +13,9 @@ public class GetProducersEndPoint : ICarterModule
 {
     public void AddRoutes(IEndpointRouteBuilder app)
     {
-        app.MapGet("/producers/", async (ISender sender, string? searchTerm, int page, int viewCount) =>
+        app.MapGet("/producers", async (ISender sender, string? searchTerm, int page, int limit) =>
             {
-                var query = new GetProducersQuery(searchTerm, new PaginationModel(page, viewCount));
+                var query = new GetProducersQuery(searchTerm, new PaginationModel(page, limit));
                 var result = await sender.Send(query);
                 return Results.Ok(result.Adapt<GetProducersResponse>());
             }).WithTags("Producers")

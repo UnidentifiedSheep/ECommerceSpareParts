@@ -19,14 +19,14 @@ public class GetArticleCrossesEndPoint : ICarterModule
 {
     public void AddRoutes(IEndpointRouteBuilder app)
     {
-        app.MapGet("/articles/crosses/{articleId}", async (ISender sender, ClaimsPrincipal user, int articleId,
-                int viewCount, int page, string? sortBy, CancellationToken token) =>
+        app.MapGet("/articles/{articleId}/crosses/", async (ISender sender, ClaimsPrincipal user, int articleId,
+                int limit, int page, string? sortBy, CancellationToken token) =>
             {
                 var roles = user.GetUserRoles();
                 var userId = user.GetUserId();
                 if (userId == null) return Results.Unauthorized();
 
-                var pagination = new PaginationModel(page, viewCount);
+                var pagination = new PaginationModel(page, limit);
                 if (roles.IsAnyMatchInvariant("admin", "moderator", "worker"))
                     return await GetAmw(sender, articleId, pagination, sortBy, userId, token);
                 if (roles.IsAnyMatchInvariant("member"))

@@ -13,7 +13,7 @@ public class AddVehicleToGarageEndPoint : ICarterModule
     public void AddRoutes(IEndpointRouteBuilder app)
     {
         app.MapPost("/users/{userId}/vehicles/",
-                async (ISender sender, AddVehicleToGarageRequest request, string userId, CancellationToken token) =>
+                async (ISender sender, AddVehicleToGarageRequest request, Guid userId, CancellationToken token) =>
                 {
                     var command = new AddVehicleToGarageCommand(request.Vehicle, userId);
                     await sender.Send(command, token);
@@ -26,8 +26,9 @@ public class AddVehicleToGarageEndPoint : ICarterModule
         app.MapPost("/users/me/vehicles/", async (ISender sender, AddVehicleToGarageRequest request,
                 ClaimsPrincipal user, CancellationToken token) =>
             {
-                var userId = user.FindFirstValue(ClaimTypes.NameIdentifier);
-                var command = new AddVehicleToGarageCommand(request.Vehicle, userId ?? "");
+                if (!Guid.TryParse(user.FindFirstValue(ClaimTypes.NameIdentifier), out var userId)) 
+                    return Results.Unauthorized();
+                var command = new AddVehicleToGarageCommand(request.Vehicle, userId);
                 await sender.Send(command, token);
                 return Results.NoContent();
             }).RequireAuthorization()

@@ -21,7 +21,7 @@ public class RemoveContentFromStorageTests : IAsyncLifetime
     private readonly IMediator _mediator;
     private List<StorageContent> _storageContents = null!;
     private List<Storage> _storages = null!;
-    private AspNetUser _user = null!;
+    private User _user = null!;
 
     public RemoveContentFromStorageTests(CombinedContainerFixture fixture)
     {
@@ -40,7 +40,7 @@ public class RemoveContentFromStorageTests : IAsyncLifetime
         await _mediator.AddMockStorage();
 
         _storages = await _context.Storages.ToListAsync();
-        _user = await _context.AspNetUsers.FirstAsync();
+        _user = await _context.Users.FirstAsync();
         var articleIds = await _context.Articles.Select(a => a.Id).ToListAsync();
         var currency = await _context.Currencies.FirstAsync();
 
@@ -59,7 +59,7 @@ public class RemoveContentFromStorageTests : IAsyncLifetime
     public async Task RemoveContentFromStorage_WithInvalidUserId_ThrowsUserNotFoundException()
     {
         var storageName = _storages.First().Name;
-        var userId = Global.Faker.Random.Guid().ToString();
+        var userId = Global.Faker.Random.Guid();
         var article = _storageContents.First();
 
         var content = new Dictionary<int, int>

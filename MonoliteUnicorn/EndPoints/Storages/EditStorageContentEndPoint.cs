@@ -16,8 +16,7 @@ public class EditStorageContentEndPoint : ICarterModule
         app.MapPatch("/storages/content", async (ISender sender, EditStorageContentRequest request,
                 ClaimsPrincipal claims, CancellationToken cancellationToken) =>
             {
-                var userId = claims.FindFirstValue(ClaimTypes.NameIdentifier);
-                if (userId == null)
+                if (!Guid.TryParse(claims.FindFirstValue(ClaimTypes.NameIdentifier), out var userId)) 
                     return Results.Unauthorized();
                 var command = new EditStorageContentCommand(request.EditedFields, userId);
                 await sender.Send(command, cancellationToken);

@@ -8,9 +8,9 @@ public partial class TransactionVersion
 
     public int CurrencyId { get; set; }
 
-    public string SenderId { get; set; } = null!;
+    public Guid SenderId { get; set; }
 
-    public string ReceiverId { get; set; } = null!;
+    public Guid ReceiverId { get; set; }
 
     public decimal TransactionSum { get; set; }
 
@@ -24,9 +24,9 @@ public partial class TransactionVersion
 
     public virtual Currency Currency { get; set; } = null!;
 
-    public virtual AspNetUser Receiver { get; set; } = null!;
+    public virtual User Receiver { get; set; } = null!;
 
-    public virtual AspNetUser Sender { get; set; } = null!;
+    public virtual User Sender { get; set; } = null!;
 
     public virtual Transaction Transaction { get; set; } = null!;
 }

@@ -16,8 +16,8 @@ namespace Application.Handlers.Purchases.CreateFullPurchase;
 
 [Transactional(IsolationLevel.Serializable, 20, 2)]
 public record CreateFullPurchaseCommand(
-    string CreatedUserId,
-    string SupplierId,
+    Guid CreatedUserId,
+    Guid SupplierId,
     int CurrencyId,
     string StorageName,
     DateTime PurchaseDate,
@@ -53,9 +53,9 @@ public class CreateFullPurchaseHandler(IMediator mediator) : ICommandHandler<Cre
         return Unit.Value;
     }
 
-    private async Task<Transaction> CreateTransaction(string senderId, string receiverId, decimal amount,
+    private async Task<Transaction> CreateTransaction(Guid senderId, Guid receiverId, decimal amount,
         TransactionStatus status, int currencyId,
-        string whoCreatedUserId, DateTime dateTime, CancellationToken cancellationToken = default)
+        Guid whoCreatedUserId, DateTime dateTime, CancellationToken cancellationToken = default)
     {
         var command = new CreateTransactionCommand(senderId, receiverId, amount, currencyId, whoCreatedUserId, dateTime,
             status);
@@ -63,8 +63,7 @@ public class CreateFullPurchaseHandler(IMediator mediator) : ICommandHandler<Cre
     }
 
     private async Task CreatePurchase(List<NewPurchaseContentDto> content, int currencyId, string? comment,
-        string supplierId,
-        string whoCreated, string transactionId, string storageName, DateTime dateTime,
+        Guid supplierId, Guid whoCreated, string transactionId, string storageName, DateTime dateTime,
         CancellationToken cancellationToken = default)
     {
         var command = new CreatePurchaseCommand(content, currencyId, comment, whoCreated, transactionId, storageName,
@@ -72,9 +71,8 @@ public class CreateFullPurchaseHandler(IMediator mediator) : ICommandHandler<Cre
         await mediator.Send(command, cancellationToken);
     }
 
-    private async Task AddContentToStorage(List<NewPurchaseContentDto> content, string storageName, string userId,
-        int currencyId,
-        CancellationToken cancellationToken = default)
+    private async Task AddContentToStorage(List<NewPurchaseContentDto> content, string storageName, Guid userId,
+        int currencyId, CancellationToken cancellationToken = default)
     {
         var storageContents = content.Select(x =>
         {

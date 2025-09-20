@@ -15,7 +15,7 @@ public class GetPurchasesRequest
     [FromQuery(Name = "rangeEndDate")] public DateTime RangeEndDate { get; set; }
     [FromQuery(Name = "page")] public int Page { get; set; }
     [FromQuery(Name = "viewCount")] public int ViewCount { get; set; }
-    [FromQuery(Name = "supplierId")] public string? SupplierId { get; set; }
+    [FromQuery(Name = "supplierId")] public Guid? SupplierId { get; set; }
     [FromQuery(Name = "currencyId")] public int? CurrencyId { get; set; }
     [FromQuery(Name = "sortBy")] public string? SortBy { get; set; }
     [FromQuery(Name = "searchTerm")] public string? SearchTerm { get; set; }

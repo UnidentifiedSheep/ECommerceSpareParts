@@ -11,7 +11,7 @@ public interface IPurchaseRepository
         CancellationToken cancellationToken = default);
 
     Task<IEnumerable<Purchase>> GetPurchases(DateTime rangeStart, DateTime rangeEnd, int page, int viewCount,
-        string? supplierId,
+        Guid? supplierId,
         int? currencyId, string? sortBy, string? searchTerm, bool track = true,
         CancellationToken cancellationToken = default);
 }

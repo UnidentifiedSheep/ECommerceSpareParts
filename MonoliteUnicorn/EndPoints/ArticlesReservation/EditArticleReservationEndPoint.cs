@@ -16,8 +16,8 @@ public class EditArticleReservationEndPoint : ICarterModule
             (ISender sender, int reservationId, EditArticleReservationRequest request, ClaimsPrincipal claims,
                 CancellationToken token) =>
             {
-                var userId = claims.FindFirstValue(ClaimTypes.NameIdentifier);
-                if (userId == null) return Results.Unauthorized();
+                if (!Guid.TryParse(claims.FindFirstValue(ClaimTypes.NameIdentifier), out var userId)) 
+                    return Results.Unauthorized();
                 var command = new EditArticleReservationCommand(reservationId, request.NewValue, userId);
                 await sender.Send(command, token);
                 return Results.NoContent();

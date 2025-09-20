@@ -19,8 +19,8 @@ public class DeleteTransactionTest : IAsyncLifetime
     private readonly DContext _context;
     private readonly IMediator _mediator;
     private Currency _currency = null!;
-    private AspNetUser _mockUser = null!;
-    private AspNetUser _systemUser = null!;
+    private User _mockUser = null!;
+    private User _systemUser = null!;
     private Transaction _transaction = null!;
 
     public DeleteTransactionTest(CombinedContainerFixture fixture)
@@ -33,12 +33,12 @@ public class DeleteTransactionTest : IAsyncLifetime
 
     public async Task InitializeAsync()
     {
-        await _context.CreateSystemUser();
+        var systemId = await _mediator.AddMockUser();
         await _context.AddMockCurrencies();
         _currency = await _context.Currencies.AsNoTracking().FirstAsync();
-        _systemUser = await _context.AspNetUsers.AsNoTracking().FirstAsync(x => x.Id == "SYSTEM");
+        _systemUser = await _context.Users.AsNoTracking().FirstAsync(x => x.Id == systemId);
         var mockUserId = await _mediator.AddMockUser();
-        _mockUser = await _context.AspNetUsers.AsNoTracking().FirstAsync(x => x.Id == mockUserId);
+        _mockUser = await _context.Users.AsNoTracking().FirstAsync(x => x.Id == mockUserId);
 
         //Before test transaction
         await _mediator.AddMockTransaction(_mockUser.Id, _systemUser.Id, _systemUser.Id,
@@ -69,7 +69,7 @@ public class DeleteTransactionTest : IAsyncLifetime
     [Fact]
     public async Task DeleteTransaction_EmptyUserId_FailsValidation()
     {
-        var command = new DeleteTransactionCommand(_transaction.Id, "  ");
+        var command = new DeleteTransactionCommand(_transaction.Id, Guid.Empty);
         await Assert.ThrowsAsync<ValidationException>(async () => await _mediator.Send(command));
     }
 

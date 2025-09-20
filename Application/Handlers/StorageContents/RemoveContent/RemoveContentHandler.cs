@@ -17,7 +17,7 @@ namespace Application.Handlers.StorageContents.RemoveContent;
 [Transactional(IsolationLevel.Serializable, 20, 2)]
 public record RemoveContentCommand(
     Dictionary<int, int> Content,
-    string UserId,
+    Guid UserId,
     string? StorageName,
     bool TakeFromOtherStorages,
     StorageMovementType MovementType) : ICommand<RemoveContentResult>;
@@ -25,7 +25,7 @@ public record RemoveContentCommand(
 public record RemoveContentResult(IEnumerable<PrevAndNewValue<StorageContent>> Changes);
 
 public class RemoveContentHandler(
-    IUsersRepository usersRepository,
+    IUserRepository usersRepository,
     IStorageContentRepository contentRepository,
     IArticlesRepository articlesRepository,
     IStoragesRepository storagesRepository,
@@ -105,7 +105,7 @@ public class RemoveContentHandler(
     }
 
     private async Task ValidateData(bool takeFromOtherStorages, string? storageName, IEnumerable<int> articleIds,
-        string userId, CancellationToken cancellationToken = default)
+        Guid userId, CancellationToken cancellationToken = default)
     {
         if (!takeFromOtherStorages && !string.IsNullOrWhiteSpace(storageName))
             await storagesRepository.EnsureStorageExists(storageName, cancellationToken);
@@ -113,7 +113,7 @@ public class RemoveContentHandler(
         await articlesRepository.EnsureArticlesExistForUpdate(articleIds, false, cancellationToken);
     }
 
-    private StorageMovement GetMovement(StorageContent content, StorageMovementType movementType, string whoMoved,
+    private StorageMovement GetMovement(StorageContent content, StorageMovementType movementType, Guid whoMoved,
         int count)
     {
         var tempMovement = content.Adapt<StorageMovement>().SetActionType(movementType);

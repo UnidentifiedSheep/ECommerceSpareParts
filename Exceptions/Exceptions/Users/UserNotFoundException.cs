@@ -8,11 +8,11 @@ public class UserNotFoundException : NotFoundException
     {
     }
 
-    public UserNotFoundException(string id) : base("Не удалось найти пользователя", new { Id = id })
+    public UserNotFoundException(Guid id) : base("Не удалось найти пользователя", new { Id = id })
     {
     }
 
-    public UserNotFoundException(IEnumerable<string> ids) : base("Не удалось найти пользователя", new { Ids = ids })
+    public UserNotFoundException(IEnumerable<Guid> ids) : base("Не удалось найти пользователя", new { Ids = ids })
     {
     }
 }

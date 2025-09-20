@@ -4,9 +4,9 @@ public partial class Sale
 {
     public string Id { get; set; } = null!;
 
-    public string CreatedUserId { get; set; } = null!;
+    public Guid CreatedUserId { get; set; }
 
-    public string BuyerId { get; set; } = null!;
+    public Guid BuyerId { get; set; }
 
     public string? Comment { get; set; }
 
@@ -20,13 +20,13 @@ public partial class Sale
 
     public string TransactionId { get; set; } = null!;
 
-    public string? UpdatedUserId { get; set; }
+    public Guid? UpdatedUserId { get; set; }
 
     public string MainStorageName { get; set; } = null!;
 
-    public virtual AspNetUser Buyer { get; set; } = null!;
+    public virtual User Buyer { get; set; } = null!;
 
-    public virtual AspNetUser CreatedUser { get; set; } = null!;
+    public virtual User CreatedUser { get; set; } = null!;
 
     public virtual Currency Currency { get; set; } = null!;
 
@@ -36,5 +36,5 @@ public partial class Sale
 
     public virtual Transaction Transaction { get; set; } = null!;
 
-    public virtual AspNetUser? UpdatedUser { get; set; }
+    public virtual User? UpdatedUser { get; set; }
 }

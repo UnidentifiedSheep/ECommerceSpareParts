@@ -2,9 +2,9 @@
 
 public partial class UserDiscount
 {
-    public string UserId { get; set; } = null!;
+    public Guid UserId { get; set; }
 
     public decimal? Discount { get; set; }
 
-    public virtual AspNetUser User { get; set; } = null!;
+    public virtual User User { get; set; } = null!;
 }

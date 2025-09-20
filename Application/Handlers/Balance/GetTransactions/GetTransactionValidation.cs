@@ -7,11 +7,11 @@ public class GetTransactionsValidation : AbstractValidator<GetTransactionsQuery>
     public GetTransactionsValidation()
     {
         RuleFor(x => new { x.ReceiverId, x.SenderId })
-            .Must(x => x.ReceiverId != x.SenderId || string.IsNullOrWhiteSpace(x.ReceiverId))
+            .Must(x => x.ReceiverId != x.SenderId || x.ReceiverId == null)
             .WithMessage("Отправитель и получатель не могут быть одинаковы");
 
         RuleFor(x => new { x.ReceiverId, x.SenderId })
-            .Must(x => !string.IsNullOrWhiteSpace(x.ReceiverId) || !string.IsNullOrWhiteSpace(x.SenderId))
+            .Must(x => x.ReceiverId != null || x.SenderId != null)
             .WithMessage("Должен быть указан хотя бы один: отправитель или получатель");
 
         RuleFor(x => new { x.RangeStart, x.RangeEnd })

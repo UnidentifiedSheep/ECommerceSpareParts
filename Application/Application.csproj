@@ -34,6 +34,8 @@
     <ItemGroup>
       <Folder Include="Handlers\Analytics\GetSaleAnalytics\" />
       <Folder Include="Handlers\Cart\" />
+      <Folder Include="Handlers\Users\AddUserToRole\" />
+      <Folder Include="Handlers\Users\RemoveUserFromRole\" />
     </ItemGroup>
 
 </Project>

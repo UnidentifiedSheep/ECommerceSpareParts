@@ -20,8 +20,8 @@ public class EditSaleEndPoint : ICarterModule
         app.MapPut("/sales/{saleId}", async (ISender sender, string saleId, EditSaleRequest request,
                 ClaimsPrincipal claims, CancellationToken cancellationToken) =>
             {
-                var userId = claims.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-                if (userId == null) return Results.Unauthorized();
+                if (!Guid.TryParse(claims.FindFirstValue(ClaimTypes.NameIdentifier), out var userId)) 
+                    return Results.Unauthorized();
                 var command = new EditFullSaleCommand(request.EditedContent, saleId, request.CurrencyId, userId,
                     request.SaleDateTime, request.Comment, request.SellFromOtherStorages);
                 await sender.Send(command, cancellationToken);

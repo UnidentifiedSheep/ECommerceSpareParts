@@ -12,11 +12,11 @@ namespace Application.Handlers.Balance.CreateTransaction;
 
 [Transactional(IsolationLevel.Serializable, 20, 3)]
 public record CreateTransactionCommand(
-    string SenderId,
-    string ReceiverId,
+    Guid SenderId,
+    Guid ReceiverId,
     decimal Amount,
     int CurrencyId,
-    string WhoCreatedTransaction,
+    Guid WhoCreatedTransaction,
     DateTime TransactionDateTime,
     TransactionStatus TransactionStatus) : ICommand<CreateTransactionResult>;
 
@@ -25,7 +25,7 @@ public record CreateTransactionResult(Transaction Transaction);
 public class CreateTransactionHandler(
     IBalanceRepository balanceRepository,
     ICurrencyRepository currencyRepository,
-    IUsersRepository usersRepository,
+    IUserRepository usersRepository,
     IBalanceService balanceService,
     IUnitOfWork unitOfWork) : ICommandHandler<CreateTransactionCommand, CreateTransactionResult>
 {
@@ -59,7 +59,7 @@ public class CreateTransactionHandler(
         return new CreateTransactionResult(transaction);
     }
 
-    private async Task EnsureNeededDataExists(string senderId, string receiverId, string whoCreatedTransaction,
+    private async Task EnsureNeededDataExists(Guid senderId, Guid receiverId, Guid whoCreatedTransaction,
         DateTime transactionDateTime,
         int currencyId, CancellationToken cancellationToken = default)
     {
@@ -70,8 +70,8 @@ public class CreateTransactionHandler(
         await usersRepository.EnsureUsersExists([senderId, receiverId, whoCreatedTransaction], cancellationToken);
     }
 
-    private Transaction CreateTransaction(string senderId, string receiverId, int currencyId,
-        string whoCreatedTransaction,
+    private Transaction CreateTransaction(Guid senderId, Guid receiverId, int currencyId,
+        Guid whoCreatedTransaction,
         decimal amount, DateTime transactionDateTime, TransactionStatus transactionStatus,
         Transaction? prevSenderTransaction,
         Transaction? prevReceiverTransaction)

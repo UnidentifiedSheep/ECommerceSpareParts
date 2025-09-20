@@ -20,8 +20,8 @@ public class EditTransactionTests : IAsyncLifetime
     private readonly IMediator _mediator;
 
     private Currency _currency = null!;
-    private AspNetUser _receiver = null!;
-    private AspNetUser _sender = null!;
+    private User _receiver = null!;
+    private User _sender = null!;
     private List<Transaction> _transactions = null!;
 
     public EditTransactionTests(CombinedContainerFixture fixture)
@@ -34,12 +34,12 @@ public class EditTransactionTests : IAsyncLifetime
 
     public async Task InitializeAsync()
     {
-        await _context.CreateSystemUser();
+        var systemId = await _mediator.AddMockUser();
         await _context.AddMockCurrencies();
         _currency = await _context.Currencies.AsNoTracking().FirstAsync();
-        _sender = await _context.AspNetUsers.AsNoTracking().FirstAsync(x => x.Id == "SYSTEM");
+        _sender = await _context.Users.AsNoTracking().FirstAsync(x => x.Id == systemId);
         var mockUserId = await _mediator.AddMockUser();
-        _receiver = await _context.AspNetUsers.AsNoTracking().FirstAsync(x => x.Id == mockUserId);
+        _receiver = await _context.Users.AsNoTracking().FirstAsync(x => x.Id == mockUserId);
 
         for (var i = 0; i < 10; i++)
             await _mediator.AddMockTransaction(_sender.Id, _receiver.Id, _sender.Id);
@@ -103,15 +103,15 @@ public class EditTransactionTests : IAsyncLifetime
         var balancesDict = new Dictionary<string, decimal>();
         foreach (var tr in transactionsAfter)
         {
-            if (!balancesDict.TryGetValue(tr.SenderId + tr.CurrencyId, out var senderBalance))
+            if (!balancesDict.TryGetValue(tr.SenderId.ToString() + tr.CurrencyId, out var senderBalance))
                 senderBalance = 0;
-            if (!balancesDict.TryGetValue(tr.ReceiverId + tr.CurrencyId, out var receiverBalance))
+            if (!balancesDict.TryGetValue(tr.ReceiverId.ToString() + tr.CurrencyId, out var receiverBalance))
                 receiverBalance = 0;
             var amount = tr.TransactionSum;
-            balancesDict[tr.SenderId + tr.CurrencyId] = senderBalance - amount;
-            balancesDict[tr.ReceiverId + tr.CurrencyId] = receiverBalance + amount;
-            Assert.Equal(balancesDict[tr.SenderId + tr.CurrencyId], tr.SenderBalanceAfterTransaction);
-            Assert.Equal(balancesDict[tr.ReceiverId + tr.CurrencyId], tr.ReceiverBalanceAfterTransaction);
+            balancesDict[tr.SenderId.ToString() + tr.CurrencyId] = senderBalance - amount;
+            balancesDict[tr.ReceiverId.ToString() + tr.CurrencyId] = receiverBalance + amount;
+            Assert.Equal(balancesDict[tr.SenderId.ToString() + tr.CurrencyId], tr.SenderBalanceAfterTransaction);
+            Assert.Equal(balancesDict[tr.ReceiverId.ToString() + tr.CurrencyId], tr.ReceiverBalanceAfterTransaction);
         }
 
         Assert.False(updatedTransaction.IsDeleted);

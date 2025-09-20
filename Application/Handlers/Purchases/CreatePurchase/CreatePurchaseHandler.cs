@@ -14,16 +14,16 @@ public record CreatePurchaseCommand(
     IEnumerable<NewPurchaseContentDto> Content,
     int CurrencyId,
     string? Comment,
-    string CreatedUserId,
+    Guid CreatedUserId,
     string TransactionId,
     string StorageName,
-    string SupplierId,
+    Guid SupplierId,
     DateTime PurchaseDateTime) : ICommand<CreatePurchaseResult>;
 
 public record CreatePurchaseResult(Purchase Purchase);
 
 public class CreatePurchaseHandler(
-    IUsersRepository usersRepository,
+    IUserRepository usersRepository,
     ICurrencyRepository currencyRepository,
     IBalanceRepository balanceRepository,
     IStoragesRepository storagesRepository,
@@ -60,7 +60,7 @@ public class CreatePurchaseHandler(
         return new CreatePurchaseResult(purchaseModel);
     }
 
-    private async Task ValidateData(IEnumerable<string> userIds, int currencyId, string storageName,
+    private async Task ValidateData(IEnumerable<Guid> userIds, int currencyId, string storageName,
         string transactionId, IEnumerable<int> articleIds, CancellationToken cancellationToken = default)
     {
         await usersRepository.EnsureUsersExists(userIds, cancellationToken);

@@ -10,7 +10,7 @@ public record GetPurchasesQuery(
     DateTime RangeStartDate,
     DateTime RangeEndDate,
     PaginationModel Pagination,
-    string? SupplierId,
+    Guid? SupplierId,
     int? CurrencyId,
     string? SortBy,
     string? SearchTerm) : IQuery<GetPurchasesResult>;

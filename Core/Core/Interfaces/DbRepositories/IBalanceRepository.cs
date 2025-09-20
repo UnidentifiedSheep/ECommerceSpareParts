@@ -6,17 +6,17 @@ public interface IBalanceRepository
 {
     Task<Transaction?> GetTransactionByIdAsync(string id, bool track = true, CancellationToken ct = default);
 
-    Task<bool> TransactionExistsAsync(string senderId, string receiverId, DateTime dt, string? exceptId = null,
+    Task<bool> TransactionExistsAsync(Guid senderId, Guid receiverId, DateTime dt, string? exceptId = null,
         CancellationToken ct = default);
 
-    Task<Transaction?> GetPreviousTransactionAsync(DateTime dt, string userId, int currencyId, bool track = true,
+    Task<Transaction?> GetPreviousTransactionAsync(DateTime dt, Guid userId, int currencyId, bool track = true,
         CancellationToken ct = default);
 
-    IAsyncEnumerable<Transaction> GetAffectedTransactions(string userId, int currencyId, DateTime dt,
+    IAsyncEnumerable<Transaction> GetAffectedTransactions(Guid userId, int currencyId, DateTime dt,
         string? excludeId = null, bool track = true);
 
 
-    Task<UserBalance?> GetUserBalanceAsync(string userId, int currencyId, bool track = true,
+    Task<UserBalance?> GetUserBalanceAsync(Guid userId, int currencyId, bool track = true,
         CancellationToken ct = default);
 
 
@@ -24,7 +24,7 @@ public interface IBalanceRepository
         CancellationToken ct = default);
 
     Task<IEnumerable<Transaction>> GetTransactionsAsync(DateTime rangeStart, DateTime rangeEnd,
-        int? currencyId, string? senderId, string? receiverId, int page, int viewCount, bool track = true,
+        int? currencyId, Guid? senderId, Guid? receiverId, int page, int viewCount, bool track = true,
         CancellationToken ct = default);
 
     Task<bool> TransactionExistsAsync(string transactionId, CancellationToken ct = default);

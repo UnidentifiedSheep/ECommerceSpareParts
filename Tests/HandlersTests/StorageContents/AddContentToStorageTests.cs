@@ -27,7 +27,7 @@ public class AddContentToStorageTests : IAsyncLifetime
 
     private Currency _currency = null!;
     private Storage _storage = null!;
-    private AspNetUser _user = null!;
+    private User _user = null!;
 
     public AddContentToStorageTests(CombinedContainerFixture fixture)
     {
@@ -47,7 +47,7 @@ public class AddContentToStorageTests : IAsyncLifetime
         _currency = await _context.Currencies.FirstAsync();
         _storage = await _context.Storages.FirstAsync();
         _articles = await _context.Articles.ToListAsync();
-        _user = await _context.AspNetUsers.FirstAsync();
+        _user = await _context.Users.FirstAsync();
     }
 
     public async Task DisposeAsync()
@@ -128,7 +128,7 @@ public class AddContentToStorageTests : IAsyncLifetime
         var storageContent = MockData.MockData
             .CreateNewStorageContentDto(articleIds, [_currency.Id], 10)
             .ToList();
-        var command = new AddContentCommand(storageContent, _storage.Name, Global.Faker.Lorem.Letter(10),
+        var command = new AddContentCommand(storageContent, _storage.Name, Global.Faker.Random.Guid(),
             StorageMovementType.StorageContentAddition);
         await Assert.ThrowsAsync<UserNotFoundException>(async () => await _mediator.Send(command));
     }

@@ -4,6 +4,7 @@ using Core.Dtos.Amw.Producers;
 using Core.Dtos.Amw.Storage;
 using Core.Dtos.Amw.Users;
 using Core.Dtos.Services.Articles;
+using Core.Dtos.Users;
 using Core.Entities;
 using Core.Enums;
 
@@ -37,37 +38,6 @@ public static class MockData
         return f.Generate(count);
     }
 
-    public static List<AspNetUser> CreateNewUser(int count)
-    {
-        var f = new Faker<AspNetUser>(Locale)
-            .RuleFor(x => x.Email, f => f.Person.Email)
-            .RuleFor(x => x.NormalizedEmail, f => f.Person.Email.ToUpperInvariant())
-            .RuleFor(x => x.PhoneNumber, f => f.Person.Phone)
-            .RuleFor(x => x.Name, f => f.Person.FirstName)
-            .RuleFor(x => x.Surname, f => f.Person.LastName)
-            .RuleFor(x => x.UserName, f => f.Person.UserName)
-            .RuleFor(x => x.Id, f => f.Person.UserName)
-            .RuleFor(x => x.NormalizedUserName, f => f.Person.UserName.ToUpperInvariant())
-            .RuleFor(x => x.PhoneNumberConfirmed, f => f.Random.Bool())
-            .RuleFor(x => x.EmailConfirmed, f => f.Random.Bool())
-            .RuleFor(x => x.LockoutEnabled, f => f.Random.Bool())
-            .RuleFor(x => x.TwoFactorEnabled, f => f.Random.Bool());
-        return f.Generate(count);
-    }
-
-    public static NewUserDto GetUserDto()
-    {
-        var f = new Faker<NewUserDto>(Locale)
-            .RuleFor(x => x.Email, f => f.Person.Email)
-            .RuleFor(x => x.UserName, f => f.Person.UserName)
-            .RuleFor(x => x.PhoneNumber, f => "+7" + f.Person.Phone)
-            .RuleFor(x => x.Name, f => f.Person.FirstName)
-            .RuleFor(x => x.Surname, f => f.Person.LastName)
-            .RuleFor(x => x.Description, f => f.Lorem.Sentence())
-            .RuleFor(x => x.Roles, ["Member"]);
-        return f.Generate();
-    }
-
     public static List<Storage> CreateNewStorage(int count)
     {
         var f = new Faker<Storage>(Locale)
@@ -75,6 +45,15 @@ public static class MockData
             .RuleFor(x => x.Description, f => Random.Shared.Next(1, 2) == 1 ? f.Commerce.ProductDescription() : null)
             .RuleFor(x => x.Name, f => f.Company.CompanyName());
         return f.Generate(count);
+    }
+
+    public static UserInfoDto CreateUserInfoDto()
+    {
+        var f = new Faker<UserInfoDto>(Locale)
+            .RuleFor(x => x.Name, f => f.Person.FirstName)
+            .RuleFor(x => x.Surname, f => f.Person.LastName)
+            .RuleFor(x => x.Description, f => f.Person.Email);
+        return f.Generate(1).First();
     }
 
     public static List<StorageContent> CreateStorageContent(IEnumerable<int> availableArticlesIds,
@@ -134,8 +113,8 @@ public static class MockData
         return f.Generate(count);
     }
 
-    public static List<Transaction> CreateTransaction(IEnumerable<string> receiverIds, IEnumerable<string> senderIds,
-        string whoMade, IEnumerable<int> currencyIds, int count)
+    public static List<Transaction> CreateTransaction(IEnumerable<Guid> receiverIds, IEnumerable<Guid> senderIds,
+        Guid whoMade, IEnumerable<int> currencyIds, int count)
     {
         var r = receiverIds.ToList();
         var balanceCounter = new Dictionary<string, decimal>();
@@ -144,7 +123,7 @@ public static class MockData
             .RuleFor(x => x.SenderId, f => f.PickRandom(senderIds))
             .RuleFor(x => x.ReceiverId, (f, t) =>
             {
-                string receiver;
+                Guid receiver;
                 do
                 {
                     receiver = f.PickRandom(r);
@@ -162,23 +141,22 @@ public static class MockData
 
         foreach (var item in tr.OrderBy(x => x.TransactionDatetime))
         {
-            if (!balanceCounter.TryGetValue(item.SenderId + item.CurrencyId, out var senderBalance))
+            if (!balanceCounter.TryGetValue(item.SenderId.ToString() + item.CurrencyId, out var senderBalance))
                 senderBalance = 0;
-            if (!balanceCounter.TryGetValue(item.ReceiverId + item.CurrencyId, out var receiverBalance))
+            if (!balanceCounter.TryGetValue(item.ReceiverId.ToString() + item.CurrencyId, out var receiverBalance))
                 receiverBalance = 0;
             item.SenderBalanceAfterTransaction = senderBalance;
             item.ReceiverBalanceAfterTransaction = receiverBalance;
             item.SenderBalanceAfterTransaction -= item.TransactionSum;
             item.ReceiverBalanceAfterTransaction += item.TransactionSum;
-            balanceCounter[item.SenderId + item.CurrencyId] = item.SenderBalanceAfterTransaction;
-            balanceCounter[item.ReceiverId + item.CurrencyId] = item.ReceiverBalanceAfterTransaction;
+            balanceCounter[item.SenderId.ToString() + item.CurrencyId] = item.SenderBalanceAfterTransaction;
+            balanceCounter[item.ReceiverId.ToString() + item.CurrencyId] = item.ReceiverBalanceAfterTransaction;
         }
 
         return tr;
     }
 
-    public static Sale CreateSale(string transactionId, string buyerId, string whoMade, string storageName,
-        int currencyId)
+    public static Sale CreateSale(string transactionId, Guid buyerId, Guid whoMade, string storageName, int currencyId)
     {
         var f = new Faker<Sale>(Locale)
             .RuleFor(x => x.Comment, f => f.Random.Int(1, 100) < 50 ? f.Lorem.Letter(100) : null)

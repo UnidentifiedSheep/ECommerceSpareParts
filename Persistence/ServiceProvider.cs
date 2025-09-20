@@ -13,10 +13,15 @@ public static class ServiceProvider
     public static IServiceCollection AddPersistenceLayer(this IServiceCollection collection, string connectionString)
     {
         collection.AddDbContext<DContext>(options => options.UseNpgsql(connectionString));
-        collection.AddDbContext<IdentityContext>(options => options.UseNpgsql(connectionString));
 
         collection.AddScoped<IUserVehicleRepository, UserVehicleRepository>();
-        collection.AddScoped<IUsersRepository, UsersRepository>();
+        collection.AddScoped<IUserRepository, UserRepository>();
+        collection.AddScoped<IRoleRepository, RoleRepository>();
+        collection.AddScoped<IUserPhoneRepository, UserPhoneRepository>();
+        collection.AddScoped<IUserEmailRepository, UserEmailRepository>();
+        collection.AddScoped<IUserTokenRepository, UserTokenRepository>();
+        collection.AddScoped<IUserRoleRepository, UserRoleRepository>();
+        collection.AddScoped<IRoleRepository, RoleRepository>();
         collection.AddScoped<IUserEmailRepository, UserEmailRepository>();
         collection.AddScoped<IStoragesRepository, StoragesRepository>();
         collection.AddScoped<IStorageContentRepository, StorageContentRepository>();

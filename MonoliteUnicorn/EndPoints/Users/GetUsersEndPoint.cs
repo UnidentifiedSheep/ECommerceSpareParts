@@ -11,7 +11,7 @@ using Microsoft.AspNetCore.Mvc;
 namespace MonoliteUnicorn.EndPoints.Users;
 
 public record GetUsersRequest(
-    [FromQuery(Name = "id")] string? Id,
+    [FromQuery(Name = "id")] Guid? Id,
     [FromQuery(Name = "name")] string? Name,
     [FromQuery(Name = "surname")] string? Surname,
     [FromQuery(Name = "email")] string? Email,
@@ -40,7 +40,7 @@ public class GetUsersEndPoint : ICarterModule
                         request.SimilarityLevel,
                         userId, request.Name, request.Surname, request.Email, request.Phone, request.UserName,
                         request.Id,
-                        request.Description, request.IsSupplier, GeneralSearchStrategy.Similarity);
+                        request.Description, request.IsSupplier, Enum.Parse<GeneralSearchStrategy>(request.SearchMethod));
                     var result = await sender.Send(query, token);
                     var response = result.Adapt<GetUsersResponse>();
                     return Results.Ok(response);

@@ -5,7 +5,9 @@ using Application.Handlers.Sales.CreateSale;
 using Application.Handlers.StorageContents.AddContent;
 using Application.Handlers.Storages.CreateStorage;
 using Application.Handlers.Users.CreateUser;
+using Bogus;
 using Core.Dtos.Amw.Sales;
+using Core.Dtos.Emails;
 using Core.Entities;
 using Core.Enums;
 using Core.Models;
@@ -36,18 +38,28 @@ public static class MockMediatr
         await mediator.Send(articleCommand);
     }
 
-    public static async Task<string> AddMockUser(this IMediator mediator)
+    public static async Task<Guid> AddMockUser(this IMediator mediator)
     {
-        var user = GetUserDto();
-        var command = new CreateUserCommand(user);
+        var faker = new Faker(Global.Locale);
+        var email = new EmailDto
+        {
+            Email = faker.Person.Email,
+            IsConfirmed = false,
+            IsPrimary = true,
+            Type = EmailType.Personal
+        };
+        var userInfo = CreateUserInfoDto();
+        var command = new CreateUserCommand(faker.Person.UserName, 
+            faker.Lorem.Letter(10), userInfo,[email], [], []);
+
+
 
         var result = await mediator.Send(command);
         return result.UserId;
     }
 
-    public static async Task<Transaction> AddMockTransaction(this IMediator mediator, string sender, string receiver,
-        string whoCreated,
-        decimal amount = 100, DateTime? when = null)
+    public static async Task<Transaction> AddMockTransaction(this IMediator mediator, Guid sender, Guid receiver,
+        Guid whoCreated, decimal amount = 100, DateTime? when = null)
     {
         var command = new CreateTransactionCommand(
             sender,
@@ -70,8 +82,7 @@ public static class MockMediatr
     }
 
     public static async Task AddMockStorageContents(this IMediator mediator, IEnumerable<int> articleIds,
-        int currencyId,
-        string storageName, string userId, int count = 20)
+        int currencyId, string storageName, Guid userId, int count = 20)
     {
         var dtoList = CreateNewStorageContentDto(articleIds, [currencyId], count)
             .ToList();
@@ -82,7 +93,7 @@ public static class MockMediatr
 
     public static async Task AddMockSale(this IMediator mediator, IEnumerable<StorageContent> storageContents,
         int currencyId,
-        string userId, string transactionId, string storageName, DateTime? when = null)
+        Guid userId, string transactionId, string storageName, DateTime? when = null)
     {
         var saleContent = new List<NewSaleContentDto>();
         var storageContentValues = new List<PrevAndNewValue<StorageContent>>();

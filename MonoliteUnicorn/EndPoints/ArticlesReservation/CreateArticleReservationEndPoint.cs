@@ -15,8 +15,8 @@ public class CreateArticleReservationEndPoint : ICarterModule
         app.MapPost("/articles/reservations", async (ISender sender, ClaimsPrincipal claims,
                 CreateArticleReservationQuery query, CancellationToken cancellationToken) =>
             {
-                var userId = claims.FindFirstValue(ClaimTypes.NameIdentifier);
-                if (userId == null) return Results.Unauthorized();
+                if (!Guid.TryParse(claims.FindFirstValue(ClaimTypes.NameIdentifier), out var userId)) 
+                    return Results.Unauthorized();
                 var command = new CreateArticleReservationCommand(query.Reservations, userId);
                 await sender.Send(command, cancellationToken);
                 return Results.NoContent();

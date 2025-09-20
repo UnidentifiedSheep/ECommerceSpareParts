@@ -19,7 +19,7 @@ namespace Application.Handlers.StorageContents.EditContent;
 [Transactional(IsolationLevel.Serializable, 20, 2)]
 public record EditStorageContentCommand(
     Dictionary<int, (PatchStorageContentDto value, string concurrencyCode)> EditedFields,
-    string UserId) : ICommand;
+    Guid UserId) : ICommand;
 
 public class EditStorageContentHandler(
     IStorageContentRepository storageContentRepository,
@@ -30,7 +30,7 @@ public class EditStorageContentHandler(
     IArticlesService articlesService,
     IStoragesRepository storagesRepository,
     ICurrencyRepository currencyRepository,
-    IUsersRepository usersRepository) : ICommandHandler<EditStorageContentCommand>
+    IUserRepository usersRepository) : ICommandHandler<EditStorageContentCommand>
 {
     public async Task<Unit> Handle(EditStorageContentCommand request, CancellationToken cancellationToken)
     {
@@ -75,7 +75,7 @@ public class EditStorageContentHandler(
     }
 
     private (int diff, StorageMovement? movement) CalculateDiffAndMovement(StorageContent content,
-        PatchStorageContentDto patch, string userId)
+        PatchStorageContentDto patch, Guid userId)
     {
         if (!patch.Count.IsSet || patch.Count.Value == content.Count)
             return (0, null);
@@ -100,7 +100,7 @@ public class EditStorageContentHandler(
         return storageContents;
     }
 
-    private async Task ValidateData(IEnumerable<PatchStorageContentDto> values, string userId,
+    private async Task ValidateData(IEnumerable<PatchStorageContentDto> values, Guid userId,
         CancellationToken cancellationToken = default)
     {
         var currencyIds = new HashSet<int>();

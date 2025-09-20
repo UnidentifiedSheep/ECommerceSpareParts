@@ -25,7 +25,7 @@ public record EditFullSaleCommand(
     IEnumerable<EditSaleContentDto> EditedContent,
     string SaleId,
     int CurrencyId,
-    string UpdatedUserId,
+    Guid UpdatedUserId,
     DateTime SaleDateTime,
     string? Comment,
     bool SellFromOtherStorages) : ICommand;
@@ -149,14 +149,14 @@ public class EditFullSaleHandler(IMediator mediator, ISaleRepository saleReposit
     }
 
     private async Task RestoreContentToStorage(IEnumerable<RestoreContentItem> details,
-        string whoUpdated, CancellationToken cancellationToken = default)
+        Guid whoUpdated, CancellationToken cancellationToken = default)
     {
         var command = new RestoreContentCommand(details, StorageMovementType.SaleEditing, whoUpdated);
         await mediator.Send(command, cancellationToken);
     }
 
     private async Task<IEnumerable<PrevAndNewValue<StorageContent>>> RemoveContentFromStorage(
-        Dictionary<int, int> content, string? storageName, bool takeFromOtherStorages, string whoMoved,
+        Dictionary<int, int> content, string? storageName, bool takeFromOtherStorages, Guid whoMoved,
         CancellationToken cancellationToken = default)
     {
         var command = new RemoveContentCommand(content, whoMoved, storageName, takeFromOtherStorages,
@@ -174,7 +174,7 @@ public class EditFullSaleHandler(IMediator mediator, ISaleRepository saleReposit
 
     private async Task EditSale(List<EditSaleContentDto> editedContent,
         IEnumerable<PrevAndNewValue<StorageContent>> storageContents,
-        IEnumerable<(SaleContentDetail, int)> contentLessCount, string saleId, int currencyId, string whoUpdated,
+        IEnumerable<(SaleContentDetail, int)> contentLessCount, string saleId, int currencyId, Guid whoUpdated,
         DateTime saleDateTime,
         string? comment, CancellationToken cancellationToken = default)
     {
@@ -182,12 +182,11 @@ public class EditFullSaleHandler(IMediator mediator, ISaleRepository saleReposit
             .GroupBy(x => x.Item1.SaleContentId, x => x.Item1)
             .ToDictionary(x => x.Key, x => x.ToList());
         var command = new EditSaleCommand(editedContent, storageContents, movedToStorage, saleId, currencyId,
-            whoUpdated,
-            saleDateTime, comment);
+            whoUpdated, saleDateTime, comment);
         await mediator.Send(command, cancellationToken);
     }
 
-    private async Task SubtractFromReservation(Dictionary<int, int> graterCount, string whoUpdated, string userId,
+    private async Task SubtractFromReservation(Dictionary<int, int> graterCount, Guid whoUpdated, Guid userId,
         CancellationToken cancellationToken = default)
     {
         var command = new SubtractCountFromReservationsCommand(userId, whoUpdated, graterCount);

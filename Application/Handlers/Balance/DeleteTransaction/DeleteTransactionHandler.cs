@@ -13,12 +13,12 @@ using TransactionStatus = Core.Enums.TransactionStatus;
 namespace Application.Handlers.Balance.DeleteTransaction;
 
 [Transactional(IsolationLevel.Serializable, 20, 3)]
-public record DeleteTransactionCommand(string TransactionId, string WhoDeleteUserId, bool IsSystem = false)
+public record DeleteTransactionCommand(string TransactionId, Guid WhoDeleteUserId, bool IsSystem = false)
     : ICommand<Unit>;
 
 public class DeleteTransactionHandler(
     IBalanceRepository balanceRepository,
-    IUsersRepository usersRepository,
+    IUserRepository usersRepository,
     IUnitOfWork unitOfWork,
     IBalanceService balanceService) : ICommandHandler<DeleteTransactionCommand, Unit>
 {
@@ -46,7 +46,7 @@ public class DeleteTransactionHandler(
         return Unit.Value;
     }
 
-    private async Task EnsureDataIsValid(Transaction transaction, string whoDeletedUserId, bool isSystem,
+    private async Task EnsureDataIsValid(Transaction transaction, Guid whoDeletedUserId, bool isSystem,
         CancellationToken ct = default)
     {
         if (transaction.IsDeleted)

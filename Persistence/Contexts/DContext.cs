@@ -30,18 +30,6 @@ public partial class DContext : DbContext
 
     public virtual DbSet<ArticlesPair> ArticlesPairs { get; set; }
 
-    public virtual DbSet<AspNetRole> AspNetRoles { get; set; }
-
-    public virtual DbSet<AspNetRoleClaim> AspNetRoleClaims { get; set; }
-
-    public virtual DbSet<AspNetUser> AspNetUsers { get; set; }
-
-    public virtual DbSet<AspNetUserClaim> AspNetUserClaims { get; set; }
-
-    public virtual DbSet<AspNetUserLogin> AspNetUserLogins { get; set; }
-
-    public virtual DbSet<AspNetUserToken> AspNetUserTokens { get; set; }
-
     public virtual DbSet<BuySellPrice> BuySellPrices { get; set; }
 
     public virtual DbSet<Cart> Carts { get; set; }
@@ -70,6 +58,8 @@ public partial class DContext : DbContext
 
     public virtual DbSet<PurchaseContent> PurchaseContents { get; set; }
 
+    public virtual DbSet<Role> Roles { get; set; }
+
     public virtual DbSet<Sale> Sales { get; set; }
 
     public virtual DbSet<SaleContent> SaleContents { get; set; }
@@ -88,16 +78,26 @@ public partial class DContext : DbContext
 
     public virtual DbSet<TransactionVersion> TransactionVersions { get; set; }
 
+    public virtual DbSet<User> Users { get; set; }
+
     public virtual DbSet<UserBalance> UserBalances { get; set; }
 
     public virtual DbSet<UserDiscount> UserDiscounts { get; set; }
 
-    public virtual DbSet<UserMail> UserMails { get; set; }
+    public virtual DbSet<UserEmail> UserEmails { get; set; }
+    
+    public virtual DbSet<UserInfo> UserInfos { get; set; }
+
+    public virtual DbSet<UserPhone> UserPhones { get; set; }
+
+    public virtual DbSet<UserRole> UserRoles { get; set; }
 
     public virtual DbSet<UserSearchHistory> UserSearchHistories { get; set; }
 
+    public virtual DbSet<UserToken> UserTokens { get; set; }
+
     public virtual DbSet<UserVehicle> UserVehicles { get; set; }
-    
+
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         modelBuilder
@@ -285,7 +285,7 @@ public partial class DContext : DbContext
 
             entity.HasOne(d => d.WhoProposedNavigation).WithMany(p => p.ArticleSupplierBuyInfos)
                 .HasForeignKey(d => d.WhoProposed)
-                .HasConstraintName("article_supplier_buy_info_aspnetusers_id_fk");
+                .HasConstraintName("article_supplier_buy_info_users_id_fk");
         });
 
         modelBuilder.Entity<ArticlesContent>(entity =>
@@ -332,96 +332,6 @@ public partial class DContext : DbContext
                 .HasForeignKey(d => d.ArticleRight)
                 .OnDelete(DeleteBehavior.ClientSetNull)
                 .HasConstraintName("articles_pair_articles_id_fk_2");
-        });
-
-        modelBuilder.Entity<AspNetRole>(entity =>
-        {
-            entity.HasIndex(e => e.NormalizedName, "RoleNameIndex").IsUnique();
-
-            entity.Property(e => e.Name).HasMaxLength(256);
-            entity.Property(e => e.NormalizedName).HasMaxLength(256);
-        });
-
-        modelBuilder.Entity<AspNetRoleClaim>(entity =>
-        {
-            entity.HasIndex(e => e.RoleId, "IX_AspNetRoleClaims_RoleId");
-
-            entity.HasOne(d => d.Role).WithMany(p => p.AspNetRoleClaims).HasForeignKey(d => d.RoleId);
-        });
-
-        modelBuilder.Entity<AspNetUser>(entity =>
-        {
-            entity.HasIndex(e => e.NormalizedEmail, "EmailIndex");
-
-            entity.HasIndex(e => e.NormalizedUserName, "UserNameIndex").IsUnique();
-
-            entity.HasIndex(e => e.Description, "aspnetusers_description_index")
-                .HasMethod("gin")
-                .HasOperators(new[] { "gin_trgm_ops" });
-
-            entity.HasIndex(e => e.IsSupplier, "aspnetusers_issupplier_index");
-
-            entity.HasIndex(e => e.Name, "aspnetusers_name_index")
-                .HasMethod("gin")
-                .HasOperators(new[] { "gin_trgm_ops" });
-
-            entity.HasIndex(e => e.NormalizedEmail, "aspnetusers_normalizedemail_index")
-                .HasMethod("gin")
-                .HasOperators(new[] { "gin_trgm_ops" });
-
-            entity.HasIndex(e => e.PhoneNumber, "aspnetusers_phonenumber_index")
-                .HasMethod("gin")
-                .HasOperators(new[] { "gin_trgm_ops" });
-
-            entity.HasIndex(e => e.Surname, "aspnetusers_surname_index")
-                .HasMethod("gin")
-                .HasOperators(new[] { "gin_trgm_ops" });
-
-            entity.HasIndex(e => e.NormalizedUserName, "aspnetusers_username_index")
-                .HasMethod("gin")
-                .HasOperators(new[] { "gin_trgm_ops" });
-
-            entity.Property(e => e.Description).HasMaxLength(256);
-            entity.Property(e => e.Email).HasMaxLength(256);
-            entity.Property(e => e.IsSupplier).HasDefaultValue(false);
-            entity.Property(e => e.NormalizedEmail).HasMaxLength(256);
-            entity.Property(e => e.NormalizedUserName).HasMaxLength(256);
-            entity.Property(e => e.UserName).HasMaxLength(256);
-
-            entity.HasMany(d => d.Roles).WithMany(p => p.Users)
-                .UsingEntity<Dictionary<string, object>>(
-                    "AspNetUserRole",
-                    r => r.HasOne<AspNetRole>().WithMany().HasForeignKey("RoleId"),
-                    l => l.HasOne<AspNetUser>().WithMany().HasForeignKey("UserId"),
-                    j =>
-                    {
-                        j.HasKey("UserId", "RoleId");
-                        j.ToTable("AspNetUserRoles");
-                        j.HasIndex(new[] { "RoleId" }, "IX_AspNetUserRoles_RoleId");
-                    });
-        });
-
-        modelBuilder.Entity<AspNetUserClaim>(entity =>
-        {
-            entity.HasIndex(e => e.UserId, "IX_AspNetUserClaims_UserId");
-
-            entity.HasOne(d => d.User).WithMany(p => p.AspNetUserClaims).HasForeignKey(d => d.UserId);
-        });
-
-        modelBuilder.Entity<AspNetUserLogin>(entity =>
-        {
-            entity.HasKey(e => new { e.LoginProvider, e.ProviderKey });
-
-            entity.HasIndex(e => e.UserId, "IX_AspNetUserLogins_UserId");
-
-            entity.HasOne(d => d.User).WithMany(p => p.AspNetUserLogins).HasForeignKey(d => d.UserId);
-        });
-
-        modelBuilder.Entity<AspNetUserToken>(entity =>
-        {
-            entity.HasKey(e => new { e.UserId, e.LoginProvider, e.Name });
-
-            entity.HasOne(d => d.User).WithMany(p => p.AspNetUserTokens).HasForeignKey(d => d.UserId);
         });
 
         modelBuilder.Entity<BuySellPrice>(entity =>
@@ -479,7 +389,7 @@ public partial class DContext : DbContext
 
             entity.HasOne(d => d.User).WithMany(p => p.Carts)
                 .HasForeignKey(d => d.UserId)
-                .HasConstraintName("cart_aspnetusers_id_fk");
+                .HasConstraintName("cart_users_id_fk");
         });
 
         modelBuilder.Entity<Category>(entity =>
@@ -758,7 +668,7 @@ public partial class DContext : DbContext
             entity.HasOne(d => d.CreatedUser).WithMany(p => p.PurchaseCreatedUsers)
                 .HasForeignKey(d => d.CreatedUserId)
                 .OnDelete(DeleteBehavior.Restrict)
-                .HasConstraintName("purchase_aspnetusers_id_fk");
+                .HasConstraintName("purchase_users_id_fk");
 
             entity.HasOne(d => d.Currency).WithMany(p => p.Purchases)
                 .HasForeignKey(d => d.CurrencyId)
@@ -773,7 +683,7 @@ public partial class DContext : DbContext
             entity.HasOne(d => d.Supplier).WithMany(p => p.PurchaseSuppliers)
                 .HasForeignKey(d => d.SupplierId)
                 .OnDelete(DeleteBehavior.Restrict)
-                .HasConstraintName("purchase_aspnetusers_id_fk_2");
+                .HasConstraintName("purchase_users_id_fk_2");
 
             entity.HasOne(d => d.Transaction).WithMany(p => p.Purchases)
                 .HasForeignKey(d => d.TransactionId)
@@ -783,7 +693,7 @@ public partial class DContext : DbContext
             entity.HasOne(d => d.UpdatedUser).WithMany(p => p.PurchaseUpdatedUsers)
                 .HasForeignKey(d => d.UpdatedUserId)
                 .OnDelete(DeleteBehavior.Restrict)
-                .HasConstraintName("purchase_aspnetusers_id_fk_3");
+                .HasConstraintName("purchase_users_id_fk_3");
         });
 
         modelBuilder.Entity<PurchaseContent>(entity =>
@@ -826,6 +736,37 @@ public partial class DContext : DbContext
                 .HasForeignKey(d => d.StorageContentId)
                 .OnDelete(DeleteBehavior.SetNull)
                 .HasConstraintName("purchase_content_storage_content_id_fk");
+        });
+
+        modelBuilder.Entity<Role>(entity =>
+        {
+            entity.HasKey(e => e.Id).HasName("roles_pk");
+
+            entity.ToTable("roles", "auth");
+
+            entity.HasIndex(e => e.NormalizedName, "roles_normalized_name_uindex").IsUnique();
+
+            entity.Property(e => e.Id)
+                .HasDefaultValueSql("gen_random_uuid()")
+                .HasColumnName("id");
+            entity.Property(e => e.CreatedAt)
+                .HasDefaultValueSql("now()")
+                .HasColumnName("created_at");
+            entity.Property(e => e.Description)
+                .HasMaxLength(255)
+                .HasColumnName("description");
+            entity.Property(e => e.IsSystem)
+                .HasDefaultValue(false)
+                .HasColumnName("is_system");
+            entity.Property(e => e.Name)
+                .HasMaxLength(24)
+                .HasColumnName("name");
+            entity.Property(e => e.NormalizedName)
+                .HasMaxLength(24)
+                .HasColumnName("normalized_name");
+            entity.Property(e => e.UpdatedAt)
+                .HasDefaultValueSql("now()")
+                .HasColumnName("updated_at");
         });
 
         modelBuilder.Entity<Sale>(entity =>
@@ -878,12 +819,12 @@ public partial class DContext : DbContext
             entity.HasOne(d => d.Buyer).WithMany(p => p.SaleBuyers)
                 .HasForeignKey(d => d.BuyerId)
                 .OnDelete(DeleteBehavior.Restrict)
-                .HasConstraintName("sale_aspnetusers_id_fk_2");
+                .HasConstraintName("sale_users_id_fk");
 
             entity.HasOne(d => d.CreatedUser).WithMany(p => p.SaleCreatedUsers)
                 .HasForeignKey(d => d.CreatedUserId)
                 .OnDelete(DeleteBehavior.Restrict)
-                .HasConstraintName("sale_aspnetusers_id_fk");
+                .HasConstraintName("sale_users_id_fk_2");
 
             entity.HasOne(d => d.Currency).WithMany(p => p.Sales)
                 .HasForeignKey(d => d.CurrencyId)
@@ -903,7 +844,7 @@ public partial class DContext : DbContext
             entity.HasOne(d => d.UpdatedUser).WithMany(p => p.SaleUpdatedUsers)
                 .HasForeignKey(d => d.UpdatedUserId)
                 .OnDelete(DeleteBehavior.Restrict)
-                .HasConstraintName("sale_aspnetusers_id_fk_3");
+                .HasConstraintName("sale_users_id_fk_3");
         });
 
         modelBuilder.Entity<SaleContent>(entity =>
@@ -1127,18 +1068,16 @@ public partial class DContext : DbContext
 
             entity.HasOne(d => d.User).WithMany(p => p.StorageContentReservationUsers)
                 .HasForeignKey(d => d.UserId)
-                .OnDelete(DeleteBehavior.Restrict)
-                .HasConstraintName("storage_content_reservations_aspnetusers_id_fk");
+                .HasConstraintName("storage_content_reservations_users_id_fk");
 
             entity.HasOne(d => d.WhoCreatedNavigation).WithMany(p => p.StorageContentReservationWhoCreatedNavigations)
                 .HasForeignKey(d => d.WhoCreated)
-                .OnDelete(DeleteBehavior.Restrict)
-                .HasConstraintName("storage_content_reservations_aspnetusers_id_fk_3");
+                .HasConstraintName("storage_content_reservations_users_id_fk_3");
 
             entity.HasOne(d => d.WhoUpdatedNavigation).WithMany(p => p.StorageContentReservationWhoUpdatedNavigations)
                 .HasForeignKey(d => d.WhoUpdated)
-                .OnDelete(DeleteBehavior.Restrict)
-                .HasConstraintName("storage_content_reservations_aspnetusers_id_fk_2");
+                .OnDelete(DeleteBehavior.Cascade)
+                .HasConstraintName("storage_content_reservations_users_id_fk_2");
         });
 
         modelBuilder.Entity<StorageMovement>(entity =>
@@ -1193,7 +1132,7 @@ public partial class DContext : DbContext
             entity.HasOne(d => d.WhoMovedNavigation).WithMany(p => p.StorageMovements)
                 .HasForeignKey(d => d.WhoMoved)
                 .OnDelete(DeleteBehavior.Restrict)
-                .HasConstraintName("storage_movement_aspnetusers_id_fk");
+                .HasConstraintName("storage_movement_users_id_fk");
         });
 
         modelBuilder.Entity<Transaction>(entity =>
@@ -1264,22 +1203,22 @@ public partial class DContext : DbContext
             entity.HasOne(d => d.DeletedByNavigation).WithMany(p => p.TransactionDeletedByNavigations)
                 .HasForeignKey(d => d.DeletedBy)
                 .OnDelete(DeleteBehavior.Restrict)
-                .HasConstraintName("transactions_aspnetusers_id_fk_4");
+                .HasConstraintName("transactions_users_id_fk_4");
 
             entity.HasOne(d => d.Receiver).WithMany(p => p.TransactionReceivers)
                 .HasForeignKey(d => d.ReceiverId)
                 .OnDelete(DeleteBehavior.Restrict)
-                .HasConstraintName("transactions_aspnetusers_id_fk_2");
+                .HasConstraintName("transactions_users_id_fk_2");
 
             entity.HasOne(d => d.Sender).WithMany(p => p.TransactionSenders)
                 .HasForeignKey(d => d.SenderId)
                 .OnDelete(DeleteBehavior.Restrict)
-                .HasConstraintName("transactions_aspnetusers_id_fk");
+                .HasConstraintName("transactions_users_id_fk");
 
             entity.HasOne(d => d.WhoMadeUser).WithMany(p => p.TransactionWhoMadeUsers)
                 .HasForeignKey(d => d.WhoMadeUserId)
                 .OnDelete(DeleteBehavior.Restrict)
-                .HasConstraintName("transactions_aspnetusers_id_fk_3");
+                .HasConstraintName("transactions_users_id_fk_3");
             
             entity.HasQueryFilter(t => !t.IsDeleted);
         });
@@ -1334,16 +1273,54 @@ public partial class DContext : DbContext
             entity.HasOne(d => d.Receiver).WithMany(p => p.TransactionVersionReceivers)
                 .HasForeignKey(d => d.ReceiverId)
                 .OnDelete(DeleteBehavior.Restrict)
-                .HasConstraintName("transaction_versions_aspnetusers_id_fk");
+                .HasConstraintName("transaction_versions_users_id_fk");
 
             entity.HasOne(d => d.Sender).WithMany(p => p.TransactionVersionSenders)
                 .HasForeignKey(d => d.SenderId)
                 .OnDelete(DeleteBehavior.Restrict)
-                .HasConstraintName("transaction_versions_aspnetusers_id_fk_2");
+                .HasConstraintName("transaction_versions_users_id_fk_2");
 
             entity.HasOne(d => d.Transaction).WithMany(p => p.TransactionVersions)
                 .HasForeignKey(d => d.TransactionId)
                 .HasConstraintName("transaction_versions_transactions_id_fk");
+        });
+
+        modelBuilder.Entity<User>(entity =>
+        {
+            entity.HasKey(e => e.Id).HasName("users_pk");
+
+            entity.ToTable("users", "auth");
+
+            entity.HasIndex(e => e.NormalizedUserName, "users_normalized_user_name_index")
+                .HasMethod("gin")
+                .HasOperators(new[] { "gin_trgm_ops" });
+
+            entity.HasIndex(e => e.NormalizedUserName, "users_normalized_user_name_uindex").IsUnique();
+
+            entity.Property(e => e.Id)
+                .HasDefaultValueSql("gen_random_uuid()")
+                .HasColumnName("id");
+            entity.Property(e => e.AccessFailedCount)
+                .HasDefaultValue(0)
+                .HasColumnName("access_failed_count");
+            entity.Property(e => e.CreatedAt)
+                .HasDefaultValueSql("now()")
+                .HasColumnName("created_at");
+            entity.Property(e => e.LastLoginAt).HasColumnName("last_login_at");
+            entity.Property(e => e.LockoutEnd).HasColumnName("lockout_end");
+            entity.Property(e => e.NormalizedUserName)
+                .HasMaxLength(36)
+                .HasColumnName("normalized_user_name");
+            entity.Property(e => e.PasswordHash).HasColumnName("password_hash");
+            entity.Property(e => e.TwoFactorEnabled)
+                .HasDefaultValue(false)
+                .HasColumnName("two_factor_enabled");
+            entity.Property(e => e.UpdatedAt)
+                .HasDefaultValueSql("now()")
+                .HasColumnName("updated_at");
+            entity.Property(e => e.UserName)
+                .HasMaxLength(36)
+                .HasColumnName("user_name");
         });
 
         modelBuilder.Entity<UserBalance>(entity =>
@@ -1375,7 +1352,7 @@ public partial class DContext : DbContext
             entity.HasOne(d => d.User).WithMany(p => p.UserBalances)
                 .HasForeignKey(d => d.UserId)
                 .OnDelete(DeleteBehavior.Restrict)
-                .HasConstraintName("table_name_aspnetusers_id_fk");
+                .HasConstraintName("user_balances_users_id_fk");
         });
 
         modelBuilder.Entity<UserDiscount>(entity =>
@@ -1384,43 +1361,164 @@ public partial class DContext : DbContext
 
             entity.ToTable("user_discounts");
 
-            entity.Property(e => e.UserId).HasColumnName("user_id");
+            entity.Property(e => e.UserId)
+                .ValueGeneratedNever()
+                .HasColumnName("user_id");
             entity.Property(e => e.Discount).HasColumnName("discount");
 
             entity.HasOne(d => d.User).WithOne(p => p.UserDiscount)
                 .HasForeignKey<UserDiscount>(d => d.UserId)
-                .HasConstraintName("user_discounts_aspnetusers_id_fk");
+                .HasConstraintName("user_discounts_users_id_fk");
         });
 
-        modelBuilder.Entity<UserMail>(entity =>
+        modelBuilder.Entity<UserEmail>(entity =>
         {
-            entity.HasKey(e => e.Email).HasName("user_mails_pk");
+            entity.HasKey(e => e.Id).HasName("user_emails_pk");
 
-            entity.ToTable("user_mails");
+            entity.ToTable("user_emails", "auth");
 
-            entity.HasIndex(e => e.LocalPart, "user_mails_local_part_index")
+            entity.HasIndex(e => e.NormalizedEmail, "user_emails_normalized_email_index")
                 .HasMethod("gin")
                 .HasOperators(new[] { "gin_trgm_ops" });
 
-            entity.HasIndex(e => e.NormalizedEmail, "user_mails_normalized_email_index")
-                .HasMethod("gin")
-                .HasOperators(new[] { "gin_trgm_ops" });
+            entity.HasIndex(e => e.NormalizedEmail, "user_emails_normalized_email_uindex").IsUnique();
 
-            entity.HasIndex(e => e.NormalizedEmail, "user_mails_normalized_email_uindex").IsUnique();
+            entity.HasIndex(e => e.UserId, "user_emails_user_id_index");
 
-            entity.HasIndex(e => e.UserId, "user_mails_user_id_index");
+            entity.HasIndex(e => new { e.UserId, e.IsPrimary }, "user_emails_user_id_is_primary_uindex")
+                .IsUnique()
+                .HasFilter("(is_primary = true)");
 
-            entity.Property(e => e.Email).HasColumnName("email");
-            entity.Property(e => e.IsVerified)
+            entity.Property(e => e.Id)
+                .HasDefaultValueSql("gen_random_uuid()")
+                .HasColumnName("id");
+            entity.Property(e => e.Confirmed)
                 .HasDefaultValue(false)
-                .HasColumnName("is_verified");
-            entity.Property(e => e.LocalPart).HasColumnName("local_part");
-            entity.Property(e => e.NormalizedEmail).HasColumnName("normalized_email");
+                .HasColumnName("confirmed");
+            entity.Property(e => e.ConfirmedAt).HasColumnName("confirmed_at");
+            entity.Property(e => e.CreatedAt)
+                .HasDefaultValueSql("now()")
+                .HasColumnName("created_at");
+            entity.Property(e => e.Email)
+                .HasMaxLength(255)
+                .HasColumnName("email");
+            entity.Property(e => e.EmailType)
+                .HasMaxLength(50)
+                .HasColumnName("email_type");
+            entity.Property(e => e.IsPrimary)
+                .HasDefaultValue(false)
+                .HasColumnName("is_primary");
+            entity.Property(e => e.NormalizedEmail)
+                .HasMaxLength(255)
+                .HasColumnName("normalized_email");
+            entity.Property(e => e.UpdatedAt)
+                .HasDefaultValueSql("now()")
+                .HasColumnName("updated_at");
             entity.Property(e => e.UserId).HasColumnName("user_id");
 
-            entity.HasOne(d => d.User).WithMany(p => p.UserMails)
+            entity.HasOne(d => d.User).WithMany(p => p.UserEmails)
                 .HasForeignKey(d => d.UserId)
-                .HasConstraintName("user_mails_aspnetusers_id_fk");
+                .HasConstraintName("user_emails_users_id_fk");
+        });
+        
+        modelBuilder.Entity<UserInfo>(entity =>
+        {
+            entity.HasKey(e => e.UserId).HasName("user_info_pk");
+
+            entity.ToTable("user_info", "auth");
+
+            entity.HasIndex(e => e.Description, "user_info_description_index")
+                .HasMethod("gin")
+                .HasOperators(new[] { "gin_trgm_ops" });
+
+            entity.HasIndex(e => e.IsSupplier, "user_info_is_supplier_index");
+
+            entity.HasIndex(e => e.Name, "user_info_name_index")
+                .HasMethod("gin")
+                .HasOperators(new[] { "gin_trgm_ops" });
+
+            entity.HasIndex(e => e.Surname, "user_info_surname_index")
+                .HasMethod("gin")
+                .HasOperators(new[] { "gin_trgm_ops" });
+
+            entity.Property(e => e.UserId)
+                .ValueGeneratedNever()
+                .HasColumnName("user_id");
+            entity.Property(e => e.Description).HasColumnName("description");
+            entity.Property(e => e.IsSupplier).HasColumnName("is_supplier");
+            entity.Property(e => e.Name).HasColumnName("name");
+            entity.Property(e => e.Surname).HasColumnName("surname");
+
+            entity.HasOne(d => d.User).WithOne(p => p.UserInfo)
+                .HasForeignKey<UserInfo>(d => d.UserId)
+                .HasConstraintName("user_info_users_id_fk");
+        });
+
+        modelBuilder.Entity<UserPhone>(entity =>
+        {
+            entity.HasKey(e => e.Id).HasName("user_phones_pk");
+
+            entity.ToTable("user_phones", "auth");
+
+            entity.HasIndex(e => e.NormalizedPhone, "user_phones_normalized_phone_uindex").IsUnique();
+
+            entity.HasIndex(e => e.UserId, "user_phones_user_id_uindex")
+                .IsUnique()
+                .HasFilter("(is_primary = true)");
+
+            entity.Property(e => e.Id)
+                .HasDefaultValueSql("gen_random_uuid()")
+                .HasColumnName("id");
+            entity.Property(e => e.Confirmed)
+                .HasDefaultValue(false)
+                .HasColumnName("confirmed");
+            entity.Property(e => e.ConfirmedAt).HasColumnName("confirmed_at");
+            entity.Property(e => e.CreatedAt)
+                .HasDefaultValueSql("now()")
+                .HasColumnName("created_at");
+            entity.Property(e => e.IsPrimary)
+                .HasDefaultValue(false)
+                .HasColumnName("is_primary");
+            entity.Property(e => e.NormalizedPhone)
+                .HasMaxLength(32)
+                .HasColumnName("normalized_phone");
+            entity.Property(e => e.PhoneNumber)
+                .HasMaxLength(32)
+                .HasColumnName("phone_number");
+            entity.Property(e => e.PhoneType)
+                .HasMaxLength(32)
+                .HasColumnName("phone_type");
+            entity.Property(e => e.UpdatedAt)
+                .HasDefaultValueSql("now()")
+                .HasColumnName("updated_at");
+            entity.Property(e => e.UserId).HasColumnName("user_id");
+
+            entity.HasOne(d => d.User).WithOne(p => p.UserPhone)
+                .HasForeignKey<UserPhone>(d => d.UserId)
+                .HasConstraintName("user_phones_user_id_fkey");
+        });
+
+        modelBuilder.Entity<UserRole>(entity =>
+        {
+            entity.HasKey(e => new { e.UserId, e.RoleId }).HasName("user_roles_pk");
+
+            entity.ToTable("user_roles", "auth");
+
+            entity.HasIndex(e => e.RoleId, "IX_user_roles_role_id");
+
+            entity.Property(e => e.UserId).HasColumnName("user_id");
+            entity.Property(e => e.RoleId).HasColumnName("role_id");
+            entity.Property(e => e.AssignedAt)
+                .HasDefaultValueSql("now()")
+                .HasColumnName("assigned_at");
+
+            entity.HasOne(d => d.Role).WithMany(p => p.UserRoles)
+                .HasForeignKey(d => d.RoleId)
+                .HasConstraintName("user_roles_roles_id_fk");
+
+            entity.HasOne(d => d.User).WithMany(p => p.UserRoles)
+                .HasForeignKey(d => d.UserId)
+                .HasConstraintName("user_roles_users_id_fk");
         });
 
         modelBuilder.Entity<UserSearchHistory>(entity =>
@@ -1450,7 +1548,57 @@ public partial class DContext : DbContext
 
             entity.HasOne(d => d.User).WithMany(p => p.UserSearchHistories)
                 .HasForeignKey(d => d.UserId)
-                .HasConstraintName("user_search_history_aspnetusers_id_fk");
+                .HasConstraintName("user_search_history_users_id_fk");
+        });
+
+        modelBuilder.Entity<UserToken>(entity =>
+        {
+            entity.HasKey(e => e.Id).HasName("user_tokens_pk");
+
+            entity.ToTable("user_tokens", "auth");
+
+            entity.HasIndex(e => e.ExpiresAt, "user_tokens_expires_at_index").HasFilter("((revoked = false) AND (expires_at IS NOT NULL))");
+
+            entity.HasIndex(e => e.Permissions, "user_tokens_permissions_index").HasMethod("gin");
+
+            entity.HasIndex(e => e.TokenHash, "user_tokens_token_hash_uindex").IsUnique();
+
+            entity.HasIndex(e => e.UserId, "user_tokens_user_id_index");
+
+            entity.Property(e => e.Id)
+                .HasDefaultValueSql("gen_random_uuid()")
+                .HasColumnName("id");
+            entity.Property(e => e.CreatedAt)
+                .HasDefaultValueSql("now()")
+                .HasColumnName("created_at");
+            entity.Property(e => e.DeviceId)
+                .HasMaxLength(255)
+                .HasColumnName("device_id");
+            entity.Property(e => e.ExpiresAt).HasColumnName("expires_at");
+            entity.Property(e => e.IpAddress).HasColumnName("ip_address");
+            entity.Property(e => e.IssuedAt)
+                .HasDefaultValueSql("now()")
+                .HasColumnName("issued_at");
+            entity.Property(e => e.Permissions).HasColumnName("permissions");
+            entity.Property(e => e.RevokeReason)
+                .HasMaxLength(255)
+                .HasColumnName("revoke_reason");
+            entity.Property(e => e.Revoked)
+                .HasDefaultValue(false)
+                .HasColumnName("revoked");
+            entity.Property(e => e.TokenHash).HasColumnName("token_hash");
+            entity.Property(e => e.Type)
+                .HasMaxLength(50)
+                .HasColumnName("type");
+            entity.Property(e => e.UpdatedAt)
+                .HasDefaultValueSql("now()")
+                .HasColumnName("updated_at");
+            entity.Property(e => e.UserAgent).HasColumnName("user_agent");
+            entity.Property(e => e.UserId).HasColumnName("user_id");
+
+            entity.HasOne(d => d.User).WithMany(p => p.UserTokens)
+                .HasForeignKey(d => d.UserId)
+                .HasConstraintName("user_tokens_users_id_fk");
         });
 
         modelBuilder.Entity<UserVehicle>(entity =>
@@ -1502,7 +1650,7 @@ public partial class DContext : DbContext
 
             entity.HasOne(d => d.User).WithMany(p => p.UserVehicles)
                 .HasForeignKey(d => d.UserId)
-                .HasConstraintName("user_vehicles_aspnetusers_id_fk");
+                .HasConstraintName("user_vehicles_users_id_fk");
         });
         modelBuilder.HasSequence<int>("storage_movement_id_seq");
 

@@ -20,7 +20,7 @@ public record GetArticleViaStartNumberAnonymousResponse(IEnumerable<AnonymousArt
 public record GetArticleViaStartNumberRequest(
     [FromQuery(Name = "searchTerm")] string SearchTerm,
     [FromQuery(Name = "page")] int Page,
-    [FromQuery(Name = "viewCount")] int ViewCount,
+    [FromQuery(Name = "limit")] int Limit,
     [FromQuery(Name = "sortBy")] string? SortBy,
     [FromQuery(Name = "searchStrategy")] ArticleSearchStrategy SearchStrategy);
 
@@ -38,7 +38,7 @@ public class GetArticlesEndPoint : ICarterModule
                     .Where(x => x.HasValue)
                     .Select(x => x!.Value)
                     .ToList();
-                var pagination = new PaginationModel(request.Page, request.ViewCount);
+                var pagination = new PaginationModel(request.Page, request.Limit);
                 if (roles.IsAnyMatchInvariant("admin", "moderator", "worker"))
                     return await GetAmw(sender, request, pagination, userId, producerIds, token);
                 return await GetAnonymous(sender, request, pagination, userId, producerIds, token);

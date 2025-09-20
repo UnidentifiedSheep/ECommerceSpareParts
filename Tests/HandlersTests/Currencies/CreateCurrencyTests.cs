@@ -121,7 +121,7 @@ public class CreateCurrencyTests : IAsyncLifetime
             await _mediator.Send(new CreateCurrencyCommand(GetValidShortName(), GetValidName(), sign,
                 GetValidCurrencyCode())));
 
-        await Assert.ThrowsAsync<CurrencyShortNameTakenException>(async () =>
+                await Assert.ThrowsAsync<CurrencyShortNameTakenException>(async () =>
             await _mediator.Send(new CreateCurrencyCommand(shortName, GetValidName(), GetValidCurrencySign(),
                 GetValidCurrencyCode())));
     }

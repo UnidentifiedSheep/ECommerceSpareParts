@@ -17,10 +17,10 @@ public class CreateTransactionTests : IAsyncLifetime
 {
     private readonly DContext _context;
     private readonly IMediator _mediator;
-    private AspNetUser _adminUser = null!;
+    private User _adminUser = null!;
     private Currency _currency = null!;
-    private AspNetUser _mockUser = null!;
-    private AspNetUser _systemUser = null!;
+    private User _mockUser = null!;
+    private User _systemUser = null!;
 
     public CreateTransactionTests(CombinedContainerFixture fixture)
     {
@@ -34,13 +34,13 @@ public class CreateTransactionTests : IAsyncLifetime
     {
         await _mediator.AddMockProducersAndArticles();
         await _context.AddMockCurrencies();
-        await _context.CreateSystemUser();
-        _systemUser = await _context.AspNetUsers.AsNoTracking().FirstAsync(x => x.Id == "SYSTEM");
+        var systemId = await _mediator.AddMockUser();
+        _systemUser = await _context.Users.AsNoTracking().FirstAsync(x => x.Id == systemId);
         await _mediator.AddMockUser();
         await _mediator.AddMockUser();
-        _mockUser = await _context.AspNetUsers.AsNoTracking().FirstAsync(x => x.Id != "SYSTEM");
-        _adminUser = await _context.AspNetUsers.AsNoTracking()
-            .FirstAsync(x => x.Id != "SYSTEM" && x.Id != _mockUser.Id);
+        _mockUser = await _context.Users.AsNoTracking().FirstAsync(x => x.Id != systemId);
+        _adminUser = await _context.Users.AsNoTracking()
+            .FirstAsync(x => x.Id != systemId && x.Id != _mockUser.Id);
         _currency = await _context.Currencies.AsNoTracking().FirstAsync();
     }
 
@@ -76,7 +76,7 @@ public class CreateTransactionTests : IAsyncLifetime
     public async Task CreateTransaction_WithEmptySender_FailsValidation()
     {
         var command = new CreateTransactionCommand(
-            "",
+            Guid.Empty,
             _mockUser.Id,
             125,
             _currency.Id,
@@ -141,7 +141,7 @@ public class CreateTransactionTests : IAsyncLifetime
     {
         var command = new CreateTransactionCommand(
             _systemUser.Id,
-            "",
+            Guid.Empty,
             100,
             _currency.Id,
             _adminUser.Id,

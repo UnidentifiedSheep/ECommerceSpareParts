@@ -20,7 +20,7 @@ public partial class StorageMovement
 
     public DateTime CreatedAt { get; set; }
 
-    public string WhoMoved { get; set; } = null!;
+    public Guid WhoMoved { get; set; }
 
     public virtual Article Article { get; set; } = null!;
 
@@ -28,7 +28,7 @@ public partial class StorageMovement
 
     public virtual Storage StorageNameNavigation { get; set; } = null!;
 
-    public virtual AspNetUser WhoMovedNavigation { get; set; } = null!;
+    public virtual User WhoMovedNavigation { get; set; } = null!;
     
     public StorageMovement SetActionType(StorageMovementType type)
     {

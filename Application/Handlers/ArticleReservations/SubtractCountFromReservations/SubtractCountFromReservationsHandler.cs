@@ -7,7 +7,7 @@ using Core.Interfaces.Services;
 namespace Application.Handlers.ArticleReservations.SubtractCountFromReservations;
 
 [Transactional]
-public record SubtractCountFromReservationsCommand(string UserId, string WhoUpdated, Dictionary<int, int> Contents)
+public record SubtractCountFromReservationsCommand(Guid UserId, Guid WhoUpdated, Dictionary<int, int> Contents)
     : ICommand<SubtractCountFromReservationsResult>;
 
 /// <param name="NotFoundReservations">Id артикулов и количество, которые не были найдены в резервациях у пользователя.</param>
@@ -15,7 +15,7 @@ public record SubtractCountFromReservationsResult(Dictionary<int, int> NotFoundR
 
 public class SubtractCountFromReservationsHandler(
     IArticleReservationRepository reservationRepository,
-    IUsersRepository usersRepository,
+    IUserRepository usersRepository,
     IUnitOfWork unitOfWork) : ICommandHandler<SubtractCountFromReservationsCommand, SubtractCountFromReservationsResult>
 {
     public async Task<SubtractCountFromReservationsResult> Handle(SubtractCountFromReservationsCommand request,
@@ -59,7 +59,7 @@ public class SubtractCountFromReservationsHandler(
         return new SubtractCountFromReservationsResult(notFoundReservations);
     }
 
-    private async Task EnsureDataExists(IEnumerable<string> userIds, CancellationToken cancellationToken = default)
+    private async Task EnsureDataExists(IEnumerable<Guid> userIds, CancellationToken cancellationToken = default)
     {
         await usersRepository.EnsureUsersExists(userIds, cancellationToken);
     }

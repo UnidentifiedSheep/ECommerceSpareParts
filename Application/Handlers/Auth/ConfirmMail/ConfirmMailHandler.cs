@@ -1,24 +1,22 @@
 using Application.Interfaces;
 using Core.Attributes;
-using Exceptions.Exceptions.Auth;
-using Exceptions.Exceptions.Users;
 using MediatR;
-using Microsoft.AspNetCore.Identity;
-using Persistence.Entities;
+
 
 namespace Application.Handlers.Auth.ConfirmMail;
 
 [Transactional]
 public record ConfirmMailCommand(string UserId, string ConfirmationToken) : ICommand;
 
-public class ConfirmMailHandler(UserManager<UserModel> manager) : ICommandHandler<ConfirmMailCommand>
+public class ConfirmMailHandler() : ICommandHandler<ConfirmMailCommand>
 {
     public async Task<Unit> Handle(ConfirmMailCommand request, CancellationToken cancellationToken)
     {
-        var user = await manager.FindByIdAsync(request.UserId);
+        throw new NotImplementedException();
+        /*var user = await manager.FindByIdAsync(request.UserId);
         if (user == null) throw new UserNotFoundException();
         var confirmed = await manager.ConfirmEmailAsync(user, request.ConfirmationToken);
         if (!confirmed.Succeeded) throw new InvalidTokenException($"{request.ConfirmationToken} не является валидным.");
-        return Unit.Value;
+        return Unit.Value;*/
     }
 }

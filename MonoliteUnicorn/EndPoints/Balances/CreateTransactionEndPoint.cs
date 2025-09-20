@@ -7,11 +7,10 @@ using MediatR;
 namespace MonoliteUnicorn.EndPoints.Balances;
 
 public record CreateTransactionRequest(
-    string SenderId,
-    string ReceiverId,
+    Guid SenderId,
+    Guid ReceiverId,
     decimal Amount,
     int CurrencyId,
-    string WhoCreatedTransaction,
     DateTime TransactionDateTime);
 
 public class CreateTransactionEndPoint : ICarterModule
@@ -19,9 +18,10 @@ public class CreateTransactionEndPoint : ICarterModule
     public void AddRoutes(IEndpointRouteBuilder app)
     {
         app.MapPost("/balances/transaction", async (ISender sender, CreateTransactionRequest request,
-                CancellationToken token, HttpContext context) =>
+                CancellationToken token, ClaimsPrincipal claims) =>
             {
-                var userId = context.User.FindFirst(ClaimTypes.NameIdentifier)?.Value ?? "";
+                if (!Guid.TryParse(claims.FindFirstValue(ClaimTypes.NameIdentifier), out var userId)) 
+                    return Results.Unauthorized();
                 var command = new CreateTransactionCommand(request.SenderId, request.ReceiverId,
                     request.Amount, request.CurrencyId, userId, request.TransactionDateTime, TransactionStatus.Normal);
                 await sender.Send(command, token);

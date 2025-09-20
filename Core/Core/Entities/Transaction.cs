@@ -6,9 +6,9 @@ public partial class Transaction
 
     public int CurrencyId { get; set; }
 
-    public string SenderId { get; set; } = null!;
+    public Guid SenderId { get; set; }
 
-    public string ReceiverId { get; set; } = null!;
+    public Guid ReceiverId { get; set; }
 
     public decimal TransactionSum { get; set; }
 
@@ -16,7 +16,7 @@ public partial class Transaction
 
     public string Status { get; set; } = null!;
 
-    public string WhoMadeUserId { get; set; } = null!;
+    public Guid WhoMadeUserId { get; set; }
 
     public DateTime TransactionDatetime { get; set; }
 
@@ -28,21 +28,21 @@ public partial class Transaction
 
     public DateTime? DeletedAt { get; set; }
 
-    public string? DeletedBy { get; set; }
+    public Guid? DeletedBy { get; set; }
 
     public virtual Currency Currency { get; set; } = null!;
 
-    public virtual AspNetUser? DeletedByNavigation { get; set; }
+    public virtual User? DeletedByNavigation { get; set; }
 
     public virtual ICollection<Purchase> Purchases { get; set; } = new List<Purchase>();
 
-    public virtual AspNetUser Receiver { get; set; } = null!;
+    public virtual User Receiver { get; set; } = null!;
 
     public virtual ICollection<Sale> Sales { get; set; } = new List<Sale>();
 
-    public virtual AspNetUser Sender { get; set; } = null!;
+    public virtual User Sender { get; set; } = null!;
 
     public virtual ICollection<TransactionVersion> TransactionVersions { get; set; } = new List<TransactionVersion>();
 
-    public virtual AspNetUser WhoMadeUser { get; set; } = null!;
+    public virtual User WhoMadeUser { get; set; } = null!;
 }

@@ -1,54 +1,66 @@
+using Application.Extensions;
 using Application.Interfaces;
 using Core.Attributes;
-using Core.Dtos.Amw.Users;
+using Core.Dtos.Emails;
+using Core.Dtos.Users;
 using Core.Entities;
+using Core.Extensions;
 using Core.Interfaces.DbRepositories;
 using Core.Interfaces.Services;
+using Core.Interfaces.Validators;
 using Exceptions.Exceptions.Users;
 using Mapster;
+using MediatR;
 
 namespace Application.Handlers.Users.CreateUser;
 
 [Transactional]
-public record CreateUserCommand(NewUserDto NewUser) : ICommand<CreateUserResult>;
+public record CreateUserCommand(string UserName, string Password, UserInfoDto UserInfo, 
+    IEnumerable<EmailDto> Emails, IEnumerable<string> Phones, IEnumerable<string> Roles) : ICommand<CreateUserResult>;
 
-public record CreateUserResult(string UserId);
-
-public class CreateUserHandler(
-    IUsersRepository usersRepository,
-    IUserEmailRepository emailRepository,
-    IUnitOfWork unitOfWork) : ICommandHandler<CreateUserCommand, CreateUserResult>
+public record CreateUserResult(Guid UserId);
+public class CreateUserHandler(IUserRepository userRepository, IRoleRepository roleRepository, 
+    IUserEmailRepository userEmailRepository,
+    IUnitOfWork unitOfWork, IPasswordManager passwordManager) : ICommandHandler<CreateUserCommand, CreateUserResult>
 {
     public async Task<CreateUserResult> Handle(CreateUserCommand request, CancellationToken cancellationToken)
     {
-        var newUser = request.NewUser;
-        await ValidateData(newUser.UserName, newUser.Email, newUser.Roles, cancellationToken);
-
-        var model = newUser.Adapt<AspNetUser>();
-        if (model.Email != null)
+        var userName = request.UserName.Trim();
+        var emails = request.Emails.Select(x => x.Email.Trim()).ToHashSet();
+        //Add Phone Number addition logic to it.
+        await ValidateData(userName, emails, request.Phones, request.Roles, cancellationToken);
+        var roles = await roleRepository.GetRolesAsync(request.Roles, true, cancellationToken);
+        var passwordHash = passwordManager.GetHashOfPassword(request.Password);
+        var user = new User
         {
-            var emailModel = new UserMail
+            UserName = userName,
+            NormalizedUserName = userName.ToNormalized(),
+            PasswordHash = passwordHash,
+            UserRoles = roles.Select(x => new UserRole
             {
-                Email = model.Email,
-                NormalizedEmail = model.NormalizedEmail!,
-                IsVerified = model.EmailConfirmed,
-                LocalPart = model.Email.Split('@').First(),
-                UserId = model.Id
-            };
-            await unitOfWork.AddAsync(emailModel, cancellationToken);
-        }
-
-        await unitOfWork.AddAsync(model, cancellationToken);
+                RoleId = x.Id
+            }).ToList(),
+            UserEmails = request.Emails.Adapt<List<UserEmail>>(),
+            UserInfo = request.UserInfo.Adapt<UserInfo>()
+        };
+        
+        await unitOfWork.AddAsync(user, cancellationToken);
         await unitOfWork.SaveChangesAsync(cancellationToken);
-        return new CreateUserResult(model.Id);
+        return new CreateUserResult(user.Id);
     }
 
-    private async Task ValidateData(string username, string? email, IEnumerable<string> roles,
-        CancellationToken ct = default)
+    private async Task ValidateData(string userName, HashSet<string> emails, IEnumerable<string> phones, IEnumerable<string> roles,
+        CancellationToken cancellationToken = default)
     {
-        if (await usersRepository.UserNameTaken(username, ct))
-            throw new UserNameAlreadyTakenException(username);
-        if (!string.IsNullOrWhiteSpace(email) && await emailRepository.EmailTaken(email, ct))
-            throw new EmailAlreadyTakenException(email);
+        await roleRepository.EnsureRolesExists(roles, cancellationToken);
+        if (await userRepository.IsUserNameTakenAsync(userName, cancellationToken))
+            throw new UserNameAlreadyTakenException(userName);
+        if (emails.Count > 0)
+        {
+            var notFound = (await userEmailRepository.IsEmailsExists(emails, cancellationToken))
+                .ToList();
+            if (notFound.Count != emails.Count)
+                throw new EmailAlreadyTakenException(emails.Except(notFound));
+        }
     }
 }

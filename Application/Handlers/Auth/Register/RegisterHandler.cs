@@ -1,35 +1,36 @@
-﻿using Application.Interfaces;
+﻿using Application.Handlers.Users.CreateUser;
+using Application.Interfaces;
 using Core.Attributes;
-using Core.Entities;
-using Exceptions.Base;
-using Mapster;
+using Core.Dtos.Emails;
+using Core.Dtos.Users;
+using Core.Enums;
 using MediatR;
-using Microsoft.AspNetCore.Identity;
-using Persistence.Contexts;
-using Persistence.Entities;
 
 namespace Application.Handlers.Auth.Register;
 
 [Transactional]
-public record RegisterCommand(string Email, string UserName, string Password, string Name, string Surname)
-    : ICommand<Unit>;
+public record RegisterCommand(string Email, string UserName, string Password, string Name, string Surname) : ICommand<Unit>;
 
-internal class RegisterHandler(UserManager<UserModel> manager) : ICommandHandler<RegisterCommand, Unit>
+internal class RegisterHandler(IMediator mediator) : ICommandHandler<RegisterCommand, Unit>
 {
     public async Task<Unit> Handle(RegisterCommand request, CancellationToken cancellationToken)
     {
-        var user = new UserModel
+        var userInfo = new UserInfoDto
         {
-            Email = request.Email,
             Name = request.Name,
             Surname = request.Surname,
-            UserName = request.UserName,
+            IsSupplier = false,
         };
-        //TODO: Change to custom Auth. RvsSecureBack repo.
-        var result = await manager.CreateAsync(user, request.Password);
-        string errors = string.Join('\n', result.Errors.Select(x => x.Description));
-        if (!result.Succeeded) throw new BadRequestException("Registration Failed", errors);
-        await manager.AddToRoleAsync(user, "Member");
+        var email = new EmailDto
+        {
+            Email = request.Email,
+            IsConfirmed = false,
+            IsPrimary = true,
+            Type = EmailType.Unknown
+        };
+        var command = new CreateUserCommand(request.UserName, request.Password, userInfo, 
+            [email], [], ["Member"]);
+        await mediator.Send(command, cancellationToken);
         return Unit.Value;
     }
 }

@@ -11,12 +11,12 @@ using MediatR;
 namespace Application.Handlers.ArticleReservations.EditArticleReservation;
 
 [Transactional]
-public record EditArticleReservationCommand(int ReservationId, EditArticleReservationDto NewValue, string WhoUpdated)
+public record EditArticleReservationCommand(int ReservationId, EditArticleReservationDto NewValue, Guid WhoUpdated)
     : ICommand;
 
 public class EditArticleReservationHandler(
     IArticleReservationRepository reservationRepository,
-    IUsersRepository usersRepository,
+    IUserRepository usersRepository,
     ICurrencyRepository currencyRepository,
     IArticlesRepository articlesRepository,
     IUnitOfWork unitOfWork) : ICommandHandler<EditArticleReservationCommand>
@@ -33,7 +33,7 @@ public class EditArticleReservationHandler(
         return Unit.Value;
     }
 
-    private async Task EnsureNeededExists(int articleId, int? currencyId, string userId,
+    private async Task EnsureNeededExists(int articleId, int? currencyId, Guid userId,
         CancellationToken cancellationToken = default)
     {
         await articlesRepository.EnsureArticlesExist([articleId], cancellationToken);

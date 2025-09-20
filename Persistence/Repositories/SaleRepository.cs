@@ -43,11 +43,11 @@ public class SaleRepository(DContext context) : ISaleRepository
 
     public async Task<IEnumerable<Sale>> GetSales(DateTime rangeStart, DateTime rangeEnd, int page, int viewCount,
         bool track = true,
-        string? sortBy = null, string? searchTerm = null, string? buyerId = null, int? currencyId = null,
+        string? sortBy = null, string? searchTerm = null, Guid? buyerId = null, int? currencyId = null,
         CancellationToken cancellationToken = default)
     {
         var query = context.Sales.ConfigureTracking(track);
-        if (!string.IsNullOrWhiteSpace(buyerId))
+        if (buyerId.HasValue)
             query = query.Where(x => x.BuyerId == buyerId);
 
         if (currencyId != null) query = query.Where(x => x.CurrencyId == currencyId);

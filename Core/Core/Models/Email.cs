@@ -1,5 +1,6 @@
 using Core.Extensions;
 using Core.Interfaces;
+using Core.Interfaces.Validators;
 using Exceptions.Exceptions;
 
 namespace Core.Models;

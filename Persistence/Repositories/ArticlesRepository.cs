@@ -202,6 +202,7 @@ public class ArticlesRepository(DContext context) : IArticlesRepository
     public async Task<Article?> GetArticleById(int id, bool track = true, CancellationToken cancellationToken = default)
     {
         return await context.Articles.ConfigureTracking(track)
+            .Include(x => x.Producer)
             .FirstOrDefaultAsync(x => x.Id == id, cancellationToken);
     }
 

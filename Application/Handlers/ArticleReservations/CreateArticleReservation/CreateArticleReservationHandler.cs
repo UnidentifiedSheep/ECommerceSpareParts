@@ -11,12 +11,12 @@ using MediatR;
 namespace Application.Handlers.ArticleReservations.CreateArticleReservation;
 
 [Transactional]
-public record CreateArticleReservationCommand(List<NewArticleReservationDto> Reservations, string WhoCreated)
+public record CreateArticleReservationCommand(List<NewArticleReservationDto> Reservations, Guid WhoCreated)
     : ICommand;
 
 public class CreateArticleReservationHandler(
     IArticlesRepository articlesRepository,
-    IUsersRepository usersRepository,
+    IUserRepository usersRepository,
     ICurrencyRepository currencyRepository,
     IUnitOfWork unitOfWork) : ICommandHandler<CreateArticleReservationCommand>
 {
@@ -25,7 +25,7 @@ public class CreateArticleReservationHandler(
         var reservations = request.Reservations.ToList();
         var currencyIds = new HashSet<int>();
         var articleIds = new HashSet<int>();
-        var userIds = new HashSet<string> { request.WhoCreated };
+        var userIds = new HashSet<Guid> { request.WhoCreated };
 
         foreach (var item in reservations)
         {
@@ -47,7 +47,7 @@ public class CreateArticleReservationHandler(
     }
 
     private async Task CheckIfNeededExists(IEnumerable<int> currencyIds, IEnumerable<int> articleIds,
-        IEnumerable<string> userIds, CancellationToken cancellationToken = default)
+        IEnumerable<Guid> userIds, CancellationToken cancellationToken = default)
     {
         await currencyRepository.EnsureCurrenciesExists(currencyIds, cancellationToken);
         await usersRepository.EnsureUsersExists(userIds, cancellationToken);

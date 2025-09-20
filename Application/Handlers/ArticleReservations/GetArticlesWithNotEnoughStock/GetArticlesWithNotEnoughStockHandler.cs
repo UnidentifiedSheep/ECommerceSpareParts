@@ -10,7 +10,7 @@ namespace Application.Handlers.ArticleReservations.GetArticlesWithNotEnoughStock
 ///     не покрывает продажу и резервацию.
 /// </summary>
 public record GetArticlesWithNotEnoughStockQuery(
-    string BuyerId,
+    Guid BuyerId,
     string StorageName,
     bool TakeFromOtherStorages,
     Dictionary<int, int> NeededCounts) : IQuery<GetArticlesWithNotEnoughStockResult>;
@@ -22,7 +22,7 @@ public record GetArticlesWithNotEnoughStockResult(
     Dictionary<int, int> NotEnoughByStock);
 
 public class GetArticlesWithNotEnoughStockHandler(
-    IUsersRepository usersRepository,
+    IUserRepository usersRepository,
     IArticlesRepository articlesRepository,
     IStoragesRepository storagesRepository,
     IStorageContentRepository storageContentRepository,
@@ -68,7 +68,7 @@ public class GetArticlesWithNotEnoughStockHandler(
         return new GetArticlesWithNotEnoughStockResult(notEnoughByReservation, notEnoughStock);
     }
 
-    private async Task EnsureDataExists(string storageName, string userId, IEnumerable<int> articleIds,
+    private async Task EnsureDataExists(string storageName, Guid userId, IEnumerable<int> articleIds,
         CancellationToken cancellationToken = default)
     {
         await storagesRepository.EnsureStorageExists(storageName, cancellationToken);

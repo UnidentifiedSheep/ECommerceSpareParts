@@ -9,8 +9,8 @@ public record GetTransactionsQuery(
     DateTime RangeStart,
     DateTime RangeEnd,
     int? CurrencyId,
-    string? SenderId,
-    string? ReceiverId,
+    Guid? SenderId,
+    Guid? ReceiverId,
     int Page,
     int ViewCount) : IQuery<GetTransactionsResult>;
 

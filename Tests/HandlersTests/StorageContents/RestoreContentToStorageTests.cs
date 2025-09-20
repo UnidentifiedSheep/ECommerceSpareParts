@@ -29,7 +29,7 @@ public class RestoreContentToStorageTests : IAsyncLifetime
     private List<Currency> _currency = null!;
     private Dictionary<int, StorageContent> _storageContent = null!;
     private List<Storage> _storages = null!;
-    private AspNetUser _user = null!;
+    private User _user = null!;
 
     public RestoreContentToStorageTests(CombinedContainerFixture fixture)
     {
@@ -45,7 +45,7 @@ public class RestoreContentToStorageTests : IAsyncLifetime
         await _mediator.AddMockStorage();
         await _context.AddMockCurrencies();
 
-        _user = await _context.AspNetUsers.FirstAsync();
+        _user = await _context.Users.FirstAsync();
         _articles = await _context.Articles.ToListAsync();
         _storages = await _context.Storages.ToListAsync();
         _currency = await _context.Currencies.ToListAsync();
@@ -140,7 +140,7 @@ public class RestoreContentToStorageTests : IAsyncLifetime
     public async Task RestoreContentToStorage_WithInvalidUserId_ThrowsUserNotFoundException()
     {
         var content = GenerateValidStorageContent();
-        var invalidUserId = Global.Faker.Random.Guid().ToString();
+        var invalidUserId = Global.Faker.Random.Guid();
 
         var command = new RestoreContentCommand(content, StorageMovementType.StorageContentAddition, invalidUserId);
         await Assert.ThrowsAsync<UserNotFoundException>(async () => await _mediator.Send(command));

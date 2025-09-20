@@ -13,7 +13,7 @@ using MediatR;
 namespace Application.Handlers.Sales.DeleteFullSale;
 
 [Transactional(IsolationLevel.Serializable, 20, 2)]
-public record DeleteFullSaleCommand(string SaleId, string UserId) : ICommand;
+public record DeleteFullSaleCommand(string SaleId, Guid UserId) : ICommand;
 
 public class DeleteFullSaleHandler(IMediator mediator) : ICommandHandler<DeleteFullSaleCommand>
 {
@@ -37,14 +37,14 @@ public class DeleteFullSaleHandler(IMediator mediator) : ICommandHandler<DeleteF
         return (await mediator.Send(command, cancellationToken)).Sale;
     }
 
-    private async Task DeleteTransaction(string transactionId, string userId,
+    private async Task DeleteTransaction(string transactionId, Guid userId,
         CancellationToken cancellationToken = default)
     {
         var command = new DeleteTransactionCommand(transactionId, userId, true);
         await mediator.Send(command, cancellationToken);
     }
 
-    private async Task RestoreStorageContents(IEnumerable<RestoreContentItem> details, string userId,
+    private async Task RestoreStorageContents(IEnumerable<RestoreContentItem> details, Guid userId,
         CancellationToken cancellationToken = default)
     {
         var command = new RestoreContentCommand(details, StorageMovementType.SaleDeletion, userId);

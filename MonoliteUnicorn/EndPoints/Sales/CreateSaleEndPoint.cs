@@ -7,7 +7,7 @@ using MediatR;
 namespace MonoliteUnicorn.EndPoints.Sales;
 
 public record CreateSaleRequest(
-    string BuyerId,
+    Guid BuyerId,
     int CurrencyId,
     string StorageName,
     bool SellFromOtherStorages,
@@ -22,10 +22,10 @@ public class CreateSaleEndPoint : ICarterModule
     public void AddRoutes(IEndpointRouteBuilder app)
     {
         app.MapPost("/amw/sales/",
-                async (HttpContext context, ISender sender, CreateSaleRequest request, CancellationToken token) =>
+                async (ClaimsPrincipal claims, ISender sender, CreateSaleRequest request, CancellationToken token) =>
                 {
-                    var userId = context.User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-                    if (userId == null) return Results.Unauthorized();
+                    if (!Guid.TryParse(claims.FindFirstValue(ClaimTypes.NameIdentifier), out var userId)) 
+                        return Results.Unauthorized();
                     var command = new CreateFullSaleCommand(userId, request.BuyerId, request.CurrencyId,
                         request.StorageName, request.SellFromOtherStorages,
                         request.SaleDateTime, request.SaleContent, request.Comment, request.PayedSum,

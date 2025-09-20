@@ -13,7 +13,7 @@ public record GetArticleReservationsQuery(
     int ViewCount,
     string? SortBy,
     double? Similarity,
-    string? UserId,
+    Guid? UserId,
     GeneralSearchStrategy Strategy) : IQuery<GetArticleReservationsResult>;
 
 public record GetArticleReservationsResult(IEnumerable<ArticleReservationDto> Reservations);

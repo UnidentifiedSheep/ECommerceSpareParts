@@ -1,38 +1,39 @@
 ﻿using Application.Interfaces;
+using Core.Entities;
+using Core.Enums;
 using Core.Interfaces;
 using Core.Interfaces.DbRepositories;
-using Microsoft.AspNetCore.Identity;
-using Persistence.Entities;
+using Core.Interfaces.Services;
+using Exceptions.Exceptions.Auth;
 
 namespace Application.Handlers.Auth.RefreshToken;
 
-public record RefreshTokenCommand(string RefreshToken) : ICommand<RefreshTokenResult>;
+public record RefreshTokenCommand(string RefreshToken, string DeviceId) : ICommand<RefreshTokenResult>;
 
 public record RefreshTokenResult(string Token, string RefreshToken);
 
-public class RefreshTokenHandler(
-    IJwtGenerator tokenGenerator,
-    UserManager<UserModel> manager,
-    IUsersRepository usersRepository) : ICommandHandler<RefreshTokenCommand, RefreshTokenResult>
+public class RefreshTokenHandler(IUserTokenRepository tokenRepository, IUserRoleRepository userRoleRepository,
+    IUnitOfWork unitOfWork, IJwtGenerator tokenGenerator, IUserTokenService userTokenService, 
+    IUserRepository userRepository) : ICommandHandler<RefreshTokenCommand, RefreshTokenResult>
 {
     public async Task<RefreshTokenResult> Handle(RefreshTokenCommand request, CancellationToken cancellationToken)
     {
-        throw new NotImplementedException();
-        /*var user = await context.Users.FirstOrDefaultAsync(x => x.RefreshToken == request.RefreshToken,
-            cancellationToken: cancellationToken) ?? throw new InvalidTokenException(request.RefreshToken);
-
-        if (user.RefreshToken != request.RefreshToken || user.RefreshTokenExpiryTime < DateTime.UtcNow)
+        var userToken = await tokenRepository.GetTokenByHashAsync(request.RefreshToken, true, cancellationToken)
+            ?? throw new InvalidTokenException(request.RefreshToken);
+        if (userToken.ExpiresAt < DateTime.UtcNow || userToken.DeviceId != request.DeviceId)
             throw new InvalidTokenException(request.RefreshToken);
-
-        var userRoles = await manager.GetRolesAsync(user);
-
-        var token = tokenGenerator.CreateToken(user, userRoles);
+        
+        User user = (await userRepository.GetUserByIdAsync(userToken.UserId, false, cancellationToken))!;
+        var userRoles = (await userRoleRepository.GetUserRolesAsync(userToken.UserId, false,
+            cancellationToken: cancellationToken)).Select(x => x.Role.Name).ToList();
+        
+        var token = tokenGenerator.CreateToken(user, user.UserInfo!, request.DeviceId, userRoles);
         var refreshToken = tokenGenerator.CreateRefreshToken();
-
-        user.RefreshToken = refreshToken;
-        user.RefreshTokenExpiryTime = DateTime.UtcNow.AddMonths(1);
-        await manager.UpdateAsync(user);
-
-        return new RefreshTokenResult(token, refreshToken);*/
+        
+        await userTokenService.AddToken(refreshToken, user.Id, TokenType.RefreshToken, DateTime.UtcNow.AddMonths(1), 
+            userToken.IpAddress, userToken.UserAgent, [], cancellationToken);
+        
+        await unitOfWork.SaveChangesAsync(cancellationToken);
+        return new RefreshTokenResult(token, refreshToken);
     }
 }

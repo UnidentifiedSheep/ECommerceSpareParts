@@ -26,8 +26,8 @@ namespace Application.Handlers.Sales.CreateFullSale;
 
 [Transactional(IsolationLevel.Serializable, 20, 2)]
 public record CreateFullSaleCommand(
-    string CreatedUserId,
-    string BuyerId,
+    Guid CreatedUserId,
+    Guid BuyerId,
     int CurrencyId,
     string StorageName,
     bool SellFromOtherStorages,
@@ -81,7 +81,7 @@ public class CreateFullSaleHandler(IMediator mediator, IArticlesRepository artic
         return Unit.Value;
     }
 
-    private async Task SubtractCountFromReservations(string buyerId, string whoCreated, Dictionary<int, int> toSubtract,
+    private async Task SubtractCountFromReservations(Guid buyerId, Guid whoCreated, Dictionary<int, int> toSubtract,
         CancellationToken cancellation = default)
     {
         var command = new SubtractCountFromReservationsCommand(buyerId, whoCreated, toSubtract);
@@ -96,9 +96,8 @@ public class CreateFullSaleHandler(IMediator mediator, IArticlesRepository artic
         await mediator.Send(command, cancellationToken);
     }
 
-    private async Task CheckReservations(IEnumerable<NewSaleContentDto> saleContent, string buyerId,
-        string whoCreateUserId,
-        string storageName, bool sellFromOtherStorages, string? confirmationCode,
+    private async Task CheckReservations(IEnumerable<NewSaleContentDto> saleContent, Guid buyerId,
+        Guid whoCreateUserId, string storageName, bool sellFromOtherStorages, string? confirmationCode,
         CancellationToken cancellationToken = default)
     {
         var (byReservation, byStock) = await GetStockReservations(saleContent, buyerId, storageName,
@@ -129,7 +128,7 @@ public class CreateFullSaleHandler(IMediator mediator, IArticlesRepository artic
     }
 
     private async Task<(Dictionary<int, int> byReservation, Dictionary<int, int> byStock)> GetStockReservations(
-        IEnumerable<NewSaleContentDto> saleContent, string buyerId, string storageName,
+        IEnumerable<NewSaleContentDto> saleContent, Guid buyerId, string storageName,
         bool sellFromOtherStorages, CancellationToken cancellationToken = default)
     {
         var neededArticlesCounts = saleContent
@@ -138,14 +137,13 @@ public class CreateFullSaleHandler(IMediator mediator, IArticlesRepository artic
                 x => x.Sum(z => z.Count));
 
         var result = await mediator.Send(new GetArticlesWithNotEnoughStockQuery(buyerId, storageName,
-            sellFromOtherStorages,
-            neededArticlesCounts), cancellationToken);
+            sellFromOtherStorages, neededArticlesCounts), cancellationToken);
 
         return (result.NotEnoughByReservation, result.NotEnoughByStock);
     }
 
-    private async Task<Transaction> CreateTransaction(decimal amount, string sender, string receiver,
-        int currencyId, string createdUserId, DateTime transactionDateTime,
+    private async Task<Transaction> CreateTransaction(decimal amount, Guid sender, Guid receiver,
+        int currencyId, Guid createdUserId, DateTime transactionDateTime,
         CancellationToken cancellationToken = default)
     {
         var command = new CreateTransactionCommand(sender, receiver, amount, currencyId, createdUserId,
@@ -156,7 +154,7 @@ public class CreateFullSaleHandler(IMediator mediator, IArticlesRepository artic
 
     private async Task<IEnumerable<PrevAndNewValue<StorageContent>>> RemoveContentFromStorage(
         IEnumerable<NewSaleContentDto> saleContent,
-        string whoCreateUserId, string storageName, bool saleFromOtherStorages,
+        Guid whoCreateUserId, string storageName, bool saleFromOtherStorages,
         CancellationToken cancellationToken = default)
     {
         var dict = saleContent.GroupBy(x => x.ArticleId)
@@ -168,7 +166,7 @@ public class CreateFullSaleHandler(IMediator mediator, IArticlesRepository artic
     }
 
     private async Task<Sale> CreateSale(IEnumerable<PrevAndNewValue<StorageContent>> storageContents,
-        IEnumerable<NewSaleContentDto> saleContent, int currencyId, string buyerId, string whoCreatedUserId,
+        IEnumerable<NewSaleContentDto> saleContent, int currencyId, Guid buyerId, Guid whoCreatedUserId,
         string transactionId, string mainStorage, DateTime saleDateTime, string? comment,
         CancellationToken cancellationToken = default)
     {

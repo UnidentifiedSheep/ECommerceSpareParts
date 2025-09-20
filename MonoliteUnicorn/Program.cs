@@ -4,6 +4,7 @@ using Api.Common.BackgroundServices;
 using Api.Common.ExceptionHandlers;
 using Api.Common.HangFireTasks;
 using Api.Common.Logging;
+using Application;
 using Application.Configs;
 using Carter;
 using Core.Interfaces;
@@ -14,20 +15,17 @@ using Integrations;
 using Mail;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using OpenTelemetry.Metrics;
 using Persistence;
-using Persistence.Contexts;
-using Persistence.Entities;
 using RabbitMq;
+using Redis;
 using Security;
 using Serilog;
 using Serilog.Sinks.Loki;
 using Serilog.Sinks.Loki.Labels;
-using ApplicationServiceProvider = Application.ServiceProvider;
-using CacheServiceProvider = Redis.ServiceProvider;
 
 
 var builder = WebApplication.CreateBuilder(args);
@@ -95,33 +93,26 @@ var brokerOptions = new MessageBrokerOptions
     Password = builder.Configuration["RabbitMqSettings:Password"]!
 };
 
-ApplicationServiceProvider.AddApplicationLayer(builder.Services)
+var emailOptions = new UserEmailOptions
+{
+    MinEmailCount = 0,
+    MaxEmailCount = 5,
+};
+
+builder.Services.AddApplicationLayer(emailOptions)
     .AddPersistenceLayer(builder.Configuration["ConnectionStrings:DefaultConnection"]!)
-    .AddMassageBrokerLayer(brokerOptions);
-CacheServiceProvider.AddCacheLayer(builder.Services, builder.Configuration["ConnectionStrings:RedisConnection"]!)
+    .AddMassageBrokerLayer(brokerOptions)
+    .AddCacheLayer(builder.Configuration["ConnectionStrings:RedisConnection"]!)
     .AddSecurityLayer()
     .AddMailLayer()
     .AddCommonLayer()
     .AddIntegrations(builder.Configuration);
 
-builder.Services.AddIdentity<UserModel, IdentityRole>(options =>
-    {
-        options.Password.RequiredLength = 8;
-        options.Password.RequireNonAlphanumeric = true;
-        options.Password.RequireDigit = true;
-        options.Password.RequireLowercase = true;
-        options.Password.RequireUppercase = true;
-    }).AddEntityFrameworkStores<IdentityContext>()
-    .AddUserManager<UserManager<UserModel>>()
-    .AddRoleManager<RoleManager<IdentityRole>>()
-    .AddSignInManager<SignInManager<UserModel>>()
-    .AddDefaultTokenProviders();
-
 
 builder.Services.AddAuthorization(options =>
 {
-    options.AddPolicy("AMW", policy => { policy.RequireRole("ADMIN", "MODERATOR", "WORKER"); });
-    options.AddPolicy("AM", policy => { policy.RequireRole("ADMIN", "MODERATOR"); });
+    options.AddPolicy("AMW", policy => { policy.RequireRole("Admin", "Moderator", "Worker"); });
+    options.AddPolicy("AM", policy => { policy.RequireRole("Admin", "Moderator"); });
 });
 
 builder.Services.AddAuthentication(options =>
@@ -164,8 +155,24 @@ builder.Services.AddOpenTelemetry()
             .AddPrometheusExporter();
     });
 
+builder.Services.AddCors(options =>
+{
+    options.AddDefaultPolicy(policy =>
+    {
+        policy
+            .AllowAnyOrigin()   
+            .AllowAnyHeader()  
+            .AllowAnyMethod(); 
+    });
+});
+
 
 var app = builder.Build();
+
+app.UseForwardedHeaders(new ForwardedHeadersOptions
+{
+    ForwardedHeaders = ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto
+});
 
 app.UseHangfireDashboard();
 
@@ -174,6 +181,7 @@ SortByConfig.Configure();
 
 await SetupPrice(app.Services);
 
+app.UseCors();  
 app.UseExceptionHandler(_ => { });
 app.UseAuthentication();
 app.UseAuthorization();

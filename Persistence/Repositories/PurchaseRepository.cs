@@ -31,11 +31,11 @@ public class PurchaseRepository(DContext context) : IPurchaseRepository
 
     public async Task<IEnumerable<Purchase>> GetPurchases(DateTime rangeStart, DateTime rangeEnd, int page,
         int viewCount,
-        string? supplierId, int? currencyId, string? sortBy, string? searchTerm, bool track = true,
+        Guid? supplierId, int? currencyId, string? sortBy, string? searchTerm, bool track = true,
         CancellationToken cancellationToken = default)
     {
         var query = context.Purchases.ConfigureTracking(track);
-        if (!string.IsNullOrWhiteSpace(supplierId))
+        if (supplierId != null)
             query = query.Where(x => x.SupplierId == supplierId);
 
         if (currencyId != null) query = query.Where(x => x.CurrencyId == currencyId);

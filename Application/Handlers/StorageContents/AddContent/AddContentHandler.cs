@@ -18,13 +18,13 @@ namespace Application.Handlers.StorageContents.AddContent;
 public record AddContentCommand(
     IEnumerable<NewStorageContentDto> StorageContent,
     string StorageName,
-    string UserId,
+    Guid UserId,
     StorageMovementType MovementType) : ICommand;
 
 public class AddContentHandler(
     ICurrencyRepository currencyRepository,
     IStoragesRepository storagesRepository,
-    IUsersRepository usersRepository,
+    IUserRepository usersRepository,
     IArticlesRepository articlesRepository,
     IUnitOfWork unitOfWork,
     ICurrencyConverter currencyConverter,
@@ -69,7 +69,7 @@ public class AddContentHandler(
     }
 
     private async Task ValidateData(IEnumerable<int> articleIds, IEnumerable<int> currencyIds, string storageName,
-        string userId,
+        Guid userId,
         CancellationToken cancellationToken = default)
     {
         await currencyRepository.EnsureCurrenciesExists(currencyIds, cancellationToken);

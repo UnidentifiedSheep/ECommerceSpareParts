@@ -5,25 +5,22 @@ namespace Tests.MockData;
 
 public static class MockDContext
 {
-    private static readonly string[] Tables =
-    [
-        "producer", "producer_details", "producers_other_names",
-        "AspNetRoles", "AspNetRoleClaims", "AspNetUsers", "AspNetUserClaims",
-        "AspNetUserLogins", "AspNetUserRoles", "articles", "categories",
-        "articles_content", "articles_pair", "storage_content", "article_characteristics",
-        "article_images", "storages", "currency", "transactions",
-        "user_balances", "user_discounts", "currency_history", "currency_to_usd",
-        "default_settings", "markup_group", "markup_ranges", "purchase", "purchase_content",
-        "buy_sell_prices", "sale_content", "categories", "sale",
-        "article_crosses", "article_ean", "article_supplier_buy_info", "transaction_versions",
-        "user_mails", "user_vehicles", "sale_content_details", "storage_movement", "user_search_history",
-        "storage_content_reservations"
-    ];
-
     public static async Task ClearDatabaseFull(this DContext context)
     {
-        var tablesList = string.Join(", ", Tables.Select(t => $@"""{t}"""));
-        var sql = $@"TRUNCATE TABLE {tablesList} RESTART IDENTITY CASCADE";
+        var sql = """
+                  DO $$
+                  DECLARE
+                      r RECORD;
+                  BEGIN
+                      FOR r IN 
+                          SELECT schemaname, tablename
+                          FROM pg_tables
+                          WHERE schemaname IN ('auth', 'public')
+                      LOOP
+                          EXECUTE format('TRUNCATE TABLE %I.%I RESTART IDENTITY CASCADE', r.schemaname, r.tablename);
+                      END LOOP;
+                  END $$;
+                  """;
         await context.Database.ExecuteSqlRawAsync(sql);
     }
 
@@ -33,16 +30,6 @@ public static class MockDContext
                                                    INSERT INTO article_crosses (article_id, article_cross_id) 
                                                    values ({leftId}, {rightId})
                                                    """);
-    }
-
-    public static async Task CreateSystemUser(this DContext context)
-    {
-        await context.Database.ExecuteSqlRawAsync("""
-                                                  INSERT INTO "AspNetUsers" ("Id", "Name", "Surname", "EmailConfirmed", 
-                                                                             "IsSupplier", "PhoneNumberConfirmed", 
-                                                                             "TwoFactorEnabled", "LockoutEnabled", "AccessFailedCount")
-                                                  values ('SYSTEM', 'SYSTEM', 'SYSTEM',  true, false, false, false, false, 0);
-                                                  """);
     }
 
     public static async Task AddMockCurrencies(this DContext context)

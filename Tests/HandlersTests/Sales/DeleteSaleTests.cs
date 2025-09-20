@@ -21,7 +21,7 @@ public class DeleteSaleTests : IAsyncLifetime
     private Sale _saleModel = null!;
     private Storage _storage = null!;
     private Transaction _transaction = null!;
-    private AspNetUser _user = null!;
+    private User _user = null!;
 
     public DeleteSaleTests(CombinedContainerFixture fixture)
     {
@@ -39,7 +39,7 @@ public class DeleteSaleTests : IAsyncLifetime
         await _mediator.AddMockStorage();
         await _context.AddMockCurrencies();
 
-        _user = await _context.AspNetUsers.FirstAsync();
+        _user = await _context.Users.FirstAsync();
         _storage = await _context.Storages.FirstAsync();
         var articleIds = await _context.Articles.Select(a => a.Id).ToListAsync();
         var storage = await _context.Storages.FirstAsync();
@@ -49,7 +49,7 @@ public class DeleteSaleTests : IAsyncLifetime
 
         var storageContents = await _context.StorageContents.ToListAsync();
 
-        var receiver = await _context.AspNetUsers.FirstAsync(x => x.Id != _user.Id);
+        var receiver = await _context.Users.FirstAsync(x => x.Id != _user.Id);
         await _mediator.AddMockTransaction(_user.Id, receiver.Id, _user.Id, 1212.21m);
         _transaction = await _context.Transactions.FirstAsync();
         _currency = await _context.Currencies.FirstAsync(x => x.Id == _transaction.CurrencyId);

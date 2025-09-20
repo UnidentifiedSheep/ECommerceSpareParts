@@ -17,18 +17,18 @@ public record GetUsersQuery(
     string? Email,
     string? Phone,
     string? UserName,
-    string? Id,
+    Guid? Id,
     string? Description,
     bool? IsSupplier,
     GeneralSearchStrategy SearchStrategy) : IQuery<GetUsersResult>;
 
 public record GetUsersResult(IEnumerable<UserDto> Users);
 
-public class GetUsersHandler(IUsersRepository usersRepositoryService) : IQueryHandler<GetUsersQuery, GetUsersResult>
+public class GetUsersHandler(IUserRepository usersRepositoryService) : IQueryHandler<GetUsersQuery, GetUsersResult>
 {
     public async Task<GetUsersResult> Handle(GetUsersQuery request, CancellationToken cancellationToken)
     {
-        var users = new List<AspNetUser>();
+        var users = new List<User>();
 
         switch (request.SearchStrategy)
         {

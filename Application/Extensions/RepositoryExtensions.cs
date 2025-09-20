@@ -12,7 +12,7 @@ namespace Application.Extensions;
 
 public static class RepositoryExtensions
 {
-    public static async Task EnsureUsersExists(this IUsersRepository usersRepository, IEnumerable<string> userIds,
+    public static async Task EnsureUsersExists(this IUserRepository usersRepository, IEnumerable<Guid> userIds,
         CancellationToken ct = default)
     {
         var notExistingUser = await usersRepository.UsersExists(userIds, ct);

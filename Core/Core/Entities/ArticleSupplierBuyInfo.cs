@@ -6,7 +6,7 @@ public partial class ArticleSupplierBuyInfo
 
     public int ArticleId { get; set; }
 
-    public string WhoProposed { get; set; } = null!;
+    public Guid WhoProposed { get; set; }
 
     public int CurrencyId { get; set; }
 
@@ -22,5 +22,5 @@ public partial class ArticleSupplierBuyInfo
 
     public virtual Currency Currency { get; set; } = null!;
 
-    public virtual AspNetUser WhoProposedNavigation { get; set; } = null!;
+    public virtual User WhoProposedNavigation { get; set; } = null!;
 }

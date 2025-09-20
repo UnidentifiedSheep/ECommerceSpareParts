@@ -4,11 +4,11 @@ using Core.Interfaces.DbRepositories;
 
 namespace Application.Handlers.Users.GetUserDiscount;
 
-public record GetUserDiscountQuery(string UserId) : IQuery<GetUserDiscountResult>;
+public record GetUserDiscountQuery(Guid UserId) : IQuery<GetUserDiscountResult>;
 
 public record GetUserDiscountResult(decimal? Discount);
 
-public class GetUserDiscountHandler(IRedisUserRepository cacheUserRepository, IUsersRepository usersRepository)
+public class GetUserDiscountHandler(IRedisUserRepository cacheUserRepository, IUserRepository usersRepository)
     : IQueryHandler<GetUserDiscountQuery, GetUserDiscountResult>
 {
     public async Task<GetUserDiscountResult> Handle(GetUserDiscountQuery request, CancellationToken cancellationToken)

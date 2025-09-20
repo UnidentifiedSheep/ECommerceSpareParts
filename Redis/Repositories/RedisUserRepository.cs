@@ -14,7 +14,7 @@ public class RedisUserRepository : IRedisUserRepository
         _ttl = ttl;
     }
 
-    public async Task<decimal?> GetUserDiscount(string userId)
+    public async Task<decimal?> GetUserDiscount(Guid userId)
     {
         var key = GetUserDiscountKey(userId);
         var value = await _redis.StringGetAsync(key);
@@ -22,13 +22,13 @@ public class RedisUserRepository : IRedisUserRepository
         return value.HasValue ? result : null;
     }
 
-    public async Task SetUserDiscount(string userId, decimal discount)
+    public async Task SetUserDiscount(Guid userId, decimal discount)
     {
         var key = GetUserDiscountKey(userId);
         await _redis.StringSetAsync(key, discount.ToString(Global.Culture), _ttl);
     }
 
-    private static string GetUserDiscountKey(string userId)
+    private static string GetUserDiscountKey(Guid userId)
     {
         return $"user-discount:{userId}";
     }

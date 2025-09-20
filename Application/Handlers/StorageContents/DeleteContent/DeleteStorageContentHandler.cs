@@ -16,7 +16,7 @@ using MediatR;
 namespace Application.Handlers.StorageContents.DeleteContent;
 
 [Transactional(IsolationLevel.Serializable, 20, 2)]
-public record DeleteStorageContentCommand(int ContentId, string ConcurrencyCode, string UserId) : ICommand;
+public record DeleteStorageContentCommand(int ContentId, string ConcurrencyCode, Guid UserId) : ICommand;
 
 public class DeleteStorageContentHandler(
     IStorageContentRepository storageContentRepository,
@@ -24,7 +24,7 @@ public class DeleteStorageContentHandler(
     IMediator mediator,
     IConcurrencyValidator<StorageContent> concurrencyValidator,
     IArticlesService articlesService,
-    IUsersRepository usersRepository) : ICommandHandler<DeleteStorageContentCommand>
+    IUserRepository usersRepository) : ICommandHandler<DeleteStorageContentCommand>
 {
     public async Task<Unit> Handle(DeleteStorageContentCommand request, CancellationToken cancellationToken)
     {
@@ -51,7 +51,7 @@ public class DeleteStorageContentHandler(
         return Unit.Value;
     }
 
-    private async Task ValidateData(string concurrencyCode, string userId, StorageContent content,
+    private async Task ValidateData(string concurrencyCode, Guid userId, StorageContent content,
         CancellationToken cancellationToken = default)
     {
         await usersRepository.EnsureUsersExists([userId], cancellationToken);

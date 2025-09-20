@@ -22,7 +22,7 @@ public record EditFullPurchaseCommand(
     int CurrencyId,
     string? Comment,
     DateTime PurchaseDateTime,
-    string UpdatedUserId) : ICommand;
+    Guid UpdatedUserId) : ICommand;
 
 public class EditFullPurchaseHandler(IMediator mediator, IPurchaseRepository purchaseRepository)
     : ICommandHandler<EditFullPurchaseCommand>
@@ -52,7 +52,7 @@ public class EditFullPurchaseHandler(IMediator mediator, IPurchaseRepository pur
 
     private async Task<Dictionary<int, Dictionary<decimal, int>>> EditPurchase(List<EditPurchaseDto> contentList,
         string purchaseId, int currencyId,
-        string? comment, string whoUpdated, DateTime dateTime, CancellationToken cancellationToken = default)
+        string? comment, Guid whoUpdated, DateTime dateTime, CancellationToken cancellationToken = default)
     {
         var command = new EditPurchaseCommand(contentList, purchaseId, currencyId, comment, whoUpdated, dateTime);
         return (await mediator.Send(command, cancellationToken)).EditedCounts;
@@ -67,7 +67,7 @@ public class EditFullPurchaseHandler(IMediator mediator, IPurchaseRepository pur
     }
 
     private async Task AddOrRemoveContentToStorage(Dictionary<int, Dictionary<decimal, int>> values, string storageName,
-        int currencyId, string whoUpdated, CancellationToken cancellationToken = default)
+        int currencyId, Guid whoUpdated, CancellationToken cancellationToken = default)
     {
         var returnedToStorage = new List<NewStorageContentDto>();
         var takenFromStorage = new Dictionary<int, int>();

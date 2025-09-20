@@ -11,7 +11,7 @@ public record GetSalesQuery(
     DateTime RangeStartDate,
     DateTime RangeEndDate,
     PaginationModel Pagination,
-    string? BuyerId,
+    Guid? BuyerId,
     int? CurrencyId,
     string? SortBy,
     string? SearchTerm) : IQuery<GetSalesResult>;
@@ -20,7 +20,7 @@ public record GetSalesResult(IEnumerable<SaleDto> Sales);
 
 public class GetSalesHandler(
     ISaleRepository saleRepository,
-    IUsersRepository usersRepository,
+    IUserRepository usersRepository,
     ICurrencyRepository currencyRepository) : IQueryHandler<GetSalesQuery, GetSalesResult>
 {
     public async Task<GetSalesResult> Handle(GetSalesQuery request, CancellationToken cancellationToken)
@@ -33,10 +33,10 @@ public class GetSalesHandler(
         return new GetSalesResult(result.Adapt<List<SaleDto>>());
     }
 
-    private async Task ValidateData(string? buyerId, int? currencyId, CancellationToken cancellationToken = default)
+    private async Task ValidateData(Guid? buyerId, int? currencyId, CancellationToken cancellationToken = default)
     {
         if (buyerId != null)
-            await usersRepository.EnsureUsersExists([buyerId], cancellationToken);
+            await usersRepository.EnsureUsersExists([buyerId.Value], cancellationToken);
         if (currencyId != null)
             await currencyRepository.EnsureCurrenciesExists([currencyId.Value], cancellationToken);
     }

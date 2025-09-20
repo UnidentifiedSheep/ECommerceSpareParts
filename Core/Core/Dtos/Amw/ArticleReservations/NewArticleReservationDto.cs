@@ -2,7 +2,7 @@ namespace Core.Dtos.Amw.ArticleReservations;
 
 public class NewArticleReservationDto
 {
-    public string UserId { get; set; } = null!;
+    public Guid UserId { get; set; }
 
     public int ArticleId { get; set; }
 
