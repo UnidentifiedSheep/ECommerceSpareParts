@@ -22,6 +22,8 @@ public class CustomExceptionHandler : IExceptionHandler
             ConflictException or
             PreconditionRequiredException;
 
+        var exceptionMessage = exception.Message;
+
         var statusCode = exception switch
         {
             InternalServerException => StatusCodes.Status500InternalServerError,
@@ -39,7 +41,7 @@ public class CustomExceptionHandler : IExceptionHandler
         var problemDetails = new ProblemDetails
         {
             Title = showDetails ? exception.GetType().Name : "An unexpected error occurred",
-            Detail = showDetails ? exception.Message : null,
+            Detail = showDetails ? exceptionMessage : null,
             Status = statusCode,
             Instance = context.Request.Path,
             Type = $"https://httpstatuses.io/{statusCode}",

@@ -43,11 +43,14 @@ public interface IUserRepository
     Task<bool> IsUserNameTakenAsync(string userName, CancellationToken cancellationToken = default);
     Task<bool> UserExists(Guid id, CancellationToken cancellationToken = default);
 
-    Task<IEnumerable<User>> GetUsersBySimilarityAsync(double similarityLevel, int page,
-        int viewCount,
+    Task<IEnumerable<User>> GetUsersBySimilarityAsync(double similarityLevel, int page, int viewCount,
         string? name = null, string? surname = null, string? email = null,
         string? phone = null, string? userName = null, Guid? id = null,
-        string? description = null, bool? isSupplier = null, CancellationToken cancellationToken = default);
+        string? description = null, bool? isSupplier = null, bool track = true,
+        CancellationToken cancellationToken = default);
+
+    Task<IEnumerable<User>> GetUserBySearchColumn(string? searchTerm, int page, int viewCount, bool? isSupplier = null, bool track = true,
+        CancellationToken cancellationToken = default);
 
     Task<decimal?> GetUsersDiscountAsync(Guid userId, CancellationToken cancellationToken = default);
 

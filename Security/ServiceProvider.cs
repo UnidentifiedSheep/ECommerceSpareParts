@@ -12,6 +12,7 @@ public static class ServiceProvider
         collection.AddSingleton<IJwtGenerator, JwtGenerator>();
         collection.AddSingleton<IPasswordManager, PasswordManager>();
         collection.AddSingleton(passwordRules ?? new PasswordRules());
+        collection.AddSingleton<ITokenHasher, TokenHasher>();
         return collection;
     }
 }

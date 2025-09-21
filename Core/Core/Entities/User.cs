@@ -66,7 +66,7 @@ public partial class User
 
     public virtual UserInfo? UserInfo { get; set; }
 
-    public virtual UserPhone? UserPhone { get; set; }
+    public virtual ICollection<UserPhone> UserPhones { get; set; } = new List<UserPhone>();
 
     public virtual ICollection<UserRole> UserRoles { get; set; } = new List<UserRole>();
 

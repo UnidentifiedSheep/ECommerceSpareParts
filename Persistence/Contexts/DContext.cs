@@ -1321,6 +1321,7 @@ public partial class DContext : DbContext
             entity.Property(e => e.UserName)
                 .HasMaxLength(36)
                 .HasColumnName("user_name");
+            
         });
 
         modelBuilder.Entity<UserBalance>(entity =>
@@ -1437,6 +1438,10 @@ public partial class DContext : DbContext
                 .HasMethod("gin")
                 .HasOperators(new[] { "gin_trgm_ops" });
 
+            entity.HasIndex(e => e.SearchColumn, "user_info_search_column_index")
+                .HasMethod("gin")
+                .HasOperators(new[] { "gin_trgm_ops" });
+
             entity.HasIndex(e => e.Surname, "user_info_surname_index")
                 .HasMethod("gin")
                 .HasOperators(new[] { "gin_trgm_ops" });
@@ -1447,6 +1452,7 @@ public partial class DContext : DbContext
             entity.Property(e => e.Description).HasColumnName("description");
             entity.Property(e => e.IsSupplier).HasColumnName("is_supplier");
             entity.Property(e => e.Name).HasColumnName("name");
+            entity.Property(e => e.SearchColumn).HasColumnName("search_column");
             entity.Property(e => e.Surname).HasColumnName("surname");
 
             entity.HasOne(d => d.User).WithOne(p => p.UserInfo)
@@ -1460,9 +1466,13 @@ public partial class DContext : DbContext
 
             entity.ToTable("user_phones", "auth");
 
+            entity.HasIndex(e => e.NormalizedPhone, "user_phones_normalized_phone_index")
+                .HasMethod("gin")
+                .HasOperators(new[] { "gin_trgm_ops" });
+
             entity.HasIndex(e => e.NormalizedPhone, "user_phones_normalized_phone_uindex").IsUnique();
 
-            entity.HasIndex(e => e.UserId, "user_phones_user_id_uindex")
+            entity.HasIndex(e => new { e.UserId, e.IsPrimary }, "user_phones_user_id_is_primary_uindex")
                 .IsUnique()
                 .HasFilter("(is_primary = true)");
 
@@ -1493,8 +1503,8 @@ public partial class DContext : DbContext
                 .HasColumnName("updated_at");
             entity.Property(e => e.UserId).HasColumnName("user_id");
 
-            entity.HasOne(d => d.User).WithOne(p => p.UserPhone)
-                .HasForeignKey<UserPhone>(d => d.UserId)
+            entity.HasOne(d => d.User).WithMany(p => p.UserPhones)
+                .HasForeignKey(d => d.UserId)
                 .HasConstraintName("user_phones_user_id_fkey");
         });
 

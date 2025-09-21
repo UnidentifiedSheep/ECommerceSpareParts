@@ -12,7 +12,8 @@ public class UserTokenRepository(DContext context) : IUserTokenRepository
         => await context.UserTokens.ConfigureTracking(track).FirstOrDefaultAsync(x => x.Id == id, cancellationToken);
 
     public async Task<UserToken?> GetTokenByHashAsync(string hash, bool track = true, CancellationToken cancellationToken = default) 
-        => await context.UserTokens.ConfigureTracking(track).FirstOrDefaultAsync(x => x.TokenHash == hash, cancellationToken);
+        => await context.UserTokens.ConfigureTracking(track)
+            .FirstOrDefaultAsync(x => x.TokenHash == hash, cancellationToken);
 
     public async Task<bool> TokenExistsAsync(Guid id, CancellationToken cancellationToken = default) 
         => await context.UserTokens.AsNoTracking().AnyAsync(x => x.Id == id, cancellationToken);

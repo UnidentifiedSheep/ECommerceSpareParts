@@ -11,6 +11,7 @@ using Microsoft.AspNetCore.Mvc;
 namespace MonoliteUnicorn.EndPoints.Users;
 
 public record GetUsersRequest(
+    [FromQuery(Name = "searchTerm")] string? SearchTerm,
     [FromQuery(Name = "id")] Guid? Id,
     [FromQuery(Name = "name")] string? Name,
     [FromQuery(Name = "surname")] string? Surname,
@@ -36,8 +37,8 @@ public class GetUsersEndPoint : ICarterModule
                 {
                     var userId = claims.FindFirstValue(ClaimTypes.NameIdentifier);
                     if (userId == null) return Results.Unauthorized();
-                    var query = new GetUsersQuery(new PaginationModel(request.Page, request.ViewCount),
-                        request.SimilarityLevel,
+                    var pagination = new PaginationModel(request.Page, request.ViewCount);
+                    var query = new GetUsersQuery(request.SearchTerm, pagination, request.SimilarityLevel,
                         userId, request.Name, request.Surname, request.Email, request.Phone, request.UserName,
                         request.Id,
                         request.Description, request.IsSupplier, Enum.Parse<GeneralSearchStrategy>(request.SearchMethod));
