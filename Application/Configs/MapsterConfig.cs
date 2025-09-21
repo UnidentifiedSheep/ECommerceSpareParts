@@ -206,9 +206,10 @@ public static class MapsterConfig
             .Map(d => d.Description, s => s.Description)
             .Map(d => d.Name, s => s.Name)
             .Map(d => d.Surname, s => s.Surname)
-            .Map(d => d.IsSupplier, s => s.IsSupplier);
-        
-        TypeAdapterConfig<UserInfo, UserInfoDto>.NewConfig()
+            .Map(d => d.IsSupplier, s => s.IsSupplier)
+            .Map(d => d.SearchColumn, s => $"{s.Name} {s.Surname} {s.Description}".ToNormalized());
+
+    TypeAdapterConfig<UserInfo, UserInfoDto>.NewConfig()
             .Map(d => d.Description, s => s.Description)
             .Map(d => d.Name, s => s.Name)
             .Map(d => d.Surname, s => s.Surname)
