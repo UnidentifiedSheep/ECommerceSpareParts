@@ -7,7 +7,6 @@ namespace Application.Behaviors;
 
 public class CacheBehavior<TRequest, TResponse>(
     ICache cache,
-    IEnumerable<ICacheableQuery<TRequest>> cacheableList,
     IRelatedDataFactory relatedDataFactory)
     : IPipelineBehavior<TRequest, TResponse>
     where TRequest : IRequest<TResponse>
@@ -16,24 +15,24 @@ public class CacheBehavior<TRequest, TResponse>(
     public async Task<TResponse> Handle(TRequest request, RequestHandlerDelegate<TResponse> next,
         CancellationToken cancellationToken)
     {
-        var cacheable = cacheableList.FirstOrDefault();
-        if (cacheable == null)
+        if (request is not ICacheableQuery cacheable)
             return await next(cancellationToken);
 
-        var cacheKey = cacheable.GetCacheKey(request);
-        var duration = cacheable.GetDurationSeconds(request);
-        var entityId = cacheable.GetEntityId(request);
-        var relatedType = cacheable.GetRelatedType(request);
-        var relatedDataRepository = relatedDataFactory.GetRepository(relatedType);
+        var cacheKey = cacheable.GetCacheKey();
 
-        await relatedDataRepository.AddRelatedDataAsync(entityId, cacheKey);
         var cacheValue = await cache.StringGetAsync<TResponse>(cacheKey);
         if (cacheValue != null)
             return cacheValue;
 
         var response = await next(cancellationToken);
 
+        var duration = cacheable.GetDurationSeconds();
+        var relatedType = cacheable.GetRelatedType();
+        var relatedDataRepository = relatedDataFactory.GetRepository(relatedType);
+        await relatedDataRepository.AddRelatedDataAsync(cacheable.RelatedEntityIds, cacheKey);
+
         await cache.StringSetAsync(cacheKey, response, TimeSpan.FromSeconds(duration));
         return response;
     }
+
 }

@@ -61,4 +61,36 @@ public class Cache(IDatabase redis) : ICache
     {
         await redis.KeyExpireAsync(key, expiry);
     }
+
+    public async Task SetAddAsync(IEnumerable<string> keys, string member, TimeSpan? expiry = null)
+    {
+        var batch = redis.CreateBatch();
+        List<Task> tasks = new List<Task>();
+
+        foreach (var key in keys)
+        {
+            tasks.Add(batch.SetAddAsync(key, member));
+            tasks.Add(batch.KeyExpireAsync(key, expiry));
+        }
+
+        batch.Execute();
+        await Task.WhenAll(tasks);
+    }
+    
+    public async Task SetAddAsync(IEnumerable<string> keys, IEnumerable<string> members, TimeSpan? expiry = null)
+    {
+        var mems = members.ToList();
+        var batch = redis.CreateBatch();
+        List<Task> tasks = new List<Task>();
+
+        foreach (var key in keys)
+        {
+            var values = mems.Select(k => new RedisValue(k)).ToArray();
+            tasks.Add(batch.SetAddAsync(key, values));
+            tasks.Add(batch.KeyExpireAsync(key, expiry));
+        }
+
+        batch.Execute();
+        await Task.WhenAll(tasks);
+    }
 }

@@ -6,5 +6,5 @@ namespace Core.Interfaces;
 public interface IRelatedDataFactory
 {
     RelatedDataBase<T> GetRepository<T>();
-    Abstractions.RelatedDataBase GetRepository(Type relatedType);
+    RelatedDataBase GetRepository(Type relatedType);
 }

@@ -56,6 +56,12 @@ public static class ServiceProvider
             var cache = sp.GetRequiredService<ICache>();
             return new ProducerRelatedData(cache, relatedDataTtl);
         });
+        
+        collection.AddTransient<RelatedDataBase<Currency>, CurrencyRelatedData>(sp =>
+        {
+            var cache = sp.GetRequiredService<ICache>();
+            return new CurrencyRelatedData(cache, relatedDataTtl);
+        });
 
         collection.AddValidatorsFromAssembly(typeof(Global).Assembly);
 
@@ -84,7 +90,7 @@ public static class ServiceProvider
             .WithScopedLifetime()
         );
 
-        collection.Scan(scan => scan
+        /*collection.Scan(scan => scan
             .FromAssemblyOf<GetArticlesAmwLogSettings>()
             .AddClasses(classes => classes.Where(type =>
                 type.GetInterfaces()
@@ -94,7 +100,7 @@ public static class ServiceProvider
                 .Where(i => i.IsGenericType &&
                             i.GetGenericTypeDefinition() == typeof(ICacheableQuery<>)))
             .WithScopedLifetime()
-        );
+        );*/
 
 
         collection.AddMediatR(config =>

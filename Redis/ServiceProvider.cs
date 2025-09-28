@@ -12,25 +12,25 @@ public static class ServiceProvider
     {
         Redis.Configure(redisConnectionString);
 
-        collection.AddTransient<ICache, Cache>(_ =>
+        collection.AddScoped<ICache, Cache>(_ =>
         {
             var redis = Redis.GetRedis();
             return new Cache(redis);
         });
-        collection.AddTransient<IRedisArticlePriceRepository, RedisArticlePricesRepository>(_ =>
+        collection.AddScoped<IRedisArticlePriceRepository, RedisArticlePricesRepository>(_ =>
         {
             var redis = Redis.GetRedis();
             var ttl = TimeSpan.FromHours(8);
             return new RedisArticlePricesRepository(redis, ttl);
         });
-        collection.AddTransient<IRedisUserRepository, RedisUserRepository>(_ =>
+        collection.AddScoped<IRedisUserRepository, RedisUserRepository>(_ =>
         {
             var redis = Redis.GetRedis();
             var ttl = TimeSpan.FromHours(1);
             return new RedisUserRepository(redis, ttl);
         });
 
-        collection.AddTransient<IRelatedDataFactory, RelatedDataFactory>();
+        collection.AddScoped<IRelatedDataFactory, RelatedDataFactory>();
 
         return collection;
     }

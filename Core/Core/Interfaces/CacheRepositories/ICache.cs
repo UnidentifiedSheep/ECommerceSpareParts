@@ -11,5 +11,14 @@ public interface ICache
     Task<IEnumerable<string?>> SetMembersAsync(string key);
     Task SetAddAsync(string key, string value);
     Task SetAddAsync(string key, IEnumerable<string> members);
+    Task SetAddAsync(IEnumerable<string> keys, string member, TimeSpan? expiry = null);
+    /// <summary>
+    /// Adds to each key from keys, all members
+    /// </summary>
+    /// <param name="keys">redis keys</param>
+    /// <param name="members">values</param>
+    /// <param name="expiry">when expires</param>
+    /// <returns>Task</returns>
+    Task SetAddAsync(IEnumerable<string> keys, IEnumerable<string> members, TimeSpan? expiry = null);
     Task KeyExpireAsync(string key, TimeSpan? expiry = null);
 }

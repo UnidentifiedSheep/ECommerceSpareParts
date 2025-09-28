@@ -64,4 +64,12 @@ public class CurrencyRepository(DContext context) : ICurrencyRepository
     {
         return await context.Currencies.AsNoTracking().AnyAsync(x => x.CurrencySign == sign, cancellationToken);
     }
+
+    public async Task<IEnumerable<Currency>> GetCurrencies(int page, int limit, bool track = true, CancellationToken cancellationToken = default)
+    {
+        return await context.Currencies.ConfigureTracking(track)
+            .Skip(page * limit)
+            .Take(limit)
+            .ToListAsync(cancellationToken);
+    }
 }

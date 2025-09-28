@@ -1,13 +1,22 @@
 using Application.Interfaces;
+using Core.Entities;
 using Core.Interfaces.DbRepositories;
 using Core.Models;
+using Core.StaticFunctions;
 using Exceptions.Exceptions.Articles;
 using Mapster;
 
 namespace Application.Handlers.Articles.GetArticleCrosses;
 
 public record GetArticleCrossesQuery<TDto>(int ArticleId, PaginationModel Pagination, string? SortBy, string? UserId)
-    : IQuery<GetArticleCrossesResult<TDto>>;
+    : IQuery<GetArticleCrossesResult<TDto>>, ICacheableQuery
+{
+    public HashSet<string> RelatedEntityIds { get; } = [ArticleId.ToString()];
+    public string GetCacheKey() => string.Format(CacheKeys.ArticleCrossesCacheKey, ArticleId, Pagination.Page, 
+        Pagination.Size, SortBy);
+    public Type GetRelatedType() => typeof(Article);
+    public int GetDurationSeconds() => 600;
+}
 
 public record GetArticleCrossesResult<TDto>(IEnumerable<TDto> Crosses, TDto RequestedArticle);
 
@@ -25,6 +34,8 @@ public class GetArticleCrossesHandler<TDto>(IArticlesRepository articlesReposito
 
         var requestedAdapted = requestedArticle.Adapt<TDto>();
         var crossArticlesAdapted = crosses.Adapt<List<TDto>>();
+        
+        request.RelatedEntityIds.UnionWith(crosses.Select(x => x.Id.ToString()));
 
         return new GetArticleCrossesResult<TDto>(crossArticlesAdapted, requestedAdapted);
     }

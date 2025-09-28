@@ -1,9 +1,9 @@
 namespace Application.Interfaces;
 
-public interface ICacheableQuery<in TRequest>
+public interface ICacheableQuery
 {
-    string GetCacheKey(TRequest request);
-    string GetEntityId(TRequest request);
-    Type GetRelatedType(TRequest request);
-    int GetDurationSeconds(TRequest request);
+    HashSet<string> RelatedEntityIds { get; }
+    string GetCacheKey();
+    Type GetRelatedType();
+    int GetDurationSeconds();
 }

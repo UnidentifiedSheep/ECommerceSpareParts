@@ -21,6 +21,12 @@ public abstract class RelatedDataBase(ICache cache, TimeSpan? ttl = null)
         await cache.KeyExpireAsync(key, ttl);
     }
 
+    public virtual async Task AddRelatedDataAsync(IEnumerable<string> ids, string relatedKey)
+    {
+        var keys = ids.Select(GetRelatedDataKey);
+        await cache.SetAddAsync(keys, relatedKey, ttl);
+    }
+
     public virtual async Task AddRelatedDataAsync(string id, IEnumerable<string> relatedKeys)
     {
         var key = GetRelatedDataKey(id);
