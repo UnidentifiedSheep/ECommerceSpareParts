@@ -11,4 +11,7 @@ public interface IRoleRepository
     Task<bool> RoleExistsAsync(Guid id, CancellationToken cancellationToken = default);
     Task<IEnumerable<Guid>> RolesExistsAsync(IEnumerable<Guid> ids, CancellationToken cancellationToken = default);
     Task<IEnumerable<string>> RolesExistsAsync(IEnumerable<string> roleNames, CancellationToken cancellationToken = default);
+
+    Task<IEnumerable<Role>> SearchRoles(string? searchTerm, int page, int limit, bool track = true,
+        CancellationToken cancellationToken = default);
 }

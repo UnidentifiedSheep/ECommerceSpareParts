@@ -1,4 +1,3 @@
-using Core.Entities;
 using Core.Interfaces;
 using Core.Interfaces.CacheRepositories;
 using Microsoft.Extensions.DependencyInjection;
@@ -18,12 +17,6 @@ public static class ServiceProvider
             var redis = Redis.GetRedis();
             return new Cache(redis);
         });
-        collection.AddTransient<IRelatedDataRepository<Article>, ArticleRelatedDataRepository>(_ =>
-        {
-            var redis = Redis.GetRedis();
-            var ttl = TimeSpan.FromHours(10);
-            return new ArticleRelatedDataRepository(redis, ttl);
-        });
         collection.AddTransient<IRedisArticlePriceRepository, RedisArticlePricesRepository>(_ =>
         {
             var redis = Redis.GetRedis();
@@ -37,7 +30,7 @@ public static class ServiceProvider
             return new RedisUserRepository(redis, ttl);
         });
 
-        collection.AddTransient<IRelatedDataRepositoryFactory, RelatedDataRepositoryFactory>();
+        collection.AddTransient<IRelatedDataFactory, RelatedDataFactory>();
 
         return collection;
     }

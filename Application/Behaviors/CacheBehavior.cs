@@ -8,7 +8,7 @@ namespace Application.Behaviors;
 public class CacheBehavior<TRequest, TResponse>(
     ICache cache,
     IEnumerable<ICacheableQuery<TRequest>> cacheableList,
-    IRelatedDataRepositoryFactory relatedDataRepositoryFactory)
+    IRelatedDataFactory relatedDataFactory)
     : IPipelineBehavior<TRequest, TResponse>
     where TRequest : IRequest<TResponse>
     where TResponse : notnull
@@ -24,7 +24,7 @@ public class CacheBehavior<TRequest, TResponse>(
         var duration = cacheable.GetDurationSeconds(request);
         var entityId = cacheable.GetEntityId(request);
         var relatedType = cacheable.GetRelatedType(request);
-        var relatedDataRepository = relatedDataRepositoryFactory.GetRepository(relatedType);
+        var relatedDataRepository = relatedDataFactory.GetRepository(relatedType);
 
         await relatedDataRepository.AddRelatedDataAsync(entityId, cacheKey);
         var cacheValue = await cache.StringGetAsync<TResponse>(cacheKey);

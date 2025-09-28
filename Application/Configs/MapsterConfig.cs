@@ -17,6 +17,7 @@ using Core.Dtos.Amw.Users;
 using Core.Dtos.Anonymous.Producers;
 using Core.Dtos.Emails;
 using Core.Dtos.Member.Vehicles;
+using Core.Dtos.Roles;
 using Core.Dtos.Services.Articles;
 using Core.Dtos.Users;
 using Core.Entities;
@@ -209,7 +210,7 @@ public static class MapsterConfig
             .Map(d => d.IsSupplier, s => s.IsSupplier)
             .Map(d => d.SearchColumn, s => $"{s.Name} {s.Surname} {s.Description}".ToNormalized());
 
-    TypeAdapterConfig<UserInfo, UserInfoDto>.NewConfig()
+        TypeAdapterConfig<UserInfo, UserInfoDto>.NewConfig()
             .Map(d => d.Description, s => s.Description)
             .Map(d => d.Name, s => s.Name)
             .Map(d => d.Surname, s => s.Surname)
@@ -232,6 +233,15 @@ public static class MapsterConfig
             .Map(dest => dest.CurrencyId, src => src.CurrencyId)
             .Map(dest => dest.PurchaseDatetime, src => src.SaleDatetime);
 
+        
+        //Roles
+
+        TypeAdapterConfig<Role, RoleDto>.NewConfig()
+            .IgnoreNonMapped(true)
+            .Map(dest => dest.Id, src => src.Id)
+            .Map(dest => dest.Name, src => src.Name)
+            .Map(dest => dest.Description, src => src.Description)
+            .Map(dest => dest.IsSystem, src => src.IsSystem);
         //Balances
 
         TypeAdapterConfig<Transaction, TransactionDto>.NewConfig()

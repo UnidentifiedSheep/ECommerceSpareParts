@@ -4,10 +4,13 @@ using Application.Handlers.Articles.GetArticleCrosses;
 using Application.Handlers.Articles.GetArticles;
 using Application.Interfaces;
 using Application.Pricing;
+using Application.RelatedData;
 using Application.Services;
 using Application.Validators;
+using Core.Abstractions;
 using Core.Entities;
 using Core.Interfaces;
+using Core.Interfaces.CacheRepositories;
 using Core.Interfaces.Services;
 using Core.Interfaces.Validators;
 using Core.Models;
@@ -26,6 +29,7 @@ public static class ServiceProvider
     public static IServiceCollection AddApplicationLayer(this IServiceCollection collection, 
         UserEmailOptions? emailOptions = null, UserPhoneOptions? phoneOptions = null)
     {
+        var relatedDataTtl = TimeSpan.FromHours(10);
         collection.AddSingleton(emailOptions ?? new UserEmailOptions());
         collection.AddSingleton(phoneOptions ?? new UserPhoneOptions());
         collection.AddSingleton<ICurrencyConverter, CurrencyConverter>(_ => new CurrencyConverter(Global.UsdId));
@@ -41,6 +45,17 @@ public static class ServiceProvider
 
         collection.AddSingleton<IEmailValidator, EmailValidator>();
         collection.AddSingleton<IConcurrencyValidator<StorageContent>, StorageContentConcurrencyValidator>();
+        
+        collection.AddTransient<RelatedDataBase<Article>, ArticleRelatedData>(sp =>
+        {
+            var cache = sp.GetRequiredService<ICache>();
+            return new ArticleRelatedData(cache, relatedDataTtl);
+        });
+        collection.AddTransient<RelatedDataBase<Producer>, ProducerRelatedData>(sp =>
+        {
+            var cache = sp.GetRequiredService<ICache>();
+            return new ProducerRelatedData(cache, relatedDataTtl);
+        });
 
         collection.AddValidatorsFromAssembly(typeof(Global).Assembly);
 

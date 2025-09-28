@@ -1,6 +1,8 @@
+using System.Diagnostics.CodeAnalysis;
 using Core.Entities;
 using Core.Extensions;
 using Core.Interfaces.DbRepositories;
+using Core.Models;
 using Microsoft.EntityFrameworkCore;
 using Persistence.Contexts;
 using Persistence.Extensions;
@@ -52,5 +54,19 @@ public class RoleRepository(DContext context) : IRoleRepository
             .Select(x => x.NormalizedName)
             .ToListAsync(cancellationToken);
         return set.Except(foundRoles);
+    }
+
+    [SuppressMessage("ReSharper", "EntityFramework.ClientSideDbFunctionCall")]
+    public async Task<IEnumerable<Role>> SearchRoles(string? searchTerm, int page, int limit, bool track = true, 
+        CancellationToken cancellationToken = default)
+    {
+        return await context.Roles.ConfigureTracking(track)
+            .Where(x => EF.Functions.ILike(x.NormalizedName, $"%{searchTerm}%"))
+            .Select(x => new { Role = x, Rank = EF.Functions.TrigramsSimilarity(x.NormalizedName, $"%{searchTerm}%")})
+            .OrderByDescending(x => x.Rank)
+            .Select(x => x.Role)
+            .Skip(page * limit)
+            .Take(limit)
+            .ToListAsync(cancellationToken);
     }
 }

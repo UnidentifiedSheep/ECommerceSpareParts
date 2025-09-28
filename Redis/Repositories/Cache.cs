@@ -39,4 +39,26 @@ public class Cache(IDatabase redis) : ICache
         var redisKeys = keys.Select(k => new RedisKey(k)).ToArray();
         await redis.KeyDeleteAsync(redisKeys);
     }
+
+    public async Task<IEnumerable<string?>> SetMembersAsync(string key)
+    {
+        return (await redis.SetMembersAsync(key))
+            .Select(x => x.HasValue ? x.ToString() : null);
+    }
+
+    public async Task SetAddAsync(string key, string value)
+    {
+        await redis.SetAddAsync(key, value);
+    }
+
+    public async Task SetAddAsync(string key, IEnumerable<string> members)
+    {
+        var values = members.Select(k => new RedisValue(k)).ToArray();
+        await redis.SetAddAsync(key, values);
+    }
+
+    public async Task KeyExpireAsync(string key, TimeSpan? expiry = null)
+    {
+        await redis.KeyExpireAsync(key, expiry);
+    }
 }
