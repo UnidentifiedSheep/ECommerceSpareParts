@@ -11,7 +11,7 @@ public class PurchaseDateTimeValidator : AbstractValidator<DateTime>
             .WithMessage("Дата закупки не может быть более чем трёхмесячной давности.");
 
         RuleFor(x => x)
-            .LessThanOrEqualTo(DateTime.Now.Date.AddMinutes(10))
+            .LessThanOrEqualTo(DateTime.Now.AddMinutes(10))
             .WithMessage("Дата закупки не может быть в будущем.");
     }
 }

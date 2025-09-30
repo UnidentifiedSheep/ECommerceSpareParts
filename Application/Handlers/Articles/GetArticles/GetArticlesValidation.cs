@@ -9,8 +9,7 @@ public class GetArticlesAnonymousValidation : AbstractValidator<GetArticlesQuery
     public GetArticlesAnonymousValidation()
     {
         RuleFor(x => x.SearchTerm)
-            .NotEmpty()
-            .MinimumLength(3)
+            .Must(x => x.Trim().Length >= 3)
             .WithMessage("Минимальная длина строки поиска — 3");
 
         RuleFor(x => x.Pagination)
@@ -23,8 +22,7 @@ public class GetArticlesAmwValidation : AbstractValidator<GetArticlesQuery<Core.
     public GetArticlesAmwValidation()
     {
         RuleFor(x => x.SearchTerm)
-            .NotEmpty()
-            .MinimumLength(3)
+            .Must(x => x.Trim().Length >= 3)
             .WithMessage("Минимальная длина строки поиска — 3");
 
         RuleFor(x => x.Pagination)

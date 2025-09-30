@@ -9,4 +9,5 @@ public class StorageContentDto
     public decimal BuyPrice { get; set; }
     public int CurrencyId { get; set; }
     public string ConcurrencyCode { get; set; } = null!;
+    public DateTime PurchaseDatetime { get; set; }
 }

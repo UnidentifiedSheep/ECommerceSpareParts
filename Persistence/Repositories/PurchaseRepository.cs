@@ -30,8 +30,7 @@ public class PurchaseRepository(DContext context) : IPurchaseRepository
     }
 
     public async Task<IEnumerable<Purchase>> GetPurchases(DateTime rangeStart, DateTime rangeEnd, int page,
-        int viewCount,
-        Guid? supplierId, int? currencyId, string? sortBy, string? searchTerm, bool track = true,
+        int viewCount, Guid? supplierId, int? currencyId, string? sortBy, string? searchTerm, bool track = true,
         CancellationToken cancellationToken = default)
     {
         var query = context.Purchases.ConfigureTracking(track);
@@ -63,5 +62,14 @@ public class PurchaseRepository(DContext context) : IPurchaseRepository
             .Take(viewCount)
             .ToListAsync(cancellationToken);
         return result;
+    }
+
+    public async Task<IEnumerable<PurchaseContent>> GetPurchaseContent(string purchaseId, bool track = true, CancellationToken cancellationToken = default)
+    {
+        return await context.PurchaseContents.ConfigureTracking(track)
+            .Include(x => x.Article)
+            .Include(x => x.StorageContent)
+            .Where(x => x.PurchaseId == purchaseId)
+            .ToListAsync(cancellationToken);
     }
 }

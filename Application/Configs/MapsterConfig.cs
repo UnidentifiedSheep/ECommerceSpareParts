@@ -38,6 +38,16 @@ public static class MapsterConfig
 {
     public static void Configure()
     {
+
+        TypeAdapterConfig<PurchaseContent, PurchaseContentDto>.NewConfig()
+            .Map(dest => dest.Id, src => src.Id)
+            .Map(dest => dest.StorageContent, src => src.StorageContent)
+            .Map(dest => dest.Article, src => src.Article)
+            .Map(dest => dest.TotalSum, src => src.TotalSum)
+            .Map(dest => dest.Comment, src => src.Comment)
+            .Map(dest => dest.Price, src => src.Price)
+            .Map(dest => dest.Count, src => src.Count);
+            
         TypeAdapterConfig<NewPurchaseContentDto, PurchaseContent>.NewConfig()
             .Map(dest => dest.ArticleId, src => src.ArticleId)
             .Map(dest => dest.Count, src => src.Count)
@@ -177,7 +187,7 @@ public static class MapsterConfig
         //Purchases
         TypeAdapterConfig<Purchase, AmwPurchaseDto>.NewConfig()
             .Map(dest => dest.Id, src => src.Id)
-            .Map(dest => dest.SupplierId, src => src.SupplierId)
+            .Map(dest => dest.Supplier, src => src.Supplier)
             .Map(dest => dest.TotalSum, src => src.Transaction.TransactionSum)
             .Map(dest => dest.TransactionId, src => src.TransactionId)
             .Map(dest => dest.CurrencyId, src => src.CurrencyId)
@@ -306,10 +316,10 @@ public static class MapsterConfig
             .Map(dest => dest.BuyPrice, src => src.BuyPrice)
             .Map(dest => dest.CurrencyId, src => src.CurrencyId)
             .Map(dest => dest.StorageName, src => src.StorageName)
+            .Map(dest => dest.PurchaseDatetime, src => src.PurchaseDatetime)
             .Map(dest => dest.ConcurrencyCode, src =>
                 ConcurrencyStatic.GetConcurrencyCode(src.Id, src.ArticleId, src.BuyPrice, src.CurrencyId,
-                    src.StorageName,
-                    src.BuyPriceInUsd, src.Count, src.PurchaseDatetime));
+                    src.StorageName, src.BuyPriceInUsd, src.Count, src.PurchaseDatetime));
 
         TypeAdapterConfig<PatchStorageContentDto, StorageContent>.NewConfig()
             .IgnorePatchIfNotSet()

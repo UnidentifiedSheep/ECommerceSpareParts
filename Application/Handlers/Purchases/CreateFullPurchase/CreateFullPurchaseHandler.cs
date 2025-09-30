@@ -39,13 +39,12 @@ public class CreateFullPurchaseHandler(IMediator mediator) : ICommandHandler<Cre
         var totalSum = content.GetTotalSum();
 
         var transaction = await CreateTransaction(supplierId, Global.SystemId, totalSum, TransactionStatus.Purchase,
-            currencyId,
-            whoCreated, dateTime, cancellationToken);
+            currencyId, whoCreated, dateTime, cancellationToken);
 
         await CreatePurchase(content, currencyId, request.Comment, supplierId, whoCreated, transaction.Id, storageName,
             dateTime, cancellationToken);
 
-        await AddContentToStorage(content, storageName, whoCreated, currencyId, cancellationToken);
+        await AddContentToStorage(content, storageName, whoCreated, currencyId, dateTime, cancellationToken);
 
         if (payedSum > 0)
             await CreateTransaction(Global.SystemId, supplierId, payedSum, TransactionStatus.Normal, currencyId,
@@ -72,12 +71,13 @@ public class CreateFullPurchaseHandler(IMediator mediator) : ICommandHandler<Cre
     }
 
     private async Task AddContentToStorage(List<NewPurchaseContentDto> content, string storageName, Guid userId,
-        int currencyId, CancellationToken cancellationToken = default)
+        int currencyId, DateTime purchaseDate, CancellationToken cancellationToken = default)
     {
         var storageContents = content.Select(x =>
         {
             var temp = x.Adapt<NewStorageContentDto>();
             temp.CurrencyId = currencyId;
+            temp.PurchaseDate = purchaseDate;
             return temp;
         });
         var command = new AddContentCommand(storageContents, storageName, userId, StorageMovementType.Purchase);

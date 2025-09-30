@@ -14,4 +14,6 @@ public interface IPurchaseRepository
         Guid? supplierId,
         int? currencyId, string? sortBy, string? searchTerm, bool track = true,
         CancellationToken cancellationToken = default);
+    
+    Task<IEnumerable<PurchaseContent>> GetPurchaseContent(string purchaseId, bool track = true, CancellationToken cancellationToken = default);
 }

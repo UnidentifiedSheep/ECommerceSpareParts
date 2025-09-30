@@ -34,7 +34,7 @@ public class BalanceRepository(DContext context) : IBalanceRepository
                       WHERE transaction_datetime < @dt
                         AND (sender_id = @userId OR receiver_id = @userId)
                         AND currency_id = @currencyId
-                      ORDER BY transaction_datetime DESC
+                      ORDER BY transaction_datetime DESC, id DESC
                       LIMIT 1
                       FOR UPDATE
                   """;
