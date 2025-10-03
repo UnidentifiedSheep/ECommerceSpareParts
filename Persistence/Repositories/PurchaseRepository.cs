@@ -54,9 +54,11 @@ public class PurchaseRepository(DContext context) : IPurchaseRepository
 
         var startDate = DateTime.SpecifyKind(rangeStart.Date, DateTimeKind.Unspecified);
         var endDate = DateTime.SpecifyKind(rangeEnd.Date, DateTimeKind.Unspecified).AddDays(1);
-        var result = await query.Where(x => x.CreationDatetime >= startDate && x.CreationDatetime <= endDate)
+        var result = await query.Where(x => x.PurchaseDatetime >= startDate.Date && x.PurchaseDatetime <= endDate.Date.AddDays(1))
             .Include(x => x.Transaction)
             .Include(x => x.Supplier)
+            .ThenInclude(x => x.UserInfo)
+            .Include(x => x.Currency)
             .SortBy(sortBy)
             .Skip(viewCount * page)
             .Take(viewCount)
@@ -68,7 +70,7 @@ public class PurchaseRepository(DContext context) : IPurchaseRepository
     {
         return await context.PurchaseContents.ConfigureTracking(track)
             .Include(x => x.Article)
-            .Include(x => x.StorageContent)
+            .ThenInclude(x => x.Producer)
             .Where(x => x.PurchaseId == purchaseId)
             .ToListAsync(cancellationToken);
     }

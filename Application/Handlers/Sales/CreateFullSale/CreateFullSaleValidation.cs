@@ -15,7 +15,7 @@ public class CreateFullSaleValidation : AbstractValidator<CreateFullSaleCommand>
             .SetValidator(new SaleContentValidator());
 
         RuleFor(x => x.PayedSum)
-            .GreaterThan(0)
+            .GreaterThanOrEqualTo(0)
             .When(x => x.PayedSum != null)
             .WithMessage("Оплаченная сумма должна быть больше или равна 0, если указана")
             .PrecisionScale(18, 2, true)

@@ -15,4 +15,6 @@ public interface ISaleRepository
     Task<IEnumerable<Sale>> GetSales(DateTime rangeStart, DateTime rangeEnd, int page, int viewCount, bool track = true,
         string? sortBy = null, string? searchTerm = null, Guid? buyerId = null,
         int? currencyId = null, CancellationToken cancellationToken = default);
+    
+    Task<IEnumerable<SaleContent>> GetSaleContent(string saleId, bool track = true, CancellationToken cancellationToken = default);
 }

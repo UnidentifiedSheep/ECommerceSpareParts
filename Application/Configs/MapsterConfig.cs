@@ -1,4 +1,3 @@
-using System.Globalization;
 using System.Text.Json;
 using Application.Extensions;
 using Application.Handlers.ArticlePairs.CreatePair;
@@ -41,7 +40,6 @@ public static class MapsterConfig
 
         TypeAdapterConfig<PurchaseContent, PurchaseContentDto>.NewConfig()
             .Map(dest => dest.Id, src => src.Id)
-            .Map(dest => dest.StorageContent, src => src.StorageContent)
             .Map(dest => dest.Article, src => src.Article)
             .Map(dest => dest.TotalSum, src => src.TotalSum)
             .Map(dest => dest.Comment, src => src.Comment)
@@ -187,10 +185,11 @@ public static class MapsterConfig
         //Purchases
         TypeAdapterConfig<Purchase, AmwPurchaseDto>.NewConfig()
             .Map(dest => dest.Id, src => src.Id)
+            .Map(dest => dest.Storage, s => s.Storage)
             .Map(dest => dest.Supplier, src => src.Supplier)
             .Map(dest => dest.TotalSum, src => src.Transaction.TransactionSum)
             .Map(dest => dest.TransactionId, src => src.TransactionId)
-            .Map(dest => dest.CurrencyId, src => src.CurrencyId)
+            .Map(dest => dest.Currency, src => src.Currency)
             .Map(dest => dest.PurchaseDatetime, src => src.PurchaseDatetime)
             .Map(dest => dest.Comment, src => src.Comment);
 
@@ -331,12 +330,22 @@ public static class MapsterConfig
         //SALES
         TypeAdapterConfig<Sale, SaleDto>.NewConfig()
             .Map(dest => dest.Id, src => src.Id)
-            .Map(dest => dest.BuyerId, src => src.BuyerId)
+            .Map(dest => dest.Buyer, src => src.Buyer)
             .Map(dest => dest.TotalSum, src => src.Transaction.TransactionSum)
             .Map(dest => dest.TransactionId, src => src.TransactionId)
-            .Map(dest => dest.CurrencyId, src => src.CurrencyId)
+            .Map(dest => dest.Currency, src => src.Currency)
             .Map(dest => dest.SaleDatetime, src => src.SaleDatetime)
-            .Map(dest => dest.Comment, src => src.Comment);
+            .Map(dest => dest.Comment, src => src.Comment)
+            .Map(dest => dest.Storage, src => src.MainStorageName);
+
+        TypeAdapterConfig<SaleContent, SaleContentDto>.NewConfig()
+            .Map(dest => dest.Id, src => src.Id)
+            .Map(d => d.Article, s => s.Article)
+            .Map(d => d.Comment, s => s.Comment)
+            .Map(d => d.Count, s => s.Count)
+            .Map(d => d.Price, s => s.Price)
+            .Map(d => d.Discount, s => s.Discount)
+            .Map(d => d.TotalSum, s => s.TotalSum);
 
 
         TypeAdapterConfig<NewSaleContentDto, SaleContent>.NewConfig()

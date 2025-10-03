@@ -69,12 +69,22 @@ public class SaleRepository(DContext context) : ISaleRepository
         var endDate = DateTime.SpecifyKind(rangeEnd.Date, DateTimeKind.Unspecified).AddDays(1);
         return await query.Where(x => x.CreationDatetime >= startDate && x.CreationDatetime <= endDate)
             .Include(x => x.Transaction)
-            .Include(x => x.SaleContents)
-            .ThenInclude(x => x.SaleContentDetails)
             .Include(x => x.Buyer)
+            .ThenInclude(x => x.UserInfo)
+            .Include(x => x.Currency)
             .SortBy(sortBy)
             .Skip(viewCount * page)
             .Take(viewCount)
+            .ToListAsync(cancellationToken);
+    }
+
+    public async Task<IEnumerable<SaleContent>> GetSaleContent(string saleId, bool track = true, 
+        CancellationToken cancellationToken = default)
+    {
+        return await context.SaleContents.ConfigureTracking(track)
+            .Include(x => x.Article)
+            .ThenInclude(x => x.Producer)
+            .Where(x => x.SaleId == saleId)
             .ToListAsync(cancellationToken);
     }
 }

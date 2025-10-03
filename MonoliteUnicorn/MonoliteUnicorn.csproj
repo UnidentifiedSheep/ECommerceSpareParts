@@ -60,8 +60,4 @@
         <ProjectReference Include="..\Security\Security.csproj"/>
     </ItemGroup>
 
-    <ItemGroup>
-      <Folder Include="EndPoints\Prices\" />
-    </ItemGroup>
-
 </Project>

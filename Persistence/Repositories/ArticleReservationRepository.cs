@@ -149,16 +149,37 @@ public class ArticleReservationRepository(DContext context) : IArticleReservatio
         IEnumerable<int> articleIds, bool isDone = false, bool track = true,
         CancellationToken cancellationToken = default)
     {
-        return await GetUserReservationsInternalAsync(context.StorageContentReservations, userId, articleIds, isDone,
-            track, cancellationToken);
+        return await context.StorageContentReservations
+            .ConfigureTracking(track)
+            .Where(x => x.UserId == userId &&
+                        articleIds.Contains(x.ArticleId) &&
+                        x.IsDone == isDone)
+            .GroupBy(x => x.ArticleId)
+            .ToDictionaryAsync(g => g.Key,
+                g => g.ToList(), cancellationToken);
     }
 
     public async Task<Dictionary<int, List<StorageContentReservation>>> GetUserReservationsForUpdate(Guid userId,
         IEnumerable<int> articleIds, bool isDone = false, bool track = true,
         CancellationToken cancellationToken = default)
     {
-        return await GetUserReservationsInternalAsync(context.StorageContentReservations.FromSql($"FROM SQL"),
-            userId, articleIds, isDone, track, cancellationToken);
+        var list = await context.StorageContentReservations
+            .FromSql($"""
+                      SELECT *
+                      FROM storage_content_reservations
+                      WHERE user_id = {userId}
+                        AND is_done = {isDone}
+                        AND article_id = ANY({articleIds})
+                      FOR UPDATE
+                      """)
+            .ConfigureTracking(track)
+            .ToListAsync(cancellationToken);
+
+        return list
+            .GroupBy(x => x.ArticleId)
+            .ToDictionary(
+                g => g.Key,
+                g => g.ToList());
     }
 
     private IQueryable<StorageContentReservation> GetReservationsInternal(Guid? userId, bool track, string? sortBy)
@@ -169,22 +190,6 @@ public class ArticleReservationRepository(DContext context) : IArticleReservatio
         if (userId != null)
             query = query.Where(x => x.UserId == userId);
         return query;
-    }
-
-    private async Task<Dictionary<int, List<StorageContentReservation>>> GetUserReservationsInternalAsync(
-        IQueryable<StorageContentReservation> baseQuery, Guid userId, IEnumerable<int> articleIds, bool isDone,
-        bool track, CancellationToken cancellationToken = default)
-    {
-        var query = baseQuery
-            .ConfigureTracking(track)
-            .Where(x => x.UserId == userId &&
-                        articleIds.Contains(x.ArticleId) &&
-                        x.IsDone == isDone);
-
-        return await query
-            .GroupBy(x => x.ArticleId)
-            .ToDictionaryAsync(g => g.Key,
-                g => g.ToList(), cancellationToken);
     }
 
     private Task<Dictionary<int, int>> GetReservationsCountInternalAsync(

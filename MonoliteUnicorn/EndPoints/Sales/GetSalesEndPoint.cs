@@ -1,6 +1,7 @@
 using Application.Handlers.Sales.GetSales;
 using Carter;
 using Core.Dtos.Amw.Sales;
+using Core.Models;
 using Mapster;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
@@ -13,7 +14,7 @@ public class GetSalesRequest
     [FromQuery(Name = "rangeEndDate")] public DateTime RangeEndDate { get; set; }
     [FromQuery(Name = "page")] public int Page { get; set; }
     [FromQuery(Name = "viewCount")] public int ViewCount { get; set; }
-    [FromQuery(Name = "buyerId")] public string? BuyerId { get; set; }
+    [FromQuery(Name = "buyerId")] public Guid? BuyerId { get; set; }
     [FromQuery(Name = "currencyId")] public int? CurrencyId { get; set; }
     [FromQuery(Name = "sortBy")] public string? SortBy { get; set; }
     [FromQuery(Name = "searchTerm")] public string? SearchTerm { get; set; }
@@ -27,7 +28,9 @@ public class GetSalesEndPoint : ICarterModule
     {
         app.MapGet("/sales/", async (ISender sender, [AsParameters] GetSalesRequest request, CancellationToken token) =>
             {
-                var query = request.Adapt<GetSalesQuery>();
+                var pagination = new PaginationModel(request.Page, request.ViewCount);
+                var query = new GetSalesQuery(request.RangeStartDate, request.RangeEndDate, pagination,
+                    request.BuyerId, request.CurrencyId, request.SortBy, request.SearchTerm);
                 var result = await sender.Send(query, token);
                 var response = result.Adapt<GetSalesResponse>();
                 return Results.Ok(response);

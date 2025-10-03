@@ -21,7 +21,7 @@ public class CreateSaleEndPoint : ICarterModule
 {
     public void AddRoutes(IEndpointRouteBuilder app)
     {
-        app.MapPost("/amw/sales/",
+        app.MapPost("/sales/",
                 async (ClaimsPrincipal claims, ISender sender, CreateSaleRequest request, CancellationToken token) =>
                 {
                     if (!Guid.TryParse(claims.FindFirstValue(ClaimTypes.NameIdentifier), out var userId)) 

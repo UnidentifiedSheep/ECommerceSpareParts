@@ -24,9 +24,9 @@ public class CreateFullPurchaseValidation : AbstractValidator<CreateFullPurchase
             .SetValidator(new PurchaseDateTimeValidator());
 
         RuleFor(x => x.PayedSum)
-            .GreaterThan(0)
+            .GreaterThanOrEqualTo(0)
             .When(x => x.PayedSum != null)
-            .WithMessage("Оплаченная сумма должна быть больше 0.")
+            .WithMessage("Оплаченная сумма должна быть больше или равна 0.")
             .PrecisionScale(18, 2, true)
             .When(x => x.PayedSum != null)
             .WithMessage("Оплаченная сумма должна иметь максимум 2 числа после запятой.");
