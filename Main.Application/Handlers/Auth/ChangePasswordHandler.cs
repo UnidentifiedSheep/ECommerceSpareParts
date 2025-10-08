@@ -1,4 +1,4 @@
-﻿using Main.Application.Interfaces;
+﻿using Application.Common.Interfaces;
 using MediatR;
 
 namespace Main.Application.Handlers.Auth;

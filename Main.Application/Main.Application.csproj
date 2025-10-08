@@ -7,16 +7,13 @@
     </PropertyGroup>
 
     <ItemGroup>
-        <PackageReference Include="FluentValidation" Version="12.0.0"/>
-        <PackageReference Include="FluentValidation.DependencyInjectionExtensions" Version="12.0.0"/>
         <PackageReference Include="IntervalMap" Version="1.0.2"/>
-        <PackageReference Include="Mapster" Version="7.4.0"/>
-        <PackageReference Include="MediatR" Version="13.0.0"/>
         <PackageReference Include="Microsoft.AspNetCore.Identity.EntityFrameworkCore" Version="9.0.8"/>
         <PackageReference Include="Scrutor" Version="6.1.0"/>
     </ItemGroup>
 
     <ItemGroup>
+        <ProjectReference Include="..\Application.Common\Application.Common.csproj" />
         <ProjectReference Include="..\Core\Core\Core.csproj"/>
         <ProjectReference Include="..\Exceptions\Exceptions.csproj"/>
         <ProjectReference Include="..\Persistence\Persistence.csproj"/>
@@ -32,7 +29,6 @@
     </ItemGroup>
 
     <ItemGroup>
-      <Folder Include="Handlers\Analytics\GetSaleAnalytics\" />
       <Folder Include="Handlers\Cart\" />
       <Folder Include="Handlers\Users\AddUserToRole\" />
       <Folder Include="Handlers\Users\RemoveUserFromRole\" />

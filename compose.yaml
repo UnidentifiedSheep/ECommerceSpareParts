@@ -1,0 +1,16 @@
+﻿services:
+  analytics.api:
+    image: analytics.api
+    build:
+      context: .
+      dockerfile: Analytics.Api/Dockerfile
+    ports:
+      - "57004:7268"
+
+  main.api:
+    image: main.api
+    build:
+      context: .
+      dockerfile: Main.Api/Dockerfile
+    ports:
+      - "57005:7292"

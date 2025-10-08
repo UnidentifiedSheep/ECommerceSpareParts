@@ -1,6 +1,6 @@
 using Core.Interfaces;
 
-namespace Main.Application.Pricing;
+namespace Application.Common;
 
 public class CurrencyConverter(int usdId) : ICurrencyConverter
 {

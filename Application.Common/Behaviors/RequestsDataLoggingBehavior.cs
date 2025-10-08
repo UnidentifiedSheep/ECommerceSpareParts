@@ -1,9 +1,9 @@
+using Application.Common.Interfaces;
 using Core.Interfaces;
 using Core.Models;
-using Main.Application.Interfaces;
 using MediatR;
 
-namespace Main.Application.Behaviors;
+namespace Application.Common.Behaviors;
 
 public class RequestsDataLoggingBehavior<TRequest, TResponse>(
     IEnumerable<ILoggableRequest<TRequest>> logParams,

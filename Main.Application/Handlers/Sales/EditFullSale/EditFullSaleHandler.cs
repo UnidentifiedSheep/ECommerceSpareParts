@@ -1,4 +1,5 @@
 using System.Data;
+using Application.Common.Interfaces;
 using Main.Application.Extensions;
 using Core.Attributes;
 using Core.Dtos.Amw.Sales;
@@ -9,12 +10,9 @@ using Core.Models;
 using Exceptions.Exceptions.Sales;
 using Main.Application.Handlers.ArticleReservations.SubtractCountFromReservations;
 using Main.Application.Handlers.Balance.EditTransaction;
-using Main.Application.Handlers.BuySellPrices.AddBuySellPrices;
-using Main.Application.Handlers.BuySellPrices.EditBuySellPrices;
 using Main.Application.Handlers.Sales.EditSale;
 using Main.Application.Handlers.StorageContents.RemoveContent;
 using Main.Application.Handlers.StorageContents.RestoreContent;
-using Main.Application.Interfaces;
 using Mapster;
 using MediatR;
 
@@ -80,10 +78,7 @@ public class EditFullSaleHandler(IMediator mediator, ISaleRepository saleReposit
             saleDateTime, request.Comment, cancellationToken);
 
         await SubtractFromReservation(contentGreaterCount, userId, sale.BuyerId, cancellationToken);
-
-        await EditBuySellPrices(sale, saleContentIds, currencyId, cancellationToken);
-        await AddBuySellPrices(sale, takenStorageContents, saleContentIds, currencyId, cancellationToken);
-
+        
         return Unit.Value;
     }
 
@@ -190,27 +185,6 @@ public class EditFullSaleHandler(IMediator mediator, ISaleRepository saleReposit
         CancellationToken cancellationToken = default)
     {
         var command = new SubtractCountFromReservationsCommand(userId, whoUpdated, graterCount);
-        await mediator.Send(command, cancellationToken);
-    }
-
-    private async Task EditBuySellPrices(Sale sale, HashSet<int> seenIds, int currencyId,
-        CancellationToken cancellationToken = default)
-    {
-        var oldSaleContents = sale.SaleContents
-            .Where(x => seenIds.Contains(x.Id))
-            .ToList();
-        var command = new EditBuySellPricesCommand(oldSaleContents, currencyId);
-        await mediator.Send(command, cancellationToken);
-    }
-
-    private async Task AddBuySellPrices(Sale sale, List<PrevAndNewValue<StorageContent>> storageContents,
-        HashSet<int> seenIds, int currencyId, CancellationToken cancellationToken = default)
-    {
-        var takenContents = storageContents.Select(x => x.NewValue);
-        var newSaleContents = sale.SaleContents
-            .Where(x => !seenIds.Contains(x.Id))
-            .ToList();
-        var command = new AddBuySellPricesCommand(takenContents, newSaleContents, currencyId);
         await mediator.Send(command, cancellationToken);
     }
 }

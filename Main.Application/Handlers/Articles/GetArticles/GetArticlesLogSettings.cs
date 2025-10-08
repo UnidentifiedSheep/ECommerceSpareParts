@@ -1,4 +1,4 @@
-using Main.Application.Interfaces;
+using Application.Common.Interfaces;
 using AmwArticleDto = Core.Dtos.Amw.Articles.ArticleDto;
 using AnonymousArticleDto = Core.Dtos.Anonymous.Articles.ArticleDto;
 

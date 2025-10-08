@@ -1,7 +1,7 @@
+using Application.Common.Interfaces;
 using Core.Dtos.Amw.Markups;
 using Core.Interfaces.DbRepositories;
 using Exceptions.Exceptions.Markups;
-using Main.Application.Interfaces;
 using Mapster;
 
 namespace Main.Application.Handlers.Markups.GetMarkupGanges;

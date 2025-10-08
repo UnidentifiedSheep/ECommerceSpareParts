@@ -1,7 +1,7 @@
+using Application.Common.Interfaces;
 using Core.Attributes;
 using Core.Entities;
 using Core.Interfaces.Services;
-using Main.Application.Interfaces;
 using Mapster;
 using MediatR;
 

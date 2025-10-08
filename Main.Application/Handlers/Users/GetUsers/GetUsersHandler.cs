@@ -1,9 +1,9 @@
+using Application.Common.Interfaces;
 using Core.Dtos.Amw.Users;
 using Core.Entities;
 using Core.Enums;
 using Core.Interfaces.DbRepositories;
 using Core.Models;
-using Main.Application.Interfaces;
 using Mapster;
 
 namespace Main.Application.Handlers.Users.GetUsers;

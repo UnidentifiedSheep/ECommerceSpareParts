@@ -31,7 +31,6 @@ public static class ServiceProvider
         collection.AddScoped<IMarkupRepository, MarkupRepository>();
         collection.AddScoped<IDefaultSettingsRepository, DefaultSettingsRepository>();
         collection.AddScoped<ICurrencyRepository, CurrencyRepository>();
-        collection.AddScoped<IBuySellPriceRepository, BuySellPriceRepository>();
         collection.AddScoped<IBalanceRepository, BalanceRepository>();
         collection.AddScoped<IArticleImageRepository, ArticleImageRepository>();
         collection.AddScoped<IArticlesRepository, ArticlesRepository>();

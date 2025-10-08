@@ -1,4 +1,5 @@
 using System.Text;
+using Application.Common.Interfaces;
 using Main.Application.Extensions;
 using Core.Attributes;
 using Core.Dtos.Amw.Sales;
@@ -14,10 +15,8 @@ using Main.Application.Events;
 using Main.Application.Handlers.ArticleReservations.GetArticlesWithNotEnoughStock;
 using Main.Application.Handlers.ArticleReservations.SubtractCountFromReservations;
 using Main.Application.Handlers.Balance.CreateTransaction;
-using Main.Application.Handlers.BuySellPrices.AddBuySellPrices;
 using Main.Application.Handlers.Sales.CreateSale;
 using Main.Application.Handlers.StorageContents.RemoveContent;
-using Main.Application.Interfaces;
 using MediatR;
 using IsolationLevel = System.Data.IsolationLevel;
 using TransactionStatus = Core.Enums.TransactionStatus;
@@ -68,8 +67,6 @@ public class CreateFullSaleHandler(IMediator mediator, IArticlesRepository artic
             await CreateTransaction(request.PayedSum.Value, buyerId, Global.SystemId, currencyId, whoCreated,
                 dateTimeWithoutTimeZone, cancellationToken);
 
-        await AddBuySellPrices(changedStorageContents, sale.SaleContents, currencyId, cancellationToken);
-
         var saleCounts = sale.SaleContents
             .GroupBy(x => x.ArticleId)
             .ToDictionary(x => x.Key, x => x.Sum(z => z.Count));
@@ -86,14 +83,6 @@ public class CreateFullSaleHandler(IMediator mediator, IArticlesRepository artic
     {
         var command = new SubtractCountFromReservationsCommand(buyerId, whoCreated, toSubtract);
         await mediator.Send(command, cancellation);
-    }
-
-    private async Task AddBuySellPrices(IEnumerable<PrevAndNewValue<StorageContent>> storageContents,
-        IEnumerable<SaleContent> saleContents,
-        int currencyId, CancellationToken cancellationToken = default)
-    {
-        var command = new AddBuySellPricesCommand(storageContents.Select(x => x.NewValue), saleContents, currencyId);
-        await mediator.Send(command, cancellationToken);
     }
 
     private async Task CheckReservations(IEnumerable<NewSaleContentDto> saleContent, Guid buyerId,

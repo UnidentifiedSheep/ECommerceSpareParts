@@ -1,3 +1,4 @@
+using Application.Common.Interfaces;
 using Main.Application.Extensions;
 using Core.Attributes;
 using Core.Dtos.Emails;
@@ -8,7 +9,6 @@ using Core.Interfaces.DbRepositories;
 using Core.Interfaces.Services;
 using Core.Interfaces.Validators;
 using Exceptions.Exceptions.Users;
-using Main.Application.Interfaces;
 using Mapster;
 using MediatR;
 

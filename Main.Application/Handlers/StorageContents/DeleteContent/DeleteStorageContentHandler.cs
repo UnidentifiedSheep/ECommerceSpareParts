@@ -1,4 +1,5 @@
 using System.Data;
+using Application.Common.Interfaces;
 using Main.Application.Extensions;
 using Core.Attributes;
 using Core.Entities;
@@ -9,7 +10,6 @@ using Core.Interfaces.Services;
 using Exceptions.Base;
 using Exceptions.Exceptions.Storages;
 using Main.Application.Events;
-using Main.Application.Interfaces;
 using Mapster;
 using MediatR;
 

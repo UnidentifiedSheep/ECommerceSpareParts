@@ -1,3 +1,4 @@
+using Application.Common.Interfaces;
 using Core.Attributes;
 using Core.Dtos.Amw.Articles;
 using Core.Enums;
@@ -5,7 +6,6 @@ using Core.Interfaces.DbRepositories;
 using Core.Interfaces.Services;
 using Exceptions.Exceptions.Articles;
 using Main.Application.Events;
-using Main.Application.Interfaces;
 using MediatR;
 
 namespace Main.Application.Handlers.Articles.MakeLinkageBetweenArticles;

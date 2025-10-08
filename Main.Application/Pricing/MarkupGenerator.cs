@@ -1,4 +1,4 @@
-using Core.Entities;
+/*using Core.Entities;
 using Core.Interfaces;
 using Core.Interfaces.DbRepositories;
 using Core.Interfaces.Services;
@@ -6,7 +6,6 @@ using Core.Models;
 using Exceptions.Exceptions.Markups;
 using MediatR;
 using Events_MarkupRangesUpdatedEvent = Main.Application.Events.MarkupRangesUpdatedEvent;
-using MarkupRangesUpdatedEvent = Main.Application.Events.MarkupRangesUpdatedEvent;
 
 namespace Main.Application.Pricing;
 
@@ -25,7 +24,6 @@ public class MarkupGenerator(
     {
         _defaultSetting = await defaultSettingsRepository.GetDefaultSettingsAsync(cancellationToken);
         await ConvertBuySellToDefaultCurrencyAsync(cancellationToken);
-        await CalculateNullMarkUpsAsync(cancellationToken);
         await MarkOutliersAsync(cancellationToken);
         await UpdateMarkUpRangesAsync(cancellationToken);
         await mediator.Publish(new Events_MarkupRangesUpdatedEvent(), cancellationToken);
@@ -54,28 +52,6 @@ public class MarkupGenerator(
 
             await buySellPriceRepository.UpdateRange(buffer, cancellationToken);
             buffer.Clear();
-        }
-
-        if (buffer.Count > 0)
-            await buySellPriceRepository.UpdateRange(buffer, cancellationToken);
-    }
-
-    private async Task CalculateNullMarkUpsAsync(CancellationToken cancellationToken)
-    {
-        var buffer = new List<BuySellPrice>();
-        const int bufferSize = 10_000;
-
-        await foreach (var price in buySellPriceRepository.GetBuySellPrices(
-                           x => x.Markup == null, false, cancellationToken))
-        {
-            price.Markup = Math.Round((price.SellPrice - price.BuyPrice) / price.BuyPrice * 100, 2);
-            buffer.Add(price);
-
-            if (buffer.Count >= bufferSize)
-            {
-                await buySellPriceRepository.UpdateRange(buffer, cancellationToken);
-                buffer.Clear();
-            }
         }
 
         if (buffer.Count > 0)
@@ -211,4 +187,4 @@ public class MarkupGenerator(
         var variance = values.Average(v => Math.Pow((double)(v - mean), 2));
         return (decimal)Math.Round(Math.Sqrt(variance), 2);
     }
-}
+}*/

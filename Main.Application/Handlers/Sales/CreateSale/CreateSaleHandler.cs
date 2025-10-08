@@ -1,4 +1,5 @@
 using System.Data;
+using Application.Common.Interfaces;
 using Main.Application.Extensions;
 using Core.Attributes;
 using Core.Dtos.Amw.Sales;
@@ -6,7 +7,6 @@ using Core.Entities;
 using Core.Interfaces.DbRepositories;
 using Core.Interfaces.Services;
 using Core.Models;
-using Main.Application.Interfaces;
 using Mapster;
 
 namespace Main.Application.Handlers.Sales.CreateSale;

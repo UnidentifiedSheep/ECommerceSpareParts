@@ -1,9 +1,9 @@
+using Application.Common.Interfaces;
 using Core.Attributes;
 using Core.Entities;
 using Core.Interfaces.DbRepositories;
 using Core.Interfaces.Services;
 using Exceptions.Exceptions.Sales;
-using Main.Application.Interfaces;
 
 namespace Main.Application.Handlers.Sales.DeleteSale;
 

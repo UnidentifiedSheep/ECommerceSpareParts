@@ -1,5 +1,6 @@
 ﻿using System.Net;
 using System.Security.Cryptography;
+using Application.Common.Interfaces;
 using Core.Entities;
 using Core.Enums;
 using Core.Interfaces;
@@ -8,7 +9,6 @@ using Core.Interfaces.Services;
 using Core.Interfaces.Validators;
 using Exceptions.Base;
 using Exceptions.Exceptions.Auth;
-using Main.Application.Interfaces;
 
 namespace Main.Application.Handlers.Auth.Login;
 

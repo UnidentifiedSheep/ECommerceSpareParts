@@ -1,5 +1,5 @@
+using Application.Common.Interfaces;
 using Core.Attributes;
-using Main.Application.Interfaces;
 using MediatR;
 
 

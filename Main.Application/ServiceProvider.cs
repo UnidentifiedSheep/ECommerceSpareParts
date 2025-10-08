@@ -1,3 +1,6 @@
+using Application.Common;
+using Application.Common.Behaviors;
+using Application.Common.Interfaces;
 using Core.Abstractions;
 using Core.Entities;
 using Core.Interfaces;
@@ -6,11 +9,9 @@ using Core.Interfaces.Services;
 using Core.Interfaces.Validators;
 using Core.Models;
 using FluentValidation;
-using Main.Application.Behaviors;
 using Main.Application.ConcurrencyValidator;
 using Main.Application.Handlers.Articles.GetArticleCrosses;
 using Main.Application.Handlers.Articles.GetArticles;
-using Main.Application.Interfaces;
 using Main.Application.Pricing;
 using Main.Application.RelatedData;
 using Main.Application.Services;
@@ -34,7 +35,6 @@ public static class ServiceProvider
         collection.AddSingleton(phoneOptions ?? new UserPhoneOptions());
         collection.AddSingleton<ICurrencyConverter, CurrencyConverter>(_ => new CurrencyConverter(Global.UsdId));
         collection.AddSingleton<IPriceGenerator, PriceGenerator>();
-        collection.AddScoped<IMarkupGenerator, MarkupGenerator>();
         collection.AddScoped<IPriceSetup, PriceSetup>();
 
         collection.AddScoped<IArticlePricesService, ArticlePricesService>();

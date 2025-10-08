@@ -1,5 +1,5 @@
+using Application.Common.Interfaces;
 using Core.Interfaces.Services;
-using Main.Application.Interfaces;
 using MediatR;
 
 namespace Main.Application.Handlers.Prices.RecalculateUsablePrice;

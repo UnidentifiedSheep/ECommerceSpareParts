@@ -1,11 +1,11 @@
-﻿using Core.Entities;
+﻿using Application.Common.Interfaces;
+using Core.Entities;
 using Core.Enums;
 using Core.Interfaces;
 using Core.Interfaces.DbRepositories;
 using Core.Interfaces.Services;
 using Core.Interfaces.Validators;
 using Exceptions.Exceptions.Auth;
-using Main.Application.Interfaces;
 
 namespace Main.Application.Handlers.Auth.RefreshToken;
 

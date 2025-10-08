@@ -1,4 +1,4 @@
-using Main.Application.Interfaces;
+using Application.Common.Interfaces;
 using AmwArticleDto = Core.Dtos.Amw.Articles.ArticleFullDto;
 using MemberArticleDto = Core.Dtos.Member.Articles.ArticleFullDto;
 

@@ -3,7 +3,7 @@ using Core.Attributes;
 using Core.Interfaces.Services;
 using MediatR;
 
-namespace Main.Application.Behaviors;
+namespace Application.Common.Behaviors;
 
 public class TransactionBehavior<TRequest, TResponse>(IUnitOfWork unitOfWork) : IPipelineBehavior<TRequest, TResponse>
     where TRequest : IRequest<TResponse>

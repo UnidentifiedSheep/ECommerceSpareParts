@@ -1,4 +1,4 @@
-using Main.Application.Interfaces;
+using Application.Common.Interfaces;
 
 namespace Main.Application.Handlers.Users.GetUsers;
 
