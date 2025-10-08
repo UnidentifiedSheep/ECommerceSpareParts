@@ -1,4 +1,4 @@
-using Application.Handlers.Users.CreateUser;
+using Main.Application.Handlers.Users.CreateUser;
 using Bogus;
 using Core.Dtos.Emails;
 using Core.Enums;

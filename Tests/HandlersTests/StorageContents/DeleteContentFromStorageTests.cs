@@ -1,5 +1,5 @@
-using Application.Configs;
-using Application.Handlers.StorageContents.DeleteContent;
+using Main.Application.Configs;
+using Main.Application.Handlers.StorageContents.DeleteContent;
 using Core.Entities;
 using Exceptions.Base;
 using Exceptions.Exceptions.Storages;

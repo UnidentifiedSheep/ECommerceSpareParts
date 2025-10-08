@@ -1,5 +1,5 @@
-using Application.Configs;
-using Application.Handlers.Articles.SetArticleIndicator;
+using Main.Application.Configs;
+using Main.Application.Handlers.Articles.SetArticleIndicator;
 using Bogus;
 using Exceptions.Exceptions.Articles;
 using MediatR;

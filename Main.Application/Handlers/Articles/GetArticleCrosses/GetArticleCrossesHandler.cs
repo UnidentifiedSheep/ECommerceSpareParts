@@ -1,0 +1,42 @@
+using Core.Entities;
+using Core.Interfaces.DbRepositories;
+using Core.Models;
+using Core.StaticFunctions;
+using Exceptions.Exceptions.Articles;
+using Main.Application.Interfaces;
+using Mapster;
+
+namespace Main.Application.Handlers.Articles.GetArticleCrosses;
+
+public record GetArticleCrossesQuery<TDto>(int ArticleId, PaginationModel Pagination, string? SortBy, string? UserId)
+    : IQuery<GetArticleCrossesResult<TDto>>, ICacheableQuery
+{
+    public HashSet<string> RelatedEntityIds { get; } = [ArticleId.ToString()];
+    public string GetCacheKey() => string.Format(CacheKeys.ArticleCrossesCacheKey, ArticleId, Pagination.Page, 
+        Pagination.Size, SortBy);
+    public Type GetRelatedType() => typeof(ArticleCross);
+    public int GetDurationSeconds() => 600;
+}
+
+public record GetArticleCrossesResult<TDto>(IEnumerable<TDto> Crosses, TDto RequestedArticle);
+
+public class GetArticleCrossesHandler<TDto>(IArticlesRepository articlesRepository)
+    : IQueryHandler<GetArticleCrossesQuery<TDto>, GetArticleCrossesResult<TDto>>
+{
+    public async Task<GetArticleCrossesResult<TDto>> Handle(GetArticleCrossesQuery<TDto> request,
+        CancellationToken cancellationToken)
+    {
+        var pagination = request.Pagination;
+        var requestedArticle = await articlesRepository.GetArticleById(request.ArticleId, false, cancellationToken);
+        if (requestedArticle == null) throw new ArticleNotFoundException(request.ArticleId);
+        var crosses = await articlesRepository.GetArticleCrosses(request.ArticleId, pagination.Page,
+            pagination.Size, request.SortBy, false, cancellationToken);
+
+        var requestedAdapted = requestedArticle.Adapt<TDto>();
+        var crossArticlesAdapted = crosses.Adapt<List<TDto>>();
+        
+        request.RelatedEntityIds.UnionWith(crosses.Select(x => x.Id.ToString()));
+
+        return new GetArticleCrossesResult<TDto>(crossArticlesAdapted, requestedAdapted);
+    }
+}

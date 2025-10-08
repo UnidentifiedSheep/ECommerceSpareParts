@@ -20,7 +20,7 @@
     </ItemGroup>
 
     <ItemGroup>
-        <ProjectReference Include="..\Application\Application.csproj"/>
+        <ProjectReference Include="..\Main.Application\Main.Application.csproj" />
         <ProjectReference Include="..\Core\Core\Core.csproj"/>
         <ProjectReference Include="..\Persistence\Persistence.csproj"/>
     </ItemGroup>

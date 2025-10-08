@@ -1,5 +1,5 @@
-using Application.Configs;
-using Application.Handlers.Balance.EditTransaction;
+using Main.Application.Configs;
+using Main.Application.Handlers.Balance.EditTransaction;
 using Core.Entities;
 using Core.Enums;
 using Exceptions.Exceptions.Balances;

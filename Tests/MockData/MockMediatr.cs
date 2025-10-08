@@ -1,10 +1,10 @@
-using Application.Handlers.Articles.CreateArticles;
-using Application.Handlers.Balance.CreateTransaction;
-using Application.Handlers.Producers.CreateProducer;
-using Application.Handlers.Sales.CreateSale;
-using Application.Handlers.StorageContents.AddContent;
-using Application.Handlers.Storages.CreateStorage;
-using Application.Handlers.Users.CreateUser;
+using Main.Application.Handlers.Articles.CreateArticles;
+using Main.Application.Handlers.Balance.CreateTransaction;
+using Main.Application.Handlers.Producers.CreateProducer;
+using Main.Application.Handlers.Sales.CreateSale;
+using Main.Application.Handlers.StorageContents.AddContent;
+using Main.Application.Handlers.Storages.CreateStorage;
+using Main.Application.Handlers.Users.CreateUser;
 using Bogus;
 using Core.Dtos.Amw.Sales;
 using Core.Dtos.Emails;

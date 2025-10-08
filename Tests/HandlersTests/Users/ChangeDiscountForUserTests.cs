@@ -1,5 +1,5 @@
-using Application.Configs;
-using Application.Handlers.Users.ChangeUserDiscount;
+using Main.Application.Configs;
+using Main.Application.Handlers.Users.ChangeUserDiscount;
 using Core.Entities;
 using Core.Interfaces.CacheRepositories;
 using FluentValidation;

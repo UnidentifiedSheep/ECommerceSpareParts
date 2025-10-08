@@ -1,7 +1,7 @@
-using Application.Configs;
-using Application.Handlers.Articles.CreateArticles;
-using Application.Handlers.Articles.MakeLinkageBetweenArticles;
-using Application.Handlers.Producers.CreateProducer;
+using Main.Application.Configs;
+using Main.Application.Handlers.Articles.CreateArticles;
+using Main.Application.Handlers.Articles.MakeLinkageBetweenArticles;
+using Main.Application.Handlers.Producers.CreateProducer;
 using Core.Dtos.Amw.Articles;
 using Core.Enums;
 using FluentValidation;

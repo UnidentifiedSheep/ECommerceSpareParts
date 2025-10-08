@@ -1,5 +1,5 @@
-using Application.Configs;
-using Application.Handlers.Balance.CreateTransaction;
+using Main.Application.Configs;
+using Main.Application.Handlers.Balance.CreateTransaction;
 using Core.Entities;
 using Core.Enums;
 using FluentValidation;

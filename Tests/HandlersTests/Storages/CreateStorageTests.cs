@@ -1,5 +1,5 @@
-using Application.Configs;
-using Application.Handlers.Storages.CreateStorage;
+using Main.Application.Configs;
+using Main.Application.Handlers.Storages.CreateStorage;
 using Bogus;
 using Exceptions.Exceptions.Storages;
 using MediatR;

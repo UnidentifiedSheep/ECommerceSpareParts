@@ -1,4 +1,4 @@
-using Application.Handlers.Currencies.UpdateCurrenciesRates;
+using Main.Application.Handlers.Currencies.UpdateCurrenciesRates;
 using MediatR;
 
 namespace Api.Common.HangFireTasks;

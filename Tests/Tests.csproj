@@ -26,7 +26,7 @@
     </ItemGroup>
 
     <ItemGroup>
-        <ProjectReference Include="..\MonoliteUnicorn\MonoliteUnicorn.csproj"/>
+        <ProjectReference Include="..\Main.Api\Main.Api.csproj" />
     </ItemGroup>
 
 </Project>

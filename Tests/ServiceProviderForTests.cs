@@ -1,5 +1,5 @@
 using Api.Common;
-using Application.Configs;
+using Main.Application.Configs;
 using Core.Interfaces;
 using Core.Models;
 using Mail;
@@ -10,7 +10,7 @@ using Persistence.Contexts;
 using Security;
 using Serilog;
 using Tests.MockData;
-using ApplicationServiceProvider = Application.ServiceProvider;
+using ApplicationServiceProvider = Main.Application.ServiceProvider;
 using CacheServiceProvider = Redis.ServiceProvider;
 using ServiceProvider = Microsoft.Extensions.DependencyInjection.ServiceProvider;
 

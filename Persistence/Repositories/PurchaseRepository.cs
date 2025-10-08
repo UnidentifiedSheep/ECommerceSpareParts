@@ -49,7 +49,8 @@ public class PurchaseRepository(DContext context) : IPurchaseRepository
                                                                  EF.Functions.PlainToTsQuery("russian", searchTerm)) ||
                                                          EF.Functions.ILike(content.Article.NormalizedArticleNumber,
                                                              $"%{normalizedSearchTerm}%")) ||
-                                     (x.Comment != null && EF.Functions.ILike(x.Comment, $"%{searchTerm}%")));
+                                     (x.Comment != null && EF.Functions.ILike(x.Comment, $"%{searchTerm}%")) ||
+                                     x.PurchaseContents.Any(z => z.Comment != null && EF.Functions.ILike(z.Comment, $"%{searchTerm}%")));
         }
 
         var startDate = DateTime.SpecifyKind(rangeStart.Date, DateTimeKind.Unspecified);

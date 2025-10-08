@@ -1,5 +1,5 @@
-using Application.Configs;
-using Application.Handlers.Articles.PatchArticle;
+using Main.Application.Configs;
+using Main.Application.Handlers.Articles.PatchArticle;
 using Core.Dtos.Amw.Articles;
 using Core.Models;
 using Exceptions.Exceptions.Articles;

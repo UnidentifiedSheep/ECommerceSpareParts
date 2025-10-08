@@ -1,4 +1,4 @@
-using Application.Handlers.Currencies.CreateCurrency;
+using Main.Application.Handlers.Currencies.CreateCurrency;
 using Exceptions.Exceptions.Currencies;
 using FluentValidation;
 using MediatR;

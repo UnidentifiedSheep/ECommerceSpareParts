@@ -1,5 +1,5 @@
-using Application.Configs;
-using Application.Handlers.StorageContents.EditContent;
+using Main.Application.Configs;
+using Main.Application.Handlers.StorageContents.EditContent;
 using Core.Dtos.Amw.Storage;
 using Core.Entities;
 using Core.Models;

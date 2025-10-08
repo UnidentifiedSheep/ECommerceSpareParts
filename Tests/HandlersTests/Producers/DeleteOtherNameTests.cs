@@ -1,5 +1,5 @@
-using Application.Configs;
-using Application.Handlers.Producers.DeleteOtherName;
+using Main.Application.Configs;
+using Main.Application.Handlers.Producers.DeleteOtherName;
 using Bogus;
 using Core.Entities;
 using Exceptions.Exceptions.Producers;

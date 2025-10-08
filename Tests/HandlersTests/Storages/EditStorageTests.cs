@@ -1,5 +1,5 @@
-using Application.Configs;
-using Application.Handlers.Storages.EditStorage;
+using Main.Application.Configs;
+using Main.Application.Handlers.Storages.EditStorage;
 using Bogus;
 using Core.Dtos.Amw.Storage;
 using Core.Entities;

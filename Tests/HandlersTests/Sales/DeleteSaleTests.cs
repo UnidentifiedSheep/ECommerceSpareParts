@@ -1,5 +1,5 @@
-using Application.Configs;
-using Application.Handlers.Sales.DeleteSale;
+using Main.Application.Configs;
+using Main.Application.Handlers.Sales.DeleteSale;
 using Core.Entities;
 using Exceptions.Exceptions.Sales;
 using MediatR;

@@ -1,6 +1,6 @@
-using Application.Configs;
-using Application.Handlers.Producers.AddOtherName;
-using Application.Handlers.Producers.CreateProducer;
+using Main.Application.Configs;
+using Main.Application.Handlers.Producers.AddOtherName;
+using Main.Application.Handlers.Producers.CreateProducer;
 using Bogus;
 using Exceptions.Exceptions.Producers;
 using MediatR;

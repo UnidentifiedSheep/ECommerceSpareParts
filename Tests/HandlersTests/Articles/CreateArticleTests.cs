@@ -1,6 +1,6 @@
-using Application.Configs;
-using Application.Handlers.Articles.CreateArticles;
-using Application.Handlers.Producers.CreateProducer;
+using Main.Application.Configs;
+using Main.Application.Handlers.Articles.CreateArticles;
+using Main.Application.Handlers.Producers.CreateProducer;
 using Bogus;
 using Exceptions.Exceptions.Producers;
 using MediatR;
