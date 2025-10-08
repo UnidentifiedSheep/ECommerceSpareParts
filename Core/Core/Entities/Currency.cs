@@ -14,8 +14,6 @@ public partial class Currency
 
     public virtual ICollection<ArticleSupplierBuyInfo> ArticleSupplierBuyInfos { get; set; } = new List<ArticleSupplierBuyInfo>();
 
-    public virtual ICollection<BuySellPrice> BuySellPrices { get; set; } = new List<BuySellPrice>();
-
     public virtual ICollection<CurrencyHistory> CurrencyHistories { get; set; } = new List<CurrencyHistory>();
 
     public virtual CurrencyToUsd? CurrencyToUsd { get; set; }

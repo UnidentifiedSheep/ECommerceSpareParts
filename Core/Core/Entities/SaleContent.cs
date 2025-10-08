@@ -20,8 +20,6 @@ public partial class SaleContent
 
     public virtual Article Article { get; set; } = null!;
 
-    public virtual BuySellPrice? BuySellPrice { get; set; }
-
     public virtual Sale Sale { get; set; } = null!;
 
     public virtual ICollection<SaleContentDetail> SaleContentDetails { get; set; } = new List<SaleContentDetail>();

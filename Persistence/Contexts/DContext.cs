@@ -30,8 +30,6 @@ public partial class DContext : DbContext
 
     public virtual DbSet<ArticlesPair> ArticlesPairs { get; set; }
 
-    public virtual DbSet<BuySellPrice> BuySellPrices { get; set; }
-
     public virtual DbSet<Cart> Carts { get; set; }
 
     public virtual DbSet<Category> Categories { get; set; }
@@ -332,36 +330,6 @@ public partial class DContext : DbContext
                 .HasForeignKey(d => d.ArticleRight)
                 .OnDelete(DeleteBehavior.ClientSetNull)
                 .HasConstraintName("articles_pair_articles_id_fk_2");
-        });
-
-        modelBuilder.Entity<BuySellPrice>(entity =>
-        {
-            entity.HasKey(e => e.SaleContentId).HasName("buy_sell_prices_pk");
-
-            entity.ToTable("buy_sell_prices");
-
-            entity.HasIndex(e => e.BuyPrice, "buy_sell_prices_buy_price_index");
-
-            entity.HasIndex(e => e.SellPrice, "buy_sell_prices_sell_price_index");
-
-            entity.Property(e => e.SaleContentId)
-                .ValueGeneratedNever()
-                .HasColumnName("sale_content_id");
-            entity.Property(e => e.BuyPrice).HasColumnName("buy_price");
-            entity.Property(e => e.CurrencyId).HasColumnName("currency_id");
-            entity.Property(e => e.IsOutLiner)
-                .HasDefaultValue(false)
-                .HasColumnName("is_out_liner");
-            entity.Property(e => e.Markup).HasColumnName("markup");
-            entity.Property(e => e.SellPrice).HasColumnName("sell_price");
-
-            entity.HasOne(d => d.Currency).WithMany(p => p.BuySellPrices)
-                .HasForeignKey(d => d.CurrencyId)
-                .HasConstraintName("buy_sell_prices_currency_id_fk");
-
-            entity.HasOne(d => d.SaleContent).WithOne(p => p.BuySellPrice)
-                .HasForeignKey<BuySellPrice>(d => d.SaleContentId)
-                .HasConstraintName("buy_sell_prices_sale_content_id_fk");
         });
 
         modelBuilder.Entity<Cart>(entity =>
