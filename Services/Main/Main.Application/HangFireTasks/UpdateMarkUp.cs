@@ -1,6 +1,7 @@
 using Core.Interfaces;
+using Microsoft.Extensions.DependencyInjection;
 
-namespace Api.Common.HangFireTasks;
+namespace Main.Application.HangFireTasks;
 
 public class UpdateMarkUp(IServiceProvider serviceProvider)
 {

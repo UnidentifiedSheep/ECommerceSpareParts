@@ -1,7 +1,8 @@
 using Main.Application.Handlers.Currencies.UpdateCurrenciesRates;
 using MediatR;
+using Microsoft.Extensions.DependencyInjection;
 
-namespace Api.Common.HangFireTasks;
+namespace Main.Application.HangFireTasks;
 
 public class UpdateCurrencyRate(IServiceProvider serviceProvider)
 {

@@ -26,7 +26,15 @@
     </ItemGroup>
 
     <ItemGroup>
-        <ProjectReference Include="..\Main.Api\Main.Api.csproj" />
+      <ProjectReference Include="..\Core\Core\Core.csproj" />
+      <ProjectReference Include="..\Core\Exceptions\Exceptions.csproj" />
+      <ProjectReference Include="..\Infrastructure\Integrations\Integrations.csproj" />
+      <ProjectReference Include="..\Infrastructure\Mail\Mail.csproj" />
+      <ProjectReference Include="..\Infrastructure\Persistence\Persistence.csproj" />
+      <ProjectReference Include="..\Infrastructure\RabbitMq\RabbitMq.csproj" />
+      <ProjectReference Include="..\Infrastructure\Redis\Redis.csproj" />
+      <ProjectReference Include="..\Infrastructure\Security\Security.csproj" />
+      <ProjectReference Include="..\Services\Main\Main.Api\Main.Api.csproj" />
     </ItemGroup>
 
 </Project>

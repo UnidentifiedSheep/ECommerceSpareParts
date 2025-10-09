@@ -13,6 +13,7 @@ using Main.Application.ConcurrencyValidator;
 using Main.Application.Factories;
 using Main.Application.Handlers.Articles.GetArticleCrosses;
 using Main.Application.Handlers.Articles.GetArticles;
+using Main.Application.HangFireTasks;
 using Main.Application.Pricing;
 using Main.Application.RelatedData;
 using Main.Application.Services;
@@ -32,6 +33,9 @@ public static class ServiceProvider
         UserEmailOptions? emailOptions = null, UserPhoneOptions? phoneOptions = null)
     {
         var relatedDataTtl = TimeSpan.FromHours(10);
+        
+        collection.AddSingleton<UpdateCurrencyRate>();
+        collection.AddSingleton<UpdateMarkUp>();
         collection.AddScoped<IRelatedDataFactory, RelatedDataFactory>();
         collection.AddSingleton(emailOptions ?? new UserEmailOptions());
         collection.AddSingleton(phoneOptions ?? new UserPhoneOptions());

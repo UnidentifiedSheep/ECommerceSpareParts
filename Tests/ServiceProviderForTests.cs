@@ -1,9 +1,8 @@
 using Api.Common;
-using Main.Application.Configs;
 using Core.Interfaces;
 using Core.Models;
 using Mail;
-using Microsoft.AspNetCore.Identity;
+using Main.Application.Configs;
 using Microsoft.Extensions.DependencyInjection;
 using Persistence;
 using Persistence.Contexts;

@@ -17,20 +17,26 @@
         <Reference Include="Serilog">
             <HintPath>..\..\..\..\.nuget\packages\serilog\4.3.0\lib\net9.0\Serilog.dll</HintPath>
         </Reference>
+        <Reference Include="Serilog.Sinks.Loki">
+          <HintPath>..\..\..\..\..\.nuget\packages\serilog.sinks.loki\4.0.0-beta3\lib\netstandard2.0\Serilog.Sinks.Loki.dll</HintPath>
+        </Reference>
     </ItemGroup>
-
-    <ItemGroup>
-        <ProjectReference Include="..\Main.Application\Main.Application.csproj" />
-        <ProjectReference Include="..\Core\Core\Core.csproj"/>
-        <ProjectReference Include="..\Persistence\Persistence.csproj"/>
-    </ItemGroup>
+    
 
     <ItemGroup>
         <PackageReference Include="Carter" Version="8.0.0" />
         <PackageReference Include="Hangfire.AspNetCore" Version="1.8.21" />
+        <PackageReference Include="Mapster" Version="9.0.0-pre01" />
         <PackageReference Include="MediatR" Version="13.0.0"/>
         <PackageReference Include="Serilog.AspNetCore" Version="9.0.0" />
         <PackageReference Include="Serilog.Sinks.Console" Version="6.0.1-dev-00953" />
+    </ItemGroup>
+    
+
+    <ItemGroup>
+      <ProjectReference Include="..\..\Core\Core\Core.csproj" />
+      <ProjectReference Include="..\..\Core\Exceptions\Exceptions.csproj" />
+      <ProjectReference Include="..\..\Exceptions\Exceptions.csproj" />
     </ItemGroup>
 
 </Project>
