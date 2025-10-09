@@ -35,7 +35,7 @@ public class GetUsersHandler(IUserRepository usersRepositoryService) : IQueryHan
         switch (request.SearchStrategy)
         {
             case GeneralSearchStrategy.General:
-                users.AddRange(await usersRepositoryService.GetUserBySearchColumn(request.SearchTerm, page, 
+                users.AddRange(await usersRepositoryService.GetUserBySearchColumn(request.SearchTerm, page,
                     size, request.IsSupplier, false, cancellationToken));
                 break;
             case GeneralSearchStrategy.Exec:

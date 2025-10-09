@@ -1,7 +1,7 @@
-using Main.Application.Handlers.Producers.GetProducers;
 using Carter;
 using Core.Dtos.Anonymous.Producers;
 using Core.Models;
+using Main.Application.Handlers.Producers.GetProducers;
 using Mapster;
 using MediatR;
 

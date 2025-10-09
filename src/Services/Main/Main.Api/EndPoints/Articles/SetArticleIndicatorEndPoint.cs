@@ -1,5 +1,5 @@
-using Main.Application.Handlers.Articles.SetArticleIndicator;
 using Carter;
+using Main.Application.Handlers.Articles.SetArticleIndicator;
 using MediatR;
 
 namespace Main.Api.EndPoints.Articles;

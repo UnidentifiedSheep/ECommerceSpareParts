@@ -1,7 +1,7 @@
 using System.Security.Claims;
-using Main.Application.Handlers.ArticleReservations.CreateArticleReservation;
 using Carter;
 using Core.Dtos.Amw.ArticleReservations;
+using Main.Application.Handlers.ArticleReservations.CreateArticleReservation;
 using MediatR;
 
 namespace Main.Api.EndPoints.ArticlesReservation;
@@ -15,7 +15,7 @@ public class CreateArticleReservationEndPoint : ICarterModule
         app.MapPost("/articles/reservations", async (ISender sender, ClaimsPrincipal claims,
                 CreateArticleReservationQuery query, CancellationToken cancellationToken) =>
             {
-                if (!Guid.TryParse(claims.FindFirstValue(ClaimTypes.NameIdentifier), out var userId)) 
+                if (!Guid.TryParse(claims.FindFirstValue(ClaimTypes.NameIdentifier), out var userId))
                     return Results.Unauthorized();
                 var command = new CreateArticleReservationCommand(query.Reservations, userId);
                 await sender.Send(command, cancellationToken);

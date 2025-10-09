@@ -1,9 +1,9 @@
 ﻿using System.Security.Claims;
-using Main.Application.Handlers.Articles.GetArticles;
 using Carter;
 using Core.Enums;
 using Core.Models;
 using Core.StaticFunctions;
+using Main.Application.Handlers.Articles.GetArticles;
 using Mapster;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;

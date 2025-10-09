@@ -1,6 +1,5 @@
 using System.Data;
 using Application.Common.Interfaces;
-using Main.Application.Extensions;
 using Core.Attributes;
 using Core.Dtos.Amw.Sales;
 using Core.Entities;
@@ -8,6 +7,7 @@ using Core.Enums;
 using Core.Interfaces.DbRepositories;
 using Core.Models;
 using Exceptions.Exceptions.Sales;
+using Main.Application.Extensions;
 using Main.Application.Handlers.ArticleReservations.SubtractCountFromReservations;
 using Main.Application.Handlers.Balance.EditTransaction;
 using Main.Application.Handlers.Sales.EditSale;
@@ -78,7 +78,7 @@ public class EditFullSaleHandler(IMediator mediator, ISaleRepository saleReposit
             saleDateTime, request.Comment, cancellationToken);
 
         await SubtractFromReservation(contentGreaterCount, userId, sale.BuyerId, cancellationToken);
-        
+
         return Unit.Value;
     }
 

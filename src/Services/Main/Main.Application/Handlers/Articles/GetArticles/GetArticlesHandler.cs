@@ -1,9 +1,7 @@
 using Application.Common.Interfaces;
-using Core.Entities;
 using Core.Enums;
 using Core.Interfaces.DbRepositories;
 using Core.Models;
-using Core.StaticFunctions;
 using Mapster;
 
 namespace Main.Application.Handlers.Articles.GetArticles;

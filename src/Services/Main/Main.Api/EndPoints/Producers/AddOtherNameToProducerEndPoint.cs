@@ -1,5 +1,5 @@
-using Main.Application.Handlers.Producers.AddOtherName;
 using Carter;
+using Main.Application.Handlers.Producers.AddOtherName;
 using MediatR;
 
 namespace Main.Api.EndPoints.Producers;

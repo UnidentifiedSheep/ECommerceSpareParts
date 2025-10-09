@@ -1,5 +1,5 @@
-using Main.Application.Handlers.Markups.SelectDefaultMarkup;
 using Carter;
+using Main.Application.Handlers.Markups.SelectDefaultMarkup;
 using MediatR;
 
 namespace Main.Api.EndPoints.Markups;

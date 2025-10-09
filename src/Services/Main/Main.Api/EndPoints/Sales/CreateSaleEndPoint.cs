@@ -1,7 +1,7 @@
 using System.Security.Claims;
-using Main.Application.Handlers.Sales.CreateFullSale;
 using Carter;
 using Core.Dtos.Amw.Sales;
+using Main.Application.Handlers.Sales.CreateFullSale;
 using MediatR;
 
 namespace Main.Api.EndPoints.Sales;
@@ -24,7 +24,7 @@ public class CreateSaleEndPoint : ICarterModule
         app.MapPost("/sales/",
                 async (ClaimsPrincipal claims, ISender sender, CreateSaleRequest request, CancellationToken token) =>
                 {
-                    if (!Guid.TryParse(claims.FindFirstValue(ClaimTypes.NameIdentifier), out var userId)) 
+                    if (!Guid.TryParse(claims.FindFirstValue(ClaimTypes.NameIdentifier), out var userId))
                         return Results.Unauthorized();
                     var command = new CreateFullSaleCommand(userId, request.BuyerId, request.CurrencyId,
                         request.StorageName, request.SellFromOtherStorages,

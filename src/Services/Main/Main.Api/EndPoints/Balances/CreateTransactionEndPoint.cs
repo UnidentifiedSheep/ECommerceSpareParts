@@ -1,7 +1,7 @@
 using System.Security.Claims;
-using Main.Application.Handlers.Balance.CreateTransaction;
 using Carter;
 using Core.Enums;
+using Main.Application.Handlers.Balance.CreateTransaction;
 using MediatR;
 
 namespace Main.Api.EndPoints.Balances;
@@ -20,7 +20,7 @@ public class CreateTransactionEndPoint : ICarterModule
         app.MapPost("/balances/transaction", async (ISender sender, CreateTransactionRequest request,
                 CancellationToken token, ClaimsPrincipal claims) =>
             {
-                if (!Guid.TryParse(claims.FindFirstValue(ClaimTypes.NameIdentifier), out var userId)) 
+                if (!Guid.TryParse(claims.FindFirstValue(ClaimTypes.NameIdentifier), out var userId))
                     return Results.Unauthorized();
                 var command = new CreateTransactionCommand(request.SenderId, request.ReceiverId,
                     request.Amount, request.CurrencyId, userId, request.TransactionDateTime, TransactionStatus.Normal);

@@ -17,19 +17,19 @@
             <HintPath>..\..\..\..\.nuget\packages\polly\8.6.2\lib\net6.0\Polly.dll</HintPath>
         </Reference>
         <Reference Include="Serilog">
-          <HintPath>..\..\..\..\..\..\..\.nuget\packages\serilog\4.3.1-dev-02373\lib\net9.0\Serilog.dll</HintPath>
+            <HintPath>..\..\..\..\..\..\..\.nuget\packages\serilog\4.3.1-dev-02373\lib\net9.0\Serilog.dll</HintPath>
         </Reference>
     </ItemGroup>
 
     <ItemGroup>
-      <Folder Include="Handlers\Cart\" />
-      <Folder Include="Handlers\Users\AddUserToRole\" />
-      <Folder Include="Handlers\Users\RemoveUserFromRole\" />
+        <Folder Include="Handlers\Cart\"/>
+        <Folder Include="Handlers\Users\AddUserToRole\"/>
+        <Folder Include="Handlers\Users\RemoveUserFromRole\"/>
     </ItemGroup>
 
     <ItemGroup>
-      <ProjectReference Include="..\..\..\Core\Core\Core.csproj" />
-      <ProjectReference Include="..\..\Application.Common\Application.Common.csproj" />
+        <ProjectReference Include="..\..\..\Core\Core\Core.csproj"/>
+        <ProjectReference Include="..\..\Application.Common\Application.Common.csproj"/>
     </ItemGroup>
 
 </Project>

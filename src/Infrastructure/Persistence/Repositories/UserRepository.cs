@@ -10,17 +10,24 @@ namespace Persistence.Repositories;
 
 public class UserRepository(DContext context) : IUserRepository
 {
-    public async Task<User?> GetUserByIdAsync(Guid userId, bool track = true, CancellationToken cancellationToken = default) 
-        => await context.Users.ConfigureTracking(track)
+    public async Task<User?> GetUserByIdAsync(Guid userId, bool track = true,
+        CancellationToken cancellationToken = default)
+    {
+        return await context.Users.ConfigureTracking(track)
             .Include(x => x.UserInfo)
             .FirstOrDefaultAsync(x => x.Id == userId, cancellationToken);
+    }
 
-    public async Task<User?> GetUserByUserNameAsync(string userName, bool track = true, CancellationToken cancellationToken = default)
-        => await context.Users.ConfigureTracking(track)
+    public async Task<User?> GetUserByUserNameAsync(string userName, bool track = true,
+        CancellationToken cancellationToken = default)
+    {
+        return await context.Users.ConfigureTracking(track)
             .Include(x => x.UserInfo)
             .FirstOrDefaultAsync(x => x.NormalizedUserName == userName.ToNormalized(), cancellationToken);
+    }
 
-    public async Task<User?> GetUserByEmailAsync(string email, bool track = true, CancellationToken cancellationToken = default)
+    public async Task<User?> GetUserByEmailAsync(string email, bool track = true,
+        CancellationToken cancellationToken = default)
     {
         var normalizedEmail = email.ToNormalizedEmail();
         var userEmail = await context.UserEmails
@@ -31,7 +38,8 @@ public class UserRepository(DContext context) : IUserRepository
         return userEmail?.User;
     }
 
-    public async Task<User?> GetUserByPhoneAsync(string phoneNumber, bool track = true, CancellationToken cancellationToken = default)
+    public async Task<User?> GetUserByPhoneAsync(string phoneNumber, bool track = true,
+        CancellationToken cancellationToken = default)
     {
         var normalizedPhone = phoneNumber.ToNormalizedPhoneNumber();
         var userPhone = await context.UserPhones.ConfigureTracking(track)
@@ -40,16 +48,18 @@ public class UserRepository(DContext context) : IUserRepository
             .FirstOrDefaultAsync(x => x.NormalizedPhone == normalizedPhone, cancellationToken);
         return userPhone?.User;
     }
-    
+
     public async Task<bool> IsUserNameTakenAsync(string userName, CancellationToken cancellationToken = default)
     {
         var normalizedUserName = userName.ToNormalized();
         return await context.Users.AnyAsync(x => x.NormalizedUserName == normalizedUserName, cancellationToken);
     }
 
-    public async Task<bool> UserExists(Guid id, CancellationToken cancellationToken = default) 
-        => await context.Users.AnyAsync(x => x.Id == id, cancellationToken);
-    
+    public async Task<bool> UserExists(Guid id, CancellationToken cancellationToken = default)
+    {
+        return await context.Users.AnyAsync(x => x.Id == id, cancellationToken);
+    }
+
     public async Task ChangeUsersDiscount(Guid userId, decimal discount,
         CancellationToken cancellationToken = default)
     {
@@ -60,7 +70,7 @@ public class UserRepository(DContext context) : IUserRepository
                                                 DO UPDATE SET discount = EXCLUDED.discount;
                                                 """, cancellationToken);
     }
-    
+
     public async Task<List<Guid>> UsersExists(IEnumerable<Guid> userIds,
         CancellationToken cancellationToken = default)
     {
@@ -72,29 +82,32 @@ public class UserRepository(DContext context) : IUserRepository
     }
 
     [SuppressMessage("ReSharper", "EntityFramework.ClientSideDbFunctionCall")]
-    public async Task<IEnumerable<User>> GetUserBySearchColumn(string? searchTerm, int page, int viewCount, bool? isSupplier = null, bool track = true, CancellationToken cancellationToken = default)
+    public async Task<IEnumerable<User>> GetUserBySearchColumn(string? searchTerm, int page, int viewCount,
+        bool? isSupplier = null, bool track = true, CancellationToken cancellationToken = default)
     {
         var normalizedSearchTerm = searchTerm ?? "";
         normalizedSearchTerm = normalizedSearchTerm.ToNormalized();
 
-        bool searchBySearchTerm = !string.IsNullOrWhiteSpace(normalizedSearchTerm);
-        
+        var searchBySearchTerm = !string.IsNullOrWhiteSpace(normalizedSearchTerm);
+
         var query = context.Users.ConfigureTracking(track)
             .Include(x => x.UserInfo)
             .Where(x => isSupplier == null || (x.UserInfo != null && x.UserInfo.IsSupplier == isSupplier))
-            .Where(x => !searchBySearchTerm || 
-                        (x.UserInfo != null && EF.Functions.TrigramsSimilarity(x.UserInfo!.SearchColumn, 
+            .Where(x => !searchBySearchTerm ||
+                        (x.UserInfo != null && EF.Functions.TrigramsSimilarity(x.UserInfo!.SearchColumn,
                             normalizedSearchTerm) >= 0.1))
             .Select(x => new
             {
-                Rank = searchBySearchTerm ? EF.Functions.TrigramsSimilarity(x.UserInfo!.SearchColumn, normalizedSearchTerm) : 0,
+                Rank = searchBySearchTerm
+                    ? EF.Functions.TrigramsSimilarity(x.UserInfo!.SearchColumn, normalizedSearchTerm)
+                    : 0,
                 User = x
             });
 
         var orderQuery = searchBySearchTerm
             ? query.OrderByDescending(x => x.Rank)
             : query.OrderByDescending(x => x.User.Id);
-        
+
         return await orderQuery
             .Select(x => x.User)
             .Skip(page * viewCount)
@@ -109,12 +122,13 @@ public class UserRepository(DContext context) : IUserRepository
             .Select(x => x.Discount)
             .FirstOrDefaultAsync(cancellationToken);
     }
-    
+
     [SuppressMessage("ReSharper", "EntityFramework.ClientSideDbFunctionCall")]
     public async Task<IEnumerable<User>> GetUsersBySimilarityAsync(double similarityLevel, int page, int viewCount,
         string? name = null, string? surname = null, string? email = null,
         string? phone = null, string? userName = null, Guid? id = null,
-        string? description = null, bool? isSupplier = null, bool track = true, CancellationToken cancellationToken = default)
+        string? description = null, bool? isSupplier = null, bool track = true,
+        CancellationToken cancellationToken = default)
     {
         similarityLevel = similarityLevel >= 1 ? 0.999 : similarityLevel;
         var query = context.Users
@@ -138,7 +152,7 @@ public class UserRepository(DContext context) : IUserRepository
         {
             currName = name.Trim().ToUpperInvariant();
             query = query.Where(u => u.UserInfo != null &&
-                                     EF.Functions.TrigramsSimilarity(u.UserInfo.Name.ToUpper(), 
+                                     EF.Functions.TrigramsSimilarity(u.UserInfo.Name.ToUpper(),
                                          currName) > similarityLevel);
             isNameIncluded = true;
         }
@@ -147,7 +161,7 @@ public class UserRepository(DContext context) : IUserRepository
         {
             currSurname = surname.Trim().ToUpperInvariant();
             query = query.Where(u => u.UserInfo != null &&
-                                     EF.Functions.TrigramsSimilarity(u.UserInfo.Surname.ToUpper(), 
+                                     EF.Functions.TrigramsSimilarity(u.UserInfo.Surname.ToUpper(),
                                          currSurname) > similarityLevel);
             isSurnameIncluded = true;
         }
@@ -156,8 +170,8 @@ public class UserRepository(DContext context) : IUserRepository
         if (!string.IsNullOrWhiteSpace(email))
         {
             normalizedEmail = email.ToNormalizedEmail();
-            query = query.Where(u => u.UserEmails.Any(e => 
-                EF.Functions.TrigramsSimilarity(e.NormalizedEmail, 
+            query = query.Where(u => u.UserEmails.Any(e =>
+                EF.Functions.TrigramsSimilarity(e.NormalizedEmail,
                     normalizedEmail) > similarityLevel));
             isEmailIncluded = true;
         }
@@ -165,7 +179,7 @@ public class UserRepository(DContext context) : IUserRepository
         if (!string.IsNullOrWhiteSpace(phone))
         {
             normalizedPhone = phone.Trim().ToNormalizedPhoneNumber();
-            query = query.Where(u => u.UserPhones.Any(p => 
+            query = query.Where(u => u.UserPhones.Any(p =>
                 EF.Functions.TrigramsSimilarity(p.NormalizedPhone, normalizedPhone) > similarityLevel));
             isPhoneNumberIncluded = true;
         }
@@ -182,8 +196,8 @@ public class UserRepository(DContext context) : IUserRepository
         {
             normalizedDescription = description.ToNormalized();
             query = query.Where(u => u.UserInfo!.Description != null &&
-                EF.Functions.TrigramsSimilarity(u.UserInfo.Description.ToUpper(), 
-                    normalizedDescription) > similarityLevel);
+                                     EF.Functions.TrigramsSimilarity(u.UserInfo.Description.ToUpper(),
+                                         normalizedDescription) > similarityLevel);
             isDescriptionIncluded = true;
         }
 
@@ -205,19 +219,21 @@ public class UserRepository(DContext context) : IUserRepository
                         : 0) +
                     (isEmailIncluded
                         ? u.UserEmails
-                              .OrderByDescending(x => EF.Functions.TrigramsSimilarity(x.NormalizedEmail, normalizedEmail))
-                              .Select(x => EF.Functions.Greatest(
-                                  EF.Functions.TrigramsSimilarity(x.NormalizedEmail, normalizedEmail)))
-                              .FirstOrDefault()
+                            .OrderByDescending(x => EF.Functions.TrigramsSimilarity(x.NormalizedEmail, normalizedEmail))
+                            .Select(x => EF.Functions.Greatest(
+                                EF.Functions.TrigramsSimilarity(x.NormalizedEmail, normalizedEmail)))
+                            .FirstOrDefault()
                         : 0) +
                     (isDescriptionIncluded
                         ? EF.Functions.TrigramsSimilarity(u.UserInfo!.Description!, normalizedDescription)
                         : 0) +
-                    (isPhoneNumberIncluded ? u.UserPhones
-                        .OrderByDescending(x => EF.Functions.TrigramsSimilarity(x.NormalizedPhone, normalizedPhone))
-                        .Select(x => EF.Functions.Greatest(
-                            EF.Functions.TrigramsSimilarity(x.NormalizedPhone, normalizedPhone)))
-                        .FirstOrDefault() : 0)
+                    (isPhoneNumberIncluded
+                        ? u.UserPhones
+                            .OrderByDescending(x => EF.Functions.TrigramsSimilarity(x.NormalizedPhone, normalizedPhone))
+                            .Select(x => EF.Functions.Greatest(
+                                EF.Functions.TrigramsSimilarity(x.NormalizedPhone, normalizedPhone)))
+                            .FirstOrDefault()
+                        : 0)
             })
             .OrderByDescending(x => x.Score);
 

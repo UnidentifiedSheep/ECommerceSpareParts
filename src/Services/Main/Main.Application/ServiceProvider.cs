@@ -29,11 +29,11 @@ namespace Main.Application;
 
 public static class ServiceProvider
 {
-    public static IServiceCollection AddApplicationLayer(this IServiceCollection collection, 
+    public static IServiceCollection AddApplicationLayer(this IServiceCollection collection,
         UserEmailOptions? emailOptions = null, UserPhoneOptions? phoneOptions = null)
     {
         var relatedDataTtl = TimeSpan.FromHours(10);
-        
+
         collection.AddSingleton<UpdateCurrencyRate>();
         collection.AddSingleton<UpdateMarkUp>();
         collection.AddScoped<IRelatedDataFactory, RelatedDataFactory>();
@@ -51,7 +51,7 @@ public static class ServiceProvider
 
         collection.AddSingleton<IEmailValidator, EmailValidator>();
         collection.AddSingleton<IConcurrencyValidator<StorageContent>, StorageContentConcurrencyValidator>();
-        
+
         collection.AddTransient<RelatedDataBase<ArticleCross>, ArticleCrossesRelatedData>(sp =>
         {
             var cache = sp.GetRequiredService<ICache>();
@@ -62,7 +62,7 @@ public static class ServiceProvider
             var cache = sp.GetRequiredService<ICache>();
             return new ProducerRelatedData(cache, relatedDataTtl);
         });
-        
+
         collection.AddTransient<RelatedDataBase<Currency>, CurrencyRelatedData>(sp =>
         {
             var cache = sp.GetRequiredService<ICache>();

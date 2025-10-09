@@ -1,8 +1,8 @@
-using Main.Application.Handlers.Users.CreateUser;
 using Bogus;
 using Core.Dtos.Emails;
 using Core.Enums;
 using Exceptions.Exceptions.Users;
+using Main.Application.Handlers.Users.CreateUser;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
@@ -17,8 +17,8 @@ namespace Tests.HandlersTests.Users;
 public class CreateUserTests : IAsyncLifetime
 {
     private readonly DContext _context;
-    private readonly IMediator _mediator;
     private readonly Faker _faker = new(Global.Locale);
+    private readonly IMediator _mediator;
 
     public CreateUserTests(CombinedContainerFixture fixture)
     {
@@ -43,8 +43,8 @@ public class CreateUserTests : IAsyncLifetime
     public async Task CreateUser_WithInvalidUsername_ThrowsValidationException(string invalidUsername)
     {
         var userInfo = MockData.MockData.CreateUserInfoDto();
-        var command = new CreateUserCommand(invalidUsername, _faker.Lorem.Letter(10), 
-            userInfo,[], [], []);
+        var command = new CreateUserCommand(invalidUsername, _faker.Lorem.Letter(10),
+            userInfo, [], [], []);
         await Assert.ThrowsAsync<ValidationException>(async () => await _mediator.Send(command));
     }
 
@@ -66,7 +66,7 @@ public class CreateUserTests : IAsyncLifetime
             Type = EmailType.Personal
         };
         var userInfo = MockData.MockData.CreateUserInfoDto();
-        var command = new CreateUserCommand(_faker.Person.UserName, _faker.Lorem.Letter(10), 
+        var command = new CreateUserCommand(_faker.Person.UserName, _faker.Lorem.Letter(10),
             userInfo, [email], [], []);
 
         await Assert.ThrowsAsync<ValidationException>(async () => await _mediator.Send(command));
@@ -83,8 +83,8 @@ public class CreateUserTests : IAsyncLifetime
             Type = EmailType.Personal
         };
         var userInfo = MockData.MockData.CreateUserInfoDto();
-        var command = new CreateUserCommand(_faker.Lorem.Letter(10), 
-            _faker.Lorem.Letter(10), userInfo,[email], [], []);
+        var command = new CreateUserCommand(_faker.Lorem.Letter(10),
+            _faker.Lorem.Letter(10), userInfo, [email], [], []);
 
         await _mediator.Send(command);
         await Assert.ThrowsAsync<UserNameAlreadyTakenException>(async () => await _mediator.Send(command));
@@ -101,11 +101,11 @@ public class CreateUserTests : IAsyncLifetime
             Type = EmailType.Personal
         };
         var userInfo = MockData.MockData.CreateUserInfoDto();
-        var command = new CreateUserCommand(_faker.Person.UserName, _faker.Lorem.Letter(10), 
+        var command = new CreateUserCommand(_faker.Person.UserName, _faker.Lorem.Letter(10),
             userInfo, [email], [], []);
-        
+
         await _mediator.Send(command);
-        var scommand = new CreateUserCommand("sdfsdf", _faker.Lorem.Letter(10), userInfo, 
+        var scommand = new CreateUserCommand("sdfsdf", _faker.Lorem.Letter(10), userInfo,
             [email], [], []);
         await Assert.ThrowsAsync<EmailAlreadyTakenException>(async () => await _mediator.Send(scommand));
     }
@@ -121,7 +121,7 @@ public class CreateUserTests : IAsyncLifetime
             Type = EmailType.Personal
         };
         var userInfo = MockData.MockData.CreateUserInfoDto();
-        var command = new CreateUserCommand(_faker.Person.UserName, _faker.Lorem.Letter(10), 
+        var command = new CreateUserCommand(_faker.Person.UserName, _faker.Lorem.Letter(10),
             userInfo, [email], [], []);
 
         var result = await _mediator.Send(command);

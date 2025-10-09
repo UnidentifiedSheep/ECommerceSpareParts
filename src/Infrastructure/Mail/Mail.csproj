@@ -11,12 +11,12 @@
     </ItemGroup>
 
     <ItemGroup>
-      <Reference Include="Microsoft.Extensions.DependencyInjection.Abstractions">
-        <HintPath>..\..\..\..\..\..\.nuget\packages\microsoft.extensions.dependencyinjection.abstractions\9.0.0\lib\net9.0\Microsoft.Extensions.DependencyInjection.Abstractions.dll</HintPath>
-      </Reference>
-      <Reference Include="Microsoft.Extensions.Options">
-        <HintPath>..\..\..\..\..\..\.nuget\packages\microsoft.extensions.options\9.0.8\lib\net9.0\Microsoft.Extensions.Options.dll</HintPath>
-      </Reference>
+        <Reference Include="Microsoft.Extensions.DependencyInjection.Abstractions">
+            <HintPath>..\..\..\..\..\..\.nuget\packages\microsoft.extensions.dependencyinjection.abstractions\9.0.0\lib\net9.0\Microsoft.Extensions.DependencyInjection.Abstractions.dll</HintPath>
+        </Reference>
+        <Reference Include="Microsoft.Extensions.Options">
+            <HintPath>..\..\..\..\..\..\.nuget\packages\microsoft.extensions.options\9.0.8\lib\net9.0\Microsoft.Extensions.Options.dll</HintPath>
+        </Reference>
     </ItemGroup>
 
 </Project>

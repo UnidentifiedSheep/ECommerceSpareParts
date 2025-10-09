@@ -1,8 +1,8 @@
-using Main.Application.Configs;
-using Main.Application.Handlers.Producers.DeleteOtherName;
 using Bogus;
 using Core.Entities;
 using Exceptions.Exceptions.Producers;
+using Main.Application.Configs;
+using Main.Application.Handlers.Producers.DeleteOtherName;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;

@@ -42,7 +42,7 @@ public static class ServiceProviderForTests
         var passwordRules = new PasswordRules
         {
             RequireDigit = false,
-            RequireUppercase = false,
+            RequireUppercase = false
         };
         CacheServiceProvider.AddCacheLayer(services, redisConnectionString)
             .AddSecurityLayer(passwordRules)
@@ -50,8 +50,7 @@ public static class ServiceProviderForTests
             .AddCommonLayer();
         MapsterConfig.Configure();
         SortByConfig.Configure();
-        
-        
+
 
         var serviceProvider = services.BuildServiceProvider();
         IsConfiguredBefore = true;

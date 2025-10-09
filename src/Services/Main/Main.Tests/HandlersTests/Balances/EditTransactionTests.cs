@@ -1,9 +1,9 @@
-using Main.Application.Configs;
-using Main.Application.Handlers.Balance.EditTransaction;
 using Core.Entities;
 using Core.Enums;
 using Exceptions.Exceptions.Balances;
 using FluentValidation;
+using Main.Application.Configs;
+using Main.Application.Handlers.Balance.EditTransaction;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;

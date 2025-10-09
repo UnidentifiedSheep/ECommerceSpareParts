@@ -6,6 +6,5 @@ public class RoleAlreadyExistsException : BadRequestException
 {
     public RoleAlreadyExistsException(string roleName) : base("Роль уже существует", new { Name = roleName })
     {
-        
     }
 }

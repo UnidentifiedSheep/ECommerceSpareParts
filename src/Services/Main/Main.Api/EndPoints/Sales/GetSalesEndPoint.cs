@@ -1,7 +1,7 @@
-using Main.Application.Handlers.Sales.GetSales;
 using Carter;
 using Core.Dtos.Amw.Sales;
 using Core.Models;
+using Main.Application.Handlers.Sales.GetSales;
 using Mapster;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;

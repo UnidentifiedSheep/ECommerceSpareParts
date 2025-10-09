@@ -16,7 +16,7 @@ public class UserInfoValidator : AbstractValidator<UserInfoDto>
             .WithMessage("Имя не должно содержать спец символов")
             .Must(x => x.Trim().Length <= 30)
             .WithMessage("Максимальная длина имени 30 символов");
-        
+
         RuleFor(x => x.Surname)
             .NotEmpty()
             .WithMessage("Пользователь должен иметь Фамилию")
@@ -26,9 +26,9 @@ public class UserInfoValidator : AbstractValidator<UserInfoDto>
             .WithMessage("Фамилия не должна содержать спец символов")
             .Must(x => x.Trim().Length <= 30)
             .WithMessage("Максимальная длина фамилии 30 символов");
-        
+
         RuleFor(x => x.Description)
-            .Must(x =>  x == null || x.Trim().Length <= 300)
+            .Must(x => x == null || x.Trim().Length <= 300)
             .WithMessage("Максимальная длина описания 300 символов");
     }
 }

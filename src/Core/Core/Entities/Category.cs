@@ -1,6 +1,6 @@
 ﻿namespace Core.Entities;
 
-public partial class Category
+public class Category
 {
     public int Id { get; set; }
 

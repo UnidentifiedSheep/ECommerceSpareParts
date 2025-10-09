@@ -1,5 +1,4 @@
 ﻿using System.Security.Claims;
-using Core.Dtos.Internal;
 using Core.Entities;
 
 namespace Core.Interfaces;

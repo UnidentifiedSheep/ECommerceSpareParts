@@ -42,9 +42,12 @@ public class UserPhoneRepository(DContext context) : IUserPhoneRepository
             .FirstOrDefaultAsync(x => x.NormalizedPhone == normalizedPhone, cancellationToken);
     }
 
-    public async Task<UserPhone?> GetUserPrimaryPhoneAsync(Guid userId, bool track = true, CancellationToken cancellationToken = default)
-    => await context.UserPhones.ConfigureTracking(track)
-        .FirstOrDefaultAsync(x => x.UserId == userId && x.IsPrimary == true, cancellationToken);
+    public async Task<UserPhone?> GetUserPrimaryPhoneAsync(Guid userId, bool track = true,
+        CancellationToken cancellationToken = default)
+    {
+        return await context.UserPhones.ConfigureTracking(track)
+            .FirstOrDefaultAsync(x => x.UserId == userId && x.IsPrimary == true, cancellationToken);
+    }
 
     public async Task<bool> IsPhoneTakenAsync(string phone, CancellationToken cancellationToken = default)
     {
@@ -53,15 +56,20 @@ public class UserPhoneRepository(DContext context) : IUserPhoneRepository
             .AnyAsync(x => x.NormalizedPhone == normalizedPhone, cancellationToken);
     }
 
-    public async Task<int> GetUserPhoneCountAsync(Guid userId, CancellationToken cancellationToken = default) 
-        => await context.UserPhones.AsNoTracking()
+    public async Task<int> GetUserPhoneCountAsync(Guid userId, CancellationToken cancellationToken = default)
+    {
+        return await context.UserPhones.AsNoTracking()
             .CountAsync(x => x.UserId == userId, cancellationToken);
+    }
 
-    public async Task<bool> UserHasPrimaryPhoneAsync(Guid userId, CancellationToken cancellationToken = default) 
-        => await context.UserPhones.AsNoTracking()
+    public async Task<bool> UserHasPrimaryPhoneAsync(Guid userId, CancellationToken cancellationToken = default)
+    {
+        return await context.UserPhones.AsNoTracking()
             .AnyAsync(x => x.UserId == userId && x.IsPrimary == true, cancellationToken);
+    }
 
-    public async Task<UserPhoneSummary?> GetUserPhoneSummaryAsync(Guid userId, CancellationToken cancellationToken = default)
+    public async Task<UserPhoneSummary?> GetUserPhoneSummaryAsync(Guid userId,
+        CancellationToken cancellationToken = default)
     {
         var summary = await context.UserPhones
             .AsNoTracking()

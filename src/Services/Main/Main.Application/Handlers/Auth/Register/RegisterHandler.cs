@@ -9,7 +9,8 @@ using MediatR;
 namespace Main.Application.Handlers.Auth.Register;
 
 [Transactional]
-public record RegisterCommand(string Email, string UserName, string Password, string Name, string Surname) : ICommand<Unit>;
+public record RegisterCommand(string Email, string UserName, string Password, string Name, string Surname)
+    : ICommand<Unit>;
 
 internal class RegisterHandler(IMediator mediator) : ICommandHandler<RegisterCommand, Unit>
 {
@@ -19,7 +20,7 @@ internal class RegisterHandler(IMediator mediator) : ICommandHandler<RegisterCom
         {
             Name = request.Name,
             Surname = request.Surname,
-            IsSupplier = false,
+            IsSupplier = false
         };
         var email = new EmailDto
         {
@@ -28,7 +29,7 @@ internal class RegisterHandler(IMediator mediator) : ICommandHandler<RegisterCom
             IsPrimary = true,
             Type = EmailType.Unknown
         };
-        var command = new CreateUserCommand(request.UserName, request.Password, userInfo, 
+        var command = new CreateUserCommand(request.UserName, request.Password, userInfo,
             [email], [], ["Member"]);
         await mediator.Send(command, cancellationToken);
         return Unit.Value;

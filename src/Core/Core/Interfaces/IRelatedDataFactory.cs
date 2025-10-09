@@ -1,5 +1,4 @@
 using Core.Abstractions;
-using Core.Interfaces.CacheRepositories;
 
 namespace Core.Interfaces;
 

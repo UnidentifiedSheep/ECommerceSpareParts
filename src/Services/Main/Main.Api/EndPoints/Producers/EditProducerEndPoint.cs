@@ -1,6 +1,6 @@
-using Main.Application.Handlers.Producers.EditProducer;
 using Carter;
 using Core.Dtos.Amw.Producers;
+using Main.Application.Handlers.Producers.EditProducer;
 using MediatR;
 
 namespace Main.Api.EndPoints.Producers;

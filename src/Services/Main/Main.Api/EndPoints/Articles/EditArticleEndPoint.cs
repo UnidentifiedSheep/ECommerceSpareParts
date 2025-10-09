@@ -1,6 +1,6 @@
-using Main.Application.Handlers.Articles.PatchArticle;
 using Carter;
 using Core.Dtos.Amw.Articles;
+using Main.Application.Handlers.Articles.PatchArticle;
 using MediatR;
 
 namespace Main.Api.EndPoints.Articles;

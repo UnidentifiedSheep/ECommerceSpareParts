@@ -23,5 +23,7 @@ public interface ICurrencyRepository
     Task<bool> IsCurrencyShortNameTaken(string shortName, CancellationToken cancellationToken = default);
     Task<bool> IsCurrencyNameTaken(string name, CancellationToken cancellationToken = default);
     Task<bool> IsCurrencySignTaken(string sign, CancellationToken cancellationToken = default);
-    Task<IEnumerable<Currency>> GetCurrencies(int page, int limit, bool track = true, CancellationToken cancellationToken = default);
+
+    Task<IEnumerable<Currency>> GetCurrencies(int page, int limit, bool track = true,
+        CancellationToken cancellationToken = default);
 }

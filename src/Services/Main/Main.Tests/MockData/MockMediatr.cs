@@ -1,3 +1,9 @@
+using Bogus;
+using Core.Dtos.Amw.Sales;
+using Core.Dtos.Emails;
+using Core.Entities;
+using Core.Enums;
+using Core.Models;
 using Main.Application.Handlers.Articles.CreateArticles;
 using Main.Application.Handlers.Balance.CreateTransaction;
 using Main.Application.Handlers.Producers.CreateProducer;
@@ -5,12 +11,6 @@ using Main.Application.Handlers.Sales.CreateSale;
 using Main.Application.Handlers.StorageContents.AddContent;
 using Main.Application.Handlers.Storages.CreateStorage;
 using Main.Application.Handlers.Users.CreateUser;
-using Bogus;
-using Core.Dtos.Amw.Sales;
-using Core.Dtos.Emails;
-using Core.Entities;
-using Core.Enums;
-using Core.Models;
 using Mapster;
 using MediatR;
 using static Tests.MockData.MockData;
@@ -49,9 +49,8 @@ public static class MockMediatr
             Type = EmailType.Personal
         };
         var userInfo = CreateUserInfoDto();
-        var command = new CreateUserCommand(faker.Person.UserName, 
-            faker.Lorem.Letter(10), userInfo,[email], [], []);
-
+        var command = new CreateUserCommand(faker.Person.UserName,
+            faker.Lorem.Letter(10), userInfo, [email], [], []);
 
 
         var result = await mediator.Send(command);

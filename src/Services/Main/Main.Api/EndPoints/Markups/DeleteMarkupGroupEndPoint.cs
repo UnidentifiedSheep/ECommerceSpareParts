@@ -1,5 +1,5 @@
-using Main.Application.Handlers.Markups.DeleteMarkup;
 using Carter;
+using Main.Application.Handlers.Markups.DeleteMarkup;
 using MediatR;
 
 namespace Main.Api.EndPoints.Markups;

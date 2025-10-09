@@ -63,7 +63,8 @@ public class SaleRepository(DContext context) : ISaleRepository
                                                          EF.Functions.ILike(content.Article.NormalizedArticleNumber,
                                                              $"%{normalizedSearchTerm}%")) ||
                                      (x.Comment != null && EF.Functions.ILike(x.Comment, $"%{searchTerm}%")) ||
-                                     x.SaleContents.Any(z => z.Comment != null && EF.Functions.ILike(z.Comment, $"%{searchTerm}%")));
+                                     x.SaleContents.Any(z =>
+                                         z.Comment != null && EF.Functions.ILike(z.Comment, $"%{searchTerm}%")));
         }
 
         var startDate = DateTime.SpecifyKind(rangeStart.Date, DateTimeKind.Unspecified);
@@ -79,7 +80,7 @@ public class SaleRepository(DContext context) : ISaleRepository
             .ToListAsync(cancellationToken);
     }
 
-    public async Task<IEnumerable<SaleContent>> GetSaleContent(string saleId, bool track = true, 
+    public async Task<IEnumerable<SaleContent>> GetSaleContent(string saleId, bool track = true,
         CancellationToken cancellationToken = default)
     {
         return await context.SaleContents.ConfigureTracking(track)

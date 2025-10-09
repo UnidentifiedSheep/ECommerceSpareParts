@@ -1,6 +1,6 @@
 ﻿namespace Core.Entities;
 
-public partial class Cart
+public class Cart
 {
     public string Id { get; set; } = null!;
 

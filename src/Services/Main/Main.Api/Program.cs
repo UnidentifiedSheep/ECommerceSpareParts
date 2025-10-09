@@ -4,8 +4,6 @@ using Api.Common.BackgroundServices;
 using Api.Common.ExceptionHandlers;
 using Api.Common.Logging;
 using Application.Common.EventHandlers;
-using Main.Application;
-using Main.Application.Configs;
 using Carter;
 using Core.Contracts;
 using Core.Interfaces;
@@ -15,6 +13,8 @@ using Hangfire;
 using Hangfire.PostgreSql;
 using Integrations;
 using Mail;
+using Main.Application;
+using Main.Application.Configs;
 using Main.Application.EventHandlers;
 using Main.Application.HangFireTasks;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
@@ -30,7 +30,6 @@ using Security;
 using Serilog;
 using Serilog.Sinks.Loki;
 using Serilog.Sinks.Loki.Labels;
-
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -100,10 +99,10 @@ var brokerOptions = new MessageBrokerOptions
 var emailOptions = new UserEmailOptions
 {
     MinEmailCount = 0,
-    MaxEmailCount = 5,
+    MaxEmailCount = 5
 };
 
-string mainQueueName = $"queue-of-main-{Environment.MachineName}";
+var mainQueueName = $"queue-of-main-{Environment.MachineName}";
 
 ConsumerRegistration[] eventHandlers =
 [
@@ -177,9 +176,9 @@ builder.Services.AddCors(options =>
     options.AddDefaultPolicy(policy =>
     {
         policy
-            .AllowAnyOrigin()   
-            .AllowAnyHeader()  
-            .AllowAnyMethod(); 
+            .AllowAnyOrigin()
+            .AllowAnyHeader()
+            .AllowAnyMethod();
     });
 });
 
@@ -198,7 +197,7 @@ SortByConfig.Configure();
 
 await SetupPrice(app.Services);
 
-app.UseCors();  
+app.UseCors();
 app.UseExceptionHandler(_ => { });
 app.UseAuthentication();
 app.UseAuthorization();

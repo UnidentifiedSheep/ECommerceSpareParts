@@ -33,6 +33,7 @@ public abstract class RelatedDataBase(ICache cache, TimeSpan? ttl = null)
         await cache.SetAddAsync(key, relatedKeys);
         await cache.KeyExpireAsync(key, ttl);
     }
+
     public abstract string GetRelatedDataKey(string id);
 }
 

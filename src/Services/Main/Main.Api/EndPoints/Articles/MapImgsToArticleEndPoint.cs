@@ -1,5 +1,5 @@
-﻿using Main.Application.Handlers.Articles;
-using Carter;
+﻿using Carter;
+using Main.Application.Handlers.Articles;
 using MediatR;
 
 namespace Main.Api.EndPoints.Articles;

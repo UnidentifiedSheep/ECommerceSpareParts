@@ -1,5 +1,5 @@
-using Main.Application.Handlers.Auth.ConfirmMail;
 using Carter;
+using Main.Application.Handlers.Auth.ConfirmMail;
 using MediatR;
 
 namespace Main.Api.EndPoints.Auth;

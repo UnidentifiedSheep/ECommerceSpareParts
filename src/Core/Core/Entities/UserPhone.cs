@@ -1,6 +1,6 @@
 ﻿namespace Core.Entities;
 
-public partial class UserPhone
+public class UserPhone
 {
     public Guid Id { get; set; }
 

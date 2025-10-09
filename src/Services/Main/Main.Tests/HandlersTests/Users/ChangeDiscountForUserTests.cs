@@ -1,8 +1,8 @@
-using Main.Application.Configs;
-using Main.Application.Handlers.Users.ChangeUserDiscount;
 using Core.Entities;
 using Core.Interfaces.CacheRepositories;
 using FluentValidation;
+using Main.Application.Configs;
+using Main.Application.Handlers.Users.ChangeUserDiscount;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;

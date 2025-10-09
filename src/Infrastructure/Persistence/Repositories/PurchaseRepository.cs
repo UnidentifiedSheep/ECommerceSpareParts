@@ -50,12 +50,14 @@ public class PurchaseRepository(DContext context) : IPurchaseRepository
                                                          EF.Functions.ILike(content.Article.NormalizedArticleNumber,
                                                              $"%{normalizedSearchTerm}%")) ||
                                      (x.Comment != null && EF.Functions.ILike(x.Comment, $"%{searchTerm}%")) ||
-                                     x.PurchaseContents.Any(z => z.Comment != null && EF.Functions.ILike(z.Comment, $"%{searchTerm}%")));
+                                     x.PurchaseContents.Any(z =>
+                                         z.Comment != null && EF.Functions.ILike(z.Comment, $"%{searchTerm}%")));
         }
 
         var startDate = DateTime.SpecifyKind(rangeStart.Date, DateTimeKind.Unspecified);
         var endDate = DateTime.SpecifyKind(rangeEnd.Date, DateTimeKind.Unspecified).AddDays(1);
-        var result = await query.Where(x => x.PurchaseDatetime >= startDate.Date && x.PurchaseDatetime <= endDate.Date.AddDays(1))
+        var result = await query.Where(x =>
+                x.PurchaseDatetime >= startDate.Date && x.PurchaseDatetime <= endDate.Date.AddDays(1))
             .Include(x => x.Transaction)
             .Include(x => x.Supplier)
             .ThenInclude(x => x.UserInfo)
@@ -67,7 +69,8 @@ public class PurchaseRepository(DContext context) : IPurchaseRepository
         return result;
     }
 
-    public async Task<IEnumerable<PurchaseContent>> GetPurchaseContent(string purchaseId, bool track = true, CancellationToken cancellationToken = default)
+    public async Task<IEnumerable<PurchaseContent>> GetPurchaseContent(string purchaseId, bool track = true,
+        CancellationToken cancellationToken = default)
     {
         return await context.PurchaseContents.ConfigureTracking(track)
             .Include(x => x.Article)

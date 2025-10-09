@@ -1,5 +1,5 @@
-using Main.Application.Handlers.Producers.CreateProducer;
 using Bogus;
+using Main.Application.Handlers.Producers.CreateProducer;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;

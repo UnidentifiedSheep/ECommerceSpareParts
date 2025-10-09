@@ -1,4 +1,3 @@
-using Core.Interfaces.Validators;
 using FluentValidation;
 
 namespace Main.Application.Handlers.BaseValidators;

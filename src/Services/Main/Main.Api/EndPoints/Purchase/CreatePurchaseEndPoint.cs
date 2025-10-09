@@ -1,7 +1,7 @@
 using System.Security.Claims;
-using Main.Application.Handlers.Purchases.CreateFullPurchase;
 using Carter;
 using Core.Dtos.Amw.Purchase;
+using Main.Application.Handlers.Purchases.CreateFullPurchase;
 using MediatR;
 
 namespace Main.Api.EndPoints.Purchase;
@@ -20,9 +20,10 @@ public class CreatePurchaseEndPoint : ICarterModule
     public void AddRoutes(IEndpointRouteBuilder app)
     {
         app.MapPost("/purchases/",
-                async (ClaimsPrincipal claims, ISender sender, CreatePurchaseRequest request, CancellationToken token) =>
+                async (ClaimsPrincipal claims, ISender sender, CreatePurchaseRequest request,
+                    CancellationToken token) =>
                 {
-                    if (!Guid.TryParse(claims.FindFirstValue(ClaimTypes.NameIdentifier), out var userId)) 
+                    if (!Guid.TryParse(claims.FindFirstValue(ClaimTypes.NameIdentifier), out var userId))
                         return Results.Unauthorized();
                     var command = new CreateFullPurchaseCommand(userId, request.SupplierId, request.CurrencyId,
                         request.StorageName, request.PurchaseDate, request.PurchaseContent, request.Comment,

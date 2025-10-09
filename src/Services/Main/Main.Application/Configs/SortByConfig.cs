@@ -25,7 +25,7 @@ public static class SortByConfig
             .Map("dateTime", x => x.PurchaseDatetime)
             .Map("totalSum", x => x.Transaction.TransactionSum)
             .Map("id", x => x.Id);
-        
+
         new Sale().MapDefault(x => x.SaleDatetime)
             .Map("dateTime", x => x.SaleDatetime)
             .Map("totalSum", x => x.Transaction.TransactionSum)

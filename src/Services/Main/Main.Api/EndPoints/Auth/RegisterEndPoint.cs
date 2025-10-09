@@ -1,6 +1,5 @@
-﻿using Main.Application.Handlers.Auth;
+﻿using Carter;
 using Main.Application.Handlers.Auth.Register;
-using Carter;
 using Mapster;
 using MediatR;
 

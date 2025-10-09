@@ -1,7 +1,7 @@
-using Main.Application.Configs;
-using Main.Application.Handlers.Storages.CreateStorage;
 using Bogus;
 using Exceptions.Exceptions.Storages;
+using Main.Application.Configs;
+using Main.Application.Handlers.Storages.CreateStorage;
 using MediatR;
 using Microsoft.Extensions.DependencyInjection;
 using Persistence.Contexts;

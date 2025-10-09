@@ -1,5 +1,5 @@
-using Main.Application.Handlers.Users;
 using Carter;
+using Main.Application.Handlers.Users;
 using Mapster;
 using MediatR;
 

@@ -1,5 +1,5 @@
-using Main.Application.Handlers.ArticleContent.AddArticleContent;
 using Carter;
+using Main.Application.Handlers.ArticleContent.AddArticleContent;
 using MediatR;
 
 namespace Main.Api.EndPoints.Articles;

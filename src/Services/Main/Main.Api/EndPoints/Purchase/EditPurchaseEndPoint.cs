@@ -1,7 +1,7 @@
 using System.Security.Claims;
-using Main.Application.Handlers.Purchases.EditFullPurchase;
 using Carter;
 using Core.Dtos.Amw.Purchase;
+using Main.Application.Handlers.Purchases.EditFullPurchase;
 using MediatR;
 
 namespace Main.Api.EndPoints.Purchase;
@@ -19,7 +19,7 @@ public class EditPurchaseEndPoint : ICarterModule
         app.MapPut("/purchase/{purchaseId}", async (ISender sender, string purchaseId, EditPurchaseRequest request,
                 CancellationToken cancellationToken, ClaimsPrincipal claims) =>
             {
-                if (!Guid.TryParse(claims.FindFirstValue(ClaimTypes.NameIdentifier), out var userId)) 
+                if (!Guid.TryParse(claims.FindFirstValue(ClaimTypes.NameIdentifier), out var userId))
                     return Results.Unauthorized();
                 var command = new EditFullPurchaseCommand(request.Content, purchaseId, request.CurrencyId,
                     request.Comment, request.PurchaseDateTime, userId);

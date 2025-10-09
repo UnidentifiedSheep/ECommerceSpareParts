@@ -12,10 +12,22 @@ public record GetArticleCrossesQuery<TDto>(int ArticleId, PaginationModel Pagina
     : IQuery<GetArticleCrossesResult<TDto>>, ICacheableQuery
 {
     public HashSet<string> RelatedEntityIds { get; } = [ArticleId.ToString()];
-    public string GetCacheKey() => string.Format(CacheKeys.ArticleCrossesCacheKey, ArticleId, Pagination.Page, 
-        Pagination.Size, SortBy);
-    public Type GetRelatedType() => typeof(ArticleCross);
-    public int GetDurationSeconds() => 600;
+
+    public string GetCacheKey()
+    {
+        return string.Format(CacheKeys.ArticleCrossesCacheKey, ArticleId, Pagination.Page,
+            Pagination.Size, SortBy);
+    }
+
+    public Type GetRelatedType()
+    {
+        return typeof(ArticleCross);
+    }
+
+    public int GetDurationSeconds()
+    {
+        return 600;
+    }
 }
 
 public record GetArticleCrossesResult<TDto>(IEnumerable<TDto> Crosses, TDto RequestedArticle);
@@ -34,7 +46,7 @@ public class GetArticleCrossesHandler<TDto>(IArticlesRepository articlesReposito
 
         var requestedAdapted = requestedArticle.Adapt<TDto>();
         var crossArticlesAdapted = crosses.Adapt<List<TDto>>();
-        
+
         request.RelatedEntityIds.UnionWith(crosses.Select(x => x.Id.ToString()));
 
         return new GetArticleCrossesResult<TDto>(crossArticlesAdapted, requestedAdapted);

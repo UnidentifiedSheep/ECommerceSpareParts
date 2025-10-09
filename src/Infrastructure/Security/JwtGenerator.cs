@@ -63,7 +63,7 @@ public class JwtGenerator(IConfiguration configuration) : IJwtGenerator
         claims.AddClaim(new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()));
         foreach (var role in roles)
             claims.AddClaim(new Claim(ClaimTypes.Role, role));
-        
+
         return claims;
     }
 }

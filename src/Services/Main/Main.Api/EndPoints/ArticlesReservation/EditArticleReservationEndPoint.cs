@@ -1,7 +1,7 @@
 using System.Security.Claims;
-using Main.Application.Handlers.ArticleReservations.EditArticleReservation;
 using Carter;
 using Core.Dtos.Amw.ArticleReservations;
+using Main.Application.Handlers.ArticleReservations.EditArticleReservation;
 using MediatR;
 
 namespace Main.Api.EndPoints.ArticlesReservation;
@@ -16,7 +16,7 @@ public class EditArticleReservationEndPoint : ICarterModule
             (ISender sender, int reservationId, EditArticleReservationRequest request, ClaimsPrincipal claims,
                 CancellationToken token) =>
             {
-                if (!Guid.TryParse(claims.FindFirstValue(ClaimTypes.NameIdentifier), out var userId)) 
+                if (!Guid.TryParse(claims.FindFirstValue(ClaimTypes.NameIdentifier), out var userId))
                     return Results.Unauthorized();
                 var command = new EditArticleReservationCommand(reservationId, request.NewValue, userId);
                 await sender.Send(command, token);

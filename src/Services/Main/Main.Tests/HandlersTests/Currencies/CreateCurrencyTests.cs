@@ -1,6 +1,6 @@
-using Main.Application.Handlers.Currencies.CreateCurrency;
 using Exceptions.Exceptions.Currencies;
 using FluentValidation;
+using Main.Application.Handlers.Currencies.CreateCurrency;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
@@ -121,7 +121,7 @@ public class CreateCurrencyTests : IAsyncLifetime
             await _mediator.Send(new CreateCurrencyCommand(GetValidShortName(), GetValidName(), sign,
                 GetValidCurrencyCode())));
 
-                await Assert.ThrowsAsync<CurrencyShortNameTakenException>(async () =>
+        await Assert.ThrowsAsync<CurrencyShortNameTakenException>(async () =>
             await _mediator.Send(new CreateCurrencyCommand(shortName, GetValidName(), GetValidCurrencySign(),
                 GetValidCurrencyCode())));
     }

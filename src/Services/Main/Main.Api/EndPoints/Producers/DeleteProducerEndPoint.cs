@@ -1,5 +1,5 @@
-using Main.Application.Handlers.Producers.DeleteProducer;
 using Carter;
+using Main.Application.Handlers.Producers.DeleteProducer;
 using MediatR;
 
 namespace Main.Api.EndPoints.Producers;

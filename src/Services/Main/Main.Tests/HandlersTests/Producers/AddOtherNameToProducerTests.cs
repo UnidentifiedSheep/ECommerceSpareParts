@@ -1,8 +1,8 @@
+using Bogus;
+using Exceptions.Exceptions.Producers;
 using Main.Application.Configs;
 using Main.Application.Handlers.Producers.AddOtherName;
 using Main.Application.Handlers.Producers.CreateProducer;
-using Bogus;
-using Exceptions.Exceptions.Producers;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;

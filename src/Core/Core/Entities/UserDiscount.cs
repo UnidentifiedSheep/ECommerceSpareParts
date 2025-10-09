@@ -1,6 +1,6 @@
 ﻿namespace Core.Entities;
 
-public partial class UserDiscount
+public class UserDiscount
 {
     public Guid UserId { get; set; }
 

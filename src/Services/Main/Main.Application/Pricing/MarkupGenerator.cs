@@ -188,3 +188,4 @@ public class MarkupGenerator(
         return (decimal)Math.Round(Math.Sqrt(variance), 2);
     }
 }*/
+

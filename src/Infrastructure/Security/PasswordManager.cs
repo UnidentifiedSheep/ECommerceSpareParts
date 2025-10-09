@@ -1,6 +1,6 @@
-using static BCrypt.Net.BCrypt;
 using Core.Interfaces.Validators;
 using Core.Models;
+using static BCrypt.Net.BCrypt;
 
 namespace Security;
 
@@ -33,24 +33,22 @@ public class PasswordManager(PasswordRules rules) : IPasswordManager
         if (rules.MaxLength.HasValue && password.Length > rules.MaxLength.Value)
             errors.Add($"Пароль должен быть длиной максимум до {rules.MaxLength.Value} символов.");
 
-        if (!rules.CanContainTrailingSpaces && 
+        if (!rules.CanContainTrailingSpaces &&
             (password[0] == ' ' || password[^1] == ' '))
             errors.Add("Пароль не может начинаться или заканчиваться пробелом.");
 
-        bool hasUpper = false;
-        bool hasDigit = false;
-        bool hasSpecial = false;
-        bool hasSpace = false;
+        var hasUpper = false;
+        var hasDigit = false;
+        var hasSpecial = false;
+        var hasSpace = false;
 
-        HashSet<char> specials = rules.SpecialCharacters;
-        
+        var specials = rules.SpecialCharacters;
+
         foreach (var c in password)
-        {
             if (char.IsUpper(c)) hasUpper = true;
             else if (char.IsDigit(c)) hasDigit = true;
             else if (specials.Contains(c)) hasSpecial = true;
             else if (c == ' ') hasSpace = true;
-        }
 
         if (!rules.CanContainSpaces && hasSpace)
             errors.Add("Пароль не может содержать пробелы");

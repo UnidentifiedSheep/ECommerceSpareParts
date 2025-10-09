@@ -1,5 +1,4 @@
 using Application.Common.Interfaces;
-using Main.Application.Extensions;
 using Core.Attributes;
 using Core.Dtos.Emails;
 using Core.Dtos.Users;
@@ -9,19 +8,28 @@ using Core.Interfaces.DbRepositories;
 using Core.Interfaces.Services;
 using Core.Interfaces.Validators;
 using Exceptions.Exceptions.Users;
+using Main.Application.Extensions;
 using Mapster;
-using MediatR;
 
 namespace Main.Application.Handlers.Users.CreateUser;
 
 [Transactional]
-public record CreateUserCommand(string UserName, string Password, UserInfoDto UserInfo, 
-    IEnumerable<EmailDto> Emails, IEnumerable<string> Phones, IEnumerable<string> Roles) : ICommand<CreateUserResult>;
+public record CreateUserCommand(
+    string UserName,
+    string Password,
+    UserInfoDto UserInfo,
+    IEnumerable<EmailDto> Emails,
+    IEnumerable<string> Phones,
+    IEnumerable<string> Roles) : ICommand<CreateUserResult>;
 
 public record CreateUserResult(Guid UserId);
-public class CreateUserHandler(IUserRepository userRepository, IRoleRepository roleRepository, 
+
+public class CreateUserHandler(
+    IUserRepository userRepository,
+    IRoleRepository roleRepository,
     IUserEmailRepository userEmailRepository,
-    IUnitOfWork unitOfWork, IPasswordManager passwordManager) : ICommandHandler<CreateUserCommand, CreateUserResult>
+    IUnitOfWork unitOfWork,
+    IPasswordManager passwordManager) : ICommandHandler<CreateUserCommand, CreateUserResult>
 {
     public async Task<CreateUserResult> Handle(CreateUserCommand request, CancellationToken cancellationToken)
     {
@@ -43,13 +51,14 @@ public class CreateUserHandler(IUserRepository userRepository, IRoleRepository r
             UserEmails = request.Emails.Adapt<List<UserEmail>>(),
             UserInfo = request.UserInfo.Adapt<UserInfo>()
         };
-        
+
         await unitOfWork.AddAsync(user, cancellationToken);
         await unitOfWork.SaveChangesAsync(cancellationToken);
         return new CreateUserResult(user.Id);
     }
 
-    private async Task ValidateData(string userName, HashSet<string> emails, IEnumerable<string> phones, IEnumerable<string> roles,
+    private async Task ValidateData(string userName, HashSet<string> emails, IEnumerable<string> phones,
+        IEnumerable<string> roles,
         CancellationToken cancellationToken = default)
     {
         await roleRepository.EnsureRolesExists(roles, cancellationToken);

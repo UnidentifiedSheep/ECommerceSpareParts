@@ -1,6 +1,6 @@
 using System.Security.Claims;
-using Main.Application.Handlers.Sales.DeleteFullSale;
 using Carter;
+using Main.Application.Handlers.Sales.DeleteFullSale;
 using MediatR;
 
 namespace Main.Api.EndPoints.Sales;
@@ -12,7 +12,7 @@ public class DeleteSaleEndPoint : ICarterModule
         app.MapDelete("/sales/{saleId}",
                 async (ISender sender, ClaimsPrincipal claims, string saleId, CancellationToken token) =>
                 {
-                    if (!Guid.TryParse(claims.FindFirstValue(ClaimTypes.NameIdentifier), out var userId)) 
+                    if (!Guid.TryParse(claims.FindFirstValue(ClaimTypes.NameIdentifier), out var userId))
                         return Results.Unauthorized();
                     var command = new DeleteFullSaleCommand(saleId, userId);
                     await sender.Send(command, token);

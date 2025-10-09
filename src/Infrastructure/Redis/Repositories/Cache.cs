@@ -65,7 +65,7 @@ public class Cache(IDatabase redis) : ICache
     public async Task SetAddAsync(IEnumerable<string> keys, string member, TimeSpan? expiry = null)
     {
         var batch = redis.CreateBatch();
-        List<Task> tasks = new List<Task>();
+        var tasks = new List<Task>();
 
         foreach (var key in keys)
         {
@@ -76,12 +76,12 @@ public class Cache(IDatabase redis) : ICache
         batch.Execute();
         await Task.WhenAll(tasks);
     }
-    
+
     public async Task SetAddAsync(IEnumerable<string> keys, IEnumerable<string> members, TimeSpan? expiry = null)
     {
         var mems = members.ToList();
         var batch = redis.CreateBatch();
-        List<Task> tasks = new List<Task>();
+        var tasks = new List<Task>();
 
         foreach (var key in keys)
         {

@@ -1,9 +1,9 @@
 using System.Security.Claims;
-using Main.Application.Handlers.Users.GetUsers;
 using Carter;
 using Core.Dtos.Amw.Users;
 using Core.Enums;
 using Core.Models;
+using Main.Application.Handlers.Users.GetUsers;
 using Mapster;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
@@ -41,7 +41,8 @@ public class GetUsersEndPoint : ICarterModule
                     var query = new GetUsersQuery(request.SearchTerm, pagination, request.SimilarityLevel,
                         userId, request.Name, request.Surname, request.Email, request.Phone, request.UserName,
                         request.Id,
-                        request.Description, request.IsSupplier, Enum.Parse<GeneralSearchStrategy>(request.SearchMethod));
+                        request.Description, request.IsSupplier,
+                        Enum.Parse<GeneralSearchStrategy>(request.SearchMethod));
                     var result = await sender.Send(query, token);
                     var response = result.Adapt<GetUsersResponse>();
                     return Results.Ok(response);

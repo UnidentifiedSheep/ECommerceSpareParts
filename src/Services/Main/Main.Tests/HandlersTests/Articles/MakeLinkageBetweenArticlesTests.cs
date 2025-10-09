@@ -1,10 +1,10 @@
+using Core.Dtos.Amw.Articles;
+using Core.Enums;
+using FluentValidation;
 using Main.Application.Configs;
 using Main.Application.Handlers.Articles.CreateArticles;
 using Main.Application.Handlers.Articles.MakeLinkageBetweenArticles;
 using Main.Application.Handlers.Producers.CreateProducer;
-using Core.Dtos.Amw.Articles;
-using Core.Enums;
-using FluentValidation;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;

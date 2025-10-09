@@ -1,7 +1,7 @@
-using Main.Application.Configs;
-using Main.Application.Handlers.Articles.SetArticleIndicator;
 using Bogus;
 using Exceptions.Exceptions.Articles;
+using Main.Application.Configs;
+using Main.Application.Handlers.Articles.SetArticleIndicator;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;

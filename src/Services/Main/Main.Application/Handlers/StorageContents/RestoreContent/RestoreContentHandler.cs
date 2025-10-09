@@ -1,6 +1,5 @@
 using System.Data;
 using Application.Common.Interfaces;
-using Main.Application.Extensions;
 using Core.Attributes;
 using Core.Entities;
 using Core.Enums;
@@ -8,6 +7,7 @@ using Core.Interfaces;
 using Core.Interfaces.DbRepositories;
 using Core.Interfaces.Services;
 using Main.Application.Events;
+using Main.Application.Extensions;
 using Mapster;
 using MediatR;
 

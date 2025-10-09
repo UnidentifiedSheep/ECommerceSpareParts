@@ -2,7 +2,6 @@ using System.Diagnostics.CodeAnalysis;
 using Core.Entities;
 using Core.Extensions;
 using Core.Interfaces.DbRepositories;
-using Core.Models;
 using Microsoft.EntityFrameworkCore;
 using Persistence.Contexts;
 using Persistence.Extensions;
@@ -11,9 +10,11 @@ namespace Persistence.Repositories;
 
 public class RoleRepository(DContext context) : IRoleRepository
 {
-    public async Task<Role?> GetRoleAsync(Guid id, bool track = true, CancellationToken cancellationToken = default) 
-        => await context.Roles.ConfigureTracking(track).FirstOrDefaultAsync(x => x.Id == id, cancellationToken);
-    
+    public async Task<Role?> GetRoleAsync(Guid id, bool track = true, CancellationToken cancellationToken = default)
+    {
+        return await context.Roles.ConfigureTracking(track).FirstOrDefaultAsync(x => x.Id == id, cancellationToken);
+    }
+
     public async Task<Role?> GetRoleAsync(string name, bool track = true, CancellationToken cancellationToken = default)
     {
         var normalizedRoleName = name.ToNormalized();
@@ -21,7 +22,8 @@ public class RoleRepository(DContext context) : IRoleRepository
             .FirstOrDefaultAsync(x => x.NormalizedName == normalizedRoleName, cancellationToken);
     }
 
-    public async Task<IEnumerable<Role>> GetRolesAsync(IEnumerable<string> names, bool track = true, CancellationToken cancellationToken = default)
+    public async Task<IEnumerable<Role>> GetRolesAsync(IEnumerable<string> names, bool track = true,
+        CancellationToken cancellationToken = default)
     {
         var normalized = names.Select(x => x.ToNormalized()).ToHashSet();
         return await context.Roles.ConfigureTracking(track)
@@ -30,12 +32,18 @@ public class RoleRepository(DContext context) : IRoleRepository
     }
 
     public async Task<bool> RoleExistsAsync(string name, CancellationToken cancellationToken = default)
-        => await context.Roles.AsNoTracking().AnyAsync(x => x.NormalizedName == name.ToNormalized(), cancellationToken);
-    
-    public async Task<bool> RoleExistsAsync(Guid id, CancellationToken cancellationToken = default)
-        => await context.Roles.AsNoTracking().AnyAsync(x => x.Id == id, cancellationToken);
+    {
+        return await context.Roles.AsNoTracking()
+            .AnyAsync(x => x.NormalizedName == name.ToNormalized(), cancellationToken);
+    }
 
-    public async Task<IEnumerable<Guid>> RolesExistsAsync(IEnumerable<Guid> ids, CancellationToken cancellationToken = default)
+    public async Task<bool> RoleExistsAsync(Guid id, CancellationToken cancellationToken = default)
+    {
+        return await context.Roles.AsNoTracking().AnyAsync(x => x.Id == id, cancellationToken);
+    }
+
+    public async Task<IEnumerable<Guid>> RolesExistsAsync(IEnumerable<Guid> ids,
+        CancellationToken cancellationToken = default)
     {
         var set = ids.ToHashSet();
         var foundRoles = await context.Roles.AsNoTracking()
@@ -44,7 +52,8 @@ public class RoleRepository(DContext context) : IRoleRepository
         return set.Except(foundRoles);
     }
 
-    public async Task<IEnumerable<string>> RolesExistsAsync(IEnumerable<string> roleNames, CancellationToken cancellationToken = default)
+    public async Task<IEnumerable<string>> RolesExistsAsync(IEnumerable<string> roleNames,
+        CancellationToken cancellationToken = default)
     {
         var set = roleNames
             .Select(x => x.ToNormalized())
@@ -57,12 +66,12 @@ public class RoleRepository(DContext context) : IRoleRepository
     }
 
     [SuppressMessage("ReSharper", "EntityFramework.ClientSideDbFunctionCall")]
-    public async Task<IEnumerable<Role>> SearchRoles(string? searchTerm, int page, int limit, bool track = true, 
+    public async Task<IEnumerable<Role>> SearchRoles(string? searchTerm, int page, int limit, bool track = true,
         CancellationToken cancellationToken = default)
     {
         return await context.Roles.ConfigureTracking(track)
             .Where(x => EF.Functions.ILike(x.NormalizedName, $"%{searchTerm}%"))
-            .Select(x => new { Role = x, Rank = EF.Functions.TrigramsSimilarity(x.NormalizedName, $"%{searchTerm}%")})
+            .Select(x => new { Role = x, Rank = EF.Functions.TrigramsSimilarity(x.NormalizedName, $"%{searchTerm}%") })
             .OrderByDescending(x => x.Rank)
             .Select(x => x.Role)
             .Skip(page * limit)

@@ -1,12 +1,12 @@
 using System.Collections.Immutable;
 using System.Data;
 using Application.Common.Interfaces;
-using Main.Application.Extensions;
 using Core.Attributes;
 using Core.Entities;
 using Core.Interfaces.DbRepositories;
 using Core.Interfaces.Services;
 using Exceptions.Exceptions.Balances;
+using Main.Application.Extensions;
 using MediatR;
 using TransactionStatus = Core.Enums.TransactionStatus;
 

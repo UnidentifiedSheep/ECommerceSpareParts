@@ -1,9 +1,9 @@
-using Main.Application.Configs;
-using Main.Application.Handlers.Articles.PatchArticle;
 using Core.Dtos.Amw.Articles;
 using Core.Models;
 using Exceptions.Exceptions.Articles;
 using FluentValidation;
+using Main.Application.Configs;
+using Main.Application.Handlers.Articles.PatchArticle;
 using MediatR;
 using Microsoft.Extensions.DependencyInjection;
 using Persistence.Contexts;

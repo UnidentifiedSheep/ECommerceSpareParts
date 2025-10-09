@@ -1,7 +1,7 @@
 using System.Security.Claims;
-using Main.Application.Handlers.StorageContents.EditContent;
 using Carter;
 using Core.Dtos.Amw.Storage;
+using Main.Application.Handlers.StorageContents.EditContent;
 using MediatR;
 
 namespace Main.Api.EndPoints.Storages;
@@ -16,7 +16,7 @@ public class EditStorageContentEndPoint : ICarterModule
         app.MapPatch("/storages/content", async (ISender sender, EditStorageContentRequest request,
                 ClaimsPrincipal claims, CancellationToken cancellationToken) =>
             {
-                if (!Guid.TryParse(claims.FindFirstValue(ClaimTypes.NameIdentifier), out var userId)) 
+                if (!Guid.TryParse(claims.FindFirstValue(ClaimTypes.NameIdentifier), out var userId))
                     return Results.Unauthorized();
                 var command = new EditStorageContentCommand(request.EditedFields, userId);
                 await sender.Send(command, cancellationToken);

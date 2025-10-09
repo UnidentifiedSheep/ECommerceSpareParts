@@ -7,7 +7,8 @@ namespace Security;
 
 public static class ServiceProvider
 {
-    public static IServiceCollection AddSecurityLayer(this IServiceCollection collection, PasswordRules? passwordRules = null)
+    public static IServiceCollection AddSecurityLayer(this IServiceCollection collection,
+        PasswordRules? passwordRules = null)
     {
         collection.AddSingleton<IJwtGenerator, JwtGenerator>();
         collection.AddSingleton<IPasswordManager, PasswordManager>();

@@ -1,5 +1,5 @@
-using Main.Application.Handlers.ArticleContent.RemoveArticleContent;
 using Carter;
+using Main.Application.Handlers.ArticleContent.RemoveArticleContent;
 using MediatR;
 
 namespace Main.Api.EndPoints.Articles;

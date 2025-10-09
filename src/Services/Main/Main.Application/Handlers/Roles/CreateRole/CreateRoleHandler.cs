@@ -10,7 +10,8 @@ namespace Main.Application.Handlers.Roles.CreateRole;
 
 public record CreateRoleCommand(string Name, string? Description) : ICommand;
 
-public class CreateRoleHandler(IRoleRepository roleRepository, IUnitOfWork unitOfWork) : ICommandHandler<CreateRoleCommand>
+public class CreateRoleHandler(IRoleRepository roleRepository, IUnitOfWork unitOfWork)
+    : ICommandHandler<CreateRoleCommand>
 {
     public async Task<Unit> Handle(CreateRoleCommand request, CancellationToken cancellationToken)
     {
@@ -23,7 +24,7 @@ public class CreateRoleHandler(IRoleRepository roleRepository, IUnitOfWork unitO
             Description = request.Description,
             IsSystem = false
         };
-        
+
         await unitOfWork.AddAsync(newRole, cancellationToken);
         await unitOfWork.SaveChangesAsync(cancellationToken);
         return Unit.Value;

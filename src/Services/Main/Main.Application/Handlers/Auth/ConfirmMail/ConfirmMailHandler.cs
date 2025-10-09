@@ -2,13 +2,12 @@ using Application.Common.Interfaces;
 using Core.Attributes;
 using MediatR;
 
-
 namespace Main.Application.Handlers.Auth.ConfirmMail;
 
 [Transactional]
 public record ConfirmMailCommand(string UserId, string ConfirmationToken) : ICommand;
 
-public class ConfirmMailHandler() : ICommandHandler<ConfirmMailCommand>
+public class ConfirmMailHandler : ICommandHandler<ConfirmMailCommand>
 {
     public async Task<Unit> Handle(ConfirmMailCommand request, CancellationToken cancellationToken)
     {

@@ -1,7 +1,7 @@
-using Main.Application.Configs;
-using Main.Application.Handlers.Sales.DeleteSale;
 using Core.Entities;
 using Exceptions.Exceptions.Sales;
+using Main.Application.Configs;
+using Main.Application.Handlers.Sales.DeleteSale;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;

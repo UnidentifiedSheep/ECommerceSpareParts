@@ -1,5 +1,5 @@
-﻿using Main.Application.Handlers.Auth.RefreshToken;
-using Carter;
+﻿using Carter;
+using Main.Application.Handlers.Auth.RefreshToken;
 using Mapster;
 using MediatR;
 

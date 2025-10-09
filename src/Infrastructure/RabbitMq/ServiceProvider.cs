@@ -30,7 +30,6 @@ public static class ServiceProvider
                 var grouped = consumers.GroupBy(c => c.QueueName);
 
                 foreach (var group in grouped)
-                {
                     cfg.ReceiveEndpoint(group.Key, e =>
                     {
                         foreach (var reg in group)
@@ -39,11 +38,9 @@ public static class ServiceProvider
                             e.ConfigureConsumer(context, consumerType);
                         }
                     });
-                }
             });
         });
 
         return services;
     }
-
 }

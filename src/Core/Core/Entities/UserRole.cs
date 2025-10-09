@@ -1,6 +1,6 @@
 ﻿namespace Core.Entities;
 
-public partial class UserRole
+public class UserRole
 {
     public Guid UserId { get; set; }
 

@@ -42,20 +42,24 @@ public class UserEmailRepository(DContext context) : IUserEmailRepository
             .FirstOrDefaultAsync(x => x.NormalizedEmail == normalizedEmail, cancellationToken);
     }
 
-    public async Task<User?> GetUserByPrimaryMailAsync(string email, bool track = true, CancellationToken cancellationToken = default)
+    public async Task<User?> GetUserByPrimaryMailAsync(string email, bool track = true,
+        CancellationToken cancellationToken = default)
     {
         var userEmail = await context.UserEmails.ConfigureTracking(track)
             .Include(x => x.User)
             .ThenInclude(x => x.UserInfo)
-            .FirstOrDefaultAsync(x => x.NormalizedEmail == email.ToNormalizedEmail() && 
+            .FirstOrDefaultAsync(x => x.NormalizedEmail == email.ToNormalizedEmail() &&
                                       x.IsPrimary == true, cancellationToken);
         return userEmail?.User;
     }
 
-    public async Task<UserEmail?> GetUserPrimaryEmailAsync(Guid userId, bool track = true, CancellationToken cancellationToken = default)
-    => await context.UserEmails.ConfigureTracking(track)
-        .FirstOrDefaultAsync(x => x.UserId == userId && x.IsPrimary == true, cancellationToken);
-    
+    public async Task<UserEmail?> GetUserPrimaryEmailAsync(Guid userId, bool track = true,
+        CancellationToken cancellationToken = default)
+    {
+        return await context.UserEmails.ConfigureTracking(track)
+            .FirstOrDefaultAsync(x => x.UserId == userId && x.IsPrimary == true, cancellationToken);
+    }
+
     public async Task<bool> IsEmailTakenAsync(string email, CancellationToken cancellationToken = default)
     {
         var normalizedEmail = email.ToNormalizedEmail();
@@ -63,15 +67,20 @@ public class UserEmailRepository(DContext context) : IUserEmailRepository
             .AnyAsync(x => x.NormalizedEmail == normalizedEmail, cancellationToken);
     }
 
-    public async Task<int> GetUserEmailCountAsync(Guid userId, CancellationToken cancellationToken = default) 
-        => await context.UserEmails.AsNoTracking()
+    public async Task<int> GetUserEmailCountAsync(Guid userId, CancellationToken cancellationToken = default)
+    {
+        return await context.UserEmails.AsNoTracking()
             .CountAsync(x => x.UserId == userId, cancellationToken);
+    }
 
-    public async Task<bool> UserHasPrimaryEmailAsync(Guid userId, CancellationToken cancellationToken = default) 
-        => await context.UserEmails.AsNoTracking()
+    public async Task<bool> UserHasPrimaryEmailAsync(Guid userId, CancellationToken cancellationToken = default)
+    {
+        return await context.UserEmails.AsNoTracking()
             .AnyAsync(x => x.UserId == userId && x.IsPrimary == true, cancellationToken);
+    }
 
-    public async Task<UserEmailSummary?> GetUserEmailSummaryAsync(Guid userId, CancellationToken cancellationToken = default)
+    public async Task<UserEmailSummary?> GetUserEmailSummaryAsync(Guid userId,
+        CancellationToken cancellationToken = default)
     {
         var summary = await context.UserEmails
             .AsNoTracking()
@@ -94,7 +103,8 @@ public class UserEmailRepository(DContext context) : IUserEmailRepository
             .AnyAsync(x => x.NormalizedEmail == normalizedEmail, cancellationToken);
     }
 
-    public async Task<IEnumerable<string>> IsEmailsExists(IEnumerable<string> emails, CancellationToken cancellationToken = default)
+    public async Task<IEnumerable<string>> IsEmailsExists(IEnumerable<string> emails,
+        CancellationToken cancellationToken = default)
     {
         var normalizedEmails = emails.Select(x => x.ToNormalizedEmail())
             .ToHashSet();

@@ -7,6 +7,7 @@ using Mapster;
 namespace Main.Application.Handlers.Roles.GetRoles;
 
 public record GetRolesQuery(string? SearchTerm, PaginationModel Pagination) : IQuery<GetRolesResult>;
+
 public record GetRolesResult(IEnumerable<RoleDto> Roles);
 
 public class GetRolesHandler(IRoleRepository roleRepository) : IQueryHandler<GetRolesQuery, GetRolesResult>

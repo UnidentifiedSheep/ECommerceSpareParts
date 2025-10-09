@@ -1,6 +1,6 @@
 using System.Security.Claims;
-using Main.Application.Handlers.StorageContents.DeleteContent;
 using Carter;
+using Main.Application.Handlers.StorageContents.DeleteContent;
 using MediatR;
 
 namespace Main.Api.EndPoints.Storages;
@@ -12,7 +12,7 @@ public class DeleteStorageContentEndPoint : ICarterModule
         app.MapDelete("/storages/content/{contentId}", async (ISender sender, int contentId, string concurrencyCode,
                 ClaimsPrincipal claims, CancellationToken cancellationToken) =>
             {
-                if (!Guid.TryParse(claims.FindFirstValue(ClaimTypes.NameIdentifier), out var userId)) 
+                if (!Guid.TryParse(claims.FindFirstValue(ClaimTypes.NameIdentifier), out var userId))
                     return Results.Unauthorized();
                 var command = new DeleteStorageContentCommand(contentId, concurrencyCode, userId);
                 await sender.Send(command, cancellationToken);

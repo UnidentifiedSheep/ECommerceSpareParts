@@ -1,6 +1,6 @@
 ﻿namespace Core.Entities;
 
-public partial class MarkupGroup
+public class MarkupGroup
 {
     public int Id { get; set; }
 

@@ -1,7 +1,7 @@
 using System.Security.Claims;
-using Main.Application.Handlers.Sales.EditFullSale;
 using Carter;
 using Core.Dtos.Amw.Sales;
+using Main.Application.Handlers.Sales.EditFullSale;
 using MediatR;
 
 namespace Main.Api.EndPoints.Sales;
@@ -20,7 +20,7 @@ public class EditSaleEndPoint : ICarterModule
         app.MapPut("/sales/{saleId}", async (ISender sender, string saleId, EditSaleRequest request,
                 ClaimsPrincipal claims, CancellationToken cancellationToken) =>
             {
-                if (!Guid.TryParse(claims.FindFirstValue(ClaimTypes.NameIdentifier), out var userId)) 
+                if (!Guid.TryParse(claims.FindFirstValue(ClaimTypes.NameIdentifier), out var userId))
                     return Results.Unauthorized();
                 var command = new EditFullSaleCommand(request.EditedContent, saleId, request.CurrencyId, userId,
                     request.SaleDateTime, request.Comment, request.SellFromOtherStorages);

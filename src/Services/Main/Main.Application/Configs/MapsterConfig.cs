@@ -1,5 +1,4 @@
 using System.Text.Json;
-using Main.Application.Extensions;
 using Core.Dtos.Amw.ArticleCharacteristics;
 using Core.Dtos.Amw.ArticleReservations;
 using Core.Dtos.Amw.Articles;
@@ -20,6 +19,7 @@ using Core.Entities;
 using Core.Extensions;
 using Core.Models;
 using Core.StaticFunctions;
+using Main.Application.Extensions;
 using Main.Application.Handlers.ArticlePairs.CreatePair;
 using Main.Application.Handlers.Currencies.CreateCurrency;
 using Main.Application.Handlers.Storages.CreateStorage;
@@ -37,7 +37,6 @@ public static class MapsterConfig
 {
     public static void Configure()
     {
-
         TypeAdapterConfig<PurchaseContent, PurchaseContentDto>.NewConfig()
             .Map(dest => dest.Id, src => src.Id)
             .Map(dest => dest.Article, src => src.Article)
@@ -45,7 +44,7 @@ public static class MapsterConfig
             .Map(dest => dest.Comment, src => src.Comment)
             .Map(dest => dest.Price, src => src.Price)
             .Map(dest => dest.Count, src => src.Count);
-            
+
         TypeAdapterConfig<NewPurchaseContentDto, PurchaseContent>.NewConfig()
             .Map(dest => dest.ArticleId, src => src.ArticleId)
             .Map(dest => dest.Count, src => src.Count)
@@ -242,7 +241,7 @@ public static class MapsterConfig
             .Map(dest => dest.CurrencyId, src => src.CurrencyId)
             .Map(dest => dest.PurchaseDatetime, src => src.SaleDatetime);
 
-        
+
         //Roles
 
         TypeAdapterConfig<Role, RoleDto>.NewConfig()
@@ -446,8 +445,8 @@ public static class MapsterConfig
             .Map(x => x.Name, src => src.Name.Trim())
             .Map(x => x.CurrencySign, src => src.CurrencySign.Trim())
             .Map(x => x.ShortName, src => src.ShortName.Trim());
-        
-        
+
+
         //Emails
         TypeAdapterConfig<EmailDto, UserEmail>.NewConfig()
             .Map(dest => dest.Email, src => src.Email)

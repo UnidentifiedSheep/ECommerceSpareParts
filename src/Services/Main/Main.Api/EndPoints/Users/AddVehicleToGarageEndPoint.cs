@@ -1,7 +1,7 @@
 using System.Security.Claims;
-using Main.Application.Handlers.Users.AddVehicleToGarage;
 using Carter;
 using Core.Dtos.Member.Vehicles;
+using Main.Application.Handlers.Users.AddVehicleToGarage;
 using MediatR;
 
 namespace Main.Api.EndPoints.Users;
@@ -26,7 +26,7 @@ public class AddVehicleToGarageEndPoint : ICarterModule
         app.MapPost("/users/me/vehicles/", async (ISender sender, AddVehicleToGarageRequest request,
                 ClaimsPrincipal user, CancellationToken token) =>
             {
-                if (!Guid.TryParse(user.FindFirstValue(ClaimTypes.NameIdentifier), out var userId)) 
+                if (!Guid.TryParse(user.FindFirstValue(ClaimTypes.NameIdentifier), out var userId))
                     return Results.Unauthorized();
                 var command = new AddVehicleToGarageCommand(request.Vehicle, userId);
                 await sender.Send(command, token);

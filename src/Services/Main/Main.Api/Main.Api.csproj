@@ -43,15 +43,15 @@
     </ItemGroup>
 
     <ItemGroup>
-      <ProjectReference Include="..\..\..\Infrastructure\Integrations\Integrations.csproj" />
-      <ProjectReference Include="..\..\..\Infrastructure\Mail\Mail.csproj" />
-      <ProjectReference Include="..\..\..\Infrastructure\Persistence\Persistence.csproj" />
-      <ProjectReference Include="..\..\..\Infrastructure\RabbitMq\RabbitMq.csproj" />
-      <ProjectReference Include="..\..\..\Infrastructure\Redis\Redis.csproj" />
-      <ProjectReference Include="..\..\..\Infrastructure\Security\Security.csproj" />
-      <ProjectReference Include="..\..\Api.Common\Api.Common.csproj" />
-      <ProjectReference Include="..\..\Application.Common\Application.Common.csproj" />
-      <ProjectReference Include="..\Main.Application\Main.Application.csproj" />
+        <ProjectReference Include="..\..\..\Infrastructure\Integrations\Integrations.csproj"/>
+        <ProjectReference Include="..\..\..\Infrastructure\Mail\Mail.csproj"/>
+        <ProjectReference Include="..\..\..\Infrastructure\Persistence\Persistence.csproj"/>
+        <ProjectReference Include="..\..\..\Infrastructure\RabbitMq\RabbitMq.csproj"/>
+        <ProjectReference Include="..\..\..\Infrastructure\Redis\Redis.csproj"/>
+        <ProjectReference Include="..\..\..\Infrastructure\Security\Security.csproj"/>
+        <ProjectReference Include="..\..\Api.Common\Api.Common.csproj"/>
+        <ProjectReference Include="..\..\Application.Common\Application.Common.csproj"/>
+        <ProjectReference Include="..\Main.Application\Main.Application.csproj"/>
     </ItemGroup>
 
 </Project>

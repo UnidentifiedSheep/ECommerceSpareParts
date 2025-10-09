@@ -1,8 +1,8 @@
 using System.Security.Claims;
-using Main.Application.Handlers.StorageContents.AddContent;
 using Carter;
 using Core.Dtos.Amw.Storage;
 using Core.Enums;
+using Main.Application.Handlers.StorageContents.AddContent;
 using MediatR;
 
 namespace Main.Api.EndPoints.Storages;
@@ -16,7 +16,7 @@ public class AddContentToStorageEndPoint : ICarterModule
         app.MapPost("/storages/content", async (ISender sender, AddContentToStorageRequest request,
                 ClaimsPrincipal claims, CancellationToken cancellationToken) =>
             {
-                if (!Guid.TryParse(claims.FindFirstValue(ClaimTypes.NameIdentifier), out var userId)) 
+                if (!Guid.TryParse(claims.FindFirstValue(ClaimTypes.NameIdentifier), out var userId))
                     return Results.Unauthorized();
                 var command = new AddContentCommand(request.StorageContent, request.StorageName, userId,
                     StorageMovementType.StorageContentAddition);

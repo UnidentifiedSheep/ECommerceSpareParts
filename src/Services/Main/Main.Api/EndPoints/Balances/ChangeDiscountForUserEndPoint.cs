@@ -1,5 +1,5 @@
-using Main.Application.Handlers.Users.ChangeUserDiscount;
 using Carter;
+using Main.Application.Handlers.Users.ChangeUserDiscount;
 using MediatR;
 
 namespace Main.Api.EndPoints.Balances;

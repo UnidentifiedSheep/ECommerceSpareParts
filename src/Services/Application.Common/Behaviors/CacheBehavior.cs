@@ -34,5 +34,4 @@ public class CacheBehavior<TRequest, TResponse>(
         await cache.StringSetAsync(cacheKey, response, TimeSpan.FromSeconds(duration));
         return response;
     }
-
 }

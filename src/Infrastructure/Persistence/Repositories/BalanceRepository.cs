@@ -122,7 +122,8 @@ public class BalanceRepository(DContext context) : IBalanceRepository
             .FirstOrDefaultAsync(ct);
     }
 
-    public async Task<IEnumerable<Transaction>> GetTransactionsAsync(DateTime rangeStart, DateTime rangeEnd, int? currencyId,
+    public async Task<IEnumerable<Transaction>> GetTransactionsAsync(DateTime rangeStart, DateTime rangeEnd,
+        int? currencyId,
         Guid? senderId, Guid? receiverId, int page, int viewCount, bool track = true, CancellationToken ct = default)
     {
         var query = context.Transactions.ConfigureTracking(track)
@@ -132,16 +133,14 @@ public class BalanceRepository(DContext context) : IBalanceRepository
                 (currencyId == null || x.CurrencyId == currencyId));
 
         if (senderId != null && receiverId != null)
-        {
             query = query.Where(x =>
                 (x.SenderId == senderId && x.ReceiverId == receiverId) ||
                 (x.SenderId == receiverId && x.ReceiverId == senderId));
-        }
         else if (senderId != null)
             query = query.Where(x => x.SenderId == senderId || x.ReceiverId == senderId);
         else if (receiverId != null)
             query = query.Where(x => x.SenderId == receiverId || x.ReceiverId == receiverId);
-        
+
 
         query = query
             .OrderBy(x => x.TransactionDatetime)

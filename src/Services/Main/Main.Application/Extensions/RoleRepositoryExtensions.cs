@@ -1,4 +1,3 @@
-using Core.Extensions;
 using Core.Interfaces.DbRepositories;
 using Exceptions.Exceptions.Roles;
 
@@ -12,7 +11,7 @@ public static class RoleRepositoryExtensions
         if (!await repository.RoleExistsAsync(roleId, cancellationToken))
             throw new RoleNotFoundException(roleId);
     }
-    
+
     public static async Task EnsureRolesExists(this IRoleRepository repository, IEnumerable<Guid> roleIds,
         CancellationToken cancellationToken = default)
     {
@@ -21,7 +20,7 @@ public static class RoleRepositoryExtensions
         if (list.Count != 0)
             throw new RoleNotFoundException(list);
     }
-    
+
     public static async Task EnsureRoleExists(this IRoleRepository repository, string roleName,
         CancellationToken cancellationToken = default)
     {
@@ -29,7 +28,7 @@ public static class RoleRepositoryExtensions
         if (exists)
             throw new RoleNotFoundException(roleName);
     }
-    
+
     public static async Task EnsureRolesExists(this IRoleRepository repository, IEnumerable<string> roleNames,
         CancellationToken cancellationToken = default)
     {

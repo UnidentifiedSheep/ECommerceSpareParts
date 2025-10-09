@@ -1,5 +1,4 @@
 using Application.Common.Interfaces;
-using Main.Application.Extensions;
 using Core.Attributes;
 using Core.Dtos.Amw.Markups;
 using Core.Entities;
@@ -8,6 +7,7 @@ using Core.Interfaces.Services;
 using Core.Models;
 using IntervalMap.Core.Models;
 using IntervalMap.Variations;
+using Main.Application.Extensions;
 using Mapster;
 
 namespace Main.Application.Handlers.Markups.CreateMarkup;
