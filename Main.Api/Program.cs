@@ -4,15 +4,19 @@ using Api.Common.BackgroundServices;
 using Api.Common.ExceptionHandlers;
 using Api.Common.HangFireTasks;
 using Api.Common.Logging;
+using Application.Common.EventHandlers;
 using Main.Application;
 using Main.Application.Configs;
 using Carter;
+using Core.Contracts;
 using Core.Interfaces;
+using Core.Interfaces.MessageBroker;
 using Core.Models;
 using Hangfire;
 using Hangfire.PostgreSql;
 using Integrations;
 using Mail;
+using Main.Application.EventHandlers;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.HttpOverrides;
@@ -99,9 +103,22 @@ var emailOptions = new UserEmailOptions
     MaxEmailCount = 5,
 };
 
+string mainQueueName = $"queue-of-main-{Environment.MachineName}";
+
+ConsumerRegistration[] eventHandlers =
+[
+    new(typeof(MarkupGroupChangedEvent), mainQueueName),
+    new(typeof(MarkupRangesUpdatedEvent), mainQueueName),
+    new(typeof(CurrencyRateChangedEvent), mainQueueName)
+];
+
+builder.Services.AddScoped<IEventHandler<MarkupGroupChangedEvent>, MarkupGroupChangedEventHandler>();
+builder.Services.AddScoped<IEventHandler<MarkupRangesUpdatedEvent>, MarkupRangesChangedEventHandler>();
+builder.Services.AddScoped<IEventHandler<CurrencyRateChangedEvent>, CurrencyRatesChangedEventHandler>();
+
 builder.Services.AddApplicationLayer(emailOptions)
     .AddPersistenceLayer(builder.Configuration["ConnectionStrings:DefaultConnection"]!)
-    .AddMassageBrokerLayer(brokerOptions)
+    .AddMassageBrokerLayer(brokerOptions, eventHandlers)
     .AddCacheLayer(builder.Configuration["ConnectionStrings:RedisConnection"]!)
     .AddSecurityLayer()
     .AddMailLayer()

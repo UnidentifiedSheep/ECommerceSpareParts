@@ -1,7 +1,5 @@
-using Core.Interfaces;
 using Core.Interfaces.CacheRepositories;
 using Microsoft.Extensions.DependencyInjection;
-using Redis.Factories;
 using Redis.Repositories;
 
 namespace Redis;
@@ -29,8 +27,6 @@ public static class ServiceProvider
             var ttl = TimeSpan.FromHours(1);
             return new RedisUserRepository(redis, ttl);
         });
-
-        collection.AddScoped<IRelatedDataFactory, RelatedDataFactory>();
 
         return collection;
     }

@@ -2,7 +2,7 @@ using Core.Interfaces;
 using Main.Application.Events;
 using MediatR;
 
-namespace Main.Application.EventHandlers;
+namespace Main.Application.NotificationHandlers;
 
 public class MarkupRangesUpdatedNotificationHandler(IMessageBroker messageBroker, IPriceSetup priceSetup)
     : INotificationHandler<MarkupRangesUpdatedEvent>

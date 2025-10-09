@@ -4,7 +4,7 @@ using Core.Interfaces.CacheRepositories;
 using Main.Application.Events;
 using MediatR;
 
-namespace Main.Application.EventHandlers;
+namespace Main.Application.NotificationHandlers;
 
 public class ArticleUpdatedCacheInvalidator(RelatedDataBase<ArticleCross> relatedDataBase, ICache cache)
     : INotificationHandler<ArticleUpdatedEvent>

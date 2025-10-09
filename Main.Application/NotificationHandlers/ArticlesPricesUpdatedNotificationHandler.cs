@@ -2,7 +2,7 @@ using Main.Application.Events;
 using Main.Application.Handlers.Prices.RecalculateUsablePrice;
 using MediatR;
 
-namespace Main.Application.EventHandlers;
+namespace Main.Application.NotificationHandlers;
 
 public class ArticlesPricesUpdatedNotificationHandler(IMediator mediator)
     : INotificationHandler<ArticlePricesUpdatedEvent>

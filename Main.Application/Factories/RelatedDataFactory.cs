@@ -1,9 +1,8 @@
 using Core.Abstractions;
 using Core.Interfaces;
-using Core.Interfaces.CacheRepositories;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace Redis.Factories;
+namespace Main.Application.Factories;
 
 public class RelatedDataFactory(IServiceProvider serviceProvider) : IRelatedDataFactory
 {

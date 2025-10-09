@@ -10,6 +10,7 @@ using Core.Interfaces.Validators;
 using Core.Models;
 using FluentValidation;
 using Main.Application.ConcurrencyValidator;
+using Main.Application.Factories;
 using Main.Application.Handlers.Articles.GetArticleCrosses;
 using Main.Application.Handlers.Articles.GetArticles;
 using Main.Application.Pricing;
@@ -31,6 +32,7 @@ public static class ServiceProvider
         UserEmailOptions? emailOptions = null, UserPhoneOptions? phoneOptions = null)
     {
         var relatedDataTtl = TimeSpan.FromHours(10);
+        collection.AddScoped<IRelatedDataFactory, RelatedDataFactory>();
         collection.AddSingleton(emailOptions ?? new UserEmailOptions());
         collection.AddSingleton(phoneOptions ?? new UserPhoneOptions());
         collection.AddSingleton<ICurrencyConverter, CurrencyConverter>(_ => new CurrencyConverter(Global.UsdId));

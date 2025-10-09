@@ -1,41 +1,49 @@
-using System.Reflection;
 using Core.Interfaces;
 using Core.Models;
 using MassTransit;
 using Microsoft.Extensions.DependencyInjection;
-using RabbitMq.Consumers;
 
 namespace RabbitMq;
 
 public static class ServiceProvider
 {
-    public static IServiceCollection AddMassageBrokerLayer(this IServiceCollection collection,
-        MessageBrokerOptions options)
+    public static IServiceCollection AddMassageBrokerLayer(this IServiceCollection services,
+        MessageBrokerOptions options, ConsumerRegistration[] consumers)
     {
-        var brokerOptions = options;
-        collection.AddTransient<IMessageBroker, MessageBroker>();
-
-        collection.AddMassTransit(conf =>
+        services.AddScoped<IMessageBroker, MessageBroker>();
+        services.AddMassTransit(conf =>
         {
-            conf.SetKebabCaseEndpointNameFormatter();
-            conf.AddConsumers(Assembly.GetExecutingAssembly());
-            conf.UsingRabbitMq((context, configurator) =>
+            foreach (var reg in consumers)
             {
-                configurator.Host(new Uri(brokerOptions.Host), x =>
+                var consumerType = typeof(MassTransitConsumerAdapter<>).MakeGenericType(reg.EventType);
+                conf.AddConsumer(consumerType);
+            }
+
+            conf.UsingRabbitMq((context, cfg) =>
+            {
+                cfg.Host(new Uri(options.Host), h =>
                 {
-                    x.Username(brokerOptions.Username);
-                    x.Password(brokerOptions.Password);
+                    h.Username(options.Username);
+                    h.Password(options.Password);
                 });
-                var queueName = $"currency-rates-updated-{Environment.MachineName}";
-                configurator.ReceiveEndpoint(queueName, e =>
+
+                var grouped = consumers.GroupBy(c => c.QueueName);
+
+                foreach (var group in grouped)
                 {
-                    e.ConfigureConsumer<CurrencyRatesChangedConsumer>(context);
-                    e.ConfigureConsumer<MarkupGroupChangedConsumer>(context);
-                    e.ConfigureConsumer<MarkupRangesChangedConsumer>(context);
-                });
+                    cfg.ReceiveEndpoint(group.Key, e =>
+                    {
+                        foreach (var reg in group)
+                        {
+                            var consumerType = typeof(MassTransitConsumerAdapter<>).MakeGenericType(reg.EventType);
+                            e.ConfigureConsumer(context, consumerType);
+                        }
+                    });
+                }
             });
         });
 
-        return collection;
+        return services;
     }
+
 }
