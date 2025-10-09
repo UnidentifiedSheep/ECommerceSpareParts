@@ -1,6 +1,6 @@
 /*using Core.Entities;
 
-namespace Tests.MockData;
+namespace Main.Tests.MockData;
 
 public static class MockExtensions
 {

@@ -15,14 +15,14 @@
     </ItemGroup>
 
     <ItemGroup>
-        <ProjectReference Include="..\..\Core\Core\Core.csproj" />
-        <ProjectReference Include="..\Common\Common.csproj"/>
-    </ItemGroup>
-
-    <ItemGroup>
         <Reference Include="AWSSDK.S3">
             <HintPath>..\..\..\..\.nuget\packages\awssdk.s3\4.0.0.1\lib\net8.0\AWSSDK.S3.dll</HintPath>
         </Reference>
+    </ItemGroup>
+
+    <ItemGroup>
+      <ProjectReference Include="..\..\Core\Core\Core.csproj" />
+      <ProjectReference Include="..\Common\Common.csproj" />
     </ItemGroup>
 
 </Project>
