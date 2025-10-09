@@ -2,6 +2,4 @@
 
 namespace Exceptions.Exceptions;
 
-public class InvalidResponseException(string message) : InternalServerException(message)
-{
-}
+public class InvalidResponseException(string message) : InternalServerException(message);

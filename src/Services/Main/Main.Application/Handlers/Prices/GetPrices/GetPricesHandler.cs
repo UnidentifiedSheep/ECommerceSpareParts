@@ -31,7 +31,7 @@ public class GetPricesHandler(
 
         foreach (var (articleId, usablePrice) in prices)
         {
-            if (usablePrice == null || usablePrice <= 0) continue;
+            if (usablePrice is null or <= 0) continue;
             var converted = currencyConverter.ConvertFromUsd(usablePrice.Value, currencyId);
             var sellPrice = priceGenerator.GetSellPrice(converted, (double)userDiscount, currencyId);
             results[articleId] = sellPrice;

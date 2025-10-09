@@ -13,7 +13,7 @@ public sealed class Email
     }
 
     public string FullEmail => $"{LocalPart}@{Domain}";
-    public string NormalizedEmail => FullEmail.ToNormalized()!;
+    public string NormalizedEmail => FullEmail.ToNormalized();
     public string LocalPart { get; }
     public string Domain { get; }
 

@@ -239,9 +239,8 @@ public class EditTransactionTests : IAsyncLifetime
         decimal amount)
     {
         var transaction = _transactions.First();
-        var invalidAmount = amount;
 
-        var command = new EditTransactionCommand(transaction.Id, transaction.CurrencyId, invalidAmount,
+        var command = new EditTransactionCommand(transaction.Id, transaction.CurrencyId, amount,
             TransactionStatus.Normal, DateTime.Now);
 
         await Assert.ThrowsAsync<ValidationException>(async () => await _mediator.Send(command));

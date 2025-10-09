@@ -11,7 +11,7 @@ public class ConfirmMailEndPoint : ICarterModule
         app.MapGet("/auth/verify/mail", async (ISender sender, string userId, string confirmationToken) =>
         {
             var query = new ConfirmMailCommand(userId, confirmationToken);
-            var result = await sender.Send(query);
+            await sender.Send(query);
             return Results.Ok();
         }).WithTags("Auth");
     }

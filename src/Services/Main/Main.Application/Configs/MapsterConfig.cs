@@ -113,9 +113,7 @@ public static class MapsterConfig
             .Map(d => d.CurrentStock, s => s.TotalCount)
             .Map(d => d.IndicatorColor, s => s.Indicator);
 
-        TypeAdapterConfig<Article, Versioned<AmwArticleFullDto>>.NewConfig()
-            .ConstructUsing(src => new Versioned<AmwArticleFullDto>(src.Adapt<AmwArticleFullDto>()));
-
+        
         TypeAdapterConfig<AmwArticleFullDto, MemberArticleFullDto>.NewConfig()
             .IgnoreNonMapped(true)
             .Map(d => d.Id, s => s.Id)

@@ -11,8 +11,8 @@ public class PriceGenerator(ICurrencyConverter currencyConverter) : IPriceGenera
 {
     private readonly Dictionary<int, AdaptiveIntervalMap<MarkupModel>> _markUps = new();
     public int DefaultMarkUpCurrencyId { get; private set; }
-    private double DefaultMarkUp { get; } = 20;
-    private double MinimalMarkUp { get; } = 6;
+    private double DefaultMarkUp => 20;
+    private double MinimalMarkUp => 6;
 
     public double GetSellPriceWithMinimalMarkUp(double buyPrice)
     {

@@ -48,7 +48,6 @@ public class GetUsersHandler(IUserRepository usersRepositoryService) : IQueryHan
                     request.Description, request.IsSupplier, false, cancellationToken));
                 break;
             case GeneralSearchStrategy.FromStart:
-                break;
             case GeneralSearchStrategy.Contains:
                 break;
             default:

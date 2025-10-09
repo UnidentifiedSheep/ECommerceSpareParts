@@ -17,12 +17,12 @@ namespace Tests;
 
 public static class ServiceProviderForTests
 {
-    public static bool IsConfiguredBefore;
+    private static bool _isConfiguredBefore;
     private static ServiceProvider? _serviceProvider;
 
     public static IServiceProvider Build(string postgresConnectionString, string redisConnectionString)
     {
-        if (IsConfiguredBefore)
+        if (_isConfiguredBefore)
         {
             var scope = _serviceProvider!.CreateScope();
             return scope.ServiceProvider;
@@ -53,7 +53,7 @@ public static class ServiceProviderForTests
 
 
         var serviceProvider = services.BuildServiceProvider();
-        IsConfiguredBefore = true;
+        _isConfiguredBefore = true;
         _serviceProvider = serviceProvider;
         SetupPrice(_serviceProvider).Wait();
         return serviceProvider;

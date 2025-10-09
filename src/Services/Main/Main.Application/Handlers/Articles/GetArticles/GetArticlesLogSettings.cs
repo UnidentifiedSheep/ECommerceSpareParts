@@ -18,7 +18,7 @@ public class GetArticlesAmwLogSettings : ILoggableRequest<GetArticlesQuery<AmwAr
 
     public object GetLogData(GetArticlesQuery<AmwArticleDto> request)
     {
-        return request!;
+        return request;
     }
 
     public string? GetUserId(GetArticlesQuery<AmwArticleDto> request)
@@ -41,7 +41,7 @@ public class GetArticlesMemberLogSettings : ILoggableRequest<GetArticlesQuery<An
 
     public object GetLogData(GetArticlesQuery<AnonymousArticleDto> request)
     {
-        return request!;
+        return request;
     }
 
     public string? GetUserId(GetArticlesQuery<AnonymousArticleDto> request)

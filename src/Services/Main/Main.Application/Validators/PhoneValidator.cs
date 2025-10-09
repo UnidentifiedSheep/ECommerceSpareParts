@@ -12,17 +12,14 @@ public partial class PhoneValidator : IPhoneValidator
 
         phone = phone.Trim();
 
-        if (phone.Length < 7 || phone.Length > 20)
+        if (phone.Length is < 7 or > 20)
             return false;
 
         if (!PhoneRegex().IsMatch(phone))
             return false;
 
         var digitsOnly = new string(phone.Where(char.IsDigit).ToArray());
-        if (digitsOnly.Length < 7)
-            return false;
-
-        return true;
+        return digitsOnly.Length >= 7;
     }
     //Допустимые форматы
     // +1 (555) 123-4567

@@ -99,11 +99,12 @@ public class StorageContentRepository(DContext context) : IStorageContentReposit
 
         var inClause = string.Join(", ", tupleConditions);
 
-        var sql = $@"
-        SELECT * 
-        FROM storage_content
-        WHERE (id, storage_name) IN ({inClause})
-        FOR UPDATE";
+        var sql = $"""
+                   SELECT * 
+                   FROM storage_content
+                   WHERE (id, storage_name) IN ({inClause})
+                   FOR UPDATE
+                   """;
 
         var query = context.StorageContents.FromSqlRaw(sql, parameters.ToArray());
 
