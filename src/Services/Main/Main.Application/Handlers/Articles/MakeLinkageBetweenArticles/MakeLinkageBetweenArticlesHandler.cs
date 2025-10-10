@@ -1,11 +1,11 @@
 using Application.Common.Interfaces;
 using Core.Attributes;
-using Core.Dtos.Amw.Articles;
-using Core.Enums;
-using Core.Interfaces.DbRepositories;
 using Core.Interfaces.Services;
 using Exceptions.Exceptions.Articles;
-using Main.Application.Events;
+using Main.Application.Notifications;
+using Main.Core.Dtos.Amw.Articles;
+using Main.Core.Enums;
+using Main.Core.Interfaces.DbRepositories;
 using MediatR;
 
 namespace Main.Application.Handlers.Articles.MakeLinkageBetweenArticles;
@@ -61,8 +61,8 @@ public class MakeLinkageBetweenArticlesHandler(
         await articlesRepository.AddArticleLinkage(toAdd, cancellationToken);
         await unitOfWork.SaveChangesAsync(cancellationToken);
 
-        await mediator.Publish(new ArticleUpdatedEvent(linkage.ArticleId), cancellationToken);
-        await mediator.Publish(new ArticleUpdatedEvent(linkage.CrossArticleId), cancellationToken);
+        await mediator.Publish(new ArticleUpdatedNotification(linkage.ArticleId), cancellationToken);
+        await mediator.Publish(new ArticleUpdatedNotification(linkage.CrossArticleId), cancellationToken);
 
         return Unit.Value;
     }

@@ -1,10 +1,10 @@
 using Application.Common.Interfaces;
 using Core.Attributes;
-using Core.Entities;
-using Core.Interfaces.DbRepositories;
 using Core.Interfaces.Services;
 using Exceptions.Exceptions.Producers;
 using Main.Application.Extensions;
+using Main.Core.Entities;
+using Main.Core.Interfaces.DbRepositories;
 using MediatR;
 
 namespace Main.Application.Handlers.Producers.AddOtherName;

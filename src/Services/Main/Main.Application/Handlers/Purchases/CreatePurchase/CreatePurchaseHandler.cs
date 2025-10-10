@@ -1,10 +1,10 @@
 using Application.Common.Interfaces;
 using Core.Attributes;
-using Core.Dtos.Amw.Purchase;
-using Core.Entities;
-using Core.Interfaces.DbRepositories;
 using Core.Interfaces.Services;
 using Main.Application.Extensions;
+using Main.Core.Dtos.Amw.Purchase;
+using Main.Core.Entities;
+using Main.Core.Interfaces.DbRepositories;
 using Mapster;
 
 namespace Main.Application.Handlers.Purchases.CreatePurchase;

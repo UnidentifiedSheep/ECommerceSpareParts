@@ -1,7 +1,7 @@
 using System.Security.Claims;
 using Carter;
-using Core.Dtos.Amw.Storage;
 using Main.Application.Handlers.StorageContents.EditContent;
+using Main.Core.Dtos.Amw.Storage;
 using MediatR;
 
 namespace Main.Api.EndPoints.Storages;

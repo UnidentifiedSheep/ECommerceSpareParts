@@ -1,8 +1,8 @@
 using Application.Common.Interfaces;
-using Core.Dtos.Amw.Sales;
-using Core.Interfaces.DbRepositories;
 using Core.Models;
 using Main.Application.Extensions;
+using Main.Core.Dtos.Amw.Sales;
+using Main.Core.Interfaces.DbRepositories;
 using Mapster;
 
 namespace Main.Application.Handlers.Sales.GetSales;

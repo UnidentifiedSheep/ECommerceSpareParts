@@ -1,16 +1,14 @@
 using Application.Common;
 using Application.Common.Behaviors;
+using Application.Common.Factories;
 using Application.Common.Interfaces;
 using Core.Abstractions;
-using Core.Entities;
 using Core.Interfaces;
 using Core.Interfaces.CacheRepositories;
-using Core.Interfaces.Services;
 using Core.Interfaces.Validators;
 using Core.Models;
 using FluentValidation;
 using Main.Application.ConcurrencyValidator;
-using Main.Application.Factories;
 using Main.Application.Handlers.Articles.GetArticleCrosses;
 using Main.Application.Handlers.Articles.GetArticles;
 using Main.Application.HangFireTasks;
@@ -18,12 +16,15 @@ using Main.Application.Pricing;
 using Main.Application.RelatedData;
 using Main.Application.Services;
 using Main.Application.Validators;
+using Main.Core.Entities;
+using Main.Core.Interfaces.Pricing;
+using Main.Core.Interfaces.Services;
 using MediatR;
 using Microsoft.Extensions.DependencyInjection;
-using AmwArticleDto = Core.Dtos.Amw.Articles.ArticleDto;
-using AnonymousArticleDto = Core.Dtos.Anonymous.Articles.ArticleDto;
-using AmwArticleFullDto = Core.Dtos.Amw.Articles.ArticleFullDto;
-using MemberArticleFullDto = Core.Dtos.Member.Articles.ArticleFullDto;
+using AmwArticleDto = Main.Core.Dtos.Amw.Articles.ArticleDto;
+using AnonymousArticleDto = Main.Core.Dtos.Anonymous.Articles.ArticleDto;
+using AmwArticleFullDto = Main.Core.Dtos.Amw.Articles.ArticleFullDto;
+using MemberArticleFullDto = Main.Core.Dtos.Member.Articles.ArticleFullDto;
 
 namespace Main.Application;
 
@@ -35,7 +36,6 @@ public static class ServiceProvider
         var relatedDataTtl = TimeSpan.FromHours(10);
 
         collection.AddSingleton<UpdateCurrencyRate>();
-        collection.AddSingleton<UpdateMarkUp>();
         collection.AddScoped<IRelatedDataFactory, RelatedDataFactory>();
         collection.AddSingleton(emailOptions ?? new UserEmailOptions());
         collection.AddSingleton(phoneOptions ?? new UserPhoneOptions());

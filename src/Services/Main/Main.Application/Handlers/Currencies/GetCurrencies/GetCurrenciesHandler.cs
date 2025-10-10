@@ -1,9 +1,9 @@
 using Application.Common.Interfaces;
-using Core.Dtos.Currencies;
-using Core.Entities;
-using Core.Interfaces.DbRepositories;
 using Core.Models;
 using Core.StaticFunctions;
+using Main.Core.Dtos.Currencies;
+using Main.Core.Entities;
+using Main.Core.Interfaces.DbRepositories;
 using Mapster;
 
 namespace Main.Application.Handlers.Currencies.GetCurrencies;

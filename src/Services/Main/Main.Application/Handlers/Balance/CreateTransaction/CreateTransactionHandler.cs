@@ -1,12 +1,13 @@
 using System.Data;
 using Application.Common.Interfaces;
 using Core.Attributes;
-using Core.Entities;
-using Core.Enums;
-using Core.Interfaces.DbRepositories;
 using Core.Interfaces.Services;
 using Exceptions.Exceptions.Balances;
 using Main.Application.Extensions;
+using Main.Core.Entities;
+using Main.Core.Enums;
+using Main.Core.Interfaces.DbRepositories;
+using Main.Core.Interfaces.Services;
 
 namespace Main.Application.Handlers.Balance.CreateTransaction;
 

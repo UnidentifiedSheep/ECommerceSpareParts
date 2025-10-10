@@ -1,12 +1,12 @@
-using Core.Entities;
 using Core.Interfaces.CacheRepositories;
 using FluentValidation;
 using Main.Application.Configs;
 using Main.Application.Handlers.Users.ChangeUserDiscount;
+using Main.Core.Entities;
+using Main.Persistence.Context;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
-using Persistence.Contexts;
 using Tests.MockData;
 using Tests.testContainers.Combined;
 

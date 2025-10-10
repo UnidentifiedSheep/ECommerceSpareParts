@@ -1,21 +1,4 @@
 using System.Text.Json;
-using Core.Dtos.Amw.ArticleCharacteristics;
-using Core.Dtos.Amw.ArticleReservations;
-using Core.Dtos.Amw.Articles;
-using Core.Dtos.Amw.Balances;
-using Core.Dtos.Amw.Markups;
-using Core.Dtos.Amw.Producers;
-using Core.Dtos.Amw.Purchase;
-using Core.Dtos.Amw.Sales;
-using Core.Dtos.Amw.Storage;
-using Core.Dtos.Amw.Users;
-using Core.Dtos.Anonymous.Producers;
-using Core.Dtos.Emails;
-using Core.Dtos.Member.Vehicles;
-using Core.Dtos.Roles;
-using Core.Dtos.Services.Articles;
-using Core.Dtos.Users;
-using Core.Entities;
 using Core.Extensions;
 using Core.Models;
 using Core.StaticFunctions;
@@ -23,13 +6,35 @@ using Main.Application.Extensions;
 using Main.Application.Handlers.ArticlePairs.CreatePair;
 using Main.Application.Handlers.Currencies.CreateCurrency;
 using Main.Application.Handlers.Storages.CreateStorage;
+using Main.Core.Dtos.Amw.ArticleCharacteristics;
+using Main.Core.Dtos.Amw.ArticleReservations;
+using Main.Core.Dtos.Amw.Articles;
+using Main.Core.Dtos.Amw.Balances;
+using Main.Core.Dtos.Amw.Markups;
+using Main.Core.Dtos.Amw.Producers;
+using Main.Core.Dtos.Amw.Purchase;
+using Main.Core.Dtos.Amw.Sales;
+using Main.Core.Dtos.Amw.Storage;
+using Main.Core.Dtos.Amw.Users;
+using Main.Core.Dtos.Anonymous.Producers;
+using Main.Core.Dtos.Emails;
+using Main.Core.Dtos.Member.Vehicles;
+using Main.Core.Dtos.Roles;
+using Main.Core.Dtos.Services.Articles;
+using Main.Core.Dtos.Users;
+using Main.Core.Entities;
 using Mapster;
-using AmwArticleFullDto = Core.Dtos.Amw.Articles.ArticleFullDto;
-using MemberArticleFullDto = Core.Dtos.Member.Articles.ArticleFullDto;
-using AmwArticleDto = Core.Dtos.Amw.Articles.ArticleDto;
-using AnonymousArticleDto = Core.Dtos.Anonymous.Articles.ArticleDto;
-using AmwPurchaseDto = Core.Dtos.Amw.Purchase.PurchaseDto;
-using MemberPurchaseDto = Core.Dtos.Member.Purchase.PurchaseDto;
+using AmwArticleFullDto = Main.Core.Dtos.Amw.Articles.ArticleFullDto;
+using MemberArticleFullDto = Main.Core.Dtos.Member.Articles.ArticleFullDto;
+using AmwArticleDto = Main.Core.Dtos.Amw.Articles.ArticleDto;
+using AnonymousArticleDto = Main.Core.Dtos.Anonymous.Articles.ArticleDto;
+using AmwPurchaseDto = Main.Core.Dtos.Amw.Purchase.PurchaseDto;
+using MemberPurchaseDto = Main.Core.Dtos.Member.Purchase.PurchaseDto;
+
+using CoreUser = Core.Models.User;
+using User = Main.Core.Entities.User;
+using CoreUserInfo = Core.Models.UserInfo;
+using UserInfo = Main.Core.Entities.UserInfo;
 
 namespace Main.Application.Configs;
 
@@ -37,6 +42,15 @@ public static class MapsterConfig
 {
     public static void Configure()
     {
+
+        TypeAdapterConfig<User, CoreUser>.NewConfig()
+            .Map(d => d.Id, s => s.Id)
+            .Map(d => d.UserName, s => s.UserName);
+
+        TypeAdapterConfig<UserInfo, CoreUserInfo>.NewConfig()
+            .Map(d => d.Name, s => s.Name)
+            .Map(d => d.Surname, s => s.Surname);
+        
         TypeAdapterConfig<PurchaseContent, PurchaseContentDto>.NewConfig()
             .Map(dest => dest.Id, src => src.Id)
             .Map(dest => dest.Article, src => src.Article)

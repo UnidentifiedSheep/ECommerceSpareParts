@@ -1,4 +1,4 @@
-using Core.Dtos.Amw.Sales;
+using Main.Core.Dtos.Amw.Sales;
 
 namespace Main.Application.Handlers.StorageContents.RestoreContent;
 

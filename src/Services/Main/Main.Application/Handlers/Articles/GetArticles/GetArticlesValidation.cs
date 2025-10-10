@@ -1,6 +1,6 @@
-using Core.Dtos.Anonymous.Articles;
 using FluentValidation;
 using Main.Application.Handlers.BaseValidators;
+using Main.Core.Dtos.Anonymous.Articles;
 
 namespace Main.Application.Handlers.Articles.GetArticles;
 
@@ -17,7 +17,7 @@ public class GetArticlesAnonymousValidation : AbstractValidator<GetArticlesQuery
     }
 }
 
-public class GetArticlesAmwValidation : AbstractValidator<GetArticlesQuery<Core.Dtos.Amw.Articles.ArticleDto>>
+public class GetArticlesAmwValidation : AbstractValidator<GetArticlesQuery<global::Main.Core.Dtos.Amw.Articles.ArticleDto>>
 {
     public GetArticlesAmwValidation()
     {

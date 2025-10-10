@@ -1,6 +1,6 @@
 using Application.Common.Interfaces;
 using Core.Interfaces.CacheRepositories;
-using Core.Interfaces.DbRepositories;
+using Main.Core.Interfaces.DbRepositories;
 
 namespace Main.Application.Handlers.Users.GetUserDiscount;
 

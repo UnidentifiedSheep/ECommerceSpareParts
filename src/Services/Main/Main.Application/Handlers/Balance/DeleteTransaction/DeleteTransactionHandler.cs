@@ -2,13 +2,14 @@ using System.Collections.Immutable;
 using System.Data;
 using Application.Common.Interfaces;
 using Core.Attributes;
-using Core.Entities;
-using Core.Interfaces.DbRepositories;
 using Core.Interfaces.Services;
 using Exceptions.Exceptions.Balances;
 using Main.Application.Extensions;
+using Main.Core.Entities;
+using Main.Core.Enums;
+using Main.Core.Interfaces.DbRepositories;
+using Main.Core.Interfaces.Services;
 using MediatR;
-using TransactionStatus = Core.Enums.TransactionStatus;
 
 namespace Main.Application.Handlers.Balance.DeleteTransaction;
 

@@ -1,11 +1,11 @@
 using Application.Common.Interfaces;
+using Contracts;
 using Core.Attributes;
-using Core.Contracts;
-using Core.Entities;
 using Core.Interfaces;
-using Core.Interfaces.DbRepositories;
 using Core.Interfaces.Integrations;
 using Core.Interfaces.Services;
+using Main.Core.Entities;
+using Main.Core.Interfaces.DbRepositories;
 using MediatR;
 
 namespace Main.Application.Handlers.Currencies.UpdateCurrenciesRates;

@@ -1,14 +1,14 @@
-using Core.Dtos.Amw.Articles;
-using Core.Enums;
 using FluentValidation;
 using Main.Application.Configs;
 using Main.Application.Handlers.Articles.CreateArticles;
 using Main.Application.Handlers.Articles.MakeLinkageBetweenArticles;
 using Main.Application.Handlers.Producers.CreateProducer;
+using Main.Core.Dtos.Amw.Articles;
+using Main.Core.Enums;
+using Main.Persistence.Context;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
-using Persistence.Contexts;
 using Tests.MockData;
 using Tests.testContainers.Combined;
 using static Tests.MockData.MockData;

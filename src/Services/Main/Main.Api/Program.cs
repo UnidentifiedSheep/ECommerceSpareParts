@@ -1,12 +1,9 @@
 using System.Text;
 using Api.Common;
-using Api.Common.BackgroundServices;
 using Api.Common.ExceptionHandlers;
 using Api.Common.Logging;
-using Application.Common.EventHandlers;
 using Carter;
-using Core.Contracts;
-using Core.Interfaces;
+using Contracts;
 using Core.Interfaces.MessageBroker;
 using Core.Models;
 using Hangfire;
@@ -14,16 +11,18 @@ using Hangfire.PostgreSql;
 using Integrations;
 using Mail;
 using Main.Application;
+using Main.Application.BackgroundServices;
 using Main.Application.Configs;
 using Main.Application.EventHandlers;
 using Main.Application.HangFireTasks;
+using Main.Core.Interfaces.Pricing;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using OpenTelemetry.Metrics;
-using Persistence;
+using Main.Persistence;
 using RabbitMq;
 using Redis;
 using Security;
@@ -215,8 +214,6 @@ app.UseHttpsRedirection();
 
 RecurringJob.AddOrUpdate<UpdateCurrencyRate>("UpdateCurrencyTask",
     x => x.Run(), Cron.Daily);
-RecurringJob.AddOrUpdate<UpdateMarkUp>("UpdateMarkUp",
-    x => x.Run(), Cron.Weekly);
 
 app.UseOpenTelemetryPrometheusScrapingEndpoint();
 

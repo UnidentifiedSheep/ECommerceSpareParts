@@ -2,6 +2,7 @@ using System.Security.Claims;
 using Carter;
 using Core.Enums;
 using Main.Application.Handlers.Balance.CreateTransaction;
+using Main.Core.Enums;
 using MediatR;
 
 namespace Main.Api.EndPoints.Balances;

@@ -1,14 +1,14 @@
 using Bogus;
-using Core.Dtos.Amw.Storage;
-using Core.Entities;
 using Core.Models;
 using Exceptions.Exceptions.Storages;
 using Main.Application.Configs;
 using Main.Application.Handlers.Storages.EditStorage;
+using Main.Core.Dtos.Amw.Storage;
+using Main.Core.Entities;
+using Main.Persistence.Context;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
-using Persistence.Contexts;
 using Tests.MockData;
 using Tests.testContainers.Combined;
 using static Tests.MockData.MockData;

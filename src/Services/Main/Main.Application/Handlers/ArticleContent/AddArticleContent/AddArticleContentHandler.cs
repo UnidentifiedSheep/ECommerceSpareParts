@@ -1,7 +1,7 @@
 using Application.Common.Interfaces;
 using Core.Attributes;
-using Core.Entities;
 using Core.Interfaces.Services;
+using Main.Core.Entities;
 using MediatR;
 
 namespace Main.Application.Handlers.ArticleContent.AddArticleContent;

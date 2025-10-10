@@ -1,5 +1,5 @@
-using Core.Dtos.Amw.Sales;
 using FluentValidation;
+using Main.Core.Dtos.Amw.Sales;
 
 namespace Main.Application.Handlers.Sales.BaseValidators.Edit;
 

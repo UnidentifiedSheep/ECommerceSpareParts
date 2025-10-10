@@ -1,9 +1,11 @@
-﻿using Core.Entities;
-using Core.Interfaces;
+﻿using Core.Interfaces;
 using Core.Models;
 using IntervalMap.Core.Models;
 using IntervalMap.Variations;
 using Main.Application.Extensions;
+using Main.Core.Entities;
+using Main.Core.Interfaces.Pricing;
+using Main.Core.Models;
 
 namespace Main.Application.Pricing;
 

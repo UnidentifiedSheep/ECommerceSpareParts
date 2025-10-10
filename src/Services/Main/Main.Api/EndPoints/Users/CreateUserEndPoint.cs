@@ -1,7 +1,7 @@
 using Carter;
-using Core.Dtos.Emails;
-using Core.Dtos.Users;
 using Main.Application.Handlers.Users.CreateUser;
+using Main.Core.Dtos.Emails;
+using Main.Core.Dtos.Users;
 using Mapster;
 using MediatR;
 

@@ -1,11 +1,11 @@
 using System.Drawing;
 using Bogus;
-using Core.Dtos.Amw.Producers;
-using Core.Dtos.Amw.Storage;
-using Core.Dtos.Services.Articles;
-using Core.Dtos.Users;
-using Core.Entities;
-using Core.Enums;
+using Main.Core.Dtos.Amw.Producers;
+using Main.Core.Dtos.Amw.Storage;
+using Main.Core.Dtos.Services.Articles;
+using Main.Core.Dtos.Users;
+using Main.Core.Entities;
+using Main.Core.Enums;
 
 namespace Tests.MockData;
 

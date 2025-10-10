@@ -6,8 +6,8 @@ using Main.Application.Handlers.Articles.GetArticleCrosses;
 using Mapster;
 using MediatR;
 using Security.Extensions;
-using AmwArticleDto = Core.Dtos.Amw.Articles.ArticleFullDto;
-using MemberArticleDto = Core.Dtos.Member.Articles.ArticleFullDto;
+using AmwArticleDto = Main.Core.Dtos.Amw.Articles.ArticleFullDto;
+using MemberArticleDto = Main.Core.Dtos.Member.Articles.ArticleFullDto;
 
 namespace Main.Api.EndPoints.Articles;
 

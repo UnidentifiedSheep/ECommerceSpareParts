@@ -1,8 +1,8 @@
 using Application.Common.Interfaces;
 using Core.Attributes;
-using Core.Interfaces.DbRepositories;
 using Core.Interfaces.Services;
 using Main.Application.Extensions;
+using Main.Core.Interfaces.DbRepositories;
 
 namespace Main.Application.Handlers.ArticleReservations.SubtractCountFromReservations;
 

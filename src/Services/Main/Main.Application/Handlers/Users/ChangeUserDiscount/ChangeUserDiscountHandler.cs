@@ -1,6 +1,6 @@
 using Application.Common.Interfaces;
 using Core.Interfaces.CacheRepositories;
-using Core.Interfaces.DbRepositories;
+using Main.Core.Interfaces.DbRepositories;
 using MediatR;
 
 namespace Main.Application.Handlers.Users.ChangeUserDiscount;

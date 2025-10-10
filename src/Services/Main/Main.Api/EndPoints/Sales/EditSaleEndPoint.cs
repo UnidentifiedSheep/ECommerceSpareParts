@@ -1,7 +1,7 @@
 using System.Security.Claims;
 using Carter;
-using Core.Dtos.Amw.Sales;
 using Main.Application.Handlers.Sales.EditFullSale;
+using Main.Core.Dtos.Amw.Sales;
 using MediatR;
 
 namespace Main.Api.EndPoints.Sales;

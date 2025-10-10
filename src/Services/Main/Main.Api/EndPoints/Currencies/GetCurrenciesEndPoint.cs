@@ -1,7 +1,7 @@
 using Carter;
-using Core.Dtos.Currencies;
 using Core.Models;
 using Main.Application.Handlers.Currencies.GetCurrencies;
+using Main.Core.Dtos.Currencies;
 using Mapster;
 using MediatR;
 

@@ -1,6 +1,6 @@
 using Application.Common.Interfaces;
-using Core.Dtos.Amw.Sales;
-using Core.Interfaces.DbRepositories;
+using Main.Core.Dtos.Amw.Sales;
+using Main.Core.Interfaces.DbRepositories;
 using Mapster;
 
 namespace Main.Application.Handlers.Sales.GetSaleContent;

@@ -1,5 +1,5 @@
-using Core.Interfaces.DbRepositories;
-using Core.Interfaces.Services;
+using Main.Core.Interfaces.DbRepositories;
+using Main.Core.Interfaces.Services;
 
 namespace Main.Application.Services;
 

@@ -1,13 +1,14 @@
 using System.Data;
 using Application.Common.Interfaces;
 using Core.Attributes;
-using Core.Entities;
-using Core.Enums;
 using Core.Interfaces;
-using Core.Interfaces.DbRepositories;
 using Core.Interfaces.Services;
-using Main.Application.Events;
 using Main.Application.Extensions;
+using Main.Application.Notifications;
+using Main.Core.Entities;
+using Main.Core.Enums;
+using Main.Core.Interfaces.DbRepositories;
+using Main.Core.Interfaces.Services;
 using Mapster;
 using MediatR;
 
@@ -78,8 +79,8 @@ public class RestoreContentHandler(
         await articlesService.UpdateArticlesCount(toIncrement, cancellationToken);
         await unitOfWork.SaveChangesAsync(cancellationToken);
 
-        await mediator.Publish(new ArticlesUpdatedEvent(articleIds), cancellationToken);
-        await mediator.Publish(new ArticlePricesUpdatedEvent(articleIds), cancellationToken);
+        await mediator.Publish(new ArticlesUpdatedNotification(articleIds), cancellationToken);
+        await mediator.Publish(new ArticlePricesUpdatedNotification(articleIds), cancellationToken);
         return Unit.Value;
     }
 

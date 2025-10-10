@@ -1,6 +1,6 @@
 ﻿using Carter;
-using Core.Dtos.Anonymous.Articles;
 using Main.Application.Handlers.ArticleCharacteristics.GetCharacteristics;
+using Main.Core.Dtos.Anonymous.Articles;
 using Mapster;
 using MediatR;
 

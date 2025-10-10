@@ -1,6 +1,6 @@
 using Application.Common.Interfaces;
-using Core.Interfaces.DbRepositories;
 using Main.Application.Extensions;
+using Main.Core.Interfaces.DbRepositories;
 
 namespace Main.Application.Handlers.ArticleReservations.GetArticlesWithNotEnoughStock;
 

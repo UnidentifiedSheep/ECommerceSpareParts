@@ -1,7 +1,7 @@
 using System.Security.Claims;
 using Carter;
-using Core.Dtos.Amw.Purchase;
 using Main.Application.Handlers.Purchases.EditFullPurchase;
+using Main.Core.Dtos.Amw.Purchase;
 using MediatR;
 
 namespace Main.Api.EndPoints.Purchase;

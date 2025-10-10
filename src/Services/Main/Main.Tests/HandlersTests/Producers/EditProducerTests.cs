@@ -1,11 +1,11 @@
 using Bogus;
-using Core.Dtos.Amw.Producers;
 using Core.Models;
 using Main.Application.Handlers.Producers.EditProducer;
+using Main.Core.Dtos.Amw.Producers;
+using Main.Persistence.Context;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
-using Persistence.Contexts;
 using Tests.MockData;
 using Tests.testContainers.Combined;
 using ValidationException = FluentValidation.ValidationException;

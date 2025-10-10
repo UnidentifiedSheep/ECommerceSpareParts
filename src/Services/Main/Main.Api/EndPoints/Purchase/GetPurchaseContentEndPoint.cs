@@ -1,6 +1,6 @@
 using Carter;
-using Core.Dtos.Amw.Purchase;
 using Main.Application.Handlers.Purchases.GetPurchaseContent;
+using Main.Core.Dtos.Amw.Purchase;
 using Mapster;
 using MediatR;
 

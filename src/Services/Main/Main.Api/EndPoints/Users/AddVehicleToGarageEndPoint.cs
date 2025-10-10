@@ -1,7 +1,7 @@
 using System.Security.Claims;
 using Carter;
-using Core.Dtos.Member.Vehicles;
 using Main.Application.Handlers.Users.AddVehicleToGarage;
+using Main.Core.Dtos.Member.Vehicles;
 using MediatR;
 
 namespace Main.Api.EndPoints.Users;

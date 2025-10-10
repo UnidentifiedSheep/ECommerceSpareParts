@@ -1,13 +1,16 @@
 ﻿using System.Net;
 using System.Security.Cryptography;
 using Application.Common.Interfaces;
-using Core.Enums;
 using Core.Interfaces;
-using Core.Interfaces.DbRepositories;
 using Core.Interfaces.Services;
 using Core.Interfaces.Validators;
+using Core.Models;
 using Exceptions.Base;
 using Exceptions.Exceptions.Auth;
+using Main.Core.Enums;
+using Main.Core.Interfaces.DbRepositories;
+using Main.Core.Interfaces.Services;
+using Mapster;
 
 namespace Main.Application.Handlers.Auth.Login;
 
@@ -40,7 +43,7 @@ public class LoginHandler(
         var ip = request.IpAddress;
         var userAgent = request.UserAgent;
 
-        var token = tokenGenerator.CreateToken(user, user.UserInfo, deviceId, roles);
+        var token = tokenGenerator.CreateToken(user.Adapt<User>(), user.UserInfo.Adapt<UserInfo>(), deviceId, roles);
         var refreshToken = tokenGenerator.CreateRefreshToken();
 
         await userTokenService.AddToken(refreshToken, user.Id, TokenType.RefreshToken, DateTime.UtcNow.AddMonths(1),

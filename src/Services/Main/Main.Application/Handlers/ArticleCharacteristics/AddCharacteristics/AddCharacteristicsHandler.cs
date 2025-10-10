@@ -1,8 +1,8 @@
 using Application.Common.Interfaces;
 using Core.Attributes;
-using Core.Dtos.Amw.ArticleCharacteristics;
-using Core.Entities;
 using Core.Interfaces.Services;
+using Main.Core.Dtos.Amw.ArticleCharacteristics;
+using Main.Core.Entities;
 using Mapster;
 using MediatR;
 

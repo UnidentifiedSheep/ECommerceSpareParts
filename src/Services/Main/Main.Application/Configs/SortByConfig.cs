@@ -1,6 +1,6 @@
-using Core.Dtos.Amw.Articles;
-using Core.Entities;
 using Core.Extensions;
+using Main.Core.Dtos.Amw.Articles;
+using Main.Core.Entities;
 
 namespace Main.Application.Configs;
 

@@ -1,9 +1,12 @@
 ﻿using Application.Common.Interfaces;
-using Core.Enums;
 using Core.Interfaces;
-using Core.Interfaces.DbRepositories;
 using Core.Interfaces.Services;
+using Core.Models;
 using Exceptions.Exceptions.Auth;
+using Main.Core.Enums;
+using Main.Core.Interfaces.DbRepositories;
+using Main.Core.Interfaces.Services;
+using Mapster;
 
 namespace Main.Application.Handlers.Auth.RefreshToken;
 
@@ -32,7 +35,7 @@ public class RefreshTokenHandler(
         var userRoles = (await userRoleRepository.GetUserRolesAsync(userToken.UserId, false,
             cancellationToken: cancellationToken)).Select(x => x.Role.Name).ToList();
 
-        var token = tokenGenerator.CreateToken(user, user.UserInfo!, request.DeviceId, userRoles);
+        var token = tokenGenerator.CreateToken(user.Adapt<User>(), user.UserInfo!.Adapt<UserInfo>(), request.DeviceId, userRoles);
         var refreshToken = tokenGenerator.CreateRefreshToken();
 
         await userTokenService.AddToken(refreshToken, user.Id, TokenType.RefreshToken, DateTime.UtcNow.AddMonths(1),

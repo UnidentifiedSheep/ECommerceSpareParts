@@ -1,6 +1,6 @@
 using Application.Common.Interfaces;
-using Core.Dtos.Amw.Balances;
-using Core.Interfaces.DbRepositories;
+using Main.Core.Dtos.Amw.Balances;
+using Main.Core.Interfaces.DbRepositories;
 using Mapster;
 
 namespace Main.Application.Handlers.Balance.GetTransactions;

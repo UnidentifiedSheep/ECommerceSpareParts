@@ -1,7 +1,7 @@
 using Application.Common.Interfaces;
-using Core.Dtos.Amw.Purchase;
-using Core.Interfaces.DbRepositories;
 using Core.Models;
+using Main.Core.Dtos.Amw.Purchase;
+using Main.Core.Interfaces.DbRepositories;
 using Mapster;
 
 namespace Main.Application.Handlers.Purchases.GetPurchase;

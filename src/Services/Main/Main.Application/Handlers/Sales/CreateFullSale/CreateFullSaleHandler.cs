@@ -1,25 +1,24 @@
 using System.Text;
 using Application.Common.Interfaces;
 using Core.Attributes;
-using Core.Dtos.Amw.Sales;
-using Core.Entities;
-using Core.Enums;
-using Core.Interfaces.DbRepositories;
 using Core.Interfaces.Services;
-using Core.Models;
 using Core.StaticFunctions;
 using Exceptions.Exceptions.Sales;
 using Exceptions.Exceptions.Storages;
-using Main.Application.Events;
 using Main.Application.Extensions;
 using Main.Application.Handlers.ArticleReservations.GetArticlesWithNotEnoughStock;
 using Main.Application.Handlers.ArticleReservations.SubtractCountFromReservations;
 using Main.Application.Handlers.Balance.CreateTransaction;
 using Main.Application.Handlers.Sales.CreateSale;
 using Main.Application.Handlers.StorageContents.RemoveContent;
+using Main.Application.Notifications;
+using Main.Core.Dtos.Amw.Sales;
+using Main.Core.Entities;
+using Main.Core.Enums;
+using Main.Core.Interfaces.DbRepositories;
+using Main.Core.Models;
 using MediatR;
 using IsolationLevel = System.Data.IsolationLevel;
-using TransactionStatus = Core.Enums.TransactionStatus;
 
 namespace Main.Application.Handlers.Sales.CreateFullSale;
 
@@ -74,7 +73,7 @@ public class CreateFullSaleHandler(IMediator mediator, IArticlesRepository artic
         await SubtractCountFromReservations(buyerId, whoCreated, saleCounts, cancellationToken);
 
         await unitOfWork.SaveChangesAsync(cancellationToken);
-        await mediator.Publish(new ArticlesUpdatedEvent(saleCounts.Keys), cancellationToken);
+        await mediator.Publish(new ArticlesUpdatedNotification(saleCounts.Keys), cancellationToken);
         return Unit.Value;
     }
 

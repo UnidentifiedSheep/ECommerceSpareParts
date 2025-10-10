@@ -1,6 +1,6 @@
-using Core.Entities;
-using Core.Interfaces.Services;
-using Core.Models;
+using Main.Core.Entities;
+using Main.Core.Interfaces.Services;
+using Main.Core.Models;
 using Mapster;
 
 namespace Main.Application.Services;

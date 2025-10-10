@@ -1,7 +1,7 @@
 using Application.Common.Interfaces;
-using Core.Interfaces.DbRepositories;
 using Core.Interfaces.Services;
 using Exceptions.Exceptions.Articles;
+using Main.Core.Interfaces.DbRepositories;
 using MediatR;
 
 namespace Main.Application.Handlers.ArticleContent.SetArticleContentCount;

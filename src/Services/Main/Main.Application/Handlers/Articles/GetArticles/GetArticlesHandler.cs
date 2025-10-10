@@ -1,7 +1,7 @@
 using Application.Common.Interfaces;
-using Core.Enums;
-using Core.Interfaces.DbRepositories;
 using Core.Models;
+using Main.Core.Enums;
+using Main.Core.Interfaces.DbRepositories;
 using Mapster;
 
 namespace Main.Application.Handlers.Articles.GetArticles;

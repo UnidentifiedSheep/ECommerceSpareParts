@@ -19,4 +19,8 @@
         <ProjectReference Include="..\Exceptions\Exceptions.csproj"/>
     </ItemGroup>
 
+    <ItemGroup>
+      <Folder Include="Dtos\" />
+    </ItemGroup>
+
 </Project>

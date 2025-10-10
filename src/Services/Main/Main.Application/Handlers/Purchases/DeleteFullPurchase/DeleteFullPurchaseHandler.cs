@@ -1,13 +1,13 @@
 using System.Data;
 using Application.Common.Interfaces;
 using Core.Attributes;
-using Core.Entities;
-using Core.Enums;
-using Core.Interfaces.DbRepositories;
 using Exceptions.Exceptions.Purchase;
 using Main.Application.Handlers.Balance.DeleteTransaction;
 using Main.Application.Handlers.Purchases.DeletePurchase;
 using Main.Application.Handlers.StorageContents.RemoveContent;
+using Main.Core.Entities;
+using Main.Core.Enums;
+using Main.Core.Interfaces.DbRepositories;
 using MediatR;
 
 namespace Main.Application.Handlers.Purchases.DeleteFullPurchase;

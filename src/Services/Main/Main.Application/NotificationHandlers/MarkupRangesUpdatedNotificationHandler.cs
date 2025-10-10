@@ -1,15 +1,16 @@
 using Core.Interfaces;
-using Main.Application.Events;
+using Main.Application.Notifications;
+using Main.Core.Interfaces.Pricing;
 using MediatR;
 
 namespace Main.Application.NotificationHandlers;
 
 public class MarkupRangesUpdatedNotificationHandler(IMessageBroker messageBroker, IPriceSetup priceSetup)
-    : INotificationHandler<MarkupRangesUpdatedEvent>
+    : INotificationHandler<MarkupRangesUpdatedNotification>
 {
-    public async Task Handle(MarkupRangesUpdatedEvent notification, CancellationToken cancellationToken)
+    public async Task Handle(MarkupRangesUpdatedNotification notification, CancellationToken cancellationToken)
     {
-        await messageBroker.Publish(new Core.Contracts.MarkupRangesUpdatedEvent(), cancellationToken);
+        await messageBroker.Publish(new Contracts.MarkupRangesUpdatedEvent(), cancellationToken);
         await priceSetup.SetupAsync(cancellationToken);
     }
 }

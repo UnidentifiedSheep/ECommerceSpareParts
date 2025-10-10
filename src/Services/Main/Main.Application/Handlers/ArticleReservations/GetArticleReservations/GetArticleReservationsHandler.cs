@@ -1,8 +1,8 @@
 using Application.Common.Interfaces;
-using Core.Dtos.Amw.ArticleReservations;
-using Core.Entities;
-using Core.Enums;
-using Core.Interfaces.DbRepositories;
+using Main.Core.Dtos.Amw.ArticleReservations;
+using Main.Core.Entities;
+using Main.Core.Enums;
+using Main.Core.Interfaces.DbRepositories;
 using Mapster;
 
 namespace Main.Application.Handlers.ArticleReservations.GetArticleReservations;

@@ -1,6 +1,6 @@
-using Core.Dtos.Emails;
 using Core.Interfaces.Validators;
 using FluentValidation;
+using Main.Core.Dtos.Emails;
 
 namespace Main.Application.Handlers.BaseValidators;
 

@@ -1,9 +1,9 @@
 using Application.Common.Interfaces;
 using Core.Attributes;
-using Core.Interfaces.DbRepositories;
 using Core.Interfaces.Services;
 using Exceptions.Exceptions.Articles;
-using Main.Application.Events;
+using Main.Application.Notifications;
+using Main.Core.Interfaces.DbRepositories;
 using MediatR;
 
 namespace Main.Application.Handlers.Articles.SetArticleIndicator;
@@ -24,7 +24,7 @@ public class SetArticleIndicatorHandler(
         article.Indicator = request.Indicator;
 
         await unitOfWork.SaveChangesAsync(cancellationToken);
-        await mediator.Publish(new ArticleUpdatedEvent(request.ArticleId), cancellationToken);
+        await mediator.Publish(new ArticleUpdatedNotification(request.ArticleId), cancellationToken);
 
         return Unit.Value;
     }

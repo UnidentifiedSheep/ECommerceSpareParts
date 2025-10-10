@@ -1,5 +1,5 @@
-using Core.Dtos.Users;
 using FluentValidation;
+using Main.Core.Dtos.Users;
 
 namespace Main.Application.Handlers.BaseValidators;
 

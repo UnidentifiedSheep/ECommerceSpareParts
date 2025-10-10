@@ -1,12 +1,12 @@
 using Bogus;
-using Core.Dtos.Emails;
-using Core.Enums;
 using Exceptions.Exceptions.Users;
 using Main.Application.Handlers.Users.CreateUser;
+using Main.Core.Dtos.Emails;
+using Main.Core.Enums;
+using Main.Persistence.Context;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
-using Persistence.Contexts;
 using Tests.MockData;
 using Tests.testContainers.Combined;
 using ValidationException = FluentValidation.ValidationException;

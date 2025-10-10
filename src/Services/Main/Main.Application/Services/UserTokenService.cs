@@ -1,8 +1,9 @@
 using System.Net;
-using Core.Entities;
-using Core.Enums;
 using Core.Interfaces;
 using Core.Interfaces.Services;
+using Main.Core.Entities;
+using Main.Core.Enums;
+using Main.Core.Interfaces.Services;
 
 namespace Main.Application.Services;
 

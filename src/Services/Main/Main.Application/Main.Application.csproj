@@ -13,6 +13,9 @@
     </ItemGroup>
 
     <ItemGroup>
+        <Reference Include="Microsoft.Extensions.Hosting.Abstractions">
+          <HintPath>..\..\..\..\..\..\..\.nuget\packages\microsoft.extensions.hosting.abstractions\9.0.0\lib\net9.0\Microsoft.Extensions.Hosting.Abstractions.dll</HintPath>
+        </Reference>
         <Reference Include="Polly">
             <HintPath>..\..\..\..\.nuget\packages\polly\8.6.2\lib\net6.0\Polly.dll</HintPath>
         </Reference>
@@ -28,6 +31,8 @@
     </ItemGroup>
 
     <ItemGroup>
+        <ProjectReference Include="..\..\..\..\Contracts\Contracts.csproj" />
+        <ProjectReference Include="..\..\..\..\Main.Core\Main.Core.csproj" />
         <ProjectReference Include="..\..\..\Core\Core\Core.csproj"/>
         <ProjectReference Include="..\..\Application.Common\Application.Common.csproj"/>
     </ItemGroup>

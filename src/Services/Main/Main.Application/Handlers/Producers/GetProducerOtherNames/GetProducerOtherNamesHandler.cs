@@ -1,7 +1,7 @@
 using Application.Common.Interfaces;
-using Core.Dtos.Amw.Producers;
-using Core.Interfaces.DbRepositories;
 using Core.Models;
+using Main.Core.Dtos.Amw.Producers;
+using Main.Core.Interfaces.DbRepositories;
 using Mapster;
 
 namespace Main.Application.Handlers.Producers.GetProducerOtherNames;

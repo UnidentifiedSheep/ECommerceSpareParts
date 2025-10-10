@@ -1,7 +1,7 @@
 using System.Security.Claims;
 using Carter;
-using Core.Dtos.Amw.ArticleReservations;
 using Main.Application.Handlers.ArticleReservations.CreateArticleReservation;
+using Main.Core.Dtos.Amw.ArticleReservations;
 using MediatR;
 
 namespace Main.Api.EndPoints.ArticlesReservation;

@@ -1,10 +1,10 @@
 using Application.Common.Interfaces;
+using Contracts;
 using Core.Attributes;
-using Core.Contracts;
 using Core.Interfaces;
-using Core.Interfaces.DbRepositories;
 using Core.Interfaces.Services;
 using Exceptions.Exceptions.Markups;
+using Main.Core.Interfaces.DbRepositories;
 using MediatR;
 
 namespace Main.Application.Handlers.Markups.SelectDefaultMarkup;

@@ -1,10 +1,10 @@
 using Exceptions.Exceptions.Currencies;
 using FluentValidation;
 using Main.Application.Handlers.Currencies.CreateCurrency;
+using Main.Persistence.Context;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
-using Persistence.Contexts;
 using Tests.MockData;
 using Tests.testContainers.Combined;
 
