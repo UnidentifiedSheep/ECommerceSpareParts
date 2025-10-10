@@ -37,6 +37,7 @@
         <ProjectReference Include="..\..\..\Infrastructure\Security\Security.csproj"/>
         <ProjectReference Include="..\..\Api.Common\Api.Common.csproj"/>
         <ProjectReference Include="..\Main.Application\Main.Application.csproj"/>
+        <ProjectReference Include="..\Main.Persistence\Main.Persistence.csproj" />
     </ItemGroup>
 
 </Project>

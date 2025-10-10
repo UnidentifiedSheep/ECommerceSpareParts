@@ -33,8 +33,10 @@
     <ItemGroup>
         <ProjectReference Include="..\..\..\..\Contracts\Contracts.csproj" />
         <ProjectReference Include="..\..\..\..\Main.Core\Main.Core.csproj" />
+        <ProjectReference Include="..\..\..\Core\Contracts\Contracts.csproj" />
         <ProjectReference Include="..\..\..\Core\Core\Core.csproj"/>
         <ProjectReference Include="..\..\Application.Common\Application.Common.csproj"/>
+        <ProjectReference Include="..\Main.Core\Main.Core.csproj" />
     </ItemGroup>
 
 </Project>
