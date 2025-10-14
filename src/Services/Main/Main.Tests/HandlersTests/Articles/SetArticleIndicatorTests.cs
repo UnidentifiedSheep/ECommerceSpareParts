@@ -43,7 +43,7 @@ public class SetArticleIndicatorTests : IAsyncLifetime
 
         Assert.NotNull(article);
 
-        var indicator = _faker.Lorem.Word();
+        var indicator = _faker.Lorem.Letter(18);
         var command = new SetArticleIndicatorCommand(article.Id, indicator);
         await _mediator.Send(command);
 
