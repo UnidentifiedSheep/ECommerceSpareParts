@@ -3,6 +3,8 @@ using Core.Attributes;
 using Core.Interfaces.Services;
 using Exceptions.Exceptions.Producers;
 using Main.Application.Extensions;
+using Main.Application.Validation;
+using Main.Core.Abstractions;
 using Main.Core.Entities;
 using Main.Core.Interfaces.DbRepositories;
 using MediatR;
@@ -12,7 +14,7 @@ namespace Main.Application.Handlers.Producers.AddOtherName;
 [Transactional]
 public record AddOtherNameCommand(int ProducerId, string OtherName, string? WhereUsed) : ICommand<Unit>;
 
-public class AddOtherNameHandler(IProducerRepository producerRepository, IUnitOfWork unitOfWork)
+public class AddOtherNameHandler(IProducerRepository producerRepository, IUnitOfWork unitOfWork, DbDataValidatorBase dbValidator)
     : ICommandHandler<AddOtherNameCommand>
 {
     public async Task<Unit> Handle(AddOtherNameCommand request, CancellationToken cancellationToken)
@@ -38,7 +40,8 @@ public class AddOtherNameHandler(IProducerRepository producerRepository, IUnitOf
     private async Task ValidateData(int producerId, string otherName, string? whereUsed,
         CancellationToken cancellationToken = default)
     {
-        await producerRepository.EnsureProducersExists([producerId], cancellationToken);
+        var plan = new ValidationPlan().EnsureProducerExists(producerId);
+        await dbValidator.Validate(plan, true, true, cancellationToken);
         if (await producerRepository.OtherNameIsTaken(otherName, producerId, whereUsed, cancellationToken))
             throw new SameProducerOtherNameExistsException();
     }

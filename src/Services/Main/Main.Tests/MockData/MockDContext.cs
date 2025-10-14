@@ -26,7 +26,7 @@ public static class MockDContext
 
     public static async Task AddArticleCross(this DContext context, int leftId, int rightId)
     {
-        await context.Database.ExecuteSqlRawAsync($"""
+        await context.Database.ExecuteSqlAsync($"""
                                                    INSERT INTO article_crosses (article_id, article_cross_id) 
                                                    values ({leftId}, {rightId})
                                                    """);

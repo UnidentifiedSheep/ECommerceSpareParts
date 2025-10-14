@@ -5,6 +5,8 @@ using Core.Interfaces;
 using Core.Interfaces.Services;
 using Main.Application.Extensions;
 using Main.Application.Notifications;
+using Main.Application.Validation;
+using Main.Core.Abstractions;
 using Main.Core.Entities;
 using Main.Core.Enums;
 using Main.Core.Interfaces.DbRepositories;
@@ -21,11 +23,9 @@ public record RestoreContentCommand(
     Guid UserId) : ICommand;
 
 public class RestoreContentHandler(
-    ICurrencyRepository currencyRepository,
-    IUserRepository usersRepository,
+    DbDataValidatorBase dbValidator,
     IStorageContentRepository contentRepository,
     IArticlesRepository articlesRepository,
-    IStoragesRepository storagesRepository,
     IArticlesService articlesService,
     IUnitOfWork unitOfWork,
     ICurrencyConverter currencyConverter,
@@ -87,9 +87,11 @@ public class RestoreContentHandler(
     private async Task ValidateData(Guid userId, IEnumerable<int> articleIds, IEnumerable<int> currencyIds,
         IEnumerable<string> storageIds, CancellationToken cancellationToken = default)
     {
-        await currencyRepository.EnsureCurrenciesExists(currencyIds, cancellationToken);
-        await usersRepository.EnsureUsersExists([userId], cancellationToken);
-        await storagesRepository.EnsureStoragesExists(storageIds, cancellationToken);
+        var plan = new ValidationPlan()
+            .EnsureCurrencyExists(currencyIds)
+            .EnsureUserExists(userId)
+            .EnsureStorageExists(storageIds);
+        await dbValidator.Validate(plan, true, true, cancellationToken);
         await articlesRepository.EnsureArticlesExistForUpdate(articleIds, false, cancellationToken);
     }
 

@@ -1,4 +1,5 @@
 using Core.Interfaces.Services;
+using Main.Core.Interfaces;
 using Main.Core.Interfaces.DbRepositories;
 using Main.Persistence.Context;
 using Main.Persistence.Repositories;
@@ -12,6 +13,7 @@ public static class ServiceProvider
     public static IServiceCollection AddPersistenceLayer(this IServiceCollection collection, string connectionString)
     {
         collection.AddDbContext<DContext>(options => options.UseNpgsql(connectionString));
+        collection.AddScoped<ICombinedDataLoader, CombinedDataLoader>();
 
         collection.AddScoped<IUserVehicleRepository, UserVehicleRepository>();
         collection.AddScoped<IUserRepository, UserRepository>();

@@ -3,6 +3,8 @@ using Core.Attributes;
 using Core.Interfaces.Services;
 using Exceptions.Exceptions.Purchase;
 using Main.Application.Extensions;
+using Main.Application.Validation;
+using Main.Core.Abstractions;
 using Main.Core.Dtos.Amw.Purchase;
 using Main.Core.Entities;
 using Main.Core.Interfaces.DbRepositories;
@@ -27,9 +29,7 @@ public record EditPurchaseCommand(
 /// </param>
 public record EditPurchaseResult(Dictionary<int, Dictionary<decimal, int>> EditedCounts);
 
-public class EditPurchaseHandler(
-    IUserRepository usersRepository,
-    ICurrencyRepository currencyRepository,
+public class EditPurchaseHandler(DbDataValidatorBase dbValidator,
     IPurchaseRepository purchaseRepository,
     IUnitOfWork unitOfWork) : ICommandHandler<EditPurchaseCommand, EditPurchaseResult>
 {
@@ -122,7 +122,10 @@ public class EditPurchaseHandler(
 
     private async Task ValidateData(int currencyId, Guid updatedUserId, CancellationToken cancellationToken = default)
     {
-        await usersRepository.EnsureUsersExists([updatedUserId], cancellationToken);
-        await currencyRepository.EnsureCurrenciesExists([currencyId], cancellationToken);
+        var plan = new ValidationPlan()
+            .EnsureUserExists(updatedUserId)
+            .EnsureCurrencyExists(currencyId);
+        
+        await dbValidator.Validate(plan, true, true, cancellationToken);
     }
 }

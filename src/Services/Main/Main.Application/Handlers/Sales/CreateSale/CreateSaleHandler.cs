@@ -3,9 +3,10 @@ using Application.Common.Interfaces;
 using Core.Attributes;
 using Core.Interfaces.Services;
 using Main.Application.Extensions;
+using Main.Application.Validation;
+using Main.Core.Abstractions;
 using Main.Core.Dtos.Amw.Sales;
 using Main.Core.Entities;
-using Main.Core.Interfaces.DbRepositories;
 using Main.Core.Interfaces.Services;
 using Main.Core.Models;
 using Mapster;
@@ -28,11 +29,7 @@ public record CreateSaleResult(Sale Sale);
 
 public class CreateSaleHandler(
     ISaleService saleService,
-    IBalanceRepository balanceRepository,
-    ICurrencyRepository currencyRepository,
-    IStoragesRepository storagesRepository,
-    IUserRepository usersRepository,
-    IArticlesRepository articlesRepository,
+    DbDataValidatorBase dbValidator,
     IUnitOfWork unitOfWork) : ICommandHandler<CreateSaleCommand, CreateSaleResult>
 {
     public async Task<CreateSaleResult> Handle(CreateSaleCommand request, CancellationToken cancellationToken)
@@ -115,10 +112,12 @@ public class CreateSaleHandler(
     private async Task ValidateData(string transactionId, IEnumerable<int> articleIds, int currencyId, Guid buyerId,
         Guid createdUserId, string storageName, CancellationToken cancellationToken = default)
     {
-        await balanceRepository.EnsureTransactionExists(transactionId, cancellationToken);
-        await articlesRepository.EnsureArticlesExist(articleIds, cancellationToken);
-        await currencyRepository.EnsureCurrenciesExists([currencyId], cancellationToken);
-        await usersRepository.EnsureUsersExists([buyerId, createdUserId], cancellationToken);
-        await storagesRepository.EnsureStorageExists(storageName, cancellationToken);
+        var plan = new ValidationPlan()
+            .EnsureTransactionExists(transactionId)
+            .EnsureArticleExists(articleIds)
+            .EnsureCurrencyExists(currencyId)
+            .EnsureUserExists([buyerId, createdUserId])
+            .EnsureStorageExists(storageName);
+        await dbValidator.Validate(plan, true, true, cancellationToken);
     }
 }

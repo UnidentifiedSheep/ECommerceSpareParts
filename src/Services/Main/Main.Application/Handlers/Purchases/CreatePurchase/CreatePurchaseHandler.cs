@@ -2,6 +2,8 @@ using Application.Common.Interfaces;
 using Core.Attributes;
 using Core.Interfaces.Services;
 using Main.Application.Extensions;
+using Main.Application.Validation;
+using Main.Core.Abstractions;
 using Main.Core.Dtos.Amw.Purchase;
 using Main.Core.Entities;
 using Main.Core.Interfaces.DbRepositories;
@@ -22,12 +24,7 @@ public record CreatePurchaseCommand(
 
 public record CreatePurchaseResult(Purchase Purchase);
 
-public class CreatePurchaseHandler(
-    IUserRepository usersRepository,
-    ICurrencyRepository currencyRepository,
-    IBalanceRepository balanceRepository,
-    IStoragesRepository storagesRepository,
-    IArticlesRepository articlesRepository,
+public class CreatePurchaseHandler(DbDataValidatorBase dbValidator,
     IUnitOfWork unitOfWork) : ICommandHandler<CreatePurchaseCommand, CreatePurchaseResult>
 {
     public async Task<CreatePurchaseResult> Handle(CreatePurchaseCommand request, CancellationToken cancellationToken)
@@ -63,10 +60,13 @@ public class CreatePurchaseHandler(
     private async Task ValidateData(IEnumerable<Guid> userIds, int currencyId, string storageName,
         string transactionId, IEnumerable<int> articleIds, CancellationToken cancellationToken = default)
     {
-        await usersRepository.EnsureUsersExists(userIds, cancellationToken);
-        await currencyRepository.EnsureCurrenciesExists([currencyId], cancellationToken);
-        await balanceRepository.EnsureTransactionExists(transactionId, cancellationToken);
-        await storagesRepository.EnsureStorageExists(storageName, cancellationToken);
-        await articlesRepository.EnsureArticlesExist(articleIds, cancellationToken);
+        var plan = new ValidationPlan()
+            .EnsureUserExists(userIds)
+            .EnsureCurrencyExists(currencyId)
+            .EnsureTransactionExists(transactionId)
+            .EnsureStorageExists(storageName)
+            .EnsureArticleExists(articleIds);
+        
+        await dbValidator.Validate(plan, true, true, cancellationToken);
     }
 }

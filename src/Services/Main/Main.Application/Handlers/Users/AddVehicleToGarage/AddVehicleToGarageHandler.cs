@@ -2,6 +2,8 @@ using Application.Common.Interfaces;
 using Core.Interfaces.Services;
 using Exceptions.Exceptions.Vehicles;
 using Main.Application.Extensions;
+using Main.Application.Validation;
+using Main.Core.Abstractions;
 using Main.Core.Dtos.Member.Vehicles;
 using Main.Core.Entities;
 using Main.Core.Interfaces.DbRepositories;
@@ -13,9 +15,9 @@ namespace Main.Application.Handlers.Users.AddVehicleToGarage;
 public record AddVehicleToGarageCommand(VehicleDto Vehicle, Guid UserId) : ICommand<Unit>;
 
 public class AddVehicleToGarageHandler(
+    DbDataValidatorBase dbValidator,
     IUserVehicleRepository vehicleRepository,
-    IUnitOfWork unitOfWork,
-    IUserRepository usersRepository) : ICommandHandler<AddVehicleToGarageCommand, Unit>
+    IUnitOfWork unitOfWork) : ICommandHandler<AddVehicleToGarageCommand, Unit>
 {
     public async Task<Unit> Handle(AddVehicleToGarageCommand request, CancellationToken cancellationToken)
     {
@@ -35,7 +37,8 @@ public class AddVehicleToGarageHandler(
     private async Task ValidateData(string? vin, string plateNumber, Guid userId,
         CancellationToken cancellationToken = default)
     {
-        await usersRepository.EnsureUsersExists([userId], cancellationToken);
+        var plan = new ValidationPlan().EnsureUserExists(userId);
+        await dbValidator.Validate(plan, true, true, cancellationToken);
         if (!string.IsNullOrWhiteSpace(vin) && await vehicleRepository.VehicleVinCodeTaken(vin, cancellationToken))
             throw new VinCodeAlreadyTakenException(vin);
         if (await vehicleRepository.VehiclePlateNumberTaken(plateNumber, cancellationToken))

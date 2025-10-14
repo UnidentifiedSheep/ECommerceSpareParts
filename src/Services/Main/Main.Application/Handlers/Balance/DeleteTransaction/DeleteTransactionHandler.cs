@@ -5,6 +5,8 @@ using Core.Attributes;
 using Core.Interfaces.Services;
 using Exceptions.Exceptions.Balances;
 using Main.Application.Extensions;
+using Main.Application.Validation;
+using Main.Core.Abstractions;
 using Main.Core.Entities;
 using Main.Core.Enums;
 using Main.Core.Interfaces.DbRepositories;
@@ -19,7 +21,7 @@ public record DeleteTransactionCommand(string TransactionId, Guid WhoDeleteUserI
 
 public class DeleteTransactionHandler(
     IBalanceRepository balanceRepository,
-    IUserRepository usersRepository,
+    DbDataValidatorBase dbValidator,
     IUnitOfWork unitOfWork,
     IBalanceService balanceService) : ICommandHandler<DeleteTransactionCommand, Unit>
 {
@@ -54,6 +56,8 @@ public class DeleteTransactionHandler(
             throw new TransactionAlreadyDeletedException(transaction.Id);
         if (!isSystem && !AllowedStatuses.Contains(transaction.Status))
             throw new BadTransactionStatusException(transaction.Status);
-        await usersRepository.EnsureUsersExists([whoDeletedUserId], ct);
+        
+        var plan = new ValidationPlan().EnsureUserExists(whoDeletedUserId);
+        await dbValidator.Validate(plan, true, true, ct);
     }
 }

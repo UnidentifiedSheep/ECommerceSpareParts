@@ -180,7 +180,7 @@ public static class MapsterConfig
             .Map(dest => dest.Name, src => src.Name)
             .Map(dest => dest.Description, src => src.Description);
         TypeAdapterConfig<NewProducerDto, Producer>.NewConfig()
-            .Map(d => d.Name, s => s.ProducerName.Trim())
+            .Map(d => d.Name, s => s.ProducerName.ToNormalized())
             .Map(d => d.IsOe, s => s.IsOe)
             .Map(d => d.Description, s => string.IsNullOrWhiteSpace(s.Description) ? null : s.Description.Trim());
         TypeAdapterConfig<ProducersOtherName, ProducerOtherNameDto>.NewConfig()

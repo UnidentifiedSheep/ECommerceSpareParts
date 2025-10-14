@@ -1,6 +1,8 @@
 using Application.Common.Interfaces;
 using Core.Models;
 using Main.Application.Extensions;
+using Main.Application.Validation;
+using Main.Core.Abstractions;
 using Main.Core.Dtos.Amw.Sales;
 using Main.Core.Interfaces.DbRepositories;
 using Mapster;
@@ -20,8 +22,7 @@ public record GetSalesResult(IEnumerable<SaleDto> Sales);
 
 public class GetSalesHandler(
     ISaleRepository saleRepository,
-    IUserRepository usersRepository,
-    ICurrencyRepository currencyRepository) : IQueryHandler<GetSalesQuery, GetSalesResult>
+    DbDataValidatorBase dbValidator) : IQueryHandler<GetSalesQuery, GetSalesResult>
 {
     public async Task<GetSalesResult> Handle(GetSalesQuery request, CancellationToken cancellationToken)
     {
@@ -35,9 +36,11 @@ public class GetSalesHandler(
 
     private async Task ValidateData(Guid? buyerId, int? currencyId, CancellationToken cancellationToken = default)
     {
+        var plan = new ValidationPlan();
         if (buyerId != null)
-            await usersRepository.EnsureUsersExists([buyerId.Value], cancellationToken);
+            plan.EnsureUserExists(buyerId.Value);
         if (currencyId != null)
-            await currencyRepository.EnsureCurrenciesExists([currencyId.Value], cancellationToken);
+            plan.EnsureCurrencyExists(currencyId.Value);
+        await dbValidator.Validate(plan, true, true, cancellationToken);
     }
 }

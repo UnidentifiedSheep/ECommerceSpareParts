@@ -3,6 +3,8 @@ using Core.Attributes;
 using Core.Interfaces.Services;
 using Exceptions.Exceptions.Sales;
 using Main.Application.Extensions;
+using Main.Application.Validation;
+using Main.Core.Abstractions;
 using Main.Core.Dtos.Amw.Sales;
 using Main.Core.Entities;
 using Main.Core.Interfaces.DbRepositories;
@@ -26,8 +28,7 @@ public record EditSaleCommand(
     string? Comment) : ICommand;
 
 public class EditSaleHandler(
-    ICurrencyRepository currencyRepository,
-    IUserRepository usersRepository,
+    DbDataValidatorBase dbValidator,
     IUnitOfWork unitOfWork,
     ISaleService saleService,
     ISaleRepository saleRepository,
@@ -159,7 +160,9 @@ public class EditSaleHandler(
 
     private async Task ValidateData(Guid userId, int currencyId, CancellationToken cancellationToken = default)
     {
-        await usersRepository.EnsureUsersExists([userId], cancellationToken);
-        await currencyRepository.EnsureCurrenciesExists([currencyId], cancellationToken);
+        var plan = new ValidationPlan()
+            .EnsureUserExists(userId)
+            .EnsureCurrencyExists(currencyId);
+        await dbValidator.Validate(plan, true, true, cancellationToken);
     }
 }

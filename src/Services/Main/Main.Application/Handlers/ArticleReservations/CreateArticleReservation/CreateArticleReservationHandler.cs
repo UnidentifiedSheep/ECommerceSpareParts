@@ -1,7 +1,12 @@
 using Application.Common.Interfaces;
 using Core.Attributes;
 using Core.Interfaces.Services;
+using Exceptions.Exceptions.Articles;
+using Exceptions.Exceptions.Currencies;
+using Exceptions.Exceptions.Users;
 using Main.Application.Extensions;
+using Main.Application.Validation;
+using Main.Core.Abstractions;
 using Main.Core.Dtos.Amw.ArticleReservations;
 using Main.Core.Entities;
 using Main.Core.Interfaces.DbRepositories;
@@ -18,6 +23,7 @@ public class CreateArticleReservationHandler(
     IArticlesRepository articlesRepository,
     IUserRepository usersRepository,
     ICurrencyRepository currencyRepository,
+    DbDataValidatorBase dbValidator,
     IUnitOfWork unitOfWork) : ICommandHandler<CreateArticleReservationCommand>
 {
     public async Task<Unit> Handle(CreateArticleReservationCommand request, CancellationToken cancellationToken)
@@ -49,8 +55,10 @@ public class CreateArticleReservationHandler(
     private async Task CheckIfNeededExists(IEnumerable<int> currencyIds, IEnumerable<int> articleIds,
         IEnumerable<Guid> userIds, CancellationToken cancellationToken = default)
     {
-        await currencyRepository.EnsureCurrenciesExists(currencyIds, cancellationToken);
-        await usersRepository.EnsureUsersExists(userIds, cancellationToken);
-        await articlesRepository.EnsureArticlesExist(articleIds, cancellationToken);
+        var plan = new ValidationPlan()
+            .EnsureCurrencyExists(currencyIds)
+            .EnsureUserExists(userIds)
+            .EnsureArticleExists(articleIds);
+        await dbValidator.Validate(plan, true, true, cancellationToken);
     }
 }

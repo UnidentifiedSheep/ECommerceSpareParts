@@ -10,6 +10,7 @@ using Hangfire;
 using Hangfire.PostgreSql;
 using Integrations;
 using Mail;
+using Main.Api.EndPoints.Articles;
 using Main.Application;
 using Main.Application.BackgroundServices;
 using Main.Application.Configs;
@@ -154,7 +155,7 @@ builder.Services.AddAuthorizationBuilder()
     .SetDefaultPolicy(new AuthorizationPolicyBuilder(JwtBearerDefaults.AuthenticationScheme).RequireAuthenticatedUser()
         .Build());
 
-builder.Services.AddCarter();
+
 builder.Services.AddExceptionHandler<CustomExceptionHandler>();
 
 
@@ -181,6 +182,8 @@ builder.Services.AddCors(options =>
     });
 });
 
+var endpointAssembly = typeof(AddArticleContentEndPoint).Assembly;
+builder.Services.AddCarter(new DependencyContextAssemblyCatalog(endpointAssembly));
 
 var app = builder.Build();
 
@@ -196,11 +199,14 @@ SortByConfig.Configure();
 
 await SetupPrice(app.Services);
 
+app.UseRouting();
 app.UseCors();
 app.UseExceptionHandler(_ => { });
 app.UseAuthentication();
 app.UseAuthorization();
+
 app.MapCarter();
+
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {
@@ -217,8 +223,9 @@ RecurringJob.AddOrUpdate<UpdateCurrencyRate>("UpdateCurrencyTask",
 
 app.UseOpenTelemetryPrometheusScrapingEndpoint();
 
-
 app.Run();
+
+
 return;
 
 async Task SetupPrice(IServiceProvider serviceProvider)

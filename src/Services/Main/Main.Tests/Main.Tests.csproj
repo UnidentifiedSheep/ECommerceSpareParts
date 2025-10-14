@@ -31,7 +31,6 @@
         <ProjectReference Include="..\..\..\Core\Exceptions\Exceptions.csproj"/>
         <ProjectReference Include="..\..\..\Infrastructure\Integrations\Integrations.csproj"/>
         <ProjectReference Include="..\..\..\Infrastructure\Mail\Mail.csproj"/>
-        <ProjectReference Include="..\..\..\Infrastructure\Main.Persistence\Main.Persistence.csproj" />
         <ProjectReference Include="..\..\..\Infrastructure\RabbitMq\RabbitMq.csproj"/>
         <ProjectReference Include="..\..\..\Infrastructure\Redis\Redis.csproj"/>
         <ProjectReference Include="..\..\..\Infrastructure\Security\Security.csproj"/>

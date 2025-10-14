@@ -5,6 +5,8 @@ using Core.Interfaces;
 using Core.Interfaces.Services;
 using Main.Application.Extensions;
 using Main.Application.Notifications;
+using Main.Application.Validation;
+using Main.Core.Abstractions;
 using Main.Core.Dtos.Amw.Storage;
 using Main.Core.Entities;
 using Main.Core.Enums;
@@ -23,9 +25,7 @@ public record AddContentCommand(
     StorageMovementType MovementType) : ICommand;
 
 public class AddContentHandler(
-    ICurrencyRepository currencyRepository,
-    IStoragesRepository storagesRepository,
-    IUserRepository usersRepository,
+    DbDataValidatorBase dbValidator,
     IArticlesRepository articlesRepository,
     IUnitOfWork unitOfWork,
     ICurrencyConverter currencyConverter,
@@ -70,12 +70,14 @@ public class AddContentHandler(
     }
 
     private async Task ValidateData(IEnumerable<int> articleIds, IEnumerable<int> currencyIds, string storageName,
-        Guid userId,
-        CancellationToken cancellationToken = default)
+        Guid userId, CancellationToken cancellationToken = default)
     {
-        await currencyRepository.EnsureCurrenciesExists(currencyIds, cancellationToken);
+        var plan = new ValidationPlan()
+            .EnsureCurrencyExists(currencyIds)
+            .EnsureStorageExists(storageName)
+            .EnsureUserExists(userId);
+
+        await dbValidator.Validate(plan, true, true, cancellationToken);
         await articlesRepository.EnsureArticlesExistForUpdate(articleIds, false, cancellationToken);
-        await storagesRepository.EnsureStorageExists(storageName, cancellationToken);
-        await usersRepository.EnsureUsersExists([userId], cancellationToken);
     }
 }

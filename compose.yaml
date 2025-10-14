@@ -1,16 +1,26 @@
 ﻿services:
-  analytics.api:
-    image: analytics.api
-    build:
-      context: .
-      dockerfile: Analytics.Api/Dockerfile
-    ports:
-      - "57004:7268"
-
   main.api:
     image: main.api
     build:
       context: .
-      dockerfile: Main.Api/Dockerfile
+      dockerfile: src/Services/Main/Main.Api/Dockerfile
     ports:
       - "57005:7292"
+    volumes:
+      - ./certs/localhost.pfx:/app/certs/localhost.pfx:ro
+    environment:
+      - ASPNETCORE_Kestrel__Certificates__Default__Path=/app/certs/localhost.pfx
+      - ASPNETCORE_Kestrel__Certificates__Default__Password=PleasKillMe.21
+
+  analytics.api:
+    image: analytics.api
+    build:
+      context: .
+      dockerfile: src/Services/Analytics/Analytics.Api/Dockerfile
+    ports:
+      - "57004:7292"
+    volumes:
+      - ./certs/localhost.pfx:/app/certs/localhost.pfx:ro
+    environment:
+      - ASPNETCORE_Kestrel__Certificates__Default__Path=/app/certs/localhost.pfx
+      - ASPNETCORE_Kestrel__Certificates__Default__Password=PleasKillMe.21

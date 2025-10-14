@@ -3,6 +3,8 @@ using Core.Attributes;
 using Core.Interfaces.Services;
 using Exceptions.Exceptions.ArticleReservations;
 using Main.Application.Extensions;
+using Main.Application.Validation;
+using Main.Core.Abstractions;
 using Main.Core.Dtos.Amw.ArticleReservations;
 using Main.Core.Interfaces.DbRepositories;
 using Mapster;
@@ -16,9 +18,7 @@ public record EditArticleReservationCommand(int ReservationId, EditArticleReserv
 
 public class EditArticleReservationHandler(
     IArticleReservationRepository reservationRepository,
-    IUserRepository usersRepository,
-    ICurrencyRepository currencyRepository,
-    IArticlesRepository articlesRepository,
+    DbDataValidatorBase dbValidator,
     IUnitOfWork unitOfWork) : ICommandHandler<EditArticleReservationCommand>
 {
     public async Task<Unit> Handle(EditArticleReservationCommand request, CancellationToken cancellationToken)
@@ -36,9 +36,10 @@ public class EditArticleReservationHandler(
     private async Task EnsureNeededExists(int articleId, int? currencyId, Guid userId,
         CancellationToken cancellationToken = default)
     {
-        await articlesRepository.EnsureArticlesExist([articleId], cancellationToken);
+        var plan = new ValidationPlan()
+            .EnsureArticleExists(articleId);
         if (currencyId != null)
-            await currencyRepository.EnsureCurrenciesExists([currencyId.Value], cancellationToken);
-        await usersRepository.EnsureUsersExists([userId], cancellationToken);
+            plan.EnsureCurrencyExists(currencyId.Value);
+        await dbValidator.Validate(plan, true, true, cancellationToken);
     }
 }

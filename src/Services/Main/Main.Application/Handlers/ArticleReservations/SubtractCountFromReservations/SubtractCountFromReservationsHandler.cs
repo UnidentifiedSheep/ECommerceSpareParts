@@ -2,6 +2,8 @@ using Application.Common.Interfaces;
 using Core.Attributes;
 using Core.Interfaces.Services;
 using Main.Application.Extensions;
+using Main.Application.Validation;
+using Main.Core.Abstractions;
 using Main.Core.Interfaces.DbRepositories;
 
 namespace Main.Application.Handlers.ArticleReservations.SubtractCountFromReservations;
@@ -16,6 +18,7 @@ public record SubtractCountFromReservationsResult(Dictionary<int, int> NotFoundR
 public class SubtractCountFromReservationsHandler(
     IArticleReservationRepository reservationRepository,
     IUserRepository usersRepository,
+    DbDataValidatorBase dbValidator,
     IUnitOfWork unitOfWork) : ICommandHandler<SubtractCountFromReservationsCommand, SubtractCountFromReservationsResult>
 {
     public async Task<SubtractCountFromReservationsResult> Handle(SubtractCountFromReservationsCommand request,
@@ -61,6 +64,7 @@ public class SubtractCountFromReservationsHandler(
 
     private async Task EnsureDataExists(IEnumerable<Guid> userIds, CancellationToken cancellationToken = default)
     {
-        await usersRepository.EnsureUsersExists(userIds, cancellationToken);
+        var plan = new ValidationPlan().EnsureUserExists(userIds);
+        await dbValidator.Validate(plan, true, true, cancellationToken);
     }
 }

@@ -5,6 +5,8 @@ using Core.Interfaces.Services;
 using Exceptions.Exceptions.Storages;
 using Main.Application.Extensions;
 using Main.Application.Notifications;
+using Main.Application.Validation;
+using Main.Core.Abstractions;
 using Main.Core.Entities;
 using Main.Core.Enums;
 using Main.Core.Interfaces.DbRepositories;
@@ -26,10 +28,9 @@ public record RemoveContentCommand(
 public record RemoveContentResult(IEnumerable<PrevAndNewValue<StorageContent>> Changes);
 
 public class RemoveContentHandler(
-    IUserRepository usersRepository,
+    DbDataValidatorBase dbValidator,
     IStorageContentRepository contentRepository,
     IArticlesRepository articlesRepository,
-    IStoragesRepository storagesRepository,
     IArticlesService articlesService,
     IUnitOfWork unitOfWork,
     IMediator mediator) : ICommandHandler<RemoveContentCommand, RemoveContentResult>
@@ -108,9 +109,12 @@ public class RemoveContentHandler(
     private async Task ValidateData(bool takeFromOtherStorages, string? storageName, IEnumerable<int> articleIds,
         Guid userId, CancellationToken cancellationToken = default)
     {
+        var plan = new ValidationPlan()
+            .EnsureUserExists(userId);
         if (!takeFromOtherStorages && !string.IsNullOrWhiteSpace(storageName))
-            await storagesRepository.EnsureStorageExists(storageName, cancellationToken);
-        await usersRepository.EnsureUsersExists([userId], cancellationToken);
+            plan.EnsureStorageExists(storageName);
+        
+        await dbValidator.Validate(plan, true, true, cancellationToken);
         await articlesRepository.EnsureArticlesExistForUpdate(articleIds, false, cancellationToken);
     }
 

@@ -1,6 +1,9 @@
 using Application.Common.Interfaces;
 using Core.Models;
+using Main.Application.Validation;
+using Main.Core.Entities;
 using Main.Core.Enums;
+using Main.Core.Interfaces;
 using Main.Core.Interfaces.DbRepositories;
 using Mapster;
 
@@ -16,8 +19,8 @@ public record GetArticlesQuery<TDto>(
 
 public record GetArticlesResult<TDto>(IEnumerable<TDto> Articles);
 
-public class GetArticlesHandler<TDto>(IArticlesRepository articlesRepository)
-    : IQueryHandler<GetArticlesQuery<TDto>, GetArticlesResult<TDto>>
+public class GetArticlesHandler<TDto>(IArticlesRepository articlesRepository,
+    ICombinedDataLoader combinedDataLoader) : IQueryHandler<GetArticlesQuery<TDto>, GetArticlesResult<TDto>>
 {
     public async Task<GetArticlesResult<TDto>> Handle(GetArticlesQuery<TDto> request,
         CancellationToken cancellationToken)

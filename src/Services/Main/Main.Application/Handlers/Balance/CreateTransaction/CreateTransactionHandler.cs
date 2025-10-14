@@ -4,6 +4,8 @@ using Core.Attributes;
 using Core.Interfaces.Services;
 using Exceptions.Exceptions.Balances;
 using Main.Application.Extensions;
+using Main.Application.Validation;
+using Main.Core.Abstractions;
 using Main.Core.Entities;
 using Main.Core.Enums;
 using Main.Core.Interfaces.DbRepositories;
@@ -25,8 +27,7 @@ public record CreateTransactionResult(Transaction Transaction);
 
 public class CreateTransactionHandler(
     IBalanceRepository balanceRepository,
-    ICurrencyRepository currencyRepository,
-    IUserRepository usersRepository,
+    DbDataValidatorBase dbValidator,
     IBalanceService balanceService,
     IUnitOfWork unitOfWork) : ICommandHandler<CreateTransactionCommand, CreateTransactionResult>
 {
@@ -64,11 +65,12 @@ public class CreateTransactionHandler(
         DateTime transactionDateTime,
         int currencyId, CancellationToken cancellationToken = default)
     {
-        if (await balanceRepository.TransactionExistsAsync(senderId, receiverId, transactionDateTime, null,
-                cancellationToken))
+        if (await balanceRepository.TransactionExistsAsync(senderId, receiverId, transactionDateTime, null, cancellationToken))
             throw new SameTransactionExists();
-        await currencyRepository.EnsureCurrenciesExists([currencyId], cancellationToken);
-        await usersRepository.EnsureUsersExists([senderId, receiverId, whoCreatedTransaction], cancellationToken);
+        var plan = new ValidationPlan()
+            .EnsureCurrencyExists(currencyId)
+            .EnsureUserExists([senderId, receiverId, whoCreatedTransaction]);
+        await dbValidator.Validate(plan, true, true, cancellationToken);
     }
 
     private Transaction CreateTransaction(Guid senderId, Guid receiverId, int currencyId,

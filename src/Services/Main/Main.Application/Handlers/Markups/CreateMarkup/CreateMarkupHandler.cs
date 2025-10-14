@@ -5,9 +5,10 @@ using Core.Models;
 using IntervalMap.Core.Models;
 using IntervalMap.Variations;
 using Main.Application.Extensions;
+using Main.Application.Validation;
+using Main.Core.Abstractions;
 using Main.Core.Dtos.Amw.Markups;
 using Main.Core.Entities;
-using Main.Core.Interfaces.DbRepositories;
 using Mapster;
 
 namespace Main.Application.Handlers.Markups.CreateMarkup;
@@ -21,7 +22,7 @@ public record CreateMarkupCommand(
 
 public record CreateMarkupResult(int GroupId);
 
-public class CreateMarkupHandler(ICurrencyRepository currencyRepository, IUnitOfWork unitOfWork)
+public class CreateMarkupHandler(DbDataValidatorBase dbValidator, IUnitOfWork unitOfWork)
     : ICommandHandler<CreateMarkupCommand, CreateMarkupResult>
 {
     public async Task<CreateMarkupResult> Handle(CreateMarkupCommand request, CancellationToken cancellationToken)
@@ -80,6 +81,7 @@ public class CreateMarkupHandler(ICurrencyRepository currencyRepository, IUnitOf
 
     private async Task ValidateData(int currencyId, CancellationToken cancellationToken = default)
     {
-        await currencyRepository.EnsureCurrenciesExists([currencyId], cancellationToken);
+        var plan = new ValidationPlan().EnsureCurrencyExists(currencyId);
+        await dbValidator.Validate(plan, true, true, cancellationToken);
     }
 }

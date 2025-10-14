@@ -2,6 +2,7 @@ using Application.Common;
 using Application.Common.Behaviors;
 using Application.Common.Factories;
 using Application.Common.Interfaces;
+using Application.Common.Validators;
 using Core.Abstractions;
 using Core.Interfaces;
 using Core.Interfaces.CacheRepositories;
@@ -15,7 +16,8 @@ using Main.Application.HangFireTasks;
 using Main.Application.Pricing;
 using Main.Application.RelatedData;
 using Main.Application.Services;
-using Main.Application.Validators;
+using Main.Application.Validation;
+using Main.Core.Abstractions;
 using Main.Core.Entities;
 using Main.Core.Interfaces.Pricing;
 using Main.Core.Interfaces.Services;
@@ -42,7 +44,8 @@ public static class ServiceProvider
         collection.AddSingleton<ICurrencyConverter, CurrencyConverter>(_ => new CurrencyConverter(Global.UsdId));
         collection.AddSingleton<IPriceGenerator, PriceGenerator>();
         collection.AddScoped<IPriceSetup, PriceSetup>();
-
+        collection.AddScoped<DbDataValidatorBase, DbDataValidator>();
+        
         collection.AddScoped<IArticlePricesService, ArticlePricesService>();
         collection.AddScoped<IArticlesService, ArticlesService>();
         collection.AddScoped<IBalanceService, BalanceService>();

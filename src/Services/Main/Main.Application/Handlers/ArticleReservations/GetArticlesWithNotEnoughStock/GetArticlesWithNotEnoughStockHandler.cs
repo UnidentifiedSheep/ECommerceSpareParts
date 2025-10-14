@@ -1,5 +1,7 @@
 using Application.Common.Interfaces;
 using Main.Application.Extensions;
+using Main.Application.Validation;
+using Main.Core.Abstractions;
 using Main.Core.Interfaces.DbRepositories;
 
 namespace Main.Application.Handlers.ArticleReservations.GetArticlesWithNotEnoughStock;
@@ -22,9 +24,7 @@ public record GetArticlesWithNotEnoughStockResult(
     Dictionary<int, int> NotEnoughByStock);
 
 public class GetArticlesWithNotEnoughStockHandler(
-    IUserRepository usersRepository,
-    IArticlesRepository articlesRepository,
-    IStoragesRepository storagesRepository,
+    DbDataValidatorBase dbValidator,
     IStorageContentRepository storageContentRepository,
     IArticleReservationRepository reservationRepository)
     : IQueryHandler<GetArticlesWithNotEnoughStockQuery, GetArticlesWithNotEnoughStockResult>
@@ -71,8 +71,10 @@ public class GetArticlesWithNotEnoughStockHandler(
     private async Task EnsureDataExists(string storageName, Guid userId, IEnumerable<int> articleIds,
         CancellationToken cancellationToken = default)
     {
-        await storagesRepository.EnsureStorageExists(storageName, cancellationToken);
-        await usersRepository.EnsureUsersExists([userId], cancellationToken);
-        await articlesRepository.EnsureArticlesExist(articleIds, cancellationToken);
+        var plan = new ValidationPlan()
+            .EnsureStorageExists(storageName)
+            .EnsureUserExists(userId)
+            .EnsureArticleExists(articleIds);
+        await dbValidator.Validate(plan, true, true, cancellationToken);
     }
 }

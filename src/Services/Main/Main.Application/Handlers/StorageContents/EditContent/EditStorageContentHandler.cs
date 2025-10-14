@@ -7,6 +7,8 @@ using Exceptions.Base;
 using Exceptions.Exceptions.Storages;
 using Main.Application.Extensions;
 using Main.Application.Notifications;
+using Main.Application.Validation;
+using Main.Core.Abstractions;
 using Main.Core.Dtos.Amw.Storage;
 using Main.Core.Entities;
 using Main.Core.Enums;
@@ -23,15 +25,13 @@ public record EditStorageContentCommand(
     Guid UserId) : ICommand;
 
 public class EditStorageContentHandler(
+    DbDataValidatorBase dbValidator,
     IStorageContentRepository storageContentRepository,
     IUnitOfWork unitOfWork,
     IConcurrencyValidator<StorageContent> concurrencyValidator,
     ICurrencyConverter currencyConverter,
     IMediator mediator,
-    IArticlesService articlesService,
-    IStoragesRepository storagesRepository,
-    ICurrencyRepository currencyRepository,
-    IUserRepository usersRepository) : ICommandHandler<EditStorageContentCommand>
+    IArticlesService articlesService) : ICommandHandler<EditStorageContentCommand>
 {
     public async Task<Unit> Handle(EditStorageContentCommand request, CancellationToken cancellationToken)
     {
@@ -115,8 +115,11 @@ public class EditStorageContentHandler(
                 currencyIds.Add(value.CurrencyId.Value);
         }
 
-        await usersRepository.EnsureUsersExists([userId], cancellationToken);
-        await currencyRepository.EnsureCurrenciesExists(currencyIds, cancellationToken);
-        await storagesRepository.EnsureStoragesExists(storageIds, cancellationToken);
+        var plan = new ValidationPlan()
+            .EnsureUserExists(userId)
+            .EnsureCurrencyExists(currencyIds)
+            .EnsureStorageExists(storageIds);
+        
+        await dbValidator.Validate(plan, true, true, cancellationToken);
     }
 }

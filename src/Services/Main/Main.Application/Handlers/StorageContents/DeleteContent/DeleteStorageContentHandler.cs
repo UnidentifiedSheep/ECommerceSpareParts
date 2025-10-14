@@ -7,6 +7,8 @@ using Exceptions.Base;
 using Exceptions.Exceptions.Storages;
 using Main.Application.Extensions;
 using Main.Application.Notifications;
+using Main.Application.Validation;
+using Main.Core.Abstractions;
 using Main.Core.Entities;
 using Main.Core.Enums;
 using Main.Core.Interfaces.DbRepositories;
@@ -20,12 +22,12 @@ namespace Main.Application.Handlers.StorageContents.DeleteContent;
 public record DeleteStorageContentCommand(int ContentId, string ConcurrencyCode, Guid UserId) : ICommand;
 
 public class DeleteStorageContentHandler(
+    DbDataValidatorBase dbValidator,
     IStorageContentRepository storageContentRepository,
     IUnitOfWork unitOfWork,
     IMediator mediator,
     IConcurrencyValidator<StorageContent> concurrencyValidator,
-    IArticlesService articlesService,
-    IUserRepository usersRepository) : ICommandHandler<DeleteStorageContentCommand>
+    IArticlesService articlesService) : ICommandHandler<DeleteStorageContentCommand>
 {
     public async Task<Unit> Handle(DeleteStorageContentCommand request, CancellationToken cancellationToken)
     {
@@ -55,7 +57,8 @@ public class DeleteStorageContentHandler(
     private async Task ValidateData(string concurrencyCode, Guid userId, StorageContent content,
         CancellationToken cancellationToken = default)
     {
-        await usersRepository.EnsureUsersExists([userId], cancellationToken);
+        var plan = new ValidationPlan().EnsureUserExists(userId);
+        await dbValidator.Validate(plan, true, true, cancellationToken);
 
         if (!concurrencyValidator.IsValid(content, concurrencyCode, out var validCode))
             throw new ConcurrencyCodeMismatchException(concurrencyCode, validCode);
