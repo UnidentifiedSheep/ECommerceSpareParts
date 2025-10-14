@@ -1,4 +1,5 @@
 using Bogus;
+using Core.Extensions;
 using Main.Application.Handlers.Producers.CreateProducer;
 using Main.Persistence.Context;
 using MediatR;
@@ -72,7 +73,7 @@ public class CreateProducerTests : IAsyncLifetime
             .AsNoTracking().FirstOrDefaultAsync(x => x.Id == result.ProducerId);
         Assert.NotNull(createdProducer);
         Assert.Equal(createdProducer.Description, newProducerModel.Description);
-        Assert.Equal(createdProducer.Name, newProducerModel.ProducerName);
+        Assert.Equal(createdProducer.Name, newProducerModel.ProducerName.ToNormalized());
         Assert.Equal(createdProducer.IsOe, newProducerModel.IsOe);
     }
 }

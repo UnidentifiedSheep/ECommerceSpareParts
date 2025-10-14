@@ -30,17 +30,12 @@ public class ExistenceCheck
     public object[] ValidateAndReturnMismatches(object[] foundValues)
     {
         var mismatches = new List<object>();
+        var foundSet = new HashSet<object>(foundValues.Select(v => Convert.ChangeType(v, KeyType)));
 
-        if (foundValues.Length == 0 && Exists)
-            mismatches.AddRange(Keys);
+        mismatches.AddRange(Exists
+            ? Keys.Where(key => !foundSet.Contains(key))
+            : foundSet.Where(found => Keys.Contains(found)));
 
-        foreach (var value in foundValues)
-        {
-            var typedValue = Convert.ChangeType(value, KeyType);
-
-            if (Exists && !Keys.Contains(typedValue) || !Exists && Keys.Contains(typedValue))
-                mismatches.Add(value);
-        }
 
         return mismatches.ToArray();
     }
