@@ -1,4 +1,6 @@
 using Application.Common.Interfaces;
+using Contracts.Currency;
+using Core.Interfaces;
 using Core.Interfaces.Services;
 using Exceptions.Exceptions.Currencies;
 using Main.Core.Entities;
@@ -12,7 +14,8 @@ public record CreateCurrencyCommand(string ShortName, string Name, string Curren
 
 public record CreateCurrencyResult(int Id);
 
-public class CreateCurrencyHandler(ICurrencyRepository currencyRepository, IUnitOfWork unitOfWork)
+public class CreateCurrencyHandler(ICurrencyRepository currencyRepository, IUnitOfWork unitOfWork,
+    IMessageBroker broker)
     : ICommandHandler<CreateCurrencyCommand, CreateCurrencyResult>
 {
     public async Task<CreateCurrencyResult> Handle(CreateCurrencyCommand request, CancellationToken cancellationToken)
@@ -21,6 +24,8 @@ public class CreateCurrencyHandler(ICurrencyRepository currencyRepository, IUnit
         var model = request.Adapt<Currency>();
         await unitOfWork.AddAsync(model, cancellationToken);
         await unitOfWork.SaveChangesAsync(cancellationToken);
+        
+        await broker.Publish(new CurrencyCreatedEvent(model.Adapt<global::Core.Models.Currency>()), cancellationToken);
         return new CreateCurrencyResult(model.Id);
     }
 

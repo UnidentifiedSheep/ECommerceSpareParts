@@ -1,3 +1,4 @@
+using Contracts.Markup;
 using Core.Interfaces;
 using Main.Application.Notifications;
 using Main.Core.Interfaces.Pricing;
@@ -10,7 +11,7 @@ public class MarkupRangesUpdatedNotificationHandler(IMessageBroker messageBroker
 {
     public async Task Handle(MarkupRangesUpdatedNotification notification, CancellationToken cancellationToken)
     {
-        await messageBroker.Publish(new Contracts.MarkupRangesUpdatedEvent(), cancellationToken);
+        await messageBroker.Publish(new MarkupRangesUpdatedEvent(), cancellationToken);
         await priceSetup.SetupAsync(cancellationToken);
     }
 }

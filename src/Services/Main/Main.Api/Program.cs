@@ -4,6 +4,8 @@ using Api.Common.ExceptionHandlers;
 using Api.Common.Logging;
 using Carter;
 using Contracts;
+using Contracts.Currency;
+using Contracts.Markup;
 using Core.Interfaces.MessageBroker;
 using Core.Models;
 using Hangfire;

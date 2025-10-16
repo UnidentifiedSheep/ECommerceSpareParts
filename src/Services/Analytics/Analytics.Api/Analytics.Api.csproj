@@ -20,4 +20,9 @@
         </Content>
     </ItemGroup>
 
+    <ItemGroup>
+      <ProjectReference Include="..\..\..\Core\Core\Core.csproj" />
+      <ProjectReference Include="..\Analytics.Application\Analytics.Application.csproj" />
+    </ItemGroup>
+
 </Project>

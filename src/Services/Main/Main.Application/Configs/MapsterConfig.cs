@@ -34,6 +34,7 @@ using MemberPurchaseDto = Main.Core.Dtos.Member.Purchase.PurchaseDto;
 using CoreUser = Core.Models.User;
 using User = Main.Core.Entities.User;
 using CoreUserInfo = Core.Models.UserInfo;
+using Currency = Main.Core.Entities.Currency;
 using UserInfo = Main.Core.Entities.UserInfo;
 
 namespace Main.Application.Configs;
@@ -457,6 +458,13 @@ public static class MapsterConfig
             .Map(x => x.Name, src => src.Name.Trim())
             .Map(x => x.CurrencySign, src => src.CurrencySign.Trim())
             .Map(x => x.ShortName, src => src.ShortName.Trim());
+
+        TypeAdapterConfig<Currency, global::Core.Models.Currency>.NewConfig()
+            .Map(d => d.Code, s => s.Code)
+            .Map(d => d.Name, s => s.Name)
+            .Map(d => d.Id, s => s.Id)
+            .Map(d => d.ShortName, s => s.ShortName)
+            .Map(d => d.CurrencySign, s => s.CurrencySign);
 
 
         //Emails

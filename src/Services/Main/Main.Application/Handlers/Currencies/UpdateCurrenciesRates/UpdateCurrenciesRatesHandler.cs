@@ -1,5 +1,6 @@
 using Application.Common.Interfaces;
 using Contracts;
+using Contracts.Currency;
 using Core.Attributes;
 using Core.Interfaces;
 using Core.Interfaces.Integrations;
@@ -27,11 +28,13 @@ public class UpdateCurrenciesRatesHandler(
         var newRates = await exchange.GetRates(currencyCodes, "USD", cancellationToken);
 
         var historyToAdd = new List<CurrencyHistory>();
+        var rates = new Dictionary<int, decimal>();
         foreach (var rate in newRates.Rates)
         {
             var currency = currencies.FirstOrDefault(x => x.Code == rate.Key);
             if (currency == null) continue;
-
+            
+            rates[currency.Id] = rate.Value;
             var prevValue = currency.CurrencyToUsd?.ToUsd ?? 0;
             if (currency.CurrencyToUsd == null)
                 currency.CurrencyToUsd = new CurrencyToUsd
@@ -54,7 +57,7 @@ public class UpdateCurrenciesRatesHandler(
 
         await unitOfWork.AddRangeAsync(historyToAdd, cancellationToken);
         await unitOfWork.SaveChangesAsync(cancellationToken);
-        await messageBroker.Publish(new CurrencyRateChangedEvent(), cancellationToken);
+        await messageBroker.Publish(new CurrencyRateChangedEvent(rates), cancellationToken);
         return Unit.Value;
     }
 }

@@ -1,5 +1,5 @@
 using Core.Interfaces;
 
-namespace Contracts;
+namespace Contracts.Markup;
 
 public record MarkupRangesUpdatedEvent : IContract;

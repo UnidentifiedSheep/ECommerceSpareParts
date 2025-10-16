@@ -5,6 +5,7 @@ using Main.Core.Dtos.Currencies;
 using Main.Core.Entities;
 using Main.Core.Interfaces.DbRepositories;
 using Mapster;
+using Currency = Main.Core.Entities.Currency;
 
 namespace Main.Application.Handlers.Currencies.GetCurrencies;
 

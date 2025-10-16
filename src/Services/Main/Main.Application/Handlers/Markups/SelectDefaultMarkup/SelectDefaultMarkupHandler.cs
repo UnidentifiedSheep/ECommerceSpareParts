@@ -1,5 +1,6 @@
 using Application.Common.Interfaces;
 using Contracts;
+using Contracts.Markup;
 using Core.Attributes;
 using Core.Interfaces;
 using Core.Interfaces.Services;

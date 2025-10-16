@@ -1,4 +1,4 @@
-using Contracts;
+using Contracts.Currency;
 using Core.Interfaces;
 using Core.Interfaces.MessageBroker;
 using Main.Core.Interfaces.DbRepositories;

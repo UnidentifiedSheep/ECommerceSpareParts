@@ -26,6 +26,7 @@ using Microsoft.Extensions.DependencyInjection;
 using AmwArticleDto = Main.Core.Dtos.Amw.Articles.ArticleDto;
 using AnonymousArticleDto = Main.Core.Dtos.Anonymous.Articles.ArticleDto;
 using AmwArticleFullDto = Main.Core.Dtos.Amw.Articles.ArticleFullDto;
+using Currency = Main.Core.Entities.Currency;
 using MemberArticleFullDto = Main.Core.Dtos.Member.Articles.ArticleFullDto;
 
 namespace Main.Application;
