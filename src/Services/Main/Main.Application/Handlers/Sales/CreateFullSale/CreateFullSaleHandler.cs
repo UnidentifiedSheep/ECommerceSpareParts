@@ -1,6 +1,8 @@
 using System.Text;
 using Application.Common.Interfaces;
+using Contracts.Sale;
 using Core.Attributes;
+using Core.Interfaces;
 using Core.Interfaces.Services;
 using Core.StaticFunctions;
 using Exceptions.Exceptions.Sales;
@@ -17,6 +19,7 @@ using Main.Core.Entities;
 using Main.Core.Enums;
 using Main.Core.Interfaces.DbRepositories;
 using Main.Core.Models;
+using Mapster;
 using MediatR;
 using IsolationLevel = System.Data.IsolationLevel;
 
@@ -35,7 +38,8 @@ public record CreateFullSaleCommand(
     decimal? PayedSum,
     string? ConfirmationCode) : ICommand;
 
-public class CreateFullSaleHandler(IMediator mediator, IArticlesRepository articlesRepository, IUnitOfWork unitOfWork)
+public class CreateFullSaleHandler(IMediator mediator, IArticlesRepository articlesRepository, IUnitOfWork unitOfWork,
+    IMessageBroker messageBroker)
     : ICommandHandler<CreateFullSaleCommand, Unit>
 {
     public async Task<Unit> Handle(CreateFullSaleCommand request, CancellationToken cancellationToken)
@@ -74,6 +78,7 @@ public class CreateFullSaleHandler(IMediator mediator, IArticlesRepository artic
 
         await unitOfWork.SaveChangesAsync(cancellationToken);
         await mediator.Publish(new ArticlesUpdatedNotification(saleCounts.Keys), cancellationToken);
+        await messageBroker.Publish(new SaleCreatedEvent(sale.Adapt<global::Contracts.Models.Sale.Sale>()), cancellationToken);
         return Unit.Value;
     }
 

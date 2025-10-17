@@ -1,4 +1,4 @@
-using Core.Interfaces;
+using Contracts.Interfaces;
 
 namespace Contracts.Currency;
 

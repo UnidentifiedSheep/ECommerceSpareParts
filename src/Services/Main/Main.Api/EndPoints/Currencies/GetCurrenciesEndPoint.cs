@@ -1,6 +1,7 @@
 using Carter;
 using Core.Models;
 using Main.Application.Handlers.Currencies.GetCurrencies;
+using Main.Application.Handlers.Currencies.GetCurrencyById;
 using Main.Core.Dtos.Currencies;
 using Mapster;
 using MediatR;
@@ -8,6 +9,7 @@ using MediatR;
 namespace Main.Api.EndPoints.Currencies;
 
 public record GetCurrenciesResponse(IEnumerable<CurrencyDto> Currencies);
+public record GetCurrencyByIdResponse(CurrencyDto Currency);
 
 public class GetCurrenciesEndPoint : ICarterModule
 {
@@ -19,7 +21,16 @@ public class GetCurrenciesEndPoint : ICarterModule
                 var result = await sender.Send(query, cancellation);
                 return Results.Ok(result.Adapt<GetCurrenciesResponse>());
             }).WithTags("Currencies")
-            .WithDescription("Получение валют")
-            .WithDisplayName("Получение Валют");
+            .WithDescription("Получение списка валют")
+            .WithDisplayName("Получение списка валют");
+        
+        app.MapGet("/currencies/{id}", async (ISender sender, int id, CancellationToken cancellation) =>
+            {
+                var command = new GetCurrencyByIdQuery(id);
+                var result = await sender.Send(command, cancellation);
+                return Results.Ok(result.Adapt<GetCurrencyByIdResponse>());
+            }).WithTags("Currencies")
+            .WithDescription("Получение валюты по идентификатору")
+            .WithDisplayName("Получение валюты по id");
     }
 }

@@ -1,18 +1,21 @@
 using Core.Interfaces;
 using Core.Models;
 using MassTransit;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace RabbitMq;
 
 public static class ServiceProvider
 {
-    public static IServiceCollection AddMassageBrokerLayer(this IServiceCollection services,
-        MessageBrokerOptions options, ConsumerRegistration[] consumers)
+    public static IServiceCollection AddMassageBrokerLayer<TContext>(this IServiceCollection services,
+        MessageBrokerOptions options, ConsumerRegistration[] consumers, Action<IEntityFrameworkOutboxConfigurator> configurator) 
+        where TContext : DbContext
     {
-        services.AddScoped<IMessageBroker, MessageBroker>();
         services.AddMassTransit(conf =>
         {
+            conf.AddEntityFrameworkOutbox<TContext>(configurator);
+            
             foreach (var reg in consumers)
             {
                 var consumerType = typeof(MassTransitConsumerAdapter<>).MakeGenericType(reg.EventType);
@@ -41,6 +44,7 @@ public static class ServiceProvider
             });
         });
 
+        services.AddScoped<IMessageBroker, MessageBroker>();
         return services;
     }
 }

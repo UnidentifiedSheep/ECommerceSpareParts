@@ -26,4 +26,5 @@ public interface ICurrencyRepository
 
     Task<IEnumerable<Currency>> GetCurrencies(int page, int limit, bool track = true,
         CancellationToken cancellationToken = default);
+    Task<Currency?> GetCurrencyBeforeSpecifiedId(int id, bool track = true, CancellationToken cancellationToken = default);
 }

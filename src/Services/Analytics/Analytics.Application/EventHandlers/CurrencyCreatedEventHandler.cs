@@ -1,4 +1,5 @@
 using Contracts.Currency;
+using Contracts.Models.Currency;
 using Core.Interfaces.MessageBroker;
 using Core.Interfaces.Services;
 using Core.Models;

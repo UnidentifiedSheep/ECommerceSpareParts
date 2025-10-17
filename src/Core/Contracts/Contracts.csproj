@@ -5,11 +5,5 @@
         <ImplicitUsings>enable</ImplicitUsings>
         <Nullable>enable</Nullable>
     </PropertyGroup>
-    <ItemGroup>
-      <ProjectReference Include="..\Core\Core.csproj" />
-    </ItemGroup>
-    <ItemGroup>
-      <Folder Include="Sale\" />
-    </ItemGroup>
 
 </Project>

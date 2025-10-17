@@ -26,6 +26,8 @@ using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using OpenTelemetry.Metrics;
 using Main.Persistence;
+using Main.Persistence.Context;
+using MassTransit;
 using RabbitMq;
 using Redis;
 using Security;
@@ -104,27 +106,32 @@ var emailOptions = new UserEmailOptions
     MaxEmailCount = 5
 };
 
-var mainQueueName = $"queue-of-main-{Environment.MachineName}";
+var uniqQueueName = $"queue-of-main-{Environment.MachineName}";
 
 ConsumerRegistration[] eventHandlers =
 [
-    new(typeof(MarkupGroupChangedEvent), mainQueueName),
-    new(typeof(MarkupRangesUpdatedEvent), mainQueueName),
-    new(typeof(CurrencyRateChangedEvent), mainQueueName)
+    new(typeof(MarkupGroupChangedEvent), uniqQueueName),
+    new(typeof(MarkupRangesUpdatedEvent), uniqQueueName),
+    new(typeof(CurrencyRateChangedEvent), uniqQueueName)
 ];
 
 builder.Services.AddScoped<IEventHandler<MarkupGroupChangedEvent>, MarkupGroupChangedEventHandler>();
 builder.Services.AddScoped<IEventHandler<MarkupRangesUpdatedEvent>, MarkupRangesChangedEventHandler>();
 builder.Services.AddScoped<IEventHandler<CurrencyRateChangedEvent>, CurrencyRatesChangedEventHandler>();
 
-builder.Services.AddApplicationLayer(emailOptions)
+builder.Services.AddMassageBrokerLayer<DContext>(brokerOptions, eventHandlers,
+        opt =>
+        {
+            opt.UseBusOutbox();
+            opt.UsePostgres();
+        })
     .AddPersistenceLayer(builder.Configuration["ConnectionStrings:DefaultConnection"]!)
-    .AddMassageBrokerLayer(brokerOptions, eventHandlers)
     .AddCacheLayer(builder.Configuration["ConnectionStrings:RedisConnection"]!)
     .AddSecurityLayer()
     .AddMailLayer()
     .AddCommonLayer()
-    .AddIntegrations(builder.Configuration);
+    .AddIntegrations(builder.Configuration)
+    .AddApplicationLayer(emailOptions);
 
 
 builder.Services.AddAuthorization(options =>

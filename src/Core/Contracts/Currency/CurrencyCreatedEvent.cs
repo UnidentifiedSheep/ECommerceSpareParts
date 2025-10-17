@@ -1,5 +1,4 @@
-using Core.Interfaces;
-
+using Contracts.Interfaces;
 namespace Contracts.Currency;
 
-public record CurrencyCreatedEvent(Core.Models.Currency Currency) : IContract;
+public record CurrencyCreatedEvent(Models.Currency.Currency Currency) : IContract;

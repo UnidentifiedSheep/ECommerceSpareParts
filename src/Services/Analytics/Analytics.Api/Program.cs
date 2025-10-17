@@ -15,8 +15,8 @@ ConsumerRegistration[] eventHandlers =
     new(typeof(CurrencyRateChangedEvent), uniqQueueName)
 ];
 
-builder.Services.AddScoped<IEventHandler<CurrencyCreatedEvent>, CurrencyCreatedEventHandler>();
-builder.Services.AddScoped<IEventHandler<CurrencyRateChangedEvent>, CurrencyRatesChangedEventHandler>();
+/*builder.Services.AddScoped<IEventHandler<CurrencyCreatedEvent>, CurrencyCreatedEventHandler>();
+builder.Services.AddScoped<IEventHandler<CurrencyRateChangedEvent>, CurrencyRatesChangedEventHandler>();*/
 
 var app = builder.Build();
 

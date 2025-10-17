@@ -1,4 +1,6 @@
 ﻿using Main.Core.Entities;
+using MassTransit;
+using MassTransit.EntityFrameworkCoreIntegration;
 using Microsoft.EntityFrameworkCore;
 
 namespace Main.Persistence.Context;
@@ -98,6 +100,15 @@ public partial class DContext : DbContext
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
+        
+        modelBuilder.AddOutboxMessageEntity();
+        modelBuilder.AddOutboxStateEntity();
+        modelBuilder.AddInboxStateEntity();
+
+        modelBuilder.Entity<OutboxMessage>().ToTable("OutboxMessage", "msg");
+        modelBuilder.Entity<OutboxState>().ToTable("OutboxState", "msg");
+        modelBuilder.Entity<InboxState>().ToTable("InboxState", "msg");
+        
         modelBuilder
             .HasPostgresEnum("car_types", new[] { "PassengerCar", "CommercialVehicle", "Motorbike" })
             .HasPostgresExtension("dblink")

@@ -69,8 +69,17 @@ public class CurrencyRepository(DContext context) : ICurrencyRepository
         CancellationToken cancellationToken = default)
     {
         return await context.Currencies.ConfigureTracking(track)
+            .OrderBy(x => x.Id)
             .Skip(page * limit)
             .Take(limit)
             .ToListAsync(cancellationToken);
+    }
+
+    public async Task<Currency?> GetCurrencyBeforeSpecifiedId(int id, bool track = true, CancellationToken cancellationToken = default)
+    {
+        return await context.Currencies.ConfigureTracking(track)
+            .Where(x => x.Id < id)
+            .OrderByDescending(x => x.Id)
+            .FirstOrDefaultAsync(cancellationToken);
     }
 }

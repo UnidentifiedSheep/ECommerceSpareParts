@@ -459,7 +459,7 @@ public static class MapsterConfig
             .Map(x => x.CurrencySign, src => src.CurrencySign.Trim())
             .Map(x => x.ShortName, src => src.ShortName.Trim());
 
-        TypeAdapterConfig<Currency, global::Core.Models.Currency>.NewConfig()
+        TypeAdapterConfig<Currency, global::Contracts.Models.Currency.Currency>.NewConfig()
             .Map(d => d.Code, s => s.Code)
             .Map(d => d.Name, s => s.Name)
             .Map(d => d.Id, s => s.Id)
