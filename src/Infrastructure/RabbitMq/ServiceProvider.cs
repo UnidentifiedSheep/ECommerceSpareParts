@@ -9,12 +9,14 @@ namespace RabbitMq;
 public static class ServiceProvider
 {
     public static IServiceCollection AddMassageBrokerLayer<TContext>(this IServiceCollection services,
-        MessageBrokerOptions options, ConsumerRegistration[] consumers, Action<IEntityFrameworkOutboxConfigurator> configurator) 
+        MessageBrokerOptions options, ConsumerRegistration[] consumers, Action<IEntityFrameworkOutboxConfigurator>? configurator = null) 
         where TContext : DbContext
     {
         services.AddMassTransit(conf =>
         {
-            conf.AddEntityFrameworkOutbox<TContext>(configurator);
+            if (configurator != null)
+                conf.AddEntityFrameworkOutbox<TContext>(configurator);
+            
             
             foreach (var reg in consumers)
             {

@@ -1,8 +1,7 @@
+using Analytics.Core.Entities;
 using Contracts.Currency;
-using Contracts.Models.Currency;
 using Core.Interfaces.MessageBroker;
 using Core.Interfaces.Services;
-using Core.Models;
 using Mapster;
 
 namespace Analytics.Application.EventHandlers;

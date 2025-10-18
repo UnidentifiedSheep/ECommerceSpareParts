@@ -119,16 +119,17 @@ builder.Services.AddScoped<IEventHandler<MarkupGroupChangedEvent>, MarkupGroupCh
 builder.Services.AddScoped<IEventHandler<MarkupRangesUpdatedEvent>, MarkupRangesChangedEventHandler>();
 builder.Services.AddScoped<IEventHandler<CurrencyRateChangedEvent>, CurrencyRatesChangedEventHandler>();
 
-builder.Services.AddMassageBrokerLayer<DContext>(brokerOptions, eventHandlers,
+builder.Services
+    .AddPersistenceLayer(builder.Configuration["ConnectionStrings:DefaultConnection"]!)
+    .AddCacheLayer(builder.Configuration["ConnectionStrings:RedisConnection"]!)
+    .AddSecurityLayer()
+    .AddMailLayer()
+    .AddMassageBrokerLayer<DContext>(brokerOptions, eventHandlers,
         opt =>
         {
             opt.UseBusOutbox();
             opt.UsePostgres();
         })
-    .AddPersistenceLayer(builder.Configuration["ConnectionStrings:DefaultConnection"]!)
-    .AddCacheLayer(builder.Configuration["ConnectionStrings:RedisConnection"]!)
-    .AddSecurityLayer()
-    .AddMailLayer()
     .AddCommonLayer()
     .AddIntegrations(builder.Configuration)
     .AddApplicationLayer(emailOptions);

@@ -8,7 +8,10 @@
     </PropertyGroup>
 
     <ItemGroup>
-        <PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="9.0.9"/>
+        <PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="9.0.9" />
+        <PackageReference Include="Microsoft.EntityFrameworkCore" Version="9.0.7" />
+        <PackageReference Include="Microsoft.EntityFrameworkCore.Abstractions" Version="9.0.7" />
+        <PackageReference Include="Microsoft.EntityFrameworkCore.Relational" Version="9.0.7" />
     </ItemGroup>
 
     <ItemGroup>
@@ -22,7 +25,10 @@
 
     <ItemGroup>
       <ProjectReference Include="..\..\..\Core\Core\Core.csproj" />
+      <ProjectReference Include="..\..\..\Infrastructure\RabbitMq\RabbitMq.csproj" />
+      <ProjectReference Include="..\..\Api.Common\Api.Common.csproj" />
       <ProjectReference Include="..\Analytics.Application\Analytics.Application.csproj" />
+      <ProjectReference Include="..\Analytics.Persistence\Analytics.Persistence.csproj" />
     </ItemGroup>
 
 </Project>

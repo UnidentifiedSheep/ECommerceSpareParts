@@ -376,7 +376,38 @@ public static class MapsterConfig
             .Map(dest => dest.TotalSum, src => src.PriceWithDiscount * src.Count)
             .Map(dest => dest.Discount, src => (src.Price - src.PriceWithDiscount) / src.Price * 100);
 
+        TypeAdapterConfig<Sale, Contracts.Models.Sale.Sale>.NewConfig()
+            .Map(d => d.Id, s => s.Id)
+            .Map(d => d.BuyerId, s => s.BuyerId)
+            .Map(d => d.Comment, s => s.Comment)
+            .Map(d => d.CreatedUserId, s => s.CreatedUserId)
+            .Map(d => d.CreationDatetime, s => s.CreationDatetime)
+            .Map(d => d.CurrencyId, s => s.CurrencyId)
+            .Map(d => d.MainStorageName, s => s.MainStorageName)
+            .Map(d => d.SaleContents, s => s.SaleContents)
+            .Map(d => d.SaleDatetime, s => s.SaleDatetime)
+            .Map(d => d.TransactionId, s => s.TransactionId);
 
+        TypeAdapterConfig<SaleContent, Contracts.Models.Sale.SaleContent>.NewConfig()
+            .Map(d => d.Id, s => s.Id)
+            .Map(d => d.ArticleId, s => s.ArticleId)
+            .Map(d => d.Comment, s => s.Comment)
+            .Map(d => d.Count, s => s.Count)
+            .Map(d => d.Details, s => s.SaleContentDetails)
+            .Map(d => d.Discount, s => s.Discount)
+            .Map(d => d.Price, s => s.Price)
+            .Map(d => d.SaleId, s => s.SaleId)
+            .Map(d => d.TotalSum, s => s.TotalSum);
+
+        TypeAdapterConfig<SaleContentDetail, Contracts.Models.Sale.SaleContentDetail>.NewConfig()
+            .Map(d => d.Id, s => s.Id)
+            .Map(d => d.Count, s => s.Count)
+            .Map(d => d.CurrencyId, s => s.CurrencyId)
+            .Map(d => d.BuyPrice, s => s.BuyPrice)
+            .Map(d => d.PurchaseDatetime, s => s.PurchaseDatetime)
+            .Map(d => d.SaleContentId, s => s.SaleContentId)
+            .Map(d => d.Storage, s => s.Storage)
+            .Map(d => d.StorageContentId, s => s.StorageContentId);
         //Остальные поля прописываются мануально
         TypeAdapterConfig<StorageContent, SaleContentDetail>.NewConfig()
             .IgnoreNonMapped(true)

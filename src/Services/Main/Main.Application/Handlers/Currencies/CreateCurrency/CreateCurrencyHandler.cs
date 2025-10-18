@@ -25,9 +25,10 @@ public class CreateCurrencyHandler(ICurrencyRepository currencyRepository, IUnit
         await ValidateData(request.ShortName, request.Name, request.CurrencySign, request.Code, cancellationToken);
         var model = request.Adapt<Currency>();
         await unitOfWork.AddAsync(model, cancellationToken);
-        await unitOfWork.SaveChangesAsync(cancellationToken);
         
         await broker.Publish(new CurrencyCreatedEvent(model.Adapt<global::Contracts.Models.Currency.Currency>()), cancellationToken);
+        await unitOfWork.SaveChangesAsync(cancellationToken);
+        
         await mediator.Publish(new CurrencyCreatedNotification(model.Id), cancellationToken);
         return new CreateCurrencyResult(model.Id);
     }

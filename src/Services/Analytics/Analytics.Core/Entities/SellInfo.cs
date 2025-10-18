@@ -18,8 +18,6 @@ public partial class SellInfo
 
     public decimal? Markup { get; set; }
 
-    public virtual Article Article { get; set; } = null!;
-
     public virtual Currency BuyCurrency { get; set; } = null!;
 
     public virtual Currency SellCurrency { get; set; } = null!;

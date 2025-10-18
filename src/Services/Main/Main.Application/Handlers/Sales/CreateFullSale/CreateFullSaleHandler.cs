@@ -76,9 +76,9 @@ public class CreateFullSaleHandler(IMediator mediator, IArticlesRepository artic
 
         await SubtractCountFromReservations(buyerId, whoCreated, saleCounts, cancellationToken);
 
+        await messageBroker.Publish(new SaleCreatedEvent(sale.Adapt<global::Contracts.Models.Sale.Sale>()), cancellationToken);
         await unitOfWork.SaveChangesAsync(cancellationToken);
         await mediator.Publish(new ArticlesUpdatedNotification(saleCounts.Keys), cancellationToken);
-        await messageBroker.Publish(new SaleCreatedEvent(sale.Adapt<global::Contracts.Models.Sale.Sale>()), cancellationToken);
         return Unit.Value;
     }
 
