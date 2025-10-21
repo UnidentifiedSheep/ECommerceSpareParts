@@ -26,8 +26,7 @@ public class EditSaleEndPoint : ICarterModule
                     request.SaleDateTime, request.Comment, request.SellFromOtherStorages);
                 await sender.Send(command, cancellationToken);
                 return Results.Ok();
-            }).RequireAuthorization("AMW")
-            .WithTags("Sales")
+            }).WithTags("Sales")
             .WithDescription("Редактирование продажи")
             .WithDisplayName("Редактирование продажи");
     }

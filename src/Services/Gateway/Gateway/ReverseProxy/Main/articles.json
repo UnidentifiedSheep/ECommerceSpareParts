@@ -1,0 +1,154 @@
+{
+  "ReverseProxy": {
+    "Routes": {
+      "add-main-article-content": {
+        "ClusterId": "main-cluster",
+        "Match": {
+          "Path": "/main/articles/{articleId}/contents",
+          "Methods": [ "POST" ]
+        },
+        "AuthorizationPolicy": "AMW",
+        "Transforms": [
+          { "PathRemovePrefix": "/main" }
+        ]
+      },
+      "create-articles": {
+        "ClusterId": "main-cluster",
+        "Match": {
+          "Path": "/main/articles/",
+          "Methods": [ "POST" ]
+        },
+        "AuthorizationPolicy": "AMW",
+        "Transforms": [
+          { "PathRemovePrefix": "/main" }
+        ]
+      },
+      "edit-article": {
+        "ClusterId": "main-cluster",
+        "Match": {
+          "Path": "/main/articles/{articleId}",
+          "Methods": [ "PATCH" ]
+        },
+        "AuthorizationPolicy": "AMW",
+        "Transforms": [
+          { "PathRemovePrefix": "/main" }
+        ]
+      },
+      "get-article-characteristics": {
+        "ClusterId": "main-cluster",
+        "Match": {
+          "Path": "/main/articles/characteristics/{articleId}",
+          "Methods": [ "GET" ]
+        },
+        "Transforms": [
+          { "PathRemovePrefix": "/main" }
+        ]
+      },
+      "get-article-content": {
+        "ClusterId": "main-cluster",
+        "Match": {
+          "Path": "/main/articles/{articleId}/contents",
+          "Methods": [ "GET" ]
+        },
+        "Transforms": [
+          { "PathRemovePrefix": "/main" }
+        ]
+      },
+      "get-article-crosses": {
+        "ClusterId": "main-cluster",
+        "Match": {
+          "Path": "/main/articles/{articleId}/crosses/",
+          "Methods": [ "GET" ]
+        },
+        "Transforms": [
+          { "PathRemovePrefix": "/main" }
+        ]
+      },
+      "get-article-images": {
+        "ClusterId": "main-cluster",
+        "Match": {
+          "Path": "/main/articles/imgs",
+          "Methods": [ "GET" ]
+        },
+        "Transforms": [
+          { "PathRemovePrefix": "/main" }
+        ]
+      },
+      "get-article-pairs": {
+        "ClusterId": "main-cluster",
+        "Match": {
+          "Path": "/main/articles/{articleId}/pairs",
+          "Methods": [ "GET" ]
+        },
+        "Transforms": [
+          { "PathRemovePrefix": "/main" }
+        ]
+      },
+      "get-articles": {
+        "ClusterId": "main-cluster",
+        "Match": {
+          "Path": "/main/articles",
+          "Methods": [ "GET" ]
+        },
+        "Transforms": [
+          { "PathRemovePrefix": "/main" }
+        ]
+      },
+      "make-linkage-between-articles": {
+        "ClusterId": "main-cluster",
+        "Match": {
+          "Path": "/main/articles/crosses",
+          "Methods": [ "POST" ]
+        },
+        "AuthorizationPolicy": "AMW",
+        "Transforms": [
+          { "PathRemovePrefix": "/main" }
+        ]
+      },
+      "map-imgs-to-article": {
+        "ClusterId": "main-cluster",
+        "Match": {
+          "Path": "/main/articles/{articleId}/imgs/",
+          "Methods": [ "POST" ]
+        },
+        "AuthorizationPolicy": "AMW",
+        "Transforms": [
+          { "PathRemovePrefix": "/main" }
+        ]
+      },
+      "remove-article-content": {
+        "ClusterId": "main-cluster",
+        "Match": {
+          "Path": "/main/articles/{articleId}/contents/{insideArticleId}",
+          "Methods": [ "DELETE" ]
+        },
+        "AuthorizationPolicy": "AMW",
+        "Transforms": [
+          { "PathRemovePrefix": "/main" }
+        ]
+      },
+      "set-article-indicator": {
+        "ClusterId": "main-cluster",
+        "Match": {
+          "Path": "/main/articles/{articleId}/indicator",
+          "Methods": [ "PATCH" ]
+        },
+        "AuthorizationPolicy": "AMW",
+        "Transforms": [
+          { "PathRemovePrefix": "/main" }
+        ]
+      },
+      "set-article-content-count": {
+        "ClusterId": "main-cluster",
+        "Match": {
+          "Path": "/main/articles/{articleId}/contents/{insideArticleId}",
+          "Methods": [ "PATCH" ]
+        },
+        "AuthorizationPolicy": "AMW",
+        "Transforms": [
+          { "PathRemovePrefix": "/main" }
+        ]
+      }
+    }
+  }
+}

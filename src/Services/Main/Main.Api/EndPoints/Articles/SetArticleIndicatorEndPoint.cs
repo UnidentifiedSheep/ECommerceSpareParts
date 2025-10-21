@@ -16,8 +16,7 @@ public class SetArticleIndicatorEndPoint : ICarterModule
                 var command = new SetArticleIndicatorCommand(articleId, request.Indicator);
                 await sender.Send(command, token);
                 return Results.NoContent();
-            }).RequireAuthorization("AMW")
-            .WithTags("Articles")
+            }).WithTags("Articles")
             .WithName("Установка индикатора артикула");
     }
 }

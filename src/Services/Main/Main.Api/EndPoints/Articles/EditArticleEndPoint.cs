@@ -17,9 +17,8 @@ public class EditArticleEndPoint : ICarterModule
                     var command = new PatchArticleCommand(articleId, request.PatchArticle);
                     await sender.Send(command, token);
                     return Results.NoContent();
-                }).RequireAuthorization("AMW")
-            .WithTags("Articles")
-            .WithDescription("Редактирование артикула")
-            .WithDisplayName("Редактирование артикула");
+                }).WithTags("Articles")
+                .WithDescription("Редактирование артикула")
+                .WithDisplayName("Редактирование артикула");
     }
 }

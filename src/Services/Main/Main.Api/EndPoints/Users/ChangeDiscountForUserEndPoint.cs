@@ -2,7 +2,7 @@ using Carter;
 using Main.Application.Handlers.Users.ChangeUserDiscount;
 using MediatR;
 
-namespace Main.Api.EndPoints.Balances;
+namespace Main.Api.EndPoints.Users;
 
 public record ChangeDiscountForUserRequest(decimal NewDiscount);
 
@@ -18,7 +18,6 @@ public class ChangeDiscountForUserEndPoint : ICarterModule
                     await sender.Send(command, cancellationToken);
                     return Results.Ok();
                 }).WithTags("Balances")
-            .RequireAuthorization("AM")
             .WithDescription("Изменение скидки пользователя")
             .WithDisplayName("Поменять скидку");
     }

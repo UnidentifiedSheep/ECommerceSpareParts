@@ -23,8 +23,7 @@ public class AddContentToStorageEndPoint : ICarterModule
                     StorageMovementType.StorageContentAddition);
                 await sender.Send(command, cancellationToken);
                 return Results.NoContent();
-            }).RequireAuthorization("AMW")
-            .WithTags("Storages")
+            }).WithTags("Storages")
             .WithDescription("Добавление позиций на склад")
             .WithDisplayName("Добавление позиций на склад");
     }

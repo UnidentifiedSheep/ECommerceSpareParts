@@ -29,12 +29,6 @@
     </ItemGroup>
 
     <ItemGroup>
-        <Content Include="..\..\.dockerignore">
-            <Link>.dockerignore</Link>
-        </Content>
-    </ItemGroup>
-
-    <ItemGroup>
         <ProjectReference Include="..\..\..\Infrastructure\Integrations\Integrations.csproj" />
         <ProjectReference Include="..\..\..\Infrastructure\Mail\Mail.csproj" />
         <ProjectReference Include="..\..\..\Infrastructure\RabbitMq\RabbitMq.csproj" />
@@ -44,6 +38,12 @@
         <ProjectReference Include="..\..\Application.Common\Application.Common.csproj" />
         <ProjectReference Include="..\Main.Application\Main.Application.csproj" />
         <ProjectReference Include="..\Main.Persistence\Main.Persistence.csproj" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <Content Include="..\..\..\..\.dockerignore">
+        <Link>.dockerignore</Link>
+      </Content>
     </ItemGroup>
 
 </Project>

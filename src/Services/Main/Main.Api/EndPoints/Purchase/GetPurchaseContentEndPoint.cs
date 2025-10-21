@@ -17,8 +17,7 @@ public class GetPurchaseContentEndPoint : ICarterModule
                 var result = await sender.Send(new GetPurchaseContentQuery(id), ct);
                 var response = result.Adapt<GetPurchaseContentResponse>();
                 return Results.Ok(response);
-            }).RequireAuthorization("AMW")
-            .WithTags("Purchases")
+            }).WithTags("Purchases")
             .WithDescription("Получение содержания закупки")
             .WithDisplayName("Получение содержания закупки");
     }

@@ -24,8 +24,7 @@ public class CreateUserEndPoint : ICarterModule
                 var command = request.Adapt<CreateUserCommand>();
                 var userId = (await sender.Send(command, cancellationToken)).UserId;
                 return Results.Created($"users/{userId}", null);
-            }).RequireAuthorization("AM")
-            .WithTags("Users")
+            }).WithTags("Users")
             .WithDescription("Создание пользователя")
             .WithDisplayName("Создание пользователя");
     }

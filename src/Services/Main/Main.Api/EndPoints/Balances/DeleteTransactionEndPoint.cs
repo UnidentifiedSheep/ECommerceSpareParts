@@ -18,7 +18,6 @@ public class DeleteTransactionEndPoint : ICarterModule
                     await sender.Send(command, token);
                     return Results.Ok();
                 }).WithTags("Balances")
-            .RequireAuthorization("AMW")
             .WithDescription("Удалить транзакцию")
             .WithDisplayName("Удалить транзакцию");
     }

@@ -1,0 +1,39 @@
+{
+  "ReverseProxy": {
+    "Routes": {
+      "create-currency": {
+        "ClusterId": "main-cluster",
+        "Match": {
+          "Path": "/main/currencies",
+          "Methods": [ "POST" ]
+        },
+        "AuthorizationPolicy": "AM",
+        "Transforms": [
+          { "PathRemovePrefix": "/main" }
+        ]
+      },
+      "get-currencies": {
+        "ClusterId": "main-cluster",
+        "Match": {
+          "Path": "/main/currencies",
+          "Methods": [ "GET" ]
+        },
+        "Order": 2,
+        "Transforms": [
+          { "PathRemovePrefix": "/main" }
+        ]
+      },
+      "get-currency-by-id": {
+        "ClusterId": "main-cluster",
+        "Match": {
+          "Path": "/main/currencies/{id}",
+          "Methods": [ "GET" ]
+        },
+        "Order": 1,
+        "Transforms": [
+          { "PathRemovePrefix": "/main" }
+        ]
+      }
+    }
+  }
+}

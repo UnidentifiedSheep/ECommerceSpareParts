@@ -17,9 +17,8 @@ public class DeleteSaleEndPoint : ICarterModule
                     var command = new DeleteFullSaleCommand(saleId, userId);
                     await sender.Send(command, token);
                     return Results.NoContent();
-                }).RequireAuthorization("AMW")
-            .WithTags("Sales")
-            .WithDescription("Удаление продажи")
-            .WithDisplayName("Удаление продажи");
+                }).WithTags("Sales")
+                .WithDescription("Удаление продажи")
+                .WithDisplayName("Удаление продажи");
     }
 }

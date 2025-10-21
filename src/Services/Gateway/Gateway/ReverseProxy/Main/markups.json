@@ -1,0 +1,61 @@
+{
+  "ReverseProxy": {
+    "Routes": {
+      "create-markup": {
+        "ClusterId": "main-cluster",
+        "Match": {
+          "Path": "/main/markups",
+          "Methods": [ "POST" ]
+        },
+        "AuthorizationPolicy": "AM",
+        "Transforms": [
+          { "PathRemovePrefix": "/main" }
+        ]
+      },
+      "delete-markup": {
+        "ClusterId": "main-cluster",
+        "Match": {
+          "Path": "/main/markups/{groupId}",
+          "Methods": [ "DELETE" ]
+        },
+        "AuthorizationPolicy": "AM",
+        "Transforms": [
+          { "PathRemovePrefix": "/main" }
+        ]
+      },
+      "get-markup-group": {
+        "ClusterId": "main-cluster",
+        "Match": {
+          "Path": "/main/markups/",
+          "Methods": [ "GET" ]
+        },
+        "AuthorizationPolicy": "AM",
+        "Transforms": [
+          { "PathRemovePrefix": "/main" }
+        ]
+      },
+      "get-markup-ranges": {
+        "ClusterId": "main-cluster",
+        "Match": {
+          "Path": "/main/markups/{groupId}",
+          "Methods": [ "GET" ]
+        },
+        "AuthorizationPolicy": "AM",
+        "Transforms": [
+          { "PathRemovePrefix": "/main" }
+        ]
+      },
+      "select-default-markup": {
+        "ClusterId": "main-cluster",
+        "Match": {
+          "Path": "/main/markups/default",
+          "Methods": [ "PUT" ]
+        },
+        "AuthorizationPolicy": "AM",
+        "Transforms": [
+          { "PathRemovePrefix": "/main" }
+        ]
+      }
+    }
+  }
+}

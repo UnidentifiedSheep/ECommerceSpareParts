@@ -20,8 +20,7 @@ public class GetStoragesEndPoint : ICarterModule
                     var result = await sender.Send(query, token);
                     var response = result.Adapt<GetStoragesResponse>();
                     return Results.Ok(response);
-                }).RequireAuthorization("AMW")
-            .WithTags("Storages")
+                }).WithTags("Storages")
             .WithDescription("Поиск и получение существующих складов")
             .WithDisplayName("Получение складов");
     }

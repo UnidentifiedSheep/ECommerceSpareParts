@@ -1,4 +1,5 @@
 using Analytics.Core.Entities;
+using Analytics.Core.Static;
 using Contracts.Models.Sale;
 using Contracts.Sale;
 using Core.Attributes;
@@ -30,21 +31,13 @@ public class SaleCreatedEventHandler(ICurrencyConverter currencyConverter, IUnit
                     SellPrice = content.Price,
                     SellCurrencyId = sell.CurrencyId,
                     SellContentId = content.Id,
-                    Markup = GetMarkup(avrgBuyPrice, content.Price)
+                    Markup = Calculate.Markup(avrgBuyPrice, content.Price),
+                    SellDate = sell.SaleDatetime
                 };
                 sellInfos.Add(sellInfo);
             }
             await unitOfWork.AddRangeAsync(sellInfos);
             await unitOfWork.SaveChangesAsync();
         });
-    }
-
-    private decimal GetMarkup(decimal buyPrice, decimal sellPrice)
-    {
-        if (buyPrice == 0)
-            throw new DivideByZeroException("Цена закупки не может равняться 0.");
-
-        decimal markup = (sellPrice - buyPrice) / buyPrice * 100;
-        return Math.Round(markup, 2);
     }
 }

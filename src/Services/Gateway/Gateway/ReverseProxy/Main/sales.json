@@ -1,0 +1,61 @@
+{
+  "ReverseProxy": {
+    "Routes": {
+      "create-sale": {
+        "ClusterId": "main-cluster",
+        "Match": {
+          "Path": "/main/sales/",
+          "Methods": [ "POST" ]
+        },
+        "AuthorizationPolicy": "AMW",
+        "Transforms": [
+          { "PathRemovePrefix": "/main" }
+        ]
+      },
+      "delete-sale": {
+        "ClusterId": "main-cluster",
+        "Match": {
+          "Path": "/main/sales/{saleId}",
+          "Methods": [ "DELETE" ]
+        },
+        "AuthorizationPolicy": "AMW",
+        "Transforms": [
+          { "PathRemovePrefix": "/main" }
+        ]
+      },
+      "edit-sale": {
+        "ClusterId": "main-cluster",
+        "Match": {
+          "Path": "/main/sales/{saleId}",
+          "Methods": [ "PUT" ]
+        },
+        "AuthorizationPolicy": "AMW",
+        "Transforms": [
+          { "PathRemovePrefix": "/main" }
+        ]
+      },
+      "get-sale-content": {
+        "ClusterId": "main-cluster",
+        "Match": {
+          "Path": "/main/sales/{id}/content",
+          "Methods": [ "GET" ]
+        },
+        "AuthorizationPolicy": "AMW",
+        "Transforms": [
+          { "PathRemovePrefix": "/main" }
+        ]
+      },
+      "get-sales": {
+        "ClusterId": "main-cluster",
+        "Match": {
+          "Path": "/main/sales/",
+          "Methods": [ "GET" ]
+        },
+        "AuthorizationPolicy": "AMW",
+        "Transforms": [
+          { "PathRemovePrefix": "/main" }
+        ]
+      }
+    }
+  }
+}

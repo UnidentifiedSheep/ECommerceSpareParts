@@ -30,9 +30,8 @@ public class CreatePurchaseEndPoint : ICarterModule
                         request.PayedSum);
                     await sender.Send(command, token);
                     return Results.Ok();
-                }).RequireAuthorization("AMW")
-            .WithTags("Purchases")
-            .WithDescription("Создание новой закупку")
-            .WithDisplayName("Добавление артикулов");
+                }).WithTags("Purchases")
+                .WithDescription("Создание новой закупку")
+                .WithDisplayName("Добавление артикулов");
     }
 }

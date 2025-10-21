@@ -18,9 +18,8 @@ public class MakeLinkageBetweenArticlesEndPoint : ICarterModule
                     var command = request.Adapt<MakeLinkageBetweenArticlesCommand>();
                     await sender.Send(command, token);
                     return Results.Ok();
-                }).RequireAuthorization("AMW")
-            .WithTags("Articles")
-            .WithDescription("Создание кроссировки между артикулами")
-            .WithDisplayName("Создание кроссировки");
+                }).WithTags("Articles")
+                .WithDescription("Создание кроссировки между артикулами")
+                .WithDisplayName("Создание кроссировки");
     }
 }

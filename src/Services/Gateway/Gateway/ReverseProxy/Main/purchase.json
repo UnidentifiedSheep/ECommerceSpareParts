@@ -1,0 +1,61 @@
+{
+  "ReverseProxy": {
+    "Routes": {
+      "create-purchase": {
+        "ClusterId": "main-cluster",
+        "Match": {
+          "Path": "/main/purchases/",
+          "Methods": [ "POST" ]
+        },
+        "AuthorizationPolicy": "AMW",
+        "Transforms": [
+          { "PathRemovePrefix": "/main" }
+        ]
+      },
+      "delete-purchase": {
+        "ClusterId": "main-cluster",
+        "Match": {
+          "Path": "/main/purchases/{purchaseId}",
+          "Methods": [ "DELETE" ]
+        },
+        "AuthorizationPolicy": "AMW",
+        "Transforms": [
+          { "PathRemovePrefix": "/main" }
+        ]
+      },
+      "edit-purchase": {
+        "ClusterId": "main-cluster",
+        "Match": {
+          "Path": "/main/purchase/{purchaseId}",
+          "Methods": [ "PUT" ]
+        },
+        "AuthorizationPolicy": "AMW",
+        "Transforms": [
+          { "PathRemovePrefix": "/main" }
+        ]
+      },
+      "get-purchase-content": {
+        "ClusterId": "main-cluster",
+        "Match": {
+          "Path": "/main/purchases/{id}/content",
+          "Methods": [ "GET" ]
+        },
+        "AuthorizationPolicy": "AMW",
+        "Transforms": [
+          { "PathRemovePrefix": "/main" }
+        ]
+      },
+      "get-purchases": {
+        "ClusterId": "main-cluster",
+        "Match": {
+          "Path": "/main/purchases/",
+          "Methods": [ "GET" ]
+        },
+        "AuthorizationPolicy": "AMW",
+        "Transforms": [
+          { "PathRemovePrefix": "/main" }
+        ]
+      }
+    }
+  }
+}

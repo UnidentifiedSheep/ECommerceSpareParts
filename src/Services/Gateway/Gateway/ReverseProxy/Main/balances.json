@@ -1,0 +1,39 @@
+{
+  "ReverseProxy": {
+    "Routes": {
+      "create-transaction": {
+        "ClusterId": "main-cluster",
+        "Match": {
+          "Path": "/main/balances/transaction",
+          "Methods": [ "POST" ]
+        },
+        "AuthorizationPolicy": "AMW",
+        "Transforms": [
+          { "PathRemovePrefix": "/main" }
+        ]
+      },
+      "delete-transaction": {
+        "ClusterId": "main-cluster",
+        "Match": {
+          "Path": "/main/balances/transaction/{id}",
+          "Methods": [ "DELETE" ]
+        },
+        "AuthorizationPolicy": "AMW",
+        "Transforms": [
+          { "PathRemovePrefix": "/main" }
+        ]
+      },
+      "get-transactions": {
+        "ClusterId": "main-cluster",
+        "Match": {
+          "Path": "/main/balances/transactions",
+          "Methods": [ "GET" ]
+        },
+        "AuthorizationPolicy": "AMW",
+        "Transforms": [
+          { "PathRemovePrefix": "/main" }
+        ]
+      }
+    }
+  }
+}

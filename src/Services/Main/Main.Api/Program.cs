@@ -112,12 +112,14 @@ ConsumerRegistration[] eventHandlers =
 [
     new(typeof(MarkupGroupChangedEvent), uniqQueueName),
     new(typeof(MarkupRangesUpdatedEvent), uniqQueueName),
-    new(typeof(CurrencyRateChangedEvent), uniqQueueName)
+    new(typeof(CurrencyRateChangedEvent), uniqQueueName),
+    new(typeof(MarkupGroupGeneratedEvent), "main-queue")
 ];
 
 builder.Services.AddScoped<IEventHandler<MarkupGroupChangedEvent>, MarkupGroupChangedEventHandler>();
 builder.Services.AddScoped<IEventHandler<MarkupRangesUpdatedEvent>, MarkupRangesChangedEventHandler>();
 builder.Services.AddScoped<IEventHandler<CurrencyRateChangedEvent>, CurrencyRatesChangedEventHandler>();
+builder.Services.AddScoped<IEventHandler<MarkupGroupGeneratedEvent>, MarkupGroupGeneratedEventHandler>();
 
 builder.Services
     .AddPersistenceLayer(builder.Configuration["ConnectionStrings:DefaultConnection"]!)
@@ -135,32 +137,9 @@ builder.Services
     .AddApplicationLayer(emailOptions);
 
 
-builder.Services.AddAuthorization(options =>
-{
-    options.AddPolicy("AMW", policy => { policy.RequireRole("Admin", "Moderator", "Worker"); });
-    options.AddPolicy("AM", policy => { policy.RequireRole("Admin", "Moderator"); });
-});
 
-builder.Services.AddAuthentication(options =>
-{
-    options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
-    options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
-    options.DefaultScheme = JwtBearerDefaults.AuthenticationScheme;
-}).AddJwtBearer(options =>
-{
-    var iss = builder.Configuration["JwtBearer:ValidIssuer"];
-    options.TokenValidationParameters = new TokenValidationParameters
-    {
-        ValidateIssuer = true,
-        ValidateAudience = false,
-        ValidateLifetime = true,
-        ValidateIssuerSigningKey = true,
-        ValidIssuer = iss,
-        ValidAudience = builder.Configuration["JwtBearer:ValidAudience"],
-        IssuerSigningKey =
-            new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration["JwtBearer:IssuerSigningKey"]!))
-    };
-});
+
+
 builder.Services.AddAuthorizationBuilder()
     .SetDefaultPolicy(new AuthorizationPolicyBuilder(JwtBearerDefaults.AuthenticationScheme).RequireAuthenticatedUser()
         .Build());
@@ -212,8 +191,6 @@ await SetupPrice(app.Services);
 app.UseRouting();
 app.UseCors();
 app.UseExceptionHandler(_ => { });
-app.UseAuthentication();
-app.UseAuthorization();
 
 app.MapCarter();
 

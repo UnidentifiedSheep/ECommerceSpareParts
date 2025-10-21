@@ -25,8 +25,7 @@ public class EditPurchaseEndPoint : ICarterModule
                     request.Comment, request.PurchaseDateTime, userId);
                 await sender.Send(command, cancellationToken);
                 return Results.NoContent();
-            }).RequireAuthorization("AMW")
-            .WithTags("Purchases")
+            }).WithTags("Purchases")
             .WithDescription("Редактирование существующей закупки")
             .WithDisplayName("Редактирование закупки");
     }

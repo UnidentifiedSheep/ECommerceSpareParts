@@ -17,8 +17,7 @@ public class EditStorageEndPoint : ICarterModule
                     var command = new EditStorageCommand(storageName, request.EditStorage);
                     await sender.Send(command, token);
                     return Results.NoContent();
-                }).RequireAuthorization("AMW")
-            .WithTags("Storages")
+                }).WithTags("Storages")
             .WithDescription("Редактирование полей склада")
             .WithDisplayName("Редактирование склада");
     }

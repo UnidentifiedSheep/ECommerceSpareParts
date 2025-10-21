@@ -17,8 +17,7 @@ public class CreateProducerEndPoint : ICarterModule
                 var command = request.Adapt<CreateProducerCommand>();
                 var result = await sender.Send(command, token);
                 return Results.Created("/producers", result.ProducerId);
-            }).RequireAuthorization("AMW")
-            .WithTags("Producers")
+            }).WithTags("Producers")
             .WithDescription("Добавление новых производителей в бд")
             .WithDisplayName("Добавление производителей");
     }

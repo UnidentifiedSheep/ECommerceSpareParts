@@ -1,4 +1,6 @@
-﻿services:
+﻿version: '3.9'
+
+services:
   main.api:
     image: main.api
     build:
@@ -6,11 +8,14 @@
       dockerfile: src/Services/Main/Main.Api/Dockerfile
     ports:
       - "57005:7292"
+      - "57015:8080"
     volumes:
       - ./certs/localhost.pfx:/app/certs/localhost.pfx:ro
     environment:
       - ASPNETCORE_Kestrel__Certificates__Default__Path=/app/certs/localhost.pfx
       - ASPNETCORE_Kestrel__Certificates__Default__Password=PleasKillMe.21
+    networks:
+      - backend-network
 
   analytics.api:
     image: analytics.api
@@ -19,8 +24,30 @@
       dockerfile: src/Services/Analytics/Analytics.Api/Dockerfile
     ports:
       - "57004:7292"
+      - "57014:8080"
     volumes:
       - ./certs/localhost.pfx:/app/certs/localhost.pfx:ro
     environment:
       - ASPNETCORE_Kestrel__Certificates__Default__Path=/app/certs/localhost.pfx
       - ASPNETCORE_Kestrel__Certificates__Default__Password=PleasKillMe.21
+    networks:
+      - backend-network
+
+  gateway:
+    image: gateway
+    build:
+      context: .
+      dockerfile: src/Services/Gateway/Gateway/Dockerfile
+    ports:
+      - "57006:8081"
+    volumes:
+      - ./certs/localhost.pfx:/app/certs/localhost.pfx:ro
+    environment:
+      - ASPNETCORE_Kestrel__Certificates__Default__Path=/app/certs/localhost.pfx
+      - ASPNETCORE_Kestrel__Certificates__Default__Password=PleasKillMe.21
+    networks:
+      - backend-network
+
+networks:
+  backend-network:
+    driver: bridge

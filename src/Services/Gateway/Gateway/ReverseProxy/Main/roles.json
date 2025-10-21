@@ -1,0 +1,28 @@
+{
+  "ReverseProxy": {
+    "Routes": {
+      "create-role": {
+        "ClusterId": "main-cluster",
+        "Match": {
+          "Path": "/main/roles",
+          "Methods": [ "POST" ]
+        },
+        "AuthorizationPolicy": "AM",
+        "Transforms": [
+          { "PathRemovePrefix": "/main" }
+        ]
+      },
+      "get-roles": {
+        "ClusterId": "main-cluster",
+        "Match": {
+          "Path": "/main/roles",
+          "Methods": [ "GET" ]
+        },
+        "AuthorizationPolicy": "AM",
+        "Transforms": [
+          { "PathRemovePrefix": "/main" }
+        ]
+      }
+    }
+  }
+}

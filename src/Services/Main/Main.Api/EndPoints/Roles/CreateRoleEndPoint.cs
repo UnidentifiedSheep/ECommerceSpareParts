@@ -15,8 +15,7 @@ public class CreateRoleEndPoint : ICarterModule
                 var command = new CreateRoleCommand(request.Name, request.Description);
                 await sender.Send(command, cancellationToken);
                 return Results.Created();
-            }).RequireAuthorization("AM")
-            .WithTags("Roles")
+            }).WithTags("Roles")
             .WithDescription("Создание роли")
             .WithDisplayName("Создание роли");
     }

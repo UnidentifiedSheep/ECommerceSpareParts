@@ -18,9 +18,8 @@ public class EditProducerEndPoint : ICarterModule
                     var command = new EditProducerCommand(producerId, request.EditProducer);
                     await sender.Send(command, cancellationToken);
                     return Results.NoContent();
-                }).RequireAuthorization("AMW")
-            .WithTags("Producers")
-            .WithDescription("Редактирование производителя")
-            .WithDisplayName("Редактирование производителя");
+                }).WithTags("Producers")
+                .WithDescription("Редактирование производителя")
+                .WithDisplayName("Редактирование производителя");
     }
 }

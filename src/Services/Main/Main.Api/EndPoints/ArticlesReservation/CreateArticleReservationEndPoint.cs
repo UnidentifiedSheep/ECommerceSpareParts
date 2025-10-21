@@ -21,7 +21,6 @@ public class CreateArticleReservationEndPoint : ICarterModule
                 await sender.Send(command, cancellationToken);
                 return Results.NoContent();
             }).WithTags("ArticleReservations")
-            .RequireAuthorization("AMW")
             .WithDisplayName("Создать резервацию")
             .WithDescription("Создать резервацию для пользователя");
     }

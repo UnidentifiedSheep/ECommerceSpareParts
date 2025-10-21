@@ -32,8 +32,7 @@ public class GetTransactionsEndPoint : ICarterModule
                 if (roles.IsAnyMatchInvariant("admin", "moderator", "worker"))
                     return await GetAmw(sender, request, token);
                 return null;
-            }).RequireAuthorization()
-            .WithTags("Balances")
+            }).WithTags("Balances")
             .WithDescription("Получение списка транзакций")
             .WithDisplayName("Получение транзакций");
     }

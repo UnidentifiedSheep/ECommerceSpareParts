@@ -20,9 +20,8 @@ public class GetRoles : ICarterModule
                     var result = await sender.Send(command, cancellationToken);
                     var response = result.Adapt<GetRolesResponse>();
                     return Results.Ok(response);
-                }).RequireAuthorization("AMW")
-            .WithTags("Roles")
-            .WithDescription("Получение ролей")
-            .WithDisplayName("Получение ролей");
+                }).WithTags("Roles")
+                .WithDescription("Получение ролей")
+                .WithDisplayName("Получение ролей");
     }
 }

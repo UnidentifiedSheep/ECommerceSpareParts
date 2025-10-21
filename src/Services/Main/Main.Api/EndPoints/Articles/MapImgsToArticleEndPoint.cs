@@ -17,8 +17,7 @@ public class MapImgsToArticleEndPoint : ICarterModule
                     await sender.Send(command, token);
                     return Results.Ok();
                 }).WithMetadata()
-            .RequireAuthorization("AMW")
-            .WithTags("Articles")
-            .WithName("Добавить изображение к артикулу");
+                .WithTags("Articles")
+                .WithName("Добавить изображение к артикулу");
     }
 }

@@ -18,8 +18,7 @@ public class GetSaleContentEndPoint : ICarterModule
                 var result = await sender.Send(query, cancellationToken);
                 var response = result.Adapt<GetSaleContentResponse>();
                 return Results.Ok(response);
-            }).RequireAuthorization("AMW")
-            .WithTags("Sales")
+            }).WithTags("Sales")
             .WithDescription("Получение содержания продажи")
             .WithDisplayName("Получение содержания продажи");
     }

@@ -18,8 +18,7 @@ public class GetMarkupRangesEndPoint : ICarterModule
                 var result = await sender.Send(query, token);
                 var response = result.Adapt<GetMarkupRangesResponse>();
                 return Results.Ok(response);
-            }).RequireAuthorization("AM")
-            .WithTags("Markups")
+            }).WithTags("Markups")
             .WithDescription("Получение диапазонов группы")
             .WithDisplayName("Получение диапазонов группы");
     }

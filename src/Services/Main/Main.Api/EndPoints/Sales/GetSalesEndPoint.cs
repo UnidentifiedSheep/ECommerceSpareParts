@@ -34,8 +34,7 @@ public class GetSalesEndPoint : ICarterModule
                 var result = await sender.Send(query, token);
                 var response = result.Adapt<GetSalesResponse>();
                 return Results.Ok(response);
-            }).RequireAuthorization("AMW")
-            .WithTags("Sales")
+            }).WithTags("Sales")
             .WithDescription("Получение списка продаж")
             .WithDisplayName("Получение продаж");
     }

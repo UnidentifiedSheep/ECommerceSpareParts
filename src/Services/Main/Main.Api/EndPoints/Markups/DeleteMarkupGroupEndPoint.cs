@@ -13,8 +13,7 @@ public class DeleteMarkupGroupEndPoint : ICarterModule
                 var command = new DeleteMarkupGroupCommand(groupId);
                 await sender.Send(command, cancellation);
                 return Results.NoContent();
-            }).RequireAuthorization("AM")
-            .WithTags("Markups")
+            }).WithTags("Markups")
             .WithDescription("Удаление группы наценок")
             .WithDisplayName("Удаление группы наценок");
     }

@@ -19,8 +19,7 @@ public class GetMarkupGroupsEndPoint : ICarterModule
                 var result = await sender.Send(query, cancellationToken);
                 var response = result.Adapt<GetMarkupGroupsResponse>();
                 return Results.Ok(response);
-            }).RequireAuthorization("AM")
-            .WithTags("Markups")
+            }).WithTags("Markups")
             .WithDescription("Получение групп наценок")
             .WithDisplayName("Получение групп наценок");
     }

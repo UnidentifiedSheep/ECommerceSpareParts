@@ -1,0 +1,16 @@
+{
+  "ReverseProxy": {
+    "Routes": {
+      "get-prices": {
+        "ClusterId": "main-cluster",
+        "Match": {
+          "Path": "/main/prices",
+          "Methods": [ "GET" ]
+        },
+        "Transforms": [
+          { "PathRemovePrefix": "/main" }
+        ]
+      }
+    }
+  }
+}

@@ -19,7 +19,6 @@ public class CreateCurrencyEndPoint : ICarterModule
             var response = new CreateCurrencyResponse(result.Id);
             return Results.Created($"currencies/{result.Id}", response);
         }).WithTags("Currencies")
-        .RequireAuthorization("AM")
         .WithDescription("Создание валюты")
         .WithDisplayName("Создание валюты");
     }

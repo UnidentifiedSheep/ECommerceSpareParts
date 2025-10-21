@@ -36,8 +36,7 @@ public class GetPurchasesEndPoint : ICarterModule
                 var result = await sender.Send(query, token);
                 var response = result.Adapt<GetPurchasesResponse>();
                 return Results.Ok(response);
-            }).RequireAuthorization("AMW")
-            .WithTags("Purchases")
+            }).WithTags("Purchases")
             .WithDescription("Получение списка покупок")
             .WithDisplayName("Получение покупок");
     }

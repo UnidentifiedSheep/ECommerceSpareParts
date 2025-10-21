@@ -13,8 +13,7 @@ public class DeleteProducerEndPoint : ICarterModule
                 var command = new DeleteProducerCommand(id);
                 await sender.Send(command, cancellationToken);
                 return Results.Ok();
-            }).RequireAuthorization("AMW")
-            .WithTags("Producers")
+            }).WithTags("Producers")
             .WithDescription("Удаление производителя из бд")
             .WithDisplayName("Удаление производителя");
     }

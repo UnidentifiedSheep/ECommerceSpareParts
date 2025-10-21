@@ -22,9 +22,8 @@ public class CreateMailForUserEndPoint : ICarterModule
                     var response = result.Adapt<CreateMailForUserResponse>();
                     string? uri = null;
                     return Results.Created(uri, response);
-                }).RequireAuthorization("AM")
-            .WithTags("Users")
-            .WithDescription("Создание корпоративной почты для определенного пользователя")
-            .WithDisplayName("Создание почты для пользователя");
+                }).WithTags("Users")
+                .WithDescription("Создание корпоративной почты для определенного пользователя")
+                .WithDisplayName("Создание почты для пользователя");
     }
 }

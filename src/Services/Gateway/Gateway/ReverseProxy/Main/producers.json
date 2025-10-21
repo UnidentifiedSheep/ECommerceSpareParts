@@ -1,0 +1,82 @@
+{
+  "ReverseProxy": {
+    "Routes": {
+      "add-other-name-to-producer": {
+        "ClusterId": "main-cluster",
+        "Match": {
+          "Path": "/main/producers/{producerId}/names",
+          "Methods": [ "POST" ]
+        },
+        "AuthorizationPolicy": "AMW",
+        "Transforms": [
+          { "PathRemovePrefix": "/main" }
+        ]
+      },
+      "create-producer": {
+        "ClusterId": "main-cluster",
+        "Match": {
+          "Path": "/main/producers",
+          "Methods": [ "POST" ]
+        },
+        "AuthorizationPolicy": "AMW",
+        "Transforms": [
+          { "PathRemovePrefix": "/main" }
+        ]
+      },
+      "delete-producer-other-name": {
+        "ClusterId": "main-cluster",
+        "Match": {
+          "Path": "/main/producers/{producerId}/names/{otherName}",
+          "Methods": [ "DELETE" ]
+        },
+        "AuthorizationPolicy": "AMW",
+        "Transforms": [
+          { "PathRemovePrefix": "/main" }
+        ]
+      },
+      "delete-producer": {
+        "ClusterId": "main-cluster",
+        "Match": {
+          "Path": "/main/producers/{id}",
+          "Methods": [ "DELETE" ]
+        },
+        "AuthorizationPolicy": "AMW",
+        "Transforms": [
+          { "PathRemovePrefix": "/main" }
+        ]
+      },
+      "edit-producer": {
+        "ClusterId": "main-cluster",
+        "Match": {
+          "Path": "/main/producers/{producerId}",
+          "Methods": [ "PATCH" ]
+        },
+        "AuthorizationPolicy": "AMW",
+        "Transforms": [
+          { "PathRemovePrefix": "/main" }
+        ]
+      },
+      "get-producer-other-names": {
+        "ClusterId": "main-cluster",
+        "Match": {
+          "Path": "/main/producers/{producerId}/names",
+          "Methods": [ "GET" ]
+        },
+        "AuthorizationPolicy": "AMW",
+        "Transforms": [
+          { "PathRemovePrefix": "/main" }
+        ]
+      },
+      "get-producers": {
+        "ClusterId": "main-cluster",
+        "Match": {
+          "Path": "/main/producers",
+          "Methods": [ "GET" ]
+        },
+        "Transforms": [
+          { "PathRemovePrefix": "/main" }
+        ]
+      }
+    }
+  }
+}

@@ -25,9 +25,8 @@ public class CreateMarkupEndPoint : ICarterModule
                     var result = await sender.Send(command, cancellationToken);
                     var response = new CreateMarkupResponse(result.GroupId);
                     return Results.Created($"/markups/{result.GroupId}", response);
-                }).RequireAuthorization("AM")
-            .WithTags("Markups")
-            .WithDescription("Создание группы наценок")
-            .WithDisplayName("Создание группы наценок");
+                }).WithTags("Markups")
+                .WithDescription("Создание группы наценок")
+                .WithDisplayName("Создание группы наценок");
     }
 }

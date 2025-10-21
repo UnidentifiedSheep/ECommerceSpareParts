@@ -20,8 +20,7 @@ public class GetProducerOtherNamesEndPoint : ICarterModule
                     var result = await sender.Send(query, token);
                     return Results.Ok(result.Adapt<GetProducerOtherNamesResponse>());
                 }).WithTags("Producers")
-            .RequireAuthorization("AMW")
-            .WithDisplayName("Получение дополнительных имен производителя")
-            .WithDescription("Дополнительные имена производителя");
+                .WithDisplayName("Получение дополнительных имен производителя")
+                .WithDescription("Дополнительные имена производителя");
     }
 }

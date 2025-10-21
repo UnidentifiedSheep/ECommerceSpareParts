@@ -16,9 +16,8 @@ public class SelectDefaultMarkupEndPoint : ICarterModule
                     var command = new SelectDefaultMarkupCommand(request.MarkupGroupId);
                     await sender.Send(command, token);
                     return Results.Ok();
-                }).RequireAuthorization("AM")
-            .WithTags("Markups")
-            .WithDescription("Установка дефолтной политики-наценки")
-            .WithDisplayName("Установка дефолтной политики-наценки");
+                }).WithTags("Markups")
+                .WithDescription("Установка дефолтной политики-наценки")
+                .WithDisplayName("Установка дефолтной политики-наценки");
     }
 }

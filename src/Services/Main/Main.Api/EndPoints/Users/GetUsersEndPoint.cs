@@ -47,9 +47,8 @@ public class GetUsersEndPoint : ICarterModule
                     var result = await sender.Send(query, token);
                     var response = result.Adapt<GetUsersResponse>();
                     return Results.Ok(response);
-                }).RequireAuthorization("AMW")
-            .WithTags("Users")
-            .WithDescription("Получение пользователей")
-            .WithDisplayName("Получение пользователей");
+                }).WithTags("Users")
+                .WithDescription("Получение пользователей")
+                .WithDisplayName("Получение пользователей");
     }
 }

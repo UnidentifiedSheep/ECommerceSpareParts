@@ -18,7 +18,6 @@ public class CreateStorageEndPoint : ICarterModule
                     await sender.Send(command, cancellationToken);
                     return Results.Created();
                 }).WithTags("Storages")
-            .RequireAuthorization("AM")
             .WithDescription("Создание нового склада")
             .WithDisplayName("Создать склад");
     }

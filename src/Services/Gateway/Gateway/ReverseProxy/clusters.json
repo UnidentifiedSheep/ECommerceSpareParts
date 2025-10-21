@@ -1,0 +1,17 @@
+{
+  "ReverseProxy": {
+    "Clusters": {
+      "main-cluster": {
+        "LoadBalancingPolicy": "RoundRobin",
+        "Destinations": {
+          "main-api": {
+            "Address": "https://main.api:7292/"
+          }
+        },
+        "HttpClient": {
+          "DangerousAcceptAnyServerCertificate": "true"
+        }
+      }
+    }
+  }
+}

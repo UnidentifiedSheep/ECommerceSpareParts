@@ -16,8 +16,7 @@ public class SetArticlesContentCountEndPoint : ICarterModule
                 var command = new SetArticlesContentCountCommand(articleId, insideArticleId, request.Count);
                 await sender.Send(command, token);
                 return Results.NoContent();
-            }).RequireAuthorization("AMW")
-            .WithTags("Articles")
+            }).WithTags("Articles")
             .WithName("Установка входящего количества в содержимое артикула");
     }
 }

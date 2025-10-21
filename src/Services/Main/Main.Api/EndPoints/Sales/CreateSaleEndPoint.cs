@@ -32,9 +32,8 @@ public class CreateSaleEndPoint : ICarterModule
                         request.ConfirmationCode);
                     await sender.Send(command, token);
                     return Results.Ok();
-                }).RequireAuthorization("AMW")
-            .WithTags("Sales")
-            .WithDescription("Создание новой продажи")
-            .WithDisplayName("Создание новой продажи");
+                }).WithTags("Sales")
+                .WithDescription("Создание новой продажи")
+                .WithDisplayName("Создание новой продажи");
     }
 }

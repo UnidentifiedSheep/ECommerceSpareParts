@@ -30,8 +30,7 @@ public class GetStorageContentEndPoint : ICarterModule
                     var result = await sender.Send(query, token);
                     var response = result.Adapt<GetStorageContentResponse>();
                     return Results.Ok(response);
-                }).RequireAuthorization("AMW")
-            .WithTags("Storages")
+                }).WithTags("Storages")
             .WithDescription("Получение списка позиций на складе по айди артикула или по названию склада")
             .WithDisplayName("Получение позиций склада");
     }

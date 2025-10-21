@@ -17,8 +17,7 @@ public class CreateArticleEndPoint : ICarterModule
                 var command = request.Adapt<CreateArticlesCommand>();
                 await sender.Send(command, token);
                 return Results.Created();
-            }).RequireAuthorization("AMW")
-            .WithTags("Articles")
+            }).WithTags("Articles")
             .WithDescription("Добавление новых артикулов в бд")
             .WithDisplayName("Добавление артикулов");
     }

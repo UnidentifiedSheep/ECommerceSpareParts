@@ -16,6 +16,7 @@ public static class ServiceProvider
         collection.AddScoped<IUnitOfWork, UnitOfWork>();
 
         collection.AddScoped<ICurrencyRepository, CurrencyRepository>();
+        collection.AddScoped<ISellInfoRepository, SellInfoRepository>();
 
         return collection;
     }

@@ -22,7 +22,6 @@ public class EditArticleReservationEndPoint : ICarterModule
                 await sender.Send(command, token);
                 return Results.NoContent();
             }).WithTags("ArticleReservations")
-            .RequireAuthorization("AMW")
             .WithDisplayName("Редактирование резервации")
             .WithDescription("Редактирование резервации");
     }

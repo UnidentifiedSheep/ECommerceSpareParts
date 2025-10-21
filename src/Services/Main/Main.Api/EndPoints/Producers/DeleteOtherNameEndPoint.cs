@@ -16,7 +16,6 @@ public class DeleteOtherNameEndPoint : ICarterModule
                     await sender.Send(command, cancellationToken);
                     return Results.NoContent();
                 }).WithTags("Producers")
-            .RequireAuthorization("AMW")
             .WithDisplayName("Удаление дополнительного имени")
             .WithDescription("Удаление дополнительного имени у производителю");
     }

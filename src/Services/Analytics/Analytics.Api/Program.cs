@@ -6,6 +6,7 @@ using Contracts.Currency;
 using Contracts.Sale;
 using Core.Interfaces.MessageBroker;
 using Core.Models;
+using MassTransit;
 using RabbitMq;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -32,7 +33,11 @@ builder.Services.AddScoped<IEventHandler<CurrencyCreatedEvent>, CurrencyCreatedE
 builder.Services.AddScoped<IEventHandler<CurrencyRateChangedEvent>, CurrencyRatesChangedEventHandler>();
 builder.Services.AddScoped<IEventHandler<SaleCreatedEvent>, SaleCreatedEventHandler>();
 
-builder.Services.AddMassageBrokerLayer<DContext>(brokerOptions, eventHandlers)
+builder.Services.AddMassageBrokerLayer<DContext>(brokerOptions, eventHandlers, opt =>
+    {
+        opt.UseBusOutbox();
+        opt.UsePostgres();
+    })
     .AddPersistenceLayer(builder.Configuration["ConnectionStrings:DefaultConnection"]!)
     .AddApplicationLayer();
 

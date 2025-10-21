@@ -54,6 +54,7 @@ public partial class DContext : DbContext
             entity.HasIndex(e => e.SellPrice, "sell_info_sell_price_index");
 
             entity.HasIndex(e => e.StorageName, "sell_info_storage_name_index");
+            entity.HasIndex(e => e.SellDate, "sell_info_sell_date_index");
 
             entity.Property(e => e.ArticleId).HasColumnName("article_id");
             entity.Property(e => e.BuyCurrencyId).HasColumnName("buy_currency_id");
@@ -63,6 +64,7 @@ public partial class DContext : DbContext
             entity.Property(e => e.SellCurrencyId).HasColumnName("sell_currency_id");
             entity.Property(e => e.SellPrice).HasColumnName("sell_price");
             entity.Property(e => e.StorageName).HasColumnName("storage_name");
+            entity.Property(e => e.SellDate).HasColumnName("sell_date");
 
             entity.HasOne(d => d.BuyCurrency).WithMany()
                 .HasForeignKey(d => d.BuyCurrencyId)

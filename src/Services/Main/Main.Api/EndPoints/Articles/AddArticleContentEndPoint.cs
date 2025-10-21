@@ -16,8 +16,7 @@ public class AddArticleContentEndPoint : ICarterModule
                 var command = new AddArticleContentCommand(articleId, request.Content);
                 await sender.Send(command, cancellationToken);
                 return Results.NoContent();
-            }).RequireAuthorization("AMW")
-            .WithTags("Articles")
+            }).WithTags("Articles")
             .WithDescription("Добавление содержимое артикула в бд")
             .WithDisplayName("Добавление содержимое артикула");
     }

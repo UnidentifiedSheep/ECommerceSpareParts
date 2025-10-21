@@ -23,4 +23,12 @@ RUN dotnet publish "./Analytics.Api.csproj" -c $BUILD_CONFIGURATION -o /app/publ
 FROM base AS final
 WORKDIR /app
 COPY --from=publish /app/publish .
+
+RUN mkdir -p /usr/local/share/ca-certificates/custom \
+    && for cert in /app/certs/*.pfx; do \
+        openssl pkcs12 -in "$cert" -nokeys -out "/usr/local/share/ca-certificates/custom/$(basename "$cert").crt" -clcerts -passin pass:PASSWORD; \
+    done \
+    && chmod 644 /usr/local/share/ca-certificates/custom/* \
+    && update-ca-certificates
+
 ENTRYPOINT ["dotnet", "Analytics.Api.dll"]

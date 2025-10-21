@@ -17,6 +17,8 @@ public partial class SellInfo
     public int SellContentId { get; set; }
 
     public decimal? Markup { get; set; }
+    
+    public DateTime SellDate { get; set; }
 
     public virtual Currency BuyCurrency { get; set; } = null!;
 

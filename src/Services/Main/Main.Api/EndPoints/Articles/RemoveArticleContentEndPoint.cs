@@ -14,9 +14,8 @@ public class RemoveArticleContentEndPoint : ICarterModule
                     var command = new RemoveArticleContentCommand(articleId, insideArticleId);
                     await sender.Send(command, token);
                     return Results.NoContent();
-                }).RequireAuthorization("AMW")
-            .WithTags("Articles")
-            .WithDescription("Удаление содержимого артикула в бд")
-            .WithDisplayName("Удаление содержимого артикула");
+                }).WithTags("Articles")
+                .WithDescription("Удаление содержимого артикула в бд")
+                .WithDisplayName("Удаление содержимого артикула");
     }
 }

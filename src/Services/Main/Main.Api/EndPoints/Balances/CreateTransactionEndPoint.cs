@@ -28,7 +28,6 @@ public class CreateTransactionEndPoint : ICarterModule
                 await sender.Send(command, token);
                 return Results.Ok();
             }).WithTags("Balances")
-            .RequireAuthorization("AMW")
             .WithDescription("Создание транзакции")
             .WithDisplayName("Создание транзакции");
     }

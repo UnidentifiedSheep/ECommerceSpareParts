@@ -1,0 +1,50 @@
+{
+  "ReverseProxy": {
+    "Routes": {
+      "create-article-reservation": {
+        "ClusterId": "main-cluster",
+        "Match": {
+          "Path": "/main/articles/reservations",
+          "Methods": [ "POST" ]
+        },
+        "AuthorizationPolicy": "AMW",
+        "Transforms": [
+          { "PathRemovePrefix": "/main" }
+        ]
+      },
+      "delete-article-reservation": {
+        "ClusterId": "main-cluster",
+        "Match": {
+          "Path": "/main/articles/reservations/{reservationId}",
+          "Methods": [ "DELETE" ]
+        },
+        "AuthorizationPolicy": "AMW",
+        "Transforms": [
+          { "PathRemovePrefix": "/main" }
+        ]
+      },
+      "edit-article-reservation": {
+        "ClusterId": "main-cluster",
+        "Match": {
+          "Path": "/main/articles/reservations/{reservationId}",
+          "Methods": [ "PUT" ]
+        },
+        "AuthorizationPolicy": "AMW",
+        "Transforms": [
+          { "PathRemovePrefix": "/main" }
+        ]
+      },
+      "get-article-reservations": {
+        "ClusterId": "main-cluster",
+        "Match": {
+          "Path": "/main/articles/reservations",
+          "Methods": [ "GET" ]
+        },
+        "AuthorizationPolicy": "AMW",
+        "Transforms": [
+          { "PathRemovePrefix": "/main" }
+        ]
+      }
+    }
+  }
+}

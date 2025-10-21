@@ -17,7 +17,6 @@ public class AddOtherNameToProducerEndPoint : ICarterModule
                 await sender.Send(command, token);
                 return Results.Ok();
             }).WithTags("Producers")
-            .RequireAuthorization("AMW")
             .WithDisplayName("Добавление дополнительного имени")
             .WithDescription("Добавление дополнительного имени к производителю");
     }

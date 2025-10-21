@@ -18,7 +18,6 @@ public class DeletePurchaseEndPoint : ICarterModule
                 await sender.Send(command, cancellationToken);
                 return Results.NoContent();
             }).WithTags("Purchases")
-            .RequireAuthorization("AMW")
             .WithDescription("Удаление закупки")
             .WithDisplayName("Удаление закупки");
     }

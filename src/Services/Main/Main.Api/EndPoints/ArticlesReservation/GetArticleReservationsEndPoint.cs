@@ -30,7 +30,6 @@ public class GetArticleReservationsEndPoint : ICarterModule
                     var response = result.Adapt<GetArticleReservationsResponse>();
                     return Results.Ok(response);
                 }).WithTags("ArticleReservations")
-            .RequireAuthorization("AMW")
             .WithDisplayName("Создать резервацию")
             .WithDescription("Создать резервацию для пользователя");
     }

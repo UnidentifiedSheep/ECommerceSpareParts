@@ -14,8 +14,7 @@ public class DeleteStorageEndPoint : ICarterModule
                     var command = new DeleteStorageCommand(storageName);
                     await sender.Send(command, cancellationToken);
                     return Results.NoContent();
-                }).RequireAuthorization("AM")
-            .WithTags("Storages")
+                }).WithTags("Storages")
             .WithDescription("Полное удаление склада по его имени")
             .WithDisplayName("Удаление склада");
     }

@@ -1,0 +1,94 @@
+{
+  "ReverseProxy": {
+    "Routes": {
+      "add-content-to-storage": {
+        "ClusterId": "main-cluster",
+        "Match": {
+          "Path": "/main/storages/content",
+          "Methods": [ "POST" ]
+        },
+        "AuthorizationPolicy": "AMW",
+        "Transforms": [
+          { "PathRemovePrefix": "/main" }
+        ]
+      },
+      "create-storage": {
+        "ClusterId": "main-cluster",
+        "Match": {
+          "Path": "/main/storages/",
+          "Methods": [ "POST" ]
+        },
+        "AuthorizationPolicy": "AM",
+        "Transforms": [
+          { "PathRemovePrefix": "/main" }
+        ]
+      },
+      "delete-storage-content": {
+        "ClusterId": "main-cluster",
+        "Match": {
+          "Path": "/main/storages/content/{contentId}",
+          "Methods": [ "DELETE" ]
+        },
+        "AuthorizationPolicy": "AM",
+        "Transforms": [
+          { "PathRemovePrefix": "/main" }
+        ]
+      },
+      "delete-storage": {
+        "ClusterId": "main-cluster",
+        "Match": {
+          "Path": "/main/storages/{StorageName}",
+          "Methods": [ "DELETE" ]
+        },
+        "AuthorizationPolicy": "AM",
+        "Transforms": [
+          { "PathRemovePrefix": "/main" }
+        ]
+      },
+      "edit-storage-content": {
+        "ClusterId": "main-cluster",
+        "Match": {
+          "Path": "/main/storages/content",
+          "Methods": [ "PATCH" ]
+        },
+        "AuthorizationPolicy": "AMW",
+        "Transforms": [
+          { "PathRemovePrefix": "/main" }
+        ]
+      },
+      "edit-storage": {
+        "ClusterId": "main-cluster",
+        "Match": {
+          "Path": "/main/storages/{storageName}",
+          "Methods": [ "PATCH" ]
+        },
+        "AuthorizationPolicy": "AM",
+        "Transforms": [
+          { "PathRemovePrefix": "/main" }
+        ]
+      },
+      "get-storage-content": {
+        "ClusterId": "main-cluster",
+        "Match": {
+          "Path": "/main/storages/content",
+          "Methods": [ "GET" ]
+        },
+        "AuthorizationPolicy": "AMW",
+        "Transforms": [
+          { "PathRemovePrefix": "/main" }
+        ]
+      },
+      "get-storages": {
+        "ClusterId": "main-cluster",
+        "Match": {
+          "Path": "/main/storages/",
+          "Methods": [ "GET" ]
+        },
+        "AuthorizationPolicy": "AMW",
+        "Transforms": [
+          { "PathRemovePrefix": "/main" }
+        ]
+      }
+    }
+  }
+}
