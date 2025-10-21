@@ -2,6 +2,7 @@ using System.Text;
 using Gateway.Extensions;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
+using Yarp.ReverseProxy.Transforms;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -35,11 +36,18 @@ builder.Services.AddAuthentication(options =>
     };
 });
 
+var secret = builder.Configuration["Gateway:Secret"];
+
 builder.Services.AddReverseProxy()
     .LoadFromConfig(builder.Configuration.GetSection("ReverseProxy"))
     .AddTransforms(builderContext =>
     {
         builderContext.CopyRequestHeaders = true;
+        builderContext.AddRequestTransform(transformContext =>
+        {
+            transformContext.ProxyRequest.Headers.Add("X-Gateway-Token", secret);
+            return ValueTask.CompletedTask;
+        });
     });
 
 var app = builder.Build();

@@ -2,6 +2,7 @@ using System.Text;
 using Api.Common;
 using Api.Common.ExceptionHandlers;
 using Api.Common.Logging;
+using Api.Common.Middleware;
 using Carter;
 using Contracts;
 using Contracts.Currency;
@@ -173,8 +174,12 @@ builder.Services.AddCors(options =>
 
 var endpointAssembly = typeof(AddArticleContentEndPoint).Assembly;
 builder.Services.AddCarter(new DependencyContextAssemblyCatalog(endpointAssembly));
+var secret = builder.Configuration["Gateway:Secret"]!;
+builder.Services.AddTransient<HeaderSecretMiddleware>(_ => new HeaderSecretMiddleware(secret));
 
 var app = builder.Build();
+
+app.UseMiddleware<HeaderSecretMiddleware>();
 
 app.UseForwardedHeaders(new ForwardedHeadersOptions
 {
@@ -187,6 +192,7 @@ MapsterConfig.Configure();
 SortByConfig.Configure();
 
 await SetupPrice(app.Services);
+
 
 app.UseRouting();
 app.UseCors();
