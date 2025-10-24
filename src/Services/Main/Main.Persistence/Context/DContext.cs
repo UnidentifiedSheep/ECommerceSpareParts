@@ -100,7 +100,6 @@ public partial class DContext : DbContext
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
-        
         modelBuilder.AddOutboxMessageEntity();
         modelBuilder.AddOutboxStateEntity();
         modelBuilder.AddInboxStateEntity();
@@ -274,8 +273,8 @@ public partial class DContext : DbContext
             entity.Property(e => e.ArticleId).HasColumnName("article_id");
             entity.Property(e => e.BuyPrice).HasColumnName("buy_price");
             entity.Property(e => e.CreationDatetime)
-                .HasDefaultValueSql("(now())::timestamp without time zone")
-                .HasColumnType("timestamp without time zone")
+                .HasDefaultValueSql("(now())::timestamp with time zone")
+                .HasColumnType("timestamp with time zone")
                 .HasColumnName("creation_datetime");
             entity.Property(e => e.CurrencyId).HasColumnName("currency_id");
             entity.Property(e => e.CurrentSupplierStock)
@@ -430,7 +429,7 @@ public partial class DContext : DbContext
             entity.Property(e => e.CurrencyId).HasColumnName("currency_id");
             entity.Property(e => e.Datetime)
                 .HasDefaultValueSql("now()")
-                .HasColumnType("timestamp without time zone")
+                .HasColumnType("timestamp with time zone")
                 .HasColumnName("datetime");
             entity.Property(e => e.NewValue).HasColumnName("new_value");
             entity.Property(e => e.PrevValue).HasColumnName("prev_value");
@@ -630,18 +629,18 @@ public partial class DContext : DbContext
                 .HasColumnName("comment");
             entity.Property(e => e.CreatedUserId).HasColumnName("created_user_id");
             entity.Property(e => e.CreationDatetime)
-                .HasDefaultValueSql("(now())::timestamp without time zone")
-                .HasColumnType("timestamp without time zone")
+                .HasDefaultValueSql("(now())::timestamp with time zone")
+                .HasColumnType("timestamp with time zone")
                 .HasColumnName("creation_datetime");
             entity.Property(e => e.CurrencyId).HasColumnName("currency_id");
             entity.Property(e => e.PurchaseDatetime)
-                .HasColumnType("timestamp without time zone")
+                .HasColumnType("timestamp with time zone")
                 .HasColumnName("purchase_datetime");
             entity.Property(e => e.Storage).HasColumnName("storage");
             entity.Property(e => e.SupplierId).HasColumnName("supplier_id");
             entity.Property(e => e.TransactionId).HasColumnName("transaction_id");
             entity.Property(e => e.UpdateDatetime)
-                .HasColumnType("timestamp without time zone")
+                .HasColumnType("timestamp with time zone")
                 .HasColumnName("update_datetime");
             entity.Property(e => e.UpdatedUserId).HasColumnName("updated_user_id");
 
@@ -782,17 +781,17 @@ public partial class DContext : DbContext
                 .HasColumnName("comment");
             entity.Property(e => e.CreatedUserId).HasColumnName("created_user_id");
             entity.Property(e => e.CreationDatetime)
-                .HasDefaultValueSql("(now())::timestamp without time zone")
-                .HasColumnType("timestamp without time zone")
+                .HasDefaultValueSql("(now())::timestamp with time zone")
+                .HasColumnType("timestamp with time zone")
                 .HasColumnName("creation_datetime");
             entity.Property(e => e.CurrencyId).HasColumnName("currency_id");
             entity.Property(e => e.MainStorageName).HasColumnName("main_storage_name");
             entity.Property(e => e.SaleDatetime)
-                .HasColumnType("timestamp without time zone")
+                .HasColumnType("timestamp with time zone")
                 .HasColumnName("sale_datetime");
             entity.Property(e => e.TransactionId).HasColumnName("transaction_id");
             entity.Property(e => e.UpdateDatetime)
-                .HasColumnType("timestamp without time zone")
+                .HasColumnType("timestamp with time zone")
                 .HasColumnName("update_datetime");
             entity.Property(e => e.UpdatedUserId).HasColumnName("updated_user_id");
 
@@ -881,7 +880,7 @@ public partial class DContext : DbContext
             entity.Property(e => e.Count).HasColumnName("count");
             entity.Property(e => e.CurrencyId).HasColumnName("currency_id");
             entity.Property(e => e.PurchaseDatetime)
-                .HasColumnType("timestamp without time zone")
+                .HasColumnType("timestamp with time zone")
                 .HasColumnName("purchase_datetime");
             entity.Property(e => e.SaleContentId).HasColumnName("sale_content_id");
             entity.Property(e => e.Storage).HasColumnName("storage");
@@ -964,12 +963,12 @@ public partial class DContext : DbContext
             entity.Property(e => e.BuyPriceInUsd).HasColumnName("buy_price_in_usd");
             entity.Property(e => e.Count).HasColumnName("count");
             entity.Property(e => e.CreatedDatetime)
-                .HasDefaultValueSql("(now())::timestamp without time zone")
-                .HasColumnType("timestamp without time zone")
+                .HasDefaultValueSql("(now())::timestamp with time zone")
+                .HasColumnType("timestamp with time zone")
                 .HasColumnName("created_datetime");
             entity.Property(e => e.CurrencyId).HasColumnName("currency_id");
             entity.Property(e => e.PurchaseDatetime)
-                .HasColumnType("timestamp without time zone")
+                .HasColumnType("timestamp with time zone")
                 .HasColumnName("purchase_datetime");
             entity.Property(e => e.StorageName)
                 .HasMaxLength(128)
@@ -1021,7 +1020,7 @@ public partial class DContext : DbContext
             entity.Property(e => e.Comment).HasColumnName("comment");
             entity.Property(e => e.CreateAt)
                 .HasDefaultValueSql("now()")
-                .HasColumnType("timestamp without time zone")
+                .HasColumnType("timestamp with time zone")
                 .HasColumnName("create_at");
             entity.Property(e => e.CurrentCount).HasColumnName("current_count");
             entity.Property(e => e.GivenCurrencyId).HasColumnName("given_currency_id");
@@ -1031,7 +1030,7 @@ public partial class DContext : DbContext
                 .HasDefaultValue(false)
                 .HasColumnName("is_done");
             entity.Property(e => e.UpdatedAt)
-                .HasColumnType("timestamp without time zone")
+                .HasColumnType("timestamp with time zone")
                 .HasColumnName("updated_at");
             entity.Property(e => e.UserId).HasColumnName("user_id");
             entity.Property(e => e.WhoCreated).HasColumnName("who_created");
@@ -1091,7 +1090,7 @@ public partial class DContext : DbContext
             entity.Property(e => e.Count).HasColumnName("count");
             entity.Property(e => e.CreatedAt)
                 .HasDefaultValueSql("now()")
-                .HasColumnType("timestamp without time zone")
+                .HasColumnType("timestamp with time zone")
                 .HasColumnName("created_at");
             entity.Property(e => e.CurrencyId).HasColumnName("currency_id");
             entity.Property(e => e.Price).HasColumnName("price");
@@ -1154,12 +1153,12 @@ public partial class DContext : DbContext
                 .HasDefaultValueSql("gen_random_uuid()")
                 .HasColumnName("id");
             entity.Property(e => e.CreationDate)
-                .HasDefaultValueSql("(now())::timestamp without time zone")
-                .HasColumnType("timestamp without time zone")
+                .HasDefaultValueSql("(now())::timestamp with time zone")
+                .HasColumnType("timestamp with time zone")
                 .HasColumnName("creation_date");
             entity.Property(e => e.CurrencyId).HasColumnName("currency_id");
             entity.Property(e => e.DeletedAt)
-                .HasColumnType("timestamp without time zone")
+                .HasColumnType("timestamp with time zone")
                 .HasColumnName("deleted_at");
             entity.Property(e => e.DeletedBy).HasColumnName("deleted_by");
             entity.Property(e => e.IsDeleted)
@@ -1173,7 +1172,7 @@ public partial class DContext : DbContext
                 .HasMaxLength(28)
                 .HasColumnName("status");
             entity.Property(e => e.TransactionDatetime)
-                .HasColumnType("timestamp without time zone")
+                .HasColumnType("timestamp with time zone")
                 .HasColumnName("transaction_datetime");
             entity.Property(e => e.TransactionSum).HasColumnName("transaction_sum");
             entity.Property(e => e.WhoMadeUserId).HasColumnName("who_made_user_id");
@@ -1239,14 +1238,14 @@ public partial class DContext : DbContext
                 .HasMaxLength(28)
                 .HasColumnName("status");
             entity.Property(e => e.TransactionDatetime)
-                .HasColumnType("timestamp without time zone")
+                .HasColumnType("timestamp with time zone")
                 .HasColumnName("transaction_datetime");
             entity.Property(e => e.TransactionId).HasColumnName("transaction_id");
             entity.Property(e => e.TransactionSum).HasColumnName("transaction_sum");
             entity.Property(e => e.Version).HasColumnName("version");
             entity.Property(e => e.VersionCreatedDatetime)
                 .HasDefaultValueSql("now()")
-                .HasColumnType("timestamp without time zone")
+                .HasColumnType("timestamp with time zone")
                 .HasColumnName("version_created_datetime");
 
             entity.HasOne(d => d.Currency).WithMany(p => p.TransactionVersions)
@@ -1534,7 +1533,7 @@ public partial class DContext : DbContext
                 .HasColumnName("query");
             entity.Property(e => e.SearchDateTime)
                 .HasDefaultValueSql("now()")
-                .HasColumnType("timestamp without time zone")
+                .HasColumnType("timestamp with time zone")
                 .HasColumnName("search_date_time");
             entity.Property(e => e.SearchPlace).HasColumnName("search_place");
             entity.Property(e => e.UserId).HasColumnName("user_id");
@@ -1624,8 +1623,8 @@ public partial class DContext : DbContext
                 .HasColumnName("id");
             entity.Property(e => e.Comment).HasColumnName("comment");
             entity.Property(e => e.CreatedAt)
-                .HasDefaultValueSql("(now())::timestamp without time zone")
-                .HasColumnType("timestamp without time zone")
+                .HasDefaultValueSql("(now())::timestamp with time zone")
+                .HasColumnType("timestamp with time zone")
                 .HasColumnName("created_at");
             entity.Property(e => e.EngineCode).HasColumnName("engine_code");
             entity.Property(e => e.Manufacture)
@@ -1647,7 +1646,25 @@ public partial class DContext : DbContext
                 .HasConstraintName("user_vehicles_users_id_fk");
         });
         modelBuilder.HasSequence<int>("storage_movement_id_seq");
+        
+        base.OnModelCreating(modelBuilder);
 
+        foreach (var entityType in modelBuilder.Model.GetEntityTypes())
+        {
+            var dateTimeProps = entityType.GetProperties()
+                .Where(p => p.ClrType == typeof(DateTime) || p.ClrType == typeof(DateTime?));
+
+            foreach (var prop in dateTimeProps)
+            {
+                prop.SetValueConverter(
+                    new Microsoft.EntityFrameworkCore.Storage.ValueConversion.ValueConverter<DateTime, DateTime>(
+                        v => v.Kind == DateTimeKind.Utc ? v : v.ToUniversalTime(),
+                        v => v.ToUniversalTime()
+                    )
+                );
+            }
+        }
+        
         OnModelCreatingPartial(modelBuilder);
     }
 

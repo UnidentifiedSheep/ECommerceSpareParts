@@ -50,25 +50,25 @@ public class CreateFullSaleHandler(IMediator mediator, IArticlesRepository artic
         var storageName = request.StorageName;
         var sellFromOtherStorages = request.SellFromOtherStorages;
         var saleContentList = request.SaleContent.ToList();
-        var dateTimeWithoutTimeZone = DateTime.SpecifyKind(request.SaleDateTime, DateTimeKind.Unspecified);
+        var dateTime = request.SaleDateTime;
 
         await CheckReservations(saleContentList, buyerId, whoCreated, storageName, sellFromOtherStorages,
             request.ConfirmationCode, cancellationToken);
 
         var totalSum = saleContentList.GetTotalSum();
         var transaction = await CreateTransaction(totalSum, Global.SystemId, buyerId, currencyId, whoCreated,
-            dateTimeWithoutTimeZone, cancellationToken);
+            dateTime, cancellationToken);
 
         var changedStorageContents = (await RemoveContentFromStorage(saleContentList,
             whoCreated, storageName, sellFromOtherStorages, cancellationToken)).ToList();
 
         var sale = await CreateSale(changedStorageContents, saleContentList, currencyId, buyerId, whoCreated,
             transaction.Id,
-            storageName, dateTimeWithoutTimeZone, request.Comment, cancellationToken);
+            storageName, dateTime, request.Comment, cancellationToken);
 
         if (request.PayedSum > 0)
             await CreateTransaction(request.PayedSum.Value, buyerId, Global.SystemId, currencyId, whoCreated,
-                dateTimeWithoutTimeZone, cancellationToken);
+                dateTime, cancellationToken);
 
         var saleCounts = sale.SaleContents
             .GroupBy(x => x.ArticleId)

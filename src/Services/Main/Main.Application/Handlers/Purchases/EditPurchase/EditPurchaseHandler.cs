@@ -37,7 +37,7 @@ public class EditPurchaseHandler(DbDataValidatorBase dbValidator,
     {
         var purchaseId = request.PurchaseId;
         var currencyId = request.CurrencyId;
-        var purchaseDateTime = DateTime.SpecifyKind(request.PurchaseDateTime, DateTimeKind.Unspecified);
+        var purchaseDateTime = request.PurchaseDateTime;
         var whoUpdated = request.UpdatedUserId;
         var comment = request.Comment;
         var result = new Dictionary<int, Dictionary<decimal, int>>();
@@ -115,8 +115,8 @@ public class EditPurchaseHandler(DbDataValidatorBase dbValidator,
     {
         purchase.Comment = comment?.Trim();
         purchase.CurrencyId = currencyId;
-        purchase.PurchaseDatetime = DateTime.SpecifyKind(purchaseDateTime, DateTimeKind.Unspecified);
-        purchase.UpdateDatetime = DateTime.SpecifyKind(DateTime.Now, DateTimeKind.Unspecified);
+        purchase.PurchaseDatetime = purchaseDateTime;
+        purchase.UpdateDatetime = DateTime.UtcNow;
         purchase.UpdatedUserId = updatedUserId;
     }
 

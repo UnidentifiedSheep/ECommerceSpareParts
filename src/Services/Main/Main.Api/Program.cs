@@ -59,34 +59,7 @@ builder.Host.UseSerilog();
 
 builder.Services.AddOpenApi();
 builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen(c =>
-{
-    // Security (JWT)
-    c.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
-    {
-        In = ParameterLocation.Header,
-        Description = "Please enter a valid token",
-        Name = "Authorization",
-        Type = SecuritySchemeType.Http,
-        BearerFormat = "JWT",
-        Scheme = "Bearer"
-    });
-
-    c.AddSecurityRequirement(new OpenApiSecurityRequirement
-    {
-        {
-            new OpenApiSecurityScheme
-            {
-                Reference = new OpenApiReference
-                {
-                    Type = ReferenceType.SecurityScheme,
-                    Id = "Bearer"
-                }
-            },
-            []
-        }
-    });
-});
+builder.Services.AddSwaggerGen();
 
 builder.Services.AddHangfire(x =>
     x.UsePostgreSqlStorage(z => z.UseNpgsqlConnection(builder.Configuration
@@ -116,6 +89,26 @@ ConsumerRegistration[] eventHandlers =
     new(typeof(CurrencyRateChangedEvent), uniqQueueName),
     new(typeof(MarkupGroupGeneratedEvent), "main-queue")
 ];
+
+builder.Services.AddAuthentication(options =>
+{
+    options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+    options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+    options.DefaultScheme = JwtBearerDefaults.AuthenticationScheme;
+}).AddJwtBearer(options =>
+{
+    var iss = builder.Configuration["JwtBearer:ValidIssuer"];
+    options.TokenValidationParameters = new TokenValidationParameters
+    {
+        ValidateIssuer = true,
+        ValidateAudience = false,
+        ValidateLifetime = true,
+        ValidateIssuerSigningKey = true,
+        ValidIssuer = iss,
+        IssuerSigningKey =
+            new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration["JwtBearer:IssuerSigningKey"]!)),
+    };
+});
 
 builder.Services.AddScoped<IEventHandler<MarkupGroupChangedEvent>, MarkupGroupChangedEventHandler>();
 builder.Services.AddScoped<IEventHandler<MarkupRangesUpdatedEvent>, MarkupRangesChangedEventHandler>();
@@ -179,7 +172,7 @@ builder.Services.AddTransient<HeaderSecretMiddleware>(_ => new HeaderSecretMiddl
 
 var app = builder.Build();
 
-app.UseMiddleware<HeaderSecretMiddleware>();
+/*app.UseMiddleware<HeaderSecretMiddleware>();*/
 
 app.UseForwardedHeaders(new ForwardedHeadersOptions
 {

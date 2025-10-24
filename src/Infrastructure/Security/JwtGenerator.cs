@@ -47,7 +47,6 @@ public class JwtGenerator(IConfiguration configuration) : IJwtGenerator
             ValidateLifetime = true,
             ValidateIssuerSigningKey = true,
             ValidIssuer = configuration["JwtBearer:ValidIssuer"],
-            ValidAudience = configuration["JwtBearer:ValidAudience"],
             IssuerSigningKey =
                 new SymmetricSecurityKey(Encoding.UTF8.GetBytes(configuration["JwtBearer:IssuerSigningKey"]!))
         };

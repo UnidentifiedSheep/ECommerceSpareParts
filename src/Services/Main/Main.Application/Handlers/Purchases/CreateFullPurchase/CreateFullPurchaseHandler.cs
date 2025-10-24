@@ -35,7 +35,7 @@ public class CreateFullPurchaseHandler(IMediator mediator) : ICommandHandler<Cre
         var currencyId = request.CurrencyId;
         var storageName = request.StorageName;
         var payedSum = request.PayedSum ?? 0;
-        var dateTime = DateTime.SpecifyKind(request.PurchaseDate, DateTimeKind.Unspecified);
+        var dateTime = request.PurchaseDate;
         var totalSum = content.GetTotalSum();
 
         var transaction = await CreateTransaction(supplierId, Global.SystemId, totalSum, TransactionStatus.Purchase,

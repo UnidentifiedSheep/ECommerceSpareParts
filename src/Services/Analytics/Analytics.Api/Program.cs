@@ -2,6 +2,8 @@ using Analytics.Application;
 using Analytics.Application.EventHandlers;
 using Analytics.Persistence;
 using Analytics.Persistence.Context;
+using Api.Common.Middleware;
+using Carter;
 using Contracts.Currency;
 using Contracts.Sale;
 using Core.Interfaces.MessageBroker;
@@ -41,7 +43,15 @@ builder.Services.AddMassageBrokerLayer<DContext>(brokerOptions, eventHandlers, o
     .AddPersistenceLayer(builder.Configuration["ConnectionStrings:DefaultConnection"]!)
     .AddApplicationLayer();
 
+builder.Services.AddCarter();
+
+var secret = builder.Configuration["Gateway:Secret"]!;
+builder.Services.AddTransient<HeaderSecretMiddleware>(_ => new HeaderSecretMiddleware(secret));
+
 var app = builder.Build();
+
+app.UseMiddleware<HeaderSecretMiddleware>();
+
 
 if (app.Environment.IsDevelopment()) app.MapOpenApi();
 

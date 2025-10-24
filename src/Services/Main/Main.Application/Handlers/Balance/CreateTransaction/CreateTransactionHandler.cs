@@ -39,7 +39,7 @@ public class CreateTransactionHandler(
         var whoCreatedTransaction = request.WhoCreatedTransaction;
         var amount = request.Amount;
         var currencyId = request.CurrencyId;
-        var transactionDateTime = DateTime.SpecifyKind(request.TransactionDateTime, DateTimeKind.Unspecified);
+        var transactionDateTime = request.TransactionDateTime;
 
         await EnsureNeededDataExists(senderId, receiverId, whoCreatedTransaction, transactionDateTime, currencyId,
             cancellationToken);

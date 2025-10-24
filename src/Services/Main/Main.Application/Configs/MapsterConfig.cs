@@ -79,7 +79,7 @@ public static class MapsterConfig
             .Map(dest => dest.BuyPrice, src => src.BuyPrice)
             .Map(dest => dest.Count, src => src.Count)
             .Map(dest => dest.PurchaseDatetime,
-                src => DateTime.SpecifyKind(src.PurchaseDate, DateTimeKind.Unspecified));
+                src => src.PurchaseDate);
 
         TypeAdapterConfig<CreatePairCommand, ArticlesPair>.NewConfig()
             .Map(dest => dest.ArticleLeft, src => src.LeftArticleId)
@@ -282,7 +282,7 @@ public static class MapsterConfig
             .Map(dest => dest.CurrencyId, s => s.CurrencyId)
             .Map(dest => dest.Status, s => s.Status)
             .Map(dest => dest.TransactionDatetime,
-                dest => DateTime.SpecifyKind(dest.TransactionDatetime, DateTimeKind.Unspecified))
+                dest => dest.TransactionDatetime)
             .Map(dest => dest.TransactionSum, dest => dest.TransactionSum);
 
         //STORAGES
@@ -325,9 +325,9 @@ public static class MapsterConfig
             .Map(dest => dest.ArticleId, src => src.ArticleId)
             .Map(dest => dest.Count, src => src.Count)
             .Map(dest => dest.BuyPrice, src => src.BuyPrice)
-            .Map(dest => dest.CurrencyId, src => src.CurrencyId)
             .Map(dest => dest.StorageName, src => src.StorageName)
             .Map(dest => dest.PurchaseDatetime, src => src.PurchaseDatetime)
+            .Map(dest => dest.Currency, src => src.Currency)
             .Map(dest => dest.ConcurrencyCode, src =>
                 ConcurrencyStatic.GetConcurrencyCode(src.Id, src.ArticleId, src.BuyPrice, src.CurrencyId,
                     src.StorageName, src.BuyPriceInUsd, src.Count, src.PurchaseDatetime));

@@ -12,19 +12,19 @@ using MediatR;
 namespace Analytics.Application.Handlers.AnalyzeSalesForMarkup;
 
 [Transactional]
-public record AnalyzeSalesForMarkup : ICommand;
+public record AnalyzeSalesForMarkupCommand : ICommand;
 
 public class AnalyzeSalesForMarkupHandler(
     ISellInfoRepository sellInfoRepository,
     ICurrencyConverter currencyConverter,
     IUnitOfWork unitOfWork,
-    IMessageBroker messageBroker) : ICommandHandler<AnalyzeSalesForMarkup>
+    IMessageBroker messageBroker) : ICommandHandler<AnalyzeSalesForMarkupCommand>
 {
     private const decimal Step = 1.5m;
     private const int ConvertBatchSize = 10_000;
     private const double OutlierMultiplier = 3.0;
 
-    public async Task<Unit> Handle(AnalyzeSalesForMarkup request, CancellationToken cancellationToken)
+    public async Task<Unit> Handle(AnalyzeSalesForMarkupCommand request, CancellationToken cancellationToken)
     {
         var minDate = DateTime.Now.AddYears(-2).Date;
         

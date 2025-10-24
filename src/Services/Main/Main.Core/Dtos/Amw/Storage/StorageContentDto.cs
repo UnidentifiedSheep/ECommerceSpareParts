@@ -1,3 +1,5 @@
+using Main.Core.Dtos.Currencies;
+
 namespace Main.Core.Dtos.Amw.Storage;
 
 public class StorageContentDto
@@ -7,7 +9,7 @@ public class StorageContentDto
     public int ArticleId { get; set; }
     public int Count { get; set; }
     public decimal BuyPrice { get; set; }
-    public int CurrencyId { get; set; }
     public string ConcurrencyCode { get; set; } = null!;
     public DateTime PurchaseDatetime { get; set; }
+    public CurrencyDto Currency { get; set; } = null!;
 }

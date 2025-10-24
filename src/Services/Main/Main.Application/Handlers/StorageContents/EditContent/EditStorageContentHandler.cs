@@ -14,6 +14,7 @@ using Main.Core.Entities;
 using Main.Core.Enums;
 using Main.Core.Interfaces.DbRepositories;
 using Main.Core.Interfaces.Services;
+using Main.Core.Models;
 using Mapster;
 using MediatR;
 
@@ -21,7 +22,7 @@ namespace Main.Application.Handlers.StorageContents.EditContent;
 
 [Transactional(IsolationLevel.Serializable, 20, 2)]
 public record EditStorageContentCommand(
-    Dictionary<int, (PatchStorageContentDto value, string concurrencyCode)> EditedFields,
+    Dictionary<int, ModelWithCode<PatchStorageContentDto, string>> EditedFields,
     Guid UserId) : ICommand;
 
 public class EditStorageContentHandler(
@@ -37,7 +38,7 @@ public class EditStorageContentHandler(
     {
         var editedFields = request.EditedFields;
 
-        await ValidateData(editedFields.Select(x => x.Value.value), request.UserId, cancellationToken);
+        await ValidateData(editedFields.Select(x => x.Value.Model), request.UserId, cancellationToken);
 
         var storageContents = await GetAndValidateStorageContents(editedFields.Keys, cancellationToken);
         var articleIds = new HashSet<int>();
@@ -45,9 +46,9 @@ public class EditStorageContentHandler(
         var toIncrement = new Dictionary<int, int>();
         foreach (var item in editedFields)
         {
-            var patchDto = item.Value.value;
+            var patchDto = item.Value.Model;
             var content = storageContents[item.Key];
-            var clientConcurrencyCode = item.Value.concurrencyCode;
+            var clientConcurrencyCode = item.Value.Code;
             if (!concurrencyValidator.IsValid(content, clientConcurrencyCode, out var validCode))
                 throw new ConcurrencyCodeMismatchException(clientConcurrencyCode, validCode);
 

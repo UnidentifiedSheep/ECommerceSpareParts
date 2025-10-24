@@ -64,7 +64,7 @@ public class EditTransactionTests : IAsyncLifetime
 
         var newAmount = 999.99m;
         var newStatus = TransactionStatus.Purchase;
-        var newDate = DateTime.SpecifyKind(DateTime.Now.AddDays(-1), DateTimeKind.Unspecified);
+        var newDate = DateTime.Now.AddDays(-1);
         var newCurrency = await _context.Currencies.AsNoTracking().FirstAsync(x => x.Id != _currency.Id);
 
         var senderBalanceBeforeFirstCurrency = await _context.UserBalances
@@ -129,7 +129,7 @@ public class EditTransactionTests : IAsyncLifetime
         Assert.Equal(newCurrency.Id, updatedTransaction.CurrencyId);
         Assert.Equal(newAmount, updatedTransaction.TransactionSum);
         Assert.Equal(newStatus.ToString(), updatedTransaction.Status);
-        Assert.True(Math.Abs((updatedTransaction.TransactionDatetime - newDate).TotalMilliseconds) < 1);
+        Assert.True(Math.Abs((updatedTransaction.TransactionDatetime - newDate.ToUniversalTime()).TotalMilliseconds) < 1);
 
         var version = await _context.TransactionVersions
             .Where(x => x.TransactionId == transaction.Id)
@@ -139,7 +139,7 @@ public class EditTransactionTests : IAsyncLifetime
         Assert.NotNull(version);
         Assert.Equal(transaction.TransactionSum, version.TransactionSum);
         Assert.Equal(transaction.Status, version.Status);
-        Assert.True(Math.Abs((transaction.TransactionDatetime - version.TransactionDatetime).TotalMilliseconds) < 1);
+        Assert.True(Math.Abs((transaction.TransactionDatetime.ToUniversalTime() - version.TransactionDatetime.ToUniversalTime()).TotalMilliseconds) < 1);
     }
 
     [Fact]
@@ -159,7 +159,7 @@ public class EditTransactionTests : IAsyncLifetime
 
         var newAmount = 999.99m;
         var newStatus = TransactionStatus.Purchase;
-        var newDate = DateTime.SpecifyKind(transaction.TransactionDatetime.AddSeconds(-1), DateTimeKind.Unspecified);
+        var newDate = transaction.TransactionDatetime.AddSeconds(-1);
 
         var senderBalanceBefore = await _context.UserBalances
             .AsNoTracking()
@@ -228,7 +228,7 @@ public class EditTransactionTests : IAsyncLifetime
         Assert.NotNull(version);
         Assert.Equal(oldAmount, version.TransactionSum);
         Assert.Equal(oldStatus, version.Status);
-        Assert.True(Math.Abs((version.TransactionDatetime - oldDate).TotalSeconds) < 1);
+        Assert.True(Math.Abs((version.TransactionDatetime.ToUniversalTime() - oldDate.ToUniversalTime()).TotalSeconds) < 1);
     }
 
     [Theory]

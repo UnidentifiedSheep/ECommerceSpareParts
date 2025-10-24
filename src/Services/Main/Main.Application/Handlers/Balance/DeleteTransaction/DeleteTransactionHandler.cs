@@ -39,7 +39,7 @@ public class DeleteTransactionHandler(
         await EnsureDataIsValid(transaction, whoDelete, request.IsSystem, cancellationToken);
 
         transaction.IsDeleted = true;
-        transaction.DeletedAt = DateTime.SpecifyKind(DateTime.Now, DateTimeKind.Unspecified);
+        transaction.DeletedAt = DateTime.Now;
         transaction.DeletedBy = whoDelete;
 
         await balanceService.ChangeSenderReceiverBalancesAsync(transaction, cancellationToken);

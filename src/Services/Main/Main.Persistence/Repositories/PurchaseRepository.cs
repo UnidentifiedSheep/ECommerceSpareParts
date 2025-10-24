@@ -54,8 +54,8 @@ public class PurchaseRepository(DContext context) : IPurchaseRepository
                                          z.Comment != null && EF.Functions.ILike(z.Comment, $"%{searchTerm}%")));
         }
 
-        var startDate = DateTime.SpecifyKind(rangeStart.Date, DateTimeKind.Unspecified);
-        var endDate = DateTime.SpecifyKind(rangeEnd.Date, DateTimeKind.Unspecified).AddDays(1);
+        var startDate = rangeStart.Date;
+        var endDate = rangeEnd.Date.AddDays(1);
         var result = await query.Where(x =>
                 x.PurchaseDatetime >= startDate.Date && x.PurchaseDatetime <= endDate.Date.AddDays(1))
             .Include(x => x.Transaction)

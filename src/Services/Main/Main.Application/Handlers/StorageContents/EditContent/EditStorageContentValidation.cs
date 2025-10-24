@@ -17,17 +17,18 @@ public class EditStorageContentValidation : AbstractValidator<EditStorageContent
         RuleForEach(x => x.EditedFields.Values)
             .ChildRules(z =>
             {
-                z.RuleFor(x => x.value.BuyPrice.Value)
+                z.RuleFor(x => x.Model.BuyPrice.Value)
                     .SetValidator(new PriceValidator())
-                    .When(x => x.value.BuyPrice.IsSet);
+                    .When(x => x.Model.BuyPrice.IsSet);
 
-                z.RuleFor(x => x.value.Count.Value)
-                    .SetValidator(new CountValidator())
-                    .When(x => x.value.Count.IsSet);
+                z.RuleFor(x => x.Model.Count.Value)
+                    .GreaterThanOrEqualTo(0)
+                    .WithMessage("Количество у позиции должно быть больше или равно 0")
+                    .When(x => x.Model.Count.IsSet);
 
-                z.RuleFor(x => x.value.PurchaseDatetime.Value)
-                    .InclusiveBetween(DateTime.Now.AddMonths(-3), DateTime.Now.AddMinutes(10))
-                    .When(x => x.value.PurchaseDatetime.IsSet)
+                z.RuleFor(x => x.Model.PurchaseDatetime.Value.ToUniversalTime())
+                    .InclusiveBetween(DateTime.UtcNow.AddMonths(-3), DateTime.UtcNow.AddMinutes(10))
+                    .When(x => x.Model.PurchaseDatetime.IsSet)
                     .WithMessage("Дата покупки не может быть в будущем, или более чем на 3 месяца в прошлом");
             });
     }

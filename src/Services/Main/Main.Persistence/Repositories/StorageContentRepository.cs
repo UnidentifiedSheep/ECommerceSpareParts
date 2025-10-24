@@ -51,12 +51,15 @@ public class StorageContentRepository(DContext context) : IStorageContentReposit
     {
         var query = context.StorageContents
             .ConfigureTracking(true)
+            .Include(x => x.Currency)
             .Where(c => string.IsNullOrWhiteSpace(storageName) || c.StorageName == storageName)
             .Where(x => articleId == null || x.ArticleId == articleId);
         if (!showZeroCount)
             query = query.Where(x => x.Count > 0);
-        var result = await query.Take(viewCount)
+        var result = await query
+            .OrderByDescending(x => x.Count)
             .Skip(page * viewCount)
+            .Take(viewCount)
             .ToListAsync(cancellationToken);
         return result;
     }

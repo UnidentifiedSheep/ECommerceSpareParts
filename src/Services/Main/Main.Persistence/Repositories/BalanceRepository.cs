@@ -3,6 +3,7 @@ using Main.Core.Interfaces.DbRepositories;
 using Main.Persistence.Context;
 using Microsoft.EntityFrameworkCore;
 using Npgsql;
+using NpgsqlTypes;
 using Persistence.Extensions;
 
 namespace Main.Persistence.Repositories;
@@ -39,7 +40,10 @@ public class BalanceRepository(DContext context) : IBalanceRepository
                       FOR UPDATE
                   """;
 
-        var dtParam = new NpgsqlParameter("dt", dt);
+        var dtParam = new NpgsqlParameter("dt", dt.ToUniversalTime())
+        {
+            NpgsqlDbType = NpgsqlDbType.TimestampTz,
+        };
         var userIdParam = new NpgsqlParameter("userId", userId);
         var currencyIdParam = new NpgsqlParameter("currencyId", currencyId);
 
@@ -77,13 +81,19 @@ public class BalanceRepository(DContext context) : IBalanceRepository
             ? new object[]
             {
                 new NpgsqlParameter("@currencyId", currencyId),
-                new NpgsqlParameter("@dt", dt),
+                new NpgsqlParameter("@dt", dt.ToUniversalTime())
+                {
+                    NpgsqlDbType = NpgsqlDbType.TimestampTz
+                },
                 new NpgsqlParameter("@userId", userId)
             }
             : new object[]
             {
                 new NpgsqlParameter("@currencyId", currencyId),
-                new NpgsqlParameter("@dt", dt),
+                new NpgsqlParameter("@dt", dt.ToUniversalTime())
+                {
+                    NpgsqlDbType = NpgsqlDbType.TimestampTz
+                },
                 new NpgsqlParameter("@userId", userId),
                 new NpgsqlParameter("@excludeId", excludeId)
             };

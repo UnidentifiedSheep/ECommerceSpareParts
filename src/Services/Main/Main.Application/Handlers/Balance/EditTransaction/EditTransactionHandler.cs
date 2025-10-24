@@ -51,7 +51,7 @@ public class EditTransactionHandler(
         var sameTransactionExists = await balanceRepository.TransactionExistsAsync(
             transaction.SenderId,
             transaction.ReceiverId,
-            DateTime.SpecifyKind(request.TransactionDateTime, DateTimeKind.Unspecified),
+            request.TransactionDateTime,
             request.TransactionId,
             ct);
 
@@ -80,7 +80,7 @@ public class EditTransactionHandler(
     private void ApplyNewParameters(Transaction transaction, EditTransactionCommand request)
     {
         transaction.IsDeleted = false;
-        transaction.TransactionDatetime = DateTime.SpecifyKind(request.TransactionDateTime, DateTimeKind.Unspecified);
+        transaction.TransactionDatetime = request.TransactionDateTime;
         transaction.TransactionSum = request.Amount;
         transaction.Status = request.Status.ToString();
         transaction.CurrencyId = request.CurrencyId;

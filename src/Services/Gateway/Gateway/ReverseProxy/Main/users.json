@@ -4,7 +4,7 @@
       "add-vehicle-to-garage": {
         "ClusterId": "main-cluster",
         "Match": {
-          "Path": "/main/users/{userId}/vehicles/",
+          "Path": "/main/users/{userId}/vehicles",
           "Methods": [ "POST" ]
         },
         "AuthorizationPolicy": "AMW",
@@ -15,7 +15,7 @@
       "add-vehicle-to-garage-user": {
         "ClusterId": "main-cluster",
         "Match": {
-          "Path": "/main/users/me/vehicles/",
+          "Path": "/main/users/me/vehicles",
           "Methods": [ "POST" ]
         },
         "AuthorizationPolicy": "MEMBER",
@@ -26,7 +26,7 @@
       "change-discount-for-user": {
         "ClusterId": "main-cluster",
         "Match": {
-          "Path": "/main/users/{userId}/discount/",
+          "Path": "/main/users/{userId}/discount",
           "Methods": [ "PATCH" ]
         },
         "AuthorizationPolicy": "AM",
@@ -48,7 +48,7 @@
       "create-users": {
         "ClusterId": "main-cluster",
         "Match": {
-          "Path": "/main/users/",
+          "Path": "/main/users",
           "Methods": [ "POST" ]
         },
         "AuthorizationPolicy": "AM",
@@ -59,7 +59,7 @@
       "get-users": {
         "ClusterId": "main-cluster",
         "Match": {
-          "Path": "/main/users/",
+          "Path": "/main/users",
           "Methods": [ "GET" ]
         },
         "AuthorizationPolicy": "AMW",

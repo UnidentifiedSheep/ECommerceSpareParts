@@ -29,7 +29,7 @@ public class EditFullPurchaseHandler(IMediator mediator, IPurchaseRepository pur
 {
     public async Task<Unit> Handle(EditFullPurchaseCommand request, CancellationToken cancellationToken)
     {
-        var dateTime = DateTime.SpecifyKind(request.PurchaseDateTime, DateTimeKind.Unspecified);
+        var dateTime = request.PurchaseDateTime;
         var content = request.Content.ToList();
         var purchaseId = request.PurchaseId;
         var currencyId = request.CurrencyId;

@@ -2,12 +2,13 @@ using System.Security.Claims;
 using Carter;
 using Main.Application.Handlers.StorageContents.EditContent;
 using Main.Core.Dtos.Amw.Storage;
+using Main.Core.Models;
 using MediatR;
 
 namespace Main.Api.EndPoints.Storages;
 
 public record EditStorageContentRequest(
-    Dictionary<int, (PatchStorageContentDto value, string concurrencyCode)> EditedFields);
+    Dictionary<int, ModelWithCode<PatchStorageContentDto, string>> EditedFields);
 
 public class EditStorageContentEndPoint : ICarterModule
 {

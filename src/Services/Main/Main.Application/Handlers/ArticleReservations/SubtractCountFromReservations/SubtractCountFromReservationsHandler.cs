@@ -52,7 +52,7 @@ public class SubtractCountFromReservationsHandler(
                 if (reservation.CurrentCount == 0)
                     reservation.IsDone = true;
                 reservation.WhoUpdated = whoUpdated;
-                reservation.UpdatedAt = DateTime.SpecifyKind(DateTime.Now, DateTimeKind.Unspecified);
+                reservation.UpdatedAt = DateTime.Now;
             }
         }
 

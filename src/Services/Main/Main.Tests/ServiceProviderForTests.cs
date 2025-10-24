@@ -1,4 +1,5 @@
 using Api.Common;
+using Core.Interfaces;
 using Core.Models;
 using Mail;
 using Main.Application.Configs;
@@ -9,6 +10,7 @@ using Main.Persistence.Context;
 using Security;
 using Serilog;
 using Tests.MockData;
+using Tests.Stubs;
 using ApplicationServiceProvider = Main.Application.ServiceProvider;
 using CacheServiceProvider = Redis.ServiceProvider;
 using ServiceProvider = Microsoft.Extensions.DependencyInjection.ServiceProvider;
@@ -48,6 +50,8 @@ public static class ServiceProviderForTests
             .AddSecurityLayer(passwordRules)
             .AddMailLayer()
             .AddCommonLayer();
+
+        services.AddTransient<IMessageBroker, MessageBrokerStub>();
         MapsterConfig.Configure();
         SortByConfig.Configure();
 
