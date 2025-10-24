@@ -13,8 +13,8 @@ public class AddContentValidation : AbstractValidator<AddContentCommand>
                 .SetValidator(new PriceValidator());
             content.RuleFor(x => x.Count)
                 .SetValidator(new CountValidator());
-            content.RuleFor(x => x.PurchaseDate)
-                .InclusiveBetween(DateTime.Now.AddMonths(-3), DateTime.Now.AddMinutes(10))
+            content.RuleFor(x => x.PurchaseDate.ToUniversalTime())
+                .InclusiveBetween(DateTime.UtcNow.AddMonths(-3), DateTime.UtcNow.AddMinutes(10))
                 .WithMessage("Дата покупки не может быть в будущем, или более чем на 3 месяца в прошлом");
         });
         RuleFor(x => x.StorageContent)

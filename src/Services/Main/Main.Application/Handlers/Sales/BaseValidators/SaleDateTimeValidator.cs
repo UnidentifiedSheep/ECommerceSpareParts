@@ -6,12 +6,12 @@ public class SaleDateTimeValidator : AbstractValidator<DateTime>
 {
     public SaleDateTimeValidator()
     {
-        RuleFor(x => x)
-            .GreaterThanOrEqualTo(DateTime.Now.Date.AddMonths(-3))
+        RuleFor(x => x.ToUniversalTime())
+            .GreaterThanOrEqualTo(DateTime.Now.Date.AddMonths(-3).ToUniversalTime())
             .WithMessage("Дата продажи не может быть более чем трёхмесячной давности.");
 
-        RuleFor(x => x)
-            .LessThanOrEqualTo(DateTime.Now.AddMinutes(10))
+        RuleFor(x => x.ToUniversalTime())
+            .LessThanOrEqualTo(DateTime.Now.AddMinutes(10).ToUniversalTime())
             .WithMessage("Дата продажи не может быть в будущем.");
     }
 }
