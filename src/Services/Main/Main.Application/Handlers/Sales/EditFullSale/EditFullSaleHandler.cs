@@ -1,6 +1,9 @@
 using System.Data;
 using Application.Common.Interfaces;
+using Contracts.Sale;
 using Core.Attributes;
+using Core.Interfaces;
+using Core.Interfaces.Services;
 using Exceptions.Exceptions.Sales;
 using Main.Application.Extensions;
 using Main.Application.Handlers.ArticleReservations.SubtractCountFromReservations;
@@ -28,7 +31,8 @@ public record EditFullSaleCommand(
     string? Comment,
     bool SellFromOtherStorages) : ICommand;
 
-public class EditFullSaleHandler(IMediator mediator, ISaleRepository saleRepository)
+public class EditFullSaleHandler(IMediator mediator, ISaleRepository saleRepository, IMessageBroker messageBroker,
+    IUnitOfWork unitOfWork)
     : ICommandHandler<EditFullSaleCommand>
 {
     public async Task<Unit> Handle(EditFullSaleCommand request, CancellationToken cancellationToken)
@@ -48,13 +52,17 @@ public class EditFullSaleHandler(IMediator mediator, ISaleRepository saleReposit
         var saleContentsDetails =
             (await saleRepository.GetSaleContentDetailsForUpdate(saleContents.Keys, true, cancellationToken)).ToList();
 
+        var deletedSaleContents = saleContents
+            .Where(x => !saleContentIds.Contains(x.Key))
+            .ToDictionary();
+        
         var totalSum = editedContent.GetTotalSum();
 
         var (contentGreaterCount, contentLessCount) =
             CalculateInventoryDeltas(editedContent, saleContents, saleContentsDetails);
 
         //Оставшиеся Id убираем из продажи
-        contentLessCount.AddRange(GetRemovedContentDetails(saleContentIds, saleContents, saleContentsDetails));
+        contentLessCount.AddRange(GetRemovedContentDetails(deletedSaleContents, saleContentsDetails));
         //Возвращаем на склад
         if (contentLessCount.Count != 0)
         {
@@ -79,6 +87,9 @@ public class EditFullSaleHandler(IMediator mediator, ISaleRepository saleReposit
 
         await SubtractFromReservation(contentGreaterCount, userId, sale.BuyerId, cancellationToken);
 
+        await messageBroker.Publish(new SaleEditedEvent(sale.Adapt<global::Contracts.Models.Sale.Sale>(),
+            deletedSaleContents.Keys), cancellationToken);
+        await unitOfWork.SaveChangesAsync(cancellationToken);
         return Unit.Value;
     }
 
@@ -128,12 +139,12 @@ public class EditFullSaleHandler(IMediator mediator, ISaleRepository saleReposit
     }
 
     private List<(SaleContentDetail Detail, int ArticleId)> GetRemovedContentDetails(
-        HashSet<int> saleContentIds, Dictionary<int, SaleContent> saleContent,
+        Dictionary<int, SaleContent> deletedSaleContents,
         List<SaleContentDetail> saleContentDetails)
     {
         var removedDetails = new List<(SaleContentDetail, int)>();
 
-        foreach (var (id, deletedContent) in saleContent.Where(x => !saleContentIds.Contains(x.Key)))
+        foreach (var (id, deletedContent) in deletedSaleContents)
         {
             var details = saleContentDetails
                 .Where(x => x.SaleContentId == id);

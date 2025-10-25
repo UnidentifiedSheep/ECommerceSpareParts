@@ -95,7 +95,7 @@ public class UserRepository(DContext context) : IUserRepository
             .Where(x => isSupplier == null || (x.UserInfo != null && x.UserInfo.IsSupplier == isSupplier))
             .Where(x => !searchBySearchTerm ||
                         (x.UserInfo != null && EF.Functions.TrigramsSimilarity(x.UserInfo!.SearchColumn,
-                            normalizedSearchTerm) >= 0.1))
+                            normalizedSearchTerm) >= 0.2))
             .Select(x => new
             {
                 Rank = searchBySearchTerm
