@@ -78,30 +78,29 @@ public class CombinedDataLoader(DContext context) : ICombinedDataLoader
 
     private string BuildSql(IEnumerable<ExistenceCheck> rules, Dictionary<string, ExistenceCheck> ruleMap)
     {
+        var rulesList = rules.ToList();
         var sb = new StringBuilder("SELECT ");
-        int ruleIdx = 0;
 
-        foreach (var rule in rules)
+        for (int i = 0; i < rulesList.Count; i++)
         {
+            var rule = rulesList[i];
             var fieldName = context.GetColumnName(rule.EntityType, rule.KeySelector);
             var tableName = context.GetTableName(rule.EntityType);
             var schema = context.GetSchemaName(rule.EntityType);
 
-            var varName = GetKey(fieldName, ruleIdx);
+            var varName = GetKey(fieldName, i);
             ruleMap[varName] = rule;
 
-            sb.AppendLine($"""
-                ARRAY(
-                    SELECT {fieldName}
-                    FROM "{schema}"."{tableName}"
-                    WHERE {fieldName} = ANY(@p{ruleIdx})
-                ) AS "{varName}",
-            """);
-
-            ruleIdx++;
+            sb.Append($"""
+                       ARRAY(
+                           SELECT {fieldName}
+                           FROM "{schema}"."{tableName}"
+                           WHERE {fieldName} = ANY(@p{i})
+                       ) AS "{varName}"
+                       """);
+            sb.Append(i == rulesList.Count - 1 ? ";" : ",\n");
         }
-
-        sb.Length -= 2; // remove last comma
+        
         return sb.ToString();
     }
 

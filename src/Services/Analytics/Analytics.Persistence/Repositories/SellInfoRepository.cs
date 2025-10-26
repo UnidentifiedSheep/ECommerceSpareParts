@@ -17,6 +17,14 @@ public class SellInfoRepository(DContext context) : ISellInfoRepository
             .AsAsyncEnumerable();
     }
 
+    public async Task<IEnumerable<SellInfo>> GetSellInfosList(Expression<Func<SellInfo, bool>> where, bool track = true)
+    {
+        return await context.SellInfos.ConfigureTracking(track)
+            .Where(where)
+            .OrderBy(x => x.SellContentId)
+            .ToListAsync();
+    }
+
     public async Task<SellInfo?> GetWithMaximumBuyPrice(bool track = true, CancellationToken cancellationToken = default)
     {
         return await context.SellInfos.ConfigureTracking(track)

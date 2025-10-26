@@ -4,7 +4,6 @@ using Api.Common.ExceptionHandlers;
 using Api.Common.Logging;
 using Api.Common.Middleware;
 using Carter;
-using Contracts;
 using Contracts.Currency;
 using Contracts.Markup;
 using Core.Interfaces.MessageBroker;
@@ -24,11 +23,11 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.IdentityModel.Tokens;
-using Microsoft.OpenApi.Models;
 using OpenTelemetry.Metrics;
 using Main.Persistence;
 using Main.Persistence.Context;
 using MassTransit;
+using Persistence.Extensions;
 using RabbitMq;
 using Redis;
 using Security;
@@ -178,6 +177,8 @@ app.UseForwardedHeaders(new ForwardedHeadersOptions
 {
     ForwardedHeaders = ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto
 });
+
+await app.EnsureDbExists<DContext>();
 
 app.UseHangfireDashboard();
 

@@ -9,6 +9,7 @@ using Contracts.Sale;
 using Core.Interfaces.MessageBroker;
 using Core.Models;
 using MassTransit;
+using Persistence.Extensions;
 using RabbitMq;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -28,12 +29,14 @@ ConsumerRegistration[] eventHandlers =
 [
     new(typeof(CurrencyCreatedEvent), "analytics-queue"),
     new(typeof(CurrencyRateChangedEvent), uniqQueueName),
-    new(typeof(SaleCreatedEvent), "analytics-queue")
+    new(typeof(SaleCreatedEvent), "analytics-queue"),
+    new(typeof(SaleEditedEvent), "analytics-queue")
 ];
 
 builder.Services.AddScoped<IEventHandler<CurrencyCreatedEvent>, CurrencyCreatedEventHandler>();
 builder.Services.AddScoped<IEventHandler<CurrencyRateChangedEvent>, CurrencyRatesChangedEventHandler>();
 builder.Services.AddScoped<IEventHandler<SaleCreatedEvent>, SaleCreatedEventHandler>();
+
 
 builder.Services.AddMassageBrokerLayer<DContext>(brokerOptions, eventHandlers, opt =>
     {
@@ -49,6 +52,8 @@ var secret = builder.Configuration["Gateway:Secret"]!;
 builder.Services.AddTransient<HeaderSecretMiddleware>(_ => new HeaderSecretMiddleware(secret));
 
 var app = builder.Build();
+
+await app.EnsureDbExists<DContext>();
 
 app.UseMiddleware<HeaderSecretMiddleware>();
 

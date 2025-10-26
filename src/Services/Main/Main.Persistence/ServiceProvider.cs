@@ -5,6 +5,7 @@ using Main.Persistence.Context;
 using Main.Persistence.Repositories;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
 
 namespace Main.Persistence;
 

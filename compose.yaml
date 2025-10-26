@@ -1,4 +1,4 @@
-﻿version: '3.9'
+﻿version: "3.9"
 
 services:
   main.api:
@@ -16,6 +16,11 @@ services:
       - ASPNETCORE_Kestrel__Certificates__Default__Password=PleasKillMe.21
     networks:
       - backend-network
+    depends_on:
+      - pgql
+      - redis
+      - rabbitmq
+    restart: unless-stopped
 
   analytics.api:
     image: analytics.api
@@ -32,6 +37,11 @@ services:
       - ASPNETCORE_Kestrel__Certificates__Default__Password=PleasKillMe.21
     networks:
       - backend-network
+    depends_on:
+      - pgql
+      - redis
+      - rabbitmq
+    restart: unless-stopped
 
   gateway:
     image: gateway
@@ -47,7 +57,52 @@ services:
       - ASPNETCORE_Kestrel__Certificates__Default__Password=PleasKillMe.21
     networks:
       - backend-network
+    depends_on:
+      - main.api
+      - analytics.api
+    restart: unless-stopped
+  
+  pgql:
+    image: postgres:latest
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: PleasKillMe21
+    volumes:
+      - pg_data:/var/lib/postgresql/data
+    networks:
+      - backend-network
+    restart: always
+
+  redis:
+    image: redis:latest
+    command: >
+      redis-server
+      --maxmemory-policy allkeys-lru
+      --active-expire-effort 10
+    volumes:
+      - redis_data:/data
+    networks:
+      - backend-network
+    ports:
+      - "6379:6379"
+    restart: always
+  
+  rabbitmq:
+    image: rabbitmq:3-management
+    ports:
+      - "15672:15672"
+      - "5672:5672"
+    volumes:
+      - rabbitmq_data:/var/lib/rabbitmq
+    networks:
+      - backend-network
+    restart: always
 
 networks:
   backend-network:
     driver: bridge
+
+volumes:
+  pg_data:
+  redis_data:
+  rabbitmq_data:
