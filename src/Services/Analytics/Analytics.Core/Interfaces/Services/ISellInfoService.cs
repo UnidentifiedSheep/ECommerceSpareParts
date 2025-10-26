@@ -1,4 +1,5 @@
 using Analytics.Core.Entities;
+using Contracts.Models.Sale;
 
 namespace Analytics.Core.Interfaces.Services;
 
@@ -13,6 +14,6 @@ public interface ISellInfoService
     Task<IEnumerable<SellInfo>> RemoveSellInfos(IEnumerable<int> saleContentIds,
         CancellationToken cancellationToken = default);
 
-    Task<IEnumerable<SellInfo>> CreateSellInfos();
-    Task<IEnumerable<SellInfo>> EditSellInfos();
+    Task<IEnumerable<SellInfo>> CreateSellInfos(Sale sell, CancellationToken cancellationToken = default);
+    Task<IEnumerable<SellInfo>> EditSellInfos(Sale sell, CancellationToken cancellationToken = default);
 }

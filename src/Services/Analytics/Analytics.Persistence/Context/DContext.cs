@@ -74,6 +74,22 @@ public partial class DContext : DbContext
                 .HasForeignKey(d => d.SellCurrencyId)
                 .HasConstraintName("sell_info_currencies_id_fk_2");
         });
+        
+        foreach (var entityType in modelBuilder.Model.GetEntityTypes())
+        {
+            var dateTimeProps = entityType.GetProperties()
+                .Where(p => p.ClrType == typeof(DateTime) || p.ClrType == typeof(DateTime?));
+
+            foreach (var prop in dateTimeProps)
+            {
+                prop.SetValueConverter(
+                    new Microsoft.EntityFrameworkCore.Storage.ValueConversion.ValueConverter<DateTime, DateTime>(
+                        v => v.Kind == DateTimeKind.Utc ? v : v.ToUniversalTime(),
+                        v => v.ToUniversalTime()
+                    )
+                );
+            }
+        }
 
         OnModelCreatingPartial(modelBuilder);
     }

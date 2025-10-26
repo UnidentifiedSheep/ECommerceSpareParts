@@ -1,6 +1,9 @@
 using System.Data;
 using Application.Common.Interfaces;
+using Contracts.Sale;
 using Core.Attributes;
+using Core.Interfaces;
+using Core.Interfaces.Services;
 using Main.Application.Handlers.Balance.DeleteTransaction;
 using Main.Application.Handlers.Sales.DeleteSale;
 using Main.Application.Handlers.StorageContents.RestoreContent;
@@ -15,7 +18,8 @@ namespace Main.Application.Handlers.Sales.DeleteFullSale;
 [Transactional(IsolationLevel.Serializable, 20, 2)]
 public record DeleteFullSaleCommand(string SaleId, Guid UserId) : ICommand;
 
-public class DeleteFullSaleHandler(IMediator mediator) : ICommandHandler<DeleteFullSaleCommand>
+public class DeleteFullSaleHandler(IMediator mediator, IMessageBroker messageBroker, 
+    IUnitOfWork unitOfWork) : ICommandHandler<DeleteFullSaleCommand>
 {
     public async Task<Unit> Handle(DeleteFullSaleCommand request, CancellationToken cancellationToken)
     {
@@ -28,6 +32,9 @@ public class DeleteFullSaleHandler(IMediator mediator) : ICommandHandler<DeleteF
 
         await DeleteTransaction(transactionId, request.UserId, cancellationToken);
         await RestoreStorageContents(saleContentDetails, request.UserId, cancellationToken);
+
+        await messageBroker.Publish(new SaleDeletedEvent(sale.Adapt<global::Contracts.Models.Sale.Sale>()), cancellationToken);
+        await unitOfWork.SaveChangesAsync(cancellationToken);
         return Unit.Value;
     }
 

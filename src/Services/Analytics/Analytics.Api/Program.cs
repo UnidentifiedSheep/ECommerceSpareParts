@@ -1,12 +1,10 @@
 using Analytics.Application;
-using Analytics.Application.EventHandlers;
 using Analytics.Persistence;
 using Analytics.Persistence.Context;
 using Api.Common.Middleware;
 using Carter;
 using Contracts.Currency;
 using Contracts.Sale;
-using Core.Interfaces.MessageBroker;
 using Core.Models;
 using MassTransit;
 using Persistence.Extensions;
@@ -30,13 +28,9 @@ ConsumerRegistration[] eventHandlers =
     new(typeof(CurrencyCreatedEvent), "analytics-queue"),
     new(typeof(CurrencyRateChangedEvent), uniqQueueName),
     new(typeof(SaleCreatedEvent), "analytics-queue"),
-    new(typeof(SaleEditedEvent), "analytics-queue")
+    new(typeof(SaleEditedEvent), "analytics-queue"),
+    new(typeof(SaleDeletedEvent), "analytics-queue")
 ];
-
-builder.Services.AddScoped<IEventHandler<CurrencyCreatedEvent>, CurrencyCreatedEventHandler>();
-builder.Services.AddScoped<IEventHandler<CurrencyRateChangedEvent>, CurrencyRatesChangedEventHandler>();
-builder.Services.AddScoped<IEventHandler<SaleCreatedEvent>, SaleCreatedEventHandler>();
-
 
 builder.Services.AddMassageBrokerLayer<DContext>(brokerOptions, eventHandlers, opt =>
     {
