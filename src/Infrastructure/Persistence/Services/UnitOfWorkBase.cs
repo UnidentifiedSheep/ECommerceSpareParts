@@ -48,8 +48,8 @@ public class UnitOfWorkBase(DbContext context) : IUnitOfWork
         context.Remove(entity ?? throw new ArgumentNullException(nameof(entity)));
     }
 
-    public void RemoveRange<T>(IEnumerable<T> entities)
+    public void RemoveRange<T>(IEnumerable<T> entities) where T : class
     {
-        context.RemoveRange(entities);
+        context.Set<T>().RemoveRange(entities);
     }
 }

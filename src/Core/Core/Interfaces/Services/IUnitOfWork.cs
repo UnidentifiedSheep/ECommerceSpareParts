@@ -18,5 +18,5 @@ public interface IUnitOfWork
         where T : class;
 
     void Remove<T>(T entity);
-    void RemoveRange<T>(IEnumerable<T> entities);
+    void RemoveRange<T>(IEnumerable<T> entities) where T : class;
 }

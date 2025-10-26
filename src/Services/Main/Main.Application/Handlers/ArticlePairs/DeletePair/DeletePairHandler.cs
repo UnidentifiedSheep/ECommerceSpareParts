@@ -14,7 +14,8 @@ public class DeletePairHandler(IArticlePairsRepository pairsRepository, IUnitOfW
 {
     public async Task<Unit> Handle(DeletePairCommand request, CancellationToken cancellationToken)
     {
-        var pairs = await pairsRepository.GetRelatedPairsAsync(request.ArticleId, true, cancellationToken);
+        var pairs = await pairsRepository
+            .GetRelatedPairsAsync(request.ArticleId, true, cancellationToken);
         unitOfWork.RemoveRange(pairs);
         await unitOfWork.SaveChangesAsync(cancellationToken);
         return Unit.Value;

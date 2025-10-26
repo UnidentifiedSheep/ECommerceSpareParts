@@ -16,7 +16,7 @@ public class ArticlePairsRepository(DContext context) : IArticlePairsRepository
             .Include(articlesPair => articlesPair.ArticleRightNavigation)
             .Include(articlesPair => articlesPair.ArticleLeftNavigation)
             .FirstOrDefaultAsync(x => x.ArticleLeft == articleId || x.ArticleRight == articleId, cancellationToken);
-        return pair?.ArticleRightNavigation ?? pair?.ArticleLeftNavigation;
+        return pair?.ArticleLeft == articleId ? pair.ArticleRightNavigation : pair?.ArticleLeftNavigation;
     }
 
     public async Task<IEnumerable<ArticlesPair>> GetRelatedPairsAsync(int articleId, bool track = true,
