@@ -2,6 +2,7 @@
 using MassTransit;
 using MassTransit.EntityFrameworkCoreIntegration;
 using Microsoft.EntityFrameworkCore;
+using Persistence.Extensions;
 
 namespace Main.Persistence.Context;
 
@@ -14,6 +15,7 @@ public partial class DContext : DbContext
     public DContext(DbContextOptions<DContext> options)
         : base(options)
     {
+        
     }
 
     public virtual DbSet<Article> Articles { get; set; }
@@ -1649,21 +1651,7 @@ public partial class DContext : DbContext
         
         base.OnModelCreating(modelBuilder);
 
-        foreach (var entityType in modelBuilder.Model.GetEntityTypes())
-        {
-            var dateTimeProps = entityType.GetProperties()
-                .Where(p => p.ClrType == typeof(DateTime) || p.ClrType == typeof(DateTime?));
-
-            foreach (var prop in dateTimeProps)
-            {
-                prop.SetValueConverter(
-                    new Microsoft.EntityFrameworkCore.Storage.ValueConversion.ValueConverter<DateTime, DateTime>(
-                        v => v.Kind == DateTimeKind.Utc ? v : v.ToUniversalTime(),
-                        v => v.ToUniversalTime()
-                    )
-                );
-            }
-        }
+        modelBuilder.AllDateTimesToUtc();
         
         OnModelCreatingPartial(modelBuilder);
     }

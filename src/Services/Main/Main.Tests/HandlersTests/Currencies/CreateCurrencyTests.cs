@@ -105,7 +105,7 @@ public class CreateCurrencyTests : IAsyncLifetime
         var shortName = GetValidShortName();
         var name = GetValidName();
         var code = GetValidCurrencyCode();
-        var sign = GetValidCurrencySign();
+        var sign = ")";
 
         await _mediator.Send(new CreateCurrencyCommand(shortName, name, sign, code));
 

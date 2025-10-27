@@ -1,5 +1,8 @@
 ﻿using Analytics.Core.Entities;
+using MassTransit;
+using MassTransit.EntityFrameworkCoreIntegration;
 using Microsoft.EntityFrameworkCore;
+using Persistence.Extensions;
 
 namespace Analytics.Persistence.Context;
 
@@ -20,6 +23,15 @@ public partial class DContext : DbContext
     
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
+        
+        modelBuilder.AddOutboxMessageEntity();
+        modelBuilder.AddOutboxStateEntity();
+        modelBuilder.AddInboxStateEntity();
+
+        modelBuilder.Entity<OutboxMessage>().ToTable("OutboxMessage", "msg");
+        modelBuilder.Entity<OutboxState>().ToTable("OutboxState", "msg");
+        modelBuilder.Entity<InboxState>().ToTable("InboxState", "msg");
+        
         modelBuilder.Entity<Currency>(entity =>
         {
             entity.HasKey(e => e.Id).HasName("currencies_pk");
@@ -34,10 +46,9 @@ public partial class DContext : DbContext
 
         modelBuilder.Entity<SellInfo>(entity =>
         {
+            entity.HasKey(e => e.SellContentId).HasName("sell_info_pk");
+
             entity.ToTable("sell_info");
-            
-            entity.HasKey(e => e.SellContentId)
-                .HasName("sell_info_pk");
 
             entity.HasIndex(e => e.ArticleId, "sell_info_article_id_index");
 
@@ -51,46 +62,32 @@ public partial class DContext : DbContext
 
             entity.HasIndex(e => e.SellCurrencyId, "sell_info_sell_currency_id_index");
 
+            entity.HasIndex(e => e.SellDate, "sell_info_sell_date_index");
+
             entity.HasIndex(e => e.SellPrice, "sell_info_sell_price_index");
 
             entity.HasIndex(e => e.StorageName, "sell_info_storage_name_index");
-            entity.HasIndex(e => e.SellDate, "sell_info_sell_date_index");
 
+            entity.Property(e => e.SellContentId).HasColumnName("sell_content_id");
             entity.Property(e => e.ArticleId).HasColumnName("article_id");
             entity.Property(e => e.BuyCurrencyId).HasColumnName("buy_currency_id");
             entity.Property(e => e.BuyPrices).HasColumnName("buy_prices");
             entity.Property(e => e.Markup).HasColumnName("markup");
-            entity.Property(e => e.SellContentId).HasColumnName("sell_content_id");
             entity.Property(e => e.SellCurrencyId).HasColumnName("sell_currency_id");
+            entity.Property(e => e.SellDate).HasColumnName("sell_date");
             entity.Property(e => e.SellPrice).HasColumnName("sell_price");
             entity.Property(e => e.StorageName).HasColumnName("storage_name");
-            entity.Property(e => e.SellDate).HasColumnName("sell_date");
 
-            entity.HasOne(d => d.BuyCurrency).WithMany()
+            entity.HasOne(d => d.BuyCurrency).WithMany(p => p.SellInfoBuyCurrencies)
                 .HasForeignKey(d => d.BuyCurrencyId)
                 .HasConstraintName("sell_info_currencies_id_fk");
 
-            entity.HasOne(d => d.SellCurrency).WithMany()
+            entity.HasOne(d => d.SellCurrency).WithMany(p => p.SellInfoSellCurrencies)
                 .HasForeignKey(d => d.SellCurrencyId)
                 .HasConstraintName("sell_info_currencies_id_fk_2");
         });
-        
-        foreach (var entityType in modelBuilder.Model.GetEntityTypes())
-        {
-            var dateTimeProps = entityType.GetProperties()
-                .Where(p => p.ClrType == typeof(DateTime) || p.ClrType == typeof(DateTime?));
 
-            foreach (var prop in dateTimeProps)
-            {
-                prop.SetValueConverter(
-                    new Microsoft.EntityFrameworkCore.Storage.ValueConversion.ValueConverter<DateTime, DateTime>(
-                        v => v.Kind == DateTimeKind.Utc ? v : v.ToUniversalTime(),
-                        v => v.ToUniversalTime()
-                    )
-                );
-            }
-        }
-
+        modelBuilder.AllDateTimesToUtc();
         OnModelCreatingPartial(modelBuilder);
     }
 

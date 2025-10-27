@@ -2,6 +2,8 @@
 
 public partial class SellInfo
 {
+    public int SellContentId { get; set; }
+
     public int ArticleId { get; set; }
 
     public string StorageName { get; set; } = null!;
@@ -14,10 +16,8 @@ public partial class SellInfo
 
     public decimal SellPrice { get; set; }
 
-    public int SellContentId { get; set; }
-
     public decimal? Markup { get; set; }
-    
+
     public DateTime SellDate { get; set; }
 
     public virtual Currency BuyCurrency { get; set; } = null!;
