@@ -4,7 +4,6 @@ using Core.Attributes;
 using Core.Interfaces;
 using Core.Interfaces.Services;
 using Exceptions.Base;
-using Exceptions.Exceptions.Storages;
 using Main.Application.Extensions;
 using Main.Application.Notifications;
 using Main.Application.Validation;
@@ -12,7 +11,6 @@ using Main.Core.Abstractions;
 using Main.Core.Dtos.Amw.Storage;
 using Main.Core.Entities;
 using Main.Core.Enums;
-using Main.Core.Interfaces.DbRepositories;
 using Main.Core.Interfaces.Services;
 using Main.Core.Models;
 using Mapster;
@@ -27,7 +25,7 @@ public record EditStorageContentCommand(
 
 public class EditStorageContentHandler(
     DbDataValidatorBase dbValidator,
-    IStorageContentRepository storageContentRepository,
+    IStorageContentService storageContentService,
     IUnitOfWork unitOfWork,
     IConcurrencyValidator<StorageContent> concurrencyValidator,
     ICurrencyConverter currencyConverter,
@@ -40,7 +38,8 @@ public class EditStorageContentHandler(
 
         await ValidateData(editedFields.Select(x => x.Value.Model), request.UserId, cancellationToken);
 
-        var storageContents = await GetAndValidateStorageContents(editedFields.Keys, cancellationToken);
+        var storageContents = await storageContentService
+            .GetStorageContentsForUpdate(editedFields.Keys, cancellationToken);
         var articleIds = new HashSet<int>();
         var storageMovements = new List<StorageMovement>();
         var toIncrement = new Dictionary<int, int>();
@@ -82,7 +81,7 @@ public class EditStorageContentHandler(
         if (!patch.Count.IsSet || patch.Count.Value == content.Count)
             return (0, null);
 
-        var diff = patch.Count.Value - content.Count; // положительное — увеличение, отрицательное — уменьшение
+        var diff = patch.Count.Value - content.Count;
         var movement = content.Adapt<StorageMovement>()
             .SetActionType(StorageMovementType.StorageContentEditing);
         movement.Count = diff;
@@ -91,35 +90,20 @@ public class EditStorageContentHandler(
         return (diff, movement);
     }
 
-    private async Task<Dictionary<int, StorageContent>> GetAndValidateStorageContents(
-        IEnumerable<int> storageContentIds, CancellationToken cancellationToken)
-    {
-        var ids = storageContentIds.ToHashSet();
-        var storageContents = (await storageContentRepository.GetStorageContentsForUpdate(ids,
-            true, cancellationToken)).ToDictionary(x => x.Id);
-        if (storageContents.Count != ids.Count)
-            throw new StorageContentNotFoundException(ids.Except(storageContents.Keys));
-        return storageContents;
-    }
-
     private async Task ValidateData(IEnumerable<PatchStorageContentDto> values, Guid userId,
         CancellationToken cancellationToken = default)
     {
         var currencyIds = new HashSet<int>();
-        var storageIds = new HashSet<string>();
 
         foreach (var value in values)
         {
-            if (value.StorageName.IsSet)
-                storageIds.Add(value.StorageName.Value!);
             if (value.CurrencyId.IsSet)
                 currencyIds.Add(value.CurrencyId.Value);
         }
 
         var plan = new ValidationPlan()
             .EnsureUserExists(userId)
-            .EnsureCurrencyExists(currencyIds)
-            .EnsureStorageExists(storageIds);
+            .EnsureCurrencyExists(currencyIds);
         
         await dbValidator.Validate(plan, true, true, cancellationToken);
     }

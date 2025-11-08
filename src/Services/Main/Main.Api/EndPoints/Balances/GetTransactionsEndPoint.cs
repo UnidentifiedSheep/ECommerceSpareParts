@@ -18,7 +18,7 @@ public record GetTransactionsRequest(
     [FromQuery(Name = "senderId")] string? SenderId,
     [FromQuery(Name = "receiverId")] string? ReceiverId,
     [FromQuery(Name = "page")] int Page,
-    [FromQuery(Name = "viewCount")] int ViewCount);
+    [FromQuery(Name = "limit")] int Limit);
 
 public class GetTransactionsEndPoint : ICarterModule
 {

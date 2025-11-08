@@ -13,7 +13,7 @@ public class GetSalesRequest
     [FromQuery(Name = "rangeStartDate")] public DateTime RangeStartDate { get; set; }
     [FromQuery(Name = "rangeEndDate")] public DateTime RangeEndDate { get; set; }
     [FromQuery(Name = "page")] public int Page { get; set; }
-    [FromQuery(Name = "viewCount")] public int ViewCount { get; set; }
+    [FromQuery(Name = "limit")] public int Limit { get; set; }
     [FromQuery(Name = "buyerId")] public Guid? BuyerId { get; set; }
     [FromQuery(Name = "currencyId")] public int? CurrencyId { get; set; }
     [FromQuery(Name = "sortBy")] public string? SortBy { get; set; }
@@ -28,7 +28,7 @@ public class GetSalesEndPoint : ICarterModule
     {
         app.MapGet("/sales/", async (ISender sender, [AsParameters] GetSalesRequest request, CancellationToken token) =>
             {
-                var pagination = new PaginationModel(request.Page, request.ViewCount);
+                var pagination = new PaginationModel(request.Page, request.Limit);
                 var query = new GetSalesQuery(request.RangeStartDate, request.RangeEndDate, pagination,
                     request.BuyerId, request.CurrencyId, request.SortBy, request.SearchTerm);
                 var result = await sender.Send(query, token);

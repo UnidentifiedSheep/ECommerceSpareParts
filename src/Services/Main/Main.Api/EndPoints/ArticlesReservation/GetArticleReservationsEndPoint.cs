@@ -13,7 +13,7 @@ public class GetArticleReservationsRequest
 {
     [FromQuery(Name = "searchTerm")] public string? SearchTerm { get; set; }
     [FromQuery(Name = "page")] public int Page { get; set; }
-    [FromQuery(Name = "viewCount")] public int ViewCount { get; set; }
+    [FromQuery(Name = "limit")] public int Limit { get; set; }
     [FromQuery(Name = "sortBy")] public string? SortBy { get; set; }
     [FromQuery(Name = "userId")] public string? UserId { get; set; }
 }

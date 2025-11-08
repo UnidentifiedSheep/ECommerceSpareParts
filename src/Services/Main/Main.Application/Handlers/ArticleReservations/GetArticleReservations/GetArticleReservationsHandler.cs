@@ -10,7 +10,7 @@ namespace Main.Application.Handlers.ArticleReservations.GetArticleReservations;
 public record GetArticleReservationsQuery(
     string? SearchTerm,
     int Page,
-    int ViewCount,
+    int Limit,
     string? SortBy,
     double? Similarity,
     Guid? UserId,
@@ -25,25 +25,25 @@ public class GetArticleReservationsHandler(IArticleReservationRepository reserva
         CancellationToken cancellationToken)
     {
         IEnumerable<StorageContentReservation> reservations;
-        var offset = request.Page * request.ViewCount;
+        var offset = request.Page * request.Limit;
         var similarity = (request.Similarity ?? 0.5) >= 1 ? 0.999 : request.Similarity ?? 0.5;
         switch (request.Strategy)
         {
             case GeneralSearchStrategy.Exec:
                 reservations = await reservationRepository.GetReservationsByExecAsync(request.SearchTerm,
-                    request.UserId, offset, request.ViewCount, request.SortBy, false, cancellationToken);
+                    request.UserId, offset, request.Limit, request.SortBy, false, cancellationToken);
                 break;
             case GeneralSearchStrategy.Similarity:
                 reservations = await reservationRepository.GetReservationsBySimilarityAsync(request.SearchTerm,
-                    request.UserId, offset, request.ViewCount, request.SortBy, false, similarity, cancellationToken);
+                    request.UserId, offset, request.Limit, request.SortBy, false, similarity, cancellationToken);
                 break;
             case GeneralSearchStrategy.FromStart:
                 reservations = await reservationRepository.GetReservationsFromStartAsync(request.SearchTerm,
-                    request.UserId, offset, request.ViewCount, request.SortBy, false, cancellationToken);
+                    request.UserId, offset, request.Limit, request.SortBy, false, cancellationToken);
                 break;
             case GeneralSearchStrategy.Contains:
                 reservations = await reservationRepository.GetReservationsContainsAsync(request.SearchTerm,
-                    request.UserId, offset, request.ViewCount, request.SortBy, false, cancellationToken);
+                    request.UserId, offset, request.Limit, request.SortBy, false, cancellationToken);
                 break;
             default:
                 throw new ArgumentOutOfRangeException();

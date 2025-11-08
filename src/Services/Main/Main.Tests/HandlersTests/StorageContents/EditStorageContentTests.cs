@@ -189,25 +189,7 @@ public class EditStorageContentTests : IAsyncLifetime
         var command = new EditStorageContentCommand(dict, _user.Id);
         await Assert.ThrowsAsync<CurrencyNotFoundException>(async () => await _mediator.Send(command));
     }
-
-    [Fact]
-    public async Task EditStorageContent_WithInvalidStorageName_ThrowsStorageNotFoundException()
-    {
-        var dto = new PatchStorageContentDto
-        {
-            StorageName = new PatchField<string>
-            {
-                IsSet = true,
-                Value = "non_existing_storage"
-            }
-        };
-        var concurrentCode = "";
-        var dict = new Dictionary<int, ModelWithCode<PatchStorageContentDto, string>>
-            { [_storageContents.First().Id] = new (dto, concurrentCode) };
-
-        var command = new EditStorageContentCommand(dict, _user.Id);
-        await Assert.ThrowsAsync<StorageNotFoundException>(async () => await _mediator.Send(command));
-    }
+    
 
     [Fact]
     public async Task EditStorageContent_WithMultipleFieldsUpdate_Succeeds()
@@ -230,11 +212,6 @@ public class EditStorageContentTests : IAsyncLifetime
             {
                 IsSet = true,
                 Value = 1
-            },
-            StorageName = new PatchField<string>
-            {
-                IsSet = true,
-                Value = content.StorageName
             }
         };
         var concurrentCode = "";

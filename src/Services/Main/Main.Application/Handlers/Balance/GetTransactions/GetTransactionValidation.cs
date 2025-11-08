@@ -26,7 +26,7 @@ public class GetTransactionsValidation : AbstractValidator<GetTransactionsQuery>
             .GreaterThanOrEqualTo(0)
             .WithMessage("Страница не может быть меньше 0");
 
-        RuleFor(x => x.ViewCount)
+        RuleFor(x => x.Limit)
             .InclusiveBetween(1, 100)
             .WithMessage("Количество элементов должно быть от 1 до 100");
     }

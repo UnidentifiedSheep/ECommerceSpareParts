@@ -12,7 +12,7 @@ public record GetStorageContentRequest(
     [FromQuery(Name = "storageName")] string? StorageName,
     [FromQuery(Name = "articleId")] int? ArticleId,
     [FromQuery(Name = "page")] int Page,
-    [FromQuery(Name = "viewCount")] int ViewCount,
+    [FromQuery(Name = "limit")] int Limit,
     [FromQuery(Name = "showZeroContent")] bool ShowZeroCount = true);
 
 public record GetStorageContentResponse(IEnumerable<StorageContentDto> Content);
@@ -25,7 +25,7 @@ public class GetStorageContentEndPoint : ICarterModule
                 async (ISender sender, CancellationToken token, [AsParameters] GetStorageContentRequest request) =>
                 {
                     var query = new GetStorageContentQuery(request.StorageName, request.ArticleId,
-                        new PaginationModel(request.Page, request.ViewCount),
+                        new PaginationModel(request.Page, request.Limit),
                         request.ShowZeroCount);
                     var result = await sender.Send(query, token);
                     var response = result.Adapt<GetStorageContentResponse>();

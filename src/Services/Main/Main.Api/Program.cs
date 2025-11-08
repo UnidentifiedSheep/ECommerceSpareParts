@@ -8,6 +8,7 @@ using Contracts.Currency;
 using Contracts.Markup;
 using Core.Interfaces.MessageBroker;
 using Core.Models;
+using Core.StaticFunctions;
 using Hangfire;
 using Hangfire.PostgreSql;
 using Integrations;
@@ -37,9 +38,7 @@ using Serilog.Sinks.Loki.Labels;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Add services to the container.
-// Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
-
+Certs.RegisterCerts("/app/certs");
 Log.Logger = new LoggerConfiguration()
     .MinimumLevel.Debug()
     .Enrich.FromLogContext()

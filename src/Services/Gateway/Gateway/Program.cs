@@ -1,11 +1,12 @@
 using System.Text;
+using Core.StaticFunctions;
 using Gateway.Extensions;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using Yarp.ReverseProxy.Transforms;
 
 var builder = WebApplication.CreateBuilder(args);
-
+Certs.RegisterCerts("/app/certs");
 builder.Configuration.AddJsonFromDirectory("ReverseProxy");
 
 builder.Services.AddAuthorization(options =>
@@ -61,13 +62,15 @@ builder.Services.AddCors(options =>
 });
 
 var app = builder.Build();
-
+app.UseHttpsRedirection();
 app.UseCors();
 
 app.UseAuthentication();
 app.UseAuthorization();
 
-app.MapReverseProxy();
+app.MapMethods("{**any}", ["OPTIONS"], () => Results.Ok())
+    .AllowAnonymous();
 
+app.MapReverseProxy();
 
 app.Run();

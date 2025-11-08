@@ -14,9 +14,9 @@ public class GetProducerOtherNamesEndPoint : ICarterModule
     public void AddRoutes(IEndpointRouteBuilder app)
     {
         app.MapGet("/producers/{producerId}/names",
-                async (ISender sender, int producerId, int page, int viewCount, CancellationToken token) =>
+                async (ISender sender, int producerId, int page, int limit, CancellationToken token) =>
                 {
-                    var query = new GetProducerOtherNamesQuery(producerId, new PaginationModel(page, viewCount));
+                    var query = new GetProducerOtherNamesQuery(producerId, new PaginationModel(page, limit));
                     var result = await sender.Send(query, token);
                     return Results.Ok(result.Adapt<GetProducerOtherNamesResponse>());
                 }).WithTags("Producers")

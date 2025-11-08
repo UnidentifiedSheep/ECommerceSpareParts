@@ -12,7 +12,7 @@ public record GetTransactionsQuery(
     Guid? SenderId,
     Guid? ReceiverId,
     int Page,
-    int ViewCount) : IQuery<GetTransactionsResult>;
+    int Limit) : IQuery<GetTransactionsResult>;
 
 public record GetTransactionsResult(IEnumerable<TransactionDto> Transactions);
 
@@ -22,7 +22,7 @@ public class GetTransactionsHandler(IBalanceRepository balanceRepository)
     public async Task<GetTransactionsResult> Handle(GetTransactionsQuery request, CancellationToken cancellationToken)
     {
         var res = await balanceRepository.GetTransactionsAsync(request.RangeStart, request.RangeEnd,
-            request.CurrencyId, request.SenderId, request.ReceiverId, request.Page, request.ViewCount, false,
+            request.CurrencyId, request.SenderId, request.ReceiverId, request.Page, request.Limit, false,
             cancellationToken);
         return new GetTransactionsResult(res.Adapt<List<TransactionDto>>());
     }

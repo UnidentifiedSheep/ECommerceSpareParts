@@ -7,9 +7,6 @@
           "main-api": {
             "Address": "https://main.api:7292/"
           }
-        },
-        "HttpClient": {
-          "DangerousAcceptAnyServerCertificate": "true"
         }
       }
     }

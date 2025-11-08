@@ -6,12 +6,13 @@ using Carter;
 using Contracts.Currency;
 using Contracts.Sale;
 using Core.Models;
+using Core.StaticFunctions;
 using MassTransit;
 using Persistence.Extensions;
 using RabbitMq;
 
 var builder = WebApplication.CreateBuilder(args);
-
+Certs.RegisterCerts("/app/certs");
 builder.Services.AddOpenApi();
 
 var brokerOptions = new MessageBrokerOptions

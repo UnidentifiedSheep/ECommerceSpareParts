@@ -23,7 +23,7 @@ public record GetUsersRequest(
     [FromQuery(Name = "description")] string? Description,
     [FromQuery(Name = "similarityLevel")] double? SimilarityLevel,
     [FromQuery(Name = "page")] int Page,
-    [FromQuery(Name = "viewCount")] int ViewCount,
+    [FromQuery(Name = "limit")] int Limit,
     [FromQuery(Name = "searchMethod")] string SearchMethod);
 
 public record GetUsersResponse(IEnumerable<UserDto> Users);
@@ -38,7 +38,7 @@ public class GetUsersEndPoint : ICarterModule
                 {
                     var userId = claims.FindFirstValue(ClaimTypes.NameIdentifier);
                     if (userId == null) return Results.Unauthorized();
-                    var pagination = new PaginationModel(request.Page, request.ViewCount);
+                    var pagination = new PaginationModel(request.Page, request.Limit);
                     var query = new GetUsersQuery(request.SearchTerm, pagination, request.SimilarityLevel,
                         userId, request.Name, request.Surname, request.Email, request.Phone, request.UserName,
                         request.Id,

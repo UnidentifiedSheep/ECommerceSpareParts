@@ -334,7 +334,6 @@ public static class MapsterConfig
 
         TypeAdapterConfig<PatchStorageContentDto, StorageContent>.NewConfig()
             .IgnorePatchIfNotSet()
-            .Map(dest => dest.StorageName, src => src.StorageName.Value)
             .Map(dest => dest.BuyPrice, src => Math.Round(src.BuyPrice.Value, 2))
             .Map(dest => dest.CurrencyId, src => src.CurrencyId.Value)
             .Map(dest => dest.Count, src => src.Count.Value)

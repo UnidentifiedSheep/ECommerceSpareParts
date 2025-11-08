@@ -14,7 +14,7 @@ public class GetPurchasesRequest
     [FromQuery(Name = "rangeStartDate")] public DateTime RangeStartDate { get; set; }
     [FromQuery(Name = "rangeEndDate")] public DateTime RangeEndDate { get; set; }
     [FromQuery(Name = "page")] public int Page { get; set; }
-    [FromQuery(Name = "viewCount")] public int ViewCount { get; set; }
+    [FromQuery(Name = "limit")] public int Limit { get; set; }
     [FromQuery(Name = "supplierId")] public Guid? SupplierId { get; set; }
     [FromQuery(Name = "currencyId")] public int? CurrencyId { get; set; }
     [FromQuery(Name = "sortBy")] public string? SortBy { get; set; }
@@ -31,7 +31,7 @@ public class GetPurchasesEndPoint : ICarterModule
                 ClaimsPrincipal user, CancellationToken token) =>
             {
                 var query = new GetPurchasesQuery(request.RangeStartDate, request.RangeEndDate,
-                    new PaginationModel(request.Page, request.ViewCount),
+                    new PaginationModel(request.Page, request.Limit),
                     request.SupplierId, request.CurrencyId, request.SortBy, request.SearchTerm);
                 var result = await sender.Send(query, token);
                 var response = result.Adapt<GetPurchasesResponse>();

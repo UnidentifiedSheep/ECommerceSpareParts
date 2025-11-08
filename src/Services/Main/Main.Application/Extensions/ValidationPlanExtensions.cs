@@ -39,6 +39,9 @@ public static class ValidationPlanExtensions
     public static IValidationPlan EnsureStorageExists(this IValidationPlan plan, IEnumerable<string> storageNames)
         => plan.EnsureExists<Storage, string>(x => x.Name, storageNames, typeof(StorageNotFoundException));
     
+    //STORAGE CONTENT
+    
+    
     //PRODUCER
     public static IValidationPlan EnsureProducerExists(this IValidationPlan plan, int producerId)
         => plan.EnsureExists<Producer, int>(x => x.Id, producerId, typeof(ProducerNotFoundException));

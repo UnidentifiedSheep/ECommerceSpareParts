@@ -14,9 +14,9 @@ public class GetStoragesEndPoint : ICarterModule
     public void AddRoutes(IEndpointRouteBuilder app)
     {
         app.MapGet("/storages/",
-                async (ISender sender, int page, int viewCount, string? searchTerm, CancellationToken token) =>
+                async (ISender sender, int page, int limit, string? searchTerm, CancellationToken token) =>
                 {
-                    var query = new GetStoragesQuery(new PaginationModel(page, viewCount), searchTerm);
+                    var query = new GetStoragesQuery(new PaginationModel(page, limit), searchTerm);
                     var result = await sender.Send(query, token);
                     var response = result.Adapt<GetStoragesResponse>();
                     return Results.Ok(response);

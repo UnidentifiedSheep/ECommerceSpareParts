@@ -46,7 +46,8 @@ public static class ServiceProvider
         collection.AddSingleton<IPriceGenerator, PriceGenerator>();
         collection.AddScoped<IPriceSetup, PriceSetup>();
         collection.AddScoped<DbDataValidatorBase, DbDataValidator>();
-        
+
+        collection.AddScoped<IStorageContentService, StorageContentService>();
         collection.AddScoped<IArticlePricesService, ArticlePricesService>();
         collection.AddScoped<IArticlesService, ArticlesService>();
         collection.AddScoped<IBalanceService, BalanceService>();
