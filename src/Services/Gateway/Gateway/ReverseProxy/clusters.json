@@ -8,6 +8,14 @@
             "Address": "https://main.api:7292/"
           }
         }
+      },
+      "analytics-cluster": {
+        "LoadBalancingPolicy": "RoundRobin",
+        "Destinations": {
+          "analytics-api": {
+            "Address": "https://analytics.api:7292/"
+          }
+        }
       }
     }
   }

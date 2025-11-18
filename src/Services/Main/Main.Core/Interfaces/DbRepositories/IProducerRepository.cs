@@ -4,7 +4,6 @@ namespace Main.Core.Interfaces.DbRepositories;
 
 public interface IProducerRepository
 {
-    Task<IEnumerable<int>> ProducersExistsAsync(IEnumerable<int> ids, CancellationToken cancellationToken = default);
     Task<Producer?> GetProducer(int producerId, bool track = true, CancellationToken cancellationToken = default);
     Task<bool> ProducerHasAnyArticle(int producerId, CancellationToken cancellationToken = default);
 

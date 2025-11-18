@@ -10,17 +10,6 @@ namespace Main.Persistence.Repositories;
 
 public class ProducerRepository(DContext context) : IProducerRepository
 {
-    public async Task<IEnumerable<int>> ProducersExistsAsync(IEnumerable<int> ids,
-        CancellationToken cancellationToken = default)
-    {
-        var idsSet = ids.ToHashSet();
-        var foundProducers = await context.Producers.AsNoTracking()
-            .Where(x => idsSet.Contains(x.Id))
-            .Select(x => x.Id)
-            .ToListAsync(cancellationToken);
-        return idsSet.Except(foundProducers);
-    }
-
     public async Task<Producer?> GetProducer(int producerId, bool track = true,
         CancellationToken cancellationToken = default)
     {
@@ -64,8 +53,7 @@ public class ProducerRepository(DContext context) : IProducerRepository
     }
 
     public async Task<IEnumerable<Producer>> GetProducers(string? searchTerm, int page, int viewCount,
-        bool track = true,
-        CancellationToken cancellationToken = default)
+        bool track = true, CancellationToken cancellationToken = default)
     {
         var query = context.Producers.ConfigureTracking(track);
         if (!string.IsNullOrWhiteSpace(searchTerm))

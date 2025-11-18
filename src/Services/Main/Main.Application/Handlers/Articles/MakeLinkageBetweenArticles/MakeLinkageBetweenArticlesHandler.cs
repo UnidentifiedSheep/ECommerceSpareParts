@@ -76,11 +76,11 @@ public class MakeLinkageBetweenArticlesHandler(
     {
         var rIds = rightIds.ToList();
         foreach (var l in leftIds)
-        foreach (var r in rIds)
-        {
-            set.Add((l, r));
-            set.Add((r, l));
-        }
+            foreach (var r in rIds)
+            {
+                set.Add((l, r));
+                set.Add((r, l));
+            }
     }
 
     private void AddBidirectionalPairs(HashSet<(int, int)> set, IEnumerable<int> ids, int singleId)

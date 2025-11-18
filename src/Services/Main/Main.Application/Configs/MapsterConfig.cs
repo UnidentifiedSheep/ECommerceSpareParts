@@ -92,6 +92,7 @@ public static class MapsterConfig
         //ALL
         TypeAdapterConfig<Article, AmwArticleDto>.NewConfig()
             .Map(dest => dest.Id, src => src.Id)
+            .Map(dest => dest.ProducerId, src => src.ProducerId)
             .Map(dest => dest.ProducerName, src => src.Producer.Name)
             .Map(dest => dest.Title, src => src.ArticleName)
             .Map(dest => dest.ArticleNumber, src => src.ArticleNumber)
@@ -178,6 +179,7 @@ public static class MapsterConfig
         //Producers
         TypeAdapterConfig<Producer, ProducerDto>.NewConfig()
             .Map(dest => dest.Id, src => src.Id)
+            .Map(dest => dest.IsOe, src => src.IsOe)
             .Map(dest => dest.Name, src => src.Name)
             .Map(dest => dest.Description, src => src.Description);
         TypeAdapterConfig<NewProducerDto, Producer>.NewConfig()

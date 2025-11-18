@@ -17,7 +17,8 @@ public class AddArticleContentEndPoint : ICarterModule
                 await sender.Send(command, cancellationToken);
                 return Results.NoContent();
             }).WithTags("Articles")
-            .WithDescription("Добавление содержимое артикула в бд")
-            .WithDisplayName("Добавление содержимое артикула");
+            .WithDescription("Добавление содержимое артикула")
+            .WithDisplayName("Добавление содержимое артикула")
+            .Accepts<AddArticleContentRequest>(false, "application/json");
     }
 }

@@ -13,11 +13,11 @@ using AnonymousArticleDto = Main.Core.Dtos.Anonymous.Articles.ArticleDto;
 
 namespace Main.Api.EndPoints.Articles;
 
-public record GetArticleViaStartNumberAmwResponse(IEnumerable<AmwArticleDto> Articles);
+public record GetArticleAmwResponse(IEnumerable<AmwArticleDto> Articles);
 
-public record GetArticleViaStartNumberAnonymousResponse(IEnumerable<AnonymousArticleDto> Articles);
+public record GetArticleAnonymousResponse(IEnumerable<AnonymousArticleDto> Articles);
 
-public record GetArticleViaStartNumberRequest(
+public record GetArticleRequest(
     [FromQuery(Name = "searchTerm")] string SearchTerm,
     [FromQuery(Name = "page")] int Page,
     [FromQuery(Name = "limit")] int Limit,
@@ -29,7 +29,7 @@ public class GetArticlesEndPoint : ICarterModule
     public void AddRoutes(IEndpointRouteBuilder app)
     {
         app.MapGet("/articles", async (ISender sender, HttpContext context, ClaimsPrincipal user,
-                [AsParameters] GetArticleViaStartNumberRequest request, CancellationToken token) =>
+                [AsParameters] GetArticleRequest request, CancellationToken token) =>
             {
                 var userId = user.GetUserId();
                 var roles = user.GetUserRoles();
@@ -49,25 +49,25 @@ public class GetArticlesEndPoint : ICarterModule
             .WithSummary("Поиск артикула с начала номера");
     }
 
-    private async Task<IResult> GetAmw(ISender sender, GetArticleViaStartNumberRequest request,
+    private async Task<IResult> GetAmw(ISender sender, GetArticleRequest request,
         PaginationModel pagination,
         string? userId, IEnumerable<int> producerIds, CancellationToken token)
     {
         var query = new GetArticlesQuery<AmwArticleDto>(request.SearchTerm, pagination, request.SortBy, producerIds,
             request.SearchStrategy, userId);
         var result = await sender.Send(query, token);
-        var response = result.Adapt<GetArticleViaStartNumberAmwResponse>();
+        var response = result.Adapt<GetArticleAmwResponse>();
         return Results.Ok(response);
     }
 
-    private async Task<IResult> GetAnonymous(ISender sender, GetArticleViaStartNumberRequest request,
+    private async Task<IResult> GetAnonymous(ISender sender, GetArticleRequest request,
         PaginationModel pagination,
         string? userId, IEnumerable<int> producerIds, CancellationToken token)
     {
         var query = new GetArticlesQuery<AnonymousArticleDto>(request.SearchTerm, pagination, request.SortBy,
             producerIds, request.SearchStrategy, userId);
         var result = await sender.Send(query, token);
-        var response = result.Adapt<GetArticleViaStartNumberAnonymousResponse>();
+        var response = result.Adapt<GetArticleAnonymousResponse>();
         return Results.Ok(response);
     }
 }

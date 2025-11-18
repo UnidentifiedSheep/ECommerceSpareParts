@@ -18,7 +18,8 @@ public class CreateArticleEndPoint : ICarterModule
                 await sender.Send(command, token);
                 return Results.Created();
             }).WithTags("Articles")
-            .WithDescription("Добавление новых артикулов в бд")
-            .WithDisplayName("Добавление артикулов");
+            .WithDescription("Добавление новых артикулов")
+            .WithDisplayName("Добавление артикулов")
+            .Accepts<CreateArticleRequest>(false, "application/json");
     }
 }

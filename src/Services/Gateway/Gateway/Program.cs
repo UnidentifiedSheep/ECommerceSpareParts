@@ -11,9 +11,9 @@ builder.Configuration.AddJsonFromDirectory("ReverseProxy");
 
 builder.Services.AddAuthorization(options =>
 {
-    options.AddPolicy("AMW", policy => { policy.RequireRole("Admin", "Moderator", "Worker"); });
-    options.AddPolicy("AM", policy => { policy.RequireRole("Admin", "Moderator"); });
-    options.AddPolicy("MEMBER", policy => { policy.RequireRole("Member"); });
+    options.AddPolicy("AMW", policy => { policy.RequireRole("ADMIN", "MODERATOR", "WORKER"); });
+    options.AddPolicy("AM", policy => { policy.RequireRole("ADMIN", "MODERATOR"); });
+    options.AddPolicy("MEMBER", policy => { policy.RequireRole("MEMBER"); });
 });
 
 builder.Services.AddAuthentication(options =>

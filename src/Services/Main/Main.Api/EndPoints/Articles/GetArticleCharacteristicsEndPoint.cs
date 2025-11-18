@@ -23,7 +23,6 @@ public class GetArticleCharacteristicsEndPoint : ICarterModule
             .WithDescription("Получить характеристики артикула")
             .Produces<GetArticleCharacteristicsResponse>()
             .ProducesProblem(StatusCodes.Status400BadRequest)
-            .ProducesProblem(StatusCodes.Status404NotFound)
             .WithSummary("Получение характеристик артикула по id");
     }
 }

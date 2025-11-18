@@ -35,6 +35,7 @@ using Security;
 using Serilog;
 using Serilog.Sinks.Loki;
 using Serilog.Sinks.Loki.Labels;
+using Global = Main.Application.Global;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -177,6 +178,8 @@ app.UseForwardedHeaders(new ForwardedHeadersOptions
     ForwardedHeaders = ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto
 });
 
+Global.SetSystemId(app.Configuration["App:SystemId"]!);
+
 await app.EnsureDbExists<DContext>();
 
 app.UseHangfireDashboard();
@@ -196,6 +199,12 @@ app.MapCarter();
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {
+    app.UseReDoc(options =>
+    {
+        options.DocumentTitle = "Main API Docs";
+        options.SpecUrl = "/swagger/v1/swagger.json";
+        options.RoutePrefix = "docs";
+    });
     app.UseSwagger();
     app.UseSwaggerUI();
     app.MapOpenApi();

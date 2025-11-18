@@ -33,7 +33,7 @@ public class RefreshTokenHandler(
 
         var user = (await userRepository.GetUserByIdAsync(userToken.UserId, false, cancellationToken))!;
         var userRoles = (await userRoleRepository.GetUserRolesAsync(userToken.UserId, false,
-            cancellationToken: cancellationToken)).Select(x => x.Role.Name).ToList();
+            cancellationToken: cancellationToken)).Select(x => x.Role.NormalizedName).ToList();
 
         var token = tokenGenerator.CreateToken(user.Adapt<User>(), user.UserInfo!.Adapt<UserInfo>(), request.DeviceId, userRoles);
         var refreshToken = tokenGenerator.CreateRefreshToken();

@@ -1,5 +1,6 @@
 using Carter;
 using Core.Models;
+using Main.Application.Handlers.Producers.GetProducerById;
 using Main.Application.Handlers.Producers.GetProducers;
 using Main.Core.Dtos.Anonymous.Producers;
 using Mapster;
@@ -8,6 +9,7 @@ using MediatR;
 namespace Main.Api.EndPoints.Producers;
 
 public record GetProducersResponse(IEnumerable<ProducerDto> Producers);
+public record GetProducerByIdResponse(ProducerDto Producer);
 
 public class GetProducersEndPoint : ICarterModule
 {
@@ -21,5 +23,16 @@ public class GetProducersEndPoint : ICarterModule
             }).WithTags("Producers")
             .WithDescription("Получение производителей по ключевому слову либо просто списком")
             .Produces<GetProducersResponse>();
+        
+        app.MapGet("/producers/{id}", async (ISender sender, int id) =>
+            {
+                var query = new GetProducerByIdQuery(id);
+                var result = await sender.Send(query);
+                return Results.Ok(result.Adapt<GetProducerByIdResponse>());
+            }).WithTags("Producers")
+            .WithDisplayName("Получение производителя по Id")
+            .WithDescription("Получение производителя по Id")
+            .Produces<GetProducerByIdResponse>()
+            .ProducesProblem(404);
     }
 }

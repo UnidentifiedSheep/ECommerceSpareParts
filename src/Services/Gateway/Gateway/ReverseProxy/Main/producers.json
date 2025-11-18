@@ -76,6 +76,16 @@
         "Transforms": [
           { "PathRemovePrefix": "/main" }
         ]
+      },
+      "get-producer-by-id": {
+        "ClusterId": "main-cluster",
+        "Match": {
+          "Path": "/main/producers/{id}",
+          "Methods": [ "GET" ]
+        },
+        "Transforms": [
+          { "PathRemovePrefix": "/main" }
+        ]
       }
     }
   }

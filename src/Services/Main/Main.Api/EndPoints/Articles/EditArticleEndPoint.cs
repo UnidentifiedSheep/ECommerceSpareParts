@@ -19,6 +19,7 @@ public class EditArticleEndPoint : ICarterModule
                     return Results.NoContent();
                 }).WithTags("Articles")
                 .WithDescription("Редактирование артикула")
-                .WithDisplayName("Редактирование артикула");
+                .WithDisplayName("Редактирование артикула")
+                .Accepts<EditArticleRequest>(false, "application/json");
     }
 }

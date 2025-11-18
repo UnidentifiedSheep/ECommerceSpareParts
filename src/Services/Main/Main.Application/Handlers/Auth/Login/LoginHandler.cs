@@ -37,7 +37,7 @@ public class LoginHandler(
             throw new WrongCredentialsException(request.Email + request.Password);
 
         var roles = (await userRoleRepository.GetUserRolesAsync(user.Id, false,
-            cancellationToken: cancellationToken)).Select(x => x.Role.Name).ToList();
+            cancellationToken: cancellationToken)).Select(x => x.Role.NormalizedName).ToList();
 
         var deviceId = GenerateDeviceId();
         var ip = request.IpAddress;

@@ -8,6 +8,8 @@ namespace Main.Api.EndPoints.Producers;
 
 public record CreateProducerRequest(NewProducerDto NewProducer);
 
+public record CreateProducerResponse(int Id);
+
 public class CreateProducerEndPoint : ICarterModule
 {
     public void AddRoutes(IEndpointRouteBuilder app)
@@ -16,7 +18,7 @@ public class CreateProducerEndPoint : ICarterModule
             {
                 var command = request.Adapt<CreateProducerCommand>();
                 var result = await sender.Send(command, token);
-                return Results.Created("/producers", result.ProducerId);
+                return Results.Created("/producers", new CreateProducerResponse(result.ProducerId));
             }).WithTags("Producers")
             .WithDescription("Добавление новых производителей в бд")
             .WithDisplayName("Добавление производителей");
