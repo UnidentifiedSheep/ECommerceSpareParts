@@ -57,7 +57,7 @@ public class MakeLinkageBetweenArticlesTests : IAsyncLifetime
             CrossArticleId = 1,
             LinkageType = ArticleLinkageTypes.FullCross
         };
-        var command = new MakeLinkageBetweenArticlesCommand(newLinkage);
+        var command = new MakeLinkageBetweenArticlesCommand([newLinkage]);
         await Assert.ThrowsAsync<ValidationException>(async () => await _mediator.Send(command));
     }
 
@@ -70,7 +70,7 @@ public class MakeLinkageBetweenArticlesTests : IAsyncLifetime
             CrossArticleId = 2,
             LinkageType = ArticleLinkageTypes.SingleCross
         };
-        var command = new MakeLinkageBetweenArticlesCommand(newLinkage);
+        var command = new MakeLinkageBetweenArticlesCommand([newLinkage]);
 
         var result = await _mediator.Send(command);
         Assert.Equal(Unit.Value, result);
@@ -95,7 +95,7 @@ public class MakeLinkageBetweenArticlesTests : IAsyncLifetime
             CrossArticleId = 2,
             LinkageType = ArticleLinkageTypes.FullCross
         };
-        var command = new MakeLinkageBetweenArticlesCommand(newLinkage);
+        var command = new MakeLinkageBetweenArticlesCommand([newLinkage]);
 
         var result = await _mediator.Send(command);
 
@@ -133,7 +133,7 @@ public class MakeLinkageBetweenArticlesTests : IAsyncLifetime
             CrossArticleId = 2,
             LinkageType = ArticleLinkageTypes.FullRightToLeftCross
         };
-        var command = new MakeLinkageBetweenArticlesCommand(newLinkage);
+        var command = new MakeLinkageBetweenArticlesCommand([newLinkage]);
 
         var result = await _mediator.Send(command);
 
@@ -169,7 +169,7 @@ public class MakeLinkageBetweenArticlesTests : IAsyncLifetime
             CrossArticleId = 2,
             LinkageType = ArticleLinkageTypes.FullLeftToRightCross
         };
-        var command = new MakeLinkageBetweenArticlesCommand(newLinkage);
+        var command = new MakeLinkageBetweenArticlesCommand([newLinkage]);
 
         var result = await _mediator.Send(command);
 

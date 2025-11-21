@@ -12,12 +12,13 @@ using MediatR;
 namespace Main.Application.Handlers.Articles.CreateArticles;
 
 [Transactional]
-public record CreateArticlesCommand(List<CreateArticleDto> NewArticles) : ICommand;
+public record CreateArticlesCommand(List<CreateArticleDto> NewArticles) : ICommand<CreateArticlesResult>;
+public record CreateArticlesResult(List<int> CreatedIds);
 
 public class CreateArticlesHandler(IUnitOfWork unitOfWork, DbDataValidatorBase dbValidator)
-    : ICommandHandler<CreateArticlesCommand>
+    : ICommandHandler<CreateArticlesCommand, CreateArticlesResult>
 {
-    public async Task<Unit> Handle(CreateArticlesCommand request, CancellationToken cancellationToken)
+    public async Task<CreateArticlesResult> Handle(CreateArticlesCommand request, CancellationToken cancellationToken)
     {
         var producersIds = request.NewArticles.Select(x => x.ProducerId);
 
@@ -27,6 +28,6 @@ public class CreateArticlesHandler(IUnitOfWork unitOfWork, DbDataValidatorBase d
         var articles = request.NewArticles.Adapt<List<Article>>();
         await unitOfWork.AddRangeAsync(articles, cancellationToken);
         await unitOfWork.SaveChangesAsync(cancellationToken);
-        return Unit.Value;
+        return new CreateArticlesResult(articles.Select(x => x.Id).ToList());
     }
 }

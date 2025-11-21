@@ -6,8 +6,12 @@ public class MakeLinkageBetweenArticlesValidation : AbstractValidator<MakeLinkag
 {
     public MakeLinkageBetweenArticlesValidation()
     {
-        RuleFor(x => new { x.Linkage.ArticleId, x.Linkage.CrossArticleId })
-            .Must(x => x.ArticleId != x.CrossArticleId)
-            .WithMessage("Артикул не может быть таким же как кросс артикул");
+        RuleForEach(x => x.Linkages)
+            .ChildRules(z =>
+            {
+                z.RuleFor(x => new { x.ArticleId, x.CrossArticleId })
+                    .Must(x => x.ArticleId != x.CrossArticleId)
+                    .WithMessage("Артикул не может быть таким же как кросс артикул");
+            });
     }
 }

@@ -8,6 +8,7 @@ namespace Main.Api.EndPoints.Articles;
 
 public record CreateArticleRequest(List<CreateArticleDto> NewArticles);
 
+public record CreateArticleResponse(List<int> CreatedIds);
 public class CreateArticleEndPoint : ICarterModule
 {
     public void AddRoutes(IEndpointRouteBuilder app)
@@ -15,11 +16,14 @@ public class CreateArticleEndPoint : ICarterModule
         app.MapPost("/articles", async (ISender sender, CreateArticleRequest request, CancellationToken token) =>
             {
                 var command = request.Adapt<CreateArticlesCommand>();
-                await sender.Send(command, token);
-                return Results.Created();
+                var result = await sender.Send(command, token);
+                var response = result.Adapt<CreateArticleResponse>();
+                return Results.Created("/articles", response);
             }).WithTags("Articles")
             .WithDescription("Добавление новых артикулов")
             .WithDisplayName("Добавление артикулов")
-            .Accepts<CreateArticleRequest>(false, "application/json");
+            .Accepts<CreateArticleRequest>(false, "application/json")
+            .Produces<CreateArticleResponse>(201, "application/json")
+            .ProducesProblem(400);
     }
 }

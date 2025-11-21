@@ -6,7 +6,7 @@ using MediatR;
 
 namespace Main.Api.EndPoints.Articles;
 
-public record MakeLinkageBetweenArticlesRequest(NewArticleLinkageDto Linkage);
+public record MakeLinkageBetweenArticlesRequest(List<NewArticleLinkageDto> Linkages);
 
 public class MakeLinkageBetweenArticlesEndPoint : ICarterModule
 {
@@ -17,9 +17,12 @@ public class MakeLinkageBetweenArticlesEndPoint : ICarterModule
                 {
                     var command = request.Adapt<MakeLinkageBetweenArticlesCommand>();
                     await sender.Send(command, token);
-                    return Results.Ok();
+                    return Results.Created();
                 }).WithTags("Articles")
                 .WithDescription("Создание кроссировки между артикулами")
-                .WithDisplayName("Создание кроссировки");
+                .WithDisplayName("Создание кроссировки")
+                .Produces(201)
+                .ProducesProblem(404)
+                .ProducesProblem(400);
     }
 }

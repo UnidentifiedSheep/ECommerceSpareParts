@@ -49,7 +49,7 @@ public class CreateArticleTests : IAsyncLifetime
 
         var result = await _mediator.Send(command);
 
-        Assert.Equal(Unit.Value, result);
+        Assert.Equal(articleList.Count, result.CreatedIds.Count);
 
         var saved = await _context.Articles.AnyAsync(a => a.ArticleNumber == articleList[0].ArticleNumber);
         Assert.True(saved);
@@ -65,7 +65,7 @@ public class CreateArticleTests : IAsyncLifetime
 
         var result = await _mediator.Send(command, CancellationToken.None);
 
-        Assert.Equal(Unit.Value, result);
+        Assert.Equal(articleList.Count, result.CreatedIds.Count);
 
         var saved = true;
         foreach (var item in articleList)

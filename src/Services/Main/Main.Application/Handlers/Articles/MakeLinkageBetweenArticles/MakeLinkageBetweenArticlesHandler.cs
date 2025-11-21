@@ -11,7 +11,7 @@ using MediatR;
 namespace Main.Application.Handlers.Articles.MakeLinkageBetweenArticles;
 
 [Transactional]
-public record MakeLinkageBetweenArticlesCommand(NewArticleLinkageDto Linkage) : ICommand<Unit>;
+public record MakeLinkageBetweenArticlesCommand(List<NewArticleLinkageDto> Linkages) : ICommand<Unit>;
 
 public class MakeLinkageBetweenArticlesHandler(
     IMediator mediator,
@@ -21,7 +21,22 @@ public class MakeLinkageBetweenArticlesHandler(
 {
     public async Task<Unit> Handle(MakeLinkageBetweenArticlesCommand request, CancellationToken cancellationToken)
     {
-        var linkage = request.Linkage;
+        var linkages = request.Linkages;
+        var updatedIds = new HashSet<int>();
+
+        foreach (var linkage in linkages)
+        {
+            int[] ids = await CreateLinkages(linkage, cancellationToken);
+            updatedIds.UnionWith(ids);
+        }
+        
+        await mediator.Publish(new ArticlesUpdatedNotification(updatedIds), cancellationToken);
+        return Unit.Value;
+    }
+
+    private async Task<int[]> CreateLinkages(NewArticleLinkageDto linkage, 
+        CancellationToken cancellationToken = default)
+    {
         var lrArticles = await articlesRepository
             .GetArticlesByIds([linkage.ArticleId, linkage.CrossArticleId], false, cancellationToken);
 
@@ -40,17 +55,21 @@ public class MakeLinkageBetweenArticlesHandler(
 
             case ArticleLinkageTypes.FullCross:
                 var leftIds = await GetCrossIds(linkage.ArticleId, cancellationToken);
+                leftIds.Add(leftArticle.Id);
                 var rightIds = await GetCrossIds(linkage.CrossArticleId, cancellationToken);
+                rightIds.Add(rightArticle.Id);
                 AddBidirectionalPairs(toAdd, leftIds, rightIds);
                 break;
 
             case ArticleLinkageTypes.FullLeftToRightCross:
                 var leftCrossIds = await GetCrossIds(linkage.ArticleId, cancellationToken);
+                leftCrossIds.Add(leftArticle.Id);
                 AddBidirectionalPairs(toAdd, leftCrossIds, rightArticle.Id);
                 break;
 
             case ArticleLinkageTypes.FullRightToLeftCross:
                 var rightCrossIds = await GetCrossIds(linkage.CrossArticleId, cancellationToken);
+                rightCrossIds.Add(rightArticle.Id);
                 AddBidirectionalPairs(toAdd, rightCrossIds, leftArticle.Id);
                 break;
 
@@ -60,11 +79,7 @@ public class MakeLinkageBetweenArticlesHandler(
 
         await articlesRepository.AddArticleLinkage(toAdd, cancellationToken);
         await unitOfWork.SaveChangesAsync(cancellationToken);
-
-        await mediator.Publish(new ArticleUpdatedNotification(linkage.ArticleId), cancellationToken);
-        await mediator.Publish(new ArticleUpdatedNotification(linkage.CrossArticleId), cancellationToken);
-
-        return Unit.Value;
+        return [leftArticle.Id, rightArticle.Id];
     }
 
     private async Task<HashSet<int>> GetCrossIds(int articleId, CancellationToken ct)
