@@ -34,6 +34,7 @@
         <ProjectReference Include="..\..\..\Infrastructure\Mail\Mail.csproj" />
         <ProjectReference Include="..\..\..\Infrastructure\RabbitMq\RabbitMq.csproj" />
         <ProjectReference Include="..\..\..\Infrastructure\Redis\Redis.csproj" />
+        <ProjectReference Include="..\..\..\Infrastructure\S3\S3.csproj" />
         <ProjectReference Include="..\..\..\Infrastructure\Security\Security.csproj" />
         <ProjectReference Include="..\..\Api.Common\Api.Common.csproj" />
         <ProjectReference Include="..\..\Application.Common\Application.Common.csproj" />

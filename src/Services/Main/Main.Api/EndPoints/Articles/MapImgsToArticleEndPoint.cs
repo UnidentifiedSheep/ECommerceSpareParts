@@ -1,5 +1,6 @@
-﻿using Carter;
-using Main.Application.Handlers.Articles;
+﻿using Api.Common.Models;
+using Carter;
+using Main.Application.Handlers.ArticleImages.MapImgsToArticle;
 using MediatR;
 
 namespace Main.Api.EndPoints.Articles;
@@ -11,13 +12,14 @@ public class MapImgsToArticleEndPoint : ICarterModule
         app.MapPost("/articles/{articleId}/imgs/",
                 async (ISender sender, int articleId, HttpContext context, CancellationToken token) =>
                 {
-                    //TODO: MAKE THIS
-                    var files = context.Request.Form.Files;
-                    var command = new MapImgsToArticleCommand();
+                    var files = FileModel.GetFileModels(context.Request.Form.Files);
+                    var command = new MapImgsToArticleCommand(articleId, files);
                     await sender.Send(command, token);
                     return Results.Ok();
                 }).WithMetadata()
                 .WithTags("Articles")
-                .WithName("Добавить изображение к артикулу");
+                .WithName("Добавить изображение к артикулу")
+                .Produces(200)
+                .ProducesProblem(404);
     }
 }

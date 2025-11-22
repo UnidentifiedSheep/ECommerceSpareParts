@@ -7,8 +7,6 @@
     </PropertyGroup>
 
     <ItemGroup>
-        <PackageReference Include="AWSSDK.Extensions.NETCore.Setup" Version="4.0.2.2"/>
-        <PackageReference Include="AWSSDK.S3" Version="4.0.6.10"/>
         <PackageReference Include="Microsoft.AspNetCore.Http" Version="2.3.0"/>
         <PackageReference Include="Microsoft.Extensions.Http" Version="9.0.7"/>
         <PackageReference Include="Newtonsoft.Json" Version="13.0.4" />
@@ -23,6 +21,11 @@
     <ItemGroup>
         <ProjectReference Include="..\..\Core\Core\Core.csproj"/>
         <ProjectReference Include="..\Common\Common.csproj"/>
+    </ItemGroup>
+
+    <ItemGroup>
+      <Folder Include="Interfaces\" />
+      <Folder Include="S3\" />
     </ItemGroup>
 
 </Project>

@@ -1,4 +1,6 @@
 using System.Text;
+using Amazon.Extensions.NETCore.Setup;
+using Amazon.Runtime;
 using Api.Common;
 using Api.Common.ExceptionHandlers;
 using Api.Common.Logging;
@@ -31,6 +33,7 @@ using MassTransit;
 using Persistence.Extensions;
 using RabbitMq;
 using Redis;
+using S3;
 using Security;
 using Serilog;
 using Serilog.Sinks.Loki;
@@ -127,6 +130,7 @@ builder.Services
         })
     .AddCommonLayer()
     .AddIntegrations(builder.Configuration)
+    .AddS3(builder.Configuration)
     .AddApplicationLayer(emailOptions);
 
 
@@ -179,6 +183,7 @@ app.UseForwardedHeaders(new ForwardedHeadersOptions
 });
 
 Global.SetSystemId(app.Configuration["App:SystemId"]!);
+Global.SetServiceUrl(app.Configuration["AWS:ServiceURL"]!);
 
 await app.EnsureDbExists<DContext>();
 
