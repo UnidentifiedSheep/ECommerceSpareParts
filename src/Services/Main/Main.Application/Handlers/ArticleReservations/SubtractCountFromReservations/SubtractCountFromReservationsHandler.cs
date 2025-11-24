@@ -17,7 +17,6 @@ public record SubtractCountFromReservationsResult(Dictionary<int, int> NotFoundR
 
 public class SubtractCountFromReservationsHandler(
     IArticleReservationRepository reservationRepository,
-    IUserRepository usersRepository,
     DbDataValidatorBase dbValidator,
     IUnitOfWork unitOfWork) : ICommandHandler<SubtractCountFromReservationsCommand, SubtractCountFromReservationsResult>
 {

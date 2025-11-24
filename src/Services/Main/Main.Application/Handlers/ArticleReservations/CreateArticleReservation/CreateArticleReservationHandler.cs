@@ -20,9 +20,6 @@ public record CreateArticleReservationCommand(List<NewArticleReservationDto> Res
     : ICommand;
 
 public class CreateArticleReservationHandler(
-    IArticlesRepository articlesRepository,
-    IUserRepository usersRepository,
-    ICurrencyRepository currencyRepository,
     DbDataValidatorBase dbValidator,
     IUnitOfWork unitOfWork) : ICommandHandler<CreateArticleReservationCommand>
 {

@@ -15,6 +15,15 @@ public class ArticleCharacteristicsRepository(DContext context) : IArticleCharac
             .ToListAsync(cancellationToken);
     }
 
+    public async Task<IEnumerable<ArticleCharacteristic>> GetArticleCharacteristicsByIds(int? articleId, 
+        IEnumerable<int> ids, bool track = true, CancellationToken cancellationToken = default)
+    {
+        return await context.ArticleCharacteristics
+            .ConfigureTracking(track)
+            .Where(x => ids.Contains(x.Id) && (articleId == null || x.ArticleId == articleId))
+            .ToListAsync(cancellationToken);
+    }
+
     public async Task<ArticleCharacteristic?> GetCharacteristic(int id, bool track = true,
         CancellationToken cancellationToken = default)
     {

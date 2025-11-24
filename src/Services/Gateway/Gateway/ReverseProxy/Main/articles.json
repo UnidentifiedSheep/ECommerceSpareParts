@@ -34,16 +34,6 @@
           { "PathRemovePrefix": "/main" }
         ]
       },
-      "get-article-characteristics": {
-        "ClusterId": "main-cluster",
-        "Match": {
-          "Path": "/main/articles/characteristics/{articleId}",
-          "Methods": [ "GET" ]
-        },
-        "Transforms": [
-          { "PathRemovePrefix": "/main" }
-        ]
-      },
       "get-article-content": {
         "ClusterId": "main-cluster",
         "Match": {

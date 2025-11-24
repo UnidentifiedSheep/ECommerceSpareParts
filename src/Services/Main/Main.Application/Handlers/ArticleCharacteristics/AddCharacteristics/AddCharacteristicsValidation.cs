@@ -13,9 +13,9 @@ public class AddCharacteristicsValidation : AbstractValidator<AddCharacteristics
                     .NotEmpty()
                     .WithMessage("Значение не должно быть пустым");
                 z.RuleFor(x => x.Value)
-                    .MinimumLength(3)
+                    .Must(x => x.Trim().Length >= 3)
                     .WithMessage("Минимальная длина значение 3 символа")
-                    .MaximumLength(128)
+                    .Must(x => x.Trim().Length <= 128)
                     .WithMessage("Длина значение не должна быть больше 128 символов");
 
                 z.RuleFor(x => x.Name)

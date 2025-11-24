@@ -1,0 +1,49 @@
+﻿{
+  "ReverseProxy": {
+    "Routes": {
+      "get-article-characteristics": {
+        "ClusterId": "main-cluster",
+        "Match": {
+          "Path": "/main/articles/{articleId}/characteristics/",
+          "Methods": [ "GET" ]
+        },
+        "Transforms": [
+          { "PathRemovePrefix": "/main" }
+        ]
+      },
+      "delete-article-characteristics": {
+        "ClusterId": "main-cluster",
+        "Match": {
+          "Path": "/main/articles/characteristics/{id}",
+          "Methods": [ "DELETE" ]
+        },
+        "AuthorizationPolicy": "AMW",
+        "Transforms": [
+          { "PathRemovePrefix": "/main" }
+        ]
+      },
+      "edit-article-characteristics": {
+        "ClusterId": "main-cluster",
+        "Match": {
+          "Path": "/main/articles/characteristics/{id}",
+          "Methods": [ "PATCH" ]
+        },
+        "AuthorizationPolicy": "AMW",
+        "Transforms": [
+          { "PathRemovePrefix": "/main" }
+        ]
+      },
+      "add-article-characteristics": {
+        "ClusterId": "main-cluster",
+        "Match": {
+          "Path": "/main/articles/characteristics/",
+          "Methods": [ "POST" ]
+        },
+        "AuthorizationPolicy": "AMW",
+        "Transforms": [
+          { "PathRemovePrefix": "/main" }
+        ]
+      }
+    }
+  }
+}

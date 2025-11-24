@@ -143,7 +143,6 @@ public static class MapsterConfig
 
         TypeAdapterConfig<PatchCharacteristicsDto, ArticleCharacteristic>.NewConfig()
             .IgnorePatchIfNotSet()
-            .Map(d => d.ArticleId, s => s.ArticleId.Value)
             .Map(d => d.Name, s => s.Name.Value == null ? null : s.Name.Value.Trim())
             .Map(d => d.Value, s => s.Value.Value == null ? null : s.Value.Value.Trim());
 

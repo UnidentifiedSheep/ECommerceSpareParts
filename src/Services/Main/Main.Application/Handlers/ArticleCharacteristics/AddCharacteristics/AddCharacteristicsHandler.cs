@@ -4,20 +4,21 @@ using Core.Interfaces.Services;
 using Main.Core.Dtos.Amw.ArticleCharacteristics;
 using Main.Core.Entities;
 using Mapster;
-using MediatR;
 
 namespace Main.Application.Handlers.ArticleCharacteristics.AddCharacteristics;
 
 [Transactional]
-public record AddCharacteristicsCommand(IEnumerable<NewCharacteristicsDto> Characteristics) : ICommand;
+public record AddCharacteristicsCommand(IEnumerable<NewCharacteristicsDto> Characteristics) : ICommand<AddCharacteristicsResult>;
 
-public class AddCharacteristicsHandler(IUnitOfWork unitOfWork) : ICommandHandler<AddCharacteristicsCommand>
+public record AddCharacteristicsResult(IEnumerable<int> Ids);
+
+public class AddCharacteristicsHandler(IUnitOfWork unitOfWork) : ICommandHandler<AddCharacteristicsCommand, AddCharacteristicsResult>
 {
-    public async Task<Unit> Handle(AddCharacteristicsCommand request, CancellationToken cancellationToken)
+    public async Task<AddCharacteristicsResult> Handle(AddCharacteristicsCommand request, CancellationToken cancellationToken)
     {
         var adapted = request.Characteristics.Adapt<List<ArticleCharacteristic>>();
         await unitOfWork.AddRangeAsync(adapted, cancellationToken);
         await unitOfWork.SaveChangesAsync(cancellationToken);
-        return Unit.Value;
+        return new (adapted.Select(x => x.Id));
     }
 }

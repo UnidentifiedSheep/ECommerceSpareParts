@@ -11,7 +11,7 @@ public static class SortByConfig
         new Article().MapDefault(x => x.Id)
             .Map("id", x => x.Id)
             .Map("articleNumber", x => x.ArticleNumber)
-            .Map("articleName", x => x.ArticleName)
+            .Map("title", x => x.ArticleName)
             .Map("count", x => x.TotalCount)
             .Map("producerName", x => x.Producer.Name)
             .Map("indicator", x => x.Indicator);

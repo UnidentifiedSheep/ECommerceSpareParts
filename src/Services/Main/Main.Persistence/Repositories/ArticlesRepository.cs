@@ -203,6 +203,7 @@ public class ArticlesRepository(DContext context) : IArticlesRepository
     {
         return await context.Articles.ConfigureTracking(track)
             .Include(x => x.Producer)
+            .Include(x => x.ArticleImages)
             .FirstOrDefaultAsync(x => x.Id == id, cancellationToken);
     }
 
