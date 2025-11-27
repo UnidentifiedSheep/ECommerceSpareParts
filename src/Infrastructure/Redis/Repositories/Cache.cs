@@ -9,12 +9,14 @@ public class Cache(IDatabase redis) : ICache
     public async Task StringSetAsync<T>(string key, T value, TimeSpan? expiry = null)
     {
         var ser = JsonSerializer.Serialize(value, Global.JsonOptions);
-        await redis.StringSetAsync(key, ser, expiry);
+        await redis.StringSetAsync(key, ser);
+        await redis.KeyExpireAsync(key, expiry);
     }
 
     public async Task StringSetAsync(string key, string value, TimeSpan? expiry = null)
     {
-        await redis.StringSetAsync(key, value, expiry);
+        await redis.StringSetAsync(key, value);
+        await redis.KeyExpireAsync(key, expiry);
     }
 
     public async Task<string?> StringGetAsync(string key)

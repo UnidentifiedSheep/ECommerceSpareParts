@@ -55,7 +55,7 @@ public class AddOtherNameToProducerTests : IAsyncLifetime
     {
         var producer = await _context.Producers.AsNoTracking().FirstOrDefaultAsync();
         Assert.NotNull(producer);
-        var command = new AddOtherNameCommand(producer.Id, _faker.Lorem.Letter(200), null);
+        var command = new AddOtherNameCommand(producer.Id, _faker.Lorem.Letter(200), "sdfsdf");
         await Assert.ThrowsAsync<ValidationException>(async () => await _mediator.Send(command));
     }
 

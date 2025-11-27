@@ -16,6 +16,7 @@ using Main.Core.Dtos.Amw.Purchase;
 using Main.Core.Dtos.Amw.Sales;
 using Main.Core.Dtos.Amw.Storage;
 using Main.Core.Dtos.Amw.Users;
+using Main.Core.Dtos.Anonymous.Articles;
 using Main.Core.Dtos.Anonymous.Producers;
 using Main.Core.Dtos.Emails;
 using Main.Core.Dtos.Member.Vehicles;
@@ -105,6 +106,11 @@ public static class MapsterConfig
             .Map(dest => dest.Title, src => src.ArticleName)
             .Map(dest => dest.ArticleNumber, src => src.ArticleNumber)
             .Map(dest => dest.CurrentStock, src => src.TotalCount);
+
+        TypeAdapterConfig<ArticlesContent, ContentArticleDto>.NewConfig()
+            .IgnoreNonMapped(true)
+            .Map(d => d.Quantity, src => src.Quantity)
+            .Map(d => d.Article, s => s.InsideArticle);
 
         //AMW
         TypeAdapterConfig<CreateArticleDto, Article>.NewConfig()

@@ -12,7 +12,7 @@ using MediatR;
 namespace Main.Application.Handlers.Producers.AddOtherName;
 
 [Transactional]
-public record AddOtherNameCommand(int ProducerId, string OtherName, string? WhereUsed) : ICommand<Unit>;
+public record AddOtherNameCommand(int ProducerId, string OtherName, string WhereUsed) : ICommand<Unit>;
 
 public class AddOtherNameHandler(IProducerRepository producerRepository, IUnitOfWork unitOfWork, DbDataValidatorBase dbValidator)
     : ICommandHandler<AddOtherNameCommand>
@@ -21,7 +21,7 @@ public class AddOtherNameHandler(IProducerRepository producerRepository, IUnitOf
     {
         var producerId = request.ProducerId;
         var otherName = request.OtherName.Trim();
-        var usage = request.WhereUsed?.Trim();
+        var usage = request.WhereUsed.Trim();
 
         await ValidateData(producerId, otherName, usage, cancellationToken);
 

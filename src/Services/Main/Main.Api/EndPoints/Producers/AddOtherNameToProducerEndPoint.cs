@@ -4,7 +4,7 @@ using MediatR;
 
 namespace Main.Api.EndPoints.Producers;
 
-public record AddOtherNameToProducerRequest(string OtherName, string? WhereUsed);
+public record AddOtherNameToProducerRequest(string OtherName, string WhereUsed);
 
 public class AddOtherNameToProducerEndPoint : ICarterModule
 {

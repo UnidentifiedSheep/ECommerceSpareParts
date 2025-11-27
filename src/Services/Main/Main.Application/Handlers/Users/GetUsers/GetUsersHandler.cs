@@ -55,7 +55,8 @@ public class GetUsersHandler(IUserRepository usersRepositoryService) : IQueryHan
                 throw new ArgumentOutOfRangeException();
         }
 
-        users.RemoveAll(x => x.Id == Global.SystemId);
+        var systemUser = users.FirstOrDefault(x => x.Id == Global.SystemId);
+        if (systemUser != null) users.Remove(systemUser);
 
         return new GetUsersResult(users.Adapt<List<UserDto>>());
     }

@@ -24,7 +24,7 @@ public class RedisArticlePricesRepository : IRedisArticlePriceRepository
             var id = ids[i];
             var redisValue = usablePrices[i];
             double? value = null;
-            if (redisValue.HasValue && double.TryParse(redisValue, Global.Culture, out var price))
+            if (redisValue.HasValue && double.TryParse(redisValue.ToString(), Global.Culture, out var price))
                 value = price;
             result.Add(id, value);
         }
@@ -39,7 +39,8 @@ public class RedisArticlePricesRepository : IRedisArticlePriceRepository
         foreach (var (articleId, price) in prices)
         {
             if (price <= 0) continue;
-            tasks.Add(batch.StringSetAsync(GetUsablePriceKey(articleId), price, _ttl));
+            tasks.Add(batch.StringSetAsync(GetUsablePriceKey(articleId), price));
+            tasks.Add(batch.KeyExpireAsync(GetUsablePriceKey(articleId), _ttl));
         }
 
         batch.Execute();
@@ -49,7 +50,8 @@ public class RedisArticlePricesRepository : IRedisArticlePriceRepository
     public async Task SetUsablePriceAsync(int articleId, double price)
     {
         if (price <= 0) return;
-        await _redis.StringSetAsync(GetUsablePriceKey(articleId), price, _ttl);
+        await _redis.StringSetAsync(GetUsablePriceKey(articleId), price);
+        await _redis.KeyExpireAsync(GetUsablePriceKey(articleId), _ttl);
     }
 
     public async Task<DateTime?> GetPriceUpdateTimeAsync(int articleId)
@@ -87,7 +89,8 @@ public class RedisArticlePricesRepository : IRedisArticlePriceRepository
 
     public async Task SetPriceUpdateTimeAsync(int articleId, DateTime updateTime)
     {
-        await _redis.StringSetAsync(GetPriceUpdateKey(articleId), updateTime.ToString(Global.Culture), _ttl);
+        await _redis.StringSetAsync(GetPriceUpdateKey(articleId), updateTime.ToString(Global.Culture));
+        await _redis.KeyExpireAsync(GetPriceUpdateKey(articleId), _ttl);
     }
 
     public async Task SetPriceUpdateTimeAsync(IEnumerable<int> ids, DateTime updateTime)
@@ -96,7 +99,10 @@ public class RedisArticlePricesRepository : IRedisArticlePriceRepository
         var tasks = new List<Task>();
         ids = ids.DistinctBy(x => x);
         foreach (var id in ids)
-            tasks.Add(batch.StringSetAsync(GetPriceUpdateKey(id), updateTime.ToString(Global.Culture), _ttl));
+        {
+            tasks.Add(batch.StringSetAsync(GetPriceUpdateKey(id), updateTime.ToString(Global.Culture)));
+            tasks.Add(batch.KeyExpireAsync(GetPriceUpdateKey(id), _ttl));
+        }
         batch.Execute();
         await Task.WhenAll(tasks);
     }

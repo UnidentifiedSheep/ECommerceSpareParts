@@ -15,7 +15,7 @@ public class RemoveArticleContentHandler(
     public async Task<Unit> Handle(RemoveArticleContentCommand request, CancellationToken cancellationToken)
     {
         var content =
-            await contentRepository.GetArticleContentAsync(request.ArticleId, request.InsideArticleId, true,
+            await contentRepository.GetArticleContent(request.ArticleId, request.InsideArticleId, true,
                 cancellationToken)
             ?? throw new ArticleContentNotFoundException(request.ArticleId, request.InsideArticleId);
         unitOfWork.Remove(content);

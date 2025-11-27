@@ -49,7 +49,7 @@ services:
       context: .
       dockerfile: src/Services/Gateway/Gateway/Dockerfile
     ports:
-      - "57006:8081"
+      - "57006:7292"
     volumes:
       - ./certs:/app/certs:ro
     environment:

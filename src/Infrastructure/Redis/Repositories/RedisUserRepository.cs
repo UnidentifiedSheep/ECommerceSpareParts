@@ -18,14 +18,15 @@ public class RedisUserRepository : IRedisUserRepository
     {
         var key = GetUserDiscountKey(userId);
         var value = await _redis.StringGetAsync(key);
-        decimal.TryParse(value, Global.Culture, out var result);
+        decimal.TryParse(value.ToString(), Global.Culture, out var result);
         return value.HasValue ? result : null;
     }
 
     public async Task SetUserDiscount(Guid userId, decimal discount)
     {
         var key = GetUserDiscountKey(userId);
-        await _redis.StringSetAsync(key, discount.ToString(Global.Culture), _ttl);
+        await _redis.StringSetAsync(key, discount.ToString(Global.Culture));
+        await _redis.KeyExpireAsync(key, _ttl);
     }
 
     private static string GetUserDiscountKey(Guid userId)
