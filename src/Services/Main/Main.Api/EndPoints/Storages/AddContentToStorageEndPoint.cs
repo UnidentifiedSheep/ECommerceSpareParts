@@ -1,4 +1,5 @@
 using System.Security.Claims;
+using Api.Common.Extensions;
 using Carter;
 using Core.Enums;
 using Main.Application.Handlers.StorageContents.AddContent;
@@ -25,6 +26,7 @@ public class AddContentToStorageEndPoint : ICarterModule
                 return Results.NoContent();
             }).WithTags("Storages")
             .WithDescription("Добавление позиций на склад")
-            .WithDisplayName("Добавление позиций на склад");
+            .WithDisplayName("Добавление позиций на склад")
+            .RequireAnyPermission("STORAGES.CONTENT.CREATE");
     }
 }

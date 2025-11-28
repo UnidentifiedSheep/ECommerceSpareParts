@@ -1,4 +1,5 @@
 using System.Security.Claims;
+using Api.Common.Extensions;
 using Carter;
 using Main.Application.Handlers.Sales.EditFullSale;
 using Main.Core.Dtos.Amw.Sales;
@@ -28,6 +29,7 @@ public class EditSaleEndPoint : ICarterModule
                 return Results.Ok();
             }).WithTags("Sales")
             .WithDescription("Редактирование продажи")
-            .WithDisplayName("Редактирование продажи");
+            .WithDisplayName("Редактирование продажи")
+            .RequireAnyPermission("SALES.EDIT");
     }
 }

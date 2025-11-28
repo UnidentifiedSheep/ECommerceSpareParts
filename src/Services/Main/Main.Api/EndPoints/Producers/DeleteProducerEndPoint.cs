@@ -1,3 +1,4 @@
+using Api.Common.Extensions;
 using Carter;
 using Main.Application.Handlers.Producers.DeleteProducer;
 using MediatR;
@@ -15,6 +16,7 @@ public class DeleteProducerEndPoint : ICarterModule
                 return Results.Ok();
             }).WithTags("Producers")
             .WithDescription("Удаление производителя из бд")
-            .WithDisplayName("Удаление производителя");
+            .WithDisplayName("Удаление производителя")
+            .RequireAnyPermission("PRODUCERS.DELETE");
     }
 }

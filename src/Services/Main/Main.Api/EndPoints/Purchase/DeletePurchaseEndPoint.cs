@@ -1,4 +1,5 @@
 using System.Security.Claims;
+using Api.Common.Extensions;
 using Carter;
 using Main.Application.Handlers.Purchases.DeleteFullPurchase;
 using MediatR;
@@ -19,6 +20,7 @@ public class DeletePurchaseEndPoint : ICarterModule
                 return Results.NoContent();
             }).WithTags("Purchases")
             .WithDescription("Удаление закупки")
-            .WithDisplayName("Удаление закупки");
+            .WithDisplayName("Удаление закупки")
+            .RequireAnyPermission("PURCHASE.DELETE");
     }
 }

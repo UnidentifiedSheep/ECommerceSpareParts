@@ -5,6 +5,7 @@ using Api.Common;
 using Api.Common.ExceptionHandlers;
 using Api.Common.Logging;
 using Api.Common.Middleware;
+using Api.Common.OperationFilters;
 using Carter;
 using Contracts.Currency;
 using Contracts.Markup;
@@ -61,7 +62,10 @@ builder.Host.UseSerilog();
 
 builder.Services.AddOpenApi();
 builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen();
+builder.Services.AddSwaggerGen(c =>
+{
+    c.OperationFilter<PermissionsOperationFilter>();
+});
 
 builder.Services.AddHangfire(x =>
     x.UsePostgreSqlStorage(z => z.UseNpgsqlConnection(builder.Configuration

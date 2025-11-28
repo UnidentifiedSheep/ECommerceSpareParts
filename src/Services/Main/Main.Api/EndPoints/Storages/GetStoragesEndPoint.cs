@@ -1,3 +1,4 @@
+using Api.Common.Extensions;
 using Carter;
 using Core.Models;
 using Main.Application.Handlers.Storages.GetStorage;
@@ -22,6 +23,7 @@ public class GetStoragesEndPoint : ICarterModule
                     return Results.Ok(response);
                 }).WithTags("Storages")
             .WithDescription("Поиск и получение существующих складов")
-            .WithDisplayName("Получение складов");
+            .WithDisplayName("Получение складов")
+            .RequireAnyPermission("STORAGES.GET");
     }
 }

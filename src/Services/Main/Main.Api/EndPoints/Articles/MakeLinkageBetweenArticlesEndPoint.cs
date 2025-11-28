@@ -1,3 +1,4 @@
+using Api.Common.Extensions;
 using Carter;
 using Main.Application.Handlers.Articles.MakeLinkageBetweenArticles;
 using Main.Core.Dtos.Amw.Articles;
@@ -23,6 +24,7 @@ public class MakeLinkageBetweenArticlesEndPoint : ICarterModule
                 .WithDisplayName("Создание кроссировки")
                 .Produces(201)
                 .ProducesProblem(404)
-                .ProducesProblem(400);
+                .ProducesProblem(400)
+                .RequireAnyPermission("ARTICLE.CROSSES.CREATE");
     }
 }

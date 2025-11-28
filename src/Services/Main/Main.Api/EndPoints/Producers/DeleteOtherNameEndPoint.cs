@@ -1,3 +1,4 @@
+using Api.Common.Extensions;
 using Carter;
 using Main.Application.Handlers.Producers.DeleteOtherName;
 using MediatR;
@@ -17,6 +18,7 @@ public class DeleteOtherNameEndPoint : ICarterModule
                     return Results.NoContent();
                 }).WithTags("Producers")
             .WithDisplayName("Удаление дополнительного имени")
-            .WithDescription("Удаление дополнительного имени у производителю");
+            .WithDescription("Удаление дополнительного имени у производителю")
+            .RequireAnyPermission("PRODUCERS.EDIT");
     }
 }

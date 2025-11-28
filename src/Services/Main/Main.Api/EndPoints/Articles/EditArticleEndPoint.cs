@@ -1,3 +1,4 @@
+using Api.Common.Extensions;
 using Carter;
 using Main.Application.Handlers.Articles.PatchArticle;
 using Main.Core.Dtos.Amw.Articles;
@@ -20,6 +21,7 @@ public class EditArticleEndPoint : ICarterModule
                 }).WithTags("Articles")
                 .WithDescription("Редактирование артикула")
                 .WithDisplayName("Редактирование артикула")
-                .Accepts<EditArticleRequest>(false, "application/json");
+                .Accepts<EditArticleRequest>(false, "application/json")
+                .RequireAnyPermission("ARTICLES.EDIT");
     }
 }

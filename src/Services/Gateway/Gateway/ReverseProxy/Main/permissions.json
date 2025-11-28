@@ -1,0 +1,16 @@
+﻿{
+  "ReverseProxy": {
+    "Routes": {
+      "get-permissions": {
+        "ClusterId": "main-cluster",
+        "Match": {
+          "Path": "/main/permissions",
+          "Methods": [ "GET" ]
+        },
+        "Transforms": [
+          { "PathRemovePrefix": "/main" }
+        ]
+      }
+    }
+  }
+}

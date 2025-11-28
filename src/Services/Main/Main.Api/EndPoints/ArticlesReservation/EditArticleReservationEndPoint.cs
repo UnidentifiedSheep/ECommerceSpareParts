@@ -1,4 +1,5 @@
 using System.Security.Claims;
+using Api.Common.Extensions;
 using Carter;
 using Main.Application.Handlers.ArticleReservations.EditArticleReservation;
 using Main.Core.Dtos.Amw.ArticleReservations;
@@ -23,6 +24,7 @@ public class EditArticleReservationEndPoint : ICarterModule
                 return Results.NoContent();
             }).WithTags("ArticleReservations")
             .WithDisplayName("Редактирование резервации")
-            .WithDescription("Редактирование резервации");
+            .WithDescription("Редактирование резервации")
+            .RequireAnyPermission("ARTICLE.RESERVATIONS.EDIT");
     }
 }

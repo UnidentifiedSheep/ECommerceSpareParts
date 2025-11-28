@@ -1,3 +1,4 @@
+using Api.Common.Extensions;
 using Carter;
 using Main.Application.Handlers.Users.ChangeUserDiscount;
 using MediatR;
@@ -19,6 +20,7 @@ public class ChangeDiscountForUserEndPoint : ICarterModule
                     return Results.Ok();
                 }).WithTags("Balances")
             .WithDescription("Изменение скидки пользователя")
-            .WithDisplayName("Поменять скидку");
+            .WithDisplayName("Поменять скидку")
+            .RequireAnyPermission("USERS.DISCOUNT");
     }
 }

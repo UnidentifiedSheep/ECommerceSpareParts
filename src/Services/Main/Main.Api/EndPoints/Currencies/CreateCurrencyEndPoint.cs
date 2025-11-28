@@ -1,3 +1,4 @@
+using Api.Common.Extensions;
 using Carter;
 using Main.Application.Handlers.Currencies.CreateCurrency;
 using Mapster;
@@ -20,6 +21,7 @@ public class CreateCurrencyEndPoint : ICarterModule
             return Results.Created($"currencies/{result.Id}", response);
         }).WithTags("Currencies")
         .WithDescription("Создание валюты")
-        .WithDisplayName("Создание валюты");
+        .WithDisplayName("Создание валюты")
+        .RequireAnyPermission("CURRENCIES.CREATE");
     }
 }

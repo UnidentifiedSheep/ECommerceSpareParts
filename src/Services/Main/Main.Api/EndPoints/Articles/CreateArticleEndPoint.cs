@@ -1,4 +1,5 @@
-﻿using Carter;
+﻿using Api.Common.Extensions;
+using Carter;
 using Main.Application.Handlers.Articles.CreateArticles;
 using Main.Core.Dtos.Services.Articles;
 using Mapster;
@@ -24,6 +25,7 @@ public class CreateArticleEndPoint : ICarterModule
             .WithDisplayName("Добавление артикулов")
             .Accepts<CreateArticleRequest>(false, "application/json")
             .Produces<CreateArticleResponse>(201, "application/json")
-            .ProducesProblem(400);
+            .ProducesProblem(400)
+            .RequireAnyPermission("ARTICLES.CREATE");
     }
 }

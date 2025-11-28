@@ -1,4 +1,5 @@
 using System.Security.Claims;
+using Api.Common.Extensions;
 using Carter;
 using Core.Models;
 using Main.Application.Handlers.Purchases.GetPurchase;
@@ -28,7 +29,7 @@ public class GetPurchasesEndPoint : ICarterModule
     public void AddRoutes(IEndpointRouteBuilder app)
     {
         app.MapGet("/purchases/", async (ISender sender, [AsParameters] GetPurchasesRequest request,
-                ClaimsPrincipal user, CancellationToken token) =>
+                CancellationToken token) =>
             {
                 var query = new GetPurchasesQuery(request.RangeStartDate, request.RangeEndDate,
                     new PaginationModel(request.Page, request.Limit),
@@ -38,6 +39,7 @@ public class GetPurchasesEndPoint : ICarterModule
                 return Results.Ok(response);
             }).WithTags("Purchases")
             .WithDescription("Получение списка покупок")
-            .WithDisplayName("Получение покупок");
+            .WithDisplayName("Получение покупок")
+            .RequireAnyPermission("PURCHASE.GET");
     }
 }

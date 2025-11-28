@@ -1,3 +1,4 @@
+using Api.Common.Extensions;
 using Carter;
 using Core.Models;
 using Main.Application.Handlers.Sales.GetSales;
@@ -36,6 +37,7 @@ public class GetSalesEndPoint : ICarterModule
                 return Results.Ok(response);
             }).WithTags("Sales")
             .WithDescription("Получение списка продаж")
-            .WithDisplayName("Получение продаж");
+            .WithDisplayName("Получение продаж")
+            .RequireAnyPermission("SALES.GET");
     }
 }

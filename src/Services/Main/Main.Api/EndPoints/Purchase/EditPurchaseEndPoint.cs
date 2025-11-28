@@ -1,4 +1,5 @@
 using System.Security.Claims;
+using Api.Common.Extensions;
 using Carter;
 using Main.Application.Handlers.Purchases.EditFullPurchase;
 using Main.Core.Dtos.Amw.Purchase;
@@ -27,6 +28,7 @@ public class EditPurchaseEndPoint : ICarterModule
                 return Results.NoContent();
             }).WithTags("Purchases")
             .WithDescription("Редактирование существующей закупки")
-            .WithDisplayName("Редактирование закупки");
+            .WithDisplayName("Редактирование закупки")
+            .RequireAnyPermission("PURCHASE.EDIT");
     }
 }

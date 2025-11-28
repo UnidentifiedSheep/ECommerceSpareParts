@@ -7,7 +7,6 @@
           "Path": "/main/users/{userId}/vehicles",
           "Methods": [ "POST" ]
         },
-        "AuthorizationPolicy": "AMW",
         "Transforms": [
           { "PathRemovePrefix": "/main" }
         ]
@@ -18,7 +17,6 @@
           "Path": "/main/users/me/vehicles",
           "Methods": [ "POST" ]
         },
-        "AuthorizationPolicy": "MEMBER",
         "Transforms": [
           { "PathRemovePrefix": "/main" }
         ]
@@ -29,7 +27,6 @@
           "Path": "/main/users/{userId}/discount",
           "Methods": [ "PATCH" ]
         },
-        "AuthorizationPolicy": "AM",
         "Transforms": [
           { "PathRemovePrefix": "/main" }
         ]
@@ -40,7 +37,6 @@
           "Path": "/main/users/{userId}/mail/corporate",
           "Methods": [ "POST" ]
         },
-        "AuthorizationPolicy": "AM",
         "Transforms": [
           { "PathRemovePrefix": "/main" }
         ]
@@ -51,7 +47,6 @@
           "Path": "/main/users",
           "Methods": [ "POST" ]
         },
-        "AuthorizationPolicy": "AM",
         "Transforms": [
           { "PathRemovePrefix": "/main" }
         ]
@@ -62,7 +57,16 @@
           "Path": "/main/users",
           "Methods": [ "GET" ]
         },
-        "AuthorizationPolicy": "AMW",
+        "Transforms": [
+          { "PathRemovePrefix": "/main" }
+        ]
+      },
+      "add-permission-to-user": {
+        "ClusterId": "main-cluster",
+        "Match": {
+          "Path": "/main/users/{userId}/permissions",
+          "Methods": [ "POST" ]
+        },
         "Transforms": [
           { "PathRemovePrefix": "/main" }
         ]

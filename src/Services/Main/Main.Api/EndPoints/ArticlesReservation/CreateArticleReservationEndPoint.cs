@@ -1,4 +1,5 @@
 using System.Security.Claims;
+using Api.Common.Extensions;
 using Carter;
 using Main.Application.Handlers.ArticleReservations.CreateArticleReservation;
 using Main.Core.Dtos.Amw.ArticleReservations;
@@ -22,6 +23,7 @@ public class CreateArticleReservationEndPoint : ICarterModule
                 return Results.NoContent();
             }).WithTags("ArticleReservations")
             .WithDisplayName("Создать резервацию")
-            .WithDescription("Создать резервацию для пользователя");
+            .WithDescription("Создать резервацию для пользователя")
+            .RequireAnyPermission("ARTICLE.RESERVATIONS.CREATE");
     }
 }

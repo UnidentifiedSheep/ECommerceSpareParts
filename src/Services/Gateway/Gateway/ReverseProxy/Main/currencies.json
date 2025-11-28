@@ -7,7 +7,6 @@
           "Path": "/main/currencies",
           "Methods": [ "POST" ]
         },
-        "AuthorizationPolicy": "AM",
         "Transforms": [
           { "PathRemovePrefix": "/main" }
         ]

@@ -1,3 +1,4 @@
+using Api.Common.Extensions;
 using Carter;
 using Main.Application.Handlers.ArticleReservations.DeleteArticleReservation;
 using MediatR;
@@ -16,6 +17,7 @@ public class DeleteArticleReservationEndPoint : ICarterModule
                     return Results.NoContent();
                 }).WithTags("ArticleReservations")
             .WithDisplayName("Удалить резервацию")
-            .WithDescription("Удалить резервацию");
+            .WithDescription("Удалить резервацию")
+            .RequireAnyPermission("ARTICLE.RESERVATIONS.DELETE");
     }
 }

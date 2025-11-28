@@ -1,3 +1,4 @@
+using Api.Common.Extensions;
 using Carter;
 using Main.Application.Handlers.Purchases.GetPurchaseContent;
 using Main.Core.Dtos.Amw.Purchase;
@@ -19,6 +20,7 @@ public class GetPurchaseContentEndPoint : ICarterModule
                 return Results.Ok(response);
             }).WithTags("Purchases")
             .WithDescription("Получение содержания закупки")
-            .WithDisplayName("Получение содержания закупки");
+            .WithDisplayName("Получение содержания закупки")
+            .RequireAnyPermission("PURCHASE.GET");
     }
 }

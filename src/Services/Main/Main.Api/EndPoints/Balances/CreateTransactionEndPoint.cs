@@ -1,4 +1,5 @@
 using System.Security.Claims;
+using Api.Common.Extensions;
 using Carter;
 using Core.Enums;
 using Main.Application.Handlers.Balance.CreateTransaction;
@@ -29,6 +30,7 @@ public class CreateTransactionEndPoint : ICarterModule
                 return Results.Ok();
             }).WithTags("Balances")
             .WithDescription("Создание транзакции")
-            .WithDisplayName("Создание транзакции");
+            .WithDisplayName("Создание транзакции")
+            .RequireAnyPermission("BALANCES.TRANSACTION.CREATE");
     }
 }

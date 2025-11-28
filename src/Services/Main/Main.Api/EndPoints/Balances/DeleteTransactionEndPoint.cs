@@ -1,4 +1,5 @@
 using System.Security.Claims;
+using Api.Common.Extensions;
 using Carter;
 using Main.Application.Handlers.Balance.DeleteTransaction;
 using MediatR;
@@ -19,6 +20,7 @@ public class DeleteTransactionEndPoint : ICarterModule
                     return Results.Ok();
                 }).WithTags("Balances")
             .WithDescription("Удалить транзакцию")
-            .WithDisplayName("Удалить транзакцию");
+            .WithDisplayName("Удалить транзакцию")
+            .RequireAnyPermission("BALANCES.TRANSACTION.DELETE");
     }
 }

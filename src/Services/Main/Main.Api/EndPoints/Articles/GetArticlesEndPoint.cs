@@ -1,4 +1,5 @@
 ﻿using System.Security.Claims;
+using Api.Common.Extensions;
 using Carter;
 using Core.Models;
 using Core.StaticFunctions;
@@ -32,21 +33,21 @@ public class GetArticlesEndPoint : ICarterModule
                 [AsParameters] GetArticleRequest request, CancellationToken token) =>
             {
                 var userId = user.GetUserId();
-                var roles = user.GetUserRoles();
                 var producerIds = context.Request.Query["producerId"]
                     .Select(x => int.TryParse(x, out var id) ? id : (int?)null)
                     .Where(x => x.HasValue)
                     .Select(x => x!.Value)
                     .ToList();
                 var pagination = new PaginationModel(request.Page, request.Limit);
-                if (roles.IsAnyMatchInvariant("admin", "moderator", "worker"))
+                if (user.HasPermissions("ARTICLES.GET.FULL"))
                     return await GetAmw(sender, request, pagination, userId, producerIds, token);
                 return await GetAnonymous(sender, request, pagination, userId, producerIds, token);
             }).WithTags("Articles")
             .WithDescription("Поиск артикула с начала номера")
             .ProducesProblem(StatusCodes.Status400BadRequest)
             .ProducesProblem(StatusCodes.Status404NotFound)
-            .WithSummary("Поиск артикула с начала номера");
+            .WithSummary("Поиск артикула с начала номера")
+            .RequireAnyPermission("ARTICLES.GET.FULL", "ARTICLES.GET.MAIN");
     }
 
     private async Task<IResult> GetAmw(ISender sender, GetArticleRequest request,

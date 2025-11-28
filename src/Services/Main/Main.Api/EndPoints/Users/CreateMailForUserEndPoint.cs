@@ -1,3 +1,4 @@
+using Api.Common.Extensions;
 using Carter;
 using Main.Application.Handlers.Users;
 using Mapster;
@@ -24,6 +25,7 @@ public class CreateMailForUserEndPoint : ICarterModule
                     return Results.Created(uri, response);
                 }).WithTags("Users")
                 .WithDescription("Создание корпоративной почты для определенного пользователя")
-                .WithDisplayName("Создание почты для пользователя");
+                .WithDisplayName("Создание почты для пользователя")
+                .RequireAnyPermission("USERS.MAILS.CREATE");
     }
 }

@@ -1,3 +1,4 @@
+using Api.Common.Extensions;
 using Carter;
 using Main.Application.Handlers.Storages.CreateStorage;
 using Mapster;
@@ -19,6 +20,7 @@ public class CreateStorageEndPoint : ICarterModule
                     return Results.Created();
                 }).WithTags("Storages")
             .WithDescription("Создание нового склада")
-            .WithDisplayName("Создать склад");
+            .WithDisplayName("Создать склад")
+            .RequireAnyPermission("STORAGES.CREATE");
     }
 }

@@ -1,3 +1,4 @@
+using Api.Common.Extensions;
 using Carter;
 using Main.Application.Handlers.Storages.DeleteStorage;
 using MediatR;
@@ -16,6 +17,7 @@ public class DeleteStorageEndPoint : ICarterModule
                     return Results.NoContent();
                 }).WithTags("Storages")
             .WithDescription("Полное удаление склада по его имени")
-            .WithDisplayName("Удаление склада");
+            .WithDisplayName("Удаление склада")
+            .RequireAnyPermission("STORAGES.DELETE");
     }
 }

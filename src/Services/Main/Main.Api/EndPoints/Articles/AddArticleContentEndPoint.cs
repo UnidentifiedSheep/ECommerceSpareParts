@@ -1,3 +1,4 @@
+using Api.Common.Extensions;
 using Carter;
 using Main.Application.Handlers.ArticleContent.AddArticleContent;
 using MediatR;
@@ -19,6 +20,7 @@ public class AddArticleContentEndPoint : ICarterModule
             }).WithTags("Articles")
             .WithDescription("Добавление содержимое артикула")
             .WithDisplayName("Добавление содержимое артикула")
-            .Accepts<AddArticleContentRequest>(false, "application/json");
+            .Accepts<AddArticleContentRequest>(false, "application/json")
+            .RequireAnyPermission("ARTICLE.CONTENT.CREATE");
     }
 }

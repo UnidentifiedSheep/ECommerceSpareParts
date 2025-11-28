@@ -16,9 +16,9 @@ public record RefreshTokenResult(string Token, string RefreshToken);
 
 public class RefreshTokenHandler(
     IUserTokenRepository tokenRepository,
-    IUserRoleRepository userRoleRepository,
     IUnitOfWork unitOfWork,
     IJwtGenerator tokenGenerator,
+    IRolePermissionService rolePermissionService,
     IUserTokenService userTokenService,
     IUserRepository userRepository,
     ITokenHasher tokenHasher) : ICommandHandler<RefreshTokenCommand, RefreshTokenResult>
@@ -32,10 +32,11 @@ public class RefreshTokenHandler(
             throw new InvalidTokenException(request.RefreshToken);
 
         var user = (await userRepository.GetUserByIdAsync(userToken.UserId, false, cancellationToken))!;
-        var userRoles = (await userRoleRepository.GetUserRolesAsync(userToken.UserId, false,
-            cancellationToken: cancellationToken)).Select(x => x.Role.NormalizedName).ToList();
+        var (roles, permissions) = await rolePermissionService
+            .GetUserPermissionsAsync(user.Id, cancellationToken);
 
-        var token = tokenGenerator.CreateToken(user.Adapt<User>(), user.UserInfo!.Adapt<UserInfo>(), request.DeviceId, userRoles);
+        var token = tokenGenerator.CreateToken(user.Adapt<User>(), user.UserInfo!.Adapt<UserInfo>(), 
+            request.DeviceId, roles, permissions);
         var refreshToken = tokenGenerator.CreateRefreshToken();
 
         await userTokenService.AddToken(refreshToken, user.Id, TokenType.RefreshToken, DateTime.UtcNow.AddMonths(1),

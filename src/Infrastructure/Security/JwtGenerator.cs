@@ -11,7 +11,8 @@ namespace Security;
 
 public class JwtGenerator(IConfiguration configuration) : IJwtGenerator
 {
-    public string CreateToken(User user, UserInfo userInfo, string deviceId, IEnumerable<string> roles)
+    public string CreateToken(User user, UserInfo userInfo, string deviceId, IEnumerable<string> roles,
+        IEnumerable<string> permissions)
     {
         var handler = new JwtSecurityTokenHandler();
         var privateKey = Encoding.UTF8.GetBytes(configuration["JwtBearer:IssuerSigningKey"]!);
@@ -24,7 +25,7 @@ public class JwtGenerator(IConfiguration configuration) : IJwtGenerator
             SigningCredentials = credentials,
             Issuer = configuration["JwtBearer:ValidIssuer"],
             Expires = DateTime.UtcNow.AddMinutes(5),
-            Subject = GetClaims(user, userInfo, deviceId, roles)
+            Subject = GetClaims(user, userInfo, deviceId, roles, permissions)
         };
         return handler.WriteToken(handler.CreateToken(tokenDescriptor));
     }
@@ -53,7 +54,8 @@ public class JwtGenerator(IConfiguration configuration) : IJwtGenerator
         return new JwtSecurityTokenHandler().ValidateToken(token, validation, out _);
     }
 
-    private ClaimsIdentity GetClaims(User user, UserInfo userInfo, string deviceId, IEnumerable<string> roles)
+    private ClaimsIdentity GetClaims(User user, UserInfo userInfo, string deviceId, IEnumerable<string> roles, 
+        IEnumerable<string> permissions)
     {
         var claims = new ClaimsIdentity();
         claims.AddClaim(new Claim(ClaimTypes.GivenName, userInfo.Name + " " + userInfo.Surname));
@@ -62,6 +64,8 @@ public class JwtGenerator(IConfiguration configuration) : IJwtGenerator
         claims.AddClaim(new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()));
         foreach (var role in roles)
             claims.AddClaim(new Claim(ClaimTypes.Role, role));
+        foreach (var permission in permissions)
+            claims.AddClaim(new Claim("permission", permission));
 
         return claims;
     }

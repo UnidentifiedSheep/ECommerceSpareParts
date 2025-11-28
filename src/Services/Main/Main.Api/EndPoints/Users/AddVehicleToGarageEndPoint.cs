@@ -1,4 +1,5 @@
 using System.Security.Claims;
+using Api.Common.Extensions;
 using Carter;
 using Main.Application.Handlers.Users.AddVehicleToGarage;
 using Main.Core.Dtos.Member.Vehicles;
@@ -20,7 +21,8 @@ public class AddVehicleToGarageEndPoint : ICarterModule
                     return Results.NoContent();
                 }).WithTags("Users")
                 .WithDescription("Добавление транспортного средства пользователю")
-                .WithDisplayName("Добавление ТС AMW");
+                .WithDisplayName("Добавление ТС AMW")
+                .RequireAnyPermission("USERS.VEHICLES.CREATE.ALL");
 
         app.MapPost("/users/me/vehicles/", async (ISender sender, AddVehicleToGarageRequest request,
                 ClaimsPrincipal user, CancellationToken token) =>
@@ -32,6 +34,7 @@ public class AddVehicleToGarageEndPoint : ICarterModule
                 return Results.NoContent();
             }).WithTags("Users")
             .WithDescription("Добавление транспортного средства пользователю")
-            .WithDisplayName("Добавление ТС Member");
+            .WithDisplayName("Добавление ТС Member")
+            .RequireAnyPermission("USERS.VEHICLES.CREATE.ME");
     }
 }

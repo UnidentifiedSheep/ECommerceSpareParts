@@ -1,4 +1,5 @@
 using System.Security.Claims;
+using Api.Common.Extensions;
 using Carter;
 using Main.Application.Handlers.Purchases.CreateFullPurchase;
 using Main.Core.Dtos.Amw.Purchase;
@@ -32,6 +33,7 @@ public class CreatePurchaseEndPoint : ICarterModule
                     return Results.Ok();
                 }).WithTags("Purchases")
                 .WithDescription("Создание новой закупку")
-                .WithDisplayName("Добавление артикулов");
+                .WithDisplayName("Создание новой закупку")
+                .RequireAnyPermission("PURCHASE.CREATE");
     }
 }

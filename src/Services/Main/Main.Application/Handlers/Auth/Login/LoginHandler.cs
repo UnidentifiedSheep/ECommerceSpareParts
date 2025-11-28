@@ -22,7 +22,7 @@ public record LoginResult(string Token, string RefreshToken, string DeviceId);
 public class LoginHandler(
     IPasswordManager passwordManager,
     IUserEmailRepository userEmailRepository,
-    IUserRoleRepository userRoleRepository,
+    IRolePermissionService rolePermissionService,
     IUserTokenService userTokenService,
     IJwtGenerator tokenGenerator,
     IUnitOfWork unitOfWork) : ICommandHandler<LoginCommand, LoginResult>
@@ -36,14 +36,14 @@ public class LoginHandler(
         if (!passwordManager.VerifyHashedPassword(user.PasswordHash, request.Password))
             throw new WrongCredentialsException(request.Email + request.Password);
 
-        var roles = (await userRoleRepository.GetUserRolesAsync(user.Id, false,
-            cancellationToken: cancellationToken)).Select(x => x.Role.NormalizedName).ToList();
+        var (roles, permissions) = await rolePermissionService
+            .GetUserPermissionsAsync(user.Id, cancellationToken);
 
         var deviceId = GenerateDeviceId();
         var ip = request.IpAddress;
         var userAgent = request.UserAgent;
 
-        var token = tokenGenerator.CreateToken(user.Adapt<User>(), user.UserInfo.Adapt<UserInfo>(), deviceId, roles);
+        var token = tokenGenerator.CreateToken(user.Adapt<User>(), user.UserInfo.Adapt<UserInfo>(), deviceId, roles, permissions);
         var refreshToken = tokenGenerator.CreateRefreshToken();
 
         await userTokenService.AddToken(refreshToken, user.Id, TokenType.RefreshToken, DateTime.UtcNow.AddMonths(1),

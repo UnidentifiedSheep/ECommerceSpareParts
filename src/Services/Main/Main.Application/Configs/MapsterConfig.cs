@@ -11,6 +11,7 @@ using Main.Core.Dtos.Amw.ArticleReservations;
 using Main.Core.Dtos.Amw.Articles;
 using Main.Core.Dtos.Amw.Balances;
 using Main.Core.Dtos.Amw.Markups;
+using Main.Core.Dtos.Amw.Permissions;
 using Main.Core.Dtos.Amw.Producers;
 using Main.Core.Dtos.Amw.Purchase;
 using Main.Core.Dtos.Amw.Sales;
@@ -512,5 +513,10 @@ public static class MapsterConfig
             .Map(dest => dest.EmailType, src => src.Type.ToString())
             .Map(dest => dest.Confirmed, src => src.IsConfirmed)
             .Map(dest => dest.ConfirmedAt, src => src.IsConfirmed ? DateTime.UtcNow : (DateTime?)null);
+
+        TypeAdapterConfig<Permission, PermissionDto>.NewConfig()
+            .IgnoreNonMapped(true)
+            .Map(d => d.Name, s => s.Name)
+            .Map(d => d.Description, s => s.Description);
     }
 }

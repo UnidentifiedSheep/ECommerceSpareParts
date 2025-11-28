@@ -1,3 +1,4 @@
+using Api.Common.Extensions;
 using Carter;
 using Main.Application.Handlers.ArticleReservations.GetArticleReservations;
 using Main.Core.Dtos.Amw.ArticleReservations;
@@ -31,6 +32,7 @@ public class GetArticleReservationsEndPoint : ICarterModule
                     return Results.Ok(response);
                 }).WithTags("ArticleReservations")
             .WithDisplayName("Создать резервацию")
-            .WithDescription("Создать резервацию для пользователя");
+            .WithDescription("Создать резервацию для пользователя")
+            .RequireAnyPermission("ARTICLE.RESERVATIONS.GET.ALL");
     }
 }

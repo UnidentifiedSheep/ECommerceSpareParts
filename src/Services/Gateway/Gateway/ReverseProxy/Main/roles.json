@@ -7,7 +7,6 @@
           "Path": "/main/roles",
           "Methods": [ "POST" ]
         },
-        "AuthorizationPolicy": "AM",
         "Transforms": [
           { "PathRemovePrefix": "/main" }
         ]
@@ -18,7 +17,6 @@
           "Path": "/main/roles",
           "Methods": [ "GET" ]
         },
-        "AuthorizationPolicy": "AM",
         "Transforms": [
           { "PathRemovePrefix": "/main" }
         ]

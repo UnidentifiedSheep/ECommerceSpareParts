@@ -1,3 +1,4 @@
+using Api.Common.Extensions;
 using Carter;
 using Main.Application.Handlers.Producers.AddOtherName;
 using MediatR;
@@ -18,6 +19,7 @@ public class AddOtherNameToProducerEndPoint : ICarterModule
                 return Results.Ok();
             }).WithTags("Producers")
             .WithDisplayName("Добавление дополнительного имени")
-            .WithDescription("Добавление дополнительного имени к производителю");
+            .WithDescription("Добавление дополнительного имени к производителю")
+            .RequireAnyPermission("PRODUCERS.EDIT");
     }
 }

@@ -1,3 +1,4 @@
+using Api.Common.Extensions;
 using Carter;
 using Main.Application.Handlers.Markups.SelectDefaultMarkup;
 using MediatR;
@@ -18,6 +19,7 @@ public class SelectDefaultMarkupEndPoint : ICarterModule
                     return Results.Ok();
                 }).WithTags("Markups")
                 .WithDescription("Установка дефолтной политики-наценки")
-                .WithDisplayName("Установка дефолтной политики-наценки");
+                .WithDisplayName("Установка дефолтной политики-наценки")
+                .RequireAnyPermission("MARKUP.SET.DEFAULT");
     }
 }

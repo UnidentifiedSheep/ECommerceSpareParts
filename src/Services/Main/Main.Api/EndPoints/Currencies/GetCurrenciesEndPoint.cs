@@ -1,3 +1,4 @@
+using Api.Common.Extensions;
 using Carter;
 using Core.Models;
 using Main.Application.Handlers.Currencies.GetCurrencies;
@@ -22,7 +23,8 @@ public class GetCurrenciesEndPoint : ICarterModule
                 return Results.Ok(result.Adapt<GetCurrenciesResponse>());
             }).WithTags("Currencies")
             .WithDescription("Получение списка валют")
-            .WithDisplayName("Получение списка валют");
+            .WithDisplayName("Получение списка валют")
+            .RequireAnyPermission("CURRENCIES.GET");
         
         app.MapGet("/currencies/{id}", async (ISender sender, int id, CancellationToken cancellation) =>
             {
@@ -31,6 +33,7 @@ public class GetCurrenciesEndPoint : ICarterModule
                 return Results.Ok(result.Adapt<GetCurrencyByIdResponse>());
             }).WithTags("Currencies")
             .WithDescription("Получение валюты по идентификатору")
-            .WithDisplayName("Получение валюты по id");
+            .WithDisplayName("Получение валюты по id")
+            .RequireAnyPermission("CURRENCIES.GET");
     }
 }

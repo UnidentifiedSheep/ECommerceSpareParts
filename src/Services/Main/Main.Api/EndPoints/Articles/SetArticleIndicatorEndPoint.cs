@@ -1,3 +1,4 @@
+using Api.Common.Extensions;
 using Carter;
 using Main.Application.Handlers.Articles.SetArticleIndicator;
 using MediatR;
@@ -17,6 +18,7 @@ public class SetArticleIndicatorEndPoint : ICarterModule
                 await sender.Send(command, token);
                 return Results.NoContent();
             }).WithTags("Articles")
-            .WithName("Установка индикатора артикула");
+            .WithName("Установка индикатора артикула")
+            .RequireAnyPermission("ARTICLES.EDIT");
     }
 }

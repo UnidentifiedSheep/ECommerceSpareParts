@@ -1,3 +1,4 @@
+using Api.Common.Extensions;
 using Carter;
 using Main.Application.Handlers.Sales.GetSaleContent;
 using Main.Core.Dtos.Amw.Sales;
@@ -20,6 +21,7 @@ public class GetSaleContentEndPoint : ICarterModule
                 return Results.Ok(response);
             }).WithTags("Sales")
             .WithDescription("Получение содержания продажи")
-            .WithDisplayName("Получение содержания продажи");
+            .WithDisplayName("Получение содержания продажи")
+            .RequireAnyPermission("SALES.GET");
     }
 }

@@ -1,3 +1,4 @@
+using Api.Common.Extensions;
 using Carter;
 using Main.Application.Handlers.Markups.GetMarkupGanges;
 using Main.Core.Dtos.Amw.Markups;
@@ -20,6 +21,7 @@ public class GetMarkupRangesEndPoint : ICarterModule
                 return Results.Ok(response);
             }).WithTags("Markups")
             .WithDescription("Получение диапазонов группы")
-            .WithDisplayName("Получение диапазонов группы");
+            .WithDisplayName("Получение диапазонов группы")
+            .RequireAnyPermission("MARKUP.GET");
     }
 }

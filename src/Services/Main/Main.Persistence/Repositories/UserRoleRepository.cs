@@ -14,6 +14,7 @@ public class UserRoleRepository(DContext context) : IUserRoleRepository
     {
         var query = context.UserRoles
             .Include(x => x.Role)
+            .Include(x => x.Role.PermissionNames)
             .Where(x => x.UserId == userId)
             .OrderBy(x => x.RoleId)
             .ConfigureTracking(track);

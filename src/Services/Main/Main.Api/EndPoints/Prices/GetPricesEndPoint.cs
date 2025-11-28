@@ -1,7 +1,6 @@
 using System.Security.Claims;
 using Carter;
 using Core.Models;
-using Core.StaticFunctions;
 using Main.Application.Handlers.Prices.GetDetailedPrices;
 using Main.Application.Handlers.Prices.GetPrices;
 using Mapster;
@@ -21,16 +20,14 @@ public class GetPricesEndPoint : ICarterModule
         app.MapGet("/prices", async (ISender sender, bool detailed, int currencyId, Guid? buyerId,
             ClaimsPrincipal user, HttpContext context, CancellationToken cancellationToken) =>
         {
-            var roles = user.GetUserRoles();
-
             var articleIds = context.Request.Query["articleId"]
                 .Select(x => int.TryParse(x, out var id) ? id : (int?)null)
                 .Where(x => x.HasValue)
                 .Select(x => x!.Value)
                 .ToList();
 
-            if (!roles.IsAnyMatchInvariant("admin", "moderator", "worker") && detailed) return Results.Unauthorized();
-
+            if (!user.HasPermissions("PRICES.GET.DETAILED") && detailed) return Results.Forbid();
+            
             if (detailed) return await GetDetailed(sender, articleIds, buyerId, currencyId, cancellationToken);
             return await GetNormal(sender, articleIds, buyerId, currencyId, cancellationToken);
         });

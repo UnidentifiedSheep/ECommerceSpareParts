@@ -1,4 +1,5 @@
 using System.Security.Claims;
+using Api.Common.Extensions;
 using Carter;
 using Main.Application.Handlers.Sales.DeleteFullSale;
 using MediatR;
@@ -19,6 +20,7 @@ public class DeleteSaleEndPoint : ICarterModule
                     return Results.NoContent();
                 }).WithTags("Sales")
                 .WithDescription("Удаление продажи")
-                .WithDisplayName("Удаление продажи");
+                .WithDisplayName("Удаление продажи")
+                .RequireAnyPermission("SALES.DELETE");
     }
 }

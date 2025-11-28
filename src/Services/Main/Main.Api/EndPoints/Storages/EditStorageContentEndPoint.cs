@@ -1,4 +1,5 @@
 using System.Security.Claims;
+using Api.Common.Extensions;
 using Carter;
 using Main.Application.Handlers.StorageContents.EditContent;
 using Main.Core.Dtos.Amw.Storage;
@@ -24,6 +25,7 @@ public class EditStorageContentEndPoint : ICarterModule
                 return Results.NoContent();
             }).WithTags("Storages")
             .WithDescription("Редактирование позиций на складе, количества, цены итд")
-            .WithDisplayName("Редактирование позиций склада");
+            .WithDisplayName("Редактирование позиций склада")
+            .RequireAnyPermission("STORAGES.CONTENT.EDIT");
     }
 }

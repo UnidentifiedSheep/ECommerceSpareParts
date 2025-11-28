@@ -22,17 +22,16 @@ public class GetArticleCrossesEndPoint : ICarterModule
         app.MapGet("/articles/{articleId}/crosses/", async (ISender sender, ClaimsPrincipal user, int articleId,
                 int limit, int page, string? sortBy, CancellationToken token) =>
             {
-                var roles = user.GetUserRoles();
                 var userId = user.GetUserId();
                 if (userId == null) return Results.Unauthorized();
+                if (!user.HasPermissions("ARTICLE.CROSSES.GET")) return Results.Forbid();
 
                 var pagination = new PaginationModel(page, limit);
-                if (roles.IsAnyMatchInvariant("admin", "moderator", "worker"))
+                if (user.HasPermissions("ARTICLES.GET.FULL"))
                     return await GetAmw(sender, articleId, pagination, sortBy, userId, token);
-                if (roles.IsAnyMatchInvariant("member"))
+                if (user.HasPermissions("ARTICLES.GET.Main"))
                     return await GetMember(sender, articleId, pagination, sortBy, userId, token);
-
-                return Results.Unauthorized();
+                return Results.Forbid();
             })
             .WithTags("Articles")
             .WithDescription("Получение кросс номеров по id артикула")

@@ -1,3 +1,4 @@
+using Api.Common.Extensions;
 using Carter;
 using Main.Application.Handlers.Markups.DeleteMarkup;
 using MediatR;
@@ -15,6 +16,7 @@ public class DeleteMarkupGroupEndPoint : ICarterModule
                 return Results.NoContent();
             }).WithTags("Markups")
             .WithDescription("Удаление группы наценок")
-            .WithDisplayName("Удаление группы наценок");
+            .WithDisplayName("Удаление группы наценок")
+            .RequireAnyPermission("MARKUP.DELETE");
     }
 }

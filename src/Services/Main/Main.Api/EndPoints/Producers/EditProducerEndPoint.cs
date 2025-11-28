@@ -1,3 +1,4 @@
+using Api.Common.Extensions;
 using Carter;
 using Main.Application.Handlers.Producers.EditProducer;
 using Main.Core.Dtos.Amw.Producers;
@@ -20,6 +21,7 @@ public class EditProducerEndPoint : ICarterModule
                     return Results.NoContent();
                 }).WithTags("Producers")
                 .WithDescription("Редактирование производителя")
-                .WithDisplayName("Редактирование производителя");
+                .WithDisplayName("Редактирование производителя")
+                .RequireAnyPermission("PRODUCERS.EDIT");
     }
 }

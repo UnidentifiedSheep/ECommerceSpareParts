@@ -1,3 +1,4 @@
+using Api.Common.Extensions;
 using Carter;
 using Main.Application.Handlers.Producers.CreateProducer;
 using Main.Core.Dtos.Amw.Producers;
@@ -21,6 +22,7 @@ public class CreateProducerEndPoint : ICarterModule
                 return Results.Created("/producers", new CreateProducerResponse(result.ProducerId));
             }).WithTags("Producers")
             .WithDescription("Добавление новых производителей в бд")
-            .WithDisplayName("Добавление производителей");
+            .WithDisplayName("Добавление производителей")
+            .RequireAnyPermission("PRODUCERS.CREATE");
     }
 }

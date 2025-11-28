@@ -53,6 +53,7 @@ public static class ServiceProvider
         collection.AddScoped<IBalanceService, BalanceService>();
         collection.AddScoped<ISaleService, SaleService>();
         collection.AddScoped<IUserTokenService, UserTokenService>();
+        collection.AddScoped<IRolePermissionService, RolePermissionService>();
 
         collection.AddSingleton<IEmailValidator, EmailValidator>();
         collection.AddSingleton<IConcurrencyValidator<StorageContent>, StorageContentConcurrencyValidator>();

@@ -1,3 +1,4 @@
+using Api.Common.Extensions;
 using Carter;
 using Main.Application.Handlers.ArticleContent.RemoveArticleContent;
 using MediatR;
@@ -16,6 +17,7 @@ public class RemoveArticleContentEndPoint : ICarterModule
                     return Results.NoContent();
                 }).WithTags("Articles")
                 .WithDescription("Удаление содержимого артикула в бд")
-                .WithDisplayName("Удаление содержимого артикула");
+                .WithDisplayName("Удаление содержимого артикула")
+                .RequireAnyPermission("ARTICLE.CONTENT.DELETE");
     }
 }

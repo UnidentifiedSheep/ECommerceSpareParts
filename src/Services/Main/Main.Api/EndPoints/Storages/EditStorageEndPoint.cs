@@ -1,3 +1,4 @@
+using Api.Common.Extensions;
 using Carter;
 using Main.Application.Handlers.Storages.EditStorage;
 using Main.Core.Dtos.Amw.Storage;
@@ -19,6 +20,7 @@ public class EditStorageEndPoint : ICarterModule
                     return Results.NoContent();
                 }).WithTags("Storages")
             .WithDescription("Редактирование полей склада")
-            .WithDisplayName("Редактирование склада");
+            .WithDisplayName("Редактирование склада")
+            .RequireAnyPermission("STORAGES.EDIT");
     }
 }

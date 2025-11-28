@@ -50,6 +50,8 @@ public partial class DContext : DbContext
 
     public virtual DbSet<MarkupRange> MarkupRanges { get; set; }
 
+    public virtual DbSet<Permission> Permissions { get; set; }
+
     public virtual DbSet<Producer> Producers { get; set; }
 
     public virtual DbSet<ProducerDetail> ProducerDetails { get; set; }
@@ -89,6 +91,8 @@ public partial class DContext : DbContext
     public virtual DbSet<UserEmail> UserEmails { get; set; }
 
     public virtual DbSet<UserInfo> UserInfos { get; set; }
+
+    public virtual DbSet<UserPermission> UserPermissions { get; set; }
 
     public virtual DbSet<UserPhone> UserPhones { get; set; }
 
@@ -736,9 +740,7 @@ public partial class DContext : DbContext
             entity.Property(e => e.Description)
                 .HasMaxLength(255)
                 .HasColumnName("description");
-            entity.Property(e => e.IsSystem)
-                .HasDefaultValue(false)
-                .HasColumnName("is_system");
+            entity.Property(e => e.IsSystem).HasColumnName("is_system");
             entity.Property(e => e.Name)
                 .HasMaxLength(24)
                 .HasColumnName("name");
@@ -748,6 +750,25 @@ public partial class DContext : DbContext
             entity.Property(e => e.UpdatedAt)
                 .HasDefaultValueSql("now()")
                 .HasColumnName("updated_at");
+
+            entity.HasMany(d => d.PermissionNames).WithMany(p => p.Roles)
+                .UsingEntity<Dictionary<string, object>>(
+                    "RolePermission",
+                    r => r.HasOne<Permission>().WithMany()
+                        .HasForeignKey("PermissionName")
+                        .OnDelete(DeleteBehavior.ClientSetNull)
+                        .HasConstraintName("role_permissions_permissions_name_fk"),
+                    l => l.HasOne<Role>().WithMany()
+                        .HasForeignKey("RoleId")
+                        .OnDelete(DeleteBehavior.ClientSetNull)
+                        .HasConstraintName("role_permissions_roles_id_fk"),
+                    j =>
+                    {
+                        j.HasKey("RoleId", "PermissionName").HasName("role_permissions_pk");
+                        j.ToTable("role_permissions", "auth");
+                        j.IndexerProperty<Guid>("RoleId").HasColumnName("role_id");
+                        j.IndexerProperty<string>("PermissionName").HasColumnName("permission_name");
+                    });
         });
 
         modelBuilder.Entity<Sale>(entity =>
@@ -1269,6 +1290,19 @@ public partial class DContext : DbContext
                 .HasForeignKey(d => d.TransactionId)
                 .HasConstraintName("transaction_versions_transactions_id_fk");
         });
+        
+        modelBuilder.Entity<Permission>(entity =>
+        {
+            entity.HasKey(e => e.Name).HasName("permissions_pk");
+
+            entity.ToTable("permissions", "auth");
+
+            entity.Property(e => e.Name).HasColumnName("name");
+            entity.Property(e => e.CreatedAt)
+                .HasDefaultValueSql("now()")
+                .HasColumnName("created_at");
+            entity.Property(e => e.Description).HasColumnName("description");
+        });
 
         modelBuilder.Entity<User>(entity =>
         {
@@ -1278,16 +1312,14 @@ public partial class DContext : DbContext
 
             entity.HasIndex(e => e.NormalizedUserName, "users_normalized_user_name_index")
                 .HasMethod("gin")
-                .HasOperators("gin_trgm_ops");
+                .HasOperators(new[] { "gin_trgm_ops" });
 
             entity.HasIndex(e => e.NormalizedUserName, "users_normalized_user_name_uindex").IsUnique();
 
             entity.Property(e => e.Id)
                 .HasDefaultValueSql("gen_random_uuid()")
                 .HasColumnName("id");
-            entity.Property(e => e.AccessFailedCount)
-                .HasDefaultValue(0)
-                .HasColumnName("access_failed_count");
+            entity.Property(e => e.AccessFailedCount).HasColumnName("access_failed_count");
             entity.Property(e => e.CreatedAt)
                 .HasDefaultValueSql("now()")
                 .HasColumnName("created_at");
@@ -1297,15 +1329,36 @@ public partial class DContext : DbContext
                 .HasMaxLength(36)
                 .HasColumnName("normalized_user_name");
             entity.Property(e => e.PasswordHash).HasColumnName("password_hash");
-            entity.Property(e => e.TwoFactorEnabled)
-                .HasDefaultValue(false)
-                .HasColumnName("two_factor_enabled");
+            entity.Property(e => e.TwoFactorEnabled).HasColumnName("two_factor_enabled");
             entity.Property(e => e.UpdatedAt)
                 .HasDefaultValueSql("now()")
                 .HasColumnName("updated_at");
             entity.Property(e => e.UserName)
                 .HasMaxLength(36)
                 .HasColumnName("user_name");
+        });
+        
+        modelBuilder.Entity<UserPermission>(entity =>
+        {
+            entity.HasKey(e => new { e.UserId, e.Permission }).HasName("user_permissions_pk");
+
+            entity.ToTable("user_permissions", "auth");
+
+            entity.Property(e => e.UserId).HasColumnName("user_id");
+            entity.Property(e => e.Permission).HasColumnName("permission");
+            entity.Property(e => e.CreatedAt)
+                .HasDefaultValueSql("now()")
+                .HasColumnName("created_at");
+
+            entity.HasOne(d => d.PermissionNavigation).WithMany(p => p.UserPermissions)
+                .HasForeignKey(d => d.Permission)
+                .OnDelete(DeleteBehavior.Restrict)
+                .HasConstraintName("user_permissions_permissions_name_fk");
+
+            entity.HasOne(d => d.User).WithMany(p => p.UserPermissions)
+                .HasForeignKey(d => d.UserId)
+                .OnDelete(DeleteBehavior.Restrict)
+                .HasConstraintName("user_permissions_users_id_fk");
         });
 
         modelBuilder.Entity<UserBalance>(entity =>

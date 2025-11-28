@@ -1,7 +1,9 @@
 using Exceptions.Exceptions.Articles;
 using Exceptions.Exceptions.Balances;
 using Exceptions.Exceptions.Currencies;
+using Exceptions.Exceptions.Permissions;
 using Exceptions.Exceptions.Producers;
+using Exceptions.Exceptions.Roles;
 using Exceptions.Exceptions.Storages;
 using Exceptions.Exceptions.Users;
 using Main.Core.Entities;
@@ -55,4 +57,14 @@ public static class ValidationPlanExtensions
     
     public static IValidationPlan EnsureTransactionExists(this IValidationPlan plan, IEnumerable<string> transactionIds)
         => plan.EnsureExists<Transaction, string>(x => x.Id, transactionIds, typeof(TransactionNotFound));
+    
+    //PERMISSION
+    
+    public static IValidationPlan EnsurePermissionExists(this IValidationPlan plan, string name)
+        => plan.EnsureExists<Permission, string>(x => x.Name, name, typeof(PermissionNotFoundException));
+    
+    //ROLE
+    
+    public static IValidationPlan EnsureRoleExists(this IValidationPlan plan, Guid roleId)
+        => plan.EnsureExists<Role, Guid>(x => x.Id, roleId, typeof(RoleNotFoundException));
 }

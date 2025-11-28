@@ -1,3 +1,4 @@
+using Api.Common.Extensions;
 using Carter;
 using Main.Application.Handlers.Markups.CreateMarkup;
 using Main.Core.Dtos.Amw.Markups;
@@ -27,6 +28,7 @@ public class CreateMarkupEndPoint : ICarterModule
                     return Results.Created($"/markups/{result.GroupId}", response);
                 }).WithTags("Markups")
                 .WithDescription("Создание группы наценок")
-                .WithDisplayName("Создание группы наценок");
+                .WithDisplayName("Создание группы наценок")
+                .RequireAnyPermission("MARKUP.CREATE");
     }
 }

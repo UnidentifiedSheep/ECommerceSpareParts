@@ -1,3 +1,4 @@
+using Api.Common.Extensions;
 using Carter;
 using Main.Application.Handlers.Roles.CreateRole;
 using MediatR;
@@ -17,6 +18,7 @@ public class CreateRoleEndPoint : ICarterModule
                 return Results.Created();
             }).WithTags("Roles")
             .WithDescription("Создание роли")
-            .WithDisplayName("Создание роли");
+            .WithDisplayName("Создание роли")
+            .RequireAnyPermission("ROLES.CREATE");
     }
 }

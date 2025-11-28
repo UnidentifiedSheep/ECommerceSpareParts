@@ -1,3 +1,4 @@
+using Api.Common.Extensions;
 using Carter;
 using Main.Application.Handlers.Users.CreateUser;
 using Main.Core.Dtos.Emails;
@@ -26,6 +27,7 @@ public class CreateUserEndPoint : ICarterModule
                 return Results.Created($"users/{userId}", null);
             }).WithTags("Users")
             .WithDescription("Создание пользователя")
-            .WithDisplayName("Создание пользователя");
+            .WithDisplayName("Создание пользователя")
+            .RequireAnyPermission("USERS.CREATE");
     }
 }

@@ -1,4 +1,6 @@
-﻿using Carter;
+﻿using System.Security.Claims;
+using Api.Common.Extensions;
+using Carter;
 using Main.Application.Handlers.ArticleCharacteristics.AddCharacteristics;
 using Main.Core.Dtos.Amw.ArticleCharacteristics;
 using MediatR;
@@ -24,6 +26,7 @@ public class AddCharacteristicsEndPoint : ICarterModule
             .WithDescription("Создание характеристик артикула")
             .ProducesProblem(StatusCodes.Status400BadRequest)
             .ProducesProblem(StatusCodes.Status404NotFound)
-            .WithSummary("Создание характеристик артикула");
+            .WithSummary("Создание характеристик артикула")
+            .RequireAnyPermission("ARTICLE.CHARACTERISTICS.CREATE");
     }
 }

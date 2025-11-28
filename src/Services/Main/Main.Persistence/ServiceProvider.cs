@@ -16,6 +16,8 @@ public static class ServiceProvider
         collection.AddDbContext<DContext>(options => options.UseNpgsql(connectionString));
         collection.AddScoped<ICombinedDataLoader, CombinedDataLoader>();
 
+        collection.AddScoped<IUserPermissionRepository, UserPermissionRepository>();
+        collection.AddScoped<IPermissionRepository, PermissionsRepository>();
         collection.AddScoped<IUserVehicleRepository, UserVehicleRepository>();
         collection.AddScoped<IUserRepository, UserRepository>();
         collection.AddScoped<IRoleRepository, RoleRepository>();

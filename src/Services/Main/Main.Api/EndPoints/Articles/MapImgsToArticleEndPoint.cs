@@ -1,4 +1,5 @@
-﻿using Api.Common.Models;
+﻿using Api.Common.Extensions;
+using Api.Common.Models;
 using Carter;
 using Main.Application.Handlers.ArticleImages.MapImgsToArticle;
 using MediatR;
@@ -20,6 +21,7 @@ public class MapImgsToArticleEndPoint : ICarterModule
                 .WithTags("Articles")
                 .WithName("Добавить изображение к артикулу")
                 .Produces(200)
-                .ProducesProblem(404);
+                .ProducesProblem(404)
+                .RequireAnyPermission("ARTICLE.IMAGES.CREATE");
     }
 }

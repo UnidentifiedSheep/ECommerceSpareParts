@@ -1,4 +1,5 @@
 using System.Security.Claims;
+using Api.Common.Extensions;
 using Carter;
 using Main.Application.Handlers.StorageContents.DeleteContent;
 using MediatR;
@@ -19,6 +20,7 @@ public class DeleteStorageContentEndPoint : ICarterModule
                 return Results.NoContent();
             }).WithTags("Storages")
             .WithDescription("Полное удаление позиции со склада по его Id")
-            .WithDisplayName("Удаление позиции со склада");
+            .WithDisplayName("Удаление позиции со склада")
+            .RequireAnyPermission("STORAGES.CONTENT.DELETE");
     }
 }

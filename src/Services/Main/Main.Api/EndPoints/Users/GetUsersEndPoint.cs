@@ -1,4 +1,5 @@
 using System.Security.Claims;
+using Api.Common.Extensions;
 using Carter;
 using Core.Enums;
 using Core.Models;
@@ -49,6 +50,7 @@ public class GetUsersEndPoint : ICarterModule
                     return Results.Ok(response);
                 }).WithTags("Users")
                 .WithDescription("Получение пользователей")
-                .WithDisplayName("Получение пользователей");
+                .WithDisplayName("Получение пользователей")
+                .RequireAnyPermission("USERS.GET");
     }
 }

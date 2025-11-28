@@ -1,3 +1,4 @@
+using Api.Common.Extensions;
 using Carter;
 using Core.Models;
 using Main.Application.Handlers.Roles.GetRoles;
@@ -22,6 +23,7 @@ public class GetRoles : ICarterModule
                     return Results.Ok(response);
                 }).WithTags("Roles")
                 .WithDescription("Получение ролей")
-                .WithDisplayName("Получение ролей");
+                .WithDisplayName("Получение ролей")
+                .RequireAnyPermission("ROLES.GET");
     }
 }

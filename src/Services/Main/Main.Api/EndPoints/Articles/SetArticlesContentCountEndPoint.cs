@@ -1,3 +1,4 @@
+using Api.Common.Extensions;
 using Carter;
 using Main.Application.Handlers.ArticleContent.SetArticleContentCount;
 using MediatR;
@@ -17,6 +18,7 @@ public class SetArticlesContentCountEndPoint : ICarterModule
                 await sender.Send(command, token);
                 return Results.NoContent();
             }).WithTags("Articles")
-            .WithName("Установка входящего количества в содержимое артикула");
+            .WithName("Установка входящего количества в содержимое артикула")
+            .RequireAnyPermission("ARTICLE.CONTENT.EDIT");
     }
 }

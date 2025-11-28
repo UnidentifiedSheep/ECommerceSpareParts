@@ -1,3 +1,4 @@
+using Api.Common.Extensions;
 using Carter;
 using Core.Models;
 using Main.Application.Handlers.StorageContents.GetContents;
@@ -32,6 +33,7 @@ public class GetStorageContentEndPoint : ICarterModule
                     return Results.Ok(response);
                 }).WithTags("Storages")
             .WithDescription("Получение списка позиций на складе по айди артикула или по названию склада")
-            .WithDisplayName("Получение позиций склада");
+            .WithDisplayName("Получение позиций склада")
+            .RequireAnyPermission("STORAGES.CONTENT.GET.ALL");
     }
 }

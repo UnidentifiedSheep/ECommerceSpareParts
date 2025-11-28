@@ -1,4 +1,5 @@
-﻿using Carter;
+﻿using Api.Common.Extensions;
+using Carter;
 using Main.Application.Handlers.ArticleCharacteristics.PatchCharacteristics;
 using Main.Core.Dtos.Amw.ArticleCharacteristics;
 using MediatR;
@@ -22,6 +23,7 @@ public class EditCharacteristicsEndPoint : ICarterModule
             .WithDescription("Редактирование характеристики")
             .ProducesProblem(StatusCodes.Status400BadRequest)
             .ProducesProblem(StatusCodes.Status404NotFound)
-            .WithSummary("Редактирование характеристики");
+            .WithSummary("Редактирование характеристики")
+            .RequireAnyPermission("ARTICLE.CHARACTERISTICS.UPDATE");
     }
 }

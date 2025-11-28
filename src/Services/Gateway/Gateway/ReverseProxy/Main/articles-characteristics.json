@@ -17,7 +17,6 @@
           "Path": "/main/articles/characteristics/{id}",
           "Methods": [ "DELETE" ]
         },
-        "AuthorizationPolicy": "AMW",
         "Transforms": [
           { "PathRemovePrefix": "/main" }
         ]
@@ -28,7 +27,6 @@
           "Path": "/main/articles/characteristics/{id}",
           "Methods": [ "PATCH" ]
         },
-        "AuthorizationPolicy": "AMW",
         "Transforms": [
           { "PathRemovePrefix": "/main" }
         ]
@@ -39,7 +37,6 @@
           "Path": "/main/articles/characteristics/",
           "Methods": [ "POST" ]
         },
-        "AuthorizationPolicy": "AMW",
         "Transforms": [
           { "PathRemovePrefix": "/main" }
         ]

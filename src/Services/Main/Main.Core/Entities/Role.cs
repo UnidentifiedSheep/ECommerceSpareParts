@@ -1,6 +1,6 @@
 ﻿namespace Main.Core.Entities;
 
-public class Role
+public partial class Role
 {
     public Guid Id { get; set; }
 
@@ -17,4 +17,6 @@ public class Role
     public DateTime UpdatedAt { get; set; }
 
     public virtual ICollection<UserRole> UserRoles { get; set; } = new List<UserRole>();
+
+    public virtual ICollection<Permission> PermissionNames { get; set; } = new List<Permission>();
 }

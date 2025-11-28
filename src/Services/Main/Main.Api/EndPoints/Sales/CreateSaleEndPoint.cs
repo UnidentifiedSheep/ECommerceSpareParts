@@ -1,4 +1,5 @@
 using System.Security.Claims;
+using Api.Common.Extensions;
 using Carter;
 using Main.Application.Handlers.Sales.CreateFullSale;
 using Main.Core.Dtos.Amw.Sales;
@@ -34,6 +35,7 @@ public class CreateSaleEndPoint : ICarterModule
                     return Results.Ok();
                 }).WithTags("Sales")
                 .WithDescription("Создание новой продажи")
-                .WithDisplayName("Создание новой продажи");
+                .WithDisplayName("Создание новой продажи")
+                .RequireAnyPermission("SALES.CREATE");
     }
 }

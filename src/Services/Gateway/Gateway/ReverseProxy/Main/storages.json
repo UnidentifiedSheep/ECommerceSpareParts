@@ -7,7 +7,6 @@
           "Path": "/main/storages/content",
           "Methods": [ "POST" ]
         },
-        "AuthorizationPolicy": "AMW",
         "Transforms": [
           { "PathRemovePrefix": "/main" }
         ]
@@ -18,7 +17,6 @@
           "Path": "/main/storages/",
           "Methods": [ "POST" ]
         },
-        "AuthorizationPolicy": "AM",
         "Transforms": [
           { "PathRemovePrefix": "/main" }
         ]
@@ -29,7 +27,6 @@
           "Path": "/main/storages/content/{contentId}",
           "Methods": [ "DELETE" ]
         },
-        "AuthorizationPolicy": "AM",
         "Transforms": [
           { "PathRemovePrefix": "/main" }
         ]
@@ -40,7 +37,6 @@
           "Path": "/main/storages/{StorageName}",
           "Methods": [ "DELETE" ]
         },
-        "AuthorizationPolicy": "AM",
         "Transforms": [
           { "PathRemovePrefix": "/main" }
         ]
@@ -51,7 +47,6 @@
           "Path": "/main/storages/content",
           "Methods": [ "PATCH" ]
         },
-        "AuthorizationPolicy": "AMW",
         "Transforms": [
           { "PathRemovePrefix": "/main" }
         ]
@@ -62,7 +57,6 @@
           "Path": "/main/storages/{storageName}",
           "Methods": [ "PATCH" ]
         },
-        "AuthorizationPolicy": "AM",
         "Transforms": [
           { "PathRemovePrefix": "/main" }
         ]
@@ -73,7 +67,6 @@
           "Path": "/main/storages/content",
           "Methods": [ "GET" ]
         },
-        "AuthorizationPolicy": "AMW",
         "Transforms": [
           { "PathRemovePrefix": "/main" }
         ]
@@ -84,7 +77,6 @@
           "Path": "/main/storages/",
           "Methods": [ "GET" ]
         },
-        "AuthorizationPolicy": "AMW",
         "Transforms": [
           { "PathRemovePrefix": "/main" }
         ]

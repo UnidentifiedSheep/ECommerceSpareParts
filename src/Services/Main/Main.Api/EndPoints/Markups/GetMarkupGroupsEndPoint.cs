@@ -1,3 +1,4 @@
+using Api.Common.Extensions;
 using Carter;
 using Core.Models;
 using Main.Application.Handlers.Markups.GetMarkupGroups;
@@ -21,6 +22,7 @@ public class GetMarkupGroupsEndPoint : ICarterModule
                 return Results.Ok(response);
             }).WithTags("Markups")
             .WithDescription("Получение групп наценок")
-            .WithDisplayName("Получение групп наценок");
+            .WithDisplayName("Получение групп наценок")
+            .RequireAnyPermission("MARKUP.GET");
     }
 }
