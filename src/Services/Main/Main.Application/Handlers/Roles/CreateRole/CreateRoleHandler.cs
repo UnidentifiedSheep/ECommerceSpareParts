@@ -1,13 +1,15 @@
 using Application.Common.Interfaces;
-using Core.Extensions;
+using Core.Attributes;
 using Core.Interfaces.Services;
 using Exceptions.Exceptions.Roles;
 using Main.Core.Entities;
+using Main.Core.Extensions;
 using Main.Core.Interfaces.DbRepositories;
 using MediatR;
 
 namespace Main.Application.Handlers.Roles.CreateRole;
 
+[ExceptionType<RoleAlreadyExistsException>]
 public record CreateRoleCommand(string Name, string? Description) : ICommand;
 
 public class CreateRoleHandler(IRoleRepository roleRepository, IUnitOfWork unitOfWork)

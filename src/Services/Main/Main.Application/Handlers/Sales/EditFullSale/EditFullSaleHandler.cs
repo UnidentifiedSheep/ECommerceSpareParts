@@ -22,6 +22,7 @@ using MediatR;
 namespace Main.Application.Handlers.Sales.EditFullSale;
 
 [Transactional(IsolationLevel.Serializable, 20, 2)]
+[ExceptionType<SaleNotFoundException>]
 public record EditFullSaleCommand(
     IEnumerable<EditSaleContentDto> EditedContent,
     string SaleId,
@@ -170,7 +171,7 @@ public class EditFullSaleHandler(IMediator mediator, ISaleRepository saleReposit
         return (await mediator.Send(command, cancellationToken)).Changes;
     }
 
-    private async Task EditTransaction(string transactionId, int currencyId, decimal totalSum, DateTime saleDateTime,
+    private async Task EditTransaction(Guid transactionId, int currencyId, decimal totalSum, DateTime saleDateTime,
         CancellationToken cancellationToken = default)
     {
         var command =

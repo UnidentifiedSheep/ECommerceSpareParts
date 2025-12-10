@@ -26,6 +26,8 @@ using IsolationLevel = System.Data.IsolationLevel;
 namespace Main.Application.Handlers.Sales.CreateFullSale;
 
 [Transactional(IsolationLevel.Serializable, 20, 2)]
+[ExceptionType<NotEnoughCountOnStorageException>]
+[ExceptionType<SoftConfirmationNeededException>]
 public record CreateFullSaleCommand(
     Guid CreatedUserId,
     Guid BuyerId,
@@ -160,7 +162,7 @@ public class CreateFullSaleHandler(IMediator mediator, IArticlesRepository artic
 
     private async Task<Sale> CreateSale(IEnumerable<PrevAndNewValue<StorageContent>> storageContents,
         IEnumerable<NewSaleContentDto> saleContent, int currencyId, Guid buyerId, Guid whoCreatedUserId,
-        string transactionId, string mainStorage, DateTime saleDateTime, string? comment,
+        Guid transactionId, string mainStorage, DateTime saleDateTime, string? comment,
         CancellationToken cancellationToken = default)
     {
         var command = new CreateSaleCommand(saleContent, storageContents, currencyId, buyerId, whoCreatedUserId,

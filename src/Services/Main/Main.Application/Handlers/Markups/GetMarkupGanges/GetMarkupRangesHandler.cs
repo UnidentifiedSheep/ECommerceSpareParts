@@ -1,4 +1,5 @@
 using Application.Common.Interfaces;
+using Core.Attributes;
 using Exceptions.Exceptions.Markups;
 using Main.Core.Dtos.Amw.Markups;
 using Main.Core.Interfaces.DbRepositories;
@@ -6,6 +7,7 @@ using Mapster;
 
 namespace Main.Application.Handlers.Markups.GetMarkupGanges;
 
+[ExceptionType<MarkupGroupNotFoundException>]
 public record GetMarkupRangesQuery(int GroupId) : IQuery<GetMarkupRangesResult>;
 
 public record GetMarkupRangesResult(IEnumerable<MarkupRangeDto> Ranges);

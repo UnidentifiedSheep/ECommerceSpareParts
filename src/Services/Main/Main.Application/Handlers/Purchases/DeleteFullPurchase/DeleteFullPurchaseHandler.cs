@@ -13,6 +13,7 @@ using MediatR;
 namespace Main.Application.Handlers.Purchases.DeleteFullPurchase;
 
 [Transactional(IsolationLevel.Serializable, 20, 2)]
+[ExceptionType<PurchaseNotFoundException>]
 public record DeleteFullPurchaseCommand(string PurchaseId, Guid WhoDeleted) : ICommand;
 
 public class DeleteFullPurchaseHandler(IPurchaseRepository purchaseRepository, IMediator mediator)
@@ -33,7 +34,7 @@ public class DeleteFullPurchaseHandler(IPurchaseRepository purchaseRepository, I
         return Unit.Value;
     }
 
-    private async Task DeleteTransaction(string transactionId, Guid whoDeleted,
+    private async Task DeleteTransaction(Guid transactionId, Guid whoDeleted,
         CancellationToken cancellationToken = default)
     {
         var command = new DeleteTransactionCommand(transactionId, whoDeleted, true);

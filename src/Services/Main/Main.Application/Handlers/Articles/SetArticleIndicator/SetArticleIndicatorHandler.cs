@@ -9,6 +9,7 @@ using MediatR;
 namespace Main.Application.Handlers.Articles.SetArticleIndicator;
 
 [Transactional]
+[ExceptionType<ArticleNotFoundException>]
 public record SetArticleIndicatorCommand(int ArticleId, string? Indicator) : ICommand;
 
 public class SetArticleIndicatorHandler(

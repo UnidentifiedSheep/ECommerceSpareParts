@@ -1,16 +1,20 @@
 ﻿using Application.Common.Interfaces;
 using Core.Attributes;
-using Core.Extensions;
 using Core.Interfaces.Services;
+using Exceptions.Exceptions.Permissions;
+using Exceptions.Exceptions.Users;
 using Main.Application.Extensions;
 using Main.Application.Validation;
 using Main.Core.Abstractions;
 using Main.Core.Entities;
+using Main.Core.Extensions;
 using MediatR;
 
 namespace Main.Application.Handlers.Users.AddPermissionToUser;
 
 [Transactional]
+[ExceptionType<UserNotFoundException>]
+[ExceptionType<PermissionNotFoundException>]
 public record AddPermissionToUserCommand(Guid UserId, string PermissionName) : ICommand;
 
 public class AddPermissionToUserHandler(IUnitOfWork unitOfWork, DbDataValidatorBase dbValidator) : ICommandHandler<AddPermissionToUserCommand>

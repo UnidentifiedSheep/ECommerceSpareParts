@@ -1,6 +1,7 @@
 using System.Diagnostics.CodeAnalysis;
 using Core.Extensions;
 using Main.Core.Entities;
+using Main.Core.Extensions;
 using Main.Core.Interfaces.DbRepositories;
 using Main.Persistence.Context;
 using Microsoft.EntityFrameworkCore;

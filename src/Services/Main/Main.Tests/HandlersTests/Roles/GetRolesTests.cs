@@ -1,6 +1,6 @@
-﻿using Core.Extensions;
-using Core.Models;
+﻿using Core.Models;
 using Main.Application.Handlers.Roles.GetRoles;
+using Main.Core.Extensions;
 using Main.Persistence.Context;
 using MediatR;
 using Microsoft.Extensions.DependencyInjection;

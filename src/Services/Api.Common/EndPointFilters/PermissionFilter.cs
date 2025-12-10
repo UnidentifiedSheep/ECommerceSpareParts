@@ -16,6 +16,8 @@ public class PermissionFilter : IEndpointFilter
     public async ValueTask<object?> InvokeAsync(EndpointFilterInvocationContext ctx, EndpointFilterDelegate next)
     {
         var user = ctx.HttpContext.User;
+        if (user.Identity?.IsAuthenticated != true) return Results.Unauthorized();
+        
         var userPerms = user.FindAll("permission")
             .Select(x => x.Value)
             .ToHashSet();

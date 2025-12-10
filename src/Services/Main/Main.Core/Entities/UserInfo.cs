@@ -1,6 +1,6 @@
 ﻿namespace Main.Core.Entities;
 
-public class UserInfo
+public partial class UserInfo
 {
     public Guid UserId { get; set; }
 

@@ -8,6 +8,7 @@ using MediatR;
 namespace Main.Application.Handlers.Purchases.DeletePurchase;
 
 [Transactional]
+[ExceptionType<PurchaseNotFoundException>]
 public record DeletePurchaseCommand(string PurchaseId) : ICommand<Unit>;
 
 public class DeletePurchaseHandler(IPurchaseRepository purchaseRepository, IUnitOfWork unitOfWork)

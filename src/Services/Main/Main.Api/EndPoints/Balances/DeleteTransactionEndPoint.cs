@@ -11,7 +11,7 @@ public class DeleteTransactionEndPoint : ICarterModule
     public void AddRoutes(IEndpointRouteBuilder app)
     {
         app.MapDelete("/balances/transaction/{id}",
-                async (ISender sender, ClaimsPrincipal claims, string id, CancellationToken token) =>
+                async (ISender sender, ClaimsPrincipal claims, Guid id, CancellationToken token) =>
                 {
                     if (!Guid.TryParse(claims.FindFirstValue(ClaimTypes.NameIdentifier), out var userId))
                         return Results.Unauthorized();

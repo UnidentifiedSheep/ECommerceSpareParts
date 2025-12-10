@@ -42,7 +42,7 @@ public class BalanceService(IBalanceRepository balanceRepository, IUnitOfWork un
         senderBalance.Balance -= multiplier * transaction.TransactionSum;
     }
 
-    public async Task RecalculateBalanceAsync(Transaction transaction, string? withOut = null,
+    public async Task RecalculateBalanceAsync(Transaction transaction, Guid? withOut = null,
         CancellationToken cancellationToken = default)
     {
         await foreach (var tr in balanceRepository.GetAffectedTransactions(transaction.ReceiverId,

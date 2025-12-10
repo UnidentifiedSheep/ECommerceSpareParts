@@ -75,8 +75,9 @@ public class MakeLinkageBetweenArticlesTests : IAsyncLifetime
         var result = await _mediator.Send(command);
         Assert.Equal(Unit.Value, result);
 
-        var crosses = await _context.ArticleCrosses
-            .Where(x => (x.ArticleId == 1 && x.ArticleCrossId == 2) || (x.ArticleId == 2 && x.ArticleCrossId == 1))
+        var crosses = await _context.Articles
+            .Where(x => (x.Id == 1 && x.ArticleCrosses.FirstOrDefault(z => z.Id == 2) != null) ||
+                        (x.Id == 2 && x.ArticleCrosses.FirstOrDefault(z => z.Id == 1) != null))
             .CountAsync();
 
         Assert.Equal(2, crosses);
@@ -85,7 +86,7 @@ public class MakeLinkageBetweenArticlesTests : IAsyncLifetime
     [Fact]
     public async Task MakeLinkage_FullCrosses_Succeeds()
     {
-        _context.ArticleCrosses.RemoveRange(await _context.ArticleCrosses.ToListAsync());
+        await ClearCrosses(_context);
         await _context.AddArticleCross(1, 3);
         await _context.AddArticleCross(2, 4);
 
@@ -107,9 +108,7 @@ public class MakeLinkageBetweenArticlesTests : IAsyncLifetime
             (2, 1), (4, 1), (2, 3), (4, 3)
         };
 
-        var actualLinks = await _context.ArticleCrosses
-            .AsNoTracking()
-            .ToListAsync();
+        var actualLinks = await GetArticleCrosses(_context);
 
         var matchingLinks = actualLinks
             .Where(x => expectedLinks.Contains((x.ArticleId, x.ArticleCrossId)))
@@ -124,7 +123,7 @@ public class MakeLinkageBetweenArticlesTests : IAsyncLifetime
     [Fact]
     public async Task MakeLinkage_FullRightToLeft_Succeeds()
     {
-        _context.ArticleCrosses.RemoveRange(await _context.ArticleCrosses.ToListAsync());
+        await ClearCrosses(_context);
         await _context.AddArticleCross(2, 4);
 
         var newLinkage = new NewArticleLinkageDto
@@ -144,9 +143,7 @@ public class MakeLinkageBetweenArticlesTests : IAsyncLifetime
             (1, 2), (2, 1), (1, 4), (4, 1)
         };
 
-        var actualLinks = await _context.ArticleCrosses
-            .AsNoTracking()
-            .ToListAsync();
+        var actualLinks = await GetArticleCrosses(_context);
 
         var matchingLinks = actualLinks
             .Where(x => expectedLinks.Contains((x.ArticleId, x.ArticleCrossId)))
@@ -160,7 +157,7 @@ public class MakeLinkageBetweenArticlesTests : IAsyncLifetime
     [Fact]
     public async Task MakeLinkage_FullLeftToRightCross_Succeeds()
     {
-        _context.ArticleCrosses.RemoveRange(await _context.ArticleCrosses.ToListAsync());
+        await ClearCrosses(_context);
         await _context.AddArticleCross(1, 3);
 
         var newLinkage = new NewArticleLinkageDto
@@ -180,9 +177,7 @@ public class MakeLinkageBetweenArticlesTests : IAsyncLifetime
             (1, 2), (2, 1), (3, 2), (2, 3)
         };
 
-        var actualLinks = await _context.ArticleCrosses
-            .AsNoTracking()
-            .ToListAsync();
+        var actualLinks = await GetArticleCrosses(_context);
 
         var matchingLinks = actualLinks
             .Where(x => expectedLinks.Contains((x.ArticleId, x.ArticleCrossId)))
@@ -192,4 +187,21 @@ public class MakeLinkageBetweenArticlesTests : IAsyncLifetime
         var missing = expectedLinks.Except(matchingLinks.Select(x => (x.ArticleId, x.ArticleCrossId))).ToList();
         Assert.True(missing.Count == 0, $"Missing expected pairs: {string.Join(", ", missing)}");
     }
+
+    private async Task ClearCrosses(DContext context)
+    {
+        var articles = await context.Articles.Include(a => a.ArticleCrosses).ToListAsync();
+        articles.ForEach(a => a.ArticleCrosses.Clear());
+        await context.SaveChangesAsync();
+    }
+
+    public async Task<List<(int ArticleId, int ArticleCrossId)>> GetArticleCrosses(DContext context)
+    {
+        var articles = await context.Articles
+            .Include(a => a.ArticleCrosses)
+            .ToDictionaryAsync(x => x.Id, z => z.ArticleCrosses);
+        var crosses = articles.Select(x => x.Value.Select(y => (x.Key, y.Id)));
+        return crosses.SelectMany(x => x).ToList();
+    }
+    
 }

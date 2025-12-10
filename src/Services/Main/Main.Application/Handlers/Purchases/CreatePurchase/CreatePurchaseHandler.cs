@@ -1,23 +1,33 @@
 using Application.Common.Interfaces;
 using Core.Attributes;
 using Core.Interfaces.Services;
+using Exceptions.Exceptions.Articles;
+using Exceptions.Exceptions.Balances;
+using Exceptions.Exceptions.Currencies;
+using Exceptions.Exceptions.Storages;
+using Exceptions.Exceptions.Users;
 using Main.Application.Extensions;
 using Main.Application.Validation;
 using Main.Core.Abstractions;
 using Main.Core.Dtos.Amw.Purchase;
 using Main.Core.Entities;
-using Main.Core.Interfaces.DbRepositories;
+using Main.Core.Enums;
 using Mapster;
 
 namespace Main.Application.Handlers.Purchases.CreatePurchase;
 
 [Transactional]
+[ExceptionType<UserNotFoundException>]
+[ExceptionType<CurrencyNotFoundException>]
+[ExceptionType<TransactionNotFoundExcpetion>]
+[ExceptionType<StorageNotFoundException>]
+[ExceptionType<ArticleNotFoundException>]
 public record CreatePurchaseCommand(
     IEnumerable<NewPurchaseContentDto> Content,
     int CurrencyId,
     string? Comment,
     Guid CreatedUserId,
-    string TransactionId,
+    Guid TransactionId,
     string StorageName,
     Guid SupplierId,
     DateTime PurchaseDateTime) : ICommand<CreatePurchaseResult>;
@@ -50,7 +60,8 @@ public class CreatePurchaseHandler(DbDataValidatorBase dbValidator,
             SupplierId = supplierId,
             PurchaseDatetime = request.PurchaseDateTime,
             PurchaseContents = purchaseContents,
-            TransactionId = transactionId
+            TransactionId = transactionId,
+            State = nameof(PurchaseState.Draft)
         };
         await unitOfWork.AddAsync(purchaseModel, cancellationToken);
         await unitOfWork.SaveChangesAsync(cancellationToken);
@@ -58,7 +69,7 @@ public class CreatePurchaseHandler(DbDataValidatorBase dbValidator,
     }
 
     private async Task ValidateData(IEnumerable<Guid> userIds, int currencyId, string storageName,
-        string transactionId, IEnumerable<int> articleIds, CancellationToken cancellationToken = default)
+        Guid transactionId, IEnumerable<int> articleIds, CancellationToken cancellationToken = default)
     {
         var plan = new ValidationPlan()
             .EnsureUserExists(userIds)

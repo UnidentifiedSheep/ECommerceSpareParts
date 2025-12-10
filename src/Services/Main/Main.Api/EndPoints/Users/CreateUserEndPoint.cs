@@ -1,5 +1,6 @@
 using Api.Common.Extensions;
 using Carter;
+using Exceptions.Exceptions.Users;
 using Main.Application.Handlers.Users.CreateUser;
 using Main.Core.Dtos.Emails;
 using Main.Core.Dtos.Users;
@@ -28,6 +29,7 @@ public class CreateUserEndPoint : ICarterModule
             }).WithTags("Users")
             .WithDescription("Создание пользователя")
             .WithDisplayName("Создание пользователя")
+            .Produces<EmailAlreadyTakenException>(409)
             .RequireAnyPermission("USERS.CREATE");
     }
 }

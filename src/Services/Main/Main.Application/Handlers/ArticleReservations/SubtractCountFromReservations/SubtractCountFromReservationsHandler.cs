@@ -1,6 +1,7 @@
 using Application.Common.Interfaces;
 using Core.Attributes;
 using Core.Interfaces.Services;
+using Exceptions.Exceptions.Users;
 using Main.Application.Extensions;
 using Main.Application.Validation;
 using Main.Core.Abstractions;
@@ -9,6 +10,7 @@ using Main.Core.Interfaces.DbRepositories;
 namespace Main.Application.Handlers.ArticleReservations.SubtractCountFromReservations;
 
 [Transactional]
+[ExceptionType<UserNotFoundException>]
 public record SubtractCountFromReservationsCommand(Guid UserId, Guid WhoUpdated, Dictionary<int, int> Contents)
     : ICommand<SubtractCountFromReservationsResult>;
 

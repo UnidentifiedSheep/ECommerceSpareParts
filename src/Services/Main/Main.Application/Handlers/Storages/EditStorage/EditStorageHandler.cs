@@ -1,4 +1,5 @@
 using Application.Common.Interfaces;
+using Core.Attributes;
 using Core.Interfaces.Services;
 using Exceptions.Exceptions.Storages;
 using Main.Core.Dtos.Amw.Storage;
@@ -8,6 +9,8 @@ using MediatR;
 
 namespace Main.Application.Handlers.Storages.EditStorage;
 
+[Transactional]
+[ExceptionType<StorageNotFoundException>]
 public record EditStorageCommand(string StorageName, PatchStorageDto EditStorage) : ICommand;
 
 public class EditStorageHandler(IStoragesRepository repository, IUnitOfWork unitOfWork)

@@ -1,6 +1,7 @@
 ﻿using System.Net;
 using System.Security.Cryptography;
 using Application.Common.Interfaces;
+using Core.Attributes;
 using Core.Interfaces;
 using Core.Interfaces.Services;
 using Core.Interfaces.Validators;
@@ -14,6 +15,8 @@ using Mapster;
 
 namespace Main.Application.Handlers.Auth.Login;
 
+[Transactional]
+[ExceptionType<WrongCredentialsException>]
 public record LoginCommand(string Email, string Password, IPAddress? IpAddress, string? UserAgent)
     : ICommand<LoginResult>;
 

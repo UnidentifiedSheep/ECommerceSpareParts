@@ -1,4 +1,5 @@
 ﻿using Application.Common.Interfaces;
+using Core.Attributes;
 using Core.Interfaces;
 using Core.Interfaces.Services;
 using Core.Models;
@@ -10,6 +11,8 @@ using Mapster;
 
 namespace Main.Application.Handlers.Auth.RefreshToken;
 
+[Transactional]
+[ExceptionType<InvalidCastException>]
 public record RefreshTokenCommand(string RefreshToken, string DeviceId) : ICommand<RefreshTokenResult>;
 
 public record RefreshTokenResult(string Token, string RefreshToken);

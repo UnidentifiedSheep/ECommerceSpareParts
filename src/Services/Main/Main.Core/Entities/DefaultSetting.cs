@@ -1,6 +1,6 @@
 ﻿namespace Main.Core.Entities;
 
-public class DefaultSetting
+public partial class DefaultSetting
 {
     public string Key { get; set; } = null!;
 

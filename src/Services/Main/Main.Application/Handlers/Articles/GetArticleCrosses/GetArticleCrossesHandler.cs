@@ -1,4 +1,5 @@
 using Application.Common.Interfaces;
+using Core.Attributes;
 using Core.Models;
 using Core.StaticFunctions;
 using Exceptions.Exceptions.Articles;
@@ -8,6 +9,7 @@ using Mapster;
 
 namespace Main.Application.Handlers.Articles.GetArticleCrosses;
 
+[ExceptionType<ArticleNotFoundException>]
 public record GetArticleCrossesQuery<TDto>(int ArticleId, PaginationModel Pagination, string? SortBy, string? UserId)
     : IQuery<GetArticleCrossesResult<TDto>>, ICacheableQuery
 {

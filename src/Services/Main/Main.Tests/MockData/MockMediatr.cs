@@ -92,7 +92,7 @@ public static class MockMediatr
 
     public static async Task AddMockSale(this IMediator mediator, IEnumerable<StorageContent> storageContents,
         int currencyId,
-        Guid userId, string transactionId, string storageName, DateTime? when = null)
+        Guid userId, Guid transactionId, string storageName, DateTime? when = null)
     {
         var saleContent = new List<NewSaleContentDto>();
         var storageContentValues = new List<PrevAndNewValue<StorageContent>>();

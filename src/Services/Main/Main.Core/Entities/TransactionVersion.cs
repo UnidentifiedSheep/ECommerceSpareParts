@@ -1,10 +1,10 @@
 ﻿namespace Main.Core.Entities;
 
-public class TransactionVersion
+public partial class TransactionVersion
 {
     public string Id { get; set; } = null!;
 
-    public string TransactionId { get; set; } = null!;
+    public Guid TransactionId { get; set; }
 
     public int CurrencyId { get; set; }
 

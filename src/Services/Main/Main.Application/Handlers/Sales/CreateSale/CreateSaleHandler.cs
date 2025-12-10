@@ -2,11 +2,17 @@ using System.Data;
 using Application.Common.Interfaces;
 using Core.Attributes;
 using Core.Interfaces.Services;
+using Exceptions.Exceptions.Articles;
+using Exceptions.Exceptions.Balances;
+using Exceptions.Exceptions.Currencies;
+using Exceptions.Exceptions.Storages;
+using Exceptions.Exceptions.Users;
 using Main.Application.Extensions;
 using Main.Application.Validation;
 using Main.Core.Abstractions;
 using Main.Core.Dtos.Amw.Sales;
 using Main.Core.Entities;
+using Main.Core.Enums;
 using Main.Core.Interfaces.Services;
 using Main.Core.Models;
 using Mapster;
@@ -14,13 +20,18 @@ using Mapster;
 namespace Main.Application.Handlers.Sales.CreateSale;
 
 [Transactional(IsolationLevel.Serializable, 20, 2)]
+[ExceptionType<TransactionNotFoundExcpetion>]
+[ExceptionType<ArticleNotFoundException>]
+[ExceptionType<CurrencyNotFoundException>]
+[ExceptionType<UserNotFoundException>]
+[ExceptionType<StorageNotFoundException>]
 public record CreateSaleCommand(
     IEnumerable<NewSaleContentDto> SellContent,
     IEnumerable<PrevAndNewValue<StorageContent>> StorageContentValues,
     int CurrencyId,
     Guid BuyerId,
     Guid CreatedUserId,
-    string TransactionId,
+    Guid TransactionId,
     string MainStorage,
     DateTime SaleDateTime,
     string? Comment) : ICommand<CreateSaleResult>;
@@ -71,7 +82,8 @@ public class CreateSaleHandler(
             Comment = request.Comment,
             SaleContents = saleContents,
             CurrencyId = currencyId,
-            MainStorageName = mainStorage
+            MainStorageName = mainStorage,
+            State = nameof(SaleState.Draft)
         };
 
         await unitOfWork.AddAsync(saleModel, cancellationToken);
@@ -109,7 +121,7 @@ public class CreateSaleHandler(
             throw new ArgumentException($"Недостаточно деталей для артикула {articleId}");
     }
 
-    private async Task ValidateData(string transactionId, IEnumerable<int> articleIds, int currencyId, Guid buyerId,
+    private async Task ValidateData(Guid transactionId, IEnumerable<int> articleIds, int currencyId, Guid buyerId,
         Guid createdUserId, string storageName, CancellationToken cancellationToken = default)
     {
         var plan = new ValidationPlan()

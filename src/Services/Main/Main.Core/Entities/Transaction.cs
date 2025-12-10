@@ -1,8 +1,8 @@
 ﻿namespace Main.Core.Entities;
 
-public class Transaction
+public partial class Transaction
 {
-    public string Id { get; set; } = null!;
+    public Guid Id { get; set; }
 
     public int CurrencyId { get; set; }
 

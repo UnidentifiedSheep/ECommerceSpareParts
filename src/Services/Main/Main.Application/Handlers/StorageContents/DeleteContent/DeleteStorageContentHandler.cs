@@ -19,6 +19,8 @@ using MediatR;
 namespace Main.Application.Handlers.StorageContents.DeleteContent;
 
 [Transactional(IsolationLevel.Serializable, 20, 2)]
+[ExceptionType<StorageContentNotFoundException>]
+[ExceptionType<ConcurrencyCodeMismatchException>]
 public record DeleteStorageContentCommand(int ContentId, string ConcurrencyCode, Guid UserId) : ICommand;
 
 public class DeleteStorageContentHandler(

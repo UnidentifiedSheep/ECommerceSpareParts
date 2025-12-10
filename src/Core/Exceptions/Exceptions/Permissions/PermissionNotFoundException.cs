@@ -1,6 +1,13 @@
-﻿using Exceptions.Base;
+﻿using Core.Attributes;
+using Exceptions.Base;
 
 namespace Exceptions.Exceptions.Permissions;
 
-public class PermissionNotFoundException(string name) : 
-    NotFoundException("Не удалось найти разрешение", new { Name = name }) { }
+public class PermissionNotFoundException : 
+    NotFoundException
+{
+    [ExampleExceptionValues(false, "EXAMPLE_PERMISSION")]
+    public PermissionNotFoundException(string name) : base("Не удалось найти разрешение", new { Name = name })
+    {
+    }
+}

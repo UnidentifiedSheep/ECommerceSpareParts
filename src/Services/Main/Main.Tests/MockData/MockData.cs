@@ -155,7 +155,7 @@ public static class MockData
         return tr;
     }
 
-    public static Sale CreateSale(string transactionId, Guid buyerId, Guid whoMade, string storageName, int currencyId)
+    public static Sale CreateSale(Guid transactionId, Guid buyerId, Guid whoMade, string storageName, int currencyId)
     {
         var f = new Faker<Sale>(Locale)
             .RuleFor(x => x.Comment, f => f.Random.Int(1, 100) < 50 ? f.Lorem.Letter(100) : null)

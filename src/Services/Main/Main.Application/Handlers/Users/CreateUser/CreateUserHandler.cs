@@ -1,19 +1,23 @@
 using Application.Common.Interfaces;
 using Core.Attributes;
-using Core.Extensions;
 using Core.Interfaces.Services;
 using Core.Interfaces.Validators;
+using Exceptions.Exceptions.Roles;
 using Exceptions.Exceptions.Users;
 using Main.Application.Extensions;
 using Main.Core.Dtos.Emails;
 using Main.Core.Dtos.Users;
 using Main.Core.Entities;
+using Main.Core.Extensions;
 using Main.Core.Interfaces.DbRepositories;
 using Mapster;
 
 namespace Main.Application.Handlers.Users.CreateUser;
 
 [Transactional]
+[ExceptionType<RoleNotFoundException>]
+[ExceptionType<UserNameAlreadyTakenException>]
+[ExceptionType<EmailAlreadyTakenException>]
 public record CreateUserCommand(
     string UserName,
     string Password,

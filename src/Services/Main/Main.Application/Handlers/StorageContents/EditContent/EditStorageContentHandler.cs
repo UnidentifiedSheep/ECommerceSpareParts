@@ -4,6 +4,8 @@ using Core.Attributes;
 using Core.Interfaces;
 using Core.Interfaces.Services;
 using Exceptions.Base;
+using Exceptions.Exceptions.Currencies;
+using Exceptions.Exceptions.Users;
 using Main.Application.Extensions;
 using Main.Application.Notifications;
 using Main.Application.Validation;
@@ -19,6 +21,9 @@ using MediatR;
 namespace Main.Application.Handlers.StorageContents.EditContent;
 
 [Transactional(IsolationLevel.Serializable, 20, 2)]
+[ExceptionType<CurrencyNotFoundException>]
+[ExceptionType<UserNotFoundException>]
+[ExceptionType<ConcurrencyCodeMismatchException>]
 public record EditStorageContentCommand(
     Dictionary<int, ModelWithCode<PatchStorageContentDto, string>> EditedFields,
     Guid UserId) : ICommand;

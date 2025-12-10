@@ -62,7 +62,7 @@ public class DeleteTransactionTest : IAsyncLifetime
     [Fact]
     public async Task DeleteTransaction_EmptyTransactionId_FailsValidation()
     {
-        var command = new DeleteTransactionCommand("  ", _mockUser.Id);
+        var command = new DeleteTransactionCommand(Guid.Empty, _mockUser.Id);
         await Assert.ThrowsAsync<ValidationException>(async () => await _mediator.Send(command));
     }
 

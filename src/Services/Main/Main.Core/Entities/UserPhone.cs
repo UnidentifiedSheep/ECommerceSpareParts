@@ -1,6 +1,6 @@
 ﻿namespace Main.Core.Entities;
 
-public class UserPhone
+public partial class UserPhone
 {
     public Guid Id { get; set; }
 

@@ -1,4 +1,5 @@
 using Application.Common.Interfaces;
+using Core.Attributes;
 using Core.Interfaces.Services;
 using Exceptions.Exceptions.ArticleCharacteristics;
 using Main.Core.Interfaces.DbRepositories;
@@ -6,6 +7,8 @@ using MediatR;
 
 namespace Main.Application.Handlers.ArticleCharacteristics.DeleteCharacteristics;
 
+[Transactional]
+[ExceptionType<ArticleCharacteristicsNotFoundException>]
 public record DeleteCharacteristicsCommand(int Id) : ICommand;
 
 public class DeleteCharacteristicsHandler(

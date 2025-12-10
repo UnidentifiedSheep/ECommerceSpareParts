@@ -62,7 +62,7 @@ public class CreateFullPurchaseHandler(IMediator mediator) : ICommandHandler<Cre
     }
 
     private async Task CreatePurchase(List<NewPurchaseContentDto> content, int currencyId, string? comment,
-        Guid supplierId, Guid whoCreated, string transactionId, string storageName, DateTime dateTime,
+        Guid supplierId, Guid whoCreated, Guid transactionId, string storageName, DateTime dateTime,
         CancellationToken cancellationToken = default)
     {
         var command = new CreatePurchaseCommand(content, currencyId, comment, whoCreated, transactionId, storageName,

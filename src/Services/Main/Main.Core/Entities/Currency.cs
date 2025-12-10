@@ -1,6 +1,6 @@
 ﻿namespace Main.Core.Entities;
 
-public class Currency
+public partial class Currency
 {
     public int Id { get; set; }
 
@@ -12,8 +12,7 @@ public class Currency
 
     public string Code { get; set; } = null!;
 
-    public virtual ICollection<ArticleSupplierBuyInfo> ArticleSupplierBuyInfos { get; set; } =
-        new List<ArticleSupplierBuyInfo>();
+    public virtual ICollection<ArticleSupplierBuyInfo> ArticleSupplierBuyInfos { get; set; } = new List<ArticleSupplierBuyInfo>();
 
     public virtual ICollection<CurrencyHistory> CurrencyHistories { get; set; } = new List<CurrencyHistory>();
 
@@ -27,8 +26,7 @@ public class Currency
 
     public virtual ICollection<Sale> Sales { get; set; } = new List<Sale>();
 
-    public virtual ICollection<StorageContentReservation> StorageContentReservations { get; set; } =
-        new List<StorageContentReservation>();
+    public virtual ICollection<StorageContentReservation> StorageContentReservations { get; set; } = new List<StorageContentReservation>();
 
     public virtual ICollection<StorageContent> StorageContents { get; set; } = new List<StorageContent>();
 

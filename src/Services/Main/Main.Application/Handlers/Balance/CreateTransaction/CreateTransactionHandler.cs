@@ -3,6 +3,8 @@ using Application.Common.Interfaces;
 using Core.Attributes;
 using Core.Interfaces.Services;
 using Exceptions.Exceptions.Balances;
+using Exceptions.Exceptions.Currencies;
+using Exceptions.Exceptions.Users;
 using Main.Application.Extensions;
 using Main.Application.Validation;
 using Main.Core.Abstractions;
@@ -14,6 +16,8 @@ using Main.Core.Interfaces.Services;
 namespace Main.Application.Handlers.Balance.CreateTransaction;
 
 [Transactional(IsolationLevel.Serializable, 20, 3)]
+[ExceptionType<CurrencyNotFoundException>]
+[ExceptionType<UserNotFoundException>]
 public record CreateTransactionCommand(
     Guid SenderId,
     Guid ReceiverId,
@@ -41,7 +45,7 @@ public class CreateTransactionHandler(
         var currencyId = request.CurrencyId;
         var transactionDateTime = request.TransactionDateTime;
 
-        await EnsureNeededDataExists(senderId, receiverId, whoCreatedTransaction, transactionDateTime, currencyId,
+        await EnsureNeededDataExists(senderId, receiverId, whoCreatedTransaction, currencyId,
             cancellationToken);
 
         var prevSenderTransaction = await balanceRepository.GetPreviousTransactionAsync(transactionDateTime, senderId,
@@ -62,11 +66,8 @@ public class CreateTransactionHandler(
     }
 
     private async Task EnsureNeededDataExists(Guid senderId, Guid receiverId, Guid whoCreatedTransaction,
-        DateTime transactionDateTime,
         int currencyId, CancellationToken cancellationToken = default)
     {
-        if (await balanceRepository.TransactionExistsAsync(senderId, receiverId, transactionDateTime, null, cancellationToken))
-            throw new SameTransactionExists();
         var plan = new ValidationPlan()
             .EnsureCurrencyExists(currencyId)
             .EnsureUserExists([senderId, receiverId, whoCreatedTransaction]);

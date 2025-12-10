@@ -62,7 +62,7 @@ public class CreateMarkupHandler(DbDataValidatorBase dbValidator, IUnitOfWork un
         {
             var markupModel = new MarkupModel((double)range.Markup);
 
-            //Check if we can build interval map with this data
+            //Check if we can build an interval map with this data
             intervalMap.AddInterval(new Interval<MarkupModel>(range.RangeStart, range.RangeEnd, markupModel));
             markupRanges.Add(range.Adapt<MarkupRange>());
         }

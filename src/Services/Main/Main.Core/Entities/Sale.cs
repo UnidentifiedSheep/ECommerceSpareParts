@@ -1,6 +1,6 @@
 ﻿namespace Main.Core.Entities;
 
-public class Sale
+public partial class Sale
 {
     public string Id { get; set; } = null!;
 
@@ -18,11 +18,13 @@ public class Sale
 
     public int CurrencyId { get; set; }
 
-    public string TransactionId { get; set; } = null!;
+    public Guid TransactionId { get; set; }
 
     public Guid? UpdatedUserId { get; set; }
 
     public string MainStorageName { get; set; } = null!;
+
+    public string State { get; set; } = null!;
 
     public virtual User Buyer { get; set; } = null!;
 

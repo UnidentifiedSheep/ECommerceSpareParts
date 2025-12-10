@@ -10,7 +10,7 @@ namespace Main.Persistence.Repositories;
 
 public class BalanceRepository(DContext context) : IBalanceRepository
 {
-    public async Task<Transaction?> GetTransactionByIdAsync(string id, bool track = true,
+    public async Task<Transaction?> GetTransactionByIdAsync(Guid id, bool track = true,
         CancellationToken ct = default)
     {
         return await context.Transactions
@@ -19,20 +19,12 @@ public class BalanceRepository(DContext context) : IBalanceRepository
             .FirstOrDefaultAsync(ct);
     }
 
-    public async Task<bool> TransactionExistsAsync(Guid senderId, Guid receiverId, DateTime dt,
-        string? exceptId = null, CancellationToken ct = default)
-    {
-        return await context.Transactions.AsNoTracking()
-            .AnyAsync(x => x.SenderId == senderId && x.ReceiverId == receiverId &&
-                           x.TransactionDatetime == dt && (exceptId == null || x.Id != exceptId), ct);
-    }
-
     public async Task<Transaction?> GetPreviousTransactionAsync(DateTime dt, Guid userId, int currencyId,
         bool track = true, CancellationToken ct = default)
     {
         var sql = """
                       SELECT * FROM transactions
-                      WHERE transaction_datetime < @dt
+                      WHERE transaction_datetime <= @dt
                         AND (sender_id = @userId OR receiver_id = @userId)
                         AND currency_id = @currencyId
                       ORDER BY transaction_datetime DESC, id DESC
@@ -54,7 +46,7 @@ public class BalanceRepository(DContext context) : IBalanceRepository
     }
 
     public IAsyncEnumerable<Transaction> GetAffectedTransactions(Guid userId, int currencyId, DateTime dt,
-        string? excludeId = null, bool track = true)
+        Guid? excludeId = null, bool track = true)
     {
         var sql = excludeId is null
             ? """
@@ -96,6 +88,9 @@ public class BalanceRepository(DContext context) : IBalanceRepository
                 },
                 new NpgsqlParameter("@userId", userId),
                 new NpgsqlParameter("@excludeId", excludeId)
+                {
+                    NpgsqlDbType = NpgsqlDbType.Uuid
+                }
             };
 
         return context.Transactions.FromSqlRaw(sql, parameters)
@@ -121,7 +116,7 @@ public class BalanceRepository(DContext context) : IBalanceRepository
             .FirstOrDefaultAsync(ct);
     }
 
-    public async Task<TransactionVersion?> GetLastTransactionVersionAsync(string transactionId, bool track = true,
+    public async Task<TransactionVersion?> GetLastTransactionVersionAsync(Guid transactionId, bool track = true,
         CancellationToken ct = default)
     {
         return await context.TransactionVersions
@@ -159,21 +154,5 @@ public class BalanceRepository(DContext context) : IBalanceRepository
             .Take(viewCount);
 
         return await query.ToListAsync(ct);
-    }
-
-
-    public async Task<bool> TransactionExistsAsync(string transactionId, CancellationToken ct = default)
-    {
-        return await context.Transactions.AsNoTracking().AnyAsync(x => x.Id == transactionId, ct);
-    }
-
-    public async Task AddTransactionAsync(Transaction transaction, CancellationToken ct = default)
-    {
-        await context.Transactions.AddAsync(transaction, ct);
-    }
-
-    public Task SaveChangesAsync(CancellationToken ct = default)
-    {
-        return context.SaveChangesAsync(ct);
     }
 }

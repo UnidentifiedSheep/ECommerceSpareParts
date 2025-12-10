@@ -4,6 +4,7 @@ using Core.Attributes;
 using Core.Interfaces;
 using Core.Interfaces.Services;
 using Exceptions.Base;
+using Exceptions.Exceptions.Storages;
 using Main.Application.Extensions;
 using Main.Application.Validation;
 using Main.Core.Abstractions;
@@ -17,6 +18,8 @@ using MediatR;
 namespace Main.Application.Handlers.StorageContents.MoveContentToOtherStorage;
 
 [Transactional(IsolationLevel.ReadCommitted, 0, 2)]
+[ExceptionType<StorageNotFoundException>]
+[ExceptionType<ConcurrencyCodeMismatchException>]
 public record MoveContentToOtherStorageCommand(IEnumerable<MoveStorageContentDto> Movements, Guid MovedBy) : ICommand;
 
 public class MoveContentToOtherStorageHandler(IStorageContentService storageContentService, 

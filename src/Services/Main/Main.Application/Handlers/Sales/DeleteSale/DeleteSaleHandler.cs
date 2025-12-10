@@ -8,6 +8,7 @@ using Main.Core.Interfaces.DbRepositories;
 namespace Main.Application.Handlers.Sales.DeleteSale;
 
 [Transactional]
+[ExceptionType<SaleNotFoundException>]
 public record DeleteSaleCommand(string SaleId) : ICommand<DeleteSaleResult>;
 
 public record DeleteSaleResult(Sale Sale);

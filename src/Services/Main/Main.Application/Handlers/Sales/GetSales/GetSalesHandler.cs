@@ -1,5 +1,8 @@
 using Application.Common.Interfaces;
+using Core.Attributes;
 using Core.Models;
+using Exceptions.Exceptions.Currencies;
+using Exceptions.Exceptions.Users;
 using Main.Application.Extensions;
 using Main.Application.Validation;
 using Main.Core.Abstractions;
@@ -9,6 +12,8 @@ using Mapster;
 
 namespace Main.Application.Handlers.Sales.GetSales;
 
+[ExceptionType<UserNotFoundException>]
+[ExceptionType<CurrencyNotFoundException>]
 public record GetSalesQuery(
     DateTime RangeStartDate,
     DateTime RangeEndDate,

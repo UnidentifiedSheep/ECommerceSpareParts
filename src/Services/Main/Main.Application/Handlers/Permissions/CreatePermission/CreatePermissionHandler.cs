@@ -1,15 +1,16 @@
 ﻿using Application.Common.Interfaces;
 using Core.Attributes;
-using Core.Extensions;
 using Core.Interfaces.Services;
 using Exceptions.Exceptions.Permissions;
 using Main.Application.Validation;
 using Main.Core.Abstractions;
 using Main.Core.Entities;
+using Main.Core.Extensions;
 
 namespace Main.Application.Handlers.Permissions.CreatePermission;
 
 [Transactional]
+[ExceptionType<PermissionAlreadyExistsException>]
 public record CreatePermissionCommand(string Name, string? Description) : ICommand<CreatePermissionResult>;
 public record CreatePermissionResult(string Name);
 

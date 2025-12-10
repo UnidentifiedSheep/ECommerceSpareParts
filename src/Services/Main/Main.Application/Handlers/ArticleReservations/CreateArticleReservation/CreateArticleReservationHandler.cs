@@ -16,8 +16,10 @@ using MediatR;
 namespace Main.Application.Handlers.ArticleReservations.CreateArticleReservation;
 
 [Transactional]
-public record CreateArticleReservationCommand(List<NewArticleReservationDto> Reservations, Guid WhoCreated)
-    : ICommand;
+[ExceptionType<CurrencyNotFoundException>]
+[ExceptionType<UserNotFoundException>]
+[ExceptionType<ArticleNotFoundException>]
+public record CreateArticleReservationCommand(List<NewArticleReservationDto> Reservations, Guid WhoCreated) : ICommand;
 
 public class CreateArticleReservationHandler(
     DbDataValidatorBase dbValidator,

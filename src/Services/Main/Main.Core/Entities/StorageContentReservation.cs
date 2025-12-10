@@ -1,7 +1,9 @@
 ﻿namespace Main.Core.Entities;
 
-public class StorageContentReservation
+public partial class StorageContentReservation
 {
+    public int Id { get; set; }
+
     public Guid UserId { get; set; }
 
     public int ArticleId { get; set; }
@@ -21,8 +23,6 @@ public class StorageContentReservation
     public bool IsDone { get; set; }
 
     public string? Comment { get; set; }
-
-    public int Id { get; set; }
 
     public Guid WhoCreated { get; set; }
 

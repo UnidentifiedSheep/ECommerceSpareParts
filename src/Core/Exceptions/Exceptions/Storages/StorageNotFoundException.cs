@@ -1,14 +1,12 @@
 using Exceptions.Base;
+using Core.Attributes;
 
 namespace Exceptions.Exceptions.Storages;
 
 public class StorageNotFoundException : NotFoundException
 {
+    [ExampleExceptionValues(false,"exampleStorage")]
     public StorageNotFoundException(string name) : base("Склад не найден", new { Name = name })
-    {
-    }
-
-    public StorageNotFoundException(IEnumerable<string> names) : base("Не удалось найти склады", new { Names = names })
     {
     }
 }

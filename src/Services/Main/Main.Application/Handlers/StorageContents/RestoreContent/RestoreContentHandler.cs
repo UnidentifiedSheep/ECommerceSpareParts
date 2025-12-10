@@ -3,6 +3,9 @@ using Application.Common.Interfaces;
 using Core.Attributes;
 using Core.Interfaces;
 using Core.Interfaces.Services;
+using Exceptions.Exceptions.Articles;
+using Exceptions.Exceptions.Currencies;
+using Exceptions.Exceptions.Storages;
 using Main.Application.Extensions;
 using Main.Application.Notifications;
 using Main.Application.Validation;
@@ -17,6 +20,9 @@ using MediatR;
 namespace Main.Application.Handlers.StorageContents.RestoreContent;
 
 [Transactional(IsolationLevel.Serializable, 20, 2)]
+[ExceptionType<CurrencyNotFoundException>]
+[ExceptionType<StorageNotFoundException>]
+[ExceptionType<ArticleNotFoundException>]
 public record RestoreContentCommand(
     IEnumerable<RestoreContentItem> ContentDetails,
     StorageMovementType MovementType,

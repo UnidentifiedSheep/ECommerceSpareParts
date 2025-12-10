@@ -1,16 +1,18 @@
 ﻿using Application.Common.Interfaces;
 using Core.Attributes;
-using Core.Extensions;
 using Core.Interfaces.Services;
 using Exceptions.Exceptions.Permissions;
 using Exceptions.Exceptions.Roles;
 using Main.Core.Entities;
+using Main.Core.Extensions;
 using Main.Core.Interfaces.DbRepositories;
 using MediatR;
 
 namespace Main.Application.Handlers.Roles.AddPermissionToRole;
 
 [Transactional]
+[ExceptionType<RoleNotFoundException>]
+[ExceptionType<PermissionNotFoundException>]
 public record AddPermissionToRoleCommand(Guid RoleId, string PermissionName) : ICommand;
 
 public class AddPermissionToRoleHandler(IUnitOfWork unitOfWork, 

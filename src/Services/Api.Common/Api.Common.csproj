@@ -37,6 +37,8 @@
 
     <ItemGroup>
         <ProjectReference Include="..\..\Core\Core\Core.csproj"/>
+        <ProjectReference Include="..\..\Core\Exceptions\Exceptions.csproj" />
+        <ProjectReference Include="..\Application.Common\Application.Common.csproj" />
     </ItemGroup>
 
 </Project>

@@ -1,4 +1,5 @@
 using Application.Common.Interfaces;
+using Core.Attributes;
 using Core.Interfaces.Services;
 using Exceptions.Exceptions.Storages;
 using Main.Core.Interfaces.DbRepositories;
@@ -6,6 +7,8 @@ using MediatR;
 
 namespace Main.Application.Handlers.Storages.DeleteStorage;
 
+[Transactional]
+[ExceptionType<StorageNotFoundException>]
 public record DeleteStorageCommand(string StorageName) : ICommand;
 
 public class DeleteStorageHandler(IStoragesRepository storagesRepository, IUnitOfWork unitOfWork)

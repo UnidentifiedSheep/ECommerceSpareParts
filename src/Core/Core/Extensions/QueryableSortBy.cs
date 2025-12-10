@@ -1,5 +1,4 @@
 ﻿using System.Linq.Expressions;
-using Exceptions.Exceptions;
 
 namespace Core.Extensions;
 
@@ -28,7 +27,7 @@ public static class QueryableSortBy
         var objectKeySelector = Expression.Lambda<Func<TSource, object>>(
             Expression.Convert(keySelector.Body, typeof(object)), keySelector.Parameters);
         var added = primary.TryAdd(source, objectKeySelector);
-        if (!added) throw new MappingAlreadyExists($"{source}|{type}");
+        if (!added) throw new ArgumentException($"{source}|{type} Already Exists");
         return src;
     }
 
@@ -40,7 +39,7 @@ public static class QueryableSortBy
         var objectKeySelector = Expression.Lambda<Func<TSource, object>>(
             Expression.Convert(keySelector.Body, typeof(object)), keySelector.Parameters);
         var added = primary.TryAdd("DEFAULT", objectKeySelector);
-        if (!added) throw new MappingAlreadyExists($"DEFAULT|{type}");
+        if (!added) throw new ArgumentException($"DEFAULT|{type} Already Exists");
         return src;
     }
 
@@ -49,10 +48,10 @@ public static class QueryableSortBy
         source = source.ToLowerInvariant();
         var type = typeof(TEntity);
         var primaryExists = MapDictionary.TryGetValue(type, out var primary);
-        if (!primaryExists) throw new MappingDoesntExists(type);
+        if (!primaryExists) throw new ArgumentException($"{type} mapping not exists");
         var valueExists = primary!.TryGetValue(source, out var value);
         if (!valueExists) primary.TryGetValue("DEFAULT", out value);
-        if (value == null) throw new MappingDoesntExists(type);
+        if (value == null) throw new ArgumentException($"{type} mapping not exists");
         return (Expression<Func<TEntity, object>>)value;
     }
 
@@ -61,7 +60,7 @@ public static class QueryableSortBy
         source = source.ToLowerInvariant();
         var type = typeof(TEntity);
         var primaryExists = MapDictionary.TryGetValue(type, out var primary);
-        if (!primaryExists) throw new MappingDoesntExists(type);
+        if (!primaryExists) throw new ArgumentException($"{type} mapping not exists");
         primary!.TryGetValue(source, out var value);
         return (Expression<Func<TEntity, object>>?)value;
     }

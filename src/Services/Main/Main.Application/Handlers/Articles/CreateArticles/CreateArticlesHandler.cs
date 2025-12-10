@@ -1,6 +1,7 @@
 ﻿using Application.Common.Interfaces;
 using Core.Attributes;
 using Core.Interfaces.Services;
+using Exceptions.Exceptions.Producers;
 using Main.Application.Extensions;
 using Main.Application.Validation;
 using Main.Core.Abstractions;
@@ -12,6 +13,7 @@ using MediatR;
 namespace Main.Application.Handlers.Articles.CreateArticles;
 
 [Transactional]
+[ExceptionType<ProducerNotFoundException>]
 public record CreateArticlesCommand(List<CreateArticleDto> NewArticles) : ICommand<CreateArticlesResult>;
 public record CreateArticlesResult(List<int> CreatedIds);
 

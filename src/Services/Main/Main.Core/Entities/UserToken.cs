@@ -2,7 +2,7 @@
 
 namespace Main.Core.Entities;
 
-public class UserToken
+public partial class UserToken
 {
     public Guid Id { get; set; }
 

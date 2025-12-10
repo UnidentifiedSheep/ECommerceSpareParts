@@ -11,13 +11,11 @@ using MediatR;
 namespace Main.Application.Handlers.Articles.MakeLinkageBetweenArticles;
 
 [Transactional]
+[ExceptionType<ArticleNotFoundException>]
 public record MakeLinkageBetweenArticlesCommand(List<NewArticleLinkageDto> Linkages) : ICommand<Unit>;
 
-public class MakeLinkageBetweenArticlesHandler(
-    IMediator mediator,
-    IArticlesRepository articlesRepository,
-    IUnitOfWork unitOfWork)
-    : ICommandHandler<MakeLinkageBetweenArticlesCommand, Unit>
+public class MakeLinkageBetweenArticlesHandler(IMediator mediator, IArticlesRepository articlesRepository,
+    IUnitOfWork unitOfWork) : ICommandHandler<MakeLinkageBetweenArticlesCommand, Unit>
 {
     public async Task<Unit> Handle(MakeLinkageBetweenArticlesCommand request, CancellationToken cancellationToken)
     {

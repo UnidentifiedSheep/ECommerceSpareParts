@@ -1,10 +1,10 @@
 ﻿namespace Main.Core.Entities;
 
-public class ArticleImage
+public partial class ArticleImage
 {
-    public int ArticleId { get; set; }
-
     public string Path { get; set; } = null!;
+
+    public int ArticleId { get; set; }
 
     public string? Description { get; set; }
 

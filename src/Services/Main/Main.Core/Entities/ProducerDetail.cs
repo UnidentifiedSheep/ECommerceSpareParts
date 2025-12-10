@@ -1,6 +1,6 @@
 ﻿namespace Main.Core.Entities;
 
-public class ProducerDetail
+public partial class ProducerDetail
 {
     public int Id { get; set; }
 

@@ -13,7 +13,7 @@ public class CreatePermissionValidation : AbstractValidator<CreatePermissionComm
             .WithMessage("Максимальная длина 'разрешения' 128 символа");
 
         RuleFor(x => x.Description)
-            .Must(x => x.Trim().Length <= 256)
+            .Must(x => x?.Trim().Length <= 256)
             .WithMessage("Максимальная длина описания 256 символа");
     }
 }

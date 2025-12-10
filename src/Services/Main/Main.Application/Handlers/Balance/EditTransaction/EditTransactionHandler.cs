@@ -13,8 +13,10 @@ using MediatR;
 namespace Main.Application.Handlers.Balance.EditTransaction;
 
 [Transactional(IsolationLevel.Serializable, 20, 3)]
+[ExceptionType<TransactionNotFoundExcpetion>]
+[ExceptionType<EditingDeletedTransactionException>]
 public record EditTransactionCommand(
-    string TransactionId,
+    Guid TransactionId,
     int CurrencyId,
     decimal Amount,
     TransactionStatus Status,
@@ -43,22 +45,9 @@ public class EditTransactionHandler(
     private async Task<Transaction> GetAndValidateTransactionAsync(EditTransactionCommand request, CancellationToken ct)
     {
         var transaction = await balanceRepository.GetTransactionByIdAsync(request.TransactionId, true, ct)
-                          ?? throw new TransactionNotFound(request.TransactionId);
+                          ?? throw new TransactionNotFoundExcpetion(request.TransactionId);
 
-        if (transaction.IsDeleted)
-            throw new EditingDeletedTransactionException(request.TransactionId);
-
-        var sameTransactionExists = await balanceRepository.TransactionExistsAsync(
-            transaction.SenderId,
-            transaction.ReceiverId,
-            request.TransactionDateTime,
-            request.TransactionId,
-            ct);
-
-        if (sameTransactionExists)
-            throw new SameTransactionExists();
-
-        return transaction;
+        return transaction.IsDeleted ? throw new EditingDeletedTransactionException(request.TransactionId) : transaction;
     }
 
     private async Task CreateTransactionVersionAsync(Transaction transaction, CancellationToken ct)

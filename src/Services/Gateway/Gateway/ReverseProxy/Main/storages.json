@@ -80,6 +80,16 @@
         "Transforms": [
           { "PathRemovePrefix": "/main" }
         ]
+      },
+      "get-storage-by-name": {
+        "ClusterId": "main-cluster",
+        "Match": {
+          "Path": "/main/storages/{name}",
+          "Methods": [ "GET" ]
+        },
+        "Transforms": [
+          { "PathRemovePrefix": "/main" }
+        ]
       }
     }
   }

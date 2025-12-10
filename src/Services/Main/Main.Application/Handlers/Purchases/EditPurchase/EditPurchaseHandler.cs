@@ -1,7 +1,9 @@
 using Application.Common.Interfaces;
 using Core.Attributes;
 using Core.Interfaces.Services;
+using Exceptions.Exceptions.Currencies;
 using Exceptions.Exceptions.Purchase;
+using Exceptions.Exceptions.Users;
 using Main.Application.Extensions;
 using Main.Application.Validation;
 using Main.Core.Abstractions;
@@ -13,6 +15,11 @@ using Mapster;
 namespace Main.Application.Handlers.Purchases.EditPurchase;
 
 [Transactional]
+[ExceptionType<CurrencyNotFoundException>]
+[ExceptionType<UserNotFoundException>]
+[ExceptionType<PurchaseNotFoundException>]
+[ExceptionType<PurchaseContentNotFoundException>]
+[ExceptionType<ArticleDoesntMatchContentException>]
 public record EditPurchaseCommand(
     IEnumerable<EditPurchaseDto> Content,
     string PurchaseId,

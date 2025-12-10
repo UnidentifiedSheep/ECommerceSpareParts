@@ -46,8 +46,7 @@ public class GetArticlesEndPoint : ICarterModule
             .WithDescription("Поиск артикула с начала номера")
             .ProducesProblem(StatusCodes.Status400BadRequest)
             .ProducesProblem(StatusCodes.Status404NotFound)
-            .WithSummary("Поиск артикула с начала номера")
-            .RequireAnyPermission("ARTICLES.GET.FULL", "ARTICLES.GET.MAIN");
+            .WithSummary("Поиск артикула с начала номера");
     }
 
     private async Task<IResult> GetAmw(ISender sender, GetArticleRequest request,

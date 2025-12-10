@@ -44,11 +44,6 @@ public class GetArticlesHandler<TDto>(IArticlesRepository articlesRepository) : 
                     request.SearchTerm, page, viewCount,
                     request.SortBy, request.ProducerIds, cancellationToken),
 
-            ArticleSearchStrategy.ByArticleOrName =>
-                await articlesRepository.GetArticlesByNameOrNumber(
-                    request.SearchTerm, page, viewCount,
-                    request.SortBy, request.ProducerIds, cancellationToken),
-
             _ => throw new ArgumentOutOfRangeException(nameof(request.Strategy), request.Strategy, null)
         };
 

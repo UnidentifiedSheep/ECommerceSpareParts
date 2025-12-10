@@ -25,6 +25,7 @@ using Main.Core.Dtos.Roles;
 using Main.Core.Dtos.Services.Articles;
 using Main.Core.Dtos.Users;
 using Main.Core.Entities;
+using Main.Core.Extensions;
 using Mapster;
 using AmwArticleFullDto = Main.Core.Dtos.Amw.Articles.ArticleFullDto;
 using MemberArticleFullDto = Main.Core.Dtos.Member.Articles.ArticleFullDto;
@@ -154,9 +155,9 @@ public static class MapsterConfig
             .Map(d => d.Value, s => s.Value.Value == null ? null : s.Value.Value.Trim());
 
         TypeAdapterConfig<CreateStorageCommand, Storage>.NewConfig()
-            .Map(d => d.Name, s => s.Name)
-            .Map(d => d.Description, s => s.Description)
-            .Map(d => d.Location, s => s.Location);
+            .Map(d => d.Name, s => s.Name.Trim())
+            .Map(d => d.Description, s => s.Description == null ? null : s.Description.Trim())
+            .Map(d => d.Location, s => s.Location == null ? null : s.Location.Trim());
 
         TypeAdapterConfig<PatchArticleDto, Article>.NewConfig()
             .IgnorePatchIfNotSet()
@@ -436,10 +437,6 @@ public static class MapsterConfig
             .Ignore(x => x.SaleContent)
             .Ignore(x => x.StorageNavigation);
         //User Search History
-
-        TypeAdapterConfig<Email, UserEmail>.NewConfig()
-            .Map(dest => dest.NormalizedEmail, src => src.NormalizedEmail)
-            .Map(dest => dest.Email, src => src.FullEmail);
 
         TypeAdapterConfig<SearchLogModel, UserSearchHistory>.NewConfig()
             .Map(dest => dest.UserId, src => src.UserId)

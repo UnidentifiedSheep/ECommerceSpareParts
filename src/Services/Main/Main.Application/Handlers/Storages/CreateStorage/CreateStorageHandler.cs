@@ -10,19 +10,22 @@ using MediatR;
 namespace Main.Application.Handlers.Storages.CreateStorage;
 
 [Transactional]
-public record CreateStorageCommand(string Name, string? Description, string? Location) : ICommand;
+[ExceptionType<StorageNotFoundException>]
+public record CreateStorageCommand(string Name, string? Description, string? Location) : ICommand<CreateStorageResult>;
+
+public record CreateStorageResult(string Name);
 
 public class CreateStorageHandler(
     IStoragesRepository repository,
-    IUnitOfWork unitOfWork) : ICommandHandler<CreateStorageCommand>
+    IUnitOfWork unitOfWork) : ICommandHandler<CreateStorageCommand, CreateStorageResult>
 {
-    public async Task<Unit> Handle(CreateStorageCommand request, CancellationToken cancellationToken)
+    public async Task<CreateStorageResult> Handle(CreateStorageCommand request, CancellationToken cancellationToken)
     {
         await ValidateData(request.Name, cancellationToken);
         var newStorage = request.Adapt<Storage>();
         await unitOfWork.AddAsync(newStorage, cancellationToken);
         await unitOfWork.SaveChangesAsync(cancellationToken);
-        return Unit.Value;
+        return new CreateStorageResult(newStorage.Name);
     }
 
     private async Task ValidateData(string name, CancellationToken cancellationToken = default)

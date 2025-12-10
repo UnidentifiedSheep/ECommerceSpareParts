@@ -166,8 +166,8 @@ public class CreateSaleTests : IAsyncLifetime
         };
 
         var command = new CreateSaleCommand(saleContent, storageContentValues, _currency.Id, _user.Id, _user.Id,
-            "non-existent-id", _storage.Name, DateTime.Now, null);
-        await Assert.ThrowsAsync<TransactionNotFound>(async () => await _mediator.Send(command));
+            Guid.Empty, _storage.Name, DateTime.Now, null);
+        await Assert.ThrowsAsync<TransactionNotFoundExcpetion>(async () => await _mediator.Send(command));
     }
 
     [Fact]

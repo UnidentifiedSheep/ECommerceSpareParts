@@ -7,6 +7,7 @@ using MediatR;
 namespace Main.Api.EndPoints.Storages;
 
 public record CreateStorageRequest(string Name, string? Description, string? Location);
+public record CreateStorageResponse(string Name);
 
 public class CreateStorageEndPoint : ICarterModule
 {
@@ -16,11 +17,14 @@ public class CreateStorageEndPoint : ICarterModule
                 async (ISender sender, CreateStorageRequest request, CancellationToken cancellationToken) =>
                 {
                     var command = request.Adapt<CreateStorageCommand>();
-                    await sender.Send(command, cancellationToken);
-                    return Results.Created();
+                    var result = await sender.Send(command, cancellationToken);
+                    var response = new CreateStorageResponse(result.Name);
+                    return Results.Created($"/storages/{response.Name}", response);
                 }).WithTags("Storages")
             .WithDescription("Создание нового склада")
             .WithDisplayName("Создать склад")
+            .Produces<CreateStorageResponse>(201)
+            .ProducesProblem(400)
             .RequireAnyPermission("STORAGES.CREATE");
     }
 }

@@ -10,6 +10,7 @@ using MediatR;
 namespace Main.Application.Handlers.Producers.EditProducer;
 
 [Transactional]
+[ExceptionType<ProducerNotFoundException>]
 public record EditProducerCommand(int ProducerId, PatchProducerDto EditProducer) : ICommand;
 
 public class EditProducerHandler(IProducerRepository producerRepository, IUnitOfWork unitOfWork)

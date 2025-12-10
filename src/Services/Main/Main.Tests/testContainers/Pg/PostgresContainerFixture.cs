@@ -7,7 +7,7 @@ namespace Tests.testContainers.Pg;
 public class PostgresContainerFixture : IAsyncLifetime
 {
     private readonly PostgreSqlContainer _postgresqlContainer = new PostgreSqlBuilder()
-        .WithImage("postgres:17-alpine")
+        .WithImage("postgres:latest")
         .Build();
 
     public string ConnectionString => _postgresqlContainer.GetConnectionString();

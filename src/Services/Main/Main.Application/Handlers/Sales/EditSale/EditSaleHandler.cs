@@ -1,7 +1,9 @@
 using Application.Common.Interfaces;
 using Core.Attributes;
 using Core.Interfaces.Services;
+using Exceptions.Exceptions.Currencies;
 using Exceptions.Exceptions.Sales;
+using Exceptions.Exceptions.Users;
 using Main.Application.Extensions;
 using Main.Application.Validation;
 using Main.Core.Abstractions;
@@ -17,6 +19,10 @@ using MediatR;
 namespace Main.Application.Handlers.Sales.EditSale;
 
 [Transactional]
+[ExceptionType<CurrencyNotFoundException>]
+[ExceptionType<UserNotFoundException>]
+[ExceptionType<SaleNotFoundException>]
+[ExceptionType<SaleContentNotFoundException>]
 public record EditSaleCommand(
     IEnumerable<EditSaleContentDto> EditedContent,
     IEnumerable<PrevAndNewValue<StorageContent>> StorageContentValues,

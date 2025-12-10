@@ -256,16 +256,15 @@ public class EditTransactionTests : IAsyncLifetime
         var command = new EditTransactionCommand(transaction.Id, transaction.CurrencyId, 123.45m,
             TransactionStatus.Normal, DateTime.Now);
 
-        await Assert.ThrowsAsync<TransactionNotFound>(async () => await _mediator.Send(command));
+        await Assert.ThrowsAsync<TransactionNotFoundExcpetion>(async () => await _mediator.Send(command));
     }
 
     [Fact]
     public async Task EditTransaction_WithInvalidTransactionId_ThrowsTransactionNotFoundException()
     {
-        var nonExistentId = Guid.NewGuid().ToString();
         var command =
-            new EditTransactionCommand(nonExistentId, _currency.Id, 100m, TransactionStatus.Normal, DateTime.Now);
+            new EditTransactionCommand(Guid.NewGuid(), _currency.Id, 100m, TransactionStatus.Normal, DateTime.Now);
 
-        await Assert.ThrowsAsync<TransactionNotFound>(async () => await _mediator.Send(command));
+        await Assert.ThrowsAsync<TransactionNotFoundExcpetion>(async () => await _mediator.Send(command));
     }
 }

@@ -1,4 +1,8 @@
 using Application.Common.Interfaces;
+using Core.Attributes;
+using Exceptions.Exceptions.Articles;
+using Exceptions.Exceptions.Storages;
+using Exceptions.Exceptions.Users;
 using Main.Application.Extensions;
 using Main.Application.Validation;
 using Main.Core.Abstractions;
@@ -11,10 +15,10 @@ namespace Main.Application.Handlers.ArticleReservations.GetArticlesWithNotEnough
 ///     или есть резервации артикулов другими пользователями при этом количество на складе
 ///     не покрывает продажу и резервацию.
 /// </summary>
-public record GetArticlesWithNotEnoughStockQuery(
-    Guid BuyerId,
-    string StorageName,
-    bool TakeFromOtherStorages,
+[ExceptionType<StorageNotFoundException>]
+[ExceptionType<ArticleNotFoundException>]
+[ExceptionType<UserNotFoundException>]
+public record GetArticlesWithNotEnoughStockQuery(Guid BuyerId, string StorageName, bool TakeFromOtherStorages,
     Dictionary<int, int> NeededCounts) : IQuery<GetArticlesWithNotEnoughStockResult>;
 
 /// <param name="NotEnoughByReservation">Список артикулов которых не хватает из-за резерваций</param>

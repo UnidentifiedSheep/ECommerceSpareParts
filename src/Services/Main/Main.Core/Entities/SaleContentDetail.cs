@@ -1,7 +1,9 @@
 ﻿namespace Main.Core.Entities;
 
-public class SaleContentDetail
+public partial class SaleContentDetail
 {
+    public int Id { get; set; }
+
     public int SaleContentId { get; set; }
 
     public int? StorageContentId { get; set; }
@@ -15,8 +17,6 @@ public class SaleContentDetail
     public int Count { get; set; }
 
     public DateTime PurchaseDatetime { get; set; }
-
-    public int Id { get; set; }
 
     public virtual Currency Currency { get; set; } = null!;
 

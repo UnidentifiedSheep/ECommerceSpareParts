@@ -4,6 +4,5 @@ public enum ArticleSearchStrategy
 {
     ByStartNumber,
     ByExecNumber,
-    ByName,
-    ByArticleOrName
+    ByName
 }

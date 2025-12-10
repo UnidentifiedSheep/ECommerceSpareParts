@@ -4,6 +4,7 @@ using Application.Common.Interfaces;
 using Core.Attributes;
 using Core.Interfaces.Services;
 using Exceptions.Exceptions.Balances;
+using Exceptions.Exceptions.Users;
 using Main.Application.Extensions;
 using Main.Application.Validation;
 using Main.Core.Abstractions;
@@ -16,7 +17,11 @@ using MediatR;
 namespace Main.Application.Handlers.Balance.DeleteTransaction;
 
 [Transactional(IsolationLevel.Serializable, 20, 3)]
-public record DeleteTransactionCommand(string TransactionId, Guid WhoDeleteUserId, bool IsSystem = false)
+[ExceptionType<TransactionNotFoundExcpetion>]
+[ExceptionType<TransactionAlreadyDeletedException>]
+[ExceptionType<BadTransactionStatusException>]
+[ExceptionType<UserNotFoundException>]
+public record DeleteTransactionCommand(Guid TransactionId, Guid WhoDeleteUserId, bool IsSystem = false)
     : ICommand<Unit>;
 
 public class DeleteTransactionHandler(
@@ -35,7 +40,7 @@ public class DeleteTransactionHandler(
         var transactionId = request.TransactionId;
         var whoDelete = request.WhoDeleteUserId;
         var transaction = await balanceRepository.GetTransactionByIdAsync(transactionId, true, cancellationToken)
-                          ?? throw new TransactionDoesntExistsException(transactionId);
+                          ?? throw new TransactionNotFoundExcpetion(transactionId);
         await EnsureDataIsValid(transaction, whoDelete, request.IsSystem, cancellationToken);
 
         transaction.IsDeleted = true;

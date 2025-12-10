@@ -44,7 +44,7 @@ public class DeleteFullSaleHandler(IMediator mediator, IMessageBroker messageBro
         return (await mediator.Send(command, cancellationToken)).Sale;
     }
 
-    private async Task DeleteTransaction(string transactionId, Guid userId,
+    private async Task DeleteTransaction(Guid transactionId, Guid userId,
         CancellationToken cancellationToken = default)
     {
         var command = new DeleteTransactionCommand(transactionId, userId, true);

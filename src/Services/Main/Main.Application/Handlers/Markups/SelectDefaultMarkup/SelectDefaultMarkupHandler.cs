@@ -11,6 +11,8 @@ using MediatR;
 namespace Main.Application.Handlers.Markups.SelectDefaultMarkup;
 
 [Transactional]
+[ExceptionType<SelectedMarkupNotFoundException>]
+[ExceptionType<MarkupGroupNotFoundException>]
 public record SelectDefaultMarkupCommand(int MarkupGroupId) : ICommand;
 
 public class SelectDefaultMarkupHandler(

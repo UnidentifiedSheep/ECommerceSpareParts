@@ -1,4 +1,5 @@
-﻿using Exceptions.Base;
+﻿using Api.Common.Extensions;
+using Exceptions.Base;
 using Exceptions.Interfaces;
 using FluentValidation;
 using Microsoft.AspNetCore.Diagnostics;
@@ -13,7 +14,7 @@ public class CustomExceptionHandler : IExceptionHandler
     {
         LogError(context, exception);
 
-        var statusCode = GetStatusCode(exception);
+        var statusCode = exception.GetStatusCode();
         context.Response.StatusCode = statusCode;
 
         var problemDetails = CreateProblemDetails(context, exception, statusCode);
@@ -27,18 +28,6 @@ public class CustomExceptionHandler : IExceptionHandler
         Log.ForContext("traceId", context.TraceIdentifier)
             .Error(exception, "Error occurred at {time}", DateTime.UtcNow);
     }
-
-    private static int GetStatusCode(Exception exception) => exception switch
-    {
-        InternalServerException => StatusCodes.Status500InternalServerError,
-        ValidationException => StatusCodes.Status400BadRequest,
-        BadRequestException => StatusCodes.Status400BadRequest,
-        UnauthorizedAccessException => StatusCodes.Status401Unauthorized,
-        NotFoundException => StatusCodes.Status404NotFound,
-        ConflictException => StatusCodes.Status409Conflict,
-        PreconditionRequiredException => StatusCodes.Status428PreconditionRequired,
-        _ => StatusCodes.Status500InternalServerError
-    };
 
     private ProblemDetails CreateProblemDetails(HttpContext context, Exception exception, int statusCode)
     {

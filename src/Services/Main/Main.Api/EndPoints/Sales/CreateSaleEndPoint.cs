@@ -1,6 +1,8 @@
 using System.Security.Claims;
 using Api.Common.Extensions;
 using Carter;
+using Exceptions.Exceptions.Sales;
+using Exceptions.Exceptions.Storages;
 using Main.Application.Handlers.Sales.CreateFullSale;
 using Main.Core.Dtos.Amw.Sales;
 using MediatR;
@@ -36,6 +38,8 @@ public class CreateSaleEndPoint : ICarterModule
                 }).WithTags("Sales")
                 .WithDescription("Создание новой продажи")
                 .WithDisplayName("Создание новой продажи")
+                .Produces<NotEnoughCountOnStorageException>(400)
+                .Produces<SoftConfirmationNeededException>(428)
                 .RequireAnyPermission("SALES.CREATE");
     }
 }

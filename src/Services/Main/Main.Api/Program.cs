@@ -1,11 +1,10 @@
 using System.Text;
-using Amazon.Extensions.NETCore.Setup;
-using Amazon.Runtime;
 using Api.Common;
 using Api.Common.ExceptionHandlers;
 using Api.Common.Logging;
 using Api.Common.Middleware;
 using Api.Common.OperationFilters;
+using Api.Common.SchemaFilters;
 using Carter;
 using Contracts.Currency;
 using Contracts.Markup;
@@ -65,6 +64,8 @@ builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen(c =>
 {
     c.OperationFilter<PermissionsOperationFilter>();
+    c.OperationFilter<ExceptionExamplesOperationFilter>();
+    c.SchemaFilter<ExceptionToProblemFilter>();
 });
 
 builder.Services.AddHangfire(x =>
@@ -197,11 +198,16 @@ MapsterConfig.Configure();
 SortByConfig.Configure();
 
 await SetupPrice(app.Services);
+app.UseHttpsRedirection();
 
+app.UseExceptionHandler(_ => { });
+
+app.UseAuthentication();
+app.UseAuthorization();
 
 app.UseRouting();
 app.UseCors();
-app.UseExceptionHandler(_ => { });
+
 
 app.MapCarter();
 
@@ -218,8 +224,6 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI();
     app.MapOpenApi();
 }
-
-app.UseHttpsRedirection();
 
 
 RecurringJob.AddOrUpdate<UpdateCurrencyRate>("UpdateCurrencyTask",

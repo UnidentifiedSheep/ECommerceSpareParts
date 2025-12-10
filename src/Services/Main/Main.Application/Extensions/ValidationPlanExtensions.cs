@@ -52,11 +52,11 @@ public static class ValidationPlanExtensions
         => plan.EnsureExists<Producer, int>(x => x.Id, producerIds, typeof(ProducerNotFoundException));
     
     //TRANSACTION
-    public static IValidationPlan EnsureTransactionExists(this IValidationPlan plan, string transactionId)
-        => plan.EnsureExists<Transaction, string>(x => x.Id, transactionId, typeof(TransactionNotFound));
+    public static IValidationPlan EnsureTransactionExists(this IValidationPlan plan, Guid transactionId)
+        => plan.EnsureExists<Transaction, Guid>(x => x.Id, transactionId, typeof(TransactionNotFoundExcpetion));
     
-    public static IValidationPlan EnsureTransactionExists(this IValidationPlan plan, IEnumerable<string> transactionIds)
-        => plan.EnsureExists<Transaction, string>(x => x.Id, transactionIds, typeof(TransactionNotFound));
+    public static IValidationPlan EnsureTransactionExists(this IValidationPlan plan, IEnumerable<Guid> transactionIds)
+        => plan.EnsureExists<Transaction, Guid>(x => x.Id, transactionIds, typeof(TransactionNotFoundExcpetion));
     
     //PERMISSION
     

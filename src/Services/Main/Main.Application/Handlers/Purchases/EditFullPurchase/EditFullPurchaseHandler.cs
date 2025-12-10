@@ -16,6 +16,7 @@ using MediatR;
 namespace Main.Application.Handlers.Purchases.EditFullPurchase;
 
 [Transactional(IsolationLevel.Serializable, 20, 2)]
+[ExceptionType<PurchaseNotFoundException>]
 public record EditFullPurchaseCommand(
     IEnumerable<EditPurchaseDto> Content,
     string PurchaseId,
@@ -58,7 +59,7 @@ public class EditFullPurchaseHandler(IMediator mediator, IPurchaseRepository pur
         return (await mediator.Send(command, cancellationToken)).EditedCounts;
     }
 
-    private async Task EditTransaction(string transactionId, int currencyId, decimal amount, DateTime dateTime,
+    private async Task EditTransaction(Guid transactionId, int currencyId, decimal amount, DateTime dateTime,
         CancellationToken cancellationToken = default)
     {
         var command =

@@ -1,4 +1,5 @@
 using Application.Common.Interfaces;
+using Core.Attributes;
 using Core.Interfaces.Services;
 using Exceptions.Exceptions.Articles;
 using Main.Core.Interfaces.DbRepositories;
@@ -6,6 +7,8 @@ using MediatR;
 
 namespace Main.Application.Handlers.ArticleContent.SetArticleContentCount;
 
+[Transactional]
+[ExceptionType<ArticleContentNotFoundException>]
 public record SetArticlesContentCountCommand(int ArticleId, int InsideArticleId, int Count) : ICommand;
 
 public class SetArticlesContentCountHandler(

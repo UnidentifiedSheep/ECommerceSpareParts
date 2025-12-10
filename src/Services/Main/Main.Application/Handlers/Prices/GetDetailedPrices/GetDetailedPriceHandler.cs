@@ -1,4 +1,5 @@
 using Application.Common.Interfaces;
+using Core.Attributes;
 using Core.Interfaces;
 using Core.Models;
 using Exceptions.Exceptions.Currencies;
@@ -9,6 +10,7 @@ using MediatR;
 
 namespace Main.Application.Handlers.Prices.GetDetailedPrices;
 
+[ExceptionType<CurrencyNotFoundException>]
 public record GetDetailedPricesQuery(IEnumerable<int> ArticleIds, int CurrencyId, Guid? BuyerId)
     : IQuery<GetDetailedPriceResult>;
 

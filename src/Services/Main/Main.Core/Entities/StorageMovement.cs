@@ -2,7 +2,7 @@
 
 namespace Main.Core.Entities;
 
-public class StorageMovement
+public partial class StorageMovement
 {
     public int Id { get; set; }
 
@@ -29,7 +29,7 @@ public class StorageMovement
     public virtual Storage StorageNameNavigation { get; set; } = null!;
 
     public virtual User WhoMovedNavigation { get; set; } = null!;
-
+    
     public StorageMovement SetActionType(StorageMovementType type)
     {
         ActionType = type.ToString();
