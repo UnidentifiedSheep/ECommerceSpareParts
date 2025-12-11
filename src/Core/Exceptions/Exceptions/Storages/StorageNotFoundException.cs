@@ -5,7 +5,6 @@ namespace Exceptions.Exceptions.Storages;
 
 public class StorageNotFoundException : NotFoundException
 {
-    [ExampleExceptionValues(false,"exampleStorage")]
     public StorageNotFoundException(string name) : base("Склад не найден", new { Name = name })
     {
     }

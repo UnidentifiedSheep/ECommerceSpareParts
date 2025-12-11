@@ -1,29 +1,67 @@
 ﻿using Application.Common.Abstractions;
 using Application.Common.Attributes;
+using Core.Attributes;
 
 namespace Api.Common.Extensions;
 
 public static class ResponsesExtensions
 {
-    public static TBuilder ProducesErrorFlow<TBuilder, TFlow>(this TBuilder builder, params string[] permissions)
+    public static TBuilder HasErrorFlow<TBuilder>(this TBuilder builder, Type flowType) 
         where TBuilder : IEndpointConventionBuilder
     {
-        var type = typeof(TFlow);
-        var commandFlow = FindCommandFlow(type);
+        if (builder is not RouteHandlerBuilder routeBuilder) return builder;
+        var commandFlow = FindCommandFlow(flowType);
         
         if (commandFlow == null) return builder;
         
         var flowSteps = GetFlowSteps(commandFlow);
-        
-        builder.Add(endpoint =>
+        flowSteps.Add(flowType);
+
+        foreach (var step in flowSteps)
         {
-        });
+            var exceptionTypes = GetExceptionTypes(step);
+            foreach (var exceptionType in exceptionTypes)
+            {
+                var statusCode = exceptionType.GetStatusCode();
+                var exceptionExample = exceptionType.GetExceptionExample();
+                routeBuilder.Produces(statusCode, exceptionExample.GetType());
+            }
+        }
 
 
         return builder;
     }
+
+    private static Type[] GetExceptionTypes(Type step)
+    {
+        var exceptionTypes = step
+            .GetCustomAttributes(inherit: true)
+            .Where(a =>
+                    a is ExceptionTypeAttribute || // обычный
+                    (a.GetType().IsGenericType &&
+                     a.GetType().GetGenericTypeDefinition() == typeof(ExceptionTypeAttribute<>)) // generic
+            )
+            .Select(a =>
+            {
+                // Обычный атрибут
+                if (a is ExceptionTypeAttribute nonGeneric)
+                    return nonGeneric.ExceptionType;
+
+                // Generic: получаем TException
+                if (a.GetType().IsGenericType &&
+                    a.GetType().GetGenericTypeDefinition() == typeof(ExceptionTypeAttribute<>))
+                {
+                    return a.GetType().GetGenericArguments()[0]; // TException
+                }
+
+                return null!;
+            })
+            .Distinct()
+            .ToArray();
+        return exceptionTypes;
+    }
     
-    private static (Type request, Type response)[] GetFlowSteps(Type commandFlowType)
+    private static List<Type> GetFlowSteps(Type commandFlowType)
     {
         var attrs = commandFlowType.GetCustomAttributes(inherit: false);
 
@@ -34,10 +72,12 @@ public static class ResponsesExtensions
             {
                 var type = a.GetType();
                 var requestType = type.GetProperty("RequestType")?.GetValue(a) as Type;
-                var responseType = type.GetProperty("ResponseType")?.GetValue(a) as Type;
-                return (requestType!, responseType!);
+                return requestType;
             })
-            .ToArray();
+            .Where(t => t != null)
+            .Select(t => t!)
+            .Distinct()
+            .ToList();
 
         return steps;
     }
@@ -48,10 +88,7 @@ public static class ResponsesExtensions
 
         var flowType = assembly.GetTypes()
             .FirstOrDefault(t =>
-                !t.IsAbstract &&
-                !t.IsInterface &&
-                t.BaseType != null &&
-                t.BaseType.IsGenericType &&
+                t is { IsAbstract: false, IsInterface: false, BaseType.IsGenericType: true } &&
                 t.BaseType.GetGenericTypeDefinition() == typeof(CommandFlow<>) &&
                 t.BaseType.GetGenericArguments()[0] == commandType
             );

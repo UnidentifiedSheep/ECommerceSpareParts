@@ -64,7 +64,6 @@ builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen(c =>
 {
     c.OperationFilter<PermissionsOperationFilter>();
-    c.OperationFilter<ExceptionExamplesOperationFilter>();
     c.SchemaFilter<ExceptionToProblemFilter>();
 });
 

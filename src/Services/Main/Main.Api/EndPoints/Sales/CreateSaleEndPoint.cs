@@ -38,8 +38,7 @@ public class CreateSaleEndPoint : ICarterModule
                 }).WithTags("Sales")
                 .WithDescription("Создание новой продажи")
                 .WithDisplayName("Создание новой продажи")
-                .Produces<NotEnoughCountOnStorageException>(400)
-                .Produces<SoftConfirmationNeededException>(428)
+                .HasErrorFlow(typeof(CreateFullSaleCommand))
                 .RequireAnyPermission("SALES.CREATE");
     }
 }
