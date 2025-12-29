@@ -1702,6 +1702,7 @@ public partial class DContext : DbContext
         modelBuilder.HasSequence<int>("table_name_id_seq");
 
         modelBuilder.AllDateTimesToUtc();
+        
         OnModelCreatingPartial(modelBuilder);
     }
 

@@ -21,6 +21,7 @@ using Main.Application.BackgroundServices;
 using Main.Application.Configs;
 using Main.Application.EventHandlers;
 using Main.Application.HangFireTasks;
+using Main.Application.Seeding;
 using Main.Core.Interfaces.Pricing;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
@@ -42,7 +43,10 @@ using Global = Main.Application.Global;
 
 var builder = WebApplication.CreateBuilder(args);
 
-Certs.RegisterCerts("/app/certs");
+var certsPath = Environment.GetEnvironmentVariable("CERTS_PATH");
+if (!string.IsNullOrWhiteSpace(certsPath))
+    Certs.RegisterCerts(certsPath);
+
 Log.Logger = new LoggerConfiguration()
     .MinimumLevel.Debug()
     .Enrich.FromLogContext()
@@ -179,7 +183,21 @@ builder.Services.AddTransient<HeaderSecretMiddleware>(_ => new HeaderSecretMiddl
 
 var app = builder.Build();
 
-/*app.UseMiddleware<HeaderSecretMiddleware>();*/
+if (Environment.GetEnvironmentVariable("SEED_DB") == "true")
+    await app.SeedAsync<DContext>();
+
+if (Environment.GetEnvironmentVariable("SEED_ADMIN") == "true")
+{
+    var login = Environment.GetEnvironmentVariable("SEED_ADMIN_LOGIN");
+    if (string.IsNullOrWhiteSpace(login)) login = "Administrator";
+    var password = Environment.GetEnvironmentVariable("SEED_ADMIN_PASSWORD");
+    if (string.IsNullOrWhiteSpace(password)) password = "Administrator12345"; 
+    
+    await UserSeed.SeedAdmin(login, password, app.Services);
+}
+    
+    
+app.UseMiddleware<HeaderSecretMiddleware>();
 
 app.UseForwardedHeaders(new ForwardedHeadersOptions
 {
@@ -189,7 +207,6 @@ app.UseForwardedHeaders(new ForwardedHeadersOptions
 Global.SetSystemId(app.Configuration["App:SystemId"]!);
 Global.SetServiceUrl(app.Configuration["AWS:ServiceURL"]!);
 
-await app.EnsureDbExists<DContext>();
 
 app.UseHangfireDashboard();
 

@@ -9,7 +9,7 @@ public class DeleteStorageEndPoint : ICarterModule
 {
     public void AddRoutes(IEndpointRouteBuilder app)
     {
-        app.MapDelete("/storages/{StorageName}",
+        app.MapDelete("/storages/{storageName}",
                 async (ISender sender, string storageName, CancellationToken cancellationToken) =>
                 {
                     var command = new DeleteStorageCommand(storageName);

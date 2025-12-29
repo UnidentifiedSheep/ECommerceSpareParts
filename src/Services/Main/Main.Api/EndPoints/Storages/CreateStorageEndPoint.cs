@@ -19,7 +19,7 @@ public class CreateStorageEndPoint : ICarterModule
                     var command = request.Adapt<CreateStorageCommand>();
                     var result = await sender.Send(command, cancellationToken);
                     var response = new CreateStorageResponse(result.Name);
-                    return Results.Created($"/storages/{response.Name}", response);
+                    return Results.Created($"/storages/", response);
                 }).WithTags("Storages")
             .WithDescription("Создание нового склада")
             .WithDisplayName("Создать склад")

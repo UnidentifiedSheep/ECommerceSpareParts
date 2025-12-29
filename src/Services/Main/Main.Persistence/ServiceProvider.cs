@@ -1,11 +1,14 @@
+using Core.Interfaces;
 using Core.Interfaces.Services;
 using Main.Core.Interfaces;
 using Main.Core.Interfaces.DbRepositories;
 using Main.Persistence.Context;
+using Main.Persistence.DataSeeds;
 using Main.Persistence.Repositories;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Persistence.Interfaces;
 
 namespace Main.Persistence;
 
@@ -44,7 +47,14 @@ public static class ServiceProvider
         collection.AddScoped<IArticleCharacteristicsRepository, ArticleCharacteristicsRepository>();
 
         collection.AddScoped<IUnitOfWork, UnitOfWork>();
-
+        
+        //Seeds
+        collection.AddScoped<ISeed<DContext>, PermissionSeed>();
+        collection.AddScoped<ISeed<DContext>, RoleSeed>();
+        collection.AddScoped<ISeed<DContext>, RolePermissionSeed>();
+        collection.AddScoped<ISeed<DContext>, UserSeed>();
+        collection.AddScoped<ISeed<DContext>, CurrencySeed>();
+        
         return collection;
     }
 }

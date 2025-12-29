@@ -12,8 +12,13 @@ services:
     volumes:
       - ./certs:/app/certs:ro
     environment:
-      - ASPNETCORE_Kestrel__Certificates__Default__Path=/app/certs/localhost.pfx
-      - ASPNETCORE_Kestrel__Certificates__Default__Password=PleasKillMe.21
+      - ASPNETCORE_Kestrel__Certificates__Default__Path=${MAIN_CERT_PATH}
+      - ASPNETCORE_Kestrel__Certificates__Default__Password=${MAIN_CERT_PASSWORD}
+      - CERTS_PATH=${MAIN_CERTS_PATH}  
+      - SEED_DB=${MAIN_SEED_DB}
+      - SEED_ADMIN=${MAIN_SEED_ADMIN}
+      - SEED_ADMIN_PASSWORD=${MAIN_SEED_ADMIN_PASSWORD}
+      - SEED_ADMIN_LOGIN=${MAIN_SEED_ADMIN_LOGIN}
     networks:
       - backend-network
     depends_on:
