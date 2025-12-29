@@ -1,9 +1,11 @@
 using Analytics.Core.Interfaces.DbRepositories;
 using Analytics.Persistence.Context;
+using Analytics.Persistence.DataSeeds;
 using Analytics.Persistence.Repositories;
 using Core.Interfaces.Services;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
+using Persistence.Interfaces;
 
 namespace Analytics.Persistence;
 
@@ -17,6 +19,8 @@ public static class ServiceProvider
 
         collection.AddScoped<ICurrencyRepository, CurrencyRepository>();
         collection.AddScoped<ISellInfoRepository, SellInfoRepository>();
+
+        collection.AddScoped<ISeed<DContext>, CurrencySeed>();
 
         return collection;
     }

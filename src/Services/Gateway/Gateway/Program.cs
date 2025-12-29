@@ -6,7 +6,9 @@ using Microsoft.IdentityModel.Tokens;
 using Yarp.ReverseProxy.Transforms;
 
 var builder = WebApplication.CreateBuilder(args);
-Certs.RegisterCerts("/app/certs");
+var certsPath = Environment.GetEnvironmentVariable("CERTS_PATH");
+if (!string.IsNullOrWhiteSpace(certsPath))
+    Certs.RegisterCerts(certsPath);
 builder.Configuration.AddJsonFromDirectory("ReverseProxy");
 
 builder.Services.AddAuthentication(options =>
@@ -29,7 +31,7 @@ builder.Services.AddAuthentication(options =>
     };
 });
 
-var secret = builder.Configuration["Gateway:Secret"];
+var secret = Environment.GetEnvironmentVariable("GATEWAY_SUPER_KEY");
 
 builder.Services.AddReverseProxy()
     .LoadFromConfig(builder.Configuration.GetSection("ReverseProxy"))

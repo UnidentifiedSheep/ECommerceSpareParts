@@ -6,7 +6,7 @@ public static class Global
 {
     public const int UsdId = 3;
     public static Guid SystemId { get; private set; } = Guid.Empty;
-    public const string ImageBucketName = "imgs";
+    public static string ImageBucketName { get; private set; } = "";
     public static string ServiceUrl { get; private set; } = "";
 
     public static void SetServiceUrl(string url) => ServiceUrl = url;
@@ -14,6 +14,8 @@ public static class Global
     {
         PropertyNamingPolicy = JsonNamingPolicy.CamelCase
     };
+    
+    public static void SetImageBucketName(string name) => ImageBucketName = name;
 
     public static void SetSystemId(string id)
     {

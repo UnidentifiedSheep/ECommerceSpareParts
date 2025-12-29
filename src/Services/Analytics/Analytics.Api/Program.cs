@@ -12,15 +12,18 @@ using Persistence.Extensions;
 using RabbitMq;
 
 var builder = WebApplication.CreateBuilder(args);
-Certs.RegisterCerts("/app/certs");
+var certsPath = Environment.GetEnvironmentVariable("CERTS_PATH");
+if (!string.IsNullOrWhiteSpace(certsPath))
+    Certs.RegisterCerts(certsPath);
 builder.Services.AddOpenApi();
 
 var brokerOptions = new MessageBrokerOptions
 {
-    Host = builder.Configuration["RabbitMqSettings:Host"]!,
-    Username = builder.Configuration["RabbitMqSettings:Username"]!,
-    Password = builder.Configuration["RabbitMqSettings:Password"]!
+    Host = Environment.GetEnvironmentVariable("RABBITMQ_HOST")!,
+    Username = Environment.GetEnvironmentVariable("RABBITMQ_DEFAULT_USER")!,
+    Password = Environment.GetEnvironmentVariable("RABBITMQ_DEFAULT_PASS")!
 };
+builder.Services.AddSingleton(brokerOptions);
 
 var uniqQueueName = $"queue-of-main-{Environment.MachineName}";
 
@@ -38,17 +41,18 @@ builder.Services.AddMassageBrokerLayer<DContext>(brokerOptions, eventHandlers, o
         opt.UseBusOutbox();
         opt.UsePostgres();
     })
-    .AddPersistenceLayer(builder.Configuration["ConnectionStrings:DefaultConnection"]!)
+    .AddPersistenceLayer(Environment.GetEnvironmentVariable("DB_CONNECTION_STRING")!)
     .AddApplicationLayer();
 
 builder.Services.AddCarter();
 
-var secret = builder.Configuration["Gateway:Secret"]!;
+var secret = Environment.GetEnvironmentVariable("GATEWAY_SUPER_KEY")!;
 builder.Services.AddTransient<HeaderSecretMiddleware>(_ => new HeaderSecretMiddleware(secret));
 
 var app = builder.Build();
 
-await app.EnsureDbExists<DContext>();
+if (Environment.GetEnvironmentVariable("SEED_DB") == "true")
+    await app.SeedAsync<DContext>();
 
 app.UseMiddleware<HeaderSecretMiddleware>();
 

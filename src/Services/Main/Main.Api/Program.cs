@@ -1,4 +1,5 @@
 using System.Text;
+using Amazon.S3;
 using Api.Common;
 using Api.Common.ExceptionHandlers;
 using Api.Common.Logging;
@@ -72,17 +73,17 @@ builder.Services.AddSwaggerGen(c =>
 });
 
 builder.Services.AddHangfire(x =>
-    x.UsePostgreSqlStorage(z => z.UseNpgsqlConnection(builder.Configuration
-        .GetConnectionString("DefaultConnection"))));
+    x.UsePostgreSqlStorage(z => 
+        z.UseNpgsqlConnection(Environment.GetEnvironmentVariable("DB_CONNECTION_STRING"))));
 builder.Services.AddHangfireServer();
 
-builder.Services.Configure<MessageBrokerOptions>(builder.Configuration.GetSection("RabbitMqSettings"));
 var brokerOptions = new MessageBrokerOptions
 {
-    Host = builder.Configuration["RabbitMqSettings:Host"]!,
-    Username = builder.Configuration["RabbitMqSettings:Username"]!,
-    Password = builder.Configuration["RabbitMqSettings:Password"]!
+    Host = Environment.GetEnvironmentVariable("RABBITMQ_HOST")!,
+    Username = Environment.GetEnvironmentVariable("RABBITMQ_DEFAULT_USER")!,
+    Password = Environment.GetEnvironmentVariable("RABBITMQ_DEFAULT_PASS")!
 };
+builder.Services.AddSingleton(brokerOptions);
 
 var emailOptions = new UserEmailOptions
 {
@@ -126,8 +127,8 @@ builder.Services.AddScoped<IEventHandler<CurrencyRateChangedEvent>, CurrencyRate
 builder.Services.AddScoped<IEventHandler<MarkupGroupGeneratedEvent>, MarkupGroupGeneratedEventHandler>();
 
 builder.Services
-    .AddPersistenceLayer(builder.Configuration["ConnectionStrings:DefaultConnection"]!)
-    .AddCacheLayer(builder.Configuration["ConnectionStrings:RedisConnection"]!)
+    .AddPersistenceLayer(Environment.GetEnvironmentVariable("DB_CONNECTION_STRING")!)
+    .AddCacheLayer(Environment.GetEnvironmentVariable("REDIS_CONNECTION_STRING")!)
     .AddSecurityLayer()
     .AddMailLayer()
     .AddMassageBrokerLayer<DContext>(brokerOptions, eventHandlers,
@@ -138,7 +139,16 @@ builder.Services
         })
     .AddCommonLayer()
     .AddIntegrations(builder.Configuration)
-    .AddS3(builder.Configuration)
+    .AddS3(() =>
+    {
+        var config = new AmazonS3Config
+        {
+            ServiceURL = Environment.GetEnvironmentVariable("S3_SERVICE_URL"),
+            ForcePathStyle = Environment.GetEnvironmentVariable("S3_FORCE_PATH_STYLE") == "true",
+        };
+        return new AmazonS3Client(Environment.GetEnvironmentVariable("S3_LOGIN"), 
+            Environment.GetEnvironmentVariable("S3_PASSWORD"), config);
+    })
     .AddApplicationLayer(emailOptions);
 
 
@@ -178,10 +188,13 @@ builder.Services.AddCors(options =>
 
 var endpointAssembly = typeof(AddArticleContentEndPoint).Assembly;
 builder.Services.AddCarter(new DependencyContextAssemblyCatalog(endpointAssembly));
-var secret = builder.Configuration["Gateway:Secret"]!;
+var secret = Environment.GetEnvironmentVariable("GATEWAY_SUPER_KEY")!;
 builder.Services.AddTransient<HeaderSecretMiddleware>(_ => new HeaderSecretMiddleware(secret));
 
 var app = builder.Build();
+
+MapsterConfig.Configure();
+SortByConfig.Configure();
 
 if (Environment.GetEnvironmentVariable("SEED_DB") == "true")
     await app.SeedAsync<DContext>();
@@ -204,14 +217,11 @@ app.UseForwardedHeaders(new ForwardedHeadersOptions
     ForwardedHeaders = ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto
 });
 
-Global.SetSystemId(app.Configuration["App:SystemId"]!);
-Global.SetServiceUrl(app.Configuration["AWS:ServiceURL"]!);
-
+Global.SetSystemId(Environment.GetEnvironmentVariable("SYSTEM_ID")!);
+Global.SetServiceUrl(Environment.GetEnvironmentVariable("S3_SERVICE_URL")!);
+Global.SetImageBucketName(Environment.GetEnvironmentVariable("S3_IMAGES_BUCKET")!);
 
 app.UseHangfireDashboard();
-
-MapsterConfig.Configure();
-SortByConfig.Configure();
 
 await SetupPrice(app.Services);
 app.UseHttpsRedirection();
@@ -227,7 +237,6 @@ app.UseCors();
 
 app.MapCarter();
 
-// Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {
     app.UseReDoc(options =>

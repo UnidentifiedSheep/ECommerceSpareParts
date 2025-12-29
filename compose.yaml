@@ -14,11 +14,24 @@ services:
     environment:
       - ASPNETCORE_Kestrel__Certificates__Default__Path=${MAIN_CERT_PATH}
       - ASPNETCORE_Kestrel__Certificates__Default__Password=${MAIN_CERT_PASSWORD}
-      - CERTS_PATH=${MAIN_CERTS_PATH}  
+      - CERTS_PATH=${CERTS_PATH}
       - SEED_DB=${MAIN_SEED_DB}
       - SEED_ADMIN=${MAIN_SEED_ADMIN}
       - SEED_ADMIN_PASSWORD=${MAIN_SEED_ADMIN_PASSWORD}
       - SEED_ADMIN_LOGIN=${MAIN_SEED_ADMIN_LOGIN}
+      - REDIS_CONNECTION_STRING=redis:6379,password=${REDIS_PASSWORD}
+      - DB_CONNECTION_STRING=Host=pgql;Database=${PGQL_MAIN_DB};Username=${PGQL_USER};Password=${PGQL_PASSWORD}
+      - RABBITMQ_HOST=amqp://rabbitmq:5672
+      - RABBITMQ_USERNAME=${RABBITMQ_DEFAULT_USER}
+      - RABBITMQ_PASSWORD=${RABBITMQ_DEFAULT_PASS}
+      - S3_URL=http://minio:9000
+      - S3_FORCE_PATH_STYLE=${MAIN_S3_FORCE_PATH_STYLE}
+      - S3_LOGIN=${MINIO_SERVICE_USER}
+      - S3_PASSWORD=${MINIO_SERVICE_PASSWORD}
+      - S3_REGION=${MINIO_REGION}
+      - S3_IMAGES_BUCKET=${MINIO_IMAGES_BUCKET}
+      - GATEWAY_SUPER_KEY=${GATEWAY_SUPER_KEY}
+      - SYSTEM_ID=${MAIN_SYSTEM_ID}
     networks:
       - backend-network
     depends_on:
@@ -38,8 +51,16 @@ services:
     volumes:
       - ./certs:/app/certs:ro
     environment:
-      - ASPNETCORE_Kestrel__Certificates__Default__Path=/app/certs/localhost.pfx
-      - ASPNETCORE_Kestrel__Certificates__Default__Password=PleasKillMe.21
+      - ASPNETCORE_Kestrel__Certificates__Default__Path=${MAIN_CERT_PATH}
+      - ASPNETCORE_Kestrel__Certificates__Default__Password=${MAIN_CERT_PASSWORD}
+      - CERTS_PATH=${CERTS_PATH}
+      - REDIS_CONNECTION_STRING=redis:6379,password=${REDIS_PASSWORD}
+      - DB_CONNECTION_STRING=Host=pgql;Database=${PGQL_ANALYTICS_DB};Username=${PGQL_USER};Password=${PGQL_PASSWORD}
+      - RABBITMQ_HOST=amqp://rabbitmq:5672
+      - RABBITMQ_USERNAME=${RABBITMQ_DEFAULT_USER}
+      - RABBITMQ_PASSWORD=${RABBITMQ_DEFAULT_PASS}
+      - SEED_DB=${ANALYTICS_SEED_DB}
+      - GATEWAY_SUPER_KEY=${GATEWAY_SUPER_KEY}
     networks:
       - backend-network
     depends_on:
@@ -58,8 +79,10 @@ services:
     volumes:
       - ./certs:/app/certs:ro
     environment:
-      - ASPNETCORE_Kestrel__Certificates__Default__Path=/app/certs/localhost.pfx
-      - ASPNETCORE_Kestrel__Certificates__Default__Password=PleasKillMe.21
+      - ASPNETCORE_Kestrel__Certificates__Default__Path=${MAIN_CERT_PATH}
+      - ASPNETCORE_Kestrel__Certificates__Default__Password=${MAIN_CERT_PASSWORD}
+      - CERTS_PATH=${CERTS_PATH}
+      - GATEWAY_SUPER_KEY=${GATEWAY_SUPER_KEY}
     networks:
       - backend-network
     depends_on:
@@ -70,10 +93,12 @@ services:
   pgql:
     image: postgres:latest
     environment:
-      POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: PleasKillMe21
+      POSTGRES_USER: ${PGQL_USER}
+      POSTGRES_PASSWORD: ${PGQL_PASSWORD}
+      POSTGRES_MULTIPLE_DATABASES: ${PGQL_MAIN_DB},${PGQL_ANALYTICS_DB}
     volumes:
       - pg_data:/var/lib/postgresql
+      - ./init:/docker-entrypoint-initdb.d
     networks:
       - backend-network
     ports:
@@ -82,10 +107,13 @@ services:
 
   redis:
     image: redis:latest
-    command: >
-      redis-server
-      --maxmemory-policy allkeys-lru
-      --active-expire-effort 10
+    command:
+      - redis-server
+      - --maxmemory-policy
+      - allkeys-lru
+      - --active-expire-effort
+      - "10"
+      - --requirepass ${REDIS_PASSWORD}
     volumes:
       - redis_data:/data
     networks:
@@ -96,6 +124,9 @@ services:
   
   rabbitmq:
     image: rabbitmq:3-management
+    environment:
+      RABBITMQ_DEFAULT_USER: ${RABBITMQ_DEFAULT_USER}
+      RABBITMQ_DEFAULT_PASS: ${RABBITMQ_DEFAULT_PASS}
     ports:
       - "15672:15672"
       - "5672:5672"
@@ -114,8 +145,8 @@ services:
     volumes:
       - minio_data:/data
     environment:
-      MINIO_ROOT_USER: admin
-      MINIO_ROOT_PASSWORD: adminpass
+      MINIO_ROOT_USER: ${MINIO_ROOT_USER}
+      MINIO_ROOT_PASSWORD: ${MINIO_ROOT_PASSWORD}
     command: >
       server /data --console-address ":9001"
     restart: unless-stopped
@@ -130,11 +161,11 @@ services:
     entrypoint: >
       /bin/sh -c "
       sleep 5;
-      mc alias set local http://minio:9000 admin adminpass;
-      mc mb -p local/imgs;
-      mc anonymous set public local/imgs;
-      mc admin user add local foobar foo12345;
-      mc admin policy attach local readwrite --user foobar;
+      mc alias set local http://minio:9000 ${MINIO_ROOT_USER} ${MINIO_ROOT_PASSWORD};
+      mc mb -p local/${MINIO_IMAGES_BUCKET};
+      mc anonymous set public local/${MINIO_IMAGES_BUCKET};
+      mc ${MINIO_ROOT_USER} user add local ${MINIO_SERVICE_USER} ${MINIO_SERVICE_PASSWORD};
+      mc ${MINIO_ROOT_USER} policy attach local readwrite --user ${MINIO_SERVICE_USER};
       exit 0;
       "
     networks:
