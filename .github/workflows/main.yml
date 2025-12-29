@@ -31,7 +31,6 @@ jobs:
             git fetch --all
             git reset --hard origin/${{ secrets.MAIN_BRANCH }}
       
-            docker compose --env-file default.env pull
             docker compose --env-file default.env up -d --build
           EOF
 
