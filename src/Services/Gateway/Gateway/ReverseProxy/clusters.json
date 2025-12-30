@@ -5,7 +5,7 @@
         "LoadBalancingPolicy": "RoundRobin",
         "Destinations": {
           "main-api": {
-            "Address": "https://main.api:7292/"
+            "Address": "http://main.api:8080/"
           }
         }
       },
@@ -13,7 +13,7 @@
         "LoadBalancingPolicy": "RoundRobin",
         "Destinations": {
           "analytics-api": {
-            "Address": "https://analytics.api:7292/"
+            "Address": "http://analytics.api:8080/"
           }
         }
       }
