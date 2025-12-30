@@ -32,6 +32,7 @@ services:
       - S3_IMAGES_BUCKET=${MINIO_IMAGES_BUCKET}
       - GATEWAY_SUPER_KEY=${GATEWAY_SUPER_KEY}
       - SYSTEM_ID=${MAIN_SYSTEM_ID}
+      - USE_HTTPS_REDIRECTION=${MAIN_USE_HTTPS_REDIRECTION}
     networks:
       - backend-network
     depends_on:
@@ -61,6 +62,7 @@ services:
       - RABBITMQ_PASSWORD=${RABBITMQ_DEFAULT_PASS}
       - SEED_DB=${ANALYTICS_SEED_DB}
       - GATEWAY_SUPER_KEY=${GATEWAY_SUPER_KEY}
+      - USE_HTTPS_REDIRECTION=${ANALYTICS_USE_HTTPS_REDIRECTION}
     networks:
       - backend-network
     depends_on:

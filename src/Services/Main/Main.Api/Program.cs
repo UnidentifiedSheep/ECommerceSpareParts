@@ -224,7 +224,8 @@ Global.SetImageBucketName(Environment.GetEnvironmentVariable("S3_IMAGES_BUCKET")
 app.UseHangfireDashboard();
 
 await SetupPrice(app.Services);
-app.UseHttpsRedirection();
+if (Environment.GetEnvironmentVariable("USE_HTTPS_REDIRECTION") == "true")
+    app.UseHttpsRedirection();
 
 app.UseExceptionHandler(_ => { });
 

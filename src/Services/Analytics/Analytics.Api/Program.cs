@@ -59,7 +59,8 @@ app.UseMiddleware<HeaderSecretMiddleware>();
 
 if (app.Environment.IsDevelopment()) app.MapOpenApi();
 
-app.UseHttpsRedirection();
+if (Environment.GetEnvironmentVariable("USE_HTTPS_REDIRECTION") == "true")
+    app.UseHttpsRedirection();
 
 
 app.Run();
