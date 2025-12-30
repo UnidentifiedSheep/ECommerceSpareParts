@@ -205,8 +205,10 @@ if (Environment.GetEnvironmentVariable("SEED_ADMIN") == "true")
     if (string.IsNullOrWhiteSpace(login)) login = "Administrator";
     var password = Environment.GetEnvironmentVariable("SEED_ADMIN_PASSWORD");
     if (string.IsNullOrWhiteSpace(password)) password = "Administrator12345"; 
+    var email = Environment.GetEnvironmentVariable("SEED_ADMIN_EMAIL");
+    if (string.IsNullOrWhiteSpace(email)) email = "emailNotProvided@some.com";
     
-    await UserSeed.SeedAdmin(login, password, app.Services);
+    await UserSeed.SeedAdmin(login, password, email, app.Services);
 }
     
     
