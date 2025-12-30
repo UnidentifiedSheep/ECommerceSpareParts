@@ -143,7 +143,7 @@ builder.Services
     {
         var config = new AmazonS3Config
         {
-            ServiceURL = Environment.GetEnvironmentVariable("S3_SERVICE_URL"),
+            ServiceURL = Environment.GetEnvironmentVariable("S3_URL"),
             ForcePathStyle = Environment.GetEnvironmentVariable("S3_FORCE_PATH_STYLE") == "true",
         };
         return new AmazonS3Client(Environment.GetEnvironmentVariable("S3_LOGIN"), 
