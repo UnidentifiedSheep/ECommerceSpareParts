@@ -49,7 +49,7 @@ if (!string.IsNullOrWhiteSpace(certsPath))
     Certs.RegisterCerts(certsPath);
 
 Log.Logger = new LoggerConfiguration()
-    .MinimumLevel.Debug()
+    .ReadFrom.Configuration(builder.Configuration)
     .Enrich.FromLogContext()
     .WriteTo.LokiHttp(() => new LokiSinkConfiguration
     {
