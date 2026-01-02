@@ -26,8 +26,6 @@ using IsolationLevel = System.Data.IsolationLevel;
 namespace Main.Application.Handlers.Sales.CreateFullSale;
 
 [Transactional(IsolationLevel.Serializable, 20, 2)]
-[ExceptionType<NotEnoughCountOnStorageException>]
-[ExceptionType<SoftConfirmationNeededException>]
 public record CreateFullSaleCommand(
     Guid CreatedUserId,
     Guid BuyerId,

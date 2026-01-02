@@ -10,7 +10,6 @@ using MediatR;
 namespace Main.Application.Handlers.Storages.EditStorage;
 
 [Transactional]
-[ExceptionType<StorageNotFoundException>]
 public record EditStorageCommand(string StorageName, PatchStorageDto EditStorage) : ICommand;
 
 public class EditStorageHandler(IStoragesRepository repository, IUnitOfWork unitOfWork)

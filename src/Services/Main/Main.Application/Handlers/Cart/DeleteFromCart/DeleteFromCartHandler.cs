@@ -9,8 +9,6 @@ using MediatR;
 namespace Main.Application.Handlers.Cart.DeleteFromCart;
 
 [Transactional]
-[ExceptionType<UserNotFoundException>]
-[ExceptionType<CartItemNotFoundException>]
 public record DeleteFromCartCommand(Guid UserId, int ArticleId) : ICommand;
 
 public class DeleteFromCartHandler(ICartRepository cartRepository, IUserRepository userRepository, IUnitOfWork unitOfWork) : ICommandHandler<DeleteFromCartCommand>

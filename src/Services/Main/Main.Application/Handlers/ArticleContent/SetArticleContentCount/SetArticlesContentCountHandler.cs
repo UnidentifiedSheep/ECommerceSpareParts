@@ -8,7 +8,6 @@ using MediatR;
 namespace Main.Application.Handlers.ArticleContent.SetArticleContentCount;
 
 [Transactional]
-[ExceptionType<ArticleContentNotFoundException>]
 public record SetArticlesContentCountCommand(int ArticleId, int InsideArticleId, int Count) : ICommand;
 
 public class SetArticlesContentCountHandler(

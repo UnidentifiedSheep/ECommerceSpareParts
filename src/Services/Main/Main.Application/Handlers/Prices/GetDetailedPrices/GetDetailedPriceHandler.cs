@@ -10,7 +10,6 @@ using MediatR;
 
 namespace Main.Application.Handlers.Prices.GetDetailedPrices;
 
-[ExceptionType<CurrencyNotFoundException>]
 public record GetDetailedPricesQuery(IEnumerable<int> ArticleIds, int CurrencyId, Guid? BuyerId)
     : IQuery<GetDetailedPriceResult>;
 

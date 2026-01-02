@@ -12,8 +12,6 @@ using MediatR;
 namespace Main.Application.Handlers.Producers.AddOtherName;
 
 [Transactional]
-[ExceptionType<ProducerNotFoundException>]
-[ExceptionType<SameProducerOtherNameExistsException>]
 public record AddOtherNameCommand(int ProducerId, string OtherName, string WhereUsed) : ICommand<Unit>;
 
 public class AddOtherNameHandler(IProducerRepository producerRepository, IUnitOfWork unitOfWork, DbDataValidatorBase dbValidator)

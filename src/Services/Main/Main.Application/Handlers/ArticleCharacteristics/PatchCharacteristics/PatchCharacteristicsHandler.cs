@@ -10,7 +10,6 @@ using MediatR;
 namespace Main.Application.Handlers.ArticleCharacteristics.PatchCharacteristics;
 
 [Transactional]
-[ExceptionType<ArticleCharacteristicsNotFoundException>]
 public record PatchCharacteristicsCommand(int Id, PatchCharacteristicsDto NewValues) : ICommand;
 
 public class PatchCharacteristicsHandler(

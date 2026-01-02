@@ -8,8 +8,6 @@ using MediatR;
 namespace Main.Application.Handlers.Producers.DeleteProducer;
 
 [Transactional]
-[ExceptionType<ProducerNotFoundException>]
-[ExceptionType<CannotDeleteProducerWithArticlesException>]
 public record DeleteProducerCommand(int Id) : ICommand;
 
 public class DeleteProducerHandler(IProducerRepository producerRepository, IUnitOfWork unitOfWork)

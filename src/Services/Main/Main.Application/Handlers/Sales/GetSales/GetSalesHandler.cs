@@ -12,8 +12,6 @@ using Mapster;
 
 namespace Main.Application.Handlers.Sales.GetSales;
 
-[ExceptionType<UserNotFoundException>]
-[ExceptionType<CurrencyNotFoundException>]
 public record GetSalesQuery(
     DateTime RangeStartDate,
     DateTime RangeEndDate,

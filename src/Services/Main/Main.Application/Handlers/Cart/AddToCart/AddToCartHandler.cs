@@ -9,8 +9,6 @@ using MediatR;
 namespace Main.Application.Handlers.Cart.AddToCart;
 
 [Transactional]
-[ExceptionType<UserNotFoundException>]
-[ExceptionType<SameItemInCartException>]
 public record AddToCartCommand(Guid UserId, int ArticleId, int Count) : ICommand;
 
 public class AddToCartHandler(ICartRepository cartRepository, IUserRepository userRepository, IUnitOfWork unitOfWork) 

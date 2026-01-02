@@ -8,7 +8,6 @@ using MediatR;
 namespace Main.Application.Handlers.Producers.DeleteOtherName;
 
 [Transactional]
-[ExceptionType<ProducersOtherNameNotFoundException>]
 public record DeleteOtherNameCommand(int ProducerId, string OtherName, string? Usage) : ICommand;
 
 public class DeleteOtherNameHandler(IProducerRepository producerRepository, IUnitOfWork unitOfWork)

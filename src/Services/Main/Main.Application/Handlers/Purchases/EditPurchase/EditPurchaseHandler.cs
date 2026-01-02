@@ -15,11 +15,6 @@ using Mapster;
 namespace Main.Application.Handlers.Purchases.EditPurchase;
 
 [Transactional]
-[ExceptionType<CurrencyNotFoundException>]
-[ExceptionType<UserNotFoundException>]
-[ExceptionType<PurchaseNotFoundException>]
-[ExceptionType<PurchaseContentNotFoundException>]
-[ExceptionType<ArticleDoesntMatchContentException>]
 public record EditPurchaseCommand(
     IEnumerable<EditPurchaseDto> Content,
     string PurchaseId,

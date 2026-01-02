@@ -17,11 +17,6 @@ using Mapster;
 namespace Main.Application.Handlers.Purchases.CreatePurchase;
 
 [Transactional]
-[ExceptionType<UserNotFoundException>]
-[ExceptionType<CurrencyNotFoundException>]
-[ExceptionType<TransactionNotFoundExcpetion>]
-[ExceptionType<StorageNotFoundException>]
-[ExceptionType<ArticleNotFoundException>]
 public record CreatePurchaseCommand(
     IEnumerable<NewPurchaseContentDto> Content,
     int CurrencyId,

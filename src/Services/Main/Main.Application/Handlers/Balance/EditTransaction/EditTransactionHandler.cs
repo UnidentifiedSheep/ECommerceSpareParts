@@ -13,8 +13,6 @@ using MediatR;
 namespace Main.Application.Handlers.Balance.EditTransaction;
 
 [Transactional(IsolationLevel.Serializable, 20, 3)]
-[ExceptionType<TransactionNotFoundExcpetion>]
-[ExceptionType<EditingDeletedTransactionException>]
 public record EditTransactionCommand(
     Guid TransactionId,
     int CurrencyId,

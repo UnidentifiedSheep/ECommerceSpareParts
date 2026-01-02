@@ -13,7 +13,6 @@ using MediatR;
 namespace Main.Application.Handlers.Articles.CreateArticles;
 
 [Transactional]
-[ExceptionType<ProducerNotFoundException>]
 public record CreateArticlesCommand(List<CreateArticleDto> NewArticles) : ICommand<CreateArticlesResult>;
 public record CreateArticlesResult(List<int> CreatedIds);
 

@@ -15,9 +15,6 @@ using MediatR;
 namespace Main.Application.Handlers.Users.AddVehicleToGarage;
 
 [Transactional]
-[ExceptionType<UserNotFoundException>]
-[ExceptionType<VinCodeAlreadyTakenException>]
-[ExceptionType<PlateNumberAlreadyTakenException>]
 public record AddVehicleToGarageCommand(VehicleDto Vehicle, Guid UserId) : ICommand<Unit>;
 
 public class AddVehicleToGarageHandler(

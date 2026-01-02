@@ -19,10 +19,6 @@ using MediatR;
 namespace Main.Application.Handlers.Sales.EditSale;
 
 [Transactional]
-[ExceptionType<CurrencyNotFoundException>]
-[ExceptionType<UserNotFoundException>]
-[ExceptionType<SaleNotFoundException>]
-[ExceptionType<SaleContentNotFoundException>]
 public record EditSaleCommand(
     IEnumerable<EditSaleContentDto> EditedContent,
     IEnumerable<PrevAndNewValue<StorageContent>> StorageContentValues,

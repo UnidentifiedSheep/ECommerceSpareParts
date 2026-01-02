@@ -8,8 +8,6 @@ using MediatR;
 namespace Main.Application.Handlers.Markups.DeleteMarkup;
 
 [Transactional]
-[ExceptionType<MarkupGroupNotFoundException>]
-[ExceptionType<MarkupGroupCanNotBeDeletedException>]
 public record DeleteMarkupGroupCommand(int Id) : ICommand;
 
 public class DeleteMarkupGroupHandler(

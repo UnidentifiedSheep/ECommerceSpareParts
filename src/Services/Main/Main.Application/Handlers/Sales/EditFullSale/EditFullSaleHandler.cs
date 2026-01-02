@@ -22,7 +22,6 @@ using MediatR;
 namespace Main.Application.Handlers.Sales.EditFullSale;
 
 [Transactional(IsolationLevel.Serializable, 20, 2)]
-[ExceptionType<SaleNotFoundException>]
 public record EditFullSaleCommand(
     IEnumerable<EditSaleContentDto> EditedContent,
     string SaleId,

@@ -15,9 +15,6 @@ namespace Main.Application.Handlers.ArticleReservations.GetArticlesWithNotEnough
 ///     или есть резервации артикулов другими пользователями при этом количество на складе
 ///     не покрывает продажу и резервацию.
 /// </summary>
-[ExceptionType<StorageNotFoundException>]
-[ExceptionType<ArticleNotFoundException>]
-[ExceptionType<UserNotFoundException>]
 public record GetArticlesWithNotEnoughStockQuery(Guid BuyerId, string StorageName, bool TakeFromOtherStorages,
     Dictionary<int, int> NeededCounts) : IQuery<GetArticlesWithNotEnoughStockResult>;
 

@@ -7,7 +7,6 @@ using MediatR;
 
 namespace Main.Application.Handlers.ArticleReservations.DeleteArticleReservation;
 
-[ExceptionType<ReservationNotFoundException>]
 public record DeleteArticleReservationCommand(int ReservationId) : ICommand;
 
 public class DeleteArticleReservationHandler(

@@ -20,11 +20,6 @@ using Mapster;
 namespace Main.Application.Handlers.Sales.CreateSale;
 
 [Transactional(IsolationLevel.Serializable, 20, 2)]
-[ExceptionType<TransactionNotFoundExcpetion>]
-[ExceptionType<ArticleNotFoundException>]
-[ExceptionType<CurrencyNotFoundException>]
-[ExceptionType<UserNotFoundException>]
-[ExceptionType<StorageNotFoundException>]
 public record CreateSaleCommand(
     IEnumerable<NewSaleContentDto> SellContent,
     IEnumerable<PrevAndNewValue<StorageContent>> StorageContentValues,

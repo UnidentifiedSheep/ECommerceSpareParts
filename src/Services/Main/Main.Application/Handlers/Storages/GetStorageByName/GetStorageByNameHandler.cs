@@ -7,7 +7,6 @@ using Mapster;
 
 namespace Main.Application.Handlers.Storages.GetStorageByName;
 
-[ExceptionType<StorageNotFoundException>]
 public record GetStorageByNameQuery(string StorageName) : IQuery<GetStorageByNameResult>;
 public record GetStorageByNameResult(StorageDto Storage);
 

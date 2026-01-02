@@ -17,10 +17,6 @@ using MediatR;
 namespace Main.Application.Handlers.Balance.DeleteTransaction;
 
 [Transactional(IsolationLevel.Serializable, 20, 3)]
-[ExceptionType<TransactionNotFoundExcpetion>]
-[ExceptionType<TransactionAlreadyDeletedException>]
-[ExceptionType<BadTransactionStatusException>]
-[ExceptionType<UserNotFoundException>]
 public record DeleteTransactionCommand(Guid TransactionId, Guid WhoDeleteUserId, bool IsSystem = false)
     : ICommand<Unit>;
 

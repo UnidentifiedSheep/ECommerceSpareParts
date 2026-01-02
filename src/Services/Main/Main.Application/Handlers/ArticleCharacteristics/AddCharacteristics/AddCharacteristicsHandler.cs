@@ -12,7 +12,6 @@ using Mapster;
 namespace Main.Application.Handlers.ArticleCharacteristics.AddCharacteristics;
 
 [Transactional]
-[ExceptionType<ArticleNotFoundException>]
 public record AddCharacteristicsCommand(IEnumerable<NewCharacteristicsDto> Characteristics)
     : ICommand<AddCharacteristicsResult>;
 

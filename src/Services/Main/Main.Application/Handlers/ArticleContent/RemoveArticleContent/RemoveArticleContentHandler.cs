@@ -8,7 +8,6 @@ using MediatR;
 namespace Main.Application.Handlers.ArticleContent.RemoveArticleContent;
 
 [Transactional]
-[ExceptionType<ArticleContentNotFoundException>]
 public record RemoveArticleContentCommand(int ArticleId, int InsideArticleId) : ICommand;
 
 public class RemoveArticleContentHandler(

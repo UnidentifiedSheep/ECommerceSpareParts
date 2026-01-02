@@ -13,10 +13,6 @@ using MediatR;
 namespace Main.Application.Handlers.Currencies.CreateCurrency;
 
 [Transactional]
-[ExceptionType<CurrencyCodeTakenException>]
-[ExceptionType<CurrencyNameTakenException>]
-[ExceptionType<CurrencySignTakenException>]
-[ExceptionType<CurrencyShortNameTakenException>]
 public record CreateCurrencyCommand(string ShortName, string Name, string CurrencySign, string Code)
     : ICommand<CreateCurrencyResult>;
 

@@ -7,7 +7,6 @@ using Mapster;
 
 namespace Main.Application.Handlers.ArticlePairs.GetArticlePair;
 
-[ExceptionType<ArticlePairNotFoundException>]
 public record GetArticlePairsQuery(int ArticleId) : IQuery<GetArticlePairsResult>;
 
 public record GetArticlePairsResult(ArticleDto Pair);

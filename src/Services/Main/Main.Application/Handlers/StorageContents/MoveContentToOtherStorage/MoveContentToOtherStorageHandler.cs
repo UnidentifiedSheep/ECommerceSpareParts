@@ -18,8 +18,6 @@ using MediatR;
 namespace Main.Application.Handlers.StorageContents.MoveContentToOtherStorage;
 
 [Transactional(IsolationLevel.ReadCommitted, 0, 2)]
-[ExceptionType<StorageNotFoundException>]
-[ExceptionType<ConcurrencyCodeMismatchException>]
 public record MoveContentToOtherStorageCommand(IEnumerable<MoveStorageContentDto> Movements, Guid MovedBy) : ICommand;
 
 public class MoveContentToOtherStorageHandler(IStorageContentService storageContentService, 

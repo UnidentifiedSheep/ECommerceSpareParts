@@ -7,7 +7,6 @@ using Mapster;
 
 namespace Main.Application.Handlers.Markups.GetMarkupGanges;
 
-[ExceptionType<MarkupGroupNotFoundException>]
 public record GetMarkupRangesQuery(int GroupId) : IQuery<GetMarkupRangesResult>;
 
 public record GetMarkupRangesResult(IEnumerable<MarkupRangeDto> Ranges);

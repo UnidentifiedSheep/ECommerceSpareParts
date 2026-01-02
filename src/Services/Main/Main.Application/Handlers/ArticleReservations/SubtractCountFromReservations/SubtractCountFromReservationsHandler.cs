@@ -10,7 +10,6 @@ using Main.Core.Interfaces.DbRepositories;
 namespace Main.Application.Handlers.ArticleReservations.SubtractCountFromReservations;
 
 [Transactional]
-[ExceptionType<UserNotFoundException>]
 public record SubtractCountFromReservationsCommand(Guid UserId, Guid WhoUpdated, Dictionary<int, int> Contents)
     : ICommand<SubtractCountFromReservationsResult>;
 

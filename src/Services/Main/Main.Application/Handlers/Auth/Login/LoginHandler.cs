@@ -16,7 +16,6 @@ using Mapster;
 namespace Main.Application.Handlers.Auth.Login;
 
 [Transactional]
-[ExceptionType<WrongCredentialsException>]
 public record LoginCommand(string Email, string Password, IPAddress? IpAddress, string? UserAgent)
     : ICommand<LoginResult>;
 

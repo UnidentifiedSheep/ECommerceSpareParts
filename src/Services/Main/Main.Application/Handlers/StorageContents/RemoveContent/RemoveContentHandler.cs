@@ -20,10 +20,6 @@ using MediatR;
 namespace Main.Application.Handlers.StorageContents.RemoveContent;
 
 [Transactional(IsolationLevel.Serializable, 20, 2)]
-[ExceptionType<UserNotFoundException>]
-[ExceptionType<StorageNotFoundException>]
-[ExceptionType<ArticleNotFoundException>]
-[ExceptionType<NotEnoughCountOnStorageException>]
 public record RemoveContentCommand(
     Dictionary<int, int> Content,
     Guid UserId,

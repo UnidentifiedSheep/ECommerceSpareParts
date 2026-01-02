@@ -10,7 +10,6 @@ using Main.Core.Extensions;
 namespace Main.Application.Handlers.Permissions.CreatePermission;
 
 [Transactional]
-[ExceptionType<PermissionAlreadyExistsException>]
 public record CreatePermissionCommand(string Name, string? Description) : ICommand<CreatePermissionResult>;
 public record CreatePermissionResult(string Name);
 

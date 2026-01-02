@@ -8,7 +8,6 @@ using MediatR;
 namespace Main.Application.Handlers.ArticlePairs.DeletePair;
 
 [Transactional]
-[ExceptionType<ArticlePairNotFoundException>]
 public record DeletePairCommand(int ArticleId) : ICommand;
 
 public class DeletePairHandler(IArticlePairsRepository pairsRepository, IUnitOfWork unitOfWork)

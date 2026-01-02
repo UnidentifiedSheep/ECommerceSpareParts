@@ -21,9 +21,6 @@ using MediatR;
 namespace Main.Application.Handlers.StorageContents.EditContent;
 
 [Transactional(IsolationLevel.Serializable, 20, 2)]
-[ExceptionType<CurrencyNotFoundException>]
-[ExceptionType<UserNotFoundException>]
-[ExceptionType<ConcurrencyCodeMismatchException>]
 public record EditStorageContentCommand(
     Dictionary<int, ModelWithCode<PatchStorageContentDto, string>> EditedFields,
     Guid UserId) : ICommand;

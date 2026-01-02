@@ -22,10 +22,6 @@ using MediatR;
 namespace Main.Application.Handlers.StorageContents.AddContent;
 
 [Transactional(IsolationLevel.Serializable, 20, 2)]
-[ExceptionType<CurrencyNotFoundException>]
-[ExceptionType<StorageNotFoundException>]
-[ExceptionType<UserNotFoundException>]
-[ExceptionType<ArticleNotFoundException>]
 public record AddContentCommand(
     IEnumerable<NewStorageContentDto> StorageContent,
     string StorageName,

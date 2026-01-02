@@ -8,7 +8,6 @@ using MediatR;
 namespace Main.Application.Handlers.ArticleCharacteristics.DeleteCharacteristics;
 
 [Transactional]
-[ExceptionType<ArticleCharacteristicsNotFoundException>]
 public record DeleteCharacteristicsCommand(int Id) : ICommand;
 
 public class DeleteCharacteristicsHandler(

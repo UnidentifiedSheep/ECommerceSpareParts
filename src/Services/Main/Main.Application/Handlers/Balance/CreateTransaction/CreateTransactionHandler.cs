@@ -16,8 +16,6 @@ using Main.Core.Interfaces.Services;
 namespace Main.Application.Handlers.Balance.CreateTransaction;
 
 [Transactional(IsolationLevel.Serializable, 20, 3)]
-[ExceptionType<CurrencyNotFoundException>]
-[ExceptionType<UserNotFoundException>]
 public record CreateTransactionCommand(
     Guid SenderId,
     Guid ReceiverId,

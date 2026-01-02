@@ -8,7 +8,6 @@ using MediatR;
 namespace Main.Application.Handlers.Storages.DeleteStorage;
 
 [Transactional]
-[ExceptionType<StorageNotFoundException>]
 public record DeleteStorageCommand(string StorageName) : ICommand;
 
 public class DeleteStorageHandler(IStoragesRepository storagesRepository, IUnitOfWork unitOfWork)

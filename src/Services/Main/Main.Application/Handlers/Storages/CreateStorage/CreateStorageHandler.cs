@@ -10,7 +10,6 @@ using MediatR;
 namespace Main.Application.Handlers.Storages.CreateStorage;
 
 [Transactional]
-[ExceptionType<StorageNotFoundException>]
 public record CreateStorageCommand(string Name, string? Description, string? Location) : ICommand<CreateStorageResult>;
 
 public record CreateStorageResult(string Name);

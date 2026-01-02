@@ -7,7 +7,6 @@ using Mapster;
 
 namespace Main.Application.Handlers.Currencies.GetCurrencyById;
 
-[ExceptionType<CurrencyNotFoundException>]
 public record GetCurrencyByIdQuery(int Id) : IQuery<GetCurrencyByIdResult>;
 public record GetCurrencyByIdResult(CurrencyDto Currency);
 

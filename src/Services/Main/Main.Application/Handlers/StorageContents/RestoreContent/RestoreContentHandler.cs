@@ -14,15 +14,13 @@ using Main.Core.Entities;
 using Main.Core.Enums;
 using Main.Core.Interfaces.DbRepositories;
 using Main.Core.Interfaces.Services;
+using Main.Core.Models;
 using Mapster;
 using MediatR;
 
 namespace Main.Application.Handlers.StorageContents.RestoreContent;
 
 [Transactional(IsolationLevel.Serializable, 20, 2)]
-[ExceptionType<CurrencyNotFoundException>]
-[ExceptionType<StorageNotFoundException>]
-[ExceptionType<ArticleNotFoundException>]
 public record RestoreContentCommand(
     IEnumerable<RestoreContentItem> ContentDetails,
     StorageMovementType MovementType,

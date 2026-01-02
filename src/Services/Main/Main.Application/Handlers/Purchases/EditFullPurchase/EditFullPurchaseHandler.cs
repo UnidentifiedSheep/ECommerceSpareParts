@@ -16,7 +16,6 @@ using MediatR;
 namespace Main.Application.Handlers.Purchases.EditFullPurchase;
 
 [Transactional(IsolationLevel.Serializable, 20, 2)]
-[ExceptionType<PurchaseNotFoundException>]
 public record EditFullPurchaseCommand(
     IEnumerable<EditPurchaseDto> Content,
     string PurchaseId,

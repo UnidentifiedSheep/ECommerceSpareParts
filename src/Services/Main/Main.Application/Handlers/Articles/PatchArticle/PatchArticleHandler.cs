@@ -11,7 +11,6 @@ using MediatR;
 namespace Main.Application.Handlers.Articles.PatchArticle;
 
 [Transactional]
-[ExceptionType<ArticleNotFoundException>]
 public record PatchArticleCommand(int ArticleId, PatchArticleDto PatchArticle) : ICommand;
 
 public class PatchArticleHandler(IMediator mediator, IArticlesRepository articlesRepository, IUnitOfWork unitOfWork)

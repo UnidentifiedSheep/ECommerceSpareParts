@@ -13,7 +13,6 @@ using MediatR;
 namespace Main.Application.Handlers.ArticleImages.MapImgsToArticle;
 
 [Transactional]
-[ExceptionType<ArticleNotFoundException>]
 public record MapImgsToArticleCommand(int ArticleId, IEnumerable<IFile> Images) : ICommand;
 
 public class MapImgsToArticleHandler(IS3StorageService s3Storage, IUnitOfWork unitOfWork, IMediator mediator, 

@@ -9,7 +9,6 @@ using MediatR;
 
 namespace Main.Application.Handlers.Roles.CreateRole;
 
-[ExceptionType<RoleAlreadyExistsException>]
 public record CreateRoleCommand(string Name, string? Description) : ICommand;
 
 public class CreateRoleHandler(IRoleRepository roleRepository, IUnitOfWork unitOfWork)

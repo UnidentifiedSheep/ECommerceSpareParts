@@ -12,7 +12,6 @@ using MediatR;
 namespace Main.Application.Handlers.ArticlePairs.CreatePair;
 
 [Transactional]
-[ExceptionType<ArticleNotFoundException>]
 public record CreatePairCommand(int LeftArticleId, int RightArticleId) : ICommand;
 
 public class CreatePairHandler(IUnitOfWork unitOfWork, DbDataValidatorBase dbValidator)

@@ -1,8 +1,6 @@
 using System.Security.Claims;
 using Api.Common.Extensions;
 using Carter;
-using Exceptions.Exceptions.Sales;
-using Exceptions.Exceptions.Storages;
 using Main.Application.Handlers.Sales.CreateFullSale;
 using Main.Core.Dtos.Amw.Sales;
 using MediatR;
@@ -40,7 +38,6 @@ public class CreateSaleEndPoint : ICarterModule
                 .WithDisplayName("Создание новой продажи")
                 .Produces(200)
                 .Produces(401)
-                .HasErrorFlow(typeof(CreateFullSaleCommand))
                 .RequireAnyPermission("SALES.CREATE");
     }
 }

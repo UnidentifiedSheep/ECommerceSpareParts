@@ -15,9 +15,6 @@ using Mapster;
 namespace Main.Application.Handlers.Users.CreateUser;
 
 [Transactional]
-[ExceptionType<RoleNotFoundException>]
-[ExceptionType<UserNameAlreadyTakenException>]
-[ExceptionType<EmailAlreadyTakenException>]
 public record CreateUserCommand(
     string UserName,
     string Password,

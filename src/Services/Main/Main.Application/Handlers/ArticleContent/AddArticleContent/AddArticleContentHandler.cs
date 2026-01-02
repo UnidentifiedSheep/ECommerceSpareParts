@@ -11,7 +11,6 @@ using MediatR;
 namespace Main.Application.Handlers.ArticleContent.AddArticleContent;
 
 [Transactional]
-[ExceptionType<ArticleNotFoundException>]
 public record AddArticleContentCommand(int ArticleId, Dictionary<int, int> Content) : ICommand;
 
 

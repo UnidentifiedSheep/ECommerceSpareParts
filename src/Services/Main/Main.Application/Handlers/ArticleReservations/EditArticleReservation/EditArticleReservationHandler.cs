@@ -15,9 +15,6 @@ using MediatR;
 namespace Main.Application.Handlers.ArticleReservations.EditArticleReservation;
 
 [Transactional]
-[ExceptionType<ReservationNotFoundException>]
-[ExceptionType<ArticleNotFoundException>]
-[ExceptionType<CurrencyNotFoundException>]
 public record EditArticleReservationCommand(int ReservationId, EditArticleReservationDto NewValue, Guid WhoUpdated)
     : ICommand;
 

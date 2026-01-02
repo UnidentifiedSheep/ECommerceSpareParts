@@ -10,7 +10,6 @@ using Mapster;
 namespace Main.Application.Handlers.Producers.CreateProducer;
 
 [Transactional]
-[ExceptionType<ProducerNameTakenException>]
 public record CreateProducerCommand(NewProducerDto NewProducer) : ICommand<CreateProducerResult>;
 
 public record CreateProducerResult(int ProducerId);

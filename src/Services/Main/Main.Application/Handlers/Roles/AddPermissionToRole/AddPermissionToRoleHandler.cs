@@ -11,8 +11,6 @@ using MediatR;
 namespace Main.Application.Handlers.Roles.AddPermissionToRole;
 
 [Transactional]
-[ExceptionType<RoleNotFoundException>]
-[ExceptionType<PermissionNotFoundException>]
 public record AddPermissionToRoleCommand(Guid RoleId, string PermissionName) : ICommand;
 
 public class AddPermissionToRoleHandler(IUnitOfWork unitOfWork, 

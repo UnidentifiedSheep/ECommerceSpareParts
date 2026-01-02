@@ -12,7 +12,6 @@ using Mapster;
 namespace Main.Application.Handlers.Auth.RefreshToken;
 
 [Transactional]
-[ExceptionType<InvalidCastException>]
 public record RefreshTokenCommand(string RefreshToken, string DeviceId) : ICommand<RefreshTokenResult>;
 
 public record RefreshTokenResult(string Token, string RefreshToken);

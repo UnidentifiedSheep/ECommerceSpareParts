@@ -13,8 +13,6 @@ using MediatR;
 namespace Main.Application.Handlers.Users.AddPermissionToUser;
 
 [Transactional]
-[ExceptionType<UserNotFoundException>]
-[ExceptionType<PermissionNotFoundException>]
 public record AddPermissionToUserCommand(Guid UserId, string PermissionName) : ICommand;
 
 public class AddPermissionToUserHandler(IUnitOfWork unitOfWork, DbDataValidatorBase dbValidator) : ICommandHandler<AddPermissionToUserCommand>
