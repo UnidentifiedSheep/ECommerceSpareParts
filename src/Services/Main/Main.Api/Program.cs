@@ -87,7 +87,7 @@ builder.Services.AddSingleton(brokerOptions);
 
 var emailOptions = new UserEmailOptions
 {
-    MinEmailCount = 0,
+    MinEmailCount = 1,
     MaxEmailCount = 5
 };
 

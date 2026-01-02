@@ -1,4 +1,5 @@
 ﻿using Main.Core.Entities;
+using Main.Core.Extensions;
 using Main.Core.Permissions;
 using Main.Persistence.Context;
 using Microsoft.EntityFrameworkCore;
@@ -183,7 +184,7 @@ public class RolePermissionSeed : ISeed<DContext>
 
         foreach (var code in needed)
         {
-            var key = code.ToString().Replace('_', '.');
+            var key = code.ToPermissionName();
 
             if (!permissions.TryGetValue(key, out var permission))
                 throw new InvalidOperationException(
