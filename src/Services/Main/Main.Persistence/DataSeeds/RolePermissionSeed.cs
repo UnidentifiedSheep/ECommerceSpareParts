@@ -1,6 +1,6 @@
-﻿using Main.Core.Entities;
-using Main.Core.Extensions;
-using Main.Core.Permissions;
+﻿using Core.Extensions;
+using Main.Core.Entities;
+using Main.Core.Enums;
 using Main.Persistence.Context;
 using Microsoft.EntityFrameworkCore;
 using Persistence.Interfaces;
@@ -184,7 +184,7 @@ public class RolePermissionSeed : ISeed<DContext>
 
         foreach (var code in needed)
         {
-            var key = code.ToPermissionName();
+            var key = code.ToNormalizedPermission();
 
             if (!permissions.TryGetValue(key, out var permission))
                 throw new InvalidOperationException(

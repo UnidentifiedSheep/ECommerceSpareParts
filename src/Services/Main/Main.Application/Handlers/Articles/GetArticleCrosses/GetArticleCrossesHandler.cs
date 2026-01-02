@@ -10,7 +10,7 @@ using Mapster;
 namespace Main.Application.Handlers.Articles.GetArticleCrosses;
 
 [ExceptionType<ArticleNotFoundException>]
-public record GetArticleCrossesQuery<TDto>(int ArticleId, PaginationModel Pagination, string? SortBy, string? UserId)
+public record GetArticleCrossesQuery<TDto>(int ArticleId, PaginationModel Pagination, string? SortBy, Guid? UserId)
     : IQuery<GetArticleCrossesResult<TDto>>, ICacheableQuery
 {
     public HashSet<string> RelatedEntityIds { get; } = [ArticleId.ToString()];

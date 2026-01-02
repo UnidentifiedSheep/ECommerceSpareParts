@@ -20,4 +20,9 @@ public static partial class NormalizationExtensions
         if (string.IsNullOrWhiteSpace(source)) return source;
         return OnlyDigitsRegex().Replace(source.Trim(), "");
     }
+
+    public static string ToNormalizedPermission(this string permission) =>
+        permission.ToUpperInvariant().Replace('_', '.');
+    public static string ToNormalizedPermission(this Enum permission) =>
+        permission.ToString().ToUpperInvariant().Replace('_', '.');
 }

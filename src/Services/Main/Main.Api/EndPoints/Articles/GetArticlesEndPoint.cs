@@ -1,8 +1,6 @@
 ﻿using System.Security.Claims;
-using Api.Common.Extensions;
 using Carter;
 using Core.Models;
-using Core.StaticFunctions;
 using Main.Application.Handlers.Articles.GetArticles;
 using Main.Core.Enums;
 using Mapster;
@@ -51,7 +49,7 @@ public class GetArticlesEndPoint : ICarterModule
 
     private async Task<IResult> GetAmw(ISender sender, GetArticleRequest request,
         PaginationModel pagination,
-        string? userId, IEnumerable<int> producerIds, CancellationToken token)
+        Guid? userId, IEnumerable<int> producerIds, CancellationToken token)
     {
         var query = new GetArticlesQuery<AmwArticleDto>(request.SearchTerm, pagination, request.SortBy, producerIds,
             request.SearchStrategy, userId);
@@ -62,7 +60,7 @@ public class GetArticlesEndPoint : ICarterModule
 
     private async Task<IResult> GetAnonymous(ISender sender, GetArticleRequest request,
         PaginationModel pagination,
-        string? userId, IEnumerable<int> producerIds, CancellationToken token)
+        Guid? userId, IEnumerable<int> producerIds, CancellationToken token)
     {
         var query = new GetArticlesQuery<AnonymousArticleDto>(request.SearchTerm, pagination, request.SortBy,
             producerIds, request.SearchStrategy, userId);

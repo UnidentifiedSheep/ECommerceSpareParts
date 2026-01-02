@@ -4,9 +4,10 @@ namespace Security.Extensions;
 
 public static class JwtExtensions
 {
-    public static string? GetUserId(this ClaimsPrincipal user)
+    public static Guid? GetUserId(this ClaimsPrincipal user)
     {
-        return user.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+        var foundValue = user.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+        return foundValue == null ? null : Guid.Parse(foundValue);
     }
 
     public static bool HasPermissions(this ClaimsPrincipal user, params string[] requiredPermissions)

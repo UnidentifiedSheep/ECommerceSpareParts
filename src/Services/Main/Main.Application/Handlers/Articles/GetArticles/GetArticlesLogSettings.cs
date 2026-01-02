@@ -8,7 +8,7 @@ public class GetArticlesAmwLogSettings : ILoggableRequest<GetArticlesQuery<AmwAr
 {
     public bool IsLoggingNeeded(GetArticlesQuery<AmwArticleDto> request)
     {
-        return true;
+        return request.UserId != null;
     }
 
     public string GetLogPlace(GetArticlesQuery<AmwArticleDto> request)
@@ -21,7 +21,7 @@ public class GetArticlesAmwLogSettings : ILoggableRequest<GetArticlesQuery<AmwAr
         return request;
     }
 
-    public string? GetUserId(GetArticlesQuery<AmwArticleDto> request)
+    public Guid? GetUserId(GetArticlesQuery<AmwArticleDto> request)
     {
         return request.UserId;
     }
@@ -31,7 +31,7 @@ public class GetArticlesMemberLogSettings : ILoggableRequest<GetArticlesQuery<An
 {
     public bool IsLoggingNeeded(GetArticlesQuery<AnonymousArticleDto> request)
     {
-        return true;
+        return request.UserId != null;
     }
 
     public string GetLogPlace(GetArticlesQuery<AnonymousArticleDto> request)
@@ -44,7 +44,7 @@ public class GetArticlesMemberLogSettings : ILoggableRequest<GetArticlesQuery<An
         return request;
     }
 
-    public string? GetUserId(GetArticlesQuery<AnonymousArticleDto> request)
+    public Guid? GetUserId(GetArticlesQuery<AnonymousArticleDto> request)
     {
         return request.UserId;
     }

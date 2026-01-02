@@ -6,7 +6,7 @@ public class GetUsersLogSettings : ILoggableRequest<GetUsersQuery>
 {
     bool ILoggableRequest<GetUsersQuery>.IsLoggingNeeded(GetUsersQuery request)
     {
-        return !string.IsNullOrWhiteSpace(request.WhoSearchedUserId);
+        return request.WhoSearchedUserId != null;
     }
 
     public string GetLogPlace(GetUsersQuery request)
@@ -19,7 +19,7 @@ public class GetUsersLogSettings : ILoggableRequest<GetUsersQuery>
         return request;
     }
 
-    public string? GetUserId(GetUsersQuery request)
+    public Guid? GetUserId(GetUsersQuery request)
     {
         return request.WhoSearchedUserId;
     }

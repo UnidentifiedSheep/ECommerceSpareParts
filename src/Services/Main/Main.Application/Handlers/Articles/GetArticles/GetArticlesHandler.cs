@@ -15,7 +15,7 @@ public record GetArticlesQuery<TDto>(
     string? SortBy,
     IEnumerable<int> ProducerIds,
     ArticleSearchStrategy Strategy,
-    string? UserId) : IQuery<GetArticlesResult<TDto>>;
+    Guid? UserId) : IQuery<GetArticlesResult<TDto>>;
 
 public record GetArticlesResult<TDto>(IEnumerable<TDto> Articles);
 

@@ -13,7 +13,7 @@ public record GetUsersQuery(
     string? SearchTerm,
     PaginationModel Pagination,
     double? SimilarityLevel,
-    string? WhoSearchedUserId,
+    Guid? WhoSearchedUserId,
     string? Name,
     string? Surname,
     string? Email,

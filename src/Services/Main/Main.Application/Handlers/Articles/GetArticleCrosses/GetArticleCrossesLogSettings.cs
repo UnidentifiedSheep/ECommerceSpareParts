@@ -18,10 +18,10 @@ public class GetArticleCrossesAmwLogSettings : ILoggableRequest<GetArticleCrosse
 
     public bool IsLoggingNeeded(GetArticleCrossesQuery<AmwArticleDto> request)
     {
-        return !string.IsNullOrWhiteSpace(request.UserId);
+        return request.UserId != null;
     }
 
-    public string? GetUserId(GetArticleCrossesQuery<AmwArticleDto> request)
+    public Guid? GetUserId(GetArticleCrossesQuery<AmwArticleDto> request)
     {
         return request.UserId;
     }
@@ -41,10 +41,10 @@ public class GetArticleCrossesMemberLogSettings : ILoggableRequest<GetArticleCro
 
     public bool IsLoggingNeeded(GetArticleCrossesQuery<MemberArticleDto> request)
     {
-        return !string.IsNullOrWhiteSpace(request.UserId);
+        return request.UserId != null;
     }
 
-    public string? GetUserId(GetArticleCrossesQuery<MemberArticleDto> request)
+    public  Guid? GetUserId(GetArticleCrossesQuery<MemberArticleDto> request)
     {
         return request.UserId;
     }

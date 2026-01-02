@@ -373,22 +373,19 @@ public partial class DContext : DbContext
 
         modelBuilder.Entity<Cart>(entity =>
         {
-            entity.HasKey(e => e.Id).HasName("cart_pk");
+            entity.HasKey(e => new { e.UserId, e.ArticleId }).HasName("cart_pk");
 
             entity.ToTable("cart");
 
-            entity.HasIndex(e => e.ArticleId, "cart_article_id_index");
-
-            entity.HasIndex(e => e.UserId, "cart_user_id_index");
-
-            entity.Property(e => e.Id)
-                .HasDefaultValueSql("gen_random_uuid()")
-                .HasColumnName("id");
+            entity.Property(e => e.UserId).HasColumnName("user_id");
             entity.Property(e => e.ArticleId).HasColumnName("article_id");
             entity.Property(e => e.Count).HasColumnName("count");
-            entity.Property(e => e.Price).HasColumnName("price");
-            entity.Property(e => e.UserId).HasColumnName("user_id");
-            entity.Property(e => e.ValidTill).HasColumnName("valid_till");
+            entity.Property(e => e.CreatedAt)
+                .HasDefaultValueSql("now()")
+                .HasColumnName("created_at");
+            entity.Property(e => e.UpdatedAt)
+                .HasDefaultValueSql("now()")
+                .HasColumnName("updated_at");
 
             entity.HasOne(d => d.Article).WithMany(p => p.Carts)
                 .HasForeignKey(d => d.ArticleId)

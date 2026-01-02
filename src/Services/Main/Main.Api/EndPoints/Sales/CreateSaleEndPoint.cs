@@ -38,6 +38,8 @@ public class CreateSaleEndPoint : ICarterModule
                 }).WithTags("Sales")
                 .WithDescription("Создание новой продажи")
                 .WithDisplayName("Создание новой продажи")
+                .Produces(200)
+                .Produces(401)
                 .HasErrorFlow(typeof(CreateFullSaleCommand))
                 .RequireAnyPermission("SALES.CREATE");
     }

@@ -1,7 +1,6 @@
 using System.Security.Claims;
 using Carter;
 using Core.Models;
-using Core.StaticFunctions;
 using Main.Application.Handlers.Articles.GetArticleCrosses;
 using Mapster;
 using MediatR;
@@ -39,7 +38,7 @@ public class GetArticleCrossesEndPoint : ICarterModule
     }
 
     private async Task<IResult> GetAmw(ISender sender, int articleId, PaginationModel pagination, string? sortBy,
-        string userId, CancellationToken token)
+        Guid? userId, CancellationToken token)
     {
         var query = new GetArticleCrossesQuery<AmwArticleDto>(articleId, pagination, sortBy, userId);
         var result = await sender.Send(query, token);
@@ -48,7 +47,7 @@ public class GetArticleCrossesEndPoint : ICarterModule
     }
 
     private async Task<IResult> GetMember(ISender sender, int articleId, PaginationModel pagination, string? sortBy,
-        string userId, CancellationToken token)
+        Guid? userId, CancellationToken token)
     {
         var query = new GetArticleCrossesQuery<MemberArticleDto>(articleId, pagination, sortBy, userId);
         var result = await sender.Send(query, token);

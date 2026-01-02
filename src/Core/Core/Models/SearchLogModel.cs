@@ -2,7 +2,7 @@ namespace Core.Models;
 
 public class SearchLogModel
 {
-    public SearchLogModel(string userId, string searchPlace, object query)
+    public SearchLogModel(Guid userId, string searchPlace, object query)
     {
         if (string.IsNullOrWhiteSpace(searchPlace))
             throw new ArgumentNullException(nameof(searchPlace), "Search place cannot be null or whitespace.");
@@ -12,7 +12,7 @@ public class SearchLogModel
         SearchDateTime = DateTime.Now;
     }
 
-    public string UserId { get; set; }
+    public Guid UserId { get; set; }
 
     public string SearchPlace { get; set; }
 

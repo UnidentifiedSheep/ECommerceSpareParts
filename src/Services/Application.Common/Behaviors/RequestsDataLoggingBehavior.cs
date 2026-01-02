@@ -22,7 +22,7 @@ public class RequestsDataLoggingBehavior<TRequest, TResponse>(
         var userId = logParam.GetUserId(request);
         if (!logParam.IsLoggingNeeded(request) || userId == null) return await next(cancellationToken);
 
-        var searchModel = new SearchLogModel(userId, logParam.GetLogPlace(request), logParam.GetLogData(request));
+        var searchModel = new SearchLogModel(userId.Value, logParam.GetLogPlace(request), logParam.GetLogData(request));
         searchLogger.Enqueue(searchModel);
 
         return await next(cancellationToken);

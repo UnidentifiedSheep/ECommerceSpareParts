@@ -9,6 +9,7 @@ using Main.Core.Enums;
 using Mapster;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
+using Security.Extensions;
 
 namespace Main.Api.EndPoints.Users;
 
@@ -37,7 +38,7 @@ public class GetUsersEndPoint : ICarterModule
                 async (ISender sender, [AsParameters] GetUsersRequest request, ClaimsPrincipal claims,
                     CancellationToken token) =>
                 {
-                    var userId = claims.FindFirstValue(ClaimTypes.NameIdentifier);
+                    var userId = claims.GetUserId();
                     if (userId == null) return Results.Unauthorized();
                     var pagination = new PaginationModel(request.Page, request.Limit);
                     var query = new GetUsersQuery(request.SearchTerm, pagination, request.SimilarityLevel,

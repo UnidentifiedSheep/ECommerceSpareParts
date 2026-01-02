@@ -1,5 +1,5 @@
 ﻿// ReSharper disable InconsistentNaming
-namespace Main.Core.Permissions;
+namespace Main.Core.Enums;
 
 public enum PermissionCodes
 {
@@ -107,5 +107,11 @@ public enum PermissionCodes
 
     // ===== PERMISSIONS =====
     PERMISSIONS_CREATE,
-    PERMISSIONS_GET
+    PERMISSIONS_GET,
+    
+    // ===== CART =====
+    CART_ADD,
+    CART_GET,
+    CART_DELETE,
+    CART_UPDATE,
 }
