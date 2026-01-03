@@ -545,11 +545,13 @@ public partial class DContext : DbContext
 
             entity.HasIndex(e => e.CurrencyId, "orders_currency_id_index");
 
+            entity.HasIndex(e => e.IsCanceled, "orders_is_canceled_index");
+
             entity.HasIndex(e => e.SellerApproved, "orders_seller_approved_index");
 
             entity.HasIndex(e => e.Status, "orders_status_index");
 
-            entity.HasIndex(e => e.UserId, "orders_user_id_index");
+            entity.HasIndex(e => new { e.UserId, e.IsCanceled }, "orders_user_id_is_canceled_index");
 
             entity.Property(e => e.Id)
                 .HasDefaultValueSql("gen_random_uuid()")
@@ -559,6 +561,7 @@ public partial class DContext : DbContext
                 .HasDefaultValueSql("now()")
                 .HasColumnName("create_at");
             entity.Property(e => e.CurrencyId).HasColumnName("currency_id");
+            entity.Property(e => e.IsCanceled).HasColumnName("is_canceled");
             entity.Property(e => e.SellerApproved).HasColumnName("seller_approved");
             entity.Property(e => e.SignedTotalPrice).HasColumnName("signed_total_price");
             entity.Property(e => e.Status).HasColumnName("status");

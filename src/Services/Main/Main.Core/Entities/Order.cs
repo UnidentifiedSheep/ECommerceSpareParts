@@ -22,6 +22,7 @@ public partial class Order
 
     public Guid? WhoUpdated { get; set; }
 
+    public bool IsCanceled { get; set; }
     public virtual Currency Currency { get; set; } = null!;
 
     public virtual ICollection<OrderItem> OrderItems { get; set; } = new List<OrderItem>();

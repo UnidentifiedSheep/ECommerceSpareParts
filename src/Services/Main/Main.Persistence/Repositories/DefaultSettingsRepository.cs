@@ -16,7 +16,8 @@ public class DefaultSettingsRepository(DContext context) : IDefaultSettingsRepos
                                                   INSERT INTO default_settings (key, value) 
                                                   VALUES ('DefaultCurrency', '3'), ('DefaultMarkUp', '25'),
                                                          ('MaximumDaysOfPriceStorage', '30'), ('SelectedMarkupId', '-1'),
-                                                         ('PriceGenerationStrategy', 'TakeHighestPrice')
+                                                         ('PriceGenerationStrategy', 'TakeHighestPrice'),
+                                                         ('UseOrderAutoApprovement', 'false')
                                                   ON CONFLICT (key) DO NOTHING;
                                                   """, cancellationToken);
     }
