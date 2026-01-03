@@ -5,7 +5,7 @@ using Main.Core.Interfaces.Pricing;
 using Main.Core.Models;
 using Serilog;
 
-namespace Main.Application.Pricing;
+namespace Main.Application.Services.Pricing;
 
 public class PriceSetup(
     IDefaultSettingsRepository defaultSettingsRepository,

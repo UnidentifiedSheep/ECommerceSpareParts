@@ -38,8 +38,8 @@ public class GetUsersEndPoint : ICarterModule
                 async (ISender sender, [AsParameters] GetUsersRequest request, ClaimsPrincipal claims,
                     CancellationToken token) =>
                 {
-                    var userId = claims.GetUserId();
-                    if (userId == null) return Results.Unauthorized();
+                    if (!claims.GetUserId(out var userId)) return Results.Unauthorized();
+                    
                     var pagination = new PaginationModel(request.Page, request.Limit);
                     var query = new GetUsersQuery(request.SearchTerm, pagination, request.SimilarityLevel,
                         userId, request.Name, request.Surname, request.Email, request.Phone, request.UserName,

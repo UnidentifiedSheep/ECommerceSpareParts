@@ -15,10 +15,12 @@ public class CartRepository(DContext context) : ICartRepository
             .FirstOrDefaultAsync(x => x.UserId == userId && x.ArticleId == articleId, cancellationToken);
     }
 
-    public async Task<IEnumerable<Cart>> GetUserCartAsync(Guid userId, bool track = true, int? page = null, int? limit = null,
+    public async Task<IEnumerable<Cart>> GetCartItemsAsync(Guid userId, bool track = true, int? page = null, int? limit = null,
         CancellationToken cancellationToken = default)
     {
         var query = context.Carts
+            .Include(x => x.Article)
+            .ThenInclude(x => x.Producer)
             .ConfigureTracking(track)
             .Where(x => x.UserId == userId);
 

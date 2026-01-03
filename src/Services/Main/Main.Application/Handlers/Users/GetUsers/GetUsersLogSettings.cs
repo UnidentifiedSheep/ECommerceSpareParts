@@ -6,7 +6,7 @@ public class GetUsersLogSettings : ILoggableRequest<GetUsersQuery>
 {
     bool ILoggableRequest<GetUsersQuery>.IsLoggingNeeded(GetUsersQuery request)
     {
-        return request.WhoSearchedUserId != null;
+        return request.WhoSearchedUserId != null && request.WhoSearchedUserId != Guid.Empty;
     }
 
     public string GetLogPlace(GetUsersQuery request)

@@ -149,7 +149,7 @@ builder.Services
         return new AmazonS3Client(Environment.GetEnvironmentVariable("S3_LOGIN"), 
             Environment.GetEnvironmentVariable("S3_PASSWORD"), config);
     })
-    .AddApplicationLayer(emailOptions);
+    .AddApplicationLayer(Environment.GetEnvironmentVariable("SIGN_SECRET")!, emailOptions);
 
 
 

@@ -8,7 +8,7 @@ public class GetArticlesAmwLogSettings : ILoggableRequest<GetArticlesQuery<AmwAr
 {
     public bool IsLoggingNeeded(GetArticlesQuery<AmwArticleDto> request)
     {
-        return request.UserId != null;
+        return request.UserId != null && request.UserId != Guid.Empty;
     }
 
     public string GetLogPlace(GetArticlesQuery<AmwArticleDto> request)
@@ -31,7 +31,7 @@ public class GetArticlesMemberLogSettings : ILoggableRequest<GetArticlesQuery<An
 {
     public bool IsLoggingNeeded(GetArticlesQuery<AnonymousArticleDto> request)
     {
-        return request.UserId != null;
+        return request.UserId != null && request.UserId != Guid.Empty;
     }
 
     public string GetLogPlace(GetArticlesQuery<AnonymousArticleDto> request)

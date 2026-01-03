@@ -15,10 +15,9 @@ public class DeleteFromCartEndPoint : ICarterModule
         app.MapDelete("/cart/{articleId}", async (ISender sender, ClaimsPrincipal user, int articleId, 
             CancellationToken cancellationToken) =>
         {
-            var userId = user.GetUserId();
-            if (userId == null) return Results.Unauthorized();
+            if (!user.GetUserId(out var userId)) return Results.Unauthorized();
             
-            var command = new DeleteFromCartCommand(userId.Value, articleId);
+            var command = new DeleteFromCartCommand(userId, articleId);
             await sender.Send(command, cancellationToken);
             return Results.NoContent();
         }).WithTags("Cart")

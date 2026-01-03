@@ -19,6 +19,7 @@ using Main.Core.Dtos.Amw.Storage;
 using Main.Core.Dtos.Amw.Users;
 using Main.Core.Dtos.Anonymous.Articles;
 using Main.Core.Dtos.Anonymous.Producers;
+using Main.Core.Dtos.Cart;
 using Main.Core.Dtos.Emails;
 using Main.Core.Dtos.Member.Vehicles;
 using Main.Core.Dtos.Roles;
@@ -515,5 +516,11 @@ public static class MapsterConfig
             .IgnoreNonMapped(true)
             .Map(d => d.Name, s => s.Name)
             .Map(d => d.Description, s => s.Description);
+
+        TypeAdapterConfig<Cart, CartItemDto>.NewConfig()
+            .Map(d => d.ArticleId, s => s.ArticleId)
+            .Map(d => d.Count, s => s.Count)
+            .Map(d => d.CreatedAt, s => s.CreatedAt)
+            .Map(d => d.Article, s => s.Article.Adapt<AnonymousArticleDto>());
     }
 }

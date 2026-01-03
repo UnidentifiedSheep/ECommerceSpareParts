@@ -16,9 +16,8 @@ public class AddToCartEndPoint : ICarterModule
     {
         app.MapPost("/cart", async (ISender sender, ClaimsPrincipal user, AddToCartRequest request, CancellationToken cancellationToken) =>
         {
-            var userId = user.GetUserId();
-            if (userId == null) return Results.Unauthorized();
-            var command = new AddToCartCommand(userId.Value, request.ArticleId, request.Count);
+            if (!user.GetUserId(out var userId)) return Results.Unauthorized();
+            var command = new AddToCartCommand(userId, request.ArticleId, request.Count);
             await sender.Send(command, cancellationToken);
             return Results.NoContent();
         }).WithTags("Cart")

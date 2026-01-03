@@ -30,7 +30,8 @@ public class GetArticlesEndPoint : ICarterModule
         app.MapGet("/articles", async (ISender sender, HttpContext context, ClaimsPrincipal user,
                 [AsParameters] GetArticleRequest request, CancellationToken token) =>
             {
-                var userId = user.GetUserId();
+                user.GetUserId(out var userId);
+                
                 var producerIds = context.Request.Query["producerId"]
                     .Select(x => int.TryParse(x, out var id) ? id : (int?)null)
                     .Where(x => x.HasValue)

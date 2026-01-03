@@ -21,8 +21,7 @@ public class GetArticleCrossesEndPoint : ICarterModule
         app.MapGet("/articles/{articleId}/crosses/", async (ISender sender, ClaimsPrincipal user, int articleId,
                 int limit, int page, string? sortBy, CancellationToken token) =>
             {
-                var userId = user.GetUserId();
-                if (userId == null) return Results.Unauthorized();
+                if (!user.GetUserId(out var userId)) return Results.Unauthorized();
                 if (!user.HasPermissions("ARTICLE.CROSSES.GET")) return Results.Forbid();
 
                 var pagination = new PaginationModel(page, limit);

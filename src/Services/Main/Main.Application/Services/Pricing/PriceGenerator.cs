@@ -7,7 +7,7 @@ using Main.Core.Entities;
 using Main.Core.Interfaces.Pricing;
 using Main.Core.Models;
 
-namespace Main.Application.Pricing;
+namespace Main.Application.Services.Pricing;
 
 public class PriceGenerator(ICurrencyConverter currencyConverter) : IPriceGenerator
 {

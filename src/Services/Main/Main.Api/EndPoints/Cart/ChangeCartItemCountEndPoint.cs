@@ -17,10 +17,9 @@ public class ChangeCartItemCountEndPoint : ICarterModule
         app.MapPatch("/cart/{articleId}", async (ISender sender, ClaimsPrincipal user, int articleId,  
             ChangeCartItemCountRequest request, CancellationToken cancellationToken) =>
         {
-            var userId = user.GetUserId();
-            if (userId == null) return Results.Unauthorized();
+            if (!user.GetUserId(out var userId)) return Results.Unauthorized();
             
-            var command = new ChangeCartItemCountCommand(userId.Value, articleId, request.NewCount);
+            var command = new ChangeCartItemCountCommand(userId, articleId, request.NewCount);
             await sender.Send(command, cancellationToken);
             return Results.NoContent();
         }).WithTags("Cart")

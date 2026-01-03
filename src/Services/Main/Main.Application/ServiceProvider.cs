@@ -4,6 +4,7 @@ using Application.Common.Factories;
 using Application.Common.Interfaces;
 using Application.Common.Validators;
 using Core.Abstractions;
+using Core.Attributes;
 using Core.Interfaces;
 using Core.Interfaces.CacheRepositories;
 using Core.Interfaces.Validators;
@@ -13,9 +14,9 @@ using Main.Application.ConcurrencyValidator;
 using Main.Application.Handlers.Articles.GetArticleCrosses;
 using Main.Application.Handlers.Articles.GetArticles;
 using Main.Application.HangFireTasks;
-using Main.Application.Pricing;
 using Main.Application.RelatedData;
 using Main.Application.Services;
+using Main.Application.Services.Pricing;
 using Main.Application.Validation;
 using Main.Core.Abstractions;
 using Main.Core.Entities;
@@ -33,7 +34,7 @@ namespace Main.Application;
 
 public static class ServiceProvider
 {
-    public static IServiceCollection AddApplicationLayer(this IServiceCollection collection,
+    public static IServiceCollection AddApplicationLayer(this IServiceCollection collection, string signSecret,
         UserEmailOptions? emailOptions = null, UserPhoneOptions? phoneOptions = null)
     {
         var relatedDataTtl = TimeSpan.FromHours(10);
@@ -54,6 +55,7 @@ public static class ServiceProvider
         collection.AddScoped<ISaleService, SaleService>();
         collection.AddScoped<IUserTokenService, UserTokenService>();
         collection.AddScoped<IRolePermissionService, RolePermissionService>();
+        collection.AddSingleton<BaseSigner, JsonSigner>(_ => new JsonSigner(signSecret));
 
         collection.AddSingleton<IEmailValidator, EmailValidator>();
         collection.AddSingleton<IConcurrencyValidator<StorageContent>, StorageContentConcurrencyValidator>();

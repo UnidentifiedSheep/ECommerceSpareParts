@@ -34,6 +34,7 @@ services:
       - GATEWAY_SUPER_KEY=${GATEWAY_SUPER_KEY}
       - SYSTEM_ID=${MAIN_SYSTEM_ID}
       - USE_HTTPS_REDIRECTION=${MAIN_USE_HTTPS_REDIRECTION}
+      - SIGN_SECRET=${MAIN_SIGN_SECRET}
     networks:
       - backend-network
     depends_on:

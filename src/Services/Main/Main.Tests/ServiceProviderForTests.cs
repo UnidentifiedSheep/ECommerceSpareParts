@@ -39,7 +39,7 @@ public static class ServiceProviderForTests
             .WriteTo.Console()
             .CreateLogger();
 
-        ApplicationServiceProvider.AddApplicationLayer(services)
+        ApplicationServiceProvider.AddApplicationLayer(services, "some secret")
             .AddPersistenceLayer(postgresConnectionString);
         var passwordRules = new PasswordRules
         {
