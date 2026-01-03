@@ -20,6 +20,10 @@ public partial class Currency
 
     public virtual ICollection<MarkupGroup> MarkupGroups { get; set; } = new List<MarkupGroup>();
 
+    public virtual ICollection<OrderVersion> OrderVersions { get; set; } = new List<OrderVersion>();
+
+    public virtual ICollection<Order> Orders { get; set; } = new List<Order>();
+
     public virtual ICollection<Purchase> Purchases { get; set; } = new List<Purchase>();
 
     public virtual ICollection<SaleContentDetail> SaleContentDetails { get; set; } = new List<SaleContentDetail>();

@@ -5,6 +5,7 @@ using Core.StaticFunctions;
 using Exceptions.Exceptions.Articles;
 using Main.Core.Entities;
 using Main.Core.Interfaces.DbRepositories;
+using Main.Core.Models;
 using Mapster;
 
 namespace Main.Application.Handlers.Articles.GetArticleCrosses;

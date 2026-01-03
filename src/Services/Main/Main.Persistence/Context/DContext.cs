@@ -47,6 +47,12 @@ public partial class DContext : DbContext
 
     public virtual DbSet<MarkupRange> MarkupRanges { get; set; }
 
+    public virtual DbSet<Order> Orders { get; set; }
+
+    public virtual DbSet<OrderItem> OrderItems { get; set; }
+
+    public virtual DbSet<OrderVersion> OrderVersions { get; set; }
+
     public virtual DbSet<Permission> Permissions { get; set; }
 
     public virtual DbSet<Producer> Producers { get; set; }
@@ -132,7 +138,7 @@ public partial class DContext : DbContext
             
             entity.HasIndex(e => e.ArticleName, "articles_article_name_index")
                 .HasMethod("gin")
-                .HasOperators("gin_trgm_ops");
+                .HasOperators(new[] { "gin_trgm_ops" });
 
             entity.HasIndex(e => e.ArticleNumber, "articles_article_number_index")
                 .HasMethod("gin")
@@ -527,6 +533,117 @@ public partial class DContext : DbContext
             entity.HasOne(d => d.Group).WithMany(p => p.MarkupRanges)
                 .HasForeignKey(d => d.GroupId)
                 .HasConstraintName("markup_ranges_markup_group_id_fk");
+        });
+        
+        modelBuilder.Entity<Order>(entity =>
+        {
+            entity.HasKey(e => e.Id).HasName("orders_pk");
+
+            entity.ToTable("orders");
+
+            entity.HasIndex(e => e.BuyerApproved, "orders_buyer_approved_index");
+
+            entity.HasIndex(e => e.CurrencyId, "orders_currency_id_index");
+
+            entity.HasIndex(e => e.SellerApproved, "orders_seller_approved_index");
+
+            entity.HasIndex(e => e.Status, "orders_status_index");
+
+            entity.HasIndex(e => e.UserId, "orders_user_id_index");
+
+            entity.Property(e => e.Id)
+                .HasDefaultValueSql("gen_random_uuid()")
+                .HasColumnName("id");
+            entity.Property(e => e.BuyerApproved).HasColumnName("buyer_approved");
+            entity.Property(e => e.CreateAt)
+                .HasDefaultValueSql("now()")
+                .HasColumnName("create_at");
+            entity.Property(e => e.CurrencyId).HasColumnName("currency_id");
+            entity.Property(e => e.SellerApproved).HasColumnName("seller_approved");
+            entity.Property(e => e.SignedTotalPrice).HasColumnName("signed_total_price");
+            entity.Property(e => e.Status).HasColumnName("status");
+            entity.Property(e => e.UpdateAt).HasColumnName("update_at");
+            entity.Property(e => e.UserId).HasColumnName("user_id");
+            entity.Property(e => e.WhoUpdated).HasColumnName("who_updated");
+
+            entity.HasOne(d => d.Currency).WithMany(p => p.Orders)
+                .HasForeignKey(d => d.CurrencyId)
+                .OnDelete(DeleteBehavior.Restrict)
+                .HasConstraintName("orders_currency_id_fk");
+
+            entity.HasOne(d => d.User).WithMany(p => p.OrderUsers)
+                .HasForeignKey(d => d.UserId)
+                .HasConstraintName("orders_users_id_fk");
+
+            entity.HasOne(d => d.WhoUpdatedNavigation).WithMany(p => p.OrderWhoUpdatedNavigations)
+                .HasForeignKey(d => d.WhoUpdated)
+                .OnDelete(DeleteBehavior.Restrict)
+                .HasConstraintName("orders_users_id_fk_2");
+        });
+
+        modelBuilder.Entity<OrderItem>(entity =>
+        {
+            entity.HasKey(e => e.Id).HasName("order_items_pk");
+
+            entity.ToTable("order_items");
+
+            entity.HasIndex(e => e.ArticleId, "order_items_article_id_index");
+
+            entity.HasIndex(e => e.OrderId, "order_items_order_id_index");
+
+            entity.Property(e => e.Id)
+                .HasDefaultValueSql("gen_random_uuid()")
+                .HasColumnName("id");
+            entity.Property(e => e.ArticleId).HasColumnName("article_id");
+            entity.Property(e => e.Count).HasColumnName("count");
+            entity.Property(e => e.LockedPrice).HasColumnName("locked_price");
+            entity.Property(e => e.OrderId).HasColumnName("order_id");
+            entity.Property(e => e.SignedPrice).HasColumnName("signed_price");
+
+            entity.HasOne(d => d.Article).WithMany(p => p.OrderItems)
+                .HasForeignKey(d => d.ArticleId)
+                .OnDelete(DeleteBehavior.Restrict)
+                .HasConstraintName("order_items_articles_id_fk");
+
+            entity.HasOne(d => d.Order).WithMany(p => p.OrderItems)
+                .HasForeignKey(d => d.OrderId)
+                .HasConstraintName("order_items_orders_id_fk");
+        });
+
+        modelBuilder.Entity<OrderVersion>(entity =>
+        {
+            entity.HasKey(e => e.Id).HasName("order_versions_pk");
+
+            entity.ToTable("order_versions");
+
+            entity.HasIndex(e => new { e.OrderId, e.Id }, "order_versions_order_id_id_index");
+
+            entity.Property(e => e.Id)
+                .HasDefaultValueSql("uuidv7()")
+                .HasColumnName("id");
+            entity.Property(e => e.BuyerApproved).HasColumnName("buyer_approved");
+            entity.Property(e => e.CurrencyId).HasColumnName("currency_id");
+            entity.Property(e => e.OrderId).HasColumnName("order_id");
+            entity.Property(e => e.SellerApproved).HasColumnName("seller_approved");
+            entity.Property(e => e.SignedTotalPrice).HasColumnName("signed_total_price");
+            entity.Property(e => e.Status).HasColumnName("status");
+            entity.Property(e => e.UpdatedAt).HasColumnName("updated_at");
+            entity.Property(e => e.WhoUpdated).HasColumnName("who_updated");
+
+            entity.HasOne(d => d.Currency).WithMany(p => p.OrderVersions)
+                .HasForeignKey(d => d.CurrencyId)
+                .OnDelete(DeleteBehavior.Restrict)
+                .HasConstraintName("order_versions_currency_id_fk");
+
+            entity.HasOne(d => d.Order).WithMany(p => p.OrderVersions)
+                .HasForeignKey(d => d.OrderId)
+                .OnDelete(DeleteBehavior.Restrict)
+                .HasConstraintName("order_versions_orders_id_fk");
+
+            entity.HasOne(d => d.WhoUpdatedNavigation).WithMany(p => p.OrderVersions)
+                .HasForeignKey(d => d.WhoUpdated)
+                .OnDelete(DeleteBehavior.Restrict)
+                .HasConstraintName("order_versions_users_id_fk");
         });
 
         modelBuilder.Entity<Permission>(entity =>

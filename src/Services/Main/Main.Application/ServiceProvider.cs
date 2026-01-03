@@ -22,6 +22,7 @@ using Main.Core.Abstractions;
 using Main.Core.Entities;
 using Main.Core.Interfaces.Pricing;
 using Main.Core.Interfaces.Services;
+using Main.Core.Models;
 using MediatR;
 using Microsoft.Extensions.DependencyInjection;
 using AmwArticleDto = Main.Core.Dtos.Amw.Articles.ArticleDto;

@@ -46,6 +46,8 @@ public partial class Article
 
     public virtual Category? Category { get; set; }
 
+    public virtual ICollection<OrderItem> OrderItems { get; set; } = new List<OrderItem>();
+
     public virtual Producer Producer { get; set; } = null!;
 
     public virtual ICollection<PurchaseContent> PurchaseContents { get; set; } = new List<PurchaseContent>();

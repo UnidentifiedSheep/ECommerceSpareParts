@@ -2,6 +2,7 @@ using Core.Abstractions;
 using Core.Interfaces.CacheRepositories;
 using Main.Application.Notifications;
 using Main.Core.Entities;
+using Main.Core.Models;
 using MediatR;
 
 namespace Main.Application.NotificationHandlers;
