@@ -3,6 +3,7 @@ using Core.Attributes;
 using Core.Interfaces.Services;
 using Exceptions.Exceptions.Storages;
 using Main.Core.Entities;
+using Main.Core.Enums;
 using Main.Core.Interfaces.DbRepositories;
 using Mapster;
 using MediatR;
@@ -10,7 +11,7 @@ using MediatR;
 namespace Main.Application.Handlers.Storages.CreateStorage;
 
 [Transactional]
-public record CreateStorageCommand(string Name, string? Description, string? Location) : ICommand<CreateStorageResult>;
+public record CreateStorageCommand(string Name, string? Description, string? Location, StorageType Type) : ICommand<CreateStorageResult>;
 
 public record CreateStorageResult(string Name);
 

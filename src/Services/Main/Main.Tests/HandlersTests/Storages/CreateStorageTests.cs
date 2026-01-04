@@ -2,8 +2,11 @@ using Bogus;
 using Exceptions.Exceptions.Storages;
 using Main.Application.Configs;
 using Main.Application.Handlers.Storages.CreateStorage;
+using Main.Core.Entities;
+using Main.Core.Enums;
 using Main.Persistence.Context;
 using MediatR;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Tests.MockData;
 using Tests.testContainers.Combined;
@@ -41,7 +44,7 @@ public class CreateStorageTests : IAsyncLifetime
     public async Task CreateStorage_TooLargeName_FailsValidation()
     {
         var storage = CreateNewStorage(1)[0];
-        var command = new CreateStorageCommand(_faker.Lorem.Letter(200), storage.Description, storage.Location);
+        var command = new CreateStorageCommand(_faker.Lorem.Letter(200), storage.Description, storage.Location, StorageType.Warehouse);
         await Assert.ThrowsAsync<ValidationException>(async () => await _mediator.Send(command));
     }
 
@@ -49,7 +52,7 @@ public class CreateStorageTests : IAsyncLifetime
     public async Task CreateStorage_TooSmallName_FailsValidation()
     {
         var storage = CreateNewStorage(1)[0];
-        var command = new CreateStorageCommand(_faker.Lorem.Letter(), storage.Description, storage.Location);
+        var command = new CreateStorageCommand(_faker.Lorem.Letter(), storage.Description, storage.Location, StorageType.Warehouse);
         await Assert.ThrowsAsync<ValidationException>(async () => await _mediator.Send(command));
     }
 
@@ -57,7 +60,7 @@ public class CreateStorageTests : IAsyncLifetime
     public async Task CreateStorage_TooLargeDescription_FailsValidation()
     {
         var storage = CreateNewStorage(1)[0];
-        var command = new CreateStorageCommand(storage.Name, storage.Description, _faker.Lorem.Letter(500));
+        var command = new CreateStorageCommand(storage.Name, storage.Description, _faker.Lorem.Letter(500), StorageType.Warehouse);
         await Assert.ThrowsAsync<ValidationException>(async () => await _mediator.Send(command));
     }
 
@@ -65,9 +68,10 @@ public class CreateStorageTests : IAsyncLifetime
     public async Task CreateStorage_ExistingName_ThrowStorageNameIsTaken()
     {
         var storage = CreateNewStorage(1)[0];
+        storage.Type = nameof(StorageType.Warehouse);
         await _context.Storages.AddAsync(storage);
         await _context.SaveChangesAsync();
-        var command = new CreateStorageCommand(storage.Name, storage.Description, storage.Location);
+        var command = new CreateStorageCommand(storage.Name, storage.Description, storage.Location, StorageType.Warehouse);
         await Assert.ThrowsAsync<StorageNameIsTakenException>(async () => await _mediator.Send(command));
     }
 
@@ -75,7 +79,14 @@ public class CreateStorageTests : IAsyncLifetime
     public async Task CreateStorage_Normal_Succeeds()
     {
         var storage = CreateNewStorage(1)[0];
-        var command = new CreateStorageCommand(storage.Name, storage.Description, storage.Location);
+        var command = new CreateStorageCommand(storage.Name, storage.Description, storage.Location, StorageType.Warehouse);
         await _mediator.Send(command);
+        
+        var createdStorage = await _context.Storages.FirstOrDefaultAsync(x => x.Name == storage.Name);
+        Assert.NotNull(createdStorage);
+        
+        Assert.Equal(storage.Description, createdStorage.Description);
+        Assert.Equal(storage.Location, createdStorage.Location);
+        Assert.Equal(nameof(StorageType.Warehouse), createdStorage.Type);
     }
 }

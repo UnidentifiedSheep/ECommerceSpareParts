@@ -15,8 +15,9 @@
     </ItemGroup>
 
     <ItemGroup>
-        <Folder Include="Handlers\Users\AddUserToRole\"/>
-        <Folder Include="Handlers\Users\RemoveUserFromRole\"/>
+        <Folder Include="Handlers\StorageRoutes\" />
+        <Folder Include="Handlers\Users\AddRoleToUser\" />
+        <Folder Include="Handlers\Users\RemoveRoleFromUser\" />
     </ItemGroup>
 
     <ItemGroup>

@@ -158,7 +158,8 @@ public static class MapsterConfig
         TypeAdapterConfig<CreateStorageCommand, Storage>.NewConfig()
             .Map(d => d.Name, s => s.Name.Trim())
             .Map(d => d.Description, s => s.Description == null ? null : s.Description.Trim())
-            .Map(d => d.Location, s => s.Location == null ? null : s.Location.Trim());
+            .Map(d => d.Location, s => s.Location == null ? null : s.Location.Trim())
+            .Map(d => d.Type, s => s.Type.ToString());
 
         TypeAdapterConfig<PatchArticleDto, Article>.NewConfig()
             .IgnorePatchIfNotSet()
@@ -328,7 +329,8 @@ public static class MapsterConfig
             .IgnorePatchIfNotSet()
             .Map(d => d.Location, s => string.IsNullOrWhiteSpace(s.Location.Value) ? null : s.Location.Value.Trim())
             .Map(d => d.Description,
-                s => string.IsNullOrWhiteSpace(s.Description.Value) ? null : s.Description.Value.Trim());
+                s => string.IsNullOrWhiteSpace(s.Description.Value) ? null : s.Description.Value.Trim())
+            .Map(d => d.Type, s => s.Type.Value);
 
         TypeAdapterConfig<StorageContent, StorageContentDto>.NewConfig()
             .Map(dest => dest.Id, src => src.Id)
@@ -368,6 +370,11 @@ public static class MapsterConfig
             .Map(d => d.Discount, s => s.Discount)
             .Map(d => d.TotalSum, s => s.TotalSum);
 
+        TypeAdapterConfig<Storage, StorageDto>.NewConfig()
+            .Map(d => d.Name, s => s.Name)
+            .Map(d => d.Description, s => s.Description)
+            .Map(d => d.Location, s => s.Location)
+            .Map(d => d.Type, s => s.Type);
 
         TypeAdapterConfig<NewSaleContentDto, SaleContent>.NewConfig()
             .Map(dest => dest.ArticleId, src => src.ArticleId)

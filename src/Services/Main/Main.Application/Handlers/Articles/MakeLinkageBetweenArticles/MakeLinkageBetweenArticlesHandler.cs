@@ -46,11 +46,11 @@ public class MakeLinkageBetweenArticlesHandler(IMediator mediator, IArticlesRepo
 
         switch (linkage.LinkageType)
         {
-            case ArticleLinkageTypes.SingleCross:
+            case ArticleLinkageType.SingleCross:
                 AddBidirectionalPairs(toAdd, [leftArticle.Id], [rightArticle.Id]);
                 break;
 
-            case ArticleLinkageTypes.FullCross:
+            case ArticleLinkageType.FullCross:
                 var leftIds = await GetCrossIds(linkage.ArticleId, cancellationToken);
                 leftIds.Add(leftArticle.Id);
                 var rightIds = await GetCrossIds(linkage.CrossArticleId, cancellationToken);
@@ -58,13 +58,13 @@ public class MakeLinkageBetweenArticlesHandler(IMediator mediator, IArticlesRepo
                 AddBidirectionalPairs(toAdd, leftIds, rightIds);
                 break;
 
-            case ArticleLinkageTypes.FullLeftToRightCross:
+            case ArticleLinkageType.FullLeftToRightCross:
                 var leftCrossIds = await GetCrossIds(linkage.ArticleId, cancellationToken);
                 leftCrossIds.Add(leftArticle.Id);
                 AddBidirectionalPairs(toAdd, leftCrossIds, rightArticle.Id);
                 break;
 
-            case ArticleLinkageTypes.FullRightToLeftCross:
+            case ArticleLinkageType.FullRightToLeftCross:
                 var rightCrossIds = await GetCrossIds(linkage.CrossArticleId, cancellationToken);
                 rightCrossIds.Add(rightArticle.Id);
                 AddBidirectionalPairs(toAdd, rightCrossIds, leftArticle.Id);

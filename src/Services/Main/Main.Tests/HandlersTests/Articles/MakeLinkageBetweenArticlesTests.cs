@@ -55,7 +55,7 @@ public class MakeLinkageBetweenArticlesTests : IAsyncLifetime
         {
             ArticleId = 1,
             CrossArticleId = 1,
-            LinkageType = ArticleLinkageTypes.FullCross
+            LinkageType = ArticleLinkageType.FullCross
         };
         var command = new MakeLinkageBetweenArticlesCommand([newLinkage]);
         await Assert.ThrowsAsync<ValidationException>(async () => await _mediator.Send(command));
@@ -68,7 +68,7 @@ public class MakeLinkageBetweenArticlesTests : IAsyncLifetime
         {
             ArticleId = 1,
             CrossArticleId = 2,
-            LinkageType = ArticleLinkageTypes.SingleCross
+            LinkageType = ArticleLinkageType.SingleCross
         };
         var command = new MakeLinkageBetweenArticlesCommand([newLinkage]);
 
@@ -94,7 +94,7 @@ public class MakeLinkageBetweenArticlesTests : IAsyncLifetime
         {
             ArticleId = 1,
             CrossArticleId = 2,
-            LinkageType = ArticleLinkageTypes.FullCross
+            LinkageType = ArticleLinkageType.FullCross
         };
         var command = new MakeLinkageBetweenArticlesCommand([newLinkage]);
 
@@ -130,7 +130,7 @@ public class MakeLinkageBetweenArticlesTests : IAsyncLifetime
         {
             ArticleId = 1,
             CrossArticleId = 2,
-            LinkageType = ArticleLinkageTypes.FullRightToLeftCross
+            LinkageType = ArticleLinkageType.FullRightToLeftCross
         };
         var command = new MakeLinkageBetweenArticlesCommand([newLinkage]);
 
@@ -164,7 +164,7 @@ public class MakeLinkageBetweenArticlesTests : IAsyncLifetime
         {
             ArticleId = 1,
             CrossArticleId = 2,
-            LinkageType = ArticleLinkageTypes.FullLeftToRightCross
+            LinkageType = ArticleLinkageType.FullLeftToRightCross
         };
         var command = new MakeLinkageBetweenArticlesCommand([newLinkage]);
 

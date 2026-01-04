@@ -1,6 +1,6 @@
 namespace Main.Core.Enums;
 
-public enum ArticleLinkageTypes
+public enum ArticleLinkageType
 {
     /// <summary>
     ///     Будет создана связь только Артикула с Кросс-Артикулом и наоборот, их кросс-артикулы не будут затронуты.

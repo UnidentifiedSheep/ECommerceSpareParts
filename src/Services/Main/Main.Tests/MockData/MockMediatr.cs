@@ -73,10 +73,10 @@ public static class MockMediatr
         return result.Transaction;
     }
 
-    public static async Task AddMockStorage(this IMediator mediator)
+    public static async Task AddMockStorage(this IMediator mediator, StorageType type = StorageType.Warehouse)
     {
         var storage = CreateNewStorage(1)[0];
-        var command = new CreateStorageCommand(storage.Name, storage.Description, storage.Location);
+        var command = new CreateStorageCommand(storage.Name, storage.Description, storage.Location, type);
         await mediator.Send(command);
     }
 

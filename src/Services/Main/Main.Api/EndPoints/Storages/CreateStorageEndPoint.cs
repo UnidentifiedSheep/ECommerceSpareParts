@@ -1,12 +1,13 @@
 using Api.Common.Extensions;
 using Carter;
 using Main.Application.Handlers.Storages.CreateStorage;
+using Main.Core.Enums;
 using Mapster;
 using MediatR;
 
 namespace Main.Api.EndPoints.Storages;
 
-public record CreateStorageRequest(string Name, string? Description, string? Location);
+public record CreateStorageRequest(string Name, string? Description, string? Location, StorageType Type);
 public record CreateStorageResponse(string Name);
 
 public class CreateStorageEndPoint : ICarterModule

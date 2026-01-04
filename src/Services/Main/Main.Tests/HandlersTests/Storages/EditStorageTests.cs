@@ -5,6 +5,7 @@ using Main.Application.Configs;
 using Main.Application.Handlers.Storages.EditStorage;
 using Main.Core.Dtos.Amw.Storage;
 using Main.Core.Entities;
+using Main.Core.Enums;
 using Main.Persistence.Context;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
@@ -135,6 +136,11 @@ public class EditStorageTests : IAsyncLifetime
             {
                 IsSet = true,
                 Value = _faker.Lorem.Letter(120)
+            },
+            Type = new PatchField<StorageType>
+            {
+                IsSet = true,
+                Value = StorageType.SupplierStorage
             }
         };
         var command = new EditStorageCommand(_storage.Name, model);
@@ -146,6 +152,7 @@ public class EditStorageTests : IAsyncLifetime
         Assert.NotNull(storage);
         Assert.Equal(storage.Description, model.Description);
         Assert.Equal(storage.Location, model.Location);
+        Assert.Equal(nameof(StorageType.SupplierStorage), storage.Type);
     }
 
     [Fact]
