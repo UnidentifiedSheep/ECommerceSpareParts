@@ -2,7 +2,7 @@
 
 namespace Main.Core.Models;
 
-public class DefaultSettings
+public class Settings
 {
     public int DefaultCurrency { get; set; }
     public decimal MinimalMarkup { get; set; } = 25;

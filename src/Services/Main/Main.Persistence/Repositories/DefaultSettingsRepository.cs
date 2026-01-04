@@ -22,11 +22,11 @@ public class DefaultSettingsRepository(DContext context) : IDefaultSettingsRepos
                                                   """, cancellationToken);
     }
 
-    public async Task<DefaultSettings> GetDefaultSettingsAsync(CancellationToken cancellationToken = default)
+    public async Task<Settings> GetDefaultSettingsAsync(CancellationToken cancellationToken = default)
     {
         var kvp = await context.DefaultSettings.AsNoTracking()
             .ToDictionaryAsync(x => x.Key, x => x.Value, cancellationToken);
-        var settings = new DefaultSettings();
+        var settings = new Settings();
         settings.SetupValuesViaNames(kvp);
         return settings;
     }

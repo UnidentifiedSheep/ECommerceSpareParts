@@ -80,6 +80,8 @@ public partial class DContext : DbContext
     public virtual DbSet<StorageContentReservation> StorageContentReservations { get; set; }
 
     public virtual DbSet<StorageMovement> StorageMovements { get; set; }
+    
+    public virtual DbSet<StorageRoute> StorageRoutes { get; set; }
 
     public virtual DbSet<Transaction> Transactions { get; set; }
 
@@ -919,6 +921,7 @@ public partial class DContext : DbContext
                     {
                         j.HasKey("RoleId", "PermissionName").HasName("role_permissions_pk");
                         j.ToTable("role_permissions", "auth");
+                        j.HasIndex(new[] { "PermissionName" }, "IX_role_permissions_permission_name");
                         j.IndexerProperty<Guid>("RoleId").HasColumnName("role_id");
                         j.IndexerProperty<string>("PermissionName").HasColumnName("permission_name");
                     });
@@ -1096,6 +1099,8 @@ public partial class DContext : DbContext
                 .HasMethod("gin")
                 .HasOperators(new[] { "gin_trgm_ops" });
 
+            entity.HasIndex(e => e.Type, "storages_type_index");
+
             entity.Property(e => e.Name)
                 .HasMaxLength(128)
                 .HasColumnName("name");
@@ -1105,6 +1110,70 @@ public partial class DContext : DbContext
             entity.Property(e => e.Location)
                 .HasMaxLength(256)
                 .HasColumnName("location");
+            entity.Property(e => e.Type)
+                .HasMaxLength(24)
+                .HasColumnName("type");
+
+            entity.HasMany(d => d.Owners).WithMany(p => p.StorageNames)
+                .UsingEntity<Dictionary<string, object>>(
+                    "StorageOwner",
+                    r => r.HasOne<User>().WithMany()
+                        .HasForeignKey("OwnerId")
+                        .HasConstraintName("storage_owners_users_id_fk"),
+                    l => l.HasOne<Storage>().WithMany()
+                        .HasForeignKey("StorageName")
+                        .HasConstraintName("storage_owners_storages_name_fk"),
+                    j =>
+                    {
+                        j.HasKey("StorageName", "OwnerId").HasName("storage_owners_pk");
+                        j.ToTable("storage_owners");
+                        j.HasIndex(new[] { "OwnerId" }, "storage_owners_owner_id_index");
+                        j.IndexerProperty<string>("StorageName")
+                            .HasMaxLength(128)
+                            .HasColumnName("storage_name");
+                        j.IndexerProperty<Guid>("OwnerId").HasColumnName("owner_id");
+                    });
+        });
+        
+        modelBuilder.Entity<StorageRoute>(entity =>
+        {
+            entity.HasKey(e => e.Id).HasName("storage_routes_pk");
+
+            entity.ToTable("storage_routes");
+
+            entity.HasIndex(e => new { e.FromStorageName, e.ToStorageName }, "storage_routes_from_storage_name_to_storage_name_index");
+
+            entity.Property(e => e.Id)
+                .HasDefaultValueSql("gen_random_uuid()")
+                .HasColumnName("id");
+            entity.Property(e => e.DeliveryTimeMinutes).HasColumnName("delivery_time_minutes");
+            entity.Property(e => e.DistanceM).HasColumnName("distance_m");
+            entity.Property(e => e.FromStorageName)
+                .HasMaxLength(128)
+                .HasColumnName("from_storage_name");
+            entity.Property(e => e.PriceKg).HasColumnName("price_kg");
+            entity.Property(e => e.PricePerM3).HasColumnName("price_per_m3");
+            entity.Property(e => e.PricePerOrder).HasColumnName("price_per_order");
+            entity.Property(e => e.PricingModel)
+                .HasMaxLength(24)
+                .HasColumnName("pricing_model");
+            entity.Property(e => e.RouteType)
+                .HasMaxLength(24)
+                .HasColumnName("route_type");
+            entity.Property(e => e.Status)
+                .HasMaxLength(24)
+                .HasColumnName("status");
+            entity.Property(e => e.ToStorageName)
+                .HasMaxLength(128)
+                .HasColumnName("to_storage_name");
+
+            entity.HasOne(d => d.FromStorageNameNavigation).WithMany(p => p.StorageRouteFromStorageNameNavigations)
+                .HasForeignKey(d => d.FromStorageName)
+                .HasConstraintName("storage_routes_storages_name_fk");
+
+            entity.HasOne(d => d.ToStorageNameNavigation).WithMany(p => p.StorageRouteToStorageNameNavigations)
+                .HasForeignKey(d => d.ToStorageName)
+                .HasConstraintName("storage_routes_storages_name_fk_2");
         });
 
         modelBuilder.Entity<StorageContent>(entity =>
@@ -1273,14 +1342,17 @@ public partial class DContext : DbContext
 
             entity.HasOne(d => d.Article).WithMany(p => p.StorageMovements)
                 .HasForeignKey(d => d.ArticleId)
+                .OnDelete(DeleteBehavior.Restrict)
                 .HasConstraintName("storage_movement_articles_id_fk");
 
             entity.HasOne(d => d.Currency).WithMany(p => p.StorageMovements)
                 .HasForeignKey(d => d.CurrencyId)
+                .OnDelete(DeleteBehavior.Restrict)
                 .HasConstraintName("storage_movement_currency_id_fk");
 
             entity.HasOne(d => d.StorageNameNavigation).WithMany(p => p.StorageMovements)
                 .HasForeignKey(d => d.StorageName)
+                .OnDelete(DeleteBehavior.Restrict)
                 .HasConstraintName("storage_movement_storages_name_fk");
 
             entity.HasOne(d => d.WhoMovedNavigation).WithMany(p => p.StorageMovements)
@@ -1603,6 +1675,8 @@ public partial class DContext : DbContext
             entity.HasKey(e => new { e.UserId, e.Permission }).HasName("user_permissions_pk");
 
             entity.ToTable("user_permissions", "auth");
+
+            entity.HasIndex(e => e.Permission, "IX_user_permissions_permission");
 
             entity.Property(e => e.UserId).HasColumnName("user_id");
             entity.Property(e => e.Permission).HasColumnName("permission");

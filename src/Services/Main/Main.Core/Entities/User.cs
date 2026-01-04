@@ -83,4 +83,6 @@ public partial class User
     public virtual ICollection<UserToken> UserTokens { get; set; } = new List<UserToken>();
 
     public virtual ICollection<UserVehicle> UserVehicles { get; set; } = new List<UserVehicle>();
+
+    public virtual ICollection<Storage> StorageNames { get; set; } = new List<Storage>();
 }

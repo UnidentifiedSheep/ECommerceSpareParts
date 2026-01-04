@@ -9,7 +9,7 @@ public interface IPriceGenerator
     double GetSellPrice(double buyPrice, double discount, int currencyId);
     double GetSellPriceWithMinimalMarkUp(double buyPrice);
 
-    void SetUp(MarkupGroup markupGroup, DefaultSettings defaultSettings);
+    void SetUp(MarkupGroup markupGroup, Settings settings);
 
     double GetDiscountFromPrices(double withDiscount, double withNoDiscount);
     decimal GetDiscountFromPrices(decimal withDiscount, decimal withNoDiscount);

@@ -14,14 +14,14 @@ public class PriceSetup(
     ICurrencyConverter currencyConverter,
     IPriceGenerator priceGenerator) : IPriceSetup
 {
-    private DefaultSettings _defaultSettings = new();
+    private Settings _settings = new();
 
     public async Task SetupAsync(CancellationToken cancellationToken = default)
     {
         await defaultSettingsRepository.CreateDefaultSettingsIfNotExist(cancellationToken);
-        _defaultSettings = await defaultSettingsRepository.GetDefaultSettingsAsync(cancellationToken);
+        _settings = await defaultSettingsRepository.GetDefaultSettingsAsync(cancellationToken);
         await SetupCurrencyConverterAsync(cancellationToken);
-        if (_defaultSettings.SelectedMarkupId != -1)
+        if (_settings.SelectedMarkupId != -1)
         {
             await SetUserMarkupsAsync(cancellationToken);
             return;
@@ -41,14 +41,14 @@ public class PriceSetup(
         var generatedMarkup = await markupRepository.GetGeneratedMarkupsAsync(true, cancellationToken);
         Log.Logger.Warning("Generated markup not found.");
         if (generatedMarkup == null) return;
-        priceGenerator.SetUp(generatedMarkup, _defaultSettings);
+        priceGenerator.SetUp(generatedMarkup, _settings);
     }
 
     private async Task SetUserMarkupsAsync(CancellationToken cancellationToken = default)
     {
         var generatedMarkup =
-            await markupRepository.GetMarkupByIdAsync(_defaultSettings.SelectedMarkupId, true, cancellationToken)
-            ?? throw new MarkupGroupNotFoundException(_defaultSettings.SelectedMarkupId);
-        priceGenerator.SetUp(generatedMarkup, _defaultSettings);
+            await markupRepository.GetMarkupByIdAsync(_settings.SelectedMarkupId, true, cancellationToken)
+            ?? throw new MarkupGroupNotFoundException(_settings.SelectedMarkupId);
+        priceGenerator.SetUp(generatedMarkup, _settings);
     }
 }

@@ -22,10 +22,10 @@ public class PriceGenerator(ICurrencyConverter currencyConverter) : IPriceGenera
         return sellPrice;
     }
 
-    public void SetUp(MarkupGroup group, DefaultSettings defaultSettings)
+    public void SetUp(MarkupGroup group, Settings settings)
     {
         _markUps.Clear();
-        DefaultMarkUpCurrencyId = defaultSettings.DefaultCurrency;
+        DefaultMarkUpCurrencyId = settings.DefaultCurrency;
 
         foreach (var toUsd in currencyConverter.ToUsdDoub)
         {

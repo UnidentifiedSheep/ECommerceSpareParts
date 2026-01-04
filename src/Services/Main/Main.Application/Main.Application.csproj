@@ -15,7 +15,6 @@
     </ItemGroup>
 
     <ItemGroup>
-        <Folder Include="Handlers\Orders\CreateOrder\" />
         <Folder Include="Handlers\Users\AddUserToRole\"/>
         <Folder Include="Handlers\Users\RemoveUserFromRole\"/>
     </ItemGroup>
