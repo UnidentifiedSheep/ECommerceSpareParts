@@ -110,7 +110,7 @@ public class DeleteTransactionTest : IAsyncLifetime
     [Fact]
     public async Task DeleteTransaction_NotNormalStatus_ThrowBadTransactionStatusException()
     {
-        _transaction.Status = nameof(TransactionStatus.Purchase);
+        _transaction.Status = TransactionStatus.Purchase;
         await _context.SaveChangesAsync();
 
         var command = new DeleteTransactionCommand(_transaction.Id, _mockUser.Id);

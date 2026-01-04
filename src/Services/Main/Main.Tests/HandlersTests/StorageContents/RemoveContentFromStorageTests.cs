@@ -201,7 +201,7 @@ public class RemoveContentFromStorageTests : IAsyncLifetime
             .FirstOrDefaultAsync();
 
         Assert.NotNull(movement);
-        Assert.Equal(nameof(StorageMovementType.Sale), movement.ActionType);
+        Assert.Equal(StorageMovementType.Sale, movement.ActionType);
         Assert.Equal(-1, movement.Count);
         Assert.Equal(_user.Id, movement.WhoMoved);
     }

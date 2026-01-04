@@ -1,4 +1,5 @@
 ﻿using System.Net;
+using Main.Core.Enums;
 
 namespace Main.Core.Entities;
 
@@ -12,7 +13,7 @@ public partial class UserToken
 
     public List<string> Permissions { get; set; } = null!;
 
-    public string Type { get; set; } = null!;
+    public TokenType Type { get; set; }
 
     public DateTime IssuedAt { get; set; }
 

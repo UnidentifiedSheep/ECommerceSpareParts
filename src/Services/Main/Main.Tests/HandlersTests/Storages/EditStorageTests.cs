@@ -152,7 +152,7 @@ public class EditStorageTests : IAsyncLifetime
         Assert.NotNull(storage);
         Assert.Equal(storage.Description, model.Description);
         Assert.Equal(storage.Location, model.Location);
-        Assert.Equal(nameof(StorageType.SupplierStorage), storage.Type);
+        Assert.Equal(StorageType.SupplierStorage, storage.Type);
     }
 
     [Fact]

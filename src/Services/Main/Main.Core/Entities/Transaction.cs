@@ -1,4 +1,6 @@
-﻿namespace Main.Core.Entities;
+﻿using Main.Core.Enums;
+
+namespace Main.Core.Entities;
 
 public partial class Transaction
 {
@@ -14,7 +16,7 @@ public partial class Transaction
 
     public DateTime CreationDate { get; set; }
 
-    public string Status { get; set; } = null!;
+    public TransactionStatus Status { get; set; }
 
     public Guid WhoMadeUserId { get; set; }
 

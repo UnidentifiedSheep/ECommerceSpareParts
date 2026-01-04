@@ -248,7 +248,7 @@ public class AddContentToStorageTests : IAsyncLifetime
                 m.Price == sc.BuyPrice &&
                 m.CurrencyId == sc.CurrencyId &&
                 m.StorageName == sc.StorageName &&
-                m.ActionType == nameof(StorageMovementType.StorageContentAddition) &&
+                m.ActionType == StorageMovementType.StorageContentAddition &&
                 m.WhoMoved == _user.Id);
 
             Assert.NotNull(match);

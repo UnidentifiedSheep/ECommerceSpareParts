@@ -3,6 +3,7 @@ using Core.Attributes;
 using Core.Interfaces.Services;
 using Exceptions.Exceptions.Storages;
 using Main.Core.Dtos.Amw.Storage;
+using Main.Core.Enums;
 using Main.Core.Interfaces.DbRepositories;
 using Mapster;
 using MediatR;
@@ -17,8 +18,13 @@ public class EditStorageHandler(IStoragesRepository repository, IUnitOfWork unit
 {
     public async Task<Unit> Handle(EditStorageCommand request, CancellationToken cancellationToken)
     {
-        var storage = await repository.GetStorageAsync(request.StorageName, true, cancellationToken)
+        var storage = await repository.GetStorageAsync(request.StorageName, cancellationToken: cancellationToken,
+                          includes: x => x.Owners)
                       ?? throw new StorageNotFoundException(request.StorageName);
+        var editType = request.EditStorage.Type;
+        if (editType.IsSet &&  storage.Type != editType.Value && storage.Owners.Count > 0)
+            throw new ChangeOfStorageTypeRestrictedException("Присутствуют владельцы склада");
+        
         request.EditStorage.Adapt(storage);
         await unitOfWork.SaveChangesAsync(cancellationToken);
         return Unit.Value;

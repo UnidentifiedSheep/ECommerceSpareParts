@@ -78,7 +78,7 @@ public class CreateSaleHandler(
             SaleContents = saleContents,
             CurrencyId = currencyId,
             MainStorageName = mainStorage,
-            State = nameof(SaleState.Draft)
+            State = SaleState.Draft
         };
 
         await unitOfWork.AddAsync(saleModel, cancellationToken);

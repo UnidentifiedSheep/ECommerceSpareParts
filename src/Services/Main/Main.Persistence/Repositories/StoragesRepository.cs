@@ -1,3 +1,4 @@
+using System.Linq.Expressions;
 using Main.Core.Entities;
 using Main.Core.Interfaces.DbRepositories;
 using Main.Persistence.Context;
@@ -9,10 +10,11 @@ namespace Main.Persistence.Repositories;
 public class StoragesRepository(DContext context) : IStoragesRepository
 {
     public async Task<Storage?> GetStorageAsync(string name, bool track = true,
-        CancellationToken cancellationToken = default)
+        CancellationToken cancellationToken = default, params Expression<Func<Storage, object>>[] includes)
     {
-        return await context.Storages.ConfigureTracking(track)
-            .FirstOrDefaultAsync(x => x.Name == name.Trim(), cancellationToken);
+        var query = context.Storages.ConfigureTracking(track);
+        foreach (var include in includes) query = query.Include(include);
+        return await query.FirstOrDefaultAsync(x => x.Name == name.Trim(), cancellationToken);
     }
 
     public async Task<IEnumerable<Storage>> GetStoragesAsync(string? searchTerm, int page, int viewCount,
@@ -44,16 +46,5 @@ public class StoragesRepository(DContext context) : IStoragesRepository
     {
         return await context.Storages.AsNoTracking().AnyAsync(x => x.Name == name.Trim(), cancellationToken);
     }
-
-    public async Task<IEnumerable<string>> StoragesExistsAsync(IEnumerable<string> names,
-        CancellationToken cancellationToken = default)
-    {
-        var namesList = names.Distinct().ToList();
-        var foundNames = await context.Storages
-            .AsNoTracking()
-            .Where(x => namesList.Contains(x.Name))
-            .Select(x => x.Name)
-            .ToListAsync(cancellationToken);
-        return namesList.Count != foundNames.Count ? namesList.Except(foundNames) : [];
-    }
+    
 }

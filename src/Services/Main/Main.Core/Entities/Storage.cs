@@ -1,4 +1,6 @@
-﻿namespace Main.Core.Entities;
+﻿using Main.Core.Enums;
+
+namespace Main.Core.Entities;
 
 public partial class Storage
 {
@@ -8,7 +10,7 @@ public partial class Storage
 
     public string? Location { get; set; }
 
-    public string Type { get; set; } = null!;
+    public StorageType Type { get; set; }
 
     public virtual ICollection<Purchase> Purchases { get; set; } = new List<Purchase>();
 

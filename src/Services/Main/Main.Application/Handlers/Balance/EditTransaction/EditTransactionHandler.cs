@@ -69,7 +69,7 @@ public class EditTransactionHandler(
         transaction.IsDeleted = false;
         transaction.TransactionDatetime = request.TransactionDateTime;
         transaction.TransactionSum = request.Amount;
-        transaction.Status = request.Status.ToString();
+        transaction.Status = request.Status;
         transaction.CurrencyId = request.CurrencyId;
     }
 

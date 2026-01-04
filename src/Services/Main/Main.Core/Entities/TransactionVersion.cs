@@ -1,4 +1,6 @@
-﻿namespace Main.Core.Entities;
+﻿using Main.Core.Enums;
+
+namespace Main.Core.Entities;
 
 public partial class TransactionVersion
 {
@@ -14,7 +16,7 @@ public partial class TransactionVersion
 
     public decimal TransactionSum { get; set; }
 
-    public string Status { get; set; } = null!;
+    public TransactionStatus Status { get; set; }
 
     public DateTime TransactionDatetime { get; set; }
 

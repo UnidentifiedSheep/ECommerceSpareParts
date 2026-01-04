@@ -1,4 +1,6 @@
-﻿namespace Main.Core.Entities;
+﻿using Main.Core.Enums;
+
+namespace Main.Core.Entities;
 
 public partial class Purchase
 {
@@ -24,7 +26,7 @@ public partial class Purchase
 
     public string Storage { get; set; } = null!;
 
-    public string State { get; set; } = null!;
+    public PurchaseState State { get; set; }
 
     public virtual User CreatedUser { get; set; } = null!;
 

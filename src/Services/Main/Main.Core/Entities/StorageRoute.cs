@@ -1,4 +1,6 @@
-﻿namespace Main.Core.Entities;
+﻿using Main.Core.Enums;
+
+namespace Main.Core.Entities;
 
 public partial class StorageRoute
 {
@@ -10,9 +12,9 @@ public partial class StorageRoute
 
     public int DistanceM { get; set; }
 
-    public string RouteType { get; set; } = null!;
+    public RouteType RouteType { get; set; }
 
-    public string PricingModel { get; set; } = null!;
+    public LogisticPricingType PricingModel { get; set; }
 
     public int DeliveryTimeMinutes { get; set; }
 
@@ -22,7 +24,7 @@ public partial class StorageRoute
 
     public decimal PricePerOrder { get; set; }
 
-    public string Status { get; set; } = null!;
+    public RouteStatus Status { get; set; }
 
     public virtual Storage FromStorageNameNavigation { get; set; } = null!;
 

@@ -2,7 +2,6 @@ using Bogus;
 using Exceptions.Exceptions.Storages;
 using Main.Application.Configs;
 using Main.Application.Handlers.Storages.CreateStorage;
-using Main.Core.Entities;
 using Main.Core.Enums;
 using Main.Persistence.Context;
 using MediatR;
@@ -68,7 +67,7 @@ public class CreateStorageTests : IAsyncLifetime
     public async Task CreateStorage_ExistingName_ThrowStorageNameIsTaken()
     {
         var storage = CreateNewStorage(1)[0];
-        storage.Type = nameof(StorageType.Warehouse);
+        storage.Type = StorageType.Warehouse;
         await _context.Storages.AddAsync(storage);
         await _context.SaveChangesAsync();
         var command = new CreateStorageCommand(storage.Name, storage.Description, storage.Location, StorageType.Warehouse);
@@ -87,6 +86,6 @@ public class CreateStorageTests : IAsyncLifetime
         
         Assert.Equal(storage.Description, createdStorage.Description);
         Assert.Equal(storage.Location, createdStorage.Location);
-        Assert.Equal(nameof(StorageType.Warehouse), createdStorage.Type);
+        Assert.Equal(StorageType.Warehouse, createdStorage.Type);
     }
 }

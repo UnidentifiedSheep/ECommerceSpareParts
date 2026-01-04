@@ -56,7 +56,7 @@ public class CreatePurchaseHandler(DbDataValidatorBase dbValidator,
             PurchaseDatetime = request.PurchaseDateTime,
             PurchaseContents = purchaseContents,
             TransactionId = transactionId,
-            State = nameof(PurchaseState.Draft)
+            State = PurchaseState.Draft
         };
         await unitOfWork.AddAsync(purchaseModel, cancellationToken);
         await unitOfWork.SaveChangesAsync(cancellationToken);

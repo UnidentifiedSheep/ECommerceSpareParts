@@ -128,7 +128,7 @@ public class EditTransactionTests : IAsyncLifetime
         Assert.NotNull(updatedTransaction);
         Assert.Equal(newCurrency.Id, updatedTransaction.CurrencyId);
         Assert.Equal(newAmount, updatedTransaction.TransactionSum);
-        Assert.Equal(newStatus.ToString(), updatedTransaction.Status);
+        Assert.Equal(newStatus, updatedTransaction.Status);
         Assert.True(Math.Abs((updatedTransaction.TransactionDatetime - newDate.ToUniversalTime()).TotalMilliseconds) < 1);
 
         var version = await _context.TransactionVersions
@@ -179,7 +179,7 @@ public class EditTransactionTests : IAsyncLifetime
         Assert.NotNull(updatedTransaction);
         Assert.False(updatedTransaction.IsDeleted);
         Assert.Equal(newAmount, updatedTransaction.TransactionSum);
-        Assert.Equal(newStatus.ToString(), updatedTransaction.Status);
+        Assert.Equal(newStatus, updatedTransaction.Status);
         Assert.True(Math.Abs((updatedTransaction.TransactionDatetime - newDate).TotalSeconds) < 1);
 
         var senderBalanceAfter = await _context.UserBalances

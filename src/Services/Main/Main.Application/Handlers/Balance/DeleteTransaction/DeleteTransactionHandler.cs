@@ -26,9 +26,9 @@ public class DeleteTransactionHandler(
     IUnitOfWork unitOfWork,
     IBalanceService balanceService) : ICommandHandler<DeleteTransactionCommand, Unit>
 {
-    private static readonly ImmutableHashSet<string> AllowedStatuses =
+    private static readonly ImmutableHashSet<TransactionStatus> AllowedStatuses =
     [
-        nameof(TransactionStatus.Normal)
+        TransactionStatus.Normal
     ];
 
     public async Task<Unit> Handle(DeleteTransactionCommand request, CancellationToken cancellationToken)
@@ -56,7 +56,7 @@ public class DeleteTransactionHandler(
         if (transaction.IsDeleted)
             throw new TransactionAlreadyDeletedException(transaction.Id);
         if (!isSystem && !AllowedStatuses.Contains(transaction.Status))
-            throw new BadTransactionStatusException(transaction.Status);
+            throw new BadTransactionStatusException(transaction.Status.ToString());
         
         var plan = new ValidationPlan().EnsureUserExists(whoDeletedUserId);
         await dbValidator.Validate(plan, true, true, ct);

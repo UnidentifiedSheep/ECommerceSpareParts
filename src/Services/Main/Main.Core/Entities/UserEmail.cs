@@ -1,4 +1,6 @@
-﻿namespace Main.Core.Entities;
+﻿using Main.Core.Enums;
+
+namespace Main.Core.Entities;
 
 public partial class UserEmail
 {
@@ -12,7 +14,7 @@ public partial class UserEmail
 
     public bool Confirmed { get; set; }
 
-    public string EmailType { get; set; } = null!;
+    public EmailType EmailType { get; set; }
 
     public bool IsPrimary { get; set; }
 

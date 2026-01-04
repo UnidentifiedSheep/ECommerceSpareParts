@@ -2,9 +2,6 @@ using System.Data;
 using Application.Common.Interfaces;
 using Core.Attributes;
 using Core.Interfaces.Services;
-using Exceptions.Exceptions.Balances;
-using Exceptions.Exceptions.Currencies;
-using Exceptions.Exceptions.Users;
 using Main.Application.Extensions;
 using Main.Application.Validation;
 using Main.Core.Abstractions;
@@ -92,7 +89,7 @@ public class CreateTransactionHandler(
             SenderBalanceAfterTransaction = prevSenderTransaction?.SenderId == senderId
                 ? prevSenderTransaction.SenderBalanceAfterTransaction - amount
                 : (prevSenderTransaction?.ReceiverBalanceAfterTransaction ?? 0) - amount,
-            Status = transactionStatus.ToString()
+            Status = transactionStatus
         };
     }
 }

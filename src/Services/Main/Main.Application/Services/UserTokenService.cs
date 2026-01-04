@@ -17,7 +17,7 @@ public class UserTokenService(IUnitOfWork unitOfWork, ITokenHasher tokenHasher) 
         {
             TokenHash = tokenHasher.HashToken(token),
             UserId = userId,
-            Type = type.ToString(),
+            Type = type,
             Permissions = permissions.ToList(),
             ExpiresAt = exp,
             IpAddress = ip,

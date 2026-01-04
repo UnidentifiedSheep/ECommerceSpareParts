@@ -133,7 +133,7 @@ public static class MockData
             .RuleFor(x => x.TransactionDatetime,
                 f => f.Date.Between(DateTime.Now.AddMonths(-2), DateTime.Now.AddMonths(2)))
             .RuleFor(x => x.CurrencyId, f => f.PickRandom(currencyIds))
-            .RuleFor(x => x.Status, _ => nameof(TransactionStatus.Normal))
+            .RuleFor(x => x.Status, _ => TransactionStatus.Normal)
             .RuleFor(x => x.WhoMadeUserId, _ => whoMade);
 
         var tr = f.Generate(count);

@@ -16,7 +16,7 @@ public partial class StorageMovement
 
     public int Count { get; set; }
 
-    public string ActionType { get; set; } = null!;
+    public StorageMovementType ActionType { get; set; }
 
     public DateTime CreatedAt { get; set; }
 
@@ -32,7 +32,7 @@ public partial class StorageMovement
     
     public StorageMovement SetActionType(StorageMovementType type)
     {
-        ActionType = type.ToString();
+        ActionType = type;
         return this;
     }
 }
