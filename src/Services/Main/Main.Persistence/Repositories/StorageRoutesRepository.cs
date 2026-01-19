@@ -8,12 +8,14 @@ namespace Main.Persistence.Repositories;
 
 public class StorageRoutesRepository(DContext context) : IStorageRoutesRepository
 {
-    public async Task<StorageRoute?> GetStorageRouteAsync(string storageFrom, string storageTo, bool track = true,
-        CancellationToken cancellationToken = default)
+    public async Task<StorageRoute?> GetStorageRouteAsync(string storageFrom, string storageTo, bool isActive, 
+        bool track = true, CancellationToken cancellationToken = default)
     {
         return await context.StorageRoutes
             .ConfigureTracking(track)
-            .FirstOrDefaultAsync(x => x.FromStorageName == storageFrom && x.ToStorageName == storageTo, cancellationToken);
+            .FirstOrDefaultAsync(x => x.FromStorageName == storageFrom 
+                                      && x.ToStorageName == storageTo 
+                                      && x.IsActive == isActive, cancellationToken);
     }
     
     public async Task<StorageRoute?> GetStorageRouteAsync(Guid id, bool track = true, CancellationToken cancellationToken = default)

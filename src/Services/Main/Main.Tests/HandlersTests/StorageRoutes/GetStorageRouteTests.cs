@@ -51,7 +51,7 @@ public class GetStorageRouteTests : IAsyncLifetime
     {
         await _mediator.AddMockStorageRoute(_storageFrom.Name, _storageTo.Name, _currency.Id);
 
-        var query = new GetStorageRouteByStorageQuery(_storageFrom.Name, _storageTo.Name);
+        var query = new GetStorageRouteByStorageQuery(_storageFrom.Name, _storageTo.Name, true);
         var result = await _mediator.Send(query);
 
         Assert.NotNull(result.StorageRoute);
@@ -62,14 +62,14 @@ public class GetStorageRouteTests : IAsyncLifetime
     [Fact]
     public async Task GetStorageRouteByStorage_WithNonExistentStorages_ThrowsDbValidationException()
     {
-        var query = new GetStorageRouteByStorageQuery("NonExistent", "NonExistent2");
+        var query = new GetStorageRouteByStorageQuery("NonExistent", "NonExistent2", true);
         await Assert.ThrowsAsync<DbValidationException>(async () => await _mediator.Send(query));
     }
 
     [Fact]
     public async Task GetStorageRouteByStorage_WithExistingStoragesButNoRoute_ThrowsStorageRouteNotFound()
     {
-        var query = new GetStorageRouteByStorageQuery(_storageFrom.Name, _storageTo.Name);
+        var query = new GetStorageRouteByStorageQuery(_storageFrom.Name, _storageTo.Name, true);
         await Assert.ThrowsAsync<StorageRouteNotFound>(async () => await _mediator.Send(query));
     }
 

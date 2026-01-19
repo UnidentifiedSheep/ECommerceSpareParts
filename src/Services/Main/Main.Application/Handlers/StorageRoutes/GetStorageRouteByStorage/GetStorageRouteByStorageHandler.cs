@@ -6,7 +6,7 @@ using Mapster;
 
 namespace Main.Application.Handlers.StorageRoutes.GetStorageRouteByStorage;
 
-public record GetStorageRouteByStorageQuery(string StorageFrom, string StorageTo) : IQuery<GetStorageRouteByStorageResult>;
+public record GetStorageRouteByStorageQuery(string StorageFrom, string StorageTo, bool IsActive) : IQuery<GetStorageRouteByStorageResult>;
 public record GetStorageRouteByStorageResult(StorageRouteDto StorageRoute);
 
 public class GetStorageRouteByStorageHandler(IStorageRoutesRepository storageRoutesRepository) 
@@ -14,8 +14,9 @@ public class GetStorageRouteByStorageHandler(IStorageRoutesRepository storageRou
 {
     public async Task<GetStorageRouteByStorageResult> Handle(GetStorageRouteByStorageQuery request, CancellationToken cancellationToken)
     {
-        var route = await storageRoutesRepository.GetStorageRouteAsync(request.StorageFrom, request.StorageTo, false,
-            cancellationToken) ?? throw new StorageRouteNotFound(request.StorageFrom, request.StorageTo);
+        var route = await storageRoutesRepository.GetStorageRouteAsync(request.StorageFrom, request.StorageTo, 
+            request.IsActive, false, cancellationToken) 
+                    ?? throw new StorageRouteNotFound(request.StorageFrom, request.StorageTo);
 
         return new GetStorageRouteByStorageResult(route.Adapt<StorageRouteDto>());
     }

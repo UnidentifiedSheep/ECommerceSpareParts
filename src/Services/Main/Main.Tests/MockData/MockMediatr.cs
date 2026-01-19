@@ -130,7 +130,7 @@ public static class MockMediatr
         var command = new AddStorageRouteCommand(fromStorage, toStorage, faker.Random.Int(1, 100), 
             RouteType.IntraCity, LogisticPricingType.PerAreaOrWeight, faker.Random.Int(1, 100),
             GetRandomWithScale2(faker), GetRandomWithScale2(faker), currencyId, 
-            GetRandomWithScale2(faker), RouteStatus.Active);
+            GetRandomWithScale2(faker));
         await mediator.Send(command);
     }
 

@@ -22,5 +22,7 @@ public partial class PurchaseContent
 
     public virtual Purchase Purchase { get; set; } = null!;
 
+    public virtual PurchaseContentLogistic? PurchaseContentLogistic { get; set; }
+
     public virtual StorageContent? StorageContent { get; set; }
 }

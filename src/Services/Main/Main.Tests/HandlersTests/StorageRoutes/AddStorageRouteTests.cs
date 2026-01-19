@@ -52,7 +52,7 @@ public class AddStorageRouteTests : IAsyncLifetime
     {
         var command = new AddStorageRouteCommand(_storageFrom.Name, _storageTo.Name, 1000,
             RouteType.IntraCity, LogisticPricingType.PerOrder, 60, 10.5m, 20.5m,
-            _currency.Id, 5.0m, RouteStatus.Active);
+            _currency.Id, 5.0m);
         
         var result = await _mediator.Send(command);
 
@@ -69,7 +69,7 @@ public class AddStorageRouteTests : IAsyncLifetime
     {
         var command = new AddStorageRouteCommand(_storageFrom.Name, _storageTo.Name, 0, RouteType.IntraCity,
             LogisticPricingType.PerOrder, 60, 10.5m, 20.5m, _currency.Id,
-            5.0m, RouteStatus.Active);
+            5.0m);
 
         await Assert.ThrowsAsync<ValidationException>(async () => await _mediator.Send(command));
     }
@@ -78,8 +78,7 @@ public class AddStorageRouteTests : IAsyncLifetime
     public async Task AddStorageRoute_WithInvalidPricePrecision_ThrowsValidationException()
     {
         var command = new AddStorageRouteCommand(_storageFrom.Name, _storageTo.Name, 1000, RouteType.IntraCity,
-            LogisticPricingType.PerOrder, 60, 10.555m, 20.5m, _currency.Id, 5.0m,
-            RouteStatus.Active);
+            LogisticPricingType.PerOrder, 60, 10.555m, 20.5m, _currency.Id, 5.0m);
 
         await Assert.ThrowsAsync<ValidationException>(async () => await _mediator.Send(command));
     }
@@ -88,8 +87,7 @@ public class AddStorageRouteTests : IAsyncLifetime
     public async Task AddStorageRoute_WithNonExistentCurrency_ThrowsValidationException()
     {
         var command = new AddStorageRouteCommand(_storageFrom.Name, _storageTo.Name, 1000, RouteType.IntraCity, 
-            LogisticPricingType.PerOrder, 60, 10.5m, 20.5m, 9999, 5.0m, 
-            RouteStatus.Active);
+            LogisticPricingType.PerOrder, 60, 10.5m, 20.5m, 9999, 5.0m);
 
         await Assert.ThrowsAsync<ValidationException>(async () => await _mediator.Send(command));
     }
@@ -98,8 +96,7 @@ public class AddStorageRouteTests : IAsyncLifetime
     public async Task AddStorageRoute_WithNonExistentStorage_ThrowsDbValidationException()
     {
         var command = new AddStorageRouteCommand("NonExistentStorage", _storageTo.Name, 1000, RouteType.IntraCity,
-            LogisticPricingType.PerOrder, 60, 10.5m, 20.5m, _currency.Id, 5.0m,
-            RouteStatus.Active);
+            LogisticPricingType.PerOrder, 60, 10.5m, 20.5m, _currency.Id, 5.0m);
 
         var exception = await Assert.ThrowsAsync<DbValidationException>(async () => await _mediator.Send(command));
         Assert.Contains(exception.Failures, f => f.ErrorName == ApplicationErrors.StoragesNotFound);
@@ -109,8 +106,7 @@ public class AddStorageRouteTests : IAsyncLifetime
     public async Task AddStorageRoute_WithDuplicateRoute_ThrowsDbValidationException()
     {
         var command = new AddStorageRouteCommand(_storageFrom.Name, _storageTo.Name, 1000, RouteType.IntraCity,
-            LogisticPricingType.PerOrder, 60, 10.5m, 20.5m, _currency.Id, 5.0m,
-            RouteStatus.Active);
+            LogisticPricingType.PerOrder, 60, 10.5m, 20.5m, _currency.Id, 5.0m);
 
         await _mediator.Send(command);
 

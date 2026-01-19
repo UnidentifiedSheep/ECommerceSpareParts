@@ -50,4 +50,6 @@ public partial class Currency
     public virtual ICollection<Transaction> Transactions { get; set; } = new List<Transaction>();
 
     public virtual ICollection<UserBalance> UserBalances { get; set; } = new List<UserBalance>();
+    
+    public virtual ICollection<PurchaseLogistic> PurchaseLogistics { get; set; } = new List<PurchaseLogistic>();
 }

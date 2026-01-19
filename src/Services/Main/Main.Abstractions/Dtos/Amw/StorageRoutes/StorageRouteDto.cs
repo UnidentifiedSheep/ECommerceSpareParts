@@ -14,6 +14,6 @@ public class StorageRouteDto
     public decimal PriceKg { get; set; }
     public decimal PricePerM3 { get; set; }
     public decimal PricePerOrder { get; set; }
-    public RouteStatus Status { get; set; }
+    public bool IsActive { get; set; }
     public int CurrencyId { get; set; }
 }

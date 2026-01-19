@@ -28,13 +28,16 @@ public partial class StorageRoute
 
     public decimal PricePerOrder { get; set; }
 
-    public RouteStatus Status { get; set; }
+    [ValidateTuple("FromTo")]
+    public bool IsActive { get; set; }
 
     public int CurrencyId { get; set; }
 
     public virtual Currency Currency { get; set; } = null!;
 
     public virtual Storage FromStorageNameNavigation { get; set; } = null!;
+
+    public virtual ICollection<PurchaseLogistic> PurchaseLogistics { get; set; } = new List<PurchaseLogistic>();
 
     public virtual Storage ToStorageNameNavigation { get; set; } = null!;
 }

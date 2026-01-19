@@ -38,6 +38,8 @@ public partial class Transaction
 
     public virtual User? DeletedByNavigation { get; set; }
 
+    public virtual PurchaseLogistic? PurchaseLogistic { get; set; }
+
     public virtual ICollection<Purchase> Purchases { get; set; } = new List<Purchase>();
 
     public virtual User Receiver { get; set; } = null!;

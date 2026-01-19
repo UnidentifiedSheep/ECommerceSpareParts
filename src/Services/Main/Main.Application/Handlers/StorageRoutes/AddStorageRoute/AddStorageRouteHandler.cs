@@ -19,11 +19,10 @@ namespace Main.Application.Handlers.StorageRoutes.AddStorageRoute;
 /// <param name="PriceKg">Price per kilogram.</param>
 /// <param name="PriceM3">Price per cubic meter.</param>
 /// <param name="PricePerOrder">Fixed price per order (if applicable).</param>
-/// <param name="Status">Current route status. Active or not</param>
 [Transactional]
 public record AddStorageRouteCommand(string StorageFrom, string StorageTo, int Distance, RouteType RouteType, 
     LogisticPricingType PricingType, int DeliveryTime, decimal PriceKg, decimal PriceM3, int CurrencyId,
-    decimal PricePerOrder, RouteStatus Status) : ICommand<AddStorageRouteResult>;
+    decimal PricePerOrder) : ICommand<AddStorageRouteResult>;
 
 public record AddStorageRouteResult(Guid RouteId);
 

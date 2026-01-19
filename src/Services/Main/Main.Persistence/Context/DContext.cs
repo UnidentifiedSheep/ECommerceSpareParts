@@ -19,6 +19,7 @@ public partial class DContext : DbContext
     }
 
     public virtual DbSet<Article> Articles { get; set; }
+
     public virtual DbSet<ArticleCharacteristic> ArticleCharacteristics { get; set; }
 
     public virtual DbSet<ArticleEan> ArticleEans { get; set; }
@@ -65,6 +66,10 @@ public partial class DContext : DbContext
 
     public virtual DbSet<PurchaseContent> PurchaseContents { get; set; }
 
+    public virtual DbSet<PurchaseContentLogistic> PurchaseContentLogistics { get; set; }
+
+    public virtual DbSet<PurchaseLogistic> PurchaseLogistics { get; set; }
+
     public virtual DbSet<Role> Roles { get; set; }
 
     public virtual DbSet<Sale> Sales { get; set; }
@@ -80,7 +85,7 @@ public partial class DContext : DbContext
     public virtual DbSet<StorageContentReservation> StorageContentReservations { get; set; }
 
     public virtual DbSet<StorageMovement> StorageMovements { get; set; }
-    
+
     public virtual DbSet<StorageRoute> StorageRoutes { get; set; }
 
     public virtual DbSet<Transaction> Transactions { get; set; }
@@ -536,7 +541,7 @@ public partial class DContext : DbContext
                 .HasForeignKey(d => d.GroupId)
                 .HasConstraintName("markup_ranges_markup_group_id_fk");
         });
-        
+
         modelBuilder.Entity<Order>(entity =>
         {
             entity.HasKey(e => e.Id).HasName("orders_pk");
@@ -876,6 +881,67 @@ public partial class DContext : DbContext
                 .HasForeignKey(d => d.StorageContentId)
                 .OnDelete(DeleteBehavior.SetNull)
                 .HasConstraintName("purchase_content_storage_content_id_fk");
+        });
+
+        modelBuilder.Entity<PurchaseContentLogistic>(entity =>
+        {
+            entity.HasKey(e => e.PurchaseContentId).HasName("purchase_content_logistics_pk");
+
+            entity.ToTable("purchase_content_logistics");
+
+            entity.Property(e => e.PurchaseContentId)
+                .ValueGeneratedNever()
+                .HasColumnName("purchase_content_id");
+            entity.Property(e => e.AreaCm3).HasColumnName("area_cm3");
+            entity.Property(e => e.Price).HasColumnName("price");
+            entity.Property(e => e.WeightG).HasColumnName("weight_g");
+
+            entity.HasOne(d => d.PurchaseContent).WithOne(p => p.PurchaseContentLogistic)
+                .HasForeignKey<PurchaseContentLogistic>(d => d.PurchaseContentId)
+                .HasConstraintName("purchase_content_logistics_purchase_content_id_fk");
+        });
+
+        modelBuilder.Entity<PurchaseLogistic>(entity =>
+        {
+            entity.HasKey(e => e.PurchaseId).HasName("purchase_logistics_pk");
+
+            entity.ToTable("purchase_logistics");
+
+            entity.HasIndex(e => e.CurrencyId, "purchase_logistics_currency_id_index");
+
+            entity.HasIndex(e => e.RouteId, "purchase_logistics_route_id_index");
+
+            entity.HasIndex(e => e.TransactionId, "purchase_logistics_transaction_id_uindex").IsUnique();
+
+            entity.Property(e => e.PurchaseId).HasColumnName("purchase_id");
+            entity.Property(e => e.CurrencyId).HasColumnName("currency_id");
+            entity.Property(e => e.PricingModel)
+                .HasMaxLength(24)
+                .HasColumnName("pricing_model");
+            entity.Property(e => e.RouteId).HasColumnName("route_id");
+            entity.Property(e => e.RouteType)
+                .HasMaxLength(24)
+                .HasColumnName("route_type");
+            entity.Property(e => e.TransactionId).HasColumnName("transaction_id");
+
+            entity.HasOne(d => d.Currency).WithMany(p => p.PurchaseLogistics)
+                .HasForeignKey(d => d.CurrencyId)
+                .OnDelete(DeleteBehavior.Restrict)
+                .HasConstraintName("purchase_logistics_currency_id_fk");
+
+            entity.HasOne(d => d.Purchase).WithOne(p => p.PurchaseLogistic)
+                .HasForeignKey<PurchaseLogistic>(d => d.PurchaseId)
+                .HasConstraintName("purchase_logistics_purchase_id_fk");
+
+            entity.HasOne(d => d.Route).WithMany(p => p.PurchaseLogistics)
+                .HasForeignKey(d => d.RouteId)
+                .OnDelete(DeleteBehavior.Restrict)
+                .HasConstraintName("purchase_logistics_storage_routes_id_fk");
+
+            entity.HasOne(d => d.Transaction).WithOne(p => p.PurchaseLogistic)
+                .HasForeignKey<PurchaseLogistic>(d => d.TransactionId)
+                .OnDelete(DeleteBehavior.Restrict)
+                .HasConstraintName("purchase_logistics_transactions_id_fk");
         });
 
         modelBuilder.Entity<Role>(entity =>
@@ -1326,7 +1392,11 @@ public partial class DContext : DbContext
 
             entity.ToTable("storage_routes");
 
-            entity.HasIndex(e => new { e.FromStorageName, e.ToStorageName }, "storage_routes_from_storage_name_to_storage_name_uindex").IsUnique();
+            entity.HasIndex(e => new { e.FromStorageName, e.ToStorageName, e.IsActive }, "storage_from_to_active_uindex")
+                .IsUnique()
+                .HasFilter("(is_active = true)");
+
+            entity.HasIndex(e => e.CurrencyId, "storage_routes_currency_id_index");
 
             entity.Property(e => e.Id)
                 .HasDefaultValueSql("gen_random_uuid()")
@@ -1337,6 +1407,9 @@ public partial class DContext : DbContext
             entity.Property(e => e.FromStorageName)
                 .HasMaxLength(128)
                 .HasColumnName("from_storage_name");
+            entity.Property(e => e.IsActive)
+                .HasDefaultValue(true)
+                .HasColumnName("is_active");
             entity.Property(e => e.PriceKg).HasColumnName("price_kg");
             entity.Property(e => e.PricePerM3).HasColumnName("price_per_m3");
             entity.Property(e => e.PricePerOrder).HasColumnName("price_per_order");
@@ -1346,9 +1419,6 @@ public partial class DContext : DbContext
             entity.Property(e => e.RouteType)
                 .HasMaxLength(24)
                 .HasColumnName("route_type");
-            entity.Property(e => e.Status)
-                .HasMaxLength(24)
-                .HasColumnName("status");
             entity.Property(e => e.ToStorageName)
                 .HasMaxLength(128)
                 .HasColumnName("to_storage_name");

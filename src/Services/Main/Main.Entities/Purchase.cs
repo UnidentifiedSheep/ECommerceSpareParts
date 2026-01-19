@@ -34,6 +34,8 @@ public partial class Purchase
 
     public virtual ICollection<PurchaseContent> PurchaseContents { get; set; } = new List<PurchaseContent>();
 
+    public virtual PurchaseLogistic? PurchaseLogistic { get; set; }
+
     public virtual Storage StorageNavigation { get; set; } = null!;
 
     public virtual User Supplier { get; set; } = null!;
