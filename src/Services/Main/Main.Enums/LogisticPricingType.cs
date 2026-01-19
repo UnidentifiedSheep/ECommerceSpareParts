@@ -21,5 +21,9 @@ public enum LogisticPricingType
     /// <summary>
     /// За вес и площадь
     /// </summary>
-    PerAreaAndWeight
+    PerAreaAndWeight,
+    /// <summary>
+    /// За вес или площадь (в зависимости от того, что больше)
+    /// </summary>
+    PerAreaOrWeight
 }

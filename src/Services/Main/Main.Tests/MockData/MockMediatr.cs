@@ -11,6 +11,7 @@ using Main.Abstractions.Dtos.Emails;
 using Main.Entities;
 using Main.Enums;
 using Main.Abstractions.Models;
+using Main.Application.Handlers.StorageRoutes.AddStorageRoute;
 using Mapster;
 using MediatR;
 using static Tests.MockData.MockData;
@@ -119,5 +120,24 @@ public static class MockMediatr
         var command = new CreateSaleCommand(saleContent, storageContentValues, currencyId, userId, userId,
             transactionId, storageName, when ?? DateTime.Now, null);
         await mediator.Send(command);
+    }
+
+    public static async Task AddMockStorageRoute(this IMediator mediator, string fromStorage, string toStorage, 
+        int currencyId)
+    {
+        Faker faker = new Faker(Global.Locale);
+        
+        var command = new AddStorageRouteCommand(fromStorage, toStorage, faker.Random.Int(1, 100), 
+            RouteType.IntraCity, LogisticPricingType.PerAreaOrWeight, faker.Random.Int(1, 100),
+            GetRandomWithScale2(faker), GetRandomWithScale2(faker), currencyId, 
+            GetRandomWithScale2(faker), RouteStatus.Active);
+        await mediator.Send(command);
+    }
+
+
+    private static decimal GetRandomWithScale2(Faker faker)
+    {
+        var value = faker.Random.Decimal(0, 100_000);
+        return decimal.Parse(value.ToString("F2"));
     }
 }

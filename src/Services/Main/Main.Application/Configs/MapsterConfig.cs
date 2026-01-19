@@ -12,6 +12,7 @@ using Main.Abstractions.Dtos.Amw.Producers;
 using Main.Abstractions.Dtos.Amw.Purchase;
 using Main.Abstractions.Dtos.Amw.Sales;
 using Main.Abstractions.Dtos.Amw.Storage;
+using Main.Abstractions.Dtos.Amw.StorageRoutes;
 using Main.Abstractions.Dtos.Amw.Users;
 using Main.Abstractions.Dtos.Anonymous.Articles;
 using Main.Abstractions.Dtos.Anonymous.Producers;
@@ -545,5 +546,20 @@ public static class MapsterConfig
             .Map(d => d.PricePerM3, s => s.PriceM3)
             .Map(d => d.PricePerOrder, s => s.PricePerOrder)
             .Map(d => d.Status, s => s.Status);
+        
+        TypeAdapterConfig<StorageRoute, StorageRouteDto>.NewConfig()
+            .IgnoreNonMapped(true)
+            .Map(d => d.Id, s => s.Id)
+            .Map(d => d.FromStorageName, s => s.FromStorageName)
+            .Map(d => d.ToStorageName, s => s.ToStorageName)
+            .Map(d => d.DistanceM, s => s.DistanceM)
+            .Map(d => d.RouteType, s => s.RouteType)
+            .Map(d => d.PricingModel, s => s.PricingModel)
+            .Map(d => d.DeliveryTimeMinutes, s => s.DeliveryTimeMinutes)
+            .Map(d => d.PriceKg, s => s.PriceKg)
+            .Map(d => d.PricePerM3, s => s.PricePerM3)
+            .Map(d => d.PricePerOrder, s => s.PricePerOrder)
+            .Map(d => d.Status, s => s.Status)
+            .Map(d => d.CurrencyId, s => s.CurrencyId);
     }
 }
