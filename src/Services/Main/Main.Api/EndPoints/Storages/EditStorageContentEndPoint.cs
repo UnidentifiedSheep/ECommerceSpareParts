@@ -1,9 +1,9 @@
 using System.Security.Claims;
 using Api.Common.Extensions;
 using Carter;
+using Main.Abstractions.Dtos.Amw.Storage;
+using Main.Abstractions.Models;
 using Main.Application.Handlers.StorageContents.EditContent;
-using Main.Core.Dtos.Amw.Storage;
-using Main.Core.Models;
 using MediatR;
 
 namespace Main.Api.EndPoints.Storages;

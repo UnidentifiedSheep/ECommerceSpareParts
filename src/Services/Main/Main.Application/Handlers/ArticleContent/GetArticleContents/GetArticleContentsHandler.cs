@@ -1,6 +1,6 @@
 ﻿using Application.Common.Interfaces;
-using Main.Core.Dtos.Anonymous.Articles;
-using Main.Core.Interfaces.DbRepositories;
+using Main.Abstractions.Dtos.Anonymous.Articles;
+using Main.Abstractions.Interfaces.DbRepositories;
 using Mapster;
 
 namespace Main.Application.Handlers.ArticleContent.GetArticleContents;

@@ -2,7 +2,7 @@ using Application.Common.Interfaces;
 using Core.Attributes;
 using Core.Interfaces.Services;
 using Exceptions.Exceptions.Purchase;
-using Main.Core.Interfaces.DbRepositories;
+using Main.Abstractions.Interfaces.DbRepositories;
 using MediatR;
 
 namespace Main.Application.Handlers.Purchases.DeletePurchase;

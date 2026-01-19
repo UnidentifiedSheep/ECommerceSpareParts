@@ -2,9 +2,9 @@ using Api.Common.Extensions;
 using Carter;
 using Core.Models;
 using Exceptions.Exceptions.Storages;
+using Main.Abstractions.Dtos.Amw.Storage;
 using Main.Application.Handlers.Storages.GetStorage;
 using Main.Application.Handlers.Storages.GetStorageByName;
-using Main.Core.Dtos.Amw.Storage;
 using Mapster;
 using MediatR;
 

@@ -1,8 +1,7 @@
 using Core.Extensions;
-using Main.Core.Entities;
-using Main.Core.Extensions;
-using Main.Core.Interfaces.DbRepositories;
-using Main.Core.Models;
+using Main.Abstractions.Interfaces.DbRepositories;
+using Main.Abstractions.Models;
+using Main.Entities;
 using Main.Persistence.Context;
 using Microsoft.EntityFrameworkCore;
 using Persistence.Extensions;

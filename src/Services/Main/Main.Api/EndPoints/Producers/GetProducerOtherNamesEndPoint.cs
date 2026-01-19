@@ -1,7 +1,7 @@
 using Carter;
 using Core.Models;
 using Main.Application.Handlers.Producers.GetProducerOtherNames;
-using Main.Core.Dtos.Amw.Producers;
+using Main.Abstractions.Dtos.Amw.Producers;
 using Mapster;
 using MediatR;
 

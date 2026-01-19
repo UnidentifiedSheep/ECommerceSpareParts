@@ -1,3 +1,4 @@
+using System.Reflection;
 using Application.Common;
 using Application.Common.Behaviors;
 using Application.Common.Factories;
@@ -10,26 +11,25 @@ using Core.Interfaces.CacheRepositories;
 using Core.Interfaces.Validators;
 using Core.Models;
 using FluentValidation;
+using Main.Abstractions.Interfaces.Pricing;
+using Main.Abstractions.Interfaces.Services;
+using Main.Abstractions.Models;
 using Main.Application.ConcurrencyValidator;
+using Main.Application.Configs;
 using Main.Application.Handlers.Articles.GetArticleCrosses;
 using Main.Application.Handlers.Articles.GetArticles;
 using Main.Application.HangFireTasks;
 using Main.Application.RelatedData;
 using Main.Application.Services;
 using Main.Application.Services.Pricing;
-using Main.Application.Validation;
-using Main.Core.Abstractions;
-using Main.Core.Entities;
-using Main.Core.Interfaces.Pricing;
-using Main.Core.Interfaces.Services;
-using Main.Core.Models;
+using Main.Entities;
 using MediatR;
 using Microsoft.Extensions.DependencyInjection;
-using AmwArticleDto = Main.Core.Dtos.Amw.Articles.ArticleDto;
-using AnonymousArticleDto = Main.Core.Dtos.Anonymous.Articles.ArticleDto;
-using AmwArticleFullDto = Main.Core.Dtos.Amw.Articles.ArticleFullDto;
-using Currency = Main.Core.Entities.Currency;
-using MemberArticleFullDto = Main.Core.Dtos.Member.Articles.ArticleFullDto;
+using AmwArticleDto = Main.Abstractions.Dtos.Amw.Articles.ArticleDto;
+using AnonymousArticleDto = Main.Abstractions.Dtos.Anonymous.Articles.ArticleDto;
+using AmwArticleFullDto = Main.Abstractions.Dtos.Amw.Articles.ArticleFullDto;
+using Currency = Main.Entities.Currency;
+using MemberArticleFullDto = Main.Abstractions.Dtos.Member.Articles.ArticleFullDto;
 
 namespace Main.Application;
 
@@ -47,7 +47,6 @@ public static class ServiceProvider
         collection.AddSingleton<ICurrencyConverter, CurrencyConverter>(_ => new CurrencyConverter(Global.UsdId));
         collection.AddSingleton<IPriceGenerator, PriceGenerator>();
         collection.AddScoped<IPriceSetup, PriceSetup>();
-        collection.AddScoped<DbDataValidatorBase, DbDataValidator>();
 
         collection.AddScoped<IStorageContentService, StorageContentService>();
         collection.AddScoped<IArticlePricesService, ArticlePricesService>();
@@ -104,6 +103,8 @@ public static class ServiceProvider
                             i.GetGenericTypeDefinition() == typeof(ILoggableRequest<>)))
             .WithScopedLifetime()
         );
+        
+        ValidationConfiguration.Configure();
 
         /*collection.Scan(scan => scan
             .FromAssemblyOf<GetArticlesAmwLogSettings>()
@@ -117,6 +118,8 @@ public static class ServiceProvider
             .WithScopedLifetime()
         );*/
 
+        collection.RegisterDbValidations(Assembly.GetAssembly(typeof(Global)));
+
 
         collection.AddMediatR(config =>
         {
@@ -125,7 +128,8 @@ public static class ServiceProvider
             config.AddOpenBehavior(typeof(LoggingBehavior<,>));
             config.AddOpenBehavior(typeof(RequestsDataLoggingBehavior<,>));
             config.AddOpenBehavior(typeof(CacheBehavior<,>));
-            config.AddOpenBehavior(typeof(TransactionBehavior<,>));
+            config.AddOpenBehavior(typeof(TransactionBehavior<,>), ServiceLifetime.Scoped);
+            config.AddOpenBehavior(typeof(DbValidationBehavior<,>), ServiceLifetime.Scoped);
         });
 
         return collection;

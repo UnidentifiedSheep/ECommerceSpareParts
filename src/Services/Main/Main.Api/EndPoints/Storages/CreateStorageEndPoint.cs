@@ -1,7 +1,7 @@
 using Api.Common.Extensions;
 using Carter;
 using Main.Application.Handlers.Storages.CreateStorage;
-using Main.Core.Enums;
+using Main.Enums;
 using Mapster;
 using MediatR;
 

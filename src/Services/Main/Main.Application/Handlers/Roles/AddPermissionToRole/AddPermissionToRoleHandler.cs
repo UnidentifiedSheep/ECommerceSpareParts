@@ -1,11 +1,11 @@
 ﻿using Application.Common.Interfaces;
 using Core.Attributes;
+using Core.Extensions;
 using Core.Interfaces.Services;
 using Exceptions.Exceptions.Permissions;
 using Exceptions.Exceptions.Roles;
-using Main.Core.Entities;
-using Main.Core.Extensions;
-using Main.Core.Interfaces.DbRepositories;
+using Main.Abstractions.Interfaces.DbRepositories;
+using Main.Entities;
 using MediatR;
 
 namespace Main.Application.Handlers.Roles.AddPermissionToRole;

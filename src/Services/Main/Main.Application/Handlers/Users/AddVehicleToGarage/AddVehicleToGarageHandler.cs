@@ -1,14 +1,10 @@
 using Application.Common.Interfaces;
 using Core.Attributes;
 using Core.Interfaces.Services;
-using Exceptions.Exceptions.Users;
 using Exceptions.Exceptions.Vehicles;
-using Main.Application.Extensions;
-using Main.Application.Validation;
-using Main.Core.Abstractions;
-using Main.Core.Dtos.Member.Vehicles;
-using Main.Core.Entities;
-using Main.Core.Interfaces.DbRepositories;
+using Main.Abstractions.Dtos.Member.Vehicles;
+using Main.Abstractions.Interfaces.DbRepositories;
+using Main.Entities;
 using Mapster;
 using MediatR;
 
@@ -17,31 +13,25 @@ namespace Main.Application.Handlers.Users.AddVehicleToGarage;
 [Transactional]
 public record AddVehicleToGarageCommand(VehicleDto Vehicle, Guid UserId) : ICommand<Unit>;
 
-public class AddVehicleToGarageHandler(
-    DbDataValidatorBase dbValidator,
-    IUserVehicleRepository vehicleRepository,
-    IUnitOfWork unitOfWork) : ICommandHandler<AddVehicleToGarageCommand, Unit>
+public class AddVehicleToGarageHandler(IUserVehicleRepository vehicleRepository, IUnitOfWork unitOfWork) 
+    : ICommandHandler<AddVehicleToGarageCommand, Unit>
 {
     public async Task<Unit> Handle(AddVehicleToGarageCommand request, CancellationToken cancellationToken)
     {
         var vin = request.Vehicle.Vin?.Trim();
         var plateNumber = request.Vehicle.PlateNumber.Trim();
-        var userId = request.UserId;
 
-        await ValidateData(vin, plateNumber, userId, cancellationToken);
+        await ValidateData(vin, plateNumber, cancellationToken);
 
         var model = request.Vehicle.Adapt<UserVehicle>();
-        model.UserId = userId;
+        model.UserId = request.UserId;
         await unitOfWork.AddAsync(model, cancellationToken);
         await unitOfWork.SaveChangesAsync(cancellationToken);
         return Unit.Value;
     }
 
-    private async Task ValidateData(string? vin, string plateNumber, Guid userId,
-        CancellationToken cancellationToken = default)
+    private async Task ValidateData(string? vin, string plateNumber, CancellationToken cancellationToken = default)
     {
-        var plan = new ValidationPlan().EnsureUserExists(userId);
-        await dbValidator.Validate(plan, true, true, cancellationToken);
         if (!string.IsNullOrWhiteSpace(vin) && await vehicleRepository.VehicleVinCodeTaken(vin, cancellationToken))
             throw new VinCodeAlreadyTakenException(vin);
         if (await vehicleRepository.VehiclePlateNumberTaken(plateNumber, cancellationToken))

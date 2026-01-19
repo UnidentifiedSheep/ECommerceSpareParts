@@ -1,7 +1,7 @@
 using Exceptions.Exceptions.Sales;
 using Main.Application.Configs;
 using Main.Application.Handlers.Sales.DeleteSale;
-using Main.Core.Entities;
+using Main.Entities;
 using Main.Persistence.Context;
 using MediatR;
 using Microsoft.EntityFrameworkCore;

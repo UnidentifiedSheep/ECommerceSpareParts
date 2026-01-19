@@ -8,6 +8,7 @@
     </PropertyGroup>
 
     <ItemGroup>
+        <PackageReference Include="BulkValidation.Core" Version="1.0.9" />
         <PackageReference Include="IntervalMap" Version="1.0.2"/>
         <PackageReference Include="Microsoft.Extensions.Hosting.Abstractions" Version="10.0.0" />
         <PackageReference Include="Scrutor" Version="7.0.0" />
@@ -15,8 +16,6 @@
     </ItemGroup>
 
     <ItemGroup>
-        <Folder Include="Handlers\StorageRoutes\" />
-        <Folder Include="Handlers\Users\AddRoleToUser\" />
         <Folder Include="Handlers\Users\RemoveRoleFromUser\" />
     </ItemGroup>
 
@@ -24,7 +23,8 @@
         <ProjectReference Include="..\..\..\Core\Contracts\Contracts.csproj" />
         <ProjectReference Include="..\..\..\Core\Core\Core.csproj"/>
         <ProjectReference Include="..\..\Application.Common\Application.Common.csproj"/>
-        <ProjectReference Include="..\Main.Core\Main.Core.csproj" />
+        <ProjectReference Include="..\Main.Abstractions\Main.Abstractions.csproj" />
+        <ProjectReference Include="..\Main.Entities\Main.Entities.csproj" />
     </ItemGroup>
 
     <ItemGroup>

@@ -1,12 +1,5 @@
 using Application.Common.Interfaces;
-using Core.Attributes;
-using Exceptions.Exceptions.Articles;
-using Exceptions.Exceptions.Storages;
-using Exceptions.Exceptions.Users;
-using Main.Application.Extensions;
-using Main.Application.Validation;
-using Main.Core.Abstractions;
-using Main.Core.Interfaces.DbRepositories;
+using Main.Abstractions.Interfaces.DbRepositories;
 
 namespace Main.Application.Handlers.ArticleReservations.GetArticlesWithNotEnoughStock;
 
@@ -24,9 +17,7 @@ public record GetArticlesWithNotEnoughStockResult(
     Dictionary<int, int> NotEnoughByReservation,
     Dictionary<int, int> NotEnoughByStock);
 
-public class GetArticlesWithNotEnoughStockHandler(
-    DbDataValidatorBase dbValidator,
-    IStorageContentRepository storageContentRepository,
+public class GetArticlesWithNotEnoughStockHandler(IStorageContentRepository storageContentRepository,
     IArticleReservationRepository reservationRepository)
     : IQueryHandler<GetArticlesWithNotEnoughStockQuery, GetArticlesWithNotEnoughStockResult>
 {
@@ -37,7 +28,6 @@ public class GetArticlesWithNotEnoughStockHandler(
         var storageName = request.StorageName;
         var userId = request.BuyerId;
         var takeFromOtherStorages = request.TakeFromOtherStorages;
-        await EnsureDataExists(storageName, userId, articleIds, cancellationToken);
 
         var notEnoughByReservation = new Dictionary<int, int>();
         var notEnoughStock = new Dictionary<int, int>();
@@ -67,15 +57,5 @@ public class GetArticlesWithNotEnoughStockHandler(
         }
 
         return new GetArticlesWithNotEnoughStockResult(notEnoughByReservation, notEnoughStock);
-    }
-
-    private async Task EnsureDataExists(string storageName, Guid userId, IEnumerable<int> articleIds,
-        CancellationToken cancellationToken = default)
-    {
-        var plan = new ValidationPlan()
-            .EnsureStorageExists(storageName)
-            .EnsureUserExists(userId)
-            .EnsureArticleExists(articleIds);
-        await dbValidator.Validate(plan, true, true, cancellationToken);
     }
 }

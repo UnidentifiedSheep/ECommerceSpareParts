@@ -4,29 +4,22 @@ using Core.Attributes;
 using Core.Interfaces;
 using Core.Interfaces.Services;
 using Exceptions.Base;
-using Exceptions.Exceptions.Currencies;
-using Exceptions.Exceptions.Users;
-using Main.Application.Extensions;
+using Main.Abstractions.Dtos.Amw.Storage;
+using Main.Abstractions.Interfaces.Services;
+using Main.Abstractions.Models;
 using Main.Application.Notifications;
-using Main.Application.Validation;
-using Main.Core.Abstractions;
-using Main.Core.Dtos.Amw.Storage;
-using Main.Core.Entities;
-using Main.Core.Enums;
-using Main.Core.Interfaces.Services;
-using Main.Core.Models;
+using Main.Entities;
+using Main.Enums;
 using Mapster;
 using MediatR;
 
 namespace Main.Application.Handlers.StorageContents.EditContent;
 
 [Transactional(IsolationLevel.Serializable, 20, 2)]
-public record EditStorageContentCommand(
-    Dictionary<int, ModelWithCode<PatchStorageContentDto, string>> EditedFields,
+public record EditStorageContentCommand(Dictionary<int, ModelWithCode<PatchStorageContentDto, string>> EditedFields,
     Guid UserId) : ICommand;
 
 public class EditStorageContentHandler(
-    DbDataValidatorBase dbValidator,
     IStorageContentService storageContentService,
     IUnitOfWork unitOfWork,
     IConcurrencyValidator<StorageContent> concurrencyValidator,
@@ -37,8 +30,6 @@ public class EditStorageContentHandler(
     public async Task<Unit> Handle(EditStorageContentCommand request, CancellationToken cancellationToken)
     {
         var editedFields = request.EditedFields;
-
-        await ValidateData(editedFields.Select(x => x.Value.Model), request.UserId, cancellationToken);
 
         var storageContents = await storageContentService
             .GetStorageContentsForUpdate(editedFields.Keys, cancellationToken);
@@ -90,23 +81,5 @@ public class EditStorageContentHandler(
         movement.WhoMoved = userId;
 
         return (diff, movement);
-    }
-
-    private async Task ValidateData(IEnumerable<PatchStorageContentDto> values, Guid userId,
-        CancellationToken cancellationToken = default)
-    {
-        var currencyIds = new HashSet<int>();
-
-        foreach (var value in values)
-        {
-            if (value.CurrencyId.IsSet)
-                currencyIds.Add(value.CurrencyId.Value);
-        }
-
-        var plan = new ValidationPlan()
-            .EnsureUserExists(userId)
-            .EnsureCurrencyExists(currencyIds);
-        
-        await dbValidator.Validate(plan, true, true, cancellationToken);
     }
 }

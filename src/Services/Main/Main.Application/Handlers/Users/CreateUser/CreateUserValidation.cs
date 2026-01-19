@@ -3,7 +3,6 @@ using Core.Interfaces.Validators;
 using Core.Models;
 using FluentValidation;
 using Main.Application.Handlers.BaseValidators;
-using Main.Core.Extensions;
 
 namespace Main.Application.Handlers.Users.CreateUser;
 

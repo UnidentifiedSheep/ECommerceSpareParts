@@ -8,6 +8,9 @@
     </PropertyGroup>
 
     <ItemGroup>
+        <PackageReference Include="BulkValidation.Base" Version="1.0.3" />
+        <PackageReference Include="BulkValidation.Core" Version="1.0.9" />
+        <PackageReference Include="BulkValidation.Pgsql" Version="1.0.12" />
         <PackageReference Include="MassTransit.EntityFrameworkCore" Version="9.0.0-develop.25" />
         <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="10.0.0">
             <PrivateAssets>all</PrivateAssets>
@@ -29,7 +32,8 @@
 
     <ItemGroup>
         <ProjectReference Include="..\..\..\Infrastructure\Persistence\Persistence.csproj" />
-        <ProjectReference Include="..\Main.Core\Main.Core.csproj" />
+        <ProjectReference Include="..\Main.Abstractions\Main.Abstractions.csproj" />
+        <ProjectReference Include="..\Main.Entities\Main.Entities.csproj" />
     </ItemGroup>
 
 </Project>

@@ -1,10 +1,13 @@
+using Core.Interfaces;
 using FluentValidation;
+using Main.Application.Extensions;
+using Main.Application.Handlers.BaseValidators;
 
 namespace Main.Application.Handlers.ArticleReservations.EditArticleReservation;
 
 public class EditArticleReservationValidation : AbstractValidator<EditArticleReservationCommand>
 {
-    public EditArticleReservationValidation()
+    public EditArticleReservationValidation(ICurrencyConverter currencyConverter)
     {
         RuleFor(z => z.NewValue.GivenPrice)
             .Must(z => Math.Round(z!.Value, 2) > 0)
@@ -16,5 +19,8 @@ public class EditArticleReservationValidation : AbstractValidator<EditArticleRes
         RuleFor(z => z.NewValue.InitialCount)
             .GreaterThan(0)
             .WithMessage("Общее количество для резервации должно быть больше 0");
+
+        RuleFor(x => x.NewValue.GivenCurrencyId)
+            .CurrencyMustExist(currencyConverter);
     }
 }

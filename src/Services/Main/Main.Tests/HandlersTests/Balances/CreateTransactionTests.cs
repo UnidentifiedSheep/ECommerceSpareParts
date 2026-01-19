@@ -1,8 +1,8 @@
 using FluentValidation;
 using Main.Application.Configs;
 using Main.Application.Handlers.Balance.CreateTransaction;
-using Main.Core.Entities;
-using Main.Core.Enums;
+using Main.Entities;
+using Main.Enums;
 using Main.Persistence.Context;
 using MediatR;
 using Microsoft.EntityFrameworkCore;

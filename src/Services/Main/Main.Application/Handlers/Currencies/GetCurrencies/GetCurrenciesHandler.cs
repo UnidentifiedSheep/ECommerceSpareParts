@@ -1,11 +1,10 @@
 using Application.Common.Interfaces;
 using Core.Models;
 using Core.StaticFunctions;
-using Main.Core.Dtos.Currencies;
-using Main.Core.Entities;
-using Main.Core.Interfaces.DbRepositories;
+using Main.Abstractions.Dtos.Currencies;
+using Main.Abstractions.Interfaces.DbRepositories;
 using Mapster;
-using Currency = Main.Core.Entities.Currency;
+using Currency = Main.Entities.Currency;
 
 namespace Main.Application.Handlers.Currencies.GetCurrencies;
 
@@ -19,8 +18,7 @@ public record GetCurrenciesQuery(PaginationModel Pagination) : IQuery<GetCurrenc
 
 public record GetCurrenciesResult(IEnumerable<CurrencyDto> Currencies);
 
-public class GetCurrenciesHandler(ICurrencyRepository currencyRepository)
-    : IQueryHandler<GetCurrenciesQuery, GetCurrenciesResult>
+public class GetCurrenciesHandler(ICurrencyRepository currencyRepository) : IQueryHandler<GetCurrenciesQuery, GetCurrenciesResult>
 {
     public async Task<GetCurrenciesResult> Handle(GetCurrenciesQuery request, CancellationToken cancellationToken)
     {

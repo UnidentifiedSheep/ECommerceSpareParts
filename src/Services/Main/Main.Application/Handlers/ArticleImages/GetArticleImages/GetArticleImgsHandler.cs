@@ -1,5 +1,5 @@
 using Application.Common.Interfaces;
-using Main.Core.Interfaces.DbRepositories;
+using Main.Abstractions.Interfaces.DbRepositories;
 
 namespace Main.Application.Handlers.ArticleImages.GetArticleImages;
 

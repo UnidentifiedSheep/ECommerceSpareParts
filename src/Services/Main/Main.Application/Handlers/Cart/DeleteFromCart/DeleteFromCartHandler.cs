@@ -2,8 +2,7 @@
 using Core.Attributes;
 using Core.Interfaces.Services;
 using Exceptions.Exceptions.Cart;
-using Exceptions.Exceptions.Users;
-using Main.Core.Interfaces.DbRepositories;
+using Main.Abstractions.Interfaces.DbRepositories;
 using MediatR;
 
 namespace Main.Application.Handlers.Cart.DeleteFromCart;
@@ -11,7 +10,7 @@ namespace Main.Application.Handlers.Cart.DeleteFromCart;
 [Transactional]
 public record DeleteFromCartCommand(Guid UserId, int ArticleId) : ICommand;
 
-public class DeleteFromCartHandler(ICartRepository cartRepository, IUserRepository userRepository, IUnitOfWork unitOfWork) : ICommandHandler<DeleteFromCartCommand>
+public class DeleteFromCartHandler(ICartRepository cartRepository, IUnitOfWork unitOfWork) : ICommandHandler<DeleteFromCartCommand>
 {
     public async Task<Unit> Handle(DeleteFromCartCommand request, CancellationToken cancellationToken)
     {

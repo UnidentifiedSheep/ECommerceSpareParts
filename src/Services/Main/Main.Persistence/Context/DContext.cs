@@ -1,4 +1,4 @@
-﻿using Main.Core.Entities;
+﻿using Main.Entities;
 using MassTransit;
 using MassTransit.EntityFrameworkCoreIntegration;
 using Microsoft.EntityFrameworkCore;
@@ -1134,47 +1134,6 @@ public partial class DContext : DbContext
                         j.IndexerProperty<Guid>("OwnerId").HasColumnName("owner_id");
                     });
         });
-        
-        modelBuilder.Entity<StorageRoute>(entity =>
-        {
-            entity.HasKey(e => e.Id).HasName("storage_routes_pk");
-
-            entity.ToTable("storage_routes");
-
-            entity.HasIndex(e => new { e.FromStorageName, e.ToStorageName }, "storage_routes_from_storage_name_to_storage_name_index");
-
-            entity.Property(e => e.Id)
-                .HasDefaultValueSql("gen_random_uuid()")
-                .HasColumnName("id");
-            entity.Property(e => e.DeliveryTimeMinutes).HasColumnName("delivery_time_minutes");
-            entity.Property(e => e.DistanceM).HasColumnName("distance_m");
-            entity.Property(e => e.FromStorageName)
-                .HasMaxLength(128)
-                .HasColumnName("from_storage_name");
-            entity.Property(e => e.PriceKg).HasColumnName("price_kg");
-            entity.Property(e => e.PricePerM3).HasColumnName("price_per_m3");
-            entity.Property(e => e.PricePerOrder).HasColumnName("price_per_order");
-            entity.Property(e => e.PricingModel)
-                .HasMaxLength(24)
-                .HasColumnName("pricing_model");
-            entity.Property(e => e.RouteType)
-                .HasMaxLength(24)
-                .HasColumnName("route_type");
-            entity.Property(e => e.Status)
-                .HasMaxLength(24)
-                .HasColumnName("status");
-            entity.Property(e => e.ToStorageName)
-                .HasMaxLength(128)
-                .HasColumnName("to_storage_name");
-
-            entity.HasOne(d => d.FromStorageNameNavigation).WithMany(p => p.StorageRouteFromStorageNameNavigations)
-                .HasForeignKey(d => d.FromStorageName)
-                .HasConstraintName("storage_routes_storages_name_fk");
-
-            entity.HasOne(d => d.ToStorageNameNavigation).WithMany(p => p.StorageRouteToStorageNameNavigations)
-                .HasForeignKey(d => d.ToStorageName)
-                .HasConstraintName("storage_routes_storages_name_fk_2");
-        });
 
         modelBuilder.Entity<StorageContent>(entity =>
         {
@@ -1359,6 +1318,53 @@ public partial class DContext : DbContext
                 .HasForeignKey(d => d.WhoMoved)
                 .OnDelete(DeleteBehavior.Restrict)
                 .HasConstraintName("storage_movement_users_id_fk");
+        });
+
+        modelBuilder.Entity<StorageRoute>(entity =>
+        {
+            entity.HasKey(e => e.Id).HasName("storage_routes_pk");
+
+            entity.ToTable("storage_routes");
+
+            entity.HasIndex(e => new { e.FromStorageName, e.ToStorageName }, "storage_routes_from_storage_name_to_storage_name_uindex").IsUnique();
+
+            entity.Property(e => e.Id)
+                .HasDefaultValueSql("gen_random_uuid()")
+                .HasColumnName("id");
+            entity.Property(e => e.CurrencyId).HasColumnName("currency_id");
+            entity.Property(e => e.DeliveryTimeMinutes).HasColumnName("delivery_time_minutes");
+            entity.Property(e => e.DistanceM).HasColumnName("distance_m");
+            entity.Property(e => e.FromStorageName)
+                .HasMaxLength(128)
+                .HasColumnName("from_storage_name");
+            entity.Property(e => e.PriceKg).HasColumnName("price_kg");
+            entity.Property(e => e.PricePerM3).HasColumnName("price_per_m3");
+            entity.Property(e => e.PricePerOrder).HasColumnName("price_per_order");
+            entity.Property(e => e.PricingModel)
+                .HasMaxLength(24)
+                .HasColumnName("pricing_model");
+            entity.Property(e => e.RouteType)
+                .HasMaxLength(24)
+                .HasColumnName("route_type");
+            entity.Property(e => e.Status)
+                .HasMaxLength(24)
+                .HasColumnName("status");
+            entity.Property(e => e.ToStorageName)
+                .HasMaxLength(128)
+                .HasColumnName("to_storage_name");
+
+            entity.HasOne(d => d.Currency).WithMany(p => p.StorageRoutes)
+                .HasForeignKey(d => d.CurrencyId)
+                .OnDelete(DeleteBehavior.Restrict)
+                .HasConstraintName("storage_routes_currency_id_fk");
+
+            entity.HasOne(d => d.FromStorageNameNavigation).WithMany(p => p.StorageRouteFromStorageNameNavigations)
+                .HasForeignKey(d => d.FromStorageName)
+                .HasConstraintName("storage_routes_storages_name_fk");
+
+            entity.HasOne(d => d.ToStorageNameNavigation).WithMany(p => p.StorageRouteToStorageNameNavigations)
+                .HasForeignKey(d => d.ToStorageName)
+                .HasConstraintName("storage_routes_storages_name_fk_2");
         });
 
         modelBuilder.Entity<Transaction>(entity =>
@@ -1892,7 +1898,8 @@ public partial class DContext : DbContext
         modelBuilder.HasSequence<int>("storage_movement_id_seq");
         modelBuilder.HasSequence<int>("table_name_id_seq");
 
-        modelBuilder.AllDateTimesToUtc();
+        modelBuilder.AllDateTimesToUtc()
+            .AllEnumsToString();
         
         OnModelCreatingPartial(modelBuilder);
     }

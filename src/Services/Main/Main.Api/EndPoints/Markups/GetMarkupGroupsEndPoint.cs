@@ -2,7 +2,7 @@ using Api.Common.Extensions;
 using Carter;
 using Core.Models;
 using Main.Application.Handlers.Markups.GetMarkupGroups;
-using Main.Core.Dtos.Amw.Markups;
+using Main.Abstractions.Dtos.Amw.Markups;
 using Mapster;
 using MediatR;
 

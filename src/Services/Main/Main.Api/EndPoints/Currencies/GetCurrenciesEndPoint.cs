@@ -3,7 +3,7 @@ using Carter;
 using Core.Models;
 using Main.Application.Handlers.Currencies.GetCurrencies;
 using Main.Application.Handlers.Currencies.GetCurrencyById;
-using Main.Core.Dtos.Currencies;
+using Main.Abstractions.Dtos.Currencies;
 using Mapster;
 using MediatR;
 

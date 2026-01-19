@@ -1,11 +1,10 @@
 using System.Security.Claims;
 using Api.Common.Extensions;
 using Carter;
-using Core.Enums;
 using Core.Models;
+using Main.Abstractions.Dtos.Amw.Users;
 using Main.Application.Handlers.Users.GetUsers;
-using Main.Core.Dtos.Amw.Users;
-using Main.Core.Enums;
+using Main.Enums;
 using Mapster;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;

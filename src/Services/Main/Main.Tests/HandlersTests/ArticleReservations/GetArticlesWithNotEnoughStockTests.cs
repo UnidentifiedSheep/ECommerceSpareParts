@@ -1,16 +1,15 @@
-﻿using Exceptions.Exceptions.Articles;
-using Exceptions.Exceptions.Storages;
-using Exceptions.Exceptions.Users;
+﻿using Main.Abstractions.Consts;
 using Main.Application.Handlers.ArticleReservations.CreateArticleReservation;
 using Main.Application.Handlers.ArticleReservations.GetArticlesWithNotEnoughStock;
-using Main.Core.Dtos.Amw.ArticleReservations;
-using Main.Core.Entities;
+using Main.Abstractions.Dtos.Amw.ArticleReservations;
+using Main.Entities;
 using Main.Persistence.Context;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Tests.MockData;
 using Tests.testContainers.Combined;
+using DbValidationException = BulkValidation.Core.Exceptions.ValidationException;
 
 namespace Tests.HandlersTests.ArticleReservations;
 
@@ -107,12 +106,15 @@ public class GetArticlesWithNotEnoughStockTests : IAsyncLifetime
     public async Task ValidationErrors_ForMissingData()
     {
         var badStorage = new GetArticlesWithNotEnoughStockQuery(_buyer.Id, "__no_storage__", false, new Dictionary<int, int> { { _article.Id, 1 } });
-        await Assert.ThrowsAsync<StorageNotFoundException>(() => _mediator.Send(badStorage));
-
+        var exception = await Assert.ThrowsAsync<DbValidationException>(() => _mediator.Send(badStorage));
+        Assert.Equal(ApplicationErrors.StoragesNotFound, exception.Failures[0].ErrorName);
+        
         var badUser = new GetArticlesWithNotEnoughStockQuery(Guid.NewGuid(), _storageName, false, new Dictionary<int, int> { { _article.Id, 1 } });
-        await Assert.ThrowsAsync<UserNotFoundException>(() => _mediator.Send(badUser));
-
+        exception = await Assert.ThrowsAsync<DbValidationException>(() => _mediator.Send(badUser));
+        Assert.Equal(ApplicationErrors.UsersNotFound, exception.Failures[0].ErrorName);
+        
         var badArticle = new GetArticlesWithNotEnoughStockQuery(_buyer.Id, _storageName, false, new Dictionary<int, int> { { int.MaxValue, 1 } });
-        await Assert.ThrowsAsync<ArticleNotFoundException>(() => _mediator.Send(badArticle));
+        exception = await Assert.ThrowsAsync<DbValidationException>(() => _mediator.Send(badArticle));
+        Assert.Equal(ApplicationErrors.ArticlesNotFound, exception.Failures[0].ErrorName);
     }
 }

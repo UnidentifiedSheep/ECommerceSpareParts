@@ -1,16 +1,18 @@
 using Exceptions.Exceptions.Storages;
 using Exceptions.Exceptions.Users;
-using FluentValidation;
+using Main.Abstractions.Consts;
 using Main.Application.Configs;
 using Main.Application.Handlers.StorageContents.RemoveContent;
-using Main.Core.Entities;
-using Main.Core.Enums;
+using Main.Entities;
+using Main.Enums;
 using Main.Persistence.Context;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Tests.MockData;
 using Tests.testContainers.Combined;
+using ValidationException = FluentValidation.ValidationException;
+using DbValidationException = BulkValidation.Core.Exceptions.ValidationException;
 
 namespace Tests.HandlersTests.StorageContents;
 
@@ -68,7 +70,8 @@ public class RemoveContentFromStorageTests : IAsyncLifetime
         };
 
         var command = new RemoveContentCommand(content, userId, storageName, false, StorageMovementType.Sale);
-        await Assert.ThrowsAsync<UserNotFoundException>(async () => await _mediator.Send(command));
+        var exception = await Assert.ThrowsAsync<DbValidationException>(async () => await _mediator.Send(command));
+        Assert.Equal(ApplicationErrors.UsersNotFound, exception.Failures[0].ErrorName);
     }
 
     [Fact]

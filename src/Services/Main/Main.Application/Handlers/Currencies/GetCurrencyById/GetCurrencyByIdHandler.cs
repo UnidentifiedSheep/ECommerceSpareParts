@@ -1,8 +1,7 @@
 using Application.Common.Interfaces;
-using Core.Attributes;
 using Exceptions.Exceptions.Currencies;
-using Main.Core.Dtos.Currencies;
-using Main.Core.Interfaces.DbRepositories;
+using Main.Abstractions.Dtos.Currencies;
+using Main.Abstractions.Interfaces.DbRepositories;
 using Mapster;
 
 namespace Main.Application.Handlers.Currencies.GetCurrencyById;

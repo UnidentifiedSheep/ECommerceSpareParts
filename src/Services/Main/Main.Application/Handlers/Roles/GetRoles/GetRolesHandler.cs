@@ -1,7 +1,7 @@
 using Application.Common.Interfaces;
 using Core.Models;
-using Main.Core.Dtos.Roles;
-using Main.Core.Interfaces.DbRepositories;
+using Main.Abstractions.Dtos.Roles;
+using Main.Abstractions.Interfaces.DbRepositories;
 using Mapster;
 
 namespace Main.Application.Handlers.Roles.GetRoles;

@@ -20,4 +20,8 @@
       <Folder Include="Dtos\" />
     </ItemGroup>
 
+    <ItemGroup>
+      <PackageReference Include="BulkValidation.Core" Version="1.0.9" />
+    </ItemGroup>
+
 </Project>

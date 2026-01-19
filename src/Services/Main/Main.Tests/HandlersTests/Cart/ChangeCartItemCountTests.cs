@@ -1,13 +1,12 @@
 ﻿using Bogus;
 using Exceptions.Exceptions.Cart;
-using Exceptions.Exceptions.Users;
 using Main.Application.Handlers.Articles.CreateArticles;
 using Main.Application.Handlers.Cart.AddToCart;
 using Main.Application.Handlers.Cart.ChangeCartItemCount;
 using Main.Application.Handlers.Producers.CreateProducer;
 using Main.Application.Handlers.Users.CreateUser;
-using Main.Core.Dtos.Emails;
-using Main.Core.Enums;
+using Main.Abstractions.Dtos.Emails;
+using Main.Enums;
 using Main.Persistence.Context;
 using MediatR;
 using Microsoft.EntityFrameworkCore;

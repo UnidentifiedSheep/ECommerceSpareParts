@@ -1,13 +1,10 @@
 using Exceptions.Exceptions.Articles;
-using Exceptions.Exceptions.Currencies;
-using Exceptions.Exceptions.Storages;
-using Exceptions.Exceptions.Users;
-using FluentValidation;
+using Main.Abstractions.Consts;
 using Main.Application.Handlers.StorageContents.RestoreContent;
-using Main.Core.Dtos.Amw.Sales;
-using Main.Core.Entities;
-using Main.Core.Enums;
-using Main.Core.Models;
+using Main.Abstractions.Dtos.Amw.Sales;
+using Main.Entities;
+using Main.Enums;
+using Main.Abstractions.Models;
 using Main.Persistence.Context;
 using Mapster;
 using MediatR;
@@ -15,6 +12,8 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Tests.MockData;
 using Tests.testContainers.Combined;
+using ValidationException = FluentValidation.ValidationException;
+using DbValidationException = BulkValidation.Core.Exceptions.ValidationException;
 
 namespace Tests.HandlersTests.StorageContents;
 
@@ -124,7 +123,8 @@ public class RestoreContentToStorageTests : IAsyncLifetime
         content[^1].Detail.CurrencyId = currencyId;
 
         var command = new RestoreContentCommand(content, StorageMovementType.StorageContentAddition, _user.Id);
-        await Assert.ThrowsAsync<CurrencyNotFoundException>(async () => await _mediator.Send(command));
+        var exception = await Assert.ThrowsAsync<ValidationException>(async () => await _mediator.Send(command));
+        Assert.Equal("Не удалось найти валюту.", exception.Errors.First().ErrorMessage);
     }
 
     [Fact]
@@ -134,7 +134,8 @@ public class RestoreContentToStorageTests : IAsyncLifetime
         content[^1].Detail.Storage = Global.Faker.Lorem.Letter(InvalidStorageNameLength);
 
         var command = new RestoreContentCommand(content, StorageMovementType.StorageContentAddition, _user.Id);
-        await Assert.ThrowsAsync<StorageNotFoundException>(async () => await _mediator.Send(command));
+        var exception = await Assert.ThrowsAsync<DbValidationException>(async () => await _mediator.Send(command));
+        Assert.Equal(ApplicationErrors.StoragesNotFound, exception.Failures[0].ErrorName);
     }
 
     [Fact]
@@ -144,7 +145,8 @@ public class RestoreContentToStorageTests : IAsyncLifetime
         var invalidUserId = Global.Faker.Random.Guid();
 
         var command = new RestoreContentCommand(content, StorageMovementType.StorageContentAddition, invalidUserId);
-        await Assert.ThrowsAsync<UserNotFoundException>(async () => await _mediator.Send(command));
+        var exception = await Assert.ThrowsAsync<DbValidationException>(async () => await _mediator.Send(command));
+        Assert.Equal(ApplicationErrors.UsersNotFound, exception.Failures[0].ErrorName);
     }
 
     [Theory]

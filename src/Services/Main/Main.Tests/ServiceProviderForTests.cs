@@ -3,7 +3,7 @@ using Core.Interfaces;
 using Core.Models;
 using Mail;
 using Main.Application.Configs;
-using Main.Core.Interfaces.Pricing;
+using Main.Abstractions.Interfaces.Pricing;
 using Microsoft.Extensions.DependencyInjection;
 using Main.Persistence;
 using Main.Persistence.Context;

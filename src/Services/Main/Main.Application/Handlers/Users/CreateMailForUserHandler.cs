@@ -1,7 +1,7 @@
 using Application.Common.Interfaces;
 using Core.Interfaces;
 using FluentValidation;
-using Main.Core.Interfaces.DbRepositories;
+using Main.Abstractions.Interfaces.DbRepositories;
 
 namespace Main.Application.Handlers.Users;
 

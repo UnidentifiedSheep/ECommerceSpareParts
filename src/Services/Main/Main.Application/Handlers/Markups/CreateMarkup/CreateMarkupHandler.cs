@@ -4,11 +4,8 @@ using Core.Interfaces.Services;
 using Core.Models;
 using IntervalMap.Core.Models;
 using IntervalMap.Variations;
-using Main.Application.Extensions;
-using Main.Application.Validation;
-using Main.Core.Abstractions;
-using Main.Core.Dtos.Amw.Markups;
-using Main.Core.Entities;
+using Main.Abstractions.Dtos.Amw.Markups;
+using Main.Entities;
 using Mapster;
 
 namespace Main.Application.Handlers.Markups.CreateMarkup;
@@ -22,12 +19,10 @@ public record CreateMarkupCommand(
 
 public record CreateMarkupResult(int GroupId);
 
-public class CreateMarkupHandler(DbDataValidatorBase dbValidator, IUnitOfWork unitOfWork)
-    : ICommandHandler<CreateMarkupCommand, CreateMarkupResult>
+public class CreateMarkupHandler(IUnitOfWork unitOfWork) : ICommandHandler<CreateMarkupCommand, CreateMarkupResult>
 {
     public async Task<CreateMarkupResult> Handle(CreateMarkupCommand request, CancellationToken cancellationToken)
     {
-        await ValidateData(request.CurrencyId, cancellationToken);
 
         var unknownMarkup = request.MarkupForUnknownRange;
         var markupRanges = new List<MarkupRange>();
@@ -77,11 +72,5 @@ public class CreateMarkupHandler(DbDataValidatorBase dbValidator, IUnitOfWork un
         await unitOfWork.SaveChangesAsync(cancellationToken);
 
         return new CreateMarkupResult(group.Id);
-    }
-
-    private async Task ValidateData(int currencyId, CancellationToken cancellationToken = default)
-    {
-        var plan = new ValidationPlan().EnsureCurrencyExists(currencyId);
-        await dbValidator.Validate(plan, true, true, cancellationToken);
     }
 }

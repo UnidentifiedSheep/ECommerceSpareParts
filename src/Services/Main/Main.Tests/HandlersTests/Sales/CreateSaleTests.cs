@@ -1,10 +1,8 @@
-using Exceptions.Exceptions.Balances;
-using Exceptions.Exceptions.Storages;
-using FluentValidation;
+using Main.Abstractions.Consts;
 using Main.Application.Handlers.Sales.CreateSale;
-using Main.Core.Dtos.Amw.Sales;
-using Main.Core.Entities;
-using Main.Core.Models;
+using Main.Abstractions.Dtos.Amw.Sales;
+using Main.Entities;
+using Main.Abstractions.Models;
 using Main.Persistence.Context;
 using Mapster;
 using MediatR;
@@ -12,6 +10,8 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Tests.MockData;
 using Tests.testContainers.Combined;
+using ValidationException = FluentValidation.ValidationException;
+using DbValidationException = BulkValidation.Core.Exceptions.ValidationException;
 
 namespace Tests.HandlersTests.Sales;
 
@@ -167,11 +167,12 @@ public class CreateSaleTests : IAsyncLifetime
 
         var command = new CreateSaleCommand(saleContent, storageContentValues, _currency.Id, _user.Id, _user.Id,
             Guid.Empty, _storage.Name, DateTime.Now, null);
-        await Assert.ThrowsAsync<TransactionNotFoundExcpetion>(async () => await _mediator.Send(command));
+        var exception = await Assert.ThrowsAsync<DbValidationException>(async () => await _mediator.Send(command));
+        Assert.Equal(ApplicationErrors.TransactionsNotFound, exception.Failures[0].ErrorName);
     }
 
     [Fact]
-    public async Task CreateSale_WithInvalidStorageName_ThrowsTransactionDoesntExistsException()
+    public async Task CreateSale_WithInvalidStorageName_ThrowsStorageNotFoundException()
     {
         var storageContent = await _context.StorageContents.FirstAsync();
         var saleContent = new List<NewSaleContentDto>
@@ -194,7 +195,8 @@ public class CreateSaleTests : IAsyncLifetime
 
         var command = new CreateSaleCommand(saleContent, storageContentValues, _currency.Id, _user.Id, _user.Id,
             _transaction.Id, "non-existing-storage-name", DateTime.Now, null);
-        await Assert.ThrowsAsync<StorageNotFoundException>(async () => await _mediator.Send(command));
+        var exception = await Assert.ThrowsAsync<DbValidationException>(async () => await _mediator.Send(command));
+        Assert.Equal(ApplicationErrors.StoragesNotFound, exception.Failures[0].ErrorName);
     }
 
     [Fact]

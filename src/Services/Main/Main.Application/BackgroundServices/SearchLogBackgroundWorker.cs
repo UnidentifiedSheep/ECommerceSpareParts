@@ -1,7 +1,7 @@
 using Core.Interfaces;
 using Core.Interfaces.Services;
 using Core.Models;
-using Main.Core.Entities;
+using Main.Entities;
 using Mapster;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;

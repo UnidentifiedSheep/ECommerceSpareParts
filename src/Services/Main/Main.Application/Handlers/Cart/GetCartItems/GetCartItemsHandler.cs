@@ -1,7 +1,7 @@
 ﻿using Application.Common.Interfaces;
 using Core.Models;
-using Main.Core.Dtos.Cart;
-using Main.Core.Interfaces.DbRepositories;
+using Main.Abstractions.Dtos.Cart;
+using Main.Abstractions.Interfaces.DbRepositories;
 using Mapster;
 
 namespace Main.Application.Handlers.Cart.GetCartItems;
@@ -16,7 +16,8 @@ public class GetCartItemsHandler(ICartRepository cartRepository) : IQueryHandler
         var page = request.Pagination.Page;
         var size = request.Pagination.Size;
 
-        var result = await cartRepository.GetCartItemsAsync(request.UserId, false, page, size, cancellationToken);
+        var result = await cartRepository
+            .GetCartItemsAsync(request.UserId, false, page, size, cancellationToken);
         return new GetCartItemsResult(result.Adapt<List<CartItemDto>>());
     }
 }

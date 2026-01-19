@@ -1,7 +1,7 @@
 using Contracts.Currency;
 using Core.Interfaces;
 using Core.Interfaces.MessageBroker;
-using Main.Core.Interfaces.DbRepositories;
+using Main.Abstractions.Interfaces.DbRepositories;
 
 namespace Main.Application.EventHandlers;
 

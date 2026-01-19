@@ -1,19 +1,16 @@
 using System.Data;
 using Application.Common.Interfaces;
+using BulkValidation.Core.Plan;
 using Core.Attributes;
 using Core.Interfaces.Services;
-using Exceptions.Exceptions.Articles;
 using Exceptions.Exceptions.Storages;
-using Exceptions.Exceptions.Users;
+using Main.Abstractions.Interfaces.DbRepositories;
+using Main.Abstractions.Interfaces.Services;
+using Main.Abstractions.Models;
 using Main.Application.Extensions;
 using Main.Application.Notifications;
-using Main.Application.Validation;
-using Main.Core.Abstractions;
-using Main.Core.Entities;
-using Main.Core.Enums;
-using Main.Core.Interfaces.DbRepositories;
-using Main.Core.Interfaces.Services;
-using Main.Core.Models;
+using Main.Entities;
+using Main.Enums;
 using Mapster;
 using MediatR;
 
@@ -29,12 +26,8 @@ public record RemoveContentCommand(
 
 public record RemoveContentResult(IEnumerable<PrevAndNewValue<StorageContent>> Changes);
 
-public class RemoveContentHandler(
-    DbDataValidatorBase dbValidator,
-    IStorageContentRepository contentRepository,
-    IArticlesRepository articlesRepository,
-    IArticlesService articlesService,
-    IUnitOfWork unitOfWork,
+public class RemoveContentHandler(IStorageContentRepository contentRepository, IArticlesRepository articlesRepository,
+    IArticlesService articlesService, IUnitOfWork unitOfWork,
     IMediator mediator) : ICommandHandler<RemoveContentCommand, RemoveContentResult>
 {
     public async Task<RemoveContentResult> Handle(RemoveContentCommand request, CancellationToken cancellationToken)
@@ -45,7 +38,7 @@ public class RemoveContentHandler(
         var storageName = request.StorageName;
         var articleIds = content.Keys;
 
-        await ValidateData(takeFromOtherStorages, storageName, articleIds, userId, cancellationToken);
+        await articlesRepository.EnsureArticlesExistForUpdate(articleIds, false, cancellationToken);
 
         var movements = new List<StorageMovement>();
         var toIncrement = new Dictionary<int, int>();
@@ -106,18 +99,6 @@ public class RemoveContentHandler(
         await mediator.Publish(new ArticlePricesUpdatedNotification(articleIds), cancellationToken);
 
         return new RemoveContentResult(result);
-    }
-
-    private async Task ValidateData(bool takeFromOtherStorages, string? storageName, IEnumerable<int> articleIds,
-        Guid userId, CancellationToken cancellationToken = default)
-    {
-        var plan = new ValidationPlan()
-            .EnsureUserExists(userId);
-        if (!takeFromOtherStorages && !string.IsNullOrWhiteSpace(storageName))
-            plan.EnsureStorageExists(storageName);
-        
-        await dbValidator.Validate(plan, true, true, cancellationToken);
-        await articlesRepository.EnsureArticlesExistForUpdate(articleIds, false, cancellationToken);
     }
 
     private StorageMovement GetMovement(StorageContent content, StorageMovementType movementType, Guid whoMoved,

@@ -1,6 +1,6 @@
 using Application.Common.Interfaces;
-using AmwArticleDto = Main.Core.Dtos.Amw.Articles.ArticleDto;
-using AnonymousArticleDto = Main.Core.Dtos.Anonymous.Articles.ArticleDto;
+using AmwArticleDto = Main.Abstractions.Dtos.Amw.Articles.ArticleDto;
+using AnonymousArticleDto = Main.Abstractions.Dtos.Anonymous.Articles.ArticleDto;
 
 namespace Main.Application.Handlers.Articles.GetArticles;
 

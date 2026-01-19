@@ -2,7 +2,7 @@ using System.Security.Claims;
 using Api.Common.Extensions;
 using Carter;
 using Main.Application.Handlers.ArticleReservations.EditArticleReservation;
-using Main.Core.Dtos.Amw.ArticleReservations;
+using Main.Abstractions.Dtos.Amw.ArticleReservations;
 using MediatR;
 
 namespace Main.Api.EndPoints.ArticlesReservation;

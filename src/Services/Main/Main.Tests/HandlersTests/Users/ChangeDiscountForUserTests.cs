@@ -2,7 +2,7 @@ using Core.Interfaces.CacheRepositories;
 using FluentValidation;
 using Main.Application.Configs;
 using Main.Application.Handlers.Users.ChangeUserDiscount;
-using Main.Core.Entities;
+using Main.Entities;
 using Main.Persistence.Context;
 using MediatR;
 using Microsoft.EntityFrameworkCore;

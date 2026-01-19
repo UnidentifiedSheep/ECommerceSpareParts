@@ -2,7 +2,7 @@ using Application.Common.Interfaces;
 using Core.Attributes;
 using Core.Interfaces.Services;
 using Exceptions.Exceptions.Producers;
-using Main.Core.Interfaces.DbRepositories;
+using Main.Abstractions.Interfaces.DbRepositories;
 using MediatR;
 
 namespace Main.Application.Handlers.Producers.DeleteProducer;

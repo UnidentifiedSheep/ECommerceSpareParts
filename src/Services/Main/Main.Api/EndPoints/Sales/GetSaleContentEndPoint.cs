@@ -1,7 +1,7 @@
 using Api.Common.Extensions;
 using Carter;
+using Main.Abstractions.Dtos.Amw.Sales;
 using Main.Application.Handlers.Sales.GetSaleContent;
-using Main.Core.Dtos.Amw.Sales;
 using Mapster;
 using MediatR;
 

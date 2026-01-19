@@ -1,7 +1,7 @@
 using FluentValidation;
 using Main.Application.Handlers.BaseValidators;
-using AmwArticleDto = Main.Core.Dtos.Amw.Articles.ArticleFullDto;
-using MemberArticleDto = Main.Core.Dtos.Member.Articles.ArticleFullDto;
+using AmwArticleDto = Main.Abstractions.Dtos.Amw.Articles.ArticleFullDto;
+using MemberArticleDto = Main.Abstractions.Dtos.Member.Articles.ArticleFullDto;
 
 namespace Main.Application.Handlers.Articles.GetArticleCrosses;
 

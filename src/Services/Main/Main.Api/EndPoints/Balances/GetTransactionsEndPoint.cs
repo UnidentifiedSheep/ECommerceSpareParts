@@ -1,9 +1,7 @@
-using System.Security.Claims;
 using Api.Common.Extensions;
 using Carter;
-using Core.StaticFunctions;
 using Main.Application.Handlers.Balance.GetTransactions;
-using Main.Core.Dtos.Amw.Balances;
+using Main.Abstractions.Dtos.Amw.Balances;
 using Mapster;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;

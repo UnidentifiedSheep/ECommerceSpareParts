@@ -1,11 +1,7 @@
 using Application.Common.Interfaces;
 using Core.Attributes;
 using Core.Interfaces.Services;
-using Exceptions.Exceptions.Users;
-using Main.Application.Extensions;
-using Main.Application.Validation;
-using Main.Core.Abstractions;
-using Main.Core.Interfaces.DbRepositories;
+using Main.Abstractions.Interfaces.DbRepositories;
 
 namespace Main.Application.Handlers.ArticleReservations.SubtractCountFromReservations;
 
@@ -18,7 +14,6 @@ public record SubtractCountFromReservationsResult(Dictionary<int, int> NotFoundR
 
 public class SubtractCountFromReservationsHandler(
     IArticleReservationRepository reservationRepository,
-    DbDataValidatorBase dbValidator,
     IUnitOfWork unitOfWork) : ICommandHandler<SubtractCountFromReservationsCommand, SubtractCountFromReservationsResult>
 {
     public async Task<SubtractCountFromReservationsResult> Handle(SubtractCountFromReservationsCommand request,
@@ -29,11 +24,10 @@ public class SubtractCountFromReservationsHandler(
         var userId = request.UserId;
         var whoUpdated = request.WhoUpdated;
         var remaining = new Dictionary<int, int>(request.Contents);
-        await EnsureDataExists([userId, whoUpdated], cancellationToken);
 
         var articleIds = remaining.Keys;
-        var reservationsByIds = await reservationRepository.GetUserReservationsForUpdate(userId, articleIds,
-            false, true, cancellationToken);
+        var reservationsByIds = await reservationRepository
+            .GetUserReservationsForUpdate(userId, articleIds, false, true, cancellationToken);
         foreach (var articleId in articleIds)
         {
             if (!reservationsByIds.TryGetValue(articleId, out var reservations))
@@ -60,11 +54,5 @@ public class SubtractCountFromReservationsHandler(
         var notFoundReservations = remaining.Where(x => x.Value > 0)
             .ToDictionary(x => x.Key, x => x.Value);
         return new SubtractCountFromReservationsResult(notFoundReservations);
-    }
-
-    private async Task EnsureDataExists(IEnumerable<Guid> userIds, CancellationToken cancellationToken = default)
-    {
-        var plan = new ValidationPlan().EnsureUserExists(userIds);
-        await dbValidator.Validate(plan, true, true, cancellationToken);
     }
 }

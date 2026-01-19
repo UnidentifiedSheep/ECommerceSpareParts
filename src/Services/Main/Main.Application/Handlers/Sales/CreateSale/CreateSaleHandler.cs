@@ -2,19 +2,11 @@ using System.Data;
 using Application.Common.Interfaces;
 using Core.Attributes;
 using Core.Interfaces.Services;
-using Exceptions.Exceptions.Articles;
-using Exceptions.Exceptions.Balances;
-using Exceptions.Exceptions.Currencies;
-using Exceptions.Exceptions.Storages;
-using Exceptions.Exceptions.Users;
-using Main.Application.Extensions;
-using Main.Application.Validation;
-using Main.Core.Abstractions;
-using Main.Core.Dtos.Amw.Sales;
-using Main.Core.Entities;
-using Main.Core.Enums;
-using Main.Core.Interfaces.Services;
-using Main.Core.Models;
+using Main.Abstractions.Dtos.Amw.Sales;
+using Main.Abstractions.Interfaces.Services;
+using Main.Abstractions.Models;
+using Main.Entities;
+using Main.Enums;
 using Mapster;
 
 namespace Main.Application.Handlers.Sales.CreateSale;
@@ -33,10 +25,8 @@ public record CreateSaleCommand(
 
 public record CreateSaleResult(Sale Sale);
 
-public class CreateSaleHandler(
-    ISaleService saleService,
-    DbDataValidatorBase dbValidator,
-    IUnitOfWork unitOfWork) : ICommandHandler<CreateSaleCommand, CreateSaleResult>
+public class CreateSaleHandler(ISaleService saleService, IUnitOfWork unitOfWork) 
+    : ICommandHandler<CreateSaleCommand, CreateSaleResult>
 {
     public async Task<CreateSaleResult> Handle(CreateSaleCommand request, CancellationToken cancellationToken)
     {
@@ -47,11 +37,6 @@ public class CreateSaleHandler(
         var mainStorage = request.MainStorage;
 
         var saleContentList = request.SellContent.ToList();
-
-        var articleIds = saleContentList.Select(x => x.ArticleId).ToHashSet();
-
-        await ValidateData(transactionId, articleIds, currencyId, buyerId, createdUserId, mainStorage,
-            cancellationToken);
 
         var detailGroups = saleService.GetDetailsGroup(request.StorageContentValues);
 
@@ -114,17 +99,5 @@ public class CreateSaleHandler(
 
         if (counter > 0)
             throw new ArgumentException($"Недостаточно деталей для артикула {articleId}");
-    }
-
-    private async Task ValidateData(Guid transactionId, IEnumerable<int> articleIds, int currencyId, Guid buyerId,
-        Guid createdUserId, string storageName, CancellationToken cancellationToken = default)
-    {
-        var plan = new ValidationPlan()
-            .EnsureTransactionExists(transactionId)
-            .EnsureArticleExists(articleIds)
-            .EnsureCurrencyExists(currencyId)
-            .EnsureUserExists([buyerId, createdUserId])
-            .EnsureStorageExists(storageName);
-        await dbValidator.Validate(plan, true, true, cancellationToken);
     }
 }

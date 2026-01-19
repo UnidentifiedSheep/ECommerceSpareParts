@@ -1,9 +1,9 @@
 using Api.Common.Extensions;
 using Carter;
 using Exceptions.Exceptions.Users;
+using Main.Abstractions.Dtos.Emails;
+using Main.Abstractions.Dtos.Users;
 using Main.Application.Handlers.Users.CreateUser;
-using Main.Core.Dtos.Emails;
-using Main.Core.Dtos.Users;
 using Mapster;
 using MediatR;
 

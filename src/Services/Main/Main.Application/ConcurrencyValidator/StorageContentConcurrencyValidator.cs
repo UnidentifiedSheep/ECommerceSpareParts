@@ -1,6 +1,6 @@
 using Core.Interfaces;
 using Core.StaticFunctions;
-using Main.Core.Entities;
+using Main.Entities;
 
 namespace Main.Application.ConcurrencyValidator;
 

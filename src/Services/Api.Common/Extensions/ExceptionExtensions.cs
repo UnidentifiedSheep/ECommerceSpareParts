@@ -1,6 +1,4 @@
-﻿using Core.Abstractions;
-using Exceptions.Base;
-using Exceptions.Base.Examples;
+﻿using Exceptions.Base;
 using FluentValidation;
 using NotFoundException = Exceptions.Base.NotFoundException;
 using PreconditionRequiredException = Exceptions.Base.PreconditionRequiredException;
@@ -9,59 +7,42 @@ namespace Api.Common.Extensions;
 
 public static class ExceptionExtensions
 {
-    public static int GetStatusCode(this Exception exception) => exception switch
+    public static int GetStatusCode(this Exception exception)
     {
-        InternalServerException => StatusCodes.Status500InternalServerError,
-        ValidationException => StatusCodes.Status400BadRequest,
-        BadRequestException => StatusCodes.Status400BadRequest,
-        UnauthorizedAccessException => StatusCodes.Status401Unauthorized,
-        NotFoundException => StatusCodes.Status404NotFound,
-        ConflictException => StatusCodes.Status409Conflict,
-        PreconditionRequiredException => StatusCodes.Status428PreconditionRequired,
-        _ => StatusCodes.Status500InternalServerError
-    };
-    
-    public static int GetStatusCode(this Type exception)
-    {
-        if ( exception.IsAssignableTo(typeof(InternalServerException)))
-            return StatusCodes.Status500InternalServerError;
-        if ( exception.IsAssignableTo(typeof(ValidationException)))
-            return StatusCodes.Status400BadRequest;
-        if ( exception.IsAssignableTo(typeof(BadRequestException)))
-            return StatusCodes.Status400BadRequest;
-        if ( exception.IsAssignableTo(typeof(UnauthorizedAccessException)))
-            return StatusCodes.Status401Unauthorized;
-        if ( exception.IsAssignableTo(typeof(NotFoundException)))
-            return StatusCodes.Status404NotFound;
-        if ( exception.IsAssignableTo(typeof(ConflictException)))
-            return StatusCodes.Status409Conflict;
-        if ( exception.IsAssignableTo(typeof(PreconditionRequiredException)))
-            return StatusCodes.Status428PreconditionRequired;
-        return StatusCodes.Status500InternalServerError;
-    }
-
-    public static BaseExceptionExample GetExceptionExample(this Type exceptionType) =>
-        exceptionType switch
+        switch (exception)
         {
-            _ when exceptionType.IsAssignableTo(typeof(InternalServerException))
-                => new InternalServerExample(),
+            case BulkValidation.Core.Exceptions.ValidationException bv:
+            {
+                int max = -1;
 
-            _ when exceptionType.IsAssignableTo(typeof(ValidationException)) ||
-                   exceptionType.IsAssignableTo(typeof(BadRequestException))
-                => new BadRequestExample(),
+                foreach (var failure in bv.Failures)
+                    if (failure.ErrorCode.HasValue && failure.ErrorCode.Value > max)
+                        max = failure.ErrorCode.Value;
+                
+                return max == -1 ? StatusCodes.Status500InternalServerError : max;
+            }
 
-            _ when exceptionType.IsAssignableTo(typeof(UnauthorizedAccessException))
-                => new UnauthorizedAccessExample(),
+            case ValidationException:
+            case BadRequestException:
+                return StatusCodes.Status400BadRequest;
 
-            _ when exceptionType.IsAssignableTo(typeof(NotFoundException))
-                => new NotFoundExample(),
+            case UnauthorizedAccessException:
+                return StatusCodes.Status401Unauthorized;
 
-            _ when exceptionType.IsAssignableTo(typeof(ConflictException))
-                => new ConflictExample(),
+            case NotFoundException:
+                return StatusCodes.Status404NotFound;
 
-            _ when exceptionType.IsAssignableTo(typeof(PreconditionRequiredException))
-                => new PreconditionRequiredExample(),
+            case ConflictException:
+                return StatusCodes.Status409Conflict;
 
-            _ => new InternalServerExample()
-        };
+            case PreconditionRequiredException:
+                return StatusCodes.Status428PreconditionRequired;
+
+            case InternalServerException:
+                return StatusCodes.Status500InternalServerError;
+
+            default:
+                return StatusCodes.Status500InternalServerError;
+        }
+    }
 }

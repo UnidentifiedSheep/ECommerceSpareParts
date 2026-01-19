@@ -1,7 +1,7 @@
 ﻿using Bogus;
+using Core.Extensions;
 using Exceptions.Exceptions.Roles;
 using Main.Application.Handlers.Roles.CreateRole;
-using Main.Core.Extensions;
 using Main.Persistence.Context;
 using MediatR;
 using Microsoft.EntityFrameworkCore;

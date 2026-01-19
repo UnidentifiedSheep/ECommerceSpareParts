@@ -4,9 +4,9 @@ using Core.Interfaces;
 using Core.Interfaces.MessageBroker;
 using Core.Interfaces.Services;
 using Exceptions.Exceptions.Markups;
-using Main.Core.Entities;
-using Main.Core.Interfaces.DbRepositories;
-using Main.Core.Interfaces.Pricing;
+using Main.Abstractions.Interfaces.DbRepositories;
+using Main.Abstractions.Interfaces.Pricing;
+using Main.Entities;
 
 namespace Main.Application.EventHandlers;
 

@@ -1,10 +1,9 @@
 using System.Security.Claims;
 using Api.Common.Extensions;
 using Carter;
-using Core.Enums;
+using Main.Abstractions.Dtos.Amw.Storage;
 using Main.Application.Handlers.StorageContents.AddContent;
-using Main.Core.Dtos.Amw.Storage;
-using Main.Core.Enums;
+using Main.Enums;
 using MediatR;
 
 namespace Main.Api.EndPoints.Storages;

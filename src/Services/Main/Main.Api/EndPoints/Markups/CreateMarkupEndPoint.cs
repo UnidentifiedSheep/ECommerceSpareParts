@@ -1,7 +1,7 @@
 using Api.Common.Extensions;
 using Carter;
 using Main.Application.Handlers.Markups.CreateMarkup;
-using Main.Core.Dtos.Amw.Markups;
+using Main.Abstractions.Dtos.Amw.Markups;
 using Mapster;
 using MediatR;
 

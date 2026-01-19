@@ -1,6 +1,6 @@
 using Core.Abstractions;
 using Core.Interfaces.CacheRepositories;
-using Main.Core.Entities;
+using Main.Entities;
 
 namespace Main.Application.RelatedData;
 

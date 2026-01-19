@@ -1,11 +1,13 @@
+using Core.Interfaces;
 using FluentValidation;
+using Main.Application.Extensions;
 using Main.Application.Handlers.BaseValidators;
 
 namespace Main.Application.Handlers.Purchases.GetPurchase;
 
 public class GetPurchasesValidation : AbstractValidator<GetPurchasesQuery>
 {
-    public GetPurchasesValidation()
+    public GetPurchasesValidation(ICurrencyConverter currencyConverter)
     {
         RuleFor(query => new { Start = query.RangeStartDate, End = query.RangeEndDate })
             .Must(x => x.Start.Date <= x.End.Date)
@@ -17,5 +19,8 @@ public class GetPurchasesValidation : AbstractValidator<GetPurchasesQuery>
 
         RuleFor(x => x.Pagination)
             .SetValidator(new PaginationValidator());
+
+        RuleFor(x => x.CurrencyId)
+            .CurrencyMustExist(currencyConverter);
     }
 }

@@ -1,8 +1,8 @@
 using Api.Common.Extensions;
 using Carter;
 using Core.Models;
+using Main.Abstractions.Dtos.Amw.Storage;
 using Main.Application.Handlers.StorageContents.GetContents;
-using Main.Core.Dtos.Amw.Storage;
 using Mapster;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;

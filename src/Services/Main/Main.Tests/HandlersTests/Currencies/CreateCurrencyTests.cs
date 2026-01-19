@@ -1,5 +1,4 @@
-using Exceptions.Exceptions.Currencies;
-using FluentValidation;
+using Main.Abstractions.Consts;
 using Main.Application.Handlers.Currencies.CreateCurrency;
 using Main.Persistence.Context;
 using MediatR;
@@ -7,6 +6,8 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Tests.MockData;
 using Tests.testContainers.Combined;
+using ValidationException = FluentValidation.ValidationException;
+using DbValidationException = BulkValidation.Core.Exceptions.ValidationException;
 
 namespace Tests.HandlersTests.Currencies;
 
@@ -109,21 +110,25 @@ public class CreateCurrencyTests : IAsyncLifetime
 
         await _mediator.Send(new CreateCurrencyCommand(shortName, name, sign, code));
 
-        await Assert.ThrowsAsync<CurrencyCodeTakenException>(async () =>
+        var exception = await Assert.ThrowsAsync<DbValidationException>(async () =>
             await _mediator.Send(new CreateCurrencyCommand(GetValidShortName(), GetValidName(), GetValidCurrencySign(),
                 code)));
-
-        await Assert.ThrowsAsync<CurrencyNameTakenException>(async () =>
+        Assert.Equal(ApplicationErrors.CurrencyCodeAlreadyTaken, exception.Failures[0].ErrorName);
+        
+        exception = await Assert.ThrowsAsync<DbValidationException>(async () =>
             await _mediator.Send(new CreateCurrencyCommand(GetValidShortName(), name, GetValidCurrencySign(),
                 GetValidCurrencyCode())));
-
-        await Assert.ThrowsAsync<CurrencySignTakenException>(async () =>
+        Assert.Equal(ApplicationErrors.CurrencyNameAlreadyTaken, exception.Failures[0].ErrorName);
+        
+        exception = await Assert.ThrowsAsync<DbValidationException>(async () =>
             await _mediator.Send(new CreateCurrencyCommand(GetValidShortName(), GetValidName(), sign,
                 GetValidCurrencyCode())));
-
-        await Assert.ThrowsAsync<CurrencyShortNameTakenException>(async () =>
+        Assert.Equal(ApplicationErrors.CurrencySignAlreadyTaken, exception.Failures[0].ErrorName);
+        
+        exception = await Assert.ThrowsAsync<DbValidationException>(async () =>
             await _mediator.Send(new CreateCurrencyCommand(shortName, GetValidName(), GetValidCurrencySign(),
                 GetValidCurrencyCode())));
+        Assert.Equal(ApplicationErrors.CurrencyShortNameAlreadyTaken, exception.Failures[0].ErrorName);
     }
 
     [Fact]

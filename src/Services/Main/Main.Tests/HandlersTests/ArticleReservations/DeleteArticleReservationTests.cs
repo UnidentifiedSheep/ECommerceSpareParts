@@ -1,8 +1,8 @@
 ﻿using Exceptions.Exceptions.ArticleReservations;
 using Main.Application.Handlers.ArticleReservations.CreateArticleReservation;
 using Main.Application.Handlers.ArticleReservations.DeleteArticleReservation;
-using Main.Core.Dtos.Amw.ArticleReservations;
-using Main.Core.Entities;
+using Main.Abstractions.Dtos.Amw.ArticleReservations;
+using Main.Entities;
 using Main.Persistence.Context;
 using MediatR;
 using Microsoft.EntityFrameworkCore;

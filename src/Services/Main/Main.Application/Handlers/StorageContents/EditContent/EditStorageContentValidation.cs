@@ -1,11 +1,13 @@
+using Core.Interfaces;
 using FluentValidation;
+using Main.Application.Extensions;
 using Main.Application.Handlers.BaseValidators;
 
 namespace Main.Application.Handlers.StorageContents.EditContent;
 
 public class EditStorageContentValidation : AbstractValidator<EditStorageContentCommand>
 {
-    public EditStorageContentValidation()
+    public EditStorageContentValidation(ICurrencyConverter currencyConverter)
     {
         RuleFor(x => x.EditedFields).NotEmpty()
             .WithMessage("Список отредактированных элементов не может быть пустым.");
@@ -30,6 +32,10 @@ public class EditStorageContentValidation : AbstractValidator<EditStorageContent
                     .InclusiveBetween(DateTime.UtcNow.AddMonths(-3), DateTime.UtcNow.AddMinutes(10))
                     .When(x => x.Model.PurchaseDatetime.IsSet)
                     .WithMessage("Дата покупки не может быть в будущем, или более чем на 3 месяца в прошлом");
+                
+                z.RuleFor(x => x.Model.CurrencyId.Value)
+                    .CurrencyMustExist(currencyConverter)
+                    .When(x => x.Model.CurrencyId.IsSet);
             });
     }
 }

@@ -2,7 +2,7 @@ using Bogus;
 using Exceptions.Exceptions.Producers;
 using Main.Application.Configs;
 using Main.Application.Handlers.Producers.DeleteOtherName;
-using Main.Core.Entities;
+using Main.Entities;
 using Main.Persistence.Context;
 using MediatR;
 using Microsoft.EntityFrameworkCore;

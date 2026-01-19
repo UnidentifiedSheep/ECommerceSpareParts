@@ -1,8 +1,8 @@
 using Core.Interfaces;
 using Exceptions.Exceptions.Markups;
-using Main.Core.Interfaces.DbRepositories;
-using Main.Core.Interfaces.Pricing;
-using Main.Core.Models;
+using Main.Abstractions.Interfaces.DbRepositories;
+using Main.Abstractions.Interfaces.Pricing;
+using Main.Abstractions.Models;
 using Serilog;
 
 namespace Main.Application.Services.Pricing;

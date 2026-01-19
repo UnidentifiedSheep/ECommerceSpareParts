@@ -1,8 +1,8 @@
 using Bogus;
-using Exceptions.Exceptions.Storages;
+using Main.Abstractions.Consts;
 using Main.Application.Configs;
 using Main.Application.Handlers.Storages.CreateStorage;
-using Main.Core.Enums;
+using Main.Enums;
 using Main.Persistence.Context;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
@@ -11,6 +11,7 @@ using Tests.MockData;
 using Tests.testContainers.Combined;
 using static Tests.MockData.MockData;
 using ValidationException = FluentValidation.ValidationException;
+using DbValidationException = BulkValidation.Core.Exceptions.ValidationException;
 
 namespace Tests.HandlersTests.Storages;
 
@@ -71,7 +72,8 @@ public class CreateStorageTests : IAsyncLifetime
         await _context.Storages.AddAsync(storage);
         await _context.SaveChangesAsync();
         var command = new CreateStorageCommand(storage.Name, storage.Description, storage.Location, StorageType.Warehouse);
-        await Assert.ThrowsAsync<StorageNameIsTakenException>(async () => await _mediator.Send(command));
+        var exception = await Assert.ThrowsAsync<DbValidationException>(async () => await _mediator.Send(command));
+        Assert.Equal(ApplicationErrors.StoragesNameAlreadyTaken, exception.Failures[0].ErrorName);
     }
 
     [Fact]

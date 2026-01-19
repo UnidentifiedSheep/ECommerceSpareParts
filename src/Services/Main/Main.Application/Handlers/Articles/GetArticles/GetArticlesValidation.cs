@@ -1,6 +1,7 @@
 using FluentValidation;
 using Main.Application.Handlers.BaseValidators;
-using Main.Core.Dtos.Anonymous.Articles;
+using ArticleDto = Main.Abstractions.Dtos.Anonymous.Articles.ArticleDto;
+using AmwArticleDto = Main.Abstractions.Dtos.Amw.Articles.ArticleDto;
 
 namespace Main.Application.Handlers.Articles.GetArticles;
 
@@ -13,7 +14,7 @@ public class GetArticlesAnonymousValidation : AbstractValidator<GetArticlesQuery
     }
 }
 
-public class GetArticlesAmwValidation : AbstractValidator<GetArticlesQuery<global::Main.Core.Dtos.Amw.Articles.ArticleDto>>
+public class GetArticlesAmwValidation : AbstractValidator<GetArticlesQuery<AmwArticleDto>>
 {
     public GetArticlesAmwValidation()
     {

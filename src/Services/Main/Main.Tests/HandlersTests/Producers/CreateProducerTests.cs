@@ -1,6 +1,6 @@
 using Bogus;
+using Core.Extensions;
 using Main.Application.Handlers.Producers.CreateProducer;
-using Main.Core.Extensions;
 using Main.Persistence.Context;
 using MediatR;
 using Microsoft.EntityFrameworkCore;

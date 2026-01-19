@@ -1,6 +1,6 @@
 using Core.Interfaces.CacheRepositories;
-using Main.Core.Interfaces.DbRepositories;
-using Main.Core.Interfaces.Services;
+using Main.Abstractions.Interfaces.DbRepositories;
+using Main.Abstractions.Interfaces.Services;
 
 namespace Main.Application.Services;
 

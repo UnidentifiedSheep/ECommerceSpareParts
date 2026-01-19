@@ -4,13 +4,13 @@ using Contracts.Sale;
 using Core.Attributes;
 using Core.Interfaces;
 using Core.Interfaces.Services;
+using Main.Abstractions.Dtos.Amw.Sales;
+using Main.Abstractions.Models;
 using Main.Application.Handlers.Balance.DeleteTransaction;
 using Main.Application.Handlers.Sales.DeleteSale;
 using Main.Application.Handlers.StorageContents.RestoreContent;
-using Main.Core.Dtos.Amw.Sales;
-using Main.Core.Entities;
-using Main.Core.Enums;
-using Main.Core.Models;
+using Main.Entities;
+using Main.Enums;
 using Mapster;
 using MediatR;
 

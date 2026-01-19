@@ -1,11 +1,13 @@
+using Core.Interfaces;
 using FluentValidation;
+using Main.Application.Extensions;
 using Main.Application.Handlers.BaseValidators;
 
 namespace Main.Application.Handlers.Balance.CreateTransaction;
 
 public class CreateTransactionValidation : AbstractValidator<CreateTransactionCommand>
 {
-    public CreateTransactionValidation()
+    public CreateTransactionValidation(ICurrencyConverter currencyConverter)
     {
         RuleFor(command => command.SenderId).NotEmpty().WithMessage("Поле 'SenderId' должно быть заполнено");
         RuleFor(command => command.ReceiverId).NotEmpty().WithMessage("Поле 'ReceiverId' должно быть заполнено");
@@ -14,5 +16,7 @@ public class CreateTransactionValidation : AbstractValidator<CreateTransactionCo
             .GreaterThanOrEqualTo(DateTime.UtcNow.AddMonths(-2))
             .LessThanOrEqualTo(DateTime.UtcNow.AddHours(1))
             .WithMessage("Дата транзакции не может отличаться более чем на 2 месяца от текущей даты");
+        RuleFor(command => command.CurrencyId)
+            .CurrencyMustExist(currencyConverter);
     }
 }

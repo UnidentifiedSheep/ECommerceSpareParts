@@ -1,7 +1,7 @@
 using Api.Common.Extensions;
 using Carter;
 using Main.Application.Handlers.ArticleReservations.GetArticleReservations;
-using Main.Core.Dtos.Amw.ArticleReservations;
+using Main.Abstractions.Dtos.Amw.ArticleReservations;
 using Mapster;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;

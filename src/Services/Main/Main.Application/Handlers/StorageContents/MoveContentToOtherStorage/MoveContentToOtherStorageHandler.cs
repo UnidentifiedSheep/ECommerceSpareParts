@@ -4,14 +4,10 @@ using Core.Attributes;
 using Core.Interfaces;
 using Core.Interfaces.Services;
 using Exceptions.Base;
-using Exceptions.Exceptions.Storages;
-using Main.Application.Extensions;
-using Main.Application.Validation;
-using Main.Core.Abstractions;
-using Main.Core.Dtos.Amw.Storage;
-using Main.Core.Entities;
-using Main.Core.Enums;
-using Main.Core.Interfaces.Services;
+using Main.Abstractions.Dtos.Amw.Storage;
+using Main.Abstractions.Interfaces.Services;
+using Main.Entities;
+using Main.Enums;
 using Mapster;
 using MediatR;
 
@@ -21,20 +17,13 @@ namespace Main.Application.Handlers.StorageContents.MoveContentToOtherStorage;
 public record MoveContentToOtherStorageCommand(IEnumerable<MoveStorageContentDto> Movements, Guid MovedBy) : ICommand;
 
 public class MoveContentToOtherStorageHandler(IStorageContentService storageContentService, 
-    DbDataValidatorBase dbValidator, IConcurrencyValidator<StorageContent> concurrencyValidator, IUnitOfWork unitOfWork) 
+    IConcurrencyValidator<StorageContent> concurrencyValidator, IUnitOfWork unitOfWork) 
     : ICommandHandler<MoveContentToOtherStorageCommand>
 {
     public async Task<Unit> Handle(MoveContentToOtherStorageCommand request, CancellationToken cancellationToken)
     {
-        var ids = new HashSet<int>();
-        var storageNames = new HashSet<string>();
-        foreach (var movement in request.Movements)
-        {
-            ids.Add(movement.StorageContentId);
-            storageNames.Add(movement.NewStorageName);
-        }
+        var ids = request.Movements.Select(x => x.StorageContentId).ToHashSet();
 
-        await ValidateData(storageNames, cancellationToken);
         var storageContents = await storageContentService
             .GetStorageContentsForUpdate(ids, cancellationToken);
         
@@ -69,11 +58,5 @@ public class MoveContentToOtherStorageHandler(IStorageContentService storageCont
         movementS.StorageName = newStorageName;
         movementS.WhoMoved = whoMoved;
         return [movementF, movementS];
-    }
-
-    private async Task ValidateData(IEnumerable<string> storageNames, CancellationToken ct)
-    {
-        var plan = new ValidationPlan().EnsureStorageExists(storageNames);
-        await dbValidator.Validate(plan, true, true, ct);
     }
 }

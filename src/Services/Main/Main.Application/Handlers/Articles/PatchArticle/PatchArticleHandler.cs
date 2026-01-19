@@ -2,9 +2,9 @@ using Application.Common.Interfaces;
 using Core.Attributes;
 using Core.Interfaces.Services;
 using Exceptions.Exceptions.Articles;
+using Main.Abstractions.Dtos.Amw.Articles;
+using Main.Abstractions.Interfaces.DbRepositories;
 using Main.Application.Notifications;
-using Main.Core.Dtos.Amw.Articles;
-using Main.Core.Interfaces.DbRepositories;
 using Mapster;
 using MediatR;
 

@@ -2,8 +2,7 @@
 using Core.Attributes;
 using Core.Interfaces.Services;
 using Exceptions.Exceptions.Cart;
-using Exceptions.Exceptions.Users;
-using Main.Core.Interfaces.DbRepositories;
+using Main.Abstractions.Interfaces.DbRepositories;
 using MediatR;
 
 namespace Main.Application.Handlers.Cart.ChangeCartItemCount;
@@ -11,7 +10,7 @@ namespace Main.Application.Handlers.Cart.ChangeCartItemCount;
 [Transactional]
 public record ChangeCartItemCountCommand(Guid UserId, int ArticleId, int NewCount) : ICommand;
 
-public class ChangeCartItemCountHandler(ICartRepository cartRepository, IUserRepository userRepository, IUnitOfWork unitOfWork) : ICommandHandler<ChangeCartItemCountCommand>
+public class ChangeCartItemCountHandler(ICartRepository cartRepository, IUnitOfWork unitOfWork) : ICommandHandler<ChangeCartItemCountCommand>
 {
     public async Task<Unit> Handle(ChangeCartItemCountCommand request, CancellationToken cancellationToken)
     {

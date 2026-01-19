@@ -1,11 +1,10 @@
 using Application.Common.Interfaces;
-using Core.Attributes;
 using Core.Interfaces;
 using Core.Models;
 using Exceptions.Exceptions.Currencies;
+using Main.Abstractions.Interfaces.Pricing;
+using Main.Abstractions.Interfaces.Services;
 using Main.Application.Handlers.Users.GetUserDiscount;
-using Main.Core.Interfaces.Pricing;
-using Main.Core.Interfaces.Services;
 using MediatR;
 
 namespace Main.Application.Handlers.Prices.GetDetailedPrices;
@@ -15,17 +14,11 @@ public record GetDetailedPricesQuery(IEnumerable<int> ArticleIds, int CurrencyId
 
 public record GetDetailedPriceResult(Dictionary<int, DetailedPriceModel> Prices);
 
-public class GetDetailedPriceHandler(
-    ICurrencyConverter currencyConverter,
-    IArticlePricesService pricesService,
-    IPriceGenerator priceGenerator,
-    IMediator mediator) : IQueryHandler<GetDetailedPricesQuery, GetDetailedPriceResult>
+public class GetDetailedPriceHandler(ICurrencyConverter currencyConverter, IArticlePricesService pricesService,
+    IPriceGenerator priceGenerator, IMediator mediator) : IQueryHandler<GetDetailedPricesQuery, GetDetailedPriceResult>
 {
-    public async Task<GetDetailedPriceResult> Handle(GetDetailedPricesQuery request,
-        CancellationToken cancellationToken)
+    public async Task<GetDetailedPriceResult> Handle(GetDetailedPricesQuery request, CancellationToken cancellationToken)
     {
-        ValidateData(request.CurrencyId);
-
         var buyerId = request.BuyerId;
         var currencyId = request.CurrencyId;
         var articleIds = request.ArticleIds;
@@ -52,15 +45,9 @@ public class GetDetailedPriceHandler(
     }
 
     private async Task<decimal?> GetUserDiscount(Guid? buyerId, CancellationToken cancellationToken)
-    {
+    { 
         if (buyerId == null) return null;
         var query = new GetUserDiscountQuery(buyerId.Value);
         return (await mediator.Send(query, cancellationToken)).Discount;
-    }
-
-    private void ValidateData(int currencyId)
-    {
-        if (!currencyConverter.IsSupportedCurrency(currencyId))
-            throw new CurrencyNotFoundException(currencyId);
     }
 }

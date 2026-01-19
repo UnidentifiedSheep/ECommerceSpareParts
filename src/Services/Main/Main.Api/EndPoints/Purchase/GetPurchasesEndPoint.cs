@@ -1,9 +1,8 @@
-using System.Security.Claims;
 using Api.Common.Extensions;
 using Carter;
 using Core.Models;
 using Main.Application.Handlers.Purchases.GetPurchase;
-using Main.Core.Dtos.Amw.Purchase;
+using Main.Abstractions.Dtos.Amw.Purchase;
 using Mapster;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;

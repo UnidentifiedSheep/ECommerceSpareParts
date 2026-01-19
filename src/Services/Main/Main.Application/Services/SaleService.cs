@@ -1,6 +1,6 @@
-using Main.Core.Entities;
-using Main.Core.Interfaces.Services;
-using Main.Core.Models;
+using Main.Abstractions.Interfaces.Services;
+using Main.Abstractions.Models;
+using Main.Entities;
 using Mapster;
 
 namespace Main.Application.Services;

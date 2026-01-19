@@ -1,15 +1,14 @@
 using Application.Common.Interfaces;
 using Core.Interfaces.CacheRepositories;
-using Main.Core.Interfaces.DbRepositories;
+using Main.Abstractions.Interfaces.DbRepositories;
 using MediatR;
 
 namespace Main.Application.Handlers.Users.ChangeUserDiscount;
 
 public record ChangeUserDiscountCommand(Guid UserId, decimal Discount) : ICommand;
 
-public class ChangeUserDiscountHandler(
-    IRedisUserRepository cacheUserRepository,
-    IUserRepository usersRepository) : ICommandHandler<ChangeUserDiscountCommand>
+public class ChangeUserDiscountHandler(IRedisUserRepository cacheUserRepository, IUserRepository usersRepository) 
+    : ICommandHandler<ChangeUserDiscountCommand>
 {
     public async Task<Unit> Handle(ChangeUserDiscountCommand request, CancellationToken cancellationToken)
     {

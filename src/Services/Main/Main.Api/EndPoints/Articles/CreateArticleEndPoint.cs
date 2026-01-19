@@ -1,7 +1,7 @@
 ﻿using Api.Common.Extensions;
 using Carter;
 using Main.Application.Handlers.Articles.CreateArticles;
-using Main.Core.Dtos.Services.Articles;
+using Main.Abstractions.Dtos.Services.Articles;
 using Mapster;
 using MediatR;
 

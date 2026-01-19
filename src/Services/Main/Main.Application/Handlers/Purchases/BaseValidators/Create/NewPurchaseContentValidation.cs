@@ -1,6 +1,6 @@
 using FluentValidation;
+using Main.Abstractions.Dtos.Amw.Purchase;
 using Main.Application.Handlers.BaseValidators;
-using Main.Core.Dtos.Amw.Purchase;
 
 namespace Main.Application.Handlers.Purchases.BaseValidators.Create;
 

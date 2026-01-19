@@ -1,8 +1,7 @@
-﻿using System.Security.Claims;
-using Api.Common.Extensions;
+﻿using Api.Common.Extensions;
 using Carter;
 using Main.Application.Handlers.ArticleCharacteristics.AddCharacteristics;
-using Main.Core.Dtos.Amw.ArticleCharacteristics;
+using Main.Abstractions.Dtos.Amw.ArticleCharacteristics;
 using MediatR;
 
 namespace Main.Api.EndPoints.ArticleCharacteristics;

@@ -1,4 +1,4 @@
-﻿using Main.Core.Entities;
+﻿using Main.Entities;
 using Main.Persistence.Context;
 using Microsoft.EntityFrameworkCore;
 using Persistence.Interfaces;

@@ -3,10 +3,10 @@ using Application.Common.Interfaces;
 using Core.Attributes;
 using Core.Interfaces.Services;
 using Exceptions.Exceptions.Balances;
-using Main.Core.Entities;
-using Main.Core.Enums;
-using Main.Core.Interfaces.DbRepositories;
-using Main.Core.Interfaces.Services;
+using Main.Abstractions.Interfaces.DbRepositories;
+using Main.Abstractions.Interfaces.Services;
+using Main.Entities;
+using Main.Enums;
 using Mapster;
 using MediatR;
 
@@ -20,9 +20,7 @@ public record EditTransactionCommand(
     TransactionStatus Status,
     DateTime TransactionDateTime) : ICommand;
 
-public class EditTransactionHandler(
-    IBalanceRepository balanceRepository,
-    IBalanceService balanceService,
+public class EditTransactionHandler(IBalanceRepository balanceRepository, IBalanceService balanceService,
     IUnitOfWork unitOfWork) : ICommandHandler<EditTransactionCommand>
 {
     public async Task<Unit> Handle(EditTransactionCommand request, CancellationToken cancellationToken)

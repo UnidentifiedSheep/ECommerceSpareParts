@@ -2,8 +2,8 @@ using Application.Common.Interfaces;
 using Core.Attributes;
 using Core.Interfaces.Services;
 using Exceptions.Exceptions.Producers;
-using Main.Core.Dtos.Amw.Producers;
-using Main.Core.Interfaces.DbRepositories;
+using Main.Abstractions.Dtos.Amw.Producers;
+using Main.Abstractions.Interfaces.DbRepositories;
 using Mapster;
 using MediatR;
 

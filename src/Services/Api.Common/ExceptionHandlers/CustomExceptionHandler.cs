@@ -52,15 +52,15 @@ public class CustomExceptionHandler : IExceptionHandler
     private static void AddExceptionExtensions(ProblemDetails problemDetails, Exception exception)
     {
         switch (exception)
-        {
-            case GroupedException groupedEx:
-                problemDetails.Extensions["errors"] = GetGroupedErrors(groupedEx);
-                break;
+        {      
             case IValuedException valuedEx:
                 AddValuedExceptionData(problemDetails, valuedEx);
                 break;
+            case BulkValidation.Core.Exceptions.ValidationException bulkEx:
+                problemDetails.Extensions["errors"] = GetDbValidationErrors(bulkEx);
+                break;
             case ValidationException validationEx:
-                problemDetails.Extensions["validationErrors"] = validationEx.Errors.Select(e => new
+                problemDetails.Extensions["errors"] = validationEx.Errors.Select(e => new
                 {
                     propertyName = e.PropertyName,
                     errorMessage = e.ErrorMessage,
@@ -70,26 +70,16 @@ public class CustomExceptionHandler : IExceptionHandler
         }
     }
 
-    private static IEnumerable<ProblemDetails> GetGroupedErrors(GroupedException groupedEx)
+    private static IEnumerable<ProblemDetails> GetDbValidationErrors(
+        BulkValidation.Core.Exceptions.ValidationException bulkEx)
     {
-        var problems = new List<ProblemDetails>();
-        foreach (var errorValue in groupedEx.Exceptions)
-        {
-            var showDetails = ShowDetails(errorValue);
-
-            var problem = new ProblemDetails
+        return bulkEx.Failures
+            .Select(errorValue => new ProblemDetails
             {
-                Title = showDetails ? errorValue.GetType().Name : "An unexpected error occurred",
-                Detail = showDetails ? errorValue.Message : null
-            };
-
-            if (errorValue is IValuedException valuedEx)
-                AddValuedExceptionData(problem, valuedEx);
-
-            problems.Add(problem);
-        }
-
-        return problems;
+                Title = errorValue.ErrorName ?? "An unexpected error occurred", 
+                Detail = errorValue.Message,
+                Status = errorValue.ErrorCode
+            }).ToList();
     }
 
     private static void AddValuedExceptionData(ProblemDetails problem, IValuedException valuedEx)
@@ -106,7 +96,7 @@ public class CustomExceptionHandler : IExceptionHandler
             UnauthorizedAccessException or
             NotFoundException or
             ConflictException or
-            PreconditionRequiredException or
-            GroupedException;
+            PreconditionRequiredException or 
+            BulkValidation.Core.Exceptions.ValidationException;
     }
 }

@@ -8,9 +8,9 @@ using Core.Interfaces.Validators;
 using Core.Models;
 using Exceptions.Base;
 using Exceptions.Exceptions.Auth;
-using Main.Core.Enums;
-using Main.Core.Interfaces.DbRepositories;
-using Main.Core.Interfaces.Services;
+using Main.Abstractions.Interfaces.DbRepositories;
+using Main.Abstractions.Interfaces.Services;
+using Main.Enums;
 using Mapster;
 
 namespace Main.Application.Handlers.Auth.Login;

@@ -1,13 +1,14 @@
+using System.Reflection;
+using BulkValidation.Pgsql.Extensions;
 using Core.Interfaces;
 using Core.Interfaces.Services;
-using Main.Core.Interfaces;
-using Main.Core.Interfaces.DbRepositories;
+using Main.Abstractions.Interfaces;
+using Main.Abstractions.Interfaces.DbRepositories;
 using Main.Persistence.Context;
 using Main.Persistence.DataSeeds;
 using Main.Persistence.Repositories;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Hosting;
 using Persistence.Interfaces;
 
 namespace Main.Persistence;
@@ -17,7 +18,6 @@ public static class ServiceProvider
     public static IServiceCollection AddPersistenceLayer(this IServiceCollection collection, string connectionString)
     {
         collection.AddDbContext<DContext>(options => options.UseNpgsql(connectionString));
-        collection.AddScoped<ICombinedDataLoader, CombinedDataLoader>();
 
         collection.AddScoped<IUserPermissionRepository, UserPermissionRepository>();
         collection.AddScoped<IPermissionRepository, PermissionsRepository>();
@@ -46,6 +46,7 @@ public static class ServiceProvider
         collection.AddScoped<IArticleContentRepository, ArticleContentRepository>();
         collection.AddScoped<IArticleCharacteristicsRepository, ArticleCharacteristicsRepository>();
         collection.AddScoped<ICartRepository, CartRepository>();
+        collection.AddScoped<IStorageRoutesRepository, StorageRoutesRepository>();
 
         collection.AddScoped<IUnitOfWork, UnitOfWork>();
         
@@ -55,6 +56,10 @@ public static class ServiceProvider
         collection.AddScoped<ISeed<DContext>, RolePermissionSeed>();
         collection.AddScoped<ISeed<DContext>, UserSeed>();
         collection.AddScoped<ISeed<DContext>, CurrencySeed>();
+
+        collection.AddScoped<IDbValidator, PgsqlDbValidator>();
+        collection.AddPgsqlDbValidators<DContext>();
+        
         
         return collection;
     }

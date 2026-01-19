@@ -2,13 +2,13 @@
 using Carter;
 using Core.Models;
 using Main.Application.Handlers.Articles.GetArticles;
-using Main.Core.Enums;
+using Main.Enums;
 using Mapster;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
 using Security.Extensions;
-using AmwArticleDto = Main.Core.Dtos.Amw.Articles.ArticleDto;
-using AnonymousArticleDto = Main.Core.Dtos.Anonymous.Articles.ArticleDto;
+using AmwArticleDto = Main.Abstractions.Dtos.Amw.Articles.ArticleDto;
+using AnonymousArticleDto = Main.Abstractions.Dtos.Anonymous.Articles.ArticleDto;
 
 namespace Main.Api.EndPoints.Articles;
 

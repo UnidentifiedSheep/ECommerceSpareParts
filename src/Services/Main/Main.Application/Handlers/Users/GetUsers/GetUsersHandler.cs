@@ -1,11 +1,11 @@
 using Application.Common.Interfaces;
 using Core.Models;
-using Main.Core.Dtos.Amw.Users;
-using Main.Core.Enums;
-using Main.Core.Interfaces.DbRepositories;
+using Main.Abstractions.Dtos.Amw.Users;
+using Main.Abstractions.Interfaces.DbRepositories;
+using Main.Enums;
 using Mapster;
 
-using User = Main.Core.Entities.User;
+using User = Main.Entities.User;
 
 namespace Main.Application.Handlers.Users.GetUsers;
 

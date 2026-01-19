@@ -2,7 +2,7 @@
 using Api.Common.Extensions;
 using Carter;
 using Main.Application.Handlers.Cart.ChangeCartItemCount;
-using Main.Core.Enums;
+using Main.Enums;
 using MediatR;
 using Security.Extensions;
 

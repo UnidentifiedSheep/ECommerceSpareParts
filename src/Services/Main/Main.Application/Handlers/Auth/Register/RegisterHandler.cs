@@ -1,9 +1,9 @@
 ﻿using Application.Common.Interfaces;
 using Core.Attributes;
+using Main.Abstractions.Dtos.Emails;
+using Main.Abstractions.Dtos.Users;
 using Main.Application.Handlers.Users.CreateUser;
-using Main.Core.Dtos.Emails;
-using Main.Core.Dtos.Users;
-using Main.Core.Enums;
+using Main.Enums;
 using MediatR;
 
 namespace Main.Application.Handlers.Auth.Register;

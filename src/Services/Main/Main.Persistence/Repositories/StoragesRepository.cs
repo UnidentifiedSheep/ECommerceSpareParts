@@ -1,6 +1,6 @@
 using System.Linq.Expressions;
-using Main.Core.Entities;
-using Main.Core.Interfaces.DbRepositories;
+using Main.Abstractions.Interfaces.DbRepositories;
+using Main.Entities;
 using Main.Persistence.Context;
 using Microsoft.EntityFrameworkCore;
 using Persistence.Extensions;

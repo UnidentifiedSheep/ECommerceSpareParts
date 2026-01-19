@@ -2,8 +2,8 @@ using Application.Common.Interfaces;
 using Core.Attributes;
 using Core.Interfaces.Services;
 using Exceptions.Exceptions.ArticleCharacteristics;
-using Main.Core.Dtos.Amw.ArticleCharacteristics;
-using Main.Core.Interfaces.DbRepositories;
+using Main.Abstractions.Dtos.Amw.ArticleCharacteristics;
+using Main.Abstractions.Interfaces.DbRepositories;
 using Mapster;
 using MediatR;
 

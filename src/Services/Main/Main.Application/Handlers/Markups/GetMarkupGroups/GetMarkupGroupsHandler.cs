@@ -1,7 +1,7 @@
 using Application.Common.Interfaces;
 using Core.Models;
-using Main.Core.Dtos.Amw.Markups;
-using Main.Core.Interfaces.DbRepositories;
+using Main.Abstractions.Dtos.Amw.Markups;
+using Main.Abstractions.Interfaces.DbRepositories;
 using Mapster;
 
 namespace Main.Application.Handlers.Markups.GetMarkupGroups;

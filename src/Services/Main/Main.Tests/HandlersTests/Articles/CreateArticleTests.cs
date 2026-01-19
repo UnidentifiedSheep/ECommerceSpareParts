@@ -1,5 +1,6 @@
 using Bogus;
 using Exceptions.Exceptions.Producers;
+using Main.Abstractions.Consts;
 using Main.Application.Configs;
 using Main.Application.Handlers.Articles.CreateArticles;
 using Main.Application.Handlers.Producers.CreateProducer;
@@ -10,6 +11,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Tests.MockData;
 using Tests.testContainers.Combined;
 using ValidationException = FluentValidation.ValidationException;
+using DbValidationException = BulkValidation.Core.Exceptions.ValidationException;
 
 namespace Tests.HandlersTests.Articles;
 
@@ -116,6 +118,7 @@ public class CreateArticleTests : IAsyncLifetime
 
         var command = new CreateArticlesCommand(articleList);
 
-        await Assert.ThrowsAsync<ProducerNotFoundException>(() => _mediator.Send(command));
+        var exception = await Assert.ThrowsAsync<DbValidationException>(() => _mediator.Send(command));
+        Assert.Equal(ApplicationErrors.ProducersNotFound, exception.Failures[0].ErrorName);
     }
 }

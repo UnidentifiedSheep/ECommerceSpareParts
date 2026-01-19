@@ -23,4 +23,23 @@ public static class ModelBuilderExtensions
         }
         return modelBuilder;
     }
+
+    public static ModelBuilder AllEnumsToString(this ModelBuilder modelBuilder)
+    {
+        foreach (var entityType in modelBuilder.Model.GetEntityTypes())
+        {
+            var enumProperties = entityType.ClrType
+                .GetProperties()
+                .Where(p => p.PropertyType.IsEnum);
+
+            foreach (var property in enumProperties)
+            {
+                modelBuilder
+                    .Entity(entityType.ClrType)
+                    .Property(property.Name)
+                    .HasConversion<string>();
+            }
+        }
+        return modelBuilder;
+    }
 }

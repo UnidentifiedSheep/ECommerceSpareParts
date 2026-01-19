@@ -1,19 +1,18 @@
 using Exceptions.Exceptions.Articles;
-using Exceptions.Exceptions.Currencies;
-using Exceptions.Exceptions.Storages;
-using Exceptions.Exceptions.Users;
-using FluentValidation;
+using Main.Abstractions.Consts;
 using Main.Application.Configs;
 using Main.Application.Handlers.StorageContents.AddContent;
-using Main.Core.Dtos.Amw.Storage;
-using Main.Core.Entities;
-using Main.Core.Enums;
+using Main.Abstractions.Dtos.Amw.Storage;
+using Main.Entities;
+using Main.Enums;
 using Main.Persistence.Context;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Tests.MockData;
 using Tests.testContainers.Combined;
+using ValidationException = FluentValidation.ValidationException;
+using DbValidationException = BulkValidation.Core.Exceptions.ValidationException;
 
 namespace Tests.HandlersTests.StorageContents;
 
@@ -106,7 +105,8 @@ public class AddContentToStorageTests : IAsyncLifetime
         storageContent.Last().CurrencyId = int.MaxValue;
         var command = new AddContentCommand(storageContent, _storage.Name, _user.Id,
             StorageMovementType.StorageContentAddition);
-        await Assert.ThrowsAsync<CurrencyNotFoundException>(async () => await _mediator.Send(command));
+        var exception = await Assert.ThrowsAsync<ValidationException>(async () => await _mediator.Send(command));
+        Assert.Equal("Не удалось найти валюту.", exception.Errors.First().ErrorMessage);
     }
 
     [Fact]
@@ -118,7 +118,8 @@ public class AddContentToStorageTests : IAsyncLifetime
             .ToList();
         var command = new AddContentCommand(storageContent, Global.Faker.Lorem.Letter(200), _user.Id,
             StorageMovementType.StorageContentAddition);
-        await Assert.ThrowsAsync<StorageNotFoundException>(async () => await _mediator.Send(command));
+        var exception = await Assert.ThrowsAsync<DbValidationException>(async () => await _mediator.Send(command));
+        Assert.Equal(ApplicationErrors.StoragesNotFound, exception.Failures[0].ErrorName);
     }
 
     [Fact]
@@ -130,7 +131,8 @@ public class AddContentToStorageTests : IAsyncLifetime
             .ToList();
         var command = new AddContentCommand(storageContent, _storage.Name, Global.Faker.Random.Guid(),
             StorageMovementType.StorageContentAddition);
-        await Assert.ThrowsAsync<UserNotFoundException>(async () => await _mediator.Send(command));
+        var exception = await Assert.ThrowsAsync<DbValidationException>(async () => await _mediator.Send(command));
+        Assert.Equal(ApplicationErrors.UsersNotFound, exception.Failures[0].ErrorName);
     }
 
     [Fact]

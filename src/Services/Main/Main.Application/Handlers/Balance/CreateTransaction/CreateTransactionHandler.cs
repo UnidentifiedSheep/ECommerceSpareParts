@@ -2,13 +2,10 @@ using System.Data;
 using Application.Common.Interfaces;
 using Core.Attributes;
 using Core.Interfaces.Services;
-using Main.Application.Extensions;
-using Main.Application.Validation;
-using Main.Core.Abstractions;
-using Main.Core.Entities;
-using Main.Core.Enums;
-using Main.Core.Interfaces.DbRepositories;
-using Main.Core.Interfaces.Services;
+using Main.Abstractions.Interfaces.DbRepositories;
+using Main.Abstractions.Interfaces.Services;
+using Main.Entities;
+using Main.Enums;
 
 namespace Main.Application.Handlers.Balance.CreateTransaction;
 
@@ -24,10 +21,7 @@ public record CreateTransactionCommand(
 
 public record CreateTransactionResult(Transaction Transaction);
 
-public class CreateTransactionHandler(
-    IBalanceRepository balanceRepository,
-    DbDataValidatorBase dbValidator,
-    IBalanceService balanceService,
+public class CreateTransactionHandler(IBalanceRepository balanceRepository, IBalanceService balanceService,
     IUnitOfWork unitOfWork) : ICommandHandler<CreateTransactionCommand, CreateTransactionResult>
 {
     public async Task<CreateTransactionResult> Handle(CreateTransactionCommand request,
@@ -39,9 +33,6 @@ public class CreateTransactionHandler(
         var amount = request.Amount;
         var currencyId = request.CurrencyId;
         var transactionDateTime = request.TransactionDateTime;
-
-        await EnsureNeededDataExists(senderId, receiverId, whoCreatedTransaction, currencyId,
-            cancellationToken);
 
         var prevSenderTransaction = await balanceRepository.GetPreviousTransactionAsync(transactionDateTime, senderId,
             currencyId, true, cancellationToken);
@@ -58,15 +49,6 @@ public class CreateTransactionHandler(
         await balanceService.RecalculateBalanceAsync(transaction, null, cancellationToken);
         await unitOfWork.SaveChangesAsync(cancellationToken);
         return new CreateTransactionResult(transaction);
-    }
-
-    private async Task EnsureNeededDataExists(Guid senderId, Guid receiverId, Guid whoCreatedTransaction,
-        int currencyId, CancellationToken cancellationToken = default)
-    {
-        var plan = new ValidationPlan()
-            .EnsureCurrencyExists(currencyId)
-            .EnsureUserExists([senderId, receiverId, whoCreatedTransaction]);
-        await dbValidator.Validate(plan, true, true, cancellationToken);
     }
 
     private Transaction CreateTransaction(Guid senderId, Guid receiverId, int currencyId,

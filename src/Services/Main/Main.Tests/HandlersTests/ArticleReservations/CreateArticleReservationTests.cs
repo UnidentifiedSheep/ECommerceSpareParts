@@ -1,16 +1,15 @@
-﻿using Exceptions.Exceptions.Articles;
-using Exceptions.Exceptions.Currencies;
-using Exceptions.Exceptions.Users;
-using FluentValidation;
+﻿using Main.Abstractions.Consts;
 using Main.Application.Handlers.ArticleReservations.CreateArticleReservation;
-using Main.Core.Dtos.Amw.ArticleReservations;
-using Main.Core.Entities;
+using Main.Abstractions.Dtos.Amw.ArticleReservations;
+using Main.Entities;
 using Main.Persistence.Context;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Tests.MockData;
 using Tests.testContainers.Combined;
+using ValidationException = FluentValidation.ValidationException;
+using DbValidationException = BulkValidation.Core.Exceptions.ValidationException;
 
 namespace Tests.HandlersTests.ArticleReservations;
 
@@ -193,7 +192,8 @@ public class CreateArticleReservationTests : IAsyncLifetime
             }
         };
         var cmd = new CreateArticleReservationCommand(dto, _whoCreated.Id);
-        await Assert.ThrowsAsync<CurrencyNotFoundException>(() => _mediator.Send(cmd));
+        var exception = await Assert.ThrowsAsync<ValidationException>(() => _mediator.Send(cmd));
+        Assert.Equal("Не удалось найти валюту.", exception.Errors.First().ErrorMessage);
     }
 
     [Fact]
@@ -210,7 +210,8 @@ public class CreateArticleReservationTests : IAsyncLifetime
             }
         };
         var cmd = new CreateArticleReservationCommand(dto, _whoCreated.Id);
-        await Assert.ThrowsAsync<ArticleNotFoundException>(() => _mediator.Send(cmd));
+        var exception = await Assert.ThrowsAsync<DbValidationException>(() => _mediator.Send(cmd));
+        Assert.Equal(ApplicationErrors.ArticlesNotFound, exception.Failures[0].ErrorName);
     }
 
     [Fact]
@@ -227,6 +228,7 @@ public class CreateArticleReservationTests : IAsyncLifetime
             }
         };
         var cmd = new CreateArticleReservationCommand(dto, _whoCreated.Id);
-        await Assert.ThrowsAsync<UserNotFoundException>(() => _mediator.Send(cmd));
+        var exception = await Assert.ThrowsAsync<DbValidationException>(() => _mediator.Send(cmd));
+        Assert.Equal(ApplicationErrors.UsersNotFound, exception.Failures[0].ErrorName);
     }
 }

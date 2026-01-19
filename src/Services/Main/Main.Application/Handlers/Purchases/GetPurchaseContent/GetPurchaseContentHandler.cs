@@ -1,6 +1,6 @@
 using Application.Common.Interfaces;
-using Main.Core.Dtos.Amw.Purchase;
-using Main.Core.Interfaces.DbRepositories;
+using Main.Abstractions.Dtos.Amw.Purchase;
+using Main.Abstractions.Interfaces.DbRepositories;
 using Mapster;
 
 namespace Main.Application.Handlers.Purchases.GetPurchaseContent;

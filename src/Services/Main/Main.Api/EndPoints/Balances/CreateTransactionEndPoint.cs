@@ -1,9 +1,8 @@
 using System.Security.Claims;
 using Api.Common.Extensions;
 using Carter;
-using Core.Enums;
 using Main.Application.Handlers.Balance.CreateTransaction;
-using Main.Core.Enums;
+using Main.Enums;
 using MediatR;
 
 namespace Main.Api.EndPoints.Balances;

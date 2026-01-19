@@ -1,6 +1,7 @@
-﻿using Core.Models;
+﻿using Core.Extensions;
+using Core.Models;
 using Main.Application.Handlers.Roles.GetRoles;
-using Main.Core.Extensions;
+using Main.Entities;
 using Main.Persistence.Context;
 using MediatR;
 using Microsoft.Extensions.DependencyInjection;
@@ -47,7 +48,7 @@ public class GetRolesTests : IAsyncLifetime
         var roles = new[] { "Admin", "User", "Manager" };
         foreach (var r in roles)
         {
-            await _context.Roles.AddAsync(new Main.Core.Entities.Role
+            await _context.Roles.AddAsync(new Role
             {
                 Id = Guid.NewGuid(),
                 Name = r.ToNormalized(),

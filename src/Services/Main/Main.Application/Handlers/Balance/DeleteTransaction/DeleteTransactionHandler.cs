@@ -4,14 +4,10 @@ using Application.Common.Interfaces;
 using Core.Attributes;
 using Core.Interfaces.Services;
 using Exceptions.Exceptions.Balances;
-using Exceptions.Exceptions.Users;
-using Main.Application.Extensions;
-using Main.Application.Validation;
-using Main.Core.Abstractions;
-using Main.Core.Entities;
-using Main.Core.Enums;
-using Main.Core.Interfaces.DbRepositories;
-using Main.Core.Interfaces.Services;
+using Main.Abstractions.Interfaces.DbRepositories;
+using Main.Abstractions.Interfaces.Services;
+using Main.Entities;
+using Main.Enums;
 using MediatR;
 
 namespace Main.Application.Handlers.Balance.DeleteTransaction;
@@ -20,10 +16,7 @@ namespace Main.Application.Handlers.Balance.DeleteTransaction;
 public record DeleteTransactionCommand(Guid TransactionId, Guid WhoDeleteUserId, bool IsSystem = false)
     : ICommand<Unit>;
 
-public class DeleteTransactionHandler(
-    IBalanceRepository balanceRepository,
-    DbDataValidatorBase dbValidator,
-    IUnitOfWork unitOfWork,
+public class DeleteTransactionHandler(IBalanceRepository balanceRepository, IUnitOfWork unitOfWork,
     IBalanceService balanceService) : ICommandHandler<DeleteTransactionCommand, Unit>
 {
     private static readonly ImmutableHashSet<TransactionStatus> AllowedStatuses =
@@ -37,7 +30,7 @@ public class DeleteTransactionHandler(
         var whoDelete = request.WhoDeleteUserId;
         var transaction = await balanceRepository.GetTransactionByIdAsync(transactionId, true, cancellationToken)
                           ?? throw new TransactionNotFoundExcpetion(transactionId);
-        await EnsureDataIsValid(transaction, whoDelete, request.IsSystem, cancellationToken);
+        CheckTransaction(transaction, request.IsSystem);
 
         transaction.IsDeleted = true;
         transaction.DeletedAt = DateTime.Now;
@@ -50,15 +43,11 @@ public class DeleteTransactionHandler(
         return Unit.Value;
     }
 
-    private async Task EnsureDataIsValid(Transaction transaction, Guid whoDeletedUserId, bool isSystem,
-        CancellationToken ct = default)
+    private void CheckTransaction(Transaction transaction, bool isSystem)
     {
         if (transaction.IsDeleted)
             throw new TransactionAlreadyDeletedException(transaction.Id);
         if (!isSystem && !AllowedStatuses.Contains(transaction.Status))
             throw new BadTransactionStatusException(transaction.Status.ToString());
-        
-        var plan = new ValidationPlan().EnsureUserExists(whoDeletedUserId);
-        await dbValidator.Validate(plan, true, true, ct);
     }
 }

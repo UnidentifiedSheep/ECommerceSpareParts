@@ -1,16 +1,14 @@
 using Application.Common.Interfaces;
-using Core.Attributes;
 using Core.Interfaces.Services;
 using Exceptions.Exceptions.ArticleReservations;
-using Main.Core.Interfaces.DbRepositories;
+using Main.Abstractions.Interfaces.DbRepositories;
 using MediatR;
 
 namespace Main.Application.Handlers.ArticleReservations.DeleteArticleReservation;
 
 public record DeleteArticleReservationCommand(int ReservationId) : ICommand;
 
-public class DeleteArticleReservationHandler(
-    IArticleReservationRepository reservationRepository,
+public class DeleteArticleReservationHandler(IArticleReservationRepository reservationRepository,
     IUnitOfWork unitOfWork) : ICommandHandler<DeleteArticleReservationCommand>
 {
     public async Task<Unit> Handle(DeleteArticleReservationCommand request, CancellationToken cancellationToken)

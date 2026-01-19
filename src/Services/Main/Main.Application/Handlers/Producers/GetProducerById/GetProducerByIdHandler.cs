@@ -1,8 +1,7 @@
 ﻿using Application.Common.Interfaces;
-using Core.Attributes;
 using Exceptions.Exceptions.Producers;
-using Main.Core.Dtos.Anonymous.Producers;
-using Main.Core.Interfaces.DbRepositories;
+using Main.Abstractions.Dtos.Anonymous.Producers;
+using Main.Abstractions.Interfaces.DbRepositories;
 using Mapster;
 
 namespace Main.Application.Handlers.Producers.GetProducerById;

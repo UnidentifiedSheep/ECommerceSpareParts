@@ -1,5 +1,5 @@
 using Bogus;
-using Exceptions.Exceptions.Producers;
+using Main.Abstractions.Consts;
 using Main.Application.Configs;
 using Main.Application.Handlers.Producers.AddOtherName;
 using Main.Application.Handlers.Producers.CreateProducer;
@@ -11,6 +11,7 @@ using Tests.MockData;
 using Tests.testContainers.Combined;
 using static Tests.MockData.MockData;
 using ValidationException = FluentValidation.ValidationException;
+using DbValidationException = BulkValidation.Core.Exceptions.ValidationException;
 
 namespace Tests.HandlersTests.Producers;
 
@@ -46,7 +47,7 @@ public class AddOtherNameToProducerTests : IAsyncLifetime
     {
         var producer = await _context.Producers.AsNoTracking().FirstOrDefaultAsync();
         Assert.NotNull(producer);
-        var command = new AddOtherNameCommand(producer.Id, " ", null);
+        var command = new AddOtherNameCommand(producer.Id, " ", "null");
         await Assert.ThrowsAsync<ValidationException>(async () => await _mediator.Send(command));
     }
 
@@ -72,7 +73,8 @@ public class AddOtherNameToProducerTests : IAsyncLifetime
     public async Task AddOtherProducerName_InvalidProducerId_ThrowsProducerNotFound()
     {
         var command = new AddOtherNameCommand(int.MaxValue, _faker.Lorem.Letter(40), _faker.Lorem.Letter(10));
-        await Assert.ThrowsAsync<ProducerNotFoundException>(async () => await _mediator.Send(command));
+        var exception = await Assert.ThrowsAsync<DbValidationException>(async () => await _mediator.Send(command));
+        Assert.Equal(ApplicationErrors.ProducersNotFound, exception.Failures[0].ErrorName);
     }
 
     [Fact]
@@ -104,6 +106,7 @@ public class AddOtherNameToProducerTests : IAsyncLifetime
         await _mediator.Send(new AddOtherNameCommand(producer.Id, otherName, usage));
 
         var command = new AddOtherNameCommand(producer.Id, otherName, usage);
-        await Assert.ThrowsAsync<SameProducerOtherNameExistsException>(async () => await _mediator.Send(command));
+        var exception = await Assert.ThrowsAsync<DbValidationException>(async () => await _mediator.Send(command));
+        Assert.Equal(ApplicationErrors.ProducerOtherNameAlreadyTaken, exception.Failures[0].ErrorName);
     }
 }

@@ -1,11 +1,13 @@
+using Core.Interfaces;
 using FluentValidation;
+using Main.Application.Extensions;
 using Main.Application.Handlers.BaseValidators;
 
 namespace Main.Application.Handlers.StorageContents.RestoreContent;
 
 public class RestoreContentValidation : AbstractValidator<RestoreContentCommand>
 {
-    public RestoreContentValidation()
+    public RestoreContentValidation(ICurrencyConverter currencyConverter)
     {
         RuleForEach(z => z.ContentDetails)
             .ChildRules(z =>
@@ -14,6 +16,9 @@ public class RestoreContentValidation : AbstractValidator<RestoreContentCommand>
                     .SetValidator(new CountValidator());
                 z.RuleFor(x => x.Detail.BuyPrice)
                     .SetValidator(new PriceValidator());
+
+                z.RuleFor(x => x.Detail.CurrencyId)
+                    .CurrencyMustExist(currencyConverter);
             });
 
         RuleFor(x => x.ContentDetails)

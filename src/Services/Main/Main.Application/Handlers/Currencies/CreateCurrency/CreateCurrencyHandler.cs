@@ -3,10 +3,8 @@ using Contracts.Currency;
 using Core.Attributes;
 using Core.Interfaces;
 using Core.Interfaces.Services;
-using Exceptions.Exceptions.Currencies;
 using Main.Application.Notifications;
-using Main.Core.Entities;
-using Main.Core.Interfaces.DbRepositories;
+using Main.Entities;
 using Mapster;
 using MediatR;
 
@@ -18,13 +16,11 @@ public record CreateCurrencyCommand(string ShortName, string Name, string Curren
 
 public record CreateCurrencyResult(int Id);
 
-public class CreateCurrencyHandler(ICurrencyRepository currencyRepository, IUnitOfWork unitOfWork,
-    IMessageBroker broker, IMediator mediator)
+public class CreateCurrencyHandler(IUnitOfWork unitOfWork, IMessageBroker broker, IMediator mediator)
     : ICommandHandler<CreateCurrencyCommand, CreateCurrencyResult>
 {
     public async Task<CreateCurrencyResult> Handle(CreateCurrencyCommand request, CancellationToken cancellationToken)
     {
-        await ValidateData(request.ShortName, request.Name, request.CurrencySign, request.Code, cancellationToken);
         var model = request.Adapt<Currency>();
         await unitOfWork.AddAsync(model, cancellationToken);
         
@@ -33,18 +29,5 @@ public class CreateCurrencyHandler(ICurrencyRepository currencyRepository, IUnit
         
         await mediator.Publish(new CurrencyCreatedNotification(model.Id), cancellationToken);
         return new CreateCurrencyResult(model.Id);
-    }
-
-    private async Task ValidateData(string shortName, string name, string currencySign, string code,
-        CancellationToken cancellationToken = default)
-    {
-        if (await currencyRepository.IsCurrencyCodeTaken(code, cancellationToken))
-            throw new CurrencyCodeTakenException(code);
-        if (await currencyRepository.IsCurrencyNameTaken(name, cancellationToken))
-            throw new CurrencyNameTakenException(name);
-        if (await currencyRepository.IsCurrencySignTaken(currencySign, cancellationToken))
-            throw new CurrencySignTakenException(currencySign);
-        if (await currencyRepository.IsCurrencyShortNameTaken(shortName, cancellationToken))
-            throw new CurrencyShortNameTakenException(shortName);
     }
 }

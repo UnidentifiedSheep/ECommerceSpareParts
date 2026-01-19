@@ -1,15 +1,17 @@
 using Exceptions.Base;
 using Exceptions.Exceptions.Storages;
 using Exceptions.Exceptions.Users;
+using Main.Abstractions.Consts;
 using Main.Application.Configs;
 using Main.Application.Handlers.StorageContents.DeleteContent;
-using Main.Core.Entities;
+using Main.Entities;
 using Main.Persistence.Context;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Tests.MockData;
 using Tests.testContainers.Combined;
+using DbValidationException = BulkValidation.Core.Exceptions.ValidationException;
 
 namespace Tests.HandlersTests.StorageContents;
 
@@ -54,7 +56,8 @@ public class DeleteContentFromStorageTests : IAsyncLifetime
     {
         var contentId = _storageContents.First().Id;
         var command = new DeleteStorageContentCommand(contentId, "", Guid.Empty);
-        await Assert.ThrowsAsync<UserNotFoundException>(async () => await _mediator.Send(command));
+        var exception = await Assert.ThrowsAsync<DbValidationException>(async () => await _mediator.Send(command));
+        Assert.Equal(ApplicationErrors.UsersNotFound, exception.Failures[0].ErrorName);
     }
 
     [Fact]

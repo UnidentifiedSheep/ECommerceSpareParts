@@ -1,20 +1,14 @@
 using Application.Common.Interfaces;
-using Main.Core.Dtos.Amw.ArticleReservations;
-using Main.Core.Entities;
-using Main.Core.Enums;
-using Main.Core.Interfaces.DbRepositories;
+using Main.Abstractions.Dtos.Amw.ArticleReservations;
+using Main.Abstractions.Interfaces.DbRepositories;
+using Main.Entities;
+using Main.Enums;
 using Mapster;
 
 namespace Main.Application.Handlers.ArticleReservations.GetArticleReservations;
 
-public record GetArticleReservationsQuery(
-    string? SearchTerm,
-    int Page,
-    int Limit,
-    string? SortBy,
-    double? Similarity,
-    Guid? UserId,
-    GeneralSearchStrategy Strategy) : IQuery<GetArticleReservationsResult>;
+public record GetArticleReservationsQuery(string? SearchTerm, int Page, int Limit, string? SortBy, double? Similarity,
+    Guid? UserId, GeneralSearchStrategy Strategy) : IQuery<GetArticleReservationsResult>;
 
 public record GetArticleReservationsResult(IEnumerable<ArticleReservationDto> Reservations);
 

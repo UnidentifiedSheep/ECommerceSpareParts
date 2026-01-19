@@ -1,27 +1,17 @@
 using Application.Common.Interfaces;
 using Core.Attributes;
 using Core.Interfaces.Services;
-using Exceptions.Exceptions.Currencies;
 using Exceptions.Exceptions.Purchase;
-using Exceptions.Exceptions.Users;
-using Main.Application.Extensions;
-using Main.Application.Validation;
-using Main.Core.Abstractions;
-using Main.Core.Dtos.Amw.Purchase;
-using Main.Core.Entities;
-using Main.Core.Interfaces.DbRepositories;
+using Main.Abstractions.Dtos.Amw.Purchase;
+using Main.Abstractions.Interfaces.DbRepositories;
+using Main.Entities;
 using Mapster;
 
 namespace Main.Application.Handlers.Purchases.EditPurchase;
 
 [Transactional]
-public record EditPurchaseCommand(
-    IEnumerable<EditPurchaseDto> Content,
-    string PurchaseId,
-    int CurrencyId,
-    string? Comment,
-    Guid UpdatedUserId,
-    DateTime PurchaseDateTime) : ICommand<EditPurchaseResult>;
+public record EditPurchaseCommand(IEnumerable<EditPurchaseDto> Content, string PurchaseId, int CurrencyId,
+    string? Comment, Guid UpdatedUserId, DateTime PurchaseDateTime) : ICommand<EditPurchaseResult>;
 
 /// <param name="EditedCounts">
 ///     Словарь где Key - айди артикула,
@@ -31,9 +21,8 @@ public record EditPurchaseCommand(
 /// </param>
 public record EditPurchaseResult(Dictionary<int, Dictionary<decimal, int>> EditedCounts);
 
-public class EditPurchaseHandler(DbDataValidatorBase dbValidator,
-    IPurchaseRepository purchaseRepository,
-    IUnitOfWork unitOfWork) : ICommandHandler<EditPurchaseCommand, EditPurchaseResult>
+public class EditPurchaseHandler(IPurchaseRepository purchaseRepository, IUnitOfWork unitOfWork) 
+    : ICommandHandler<EditPurchaseCommand, EditPurchaseResult>
 {
     public async Task<EditPurchaseResult> Handle(EditPurchaseCommand request, CancellationToken cancellationToken)
     {
@@ -44,8 +33,6 @@ public class EditPurchaseHandler(DbDataValidatorBase dbValidator,
         var comment = request.Comment;
         var result = new Dictionary<int, Dictionary<decimal, int>>();
         var content = request.Content.ToList();
-
-        await ValidateData(currencyId, whoUpdated, cancellationToken);
 
         var purchase = await purchaseRepository.GetPurchaseForUpdate(purchaseId, true, cancellationToken)
                        ?? throw new PurchaseNotFoundException(purchaseId);
@@ -120,14 +107,5 @@ public class EditPurchaseHandler(DbDataValidatorBase dbValidator,
         purchase.PurchaseDatetime = purchaseDateTime;
         purchase.UpdateDatetime = DateTime.UtcNow;
         purchase.UpdatedUserId = updatedUserId;
-    }
-
-    private async Task ValidateData(int currencyId, Guid updatedUserId, CancellationToken cancellationToken = default)
-    {
-        var plan = new ValidationPlan()
-            .EnsureUserExists(updatedUserId)
-            .EnsureCurrencyExists(currencyId);
-        
-        await dbValidator.Validate(plan, true, true, cancellationToken);
     }
 }

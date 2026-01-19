@@ -1,10 +1,8 @@
 using Application.Common.Interfaces;
-using Core.Attributes;
 using Core.Interfaces;
-using Exceptions.Exceptions.Currencies;
+using Main.Abstractions.Interfaces.Pricing;
+using Main.Abstractions.Interfaces.Services;
 using Main.Application.Handlers.Users.GetUserDiscount;
-using Main.Core.Interfaces.Pricing;
-using Main.Core.Interfaces.Services;
 using MediatR;
 
 namespace Main.Application.Handlers.Prices.GetPrices;
@@ -13,16 +11,11 @@ public record GetPricesQuery(IEnumerable<int> ArticleIds, int CurrencyId, Guid? 
 
 public record GetPricesResult(Dictionary<int, double> Prices);
 
-public class GetPricesHandler(
-    ICurrencyConverter currencyConverter,
-    IArticlePricesService pricesService,
-    IPriceGenerator priceGenerator,
-    IMediator mediator) : IQueryHandler<GetPricesQuery, GetPricesResult>
+public class GetPricesHandler(ICurrencyConverter currencyConverter, IArticlePricesService pricesService,
+    IPriceGenerator priceGenerator, IMediator mediator) : IQueryHandler<GetPricesQuery, GetPricesResult>
 {
     public async Task<GetPricesResult> Handle(GetPricesQuery request, CancellationToken cancellationToken)
     {
-        ValidateData(request.CurrencyId);
-
         var currencyId = request.CurrencyId;
         var buyerId = request.BuyerId;
         var articleIds = request.ArticleIds;
@@ -47,11 +40,5 @@ public class GetPricesHandler(
         if (buyerId == null) return null;
         var query = new GetUserDiscountQuery(buyerId.Value);
         return (await mediator.Send(query, cancellationToken)).Discount;
-    }
-
-    private void ValidateData(int currencyId)
-    {
-        if (!currencyConverter.IsSupportedCurrency(currencyId))
-            throw new CurrencyNotFoundException(currencyId);
     }
 }

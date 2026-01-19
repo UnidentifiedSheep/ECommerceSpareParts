@@ -3,7 +3,7 @@ using Exceptions.Exceptions.Articles;
 using FluentValidation;
 using Main.Application.Configs;
 using Main.Application.Handlers.Articles.PatchArticle;
-using Main.Core.Dtos.Amw.Articles;
+using Main.Abstractions.Dtos.Amw.Articles;
 using Main.Persistence.Context;
 using MediatR;
 using Microsoft.Extensions.DependencyInjection;

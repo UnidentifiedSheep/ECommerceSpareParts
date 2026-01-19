@@ -1,12 +1,11 @@
 ﻿using Bogus;
-using Exceptions.Exceptions.Cart;
-using Exceptions.Exceptions.Users;
+using Main.Abstractions.Consts;
 using Main.Application.Handlers.Articles.CreateArticles;
 using Main.Application.Handlers.Cart.AddToCart;
 using Main.Application.Handlers.Producers.CreateProducer;
 using Main.Application.Handlers.Users.CreateUser;
-using Main.Core.Dtos.Emails;
-using Main.Core.Enums;
+using Main.Abstractions.Dtos.Emails;
+using Main.Enums;
 using Main.Persistence.Context;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
@@ -14,6 +13,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Tests.MockData;
 using Tests.testContainers.Combined;
 using ValidationException = FluentValidation.ValidationException;
+using DbValidationException = BulkValidation.Core.Exceptions.ValidationException;
 
 namespace Tests.HandlersTests.Cart;
 
@@ -86,7 +86,8 @@ public class AddToCartTests : IAsyncLifetime
         var command = new AddToCartCommand(_userId, _articleId, 5);
         await _mediator.Send(command);
 
-        await Assert.ThrowsAsync<SameItemInCartException>(() => _mediator.Send(command));
+        var exception = await Assert.ThrowsAsync<DbValidationException>(() => _mediator.Send(command));
+        Assert.Equal(ApplicationErrors.CartItemAlreadyExist, exception.Failures[0].ErrorName);
     }
 
     [Theory]
@@ -104,6 +105,7 @@ public class AddToCartTests : IAsyncLifetime
     {
         var command = new AddToCartCommand(Guid.NewGuid(), _articleId, 1);
 
-        await Assert.ThrowsAsync<UserNotFoundException>(() => _mediator.Send(command));
+        var exception = await Assert.ThrowsAsync<DbValidationException>(() => _mediator.Send(command));
+        Assert.Equal(ApplicationErrors.UsersNotFound, exception.Failures[0].ErrorName);
     }
 }

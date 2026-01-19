@@ -1,8 +1,8 @@
 using Bogus;
-using Exceptions.Exceptions.Users;
+using Main.Abstractions.Consts;
 using Main.Application.Handlers.Users.CreateUser;
-using Main.Core.Dtos.Emails;
-using Main.Core.Enums;
+using Main.Abstractions.Dtos.Emails;
+using Main.Enums;
 using Main.Persistence.Context;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
@@ -10,6 +10,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Tests.MockData;
 using Tests.testContainers.Combined;
 using ValidationException = FluentValidation.ValidationException;
+using DbValidationException = BulkValidation.Core.Exceptions.ValidationException;
 
 namespace Tests.HandlersTests.Users;
 
@@ -87,7 +88,8 @@ public class CreateUserTests : IAsyncLifetime
             _faker.Lorem.Letter(10), userInfo, [email], [], []);
 
         await _mediator.Send(command);
-        await Assert.ThrowsAsync<UserNameAlreadyTakenException>(async () => await _mediator.Send(command));
+        var exception = await Assert.ThrowsAsync<DbValidationException>(async () => await _mediator.Send(command));
+        Assert.Equal(ApplicationErrors.UserNameAlreadyTaken, exception.Failures[0].ErrorName);
     }
 
     [Fact]
@@ -107,7 +109,8 @@ public class CreateUserTests : IAsyncLifetime
         await _mediator.Send(command);
         var scommand = new CreateUserCommand("sdfsdf", _faker.Lorem.Letter(10), userInfo,
             [email], [], []);
-        await Assert.ThrowsAsync<EmailAlreadyTakenException>(async () => await _mediator.Send(scommand));
+        var error = await Assert.ThrowsAsync<DbValidationException>(async () => await _mediator.Send(scommand));
+        Assert.Equal(ApplicationErrors.UserEmailAlreadyTaken, error.Failures[0].ErrorName);
     }
 
     [Fact]

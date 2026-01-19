@@ -1,7 +1,7 @@
 using Api.Common.Extensions;
 using Carter;
+using Main.Abstractions.Dtos.Amw.Storage;
 using Main.Application.Handlers.Storages.EditStorage;
-using Main.Core.Dtos.Amw.Storage;
 using MediatR;
 
 namespace Main.Api.EndPoints.Storages;

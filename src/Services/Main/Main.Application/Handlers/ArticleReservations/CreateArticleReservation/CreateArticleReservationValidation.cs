@@ -1,10 +1,12 @@
+using Core.Interfaces;
 using FluentValidation;
+using Main.Application.Extensions;
 
 namespace Main.Application.Handlers.ArticleReservations.CreateArticleReservation;
 
 public class CreateArticleReservationValidation : AbstractValidator<CreateArticleReservationCommand>
 {
-    public CreateArticleReservationValidation()
+    public CreateArticleReservationValidation(ICurrencyConverter currencyConverter)
     {
         RuleFor(x => x.Reservations.Count)
             .LessThanOrEqualTo(100)
@@ -28,6 +30,9 @@ public class CreateArticleReservationValidation : AbstractValidator<CreateArticl
                 x.RuleFor(z => z.InitialCount)
                     .GreaterThanOrEqualTo(z => z.CurrentCount)
                     .WithMessage("Начальное количество не может быть меньше текущего количества");
+
+                x.RuleFor(z => z.GivenCurrencyId)
+                    .CurrencyMustExist(currencyConverter);
             });
     }
 }

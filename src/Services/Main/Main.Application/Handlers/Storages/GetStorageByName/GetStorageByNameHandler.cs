@@ -1,8 +1,7 @@
 ﻿using Application.Common.Interfaces;
-using Core.Attributes;
 using Exceptions.Exceptions.Storages;
-using Main.Core.Dtos.Amw.Storage;
-using Main.Core.Interfaces.DbRepositories;
+using Main.Abstractions.Dtos.Amw.Storage;
+using Main.Abstractions.Interfaces.DbRepositories;
 using Mapster;
 
 namespace Main.Application.Handlers.Storages.GetStorageByName;

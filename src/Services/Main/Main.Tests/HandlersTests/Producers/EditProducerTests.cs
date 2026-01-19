@@ -1,7 +1,7 @@
 using Bogus;
 using Core.Models;
 using Main.Application.Handlers.Producers.EditProducer;
-using Main.Core.Dtos.Amw.Producers;
+using Main.Abstractions.Dtos.Amw.Producers;
 using Main.Persistence.Context;
 using MediatR;
 using Microsoft.EntityFrameworkCore;

@@ -1,8 +1,6 @@
 using Application.Common.Interfaces;
-using Core.Attributes;
-using Exceptions.Exceptions.Markups;
-using Main.Core.Dtos.Amw.Markups;
-using Main.Core.Interfaces.DbRepositories;
+using Main.Abstractions.Dtos.Amw.Markups;
+using Main.Abstractions.Interfaces.DbRepositories;
 using Mapster;
 
 namespace Main.Application.Handlers.Markups.GetMarkupGanges;
@@ -16,15 +14,7 @@ public class GetMarkupRangesHandler(IMarkupRepository markupRepository)
 {
     public async Task<GetMarkupRangesResult> Handle(GetMarkupRangesQuery request, CancellationToken cancellationToken)
     {
-        var groupId = request.GroupId;
-        await ValidateData(groupId, cancellationToken);
-        var ranges = await markupRepository.GetMarkupRanges(groupId, false, cancellationToken);
+        var ranges = await markupRepository.GetMarkupRanges(request.GroupId, false, cancellationToken);
         return new GetMarkupRangesResult(ranges.Adapt<List<MarkupRangeDto>>());
-    }
-
-    private async Task ValidateData(int groupId, CancellationToken cancellationToken = default)
-    {
-        if (!await markupRepository.MarkupExists(groupId, cancellationToken))
-            throw new MarkupGroupNotFoundException(groupId);
     }
 }

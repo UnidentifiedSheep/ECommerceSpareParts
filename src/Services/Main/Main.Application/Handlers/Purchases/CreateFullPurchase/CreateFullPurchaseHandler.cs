@@ -1,14 +1,14 @@
 using System.Data;
 using Application.Common.Interfaces;
 using Core.Attributes;
+using Main.Abstractions.Dtos.Amw.Purchase;
+using Main.Abstractions.Dtos.Amw.Storage;
 using Main.Application.Extensions;
 using Main.Application.Handlers.Balance.CreateTransaction;
 using Main.Application.Handlers.Purchases.CreatePurchase;
 using Main.Application.Handlers.StorageContents.AddContent;
-using Main.Core.Dtos.Amw.Purchase;
-using Main.Core.Dtos.Amw.Storage;
-using Main.Core.Entities;
-using Main.Core.Enums;
+using Main.Entities;
+using Main.Enums;
 using Mapster;
 using MediatR;
 

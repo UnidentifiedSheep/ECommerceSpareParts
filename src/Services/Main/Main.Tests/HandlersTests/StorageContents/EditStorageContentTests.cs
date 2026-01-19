@@ -1,20 +1,19 @@
 using Core.Models;
 using Exceptions.Base;
-using Exceptions.Exceptions.Currencies;
 using Exceptions.Exceptions.Storages;
-using FluentValidation;
 using Main.Application.Configs;
 using Main.Application.Handlers.StorageContents.EditContent;
-using Main.Core.Dtos.Amw.Storage;
-using Main.Core.Entities;
-using Main.Core.Models;
+using Main.Abstractions.Dtos.Amw.Storage;
+using Main.Entities;
+using Main.Abstractions.Models;
 using Main.Persistence.Context;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Tests.MockData;
 using Tests.testContainers.Combined;
-using User = Main.Core.Entities.User;
+using User = Main.Entities.User;
+using ValidationException = FluentValidation.ValidationException;
 
 namespace Tests.HandlersTests.StorageContents;
 
@@ -187,7 +186,8 @@ public class EditStorageContentTests : IAsyncLifetime
             { [_storageContents.First().Id] = new (dto, concurrentCode) };
 
         var command = new EditStorageContentCommand(dict, _user.Id);
-        await Assert.ThrowsAsync<CurrencyNotFoundException>(async () => await _mediator.Send(command));
+        var exception = await Assert.ThrowsAsync<ValidationException>(async () => await _mediator.Send(command));
+        Assert.Equal("Не удалось найти валюту.", exception.Errors.First().ErrorMessage);
     }
     
 

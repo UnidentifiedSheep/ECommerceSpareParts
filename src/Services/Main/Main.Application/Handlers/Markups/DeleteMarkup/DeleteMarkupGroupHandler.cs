@@ -2,7 +2,7 @@ using Application.Common.Interfaces;
 using Core.Attributes;
 using Core.Interfaces.Services;
 using Exceptions.Exceptions.Markups;
-using Main.Core.Interfaces.DbRepositories;
+using Main.Abstractions.Interfaces.DbRepositories;
 using MediatR;
 
 namespace Main.Application.Handlers.Markups.DeleteMarkup;
@@ -10,9 +10,7 @@ namespace Main.Application.Handlers.Markups.DeleteMarkup;
 [Transactional]
 public record DeleteMarkupGroupCommand(int Id) : ICommand;
 
-public class DeleteMarkupGroupHandler(
-    IUnitOfWork unitOfWork,
-    IMarkupRepository markupRepository,
+public class DeleteMarkupGroupHandler(IUnitOfWork unitOfWork, IMarkupRepository markupRepository,
     IDefaultSettingsRepository defaultSettingsRepository) : ICommandHandler<DeleteMarkupGroupCommand>
 {
     public async Task<Unit> Handle(DeleteMarkupGroupCommand request, CancellationToken cancellationToken)

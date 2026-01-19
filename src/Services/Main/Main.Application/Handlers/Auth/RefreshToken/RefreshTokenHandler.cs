@@ -4,9 +4,9 @@ using Core.Interfaces;
 using Core.Interfaces.Services;
 using Core.Models;
 using Exceptions.Exceptions.Auth;
-using Main.Core.Enums;
-using Main.Core.Interfaces.DbRepositories;
-using Main.Core.Interfaces.Services;
+using Main.Abstractions.Interfaces.DbRepositories;
+using Main.Abstractions.Interfaces.Services;
+using Main.Enums;
 using Mapster;
 
 namespace Main.Application.Handlers.Auth.RefreshToken;
@@ -33,7 +33,7 @@ public class RefreshTokenHandler(
         if (userToken.ExpiresAt < DateTime.UtcNow || userToken.DeviceId != request.DeviceId)
             throw new InvalidTokenException(request.RefreshToken);
 
-        var user = (await userRepository.GetUserByIdAsync(userToken.UserId, false, cancellationToken))!;
+        var user = (await userRepository.GetUserByIdAsync(userToken.UserId, false, cancellationToken, x => x.UserInfo))!;
         var (roles, permissions) = await rolePermissionService
             .GetUserPermissionsAsync(user.Id, cancellationToken);
 

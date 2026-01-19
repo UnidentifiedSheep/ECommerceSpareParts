@@ -1,7 +1,7 @@
-﻿using Main.Application.Handlers.Users.CreateUser;
-using Main.Core.Dtos.Emails;
-using Main.Core.Dtos.Users;
-using Main.Core.Enums;
+﻿using Main.Abstractions.Dtos.Emails;
+using Main.Abstractions.Dtos.Users;
+using Main.Application.Handlers.Users.CreateUser;
+using Main.Enums;
 using MediatR;
 using Microsoft.Extensions.DependencyInjection;
 

@@ -1,39 +1,25 @@
 using Application.Common.Interfaces;
 using Core.Attributes;
 using Core.Interfaces.Services;
-using Exceptions.Exceptions.Currencies;
 using Exceptions.Exceptions.Sales;
-using Exceptions.Exceptions.Users;
-using Main.Application.Extensions;
-using Main.Application.Validation;
-using Main.Core.Abstractions;
-using Main.Core.Dtos.Amw.Sales;
-using Main.Core.Entities;
-using Main.Core.Interfaces.DbRepositories;
-using Main.Core.Interfaces.Pricing;
-using Main.Core.Interfaces.Services;
-using Main.Core.Models;
+using Main.Abstractions.Dtos.Amw.Sales;
+using Main.Abstractions.Interfaces.DbRepositories;
+using Main.Abstractions.Interfaces.Pricing;
+using Main.Abstractions.Interfaces.Services;
+using Main.Abstractions.Models;
+using Main.Entities;
 using Mapster;
 using MediatR;
 
 namespace Main.Application.Handlers.Sales.EditSale;
 
 [Transactional]
-public record EditSaleCommand(
-    IEnumerable<EditSaleContentDto> EditedContent,
-    IEnumerable<PrevAndNewValue<StorageContent>> StorageContentValues,
-    Dictionary<int, List<SaleContentDetail>> MovedToStorage,
-    string SaleId,
-    int CurrencyId,
-    Guid UpdatedUserId,
-    DateTime SaleDateTime,
-    string? Comment) : ICommand;
+public record EditSaleCommand(IEnumerable<EditSaleContentDto> EditedContent,
+    IEnumerable<PrevAndNewValue<StorageContent>> StorageContentValues, Dictionary<int, List<SaleContentDetail>> MovedToStorage,
+    string SaleId, int CurrencyId, Guid UpdatedUserId,
+    DateTime SaleDateTime, string? Comment) : ICommand;
 
-public class EditSaleHandler(
-    DbDataValidatorBase dbValidator,
-    IUnitOfWork unitOfWork,
-    ISaleService saleService,
-    ISaleRepository saleRepository,
+public class EditSaleHandler(IUnitOfWork unitOfWork, ISaleService saleService, ISaleRepository saleRepository,
     IPriceGenerator priceGenerator) : ICommandHandler<EditSaleCommand>
 {
     public async Task<Unit> Handle(EditSaleCommand request, CancellationToken cancellationToken)
@@ -42,7 +28,6 @@ public class EditSaleHandler(
         var saleId = request.SaleId;
         var editedContent = request.EditedContent;
         var movedToStorage = request.MovedToStorage;
-        await ValidateData(updatedUserId, request.CurrencyId, cancellationToken);
 
         var sale = await saleRepository.GetSaleForUpdate(saleId, true, cancellationToken)
                    ?? throw new SaleNotFoundException(saleId);
@@ -158,13 +143,5 @@ public class EditSaleHandler(
 
         if (counter > 0)
             throw new ArgumentException($"Недостаточно деталей для артикула {saleContent.ArticleId}");
-    }
-
-    private async Task ValidateData(Guid userId, int currencyId, CancellationToken cancellationToken = default)
-    {
-        var plan = new ValidationPlan()
-            .EnsureUserExists(userId)
-            .EnsureCurrencyExists(currencyId);
-        await dbValidator.Validate(plan, true, true, cancellationToken);
     }
 }

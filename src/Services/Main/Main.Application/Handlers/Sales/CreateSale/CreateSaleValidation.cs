@@ -1,4 +1,6 @@
+using Core.Interfaces;
 using FluentValidation;
+using Main.Application.Extensions;
 using Main.Application.Handlers.Sales.BaseValidators;
 using Main.Application.Handlers.Sales.BaseValidators.Create;
 
@@ -6,13 +8,16 @@ namespace Main.Application.Handlers.Sales.CreateSale;
 
 public class CreateSaleValidation : AbstractValidator<CreateSaleCommand>
 {
-    public CreateSaleValidation()
+    public CreateSaleValidation(ICurrencyConverter currencyConverter)
     {
         RuleFor(x => x.SaleDateTime)
             .SetValidator(new SaleDateTimeValidator());
 
         RuleFor(x => x.SellContent)
             .SetValidator(new SaleContentValidator());
+
+        RuleFor(x => x.CurrencyId)
+            .CurrencyMustExist(currencyConverter);
 
         RuleFor(x => new { x.SellContent, x.StorageContentValues })
             .Must(x =>

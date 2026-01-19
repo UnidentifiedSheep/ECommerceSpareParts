@@ -2,7 +2,7 @@ using Carter;
 using Core.Models;
 using Main.Application.Handlers.Producers.GetProducerById;
 using Main.Application.Handlers.Producers.GetProducers;
-using Main.Core.Dtos.Anonymous.Producers;
+using Main.Abstractions.Dtos.Anonymous.Producers;
 using Mapster;
 using MediatR;
 

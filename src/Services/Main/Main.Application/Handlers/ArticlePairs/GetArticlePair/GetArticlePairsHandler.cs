@@ -1,8 +1,7 @@
 using Application.Common.Interfaces;
-using Core.Attributes;
 using Exceptions.Exceptions.ArticlePair;
-using Main.Core.Dtos.Anonymous.Articles;
-using Main.Core.Interfaces.DbRepositories;
+using Main.Abstractions.Dtos.Amw.Articles;
+using Main.Abstractions.Interfaces.DbRepositories;
 using Mapster;
 
 namespace Main.Application.Handlers.ArticlePairs.GetArticlePair;

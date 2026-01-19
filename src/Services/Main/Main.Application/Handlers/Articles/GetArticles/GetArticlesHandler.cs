@@ -1,10 +1,7 @@
 using Application.Common.Interfaces;
 using Core.Models;
-using Main.Application.Validation;
-using Main.Core.Entities;
-using Main.Core.Enums;
-using Main.Core.Interfaces;
-using Main.Core.Interfaces.DbRepositories;
+using Main.Abstractions.Interfaces.DbRepositories;
+using Main.Enums;
 using Mapster;
 
 namespace Main.Application.Handlers.Articles.GetArticles;

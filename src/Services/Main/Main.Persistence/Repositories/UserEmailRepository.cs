@@ -1,8 +1,7 @@
 using Core.Extensions;
-using Main.Core.Entities;
-using Main.Core.Extensions;
-using Main.Core.Interfaces.DbRepositories;
-using Main.Core.Models;
+using Main.Abstractions.Interfaces.DbRepositories;
+using Main.Abstractions.Models;
+using Main.Entities;
 using Main.Persistence.Context;
 using Microsoft.EntityFrameworkCore;
 using Persistence.Extensions;
@@ -50,7 +49,7 @@ public class UserEmailRepository(DContext context) : IUserEmailRepository
             .Include(x => x.User)
             .ThenInclude(x => x.UserInfo)
             .FirstOrDefaultAsync(x => x.NormalizedEmail == email.ToNormalizedEmail() &&
-                                      x.IsPrimary == true, cancellationToken);
+                                      x.IsPrimary, cancellationToken);
         return userEmail?.User;
     }
 

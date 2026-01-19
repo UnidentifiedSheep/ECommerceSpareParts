@@ -3,8 +3,8 @@ using Api.Common.Extensions;
 using Carter;
 using Core.Models;
 using Main.Application.Handlers.Cart.GetCartItems;
-using Main.Core.Dtos.Cart;
-using Main.Core.Enums;
+using Main.Abstractions.Dtos.Cart;
+using Main.Enums;
 using MediatR;
 using Security.Extensions;
 

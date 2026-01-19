@@ -2,7 +2,7 @@
 using Carter;
 using Core.Models;
 using Main.Application.Handlers.Permissions.GetPermission;
-using Main.Core.Dtos.Amw.Permissions;
+using Main.Abstractions.Dtos.Amw.Permissions;
 using MediatR;
 
 namespace Main.Api.EndPoints.Permissions;

@@ -2,10 +2,10 @@
 using Core.Models;
 using IntervalMap.Core.Models;
 using IntervalMap.Variations;
+using Main.Abstractions.Interfaces.Pricing;
+using Main.Abstractions.Models;
 using Main.Application.Extensions;
-using Main.Core.Entities;
-using Main.Core.Interfaces.Pricing;
-using Main.Core.Models;
+using Main.Entities;
 
 namespace Main.Application.Services.Pricing;
 

@@ -1,7 +1,6 @@
-using Contracts;
 using Contracts.Markup;
 using Core.Interfaces.MessageBroker;
-using Main.Core.Interfaces.Pricing;
+using Main.Abstractions.Interfaces.Pricing;
 
 namespace Main.Application.EventHandlers;
 

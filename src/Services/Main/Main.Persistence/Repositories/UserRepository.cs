@@ -1,8 +1,8 @@
 using System.Diagnostics.CodeAnalysis;
+using System.Linq.Expressions;
 using Core.Extensions;
-using Main.Core.Entities;
-using Main.Core.Extensions;
-using Main.Core.Interfaces.DbRepositories;
+using Main.Abstractions.Interfaces.DbRepositories;
+using Main.Entities;
 using Main.Persistence.Context;
 using Microsoft.EntityFrameworkCore;
 using Persistence.Extensions;
@@ -12,11 +12,13 @@ namespace Main.Persistence.Repositories;
 public class UserRepository(DContext context) : IUserRepository
 {
     public async Task<User?> GetUserByIdAsync(Guid userId, bool track = true,
-        CancellationToken cancellationToken = default)
+        CancellationToken cancellationToken = default, params Expression<Func<User, object?>>[] includes)
     {
-        return await context.Users.ConfigureTracking(track)
-            .Include(x => x.UserInfo)
-            .FirstOrDefaultAsync(x => x.Id == userId, cancellationToken);
+        var query = context.Users.ConfigureTracking(track);
+        foreach (var include in includes)
+            query.Include(include);
+                
+        return await query.FirstOrDefaultAsync(x => x.Id == userId, cancellationToken);
     }
 
     public async Task<User?> GetUserByUserNameAsync(string userName, bool track = true,
@@ -56,10 +58,6 @@ public class UserRepository(DContext context) : IUserRepository
         return await context.Users.AnyAsync(x => x.NormalizedUserName == normalizedUserName, cancellationToken);
     }
 
-    public async Task<bool> UserExists(Guid id, CancellationToken cancellationToken = default)
-    {
-        return await context.Users.AnyAsync(x => x.Id == id, cancellationToken);
-    }
 
     public async Task ChangeUsersDiscount(Guid userId, decimal discount,
         CancellationToken cancellationToken = default)
@@ -72,15 +70,15 @@ public class UserRepository(DContext context) : IUserRepository
                                                 """, cancellationToken);
     }
 
-    public async Task<List<Guid>> UsersExists(IEnumerable<Guid> userIds,
-        CancellationToken cancellationToken = default)
+    public async Task<bool> UserOwnsStorage(Guid userId, string storageName, CancellationToken cancellationToken = default)
     {
-        var ids = userIds.ToHashSet();
-        var foundIds = await context.Users.AsNoTracking()
-            .Where(x => ids.Contains(x.Id))
-            .Select(x => x.Id).ToListAsync(cancellationToken);
-        return ids.Except(foundIds).ToList();
+        return await context.Users
+            .AsNoTracking()
+            .AnyAsync(x => x.Id == userId && 
+                           x.StorageNames.Any(z => EF.Functions.Like(z.Name, storageName)), 
+                cancellationToken);
     }
+
 
     [SuppressMessage("ReSharper", "EntityFramework.ClientSideDbFunctionCall")]
     public async Task<IEnumerable<User>> GetUserBySearchColumn(string? searchTerm, int page, int viewCount,

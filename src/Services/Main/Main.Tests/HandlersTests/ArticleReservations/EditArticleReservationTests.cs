@@ -1,17 +1,17 @@
 ﻿using Exceptions.Exceptions.ArticleReservations;
-using Exceptions.Exceptions.Articles;
-using Exceptions.Exceptions.Currencies;
-using FluentValidation;
+using Main.Abstractions.Consts;
 using Main.Application.Handlers.ArticleReservations.CreateArticleReservation;
 using Main.Application.Handlers.ArticleReservations.EditArticleReservation;
-using Main.Core.Dtos.Amw.ArticleReservations;
-using Main.Core.Entities;
+using Main.Abstractions.Dtos.Amw.ArticleReservations;
+using Main.Entities;
 using Main.Persistence.Context;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Tests.MockData;
 using Tests.testContainers.Combined;
+using ValidationException = FluentValidation.ValidationException;
+using DbValidationException = BulkValidation.Core.Exceptions.ValidationException;
 
 namespace Tests.HandlersTests.ArticleReservations;
 
@@ -160,7 +160,8 @@ public class EditArticleReservationTests : IAsyncLifetime
             CurrentCount = 1
         };
         var cmd = new EditArticleReservationCommand(_reservationId, dto, _whoUpdated.Id);
-        await Assert.ThrowsAsync<ArticleNotFoundException>(() => _mediator.Send(cmd));
+        var exception = await Assert.ThrowsAsync<DbValidationException>(() => _mediator.Send(cmd));
+        Assert.Equal(ApplicationErrors.ArticlesNotFound, exception.Failures[0].ErrorName);
     }
 
     [Fact]
@@ -175,6 +176,7 @@ public class EditArticleReservationTests : IAsyncLifetime
             GivenCurrencyId = int.MaxValue
         };
         var cmd = new EditArticleReservationCommand(_reservationId, dto, _whoUpdated.Id);
-        await Assert.ThrowsAsync<CurrencyNotFoundException>(() => _mediator.Send(cmd));
+        var exception = await Assert.ThrowsAsync<ValidationException>(() => _mediator.Send(cmd));
+        Assert.Equal("Не удалось найти валюту.", exception.Errors.First().ErrorMessage);
     }
 }
