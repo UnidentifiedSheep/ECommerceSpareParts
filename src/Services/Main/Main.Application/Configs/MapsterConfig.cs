@@ -24,6 +24,7 @@ using Main.Abstractions.Dtos.Users;
 using Main.Application.Extensions;
 using Main.Application.Handlers.ArticlePairs.CreatePair;
 using Main.Application.Handlers.Currencies.CreateCurrency;
+using Main.Application.Handlers.StorageRoutes.AddStorageRoute;
 using Main.Application.Handlers.Storages.CreateStorage;
 using Main.Entities;
 using Mapster;
@@ -528,5 +529,21 @@ public static class MapsterConfig
             .Map(d => d.Count, s => s.Count)
             .Map(d => d.CreatedAt, s => s.CreatedAt)
             .Map(d => d.Article, s => s.Article.Adapt<AnonymousArticleDto>());
+        
+        
+        //Storage Route
+        
+        TypeAdapterConfig<AddStorageRouteCommand, StorageRoute>.NewConfig()
+            .Map(d => d.CurrencyId, s => s.CurrencyId)
+            .Map(d => d.FromStorageName, s => s.StorageFrom)
+            .Map(d => d.ToStorageName, s => s.StorageTo)
+            .Map(d => d.DistanceM, s => s.Distance)
+            .Map(d => d.RouteType, s => s.RouteType)
+            .Map(d => d.PricingModel, s => s.PricingType)
+            .Map(d => d.DeliveryTimeMinutes, s => s.DeliveryTime)
+            .Map(d => d.PriceKg, s => s.PriceKg)
+            .Map(d => d.PricePerM3, s => s.PriceM3)
+            .Map(d => d.PricePerOrder, s => s.PricePerOrder)
+            .Map(d => d.Status, s => s.Status);
     }
 }

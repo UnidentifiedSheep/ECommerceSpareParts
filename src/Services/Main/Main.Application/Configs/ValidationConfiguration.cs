@@ -24,6 +24,34 @@ public static class ValidationConfiguration
         ConfigureCurrency();
         ConfigureProducerOtherNames();
         ConfigureCart();
+        ConfigureStorageRoutes();
+    }
+
+    private static void ConfigureStorageRoutes()
+    {
+        ConfigureDbValidation.AddConfig(ValidationFunctions.ValidateStorageRouteExistsId, KeyValueType.Single,
+            config => config.WithErrorName(ApplicationErrors.StorageRouteNotFound)
+                .WithMessageTemplate("Не удалось найти складской путь.")
+                .WithErrorType(typeof(NotFoundException))
+                .WithErrorCode((int)HttpStatusCode.NotFound));
+        
+        ConfigureDbValidation.AddConfig(ValidationFunctions.ValidateStorageRouteExistsId, KeyValueType.MultipleKeys,
+            config => config.WithErrorName(ApplicationErrors.StorageRouteNotFound)
+                .WithMessageTemplate("Не удалось найти складские пути.")
+                .WithErrorType(typeof(NotFoundException))
+                .WithErrorCode((int)HttpStatusCode.NotFound));
+        
+        ConfigureDbValidation.AddConfig(ValidationFunctions.ValidateStorageRouteExistsFromTo, KeyValueType.Tuple,
+            config => config.WithErrorName(ApplicationErrors.StorageRouteNotFound)
+                .WithMessageTemplate("Не удалось найти складской путь.")
+                .WithErrorType(typeof(NotFoundException))
+                .WithErrorCode((int)HttpStatusCode.NotFound));
+        
+        ConfigureDbValidation.AddConfig(ValidationFunctions.ValidateStorageRouteNotExistsFromTo, KeyValueType.Tuple,
+            config => config.WithErrorName(ApplicationErrors.StorageRouteAlreadyExist)
+                .WithMessageTemplate("Такой складской путь уже существует.")
+                .WithErrorType(typeof(ConflictException))
+                .WithErrorCode((int)HttpStatusCode.Conflict));
     }
 
     private static void ConfigureCart()

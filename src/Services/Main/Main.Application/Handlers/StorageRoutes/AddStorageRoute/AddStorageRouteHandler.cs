@@ -1,8 +1,9 @@
 ﻿using Application.Common.Interfaces;
 using Core.Attributes;
 using Core.Interfaces.Services;
-using Main.Abstractions.Interfaces.DbRepositories;
+using Main.Entities;
 using Main.Enums;
+using Mapster;
 
 namespace Main.Application.Handlers.StorageRoutes.AddStorageRoute;
 
@@ -21,20 +22,19 @@ namespace Main.Application.Handlers.StorageRoutes.AddStorageRoute;
 /// <param name="Status">Current route status. Active or not</param>
 [Transactional]
 public record AddStorageRouteCommand(string StorageFrom, string StorageTo, int Distance, RouteType RouteType, 
-    LogisticPricingType PricingType, int DeliveryTime, decimal PriceKg, decimal PriceM3, 
+    LogisticPricingType PricingType, int DeliveryTime, decimal PriceKg, decimal PriceM3, int CurrencyId,
     decimal PricePerOrder, RouteStatus Status) : ICommand<AddStorageRouteResult>;
 
 public record AddStorageRouteResult(Guid RouteId);
 
-public class AddStorageRouteHandler(IStorageRoutesRepository storageRoutesRepository, IUnitOfWork unitOfWork) 
-    : ICommandHandler<AddStorageRouteCommand, AddStorageRouteResult>
+public class AddStorageRouteHandler(IUnitOfWork unitOfWork) : ICommandHandler<AddStorageRouteCommand, AddStorageRouteResult>
 {
     public async Task<AddStorageRouteResult> Handle(AddStorageRouteCommand request, CancellationToken cancellationToken)
     {
-        throw new NotImplementedException();
-    }
-
-    private async Task ValidateData(string storageFrom, string storageTo, CancellationToken cancellationToken)
-    {
+        var storageRoute = request.Adapt<StorageRoute>();
+        await unitOfWork.AddAsync(storageRoute, cancellationToken);
+        await unitOfWork.SaveChangesAsync(cancellationToken);
+        
+        return new AddStorageRouteResult(storageRoute.Id);
     }
 }

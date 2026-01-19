@@ -35,4 +35,7 @@ public static class ApplicationErrors
     
     public const string CartItemNotFound = "CartItemNotFound";
     public const string CartItemAlreadyExist = "CartItemAlreadyExist";
+    
+    public const string StorageRouteNotFound = "StorageRouteNotFound";
+    public const string StorageRouteAlreadyExist = "StorageRouteAlreadyExist";
 }
