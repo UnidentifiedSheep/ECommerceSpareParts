@@ -11,6 +11,7 @@ using Core.Interfaces.CacheRepositories;
 using Core.Interfaces.Validators;
 using Core.Models;
 using FluentValidation;
+using Main.Abstractions.Interfaces.Logistics;
 using Main.Abstractions.Interfaces.Pricing;
 using Main.Abstractions.Interfaces.Services;
 using Main.Abstractions.Models;
@@ -21,6 +22,8 @@ using Main.Application.Handlers.Articles.GetArticles;
 using Main.Application.HangFireTasks;
 using Main.Application.RelatedData;
 using Main.Application.Services;
+using Main.Application.Services.Logistics;
+using Main.Application.Services.Logistics.PricingStrategies;
 using Main.Application.Services.Pricing;
 using Main.Entities;
 using MediatR;
@@ -48,6 +51,14 @@ public static class ServiceProvider
         collection.AddSingleton<IPriceGenerator, PriceGenerator>();
         collection.AddScoped<IPriceSetup, PriceSetup>();
 
+        collection.AddSingleton<ILogisticsPricingStrategy, NonePricing>();
+        collection.AddSingleton<ILogisticsPricingStrategy, PerAreaAndWeight>();
+        collection.AddSingleton<ILogisticsPricingStrategy, PerAreaOrWeightPricing>();
+        collection.AddSingleton<ILogisticsPricingStrategy, PerAreaPricing>();
+        collection.AddSingleton<ILogisticsPricingStrategy, PerOrderPricing>();
+        collection.AddSingleton<ILogisticsPricingStrategy, PerWeightPricing>();
+        collection.AddSingleton<ILogisticsCostService, LogisticsCostService>();
+        
         collection.AddScoped<IStorageContentService, StorageContentService>();
         collection.AddScoped<IArticlePricesService, ArticlePricesService>();
         collection.AddScoped<IArticlesService, ArticlesService>();
