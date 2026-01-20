@@ -561,5 +561,17 @@ public static class MapsterConfig
             .Map(d => d.PricePerOrder, s => s.PricePerOrder)
             .Map(d => d.IsActive, s => s.IsActive)
             .Map(d => d.CurrencyId, s => s.CurrencyId);
+        
+        TypeAdapterConfig<PatchStorageRouteDto, StorageRoute>.NewConfig()
+            .IgnorePatchIfNotSet()
+            .Map(d => d.DistanceM, s => s.DistanceM)
+            .Map(d => d.RouteType, s => s.RouteType)
+            .Map(d => d.PricingModel, s => s.PricingModel)
+            .Map(d => d.DeliveryTimeMinutes, s => s.DeliveryTimeMinutes)
+            .Map(d => d.PriceKg, s => s.PriceKg)
+            .Map(d => d.PricePerM3, s => s.PricePerM3)
+            .Map(d => d.PricePerOrder, s => s.PricePerOrder)
+            .Map(d => d.IsActive, s => s.IsActive)
+            .Map(d => d.CurrencyId, s => s.CurrencyId);
     }
 }
