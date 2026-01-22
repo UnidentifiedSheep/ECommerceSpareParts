@@ -91,31 +91,35 @@ public class UserRepository(DContext context) : IUserRepository
     public async Task<IEnumerable<User>> GetUserBySearchColumn(string? searchTerm, int page, int viewCount,
         bool? isSupplier = null, bool track = true, CancellationToken cancellationToken = default)
     {
-        var normalizedSearchTerm = searchTerm ?? "";
-        normalizedSearchTerm = normalizedSearchTerm.ToNormalized();
-
+        var normalizedSearchTerm = (searchTerm ?? "").ToNormalized();
         var searchBySearchTerm = !string.IsNullOrWhiteSpace(normalizedSearchTerm);
 
-        var query = context.Users.ConfigureTracking(track)
+        var query = context.Users
+            .ConfigureTracking(track)
             .Include(x => x.UserInfo)
-            .Where(x => isSupplier == null || (x.UserInfo != null && x.UserInfo.IsSupplier == isSupplier))
-            .Where(x => !searchBySearchTerm ||
-                        (x.UserInfo != null && EF.Functions.TrigramsSimilarity(x.UserInfo!.SearchColumn,
-                            normalizedSearchTerm) >= 0.1))
-            .Select(x => new
-            {
-                Rank = searchBySearchTerm
-                    ? EF.Functions.TrigramsSimilarity(x.UserInfo!.SearchColumn, normalizedSearchTerm)
-                    : 0,
-                User = x
-            });
+            .Where(x => isSupplier == null
+                        || (x.UserInfo != null && x.UserInfo.IsSupplier == isSupplier));
 
-        var orderQuery = searchBySearchTerm
-            ? query.OrderByDescending(x => x.Rank)
-            : query.OrderByDescending(x => x.User.Id);
+        if (searchBySearchTerm)
+        {
+            query = query
+                .Where(x => x.UserInfo != null)
+                .Select(x => new
+                {
+                    Rank = EF.Functions.TrigramsSimilarity(x.UserInfo!.SearchColumn, normalizedSearchTerm) + 
+                           EF.Functions
+                               .TrigramsWordSimilarity(x.UserInfo!.SearchColumn, normalizedSearchTerm) * 0.7,
+                    User = x
+                })
+                .Where(x => x.Rank >= 0.1)
+                .OrderByDescending(x => x.Rank)
+                .Select(x => x.User);
+        }
+        else
+            query = query.OrderByDescending(x => x.Id);
+        
 
-        return await orderQuery
-            .Select(x => x.User)
+        return await query
             .Skip(page * viewCount)
             .Take(viewCount)
             .ToListAsync(cancellationToken);

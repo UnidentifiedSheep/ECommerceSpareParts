@@ -1,0 +1,16 @@
+global:
+  scrape_interval: 5s
+
+scrape_configs:
+  - job_name: "main-api"
+    metrics_path: /metrics
+    static_configs:
+      - targets: ["main.api:8080"]
+
+  - job_name: "gateway"
+    metrics_path: /metrics
+    scheme: https
+    tls_config:
+      insecure_skip_verify: true
+    static_configs:
+      - targets: ["gateway:7292"]

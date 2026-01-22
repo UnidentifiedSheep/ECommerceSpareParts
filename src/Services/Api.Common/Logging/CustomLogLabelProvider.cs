@@ -10,9 +10,9 @@ public class CustomLogLabelProvider(IList<LokiLabel> lokiLabels) : ILogLabelProv
         return lokiLabels;
     }
 
-    public IList<string> PropertiesAsLabels { get; } = new List<string> { "traceId" };
+    public IList<string> PropertiesAsLabels { get; } = new List<string> { "traceId", "level" };
 
-    public IList<string> PropertiesToAppend { get; } = new List<string> { "level" };
+    public IList<string> PropertiesToAppend { get; } = new List<string> {  };
 
     public LokiFormatterStrategy FormatterStrategy => LokiFormatterStrategy.SpecificPropertiesAsLabelsOrAppended;
 }

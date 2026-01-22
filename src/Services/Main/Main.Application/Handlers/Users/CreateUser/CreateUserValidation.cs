@@ -30,7 +30,7 @@ public class CreateUserValidation : AbstractValidator<CreateUserCommand>
                 foreach (var email in list)
                 {
                     setOfEmails.Add(email.Email.ToNormalizedEmail());
-                    primaryCount++;
+                    if (email.IsPrimary) primaryCount++;
                 }
 
 

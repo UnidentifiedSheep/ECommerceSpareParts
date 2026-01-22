@@ -1,15 +1,53 @@
 using System.Text;
+using Api.Common.Logging;
 using Core.StaticFunctions;
 using Gateway.Extensions;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
+using OpenTelemetry.Metrics;
+using Serilog;
+using Serilog.Sinks.Loki;
+using Serilog.Sinks.Loki.Labels;
 using Yarp.ReverseProxy.Transforms;
 
 var builder = WebApplication.CreateBuilder(args);
 var certsPath = Environment.GetEnvironmentVariable("CERTS_PATH");
 if (!string.IsNullOrWhiteSpace(certsPath))
     Certs.RegisterCerts(certsPath);
+
 builder.Configuration.AddJsonFromDirectory("ReverseProxy");
+
+var lokiUrl = Environment.GetEnvironmentVariable("LOKI_URL");
+
+Log.Logger = new LoggerConfiguration()
+    .ReadFrom.Configuration(builder.Configuration)
+    .Enrich.FromLogContext()
+    .WriteTo.Console()
+    .WriteTo.Conditional(
+        _ => !string.IsNullOrWhiteSpace(lokiUrl),
+        wt => wt.LokiHttp(() => new LokiSinkConfiguration
+        {
+            LokiUrl = lokiUrl!,
+            LogLabelProvider = new CustomLogLabelProvider([
+                new LokiLabel("service", "gateway"),
+                new LokiLabel(
+                    "env",
+                    Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT") ?? "unknown"
+                )
+            ])
+        })
+    )
+    .CreateLogger();
+
+builder.Services.AddOpenTelemetry()
+    .WithMetrics(metrics =>
+    {
+        metrics
+            .AddAspNetCoreInstrumentation()
+            .AddProcessInstrumentation()
+            .AddRuntimeInstrumentation()
+            .AddPrometheusExporter();
+    });
 
 builder.Services.AddAuthentication(options =>
 {
@@ -44,6 +82,7 @@ builder.Services.AddReverseProxy()
             return ValueTask.CompletedTask;
         });
     });
+builder.Host.UseSerilog();
 
 builder.Services.AddCors(options =>
 {
@@ -68,4 +107,5 @@ app.MapMethods("{**any}", ["OPTIONS"], () => Results.Ok())
 
 app.MapReverseProxy();
 
+app.UseOpenTelemetryPrometheusScrapingEndpoint();
 app.Run();

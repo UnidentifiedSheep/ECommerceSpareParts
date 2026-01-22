@@ -48,17 +48,26 @@ var certsPath = Environment.GetEnvironmentVariable("CERTS_PATH");
 if (!string.IsNullOrWhiteSpace(certsPath))
     Certs.RegisterCerts(certsPath);
 
+var lokiUrl = Environment.GetEnvironmentVariable("LOKI_URL");
+
 Log.Logger = new LoggerConfiguration()
     .ReadFrom.Configuration(builder.Configuration)
     .Enrich.FromLogContext()
-    .WriteTo.LokiHttp(() => new LokiSinkConfiguration
-    {
-        LokiUrl = builder.Configuration["Loki:Url"],
-        LogLabelProvider = new CustomLogLabelProvider([
-            new LokiLabel("app", "app"), new LokiLabel("monolite-unicorn", "monolite-unicorn")
-        ])
-    })
     .WriteTo.Console()
+    .WriteTo.Conditional(
+        _ => !string.IsNullOrWhiteSpace(lokiUrl),
+        wt => wt.LokiHttp(() => new LokiSinkConfiguration
+        {
+            LokiUrl = lokiUrl!,
+            LogLabelProvider = new CustomLogLabelProvider([
+                new LokiLabel("service", "main.api"),
+                new LokiLabel(
+                    "env",
+                    Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT") ?? "unknown"
+                ),
+            ])
+        })
+    )
     .CreateLogger();
 
 
@@ -231,10 +240,11 @@ if (Environment.GetEnvironmentVariable("USE_HTTPS_REDIRECTION") == "true")
 
 app.UseExceptionHandler(_ => { });
 
+app.UseRouting();
+
 app.UseAuthentication();
 app.UseAuthorization();
 
-app.UseRouting();
 app.UseCors();
 
 

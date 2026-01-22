@@ -8,7 +8,7 @@ using Serilog;
 
 namespace Api.Common.ExceptionHandlers;
 
-public class CustomExceptionHandler : IExceptionHandler
+public class CustomExceptionHandler() : IExceptionHandler
 {
     public async ValueTask<bool> TryHandleAsync(HttpContext context, Exception exception, CancellationToken cancellationToken)
     {
@@ -23,7 +23,7 @@ public class CustomExceptionHandler : IExceptionHandler
         return true;
     }
 
-    private static void LogError(HttpContext context, Exception exception)
+    private void LogError(HttpContext context, Exception exception)
     {
         Log.ForContext("traceId", context.TraceIdentifier)
             .Error(exception, "Error occurred at {time}", DateTime.UtcNow);
