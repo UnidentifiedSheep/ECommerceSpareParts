@@ -90,6 +90,16 @@
         "Transforms": [
           { "PathRemovePrefix": "/main" }
         ]
+      },
+      "add-storage-to-user": {
+        "ClusterId": "main-cluster",
+        "Match": {
+          "Path": "/main/users/{userId}/storages/{storageName}",
+          "Methods": [ "POST" ]
+        },
+        "Transforms": [
+          { "PathRemovePrefix": "/main" }
+        ]
       }
     }
   }

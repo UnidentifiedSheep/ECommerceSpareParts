@@ -26,6 +26,6 @@ public class CreateStorageEndPoint : ICarterModule
             .WithDisplayName("Создать склад")
             .Produces<CreateStorageResponse>(201)
             .ProducesProblem(400)
-            .RequireAnyPermission("STORAGES.CREATE");
+            .RequireAnyPermission(PermissionCodes.STORAGES_CREATE);
     }
 }

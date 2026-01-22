@@ -1,3 +1,5 @@
+using Main.Enums;
+
 namespace Main.Abstractions.Dtos.Amw.Storage;
 
 public class StorageDto
@@ -8,5 +10,5 @@ public class StorageDto
 
     public string? Location { get; set; }
 
-    public string Type { get; set; } = null!;
+    public StorageType Type { get; set; }
 }
