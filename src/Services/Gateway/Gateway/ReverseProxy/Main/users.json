@@ -80,6 +80,16 @@
         "Transforms": [
           { "PathRemovePrefix": "/main" }
         ]
+      },
+      "get-user-discount": {
+        "ClusterId": "main-cluster",
+        "Match": {
+          "Path": "/main/users/{userId}/discount",
+          "Methods": [ "GET" ]
+        },
+        "Transforms": [
+          { "PathRemovePrefix": "/main" }
+        ]
       }
     }
   }

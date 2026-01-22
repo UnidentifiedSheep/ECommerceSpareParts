@@ -10,7 +10,7 @@ public class RolePermissionService(IUserRoleRepository userRoleRepository, IUser
         CancellationToken cancellationToken = default)
     {
         var userRoles = await userRoleRepository.GetUserRolesAsync(userId, false, 
-            null, null, cancellationToken);
+            null, null, cancellationToken, x => x.Role, x => x.Role.PermissionNames);
         var permissions = new List<string>();
         var roles = new List<string>();
         

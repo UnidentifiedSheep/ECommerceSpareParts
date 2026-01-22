@@ -1,3 +1,4 @@
+using System.Linq.Expressions;
 using Main.Abstractions.Interfaces.DbRepositories;
 using Main.Entities;
 using Main.Persistence.Context;
@@ -9,20 +10,23 @@ namespace Main.Persistence.Repositories;
 public class UserRoleRepository(DContext context) : IUserRoleRepository
 {
     public async Task<IEnumerable<UserRole>> GetUserRolesAsync(Guid userId, bool track = true, int? limit = null,
-        int? offset = null,
-        CancellationToken cancellationToken = default)
+        int? offset = null, CancellationToken cancellationToken = default, params Expression<Func<UserRole, object>>[] includes)
     {
-        var query = context.UserRoles
-            .Include(x => x.Role)
-            .Include(x => x.Role.PermissionNames)
-            .Where(x => x.UserId == userId)
-            .OrderBy(x => x.RoleId)
-            .ConfigureTracking(track);
+        IQueryable<UserRole> query = context.UserRoles;
 
-        if (offset != null)
+        foreach (var include in includes)
+            query = query.Include(include);
+        
+        query = query
+            .ConfigureTracking(track)
+            .Where(x => x.UserId == userId)
+            .OrderBy(x => x.RoleId);
+        
+
+        if (offset.HasValue)
             query = query.Skip(offset.Value);
 
-        if (limit != null)
+        if (limit.HasValue)
             query = query.Take(limit.Value);
 
         return await query.ToListAsync(cancellationToken);
