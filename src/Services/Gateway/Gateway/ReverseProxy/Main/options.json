@@ -1,0 +1,16 @@
+﻿{
+  "ReverseProxy": {
+    "Routes": {
+      "add-main-article-content": {
+        "ClusterId": "main-cluster",
+        "Match": {
+          "Path": "/main/options/emails",
+          "Methods": [ "GET" ]
+        },
+        "Transforms": [
+          { "PathRemovePrefix": "/main" }
+        ]
+      }
+    }
+  }
+}

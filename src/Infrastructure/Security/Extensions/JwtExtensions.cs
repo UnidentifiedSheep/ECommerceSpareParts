@@ -5,18 +5,18 @@ namespace Security.Extensions;
 public static class JwtExtensions
 {
     /// <summary>
-    /// If user is not found, return false, else true.
+    /// Gets the user ID from the ClaimsPrincipal.
     /// </summary>
-    /// <param name="user"></param>
+    /// <param name="user">Clim</param>
     /// <param name="userId"></param>
-    /// <returns></returns>
+    /// <returns>Returns true if clim contains user id, else returns false</returns>
     public static bool GetUserId(this ClaimsPrincipal user, out Guid userId)
     {
         userId = Guid.Empty;
         var foundValue = user.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-        if (foundValue != null)
-            userId = Guid.Parse(foundValue);
-        return foundValue == null;
+        if (string.IsNullOrWhiteSpace(foundValue)) 
+            return false;
+        return Guid.TryParse(foundValue, out userId);
     }
 
     public static bool HasPermissions(this ClaimsPrincipal user, params string[] requiredPermissions)

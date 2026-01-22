@@ -23,9 +23,11 @@ public class RolePermissionSeed : ISeed<DContext>
                 PermissionCodes.USERS_MAILS_CREATE,
                 PermissionCodes.USERS_CREATE,
                 PermissionCodes.USERS_GET,
+                PermissionCodes.USERS_INFO_GET,
+                PermissionCodes.USERS_DISCOUNT_CREATE,
+                PermissionCodes.USERS_DISCOUNT_GET,
                 PermissionCodes.PERMISSIONS_GET,
                 PermissionCodes.PERMISSIONS_CREATE,
-                PermissionCodes.USERS_DISCOUNT,
                 PermissionCodes.ARTICLES_EDIT,
                 PermissionCodes.ARTICLES_DELETE,
                 PermissionCodes.ARTICLES_GET_FULL,
@@ -64,7 +66,7 @@ public class RolePermissionSeed : ISeed<DContext>
                 PermissionCodes.MARKUP_GET,
                 PermissionCodes.MARKUP_SET_DEFAULT,
                 PermissionCodes.PRICES_GET_DETAILED,
-                PermissionCodes.PRICES_GET_STANDART,
+                PermissionCodes.PRICES_GET_STANDARD,
                 PermissionCodes.PURCHASE_CREATE,
                 PermissionCodes.PURCHASE_DELETE,
                 PermissionCodes.PURCHASE_EDIT,
@@ -82,7 +84,8 @@ public class RolePermissionSeed : ISeed<DContext>
                 PermissionCodes.STORAGES_DELETE,
                 PermissionCodes.STORAGES_CONTENT_EDIT,
                 PermissionCodes.STORAGES_EDIT,
-                PermissionCodes.STORAGES_CONTENT_GET_STANDART
+                PermissionCodes.STORAGES_CONTENT_GET_STANDARD,
+                PermissionCodes.OPTIONS_GET
             ],
 
             ["WORKER"] =
@@ -114,7 +117,7 @@ public class RolePermissionSeed : ISeed<DContext>
                 PermissionCodes.BALANCES_TRANSACTION_EDIT,
                 PermissionCodes.CURRENCIES_GET,
                 PermissionCodes.PRICES_GET_DETAILED,
-                PermissionCodes.PRICES_GET_STANDART,
+                PermissionCodes.PRICES_GET_STANDARD,
                 PermissionCodes.PURCHASE_CREATE,
                 PermissionCodes.PURCHASE_DELETE,
                 PermissionCodes.PURCHASE_EDIT,
@@ -126,19 +129,22 @@ public class RolePermissionSeed : ISeed<DContext>
                 PermissionCodes.STORAGES_CONTENT_CREATE,
                 PermissionCodes.STORAGES_CONTENT_EDIT,
                 PermissionCodes.STORAGES_EDIT,
-                PermissionCodes.STORAGES_CONTENT_GET_STANDART,
+                PermissionCodes.STORAGES_CONTENT_GET_STANDARD,
                 PermissionCodes.STORAGES_CONTENT_GET_ALL,
                 PermissionCodes.STORAGES_GET,
                 PermissionCodes.USERS_VEHICLES_CREATE_ME,
                 PermissionCodes.USERS_VEHICLES_CREATE_ALL,
                 PermissionCodes.USERS_GET,
+                PermissionCodes.USERS_DISCOUNT_GET,
+                PermissionCodes.USERS_INFO_GET,
                 PermissionCodes.ARTICLES_DELETE,
                 PermissionCodes.ARTICLES_EDIT,
                 PermissionCodes.ARTICLES_GET_FULL,
                 PermissionCodes.ARTICLES_GET_MAIN,
                 PermissionCodes.PRODUCERS_CREATE,
                 PermissionCodes.PRODUCERS_EDIT,
-                PermissionCodes.PRODUCERS_DELETE
+                PermissionCodes.PRODUCERS_DELETE,
+                PermissionCodes.OPTIONS_GET
             ],
 
             ["MEMBER"] =
@@ -146,7 +152,7 @@ public class RolePermissionSeed : ISeed<DContext>
                 PermissionCodes.ARTICLE_CROSSES_GET,
                 PermissionCodes.ARTICLE_RESERVATIONS_GET_ME,
                 PermissionCodes.BALANCES_TRANSACTION_GET_ME,
-                PermissionCodes.STORAGES_CONTENT_GET_STANDART,
+                PermissionCodes.STORAGES_CONTENT_GET_STANDARD,
                 PermissionCodes.USERS_VEHICLES_CREATE_ME,
                 PermissionCodes.ARTICLES_GET_MAIN
             ]

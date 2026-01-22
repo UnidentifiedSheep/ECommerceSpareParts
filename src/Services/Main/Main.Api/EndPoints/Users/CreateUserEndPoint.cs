@@ -17,6 +17,8 @@ public record CreateUserRequest(
     IEnumerable<string> Phones,
     IEnumerable<string> Roles);
 
+public record CreateUserResponse(Guid UserId);
+
 public class CreateUserEndPoint : ICarterModule
 {
     public void AddRoutes(IEndpointRouteBuilder app)
@@ -25,7 +27,7 @@ public class CreateUserEndPoint : ICarterModule
             {
                 var command = request.Adapt<CreateUserCommand>();
                 var userId = (await sender.Send(command, cancellationToken)).UserId;
-                return Results.Created($"users/{userId}", null);
+                return Results.Created($"users/{userId}", new CreateUserResponse(userId));
             }).WithTags("Users")
             .WithDescription("Создание пользователя")
             .WithDisplayName("Создание пользователя")

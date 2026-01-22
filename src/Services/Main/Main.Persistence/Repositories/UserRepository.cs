@@ -16,7 +16,7 @@ public class UserRepository(DContext context) : IUserRepository
     {
         var query = context.Users.ConfigureTracking(track);
         foreach (var include in includes)
-            query.Include(include);
+            query = query.Include(include);
                 
         return await query.FirstOrDefaultAsync(x => x.Id == userId, cancellationToken);
     }

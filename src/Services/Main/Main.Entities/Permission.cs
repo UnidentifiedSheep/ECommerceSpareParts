@@ -1,4 +1,6 @@
 ﻿using BulkValidation.Core.Attributes;
+using Core.Extensions;
+using Main.Enums;
 
 namespace Main.Entities;
 
@@ -14,4 +16,11 @@ public partial class Permission
     public virtual ICollection<UserPermission> UserPermissions { get; set; } = new List<UserPermission>();
 
     public virtual ICollection<Role> Roles { get; set; } = new List<Role>();
+
+    public Permission() {}
+    public Permission(PermissionCodes name, string? description = null)
+    {
+        Name = name.ToNormalizedPermission();
+        Description = description;
+    }
 }

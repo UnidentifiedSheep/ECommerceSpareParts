@@ -2,6 +2,7 @@
 using Carter;
 using Core.Models;
 using Main.Application.Handlers.Options.GetEmailOptions;
+using Main.Enums;
 using MediatR;
 
 namespace Main.Api.EndPoints.Options;
@@ -19,6 +20,6 @@ public class GetEmailOptionsEndPoint : ICarterModule
         }).WithTags("Options")
         .WithDescription("Получение параметров почт")
         .WithDisplayName("Получение параметров почт")
-        .RequireAnyPermission("USERS.CREATE");
+        .RequireAnyPermission(PermissionCodes.OPTIONS_GET);
     }
 }

@@ -51,6 +51,6 @@ public class GetUsersEndPoint : ICarterModule
                 }).WithTags("Users")
                 .WithDescription("Получение пользователей")
                 .WithDisplayName("Получение пользователей")
-                .RequireAnyPermission("USERS.GET");
+                .RequireAnyPermission(PermissionCodes.USERS_GET);
     }
 }
