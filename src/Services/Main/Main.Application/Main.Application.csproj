@@ -17,7 +17,6 @@
 
     <ItemGroup>
         <Folder Include="Handlers\StorageRoutes\DeleteStorageRoute\" />
-        <Folder Include="Handlers\Users\RemoveRoleFromUser\" />
     </ItemGroup>
 
     <ItemGroup>

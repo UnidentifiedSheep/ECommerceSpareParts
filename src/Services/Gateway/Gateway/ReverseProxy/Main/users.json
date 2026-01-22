@@ -70,6 +70,16 @@
         "Transforms": [
           { "PathRemovePrefix": "/main" }
         ]
+      },
+      "get-user-full-info": {
+        "ClusterId": "main-cluster",
+        "Match": {
+          "Path": "/main/users/{userId}/info",
+          "Methods": [ "GET" ]
+        },
+        "Transforms": [
+          { "PathRemovePrefix": "/main" }
+        ]
       }
     }
   }

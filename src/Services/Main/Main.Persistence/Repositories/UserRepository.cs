@@ -79,6 +79,13 @@ public class UserRepository(DContext context) : IUserRepository
                 cancellationToken);
     }
 
+    public async Task<UserInfo?> GetUserInfo(Guid id, bool track = true, CancellationToken cancellationToken = default)
+    {
+        return await context.UserInfos
+            .ConfigureTracking(track)
+            .FirstOrDefaultAsync(x => x.UserId == id, cancellationToken);
+    }
+
 
     [SuppressMessage("ReSharper", "EntityFramework.ClientSideDbFunctionCall")]
     public async Task<IEnumerable<User>> GetUserBySearchColumn(string? searchTerm, int page, int viewCount,

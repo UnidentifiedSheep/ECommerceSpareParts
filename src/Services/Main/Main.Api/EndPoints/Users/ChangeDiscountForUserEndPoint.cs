@@ -1,6 +1,7 @@
 using Api.Common.Extensions;
 using Carter;
 using Main.Application.Handlers.Users.ChangeUserDiscount;
+using Main.Enums;
 using MediatR;
 
 namespace Main.Api.EndPoints.Users;
@@ -21,6 +22,6 @@ public class ChangeDiscountForUserEndPoint : ICarterModule
                 }).WithTags("Balances")
             .WithDescription("Изменение скидки пользователя")
             .WithDisplayName("Поменять скидку")
-            .RequireAnyPermission("USERS.DISCOUNT");
+            .RequireAnyPermission(PermissionCodes.USERS_DISCOUNT_CREATE);
     }
 }

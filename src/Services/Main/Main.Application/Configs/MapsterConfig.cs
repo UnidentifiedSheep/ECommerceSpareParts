@@ -519,6 +519,16 @@ public static class MapsterConfig
             .Map(dest => dest.EmailType, src => src.Type.ToString())
             .Map(dest => dest.Confirmed, src => src.IsConfirmed)
             .Map(dest => dest.ConfirmedAt, src => src.IsConfirmed ? DateTime.UtcNow : (DateTime?)null);
+        
+        TypeAdapterConfig<UserEmail, FullEmailDto>.NewConfig()
+            .Map(dest => dest.Id, src => src.Id)
+            .Map(dest => dest.Email, src => src.Email)
+            .Map(dest => dest.IsPrimary, src => src.IsPrimary)
+            .Map(dest => dest.EmailType, src => src.EmailType)
+            .Map(dest => dest.Confirmed, src => src.Confirmed)
+            .Map(dest => dest.ConfirmedAt, src => src.ConfirmedAt)
+            .Map(dest => dest.CreatedAt, src => src.CreatedAt)
+            .Map(dest => dest.UpdatedAt, src => src.UpdatedAt);
 
         TypeAdapterConfig<Permission, PermissionDto>.NewConfig()
             .IgnoreNonMapped(true)

@@ -61,4 +61,5 @@ public interface IUserRepository
 
     Task ChangeUsersDiscount(Guid userId, decimal discount, CancellationToken cancellationToken = default);
     Task<bool> UserOwnsStorage(Guid userId, string storageName, CancellationToken cancellationToken = default);
+    Task<UserInfo?> GetUserInfo(Guid id, bool track = true, CancellationToken cancellationToken = default);
 }

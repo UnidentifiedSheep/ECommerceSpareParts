@@ -18,8 +18,8 @@ public class GetUserDiscountEndPoint : ICarterModule
             var result = await sender.Send(query, token);
             return Results.Ok(new GetUserDiscountResponse(result.Discount ?? 0));
         }).WithTags("Users")
-        .WithDescription("Получение пользователей")
-        .WithDisplayName("Получение пользователей")
-        .RequireAnyPermission(PermissionCodes.USERS_DISCOUNT_CREATE);
+        .WithDescription("Получение скидки пользователя")
+        .WithDisplayName("Получение скидки пользователя")
+        .RequireAnyPermission(PermissionCodes.USERS_DISCOUNT_GET);
     }
 }
