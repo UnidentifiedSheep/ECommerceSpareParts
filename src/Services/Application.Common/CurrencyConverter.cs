@@ -88,6 +88,6 @@ public class CurrencyConverter(int usdId) : ICurrencyConverter
 
     public bool IsSupportedCurrency(int currencyId)
     {
-        return ToUsd.ContainsKey(currencyId);
+        return ToUsd.ContainsKey(currencyId) || currencyId == usdId;
     }
 }

@@ -555,7 +555,7 @@ public static class MapsterConfig
             .Map(d => d.PriceKg, s => s.PriceKg)
             .Map(d => d.PricePerM3, s => s.PriceM3)
             .Map(d => d.PricePerOrder, s => s.PricePerOrder)
-            .Map(d => d.IsActive, s => true);
+            .Map(d => d.IsActive, s => false);
         
         TypeAdapterConfig<StorageRoute, StorageRouteDto>.NewConfig()
             .IgnoreNonMapped(true)
@@ -566,11 +566,13 @@ public static class MapsterConfig
             .Map(d => d.RouteType, s => s.RouteType)
             .Map(d => d.PricingModel, s => s.PricingModel)
             .Map(d => d.DeliveryTimeMinutes, s => s.DeliveryTimeMinutes)
-            .Map(d => d.PriceKg, s => s.PriceKg)
+            .Map(d => d.PricePerKg, s => s.PriceKg)
             .Map(d => d.PricePerM3, s => s.PricePerM3)
             .Map(d => d.PricePerOrder, s => s.PricePerOrder)
             .Map(d => d.IsActive, s => s.IsActive)
-            .Map(d => d.CurrencyId, s => s.CurrencyId);
+            .Map(d => d.CurrencyId, s => s.CurrencyId)
+            .Map(d => d.CurrencySign, s => s.Currency.CurrencySign)
+            .Map(d => d.CurrencyName, s => s.Currency.Name);
         
         TypeAdapterConfig<PatchStorageRouteDto, StorageRoute>.NewConfig()
             .IgnorePatchIfNotSet()

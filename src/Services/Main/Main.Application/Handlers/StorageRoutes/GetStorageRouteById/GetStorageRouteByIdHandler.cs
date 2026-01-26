@@ -14,7 +14,8 @@ public class GetStorageRouteByIdHandler(IStorageRoutesRepository storageRoutesRe
 {
     public async Task<GetStorageRouteByIdResult> Handle(GetStorageRouteByIdQuery request, CancellationToken cancellationToken)
     {
-        var route = await storageRoutesRepository.GetStorageRouteAsync(request.Id, false, cancellationToken)
+        var route = await storageRoutesRepository.GetStorageRouteAsync(request.Id, false, cancellationToken,
+                         x => x.Currency)
                     ?? throw new StorageRouteNotFound(request.Id);
         return new GetStorageRouteByIdResult(route.Adapt<StorageRouteDto>());
     }

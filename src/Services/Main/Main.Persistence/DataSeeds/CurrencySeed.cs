@@ -10,7 +10,7 @@ public class CurrencySeed : ISeed<DContext>
     {
         var usd = new Currency
         {
-            Id = 3,
+            Id = 1,
             ShortName = "Дол.",
             Name = "Доллар США",
             CurrencySign = "$",

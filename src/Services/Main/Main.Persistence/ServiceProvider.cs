@@ -47,6 +47,7 @@ public static class ServiceProvider
         collection.AddScoped<IArticleCharacteristicsRepository, ArticleCharacteristicsRepository>();
         collection.AddScoped<ICartRepository, CartRepository>();
         collection.AddScoped<IStorageRoutesRepository, StorageRoutesRepository>();
+        collection.AddScoped<IUserStorageRepository, UserStorageRepository>();
 
         collection.AddScoped<IUnitOfWork, UnitOfWork>();
         

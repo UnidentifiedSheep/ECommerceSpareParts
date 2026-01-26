@@ -14,7 +14,7 @@ public class DefaultSettingsRepository(DContext context) : IDefaultSettingsRepos
     {
         await context.Database.ExecuteSqlRawAsync("""
                                                   INSERT INTO default_settings (key, value) 
-                                                  VALUES ('DefaultCurrency', '3'), ('DefaultMarkUp', '25'),
+                                                  VALUES ('DefaultCurrency', '1'), ('DefaultMarkUp', '25'),
                                                          ('MaximumDaysOfPriceStorage', '30'), ('SelectedMarkupId', '-1'),
                                                          ('PriceGenerationStrategy', 'TakeHighestPrice'),
                                                          ('UseOrderAutoApprovement', 'false')

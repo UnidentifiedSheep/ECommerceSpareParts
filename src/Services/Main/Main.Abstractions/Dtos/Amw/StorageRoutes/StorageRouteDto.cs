@@ -11,9 +11,11 @@ public class StorageRouteDto
     public RouteType RouteType { get; set; }
     public LogisticPricingType PricingModel { get; set; }
     public int DeliveryTimeMinutes { get; set; }
-    public decimal PriceKg { get; set; }
+    public decimal PricePerKg { get; set; }
     public decimal PricePerM3 { get; set; }
     public decimal PricePerOrder { get; set; }
     public bool IsActive { get; set; }
     public int CurrencyId { get; set; }
+    public string CurrencyName { get; set; } = string.Empty;
+    public string CurrencySign { get; set; } = string.Empty;
 }

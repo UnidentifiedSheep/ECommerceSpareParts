@@ -7,8 +7,8 @@ services:
       context: .
       dockerfile: src/Services/Main/Main.Api/Dockerfile
     ports:
-      - "25555:7292"
-      - "57115:8080"
+      - "4000:7292"
+      - "4001:8080"
     volumes:
       - ./certs:/app/certs:ro
     environment:
@@ -50,8 +50,8 @@ services:
       context: .
       dockerfile: src/Services/Analytics/Analytics.Api/Dockerfile
     ports:
-      - "57104:7292"
-      - "57124:8080"
+      - "4002:7292"
+      - "4003:8080"
     volumes:
       - ./certs:/app/certs:ro
     environment:
@@ -81,7 +81,7 @@ services:
       context: .
       dockerfile: src/Services/Gateway/Gateway/Dockerfile
     ports:
-      - "57106:7292"
+      - "4004:7292"
     volumes:
       - ./certs:/app/certs:ro
     environment:

@@ -1,0 +1,62 @@
+﻿{
+  "ReverseProxy": {
+    "Routes": {
+      "get-storage-routes": {
+        "ClusterId": "main-cluster",
+        "Match": {
+          "Path": "/main/storages/routes",
+          "Methods": [
+            "GET"
+          ]
+        },
+        "Transforms": [
+          {
+            "PathRemovePrefix": "/main"
+          }
+        ]
+      },
+      "get-storage-route": {
+        "ClusterId": "main-cluster",
+        "Match": {
+          "Path": "/main/storages/routes/{id}",
+          "Methods": [
+            "GET"
+          ]
+        },
+        "Transforms": [
+          {
+            "PathRemovePrefix": "/main"
+          }
+        ]
+      },
+      "add-storage-route": {
+        "ClusterId": "main-cluster",
+        "Match": {
+          "Path": "/main/storages/routes",
+          "Methods": [
+            "POST"
+          ]
+        },
+        "Transforms": [
+          {
+            "PathRemovePrefix": "/main"
+          }
+        ]
+      },
+      "update-storage-route": {
+        "ClusterId": "main-cluster",
+        "Match": {
+          "Path": "/main/storages/routes/{id}",
+          "Methods": [
+            "PATCH"
+          ]
+        },
+        "Transforms": [
+          {
+            "PathRemovePrefix": "/main"
+          }
+        ]
+      }
+    }
+  }
+}

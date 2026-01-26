@@ -87,7 +87,11 @@ public class RolePermissionSeed : ISeed<DContext>
                 PermissionCodes.STORAGES_CONTENT_EDIT,
                 PermissionCodes.STORAGES_EDIT,
                 PermissionCodes.STORAGES_CONTENT_GET_STANDARD,
-                PermissionCodes.OPTIONS_GET
+                PermissionCodes.OPTIONS_GET,
+                PermissionCodes.STORAGE_ROUTES_GET,
+                PermissionCodes.STORAGE_ROUTES_EDIT,
+                PermissionCodes.STORAGE_ROUTES_CREATE,
+                PermissionCodes.STORAGE_ROUTES_DELETE
             ],
 
             ["WORKER"] =
@@ -147,7 +151,8 @@ public class RolePermissionSeed : ISeed<DContext>
                 PermissionCodes.PRODUCERS_CREATE,
                 PermissionCodes.PRODUCERS_EDIT,
                 PermissionCodes.PRODUCERS_DELETE,
-                PermissionCodes.OPTIONS_GET
+                PermissionCodes.OPTIONS_GET,
+                PermissionCodes.STORAGE_ROUTES_EDIT,
             ],
 
             ["MEMBER"] =

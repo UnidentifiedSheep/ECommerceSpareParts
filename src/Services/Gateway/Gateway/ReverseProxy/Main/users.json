@@ -100,6 +100,16 @@
         "Transforms": [
           { "PathRemovePrefix": "/main" }
         ]
+      },
+      "get-user-storages": {
+        "ClusterId": "main-cluster",
+        "Match": {
+          "Path": "/main/users/{userId}/storages",
+          "Methods": [ "GET" ]
+        },
+        "Transforms": [
+          { "PathRemovePrefix": "/main" }
+        ]
       }
     }
   }

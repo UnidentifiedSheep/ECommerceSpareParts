@@ -1,6 +1,7 @@
 using System.Linq.Expressions;
 using Main.Abstractions.Interfaces.DbRepositories;
 using Main.Entities;
+using Main.Enums;
 using Main.Persistence.Context;
 using Microsoft.EntityFrameworkCore;
 using Persistence.Extensions;
@@ -18,8 +19,7 @@ public class StoragesRepository(DContext context) : IStoragesRepository
     }
 
     public async Task<IEnumerable<Storage>> GetStoragesAsync(string? searchTerm, int page, int viewCount,
-        bool track = true,
-        CancellationToken cancellationToken = default)
+        bool track = true, StorageType? type = null, CancellationToken cancellationToken = default)
     {
         var query = context.Storages.ConfigureTracking(track);
 
@@ -35,8 +35,11 @@ public class StoragesRepository(DContext context) : IStoragesRepository
                 .Where(x => x.Rank > 0)
                 .OrderByDescending(x => x.Rank)
                 .Select(x => x.Entity);
-
+        else
+            query = query.OrderByDescending(x => x.Name);
+        
         return await query
+            .Where(x => type == null || x.Type == type)
             .Skip(page * viewCount)
             .Take(viewCount)
             .ToListAsync(cancellationToken);

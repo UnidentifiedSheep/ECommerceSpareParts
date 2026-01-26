@@ -124,6 +124,11 @@ public class PermissionSeed : ISeed<DContext>
         new(PermissionCodes.PERMISSIONS_GET, "Права на получение всех прав доступа"),
 
         new(PermissionCodes.OPTIONS_GET, "Права на получение настроек"),
+        
+        new Permission(PermissionCodes.STORAGE_ROUTES_GET, "Права на получение маршрутов"),
+        new Permission(PermissionCodes.STORAGE_ROUTES_CREATE, "Права на создание маршрутов"),
+        new Permission(PermissionCodes.STORAGE_ROUTES_EDIT, "Права на редактирование маршрутов"),
+        new Permission(PermissionCodes.STORAGE_ROUTES_DELETE, "Права на удаление маршрутов")
     ];
 }
 

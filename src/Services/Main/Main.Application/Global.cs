@@ -4,7 +4,7 @@ namespace Main.Application;
 
 public static class Global
 {
-    public const int UsdId = 3;
+    public const int UsdId = 1;
     public static Guid SystemId { get; private set; } = Guid.Empty;
     public static string ImageBucketName { get; private set; } = "";
     public static string ServiceUrl { get; private set; } = "";

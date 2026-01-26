@@ -5,6 +5,7 @@ using Exceptions.Exceptions.Storages;
 using Main.Abstractions.Dtos.Amw.Storage;
 using Main.Application.Handlers.Storages.GetStorage;
 using Main.Application.Handlers.Storages.GetStorageByName;
+using Main.Enums;
 using Mapster;
 using MediatR;
 
@@ -18,9 +19,9 @@ public class GetStoragesEndPoint : ICarterModule
     public void AddRoutes(IEndpointRouteBuilder app)
     {
         app.MapGet("/storages/",
-                async (ISender sender, int page, int limit, string? searchTerm, CancellationToken token) =>
+                async (ISender sender, int page, int limit, string? searchTerm, StorageType? type, CancellationToken token) =>
                 {
-                    var query = new GetStoragesQuery(new PaginationModel(page, limit), searchTerm);
+                    var query = new GetStoragesQuery(new PaginationModel(page, limit), searchTerm, type);
                     var result = await sender.Send(query, token);
                     var response = result.Adapt<GetStoragesResponse>();
                     return Results.Ok(response);
