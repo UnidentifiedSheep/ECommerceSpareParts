@@ -16,12 +16,15 @@ using Main.Abstractions.Dtos.Amw.StorageRoutes;
 using Main.Abstractions.Dtos.Amw.Users;
 using Main.Abstractions.Dtos.Anonymous.Articles;
 using Main.Abstractions.Dtos.Anonymous.Producers;
+using Main.Abstractions.Dtos.ArticleSizes;
+using Main.Abstractions.Dtos.ArticleWeight;
 using Main.Abstractions.Dtos.Cart;
 using Main.Abstractions.Dtos.Emails;
 using Main.Abstractions.Dtos.Member.Vehicles;
 using Main.Abstractions.Dtos.Roles;
 using Main.Abstractions.Dtos.Services.Articles;
 using Main.Abstractions.Dtos.Users;
+using Main.Abstractions.Models;
 using Main.Application.Extensions;
 using Main.Application.Handlers.ArticlePairs.CreatePair;
 using Main.Application.Handlers.Currencies.CreateCurrency;
@@ -555,7 +558,8 @@ public static class MapsterConfig
             .Map(d => d.PriceKg, s => s.PriceKg)
             .Map(d => d.PricePerM3, s => s.PriceM3)
             .Map(d => d.PricePerOrder, s => s.PricePerOrder)
-            .Map(d => d.IsActive, s => false);
+            .Map(d => d.IsActive, s => false)
+            .Map(d => d.MinimumPrice, s => s.MinimumPrice);
         
         TypeAdapterConfig<StorageRoute, StorageRouteDto>.NewConfig()
             .IgnoreNonMapped(true)
@@ -572,7 +576,8 @@ public static class MapsterConfig
             .Map(d => d.IsActive, s => s.IsActive)
             .Map(d => d.CurrencyId, s => s.CurrencyId)
             .Map(d => d.CurrencySign, s => s.Currency.CurrencySign)
-            .Map(d => d.CurrencyName, s => s.Currency.Name);
+            .Map(d => d.CurrencyName, s => s.Currency.Name)
+            .Map(d => d.MinimumPrice, s => s.MinimumPrice);
         
         TypeAdapterConfig<PatchStorageRouteDto, StorageRoute>.NewConfig()
             .IgnorePatchIfNotSet()
@@ -584,6 +589,22 @@ public static class MapsterConfig
             .Map(d => d.PricePerM3, s => s.PricePerM3)
             .Map(d => d.PricePerOrder, s => s.PricePerOrder)
             .Map(d => d.IsActive, s => s.IsActive)
-            .Map(d => d.CurrencyId, s => s.CurrencyId);
+            .Map(d => d.CurrencyId, s => s.CurrencyId)
+            .Map(d => d.MinimumPrice, s => s.MinimumPrice);
+        
+        //Article weight
+        TypeAdapterConfig<ArticleWeight, ArticleWeightDto>.NewConfig()
+            .Map(d => d.ArticleId, s => s.ArticleId)
+            .Map(d => d.Weight, s => s.Weight)
+            .Map(d => d.Unit, s => s.Unit);
+        
+        //Artcile size
+        TypeAdapterConfig<ArticleSize, ArticleSizeDto>.NewConfig()
+            .Map(d => d.ArticleId, s => s.ArticleId)
+            .Map(d => d.Height, s => s.Height)
+            .Map(d => d.Width, s => s.Width)
+            .Map(d => d.Length, s => s.Length)
+            .Map(d => d.Unit, s => s.Unit)
+            .Map(d => d.VolumeM3, s => s.VolumeM3);
     }
 }

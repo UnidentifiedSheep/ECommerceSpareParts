@@ -11,7 +11,7 @@ public class ArticleCrossesRelatedData(ICache cache, TimeSpan? ttl = null) : Rel
 
     public override string GetRelatedDataKey(string id)
     {
-        return $"article-related-data:{id}";
+        return $"article-crosses-related-data:{id}";
     }
 
     public override async Task AddRelatedDataAsync(IEnumerable<string> ids, string relatedKey)

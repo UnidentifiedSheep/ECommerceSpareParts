@@ -2,8 +2,11 @@ namespace Application.Common.Interfaces;
 
 public interface ICacheableQuery
 {
-    HashSet<string> RelatedEntityIds { get; }
     string GetCacheKey();
-    Type GetRelatedType();
+    /// <summary>
+    /// Entity type used for cache dependency invalidation. null = no related tracking.
+    /// </summary>
+    /// <returns></returns>
+    Type? GetRelatedType();
     int GetDurationSeconds();
 }

@@ -23,4 +23,5 @@ public class PatchStorageRouteDto
 
     public PatchField<int> CurrencyId { get; set; } = PatchField<int>.NotSet();
 
+    public PatchField<decimal?> MinimumPrice { get; set; } = PatchField<decimal?>.NotSet();
 }

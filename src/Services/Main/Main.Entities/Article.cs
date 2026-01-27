@@ -35,7 +35,11 @@ public partial class Article
 
     public virtual ICollection<ArticleImage> ArticleImages { get; set; } = new List<ArticleImage>();
 
+    public virtual ArticleSize? ArticleSize { get; set; }
+
     public virtual ICollection<ArticleSupplierBuyInfo> ArticleSupplierBuyInfos { get; set; } = new List<ArticleSupplierBuyInfo>();
+
+    public virtual ArticleWeight? ArticleWeight { get; set; }
 
     public virtual ICollection<ArticlesContent> ArticlesContentInsideArticles { get; set; } = new List<ArticlesContent>();
 

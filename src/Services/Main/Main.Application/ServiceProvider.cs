@@ -68,6 +68,8 @@ public static class ServiceProvider
         collection.AddScoped<IRolePermissionService, RolePermissionService>();
         collection.AddSingleton<BaseSigner, JsonSigner>(_ => new JsonSigner(signSecret));
 
+        collection.AddScoped<IRelatedDataCollector, RelatedDataCollector>();
+
         collection.AddSingleton<IEmailValidator, EmailValidator>();
         collection.AddSingleton<IConcurrencyValidator<StorageContent>, StorageContentConcurrencyValidator>();
 

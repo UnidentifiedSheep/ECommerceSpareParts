@@ -26,7 +26,11 @@ public partial class DContext : DbContext
 
     public virtual DbSet<ArticleImage> ArticleImages { get; set; }
 
+    public virtual DbSet<ArticleSize> ArticleSizes { get; set; }
+
     public virtual DbSet<ArticleSupplierBuyInfo> ArticleSupplierBuyInfos { get; set; }
+
+    public virtual DbSet<ArticleWeight> ArticleWeights { get; set; }
 
     public virtual DbSet<ArticlesContent> ArticlesContents { get; set; }
 
@@ -300,6 +304,28 @@ public partial class DContext : DbContext
                 .HasConstraintName("article_id_fk");
         });
 
+        modelBuilder.Entity<ArticleSize>(entity =>
+        {
+            entity.HasKey(e => e.ArticleId).HasName("article_sizes_pk");
+
+            entity.ToTable("article_sizes");
+
+            entity.Property(e => e.ArticleId)
+                .ValueGeneratedNever()
+                .HasColumnName("article_id");
+            entity.Property(e => e.Height).HasColumnName("height");
+            entity.Property(e => e.Length).HasColumnName("length");
+            entity.Property(e => e.Unit)
+                .HasMaxLength(24)
+                .HasColumnName("unit");
+            entity.Property(e => e.VolumeM3).HasColumnName("volume_m3");
+            entity.Property(e => e.Width).HasColumnName("width");
+
+            entity.HasOne(d => d.Article).WithOne(p => p.ArticleSize)
+                .HasForeignKey<ArticleSize>(d => d.ArticleId)
+                .HasConstraintName("article_sizes_articles_id_fk");
+        });
+
         modelBuilder.Entity<ArticleSupplierBuyInfo>(entity =>
         {
             entity.HasKey(e => e.Id).HasName("article_supplier_buy_info_pk");
@@ -336,6 +362,25 @@ public partial class DContext : DbContext
             entity.HasOne(d => d.WhoProposedNavigation).WithMany(p => p.ArticleSupplierBuyInfos)
                 .HasForeignKey(d => d.WhoProposed)
                 .HasConstraintName("article_supplier_buy_info_users_id_fk");
+        });
+
+        modelBuilder.Entity<ArticleWeight>(entity =>
+        {
+            entity.HasKey(e => e.ArticleId).HasName("article_weight_pk");
+
+            entity.ToTable("article_weight");
+
+            entity.Property(e => e.ArticleId)
+                .ValueGeneratedNever()
+                .HasColumnName("article_id");
+            entity.Property(e => e.Unit)
+                .HasMaxLength(24)
+                .HasColumnName("unit");
+            entity.Property(e => e.Weight).HasColumnName("weight");
+
+            entity.HasOne(d => d.Article).WithOne(p => p.ArticleWeight)
+                .HasForeignKey<ArticleWeight>(d => d.ArticleId)
+                .HasConstraintName("article_weight_articles_id_fk");
         });
 
         modelBuilder.Entity<ArticlesContent>(entity =>
@@ -1410,6 +1455,7 @@ public partial class DContext : DbContext
             entity.Property(e => e.IsActive)
                 .HasDefaultValue(true)
                 .HasColumnName("is_active");
+            entity.Property(e => e.MinimumPrice).HasColumnName("minimum_price");
             entity.Property(e => e.PriceKg).HasColumnName("price_kg");
             entity.Property(e => e.PricePerM3).HasColumnName("price_per_m3");
             entity.Property(e => e.PricePerOrder).HasColumnName("price_per_order");

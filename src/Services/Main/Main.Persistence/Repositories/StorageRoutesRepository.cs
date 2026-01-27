@@ -10,13 +10,16 @@ namespace Main.Persistence.Repositories;
 public class StorageRoutesRepository(DContext context) : IStorageRoutesRepository
 {
     public async Task<StorageRoute?> GetStorageRouteAsync(string storageFrom, string storageTo, bool isActive, 
-        bool track = true, CancellationToken cancellationToken = default)
+        bool track = true, CancellationToken cancellationToken = default, params Expression<Func<StorageRoute,object>>[] includes)
     {
-        return await context.StorageRoutes
-            .ConfigureTracking(track)
-            .FirstOrDefaultAsync(x => x.FromStorageName == storageFrom 
-                                      && x.ToStorageName == storageTo 
-                                      && x.IsActive == isActive, cancellationToken);
+        var query = context.StorageRoutes
+            .ConfigureTracking(track);
+        foreach (var include in includes)
+            query = query.Include(include);
+        
+        return await query.FirstOrDefaultAsync(x => x.FromStorageName == storageFrom 
+                                                    && x.ToStorageName == storageTo 
+                                                    && x.IsActive == isActive, cancellationToken);
     }
     
     public async Task<StorageRoute?> GetStorageRouteAsync(Guid id, bool track = true, 

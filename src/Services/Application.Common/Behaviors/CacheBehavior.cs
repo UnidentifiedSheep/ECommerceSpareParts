@@ -5,14 +5,11 @@ using MediatR;
 
 namespace Application.Common.Behaviors;
 
-public class CacheBehavior<TRequest, TResponse>(
-    ICache cache,
-    IRelatedDataFactory relatedDataFactory)
-    : IPipelineBehavior<TRequest, TResponse>
-    where TRequest : IRequest<TResponse>
-    where TResponse : notnull
+public class CacheBehavior<TRequest, TResponse>(ICache cache, IRelatedDataFactory relatedDataFactory, 
+    IRelatedDataCollector relatedDataCollector) : IPipelineBehavior<TRequest, TResponse>
+    where TRequest : IRequest<TResponse> where TResponse : notnull
 {
-    public async Task<TResponse> Handle(TRequest request, RequestHandlerDelegate<TResponse> next,
+    public async Task<TResponse> Handle(TRequest request, RequestHandlerDelegate<TResponse> next, 
         CancellationToken cancellationToken)
     {
         if (request is not ICacheableQuery cacheable)
@@ -20,18 +17,28 @@ public class CacheBehavior<TRequest, TResponse>(
 
         var cacheKey = cacheable.GetCacheKey();
 
-        var cacheValue = await cache.StringGetAsync<TResponse>(cacheKey);
-        if (cacheValue != null)
-            return cacheValue;
-
-        var response = await next(cancellationToken);
+        var cached = await cache.StringGetAsync<TResponse>(cacheKey);
+        if (cached != null)
+            return cached;
 
         var duration = cacheable.GetDurationSeconds();
         var relatedType = cacheable.GetRelatedType();
-        var relatedDataRepository = relatedDataFactory.GetRepository(relatedType);
-        await relatedDataRepository.AddRelatedDataAsync(cacheable.RelatedEntityIds, cacheKey);
+
+        using var _ = relatedDataCollector.BeginScope();
+
+        var response = await next(cancellationToken);
+
+        if (relatedType != null)
+        {
+            var relatedRepo = relatedDataFactory.GetRepository(relatedType);
+            var ids = relatedDataCollector.CurrentIds;
+
+            if (ids.Count > 0)
+                await relatedRepo.AddRelatedDataAsync(ids, cacheKey);
+        }
 
         await cache.StringSetAsync(cacheKey, response, TimeSpan.FromSeconds(duration));
+
         return response;
     }
 }

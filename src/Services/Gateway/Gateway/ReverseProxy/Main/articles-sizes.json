@@ -1,0 +1,20 @@
+﻿{
+  "ReverseProxy": {
+    "Routes": {
+      "crud-article-size": {
+        "ClusterId": "main-cluster",
+        "Match": {
+          "Path": "/main/articles/{articleId}/sizes/",
+          "Methods": [
+            "POST", "PUT", "GET", "DELETE"
+          ]
+        },
+        "Transforms": [
+          {
+            "PathRemovePrefix": "/main"
+          }
+        ]
+      }
+    }
+  }
+}

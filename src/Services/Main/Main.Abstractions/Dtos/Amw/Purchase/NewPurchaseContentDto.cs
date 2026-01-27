@@ -6,4 +6,5 @@ public class NewPurchaseContentDto
     public int Count { get; set; }
     public decimal Price { get; set; }
     public string? Comment { get; set; }
+    public bool CalculateLogistics { get; set; }
 }

@@ -32,6 +32,8 @@ public partial class StorageRoute
     public bool IsActive { get; set; }
 
     public int CurrencyId { get; set; }
+    
+    public decimal? MinimumPrice { get; set; }
 
     public virtual Currency Currency { get; set; } = null!;
 

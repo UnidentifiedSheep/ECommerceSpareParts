@@ -36,6 +36,16 @@ public class PermissionSeed : ISeed<DContext>
         new(PermissionCodes.ARTICLES_DELETE, "Права на удаление артикула"),
         new(PermissionCodes.ARTICLES_GET_FULL, "Права на поиск артикулов (полная модель)"),
         new(PermissionCodes.ARTICLES_GET_MAIN, "Права на поиск артикулов (минимальная модель)"),
+        
+        new Permission(PermissionCodes.ARTICLE_SIZES_CREATE, "Права на установку размеров артикула"),
+        new Permission(PermissionCodes.ARTICLE_SIZES_GET, "Права на получение размеров артикула"),
+        new Permission(PermissionCodes.ARTICLE_SIZES_UPDATE, "Права на обновление размеров артикула"),
+        new Permission(PermissionCodes.ARTICLE_SIZES_DELETE, "Права на удаление размеров артикула"),
+        
+        new Permission(PermissionCodes.ARTICLE_WEIGHT_CREATE, "Права на установку веса артикула"),
+        new Permission(PermissionCodes.ARTICLE_WEIGHT_GET, "Права на получение веса артикула"),
+        new Permission(PermissionCodes.ARTICLE_WEIGHT_UPDATE, "Права на обновление веса артикула"),
+        new Permission(PermissionCodes.ARTICLE_WEIGHT_DELETE, "Права на удаление веса артикула"),
 
         new(PermissionCodes.PRODUCERS_CREATE, "Права на создание производителей"),
         new(PermissionCodes.PRODUCERS_EDIT, "Права на редактирование производителей"),

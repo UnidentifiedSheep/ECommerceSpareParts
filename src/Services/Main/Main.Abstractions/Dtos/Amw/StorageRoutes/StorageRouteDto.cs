@@ -18,4 +18,5 @@ public class StorageRouteDto
     public int CurrencyId { get; set; }
     public string CurrencyName { get; set; } = string.Empty;
     public string CurrencySign { get; set; } = string.Empty;
+    public decimal? MinimumPrice { get; set; }
 }

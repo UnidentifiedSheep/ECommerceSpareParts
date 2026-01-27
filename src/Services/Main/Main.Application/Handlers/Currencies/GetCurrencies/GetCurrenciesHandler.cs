@@ -10,7 +10,6 @@ namespace Main.Application.Handlers.Currencies.GetCurrencies;
 
 public record GetCurrenciesQuery(PaginationModel Pagination) : IQuery<GetCurrenciesResult>, ICacheableQuery
 {
-    public HashSet<string> RelatedEntityIds { get; } = [];
     public string GetCacheKey() => string.Format(CacheKeys.CurrenciesCacheKey, Pagination.Page, Pagination.Size);
     public Type GetRelatedType() => typeof(Currency);
     public int GetDurationSeconds() => 3600;
@@ -18,7 +17,8 @@ public record GetCurrenciesQuery(PaginationModel Pagination) : IQuery<GetCurrenc
 
 public record GetCurrenciesResult(IEnumerable<CurrencyDto> Currencies);
 
-public class GetCurrenciesHandler(ICurrencyRepository currencyRepository) : IQueryHandler<GetCurrenciesQuery, GetCurrenciesResult>
+public class GetCurrenciesHandler(ICurrencyRepository currencyRepository, IRelatedDataCollector relatedDataCollector) 
+    : IQueryHandler<GetCurrenciesQuery, GetCurrenciesResult>
 {
     public async Task<GetCurrenciesResult> Handle(GetCurrenciesQuery request, CancellationToken cancellationToken)
     {
@@ -26,7 +26,7 @@ public class GetCurrenciesHandler(ICurrencyRepository currencyRepository) : IQue
         var limit = request.Pagination.Size;
         var currencies = await currencyRepository.GetCurrencies(page, limit, false, cancellationToken);
 
-        request.RelatedEntityIds.UnionWith(currencies.Select(x => x.Id.ToString()));
+        relatedDataCollector.AddRange(currencies.Select(x => x.Id.ToString()));
 
         return new GetCurrenciesResult(currencies.Adapt<List<CurrencyDto>>());
     }

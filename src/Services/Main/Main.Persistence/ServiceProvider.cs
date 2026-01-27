@@ -1,8 +1,6 @@
-using System.Reflection;
 using BulkValidation.Pgsql.Extensions;
 using Core.Interfaces;
 using Core.Interfaces.Services;
-using Main.Abstractions.Interfaces;
 using Main.Abstractions.Interfaces.DbRepositories;
 using Main.Persistence.Context;
 using Main.Persistence.DataSeeds;
@@ -48,6 +46,8 @@ public static class ServiceProvider
         collection.AddScoped<ICartRepository, CartRepository>();
         collection.AddScoped<IStorageRoutesRepository, StorageRoutesRepository>();
         collection.AddScoped<IUserStorageRepository, UserStorageRepository>();
+        collection.AddScoped<IArticleWeightRepository, ArticleWeightRepository>();
+        collection.AddScoped<IArticleSizesRepository, ArticleSizesRepository>();
 
         collection.AddScoped<IUnitOfWork, UnitOfWork>();
         
