@@ -13,7 +13,7 @@ public class GetArticleSizeEndPoint : ICarterModule
 {
     public void AddRoutes(IEndpointRouteBuilder app)
     {
-        app.MapGet("/article/{id:int}/sizes", async (ISender sender, int id, CancellationToken token) =>
+        app.MapGet("/articles/{id:int}/sizes", async (ISender sender, int id, CancellationToken token) =>
         {
             var result = await sender.Send(new GetArticleSizeQuery(id), token);
             var response = new GetArticleSizeResponse(result.ArticleSize);
