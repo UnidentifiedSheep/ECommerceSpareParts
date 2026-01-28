@@ -29,6 +29,7 @@ public class SetArticleSizesHandler(IArticleSizesRepository sizesRepository, IUn
             await unitOfWork.AddAsync(sizes, cancellationToken);
         }
         
+        sizes.ArticleId = request.ArticleId;
         sizes.Unit = request.Unit;
         sizes.Height = height;
         sizes.Length = length;
