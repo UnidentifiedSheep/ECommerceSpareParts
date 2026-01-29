@@ -101,16 +101,4 @@ public class AddStorageRouteTests : IAsyncLifetime
         var exception = await Assert.ThrowsAsync<DbValidationException>(async () => await _mediator.Send(command));
         Assert.Contains(exception.Failures, f => f.ErrorName == ApplicationErrors.StoragesNotFound);
     }
-
-    [Fact]
-    public async Task AddStorageRoute_WithDuplicateRoute_ThrowsDbValidationException()
-    {
-        var command = new AddStorageRouteCommand(_storageFrom.Name, _storageTo.Name, 1000, RouteType.IntraCity,
-            LogisticPricingType.PerOrder, 60, 10.5m, 20.5m, _currency.Id, 5.0m, null);
-
-        await _mediator.Send(command);
-
-        var exception = await Assert.ThrowsAsync<DbValidationException>(async () => await _mediator.Send(command));
-        Assert.Contains(exception.Failures, f => f.ErrorName == ApplicationErrors.StorageRouteAlreadyExist);
-    }
 }

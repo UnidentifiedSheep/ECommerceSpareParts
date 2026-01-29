@@ -138,4 +138,7 @@ public enum PermissionCodes
     
     // ===== OPTIONS =====
     OPTIONS_GET,
+    
+    // ===== LOGISTICS =====
+    LOGISTICS_CALCULATE,
 }

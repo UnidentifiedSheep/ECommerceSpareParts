@@ -21,7 +21,7 @@ public class UpdateCurrenciesRatesHandler(
 {
     public async Task<Unit> Handle(UpdateCurrenciesRatesCommand request, CancellationToken cancellationToken)
     {
-        var currencies = (await currencyRepository.GetCurrencies([Global.UsdId], true, cancellationToken))
+        var currencies = (await currencyRepository.GetCurrencies([], true, cancellationToken))
             .ToList();
         var currencyCodes = currencies.Select(x => x.Code);
         var newRates = await exchange.GetRates(currencyCodes, "USD", cancellationToken);

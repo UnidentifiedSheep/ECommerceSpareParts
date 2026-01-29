@@ -1,11 +1,14 @@
-﻿using Main.Abstractions.Interfaces.Logistics;
-using Main.Abstractions.Models;
+﻿using Main.Abstractions.Models.Logistics;
 using Main.Enums;
 
 namespace Main.Application.Services.Logistics.PricingStrategies;
 
-public class NonePricing : ILogisticsPricingStrategy
+public class NonePricing : LogisticsPricingStrategyBase
 {
-    public LogisticPricingType Type => LogisticPricingType.None;
-    public decimal Calculate(LogisticsContext context) => 0;
+    public override LogisticPricingType Type => LogisticPricingType.None;
+
+    public override LogisticsCalcResult Calculate(LogisticsContext context, IEnumerable<LogisticsItem> items)
+    {
+        return Iterate(context, items, (_) => 0);
+    }
 }

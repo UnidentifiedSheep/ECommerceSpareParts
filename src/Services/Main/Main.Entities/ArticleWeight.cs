@@ -1,9 +1,11 @@
-﻿using Main.Enums;
+﻿using BulkValidation.Core.Attributes;
+using Main.Enums;
 
 namespace Main.Entities;
 
 public partial class ArticleWeight
 {
+    [Validate]
     public int ArticleId { get; set; }
 
     public decimal Weight { get; set; }

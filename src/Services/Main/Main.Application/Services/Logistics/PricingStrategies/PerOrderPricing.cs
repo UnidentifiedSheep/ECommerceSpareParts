@@ -1,11 +1,15 @@
-﻿using Main.Abstractions.Interfaces.Logistics;
-using Main.Abstractions.Models;
+﻿using Main.Abstractions.Models.Logistics;
 using Main.Enums;
 
 namespace Main.Application.Services.Logistics.PricingStrategies;
 
-public class PerOrderPricing : ILogisticsPricingStrategy
+public class PerOrderPricing : LogisticsPricingStrategyBase
 {
-    public LogisticPricingType Type => LogisticPricingType.PerOrder;
-    public decimal Calculate(LogisticsContext context) => context.PricePerOrder;
+    public override LogisticPricingType Type => LogisticPricingType.PerOrder;
+    public override LogisticsCalcResult Calculate(LogisticsContext context, IEnumerable<LogisticsItem> items)
+    {
+        var result = Iterate(context, items, _ => 0);
+        result.TotalCost = context.PricePerOrder;
+        return result;
+    }
 }

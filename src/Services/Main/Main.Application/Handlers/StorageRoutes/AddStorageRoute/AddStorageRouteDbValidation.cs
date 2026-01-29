@@ -9,7 +9,6 @@ public class AddStorageRouteDbValidation : AbstractDbValidation<AddStorageRouteC
     public override void Build(IValidationPlan plan, AddStorageRouteCommand request)
     {
         plan.ValidateStorageExistsName(request.StorageTo)
-            .ValidateStorageExistsName(request.StorageFrom)
-            .ValidateStorageRouteNotExistsFromTo((request.StorageFrom, request.StorageTo, true));
+            .ValidateStorageExistsName(request.StorageFrom);
     }
 }

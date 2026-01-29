@@ -1,4 +1,4 @@
-﻿using Main.Abstractions.Models;
+﻿using Main.Abstractions.Models.Logistics;
 using Main.Enums;
 
 namespace Main.Abstractions.Interfaces.Logistics;
@@ -6,5 +6,5 @@ namespace Main.Abstractions.Interfaces.Logistics;
 public interface ILogisticsPricingStrategy
 {
     LogisticPricingType Type { get; }
-    decimal Calculate(LogisticsContext context);
+    LogisticsCalcResult Calculate(LogisticsContext context, IEnumerable<LogisticsItem> items);
 }

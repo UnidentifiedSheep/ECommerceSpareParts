@@ -6,6 +6,7 @@ using Main.Abstractions.Dtos.Amw.ArticleCharacteristics;
 using Main.Abstractions.Dtos.Amw.ArticleReservations;
 using Main.Abstractions.Dtos.Amw.Articles;
 using Main.Abstractions.Dtos.Amw.Balances;
+using Main.Abstractions.Dtos.Amw.Logistics;
 using Main.Abstractions.Dtos.Amw.Markups;
 using Main.Abstractions.Dtos.Amw.Permissions;
 using Main.Abstractions.Dtos.Amw.Producers;
@@ -25,6 +26,7 @@ using Main.Abstractions.Dtos.Roles;
 using Main.Abstractions.Dtos.Services.Articles;
 using Main.Abstractions.Dtos.Users;
 using Main.Abstractions.Models;
+using Main.Abstractions.Models.Logistics;
 using Main.Application.Extensions;
 using Main.Application.Handlers.ArticlePairs.CreatePair;
 using Main.Application.Handlers.Currencies.CreateCurrency;
@@ -581,16 +583,16 @@ public static class MapsterConfig
         
         TypeAdapterConfig<PatchStorageRouteDto, StorageRoute>.NewConfig()
             .IgnorePatchIfNotSet()
-            .Map(d => d.DistanceM, s => s.DistanceM)
-            .Map(d => d.RouteType, s => s.RouteType)
-            .Map(d => d.PricingModel, s => s.PricingModel)
-            .Map(d => d.DeliveryTimeMinutes, s => s.DeliveryTimeMinutes)
-            .Map(d => d.PriceKg, s => s.PriceKg)
-            .Map(d => d.PricePerM3, s => s.PricePerM3)
-            .Map(d => d.PricePerOrder, s => s.PricePerOrder)
-            .Map(d => d.IsActive, s => s.IsActive)
-            .Map(d => d.CurrencyId, s => s.CurrencyId)
-            .Map(d => d.MinimumPrice, s => s.MinimumPrice);
+            .Map(d => d.DistanceM, s => s.DistanceM.Value)
+            .Map(d => d.RouteType, s => s.RouteType.Value)
+            .Map(d => d.PricingModel, s => s.PricingModel.Value)
+            .Map(d => d.DeliveryTimeMinutes, s => s.DeliveryTimeMinutes.Value)
+            .Map(d => d.PriceKg, s => s.PriceKg.Value)
+            .Map(d => d.PricePerM3, s => s.PricePerM3.Value)
+            .Map(d => d.PricePerOrder, s => s.PricePerOrder.Value)
+            .Map(d => d.IsActive, s => s.IsActive.Value)
+            .Map(d => d.CurrencyId, s => s.CurrencyId.Value)
+            .Map(d => d.MinimumPrice, s => s.MinimumPrice.Value);
         
         //Article weight
         TypeAdapterConfig<ArticleWeight, ArticleWeightDto>.NewConfig()
@@ -598,7 +600,7 @@ public static class MapsterConfig
             .Map(d => d.Weight, s => s.Weight)
             .Map(d => d.Unit, s => s.Unit);
         
-        //Artcile size
+        //Article size
         TypeAdapterConfig<ArticleSize, ArticleSizeDto>.NewConfig()
             .Map(d => d.ArticleId, s => s.ArticleId)
             .Map(d => d.Height, s => s.Height)
@@ -606,5 +608,28 @@ public static class MapsterConfig
             .Map(d => d.Length, s => s.Length)
             .Map(d => d.Unit, s => s.Unit)
             .Map(d => d.VolumeM3, s => s.VolumeM3);
+        
+        //Logistics
+        TypeAdapterConfig<LogisticsCalcItemResult, DeliveryCostItemDto>.NewConfig()
+            .Map(d => d.ArticleId, s => s.Id)
+            .Map(d => d.Quantity, s => s.Quantity)
+            .Map(d => d.Weight, s => s.Weight)
+            .Map(d => d.WeightPerItem, s => s.WeightPerItem)
+            .Map(d => d.WeightUnit, s => s.WeightUnit)
+            .Map(d => d.AreaM3, s => s.AreaM3)
+            .Map(d => d.AreaPerItem, s => s.AreaPerItem)
+            .Map(d => d.Cost, s => s.Cost)
+            .Map(d => d.Skipped, s => s.Skipped)
+            .Map(d => d.Reason, s => s.Reason);
+        
+        TypeAdapterConfig<LogisticsCalcResult, DeliveryCostDto>.NewConfig()
+            .Map(d => d.WeightUnit, s => s.WeightUnit)
+            .Map(d => d.TotalWeight, s => s.TotalWeight)
+            .Map(d => d.TotalAreaM3, s => s.TotalAreaM3)
+            .Map(d => d.Items, s => s.Items.Adapt<List<DeliveryCostItemDto>>())
+            .Map(d => d.TotalCost, s => s.TotalCost)
+            .Map(d => d.MinimalPrice, s => s.MinimalPrice)
+            .Map(d => d.MinimalPriceApplied, s => s.MinimalPriceApplied)
+            .Map(d => d.PricingModel, s=> s.PricingModel);
     }
 }

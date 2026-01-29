@@ -1,0 +1,20 @@
+﻿{
+  "ReverseProxy": {
+    "Routes": {
+      "logistics-calculate-route": {
+        "ClusterId": "main-cluster",
+        "Match": {
+          "Path": "/main/logistics/calculate",
+          "Methods": [
+            "POST"
+          ]
+        },
+        "Transforms": [
+          {
+            "PathRemovePrefix": "/main"
+          }
+        ]
+      }
+    }
+  }
+}

@@ -1,5 +1,5 @@
 ﻿using Main.Abstractions.Interfaces.Logistics;
-using Main.Abstractions.Models;
+using Main.Abstractions.Models.Logistics;
 using Main.Enums;
 
 namespace Main.Application.Services.Logistics;
@@ -13,16 +13,30 @@ public class LogisticsCostService : ILogisticsCostService
         _strategies = strategies.ToDictionary(x => x.Type);
     }
 
-    public decimal Calculate(LogisticPricingType type, LogisticsContext context)
+    /// <summary>
+    /// If base price is less than minimal price, set base price to minimal price.
+    /// </summary>
+    /// <param name="basePrice"></param>
+    /// <param name="minimalPrice"></param>
+    /// <returns>true if minimal price applied</returns>
+    private bool WithMinimalPrice(ref decimal basePrice, decimal? minimalPrice)
     {
-        decimal calculatedPrice = _strategies[type].Calculate(context);
-        WithMinimalPrice(ref calculatedPrice, context.MinimumPrice);
-        
-        
-        return calculatedPrice;
+        if (!minimalPrice.HasValue || basePrice >= minimalPrice.Value) return false;
+        basePrice = minimalPrice.Value;
+        return true;
     }
 
+    public LogisticsCalcResult Calculate(LogisticPricingType type, LogisticsContext context, 
+        IEnumerable<LogisticsItem> items)
+    {
+        var result = _strategies[type].Calculate(context, items);
+        var totalCost = result.TotalCost;
+        
+        if (!WithMinimalPrice(ref totalCost, context.MinimumPrice)) return result;
+        
+        result.TotalCost = totalCost;
+        result.MinimalPriceApplied = true;
 
-    private void WithMinimalPrice(ref decimal basePrice, decimal? minimalPrice) =>
-        basePrice = Math.Max(basePrice, minimalPrice ?? 0);
+        return result;
+    }
 }

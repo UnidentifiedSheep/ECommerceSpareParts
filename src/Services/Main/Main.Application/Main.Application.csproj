@@ -16,6 +16,7 @@
     </ItemGroup>
 
     <ItemGroup>
+        <Folder Include="Handlers\Logistics\" />
         <Folder Include="Handlers\StorageRoutes\DeleteStorageRoute\" />
     </ItemGroup>
 
