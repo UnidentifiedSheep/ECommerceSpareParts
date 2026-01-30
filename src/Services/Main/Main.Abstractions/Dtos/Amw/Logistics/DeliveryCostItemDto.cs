@@ -13,6 +13,6 @@ public class DeliveryCostItemDto
     public decimal WeightPerItem { get; set; }
     public WeightUnit WeightUnit { get; set; }
     public bool Skipped { get; set; }
-    public string? Reason { get; set; }
+    public IEnumerable<string>? Reasons { get; set; }
 
 }

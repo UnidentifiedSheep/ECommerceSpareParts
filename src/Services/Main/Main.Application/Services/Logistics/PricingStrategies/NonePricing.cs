@@ -9,6 +9,6 @@ public class NonePricing : LogisticsPricingStrategyBase
 
     public override LogisticsCalcResult Calculate(LogisticsContext context, IEnumerable<LogisticsItem> items)
     {
-        return Iterate(context, items, (_) => 0);
+        return Iterate(context, items, (_) => 0, LogisticsDataRequirements.None);
     }
 }

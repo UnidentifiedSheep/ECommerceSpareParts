@@ -620,7 +620,7 @@ public static class MapsterConfig
             .Map(d => d.AreaPerItem, s => s.AreaPerItem)
             .Map(d => d.Cost, s => s.Cost)
             .Map(d => d.Skipped, s => s.Skipped)
-            .Map(d => d.Reason, s => s.Reason);
+            .Map(d => d.Reasons, s => s.Reasons);
         
         TypeAdapterConfig<LogisticsCalcResult, DeliveryCostDto>.NewConfig()
             .Map(d => d.WeightUnit, s => s.WeightUnit)

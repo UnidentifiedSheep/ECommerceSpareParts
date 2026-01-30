@@ -9,6 +9,7 @@ public abstract class LogisticsPricingStrategyBase : ILogisticsPricingStrategy
 {
     public abstract LogisticPricingType Type { get; }
     public abstract LogisticsCalcResult Calculate(LogisticsContext context, IEnumerable<LogisticsItem> items);
+
     /// <summary>
     /// Выполняет итерацию по позициям логистики и рассчитывает стоимость каждой позиции.
     /// </summary>
@@ -22,6 +23,7 @@ public abstract class LogisticsPricingStrategyBase : ILogisticsPricingStrategy
     /// Функция, которая рассчитывает стоимость для одной позиции.
     /// Возвращает стоимость позиции в базовой валюте.
     /// </param>
+    /// <param name="requirements">Флаг показывающий какие данные нужны для расчета стоимости</param>
     /// <returns>
     /// <see cref="LogisticsCalcResult"/> - результат расчета
     /// </returns>
@@ -38,7 +40,7 @@ public abstract class LogisticsPricingStrategyBase : ILogisticsPricingStrategy
     /// </code>
     /// </example>
     protected LogisticsCalcResult Iterate(LogisticsContext context, IEnumerable<LogisticsItem> items, 
-        Func<LogisticsChargeInput, decimal> calculateCost)
+        Func<LogisticsChargeInput, decimal> calculateCost, LogisticsDataRequirements requirements)
     {
         var resultItems = new List<LogisticsCalcItemResult>();
         var result = new LogisticsCalcResult
@@ -54,17 +56,26 @@ public abstract class LogisticsPricingStrategyBase : ILogisticsPricingStrategy
         
         foreach (var item in items)
         {
-            var (skipped, reason) = Validate(item);
-            
+            if (item.Quantity <= 0) throw new ArgumentException("Количество должно быть больше или равно 0.");
             var weightPerItem = item.Weight.ToKg(item.WeightUnit);
             var weight =  weightPerItem * item.Quantity;
             var area = item.AreaM3 * item.Quantity;
+            
+            var (skipped, reason) = ValidatePerItemData(weightPerItem, item.AreaM3, requirements);
+
+            if (skipped)
+            {
+                resultItems.Add(new LogisticsCalcItemResult(item.Id, 0, item.Quantity, area, item.AreaM3, weight, 
+                    weightPerItem, WeightUnit.Kilogram, skipped, reason));
+                continue;
+            }
+            
             totalWeight += weight;
             totalArea += area;
             
             decimal cost = Math.Round(calculateCost(new LogisticsChargeInput(area, weight, item.Quantity)), 2);
 
-            if (cost < 0) throw new ArgumentException("Cost must be greater or equal to 0");
+            if (cost < 0) throw new ArgumentException("Цена должна быть больше или равна 0");
             
             accumulatedCost += cost;
             resultItems.Add(new LogisticsCalcItemResult(item.Id, cost, item.Quantity, area, item.AreaM3, weight, 
@@ -80,14 +91,22 @@ public abstract class LogisticsPricingStrategyBase : ILogisticsPricingStrategy
         return result;
     }
 
-    private static (bool skipped, string? reason) Validate(LogisticsItem item)
+    private static (bool skipped, IEnumerable<string>? reason) ValidatePerItemData(decimal weight, decimal area, 
+        LogisticsDataRequirements requirements)
     {
-        var reason = new List<string>(3);
-        if (item.Quantity <= 0) reason.Add("Количество должно быть больше 0");
-        if (item.Weight <= 0) reason.Add("Вес должен быть больше 0");
-        if (item.AreaM3 <= 0) reason.Add("Площадь должна быть больше 0");
-        return reason.Count > 0 
-            ? (true, string.Join('\n', reason))
+        if (weight < 0) throw new ArgumentException("Вес должно быть больше или равно 0.");
+        if (area < 0) throw new ArgumentException("Площадь должно быть больше или равно 0.");
+        
+        var reasons = new List<string>(2);
+        
+        if (requirements.HasFlag(LogisticsDataRequirements.Weight) && weight == 0)
+            reasons.Add("Вес должен быть больше 0");
+
+        if (requirements.HasFlag(LogisticsDataRequirements.Size) && area == 0)
+            reasons.Add("Площадь должна быть больше 0");
+
+        return reasons.Count > 0
+            ? (true, reasons)
             : (false, null);
     }
 }

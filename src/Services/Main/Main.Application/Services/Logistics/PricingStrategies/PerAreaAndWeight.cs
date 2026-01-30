@@ -8,7 +8,8 @@ public class PerAreaAndWeight : LogisticsPricingStrategyBase
     public override LogisticPricingType Type => LogisticPricingType.PerAreaAndWeight;
     public override LogisticsCalcResult Calculate(LogisticsContext context, IEnumerable<LogisticsItem> items)
     {
-        return Iterate(context, items, input => CalculatePrice(input.AreaM3, input.WeightKg, context));
+        return Iterate(context, items, input => CalculatePrice(input.AreaM3, input.WeightKg, context), 
+            LogisticsDataRequirements.Size | LogisticsDataRequirements.Weight);
     }
 
     private decimal CalculatePrice(decimal area, decimal weight, LogisticsContext context)

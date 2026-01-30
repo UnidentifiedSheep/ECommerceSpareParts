@@ -8,7 +8,8 @@ public class PerAreaPricing : LogisticsPricingStrategyBase
     public override LogisticPricingType Type => LogisticPricingType.PerArea;
     public override LogisticsCalcResult Calculate(LogisticsContext context, IEnumerable<LogisticsItem> items)
     {
-        return Iterate(context, items, input => CalculatePrice(input.AreaM3, context));
+        return Iterate(context, items, input => CalculatePrice(input.AreaM3, context),
+            LogisticsDataRequirements.Size);
     }
 
     private decimal CalculatePrice(decimal area, LogisticsContext context)

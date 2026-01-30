@@ -43,7 +43,7 @@ public class PerWeightPricingTests
         var result = _strategy.Calculate(context, items);
 
         Assert.True(result.Items[0].Skipped);
-        Assert.Contains("Вес должен быть больше 0", result.Items[0].Reason!);
+        Assert.Contains("Вес должен быть больше 0", result.Items[0].Reasons!);
         Assert.Equal(0m, result.TotalCost);
     }
 }
