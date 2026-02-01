@@ -41,4 +41,6 @@ public static class ApplicationErrors
     
     public const string StorageOwnerAlreadyExist = "StorageOwnerAlreadyExist";
     public const string StorageOwnerNotFound = "StorageOwnerNotFound";
+    
+    public const string StorageContentNotFound = "StorageContentNotFound";
 }

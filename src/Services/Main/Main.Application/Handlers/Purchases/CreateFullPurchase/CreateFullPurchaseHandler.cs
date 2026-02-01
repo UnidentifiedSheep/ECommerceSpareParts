@@ -48,11 +48,13 @@ public class CreateFullPurchaseHandler(IMediator mediator) : ICommandHandler<Cre
 
         var transaction = await CreateTransaction(supplierId, Global.SystemId, totalSum, TransactionStatus.Purchase,
             currencyId, whoCreated, dateTime, cancellationToken);
+        
+        var storageContents = await AddContentToStorage(content, storageName, whoCreated, 
+            currencyId, dateTime, cancellationToken);
 
-        var purchase = await CreatePurchase(content, currencyId, request.Comment, supplierId, whoCreated, transaction.Id, storageName,
-            dateTime, cancellationToken);
+        var purchase = await CreatePurchase(content, storageContents, currencyId, request.Comment, supplierId, 
+            whoCreated, transaction.Id, storageName, dateTime, cancellationToken);
 
-        await AddContentToStorage(content, storageName, whoCreated, currencyId, dateTime, cancellationToken);
 
         if (payedSum > 0)
             await CreateTransaction(Global.SystemId, supplierId, payedSum, TransactionStatus.Normal, currencyId,
@@ -133,17 +135,21 @@ public class CreateFullPurchaseHandler(IMediator mediator) : ICommandHandler<Cre
         return (await mediator.Send(command, cancellationToken)).Transaction;
     }
 
-    private async Task<Purchase> CreatePurchase(List<NewPurchaseContentDto> content, int currencyId, string? comment,
+    private async Task<Purchase> CreatePurchase(List<NewPurchaseContentDto> content, 
+        List<StorageContentDto> storageContents, int currencyId, string? comment,
         Guid supplierId, Guid whoCreated, Guid transactionId, string storageName, DateTime dateTime,
         CancellationToken cancellationToken = default)
     {
-        var command = new CreatePurchaseCommand(content, currencyId, comment, whoCreated, transactionId, storageName,
-            supplierId, dateTime);
+        for (int i = 0; i < storageContents.Count; i++)
+            content[i].StorageContentId = storageContents[i].Id;
+        
+        var command = new CreatePurchaseCommand(content, currencyId, comment, whoCreated, transactionId, 
+            storageName, supplierId, dateTime);
         var result = await mediator.Send(command, cancellationToken);
         return result.Purchase;
     }
 
-    private async Task AddContentToStorage(List<NewPurchaseContentDto> content, string storageName, Guid userId,
+    private async Task<List<StorageContentDto>> AddContentToStorage(List<NewPurchaseContentDto> content, string storageName, Guid userId,
         int currencyId, DateTime purchaseDate, CancellationToken cancellationToken = default)
     {
         var storageContents = content.Select(x =>
@@ -154,6 +160,7 @@ public class CreateFullPurchaseHandler(IMediator mediator) : ICommandHandler<Cre
             return temp;
         });
         var command = new AddContentCommand(storageContents, storageName, userId, StorageMovementType.Purchase);
-        await mediator.Send(command, cancellationToken);
+        var result = await mediator.Send(command, cancellationToken);
+        return result.StorageContents;
     }
 }

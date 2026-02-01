@@ -9,8 +9,8 @@ using Mapster;
 namespace Main.Application.Handlers.Purchases.CreatePurchase;
 
 [Transactional]
-public record CreatePurchaseCommand(IEnumerable<NewPurchaseContentDto> Content, int CurrencyId, string? Comment,
-    Guid CreatedUserId, Guid TransactionId, string StorageName, Guid SupplierId,
+public record CreatePurchaseCommand(IEnumerable<NewPurchaseContentDto> Content, 
+    int CurrencyId, string? Comment, Guid CreatedUserId, Guid TransactionId, string StorageName, Guid SupplierId,
     DateTime PurchaseDateTime) : ICommand<CreatePurchaseResult>;
 
 public record CreatePurchaseResult(Purchase Purchase);

@@ -2,8 +2,10 @@
 using Main.Abstractions.Consts;
 using Main.Application.Handlers.Purchases.CreatePurchase;
 using Main.Abstractions.Dtos.Amw.Purchase;
+using Main.Abstractions.Dtos.Amw.Storage;
 using Main.Entities;
 using Main.Persistence.Context;
+using Mapster;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
@@ -24,6 +26,7 @@ public class CreatePurchaseTests : IAsyncLifetime
     private Transaction _transaction = null!;
     private User _user = null!;
     private Article _article = null!;
+    private StorageContentDto _storageContent = null!;
 
     public CreatePurchaseTests(CombinedContainerFixture fixture)
     {
@@ -45,9 +48,12 @@ public class CreatePurchaseTests : IAsyncLifetime
         _article = await _context.Articles.FirstAsync();
         _currency = await _context.Currencies.FirstAsync();
 
+        await _mediator.AddMockStorageContents([_article.Id], _currency.Id, _storage.Name, _user.Id);
+            
         var receiver = await _context.Users.FirstAsync(x => x.Id != _user.Id);
         await _mediator.AddMockTransaction(_user.Id, receiver.Id, _user.Id, 1000m);
         _transaction = await _context.Transactions.FirstAsync();
+        _storageContent = (await _context.StorageContents.FirstAsync()).Adapt<StorageContentDto>();
     }
 
     public async Task DisposeAsync()
@@ -64,7 +70,8 @@ public class CreatePurchaseTests : IAsyncLifetime
             {
                 ArticleId = _article.Id,
                 Count = 10,
-                Price = 100.50m
+                Price = 100.50m,
+                StorageContentId = _storageContent.Id
             }
         };
 
@@ -100,7 +107,8 @@ public class CreatePurchaseTests : IAsyncLifetime
             {
                 ArticleId = _article.Id,
                 Count = 10,
-                Price = price
+                Price = price,
+                StorageContentId = _storageContent.Id
             }
         };
 
@@ -121,7 +129,8 @@ public class CreatePurchaseTests : IAsyncLifetime
             {
                 ArticleId = _article.Id,
                 Count = count,
-                Price = 100.50m
+                Price = 100.50m,
+                StorageContentId = _storageContent.Id
             }
         };
 
@@ -140,7 +149,8 @@ public class CreatePurchaseTests : IAsyncLifetime
             {
                 ArticleId = _article.Id,
                 Count = 10,
-                Price = 100.50m
+                Price = 100.50m,
+                StorageContentId = _storageContent.Id
             }
         };
 
@@ -160,7 +170,8 @@ public class CreatePurchaseTests : IAsyncLifetime
             {
                 ArticleId = 999999,
                 Count = 10,
-                Price = 100.50m
+                Price = 100.50m,
+                StorageContentId = _storageContent.Id
             }
         };
 

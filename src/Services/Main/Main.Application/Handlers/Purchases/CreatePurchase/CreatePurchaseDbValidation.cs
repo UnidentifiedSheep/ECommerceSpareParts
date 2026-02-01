@@ -14,5 +14,12 @@ public class CreatePurchaseDbValidation : AbstractDbValidation<CreatePurchaseCom
             .ValidateTransactionExistsId(request.TransactionId)
             .ValidateStorageExistsName(request.StorageName)
             .ValidateArticleExistsId(request.Content.Select(x => x.ArticleId).ToHashSet());
+        
+        var storageContentIds = request.Content
+            .Where(x => x.StorageContentId != null)
+            .Select(x => x.StorageContentId!.Value).ToHashSet();
+
+        if (storageContentIds.Count > 0)
+            plan.ValidateStorageContentExistsId(storageContentIds);
     }
 }

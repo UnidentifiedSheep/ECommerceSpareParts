@@ -17,13 +17,15 @@ namespace Main.Application.Handlers.StorageContents.AddContent;
 
 [Transactional(IsolationLevel.Serializable, 20, 2)]
 public record AddContentCommand(IEnumerable<NewStorageContentDto> StorageContent, string StorageName,
-    Guid UserId, StorageMovementType MovementType) : ICommand;
+    Guid UserId, StorageMovementType MovementType) : ICommand<AddContentResult>;
+
+public record AddContentResult(List<StorageContentDto> StorageContents);
 
 public class AddContentHandler(IArticlesRepository articlesRepository, IUnitOfWork unitOfWork,
     ICurrencyConverter currencyConverter, IArticlesService articlesService,
-    IMediator mediator) : ICommandHandler<AddContentCommand>
+    IMediator mediator) : ICommandHandler<AddContentCommand, AddContentResult>
 {
-    public async Task<Unit> Handle(AddContentCommand request, CancellationToken cancellationToken)
+    public async Task<AddContentResult> Handle(AddContentCommand request, CancellationToken cancellationToken)
     {
         var articleIds = request.StorageContent.Select(x => x.ArticleId).ToHashSet();
 
@@ -56,6 +58,6 @@ public class AddContentHandler(IArticlesRepository articlesRepository, IUnitOfWo
 
         await mediator.Publish(new ArticlesUpdatedNotification(articleIds), cancellationToken);
         await mediator.Publish(new ArticlePricesUpdatedNotification(articleIds), cancellationToken);
-        return Unit.Value;
+        return new AddContentResult(storageContents.Adapt<List<StorageContentDto>>());
     }
 }

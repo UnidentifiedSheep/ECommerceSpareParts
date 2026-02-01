@@ -924,8 +924,8 @@ public partial class DContext : DbContext
                 .HasForeignKey(d => d.PurchaseId)
                 .HasConstraintName("purchase_content_purchase_id_fk");
 
-            entity.HasOne(d => d.StorageContent).WithMany(p => p.PurchaseContents)
-                .HasForeignKey(d => d.StorageContentId)
+            entity.HasOne(d => d.StorageContent).WithOne(p => p.PurchaseContent)
+                .HasForeignKey<PurchaseContent>(d => d.StorageContentId)
                 .OnDelete(DeleteBehavior.SetNull)
                 .HasConstraintName("purchase_content_storage_content_id_fk");
         });

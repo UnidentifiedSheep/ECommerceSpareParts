@@ -5,8 +5,7 @@ namespace Main.Abstractions.Interfaces.DbRepositories;
 public interface IStorageContentRepository
 {
     Task<Dictionary<int, List<decimal>>> GetHighestBuyPrices(IEnumerable<int> articleIds, int takePerArticle,
-        bool calcWhereZero = false,
-        CancellationToken cancellationToken = default);
+        bool calcWhereZero = false, CancellationToken cancellationToken = default);
 
     Task<IEnumerable<StorageContent>> GetStorageContentsForUpdate(IEnumerable<int> ids, bool track = true,
         CancellationToken cancellationToken = default);

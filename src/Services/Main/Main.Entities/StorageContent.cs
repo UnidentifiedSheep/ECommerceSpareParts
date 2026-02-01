@@ -1,7 +1,10 @@
-﻿namespace Main.Entities;
+﻿using BulkValidation.Core.Attributes;
+
+namespace Main.Entities;
 
 public partial class StorageContent
 {
+    [Validate]
     public int Id { get; set; }
 
     public string StorageName { get; set; } = null!;
@@ -24,7 +27,7 @@ public partial class StorageContent
 
     public virtual Currency Currency { get; set; } = null!;
 
-    public virtual ICollection<PurchaseContent> PurchaseContents { get; set; } = new List<PurchaseContent>();
+    public virtual PurchaseContent? PurchaseContent { get; set; }
 
     public virtual ICollection<SaleContentDetail> SaleContentDetails { get; set; } = new List<SaleContentDetail>();
 

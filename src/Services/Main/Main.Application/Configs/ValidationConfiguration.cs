@@ -26,6 +26,22 @@ public static class ValidationConfiguration
         ConfigureCart();
         ConfigureStorageRoutes();
         ConfigureStorageOwners();
+        ConfigureStorageContents();
+    }
+
+    private static void ConfigureStorageContents()
+    {
+        ConfigureDbValidation.AddConfig(ValidationFunctions.ValidateStorageContentExistsId, KeyValueType.Single,
+            config => config.WithErrorName(ApplicationErrors.StorageContentNotFound)
+                .WithMessageTemplate("Не удалось найти позицию на складе.")
+                .WithErrorType(typeof(NotFoundException))
+                .WithErrorCode((int)HttpStatusCode.NotFound));
+        
+        ConfigureDbValidation.AddConfig(ValidationFunctions.ValidateStorageContentExistsId, KeyValueType.MultipleKeys,
+            config => config.WithErrorName(ApplicationErrors.StorageContentNotFound)
+                .WithMessageTemplate("Не удалось найти позицию на складе.")
+                .WithErrorType(typeof(NotFoundException))
+                .WithErrorCode((int)HttpStatusCode.NotFound));
     }
 
     private static void ConfigureStorageOwners()

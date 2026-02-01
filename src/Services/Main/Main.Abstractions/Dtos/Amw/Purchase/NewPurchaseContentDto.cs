@@ -7,4 +7,5 @@ public class NewPurchaseContentDto
     public decimal Price { get; set; }
     public string? Comment { get; set; }
     public bool CalculateLogistics { get; set; }
+    public int? StorageContentId { get; set; }
 }

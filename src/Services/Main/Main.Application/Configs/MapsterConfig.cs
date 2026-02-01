@@ -74,7 +74,8 @@ public static class MapsterConfig
             .Map(dest => dest.Count, src => src.Count)
             .Map(dest => dest.Price, src => src.Price)
             .Map(dest => dest.TotalSum, src => src.Price * src.Count)
-            .Map(dest => dest.Comment, src => src.Comment);
+            .Map(dest => dest.Comment, src => src.Comment)
+            .Map(d => d.StorageContentId, s => s.StorageContentId);
 
         TypeAdapterConfig<NewPurchaseContentDto, NewStorageContentDto>.NewConfig()
             .Map(dest => dest.ArticleId, src => src.ArticleId)

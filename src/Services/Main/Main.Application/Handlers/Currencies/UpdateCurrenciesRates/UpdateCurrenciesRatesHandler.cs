@@ -24,7 +24,8 @@ public class UpdateCurrenciesRatesHandler(
         var currencies = (await currencyRepository.GetCurrencies([], true, cancellationToken))
             .ToList();
         var currencyCodes = currencies.Select(x => x.Code);
-        var newRates = await exchange.GetRates(currencyCodes, "USD", cancellationToken);
+        var usd = currencies.First(x => x.Id == Global.UsdId);
+        var newRates = await exchange.GetRates(currencyCodes, usd.Code, cancellationToken);
 
         var historyToAdd = new List<CurrencyHistory>();
         var rates = new Dictionary<int, decimal>();
