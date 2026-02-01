@@ -9,7 +9,7 @@ namespace Main.Api.EndPoints.StorageRoutes;
 
 public record AddStorageRouteRequest(string StorageFrom, string StorageTo, int Distance, RouteType RouteType, 
     LogisticPricingType PricingType, int DeliveryTime, decimal PriceKg, decimal PriceM3, int CurrencyId,
-    decimal PricePerOrder, decimal? MinimumPrice);
+    decimal PricePerOrder, decimal? MinimumPrice, Guid? CarrierId);
 public record AddStorageRouteResponse(Guid RouteId);
 
 public class AddStorageRouteEndPoint : ICarterModule

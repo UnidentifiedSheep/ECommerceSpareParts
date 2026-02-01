@@ -17,11 +17,11 @@ public class EditStorageHandler(IStoragesRepository repository, IUnitOfWork unit
 {
     public async Task<Unit> Handle(EditStorageCommand request, CancellationToken cancellationToken)
     {
-        var storage = await repository.GetStorageAsync(request.StorageName, cancellationToken: cancellationToken,
-                          includes: x => x.Owners)
+        var storage = await repository.GetStorageAsync(request.StorageName, true, cancellationToken,
+                          x => x.StorageOwners)
                       ?? throw new StorageNotFoundException(request.StorageName);
         var editType = request.EditStorage.Type;
-        if (editType.IsSet &&  storage.Type != editType.Value && storage.Owners.Count > 0)
+        if (editType.IsSet &&  storage.Type != editType.Value && storage.StorageOwners.Count > 0)
             throw new ChangeOfStorageTypeRestrictedException("Присутствуют владельцы склада");
         
         request.EditStorage.Adapt(storage);

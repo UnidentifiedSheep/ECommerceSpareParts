@@ -1,6 +1,6 @@
-﻿namespace Main.Entities;
+﻿namespace Main.Abstractions.Dtos.Amw.Purchase;
 
-public partial class PurchaseContentLogistic
+public class PurchaseContentLogisticDto
 {
     public int PurchaseContentId { get; set; }
 
@@ -9,6 +9,4 @@ public partial class PurchaseContentLogistic
     public decimal AreaM3 { get; set; }
 
     public decimal Price { get; set; }
-
-    public virtual PurchaseContent PurchaseContent { get; set; } = null!;
 }

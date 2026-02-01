@@ -90,6 +90,8 @@ public partial class DContext : DbContext
 
     public virtual DbSet<StorageMovement> StorageMovements { get; set; }
 
+    public virtual DbSet<StorageOwner> StorageOwners { get; set; }
+
     public virtual DbSet<StorageRoute> StorageRoutes { get; set; }
 
     public virtual DbSet<Transaction> Transactions { get; set; }
@@ -937,9 +939,9 @@ public partial class DContext : DbContext
             entity.Property(e => e.PurchaseContentId)
                 .ValueGeneratedNever()
                 .HasColumnName("purchase_content_id");
-            entity.Property(e => e.AreaCm3).HasColumnName("area_cm3");
+            entity.Property(e => e.AreaM3).HasColumnName("area_m3");
             entity.Property(e => e.Price).HasColumnName("price");
-            entity.Property(e => e.WeightG).HasColumnName("weight_g");
+            entity.Property(e => e.WeightKg).HasColumnName("weight_kg");
 
             entity.HasOne(d => d.PurchaseContent).WithOne(p => p.PurchaseContentLogistic)
                 .HasForeignKey<PurchaseContentLogistic>(d => d.PurchaseContentId)
@@ -960,6 +962,11 @@ public partial class DContext : DbContext
 
             entity.Property(e => e.PurchaseId).HasColumnName("purchase_id");
             entity.Property(e => e.CurrencyId).HasColumnName("currency_id");
+            entity.Property(e => e.MinimumPrice).HasColumnName("minimum_price");
+            entity.Property(e => e.MinimumPriceApplied).HasColumnName("minimum_price_applied");
+            entity.Property(e => e.PriceKg).HasColumnName("price_kg");
+            entity.Property(e => e.PricePerM3).HasColumnName("price_per_m3");
+            entity.Property(e => e.PricePerOrder).HasColumnName("price_per_order");
             entity.Property(e => e.PricingModel)
                 .HasMaxLength(24)
                 .HasColumnName("pricing_model");
@@ -1224,26 +1231,6 @@ public partial class DContext : DbContext
             entity.Property(e => e.Type)
                 .HasMaxLength(24)
                 .HasColumnName("type");
-
-            entity.HasMany(d => d.Owners).WithMany(p => p.StorageNames)
-                .UsingEntity<Dictionary<string, object>>(
-                    "StorageOwner",
-                    r => r.HasOne<User>().WithMany()
-                        .HasForeignKey("OwnerId")
-                        .HasConstraintName("storage_owners_users_id_fk"),
-                    l => l.HasOne<Storage>().WithMany()
-                        .HasForeignKey("StorageName")
-                        .HasConstraintName("storage_owners_storages_name_fk"),
-                    j =>
-                    {
-                        j.HasKey("StorageName", "OwnerId").HasName("storage_owners_pk");
-                        j.ToTable("storage_owners");
-                        j.HasIndex(new[] { "OwnerId" }, "storage_owners_owner_id_index");
-                        j.IndexerProperty<string>("StorageName")
-                            .HasMaxLength(128)
-                            .HasColumnName("storage_name");
-                        j.IndexerProperty<Guid>("OwnerId").HasColumnName("owner_id");
-                    });
         });
 
         modelBuilder.Entity<StorageContent>(entity =>
@@ -1431,6 +1418,31 @@ public partial class DContext : DbContext
                 .HasConstraintName("storage_movement_users_id_fk");
         });
 
+        modelBuilder.Entity<StorageOwner>(entity =>
+        {
+            entity.HasKey(e => new { e.StorageName, e.OwnerId }).HasName("storage_owners_pk");
+
+            entity.ToTable("storage_owners");
+
+            entity.HasIndex(e => e.OwnerId, "storage_owners_owner_id_index");
+
+            entity.Property(e => e.StorageName)
+                .HasMaxLength(128)
+                .HasColumnName("storage_name");
+            entity.Property(e => e.OwnerId).HasColumnName("owner_id");
+            entity.Property(e => e.CreatedAt)
+                .HasDefaultValueSql("now()")
+                .HasColumnName("created_at");
+
+            entity.HasOne(d => d.Owner).WithMany(p => p.StorageOwners)
+                .HasForeignKey(d => d.OwnerId)
+                .HasConstraintName("storage_owners_users_id_fk");
+
+            entity.HasOne(d => d.StorageNameNavigation).WithMany(p => p.StorageOwners)
+                .HasForeignKey(d => d.StorageName)
+                .HasConstraintName("storage_owners_storages_name_fk");
+        });
+
         modelBuilder.Entity<StorageRoute>(entity =>
         {
             entity.HasKey(e => e.Id).HasName("storage_routes_pk");
@@ -1441,11 +1453,14 @@ public partial class DContext : DbContext
                 .IsUnique()
                 .HasFilter("(is_active = true)");
 
+            entity.HasIndex(e => e.CarrierId, "storage_routes_carrier_id_index");
+
             entity.HasIndex(e => e.CurrencyId, "storage_routes_currency_id_index");
 
             entity.Property(e => e.Id)
                 .HasDefaultValueSql("gen_random_uuid()")
                 .HasColumnName("id");
+            entity.Property(e => e.CarrierId).HasColumnName("carrier_id");
             entity.Property(e => e.CurrencyId).HasColumnName("currency_id");
             entity.Property(e => e.DeliveryTimeMinutes).HasColumnName("delivery_time_minutes");
             entity.Property(e => e.DistanceM).HasColumnName("distance_m");
@@ -1468,6 +1483,11 @@ public partial class DContext : DbContext
             entity.Property(e => e.ToStorageName)
                 .HasMaxLength(128)
                 .HasColumnName("to_storage_name");
+
+            entity.HasOne(d => d.Carrier).WithMany(p => p.StorageRoutes)
+                .HasForeignKey(d => d.CarrierId)
+                .OnDelete(DeleteBehavior.Cascade)
+                .HasConstraintName("storage_routes_users_id_fk");
 
             entity.HasOne(d => d.Currency).WithMany(p => p.StorageRoutes)
                 .HasForeignKey(d => d.CurrencyId)

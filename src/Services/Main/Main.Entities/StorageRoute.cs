@@ -35,6 +35,10 @@ public partial class StorageRoute
     
     public decimal? MinimumPrice { get; set; }
 
+    public Guid? CarrierId { get; set; }
+
+    public virtual User? Carrier { get; set; }
+
     public virtual Currency Currency { get; set; } = null!;
 
     public virtual Storage FromStorageNameNavigation { get; set; } = null!;

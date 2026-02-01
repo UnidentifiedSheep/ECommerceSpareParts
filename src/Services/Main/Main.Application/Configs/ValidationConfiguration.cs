@@ -25,6 +25,22 @@ public static class ValidationConfiguration
         ConfigureProducerOtherNames();
         ConfigureCart();
         ConfigureStorageRoutes();
+        ConfigureStorageOwners();
+    }
+
+    private static void ConfigureStorageOwners()
+    {
+        ConfigureDbValidation.AddConfig(ValidationFunctions.ValidateStorageOwnerNotExistsPK, KeyValueType.Tuple,
+            config => config.WithErrorName(ApplicationErrors.StorageOwnerAlreadyExist)
+                .WithMessageTemplate("Данные пользователь уже владеет данным складом.")
+                .WithErrorType(typeof(ConflictException))
+                .WithErrorCode((int)HttpStatusCode.Conflict));
+        
+        ConfigureDbValidation.AddConfig(ValidationFunctions.ValidateStorageOwnerExistsPK, KeyValueType.Tuple,
+            config => config.WithErrorName(ApplicationErrors.StorageOwnerNotFound)
+                .WithMessageTemplate("Не удалось найти данный склад во владениях у пользователя.")
+                .WithErrorType(typeof(NotFoundException))
+                .WithErrorCode((int)HttpStatusCode.NotFound));
     }
 
     private static void ConfigureStorageRoutes()

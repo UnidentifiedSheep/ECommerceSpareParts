@@ -24,9 +24,9 @@ public partial class Storage
 
     public virtual ICollection<StorageMovement> StorageMovements { get; set; } = new List<StorageMovement>();
 
+    public virtual ICollection<StorageOwner> StorageOwners { get; set; } = new List<StorageOwner>();
+
     public virtual ICollection<StorageRoute> StorageRouteFromStorageNameNavigations { get; set; } = new List<StorageRoute>();
 
     public virtual ICollection<StorageRoute> StorageRouteToStorageNameNavigations { get; set; } = new List<StorageRoute>();
-
-    public virtual ICollection<User> Owners { get; set; } = new List<User>();
 }

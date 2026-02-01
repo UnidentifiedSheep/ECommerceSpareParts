@@ -129,6 +129,7 @@ public class PermissionSeed : ISeed<DContext>
         new(PermissionCodes.USERS_VEHICLES_CREATE_ALL, "Права на добавление ТС в любой гараж"),
         new (PermissionCodes.USERS_STORAGES_ADD, "Права на добавление склада пользователю"),
         new (PermissionCodes.USERS_STORAGES_GET, "Права на получение складов пользователя"),
+        new (PermissionCodes.USERS_STORAGES_DELETE, "Права на удаление склада пользователя"),
 
         new(PermissionCodes.PERMISSIONS_CREATE, "Права на создание прав доступа"),
         new(PermissionCodes.PERMISSIONS_GET, "Права на получение всех прав доступа"),

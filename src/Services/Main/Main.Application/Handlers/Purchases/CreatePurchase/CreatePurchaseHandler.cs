@@ -26,7 +26,7 @@ public class CreatePurchaseHandler(IUnitOfWork unitOfWork) : ICommandHandler<Cre
         var storageName = request.StorageName;
         var transactionId = request.TransactionId;
 
-        var purchaseContents = content.Select(x => x.Adapt<PurchaseContent>()).ToList();
+        var purchaseContents = content.Adapt<List<PurchaseContent>>();
         var purchaseModel = new Purchase
         {
             CurrencyId = currencyId,

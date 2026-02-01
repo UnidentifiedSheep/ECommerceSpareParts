@@ -1,3 +1,5 @@
+using Main.Entities;
+using Main.Enums;
 using Main.Persistence.Context;
 using Microsoft.EntityFrameworkCore;
 
@@ -30,6 +32,43 @@ public static class MockDContext
                                                    INSERT INTO article_crosses (article_id, article_cross_id) 
                                                    values ({leftId}, {rightId})
                                                    """);
+    }
+
+    public static async Task AddMockWeightsAndSizesToArticles(this DbContext context, IEnumerable<int>? ids = null)
+    {
+        var articleIds = ids ?? await context.Set<Main.Entities.Article>()
+            .Select(a => a.Id)
+            .ToListAsync();
+
+        var sizes = new List<ArticleSize>();
+        var weights = new List<ArticleWeight>();
+        foreach (var articleId in articleIds)
+        {
+            var weight = Math.Round(Global.Faker.Random.Decimal(0.1m, 10m), 2);
+            var length = Math.Round(Global.Faker.Random.Decimal(1m, 100m), 2);
+            var width = Math.Round(Global.Faker.Random.Decimal(1m, 100m), 2);
+            var height = Math.Round(Global.Faker.Random.Decimal(1m, 100m), 2);
+
+            sizes.Add(new()
+            {
+                ArticleId = articleId,
+                Length = length,
+                Width = width,
+                Height = height,
+                VolumeM3 = length * width * height
+            });
+            
+            weights.Add(new ArticleWeight()
+            {
+                ArticleId = articleId,
+                Weight = weight,
+                Unit = WeightUnit.Kilogram
+            });
+        }
+        
+        await context.AddRangeAsync(sizes);
+        await context.AddRangeAsync(weights);
+        await context.SaveChangesAsync();
     }
 
     public static async Task AddMockCurrencies(this DContext context)

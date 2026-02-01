@@ -1,7 +1,10 @@
-﻿namespace Main.Entities;
+﻿using BulkValidation.Core.Attributes;
+
+namespace Main.Entities;
 
 public partial class PurchaseContent
 {
+    [Validate]
     public int Id { get; set; }
 
     public string PurchaseId { get; set; } = null!;

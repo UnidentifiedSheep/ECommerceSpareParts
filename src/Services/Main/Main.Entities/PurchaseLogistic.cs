@@ -1,4 +1,6 @@
-﻿namespace Main.Entities;
+﻿using Main.Enums;
+
+namespace Main.Entities;
 
 public partial class PurchaseLogistic
 {
@@ -8,11 +10,21 @@ public partial class PurchaseLogistic
 
     public int CurrencyId { get; set; }
 
-    public Guid TransactionId { get; set; }
+    public Guid? TransactionId { get; set; }
 
-    public string PricingModel { get; set; } = null!;
+    public LogisticPricingType PricingModel { get; set; }
 
-    public string RouteType { get; set; } = null!;
+    public RouteType RouteType { get; set; }
+
+    public decimal PriceKg { get; set; }
+
+    public decimal PricePerM3 { get; set; }
+
+    public decimal PricePerOrder { get; set; }
+
+    public decimal? MinimumPrice { get; set; }
+
+    public bool MinimumPriceApplied { get; set; }
 
     public virtual Currency Currency { get; set; } = null!;
 

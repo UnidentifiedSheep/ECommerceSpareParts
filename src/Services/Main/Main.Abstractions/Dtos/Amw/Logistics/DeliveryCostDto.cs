@@ -13,6 +13,6 @@ public class DeliveryCostDto
     public decimal TotalCost { get; set; }
     public decimal MinimalPrice { get; set; }
     public bool MinimalPriceApplied { get; set; }
-    public decimal CurrencyId { get; set; }
+    public int CurrencyId { get; set; }
     public LogisticPricingType PricingModel { get; set; }
 }

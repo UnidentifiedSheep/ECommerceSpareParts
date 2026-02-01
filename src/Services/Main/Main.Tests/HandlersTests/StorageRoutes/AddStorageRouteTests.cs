@@ -22,6 +22,7 @@ public class AddStorageRouteTests : IAsyncLifetime
     private Storage _storageFrom = null!;
     private Storage _storageTo = null!;
     private Currency _currency = null!;
+    private User _user = null!;
     
     public AddStorageRouteTests(CombinedContainerFixture fixture)
     {
@@ -36,10 +37,12 @@ public class AddStorageRouteTests : IAsyncLifetime
         await _mediator.AddMockStorage();
         await _mediator.AddMockStorage();
         await _context.AddMockCurrencies();
+        await _mediator.AddMockUser();
 
         _currency = await _context.Currencies.FirstAsync();
         _storageFrom = await _context.Storages.FirstAsync();
         _storageTo = await _context.Storages.FirstAsync(x => x.Name != _storageFrom.Name);
+        _user = await _context.Users.FirstAsync();
     }
 
     public async Task DisposeAsync()
@@ -52,7 +55,7 @@ public class AddStorageRouteTests : IAsyncLifetime
     {
         var command = new AddStorageRouteCommand(_storageFrom.Name, _storageTo.Name, 1000,
             RouteType.IntraCity, LogisticPricingType.PerOrder, 60, 10.5m, 20.5m,
-            _currency.Id, 5.0m, null);
+            _currency.Id, 5.0m, null, _user.Id);
         
         var result = await _mediator.Send(command);
 
@@ -69,7 +72,7 @@ public class AddStorageRouteTests : IAsyncLifetime
     {
         var command = new AddStorageRouteCommand(_storageFrom.Name, _storageTo.Name, 0, RouteType.IntraCity,
             LogisticPricingType.PerOrder, 60, 10.5m, 20.5m, _currency.Id,
-            5.0m, null);
+            5.0m, null, _user.Id);
 
         await Assert.ThrowsAsync<ValidationException>(async () => await _mediator.Send(command));
     }
@@ -78,7 +81,8 @@ public class AddStorageRouteTests : IAsyncLifetime
     public async Task AddStorageRoute_WithInvalidPricePrecision_ThrowsValidationException()
     {
         var command = new AddStorageRouteCommand(_storageFrom.Name, _storageTo.Name, 1000, RouteType.IntraCity,
-            LogisticPricingType.PerOrder, 60, 10.555m, 20.5m, _currency.Id, 5.0m, null);
+            LogisticPricingType.PerOrder, 60, 10.555m, 20.5m, _currency.Id, 5.0m, 
+            null, _user.Id);
 
         await Assert.ThrowsAsync<ValidationException>(async () => await _mediator.Send(command));
     }
@@ -87,7 +91,8 @@ public class AddStorageRouteTests : IAsyncLifetime
     public async Task AddStorageRoute_WithNonExistentCurrency_ThrowsValidationException()
     {
         var command = new AddStorageRouteCommand(_storageFrom.Name, _storageTo.Name, 1000, RouteType.IntraCity, 
-            LogisticPricingType.PerOrder, 60, 10.5m, 20.5m, 9999, 5.0m, null);
+            LogisticPricingType.PerOrder, 60, 10.5m, 20.5m, 9999, 5.0m, 
+            null, _user.Id);
 
         await Assert.ThrowsAsync<ValidationException>(async () => await _mediator.Send(command));
     }
@@ -96,7 +101,8 @@ public class AddStorageRouteTests : IAsyncLifetime
     public async Task AddStorageRoute_WithNonExistentStorage_ThrowsDbValidationException()
     {
         var command = new AddStorageRouteCommand("NonExistentStorage", _storageTo.Name, 1000, RouteType.IntraCity,
-            LogisticPricingType.PerOrder, 60, 10.5m, 20.5m, _currency.Id, 5.0m, null);
+            LogisticPricingType.PerOrder, 60, 10.5m, 20.5m, _currency.Id, 5.0m, 
+            null, _user.Id);
 
         var exception = await Assert.ThrowsAsync<DbValidationException>(async () => await _mediator.Send(command));
         Assert.Contains(exception.Failures, f => f.ErrorName == ApplicationErrors.StoragesNotFound);

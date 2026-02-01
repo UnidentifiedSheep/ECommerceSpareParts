@@ -5,5 +5,6 @@ public enum TransactionStatus
     Purchase,
     Sale,
     Refund,
-    Normal
+    Normal,
+    Logistics
 }

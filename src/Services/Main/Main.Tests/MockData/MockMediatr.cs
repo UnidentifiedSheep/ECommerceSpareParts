@@ -11,6 +11,7 @@ using Main.Abstractions.Dtos.Emails;
 using Main.Entities;
 using Main.Enums;
 using Main.Abstractions.Models;
+using Main.Application.Handlers.StorageOwners.AddStorageToUser;
 using Main.Application.Handlers.StorageRoutes.AddStorageRoute;
 using Mapster;
 using MediatR;
@@ -37,6 +38,12 @@ public static class MockMediatr
 
         var articleCommand = new CreateArticlesCommand(articleList);
         await mediator.Send(articleCommand);
+    }
+
+    public static async Task MockMapStorageToUser(this IMediator mediator, Guid userId, string storage)
+    {
+        var command = new AddStorageToUserCommand(userId, storage);
+        await mediator.Send(command);
     }
 
     public static async Task<Guid> AddMockUser(this IMediator mediator)
@@ -123,14 +130,14 @@ public static class MockMediatr
     }
 
     public static async Task AddMockStorageRoute(this IMediator mediator, string fromStorage, string toStorage, 
-        int currencyId)
+        int currencyId, Guid? userId)
     {
         Faker faker = new Faker(Global.Locale);
         
         var command = new AddStorageRouteCommand(fromStorage, toStorage, faker.Random.Int(1, 100), 
             RouteType.IntraCity, LogisticPricingType.PerAreaOrWeight, faker.Random.Int(1, 100),
             GetRandomWithScale2(faker), GetRandomWithScale2(faker), currencyId, 
-            GetRandomWithScale2(faker), null);
+            GetRandomWithScale2(faker), null, userId);
         await mediator.Send(command);
     }
 

@@ -70,14 +70,6 @@ public class UserRepository(DContext context) : IUserRepository
                                                 """, cancellationToken);
     }
 
-    public async Task<bool> UserOwnsStorage(Guid userId, string storageName, CancellationToken cancellationToken = default)
-    {
-        return await context.Users
-            .AsNoTracking()
-            .AnyAsync(x => x.Id == userId && 
-                           x.StorageNames.Any(z => EF.Functions.Like(z.Name, storageName)), 
-                cancellationToken);
-    }
 
     public async Task<UserInfo?> GetUserInfo(Guid id, bool track = true, CancellationToken cancellationToken = default)
     {

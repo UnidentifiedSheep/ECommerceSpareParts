@@ -11,6 +11,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Tests.MockData;
 using Tests.testContainers.Combined;
 using Exceptions.Exceptions.StorageRoutes;
+using User = Main.Entities.User;
 
 namespace Tests.HandlersTests.StorageRoutes;
 
@@ -22,6 +23,7 @@ public class EditStorageRouteTests : IAsyncLifetime
     private Storage _storageFrom = null!;
     private Storage _storageTo = null!;
     private Currency _currency = null!;
+    private User _user = null!;
     
     public EditStorageRouteTests(CombinedContainerFixture fixture)
     {
@@ -36,10 +38,12 @@ public class EditStorageRouteTests : IAsyncLifetime
         await _mediator.AddMockStorage();
         await _mediator.AddMockStorage();
         await _context.AddMockCurrencies();
+        await _mediator.AddMockUser();
 
         _currency = await _context.Currencies.FirstAsync();
         _storageFrom = await _context.Storages.FirstAsync();
         _storageTo = await _context.Storages.FirstAsync(x => x.Name != _storageFrom.Name);
+        _user = await _context.Users.FirstAsync();
     }
 
     public async Task DisposeAsync()
@@ -50,7 +54,7 @@ public class EditStorageRouteTests : IAsyncLifetime
     [Fact]
     public async Task EditStorageRoute_WithValidData_Succeeds()
     {
-        await _mediator.AddMockStorageRoute(_storageFrom.Name, _storageTo.Name, _currency.Id);
+        await _mediator.AddMockStorageRoute(_storageFrom.Name, _storageTo.Name, _currency.Id, _user.Id);
         var route = await _context.StorageRoutes.AsNoTracking().FirstAsync();
         
         var patchDto = new PatchStorageRouteDto
@@ -90,7 +94,7 @@ public class EditStorageRouteTests : IAsyncLifetime
     [Fact]
     public async Task EditStorageRoute_WithInvalidData_ThrowsValidationException()
     {
-        await _mediator.AddMockStorageRoute(_storageFrom.Name, _storageTo.Name, _currency.Id);
+        await _mediator.AddMockStorageRoute(_storageFrom.Name, _storageTo.Name, _currency.Id, _user.Id);
         var route = await _context.StorageRoutes.FirstAsync();
         
         var patchDto = new PatchStorageRouteDto
@@ -106,7 +110,7 @@ public class EditStorageRouteTests : IAsyncLifetime
     [Fact]
     public async Task EditStorageRoute_WithInvalidPricePrecision_ThrowsValidationException()
     {
-        await _mediator.AddMockStorageRoute(_storageFrom.Name, _storageTo.Name, _currency.Id);
+        await _mediator.AddMockStorageRoute(_storageFrom.Name, _storageTo.Name, _currency.Id, _user.Id);
         var route = await _context.StorageRoutes.FirstAsync();
         
         var patchDto = new PatchStorageRouteDto

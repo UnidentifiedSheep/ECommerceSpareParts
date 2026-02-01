@@ -21,6 +21,7 @@ public class RolePermissionSeed : ISeed<DContext>
                 PermissionCodes.USERS_VEHICLES_CREATE_ALL,
                 PermissionCodes.USERS_STORAGES_ADD,
                 PermissionCodes.USERS_STORAGES_GET,
+                PermissionCodes.USERS_STORAGES_DELETE,
                 PermissionCodes.ARTICLES_CREATE,
                 PermissionCodes.USERS_MAILS_CREATE,
                 PermissionCodes.USERS_CREATE,

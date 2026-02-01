@@ -56,6 +56,10 @@ public partial class User
 
     public virtual ICollection<StorageMovement> StorageMovements { get; set; } = new List<StorageMovement>();
 
+    public virtual ICollection<StorageOwner> StorageOwners { get; set; } = new List<StorageOwner>();
+
+    public virtual ICollection<StorageRoute> StorageRoutes { get; set; } = new List<StorageRoute>();
+
     public virtual ICollection<Transaction> TransactionDeletedByNavigations { get; set; } = new List<Transaction>();
 
     public virtual ICollection<Transaction> TransactionReceivers { get; set; } = new List<Transaction>();
@@ -87,6 +91,4 @@ public partial class User
     public virtual ICollection<UserToken> UserTokens { get; set; } = new List<UserToken>();
 
     public virtual ICollection<UserVehicle> UserVehicles { get; set; } = new List<UserVehicle>();
-
-    public virtual ICollection<Storage> StorageNames { get; set; } = new List<Storage>();
 }

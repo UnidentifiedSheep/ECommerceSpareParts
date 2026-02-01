@@ -3,6 +3,7 @@ using Api.Common.Extensions;
 using Carter;
 using Main.Abstractions.Dtos.Amw.Purchase;
 using Main.Application.Handlers.Purchases.CreateFullPurchase;
+using Main.Enums;
 using MediatR;
 
 namespace Main.Api.EndPoints.Purchase;
@@ -14,7 +15,10 @@ public record CreatePurchaseRequest(
     DateTime PurchaseDate,
     IEnumerable<NewPurchaseContentDto> PurchaseContent,
     string? Comment,
-    decimal? PayedSum);
+    decimal? PayedSum,
+    bool WithLogistics,
+    string? StorageFrom,
+    int? LogisticsCurrencyId);
 
 public class CreatePurchaseEndPoint : ICarterModule
 {
@@ -28,12 +32,12 @@ public class CreatePurchaseEndPoint : ICarterModule
                         return Results.Unauthorized();
                     var command = new CreateFullPurchaseCommand(userId, request.SupplierId, request.CurrencyId,
                         request.StorageName, request.PurchaseDate, request.PurchaseContent, request.Comment,
-                        request.PayedSum);
+                        request.PayedSum, request.WithLogistics, request.StorageFrom, request.LogisticsCurrencyId);
                     await sender.Send(command, token);
                     return Results.Ok();
                 }).WithTags("Purchases")
                 .WithDescription("Создание новой закупку")
                 .WithDisplayName("Создание новой закупку")
-                .RequireAnyPermission("PURCHASE.CREATE");
+                .RequireAnyPermission(PermissionCodes.PURCHASE_CREATE);
     }
 }

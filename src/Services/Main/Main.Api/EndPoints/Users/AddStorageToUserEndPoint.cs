@@ -1,6 +1,6 @@
 ﻿using Api.Common.Extensions;
 using Carter;
-using Main.Application.Handlers.Users.AddStorageToUser;
+using Main.Application.Handlers.StorageOwners.AddStorageToUser;
 using Main.Enums;
 using MediatR;
 

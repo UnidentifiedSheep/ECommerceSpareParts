@@ -22,7 +22,7 @@ namespace Main.Application.Handlers.StorageRoutes.AddStorageRoute;
 [Transactional]
 public record AddStorageRouteCommand(string StorageFrom, string StorageTo, int Distance, RouteType RouteType, 
     LogisticPricingType PricingType, int DeliveryTime, decimal PriceKg, decimal PriceM3, int CurrencyId,
-    decimal PricePerOrder, decimal? MinimumPrice) : ICommand<AddStorageRouteResult>;
+    decimal PricePerOrder, decimal? MinimumPrice, Guid? CarrierId) : ICommand<AddStorageRouteResult>;
 
 public record AddStorageRouteResult(Guid RouteId);
 

@@ -5,6 +5,7 @@ using Exceptions.Exceptions.ArticleWeight;
 using Exceptions.Exceptions.Logistics;
 using Exceptions.Exceptions.StorageRoutes;
 using Main.Abstractions.Dtos.Amw.Logistics;
+using Main.Abstractions.Dtos.Amw.StorageRoutes;
 using Main.Abstractions.Interfaces.DbRepositories;
 using Main.Abstractions.Interfaces.Logistics;
 using Main.Abstractions.Models.Logistics;
@@ -16,7 +17,7 @@ namespace Main.Application.Handlers.Logistics.CalculateDeliveryCost;
 
 public record CalculateDeliveryCostQuery(string StorageFrom, string StorageTo, int CurrencyId,
     IEnumerable<LogisticsItemDto> Items, LogisticsCalculationMode Mode = LogisticsCalculationMode.Strict) : IQuery<CalculateDeliveryCostResult>;
-public record CalculateDeliveryCostResult(DeliveryCostDto DeliveryCost);
+public record CalculateDeliveryCostResult(StorageRouteDto Route, DeliveryCostDto DeliveryCost);
 
 public class CalculateDeliveryCostHandler(ILogisticsCostService logisticsCostService, 
     IArticleSizesRepository sizesRepository, IStorageRoutesRepository storageRoutesRepository,
@@ -40,7 +41,7 @@ public class CalculateDeliveryCostHandler(ILogisticsCostService logisticsCostSer
             .Adapt<DeliveryCostDto>();
         deliveryCost.CurrencyId = request.CurrencyId;
         
-        return new CalculateDeliveryCostResult(deliveryCost);
+        return new CalculateDeliveryCostResult(route.Adapt<StorageRouteDto>(), deliveryCost);
     }
 
     private async Task<StorageRoute> GetStorageRoute(string from, string to, CancellationToken cancellationToken)

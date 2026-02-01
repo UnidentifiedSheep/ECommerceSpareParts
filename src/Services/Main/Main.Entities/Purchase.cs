@@ -1,9 +1,11 @@
-﻿using Main.Enums;
+﻿using BulkValidation.Core.Attributes;
+using Main.Enums;
 
 namespace Main.Entities;
 
 public partial class Purchase
 {
+    [Validate]
     public string Id { get; set; } = null!;
 
     public Guid CreatedUserId { get; set; }

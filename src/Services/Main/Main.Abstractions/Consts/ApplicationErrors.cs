@@ -38,4 +38,7 @@ public static class ApplicationErrors
     
     public const string StorageRouteNotFound = "StorageRouteNotFound";
     public const string StorageRouteAlreadyExist = "StorageRouteAlreadyExist";
+    
+    public const string StorageOwnerAlreadyExist = "StorageOwnerAlreadyExist";
+    public const string StorageOwnerNotFound = "StorageOwnerNotFound";
 }
