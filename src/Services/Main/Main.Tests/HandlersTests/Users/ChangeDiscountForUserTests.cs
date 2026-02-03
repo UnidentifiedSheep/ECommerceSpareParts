@@ -66,8 +66,8 @@ public class ChangeDiscountForUserTests : IAsyncLifetime
             .AsNoTracking()
             .FirstOrDefaultAsync(x => x.UserId == _mockUser.Id);
         Assert.NotNull(userDiscount);
-        Assert.Equal(20, userDiscount.Discount);
+        Assert.Equal((decimal)20/100, userDiscount.Discount);
         var redisValue = await _usersCacheRepository.GetUserDiscount(_mockUser.Id);
-        Assert.Equal(20, redisValue);
+        Assert.Equal((decimal)20/100, redisValue);
     }
 }

@@ -4,6 +4,7 @@ using Core.Models;
 using Mail;
 using Main.Application.Configs;
 using Main.Abstractions.Interfaces.Pricing;
+using Main.Cache;
 using Microsoft.Extensions.DependencyInjection;
 using Main.Persistence;
 using Main.Persistence.Context;
@@ -49,7 +50,8 @@ public static class ServiceProviderForTests
         CacheServiceProvider.AddCacheLayer(services, redisConnectionString)
             .AddSecurityLayer(passwordRules)
             .AddMailLayer()
-            .AddCommonLayer();
+            .AddCommonLayer()
+            .AddAppCacheLayer();
 
         services.AddTransient<IMessageBroker, MessageBrokerStub>();
         MapsterConfig.Configure();

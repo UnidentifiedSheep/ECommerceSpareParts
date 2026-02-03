@@ -18,22 +18,21 @@ public class StorageContentRepository(DContext context) : IStorageContentReposit
             .SqlQuery<StorageContentLogisticsProjection>($"""
                                                           SELECT 
                                                               sc.Id AS StorageContentId,
-                                                              sc.ArticleId,
-                                                              sc.CurrencyId,
-                                                              sc.BuyPrice AS Price,
-                                                              pl.CurrencyId AS LogisticsCurrencyId,
-                                                              pcl.Price AS LogisticsPrice,
-                                                              pc.Id AS PurchaseContentId,
-                                                              pc.Count AS PurchaseContentCount,
-                                                              p.Id AS PurchaseId
+                                                              sc.article_id AS ArticleId,
+                                                              sc.currency_id AS CurrencyId,
+                                                              sc.buy_price AS Price,
+                                                              pl.currency_id AS LogisticsCurrencyId,
+                                                              pcl.price AS LogisticsPrice,
+                                                              pc.id AS PurchaseContentId,
+                                                              pc.count AS PurchaseContentCount,
+                                                              p.id AS PurchaseId
                                                           FROM storage_content sc
-                                                          LEFT JOIN purchase_content pc ON sc.PurchaseContentId = pc.Id
-                                                          LEFT JOIN purchase p ON pc.PurchaseId = p.Id
-                                                          LEFT JOIN purchase_logistics pl ON p.PurchaseLogisticId = pl.Id
-                                                          LEFT JOIN purchase_content_logistics pcl ON pc.Id = pcl.PurchaseContentId
-                                                          WHERE sc.ArticleId IN ({articleIds})
-                                                            AND ({onlyPositiveQty} OR sc.Count > 0)
-
+                                                          LEFT JOIN purchase_content pc ON sc.id = pc.storage_content_id
+                                                          LEFT JOIN purchase p ON pc.purchase_id = p.Id
+                                                          LEFT JOIN purchase_logistics pl ON p.id = pl.purchase_id
+                                                          LEFT JOIN purchase_content_logistics pcl ON pc.id = pcl.purchase_content_id
+                                                          WHERE sc.article_id = ANY({articleIds})
+                                                            AND ({onlyPositiveQty} OR sc.count > 0)
                                                           """)
             .ToListAsync(ct);
 

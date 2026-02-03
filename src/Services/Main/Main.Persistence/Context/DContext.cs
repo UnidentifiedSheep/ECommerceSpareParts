@@ -138,8 +138,7 @@ public partial class DContext : DbContext
             .HasPostgresEnum("car_types", new[] { "PassengerCar", "CommercialVehicle", "Motorbike" })
             .HasPostgresExtension("dblink")
             .HasPostgresExtension("pg_trgm")
-            .HasPostgresExtension("pgcrypto")
-            .HasPostgresExtension("pg_cron");
+            .HasPostgresExtension("pgcrypto");
 
         modelBuilder.Entity<Article>(entity =>
         {
