@@ -83,9 +83,10 @@ public class RecalculateBasePricesHandler(IArticlePricesCacheRepository articleP
     private ArticlePrice ProjectionToPrice(StorageContentLogisticsProjection projection)
     {
         decimal buyPrice = currencyConverter.ConvertToUsd(projection.Price, projection.CurrencyId);
-        if (projection.LogisticsCurrencyId == null || projection.LogisticsPrice == null) 
+        if (projection.LogisticsCurrencyId == null || projection.LogisticsPrice == null || projection.PurchaseContentCount == null) 
             return new ArticlePrice(buyPrice, 0);
-        decimal deliveryPrice = currencyConverter.ConvertToUsd(projection.LogisticsPrice.Value, projection.LogisticsCurrencyId.Value);
+        decimal delPricePerItem = projection.LogisticsPrice.Value / projection.PurchaseContentCount.Value;
+        decimal deliveryPrice = currencyConverter.ConvertToUsd(delPricePerItem, projection.LogisticsCurrencyId.Value);
         return new ArticlePrice(buyPrice, deliveryPrice);
     }
 

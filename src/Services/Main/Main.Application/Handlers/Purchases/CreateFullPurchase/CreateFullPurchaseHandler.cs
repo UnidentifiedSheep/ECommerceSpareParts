@@ -12,6 +12,7 @@ using Main.Application.Handlers.Purchases.AddContentLogisticsToPurchase;
 using Main.Application.Handlers.Purchases.AddLogisticsToPurchase;
 using Main.Application.Handlers.Purchases.CreatePurchase;
 using Main.Application.Handlers.StorageContents.AddContent;
+using Main.Application.Notifications;
 using Main.Entities;
 using Main.Enums;
 using Mapster;
@@ -78,6 +79,9 @@ public class CreateFullPurchaseHandler(IMediator mediator) : ICommandHandler<Cre
             
         await AddLogisticsContentToPurchase(content, purchase.PurchaseContents, 
             deliveryCost, cancellationToken);
+        
+        await mediator.Publish(new ArticlePricesUpdatedNotification(content.Select(x => x.ArticleId)), 
+            cancellationToken);
 
         return Unit.Value;
     }
@@ -101,7 +105,8 @@ public class CreateFullPurchaseHandler(IMediator mediator) : ICommandHandler<Cre
             {
                 PurchaseContentId = content.Id,
                 WeightKg = deliveryItemInfo.Weight.ToKg(deliveryItemInfo.WeightUnit),
-                AreaM3 = deliveryItemInfo.AreaM3
+                AreaM3 = deliveryItemInfo.AreaM3,
+                Price = deliveryItemInfo.Cost
             });
             costsIndex++;
         }
@@ -159,7 +164,7 @@ public class CreateFullPurchaseHandler(IMediator mediator) : ICommandHandler<Cre
             temp.PurchaseDate = purchaseDate;
             return temp;
         });
-        var command = new AddContentCommand(storageContents, storageName, userId, StorageMovementType.Purchase);
+        var command = new AddContentCommand(storageContents, storageName, userId, StorageMovementType.Purchase, false);
         var result = await mediator.Send(command, cancellationToken);
         return result.StorageContents;
     }

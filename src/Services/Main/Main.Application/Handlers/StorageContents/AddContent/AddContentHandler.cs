@@ -17,7 +17,7 @@ namespace Main.Application.Handlers.StorageContents.AddContent;
 
 [Transactional(IsolationLevel.Serializable, 20, 2)]
 public record AddContentCommand(IEnumerable<NewStorageContentDto> StorageContent, string StorageName,
-    Guid UserId, StorageMovementType MovementType) : ICommand<AddContentResult>;
+    Guid UserId, StorageMovementType MovementType, bool RecalcPrices = true) : ICommand<AddContentResult>;
 
 public record AddContentResult(List<StorageContentDto> StorageContents);
 
@@ -57,7 +57,9 @@ public class AddContentHandler(IArticlesRepository articlesRepository, IUnitOfWo
         await unitOfWork.SaveChangesAsync(cancellationToken);
 
         await mediator.Publish(new ArticlesUpdatedNotification(articleIds), cancellationToken);
-        await mediator.Publish(new ArticlePricesUpdatedNotification(articleIds), cancellationToken);
+        if (request.RecalcPrices)
+            await mediator.Publish(new ArticlePricesUpdatedNotification(articleIds), cancellationToken);
+        
         return new AddContentResult(storageContents.Adapt<List<StorageContentDto>>());
     }
 }
