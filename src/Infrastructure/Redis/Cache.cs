@@ -1,16 +1,51 @@
-using System.Text.Json;
 using Core.Interfaces.CacheRepositories;
+using NRedisStack;
+using NRedisStack.RedisStackCommands;
 using StackExchange.Redis;
 
-namespace Redis.Repositories;
+namespace Redis;
 
 public class Cache(IDatabase redis) : ICache
 {
+    private readonly JsonCommands _json = redis.JSON();
     public async Task StringSetAsync<T>(string key, T value, TimeSpan? expiry = null)
     {
-        var ser = JsonSerializer.Serialize(value, Global.JsonOptions);
-        await redis.StringSetAsync(key, ser);
+        if (value == null) throw new ArgumentNullException(nameof(value), "Value cannot be null.");
+        await _json.SetAsync(key, "$", value, When.Always, Global.JsonOptions);
         await redis.KeyExpireAsync(key, expiry);
+    }
+    public async Task<T?> StringGetAsync<T>(string key, string path = "$")
+    {
+        var res = await _json.GetAsync<T>(key, path, Global.JsonOptions);
+        return res;
+    }
+
+    public async Task<List<T?>> StringsGetAsync<T>(IEnumerable<string> keys, string path = "$")
+    {
+        var pipeline = new Pipeline(redis);
+        var tasks = new List<Task<T?>>();
+
+        foreach (var key in keys)
+            tasks.Add(pipeline.Json.GetAsync<T>(key, path, Global.JsonOptions));
+
+        pipeline.Execute();
+
+        return (await Task.WhenAll(tasks)).ToList();
+    }
+
+    public void StringBatchSet<T>(IEnumerable<Tuple<string, T, TimeSpan?>> items)
+    {
+        var pipeline = new Pipeline(redis);
+
+        foreach (var (key, value, expiry) in items)
+        {
+            if (value == null) throw new ArgumentNullException(nameof(value), "Value cannot be null.");
+            _ = pipeline.Json.SetAsync(key, "$", value);
+            if (expiry.HasValue)
+                _ = pipeline.Db.KeyExpireAsync(key, expiry);
+        }
+
+        pipeline.Execute();
     }
 
     public async Task StringSetAsync(string key, string value, TimeSpan? expiry = null)
@@ -24,12 +59,6 @@ public class Cache(IDatabase redis) : ICache
         return await redis.StringGetAsync(key);
     }
 
-    public async Task<T?> StringGetAsync<T>(string key)
-    {
-        var cacheValue = await redis.StringGetAsync(key);
-        if (!cacheValue.HasValue || cacheValue.IsNullOrEmpty) return default;
-        return JsonSerializer.Deserialize<T?>(cacheValue.ToString(), Global.JsonOptions);
-    }
 
     public async Task DeleteAsync(string key)
     {

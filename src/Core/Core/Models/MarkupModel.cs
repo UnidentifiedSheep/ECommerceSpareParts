@@ -1,3 +1,3 @@
 ﻿namespace Core.Models;
 
-public record MarkupModel(double Markup);
+public record MarkupModel(decimal Markup);

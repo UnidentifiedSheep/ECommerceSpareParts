@@ -2,6 +2,7 @@ using Core.StaticFunctions;
 using Main.Abstractions.Interfaces.DbRepositories;
 using Main.Abstractions.Models;
 using Main.Entities;
+using Main.Enums;
 using Main.Persistence.Context;
 using Microsoft.EntityFrameworkCore;
 using Persistence.Extensions;
@@ -12,14 +13,14 @@ public class DefaultSettingsRepository(DContext context) : IDefaultSettingsRepos
 {
     public async Task CreateDefaultSettingsIfNotExist(CancellationToken cancellationToken = default)
     {
-        await context.Database.ExecuteSqlRawAsync("""
-                                                  INSERT INTO default_settings (key, value) 
-                                                  VALUES ('DefaultCurrency', '1'), ('DefaultMarkUp', '25'),
-                                                         ('MaximumDaysOfPriceStorage', '30'), ('SelectedMarkupId', '-1'),
-                                                         ('PriceGenerationStrategy', 'TakeHighestPrice'),
-                                                         ('UseOrderAutoApprovement', 'false')
-                                                  ON CONFLICT (key) DO NOTHING;
-                                                  """, cancellationToken);
+        await context.Database.ExecuteSqlRawAsync($"""
+                                                   INSERT INTO default_settings (key, value) 
+                                                   VALUES ('DefaultCurrency', '1'), ('DefaultMarkUp', '25'),
+                                                          ('MaximumDaysOfPriceStorage', '30'), ('SelectedMarkupId', '-1'),
+                                                          ('PriceGenerationStrategy', '{nameof(ArticlePricingType.Average)}'),
+                                                          ('UseOrderAutoApprovement', 'false')
+                                                   ON CONFLICT (key) DO NOTHING;
+                                                   """, cancellationToken);
     }
 
     public async Task<Settings> GetDefaultSettingsAsync(CancellationToken cancellationToken = default)

@@ -5,14 +5,14 @@ using Main.Abstractions.Interfaces.Pricing;
 using Main.Abstractions.Models;
 using Serilog;
 
-namespace Main.Application.Services.Pricing;
+namespace Main.Application.Services.ArticlePricing;
 
-public class PriceSetup(
+public class MarkupSetup(
     IDefaultSettingsRepository defaultSettingsRepository,
     IMarkupRepository markupRepository,
     ICurrencyRepository currencyRepository,
     ICurrencyConverter currencyConverter,
-    IPriceGenerator priceGenerator) : IPriceSetup
+    IMarkupService markupService) : IMarkupSetup
 {
     private Settings _settings = new();
 
@@ -29,6 +29,7 @@ public class PriceSetup(
 
         await SetGeneratedMarkupsAsync(cancellationToken);
     }
+    //TODO: move to other service
 
     private async Task SetupCurrencyConverterAsync(CancellationToken cancellationToken = default)
     {
@@ -41,7 +42,7 @@ public class PriceSetup(
         var generatedMarkup = await markupRepository.GetGeneratedMarkupsAsync(true, cancellationToken);
         Log.Logger.Warning("Generated markup not found.");
         if (generatedMarkup == null) return;
-        priceGenerator.SetUp(generatedMarkup, _settings);
+        markupService.SetUp(generatedMarkup, _settings);
     }
 
     private async Task SetUserMarkupsAsync(CancellationToken cancellationToken = default)
@@ -49,6 +50,6 @@ public class PriceSetup(
         var generatedMarkup =
             await markupRepository.GetMarkupByIdAsync(_settings.SelectedMarkupId, true, cancellationToken)
             ?? throw new MarkupGroupNotFoundException(_settings.SelectedMarkupId);
-        priceGenerator.SetUp(generatedMarkup, _settings);
+        markupService.SetUp(generatedMarkup, _settings);
     }
 }

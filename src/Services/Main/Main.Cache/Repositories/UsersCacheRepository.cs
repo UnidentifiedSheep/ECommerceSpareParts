@@ -1,14 +1,14 @@
 using Core.Interfaces.CacheRepositories;
-using StackExchange.Redis;
+using Main.Abstractions.Interfaces.CacheRepositories;
 
-namespace Redis.Repositories;
+namespace Main.Cache.Repositories;
 
-public class RedisUserRepository : IRedisUserRepository
+public class UsersCacheRepository : IUsersCacheRepository
 {
-    private readonly IDatabase _redis;
+    private readonly ICache _redis;
     private readonly TimeSpan? _ttl;
 
-    public RedisUserRepository(IDatabase redis, TimeSpan? ttl = null)
+    public UsersCacheRepository(ICache redis, TimeSpan? ttl = null)
     {
         _redis = redis;
         _ttl = ttl;
@@ -18,15 +18,14 @@ public class RedisUserRepository : IRedisUserRepository
     {
         var key = GetUserDiscountKey(userId);
         var value = await _redis.StringGetAsync(key);
-        decimal.TryParse(value.ToString(), Global.Culture, out var result);
-        return value.HasValue ? result : null;
+        decimal.TryParse(value, Global.Culture, out var result);
+        return !string.IsNullOrWhiteSpace(value) ? result : null;
     }
 
     public async Task SetUserDiscount(Guid userId, decimal discount)
     {
         var key = GetUserDiscountKey(userId);
-        await _redis.StringSetAsync(key, discount.ToString(Global.Culture));
-        await _redis.KeyExpireAsync(key, _ttl);
+        await _redis.StringSetAsync(key, discount.ToString(Global.Culture), _ttl);
     }
 
     private static string GetUserDiscountKey(Guid userId)

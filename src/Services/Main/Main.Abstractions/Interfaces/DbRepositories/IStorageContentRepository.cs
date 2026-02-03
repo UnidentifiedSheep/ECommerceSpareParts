@@ -1,11 +1,13 @@
+using System.Linq.Expressions;
+using Main.Abstractions.Models;
 using Main.Entities;
 
 namespace Main.Abstractions.Interfaces.DbRepositories;
 
 public interface IStorageContentRepository
 {
-    Task<Dictionary<int, List<decimal>>> GetHighestBuyPrices(IEnumerable<int> articleIds, int takePerArticle,
-        bool calcWhereZero = false, CancellationToken cancellationToken = default);
+    Task<Dictionary<int, List<StorageContentLogisticsProjection>>> GetStorageContentsForPricing(IEnumerable<int> articleIds, 
+        bool onlyPositiveQty = true, CancellationToken ct = default, params Expression<Func<StorageContent, object?>>[] includes);
 
     Task<IEnumerable<StorageContent>> GetStorageContentsForUpdate(IEnumerable<int> ids, bool track = true,
         CancellationToken cancellationToken = default);

@@ -12,6 +12,4 @@ public static class Global
         PropertyNameCaseInsensitive = true,
         DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull
     };
-
-    public static readonly CultureInfo Culture = CultureInfo.InvariantCulture;
 }

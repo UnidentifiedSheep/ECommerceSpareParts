@@ -2,21 +2,21 @@ namespace Main.Application.Extensions;
 
 public static class Price
 {
-    extension(double value)
+    extension(decimal value)
     {
-        public double RoundToNearestUp()
+        public decimal GetDiscountedPrice(decimal discountFraction)
         {
-            return (int)(value * 100 + 0.5) / 100.0;
+            return value * (1 - discountFraction);
         }
 
-        public double GetMarkUppedPrice(double markup)
+        public decimal GetMarkUppedPrice(decimal markupFraction)
         {
-            return value * (1 + markup / 100);
+            return value * (1 + markupFraction);
         }
-
-        public double GetDiscountedPrice(double discount)
-        {
-            return value * (1 - discount / 100);
-        }
+    }
+    
+    public static decimal GetDiscountFromPrices(decimal withDiscount, decimal withOutDiscount)
+    {
+        return (withOutDiscount - withDiscount) / withOutDiscount * 100;
     }
 }

@@ -22,9 +22,10 @@ using Main.Application.Handlers.Articles.GetArticles;
 using Main.Application.HangFireTasks;
 using Main.Application.RelatedData;
 using Main.Application.Services;
+using Main.Application.Services.ArticlePricing;
+using Main.Application.Services.ArticlePricing.BasePriceStrategies;
 using Main.Application.Services.Logistics;
 using Main.Application.Services.Logistics.PricingStrategies;
-using Main.Application.Services.Pricing;
 using Main.Entities;
 using MediatR;
 using Microsoft.Extensions.DependencyInjection;
@@ -48,8 +49,8 @@ public static class ServiceProvider
         collection.AddSingleton(emailOptions ?? new UserEmailOptions());
         collection.AddSingleton(phoneOptions ?? new UserPhoneOptions());
         collection.AddSingleton<ICurrencyConverter, CurrencyConverter>(_ => new CurrencyConverter(Global.UsdId));
-        collection.AddSingleton<IPriceGenerator, PriceGenerator>();
-        collection.AddScoped<IPriceSetup, PriceSetup>();
+        collection.AddSingleton<IMarkupService, MarkupService>();
+        collection.AddScoped<IMarkupSetup, MarkupSetup>();
 
         collection.AddSingleton<ILogisticsPricingStrategy, NonePricing>();
         collection.AddSingleton<ILogisticsPricingStrategy, PerAreaAndWeight>();
@@ -58,9 +59,18 @@ public static class ServiceProvider
         collection.AddSingleton<ILogisticsPricingStrategy, PerOrderPricing>();
         collection.AddSingleton<ILogisticsPricingStrategy, PerWeightPricing>();
         collection.AddSingleton<ILogisticsCostService, LogisticsCostService>();
+
+        collection.AddSingleton<IBasePriceStrategyFactory, BasePriceStrategyFactory>();
+        collection.AddSingleton<IBasePriceStrategy, AverageBasePriceStrategy>();
+        collection.AddSingleton<IBasePriceStrategy, HighestBasePriceStrategy>();
+        collection.AddSingleton<IBasePriceStrategy, LowestBasePriceStrategy>();
+        collection.AddSingleton<IBasePriceStrategy, MedianBasePriceStrategy>();
+        collection.AddSingleton<IBasePricesService, BasePriceService>();
+        
+        collection.AddSingleton<IDiscountService, DiscountService>();
+        collection.AddSingleton<IPriceService, PriceService>();
         
         collection.AddScoped<IStorageContentService, StorageContentService>();
-        collection.AddScoped<IArticlePricesService, ArticlePricesService>();
         collection.AddScoped<IArticlesService, ArticlesService>();
         collection.AddScoped<IBalanceService, BalanceService>();
         collection.AddScoped<ISaleService, SaleService>();

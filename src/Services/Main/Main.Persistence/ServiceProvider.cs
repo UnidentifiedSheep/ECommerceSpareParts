@@ -48,6 +48,9 @@ public static class ServiceProvider
         collection.AddScoped<IStorageOwnersRepository, StorageOwnersRepository>();
         collection.AddScoped<IArticleWeightRepository, ArticleWeightRepository>();
         collection.AddScoped<IArticleSizesRepository, ArticleSizesRepository>();
+        collection.AddScoped<IPurchaseLogisticsRepository, PurchaseLogisticsRepository>();
+        collection.AddScoped<IPurchaseContentLogisticsRepository, PurchaseContentLogisticsRepository>();
+        collection.AddScoped<IArticleCoefficients, ArticleCoefficients>();
 
         collection.AddScoped<IUnitOfWork, UnitOfWork>();
         

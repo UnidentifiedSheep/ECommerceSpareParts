@@ -1,4 +1,6 @@
+using System.Linq.Expressions;
 using Main.Abstractions.Interfaces.DbRepositories;
+using Main.Abstractions.Models;
 using Main.Entities;
 using Main.Persistence.Context;
 using Microsoft.EntityFrameworkCore;
@@ -9,30 +11,36 @@ namespace Main.Persistence.Repositories;
 
 public class StorageContentRepository(DContext context) : IStorageContentRepository
 {
-    public async Task<Dictionary<int, List<decimal>>> GetHighestBuyPrices(IEnumerable<int> articleIds,
-        int takePerArticle, bool calcWhereZero = false,
-        CancellationToken cancellationToken = default)
+    public async Task<Dictionary<int, List<StorageContentLogisticsProjection>>> GetStorageContentsForPricing(IEnumerable<int> articleIds, 
+        bool onlyPositiveQty = true, CancellationToken ct = default, params Expression<Func<StorageContent, object?>>[] includes)
     {
-        var query = context.StorageContents
-            .AsNoTracking()
-            .Where(x => articleIds.Contains(x.ArticleId));
+        var list = await context.Database
+            .SqlQuery<StorageContentLogisticsProjection>($"""
+                                                          SELECT 
+                                                              sc.Id AS StorageContentId,
+                                                              sc.ArticleId,
+                                                              sc.CurrencyId,
+                                                              sc.BuyPrice AS Price,
+                                                              pl.CurrencyId AS LogisticsCurrencyId,
+                                                              pcl.Price AS LogisticsPrice,
+                                                              pc.Id AS PurchaseContentId,
+                                                              pc.Count AS PurchaseContentCount,
+                                                              p.Id AS PurchaseId
+                                                          FROM storage_content sc
+                                                          LEFT JOIN purchase_content pc ON sc.PurchaseContentId = pc.Id
+                                                          LEFT JOIN purchase p ON pc.PurchaseId = p.Id
+                                                          LEFT JOIN purchase_logistics pl ON p.PurchaseLogisticId = pl.Id
+                                                          LEFT JOIN purchase_content_logistics pcl ON pc.Id = pcl.PurchaseContentId
+                                                          WHERE sc.ArticleId IN ({articleIds})
+                                                            AND ({onlyPositiveQty} OR sc.Count > 0)
 
-        if (!calcWhereZero)
-            query = query.Where(x => x.Count > 0);
+                                                          """)
+            .ToListAsync(ct);
 
-        var result = await query
+        var result = list
             .GroupBy(x => x.ArticleId)
-            .Select(g => new
-            {
-                ArticleId = g.Key,
-                Prices = g
-                    .OrderByDescending(x => x.BuyPriceInUsd)
-                    .Take(takePerArticle)
-                    .Select(x => x.BuyPriceInUsd)
-                    .ToList()
-            })
-            .ToDictionaryAsync(x => x.ArticleId, x => x.Prices, cancellationToken);
-
+            .ToDictionary(g => g.Key, g => g.ToList());
+        
         return result;
     }
 

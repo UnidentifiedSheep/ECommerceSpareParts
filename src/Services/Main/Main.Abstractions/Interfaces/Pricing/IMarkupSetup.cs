@@ -1,6 +1,6 @@
 namespace Main.Abstractions.Interfaces.Pricing;
 
-public interface IPriceSetup
+public interface IMarkupSetup
 {
     Task SetupAsync(CancellationToken cancellationToken = default);
 }

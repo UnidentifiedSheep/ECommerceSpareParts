@@ -1,4 +1,4 @@
-using Main.Application.Handlers.Prices.RecalculateUsablePrice;
+using Main.Application.Handlers.Prices.RecalculateBasePrices;
 using Main.Application.Notifications;
 using MediatR;
 
@@ -9,7 +9,7 @@ public class ArticlesPricesUpdatedNotificationHandler(IMediator mediator)
 {
     public async Task Handle(ArticlePricesUpdatedNotification notification, CancellationToken cancellationToken)
     {
-        var command = new RecalculateUsablePriceCommand(notification.ArticleIds);
+        var command = new RecalculateBasePricesCommand(notification.ArticleIds);
         await mediator.Send(command, cancellationToken);
     }
 }

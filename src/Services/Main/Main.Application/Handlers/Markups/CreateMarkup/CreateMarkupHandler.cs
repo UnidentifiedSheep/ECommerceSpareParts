@@ -55,7 +55,7 @@ public class CreateMarkupHandler(IUnitOfWork unitOfWork) : ICommandHandler<Creat
         finalRanges.Add(sortedRanges.Last());
         foreach (var range in finalRanges)
         {
-            var markupModel = new MarkupModel((double)range.Markup);
+            var markupModel = new MarkupModel(range.Markup / 100);
 
             //Check if we can build an interval map with this data
             intervalMap.AddInterval(new Interval<MarkupModel>(range.RangeStart, range.RangeEnd, markupModel));

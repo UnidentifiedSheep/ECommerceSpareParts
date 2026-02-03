@@ -1,5 +1,6 @@
 using Core.Interfaces.CacheRepositories;
 using FluentValidation;
+using Main.Abstractions.Interfaces.CacheRepositories;
 using Main.Application.Configs;
 using Main.Application.Handlers.Users.ChangeUserDiscount;
 using Main.Entities;
@@ -17,7 +18,7 @@ public class ChangeDiscountForUserTests : IAsyncLifetime
 {
     private readonly DContext _context;
     private readonly IMediator _mediator;
-    private readonly IRedisUserRepository _redisUserRepository;
+    private readonly IUsersCacheRepository _usersCacheRepository;
     private User _mockUser = null!;
 
     public ChangeDiscountForUserTests(CombinedContainerFixture fixture)
@@ -26,7 +27,7 @@ public class ChangeDiscountForUserTests : IAsyncLifetime
         var sp = ServiceProviderForTests.Build(fixture.PostgresConnectionString, fixture.RedisConnectionString);
         _mediator = sp.GetService<IMediator>()!;
         _context = sp.GetRequiredService<DContext>();
-        _redisUserRepository = sp.GetRequiredService<IRedisUserRepository>();
+        _usersCacheRepository = sp.GetRequiredService<IUsersCacheRepository>();
     }
 
     public async Task InitializeAsync()
@@ -66,7 +67,7 @@ public class ChangeDiscountForUserTests : IAsyncLifetime
             .FirstOrDefaultAsync(x => x.UserId == _mockUser.Id);
         Assert.NotNull(userDiscount);
         Assert.Equal(20, userDiscount.Discount);
-        var redisValue = await _redisUserRepository.GetUserDiscount(_mockUser.Id);
+        var redisValue = await _usersCacheRepository.GetUserDiscount(_mockUser.Id);
         Assert.Equal(20, redisValue);
     }
 }

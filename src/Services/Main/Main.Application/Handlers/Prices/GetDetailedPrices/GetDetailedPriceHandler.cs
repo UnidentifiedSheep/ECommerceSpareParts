@@ -14,12 +14,12 @@ public record GetDetailedPricesQuery(IEnumerable<int> ArticleIds, int CurrencyId
 
 public record GetDetailedPriceResult(Dictionary<int, DetailedPriceModel> Prices);
 
-public class GetDetailedPriceHandler(ICurrencyConverter currencyConverter, IArticlePricesService pricesService,
-    IPriceGenerator priceGenerator, IMediator mediator) : IQueryHandler<GetDetailedPricesQuery, GetDetailedPriceResult>
+public class GetDetailedPriceHandler(ICurrencyConverter currencyConverter, IBasePricesService pricesService,
+    IMarkupService markupService, IMediator mediator) : IQueryHandler<GetDetailedPricesQuery, GetDetailedPriceResult>
 {
     public async Task<GetDetailedPriceResult> Handle(GetDetailedPricesQuery request, CancellationToken cancellationToken)
     {
-        var buyerId = request.BuyerId;
+        /*var buyerId = request.BuyerId;
         var currencyId = request.CurrencyId;
         var articleIds = request.ArticleIds;
 
@@ -35,13 +35,14 @@ public class GetDetailedPriceHandler(ICurrencyConverter currencyConverter, IArti
             {
                 Id = articleId,
                 PriceInUsd = usablePrice.Value,
-                MinPrice = priceGenerator.GetSellPriceWithMinimalMarkUp(converted),
-                RecommendedPrice = priceGenerator.GetSellPrice(converted, 0, currencyId),
-                RecommendedPriceWithDiscount = priceGenerator.GetSellPrice(converted, (double)userDiscount, currencyId)
+                MinPrice = markupService.GetSellPriceWithMinimalMarkUp(converted),
+                RecommendedPrice = markupService.GetSellPrice(converted, 0, currencyId),
+                RecommendedPriceWithDiscount = markupService.GetSellPrice(converted, (double)userDiscount, currencyId)
             };
         }
 
-        return new GetDetailedPriceResult(results);
+        return new GetDetailedPriceResult(results);*/
+        throw new NotImplementedException();
     }
 
     private async Task<decimal?> GetUserDiscount(Guid? buyerId, CancellationToken cancellationToken)

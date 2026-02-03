@@ -11,12 +11,12 @@ public record GetPricesQuery(IEnumerable<int> ArticleIds, int CurrencyId, Guid? 
 
 public record GetPricesResult(Dictionary<int, double> Prices);
 
-public class GetPricesHandler(ICurrencyConverter currencyConverter, IArticlePricesService pricesService,
-    IPriceGenerator priceGenerator, IMediator mediator) : IQueryHandler<GetPricesQuery, GetPricesResult>
+public class GetPricesHandler(ICurrencyConverter currencyConverter, IBasePricesService pricesService,
+    IMarkupService markupService, IMediator mediator) : IQueryHandler<GetPricesQuery, GetPricesResult>
 {
     public async Task<GetPricesResult> Handle(GetPricesQuery request, CancellationToken cancellationToken)
     {
-        var currencyId = request.CurrencyId;
+        /*var currencyId = request.CurrencyId;
         var buyerId = request.BuyerId;
         var articleIds = request.ArticleIds;
 
@@ -28,11 +28,12 @@ public class GetPricesHandler(ICurrencyConverter currencyConverter, IArticlePric
         {
             if (usablePrice is null or <= 0) continue;
             var converted = currencyConverter.ConvertFromUsd(usablePrice.Value, currencyId);
-            var sellPrice = priceGenerator.GetSellPrice(converted, (double)userDiscount, currencyId);
+            var sellPrice = markupService.GetSellPrice(converted, (double)userDiscount, currencyId);
             results[articleId] = sellPrice;
         }
 
-        return new GetPricesResult(results);
+        return new GetPricesResult(results);*/
+        throw new NotImplementedException();
     }
 
     private async Task<decimal?> GetUserDiscount(Guid? buyerId, CancellationToken cancellationToken)

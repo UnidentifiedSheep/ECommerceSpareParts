@@ -22,6 +22,8 @@ public partial class DContext : DbContext
 
     public virtual DbSet<ArticleCharacteristic> ArticleCharacteristics { get; set; }
 
+    public virtual DbSet<ArticleCoefficient> ArticleCoefficients { get; set; }
+
     public virtual DbSet<ArticleEan> ArticleEans { get; set; }
 
     public virtual DbSet<ArticleImage> ArticleImages { get; set; }
@@ -39,6 +41,8 @@ public partial class DContext : DbContext
     public virtual DbSet<Cart> Carts { get; set; }
 
     public virtual DbSet<Category> Categories { get; set; }
+
+    public virtual DbSet<Coefficient> Coefficients { get; set; }
 
     public virtual DbSet<Currency> Currencies { get; set; }
 
@@ -134,7 +138,8 @@ public partial class DContext : DbContext
             .HasPostgresEnum("car_types", new[] { "PassengerCar", "CommercialVehicle", "Motorbike" })
             .HasPostgresExtension("dblink")
             .HasPostgresExtension("pg_trgm")
-            .HasPostgresExtension("pgcrypto");
+            .HasPostgresExtension("pgcrypto")
+            .HasPostgresExtension("pg_cron");
 
         modelBuilder.Entity<Article>(entity =>
         {
@@ -265,6 +270,33 @@ public partial class DContext : DbContext
             entity.HasOne(d => d.Article).WithMany(p => p.ArticleCharacteristics)
                 .HasForeignKey(d => d.ArticleId)
                 .HasConstraintName("article_id_fk");
+        });
+
+        modelBuilder.Entity<ArticleCoefficient>(entity =>
+        {
+            entity.HasKey(e => new { e.ArticleId, e.CoefficientName }).HasName("article_coefficients_pk");
+
+            entity.ToTable("article_coefficients");
+
+            entity.HasIndex(e => e.ValidTill, "article_coefficients_valid_till_index");
+
+            entity.Property(e => e.ArticleId).HasColumnName("article_id");
+            entity.Property(e => e.CoefficientName)
+                .HasMaxLength(56)
+                .HasColumnName("coefficient_name");
+            entity.Property(e => e.CreatedAt)
+                .HasDefaultValueSql("now()")
+                .HasColumnName("created_at");
+            entity.Property(e => e.ValidTill).HasColumnName("valid_till");
+
+            entity.HasOne(d => d.Article).WithMany(p => p.ArticleCoefficients)
+                .HasForeignKey(d => d.ArticleId)
+                .HasConstraintName("article_coefficients_articles_id_fk");
+
+            entity.HasOne(d => d.CoefficientNameNavigation).WithMany(p => p.ArticleCoefficients)
+                .HasForeignKey(d => d.CoefficientName)
+                .OnDelete(DeleteBehavior.Restrict)
+                .HasConstraintName("article_coefficients_coefficients_name_fk");
         });
 
         modelBuilder.Entity<ArticleEan>(entity =>
@@ -468,6 +500,22 @@ public partial class DContext : DbContext
             entity.Property(e => e.Name)
                 .HasMaxLength(128)
                 .HasColumnName("name");
+        });
+
+        modelBuilder.Entity<Coefficient>(entity =>
+        {
+            entity.HasKey(e => e.Name).HasName("coefficients_pk");
+
+            entity.ToTable("coefficients");
+
+            entity.Property(e => e.Name)
+                .HasMaxLength(256)
+                .HasColumnName("name");
+            entity.Property(e => e.Order).HasColumnName("order");
+            entity.Property(e => e.Type)
+                .HasMaxLength(56)
+                .HasColumnName("type");
+            entity.Property(e => e.Value).HasColumnName("value");
         });
 
         modelBuilder.Entity<Currency>(entity =>
@@ -902,7 +950,7 @@ public partial class DContext : DbContext
 
             entity.HasIndex(e => e.PurchaseId, "purchase_content_purchase_id_index");
 
-            entity.HasIndex(e => e.StorageContentId, "purchase_content_storage_content_id_index");
+            entity.HasIndex(e => e.StorageContentId, "purchase_content_storage_content_id_uindex").IsUnique();
 
             entity.Property(e => e.Id).HasColumnName("id");
             entity.Property(e => e.ArticleId).HasColumnName("article_id");

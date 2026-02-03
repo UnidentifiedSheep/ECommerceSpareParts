@@ -11,7 +11,7 @@ using Main.Entities;
 namespace Main.Application.EventHandlers;
 
 public class MarkupGroupGeneratedEventHandler(IMarkupRepository markupRepository, IUnitOfWork unitOfWork, 
-    IMessageBroker messageBroker, IPriceSetup priceSetup) : IEventHandler<MarkupGroupGeneratedEvent>
+    IMessageBroker messageBroker, IMarkupSetup markupSetup) : IEventHandler<MarkupGroupGeneratedEvent>
 {
     public async Task HandleAsync(IEventContext<MarkupGroupGeneratedEvent> context)
     {
@@ -40,6 +40,6 @@ public class MarkupGroupGeneratedEventHandler(IMarkupRepository markupRepository
             
             await unitOfWork.SaveChangesAsync();
         });
-        await priceSetup.SetupAsync();
+        await markupSetup.SetupAsync();
     }
 }

@@ -7,6 +7,7 @@ using Main.Abstractions.Interfaces.DbRepositories;
 using Main.Abstractions.Interfaces.Pricing;
 using Main.Abstractions.Interfaces.Services;
 using Main.Abstractions.Models;
+using Main.Application.Extensions;
 using Main.Entities;
 using Mapster;
 using MediatR;
@@ -20,7 +21,7 @@ public record EditSaleCommand(IEnumerable<EditSaleContentDto> EditedContent,
     DateTime SaleDateTime, string? Comment) : ICommand;
 
 public class EditSaleHandler(IUnitOfWork unitOfWork, ISaleService saleService, ISaleRepository saleRepository,
-    IPriceGenerator priceGenerator) : ICommandHandler<EditSaleCommand>
+    IMarkupService markupService) : ICommandHandler<EditSaleCommand>
 {
     public async Task<Unit> Handle(EditSaleCommand request, CancellationToken cancellationToken)
     {
@@ -85,7 +86,7 @@ public class EditSaleHandler(IUnitOfWork unitOfWork, ISaleService saleService, I
         if (!saleContents.TryGetValue(item.Id.Value, out var saleContent))
             throw new SaleContentNotFoundException(item.Id.Value);
 
-        saleContent.Discount = priceGenerator.GetDiscountFromPrices(item.PriceWithDiscount, item.Price);
+        saleContent.Discount = Price.GetDiscountFromPrices(item.PriceWithDiscount, item.Price);
         saleContent.Price = item.PriceWithDiscount;
         saleContent.TotalSum = item.PriceWithDiscount * item.Count;
 

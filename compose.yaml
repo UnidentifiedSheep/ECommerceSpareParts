@@ -98,7 +98,10 @@ services:
     restart: unless-stopped
   
   pgql:
-    image: postgres:latest
+    image: postgres-cron
+    build:
+      context: .
+      dockerfile: .dockerfiles/pgql-cron/Dockerfile
     environment:
       POSTGRES_USER: ${PGQL_USER}
       POSTGRES_PASSWORD: ${PGQL_PASSWORD}
@@ -106,6 +109,11 @@ services:
     volumes:
       - pg_data:/var/lib/postgresql
       - ./init:/docker-entrypoint-initdb.d
+      - ./init:/clear-expired-coef.sql
+    command: >
+      postgres
+      -c shared_preload_libraries=pg_cron
+      -c cron.database_name=${PGQL_MAIN_DB}
     networks:
       - backend-network
     ports:
@@ -113,7 +121,7 @@ services:
     restart: unless-stopped
 
   redis:
-    image: redis:latest
+    image: redis/redis-stack:latest
     command:
       - redis-server
       - --maxmemory-policy

@@ -24,6 +24,7 @@ using Main.Application.Configs;
 using Main.Application.EventHandlers;
 using Main.Application.HangFireTasks;
 using Main.Application.Seeding;
+using Main.Cache;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.HttpOverrides;
@@ -138,6 +139,7 @@ builder.Services.AddScoped<IEventHandler<MarkupGroupGeneratedEvent>, MarkupGroup
 builder.Services
     .AddPersistenceLayer(Environment.GetEnvironmentVariable("DB_CONNECTION_STRING")!)
     .AddCacheLayer(Environment.GetEnvironmentVariable("REDIS_CONNECTION_STRING")!)
+    .AddAppCacheLayer()
     .AddSecurityLayer()
     .AddMailLayer()
     .AddMassageBrokerLayer<DContext>(brokerOptions, eventHandlers,
@@ -277,6 +279,6 @@ return;
 async Task SetupPrice(IServiceProvider serviceProvider)
 {
     using var scope = serviceProvider.CreateScope();
-    var priceSetup = scope.ServiceProvider.GetRequiredService<IPriceSetup>();
+    var priceSetup = scope.ServiceProvider.GetRequiredService<IMarkupSetup>();
     await priceSetup.SetupAsync();
 }

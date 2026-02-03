@@ -1,6 +1,5 @@
 using Core.Interfaces.CacheRepositories;
 using Microsoft.Extensions.DependencyInjection;
-using Redis.Repositories;
 
 namespace Redis;
 
@@ -14,18 +13,6 @@ public static class ServiceProvider
         {
             var redis = Redis.GetRedis();
             return new Cache(redis);
-        });
-        collection.AddScoped<IRedisArticlePriceRepository, RedisArticlePricesRepository>(_ =>
-        {
-            var redis = Redis.GetRedis();
-            var ttl = TimeSpan.FromHours(8);
-            return new RedisArticlePricesRepository(redis, ttl);
-        });
-        collection.AddScoped<IRedisUserRepository, RedisUserRepository>(_ =>
-        {
-            var redis = Redis.GetRedis();
-            var ttl = TimeSpan.FromHours(1);
-            return new RedisUserRepository(redis, ttl);
         });
 
         return collection;

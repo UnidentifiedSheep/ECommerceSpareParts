@@ -1,5 +1,6 @@
 using Application.Common.Interfaces;
 using Core.Interfaces.CacheRepositories;
+using Main.Abstractions.Interfaces.CacheRepositories;
 using Main.Abstractions.Interfaces.DbRepositories;
 
 namespace Main.Application.Handlers.Users.GetUserDiscount;
@@ -8,7 +9,7 @@ public record GetUserDiscountQuery(Guid UserId) : IQuery<GetUserDiscountResult>;
 
 public record GetUserDiscountResult(decimal? Discount);
 
-public class GetUserDiscountHandler(IRedisUserRepository cacheUserRepository, IUserRepository usersRepository)
+public class GetUserDiscountHandler(IUsersCacheRepository cacheUserRepository, IUserRepository usersRepository)
     : IQueryHandler<GetUserDiscountQuery, GetUserDiscountResult>
 {
     public async Task<GetUserDiscountResult> Handle(GetUserDiscountQuery request, CancellationToken cancellationToken)

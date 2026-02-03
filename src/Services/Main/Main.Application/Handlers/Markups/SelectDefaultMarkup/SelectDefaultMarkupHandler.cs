@@ -26,9 +26,7 @@ public class SelectDefaultMarkupHandler(
         if (selectedMarkup.Value == request.MarkupGroupId.ToString()) return Unit.Value;
 
         if (request.MarkupGroupId == -1)
-        {
             selectedMarkup.Value = "-1";
-        }
         else
         {
             var markupGroup = await markupRepository.GetMarkupByIdAsync(request.MarkupGroupId, true, cancellationToken)

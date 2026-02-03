@@ -1,6 +1,6 @@
-namespace Core.Interfaces.CacheRepositories;
+namespace Main.Abstractions.Interfaces.CacheRepositories;
 
-public interface IRedisUserRepository
+public interface IUsersCacheRepository
 {
     Task<decimal?> GetUserDiscount(Guid userId);
     Task SetUserDiscount(Guid userId, decimal discount);

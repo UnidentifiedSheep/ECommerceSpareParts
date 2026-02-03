@@ -68,7 +68,7 @@ public static class ServiceProviderForTests
         using var scope = serviceProvider.CreateScope();
 
         var context = scope.ServiceProvider.GetRequiredService<DContext>();
-        var priceSetup = scope.ServiceProvider.GetRequiredService<IPriceSetup>();
+        var priceSetup = scope.ServiceProvider.GetRequiredService<IMarkupSetup>();
 
         await context.AddMockCurrencies();
         await priceSetup.SetupAsync();

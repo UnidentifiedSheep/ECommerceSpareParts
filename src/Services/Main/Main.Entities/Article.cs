@@ -31,6 +31,8 @@ public partial class Article
 
     public virtual ICollection<ArticleCharacteristic> ArticleCharacteristics { get; set; } = new List<ArticleCharacteristic>();
 
+    public virtual ICollection<ArticleCoefficient> ArticleCoefficients { get; set; } = new List<ArticleCoefficient>();
+
     public virtual ICollection<ArticleEan> ArticleEans { get; set; } = new List<ArticleEan>();
 
     public virtual ICollection<ArticleImage> ArticleImages { get; set; } = new List<ArticleImage>();

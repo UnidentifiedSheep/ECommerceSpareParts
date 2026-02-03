@@ -5,7 +5,9 @@ public interface ICache
     Task StringSetAsync<T>(string key, T value, TimeSpan? expiry = null);
     Task StringSetAsync(string key, string value, TimeSpan? expiry = null);
     Task<string?> StringGetAsync(string key);
-    Task<T?> StringGetAsync<T>(string key);
+    Task<T?> StringGetAsync<T>(string key, string path = "$");
+    Task<List<T?>> StringsGetAsync<T>(IEnumerable<string> keys, string path = "$");
+    void StringBatchSet<T>(IEnumerable<Tuple<string, T, TimeSpan?>> items);
     Task DeleteAsync(string key);
     Task DeleteAsync(IEnumerable<string> keys);
     Task<IEnumerable<string?>> SetMembersAsync(string key);
