@@ -1,3 +1,4 @@
+using System.Linq.Expressions;
 using Core.Extensions;
 using Main.Abstractions.Interfaces.DbRepositories;
 using Main.Entities;
@@ -70,12 +71,16 @@ public class PurchaseRepository(DContext context) : IPurchaseRepository
     }
 
     public async Task<IEnumerable<PurchaseContent>> GetPurchaseContent(string purchaseId, bool track = true,
-        CancellationToken cancellationToken = default)
+        CancellationToken cancellationToken = default, params Expression<Func<PurchaseContent, object?>>[] includes)
     {
-        return await context.PurchaseContents.ConfigureTracking(track)
+        var query = context.PurchaseContents.ConfigureTracking(track)
             .Include(x => x.Article)
             .ThenInclude(x => x.Producer)
-            .Where(x => x.PurchaseId == purchaseId)
-            .ToListAsync(cancellationToken);
+            .Where(x => x.PurchaseId == purchaseId);
+
+        foreach (var include in includes)
+            query = query.Include(include);
+        
+        return await query.ToListAsync(cancellationToken);
     }
 }

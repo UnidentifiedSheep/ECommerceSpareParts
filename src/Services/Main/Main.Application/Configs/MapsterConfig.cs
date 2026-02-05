@@ -260,6 +260,22 @@ public static class MapsterConfig
             .Map(d => d.Price, s => s.Price)
             .Map(d => d.Count, s => s.Count)
             .Map(d => d.TotalSum, s => s.Price * s.Count);
+        
+        TypeAdapterConfig<PurchaseLogistic, PurchaseLogisticDto>.NewConfig()
+            .IgnoreNonMapped(true)
+            .Map(d => d.PurchaseId, s => s.PurchaseId)
+            .Map(d => d.CurrencyId, s => s.CurrencyId)
+            .Map(d => d.CurrencySign, s => s.Currency.CurrencySign)
+            .Map(d => d.CurrencyName, s => s.Currency.Name)
+            .Map(d => d.MinimumPrice, s => s.MinimumPrice)
+            .Map(d => d.MinimumPriceApplied, s => s.MinimumPriceApplied)
+            .Map(d => d.PriceKg, s => s.PriceKg)
+            .Map(d => d.PricePerM3, s => s.PricePerM3)
+            .Map(d => d.PricePerOrder, s => s.PricePerOrder)
+            .Map(d => d.PricingModel, s => s.PricingModel)
+            .Map(d => d.RouteId, s => s.RouteId)
+            .Map(d => d.RouteType, s => s.RouteType)
+            .Map(d => d.TransactionId, s => s.TransactionId);
 
         //Users
         TypeAdapterConfig<User, UserDto>.NewConfig()

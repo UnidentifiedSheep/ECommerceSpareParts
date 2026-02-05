@@ -1,3 +1,4 @@
+using System.Linq.Expressions;
 using Main.Entities;
 
 namespace Main.Abstractions.Interfaces.DbRepositories;
@@ -16,5 +17,5 @@ public interface IPurchaseRepository
         CancellationToken cancellationToken = default);
 
     Task<IEnumerable<PurchaseContent>> GetPurchaseContent(string purchaseId, bool track = true,
-        CancellationToken cancellationToken = default);
+        CancellationToken cancellationToken = default, params Expression<Func<PurchaseContent, object?>>[] includes);
 }

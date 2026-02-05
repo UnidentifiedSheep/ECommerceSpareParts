@@ -41,6 +41,16 @@
           { "PathRemovePrefix": "/main" }
         ]
       },
+      "get-purchase-logistic": {
+        "ClusterId": "main-cluster",
+        "Match": {
+          "Path": "/main/purchases/{id}/logistics",
+          "Methods": [ "GET" ]
+        },
+        "Transforms": [
+          { "PathRemovePrefix": "/main" }
+        ]
+      },
       "get-purchases": {
         "ClusterId": "main-cluster",
         "Match": {

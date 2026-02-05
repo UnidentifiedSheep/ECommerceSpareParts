@@ -16,7 +16,7 @@ public class GetPurchaseContentHandler(IPurchaseRepository purchaseRepository)
         CancellationToken cancellationToken)
     {
         var content = await purchaseRepository
-            .GetPurchaseContent(request.Id, false, cancellationToken);
+            .GetPurchaseContent(request.Id, false, cancellationToken, x => x.PurchaseContentLogistic);
         return new GetPurchaseContentResult(content.Adapt<List<PurchaseContentDto>>());
     }
 }
