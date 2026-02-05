@@ -129,23 +129,30 @@ public class StorageContentRepository(DContext context) : IStorageContentReposit
     }
 
     public IAsyncEnumerable<StorageContent> GetStorageContentsForUpdateAsync(int? articleId, string? storageName,
-        IEnumerable<int>? exceptArticleIds = null, IEnumerable<string>? exceptStorages = null, int countGreaterThen = 0,
+        IEnumerable<int>? exceptArticleIds = null, IEnumerable<string>? exceptStorages = null, int countGreaterThen = 0, 
         bool track = true)
     {
-        var exceptArticles = exceptArticleIds ?? [];
-        var exceptStoragesArray = exceptStorages ?? [];
-        return context.StorageContents
-            .FromSql($"""
-                      SELECT *
-                      FROM storage_content
-                      WHERE ({articleId == null} OR article_id = {articleId})
-                        AND (NOT (article_id = ANY({exceptArticles.ToArray()}::int[])))
-                        AND ({storageName == null} OR storage_name = {storageName})
-                        AND (NOT (storage_name = ANY({exceptStoragesArray.ToArray()}::text[])))
-                        AND count > {countGreaterThen}
-                      FOR UPDATE
-                      """)
+        var exceptArticles = exceptArticleIds?.ToList();
+        var exceptStorageNames = exceptStorages?.ToList();
+        var query = context.StorageContents
             .ConfigureTracking(track)
+            .Where(x => x.Count > countGreaterThen);
+
+        if (articleId != null)
+            query = query.Where(x => x.ArticleId == articleId);
+
+        if (exceptArticles != null && exceptArticles.Count != 0)
+            query = query.Where(x => !exceptArticles.Contains(x.ArticleId));
+        
+        if (storageName != null)
+            query = query.Where(x => x.StorageName == storageName);
+        
+        if (exceptStorageNames != null && exceptStorageNames.Count != 0)
+            query = query.Where(x => !exceptStorageNames.Contains(x.StorageName));
+        
+        return query
+            .OrderBy(x => x.PurchaseDatetime)
+            .ForUpdate()
             .AsAsyncEnumerable();
     }
 

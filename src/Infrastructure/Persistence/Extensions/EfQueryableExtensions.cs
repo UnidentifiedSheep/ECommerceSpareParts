@@ -8,4 +8,9 @@ public static class EfQueryableExtensions
     {
         return track ? query : query.AsNoTracking();
     }
+
+    public static IQueryable<T> ForUpdate<T>(this IQueryable<T> query) where T : class
+    {
+        return query.TagWith("ForUpdate");
+    }
 }

@@ -4,6 +4,7 @@ using MassTransit.EntityFrameworkCoreIntegration;
 using Microsoft.EntityFrameworkCore;
 using NpgsqlTypes;
 using Persistence.Extensions;
+using Persistence.Interceptors;
 
 namespace Main.Persistence.Context;
 
@@ -16,6 +17,12 @@ public partial class DContext : DbContext
     public DContext(DbContextOptions<DContext> options)
         : base(options)
     {
+    }
+
+    protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
+    {
+        base.OnConfiguring(optionsBuilder);
+        optionsBuilder.AddInterceptors(new SelectForUpdateCommandInterceptor());
     }
 
     public virtual DbSet<Article> Articles { get; set; }

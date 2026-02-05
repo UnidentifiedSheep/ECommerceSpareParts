@@ -33,6 +33,16 @@ public interface IStorageContentRepository
         IEnumerable<(int contentId, string storageId)> ids, bool track = true,
         CancellationToken cancellationToken = default);
 
+    /// <summary>
+    /// Получение StorageContent, по articleId и storageName. Сортировка идет по дате покупки (по возрастанию).
+    /// </summary>
+    /// <param name="articleId">Айди артикула</param>
+    /// <param name="storageName">Название склада</param>
+    /// <param name="exceptArticleIds">Артикулы айди которые не должны быть в результате</param>
+    /// <param name="exceptStorages">Склады которые не должны быть в результате</param>
+    /// <param name="countGreaterThen">Число больше которого должно быть Количество позиции</param>
+    /// <param name="track">Отслеживать сущность/и или нет</param>
+    /// <returns></returns>
     IAsyncEnumerable<StorageContent> GetStorageContentsForUpdateAsync(int? articleId, string? storageName,
         IEnumerable<int>? exceptArticleIds = null, IEnumerable<string>? exceptStorages = null, int countGreaterThen = 0,
         bool track = true);
