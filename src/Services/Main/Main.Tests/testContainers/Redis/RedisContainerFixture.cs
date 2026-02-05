@@ -5,7 +5,7 @@ namespace Tests.testContainers.Redis;
 public class RedisContainerFixture : IAsyncLifetime
 {
     private readonly RedisContainer _redisContainer = new RedisBuilder()
-        .WithImage("redis:7-alpine")
+        .WithImage("redis/redis-stack:latest")
         .WithPortBinding(6379, true)
         .Build();
 

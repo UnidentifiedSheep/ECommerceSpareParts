@@ -1566,10 +1566,6 @@ public partial class DContext : DbContext
 
             entity.HasIndex(e => e.ReceiverId, "transactions_receiver_id_index");
 
-            entity.HasIndex(e => new { e.ReceiverId, e.TransactionDatetime, e.SenderId }, "transactions_receiver_id_transaction_datetime_sender_id_uindex")
-                .IsUnique()
-                .HasFilter("(is_deleted IS FALSE)");
-
             entity.HasIndex(e => e.SenderId, "transactions_sender_id_index");
 
             entity.HasIndex(e => new { e.SenderId, e.ReceiverId }, "transactions_sender_id_receiver_id_index");

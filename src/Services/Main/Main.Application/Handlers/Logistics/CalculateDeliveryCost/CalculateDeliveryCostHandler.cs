@@ -15,7 +15,7 @@ using Mapster;
 
 namespace Main.Application.Handlers.Logistics.CalculateDeliveryCost;
 
-public record CalculateDeliveryCostQuery(string StorageFrom, string StorageTo, int CurrencyId,
+public record CalculateDeliveryCostQuery(string StorageFrom, string StorageTo,
     IEnumerable<LogisticsItemDto> Items, LogisticsCalculationMode Mode = LogisticsCalculationMode.Strict) : IQuery<CalculateDeliveryCostResult>;
 public record CalculateDeliveryCostResult(StorageRouteDto Route, DeliveryCostDto DeliveryCost);
 
@@ -37,9 +37,9 @@ public class CalculateDeliveryCostHandler(ILogisticsCostService logisticsCostSer
         Dictionary<int, ArticleSize> sizes = await GetSizes(usableArticleIds, cancellationToken);
         Dictionary<int, Entities.ArticleWeight> weights = await GetWeights(usableArticleIds, cancellationToken);
         
-        var deliveryCost = GetDeliveryCost(route, sizes, weights, request.Items, request.CurrencyId, request.Mode)
+        var deliveryCost = GetDeliveryCost(route, sizes, weights, request.Items, route.CurrencyId, request.Mode)
             .Adapt<DeliveryCostDto>();
-        deliveryCost.CurrencyId = request.CurrencyId;
+        deliveryCost.CurrencyId = route.CurrencyId;
         
         return new CalculateDeliveryCostResult(route.Adapt<StorageRouteDto>(), deliveryCost);
     }

@@ -31,8 +31,7 @@ public record CreateFullPurchaseCommand(
     string? Comment,
     decimal? PayedSum,
     bool WithLogistics,
-    string? StorageFrom,
-    int? LogisticsCurrencyId) : ICommand;
+    string? StorageFrom) : ICommand;
 
 public class CreateFullPurchaseHandler(IMediator mediator) : ICommandHandler<CreateFullPurchaseCommand>
 {
@@ -63,8 +62,7 @@ public class CreateFullPurchaseHandler(IMediator mediator) : ICommandHandler<Cre
 
         if (!request.WithLogistics) return Unit.Value;
         
-        var (usedRoute, deliveryCost) = await CalculateDeliveryCost(request.StorageFrom!, storageName, content,
-            request.LogisticsCurrencyId!.Value, cancellationToken);
+        var (usedRoute, deliveryCost) = await CalculateDeliveryCost(request.StorageFrom!, storageName, content, cancellationToken);
         
         Transaction? logisticsTransaction = null;
         if (usedRoute.CarrierId != null)
@@ -122,12 +120,12 @@ public class CreateFullPurchaseHandler(IMediator mediator) : ICommandHandler<Cre
     }
 
     private async Task<(StorageRouteDto usedRoute, DeliveryCostDto deliveryCost)> CalculateDeliveryCost(string storageFrom, 
-        string storageTo, List<NewPurchaseContentDto> content, int logisticsCurrencyId, CancellationToken token)
+        string storageTo, List<NewPurchaseContentDto> content, CancellationToken token)
     {
         var items = content.Where(x => x.CalculateLogistics)
             .Adapt<List<LogisticsItemDto>>();
 
-        var query = new CalculateDeliveryCostQuery(storageFrom, storageTo, logisticsCurrencyId, items);
+        var query = new CalculateDeliveryCostQuery(storageFrom, storageTo, items);
         var result = await mediator.Send(query, token);
         return (result.Route, result.DeliveryCost);
     }

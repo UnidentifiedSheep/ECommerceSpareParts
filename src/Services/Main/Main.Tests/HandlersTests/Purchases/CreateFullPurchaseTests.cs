@@ -86,7 +86,7 @@ public class CreateFullPurchaseTests : IAsyncLifetime
 
         var command = new CreateFullPurchaseCommand(
             _user.Id, _supplier.Id, _currency.Id, _storageTo.Name, DateTime.Now,
-            content, "Full Purchase Comment", null, false, null, null);
+            content, "Full Purchase Comment", null, false, null);
 
         await _mediator.Send(command);
 
@@ -124,7 +124,7 @@ public class CreateFullPurchaseTests : IAsyncLifetime
 
         var command = new CreateFullPurchaseCommand(
             _user.Id, _supplier.Id, _currency.Id, _storageTo.Name, DateTime.Now,
-            content, "Purchase with payment", 500m, false, null, null);
+            content, "Purchase with payment", 500m, false, null);
 
         await _mediator.Send(command);
 
@@ -132,7 +132,7 @@ public class CreateFullPurchaseTests : IAsyncLifetime
         var transactions = await _context.Transactions
             .Where(x => (x.SenderId == _supplier.Id && x.ReceiverId == Main.Application.Global.SystemId) ||
                         (x.SenderId == Main.Application.Global.SystemId && x.ReceiverId == _supplier.Id))
-            .ToListAsync<Transaction>();
+            .ToListAsync();
 
         Assert.Equal(2, transactions.Count);
         Assert.Contains(transactions, x => x.TransactionSum == 1000m && x.Status == TransactionStatus.Purchase);
@@ -192,7 +192,7 @@ public class CreateFullPurchaseTests : IAsyncLifetime
 
         var command = new CreateFullPurchaseCommand(
             _user.Id, _supplier.Id, _currency.Id, _storageTo.Name, DateTime.Now,
-            content, "Logistics Purchase", null, true, _storageFrom.Name, _currency.Id);
+            content, "Logistics Purchase", null, true, _storageFrom.Name);
 
         await _mediator.Send(command);
 

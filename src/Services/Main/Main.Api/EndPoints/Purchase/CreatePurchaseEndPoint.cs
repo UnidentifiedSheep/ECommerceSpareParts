@@ -17,8 +17,7 @@ public record CreatePurchaseRequest(
     string? Comment,
     decimal? PayedSum,
     bool WithLogistics,
-    string? StorageFrom,
-    int? LogisticsCurrencyId);
+    string? StorageFrom);
 
 public class CreatePurchaseEndPoint : ICarterModule
 {
@@ -32,7 +31,7 @@ public class CreatePurchaseEndPoint : ICarterModule
                         return Results.Unauthorized();
                     var command = new CreateFullPurchaseCommand(userId, request.SupplierId, request.CurrencyId,
                         request.StorageName, request.PurchaseDate, request.PurchaseContent, request.Comment,
-                        request.PayedSum, request.WithLogistics, request.StorageFrom, request.LogisticsCurrencyId);
+                        request.PayedSum, request.WithLogistics, request.StorageFrom);
                     await sender.Send(command, token);
                     return Results.Ok();
                 }).WithTags("Purchases")

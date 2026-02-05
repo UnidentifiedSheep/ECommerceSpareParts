@@ -6,11 +6,8 @@ namespace Main.Application.Handlers.Logistics.CalculateDeliveryCost;
 
 public class CalculateDeliveryCostValidation : AbstractValidator<CalculateDeliveryCostQuery>
 {
-    public CalculateDeliveryCostValidation(ICurrencyConverter currencyConverter)
+    public CalculateDeliveryCostValidation()
     {
-        RuleFor(x => x.CurrencyId)
-            .CurrencyMustExist(currencyConverter);
-        
         RuleFor(x => x.Items)
             .NotEmpty()
             .WithMessage("Список элементов не может быть пустым.");

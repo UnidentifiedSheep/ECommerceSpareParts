@@ -22,11 +22,6 @@ public class CreateFullPurchaseValidation : AbstractValidator<CreateFullPurchase
 
         RuleFor(x => x.PurchaseDate)
             .SetValidator(new PurchaseDateTimeValidator());
-
-        RuleFor(x => x.LogisticsCurrencyId)
-            .Must(x => x != null)
-            .When(x => x.WithLogistics)
-            .WithMessage("При создании закупки с логистикой, валюта для расчета логистики должна быть указана");
         
         RuleFor(x => x.StorageFrom)
             .Must(x => x != null)
