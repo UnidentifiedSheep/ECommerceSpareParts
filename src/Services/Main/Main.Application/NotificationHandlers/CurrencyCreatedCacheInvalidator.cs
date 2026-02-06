@@ -1,5 +1,6 @@
 using Core.Abstractions;
 using Core.Interfaces.CacheRepositories;
+using Core.StaticFunctions;
 using Main.Abstractions.Interfaces.DbRepositories;
 using Main.Application.Notifications;
 using Main.Entities;
@@ -14,7 +15,9 @@ public class CurrencyCreatedCacheInvalidator(RelatedDataBase<Currency> relatedDa
     {
         var prevCurrency = await currencyRepository.GetCurrencyBeforeSpecifiedId(notification.Id, false, cancellationToken);
         if (prevCurrency == null) return;
-        var relatedKeys = await relatedDataBase.GetRelatedDataKeys(prevCurrency.Id.ToString());
+        var relatedKeys = (await relatedDataBase.GetRelatedDataKeys(prevCurrency.Id.ToString()))
+            .ToList();
+        relatedKeys.Add(CacheKeys.CurrencyRatesCacheKey);
         await cache.DeleteAsync(relatedKeys);
     }
 }
