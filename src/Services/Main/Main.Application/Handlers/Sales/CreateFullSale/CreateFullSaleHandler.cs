@@ -1,10 +1,8 @@
 using System.Text;
+using Abstractions.Interfaces.Services;
 using Application.Common.Interfaces;
+using Attributes;
 using Contracts.Sale;
-using Core.Attributes;
-using Core.Interfaces;
-using Core.Interfaces.Services;
-using Core.StaticFunctions;
 using Exceptions.Exceptions.Sales;
 using Exceptions.Exceptions.Storages;
 using Main.Abstractions.Dtos.Amw.Sales;
@@ -20,7 +18,9 @@ using Main.Application.Notifications;
 using Main.Entities;
 using Main.Enums;
 using Mapster;
+using MassTransit;
 using MediatR;
+using Utils;
 using IsolationLevel = System.Data.IsolationLevel;
 
 namespace Main.Application.Handlers.Sales.CreateFullSale;
@@ -39,7 +39,7 @@ public record CreateFullSaleCommand(
     string? ConfirmationCode) : ICommand;
 
 public class CreateFullSaleHandler(IMediator mediator, IArticlesRepository articlesRepository, IUnitOfWork unitOfWork,
-    IMessageBroker messageBroker)
+    IPublishEndpoint publishEndpoint)
     : ICommandHandler<CreateFullSaleCommand, Unit>
 {
     public async Task<Unit> Handle(CreateFullSaleCommand request, CancellationToken cancellationToken)
@@ -76,7 +76,10 @@ public class CreateFullSaleHandler(IMediator mediator, IArticlesRepository artic
 
         await SubtractCountFromReservations(buyerId, whoCreated, saleCounts, cancellationToken);
 
-        await messageBroker.Publish(new SaleCreatedEvent(sale.Adapt<global::Contracts.Models.Sale.Sale>()), cancellationToken);
+        await publishEndpoint.Publish(new SaleCreatedEvent
+        {
+            Sale = sale.Adapt<global::Contracts.Models.Sale.Sale>()
+        }, cancellationToken);
         await unitOfWork.SaveChangesAsync(cancellationToken);
         await mediator.Publish(new ArticlesUpdatedNotification(saleCounts.Keys), cancellationToken);
         return Unit.Value;
@@ -105,13 +108,13 @@ public class CreateFullSaleHandler(IMediator mediator, IArticlesRepository artic
                 .ToDictionary(x => x.Id);
             var res = new Dictionary<string, int>();
             var codeBuilder = new StringBuilder();
-            codeBuilder.Append(ConcurrencyStatic.GetConcurrencyCode(whoCreateUserId));
+            codeBuilder.Append(HashUtils.ComputeHash(whoCreateUserId));
             foreach (var (id, count) in byReservation.OrderBy(x => x.Key))
             {
                 var art = arts[id];
                 var key = $"{art.Producer.Name}_{art.ArticleNumber}";
                 res[key] = count;
-                codeBuilder.Append(ConcurrencyStatic.GetConcurrencyCode(key, count));
+                codeBuilder.Append(HashUtils.ComputeHash(key, count));
             }
 
             var currentCode = codeBuilder.ToString();

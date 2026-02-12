@@ -1,5 +1,5 @@
-using Core.Abstractions;
-using Core.Interfaces.CacheRepositories;
+using Abstractions.Interfaces.Cache;
+using Application.Common.Abstractions.RelatedData;
 using Main.Entities;
 
 namespace Main.Application.RelatedData;

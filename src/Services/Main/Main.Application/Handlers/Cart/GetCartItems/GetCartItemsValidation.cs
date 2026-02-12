@@ -1,5 +1,5 @@
-﻿using FluentValidation;
-using Main.Application.Handlers.BaseValidators;
+﻿using Application.Common.Validators;
+using FluentValidation;
 
 namespace Main.Application.Handlers.Cart.GetCartItems;
 

@@ -1,6 +1,6 @@
 using System.Collections.Concurrent;
-using Core.Interfaces;
-using Core.Models;
+using Application.Common.Interfaces;
+using Application.Common.Models;
 
 namespace Api.Common.Services;
 

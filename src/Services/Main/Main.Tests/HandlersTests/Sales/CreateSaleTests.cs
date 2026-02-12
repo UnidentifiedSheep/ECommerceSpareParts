@@ -1,4 +1,4 @@
-using Main.Abstractions.Consts;
+using Main.Abstractions.Constants;
 using Main.Application.Handlers.Sales.CreateSale;
 using Main.Abstractions.Dtos.Amw.Sales;
 using Main.Entities;

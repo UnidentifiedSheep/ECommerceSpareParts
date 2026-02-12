@@ -1,4 +1,4 @@
-﻿using Main.Abstractions.Consts;
+﻿using Main.Abstractions.Constants;
 using Main.Application.Handlers.ArticleReservations.CreateArticleReservation;
 using Main.Abstractions.Dtos.Amw.ArticleReservations;
 using Main.Entities;

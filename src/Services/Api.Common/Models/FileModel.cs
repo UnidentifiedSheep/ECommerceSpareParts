@@ -1,4 +1,4 @@
-﻿using Core.Interfaces;
+﻿using Abstractions.Interfaces;
 
 namespace Api.Common.Models;
 

@@ -1,12 +1,14 @@
 ﻿using System.Security.Claims;
+using Abstractions.Interfaces;
+using Abstractions.Models;
+using Api.Common.Extensions;
 using Carter;
-using Core.Models;
+using Enums;
 using Main.Application.Handlers.Articles.GetArticles;
 using Main.Enums;
 using Mapster;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
-using Security.Extensions;
 using AmwArticleDto = Main.Abstractions.Dtos.Amw.Articles.ArticleDto;
 using AnonymousArticleDto = Main.Abstractions.Dtos.Anonymous.Articles.ArticleDto;
 
@@ -27,10 +29,10 @@ public class GetArticlesEndPoint : ICarterModule
 {
     public void AddRoutes(IEndpointRouteBuilder app)
     {
-        app.MapGet("/articles", async (ISender sender, HttpContext context, ClaimsPrincipal user,
+        app.MapGet("/articles", async (ISender sender, HttpContext context, IUserContext user,
                 [AsParameters] GetArticleRequest request, CancellationToken token) =>
             {
-                user.GetUserId(out var userId);
+                var userId = user.UserId;
                 
                 var producerIds = context.Request.Query["producerId"]
                     .Select(x => int.TryParse(x, out var id) ? id : (int?)null)
@@ -38,7 +40,7 @@ public class GetArticlesEndPoint : ICarterModule
                     .Select(x => x!.Value)
                     .ToList();
                 var pagination = new PaginationModel(request.Page, request.Limit);
-                if (user.HasPermissions("ARTICLES.GET.FULL"))
+                if (user.ContainsPermission(nameof(PermissionCodes.ARTICLES_GET_FULL)))
                     return await GetAmw(sender, request, pagination, userId, producerIds, token);
                 return await GetAnonymous(sender, request, pagination, userId, producerIds, token);
             }).WithTags("Articles")

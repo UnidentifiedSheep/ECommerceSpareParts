@@ -1,5 +1,4 @@
 using Application.Common.Interfaces;
-using Core.Interfaces.CacheRepositories;
 using Main.Abstractions.Interfaces.CacheRepositories;
 using Main.Abstractions.Interfaces.DbRepositories;
 

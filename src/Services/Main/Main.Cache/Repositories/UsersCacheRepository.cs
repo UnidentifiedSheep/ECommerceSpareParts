@@ -1,4 +1,4 @@
-using Core.Interfaces.CacheRepositories;
+using Abstractions.Interfaces.Cache;
 using Main.Abstractions.Interfaces.CacheRepositories;
 
 namespace Main.Cache.Repositories;

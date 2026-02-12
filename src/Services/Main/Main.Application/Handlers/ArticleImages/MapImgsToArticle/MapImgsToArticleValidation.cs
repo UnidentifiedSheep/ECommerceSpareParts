@@ -1,4 +1,4 @@
-﻿using Core.Consts;
+﻿using Constants;
 using FluentValidation;
 
 namespace Main.Application.Handlers.ArticleImages.MapImgsToArticle;
@@ -11,7 +11,7 @@ public class MapImgsToArticleValidation : AbstractValidator<MapImgsToArticleComm
             .ChildRules(z =>
             {
                 z.RuleFor(x => x.Extension)
-                    .Must(x => FileConsts.ImageExtensions.Any(c => c == x))
+                    .Must(x => FileConstants.ImageExtensions.Any(c => c == x))
                     .WithMessage("Файл должен являться изображением");
             });
 

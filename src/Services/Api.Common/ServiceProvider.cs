@@ -1,5 +1,5 @@
 using Api.Common.Services;
-using Core.Interfaces;
+using Application.Common.Interfaces;
 
 namespace Api.Common;
 

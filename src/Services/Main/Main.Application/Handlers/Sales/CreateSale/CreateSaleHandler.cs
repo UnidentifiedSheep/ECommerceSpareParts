@@ -1,7 +1,7 @@
 using System.Data;
+using Abstractions.Interfaces.Services;
 using Application.Common.Interfaces;
-using Core.Attributes;
-using Core.Interfaces.Services;
+using Attributes;
 using Main.Abstractions.Dtos.Amw.Sales;
 using Main.Abstractions.Interfaces.Services;
 using Main.Abstractions.Models;

@@ -1,5 +1,5 @@
 ﻿using FluentValidation;
-using Main.Abstractions.Consts;
+using Main.Abstractions.Constants;
 using Main.Application.Configs;
 using Main.Application.Handlers.StorageRoutes.AddStorageRoute;
 using Main.Entities;

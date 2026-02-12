@@ -1,4 +1,5 @@
 using System.Security.Claims;
+using Abstractions.Interfaces;
 using Api.Common.Extensions;
 using Carter;
 using Main.Application.Handlers.StorageContents.DeleteContent;
@@ -11,11 +12,9 @@ public class DeleteStorageContentEndPoint : ICarterModule
     public void AddRoutes(IEndpointRouteBuilder app)
     {
         app.MapDelete("/storages/content/{contentId}", async (ISender sender, int contentId, string concurrencyCode,
-                ClaimsPrincipal claims, CancellationToken cancellationToken) =>
+                IUserContext user, CancellationToken cancellationToken) =>
             {
-                if (!Guid.TryParse(claims.FindFirstValue(ClaimTypes.NameIdentifier), out var userId))
-                    return Results.Unauthorized();
-                var command = new DeleteStorageContentCommand(contentId, concurrencyCode, userId);
+                var command = new DeleteStorageContentCommand(contentId, concurrencyCode, user.UserId);
                 await sender.Send(command, cancellationToken);
                 return Results.NoContent();
             }).WithTags("Storages")

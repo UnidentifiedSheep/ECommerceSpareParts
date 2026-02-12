@@ -1,6 +1,6 @@
 using System.Reflection;
-using Core.Attributes;
-using Core.Interfaces.Services;
+using Abstractions.Interfaces.Services;
+using Attributes;
 using MediatR;
 
 namespace Application.Common.Behaviors;

@@ -1,12 +1,13 @@
 using Api.Common.Extensions;
 using Carter;
+using Enums;
 using Main.Application.Handlers.Users.ChangeUserDiscount;
 using Main.Enums;
 using MediatR;
 
 namespace Main.Api.EndPoints.Users;
 
-public record ChangeDiscountForUserRequest(decimal NewDiscount);
+public record ChangeDiscountForUserRequest(decimal NewDiscountRate);
 
 public class ChangeDiscountForUserEndPoint : ICarterModule
 {
@@ -16,7 +17,7 @@ public class ChangeDiscountForUserEndPoint : ICarterModule
                 async (ISender sender, Guid userId, ChangeDiscountForUserRequest request,
                     CancellationToken cancellationToken) =>
                 {
-                    var command = new ChangeUserDiscountCommand(userId, request.NewDiscount);
+                    var command = new ChangeUserDiscountCommand(userId, request.NewDiscountRate);
                     await sender.Send(command, cancellationToken);
                     return Results.Ok();
                 }).WithTags("Balances")

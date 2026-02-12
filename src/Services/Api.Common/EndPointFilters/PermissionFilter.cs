@@ -1,8 +1,9 @@
-﻿using Api.Common.Enums;
+﻿using Abstractions.Interfaces;
+using Api.Common.Enums;
 
 namespace Api.Common.EndPointFilters;
 
-public class PermissionFilter : IEndpointFilter
+public sealed class PermissionFilter : IEndpointFilter
 {
     private readonly string[] _permissions;
     private readonly PermissionCheck _check;
@@ -15,17 +16,15 @@ public class PermissionFilter : IEndpointFilter
 
     public async ValueTask<object?> InvokeAsync(EndpointFilterInvocationContext ctx, EndpointFilterDelegate next)
     {
-        var user = ctx.HttpContext.User;
-        if (user.Identity?.IsAuthenticated != true) return Results.Unauthorized();
-        
-        var userPerms = user.FindAll("permission")
-            .Select(x => x.Value)
-            .ToHashSet();
+        var user = ctx.HttpContext.RequestServices.GetRequiredService<IUserContext>();
+
+        if (!user.IsAuthenticated)
+            return Results.Unauthorized();
 
         bool allowed = _check == PermissionCheck.Any
-            ? _permissions.Any(p => userPerms.Contains(p))
-            : _permissions.All(p => userPerms.Contains(p));
-        
+            ? _permissions.Any(p => user.Permissions.Contains(p))
+            : _permissions.All(p => user.Permissions.Contains(p));
+
         if (!allowed)
             return Results.Forbid();
 

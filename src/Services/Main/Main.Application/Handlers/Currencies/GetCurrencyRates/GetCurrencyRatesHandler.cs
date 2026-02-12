@@ -1,6 +1,6 @@
 ﻿using Application.Common.Interfaces;
-using Core.StaticFunctions;
 using Main.Abstractions.Interfaces.DbRepositories;
+using Main.Abstractions.Utils;
 
 namespace Main.Application.Handlers.Currencies.GetCurrencyRates;
 

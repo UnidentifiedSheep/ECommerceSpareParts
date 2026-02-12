@@ -1,6 +1,6 @@
+using Abstractions.Models;
 using Api.Common.Extensions;
 using Carter;
-using Core.Models;
 using Main.Application.Handlers.Currencies.GetCurrencies;
 using Main.Application.Handlers.Currencies.GetCurrencyById;
 using Main.Abstractions.Dtos.Currencies;

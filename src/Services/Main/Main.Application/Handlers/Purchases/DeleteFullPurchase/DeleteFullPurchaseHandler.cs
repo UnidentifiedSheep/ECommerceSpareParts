@@ -1,6 +1,6 @@
 using System.Data;
 using Application.Common.Interfaces;
-using Core.Attributes;
+using Attributes;
 using Exceptions.Exceptions.Purchase;
 using Main.Abstractions.Interfaces.DbRepositories;
 using Main.Application.Handlers.Balance.DeleteTransaction;

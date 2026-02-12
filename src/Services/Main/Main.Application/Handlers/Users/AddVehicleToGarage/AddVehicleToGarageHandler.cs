@@ -1,6 +1,6 @@
+using Abstractions.Interfaces.Services;
 using Application.Common.Interfaces;
-using Core.Attributes;
-using Core.Interfaces.Services;
+using Attributes;
 using Exceptions.Exceptions.Vehicles;
 using Main.Abstractions.Dtos.Member.Vehicles;
 using Main.Abstractions.Interfaces.DbRepositories;

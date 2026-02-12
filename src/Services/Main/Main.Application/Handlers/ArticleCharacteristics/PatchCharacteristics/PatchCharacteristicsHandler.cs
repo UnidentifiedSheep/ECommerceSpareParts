@@ -1,6 +1,6 @@
+using Abstractions.Interfaces.Services;
 using Application.Common.Interfaces;
-using Core.Attributes;
-using Core.Interfaces.Services;
+using Attributes;
 using Exceptions.Exceptions.ArticleCharacteristics;
 using Main.Abstractions.Dtos.Amw.ArticleCharacteristics;
 using Main.Abstractions.Interfaces.DbRepositories;

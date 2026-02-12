@@ -1,9 +1,8 @@
 using System.Data;
+using Abstractions.Interfaces.Services;
 using Application.Common.Interfaces;
+using Attributes;
 using Contracts.Sale;
-using Core.Attributes;
-using Core.Interfaces;
-using Core.Interfaces.Services;
 using Main.Abstractions.Dtos.Amw.Sales;
 using Main.Abstractions.Models;
 using Main.Application.Handlers.Balance.DeleteTransaction;
@@ -12,6 +11,7 @@ using Main.Application.Handlers.StorageContents.RestoreContent;
 using Main.Entities;
 using Main.Enums;
 using Mapster;
+using MassTransit;
 using MediatR;
 
 namespace Main.Application.Handlers.Sales.DeleteFullSale;
@@ -19,7 +19,7 @@ namespace Main.Application.Handlers.Sales.DeleteFullSale;
 [Transactional(IsolationLevel.Serializable, 20, 2)]
 public record DeleteFullSaleCommand(string SaleId, Guid UserId) : ICommand;
 
-public class DeleteFullSaleHandler(IMediator mediator, IMessageBroker messageBroker, 
+public class DeleteFullSaleHandler(IMediator mediator, IPublishEndpoint publishEndpoint, 
     IUnitOfWork unitOfWork) : ICommandHandler<DeleteFullSaleCommand>
 {
     public async Task<Unit> Handle(DeleteFullSaleCommand request, CancellationToken cancellationToken)
@@ -34,7 +34,10 @@ public class DeleteFullSaleHandler(IMediator mediator, IMessageBroker messageBro
         await DeleteTransaction(transactionId, request.UserId, cancellationToken);
         await RestoreStorageContents(saleContentDetails, request.UserId, cancellationToken);
 
-        await messageBroker.Publish(new SaleDeletedEvent(sale.Adapt<global::Contracts.Models.Sale.Sale>()), cancellationToken);
+        await publishEndpoint.Publish(new SaleDeletedEvent
+        {
+            Sale = sale.Adapt<global::Contracts.Models.Sale.Sale>()
+        }, cancellationToken);
         await unitOfWork.SaveChangesAsync(cancellationToken);
         return Unit.Value;
     }

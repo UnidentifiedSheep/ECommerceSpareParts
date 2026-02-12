@@ -1,6 +1,8 @@
 using System.Security.Claims;
+using Abstractions.Interfaces;
 using Api.Common.Extensions;
 using Carter;
+using Enums;
 using Main.Abstractions.Dtos.Amw.Purchase;
 using Main.Application.Handlers.Purchases.CreateFullPurchase;
 using Main.Enums;
@@ -24,12 +26,10 @@ public class CreatePurchaseEndPoint : ICarterModule
     public void AddRoutes(IEndpointRouteBuilder app)
     {
         app.MapPost("/purchases/",
-                async (ClaimsPrincipal claims, ISender sender, CreatePurchaseRequest request,
+                async (IUserContext user, ISender sender, CreatePurchaseRequest request,
                     CancellationToken token) =>
                 {
-                    if (!Guid.TryParse(claims.FindFirstValue(ClaimTypes.NameIdentifier), out var userId))
-                        return Results.Unauthorized();
-                    var command = new CreateFullPurchaseCommand(userId, request.SupplierId, request.CurrencyId,
+                    var command = new CreateFullPurchaseCommand(user.UserId, request.SupplierId, request.CurrencyId,
                         request.StorageName, request.PurchaseDate, request.PurchaseContent, request.Comment,
                         request.PayedSum, request.WithLogistics, request.StorageFrom);
                     await sender.Send(command, token);

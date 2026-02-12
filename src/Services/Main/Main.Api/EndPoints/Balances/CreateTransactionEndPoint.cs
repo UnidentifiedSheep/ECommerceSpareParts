@@ -1,4 +1,5 @@
 using System.Security.Claims;
+using Abstractions.Interfaces;
 using Api.Common.Extensions;
 using Carter;
 using Main.Application.Handlers.Balance.CreateTransaction;
@@ -19,12 +20,10 @@ public class CreateTransactionEndPoint : ICarterModule
     public void AddRoutes(IEndpointRouteBuilder app)
     {
         app.MapPost("/balances/transaction", async (ISender sender, CreateTransactionRequest request,
-                CancellationToken token, ClaimsPrincipal claims) =>
+                CancellationToken token, IUserContext user) =>
             {
-                if (!Guid.TryParse(claims.FindFirstValue(ClaimTypes.NameIdentifier), out var userId))
-                    return Results.Unauthorized();
                 var command = new CreateTransactionCommand(request.SenderId, request.ReceiverId,
-                    request.Amount, request.CurrencyId, userId, request.TransactionDateTime, TransactionStatus.Normal);
+                    request.Amount, request.CurrencyId, user.UserId, request.TransactionDateTime, TransactionStatus.Normal);
                 await sender.Send(command, token);
                 return Results.Ok();
             }).WithTags("Balances")

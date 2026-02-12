@@ -8,6 +8,7 @@
     </PropertyGroup>
 
     <ItemGroup>
+      <PackageReference Include="BulkValidation.Base" Version="1.0.3" />
       <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="10.0.0">
         <PrivateAssets>all</PrivateAssets>
         <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
@@ -21,7 +22,7 @@
     </ItemGroup>
 
     <ItemGroup>
-      <ProjectReference Include="..\..\Core\Core\Core.csproj" />
+      <ProjectReference Include="..\..\Core\Abstractions\Abstractions.csproj" />
     </ItemGroup>
     
 

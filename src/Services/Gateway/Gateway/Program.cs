@@ -1,10 +1,12 @@
+using System.Security.Claims;
 using System.Text;
 using Api.Common.Logging;
-using Core.StaticFunctions;
 using Gateway.Extensions;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.IdentityModel.Tokens;
 using OpenTelemetry.Metrics;
+using Security.Utils;
 using Serilog;
 using Serilog.Sinks.Loki;
 using Serilog.Sinks.Loki.Labels;
@@ -69,6 +71,11 @@ builder.Services.AddAuthentication(options =>
     };
 });
 
+builder.Services.AddAuthorizationBuilder()
+    .SetDefaultPolicy(new AuthorizationPolicyBuilder(JwtBearerDefaults.AuthenticationScheme)
+        .RequireAuthenticatedUser()
+        .Build());
+
 var secret = Environment.GetEnvironmentVariable("GATEWAY_SUPER_KEY");
 
 builder.Services.AddReverseProxy()
@@ -76,12 +83,44 @@ builder.Services.AddReverseProxy()
     .AddTransforms(builderContext =>
     {
         builderContext.CopyRequestHeaders = true;
+
         builderContext.AddRequestTransform(transformContext =>
         {
-            transformContext.ProxyRequest.Headers.Add("X-Gateway-Token", secret);
+            var headers = transformContext.ProxyRequest.Headers;
+            var user = transformContext.HttpContext.User;
+
+            headers.Remove("X-Gateway-Token");
+            headers.Remove("X-User-Id");
+            headers.Remove("X-Roles");
+            headers.Remove("X-Permissions");
+
+            headers.Add("X-Gateway-Token", secret);
+
+            if (user.Identity?.IsAuthenticated != true)
+                return ValueTask.CompletedTask;
+
+            var userId = user.FindFirst("sub")?.Value ??
+                         user.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+
+            if (!string.IsNullOrEmpty(userId))
+                headers.Add("X-User-Id", userId);
+
+            var roles = user.FindAll(ClaimTypes.Role)
+                .Select(r => r.Value)
+                .Distinct();
+
+            headers.Add("X-Roles", string.Join(",", roles));
+
+            var permissions = user.FindAll("permission")
+                .Select(p => p.Value)
+                .Distinct();
+
+            headers.Add("X-Permissions", string.Join(",", permissions));
+
             return ValueTask.CompletedTask;
         });
     });
+
 builder.Host.UseSerilog();
 
 builder.Services.AddCors(options =>

@@ -1,5 +1,6 @@
-using Contracts.Interfaces;
-
 namespace Contracts.Currency;
 
-public record CurrencyRateChangedEvent(Dictionary<int, decimal> Rates) : IContract;
+public record CurrencyRateChangedEvent
+{
+    public Dictionary<int, decimal> Rates { get; init; } = [];
+}

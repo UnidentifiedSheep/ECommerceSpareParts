@@ -1,5 +1,5 @@
+using Abstractions.Models;
 using Bogus;
-using Core.Models;
 using Main.Application.Handlers.Producers.EditProducer;
 using Main.Abstractions.Dtos.Amw.Producers;
 using Main.Persistence.Context;

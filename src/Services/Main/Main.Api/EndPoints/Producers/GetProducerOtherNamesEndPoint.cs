@@ -1,5 +1,5 @@
+using Abstractions.Models;
 using Carter;
-using Core.Models;
 using Main.Application.Handlers.Producers.GetProducerOtherNames;
 using Main.Abstractions.Dtos.Amw.Producers;
 using Mapster;

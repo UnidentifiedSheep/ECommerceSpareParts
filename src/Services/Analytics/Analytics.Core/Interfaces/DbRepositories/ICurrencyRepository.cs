@@ -8,4 +8,6 @@ public interface ICurrencyRepository
 
     Task<IEnumerable<Currency>> GetCurrencies(IEnumerable<int> ids, bool track = true,
         CancellationToken cancellationToken = default);
+
+    Task<IEnumerable<Currency>> GetAllCurrencies(bool track = true, CancellationToken cancellationToken = default);
 }

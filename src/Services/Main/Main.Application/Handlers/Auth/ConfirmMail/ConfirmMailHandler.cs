@@ -1,5 +1,5 @@
 using Application.Common.Interfaces;
-using Core.Attributes;
+using Attributes;
 using MediatR;
 
 namespace Main.Application.Handlers.Auth.ConfirmMail;

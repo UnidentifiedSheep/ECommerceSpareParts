@@ -1,4 +1,5 @@
 using System.Security.Claims;
+using Abstractions.Interfaces;
 using Api.Common.Extensions;
 using Carter;
 using Main.Application.Handlers.Sales.DeleteFullSale;
@@ -11,11 +12,9 @@ public class DeleteSaleEndPoint : ICarterModule
     public void AddRoutes(IEndpointRouteBuilder app)
     {
         app.MapDelete("/sales/{saleId}",
-                async (ISender sender, ClaimsPrincipal claims, string saleId, CancellationToken token) =>
+                async (ISender sender, IUserContext user, string saleId, CancellationToken token) =>
                 {
-                    if (!Guid.TryParse(claims.FindFirstValue(ClaimTypes.NameIdentifier), out var userId))
-                        return Results.Unauthorized();
-                    var command = new DeleteFullSaleCommand(saleId, userId);
+                    var command = new DeleteFullSaleCommand(saleId, user.UserId);
                     await sender.Send(command, token);
                     return Results.NoContent();
                 }).WithTags("Sales")

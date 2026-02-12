@@ -1,11 +1,12 @@
+using Abstractions.Interfaces.Services;
 using Analytics.Core.Interfaces.DbRepositories;
 using Analytics.Persistence.Context;
 using Analytics.Persistence.DataSeeds;
 using Analytics.Persistence.Repositories;
-using Core.Interfaces.Services;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Persistence.Interfaces;
+using Persistence.Services.UnitOfWork;
 
 namespace Analytics.Persistence;
 
@@ -15,7 +16,7 @@ public static class ServiceProvider
     {
         collection.AddDbContext<DContext>(options => options.UseNpgsql(connectionString));
         
-        collection.AddScoped<IUnitOfWork, UnitOfWork>();
+        collection.AddScoped<IUnitOfWork, UnitOfWork<DContext>>();
 
         collection.AddScoped<ICurrencyRepository, CurrencyRepository>();
         collection.AddScoped<ISellInfoRepository, SellInfoRepository>();

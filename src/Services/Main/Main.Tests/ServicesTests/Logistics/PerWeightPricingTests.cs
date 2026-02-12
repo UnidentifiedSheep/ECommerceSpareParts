@@ -1,4 +1,5 @@
-﻿using Main.Abstractions.Models.Logistics;
+﻿using Enums;
+using Main.Abstractions.Models.Logistics;
 using Main.Application.Services.Logistics.PricingStrategies;
 using Main.Enums;
 

@@ -1,10 +1,13 @@
 using System.Security.Claims;
+using Abstractions.Interfaces;
+using Abstractions.Models;
+using Api.Common.Extensions;
 using Carter;
-using Core.Models;
+using Enums;
 using Main.Application.Handlers.Articles.GetArticleCrosses;
+using Main.Enums;
 using Mapster;
 using MediatR;
-using Security.Extensions;
 using AmwArticleDto = Main.Abstractions.Dtos.Amw.Articles.ArticleFullDto;
 using MemberArticleDto = Main.Abstractions.Dtos.Member.Articles.ArticleFullDto;
 
@@ -18,16 +21,17 @@ public class GetArticleCrossesEndPoint : ICarterModule
 {
     public void AddRoutes(IEndpointRouteBuilder app)
     {
-        app.MapGet("/articles/{articleId}/crosses/", async (ISender sender, ClaimsPrincipal user, int articleId,
+        app.MapGet("/articles/{articleId}/crosses/", async (ISender sender, IUserContext user, int articleId,
                 int limit, int page, string? sortBy, CancellationToken token) =>
             {
-                if (!user.GetUserId(out var userId)) return Results.Unauthorized();
-                if (!user.HasPermissions("ARTICLE.CROSSES.GET")) return Results.Forbid();
+                var userId = user.UserId;
+                if (userId == null) return Results.Unauthorized();
+                if (!user.ContainsPermission(PermissionCodes.ARTICLE_CROSSES_GET)) return Results.Forbid();
 
                 var pagination = new PaginationModel(page, limit);
-                if (user.HasPermissions("ARTICLES.GET.FULL"))
+                if (user.ContainsPermission(nameof(PermissionCodes.ARTICLES_GET_FULL)))
                     return await GetAmw(sender, articleId, pagination, sortBy, userId, token);
-                if (user.HasPermissions("ARTICLES.GET.Main"))
+                if (user.ContainsPermission(PermissionCodes.ARTICLES_GET_MAIN))
                     return await GetMember(sender, articleId, pagination, sortBy, userId, token);
                 return Results.Forbid();
             })

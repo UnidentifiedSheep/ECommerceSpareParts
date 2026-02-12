@@ -1,5 +1,5 @@
 using Exceptions.Exceptions.Articles;
-using Main.Abstractions.Consts;
+using Main.Abstractions.Constants;
 using Main.Application.Configs;
 using Main.Application.Handlers.StorageContents.AddContent;
 using Main.Abstractions.Dtos.Amw.Storage;

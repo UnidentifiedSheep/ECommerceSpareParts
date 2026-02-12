@@ -1,14 +1,14 @@
-using Core.Abstractions;
-using Core.Interfaces.CacheRepositories;
-using Core.StaticFunctions;
+using Abstractions.Interfaces.Cache;
+using Abstractions.Interfaces.RelatedData;
 using Main.Abstractions.Interfaces.DbRepositories;
+using Main.Abstractions.Utils;
 using Main.Application.Notifications;
 using Main.Entities;
 using MediatR;
 
 namespace Main.Application.NotificationHandlers;
 
-public class CurrencyCreatedCacheInvalidator(RelatedDataBase<Currency> relatedDataBase, ICache cache,
+public class CurrencyCreatedCacheInvalidator(IRelatedDataRepository<Currency> relatedDataBase, ICache cache,
     ICurrencyRepository currencyRepository) : INotificationHandler<CurrencyCreatedNotification>
 {
     public async Task Handle(CurrencyCreatedNotification notification, CancellationToken cancellationToken)

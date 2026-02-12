@@ -1,10 +1,10 @@
+using Abstractions.Interfaces.Currency;
+using Abstractions.Interfaces.Services;
 using Analytics.Core.Entities;
 using Analytics.Core.Interfaces.DbRepositories;
 using Analytics.Core.Interfaces.Services;
 using Analytics.Core.Static;
 using Contracts.Models.Sale;
-using Core.Interfaces;
-using Core.Interfaces.Services;
 
 namespace Analytics.Application.Services;
 

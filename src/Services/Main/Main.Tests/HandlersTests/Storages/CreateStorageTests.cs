@@ -1,5 +1,5 @@
 using Bogus;
-using Main.Abstractions.Consts;
+using Main.Abstractions.Constants;
 using Main.Application.Configs;
 using Main.Application.Handlers.Storages.CreateStorage;
 using Main.Enums;

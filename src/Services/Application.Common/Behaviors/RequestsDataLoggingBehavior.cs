@@ -1,6 +1,5 @@
 using Application.Common.Interfaces;
-using Core.Interfaces;
-using Core.Models;
+using Application.Common.Models;
 using MediatR;
 
 namespace Application.Common.Behaviors;

@@ -1,6 +1,6 @@
-﻿using Api.Common.Extensions;
+﻿using Abstractions.Models;
+using Api.Common.Extensions;
 using Carter;
-using Core.Models;
 using Main.Application.Handlers.Permissions.GetPermission;
 using Main.Abstractions.Dtos.Amw.Permissions;
 using MediatR;

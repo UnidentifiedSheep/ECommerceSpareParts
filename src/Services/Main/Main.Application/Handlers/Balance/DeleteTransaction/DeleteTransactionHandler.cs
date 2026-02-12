@@ -1,8 +1,8 @@
 using System.Collections.Immutable;
 using System.Data;
+using Abstractions.Interfaces.Services;
 using Application.Common.Interfaces;
-using Core.Attributes;
-using Core.Interfaces.Services;
+using Attributes;
 using Exceptions.Exceptions.Balances;
 using Main.Abstractions.Interfaces.DbRepositories;
 using Main.Abstractions.Interfaces.Services;

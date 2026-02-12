@@ -1,5 +1,4 @@
 using Exceptions.Base;
-using Core.Attributes;
 
 namespace Exceptions.Exceptions.Storages;
 

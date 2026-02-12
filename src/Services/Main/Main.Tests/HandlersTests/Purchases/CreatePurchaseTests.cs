@@ -1,5 +1,5 @@
 ﻿using FluentValidation;
-using Main.Abstractions.Consts;
+using Main.Abstractions.Constants;
 using Main.Application.Handlers.Purchases.CreatePurchase;
 using Main.Abstractions.Dtos.Amw.Purchase;
 using Main.Abstractions.Dtos.Amw.Storage;

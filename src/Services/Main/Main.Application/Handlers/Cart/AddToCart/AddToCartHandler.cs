@@ -1,6 +1,6 @@
-﻿using Application.Common.Interfaces;
-using Core.Attributes;
-using Core.Interfaces.Services;
+﻿using Abstractions.Interfaces.Services;
+using Application.Common.Interfaces;
+using Attributes;
 using MediatR;
 
 namespace Main.Application.Handlers.Cart.AddToCart;

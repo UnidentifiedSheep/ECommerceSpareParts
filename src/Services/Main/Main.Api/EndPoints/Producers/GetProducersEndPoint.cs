@@ -1,5 +1,5 @@
+using Abstractions.Models;
 using Carter;
-using Core.Models;
 using Main.Application.Handlers.Producers.GetProducerById;
 using Main.Application.Handlers.Producers.GetProducers;
 using Main.Abstractions.Dtos.Anonymous.Producers;

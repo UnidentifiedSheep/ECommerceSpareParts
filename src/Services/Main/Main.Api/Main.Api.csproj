@@ -28,7 +28,7 @@
     </ItemGroup>
 
     <ItemGroup>
-        <ProjectReference Include="..\..\..\Infrastructure\Integrations\Integrations.csproj" />
+        <ProjectReference Include="..\..\..\Infrastructure\Integrations\ExchangeRate\ExchangeRate.csproj" />
         <ProjectReference Include="..\..\..\Infrastructure\Mail\Mail.csproj" />
         <ProjectReference Include="..\..\..\Infrastructure\RabbitMq\RabbitMq.csproj" />
         <ProjectReference Include="..\..\..\Infrastructure\Redis\Redis.csproj" />

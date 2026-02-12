@@ -1,5 +1,5 @@
-﻿using Core.Interfaces.CacheRepositories;
-using Core.StaticFunctions;
+﻿using Abstractions.Interfaces.Cache;
+using Main.Abstractions.Utils;
 using Main.Application.Notifications;
 using MediatR;
 

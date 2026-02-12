@@ -1,10 +1,11 @@
 ﻿using System.Security.Claims;
+using Abstractions.Interfaces;
 using Api.Common.Extensions;
 using Carter;
+using Enums;
 using Main.Application.Handlers.Cart.ChangeCartItemCount;
 using Main.Enums;
 using MediatR;
-using Security.Extensions;
 
 namespace Main.Api.EndPoints.Cart;
 
@@ -14,12 +15,10 @@ public class ChangeCartItemCountEndPoint : ICarterModule
 {
     public void AddRoutes(IEndpointRouteBuilder app)
     {
-        app.MapPatch("/cart/{articleId}", async (ISender sender, ClaimsPrincipal user, int articleId,  
+        app.MapPatch("/cart/{articleId}", async (ISender sender, IUserContext user, int articleId,  
             ChangeCartItemCountRequest request, CancellationToken cancellationToken) =>
         {
-            if (!user.GetUserId(out var userId)) return Results.Unauthorized();
-            
-            var command = new ChangeCartItemCountCommand(userId, articleId, request.NewCount);
+            var command = new ChangeCartItemCountCommand(user.UserId, articleId, request.NewCount);
             await sender.Send(command, cancellationToken);
             return Results.NoContent();
         }).WithTags("Cart")

@@ -1,4 +1,7 @@
-using Contracts.Interfaces;
 namespace Contracts.Currency;
 
-public record CurrencyCreatedEvent(Models.Currency.Currency Currency) : IContract;
+public record CurrencyCreatedEvent
+{
+    public Models.Currency.Currency Currency { get; init; } = null!;
+
+}

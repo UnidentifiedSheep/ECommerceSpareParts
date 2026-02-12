@@ -7,4 +7,5 @@ public class Currency
     public string Name { get; set; } = null!;
     public string CurrencySign { get; set; } = null!;
     public string Code { get; set; } = null!;
+    public decimal ToUsdRate { get; set; }
 }

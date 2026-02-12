@@ -1,5 +1,5 @@
-﻿using Amazon.S3;
-using Core.Interfaces;
+﻿using Abstractions.Interfaces;
+using Amazon.S3;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace S3;

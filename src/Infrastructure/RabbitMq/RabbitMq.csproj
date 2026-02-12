@@ -8,12 +8,8 @@
     </PropertyGroup>
 
     <ItemGroup>
-        <PackageReference Include="MassTransit.EntityFrameworkCore" Version="9.0.0-develop.25" />
-        <PackageReference Include="MassTransit.RabbitMQ" Version="9.0.0-develop.25" />
-    </ItemGroup>
-
-    <ItemGroup>
-        <ProjectReference Include="..\..\Core\Core\Core.csproj"/>
+        <PackageReference Include="MassTransit.EntityFrameworkCore" Version="8.5.8" />
+        <PackageReference Include="MassTransit.RabbitMQ" Version="8.5.8" />
     </ItemGroup>
 
 </Project>

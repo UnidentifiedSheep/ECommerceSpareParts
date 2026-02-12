@@ -1,8 +1,8 @@
 using System.Data;
+using Abstractions.Interfaces.Services;
 using Application.Common.Interfaces;
-using BulkValidation.Core.Plan;
-using Core.Attributes;
-using Core.Interfaces.Services;
+using Attributes;
+using Contracts.Articles;
 using Exceptions.Exceptions.Storages;
 using Main.Abstractions.Interfaces.DbRepositories;
 using Main.Abstractions.Interfaces.Services;
@@ -12,6 +12,7 @@ using Main.Application.Notifications;
 using Main.Entities;
 using Main.Enums;
 using Mapster;
+using MassTransit;
 using MediatR;
 
 namespace Main.Application.Handlers.StorageContents.RemoveContent;
@@ -27,7 +28,7 @@ public record RemoveContentCommand(
 public record RemoveContentResult(IEnumerable<PrevAndNewValue<StorageContent>> Changes);
 
 public class RemoveContentHandler(IStorageContentRepository contentRepository, IArticlesRepository articlesRepository,
-    IArticlesService articlesService, IUnitOfWork unitOfWork,
+    IArticlesService articlesService, IUnitOfWork unitOfWork, IPublishEndpoint publishEndpoint,
     IMediator mediator) : ICommandHandler<RemoveContentCommand, RemoveContentResult>
 {
     public async Task<RemoveContentResult> Handle(RemoveContentCommand request, CancellationToken cancellationToken)
@@ -93,10 +94,12 @@ public class RemoveContentHandler(IStorageContentRepository contentRepository, I
 
         await unitOfWork.AddRangeAsync(movements, cancellationToken);
         await articlesService.UpdateArticlesCount(toIncrement, cancellationToken);
+        
+        await publishEndpoint.Publish(new ArticleBuyPricesChangedEvent { ArticleIds = articleIds}, cancellationToken);
+        
         await unitOfWork.SaveChangesAsync(cancellationToken);
 
         await mediator.Publish(new ArticlesUpdatedNotification(articleIds), cancellationToken);
-        await mediator.Publish(new ArticlePricesUpdatedNotification(articleIds), cancellationToken);
 
         return new RemoveContentResult(result);
     }

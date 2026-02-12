@@ -1,8 +1,10 @@
 using System.Data;
+using Abstractions.Interfaces;
+using Abstractions.Interfaces.Currency;
+using Abstractions.Interfaces.Services;
 using Application.Common.Interfaces;
-using Core.Attributes;
-using Core.Interfaces;
-using Core.Interfaces.Services;
+using Attributes;
+using Contracts.Articles;
 using Main.Abstractions.Dtos.Amw.Storage;
 using Main.Abstractions.Interfaces.DbRepositories;
 using Main.Abstractions.Interfaces.Services;
@@ -11,6 +13,7 @@ using Main.Application.Notifications;
 using Main.Entities;
 using Main.Enums;
 using Mapster;
+using MassTransit;
 using MediatR;
 
 namespace Main.Application.Handlers.StorageContents.AddContent;
@@ -23,7 +26,7 @@ public record AddContentResult(List<StorageContentDto> StorageContents);
 
 public class AddContentHandler(IArticlesRepository articlesRepository, IUnitOfWork unitOfWork,
     ICurrencyConverter currencyConverter, IArticlesService articlesService,
-    IMediator mediator) : ICommandHandler<AddContentCommand, AddContentResult>
+    IMediator mediator, IPublishEndpoint publishEndpoint) : ICommandHandler<AddContentCommand, AddContentResult>
 {
     public async Task<AddContentResult> Handle(AddContentCommand request, CancellationToken cancellationToken)
     {
@@ -54,11 +57,14 @@ public class AddContentHandler(IArticlesRepository articlesRepository, IUnitOfWo
         await unitOfWork.AddRangeAsync(storageMovements, cancellationToken);
         await unitOfWork.AddRangeAsync(storageContents, cancellationToken);
         await articlesService.UpdateArticlesCount(toIncrement, cancellationToken);
+        
+        if (request.RecalcPrices)
+            await publishEndpoint.Publish(new ArticleBuyPricesChangedEvent { ArticleIds = articleIds}, cancellationToken);
+        
         await unitOfWork.SaveChangesAsync(cancellationToken);
 
         await mediator.Publish(new ArticlesUpdatedNotification(articleIds), cancellationToken);
-        if (request.RecalcPrices)
-            await mediator.Publish(new ArticlePricesUpdatedNotification(articleIds), cancellationToken);
+        
         
         return new AddContentResult(storageContents.Adapt<List<StorageContentDto>>());
     }

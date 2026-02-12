@@ -1,5 +1,6 @@
 ﻿using BulkValidation.Core.Attributes;
-using Core.Extensions;
+using Enums;
+using Extensions;
 using Main.Enums;
 
 namespace Main.Entities;

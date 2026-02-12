@@ -1,6 +1,4 @@
-﻿using Core.Interfaces;
-using FluentValidation;
-using Main.Application.Extensions;
+﻿using FluentValidation;
 
 namespace Main.Application.Handlers.Logistics.CalculateDeliveryCost;
 

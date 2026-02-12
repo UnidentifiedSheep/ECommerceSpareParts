@@ -1,6 +1,6 @@
 using System.Diagnostics.CodeAnalysis;
 using System.Linq.Expressions;
-using Core.Extensions;
+using Extensions;
 using Main.Abstractions.Interfaces.DbRepositories;
 using Main.Entities;
 using Main.Persistence.Context;

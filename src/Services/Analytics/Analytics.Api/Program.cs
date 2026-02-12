@@ -1,21 +1,25 @@
+using System.Reflection;
+using Abstractions.Interfaces.Currency;
 using Analytics.Application;
+using Analytics.Application.Consumers;
 using Analytics.Persistence;
 using Analytics.Persistence.Context;
 using Api.Common.Middleware;
 using Carter;
-using Contracts.Currency;
-using Contracts.Sale;
-using Core.Models;
-using Core.StaticFunctions;
 using MassTransit;
 using Persistence.Extensions;
-using RabbitMq;
+using RabbitMq.Extensions;
+using RabbitMq.Models;
+using Security.Utils;
 
 var builder = WebApplication.CreateBuilder(args);
 var certsPath = Environment.GetEnvironmentVariable("CERTS_PATH");
 if (!string.IsNullOrWhiteSpace(certsPath))
     Certs.RegisterCerts(certsPath);
 builder.Services.AddOpenApi();
+
+builder.Services.AddPersistenceLayer(Environment.GetEnvironmentVariable("DB_CONNECTION_STRING")!)
+    .AddApplicationLayer();
 
 var brokerOptions = new MessageBrokerOptions
 {
@@ -25,24 +29,43 @@ var brokerOptions = new MessageBrokerOptions
 };
 builder.Services.AddSingleton(brokerOptions);
 
-var uniqQueueName = $"queue-of-main-{Environment.MachineName}";
+builder.Services.AddHttpContextAccessor();
 
-ConsumerRegistration[] eventHandlers =
-[
-    new(typeof(CurrencyCreatedEvent), "analytics-queue"),
-    new(typeof(CurrencyRateChangedEvent), uniqQueueName),
-    new(typeof(SaleCreatedEvent), "analytics-queue"),
-    new(typeof(SaleEditedEvent), "analytics-queue"),
-    new(typeof(SaleDeletedEvent), "analytics-queue")
-];
+var uniqQueueName = $"queue-of-analytics-{Environment.MachineName}";
 
-builder.Services.AddMassageBrokerLayer<DContext>(brokerOptions, eventHandlers, opt =>
+builder.Services.AddMassTransit(x =>
+{
+    x.AddConsumers(Assembly.GetAssembly(typeof(CurrencyCreatedConsumer)));
+    
+    x.AddEntityFrameworkOutbox<DContext>(o =>
     {
-        opt.UseBusOutbox();
-        opt.UsePostgres();
-    })
-    .AddPersistenceLayer(Environment.GetEnvironmentVariable("DB_CONNECTION_STRING")!)
-    .AddApplicationLayer();
+        o.UsePostgres();
+        o.UseBusOutbox();
+    });
+    
+    x.UsingRabbitMq((context, cfg) =>
+    {
+        cfg.ConfigureRabbitMq(brokerOptions);
+        
+        cfg.ReceiveEndpoint(uniqQueueName, ep =>
+        {
+            ep.AutoDelete = true;
+            ep.Durable = false;
+        });
+        
+        cfg.ReceiveEndpoint("analytics-queue", ep =>
+        {
+            ep.Durable = true;
+            
+            ep.ConfigureConsumer<CurrencyCreatedConsumer>(context);
+            ep.ConfigureConsumer<CurrencyRatesChangedConsumer>(context);
+            ep.ConfigureConsumer<SaleCreatedConsumer>(context);
+            ep.ConfigureConsumer<SaleDeletedConsumer>(context);
+            ep.ConfigureConsumer<SaleEditedConsumer>(context);
+            ep.ConfigureConsumer<CurrencyRatesChangedConsumer>(context);
+        });
+    });
+});
 
 builder.Services.AddCarter();
 
@@ -56,6 +79,7 @@ if (Environment.GetEnvironmentVariable("SEED_DB") == "true")
 
 app.UseMiddleware<HeaderSecretMiddleware>();
 
+await SetupCurrency(app.Services);
 
 if (app.Environment.IsDevelopment()) app.MapOpenApi();
 
@@ -64,3 +88,10 @@ if (Environment.GetEnvironmentVariable("USE_HTTPS_REDIRECTION") == "true")
 
 
 app.Run();
+
+async Task SetupCurrency(IServiceProvider serviceProvider)
+{
+    using var scope = serviceProvider.CreateScope();
+    var currencyConverterSetup = scope.ServiceProvider.GetRequiredService<ICurrencyConverterSetup>();
+    await currencyConverterSetup.InitializeAsync();
+}

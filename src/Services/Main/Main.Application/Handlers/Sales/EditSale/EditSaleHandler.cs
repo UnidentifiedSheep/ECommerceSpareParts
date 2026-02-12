@@ -1,10 +1,9 @@
+using Abstractions.Interfaces.Services;
 using Application.Common.Interfaces;
-using Core.Attributes;
-using Core.Interfaces.Services;
+using Attributes;
 using Exceptions.Exceptions.Sales;
 using Main.Abstractions.Dtos.Amw.Sales;
 using Main.Abstractions.Interfaces.DbRepositories;
-using Main.Abstractions.Interfaces.Pricing;
 using Main.Abstractions.Interfaces.Services;
 using Main.Abstractions.Models;
 using Main.Application.Extensions;
@@ -20,8 +19,8 @@ public record EditSaleCommand(IEnumerable<EditSaleContentDto> EditedContent,
     string SaleId, int CurrencyId, Guid UpdatedUserId,
     DateTime SaleDateTime, string? Comment) : ICommand;
 
-public class EditSaleHandler(IUnitOfWork unitOfWork, ISaleService saleService, ISaleRepository saleRepository,
-    IMarkupService markupService) : ICommandHandler<EditSaleCommand>
+public class EditSaleHandler(IUnitOfWork unitOfWork, ISaleService saleService, ISaleRepository saleRepository) 
+    : ICommandHandler<EditSaleCommand>
 {
     public async Task<Unit> Handle(EditSaleCommand request, CancellationToken cancellationToken)
     {

@@ -1,4 +1,5 @@
 using System.Security.Claims;
+using Abstractions.Interfaces;
 using Api.Common.Extensions;
 using Carter;
 using Main.Abstractions.Dtos.Amw.Sales;
@@ -23,11 +24,9 @@ public class CreateSaleEndPoint : ICarterModule
     public void AddRoutes(IEndpointRouteBuilder app)
     {
         app.MapPost("/sales/",
-                async (ClaimsPrincipal claims, ISender sender, CreateSaleRequest request, CancellationToken token) =>
+                async (IUserContext user, ISender sender, CreateSaleRequest request, CancellationToken token) =>
                 {
-                    if (!Guid.TryParse(claims.FindFirstValue(ClaimTypes.NameIdentifier), out var userId))
-                        return Results.Unauthorized();
-                    var command = new CreateFullSaleCommand(userId, request.BuyerId, request.CurrencyId,
+                    var command = new CreateFullSaleCommand(user.UserId, request.BuyerId, request.CurrencyId,
                         request.StorageName, request.SellFromOtherStorages,
                         request.SaleDateTime, request.SaleContent, request.Comment, request.PayedSum,
                         request.ConfirmationCode);

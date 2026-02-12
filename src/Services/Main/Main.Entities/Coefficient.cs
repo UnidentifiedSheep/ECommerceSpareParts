@@ -1,4 +1,5 @@
-﻿using Main.Enums;
+﻿using Enums;
+using Main.Enums;
 
 namespace Main.Entities;
 

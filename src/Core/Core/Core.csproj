@@ -17,11 +17,12 @@
     </ItemGroup>
 
     <ItemGroup>
-      <Folder Include="Dtos\" />
+      <PackageReference Include="BulkValidation.Core" Version="1.0.9" />
     </ItemGroup>
 
     <ItemGroup>
-      <PackageReference Include="BulkValidation.Core" Version="1.0.9" />
+      <Folder Include="Extensions\" />
+      <Folder Include="StaticFunctions\" />
     </ItemGroup>
 
 </Project>

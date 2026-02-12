@@ -1,4 +1,4 @@
-using Core.Models;
+using Abstractions.Models;
 using Exceptions.Exceptions.Articles;
 using FluentValidation;
 using Main.Application.Configs;

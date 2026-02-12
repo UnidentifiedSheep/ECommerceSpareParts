@@ -1,6 +1,9 @@
 using System.Data;
+using Abstractions.Interfaces.Services;
 using Application.Common.Interfaces;
-using Core.Attributes;
+using Attributes;
+using Contracts.Articles;
+using Extensions;
 using Main.Abstractions.Dtos.Amw.Logistics;
 using Main.Abstractions.Dtos.Amw.Purchase;
 using Main.Abstractions.Dtos.Amw.Storage;
@@ -16,6 +19,7 @@ using Main.Application.Notifications;
 using Main.Entities;
 using Main.Enums;
 using Mapster;
+using MassTransit;
 using MediatR;
 
 namespace Main.Application.Handlers.Purchases.CreateFullPurchase;
@@ -33,7 +37,8 @@ public record CreateFullPurchaseCommand(
     bool WithLogistics,
     string? StorageFrom) : ICommand;
 
-public class CreateFullPurchaseHandler(IMediator mediator) : ICommandHandler<CreateFullPurchaseCommand>
+public class CreateFullPurchaseHandler(IMediator mediator, IPublishEndpoint publishEndpoint, IUnitOfWork unitOfWork) 
+    : ICommandHandler<CreateFullPurchaseCommand>
 {
     public async Task<Unit> Handle(CreateFullPurchaseCommand request, CancellationToken cancellationToken)
     {
@@ -77,10 +82,13 @@ public class CreateFullPurchaseHandler(IMediator mediator) : ICommandHandler<Cre
             
         await AddLogisticsContentToPurchase(content, purchase.PurchaseContents, 
             deliveryCost, cancellationToken);
-        
-        await mediator.Publish(new ArticlePricesUpdatedNotification(content.Select(x => x.ArticleId)), 
-            cancellationToken);
 
+        await publishEndpoint.Publish(new ArticleBuyPricesChangedEvent
+            {
+                ArticleIds = content.Select(x => x.ArticleId)
+            }, cancellationToken);
+        await unitOfWork.SaveChangesAsync(cancellationToken);
+        
         return Unit.Value;
     }
 

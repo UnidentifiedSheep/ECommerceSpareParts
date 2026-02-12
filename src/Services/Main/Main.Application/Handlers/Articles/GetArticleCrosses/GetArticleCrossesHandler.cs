@@ -1,9 +1,9 @@
+using Abstractions.Models;
 using Application.Common.Interfaces;
-using Core.Models;
-using Core.StaticFunctions;
 using Exceptions.Exceptions.Articles;
 using Main.Abstractions.Interfaces.DbRepositories;
 using Main.Abstractions.Models;
+using Main.Abstractions.Utils;
 using Mapster;
 
 namespace Main.Application.Handlers.Articles.GetArticleCrosses;

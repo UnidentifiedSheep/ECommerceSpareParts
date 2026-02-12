@@ -1,4 +1,4 @@
-﻿using Core.Models;
+﻿using Abstractions.Models;
 using Main.Enums;
 
 namespace Main.Abstractions.Dtos.Amw.StorageRoutes;

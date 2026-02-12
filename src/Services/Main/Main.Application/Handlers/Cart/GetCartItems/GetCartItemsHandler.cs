@@ -1,5 +1,5 @@
-﻿using Application.Common.Interfaces;
-using Core.Models;
+﻿using Abstractions.Models;
+using Application.Common.Interfaces;
 using Main.Abstractions.Dtos.Cart;
 using Main.Abstractions.Interfaces.DbRepositories;
 using Mapster;

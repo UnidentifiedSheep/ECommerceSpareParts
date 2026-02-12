@@ -1,13 +1,15 @@
+using Abstractions.Interfaces;
+using Abstractions.Interfaces.Services;
 using BulkValidation.Pgsql.Extensions;
-using Core.Interfaces;
-using Core.Interfaces.Services;
 using Main.Abstractions.Interfaces.DbRepositories;
 using Main.Persistence.Context;
 using Main.Persistence.DataSeeds;
 using Main.Persistence.Repositories;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
+using Persistence.DbValidator;
 using Persistence.Interfaces;
+using Persistence.Services.UnitOfWork;
 
 namespace Main.Persistence;
 
@@ -33,8 +35,6 @@ public static class ServiceProvider
         collection.AddScoped<ISaleRepository, SaleRepository>();
         collection.AddScoped<IPurchaseRepository, PurchaseRepository>();
         collection.AddScoped<IProducerRepository, ProducerRepository>();
-        collection.AddScoped<IMarkupRepository, MarkupRepository>();
-        collection.AddScoped<IDefaultSettingsRepository, DefaultSettingsRepository>();
         collection.AddScoped<ICurrencyRepository, CurrencyRepository>();
         collection.AddScoped<IBalanceRepository, BalanceRepository>();
         collection.AddScoped<IArticleImageRepository, ArticleImageRepository>();
@@ -51,8 +51,9 @@ public static class ServiceProvider
         collection.AddScoped<IPurchaseLogisticsRepository, PurchaseLogisticsRepository>();
         collection.AddScoped<IPurchaseContentLogisticsRepository, PurchaseContentLogisticsRepository>();
         collection.AddScoped<IArticleCoefficients, ArticleCoefficients>();
+        collection.AddScoped<ISettingsRepository, SettingsRepository>();
 
-        collection.AddScoped<IUnitOfWork, UnitOfWork>();
+        collection.AddScoped<IUnitOfWork, UnitOfWork<DContext>>();
         
         //Seeds
         collection.AddScoped<ISeed<DContext>, PermissionSeed>();
@@ -61,7 +62,7 @@ public static class ServiceProvider
         collection.AddScoped<ISeed<DContext>, UserSeed>();
         collection.AddScoped<ISeed<DContext>, CurrencySeed>();
 
-        collection.AddScoped<IDbValidator, PgsqlDbValidator>();
+        collection.AddScoped<IDbValidator, PgsqlDbValidator<DContext>>();
         collection.AddPgsqlDbValidators<DContext>();
         
         

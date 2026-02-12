@@ -6,6 +6,11 @@ scrape_configs:
     metrics_path: /metrics
     static_configs:
       - targets: ["main.api:8080"]
+        
+  - job_name: "pricing-api"
+    metrics_path: /metrics
+    static_configs:
+      - targets: [ "pricing.api:8080" ]
 
   - job_name: "gateway"
     metrics_path: /metrics

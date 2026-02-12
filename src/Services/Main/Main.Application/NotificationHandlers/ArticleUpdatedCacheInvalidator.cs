@@ -1,12 +1,12 @@
-using Core.Abstractions;
-using Core.Interfaces.CacheRepositories;
+using Abstractions.Interfaces.Cache;
+using Abstractions.Interfaces.RelatedData;
 using Main.Abstractions.Models;
 using Main.Application.Notifications;
 using MediatR;
 
 namespace Main.Application.NotificationHandlers;
 
-public class ArticleUpdatedCacheInvalidator(RelatedDataBase<ArticleCross> relatedDataBase, ICache cache)
+public class ArticleUpdatedCacheInvalidator(IRelatedDataRepository<ArticleCross> relatedDataBase, ICache cache)
     : INotificationHandler<ArticleUpdatedNotification>
 {
     public async Task Handle(ArticleUpdatedNotification notification, CancellationToken cancellationToken)

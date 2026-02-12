@@ -1,13 +1,15 @@
 using System.Text.Json;
-using Core.Extensions;
-using Core.Models;
-using Core.StaticFunctions;
+using Application.Common.Extensions;
+using Application.Common.Models;
+using Contracts.Models.StorageContent;
+using Extensions;
 using Main.Abstractions.Dtos.Amw.ArticleCharacteristics;
+using Main.Abstractions.Dtos.Amw.ArticleCoefficients;
 using Main.Abstractions.Dtos.Amw.ArticleReservations;
 using Main.Abstractions.Dtos.Amw.Articles;
 using Main.Abstractions.Dtos.Amw.Balances;
+using Main.Abstractions.Dtos.Amw.Coefficients;
 using Main.Abstractions.Dtos.Amw.Logistics;
-using Main.Abstractions.Dtos.Amw.Markups;
 using Main.Abstractions.Dtos.Amw.Permissions;
 using Main.Abstractions.Dtos.Amw.Producers;
 using Main.Abstractions.Dtos.Amw.Purchase;
@@ -20,13 +22,14 @@ using Main.Abstractions.Dtos.Anonymous.Producers;
 using Main.Abstractions.Dtos.ArticleSizes;
 using Main.Abstractions.Dtos.ArticleWeight;
 using Main.Abstractions.Dtos.Cart;
+using Main.Abstractions.Dtos.Currencies;
 using Main.Abstractions.Dtos.Emails;
 using Main.Abstractions.Dtos.Member.Vehicles;
 using Main.Abstractions.Dtos.Roles;
 using Main.Abstractions.Dtos.Services.Articles;
 using Main.Abstractions.Dtos.Users;
+using Main.Abstractions.Models;
 using Main.Abstractions.Models.Logistics;
-using Main.Abstractions.Models.Pricing;
 using Main.Application.Extensions;
 using Main.Application.Handlers.ArticlePairs.CreatePair;
 using Main.Application.Handlers.Currencies.CreateCurrency;
@@ -34,6 +37,7 @@ using Main.Application.Handlers.StorageRoutes.AddStorageRoute;
 using Main.Application.Handlers.Storages.CreateStorage;
 using Main.Entities;
 using Mapster;
+using Utils;
 using AmwArticleFullDto = Main.Abstractions.Dtos.Amw.Articles.ArticleFullDto;
 using MemberArticleFullDto = Main.Abstractions.Dtos.Member.Articles.ArticleFullDto;
 using AmwArticleDto = Main.Abstractions.Dtos.Amw.Articles.ArticleDto;
@@ -41,11 +45,14 @@ using AnonymousArticleDto = Main.Abstractions.Dtos.Anonymous.Articles.ArticleDto
 using AmwPurchaseDto = Main.Abstractions.Dtos.Amw.Purchase.PurchaseDto;
 using MemberPurchaseDto = Main.Abstractions.Dtos.Member.Purchase.PurchaseDto;
 
-using CoreUser = Core.Models.User;
+using CoreUser = Abstractions.Models.User;
 using User = Main.Entities.User;
-using CoreUserInfo = Core.Models.UserInfo;
+using CoreUserInfo = Abstractions.Models.UserInfo;
 using Currency = Main.Entities.Currency;
 using UserInfo = Main.Entities.UserInfo;
+
+using ArticleCoefficientContract = Contracts.Models.ArticleCoefficients.ArticleCoefficient;
+using CoefficientContract = Contracts.Models.Coefficients.Coefficient;
 
 namespace Main.Application.Configs;
 
@@ -53,6 +60,49 @@ public static class MapsterConfig
 {
     public static void Configure()
     {
+        TypeAdapterConfig<ArticleCoefficientDto, ArticleCoefficientContract>.NewConfig()
+            .Map(d => d.ArticleId, s => s.ArticleId)
+            .Map(d => d.ValidTill, s => s.ValidTill)
+            .Map(d => d.CreatedAt, s => s.CreatedAt)
+            .Map(d => d.Coefficient, s => s.Coefficient);
+        
+        TypeAdapterConfig<Coefficient, CoefficientContract>.NewConfig()
+            .Map(d => d.Value, s => s.Value)
+            .Map(d => d.Name, s => s.Name)
+            .Map(d => d.Order, s => s.Order)
+            .Map(d => d.Type, s => s.Type);
+        
+        TypeAdapterConfig<ArticleCoefficient, ArticleCoefficientDto>.NewConfig()
+            .Map(d => d.ArticleId, s => s.ArticleId)
+            .Map(d => d.ValidTill, s => s.ValidTill)
+            .Map(d => d.CreatedAt, s => s.CreatedAt)
+            .Map(d => d.Coefficient, s => s.CoefficientNameNavigation);
+        
+        TypeAdapterConfig<Coefficient, CoefficientDto>.NewConfig()
+            .Map(d => d.Value, s => s.Value)
+            .Map(d => d.Name, s => s.Name)
+            .Map(d => d.Order, s => s.Order)
+            .Map(d => d.Type, s => s.Type);
+        
+        TypeAdapterConfig<StorageContentPriceProjection, StorageContentCost>.NewConfig()
+            .IgnoreNonMapped(true)
+            .Map(d => d.ArticleId, s => s.ArticleId)
+            .Map(d => d.PurchaseId, s => s.PurchaseId)
+            .Map(d => d.CurrencyId, s => s.CurrencyId)
+            .Map(d => d.StorageContentId, s => s.StorageContentId)
+            .Map(d => d.PurchaseContentId, s => s.PurchaseContentId)
+            .Map(d => d.CurrentCount, s => s.CurrentCount)
+            .Map(d => d.DeliveryPrice, s => 
+                s.LogisticsPrice != null && s.PurchaseContentCount != null 
+                    ? s.LogisticsPrice / s.PurchaseContentCount 
+                    : 0)
+            .Map(d => d.DeliveryCurrencyId, s => 
+                s.LogisticsPrice != null && s.PurchaseContentCount != null
+                ? s.LogisticsCurrencyId 
+                : s.CurrencyId)
+            .Map(d => d.Price, s => s.Price)
+            .Map(d => d.PurchaseContentCount, s => s.PurchaseContentCount)
+            .Map(d => d.PurchaseDatetime, s => s.PurchaseDatetime);
 
         TypeAdapterConfig<User, CoreUser>.NewConfig()
             .Map(d => d.Id, s => s.Id)
@@ -390,7 +440,7 @@ public static class MapsterConfig
             .Map(dest => dest.PurchaseDatetime, src => src.PurchaseDatetime)
             .Map(dest => dest.Currency, src => src.Currency)
             .Map(dest => dest.ConcurrencyCode, src =>
-                ConcurrencyStatic.GetConcurrencyCode(src.Id, src.ArticleId, src.BuyPrice, src.CurrencyId,
+                HashUtils.ComputeHash(src.Id, src.ArticleId, src.BuyPrice, src.CurrencyId,
                     src.StorageName, src.BuyPriceInUsd, src.Count, src.PurchaseDatetime));
 
         TypeAdapterConfig<PatchStorageContentDto, StorageContent>.NewConfig()
@@ -523,29 +573,6 @@ public static class MapsterConfig
             .Map(dest => dest.InitialCount, src => src.InitialCount)
             .Map(dest => dest.UserId, src => src.UserId);
 
-        //Markup
-
-        TypeAdapterConfig<MarkupGroup, MarkupGroupDto>.NewConfig()
-            .IgnoreNonMapped(true)
-            .Map(dest => dest.Id, src => src.Id)
-            .Map(dest => dest.Name, src => src.Name)
-            .Map(dest => dest.CurrencyId, src => src.CurrencyId)
-            .Map(dest => dest.IsAutoGenerated, src => src.IsAutoGenerated)
-            .Map(dest => dest.CurrencySign, src => src.Currency.CurrencySign);
-
-        TypeAdapterConfig<MarkupRange, MarkupRangeDto>.NewConfig()
-            .IgnoreNonMapped(true)
-            .Map(dest => dest.Id, src => src.Id)
-            .Map(dest => dest.Markup, src => src.Markup)
-            .Map(dest => dest.RangeEnd, src => src.RangeEnd)
-            .Map(dest => dest.RangeStart, src => src.RangeStart);
-
-        TypeAdapterConfig<NewMarkupRangeDto, MarkupRange>.NewConfig()
-            .IgnoreNonMapped(true)
-            .Map(dest => dest.Markup, src => src.Markup / 100)
-            .Map(dest => dest.RangeEnd, src => src.RangeEnd)
-            .Map(dest => dest.RangeStart, src => src.RangeStart);
-
         //CURRENCY
         TypeAdapterConfig<CreateCurrencyCommand, Currency>.NewConfig()
             .Map(x => x.Code, src => src.Code.Trim())
@@ -558,8 +585,24 @@ public static class MapsterConfig
             .Map(d => d.Name, s => s.Name)
             .Map(d => d.Id, s => s.Id)
             .Map(d => d.ShortName, s => s.ShortName)
-            .Map(d => d.CurrencySign, s => s.CurrencySign);
+            .Map(d => d.CurrencySign, s => s.CurrencySign)
+            .Map(d => d.ToUsdRate, s => s.CurrencyToUsd == null ? 0 : s.CurrencyToUsd.ToUsd);
+        
+        TypeAdapterConfig<Currency, CurrencyWithRateDto>.NewConfig()
+            .Map(d => d.Code, s => s.Code)
+            .Map(d => d.Name, s => s.Name)
+            .Map(d => d.Id, s => s.Id)
+            .Map(d => d.ShortName, s => s.ShortName)
+            .Map(d => d.CurrencySign, s => s.CurrencySign)
+            .Map(d => d.ToUsdRate, s => s.CurrencyToUsd == null ? 0 : s.CurrencyToUsd.ToUsd);
 
+        TypeAdapterConfig<CurrencyWithRateDto, global::Contracts.Models.Currency.Currency>.NewConfig()
+            .Map(d => d.Code, s => s.Code)
+            .Map(d => d.Name, s => s.Name)
+            .Map(d => d.Id, s => s.Id)
+            .Map(d => d.ShortName, s => s.ShortName)
+            .Map(d => d.CurrencySign, s => s.CurrencySign)
+            .Map(d => d.ToUsdRate, s => s.ToUsdRate);
 
         //Emails
         TypeAdapterConfig<EmailDto, UserEmail>.NewConfig()
@@ -680,11 +723,5 @@ public static class MapsterConfig
             .Map(d => d.MinimalPriceApplied, s => s.MinimalPriceApplied)
             .Map(d => d.PricingModel, s=> s.PricingModel);
         
-        TypeAdapterConfig<ArticleCoefficient, PriceCoefficient>.NewConfig()
-            .Map(d => d.Value, s => s.CoefficientNameNavigation.Value)
-            .Map(d => d.Name, s => s.CoefficientName)
-            .Map(d => d.Order, x => x.CoefficientNameNavigation.Order)
-            .Map(d => d.Type, x => x.CoefficientNameNavigation.Type)
-            .Map(d => d.ValidTill, s => s.ValidTill);
     }
 }

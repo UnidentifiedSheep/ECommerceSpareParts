@@ -1,8 +1,8 @@
+using Abstractions.Models;
 using Application.Common.Interfaces;
-using Core.Models;
-using Core.StaticFunctions;
 using Main.Abstractions.Dtos.Currencies;
 using Main.Abstractions.Interfaces.DbRepositories;
+using Main.Abstractions.Utils;
 using Mapster;
 using Currency = Main.Entities.Currency;
 

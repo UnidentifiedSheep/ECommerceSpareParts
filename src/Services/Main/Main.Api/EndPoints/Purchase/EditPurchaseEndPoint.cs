@@ -1,4 +1,5 @@
 using System.Security.Claims;
+using Abstractions.Interfaces;
 using Api.Common.Extensions;
 using Carter;
 using Main.Abstractions.Dtos.Amw.Purchase;
@@ -18,12 +19,10 @@ public class EditPurchaseEndPoint : ICarterModule
     public void AddRoutes(IEndpointRouteBuilder app)
     {
         app.MapPut("/purchase/{purchaseId}", async (ISender sender, string purchaseId, EditPurchaseRequest request,
-                CancellationToken cancellationToken, ClaimsPrincipal claims) =>
+                CancellationToken cancellationToken, IUserContext user) =>
             {
-                if (!Guid.TryParse(claims.FindFirstValue(ClaimTypes.NameIdentifier), out var userId))
-                    return Results.Unauthorized();
                 var command = new EditFullPurchaseCommand(request.Content, purchaseId, request.CurrencyId,
-                    request.Comment, request.PurchaseDateTime, userId);
+                    request.Comment, request.PurchaseDateTime, user.UserId);
                 await sender.Send(command, cancellationToken);
                 return Results.NoContent();
             }).WithTags("Purchases")

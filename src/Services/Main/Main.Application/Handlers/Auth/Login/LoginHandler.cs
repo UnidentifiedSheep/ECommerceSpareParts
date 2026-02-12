@@ -1,11 +1,11 @@
 ﻿using System.Net;
 using System.Security.Cryptography;
+using Abstractions.Interfaces;
+using Abstractions.Interfaces.Services;
+using Abstractions.Interfaces.Validators;
+using Abstractions.Models;
 using Application.Common.Interfaces;
-using Core.Attributes;
-using Core.Interfaces;
-using Core.Interfaces.Services;
-using Core.Interfaces.Validators;
-using Core.Models;
+using Attributes;
 using Exceptions.Base;
 using Exceptions.Exceptions.Auth;
 using Main.Abstractions.Interfaces.DbRepositories;

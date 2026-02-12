@@ -1,6 +1,6 @@
 ﻿using Bogus;
-using Core.Extensions;
 using Exceptions.Exceptions.Roles;
+using Extensions;
 using Main.Application.Handlers.Roles.CreateRole;
 using Main.Persistence.Context;
 using MediatR;

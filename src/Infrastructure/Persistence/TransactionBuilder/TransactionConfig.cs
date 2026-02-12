@@ -1,5 +1,5 @@
 using System.Data;
-using Core.Interfaces;
+using Abstractions.Interfaces;
 using Microsoft.EntityFrameworkCore;
 using Npgsql;
 

@@ -1,7 +1,7 @@
 ﻿using Api.Common.EndPointFilters;
 using Api.Common.Enums;
 using Api.Common.Models;
-using Core.Extensions;
+using Extensions;
 
 namespace Api.Common.Extensions;
 

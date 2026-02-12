@@ -1,9 +1,8 @@
 ﻿using Application.Common.Interfaces;
-using Core.StaticFunctions;
 using Exceptions.Exceptions.ArticleSizes;
 using Main.Abstractions.Dtos.ArticleSizes;
 using Main.Abstractions.Interfaces.DbRepositories;
-using Main.Entities;
+using Main.Abstractions.Utils;
 using Mapster;
 
 namespace Main.Application.Handlers.ArticleSizes.GetArticleSizes;

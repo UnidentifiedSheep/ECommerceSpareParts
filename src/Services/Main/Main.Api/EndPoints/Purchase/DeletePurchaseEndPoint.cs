@@ -1,4 +1,5 @@
 using System.Security.Claims;
+using Abstractions.Interfaces;
 using Api.Common.Extensions;
 using Carter;
 using Main.Application.Handlers.Purchases.DeleteFullPurchase;
@@ -11,11 +12,9 @@ public class DeletePurchaseEndPoint : ICarterModule
     public void AddRoutes(IEndpointRouteBuilder app)
     {
         app.MapDelete("/purchases/{purchaseId}", async (ISender sender, string purchaseId,
-                ClaimsPrincipal claims, CancellationToken cancellationToken) =>
+                IUserContext user, CancellationToken cancellationToken) =>
             {
-                if (!Guid.TryParse(claims.FindFirstValue(ClaimTypes.NameIdentifier), out var userId))
-                    return Results.Unauthorized();
-                var command = new DeleteFullPurchaseCommand(purchaseId, userId);
+                var command = new DeleteFullPurchaseCommand(purchaseId, user.UserId);
                 await sender.Send(command, cancellationToken);
                 return Results.NoContent();
             }).WithTags("Purchases")

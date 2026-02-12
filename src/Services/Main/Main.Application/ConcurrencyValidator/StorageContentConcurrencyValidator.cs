@@ -1,6 +1,6 @@
-using Core.Interfaces;
-using Core.StaticFunctions;
+using Abstractions.Interfaces;
 using Main.Entities;
+using Utils;
 
 namespace Main.Application.ConcurrencyValidator;
 
@@ -8,7 +8,7 @@ public class StorageContentConcurrencyValidator : IConcurrencyValidator<StorageC
 {
     public bool IsValid(StorageContent item, string concurrencyCode, out string validCode)
     {
-        validCode = ConcurrencyStatic.GetConcurrencyCode(item.Id, item.ArticleId,
+        validCode = HashUtils.ComputeHash(item.Id, item.ArticleId,
             item.BuyPrice, item.CurrencyId, item.StorageName, item.BuyPriceInUsd, item.Count, item.PurchaseDatetime);
         return validCode == concurrencyCode;
     }

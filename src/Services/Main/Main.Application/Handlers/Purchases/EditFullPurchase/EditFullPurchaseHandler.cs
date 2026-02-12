@@ -1,6 +1,6 @@
 using System.Data;
 using Application.Common.Interfaces;
-using Core.Attributes;
+using Attributes;
 using Exceptions.Exceptions.Purchase;
 using Main.Abstractions.Dtos.Amw.Purchase;
 using Main.Abstractions.Dtos.Amw.Storage;

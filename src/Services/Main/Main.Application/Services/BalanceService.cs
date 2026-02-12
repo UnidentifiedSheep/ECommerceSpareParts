@@ -1,4 +1,4 @@
-using Core.Interfaces.Services;
+using Abstractions.Interfaces.Services;
 using Main.Abstractions.Interfaces.DbRepositories;
 using Main.Abstractions.Interfaces.Services;
 using Main.Entities;

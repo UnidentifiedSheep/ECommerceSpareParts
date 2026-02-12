@@ -43,6 +43,38 @@ services:
       - redis
       - rabbitmq
     restart: unless-stopped
+    
+  pricing.api:
+    image: pricing.api
+    build:
+      context: .
+      dockerfile: src/Services/Pricing/Pricing.Api/Dockerfile
+    ports:
+      - "4005:7292"
+      - "4006:8080"
+    volumes:
+      - ./certs:/app/certs:ro
+    environment:
+      - ASPNETCORE_Kestrel__Certificates__Default__Path=${MAIN_CERT_PATH}
+      - ASPNETCORE_Kestrel__Certificates__Default__Password=${MAIN_CERT_PASSWORD}
+      - CERTS_PATH=${CERTS_PATH}
+      - REDIS_CONNECTION_STRING=${REDIS_HOST}:${REDIS_PORT},password=${REDIS_PASSWORD}
+      - DB_CONNECTION_STRING=Host=${PGQL_HOST};Database=${PGQL_PRICING_DB};Username=${PGQL_USER};Password=${PGQL_PASSWORD}
+      - RABBITMQ_HOST=amqp://${RABBITMQ_HOST}:${RABBITMQ_PORT}
+      - RABBITMQ_USERNAME=${RABBITMQ_DEFAULT_USER}
+      - RABBITMQ_PASSWORD=${RABBITMQ_DEFAULT_PASS}
+      - GATEWAY_SUPER_KEY=${GATEWAY_SUPER_KEY}
+      - USE_HTTPS_REDIRECTION=${PRICING_USE_HTTPS_REDIRECTION}
+      - SIGN_SECRET=${PRICING_SIGN_SECRET}
+      - SEED_DB=${PRICING_SEED_DB}
+      - LOKI_URL=http://${LOKI_HOST}:${LOKI_PORT}
+    networks:
+      - backend-network
+    depends_on:
+      - pgql
+      - redis
+      - rabbitmq
+    restart: unless-stopped
 
   analytics.api:
     image: analytics.api
@@ -105,7 +137,7 @@ services:
     environment:
       POSTGRES_USER: ${PGQL_USER}
       POSTGRES_PASSWORD: ${PGQL_PASSWORD}
-      POSTGRES_MULTIPLE_DATABASES: ${PGQL_MAIN_DB},${PGQL_ANALYTICS_DB}
+      POSTGRES_MULTIPLE_DATABASES: ${PGQL_MAIN_DB},${PGQL_ANALYTICS_DB},${PGQL_PRICING_DB}
     volumes:
       - pg_data:/var/lib/postgresql
       - ./init:/docker-entrypoint-initdb.d

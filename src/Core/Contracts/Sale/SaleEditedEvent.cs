@@ -1,5 +1,7 @@
-using Contracts.Interfaces;
-
 namespace Contracts.Sale;
 
-public record SaleEditedEvent(Models.Sale.Sale Sale, IEnumerable<int> DeletedSaleContents) : IContract;
+public record SaleEditedEvent
+{
+    public Models.Sale.Sale Sale { get; init; } = null!;
+    public IEnumerable<int> DeletedSaleContents { get; init; } = null!;
+}

@@ -1,13 +1,13 @@
+using Abstractions.Interfaces.Currency;
+using Abstractions.Models;
 using Api.Common;
-using Core.Interfaces;
-using Core.Models;
 using Mail;
 using Main.Application.Configs;
-using Main.Abstractions.Interfaces.Pricing;
 using Main.Cache;
 using Microsoft.Extensions.DependencyInjection;
 using Main.Persistence;
 using Main.Persistence.Context;
+using MassTransit;
 using Security;
 using Serilog;
 using Tests.MockData;
@@ -40,7 +40,7 @@ public static class ServiceProviderForTests
             .WriteTo.Console()
             .CreateLogger();
 
-        ApplicationServiceProvider.AddApplicationLayer(services, "some secret")
+        ApplicationServiceProvider.AddApplicationLayer(services)
             .AddPersistenceLayer(postgresConnectionString);
         var passwordRules = new PasswordRules
         {
@@ -48,12 +48,12 @@ public static class ServiceProviderForTests
             RequireUppercase = false
         };
         CacheServiceProvider.AddCacheLayer(services, redisConnectionString)
-            .AddSecurityLayer(passwordRules)
+            .AddSecurityLayer("some secret", null, passwordRules)
             .AddMailLayer()
             .AddCommonLayer()
             .AddAppCacheLayer();
 
-        services.AddTransient<IMessageBroker, MessageBrokerStub>();
+        services.AddTransient<IPublishEndpoint, MessageBrokerStub>();
         MapsterConfig.Configure();
         SortByConfig.Configure();
 
@@ -70,9 +70,9 @@ public static class ServiceProviderForTests
         using var scope = serviceProvider.CreateScope();
 
         var context = scope.ServiceProvider.GetRequiredService<DContext>();
-        var priceSetup = scope.ServiceProvider.GetRequiredService<IMarkupSetup>();
+        var currencyConverterSetup = scope.ServiceProvider.GetRequiredService<ICurrencyConverterSetup>();
 
         await context.AddMockCurrencies();
-        await priceSetup.SetupAsync();
+        await currencyConverterSetup.InitializeAsync();
     }
 }

@@ -1,12 +1,13 @@
+using Abstractions.Interfaces.Currency;
+using Abstractions.Interfaces.Services;
 using Analytics.Core.Interfaces.DbRepositories;
 using Analytics.Core.Models;
 using Analytics.Core.Static;
 using Application.Common.Interfaces;
+using Attributes;
 using Contracts.Markup;
 using Contracts.Models.Markup;
-using Core.Attributes;
-using Core.Interfaces;
-using Core.Interfaces.Services;
+using MassTransit;
 using MediatR;
 
 namespace Analytics.Application.Handlers.AnalyzeSalesForMarkup;
@@ -18,7 +19,7 @@ public class AnalyzeSalesForMarkupHandler(
     ISellInfoRepository sellInfoRepository,
     ICurrencyConverter currencyConverter,
     IUnitOfWork unitOfWork,
-    IMessageBroker messageBroker) : ICommandHandler<AnalyzeSalesForMarkupCommand>
+    IPublishEndpoint publishEndpoint) : ICommandHandler<AnalyzeSalesForMarkupCommand>
 {
     private const decimal Step = 1.5m;
     private const int ConvertBatchSize = 10_000;
@@ -37,7 +38,11 @@ public class AnalyzeSalesForMarkupHandler(
         
         var finalMarkups = await BuildFinalMarkupsStreaming(rangeStats, minDate, cancellationToken);
         
-        await messageBroker.Publish(new MarkupGroupGeneratedEvent(finalMarkups, Global.DefaultCurrencyId), cancellationToken);
+        await publishEndpoint.Publish(new MarkupGroupGeneratedEvent
+        {
+            CurrencyId = Global.DefaultCurrencyId,
+            MarkupRanges = finalMarkups
+        }, cancellationToken);
 
         await unitOfWork.SaveChangesAsync(cancellationToken);
 

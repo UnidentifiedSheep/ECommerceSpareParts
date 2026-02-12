@@ -1,5 +1,5 @@
-﻿using Api.Common.Extensions;
-using Core.Interfaces.Exceptions;
+﻿using Abstractions.Interfaces.Exceptions;
+using Api.Common.Extensions;
 using Exceptions.Base;
 using FluentValidation;
 using Microsoft.AspNetCore.Diagnostics;

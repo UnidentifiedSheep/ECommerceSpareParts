@@ -1,4 +1,4 @@
-using Core.Extensions;
+using Extensions;
 using Main.Abstractions.Interfaces.DbRepositories;
 using Main.Abstractions.Models;
 using Main.Entities;

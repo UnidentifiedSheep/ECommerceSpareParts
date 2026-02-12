@@ -1,11 +1,11 @@
-﻿using Application.Common.Interfaces;
-using Core.Attributes;
-using Core.Interfaces.Services;
+﻿using Abstractions.Interfaces.Services;
+using Application.Common.Interfaces;
+using Attributes;
+using Enums;
+using Extensions;
 using Main.Abstractions.Interfaces.DbRepositories;
-using Main.Application.Extensions;
 using Main.Application.Notifications;
 using Main.Entities;
-using Main.Enums;
 using MediatR;
 
 namespace Main.Application.Handlers.ArticleSizes.SetArticleSizes;

@@ -1,8 +1,8 @@
-﻿using Application.Common.Interfaces;
-using Core.Attributes;
-using Core.Interfaces;
-using Core.Interfaces.Services;
-using Core.Models;
+﻿using Abstractions.Interfaces;
+using Abstractions.Interfaces.Services;
+using Abstractions.Models;
+using Application.Common.Interfaces;
+using Attributes;
 using Exceptions.Exceptions.Auth;
 using Main.Abstractions.Interfaces.DbRepositories;
 using Main.Abstractions.Interfaces.Services;

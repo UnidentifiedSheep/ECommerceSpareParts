@@ -1,14 +1,15 @@
 using System.Security.Claims;
+using Abstractions.Interfaces;
+using Abstractions.Models;
 using Api.Common.Extensions;
 using Carter;
-using Core.Models;
+using Enums;
 using Main.Abstractions.Dtos.Amw.Users;
 using Main.Application.Handlers.Users.GetUsers;
 using Main.Enums;
 using Mapster;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
-using Security.Extensions;
 
 namespace Main.Api.EndPoints.Users;
 
@@ -34,10 +35,11 @@ public class GetUsersEndPoint : ICarterModule
     public void AddRoutes(IEndpointRouteBuilder app)
     {
         app.MapGet("/users/",
-                async (ISender sender, [AsParameters] GetUsersRequest request, ClaimsPrincipal claims,
+                async (ISender sender, [AsParameters] GetUsersRequest request, IUserContext user,
                     CancellationToken token) =>
                 {
-                    if (!claims.GetUserId(out var userId)) return Results.Unauthorized();
+                    var userId = user.UserId;
+                    if (userId == null) return Results.Unauthorized();
                     
                     var pagination = new PaginationModel(request.Page, request.Limit);
                     var query = new GetUsersQuery(request.SearchTerm, pagination, request.SimilarityLevel,

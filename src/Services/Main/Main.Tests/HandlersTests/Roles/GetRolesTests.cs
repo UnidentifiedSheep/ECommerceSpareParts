@@ -1,5 +1,5 @@
-﻿using Core.Extensions;
-using Core.Models;
+﻿using Abstractions.Models;
+using Extensions;
 using Main.Application.Handlers.Roles.GetRoles;
 using Main.Entities;
 using Main.Persistence.Context;

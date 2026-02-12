@@ -1,9 +1,8 @@
 using System.Data;
+using Abstractions.Interfaces.Services;
 using Application.Common.Interfaces;
+using Attributes;
 using Contracts.Sale;
-using Core.Attributes;
-using Core.Interfaces;
-using Core.Interfaces.Services;
 using Exceptions.Exceptions.Sales;
 using Main.Abstractions.Dtos.Amw.Sales;
 using Main.Abstractions.Interfaces.DbRepositories;
@@ -17,6 +16,7 @@ using Main.Application.Handlers.StorageContents.RestoreContent;
 using Main.Entities;
 using Main.Enums;
 using Mapster;
+using MassTransit;
 using MediatR;
 
 namespace Main.Application.Handlers.Sales.EditFullSale;
@@ -31,7 +31,7 @@ public record EditFullSaleCommand(
     string? Comment,
     bool SellFromOtherStorages) : ICommand;
 
-public class EditFullSaleHandler(IMediator mediator, ISaleRepository saleRepository, IMessageBroker messageBroker,
+public class EditFullSaleHandler(IMediator mediator, ISaleRepository saleRepository, IPublishEndpoint publishEndpoint,
     IUnitOfWork unitOfWork)
     : ICommandHandler<EditFullSaleCommand>
 {
@@ -87,8 +87,11 @@ public class EditFullSaleHandler(IMediator mediator, ISaleRepository saleReposit
 
         await SubtractFromReservation(contentGreaterCount, userId, sale.BuyerId, cancellationToken);
 
-        await messageBroker.Publish(new SaleEditedEvent(sale.Adapt<global::Contracts.Models.Sale.Sale>(),
-            deletedSaleContents.Keys), cancellationToken);
+        await publishEndpoint.Publish(new SaleEditedEvent
+        {
+            Sale = sale.Adapt<global::Contracts.Models.Sale.Sale>(),
+            DeletedSaleContents = deletedSaleContents.Keys
+        }, cancellationToken);
         await unitOfWork.SaveChangesAsync(cancellationToken);
         return Unit.Value;
     }

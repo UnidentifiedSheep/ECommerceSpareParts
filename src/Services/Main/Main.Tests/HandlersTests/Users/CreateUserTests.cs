@@ -1,5 +1,5 @@
 using Bogus;
-using Main.Abstractions.Consts;
+using Main.Abstractions.Constants;
 using Main.Application.Handlers.Users.CreateUser;
 using Main.Abstractions.Dtos.Emails;
 using Main.Enums;

@@ -1,4 +1,5 @@
 using System.Security.Claims;
+using Abstractions.Interfaces;
 using Api.Common.Extensions;
 using Carter;
 using Main.Abstractions.Dtos.Amw.Storage;
@@ -16,11 +17,9 @@ public class EditStorageContentEndPoint : ICarterModule
     public void AddRoutes(IEndpointRouteBuilder app)
     {
         app.MapPatch("/storages/content", async (ISender sender, EditStorageContentRequest request,
-                ClaimsPrincipal claims, CancellationToken cancellationToken) =>
+                IUserContext user, CancellationToken cancellationToken) =>
             {
-                if (!Guid.TryParse(claims.FindFirstValue(ClaimTypes.NameIdentifier), out var userId))
-                    return Results.Unauthorized();
-                var command = new EditStorageContentCommand(request.EditedFields, userId);
+                var command = new EditStorageContentCommand(request.EditedFields, user.UserId);
                 await sender.Send(command, cancellationToken);
                 return Results.NoContent();
             }).WithTags("Storages")

@@ -1,5 +1,5 @@
+using Abstractions.Models;
 using Application.Common.Interfaces;
-using Core.Models;
 using Main.Abstractions.Interfaces.DbRepositories;
 using Main.Enums;
 using Mapster;

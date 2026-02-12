@@ -1,8 +1,10 @@
 using System.Data;
+using Abstractions.Interfaces;
+using Abstractions.Interfaces.Currency;
+using Abstractions.Interfaces.Services;
 using Application.Common.Interfaces;
-using Core.Attributes;
-using Core.Interfaces;
-using Core.Interfaces.Services;
+using Attributes;
+using Contracts.Articles;
 using Exceptions.Base;
 using Main.Abstractions.Dtos.Amw.Storage;
 using Main.Abstractions.Interfaces.Services;
@@ -11,6 +13,7 @@ using Main.Application.Notifications;
 using Main.Entities;
 using Main.Enums;
 using Mapster;
+using MassTransit;
 using MediatR;
 
 namespace Main.Application.Handlers.StorageContents.EditContent;
@@ -25,6 +28,7 @@ public class EditStorageContentHandler(
     IConcurrencyValidator<StorageContent> concurrencyValidator,
     ICurrencyConverter currencyConverter,
     IMediator mediator,
+    IPublishEndpoint publishEndpoint,
     IArticlesService articlesService) : ICommandHandler<EditStorageContentCommand>
 {
     public async Task<Unit> Handle(EditStorageContentCommand request, CancellationToken cancellationToken)
@@ -61,10 +65,12 @@ public class EditStorageContentHandler(
         if (toIncrement.Count > 0)
             await articlesService.UpdateArticlesCount(toIncrement, cancellationToken);
         await unitOfWork.AddRangeAsync(storageMovements, cancellationToken);
+        
+        await publishEndpoint.Publish(new ArticleBuyPricesChangedEvent { ArticleIds = articleIds}, cancellationToken);
+        
         await unitOfWork.SaveChangesAsync(cancellationToken);
 
         await mediator.Publish(new ArticlesUpdatedNotification(articleIds), cancellationToken);
-        await mediator.Publish(new ArticlePricesUpdatedNotification(articleIds), cancellationToken);
         return Unit.Value;
     }
 

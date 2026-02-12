@@ -1,7 +1,7 @@
 ﻿using System.Net;
+using Abstractions.Interfaces;
 using Amazon.S3;
 using Amazon.S3.Model;
-using Core.Interfaces;
 
 namespace S3;
 

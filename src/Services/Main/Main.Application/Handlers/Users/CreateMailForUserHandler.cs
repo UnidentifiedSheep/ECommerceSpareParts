@@ -1,5 +1,4 @@
 using Application.Common.Interfaces;
-using Core.Interfaces;
 using FluentValidation;
 using Main.Abstractions.Interfaces.DbRepositories;
 
@@ -24,7 +23,7 @@ public class CreateMailForUserValidation : AbstractValidator<CreateMailForUserCo
     }
 }
 
-public class CreateMailForUserHandler(IUserEmailRepository emailRepository, ITimeWebMail timeWebMail)
+public class CreateMailForUserHandler(IUserEmailRepository emailRepository)
     : ICommandHandler<CreateMailForUserCommand, CreateMailForUserResult>
 {
     public async Task<CreateMailForUserResult> Handle(CreateMailForUserCommand request,

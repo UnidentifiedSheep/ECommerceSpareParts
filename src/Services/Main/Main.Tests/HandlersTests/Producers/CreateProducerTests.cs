@@ -1,5 +1,5 @@
 using Bogus;
-using Core.Extensions;
+using Extensions;
 using Main.Application.Handlers.Producers.CreateProducer;
 using Main.Persistence.Context;
 using MediatR;

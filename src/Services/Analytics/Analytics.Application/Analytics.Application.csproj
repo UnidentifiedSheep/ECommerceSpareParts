@@ -9,9 +9,12 @@
 
     <ItemGroup>
       <ProjectReference Include="..\..\..\Core\Contracts\Contracts.csproj" />
-      <ProjectReference Include="..\..\..\Core\Core\Core.csproj" />
       <ProjectReference Include="..\..\Application.Common\Application.Common.csproj" />
       <ProjectReference Include="..\Analytics.Core\Analytics.Core.csproj" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <PackageReference Include="MassTransit" Version="8.5.8" />
     </ItemGroup>
 
 </Project>

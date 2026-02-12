@@ -1,6 +1,6 @@
-﻿using Application.Common.Abstractions;
+﻿using Abstractions.Interfaces;
+using Application.Common.Abstractions;
 using BulkValidation.Core.Plan;
-using Core.Interfaces;
 using MediatR;
 
 namespace Application.Common.Behaviors;

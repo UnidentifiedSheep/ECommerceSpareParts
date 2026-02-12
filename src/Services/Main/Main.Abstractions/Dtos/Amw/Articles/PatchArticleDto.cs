@@ -1,4 +1,4 @@
-using Core.Models;
+using Abstractions.Models;
 
 namespace Main.Abstractions.Dtos.Amw.Articles;
 

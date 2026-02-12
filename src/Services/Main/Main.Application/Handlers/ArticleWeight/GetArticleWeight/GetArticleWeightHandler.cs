@@ -1,8 +1,8 @@
 ﻿using Application.Common.Interfaces;
-using Core.StaticFunctions;
 using Exceptions.Exceptions.ArticleWeight;
 using Main.Abstractions.Dtos.ArticleWeight;
 using Main.Abstractions.Interfaces.DbRepositories;
+using Main.Abstractions.Utils;
 using Mapster;
 
 namespace Main.Application.Handlers.ArticleWeight.GetArticleWeight;

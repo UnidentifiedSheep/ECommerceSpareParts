@@ -1,6 +1,6 @@
-using Core.Extensions;
-using Core.Interfaces.Validators;
-using Core.Models;
+using Abstractions.Interfaces.Validators;
+using Abstractions.Models;
+using Extensions;
 using FluentValidation;
 using Main.Application.Handlers.BaseValidators;
 
@@ -9,8 +9,7 @@ namespace Main.Application.Handlers.Users.CreateUser;
 public class CreateUserValidation : AbstractValidator<CreateUserCommand>
 {
     public CreateUserValidation(IPasswordManager passwordManager, IEmailValidator emailValidator,
-        UserEmailOptions emailOptions,
-        UserPhoneOptions phoneOptions)
+        UserEmailOptions emailOptions, UserPhoneOptions phoneOptions)
     {
         RuleFor(x => x.UserName)
             .SetValidator(new LoginValidator());

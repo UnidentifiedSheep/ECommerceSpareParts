@@ -1,5 +1,6 @@
-﻿using Contracts.Interfaces;
+﻿namespace Contracts.Sale;
 
-namespace Contracts.Sale;
-
-public record SaleDeletedEvent(Models.Sale.Sale Sale) : IContract;
+public record SaleDeletedEvent
+{
+    public Models.Sale.Sale Sale { get; init; } = null!;
+}

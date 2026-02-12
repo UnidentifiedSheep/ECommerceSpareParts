@@ -1,6 +1,7 @@
-﻿using Api.Common.Extensions;
+﻿using Abstractions.Models;
+using Api.Common.Extensions;
 using Carter;
-using Core.Models;
+using Enums;
 using Main.Application.Handlers.Options.GetEmailOptions;
 using Main.Enums;
 using MediatR;

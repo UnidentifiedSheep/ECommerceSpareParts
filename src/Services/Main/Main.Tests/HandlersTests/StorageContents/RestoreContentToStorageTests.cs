@@ -1,5 +1,5 @@
 using Exceptions.Exceptions.Articles;
-using Main.Abstractions.Consts;
+using Main.Abstractions.Constants;
 using Main.Application.Handlers.StorageContents.RestoreContent;
 using Main.Abstractions.Dtos.Amw.Sales;
 using Main.Entities;

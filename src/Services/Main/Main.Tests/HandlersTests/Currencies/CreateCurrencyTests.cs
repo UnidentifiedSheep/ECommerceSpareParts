@@ -1,4 +1,4 @@
-using Main.Abstractions.Consts;
+using Main.Abstractions.Constants;
 using Main.Application.Handlers.Currencies.CreateCurrency;
 using Main.Persistence.Context;
 using MediatR;

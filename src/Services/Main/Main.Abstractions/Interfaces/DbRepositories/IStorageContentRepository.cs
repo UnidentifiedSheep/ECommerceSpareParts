@@ -6,8 +6,8 @@ namespace Main.Abstractions.Interfaces.DbRepositories;
 
 public interface IStorageContentRepository
 {
-    Task<Dictionary<int, List<StorageContentLogisticsProjection>>> GetStorageContentsForPricing(IEnumerable<int> articleIds, 
-        bool onlyPositiveQty = true, CancellationToken ct = default, params Expression<Func<StorageContent, object?>>[] includes);
+    Task<List<StorageContentPriceProjection>> GetStorageContentPricingInfo(IEnumerable<int> articleIds, 
+        bool onlyPositiveQty = true, CancellationToken ct = default);
 
     Task<IEnumerable<StorageContent>> GetStorageContentsForUpdate(IEnumerable<int> ids, bool track = true,
         CancellationToken cancellationToken = default);

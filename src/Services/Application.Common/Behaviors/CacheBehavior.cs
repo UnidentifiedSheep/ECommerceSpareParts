@@ -1,6 +1,6 @@
+using Abstractions.Interfaces.Cache;
+using Abstractions.Interfaces.RelatedData;
 using Application.Common.Interfaces;
-using Core.Interfaces;
-using Core.Interfaces.CacheRepositories;
 using MediatR;
 
 namespace Application.Common.Behaviors;

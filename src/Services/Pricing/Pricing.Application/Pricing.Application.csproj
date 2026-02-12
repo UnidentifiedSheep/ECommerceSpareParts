@@ -1,0 +1,21 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <TargetFramework>net10.0</TargetFramework>
+        <ImplicitUsings>enable</ImplicitUsings>
+        <Nullable>enable</Nullable>
+    </PropertyGroup>
+
+    <ItemGroup>
+      <ProjectReference Include="..\..\..\Core\Contracts\Contracts.csproj" />
+      <ProjectReference Include="..\..\Application.Common\Application.Common.csproj" />
+      <ProjectReference Include="..\Pricing.Abstractions\Pricing.Abstractions.csproj" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <PackageReference Include="IntervalMap" Version="1.0.3" />
+      <PackageReference Include="Mapster" Version="10.0.0-pre01" />
+      <PackageReference Include="MassTransit" Version="8.5.8" />
+    </ItemGroup>
+
+</Project>

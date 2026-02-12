@@ -8,15 +8,15 @@
     </PropertyGroup>
 
     <ItemGroup>
+        <PackageReference Include="BulkValidation.Base" Version="1.0.3" />
         <PackageReference Include="BulkValidation.Core" Version="1.0.9" />
         <PackageReference Include="FluentValidation" Version="12.1.0" />
         <PackageReference Include="FluentValidation.DependencyInjectionExtensions" Version="12.1.0" />
-        <PackageReference Include="Mapster" Version="9.0.0-pre01"/>
+        <PackageReference Include="Mapster" Version="10.0.0-pre01" />
         <PackageReference Include="MediatR" Version="14.0.0-beta-1" />
     </ItemGroup>
 
     <ItemGroup>
-        <ProjectReference Include="..\..\Core\Core\Core.csproj"/>
         <ProjectReference Include="..\..\Core\Exceptions\Exceptions.csproj" />
     </ItemGroup>
 

@@ -1,11 +1,14 @@
-﻿using Core.Attributes;
-using Exceptions.Base;
+﻿using Exceptions.Base;
 
 namespace Exceptions.Exceptions.Currencies;
 
 public class CurrencyNotFoundException : NotFoundException
 {
     public CurrencyNotFoundException(object id) : base("Валюта не найдена", new { Id = id })
+    {
+    }
+    
+    public CurrencyNotFoundException(string code) : base("Валюта не найдена", new { Code = code })
     {
     }
 

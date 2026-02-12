@@ -11,7 +11,7 @@
         <PackageReference Include="BulkValidation.Base" Version="1.0.3" />
         <PackageReference Include="BulkValidation.Core" Version="1.0.9" />
         <PackageReference Include="BulkValidation.Pgsql" Version="1.0.12" />
-        <PackageReference Include="MassTransit.EntityFrameworkCore" Version="9.0.0-develop.25" />
+        <PackageReference Include="MassTransit.EntityFrameworkCore" Version="8.5.8" />
         <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="10.0.0">
             <PrivateAssets>all</PrivateAssets>
             <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>

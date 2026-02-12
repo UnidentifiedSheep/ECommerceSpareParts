@@ -1,5 +1,6 @@
-using Contracts.Interfaces;
-
 namespace Contracts.Sale;
 
-public record SaleCreatedEvent(Models.Sale.Sale Sale) : IContract;
+public record SaleCreatedEvent
+{
+    public Models.Sale.Sale Sale { get; init; } = null!;
+}

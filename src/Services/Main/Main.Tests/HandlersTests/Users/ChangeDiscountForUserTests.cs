@@ -1,4 +1,3 @@
-using Core.Interfaces.CacheRepositories;
 using FluentValidation;
 using Main.Abstractions.Interfaces.CacheRepositories;
 using Main.Application.Configs;
@@ -51,14 +50,14 @@ public class ChangeDiscountForUserTests : IAsyncLifetime
     [Fact]
     public async Task ChangeUsersDiscount_WithTooLargeDiscount_FailsValidation()
     {
-        var command = new ChangeUserDiscountCommand(_mockUser.Id, 101);
+        var command = new ChangeUserDiscountCommand(_mockUser.Id, 1);
         await Assert.ThrowsAsync<ValidationException>(async () => await _mediator.Send(command));
     }
 
     [Fact]
     public async Task ChangeUsersDiscount_WithNormalDiscount_Succeeds()
     {
-        var command = new ChangeUserDiscountCommand(_mockUser.Id, 20);
+        var command = new ChangeUserDiscountCommand(_mockUser.Id, 0.2m);
         var result = await _mediator.Send(command);
         Assert.Equal(Unit.Value, result);
 
@@ -66,8 +65,8 @@ public class ChangeDiscountForUserTests : IAsyncLifetime
             .AsNoTracking()
             .FirstOrDefaultAsync(x => x.UserId == _mockUser.Id);
         Assert.NotNull(userDiscount);
-        Assert.Equal((decimal)20/100, userDiscount.Discount);
+        Assert.Equal(0.2m, userDiscount.Discount);
         var redisValue = await _usersCacheRepository.GetUserDiscount(_mockUser.Id);
-        Assert.Equal((decimal)20/100, redisValue);
+        Assert.Equal(0.2m, redisValue);
     }
 }

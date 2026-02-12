@@ -9,7 +9,8 @@
     </PropertyGroup>
 
     <ItemGroup>
-      <ProjectReference Include="..\..\..\Core\Core\Core.csproj" />
+      <ProjectReference Include="..\..\..\Core\Enums\Enums.csproj" />
+      <ProjectReference Include="..\..\..\Core\Extensions\Extensions.csproj" />
       <ProjectReference Include="..\Main.Enums\Main.Enums.csproj" />
     </ItemGroup>
 

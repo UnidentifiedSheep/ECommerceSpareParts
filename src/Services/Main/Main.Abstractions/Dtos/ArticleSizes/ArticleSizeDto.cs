@@ -1,4 +1,4 @@
-﻿using Main.Enums;
+﻿using Enums;
 
 namespace Main.Abstractions.Dtos.ArticleSizes;
 

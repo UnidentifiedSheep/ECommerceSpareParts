@@ -1,6 +1,7 @@
-using Core.Interfaces;
+using Abstractions.Interfaces;
+using Abstractions.Interfaces.Currency;
+using Application.Common.Extensions;
 using FluentValidation;
-using Main.Application.Extensions;
 using Main.Application.Handlers.Purchases.BaseValidators;
 using Main.Application.Handlers.Purchases.BaseValidators.Edit;
 

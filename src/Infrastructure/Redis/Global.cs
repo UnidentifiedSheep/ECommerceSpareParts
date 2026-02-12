@@ -1,10 +1,9 @@
-using System.Globalization;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 
 namespace Redis;
 
-public static class Global
+internal static class Global
 {
     public static readonly JsonSerializerOptions JsonOptions = new()
     {

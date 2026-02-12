@@ -32,6 +32,17 @@
         "Transforms": [
           { "PathRemovePrefix": "/main" }
         ]
+      },
+      "get-currency-rates": {
+        "ClusterId": "main-cluster",
+        "Match": {
+          "Path": "/main/currencies/rates",
+          "Methods": [ "GET" ]
+        },
+        "Order": 1,
+        "Transforms": [
+          { "PathRemovePrefix": "/main" }
+        ]
       }
     }
   }

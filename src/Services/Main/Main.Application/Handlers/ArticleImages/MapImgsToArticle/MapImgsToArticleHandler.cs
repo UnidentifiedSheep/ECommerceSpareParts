@@ -1,7 +1,7 @@
-﻿using Application.Common.Interfaces;
-using Core.Attributes;
-using Core.Interfaces;
-using Core.Interfaces.Services;
+﻿using Abstractions.Interfaces;
+using Abstractions.Interfaces.Services;
+using Application.Common.Interfaces;
+using Attributes;
 using Main.Application.Notifications;
 using Main.Entities;
 using MediatR;

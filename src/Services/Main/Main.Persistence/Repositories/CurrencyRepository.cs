@@ -1,3 +1,4 @@
+using System.Linq.Expressions;
 using Main.Abstractions.Interfaces.DbRepositories;
 using Main.Entities;
 using Main.Persistence.Context;
@@ -30,14 +31,20 @@ public class CurrencyRepository(DContext context) : ICurrencyRepository
             .ToListAsync(cancellationToken);
     }
 
-    public async Task<IEnumerable<Currency>> GetCurrencies(int page, int limit, bool track = true,
-        CancellationToken cancellationToken = default)
+    public async Task<IEnumerable<Currency>> GetCurrencies(int? page = null, int? limit = null, bool track = true,
+        CancellationToken cancellationToken = default, params Expression<Func<Currency, object?>>[] includes)
     {
-        return await context.Currencies.ConfigureTracking(track)
-            .OrderBy(x => x.Id)
-            .Skip(page * limit)
-            .Take(limit)
-            .ToListAsync(cancellationToken);
+        var query = context.Currencies.ConfigureTracking(track);
+
+        if (page.HasValue && limit.HasValue)
+            query = query.Skip(page.Value * limit.Value).Take(limit.Value);
+        
+        foreach (var include in includes)
+            query = query.Include(include);
+        
+        return await query
+                .OrderBy(x => x.Id)
+                .ToListAsync(cancellationToken);
     }
 
     public async Task<Currency?> GetCurrencyBeforeSpecifiedId(int id, bool track = true, CancellationToken cancellationToken = default)

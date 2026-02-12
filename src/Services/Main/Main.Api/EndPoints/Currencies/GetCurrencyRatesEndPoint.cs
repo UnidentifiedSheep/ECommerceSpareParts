@@ -1,5 +1,6 @@
 ﻿using Api.Common.Extensions;
 using Carter;
+using Enums;
 using Main.Application.Handlers.Currencies.GetCurrencyRates;
 using Main.Enums;
 using MediatR;

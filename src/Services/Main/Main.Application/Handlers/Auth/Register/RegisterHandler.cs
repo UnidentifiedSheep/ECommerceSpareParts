@@ -1,5 +1,5 @@
 ﻿using Application.Common.Interfaces;
-using Core.Attributes;
+using Attributes;
 using Main.Abstractions.Dtos.Emails;
 using Main.Abstractions.Dtos.Users;
 using Main.Application.Handlers.Users.CreateUser;

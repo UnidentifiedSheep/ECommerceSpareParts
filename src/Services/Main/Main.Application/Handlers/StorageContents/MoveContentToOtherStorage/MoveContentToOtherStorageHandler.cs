@@ -1,8 +1,8 @@
 ﻿using System.Data;
+using Abstractions.Interfaces;
+using Abstractions.Interfaces.Services;
 using Application.Common.Interfaces;
-using Core.Attributes;
-using Core.Interfaces;
-using Core.Interfaces.Services;
+using Attributes;
 using Exceptions.Base;
 using Main.Abstractions.Dtos.Amw.Storage;
 using Main.Abstractions.Interfaces.Services;

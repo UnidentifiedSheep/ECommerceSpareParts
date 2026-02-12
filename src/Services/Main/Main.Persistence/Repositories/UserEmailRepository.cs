@@ -1,6 +1,5 @@
-using Core.Extensions;
+using Extensions;
 using Main.Abstractions.Interfaces.DbRepositories;
-using Main.Abstractions.Models;
 using Main.Entities;
 using Main.Persistence.Context;
 using Microsoft.EntityFrameworkCore;

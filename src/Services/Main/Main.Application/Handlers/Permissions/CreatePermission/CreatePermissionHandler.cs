@@ -1,7 +1,7 @@
-﻿using Application.Common.Interfaces;
-using Core.Attributes;
-using Core.Extensions;
-using Core.Interfaces.Services;
+﻿using Abstractions.Interfaces.Services;
+using Application.Common.Interfaces;
+using Attributes;
+using Extensions;
 using Main.Entities;
 
 namespace Main.Application.Handlers.Permissions.CreatePermission;

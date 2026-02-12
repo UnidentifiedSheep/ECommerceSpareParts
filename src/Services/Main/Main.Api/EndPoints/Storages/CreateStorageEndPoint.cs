@@ -1,5 +1,6 @@
 using Api.Common.Extensions;
 using Carter;
+using Enums;
 using Main.Application.Handlers.Storages.CreateStorage;
 using Main.Enums;
 using Mapster;

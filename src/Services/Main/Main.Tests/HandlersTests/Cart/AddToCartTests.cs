@@ -1,5 +1,5 @@
 ﻿using Bogus;
-using Main.Abstractions.Consts;
+using Main.Abstractions.Constants;
 using Main.Application.Handlers.Articles.CreateArticles;
 using Main.Application.Handlers.Cart.AddToCart;
 using Main.Application.Handlers.Producers.CreateProducer;

@@ -1,4 +1,3 @@
-using Core.Attributes;
 using Exceptions.Base;
 
 namespace Exceptions.Exceptions.Balances;

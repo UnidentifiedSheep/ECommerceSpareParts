@@ -1,6 +1,6 @@
-using Core.Interfaces;
-using Core.Interfaces.Services;
-using Core.Models;
+using Abstractions.Interfaces.Services;
+using Application.Common.Interfaces;
+using Application.Common.Models;
 using Main.Entities;
 using Mapster;
 using Microsoft.Extensions.DependencyInjection;

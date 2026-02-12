@@ -1,4 +1,4 @@
-using Core.Extensions;
+using Extensions;
 using Main.Abstractions.Dtos.Amw.Articles;
 using Main.Entities;
 

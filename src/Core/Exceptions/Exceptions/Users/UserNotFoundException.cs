@@ -1,5 +1,4 @@
-﻿using Core.Attributes;
-using Exceptions.Base;
+﻿using Exceptions.Base;
 
 namespace Exceptions.Exceptions.Users;
 

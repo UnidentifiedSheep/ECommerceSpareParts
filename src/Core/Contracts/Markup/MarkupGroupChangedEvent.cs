@@ -1,5 +1,6 @@
-using Contracts.Interfaces;
-
 namespace Contracts.Markup;
 
-public record MarkupGroupChangedEvent(int GroupId) : IContract;
+public record MarkupGroupChangedEvent
+{
+    public int GroupId { get; init; }
+}

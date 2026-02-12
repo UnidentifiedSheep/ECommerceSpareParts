@@ -1,5 +1,5 @@
 using System.Text;
-using Core.Extensions;
+using Extensions;
 using Main.Abstractions.Interfaces.DbRepositories;
 using Main.Entities;
 using Main.Persistence.Context;

@@ -1,4 +1,5 @@
 using System.Security.Claims;
+using Abstractions.Interfaces;
 using Api.Common.Extensions;
 using Carter;
 using Main.Abstractions.Dtos.Amw.Sales;
@@ -19,11 +20,9 @@ public class EditSaleEndPoint : ICarterModule
     public void AddRoutes(IEndpointRouteBuilder app)
     {
         app.MapPut("/sales/{saleId}", async (ISender sender, string saleId, EditSaleRequest request,
-                ClaimsPrincipal claims, CancellationToken cancellationToken) =>
+                IUserContext user, CancellationToken cancellationToken) =>
             {
-                if (!Guid.TryParse(claims.FindFirstValue(ClaimTypes.NameIdentifier), out var userId))
-                    return Results.Unauthorized();
-                var command = new EditFullSaleCommand(request.EditedContent, saleId, request.CurrencyId, userId,
+                var command = new EditFullSaleCommand(request.EditedContent, saleId, request.CurrencyId, user.UserId,
                     request.SaleDateTime, request.Comment, request.SellFromOtherStorages);
                 await sender.Send(command, cancellationToken);
                 return Results.Ok();

@@ -1,8 +1,10 @@
 using System.Data;
+using Abstractions.Interfaces;
+using Abstractions.Interfaces.Currency;
+using Abstractions.Interfaces.Services;
 using Application.Common.Interfaces;
-using Core.Attributes;
-using Core.Interfaces;
-using Core.Interfaces.Services;
+using Attributes;
+using Contracts.Articles;
 using Main.Abstractions.Interfaces.DbRepositories;
 using Main.Abstractions.Interfaces.Services;
 using Main.Abstractions.Models;
@@ -11,6 +13,7 @@ using Main.Application.Notifications;
 using Main.Entities;
 using Main.Enums;
 using Mapster;
+using MassTransit;
 using MediatR;
 
 namespace Main.Application.Handlers.StorageContents.RestoreContent;
@@ -20,8 +23,8 @@ public record RestoreContentCommand(IEnumerable<RestoreContentItem> ContentDetai
     Guid UserId) : ICommand;
 
 public class RestoreContentHandler(IStorageContentRepository contentRepository, IArticlesRepository articlesRepository,
-    IArticlesService articlesService, IUnitOfWork unitOfWork, ICurrencyConverter currencyConverter,
-    IMediator mediator) : ICommandHandler<RestoreContentCommand>
+    IArticlesService articlesService, IUnitOfWork unitOfWork, ICurrencyConverter currencyConverter, 
+    IPublishEndpoint publishEndpoint, IMediator mediator) : ICommandHandler<RestoreContentCommand>
 {
     public async Task<Unit> Handle(RestoreContentCommand request, CancellationToken cancellationToken)
     {
@@ -65,10 +68,12 @@ public class RestoreContentHandler(IStorageContentRepository contentRepository, 
         }
 
         await articlesService.UpdateArticlesCount(toIncrement, cancellationToken);
+        
+        await publishEndpoint.Publish(new ArticleBuyPricesChangedEvent { ArticleIds = articleIds}, cancellationToken);
+        
         await unitOfWork.SaveChangesAsync(cancellationToken);
 
         await mediator.Publish(new ArticlesUpdatedNotification(articleIds), cancellationToken);
-        await mediator.Publish(new ArticlePricesUpdatedNotification(articleIds), cancellationToken);
         return Unit.Value;
     }
 

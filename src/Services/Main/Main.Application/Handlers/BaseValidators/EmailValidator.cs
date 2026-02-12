@@ -1,4 +1,4 @@
-using Core.Interfaces.Validators;
+using Abstractions.Interfaces.Validators;
 using FluentValidation;
 using Main.Abstractions.Dtos.Emails;
 

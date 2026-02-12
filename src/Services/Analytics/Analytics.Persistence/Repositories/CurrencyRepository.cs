@@ -18,4 +18,7 @@ public class CurrencyRepository(DContext context) : ICurrencyRepository
             .Where(x => ids.Contains(x.Id))
             .ToListAsync(cancellationToken);
     }
+    
+    public async Task<IEnumerable<Currency>> GetAllCurrencies(bool track = true, CancellationToken cancellationToken = default)
+        => await context.Currencies.ConfigureTracking(track).ToListAsync(cancellationToken);
 }

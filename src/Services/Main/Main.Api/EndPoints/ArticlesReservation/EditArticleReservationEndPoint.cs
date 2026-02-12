@@ -1,6 +1,8 @@
 using System.Security.Claims;
+using Abstractions.Interfaces;
 using Api.Common.Extensions;
 using Carter;
+using Enums;
 using Main.Application.Handlers.ArticleReservations.EditArticleReservation;
 using Main.Abstractions.Dtos.Amw.ArticleReservations;
 using MediatR;
@@ -14,17 +16,15 @@ public class EditArticleReservationEndPoint : ICarterModule
     public void AddRoutes(IEndpointRouteBuilder app)
     {
         app.MapPut("/articles/reservations/{reservationId}", async
-            (ISender sender, int reservationId, EditArticleReservationRequest request, ClaimsPrincipal claims,
+            (ISender sender, int reservationId, EditArticleReservationRequest request, IUserContext user,
                 CancellationToken token) =>
             {
-                if (!Guid.TryParse(claims.FindFirstValue(ClaimTypes.NameIdentifier), out var userId))
-                    return Results.Unauthorized();
-                var command = new EditArticleReservationCommand(reservationId, request.NewValue, userId);
+                var command = new EditArticleReservationCommand(reservationId, request.NewValue, user.UserId);
                 await sender.Send(command, token);
                 return Results.NoContent();
             }).WithTags("ArticleReservations")
             .WithDisplayName("Редактирование резервации")
             .WithDescription("Редактирование резервации")
-            .RequireAnyPermission("ARTICLE.RESERVATIONS.EDIT");
+            .RequireAnyPermission(PermissionCodes.ARTICLE_RESERVATIONS_EDIT);
     }
 }

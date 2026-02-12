@@ -1,4 +1,4 @@
-using Core.Interfaces.Exceptions;
+using Abstractions.Interfaces.Exceptions;
 
 namespace Exceptions.Base;
 

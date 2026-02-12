@@ -1,8 +1,8 @@
+using Abstractions.Interfaces.Services;
+using Abstractions.Interfaces.Validators;
 using Application.Common.Interfaces;
-using Core.Attributes;
-using Core.Extensions;
-using Core.Interfaces.Services;
-using Core.Interfaces.Validators;
+using Attributes;
+using Extensions;
 using Main.Abstractions.Dtos.Emails;
 using Main.Abstractions.Dtos.Users;
 using Main.Abstractions.Interfaces.DbRepositories;

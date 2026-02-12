@@ -1,6 +1,6 @@
 using System.Net;
-using Core.Interfaces;
-using Core.Interfaces.Services;
+using Abstractions.Interfaces;
+using Abstractions.Interfaces.Services;
 using Main.Abstractions.Interfaces.Services;
 using Main.Entities;
 using Main.Enums;

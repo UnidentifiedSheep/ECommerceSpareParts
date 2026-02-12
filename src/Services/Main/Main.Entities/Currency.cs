@@ -25,8 +25,6 @@ public partial class Currency
 
     public virtual CurrencyToUsd? CurrencyToUsd { get; set; }
 
-    public virtual ICollection<MarkupGroup> MarkupGroups { get; set; } = new List<MarkupGroup>();
-
     public virtual ICollection<OrderVersion> OrderVersions { get; set; } = new List<OrderVersion>();
 
     public virtual ICollection<Order> Orders { get; set; } = new List<Order>();
