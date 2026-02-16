@@ -1,4 +1,4 @@
-﻿using Main.Abstractions.Models.Pricing;
+﻿using Pricing.Abstractions.Models.Pricing;
 
 namespace Pricing.Abstractions.Interfaces.Services.Pricing;
 

@@ -41,7 +41,6 @@ public class GetBasePricesHandler(IArticlePricesCacheRepository articlePricesCac
                 continue;
             }
             
-            result[articleId] = basePrice;
             result[articleId] = ConvertPrice(basePrice, currencyId);
         }
     }

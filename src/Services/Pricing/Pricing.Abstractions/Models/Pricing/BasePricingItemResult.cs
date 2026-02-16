@@ -1,6 +1,4 @@
-﻿using Main.Abstractions.Models.Pricing;
-
-namespace Pricing.Abstractions.Models.Pricing;
+﻿namespace Pricing.Abstractions.Models.Pricing;
 
 /// <summary>
 /// Result of a pricing calculation for a single item.

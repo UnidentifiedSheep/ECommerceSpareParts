@@ -1,19 +1,16 @@
-using System.Security.Claims;
 using Abstractions.Interfaces;
 using Api.Common.Extensions;
 using Carter;
 using Enums;
-using Mapster;
 using MediatR;
-using Pricing.Abstractions.Models;
+using Pricing.Abstractions.Models.Pricing;
 using Pricing.Application.Handlers.Prices.GetDetailedPrices;
-using Pricing.Application.Handlers.Prices.GetPrices;
 
 namespace Pricing.Api.EndPoints.Prices;
 
-public record GetDetailedPricesResponse(Dictionary<int, DetailedPriceModel> Prices);
+public record GetDetailedPricesResponse(Dictionary<int, PricingResult?> Prices);
 
-public record GetPricesResponse(Dictionary<int, double> Prices);
+public record GetPricesResponse(Dictionary<int, decimal?> Prices);
 
 public class GetPricesEndPoint : ICarterModule
 {
@@ -42,14 +39,16 @@ public class GetPricesEndPoint : ICarterModule
     {
         var query = new GetDetailedPricesQuery(articleIds, currencyId, buyerId);
         var result = await sender.Send(query, token);
-        return Results.Ok(result.Adapt<GetDetailedPricesResponse>());
+        return Results.Ok(new GetDetailedPricesResponse(result.Prices));
     }
 
     private async Task<IResult> GetNormal(ISender sender, IEnumerable<int> articleIds, Guid? buyerId,
         int currencyId, CancellationToken token)
     {
-        var query = new GetPricesQuery(articleIds, currencyId, buyerId);
+        var query = new GetDetailedPricesQuery(articleIds, currencyId, buyerId);
         var result = await sender.Send(query, token);
-        return Results.Ok(result.Adapt<GetPricesResponse>());
+        var dict = result.Prices
+            .ToDictionary(x => x.Key, x => x.Value?.FinalPrice);
+        return Results.Ok(new GetPricesResponse(dict));
     }
 }

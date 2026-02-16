@@ -1,5 +1,5 @@
-﻿using Main.Abstractions.Models.Pricing;
-using Pricing.Abstractions.Interfaces.Services.Pricing;
+﻿using Pricing.Abstractions.Interfaces.Services.Pricing;
+using Pricing.Abstractions.Models.Pricing;
 
 namespace Pricing.Application.Services.ArticlePricing;
 

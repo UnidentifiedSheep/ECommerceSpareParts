@@ -1,6 +1,4 @@
-﻿using Abstractions.Interfaces;
-using Abstractions.Interfaces.Currency;
-using Application.Common.Interfaces;
+﻿using Abstractions.Interfaces.Currency;
 using Application.Common.Interfaces.Settings;
 using IntervalMap.Core.Models;
 using IntervalMap.Variations;

@@ -1,4 +1,3 @@
-using Application.Common.Interfaces;
 using Application.Common.Interfaces.Settings;
 using Exceptions.Exceptions.Markups;
 using Microsoft.Extensions.Logging;
