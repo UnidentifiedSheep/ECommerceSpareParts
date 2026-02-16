@@ -123,6 +123,7 @@ builder.Services.AddMassTransit(x =>
         {
             ep.Durable = true;
             ep.ConfigureConsumer<ArticleBuyPricesChangedConsumer>(context);
+            ep.ConfigureConsumer<UserDiscountChangedConsumer>(context);
         });
     });
 });

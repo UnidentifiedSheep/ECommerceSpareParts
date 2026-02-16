@@ -12,7 +12,7 @@ public static class ServiceProvider
         collection.AddScoped<IArticlePricesCacheRepository, ArticlePricesCachesRepository>(sp =>
         {
             var cache = sp.GetRequiredService<ICache>();
-            var ttl = TimeSpan.FromHours(8);
+            var ttl = TimeSpan.FromHours(48);
             return new ArticlePricesCachesRepository(cache, ttl);
         });
         
@@ -21,6 +21,13 @@ public static class ServiceProvider
             var cache = sp.GetRequiredService<ICache>();
             var ttl = TimeSpan.FromHours(24);
             return new CurrencyCacheRepository(cache, ttl);
+        });
+        
+        collection.AddScoped<IUserCacheRepository, UserCacheRepository>(sp =>
+        {
+            var cache = sp.GetRequiredService<ICache>();
+            var ttl = TimeSpan.FromHours(24);
+            return new UserCacheRepository(cache, ttl);
         });
 
         return collection;
