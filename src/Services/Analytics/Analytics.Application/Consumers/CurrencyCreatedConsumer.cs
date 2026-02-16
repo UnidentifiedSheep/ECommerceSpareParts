@@ -10,8 +10,5 @@ public class CurrencyCreatedConsumer(IUnitOfWork unitOfWork) : IConsumer<Currenc
 {
     public async Task Consume(ConsumeContext<CurrencyCreatedEvent> context)
     {
-        Currency model = context.Message.Currency.Adapt<Currency>();
-        await unitOfWork.AddAsync(model);
-        await unitOfWork.SaveChangesAsync();
     }
 }

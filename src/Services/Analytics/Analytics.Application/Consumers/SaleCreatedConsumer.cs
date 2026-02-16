@@ -12,8 +12,6 @@ public class SaleCreatedConsumer(IUnitOfWork unitOfWork, ISellInfoService sellIn
     {
         await unitOfWork.ExecuteWithTransaction(new TransactionalAttribute(), async () =>
         {
-            await sellInfoService.CreateSellInfos(context.Message.Sale);
-            await unitOfWork.SaveChangesAsync();
         });
     }
 }

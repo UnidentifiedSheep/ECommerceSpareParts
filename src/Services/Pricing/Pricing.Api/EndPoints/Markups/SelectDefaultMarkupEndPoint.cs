@@ -1,5 +1,6 @@
 using Api.Common.Extensions;
 using Carter;
+using Enums;
 using MediatR;
 using Pricing.Application.Handlers.Markups.SelectDefaultMarkup;
 
@@ -20,6 +21,6 @@ public class SelectDefaultMarkupEndPoint : ICarterModule
                 }).WithTags("Markups")
                 .WithDescription("Установка дефолтной политики-наценки")
                 .WithDisplayName("Установка дефолтной политики-наценки")
-                .RequireAnyPermission("MARKUP.SET.DEFAULT");
+                .RequireAnyPermission(PermissionCodes.MARKUP_SET_DEFAULT);
     }
 }

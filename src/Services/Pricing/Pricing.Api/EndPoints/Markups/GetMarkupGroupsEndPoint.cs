@@ -1,6 +1,7 @@
 using Abstractions.Models;
 using Api.Common.Extensions;
 using Carter;
+using Enums;
 using Mapster;
 using MediatR;
 using Pricing.Abstractions.Dtos.Markups;
@@ -23,6 +24,6 @@ public class GetMarkupGroupsEndPoint : ICarterModule
             }).WithTags("Markups")
             .WithDescription("Получение групп наценок")
             .WithDisplayName("Получение групп наценок")
-            .RequireAnyPermission("MARKUP.GET");
+            .RequireAnyPermission(PermissionCodes.MARKUP_GET);
     }
 }

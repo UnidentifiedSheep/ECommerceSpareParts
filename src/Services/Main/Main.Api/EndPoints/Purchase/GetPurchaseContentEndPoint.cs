@@ -13,7 +13,7 @@ public class GetPurchaseContentEndPoint : ICarterModule
 {
     public void AddRoutes(IEndpointRouteBuilder app)
     {
-        app.MapGet("/purchases/{id}/content", async (ISender sender, string id, CancellationToken ct) =>
+        app.MapGet("/purchases/{id}/contents", async (ISender sender, string id, CancellationToken ct) =>
             {
                 var result = await sender.Send(new GetPurchaseContentQuery(id), ct);
                 var response = result.Adapt<GetPurchaseContentResponse>();

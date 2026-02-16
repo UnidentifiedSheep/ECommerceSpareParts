@@ -22,7 +22,8 @@ public static class ExceptionExtensions
                 return max == -1 ? StatusCodes.Status500InternalServerError : max;
             }
 
-            case ValidationException:
+            case FluentValidation.ValidationException:
+            case Exceptions.Base.ValidationException: 
             case BadRequestException:
                 return StatusCodes.Status400BadRequest;
 

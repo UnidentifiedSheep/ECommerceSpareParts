@@ -1,14 +1,16 @@
 ﻿using Abstractions.Interfaces.Exceptions;
+using Abstractions.Models.Validation;
 using Api.Common.Extensions;
+using Api.Common.Models;
 using Exceptions.Base;
 using FluentValidation;
 using Microsoft.AspNetCore.Diagnostics;
 using Microsoft.AspNetCore.Mvc;
-using Serilog;
+using ValidationException = FluentValidation.ValidationException;
 
 namespace Api.Common.ExceptionHandlers;
 
-public class CustomExceptionHandler() : IExceptionHandler
+public class CustomExceptionHandler(ILogger<CustomExceptionHandler> logger) : IExceptionHandler
 {
     public async ValueTask<bool> TryHandleAsync(HttpContext context, Exception exception, CancellationToken cancellationToken)
     {
@@ -25,8 +27,9 @@ public class CustomExceptionHandler() : IExceptionHandler
 
     private void LogError(HttpContext context, Exception exception)
     {
-        Log.ForContext("traceId", context.TraceIdentifier)
-            .Error(exception, "Error occurred at {time}", DateTime.UtcNow);
+        if (!logger.IsEnabled(LogLevel.Error)) return;
+        using (logger.BeginScope(new Dictionary<string, object> { ["TraceId"] = context.TraceIdentifier }))
+            logger.LogError(exception, "Error occurred at {Time}", DateTime.UtcNow);
     }
 
     private ProblemDetails CreateProblemDetails(HttpContext context, Exception exception, int statusCode)
@@ -39,7 +42,7 @@ public class CustomExceptionHandler() : IExceptionHandler
             Status = statusCode,
             Instance = context.Request.Path,
             Type = $"https://httpstatuses.io/{statusCode}",
-            Extensions =
+            Extensions = new Dictionary<string, object?>
             {
                 ["traceId"] = context.TraceIdentifier
             }
@@ -60,12 +63,8 @@ public class CustomExceptionHandler() : IExceptionHandler
                 problemDetails.Extensions["errors"] = GetDbValidationErrors(bulkEx);
                 break;
             case ValidationException validationEx:
-                problemDetails.Extensions["errors"] = validationEx.Errors.Select(e => new
-                {
-                    propertyName = e.PropertyName,
-                    errorMessage = e.ErrorMessage,
-                    attemptedValue = e.AttemptedValue
-                });
+                problemDetails.Extensions["validationErrors"] = validationEx.Errors
+                    .Select(e => new ValidationErrorModel(e.PropertyName, e.ErrorMessage, e.AttemptedValue));
                 break;
         }
     }

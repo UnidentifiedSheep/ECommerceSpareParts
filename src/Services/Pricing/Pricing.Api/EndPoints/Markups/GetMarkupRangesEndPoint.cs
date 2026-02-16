@@ -1,5 +1,6 @@
 using Api.Common.Extensions;
 using Carter;
+using Enums;
 using Mapster;
 using MediatR;
 using Pricing.Abstractions.Dtos.Markups;
@@ -22,6 +23,6 @@ public class GetMarkupRangesEndPoint : ICarterModule
             }).WithTags("Markups")
             .WithDescription("Получение диапазонов группы")
             .WithDisplayName("Получение диапазонов группы")
-            .RequireAnyPermission("MARKUP.GET");
+            .RequireAnyPermission(PermissionCodes.MARKUP_GET);
     }
 }

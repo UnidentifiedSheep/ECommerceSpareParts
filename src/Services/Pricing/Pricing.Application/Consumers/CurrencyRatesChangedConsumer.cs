@@ -1,7 +1,6 @@
 using Abstractions.Interfaces.Currency;
 using Contracts.Currency;
 using MassTransit;
-using Pricing.Abstractions.Interfaces.Services;
 
 namespace Pricing.Application.Consumers;
 

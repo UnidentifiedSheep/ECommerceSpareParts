@@ -44,6 +44,23 @@ services:
       - rabbitmq
     restart: unless-stopped
     
+  search.api:
+    image: search.api
+    build:
+      context: .
+      dockerfile: Search.Api/Dockerfile
+    ports:
+      - "4007:7292"
+      - "4008:8080"
+    volumes:
+      - ./certs:/app/certs:ro
+      - search_api_data:${SEARCH_INDEX_FOLDER}
+    environment:
+      - ASPNETCORE_Kestrel__Certificates__Default__Path=${MAIN_CERT_PATH}
+      - ASPNETCORE_Kestrel__Certificates__Default__Password=${MAIN_CERT_PASSWORD}
+      - CERTS_PATH=${CERTS_PATH}
+      - INDEX_FOLDER=${SEARCH_INDEX_FOLDER}
+    
   pricing.api:
     image: pricing.api
     build:
@@ -271,3 +288,4 @@ volumes:
   rabbitmq_data:
   minio_data:
   grafana_data:
+  search_api_data:

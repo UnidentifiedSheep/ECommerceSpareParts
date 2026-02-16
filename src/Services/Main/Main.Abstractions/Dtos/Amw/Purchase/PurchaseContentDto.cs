@@ -10,5 +10,5 @@ public class PurchaseContentDto
     public decimal TotalSum { get; set; }
     public string? Comment { get; set; }
     public ArticleDto Article { get; set; } = null!;
-    public PurchaseContentLogisticDto? ContentLogisticDto { get; set; }
+    public PurchaseContentLogisticDto? ContentLogistics { get; set; }
 }

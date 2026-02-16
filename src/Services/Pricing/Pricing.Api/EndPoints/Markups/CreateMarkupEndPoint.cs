@@ -1,5 +1,6 @@
 using Api.Common.Extensions;
 using Carter;
+using Enums;
 using Mapster;
 using MediatR;
 using Pricing.Abstractions.Dtos.Markups;
@@ -26,6 +27,6 @@ public class CreateMarkupEndPoint : ICarterModule
                 }).WithTags("Markups")
                 .WithDescription("Создание группы наценок")
                 .WithDisplayName("Создание группы наценок")
-                .RequireAnyPermission("MARKUP.CREATE");
+                .RequireAnyPermission(PermissionCodes.MARKUP_CREATE);
     }
 }
