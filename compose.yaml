@@ -1,6 +1,6 @@
 ﻿services:
   main.api:
-    image: main.api:${TAG}
+    image: main.api
     build:
       context: .
       dockerfile: src/Services/Main/Main.Api/Dockerfile
@@ -41,9 +41,9 @@
       - redis
       - rabbitmq
     restart: unless-stopped
-    
+
   search.api:
-    image: search.api:${TAG}
+    image: search.api
     build:
       context: .
       dockerfile: Search.Api/Dockerfile
@@ -52,12 +52,12 @@
       - "4008:8080"
     volumes:
       - ./certs:/app/certs:ro
-      - search_api_data:${SEARCH_INDEX_FOLDER}
+      - search_api_data:/app/data
     environment:
       - ASPNETCORE_Kestrel__Certificates__Default__Path=${MAIN_CERT_PATH}
       - ASPNETCORE_Kestrel__Certificates__Default__Password=${MAIN_CERT_PASSWORD}
       - CERTS_PATH=${CERTS_PATH}
-      - INDEX_FOLDER=${SEARCH_INDEX_FOLDER}
+      - INDEX_FOLDER=/app/data
       - RABBITMQ_HOST=amqp://${RABBITMQ_HOST}:${RABBITMQ_PORT}
       - RABBITMQ_USERNAME=${RABBITMQ_DEFAULT_USER}
       - RABBITMQ_PASSWORD=${RABBITMQ_DEFAULT_PASS}
@@ -65,9 +65,9 @@
       - USE_HTTPS_REDIRECTION=${SEARCH_USE_HTTPS_REDIRECTION}
     networks:
       - backend-network
-    
+
   pricing.api:
-    image: pricing.api:${TAG}
+    image: pricing.api
     build:
       context: .
       dockerfile: src/Services/Pricing/Pricing.Api/Dockerfile
@@ -98,8 +98,27 @@
       - rabbitmq
     restart: unless-stopped
 
+  gateway:
+    image: gateway
+    build:
+      context: .
+      dockerfile: src/Services/Gateway/Gateway/Dockerfile
+    ports:
+      - "4004:7292"
+    volumes:
+      - ./certs:/app/certs:ro
+    environment:
+      - ASPNETCORE_Kestrel__Certificates__Default__Path=${MAIN_CERT_PATH}
+      - ASPNETCORE_Kestrel__Certificates__Default__Password=${MAIN_CERT_PASSWORD}
+      - CERTS_PATH=${CERTS_PATH}
+      - GATEWAY_SUPER_KEY=${GATEWAY_SUPER_KEY}
+      - LOKI_URL=http://${LOKI_HOST}:${LOKI_PORT}
+    networks:
+      - backend-network
+    restart: unless-stopped
+
   analytics.api:
-    image: analytics.api:${TAG}
+    image: analytics.api
     build:
       context: .
       dockerfile: src/Services/Analytics/Analytics.Api/Dockerfile
@@ -129,28 +148,7 @@
       - rabbitmq
     restart: unless-stopped
 
-  gateway:
-    image: gateway:${TAG}
-    build:
-      context: .
-      dockerfile: src/Services/Gateway/Gateway/Dockerfile
-    ports:
-      - "4004:7292"
-    volumes:
-      - ./certs:/app/certs:ro
-    environment:
-      - ASPNETCORE_Kestrel__Certificates__Default__Path=${MAIN_CERT_PATH}
-      - ASPNETCORE_Kestrel__Certificates__Default__Password=${MAIN_CERT_PASSWORD}
-      - CERTS_PATH=${CERTS_PATH}
-      - GATEWAY_SUPER_KEY=${GATEWAY_SUPER_KEY}
-      - LOKI_URL=http://${LOKI_HOST}:${LOKI_PORT}
-    networks:
-      - backend-network
-    depends_on:
-      - main.api
-      - analytics.api
-    restart: unless-stopped
-  
+
   pgql:
     image: postgres-cron
     build:
@@ -191,7 +189,7 @@
     ports:
       - "${REDIS_PORT}:6379"
     restart: unless-stopped
-  
+
   rabbitmq:
     image: rabbitmq:3-management
     environment:
@@ -205,7 +203,7 @@
     networks:
       - backend-network
     restart: unless-stopped
-  
+
   minio:
     image: quay.io/minio/minio:latest
     container_name: minio
@@ -240,7 +238,7 @@
       "
     networks:
       - backend-network
-  
+
   loki:
     image: grafana/loki:latest
     container_name: loki
