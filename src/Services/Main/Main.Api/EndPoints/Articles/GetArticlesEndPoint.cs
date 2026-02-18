@@ -40,7 +40,7 @@ public class GetArticlesEndPoint : ICarterModule
                     .Select(x => x!.Value)
                     .ToList();
                 var pagination = new PaginationModel(request.Page, request.Limit);
-                if (user.ContainsPermission(nameof(PermissionCodes.ARTICLES_GET_FULL)))
+                if (user.ContainsPermission(PermissionCodes.ARTICLES_GET_FULL))
                     return await GetAmw(sender, request, pagination, userId, producerIds, token);
                 return await GetAnonymous(sender, request, pagination, userId, producerIds, token);
             }).WithTags("Articles")

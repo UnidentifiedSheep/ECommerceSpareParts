@@ -7,6 +7,7 @@
     </PropertyGroup>
 
     <ItemGroup>
+      <ProjectReference Include="..\..\..\Core\Contracts\Contracts.csproj" />
       <ProjectReference Include="..\..\..\Core\Exceptions\Exceptions.csproj" />
       <ProjectReference Include="..\..\Application.Common.Aot\Application.Common.Aot.csproj" />
       <ProjectReference Include="..\Search.Abstractions\Search.Abstractions.csproj" />
@@ -19,10 +20,6 @@
         <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
       </PackageReference>
       <PackageReference Include="Sannr" Version="1.3.0" />
-    </ItemGroup>
-
-    <ItemGroup>
-      <Folder Include="Consumers\" />
     </ItemGroup>
 
 </Project>

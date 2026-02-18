@@ -25,11 +25,10 @@ public class GetArticleCrossesEndPoint : ICarterModule
                 int limit, int page, string? sortBy, CancellationToken token) =>
             {
                 var userId = user.UserId;
-                if (userId == null) return Results.Unauthorized();
                 if (!user.ContainsPermission(PermissionCodes.ARTICLE_CROSSES_GET)) return Results.Forbid();
 
                 var pagination = new PaginationModel(page, limit);
-                if (user.ContainsPermission(nameof(PermissionCodes.ARTICLES_GET_FULL)))
+                if (user.ContainsPermission(PermissionCodes.ARTICLES_GET_FULL))
                     return await GetAmw(sender, articleId, pagination, sortBy, userId, token);
                 if (user.ContainsPermission(PermissionCodes.ARTICLES_GET_MAIN))
                     return await GetMember(sender, articleId, pagination, sortBy, userId, token);

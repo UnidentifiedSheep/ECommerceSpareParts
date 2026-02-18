@@ -1,12 +1,11 @@
 ﻿using Lucene.Net.Analysis.Standard;
-using Lucene.Net.Store;
 using Microsoft.Extensions.DependencyInjection;
-using Search.Abstractions.Interfaces;
-using Search.Abstractions.Interfaces.IndexDirectory;
 using Search.Abstractions.Interfaces.Persistence;
-using Search.Enums;
+using Search.Persistence.Interfaces.IndexDirectory;
+using Search.Persistence.Interfaces.Repositories;
 using Search.Persistence.Providers;
 using Search.Persistence.Repositories;
+using Search.Persistence.Services;
 
 namespace Search.Persistence;
 
@@ -18,8 +17,11 @@ public static class ServiceProvider
         services.AddSingleton<IIndexDirectoryProvider, IndexDirectoryProvider>();
         services.AddSingleton<StandardAnalyzer>(_ => new StandardAnalyzer(Global.LuceneVersion));
 
-        services.AddSingleton<IArticleRepository, ArticleRepositoryBase>();
+        services.AddSingleton<IArticleRepository, ArticleRepository>();
         services.AddSingleton<IArticleSuggestionRepository, ArticleSuggestionRepository>();
+
+        services.AddSingleton<IArticleService, ArticleService>();
+        services.AddSingleton<IArticleSuggestionService, ArticleSuggestionService>();
         
         return services;
     }

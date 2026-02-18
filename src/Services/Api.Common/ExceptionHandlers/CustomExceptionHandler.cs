@@ -1,9 +1,7 @@
 ﻿using Abstractions.Interfaces.Exceptions;
 using Abstractions.Models.Validation;
 using Api.Common.Extensions;
-using Api.Common.Models;
 using Exceptions.Base;
-using FluentValidation;
 using Microsoft.AspNetCore.Diagnostics;
 using Microsoft.AspNetCore.Mvc;
 using ValidationException = FluentValidation.ValidationException;

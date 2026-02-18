@@ -30,6 +30,7 @@
 
     <ItemGroup>
       <Folder Include="ReverseProxy\Analytics\" />
+      <Folder Include="ReverseProxy\Prices\" />
     </ItemGroup>
 
     <ItemGroup>

@@ -39,7 +39,6 @@ public class GetUsersEndPoint : ICarterModule
                     CancellationToken token) =>
                 {
                     var userId = user.UserId;
-                    if (userId == null) return Results.Unauthorized();
                     
                     var pagination = new PaginationModel(request.Page, request.Limit);
                     var query = new GetUsersQuery(request.SearchTerm, pagination, request.SimilarityLevel,

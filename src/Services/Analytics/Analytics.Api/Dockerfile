@@ -12,16 +12,21 @@ FROM mcr.microsoft.com/dotnet/sdk:10.0 AS build
 ARG BUILD_CONFIGURATION=Release
 WORKDIR /src
 COPY ["src/Services/Analytics/Analytics.Api/Analytics.Api.csproj", "src/Services/Analytics/Analytics.Api/"]
-COPY ["src/Core/Core/Core.csproj", "src/Core/Core/"]
+COPY ["src/Infrastructure/Persistence/Persistence.csproj", "src/Infrastructure/Persistence/"]
+COPY ["src/Core/Abstractions/Abstractions.csproj", "src/Core/Abstractions/"]
+COPY ["src/Core/Attributes/Attributes.csproj", "src/Core/Attributes/"]
+COPY ["src/Core/Enums/Enums.csproj", "src/Core/Enums/"]
 COPY ["src/Core/Exceptions/Exceptions.csproj", "src/Core/Exceptions/"]
-COPY ["src/Infrastructure/RabbitMq/RabbitMq.csproj", "src/Infrastructure/RabbitMq/"]
-COPY ["src/Services/Api.Common/Api.Common.csproj", "src/Services/Api.Common/"]
-COPY ["src/Services/Analytics/Analytics.Application/Analytics.Application.csproj", "src/Services/Analytics/Analytics.Application/"]
 COPY ["src/Core/Contracts/Contracts.csproj", "src/Core/Contracts/"]
 COPY ["src/Services/Application.Common/Application.Common.csproj", "src/Services/Application.Common/"]
 COPY ["src/Services/Analytics/Analytics.Core/Analytics.Core.csproj", "src/Services/Analytics/Analytics.Core/"]
+COPY ["src/Infrastructure/RabbitMq/RabbitMq.csproj", "src/Infrastructure/RabbitMq/"]
+COPY ["src/Services/Api.Common/Api.Common.csproj", "src/Services/Api.Common/"]
+COPY ["src/Core/Extensions/Extensions.csproj", "src/Core/Extensions/"]
+COPY ["src/Core/Utils/Utils.csproj", "src/Core/Utils/"]
+COPY ["src/Services/Analytics/Analytics.Application/Analytics.Application.csproj", "src/Services/Analytics/Analytics.Application/"]
 COPY ["src/Services/Analytics/Analytics.Persistence/Analytics.Persistence.csproj", "src/Services/Analytics/Analytics.Persistence/"]
-COPY ["src/Infrastructure/Persistence/Persistence.csproj", "src/Infrastructure/Persistence/"]
+COPY ["src/Infrastructure/Security/Security.csproj", "src/Infrastructure/Security/"]
 RUN dotnet restore "src/Services/Analytics/Analytics.Api/Analytics.Api.csproj"
 COPY . .
 WORKDIR "/src/src/Services/Analytics/Analytics.Api"

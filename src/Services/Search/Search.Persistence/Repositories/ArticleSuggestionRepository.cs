@@ -1,26 +1,22 @@
 ﻿using Lucene.Net.Analysis.Standard;
+using Lucene.Net.Search.Suggest;
 using Lucene.Net.Search.Suggest.Analyzing;
-using Lucene.Net.Store;
-using Search.Abstractions.Interfaces.IndexDirectory;
-using Search.Abstractions.Interfaces.Persistence;
 using Search.Entities;
 using Search.Enums;
-using Search.Persistence.Enumerators;
+using Search.Persistence.Abstractions;
+using Search.Persistence.Interfaces.IndexDirectory;
+using Search.Persistence.Interfaces.Repositories;
 
 namespace Search.Persistence.Repositories;
 
-public class ArticleSuggestionRepository : IArticleSuggestionRepository
+internal class ArticleSuggestionRepository : RepositoryBase, IArticleSuggestionRepository
 {
-    private const IndexName IndexName = Enums.IndexName.Article_Suggestions;
-    private readonly StandardAnalyzer _analyzer;
-    private readonly FSDirectory _directory;
     private readonly AnalyzingInfixSuggester _suggester;
 
-    public ArticleSuggestionRepository(IIndexDirectoryProvider directoryProvider, StandardAnalyzer analyzer)
+    public ArticleSuggestionRepository(IIndexDirectoryProvider directoryProvider, StandardAnalyzer analyzer) 
+        : base(directoryProvider, analyzer, IndexName.Article_Suggestions)
     {
-        _analyzer = analyzer;
-        _directory = directoryProvider.GetDirectory(IndexName);
-        _suggester = new AnalyzingInfixSuggester(Global.LuceneVersion, _directory, _analyzer);
+        _suggester = new AnalyzingInfixSuggester(Global.LuceneVersion, Directory, Analyzer);
     }
 
 
@@ -31,9 +27,14 @@ public class ArticleSuggestionRepository : IArticleSuggestionRepository
             .ToArray();
     }
 
-    public void RebuildSuggestions(IEnumerable<Article> articles)
+    public void RebuildSuggestions(IInputEnumerator enumerator)
     {
-        var enumerator = new ArticleInputEnumerator(articles);
         _suggester.Build(enumerator);
+    }
+    
+    public override void Dispose()
+    {
+        _suggester.Dispose();
+        base.Dispose();
     }
 }

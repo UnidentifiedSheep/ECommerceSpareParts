@@ -9,11 +9,11 @@ namespace Search.Application.Handler.Articles.GetArticle;
 public record GetArticleQuery(int ArticleId) : IQuery<GetArticleResult>;
 public record GetArticleResult(ArticleDto Article);
 
-internal class GetArticleHandler(IArticleRepository articleRepository) : IQueryHandler<GetArticleQuery, GetArticleResult>
+internal class GetArticleHandler(IArticleService articleService) : IQueryHandler<GetArticleQuery, GetArticleResult>
 {
     public ValueTask<GetArticleResult> Handle(GetArticleQuery request, CancellationToken cancellationToken)
     {
-        var article = articleRepository.GetArticle(request.ArticleId)
+        var article = articleService.GetArticle(request.ArticleId)
                       ?? throw new ArticleNotFoundException(request.ArticleId);
 
         var result = article.ToDto();

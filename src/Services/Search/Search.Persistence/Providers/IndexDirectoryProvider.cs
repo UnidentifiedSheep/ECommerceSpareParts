@@ -1,7 +1,7 @@
 ﻿using System.Collections.Concurrent;
 using Lucene.Net.Store;
-using Search.Abstractions.Interfaces.IndexDirectory;
 using Search.Enums;
+using Search.Persistence.Interfaces.IndexDirectory;
 
 namespace Search.Persistence.Providers;
 

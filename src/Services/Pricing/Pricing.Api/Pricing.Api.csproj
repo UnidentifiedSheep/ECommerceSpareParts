@@ -19,12 +19,6 @@
     </ItemGroup>
 
     <ItemGroup>
-      <Content Include="..\..\..\..\.dockerignore">
-        <Link>.dockerignore</Link>
-      </Content>
-    </ItemGroup>
-
-    <ItemGroup>
       <ProjectReference Include="..\..\..\Infrastructure\RabbitMq\RabbitMq.csproj" />
       <ProjectReference Include="..\..\..\Infrastructure\Redis\Redis.csproj" />
       <ProjectReference Include="..\..\..\Infrastructure\Security\Security.csproj" />
@@ -37,6 +31,12 @@
 
     <ItemGroup>
       <Folder Include="EndPoints\" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <Content Include="..\..\..\..\.dockerignore">
+        <Link>.dockerignore</Link>
+      </Content>
     </ItemGroup>
 
 </Project>

@@ -1,6 +1,7 @@
 ﻿using Search.Entities;
+using Search.Persistence.Enumerators;
 
-namespace Search.Abstractions.Interfaces.Persistence;
+namespace Search.Persistence.Interfaces.Repositories;
 
 public interface IArticleRepository
 {
@@ -8,4 +9,7 @@ public interface IArticleRepository
     void AddRange(IEnumerable<Article> articles);
     Article? GetArticle(int articleId);
     List<Article> GetArticles(IEnumerable<int> articleIds);
+    ArticleEnumerator GetEnumerator();
+    Article? GetNextArticle(int articleId);
+    void Delete(int articleId);
 }

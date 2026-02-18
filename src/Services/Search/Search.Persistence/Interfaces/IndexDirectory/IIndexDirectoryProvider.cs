@@ -1,7 +1,7 @@
 ﻿using Lucene.Net.Store;
 using Search.Enums;
 
-namespace Search.Abstractions.Interfaces.IndexDirectory;
+namespace Search.Persistence.Interfaces.IndexDirectory;
 
 public interface IIndexDirectoryProvider
 {

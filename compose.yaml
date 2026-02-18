@@ -1,8 +1,6 @@
-﻿version: "3.9"
-
-services:
+﻿services:
   main.api:
-    image: main.api
+    image: main.api:${TAG}
     build:
       context: .
       dockerfile: src/Services/Main/Main.Api/Dockerfile
@@ -45,7 +43,7 @@ services:
     restart: unless-stopped
     
   search.api:
-    image: search.api
+    image: search.api:${TAG}
     build:
       context: .
       dockerfile: Search.Api/Dockerfile
@@ -60,9 +58,16 @@ services:
       - ASPNETCORE_Kestrel__Certificates__Default__Password=${MAIN_CERT_PASSWORD}
       - CERTS_PATH=${CERTS_PATH}
       - INDEX_FOLDER=${SEARCH_INDEX_FOLDER}
+      - RABBITMQ_HOST=amqp://${RABBITMQ_HOST}:${RABBITMQ_PORT}
+      - RABBITMQ_USERNAME=${RABBITMQ_DEFAULT_USER}
+      - RABBITMQ_PASSWORD=${RABBITMQ_DEFAULT_PASS}
+      - GATEWAY_SUPER_KEY=${GATEWAY_SUPER_KEY}
+      - USE_HTTPS_REDIRECTION=${SEARCH_USE_HTTPS_REDIRECTION}
+    networks:
+      - backend-network
     
   pricing.api:
-    image: pricing.api
+    image: pricing.api:${TAG}
     build:
       context: .
       dockerfile: src/Services/Pricing/Pricing.Api/Dockerfile
@@ -94,7 +99,7 @@ services:
     restart: unless-stopped
 
   analytics.api:
-    image: analytics.api
+    image: analytics.api:${TAG}
     build:
       context: .
       dockerfile: src/Services/Analytics/Analytics.Api/Dockerfile
@@ -125,7 +130,7 @@ services:
     restart: unless-stopped
 
   gateway:
-    image: gateway
+    image: gateway:${TAG}
     build:
       context: .
       dockerfile: src/Services/Gateway/Gateway/Dockerfile

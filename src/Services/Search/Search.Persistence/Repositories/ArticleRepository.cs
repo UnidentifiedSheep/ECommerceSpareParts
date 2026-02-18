@@ -2,18 +2,19 @@
 using Lucene.Net.Index;
 using Lucene.Net.Queries;
 using Lucene.Net.Search;
-using Search.Abstractions.Interfaces.IndexDirectory;
-using Search.Abstractions.Interfaces.Persistence;
 using Search.Entities;
 using Search.Enums;
 using Search.Persistence.Abstractions;
 using Search.Persistence.Converters;
+using Search.Persistence.Enumerators;
+using Search.Persistence.Interfaces.IndexDirectory;
+using Search.Persistence.Interfaces.Repositories;
 
 namespace Search.Persistence.Repositories;
 
-internal class ArticleRepositoryBase : RepositoryBase, IArticleRepository
+internal class ArticleRepository : RepositoryBase, IArticleRepository
 {
-    public ArticleRepositoryBase(IIndexDirectoryProvider directoryProvider, StandardAnalyzer analyzer) 
+    public ArticleRepository(IIndexDirectoryProvider directoryProvider, StandardAnalyzer analyzer) 
         : base(directoryProvider, analyzer, IndexName.Articles) { }
 
     public void Add(Article article)
@@ -56,5 +57,23 @@ internal class ArticleRepositoryBase : RepositoryBase, IArticleRepository
         foreach (var sd in topDocs.ScoreDocs) docs.Add(Searcher.Doc(sd.Doc).ToArticle());
 
         return docs;
+    }
+
+    public ArticleEnumerator GetEnumerator() => new ArticleEnumerator(this);
+    public Article? GetNextArticle(int articleId)
+    {
+        var query = new TermQuery(new Term("Id", articleId.ToString()));
+        var topDocs = Searcher.Search(query, 1);
+        if (topDocs.TotalHits == 0) return null;
+        
+        var doc = Searcher.Doc(topDocs.ScoreDocs[0].Doc);
+        return doc.ToArticle();
+    }
+
+    public void Delete(int articleId)
+    {
+        IndexWriter.DeleteDocuments(new Term("Id", articleId.ToString()));
+        IndexWriter.Commit();
+        OnIndexChanged();
     }
 }

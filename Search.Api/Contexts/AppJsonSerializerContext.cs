@@ -9,10 +9,11 @@ namespace Search.Api.Contexts;
 
 [JsonSerializable(typeof(Article[]))]
 [JsonSerializable(typeof(ArticleDto[]))]
-[JsonSerializable(typeof(AddArticleRequest[]))]
-[JsonSerializable(typeof(GetArticleResponse[]))]
 [JsonSerializable(typeof(ErrorResponse[]))]
 [JsonSerializable(typeof(ValidationErrorModel[]))]
+[JsonSerializable(typeof(AddArticleRequest))]
+[JsonSerializable(typeof(GetArticleResponse))]
+[JsonSerializable(typeof(GetSuggestionsResponse))]
 internal partial class AppJsonSerializerContext : JsonSerializerContext
 {
 }

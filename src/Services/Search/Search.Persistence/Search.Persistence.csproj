@@ -18,6 +18,7 @@
     </ItemGroup>
 
     <ItemGroup>
+      <ProjectReference Include="..\..\..\Core\Exceptions\Exceptions.csproj" />
       <ProjectReference Include="..\Search.Abstractions\Search.Abstractions.csproj" />
       <ProjectReference Include="..\Search.Entities\Search.Entities.csproj" />
       <ProjectReference Include="..\Search.Enums\Search.Enums.csproj" />

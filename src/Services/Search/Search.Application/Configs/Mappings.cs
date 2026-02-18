@@ -1,6 +1,8 @@
 ﻿using Search.Abstractions.Dtos;
 using Search.Entities;
 
+using ContractArticle = Contracts.Models.Articles.Article;
+
 namespace Search.Application.Configs;
 
 public static class Mappings
@@ -26,4 +28,13 @@ public static class Mappings
     }
     
     public static List<ArticleDto> ToDtos(this IEnumerable<Article> articles) => articles.Select(ToDto).ToList();
+
+    public static Article ToArticle(this ContractArticle article)
+    {
+        return new Article(article.Id, article.ArticleNumber, article.ArticleName, article.ProducerId,
+            article.ProducerName, article.Popularity);
+    }
+    
+    public static List<Article> ToArticles(this IEnumerable<ContractArticle> articles) 
+        => articles.Select(ToArticle).ToList();
 }

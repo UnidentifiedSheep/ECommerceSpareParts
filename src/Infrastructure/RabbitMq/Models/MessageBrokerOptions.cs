@@ -1,8 +1,8 @@
 namespace RabbitMq.Models;
 
-public class MessageBrokerOptions
+public record MessageBrokerOptions
 {
-    public string Host { get; set; } = null!;
-    public string Username { get; set; } = null!;
-    public string Password { get; set; } = null!;
+    public string Host { get; init; } = null!;
+    public string Username { get; init; } = null!;
+    public string Password { get; init; } = null!;
 }

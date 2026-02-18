@@ -4,6 +4,7 @@ using Mediator;
 using Microsoft.Extensions.DependencyInjection;
 using Sannr.AspNetCore;
 using Search.Application.Handler.Articles.AddArticle;
+using Search.Application.Handler.Articles.GetSuggestions;
 
 namespace Search.Application;
 
@@ -16,9 +17,13 @@ public static class ServiceProvider
         
 
         //Add article command
-        services.AddTransient<IPipelineBehavior<AddArticleCommand, Unit>,
-            ValidationBehavior<AddArticleCommand, Unit>>();
+        services.AddTransient<IPipelineBehavior<AddArticleCommand, Unit>, ValidationBehavior<AddArticleCommand, Unit>>();
         services.AddTransient<IValidation<AddArticleCommand>, AddArticleValidation>();
+        
+        //Get suggestions query
+        services.AddTransient<IPipelineBehavior<GetSuggestionsQuery, GetSuggestionsResult>, 
+            ValidationBehavior<GetSuggestionsQuery, GetSuggestionsResult>>();
+        services.AddTransient<IValidation<GetSuggestionsQuery>, GetSuggestionsValidation>();
         
         return services;
     }
