@@ -72,6 +72,13 @@ public class ProducerRepository(DContext context) : IProducerRepository
             .ToListAsync(cancellationToken);
     }
 
+    public async Task<IEnumerable<Producer>> GetProducers(IEnumerable<int> ids, bool track = true, CancellationToken cancellationToken = default)
+    {
+        return await context.Producers.ConfigureTracking(track)
+            .Where(x => ids.Contains(x.Id))
+            .ToListAsync(cancellationToken);
+    }
+
     public async Task<IEnumerable<ProducersOtherName>> GetOtherNames(int producerId, int page, int viewCount,
         bool track = true,
         CancellationToken cancellationToken = default)

@@ -13,19 +13,12 @@ public record GetArticleCrossesQuery<TDto>(int ArticleId, PaginationModel Pagina
 {
     public string GetCacheKey()
     {
-        return string.Format(CacheKeys.ArticleCrossesCacheKey, ArticleId, Pagination.Page,
+        return string.Format(CacheKeys.ArticleCrossesCacheKey, typeof(TDto).Name, ArticleId, Pagination.Page,
             Pagination.Size, SortBy);
     }
 
-    public Type GetRelatedType()
-    {
-        return typeof(ArticleCross);
-    }
-
-    public int GetDurationSeconds()
-    {
-        return 600;
-    }
+    public Type GetRelatedType() => typeof(ArticleCross);
+    public int GetDurationSeconds() => 600;
 }
 
 public record GetArticleCrossesResult<TDto>(IEnumerable<TDto> Crosses, TDto RequestedArticle);

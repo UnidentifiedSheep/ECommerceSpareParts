@@ -51,6 +51,7 @@ using CoreUserInfo = Abstractions.Models.UserInfo;
 using Currency = Main.Entities.Currency;
 using UserInfo = Main.Entities.UserInfo;
 
+using ContractArticle = Contracts.Models.Articles.Article;
 using ArticleCoefficientContract = Contracts.Models.ArticleCoefficients.ArticleCoefficient;
 using CoefficientContract = Contracts.Models.Coefficients.Coefficient;
 
@@ -60,6 +61,19 @@ public static class MapsterConfig
 {
     public static void Configure()
     {
+        TypeAdapterConfig<Article, ContractArticle>.NewConfig()
+            .Map(d => d.Id, s => s.Id)
+            .Map(d => d.ArticleNumber, s => s.ArticleNumber)
+            .Map(d => d.NormalizedArticleNumber, s => s.NormalizedArticleNumber)
+            .Map(d => d.ArticleName, s => s.ArticleName)
+            .Map(d => d.Description, s => s.Description)
+            .Map(d => d.PackingUnit, s => s.PackingUnit)
+            .Map(d => d.IsOe, s => s.IsOe)
+            .Map(d => d.TotalCount, s => s.TotalCount)
+            .Map(d => d.Indicator, s => s.Indicator)
+            .Map(d => d.CategoryId, s => s.CategoryId)
+            .Map(d => d.Popularity, s => s.Popularity);
+        
         TypeAdapterConfig<ArticleCoefficientDto, ArticleCoefficientContract>.NewConfig()
             .Map(d => d.ArticleId, s => s.ArticleId)
             .Map(d => d.ValidTill, s => s.ValidTill)

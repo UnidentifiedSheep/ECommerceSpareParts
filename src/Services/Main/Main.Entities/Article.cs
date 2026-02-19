@@ -28,6 +28,7 @@ public partial class Article
     public string? Indicator { get; set; }
 
     public int? CategoryId { get; set; }
+    public long Popularity { get; set; }
 
     public virtual ICollection<ArticleCharacteristic> ArticleCharacteristics { get; set; } = new List<ArticleCharacteristic>();
 

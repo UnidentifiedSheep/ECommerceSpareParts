@@ -168,6 +168,8 @@ public partial class DContext : DbContext
 
             entity.HasIndex(e => new { e.NormalizedArticleNumber, e.ProducerId }, "articles_normalized_article_number_producer_id_index").IsUnique();
 
+            entity.HasIndex(e => e.Popularity, "articles_popularity_index");
+
             entity.HasIndex(e => e.ProducerId, "articles_producer_id_index");
 
             entity.HasIndex(e => e.TotalCount, "articles_total_count_index");
@@ -198,6 +200,9 @@ public partial class DContext : DbContext
                 .HasMaxLength(128)
                 .HasColumnName("normalized_article_number");
             entity.Property(e => e.PackingUnit).HasColumnName("packing_unit");
+            entity.Property(e => e.Popularity)
+                .HasDefaultValue(1L)
+                .HasColumnName("popularity");
             entity.Property(e => e.ProducerId).HasColumnName("producer_id");
             entity.Property(e => e.TotalCount).HasColumnName("total_count");
 

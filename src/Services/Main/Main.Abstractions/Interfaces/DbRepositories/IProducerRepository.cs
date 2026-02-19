@@ -17,6 +17,9 @@ public interface IProducerRepository
 
     Task<IEnumerable<Producer>> GetProducers(string? searchTerm, int page, int viewCount, bool track = true,
         CancellationToken cancellationToken = default);
+    
+    Task<IEnumerable<Producer>> GetProducers(IEnumerable<int> ids, bool track = true,
+        CancellationToken cancellationToken = default);
 
     Task<IEnumerable<ProducersOtherName>> GetOtherNames(int producerId, int page, int viewCount, bool track = true,
         CancellationToken cancellationToken = default);
