@@ -5,7 +5,7 @@ using Search.Persistence.Interfaces.Repositories;
 
 namespace Search.Persistence.Services;
 
-public class ArticleSuggestionService(IArticleRepository articleRepository, 
+public class ArticleSuggestionService(IArticleReadRepository readRepository, 
     IArticleSuggestionRepository suggestionRepository) : IArticleSuggestionService
 {
     private static readonly SemaphoreSlim RebuildLock = new(1, 1);
@@ -13,7 +13,7 @@ public class ArticleSuggestionService(IArticleRepository articleRepository,
     public List<Article> GetSuggestions(string query, int max = 10)
     {
         var ids = suggestionRepository.GetSuggestions(query, max);
-        return articleRepository.GetArticles(ids);
+        return readRepository.GetArticles(ids);
     }
 
     public async Task RebuildSuggestions()
@@ -22,7 +22,7 @@ public class ArticleSuggestionService(IArticleRepository articleRepository,
             throw new SuggestionsRebuildingException();
         try
         {
-            using var enumerator = articleRepository.GetEnumerator();
+            using var enumerator = readRepository.GetEnumerator();
             suggestionRepository.RebuildSuggestions(enumerator);
         }
         finally

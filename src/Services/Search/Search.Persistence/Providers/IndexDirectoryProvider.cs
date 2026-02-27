@@ -5,7 +5,7 @@ using Search.Persistence.Interfaces.IndexDirectory;
 
 namespace Search.Persistence.Providers;
 
-public class IndexDirectoryProvider : IIndexDirectoryProvider
+public sealed class IndexDirectoryProvider : IIndexDirectoryProvider, IDisposable
 {
     private readonly IIndexDirectory _indexDirectory;
     private readonly ConcurrentDictionary<IndexName, FSDirectory> _directories = new();
@@ -22,5 +22,10 @@ public class IndexDirectoryProvider : IIndexDirectoryProvider
             var path = _indexDirectory.GetIndexPath(name);
             return FSDirectory.Open(path);
         });
+    }
+
+    public void Dispose()
+    {
+        foreach (var directory in _directories.Values) directory.Dispose();
     }
 }

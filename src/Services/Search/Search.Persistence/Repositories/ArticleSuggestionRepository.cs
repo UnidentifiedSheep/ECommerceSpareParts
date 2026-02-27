@@ -4,19 +4,19 @@ using Lucene.Net.Search.Suggest.Analyzing;
 using Search.Entities;
 using Search.Enums;
 using Search.Persistence.Abstractions;
+using Search.Persistence.Interfaces;
 using Search.Persistence.Interfaces.IndexDirectory;
 using Search.Persistence.Interfaces.Repositories;
 
 namespace Search.Persistence.Repositories;
 
-internal class ArticleSuggestionRepository : RepositoryBase, IArticleSuggestionRepository
+internal class ArticleSuggestionRepository : RepositoryBase, IArticleSuggestionRepository, IDisposable
 {
     private readonly AnalyzingInfixSuggester _suggester;
 
-    public ArticleSuggestionRepository(IIndexDirectoryProvider directoryProvider, StandardAnalyzer analyzer) 
-        : base(directoryProvider, analyzer, IndexName.Article_Suggestions)
+    public ArticleSuggestionRepository(IIndexManager indexManager) : base(indexManager, IndexName.Article_Suggestions)
     {
-        _suggester = new AnalyzingInfixSuggester(Global.LuceneVersion, Directory, Analyzer);
+        _suggester = new AnalyzingInfixSuggester(Global.LuceneVersion, IndexContext.Directory, IndexContext.Analyzer);
     }
 
 
@@ -32,9 +32,8 @@ internal class ArticleSuggestionRepository : RepositoryBase, IArticleSuggestionR
         _suggester.Build(enumerator);
     }
     
-    public override void Dispose()
+    public void Dispose()
     {
         _suggester.Dispose();
-        base.Dispose();
     }
 }

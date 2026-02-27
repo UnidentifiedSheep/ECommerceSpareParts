@@ -5,7 +5,7 @@ using Search.Persistence.Interfaces.Repositories;
 
 namespace Search.Persistence.Enumerators;
 
-public class ArticleEnumerator(IArticleRepository articleRepository) : IInputEnumerator, IDisposable
+public sealed class ArticleEnumerator(IArticleReadRepository articleReadRepository) : IInputEnumerator, IDisposable
 {
     public Article? CurrentArticle { get; private set; }
     public BytesRef Current => CurrentArticle == null 
@@ -29,14 +29,14 @@ public class ArticleEnumerator(IArticleRepository articleRepository) : IInputEnu
     {
         if (!_started)
         {
-            CurrentArticle = articleRepository.GetNextArticle(0);
+            CurrentArticle = articleReadRepository.GetNextArticle(0);
             _started = true;
             return CurrentArticle != null;
         }
 
         if (CurrentArticle == null) return false;
 
-        CurrentArticle = articleRepository.GetNextArticle(CurrentArticle.Id);
+        CurrentArticle = articleReadRepository.GetNextArticle(CurrentArticle.Id);
         return CurrentArticle != null;
     }
 

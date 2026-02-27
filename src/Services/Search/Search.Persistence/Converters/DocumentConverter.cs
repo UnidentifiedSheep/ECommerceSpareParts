@@ -11,7 +11,7 @@ public static class DocumentConverter
         [
             new Int32Field("Id", source.Id, Field.Store.YES),
             new StringField("Id", source.Id.ToString(), Field.Store.NO),
-            new StringField("ArticleNumber", source.ArticleNumber, Field.Store.YES),
+            new TextField("ArticleNumber", source.ArticleNumber, Field.Store.YES),
             new TextField("Title", source.Title, Field.Store.YES),
             new Int32Field("ProducerId", source.ProducerId, Field.Store.YES),
             new StringField("ProducerName", source.ProducerName, Field.Store.YES),

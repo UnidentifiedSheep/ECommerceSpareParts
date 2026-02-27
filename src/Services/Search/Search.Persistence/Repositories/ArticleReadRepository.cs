@@ -1,5 +1,4 @@
-﻿using Lucene.Net.Analysis.Standard;
-using Lucene.Net.Index;
+﻿using Lucene.Net.Index;
 using Lucene.Net.Queries;
 using Lucene.Net.Search;
 using Search.Entities;
@@ -7,32 +6,15 @@ using Search.Enums;
 using Search.Persistence.Abstractions;
 using Search.Persistence.Converters;
 using Search.Persistence.Enumerators;
-using Search.Persistence.Interfaces.IndexDirectory;
+using Search.Persistence.Interfaces;
 using Search.Persistence.Interfaces.Repositories;
 
 namespace Search.Persistence.Repositories;
 
-internal class ArticleRepository : RepositoryBase, IArticleRepository
+internal class ArticleReadRepository(IIndexManager indexManager) : RepositoryBase(indexManager, IndexName.Articles), IArticleReadRepository
 {
-    public ArticleRepository(IIndexDirectoryProvider directoryProvider, StandardAnalyzer analyzer) 
-        : base(directoryProvider, analyzer, IndexName.Articles) { }
-
-    public void Add(Article article)
-    {
-        var document = article.ToDocument();
-        IndexWriter.UpdateDocument(new Term("Id", article.Id.ToString()), document);
-        IndexWriter.Commit();
-        OnIndexChanged();
-    }
+    private IndexSearcher Searcher => IndexContext.Searcher;
     
-    public void AddRange(IEnumerable<Article> articles)
-    {
-        var documents = articles.Select(a => a.ToDocument());
-        IndexWriter.UpdateDocuments(new Term("Id"), documents);
-        IndexWriter.Commit();
-        OnIndexChanged();
-    }
-
     public Article? GetArticle(int articleId)
     {
         var query = new TermQuery(new Term("Id", articleId.ToString()));
@@ -59,7 +41,7 @@ internal class ArticleRepository : RepositoryBase, IArticleRepository
         return docs;
     }
 
-    public ArticleEnumerator GetEnumerator() => new ArticleEnumerator(this);
+    public ArticleEnumerator GetEnumerator() => new(this);
     public Article? GetNextArticle(int articleId)
     {
         var query = new TermQuery(new Term("Id", articleId.ToString()));
@@ -68,12 +50,5 @@ internal class ArticleRepository : RepositoryBase, IArticleRepository
         
         var doc = Searcher.Doc(topDocs.ScoreDocs[0].Doc);
         return doc.ToArticle();
-    }
-
-    public void Delete(int articleId)
-    {
-        IndexWriter.DeleteDocuments(new Term("Id", articleId.ToString()));
-        IndexWriter.Commit();
-        OnIndexChanged();
     }
 }
