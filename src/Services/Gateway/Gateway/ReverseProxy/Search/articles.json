@@ -1,0 +1,36 @@
+﻿{
+  "ReverseProxy": {
+    "Routes": {
+      "get-article-by-id": {
+        "ClusterId": "search-cluster",
+        "Match": {
+          "Path": "/search/articles/{articleId}",
+          "Methods": [ "GET" ]
+        },
+        "Transforms": [
+          { "PathRemovePrefix": "/seach" }
+        ]
+      },
+      "search-articles": {
+        "ClusterId": "search-cluster",
+        "Match": {
+          "Path": "/search/articles",
+          "Methods": [ "GET" ]
+        },
+        "Transforms": [
+          { "PathRemovePrefix": "/seach" }
+        ]
+      },
+      "add-articles": {
+        "ClusterId": "search-cluster",
+        "Match": {
+          "Path": "/search/articles",
+          "Methods": [ "POST" ]
+        },
+        "Transforms": [
+          { "PathRemovePrefix": "/search" }
+        ]
+      }
+    }
+  }
+}

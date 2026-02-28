@@ -4,11 +4,11 @@ using Search.Abstractions.Interfaces.Persistence;
 
 namespace Search.Application.Consumers;
 
-public class ArticleDeletedConsumer(IArticleService articleService) : IConsumer<ArticleDeletedEvent>
+public class ArticleDeletedConsumer(IArticleWriteService articleWriteService) : IConsumer<ArticleDeletedEvent>
 {
     public Task Consume(ConsumeContext<ArticleDeletedEvent> context)
     {
-        articleService.Delete(context.Message.Id);
+        articleWriteService.Delete(context.Message.Id);
         return Task.CompletedTask;
     }
 }

@@ -14,6 +14,7 @@ namespace Search.Api.Contexts;
 [JsonSerializable(typeof(AddArticleRequest))]
 [JsonSerializable(typeof(GetArticleResponse))]
 [JsonSerializable(typeof(GetSuggestionsResponse))]
+[JsonSerializable(typeof(SearchArticlesResponse))]
 internal partial class AppJsonSerializerContext : JsonSerializerContext
 {
 }

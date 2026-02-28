@@ -44,11 +44,21 @@ public abstract class IndexContext : IIndexContext, IDisposable
 
     public void Dispose()
     {
+        Dispose(true);
+        GC.SuppressFinalize(this);
+    }
+
+    protected virtual void Dispose(bool disposing)
+    {
         if (_disposed) return;
+
+        if (disposing)
+        {
+            Reader.Dispose();
+            IndexWriter.Dispose();
+        }
+
         _disposed = true;
-        Analyzer.Dispose();
-        Reader.Dispose();
-        IndexWriter.Dispose();
     }
 
 }

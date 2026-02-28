@@ -6,12 +6,12 @@ using Search.Entities;
 
 namespace Search.Application.Consumers;
 
-public class ArticledCreatedConsumer(IArticleService articleService) : IConsumer<ArticlesCreatedEvent>
+public class ArticledCreatedConsumer(IArticleWriteService articleWriteService) : IConsumer<ArticlesCreatedEvent>
 {
     public Task Consume(ConsumeContext<ArticlesCreatedEvent> context)
     {
         List<Article> adapted = context.Message.Articles.ToArticles();
-        articleService.AddRange(adapted);
+        articleWriteService.AddRange(adapted);
         return Task.CompletedTask;
     }
 }

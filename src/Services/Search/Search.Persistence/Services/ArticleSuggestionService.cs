@@ -5,7 +5,7 @@ using Search.Persistence.Interfaces.Repositories;
 
 namespace Search.Persistence.Services;
 
-public class ArticleSuggestionService(IArticleReadRepository readRepository, 
+internal class ArticleSuggestionService(IArticleReadRepository readRepository, 
     IArticleSuggestionRepository suggestionRepository) : IArticleSuggestionService
 {
     private static readonly SemaphoreSlim RebuildLock = new(1, 1);

@@ -5,12 +5,12 @@ using Search.Application.Configs;
 
 namespace Search.Application.Consumers;
 
-public class ArticleUpdatedConsumer(IArticleService articleService) : IConsumer<ArticleUpdatedEvent>
+public class ArticleUpdatedConsumer(IArticleWriteService articleWriteService) : IConsumer<ArticleUpdatedEvent>
 {
     public Task Consume(ConsumeContext<ArticleUpdatedEvent> context)
     {
         var article = context.Message.Article.ToArticle();
-        articleService.Add(article);
+        articleWriteService.Add(article);
         return Task.CompletedTask;
     }
 }

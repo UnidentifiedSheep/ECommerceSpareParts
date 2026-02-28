@@ -16,6 +16,22 @@
             "Address": "http://analytics.api:8080/"
           }
         }
+      },
+      "search-cluster": {
+        "LoadBalancingPolicy": "RoundRobin",
+        "Destinations": {
+          "search-api": {
+            "Address": "http://search.api:8080/"
+          }
+        }
+      },
+      "pricing-cluster": {
+        "LoadBalancingPolicy": "RoundRobin",
+        "Destinations": {
+          "pricing-api": {
+            "Address": "http://pricing.api:8080/"
+          }
+        }
       }
     }
   }

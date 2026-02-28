@@ -10,7 +10,7 @@ using Search.Persistence.Interfaces.IndexDirectory;
 
 namespace Search.Persistence.Services;
 
-public sealed class IndexManager : IIndexManager, IDisposable
+internal sealed class IndexManager : IIndexManager, IDisposable
 {
     private readonly ConcurrentDictionary<IndexName, IndexContext> _indexContexts;
     

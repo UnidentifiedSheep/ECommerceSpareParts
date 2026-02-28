@@ -3,6 +3,7 @@ using Lucene.Net.Index;
 using Lucene.Net.Queries;
 using Lucene.Net.QueryParsers.Classic;
 using Lucene.Net.Search;
+using Search.Abstractions.Models;
 using Search.Entities;
 using Search.Enums;
 using Search.Persistence.Abstractions;
@@ -53,29 +54,29 @@ internal class ArticleReadRepository(IIndexManager indexManager) : RepositoryBas
         return ToArticles(topDocs);
     }
 
-    public ArticleEnumerator GetEnumerator() => new(this);
-
-    public IReadOnlyList<Article> SearchByArticleNumberPrefix(string prefix, int lastArticleId = -1, int limit = 20)
-    {
-        prefix = prefix.ToNormalizedArticleNumber();
-        var query = new PrefixQuery(new Term("NormalizedArticleNumber", prefix));
-        Filter? filter = GetIdFilter(lastArticleId);
-        var sort = SortById();
-        var topDocs = Searcher.Search(query, filter, limit, sort);
-        
-        return ToArticles(topDocs);
-    }
-
-    public IReadOnlyList<Article> SearchByTitle(string title, int lastArticleId = -1, int limit = 20)
+    public (IReadOnlyList<Article> result, SearchCursor? last) SearchByTitle(string title, SearchCursor? cursor = null, int limit = 20)
     {
         QueryParser parser = new QueryParser(Global.LuceneVersion, "Title", IndexContext.Analyzer);
         Query query = parser.Parse(title);
-        Filter? filter = GetIdFilter(lastArticleId);
-        Sort sort = SortById();
-        
-        TopDocs topDocs = Searcher.Search(query, filter, limit, sort);
-        return ToArticles(topDocs);
+
+        TopDocs topDocs = Searcher.SearchAfter(cursor?.ToScoreDoc(), query, limit);
+
+        return ToArticlesWithCursor(topDocs);
     }
+
+
+    public (IReadOnlyList<Article> result, SearchCursor? last) SearchByArticleNumberPrefix(string prefix, 
+        SearchCursor? cursor = null, int limit = 20)
+    {
+        prefix = prefix.ToNormalizedArticleNumber();
+        var query = new PrefixQuery(new Term("NormalizedArticleNumber", prefix));
+        
+        TopDocs topDocs = Searcher.SearchAfter(cursor?.ToScoreDoc(), query, limit);
+        
+        return ToArticlesWithCursor(topDocs);
+    }
+    
+    public ArticleEnumerator GetEnumerator() => new(this);
 
     /// <summary>
     /// Converts the given TopDocs object into a list of Article objects.
@@ -85,6 +86,21 @@ internal class ArticleReadRepository(IIndexManager indexManager) : RepositoryBas
         var docs = new List<Article>(topDocs.ScoreDocs.Length);
         foreach (var sd in topDocs.ScoreDocs) docs.Add(Searcher.Doc(sd.Doc).ToArticle());
         return docs;
+    }
+
+    private (List<Article>, SearchCursor? last) ToArticlesWithCursor(TopDocs topDocs)
+    {
+        var result = new  List<Article>(topDocs.ScoreDocs.Length);
+        ScoreDoc? last = null;
+
+        foreach (var sd in topDocs.ScoreDocs)
+        {
+            var doc = Searcher.Doc(sd.Doc);
+            last = sd;
+            result.Add(doc.ToArticle());
+        }
+
+        return (result, last?.ToCursor());
     }
 
     /// <summary>

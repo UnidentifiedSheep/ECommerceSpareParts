@@ -40,7 +40,8 @@ public static class ServiceProvider
         services.AddSingleton<IArticleReadRepository, ArticleReadRepository>();
         services.AddSingleton<IArticleSuggestionRepository, ArticleSuggestionRepository>();
 
-        services.AddSingleton<IArticleService, ArticleService>();
+        services.AddSingleton<IArticleWriteService, ArticleWriteService>();
+        services.AddSingleton<IArticleReadService, ArticleReadService>();
         services.AddSingleton<IArticleSuggestionService, ArticleSuggestionService>();
         
         return services;
