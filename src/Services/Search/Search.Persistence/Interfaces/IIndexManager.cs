@@ -1,5 +1,5 @@
 ﻿using Search.Enums;
-using Search.Persistence.Models;
+using Search.Persistence.IndexContexts;
 
 namespace Search.Persistence.Interfaces;
 

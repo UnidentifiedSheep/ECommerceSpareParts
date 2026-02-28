@@ -1,6 +1,10 @@
-﻿using Lucene.Net.Analysis.Standard;
+﻿using Lucene.Net.Analysis.Ru;
+using Lucene.Net.Analysis.Standard;
 using Microsoft.Extensions.DependencyInjection;
 using Search.Abstractions.Interfaces.Persistence;
+using Search.Enums;
+using Search.Persistence.Analyzers;
+using Search.Persistence.IndexContexts;
 using Search.Persistence.Interfaces;
 using Search.Persistence.Interfaces.IndexDirectory;
 using Search.Persistence.Interfaces.Repositories;
@@ -16,8 +20,21 @@ public static class ServiceProvider
     {
         services.AddSingleton<IIndexDirectory, IndexDirectory>(_ => new IndexDirectory(indexDirectory));
         services.AddSingleton<IIndexDirectoryProvider, IndexDirectoryProvider>();
+        
+        //Analyzers
         services.AddSingleton<StandardAnalyzer>(_ => new StandardAnalyzer(Global.LuceneVersion));
+        services.AddSingleton<RussianAnalyzer>(_ => new RussianAnalyzer(Global.LuceneVersion));
+        services.AddSingleton<ArticleAnalyzer>(sp => new ArticleAnalyzer(sp.GetRequiredService<StandardAnalyzer>(), 
+            sp.GetRequiredService<RussianAnalyzer>()));
+        
         services.AddSingleton<IIndexManager, IndexManager>();
+        services.AddSingleton<IndexContext, ArticleIndexContext>(sp =>
+        {
+            var analyzer = sp.GetRequiredService<ArticleAnalyzer>();
+            var directory = sp.GetRequiredService<IIndexDirectoryProvider>()
+                .GetDirectory(IndexName.Articles);
+            return new ArticleIndexContext(analyzer, directory);
+        });
 
         services.AddSingleton<IArticleWriteRepository, ArticleWriteRepository>();
         services.AddSingleton<IArticleReadRepository, ArticleReadRepository>();

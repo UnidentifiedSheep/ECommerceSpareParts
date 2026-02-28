@@ -1,9 +1,10 @@
-﻿using Lucene.Net.Documents;
+﻿using Extensions;
+using Lucene.Net.Documents;
 using Search.Entities;
 
-namespace Search.Persistence.Converters;
+namespace Search.Persistence.Extensions;
 
-public static class DocumentConverter
+public static class DocumentExtensions
 {
     public static Document ToDocument(this Article source)
     {
@@ -11,7 +12,8 @@ public static class DocumentConverter
         [
             new Int32Field("Id", source.Id, Field.Store.YES),
             new StringField("Id", source.Id.ToString(), Field.Store.NO),
-            new TextField("ArticleNumber", source.ArticleNumber, Field.Store.YES),
+            new StringField("ArticleNumber", source.ArticleNumber, Field.Store.YES),
+            new TextField("NormalizedArticleNumber", source.ArticleNumber.ToNormalizedArticleNumber(), Field.Store.NO),
             new TextField("Title", source.Title, Field.Store.YES),
             new Int32Field("ProducerId", source.ProducerId, Field.Store.YES),
             new StringField("ProducerName", source.ProducerName, Field.Store.YES),

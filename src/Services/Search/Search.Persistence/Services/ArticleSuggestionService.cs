@@ -10,7 +10,7 @@ public class ArticleSuggestionService(IArticleReadRepository readRepository,
 {
     private static readonly SemaphoreSlim RebuildLock = new(1, 1);
     
-    public List<Article> GetSuggestions(string query, int max = 10)
+    public IReadOnlyList<Article> GetSuggestions(string query, int max = 10)
     {
         var ids = suggestionRepository.GetSuggestions(query, max);
         return readRepository.GetArticles(ids);

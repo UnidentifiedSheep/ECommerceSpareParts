@@ -7,6 +7,6 @@ public interface IArticleService
     void Add(Article article);
     void AddRange(IEnumerable<Article> articles);
     Article? GetArticle(int articleId);
-    List<Article> GetArticles(IEnumerable<int> articleIds);
+    IReadOnlyList<Article> GetArticles(IEnumerable<int> articleIds);
     void Delete(int articleId);
 }

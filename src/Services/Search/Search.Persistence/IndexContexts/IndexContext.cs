@@ -1,21 +1,24 @@
-﻿using Lucene.Net.Analysis.Standard;
+﻿using Lucene.Net.Analysis;
 using Lucene.Net.Index;
 using Lucene.Net.Search;
 using Lucene.Net.Store;
+using Search.Abstractions.Interfaces.Persistence;
+using Search.Enums;
 
-namespace Search.Persistence.Models;
+namespace Search.Persistence.IndexContexts;
 
-public sealed class IndexContext : IDisposable
+public abstract class IndexContext : IIndexContext, IDisposable
 {
-    public StandardAnalyzer Analyzer { get; private set; }
-    public FSDirectory Directory { get; private set; }
-    public DirectoryReader Reader { get; private set; }
-    public IndexSearcher Searcher { get; private set; }
-    public IndexWriter IndexWriter { get; private set; }
+    public abstract IndexName IndexName { get; }
+    public Analyzer Analyzer { get; protected set; }
+    public FSDirectory Directory { get; protected set; }
+    public DirectoryReader Reader { get; protected set; }
+    public IndexSearcher Searcher { get; protected set; }
+    public IndexWriter IndexWriter { get; protected set; }
     
     private bool _disposed;
     
-    public IndexContext(StandardAnalyzer analyzer, FSDirectory directory)
+    protected IndexContext(Analyzer analyzer, FSDirectory directory)
     {
         Analyzer = analyzer;
         Directory = directory;
@@ -28,7 +31,7 @@ public sealed class IndexContext : IDisposable
     /// <summary>
     /// Reloads the index. Should be called after committed changes.
     /// </summary>
-    public void ReloadIndex()
+    public virtual void ReloadIndex()
     {
         if (_disposed) return;
         var newReader = DirectoryReader.OpenIfChanged(Reader);
@@ -47,4 +50,5 @@ public sealed class IndexContext : IDisposable
         Reader.Dispose();
         IndexWriter.Dispose();
     }
+
 }

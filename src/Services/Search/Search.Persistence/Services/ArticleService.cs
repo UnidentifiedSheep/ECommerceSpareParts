@@ -10,5 +10,5 @@ public class ArticleService(IArticleWriteRepository writeRepository, IArticleRea
     public void AddRange(IEnumerable<Article> articles) => writeRepository.AddRange(articles);
     public void Delete(int articleId) => writeRepository.Delete(articleId);
     public Article? GetArticle(int articleId) => readRepository.GetArticle(articleId);
-    public List<Article> GetArticles(IEnumerable<int> articleIds) => readRepository.GetArticles(articleIds);
+    public IReadOnlyList<Article> GetArticles(IEnumerable<int> articleIds) => readRepository.GetArticles(articleIds);
 }

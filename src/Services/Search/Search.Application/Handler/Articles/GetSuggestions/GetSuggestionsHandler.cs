@@ -13,7 +13,7 @@ public class GetSuggestionsHandler(IArticleSuggestionService suggestionService) 
 {
     public ValueTask<GetSuggestionsResult> Handle(GetSuggestionsQuery query, CancellationToken cancellationToken)
     {
-        List<Article> suggestions = suggestionService.GetSuggestions(query.Query, query.Limit);
+        IReadOnlyList<Article> suggestions = suggestionService.GetSuggestions(query.Query, query.Limit);
         List<ArticleDto> adaptedSuggestions = suggestions.ToDtos();
         return ValueTask.FromResult(new GetSuggestionsResult(adaptedSuggestions));
     }

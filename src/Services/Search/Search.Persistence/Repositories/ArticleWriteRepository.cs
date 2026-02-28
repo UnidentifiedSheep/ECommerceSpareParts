@@ -1,8 +1,11 @@
-﻿using Lucene.Net.Index;
+﻿using Lucene.Net.Analysis;
+using Lucene.Net.Analysis.Miscellaneous;
+using Lucene.Net.Analysis.Ru;
+using Lucene.Net.Index;
 using Search.Entities;
 using Search.Enums;
 using Search.Persistence.Abstractions;
-using Search.Persistence.Converters;
+using Search.Persistence.Extensions;
 using Search.Persistence.Interfaces;
 using Search.Persistence.Interfaces.Repositories;
 

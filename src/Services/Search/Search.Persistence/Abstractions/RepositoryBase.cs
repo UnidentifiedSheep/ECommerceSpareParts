@@ -1,6 +1,6 @@
 ﻿using Search.Enums;
+using Search.Persistence.IndexContexts;
 using Search.Persistence.Interfaces;
-using Search.Persistence.Models;
 
 namespace Search.Persistence.Abstractions;
 

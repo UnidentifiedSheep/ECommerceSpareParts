@@ -1,27 +1,30 @@
 ﻿using System.Collections.Concurrent;
+using Lucene.Net.Analysis;
+using Lucene.Net.Analysis.Ru;
 using Lucene.Net.Analysis.Standard;
 using Search.Enums;
+using Search.Persistence.Analyzers;
+using Search.Persistence.IndexContexts;
 using Search.Persistence.Interfaces;
 using Search.Persistence.Interfaces.IndexDirectory;
-using Search.Persistence.Models;
 
 namespace Search.Persistence.Services;
 
 public sealed class IndexManager : IIndexManager, IDisposable
 {
-    private readonly IIndexDirectoryProvider _directoryProvider;
-    private readonly StandardAnalyzer _analyzer;
-    private readonly ConcurrentDictionary<IndexName, IndexContext> _indexContexts = new();
+    private readonly ConcurrentDictionary<IndexName, IndexContext> _indexContexts;
     
-    public IndexManager(IIndexDirectoryProvider directoryProvider, StandardAnalyzer analyzer)
+    public IndexManager(IEnumerable<IndexContext> contexts)
     {
-        _directoryProvider = directoryProvider;
-        _analyzer = analyzer;
+        _indexContexts = new ConcurrentDictionary<IndexName, IndexContext>();
+        foreach (var context in contexts) _indexContexts.TryAdd(context.IndexName, context);
     }
     
     public IndexContext GetContext(IndexName indexName)
     {
-        return _indexContexts.GetOrAdd(indexName, name => new IndexContext(_analyzer, _directoryProvider.GetDirectory(name)));
+        if (_indexContexts.TryGetValue(indexName, out var value))
+            return value;
+        throw new KeyNotFoundException($"Index {indexName} not found. Before getting context, you must add it to the manager.");
     }
 
     public void Dispose()
