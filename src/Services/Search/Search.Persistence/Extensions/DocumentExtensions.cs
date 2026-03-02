@@ -11,7 +11,7 @@ public static class DocumentExtensions
         return
         [
             new Int32Field("Id", source.Id, Field.Store.YES),
-            new StringField("Id", source.Id.ToString(), Field.Store.NO),
+            new StringField("IdString", source.Id.ToString(), Field.Store.NO),
             new StringField("ArticleNumber", source.ArticleNumber, Field.Store.YES),
             new TextField("NormalizedArticleNumber", source.ArticleNumber.ToNormalizedArticleNumber(), Field.Store.NO),
             new TextField("Title", source.Title, Field.Store.YES),

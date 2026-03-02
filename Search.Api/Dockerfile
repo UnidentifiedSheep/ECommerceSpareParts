@@ -7,6 +7,8 @@ EXPOSE 7292
 ENV ASPNETCORE_URLS=http://+:8080;https://+:7292
 ENV TZ=Europe/Moscow
 
+RUN mkdir -p /app/data && chown -R app:app /app/data
+
 FROM mcr.microsoft.com/dotnet/sdk:10.0 AS build
 ARG BUILD_CONFIGURATION=Release
 WORKDIR /src
@@ -57,4 +59,4 @@ FROM base AS final
 WORKDIR /app
 
 COPY --from=publish /app/publish .
-ENTRYPOINT ["./Search.Api"]
+ENTRYPOINT ["sh", "-c", "chown -R $APP_UID:$APP_UID /app/data && exec ./Search.Api"]

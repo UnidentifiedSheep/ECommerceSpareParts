@@ -1,6 +1,7 @@
 ﻿using Abstractions.Interfaces.Services;
 using Application.Common.Interfaces;
 using Attributes;
+using Contracts.Articles;
 using Exceptions.Exceptions.Producers;
 using Main.Abstractions.Dtos.Services.Articles;
 using Main.Abstractions.Interfaces.DbRepositories;
@@ -23,9 +24,18 @@ public class CreateArticlesHandler(IUnitOfWork unitOfWork, IProducerRepository p
     {
         var articles = request.NewArticles.Adapt<List<Article>>();
         await unitOfWork.AddRangeAsync(articles, cancellationToken);
+        await unitOfWork.SaveChangesAsync(cancellationToken);
+        
+        await PublishEvent(articles, cancellationToken);
+        
+        return new CreateArticlesResult(articles.Select(x => x.Id).ToList());
+    }
+
+    private async Task PublishEvent(List<Article> articles, CancellationToken cancellationToken)
+    {
         var producerIds = articles.Select(x => x.ProducerId).Distinct();
         var producers = (await producerRepository
-            .GetProducers(producerIds, false, cancellationToken))
+                .GetProducers(producerIds, false, cancellationToken))
             .ToDictionary(k => k.Id, v => v);
         
         var adaptedArticles = new List<ContractArticle>();
@@ -41,8 +51,10 @@ public class CreateArticlesHandler(IUnitOfWork unitOfWork, IProducerRepository p
             adaptedArticles.Add(adaptedArticle);
         }
         
-        await  publishEndpoint.Publish(adaptedArticles, cancellationToken);
+        await publishEndpoint.Publish(new ArticlesCreatedEvent
+        {
+            Articles = adaptedArticles
+        }, cancellationToken);
         await unitOfWork.SaveChangesAsync(cancellationToken);
-        return new CreateArticlesResult(articles.Select(x => x.Id).ToList());
     }
 }

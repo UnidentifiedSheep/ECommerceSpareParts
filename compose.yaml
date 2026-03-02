@@ -52,7 +52,7 @@
       - "4008:8080"
     volumes:
       - ./certs:/app/certs:ro
-      - search_api_data:/app/data
+      - ./search_api_data:/app/data
     environment:
       - ASPNETCORE_Kestrel__Certificates__Default__Path=${MAIN_CERT_PATH}
       - ASPNETCORE_Kestrel__Certificates__Default__Password=${MAIN_CERT_PASSWORD}
@@ -165,7 +165,7 @@
     command: >
       postgres
       -c shared_preload_libraries=pg_cron
-      -c cron.database_name=${PGQL_MAIN_DB}
+      -c cron.database_name=postgres
     networks:
       - backend-network
     ports:
@@ -291,4 +291,3 @@ volumes:
   rabbitmq_data:
   minio_data:
   grafana_data:
-  search_api_data:

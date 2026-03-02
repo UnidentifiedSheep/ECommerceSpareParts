@@ -8,7 +8,7 @@
           "Methods": [ "GET" ]
         },
         "Transforms": [
-          { "PathRemovePrefix": "/seach" }
+          { "PathRemovePrefix": "/search" }
         ]
       },
       "search-articles": {
@@ -18,7 +18,7 @@
           "Methods": [ "GET" ]
         },
         "Transforms": [
-          { "PathRemovePrefix": "/seach" }
+          { "PathRemovePrefix": "/search" }
         ]
       },
       "add-articles": {

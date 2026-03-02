@@ -1,12 +1,7 @@
 ﻿using System.Collections.Concurrent;
-using Lucene.Net.Analysis;
-using Lucene.Net.Analysis.Ru;
-using Lucene.Net.Analysis.Standard;
 using Search.Enums;
-using Search.Persistence.Analyzers;
 using Search.Persistence.IndexContexts;
 using Search.Persistence.Interfaces;
-using Search.Persistence.Interfaces.IndexDirectory;
 
 namespace Search.Persistence.Services;
 
@@ -25,6 +20,13 @@ internal sealed class IndexManager : IIndexManager, IDisposable
         if (_indexContexts.TryGetValue(indexName, out var value))
             return value;
         throw new KeyNotFoundException($"Index {indexName} not found. Before getting context, you must add it to the manager.");
+    }
+
+    public TContext GetContext<TContext>(IndexName indexName) where TContext : IndexContext
+    {
+        var ctx = GetContext(indexName);
+        if (ctx is TContext typedCtx) return typedCtx;
+        throw new InvalidCastException($"Context {ctx.GetType().Name} is not of type {typeof(TContext).Name}");
     }
 
     public void Dispose()

@@ -19,7 +19,6 @@ public static class ServiceProvider
     public static IServiceCollection AddPersistenceLayer(this IServiceCollection services, string indexDirectory)
     {
         services.AddSingleton<IIndexDirectory, IndexDirectory>(_ => new IndexDirectory(indexDirectory));
-        services.AddSingleton<IIndexDirectoryProvider, IndexDirectoryProvider>();
         
         //Analyzers
         services.AddSingleton<StandardAnalyzer>(_ => new StandardAnalyzer(Global.LuceneVersion));
@@ -28,13 +27,8 @@ public static class ServiceProvider
             sp.GetRequiredService<RussianAnalyzer>()));
         
         services.AddSingleton<IIndexManager, IndexManager>();
-        services.AddSingleton<IndexContext, ArticleIndexContext>(sp =>
-        {
-            var analyzer = sp.GetRequiredService<ArticleAnalyzer>();
-            var directory = sp.GetRequiredService<IIndexDirectoryProvider>()
-                .GetDirectory(IndexName.Articles);
-            return new ArticleIndexContext(analyzer, directory);
-        });
+        services.AddSingleton<IndexContext, ArticleIndexContext>();
+        services.AddSingleton<IndexContext, ArticleSuggestionsContext>();
 
         services.AddSingleton<IArticleWriteRepository, ArticleWriteRepository>();
         services.AddSingleton<IArticleReadRepository, ArticleReadRepository>();

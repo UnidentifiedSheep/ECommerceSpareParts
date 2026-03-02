@@ -39,6 +39,12 @@ builder.Services.AddMassTransit(x =>
     x.UsingRabbitMq((context, cfg) =>
     {
         cfg.ConfigureRabbitMq(brokerOptions);
+        
+        cfg.ConfigureJsonSerializerOptions(options =>
+        {
+            options.TypeInfoResolverChain.Insert(0, AppJsonSerializerContext.Default);
+            return options;
+        });
 
         /*cfg.ReceiveEndpoint(uniqQueueName, ep =>
         {

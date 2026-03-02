@@ -14,10 +14,10 @@ public sealed class ArticleEnumerator(IArticleReadRepository articleReadReposito
     public IComparer<BytesRef> Comparer => BytesRef.UTF8SortedAsUnicodeComparer;
     
     public long Weight => CurrentArticle?.Popularity ?? 1;
-    
-    public BytesRef Payload => CurrentArticle == null 
-        ? new BytesRef() 
-        : new BytesRef(CurrentArticle.Id);
+
+    public BytesRef Payload => CurrentArticle == null
+        ? new BytesRef()
+        : new BytesRef($"{CurrentArticle.Id}");
 
     public bool HasPayloads => true;
     public ICollection<BytesRef> Contexts => [];
@@ -29,7 +29,7 @@ public sealed class ArticleEnumerator(IArticleReadRepository articleReadReposito
     {
         if (!_started)
         {
-            CurrentArticle = articleReadRepository.GetNextArticle(0);
+            CurrentArticle = articleReadRepository.GetNextArticle();
             _started = true;
             return CurrentArticle != null;
         }

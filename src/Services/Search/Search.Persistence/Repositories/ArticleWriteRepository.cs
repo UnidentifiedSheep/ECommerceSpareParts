@@ -1,25 +1,22 @@
-﻿using Lucene.Net.Analysis;
-using Lucene.Net.Analysis.Miscellaneous;
-using Lucene.Net.Analysis.Ru;
-using Lucene.Net.Index;
+﻿using Lucene.Net.Index;
 using Search.Entities;
 using Search.Enums;
 using Search.Persistence.Abstractions;
 using Search.Persistence.Extensions;
+using Search.Persistence.IndexContexts;
 using Search.Persistence.Interfaces;
 using Search.Persistence.Interfaces.Repositories;
 
 namespace Search.Persistence.Repositories;
 
-internal class ArticleWriteRepository(IIndexManager indexManager) : RepositoryBase(indexManager, IndexName.Articles), 
-    IArticleWriteRepository
+internal class ArticleWriteRepository(IIndexManager indexManager) 
+    : RepositoryBase<ArticleIndexContext>(indexManager, IndexName.Articles), IArticleWriteRepository
 {
-    private IndexWriter IndexWriter => IndexContext.IndexWriter;
     public void Add(Article article)
     {
         var document = article.ToDocument();
-        IndexWriter.UpdateDocument(new Term("Id", article.Id.ToString()), document);
-        IndexWriter.Commit();
+        IndexContext.IndexWriter.UpdateDocument(new Term("IdString", article.Id.ToString()), document);
+        IndexContext.IndexWriter.Commit();
         
         IndexContext.ReloadIndex();
     }
@@ -27,16 +24,16 @@ internal class ArticleWriteRepository(IIndexManager indexManager) : RepositoryBa
     public void AddRange(IEnumerable<Article> articles)
     {
         var documents = articles.Select(a => a.ToDocument());
-        IndexWriter.UpdateDocuments(new Term("Id"), documents);
-        IndexWriter.Commit();
+        IndexContext.IndexWriter.UpdateDocuments(new Term("IdString"), documents);
+        IndexContext.IndexWriter.Commit();
         
         IndexContext.ReloadIndex();
     }
 
     public void Delete(int articleId)
     {
-        IndexWriter.DeleteDocuments(new Term("Id", articleId.ToString()));
-        IndexWriter.Commit();
+        IndexContext.IndexWriter.DeleteDocuments(new Term("IdString", articleId.ToString()));
+        IndexContext.IndexWriter.Commit();
         IndexContext.ReloadIndex();
     }
 }

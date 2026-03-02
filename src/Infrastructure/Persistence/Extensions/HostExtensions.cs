@@ -24,6 +24,9 @@ public static class HostExtensions
         await using var scope = host.Services.CreateAsyncScope();
         var logger = scope.ServiceProvider.GetRequiredService<ILogger<TContext>>();
         
+        var context = scope.ServiceProvider.GetRequiredService<TContext>();
+        await context.Database.EnsureCreatedAsync();
+        
         var seeds = scope.ServiceProvider.GetServices<ISeed<TContext>>()
             .OrderBy(x => x.GetPriority())
             .ToList();
@@ -32,8 +35,6 @@ public static class HostExtensions
             SeedEvents.NoSeedsFound(logger, typeof(TContext).Name, null);
             return;
         }
-        var context = scope.ServiceProvider.GetRequiredService<TContext>();
-        await context.Database.EnsureCreatedAsync();
         DatabaseEvents.DatabaseEnsuredCreated(logger, typeof(TContext).Name, null);
         
         SeedEvents.SeedStarted(logger, typeof(TContext).Name, null);

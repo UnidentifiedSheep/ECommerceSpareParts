@@ -1,64 +1,26 @@
 ﻿using Lucene.Net.Analysis;
-using Lucene.Net.Index;
-using Lucene.Net.Search;
 using Lucene.Net.Store;
 using Search.Abstractions.Interfaces.Persistence;
 using Search.Enums;
 
 namespace Search.Persistence.IndexContexts;
 
-public abstract class IndexContext : IIndexContext, IDisposable
+public abstract class IndexContext(Analyzer analyzer) : IIndexContext, IDisposable
 {
     public abstract IndexName IndexName { get; }
-    public Analyzer Analyzer { get; protected set; }
-    public FSDirectory Directory { get; protected set; }
-    public DirectoryReader Reader { get; protected set; }
-    public IndexSearcher Searcher { get; protected set; }
-    public IndexWriter IndexWriter { get; protected set; }
+    public string Path { get; protected set; } = string.Empty; //should be initialized in child classes
+    public Analyzer Analyzer { get; protected set; } = analyzer;
+    public FSDirectory Directory { get; protected set; } = null!; //should be initialized in child classes
+    public bool IsClosed { get; protected set; }
+    public bool Disposed { get; protected set; }
+
+    public abstract void Close();
+    public abstract void Open();
+    public abstract void Dispose();
     
-    private bool _disposed;
-    
-    protected IndexContext(Analyzer analyzer, FSDirectory directory)
+    protected void ThrowIfDisposedOrClosed()
     {
-        Analyzer = analyzer;
-        Directory = directory;
-        var indexConfig = new IndexWriterConfig(Global.LuceneVersion, analyzer);
-        IndexWriter = new IndexWriter(Directory, indexConfig);
-        Reader = DirectoryReader.Open(IndexWriter, true);
-        Searcher = new IndexSearcher(Reader);
+        if (IsClosed) throw new InvalidOperationException("Context is closed. Use Open() to reopen it.");
+        ObjectDisposedException.ThrowIf(Disposed, this);
     }
-    
-    /// <summary>
-    /// Reloads the index. Should be called after committed changes.
-    /// </summary>
-    public virtual void ReloadIndex()
-    {
-        if (_disposed) return;
-        var newReader = DirectoryReader.OpenIfChanged(Reader);
-        if (newReader == null) return;
-        
-        Reader.Dispose();
-        Reader = newReader;
-        Searcher = new IndexSearcher(Reader);
-    }
-
-    public void Dispose()
-    {
-        Dispose(true);
-        GC.SuppressFinalize(this);
-    }
-
-    protected virtual void Dispose(bool disposing)
-    {
-        if (_disposed) return;
-
-        if (disposing)
-        {
-            Reader.Dispose();
-            IndexWriter.Dispose();
-        }
-
-        _disposed = true;
-    }
-
 }

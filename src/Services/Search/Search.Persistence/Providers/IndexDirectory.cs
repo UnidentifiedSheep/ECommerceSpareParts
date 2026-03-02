@@ -9,4 +9,9 @@ public class IndexDirectory(string indexDirectory) : IIndexDirectory
     {
         return Path.Combine(indexDirectory, indexName.ToString().ToLowerInvariant());
     }
+
+    public string GetTempPath()
+    {
+        return Path.Combine(indexDirectory, $"temp-{Guid.NewGuid()}");
+    }
 }

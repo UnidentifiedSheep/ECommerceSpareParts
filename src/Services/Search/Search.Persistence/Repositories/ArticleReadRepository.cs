@@ -9,19 +9,20 @@ using Search.Enums;
 using Search.Persistence.Abstractions;
 using Search.Persistence.Enumerators;
 using Search.Persistence.Extensions;
+using Search.Persistence.IndexContexts;
 using Search.Persistence.Interfaces;
 using Search.Persistence.Interfaces.Repositories;
 
 namespace Search.Persistence.Repositories;
 
-internal class ArticleReadRepository(IIndexManager indexManager) : RepositoryBase(indexManager, IndexName.Articles), 
-    IArticleReadRepository
+internal class ArticleReadRepository(IIndexManager indexManager) 
+    : RepositoryBase<ArticleIndexContext>(indexManager, IndexName.Articles), IArticleReadRepository
 {
     private IndexSearcher Searcher => IndexContext.Searcher;
     
     public Article? GetArticle(int articleId)
     {
-        var query = new TermQuery(new Term("Id", articleId.ToString()));
+        var query = new TermQuery(new Term("IdString", articleId.ToString()));
         var topDocs = Searcher.Search(query, 1);
 
         if (topDocs.TotalHits == 0) return null;
@@ -32,7 +33,7 @@ internal class ArticleReadRepository(IIndexManager indexManager) : RepositoryBas
 
     public Article? GetNextArticle(int articleId = -1)
     {
-        var query = new TermQuery(new Term("Id", articleId.ToString()));
+        var query = new MatchAllDocsQuery();
         Filter? filter = GetIdFilter(articleId);
         var sort = SortById();
         var topDocs = Searcher.Search(query, filter, 1, sort);
@@ -48,7 +49,7 @@ internal class ArticleReadRepository(IIndexManager indexManager) : RepositoryBas
         var ids = articleIds.Select(id => id.ToString()).ToHashSet();
         if (ids.Count == 0) return [];
 
-        var filter = new TermsFilter(ids.Select(id => new Term("Id", id)).ToList());
+        var filter = new TermsFilter(ids.Select(id => new Term("IdString", id)).ToList());
         var topDocs = Searcher.Search(new MatchAllDocsQuery(), filter, ids.Count);
 
         return ToArticles(topDocs);

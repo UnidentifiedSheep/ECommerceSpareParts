@@ -1,0 +1,34 @@
+﻿{
+  "ReverseProxy": {
+    "Routes": {
+      "get-suggestions": {
+        "ClusterId": "search-cluster",
+        "Match": {
+          "Path": "/search/suggestions/",
+          "Methods": [
+            "GET"
+          ]
+        },
+        "Transforms": [
+          {
+            "PathRemovePrefix": "/search"
+          }
+        ]
+      },
+      "rebuild-suggestions": {
+        "ClusterId": "search-cluster",
+        "Match": {
+          "Path": "/search/suggestions/rebuild",
+          "Methods": [
+            "POST"
+          ]
+        },
+        "Transforms": [
+          {
+            "PathRemovePrefix": "/search"
+          }
+        ]
+      }
+    }
+  }
+}
