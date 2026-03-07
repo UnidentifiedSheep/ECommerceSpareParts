@@ -9,5 +9,5 @@ public record Timestamped<T>
 {
     public T? Value { get; init; }
 
-    public DateTime Timestamp { get; init; }
+    public DateTime Timestamp { get; init; } = DateTime.UtcNow;
 }

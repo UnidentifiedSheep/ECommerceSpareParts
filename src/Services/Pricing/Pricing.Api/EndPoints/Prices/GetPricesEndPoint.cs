@@ -1,4 +1,6 @@
 using Abstractions.Interfaces;
+using Abstractions.Interfaces.Services;
+using Abstractions.Models;
 using Api.Common.Extensions;
 using Carter;
 using Enums;
@@ -10,13 +12,13 @@ namespace Pricing.Api.EndPoints.Prices;
 
 public record GetDetailedPricesResponse(Dictionary<int, PricingResult?> Prices);
 
-public record GetPricesResponse(Dictionary<int, decimal?> Prices);
+public record GetPricesResponse(Dictionary<int, string?> Prices);
 
 public class GetPricesEndPoint : ICarterModule
 {
     public void AddRoutes(IEndpointRouteBuilder app)
     {
-        app.MapGet("/prices", async (ISender sender, bool detailed, int currencyId, Guid? buyerId,
+        app.MapGet("/prices", async (ISender sender, bool detailed, int currencyId, Guid? buyerId, IJsonSigner signer,
                 IUserContext user, HttpContext context, CancellationToken cancellationToken) =>
             {
                 var articleIds = context.Request.Query["articleId"]
@@ -25,10 +27,10 @@ public class GetPricesEndPoint : ICarterModule
                     .Select(x => x!.Value)
                     .ToList();
 
-                if (!user.ContainsPermission(nameof(PermissionCodes.PRICES_GET_DETAILED)) && detailed) return Results.Forbid();
+                if (!detailed) return await GetNormal(sender, articleIds, buyerId, currencyId, signer, cancellationToken);
+                if (!user.ContainsPermission(nameof(PermissionCodes.PRICES_GET_DETAILED))) return Results.Forbid();
                 
-                if (detailed) return await GetDetailed(sender, articleIds, buyerId, currencyId, cancellationToken);
-                return await GetNormal(sender, articleIds, buyerId, currencyId, cancellationToken);
+                return await GetDetailed(sender, articleIds, buyerId, currencyId, cancellationToken);
             }).WithTags("Prices")
             .WithDescription("Получение цен")
             .WithDisplayName("Получение цен");
@@ -43,12 +45,14 @@ public class GetPricesEndPoint : ICarterModule
     }
 
     private async Task<IResult> GetNormal(ISender sender, IEnumerable<int> articleIds, Guid? buyerId,
-        int currencyId, CancellationToken token)
+        int currencyId, IJsonSigner signer, CancellationToken token)
     {
         var query = new GetDetailedPricesQuery(articleIds, currencyId, buyerId);
         var result = await sender.Send(query, token);
         var dict = result.Prices
-            .ToDictionary(x => x.Key, x => x.Value?.FinalPrice);
+            .ToDictionary(x => x.Key, x => x.Value?.FinalPrice == null 
+                ? null 
+                : signer.Sign(new Timestamped<decimal> { Value = x.Value.FinalPrice }));
         return Results.Ok(new GetPricesResponse(dict));
     }
 }
