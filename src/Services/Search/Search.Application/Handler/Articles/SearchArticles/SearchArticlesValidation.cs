@@ -11,8 +11,8 @@ public class SearchArticlesValidation : IValidation<SearchArticlesQuery>
 
         if (string.IsNullOrWhiteSpace(request.Query)) 
             validationResults.Add("Query", "Строка запроса не может быть пуста.");
-        if (request.Limit <= 0) 
-            validationResults.Add("Limit", "Количество ожидаемых артикулов должно быть больше 0");
+        if (request.Limit is <= 0 or > 100) 
+            validationResults.Add("Limit", "Количество ожидаемых артикулов должно быть больше 0 и не больше 100.");
         
         return Task.FromResult(validationResults);
     }

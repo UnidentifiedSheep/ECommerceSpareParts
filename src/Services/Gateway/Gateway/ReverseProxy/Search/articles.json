@@ -20,16 +20,6 @@
         "Transforms": [
           { "PathRemovePrefix": "/search" }
         ]
-      },
-      "add-articles": {
-        "ClusterId": "search-cluster",
-        "Match": {
-          "Path": "/search/articles",
-          "Methods": [ "POST" ]
-        },
-        "Transforms": [
-          { "PathRemovePrefix": "/search" }
-        ]
       }
     }
   }

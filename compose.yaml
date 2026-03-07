@@ -10,8 +10,8 @@
     volumes:
       - ./certs:/app/certs:ro
     environment:
-      - ASPNETCORE_Kestrel__Certificates__Default__Path=${MAIN_CERT_PATH}
-      - ASPNETCORE_Kestrel__Certificates__Default__Password=${MAIN_CERT_PASSWORD}
+      - ASPNETCORE_Kestrel__Certificates__Default__Path=${CERT_PATH}
+      - ASPNETCORE_Kestrel__Certificates__Default__Password=${CERT_PASSWORD}
       - CERTS_PATH=${CERTS_PATH}
       - SEED_DB=${MAIN_SEED_DB}
       - SEED_ADMIN=${MAIN_SEED_ADMIN}
@@ -54,8 +54,8 @@
       - ./certs:/app/certs:ro
       - ./search_api_data:/app/data
     environment:
-      - ASPNETCORE_Kestrel__Certificates__Default__Path=${MAIN_CERT_PATH}
-      - ASPNETCORE_Kestrel__Certificates__Default__Password=${MAIN_CERT_PASSWORD}
+      - ASPNETCORE_Kestrel__Certificates__Default__Path=${CERT_PATH}
+      - ASPNETCORE_Kestrel__Certificates__Default__Password=${CERT_PASSWORD}
       - CERTS_PATH=${CERTS_PATH}
       - INDEX_FOLDER=/app/data
       - RABBITMQ_HOST=amqp://${RABBITMQ_HOST}:${RABBITMQ_PORT}
@@ -77,8 +77,8 @@
     volumes:
       - ./certs:/app/certs:ro
     environment:
-      - ASPNETCORE_Kestrel__Certificates__Default__Path=${MAIN_CERT_PATH}
-      - ASPNETCORE_Kestrel__Certificates__Default__Password=${MAIN_CERT_PASSWORD}
+      - ASPNETCORE_Kestrel__Certificates__Default__Path=${CERT_PATH}
+      - ASPNETCORE_Kestrel__Certificates__Default__Password=${CERT_PASSWORD}
       - CERTS_PATH=${CERTS_PATH}
       - REDIS_CONNECTION_STRING=${REDIS_HOST}:${REDIS_PORT},password=${REDIS_PASSWORD}
       - DB_CONNECTION_STRING=Host=${PGQL_HOST};Database=${PGQL_PRICING_DB};Username=${PGQL_USER};Password=${PGQL_PASSWORD}
@@ -108,8 +108,8 @@
     volumes:
       - ./certs:/app/certs:ro
     environment:
-      - ASPNETCORE_Kestrel__Certificates__Default__Path=${MAIN_CERT_PATH}
-      - ASPNETCORE_Kestrel__Certificates__Default__Password=${MAIN_CERT_PASSWORD}
+      - ASPNETCORE_Kestrel__Certificates__Default__Path=${CERT_PATH}
+      - ASPNETCORE_Kestrel__Certificates__Default__Password=${CERT_PASSWORD}
       - CERTS_PATH=${CERTS_PATH}
       - GATEWAY_SUPER_KEY=${GATEWAY_SUPER_KEY}
       - LOKI_URL=http://${LOKI_HOST}:${LOKI_PORT}
@@ -128,8 +128,8 @@
     volumes:
       - ./certs:/app/certs:ro
     environment:
-      - ASPNETCORE_Kestrel__Certificates__Default__Path=${MAIN_CERT_PATH}
-      - ASPNETCORE_Kestrel__Certificates__Default__Password=${MAIN_CERT_PASSWORD}
+      - ASPNETCORE_Kestrel__Certificates__Default__Path=${CERT_PATH}
+      - ASPNETCORE_Kestrel__Certificates__Default__Password=${CERT_PASSWORD}
       - CERTS_PATH=${CERTS_PATH}
       - REDIS_CONNECTION_STRING=${REDIS_HOST}:${REDIS_PORT},password=${REDIS_PASSWORD}
       - DB_CONNECTION_STRING=Host=${PGQL_HOST};Database=${PGQL_ANALYTICS_DB};Username=${PGQL_USER};Password=${PGQL_PASSWORD}

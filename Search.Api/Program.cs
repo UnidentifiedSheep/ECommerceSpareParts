@@ -10,6 +10,7 @@ using Search.Api.EndPoints;
 using Search.Application;
 using Search.Application.Consumers;
 using Search.Persistence;
+using Security;
 using Security.Utils;
 
 var certsPath = Environment.GetEnvironmentVariable("CERTS_PATH");
@@ -27,7 +28,6 @@ var brokerOptions = new MessageBrokerOptions
     Password = Environment.GetEnvironmentVariable("RABBITMQ_DEFAULT_PASS")!
 };
 
-var uniqQueueName = $"queue-of-search-{Environment.MachineName}";
 
 builder.Services.AddMassTransit(x =>
 {
@@ -46,13 +46,6 @@ builder.Services.AddMassTransit(x =>
             return options;
         });
 
-        /*cfg.ReceiveEndpoint(uniqQueueName, ep =>
-        {
-            ep.AutoDelete = true;
-            ep.Durable = false;
-            ep.ConfigureConsumeTopology = false;
-        });*/
-
         cfg.ReceiveEndpoint("search-queue", ep =>
         {
             ep.Durable = true;
@@ -70,7 +63,11 @@ builder.Services.AddExceptionHandler<AotExceptionHandler>();
 builder.Services.AddSingleton<BackgroundTaskQueue>();
 builder.Services.AddSingleton<IBackgroundTaskQueue>(sp => sp.GetRequiredService<BackgroundTaskQueue>());
 builder.Services.AddHostedService<BackgroundTaskQueue>(sp => sp.GetRequiredService<BackgroundTaskQueue>());
+
+builder.Services.AddHttpContextAccessor();
+
 builder.Services.AddPersistenceLayer(Environment.GetEnvironmentVariable("INDEX_FOLDER") ?? "./data")
+    .AddSecurityLayer()
     .AddApplicationLayer();
 
 var secret = Environment.GetEnvironmentVariable("GATEWAY_SUPER_KEY")!;

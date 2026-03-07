@@ -1,5 +1,6 @@
 ﻿using Api.Common.Extensions;
 using Carter;
+using Enums;
 using Main.Application.Handlers.ArticleCharacteristics.DeleteCharacteristics;
 using MediatR;
 
@@ -19,6 +20,6 @@ public class DeleteCharacteristicsEndPoint : ICarterModule
         .ProducesProblem(StatusCodes.Status400BadRequest)
         .ProducesProblem(StatusCodes.Status404NotFound)
         .WithSummary("Удаление характеристики")
-        .RequireAnyPermission("ARTICLE.CHARACTERISTICS.DELETE");
+        .RequireAnyPermission(PermissionCodes.ARTICLE_CHARACTERISTICS_DELETE);
     }
 }
