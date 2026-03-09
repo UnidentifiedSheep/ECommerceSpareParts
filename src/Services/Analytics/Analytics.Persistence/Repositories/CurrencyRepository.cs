@@ -1,5 +1,5 @@
-using Analytics.Core.Entities;
-using Analytics.Core.Interfaces.DbRepositories;
+using Analytics.Abstractions.Interfaces.DbRepositories;
+using Analytics.Entities;
 using Analytics.Persistence.Context;
 using Microsoft.EntityFrameworkCore;
 using Persistence.Extensions;

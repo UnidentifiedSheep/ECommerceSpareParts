@@ -1,4 +1,4 @@
-﻿using Analytics.Core.Entities;
+﻿using Analytics.Entities;
 using Analytics.Persistence.Context;
 using Persistence.Interfaces;
 

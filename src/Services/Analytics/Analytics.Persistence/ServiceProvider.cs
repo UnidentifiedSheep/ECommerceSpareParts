@@ -1,5 +1,5 @@
 using Abstractions.Interfaces.Services;
-using Analytics.Core.Interfaces.DbRepositories;
+using Analytics.Abstractions.Interfaces.DbRepositories;
 using Analytics.Persistence.Context;
 using Analytics.Persistence.DataSeeds;
 using Analytics.Persistence.Repositories;

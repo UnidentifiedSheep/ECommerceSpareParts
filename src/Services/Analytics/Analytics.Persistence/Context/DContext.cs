@@ -1,8 +1,7 @@
-﻿using Analytics.Core.Entities;
+﻿using Analytics.Entities;
 using MassTransit;
 using MassTransit.EntityFrameworkCoreIntegration;
 using Microsoft.EntityFrameworkCore;
-using Persistence.Extensions;
 
 namespace Analytics.Persistence.Context;
 
@@ -19,11 +18,15 @@ public partial class DContext : DbContext
 
     public virtual DbSet<Currency> Currencies { get; set; }
 
+    public virtual DbSet<PurchaseContent> PurchaseContents { get; set; }
+
+    public virtual DbSet<PurchasesFact> PurchasesFacts { get; set; }
+
     public virtual DbSet<SellInfo> SellInfos { get; set; }
-    
+
+
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
-        
         modelBuilder.AddOutboxMessageEntity();
         modelBuilder.AddOutboxStateEntity();
         modelBuilder.AddInboxStateEntity();
@@ -42,6 +45,54 @@ public partial class DContext : DbContext
                 .ValueGeneratedNever()
                 .HasColumnName("id");
             entity.Property(e => e.ToUsd).HasColumnName("to_usd");
+        });
+
+        modelBuilder.Entity<PurchaseContent>(entity =>
+        {
+            entity.HasKey(e => e.Id).HasName("purchase_contents_pk");
+
+            entity.ToTable("purchase_contents");
+
+            entity.HasIndex(e => e.ArticleId, "purchase_contents_article_id_index");
+
+            entity.HasIndex(e => e.PurchaseId, "purchase_contents_purchase_id_index");
+
+            entity.Property(e => e.Id)
+                .ValueGeneratedNever()
+                .HasColumnName("id");
+            entity.Property(e => e.ArticleId).HasColumnName("article_id");
+            entity.Property(e => e.Count).HasColumnName("count");
+            entity.Property(e => e.Price).HasColumnName("price");
+            entity.Property(e => e.PurchaseId).HasColumnName("purchase_id");
+
+            entity.HasOne(d => d.Purchase).WithMany(p => p.PurchaseContents)
+                .HasForeignKey(d => d.PurchaseId)
+                .OnDelete(DeleteBehavior.ClientSetNull)
+                .HasConstraintName("purchase_contents_purchases_fact_id_fk");
+        });
+
+        modelBuilder.Entity<PurchasesFact>(entity =>
+        {
+            entity.HasKey(e => e.Id).HasName("purchases_fact_pk");
+
+            entity.ToTable("purchases_fact");
+
+            entity.HasIndex(e => e.CreatedAt, "purchases_fact_created_at_index");
+
+            entity.HasIndex(e => e.CurrencyId, "purchases_fact_currency_id_index");
+
+            entity.HasIndex(e => e.SupplierId, "purchases_fact_supplier_id_index");
+
+            entity.Property(e => e.Id).HasColumnName("id");
+            entity.Property(e => e.CreatedAt).HasColumnName("created_at");
+            entity.Property(e => e.CurrencyId).HasColumnName("currency_id");
+            entity.Property(e => e.SupplierId).HasColumnName("supplier_id");
+            entity.Property(e => e.TotalAmount).HasColumnName("total_amount");
+
+            entity.HasOne(d => d.Currency).WithMany(p => p.PurchasesFacts)
+                .HasForeignKey(d => d.CurrencyId)
+                .OnDelete(DeleteBehavior.ClientSetNull)
+                .HasConstraintName("purchases_fact_currencies_id_fk");
         });
 
         modelBuilder.Entity<SellInfo>(entity =>
@@ -87,7 +138,6 @@ public partial class DContext : DbContext
                 .HasConstraintName("sell_info_currencies_id_fk_2");
         });
 
-        modelBuilder.AllDateTimesToUtc();
         OnModelCreatingPartial(modelBuilder);
     }
 

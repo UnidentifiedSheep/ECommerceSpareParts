@@ -1,4 +1,4 @@
-namespace Analytics.Core.Models;
+namespace Analytics.Abstractions.Models;
 
 public class FilterAccumulator
 {

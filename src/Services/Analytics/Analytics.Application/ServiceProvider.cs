@@ -1,7 +1,5 @@
 using Abstractions.Interfaces.Currency;
 using Analytics.Application.Services;
-using Analytics.Core.Interfaces.Services;
-using Application.Common;
 using Application.Common.Behaviors;
 using Application.Common.Services;
 using Microsoft.Extensions.DependencyInjection;
@@ -13,7 +11,6 @@ public static class ServiceProvider
     public static IServiceCollection AddApplicationLayer(this IServiceCollection collection)
     {
         collection.AddSingleton<ICurrencyConverter, CurrencyConverter>(_ => new CurrencyConverter(Global.UsdId));
-        collection.AddScoped<ISellInfoService, SellInfoService>();
         collection.AddScoped<ICurrencyConverterSetup, CurrencyConverterSetup>();
         
         collection.AddMediatR(config =>

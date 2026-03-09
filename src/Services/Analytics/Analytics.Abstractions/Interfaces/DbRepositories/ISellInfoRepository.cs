@@ -1,7 +1,7 @@
 using System.Linq.Expressions;
-using Analytics.Core.Entities;
+using Analytics.Entities;
 
-namespace Analytics.Core.Interfaces.DbRepositories;
+namespace Analytics.Abstractions.Interfaces.DbRepositories;
 
 public interface ISellInfoRepository
 {

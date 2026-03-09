@@ -1,4 +1,4 @@
-﻿namespace Analytics.Core.Entities;
+﻿namespace Analytics.Entities;
 
 public partial class SellInfo
 {

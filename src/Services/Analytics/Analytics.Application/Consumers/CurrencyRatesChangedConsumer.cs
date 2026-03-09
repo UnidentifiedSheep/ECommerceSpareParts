@@ -1,6 +1,5 @@
 using Abstractions.Interfaces.Services;
-using Analytics.Core.Entities;
-using Analytics.Core.Interfaces.DbRepositories;
+using Analytics.Abstractions.Interfaces.DbRepositories;
 using Contracts.Currency;
 using MassTransit;
 

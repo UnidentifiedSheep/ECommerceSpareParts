@@ -10,7 +10,8 @@
     <ItemGroup>
       <ProjectReference Include="..\..\..\Core\Contracts\Contracts.csproj" />
       <ProjectReference Include="..\..\Application.Common\Application.Common.csproj" />
-      <ProjectReference Include="..\Analytics.Core\Analytics.Core.csproj" />
+      <ProjectReference Include="..\Analytics.Abstractions\Analytics.Abstractions.csproj" />
+      <ProjectReference Include="..\Analytics.Utils\Analytics.Utils.csproj" />
     </ItemGroup>
 
     <ItemGroup>

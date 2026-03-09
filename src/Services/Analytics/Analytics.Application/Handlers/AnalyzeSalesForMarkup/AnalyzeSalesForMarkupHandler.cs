@@ -1,8 +1,8 @@
 using Abstractions.Interfaces.Currency;
 using Abstractions.Interfaces.Services;
-using Analytics.Core.Interfaces.DbRepositories;
-using Analytics.Core.Models;
-using Analytics.Core.Static;
+using Analytics.Abstractions.Interfaces.DbRepositories;
+using Analytics.Abstractions.Models;
+using Analytics.Utils;
 using Application.Common.Interfaces;
 using Attributes;
 using Contracts.Markup;

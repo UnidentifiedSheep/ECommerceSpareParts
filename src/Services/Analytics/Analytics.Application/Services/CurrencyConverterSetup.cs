@@ -1,5 +1,5 @@
 ﻿using Abstractions.Interfaces.Currency;
-using Analytics.Core.Interfaces.DbRepositories;
+using Analytics.Abstractions.Interfaces.DbRepositories;
 
 namespace Analytics.Application.Services;
 
