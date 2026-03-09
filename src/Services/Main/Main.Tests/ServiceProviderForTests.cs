@@ -3,6 +3,7 @@ using Abstractions.Models;
 using Api.Common;
 using Mail;
 using Main.Application.Configs;
+using Main.Application.Configs.Mapster;
 using Main.Cache;
 using Microsoft.Extensions.DependencyInjection;
 using Main.Persistence;

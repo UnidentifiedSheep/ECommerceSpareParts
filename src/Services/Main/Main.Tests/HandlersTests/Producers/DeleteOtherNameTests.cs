@@ -1,6 +1,7 @@
 using Bogus;
 using Exceptions.Exceptions.Producers;
 using Main.Application.Configs;
+using Main.Application.Configs.Mapster;
 using Main.Application.Handlers.Producers.DeleteOtherName;
 using Main.Entities;
 using Main.Persistence.Context;

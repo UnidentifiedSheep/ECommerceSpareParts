@@ -3,6 +3,7 @@ using Abstractions.Interfaces.Services;
 using Application.Common.Interfaces;
 using Attributes;
 using Contracts.Articles;
+using Contracts.Purchase;
 using Extensions;
 using Main.Abstractions.Dtos.Amw.Logistics;
 using Main.Abstractions.Dtos.Amw.Purchase;
@@ -15,12 +16,12 @@ using Main.Application.Handlers.Purchases.AddContentLogisticsToPurchase;
 using Main.Application.Handlers.Purchases.AddLogisticsToPurchase;
 using Main.Application.Handlers.Purchases.CreatePurchase;
 using Main.Application.Handlers.StorageContents.AddContent;
-using Main.Application.Notifications;
 using Main.Entities;
 using Main.Enums;
 using Mapster;
 using MassTransit;
 using MediatR;
+using ContractPurchase = Contracts.Models.Purchase.Purchase;
 
 namespace Main.Application.Handlers.Purchases.CreateFullPurchase;
 
@@ -87,6 +88,12 @@ public class CreateFullPurchaseHandler(IMediator mediator, IPublishEndpoint publ
             {
                 ArticleIds = content.Select(x => x.ArticleId)
             }, cancellationToken);
+
+        await publishEndpoint.Publish(new PurchaseCreatedEvent
+        {
+            Purchase = purchase.Adapt<ContractPurchase>()
+        }, cancellationToken);
+        
         await unitOfWork.SaveChangesAsync(cancellationToken);
         
         return Unit.Value;

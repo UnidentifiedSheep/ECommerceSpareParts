@@ -30,6 +30,7 @@ using Main.Abstractions.Dtos.Services.Articles;
 using Main.Abstractions.Dtos.Users;
 using Main.Abstractions.Models;
 using Main.Abstractions.Models.Logistics;
+using Main.Application.Configs.Mapster.ContractMappings;
 using Main.Application.Extensions;
 using Main.Application.Handlers.ArticlePairs.CreatePair;
 using Main.Application.Handlers.Currencies.CreateCurrency;
@@ -55,12 +56,13 @@ using ContractArticle = Contracts.Models.Articles.Article;
 using ArticleCoefficientContract = Contracts.Models.ArticleCoefficients.ArticleCoefficient;
 using CoefficientContract = Contracts.Models.Coefficients.Coefficient;
 
-namespace Main.Application.Configs;
+namespace Main.Application.Configs.Mapster;
 
 public static class MapsterConfig
 {
     public static void Configure()
     {
+        PurchaseContractConfig.Configure();
         TypeAdapterConfig<Article, ContractArticle>.NewConfig()
             .Map(d => d.Id, s => s.Id)
             .Map(d => d.ArticleNumber, s => s.ArticleNumber)

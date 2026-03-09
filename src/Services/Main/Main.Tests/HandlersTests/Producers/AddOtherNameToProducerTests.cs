@@ -1,6 +1,7 @@
 using Bogus;
 using Main.Abstractions.Constants;
 using Main.Application.Configs;
+using Main.Application.Configs.Mapster;
 using Main.Application.Handlers.Producers.AddOtherName;
 using Main.Application.Handlers.Producers.CreateProducer;
 using Main.Persistence.Context;

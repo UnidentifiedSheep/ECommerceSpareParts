@@ -6,6 +6,7 @@ using Main.Application.Handlers.StorageContents.EditContent;
 using Main.Abstractions.Dtos.Amw.Storage;
 using Main.Entities;
 using Main.Abstractions.Models;
+using Main.Application.Configs.Mapster;
 using Main.Persistence.Context;
 using MediatR;
 using Microsoft.EntityFrameworkCore;

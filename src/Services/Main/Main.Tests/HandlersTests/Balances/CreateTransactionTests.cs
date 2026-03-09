@@ -1,5 +1,6 @@
 using FluentValidation;
 using Main.Application.Configs;
+using Main.Application.Configs.Mapster;
 using Main.Application.Handlers.Balance.CreateTransaction;
 using Main.Entities;
 using Main.Enums;

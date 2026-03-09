@@ -1,6 +1,7 @@
 ﻿using FluentValidation;
 using Main.Abstractions.Constants;
 using Main.Application.Configs;
+using Main.Application.Configs.Mapster;
 using Main.Application.Handlers.StorageRoutes.AddStorageRoute;
 using Main.Entities;
 using Main.Enums;

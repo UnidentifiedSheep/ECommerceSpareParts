@@ -11,6 +11,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Tests.MockData;
 using Tests.testContainers.Combined;
 using Exceptions.Exceptions.StorageRoutes;
+using Main.Application.Configs.Mapster;
 using User = Main.Entities.User;
 
 namespace Tests.HandlersTests.StorageRoutes;

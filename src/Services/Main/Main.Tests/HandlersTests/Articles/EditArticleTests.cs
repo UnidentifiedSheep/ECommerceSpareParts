@@ -4,6 +4,7 @@ using FluentValidation;
 using Main.Application.Configs;
 using Main.Application.Handlers.Articles.PatchArticle;
 using Main.Abstractions.Dtos.Amw.Articles;
+using Main.Application.Configs.Mapster;
 using Main.Persistence.Context;
 using MediatR;
 using Microsoft.Extensions.DependencyInjection;

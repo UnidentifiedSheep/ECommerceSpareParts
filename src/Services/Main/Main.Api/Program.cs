@@ -21,6 +21,7 @@ using Main.Api.EndPoints.Articles;
 using Main.Application;
 using Main.Application.BackgroundServices;
 using Main.Application.Configs;
+using Main.Application.Configs.Mapster;
 using Main.Application.Consumers;
 using Main.Application.HangFireTasks;
 using Main.Application.Seeding;

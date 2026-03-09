@@ -2,6 +2,7 @@ using Bogus;
 using Exceptions.Exceptions.Producers;
 using Main.Abstractions.Constants;
 using Main.Application.Configs;
+using Main.Application.Configs.Mapster;
 using Main.Application.Handlers.Articles.CreateArticles;
 using Main.Application.Handlers.Producers.CreateProducer;
 using Main.Persistence.Context;
