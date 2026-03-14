@@ -1,4 +1,8 @@
-﻿using Analytics.Enums;
+﻿using System.ComponentModel.DataAnnotations.Schema;
+using System.Security.Cryptography;
+using System.Text;
+using System.Text.Json;
+using Analytics.Enums;
 
 namespace Analytics.Entities.Metrics;
 
@@ -10,7 +14,7 @@ public abstract partial class Metric
 
     public Guid CreatedBy { get; set; }
 
-    public DateTime CreatedAt { get; protected set; }
+    public DateTime CreatedAt { get; protected set; } = DateTime.UtcNow;
     
     public DateTime RangeStart { get; protected set; }
     
@@ -21,8 +25,47 @@ public abstract partial class Metric
     public string Discriminator { get; protected set; } = null!;
     
     public bool NeedsRecalculation { get; protected set; }
-    
-    public DependsOn DependsOn { get; protected set; }
 
+    public string DimensionKey { get; protected set; }
+
+    public byte[] DimensionHash { get; protected set; }
+    
+    public abstract DependsOn DependsOn { get; protected set; }
+
+    public string? Json { get; protected set; }
     public virtual Currency Currency { get; set; } = null!;
+    
+    protected Metric()
+    {
+        DimensionKey = string.Empty;
+        DimensionHash = [];
+    }
+    protected Metric(string dimensionKey = "")
+    {
+        DimensionKey = dimensionKey;
+        DimensionHash = ComputeHash(DimensionKey);
+    }
+    
+    private static byte[] ComputeHash(string key)
+    {
+        var full = SHA256.HashData(Encoding.UTF8.GetBytes(key));
+        return full[..16];
+    }
+}
+
+public abstract class Metric<T> : Metric where T : class
+{
+    protected Metric() : base() { }
+    protected Metric(string dimensionKey = "") : base(dimensionKey) { }
+    
+    [NotMapped]
+    public T? Data
+    {
+        get;
+        set
+        {
+            field = value;
+            Json = value == null ? null : JsonSerializer.Serialize(value);
+        }
+    }
 }

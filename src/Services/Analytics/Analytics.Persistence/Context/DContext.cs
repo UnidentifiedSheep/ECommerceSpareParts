@@ -1,4 +1,5 @@
-﻿using Analytics.Entities;
+﻿using System.Text.Json;
+using Analytics.Entities;
 using Analytics.Entities.Metrics;
 using MassTransit;
 using MassTransit.EntityFrameworkCoreIntegration;
@@ -53,6 +54,14 @@ public partial class DContext : DbContext
                 .HasColumnName("id");
             entity.Property(e => e.ToUsd).HasColumnName("to_usd");
         });
+
+        modelBuilder.Entity<ArticleSalesMetric>(entity =>
+        {
+            entity.HasIndex(e => new { e.Discriminator, e.ArticleId }, 
+                "metrics_discriminator_article_index");
+            
+            entity.Property(e => e.ArticleId).HasColumnName("article_id");
+        });
         
         modelBuilder.Entity<Metric>(entity =>
         {
@@ -72,8 +81,9 @@ public partial class DContext : DbContext
             entity.HasIndex(m => new { m.DependsOn, m.RangeStart, m.RangeEnd },
                 "metrics_range_depends_index");
             
-            entity.HasIndex(m => new { m.RangeStart, m.RangeEnd, m.Discriminator }, 
-                    "metrics_range_start_end_discriminator_u_index").IsUnique();
+            entity.HasIndex(m => new { m.Discriminator, m.RangeStart, m.RangeEnd, m.DimensionHash }, 
+                    "metrics_range_start_end_discriminator_u_index")
+                .IsUnique();
             
             entity.Property(e => e.Id)
                 .HasDefaultValueSql("gen_random_uuid()")
@@ -91,8 +101,15 @@ public partial class DContext : DbContext
             entity.Property(e => e.RangeStart).HasColumnName("range_start");
             entity.Property(e => e.RangeEnd).HasColumnName("range_end");
             entity.Property(e => e.Discriminator).HasColumnName("discriminator");
+            entity.Property(e => e.DimensionKey)
+                .HasColumnName("dimension_key")
+                .HasMaxLength(200);
+            entity.Property(e => e.DimensionHash).HasColumnName("dimension_hash")
+                .HasColumnType("bytea");
             
-            entity.HasDiscriminator<string>("discriminator");
+            entity.Property(e => e.Json).HasColumnName("json");
+            
+            entity.HasDiscriminator(e => e.Discriminator);
 
             entity.HasOne(d => d.Currency).WithMany(p => p.Metrics)
                 .HasForeignKey(d => d.CurrencyId)
