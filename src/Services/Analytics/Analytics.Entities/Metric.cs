@@ -12,10 +12,6 @@ public partial class Metric
 
     public DateTime CreatedAt { get; set; }
 
-    public DateTime? RaneStart { get; set; }
-
-    public DateTime? RangeEnd { get; set; }
-
     public string Discriminator { get; set; } = null!;
 
     public virtual Currency Currency { get; set; } = null!;

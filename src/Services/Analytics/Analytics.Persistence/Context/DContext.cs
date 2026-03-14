@@ -67,18 +67,16 @@ public partial class DContext : DbContext
 
             entity.HasIndex(e => e.Discriminator, "metrics_discriminator_index");
 
-            entity.HasIndex(e => new { e.RaneStart, e.RangeEnd }, "metrics_rane_start_range_end_index");
-
             entity.Property(e => e.Id)
                 .HasDefaultValueSql("gen_random_uuid()")
                 .HasColumnName("id");
             entity.Property(e => e.CreatedAt).HasColumnName("created_at");
             entity.Property(e => e.CreatedBy).HasColumnName("created_by");
             entity.Property(e => e.CurrencyId).HasColumnName("currency_id");
-            entity.Property(e => e.Discriminator).HasColumnName("discriminator");
-            entity.Property(e => e.RaneStart).HasColumnName("rane_start");
-            entity.Property(e => e.RangeEnd).HasColumnName("range_end");
             entity.Property(e => e.Value).HasColumnName("value");
+            
+            entity.Property(e => e.Discriminator).HasColumnName("discriminator");
+            entity.HasDiscriminator<string>("discriminator");
 
             entity.HasOne(d => d.Currency).WithMany(p => p.Metrics)
                 .HasForeignKey(d => d.CurrencyId)
