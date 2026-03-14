@@ -1,4 +1,5 @@
 ﻿using Analytics.Entities;
+using Analytics.Entities.Metrics;
 using MassTransit;
 using MassTransit.EntityFrameworkCoreIntegration;
 using Microsoft.EntityFrameworkCore;
@@ -52,7 +53,7 @@ public partial class DContext : DbContext
                 .HasColumnName("id");
             entity.Property(e => e.ToUsd).HasColumnName("to_usd");
         });
-
+        
         modelBuilder.Entity<Metric>(entity =>
         {
             entity.HasKey(e => e.Id).HasName("metrics_pk");
@@ -65,17 +66,32 @@ public partial class DContext : DbContext
 
             entity.HasIndex(e => e.CurrencyId, "metrics_currency_id_index");
 
-            entity.HasIndex(e => e.Discriminator, "metrics_discriminator_index");
-
+            entity.HasIndex(e => e.Discriminator, "metrics_dirty_index")
+                .HasFilter("needs_recalculation = true");
+            
+            entity.HasIndex(m => new { m.DependsOn, m.RangeStart, m.RangeEnd },
+                "metrics_range_depends_index");
+            
+            entity.HasIndex(m => new { m.RangeStart, m.RangeEnd, m.Discriminator }, 
+                    "metrics_range_start_end_discriminator_u_index").IsUnique();
+            
             entity.Property(e => e.Id)
                 .HasDefaultValueSql("gen_random_uuid()")
                 .HasColumnName("id");
+            entity.Property(e => e.NeedsRecalculation)
+                .HasColumnName("needs_recalculation")
+                .HasDefaultValue(false);
+            entity.Property(m => m.DependsOn)
+                .HasConversion<long>()
+                .HasColumnName("depends_on");
             entity.Property(e => e.CreatedAt).HasColumnName("created_at");
+            entity.Property(e => e.RecalculatedAt).HasColumnName("recalculated_at");
             entity.Property(e => e.CreatedBy).HasColumnName("created_by");
             entity.Property(e => e.CurrencyId).HasColumnName("currency_id");
-            entity.Property(e => e.Value).HasColumnName("value");
-            
+            entity.Property(e => e.RangeStart).HasColumnName("range_start");
+            entity.Property(e => e.RangeEnd).HasColumnName("range_end");
             entity.Property(e => e.Discriminator).HasColumnName("discriminator");
+            
             entity.HasDiscriminator<string>("discriminator");
 
             entity.HasOne(d => d.Currency).WithMany(p => p.Metrics)
@@ -206,8 +222,7 @@ public partial class DContext : DbContext
                 .HasConstraintName("sales_fact_currencies_id_fk");
         });
 
-        modelBuilder.AllDateTimesToUtc()
-            .AllEnumsToString();
+        modelBuilder.AllDateTimesToUtc();
             
         OnModelCreatingPartial(modelBuilder);
     }

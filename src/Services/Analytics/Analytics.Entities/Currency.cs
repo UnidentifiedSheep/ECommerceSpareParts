@@ -1,4 +1,6 @@
-﻿namespace Analytics.Entities;
+﻿using Analytics.Entities.Metrics;
+
+namespace Analytics.Entities;
 
 public partial class Currency
 {
