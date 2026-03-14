@@ -2,6 +2,7 @@
 using MassTransit;
 using MassTransit.EntityFrameworkCoreIntegration;
 using Microsoft.EntityFrameworkCore;
+using Persistence.Extensions;
 
 namespace Analytics.Persistence.Context;
 
@@ -18,13 +19,18 @@ public partial class DContext : DbContext
 
     public virtual DbSet<Currency> Currencies { get; set; }
 
+    public virtual DbSet<Metric> Metrics { get; set; }
+
     public virtual DbSet<PurchaseContent> PurchaseContents { get; set; }
 
     public virtual DbSet<PurchasesFact> PurchasesFacts { get; set; }
 
-    public virtual DbSet<SellInfo> SellInfos { get; set; }
+    public virtual DbSet<SaleContent> SaleContents { get; set; }
 
+    public virtual DbSet<SaleContentDetail> SaleContentDetails { get; set; }
 
+    public virtual DbSet<SalesFact> SalesFacts { get; set; }
+    
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         modelBuilder.AddOutboxMessageEntity();
@@ -45,6 +51,39 @@ public partial class DContext : DbContext
                 .ValueGeneratedNever()
                 .HasColumnName("id");
             entity.Property(e => e.ToUsd).HasColumnName("to_usd");
+        });
+
+        modelBuilder.Entity<Metric>(entity =>
+        {
+            entity.HasKey(e => e.Id).HasName("metrics_pk");
+
+            entity.ToTable("metrics");
+
+            entity.HasIndex(e => e.CreatedAt, "metrics_created_at_index");
+
+            entity.HasIndex(e => e.CreatedBy, "metrics_created_by_index");
+
+            entity.HasIndex(e => e.CurrencyId, "metrics_currency_id_index");
+
+            entity.HasIndex(e => e.Discriminator, "metrics_discriminator_index");
+
+            entity.HasIndex(e => new { e.RaneStart, e.RangeEnd }, "metrics_rane_start_range_end_index");
+
+            entity.Property(e => e.Id)
+                .HasDefaultValueSql("gen_random_uuid()")
+                .HasColumnName("id");
+            entity.Property(e => e.CreatedAt).HasColumnName("created_at");
+            entity.Property(e => e.CreatedBy).HasColumnName("created_by");
+            entity.Property(e => e.CurrencyId).HasColumnName("currency_id");
+            entity.Property(e => e.Discriminator).HasColumnName("discriminator");
+            entity.Property(e => e.RaneStart).HasColumnName("rane_start");
+            entity.Property(e => e.RangeEnd).HasColumnName("range_end");
+            entity.Property(e => e.Value).HasColumnName("value");
+
+            entity.HasOne(d => d.Currency).WithMany(p => p.Metrics)
+                .HasForeignKey(d => d.CurrencyId)
+                .OnDelete(DeleteBehavior.ClientSetNull)
+                .HasConstraintName("metrics_currencies_id_fk");
         });
 
         modelBuilder.Entity<PurchaseContent>(entity =>
@@ -87,7 +126,7 @@ public partial class DContext : DbContext
             entity.Property(e => e.CreatedAt).HasColumnName("created_at");
             entity.Property(e => e.CurrencyId).HasColumnName("currency_id");
             entity.Property(e => e.SupplierId).HasColumnName("supplier_id");
-            entity.Property(e => e.TotalAmount).HasColumnName("total_amount");
+            entity.Property(e => e.TotalSum).HasColumnName("total_sum");
 
             entity.HasOne(d => d.Currency).WithMany(p => p.PurchasesFacts)
                 .HasForeignKey(d => d.CurrencyId)
@@ -95,49 +134,83 @@ public partial class DContext : DbContext
                 .HasConstraintName("purchases_fact_currencies_id_fk");
         });
 
-        modelBuilder.Entity<SellInfo>(entity =>
+        modelBuilder.Entity<SaleContent>(entity =>
         {
-            entity.HasKey(e => e.SellContentId).HasName("sell_info_pk");
+            entity.HasKey(e => e.Id).HasName("sale_contents_pk");
 
-            entity.ToTable("sell_info");
+            entity.ToTable("sale_contents");
 
-            entity.HasIndex(e => e.ArticleId, "sell_info_article_id_index");
+            entity.HasIndex(e => e.ArticleId, "sale_contents_article_id_index");
 
-            entity.HasIndex(e => new { e.ArticleId, e.StorageName }, "sell_info_article_id_storage_name_index");
+            entity.HasIndex(e => e.SaleId, "sale_contents_sale_id_index");
 
-            entity.HasIndex(e => e.BuyCurrencyId, "sell_info_buy_currency_id_index");
-
-            entity.HasIndex(e => e.BuyPrices, "sell_info_buy_prices_index");
-
-            entity.HasIndex(e => e.Markup, "sell_info_markup_index");
-
-            entity.HasIndex(e => e.SellCurrencyId, "sell_info_sell_currency_id_index");
-
-            entity.HasIndex(e => e.SellDate, "sell_info_sell_date_index");
-
-            entity.HasIndex(e => e.SellPrice, "sell_info_sell_price_index");
-
-            entity.HasIndex(e => e.StorageName, "sell_info_storage_name_index");
-
-            entity.Property(e => e.SellContentId).HasColumnName("sell_content_id");
+            entity.Property(e => e.Id)
+                .ValueGeneratedNever()
+                .HasColumnName("id");
             entity.Property(e => e.ArticleId).HasColumnName("article_id");
-            entity.Property(e => e.BuyCurrencyId).HasColumnName("buy_currency_id");
-            entity.Property(e => e.BuyPrices).HasColumnName("buy_prices");
-            entity.Property(e => e.Markup).HasColumnName("markup");
-            entity.Property(e => e.SellCurrencyId).HasColumnName("sell_currency_id");
-            entity.Property(e => e.SellDate).HasColumnName("sell_date");
-            entity.Property(e => e.SellPrice).HasColumnName("sell_price");
-            entity.Property(e => e.StorageName).HasColumnName("storage_name");
+            entity.Property(e => e.Count).HasColumnName("count");
+            entity.Property(e => e.Discount).HasColumnName("discount");
+            entity.Property(e => e.Price).HasColumnName("price");
+            entity.Property(e => e.SaleId)
+                .HasMaxLength(128)
+                .HasColumnName("sale_id");
 
-            entity.HasOne(d => d.BuyCurrency).WithMany(p => p.SellInfoBuyCurrencies)
-                .HasForeignKey(d => d.BuyCurrencyId)
-                .HasConstraintName("sell_info_currencies_id_fk");
-
-            entity.HasOne(d => d.SellCurrency).WithMany(p => p.SellInfoSellCurrencies)
-                .HasForeignKey(d => d.SellCurrencyId)
-                .HasConstraintName("sell_info_currencies_id_fk_2");
+            entity.HasOne(d => d.Sale).WithMany(p => p.SaleContents)
+                .HasForeignKey(d => d.SaleId)
+                .HasConstraintName("sale_contents_sales_fact_id_fk");
         });
 
+        modelBuilder.Entity<SaleContentDetail>(entity =>
+        {
+            entity.HasKey(e => e.Id).HasName("sale_content_detail_pk");
+
+            entity.ToTable("sale_content_detail");
+
+            entity.HasIndex(e => e.CurrencyId, "sale_content_detail_currency_id_index");
+
+            entity.Property(e => e.Id)
+                .ValueGeneratedNever()
+                .HasColumnName("id");
+            entity.Property(e => e.BuyPrice).HasColumnName("buy_price");
+            entity.Property(e => e.Count).HasColumnName("count");
+            entity.Property(e => e.CurrencyId).HasColumnName("currency_id");
+            entity.Property(e => e.PurchaseDate).HasColumnName("purchase_date");
+
+            entity.HasOne(d => d.Currency).WithMany(p => p.SaleContentDetails)
+                .HasForeignKey(d => d.CurrencyId)
+                .OnDelete(DeleteBehavior.ClientSetNull)
+                .HasConstraintName("sale_content_detail_currencies_id_fk");
+        });
+
+        modelBuilder.Entity<SalesFact>(entity =>
+        {
+            entity.HasKey(e => e.Id).HasName("sales_fact_pk");
+
+            entity.ToTable("sales_fact");
+
+            entity.HasIndex(e => e.BuyerId, "sales_fact_buyer_id_index");
+
+            entity.HasIndex(e => e.CreatedAt, "sales_fact_created_at_index");
+
+            entity.HasIndex(e => e.CurrencyId, "sales_fact_currency_id_index");
+
+            entity.Property(e => e.Id)
+                .HasMaxLength(128)
+                .HasColumnName("id");
+            entity.Property(e => e.BuyerId).HasColumnName("buyer_id");
+            entity.Property(e => e.CreatedAt).HasColumnName("created_at");
+            entity.Property(e => e.CurrencyId).HasColumnName("currency_id");
+            entity.Property(e => e.TotalSum).HasColumnName("total_sum");
+
+            entity.HasOne(d => d.Currency).WithMany(p => p.SalesFacts)
+                .HasForeignKey(d => d.CurrencyId)
+                .OnDelete(DeleteBehavior.ClientSetNull)
+                .HasConstraintName("sales_fact_currencies_id_fk");
+        });
+
+        modelBuilder.AllDateTimesToUtc()
+            .AllEnumsToString();
+            
         OnModelCreatingPartial(modelBuilder);
     }
 

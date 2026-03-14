@@ -1,12 +1,12 @@
 ﻿namespace Analytics.Entities;
 
-public partial class PurchasesFact
+public partial class SalesFact
 {
     public string Id { get; set; } = null!;
 
     public int CurrencyId { get; set; }
 
-    public Guid SupplierId { get; set; }
+    public Guid BuyerId { get; set; }
 
     public DateTime CreatedAt { get; set; }
 
@@ -14,5 +14,5 @@ public partial class PurchasesFact
 
     public virtual Currency Currency { get; set; } = null!;
 
-    public virtual ICollection<PurchaseContent> PurchaseContents { get; set; } = new List<PurchaseContent>();
+    public virtual ICollection<SaleContent> SaleContents { get; set; } = new List<SaleContent>();
 }
