@@ -70,6 +70,7 @@ public static class ServiceProvider
         collection.AddScoped<ISaleService, SaleService>();
         collection.AddScoped<IUserTokenService, UserTokenService>();
         collection.AddScoped<IRolePermissionService, RolePermissionService>();
+        collection.AddScoped<IPurchaseService, PurchaseService>();
 
         collection.AddScoped<IRelatedDataCollector, RelatedDataCollector>();
 
