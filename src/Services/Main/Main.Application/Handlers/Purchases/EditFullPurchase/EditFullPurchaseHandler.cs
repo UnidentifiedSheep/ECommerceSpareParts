@@ -1,9 +1,11 @@
 using System.Data;
 using Abstractions.Interfaces.Services;
+using Abstractions.Models.Command;
 using Abstractions.Models.Repository;
 using Application.Common.Interfaces;
 using Attributes;
 using Exceptions.Exceptions.Purchase;
+using Extensions;
 using Main.Abstractions.Dtos.Amw.Logistics;
 using Main.Abstractions.Dtos.Amw.Purchase;
 using Main.Abstractions.Dtos.Amw.Storage;
@@ -14,6 +16,8 @@ using Main.Application.Handlers.Balance.CreateTransaction;
 using Main.Application.Handlers.Balance.DeleteTransaction;
 using Main.Application.Handlers.Balance.EditTransaction;
 using Main.Application.Handlers.Logistics.CalculateDeliveryCost;
+using Main.Application.Handlers.Purchases.AddContentLogisticsToPurchase;
+using Main.Application.Handlers.Purchases.ClearPurchaseLogistics;
 using Main.Application.Handlers.Purchases.EditPurchase;
 using Main.Application.Handlers.Purchases.UpsertLogisticsToPurchase;
 using Main.Application.Handlers.StorageContents.AddContent;
@@ -39,10 +43,6 @@ public record EditFullPurchaseCommand(
 public class EditFullPurchaseHandler(IMediator mediator, IPurchaseRepository purchaseRepository, 
     IUnitOfWork unitOfWork) : ICommandHandler<EditFullPurchaseCommand>
 {
-    private static readonly QueryOptions<Purchase> PurchaseOptions = new QueryOptions<Purchase>()
-        .WithForUpdate()
-        .WithTracking()
-        .WithInclude(x => x.PurchaseLogistic);
     public async Task<Unit> Handle(EditFullPurchaseCommand request, CancellationToken cancellationToken)
     {
         var dateTime = request.PurchaseDateTime;
@@ -64,38 +64,91 @@ public class EditFullPurchaseHandler(IMediator mediator, IPurchaseRepository pur
         await EditTransaction(purchase.TransactionId, currencyId, totalSum, dateTime, cancellationToken);
 
         await AddOrRemoveContentToStorage(editedCounts, purchase.Storage, currencyId, whoUpdated, cancellationToken);
-
-        if (!request.WithLogistics) return Unit.Value;
+        
+        if (!request.WithLogistics)
+        {
+            //delete old delivery transaction
+            Guid? deliveryTransactionId = purchase.PurchaseLogistic?.TransactionId;
+            if (deliveryTransactionId != null)
+                await DeleteTransaction(deliveryTransactionId.Value, whoUpdated, cancellationToken);
+            await ClearOldLogisticsData(purchaseId, CommandPresets.WithSaveChanges, cancellationToken);
+            return Unit.Value;
+        }
 
         var (route, deliveryCost) =
             await CalculateDeliveryCost(request.StorageFrom!, purchase.Storage, content, cancellationToken);
-        
-        if (purchase.PurchaseLogistic != null)
-        {
-            Guid prevRouteId = purchase.PurchaseLogistic.RouteId;
-            Guid? deliveryTransactionId = purchase.PurchaseLogistic.TransactionId;
-            
-            if (prevRouteId != route.Id && deliveryTransactionId != null)
-                await DeleteTransaction(deliveryTransactionId.Value, whoUpdated, cancellationToken);
-            //We remove purchase logistics, to be able to add new later.
-            //TODO: make upsert in future
-            unitOfWork.Remove(purchase.PurchaseLogistic);
-        }
 
-        Transaction? logisticsTransaction = route.CarrierId != null
-            ? await CreateTransaction(Global.SystemId, route.CarrierId.Value,
-                deliveryCost.TotalCost, TransactionStatus.Logistics, deliveryCost.CurrencyId, whoUpdated, dateTime,
-                cancellationToken)
-            : null;
+        var (purchaseLogistic, contents) = 
+            await ClearOldLogisticsData(purchaseId, CommandPresets.WithOutSaveChanges, cancellationToken);
+
+        Transaction? logisticsTransaction = null;
         
-        var command = new UpsertLogisticsToPurchaseCommand(
-            purchaseId, 
-            route.Id, 
-            logisticsTransaction?.Id, 
-            deliveryCost.MinimalPriceApplied);
-        await mediator.Send(command, cancellationToken);
+        //rewrite, hard to read.
+        if (purchaseLogistic != null)
+        {
+            var deliveryTransactionId = purchaseLogistic.TransactionId;
+            var prevCarrierId = deliveryTransactionId == null ? null : (Guid?)purchase.Transaction.ReceiverId;
+
+            if (deliveryTransactionId != null && prevCarrierId == route.CarrierId)
+            {
+                logisticsTransaction = await EditTransaction(deliveryTransactionId.Value, deliveryCost.CurrencyId, 
+                    deliveryCost.TotalCost, dateTime, cancellationToken);
+            }
+            else
+            {
+                if (deliveryTransactionId != null)
+                    await DeleteTransaction(deliveryTransactionId.Value, whoUpdated, cancellationToken);
+                
+                if (route.CarrierId != null)
+                    logisticsTransaction = await CreateTransaction(Global.SystemId, route.CarrierId.Value, 
+                        deliveryCost.TotalCost, TransactionStatus.Logistics, deliveryCost.CurrencyId, 
+                        whoUpdated, dateTime, cancellationToken);
+            }
+        }
+        
+        await UpsertPurchaseLogistics(purchaseId, route.Id, logisticsTransaction?.Id, deliveryCost.MinimalPriceApplied,
+            cancellationToken);
+
+        await AddLogisticsContentToPurchase(content, contents, deliveryCost, cancellationToken);
+
+        await unitOfWork.SaveChangesAsync(cancellationToken);
         
         return Unit.Value;
+    }
+    
+    private async Task AddLogisticsContentToPurchase(List<EditPurchaseDto> contentDtos, 
+        IEnumerable<PurchaseContent> contents, DeliveryCostDto costs, CancellationToken cancellationToken)
+    {
+        List<PurchaseContentLogisticDto> contentLogistics = [];
+        var contentsList = contents.ToList();
+
+        int costsIndex = 0;
+        for (int i = 0; i < contentDtos.Count; i++)
+        {
+            var dto = contentDtos[i];
+            if (!dto.CalculateLogistics) continue;
+            
+            var content = contentsList[i];
+            var deliveryItemInfo = costs.Items[costsIndex];
+            
+            contentLogistics.Add(new PurchaseContentLogisticDto
+            {
+                PurchaseContentId = content.Id,
+                WeightKg = deliveryItemInfo.Weight.ToKg(deliveryItemInfo.WeightUnit),
+                AreaM3 = deliveryItemInfo.AreaM3,
+                Price = deliveryItemInfo.Cost
+            });
+            costsIndex++;
+        }
+
+        var command = new AddContentLogisticsToPurchaseCommand(contentLogistics);
+        await mediator.Send(command, cancellationToken);
+    }
+
+    private async Task<ClearPurchaseLogisticsResult> ClearOldLogisticsData(
+        string purchaseId, CommandOptions options, CancellationToken cancellationToken)
+    {
+        return await mediator.Send(new ClearPurchaseLogisticsCommand(purchaseId, options), cancellationToken);
     }
     
     private async Task<(StorageRouteDto usedRoute, DeliveryCostDto deliveryCost)> CalculateDeliveryCost(string storageFrom, 
@@ -109,6 +162,13 @@ public class EditFullPurchaseHandler(IMediator mediator, IPurchaseRepository pur
         return (result.Route, result.DeliveryCost);
     }
 
+    private async Task UpsertPurchaseLogistics(string purchaseId, Guid routeId, Guid? logisticsTransactionId, 
+        bool minPriceApplied, CancellationToken cancellationToken)
+    {
+        var command = new UpsertPurchaseLogisticsCommand(purchaseId, routeId, logisticsTransactionId, minPriceApplied);
+        await mediator.Send(command, cancellationToken);
+    }
+
     private async Task<Dictionary<int, Dictionary<decimal, int>>> EditPurchase(List<EditPurchaseDto> contentList,
         string purchaseId, int currencyId,
         string? comment, Guid whoUpdated, DateTime dateTime, CancellationToken cancellationToken = default)
@@ -117,12 +177,12 @@ public class EditFullPurchaseHandler(IMediator mediator, IPurchaseRepository pur
         return (await mediator.Send(command, cancellationToken)).EditedCounts;
     }
 
-    private async Task EditTransaction(Guid transactionId, int currencyId, decimal amount, DateTime dateTime,
+    private async Task<Transaction> EditTransaction(Guid transactionId, int currencyId, decimal amount, DateTime dateTime,
         CancellationToken cancellationToken = default)
     {
         var command =
             new EditTransactionCommand(transactionId, currencyId, amount, TransactionStatus.Purchase, dateTime);
-        await mediator.Send(command, cancellationToken);
+        return (await mediator.Send(command, cancellationToken)).Transaction;
     }
 
     private async Task DeleteTransaction(Guid transactionId, Guid whoDeleted, CancellationToken cancellationToken = default)

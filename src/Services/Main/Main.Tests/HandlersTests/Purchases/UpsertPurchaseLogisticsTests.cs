@@ -18,7 +18,7 @@ using Tests.testContainers.Combined;
 namespace Tests.HandlersTests.Purchases;
 
 [Collection("Combined collection")]
-public class UpsertLogisticsToPurchaseTests : IAsyncLifetime
+public class UpsertPurchaseLogisticsTests : IAsyncLifetime
 {
     private readonly DContext _context;
     private readonly IMediator _mediator;
@@ -27,7 +27,7 @@ public class UpsertLogisticsToPurchaseTests : IAsyncLifetime
     private Transaction _deliveryTransaction = null!;
     private StorageRoute _route = null!;
     
-    public UpsertLogisticsToPurchaseTests(CombinedContainerFixture fixture)
+    public UpsertPurchaseLogisticsTests(CombinedContainerFixture fixture)
     {
         var sp = ServiceProviderForTests.Build(fixture.PostgresConnectionString, fixture.RedisConnectionString);
         _context = sp.GetRequiredService<DContext>();
@@ -88,7 +88,7 @@ public class UpsertLogisticsToPurchaseTests : IAsyncLifetime
     [Fact]
     public async Task Create_WithValidData_Succeeds()
     {
-        var command = new UpsertLogisticsToPurchaseCommand(_purchase.Id, _route.Id, 
+        var command = new UpsertPurchaseLogisticsCommand(_purchase.Id, _route.Id, 
             _deliveryTransaction.Id, false);
         await _mediator.Send(command);
         
@@ -101,7 +101,7 @@ public class UpsertLogisticsToPurchaseTests : IAsyncLifetime
     [Fact]
     public async Task Update_WithValidData_Succeeds()
     {
-        var command = new UpsertLogisticsToPurchaseCommand(_purchase.Id, _route.Id, 
+        var command = new UpsertPurchaseLogisticsCommand(_purchase.Id, _route.Id, 
             _deliveryTransaction.Id, false);
         await _mediator.Send(command);
         await _mediator.Send(command with { MinimumPriceApplied = true });
@@ -115,7 +115,7 @@ public class UpsertLogisticsToPurchaseTests : IAsyncLifetime
     [Fact]
     public async Task Create_WithNullTransaction_Succeeds()
     {
-        var command = new UpsertLogisticsToPurchaseCommand(_purchase.Id, _route.Id, null, false);
+        var command = new UpsertPurchaseLogisticsCommand(_purchase.Id, _route.Id, null, false);
         await _mediator.Send(command);
         
         var dbValue = await GetLogistic();
@@ -127,21 +127,21 @@ public class UpsertLogisticsToPurchaseTests : IAsyncLifetime
     [Fact]
     public async Task Create_WithInvalidRoute_FailsDbValidation()
     {
-        var command = new UpsertLogisticsToPurchaseCommand(_purchase.Id, Guid.NewGuid(), null, false);
+        var command = new UpsertPurchaseLogisticsCommand(_purchase.Id, Guid.NewGuid(), null, false);
         await Assert.ThrowsAsync<StorageRouteNotFound>(async () => await _mediator.Send(command));
     }
     
     [Fact]
     public async Task Create_WithTransactionId_FailsDbValidation()
     {
-        var command = new UpsertLogisticsToPurchaseCommand(_purchase.Id, _route.Id, Guid.NewGuid(), false);
+        var command = new UpsertPurchaseLogisticsCommand(_purchase.Id, _route.Id, Guid.NewGuid(), false);
         await Assert.ThrowsAsync<ValidationException>(async () => await _mediator.Send(command));
     }
     
     [Fact]
     public async Task Create_WithPurchaseId_FailsDbValidation()
     {
-        var command = new UpsertLogisticsToPurchaseCommand(Guid.NewGuid().ToString(), _route.Id, null, false);
+        var command = new UpsertPurchaseLogisticsCommand(Guid.NewGuid().ToString(), _route.Id, null, false);
         await Assert.ThrowsAsync<ValidationException>(async () => await _mediator.Send(command));
     }
 

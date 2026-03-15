@@ -78,11 +78,10 @@ public class CreateFullPurchaseHandler(IMediator mediator, IPublishEndpoint publ
                 cancellationToken);
         }
 
-        await AddLogisticsToPurchase(purchase.Id, usedRoute.Id, logisticsTransaction?.Id,
+        await UpsertPurchaseLogistics(purchase.Id, usedRoute.Id, logisticsTransaction?.Id,
             deliveryCost.MinimalPriceApplied, cancellationToken);
             
-        await AddLogisticsContentToPurchase(content, purchase.PurchaseContents, 
-            deliveryCost, cancellationToken);
+        await AddLogisticsContentToPurchase(content, purchase.PurchaseContents, deliveryCost, cancellationToken);
 
         await publishEndpoint.Publish(new ArticleBuyPricesChangedEvent
             {
@@ -127,10 +126,10 @@ public class CreateFullPurchaseHandler(IMediator mediator, IPublishEndpoint publ
         var command = new AddContentLogisticsToPurchaseCommand(contentLogistics);
         await mediator.Send(command, cancellationToken);
     }
-    private async Task AddLogisticsToPurchase(string purchaseId, Guid routeId, Guid? transactionId, 
+    private async Task UpsertPurchaseLogistics(string purchaseId, Guid routeId, Guid? transactionId, 
         bool minimumPriceApplied, CancellationToken cancellationToken)
     {
-        var command = new UpsertLogisticsToPurchaseCommand(purchaseId, routeId, transactionId, minimumPriceApplied);
+        var command = new UpsertPurchaseLogisticsCommand(purchaseId, routeId, transactionId, minimumPriceApplied);
         await mediator.Send(command, cancellationToken);
     }
 

@@ -12,13 +12,13 @@ namespace Main.Application.Handlers.Purchases.UpsertLogisticsToPurchase;
 
 
 [Transactional]
-public record UpsertLogisticsToPurchaseCommand(string PurchaseId, Guid RouteId, Guid? TransactionId, 
+public record UpsertPurchaseLogisticsCommand(string PurchaseId, Guid RouteId, Guid? TransactionId, 
     bool MinimumPriceApplied) : ICommand;
 
-public class UpsertLogisticsToPurchaseHandler(IUnitOfWork unitOfWork, IStorageRoutesRepository storageRoutesRepository,
-    IPurchaseLogisticsRepository purchaseLogisticsRepository) : ICommandHandler<UpsertLogisticsToPurchaseCommand>
+public class UpsertPurchaseLogisticsHandler(IUnitOfWork unitOfWork, IStorageRoutesRepository storageRoutesRepository,
+    IPurchaseLogisticsRepository purchaseLogisticsRepository) : ICommandHandler<UpsertPurchaseLogisticsCommand>
 {
-    public async Task<Unit> Handle(UpsertLogisticsToPurchaseCommand request, CancellationToken cancellationToken)
+    public async Task<Unit> Handle(UpsertPurchaseLogisticsCommand request, CancellationToken cancellationToken)
     {
         var storageRoute = await storageRoutesRepository.GetStorageRouteAsync(request.RouteId, true, cancellationToken)
                            ?? throw new StorageRouteNotFound(request.RouteId);

@@ -19,6 +19,9 @@ public record DeleteFullPurchaseCommand(string PurchaseId, Guid WhoDeleted) : IC
 public class DeleteFullPurchaseHandler(IPurchaseRepository purchaseRepository, IMediator mediator)
     : ICommandHandler<DeleteFullPurchaseCommand>
 {
+    private static readonly QueryOptions<PurchaseContent> ContentOptions = new QueryOptions<PurchaseContent>()
+        .WithTracking()
+        .WithForUpdate();
     public async Task<Unit> Handle(DeleteFullPurchaseCommand request, CancellationToken cancellationToken)
     {
         var purchaseId = request.PurchaseId;
@@ -27,8 +30,8 @@ public class DeleteFullPurchaseHandler(IPurchaseRepository purchaseRepository, I
                            QueryPresets.TrackForUpdate, 
                            cancellationToken)
                        ?? throw new PurchaseNotFoundException(purchaseId);
-        var purchaseContents = (await purchaseRepository.GetPurchaseContentForUpdate(purchaseId,
-            true, cancellationToken)).ToList();
+        var purchaseContents = (await purchaseRepository.GetPurchaseContent(purchaseId,
+            ContentOptions, cancellationToken)).ToList();
 
         await RemoveContentFromStorage(purchaseContents, request.WhoDeleted, purchase.Storage, cancellationToken);
         await DeletePurchase(purchaseId, cancellationToken);

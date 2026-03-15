@@ -4,9 +4,9 @@ using Main.Entities;
 
 namespace Main.Application.Handlers.Purchases.UpsertLogisticsToPurchase;
 
-public class UpsertLogisticsToPurchaseDbValidation : AbstractDbValidation<UpsertLogisticsToPurchaseCommand>
+public class UpsertPurchaseLogisticsDbValidation : AbstractDbValidation<UpsertPurchaseLogisticsCommand>
 {
-    public override void Build(IValidationPlan plan, UpsertLogisticsToPurchaseCommand request)
+    public override void Build(IValidationPlan plan, UpsertPurchaseLogisticsCommand request)
     {
         plan.ValidatePurchaseExistsId(request.PurchaseId);
         if (request.TransactionId != null)

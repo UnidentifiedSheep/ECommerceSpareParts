@@ -25,6 +25,9 @@ public record EditPurchaseResult(Dictionary<int, Dictionary<decimal, int>> Edite
 public class EditPurchaseHandler(IPurchaseRepository purchaseRepository, IUnitOfWork unitOfWork) 
     : ICommandHandler<EditPurchaseCommand, EditPurchaseResult>
 {
+    private static readonly QueryOptions<PurchaseContent> ContentOptions = new QueryOptions<PurchaseContent>()
+        .WithForUpdate()
+        .WithTracking();
     public async Task<EditPurchaseResult> Handle(EditPurchaseCommand request, CancellationToken cancellationToken)
     {
         var purchaseId = request.PurchaseId;
@@ -41,7 +44,7 @@ public class EditPurchaseHandler(IPurchaseRepository purchaseRepository, IUnitOf
                            cancellationToken) ?? throw new PurchaseNotFoundException(purchaseId);
 
         var purchaseContents = (await purchaseRepository
-                .GetPurchaseContentForUpdate(purchaseId, true, cancellationToken))
+                .GetPurchaseContent(purchaseId, ContentOptions, cancellationToken))
             .ToDictionary(x => x.Id);
 
         var existingIds = content.Where(x => x.Id != null)
@@ -86,6 +89,8 @@ public class EditPurchaseHandler(IPurchaseRepository purchaseRepository, IUnitOf
                 if (!result[item.ArticleId].TryAdd(item.Price, delta))
                     result[item.ArticleId][item.Price] += delta;
             }
+            
+            existingContent.PurchaseId = purchaseId;
         }
 
         foreach (var kv in result.ToList())
