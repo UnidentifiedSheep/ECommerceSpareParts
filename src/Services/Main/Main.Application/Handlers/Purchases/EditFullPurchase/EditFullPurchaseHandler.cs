@@ -22,7 +22,9 @@ public record EditFullPurchaseCommand(
     int CurrencyId,
     string? Comment,
     DateTime PurchaseDateTime,
-    Guid UpdatedUserId) : ICommand;
+    Guid UpdatedUserId,
+    bool WithLogistics,
+    string? StorageFrom) : ICommand;
 
 public class EditFullPurchaseHandler(IMediator mediator, IPurchaseRepository purchaseRepository)
     : ICommandHandler<EditFullPurchaseCommand>
@@ -39,7 +41,7 @@ public class EditFullPurchaseHandler(IMediator mediator, IPurchaseRepository pur
 
         var purchase = await purchaseRepository.GetPurchaseForUpdate(purchaseId, true, cancellationToken)
                        ?? throw new PurchaseNotFoundException(purchaseId);
-
+        
         var editedCounts = await EditPurchase(content, purchaseId, currencyId, comment,
             whoUpdated, dateTime, cancellationToken);
 
@@ -47,6 +49,8 @@ public class EditFullPurchaseHandler(IMediator mediator, IPurchaseRepository pur
 
         await AddOrRemoveContentToStorage(editedCounts, purchase.Storage, currencyId, whoUpdated, cancellationToken);
 
+        if (!request.WithLogistics) return Unit.Value;
+        
         return Unit.Value;
     }
 
