@@ -13,8 +13,8 @@ using Main.Application.Extensions;
 using Main.Application.Handlers.Balance.CreateTransaction;
 using Main.Application.Handlers.Logistics.CalculateDeliveryCost;
 using Main.Application.Handlers.Purchases.AddContentLogisticsToPurchase;
-using Main.Application.Handlers.Purchases.AddLogisticsToPurchase;
 using Main.Application.Handlers.Purchases.CreatePurchase;
+using Main.Application.Handlers.Purchases.UpsertLogisticsToPurchase;
 using Main.Application.Handlers.StorageContents.AddContent;
 using Main.Entities;
 using Main.Enums;
@@ -130,7 +130,7 @@ public class CreateFullPurchaseHandler(IMediator mediator, IPublishEndpoint publ
     private async Task AddLogisticsToPurchase(string purchaseId, Guid routeId, Guid? transactionId, 
         bool minimumPriceApplied, CancellationToken cancellationToken)
     {
-        var command = new AddLogisticsToPurchaseCommand(purchaseId, routeId, transactionId, minimumPriceApplied);
+        var command = new UpsertLogisticsToPurchaseCommand(purchaseId, routeId, transactionId, minimumPriceApplied);
         await mediator.Send(command, cancellationToken);
     }
 

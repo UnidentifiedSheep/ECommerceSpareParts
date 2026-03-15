@@ -1,8 +1,10 @@
 using Abstractions.Interfaces.Services;
+using Abstractions.Models.Repository;
 using Application.Common.Interfaces;
 using Attributes;
 using Exceptions.Exceptions.Purchase;
 using Main.Abstractions.Interfaces.DbRepositories;
+using Main.Entities;
 using MediatR;
 
 namespace Main.Application.Handlers.Purchases.DeletePurchase;
@@ -15,8 +17,10 @@ public class DeletePurchaseHandler(IPurchaseRepository purchaseRepository, IUnit
 {
     public async Task<Unit> Handle(DeletePurchaseCommand request, CancellationToken cancellationToken)
     {
-        var purchase = await purchaseRepository.GetPurchaseForUpdate(request.PurchaseId, true, cancellationToken)
-                       ?? throw new PurchaseNotFoundException(request.PurchaseId);
+        var purchase = await purchaseRepository.GetPurchase(
+                           request.PurchaseId, 
+                           QueryPresets.TrackForUpdate, 
+                           cancellationToken) ?? throw new PurchaseNotFoundException(request.PurchaseId);
         unitOfWork.Remove(purchase);
         await unitOfWork.SaveChangesAsync(cancellationToken);
         return Unit.Value;

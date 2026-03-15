@@ -1,16 +1,26 @@
 using System.Data;
+using Abstractions.Interfaces.Services;
+using Abstractions.Models.Repository;
 using Application.Common.Interfaces;
 using Attributes;
 using Exceptions.Exceptions.Purchase;
+using Main.Abstractions.Dtos.Amw.Logistics;
 using Main.Abstractions.Dtos.Amw.Purchase;
 using Main.Abstractions.Dtos.Amw.Storage;
+using Main.Abstractions.Dtos.Amw.StorageRoutes;
 using Main.Abstractions.Interfaces.DbRepositories;
 using Main.Application.Extensions;
+using Main.Application.Handlers.Balance.CreateTransaction;
+using Main.Application.Handlers.Balance.DeleteTransaction;
 using Main.Application.Handlers.Balance.EditTransaction;
+using Main.Application.Handlers.Logistics.CalculateDeliveryCost;
 using Main.Application.Handlers.Purchases.EditPurchase;
+using Main.Application.Handlers.Purchases.UpsertLogisticsToPurchase;
 using Main.Application.Handlers.StorageContents.AddContent;
 using Main.Application.Handlers.StorageContents.RemoveContent;
+using Main.Entities;
 using Main.Enums;
+using Mapster;
 using MediatR;
 
 namespace Main.Application.Handlers.Purchases.EditFullPurchase;
@@ -26,9 +36,13 @@ public record EditFullPurchaseCommand(
     bool WithLogistics,
     string? StorageFrom) : ICommand;
 
-public class EditFullPurchaseHandler(IMediator mediator, IPurchaseRepository purchaseRepository)
-    : ICommandHandler<EditFullPurchaseCommand>
+public class EditFullPurchaseHandler(IMediator mediator, IPurchaseRepository purchaseRepository, 
+    IUnitOfWork unitOfWork) : ICommandHandler<EditFullPurchaseCommand>
 {
+    private static readonly QueryOptions<Purchase> PurchaseOptions = new QueryOptions<Purchase>()
+        .WithForUpdate()
+        .WithTracking()
+        .WithInclude(x => x.PurchaseLogistic);
     public async Task<Unit> Handle(EditFullPurchaseCommand request, CancellationToken cancellationToken)
     {
         var dateTime = request.PurchaseDateTime;
@@ -39,8 +53,10 @@ public class EditFullPurchaseHandler(IMediator mediator, IPurchaseRepository pur
         var whoUpdated = request.UpdatedUserId;
         var totalSum = content.GetTotalSum();
 
-        var purchase = await purchaseRepository.GetPurchaseForUpdate(purchaseId, true, cancellationToken)
-                       ?? throw new PurchaseNotFoundException(purchaseId);
+        var purchase = await purchaseRepository.GetPurchase(
+                           purchaseId, 
+                           QueryPresets.TrackForUpdate, 
+                           cancellationToken) ?? throw new PurchaseNotFoundException(purchaseId);
         
         var editedCounts = await EditPurchase(content, purchaseId, currencyId, comment,
             whoUpdated, dateTime, cancellationToken);
@@ -50,8 +66,47 @@ public class EditFullPurchaseHandler(IMediator mediator, IPurchaseRepository pur
         await AddOrRemoveContentToStorage(editedCounts, purchase.Storage, currencyId, whoUpdated, cancellationToken);
 
         if (!request.WithLogistics) return Unit.Value;
+
+        var (route, deliveryCost) =
+            await CalculateDeliveryCost(request.StorageFrom!, purchase.Storage, content, cancellationToken);
+        
+        if (purchase.PurchaseLogistic != null)
+        {
+            Guid prevRouteId = purchase.PurchaseLogistic.RouteId;
+            Guid? deliveryTransactionId = purchase.PurchaseLogistic.TransactionId;
+            
+            if (prevRouteId != route.Id && deliveryTransactionId != null)
+                await DeleteTransaction(deliveryTransactionId.Value, whoUpdated, cancellationToken);
+            //We remove purchase logistics, to be able to add new later.
+            //TODO: make upsert in future
+            unitOfWork.Remove(purchase.PurchaseLogistic);
+        }
+
+        Transaction? logisticsTransaction = route.CarrierId != null
+            ? await CreateTransaction(Global.SystemId, route.CarrierId.Value,
+                deliveryCost.TotalCost, TransactionStatus.Logistics, deliveryCost.CurrencyId, whoUpdated, dateTime,
+                cancellationToken)
+            : null;
+        
+        var command = new UpsertLogisticsToPurchaseCommand(
+            purchaseId, 
+            route.Id, 
+            logisticsTransaction?.Id, 
+            deliveryCost.MinimalPriceApplied);
+        await mediator.Send(command, cancellationToken);
         
         return Unit.Value;
+    }
+    
+    private async Task<(StorageRouteDto usedRoute, DeliveryCostDto deliveryCost)> CalculateDeliveryCost(string storageFrom, 
+        string storageTo, List<EditPurchaseDto> content, CancellationToken token)
+    {
+        var items = content.Where(x => x.CalculateLogistics)
+            .Adapt<List<LogisticsItemDto>>();
+
+        var query = new CalculateDeliveryCostQuery(storageFrom, storageTo, items);
+        var result = await mediator.Send(query, token);
+        return (result.Route, result.DeliveryCost);
     }
 
     private async Task<Dictionary<int, Dictionary<decimal, int>>> EditPurchase(List<EditPurchaseDto> contentList,
@@ -68,6 +123,21 @@ public class EditFullPurchaseHandler(IMediator mediator, IPurchaseRepository pur
         var command =
             new EditTransactionCommand(transactionId, currencyId, amount, TransactionStatus.Purchase, dateTime);
         await mediator.Send(command, cancellationToken);
+    }
+
+    private async Task DeleteTransaction(Guid transactionId, Guid whoDeleted, CancellationToken cancellationToken = default)
+    {
+        var command = new DeleteTransactionCommand(transactionId, whoDeleted, true);
+        await mediator.Send(command, cancellationToken);
+    }
+    
+    private async Task<Transaction> CreateTransaction(Guid senderId, Guid receiverId, decimal amount,
+        TransactionStatus status, int currencyId,
+        Guid whoCreatedUserId, DateTime dateTime, CancellationToken cancellationToken = default)
+    {
+        var command = new CreateTransactionCommand(senderId, receiverId, amount, currencyId, whoCreatedUserId, dateTime,
+            status);
+        return (await mediator.Send(command, cancellationToken)).Transaction;
     }
 
     private async Task AddOrRemoveContentToStorage(Dictionary<int, Dictionary<decimal, int>> values, string storageName,

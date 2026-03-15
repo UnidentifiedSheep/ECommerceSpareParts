@@ -151,6 +151,10 @@ public static class MapsterConfig
         TypeAdapterConfig<NewPurchaseContentDto, LogisticsItemDto>.NewConfig()
             .Map(d => d.ArticleId, s => s.ArticleId)
             .Map(d => d.Quantity, s => s.Count);
+        
+        TypeAdapterConfig<EditPurchaseDto, LogisticsItemDto>.NewConfig()
+            .Map(d => d.ArticleId, s => s.ArticleId)
+            .Map(d => d.Quantity, s => s.Count);
 
         TypeAdapterConfig<PurchaseContentLogisticDto, PurchaseContentLogistic>.NewConfig()
             .Map(d => d.AreaM3, s => s.AreaM3)

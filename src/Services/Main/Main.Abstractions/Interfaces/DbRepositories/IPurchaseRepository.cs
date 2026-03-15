@@ -1,11 +1,12 @@
 using System.Linq.Expressions;
+using Abstractions.Models.Repository;
 using Main.Entities;
 
 namespace Main.Abstractions.Interfaces.DbRepositories;
 
 public interface IPurchaseRepository
 {
-    Task<Purchase?> GetPurchaseForUpdate(string purchaseId, bool track = true,
+    Task<Purchase?> GetPurchase(string purchaseId, QueryOptions? config = null,
         CancellationToken cancellationToken = default);
 
     Task<IEnumerable<PurchaseContent>> GetPurchaseContentForUpdate(string purchaseId, bool track = true,

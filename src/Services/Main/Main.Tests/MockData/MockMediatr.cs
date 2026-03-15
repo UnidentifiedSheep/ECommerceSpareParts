@@ -1,4 +1,5 @@
 using Bogus;
+using Main.Abstractions.Dtos.Amw.Purchase;
 using Main.Application.Handlers.Articles.CreateArticles;
 using Main.Application.Handlers.Balance.CreateTransaction;
 using Main.Application.Handlers.Producers.CreateProducer;
@@ -11,6 +12,7 @@ using Main.Abstractions.Dtos.Emails;
 using Main.Entities;
 using Main.Enums;
 using Main.Abstractions.Models;
+using Main.Application.Handlers.Purchases.CreatePurchase;
 using Main.Application.Handlers.StorageOwners.AddStorageToUser;
 using Main.Application.Handlers.StorageRoutes.AddStorageRoute;
 using Mapster;
@@ -99,8 +101,7 @@ public static class MockMediatr
     }
 
     public static async Task AddMockSale(this IMediator mediator, IEnumerable<StorageContent> storageContents,
-        int currencyId,
-        Guid userId, Guid transactionId, string storageName, DateTime? when = null)
+        int currencyId, Guid userId, Guid transactionId, string storageName, DateTime? when = null)
     {
         var saleContent = new List<NewSaleContentDto>();
         var storageContentValues = new List<PrevAndNewValue<StorageContent>>();

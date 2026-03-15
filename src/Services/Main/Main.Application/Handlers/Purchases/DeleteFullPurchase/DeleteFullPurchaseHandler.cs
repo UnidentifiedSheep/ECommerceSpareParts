@@ -1,4 +1,5 @@
 using System.Data;
+using Abstractions.Models.Repository;
 using Application.Common.Interfaces;
 using Attributes;
 using Exceptions.Exceptions.Purchase;
@@ -21,7 +22,10 @@ public class DeleteFullPurchaseHandler(IPurchaseRepository purchaseRepository, I
     public async Task<Unit> Handle(DeleteFullPurchaseCommand request, CancellationToken cancellationToken)
     {
         var purchaseId = request.PurchaseId;
-        var purchase = await purchaseRepository.GetPurchaseForUpdate(purchaseId, true, cancellationToken)
+        var purchase = await purchaseRepository.GetPurchase(
+                           purchaseId, 
+                           QueryPresets.TrackForUpdate, 
+                           cancellationToken)
                        ?? throw new PurchaseNotFoundException(purchaseId);
         var purchaseContents = (await purchaseRepository.GetPurchaseContentForUpdate(purchaseId,
             true, cancellationToken)).ToList();

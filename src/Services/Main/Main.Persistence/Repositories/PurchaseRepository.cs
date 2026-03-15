@@ -1,4 +1,5 @@
 using System.Linq.Expressions;
+using Abstractions.Models.Repository;
 using Extensions;
 using Main.Abstractions.Interfaces.DbRepositories;
 using Main.Entities;
@@ -12,12 +13,12 @@ namespace Main.Persistence.Repositories;
 
 public class PurchaseRepository(DContext context) : IPurchaseRepository
 {
-    public async Task<Purchase?> GetPurchaseForUpdate(string purchaseId, bool track = true,
+    public async Task<Purchase?> GetPurchase(string purchaseId, QueryOptions? config = null,
         CancellationToken cancellationToken = default)
     {
         return await context.Purchases
-            .FromSql($"select * from purchase where id = {purchaseId} for update")
-            .ConfigureTracking(track)
+            .Where(x => x.Id == purchaseId)
+            .ApplyOptions(config)
             .FirstOrDefaultAsync(cancellationToken);
     }
 

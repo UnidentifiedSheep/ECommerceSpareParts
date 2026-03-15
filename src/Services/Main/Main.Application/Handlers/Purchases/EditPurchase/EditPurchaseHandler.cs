@@ -1,4 +1,5 @@
 using Abstractions.Interfaces.Services;
+using Abstractions.Models.Repository;
 using Application.Common.Interfaces;
 using Attributes;
 using Exceptions.Exceptions.Purchase;
@@ -34,8 +35,10 @@ public class EditPurchaseHandler(IPurchaseRepository purchaseRepository, IUnitOf
         var result = new Dictionary<int, Dictionary<decimal, int>>();
         var content = request.Content.ToList();
 
-        var purchase = await purchaseRepository.GetPurchaseForUpdate(purchaseId, true, cancellationToken)
-                       ?? throw new PurchaseNotFoundException(purchaseId);
+        var purchase = await purchaseRepository.GetPurchase(
+                           purchaseId,
+                           QueryPresets.TrackForUpdate,
+                           cancellationToken) ?? throw new PurchaseNotFoundException(purchaseId);
 
         var purchaseContents = (await purchaseRepository
                 .GetPurchaseContentForUpdate(purchaseId, true, cancellationToken))
