@@ -64,15 +64,14 @@ public class CreatePurchaseTests : IAsyncLifetime
     [Fact]
     public async Task CreatePurchase_WithValidData_Succeeds()
     {
-        var content = new List<NewPurchaseContentDto>
+        var content = new List<(NewPurchaseContentDto, int?)>
         {
-            new()
+            (new NewPurchaseContentDto
             {
                 ArticleId = _article.Id,
                 Count = 10,
                 Price = 100.50m,
-                StorageContentId = _storageContent.Id
-            }
+            }, _storageContent.Id)
         };
 
         var command = new CreatePurchaseCommand(content, _currency.Id, "Test Comment",
@@ -101,15 +100,14 @@ public class CreatePurchaseTests : IAsyncLifetime
     [InlineData(-1)]
     public async Task CreatePurchase_WithInvalidPrice_ThrowsValidationException(decimal price)
     {
-        var content = new List<NewPurchaseContentDto>
+        var content = new List<(NewPurchaseContentDto, int?)>
         {
-            new()
+            (new NewPurchaseContentDto
             {
                 ArticleId = _article.Id,
                 Count = 10,
                 Price = price,
-                StorageContentId = _storageContent.Id
-            }
+            }, _storageContent.Id)
         };
 
         var command = new CreatePurchaseCommand(content, _currency.Id, "Test Comment",
@@ -123,15 +121,14 @@ public class CreatePurchaseTests : IAsyncLifetime
     [InlineData(-1)]
     public async Task CreatePurchase_WithInvalidCount_ThrowsValidationException(int count)
     {
-        var content = new List<NewPurchaseContentDto>
+        var content = new List<(NewPurchaseContentDto, int?)>
         {
-            new()
+            (new NewPurchaseContentDto
             {
                 ArticleId = _article.Id,
                 Count = count,
                 Price = 100.50m,
-                StorageContentId = _storageContent.Id
-            }
+            }, _storageContent.Id)
         };
 
         var command = new CreatePurchaseCommand(content, _currency.Id, "Test Comment",
@@ -143,15 +140,14 @@ public class CreatePurchaseTests : IAsyncLifetime
     [Fact]
     public async Task CreatePurchase_WithNonExistentStorage_ThrowsDbValidationException()
     {
-        var content = new List<NewPurchaseContentDto>
+        var content = new List<(NewPurchaseContentDto, int?)>
         {
-            new()
+            (new NewPurchaseContentDto
             {
                 ArticleId = _article.Id,
                 Count = 10,
                 Price = 100.50m,
-                StorageContentId = _storageContent.Id
-            }
+            }, _storageContent.Id)
         };
 
         var command = new CreatePurchaseCommand(content, _currency.Id, "Test Comment",
@@ -164,15 +160,14 @@ public class CreatePurchaseTests : IAsyncLifetime
     [Fact]
     public async Task CreatePurchase_WithNonExistentArticle_ThrowsDbValidationException()
     {
-        var content = new List<NewPurchaseContentDto>
+        var content = new List<(NewPurchaseContentDto, int?)>
         {
-            new()
+            (new NewPurchaseContentDto
             {
                 ArticleId = 999999,
                 Count = 10,
                 Price = 100.50m,
-                StorageContentId = _storageContent.Id
-            }
+            }, _storageContent.Id)
         };
 
         var command = new CreatePurchaseCommand(content, _currency.Id, "Test Comment",

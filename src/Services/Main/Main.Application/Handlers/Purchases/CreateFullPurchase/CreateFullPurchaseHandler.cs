@@ -158,10 +158,11 @@ public class CreateFullPurchaseHandler(IMediator mediator, IPublishEndpoint publ
         Guid supplierId, Guid whoCreated, Guid transactionId, string storageName, DateTime dateTime,
         CancellationToken cancellationToken = default)
     {
-        for (int i = 0; i < storageContents.Count; i++)
-            content[i].StorageContentId = storageContents[i].Id;
-        
-        var command = new CreatePurchaseCommand(content, currencyId, comment, whoCreated, transactionId, 
+        List<(NewPurchaseContentDto, int?)> pContent = content
+            .Select((t, i) => (t, (int?)storageContents[i].Id))
+            .ToList();
+
+        var command = new CreatePurchaseCommand(pContent, currencyId, comment, whoCreated, transactionId, 
             storageName, supplierId, dateTime);
         var result = await mediator.Send(command, cancellationToken);
         return result.Purchase;

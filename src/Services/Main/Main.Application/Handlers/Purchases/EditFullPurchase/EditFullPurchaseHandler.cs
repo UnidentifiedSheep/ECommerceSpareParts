@@ -74,17 +74,22 @@ public class EditFullPurchaseHandler(IMediator mediator, IPurchaseRepository pur
 
         foreach (var (articleId, pricesList) in values)
         foreach (var (price, count) in pricesList)
-            if (count > 0)
-                returnedToStorage.Add(new NewStorageContentDto
-                {
-                    ArticleId = articleId,
-                    BuyPrice = price,
-                    Count = count,
-                    CurrencyId = currencyId
-                });
-            else if (count < 0)
-                takenFromStorage[articleId] = takenFromStorage.GetValueOrDefault(articleId) + -count;
-
+            switch (count)
+            {
+                case > 0:
+                    returnedToStorage.Add(new NewStorageContentDto
+                    {
+                        ArticleId = articleId,
+                        BuyPrice = price,
+                        Count = count,
+                        CurrencyId = currencyId
+                    });
+                    break;
+                case < 0:
+                    takenFromStorage[articleId] = takenFromStorage.GetValueOrDefault(articleId) + -count;
+                    break;
+            }
+        
         var returnToStorageCommand = new AddContentCommand(returnedToStorage, storageName, whoUpdated,
             StorageMovementType.PurchaseEditing);
         var takeFromStorageCommand = new RemoveContentCommand(takenFromStorage, whoUpdated, storageName, false,

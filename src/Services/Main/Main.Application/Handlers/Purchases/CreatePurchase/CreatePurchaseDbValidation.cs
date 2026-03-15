@@ -13,11 +13,11 @@ public class CreatePurchaseDbValidation : AbstractDbValidation<CreatePurchaseCom
             .ValidateCurrencyExistsId(request.CurrencyId)
             .ValidateTransactionExistsId(request.TransactionId)
             .ValidateStorageExistsName(request.StorageName)
-            .ValidateArticleExistsId(request.Content.Select(x => x.ArticleId).ToHashSet());
+            .ValidateArticleExistsId(request.Content.Select(x => x.content.ArticleId).ToHashSet());
         
         var storageContentIds = request.Content
-            .Where(x => x.StorageContentId != null)
-            .Select(x => x.StorageContentId!.Value).ToHashSet();
+            .Where(x => x.storageContentId != null)
+            .Select(x => x.storageContentId!.Value).ToHashSet();
 
         if (storageContentIds.Count > 0)
             plan.ValidateStorageContentExistsId(storageContentIds);

@@ -10,7 +10,7 @@ using Mapster;
 namespace Main.Application.Handlers.Purchases.CreatePurchase;
 
 [Transactional]
-public record CreatePurchaseCommand(IEnumerable<NewPurchaseContentDto> Content, 
+public record CreatePurchaseCommand(IEnumerable<(NewPurchaseContentDto content, int? storageContentId)> Content, 
     int CurrencyId, string? Comment, Guid CreatedUserId, Guid TransactionId, string StorageName, Guid SupplierId,
     DateTime PurchaseDateTime) : ICommand<CreatePurchaseResult>;
 
@@ -27,7 +27,11 @@ public class CreatePurchaseHandler(IUnitOfWork unitOfWork) : ICommandHandler<Cre
         var storageName = request.StorageName;
         var transactionId = request.TransactionId;
 
-        var purchaseContents = content.Adapt<List<PurchaseContent>>();
+        var purchaseContents = content.Select(x => x.content)
+            .Adapt<List<PurchaseContent>>();
+        for (int i = 0; i < purchaseContents.Count; i++)
+            purchaseContents[i].StorageContentId = content[i].storageContentId;
+        
         var purchaseModel = new Purchase
         {
             CurrencyId = currencyId,
