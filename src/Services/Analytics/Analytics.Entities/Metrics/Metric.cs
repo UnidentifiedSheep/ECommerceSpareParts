@@ -10,9 +10,9 @@ public abstract partial class Metric
 {
     public Guid Id { get; set; }
 
-    public int CurrencyId { get; set; }
+    public int CurrencyId { get; protected set; }
 
-    public Guid CreatedBy { get; set; }
+    public Guid CreatedBy { get; protected set; }
 
     public DateTime CreatedAt { get; protected set; } = DateTime.UtcNow;
     
@@ -24,7 +24,7 @@ public abstract partial class Metric
 
     public string Discriminator { get; protected set; } = null!;
     
-    public bool NeedsRecalculation { get; protected set; }
+    public RecalculationTags Tags { get; protected set; }
 
     public string DimensionKey { get; protected set; }
 
@@ -33,7 +33,7 @@ public abstract partial class Metric
     public abstract DependsOn DependsOn { get; protected set; }
 
     public string? Json { get; protected set; }
-    public virtual Currency Currency { get; set; } = null!;
+    public virtual Currency Currency { get; protected set; } = null!;
     
     protected Metric()
     {
@@ -44,6 +44,12 @@ public abstract partial class Metric
     {
         DimensionKey = dimensionKey;
         DimensionHash = ComputeHash(DimensionKey);
+    }
+
+    public void SetCalculated()
+    {
+        RecalculatedAt = DateTime.UtcNow;
+        Tags = RecalculationTags.None;
     }
     
     private static byte[] ComputeHash(string key)

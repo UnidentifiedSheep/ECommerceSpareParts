@@ -88,8 +88,9 @@ public partial class DContext : DbContext
             entity.Property(e => e.Id)
                 .HasDefaultValueSql("gen_random_uuid()")
                 .HasColumnName("id");
-            entity.Property(e => e.NeedsRecalculation)
-                .HasColumnName("needs_recalculation")
+            entity.Property(e => e.Tags)
+                .HasColumnName("tags")
+                .HasConversion<long>()
                 .HasDefaultValue(false);
             entity.Property(m => m.DependsOn)
                 .HasConversion<long>()

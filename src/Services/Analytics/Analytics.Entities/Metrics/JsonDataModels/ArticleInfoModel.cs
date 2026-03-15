@@ -6,6 +6,8 @@ public class ArticleInfoModel
 {
     [JsonPropertyName("price_info")]
     public required PriceInfoModel PriceInfo { get; set; }
+    [JsonPropertyName("timer")]
+    public required MetricTimer Timer { get; set; }
     [JsonPropertyName("quantity")]
     public int Quantity { get; set; }
     [JsonPropertyName("total_amount")]
