@@ -37,13 +37,13 @@ public class DeleteFullPurchaseHandler(IPurchaseRepository purchaseRepository, I
         CancellationToken cancellationToken = default)
     {
         var command = new DeleteTransactionCommand(transactionId, whoDeleted, true);
-        await mediator.Publish(command, cancellationToken);
+        await mediator.Send(command, cancellationToken);
     }
 
     private async Task DeletePurchase(string purchaseId, CancellationToken cancellationToken = default)
     {
         var command = new DeletePurchaseCommand(purchaseId);
-        await mediator.Publish(command, cancellationToken);
+        await mediator.Send(command, cancellationToken);
     }
 
     private async Task RemoveContentFromStorage(List<PurchaseContent> purchaseContents, Guid whoRemoved,
@@ -58,6 +58,6 @@ public class DeleteFullPurchaseHandler(IPurchaseRepository purchaseRepository, I
             );
         var command = new RemoveContentCommand(toRemoveFromStorage, whoRemoved, storageName, false,
             StorageMovementType.PurchaseDeletion);
-        await mediator.Publish(command, cancellationToken);
+        await mediator.Send(command, cancellationToken);
     }
 }
