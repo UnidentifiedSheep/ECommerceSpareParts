@@ -16,8 +16,10 @@ namespace Main.Application.Handlers.Purchases.DeleteFullPurchase;
 [Transactional(IsolationLevel.Serializable, 20, 2)]
 public record DeleteFullPurchaseCommand(string PurchaseId, Guid WhoDeleted) : ICommand;
 
-public class DeleteFullPurchaseHandler(IPurchaseRepository purchaseRepository, IMediator mediator)
-    : ICommandHandler<DeleteFullPurchaseCommand>
+public class DeleteFullPurchaseHandler(
+    IPurchaseRepository purchaseRepository, 
+    IPurchaseLogisticsRepository purchaseLogisticsRepository, 
+    IMediator mediator) : ICommandHandler<DeleteFullPurchaseCommand>
 {
     private static readonly QueryOptions<PurchaseContent> ContentOptions = new QueryOptions<PurchaseContent>()
         .WithTracking()
@@ -30,6 +32,9 @@ public class DeleteFullPurchaseHandler(IPurchaseRepository purchaseRepository, I
                            QueryPresets.TrackForUpdate, 
                            cancellationToken)
                        ?? throw new PurchaseNotFoundException(purchaseId);
+        var purchaseLogistics = await purchaseLogisticsRepository
+            .GetPurchaseLogistics(purchaseId, QueryPresets.Track, token: cancellationToken);
+        
         var purchaseContents = (await purchaseRepository.GetPurchaseContent(purchaseId,
             ContentOptions, cancellationToken)).ToList();
 
@@ -37,6 +42,9 @@ public class DeleteFullPurchaseHandler(IPurchaseRepository purchaseRepository, I
         await DeletePurchase(purchaseId, cancellationToken);
         await DeleteTransaction(purchase.TransactionId, request.WhoDeleted, cancellationToken);
 
+        if (purchaseLogistics?.TransactionId != null)
+            await DeleteTransaction(purchaseLogistics.TransactionId.Value, request.WhoDeleted, cancellationToken);
+        
         return Unit.Value;
     }
 
