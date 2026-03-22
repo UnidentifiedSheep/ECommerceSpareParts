@@ -42,7 +42,7 @@ public class PurchaseTestContext(DContext ctx, IMediator mediator) : SystemUserT
         await DbContext.CreateStorageRoutes(
             StorageFrom.Name, 
             StorageTo.Name, 
-            users.Select(x => x.Id), 
+            Carrier.Id, 
             [Currency.Id]);
 
         await base.InitializeAsync(cancellationToken);
