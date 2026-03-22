@@ -40,8 +40,8 @@ public class PurchaseTestContext(DContext ctx, IMediator mediator) : SystemUserT
         
         await DbContext.AddStorageToUser(Supplier, StorageFrom);
         await DbContext.CreateStorageRoutes(
-            1, 
-            storageNames, 
+            StorageFrom.Name, 
+            StorageTo.Name, 
             users.Select(x => x.Id), 
             [Currency.Id]);
 

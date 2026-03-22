@@ -23,20 +23,17 @@ public static class StorageRouteFactory
     
     public static List<StorageRoute> Create(int count) =>  Faker.Generate(count);
 
-    public static List<StorageRoute> Create(int count, IEnumerable<string> storageNames, IEnumerable<Guid> userIds,
+    public static StorageRoute Create(string storageFrom, string storageTo, IEnumerable<Guid> userIds,
         IEnumerable<int> currencyIds)
     {
         var clone = Faker.Clone()
-            .RuleFor(x => x.FromStorageName, f => f.PickRandom(storageNames))
+            .RuleFor(x => x.IsActive, true)
+            .RuleFor(x => x.FromStorageName, storageFrom)
             .RuleFor(x => x.CarrierId, f => f.PickRandom(userIds))
             .RuleFor(x => x.CurrencyId, f => f.PickRandom(currencyIds))
-            .FinishWith((f, d) =>
-            {
-                var exceptStorageName = storageNames.ToList();
-                exceptStorageName.Remove(d.FromStorageName);
-                d.ToStorageName = f.PickRandom(exceptStorageName);
-            });
+            .RuleFor(x => x.ToStorageName, storageTo)
+            .RuleFor(x => x.PricingModel, LogisticPricingType.PerArea);
         
-        return clone.Generate(count);
+        return clone.Generate();
     }
 }

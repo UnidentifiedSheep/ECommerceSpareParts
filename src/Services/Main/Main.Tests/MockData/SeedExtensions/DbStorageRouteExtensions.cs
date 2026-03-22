@@ -6,21 +6,10 @@ namespace Tests.MockData.SeedExtensions;
 
 public static class DbStorageRouteExtensions
 {
-    /// <summary>
-    /// Generates 1 active and other not active storage routes.
-    /// </summary>
-    /// <param name="context"></param>
-    /// <param name="count"></param>
-    /// <param name="storageNames"></param>
-    /// <param name="userIds"></param>
-    /// <param name="currencyIds"></param>
-    /// <returns></returns>
-    public static async Task<List<StorageRoute>> CreateStorageRoutes(this DContext context, int count, 
-        IEnumerable<string> storageNames, IEnumerable<Guid> userIds, IEnumerable<int> currencyIds)
+    public static async Task<StorageRoute> CreateStorageRoutes(this DContext context, 
+        string storageFrom, string storageTo, IEnumerable<Guid> userIds, IEnumerable<int> currencyIds)
     {
-        var routes = StorageRouteFactory.Create(count, storageNames, userIds, currencyIds);
-        routes.First().IsActive = true;
-        for (int i = 1; i < routes.Count; i++) routes[i].IsActive = false;
+        var routes = StorageRouteFactory.Create(storageFrom, storageTo, userIds, currencyIds);
         
         await context.AddRangeAsync(routes);
         await context.SaveChangesAsync();
