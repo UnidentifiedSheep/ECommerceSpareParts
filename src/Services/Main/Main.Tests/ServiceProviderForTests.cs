@@ -13,6 +13,7 @@ using Security;
 using Serilog;
 using Tests.MockData;
 using Tests.Stubs;
+using Tests.TestContexts;
 using ApplicationServiceProvider = Main.Application.ServiceProvider;
 using CacheServiceProvider = Redis.ServiceProvider;
 using ServiceProvider = Microsoft.Extensions.DependencyInjection.ServiceProvider;
@@ -34,6 +35,8 @@ public static class ServiceProviderForTests
 
         var services = new ServiceCollection();
 
+        services.AddTestContexts();
+        
         services.AddLogging();
         Log.Logger = new LoggerConfiguration()
             .MinimumLevel.Debug()
@@ -75,5 +78,10 @@ public static class ServiceProviderForTests
 
         await context.AddMockCurrencies();
         await currencyConverterSetup.InitializeAsync();
+    }
+
+    private static void AddTestContexts(this IServiceCollection services)
+    {
+        services.AddScoped<PurchaseTestContext>();
     }
 }
