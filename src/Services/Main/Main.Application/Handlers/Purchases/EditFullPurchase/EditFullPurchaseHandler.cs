@@ -4,6 +4,7 @@ using Abstractions.Models.Command;
 using Abstractions.Models.Repository;
 using Application.Common.Interfaces;
 using Attributes;
+using Contracts.Purchase;
 using Exceptions.Exceptions.Purchase;
 using Main.Abstractions.Dtos.Amw.Purchase;
 using Main.Abstractions.Dtos.Amw.Storage;
@@ -19,7 +20,11 @@ using Main.Application.Handlers.StorageContents.AddContent;
 using Main.Application.Handlers.StorageContents.RemoveContent;
 using Main.Entities;
 using Main.Enums;
+using Mapster;
+using MassTransit;
 using MediatR;
+
+using ContractPurchase = Contracts.Models.Purchase.Purchase;
 
 namespace Main.Application.Handlers.Purchases.EditFullPurchase;
 
@@ -34,8 +39,12 @@ public record EditFullPurchaseCommand(
     bool WithLogistics,
     string? StorageFrom) : ICommand;
 
-public class EditFullPurchaseHandler(IMediator mediator, IPurchaseRepository purchaseRepository, 
-    IUnitOfWork unitOfWork, IPurchaseService purchaseService) : ICommandHandler<EditFullPurchaseCommand>
+public class EditFullPurchaseHandler(
+    IMediator mediator, 
+    IPurchaseRepository purchaseRepository, 
+    IUnitOfWork unitOfWork, 
+    IPublishEndpoint publishEndpoint,
+    IPurchaseService purchaseService) : ICommandHandler<EditFullPurchaseCommand>
 {
     public async Task<Unit> Handle(EditFullPurchaseCommand request, CancellationToken cancellationToken)
     {
@@ -83,6 +92,11 @@ public class EditFullPurchaseHandler(IMediator mediator, IPurchaseRepository pur
 
         await purchaseService.AddLogisticsContentToPurchase(content, contents, deliveryCost, cancellationToken);
 
+        await publishEndpoint.Publish(new PurchaseUpdateEvent()
+        {
+            Purchase = purchase.Adapt<ContractPurchase>()
+        }, cancellationToken);
+        
         await unitOfWork.SaveChangesAsync(cancellationToken);
         
         return Unit.Value;

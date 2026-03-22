@@ -1,7 +1,9 @@
 using System.Data;
+using Abstractions.Interfaces.Services;
 using Abstractions.Models.Repository;
 using Application.Common.Interfaces;
 using Attributes;
+using Contracts.Purchase;
 using Exceptions.Exceptions.Purchase;
 using Main.Abstractions.Interfaces.DbRepositories;
 using Main.Application.Handlers.Balance.DeleteTransaction;
@@ -9,7 +11,11 @@ using Main.Application.Handlers.Purchases.DeletePurchase;
 using Main.Application.Handlers.StorageContents.RemoveContent;
 using Main.Entities;
 using Main.Enums;
+using Mapster;
+using MassTransit;
 using MediatR;
+
+using ContractPurchase = Contracts.Models.Purchase.Purchase;
 
 namespace Main.Application.Handlers.Purchases.DeleteFullPurchase;
 
@@ -18,7 +24,9 @@ public record DeleteFullPurchaseCommand(string PurchaseId, Guid WhoDeleted) : IC
 
 public class DeleteFullPurchaseHandler(
     IPurchaseRepository purchaseRepository, 
-    IPurchaseLogisticsRepository purchaseLogisticsRepository, 
+    IPurchaseLogisticsRepository purchaseLogisticsRepository,
+    IUnitOfWork unitOfWork,
+    IPublishEndpoint publishEndpoint,
     IMediator mediator) : ICommandHandler<DeleteFullPurchaseCommand>
 {
     private static readonly QueryOptions<PurchaseContent> ContentOptions = new QueryOptions<PurchaseContent>()
@@ -44,6 +52,13 @@ public class DeleteFullPurchaseHandler(
 
         if (purchaseLogistics?.TransactionId != null)
             await DeleteTransaction(purchaseLogistics.TransactionId.Value, request.WhoDeleted, cancellationToken);
+        
+        await publishEndpoint.Publish(new PurchaseDeleteEvent
+        {
+            Purchase = purchase.Adapt<ContractPurchase>()
+        }, cancellationToken);
+        
+        await unitOfWork.SaveChangesAsync(cancellationToken);
         
         return Unit.Value;
     }
