@@ -1,4 +1,4 @@
-using System.Linq.Expressions;
+using Abstractions.Models.Repository;
 using Extensions;
 using Main.Abstractions.Interfaces.DbRepositories;
 using Main.Entities;
@@ -12,21 +12,21 @@ namespace Main.Persistence.Repositories;
 
 public class PurchaseRepository(DContext context) : IPurchaseRepository
 {
-    public async Task<Purchase?> GetPurchaseForUpdate(string purchaseId, bool track = true,
+    public async Task<Purchase?> GetPurchase(string purchaseId, QueryOptions? config = null,
         CancellationToken cancellationToken = default)
     {
         return await context.Purchases
-            .FromSql($"select * from purchase where id = {purchaseId} for update")
-            .ConfigureTracking(track)
+            .Where(x => x.Id == purchaseId)
+            .ApplyOptions(config)
             .FirstOrDefaultAsync(cancellationToken);
     }
 
-    public async Task<IEnumerable<PurchaseContent>> GetPurchaseContentForUpdate(string purchaseId, bool track = true,
+    public async Task<IEnumerable<PurchaseContent>> GetPurchaseContent(string purchaseId, QueryOptions? config = null,
         CancellationToken cancellationToken = default)
     {
         return await context.PurchaseContents
-            .FromSql($"select * from purchase_content where purchase_id = {purchaseId} for update")
-            .ConfigureTracking(track)
+            .Where(x => x.PurchaseId == purchaseId)
+            .ApplyOptions(config)
             .ToListAsync(cancellationToken);
     }
 
@@ -70,17 +70,14 @@ public class PurchaseRepository(DContext context) : IPurchaseRepository
         return result;
     }
 
-    public async Task<IEnumerable<PurchaseContent>> GetPurchaseContent(string purchaseId, bool track = true,
-        CancellationToken cancellationToken = default, params Expression<Func<PurchaseContent, object?>>[] includes)
+    public async Task<IEnumerable<PurchaseContent>> GetPurchaseContentWithArticleData(string purchaseId, QueryOptions? config = null,
+        CancellationToken cancellationToken = default)
     {
-        var query = context.PurchaseContents.ConfigureTracking(track)
+        return await context.PurchaseContents
+            .Where(x => x.PurchaseId == purchaseId)
             .Include(x => x.Article)
             .ThenInclude(x => x.Producer)
-            .Where(x => x.PurchaseId == purchaseId);
-
-        foreach (var include in includes)
-            query = query.Include(include);
-        
-        return await query.ToListAsync(cancellationToken);
+            .ApplyOptions(config)
+            .ToListAsync(cancellationToken);
     }
 }

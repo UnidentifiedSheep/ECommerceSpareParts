@@ -1,4 +1,5 @@
 using Abstractions.Interfaces.Services;
+using Abstractions.Models.Repository;
 using Application.Common.Interfaces;
 using Attributes;
 using Exceptions.Exceptions.Purchase;
@@ -24,6 +25,9 @@ public record EditPurchaseResult(Dictionary<int, Dictionary<decimal, int>> Edite
 public class EditPurchaseHandler(IPurchaseRepository purchaseRepository, IUnitOfWork unitOfWork) 
     : ICommandHandler<EditPurchaseCommand, EditPurchaseResult>
 {
+    private static readonly QueryOptions<PurchaseContent> ContentOptions = new QueryOptions<PurchaseContent>()
+        .WithForUpdate()
+        .WithTracking();
     public async Task<EditPurchaseResult> Handle(EditPurchaseCommand request, CancellationToken cancellationToken)
     {
         var purchaseId = request.PurchaseId;
@@ -34,11 +38,13 @@ public class EditPurchaseHandler(IPurchaseRepository purchaseRepository, IUnitOf
         var result = new Dictionary<int, Dictionary<decimal, int>>();
         var content = request.Content.ToList();
 
-        var purchase = await purchaseRepository.GetPurchaseForUpdate(purchaseId, true, cancellationToken)
-                       ?? throw new PurchaseNotFoundException(purchaseId);
+        var purchase = await purchaseRepository.GetPurchase(
+                           purchaseId,
+                           QueryPresets.TrackForUpdate,
+                           cancellationToken) ?? throw new PurchaseNotFoundException(purchaseId);
 
         var purchaseContents = (await purchaseRepository
-                .GetPurchaseContentForUpdate(purchaseId, true, cancellationToken))
+                .GetPurchaseContent(purchaseId, ContentOptions, cancellationToken))
             .ToDictionary(x => x.Id);
 
         var existingIds = content.Where(x => x.Id != null)
@@ -83,6 +89,8 @@ public class EditPurchaseHandler(IPurchaseRepository purchaseRepository, IUnitOf
                 if (!result[item.ArticleId].TryAdd(item.Price, delta))
                     result[item.ArticleId][item.Price] += delta;
             }
+            
+            existingContent.PurchaseId = purchaseId;
         }
 
         foreach (var kv in result.ToList())

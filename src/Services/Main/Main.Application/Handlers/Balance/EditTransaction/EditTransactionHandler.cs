@@ -18,12 +18,14 @@ public record EditTransactionCommand(
     int CurrencyId,
     decimal Amount,
     TransactionStatus Status,
-    DateTime TransactionDateTime) : ICommand;
+    DateTime TransactionDateTime) : ICommand<EditTransactionResult>;
+
+public record EditTransactionResult(Transaction Transaction);
 
 public class EditTransactionHandler(IBalanceRepository balanceRepository, IBalanceService balanceService,
-    IUnitOfWork unitOfWork) : ICommandHandler<EditTransactionCommand>
+    IUnitOfWork unitOfWork) : ICommandHandler<EditTransactionCommand, EditTransactionResult>
 {
-    public async Task<Unit> Handle(EditTransactionCommand request, CancellationToken cancellationToken)
+    public async Task<EditTransactionResult> Handle(EditTransactionCommand request, CancellationToken cancellationToken)
     {
         var transaction = await GetAndValidateTransactionAsync(request, cancellationToken);
         await CreateTransactionVersionAsync(transaction, cancellationToken);
@@ -35,7 +37,7 @@ public class EditTransactionHandler(IBalanceRepository balanceRepository, IBalan
         await ApplyNewTransactionVersionAsync(transaction, cancellationToken);
 
         await unitOfWork.SaveChangesAsync(cancellationToken);
-        return Unit.Value;
+        return new EditTransactionResult(transaction);
     }
 
     private async Task<Transaction> GetAndValidateTransactionAsync(EditTransactionCommand request, CancellationToken ct)

@@ -14,17 +14,19 @@ namespace Main.Application.Handlers.Balance.DeleteTransaction;
 
 [Transactional(IsolationLevel.Serializable, 20, 3)]
 public record DeleteTransactionCommand(Guid TransactionId, Guid WhoDeleteUserId, bool IsSystem = false)
-    : ICommand<Unit>;
+    : ICommand<DeleteTransactionResult>;
+
+public record DeleteTransactionResult(Transaction Transaction);
 
 public class DeleteTransactionHandler(IBalanceRepository balanceRepository, IUnitOfWork unitOfWork,
-    IBalanceService balanceService) : ICommandHandler<DeleteTransactionCommand, Unit>
+    IBalanceService balanceService) : ICommandHandler<DeleteTransactionCommand, DeleteTransactionResult>
 {
     private static readonly ImmutableHashSet<TransactionStatus> AllowedStatuses =
     [
         TransactionStatus.Normal
     ];
 
-    public async Task<Unit> Handle(DeleteTransactionCommand request, CancellationToken cancellationToken)
+    public async Task<DeleteTransactionResult> Handle(DeleteTransactionCommand request, CancellationToken cancellationToken)
     {
         var transactionId = request.TransactionId;
         var whoDelete = request.WhoDeleteUserId;
@@ -40,7 +42,7 @@ public class DeleteTransactionHandler(IBalanceRepository balanceRepository, IUni
         await balanceService.RecalculateBalanceAsync(transaction, transaction.Id, cancellationToken);
 
         await unitOfWork.SaveChangesAsync(cancellationToken);
-        return Unit.Value;
+        return new DeleteTransactionResult(transaction);
     }
 
     private void CheckTransaction(Transaction transaction, bool isSystem)

@@ -1,4 +1,5 @@
 ﻿using System.Linq.Expressions;
+using Abstractions.Models.Repository;
 using Main.Abstractions.Interfaces.DbRepositories;
 using Main.Entities;
 using Main.Persistence.Context;
@@ -17,15 +18,12 @@ public class PurchaseLogisticsRepository(DContext context) : IPurchaseLogisticsR
             .ToListAsync(token);
     }
 
-    public async Task<PurchaseLogistic?> GetPurchaseLogistics(string id, bool track = true, CancellationToken token = default,
-        params Expression<Func<PurchaseLogistic, object?>>[] includes)
+    public async Task<PurchaseLogistic?> GetPurchaseLogistics(string id, QueryOptions? config = null, 
+        CancellationToken token = default)
     {
-        var query = context.PurchaseLogistics.ConfigureTracking(track)
-            .Where(x => x.PurchaseId == id);
-
-        foreach (var include in includes)
-            query = query.Include(include);
-        
-        return await query.FirstOrDefaultAsync(token);
+        return await context.PurchaseLogistics
+            .ApplyOptions(config)
+            .Where(x => x.PurchaseId == id)
+            .FirstOrDefaultAsync(token);
     }
 }

@@ -2,11 +2,11 @@
 using BulkValidation.Core.Interfaces;
 using Main.Entities;
 
-namespace Main.Application.Handlers.Purchases.AddLogisticsToPurchase;
+namespace Main.Application.Handlers.Purchases.UpsertLogisticsToPurchase;
 
-public class AddLogisticsToPurchaseDbValidation : AbstractDbValidation<AddLogisticsToPurchaseCommand>
+public class UpsertPurchaseLogisticsDbValidation : AbstractDbValidation<UpsertPurchaseLogisticsCommand>
 {
-    public override void Build(IValidationPlan plan, AddLogisticsToPurchaseCommand request)
+    public override void Build(IValidationPlan plan, UpsertPurchaseLogisticsCommand request)
     {
         plan.ValidatePurchaseExistsId(request.PurchaseId);
         if (request.TransactionId != null)

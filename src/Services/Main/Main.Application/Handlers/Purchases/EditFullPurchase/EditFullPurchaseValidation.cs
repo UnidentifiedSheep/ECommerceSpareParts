@@ -19,5 +19,10 @@ public class EditFullPurchaseValidation : AbstractValidator<EditFullPurchaseComm
 
         RuleFor(x => x.Content)
             .SetValidator(new EditPurchaseDtoValidation());
+        
+        RuleFor(x => x.StorageFrom)
+            .Must(x => x != null)
+            .When(x => x.WithLogistics)
+            .WithMessage("При создании закупки с логистикой, склад отправителя должен быть указан");
     }
 }

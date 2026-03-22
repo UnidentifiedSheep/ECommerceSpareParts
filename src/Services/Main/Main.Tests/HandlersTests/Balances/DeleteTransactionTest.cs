@@ -1,6 +1,5 @@
 using Exceptions.Exceptions.Balances;
 using FluentValidation;
-using Main.Application.Configs;
 using Main.Application.Configs.Mapster;
 using Main.Application.Handlers.Balance.DeleteTransaction;
 using Main.Entities;
@@ -78,8 +77,7 @@ public class DeleteTransactionTest : IAsyncLifetime
     public async Task DeleteTransaction_Normal_Succeeds()
     {
         var command = new DeleteTransactionCommand(_transaction.Id, _mockUser.Id);
-        var result = await _mediator.Send(command);
-        Assert.Equal(result, Unit.Value);
+        await _mediator.Send(command);
 
         var transactions = await _context.Transactions
             .AsNoTracking()

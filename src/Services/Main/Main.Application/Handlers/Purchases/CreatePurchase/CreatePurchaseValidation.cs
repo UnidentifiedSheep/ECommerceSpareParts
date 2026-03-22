@@ -18,7 +18,11 @@ public class CreatePurchaseValidator : AbstractValidator<CreatePurchaseCommand>
             .WithMessage("Id пользователя создавшего закупку не может быть пустым");
 
         RuleForEach(x => x.Content)
-            .SetValidator(new NewPurchaseContentValidation());
+            .ChildRules(z =>
+            {
+                z.RuleFor(x => x.content)
+                    .SetValidator(new NewPurchaseContentValidation());
+            });
 
         RuleFor(x => x.PurchaseDateTime)
             .SetValidator(new PurchaseDateTimeValidator());

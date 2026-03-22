@@ -4,17 +4,16 @@ using Application.Common.Interfaces;
 using Attributes;
 using Contracts.Articles;
 using Contracts.Purchase;
-using Extensions;
 using Main.Abstractions.Dtos.Amw.Logistics;
 using Main.Abstractions.Dtos.Amw.Purchase;
 using Main.Abstractions.Dtos.Amw.Storage;
 using Main.Abstractions.Dtos.Amw.StorageRoutes;
+using Main.Abstractions.Interfaces.Services;
 using Main.Application.Extensions;
 using Main.Application.Handlers.Balance.CreateTransaction;
 using Main.Application.Handlers.Logistics.CalculateDeliveryCost;
-using Main.Application.Handlers.Purchases.AddContentLogisticsToPurchase;
-using Main.Application.Handlers.Purchases.AddLogisticsToPurchase;
 using Main.Application.Handlers.Purchases.CreatePurchase;
+using Main.Application.Handlers.Purchases.UpsertLogisticsToPurchase;
 using Main.Application.Handlers.StorageContents.AddContent;
 using Main.Entities;
 using Main.Enums;
@@ -38,7 +37,8 @@ public record CreateFullPurchaseCommand(
     bool WithLogistics,
     string? StorageFrom) : ICommand;
 
-public class CreateFullPurchaseHandler(IMediator mediator, IPublishEndpoint publishEndpoint, IUnitOfWork unitOfWork) 
+public class CreateFullPurchaseHandler(IMediator mediator, IPublishEndpoint publishEndpoint, IUnitOfWork unitOfWork, 
+    IPurchaseService purchaseService) 
     : ICommandHandler<CreateFullPurchaseCommand>
 {
     public async Task<Unit> Handle(CreateFullPurchaseCommand request, CancellationToken cancellationToken)
@@ -68,7 +68,8 @@ public class CreateFullPurchaseHandler(IMediator mediator, IPublishEndpoint publ
 
         if (!request.WithLogistics) return Unit.Value;
         
-        var (usedRoute, deliveryCost) = await CalculateDeliveryCost(request.StorageFrom!, storageName, content, cancellationToken);
+        var (usedRoute, deliveryCost) = await purchaseService.CalculateDeliveryCost(content, request.StorageFrom!,
+            storageName, x => x.CalculateLogistics, cancellationToken);
         
         Transaction? logisticsTransaction = null;
         if (usedRoute.CarrierId != null)
@@ -78,11 +79,10 @@ public class CreateFullPurchaseHandler(IMediator mediator, IPublishEndpoint publ
                 cancellationToken);
         }
 
-        await AddLogisticsToPurchase(purchase.Id, usedRoute.Id, logisticsTransaction?.Id,
+        await UpsertPurchaseLogistics(purchase.Id, usedRoute.Id, logisticsTransaction?.Id,
             deliveryCost.MinimalPriceApplied, cancellationToken);
             
-        await AddLogisticsContentToPurchase(content, purchase.PurchaseContents, 
-            deliveryCost, cancellationToken);
+        await purchaseService.AddLogisticsContentToPurchase(content, purchase.PurchaseContents, deliveryCost, cancellationToken);
 
         await publishEndpoint.Publish(new ArticleBuyPricesChangedEvent
             {
@@ -98,51 +98,11 @@ public class CreateFullPurchaseHandler(IMediator mediator, IPublishEndpoint publ
         
         return Unit.Value;
     }
-
-    private async Task AddLogisticsContentToPurchase(List<NewPurchaseContentDto> contentDtos, 
-        IEnumerable<PurchaseContent> contents, DeliveryCostDto costs, CancellationToken cancellationToken)
-    {
-        List<PurchaseContentLogisticDto> contentLogistics = [];
-        var contentsList = contents.ToList();
-
-        int costsIndex = 0;
-        for (int i = 0; i < contentDtos.Count; i++)
-        {
-            var dto = contentDtos[i];
-            if (!dto.CalculateLogistics) continue;
-            
-            var content = contentsList[i];
-            var deliveryItemInfo = costs.Items[costsIndex];
-            
-            contentLogistics.Add(new PurchaseContentLogisticDto
-            {
-                PurchaseContentId = content.Id,
-                WeightKg = deliveryItemInfo.Weight.ToKg(deliveryItemInfo.WeightUnit),
-                AreaM3 = deliveryItemInfo.AreaM3,
-                Price = deliveryItemInfo.Cost
-            });
-            costsIndex++;
-        }
-
-        var command = new AddContentLogisticsToPurchaseCommand(contentLogistics);
-        await mediator.Send(command, cancellationToken);
-    }
-    private async Task AddLogisticsToPurchase(string purchaseId, Guid routeId, Guid? transactionId, 
+    private async Task UpsertPurchaseLogistics(string purchaseId, Guid routeId, Guid? transactionId, 
         bool minimumPriceApplied, CancellationToken cancellationToken)
     {
-        var command = new AddLogisticsToPurchaseCommand(purchaseId, routeId, transactionId, minimumPriceApplied);
+        var command = new UpsertPurchaseLogisticsCommand(purchaseId, routeId, transactionId, minimumPriceApplied);
         await mediator.Send(command, cancellationToken);
-    }
-
-    private async Task<(StorageRouteDto usedRoute, DeliveryCostDto deliveryCost)> CalculateDeliveryCost(string storageFrom, 
-        string storageTo, List<NewPurchaseContentDto> content, CancellationToken token)
-    {
-        var items = content.Where(x => x.CalculateLogistics)
-            .Adapt<List<LogisticsItemDto>>();
-
-        var query = new CalculateDeliveryCostQuery(storageFrom, storageTo, items);
-        var result = await mediator.Send(query, token);
-        return (result.Route, result.DeliveryCost);
     }
     private async Task<Transaction> CreateTransaction(Guid senderId, Guid receiverId, decimal amount,
         TransactionStatus status, int currencyId,
@@ -158,10 +118,11 @@ public class CreateFullPurchaseHandler(IMediator mediator, IPublishEndpoint publ
         Guid supplierId, Guid whoCreated, Guid transactionId, string storageName, DateTime dateTime,
         CancellationToken cancellationToken = default)
     {
-        for (int i = 0; i < storageContents.Count; i++)
-            content[i].StorageContentId = storageContents[i].Id;
-        
-        var command = new CreatePurchaseCommand(content, currencyId, comment, whoCreated, transactionId, 
+        List<(NewPurchaseContentDto, int?)> pContent = content
+            .Select((t, i) => (t, (int?)storageContents[i].Id))
+            .ToList();
+
+        var command = new CreatePurchaseCommand(pContent, currencyId, comment, whoCreated, transactionId, 
             storageName, supplierId, dateTime);
         var result = await mediator.Send(command, cancellationToken);
         return result.Purchase;

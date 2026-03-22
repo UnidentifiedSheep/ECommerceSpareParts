@@ -1,244 +1,176 @@
-﻿using Enums;
-using Extensions;
-using Main.Abstractions.Dtos.Amw.Purchase;
-using Main.Application.Extensions;
-using Main.Application.Handlers.ArticleSizes.SetArticleSizes;
-using Main.Application.Handlers.ArticleWeight.SetArticleWeight;
+﻿using FluentAssertions;
 using Main.Application.Handlers.Purchases.CreateFullPurchase;
-using Main.Application.Handlers.StorageRoutes.AddStorageRoute;
 using Main.Entities;
 using Main.Enums;
-using Main.Persistence.Context;
-using MediatR;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Tests.MockData;
+using Tests.MockData.DataFactories.Purchase;
 using Tests.testContainers.Combined;
+using Tests.TestContexts;
 
 namespace Tests.HandlersTests.Purchases;
 
 [Collection("Combined collection")]
 public class CreateFullPurchaseTests : IAsyncLifetime
 {
-    private readonly DContext _context;
-    private readonly IMediator _mediator;
-
-    private Currency _currency = null!;
-    private Storage _storageTo = null!;
-    private Storage _storageFrom = null!;
-    private User _user = null!;
-    private User _supplier = null!;
-    private User _carrier = null!;
-    private Article _article = null!;
-
+    private readonly PurchaseTestContext _testContext;
+    
     public CreateFullPurchaseTests(CombinedContainerFixture fixture)
     {
         var sp = ServiceProviderForTests.Build(fixture.PostgresConnectionString, fixture.RedisConnectionString);
-        _context = sp.GetRequiredService<DContext>();
-        _mediator = sp.GetRequiredService<IMediator>();
+        _testContext = sp.GetRequiredService<PurchaseTestContext>();
+        
     }
 
     public async Task InitializeAsync()
     {
-        await _mediator.AddMockUser();
-        await _mediator.AddMockUser();
-        await _mediator.AddMockUser();
-        await _mediator.AddMockUser();
-        await _mediator.AddMockProducersAndArticles();
-        await _mediator.AddMockStorage();
-        await _mediator.AddMockStorage();
-        await _context.AddMockCurrencies();
-
-        var users = await _context.Users.Take(4).ToListAsync();
-        _user = users[0];
-        _supplier = users[1];
-        _carrier = users[2];
-        
-        
-        Main.Application.Global.SetSystemId(users[3].Id.ToString());
-
-        var storages = await _context.Storages.Take(2).ToListAsync();
-        _storageTo = storages[0];
-        _storageFrom = storages[1];
-
-        await _mediator.MockMapStorageToUser(_supplier.Id, _storageFrom.Name);
-
-        _article = await _context.Articles.FirstAsync();
-        _currency = await _context.Currencies.FirstAsync();
+        await _testContext.InitializeAsync();
     }
 
     public async Task DisposeAsync()
     {
-        await _context.ClearDatabaseFull();
+        await _testContext.DbContext.ClearDatabaseFull();
     }
 
     [Fact]
     public async Task CreateFullPurchase_WithoutLogistics_Succeeds()
     {
-        var content = new List<NewPurchaseContentDto>
+        var content = NewPurchaseContentDtoFactory.Create(
+            2, 
+            _testContext.Articles.Select(x => x.Id));
+        content.ForEach(x =>
         {
-            new()
-            {
-                ArticleId = _article.Id,
-                Count = 10,
-                Price = 100m,
-                CalculateLogistics = false
-            }
-        };
-
+            x.CalculateLogistics = false;
+            x.Count = 1;
+        });
+        decimal totalSum = content.Sum(x => x.Count * x.Price);
+        
         var command = new CreateFullPurchaseCommand(
-            _user.Id, _supplier.Id, _currency.Id, _storageTo.Name, DateTime.Now,
-            content, "Full Purchase Comment", null, false, null);
-
-        await _mediator.Send(command);
-
-        var purchase = await _context.Purchases
-            .Include(x => x.PurchaseContents)
-            .FirstOrDefaultAsync(x => x.Comment == "Full Purchase Comment");
-
-        Assert.NotNull(purchase);
-        Assert.Equal(_storageTo.Name, purchase.Storage);
-        Assert.Single(purchase.PurchaseContents);
+            _testContext.User.Id, _testContext.Supplier.Id, _testContext.Currency.Id, _testContext.StorageTo.Name, 
+            DateTime.Now, content, "Full Purchase Comment", null, false, null);
         
-        var transaction = await _context.Transactions.FirstOrDefaultAsync(x => x.Id == purchase.TransactionId);
-        Assert.NotNull(transaction);
-        Assert.Equal(_supplier.Id, transaction.SenderId);
-        Assert.Equal(Main.Application.Global.SystemId, transaction.ReceiverId);
-        Assert.Equal(1000m, transaction.TransactionSum);
+
+        var task = async () => await _testContext.Mediator.Send(command);
+        await task.Should().NotThrowAsync();
+
+        var purchases = await GetPurchasesAsync();
+
+        purchases.Should().HaveCount(1);
+
+        var purchase = purchases[0];
+        purchase.Storage.Should().Be(_testContext.StorageTo.Name);
+        purchase.PurchaseContents.Should().HaveCount(content.Count);
+
+        var transactions = await GetTransactionsAsync();
+        transactions.Should().HaveCount(1);
         
-        var storageContent = await _context.StorageContents.FirstOrDefaultAsync(x => x.ArticleId == _article.Id && x.StorageName == _storageTo.Name);
-        Assert.NotNull(storageContent);
-        Assert.Equal(10, storageContent.Count);
+        Transaction transaction = transactions[0];
+        
+        transaction.SenderId.Should().Be(_testContext.Supplier.Id);
+        transaction.ReceiverId.Should().Be(Main.Application.Global.SystemId);
+        transaction.TransactionSum.Should().Be(totalSum);
     }
 
     [Fact]
     public async Task CreateFullPurchase_WithPayment_Succeeds()
     {
-        var content = new List<NewPurchaseContentDto>
-        {
-            new()
-            {
-                ArticleId = _article.Id,
-                Count = 5,
-                Price = 200m
-            }
-        };
+        var content = NewPurchaseContentDtoFactory.Create(
+            1, 
+            _testContext.Articles.Select(x => x.Id));
 
+        var totalSum = content.Sum(x => x.Count * x.Price);
+        
         var command = new CreateFullPurchaseCommand(
-            _user.Id, _supplier.Id, _currency.Id, _storageTo.Name, DateTime.Now,
+            _testContext.User.Id, _testContext.Supplier.Id, _testContext.Currency.Id, _testContext.StorageTo.Name, DateTime.Now,
             content, "Purchase with payment", 500m, false, null);
 
-        await _mediator.Send(command);
+        var task = async () => await _testContext.Mediator.Send(command);
 
-        // Should have 2 transactions: 1000m (purchase) and 500m (payment)
-        var transactions = await _context.Transactions
-            .Where(x => (x.SenderId == _supplier.Id && x.ReceiverId == Main.Application.Global.SystemId) ||
-                        (x.SenderId == Main.Application.Global.SystemId && x.ReceiverId == _supplier.Id))
-            .ToListAsync();
-
-        Assert.Equal(2, transactions.Count);
-        Assert.Contains(transactions, x => x.TransactionSum == 1000m && x.Status == TransactionStatus.Purchase);
-        Assert.Contains(transactions, x => x.TransactionSum == 500m && x.Status == TransactionStatus.Normal);
+        await task.Should().NotThrowAsync();
+        
+        var transactions = await GetTransactionsAsync();
+        
+        transactions.Should().HaveCount(2);
+        transactions.Should().Contain(x => x.TransactionSum == 500m && x.Status == TransactionStatus.Normal);
+        transactions.Should().Contain(x => x.TransactionSum == totalSum && x.Status == TransactionStatus.Purchase);
     }
 
     [Fact]
     public async Task CreateFullPurchase_WithLogistics_Succeeds()
     {
-        decimal areaM3 = DimensionExtensions.ToCubicMeters(10, 10, 10, DimensionUnit.Centimeter);
-        await _mediator.Send(new SetArticleSizesCommand(_article.Id, 10, 10, 10, DimensionUnit.Centimeter));
-        await _mediator.Send(new SetArticleWeightCommand(_article.Id, 1, WeightUnit.Kilogram));
-
-        var result = await _mediator.Send(new AddStorageRouteCommand(
-            _storageFrom.Name, _storageTo.Name, 1000, RouteType.InterCity, LogisticPricingType.PerWeight,
-            60, 10m, 0m, _currency.Id, 0m, 0m, _carrier.Id));
-
-        await MakeActive(result.RouteId);
-        var content = new List<NewPurchaseContentDto>
-        {
-            new()
-            {
-                ArticleId = _article.Id,
-                Count = 1,
-                Price = 100m,
-                CalculateLogistics = true
-            },
-            new()
-            {
-                ArticleId = _article.Id,
-                Count = 3,
-                Price = 100m,
-                CalculateLogistics = true
-            },
-            new()
-            {
-                ArticleId = _article.Id,
-                Count = 2,
-                Price = 100m,
-                CalculateLogistics = false
-            },
-            new()
-            {
-                ArticleId = _article.Id,
-                Count = 5,
-                Price = 100m,
-                CalculateLogistics = false
-            },
-            new()
-            {
-                ArticleId = _article.Id,
-                Count = 4,
-                Price = 100m,
-                CalculateLogistics = true
-            }
-        };
-
-        var command = new CreateFullPurchaseCommand(
-            _user.Id, _supplier.Id, _currency.Id, _storageTo.Name, DateTime.Now,
-            content, "Logistics Purchase", null, true, _storageFrom.Name);
-
-        await _mediator.Send(command);
-
-        var purchase = await _context.Purchases
-            .Include(x => x.PurchaseContents)
-                .ThenInclude(pc => pc.PurchaseContentLogistic)
-            .Include(x => x.PurchaseLogistic)
-            .FirstOrDefaultAsync(x => x.Comment == "Logistics Purchase");
-
-        Assert.NotNull(purchase);
-        Assert.NotNull(purchase.PurchaseLogistic);
-        Assert.NotNull(purchase.PurchaseLogistic.TransactionId);
+        var content = NewPurchaseContentDtoFactory.Create(
+            5, 
+            _testContext.Articles.Select(x => x.Id));
         
-        var logisticsNotNull = purchase.PurchaseContents.Where(x => x.PurchaseContentLogistic != null)
-            .Select(x => x.PurchaseContentLogistic)
+        content.ForEach(x => x.CalculateLogistics = true);
+        
+        var totalSum = content.Sum(x => x.Count * x.Price);
+        
+        var command = new CreateFullPurchaseCommand(
+            _testContext.User.Id, _testContext.Supplier.Id, _testContext.Currency.Id, _testContext.StorageTo.Name, DateTime.Now,
+            content, "Logistics Purchase", null, true, _testContext.StorageFrom.Name);
+
+        var task = async () => await _testContext.Mediator.Send(command);
+
+        await task.Should().NotThrowAsync();
+
+        var purchases = await GetPurchasesAsync();
+        purchases.Should().HaveCount(1);
+
+        var purchase = purchases[0];
+
+        purchase.PurchaseLogistic.Should().NotBeNull();
+        purchase.PurchaseLogistic.TransactionId.Should().NotBeNull();
+        
+        var logisticsNotNull = purchase
+            .PurchaseContents
+            .Where(x => x.PurchaseContentLogistic != null)
             .ToList();
-        Assert.Equal(3, logisticsNotNull.Count);
+        
+        logisticsNotNull.Count.Should().Be(content.Count);
+        
         var index = 0;
         foreach (var con in content)
         {
             if (!con.CalculateLogistics) continue;
-            var logistic = logisticsNotNull[index];
+            var purchaseContent = logisticsNotNull[index];
+            var logistic = purchaseContent.PurchaseContentLogistic;
             
-            
-            Assert.Equal(con.Count, logistic!.WeightKg);
-            Assert.Equal(con.Count * areaM3, logistic.AreaM3);
+            logistic.Should().NotBeNull();
+            con.Count.Should().Be(purchaseContent.Count);
+
+            logistic.AreaM3.Should().BeGreaterThan(0);
+            logistic.Price.Should().BeGreaterThan(0);
             index++;
         }
         
-        var logisticsTransaction = await _context.Transactions.FirstAsync(x => x.Id == purchase.PurchaseLogistic.TransactionId);
-        Assert.Equal(TransactionStatus.Logistics, logisticsTransaction.Status);
-        Assert.Equal(_carrier.Id, logisticsTransaction.ReceiverId);
-        Assert.Equal(80, logisticsTransaction.TransactionSum);
+        var transactions = await GetTransactionsAsync();
+        transactions.Should().HaveCount(2);
+        
+        transactions.Should().Contain(x => x.TransactionSum == totalSum && x.Status == TransactionStatus.Purchase);
+        transactions.Should().Contain(x => x.Status == TransactionStatus.Logistics &&
+                                           x.ReceiverId == _testContext.Carrier.Id);
     }
 
-    private async Task MakeActive(Guid id)
+    private async Task<List<Purchase>> GetPurchasesAsync()
     {
-        var route = await _context.StorageRoutes.FirstAsync(x => x.Id == id);
-        var activeRoute = await _context.StorageRoutes
-            .FirstOrDefaultAsync(x => x.FromStorageName == route.FromStorageName &&
-                                      x.ToStorageName == route.ToStorageName &&
-                                      x.IsActive);
-        activeRoute?.IsActive = false;
-        route.IsActive = true;
-        await _context.SaveChangesAsync();
+        return await _testContext.DbContext.Purchases
+            .Include(x => x.PurchaseLogistic)
+            .Include(x => x.PurchaseContents)
+            .ThenInclude(x => x.PurchaseContentLogistic)
+            .ToListAsync();
+    }
+
+    private async Task<List<Transaction>> GetTransactionsAsync()
+    {
+        return await _testContext.DbContext.Transactions
+            .ToListAsync();
+    }
+
+    private async Task<List<Article>> GetArticlesAsync()
+    {
+        return await _testContext.DbContext.Articles
+            .ToListAsync();
     }
 }

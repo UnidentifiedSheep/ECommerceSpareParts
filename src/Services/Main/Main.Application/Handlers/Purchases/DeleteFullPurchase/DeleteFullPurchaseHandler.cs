@@ -1,4 +1,5 @@
 using System.Data;
+using Abstractions.Models.Repository;
 using Application.Common.Interfaces;
 using Attributes;
 using Exceptions.Exceptions.Purchase;
@@ -18,13 +19,19 @@ public record DeleteFullPurchaseCommand(string PurchaseId, Guid WhoDeleted) : IC
 public class DeleteFullPurchaseHandler(IPurchaseRepository purchaseRepository, IMediator mediator)
     : ICommandHandler<DeleteFullPurchaseCommand>
 {
+    private static readonly QueryOptions<PurchaseContent> ContentOptions = new QueryOptions<PurchaseContent>()
+        .WithTracking()
+        .WithForUpdate();
     public async Task<Unit> Handle(DeleteFullPurchaseCommand request, CancellationToken cancellationToken)
     {
         var purchaseId = request.PurchaseId;
-        var purchase = await purchaseRepository.GetPurchaseForUpdate(purchaseId, true, cancellationToken)
+        var purchase = await purchaseRepository.GetPurchase(
+                           purchaseId, 
+                           QueryPresets.TrackForUpdate, 
+                           cancellationToken)
                        ?? throw new PurchaseNotFoundException(purchaseId);
-        var purchaseContents = (await purchaseRepository.GetPurchaseContentForUpdate(purchaseId,
-            true, cancellationToken)).ToList();
+        var purchaseContents = (await purchaseRepository.GetPurchaseContent(purchaseId,
+            ContentOptions, cancellationToken)).ToList();
 
         await RemoveContentFromStorage(purchaseContents, request.WhoDeleted, purchase.Storage, cancellationToken);
         await DeletePurchase(purchaseId, cancellationToken);
@@ -37,13 +44,13 @@ public class DeleteFullPurchaseHandler(IPurchaseRepository purchaseRepository, I
         CancellationToken cancellationToken = default)
     {
         var command = new DeleteTransactionCommand(transactionId, whoDeleted, true);
-        await mediator.Publish(command, cancellationToken);
+        await mediator.Send(command, cancellationToken);
     }
 
     private async Task DeletePurchase(string purchaseId, CancellationToken cancellationToken = default)
     {
         var command = new DeletePurchaseCommand(purchaseId);
-        await mediator.Publish(command, cancellationToken);
+        await mediator.Send(command, cancellationToken);
     }
 
     private async Task RemoveContentFromStorage(List<PurchaseContent> purchaseContents, Guid whoRemoved,
@@ -58,6 +65,6 @@ public class DeleteFullPurchaseHandler(IPurchaseRepository purchaseRepository, I
             );
         var command = new RemoveContentCommand(toRemoveFromStorage, whoRemoved, storageName, false,
             StorageMovementType.PurchaseDeletion);
-        await mediator.Publish(command, cancellationToken);
+        await mediator.Send(command, cancellationToken);
     }
 }
