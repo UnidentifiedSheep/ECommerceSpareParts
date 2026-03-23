@@ -8,5 +8,5 @@ public record LocaleFullInfoModel
     public required string Locale { get; init; }
 
     [JsonPropertyName("keyValues")] 
-    public IReadOnlyList<LocalizeModel> KeyValues { get; init; } = [];
+    public Dictionary<string, string> KeyValues { get; init; } = [];
 }

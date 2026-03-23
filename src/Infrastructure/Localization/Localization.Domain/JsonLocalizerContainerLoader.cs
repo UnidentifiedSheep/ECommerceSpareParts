@@ -31,8 +31,8 @@ public class JsonLocalizerContainerLoader(string dirPath) : ILocalizerContainerL
 
             var dict = localesValues.GetOrAdd(locale, _ => new ConcurrentDictionary<string, string>());
 
-            foreach (var kv in model.KeyValues)
-                dict.TryAdd(kv.Key, kv.Value);
+            foreach (var (key, value) in model.KeyValues)
+                dict.TryAdd(key, value);
             
         });
 

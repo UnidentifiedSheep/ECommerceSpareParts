@@ -11,13 +11,9 @@ public class JsonLocalizerContainerLoaderTests
     public async Task LoadAsync_ShouldLoadFilesRecursively()
     {
         var locale = "en";
-        var keyValues = new List<LocalizeModel>
+        var keyValues = new Dictionary<string, string>
         {
-            new()
-            {
-                Key = "Test.Key",
-                Value = "value"
-            }
+            ["Test.Key"] = "value"
         };
         using var localeFiles = await TempLocaleFile.Create(locale, keyValues);
 
@@ -34,13 +30,9 @@ public class JsonLocalizerContainerLoaderTests
     public async Task LoadAsync_ShouldIgnoreUnknownLocales()
     {
         string locale = "fr";
-        var keyValues = new List<LocalizeModel>
+        var keyValues = new Dictionary<string, string>
         {
-            new()
-            {
-                Key = "key",
-                Value = "value"
-            }
+            ["key"] = "value"
         };
         using var localeFiles = await TempLocaleFile.Create(locale, keyValues);
 
@@ -62,7 +54,7 @@ public class JsonLocalizerContainerLoaderTests
             BaseDir = baseDir;
         }
         
-        public static async Task<TempLocaleFile> Create(string locale, IEnumerable<LocalizeModel> keyValues)
+        public static async Task<TempLocaleFile> Create(string locale, Dictionary<string, string> keyValues)
         {
             var dir = Path.Combine(Path.GetTempPath(), Guid.NewGuid().ToString());
             Directory.CreateDirectory(dir);
@@ -75,7 +67,7 @@ public class JsonLocalizerContainerLoaderTests
             var model = new LocaleFullInfoModel
             {
                 Locale = locale,
-                KeyValues = keyValues.ToList()
+                KeyValues = keyValues
             };
 
             await File.WriteAllTextAsync(filePath, JsonSerializer.Serialize(model));
