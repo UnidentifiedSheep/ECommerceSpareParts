@@ -32,6 +32,9 @@ public class UpsertPurchaseFactHandler(
         }
 
         newFact.Adapt(dbFact);
+        
+        dbFact.TotalSum = dbFact.PurchaseContents.Sum(x => x.Count * x.Price);
+        
         await unitOfWork.SaveChangesAsync(cancellationToken);
         return Unit.Value;
     }
