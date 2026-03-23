@@ -4,6 +4,11 @@ using Application.Common.Interfaces;
 using Attributes;
 using Contracts.Articles;
 using Contracts.Purchase;
+using Main.Abstractions.Dtos.Amw.Purchase;
+using Main.Abstractions.Dtos.Amw.Storage;
+using Main.Abstractions.Interfaces.Services;
+using Main.Application.Extensions;
+using Main.Application.Handlers.Balance.CreateTransaction;
 using Main.Abstractions.Dtos.Amw.Logistics;
 using Main.Abstractions.Dtos.Amw.Purchase;
 using Main.Abstractions.Dtos.Amw.Storage;
@@ -37,9 +42,11 @@ public record CreateFullPurchaseCommand(
     bool WithLogistics,
     string? StorageFrom) : ICommand;
 
-public class CreateFullPurchaseHandler(IMediator mediator, IPublishEndpoint publishEndpoint, IUnitOfWork unitOfWork, 
-    IPurchaseService purchaseService) 
-    : ICommandHandler<CreateFullPurchaseCommand>
+public class CreateFullPurchaseHandler(
+    IMediator mediator, 
+    IPublishEndpoint publishEndpoint, 
+    IUnitOfWork unitOfWork, 
+    IPurchaseService purchaseService) : ICommandHandler<CreateFullPurchaseCommand>
 {
     public async Task<Unit> Handle(CreateFullPurchaseCommand request, CancellationToken cancellationToken)
     {

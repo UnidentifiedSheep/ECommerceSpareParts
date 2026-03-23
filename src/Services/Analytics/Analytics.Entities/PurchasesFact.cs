@@ -1,7 +1,10 @@
-﻿namespace Analytics.Entities;
+﻿using BulkValidation.Core.Attributes;
+
+namespace Analytics.Entities;
 
 public partial class PurchasesFact
 {
+    [Validate]
     public string Id { get; set; } = null!;
 
     public int CurrencyId { get; set; }
