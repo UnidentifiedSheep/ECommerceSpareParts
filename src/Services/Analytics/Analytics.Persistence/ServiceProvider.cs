@@ -19,6 +19,7 @@ public static class ServiceProvider
         collection.AddScoped<IUnitOfWork, UnitOfWork<DContext>>();
 
         collection.AddScoped<ICurrencyRepository, CurrencyRepository>();
+        collection.AddScoped<IPurchaseFactRepository, PurchaseFactRepository>();
 
         collection.AddScoped<ISeed<DContext>, CurrencySeed>();
 
