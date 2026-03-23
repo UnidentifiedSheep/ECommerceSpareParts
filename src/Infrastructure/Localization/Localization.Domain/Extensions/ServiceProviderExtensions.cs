@@ -1,8 +1,8 @@
 ﻿using Abstractions.Interfaces.Localization;
-using Localization.Middlewares;
+using Localization.Domain.Middlewares;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace Localization.Extensions;
+namespace Localization.Domain.Extensions;
 
 public static class ServiceProviderExtensions
 {

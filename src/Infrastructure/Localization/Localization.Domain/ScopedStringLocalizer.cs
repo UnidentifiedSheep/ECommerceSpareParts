@@ -1,6 +1,6 @@
 ﻿using Abstractions.Interfaces.Localization;
 
-namespace Localization;
+namespace Localization.Domain;
 
 public sealed class ScopedStringLocalizer(IStringLocalizer stringLocalizer) : IScopedStringLocalizer
 {

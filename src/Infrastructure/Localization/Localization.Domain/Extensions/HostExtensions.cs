@@ -2,7 +2,7 @@
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 
-namespace Localization.Extensions;
+namespace Localization.Domain.Extensions;
 
 public static class HostExtensions
 {

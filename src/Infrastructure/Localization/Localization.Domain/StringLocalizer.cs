@@ -1,6 +1,6 @@
 ﻿using Abstractions.Interfaces.Localization;
 
-namespace Localization;
+namespace Localization.Domain;
 
 public class StringLocalizer : IStringLocalizer
 {

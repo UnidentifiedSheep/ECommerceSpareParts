@@ -2,7 +2,7 @@
 using Abstractions.Interfaces.Localization;
 using Microsoft.AspNetCore.Http;
 
-namespace Localization.Middlewares;
+namespace Localization.Domain.Middlewares;
 
 public class ScopedLocalizationMiddleware(IScopedStringLocalizer localizer) : IMiddleware
 {

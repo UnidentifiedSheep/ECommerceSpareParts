@@ -3,7 +3,7 @@ using System.Text.Json;
 using Abstractions.Interfaces.Localization;
 using Abstractions.Models.Localization;
 
-namespace Localization;
+namespace Localization.Domain;
 
 public class JsonLocalizerContainerLoader(string dirPath) : ILocalizerContainerLoader
 {
