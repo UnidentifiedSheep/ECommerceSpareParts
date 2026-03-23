@@ -10,8 +10,7 @@ namespace Main.Application.Handlers.Producers.AddOtherName;
 [Transactional]
 public record AddOtherNameCommand(int ProducerId, string OtherName, string WhereUsed) : ICommand<Unit>;
 
-public class AddOtherNameHandler(IProducerRepository producerRepository, IUnitOfWork unitOfWork)
-    : ICommandHandler<AddOtherNameCommand>
+public class AddOtherNameHandler(IUnitOfWork unitOfWork) : ICommandHandler<AddOtherNameCommand>
 {
     public async Task<Unit> Handle(AddOtherNameCommand request, CancellationToken cancellationToken)
     {

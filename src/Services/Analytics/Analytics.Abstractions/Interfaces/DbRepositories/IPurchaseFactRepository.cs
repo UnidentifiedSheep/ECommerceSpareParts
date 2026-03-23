@@ -7,6 +7,6 @@ public interface IPurchaseFactRepository
 {
     Task<PurchasesFact?> GetFact(
         string id,
-        QueryOptions<PurchasesFact>? options = null,
+        QueryOptions? options = null,
         CancellationToken cancellationToken = default);
 }

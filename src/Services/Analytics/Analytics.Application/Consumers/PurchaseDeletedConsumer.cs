@@ -8,6 +8,6 @@ public class PurchaseDeletedConsumer(IMediator mediator) : IConsumer<PurchaseDel
 {
     public Task Consume(ConsumeContext<PurchaseDeleteEvent> context)
     {
-        
+        throw new NotImplementedException();
     }
 }

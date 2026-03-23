@@ -11,7 +11,7 @@ public class PurchaseFactRepository(DContext context) : IPurchaseFactRepository
 {
     public async Task<PurchasesFact?> GetFact(
         string id, 
-        QueryOptions<PurchasesFact>? options = null, 
+        QueryOptions? options = null, 
         CancellationToken cancellationToken = default)
     {
         return await context.PurchasesFacts.ApplyOptions(options)

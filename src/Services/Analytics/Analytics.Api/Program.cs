@@ -6,11 +6,17 @@ using Analytics.Persistence;
 using Analytics.Persistence.Context;
 using Api.Common.Middleware;
 using Carter;
+using Localization.Extensions;
+using Localization.Middlewares;
 using MassTransit;
 using Persistence.Extensions;
 using RabbitMq.Extensions;
 using RabbitMq.Models;
 using Security.Utils;
+
+string localesPath = Assembly.GetExecutingAssembly().Location;
+localesPath = Path.Combine(Path.GetDirectoryName(localesPath)!, "Localization");
+var locales = new[] {"ru", "en"};
 
 var builder = WebApplication.CreateBuilder(args);
 var certsPath = Environment.GetEnvironmentVariable("CERTS_PATH");
@@ -28,6 +34,8 @@ var brokerOptions = new MessageBrokerOptions
     Password = Environment.GetEnvironmentVariable("RABBITMQ_DEFAULT_PASS")!
 };
 builder.Services.AddSingleton(brokerOptions);
+
+builder.Services.AddLocalization(locales);
 
 builder.Services.AddHttpContextAccessor();
 
@@ -78,10 +86,21 @@ builder.Services.AddTransient<HeaderSecretMiddleware>(_ => new HeaderSecretMiddl
 
 var app = builder.Build();
 
+await app.LoadLocalesFromJson(localesPath);
+
 if (Environment.GetEnvironmentVariable("SEED_DB") == "true")
     await app.SeedAsync<DContext>();
 
 app.UseMiddleware<HeaderSecretMiddleware>();
+
+app.UseRequestLocalization(options => 
+{
+    options.SetDefaultCulture("en"); 
+    options.AddSupportedCultures(locales); 
+    options.AddSupportedUICultures(locales);
+});
+
+app.UseMiddleware<ScopedLocalizationMiddleware>();
 
 await SetupCurrency(app.Services);
 

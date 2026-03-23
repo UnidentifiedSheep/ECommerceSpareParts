@@ -1,0 +1,9 @@
+﻿{
+  "locale": "en",
+  "keyValues": [
+    {
+      "key": "purchase.fact.required",
+      "value": "Purchase fact is required."
+    }
+  ]
+}

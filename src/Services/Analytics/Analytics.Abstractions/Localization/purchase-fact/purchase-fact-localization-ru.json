@@ -1,0 +1,9 @@
+﻿{
+  "locale": "ru",
+  "keyValues": [
+    {
+      "key": "purchase.fact.required",
+      "value": "Факт закупки не может отсутствовать."
+    }
+  ]
+}

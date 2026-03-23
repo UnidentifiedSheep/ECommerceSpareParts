@@ -14,6 +14,7 @@
     </ItemGroup>
 
     <ItemGroup>
+      <ProjectReference Include="..\..\..\Infrastructure\Localization\Localization.csproj" />
       <ProjectReference Include="..\..\..\Infrastructure\RabbitMq\RabbitMq.csproj" />
       <ProjectReference Include="..\..\..\Infrastructure\Security\Security.csproj" />
       <ProjectReference Include="..\..\Api.Common\Api.Common.csproj" />
@@ -24,6 +25,14 @@
     <ItemGroup>
       <Content Include="..\..\..\..\.dockerignore">
         <Link>.dockerignore</Link>
+      </Content>
+      <Content Include="..\Analytics.Abstractions\Localization\purchase-fact\purchase-fact-localization-en.json">
+        <Link>Localization\purchase-fact\purchase-fact-localization-en.json</Link>
+        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      </Content>
+      <Content Include="..\Analytics.Abstractions\Localization\purchase-fact\purchase-fact-localization-ru.json">
+        <Link>Localization\purchase-fact\purchase-fact-localization-ru.json</Link>
+        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
       </Content>
     </ItemGroup>
 
