@@ -1,13 +1,14 @@
-﻿using Abstractions.Interfaces.Localization;
+﻿using Localization.Abstractions.Interfaces;
+using Localization.Abstractions.Models;
 
 namespace Localization.Domain;
 
 public sealed class ScopedStringLocalizer(IStringLocalizer stringLocalizer) : IScopedStringLocalizer
 {
-    private string? _locale;
+    private Locale? _locale;
     private bool _disposed;
     
-    public void SetLocale(string locale)
+    public void SetLocale(Locale locale)
     {
         ObjectDisposedException.ThrowIf(_disposed, this);
         _locale = locale;
@@ -18,7 +19,7 @@ public sealed class ScopedStringLocalizer(IStringLocalizer stringLocalizer) : IS
         ObjectDisposedException.ThrowIf(_disposed, this);
         ArgumentNullException.ThrowIfNull(_locale);
         
-        return stringLocalizer.Get(key, _locale);
+        return stringLocalizer.Get(key, _locale.Value);
     }
 
     public string this[string key] => Get(key);

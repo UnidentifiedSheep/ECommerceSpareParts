@@ -1,6 +1,6 @@
 ﻿using System.Text.Json.Serialization;
 
-namespace Abstractions.Models.Localization;
+namespace Localization.Abstractions.Models;
 
 public record LocaleFullInfoModel
 {

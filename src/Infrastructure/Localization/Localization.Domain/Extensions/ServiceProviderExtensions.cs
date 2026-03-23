@@ -1,4 +1,4 @@
-﻿using Abstractions.Interfaces.Localization;
+﻿using Localization.Abstractions.Interfaces;
 using Localization.Domain.Middlewares;
 using Microsoft.Extensions.DependencyInjection;
 

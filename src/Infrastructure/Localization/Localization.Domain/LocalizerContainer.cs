@@ -1,11 +1,12 @@
-﻿using Abstractions.Interfaces.Localization;
+﻿using Localization.Abstractions.Interfaces;
+using Localization.Abstractions.Models;
 
 namespace Localization.Domain;
 
 public class LocalizerContainer(string locale) : ILocalizerContainer
 {
     private Dictionary<string, string> _ketMessages = new();
-    public string Locale { get; } = locale.ToUpperInvariant();
+    public Locale Locale { get; }= locale;
     public IReadOnlyDictionary<string, string> KetMessages => _ketMessages;
 
     private bool _initialized;

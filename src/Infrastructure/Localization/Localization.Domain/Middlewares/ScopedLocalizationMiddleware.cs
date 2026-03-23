@@ -1,5 +1,5 @@
 ﻿using System.Globalization;
-using Abstractions.Interfaces.Localization;
+using Localization.Abstractions.Interfaces;
 using Microsoft.AspNetCore.Http;
 
 namespace Localization.Domain.Middlewares;

@@ -130,6 +130,10 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Localization", "Localizatio
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Localization.Domain", "src\Infrastructure\Localization\Localization.Domain\Localization.Domain.csproj", "{98A22DEB-675F-4D22-8A78-8FECC74D4E99}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Localization.Unit.Tests", "src\Infrastructure\Localization\Localization.Unit.Tests\Localization.Unit.Tests.csproj", "{398F45E6-3105-45F5-B997-733490B7CB62}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Localization.Abstractions", "src\Infrastructure\Localization\Localization.Abstractions\Localization.Abstractions.csproj", "{E75D74EB-E173-42B1-9B67-8A61B5696EA3}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -336,6 +340,14 @@ Global
 		{98A22DEB-675F-4D22-8A78-8FECC74D4E99}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{98A22DEB-675F-4D22-8A78-8FECC74D4E99}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{98A22DEB-675F-4D22-8A78-8FECC74D4E99}.Release|Any CPU.Build.0 = Release|Any CPU
+		{398F45E6-3105-45F5-B997-733490B7CB62}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{398F45E6-3105-45F5-B997-733490B7CB62}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{398F45E6-3105-45F5-B997-733490B7CB62}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{398F45E6-3105-45F5-B997-733490B7CB62}.Release|Any CPU.Build.0 = Release|Any CPU
+		{E75D74EB-E173-42B1-9B67-8A61B5696EA3}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{E75D74EB-E173-42B1-9B67-8A61B5696EA3}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{E75D74EB-E173-42B1-9B67-8A61B5696EA3}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{E75D74EB-E173-42B1-9B67-8A61B5696EA3}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
 		{C5111875-1112-406F-B3D1-EC119DBB23F6} = {3FC16924-68A6-4CDA-9961-0B0F589E671E}
@@ -396,5 +408,7 @@ Global
 		{D214DEA5-ADBE-476F-849A-E8F590F8482A} = {6AB27EBE-09E6-43AB-A0A5-563F1E9FE71C}
 		{C6DA0F3C-2CD5-434D-BCC1-DEBBF97DE51D} = {F3A52BAB-BDFB-432B-940B-9CFBD752DA8E}
 		{98A22DEB-675F-4D22-8A78-8FECC74D4E99} = {C6DA0F3C-2CD5-434D-BCC1-DEBBF97DE51D}
+		{398F45E6-3105-45F5-B997-733490B7CB62} = {C6DA0F3C-2CD5-434D-BCC1-DEBBF97DE51D}
+		{E75D74EB-E173-42B1-9B67-8A61B5696EA3} = {C6DA0F3C-2CD5-434D-BCC1-DEBBF97DE51D}
 	EndGlobalSection
 EndGlobal

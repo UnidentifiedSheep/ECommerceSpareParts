@@ -1,4 +1,4 @@
-﻿namespace Abstractions.Interfaces.Localization;
+﻿namespace Localization.Abstractions.Interfaces;
 
 public interface ILocalizerContainerLoader
 {

@@ -1,4 +1,5 @@
-﻿using Abstractions.Interfaces.Localization;
+﻿using Localization.Abstractions.Interfaces;
+using Localization.Abstractions.Models;
 
 namespace Localization.Domain;
 
@@ -10,13 +11,11 @@ public class StringLocalizer : IStringLocalizer
     {
         _localization = new Dictionary<string, Dictionary<string, string>>();
         foreach (var container in containers)
-            _localization[container.Locale.ToUpperInvariant()] = container.KetMessages.ToDictionary();
+            _localization[container.Locale] = container.KetMessages.ToDictionary();
     }
     
-    public string Get(string key, string locale)
+    public string Get(string key, Locale locale)
     {
-        locale = locale.ToUpperInvariant();
-        
         if (!_localization.TryGetValue(locale, out Dictionary<string, string>? localeValues))
             throw new InvalidOperationException($"Locale '{locale}' not found");
         if (!localeValues.TryGetValue(key, out var value))

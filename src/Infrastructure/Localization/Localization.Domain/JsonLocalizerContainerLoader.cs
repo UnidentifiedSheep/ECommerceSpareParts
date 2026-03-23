@@ -1,7 +1,7 @@
 ﻿using System.Collections.Concurrent;
 using System.Text.Json;
-using Abstractions.Interfaces.Localization;
-using Abstractions.Models.Localization;
+using Localization.Abstractions.Interfaces;
+using Localization.Abstractions.Models;
 
 namespace Localization.Domain;
 
@@ -10,7 +10,7 @@ public class JsonLocalizerContainerLoader(string dirPath) : ILocalizerContainerL
     public async Task LoadAsync(IEnumerable<ILocalizerContainer> containers)
     {
         var containersDict = containers
-            .ToDictionary(c => c.Locale.ToUpperInvariant(), c => c);
+            .ToDictionary(c => c.Locale, c => c);
 
         if (containersDict.Count == 0) return;
 

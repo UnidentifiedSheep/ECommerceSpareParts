@@ -1,4 +1,4 @@
-﻿using Abstractions.Interfaces.Localization;
+﻿using Localization.Abstractions.Interfaces;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 

@@ -1,8 +1,10 @@
-﻿namespace Abstractions.Interfaces.Localization;
+﻿using Localization.Abstractions.Models;
+
+namespace Localization.Abstractions.Interfaces;
 
 public interface ILocalizerContainer
 {
-    string Locale { get; }
+    Locale Locale { get; }
     IReadOnlyDictionary<string, string> KetMessages { get; }
     void Initialize(Dictionary<string, string> ketMessages);
 }
