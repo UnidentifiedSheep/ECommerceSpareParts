@@ -11,6 +11,10 @@ public class UpsertPurchaseFactValidation : AbstractValidator<UpsertPurchaseFact
             .NotNull()
             .WithMessage(localizer["purchase.fact.required"]);
         
+        RuleFor(x => x.PurchaseFact.Id)
+            .NotEmpty()
+            .WithMessage(localizer["purchase.fact.id.required"]);
+        
         RuleFor(x => x.PurchaseFact.Content)
             .NotEmpty()
             .WithMessage(localizer["purchase.fact.content.required"]);

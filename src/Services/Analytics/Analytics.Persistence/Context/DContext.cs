@@ -156,6 +156,7 @@ public partial class DContext : DbContext
 
             entity.Property(e => e.Id).HasColumnName("id");
             entity.Property(e => e.CreatedAt).HasColumnName("created_at");
+            entity.Property(e => e.ProcessedAt).HasColumnName("processed_at");
             entity.Property(e => e.CurrencyId).HasColumnName("currency_id");
             entity.Property(e => e.SupplierId).HasColumnName("supplier_id");
             entity.Property(e => e.TotalSum).HasColumnName("total_sum");
