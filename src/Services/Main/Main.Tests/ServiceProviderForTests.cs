@@ -9,6 +9,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Main.Persistence;
 using Main.Persistence.Context;
 using MassTransit;
+using Persistence.Extensions;
 using Security;
 using Serilog;
 using Tests.MockData;
@@ -65,8 +66,15 @@ public static class ServiceProviderForTests
         var serviceProvider = services.BuildServiceProvider();
         _isConfiguredBefore = true;
         _serviceProvider = serviceProvider;
+        SeedDb(serviceProvider).Wait();
         SetupPrice(_serviceProvider).Wait();
         return serviceProvider;
+    }
+
+    private static async Task SeedDb(IServiceProvider serviceProvider)
+    {
+        using var scope = serviceProvider.CreateScope();
+        await scope.SeedAsync<DContext>();
     }
 
     private static async Task SetupPrice(IServiceProvider serviceProvider)

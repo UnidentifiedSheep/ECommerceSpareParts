@@ -19,6 +19,8 @@ public class CurrencyConverter(int usdId) : ICurrencyConverter
             ToUsd[currencyId] = rate;
             ToUsdDoub[currencyId] = (double)rate;
         }
+        ToUsd[usdId] = 1;
+        ToUsdDoub[usdId] = 1;
     }
 
     // === DECIMAL API ===
@@ -89,7 +91,7 @@ public class CurrencyConverter(int usdId) : ICurrencyConverter
 
     public bool IsSupportedCurrency(int currencyId)
     {
-        return ToUsd.ContainsKey(currencyId) || currencyId == usdId;
+        return ToUsd.ContainsKey(currencyId);
     }
 
     public ExchangeRates ChangeBaseCurrency(ExchangeRates data, string newBase)

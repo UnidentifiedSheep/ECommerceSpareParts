@@ -1,6 +1,4 @@
-using Enums;
 using Main.Entities;
-using Main.Enums;
 using Main.Persistence.Context;
 using Microsoft.EntityFrameworkCore;
 
@@ -34,60 +32,97 @@ public static class MockDContext
                                                    values ({leftId}, {rightId})
                                                    """);
     }
-
-    public static async Task AddMockWeightsAndSizesToArticles(this DbContext context, IEnumerable<int>? ids = null)
-    {
-        var articleIds = ids ?? await context.Set<Main.Entities.Article>()
-            .Select(a => a.Id)
-            .ToListAsync();
-
-        var sizes = new List<ArticleSize>();
-        var weights = new List<ArticleWeight>();
-        foreach (var articleId in articleIds)
-        {
-            var weight = Math.Round(Global.Faker.Random.Decimal(0.1m, 10m), 2);
-            var length = Math.Round(Global.Faker.Random.Decimal(1m, 100m), 2);
-            var width = Math.Round(Global.Faker.Random.Decimal(1m, 100m), 2);
-            var height = Math.Round(Global.Faker.Random.Decimal(1m, 100m), 2);
-
-            sizes.Add(new()
-            {
-                ArticleId = articleId,
-                Length = length,
-                Width = width,
-                Height = height,
-                VolumeM3 = length * width * height
-            });
-            
-            weights.Add(new ArticleWeight()
-            {
-                ArticleId = articleId,
-                Weight = weight,
-                Unit = WeightUnit.Kilogram
-            });
-        }
-        
-        await context.AddRangeAsync(sizes);
-        await context.AddRangeAsync(weights);
-        await context.SaveChangesAsync();
-    }
+    
 
     public static async Task AddMockCurrencies(this DContext context)
     {
-        await context.Database.ExecuteSqlRawAsync("""
-                                                  INSERT INTO currency (id, short_name, name, currency_sign, code)
-                                                  values (1,'Руб.','Рубль','₽','RUB'),
-                                                         (2,'Лиры','Турецкая лира','₺','TRY'),
-                                                         (3,'Дол.','Доллар США','$','USD'),
-                                                         (4,'Евро','Евро','€','EUR')
-                                                  ON CONFLICT (id) DO NOTHING;
-                                                  INSERT INTO currency_to_usd (currency_id, to_usd)
-                                                  VALUES 
-                                                      ((SELECT id FROM currency WHERE code = 'RUB'), 80.400696),
-                                                      ((SELECT id FROM currency WHERE code = 'TRY'), 41.145504),
-                                                      ((SELECT id FROM currency WHERE code = 'USD'), 1),
-                                                      ((SELECT id FROM currency WHERE code = 'EUR'), 0.85493)
-                                                  ON CONFLICT (currency_id) DO NOTHING;
-                                                  """);
+        var existingIds = await context.Currencies
+            .AsNoTracking()
+            .Select(x => x.Id)
+            .ToHashSetAsync();
+
+        var existingCurrencyToUsdIds = await context.CurrencyToUsds
+            .AsNoTracking()
+            .Select(x => x.CurrencyId)
+            .ToHashSetAsync();
+
+        var toAdd = new List<Currency>()
+        {
+            new()
+            {
+                Id = 3,
+                ShortName = "Руб.",
+                Name = "Рубль",
+                CurrencySign = "₽",
+                Code = "RUB",
+                CurrencyToUsd = new CurrencyToUsd
+                {
+                    CurrencyId = 3,
+                    ToUsd = 80.400696m
+                }
+            },
+            new()
+            {
+                Id = 2,
+                ShortName = "Лиры",
+                Name = "Турецкая лира",
+                CurrencySign = "₺",
+                Code = "TRY",
+                CurrencyToUsd = new CurrencyToUsd
+                {
+                    CurrencyId = 2,
+                    ToUsd = 41.145504m
+                }
+            },
+            new()
+            {
+                Id = 1,
+                ShortName = "Дол.",
+                Name = "Доллар США",
+                CurrencySign = "$",
+                Code = "USD",
+                CurrencyToUsd = new CurrencyToUsd
+                {
+                    CurrencyId = 1,
+                    ToUsd = 1m
+                }
+            },
+            new()
+            {
+                Id = 4,
+                ShortName = "Евро",
+                Name = "Евро",
+                CurrencySign = "€",
+                Code = "EUR",
+                CurrencyToUsd = new CurrencyToUsd
+                {
+                    CurrencyId = 4,
+                    ToUsd = 0.85493m
+                }
+            }
+        };
+
+        var newCurrencies = toAdd.Where(c => !existingIds.Contains(c.Id)).ToList();
+
+        foreach (var c in newCurrencies)
+        {
+            if (c.CurrencyToUsd != null &&
+                existingCurrencyToUsdIds.Contains(c.CurrencyToUsd.CurrencyId))
+            {
+                c.CurrencyToUsd = null;
+            }
+        }
+
+        if (!newCurrencies.Any()) return;
+
+        await context.AddRangeAsync(newCurrencies);
+        await context.SaveChangesAsync();
+
+        foreach (var currency in newCurrencies)
+        {
+            context.Entry(currency).State = EntityState.Detached;
+            if (currency.CurrencyToUsd != null)
+                context.Entry(currency.CurrencyToUsd).State = EntityState.Detached;
+        }
     }
 }

@@ -4,8 +4,8 @@ using Main.Persistence.Context;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
+using Test.Common.TestContainers.Combined;
 using Tests.MockData;
-using Tests.testContainers.Combined;
 using ValidationException = FluentValidation.ValidationException;
 using DbValidationException = BulkValidation.Core.Exceptions.ValidationException;
 

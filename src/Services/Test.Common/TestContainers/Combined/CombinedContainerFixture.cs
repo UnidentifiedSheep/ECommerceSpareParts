@@ -1,7 +1,8 @@
-using Tests.testContainers.Pg;
-using Tests.testContainers.Redis;
+using Test.Common.TestContainers.Pg;
+using Test.Common.TestContainers.Redis;
+using Xunit;
 
-namespace Tests.testContainers.Combined;
+namespace Test.Common.TestContainers.Combined;
 
 public class CombinedContainerFixture : IAsyncLifetime
 {

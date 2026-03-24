@@ -134,6 +134,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Localization.Unit.Tests", "
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Localization.Abstractions", "src\Infrastructure\Localization\Localization.Abstractions\Localization.Abstractions.csproj", "{E75D74EB-E173-42B1-9B67-8A61B5696EA3}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Analytics.Integration.Tests", "src\Services\Analytics\Analytics.Integration.Tests\Analytics.Integration.Tests.csproj", "{A391ED1F-7F99-4D17-8B81-3FA69BE7C5C7}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -348,6 +350,10 @@ Global
 		{E75D74EB-E173-42B1-9B67-8A61B5696EA3}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{E75D74EB-E173-42B1-9B67-8A61B5696EA3}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{E75D74EB-E173-42B1-9B67-8A61B5696EA3}.Release|Any CPU.Build.0 = Release|Any CPU
+		{A391ED1F-7F99-4D17-8B81-3FA69BE7C5C7}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A391ED1F-7F99-4D17-8B81-3FA69BE7C5C7}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A391ED1F-7F99-4D17-8B81-3FA69BE7C5C7}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A391ED1F-7F99-4D17-8B81-3FA69BE7C5C7}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
 		{C5111875-1112-406F-B3D1-EC119DBB23F6} = {3FC16924-68A6-4CDA-9961-0B0F589E671E}
@@ -410,5 +416,6 @@ Global
 		{98A22DEB-675F-4D22-8A78-8FECC74D4E99} = {C6DA0F3C-2CD5-434D-BCC1-DEBBF97DE51D}
 		{398F45E6-3105-45F5-B997-733490B7CB62} = {C6DA0F3C-2CD5-434D-BCC1-DEBBF97DE51D}
 		{E75D74EB-E173-42B1-9B67-8A61B5696EA3} = {C6DA0F3C-2CD5-434D-BCC1-DEBBF97DE51D}
+		{A391ED1F-7F99-4D17-8B81-3FA69BE7C5C7} = {06BE88A9-99AA-4C93-8775-B459345D8C67}
 	EndGlobalSection
 EndGlobal

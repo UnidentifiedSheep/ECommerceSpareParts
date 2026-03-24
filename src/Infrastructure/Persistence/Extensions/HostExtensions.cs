@@ -18,10 +18,9 @@ public static class HostExtensions
         DatabaseEvents.DatabaseEnsuredCreated(logger, typeof(TContext).Name, null);
         return host;
     }
-    
-    public static async Task SeedAsync<TContext>(this IHost host) where TContext : DbContext
+
+    public static async Task SeedAsync<TContext>(this IServiceScope scope) where TContext : DbContext
     {
-        await using var scope = host.Services.CreateAsyncScope();
         var logger = scope.ServiceProvider.GetRequiredService<ILogger<TContext>>();
         
         var context = scope.ServiceProvider.GetRequiredService<TContext>();
@@ -41,5 +40,11 @@ public static class HostExtensions
         foreach (var seed in seeds)
             await seed.SeedAsync(context);
         SeedEvents.SeedCompleted(logger, typeof(TContext).Name, null);
+    }
+    
+    public static async Task SeedAsync<TContext>(this IHost host) where TContext : DbContext
+    {
+        await using var scope = host.Services.CreateAsyncScope();
+        await scope.SeedAsync<TContext>();
     }
 }

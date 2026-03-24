@@ -4,9 +4,9 @@ using Main.Entities;
 using Main.Enums;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
+using Test.Common.TestContainers.Combined;
 using Tests.MockData;
 using Tests.MockData.DataFactories.Purchase;
-using Tests.testContainers.Combined;
 using Tests.TestContexts;
 
 namespace Tests.HandlersTests.Purchases;

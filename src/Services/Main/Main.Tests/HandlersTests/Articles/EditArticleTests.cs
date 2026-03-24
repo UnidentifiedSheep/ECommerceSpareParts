@@ -8,8 +8,8 @@ using Main.Application.Configs.Mapster;
 using Main.Persistence.Context;
 using MediatR;
 using Microsoft.Extensions.DependencyInjection;
+using Test.Common.TestContainers.Combined;
 using Tests.MockData;
-using Tests.testContainers.Combined;
 
 namespace Tests.HandlersTests.Articles;
 

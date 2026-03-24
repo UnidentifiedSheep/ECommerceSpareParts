@@ -12,8 +12,8 @@ using Mapster;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
+using Test.Common.TestContainers.Combined;
 using Tests.MockData;
-using Tests.testContainers.Combined;
 
 namespace Tests.HandlersTests.Purchases;
 
