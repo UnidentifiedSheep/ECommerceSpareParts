@@ -1,34 +1,27 @@
-﻿using Abstractions.Models.Validation;
-using Api.Common.Extensions;
-using Api.Common.Models;
-using Api.Common.Response;
+﻿using Api.Common.Response;
 using Exceptions.Base;
-using FluentValidation;
-using Microsoft.AspNetCore.Diagnostics;
 using ValidationException = Exceptions.Base.ValidationException;
 
 namespace Api.Common.ExceptionHandlers;
 
-public class AotExceptionHandler(ILogger<AotExceptionHandler> logger) : IExceptionHandler
+public class AotExceptionHandler(
+    ILogger<AotExceptionHandler> logger
+    ) : ExceptionHandlerBase<AotExceptionHandler>(logger)
 {
-    public async ValueTask<bool> TryHandleAsync(HttpContext context, Exception exception, CancellationToken cancellationToken)
+    public override async ValueTask<bool> TryHandleAsync(
+        HttpContext context, 
+        Exception exception, 
+        CancellationToken cancellationToken)
     {
         LogError(context, exception);
 
-        var statusCode = exception.GetStatusCode();
+        var statusCode = GetStatusCode(exception);
         context.Response.StatusCode = statusCode;
 
         var problemDetails = CreateErrorResponse(context, exception, statusCode);
 
         await context.Response.WriteAsJsonAsync(problemDetails, cancellationToken);
         return true;
-    }
-
-    private void LogError(HttpContext context, Exception exception)
-    {
-        if (!logger.IsEnabled(LogLevel.Error)) return;
-        using (logger.BeginScope(new Dictionary<string, object> { ["TraceId"] = context.TraceIdentifier }))
-            logger.LogError(exception, "Error occurred at {Time}", DateTime.UtcNow);
     }
 
     private ErrorResponse CreateErrorResponse(HttpContext context, Exception exception, int statusCode)

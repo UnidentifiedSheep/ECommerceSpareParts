@@ -1,7 +1,10 @@
+using System.Net;
+
 namespace Exceptions.Base;
 
 public class ConflictException : BaseValuedException
 {
+    public override HttpStatusCode StatusCode => HttpStatusCode.Conflict;
     public ConflictException(string message) : base(message)
     {
     }

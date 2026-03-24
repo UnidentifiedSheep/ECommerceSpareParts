@@ -139,7 +139,7 @@ builder.Services
 
 
 
-builder.Services.AddExceptionHandler<CustomExceptionHandler>();
+builder.Services.AddBaseExceptionHandlers();
 
 builder.Services.AddOpenTelemetry()
     .WithMetrics(metrics =>
