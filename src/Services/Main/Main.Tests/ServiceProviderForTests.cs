@@ -12,6 +12,7 @@ using MassTransit;
 using Persistence.Extensions;
 using Security;
 using Serilog;
+using Test.Common.Extensions;
 using Test.Common.Stubs;
 using Tests.MockData;
 using Tests.TestContexts;
@@ -36,7 +37,7 @@ public static class ServiceProviderForTests
 
         var services = new ServiceCollection();
 
-        services.AddTestContexts();
+        services.RegisterTestContexts();
         
         services.AddLogging();
         Log.Logger = new LoggerConfiguration()
@@ -86,10 +87,5 @@ public static class ServiceProviderForTests
 
         await context.AddMockCurrencies();
         await currencyConverterSetup.InitializeAsync();
-    }
-
-    private static void AddTestContexts(this IServiceCollection services)
-    {
-        services.AddScoped<PurchaseTestContext>();
     }
 }

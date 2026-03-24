@@ -6,25 +6,6 @@ namespace Tests.MockData;
 
 public static class MockDContext
 {
-    public static async Task ClearDatabaseFull(this DContext context)
-    {
-        var sql = """
-                  DO $$
-                  DECLARE
-                      r RECORD;
-                  BEGIN
-                      FOR r IN 
-                          SELECT schemaname, tablename
-                          FROM pg_tables
-                          WHERE schemaname IN ('auth', 'public')
-                      LOOP
-                          EXECUTE format('TRUNCATE TABLE %I.%I RESTART IDENTITY CASCADE', r.schemaname, r.tablename);
-                      END LOOP;
-                  END $$;
-                  """;
-        await context.Database.ExecuteSqlRawAsync(sql);
-    }
-
     public static async Task AddArticleCross(this DContext context, int leftId, int rightId)
     {
         await context.Database.ExecuteSqlAsync($"""

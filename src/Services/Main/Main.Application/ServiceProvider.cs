@@ -6,9 +6,9 @@ using Abstractions.Interfaces.RelatedData;
 using Abstractions.Interfaces.Validators;
 using Abstractions.Models;
 using Application.Common;
-using Application.Common.Abstractions.RelatedData;
 using Application.Common.Abstractions.Settings;
 using Application.Common.Behaviors;
+using Application.Common.Extensions;
 using Application.Common.Interfaces;
 using Application.Common.Interfaces.Settings;
 using Application.Common.Services;
@@ -29,7 +29,6 @@ using Main.Application.Services.Logistics.PricingStrategies;
 using Main.Entities;
 using MediatR;
 using Microsoft.Extensions.DependencyInjection;
-using Utils;
 using AmwArticleDto = Main.Abstractions.Dtos.Amw.Articles.ArticleDto;
 using AnonymousArticleDto = Main.Abstractions.Dtos.Anonymous.Articles.ArticleDto;
 using AmwArticleFullDto = Main.Abstractions.Dtos.Amw.Articles.ArticleFullDto;
@@ -46,7 +45,6 @@ public static class ServiceProvider
         var relatedDataTtl = TimeSpan.FromHours(10);
 
         collection.AddSingleton<UpdateCurrencyRate>();
-        collection.AddScoped<IRelatedDataFactory, RelatedDataFactory>();
         collection.AddSingleton(emailOptions ?? new UserEmailOptions());
         collection.AddSingleton(phoneOptions ?? new UserPhoneOptions());
         
@@ -72,7 +70,7 @@ public static class ServiceProvider
         collection.AddScoped<IRolePermissionService, RolePermissionService>();
         collection.AddScoped<IPurchaseService, PurchaseService>();
 
-        collection.AddScoped<IRelatedDataCollector, RelatedDataCollector>();
+        collection.RegisterRelatedData();
 
         collection.AddSingleton<IEmailValidator, EmailValidator>();
         collection.AddSingleton<IConcurrencyValidator<StorageContent>, StorageContentConcurrencyValidator>();

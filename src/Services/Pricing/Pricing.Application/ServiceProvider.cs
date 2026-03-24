@@ -1,11 +1,7 @@
 ﻿using Abstractions.Interfaces.Currency;
-using Abstractions.Interfaces.RelatedData;
-using Abstractions.Interfaces.Services;
-using Application.Common;
-using Application.Common.Abstractions.RelatedData;
 using Application.Common.Abstractions.Settings;
 using Application.Common.Behaviors;
-using Application.Common.Interfaces;
+using Application.Common.Extensions;
 using Application.Common.Interfaces.Settings;
 using Application.Common.Services;
 using Microsoft.Extensions.DependencyInjection;
@@ -21,8 +17,7 @@ public static class ServiceProvider
 {
     public static IServiceCollection AddApplicationLayer(this IServiceCollection collection)
     {
-        collection.AddScoped<IRelatedDataFactory, RelatedDataFactory>();
-        collection.AddScoped<IRelatedDataCollector, RelatedDataCollector>();
+        collection.RegisterRelatedData();
         
         collection.AddSingleton<ICurrencyConverter, CurrencyConverter>(_ => new CurrencyConverter(Global.UsdId));
         

@@ -9,7 +9,7 @@ public static class DContextMockData
     {
         await context.Database.ExecuteSqlRawAsync(
             """
-            INSERT INTO currency (id, to_usd)
+            INSERT INTO currencies (id, to_usd)
             VALUES 
                 (1, 1),
                 (2, 41.145504),

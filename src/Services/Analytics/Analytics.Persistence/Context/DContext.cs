@@ -76,7 +76,7 @@ public partial class DContext : DbContext
             entity.HasIndex(e => e.CurrencyId, "metrics_currency_id_index");
 
             entity.HasIndex(e => e.Discriminator, "metrics_dirty_index")
-                .HasFilter("needs_recalculation = true");
+                .HasFilter("(tags & 1) = 1");
             
             entity.HasIndex(m => new { m.DependsOn, m.RangeStart, m.RangeEnd },
                 "metrics_range_depends_index");
@@ -90,8 +90,8 @@ public partial class DContext : DbContext
                 .HasColumnName("id");
             entity.Property(e => e.Tags)
                 .HasColumnName("tags")
-                .HasConversion<long>()
-                .HasDefaultValue(false);
+                .HasConversion<long>();
+            
             entity.Property(m => m.DependsOn)
                 .HasConversion<long>()
                 .HasColumnName("depends_on");

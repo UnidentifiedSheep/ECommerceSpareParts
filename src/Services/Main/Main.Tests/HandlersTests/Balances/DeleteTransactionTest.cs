@@ -8,6 +8,7 @@ using Main.Persistence.Context;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
+using Test.Common.Extensions;
 using Test.Common.TestContainers.Combined;
 using Tests.MockData;
 
@@ -56,7 +57,7 @@ public class DeleteTransactionTest : IAsyncLifetime
 
     public async Task DisposeAsync()
     {
-        await _context.ClearDatabaseFull();
+        await _context.ClearDatabase();
     }
 
     [Fact]

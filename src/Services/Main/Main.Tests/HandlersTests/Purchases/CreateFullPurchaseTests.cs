@@ -4,6 +4,7 @@ using Main.Entities;
 using Main.Enums;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
+using Test.Common.Extensions;
 using Test.Common.TestContainers.Combined;
 using Tests.MockData;
 using Tests.MockData.DataFactories.Purchase;
@@ -30,7 +31,7 @@ public class CreateFullPurchaseTests : IAsyncLifetime
 
     public async Task DisposeAsync()
     {
-        await _testContext.DbContext.ClearDatabaseFull();
+        await _testContext.DbContext.ClearDatabase();
     }
 
     [Fact]

@@ -8,7 +8,5 @@ public record PurchaseFactUpsertDto
 
     public required Guid SupplierId { get; init; }
 
-    public required DateTime CreatedAt { get; init; }
-
     public required IReadOnlyList<PurchaseContentUpsertDto> Content { get; init; }
 }

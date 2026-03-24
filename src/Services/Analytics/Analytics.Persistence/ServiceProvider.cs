@@ -1,10 +1,13 @@
+using Abstractions.Interfaces;
 using Abstractions.Interfaces.Services;
 using Analytics.Abstractions.Interfaces.DbRepositories;
 using Analytics.Persistence.Context;
 using Analytics.Persistence.DataSeeds;
 using Analytics.Persistence.Repositories;
+using BulkValidation.Pgsql.Extensions;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
+using Persistence.DbValidator;
 using Persistence.Interfaces;
 using Persistence.Services.UnitOfWork;
 
@@ -21,8 +24,11 @@ public static class ServiceProvider
         collection.AddScoped<ICurrencyRepository, CurrencyRepository>();
         collection.AddScoped<IPurchaseFactRepository, PurchaseFactRepository>();
 
-        collection.AddScoped<ISeed<DContext>, CurrencySeed>();
+        collection.AddScoped<IDbValidator, PgsqlDbValidator<DContext>>();
+        collection.AddPgsqlDbValidators<DContext>();
 
+        collection.AddScoped<ISeed<DContext>, CurrencySeed>();
+        
         return collection;
     }
 }

@@ -2,7 +2,7 @@
   "locale": "en",
   "keyValues": {
     "purchase.fact.required": "Purchase fact is required.",
-    "purchase.fact.contents.required": "Content of purchase fact must not be empty.",
+    "purchase.fact.content.required": "Content of purchase fact must not be empty.",
     "purchase.fact.content.price.required": "Purchase content must be greater than 0.",
     "purchase.fact.content.price.precision.scale": "Purchase content can have maximum 2 decimal places.",
     "purchase.fact.content.count.required": "Purchase content count must be greater than 0."

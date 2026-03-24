@@ -11,6 +11,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Tests.MockData;
 using Exceptions.Exceptions.StorageRoutes;
 using Main.Application.Configs.Mapster;
+using Test.Common.Extensions;
 using Test.Common.TestContainers.Combined;
 using User = Main.Entities.User;
 
@@ -49,7 +50,7 @@ public class EditStorageRouteTests : IAsyncLifetime
 
     public async Task DisposeAsync()
     {
-        await _context.ClearDatabaseFull();
+        await _context.ClearDatabase();
     }
 
     [Fact]

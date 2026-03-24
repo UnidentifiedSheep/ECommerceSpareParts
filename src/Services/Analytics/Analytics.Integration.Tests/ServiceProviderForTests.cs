@@ -10,6 +10,7 @@ using Localization.Domain.Extensions;
 using MassTransit;
 using Persistence.Extensions;
 using Redis;
+using Test.Common.Extensions;
 using Test.Common.Stubs;
 using MsServiceProvider = Microsoft.Extensions.DependencyInjection.ServiceProvider;
 namespace Analytics.Integration.Tests;
@@ -33,10 +34,14 @@ public static class ServiceProviderForTests
         
         IServiceCollection services = new ServiceCollection();
         
+        services.AddLogging();
+        
         services.AddPersistenceLayer(postgresConnectionString)
             .AddApplicationLayer()
             .AddLocalization(locales)
             .AddCacheLayer(redisConnectionString);
+
+        services.RegisterTestContexts();
         
         services.AddTransient<IPublishEndpoint, MessageBrokerStub>();
         MapsterConfig.Configure();
