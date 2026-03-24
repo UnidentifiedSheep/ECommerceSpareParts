@@ -1,6 +1,6 @@
 using MassTransit;
 
-namespace Tests.Stubs;
+namespace Test.Common.Stubs;
 
 public class MessageBrokerStub : IPublishEndpoint
 {

@@ -16,7 +16,7 @@ using Security.Utils;
 
 string localesPath = Assembly.GetExecutingAssembly().Location;
 localesPath = Path.Combine(Path.GetDirectoryName(localesPath)!, "Localization");
-var locales = new[] {"ru", "en"};
+var locales = new[] {"ru-RU", "en-EN"};
 
 var builder = WebApplication.CreateBuilder(args);
 var certsPath = Environment.GetEnvironmentVariable("CERTS_PATH");
@@ -95,7 +95,7 @@ app.UseMiddleware<HeaderSecretMiddleware>();
 
 app.UseRequestLocalization(options => 
 {
-    options.SetDefaultCulture("en"); 
+    options.SetDefaultCulture(locales[0]); 
     options.AddSupportedCultures(locales); 
     options.AddSupportedUICultures(locales);
 });

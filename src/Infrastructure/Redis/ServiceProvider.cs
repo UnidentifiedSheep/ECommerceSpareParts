@@ -9,7 +9,7 @@ public static class ServiceProvider
     public static IServiceCollection AddCacheLayer(this IServiceCollection collection, string redisConnectionString, 
         string? prefix = null)
     {
-        collection.AddSingleton<IConnectionMultiplexer>(sp =>
+        collection.AddSingleton<IConnectionMultiplexer>(_ =>
         {
             var options = ConfigurationOptions.Parse(redisConnectionString);
             options.AbortOnConnectFail = false;

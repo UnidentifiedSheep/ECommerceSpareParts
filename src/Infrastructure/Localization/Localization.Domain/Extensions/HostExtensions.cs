@@ -8,12 +8,7 @@ public static class HostExtensions
 {
     public static async Task<IHost> LoadLocalesFromJson(this IHost host, string path)
     {
-        using var sp = host.Services.CreateScope();
-
-        var loader = new JsonLocalizerContainerLoader(path);
-        IEnumerable<ILocalizerContainer> containers = sp.ServiceProvider.GetServices<ILocalizerContainer>();
-        await loader.LoadAsync(containers);
-        
+        await host.Services.LoadLocalesFromJson(path);
         return host;
     }
 }

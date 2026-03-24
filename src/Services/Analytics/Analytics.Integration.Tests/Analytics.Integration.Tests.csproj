@@ -19,7 +19,22 @@
     </ItemGroup>
 
     <ItemGroup>
-      <Folder Include="MockData\" />
+      <ProjectReference Include="..\..\..\Infrastructure\Localization\Localization.Domain\Localization.Domain.csproj" />
+      <ProjectReference Include="..\..\..\Infrastructure\Redis\Redis.csproj" />
+      <ProjectReference Include="..\..\Test.Common\Test.Common.csproj" />
+      <ProjectReference Include="..\Analytics.Application\Analytics.Application.csproj" />
+      <ProjectReference Include="..\Analytics.Persistence\Analytics.Persistence.csproj" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <Content Include="..\Analytics.Abstractions\Localization\purchase-fact\purchase-fact-localization-en.json">
+        <Link>Localization\purchase-fact\purchase-fact-localization-en.json</Link>
+        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      </Content>
+      <Content Include="..\Analytics.Abstractions\Localization\purchase-fact\purchase-fact-localization-ru.json">
+        <Link>Localization\purchase-fact\purchase-fact-localization-ru.json</Link>
+        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      </Content>
     </ItemGroup>
 
 </Project>

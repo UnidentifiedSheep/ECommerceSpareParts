@@ -1,50 +1,18 @@
 ﻿using Localization.Abstractions.Interfaces;
-using Localization.Domain.Middlewares;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace Localization.Domain.Extensions;
 
 public static class ServiceProviderExtensions
 {
-    public static IServiceCollection AddLocalization(this IServiceCollection services, params string[] locales)
+    public static async Task<IServiceProvider> LoadLocalesFromJson(this IServiceProvider sp, string path)
     {
-        services.AddLocales(locales)
-            .AddStringLocalizer()
-            .AddScopedStringLocalizer();
+        using var scope = sp.CreateScope();
 
-        services.AddScoped<ScopedLocalizationMiddleware>();
+        var loader = new JsonLocalizerContainerLoader(path);
+        IEnumerable<ILocalizerContainer> containers = scope.ServiceProvider.GetServices<ILocalizerContainer>();
+        await loader.LoadAsync(containers);
         
-        return services;
-    }
-    
-    public static IServiceCollection AddLocales(this IServiceCollection services, params string[] locales)
-    {
-        foreach (var locale in locales)
-            services.AddSingleton<ILocalizerContainer, LocalizerContainer>(_ => new LocalizerContainer(locale));
-        return services;
-    }
-
-    public static IServiceCollection AddStringLocalizer<TLocalizer>(this IServiceCollection services) 
-        where TLocalizer : class, IStringLocalizer
-    {
-        services.AddSingleton<IStringLocalizer, TLocalizer>();
-        return services;
-    }
-    
-    public static IServiceCollection AddStringLocalizer(this IServiceCollection services) 
-    {
-        return services.AddStringLocalizer<StringLocalizer>();
-    }
-
-    public static IServiceCollection AddScopedStringLocalizer<TLocalizer>(this IServiceCollection services)
-        where TLocalizer : class, IScopedStringLocalizer
-    {
-        services.AddScoped<IScopedStringLocalizer, TLocalizer>();
-        return services;
-    }
-    
-    public static IServiceCollection AddScopedStringLocalizer(this IServiceCollection services)
-    {
-        return services.AddScopedStringLocalizer<ScopedStringLocalizer>();
+        return sp;
     }
 }
