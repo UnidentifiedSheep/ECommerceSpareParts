@@ -99,6 +99,100 @@ public class UpsertPurchaseFactTests : IAsyncLifetime
         var fact = facts.First();
         ValidateFields(dto, fact);
     }
+    
+    [Fact]
+    public async Task UpsertPurchaseFact_WhenNewContentAdded_InsertsIntoDatabase()
+    {
+        var initDto = Generate(2);
+        await _context.Mediator.Send(new UpsertPurchaseFactCommand(initDto));
+
+        var newContent = new PurchaseContentUpsertDto
+        {
+            Id = 999,
+            ArticleId = 123,
+            Count = 10,
+            Price = 50
+        };
+
+        var contents = initDto.Content.ToList();
+        contents.Add(newContent);
+        
+        var updatedDto = initDto with
+        {
+            LastUpdatedAt = DateTime.UtcNow + TimeSpan.FromMinutes(10),
+            Content = contents
+        };
+
+        await _context.Mediator.Send(new UpsertPurchaseFactCommand(updatedDto));
+
+        var fact = (await GetAllFacts()).First();
+
+        fact.PurchaseContents.Should().HaveCount(3);
+        fact.PurchaseContents.Any(x => x.Id == 999).Should().BeTrue();
+    }
+    
+    [Fact]
+    public async Task UpsertPurchaseFact_MixedChanges_HandledCorrectly()
+    {
+        var initDto = Generate(3);
+        await _context.Mediator.Send(new UpsertPurchaseFactCommand(initDto));
+
+        var updatedContent = new List<PurchaseContentUpsertDto>
+        {
+            initDto.Content[0] with { Count = 999 },
+            initDto.Content[1],
+            new()
+            {
+                Id = 777,
+                ArticleId = 42,
+                Count = 5,
+                Price = 15
+            }
+        };
+
+        var updatedDto = initDto with
+        {
+            LastUpdatedAt = DateTime.UtcNow + TimeSpan.FromMinutes(10),
+            Content = updatedContent
+        };
+
+        await _context.Mediator.Send(new UpsertPurchaseFactCommand(updatedDto));
+
+        var fact = (await GetAllFacts()).First();
+
+        fact.PurchaseContents.Should().HaveCount(3);
+
+        fact.PurchaseContents.First(x => x.Id == initDto.Content[0].Id)
+            .Count.Should().Be(999);
+
+        fact.PurchaseContents.Any(x => x.Id == 777).Should().BeTrue();
+
+        fact.PurchaseContents.Any(x => x.Id == initDto.Content[2].Id).Should().BeFalse();
+    }
+    
+    [Fact]
+    public async Task UpsertPurchaseFact_WhenContentRemoved_DeletesFromDatabase()
+    {
+        var initDto = Generate();
+        await _context.Mediator.Send(new UpsertPurchaseFactCommand(initDto));
+
+        var updatedDto = initDto with
+        {
+            LastUpdatedAt = DateTime.UtcNow + TimeSpan.FromMinutes(10),
+            Content = initDto.Content.Take(2).ToList()
+        };
+
+        await _context.Mediator.Send(new UpsertPurchaseFactCommand(updatedDto));
+
+        var facts = await GetAllFacts();
+        facts.Should().HaveCount(1);
+
+        var fact = facts.First();
+        fact.PurchaseContents.Should().HaveCount(2);
+
+        var remainingIds = updatedDto.Content.Select(x => x.Id).ToHashSet();
+        fact.PurchaseContents.All(x => remainingIds.Contains(x.Id)).Should().BeTrue();
+    }
 
     [Fact]
     public async Task UpsertPurchaseFact_WithOldUpdateAtValue_DoesNothing()
@@ -122,6 +216,30 @@ public class UpsertPurchaseFactTests : IAsyncLifetime
         
         var fact = facts.First();
         ValidateFields(initDto, fact);
+    }
+    
+    [Fact]
+    public async Task UpsertPurchaseFact_WhenRecordExists_UpdatesData()
+    {
+        var initDto = Generate();
+        var dto = initDto;
+        await _context.Mediator.Send(new UpsertPurchaseFactCommand(initDto));
+
+        dto = dto with
+        {
+            LastUpdatedAt = DateTime.UtcNow + TimeSpan.FromMinutes(10),
+            Content = dto.Content.ReplaceAt(0, x => x with{ Count = 1999})
+        };
+
+        var act = () => _context.Mediator.Send(new UpsertPurchaseFactCommand(dto));
+        await act.Should().NotThrowAsync();
+        
+        var facts = await GetAllFacts();
+        
+        facts.Should().HaveCount(1);
+        
+        var fact = facts.First();
+        ValidateFields(dto, fact);
     }
 
     private async Task<List<PurchasesFact>> GetAllFacts()

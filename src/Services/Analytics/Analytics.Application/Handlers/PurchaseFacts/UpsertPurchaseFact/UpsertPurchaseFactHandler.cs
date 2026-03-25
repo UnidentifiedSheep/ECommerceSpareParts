@@ -48,8 +48,27 @@ public class UpsertPurchaseFactHandler(
 
         //update fields.
         newFact.Adapt(dbFact);
-        dbFact.TotalSum = dbFact.PurchaseContents.Sum(x => x.Count * x.Price);
+        decimal sumAccumulator = 0m;
+        var existingContents = dbFact.PurchaseContents.ToDictionary(x => x.Id);
+        var toRemove = new Dictionary<int, PurchaseContent>(existingContents);
+        
+        foreach (var newContent in newFact.Content)
+        {
+            toRemove.Remove(newContent.Id);
+            sumAccumulator += newContent.Count * newContent.Price;
+            if (existingContents.TryGetValue(newContent.Id, out var existingContent))
+                newContent.Adapt(existingContent);
+            else
+                dbFact.PurchaseContents.Add(newContent.Adapt<PurchaseContent>());
+        }
+        
+        dbFact.TotalSum = sumAccumulator;
 
+        if (toRemove.Count != 0)
+            foreach (var item in toRemove.Values)
+                dbFact.PurchaseContents.Remove(item);
+        
+        
         //add to db if needed
         if (shouldBeAdded)
             await unitOfWork.AddAsync(dbFact, cancellationToken);

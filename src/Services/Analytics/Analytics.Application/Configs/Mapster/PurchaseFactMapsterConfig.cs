@@ -36,8 +36,7 @@ public static class PurchaseFactMapsterConfig
             .Map(d => d.CreatedAt, s => s.CreatedAt)
             .Map(d => d.ProcessedAt, s => DateTime.UtcNow)
             .Map(d => d.CurrencyId, s => s.CurrencyId)
-            .Map(d => d.SupplierId, s => s.SupplierId)
-            .Map(d => d.PurchaseContents, s => s.Content);
+            .Map(d => d.SupplierId, s => s.SupplierId);
         
         TypeAdapterConfig<PurchaseContentUpsertDto, PurchaseContent>.NewConfig()
             .IgnoreNonMapped(true)
