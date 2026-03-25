@@ -2,13 +2,13 @@
   "locale": "ru",
   "keyValues": {
     "storage.type.change.restricted": "Нельзя менять тип склада, так как у него есть владельцы.",
-    "not.enough.count.on.storage.for.article": "Недостаточно товара на складе для {articleId}. Доступно: {availableCount}, требуется: {neededCount}.",
+    "not.enough.count.on.storage.for.article": "Недостаточно товара на складе для {0}. Доступно: {1}, требуется: {2}.",
     "not.enough.count.on.storage.for.articles": "Недостаточно товара на складе для некоторых позиций.",
     "storage.content.not.found": "Не удалось найти содержимое склада, которое вы искали.",
-    "storage.not.found": "Не удалось найти склад с именем '{storage}'.",
-    "storage.not.found.in.user": "Не удалось найти склад '{storageName}' во владениях пользователя.",
-    "active.storage.route.exists": "Для склада отправителя '{from}' и склада получателя '{to}' уже существует активный маршрут.",
-    "storage.route.not.found.by.names": "Не удалось найти маршрут между складом '{from}' и складом '{to}'.",
+    "storage.not.found": "Не удалось найти склад с именем '{0}'.",
+    "storage.not.found.in.user": "Не удалось найти склад '{0}' во владениях пользователя.",
+    "active.storage.route.exists": "Для склада отправителя '{0}' и склада получателя '{1}' уже существует активный маршрут.",
+    "storage.route.not.found.by.names": "Не удалось найти маршрут между складом '{0}' и складом '{1}'.",
     "storage.route.not.found.by.id": "Не удалось найти маршрут."
   }
 }

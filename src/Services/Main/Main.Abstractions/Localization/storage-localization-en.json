@@ -2,13 +2,13 @@
   "locale": "en",
   "keyValues": {
     "storage.type.change.restricted": "You cannot change the warehouse type because it has owners.",
-    "not.enough.count.on.storage.for.article": "Not enough stock for {articleId}. Available: {availableCount}, required: {neededCount}.",
+    "not.enough.count.on.storage.for.article": "Not enough stock for {0}. Available: {1}, required: {2}.",
     "not.enough.count.on.storage.for.articles": "Not enough stock for some articles.",
     "storage.content.not.found": "We couldn't find the content in the storage you were looking for.",
-    "storage.not.found": "We couldn't find a warehouse named '{storage}'.",
-    "storage.not.found.in.user": "We couldn't find the warehouse '{storageName}' among the user's warehouses.",
-    "active.storage.route.exists": "An active route already exists between sender warehouse '{from}' and receiver warehouse '{to}'.",
-    "storage.route.not.found.by.names": "We couldn't find a route between warehouse '{from}' and warehouse '{to}'.",
+    "storage.not.found": "We couldn't find a warehouse named '{0}'.",
+    "storage.not.found.in.user": "We couldn't find the warehouse '{0}' among the user's warehouses.",
+    "active.storage.route.exists": "An active route already exists between sender warehouse '{0}' and receiver warehouse '{1}'.",
+    "storage.route.not.found.by.names": "We couldn't find a route between warehouse '{0}' and warehouse '{1}'.",
     "storage.route.not.found.by.id": "We couldn't find the route."
   }
 }

@@ -1,7 +1,7 @@
 ﻿{
   "locale": "en",
   "keyValues": {
-    "transaction.invalid.status.for.deletion": "You cannot delete a transaction with status '{status}'.",
+    "transaction.invalid.status.for.deletion": "You cannot delete a transaction with status '{0}'.",
     "deleted.transaction.cannot.be.edited": "You cannot edit a transaction that has already been deleted.",
     "transaction.already.deleted": "This transaction has already been deleted.",
     "transaction.not.found": "We couldn't find the transaction you were looking for."

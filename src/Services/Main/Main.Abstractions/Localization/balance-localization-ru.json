@@ -1,7 +1,7 @@
 ﻿{
   "locale": "ru",
   "keyValues": {
-    "transaction.invalid.status.for.deletion": "Нельзя удалить транзакцию со статусом '{status}'.",
+    "transaction.invalid.status.for.deletion": "Нельзя удалить транзакцию со статусом '{0}'.",
     "deleted.transaction.cannot.be.edited": "Нельзя редактировать уже удалённую транзакцию.",
     "transaction.already.deleted": "Эта транзакция уже была удалена.",
     "transaction.not.found": "Не удалось найти запрашиваемую транзакцию."

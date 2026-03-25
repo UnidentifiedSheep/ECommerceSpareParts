@@ -3,6 +3,6 @@
   "keyValues": {
     "producer.with.articles.cannot.be.deleted": "Нельзя удалить производителя, у которого есть статьи.",
     "producer.not.found": "Не удалось найти производителя, которого вы искали.",
-    "producer.additional.name.not.found": "Не удалось найти производителя с другим именем '{otherName}'."
+    "producer.additional.name.not.found": "Не удалось найти производителя с другим именем '{0}'."
   }
 }

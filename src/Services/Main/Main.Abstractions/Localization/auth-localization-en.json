@@ -3,11 +3,11 @@
   "keyValues": {
     "invalid.token": "The token you provided is invalid.",
     "wrong.credentials": "The credentials you entered are incorrect.",
-    "permission.not.found": "We couldn't find the permission '{name}'.",
+    "permission.not.found": "We couldn't find the permission '{0}'.",
     "role.not.found": "We couldn't find the role you were looking for.",
-    "role.not.found.with.role.name": "We couldn't find a role named '{roleName}'.",
-    "role.already.exists": "A role named '{roleName}' already exists.",
-    "user.already.have.this.role": "The user already has the role '{role}'.",
+    "role.not.found.with.role.name": "We couldn't find a role named '{0}'.",
+    "role.already.exists": "A role named '{0}' already exists.",
+    "user.already.have.this.role": "The user already has the role '{0}'.",
     "user.not.found": "We couldn't find the user you were looking for."
   }
 }

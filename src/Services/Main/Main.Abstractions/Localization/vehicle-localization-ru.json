@@ -1,7 +1,7 @@
 ﻿{
   "locale": "ru",
   "keyValues": {
-    "plate.number.already.taken": "Номерной знак '{plateNumber}' уже используется.",
-    "vin.code.already.taken": "VIN-код '{vinCode}' уже используется."
+    "plate.number.already.taken": "Номерной знак '{0}' уже используется.",
+    "vin.code.already.taken": "VIN-код '{0}' уже используется."
   }
 }

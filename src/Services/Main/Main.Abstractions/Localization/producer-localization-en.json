@@ -3,6 +3,6 @@
   "keyValues": {
     "producer.with.articles.cannot.be.deleted": "You cannot delete a producer that has articles.",
     "producer.not.found": "We couldn't find the producer you were looking for.",
-    "producer.additional.name.not.found": "We couldn't find a producer with the other name '{otherName}'."
+    "producer.additional.name.not.found": "We couldn't find a producer with the other name '{0}'."
   }
 }
