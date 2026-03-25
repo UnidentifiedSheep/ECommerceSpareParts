@@ -12,6 +12,8 @@ public partial class PurchasesFact
     public Guid SupplierId { get; set; }
 
     public DateTime CreatedAt { get; set; }
+    
+    public DateTime ProcessedAt { get; set; }
 
     public decimal TotalSum { get; set; }
 

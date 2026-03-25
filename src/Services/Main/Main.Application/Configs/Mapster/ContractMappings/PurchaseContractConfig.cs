@@ -19,6 +19,7 @@ public static class PurchaseContractConfig
             .Map(d => d.Comment, s => s.Comment)
             .Map(d => d.PurchaseDatetime, s => s.PurchaseDatetime)
             .Map(d => d.CreationDatetime, s => s.CreationDatetime)
+            .Map(d => d.LastUpdatedAt, s => s.UpdateDatetime)
             .Map(d => d.CurrencyId, s => s.CurrencyId)
             .Map(d => d.TransactionId, s => s.TransactionId)
             .Map(d => d.Storage, s => s.Storage)

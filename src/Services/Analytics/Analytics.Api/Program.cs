@@ -4,6 +4,7 @@ using Analytics.Application;
 using Analytics.Application.Consumers;
 using Analytics.Persistence;
 using Analytics.Persistence.Context;
+using Api.Common;
 using Api.Common.Middleware;
 using Carter;
 using Localization.Domain.Extensions;
@@ -80,11 +81,14 @@ builder.Services.AddMassTransit(x =>
 });
 
 builder.Services.AddCarter();
+builder.Services.AddBaseExceptionHandlers();
 
 var secret = Environment.GetEnvironmentVariable("GATEWAY_SUPER_KEY")!;
 builder.Services.AddTransient<HeaderSecretMiddleware>(_ => new HeaderSecretMiddleware(secret));
 
 var app = builder.Build();
+
+app.UseExceptionHandler(_ => { });
 
 await app.LoadLocalesFromJson(localesPath);
 

@@ -1,7 +1,11 @@
-﻿namespace Exceptions.Base;
+﻿using System.Net;
+using Abstractions.Interfaces.Exceptions;
 
-public class InternalServerException : Exception
+namespace Exceptions.Base;
+
+public class InternalServerException : Exception, IStatusCode
 {
+    public HttpStatusCode StatusCode => HttpStatusCode.InternalServerError;
     public InternalServerException(string message) : base(message)
     {
     }

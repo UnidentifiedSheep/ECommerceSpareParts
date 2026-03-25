@@ -1,9 +1,11 @@
+using System.Net;
 using Abstractions.Interfaces.Exceptions;
 
 namespace Exceptions.Base;
 
-public class BaseValuedException : Exception, IValuedException
+public abstract class BaseValuedException : Exception, IValuedException, IStatusCode
 {
+    public abstract HttpStatusCode StatusCode { get; }
     private readonly object? _errorValues;
 
     protected BaseValuedException(string message, object key) : base(message)
@@ -19,4 +21,5 @@ public class BaseValuedException : Exception, IValuedException
     {
         return _errorValues;
     }
+
 }

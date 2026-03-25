@@ -163,7 +163,7 @@ builder.Services
     .AddApplicationLayer(emailOptions)
     .AddExchangeRates();
 
-builder.Services.AddExceptionHandler<CustomExceptionHandler>();
+builder.Services.AddBaseExceptionHandlers();
 
 builder.Services.AddHostedService<SearchLogBackgroundWorker>();
 

@@ -114,7 +114,7 @@ public partial class DContext : DbContext
 
             entity.HasOne(d => d.Currency).WithMany(p => p.Metrics)
                 .HasForeignKey(d => d.CurrencyId)
-                .OnDelete(DeleteBehavior.ClientSetNull)
+                .OnDelete(DeleteBehavior.Restrict)
                 .HasConstraintName("metrics_currencies_id_fk");
         });
 
@@ -138,7 +138,7 @@ public partial class DContext : DbContext
 
             entity.HasOne(d => d.Purchase).WithMany(p => p.PurchaseContents)
                 .HasForeignKey(d => d.PurchaseId)
-                .OnDelete(DeleteBehavior.ClientSetNull)
+                .OnDelete(DeleteBehavior.Cascade)
                 .HasConstraintName("purchase_contents_purchases_fact_id_fk");
         });
 
@@ -156,13 +156,14 @@ public partial class DContext : DbContext
 
             entity.Property(e => e.Id).HasColumnName("id");
             entity.Property(e => e.CreatedAt).HasColumnName("created_at");
+            entity.Property(e => e.ProcessedAt).HasColumnName("processed_at");
             entity.Property(e => e.CurrencyId).HasColumnName("currency_id");
             entity.Property(e => e.SupplierId).HasColumnName("supplier_id");
             entity.Property(e => e.TotalSum).HasColumnName("total_sum");
 
             entity.HasOne(d => d.Currency).WithMany(p => p.PurchasesFacts)
                 .HasForeignKey(d => d.CurrencyId)
-                .OnDelete(DeleteBehavior.ClientSetNull)
+                .OnDelete(DeleteBehavior.Restrict)
                 .HasConstraintName("purchases_fact_currencies_id_fk");
         });
 
@@ -210,7 +211,7 @@ public partial class DContext : DbContext
 
             entity.HasOne(d => d.Currency).WithMany(p => p.SaleContentDetails)
                 .HasForeignKey(d => d.CurrencyId)
-                .OnDelete(DeleteBehavior.ClientSetNull)
+                .OnDelete(DeleteBehavior.Restrict)
                 .HasConstraintName("sale_content_detail_currencies_id_fk");
         });
 
@@ -236,7 +237,7 @@ public partial class DContext : DbContext
 
             entity.HasOne(d => d.Currency).WithMany(p => p.SalesFacts)
                 .HasForeignKey(d => d.CurrencyId)
-                .OnDelete(DeleteBehavior.ClientSetNull)
+                .OnDelete(DeleteBehavior.Restrict)
                 .HasConstraintName("sales_fact_currencies_id_fk");
         });
 
