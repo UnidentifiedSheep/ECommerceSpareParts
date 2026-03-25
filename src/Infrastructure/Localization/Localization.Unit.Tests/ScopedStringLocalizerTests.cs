@@ -52,6 +52,56 @@ public class ScopedStringLocalizerTests
         var action = () => scoped.Get("Test.Key");
         action.Should().Throw<ObjectDisposedException>();
     }
+    
+    [Fact]
+    public void TryGet_ShouldThrow_WhenLocaleNotSet()
+    {
+        var baseLocalizer = CreateBaseLocalizer();
+        var scoped = new ScopedStringLocalizer(baseLocalizer);
+
+        var result = () => scoped.TryGet("Test.Key", out _);
+        result.Should().Throw<ArgumentNullException>();
+    }
+
+    [Fact]
+    public void TryGet_ShouldReturnTrueAndValue_WhenKeyExists()
+    {
+        var baseLocalizer = CreateBaseLocalizer();
+        var scoped = new ScopedStringLocalizer(baseLocalizer);
+
+        scoped.SetLocale("en");
+
+        var success = scoped.TryGet("Test.Key", out var value);
+
+        success.Should().BeTrue();
+        value.Should().Be("value");
+    }
+
+    [Fact]
+    public void TryGet_ShouldReturnFalseAndNull_WhenKeyDoesNotExist()
+    {
+        var baseLocalizer = CreateBaseLocalizer();
+        var scoped = new ScopedStringLocalizer(baseLocalizer);
+
+        scoped.SetLocale("en");
+
+        var success = scoped.TryGet("NonExistent.Key", out var value);
+
+        success.Should().BeFalse();
+        value.Should().BeNull();
+    }
+
+    [Fact]
+    public void TryGet_ShouldThrow_WhenDisposed()
+    {
+        var baseLocalizer = CreateBaseLocalizer();
+        var scoped = new ScopedStringLocalizer(baseLocalizer);
+
+        scoped.Dispose();
+
+        var result = () => scoped.TryGet("Test.Key", out _);
+        result.Should().Throw<ObjectDisposedException>();
+    }
 
     private static StringLocalizer CreateBaseLocalizer()
     {

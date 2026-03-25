@@ -22,6 +22,14 @@ public sealed class ScopedStringLocalizer(IStringLocalizer stringLocalizer) : IS
         return stringLocalizer.Get(key, _locale.Value);
     }
 
+    public bool TryGet(string key, out string? value)
+    {
+        ObjectDisposedException.ThrowIf(_disposed, this);
+        ArgumentNullException.ThrowIfNull(_locale);
+        
+        return stringLocalizer.TryGet(key, _locale.Value, out value);
+    }
+
     public string this[string key] => Get(key);
 
     public void Dispose()

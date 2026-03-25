@@ -1,0 +1,6 @@
+﻿{
+  "locale": "ru",
+  "keyValues": {
+    "logistics.no.items.for.calculation": "Ни одна позиция не подходит для расчёта логистики."
+  }
+}

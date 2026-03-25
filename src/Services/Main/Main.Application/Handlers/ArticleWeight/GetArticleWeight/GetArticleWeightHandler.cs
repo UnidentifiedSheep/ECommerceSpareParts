@@ -1,6 +1,6 @@
 ﻿using Application.Common.Interfaces;
-using Exceptions.Exceptions.ArticleWeight;
 using Main.Abstractions.Dtos.ArticleWeight;
+using Main.Abstractions.Exceptions.Articles;
 using Main.Abstractions.Interfaces.DbRepositories;
 using Main.Abstractions.Utils;
 using Mapster;

@@ -3,7 +3,7 @@ using Abstractions.Interfaces.Services;
 using Abstractions.Models;
 using Application.Common.Interfaces;
 using Attributes;
-using Exceptions.Exceptions.Auth;
+using Main.Abstractions.Exceptions.Auth;
 using Main.Abstractions.Interfaces.DbRepositories;
 using Main.Abstractions.Interfaces.Services;
 using Main.Enums;

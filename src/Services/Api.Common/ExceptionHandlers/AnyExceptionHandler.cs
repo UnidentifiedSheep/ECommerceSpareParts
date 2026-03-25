@@ -25,11 +25,10 @@ public class AnyExceptionHandler(
 
     private void SetLocalizedDetail(ProblemDetails problemDetails, HttpContext httpContext, Exception exception)
     {
-        if (exception is not ILocalizableException localizableException) return;
-        
         var localizer = httpContext.RequestServices.GetService<IScopedStringLocalizer>();
         if (localizer == null) return;
-
-        problemDetails.Detail = localizer[localizableException.MessageKey];
+        
+        if (TryGetLocalizableMessageFromException(localizer, exception, out var localizedMessage))
+            problemDetails.Detail = localizedMessage;
     }
 }

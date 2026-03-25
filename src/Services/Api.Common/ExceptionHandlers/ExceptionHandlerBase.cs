@@ -1,4 +1,5 @@
 ﻿using Abstractions.Interfaces.Exceptions;
+using Localization.Abstractions.Interfaces;
 using Microsoft.AspNetCore.Diagnostics;
 using Microsoft.AspNetCore.Mvc;
 
@@ -44,5 +45,41 @@ public abstract class ExceptionHandlerBase<THandler>(
     {
         if (exception is not IStatusCode scEx) return 500;
         return (int)scEx.StatusCode;
+    }
+
+    protected bool TryGetLocalizableMessageFromException(
+        IScopedStringLocalizer localizer,
+        Exception exception,
+        out string? detail)
+    {
+        detail = null;
+        if (exception is not ILocalizableException localizableException) return false;
+
+        string key = localizableException.MessageKey;
+        string message = localizer[key];
+        var arguments = localizableException.Arguments;
+
+        if (arguments == null || arguments.Length == 0)
+        {
+            detail = message;
+            return true;
+        }
+        
+        try
+        {
+            detail = string.Format(message, arguments);
+            return true;
+        }
+        catch (FormatException ex)
+        {
+            logger.LogError(
+                ex,
+                "Unable to format localizable message for Key: {Key}, Arguments: {@Args}", 
+                key,
+                arguments);
+            
+            detail = $"{message} [Error formatting message]";
+            return true;
+        }
     }
 }

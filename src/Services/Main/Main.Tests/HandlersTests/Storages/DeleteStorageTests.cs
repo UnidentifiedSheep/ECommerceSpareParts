@@ -1,4 +1,4 @@
-﻿using Exceptions.Exceptions.Storages;
+﻿using Main.Abstractions.Exceptions.Storages;
 using Main.Application.Handlers.Storages.DeleteStorage;
 using Main.Persistence.Context;
 using MediatR;

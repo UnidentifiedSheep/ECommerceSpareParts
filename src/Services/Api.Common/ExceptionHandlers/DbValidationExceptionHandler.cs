@@ -1,4 +1,5 @@
 ﻿using BulkValidation.Core.Exceptions;
+using Localization.Abstractions.Interfaces;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Api.Common.ExceptionHandlers;
@@ -18,21 +19,27 @@ public class DbValidationExceptionHandler(
         
         var problemDetails = GetBaseDetails(dbValidationException, httpContext, null);
         SetStatusCode(problemDetails, dbValidationException);
-        AddDbValidationErrors(problemDetails, dbValidationException);
+        AddDbValidationErrors(
+            httpContext, 
+            problemDetails, 
+            dbValidationException);
         
         await httpContext.Response.WriteAsJsonAsync(problemDetails, cancellationToken);
         return true;
     }
     
-    private void AddDbValidationErrors(ProblemDetails details, ValidationException bulkEx)
+    private void AddDbValidationErrors(HttpContext httpContext, ProblemDetails details, ValidationException bulkEx)
     {
+        var localizer = httpContext.RequestServices.GetService<IScopedStringLocalizer>();
+
         details.Extensions["errors"] = bulkEx.Failures
             .Select(errorValue => new ProblemDetails
             {
-                Title = errorValue.ErrorName ?? "An unexpected error occurred", 
-                Detail = errorValue.Message,
+                Title = errorValue.ErrorName ?? "An unexpected error occurred",
+                Detail = localizer != null ? localizer[errorValue.Message] : errorValue.Message,
                 Status = errorValue.ErrorCode
-            }).ToList();
+            })
+            .ToList();
     }
 
     private void SetStatusCode(ProblemDetails details, ValidationException bulkEx)

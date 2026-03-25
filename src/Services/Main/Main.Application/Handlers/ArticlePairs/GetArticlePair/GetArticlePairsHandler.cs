@@ -1,6 +1,6 @@
 using Application.Common.Interfaces;
-using Exceptions.Exceptions.ArticlePair;
 using Main.Abstractions.Dtos.Amw.Articles;
+using Main.Abstractions.Exceptions.Articles;
 using Main.Abstractions.Interfaces.DbRepositories;
 using Mapster;
 

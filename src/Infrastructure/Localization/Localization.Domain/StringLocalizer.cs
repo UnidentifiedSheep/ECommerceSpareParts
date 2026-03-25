@@ -23,4 +23,12 @@ public class StringLocalizer : IStringLocalizer
         
         return value;
     }
+
+    public bool TryGet(string key, Locale locale, out string? value)
+    {
+        value = null;
+        if (!_localization.TryGetValue(locale, out Dictionary<string, string>? localeValues))
+            return false;
+        return localeValues.TryGetValue(key, out value);
+    }
 }

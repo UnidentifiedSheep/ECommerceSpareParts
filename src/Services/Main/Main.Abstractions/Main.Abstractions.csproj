@@ -9,7 +9,12 @@
     <ItemGroup>
       <ProjectReference Include="..\..\..\Core\Abstractions\Abstractions.csproj" />
       <ProjectReference Include="..\..\..\Core\Enums\Enums.csproj" />
+      <ProjectReference Include="..\..\..\Core\Exceptions\Exceptions.csproj" />
       <ProjectReference Include="..\Main.Entities\Main.Entities.csproj" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <Folder Include="Exceptions\" />
     </ItemGroup>
 
 </Project>

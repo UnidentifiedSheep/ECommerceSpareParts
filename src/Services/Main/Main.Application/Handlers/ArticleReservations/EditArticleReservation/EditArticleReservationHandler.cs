@@ -1,8 +1,8 @@
 using Abstractions.Interfaces.Services;
 using Application.Common.Interfaces;
 using Attributes;
-using Exceptions.Exceptions.ArticleReservations;
 using Main.Abstractions.Dtos.Amw.ArticleReservations;
+using Main.Abstractions.Exceptions.Articles;
 using Main.Abstractions.Interfaces.DbRepositories;
 using Mapster;
 using MediatR;

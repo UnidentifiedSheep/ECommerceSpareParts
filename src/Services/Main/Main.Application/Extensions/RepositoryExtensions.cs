@@ -1,4 +1,4 @@
-using Exceptions.Exceptions.Articles;
+using Main.Abstractions.Exceptions.Articles;
 using Main.Abstractions.Interfaces.DbRepositories;
 using Main.Entities;
 

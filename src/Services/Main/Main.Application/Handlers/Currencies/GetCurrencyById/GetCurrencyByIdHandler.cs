@@ -1,6 +1,6 @@
 using Application.Common.Interfaces;
-using Exceptions.Exceptions.Currencies;
 using Main.Abstractions.Dtos.Currencies;
+using Main.Abstractions.Exceptions.Currencies;
 using Main.Abstractions.Interfaces.DbRepositories;
 using Mapster;
 

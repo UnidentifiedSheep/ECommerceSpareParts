@@ -7,7 +7,7 @@ using Application.Common.Interfaces;
 using Application.Common.Interfaces.Settings;
 using Attributes;
 using Contracts.Currency;
-using Exceptions.Exceptions.Currencies;
+using Main.Abstractions.Exceptions.Currencies;
 using Main.Abstractions.Interfaces.DbRepositories;
 using Main.Abstractions.Models.Settings;
 using Main.Application.Notifications;

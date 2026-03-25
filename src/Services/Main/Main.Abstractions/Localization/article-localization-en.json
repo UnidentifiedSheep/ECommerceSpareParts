@@ -1,0 +1,13 @@
+﻿{
+  "locale": "en",
+  "keyValues": {
+    "article.characteristics.not.found": "Article characteristics not found.",
+    "article.pair.not.found": "Article pair not found.",
+    "article.reservation.not.found": "Article reservation not found.",
+    "article.content.not.found": "Article content not found.",
+    "article.not.found": "Article not found.",
+    "articles.not.found": "Articles not found.",
+    "article.weight.not.found": "Weight for the article was not found.",
+    "article.sizes.not.found": "Sizes of the article was not found."
+  }
+}

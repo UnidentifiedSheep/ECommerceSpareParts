@@ -3,9 +3,9 @@ using Abstractions.Interfaces.Services;
 using Application.Common.Interfaces;
 using Attributes;
 using Contracts.Sale;
-using Exceptions.Exceptions.Sales;
-using Exceptions.Exceptions.Storages;
 using Main.Abstractions.Dtos.Amw.Sales;
+using Main.Abstractions.Exceptions.Sales;
+using Main.Abstractions.Exceptions.Storages;
 using Main.Abstractions.Interfaces.DbRepositories;
 using Main.Abstractions.Models;
 using Main.Application.Extensions;
@@ -119,7 +119,7 @@ public class CreateFullSaleHandler(IMediator mediator, IArticlesRepository artic
 
             var currentCode = codeBuilder.ToString();
             if (currentCode != confirmationCode)
-                throw new SoftConfirmationNeededException(currentCode, res);
+                throw new SaleSoftConfirmationNeededException(currentCode, res);
         }
     }
 

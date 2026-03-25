@@ -1,0 +1,8 @@
+﻿{
+  "locale": "en",
+  "keyValues": {
+    "sale.content.not.found": "We couldn't find any content for this sale.",
+    "sale.not.found": "We couldn't find the sale you were looking for.",
+    "soft.confirmation.needed.for.sale.reservation.reason": "This sale requires confirmation because it conflicts with existing reservations. Confirmation code is '{code}'."
+  }
+}

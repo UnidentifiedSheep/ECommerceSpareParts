@@ -1,0 +1,7 @@
+﻿{
+  "locale": "en",
+  "keyValues": {
+    "plate.number.already.taken": "The plate number '{plateNumber}' is already in use.",
+    "vin.code.already.taken": "The VIN code '{vinCode}' is already in use."
+  }
+}

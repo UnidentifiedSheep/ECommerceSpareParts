@@ -1,0 +1,9 @@
+﻿{
+  "locale": "en",
+  "keyValues": {
+    "content.article.doesnt.match.purchase.position": "The article does not match the position in the purchase.",
+    "purchase.content.not.found": "We couldn't find the content for the purchase you were looking for.",
+    "purchase.logistics.data.not.found": "We couldn't find logistics information for this purchase.",
+    "purchase.not.found": "We couldn't find the purchase you were looking for."
+  }
+}

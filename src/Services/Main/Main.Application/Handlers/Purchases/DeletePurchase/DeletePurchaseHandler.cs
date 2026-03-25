@@ -2,7 +2,7 @@ using Abstractions.Interfaces.Services;
 using Abstractions.Models.Repository;
 using Application.Common.Interfaces;
 using Attributes;
-using Exceptions.Exceptions.Purchase;
+using Main.Abstractions.Exceptions.Purchase;
 using Main.Abstractions.Interfaces.DbRepositories;
 using Main.Entities;
 using MediatR;

@@ -4,7 +4,7 @@ using Abstractions.Interfaces.Services;
 using Application.Common.Interfaces;
 using Attributes;
 using Exceptions.Base;
-using Exceptions.Exceptions.Storages;
+using Main.Abstractions.Exceptions.Storages;
 using Main.Abstractions.Interfaces.DbRepositories;
 using Main.Abstractions.Interfaces.Services;
 using Main.Application.Notifications;

@@ -1,4 +1,4 @@
-﻿using Exceptions.Exceptions.Suggestions;
+﻿using Search.Abstractions.Exceptions.Suggestions;
 using Search.Abstractions.Interfaces.Persistence;
 using Search.Entities;
 using Search.Enums;

@@ -1,0 +1,6 @@
+﻿{
+  "locale": "en",
+  "keyValues": {
+    "logistics.no.items.for.calculation": "No items are suitable for logistics calculation."
+  }
+}

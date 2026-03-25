@@ -1,9 +1,9 @@
 using Abstractions.Models;
 using Exceptions.Base;
-using Exceptions.Exceptions.Storages;
 using Main.Application.Configs;
 using Main.Application.Handlers.StorageContents.EditContent;
 using Main.Abstractions.Dtos.Amw.Storage;
+using Main.Abstractions.Exceptions.Storages;
 using Main.Entities;
 using Main.Abstractions.Models;
 using Main.Application.Configs.Mapster;

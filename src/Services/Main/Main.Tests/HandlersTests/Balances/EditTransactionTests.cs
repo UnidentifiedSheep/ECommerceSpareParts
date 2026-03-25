@@ -1,5 +1,5 @@
-using Exceptions.Exceptions.Balances;
 using FluentValidation;
+using Main.Abstractions.Exceptions.Balances;
 using Main.Application.Configs;
 using Main.Application.Configs.Mapster;
 using Main.Application.Handlers.Balance.EditTransaction;

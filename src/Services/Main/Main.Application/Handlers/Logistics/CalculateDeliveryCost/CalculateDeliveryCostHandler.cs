@@ -2,12 +2,11 @@
 using Abstractions.Interfaces.Currency;
 using Application.Common.Interfaces;
 using Enums;
-using Exceptions.Exceptions.ArticleSizes;
-using Exceptions.Exceptions.ArticleWeight;
-using Exceptions.Exceptions.Logistics;
-using Exceptions.Exceptions.StorageRoutes;
 using Main.Abstractions.Dtos.Amw.Logistics;
 using Main.Abstractions.Dtos.Amw.StorageRoutes;
+using Main.Abstractions.Exceptions.Articles;
+using Main.Abstractions.Exceptions.Logistics;
+using Main.Abstractions.Exceptions.Storages;
 using Main.Abstractions.Interfaces.DbRepositories;
 using Main.Abstractions.Interfaces.Logistics;
 using Main.Abstractions.Models.Logistics;

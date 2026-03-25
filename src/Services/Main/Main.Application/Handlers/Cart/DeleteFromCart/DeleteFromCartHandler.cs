@@ -1,7 +1,7 @@
 ﻿using Abstractions.Interfaces.Services;
 using Application.Common.Interfaces;
 using Attributes;
-using Exceptions.Exceptions.Cart;
+using Main.Abstractions.Exceptions.Cart;
 using Main.Abstractions.Interfaces.DbRepositories;
 using MediatR;
 

@@ -1,5 +1,5 @@
-﻿using Exceptions.Exceptions.Suggestions;
-using Mediator;
+﻿using Mediator;
+using Search.Abstractions.Exceptions.Suggestions;
 using Search.Abstractions.Interfaces.Persistence;
 
 namespace Search.Application.Handler.Articles.IsSuggestionsRebuilding;

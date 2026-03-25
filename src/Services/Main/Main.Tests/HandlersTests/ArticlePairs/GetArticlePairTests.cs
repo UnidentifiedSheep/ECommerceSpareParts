@@ -1,4 +1,4 @@
-﻿using Exceptions.Exceptions.ArticlePair;
+﻿using Main.Abstractions.Exceptions.Articles;
 using Main.Application.Handlers.ArticlePairs.CreatePair;
 using Main.Application.Handlers.ArticlePairs.GetArticlePair;
 using Main.Persistence.Context;

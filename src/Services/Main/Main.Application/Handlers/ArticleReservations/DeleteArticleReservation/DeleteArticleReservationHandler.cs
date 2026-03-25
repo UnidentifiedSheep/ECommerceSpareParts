@@ -1,6 +1,6 @@
 using Abstractions.Interfaces.Services;
 using Application.Common.Interfaces;
-using Exceptions.Exceptions.ArticleReservations;
+using Main.Abstractions.Exceptions.Articles;
 using Main.Abstractions.Interfaces.DbRepositories;
 using MediatR;
 

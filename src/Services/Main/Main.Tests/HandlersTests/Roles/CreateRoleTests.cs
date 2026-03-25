@@ -1,6 +1,6 @@
 ﻿using Bogus;
-using Exceptions.Exceptions.Roles;
 using Extensions;
+using Main.Abstractions.Exceptions.Auth;
 using Main.Application.Handlers.Roles.CreateRole;
 using Main.Persistence.Context;
 using MediatR;

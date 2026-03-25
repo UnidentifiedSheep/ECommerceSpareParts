@@ -3,7 +3,7 @@ using Abstractions.Interfaces.Services;
 using Application.Common.Interfaces;
 using Attributes;
 using Contracts.Articles;
-using Exceptions.Exceptions.Storages;
+using Main.Abstractions.Exceptions.Storages;
 using Main.Abstractions.Interfaces.DbRepositories;
 using Main.Abstractions.Interfaces.Services;
 using Main.Abstractions.Models;
@@ -71,7 +71,7 @@ public class RemoveContentHandler(IStorageContentRepository contentRepository, I
                     if (availableCount >= count) break;
                 }
 
-            if (availableCount < count) throw new NotEnoughCountOnStorageException(articleId, availableCount);
+            if (availableCount < count) throw new NotEnoughCountOnStorageException(articleId, availableCount, count);
             var counter = count;
 
             foreach (var item in storageContents)

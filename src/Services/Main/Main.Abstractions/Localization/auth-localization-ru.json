@@ -1,0 +1,13 @@
+﻿{
+  "locale": "ru",
+  "keyValues": {
+    "invalid.token": "Переданный токен недействителен.",
+    "wrong.credentials": "Введённые учетные данные неверны.",
+    "permission.not.found": "Не удалось найти разрешение '{name}'.",
+    "role.not.found": "Не удалось найти нужную роль.",
+    "role.not.found.with.role.name": "Не удалось найти роль с именем '{roleName}'.",
+    "role.already.exists": "Роль с именем '{roleName}' уже существует.",
+    "user.already.have.this.role": "У пользователя уже есть роль '{role}'.",
+    "user.not.found": "Не удалось найти пользователя, которого вы искали."
+  }
+}

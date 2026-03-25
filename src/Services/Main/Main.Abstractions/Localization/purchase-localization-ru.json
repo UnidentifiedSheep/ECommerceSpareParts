@@ -1,0 +1,9 @@
+﻿{
+  "locale": "ru",
+  "keyValues": {
+    "content.article.doesnt.match.purchase.position": "Артикул не соответствует позиции в закупке.",
+    "purchase.content.not.found": "Не удалось найти содержимое закупки, которое вы искали.",
+    "purchase.logistics.data.not.found": "Не удалось найти данные по логистике для этой закупки.",
+    "purchase.not.found": "Не удалось найти закупку, которую вы искали."
+  }
+}
