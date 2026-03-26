@@ -1,4 +1,5 @@
 using FluentValidation;
+using Localization.Domain.Extensions;
 
 namespace Main.Application.Handlers.BaseValidators;
 
@@ -8,11 +9,12 @@ public class LoginValidator : AbstractValidator<string>
     {
         RuleFor(x => x)
             .NotEmpty()
+            .WithLocalizationKey("login.must.not.be.empty")
             .Must(x => x.Trim().Length >= 5)
-            .WithMessage("Минимальная длина логина 5 символов")
+            .WithLocalizationKey("login.min.length.5")
             .Must(x => x.Trim().Length <= 36)
-            .WithMessage("Максимальная длина логина 36 символов")
+            .WithLocalizationKey("login.max.length.36")
             .Must(x => !x.Contains(' '))
-            .WithMessage("Логин не может содержать пробелов");
+            .WithLocalizationKey("login.cannot.contain.spaces");
     }
 }

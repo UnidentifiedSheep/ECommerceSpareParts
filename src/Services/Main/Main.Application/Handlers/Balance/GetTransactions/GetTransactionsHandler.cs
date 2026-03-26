@@ -1,3 +1,4 @@
+using Abstractions.Models;
 using Application.Common.Interfaces;
 using Main.Abstractions.Dtos.Amw.Balances;
 using Main.Abstractions.Interfaces.DbRepositories;
@@ -11,8 +12,7 @@ public record GetTransactionsQuery(
     int? CurrencyId,
     Guid? SenderId,
     Guid? ReceiverId,
-    int Page,
-    int Limit) : IQuery<GetTransactionsResult>;
+    PaginationModel Pagination) : IQuery<GetTransactionsResult>;
 
 public record GetTransactionsResult(IEnumerable<TransactionDto> Transactions);
 
@@ -21,8 +21,9 @@ public class GetTransactionsHandler(IBalanceRepository balanceRepository)
 {
     public async Task<GetTransactionsResult> Handle(GetTransactionsQuery request, CancellationToken cancellationToken)
     {
+        var pagination = request.Pagination;
         var res = await balanceRepository.GetTransactionsAsync(request.RangeStart, request.RangeEnd,
-            request.CurrencyId, request.SenderId, request.ReceiverId, request.Page, request.Limit, false,
+            request.CurrencyId, request.SenderId, request.ReceiverId, pagination.Page, pagination.Size, false,
             cancellationToken);
         return new GetTransactionsResult(res.Adapt<List<TransactionDto>>());
     }

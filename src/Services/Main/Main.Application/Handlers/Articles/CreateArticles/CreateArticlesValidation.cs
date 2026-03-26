@@ -1,4 +1,5 @@
 using FluentValidation;
+using Localization.Domain.Extensions;
 
 namespace Main.Application.Handlers.Articles.CreateArticles;
 
@@ -8,36 +9,40 @@ public class CreateArticlesValidation : AbstractValidator<CreateArticlesCommand>
     {
         RuleFor(x => x.NewArticles)
             .NotEmpty()
-            .WithMessage("Должен быть указан хотя бы один артикул на добавление");
+            .WithLocalizationKey("article.create.articles.must.have.at.least.one");
+
         RuleFor(x => x.NewArticles)
             .Must(x => x.Count <= 100)
-            .WithMessage("Максимум можно добавить 100 артикулов за раз");
+            .WithLocalizationKey("article.create.articles.max.100.at.once");
+
         RuleForEach(x => x.NewArticles).ChildRules(content =>
         {
-            content.RuleFor(x => x.ArticleNumber).NotEmpty()
-                .WithMessage("Артикул не может быть пустым");
             content.RuleFor(x => x.ArticleNumber)
-                .Must(x => x.Trim().Length <= 128)
-                .WithMessage("Максимальная длина артикула 128 символов");
+                .NotEmpty()
+                .WithLocalizationKey("article.articleNumber.must.not.be.empty");
             content.RuleFor(x => x.ArticleNumber)
                 .Must(x => x.Trim().Length >= 3)
-                .WithMessage("Минимальная длина артикула 3 символа");
+                .WithLocalizationKey("article.articleNumber.min.length.3");
+            content.RuleFor(x => x.ArticleNumber)
+                .Must(x => x.Trim().Length <= 128)
+                .WithLocalizationKey("article.articleNumber.max.length.128");
 
-            content.RuleFor(x => x.Name).NotEmpty()
-                .WithMessage("Название артикула не может быть пустым");
+            content.RuleFor(x => x.Name)
+                .NotEmpty()
+                .WithLocalizationKey("article.name.must.not.be.empty");
             content.RuleFor(x => x.Name)
                 .Must(x => x.Trim().Length <= 255)
-                .WithMessage("Максимальная длина названия 255 символов");
+                .WithLocalizationKey("article.name.max.length.255");
 
             content.RuleFor(x => x.Description)
                 .Must(x => x?.Trim().Length <= 255)
                 .When(x => x.Description != null)
-                .WithMessage("Максимальная длина описания 255 символов");
+                .WithLocalizationKey("article.description.max.length.255");
 
             content.RuleFor(x => x.Indicator)
                 .Must(x => x?.Trim().Length <= 24)
                 .When(x => x.Indicator != null)
-                .WithMessage("Максимальная длина индикатора/цвета 24 символа");
+                .WithLocalizationKey("article.indicator.max.length.24");
         });
     }
 }

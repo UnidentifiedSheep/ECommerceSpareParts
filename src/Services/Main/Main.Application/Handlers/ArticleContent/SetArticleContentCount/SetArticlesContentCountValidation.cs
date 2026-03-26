@@ -1,4 +1,5 @@
 using FluentValidation;
+using Localization.Domain.Extensions;
 
 namespace Main.Application.Handlers.ArticleContent.SetArticleContentCount;
 
@@ -6,7 +7,8 @@ public class SetArticlesContentCountValidation : AbstractValidator<SetArticlesCo
 {
     public SetArticlesContentCountValidation()
     {
-        RuleFor(x => x.Count).GreaterThanOrEqualTo(0)
-            .WithMessage("Количество должно быть больше или равно 0");
+        RuleFor(x => x.Count)
+            .GreaterThanOrEqualTo(0)
+            .WithLocalizationKey("article.content.count.must.be.non.negative");
     }
 }

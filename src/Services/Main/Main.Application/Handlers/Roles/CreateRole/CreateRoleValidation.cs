@@ -1,4 +1,5 @@
 using FluentValidation;
+using Localization.Domain.Extensions;
 
 namespace Main.Application.Handlers.Roles.CreateRole;
 
@@ -6,11 +7,12 @@ public class CreateRoleValidation : AbstractValidator<CreateRoleCommand>
 {
     public CreateRoleValidation()
     {
-        RuleFor(x => x.Name).NotEmpty()
-            .WithMessage("Название роли не может быть пустым")
+        RuleFor(x => x.Name)
+            .NotEmpty()
+            .WithLocalizationKey("role.name.not.empty")
             .Must(x => x.Trim().Length >= 3)
-            .WithMessage("Минимальная длина названия роли 3 символа")
+            .WithLocalizationKey("role.name.min.length")
             .Must(x => x.Trim().Length <= 24)
-            .WithMessage("Максимальная длина названия роли 24 символа");
+            .WithLocalizationKey("role.name.max.length");
     }
 }

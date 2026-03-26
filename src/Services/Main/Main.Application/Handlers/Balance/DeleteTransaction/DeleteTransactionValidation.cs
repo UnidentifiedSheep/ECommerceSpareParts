@@ -1,4 +1,5 @@
 using FluentValidation;
+using Localization.Domain.Extensions;
 
 namespace Main.Application.Handlers.Balance.DeleteTransaction;
 
@@ -6,9 +7,12 @@ public class DeleteTransactionValidation : AbstractValidator<DeleteTransactionCo
 {
     public DeleteTransactionValidation()
     {
-        RuleFor(x => x.TransactionId).NotEmpty()
-            .WithMessage("Id Транзакции не может быть пуст.");
-        RuleFor(x => x.WhoDeleteUserId).NotEmpty()
-            .WithMessage("Id пользователя который удаляет транзакцию не может быть пуст.");
+        RuleFor(x => x.TransactionId)
+            .NotEmpty()
+            .WithLocalizationKey("transaction.id.required");
+
+        RuleFor(x => x.WhoDeleteUserId)
+            .NotEmpty()
+            .WithLocalizationKey("transaction.who.delete.user.id.required");
     }
 }

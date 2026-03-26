@@ -1,6 +1,6 @@
 ﻿{
   "locale": "ru",
   "keyValues": {
-    "cart.item.not.found": "Не удалось найти выбранный товар в корзине."
+    "cart.item.not.found": "Элемент корзины не найден."
   }
 }

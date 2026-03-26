@@ -1,4 +1,5 @@
 using FluentValidation;
+using Localization.Domain.Extensions;
 
 namespace Main.Application.Handlers.Currencies.CreateCurrency;
 
@@ -8,34 +9,34 @@ public class CreateCurrencyValidation : AbstractValidator<CreateCurrencyCommand>
     {
         RuleFor(x => x.Code)
             .NotEmpty()
-            .WithMessage("Код валюты не может быть пустым")
+            .WithLocalizationKey("currency.code.not.empty")
             .MaximumLength(26)
-            .WithMessage("Максимальная длина кода валюты 26 символов")
+            .WithLocalizationKey("currency.code.max.length")
             .Must(x => x.Trim().Length >= 2)
-            .WithMessage("Минимальная длина кода 2 символа");
+            .WithLocalizationKey("currency.code.min.length");
 
         RuleFor(x => x.Name)
             .NotEmpty()
-            .WithMessage("Название валюты не может быть пустым")
+            .WithLocalizationKey("currency.name.not.empty")
             .MaximumLength(128)
-            .WithMessage("Максимальная длина названия 128 символов")
+            .WithLocalizationKey("currency.name.max.length")
             .Must(x => x.Trim().Length >= 3)
-            .WithMessage("Минимальная длина названия 3 символа");
+            .WithLocalizationKey("currency.name.min.length");
 
         RuleFor(x => x.CurrencySign)
             .NotEmpty()
-            .WithMessage("Знак валюты не может быть пустым")
+            .WithLocalizationKey("currency.sign.not.empty")
             .MaximumLength(3)
-            .WithMessage("Максимальная длина знака валюты 3 символа")
+            .WithLocalizationKey("currency.sign.max.length")
             .Must(x => x.Trim().Length >= 1)
-            .WithMessage("Минимальная длина знака валюты 1 символ");
+            .WithLocalizationKey("currency.sign.min.length");
 
         RuleFor(x => x.ShortName)
             .NotEmpty()
-            .WithMessage("Короткое название валюты не может быть пустым")
+            .WithLocalizationKey("currency.shortName.not.empty")
             .MaximumLength(5)
-            .WithMessage("Максимальная длина короткого названия 5 символов")
-            .Must(x => x.Trim().Length >= 3)
-            .WithMessage("Минимальная длина короткого названия 2 символа");
+            .WithLocalizationKey("currency.shortName.max.length")
+            .Must(x => x.Trim().Length >= 2)
+            .WithLocalizationKey("currency.shortName.min.length");
     }
 }

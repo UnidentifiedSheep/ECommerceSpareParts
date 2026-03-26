@@ -1,4 +1,5 @@
 ﻿using FluentValidation;
+using Localization.Domain.Extensions;
 
 namespace Main.Application.Handlers.StorageContents.MoveContentToOtherStorage;
 
@@ -13,8 +14,10 @@ public class MoveContentToOtherStorageValidation : AbstractValidator<MoveContent
                 var ids = all.Select(z => z.StorageContentId).ToHashSet();
                 return all.Count == ids.Count;
             })
-            .WithMessage("Список не должен содержать дубликатов позиций")
+            .WithLocalizationKey("storage.content.move.no.duplicates");
+
+        RuleFor(x => x.Movements)
             .NotEmpty()
-            .WithMessage("Список не должен быть пустым");
+            .WithLocalizationKey("storage.content.move.not.empty");
     }
 }

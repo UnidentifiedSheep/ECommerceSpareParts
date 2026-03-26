@@ -1,8 +1,9 @@
 using FluentValidation;
+using Localization.Domain.Extensions;
 using Main.Abstractions.Dtos.Amw.Purchase;
 using Main.Application.Handlers.BaseValidators;
 
-namespace Main.Application.Handlers.Purchases.BaseValidators.Edit;
+namespace Main.Application.Handlers.Purchases.BaseValidators;
 
 public class EditPurchaseDtoValidation : AbstractValidator<IEnumerable<EditPurchaseDto>>
 {
@@ -25,6 +26,6 @@ public class EditPurchaseDtoValidation : AbstractValidator<IEnumerable<EditPurch
                 var idsSet = ids.ToHashSet();
                 return ids.Count == idsSet.Count;
             })
-            .WithMessage("Дубликаты номеров позиций не разрешены.");
+            .WithLocalizationKey("purchase.content.duplicate.ids.not.allowed");
     }
 }

@@ -1,4 +1,5 @@
 ﻿using FluentValidation;
+using Localization.Domain.Extensions;
 
 namespace Main.Application.Handlers.Permissions.CreatePermission;
 
@@ -8,12 +9,12 @@ public class CreatePermissionValidation : AbstractValidator<CreatePermissionComm
     {
         RuleFor(x => x.Name)
             .Must(x => x.Trim().Length >= 3)
-            .WithMessage("Минимальная длина 'разрешения' 3 символа")
+            .WithLocalizationKey("permission.name.min.length")
             .Must(x => x.Trim().Length <= 128)
-            .WithMessage("Максимальная длина 'разрешения' 128 символа");
+            .WithLocalizationKey("permission.name.max.length");
 
         RuleFor(x => x.Description)
             .Must(x => x?.Trim().Length <= 256)
-            .WithMessage("Максимальная длина описания 256 символа");
+            .WithLocalizationKey("permission.description.max.length");
     }
 }

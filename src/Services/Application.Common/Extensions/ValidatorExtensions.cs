@@ -1,6 +1,6 @@
-﻿using Abstractions.Interfaces;
-using Abstractions.Interfaces.Currency;
+﻿using Abstractions.Interfaces.Currency;
 using FluentValidation;
+using Localization.Domain.Extensions;
 
 namespace Application.Common.Extensions;
 
@@ -11,7 +11,7 @@ public static class ValidatorExtensions
     {
         return ruleBuilder
             .Must(currencyConverter.IsSupportedCurrency)
-            .WithMessage("Не удалось найти валюту.");
+            .WithLocalizationKey("currency.not.found");
     }
     
     extension<T>(IRuleBuilder<T, int?> ruleBuilder)
@@ -19,17 +19,17 @@ public static class ValidatorExtensions
         public IRuleBuilderOptions<T, int?> CurrencyMustExist(ICurrencyConverter currencyConverter)
         {
             return ruleBuilder
-                .Must(x => x == null || currencyConverter.IsSupportedCurrency(x!.Value))
-                .WithMessage("Не удалось найти валюту.");
+                .Must(x => x == null || currencyConverter.IsSupportedCurrency(x.Value))
+                .WithLocalizationKey("currency.must.exist");
         }
 
         public IRuleBuilderOptions<T, int?> CurrencyMustExistRequired(ICurrencyConverter currencyConverter)
         {
             return ruleBuilder
                 .NotNull()
-                .WithMessage("Валюта обязательна")
+                .WithLocalizationKey("currency.must.exist")
                 .Must(x => currencyConverter.IsSupportedCurrency(x!.Value))
-                .WithMessage("Не удалось найти валюту.");
+                .WithLocalizationKey("currency.not.found");
         }
     }
 }

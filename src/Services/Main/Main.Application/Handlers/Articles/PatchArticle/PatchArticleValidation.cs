@@ -1,4 +1,5 @@
 using FluentValidation;
+using Localization.Domain.Extensions;
 
 namespace Main.Application.Handlers.Articles.PatchArticle;
 
@@ -7,34 +8,33 @@ public class PatchArticleValidation : AbstractValidator<PatchArticleCommand>
     public PatchArticleValidation()
     {
         RuleLevelCascadeMode = CascadeMode.Stop;
-        //ArticleNumber
+
+        // ArticleNumber
         RuleFor(x => x.PatchArticle.ArticleNumber.Value)
             .NotEmpty()
             .When(x => x.PatchArticle.ArticleNumber.IsSet)
-            .WithMessage("Артикул не должен быть пустым");
-
+            .WithLocalizationKey("article.articleNumber.must.not.be.empty");
         RuleFor(x => x.PatchArticle.ArticleNumber.Value)
             .Must(x => x != null && x.Trim().Length >= 3)
             .When(x => x.PatchArticle.ArticleNumber.IsSet)
-            .WithMessage("Минимальная длина артикула 3 символа");
-
+            .WithLocalizationKey("article.articleNumber.min.length.3");
         RuleFor(x => x.PatchArticle.ArticleNumber.Value)
             .Must(x => x != null && x.Trim().Length <= 128)
             .When(x => x.PatchArticle.ArticleNumber.IsSet)
-            .WithMessage("Максимальная длина артикула 128 символов");
+            .WithLocalizationKey("article.articleNumber.max.length.128");
 
-        //ArticleName
+        // ArticleName
         RuleFor(x => x.PatchArticle.ArticleName.Value)
             .NotEmpty()
             .When(x => x.PatchArticle.ArticleName.IsSet)
-            .WithMessage("Название артикула не должен быть пустым");
+            .WithLocalizationKey("article.name.must.not.be.empty");
         RuleFor(x => x.PatchArticle.ArticleName.Value)
-            .Must(x => x?.Trim().Length > 3)
+            .Must(x => x?.Trim().Length >= 3)
             .When(x => x.PatchArticle.ArticleName.IsSet)
-            .WithMessage("Минимальная длина название артикула 3 символа");
+            .WithLocalizationKey("article.name.min.length.3");
         RuleFor(x => x.PatchArticle.ArticleName.Value)
             .Must(x => x?.Trim().Length <= 255)
             .When(x => x.PatchArticle.ArticleName.IsSet)
-            .WithMessage("Максимальная длина названия артикула 255 символов");
+            .WithLocalizationKey("article.name.max.length.255");
     }
 }

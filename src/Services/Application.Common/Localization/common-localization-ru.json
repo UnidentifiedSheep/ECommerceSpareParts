@@ -1,0 +1,7 @@
+﻿{
+  "locale": "ru",
+  "keyValues": {
+    "pagination.page.min": "Страница должна быть не меньше 0.",
+    "pagination.size.range": "Количество элементов должно быть от 1 до 100."
+  }
+}

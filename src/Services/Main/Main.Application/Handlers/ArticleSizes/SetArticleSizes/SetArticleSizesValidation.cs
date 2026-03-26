@@ -1,4 +1,5 @@
 ﻿using FluentValidation;
+using Localization.Domain.Extensions;
 
 namespace Main.Application.Handlers.ArticleSizes.SetArticleSizes;
 
@@ -8,20 +9,20 @@ public class SetArticleSizesValidation : AbstractValidator<SetArticleSizesComman
     {
         RuleFor(x => x.Height)
             .GreaterThan(0)
-            .WithMessage("Высота должна быть больше 0")
+            .WithLocalizationKey("article.size.height.must.be.greater.than.zero")
             .PrecisionScale(18, 2, true)
-            .WithMessage("Высота может содержать не более двух знаков после запятой");
-        
+            .WithLocalizationKey("article.size.height.max.two.decimals");
+
         RuleFor(x => x.Width)
             .GreaterThan(0)
-            .WithMessage("Ширина должна быть больше 0")
+            .WithLocalizationKey("article.size.width.must.be.greater.than.zero")
             .PrecisionScale(18, 2, true)
-            .WithMessage("Ширина может содержать не более двух знаков после запятой");
-        
+            .WithLocalizationKey("article.size.width.max.two.decimals");
+
         RuleFor(x => x.Length)
             .GreaterThan(0)
-            .WithMessage("Длина должна быть больше 0")
+            .WithLocalizationKey("article.size.length.must.be.greater.than.zero")
             .PrecisionScale(18, 2, true)
-            .WithMessage("Длина может содержать не более двух знаков после запятой");
+            .WithLocalizationKey("article.size.length.max.two.decimals");
     }
 }

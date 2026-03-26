@@ -1,3 +1,4 @@
+using Abstractions.Models;
 using Api.Common.Extensions;
 using Carter;
 using Main.Application.Handlers.Balance.GetTransactions;
@@ -14,8 +15,8 @@ public record GetTransactionsRequest(
     [FromQuery(Name = "rangeStart")] DateTime RangeStart,
     [FromQuery(Name = "rangeEnd")] DateTime RangeEnd,
     [FromQuery(Name = "currencyId")] int? CurrencyId,
-    [FromQuery(Name = "senderId")] string? SenderId,
-    [FromQuery(Name = "receiverId")] string? ReceiverId,
+    [FromQuery(Name = "senderId")] Guid? SenderId,
+    [FromQuery(Name = "receiverId")] Guid? ReceiverId,
     [FromQuery(Name = "page")] int Page,
     [FromQuery(Name = "limit")] int Limit);
 
@@ -26,7 +27,13 @@ public class GetTransactionsEndPoint : ICarterModule
         app.MapGet("/balances/transactions", async (ISender sender, 
                 [AsParameters] GetTransactionsRequest request, CancellationToken token) =>
             {
-                var query = request.Adapt<GetTransactionsQuery>();
+                var query = new GetTransactionsQuery(
+                    request.RangeStart,
+                    request.RangeEnd,
+                    request.CurrencyId,
+                    request.SenderId,
+                    request.ReceiverId,
+                    new PaginationModel(request.Page, request.Limit));
                 var result = await sender.Send(query, token);
                 var response = result.Adapt<GetTransactionsAmwResponse>();
                 return Results.Ok(response);

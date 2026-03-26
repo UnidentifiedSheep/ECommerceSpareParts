@@ -1,6 +1,8 @@
 ﻿{
   "locale": "ru",
   "keyValues": {
-    "logistics.no.items.for.calculation": "Ни одна позиция не подходит для расчёта логистики."
+    "logistics.no.items.for.calculation": "Нет товаров, подходящих для расчёта логистики.",
+    "delivery.items.not.empty": "Список товаров не должен быть пустым.",
+    "delivery.item.quantity.greater.than.zero": "Количество товара должно быть больше 0."
   }
 }

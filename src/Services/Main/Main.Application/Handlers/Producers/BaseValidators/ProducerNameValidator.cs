@@ -1,4 +1,5 @@
 using FluentValidation;
+using Localization.Domain.Extensions;
 
 namespace Main.Application.Handlers.Producers.BaseValidators;
 
@@ -8,10 +9,10 @@ public class ProducerNameValidator : AbstractValidator<string?>
     {
         RuleFor(x => x)
             .NotEmpty()
-            .WithMessage("Название производителя не может быть пустым")
+            .WithLocalizationKey("producer.name.not.empty")
             .Must(name => name?.Trim().Length >= 2)
-            .WithMessage("Минимальная длина названия производителя — 2 символа")
+            .WithLocalizationKey("producer.name.min.length")
             .Must(name => name?.Trim().Length <= 64)
-            .WithMessage("Максимальная длина названия производителя — 64 символа");
+            .WithLocalizationKey("producer.name.max.length");
     }
 }

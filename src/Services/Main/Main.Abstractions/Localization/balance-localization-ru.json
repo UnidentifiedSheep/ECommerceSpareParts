@@ -1,9 +1,20 @@
 ﻿{
   "locale": "ru",
   "keyValues": {
-    "transaction.invalid.status.for.deletion": "Нельзя удалить транзакцию со статусом '{0}'.",
-    "deleted.transaction.cannot.be.edited": "Нельзя редактировать уже удалённую транзакцию.",
+    "transaction.invalid.status.for.deletion": "Невозможно удалить транзакцию со статусом '{0}'.",
+    "deleted.transaction.cannot.be.edited": "Невозможно редактировать уже удалённую транзакцию.",
     "transaction.already.deleted": "Эта транзакция уже была удалена.",
-    "transaction.not.found": "Не удалось найти запрашиваемую транзакцию."
+    "transaction.not.found": "Транзакция не найдена.",
+    "transaction.sender.id.required": "Необходимо указать ID отправителя.",
+    "transaction.receiver.id.required": "Необходимо указать ID получателя.",
+    "transaction.date.out.of.range": "Дата транзакции должна быть в пределах последних 2 месяцев и не более чем на 1 час в будущем.",
+    "transaction.id.required": "Необходимо указать ID транзакции.",
+    "transaction.who.delete.user.id.required": "Необходимо указать ID пользователя, удаляющего транзакцию.",
+    "transaction.amount.must.be.positive": "Сумма транзакции должна быть больше 0.",
+    "transaction.amount.max.two.decimal.places": "Сумма транзакции может содержать не более 2 знаков после запятой.",
+    "transaction.sender.receiver.must.not.be.same": "Отправитель и получатель не могут совпадать.",
+    "transaction.sender.or.receiver.required": "Должен быть указан хотя бы отправитель или получатель.",
+    "transaction.range.start.before.end": "Дата начала диапазона не может быть позже даты конца.",
+    "transaction.range.max.months": "Максимальный диапазон — 5 месяцев."
   }
 }

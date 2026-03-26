@@ -1,7 +1,7 @@
-using Abstractions.Interfaces;
 using Abstractions.Interfaces.Currency;
 using Application.Common.Extensions;
 using FluentValidation;
+using Localization.Domain.Extensions;
 using Main.Application.Handlers.BaseValidators;
 
 namespace Main.Application.Handlers.StorageContents.EditContent;
@@ -10,12 +10,13 @@ public class EditStorageContentValidation : AbstractValidator<EditStorageContent
 {
     public EditStorageContentValidation(ICurrencyConverter currencyConverter)
     {
-        RuleFor(x => x.EditedFields).NotEmpty()
-            .WithMessage("Список отредактированных элементов не может быть пустым.");
+        RuleFor(x => x.EditedFields)
+            .NotEmpty()
+            .WithLocalizationKey("storage.content.edit.list.not.empty");
 
         RuleFor(x => x.EditedFields)
             .Must(x => x.Count < 100)
-            .WithMessage("Максимальное количество для редактирования за раз, не может превышать 100 элементов");
+            .WithLocalizationKey("storage.content.edit.max.count");
 
         RuleForEach(x => x.EditedFields.Values)
             .ChildRules(z =>
@@ -26,14 +27,14 @@ public class EditStorageContentValidation : AbstractValidator<EditStorageContent
 
                 z.RuleFor(x => x.Model.Count.Value)
                     .GreaterThanOrEqualTo(0)
-                    .WithMessage("Количество у позиции должно быть больше или равно 0")
-                    .When(x => x.Model.Count.IsSet);
+                    .When(x => x.Model.Count.IsSet)
+                    .WithLocalizationKey("storage.content.count.min.zero");
 
                 z.RuleFor(x => x.Model.PurchaseDatetime.Value.ToUniversalTime())
                     .InclusiveBetween(DateTime.UtcNow.AddMonths(-3), DateTime.UtcNow.AddMinutes(10))
                     .When(x => x.Model.PurchaseDatetime.IsSet)
-                    .WithMessage("Дата покупки не может быть в будущем, или более чем на 3 месяца в прошлом");
-                
+                    .WithLocalizationKey("storage.content.purchase.date.range");
+
                 z.RuleFor(x => x.Model.CurrencyId.Value)
                     .CurrencyMustExist(currencyConverter)
                     .When(x => x.Model.CurrencyId.IsSet);

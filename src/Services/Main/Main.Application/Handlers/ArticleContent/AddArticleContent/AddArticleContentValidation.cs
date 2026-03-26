@@ -1,4 +1,5 @@
 using FluentValidation;
+using Localization.Domain.Extensions;
 
 namespace Main.Application.Handlers.ArticleContent.AddArticleContent;
 
@@ -8,10 +9,10 @@ public class AddArticleContentValidation : AbstractValidator<AddArticleContentCo
     {
         RuleForEach(cmd => cmd.Content)
             .Must((parent, kvp) => kvp.Key != parent.ArticleId)
-            .WithMessage("Артикул не может быть содержимым самого себя.");
+            .WithLocalizationKey("article.content.self.reference.not.allowed");
 
         RuleForEach(cmd => cmd.Content)
             .Must(kvp => kvp.Value >= 0)
-            .WithMessage("Количество должно быть больше или равно 0.");
+            .WithLocalizationKey("article.content.count.must.be.non.negative");
     }
 }

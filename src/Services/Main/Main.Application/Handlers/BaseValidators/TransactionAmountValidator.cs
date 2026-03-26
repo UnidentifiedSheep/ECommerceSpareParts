@@ -1,4 +1,5 @@
 using FluentValidation;
+using Localization.Domain.Extensions;
 
 namespace Main.Application.Handlers.BaseValidators;
 
@@ -8,8 +9,10 @@ public class TransactionAmountValidator : AbstractValidator<decimal>
     {
         RuleFor(x => x)
             .GreaterThan(0)
-            .WithMessage("Сумма транзакции должна быть больше 0.")
+            .WithLocalizationKey("transaction.amount.must.be.positive");
+
+        RuleFor(x => x)
             .PrecisionScale(18, 2, true)
-            .WithMessage("Сумма транзакции должна иметь максимум 2 числа после запятой.");
+            .WithLocalizationKey("transaction.amount.max.two.decimal.places");
     }
 }

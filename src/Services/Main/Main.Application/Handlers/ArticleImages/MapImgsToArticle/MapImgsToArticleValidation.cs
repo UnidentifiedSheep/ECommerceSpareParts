@@ -1,5 +1,6 @@
 ﻿using Constants;
 using FluentValidation;
+using Localization.Domain.Extensions;
 
 namespace Main.Application.Handlers.ArticleImages.MapImgsToArticle;
 
@@ -12,11 +13,11 @@ public class MapImgsToArticleValidation : AbstractValidator<MapImgsToArticleComm
             {
                 z.RuleFor(x => x.Extension)
                     .Must(x => FileConstants.ImageExtensions.Any(c => c == x))
-                    .WithMessage("Файл должен являться изображением");
+                    .WithLocalizationKey("article.image.invalid.extension");
             });
 
         RuleFor(x => x.Images)
             .NotEmpty()
-            .WithMessage("Список изображений не может быть пуст");
+            .WithLocalizationKey("article.images.must.not.be.empty");
     }
 }

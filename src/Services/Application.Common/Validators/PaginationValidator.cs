@@ -1,5 +1,6 @@
 using Abstractions.Models;
 using FluentValidation;
+using Localization.Domain.Extensions;
 
 namespace Application.Common.Validators;
 
@@ -9,10 +10,10 @@ public class PaginationValidator : AbstractValidator<PaginationModel>
     {
         RuleFor(query => query.Page)
             .GreaterThanOrEqualTo(0)
-            .WithMessage("Страница не может быть меньше 0");
+            .WithLocalizationKey("pagination.page.min");
 
         RuleFor(query => query.Size)
             .InclusiveBetween(1, 100)
-            .WithMessage("Количество элементов должно быть от 1 до 100");
+            .WithLocalizationKey("pagination.size.range");
     }
 }

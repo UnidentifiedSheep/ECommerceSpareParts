@@ -59,27 +59,33 @@ public abstract class ExceptionHandlerBase<THandler>(
         string message = localizer[key];
         var arguments = localizableException.Arguments;
 
-        if (arguments == null || arguments.Length == 0)
-        {
-            detail = message;
+        if (TryFormatLocalizableMessage(message, arguments, out detail))
             return true;
-        }
+        
+        logger.LogError(
+            "Unable to format localizable message for Key: {Key}, Arguments: {@Args}", 
+            key,
+            arguments);
+        return false;
+    }
+    
+    protected static bool TryFormatLocalizableMessage(
+        string template,
+        object[]? arguments,
+        out string result)
+    {
+        result = template;
+        if (arguments == null || arguments.Length == 0) return true;
         
         try
         {
-            detail = string.Format(message, arguments);
+            result = string.Format(template, arguments);
             return true;
         }
-        catch (FormatException ex)
+        catch (FormatException)
         {
-            logger.LogError(
-                ex,
-                "Unable to format localizable message for Key: {Key}, Arguments: {@Args}", 
-                key,
-                arguments);
-            
-            detail = $"{message} [Error formatting message]";
-            return true;
+            result = $"{result} [Error formatting message]";
+            return false;
         }
     }
 }

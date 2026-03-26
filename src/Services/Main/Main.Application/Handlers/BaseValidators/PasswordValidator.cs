@@ -1,5 +1,7 @@
 using Abstractions.Interfaces.Validators;
+using Abstractions.Models.Validation;
 using FluentValidation;
+using FluentValidation.Results;
 
 namespace Main.Application.Handlers.BaseValidators;
 
@@ -12,8 +14,21 @@ public class PasswordValidator : AbstractValidator<string>
             {
                 var (valid, errors) = passwordManager.IsPasswordMatchRules(password);
                 if (valid) return;
-                foreach (var error in errors)
-                    context.AddFailure(error);
+
+                foreach (var (key, args) in errors)
+                {
+                    context.AddFailure(new ValidationFailure(
+                            propertyName: context.PropertyPath,
+                            errorMessage: "Validation failed")
+                        {
+                            ErrorCode = key,
+                            CustomState = new ValidationStateData
+                            {
+                                DisplayErrorToUser = true,
+                                ErrorMessageArguments = args
+                            }
+                        });
+                }
             });
     }
 }

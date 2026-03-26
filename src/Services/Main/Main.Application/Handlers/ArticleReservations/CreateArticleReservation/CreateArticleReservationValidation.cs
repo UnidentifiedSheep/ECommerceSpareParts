@@ -2,6 +2,7 @@ using Abstractions.Interfaces;
 using Abstractions.Interfaces.Currency;
 using Application.Common.Extensions;
 using FluentValidation;
+using Localization.Domain.Extensions;
 
 namespace Main.Application.Handlers.ArticleReservations.CreateArticleReservation;
 
@@ -11,26 +12,27 @@ public class CreateArticleReservationValidation : AbstractValidator<CreateArticl
     {
         RuleFor(x => x.Reservations.Count)
             .LessThanOrEqualTo(100)
-            .WithMessage("За раз можно добавить максимум 100 резерваций.");
+            .WithLocalizationKey("article.reservation.max.count.exceeded");
+
         RuleForEach(x => x.Reservations)
             .ChildRules(x =>
             {
                 x.RuleFor(z => z.GivenPrice)
                     .Must(z => !z.HasValue || Math.Round(z.Value, 2) > 0)
                     .When(z => z.GivenPrice.HasValue)
-                    .WithMessage("Предложенная цена должна быть больше 0 или не установленна");
+                    .WithLocalizationKey("article.reservation.given.price.must.be.positive");
 
                 x.RuleFor(z => z.InitialCount)
                     .GreaterThan(0)
-                    .WithMessage("Общее количество для резервации должно быть больше 0");
+                    .WithLocalizationKey("article.reservation.initial.count.must.be.positive");
 
                 x.RuleFor(z => z.CurrentCount)
                     .GreaterThan(0)
-                    .WithMessage("Текущее количество для резервации должно быть больше 0");
+                    .WithLocalizationKey("article.reservation.current.count.must.be.positive");
 
                 x.RuleFor(z => z.InitialCount)
                     .GreaterThanOrEqualTo(z => z.CurrentCount)
-                    .WithMessage("Начальное количество не может быть меньше текущего количества");
+                    .WithLocalizationKey("article.reservation.initial.count.not.less.than.current");
 
                 x.RuleFor(z => z.GivenCurrencyId)
                     .CurrencyMustExist(currencyConverter);

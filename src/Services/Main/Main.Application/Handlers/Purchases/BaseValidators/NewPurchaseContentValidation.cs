@@ -2,7 +2,7 @@ using FluentValidation;
 using Main.Abstractions.Dtos.Amw.Purchase;
 using Main.Application.Handlers.BaseValidators;
 
-namespace Main.Application.Handlers.Purchases.BaseValidators.Create;
+namespace Main.Application.Handlers.Purchases.BaseValidators;
 
 public class NewPurchaseContentValidation : AbstractValidator<NewPurchaseContentDto>
 {

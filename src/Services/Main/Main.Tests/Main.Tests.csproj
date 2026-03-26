@@ -45,6 +45,12 @@
     </ItemGroup>
 
     <ItemGroup>
+      <Content Include="..\..\Application.Common\Localization\common-localization-en.json">
+        <Link>Localization\common-localization-en.json</Link>
+      </Content>
+      <Content Include="..\..\Application.Common\Localization\common-localization-ru.json">
+        <Link>Localization\common-localization-ru.json</Link>
+      </Content>
       <Content Include="..\Main.Abstractions\Localization\article-localization-en.json">
         <Link>Localization\article-localization-en.json</Link>
         <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
@@ -68,6 +74,12 @@
       <Content Include="..\Main.Abstractions\Localization\balance-localization-ru.json">
         <Link>Localization\balance-localization-ru.json</Link>
         <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </Content>
+      <Content Include="..\Main.Abstractions\Localization\base-localization-en.json">
+        <Link>Localization\base-localization-en.json</Link>
+      </Content>
+      <Content Include="..\Main.Abstractions\Localization\base-localization-ru.json">
+        <Link>Localization\base-localization-ru.json</Link>
       </Content>
       <Content Include="..\Main.Abstractions\Localization\cart-localization-en.json">
         <Link>Localization\cart-localization-en.json</Link>
@@ -123,14 +135,6 @@
       </Content>
       <Content Include="..\Main.Abstractions\Localization\storage-localization-ru.json">
         <Link>Localization\storage-localization-ru.json</Link>
-        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-      </Content>
-      <Content Include="..\Main.Abstractions\Localization\vehicle-localization-en.json">
-        <Link>Localization\vehicle-localization-en.json</Link>
-        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-      </Content>
-      <Content Include="..\Main.Abstractions\Localization\vehicle-localization-ru.json">
-        <Link>Localization\vehicle-localization-ru.json</Link>
         <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
       </Content>
     </ItemGroup>

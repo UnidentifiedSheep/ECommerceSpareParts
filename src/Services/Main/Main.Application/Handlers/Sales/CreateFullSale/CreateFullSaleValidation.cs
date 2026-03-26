@@ -1,6 +1,6 @@
 using FluentValidation;
+using Localization.Domain.Extensions;
 using Main.Application.Handlers.Sales.BaseValidators;
-using Main.Application.Handlers.Sales.BaseValidators.Create;
 
 namespace Main.Application.Handlers.Sales.CreateFullSale;
 
@@ -12,20 +12,22 @@ public class CreateFullSaleValidation : AbstractValidator<CreateFullSaleCommand>
             .SetValidator(new SaleDateTimeValidator());
 
         RuleFor(x => x.SaleContent)
-            .SetValidator(new SaleContentValidator());
+            .SetValidator(new NewSaleContentValidator());
 
         RuleFor(x => x.PayedSum)
             .GreaterThanOrEqualTo(0)
             .When(x => x.PayedSum != null)
-            .WithMessage("Оплаченная сумма должна быть больше или равна 0, если указана")
+            .WithLocalizationKey("sale.payed.sum.min")
             .PrecisionScale(18, 2, true)
-            .WithMessage("Оплаченная сумма может содержать не более двух знаков после запятой");
+            .When(x => x.PayedSum != null)
+            .WithLocalizationKey("sale.payed.sum.precision");
 
+        RuleFor(x => x.BuyerId)
+            .NotEmpty()
+            .WithLocalizationKey("sale.buyer.id.not.empty");
 
-        RuleFor(x => x.BuyerId).NotEmpty()
-            .WithMessage("Id покупателя не может быть пустым");
-
-        RuleFor(x => x.CreatedUserId).NotEmpty()
-            .WithMessage("Id пользователя создавшего закупку не может быть пустым");
+        RuleFor(x => x.CreatedUserId)
+            .NotEmpty()
+            .WithLocalizationKey("sale.created.user.id.not.empty");
     }
 }

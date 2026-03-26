@@ -1,6 +1,19 @@
 ﻿{
   "locale": "en",
   "keyValues": {
-    "currency.not.found": "We couldn't find the currency you were looking for."
+    "currency.not.found": "We couldn't find the currency you were looking for.",
+    "currency.must.exist": "The specified currency must exist.",
+    "currency.code.not.empty": "Currency code must not be empty.",
+    "currency.code.max.length": "Currency code must be at most 26 characters long.",
+    "currency.code.min.length": "Currency code must be at least 2 characters long.",
+    "currency.name.not.empty": "Currency name must not be empty.",
+    "currency.name.max.length": "Currency name must be at most 128 characters long.",
+    "currency.name.min.length": "Currency name must be at least 3 characters long.",
+    "currency.sign.not.empty": "Currency sign must not be empty.",
+    "currency.sign.max.length": "Currency sign must be at most 3 characters long.",
+    "currency.sign.min.length": "Currency sign must be at least 1 character long.",
+    "currency.shortName.not.empty": "Currency short name must not be empty.",
+    "currency.shortName.max.length": "Currency short name must be at most 5 characters long.",
+    "currency.shortName.min.length": "Currency short name must be at least 2 characters long."
   }
 }

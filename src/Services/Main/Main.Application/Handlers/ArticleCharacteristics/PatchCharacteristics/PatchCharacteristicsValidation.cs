@@ -1,4 +1,5 @@
 using FluentValidation;
+using Localization.Domain.Extensions;
 
 namespace Main.Application.Handlers.ArticleCharacteristics.PatchCharacteristics;
 
@@ -9,18 +10,21 @@ public class PatchCharacteristicsValidation : AbstractValidator<PatchCharacteris
         RuleFor(x => x.NewValues.Value.Value)
             .NotEmpty()
             .When(x => x.NewValues.Value.IsSet)
-            .WithMessage("Значение не должно быть пустым");
+            .WithLocalizationKey("article.characteristic.value.must.not.be.empty");
+        
         RuleFor(x => x.NewValues.Value.Value)
             .MinimumLength(3)
             .When(x => x.NewValues.Value.IsSet)
-            .WithMessage("Минимальная длина значение 3 символа")
+            .WithLocalizationKey("article.characteristic.value.min.length");
+
+        RuleFor(x => x.NewValues.Value.Value)
             .MaximumLength(128)
             .When(x => x.NewValues.Value.IsSet)
-            .WithMessage("Длина значение не должна быть больше 128 символов");
+            .WithLocalizationKey("article.characteristic.value.max.length");
 
         RuleFor(x => x.NewValues.Name.Value)
             .MaximumLength(128)
             .When(x => x.NewValues.Name.IsSet)
-            .WithMessage("Название параметра не должно быть больше 128 символов");
+            .WithLocalizationKey("article.characteristic.name.max.length");
     }
 }

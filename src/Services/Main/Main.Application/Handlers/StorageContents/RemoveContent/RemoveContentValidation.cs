@@ -1,4 +1,5 @@
 using FluentValidation;
+using Localization.Domain.Extensions;
 
 namespace Main.Application.Handlers.StorageContents.RemoveContent;
 
@@ -11,17 +12,16 @@ public class RemoveContentValidation : AbstractValidator<RemoveContentCommand>
             {
                 z.RuleFor(x => x.Value)
                     .GreaterThan(0)
-                    .WithMessage("Количество которое надо убрать со склада не может быть 0 или отрицательным число");
+                    .WithLocalizationKey("storage.content.remove.count.positive");
             });
 
         RuleFor(x => x.Content)
             .NotEmpty()
-            .WithMessage("Список на уменьшение количества не должен быть пустым.");
+            .WithLocalizationKey("storage.content.remove.list.not.empty");
 
         RuleFor(x => x.StorageName)
             .NotEmpty()
             .When(x => !x.TakeFromOtherStorages)
-            .WithMessage(
-                "Нельзя менять количество артикула, не выбрав склад и не разрешая менять количество на других складах");
+            .WithLocalizationKey("storage.content.remove.storage.required");
     }
 }

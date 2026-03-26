@@ -1,6 +1,8 @@
 ﻿{
   "locale": "en",
   "keyValues": {
-    "logistics.no.items.for.calculation": "No items are suitable for logistics calculation."
+    "logistics.no.items.for.calculation": "No items are available for logistics calculation.",
+    "delivery.items.not.empty": "The list of items must not be empty.",
+    "delivery.item.quantity.greater.than.zero": "Item quantity must be greater than 0."
   }
 }

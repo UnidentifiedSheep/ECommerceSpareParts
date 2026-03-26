@@ -1,13 +1,66 @@
 ﻿{
   "locale": "ru",
   "keyValues": {
-    "article.characteristics.not.found": "Не удалось найти характеристики статьи.",
-    "article.pair.not.found": "Не удалось найти связку статьи.",
-    "article.reservation.not.found": "Не удалось найти резервирование статьи.",
-    "article.content.not.found": "Не удалось найти содержимое статьи.",
-    "article.not.found": "Не удалось найти статью, которую вы искали.",
-    "articles.not.found": "Не удалось найти статьи, которые вы искали.",
-    "article.weight.not.found": "Не удалось найти вес для этой статьи.",
-    "article.sizes.not.found": "Не удалось найти размеры для этой статьи."
+    "article.characteristics.not.found": "Характеристики артикула не найдены.",
+    "article.pair.not.found": "Пара артикулов не найдена.",
+    "article.reservation.not.found": "Резервация артикула не найдена.",
+    "article.content.not.found": "Содержимое артикула не найдено.",
+    "article.not.found": "Артикул не найден.",
+    "articles.not.found": "Артикулы не найдены.",
+    "article.weight.not.found": "Вес артикула не найден.",
+    "article.sizes.not.found": "Размеры артикула не найдены.",
+
+    "article.characteristic.value.must.not.be.empty": "Значение характеристики не может быть пустым.",
+    "article.characteristic.value.min.length": "Значение характеристики должно содержать минимум 3 символа.",
+    "article.characteristic.value.max.length": "Значение характеристики не должно превышать 128 символов.",
+    "article.characteristic.name.max.length": "Название характеристики не должно превышать 128 символов.",
+
+    "article.content.self.reference.not.allowed": "Артикул не может ссылаться сам на себя.",
+    "article.content.count.must.be.non.negative": "Количество должно быть больше или равно 0.",
+
+    "article.image.invalid.extension": "Файл должен быть изображением.",
+    "article.images.must.not.be.empty": "Список изображений не может быть пустым.",
+
+    "article.pair.self.reference.not.allowed": "Артикул не может быть парой самому себе.",
+
+    "article.reservation.max.count.exceeded": "Нельзя добавить более 100 резерваций за раз.",
+    "article.reservation.given.price.must.be.positive": "Предложенная цена должна быть больше 0 или не указана.",
+    "article.reservation.initial.count.must.be.positive": "Начальное количество должно быть больше 0.",
+    "article.reservation.current.count.must.be.positive": "Текущее количество должно быть больше 0.",
+    "article.reservation.initial.count.not.less.than.current": "Начальное количество не может быть меньше текущего.",
+    "article.reservation.buyer.id.must.not.be.empty": "Id покупателя не может быть пустым.",
+    "article.reservation.storage.name.must.not.be.empty": "Название склада не может быть пустым.",
+    "article.reservation.needed.count.must.be.positive": "Запрашиваемое количество должно быть больше 0.",
+
+    "article.create.articles.must.have.at.least.one": "Список артикулов не может быть пустым.",
+    "article.create.articles.max.100.at.once": "Нельзя добавить более 100 артикулов за раз.",
+
+    "article.articleNumber.must.not.be.empty": "Артикул не может быть пустым.",
+    "article.articleNumber.min.length.3": "Артикул должен содержать минимум 3 символа.",
+    "article.articleNumber.max.length.128": "Артикул не должен превышать 128 символов.",
+
+    "article.name.must.not.be.empty": "Название артикула не может быть пустым.",
+    "article.name.min.length.3": "Название артикула должно содержать минимум 3 символа.",
+    "article.name.max.length.255": "Название артикула не должно превышать 255 символов.",
+
+    "article.description.max.length.255": "Описание не должно превышать 255 символов.",
+    "article.indicator.max.length.24": "Индикатор не должен превышать 24 символа.",
+
+    "article.linkage.article.cannot.equal.cross.article": "Артикул не может совпадать с кросс-артикулом.",
+
+    "article.size.height.must.be.greater.than.zero": "Высота должна быть больше 0.",
+    "article.size.height.max.two.decimals": "Высота может содержать не более двух знаков после запятой.",
+
+    "article.size.width.must.be.greater.than.zero": "Ширина должна быть больше 0.",
+    "article.size.width.max.two.decimals": "Ширина может содержать не более двух знаков после запятой.",
+
+    "article.size.length.must.be.greater.than.zero": "Длина должна быть больше 0.",
+    "article.size.length.max.two.decimals": "Длина может содержать не более двух знаков после запятой.",
+
+    "article.weight.must.be.greater.than.zero": "Вес должен быть больше 0.",
+    "article.weight.max.two.decimals": "Вес может содержать не более двух знаков после запятой.",
+
+    "article.reservation.search.term.min.length": "Поисковая строка должна содержать минимум 3 символа.",
+    "article.reservation.similarity.range": "Уровень схожести должен быть от 0 до 1."
   }
 }

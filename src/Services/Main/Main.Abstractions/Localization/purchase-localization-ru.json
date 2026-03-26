@@ -2,8 +2,23 @@
   "locale": "ru",
   "keyValues": {
     "content.article.doesnt.match.purchase.position": "Артикул не соответствует позиции в закупке.",
-    "purchase.content.not.found": "Не удалось найти содержимое закупки, которое вы искали.",
-    "purchase.logistics.data.not.found": "Не удалось найти данные по логистике для этой закупки.",
-    "purchase.not.found": "Не удалось найти закупку, которую вы искали."
+    "purchase.content.not.found": "Не удалось найти содержимое закупки.",
+    "purchase.logistics.data.not.found": "Не удалось найти логистическую информацию по данной закупке.",
+    "purchase.not.found": "Не удалось найти указанную закупку.",
+    "purchase.content.not.empty": "Содержимое закупки не должно быть пустым.",
+    "purchase.supplier.id.not.empty": "ID поставщика не должно быть пустым.",
+    "purchase.created.user.id.not.empty": "ID пользователя-создателя не должно быть пустым.",
+    "purchase.storage.from.required.when.logistics": "Для закупок с логистикой необходимо указать склад-отправитель.",
+    "purchase.payed.sum.min.value": "Сумма оплаты должна быть не меньше 0.",
+    "purchase.payed.sum.precision": "Сумма оплаты может содержать не более 2 знаков после запятой.",
+    "purchase.date.range.start.before.end": "Дата начала диапазона не может быть позже даты окончания.",
+    "purchase.date.range.max.5months": "Максимальный диапазон дат составляет 5 месяцев.",
+    "purchase.id.not.empty": "ID закупки не должно быть пустым.",
+    "purchase.content.area.min.zero": "Площадь должна быть не меньше 0.",
+    "purchase.content.price.min.zero": "Цена должна быть не меньше 0.",
+    "purchase.content.weight.min.zero": "Вес должен быть не меньше 0.",
+    "purchase.datetime.min.3months": "Дата закупки не может быть старше 3 месяцев.",
+    "purchase.datetime.not.future": "Дата закупки не может быть в будущем.",
+    "purchase.content.duplicate.ids.not.allowed": "Дубликаты ID позиций не допускаются."
   }
 }

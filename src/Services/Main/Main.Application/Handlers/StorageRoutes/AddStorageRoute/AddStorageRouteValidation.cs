@@ -2,6 +2,7 @@
 using Abstractions.Interfaces.Currency;
 using Application.Common.Extensions;
 using FluentValidation;
+using Localization.Domain.Extensions;
 
 namespace Main.Application.Handlers.StorageRoutes.AddStorageRoute;
 
@@ -11,35 +12,35 @@ public class AddStorageRouteValidation : AbstractValidator<AddStorageRouteComman
     {
         RuleFor(x => new { x.StorageTo, x.StorageFrom })
             .Must(x => x.StorageTo != x.StorageFrom)
-            .WithMessage("Склад отправления и склад назначения не могут быть одинаковыми.");
-        
+            .WithLocalizationKey("storage.route.same.storages");
+
         RuleFor(x => x.Distance)
             .GreaterThanOrEqualTo(1)
-            .WithMessage("Минимальная дистанция маршрута - 1 метр.");
+            .WithLocalizationKey("storage.route.distance.min");
 
         RuleFor(x => x.DeliveryTime)
             .GreaterThanOrEqualTo(1)
-            .WithMessage("Минимальное время доставки - 1 минута");
+            .WithLocalizationKey("storage.route.delivery.time.min");
 
         RuleFor(x => x.CurrencyId)
             .CurrencyMustExist(currencyConverter);
 
         RuleFor(x => x.PriceKg)
             .GreaterThanOrEqualTo(0)
-            .WithMessage("Минимальная цена за кг 0.")
+            .WithLocalizationKey("storage.route.price.kg.min")
             .PrecisionScale(18, 2, true)
-            .WithMessage("Цена за кг может содержать не более двух знаков после запятой");
-        
+            .WithLocalizationKey("storage.route.price.kg.precision");
+
         RuleFor(x => x.PriceM3)
             .GreaterThanOrEqualTo(0)
-            .WithMessage("Минимальная цена за м^3 0.")
+            .WithLocalizationKey("storage.route.price.m3.min")
             .PrecisionScale(18, 2, true)
-            .WithMessage("Цена за м^3 может содержать не более двух знаков после запятой");
-        
+            .WithLocalizationKey("storage.route.price.m3.precision");
+
         RuleFor(x => x.PricePerOrder)
             .GreaterThanOrEqualTo(0)
-            .WithMessage("Минимальная цена за заказ 0.")
+            .WithLocalizationKey("storage.route.price.order.min")
             .PrecisionScale(18, 2, true)
-            .WithMessage("Цена за заказ может содержать не более двух знаков после запятой");
+            .WithLocalizationKey("storage.route.price.order.precision");
     }
 }

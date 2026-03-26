@@ -1,7 +1,9 @@
 using Abstractions.Interfaces.Validators;
 using Abstractions.Models;
+using Abstractions.Models.Validation;
 using Extensions;
 using FluentValidation;
+using FluentValidation.Results;
 using Main.Application.Handlers.BaseValidators;
 
 namespace Main.Application.Handlers.Users.CreateUser;
@@ -34,14 +36,43 @@ public class CreateUserValidation : AbstractValidator<CreateUserCommand>
 
 
                 if (primaryCount > 1)
-                    context.AddFailure("Не может быть больше одной основной почты");
+                    context.AddFailure(new ValidationFailure(
+                        propertyName: context.PropertyPath,
+                        errorMessage: "Validation failed")
+                    {
+                        ErrorCode = "user.email.primary.count",
+                        CustomState = null
+                    });
 
                 if (list.Count > setOfEmails.Count)
-                    context.AddFailure("В почтах не должно быть дубликатов");
+                    context.AddFailure(new ValidationFailure(
+                        propertyName: context.PropertyPath,
+                        errorMessage: "Validation failed")
+                    {
+                        ErrorCode = "user.have.duplicate.email"
+                    });
                 if (list.Count < emailOptions.MinEmailCount)
-                    context.AddFailure($"Минимальное количество почт у пользователя {emailOptions.MinEmailCount}");
+                    context.AddFailure(new ValidationFailure(
+                        propertyName: context.PropertyPath,
+                        errorMessage: "Validation failed")
+                    {
+                        ErrorCode = "user.min.email.count",
+                        CustomState = new ValidationStateData
+                        {
+                            ErrorMessageArguments = [emailOptions.MinEmailCount]
+                        }
+                    });
                 if (list.Count > emailOptions.MaxEmailCount)
-                    context.AddFailure($"Минимальное количество почт у пользователя {emailOptions.MaxEmailCount}");
+                    context.AddFailure(new ValidationFailure(
+                        propertyName: context.PropertyPath,
+                        errorMessage: "Validation failed")
+                    {
+                        ErrorCode = "user.max.email.count",
+                        CustomState = new ValidationStateData
+                        {
+                            ErrorMessageArguments = [emailOptions.MaxEmailCount]
+                        }
+                    });
             });
 
         RuleFor(x => x.UserInfo)

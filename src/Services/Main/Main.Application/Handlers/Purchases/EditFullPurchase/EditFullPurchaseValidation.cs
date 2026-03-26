@@ -1,6 +1,6 @@
 using FluentValidation;
+using Localization.Domain.Extensions;
 using Main.Application.Handlers.Purchases.BaseValidators;
-using Main.Application.Handlers.Purchases.BaseValidators.Edit;
 
 namespace Main.Application.Handlers.Purchases.EditFullPurchase;
 
@@ -9,10 +9,12 @@ public class EditFullPurchaseValidation : AbstractValidator<EditFullPurchaseComm
     public EditFullPurchaseValidation()
     {
         RuleFor(x => x.PurchaseId)
-            .NotEmpty().WithMessage("Id закупки не может быть пуст");
+            .NotEmpty()
+            .WithLocalizationKey("purchase.id.not.empty");
 
         RuleFor(x => x.Content)
-            .NotEmpty().WithMessage("Содержимое закупки не может быть пустым");
+            .NotEmpty()
+            .WithLocalizationKey("purchase.content.not.empty");
 
         RuleFor(x => x.PurchaseDateTime)
             .SetValidator(new PurchaseDateTimeValidator());
@@ -23,6 +25,6 @@ public class EditFullPurchaseValidation : AbstractValidator<EditFullPurchaseComm
         RuleFor(x => x.StorageFrom)
             .Must(x => x != null)
             .When(x => x.WithLogistics)
-            .WithMessage("При создании закупки с логистикой, склад отправителя должен быть указан");
+            .WithLocalizationKey("purchase.storage.from.required.when.logistics");
     }
 }

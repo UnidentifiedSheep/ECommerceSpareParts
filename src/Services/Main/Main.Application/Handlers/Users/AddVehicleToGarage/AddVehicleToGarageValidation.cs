@@ -1,4 +1,5 @@
 using FluentValidation;
+using Localization.Domain.Extensions;
 
 namespace Main.Application.Handlers.Users.AddVehicleToGarage;
 
@@ -7,14 +8,19 @@ public class AddVehicleToGarageValidation : AbstractValidator<AddVehicleToGarage
     public AddVehicleToGarageValidation()
     {
         RuleFor(x => x.Vehicle.PlateNumber)
-            .NotEmpty().WithMessage("Номер автомобиля не может пустым.");
+            .NotEmpty()
+            .WithLocalizationKey("user.vehicle.plate.number.not.empty");
 
         RuleFor(x => x.Vehicle.Manufacture)
-            .NotEmpty().WithMessage("Марка автомобиля не может быть пустым.")
-            .MaximumLength(50).WithMessage("Длина названия производителя должна быть не больше 50 символов.");
+            .NotEmpty()
+            .WithLocalizationKey("user.vehicle.manufacture.not.empty")
+            .MaximumLength(50)
+            .WithLocalizationKey("user.vehicle.manufacture.max.length");
 
         RuleFor(x => x.Vehicle.Model)
-            .NotEmpty().WithMessage("Модель не может быть пуста.")
-            .MaximumLength(125).WithMessage("Максимальная длина модели авто 125 символов.");
+            .NotEmpty()
+            .WithLocalizationKey("user.vehicle.model.not.empty")
+            .MaximumLength(125)
+            .WithLocalizationKey("user.vehicle.model.max.length");
     }
 }

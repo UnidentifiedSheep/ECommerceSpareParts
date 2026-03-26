@@ -23,6 +23,7 @@
         <ProjectReference Include="..\..\..\Core\Constants\Constants.csproj" />
         <ProjectReference Include="..\..\..\Core\Contracts\Contracts.csproj" />
         <ProjectReference Include="..\..\..\Core\Utils\Utils.csproj" />
+        <ProjectReference Include="..\..\..\Infrastructure\Localization\Localization.Domain\Localization.Domain.csproj" />
         <ProjectReference Include="..\..\Application.Common\Application.Common.csproj"/>
         <ProjectReference Include="..\Main.Abstractions\Main.Abstractions.csproj" />
         <ProjectReference Include="..\Main.Entities\Main.Entities.csproj" />

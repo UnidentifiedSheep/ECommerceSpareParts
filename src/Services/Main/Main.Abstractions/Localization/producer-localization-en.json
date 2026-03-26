@@ -1,8 +1,16 @@
 ﻿{
   "locale": "en",
   "keyValues": {
-    "producer.with.articles.cannot.be.deleted": "You cannot delete a producer that has articles.",
+    "producer.with.articles.cannot.be.deleted": "You cannot delete a producer that has associated articles.",
     "producer.not.found": "We couldn't find the producer you were looking for.",
-    "producer.additional.name.not.found": "We couldn't find a producer with the other name '{0}'."
+    "producer.additional.name.not.found": "We couldn't find a producer with the additional name '{0}'.",
+    "producer.name.not.empty": "Producer name must not be empty.",
+    "producer.name.min.length": "Producer name must be at least 2 characters long.",
+    "producer.name.max.length": "Producer name must be at most 64 characters long.",
+    "producer.description.max.length": "Producer description must be at most 500 characters long.",
+    "producer.other.name.not.empty": "Additional name must not be empty.",
+    "producer.other.name.min.length": "Additional name must be at least 2 characters long.",
+    "producer.other.name.max.length": "Additional name must be at most 64 characters long.",
+    "producer.other.name.where.used.max.length": "Where-used designation must be at most 64 characters long."
   }
 }

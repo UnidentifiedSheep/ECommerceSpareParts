@@ -1,6 +1,19 @@
 ﻿{
   "locale": "ru",
   "keyValues": {
-    "currency.not.found": "Не удалось найти нужную валюту."
+    "currency.not.found": "Не удалось найти указанную валюту.",
+    "currency.must.exist": "Указанная валюта должна существовать.",
+    "currency.code.not.empty": "Код валюты не должен быть пустым.",
+    "currency.code.max.length": "Код валюты должен быть не более 26 символов.",
+    "currency.code.min.length": "Код валюты должен быть не менее 2 символов.",
+    "currency.name.not.empty": "Название валюты не должно быть пустым.",
+    "currency.name.max.length": "Название валюты должно быть не более 128 символов.",
+    "currency.name.min.length": "Название валюты должно быть не менее 3 символов.",
+    "currency.sign.not.empty": "Символ валюты не должен быть пустым.",
+    "currency.sign.max.length": "Символ валюты должен быть не более 3 символов.",
+    "currency.sign.min.length": "Символ валюты должен быть не менее 1 символа.",
+    "currency.shortName.not.empty": "Краткое название валюты не должно быть пустым.",
+    "currency.shortName.max.length": "Краткое название валюты должно быть не более 5 символов.",
+    "currency.shortName.min.length": "Краткое название валюты должно быть не менее 2 символов."
   }
 }

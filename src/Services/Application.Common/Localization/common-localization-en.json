@@ -1,0 +1,7 @@
+﻿{
+  "locale": "en",
+  "keyValues": {
+    "pagination.page.min": "Page must be greater than or equal to 0.",
+    "pagination.size.range": "Number of items must be between 1 and 100."
+  }
+}

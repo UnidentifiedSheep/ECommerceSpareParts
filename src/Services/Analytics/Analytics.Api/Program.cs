@@ -5,6 +5,7 @@ using Analytics.Application.Consumers;
 using Analytics.Persistence;
 using Analytics.Persistence.Context;
 using Api.Common;
+using Api.Common.Extensions;
 using Api.Common.Middleware;
 using Carter;
 using Localization.Domain.Extensions;
@@ -15,8 +16,7 @@ using RabbitMq.Extensions;
 using RabbitMq.Models;
 using Security.Utils;
 
-string localesPath = Assembly.GetExecutingAssembly().Location;
-localesPath = Path.Combine(Path.GetDirectoryName(localesPath)!, "Localization");
+string localesPath = Assembly.GetExecutingAssembly().GetDefaultLocalizationPath();
 var locales = new[] {"ru-RU", "en-EN"};
 
 var builder = WebApplication.CreateBuilder(args);

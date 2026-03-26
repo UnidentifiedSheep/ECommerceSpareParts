@@ -1,6 +1,6 @@
 using FluentValidation;
+using Localization.Domain.Extensions;
 using Main.Application.Handlers.Purchases.BaseValidators;
-using Main.Application.Handlers.Purchases.BaseValidators.Create;
 
 namespace Main.Application.Handlers.Purchases.CreateFullPurchase;
 
@@ -10,12 +10,15 @@ public class CreateFullPurchaseValidation : AbstractValidator<CreateFullPurchase
     {
         RuleFor(x => x.PurchaseContent)
             .NotEmpty()
-            .WithMessage("Закупка не может быть пустой");
+            .WithLocalizationKey("purchase.content.not.empty");
 
-        RuleFor(x => x.SupplierId).NotEmpty()
-            .WithMessage("Id продавца не может быть пустым");
-        RuleFor(x => x.CreatedUserId).NotEmpty()
-            .WithMessage("Id пользователя создавшего закупку не может быть пустым");
+        RuleFor(x => x.SupplierId)
+            .NotEmpty()
+            .WithLocalizationKey("purchase.supplier.id.not.empty");
+
+        RuleFor(x => x.CreatedUserId)
+            .NotEmpty()
+            .WithLocalizationKey("purchase.created.user.id.not.empty");
 
         RuleForEach(x => x.PurchaseContent)
             .SetValidator(new NewPurchaseContentValidation());
@@ -26,14 +29,14 @@ public class CreateFullPurchaseValidation : AbstractValidator<CreateFullPurchase
         RuleFor(x => x.StorageFrom)
             .Must(x => x != null)
             .When(x => x.WithLogistics)
-            .WithMessage("При создании закупки с логистикой, склад отправителя должен быть указан");
+            .WithLocalizationKey("purchase.storage.from.required.when.logistics");
 
         RuleFor(x => x.PayedSum)
             .GreaterThanOrEqualTo(0)
             .When(x => x.PayedSum != null)
-            .WithMessage("Оплаченная сумма должна быть больше или равна 0.")
+            .WithLocalizationKey("purchase.payed.sum.min.value")
             .PrecisionScale(18, 2, true)
             .When(x => x.PayedSum != null)
-            .WithMessage("Оплаченная сумма должна иметь максимум 2 числа после запятой.");
+            .WithLocalizationKey("purchase.payed.sum.precision");
     }
 }

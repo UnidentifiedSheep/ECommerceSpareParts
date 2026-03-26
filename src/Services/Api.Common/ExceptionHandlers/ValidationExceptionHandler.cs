@@ -28,13 +28,31 @@ public class ValidationExceptionHandler(
     private void AddValidationErrors(HttpContext httpContext, ProblemDetails problemDetails, ValidationException exception)
     {
         var localizer = httpContext.RequestServices.GetService<IScopedStringLocalizer>();
-        problemDetails.Extensions["validationErrors"] = exception.Errors
-            .Select(e =>
-            {
-                if (localizer == null || string.IsNullOrWhiteSpace(e.ErrorCode)) 
-                    return new ValidationErrorModel(e.PropertyName, e.ErrorMessage, e.AttemptedValue);
+        var errors = new List<ValidationErrorModel>();
 
-                return new ValidationErrorModel(e.PropertyName, localizer[e.ErrorCode], e.AttemptedValue);
-            });
+        foreach (var error in exception.Errors)
+        {
+            ValidationStateData? state = error.CustomState as ValidationStateData;
+            if (!(state?.DisplayErrorToUser ?? true))
+                continue;
+            
+            string errorCode = error.ErrorCode;
+            string propertyName = error.PropertyName;
+            string errorMessage = error.ErrorMessage;
+            object attemptedValue = error.AttemptedValue;
+
+            if (localizer == null || string.IsNullOrWhiteSpace(errorCode))
+            {
+                errors.Add(new ValidationErrorModel(propertyName, errorMessage, attemptedValue));
+                continue;
+            }
+            
+            var template = localizer[errorCode];
+            TryFormatLocalizableMessage(template, state?.ErrorMessageArguments, out template);
+            
+            errors.Add(new ValidationErrorModel(propertyName, template, attemptedValue));
+        }
+        
+        problemDetails.Extensions["validationErrors"] = errors;
     }
 }

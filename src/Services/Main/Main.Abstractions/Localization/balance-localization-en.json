@@ -4,6 +4,17 @@
     "transaction.invalid.status.for.deletion": "You cannot delete a transaction with status '{0}'.",
     "deleted.transaction.cannot.be.edited": "You cannot edit a transaction that has already been deleted.",
     "transaction.already.deleted": "This transaction has already been deleted.",
-    "transaction.not.found": "We couldn't find the transaction you were looking for."
+    "transaction.not.found": "The transaction could not be found.",
+    "transaction.sender.id.required": "Sender ID must be provided.",
+    "transaction.receiver.id.required": "Receiver ID must be provided.",
+    "transaction.date.out.of.range": "Transaction date must be within the last 2 months and no more than 1 hour in the future.",
+    "transaction.id.required": "Transaction ID must be provided.",
+    "transaction.who.delete.user.id.required": "ID of the user deleting the transaction must be provided.",
+    "transaction.amount.must.be.positive": "Transaction amount must be greater than 0.",
+    "transaction.amount.max.two.decimal.places": "Transaction amount can have at most 2 decimal places.",
+    "transaction.sender.receiver.must.not.be.same": "Sender and receiver cannot be the same.",
+    "transaction.sender.or.receiver.required": "At least one of sender or receiver must be specified.",
+    "transaction.range.start.before.end": "Start date cannot be later than end date.",
+    "transaction.range.max.months": "Maximum range is 5 months."
   }
 }

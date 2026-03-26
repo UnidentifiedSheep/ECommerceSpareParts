@@ -1,4 +1,5 @@
 ﻿using FluentValidation;
+using Localization.Domain.Extensions;
 
 namespace Main.Application.Handlers.ArticleWeight.SetArticleWeight;
 
@@ -8,8 +9,8 @@ public class SetArticleWeightValidation : AbstractValidator<SetArticleWeightComm
     {
         RuleFor(x => x.Weight)
             .GreaterThan(0)
-            .WithMessage("Вес должен быть больше 0")
+            .WithLocalizationKey("article.weight.must.be.greater.than.zero")
             .PrecisionScale(18, 2, true)
-            .WithMessage("Вес может содержать не более двух знаков после запятой");
+            .WithLocalizationKey("article.weight.max.two.decimals");
     }
 }

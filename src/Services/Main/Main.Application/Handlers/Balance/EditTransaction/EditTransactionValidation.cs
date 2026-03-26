@@ -1,4 +1,5 @@
 using FluentValidation;
+using Localization.Domain.Extensions;
 using Main.Application.Handlers.BaseValidators;
 
 namespace Main.Application.Handlers.Balance.EditTransaction;
@@ -12,6 +13,6 @@ public class EditTransactionValidation : AbstractValidator<EditTransactionComman
 
         RuleFor(x => x.TransactionId)
             .NotEmpty()
-            .WithMessage("Id транзакции не может быть пустым");
+            .WithLocalizationKey("transaction.id.required");
     }
 }
