@@ -52,7 +52,7 @@ public class ScopedStringLocalizerTests
         var action = () => scoped.Get("Test.Key");
         action.Should().Throw<ObjectDisposedException>();
     }
-    
+
     [Fact]
     public void TryGet_ShouldThrow_WhenLocaleNotSet()
     {

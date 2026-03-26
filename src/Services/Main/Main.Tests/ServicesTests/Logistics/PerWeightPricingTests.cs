@@ -12,11 +12,11 @@ public class PerWeightPricingTests
     [Fact]
     public void Calculate_ShouldReturnCorrectCost_BasedOnWeight()
     {
-        var context = new LogisticsContext(priceKg: 10, priceM3: 0, pricePerOrder: 0);
+        var context = new LogisticsContext(10, 0, 0);
         var items = new List<LogisticsItem>
         {
-            new(Id: 1, Quantity: 2, Weight: 1.5m, WeightUnit: WeightUnit.Kilogram, AreaM3: 0.1m),
-            new(Id: 2, Quantity: 1, Weight: 500, WeightUnit: WeightUnit.Gram, AreaM3: 0.05m)
+            new(1, 2, 1.5m, WeightUnit.Kilogram, 0.1m),
+            new(2, 1, 500, WeightUnit.Gram, 0.05m)
         };
 
         var result = _strategy.Calculate(context, items);
@@ -35,10 +35,10 @@ public class PerWeightPricingTests
     [Fact]
     public void Calculate_ShouldHandleSkippedItems_WhenWeightIsZero()
     {
-        var context = new LogisticsContext(priceKg: 10, priceM3: 0, pricePerOrder: 0);
+        var context = new LogisticsContext(10, 0, 0);
         var items = new List<LogisticsItem>
         {
-            new(Id: 1, Quantity: 1, Weight: 0, WeightUnit: WeightUnit.Kilogram, AreaM3: 0.1m)
+            new(1, 1, 0, WeightUnit.Kilogram, 0.1m)
         };
 
         var result = _strategy.Calculate(context, items);

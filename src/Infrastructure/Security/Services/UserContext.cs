@@ -1,21 +1,11 @@
 ﻿using Abstractions.Interfaces;
-using Exceptions.Base;
 using Microsoft.AspNetCore.Http;
 
 namespace Security.Services;
 
 public sealed class UserContext : IUserContext
 {
-    public bool IsAuthenticated { get; }
-
     private readonly Guid? _userId;
-
-    public Guid UserId => IsAuthenticated && _userId.HasValue
-            ? _userId.Value
-            : throw new UnauthorizedAccessException("Пользователь не авторизован.");
-
-    public IReadOnlySet<string> Roles { get; }
-    public IReadOnlySet<string> Permissions { get; }
 
     public UserContext(IHttpContextAccessor accessor)
     {
@@ -43,4 +33,13 @@ public sealed class UserContext : IUserContext
             .Split(',', StringSplitOptions.RemoveEmptyEntries)
             .ToHashSet();
     }
+
+    public bool IsAuthenticated { get; }
+
+    public Guid UserId => IsAuthenticated && _userId.HasValue
+        ? _userId.Value
+        : throw new UnauthorizedAccessException("Пользователь не авторизован.");
+
+    public IReadOnlySet<string> Roles { get; }
+    public IReadOnlySet<string> Permissions { get; }
 }

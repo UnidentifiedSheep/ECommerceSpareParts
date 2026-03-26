@@ -7,21 +7,21 @@
     </PropertyGroup>
 
     <ItemGroup>
-      <ProjectReference Include="..\..\..\Core\Abstractions\Abstractions.csproj" />
-      <ProjectReference Include="..\Analytics.Entities\Analytics.Entities.csproj" />
+        <ProjectReference Include="..\..\..\Core\Abstractions\Abstractions.csproj"/>
+        <ProjectReference Include="..\Analytics.Entities\Analytics.Entities.csproj"/>
     </ItemGroup>
 
     <ItemGroup>
-      <None Update="Localization\purchase-fact\purchase-fact-localization-en.json">
-        <CopyToOutputDirectory>Never</CopyToOutputDirectory>
-      </None>
-      <None Update="Localization\purchase-fact\purchase-fact-localization-ru.json">
-        <CopyToOutputDirectory>Never</CopyToOutputDirectory>
-      </None>
+        <None Update="Localization\purchase-fact\purchase-fact-localization-en.json">
+            <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+        </None>
+        <None Update="Localization\purchase-fact\purchase-fact-localization-ru.json">
+            <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+        </None>
     </ItemGroup>
 
     <ItemGroup>
-      <Folder Include="Exceptions\PurchaseFacts\" />
+        <Folder Include="Exceptions\PurchaseFacts\"/>
     </ItemGroup>
 
 </Project>

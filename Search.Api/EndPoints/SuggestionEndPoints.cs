@@ -21,13 +21,20 @@ public static class SuggestionEndPoints
         return routes;
     }
 
-    static async Task<IResult> GetAll(string query, int limit, IMediator mediator, CancellationToken cancellationToken)
+    private static async Task<IResult> GetAll(
+        string query,
+        int limit,
+        IMediator mediator,
+        CancellationToken cancellationToken)
     {
         var result = await mediator.Send(new GetSuggestionsQuery(query, limit), cancellationToken);
         return Results.Ok(new GetSuggestionsResponse(result.Suggestions));
     }
 
-    static async Task<IResult> Rebuild(IBackgroundTaskQueue taskQueue, IMediator mediator, CancellationToken cancellationToken)
+    private static async Task<IResult> Rebuild(
+        IBackgroundTaskQueue taskQueue,
+        IMediator mediator,
+        CancellationToken cancellationToken)
     {
         await mediator.Send(new IsSuggestionsRebuildingQuery(true), cancellationToken);
         taskQueue.Enqueue(async ct => await mediator.Send(new RebuildSuggestionsCommand(), ct));

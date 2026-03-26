@@ -22,7 +22,7 @@ public static class ArticleFactory
             var w = Math.Round(f.Random.Decimal(1, 100), 2);
             var l = Math.Round(f.Random.Decimal(1, 100), 2);
             var unit = f.PickRandom<DimensionUnit>();
-            
+
             return new ArticleSize
             {
                 Height = h,
@@ -37,10 +37,7 @@ public static class ArticleFactory
             Weight = Math.Round(f.Random.Decimal(1, 100), 2),
             Unit = f.PickRandom<WeightUnit>()
         })
-        .FinishWith((_, x) =>
-        {
-            x.NormalizedArticleNumber = x.ArticleNumber.ToNormalizedArticleNumber(); 
-        });
+        .FinishWith((_, x) => { x.NormalizedArticleNumber = x.ArticleNumber.ToNormalizedArticleNumber(); });
 
     public static List<Article> Create(int count, params int[] producerIds)
     {

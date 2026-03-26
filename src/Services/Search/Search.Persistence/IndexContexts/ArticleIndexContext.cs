@@ -9,36 +9,6 @@ namespace Search.Persistence.IndexContexts;
 
 internal sealed class ArticleIndexContext : IndexContext
 {
-    public DirectoryReader Reader 
-    {
-        get
-        {
-            ThrowIfDisposedOrClosed();
-            return field;
-        }
-        private set; 
-    }
-    public IndexSearcher Searcher 
-    {
-        get
-        {
-            ThrowIfDisposedOrClosed();
-            return field;
-        }
-        private set; 
-    }
-    public IndexWriter IndexWriter 
-    {
-        get
-        {
-            ThrowIfDisposedOrClosed();
-            return field;
-        }
-        private set; 
-    }
-    
-    public override IndexName IndexName => IndexName.Articles;
-
     public ArticleIndexContext(ArticleAnalyzer analyzer, IIndexDirectory indexDir) : base(analyzer)
     {
         Path = indexDir.GetIndexPath(IndexName);
@@ -48,13 +18,45 @@ internal sealed class ArticleIndexContext : IndexContext
         Reader = DirectoryReader.Open(IndexWriter, true);
         Searcher = new IndexSearcher(Reader);
     }
-    
+
+    public DirectoryReader Reader
+    {
+        get
+        {
+            ThrowIfDisposedOrClosed();
+            return field;
+        }
+        private set;
+    }
+
+    public IndexSearcher Searcher
+    {
+        get
+        {
+            ThrowIfDisposedOrClosed();
+            return field;
+        }
+        private set;
+    }
+
+    public IndexWriter IndexWriter
+    {
+        get
+        {
+            ThrowIfDisposedOrClosed();
+            return field;
+        }
+        private set;
+    }
+
+    public override IndexName IndexName => IndexName.Articles;
+
     public void ReloadIndex()
     {
         ThrowIfDisposedOrClosed();
         var newReader = DirectoryReader.OpenIfChanged(Reader);
         if (newReader == null) return;
-        
+
         Reader.Dispose();
         Reader = newReader;
         Searcher = new IndexSearcher(Reader);
@@ -64,11 +66,11 @@ internal sealed class ArticleIndexContext : IndexContext
     {
         ObjectDisposedException.ThrowIf(Disposed, nameof(ArticleIndexContext));
         if (IsClosed) return;
-        
+
         Reader.Dispose();
         IndexWriter.Dispose();
         Directory.Dispose();
-        
+
         IsClosed = true;
     }
 
@@ -76,13 +78,13 @@ internal sealed class ArticleIndexContext : IndexContext
     {
         ObjectDisposedException.ThrowIf(Disposed, nameof(ArticleIndexContext));
         if (!IsClosed) return;
-        
+
         Directory = FSDirectory.Open(Path);
         var indexConfig = new IndexWriterConfig(Global.LuceneVersion, Analyzer);
         IndexWriter = new IndexWriter(Directory, indexConfig);
         Reader = DirectoryReader.Open(IndexWriter, true);
         Searcher = new IndexSearcher(Reader);
-        
+
         IsClosed = false;
     }
 

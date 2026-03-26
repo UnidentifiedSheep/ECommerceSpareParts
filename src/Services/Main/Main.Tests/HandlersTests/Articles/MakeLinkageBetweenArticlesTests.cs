@@ -1,10 +1,9 @@
 using FluentValidation;
-using Main.Application.Configs;
+using Main.Abstractions.Dtos.Amw.Articles;
+using Main.Application.Configs.Mapster;
 using Main.Application.Handlers.Articles.CreateArticles;
 using Main.Application.Handlers.Articles.MakeLinkageBetweenArticles;
 using Main.Application.Handlers.Producers.CreateProducer;
-using Main.Abstractions.Dtos.Amw.Articles;
-using Main.Application.Configs.Mapster;
 using Main.Enums;
 using Main.Persistence.Context;
 using MediatR;
@@ -205,5 +204,4 @@ public class MakeLinkageBetweenArticlesTests : IAsyncLifetime
         var crosses = articles.Select(x => x.Value.Select(y => (x.Key, y.Id)));
         return crosses.SelectMany(x => x).ToList();
     }
-    
 }

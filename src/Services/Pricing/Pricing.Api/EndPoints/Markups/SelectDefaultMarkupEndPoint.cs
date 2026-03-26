@@ -19,8 +19,8 @@ public class SelectDefaultMarkupEndPoint : ICarterModule
                     await sender.Send(command, token);
                     return Results.Ok();
                 }).WithTags("Markups")
-                .WithDescription("Установка дефолтной политики-наценки")
-                .WithDisplayName("Установка дефолтной политики-наценки")
-                .RequireAnyPermission(PermissionCodes.MARKUP_SET_DEFAULT);
+            .WithDescription("Установка дефолтной политики-наценки")
+            .WithDisplayName("Установка дефолтной политики-наценки")
+            .RequireAnyPermission(PermissionCodes.MARKUP_SET_DEFAULT);
     }
 }

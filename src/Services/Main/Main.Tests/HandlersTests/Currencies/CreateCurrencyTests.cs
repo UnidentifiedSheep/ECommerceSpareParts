@@ -6,7 +6,6 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Test.Common.Extensions;
 using Test.Common.TestContainers.Combined;
-using Tests.MockData;
 using ValidationException = FluentValidation.ValidationException;
 using DbValidationException = BulkValidation.Core.Exceptions.ValidationException;
 
@@ -115,17 +114,17 @@ public class CreateCurrencyTests : IAsyncLifetime
             await _mediator.Send(new CreateCurrencyCommand(GetValidShortName(), GetValidName(), GetValidCurrencySign(),
                 code)));
         Assert.Equal(ApplicationErrors.CurrencyCodeAlreadyTaken, exception.Failures[0].ErrorName);
-        
+
         exception = await Assert.ThrowsAsync<DbValidationException>(async () =>
             await _mediator.Send(new CreateCurrencyCommand(GetValidShortName(), name, GetValidCurrencySign(),
                 GetValidCurrencyCode())));
         Assert.Equal(ApplicationErrors.CurrencyNameAlreadyTaken, exception.Failures[0].ErrorName);
-        
+
         exception = await Assert.ThrowsAsync<DbValidationException>(async () =>
             await _mediator.Send(new CreateCurrencyCommand(GetValidShortName(), GetValidName(), sign,
                 GetValidCurrencyCode())));
         Assert.Equal(ApplicationErrors.CurrencySignAlreadyTaken, exception.Failures[0].ErrorName);
-        
+
         exception = await Assert.ThrowsAsync<DbValidationException>(async () =>
             await _mediator.Send(new CreateCurrencyCommand(shortName, GetValidName(), GetValidCurrencySign(),
                 GetValidCurrencyCode())));

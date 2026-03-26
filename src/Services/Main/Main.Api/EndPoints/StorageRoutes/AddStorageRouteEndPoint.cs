@@ -8,21 +8,33 @@ using MediatR;
 
 namespace Main.Api.EndPoints.StorageRoutes;
 
-public record AddStorageRouteRequest(string StorageFrom, string StorageTo, int Distance, RouteType RouteType, 
-    LogisticPricingType PricingType, int DeliveryTime, decimal PriceKg, decimal PriceM3, int CurrencyId,
-    decimal PricePerOrder, decimal? MinimumPrice, Guid? CarrierId);
+public record AddStorageRouteRequest(
+    string StorageFrom,
+    string StorageTo,
+    int Distance,
+    RouteType RouteType,
+    LogisticPricingType PricingType,
+    int DeliveryTime,
+    decimal PriceKg,
+    decimal PriceM3,
+    int CurrencyId,
+    decimal PricePerOrder,
+    decimal? MinimumPrice,
+    Guid? CarrierId);
+
 public record AddStorageRouteResponse(Guid RouteId);
 
 public class AddStorageRouteEndPoint : ICarterModule
 {
     public void AddRoutes(IEndpointRouteBuilder app)
     {
-        app.MapPost("/storages/routes", 
+        app.MapPost("/storages/routes",
                 async (ISender sender, AddStorageRouteRequest request, CancellationToken token) =>
                 {
                     var command = request.Adapt<AddStorageRouteCommand>();
-                    var result =  await sender.Send(command, token);
-                    return Results.Created($"/storages/routes/{result.RouteId}", new AddStorageRouteResponse(result.RouteId));
+                    var result = await sender.Send(command, token);
+                    return Results.Created($"/storages/routes/{result.RouteId}",
+                        new AddStorageRouteResponse(result.RouteId));
                 })
             .WithTags("Storage Routes")
             .WithDescription("Создание маршрута")

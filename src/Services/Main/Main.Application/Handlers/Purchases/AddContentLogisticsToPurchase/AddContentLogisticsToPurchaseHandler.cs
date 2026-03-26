@@ -11,7 +11,8 @@ namespace Main.Application.Handlers.Purchases.AddContentLogisticsToPurchase;
 [Transactional]
 public record AddContentLogisticsToPurchaseCommand(IEnumerable<PurchaseContentLogisticDto> Contents) : ICommand;
 
-public class AddContentLogisticsToPurchaseHandler(IUnitOfWork unitOfWork) : ICommandHandler<AddContentLogisticsToPurchaseCommand>
+public class AddContentLogisticsToPurchaseHandler(IUnitOfWork unitOfWork)
+    : ICommandHandler<AddContentLogisticsToPurchaseCommand>
 {
     public async Task<Unit> Handle(AddContentLogisticsToPurchaseCommand request, CancellationToken cancellationToken)
     {

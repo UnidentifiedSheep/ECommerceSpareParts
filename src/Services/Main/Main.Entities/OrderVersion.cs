@@ -1,6 +1,6 @@
 ﻿namespace Main.Entities;
 
-public partial class OrderVersion
+public class OrderVersion
 {
     public Guid Id { get; set; }
 

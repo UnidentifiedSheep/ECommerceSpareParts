@@ -3,15 +3,17 @@
 public enum RouteType
 {
     /// <summary>
-    /// Внутригородской
+    ///     Внутригородской
     /// </summary>
     IntraCity,
+
     /// <summary>
-    /// Междугородний
+    ///     Междугородний
     /// </summary>
     InterCity,
+
     /// <summary>
-    /// Международный
+    ///     Международный
     /// </summary>
     International
 }

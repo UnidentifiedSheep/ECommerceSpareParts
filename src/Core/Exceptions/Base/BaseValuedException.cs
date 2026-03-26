@@ -5,7 +5,6 @@ namespace Exceptions.Base;
 
 public abstract class BaseValuedException : Exception, IValuedException, IStatusCode
 {
-    public abstract HttpStatusCode StatusCode { get; }
     private readonly object? _errorValues;
 
     protected BaseValuedException(string? message, object key) : base(message)
@@ -17,9 +16,10 @@ public abstract class BaseValuedException : Exception, IValuedException, IStatus
     {
     }
 
+    public abstract HttpStatusCode StatusCode { get; }
+
     public object? GetErrorValues()
     {
         return _errorValues;
     }
-
 }

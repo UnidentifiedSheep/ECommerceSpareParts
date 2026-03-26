@@ -14,7 +14,7 @@ public class UserCacheRepository : IUserCacheRepository
         _cache = cache;
         _ttl = ttl;
     }
-    
+
     public async Task SetUserDiscount(Guid userId, decimal discount, DateTime? setAt = null)
     {
         setAt ??= DateTime.UtcNow;
@@ -34,8 +34,11 @@ public class UserCacheRepository : IUserCacheRepository
     public async Task<Timestamped<decimal>?> GetUserDiscount(Guid userId)
     {
         var result = await _cache.StringGetAsync<Timestamped<decimal>>(GetUserDiscountKey(userId));
-        return result; 
+        return result;
     }
-    
-    private static string GetUserDiscountKey(Guid userId) => $"user-discount:{userId}";
+
+    private static string GetUserDiscountKey(Guid userId)
+    {
+        return $"user-discount:{userId}";
+    }
 }

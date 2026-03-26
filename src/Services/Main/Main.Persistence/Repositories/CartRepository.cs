@@ -8,14 +8,22 @@ namespace Main.Persistence.Repositories;
 
 public class CartRepository(DContext context) : ICartRepository
 {
-    public async Task<Cart?> GetCartItemAsync(Guid userId, int articleId, bool track = true, CancellationToken cancellationToken = default)
+    public async Task<Cart?> GetCartItemAsync(
+        Guid userId,
+        int articleId,
+        bool track = true,
+        CancellationToken cancellationToken = default)
     {
         return await context.Carts
             .ConfigureTracking(track)
             .FirstOrDefaultAsync(x => x.UserId == userId && x.ArticleId == articleId, cancellationToken);
     }
 
-    public async Task<IEnumerable<Cart>> GetCartItemsAsync(Guid userId, bool track = true, int? page = null, int? limit = null,
+    public async Task<IEnumerable<Cart>> GetCartItemsAsync(
+        Guid userId,
+        bool track = true,
+        int? page = null,
+        int? limit = null,
         CancellationToken cancellationToken = default)
     {
         var query = context.Carts

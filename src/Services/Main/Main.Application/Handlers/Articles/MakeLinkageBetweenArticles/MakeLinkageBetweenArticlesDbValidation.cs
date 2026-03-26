@@ -9,6 +9,6 @@ public class MakeLinkageBetweenArticlesDbValidation : AbstractDbValidation<MakeL
     public override void Build(IValidationPlan plan, MakeLinkageBetweenArticlesCommand request)
     {
         plan.ValidateArticleExistsId(request.Linkages
-                .SelectMany(x => new[] { x.ArticleId, x.CrossArticleId }));
+            .SelectMany(x => new[] { x.ArticleId, x.CrossArticleId }));
     }
 }

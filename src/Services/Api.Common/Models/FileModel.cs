@@ -9,13 +9,24 @@ public class FileModel(IFormFile file) : IFile
     public string FileName => file.ContentType;
     public string Name => file.Name;
     public string Extension => Path.GetExtension(file.FileName);
-    public Stream OpenReadStream() => file.OpenReadStream();
 
-    public Task CopyToAsync(Stream target, CancellationToken cancellationToken = default) 
-        => file.CopyToAsync(target, cancellationToken);
-    public void CopyTo(Stream target) => file.CopyTo(target);
+    public Stream OpenReadStream()
+    {
+        return file.OpenReadStream();
+    }
+
+    public Task CopyToAsync(Stream target, CancellationToken cancellationToken = default)
+    {
+        return file.CopyToAsync(target, cancellationToken);
+    }
+
+    public void CopyTo(Stream target)
+    {
+        file.CopyTo(target);
+    }
 
     public static IEnumerable<IFile> GetFileModels(IFormFileCollection collection)
-        => collection.Select(x => new FileModel(x));
-    
+    {
+        return collection.Select(x => new FileModel(x));
+    }
 }

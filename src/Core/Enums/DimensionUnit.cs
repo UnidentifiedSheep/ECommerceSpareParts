@@ -4,5 +4,5 @@ public enum DimensionUnit
 {
     Millimeter,
     Centimeter,
-    Meter,
+    Meter
 }

@@ -1,10 +1,9 @@
 ﻿using BulkValidation.Core.Attributes;
 using Enums;
-using Main.Enums;
 
 namespace Main.Entities;
 
-public partial class ArticleSize
+public class ArticleSize
 {
     [Validate]
     public int ArticleId { get; set; }

@@ -1,9 +1,8 @@
 ﻿using Enums;
-using Main.Enums;
 
 namespace Main.Entities;
 
-public partial class Coefficient
+public class Coefficient
 {
     public string Name { get; set; } = null!;
 

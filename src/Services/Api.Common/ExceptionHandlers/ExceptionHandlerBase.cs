@@ -8,14 +8,18 @@ namespace Api.Common.ExceptionHandlers;
 public abstract class ExceptionHandlerBase<THandler>(
     ILogger<THandler> logger) : IExceptionHandler
 {
-    public abstract ValueTask<bool> TryHandleAsync(HttpContext httpContext, Exception exception,
+    public abstract ValueTask<bool> TryHandleAsync(
+        HttpContext httpContext,
+        Exception exception,
         CancellationToken cancellationToken);
-    
+
     protected virtual void LogError(HttpContext context, Exception exception)
     {
         if (!logger.IsEnabled(LogLevel.Error)) return;
         using (logger.BeginScope(new Dictionary<string, object> { ["TraceId"] = context.TraceIdentifier }))
+        {
             logger.LogError(exception, "Error occurred at {Time}", DateTime.UtcNow);
+        }
     }
 
     protected ProblemDetails GetBaseDetails(Exception exception, HttpContext httpContext, int? statusCode = 500)
@@ -33,7 +37,7 @@ public abstract class ExceptionHandlerBase<THandler>(
             }
         };
     }
-    
+
     protected void AddExceptionRelatedData(ProblemDetails problem, Exception ex)
     {
         if (ex is not IValuedException valuedEx) return;
@@ -55,20 +59,20 @@ public abstract class ExceptionHandlerBase<THandler>(
         detail = null;
         if (exception is not ILocalizableException localizableException) return false;
 
-        string key = localizableException.MessageKey;
-        string message = localizer[key];
+        var key = localizableException.MessageKey;
+        var message = localizer[key];
         var arguments = localizableException.Arguments;
 
         if (TryFormatLocalizableMessage(message, arguments, out detail))
             return true;
-        
+
         logger.LogError(
-            "Unable to format localizable message for Key: {Key}, Arguments: {@Args}", 
+            "Unable to format localizable message for Key: {Key}, Arguments: {@Args}",
             key,
             arguments);
         return false;
     }
-    
+
     protected static bool TryFormatLocalizableMessage(
         string template,
         object[]? arguments,
@@ -76,7 +80,7 @@ public abstract class ExceptionHandlerBase<THandler>(
     {
         result = template;
         if (arguments == null || arguments.Length == 0) return true;
-        
+
         try
         {
             result = string.Format(template, arguments);

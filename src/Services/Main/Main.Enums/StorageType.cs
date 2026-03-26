@@ -3,11 +3,12 @@
 public enum StorageType
 {
     /// <summary>
-    /// Наш склад
+    ///     Наш склад
     /// </summary>
     Warehouse,
+
     /// <summary>
-    /// Склад поставщика
+    ///     Склад поставщика
     /// </summary>
     SupplierStorage
 }

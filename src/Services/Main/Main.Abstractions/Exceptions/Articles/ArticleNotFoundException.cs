@@ -5,8 +5,6 @@ namespace Main.Abstractions.Exceptions.Articles;
 
 public class ArticleNotFoundException : NotFoundException, ILocalizableException
 {
-    public string MessageKey { get; }
-    public object[]? Arguments => null;
     public ArticleNotFoundException(int id) : base(null, new { Id = id })
     {
         MessageKey = "article.not.found";
@@ -17,4 +15,6 @@ public class ArticleNotFoundException : NotFoundException, ILocalizableException
         MessageKey = "articles.not.found";
     }
 
+    public string MessageKey { get; }
+    public object[]? Arguments => null;
 }

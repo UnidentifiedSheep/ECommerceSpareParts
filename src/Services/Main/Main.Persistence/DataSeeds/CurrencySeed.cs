@@ -16,10 +16,13 @@ public class CurrencySeed : ISeed<DContext>
             CurrencySign = "$",
             Code = "USD"
         };
-        
+
         await context.Currencies.AddAsync(usd);
         await context.SaveChangesAsync();
     }
 
-    public int GetPriority() => 0;
+    public int GetPriority()
+    {
+        return 0;
+    }
 }

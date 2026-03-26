@@ -19,6 +19,7 @@ public class CurrencyConverter(int usdId) : ICurrencyConverter
             ToUsd[currencyId] = rate;
             ToUsdDoub[currencyId] = (double)rate;
         }
+
         ToUsd[usdId] = 1;
         ToUsdDoub[usdId] = 1;
     }
@@ -115,5 +116,4 @@ public class CurrencyConverter(int usdId) : ICurrencyConverter
 
         return new ExchangeRates(newBase, newRates);
     }
-
 }

@@ -14,10 +14,13 @@ public class UserSeed : ISeed<DContext>
             NormalizedUserName = "SYSTEM",
             PasswordHash = ""
         };
-        
+
         await context.Users.AddAsync(systemUser);
         await context.SaveChangesAsync();
     }
 
-    public int GetPriority() => 1;
+    public int GetPriority()
+    {
+        return 1;
+    }
 }

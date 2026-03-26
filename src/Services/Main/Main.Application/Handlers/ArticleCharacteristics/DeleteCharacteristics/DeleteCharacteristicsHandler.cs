@@ -10,7 +10,8 @@ namespace Main.Application.Handlers.ArticleCharacteristics.DeleteCharacteristics
 [Transactional]
 public record DeleteCharacteristicsCommand(int Id) : ICommand;
 
-public class DeleteCharacteristicsHandler(IArticleCharacteristicsRepository repository,
+public class DeleteCharacteristicsHandler(
+    IArticleCharacteristicsRepository repository,
     IUnitOfWork unitOfWork) : ICommandHandler<DeleteCharacteristicsCommand>
 {
     public async Task<Unit> Handle(DeleteCharacteristicsCommand request, CancellationToken cancellationToken)

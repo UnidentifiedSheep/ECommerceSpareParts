@@ -16,7 +16,8 @@ public class SubtractCountFromReservationsHandler(
     IArticleReservationRepository reservationRepository,
     IUnitOfWork unitOfWork) : ICommandHandler<SubtractCountFromReservationsCommand, SubtractCountFromReservationsResult>
 {
-    public async Task<SubtractCountFromReservationsResult> Handle(SubtractCountFromReservationsCommand request,
+    public async Task<SubtractCountFromReservationsResult> Handle(
+        SubtractCountFromReservationsCommand request,
         CancellationToken cancellationToken)
     {
         if (request.Contents.Count == 0)

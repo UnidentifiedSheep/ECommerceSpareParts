@@ -26,7 +26,8 @@ public class CreateMailForUserValidation : AbstractValidator<CreateMailForUserCo
 public class CreateMailForUserHandler(IUserEmailRepository emailRepository)
     : ICommandHandler<CreateMailForUserCommand, CreateMailForUserResult>
 {
-    public async Task<CreateMailForUserResult> Handle(CreateMailForUserCommand request,
+    public async Task<CreateMailForUserResult> Handle(
+        CreateMailForUserCommand request,
         CancellationToken cancellationToken)
     {
         throw new NotImplementedException();

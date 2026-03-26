@@ -4,7 +4,6 @@ using Main.Abstractions.Dtos.Amw.Users;
 using Main.Abstractions.Interfaces.DbRepositories;
 using Main.Enums;
 using Mapster;
-
 using User = Main.Entities.User;
 
 namespace Main.Application.Handlers.Users.GetUsers;

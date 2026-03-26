@@ -23,7 +23,7 @@ public class EditStorageHandler(IStoragesRepository repository, IUnitOfWork unit
         var editType = request.EditStorage.Type;
         if (editType.IsSet && storage.Type != editType.Value && storage.StorageOwners.Count > 0)
             throw new ChangeOfStorageTypeRestrictedException();
-        
+
         request.EditStorage.Adapt(storage);
         await unitOfWork.SaveChangesAsync(cancellationToken);
         return Unit.Value;

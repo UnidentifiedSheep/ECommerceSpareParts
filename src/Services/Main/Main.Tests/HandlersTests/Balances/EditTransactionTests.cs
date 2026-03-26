@@ -1,6 +1,5 @@
 using FluentValidation;
 using Main.Abstractions.Exceptions.Balances;
-using Main.Application.Configs;
 using Main.Application.Configs.Mapster;
 using Main.Application.Handlers.Balance.EditTransaction;
 using Main.Entities;
@@ -131,7 +130,8 @@ public class EditTransactionTests : IAsyncLifetime
         Assert.Equal(newCurrency.Id, updatedTransaction.CurrencyId);
         Assert.Equal(newAmount, updatedTransaction.TransactionSum);
         Assert.Equal(newStatus, updatedTransaction.Status);
-        Assert.True(Math.Abs((updatedTransaction.TransactionDatetime - newDate.ToUniversalTime()).TotalMilliseconds) < 1);
+        Assert.True(
+            Math.Abs((updatedTransaction.TransactionDatetime - newDate.ToUniversalTime()).TotalMilliseconds) < 1);
 
         var version = await _context.TransactionVersions
             .Where(x => x.TransactionId == transaction.Id)
@@ -141,7 +141,8 @@ public class EditTransactionTests : IAsyncLifetime
         Assert.NotNull(version);
         Assert.Equal(transaction.TransactionSum, version.TransactionSum);
         Assert.Equal(transaction.Status, version.Status);
-        Assert.True(Math.Abs((transaction.TransactionDatetime.ToUniversalTime() - version.TransactionDatetime.ToUniversalTime()).TotalMilliseconds) < 1);
+        Assert.True(Math.Abs((transaction.TransactionDatetime.ToUniversalTime() -
+                              version.TransactionDatetime.ToUniversalTime()).TotalMilliseconds) < 1);
     }
 
     [Fact]
@@ -230,7 +231,8 @@ public class EditTransactionTests : IAsyncLifetime
         Assert.NotNull(version);
         Assert.Equal(oldAmount, version.TransactionSum);
         Assert.Equal(oldStatus, version.Status);
-        Assert.True(Math.Abs((version.TransactionDatetime.ToUniversalTime() - oldDate.ToUniversalTime()).TotalSeconds) < 1);
+        Assert.True(Math.Abs((version.TransactionDatetime.ToUniversalTime() - oldDate.ToUniversalTime()).TotalSeconds) <
+                    1);
     }
 
     [Theory]

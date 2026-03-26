@@ -13,12 +13,12 @@ public static class ServiceProvider
     public static IServiceCollection AddApplicationLayer(this IServiceCollection collection)
     {
         collection.RegisterRelatedData();
-        
+
         collection.AddSingleton<ICurrencyConverter, CurrencyConverter>(_ => new CurrencyConverter(Global.UsdId));
         collection.AddScoped<ICurrencyConverterSetup, CurrencyConverterSetup>();
-        
+
         collection.AddValidatorsFromAssembly(typeof(Global).Assembly);
-        
+
         collection.AddMediatR(config =>
         {
             config.RegisterServicesFromAssembly(typeof(Global).Assembly);
@@ -28,7 +28,7 @@ public static class ServiceProvider
             config.AddOpenBehavior(typeof(TransactionBehavior<,>), ServiceLifetime.Scoped);
             config.AddOpenBehavior(typeof(DbValidationBehavior<,>), ServiceLifetime.Scoped);
         });
-        
+
         return collection;
     }
 }

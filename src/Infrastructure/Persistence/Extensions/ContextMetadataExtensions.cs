@@ -1,7 +1,6 @@
 using System.Collections.Concurrent;
 using System.Linq.Expressions;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Metadata;
 
 namespace Persistence.Extensions;
 
@@ -25,9 +24,11 @@ public static class ContextMetadataExtensions
                            ?? throw new InvalidOperationException($"Тип {entityType.Name} не найден в модели EF Core.");
 
             var property = efEntity.FindProperty(propertyName)
-                           ?? throw new InvalidOperationException($"Свойство {propertyName} не найдено в сущности {entityType.Name}.");
+                           ?? throw new InvalidOperationException(
+                               $"Свойство {propertyName} не найдено в сущности {entityType.Name}.");
 
-            return property.GetColumnName() ?? throw new InvalidOperationException("Не удалось получить название колонки.");
+            return property.GetColumnName() ??
+                   throw new InvalidOperationException("Не удалось получить название колонки.");
         });
     }
 
@@ -36,7 +37,7 @@ public static class ContextMetadataExtensions
         return TableNameCache.GetOrAdd(entityType, _ =>
         {
             return context.Model.FindEntityType(entityType)?.GetTableName()
-                ?? throw new ArgumentNullException($"Сущность {entityType.Name} не относится к сущностям бд.");
+                   ?? throw new ArgumentNullException($"Сущность {entityType.Name} не относится к сущностям бд.");
         });
     }
 

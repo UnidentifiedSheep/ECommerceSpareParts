@@ -4,7 +4,6 @@ namespace Exceptions.Base;
 
 public class ConflictException : BaseValuedException
 {
-    public override HttpStatusCode StatusCode => HttpStatusCode.Conflict;
     public ConflictException(string? message) : base(message)
     {
     }
@@ -17,6 +16,8 @@ public class ConflictException : BaseValuedException
     public ConflictException(string? message, object relatedData) : base(message, relatedData)
     {
     }
+
+    public override HttpStatusCode StatusCode => HttpStatusCode.Conflict;
 
     public string? Details { get; }
 }

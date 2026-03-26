@@ -9,7 +9,7 @@ public static class DbUserSeedExtensions
     public static async Task<List<User>> CreateUsers(this DContext ctx, int count)
     {
         ArgumentOutOfRangeException.ThrowIfNegativeOrZero(count);
-        
+
         var users = UserFactory.Create(count);
         await ctx.AddRangeAsync(users);
         await ctx.SaveChangesAsync();

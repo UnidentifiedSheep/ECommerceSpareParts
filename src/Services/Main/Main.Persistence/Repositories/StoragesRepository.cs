@@ -10,16 +10,24 @@ namespace Main.Persistence.Repositories;
 
 public class StoragesRepository(DContext context) : IStoragesRepository
 {
-    public async Task<Storage?> GetStorageAsync(string name, bool track = true,
-        CancellationToken cancellationToken = default, params Expression<Func<Storage, object>>[] includes)
+    public async Task<Storage?> GetStorageAsync(
+        string name,
+        bool track = true,
+        CancellationToken cancellationToken = default,
+        params Expression<Func<Storage, object>>[] includes)
     {
         var query = context.Storages.ConfigureTracking(track);
         foreach (var include in includes) query = query.Include(include);
         return await query.FirstOrDefaultAsync(x => x.Name == name.Trim(), cancellationToken);
     }
 
-    public async Task<IEnumerable<Storage>> GetStoragesAsync(string? searchTerm, int page, int viewCount,
-        bool track = true, StorageType? type = null, CancellationToken cancellationToken = default)
+    public async Task<IEnumerable<Storage>> GetStoragesAsync(
+        string? searchTerm,
+        int page,
+        int viewCount,
+        bool track = true,
+        StorageType? type = null,
+        CancellationToken cancellationToken = default)
     {
         var query = context.Storages.ConfigureTracking(track);
 
@@ -37,7 +45,7 @@ public class StoragesRepository(DContext context) : IStoragesRepository
                 .Select(x => x.Entity);
         else
             query = query.OrderByDescending(x => x.Name);
-        
+
         return await query
             .Where(x => type == null || x.Type == type)
             .Skip(page * viewCount)
@@ -49,5 +57,4 @@ public class StoragesRepository(DContext context) : IStoragesRepository
     {
         return await context.Storages.AsNoTracking().AnyAsync(x => x.Name == name.Trim(), cancellationToken);
     }
-    
 }

@@ -11,8 +11,12 @@ public class SetArticlesContentCountEndPoint : ICarterModule
 {
     public void AddRoutes(IEndpointRouteBuilder app)
     {
-        app.MapPatch("/articles/{articleId}/contents/{insideArticleId}", async (ISender sender, int articleId,
-                int insideArticleId, SetArticlesContentCountRequest request, CancellationToken token) =>
+        app.MapPatch("/articles/{articleId}/contents/{insideArticleId}", async (
+                ISender sender,
+                int articleId,
+                int insideArticleId,
+                SetArticlesContentCountRequest request,
+                CancellationToken token) =>
             {
                 var command = new SetArticlesContentCountCommand(articleId, insideArticleId, request.Count);
                 await sender.Send(command, token);

@@ -3,7 +3,7 @@ using Main.Enums;
 
 namespace Main.Entities;
 
-public partial class Transaction
+public class Transaction
 {
     [Validate]
     public Guid Id { get; set; }

@@ -8,8 +8,8 @@ namespace Security.Services;
 
 public class JsonSigner : IJsonSigner
 {
-    private readonly byte[] _secretBytes;
     private readonly JsonSerializerOptions? _options;
+    private readonly byte[] _secretBytes;
 
     public JsonSigner(string secret, JsonSerializerOptions? options = null)
     {
@@ -24,14 +24,14 @@ public class JsonSigner : IJsonSigner
     {
         ArgumentNullException.ThrowIfNull(data);
 
-        string json = JsonSerializer.Serialize(data, _options); 
-        byte[] jsonBytes = Encoding.UTF8.GetBytes(json);
+        var json = JsonSerializer.Serialize(data, _options);
+        var jsonBytes = Encoding.UTF8.GetBytes(json);
 
         using var hmac = new HMACSHA256(_secretBytes);
-        byte[] hash = hmac.ComputeHash(jsonBytes);
+        var hash = hmac.ComputeHash(jsonBytes);
 
-        string payload = EncodingUtils.Base64UrlEncode(jsonBytes);
-        string signature = EncodingUtils.Base64UrlEncode(hash);
+        var payload = EncodingUtils.Base64UrlEncode(jsonBytes);
+        var signature = EncodingUtils.Base64UrlEncode(hash);
 
         return $"{payload}.{signature}";
     }
@@ -44,17 +44,17 @@ public class JsonSigner : IJsonSigner
         var parts = signed.Split('.');
         if (parts.Length != 2) return false;
 
-        string payload = parts[0];
-        string signature = parts[1];
+        var payload = parts[0];
+        var signature = parts[1];
 
-        byte[] jsonBytes = EncodingUtils.Base64UrlDecode(payload);
+        var jsonBytes = EncodingUtils.Base64UrlDecode(payload);
 
         using var hmac = new HMACSHA256(_secretBytes);
-        byte[] expectedHash = hmac.ComputeHash(jsonBytes);
+        var expectedHash = hmac.ComputeHash(jsonBytes);
 
-        string expectedSignature = EncodingUtils.Base64UrlEncode(expectedHash);
+        var expectedSignature = EncodingUtils.Base64UrlEncode(expectedHash);
 
-        bool valid = CryptographicOperations.FixedTimeEquals(
+        var valid = CryptographicOperations.FixedTimeEquals(
             Encoding.UTF8.GetBytes(signature),
             Encoding.UTF8.GetBytes(expectedSignature)
         );
@@ -68,7 +68,7 @@ public class JsonSigner : IJsonSigner
     public bool VerifyJson<T>(string signed, out T? obj)
     {
         obj = default;
-        bool valid = VerifyJson(signed, out string? jsonString);
+        var valid = VerifyJson(signed, out var jsonString);
 
         if (valid && jsonString != null)
             obj = JsonSerializer.Deserialize<T>(jsonString, _options);

@@ -10,19 +10,23 @@ using MediatR;
 
 namespace Main.Application.Handlers.Purchases.UpsertLogisticsToPurchase;
 
-
 [Transactional]
-public record UpsertPurchaseLogisticsCommand(string PurchaseId, Guid RouteId, Guid? TransactionId, 
+public record UpsertPurchaseLogisticsCommand(
+    string PurchaseId,
+    Guid RouteId,
+    Guid? TransactionId,
     bool MinimumPriceApplied) : ICommand;
 
-public class UpsertPurchaseLogisticsHandler(IUnitOfWork unitOfWork, IStorageRoutesRepository storageRoutesRepository,
+public class UpsertPurchaseLogisticsHandler(
+    IUnitOfWork unitOfWork,
+    IStorageRoutesRepository storageRoutesRepository,
     IPurchaseLogisticsRepository purchaseLogisticsRepository) : ICommandHandler<UpsertPurchaseLogisticsCommand>
 {
     public async Task<Unit> Handle(UpsertPurchaseLogisticsCommand request, CancellationToken cancellationToken)
     {
         var storageRoute = await storageRoutesRepository.GetStorageRouteAsync(request.RouteId, true, cancellationToken)
                            ?? throw new StorageRouteNotFound(request.RouteId);
-        PurchaseLogistic? model = await purchaseLogisticsRepository.GetPurchaseLogistics(request.PurchaseId,
+        var model = await purchaseLogisticsRepository.GetPurchaseLogistics(request.PurchaseId,
             QueryPresets.Track, cancellationToken);
 
         if (model == null)
@@ -30,13 +34,13 @@ public class UpsertPurchaseLogisticsHandler(IUnitOfWork unitOfWork, IStorageRout
             model = new PurchaseLogistic();
             await unitOfWork.AddAsync(model, cancellationToken);
         }
-        
+
         storageRoute.Adapt(model);
-        
+
         model.PurchaseId = request.PurchaseId;
         model.TransactionId = request.TransactionId;
         model.MinimumPriceApplied = request.MinimumPriceApplied;
-        
+
         await unitOfWork.SaveChangesAsync(cancellationToken);
         return Unit.Value;
     }

@@ -5,6 +5,8 @@ namespace Abstractions.Interfaces;
 
 public interface IDbValidator
 {
-    Task<IEnumerable<ValidationFailure>> Validate(IValidationPlan plan, bool throwOnError = true,
+    Task<IEnumerable<ValidationFailure>> Validate(
+        IValidationPlan plan,
+        bool throwOnError = true,
         CancellationToken cancellationToken = default);
 }

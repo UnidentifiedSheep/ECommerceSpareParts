@@ -4,10 +4,14 @@ namespace Abstractions.Interfaces.Services;
 
 public interface IUnitOfWork
 {
-    Task<T> ExecuteWithTransaction<T>(TransactionalAttribute settings, Func<Task<T>> action,
+    Task<T> ExecuteWithTransaction<T>(
+        TransactionalAttribute settings,
+        Func<Task<T>> action,
         CancellationToken cancellationToken = default);
 
-    Task ExecuteWithTransaction(TransactionalAttribute settings, Func<Task> action,
+    Task ExecuteWithTransaction(
+        TransactionalAttribute settings,
+        Func<Task> action,
         CancellationToken cancellationToken = default);
 
     Task SaveChangesAsync(CancellationToken cancellationToken = default);

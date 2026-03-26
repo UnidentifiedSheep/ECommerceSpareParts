@@ -8,15 +8,21 @@ using Mapster;
 
 namespace Main.Application.Handlers.ArticleReservations.GetArticleReservations;
 
-public record GetArticleReservationsQuery(string? SearchTerm, PaginationModel Pagination, string? SortBy, double? Similarity,
-    Guid? UserId, GeneralSearchStrategy Strategy) : IQuery<GetArticleReservationsResult>;
+public record GetArticleReservationsQuery(
+    string? SearchTerm,
+    PaginationModel Pagination,
+    string? SortBy,
+    double? Similarity,
+    Guid? UserId,
+    GeneralSearchStrategy Strategy) : IQuery<GetArticleReservationsResult>;
 
 public record GetArticleReservationsResult(IEnumerable<ArticleReservationDto> Reservations);
 
 public class GetArticleReservationsHandler(IArticleReservationRepository reservationRepository)
     : IQueryHandler<GetArticleReservationsQuery, GetArticleReservationsResult>
 {
-    public async Task<GetArticleReservationsResult> Handle(GetArticleReservationsQuery request,
+    public async Task<GetArticleReservationsResult> Handle(
+        GetArticleReservationsQuery request,
         CancellationToken cancellationToken)
     {
         var page = request.Pagination.Page;

@@ -10,19 +10,19 @@
     </PropertyGroup>
 
     <ItemGroup>
-        <PackageReference Include="Bogus" Version="35.6.5" />
+        <PackageReference Include="Bogus" Version="35.6.5"/>
         <PackageReference Include="coverlet.collector" Version="6.0.4">
-          <PrivateAssets>all</PrivateAssets>
-          <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+            <PrivateAssets>all</PrivateAssets>
+            <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
         </PackageReference>
-        <PackageReference Include="FluentAssertions" Version="8.9.0" />
-        <PackageReference Include="Microsoft.AspNetCore.Mvc.Testing" Version="10.0.0" />
-        <PackageReference Include="Microsoft.NET.Test.Sdk" Version="18.0.1" />
+        <PackageReference Include="FluentAssertions" Version="8.9.0"/>
+        <PackageReference Include="Microsoft.AspNetCore.Mvc.Testing" Version="10.0.0"/>
+        <PackageReference Include="Microsoft.NET.Test.Sdk" Version="18.0.1"/>
         <PackageReference Include="Moq" Version="4.20.72"/>
-        <PackageReference Include="xunit" Version="2.9.3" />
+        <PackageReference Include="xunit" Version="2.9.3"/>
         <PackageReference Include="xunit.runner.visualstudio" Version="3.1.5">
-          <PrivateAssets>all</PrivateAssets>
-          <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+            <PrivateAssets>all</PrivateAssets>
+            <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
         </PackageReference>
     </ItemGroup>
 
@@ -32,111 +32,111 @@
 
     <ItemGroup>
         <ProjectReference Include="..\..\..\Core\Exceptions\Exceptions.csproj"/>
-        <ProjectReference Include="..\..\..\Infrastructure\Localization\Localization.Domain\Localization.Domain.csproj" />
+        <ProjectReference Include="..\..\..\Infrastructure\Localization\Localization.Domain\Localization.Domain.csproj"/>
         <ProjectReference Include="..\..\..\Infrastructure\Mail\Mail.csproj"/>
         <ProjectReference Include="..\..\..\Infrastructure\RabbitMq\RabbitMq.csproj"/>
         <ProjectReference Include="..\..\..\Infrastructure\Redis\Redis.csproj"/>
         <ProjectReference Include="..\..\..\Infrastructure\Security\Security.csproj"/>
         <ProjectReference Include="..\..\Api.Common\Api.Common.csproj"/>
-        <ProjectReference Include="..\..\Test.Common\Test.Common.csproj" />
+        <ProjectReference Include="..\..\Test.Common\Test.Common.csproj"/>
         <ProjectReference Include="..\Main.Application\Main.Application.csproj"/>
-        <ProjectReference Include="..\Main.Cache\Main.Cache.csproj" />
-        <ProjectReference Include="..\Main.Persistence\Main.Persistence.csproj" />
+        <ProjectReference Include="..\Main.Cache\Main.Cache.csproj"/>
+        <ProjectReference Include="..\Main.Persistence\Main.Persistence.csproj"/>
     </ItemGroup>
 
     <ItemGroup>
-      <Content Include="..\..\Application.Common\Localization\common-localization-en.json">
-        <Link>Localization\common-localization-en.json</Link>
-      </Content>
-      <Content Include="..\..\Application.Common\Localization\common-localization-ru.json">
-        <Link>Localization\common-localization-ru.json</Link>
-      </Content>
-      <Content Include="..\Main.Abstractions\Localization\article-localization-en.json">
-        <Link>Localization\article-localization-en.json</Link>
-        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-      </Content>
-      <Content Include="..\Main.Abstractions\Localization\article-localization-ru.json">
-        <Link>Localization\article-localization-ru.json</Link>
-        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-      </Content>
-      <Content Include="..\Main.Abstractions\Localization\auth-localization-en.json">
-        <Link>Localization\auth-localization-en.json</Link>
-        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-      </Content>
-      <Content Include="..\Main.Abstractions\Localization\auth-localization-ru.json">
-        <Link>Localization\auth-localization-ru.json</Link>
-        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-      </Content>
-      <Content Include="..\Main.Abstractions\Localization\balance-localization-en.json">
-        <Link>Localization\balance-localization-en.json</Link>
-        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-      </Content>
-      <Content Include="..\Main.Abstractions\Localization\balance-localization-ru.json">
-        <Link>Localization\balance-localization-ru.json</Link>
-        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-      </Content>
-      <Content Include="..\Main.Abstractions\Localization\base-localization-en.json">
-        <Link>Localization\base-localization-en.json</Link>
-      </Content>
-      <Content Include="..\Main.Abstractions\Localization\base-localization-ru.json">
-        <Link>Localization\base-localization-ru.json</Link>
-      </Content>
-      <Content Include="..\Main.Abstractions\Localization\cart-localization-en.json">
-        <Link>Localization\cart-localization-en.json</Link>
-        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-      </Content>
-      <Content Include="..\Main.Abstractions\Localization\cart-localization-ru.json">
-        <Link>Localization\cart-localization-ru.json</Link>
-        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-      </Content>
-      <Content Include="..\Main.Abstractions\Localization\currency-localization-en.json">
-        <Link>Localization\currency-localization-en.json</Link>
-        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-      </Content>
-      <Content Include="..\Main.Abstractions\Localization\currency-localization-ru.json">
-        <Link>Localization\currency-localization-ru.json</Link>
-        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-      </Content>
-      <Content Include="..\Main.Abstractions\Localization\logistics-localization-en.json">
-        <Link>Localization\logistics-localization-en.json</Link>
-        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-      </Content>
-      <Content Include="..\Main.Abstractions\Localization\logistics-localization-ru.json">
-        <Link>Localization\logistics-localization-ru.json</Link>
-        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-      </Content>
-      <Content Include="..\Main.Abstractions\Localization\producer-localization-en.json">
-        <Link>Localization\producer-localization-en.json</Link>
-        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-      </Content>
-      <Content Include="..\Main.Abstractions\Localization\producer-localization-ru.json">
-        <Link>Localization\producer-localization-ru.json</Link>
-        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-      </Content>
-      <Content Include="..\Main.Abstractions\Localization\purchase-localization-en.json">
-        <Link>Localization\purchase-localization-en.json</Link>
-        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-      </Content>
-      <Content Include="..\Main.Abstractions\Localization\purchase-localization-ru.json">
-        <Link>Localization\purchase-localization-ru.json</Link>
-        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-      </Content>
-      <Content Include="..\Main.Abstractions\Localization\sale-localization-en.json">
-        <Link>Localization\sale-localization-en.json</Link>
-        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-      </Content>
-      <Content Include="..\Main.Abstractions\Localization\sale-localization-ru.json">
-        <Link>Localization\sale-localization-ru.json</Link>
-        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-      </Content>
-      <Content Include="..\Main.Abstractions\Localization\storage-localization-en.json">
-        <Link>Localization\storage-localization-en.json</Link>
-        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-      </Content>
-      <Content Include="..\Main.Abstractions\Localization\storage-localization-ru.json">
-        <Link>Localization\storage-localization-ru.json</Link>
-        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-      </Content>
+        <Content Include="..\..\Application.Common\Localization\common-localization-en.json">
+            <Link>Localization\common-localization-en.json</Link>
+        </Content>
+        <Content Include="..\..\Application.Common\Localization\common-localization-ru.json">
+            <Link>Localization\common-localization-ru.json</Link>
+        </Content>
+        <Content Include="..\Main.Abstractions\Localization\article-localization-en.json">
+            <Link>Localization\article-localization-en.json</Link>
+            <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+        </Content>
+        <Content Include="..\Main.Abstractions\Localization\article-localization-ru.json">
+            <Link>Localization\article-localization-ru.json</Link>
+            <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+        </Content>
+        <Content Include="..\Main.Abstractions\Localization\auth-localization-en.json">
+            <Link>Localization\auth-localization-en.json</Link>
+            <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+        </Content>
+        <Content Include="..\Main.Abstractions\Localization\auth-localization-ru.json">
+            <Link>Localization\auth-localization-ru.json</Link>
+            <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+        </Content>
+        <Content Include="..\Main.Abstractions\Localization\balance-localization-en.json">
+            <Link>Localization\balance-localization-en.json</Link>
+            <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+        </Content>
+        <Content Include="..\Main.Abstractions\Localization\balance-localization-ru.json">
+            <Link>Localization\balance-localization-ru.json</Link>
+            <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+        </Content>
+        <Content Include="..\Main.Abstractions\Localization\base-localization-en.json">
+            <Link>Localization\base-localization-en.json</Link>
+        </Content>
+        <Content Include="..\Main.Abstractions\Localization\base-localization-ru.json">
+            <Link>Localization\base-localization-ru.json</Link>
+        </Content>
+        <Content Include="..\Main.Abstractions\Localization\cart-localization-en.json">
+            <Link>Localization\cart-localization-en.json</Link>
+            <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+        </Content>
+        <Content Include="..\Main.Abstractions\Localization\cart-localization-ru.json">
+            <Link>Localization\cart-localization-ru.json</Link>
+            <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+        </Content>
+        <Content Include="..\Main.Abstractions\Localization\currency-localization-en.json">
+            <Link>Localization\currency-localization-en.json</Link>
+            <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+        </Content>
+        <Content Include="..\Main.Abstractions\Localization\currency-localization-ru.json">
+            <Link>Localization\currency-localization-ru.json</Link>
+            <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+        </Content>
+        <Content Include="..\Main.Abstractions\Localization\logistics-localization-en.json">
+            <Link>Localization\logistics-localization-en.json</Link>
+            <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+        </Content>
+        <Content Include="..\Main.Abstractions\Localization\logistics-localization-ru.json">
+            <Link>Localization\logistics-localization-ru.json</Link>
+            <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+        </Content>
+        <Content Include="..\Main.Abstractions\Localization\producer-localization-en.json">
+            <Link>Localization\producer-localization-en.json</Link>
+            <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+        </Content>
+        <Content Include="..\Main.Abstractions\Localization\producer-localization-ru.json">
+            <Link>Localization\producer-localization-ru.json</Link>
+            <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+        </Content>
+        <Content Include="..\Main.Abstractions\Localization\purchase-localization-en.json">
+            <Link>Localization\purchase-localization-en.json</Link>
+            <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+        </Content>
+        <Content Include="..\Main.Abstractions\Localization\purchase-localization-ru.json">
+            <Link>Localization\purchase-localization-ru.json</Link>
+            <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+        </Content>
+        <Content Include="..\Main.Abstractions\Localization\sale-localization-en.json">
+            <Link>Localization\sale-localization-en.json</Link>
+            <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+        </Content>
+        <Content Include="..\Main.Abstractions\Localization\sale-localization-ru.json">
+            <Link>Localization\sale-localization-ru.json</Link>
+            <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+        </Content>
+        <Content Include="..\Main.Abstractions\Localization\storage-localization-en.json">
+            <Link>Localization\storage-localization-en.json</Link>
+            <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+        </Content>
+        <Content Include="..\Main.Abstractions\Localization\storage-localization-ru.json">
+            <Link>Localization\storage-localization-ru.json</Link>
+            <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+        </Content>
     </ItemGroup>
 
 </Project>

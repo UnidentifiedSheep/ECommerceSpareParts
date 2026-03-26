@@ -8,7 +8,10 @@ namespace Main.Persistence.Repositories;
 
 public class PermissionsRepository(DContext context) : IPermissionRepository
 {
-    public async Task<IEnumerable<Permission>> GetPermissionsAsync(int page, int limit, bool track = true, 
+    public async Task<IEnumerable<Permission>> GetPermissionsAsync(
+        int page,
+        int limit,
+        bool track = true,
         CancellationToken cancellationToken = default)
     {
         return await context.Permissions
@@ -19,8 +22,12 @@ public class PermissionsRepository(DContext context) : IPermissionRepository
             .ToListAsync(cancellationToken);
     }
 
-    public async Task<Permission?> GetPermissionAsync(string name, bool track = true, CancellationToken cancellationToken = default)
+    public async Task<Permission?> GetPermissionAsync(
+        string name,
+        bool track = true,
+        CancellationToken cancellationToken = default)
     {
-        return await context.Permissions.ConfigureTracking(track).FirstOrDefaultAsync(x => x.Name == name, cancellationToken);
+        return await context.Permissions.ConfigureTracking(track)
+            .FirstOrDefaultAsync(x => x.Name == name, cancellationToken);
     }
 }

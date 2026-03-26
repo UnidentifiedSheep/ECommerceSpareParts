@@ -12,8 +12,8 @@ public class GetStorageContentCostsConsumer(IMediator mediator) : IConsumer<GetS
     public async Task Consume(ConsumeContext<GetStorageContentCostsRequest> context)
     {
         var result = await mediator.Send(new GetStorageContentCostsQuery(context.Message.ArticleIds,
-                context.Message.OnlyPositiveQty));
-        
+            context.Message.OnlyPositiveQty));
+
         var adapted = result.StorageContentCosts.Adapt<List<StorageContentCost>>();
         await context.RespondAsync(new GetStorageContentCostsResponse { StorageContentCosts = adapted });
     }

@@ -11,20 +11,22 @@ namespace Main.Application.Handlers.ArticleWeight.SetArticleWeight;
 [Transactional]
 public record SetArticleWeightCommand(int ArticleId, decimal Weight, WeightUnit Unit) : ICommand;
 
-public class SetArticleWeightHandler(IArticleWeightRepository weightRepository, IMediator mediator,
+public class SetArticleWeightHandler(
+    IArticleWeightRepository weightRepository,
+    IMediator mediator,
     IUnitOfWork unitOfWork) : ICommandHandler<SetArticleWeightCommand>
 {
-    public  async Task<Unit> Handle(SetArticleWeightCommand request, CancellationToken cancellationToken)
+    public async Task<Unit> Handle(SetArticleWeightCommand request, CancellationToken cancellationToken)
     {
         var weight = await weightRepository
             .GetArticleWeight(request.ArticleId, true, cancellationToken);
-        
+
         if (weight == null)
         {
             weight = new Entities.ArticleWeight { ArticleId = request.ArticleId };
             await unitOfWork.AddAsync(weight, cancellationToken);
         }
-        
+
         weight.Weight = request.Weight;
         weight.Unit = request.Unit;
         await unitOfWork.SaveChangesAsync(cancellationToken);

@@ -15,14 +15,11 @@ public static class UserFactory
             Name = f.Person.FirstName,
             Surname = f.Person.LastName,
             Description = f.Person.Address.Street,
-            IsSupplier =  f.Random.Bool(),
-            SearchColumn = $"{f.Person.FirstName} {f.Person.LastName} {f.Person.UserName} { f.Person.Address.Street}"
+            IsSupplier = f.Random.Bool(),
+            SearchColumn = $"{f.Person.FirstName} {f.Person.LastName} {f.Person.UserName} {f.Person.Address.Street}"
         })
-        .FinishWith((_, x) =>
-        {
-            x.NormalizedUserName = x.UserName.ToNormalized();
-        });
-    
+        .FinishWith((_, x) => { x.NormalizedUserName = x.UserName.ToNormalized(); });
+
     public static List<User> Create(int count)
     {
         return Faker.Generate(count);

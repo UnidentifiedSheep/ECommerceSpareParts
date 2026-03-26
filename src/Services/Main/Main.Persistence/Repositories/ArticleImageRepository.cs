@@ -8,7 +8,9 @@ namespace Main.Persistence.Repositories;
 
 public class ArticleImageRepository(DContext context) : IArticleImageRepository
 {
-    public async Task<IEnumerable<ArticleImage>> GetArticlesImages(IEnumerable<int> articleIds, bool track = true,
+    public async Task<IEnumerable<ArticleImage>> GetArticlesImages(
+        IEnumerable<int> articleIds,
+        bool track = true,
         CancellationToken cancellationToken = default)
     {
         return await context.ArticleImages

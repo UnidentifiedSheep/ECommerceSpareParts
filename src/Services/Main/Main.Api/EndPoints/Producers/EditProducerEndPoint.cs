@@ -1,7 +1,7 @@
 using Api.Common.Extensions;
 using Carter;
-using Main.Application.Handlers.Producers.EditProducer;
 using Main.Abstractions.Dtos.Amw.Producers;
+using Main.Application.Handlers.Producers.EditProducer;
 using MediatR;
 
 namespace Main.Api.EndPoints.Producers;
@@ -13,15 +13,18 @@ public class EditProducerEndPoint : ICarterModule
     public void AddRoutes(IEndpointRouteBuilder app)
     {
         app.MapPatch("/producers/{producerId}",
-                async (ISender sender, int producerId, EditProducerRequest request,
+                async (
+                    ISender sender,
+                    int producerId,
+                    EditProducerRequest request,
                     CancellationToken cancellationToken) =>
                 {
                     var command = new EditProducerCommand(producerId, request.EditProducer);
                     await sender.Send(command, cancellationToken);
                     return Results.NoContent();
                 }).WithTags("Producers")
-                .WithDescription("Редактирование производителя")
-                .WithDisplayName("Редактирование производителя")
-                .RequireAnyPermission("PRODUCERS.EDIT");
+            .WithDescription("Редактирование производителя")
+            .WithDisplayName("Редактирование производителя")
+            .RequireAnyPermission("PRODUCERS.EDIT");
     }
 }

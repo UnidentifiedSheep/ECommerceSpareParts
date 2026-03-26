@@ -5,9 +5,6 @@ namespace Main.Abstractions.Exceptions.Storages;
 
 public class StorageRouteNotFound : NotFoundException, ILocalizableException
 {
-    public string MessageKey { get; }
-    public object[]? Arguments { get; }
-
     public StorageRouteNotFound(string storageFrom, string storageTo)
         : base(null, new { StorageFrom = storageFrom, StorageTo = storageTo })
     {
@@ -22,4 +19,6 @@ public class StorageRouteNotFound : NotFoundException, ILocalizableException
         Arguments = null;
     }
 
+    public string MessageKey { get; }
+    public object[]? Arguments { get; }
 }

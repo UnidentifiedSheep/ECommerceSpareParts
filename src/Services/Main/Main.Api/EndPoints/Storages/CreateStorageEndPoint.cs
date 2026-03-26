@@ -9,6 +9,7 @@ using MediatR;
 namespace Main.Api.EndPoints.Storages;
 
 public record CreateStorageRequest(string Name, string? Description, string? Location, StorageType Type);
+
 public record CreateStorageResponse(string Name);
 
 public class CreateStorageEndPoint : ICarterModule
@@ -21,7 +22,7 @@ public class CreateStorageEndPoint : ICarterModule
                     var command = request.Adapt<CreateStorageCommand>();
                     var result = await sender.Send(command, cancellationToken);
                     var response = new CreateStorageResponse(result.Name);
-                    return Results.Created($"/storages/", response);
+                    return Results.Created("/storages/", response);
                 }).WithTags("Storages")
             .WithDescription("Создание нового склада")
             .WithDisplayName("Создать склад")

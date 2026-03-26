@@ -22,7 +22,9 @@ public class RoleRepository(DContext context) : IRoleRepository
             .FirstOrDefaultAsync(x => x.NormalizedName == normalizedRoleName, cancellationToken);
     }
 
-    public async Task<IEnumerable<Role>> GetRolesAsync(IEnumerable<string> names, bool track = true,
+    public async Task<IEnumerable<Role>> GetRolesAsync(
+        IEnumerable<string> names,
+        bool track = true,
         CancellationToken cancellationToken = default)
     {
         var normalized = names.Select(x => x.ToNormalized()).ToHashSet();
@@ -42,7 +44,8 @@ public class RoleRepository(DContext context) : IRoleRepository
         return await context.Roles.AsNoTracking().AnyAsync(x => x.Id == id, cancellationToken);
     }
 
-    public async Task<IEnumerable<Guid>> RolesExistsAsync(IEnumerable<Guid> ids,
+    public async Task<IEnumerable<Guid>> RolesExistsAsync(
+        IEnumerable<Guid> ids,
         CancellationToken cancellationToken = default)
     {
         var set = ids.ToHashSet();
@@ -52,7 +55,8 @@ public class RoleRepository(DContext context) : IRoleRepository
         return set.Except(foundRoles);
     }
 
-    public async Task<IEnumerable<string>> RolesExistsAsync(IEnumerable<string> roleNames,
+    public async Task<IEnumerable<string>> RolesExistsAsync(
+        IEnumerable<string> roleNames,
         CancellationToken cancellationToken = default)
     {
         var set = roleNames
@@ -66,7 +70,11 @@ public class RoleRepository(DContext context) : IRoleRepository
     }
 
     [SuppressMessage("ReSharper", "EntityFramework.ClientSideDbFunctionCall")]
-    public async Task<IEnumerable<Role>> SearchRoles(string? searchTerm, int page, int limit, bool track = true,
+    public async Task<IEnumerable<Role>> SearchRoles(
+        string? searchTerm,
+        int page,
+        int limit,
+        bool track = true,
         CancellationToken cancellationToken = default)
     {
         return await context.Roles.ConfigureTracking(track)

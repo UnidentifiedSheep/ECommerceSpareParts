@@ -11,7 +11,9 @@ namespace Main.Persistence.Repositories;
 
 public class SaleRepository(DContext context) : ISaleRepository
 {
-    public async Task<Sale?> GetSaleForUpdate(string saleId, bool track = true,
+    public async Task<Sale?> GetSaleForUpdate(
+        string saleId,
+        bool track = true,
         CancellationToken cancellationToken = default)
     {
         return await context.Sales.FromSql($"SELECT * FROM sale where id = {saleId} for update")
@@ -22,7 +24,9 @@ public class SaleRepository(DContext context) : ISaleRepository
             .FirstOrDefaultAsync(cancellationToken);
     }
 
-    public async Task<IEnumerable<SaleContent>> GetSaleContentsForUpdate(string saleId, bool track = true,
+    public async Task<IEnumerable<SaleContent>> GetSaleContentsForUpdate(
+        string saleId,
+        bool track = true,
         CancellationToken cancellationToken = default)
     {
         return await context.SaleContents
@@ -31,8 +35,10 @@ public class SaleRepository(DContext context) : ISaleRepository
             .ToListAsync(cancellationToken);
     }
 
-    public async Task<IEnumerable<SaleContentDetail>> GetSaleContentDetailsForUpdate(IEnumerable<int> saleContentIds,
-        bool track = true, CancellationToken cancellationToken = default)
+    public async Task<IEnumerable<SaleContentDetail>> GetSaleContentDetailsForUpdate(
+        IEnumerable<int> saleContentIds,
+        bool track = true,
+        CancellationToken cancellationToken = default)
     {
         var ids = saleContentIds.Distinct().ToList();
         return await context.SaleContentDetails
@@ -41,9 +47,16 @@ public class SaleRepository(DContext context) : ISaleRepository
             .ToListAsync(cancellationToken);
     }
 
-    public async Task<IEnumerable<Sale>> GetSales(DateTime rangeStart, DateTime rangeEnd, int page, int viewCount,
+    public async Task<IEnumerable<Sale>> GetSales(
+        DateTime rangeStart,
+        DateTime rangeEnd,
+        int page,
+        int viewCount,
         bool track = true,
-        string? sortBy = null, string? searchTerm = null, Guid? buyerId = null, int? currencyId = null,
+        string? sortBy = null,
+        string? searchTerm = null,
+        Guid? buyerId = null,
+        int? currencyId = null,
         CancellationToken cancellationToken = default)
     {
         var query = context.Sales.ConfigureTracking(track);
@@ -80,7 +93,9 @@ public class SaleRepository(DContext context) : ISaleRepository
             .ToListAsync(cancellationToken);
     }
 
-    public async Task<IEnumerable<SaleContent>> GetSaleContent(string saleId, bool track = true,
+    public async Task<IEnumerable<SaleContent>> GetSaleContent(
+        string saleId,
+        bool track = true,
         CancellationToken cancellationToken = default)
     {
         return await context.SaleContents.ConfigureTracking(track)

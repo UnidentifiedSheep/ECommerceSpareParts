@@ -10,7 +10,8 @@ namespace Main.Application.Handlers.ArticleContent.SetArticleContentCount;
 [Transactional]
 public record SetArticlesContentCountCommand(int ArticleId, int InsideArticleId, int Count) : ICommand;
 
-public class SetArticlesContentCountHandler(IArticleContentRepository contentRepository,
+public class SetArticlesContentCountHandler(
+    IArticleContentRepository contentRepository,
     IUnitOfWork unitOfWork) : ICommandHandler<SetArticlesContentCountCommand>
 {
     public async Task<Unit> Handle(SetArticlesContentCountCommand request, CancellationToken cancellationToken)

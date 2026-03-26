@@ -33,7 +33,6 @@ public class JsonLocalizerContainerLoader(string dirPath) : ILocalizerContainerL
 
             foreach (var (key, value) in model.KeyValues)
                 dict.TryAdd(key, value);
-            
         });
 
         foreach (var (locale, values) in localesValues)

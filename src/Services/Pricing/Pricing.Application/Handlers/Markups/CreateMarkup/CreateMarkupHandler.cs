@@ -23,7 +23,6 @@ public class CreateMarkupHandler(IUnitOfWork unitOfWork) : ICommandHandler<Creat
 {
     public async Task<CreateMarkupResult> Handle(CreateMarkupCommand request, CancellationToken cancellationToken)
     {
-
         var unknownMarkup = request.MarkupRateForUnknownRange;
         var markupRanges = new List<MarkupRange>();
         var intervalMap = new AdaptiveIntervalMap<MarkupModel>(2, true);

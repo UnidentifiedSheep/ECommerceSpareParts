@@ -11,7 +11,9 @@ public class RequestsDataLoggingBehavior<TRequest, TResponse>(
     where TRequest : IRequest<TResponse>
     where TResponse : notnull
 {
-    public async Task<TResponse> Handle(TRequest request, RequestHandlerDelegate<TResponse> next,
+    public async Task<TResponse> Handle(
+        TRequest request,
+        RequestHandlerDelegate<TResponse> next,
         CancellationToken cancellationToken)
     {
         var logParam = logParams.FirstOrDefault();

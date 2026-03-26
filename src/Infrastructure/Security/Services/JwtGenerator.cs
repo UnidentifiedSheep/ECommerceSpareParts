@@ -11,7 +11,11 @@ namespace Security.Services;
 
 public class JwtGenerator(IConfiguration configuration) : IJwtGenerator
 {
-    public string CreateToken(User user, UserInfo userInfo, string deviceId, IEnumerable<string> roles,
+    public string CreateToken(
+        User user,
+        UserInfo userInfo,
+        string deviceId,
+        IEnumerable<string> roles,
         IEnumerable<string> permissions)
     {
         var handler = new JwtSecurityTokenHandler();
@@ -54,7 +58,11 @@ public class JwtGenerator(IConfiguration configuration) : IJwtGenerator
         return new JwtSecurityTokenHandler().ValidateToken(token, validation, out _);
     }
 
-    private ClaimsIdentity GetClaims(User user, UserInfo userInfo, string deviceId, IEnumerable<string> roles, 
+    private ClaimsIdentity GetClaims(
+        User user,
+        UserInfo userInfo,
+        string deviceId,
+        IEnumerable<string> roles,
         IEnumerable<string> permissions)
     {
         var claims = new ClaimsIdentity();

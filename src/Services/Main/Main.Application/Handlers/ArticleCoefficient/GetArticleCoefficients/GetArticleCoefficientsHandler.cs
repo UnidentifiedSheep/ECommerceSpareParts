@@ -9,13 +9,15 @@ public record GetArticleCoefficientsQuery(IEnumerable<int> ArticleIds) : IQuery<
 
 public record GetArticleCoefficientsResult(Dictionary<int, List<ArticleCoefficientDto>> Coefficients);
 
-public class GetArticleCoefficientsHandler(IArticleCoefficients articleCoefficientsRepository) 
+public class GetArticleCoefficientsHandler(IArticleCoefficients articleCoefficientsRepository)
     : IQueryHandler<GetArticleCoefficientsQuery, GetArticleCoefficientsResult>
 {
-    public async Task<GetArticleCoefficientsResult> Handle(GetArticleCoefficientsQuery request, CancellationToken cancellationToken)
+    public async Task<GetArticleCoefficientsResult> Handle(
+        GetArticleCoefficientsQuery request,
+        CancellationToken cancellationToken)
     {
         var coefficients = await articleCoefficientsRepository
-            .GetArticlesCoefficients(request.ArticleIds, false, cancellationToken, 
+            .GetArticlesCoefficients(request.ArticleIds, false, cancellationToken,
                 x => x.CoefficientNameNavigation);
 
         var result = coefficients

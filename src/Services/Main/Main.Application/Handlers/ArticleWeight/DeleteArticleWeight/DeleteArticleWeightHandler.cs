@@ -11,7 +11,10 @@ namespace Main.Application.Handlers.ArticleWeight.DeleteArticleWeight;
 [Transactional]
 public record DeleteArticleWeightCommand(int ArticleId) : ICommand;
 
-public class DeleteArticleWeightHandler(IArticleWeightRepository weightRepository, IUnitOfWork unitOfWork, IMediator mediator) 
+public class DeleteArticleWeightHandler(
+    IArticleWeightRepository weightRepository,
+    IUnitOfWork unitOfWork,
+    IMediator mediator)
     : ICommandHandler<DeleteArticleWeightCommand>
 {
     public async Task<Unit> Handle(DeleteArticleWeightCommand request, CancellationToken cancellationToken)

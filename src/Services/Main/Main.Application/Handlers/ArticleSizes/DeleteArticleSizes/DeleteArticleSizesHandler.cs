@@ -11,7 +11,10 @@ namespace Main.Application.Handlers.ArticleSizes.DeleteArticleSizes;
 [Transactional]
 public record DeleteArticleSizesCommand(int ArticleId) : ICommand;
 
-public class DeleteArticleSizesHandler(IArticleSizesRepository sizesRepository, IUnitOfWork unitOfWork, IMediator mediator) 
+public class DeleteArticleSizesHandler(
+    IArticleSizesRepository sizesRepository,
+    IUnitOfWork unitOfWork,
+    IMediator mediator)
     : ICommandHandler<DeleteArticleSizesCommand>
 {
     public async Task<Unit> Handle(DeleteArticleSizesCommand request, CancellationToken cancellationToken)
@@ -20,7 +23,7 @@ public class DeleteArticleSizesHandler(IArticleSizesRepository sizesRepository, 
                     ?? throw new ArticleSizesNotFoundException(request.ArticleId);
         unitOfWork.Remove(sizes);
         await unitOfWork.SaveChangesAsync(cancellationToken);
-        
+
         //publish notification to invalidate cache
         await mediator.Publish(new ArticleSizeUpdatedNotification(request.ArticleId), cancellationToken);
         return Unit.Value;

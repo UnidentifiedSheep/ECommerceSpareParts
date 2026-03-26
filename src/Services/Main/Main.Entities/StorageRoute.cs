@@ -3,7 +3,7 @@ using Main.Enums;
 
 namespace Main.Entities;
 
-public partial class StorageRoute
+public class StorageRoute
 {
     [Validate]
     public Guid Id { get; set; }
@@ -32,7 +32,7 @@ public partial class StorageRoute
     public bool IsActive { get; set; }
 
     public int CurrencyId { get; set; }
-    
+
     public decimal? MinimumPrice { get; set; }
 
     public Guid? CarrierId { get; set; }

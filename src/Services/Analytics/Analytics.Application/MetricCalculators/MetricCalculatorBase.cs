@@ -1,5 +1,4 @@
-﻿using System.Diagnostics;
-using Analytics.Abstractions.Interfaces.Application;
+﻿using Analytics.Abstractions.Interfaces.Application;
 using Analytics.Entities.Metrics;
 
 namespace Analytics.Application.MetricCalculators;
@@ -11,9 +10,9 @@ public abstract class MetricCalculatorBase<T> : IMetricCalculator<T> where T : M
 
     protected async Task<(DateTime start, DateTime end)> WithTimer(Func<Task> func)
     {
-        DateTime start = DateTime.UtcNow;
+        var start = DateTime.UtcNow;
         await func();
-        DateTime end = DateTime.UtcNow;
+        var end = DateTime.UtcNow;
         return (start, end);
     }
 }

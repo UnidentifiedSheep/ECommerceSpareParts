@@ -8,7 +8,8 @@ namespace Main.Application.Handlers.ArticleReservations.DeleteArticleReservation
 
 public record DeleteArticleReservationCommand(int ReservationId) : ICommand;
 
-public class DeleteArticleReservationHandler(IArticleReservationRepository reservationRepository,
+public class DeleteArticleReservationHandler(
+    IArticleReservationRepository reservationRepository,
     IUnitOfWork unitOfWork) : ICommandHandler<DeleteArticleReservationCommand>
 {
     public async Task<Unit> Handle(DeleteArticleReservationCommand request, CancellationToken cancellationToken)

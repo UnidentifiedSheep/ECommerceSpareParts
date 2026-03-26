@@ -2,16 +2,16 @@
 
 public class TypedSetting<T> : TypedSetting
 {
-    public override Type Type { get; } = typeof(T);
-    public override string Key { get; }
-    public override object FallbackValue { get; }
-
     public TypedSetting(string key, T fallbackValue)
     {
         if (fallbackValue == null) throw new ArgumentNullException(nameof(fallbackValue));
         Key = key;
         FallbackValue = fallbackValue;
     }
+
+    public override Type Type { get; } = typeof(T);
+    public override string Key { get; }
+    public override object FallbackValue { get; }
 }
 
 public abstract class TypedSetting

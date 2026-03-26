@@ -8,6 +8,15 @@ namespace Search.Persistence.IndexContexts;
 
 public class ArticleSuggestionsContext : IndexContext
 {
+    public ArticleSuggestionsContext(StandardAnalyzer analyzer, IIndexDirectory indexDirectory) : base(analyzer)
+    {
+        var idxName = IndexName.Article_Suggestions;
+        IndexName = idxName;
+        Path = indexDirectory.GetIndexPath(idxName);
+        Directory = FSDirectory.Open(Path);
+        Suggester = new AnalyzingInfixSuggester(Global.LuceneVersion, Directory, Analyzer);
+    }
+
     public AnalyzingInfixSuggester Suggester
     {
         get
@@ -17,15 +26,8 @@ public class ArticleSuggestionsContext : IndexContext
         }
         private set;
     }
+
     public override IndexName IndexName { get; }
-    public ArticleSuggestionsContext(StandardAnalyzer analyzer, IIndexDirectory indexDirectory) : base(analyzer)
-    {
-        var idxName = IndexName.Article_Suggestions;
-        IndexName = idxName;
-        Path = indexDirectory.GetIndexPath(idxName);
-        Directory = FSDirectory.Open(Path);
-        Suggester = new AnalyzingInfixSuggester(Global.LuceneVersion, Directory, Analyzer);
-    }
 
     public override void Close()
     {
@@ -44,7 +46,7 @@ public class ArticleSuggestionsContext : IndexContext
         Suggester = new AnalyzingInfixSuggester(Global.LuceneVersion, Directory, Analyzer);
         IsClosed = false;
     }
-    
+
     public override void Dispose()
     {
         Close();

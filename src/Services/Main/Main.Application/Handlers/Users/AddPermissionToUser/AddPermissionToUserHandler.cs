@@ -19,7 +19,7 @@ public class AddPermissionToUserHandler(IUnitOfWork unitOfWork) : ICommandHandle
             Permission = request.PermissionName.ToNormalized(),
             UserId = request.UserId
         };
-        
+
         await unitOfWork.AddAsync(model, cancellationToken);
         await unitOfWork.SaveChangesAsync(cancellationToken);
         return Unit.Value;

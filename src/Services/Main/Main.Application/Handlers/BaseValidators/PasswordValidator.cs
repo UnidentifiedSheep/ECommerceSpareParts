@@ -16,19 +16,17 @@ public class PasswordValidator : AbstractValidator<string>
                 if (valid) return;
 
                 foreach (var (key, args) in errors)
-                {
                     context.AddFailure(new ValidationFailure(
-                            propertyName: context.PropertyPath,
-                            errorMessage: "Validation failed")
+                        context.PropertyPath,
+                        "Validation failed")
+                    {
+                        ErrorCode = key,
+                        CustomState = new ValidationStateData
                         {
-                            ErrorCode = key,
-                            CustomState = new ValidationStateData
-                            {
-                                DisplayErrorToUser = true,
-                                ErrorMessageArguments = args
-                            }
-                        });
-                }
+                            DisplayErrorToUser = true,
+                            ErrorMessageArguments = args
+                        }
+                    });
             });
     }
 }

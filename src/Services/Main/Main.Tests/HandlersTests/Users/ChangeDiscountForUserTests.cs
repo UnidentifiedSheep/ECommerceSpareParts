@@ -1,6 +1,5 @@
 using FluentValidation;
 using Main.Abstractions.Interfaces.CacheRepositories;
-using Main.Application.Configs;
 using Main.Application.Configs.Mapster;
 using Main.Application.Handlers.Users.ChangeUserDiscount;
 using Main.Entities;

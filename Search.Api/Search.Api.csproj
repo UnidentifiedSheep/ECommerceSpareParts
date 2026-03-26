@@ -10,23 +10,23 @@
     </PropertyGroup>
 
     <ItemGroup>
-        <PackageReference Include="Mediator.Abstractions" Version="3.1.0-preview.17" />
+        <PackageReference Include="Mediator.Abstractions" Version="3.1.0-preview.17"/>
         <PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="10.0.0"/>
     </ItemGroup>
 
     <ItemGroup>
-      <ProjectReference Include="..\src\Infrastructure\RabbitMq\RabbitMq.csproj" />
-      <ProjectReference Include="..\src\Infrastructure\Security\Security.csproj" />
-      <ProjectReference Include="..\src\Services\Api.Common\Api.Common.csproj" />
-      <ProjectReference Include="..\src\Services\Search\Search.Application\Search.Application.csproj" />
-      <ProjectReference Include="..\src\Services\Search\Search.Entities\Search.Entities.csproj" />
-      <ProjectReference Include="..\src\Services\Search\Search.Persistence\Search.Persistence.csproj" />
+        <ProjectReference Include="..\src\Infrastructure\RabbitMq\RabbitMq.csproj"/>
+        <ProjectReference Include="..\src\Infrastructure\Security\Security.csproj"/>
+        <ProjectReference Include="..\src\Services\Api.Common\Api.Common.csproj"/>
+        <ProjectReference Include="..\src\Services\Search\Search.Application\Search.Application.csproj"/>
+        <ProjectReference Include="..\src\Services\Search\Search.Entities\Search.Entities.csproj"/>
+        <ProjectReference Include="..\src\Services\Search\Search.Persistence\Search.Persistence.csproj"/>
     </ItemGroup>
 
     <ItemGroup>
-      <Content Include="..\.dockerignore">
-        <Link>.dockerignore</Link>
-      </Content>
+        <Content Include="..\.dockerignore">
+            <Link>.dockerignore</Link>
+        </Content>
     </ItemGroup>
 
 </Project>

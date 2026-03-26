@@ -1,5 +1,4 @@
-﻿using System.Linq.Expressions;
-using Abstractions.Models.Repository;
+﻿using Abstractions.Models.Repository;
 using Main.Abstractions.Interfaces.DbRepositories;
 using Main.Entities;
 using Main.Persistence.Context;
@@ -10,7 +9,9 @@ namespace Main.Persistence.Repositories;
 
 public class PurchaseLogisticsRepository(DContext context) : IPurchaseLogisticsRepository
 {
-    public async Task<IEnumerable<PurchaseLogistic>> GetPurchaseLogistics(IEnumerable<string> ids, bool track = true, 
+    public async Task<IEnumerable<PurchaseLogistic>> GetPurchaseLogistics(
+        IEnumerable<string> ids,
+        bool track = true,
         CancellationToken token = default)
     {
         return await context.PurchaseLogistics.ConfigureTracking(track)
@@ -18,7 +19,9 @@ public class PurchaseLogisticsRepository(DContext context) : IPurchaseLogisticsR
             .ToListAsync(token);
     }
 
-    public async Task<PurchaseLogistic?> GetPurchaseLogistics(string id, QueryOptions? config = null, 
+    public async Task<PurchaseLogistic?> GetPurchaseLogistics(
+        string id,
+        QueryOptions? config = null,
         CancellationToken token = default)
     {
         return await context.PurchaseLogistics

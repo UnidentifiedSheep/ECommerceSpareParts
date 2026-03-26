@@ -7,7 +7,7 @@ namespace Pricing.Application.Services.ArticlePricing.BasePriceStrategies;
 public class LowestBasePriceStrategy : IBasePriceStrategy
 {
     public ArticlePricingType Type => ArticlePricingType.Lowest;
-    
+
     public decimal GetPrice(IEnumerable<ArticlePrice> prices)
     {
         var list = prices.ToList();

@@ -38,7 +38,10 @@ public record CreateFullSaleCommand(
     decimal? PayedSum,
     string? ConfirmationCode) : ICommand;
 
-public class CreateFullSaleHandler(IMediator mediator, IArticlesRepository articlesRepository, IUnitOfWork unitOfWork,
+public class CreateFullSaleHandler(
+    IMediator mediator,
+    IArticlesRepository articlesRepository,
+    IUnitOfWork unitOfWork,
     IPublishEndpoint publishEndpoint)
     : ICommandHandler<CreateFullSaleCommand, Unit>
 {
@@ -78,22 +81,30 @@ public class CreateFullSaleHandler(IMediator mediator, IArticlesRepository artic
 
         await publishEndpoint.Publish(new SaleCreatedEvent
         {
-            Sale = sale.Adapt<global::Contracts.Models.Sale.Sale>()
+            Sale = sale.Adapt<Contracts.Models.Sale.Sale>()
         }, cancellationToken);
         await unitOfWork.SaveChangesAsync(cancellationToken);
         await mediator.Publish(new ArticlesUpdatedNotification(saleCounts.Keys), cancellationToken);
         return Unit.Value;
     }
 
-    private async Task SubtractCountFromReservations(Guid buyerId, Guid whoCreated, Dictionary<int, int> toSubtract,
+    private async Task SubtractCountFromReservations(
+        Guid buyerId,
+        Guid whoCreated,
+        Dictionary<int, int> toSubtract,
         CancellationToken cancellation = default)
     {
         var command = new SubtractCountFromReservationsCommand(buyerId, whoCreated, toSubtract);
         await mediator.Send(command, cancellation);
     }
 
-    private async Task CheckReservations(IEnumerable<NewSaleContentDto> saleContent, Guid buyerId,
-        Guid whoCreateUserId, string storageName, bool sellFromOtherStorages, string? confirmationCode,
+    private async Task CheckReservations(
+        IEnumerable<NewSaleContentDto> saleContent,
+        Guid buyerId,
+        Guid whoCreateUserId,
+        string storageName,
+        bool sellFromOtherStorages,
+        string? confirmationCode,
         CancellationToken cancellationToken = default)
     {
         var (byReservation, byStock) = await GetStockReservations(saleContent, buyerId, storageName,
@@ -124,8 +135,11 @@ public class CreateFullSaleHandler(IMediator mediator, IArticlesRepository artic
     }
 
     private async Task<(Dictionary<int, int> byReservation, Dictionary<int, int> byStock)> GetStockReservations(
-        IEnumerable<NewSaleContentDto> saleContent, Guid buyerId, string storageName,
-        bool sellFromOtherStorages, CancellationToken cancellationToken = default)
+        IEnumerable<NewSaleContentDto> saleContent,
+        Guid buyerId,
+        string storageName,
+        bool sellFromOtherStorages,
+        CancellationToken cancellationToken = default)
     {
         var neededArticlesCounts = saleContent
             .GroupBy(x => x.ArticleId)
@@ -138,8 +152,13 @@ public class CreateFullSaleHandler(IMediator mediator, IArticlesRepository artic
         return (result.NotEnoughByReservation, result.NotEnoughByStock);
     }
 
-    private async Task<Transaction> CreateTransaction(decimal amount, Guid sender, Guid receiver,
-        int currencyId, Guid createdUserId, DateTime transactionDateTime,
+    private async Task<Transaction> CreateTransaction(
+        decimal amount,
+        Guid sender,
+        Guid receiver,
+        int currencyId,
+        Guid createdUserId,
+        DateTime transactionDateTime,
         CancellationToken cancellationToken = default)
     {
         var command = new CreateTransactionCommand(sender, receiver, amount, currencyId, createdUserId,
@@ -150,7 +169,9 @@ public class CreateFullSaleHandler(IMediator mediator, IArticlesRepository artic
 
     private async Task<IEnumerable<PrevAndNewValue<StorageContent>>> RemoveContentFromStorage(
         IEnumerable<NewSaleContentDto> saleContent,
-        Guid whoCreateUserId, string storageName, bool saleFromOtherStorages,
+        Guid whoCreateUserId,
+        string storageName,
+        bool saleFromOtherStorages,
         CancellationToken cancellationToken = default)
     {
         var dict = saleContent.GroupBy(x => x.ArticleId)
@@ -161,9 +182,16 @@ public class CreateFullSaleHandler(IMediator mediator, IArticlesRepository artic
         return result.Changes;
     }
 
-    private async Task<Sale> CreateSale(IEnumerable<PrevAndNewValue<StorageContent>> storageContents,
-        IEnumerable<NewSaleContentDto> saleContent, int currencyId, Guid buyerId, Guid whoCreatedUserId,
-        Guid transactionId, string mainStorage, DateTime saleDateTime, string? comment,
+    private async Task<Sale> CreateSale(
+        IEnumerable<PrevAndNewValue<StorageContent>> storageContents,
+        IEnumerable<NewSaleContentDto> saleContent,
+        int currencyId,
+        Guid buyerId,
+        Guid whoCreatedUserId,
+        Guid transactionId,
+        string mainStorage,
+        DateTime saleDateTime,
+        string? comment,
         CancellationToken cancellationToken = default)
     {
         var command = new CreateSaleCommand(saleContent, storageContents, currencyId, buyerId, whoCreatedUserId,

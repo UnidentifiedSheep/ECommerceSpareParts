@@ -11,37 +11,38 @@ public class BasePriceService(IBasePriceStrategyFactory basePriceFactory) : IBas
     public BasePricingResult CalculatePrices(BasePricingContext context)
     {
         List<BasePricingItemResult> pricingResults = [];
-        ArticlePricingType pricingType = context.PricingType;
-        
+        var pricingType = context.PricingType;
+
         foreach (var item in context.Items)
             pricingResults.Add(CalculatePrice(item, pricingType));
-        
+
         return new BasePricingResult(pricingResults, pricingType);
     }
-    
+
     public BasePricingItemResult CalculatePrice(BasePricingItem item, ArticlePricingType pricingType)
     {
         var basePriceStrategy = basePriceFactory.GetStrategy(pricingType);
-        decimal basePrice = basePriceStrategy.GetPrice(item.Prices);
+        var basePrice = basePriceStrategy.GetPrice(item.Prices);
         var (finalPrice, appliedCoefficients) = ApplyCoefficients(basePrice, item.Coefficients);
         return new BasePricingItemResult(item.Id, basePrice, finalPrice, appliedCoefficients);
     }
-    
-    private (decimal finalPrice, List<PriceCoefficient> applied) ApplyCoefficients(decimal basePrice, 
+
+    private (decimal finalPrice, List<PriceCoefficient> applied) ApplyCoefficients(
+        decimal basePrice,
         IEnumerable<PriceCoefficient> coefficients)
     {
         var appliedCoefficients = new List<PriceCoefficient>();
         var now = DateTime.UtcNow;
-        
+
         var sortedCoefficients = coefficients
             .Where(c => c.ValidTill >= now)
             .OrderBy(c => (int)c.Type)
             .ThenBy(c => c.Order)
             .ToList();
 
-        decimal multiplier = 1m;
-        decimal percentOfBaseTotal = 0m;
-        decimal additiveTotal = 0m;
+        var multiplier = 1m;
+        var percentOfBaseTotal = 0m;
+        var additiveTotal = 0m;
 
         foreach (var coef in sortedCoefficients)
         {

@@ -1,4 +1,3 @@
-using System.Security.Claims;
 using Abstractions.Interfaces;
 using Api.Common.Extensions;
 using Carter;
@@ -11,8 +10,12 @@ public class DeleteStorageContentEndPoint : ICarterModule
 {
     public void AddRoutes(IEndpointRouteBuilder app)
     {
-        app.MapDelete("/storages/content/{contentId}", async (ISender sender, int contentId, string concurrencyCode,
-                IUserContext user, CancellationToken cancellationToken) =>
+        app.MapDelete("/storages/content/{contentId}", async (
+                ISender sender,
+                int contentId,
+                string concurrencyCode,
+                IUserContext user,
+                CancellationToken cancellationToken) =>
             {
                 var command = new DeleteStorageContentCommand(contentId, concurrencyCode, user.UserId);
                 await sender.Send(command, cancellationToken);

@@ -5,17 +5,16 @@ using Mail;
 using Main.Application.Configs;
 using Main.Application.Configs.Mapster;
 using Main.Cache;
-using Microsoft.Extensions.DependencyInjection;
 using Main.Persistence;
 using Main.Persistence.Context;
 using MassTransit;
+using Microsoft.Extensions.DependencyInjection;
 using Persistence.Extensions;
 using Security;
 using Serilog;
 using Test.Common.Extensions;
 using Test.Common.Stubs;
 using Tests.MockData;
-using Tests.TestContexts;
 using ApplicationServiceProvider = Main.Application.ServiceProvider;
 using CacheServiceProvider = Redis.ServiceProvider;
 using ServiceProvider = Microsoft.Extensions.DependencyInjection.ServiceProvider;
@@ -38,7 +37,7 @@ public static class ServiceProviderForTests
         var services = new ServiceCollection();
 
         services.RegisterTestContexts();
-        
+
         services.AddLogging();
         Log.Logger = new LoggerConfiguration()
             .MinimumLevel.Debug()

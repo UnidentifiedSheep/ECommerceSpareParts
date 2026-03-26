@@ -1,7 +1,7 @@
 using Api.Common.Extensions;
 using Carter;
-using Main.Application.Handlers.Purchases.GetPurchaseContent;
 using Main.Abstractions.Dtos.Amw.Purchase;
+using Main.Application.Handlers.Purchases.GetPurchaseContent;
 using Mapster;
 using MediatR;
 

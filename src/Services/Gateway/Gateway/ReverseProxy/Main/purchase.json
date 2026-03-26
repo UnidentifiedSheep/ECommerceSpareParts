@@ -5,60 +5,84 @@
         "ClusterId": "main-cluster",
         "Match": {
           "Path": "/main/purchases/",
-          "Methods": [ "POST" ]
+          "Methods": [
+            "POST"
+          ]
         },
         "Transforms": [
-          { "PathRemovePrefix": "/main" }
+          {
+            "PathRemovePrefix": "/main"
+          }
         ]
       },
       "delete-purchase": {
         "ClusterId": "main-cluster",
         "Match": {
           "Path": "/main/purchases/{purchaseId}",
-          "Methods": [ "DELETE" ]
+          "Methods": [
+            "DELETE"
+          ]
         },
         "Transforms": [
-          { "PathRemovePrefix": "/main" }
+          {
+            "PathRemovePrefix": "/main"
+          }
         ]
       },
       "edit-purchase": {
         "ClusterId": "main-cluster",
         "Match": {
           "Path": "/main/purchase/{purchaseId}",
-          "Methods": [ "PUT" ]
+          "Methods": [
+            "PUT"
+          ]
         },
         "Transforms": [
-          { "PathRemovePrefix": "/main" }
+          {
+            "PathRemovePrefix": "/main"
+          }
         ]
       },
       "get-purchase-content": {
         "ClusterId": "main-cluster",
         "Match": {
           "Path": "/main/purchases/{id}/content",
-          "Methods": [ "GET" ]
+          "Methods": [
+            "GET"
+          ]
         },
         "Transforms": [
-          { "PathRemovePrefix": "/main" }
+          {
+            "PathRemovePrefix": "/main"
+          }
         ]
       },
       "get-purchase-logistic": {
         "ClusterId": "main-cluster",
         "Match": {
           "Path": "/main/purchases/{id}/logistics",
-          "Methods": [ "GET" ]
+          "Methods": [
+            "GET"
+          ]
         },
         "Transforms": [
-          { "PathRemovePrefix": "/main" }
+          {
+            "PathRemovePrefix": "/main"
+          }
         ]
       },
       "get-purchases": {
         "ClusterId": "main-cluster",
         "Match": {
           "Path": "/main/purchases/",
-          "Methods": [ "GET" ]
+          "Methods": [
+            "GET"
+          ]
         },
         "Transforms": [
-          { "PathRemovePrefix": "/main" }
+          {
+            "PathRemovePrefix": "/main"
+          }
         ]
       }
     }

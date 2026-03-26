@@ -5,7 +5,6 @@ using Contracts.Articles;
 using Search.Abstractions.Dtos;
 using Search.Api.EndPoints;
 using Search.Entities;
-
 using ContractArticle = Contracts.Models.Articles.Article;
 
 namespace Search.Api.Contexts;

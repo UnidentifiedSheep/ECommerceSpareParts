@@ -10,14 +10,14 @@ namespace Analytics.Application.Handlers.Currencies.CreateCurrency;
 [Transactional]
 public record CreateCurrencyCommand(int CurrencyId, decimal ToUsd) : ICommand;
 
-public class CreateCurrencyHandler(ICurrencyRepository currencyRepository, IUnitOfWork unitOfWork) 
+public class CreateCurrencyHandler(ICurrencyRepository currencyRepository, IUnitOfWork unitOfWork)
     : ICommandHandler<CreateCurrencyCommand>
 {
     public async Task<Unit> Handle(CreateCurrencyCommand request, CancellationToken cancellationToken)
     {
         if (await currencyRepository.GetCurrency(request.CurrencyId, false, cancellationToken) != null)
             return Unit.Value;
-        
+
         await unitOfWork.AddAsync(new Currency
         {
             Id = request.CurrencyId,

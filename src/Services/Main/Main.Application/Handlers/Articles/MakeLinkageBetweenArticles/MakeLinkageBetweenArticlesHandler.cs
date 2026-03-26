@@ -13,7 +13,9 @@ namespace Main.Application.Handlers.Articles.MakeLinkageBetweenArticles;
 [Transactional]
 public record MakeLinkageBetweenArticlesCommand(List<NewArticleLinkageDto> Linkages) : ICommand<Unit>;
 
-public class MakeLinkageBetweenArticlesHandler(IMediator mediator, IArticlesRepository articlesRepository,
+public class MakeLinkageBetweenArticlesHandler(
+    IMediator mediator,
+    IArticlesRepository articlesRepository,
     IUnitOfWork unitOfWork) : ICommandHandler<MakeLinkageBetweenArticlesCommand, Unit>
 {
     public async Task<Unit> Handle(MakeLinkageBetweenArticlesCommand request, CancellationToken cancellationToken)
@@ -23,15 +25,16 @@ public class MakeLinkageBetweenArticlesHandler(IMediator mediator, IArticlesRepo
 
         foreach (var linkage in linkages)
         {
-            int[] ids = await CreateLinkages(linkage, cancellationToken);
+            var ids = await CreateLinkages(linkage, cancellationToken);
             updatedIds.UnionWith(ids);
         }
-        
+
         await mediator.Publish(new ArticlesUpdatedNotification(updatedIds), cancellationToken);
         return Unit.Value;
     }
 
-    private async Task<int[]> CreateLinkages(NewArticleLinkageDto linkage, 
+    private async Task<int[]> CreateLinkages(
+        NewArticleLinkageDto linkage,
         CancellationToken cancellationToken = default)
     {
         var lrArticles = await articlesRepository
@@ -88,11 +91,11 @@ public class MakeLinkageBetweenArticlesHandler(IMediator mediator, IArticlesRepo
     {
         var rIds = rightIds.ToList();
         foreach (var l in leftIds)
-            foreach (var r in rIds)
-            {
-                set.Add((l, r));
-                set.Add((r, l));
-            }
+        foreach (var r in rIds)
+        {
+            set.Add((l, r));
+            set.Add((r, l));
+        }
     }
 
     private void AddBidirectionalPairs(HashSet<(int, int)> set, IEnumerable<int> ids, int singleId)

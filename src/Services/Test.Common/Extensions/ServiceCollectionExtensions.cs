@@ -11,7 +11,7 @@ public static class ServiceCollectionExtensions
 
         var implementations = AppDomain.CurrentDomain.GetAssemblies()
             .SelectMany(a => a.GetTypes())
-            .Where(t => interfaceType.IsAssignableFrom(t) 
+            .Where(t => interfaceType.IsAssignableFrom(t)
                         && t is { IsInterface: false, IsAbstract: false });
 
         foreach (var impl in implementations)

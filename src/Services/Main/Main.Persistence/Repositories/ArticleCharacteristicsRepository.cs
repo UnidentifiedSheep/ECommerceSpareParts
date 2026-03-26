@@ -8,15 +8,20 @@ namespace Main.Persistence.Repositories;
 
 public class ArticleCharacteristicsRepository(DContext context) : IArticleCharacteristicsRepository
 {
-    public async Task<IEnumerable<ArticleCharacteristic>> GetArticleCharacteristics(int articleId, bool track = true,
+    public async Task<IEnumerable<ArticleCharacteristic>> GetArticleCharacteristics(
+        int articleId,
+        bool track = true,
         CancellationToken cancellationToken = default)
     {
         return await context.ArticleCharacteristics.ConfigureTracking(track).Where(x => x.ArticleId == articleId)
             .ToListAsync(cancellationToken);
     }
 
-    public async Task<IEnumerable<ArticleCharacteristic>> GetArticleCharacteristicsByIds(int? articleId, 
-        IEnumerable<int> ids, bool track = true, CancellationToken cancellationToken = default)
+    public async Task<IEnumerable<ArticleCharacteristic>> GetArticleCharacteristicsByIds(
+        int? articleId,
+        IEnumerable<int> ids,
+        bool track = true,
+        CancellationToken cancellationToken = default)
     {
         return await context.ArticleCharacteristics
             .ConfigureTracking(track)
@@ -24,7 +29,9 @@ public class ArticleCharacteristicsRepository(DContext context) : IArticleCharac
             .ToListAsync(cancellationToken);
     }
 
-    public async Task<ArticleCharacteristic?> GetCharacteristic(int id, bool track = true,
+    public async Task<ArticleCharacteristic?> GetCharacteristic(
+        int id,
+        bool track = true,
         CancellationToken cancellationToken = default)
     {
         return await context.ArticleCharacteristics.ConfigureTracking(track)

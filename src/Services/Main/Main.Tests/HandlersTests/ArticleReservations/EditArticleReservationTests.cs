@@ -1,8 +1,8 @@
 ﻿using Main.Abstractions.Constants;
-using Main.Application.Handlers.ArticleReservations.CreateArticleReservation;
-using Main.Application.Handlers.ArticleReservations.EditArticleReservation;
 using Main.Abstractions.Dtos.Amw.ArticleReservations;
 using Main.Abstractions.Exceptions.Articles;
+using Main.Application.Handlers.ArticleReservations.CreateArticleReservation;
+using Main.Application.Handlers.ArticleReservations.EditArticleReservation;
 using Main.Entities;
 using Main.Persistence.Context;
 using MediatR;
@@ -21,13 +21,13 @@ public class EditArticleReservationTests : IAsyncLifetime
 {
     private readonly DContext _context;
     private readonly IMediator _mediator;
-
-    private User _user = null!;
-    private User _whoUpdated = null!;
     private Article _article = null!;
     private Currency _currency = null!;
 
     private int _reservationId;
+
+    private User _user = null!;
+    private User _whoUpdated = null!;
 
     public EditArticleReservationTests(CombinedContainerFixture fixture)
     {

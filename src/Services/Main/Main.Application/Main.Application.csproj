@@ -8,34 +8,34 @@
     </PropertyGroup>
 
     <ItemGroup>
-        <PackageReference Include="BulkValidation.Core" Version="1.0.9" />
-        <PackageReference Include="MassTransit" Version="8.5.8" />
-        <PackageReference Include="Microsoft.Extensions.Hosting.Abstractions" Version="10.0.0" />
-        <PackageReference Include="Scrutor" Version="7.0.0" />
-        <PackageReference Include="Serilog" Version="4.3.1-dev-02395" />
+        <PackageReference Include="BulkValidation.Core" Version="1.0.9"/>
+        <PackageReference Include="MassTransit" Version="8.5.8"/>
+        <PackageReference Include="Microsoft.Extensions.Hosting.Abstractions" Version="10.0.0"/>
+        <PackageReference Include="Scrutor" Version="7.0.0"/>
+        <PackageReference Include="Serilog" Version="4.3.1-dev-02395"/>
     </ItemGroup>
 
     <ItemGroup>
-        <Folder Include="Handlers\Logistics\" />
+        <Folder Include="Handlers\Logistics\"/>
     </ItemGroup>
 
     <ItemGroup>
-        <ProjectReference Include="..\..\..\Core\Constants\Constants.csproj" />
-        <ProjectReference Include="..\..\..\Core\Contracts\Contracts.csproj" />
-        <ProjectReference Include="..\..\..\Core\Utils\Utils.csproj" />
-        <ProjectReference Include="..\..\..\Infrastructure\Localization\Localization.Domain\Localization.Domain.csproj" />
+        <ProjectReference Include="..\..\..\Core\Constants\Constants.csproj"/>
+        <ProjectReference Include="..\..\..\Core\Contracts\Contracts.csproj"/>
+        <ProjectReference Include="..\..\..\Core\Utils\Utils.csproj"/>
+        <ProjectReference Include="..\..\..\Infrastructure\Localization\Localization.Domain\Localization.Domain.csproj"/>
         <ProjectReference Include="..\..\Application.Common\Application.Common.csproj"/>
-        <ProjectReference Include="..\Main.Abstractions\Main.Abstractions.csproj" />
-        <ProjectReference Include="..\Main.Entities\Main.Entities.csproj" />
+        <ProjectReference Include="..\Main.Abstractions\Main.Abstractions.csproj"/>
+        <ProjectReference Include="..\Main.Entities\Main.Entities.csproj"/>
     </ItemGroup>
 
     <ItemGroup>
-      <Reference Include="Microsoft.Extensions.Hosting.Abstractions">
-        <HintPath>..\..\..\..\..\..\..\.nuget\packages\microsoft.extensions.hosting.abstractions\9.0.0\lib\net9.0\Microsoft.Extensions.Hosting.Abstractions.dll</HintPath>
-      </Reference>
-      <Reference Include="Serilog">
-        <HintPath>..\..\..\..\..\..\..\.nuget\packages\serilog\4.3.1-dev-02387\lib\net9.0\Serilog.dll</HintPath>
-      </Reference>
+        <Reference Include="Microsoft.Extensions.Hosting.Abstractions">
+            <HintPath>..\..\..\..\..\..\..\.nuget\packages\microsoft.extensions.hosting.abstractions\9.0.0\lib\net9.0\Microsoft.Extensions.Hosting.Abstractions.dll</HintPath>
+        </Reference>
+        <Reference Include="Serilog">
+            <HintPath>..\..\..\..\..\..\..\.nuget\packages\serilog\4.3.1-dev-02387\lib\net9.0\Serilog.dll</HintPath>
+        </Reference>
     </ItemGroup>
 
 </Project>

@@ -2,7 +2,7 @@
 
 namespace Main.Entities;
 
-public partial class PurchaseContent
+public class PurchaseContent
 {
     [Validate]
     public int Id { get; set; }

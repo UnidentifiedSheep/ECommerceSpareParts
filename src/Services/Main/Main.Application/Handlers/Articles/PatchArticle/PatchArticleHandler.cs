@@ -17,8 +17,12 @@ namespace Main.Application.Handlers.Articles.PatchArticle;
 [Transactional]
 public record PatchArticleCommand(int ArticleId, PatchArticleDto PatchArticle) : ICommand;
 
-public class PatchArticleHandler(IMediator mediator, IArticlesRepository articlesRepository, IUnitOfWork unitOfWork,
-    IPublishEndpoint publishEndpoint, IProducerRepository producerRepository)
+public class PatchArticleHandler(
+    IMediator mediator,
+    IArticlesRepository articlesRepository,
+    IUnitOfWork unitOfWork,
+    IPublishEndpoint publishEndpoint,
+    IProducerRepository producerRepository)
     : ICommandHandler<PatchArticleCommand>
 {
     public async Task<Unit> Handle(PatchArticleCommand request, CancellationToken cancellationToken)
@@ -28,12 +32,12 @@ public class PatchArticleHandler(IMediator mediator, IArticlesRepository article
 
         request.PatchArticle.Adapt(article);
         var producer = await producerRepository.GetProducer(article.ProducerId, false, cancellationToken)
-                          ?? throw new ProducerNotFoundException(article.ProducerId);
+                       ?? throw new ProducerNotFoundException(article.ProducerId);
 
         var adaptedArticle = article.Adapt<Article>() with
         {
-            ProducerId = article.ProducerId, 
-            ProducerName =  producer.Name
+            ProducerId = article.ProducerId,
+            ProducerName = producer.Name
         };
         await publishEndpoint.Publish(new ArticleUpdatedEvent { Article = adaptedArticle }, cancellationToken);
 

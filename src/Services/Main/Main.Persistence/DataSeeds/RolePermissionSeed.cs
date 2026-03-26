@@ -1,7 +1,6 @@
 ﻿using Enums;
 using Extensions;
 using Main.Entities;
-using Main.Enums;
 using Main.Persistence.Context;
 using Microsoft.EntityFrameworkCore;
 using Persistence.Interfaces;
@@ -10,8 +9,39 @@ namespace Main.Persistence.DataSeeds;
 
 public class RolePermissionSeed : ISeed<DContext>
 {
-    private static IReadOnlyDictionary<string, PermissionCodes[]> BuildRolePermissions() =>
-        new Dictionary<string, PermissionCodes[]>
+    public async Task SeedAsync(DContext context)
+    {
+        var roles = await context.Roles
+            .Where(r => r.NormalizedName == "ADMIN" || r.NormalizedName == "WORKER" || r.NormalizedName == "MEMBER")
+            .ToListAsync();
+
+        if (roles.Count == 0)
+            return;
+
+        var permissions = await context.Permissions
+            .ToDictionaryAsync(p => p.Name);
+
+        var rolePermissions = BuildRolePermissions();
+
+        foreach (var role in roles)
+        {
+            if (!rolePermissions.TryGetValue(role.NormalizedName, out var needed))
+                continue;
+
+            role.PermissionNames = ResolvePermissions(needed, permissions);
+        }
+
+        await context.SaveChangesAsync();
+    }
+
+    public int GetPriority()
+    {
+        return 1;
+    }
+
+    private static IReadOnlyDictionary<string, PermissionCodes[]> BuildRolePermissions()
+    {
+        return new Dictionary<string, PermissionCodes[]>
         {
             ["ADMIN"] =
             [
@@ -187,34 +217,12 @@ public class RolePermissionSeed : ISeed<DContext>
                 PermissionCodes.ARTICLES_GET_MAIN
             ]
         };
-
-    public async Task SeedAsync(DContext context)
-    {
-        var roles = await context.Roles
-            .Where(r => r.NormalizedName == "ADMIN" || r.NormalizedName == "WORKER" || r.NormalizedName == "MEMBER")
-            .ToListAsync();
-
-        if (roles.Count == 0)
-            return;
-
-        var permissions = await context.Permissions
-            .ToDictionaryAsync(p => p.Name);
-
-        var rolePermissions = BuildRolePermissions();
-
-        foreach (var role in roles)
-        {
-            if (!rolePermissions.TryGetValue(role.NormalizedName, out var needed))
-                continue;
-
-            role.PermissionNames = ResolvePermissions(needed, permissions);
-        }
-
-        await context.SaveChangesAsync();
     }
 
 
-    private static List<Permission> ResolvePermissions(IEnumerable<PermissionCodes> needed, IReadOnlyDictionary<string, Permission> permissions)
+    private static List<Permission> ResolvePermissions(
+        IEnumerable<PermissionCodes> needed,
+        IReadOnlyDictionary<string, Permission> permissions)
     {
         var result = new List<Permission>();
 
@@ -231,6 +239,4 @@ public class RolePermissionSeed : ISeed<DContext>
 
         return result;
     }
-
-    public int GetPriority() => 1;
 }

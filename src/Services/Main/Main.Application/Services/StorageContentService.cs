@@ -8,7 +8,8 @@ namespace Main.Application.Services;
 public class StorageContentService(IStorageContentRepository storageContentRepository) : IStorageContentService
 {
     public async Task<Dictionary<int, StorageContent>> GetStorageContentsForUpdate(
-        IEnumerable<int> storageContentIds, CancellationToken cancellationToken = default)
+        IEnumerable<int> storageContentIds,
+        CancellationToken cancellationToken = default)
     {
         var ids = storageContentIds.ToHashSet();
         var storageContents = (await storageContentRepository.GetStorageContentsForUpdate(ids,

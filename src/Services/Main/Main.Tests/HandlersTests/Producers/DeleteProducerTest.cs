@@ -1,5 +1,4 @@
 using Main.Abstractions.Exceptions.Producers;
-using Main.Application.Configs;
 using Main.Application.Configs.Mapster;
 using Main.Application.Handlers.Producers.DeleteProducer;
 using Main.Persistence.Context;

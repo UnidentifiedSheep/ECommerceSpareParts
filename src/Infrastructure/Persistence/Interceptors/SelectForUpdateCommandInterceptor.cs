@@ -5,28 +5,42 @@ namespace Persistence.Interceptors;
 
 public class SelectForUpdateCommandInterceptor : DbCommandInterceptor
 {
-    public override InterceptionResult<object> ScalarExecuting(DbCommand command, CommandEventData eventData, InterceptionResult<object> result)
+    public override InterceptionResult<object> ScalarExecuting(
+        DbCommand command,
+        CommandEventData eventData,
+        InterceptionResult<object> result)
     {
         ManipulateCommand(command);
         return result;
     }
 
-    public override ValueTask<InterceptionResult<object>> ScalarExecutingAsync(DbCommand command, CommandEventData eventData, InterceptionResult<object> result, CancellationToken cancellationToken = default)
+    public override ValueTask<InterceptionResult<object>> ScalarExecutingAsync(
+        DbCommand command,
+        CommandEventData eventData,
+        InterceptionResult<object> result,
+        CancellationToken cancellationToken = default)
     {
         ManipulateCommand(command);
-        return new(result);
+        return new ValueTask<InterceptionResult<object>>(result);
     }
 
-    public override InterceptionResult<DbDataReader> ReaderExecuting(DbCommand command, CommandEventData eventData, InterceptionResult<DbDataReader> result)
+    public override InterceptionResult<DbDataReader> ReaderExecuting(
+        DbCommand command,
+        CommandEventData eventData,
+        InterceptionResult<DbDataReader> result)
     {
         ManipulateCommand(command);
         return result;
     }
 
-    public override ValueTask<InterceptionResult<DbDataReader>> ReaderExecutingAsync(DbCommand command, CommandEventData eventData, InterceptionResult<DbDataReader> result, CancellationToken cancellationToken = default)
+    public override ValueTask<InterceptionResult<DbDataReader>> ReaderExecutingAsync(
+        DbCommand command,
+        CommandEventData eventData,
+        InterceptionResult<DbDataReader> result,
+        CancellationToken cancellationToken = default)
     {
         ManipulateCommand(command);
-        return new(result);
+        return new ValueTask<InterceptionResult<DbDataReader>>(result);
     }
 
     private static void ManipulateCommand(DbCommand command)

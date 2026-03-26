@@ -11,13 +11,15 @@ namespace Pricing.Application.Handlers.Settings.SetSetting;
 
 public record SetSettingCommand(string Key, object Value) : ICommand;
 
-public class SetSettingHandler(IUnitOfWork unitOfWork, ISettingsRepository settingsRepository,
-    IPublishEndpoint publishEndpoint) 
+public class SetSettingHandler(
+    IUnitOfWork unitOfWork,
+    ISettingsRepository settingsRepository,
+    IPublishEndpoint publishEndpoint)
     : ICommandHandler<SetSettingCommand>
 {
     public async Task<Unit> Handle(SetSettingCommand request, CancellationToken cancellationToken)
     {
-        var setting = await settingsRepository.GetSetting(request.Key,true, cancellationToken);
+        var setting = await settingsRepository.GetSetting(request.Key, true, cancellationToken);
         var json = JsonSerializer.Serialize(request.Value);
 
         if (setting == null)
@@ -25,9 +27,9 @@ public class SetSettingHandler(IUnitOfWork unitOfWork, ISettingsRepository setti
             setting = new Setting { Key = request.Key };
             await unitOfWork.AddAsync(setting, cancellationToken);
         }
-        
+
         setting.Value = json;
-        
+
         await publishEndpoint.Publish(new SettingChangedEvent
         {
             Key = setting.Key,

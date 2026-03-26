@@ -8,7 +8,11 @@ namespace Main.Persistence.Repositories;
 
 public class StorageOwnersRepository(DContext context) : IStorageOwnersRepository
 {
-    public async Task<IEnumerable<Storage>> GetUserStoragesAsync(Guid userId, int? page = null, int? limit = null, bool track = true,
+    public async Task<IEnumerable<Storage>> GetUserStoragesAsync(
+        Guid userId,
+        int? page = null,
+        int? limit = null,
+        bool track = true,
         CancellationToken cancellationToken = default)
     {
         var query = context.StorageOwners
@@ -19,11 +23,14 @@ public class StorageOwnersRepository(DContext context) : IStorageOwnersRepositor
 
         if (page.HasValue && limit.HasValue)
             query = query.Skip(page.Value * limit.Value).Take(limit.Value);
-        
+
         return await query.ToListAsync(cancellationToken);
     }
 
-    public async Task<StorageOwner?> GetStorageOwnerAsync(Guid userId, string storageName, bool track = true,
+    public async Task<StorageOwner?> GetStorageOwnerAsync(
+        Guid userId,
+        string storageName,
+        bool track = true,
         CancellationToken cancellationToken = default)
     {
         return await context.StorageOwners.ConfigureTracking(track)

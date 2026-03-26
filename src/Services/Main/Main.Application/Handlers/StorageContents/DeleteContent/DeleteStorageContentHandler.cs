@@ -18,8 +18,11 @@ namespace Main.Application.Handlers.StorageContents.DeleteContent;
 [Transactional(IsolationLevel.Serializable, 20, 2)]
 public record DeleteStorageContentCommand(int ContentId, string ConcurrencyCode, Guid UserId) : ICommand;
 
-public class DeleteStorageContentHandler(IStorageContentRepository storageContentRepository,
-    IUnitOfWork unitOfWork, IMediator mediator, IConcurrencyValidator<StorageContent> concurrencyValidator,
+public class DeleteStorageContentHandler(
+    IStorageContentRepository storageContentRepository,
+    IUnitOfWork unitOfWork,
+    IMediator mediator,
+    IConcurrencyValidator<StorageContent> concurrencyValidator,
     IArticlesService articlesService) : ICommandHandler<DeleteStorageContentCommand>
 {
     public async Task<Unit> Handle(DeleteStorageContentCommand request, CancellationToken cancellationToken)
@@ -29,7 +32,7 @@ public class DeleteStorageContentHandler(IStorageContentRepository storageConten
         var content =
             await storageContentRepository.GetStorageContentForUpdateAsync(id, null, null, true, cancellationToken)
             ?? throw new StorageContentNotFoundException(id);
-        
+
         if (!concurrencyValidator.IsValid(content, request.ConcurrencyCode, out var validCode))
             throw new ConcurrencyCodeMismatchException(request.ConcurrencyCode, validCode);
 

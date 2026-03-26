@@ -11,7 +11,7 @@ public class PatchCharacteristicsValidation : AbstractValidator<PatchCharacteris
             .NotEmpty()
             .When(x => x.NewValues.Value.IsSet)
             .WithLocalizationKey("article.characteristic.value.must.not.be.empty");
-        
+
         RuleFor(x => x.NewValues.Value.Value)
             .MinimumLength(3)
             .When(x => x.NewValues.Value.IsSet)

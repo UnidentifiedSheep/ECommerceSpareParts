@@ -7,9 +7,11 @@ using Mapster;
 namespace Main.Application.Handlers.Users.GetUserStorages;
 
 public record GetUserStoragesQuery(Guid UserId, PaginationModel Pagination) : IQuery<GetUserStoragesResult>;
+
 public record GetUserStoragesResult(List<StorageDto> Storages);
 
-public class GetUserStoragesHandler(IStorageOwnersRepository storageOwnersRepository) : IQueryHandler<GetUserStoragesQuery, GetUserStoragesResult>
+public class GetUserStoragesHandler(IStorageOwnersRepository storageOwnersRepository)
+    : IQueryHandler<GetUserStoragesQuery, GetUserStoragesResult>
 {
     public async Task<GetUserStoragesResult> Handle(GetUserStoragesQuery request, CancellationToken cancellationToken)
     {

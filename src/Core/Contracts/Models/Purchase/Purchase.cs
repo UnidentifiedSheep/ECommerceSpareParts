@@ -15,7 +15,7 @@ public class Purchase
     public required DateTime PurchaseDatetime { get; init; }
 
     public required DateTime CreationDatetime { get; init; }
-    
+
     public DateTime? LastUpdatedAt { get; init; }
 
     public required int CurrencyId { get; init; }

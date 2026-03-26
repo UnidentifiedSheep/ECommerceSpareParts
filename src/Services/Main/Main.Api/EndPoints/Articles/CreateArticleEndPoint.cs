@@ -1,7 +1,7 @@
 ﻿using Api.Common.Extensions;
 using Carter;
-using Main.Application.Handlers.Articles.CreateArticles;
 using Main.Abstractions.Dtos.Services.Articles;
+using Main.Application.Handlers.Articles.CreateArticles;
 using Mapster;
 using MediatR;
 
@@ -10,6 +10,7 @@ namespace Main.Api.EndPoints.Articles;
 public record CreateArticleRequest(List<CreateArticleDto> NewArticles);
 
 public record CreateArticleResponse(List<int> CreatedIds);
+
 public class CreateArticleEndPoint : ICarterModule
 {
     public void AddRoutes(IEndpointRouteBuilder app)

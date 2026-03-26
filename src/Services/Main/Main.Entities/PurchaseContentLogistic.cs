@@ -1,6 +1,6 @@
 ﻿namespace Main.Entities;
 
-public partial class PurchaseContentLogistic
+public class PurchaseContentLogistic
 {
     public int PurchaseContentId { get; set; }
 

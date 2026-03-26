@@ -6,7 +6,10 @@
         "Match": {
           "Path": "/main/articles/{articleId}/weights/",
           "Methods": [
-            "POST", "PUT", "GET", "DELETE"
+            "POST",
+            "PUT",
+            "GET",
+            "DELETE"
           ]
         },
         "Transforms": [

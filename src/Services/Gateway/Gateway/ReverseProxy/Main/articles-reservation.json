@@ -5,40 +5,56 @@
         "ClusterId": "main-cluster",
         "Match": {
           "Path": "/main/articles/reservations",
-          "Methods": [ "POST" ]
+          "Methods": [
+            "POST"
+          ]
         },
         "Transforms": [
-          { "PathRemovePrefix": "/main" }
+          {
+            "PathRemovePrefix": "/main"
+          }
         ]
       },
       "delete-article-reservation": {
         "ClusterId": "main-cluster",
         "Match": {
           "Path": "/main/articles/reservations/{reservationId}",
-          "Methods": [ "DELETE" ]
+          "Methods": [
+            "DELETE"
+          ]
         },
         "Transforms": [
-          { "PathRemovePrefix": "/main" }
+          {
+            "PathRemovePrefix": "/main"
+          }
         ]
       },
       "edit-article-reservation": {
         "ClusterId": "main-cluster",
         "Match": {
           "Path": "/main/articles/reservations/{reservationId}",
-          "Methods": [ "PUT" ]
+          "Methods": [
+            "PUT"
+          ]
         },
         "Transforms": [
-          { "PathRemovePrefix": "/main" }
+          {
+            "PathRemovePrefix": "/main"
+          }
         ]
       },
       "get-article-reservations": {
         "ClusterId": "main-cluster",
         "Match": {
           "Path": "/main/articles/reservations",
-          "Methods": [ "GET" ]
+          "Methods": [
+            "GET"
+          ]
         },
         "Transforms": [
-          { "PathRemovePrefix": "/main" }
+          {
+            "PathRemovePrefix": "/main"
+          }
         ]
       }
     }

@@ -5,20 +5,28 @@
         "ClusterId": "search-cluster",
         "Match": {
           "Path": "/search/articles/{articleId}",
-          "Methods": [ "GET" ]
+          "Methods": [
+            "GET"
+          ]
         },
         "Transforms": [
-          { "PathRemovePrefix": "/search" }
+          {
+            "PathRemovePrefix": "/search"
+          }
         ]
       },
       "search-articles": {
         "ClusterId": "search-cluster",
         "Match": {
           "Path": "/search/articles",
-          "Methods": [ "GET" ]
+          "Methods": [
+            "GET"
+          ]
         },
         "Transforms": [
-          { "PathRemovePrefix": "/search" }
+          {
+            "PathRemovePrefix": "/search"
+          }
         ]
       }
     }

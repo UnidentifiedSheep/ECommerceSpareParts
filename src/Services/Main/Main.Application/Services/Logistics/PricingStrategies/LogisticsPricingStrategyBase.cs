@@ -12,25 +12,25 @@ public abstract class LogisticsPricingStrategyBase : ILogisticsPricingStrategy
     public abstract LogisticsCalcResult Calculate(LogisticsContext context, IEnumerable<LogisticsItem> items);
 
     /// <summary>
-    /// Выполняет итерацию по позициям логистики и рассчитывает стоимость каждой позиции.
+    ///     Выполняет итерацию по позициям логистики и рассчитывает стоимость каждой позиции.
     /// </summary>
     /// <param name="context">
-    /// Контекст расчета логистики, включающий минимальную цену, валюту и другие настройки.
+    ///     Контекст расчета логистики, включающий минимальную цену, валюту и другие настройки.
     /// </param>
     /// <param name="items">
-    /// Список позиций для расчета.
+    ///     Список позиций для расчета.
     /// </param>
     /// <param name="calculateCost">
-    /// Функция, которая рассчитывает стоимость для одной позиции.
-    /// Возвращает стоимость позиции в базовой валюте.
+    ///     Функция, которая рассчитывает стоимость для одной позиции.
+    ///     Возвращает стоимость позиции в базовой валюте.
     /// </param>
     /// <param name="requirements">Флаг показывающий какие данные нужны для расчета стоимости</param>
     /// <returns>
-    /// <see cref="LogisticsCalcResult"/> - результат расчета
+    ///     <see cref="LogisticsCalcResult" /> - результат расчета
     /// </returns>
     /// <example>
-    /// Пример использования:
-    /// <code>
+    ///     Пример использования:
+    ///     <code>
     /// var result = strategy.Iterate(context, items, input =>
     /// {
     ///     // Рассчитать стоимость на основе веса и объема
@@ -40,8 +40,11 @@ public abstract class LogisticsPricingStrategyBase : ILogisticsPricingStrategy
     /// });
     /// </code>
     /// </example>
-    protected LogisticsCalcResult Iterate(LogisticsContext context, IEnumerable<LogisticsItem> items, 
-        Func<LogisticsChargeInput, decimal> calculateCost, LogisticsDataRequirements requirements)
+    protected LogisticsCalcResult Iterate(
+        LogisticsContext context,
+        IEnumerable<LogisticsItem> items,
+        Func<LogisticsChargeInput, decimal> calculateCost,
+        LogisticsDataRequirements requirements)
     {
         var resultItems = new List<LogisticsCalcItemResult>();
         var result = new LogisticsCalcResult
@@ -49,37 +52,37 @@ public abstract class LogisticsPricingStrategyBase : ILogisticsPricingStrategy
             PricingModel = Type,
             MinimalPrice = context.MinimumPrice ?? 0
         };
-        
+
         decimal totalWeight = 0;
         decimal totalArea = 0;
-        
+
         decimal accumulatedCost = 0;
-        
+
         foreach (var item in items)
         {
             if (item.Quantity <= 0) throw new ArgumentException("Количество должно быть больше или равно 0.");
             var weightPerItem = item.Weight.ToKg(item.WeightUnit);
-            var weight =  weightPerItem * item.Quantity;
+            var weight = weightPerItem * item.Quantity;
             var area = item.AreaM3 * item.Quantity;
-            
+
             var (skipped, reason) = ValidatePerItemData(weightPerItem, item.AreaM3, requirements);
 
             if (skipped)
             {
-                resultItems.Add(new LogisticsCalcItemResult(item.Id, 0, item.Quantity, area, item.AreaM3, weight, 
+                resultItems.Add(new LogisticsCalcItemResult(item.Id, 0, item.Quantity, area, item.AreaM3, weight,
                     weightPerItem, WeightUnit.Kilogram, skipped, reason));
                 continue;
             }
-            
+
             totalWeight += weight;
             totalArea += area;
-            
-            decimal cost = Math.Round(calculateCost(new LogisticsChargeInput(area, weight, item.Quantity)), 2);
+
+            var cost = Math.Round(calculateCost(new LogisticsChargeInput(area, weight, item.Quantity)), 2);
 
             if (cost < 0) throw new ArgumentException("Цена должна быть больше или равна 0");
-            
+
             accumulatedCost += cost;
-            resultItems.Add(new LogisticsCalcItemResult(item.Id, cost, item.Quantity, area, item.AreaM3, weight, 
+            resultItems.Add(new LogisticsCalcItemResult(item.Id, cost, item.Quantity, area, item.AreaM3, weight,
                 weightPerItem, WeightUnit.Kilogram, skipped, reason));
         }
 
@@ -88,18 +91,20 @@ public abstract class LogisticsPricingStrategyBase : ILogisticsPricingStrategy
         result.WeightUnit = WeightUnit.Kilogram;
         result.TotalCost = accumulatedCost;
         result.Items = resultItems;
-        
+
         return result;
     }
 
-    private static (bool skipped, IEnumerable<string>? reason) ValidatePerItemData(decimal weight, decimal area, 
+    private static (bool skipped, IEnumerable<string>? reason) ValidatePerItemData(
+        decimal weight,
+        decimal area,
         LogisticsDataRequirements requirements)
     {
         if (weight < 0) throw new ArgumentException("Вес должно быть больше или равно 0.");
         if (area < 0) throw new ArgumentException("Площадь должно быть больше или равно 0.");
-        
+
         var reasons = new List<string>(2);
-        
+
         if (requirements.HasFlag(LogisticsDataRequirements.Weight) && weight == 0)
             reasons.Add("Вес должен быть больше 0");
 

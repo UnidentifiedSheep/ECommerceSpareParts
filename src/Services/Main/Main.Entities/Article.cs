@@ -2,7 +2,7 @@
 
 namespace Main.Entities;
 
-public partial class Article
+public class Article
 {
     [Validate]
     public int Id { get; set; }
@@ -30,7 +30,8 @@ public partial class Article
     public int? CategoryId { get; set; }
     public long Popularity { get; set; }
 
-    public virtual ICollection<ArticleCharacteristic> ArticleCharacteristics { get; set; } = new List<ArticleCharacteristic>();
+    public virtual ICollection<ArticleCharacteristic> ArticleCharacteristics { get; set; } =
+        new List<ArticleCharacteristic>();
 
     public virtual ICollection<ArticleCoefficient> ArticleCoefficients { get; set; } = new List<ArticleCoefficient>();
 
@@ -40,17 +41,20 @@ public partial class Article
 
     public virtual ArticleSize? ArticleSize { get; set; }
 
-    public virtual ICollection<ArticleSupplierBuyInfo> ArticleSupplierBuyInfos { get; set; } = new List<ArticleSupplierBuyInfo>();
+    public virtual ICollection<ArticleSupplierBuyInfo> ArticleSupplierBuyInfos { get; set; } =
+        new List<ArticleSupplierBuyInfo>();
 
     public virtual ArticleWeight? ArticleWeight { get; set; }
 
-    public virtual ICollection<ArticlesContent> ArticlesContentInsideArticles { get; set; } = new List<ArticlesContent>();
+    public virtual ICollection<ArticlesContent> ArticlesContentInsideArticles { get; set; } =
+        new List<ArticlesContent>();
 
     public virtual ICollection<ArticlesContent> ArticlesContentMainArticles { get; set; } = new List<ArticlesContent>();
 
     public virtual ArticlesPair? ArticlesPairArticleLeftNavigation { get; set; }
 
-    public virtual ICollection<ArticlesPair> ArticlesPairArticleRightNavigations { get; set; } = new List<ArticlesPair>();
+    public virtual ICollection<ArticlesPair> ArticlesPairArticleRightNavigations { get; set; } =
+        new List<ArticlesPair>();
 
     public virtual ICollection<Cart> Carts { get; set; } = new List<Cart>();
 
@@ -64,7 +68,8 @@ public partial class Article
 
     public virtual ICollection<SaleContent> SaleContents { get; set; } = new List<SaleContent>();
 
-    public virtual ICollection<StorageContentReservation> StorageContentReservations { get; set; } = new List<StorageContentReservation>();
+    public virtual ICollection<StorageContentReservation> StorageContentReservations { get; set; } =
+        new List<StorageContentReservation>();
 
     public virtual ICollection<StorageContent> StorageContents { get; set; } = new List<StorageContent>();
 

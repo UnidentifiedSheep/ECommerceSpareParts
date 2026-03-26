@@ -6,7 +6,9 @@ namespace Redis;
 
 public static class ServiceProvider
 {
-    public static IServiceCollection AddCacheLayer(this IServiceCollection collection, string redisConnectionString, 
+    public static IServiceCollection AddCacheLayer(
+        this IServiceCollection collection,
+        string redisConnectionString,
         string? prefix = null)
     {
         collection.AddSingleton<IConnectionMultiplexer>(_ =>
@@ -15,7 +17,7 @@ public static class ServiceProvider
             options.AbortOnConnectFail = false;
             return ConnectionMultiplexer.Connect(options);
         });
-        
+
         collection.AddScoped<IDatabase>(sp =>
         {
             var mux = sp.GetRequiredService<IConnectionMultiplexer>();

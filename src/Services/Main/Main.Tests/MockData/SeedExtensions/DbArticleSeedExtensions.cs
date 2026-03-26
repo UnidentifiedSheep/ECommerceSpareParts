@@ -13,7 +13,7 @@ public static class DbArticleSeedExtensions
         var articles = ArticleFactory.Create(count, producerIds);
         await ctx.AddRangeAsync(articles);
         await ctx.SaveChangesAsync();
-        
+
         return articles;
     }
 }

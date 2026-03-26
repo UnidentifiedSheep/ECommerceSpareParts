@@ -10,11 +10,16 @@ using Microsoft.AspNetCore.Mvc;
 namespace Main.Api.EndPoints.Storages;
 
 public record GetStorageContentRequest(
-    [FromQuery(Name = "storageName")] string? StorageName,
-    [FromQuery(Name = "articleId")] int? ArticleId,
-    [FromQuery(Name = "page")] int Page,
-    [FromQuery(Name = "limit")] int Limit,
-    [FromQuery(Name = "showZeroContent")] bool ShowZeroCount = true);
+    [FromQuery(Name = "storageName")]
+    string? StorageName,
+    [FromQuery(Name = "articleId")]
+    int? ArticleId,
+    [FromQuery(Name = "page")]
+    int Page,
+    [FromQuery(Name = "limit")]
+    int Limit,
+    [FromQuery(Name = "showZeroContent")]
+    bool ShowZeroCount = true);
 
 public record GetStorageContentResponse(IEnumerable<StorageContentDto> Content);
 

@@ -10,14 +10,25 @@ namespace Main.Application.Handlers.Currencies.GetCurrencies;
 
 public record GetCurrenciesQuery(PaginationModel Pagination) : IQuery<GetCurrenciesResult>, ICacheableQuery
 {
-    public string GetCacheKey() => string.Format(CacheKeys.CurrenciesCacheKey, Pagination.Page, Pagination.Size);
-    public Type GetRelatedType() => typeof(Currency);
-    public int GetDurationSeconds() => 3600;
+    public string GetCacheKey()
+    {
+        return string.Format(CacheKeys.CurrenciesCacheKey, Pagination.Page, Pagination.Size);
+    }
+
+    public Type GetRelatedType()
+    {
+        return typeof(Currency);
+    }
+
+    public int GetDurationSeconds()
+    {
+        return 3600;
+    }
 }
 
 public record GetCurrenciesResult(IEnumerable<CurrencyDto> Currencies);
 
-public class GetCurrenciesHandler(ICurrencyRepository currencyRepository, IRelatedDataCollector relatedDataCollector) 
+public class GetCurrenciesHandler(ICurrencyRepository currencyRepository, IRelatedDataCollector relatedDataCollector)
     : IQueryHandler<GetCurrenciesQuery, GetCurrenciesResult>
 {
     public async Task<GetCurrenciesResult> Handle(GetCurrenciesQuery request, CancellationToken cancellationToken)

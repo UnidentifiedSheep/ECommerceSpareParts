@@ -14,7 +14,6 @@ using Main.Enums;
 using Mapster;
 using MassTransit;
 using MediatR;
-
 using ContractPurchase = Contracts.Models.Purchase.Purchase;
 
 namespace Main.Application.Handlers.Purchases.DeleteFullPurchase;
@@ -23,7 +22,7 @@ namespace Main.Application.Handlers.Purchases.DeleteFullPurchase;
 public record DeleteFullPurchaseCommand(string PurchaseId, Guid WhoDeleted) : ICommand;
 
 public class DeleteFullPurchaseHandler(
-    IPurchaseRepository purchaseRepository, 
+    IPurchaseRepository purchaseRepository,
     IPurchaseLogisticsRepository purchaseLogisticsRepository,
     IUnitOfWork unitOfWork,
     IPublishEndpoint publishEndpoint,
@@ -32,17 +31,18 @@ public class DeleteFullPurchaseHandler(
     private static readonly QueryOptions<PurchaseContent> ContentOptions = new QueryOptions<PurchaseContent>()
         .WithTracking()
         .WithForUpdate();
+
     public async Task<Unit> Handle(DeleteFullPurchaseCommand request, CancellationToken cancellationToken)
     {
         var purchaseId = request.PurchaseId;
         var purchase = await purchaseRepository.GetPurchase(
-                           purchaseId, 
-                           QueryPresets.TrackForUpdate, 
+                           purchaseId,
+                           QueryPresets.TrackForUpdate,
                            cancellationToken)
                        ?? throw new PurchaseNotFoundException(purchaseId);
         var purchaseLogistics = await purchaseLogisticsRepository
-            .GetPurchaseLogistics(purchaseId, QueryPresets.Track, token: cancellationToken);
-        
+            .GetPurchaseLogistics(purchaseId, QueryPresets.Track, cancellationToken);
+
         var purchaseContents = (await purchaseRepository.GetPurchaseContent(purchaseId,
             ContentOptions, cancellationToken)).ToList();
 
@@ -52,18 +52,20 @@ public class DeleteFullPurchaseHandler(
 
         if (purchaseLogistics?.TransactionId != null)
             await DeleteTransaction(purchaseLogistics.TransactionId.Value, request.WhoDeleted, cancellationToken);
-        
+
         await publishEndpoint.Publish(new PurchaseDeleteEvent
         {
             Purchase = purchase.Adapt<ContractPurchase>()
         }, cancellationToken);
-        
+
         await unitOfWork.SaveChangesAsync(cancellationToken);
-        
+
         return Unit.Value;
     }
 
-    private async Task DeleteTransaction(Guid transactionId, Guid whoDeleted,
+    private async Task DeleteTransaction(
+        Guid transactionId,
+        Guid whoDeleted,
         CancellationToken cancellationToken = default)
     {
         var command = new DeleteTransactionCommand(transactionId, whoDeleted, true);
@@ -76,7 +78,9 @@ public class DeleteFullPurchaseHandler(
         await mediator.Send(command, cancellationToken);
     }
 
-    private async Task RemoveContentFromStorage(List<PurchaseContent> purchaseContents, Guid whoRemoved,
+    private async Task RemoveContentFromStorage(
+        List<PurchaseContent> purchaseContents,
+        Guid whoRemoved,
         string storageName,
         CancellationToken cancellationToken = default)
     {

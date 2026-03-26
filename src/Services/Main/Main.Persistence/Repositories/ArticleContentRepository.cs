@@ -8,7 +8,9 @@ namespace Main.Persistence.Repositories;
 
 public class ArticleContentRepository(DContext context) : IArticleContentRepository
 {
-    public async Task<IEnumerable<ArticlesContent>> GetArticleContents(int articleId, bool track = true,
+    public async Task<IEnumerable<ArticlesContent>> GetArticleContents(
+        int articleId,
+        bool track = true,
         CancellationToken cancellationToken = default)
     {
         return await context.ArticlesContents.ConfigureTracking(track)
@@ -18,7 +20,10 @@ public class ArticleContentRepository(DContext context) : IArticleContentReposit
             .ToListAsync(cancellationToken);
     }
 
-    public async Task<ArticlesContent?> GetArticleContent(int articleId, int insideArticleId, bool track = true,
+    public async Task<ArticlesContent?> GetArticleContent(
+        int articleId,
+        int insideArticleId,
+        bool track = true,
         CancellationToken cancellationToken = default)
     {
         return await context.ArticlesContents.ConfigureTracking(track)

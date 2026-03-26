@@ -7,11 +7,11 @@
     </PropertyGroup>
 
     <ItemGroup>
-      <ProjectReference Include="..\Analytics.Enums\Analytics.Enums.csproj" />
+        <ProjectReference Include="..\Analytics.Enums\Analytics.Enums.csproj"/>
     </ItemGroup>
 
     <ItemGroup>
-      <PackageReference Include="BulkValidation.SourceGeneration" Version="1.0.5" />
+        <PackageReference Include="BulkValidation.SourceGeneration" Version="1.0.5"/>
     </ItemGroup>
 
 </Project>

@@ -1,20 +1,18 @@
 using Bogus;
-using Main.Abstractions.Dtos.Amw.Purchase;
+using Main.Abstractions.Dtos.Amw.Sales;
+using Main.Abstractions.Dtos.Emails;
+using Main.Abstractions.Models;
 using Main.Application.Handlers.Articles.CreateArticles;
 using Main.Application.Handlers.Balance.CreateTransaction;
 using Main.Application.Handlers.Producers.CreateProducer;
 using Main.Application.Handlers.Sales.CreateSale;
 using Main.Application.Handlers.StorageContents.AddContent;
-using Main.Application.Handlers.Storages.CreateStorage;
-using Main.Application.Handlers.Users.CreateUser;
-using Main.Abstractions.Dtos.Amw.Sales;
-using Main.Abstractions.Dtos.Emails;
-using Main.Entities;
-using Main.Enums;
-using Main.Abstractions.Models;
-using Main.Application.Handlers.Purchases.CreatePurchase;
 using Main.Application.Handlers.StorageOwners.AddStorageToUser;
 using Main.Application.Handlers.StorageRoutes.AddStorageRoute;
+using Main.Application.Handlers.Storages.CreateStorage;
+using Main.Application.Handlers.Users.CreateUser;
+using Main.Entities;
+using Main.Enums;
 using Mapster;
 using MediatR;
 using static Tests.MockData.MockData;
@@ -67,8 +65,13 @@ public static class MockMediatr
         return result.UserId;
     }
 
-    public static async Task<Transaction> AddMockTransaction(this IMediator mediator, Guid sender, Guid receiver,
-        Guid whoCreated, decimal amount = 100, DateTime? when = null)
+    public static async Task<Transaction> AddMockTransaction(
+        this IMediator mediator,
+        Guid sender,
+        Guid receiver,
+        Guid whoCreated,
+        decimal amount = 100,
+        DateTime? when = null)
     {
         var command = new CreateTransactionCommand(
             sender,
@@ -90,8 +93,13 @@ public static class MockMediatr
         await mediator.Send(command);
     }
 
-    public static async Task AddMockStorageContents(this IMediator mediator, IEnumerable<int> articleIds,
-        int currencyId, string storageName, Guid userId, int count = 20)
+    public static async Task AddMockStorageContents(
+        this IMediator mediator,
+        IEnumerable<int> articleIds,
+        int currencyId,
+        string storageName,
+        Guid userId,
+        int count = 20)
     {
         var dtoList = CreateNewStorageContentDto(articleIds, [currencyId], count)
             .ToList();
@@ -100,8 +108,14 @@ public static class MockMediatr
         await mediator.Send(command);
     }
 
-    public static async Task AddMockSale(this IMediator mediator, IEnumerable<StorageContent> storageContents,
-        int currencyId, Guid userId, Guid transactionId, string storageName, DateTime? when = null)
+    public static async Task AddMockSale(
+        this IMediator mediator,
+        IEnumerable<StorageContent> storageContents,
+        int currencyId,
+        Guid userId,
+        Guid transactionId,
+        string storageName,
+        DateTime? when = null)
     {
         var saleContent = new List<NewSaleContentDto>();
         var storageContentValues = new List<PrevAndNewValue<StorageContent>>();
@@ -130,14 +144,18 @@ public static class MockMediatr
         await mediator.Send(command);
     }
 
-    public static async Task AddMockStorageRoute(this IMediator mediator, string fromStorage, string toStorage, 
-        int currencyId, Guid? userId)
+    public static async Task AddMockStorageRoute(
+        this IMediator mediator,
+        string fromStorage,
+        string toStorage,
+        int currencyId,
+        Guid? userId)
     {
-        Faker faker = new Faker(Global.Locale);
-        
-        var command = new AddStorageRouteCommand(fromStorage, toStorage, faker.Random.Int(1, 100), 
+        var faker = new Faker(Global.Locale);
+
+        var command = new AddStorageRouteCommand(fromStorage, toStorage, faker.Random.Int(1, 100),
             RouteType.IntraCity, LogisticPricingType.PerAreaOrWeight, faker.Random.Int(1, 100),
-            GetRandomWithScale2(faker), GetRandomWithScale2(faker), currencyId, 
+            GetRandomWithScale2(faker), GetRandomWithScale2(faker), currencyId,
             GetRandomWithScale2(faker), null, userId);
         await mediator.Send(command);
     }

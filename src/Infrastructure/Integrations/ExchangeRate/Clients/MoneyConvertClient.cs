@@ -10,18 +10,18 @@ public class MoneyConvertClient(IHttpClientFactory clientFactory) : IExchangeRat
 {
     private readonly HttpClient _client = clientFactory.CreateClient(nameof(ExchangeRateProvider.MoneyConvert));
     public ExchangeRateProvider Provider => ExchangeRateProvider.MoneyConvert;
-    
+
     public async Task<ExchangeRates> GetRates(CancellationToken cancellationToken = default)
     {
         var response = await _client.GetAsync("", cancellationToken);
         if (!response.IsSuccessStatusCode)
             throw new Exception("Ошибка при получении курсов валют от ЦБР");
-        
-        string json = await response.Content.ReadAsStringAsync(cancellationToken);
-        MoneyConvertRatesResponse? result = JsonSerializer.Deserialize<MoneyConvertRatesResponse>(json);
-        
+
+        var json = await response.Content.ReadAsStringAsync(cancellationToken);
+        var result = JsonSerializer.Deserialize<MoneyConvertRatesResponse>(json);
+
         if (result == null) throw new Exception("Сервер вернул пустой ответ.");
-        
+
         return new ExchangeRates(result.Base, result.Rates);
     }
 }

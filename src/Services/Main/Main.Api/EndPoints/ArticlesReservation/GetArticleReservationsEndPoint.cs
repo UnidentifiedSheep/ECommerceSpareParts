@@ -1,8 +1,8 @@
 using Abstractions.Models;
 using Api.Common.Extensions;
 using Carter;
-using Main.Application.Handlers.ArticleReservations.GetArticleReservations;
 using Main.Abstractions.Dtos.Amw.ArticleReservations;
+using Main.Application.Handlers.ArticleReservations.GetArticleReservations;
 using Main.Enums;
 using Mapster;
 using MediatR;
@@ -14,13 +14,26 @@ public record GetArticleReservationsResponse(IEnumerable<ArticleReservationDto> 
 
 public class GetArticleReservationsRequest
 {
-    [FromQuery(Name = "searchTerm")] public string? SearchTerm { get; init; }
-    [FromQuery(Name = "page")] public int Page { get; init; }
-    [FromQuery(Name = "limit")] public int Limit { get; init; }
-    [FromQuery(Name = "sortBy")] public string? SortBy { get; init; }
-    [FromQuery(Name = "userId")] public Guid? UserId { get; init; }
-    [FromQuery(Name = "similarity")] public double? Similarity { get; init; }
-    [FromQuery(Name = "strategy")] public GeneralSearchStrategy Strategy { get; init; }
+    [FromQuery(Name = "searchTerm")]
+    public string? SearchTerm { get; init; }
+
+    [FromQuery(Name = "page")]
+    public int Page { get; init; }
+
+    [FromQuery(Name = "limit")]
+    public int Limit { get; init; }
+
+    [FromQuery(Name = "sortBy")]
+    public string? SortBy { get; init; }
+
+    [FromQuery(Name = "userId")]
+    public Guid? UserId { get; init; }
+
+    [FromQuery(Name = "similarity")]
+    public double? Similarity { get; init; }
+
+    [FromQuery(Name = "strategy")]
+    public GeneralSearchStrategy Strategy { get; init; }
 }
 
 public class GetArticleReservationsEndPoint : ICarterModule
@@ -31,9 +44,9 @@ public class GetArticleReservationsEndPoint : ICarterModule
                 async (ISender sender, [AsParameters] GetArticleReservationsRequest request, CancellationToken token) =>
                 {
                     var query = new GetArticleReservationsQuery(
-                        request.SearchTerm, 
-                        new PaginationModel(request.Page, request.Limit), 
-                        request.SortBy, 
+                        request.SearchTerm,
+                        new PaginationModel(request.Page, request.Limit),
+                        request.SortBy,
                         request.Similarity,
                         request.UserId,
                         request.Strategy);

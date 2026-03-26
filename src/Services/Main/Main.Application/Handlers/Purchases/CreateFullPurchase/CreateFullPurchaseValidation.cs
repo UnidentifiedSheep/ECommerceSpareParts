@@ -25,7 +25,7 @@ public class CreateFullPurchaseValidation : AbstractValidator<CreateFullPurchase
 
         RuleFor(x => x.PurchaseDate)
             .SetValidator(new PurchaseDateTimeValidator());
-        
+
         RuleFor(x => x.StorageFrom)
             .Must(x => x != null)
             .When(x => x.WithLogistics)

@@ -1,5 +1,4 @@
 using System.Data;
-using Abstractions.Interfaces;
 using Abstractions.Interfaces.Currency;
 using Abstractions.Interfaces.Services;
 using Application.Common.Interfaces;
@@ -19,12 +18,19 @@ using MediatR;
 namespace Main.Application.Handlers.StorageContents.RestoreContent;
 
 [Transactional(IsolationLevel.Serializable, 20, 2)]
-public record RestoreContentCommand(IEnumerable<RestoreContentItem> ContentDetails, StorageMovementType MovementType,
+public record RestoreContentCommand(
+    IEnumerable<RestoreContentItem> ContentDetails,
+    StorageMovementType MovementType,
     Guid UserId) : ICommand;
 
-public class RestoreContentHandler(IStorageContentRepository contentRepository, IArticlesRepository articlesRepository,
-    IArticlesService articlesService, IUnitOfWork unitOfWork, ICurrencyConverter currencyConverter, 
-    IPublishEndpoint publishEndpoint, IMediator mediator) : ICommandHandler<RestoreContentCommand>
+public class RestoreContentHandler(
+    IStorageContentRepository contentRepository,
+    IArticlesRepository articlesRepository,
+    IArticlesService articlesService,
+    IUnitOfWork unitOfWork,
+    ICurrencyConverter currencyConverter,
+    IPublishEndpoint publishEndpoint,
+    IMediator mediator) : ICommandHandler<RestoreContentCommand>
 {
     public async Task<Unit> Handle(RestoreContentCommand request, CancellationToken cancellationToken)
     {
@@ -68,16 +74,19 @@ public class RestoreContentHandler(IStorageContentRepository contentRepository, 
         }
 
         await articlesService.UpdateArticlesCount(toIncrement, cancellationToken);
-        
-        await publishEndpoint.Publish(new ArticleBuyPricesChangedEvent { ArticleIds = articleIds}, cancellationToken);
-        
+
+        await publishEndpoint.Publish(new ArticleBuyPricesChangedEvent { ArticleIds = articleIds }, cancellationToken);
+
         await unitOfWork.SaveChangesAsync(cancellationToken);
 
         await mediator.Publish(new ArticlesUpdatedNotification(articleIds), cancellationToken);
         return Unit.Value;
     }
 
-    private async Task AddMovement(StorageContent content, Guid userId, int movementCount,
+    private async Task AddMovement(
+        StorageContent content,
+        Guid userId,
+        int movementCount,
         StorageMovementType movementType,
         CancellationToken cancellationToken = default)
     {

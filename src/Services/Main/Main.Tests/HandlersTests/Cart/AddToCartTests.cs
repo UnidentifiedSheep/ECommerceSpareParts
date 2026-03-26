@@ -1,10 +1,10 @@
 ﻿using Bogus;
 using Main.Abstractions.Constants;
+using Main.Abstractions.Dtos.Emails;
 using Main.Application.Handlers.Articles.CreateArticles;
 using Main.Application.Handlers.Cart.AddToCart;
 using Main.Application.Handlers.Producers.CreateProducer;
 using Main.Application.Handlers.Users.CreateUser;
-using Main.Abstractions.Dtos.Emails;
 using Main.Enums;
 using Main.Persistence.Context;
 using MediatR;
@@ -12,7 +12,6 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Test.Common.Extensions;
 using Test.Common.TestContainers.Combined;
-using Tests.MockData;
 using ValidationException = FluentValidation.ValidationException;
 using DbValidationException = BulkValidation.Core.Exceptions.ValidationException;
 
@@ -24,8 +23,8 @@ public class AddToCartTests : IAsyncLifetime
     private readonly DContext _context;
     private readonly Faker _faker = new(MockData.MockData.Locale);
     private readonly IMediator _mediator;
-    private Guid _userId;
     private int _articleId;
+    private Guid _userId;
 
     public AddToCartTests(CombinedContainerFixture fixture)
     {

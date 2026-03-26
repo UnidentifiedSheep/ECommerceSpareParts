@@ -4,19 +4,25 @@ using Attributes;
 using Enums;
 using Main.Abstractions.Dtos.Amw.Purchase;
 using Main.Entities;
-using Main.Enums;
 using Mapster;
 
 namespace Main.Application.Handlers.Purchases.CreatePurchase;
 
 [Transactional]
-public record CreatePurchaseCommand(IEnumerable<(NewPurchaseContentDto content, int? storageContentId)> Content, 
-    int CurrencyId, string? Comment, Guid CreatedUserId, Guid TransactionId, string StorageName, Guid SupplierId,
+public record CreatePurchaseCommand(
+    IEnumerable<(NewPurchaseContentDto content, int? storageContentId)> Content,
+    int CurrencyId,
+    string? Comment,
+    Guid CreatedUserId,
+    Guid TransactionId,
+    string StorageName,
+    Guid SupplierId,
     DateTime PurchaseDateTime) : ICommand<CreatePurchaseResult>;
 
 public record CreatePurchaseResult(Purchase Purchase);
 
-public class CreatePurchaseHandler(IUnitOfWork unitOfWork) : ICommandHandler<CreatePurchaseCommand, CreatePurchaseResult>
+public class CreatePurchaseHandler(IUnitOfWork unitOfWork)
+    : ICommandHandler<CreatePurchaseCommand, CreatePurchaseResult>
 {
     public async Task<CreatePurchaseResult> Handle(CreatePurchaseCommand request, CancellationToken cancellationToken)
     {
@@ -29,9 +35,9 @@ public class CreatePurchaseHandler(IUnitOfWork unitOfWork) : ICommandHandler<Cre
 
         var purchaseContents = content.Select(x => x.content)
             .Adapt<List<PurchaseContent>>();
-        for (int i = 0; i < purchaseContents.Count; i++)
+        for (var i = 0; i < purchaseContents.Count; i++)
             purchaseContents[i].StorageContentId = content[i].storageContentId;
-        
+
         var purchaseModel = new Purchase
         {
             CurrencyId = currencyId,

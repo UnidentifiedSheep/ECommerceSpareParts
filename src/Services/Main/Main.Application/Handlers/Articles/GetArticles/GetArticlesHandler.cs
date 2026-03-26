@@ -16,9 +16,11 @@ public record GetArticlesQuery<TDto>(
 
 public record GetArticlesResult<TDto>(IEnumerable<TDto> Articles);
 
-public class GetArticlesHandler<TDto>(IArticlesRepository articlesRepository) : IQueryHandler<GetArticlesQuery<TDto>, GetArticlesResult<TDto>>
+public class GetArticlesHandler<TDto>(IArticlesRepository articlesRepository)
+    : IQueryHandler<GetArticlesQuery<TDto>, GetArticlesResult<TDto>>
 {
-    public async Task<GetArticlesResult<TDto>> Handle(GetArticlesQuery<TDto> request,
+    public async Task<GetArticlesResult<TDto>> Handle(
+        GetArticlesQuery<TDto> request,
         CancellationToken cancellationToken)
     {
         var page = request.Pagination.Page;

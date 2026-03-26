@@ -7,14 +7,14 @@
     </PropertyGroup>
 
     <ItemGroup>
-      <PackageReference Include="FluentValidation" Version="12.1.0" />
-      <PackageReference Include="Microsoft.AspNetCore.Http.Abstractions" Version="2.3.0" />
-      <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="10.0.0" />
-      <PackageReference Include="Microsoft.Extensions.Hosting.Abstractions" Version="10.0.0" />
+        <PackageReference Include="FluentValidation" Version="12.1.0"/>
+        <PackageReference Include="Microsoft.AspNetCore.Http.Abstractions" Version="2.3.0"/>
+        <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="10.0.0"/>
+        <PackageReference Include="Microsoft.Extensions.Hosting.Abstractions" Version="10.0.0"/>
     </ItemGroup>
 
     <ItemGroup>
-      <ProjectReference Include="..\Localization.Abstractions\Localization.Abstractions.csproj" />
+        <ProjectReference Include="..\Localization.Abstractions\Localization.Abstractions.csproj"/>
     </ItemGroup>
 
 </Project>

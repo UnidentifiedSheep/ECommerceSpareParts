@@ -6,14 +6,15 @@ namespace Application.Common.Extensions;
 
 public static class ValidatorExtensions
 {
-    public static IRuleBuilderOptions<T, int> CurrencyMustExist<T>(this IRuleBuilder<T, int> ruleBuilder,
+    public static IRuleBuilderOptions<T, int> CurrencyMustExist<T>(
+        this IRuleBuilder<T, int> ruleBuilder,
         ICurrencyConverter currencyConverter)
     {
         return ruleBuilder
             .Must(currencyConverter.IsSupportedCurrency)
             .WithLocalizationKey("currency.not.found");
     }
-    
+
     extension<T>(IRuleBuilder<T, int?> ruleBuilder)
     {
         public IRuleBuilderOptions<T, int?> CurrencyMustExist(ICurrencyConverter currencyConverter)

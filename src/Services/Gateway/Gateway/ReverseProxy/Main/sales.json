@@ -5,50 +5,70 @@
         "ClusterId": "main-cluster",
         "Match": {
           "Path": "/main/sales/",
-          "Methods": [ "POST" ]
+          "Methods": [
+            "POST"
+          ]
         },
         "Transforms": [
-          { "PathRemovePrefix": "/main" }
+          {
+            "PathRemovePrefix": "/main"
+          }
         ]
       },
       "delete-sale": {
         "ClusterId": "main-cluster",
         "Match": {
           "Path": "/main/sales/{saleId}",
-          "Methods": [ "DELETE" ]
+          "Methods": [
+            "DELETE"
+          ]
         },
         "Transforms": [
-          { "PathRemovePrefix": "/main" }
+          {
+            "PathRemovePrefix": "/main"
+          }
         ]
       },
       "edit-sale": {
         "ClusterId": "main-cluster",
         "Match": {
           "Path": "/main/sales/{saleId}",
-          "Methods": [ "PUT" ]
+          "Methods": [
+            "PUT"
+          ]
         },
         "Transforms": [
-          { "PathRemovePrefix": "/main" }
+          {
+            "PathRemovePrefix": "/main"
+          }
         ]
       },
       "get-sale-content": {
         "ClusterId": "main-cluster",
         "Match": {
           "Path": "/main/sales/{id}/content",
-          "Methods": [ "GET" ]
+          "Methods": [
+            "GET"
+          ]
         },
         "Transforms": [
-          { "PathRemovePrefix": "/main" }
+          {
+            "PathRemovePrefix": "/main"
+          }
         ]
       },
       "get-sales": {
         "ClusterId": "main-cluster",
         "Match": {
           "Path": "/main/sales/",
-          "Methods": [ "GET" ]
+          "Methods": [
+            "GET"
+          ]
         },
         "Transforms": [
-          { "PathRemovePrefix": "/main" }
+          {
+            "PathRemovePrefix": "/main"
+          }
         ]
       }
     }

@@ -7,20 +7,37 @@ public interface IProducerRepository
     Task<Producer?> GetProducer(int producerId, bool track = true, CancellationToken cancellationToken = default);
     Task<bool> ProducerHasAnyArticle(int producerId, CancellationToken cancellationToken = default);
 
-    Task<bool> OtherNameIsTaken(string otherName, int? producerId = null, string? whereUsed = null,
+    Task<bool> OtherNameIsTaken(
+        string otherName,
+        int? producerId = null,
+        string? whereUsed = null,
         CancellationToken cancellationToken = default);
 
     Task<bool> IsProducerNameTaken(string producerName, CancellationToken cancellationToken = default);
 
-    Task<ProducersOtherName?> GetOtherName(int producerId, string otherName, string? whereUsed, bool track = true,
+    Task<ProducersOtherName?> GetOtherName(
+        int producerId,
+        string otherName,
+        string? whereUsed,
+        bool track = true,
         CancellationToken cancellationToken = default);
 
-    Task<IEnumerable<Producer>> GetProducers(string? searchTerm, int page, int viewCount, bool track = true,
-        CancellationToken cancellationToken = default);
-    
-    Task<IEnumerable<Producer>> GetProducers(IEnumerable<int> ids, bool track = true,
+    Task<IEnumerable<Producer>> GetProducers(
+        string? searchTerm,
+        int page,
+        int viewCount,
+        bool track = true,
         CancellationToken cancellationToken = default);
 
-    Task<IEnumerable<ProducersOtherName>> GetOtherNames(int producerId, int page, int viewCount, bool track = true,
+    Task<IEnumerable<Producer>> GetProducers(
+        IEnumerable<int> ids,
+        bool track = true,
+        CancellationToken cancellationToken = default);
+
+    Task<IEnumerable<ProducersOtherName>> GetOtherNames(
+        int producerId,
+        int page,
+        int viewCount,
+        bool track = true,
         CancellationToken cancellationToken = default);
 }

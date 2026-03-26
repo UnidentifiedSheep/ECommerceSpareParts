@@ -1,6 +1,6 @@
 ﻿namespace Analytics.Entities;
 
-public partial class SalesFact
+public class SalesFact
 {
     public string Id { get; set; } = null!;
 

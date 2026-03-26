@@ -8,13 +8,18 @@ namespace Main.Persistence.Repositories;
 
 public class ArticleWeightRepository(DContext context) : IArticleWeightRepository
 {
-    public async Task<ArticleWeight?> GetArticleWeight(int articleId, bool track = true, CancellationToken token = default)
+    public async Task<ArticleWeight?> GetArticleWeight(
+        int articleId,
+        bool track = true,
+        CancellationToken token = default)
     {
         return await context.ArticleWeights.ConfigureTracking(track)
             .FirstOrDefaultAsync(x => x.ArticleId == articleId, token);
     }
 
-    public async Task<IEnumerable<ArticleWeight>> GetArticleWeightsByIds(IEnumerable<int> ids, bool track = true, 
+    public async Task<IEnumerable<ArticleWeight>> GetArticleWeightsByIds(
+        IEnumerable<int> ids,
+        bool track = true,
         CancellationToken token = default)
     {
         return await context.ArticleWeights.ConfigureTracking(track)

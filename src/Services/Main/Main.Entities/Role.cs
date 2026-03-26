@@ -2,14 +2,14 @@
 
 namespace Main.Entities;
 
-public partial class Role
+public class Role
 {
     [Validate]
     public Guid Id { get; set; }
 
     public string Name { get; set; } = null!;
-    [Validate]
 
+    [Validate]
     public string NormalizedName { get; set; } = null!;
 
     public string? Description { get; set; }

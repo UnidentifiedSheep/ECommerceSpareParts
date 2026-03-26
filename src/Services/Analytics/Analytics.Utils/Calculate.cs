@@ -3,7 +3,7 @@ namespace Analytics.Utils;
 public static class Calculate
 {
     /// <summary>
-    /// Calculates coefficient of markup.
+    ///     Calculates coefficient of markup.
     /// </summary>
     /// <param name="buyPrice">Buy price of item</param>
     /// <param name="sellPrice">Sell price of item</param>
@@ -13,8 +13,8 @@ public static class Calculate
     {
         ArgumentOutOfRangeException.ThrowIfNegativeOrZero(buyPrice);
         ArgumentOutOfRangeException.ThrowIfNegativeOrZero(sellPrice);
-        
-        decimal markup = (sellPrice - buyPrice) / buyPrice;
+
+        var markup = (sellPrice - buyPrice) / buyPrice;
         return Math.Round(markup, 2);
     }
 }

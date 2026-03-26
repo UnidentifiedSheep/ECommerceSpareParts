@@ -1,5 +1,4 @@
-﻿using Abstractions.Interfaces;
-using Abstractions.Interfaces.Currency;
+﻿using Abstractions.Interfaces.Currency;
 using Application.Common.Extensions;
 using FluentValidation;
 using Localization.Domain.Extensions;

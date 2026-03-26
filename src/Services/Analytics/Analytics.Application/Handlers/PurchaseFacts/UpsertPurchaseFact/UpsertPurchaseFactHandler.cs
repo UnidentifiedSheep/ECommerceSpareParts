@@ -23,12 +23,12 @@ public class UpsertPurchaseFactHandler(
     {
         var newFact = request.PurchaseFact;
         var dbFact = await factRepository.GetFact(
-            newFact.Id, 
-            QueryPresets.TrackForUpdate, 
+            newFact.Id,
+            QueryPresets.TrackForUpdate,
             cancellationToken);
 
         var shouldBeAdded = false;
-        
+
         if (dbFact == null)
         {
             dbFact = new PurchasesFact();
@@ -42,16 +42,16 @@ public class UpsertPurchaseFactHandler(
                 newFact.Id,
                 dbFact.ProcessedAt,
                 newFact.LastUpdatedAt);
-                
+
             return Unit.Value;
         }
 
         //update fields.
         newFact.Adapt(dbFact);
-        decimal sumAccumulator = 0m;
+        var sumAccumulator = 0m;
         var existingContents = dbFact.PurchaseContents.ToDictionary(x => x.Id);
         var toRemove = new Dictionary<int, PurchaseContent>(existingContents);
-        
+
         foreach (var newContent in newFact.Content)
         {
             toRemove.Remove(newContent.Id);
@@ -61,18 +61,18 @@ public class UpsertPurchaseFactHandler(
             else
                 dbFact.PurchaseContents.Add(newContent.Adapt<PurchaseContent>());
         }
-        
+
         dbFact.TotalSum = sumAccumulator;
 
         if (toRemove.Count != 0)
             foreach (var item in toRemove.Values)
                 dbFact.PurchaseContents.Remove(item);
-        
-        
+
+
         //add to db if needed
         if (shouldBeAdded)
             await unitOfWork.AddAsync(dbFact, cancellationToken);
-        
+
         await unitOfWork.SaveChangesAsync(cancellationToken);
         return Unit.Value;
     }

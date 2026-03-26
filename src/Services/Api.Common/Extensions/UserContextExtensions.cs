@@ -9,12 +9,12 @@ public static class UserContextExtensions
     {
         return userContext.Roles.Contains(role);
     }
-    
+
     public static bool ContainsPermission(this IUserContext userContext, string permission)
     {
         return userContext.Permissions.Contains(permission);
     }
-    
+
     public static bool ContainsPermission(this IUserContext userContext, Enum permission)
     {
         return userContext.Permissions.Contains(permission.ToNormalizedPermission());

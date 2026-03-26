@@ -1,4 +1,5 @@
 ﻿// ReSharper disable InconsistentNaming
+
 namespace Enums;
 
 public enum PermissionCodes
@@ -15,13 +16,13 @@ public enum PermissionCodes
     ARTICLE_SIZES_CREATE,
     ARTICLE_SIZES_UPDATE,
     ARTICLE_SIZES_DELETE,
-    
+
     // ===== ARTICLE / WEIGHT =====
     ARTICLE_WEIGHT_GET,
     ARTICLE_WEIGHT_CREATE,
     ARTICLE_WEIGHT_UPDATE,
     ARTICLE_WEIGHT_DELETE,
-    
+
     // ===== PRODUCERS =====
     PRODUCERS_CREATE,
     PRODUCERS_EDIT,
@@ -113,6 +114,7 @@ public enum PermissionCodes
     STORAGE_ROUTES_CREATE,
     STORAGE_ROUTES_EDIT,
     STORAGE_ROUTES_DELETE,
+
     // ===== USERS =====
     USERS_CREATE,
     USERS_GET,
@@ -130,16 +132,16 @@ public enum PermissionCodes
     // ===== PERMISSIONS =====
     PERMISSIONS_CREATE,
     PERMISSIONS_GET,
-    
+
     // ===== CART =====
     CART_ADD,
     CART_GET,
     CART_DELETE,
     CART_UPDATE,
-    
+
     // ===== OPTIONS =====
     OPTIONS_GET,
-    
+
     // ===== LOGISTICS =====
-    LOGISTICS_CALCULATE,
+    LOGISTICS_CALCULATE
 }

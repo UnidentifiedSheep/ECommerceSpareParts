@@ -16,11 +16,11 @@ public class LocalizationTests
     {
         using var scoped = await CreateLocalizer(path, locale);
         scoped.SetLocale(locale);
-        
+
         var exceptionTypes = exceptionsAssembly.DefinedTypes
             .Where(t => typeof(ILocalizableException).IsAssignableFrom(t)
                         && t is { IsAbstract: false, IsInterface: false });
-        
+
         foreach (var type in exceptionTypes)
         {
             var instances = CreateExceptionInstances(type);
@@ -34,7 +34,7 @@ public class LocalizationTests
 
                 var args = ex.Arguments ?? [];
 
-                Action act = () => { _ = string.Format(template, args); };
+                var act = () => { _ = string.Format(template, args); };
                 act.Should().NotThrow($"Formatting failed for key '{ex.MessageKey}'");
             }
         }
@@ -44,13 +44,13 @@ public class LocalizationTests
     {
         using var scoped = await CreateLocalizer(path, locale);
         scoped.SetLocale(locale);
-        
+
         var validatorTypes = validatorsAssembly.DefinedTypes
             .Where(t => t is { IsAbstract: false, IsInterface: false })
             .Where(t => t.GetInterfaces()
                 .Any(i => i.IsGenericType &&
                           i.GetGenericTypeDefinition() == typeof(IValidator<>)));
-        
+
         foreach (var type in validatorTypes)
         {
             var validator = CreateValidator(type);
@@ -58,8 +58,8 @@ public class LocalizationTests
             var descriptor = validator.CreateDescriptor();
             var membersAndValidators = descriptor.GetMembersWithValidators()
                 .SelectMany(x => x.ToList());
-                
-                
+
+
             foreach (var (v, o) in membersAndValidators)
             {
                 var errorCode = o.ErrorCode;
@@ -68,12 +68,12 @@ public class LocalizationTests
                     continue;
 
                 var success = scoped.TryGet(errorCode, out _);
-                    
+
                 success.Should().BeTrue($"Missing key '{errorCode}' in {type.Name}");
             }
         }
     }
-    
+
     private static IValidator CreateValidator(Type type)
     {
         var ctor = type.GetConstructors().First();
@@ -89,13 +89,13 @@ public class LocalizationTests
     {
         var jsonLoader = new JsonLocalizerContainerLoader(path);
         var container = new LocalizerContainer(locale);
-        
+
         await jsonLoader.LoadAsync([container]);
-        
+
         var localizer = new StringLocalizer([container]);
         return new ScopedStringLocalizer(localizer);
     }
-    
+
     private static IEnumerable<ILocalizableException> CreateExceptionInstances(Type type)
     {
         var result = new List<ILocalizableException>();
@@ -122,56 +122,55 @@ public class LocalizationTests
     }
 
     private static object? GetDefault(Type type)
-{
-    if (type == typeof(string)) return "test";
-    if (type == typeof(Guid)) return Guid.NewGuid();
-    if (type == typeof(int)) return 1;
-    if (type == typeof(long)) return 1L;
-    if (type == typeof(decimal)) return 1m;
-    if (type == typeof(double)) return 1.0;
-    if (type == typeof(bool)) return true;
-
-    if (type.IsArray)
     {
-        var elementType = type.GetElementType()!;
-        var array = Array.CreateInstance(elementType, 1);
-        array.SetValue(GetDefault(elementType), 0);
-        return array;
-    }
+        if (type == typeof(string)) return "test";
+        if (type == typeof(Guid)) return Guid.NewGuid();
+        if (type == typeof(int)) return 1;
+        if (type == typeof(long)) return 1L;
+        if (type == typeof(decimal)) return 1m;
+        if (type == typeof(double)) return 1.0;
+        if (type == typeof(bool)) return true;
 
-    if (type.IsGenericType)
-    {
-        var genericType = type.GetGenericTypeDefinition();
-        var argType = type.GetGenericArguments()[0];
-
-        if (typeof(IEnumerable<>).IsAssignableFrom(genericType) ||
-            typeof(ICollection<>).IsAssignableFrom(genericType) ||
-            typeof(IList<>).IsAssignableFrom(genericType) ||
-            genericType == typeof(List<>))
+        if (type.IsArray)
         {
-            var listType = typeof(List<>).MakeGenericType(argType);
-            var list = (IList)Activator.CreateInstance(listType)!;
-            list.Add(GetDefault(argType));
-            return list;
+            var elementType = type.GetElementType()!;
+            var array = Array.CreateInstance(elementType, 1);
+            array.SetValue(GetDefault(elementType), 0);
+            return array;
         }
+
+        if (type.IsGenericType)
+        {
+            var genericType = type.GetGenericTypeDefinition();
+            var argType = type.GetGenericArguments()[0];
+
+            if (typeof(IEnumerable<>).IsAssignableFrom(genericType) ||
+                typeof(ICollection<>).IsAssignableFrom(genericType) ||
+                typeof(IList<>).IsAssignableFrom(genericType) ||
+                genericType == typeof(List<>))
+            {
+                var listType = typeof(List<>).MakeGenericType(argType);
+                var list = (IList)Activator.CreateInstance(listType)!;
+                list.Add(GetDefault(argType));
+                return list;
+            }
+        }
+
+        if (type.IsGenericType && type.GetGenericTypeDefinition() == typeof(Dictionary<,>))
+        {
+            var args = type.GetGenericArguments();
+            var dict = (IDictionary)Activator.CreateInstance(type)!;
+            dict.Add(GetDefault(args[0])!, GetDefault(args[1])!);
+            return dict;
+        }
+
+        if (type.IsValueType || (!type.IsInterface && !type.IsAbstract))
+            return type.IsValueType ? Activator.CreateInstance(type) : null;
+        var mockType = typeof(Mock<>).MakeGenericType(type);
+        var mock = Activator.CreateInstance(mockType);
+        var objectProperty = mockType
+            .GetProperties(BindingFlags.Public | BindingFlags.Instance)
+            .First(p => p.Name == "Object");
+        return objectProperty.GetValue(mock);
     }
-
-    if (type.IsGenericType && type.GetGenericTypeDefinition() == typeof(Dictionary<,>))
-    {
-        var args = type.GetGenericArguments();
-        var dict = (IDictionary)Activator.CreateInstance(type)!;
-        dict.Add(GetDefault(args[0])!, GetDefault(args[1])!);
-        return dict;
-    }
-
-    if (type.IsValueType || !type.IsInterface && !type.IsAbstract) 
-        return type.IsValueType ? Activator.CreateInstance(type) : null;
-    var mockType = typeof(Mock<>).MakeGenericType(type);
-    var mock = Activator.CreateInstance(mockType);
-    var objectProperty = mockType
-        .GetProperties(BindingFlags.Public | BindingFlags.Instance)
-        .First(p => p.Name == "Object");
-    return objectProperty.GetValue(mock);
-
-}
 }

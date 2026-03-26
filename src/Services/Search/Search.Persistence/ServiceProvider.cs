@@ -2,7 +2,6 @@
 using Lucene.Net.Analysis.Standard;
 using Microsoft.Extensions.DependencyInjection;
 using Search.Abstractions.Interfaces.Persistence;
-using Search.Enums;
 using Search.Persistence.Analyzers;
 using Search.Persistence.IndexContexts;
 using Search.Persistence.Interfaces;
@@ -19,13 +18,13 @@ public static class ServiceProvider
     public static IServiceCollection AddPersistenceLayer(this IServiceCollection services, string indexDirectory)
     {
         services.AddSingleton<IIndexDirectory, IndexDirectory>(_ => new IndexDirectory(indexDirectory));
-        
+
         //Analyzers
         services.AddSingleton<StandardAnalyzer>(_ => new StandardAnalyzer(Global.LuceneVersion));
         services.AddSingleton<RussianAnalyzer>(_ => new RussianAnalyzer(Global.LuceneVersion));
-        services.AddSingleton<ArticleAnalyzer>(sp => new ArticleAnalyzer(sp.GetRequiredService<StandardAnalyzer>(), 
+        services.AddSingleton<ArticleAnalyzer>(sp => new ArticleAnalyzer(sp.GetRequiredService<StandardAnalyzer>(),
             sp.GetRequiredService<RussianAnalyzer>()));
-        
+
         services.AddSingleton<IIndexManager, IndexManager>();
         services.AddSingleton<IndexContext, ArticleIndexContext>();
         services.AddSingleton<IndexContext, ArticleSuggestionsContext>();
@@ -37,7 +36,7 @@ public static class ServiceProvider
         services.AddSingleton<IArticleWriteService, ArticleWriteService>();
         services.AddSingleton<IArticleReadService, ArticleReadService>();
         services.AddSingleton<IArticleSuggestionService, ArticleSuggestionService>();
-        
+
         return services;
     }
 }

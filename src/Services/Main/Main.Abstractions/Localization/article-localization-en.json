@@ -9,20 +9,15 @@
     "articles.not.found": "Articles not found.",
     "article.weight.not.found": "Article weight not found.",
     "article.sizes.not.found": "Article sizes not found.",
-
     "article.characteristic.value.must.not.be.empty": "Article characteristic value must not be empty.",
     "article.characteristic.value.min.length": "Article characteristic value must be at least 3 characters long.",
     "article.characteristic.value.max.length": "Article characteristic value must not exceed 128 characters.",
     "article.characteristic.name.max.length": "Article characteristic name must not exceed 128 characters.",
-
     "article.content.self.reference.not.allowed": "Article cannot reference itself as content.",
     "article.content.count.must.be.non.negative": "Quantity must be greater than or equal to 0.",
-
     "article.image.invalid.extension": "File must be a valid image.",
     "article.images.must.not.be.empty": "Image list must not be empty.",
-
     "article.pair.self.reference.not.allowed": "Article cannot be paired with itself.",
-
     "article.reservation.max.count.exceeded": "Maximum 100 reservations can be added at once.",
     "article.reservation.given.price.must.be.positive": "Proposed price must be greater than 0 or not set.",
     "article.reservation.initial.count.must.be.positive": "Initial quantity must be greater than 0.",
@@ -31,33 +26,25 @@
     "article.reservation.buyer.id.must.not.be.empty": "Buyer ID must not be empty.",
     "article.reservation.storage.name.must.not.be.empty": "Storage name must not be empty.",
     "article.reservation.needed.count.must.be.positive": "Requested quantity must be greater than 0.",
-
     "article.create.articles.must.have.at.least.one": "At least one article must be provided.",
     "article.create.articles.max.100.at.once": "Maximum 100 articles can be created at once.",
-
     "article.articleNumber.must.not.be.empty": "Article number must not be empty.",
     "article.articleNumber.min.length.3": "Article number must be at least 3 characters long.",
     "article.articleNumber.max.length.128": "Article number must not exceed 128 characters.",
-
     "article.name.must.not.be.empty": "Article name must not be empty.",
     "article.name.min.length.3": "Article name must be at least 3 characters long.",
     "article.name.max.length.255": "Article name must not exceed 255 characters.",
-
     "article.description.max.length.255": "Article description must not exceed 255 characters.",
     "article.indicator.max.length.24": "Article indicator must not exceed 24 characters.",
-
     "article.linkage.article.cannot.equal.cross.article": "Article cannot be the same as cross article.",
-
     "article.size.height.must.be.greater.than.zero": "Height must be greater than 0.",
     "article.size.height.max.two.decimals": "Height can have at most 2 decimal places.",
     "article.size.width.must.be.greater.than.zero": "Width must be greater than 0.",
     "article.size.width.max.two.decimals": "Width can have at most 2 decimal places.",
     "article.size.length.must.be.greater.than.zero": "Length must be greater than 0.",
     "article.size.length.max.two.decimals": "Length can have at most 2 decimal places.",
-
     "article.weight.must.be.greater.than.zero": "Weight must be greater than 0.",
     "article.weight.max.two.decimals": "Weight can have at most 2 decimal places.",
-
     "article.reservation.search.term.min.length": "Search term must be at least 3 characters long.",
     "article.reservation.similarity.range": "Similarity level must be between 0 and 1."
   }

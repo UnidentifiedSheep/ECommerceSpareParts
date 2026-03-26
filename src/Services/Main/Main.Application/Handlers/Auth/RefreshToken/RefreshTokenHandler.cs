@@ -33,11 +33,12 @@ public class RefreshTokenHandler(
         if (userToken.ExpiresAt < DateTime.UtcNow || userToken.DeviceId != request.DeviceId)
             throw new InvalidTokenException(request.RefreshToken);
 
-        var user = (await userRepository.GetUserByIdAsync(userToken.UserId, false, cancellationToken, x => x.UserInfo))!;
+        var user = (await userRepository.GetUserByIdAsync(userToken.UserId, false, cancellationToken,
+            x => x.UserInfo))!;
         var (roles, permissions) = await rolePermissionService
             .GetUserPermissionsAsync(user.Id, cancellationToken);
 
-        var token = tokenGenerator.CreateToken(user.Adapt<User>(), user.UserInfo!.Adapt<UserInfo>(), 
+        var token = tokenGenerator.CreateToken(user.Adapt<User>(), user.UserInfo!.Adapt<UserInfo>(),
             request.DeviceId, roles, permissions);
         var refreshToken = tokenGenerator.CreateRefreshToken();
 

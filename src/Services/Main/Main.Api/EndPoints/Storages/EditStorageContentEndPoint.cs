@@ -1,4 +1,3 @@
-using System.Security.Claims;
 using Abstractions.Interfaces;
 using Api.Common.Extensions;
 using Carter;
@@ -16,8 +15,11 @@ public class EditStorageContentEndPoint : ICarterModule
 {
     public void AddRoutes(IEndpointRouteBuilder app)
     {
-        app.MapPatch("/storages/content", async (ISender sender, EditStorageContentRequest request,
-                IUserContext user, CancellationToken cancellationToken) =>
+        app.MapPatch("/storages/content", async (
+                ISender sender,
+                EditStorageContentRequest request,
+                IUserContext user,
+                CancellationToken cancellationToken) =>
             {
                 var command = new EditStorageContentCommand(request.EditedFields, user.UserId);
                 await sender.Send(command, cancellationToken);

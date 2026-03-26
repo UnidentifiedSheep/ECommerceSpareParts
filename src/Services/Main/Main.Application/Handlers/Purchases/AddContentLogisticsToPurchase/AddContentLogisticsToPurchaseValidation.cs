@@ -17,7 +17,7 @@ public class AddContentLogisticsToPurchaseValidation : AbstractValidator<AddCont
                 z.RuleFor(x => x.Price)
                     .GreaterThanOrEqualTo(0)
                     .WithLocalizationKey("purchase.content.price.min.zero");
-                
+
                 z.RuleFor(x => x.WeightKg)
                     .GreaterThanOrEqualTo(0)
                     .WithLocalizationKey("purchase.content.weight.min.zero");

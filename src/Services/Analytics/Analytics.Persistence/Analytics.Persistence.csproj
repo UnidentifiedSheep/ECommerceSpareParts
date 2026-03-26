@@ -8,23 +8,23 @@
     </PropertyGroup>
 
     <ItemGroup>
-      <ProjectReference Include="..\..\..\Infrastructure\Persistence\Persistence.csproj" />
-      <ProjectReference Include="..\Analytics.Abstractions\Analytics.Abstractions.csproj" />
-      <ProjectReference Include="..\Analytics.Entities\Analytics.Entities.csproj" />
+        <ProjectReference Include="..\..\..\Infrastructure\Persistence\Persistence.csproj"/>
+        <ProjectReference Include="..\Analytics.Abstractions\Analytics.Abstractions.csproj"/>
+        <ProjectReference Include="..\Analytics.Entities\Analytics.Entities.csproj"/>
     </ItemGroup>
 
     <ItemGroup>
-      <PackageReference Include="BulkValidation.Pgsql" Version="1.0.12" />
-      <PackageReference Include="MassTransit.EntityFrameworkCore" Version="8.5.8" />
-      <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="10.0.0">
-        <PrivateAssets>all</PrivateAssets>
-        <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
-      </PackageReference>
-      <PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="10.0.0">
-        <PrivateAssets>all</PrivateAssets>
-        <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
-      </PackageReference>
-      <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="10.0.0" />
+        <PackageReference Include="BulkValidation.Pgsql" Version="1.0.12"/>
+        <PackageReference Include="MassTransit.EntityFrameworkCore" Version="8.5.8"/>
+        <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="10.0.0">
+            <PrivateAssets>all</PrivateAssets>
+            <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+        </PackageReference>
+        <PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="10.0.0">
+            <PrivateAssets>all</PrivateAssets>
+            <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+        </PackageReference>
+        <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="10.0.0"/>
     </ItemGroup>
 
 </Project>

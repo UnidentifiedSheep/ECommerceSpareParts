@@ -1,11 +1,9 @@
-using System.Security.Claims;
 using Abstractions.Interfaces;
 using Abstractions.Models;
 using Api.Common.Extensions;
 using Carter;
 using Enums;
 using Main.Application.Handlers.Articles.GetArticleCrosses;
-using Main.Enums;
 using Mapster;
 using MediatR;
 using AmwArticleDto = Main.Abstractions.Dtos.Amw.Articles.ArticleFullDto;
@@ -21,8 +19,14 @@ public class GetArticleCrossesEndPoint : ICarterModule
 {
     public void AddRoutes(IEndpointRouteBuilder app)
     {
-        app.MapGet("/articles/{articleId}/crosses/", async (ISender sender, IUserContext user, int articleId,
-                int limit, int page, string? sortBy, CancellationToken token) =>
+        app.MapGet("/articles/{articleId}/crosses/", async (
+                ISender sender,
+                IUserContext user,
+                int articleId,
+                int limit,
+                int page,
+                string? sortBy,
+                CancellationToken token) =>
             {
                 var userId = user.UserId;
                 if (!user.ContainsPermission(PermissionCodes.ARTICLE_CROSSES_GET)) return Results.Forbid();
@@ -39,8 +43,13 @@ public class GetArticleCrossesEndPoint : ICarterModule
             .WithDisplayName("Поиск по кросс номерам");
     }
 
-    private async Task<IResult> GetAmw(ISender sender, int articleId, PaginationModel pagination, string? sortBy,
-        Guid? userId, CancellationToken token)
+    private async Task<IResult> GetAmw(
+        ISender sender,
+        int articleId,
+        PaginationModel pagination,
+        string? sortBy,
+        Guid? userId,
+        CancellationToken token)
     {
         var query = new GetArticleCrossesQuery<AmwArticleDto>(articleId, pagination, sortBy, userId);
         var result = await sender.Send(query, token);
@@ -48,8 +57,13 @@ public class GetArticleCrossesEndPoint : ICarterModule
         return Results.Ok(response);
     }
 
-    private async Task<IResult> GetMember(ISender sender, int articleId, PaginationModel pagination, string? sortBy,
-        Guid? userId, CancellationToken token)
+    private async Task<IResult> GetMember(
+        ISender sender,
+        int articleId,
+        PaginationModel pagination,
+        string? sortBy,
+        Guid? userId,
+        CancellationToken token)
     {
         var query = new GetArticleCrossesQuery<MemberArticleDto>(articleId, pagination, sortBy, userId);
         var result = await sender.Send(query, token);

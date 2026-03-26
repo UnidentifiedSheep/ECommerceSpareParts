@@ -9,36 +9,36 @@
     </PropertyGroup>
 
     <ItemGroup>
-        <PackageReference Include="Carter" Version="10.0.0" />
-        <PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="10.0.0" />
+        <PackageReference Include="Carter" Version="10.0.0"/>
+        <PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="10.0.0"/>
     </ItemGroup>
 
     <ItemGroup>
-      <ProjectReference Include="..\..\..\Infrastructure\Localization.Domain\Localization.Domain.csproj" />
-      <ProjectReference Include="..\..\..\Infrastructure\Localization\Localization.Domain\Localization.Domain.csproj" />
-      <ProjectReference Include="..\..\..\Infrastructure\RabbitMq\RabbitMq.csproj" />
-      <ProjectReference Include="..\..\..\Infrastructure\Security\Security.csproj" />
-      <ProjectReference Include="..\..\Api.Common\Api.Common.csproj" />
-      <ProjectReference Include="..\Analytics.Application\Analytics.Application.csproj" />
-      <ProjectReference Include="..\Analytics.Persistence\Analytics.Persistence.csproj" />
+        <ProjectReference Include="..\..\..\Infrastructure\Localization.Domain\Localization.Domain.csproj"/>
+        <ProjectReference Include="..\..\..\Infrastructure\Localization\Localization.Domain\Localization.Domain.csproj"/>
+        <ProjectReference Include="..\..\..\Infrastructure\RabbitMq\RabbitMq.csproj"/>
+        <ProjectReference Include="..\..\..\Infrastructure\Security\Security.csproj"/>
+        <ProjectReference Include="..\..\Api.Common\Api.Common.csproj"/>
+        <ProjectReference Include="..\Analytics.Application\Analytics.Application.csproj"/>
+        <ProjectReference Include="..\Analytics.Persistence\Analytics.Persistence.csproj"/>
     </ItemGroup>
 
     <ItemGroup>
-      <Content Include="..\..\..\..\.dockerignore">
-        <Link>.dockerignore</Link>
-      </Content>
-      <Content Include="..\Analytics.Abstractions\Localization\purchase-fact\purchase-fact-localization-en.json">
-        <Link>Localization\purchase-fact\purchase-fact-localization-en.json</Link>
-        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-      </Content>
-      <Content Include="..\Analytics.Abstractions\Localization\purchase-fact\purchase-fact-localization-ru.json">
-        <Link>Localization\purchase-fact\purchase-fact-localization-ru.json</Link>
-        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-      </Content>
+        <Content Include="..\..\..\..\.dockerignore">
+            <Link>.dockerignore</Link>
+        </Content>
+        <Content Include="..\Analytics.Abstractions\Localization\purchase-fact\purchase-fact-localization-en.json">
+            <Link>Localization\purchase-fact\purchase-fact-localization-en.json</Link>
+            <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+        </Content>
+        <Content Include="..\Analytics.Abstractions\Localization\purchase-fact\purchase-fact-localization-ru.json">
+            <Link>Localization\purchase-fact\purchase-fact-localization-ru.json</Link>
+            <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+        </Content>
     </ItemGroup>
 
     <ItemGroup>
-      <Folder Include="EndPoints\" />
+        <Folder Include="EndPoints\"/>
     </ItemGroup>
 
 </Project>

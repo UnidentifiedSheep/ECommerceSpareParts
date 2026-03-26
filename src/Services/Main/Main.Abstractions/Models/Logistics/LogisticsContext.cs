@@ -1,6 +1,4 @@
-﻿using Main.Enums;
-
-namespace Main.Abstractions.Models.Logistics;
+﻿namespace Main.Abstractions.Models.Logistics;
 
 public class LogisticsContext(decimal priceKg, decimal priceM3, decimal pricePerOrder, decimal? minimumPrice = null)
 {

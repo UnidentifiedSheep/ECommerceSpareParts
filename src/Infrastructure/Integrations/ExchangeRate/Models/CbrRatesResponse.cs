@@ -4,7 +4,7 @@ namespace ExchangeRate.Models;
 
 public class CbrRatesResponse
 {
-    [JsonPropertyName("disclaimer")] 
+    [JsonPropertyName("disclaimer")]
     public string Disclaimer { get; set; } = null!;
 
     [JsonPropertyName("date")]
@@ -16,6 +16,6 @@ public class CbrRatesResponse
     [JsonPropertyName("base")]
     public string Base { get; set; } = null!;
 
-    [JsonPropertyName("rates")] 
+    [JsonPropertyName("rates")]
     public Dictionary<string, decimal> Rates { get; set; } = [];
 }

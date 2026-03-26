@@ -6,7 +6,6 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Test.Common.Extensions;
 using Test.Common.TestContainers.Combined;
-using Tests.MockData;
 using Tests.MockData.DataFactories.Purchase;
 using Tests.TestContexts;
 
@@ -16,12 +15,11 @@ namespace Tests.HandlersTests.Purchases;
 public class CreateFullPurchaseTests : IAsyncLifetime
 {
     private readonly PurchaseTestContext _testContext;
-    
+
     public CreateFullPurchaseTests(CombinedContainerFixture fixture)
     {
         var sp = ServiceProviderForTests.Build(fixture.PostgresConnectionString, fixture.RedisConnectionString);
         _testContext = sp.GetRequiredService<PurchaseTestContext>();
-        
     }
 
     public async Task InitializeAsync()
@@ -38,19 +36,19 @@ public class CreateFullPurchaseTests : IAsyncLifetime
     public async Task CreateFullPurchase_WithoutLogistics_Succeeds()
     {
         var content = NewPurchaseContentDtoFactory.Create(
-            2, 
+            2,
             _testContext.Articles.Select(x => x.Id));
         content.ForEach(x =>
         {
             x.CalculateLogistics = false;
             x.Count = 1;
         });
-        decimal totalSum = content.Sum(x => x.Count * x.Price);
-        
+        var totalSum = content.Sum(x => x.Count * x.Price);
+
         var command = new CreateFullPurchaseCommand(
-            _testContext.User.Id, _testContext.Supplier.Id, _testContext.Currency.Id, _testContext.StorageTo.Name, 
+            _testContext.User.Id, _testContext.Supplier.Id, _testContext.Currency.Id, _testContext.StorageTo.Name,
             DateTime.Now, content, "Full Purchase Comment", null, false, null);
-        
+
 
         var task = async () => await _testContext.Mediator.Send(command);
         await task.Should().NotThrowAsync();
@@ -65,9 +63,9 @@ public class CreateFullPurchaseTests : IAsyncLifetime
 
         var transactions = await GetTransactionsAsync();
         transactions.Should().HaveCount(1);
-        
-        Transaction transaction = transactions[0];
-        
+
+        var transaction = transactions[0];
+
         transaction.SenderId.Should().Be(_testContext.Supplier.Id);
         transaction.ReceiverId.Should().Be(Main.Application.Global.SystemId);
         transaction.TransactionSum.Should().Be(totalSum);
@@ -77,21 +75,22 @@ public class CreateFullPurchaseTests : IAsyncLifetime
     public async Task CreateFullPurchase_WithPayment_Succeeds()
     {
         var content = NewPurchaseContentDtoFactory.Create(
-            1, 
+            1,
             _testContext.Articles.Select(x => x.Id));
 
         var totalSum = content.Sum(x => x.Count * x.Price);
-        
+
         var command = new CreateFullPurchaseCommand(
-            _testContext.User.Id, _testContext.Supplier.Id, _testContext.Currency.Id, _testContext.StorageTo.Name, DateTime.Now,
+            _testContext.User.Id, _testContext.Supplier.Id, _testContext.Currency.Id, _testContext.StorageTo.Name,
+            DateTime.Now,
             content, "Purchase with payment", 500m, false, null);
 
         var task = async () => await _testContext.Mediator.Send(command);
 
         await task.Should().NotThrowAsync();
-        
+
         var transactions = await GetTransactionsAsync();
-        
+
         transactions.Should().HaveCount(2);
         transactions.Should().Contain(x => x.TransactionSum == 500m && x.Status == TransactionStatus.Normal);
         transactions.Should().Contain(x => x.TransactionSum == totalSum && x.Status == TransactionStatus.Purchase);
@@ -101,15 +100,16 @@ public class CreateFullPurchaseTests : IAsyncLifetime
     public async Task CreateFullPurchase_WithLogistics_Succeeds()
     {
         var content = NewPurchaseContentDtoFactory.Create(
-            5, 
+            5,
             _testContext.Articles.Select(x => x.Id));
-        
+
         content.ForEach(x => x.CalculateLogistics = true);
-        
+
         var totalSum = content.Sum(x => x.Count * x.Price);
-        
+
         var command = new CreateFullPurchaseCommand(
-            _testContext.User.Id, _testContext.Supplier.Id, _testContext.Currency.Id, _testContext.StorageTo.Name, DateTime.Now,
+            _testContext.User.Id, _testContext.Supplier.Id, _testContext.Currency.Id, _testContext.StorageTo.Name,
+            DateTime.Now,
             content, "Logistics Purchase", null, true, _testContext.StorageFrom.Name);
 
         var task = async () => await _testContext.Mediator.Send(command);
@@ -123,21 +123,21 @@ public class CreateFullPurchaseTests : IAsyncLifetime
 
         purchase.PurchaseLogistic.Should().NotBeNull();
         purchase.PurchaseLogistic.TransactionId.Should().NotBeNull();
-        
+
         var logisticsNotNull = purchase
             .PurchaseContents
             .Where(x => x.PurchaseContentLogistic != null)
             .ToList();
-        
+
         logisticsNotNull.Count.Should().Be(content.Count);
-        
+
         var index = 0;
         foreach (var con in content)
         {
             if (!con.CalculateLogistics) continue;
             var purchaseContent = logisticsNotNull[index];
             var logistic = purchaseContent.PurchaseContentLogistic;
-            
+
             logistic.Should().NotBeNull();
             con.Count.Should().Be(purchaseContent.Count);
 
@@ -145,10 +145,10 @@ public class CreateFullPurchaseTests : IAsyncLifetime
             logistic.Price.Should().BeGreaterThan(0);
             index++;
         }
-        
+
         var transactions = await GetTransactionsAsync();
         transactions.Should().HaveCount(2);
-        
+
         transactions.Should().Contain(x => x.TransactionSum == totalSum && x.Status == TransactionStatus.Purchase);
         transactions.Should().Contain(x => x.Status == TransactionStatus.Logistics &&
                                            x.ReceiverId == _testContext.Carrier.Id);

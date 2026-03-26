@@ -3,7 +3,7 @@ using Main.Enums;
 
 namespace Main.Entities;
 
-public partial class UserToken
+public class UserToken
 {
     public Guid Id { get; set; }
 

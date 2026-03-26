@@ -1,3 +1,3 @@
 ﻿namespace Contracts.Search;
 
-public record SuggestionRebuildNeededEvent();
+public record SuggestionRebuildNeededEvent;

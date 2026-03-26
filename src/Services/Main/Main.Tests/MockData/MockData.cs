@@ -55,8 +55,11 @@ public static class MockData
         return f.Generate(1).First();
     }
 
-    public static List<StorageContent> CreateStorageContent(IEnumerable<int> availableArticlesIds,
-        IEnumerable<string> availableStorages, IEnumerable<int> availableCurrencyIds, int count)
+    public static List<StorageContent> CreateStorageContent(
+        IEnumerable<int> availableArticlesIds,
+        IEnumerable<string> availableStorages,
+        IEnumerable<int> availableCurrencyIds,
+        int count)
     {
         var articleIds = availableArticlesIds.Distinct().ToList();
         var storages = availableStorages.Distinct().ToList();
@@ -70,8 +73,10 @@ public static class MockData
         return f.Generate(count);
     }
 
-    public static List<NewStorageContentDto> CreateNewStorageContentDto(IEnumerable<int> availableArticlesIds,
-        IEnumerable<int> availableCurrencyIds, int count)
+    public static List<NewStorageContentDto> CreateNewStorageContentDto(
+        IEnumerable<int> availableArticlesIds,
+        IEnumerable<int> availableCurrencyIds,
+        int count)
     {
         var articleIds = availableArticlesIds.Distinct().ToList();
         var currencyIds = availableCurrencyIds.Distinct().ToList();
@@ -84,8 +89,11 @@ public static class MockData
         return f.Generate(count);
     }
 
-    public static List<SaleContentDetail> CreateSaleContentDetails(IEnumerable<int> availableStorageContentIds,
-        IEnumerable<string> availableStorages, IEnumerable<int> availableCurrencyIds, int count)
+    public static List<SaleContentDetail> CreateSaleContentDetails(
+        IEnumerable<int> availableStorageContentIds,
+        IEnumerable<string> availableStorages,
+        IEnumerable<int> availableCurrencyIds,
+        int count)
     {
         var storageContentIds = availableStorageContentIds.Distinct().ToList();
         var storages = availableStorages.Distinct().ToList();
@@ -112,8 +120,12 @@ public static class MockData
         return f.Generate(count);
     }
 
-    public static List<Transaction> CreateTransaction(IEnumerable<Guid> receiverIds, IEnumerable<Guid> senderIds,
-        Guid whoMade, IEnumerable<int> currencyIds, int count)
+    public static List<Transaction> CreateTransaction(
+        IEnumerable<Guid> receiverIds,
+        IEnumerable<Guid> senderIds,
+        Guid whoMade,
+        IEnumerable<int> currencyIds,
+        int count)
     {
         var r = receiverIds.ToList();
         var balanceCounter = new Dictionary<string, decimal>();
@@ -178,7 +190,9 @@ public static class MockData
         return f.Generate(count);
     }
 
-    public static void CreateSaleContentDetail(IEnumerable<SaleContent> saleContents, IEnumerable<int> currencyIds,
+    public static void CreateSaleContentDetail(
+        IEnumerable<SaleContent> saleContents,
+        IEnumerable<int> currencyIds,
         IEnumerable<string> storageNames)
     {
         var faker = new Faker(Locale);

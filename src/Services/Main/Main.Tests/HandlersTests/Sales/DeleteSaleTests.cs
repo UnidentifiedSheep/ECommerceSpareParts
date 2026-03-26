@@ -1,5 +1,4 @@
 using Main.Abstractions.Exceptions.Sales;
-using Main.Application.Configs;
 using Main.Application.Configs.Mapster;
 using Main.Application.Handlers.Sales.DeleteSale;
 using Main.Entities;

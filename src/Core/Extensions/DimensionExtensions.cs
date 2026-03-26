@@ -5,10 +5,14 @@ namespace Extensions;
 public static class DimensionExtensions
 {
     public static decimal ToCubicMeters(decimal length, decimal width, decimal height, DimensionUnit unit)
-        => length.ToMeters(unit) * width.ToMeters(unit) * height.ToMeters(unit);
-    
+    {
+        return length.ToMeters(unit) * width.ToMeters(unit) * height.ToMeters(unit);
+    }
+
     public static decimal ToCubicMeters(decimal length, decimal width, decimal height)
-        => length * width * height;
+    {
+        return length * width * height;
+    }
 
     public static decimal ToMeters(this decimal value, DimensionUnit unit)
     {

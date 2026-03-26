@@ -7,11 +7,13 @@ using Search.Enums;
 
 namespace Search.Application.Handler.Articles.SearchArticles;
 
-public record SearchArticlesQuery(string Query, string? Cursor, int Limit, ArticleSearchVariant SearchVariant) 
+public record SearchArticlesQuery(string Query, string? Cursor, int Limit, ArticleSearchVariant SearchVariant)
     : IQuery<SearchArticlesResult>;
+
 public record SearchArticlesResult(IReadOnlyList<ArticleDto> Articles, string? Cursor);
 
-public class SearchArticlesHandler(IArticleReadService readService) : IQueryHandler<SearchArticlesQuery, SearchArticlesResult>
+public class SearchArticlesHandler(IArticleReadService readService)
+    : IQueryHandler<SearchArticlesQuery, SearchArticlesResult>
 {
     public ValueTask<SearchArticlesResult> Handle(SearchArticlesQuery query, CancellationToken cancellationToken)
     {

@@ -1,6 +1,6 @@
 ﻿namespace Main.Entities;
 
-public partial class UserDiscount
+public class UserDiscount
 {
     public Guid UserId { get; set; }
 

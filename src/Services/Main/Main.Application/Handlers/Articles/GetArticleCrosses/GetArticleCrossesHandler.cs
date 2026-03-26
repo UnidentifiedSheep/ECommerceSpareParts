@@ -17,17 +17,26 @@ public record GetArticleCrossesQuery<TDto>(int ArticleId, PaginationModel Pagina
             Pagination.Size, SortBy);
     }
 
-    public Type GetRelatedType() => typeof(ArticleCross);
-    public int GetDurationSeconds() => 600;
+    public Type GetRelatedType()
+    {
+        return typeof(ArticleCross);
+    }
+
+    public int GetDurationSeconds()
+    {
+        return 600;
+    }
 }
 
 public record GetArticleCrossesResult<TDto>(IEnumerable<TDto> Crosses, TDto RequestedArticle);
 
-public class GetArticleCrossesHandler<TDto>(IArticlesRepository articlesRepository, 
+public class GetArticleCrossesHandler<TDto>(
+    IArticlesRepository articlesRepository,
     IRelatedDataCollector relatedDataCollector)
     : IQueryHandler<GetArticleCrossesQuery<TDto>, GetArticleCrossesResult<TDto>>
 {
-    public async Task<GetArticleCrossesResult<TDto>> Handle(GetArticleCrossesQuery<TDto> request,
+    public async Task<GetArticleCrossesResult<TDto>> Handle(
+        GetArticleCrossesQuery<TDto> request,
         CancellationToken cancellationToken)
     {
         var pagination = request.Pagination;

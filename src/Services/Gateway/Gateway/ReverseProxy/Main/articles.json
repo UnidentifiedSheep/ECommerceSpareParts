@@ -5,130 +5,182 @@
         "ClusterId": "main-cluster",
         "Match": {
           "Path": "/main/articles/{articleId}/contents",
-          "Methods": [ "POST" ]
+          "Methods": [
+            "POST"
+          ]
         },
         "Transforms": [
-          { "PathRemovePrefix": "/main" }
+          {
+            "PathRemovePrefix": "/main"
+          }
         ]
       },
       "create-articles": {
         "ClusterId": "main-cluster",
         "Match": {
           "Path": "/main/articles/",
-          "Methods": [ "POST" ]
+          "Methods": [
+            "POST"
+          ]
         },
         "Transforms": [
-          { "PathRemovePrefix": "/main" }
+          {
+            "PathRemovePrefix": "/main"
+          }
         ]
       },
       "edit-article": {
         "ClusterId": "main-cluster",
         "Match": {
           "Path": "/main/articles/{articleId}",
-          "Methods": [ "PATCH" ]
+          "Methods": [
+            "PATCH"
+          ]
         },
         "Transforms": [
-          { "PathRemovePrefix": "/main" }
+          {
+            "PathRemovePrefix": "/main"
+          }
         ]
       },
       "get-article-content": {
         "ClusterId": "main-cluster",
         "Match": {
           "Path": "/main/articles/{articleId}/contents",
-          "Methods": [ "GET" ]
+          "Methods": [
+            "GET"
+          ]
         },
         "Transforms": [
-          { "PathRemovePrefix": "/main" }
+          {
+            "PathRemovePrefix": "/main"
+          }
         ]
       },
       "get-article-crosses": {
         "ClusterId": "main-cluster",
         "Match": {
           "Path": "/main/articles/{articleId}/crosses/",
-          "Methods": [ "GET" ]
+          "Methods": [
+            "GET"
+          ]
         },
         "Transforms": [
-          { "PathRemovePrefix": "/main" }
+          {
+            "PathRemovePrefix": "/main"
+          }
         ]
       },
       "get-article-images": {
         "ClusterId": "main-cluster",
         "Match": {
           "Path": "/main/articles/imgs",
-          "Methods": [ "GET" ]
+          "Methods": [
+            "GET"
+          ]
         },
         "Transforms": [
-          { "PathRemovePrefix": "/main" }
+          {
+            "PathRemovePrefix": "/main"
+          }
         ]
       },
       "get-article-pairs": {
         "ClusterId": "main-cluster",
         "Match": {
           "Path": "/main/articles/{articleId}/pairs",
-          "Methods": [ "GET" ]
+          "Methods": [
+            "GET"
+          ]
         },
         "Transforms": [
-          { "PathRemovePrefix": "/main" }
+          {
+            "PathRemovePrefix": "/main"
+          }
         ]
       },
       "get-articles": {
         "ClusterId": "main-cluster",
         "Match": {
           "Path": "/main/articles",
-          "Methods": [ "GET" ]
+          "Methods": [
+            "GET"
+          ]
         },
         "Transforms": [
-          { "PathRemovePrefix": "/main" }
+          {
+            "PathRemovePrefix": "/main"
+          }
         ]
       },
       "make-linkage-between-articles": {
         "ClusterId": "main-cluster",
         "Match": {
           "Path": "/main/articles/crosses",
-          "Methods": [ "POST" ]
+          "Methods": [
+            "POST"
+          ]
         },
         "Transforms": [
-          { "PathRemovePrefix": "/main" }
+          {
+            "PathRemovePrefix": "/main"
+          }
         ]
       },
       "map-imgs-to-article": {
         "ClusterId": "main-cluster",
         "Match": {
           "Path": "/main/articles/{articleId}/imgs/",
-          "Methods": [ "POST" ]
+          "Methods": [
+            "POST"
+          ]
         },
         "Transforms": [
-          { "PathRemovePrefix": "/main" }
+          {
+            "PathRemovePrefix": "/main"
+          }
         ]
       },
       "remove-article-content": {
         "ClusterId": "main-cluster",
         "Match": {
           "Path": "/main/articles/{articleId}/contents/{insideArticleId}",
-          "Methods": [ "DELETE" ]
+          "Methods": [
+            "DELETE"
+          ]
         },
         "Transforms": [
-          { "PathRemovePrefix": "/main" }
+          {
+            "PathRemovePrefix": "/main"
+          }
         ]
       },
       "set-article-indicator": {
         "ClusterId": "main-cluster",
         "Match": {
           "Path": "/main/articles/{articleId}/indicator",
-          "Methods": [ "PATCH" ]
+          "Methods": [
+            "PATCH"
+          ]
         },
         "Transforms": [
-          { "PathRemovePrefix": "/main" }
+          {
+            "PathRemovePrefix": "/main"
+          }
         ]
       },
       "set-article-content-count": {
         "ClusterId": "main-cluster",
         "Match": {
           "Path": "/main/articles/{articleId}/contents/{insideArticleId}",
-          "Methods": [ "PATCH" ]
+          "Methods": [
+            "PATCH"
+          ]
         },
         "Transforms": [
-          { "PathRemovePrefix": "/main" }
+          {
+            "PathRemovePrefix": "/main"
+          }
         ]
       }
     }

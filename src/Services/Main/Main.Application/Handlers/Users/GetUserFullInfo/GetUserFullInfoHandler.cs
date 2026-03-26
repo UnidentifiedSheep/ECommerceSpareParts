@@ -9,10 +9,18 @@ using Mapster;
 namespace Main.Application.Handlers.Users.GetUserFullInfo;
 
 public record GetUserFullInfoQuery(Guid UserId) : IQuery<GetUserFullInfoResult>;
-public record GetUserFullInfoResult(UserInfoDto? UserInfo, List<FullEmailDto> Emails, List<RoleDto> Roles, List<PermissionDto> Permissions);
 
-public class GetUserFullInfoHandler(IUserRepository userRepository, IUserEmailRepository userEmailRepository,
-    IUserRoleRepository userRoleRepository, IUserPermissionRepository userPermissionRepository) 
+public record GetUserFullInfoResult(
+    UserInfoDto? UserInfo,
+    List<FullEmailDto> Emails,
+    List<RoleDto> Roles,
+    List<PermissionDto> Permissions);
+
+public class GetUserFullInfoHandler(
+    IUserRepository userRepository,
+    IUserEmailRepository userEmailRepository,
+    IUserRoleRepository userRoleRepository,
+    IUserPermissionRepository userPermissionRepository)
     : IQueryHandler<GetUserFullInfoQuery, GetUserFullInfoResult>
 {
     public async Task<GetUserFullInfoResult> Handle(GetUserFullInfoQuery request, CancellationToken cancellationToken)
@@ -25,8 +33,8 @@ public class GetUserFullInfoHandler(IUserRepository userRepository, IUserEmailRe
             .Select(x => x.Role);
         var additionalPermissions = await userPermissionRepository
             .GetUserPermissionsAsync(request.UserId, false, cancellationToken);
-        
-        return new GetUserFullInfoResult(userInfo.Adapt<UserInfoDto?>(), emails.Adapt<List<FullEmailDto>>(), 
+
+        return new GetUserFullInfoResult(userInfo.Adapt<UserInfoDto?>(), emails.Adapt<List<FullEmailDto>>(),
             roles.Adapt<List<RoleDto>>(), additionalPermissions.Adapt<List<PermissionDto>>());
     }
 }

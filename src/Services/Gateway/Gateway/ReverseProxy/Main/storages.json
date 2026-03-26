@@ -5,90 +5,126 @@
         "ClusterId": "main-cluster",
         "Match": {
           "Path": "/main/storages/content",
-          "Methods": [ "POST" ]
+          "Methods": [
+            "POST"
+          ]
         },
         "Transforms": [
-          { "PathRemovePrefix": "/main" }
+          {
+            "PathRemovePrefix": "/main"
+          }
         ]
       },
       "create-storage": {
         "ClusterId": "main-cluster",
         "Match": {
           "Path": "/main/storages/",
-          "Methods": [ "POST" ]
+          "Methods": [
+            "POST"
+          ]
         },
         "Transforms": [
-          { "PathRemovePrefix": "/main" }
+          {
+            "PathRemovePrefix": "/main"
+          }
         ]
       },
       "delete-storage-content": {
         "ClusterId": "main-cluster",
         "Match": {
           "Path": "/main/storages/content/{contentId}",
-          "Methods": [ "DELETE" ]
+          "Methods": [
+            "DELETE"
+          ]
         },
         "Transforms": [
-          { "PathRemovePrefix": "/main" }
+          {
+            "PathRemovePrefix": "/main"
+          }
         ]
       },
       "delete-storage": {
         "ClusterId": "main-cluster",
         "Match": {
           "Path": "/main/storages/{StorageName}",
-          "Methods": [ "DELETE" ]
+          "Methods": [
+            "DELETE"
+          ]
         },
         "Transforms": [
-          { "PathRemovePrefix": "/main" }
+          {
+            "PathRemovePrefix": "/main"
+          }
         ]
       },
       "edit-storage-content": {
         "ClusterId": "main-cluster",
         "Match": {
           "Path": "/main/storages/content",
-          "Methods": [ "PATCH" ]
+          "Methods": [
+            "PATCH"
+          ]
         },
         "Transforms": [
-          { "PathRemovePrefix": "/main" }
+          {
+            "PathRemovePrefix": "/main"
+          }
         ]
       },
       "edit-storage": {
         "ClusterId": "main-cluster",
         "Match": {
           "Path": "/main/storages/{storageName}",
-          "Methods": [ "PATCH" ]
+          "Methods": [
+            "PATCH"
+          ]
         },
         "Transforms": [
-          { "PathRemovePrefix": "/main" }
+          {
+            "PathRemovePrefix": "/main"
+          }
         ]
       },
       "get-storage-content": {
         "ClusterId": "main-cluster",
         "Match": {
           "Path": "/main/storages/content",
-          "Methods": [ "GET" ]
+          "Methods": [
+            "GET"
+          ]
         },
         "Transforms": [
-          { "PathRemovePrefix": "/main" }
+          {
+            "PathRemovePrefix": "/main"
+          }
         ]
       },
       "get-storages": {
         "ClusterId": "main-cluster",
         "Match": {
           "Path": "/main/storages/",
-          "Methods": [ "GET" ]
+          "Methods": [
+            "GET"
+          ]
         },
         "Transforms": [
-          { "PathRemovePrefix": "/main" }
+          {
+            "PathRemovePrefix": "/main"
+          }
         ]
       },
       "get-storage-by-name": {
         "ClusterId": "main-cluster",
         "Match": {
           "Path": "/main/storages/{name}",
-          "Methods": [ "GET" ]
+          "Methods": [
+            "GET"
+          ]
         },
         "Transforms": [
-          { "PathRemovePrefix": "/main" }
+          {
+            "PathRemovePrefix": "/main"
+          }
         ]
       }
     }

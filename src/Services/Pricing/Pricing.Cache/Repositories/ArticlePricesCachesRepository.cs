@@ -21,39 +21,40 @@ public class ArticlePricesCachesRepository : IArticlePricesCacheRepository
         var key = GetArticleBasePriceKey(item.Id);
         await _cache.StringSetAsync(key, item, ttl);
     }
-    
+
     public void SetArticleBasePrices(IEnumerable<(BasePricingItemResult value, TimeSpan? exp)> items)
     {
         var data = items
-            .Select(x => 
+            .Select(x =>
                 new Tuple<string, BasePricingItemResult, TimeSpan?>
-                    (
-                        GetArticleBasePriceKey(x.value.Id), 
-                        x.value, 
-                        x.exp
-                    )
+                (
+                    GetArticleBasePriceKey(x.value.Id),
+                    x.value,
+                    x.exp
+                )
             );
         _cache.StringBatchSet(data);
     }
-    
+
     public async Task<BasePricingItemResult?> GetArticleBasePrice(int articleId)
     {
         var key = GetArticleBasePriceKey(articleId);
         var result = await _cache.StringGetAsync<BasePricingItemResult>(key);
         return result;
     }
-    
+
     public async Task<Dictionary<int, BasePricingItemResult?>> GetArticleBasePrices(IEnumerable<int> articleIds)
     {
         var ids = articleIds.Distinct().ToList();
         var keys = ids.Select(GetArticleBasePriceKey);
         var result = await _cache.StringsGetAsync<BasePricingItemResult>(keys);
         var dict = new Dictionary<int, BasePricingItemResult?>();
-        for (int i = 0; i < ids.Count; i++)
+        for (var i = 0; i < ids.Count; i++)
         {
             var id = ids[i];
             dict.Add(id, result[i]);
         }
+
         return dict;
     }
 
@@ -63,7 +64,7 @@ public class ArticlePricesCachesRepository : IArticlePricesCacheRepository
         var result = await _cache.StringGetAsync<decimal>(key, "$.finalPrice");
         return result;
     }
-    
+
     public async Task DeleteArticleBasePrice(int articleId)
     {
         var key = GetArticleBasePriceKey(articleId);

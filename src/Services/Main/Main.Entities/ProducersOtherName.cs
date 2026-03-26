@@ -2,7 +2,7 @@
 
 namespace Main.Entities;
 
-public partial class ProducersOtherName
+public class ProducersOtherName
 {
     [ValidateTuple("PK")]
     public int ProducerId { get; set; }

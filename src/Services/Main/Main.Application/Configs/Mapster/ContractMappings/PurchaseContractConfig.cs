@@ -1,8 +1,6 @@
 ﻿using Mapster;
-
 using Purchase = Main.Entities.Purchase;
 using PurchaseContent = Main.Entities.PurchaseContent;
-
 using ContractPurchase = Contracts.Models.Purchase.Purchase;
 using ContractPurchaseContent = Contracts.Models.Purchase.PurchaseContent;
 

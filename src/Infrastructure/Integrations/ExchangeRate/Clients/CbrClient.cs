@@ -17,10 +17,10 @@ public class CbrClient(IHttpClientFactory clientFactory) : IExchangeRateClient
         var response = await _client.GetAsync("", cancellationToken);
         if (!response.IsSuccessStatusCode)
             throw new Exception("Ошибка при получении курсов валют от ЦБР");
-        
-        string json = await response.Content.ReadAsStringAsync(cancellationToken);
-        CbrRatesResponse? result = JsonSerializer.Deserialize<CbrRatesResponse>(json);
-        
+
+        var json = await response.Content.ReadAsStringAsync(cancellationToken);
+        var result = JsonSerializer.Deserialize<CbrRatesResponse>(json);
+
         if (result == null) throw new Exception("Сервер вернул пустой ответ.");
         return new ExchangeRates(result.Base, result.Rates);
     }

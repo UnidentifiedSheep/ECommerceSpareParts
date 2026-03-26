@@ -13,7 +13,8 @@ namespace Main.Application.Handlers.ArticleReservations.EditArticleReservation;
 public record EditArticleReservationCommand(int ReservationId, EditArticleReservationDto NewValue, Guid WhoUpdated)
     : ICommand;
 
-public class EditArticleReservationHandler(IArticleReservationRepository reservationRepository,
+public class EditArticleReservationHandler(
+    IArticleReservationRepository reservationRepository,
     IUnitOfWork unitOfWork) : ICommandHandler<EditArticleReservationCommand>
 {
     public async Task<Unit> Handle(EditArticleReservationCommand request, CancellationToken cancellationToken)

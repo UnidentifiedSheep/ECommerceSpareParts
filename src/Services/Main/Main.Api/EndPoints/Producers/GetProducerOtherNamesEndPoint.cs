@@ -1,7 +1,7 @@
 using Abstractions.Models;
 using Carter;
-using Main.Application.Handlers.Producers.GetProducerOtherNames;
 using Main.Abstractions.Dtos.Amw.Producers;
+using Main.Application.Handlers.Producers.GetProducerOtherNames;
 using Mapster;
 using MediatR;
 
@@ -20,7 +20,7 @@ public class GetProducerOtherNamesEndPoint : ICarterModule
                     var result = await sender.Send(query, token);
                     return Results.Ok(result.Adapt<GetProducerOtherNamesResponse>());
                 }).WithTags("Producers")
-                .WithDisplayName("Получение дополнительных имен производителя")
-                .WithDescription("Дополнительные имена производителя");
+            .WithDisplayName("Получение дополнительных имен производителя")
+            .WithDescription("Дополнительные имена производителя");
     }
 }

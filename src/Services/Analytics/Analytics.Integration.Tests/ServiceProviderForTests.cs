@@ -3,16 +3,17 @@ using Abstractions.Interfaces.Currency;
 using Analytics.Application;
 using Analytics.Application.Configs.Mapster;
 using Analytics.Integration.Tests.MockData;
-using Microsoft.Extensions.DependencyInjection;
 using Analytics.Persistence;
 using Analytics.Persistence.Context;
 using Localization.Domain.Extensions;
 using MassTransit;
+using Microsoft.Extensions.DependencyInjection;
 using Persistence.Extensions;
 using Redis;
 using Test.Common.Extensions;
 using Test.Common.Stubs;
 using MsServiceProvider = Microsoft.Extensions.DependencyInjection.ServiceProvider;
+
 namespace Analytics.Integration.Tests;
 
 public static class ServiceProviderForTests
@@ -27,28 +28,28 @@ public static class ServiceProviderForTests
             var scope = _serviceProvider!.CreateScope();
             return scope.ServiceProvider;
         }
-        
-        var locales = new[] {"ru-RU", "en-EN"};
-        string localesPath = Assembly.GetExecutingAssembly().Location;
+
+        var locales = new[] { "ru-RU", "en-EN" };
+        var localesPath = Assembly.GetExecutingAssembly().Location;
         localesPath = Path.Combine(Path.GetDirectoryName(localesPath)!, "Localization");
-        
+
         IServiceCollection services = new ServiceCollection();
-        
+
         services.AddLogging();
-        
+
         services.AddPersistenceLayer(postgresConnectionString)
             .AddApplicationLayer()
             .AddLocalization(locales)
             .AddCacheLayer(redisConnectionString);
 
         services.RegisterTestContexts();
-        
+
         services.AddTransient<IPublishEndpoint, MessageBrokerStub>();
         MapsterConfig.Configure();
-        
+
         var serviceProvider = services.BuildServiceProvider();
         _serviceProvider = serviceProvider;
-        
+
         SeedDb(serviceProvider).Wait();
         SetupPrice(_serviceProvider).Wait();
         serviceProvider.LoadLocalesFromJson(localesPath).Wait();
@@ -56,13 +57,13 @@ public static class ServiceProviderForTests
         _isConfiguredBefore = true;
         return serviceProvider;
     }
-    
+
     private static async Task SeedDb(IServiceProvider serviceProvider)
     {
         using var scope = serviceProvider.CreateScope();
         await scope.SeedAsync<DContext>();
     }
-    
+
     private static async Task SetupPrice(IServiceProvider serviceProvider)
     {
         using var scope = serviceProvider.CreateScope();

@@ -1,4 +1,3 @@
-using System.Security.Claims;
 using Abstractions.Interfaces;
 using Api.Common.Extensions;
 using Carter;
@@ -33,10 +32,10 @@ public class CreateSaleEndPoint : ICarterModule
                     await sender.Send(command, token);
                     return Results.Ok();
                 }).WithTags("Sales")
-                .WithDescription("Создание новой продажи")
-                .WithDisplayName("Создание новой продажи")
-                .Produces(200)
-                .Produces(401)
-                .RequireAnyPermission("SALES.CREATE");
+            .WithDescription("Создание новой продажи")
+            .WithDisplayName("Создание новой продажи")
+            .Produces(200)
+            .Produces(401)
+            .RequireAnyPermission("SALES.CREATE");
     }
 }

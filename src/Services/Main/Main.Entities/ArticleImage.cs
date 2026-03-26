@@ -1,6 +1,6 @@
 ﻿namespace Main.Entities;
 
-public partial class ArticleImage
+public class ArticleImage
 {
     public string Path { get; set; } = null!;
 

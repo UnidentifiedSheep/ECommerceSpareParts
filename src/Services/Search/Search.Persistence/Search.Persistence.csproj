@@ -7,22 +7,22 @@
     </PropertyGroup>
 
     <ItemGroup>
-      <PackageReference Include="Lucene.Net" Version="4.8.0-beta00017" />
-      <PackageReference Include="Lucene.Net.Analysis.Common" Version="4.8.0-beta00017" />
-      <PackageReference Include="Lucene.Net.Facet" Version="4.8.0-beta00017" />
-      <PackageReference Include="Lucene.Net.Grouping" Version="4.8.0-beta00017" />
-      <PackageReference Include="Lucene.Net.Queries" Version="4.8.0-beta00017" />
-      <PackageReference Include="Lucene.Net.QueryParser" Version="4.8.0-beta00017" />
-      <PackageReference Include="Lucene.Net.Suggest" Version="4.8.0-beta00017" />
-      <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="10.0.0" />
+        <PackageReference Include="Lucene.Net" Version="4.8.0-beta00017"/>
+        <PackageReference Include="Lucene.Net.Analysis.Common" Version="4.8.0-beta00017"/>
+        <PackageReference Include="Lucene.Net.Facet" Version="4.8.0-beta00017"/>
+        <PackageReference Include="Lucene.Net.Grouping" Version="4.8.0-beta00017"/>
+        <PackageReference Include="Lucene.Net.Queries" Version="4.8.0-beta00017"/>
+        <PackageReference Include="Lucene.Net.QueryParser" Version="4.8.0-beta00017"/>
+        <PackageReference Include="Lucene.Net.Suggest" Version="4.8.0-beta00017"/>
+        <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="10.0.0"/>
     </ItemGroup>
 
     <ItemGroup>
-      <ProjectReference Include="..\..\..\Core\Exceptions\Exceptions.csproj" />
-      <ProjectReference Include="..\..\..\Core\Extensions\Extensions.csproj" />
-      <ProjectReference Include="..\Search.Abstractions\Search.Abstractions.csproj" />
-      <ProjectReference Include="..\Search.Entities\Search.Entities.csproj" />
-      <ProjectReference Include="..\Search.Enums\Search.Enums.csproj" />
+        <ProjectReference Include="..\..\..\Core\Exceptions\Exceptions.csproj"/>
+        <ProjectReference Include="..\..\..\Core\Extensions\Extensions.csproj"/>
+        <ProjectReference Include="..\Search.Abstractions\Search.Abstractions.csproj"/>
+        <ProjectReference Include="..\Search.Entities\Search.Entities.csproj"/>
+        <ProjectReference Include="..\Search.Enums\Search.Enums.csproj"/>
     </ItemGroup>
 
 </Project>

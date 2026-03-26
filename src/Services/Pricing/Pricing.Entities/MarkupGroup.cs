@@ -2,7 +2,7 @@
 
 namespace Pricing.Entities;
 
-public partial class MarkupGroup
+public class MarkupGroup
 {
     [Validate]
     public int Id { get; set; }

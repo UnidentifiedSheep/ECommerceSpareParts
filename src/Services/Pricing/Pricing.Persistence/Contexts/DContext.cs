@@ -21,7 +21,7 @@ public partial class DContext : DbContext
     public virtual DbSet<MarkupRange> MarkupRanges { get; set; }
 
     public virtual DbSet<Setting> Settings { get; set; }
-    
+
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         modelBuilder.AddOutboxMessageEntity();
@@ -31,7 +31,7 @@ public partial class DContext : DbContext
         modelBuilder.Entity<OutboxMessage>().ToTable("OutboxMessage", "msg");
         modelBuilder.Entity<OutboxState>().ToTable("OutboxState", "msg");
         modelBuilder.Entity<InboxState>().ToTable("InboxState", "msg");
-        
+
         modelBuilder.Entity<MarkupGroup>(entity =>
         {
             entity.HasKey(e => e.Id).HasName("markup_group_pk");

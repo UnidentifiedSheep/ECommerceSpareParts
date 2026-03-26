@@ -3,7 +3,7 @@
 public record ValidationStateData
 {
     /// <summary>
-    /// Default true.
+    ///     Default true.
     /// </summary>
     public bool DisplayErrorToUser { get; init; } = true;
 

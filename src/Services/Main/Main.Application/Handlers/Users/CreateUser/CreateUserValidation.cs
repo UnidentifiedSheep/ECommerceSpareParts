@@ -10,8 +10,11 @@ namespace Main.Application.Handlers.Users.CreateUser;
 
 public class CreateUserValidation : AbstractValidator<CreateUserCommand>
 {
-    public CreateUserValidation(IPasswordManager passwordManager, IEmailValidator emailValidator,
-        UserEmailOptions emailOptions, UserPhoneOptions phoneOptions)
+    public CreateUserValidation(
+        IPasswordManager passwordManager,
+        IEmailValidator emailValidator,
+        UserEmailOptions emailOptions,
+        UserPhoneOptions phoneOptions)
     {
         RuleFor(x => x.UserName)
             .SetValidator(new LoginValidator());
@@ -37,8 +40,8 @@ public class CreateUserValidation : AbstractValidator<CreateUserCommand>
 
                 if (primaryCount > 1)
                     context.AddFailure(new ValidationFailure(
-                        propertyName: context.PropertyPath,
-                        errorMessage: "Validation failed")
+                        context.PropertyPath,
+                        "Validation failed")
                     {
                         ErrorCode = "user.email.primary.count",
                         CustomState = null
@@ -46,15 +49,15 @@ public class CreateUserValidation : AbstractValidator<CreateUserCommand>
 
                 if (list.Count > setOfEmails.Count)
                     context.AddFailure(new ValidationFailure(
-                        propertyName: context.PropertyPath,
-                        errorMessage: "Validation failed")
+                        context.PropertyPath,
+                        "Validation failed")
                     {
                         ErrorCode = "user.have.duplicate.email"
                     });
                 if (list.Count < emailOptions.MinEmailCount)
                     context.AddFailure(new ValidationFailure(
-                        propertyName: context.PropertyPath,
-                        errorMessage: "Validation failed")
+                        context.PropertyPath,
+                        "Validation failed")
                     {
                         ErrorCode = "user.min.email.count",
                         CustomState = new ValidationStateData
@@ -64,8 +67,8 @@ public class CreateUserValidation : AbstractValidator<CreateUserCommand>
                     });
                 if (list.Count > emailOptions.MaxEmailCount)
                     context.AddFailure(new ValidationFailure(
-                        propertyName: context.PropertyPath,
-                        errorMessage: "Validation failed")
+                        context.PropertyPath,
+                        "Validation failed")
                     {
                         ErrorCode = "user.max.email.count",
                         CustomState = new ValidationStateData

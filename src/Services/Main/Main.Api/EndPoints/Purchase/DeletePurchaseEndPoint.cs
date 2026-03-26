@@ -1,4 +1,3 @@
-using System.Security.Claims;
 using Abstractions.Interfaces;
 using Api.Common.Extensions;
 using Carter;
@@ -11,8 +10,11 @@ public class DeletePurchaseEndPoint : ICarterModule
 {
     public void AddRoutes(IEndpointRouteBuilder app)
     {
-        app.MapDelete("/purchases/{purchaseId}", async (ISender sender, string purchaseId,
-                IUserContext user, CancellationToken cancellationToken) =>
+        app.MapDelete("/purchases/{purchaseId}", async (
+                ISender sender,
+                string purchaseId,
+                IUserContext user,
+                CancellationToken cancellationToken) =>
             {
                 var command = new DeleteFullPurchaseCommand(purchaseId, user.UserId);
                 await sender.Send(command, cancellationToken);

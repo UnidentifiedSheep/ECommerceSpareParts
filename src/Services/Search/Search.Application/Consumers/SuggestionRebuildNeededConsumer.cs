@@ -7,7 +7,8 @@ using Search.Application.Handler.Articles.RebuildSuggestions;
 
 namespace Search.Application.Consumers;
 
-public class SuggestionRebuildNeededConsumer(IBackgroundTaskQueue taskQueue, IMediator mediator) : IConsumer<SuggestionRebuildNeededEvent>
+public class SuggestionRebuildNeededConsumer(IBackgroundTaskQueue taskQueue, IMediator mediator)
+    : IConsumer<SuggestionRebuildNeededEvent>
 {
     public async Task Consume(ConsumeContext<SuggestionRebuildNeededEvent> context)
     {

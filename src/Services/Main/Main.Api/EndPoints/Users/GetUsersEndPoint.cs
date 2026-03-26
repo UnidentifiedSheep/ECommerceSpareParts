@@ -1,4 +1,3 @@
-using System.Security.Claims;
 using Abstractions.Interfaces;
 using Abstractions.Models;
 using Api.Common.Extensions;
@@ -14,19 +13,32 @@ using Microsoft.AspNetCore.Mvc;
 namespace Main.Api.EndPoints.Users;
 
 public record GetUsersRequest(
-    [FromQuery(Name = "searchTerm")] string? SearchTerm,
-    [FromQuery(Name = "id")] Guid? Id,
-    [FromQuery(Name = "name")] string? Name,
-    [FromQuery(Name = "surname")] string? Surname,
-    [FromQuery(Name = "email")] string? Email,
-    [FromQuery(Name = "phone")] string? Phone,
-    [FromQuery(Name = "userName")] string? UserName,
-    [FromQuery(Name = "isSupplier")] bool? IsSupplier,
-    [FromQuery(Name = "description")] string? Description,
-    [FromQuery(Name = "similarityLevel")] double? SimilarityLevel,
-    [FromQuery(Name = "page")] int Page,
-    [FromQuery(Name = "limit")] int Limit,
-    [FromQuery(Name = "searchMethod")] string SearchMethod);
+    [FromQuery(Name = "searchTerm")]
+    string? SearchTerm,
+    [FromQuery(Name = "id")]
+    Guid? Id,
+    [FromQuery(Name = "name")]
+    string? Name,
+    [FromQuery(Name = "surname")]
+    string? Surname,
+    [FromQuery(Name = "email")]
+    string? Email,
+    [FromQuery(Name = "phone")]
+    string? Phone,
+    [FromQuery(Name = "userName")]
+    string? UserName,
+    [FromQuery(Name = "isSupplier")]
+    bool? IsSupplier,
+    [FromQuery(Name = "description")]
+    string? Description,
+    [FromQuery(Name = "similarityLevel")]
+    double? SimilarityLevel,
+    [FromQuery(Name = "page")]
+    int Page,
+    [FromQuery(Name = "limit")]
+    int Limit,
+    [FromQuery(Name = "searchMethod")]
+    string SearchMethod);
 
 public record GetUsersResponse(IEnumerable<UserDto> Users);
 
@@ -35,11 +47,14 @@ public class GetUsersEndPoint : ICarterModule
     public void AddRoutes(IEndpointRouteBuilder app)
     {
         app.MapGet("/users/",
-                async (ISender sender, [AsParameters] GetUsersRequest request, IUserContext user,
+                async (
+                    ISender sender,
+                    [AsParameters] GetUsersRequest request,
+                    IUserContext user,
                     CancellationToken token) =>
                 {
                     var userId = user.UserId;
-                    
+
                     var pagination = new PaginationModel(request.Page, request.Limit);
                     var query = new GetUsersQuery(request.SearchTerm, pagination, request.SimilarityLevel,
                         userId, request.Name, request.Surname, request.Email, request.Phone, request.UserName,
@@ -50,8 +65,8 @@ public class GetUsersEndPoint : ICarterModule
                     var response = result.Adapt<GetUsersResponse>();
                     return Results.Ok(response);
                 }).WithTags("Users")
-                .WithDescription("Получение пользователей")
-                .WithDisplayName("Получение пользователей")
-                .RequireAnyPermission(PermissionCodes.USERS_GET);
+            .WithDescription("Получение пользователей")
+            .WithDisplayName("Получение пользователей")
+            .RequireAnyPermission(PermissionCodes.USERS_GET);
     }
 }

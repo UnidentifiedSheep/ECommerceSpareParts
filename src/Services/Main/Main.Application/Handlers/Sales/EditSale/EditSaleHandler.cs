@@ -14,12 +14,17 @@ using MediatR;
 namespace Main.Application.Handlers.Sales.EditSale;
 
 [Transactional]
-public record EditSaleCommand(IEnumerable<EditSaleContentDto> EditedContent,
-    IEnumerable<PrevAndNewValue<StorageContent>> StorageContentValues, Dictionary<int, List<SaleContentDetail>> MovedToStorage,
-    string SaleId, int CurrencyId, Guid UpdatedUserId,
-    DateTime SaleDateTime, string? Comment) : ICommand;
+public record EditSaleCommand(
+    IEnumerable<EditSaleContentDto> EditedContent,
+    IEnumerable<PrevAndNewValue<StorageContent>> StorageContentValues,
+    Dictionary<int, List<SaleContentDetail>> MovedToStorage,
+    string SaleId,
+    int CurrencyId,
+    Guid UpdatedUserId,
+    DateTime SaleDateTime,
+    string? Comment) : ICommand;
 
-public class EditSaleHandler(IUnitOfWork unitOfWork, ISaleService saleService, ISaleRepository saleRepository) 
+public class EditSaleHandler(IUnitOfWork unitOfWork, ISaleService saleService, ISaleRepository saleRepository)
     : ICommandHandler<EditSaleCommand>
 {
     public async Task<Unit> Handle(EditSaleCommand request, CancellationToken cancellationToken)
@@ -64,7 +69,9 @@ public class EditSaleHandler(IUnitOfWork unitOfWork, ISaleService saleService, I
         return Unit.Value;
     }
 
-    private void WhenSaleContentNotExists(EditSaleContentDto item, Sale sale,
+    private void WhenSaleContentNotExists(
+        EditSaleContentDto item,
+        Sale sale,
         Dictionary<int, Queue<SaleContentDetail>> detailGroups)
     {
         var saleContent = item.Adapt<SaleContent>();
@@ -76,9 +83,12 @@ public class EditSaleHandler(IUnitOfWork unitOfWork, ISaleService saleService, I
         AssignDetailsToContent(saleContent, queue, counter);
     }
 
-    private void WhenSaleContentExists(EditSaleContentDto item, HashSet<int> deletedContentIds,
+    private void WhenSaleContentExists(
+        EditSaleContentDto item,
+        HashSet<int> deletedContentIds,
         Dictionary<int, SaleContent> saleContents,
-        Dictionary<int, Queue<SaleContentDetail>> detailGroups, Dictionary<int, List<SaleContentDetail>> movedToStorage,
+        Dictionary<int, Queue<SaleContentDetail>> detailGroups,
+        Dictionary<int, List<SaleContentDetail>> movedToStorage,
         Dictionary<int, SaleContentDetail> saleContentDetails)
     {
         deletedContentIds.Remove(item.Id!.Value);
@@ -105,7 +115,8 @@ public class EditSaleHandler(IUnitOfWork unitOfWork, ISaleService saleService, I
         saleContent.Count = item.Count;
     }
 
-    private void ReturnDetailsToStorage(IEnumerable<SaleContentDetail> movedDetails,
+    private void ReturnDetailsToStorage(
+        IEnumerable<SaleContentDetail> movedDetails,
         Dictionary<int, SaleContentDetail> saleContentDetails)
     {
         foreach (var tempDetail in movedDetails)

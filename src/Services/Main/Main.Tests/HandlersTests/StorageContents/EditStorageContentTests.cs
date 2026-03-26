@@ -1,12 +1,11 @@
 using Abstractions.Models;
 using Exceptions.Base;
-using Main.Application.Configs;
-using Main.Application.Handlers.StorageContents.EditContent;
 using Main.Abstractions.Dtos.Amw.Storage;
 using Main.Abstractions.Exceptions.Storages;
-using Main.Entities;
 using Main.Abstractions.Models;
 using Main.Application.Configs.Mapster;
+using Main.Application.Handlers.StorageContents.EditContent;
+using Main.Entities;
 using Main.Persistence.Context;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
@@ -69,7 +68,7 @@ public class EditStorageContentTests : IAsyncLifetime
         };
         var concurrentCode = "";
         var dict = new Dictionary<int, ModelWithCode<PatchStorageContentDto, string>>
-            { [_storageContents.First().Id] = new (dto, concurrentCode) };
+            { [_storageContents.First().Id] = new(dto, concurrentCode) };
 
         var command = new EditStorageContentCommand(dict, _user.Id);
 
@@ -94,7 +93,7 @@ public class EditStorageContentTests : IAsyncLifetime
         };
         var concurrentCode = "";
         var dict = new Dictionary<int, ModelWithCode<PatchStorageContentDto, string>>
-            { [_storageContents.First().Id] = new (dto, concurrentCode) };
+            { [_storageContents.First().Id] = new(dto, concurrentCode) };
 
         var command = new EditStorageContentCommand(dict, _user.Id);
 
@@ -113,7 +112,8 @@ public class EditStorageContentTests : IAsyncLifetime
             }
         };
         var concurrentCode = "";
-        var dict = new Dictionary<int, ModelWithCode<PatchStorageContentDto, string>> { [999999] = new (dto, concurrentCode) };
+        var dict = new Dictionary<int, ModelWithCode<PatchStorageContentDto, string>>
+            { [999999] = new(dto, concurrentCode) };
 
         var command = new EditStorageContentCommand(dict, _user.Id);
 
@@ -144,14 +144,16 @@ public class EditStorageContentTests : IAsyncLifetime
         };
 
         var concurrentCode = "";
-        var dict = new Dictionary<int, ModelWithCode<PatchStorageContentDto, string>> { [content.Id] = new (dto, concurrentCode) };
+        var dict = new Dictionary<int, ModelWithCode<PatchStorageContentDto, string>>
+            { [content.Id] = new(dto, concurrentCode) };
 
         var command = new EditStorageContentCommand(dict, _user.Id);
 
         var ex = await Assert.ThrowsAsync<ConcurrencyCodeMismatchException>(async () => await _mediator.Send(command));
 
         concurrentCode = ex.ServerCode!;
-        dict = new Dictionary<int, ModelWithCode<PatchStorageContentDto, string>> { [content.Id] = new (dto, concurrentCode) };
+        dict = new Dictionary<int, ModelWithCode<PatchStorageContentDto, string>>
+            { [content.Id] = new(dto, concurrentCode) };
         command = new EditStorageContentCommand(dict, _user.Id);
         await _mediator.Send(command);
 
@@ -185,13 +187,13 @@ public class EditStorageContentTests : IAsyncLifetime
         };
         var concurrentCode = "";
         var dict = new Dictionary<int, ModelWithCode<PatchStorageContentDto, string>>
-            { [_storageContents.First().Id] = new (dto, concurrentCode) };
+            { [_storageContents.First().Id] = new(dto, concurrentCode) };
 
         var command = new EditStorageContentCommand(dict, _user.Id);
         var exception = await Assert.ThrowsAsync<ValidationException>(async () => await _mediator.Send(command));
         Assert.Equal("Не удалось найти валюту.", exception.Errors.First().ErrorMessage);
     }
-    
+
 
     [Fact]
     public async Task EditStorageContent_WithMultipleFieldsUpdate_Succeeds()
@@ -217,14 +219,16 @@ public class EditStorageContentTests : IAsyncLifetime
             }
         };
         var concurrentCode = "";
-        var dict = new Dictionary<int, ModelWithCode<PatchStorageContentDto, string>> { [content.Id] = new (dto, concurrentCode) };
+        var dict = new Dictionary<int, ModelWithCode<PatchStorageContentDto, string>>
+            { [content.Id] = new(dto, concurrentCode) };
 
         var command = new EditStorageContentCommand(dict, _user.Id);
 
         var ex = await Assert.ThrowsAsync<ConcurrencyCodeMismatchException>(async () => await _mediator.Send(command));
 
         concurrentCode = ex.ServerCode!;
-        dict = new Dictionary<int, ModelWithCode<PatchStorageContentDto, string>> { [content.Id] = new (dto, concurrentCode) };
+        dict = new Dictionary<int, ModelWithCode<PatchStorageContentDto, string>>
+            { [content.Id] = new(dto, concurrentCode) };
         command = new EditStorageContentCommand(dict, _user.Id);
 
         await _mediator.Send(command);

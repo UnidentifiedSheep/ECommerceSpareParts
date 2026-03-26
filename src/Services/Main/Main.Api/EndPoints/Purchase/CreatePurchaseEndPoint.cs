@@ -1,11 +1,9 @@
-using System.Security.Claims;
 using Abstractions.Interfaces;
 using Api.Common.Extensions;
 using Carter;
 using Enums;
 using Main.Abstractions.Dtos.Amw.Purchase;
 using Main.Application.Handlers.Purchases.CreateFullPurchase;
-using Main.Enums;
 using MediatR;
 
 namespace Main.Api.EndPoints.Purchase;
@@ -26,7 +24,10 @@ public class CreatePurchaseEndPoint : ICarterModule
     public void AddRoutes(IEndpointRouteBuilder app)
     {
         app.MapPost("/purchases/",
-                async (IUserContext user, ISender sender, CreatePurchaseRequest request,
+                async (
+                    IUserContext user,
+                    ISender sender,
+                    CreatePurchaseRequest request,
                     CancellationToken token) =>
                 {
                     var command = new CreateFullPurchaseCommand(user.UserId, request.SupplierId, request.CurrencyId,
@@ -35,8 +36,8 @@ public class CreatePurchaseEndPoint : ICarterModule
                     await sender.Send(command, token);
                     return Results.Ok();
                 }).WithTags("Purchases")
-                .WithDescription("Создание новой закупку")
-                .WithDisplayName("Создание новой закупку")
-                .RequireAnyPermission(PermissionCodes.PURCHASE_CREATE);
+            .WithDescription("Создание новой закупку")
+            .WithDisplayName("Создание новой закупку")
+            .RequireAnyPermission(PermissionCodes.PURCHASE_CREATE);
     }
 }

@@ -1,4 +1,3 @@
-using System.Security.Claims;
 using Abstractions.Interfaces;
 using Api.Common.Extensions;
 using Carter;
@@ -19,11 +18,15 @@ public class CreateTransactionEndPoint : ICarterModule
 {
     public void AddRoutes(IEndpointRouteBuilder app)
     {
-        app.MapPost("/balances/transaction", async (ISender sender, CreateTransactionRequest request,
-                CancellationToken token, IUserContext user) =>
+        app.MapPost("/balances/transaction", async (
+                ISender sender,
+                CreateTransactionRequest request,
+                CancellationToken token,
+                IUserContext user) =>
             {
                 var command = new CreateTransactionCommand(request.SenderId, request.ReceiverId,
-                    request.Amount, request.CurrencyId, user.UserId, request.TransactionDateTime, TransactionStatus.Normal);
+                    request.Amount, request.CurrencyId, user.UserId, request.TransactionDateTime,
+                    TransactionStatus.Normal);
                 await sender.Send(command, token);
                 return Results.Ok();
             }).WithTags("Balances")

@@ -13,10 +13,13 @@ public class CurrencySeed : ISeed<DContext>
             Id = 3,
             ToUsd = 0
         };
-        
+
         await context.Currencies.AddAsync(usd);
         await context.SaveChangesAsync();
     }
 
-    public int GetPriority() => 0;
+    public int GetPriority()
+    {
+        return 0;
+    }
 }

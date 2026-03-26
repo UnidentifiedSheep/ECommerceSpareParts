@@ -7,7 +7,9 @@ namespace Persistence.Services.UnitOfWork;
 
 public class UnitOfWorkBase(DbContext context) : IUnitOfWork
 {
-    public async Task<T> ExecuteWithTransaction<T>(TransactionalAttribute settings, Func<Task<T>> action,
+    public async Task<T> ExecuteWithTransaction<T>(
+        TransactionalAttribute settings,
+        Func<Task<T>> action,
         CancellationToken cancellationToken = default)
     {
         return await context.WithIsolationLevel(settings.IsolationLevel)
@@ -17,7 +19,9 @@ public class UnitOfWorkBase(DbContext context) : IUnitOfWork
             .ExecuteWithTransaction(action, cancellationToken);
     }
 
-    public async Task ExecuteWithTransaction(TransactionalAttribute settings, Func<Task> action,
+    public async Task ExecuteWithTransaction(
+        TransactionalAttribute settings,
+        Func<Task> action,
         CancellationToken cancellationToken = default)
     {
         await context.WithIsolationLevel(settings.IsolationLevel)

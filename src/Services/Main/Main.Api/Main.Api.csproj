@@ -10,41 +10,41 @@
     </PropertyGroup>
 
     <ItemGroup>
-        <PackageReference Include="Carter" Version="10.0.0" />
-        <PackageReference Include="Hangfire.PostgreSql" Version="1.20.12" />
-        <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="9.0.4" />
-        <PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="10.0.0" />
-        <PackageReference Include="OpenTelemetry.Exporter.Prometheus.AspNetCore" Version="1.14.0-beta.1" />
-        <PackageReference Include="OpenTelemetry.Extensions.Hosting" Version="1.14.0" />
-        <PackageReference Include="OpenTelemetry.Instrumentation.AspNetCore" Version="1.14.0" />
-        <PackageReference Include="OpenTelemetry.Instrumentation.Process" Version="1.14.0-beta.2" />
-        <PackageReference Include="OpenTelemetry.Instrumentation.Runtime" Version="1.14.0" />
-        <PackageReference Include="prometheus-net.AspNetCore" Version="8.2.1" />
-        <PackageReference Include="Serilog.Sinks.Loki" Version="4.0.0-beta3" />
-        <PackageReference Include="Swashbuckle.AspNetCore.ReDoc" Version="10.0.1" />
-        <PackageReference Include="Swashbuckle.AspNetCore.Swagger" Version="10.0.1" />
-        <PackageReference Include="Swashbuckle.AspNetCore.SwaggerGen" Version="10.0.1" />
-        <PackageReference Include="Swashbuckle.AspNetCore.SwaggerUI" Version="10.0.1" />
+        <PackageReference Include="Carter" Version="10.0.0"/>
+        <PackageReference Include="Hangfire.PostgreSql" Version="1.20.12"/>
+        <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="9.0.4"/>
+        <PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="10.0.0"/>
+        <PackageReference Include="OpenTelemetry.Exporter.Prometheus.AspNetCore" Version="1.14.0-beta.1"/>
+        <PackageReference Include="OpenTelemetry.Extensions.Hosting" Version="1.14.0"/>
+        <PackageReference Include="OpenTelemetry.Instrumentation.AspNetCore" Version="1.14.0"/>
+        <PackageReference Include="OpenTelemetry.Instrumentation.Process" Version="1.14.0-beta.2"/>
+        <PackageReference Include="OpenTelemetry.Instrumentation.Runtime" Version="1.14.0"/>
+        <PackageReference Include="prometheus-net.AspNetCore" Version="8.2.1"/>
+        <PackageReference Include="Serilog.Sinks.Loki" Version="4.0.0-beta3"/>
+        <PackageReference Include="Swashbuckle.AspNetCore.ReDoc" Version="10.0.1"/>
+        <PackageReference Include="Swashbuckle.AspNetCore.Swagger" Version="10.0.1"/>
+        <PackageReference Include="Swashbuckle.AspNetCore.SwaggerGen" Version="10.0.1"/>
+        <PackageReference Include="Swashbuckle.AspNetCore.SwaggerUI" Version="10.0.1"/>
     </ItemGroup>
 
     <ItemGroup>
-        <ProjectReference Include="..\..\..\Infrastructure\Integrations\ExchangeRate\ExchangeRate.csproj" />
-        <ProjectReference Include="..\..\..\Infrastructure\Mail\Mail.csproj" />
-        <ProjectReference Include="..\..\..\Infrastructure\RabbitMq\RabbitMq.csproj" />
-        <ProjectReference Include="..\..\..\Infrastructure\Redis\Redis.csproj" />
-        <ProjectReference Include="..\..\..\Infrastructure\S3\S3.csproj" />
-        <ProjectReference Include="..\..\..\Infrastructure\Security\Security.csproj" />
-        <ProjectReference Include="..\..\Api.Common\Api.Common.csproj" />
-        <ProjectReference Include="..\..\Application.Common\Application.Common.csproj" />
-        <ProjectReference Include="..\Main.Application\Main.Application.csproj" />
-        <ProjectReference Include="..\Main.Cache\Main.Cache.csproj" />
-        <ProjectReference Include="..\Main.Persistence\Main.Persistence.csproj" />
+        <ProjectReference Include="..\..\..\Infrastructure\Integrations\ExchangeRate\ExchangeRate.csproj"/>
+        <ProjectReference Include="..\..\..\Infrastructure\Mail\Mail.csproj"/>
+        <ProjectReference Include="..\..\..\Infrastructure\RabbitMq\RabbitMq.csproj"/>
+        <ProjectReference Include="..\..\..\Infrastructure\Redis\Redis.csproj"/>
+        <ProjectReference Include="..\..\..\Infrastructure\S3\S3.csproj"/>
+        <ProjectReference Include="..\..\..\Infrastructure\Security\Security.csproj"/>
+        <ProjectReference Include="..\..\Api.Common\Api.Common.csproj"/>
+        <ProjectReference Include="..\..\Application.Common\Application.Common.csproj"/>
+        <ProjectReference Include="..\Main.Application\Main.Application.csproj"/>
+        <ProjectReference Include="..\Main.Cache\Main.Cache.csproj"/>
+        <ProjectReference Include="..\Main.Persistence\Main.Persistence.csproj"/>
     </ItemGroup>
 
     <ItemGroup>
-      <Content Include="..\..\..\..\.dockerignore">
-        <Link>.dockerignore</Link>
-      </Content>
+        <Content Include="..\..\..\..\.dockerignore">
+            <Link>.dockerignore</Link>
+        </Content>
     </ItemGroup>
 
 </Project>

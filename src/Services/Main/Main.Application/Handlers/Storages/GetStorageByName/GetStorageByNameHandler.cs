@@ -7,9 +7,11 @@ using Mapster;
 namespace Main.Application.Handlers.Storages.GetStorageByName;
 
 public record GetStorageByNameQuery(string StorageName) : IQuery<GetStorageByNameResult>;
+
 public record GetStorageByNameResult(StorageDto Storage);
 
-public class GetStorageByNameHandler(IStoragesRepository repository) : IQueryHandler<GetStorageByNameQuery, GetStorageByNameResult>
+public class GetStorageByNameHandler(IStoragesRepository repository)
+    : IQueryHandler<GetStorageByNameQuery, GetStorageByNameResult>
 {
     public async Task<GetStorageByNameResult> Handle(GetStorageByNameQuery request, CancellationToken cancellationToken)
     {

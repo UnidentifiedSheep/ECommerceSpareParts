@@ -45,7 +45,8 @@ public class LoginHandler(
         var ip = request.IpAddress;
         var userAgent = request.UserAgent;
 
-        var token = tokenGenerator.CreateToken(user.Adapt<User>(), user.UserInfo.Adapt<UserInfo>(), deviceId, roles, permissions);
+        var token = tokenGenerator.CreateToken(user.Adapt<User>(), user.UserInfo.Adapt<UserInfo>(), deviceId, roles,
+            permissions);
         var refreshToken = tokenGenerator.CreateRefreshToken();
 
         await userTokenService.AddToken(refreshToken, user.Id, TokenType.RefreshToken, DateTime.UtcNow.AddMonths(1),

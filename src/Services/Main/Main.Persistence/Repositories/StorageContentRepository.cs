@@ -1,4 +1,3 @@
-using System.Linq.Expressions;
 using Main.Abstractions.Interfaces.DbRepositories;
 using Main.Abstractions.Models;
 using Main.Entities;
@@ -11,37 +10,41 @@ namespace Main.Persistence.Repositories;
 
 public class StorageContentRepository(DContext context) : IStorageContentRepository
 {
-    public async Task<List<StorageContentPriceProjection>> GetStorageContentPricingInfo(IEnumerable<int> articleIds, 
-        bool onlyPositiveQty = true, CancellationToken ct = default)
+    public async Task<List<StorageContentPriceProjection>> GetStorageContentPricingInfo(
+        IEnumerable<int> articleIds,
+        bool onlyPositiveQty = true,
+        CancellationToken ct = default)
     {
         var list = await context.Database
             .SqlQuery<StorageContentPriceProjection>($"""
-                                                          SELECT 
-                                                              sc.Id AS StorageContentId,
-                                                              sc.article_id AS ArticleId,
-                                                              sc.currency_id AS CurrencyId,
-                                                              sc.buy_price AS Price,
-                                                              pl.currency_id AS LogisticsCurrencyId,
-                                                              pcl.price AS LogisticsPrice,
-                                                              pc.id AS PurchaseContentId,
-                                                              pc.count AS PurchaseContentCount,
-                                                              sc.purchase_datetime AS PurchaseDatetime,
-                                                              sc.count AS CurrentCount,
-                                                              p.id AS PurchaseId
-                                                          FROM storage_content sc
-                                                          LEFT JOIN purchase_content pc ON sc.id = pc.storage_content_id
-                                                          LEFT JOIN purchase p ON pc.purchase_id = p.Id
-                                                          LEFT JOIN purchase_logistics pl ON p.id = pl.purchase_id
-                                                          LEFT JOIN purchase_content_logistics pcl ON pc.id = pcl.purchase_content_id
-                                                          WHERE sc.article_id = ANY({articleIds})
-                                                            AND ({onlyPositiveQty} OR sc.count > 0)
-                                                          """)
+                                                      SELECT 
+                                                          sc.Id AS StorageContentId,
+                                                          sc.article_id AS ArticleId,
+                                                          sc.currency_id AS CurrencyId,
+                                                          sc.buy_price AS Price,
+                                                          pl.currency_id AS LogisticsCurrencyId,
+                                                          pcl.price AS LogisticsPrice,
+                                                          pc.id AS PurchaseContentId,
+                                                          pc.count AS PurchaseContentCount,
+                                                          sc.purchase_datetime AS PurchaseDatetime,
+                                                          sc.count AS CurrentCount,
+                                                          p.id AS PurchaseId
+                                                      FROM storage_content sc
+                                                      LEFT JOIN purchase_content pc ON sc.id = pc.storage_content_id
+                                                      LEFT JOIN purchase p ON pc.purchase_id = p.Id
+                                                      LEFT JOIN purchase_logistics pl ON p.id = pl.purchase_id
+                                                      LEFT JOIN purchase_content_logistics pcl ON pc.id = pcl.purchase_content_id
+                                                      WHERE sc.article_id = ANY({articleIds})
+                                                        AND ({onlyPositiveQty} OR sc.count > 0)
+                                                      """)
             .ToListAsync(ct);
-        
+
         return list;
     }
 
-    public async Task<IEnumerable<StorageContent>> GetStorageContentsForUpdate(IEnumerable<int> ids, bool track = true,
+    public async Task<IEnumerable<StorageContent>> GetStorageContentsForUpdate(
+        IEnumerable<int> ids,
+        bool track = true,
         CancellationToken cancellationToken = default)
     {
         return await context.StorageContents
@@ -50,9 +53,14 @@ public class StorageContentRepository(DContext context) : IStorageContentReposit
             .ToListAsync(cancellationToken);
     }
 
-    public async Task<IEnumerable<StorageContent>> GetStorageContents(string? storageName, int? articleId, int page,
-        int viewCount, bool showZeroCount,
-        bool track = true, CancellationToken cancellationToken = default)
+    public async Task<IEnumerable<StorageContent>> GetStorageContents(
+        string? storageName,
+        int? articleId,
+        int page,
+        int viewCount,
+        bool showZeroCount,
+        bool track = true,
+        CancellationToken cancellationToken = default)
     {
         var query = context.StorageContents
             .ConfigureTracking(true)
@@ -69,8 +77,12 @@ public class StorageContentRepository(DContext context) : IStorageContentReposit
         return result;
     }
 
-    public async Task<StorageContent?> GetStorageContentForUpdateAsync(int? id, int? articleId, string? storageName,
-        bool track = true, CancellationToken cancellationToken = default)
+    public async Task<StorageContent?> GetStorageContentForUpdateAsync(
+        int? id,
+        int? articleId,
+        string? storageName,
+        bool track = true,
+        CancellationToken cancellationToken = default)
     {
         return await context.StorageContents
             .FromSql($"""
@@ -86,7 +98,8 @@ public class StorageContentRepository(DContext context) : IStorageContentReposit
     }
 
     public async Task<Dictionary<(int contentId, string storageId), StorageContent>> GetStorageContentsForUpdateAsync(
-        IEnumerable<(int contentId, string storageId)> ids, bool track = true,
+        IEnumerable<(int contentId, string storageId)> ids,
+        bool track = true,
         CancellationToken cancellationToken = default)
     {
         var parameters = new List<object>();
@@ -126,8 +139,12 @@ public class StorageContentRepository(DContext context) : IStorageContentReposit
         );
     }
 
-    public IAsyncEnumerable<StorageContent> GetStorageContentsForUpdateAsync(int? articleId, string? storageName,
-        IEnumerable<int>? exceptArticleIds = null, IEnumerable<string>? exceptStorages = null, int countGreaterThen = 0, 
+    public IAsyncEnumerable<StorageContent> GetStorageContentsForUpdateAsync(
+        int? articleId,
+        string? storageName,
+        IEnumerable<int>? exceptArticleIds = null,
+        IEnumerable<string>? exceptStorages = null,
+        int countGreaterThen = 0,
         bool track = true)
     {
         var exceptArticles = exceptArticleIds?.ToList();
@@ -141,20 +158,22 @@ public class StorageContentRepository(DContext context) : IStorageContentReposit
 
         if (exceptArticles != null && exceptArticles.Count != 0)
             query = query.Where(x => !exceptArticles.Contains(x.ArticleId));
-        
+
         if (storageName != null)
             query = query.Where(x => x.StorageName == storageName);
-        
+
         if (exceptStorageNames != null && exceptStorageNames.Count != 0)
             query = query.Where(x => !exceptStorageNames.Contains(x.StorageName));
-        
+
         return query
             .OrderBy(x => x.PurchaseDatetime)
             .ForUpdate()
             .AsAsyncEnumerable();
     }
 
-    public async Task<Dictionary<int, int>> GetStorageContentCounts(string storageName, IEnumerable<int> articleIds,
+    public async Task<Dictionary<int, int>> GetStorageContentCounts(
+        string storageName,
+        IEnumerable<int> articleIds,
         bool takeFromOtherStorages,
         CancellationToken cancellationToken = default)
     {

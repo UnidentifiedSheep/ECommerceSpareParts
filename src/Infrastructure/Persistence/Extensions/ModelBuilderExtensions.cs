@@ -1,4 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 namespace Persistence.Extensions;
 
@@ -12,15 +13,14 @@ public static class ModelBuilderExtensions
                 .Where(p => p.ClrType == typeof(DateTime) || p.ClrType == typeof(DateTime?));
 
             foreach (var prop in dateTimeProps)
-            {
                 prop.SetValueConverter(
-                    new Microsoft.EntityFrameworkCore.Storage.ValueConversion.ValueConverter<DateTime, DateTime>(
+                    new ValueConverter<DateTime, DateTime>(
                         v => v.Kind == DateTimeKind.Utc ? v : v.ToUniversalTime(),
                         v => v.ToUniversalTime()
                     )
                 );
-            }
         }
+
         return modelBuilder;
     }
 
@@ -33,13 +33,12 @@ public static class ModelBuilderExtensions
                 .Where(p => p.PropertyType.IsEnum);
 
             foreach (var property in enumProperties)
-            {
                 modelBuilder
                     .Entity(entityType.ClrType)
                     .Property(property.Name)
                     .HasConversion<string>();
-            }
         }
+
         return modelBuilder;
     }
 }

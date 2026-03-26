@@ -15,14 +15,14 @@ public class AverageBasePriceStrategy : IBasePriceStrategy
 
         decimal priceSum = 0;
         decimal pricesCount = 0;
-        
+
         foreach (var price in list)
         {
             priceSum += price.DeliveryPrice;
             priceSum += price.Price;
             pricesCount++;
         }
-        
+
         return priceSum / pricesCount;
     }
 }

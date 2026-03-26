@@ -10,8 +10,12 @@ namespace Main.Persistence.Repositories;
 
 public class UserPhoneRepository(DContext context) : IUserPhoneRepository
 {
-    public async Task<IEnumerable<UserPhone>> GetUserPhonesAsync(Guid userId, int? limit = null, int? offset = null,
-        bool track = true, CancellationToken cancellationToken = default)
+    public async Task<IEnumerable<UserPhone>> GetUserPhonesAsync(
+        Guid userId,
+        int? limit = null,
+        int? offset = null,
+        bool track = true,
+        CancellationToken cancellationToken = default)
     {
         var query = context.UserPhones
             .ConfigureTracking(track)
@@ -27,14 +31,18 @@ public class UserPhoneRepository(DContext context) : IUserPhoneRepository
         return await query.ToListAsync(cancellationToken);
     }
 
-    public async Task<UserPhone?> GetUserPhoneAsync(Guid id, bool track = true,
+    public async Task<UserPhone?> GetUserPhoneAsync(
+        Guid id,
+        bool track = true,
         CancellationToken cancellationToken = default)
     {
         return await context.UserPhones.ConfigureTracking(track)
             .FirstOrDefaultAsync(x => x.Id == id, cancellationToken);
     }
 
-    public async Task<UserPhone?> GetUserPhoneAsync(string phone, bool track = true,
+    public async Task<UserPhone?> GetUserPhoneAsync(
+        string phone,
+        bool track = true,
         CancellationToken cancellationToken = default)
     {
         var normalizedPhone = phone.ToNormalizedPhoneNumber();
@@ -42,7 +50,9 @@ public class UserPhoneRepository(DContext context) : IUserPhoneRepository
             .FirstOrDefaultAsync(x => x.NormalizedPhone == normalizedPhone, cancellationToken);
     }
 
-    public async Task<UserPhone?> GetUserPrimaryPhoneAsync(Guid userId, bool track = true,
+    public async Task<UserPhone?> GetUserPrimaryPhoneAsync(
+        Guid userId,
+        bool track = true,
         CancellationToken cancellationToken = default)
     {
         return await context.UserPhones.ConfigureTracking(track)
@@ -68,7 +78,8 @@ public class UserPhoneRepository(DContext context) : IUserPhoneRepository
             .AnyAsync(x => x.UserId == userId && x.IsPrimary == true, cancellationToken);
     }
 
-    public async Task<UserPhoneSummary?> GetUserPhoneSummaryAsync(Guid userId,
+    public async Task<UserPhoneSummary?> GetUserPhoneSummaryAsync(
+        Guid userId,
         CancellationToken cancellationToken = default)
     {
         var summary = await context.UserPhones

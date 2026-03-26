@@ -1,4 +1,3 @@
-using System.Security.Claims;
 using Abstractions.Interfaces;
 using Api.Common.Extensions;
 using Carter;
@@ -22,12 +21,15 @@ public class AddVehicleToGarageEndPoint : ICarterModule
                     await sender.Send(command, token);
                     return Results.NoContent();
                 }).WithTags("Users")
-                .WithDescription("Добавление транспортного средства пользователю")
-                .WithDisplayName("Добавление ТС AMW")
-                .RequireAnyPermission(PermissionCodes.USERS_VEHICLES_CREATE_ALL);
+            .WithDescription("Добавление транспортного средства пользователю")
+            .WithDisplayName("Добавление ТС AMW")
+            .RequireAnyPermission(PermissionCodes.USERS_VEHICLES_CREATE_ALL);
 
-        app.MapPost("/users/me/vehicles/", async (ISender sender, AddVehicleToGarageRequest request,
-                IUserContext user, CancellationToken token) =>
+        app.MapPost("/users/me/vehicles/", async (
+                ISender sender,
+                AddVehicleToGarageRequest request,
+                IUserContext user,
+                CancellationToken token) =>
             {
                 var command = new AddVehicleToGarageCommand(request.Vehicle, user.UserId);
                 await sender.Send(command, token);

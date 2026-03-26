@@ -1,4 +1,3 @@
-using System.Security.Claims;
 using Abstractions.Interfaces;
 using Api.Common.Extensions;
 using Carter;
@@ -15,8 +14,11 @@ public class AddContentToStorageEndPoint : ICarterModule
 {
     public void AddRoutes(IEndpointRouteBuilder app)
     {
-        app.MapPost("/storages/content", async (ISender sender, AddContentToStorageRequest request,
-                IUserContext user, CancellationToken cancellationToken) =>
+        app.MapPost("/storages/content", async (
+                ISender sender,
+                AddContentToStorageRequest request,
+                IUserContext user,
+                CancellationToken cancellationToken) =>
             {
                 var command = new AddContentCommand(request.StorageContent, request.StorageName, user.UserId,
                     StorageMovementType.StorageContentAddition);

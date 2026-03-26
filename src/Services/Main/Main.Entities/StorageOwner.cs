@@ -2,7 +2,7 @@
 
 namespace Main.Entities;
 
-public partial class StorageOwner
+public class StorageOwner
 {
     [ValidateTuple("PK")]
     [Validate]

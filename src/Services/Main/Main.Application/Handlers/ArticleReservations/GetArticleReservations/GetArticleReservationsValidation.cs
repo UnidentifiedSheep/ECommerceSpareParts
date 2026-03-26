@@ -15,7 +15,7 @@ public class GetArticleReservationsValidation : AbstractValidator<GetArticleRese
 
         RuleFor(x => x.Pagination)
             .SetValidator(new PaginationValidator());
-        
+
         RuleFor(query => query.Similarity)
             .InclusiveBetween(0, 1)
             .When(x => x.Similarity != null)

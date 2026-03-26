@@ -44,7 +44,7 @@ public class GetArticleCrossesMemberLogSettings : ILoggableRequest<GetArticleCro
         return request.UserId != null && request.UserId != Guid.Empty;
     }
 
-    public  Guid? GetUserId(GetArticleCrossesQuery<MemberArticleDto> request)
+    public Guid? GetUserId(GetArticleCrossesQuery<MemberArticleDto> request)
     {
         return request.UserId;
     }

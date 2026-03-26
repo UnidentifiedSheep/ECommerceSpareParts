@@ -16,11 +16,11 @@ public class DeletePairHandler(IArticlePairsRepository pairsRepository, IUnitOfW
     public async Task<Unit> Handle(DeletePairCommand request, CancellationToken cancellationToken)
     {
         var pairs = (await pairsRepository
-            .GetRelatedPairsAsync(request.ArticleId, true, cancellationToken))
+                .GetRelatedPairsAsync(request.ArticleId, true, cancellationToken))
             .ToList();
 
         if (pairs.Count == 0) throw new ArticlePairNotFoundException(request.ArticleId);
-        
+
         unitOfWork.RemoveRange(pairs);
         await unitOfWork.SaveChangesAsync(cancellationToken);
         return Unit.Value;

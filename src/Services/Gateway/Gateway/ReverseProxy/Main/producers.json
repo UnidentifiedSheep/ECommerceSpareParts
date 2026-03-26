@@ -5,80 +5,112 @@
         "ClusterId": "main-cluster",
         "Match": {
           "Path": "/main/producers/{producerId}/names",
-          "Methods": [ "POST" ]
+          "Methods": [
+            "POST"
+          ]
         },
         "Transforms": [
-          { "PathRemovePrefix": "/main" }
+          {
+            "PathRemovePrefix": "/main"
+          }
         ]
       },
       "create-producer": {
         "ClusterId": "main-cluster",
         "Match": {
           "Path": "/main/producers",
-          "Methods": [ "POST" ]
+          "Methods": [
+            "POST"
+          ]
         },
         "Transforms": [
-          { "PathRemovePrefix": "/main" }
+          {
+            "PathRemovePrefix": "/main"
+          }
         ]
       },
       "delete-producer-other-name": {
         "ClusterId": "main-cluster",
         "Match": {
           "Path": "/main/producers/{producerId}/names/{otherName}",
-          "Methods": [ "DELETE" ]
+          "Methods": [
+            "DELETE"
+          ]
         },
         "Transforms": [
-          { "PathRemovePrefix": "/main" }
+          {
+            "PathRemovePrefix": "/main"
+          }
         ]
       },
       "delete-producer": {
         "ClusterId": "main-cluster",
         "Match": {
           "Path": "/main/producers/{id}",
-          "Methods": [ "DELETE" ]
+          "Methods": [
+            "DELETE"
+          ]
         },
         "Transforms": [
-          { "PathRemovePrefix": "/main" }
+          {
+            "PathRemovePrefix": "/main"
+          }
         ]
       },
       "edit-producer": {
         "ClusterId": "main-cluster",
         "Match": {
           "Path": "/main/producers/{producerId}",
-          "Methods": [ "PATCH" ]
+          "Methods": [
+            "PATCH"
+          ]
         },
         "Transforms": [
-          { "PathRemovePrefix": "/main" }
+          {
+            "PathRemovePrefix": "/main"
+          }
         ]
       },
       "get-producer-other-names": {
         "ClusterId": "main-cluster",
         "Match": {
           "Path": "/main/producers/{producerId}/names",
-          "Methods": [ "GET" ]
+          "Methods": [
+            "GET"
+          ]
         },
         "Transforms": [
-          { "PathRemovePrefix": "/main" }
+          {
+            "PathRemovePrefix": "/main"
+          }
         ]
       },
       "get-producers": {
         "ClusterId": "main-cluster",
         "Match": {
           "Path": "/main/producers",
-          "Methods": [ "GET" ]
+          "Methods": [
+            "GET"
+          ]
         },
         "Transforms": [
-          { "PathRemovePrefix": "/main" }
+          {
+            "PathRemovePrefix": "/main"
+          }
         ]
       },
       "get-producer-by-id": {
         "ClusterId": "main-cluster",
         "Match": {
           "Path": "/main/producers/{id}",
-          "Methods": [ "GET" ]
+          "Methods": [
+            "GET"
+          ]
         },
         "Transforms": [
-          { "PathRemovePrefix": "/main" }
+          {
+            "PathRemovePrefix": "/main"
+          }
         ]
       }
     }

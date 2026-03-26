@@ -2,7 +2,7 @@
 
 namespace Main.Entities;
 
-public partial class PurchaseLogistic
+public class PurchaseLogistic
 {
     public string PurchaseId { get; set; } = null!;
 

@@ -1,7 +1,7 @@
 using Api.Common.Extensions;
 using Carter;
-using Main.Application.Handlers.Articles.MakeLinkageBetweenArticles;
 using Main.Abstractions.Dtos.Amw.Articles;
+using Main.Application.Handlers.Articles.MakeLinkageBetweenArticles;
 using Mapster;
 using MediatR;
 
@@ -20,11 +20,11 @@ public class MakeLinkageBetweenArticlesEndPoint : ICarterModule
                     await sender.Send(command, token);
                     return Results.Created();
                 }).WithTags("Articles")
-                .WithDescription("Создание кроссировки между артикулами")
-                .WithDisplayName("Создание кроссировки")
-                .Produces(201)
-                .ProducesProblem(404)
-                .ProducesProblem(400)
-                .RequireAnyPermission("ARTICLE.CROSSES.CREATE");
+            .WithDescription("Создание кроссировки между артикулами")
+            .WithDisplayName("Создание кроссировки")
+            .Produces(201)
+            .ProducesProblem(404)
+            .ProducesProblem(400)
+            .RequireAnyPermission("ARTICLE.CROSSES.CREATE");
     }
 }

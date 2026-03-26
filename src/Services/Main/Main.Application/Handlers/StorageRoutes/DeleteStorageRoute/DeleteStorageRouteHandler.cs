@@ -10,7 +10,7 @@ namespace Main.Application.Handlers.StorageRoutes.DeleteStorageRoute;
 [Transactional]
 public record DeleteStorageRouteCommand(Guid Id) : ICommand;
 
-public class DeleteStorageRouteHandler(IStorageRoutesRepository storageRoutesRepository, IUnitOfWork unitOfWork) 
+public class DeleteStorageRouteHandler(IStorageRoutesRepository storageRoutesRepository, IUnitOfWork unitOfWork)
     : ICommandHandler<DeleteStorageRouteCommand>
 {
     public async Task<Unit> Handle(DeleteStorageRouteCommand request, CancellationToken cancellationToken)

@@ -2,7 +2,6 @@
 using Carter;
 using Enums;
 using Main.Application.Handlers.ArticleSizes.SetArticleSizes;
-using Main.Enums;
 using MediatR;
 
 namespace Main.Api.EndPoints.ArticleSize;
@@ -13,10 +12,14 @@ public class UpdateArticleSizeEndPoint : ICarterModule
 {
     public void AddRoutes(IEndpointRouteBuilder app)
     {
-        app.MapPut("/articles/{id:int}/sizes", async (ISender sender, int id, 
-                UpdateArticleSizeRequest request, CancellationToken token) =>
+        app.MapPut("/articles/{id:int}/sizes", async (
+                ISender sender,
+                int id,
+                UpdateArticleSizeRequest request,
+                CancellationToken token) =>
             {
-                var command = new SetArticleSizesCommand(id, request.Length, request.Width, request.Height, request.Unit);
+                var command =
+                    new SetArticleSizesCommand(id, request.Length, request.Width, request.Height, request.Unit);
                 await sender.Send(command, token);
                 return Results.NoContent();
             }).WithTags("Article Size")

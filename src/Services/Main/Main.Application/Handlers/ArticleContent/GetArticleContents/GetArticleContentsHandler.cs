@@ -12,7 +12,8 @@ public record GetArticleContentsResult(IEnumerable<ContentArticleDto> Content);
 public class GetArticleContentsHandler(IArticleContentRepository repository)
     : IQueryHandler<GetArticleContentsQuery, GetArticleContentsResult>
 {
-    public async Task<GetArticleContentsResult> Handle(GetArticleContentsQuery request,
+    public async Task<GetArticleContentsResult> Handle(
+        GetArticleContentsQuery request,
         CancellationToken cancellationToken)
     {
         var content = await repository.GetArticleContents(request.ArticleId, false, cancellationToken);

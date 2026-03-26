@@ -9,7 +9,7 @@ public static class SearchCursorExtensions
     {
         return new ScoreDoc(cursor.DocId, cursor.Score, cursor.ShardIndex);
     }
-    
+
     public static SearchCursor ToCursor(this ScoreDoc scoreDoc)
     {
         return new SearchCursor

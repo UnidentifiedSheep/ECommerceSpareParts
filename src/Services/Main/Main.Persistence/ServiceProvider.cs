@@ -54,7 +54,7 @@ public static class ServiceProvider
         collection.AddScoped<ISettingsRepository, SettingsRepository>();
 
         collection.AddScoped<IUnitOfWork, UnitOfWork<DContext>>();
-        
+
         //Seeds
         collection.AddScoped<ISeed<DContext>, PermissionSeed>();
         collection.AddScoped<ISeed<DContext>, RoleSeed>();
@@ -64,8 +64,8 @@ public static class ServiceProvider
 
         collection.AddScoped<IDbValidator, PgsqlDbValidator<DContext>>();
         collection.AddPgsqlDbValidators<DContext>();
-        
-        
+
+
         return collection;
     }
 }

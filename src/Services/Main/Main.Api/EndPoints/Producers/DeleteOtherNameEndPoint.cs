@@ -10,7 +10,11 @@ public class DeleteOtherNameEndPoint : ICarterModule
     public void AddRoutes(IEndpointRouteBuilder app)
     {
         app.MapDelete("/producers/{producerId}/names/{otherName}",
-                async (ISender sender, int producerId, string otherName, string? usage,
+                async (
+                    ISender sender,
+                    int producerId,
+                    string otherName,
+                    string? usage,
                     CancellationToken cancellationToken) =>
                 {
                     var command = new DeleteOtherNameCommand(producerId, otherName, usage);

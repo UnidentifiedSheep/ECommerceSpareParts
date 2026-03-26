@@ -1,5 +1,4 @@
 ﻿using BulkValidation.Core.Interfaces;
-using BulkValidation.Core.Plan;
 
 namespace Application.Common.Abstractions;
 

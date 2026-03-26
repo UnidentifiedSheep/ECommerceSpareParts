@@ -5,43 +5,59 @@
         "ClusterId": "main-cluster",
         "Match": {
           "Path": "/main/currencies",
-          "Methods": [ "POST" ]
+          "Methods": [
+            "POST"
+          ]
         },
         "Transforms": [
-          { "PathRemovePrefix": "/main" }
+          {
+            "PathRemovePrefix": "/main"
+          }
         ]
       },
       "get-currencies": {
         "ClusterId": "main-cluster",
         "Match": {
           "Path": "/main/currencies",
-          "Methods": [ "GET" ]
+          "Methods": [
+            "GET"
+          ]
         },
         "Order": 2,
         "Transforms": [
-          { "PathRemovePrefix": "/main" }
+          {
+            "PathRemovePrefix": "/main"
+          }
         ]
       },
       "get-currency-by-id": {
         "ClusterId": "main-cluster",
         "Match": {
           "Path": "/main/currencies/{id}",
-          "Methods": [ "GET" ]
+          "Methods": [
+            "GET"
+          ]
         },
         "Order": 1,
         "Transforms": [
-          { "PathRemovePrefix": "/main" }
+          {
+            "PathRemovePrefix": "/main"
+          }
         ]
       },
       "get-currency-rates": {
         "ClusterId": "main-cluster",
         "Match": {
           "Path": "/main/currencies/rates",
-          "Methods": [ "GET" ]
+          "Methods": [
+            "GET"
+          ]
         },
         "Order": 1,
         "Transforms": [
-          { "PathRemovePrefix": "/main" }
+          {
+            "PathRemovePrefix": "/main"
+          }
         ]
       }
     }

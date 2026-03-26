@@ -24,8 +24,8 @@ public class CreateMailForUserEndPoint : ICarterModule
                     string? uri = null;
                     return Results.Created(uri, response);
                 }).WithTags("Users")
-                .WithDescription("Создание корпоративной почты для определенного пользователя")
-                .WithDisplayName("Создание почты для пользователя")
-                .RequireAnyPermission("USERS.MAILS.CREATE");
+            .WithDescription("Создание корпоративной почты для определенного пользователя")
+            .WithDisplayName("Создание почты для пользователя")
+            .RequireAnyPermission("USERS.MAILS.CREATE");
     }
 }

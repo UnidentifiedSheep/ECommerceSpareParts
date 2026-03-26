@@ -16,7 +16,11 @@ public class Mail : IMail
         _options = options.Value;
     }
 
-    public async Task SendMailAsync(string receiver, string body = "", string subject = "", HeaderList? headers = null,
+    public async Task SendMailAsync(
+        string receiver,
+        string body = "",
+        string subject = "",
+        HeaderList? headers = null,
         CancellationToken cancellationToken = default)
     {
         var message = new MimeMessage();

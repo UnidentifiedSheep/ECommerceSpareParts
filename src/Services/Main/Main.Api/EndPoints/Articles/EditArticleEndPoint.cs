@@ -1,7 +1,7 @@
 using Api.Common.Extensions;
 using Carter;
-using Main.Application.Handlers.Articles.PatchArticle;
 using Main.Abstractions.Dtos.Amw.Articles;
+using Main.Application.Handlers.Articles.PatchArticle;
 using MediatR;
 
 namespace Main.Api.EndPoints.Articles;
@@ -19,9 +19,9 @@ public class EditArticleEndPoint : ICarterModule
                     await sender.Send(command, token);
                     return Results.NoContent();
                 }).WithTags("Articles")
-                .WithDescription("Редактирование артикула")
-                .WithDisplayName("Редактирование артикула")
-                .Accepts<EditArticleRequest>(false, "application/json")
-                .RequireAnyPermission("ARTICLES.EDIT");
+            .WithDescription("Редактирование артикула")
+            .WithDisplayName("Редактирование артикула")
+            .Accepts<EditArticleRequest>(false, "application/json")
+            .RequireAnyPermission("ARTICLES.EDIT");
     }
 }

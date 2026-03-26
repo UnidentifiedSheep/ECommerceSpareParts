@@ -7,7 +7,8 @@ using Mapster;
 
 namespace Main.Application.Handlers.Storages.GetStorage;
 
-public record GetStoragesQuery(PaginationModel Pagination, string? SearchTerm, StorageType? Type) : IQuery<GetStoragesResult>;
+public record GetStoragesQuery(PaginationModel Pagination, string? SearchTerm, StorageType? Type)
+    : IQuery<GetStoragesResult>;
 
 public record GetStoragesResult(IEnumerable<StorageDto> Storages);
 

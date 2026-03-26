@@ -1,6 +1,5 @@
 using Application.Common.Validators;
 using FluentValidation;
-using Main.Application.Handlers.BaseValidators;
 using AmwArticleDto = Main.Abstractions.Dtos.Amw.Articles.ArticleFullDto;
 using MemberArticleDto = Main.Abstractions.Dtos.Member.Articles.ArticleFullDto;
 

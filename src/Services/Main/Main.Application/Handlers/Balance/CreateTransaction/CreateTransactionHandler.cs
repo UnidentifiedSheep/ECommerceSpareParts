@@ -21,10 +21,13 @@ public record CreateTransactionCommand(
 
 public record CreateTransactionResult(Transaction Transaction);
 
-public class CreateTransactionHandler(IBalanceRepository balanceRepository, IBalanceService balanceService,
+public class CreateTransactionHandler(
+    IBalanceRepository balanceRepository,
+    IBalanceService balanceService,
     IUnitOfWork unitOfWork) : ICommandHandler<CreateTransactionCommand, CreateTransactionResult>
 {
-    public async Task<CreateTransactionResult> Handle(CreateTransactionCommand request,
+    public async Task<CreateTransactionResult> Handle(
+        CreateTransactionCommand request,
         CancellationToken cancellationToken)
     {
         var senderId = request.SenderId;
@@ -51,9 +54,14 @@ public class CreateTransactionHandler(IBalanceRepository balanceRepository, IBal
         return new CreateTransactionResult(transaction);
     }
 
-    private Transaction CreateTransaction(Guid senderId, Guid receiverId, int currencyId,
+    private Transaction CreateTransaction(
+        Guid senderId,
+        Guid receiverId,
+        int currencyId,
         Guid whoCreatedTransaction,
-        decimal amount, DateTime transactionDateTime, TransactionStatus transactionStatus,
+        decimal amount,
+        DateTime transactionDateTime,
+        TransactionStatus transactionStatus,
         Transaction? prevSenderTransaction,
         Transaction? prevReceiverTransaction)
     {

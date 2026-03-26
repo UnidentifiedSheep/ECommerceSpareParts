@@ -39,18 +39,20 @@ namespace Main.Application;
 
 public static class ServiceProvider
 {
-    public static IServiceCollection AddApplicationLayer(this IServiceCollection collection,
-        UserEmailOptions? emailOptions = null, UserPhoneOptions? phoneOptions = null)
+    public static IServiceCollection AddApplicationLayer(
+        this IServiceCollection collection,
+        UserEmailOptions? emailOptions = null,
+        UserPhoneOptions? phoneOptions = null)
     {
         var relatedDataTtl = TimeSpan.FromHours(10);
 
         collection.AddSingleton<UpdateCurrencyRate>();
         collection.AddSingleton(emailOptions ?? new UserEmailOptions());
         collection.AddSingleton(phoneOptions ?? new UserPhoneOptions());
-        
+
         collection.AddSingleton<ICurrencyConverter, CurrencyConverter>(_ => new CurrencyConverter(Global.UsdId));
         collection.AddScoped<ICurrencyConverterSetup, CurrencyConverterSetup>();
-        
+
         collection.AddSingleton<ISettingsContainer, SettingsContainer>();
         collection.AddScoped<ISettingsService, SettingsService>();
 
@@ -61,7 +63,7 @@ public static class ServiceProvider
         collection.AddSingleton<ILogisticsPricingStrategy, PerOrderPricing>();
         collection.AddSingleton<ILogisticsPricingStrategy, PerWeightPricing>();
         collection.AddSingleton<ILogisticsCostService, LogisticsCostService>();
-        
+
         collection.AddScoped<IStorageContentService, StorageContentService>();
         collection.AddScoped<IArticlesService, ArticlesService>();
         collection.AddScoped<IBalanceService, BalanceService>();
@@ -118,7 +120,7 @@ public static class ServiceProvider
                             i.GetGenericTypeDefinition() == typeof(ILoggableRequest<>)))
             .WithScopedLifetime()
         );
-        
+
         ValidationConfiguration.Configure();
 
         collection.RegisterDbValidations(Assembly.GetAssembly(typeof(Global)));

@@ -9,7 +9,7 @@ using Search.Persistence.Interfaces.Repositories;
 
 namespace Search.Persistence.Repositories;
 
-internal class ArticleWriteRepository(IIndexManager indexManager) 
+internal class ArticleWriteRepository(IIndexManager indexManager)
     : RepositoryBase<ArticleIndexContext>(indexManager, IndexName.Articles), IArticleWriteRepository
 {
     public void Add(Article article)
@@ -17,16 +17,16 @@ internal class ArticleWriteRepository(IIndexManager indexManager)
         var document = article.ToDocument();
         IndexContext.IndexWriter.UpdateDocument(new Term("IdString", article.Id.ToString()), document);
         IndexContext.IndexWriter.Commit();
-        
+
         IndexContext.ReloadIndex();
     }
-    
+
     public void AddRange(IEnumerable<Article> articles)
     {
         var documents = articles.Select(a => a.ToDocument());
         IndexContext.IndexWriter.UpdateDocuments(new Term("IdString"), documents);
         IndexContext.IndexWriter.Commit();
-        
+
         IndexContext.ReloadIndex();
     }
 

@@ -1,7 +1,6 @@
 using Exceptions.Base;
 using Main.Abstractions.Constants;
 using Main.Abstractions.Exceptions.Storages;
-using Main.Application.Configs;
 using Main.Application.Configs.Mapster;
 using Main.Application.Handlers.StorageContents.DeleteContent;
 using Main.Entities;

@@ -9,7 +9,7 @@ public static partial class NormalizationExtensions
 
     [GeneratedRegex(@"\D")]
     public static partial Regex OnlyDigitsRegex();
-    
+
     public static string ToNormalizedEmail(this string email)
     {
         return email.Trim().ToUpperInvariant();
@@ -21,11 +21,16 @@ public static partial class NormalizationExtensions
         return OnlyDigitsRegex().Replace(source.Trim(), "");
     }
 
-    public static string ToNormalizedPermission(this string permission) =>
-        permission.ToUpperInvariant().Replace('_', '.');
-    public static string ToNormalizedPermission(this Enum permission) =>
-        permission.ToString().ToUpperInvariant().Replace('_', '.');
-    
+    public static string ToNormalizedPermission(this string permission)
+    {
+        return permission.ToUpperInvariant().Replace('_', '.');
+    }
+
+    public static string ToNormalizedPermission(this Enum permission)
+    {
+        return permission.ToString().ToUpperInvariant().Replace('_', '.');
+    }
+
     /// <summary>
     ///     Возвращает нормализованый артикул те состоящий только из букв и цифр.
     /// </summary>

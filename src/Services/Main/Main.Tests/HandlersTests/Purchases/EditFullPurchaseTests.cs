@@ -1,5 +1,4 @@
 ﻿using Enums;
-using Extensions;
 using Main.Abstractions.Dtos.Amw.Purchase;
 using Main.Application.Handlers.ArticleSizes.SetArticleSizes;
 using Main.Application.Handlers.ArticleWeight.SetArticleWeight;
@@ -23,15 +22,15 @@ public class EditFullPurchaseTests : IAsyncLifetime
 {
     private readonly DContext _context;
     private readonly IMediator _mediator;
+    private Article _article = null!;
+    private User _carrier = null!;
 
     private Currency _currency = null!;
-    private Storage _storageTo = null!;
-    private Storage _storageFrom = null!;
-    private User _user = null!;
-    private User _supplier = null!;
-    private User _carrier = null!;
-    private Article _article = null!;
     private Purchase _purchase = null!;
+    private Storage _storageFrom = null!;
+    private Storage _storageTo = null!;
+    private User _supplier = null!;
+    private User _user = null!;
 
     public EditFullPurchaseTests(CombinedContainerFixture fixture)
     {
@@ -55,8 +54,8 @@ public class EditFullPurchaseTests : IAsyncLifetime
         _user = users[0];
         _supplier = users[1];
         _carrier = users[2];
-        
-        
+
+
         Main.Application.Global.SetSystemId(users[3].Id.ToString());
 
         var storages = await _context.Storages.Take(2).ToListAsync();
@@ -75,7 +74,7 @@ public class EditFullPurchaseTests : IAsyncLifetime
             .ThenInclude(x => x.PurchaseContentLogistic)
             .FirstAsync();
     }
-    
+
     public async Task DisposeAsync()
     {
         await _context.ClearDatabase();
@@ -178,12 +177,12 @@ public class EditFullPurchaseTests : IAsyncLifetime
                 CalculateLogistics = true
             }
         };
-        
-        var command = new EditFullPurchaseCommand(content, _purchase.Id, _currency.Id, null, DateTime.UtcNow, 
+
+        var command = new EditFullPurchaseCommand(content, _purchase.Id, _currency.Id, null, DateTime.UtcNow,
             _user.Id, true, _storageFrom.Name);
         await _mediator.Send(command);
     }
-    
+
     private async Task MakeActive(Guid id)
     {
         var route = await _context.StorageRoutes.FirstAsync(x => x.Id == id);

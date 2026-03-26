@@ -9,14 +9,25 @@ namespace Main.Application.Handlers.ArticleSizes.GetArticleSizes;
 
 public record GetArticleSizeQuery(int ArticleId) : IQuery<GetArticleSizeResult>, ICacheableQuery
 {
-    public string GetCacheKey() => string.Format(CacheKeys.ArticleSizeCacheKey, ArticleId);
-    public Type? GetRelatedType() => null;
-    public int GetDurationSeconds() => 3600;
+    public string GetCacheKey()
+    {
+        return string.Format(CacheKeys.ArticleSizeCacheKey, ArticleId);
+    }
+
+    public Type? GetRelatedType()
+    {
+        return null;
+    }
+
+    public int GetDurationSeconds()
+    {
+        return 3600;
+    }
 }
 
 public record GetArticleSizeResult(ArticleSizeDto ArticleSize);
 
-public class GetArticleSizeHandler(IArticleSizesRepository sizesRepository) 
+public class GetArticleSizeHandler(IArticleSizesRepository sizesRepository)
     : IQueryHandler<GetArticleSizeQuery, GetArticleSizeResult>
 {
     public async Task<GetArticleSizeResult> Handle(GetArticleSizeQuery request, CancellationToken cancellationToken)

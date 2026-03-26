@@ -1,10 +1,8 @@
 using System.Reflection;
-using System.Text;
 using Abstractions.Interfaces.Currency;
 using Abstractions.Models;
 using Amazon.S3;
 using Api.Common;
-using Api.Common.ExceptionHandlers;
 using Api.Common.Logging;
 using Api.Common.Middleware;
 using Api.Common.OperationFilters;
@@ -26,11 +24,11 @@ using Main.Application.Consumers;
 using Main.Application.HangFireTasks;
 using Main.Application.Seeding;
 using Main.Cache;
-using Microsoft.AspNetCore.HttpOverrides;
-using OpenTelemetry.Metrics;
 using Main.Persistence;
 using Main.Persistence.Context;
 using MassTransit;
+using Microsoft.AspNetCore.HttpOverrides;
+using OpenTelemetry.Metrics;
 using Persistence.Extensions;
 using RabbitMq.Extensions;
 using RabbitMq.Models;
@@ -65,7 +63,7 @@ Log.Logger = new LoggerConfiguration()
                 new LokiLabel(
                     "env",
                     Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT") ?? "unknown"
-                ),
+                )
             ])
         })
     )
@@ -76,13 +74,10 @@ builder.Host.UseSerilog();
 
 builder.Services.AddOpenApi();
 builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen(c =>
-{
-    c.OperationFilter<PermissionsOperationFilter>();
-});
+builder.Services.AddSwaggerGen(c => { c.OperationFilter<PermissionsOperationFilter>(); });
 
 builder.Services.AddHangfire(x =>
-    x.UsePostgreSqlStorage(z => 
+    x.UsePostgreSqlStorage(z =>
         z.UseNpgsqlConnection(Environment.GetEnvironmentVariable("DB_CONNECTION_STRING"))));
 builder.Services.AddHangfireServer();
 
@@ -105,35 +100,35 @@ var uniqQueueName = $"queue-of-main-{Environment.MachineName}";
 builder.Services.AddMassTransit(x =>
 {
     x.AddConsumers(Assembly.GetAssembly(typeof(Global)));
-    
+
     x.AddEntityFrameworkOutbox<DContext>(o =>
     {
         o.UsePostgres();
         o.UseBusOutbox();
     });
-    
+
     x.UsingRabbitMq((context, cfg) =>
     {
         cfg.ConfigureRabbitMq(brokerOptions);
-        
+
         cfg.ReceiveEndpoint(uniqQueueName, ep =>
         {
             ep.AutoDelete = true;
             ep.Durable = false;
-            
+
             ep.ConfigureConsumeTopology = false;
-            
+
             ep.ConfigureConsumer<SettingChangedConsumer>(context);
             ep.ConfigureConsumer<CurrencyRatesChangedConsumer>(context);
-            
+
             ep.Bind<CurrencyRateChangedEvent>();
             ep.Bind<SettingChangedEvent>();
         });
-        
+
         cfg.ReceiveEndpoint("main-queue", ep =>
         {
             ep.Durable = true;
-            
+
             ep.ConfigureConsumer<GetArticleCoefficientsConsumer>(context);
             ep.ConfigureConsumer<GetCurrenciesConsumer>(context);
             ep.ConfigureConsumer<GetStorageContentCostsConsumer>(context);
@@ -155,9 +150,9 @@ builder.Services
         var config = new AmazonS3Config
         {
             ServiceURL = Environment.GetEnvironmentVariable("S3_URL"),
-            ForcePathStyle = Environment.GetEnvironmentVariable("S3_FORCE_PATH_STYLE") == "true",
+            ForcePathStyle = Environment.GetEnvironmentVariable("S3_FORCE_PATH_STYLE") == "true"
         };
-        return new AmazonS3Client(Environment.GetEnvironmentVariable("S3_LOGIN"), 
+        return new AmazonS3Client(Environment.GetEnvironmentVariable("S3_LOGIN"),
             Environment.GetEnvironmentVariable("S3_PASSWORD"), config);
     })
     .AddApplicationLayer(emailOptions)
@@ -206,14 +201,14 @@ if (Environment.GetEnvironmentVariable("SEED_ADMIN") == "true")
     var login = Environment.GetEnvironmentVariable("SEED_ADMIN_LOGIN");
     if (string.IsNullOrWhiteSpace(login)) login = "Administrator";
     var password = Environment.GetEnvironmentVariable("SEED_ADMIN_PASSWORD");
-    if (string.IsNullOrWhiteSpace(password)) password = "Administrator12345"; 
+    if (string.IsNullOrWhiteSpace(password)) password = "Administrator12345";
     var email = Environment.GetEnvironmentVariable("SEED_ADMIN_EMAIL");
     if (string.IsNullOrWhiteSpace(email)) email = "emailNotProvided@some.com";
-    
+
     await UserSeed.SeedAdmin(login, password, email, app.Services);
 }
-    
-    
+
+
 app.UseMiddleware<HeaderSecretMiddleware>();
 
 app.UseForwardedHeaders(new ForwardedHeadersOptions

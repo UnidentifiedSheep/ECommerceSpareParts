@@ -11,14 +11,29 @@ namespace Main.Api.EndPoints.Sales;
 
 public class GetSalesRequest
 {
-    [FromQuery(Name = "rangeStartDate")] public DateTime RangeStartDate { get; set; }
-    [FromQuery(Name = "rangeEndDate")] public DateTime RangeEndDate { get; set; }
-    [FromQuery(Name = "page")] public int Page { get; set; }
-    [FromQuery(Name = "limit")] public int Limit { get; set; }
-    [FromQuery(Name = "buyerId")] public Guid? BuyerId { get; set; }
-    [FromQuery(Name = "currencyId")] public int? CurrencyId { get; set; }
-    [FromQuery(Name = "sortBy")] public string? SortBy { get; set; }
-    [FromQuery(Name = "searchTerm")] public string? SearchTerm { get; set; }
+    [FromQuery(Name = "rangeStartDate")]
+    public DateTime RangeStartDate { get; set; }
+
+    [FromQuery(Name = "rangeEndDate")]
+    public DateTime RangeEndDate { get; set; }
+
+    [FromQuery(Name = "page")]
+    public int Page { get; set; }
+
+    [FromQuery(Name = "limit")]
+    public int Limit { get; set; }
+
+    [FromQuery(Name = "buyerId")]
+    public Guid? BuyerId { get; set; }
+
+    [FromQuery(Name = "currencyId")]
+    public int? CurrencyId { get; set; }
+
+    [FromQuery(Name = "sortBy")]
+    public string? SortBy { get; set; }
+
+    [FromQuery(Name = "searchTerm")]
+    public string? SearchTerm { get; set; }
 }
 
 public record GetSalesResponse(IEnumerable<SaleDto> Sales);

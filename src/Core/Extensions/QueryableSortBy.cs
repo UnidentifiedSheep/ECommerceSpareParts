@@ -18,7 +18,9 @@ public static class QueryableSortBy
         return Delimiter;
     }
 
-    public static TSource Map<TSource, TKey>(this TSource src, string source,
+    public static TSource Map<TSource, TKey>(
+        this TSource src,
+        string source,
         Expression<Func<TSource, TKey>> keySelector)
     {
         var type = typeof(TSource);
@@ -82,13 +84,15 @@ public static class QueryableSortBy
         return sortWay == "asc" ? src.SortByAscending(mapping) : src.SortByDescending(mapping);
     }
 
-    private static IOrderedQueryable<TSource> SortByDescending<TSource>(this IQueryable<TSource> src,
+    private static IOrderedQueryable<TSource> SortByDescending<TSource>(
+        this IQueryable<TSource> src,
         Expression<Func<TSource, object>> mapping)
     {
         return src.OrderByDescending(mapping);
     }
 
-    private static IOrderedQueryable<TSource> SortByAscending<TSource>(this IQueryable<TSource> src,
+    private static IOrderedQueryable<TSource> SortByAscending<TSource>(
+        this IQueryable<TSource> src,
         Expression<Func<TSource, object>> mapping)
     {
         return src.OrderBy(mapping);

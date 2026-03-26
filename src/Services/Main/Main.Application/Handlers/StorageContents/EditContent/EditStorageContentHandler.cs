@@ -19,7 +19,8 @@ using MediatR;
 namespace Main.Application.Handlers.StorageContents.EditContent;
 
 [Transactional(IsolationLevel.Serializable, 20, 2)]
-public record EditStorageContentCommand(Dictionary<int, ModelWithCode<PatchStorageContentDto, string>> EditedFields,
+public record EditStorageContentCommand(
+    Dictionary<int, ModelWithCode<PatchStorageContentDto, string>> EditedFields,
     Guid UserId) : ICommand;
 
 public class EditStorageContentHandler(
@@ -65,17 +66,19 @@ public class EditStorageContentHandler(
         if (toIncrement.Count > 0)
             await articlesService.UpdateArticlesCount(toIncrement, cancellationToken);
         await unitOfWork.AddRangeAsync(storageMovements, cancellationToken);
-        
-        await publishEndpoint.Publish(new ArticleBuyPricesChangedEvent { ArticleIds = articleIds}, cancellationToken);
-        
+
+        await publishEndpoint.Publish(new ArticleBuyPricesChangedEvent { ArticleIds = articleIds }, cancellationToken);
+
         await unitOfWork.SaveChangesAsync(cancellationToken);
 
         await mediator.Publish(new ArticlesUpdatedNotification(articleIds), cancellationToken);
         return Unit.Value;
     }
 
-    private (int diff, StorageMovement? movement) CalculateDiffAndMovement(StorageContent content,
-        PatchStorageContentDto patch, Guid userId)
+    private (int diff, StorageMovement? movement) CalculateDiffAndMovement(
+        StorageContent content,
+        PatchStorageContentDto patch,
+        Guid userId)
     {
         if (!patch.Count.IsSet || patch.Count.Value == content.Count)
             return (0, null);

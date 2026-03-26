@@ -1,6 +1,6 @@
 ﻿namespace Main.Entities;
 
-public partial class StorageContentReservation
+public class StorageContentReservation
 {
     public int Id { get; set; }
 

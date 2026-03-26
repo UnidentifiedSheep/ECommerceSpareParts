@@ -39,7 +39,7 @@ builder.Services.AddMassTransit(x =>
     x.UsingRabbitMq((context, cfg) =>
     {
         cfg.ConfigureRabbitMq(brokerOptions);
-        
+
         cfg.ConfigureJsonSerializerOptions(options =>
         {
             options.TypeInfoResolverChain.Insert(0, AppJsonSerializerContext.Default);
@@ -82,7 +82,7 @@ var app = builder.Build();
 
 if (Environment.GetEnvironmentVariable("USE_HTTPS_REDIRECTION") == "true")
     app.UseHttpsRedirection();
-        
+
 app.UseMiddleware<HeaderSecretMiddleware>();
 app.UseExceptionHandler(_ => { });
 
@@ -95,16 +95,11 @@ void ConfigureKestrel()
 {
     var certPath = Environment.GetEnvironmentVariable("ASPNETCORE_Kestrel__Certificates__Default__Path");
     var certPassword = Environment.GetEnvironmentVariable("ASPNETCORE_Kestrel__Certificates__Default__Password");
-    
+
     builder.WebHost.ConfigureKestrel(options =>
     {
         options.ListenAnyIP(8080);
         if (!string.IsNullOrEmpty(certPath) && !string.IsNullOrEmpty(certPassword))
-        {
-            options.ListenAnyIP(7292, listenOptions =>
-            {
-                listenOptions.UseHttps(certPath, certPassword);
-            });
-        }
+            options.ListenAnyIP(7292, listenOptions => { listenOptions.UseHttps(certPath, certPassword); });
     });
 }

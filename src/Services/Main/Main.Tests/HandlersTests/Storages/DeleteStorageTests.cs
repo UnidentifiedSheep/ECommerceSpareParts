@@ -101,4 +101,3 @@ public class DeleteStorageTests : IAsyncLifetime
         Assert.True(exists);
     }
 }
-

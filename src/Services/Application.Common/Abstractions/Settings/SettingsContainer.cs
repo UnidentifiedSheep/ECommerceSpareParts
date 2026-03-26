@@ -9,10 +9,12 @@ public class SettingsContainer : ISettingsContainer
     private readonly ConcurrentDictionary<Type, object> _settings = new();
 
     public bool Loaded { get; private set; }
-    
+
     public T GetSetting<T>(TypedSetting<T> setting)
     {
-        if (!Loaded) throw new InvalidOperationException("Настройки не инициализированы. Используйте ISettingsService LoadAsync().");
+        if (!Loaded)
+            throw new InvalidOperationException(
+                "Настройки не инициализированы. Используйте ISettingsService LoadAsync().");
         if (TryGetValue(setting.Type, out var value)) return (T)value;
         throw new Exception($"Не удалось найти настройку {setting.Key}");
     }
@@ -23,7 +25,7 @@ public class SettingsContainer : ISettingsContainer
         value = temp!;
         return result;
     }
-    
+
     public void SetSetting(Type key, object value)
     {
         ArgumentNullException.ThrowIfNull(value);
