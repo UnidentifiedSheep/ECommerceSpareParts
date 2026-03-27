@@ -15,18 +15,19 @@
     </ItemGroup>
 
     <ItemGroup>
-        <ProjectReference Include="..\src\Infrastructure\RabbitMq\RabbitMq.csproj"/>
-        <ProjectReference Include="..\src\Infrastructure\Security\Security.csproj"/>
-        <ProjectReference Include="..\src\Services\Api.Common\Api.Common.csproj"/>
-        <ProjectReference Include="..\src\Services\Search\Search.Application\Search.Application.csproj"/>
-        <ProjectReference Include="..\src\Services\Search\Search.Entities\Search.Entities.csproj"/>
-        <ProjectReference Include="..\src\Services\Search\Search.Persistence\Search.Persistence.csproj"/>
-    </ItemGroup>
-
-    <ItemGroup>
         <Content Include="..\.dockerignore">
             <Link>.dockerignore</Link>
         </Content>
+    </ItemGroup>
+
+    <ItemGroup>
+      <ProjectReference Include="..\..\..\Infrastructure\RabbitMq\RabbitMq.csproj" />
+      <ProjectReference Include="..\..\..\Infrastructure\Security\Security.csproj" />
+      <ProjectReference Include="..\..\Api.Common\Api.Common.csproj" />
+      <ProjectReference Include="..\Search.Abstractions\Search.Abstractions.csproj" />
+      <ProjectReference Include="..\Search.Application\Search.Application.csproj" />
+      <ProjectReference Include="..\Search.Enums\Search.Enums.csproj" />
+      <ProjectReference Include="..\Search.Persistence\Search.Persistence.csproj" />
     </ItemGroup>
 
 </Project>
