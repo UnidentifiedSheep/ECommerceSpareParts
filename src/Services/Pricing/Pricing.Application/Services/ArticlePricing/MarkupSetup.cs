@@ -1,6 +1,7 @@
 using Application.Common.Interfaces.Settings;
 using Microsoft.Extensions.Logging;
 using Pricing.Abstractions.Constants;
+using Pricing.Abstractions.Exceptions.Markup;
 using Pricing.Abstractions.Interfaces.DbRepositories;
 using Pricing.Abstractions.Interfaces.Services.Pricing;
 

@@ -18,8 +18,4 @@
         <PackageReference Include="Sannr" Version="1.3.0"/>
     </ItemGroup>
 
-    <ItemGroup>
-        <Folder Include="Exceptions\"/>
-    </ItemGroup>
-
 </Project>

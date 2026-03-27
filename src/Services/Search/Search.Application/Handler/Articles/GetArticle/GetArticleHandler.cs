@@ -1,5 +1,6 @@
 ﻿using Mediator;
 using Search.Abstractions.Dtos;
+using Search.Abstractions.Exceptions.Articles;
 using Search.Abstractions.Interfaces.Persistence;
 using Search.Application.Configs;
 

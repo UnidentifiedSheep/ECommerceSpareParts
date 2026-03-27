@@ -1,6 +1,7 @@
 using System.Reflection;
 using Abstractions.Interfaces.Currency;
 using Api.Common;
+using Api.Common.Extensions;
 using Api.Common.Logging;
 using Api.Common.Middleware;
 using Api.Common.OperationFilters;
@@ -10,6 +11,8 @@ using Contracts.Currency;
 using Contracts.Currency.GetCurrencies;
 using Contracts.Markup;
 using Contracts.Settings;
+using Localization.Domain.Extensions;
+using Localization.Domain.Middlewares;
 using MassTransit;
 using Microsoft.AspNetCore.HttpOverrides;
 using OpenTelemetry.Metrics;
@@ -29,6 +32,9 @@ using Security.Utils;
 using Serilog;
 using Serilog.Sinks.Loki;
 using Serilog.Sinks.Loki.Labels;
+
+var localesPath = Assembly.GetExecutingAssembly().GetDefaultLocalizationPath();
+var locales = new[] { "ru-RU", "en-EN" };
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -162,9 +168,20 @@ builder.Services.AddTransient<HeaderSecretMiddleware>(_ => new HeaderSecretMiddl
 
 var app = builder.Build();
 
+await app.LoadLocalesFromJson(localesPath);
+
 Pricing.Application.Configs.Mapster.Configure();
 
 app.UseMiddleware<HeaderSecretMiddleware>();
+
+app.UseRequestLocalization(options =>
+{
+    options.SetDefaultCulture(locales[0]);
+    options.AddSupportedCultures(locales);
+    options.AddSupportedUICultures(locales);
+});
+
+app.UseMiddleware<ScopedLocalizationMiddleware>();
 
 app.UseForwardedHeaders(new ForwardedHeadersOptions
 {

@@ -3,6 +3,7 @@ using Application.Common.Interfaces;
 using Application.Common.Interfaces.Settings;
 using Attributes;
 using MediatR;
+using Pricing.Abstractions.Exceptions.Markup;
 using Pricing.Abstractions.Interfaces.DbRepositories;
 
 namespace Pricing.Application.Handlers.Markups.DeleteMarkup;
@@ -21,7 +22,7 @@ public class DeleteMarkupGroupHandler(
                      ?? throw new MarkupGroupNotFoundException(request.Id);
         var setting = settingsContainer.GetSetting(Abstractions.Constants.Settings.Pricing);
         if (setting.SelectedMarkupId == request.Id)
-            throw new MarkupGroupCanNotBeDeletedException();
+            throw new CurrenMarkupGroupCanNotBeDeletedException();
         unitOfWork.Remove(markup);
         await unitOfWork.SaveChangesAsync(cancellationToken);
         return Unit.Value;

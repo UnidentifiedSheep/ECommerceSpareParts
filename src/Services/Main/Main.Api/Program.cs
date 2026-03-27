@@ -259,7 +259,7 @@ RecurringJob.AddOrUpdate<NotifySuggestionsRebuildNeeded>("UpdateCurrencyTask",
 
 app.UseOpenTelemetryPrometheusScrapingEndpoint();
 
-app.Run();
+await app.RunAsync();
 
 
 return;

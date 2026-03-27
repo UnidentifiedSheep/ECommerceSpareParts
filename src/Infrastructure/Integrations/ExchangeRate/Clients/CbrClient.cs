@@ -6,15 +6,13 @@ using ExchangeRate.Models;
 
 namespace ExchangeRate.Clients;
 
-public class CbrClient(IHttpClientFactory clientFactory) : IExchangeRateClient
+public class CbrClient(HttpClient client) : IExchangeRateClient
 {
-    private readonly HttpClient _client = clientFactory.CreateClient(nameof(ExchangeRateProvider.Cbr));
-
     public ExchangeRateProvider Provider => ExchangeRateProvider.Cbr;
 
     public async Task<ExchangeRates> GetRates(CancellationToken cancellationToken = default)
     {
-        var response = await _client.GetAsync("", cancellationToken);
+        var response = await client.GetAsync("", cancellationToken);
         if (!response.IsSuccessStatusCode)
             throw new Exception("Ошибка при получении курсов валют от ЦБР");
 

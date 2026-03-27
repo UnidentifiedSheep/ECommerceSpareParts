@@ -1,0 +1,7 @@
+﻿{
+  "locale": "en",
+  "keyValues": {
+    "markup.group.not.found": "Markup group not found.",
+    "current.markup.group.can.not.be.deleted": "Currently used markup group can not be deleted. Firstly select other group."
+  }
+}

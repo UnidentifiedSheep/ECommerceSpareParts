@@ -114,7 +114,7 @@ if (Environment.GetEnvironmentVariable("USE_HTTPS_REDIRECTION") == "true")
     app.UseHttpsRedirection();
 
 
-app.Run();
+await app.RunAsync();
 
 async Task SetupCurrency(IServiceProvider serviceProvider)
 {

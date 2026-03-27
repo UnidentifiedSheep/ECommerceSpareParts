@@ -5,6 +5,7 @@ using Attributes;
 using Contracts.Markup;
 using MassTransit;
 using MediatR;
+using Pricing.Abstractions.Exceptions.Markup;
 using Pricing.Abstractions.Interfaces.DbRepositories;
 
 namespace Pricing.Application.Handlers.Markups.SelectDefaultMarkup;
