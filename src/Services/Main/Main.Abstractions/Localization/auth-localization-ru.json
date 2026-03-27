@@ -4,6 +4,7 @@
     "invalid.token": "Неверный токен.",
     "wrong.credentials": "Неверные учетные данные.",
     "permission.not.found": "Разрешение '{0}' не найдено.",
+    "permission.name.taken": "Название разрешения '{0}' уже занято.",
     "permission.name.min.length": "Название разрешения должно быть не менее 3 символов.",
     "permission.name.max.length": "Название разрешения не должно превышать 128 символов.",
     "permission.description.max.length": "Описание разрешения не должно превышать 256 символов.",
@@ -12,6 +13,7 @@
     "role.already.exists": "Роль '{0}' уже существует.",
     "user.already.have.this.role": "Пользователь уже имеет роль '{0}'.",
     "user.not.found": "Пользователь не найден.",
+    "user.name.already.taken": "Логин пользователя уже занят другим пользовалем.",
     "role.name.not.empty": "Название роли не должно быть пустым.",
     "role.name.min.length": "Название роли должно быть не менее 3 символов.",
     "role.name.max.length": "Название роли не должно превышать 24 символа.",
@@ -27,6 +29,8 @@
     "user.vehicle.vin.code.already.taken": "VIN-код '{0}' уже используется.",
     "user.email.primary.count": "Пользователь может иметь только один основной email.",
     "user.have.duplicate.email": "У пользователя не должно быть повторяющихся email.",
+    "user.email.not.found": "Не удалось найти почту.",
+    "user.email.already.in.use": "Почта уже занята другим пользователем.",
     "user.min.email.count": "У пользователя должно быть не менее {0} email.",
     "user.max.email.count": "У пользователя должно быть не более {0} email."
   }

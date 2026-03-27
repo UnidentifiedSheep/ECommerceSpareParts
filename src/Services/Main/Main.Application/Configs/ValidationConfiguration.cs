@@ -32,13 +32,13 @@ public static class ValidationConfiguration
     {
         ConfigureDbValidation.AddConfig(ValidationFunctions.ValidateStorageContentExistsId, KeyValueType.Single,
             config => config.WithErrorName(ApplicationErrors.StorageContentNotFound)
-                .WithMessageTemplate("Не удалось найти позицию на складе.")
+                .WithMessageTemplate("storage.content.not.found")
                 .WithErrorType(typeof(NotFoundException))
                 .WithErrorCode((int)HttpStatusCode.NotFound));
 
         ConfigureDbValidation.AddConfig(ValidationFunctions.ValidateStorageContentExistsId, KeyValueType.MultipleKeys,
             config => config.WithErrorName(ApplicationErrors.StorageContentNotFound)
-                .WithMessageTemplate("Не удалось найти позицию на складе.")
+                .WithMessageTemplate("storage.content.not.found")
                 .WithErrorType(typeof(NotFoundException))
                 .WithErrorCode((int)HttpStatusCode.NotFound));
     }
@@ -47,13 +47,13 @@ public static class ValidationConfiguration
     {
         ConfigureDbValidation.AddConfig(ValidationFunctions.ValidateStorageOwnerNotExistsPK, KeyValueType.Tuple,
             config => config.WithErrorName(ApplicationErrors.StorageOwnerAlreadyExist)
-                .WithMessageTemplate("Данные пользователь уже владеет данным складом.")
+                .WithMessageTemplate("storage.already.belongs.user")
                 .WithErrorType(typeof(ConflictException))
                 .WithErrorCode((int)HttpStatusCode.Conflict));
 
         ConfigureDbValidation.AddConfig(ValidationFunctions.ValidateStorageOwnerExistsPK, KeyValueType.Tuple,
             config => config.WithErrorName(ApplicationErrors.StorageOwnerNotFound)
-                .WithMessageTemplate("Не удалось найти данный склад во владениях у пользователя.")
+                .WithMessageTemplate("storage.not.found.in.user")
                 .WithErrorType(typeof(NotFoundException))
                 .WithErrorCode((int)HttpStatusCode.NotFound));
     }
@@ -62,25 +62,25 @@ public static class ValidationConfiguration
     {
         ConfigureDbValidation.AddConfig(ValidationFunctions.ValidateStorageRouteExistsId, KeyValueType.Single,
             config => config.WithErrorName(ApplicationErrors.StorageRouteNotFound)
-                .WithMessageTemplate("Не удалось найти складской путь.")
+                .WithMessageTemplate("storage.route.not.found.by.id")
                 .WithErrorType(typeof(NotFoundException))
                 .WithErrorCode((int)HttpStatusCode.NotFound));
 
         ConfigureDbValidation.AddConfig(ValidationFunctions.ValidateStorageRouteExistsId, KeyValueType.MultipleKeys,
             config => config.WithErrorName(ApplicationErrors.StorageRouteNotFound)
-                .WithMessageTemplate("Не удалось найти складские пути.")
+                .WithMessageTemplate("storage.route.not.found.by.id")
                 .WithErrorType(typeof(NotFoundException))
                 .WithErrorCode((int)HttpStatusCode.NotFound));
 
         ConfigureDbValidation.AddConfig(ValidationFunctions.ValidateStorageRouteExistsFromTo, KeyValueType.Tuple,
             config => config.WithErrorName(ApplicationErrors.StorageRouteNotFound)
-                .WithMessageTemplate("Не удалось найти складской путь.")
+                .WithMessageTemplate("storage.route.not.found.by.names")
                 .WithErrorType(typeof(NotFoundException))
                 .WithErrorCode((int)HttpStatusCode.NotFound));
 
         ConfigureDbValidation.AddConfig(ValidationFunctions.ValidateStorageRouteNotExistsFromTo, KeyValueType.Tuple,
             config => config.WithErrorName(ApplicationErrors.StorageRouteAlreadyExist)
-                .WithMessageTemplate("Такой складской путь уже существует.")
+                .WithMessageTemplate("storage.route.already.exists")
                 .WithErrorType(typeof(ConflictException))
                 .WithErrorCode((int)HttpStatusCode.Conflict));
     }
@@ -89,13 +89,13 @@ public static class ValidationConfiguration
     {
         ConfigureDbValidation.AddConfig(ValidationFunctions.ValidateCartExistsPK, KeyValueType.Tuple,
             config => config.WithErrorName(ApplicationErrors.CartItemNotFound)
-                .WithMessageTemplate("Не удалось найти позицию в корзине.")
+                .WithMessageTemplate("cart.item.not.found")
                 .WithErrorType(typeof(NotFoundException))
                 .WithErrorCode((int)HttpStatusCode.NotFound));
 
         ConfigureDbValidation.AddConfig(ValidationFunctions.ValidateCartNotExistsPK, KeyValueType.Tuple,
             config => config.WithErrorName(ApplicationErrors.CartItemAlreadyExist)
-                .WithMessageTemplate("Позиция уже в корзине.")
+                .WithMessageTemplate("item.already.in.cart")
                 .WithErrorType(typeof(ConflictException))
                 .WithErrorCode((int)HttpStatusCode.Conflict));
     }
@@ -104,13 +104,13 @@ public static class ValidationConfiguration
     {
         ConfigureDbValidation.AddConfig(ValidationFunctions.ValidateProducersOtherNameExistsPK, KeyValueType.Tuple,
             config => config.WithErrorName(ApplicationErrors.ProducerOtherNameNotFound)
-                .WithMessageTemplate("Не удалось найти альтернативное название производителя.")
+                .WithMessageTemplate("producer.other.name.not.found")
                 .WithErrorType(typeof(NotFoundException))
                 .WithErrorCode((int)HttpStatusCode.NotFound));
 
         ConfigureDbValidation.AddConfig(ValidationFunctions.ValidateProducersOtherNameNotExistsPK, KeyValueType.Tuple,
             config => config.WithErrorName(ApplicationErrors.ProducerOtherNameAlreadyTaken)
-                .WithMessageTemplate("Данное альтернативное название производителя уже занято.")
+                .WithMessageTemplate("producer.other.name.already.taken")
                 .WithErrorType(typeof(ConflictException))
                 .WithErrorCode((int)HttpStatusCode.Conflict));
     }
@@ -119,75 +119,75 @@ public static class ValidationConfiguration
     {
         ConfigureDbValidation.AddConfig(ValidationFunctions.ValidateCurrencyExistsId, KeyValueType.Single,
             config => config.WithErrorName(ApplicationErrors.CurrencyNotFound)
-                .WithMessageTemplate("Не удалось найти валюту.")
+                .WithMessageTemplate("currency.not.found")
                 .WithErrorType(typeof(NotFoundException))
                 .WithErrorCode((int)HttpStatusCode.NotFound));
 
         ConfigureDbValidation.AddConfig(ValidationFunctions.ValidateCurrencyExistsId, KeyValueType.MultipleKeys,
             config => config.WithErrorName(ApplicationErrors.CurrencyNotFound)
-                .WithMessageTemplate("Не удалось найти валюты.")
+                .WithMessageTemplate("currency.not.found")
                 .WithErrorType(typeof(NotFoundException))
                 .WithErrorCode((int)HttpStatusCode.NotFound));
 
         ConfigureDbValidation.AddConfig(ValidationFunctions.ValidateCurrencyExistsCode, KeyValueType.Single,
             config => config.WithErrorName(ApplicationErrors.CurrencyNotFound)
-                .WithMessageTemplate("Не удалось найти валюту.")
+                .WithMessageTemplate("currency.not.found.by.code")
                 .WithErrorType(typeof(NotFoundException))
                 .WithErrorCode((int)HttpStatusCode.NotFound));
 
         ConfigureDbValidation.AddConfig(ValidationFunctions.ValidateCurrencyExistsCode, KeyValueType.MultipleKeys,
             config => config.WithErrorName(ApplicationErrors.CurrencyNotFound)
-                .WithMessageTemplate("Не удалось найти валюты.")
+                .WithMessageTemplate("currency.not.found.by.code")
                 .WithErrorType(typeof(NotFoundException))
                 .WithErrorCode((int)HttpStatusCode.NotFound));
 
         ConfigureDbValidation.AddConfig(ValidationFunctions.ValidateCurrencyNotExistsCode, KeyValueType.Single,
             config => config.WithErrorName(ApplicationErrors.CurrencyCodeAlreadyTaken)
-                .WithMessageTemplate("Валюта с таким кодом уже существует.")
+                .WithMessageTemplate("currency.code.already.take")
                 .WithErrorType(typeof(ConflictException))
                 .WithErrorCode((int)HttpStatusCode.Conflict));
 
         ConfigureDbValidation.AddConfig(ValidationFunctions.ValidateCurrencyNotExistsCode, KeyValueType.MultipleKeys,
             config => config.WithErrorName(ApplicationErrors.CurrencyCodeAlreadyTaken)
-                .WithMessageTemplate("Валюты с таким кодом уже существуют.")
+                .WithMessageTemplate("currency.code.already.take")
                 .WithErrorType(typeof(ConflictException))
                 .WithErrorCode((int)HttpStatusCode.Conflict));
 
         ConfigureDbValidation.AddConfig(ValidationFunctions.ValidateCurrencyNotExistsName, KeyValueType.Single,
             config => config.WithErrorName(ApplicationErrors.CurrencyNameAlreadyTaken)
-                .WithMessageTemplate("Валюта с таким названием уже существует.")
+                .WithMessageTemplate("currency.name.already.take")
                 .WithErrorType(typeof(ConflictException))
                 .WithErrorCode((int)HttpStatusCode.Conflict));
 
         ConfigureDbValidation.AddConfig(ValidationFunctions.ValidateCurrencyNotExistsName, KeyValueType.MultipleKeys,
             config => config.WithErrorName(ApplicationErrors.CurrencyNameAlreadyTaken)
-                .WithMessageTemplate("Валюты с такими названиями уже существуют.")
+                .WithMessageTemplate("currency.name.already.take")
                 .WithErrorType(typeof(ConflictException))
                 .WithErrorCode((int)HttpStatusCode.Conflict));
 
         ConfigureDbValidation.AddConfig(ValidationFunctions.ValidateCurrencyNotExistsShortName, KeyValueType.Single,
             config => config.WithErrorName(ApplicationErrors.CurrencyShortNameAlreadyTaken)
-                .WithMessageTemplate("Валюта с таким коротким названием уже существует.")
+                .WithMessageTemplate("currency.short.name.already.take")
                 .WithErrorType(typeof(ConflictException))
                 .WithErrorCode((int)HttpStatusCode.Conflict));
 
         ConfigureDbValidation.AddConfig(ValidationFunctions.ValidateCurrencyNotExistsShortName,
             KeyValueType.MultipleKeys,
             config => config.WithErrorName(ApplicationErrors.CurrencyShortNameAlreadyTaken)
-                .WithMessageTemplate("Валюты с такими короткими названиями уже существуют.")
+                .WithMessageTemplate("currency.short.name.already.take")
                 .WithErrorType(typeof(ConflictException))
                 .WithErrorCode((int)HttpStatusCode.Conflict));
 
         ConfigureDbValidation.AddConfig(ValidationFunctions.ValidateCurrencyNotExistsCurrencySign, KeyValueType.Single,
             config => config.WithErrorName(ApplicationErrors.CurrencySignAlreadyTaken)
-                .WithMessageTemplate("Валюта с таким символом названием уже существует.")
+                .WithMessageTemplate("currency.sign.already.take")
                 .WithErrorType(typeof(ConflictException))
                 .WithErrorCode((int)HttpStatusCode.Conflict));
 
         ConfigureDbValidation.AddConfig(ValidationFunctions.ValidateCurrencyNotExistsCurrencySign,
             KeyValueType.MultipleKeys,
             config => config.WithErrorName(ApplicationErrors.CurrencySignAlreadyTaken)
-                .WithMessageTemplate("Валюты с такими символами уже существуют.")
+                .WithMessageTemplate("currency.sign.already.take")
                 .WithErrorType(typeof(ConflictException))
                 .WithErrorCode((int)HttpStatusCode.Conflict));
     }
@@ -196,38 +196,38 @@ public static class ValidationConfiguration
     {
         ConfigureDbValidation.AddConfig(ValidationFunctions.ValidateRoleExistsId, KeyValueType.Single,
             config => config.WithErrorName(ApplicationErrors.RoleNotFound)
-                .WithMessageTemplate("Не удалось найти роль.")
+                .WithMessageTemplate("role.not.found")
                 .WithErrorType(typeof(NotFoundException))
                 .WithErrorCode((int)HttpStatusCode.NotFound));
 
         ConfigureDbValidation.AddConfig(ValidationFunctions.ValidateRoleExistsId, KeyValueType.MultipleKeys,
             config => config.WithErrorName(ApplicationErrors.RoleNotFound)
-                .WithMessageTemplate("Не удалось найти роли.")
+                .WithMessageTemplate("role.not.found")
                 .WithErrorType(typeof(NotFoundException))
                 .WithErrorCode((int)HttpStatusCode.NotFound));
 
         ConfigureDbValidation.AddConfig(ValidationFunctions.ValidateRoleExistsNormalizedName, KeyValueType.Single,
             config => config.WithErrorName(ApplicationErrors.RoleNotFound)
-                .WithMessageTemplate("Не удалось найти роль.")
+                .WithMessageTemplate("role.not.found.with.role.name")
                 .WithErrorType(typeof(NotFoundException))
                 .WithErrorCode((int)HttpStatusCode.NotFound));
 
         ConfigureDbValidation.AddConfig(ValidationFunctions.ValidateRoleExistsNormalizedName, KeyValueType.MultipleKeys,
             config => config.WithErrorName(ApplicationErrors.RoleNotFound)
-                .WithMessageTemplate("Не удалось найти роли.")
+                .WithMessageTemplate("role.not.found.with.role.name")
                 .WithErrorType(typeof(NotFoundException))
                 .WithErrorCode((int)HttpStatusCode.NotFound));
 
         ConfigureDbValidation.AddConfig(ValidationFunctions.ValidateRoleNotExistsNormalizedName, KeyValueType.Single,
             config => config.WithErrorName(ApplicationErrors.RoleNameAlreadyTaken)
-                .WithMessageTemplate("Роль с таким названием уже существует.")
+                .WithMessageTemplate("role.already.exists")
                 .WithErrorType(typeof(ConflictException))
                 .WithErrorCode((int)HttpStatusCode.Conflict));
 
         ConfigureDbValidation.AddConfig(ValidationFunctions.ValidateRoleNotExistsNormalizedName,
             KeyValueType.MultipleKeys,
             config => config.WithErrorName(ApplicationErrors.RoleNameAlreadyTaken)
-                .WithMessageTemplate("Роли с таким названиями уже существует.")
+                .WithMessageTemplate("role.already.exists")
                 .WithErrorType(typeof(ConflictException))
                 .WithErrorCode((int)HttpStatusCode.Conflict));
     }
@@ -236,25 +236,25 @@ public static class ValidationConfiguration
     {
         ConfigureDbValidation.AddConfig(ValidationFunctions.ValidatePermissionExistsName, KeyValueType.Single,
             config => config.WithErrorName(ApplicationErrors.PermissionNotFound)
-                .WithMessageTemplate("Не удалось найти разрешение.")
+                .WithMessageTemplate("permission.not.found")
                 .WithErrorType(typeof(NotFoundException))
                 .WithErrorCode((int)HttpStatusCode.NotFound));
 
         ConfigureDbValidation.AddConfig(ValidationFunctions.ValidatePermissionExistsName, KeyValueType.MultipleKeys,
             config => config.WithErrorName(ApplicationErrors.PermissionNotFound)
-                .WithMessageTemplate("Не удалось найти разрешения.")
+                .WithMessageTemplate("permission.not.found")
                 .WithErrorType(typeof(NotFoundException))
                 .WithErrorCode((int)HttpStatusCode.NotFound));
 
         ConfigureDbValidation.AddConfig(ValidationFunctions.ValidatePermissionNotExistsName, KeyValueType.Single,
             config => config.WithErrorName(ApplicationErrors.PermissionAlreadyExists)
-                .WithMessageTemplate("Разрешение с таким названием уже существует.")
+                .WithMessageTemplate("permission.name.taken")
                 .WithErrorType(typeof(ConflictException))
                 .WithErrorCode((int)HttpStatusCode.Conflict));
 
         ConfigureDbValidation.AddConfig(ValidationFunctions.ValidatePermissionNotExistsName, KeyValueType.MultipleKeys,
             config => config.WithErrorName(ApplicationErrors.PermissionAlreadyExists)
-                .WithMessageTemplate("Разрешения с такими названиями уже существуют.")
+                .WithMessageTemplate("permission.name.taken")
                 .WithErrorType(typeof(ConflictException))
                 .WithErrorCode((int)HttpStatusCode.Conflict));
     }
@@ -263,25 +263,25 @@ public static class ValidationConfiguration
     {
         ConfigureDbValidation.AddConfig(ValidationFunctions.ValidateStorageExistsName, KeyValueType.Single,
             config => config.WithErrorName(ApplicationErrors.StoragesNotFound)
-                .WithMessageTemplate("Не удалось найти склад.")
+                .WithMessageTemplate("storage.not.found")
                 .WithErrorType(typeof(NotFoundException))
                 .WithErrorCode((int)HttpStatusCode.NotFound));
 
         ConfigureDbValidation.AddConfig(ValidationFunctions.ValidateStorageExistsName, KeyValueType.MultipleKeys,
             config => config.WithErrorName(ApplicationErrors.StoragesNotFound)
-                .WithMessageTemplate("Не удалось найти склады.")
+                .WithMessageTemplate("storage.not.found")
                 .WithErrorType(typeof(NotFoundException))
                 .WithErrorCode((int)HttpStatusCode.NotFound));
 
         ConfigureDbValidation.AddConfig(ValidationFunctions.ValidateStorageNotExistsName, KeyValueType.Single,
             config => config.WithErrorName(ApplicationErrors.StoragesNameAlreadyTaken)
-                .WithMessageTemplate("Склад с таким названием уже существует.")
+                .WithMessageTemplate("storage.name.taken")
                 .WithErrorType(typeof(ConflictException))
                 .WithErrorCode((int)HttpStatusCode.Conflict));
 
         ConfigureDbValidation.AddConfig(ValidationFunctions.ValidateStorageNotExistsName, KeyValueType.MultipleKeys,
             config => config.WithErrorName(ApplicationErrors.StoragesNameAlreadyTaken)
-                .WithMessageTemplate("Склады с такими названиями уже существуют.")
+                .WithMessageTemplate("storage.name.taken")
                 .WithErrorType(typeof(ConflictException))
                 .WithErrorCode((int)HttpStatusCode.Conflict));
     }
@@ -290,13 +290,13 @@ public static class ValidationConfiguration
     {
         ConfigureDbValidation.AddConfig(ValidationFunctions.ValidateArticleExistsId, KeyValueType.Single,
             config => config.WithErrorName(ApplicationErrors.ArticlesNotFound)
-                .WithMessageTemplate("Не удалось найти артикул.")
+                .WithMessageTemplate("article.not.found")
                 .WithErrorType(typeof(NotFoundException))
                 .WithErrorCode((int)HttpStatusCode.NotFound));
 
         ConfigureDbValidation.AddConfig(ValidationFunctions.ValidateArticleExistsId, KeyValueType.MultipleKeys,
             config => config.WithErrorName(ApplicationErrors.ArticlesNotFound)
-                .WithMessageTemplate("Не удалось найти артикулы.")
+                .WithMessageTemplate("articles.not.found")
                 .WithErrorType(typeof(NotFoundException))
                 .WithErrorCode((int)HttpStatusCode.NotFound));
     }
@@ -305,25 +305,25 @@ public static class ValidationConfiguration
     {
         ConfigureDbValidation.AddConfig(ValidationFunctions.ValidateProducerExistsId, KeyValueType.Single,
             config => config.WithErrorName(ApplicationErrors.ProducersNotFound)
-                .WithMessageTemplate("Не удалось найти производителя.")
+                .WithMessageTemplate("producer.not.found")
                 .WithErrorCode((int)HttpStatusCode.NotFound)
                 .WithErrorType(typeof(NotFoundException)));
 
         ConfigureDbValidation.AddConfig(ValidationFunctions.ValidateProducerExistsId, KeyValueType.MultipleKeys,
             config => config.WithErrorName(ApplicationErrors.ProducersNotFound)
-                .WithMessageTemplate("Не удалось найти производителей.")
+                .WithMessageTemplate("producers.not.found")
                 .WithErrorCode((int)HttpStatusCode.NotFound)
                 .WithErrorType(typeof(NotFoundException)));
 
         ConfigureDbValidation.AddConfig(ValidationFunctions.ValidateProducerExistsName, KeyValueType.Single,
             config => config.WithErrorName(ApplicationErrors.ProducersNotFound)
-                .WithMessageTemplate("Не удалось найти производителя.")
+                .WithMessageTemplate("producer.not.found")
                 .WithErrorCode((int)HttpStatusCode.NotFound)
                 .WithErrorType(typeof(NotFoundException)));
 
         ConfigureDbValidation.AddConfig(ValidationFunctions.ValidateProducerExistsName, KeyValueType.MultipleKeys,
             config => config.WithErrorName(ApplicationErrors.ProducersNotFound)
-                .WithMessageTemplate("Не удалось найти производителей.")
+                .WithMessageTemplate("producers.not.found")
                 .WithErrorCode((int)HttpStatusCode.NotFound)
                 .WithErrorType(typeof(NotFoundException)));
     }
@@ -332,27 +332,27 @@ public static class ValidationConfiguration
     {
         ConfigureDbValidation.AddConfig(ValidationFunctions.ValidateUserExistsId, KeyValueType.Single,
             config => config.WithErrorName(ApplicationErrors.UsersNotFound)
-                .WithMessageTemplate("Не удалось найти пользователя.")
+                .WithMessageTemplate("user.not.found")
                 .WithErrorCode((int)HttpStatusCode.NotFound)
                 .WithErrorType(typeof(NotFoundException)));
 
         ConfigureDbValidation.AddConfig(ValidationFunctions.ValidateUserExistsId, KeyValueType.MultipleKeys,
             config => config.WithErrorName(ApplicationErrors.UsersNotFound)
-                .WithMessageTemplate("Не удалось найти пользователей.")
+                .WithMessageTemplate("user.not.found")
                 .WithErrorCode((int)HttpStatusCode.NotFound)
                 .WithErrorType(typeof(NotFoundException)));
 
         ConfigureDbValidation.AddConfig(ValidationFunctions.ValidateUserNotExistsNormalizedUserName,
             KeyValueType.Single,
             config => config.WithErrorName(ApplicationErrors.UserNameAlreadyTaken)
-                .WithMessageTemplate("Логин пользователя уже занят.")
+                .WithMessageTemplate("user.name.already.taken")
                 .WithErrorCode((int)HttpStatusCode.Conflict)
                 .WithErrorType(typeof(ConflictException)));
 
         ConfigureDbValidation.AddConfig(ValidationFunctions.ValidateUserNotExistsNormalizedUserName,
             KeyValueType.MultipleKeys,
             config => config.WithErrorName(ApplicationErrors.UserNameAlreadyTaken)
-                .WithMessageTemplate("Логины пользователей уже занят.")
+                .WithMessageTemplate("user.name.already.taken")
                 .WithErrorCode((int)HttpStatusCode.Conflict)
                 .WithErrorType(typeof(ConflictException)));
     }
@@ -361,28 +361,28 @@ public static class ValidationConfiguration
     {
         ConfigureDbValidation.AddConfig(ValidationFunctions.ValidateUserEmailExistsNormalizedEmail, KeyValueType.Single,
             config => config.WithErrorName(ApplicationErrors.UserEmailNotFound)
-                .WithMessageTemplate("Не удалось найти почту.")
+                .WithMessageTemplate("user.email.not.found")
                 .WithErrorCode((int)HttpStatusCode.NotFound)
                 .WithErrorType(typeof(NotFoundException)));
 
         ConfigureDbValidation.AddConfig(ValidationFunctions.ValidateUserEmailExistsNormalizedEmail,
             KeyValueType.MultipleKeys,
             config => config.WithErrorName(ApplicationErrors.UserEmailNotFound)
-                .WithMessageTemplate("Не удалось найти почты.")
+                .WithMessageTemplate("user.email.not.found")
                 .WithErrorCode((int)HttpStatusCode.NotFound)
                 .WithErrorType(typeof(NotFoundException)));
 
         ConfigureDbValidation.AddConfig(ValidationFunctions.ValidateUserEmailNotExistsNormalizedEmail,
             KeyValueType.Single,
             config => config.WithErrorName(ApplicationErrors.UserEmailAlreadyTaken)
-                .WithMessageTemplate("Данная почта уже используется другим пользователем.")
+                .WithMessageTemplate("user.email.already.in.use")
                 .WithErrorCode((int)HttpStatusCode.Conflict)
                 .WithErrorType(typeof(ConflictException)));
 
         ConfigureDbValidation.AddConfig(ValidationFunctions.ValidateUserEmailNotExistsNormalizedEmail,
             KeyValueType.MultipleKeys,
             config => config.WithErrorName(ApplicationErrors.UserEmailAlreadyTaken)
-                .WithMessageTemplate("Данные почты уже используются другими пользователями.")
+                .WithMessageTemplate("user.email.already.in.use")
                 .WithErrorCode((int)HttpStatusCode.Conflict)
                 .WithErrorType(typeof(ConflictException)));
     }
@@ -391,13 +391,13 @@ public static class ValidationConfiguration
     {
         ConfigureDbValidation.AddConfig(ValidationFunctions.ValidateTransactionExistsId, KeyValueType.Single,
             config => config.WithErrorName(ApplicationErrors.TransactionsNotFound)
-                .WithMessageTemplate("Не удалось найти транзакцию.")
+                .WithMessageTemplate("transaction.not.found")
                 .WithErrorCode((int)HttpStatusCode.NotFound)
                 .WithErrorType(typeof(NotFoundException)));
 
         ConfigureDbValidation.AddConfig(ValidationFunctions.ValidateTransactionExistsId, KeyValueType.MultipleKeys,
             config => config.WithErrorName(ApplicationErrors.TransactionsNotFound)
-                .WithMessageTemplate("Не удалось найти транзакцию.")
+                .WithMessageTemplate("transaction.not.found")
                 .WithErrorCode((int)HttpStatusCode.NotFound)
                 .WithErrorType(typeof(NotFoundException)));
     }

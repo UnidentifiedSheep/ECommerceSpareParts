@@ -2,6 +2,11 @@
   "locale": "ru",
   "keyValues": {
     "currency.not.found": "Не удалось найти указанную валюту.",
+    "currency.not.found.by.code": "Не удалось найти валюту с кодом '{0}'",
+    "currency.code.already.take": "Валюта с кодом '{0}' уже существует.",
+    "currency.name.already.take": "Валюта с названием '{0}' уже существует.",
+    "currency.short.name.already.take": "Валюта с коротким названием '{0}' уже существует.",
+    "currency.sign.already.take": "Валюта с таким символом '{0}' уже существует.",
     "currency.must.exist": "Указанная валюта должна существовать.",
     "currency.code.not.empty": "Код валюты не должен быть пустым.",
     "currency.code.max.length": "Код валюты должен быть не более 26 символов.",

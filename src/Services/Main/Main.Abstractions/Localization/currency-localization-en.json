@@ -2,6 +2,11 @@
   "locale": "en",
   "keyValues": {
     "currency.not.found": "We couldn't find the currency you were looking for.",
+    "currency.not.found.by.code": "We couldn't find the currency with currency code '{0}'",
+    "currency.code.already.take": "Currency with code '{0}' already exists.",
+    "currency.name.already.take": "Currency with name '{0}' already exists.",
+    "currency.short.name.already.take": "Currency with short name '{0}' already exists.",
+    "currency.sign.already.take": "Currency with sign '{0}' already exists.",
     "currency.must.exist": "The specified currency must exist.",
     "currency.code.not.empty": "Currency code must not be empty.",
     "currency.code.max.length": "Currency code must be at most 26 characters long.",

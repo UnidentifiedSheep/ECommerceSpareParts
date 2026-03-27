@@ -7,9 +7,11 @@
     "storage.content.not.found": "We couldn't find the storage content you were looking for.",
     "storage.not.found": "We couldn't find the warehouse '{0}'.",
     "storage.not.found.in.user": "We couldn't find the warehouse '{0}' among the user's warehouses.",
+    "storage.already.belongs.user": "This warehouse already belongs to user.",
     "active.storage.route.exists": "An active route already exists between sender warehouse '{0}' and receiver warehouse '{1}'.",
     "storage.route.not.found.by.names": "We couldn't find a route between warehouse '{0}' and warehouse '{1}'.",
     "storage.route.not.found.by.id": "We couldn't find the route.",
+    "storage.route.already.exists": "Storage route already exists.",
     "storage.content.purchase.date.range": "Purchase date cannot be in the future or older than 3 months.",
     "storage.content.list.not.empty": "Storage content list must not be empty.",
     "storage.name.not.empty": "Storage name must not be empty.",
@@ -34,6 +36,7 @@
     "storage.name.min.length": "Storage name must be at least 6 characters long.",
     "storage.name.max.length": "Storage name must be at most 128 characters long.",
     "storage.description.max.length": "Storage description must be at most 256 characters long.",
-    "storage.location.max.length": "Storage location must be at most 256 characters long."
+    "storage.location.max.length": "Storage location must be at most 256 characters long.",
+    "storage.name.taken": "This storage name already taken."
   }
 }

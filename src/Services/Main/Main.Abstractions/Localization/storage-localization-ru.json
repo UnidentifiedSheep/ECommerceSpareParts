@@ -7,9 +7,11 @@
     "storage.content.not.found": "Не удалось найти содержимое склада.",
     "storage.not.found": "Не удалось найти склад '{0}'.",
     "storage.not.found.in.user": "Не удалось найти склад '{0}' среди складов пользователя.",
+    "storage.already.belongs.user": "Данный склад уже принадлежит пользователю.",
     "active.storage.route.exists": "Между складом-отправителем '{0}' и складом-получателем '{1}' уже существует активный маршрут.",
     "storage.route.not.found.by.names": "Не удалось найти маршрут между складом '{0}' и складом '{1}'.",
     "storage.route.not.found.by.id": "Не удалось найти маршрут.",
+    "storage.route.already.exists": "Складской марщрут уже существует.",
     "storage.content.purchase.date.range": "Дата закупки не может быть в будущем или старше 3 месяцев.",
     "storage.content.list.not.empty": "Список содержимого склада не должен быть пустым.",
     "storage.name.not.empty": "Название склада не должно быть пустым.",
@@ -34,6 +36,7 @@
     "storage.name.min.length": "Название склада должно быть не менее 6 символов.",
     "storage.name.max.length": "Название склада должно быть не более 128 символов.",
     "storage.description.max.length": "Описание склада должно быть не более 256 символов.",
-    "storage.location.max.length": "Местоположение склада должно быть не более 256 символов."
+    "storage.location.max.length": "Местоположение склада должно быть не более 256 символов.",
+    "storage.name.taken": "Данное название склада занято."
   }
 }
