@@ -3,10 +3,12 @@ using Application.Common.Interfaces;
 
 namespace Main.Application.Handlers.Options.GetEmailOptions;
 
-public record GetEmailOptionsQuery() : IQuery<GetEmailOptionsResult>;
+public record GetEmailOptionsQuery : IQuery<GetEmailOptionsResult>;
+
 public record GetEmailOptionsResult(UserEmailOptions EmailOptions);
 
-public class GetEmailOptionsHandler(UserEmailOptions options) : IQueryHandler<GetEmailOptionsQuery, GetEmailOptionsResult>
+public class GetEmailOptionsHandler(UserEmailOptions options)
+    : IQueryHandler<GetEmailOptionsQuery, GetEmailOptionsResult>
 {
     public async Task<GetEmailOptionsResult> Handle(GetEmailOptionsQuery request, CancellationToken cancellationToken)
     {

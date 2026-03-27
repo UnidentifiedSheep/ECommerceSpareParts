@@ -1,4 +1,3 @@
-using Abstractions.Interfaces.Services;
 using Analytics.Application.Handlers.Currencies.CreateCurrency;
 using Contracts.Currency;
 using MassTransit;

@@ -9,6 +9,9 @@ public static class ProducerFactory
         .RuleFor(x => x.Name, f => f.Company.CompanyName())
         .RuleFor(x => x.Description, f => f.Commerce.ProductDescription())
         .RuleFor(x => x.IsOe, f => f.Random.Bool());
-    
-    public static List<Producer> Create(int count) => Faker.Generate(count);
+
+    public static List<Producer> Create(int count)
+    {
+        return Faker.Generate(count);
+    }
 }

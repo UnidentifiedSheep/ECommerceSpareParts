@@ -2,13 +2,12 @@ using System.Data;
 using Abstractions.Interfaces.Services;
 using Application.Common.Interfaces;
 using Attributes;
-using Exceptions.Exceptions.Balances;
+using Main.Abstractions.Exceptions.Balances;
 using Main.Abstractions.Interfaces.DbRepositories;
 using Main.Abstractions.Interfaces.Services;
 using Main.Entities;
 using Main.Enums;
 using Mapster;
-using MediatR;
 
 namespace Main.Application.Handlers.Balance.EditTransaction;
 
@@ -22,7 +21,9 @@ public record EditTransactionCommand(
 
 public record EditTransactionResult(Transaction Transaction);
 
-public class EditTransactionHandler(IBalanceRepository balanceRepository, IBalanceService balanceService,
+public class EditTransactionHandler(
+    IBalanceRepository balanceRepository,
+    IBalanceService balanceService,
     IUnitOfWork unitOfWork) : ICommandHandler<EditTransactionCommand, EditTransactionResult>
 {
     public async Task<EditTransactionResult> Handle(EditTransactionCommand request, CancellationToken cancellationToken)
@@ -45,7 +46,9 @@ public class EditTransactionHandler(IBalanceRepository balanceRepository, IBalan
         var transaction = await balanceRepository.GetTransactionByIdAsync(request.TransactionId, true, ct)
                           ?? throw new TransactionNotFoundExcpetion(request.TransactionId);
 
-        return transaction.IsDeleted ? throw new EditingDeletedTransactionException(request.TransactionId) : transaction;
+        return transaction.IsDeleted
+            ? throw new EditingDeletedTransactionException(request.TransactionId)
+            : transaction;
     }
 
     private async Task CreateTransactionVersionAsync(Transaction transaction, CancellationToken ct)
@@ -73,7 +76,9 @@ public class EditTransactionHandler(IBalanceRepository balanceRepository, IBalan
         transaction.CurrencyId = request.CurrencyId;
     }
 
-    private async Task RecalculateBalancesAsync(Transaction transaction, EditTransactionCommand request,
+    private async Task RecalculateBalancesAsync(
+        Transaction transaction,
+        EditTransactionCommand request,
         CancellationToken ct)
     {
         var prevSenderTransaction = await balanceRepository

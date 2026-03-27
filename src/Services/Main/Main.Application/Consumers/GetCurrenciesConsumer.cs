@@ -1,5 +1,5 @@
-﻿using Abstractions.Interfaces.Services;
-using Contracts.Currency.GetCurrencies;
+﻿using Contracts.Currency.GetCurrencies;
+using Contracts.Models.Currency;
 using Main.Application.Handlers.Currencies.GetAllCurrencies;
 using Mapster;
 using MassTransit;
@@ -14,7 +14,7 @@ public class GetCurrenciesConsumer(IMediator mediator) : IConsumer<GetCurrencies
         var query = new GetAllCurrenciesQuery();
         var result = await mediator.Send(query);
 
-        var currencies = result.Currencies.Adapt<List<Contracts.Models.Currency.Currency>>();
+        var currencies = result.Currencies.Adapt<List<Currency>>();
         await context.RespondAsync(new GetCurrenciesResponse { Currencies = currencies });
     }
 }

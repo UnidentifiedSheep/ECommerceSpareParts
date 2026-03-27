@@ -1,4 +1,5 @@
 using FluentValidation;
+using Localization.Domain.Extensions;
 
 namespace Main.Application.Handlers.Purchases.BaseValidators;
 
@@ -8,10 +9,10 @@ public class PurchaseDateTimeValidator : AbstractValidator<DateTime>
     {
         RuleFor(x => x)
             .GreaterThanOrEqualTo(DateTime.Now.Date.AddMonths(-3))
-            .WithMessage("Дата закупки не может быть более чем трёхмесячной давности.");
+            .WithLocalizationKey("purchase.datetime.min.3months");
 
         RuleFor(x => x)
             .LessThanOrEqualTo(DateTime.Now.AddMinutes(10))
-            .WithMessage("Дата закупки не может быть в будущем.");
+            .WithLocalizationKey("purchase.datetime.not.future");
     }
 }

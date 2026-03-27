@@ -1,4 +1,5 @@
 using FluentValidation;
+using Localization.Domain.Extensions;
 using Main.Abstractions.Dtos.Users;
 
 namespace Main.Application.Handlers.BaseValidators;
@@ -9,26 +10,26 @@ public class UserInfoValidator : AbstractValidator<UserInfoDto>
     {
         RuleFor(x => x.Name)
             .NotEmpty()
-            .WithMessage("Пользователь должен иметь имя")
+            .WithLocalizationKey("user.name.required")
             .Must(x => x.Trim().Length >= 3)
-            .WithMessage("Минимальная длина имени 3 символа")
+            .WithLocalizationKey("user.name.min.length")
             .Must(x => !x.Any(char.IsSymbol))
-            .WithMessage("Имя не должно содержать спец символов")
+            .WithLocalizationKey("user.name.no.special.chars")
             .Must(x => x.Trim().Length <= 30)
-            .WithMessage("Максимальная длина имени 30 символов");
+            .WithLocalizationKey("user.name.max.length");
 
         RuleFor(x => x.Surname)
             .NotEmpty()
-            .WithMessage("Пользователь должен иметь Фамилию")
+            .WithLocalizationKey("user.surname.required")
             .Must(x => x.Trim().Length >= 3)
-            .WithMessage("Минимальная длина фамилии 3 символа")
+            .WithLocalizationKey("user.surname.min.length")
             .Must(x => !x.Any(char.IsSymbol))
-            .WithMessage("Фамилия не должна содержать спец символов")
+            .WithLocalizationKey("user.surname.no.special.chars")
             .Must(x => x.Trim().Length <= 30)
-            .WithMessage("Максимальная длина фамилии 30 символов");
+            .WithLocalizationKey("user.surname.max.length");
 
         RuleFor(x => x.Description)
             .Must(x => x == null || x.Trim().Length <= 300)
-            .WithMessage("Максимальная длина описания 300 символов");
+            .WithLocalizationKey("user.description.max.length");
     }
 }

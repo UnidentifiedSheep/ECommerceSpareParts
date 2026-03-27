@@ -11,6 +11,6 @@ public class CurrencyWithRateDto
     public string CurrencySign { get; set; } = null!;
 
     public string Code { get; set; } = null!;
-    
+
     public decimal ToUsdRate { get; set; }
 }

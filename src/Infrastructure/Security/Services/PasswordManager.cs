@@ -16,26 +16,26 @@ public class PasswordManager(PasswordRules rules) : IPasswordManager
         return Verify(providedPassword, hashedPassword);
     }
 
-    public (bool isValid, IEnumerable<string> errors) IsPasswordMatchRules(string password)
+    public (bool isValid, IEnumerable<(string key, object[]? args)> errors) IsPasswordMatchRules(string password)
     {
-        var errors = new List<string>();
+        var errors = new List<(string, object[]?)>();
 
         if (string.IsNullOrEmpty(password))
         {
-            errors.Add("Пароль не должен быть пуст.");
+            errors.Add(("password.must.not.be.empty", null));
             return (false, errors);
         }
 
         // Проверки длины сразу
         if (password.Length < rules.MinLength)
-            errors.Add($"Пароль должен быть длиной минимум в {rules.MinLength} символов.");
+            errors.Add(("password.min.length", [rules.MinLength]));
 
         if (rules.MaxLength.HasValue && password.Length > rules.MaxLength.Value)
-            errors.Add($"Пароль должен быть длиной максимум до {rules.MaxLength.Value} символов.");
+            errors.Add(("password.max.length", [rules.MaxLength.Value]));
 
         if (!rules.CanContainTrailingSpaces &&
             (password[0] == ' ' || password[^1] == ' '))
-            errors.Add("Пароль не может начинаться или заканчиваться пробелом.");
+            errors.Add(("password.cannot.start.or.end.with.space", null));
 
         var hasUpper = false;
         var hasDigit = false;
@@ -51,16 +51,16 @@ public class PasswordManager(PasswordRules rules) : IPasswordManager
             else if (c == ' ') hasSpace = true;
 
         if (!rules.CanContainSpaces && hasSpace)
-            errors.Add("Пароль не может содержать пробелы");
+            errors.Add(("password.cannot.contain.spaces", null));
 
         if (rules.RequireUppercase && !hasUpper)
-            errors.Add("Пароль должен содержать как минимум один заглавный символ");
+            errors.Add(("password.must.contain.uppercase", null));
 
         if (rules.RequireDigit && !hasDigit)
-            errors.Add("Пароль должен содержать минимум одну цифру");
+            errors.Add(("password.must.contain.digit", null));
 
         if (rules.RequireSpecial && !hasSpecial)
-            errors.Add($"Пароль должен содержать минимум один спец. символ ({new string(specials.ToArray())}).");
+            errors.Add(("password.must.contain.special", [string.Join(',', specials)]));
 
         return (errors.Count == 0, errors);
     }

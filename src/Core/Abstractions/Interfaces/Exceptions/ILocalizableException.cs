@@ -3,4 +3,5 @@
 public interface ILocalizableException
 {
     string MessageKey { get; }
+    object[]? Arguments { get; }
 }

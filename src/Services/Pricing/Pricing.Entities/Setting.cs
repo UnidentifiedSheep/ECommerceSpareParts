@@ -1,6 +1,6 @@
 ﻿namespace Pricing.Entities;
 
-public partial class Setting
+public class Setting
 {
     public string Key { get; set; } = null!;
 

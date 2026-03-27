@@ -9,8 +9,12 @@ namespace Main.Persistence.Repositories;
 
 public class UserEmailRepository(DContext context) : IUserEmailRepository
 {
-    public async Task<IEnumerable<UserEmail>> GetUserEmailsAsync(Guid userId, int? limit = null, int? offset = null,
-        bool track = true, CancellationToken cancellationToken = default)
+    public async Task<IEnumerable<UserEmail>> GetUserEmailsAsync(
+        Guid userId,
+        int? limit = null,
+        int? offset = null,
+        bool track = true,
+        CancellationToken cancellationToken = default)
     {
         var query = context.UserEmails
             .ConfigureTracking(track)
@@ -26,7 +30,9 @@ public class UserEmailRepository(DContext context) : IUserEmailRepository
         return await query.ToListAsync(cancellationToken);
     }
 
-    public async Task<User?> GetUserByPrimaryMailAsync(string email, bool track = true,
+    public async Task<User?> GetUserByPrimaryMailAsync(
+        string email,
+        bool track = true,
         CancellationToken cancellationToken = default)
     {
         var userEmail = await context.UserEmails.ConfigureTracking(track)

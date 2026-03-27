@@ -6,11 +6,11 @@ namespace Api.Common.ExceptionHandlers;
 
 public class AotExceptionHandler(
     ILogger<AotExceptionHandler> logger
-    ) : ExceptionHandlerBase<AotExceptionHandler>(logger)
+) : ExceptionHandlerBase<AotExceptionHandler>(logger)
 {
     public override async ValueTask<bool> TryHandleAsync(
-        HttpContext context, 
-        Exception exception, 
+        HttpContext context,
+        Exception exception,
         CancellationToken cancellationToken)
     {
         LogError(context, exception);
@@ -34,7 +34,7 @@ public class AotExceptionHandler(
             Status = statusCode,
             Instance = context.Request.Path,
             Type = $"https://httpstatuses.io/{statusCode}",
-            TraceId = context.TraceIdentifier,
+            TraceId = context.TraceIdentifier
         };
 
         AddExceptionExtensions(problemDetails, exception);
@@ -60,7 +60,7 @@ public class AotExceptionHandler(
         return bulkEx.Failures
             .Select(errorValue => new ErrorResponse
             {
-                Title = errorValue.ErrorName ?? "An unexpected error occurred", 
+                Title = errorValue.ErrorName ?? "An unexpected error occurred",
                 Detail = errorValue.Message,
                 Status = errorValue.ErrorCode ?? 500
             }).ToList();
@@ -73,7 +73,7 @@ public class AotExceptionHandler(
             UnauthorizedAccessException or
             NotFoundException or
             ConflictException or
-            PreconditionRequiredException or 
+            PreconditionRequiredException or
             BulkValidation.Core.Exceptions.ValidationException;
     }
 }

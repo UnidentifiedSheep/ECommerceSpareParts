@@ -18,7 +18,7 @@ public class AddStorageToUserHandler(IUnitOfWork unitOfWork) : ICommandHandler<A
             OwnerId = request.UserId,
             StorageName = request.StorageName
         };
-        
+
         await unitOfWork.AddAsync(model, cancellationToken);
         await unitOfWork.SaveChangesAsync(cancellationToken);
         return Unit.Value;

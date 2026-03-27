@@ -10,8 +10,11 @@ public static class NewPurchaseContentDtoFactory
         .RuleFor(x => x.Count, f => f.Random.Int(1, 10))
         .RuleFor(x => x.Price, f => decimal.Parse(f.Commerce.Price()))
         .RuleFor(x => x.CalculateLogistics, f => f.Random.Bool());
-    
-    public static List<NewPurchaseContentDto> Create(int count) =>  Faker.Generate(count);
+
+    public static List<NewPurchaseContentDto> Create(int count)
+    {
+        return Faker.Generate(count);
+    }
 
     public static List<NewPurchaseContentDto> Create(int count, IEnumerable<int> articleIds)
     {

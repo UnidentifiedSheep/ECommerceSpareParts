@@ -1,9 +1,8 @@
-using Abstractions.Interfaces;
 using Abstractions.Interfaces.Currency;
 using Application.Common.Extensions;
 using FluentValidation;
+using Localization.Domain.Extensions;
 using Main.Application.Handlers.Sales.BaseValidators;
-using Main.Application.Handlers.Sales.BaseValidators.Edit;
 
 namespace Main.Application.Handlers.Sales.EditSale;
 
@@ -12,16 +11,16 @@ public class EditSaleValidation : AbstractValidator<EditSaleCommand>
     public EditSaleValidation(ICurrencyConverter currencyConverter)
     {
         RuleFor(x => x.Comment)
-            .Must(x => x?.Trim().Length <= 256)
-            .WithMessage("Максимальная длина общего комментария — 256 символов.");
-
+            .MaximumLength(256)
+            .WithLocalizationKey("sale.comment.max");
 
         RuleFor(x => x.SaleDateTime)
             .SetValidator(new SaleDateTimeValidator());
 
         RuleFor(x => x.CurrencyId)
             .CurrencyMustExist(currencyConverter);
-        
-        RuleFor(x => x.EditedContent).SetValidator(new SaleContentValidator());
+
+        RuleFor(x => x.EditedContent)
+            .SetValidator(new EditSaleContentsValidator());
     }
 }

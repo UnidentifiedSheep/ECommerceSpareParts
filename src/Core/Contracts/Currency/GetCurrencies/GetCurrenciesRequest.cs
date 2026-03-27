@@ -1,3 +1,3 @@
 ﻿namespace Contracts.Currency.GetCurrencies;
 
-public record GetCurrenciesRequest();
+public record GetCurrenciesRequest;

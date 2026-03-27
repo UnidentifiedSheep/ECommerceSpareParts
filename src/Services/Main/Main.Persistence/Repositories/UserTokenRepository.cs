@@ -8,14 +8,18 @@ namespace Main.Persistence.Repositories;
 
 public class UserTokenRepository(DContext context) : IUserTokenRepository
 {
-    public async Task<UserToken?> GetTokenByIdAsync(Guid id, bool track = true,
+    public async Task<UserToken?> GetTokenByIdAsync(
+        Guid id,
+        bool track = true,
         CancellationToken cancellationToken = default)
     {
         return await context.UserTokens.ConfigureTracking(track)
             .FirstOrDefaultAsync(x => x.Id == id, cancellationToken);
     }
 
-    public async Task<UserToken?> GetTokenByHashAsync(string hash, bool track = true,
+    public async Task<UserToken?> GetTokenByHashAsync(
+        string hash,
+        bool track = true,
         CancellationToken cancellationToken = default)
     {
         return await context.UserTokens.ConfigureTracking(track)

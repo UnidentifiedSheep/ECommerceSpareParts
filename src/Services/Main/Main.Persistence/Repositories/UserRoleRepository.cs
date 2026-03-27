@@ -9,19 +9,24 @@ namespace Main.Persistence.Repositories;
 
 public class UserRoleRepository(DContext context) : IUserRoleRepository
 {
-    public async Task<IEnumerable<UserRole>> GetUserRolesAsync(Guid userId, bool track = true, int? limit = null,
-        int? offset = null, CancellationToken cancellationToken = default, params Expression<Func<UserRole, object>>[] includes)
+    public async Task<IEnumerable<UserRole>> GetUserRolesAsync(
+        Guid userId,
+        bool track = true,
+        int? limit = null,
+        int? offset = null,
+        CancellationToken cancellationToken = default,
+        params Expression<Func<UserRole, object>>[] includes)
     {
         IQueryable<UserRole> query = context.UserRoles;
 
         foreach (var include in includes)
             query = query.Include(include);
-        
+
         query = query
             .ConfigureTracking(track)
             .Where(x => x.UserId == userId)
             .OrderBy(x => x.RoleId);
-        
+
 
         if (offset.HasValue)
             query = query.Skip(offset.Value);
@@ -32,7 +37,10 @@ public class UserRoleRepository(DContext context) : IUserRoleRepository
         return await query.ToListAsync(cancellationToken);
     }
 
-    public async Task<UserRole?> GetUserRoleAsync(Guid userId, Guid roleId, bool track = true,
+    public async Task<UserRole?> GetUserRoleAsync(
+        Guid userId,
+        Guid roleId,
+        bool track = true,
         CancellationToken cancellationToken = default)
     {
         return await context.UserRoles.ConfigureTracking(track)

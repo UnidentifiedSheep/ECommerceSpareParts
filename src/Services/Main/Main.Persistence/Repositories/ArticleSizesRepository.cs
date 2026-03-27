@@ -14,7 +14,9 @@ public class ArticleSizesRepository(DContext context) : IArticleSizesRepository
             .FirstOrDefaultAsync(x => x.ArticleId == articleId, token);
     }
 
-    public async Task<IEnumerable<ArticleSize>> GetArticleSizesByIds(IEnumerable<int> ids, bool track = true, 
+    public async Task<IEnumerable<ArticleSize>> GetArticleSizesByIds(
+        IEnumerable<int> ids,
+        bool track = true,
         CancellationToken token = default)
     {
         return await context.ArticleSizes.ConfigureTracking(track)

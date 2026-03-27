@@ -3,7 +3,7 @@ using Abstractions.Interfaces.Services;
 using Application.Common.Interfaces;
 using Attributes;
 using Contracts.Articles;
-using Exceptions.Exceptions.Storages;
+using Main.Abstractions.Exceptions.Storages;
 using Main.Abstractions.Interfaces.DbRepositories;
 using Main.Abstractions.Interfaces.Services;
 using Main.Abstractions.Models;
@@ -27,8 +27,12 @@ public record RemoveContentCommand(
 
 public record RemoveContentResult(IEnumerable<PrevAndNewValue<StorageContent>> Changes);
 
-public class RemoveContentHandler(IStorageContentRepository contentRepository, IArticlesRepository articlesRepository,
-    IArticlesService articlesService, IUnitOfWork unitOfWork, IPublishEndpoint publishEndpoint,
+public class RemoveContentHandler(
+    IStorageContentRepository contentRepository,
+    IArticlesRepository articlesRepository,
+    IArticlesService articlesService,
+    IUnitOfWork unitOfWork,
+    IPublishEndpoint publishEndpoint,
     IMediator mediator) : ICommandHandler<RemoveContentCommand, RemoveContentResult>
 {
     public async Task<RemoveContentResult> Handle(RemoveContentCommand request, CancellationToken cancellationToken)
@@ -71,7 +75,7 @@ public class RemoveContentHandler(IStorageContentRepository contentRepository, I
                     if (availableCount >= count) break;
                 }
 
-            if (availableCount < count) throw new NotEnoughCountOnStorageException(articleId, availableCount);
+            if (availableCount < count) throw new NotEnoughCountOnStorageException(articleId, availableCount, count);
             var counter = count;
 
             foreach (var item in storageContents)
@@ -94,9 +98,9 @@ public class RemoveContentHandler(IStorageContentRepository contentRepository, I
 
         await unitOfWork.AddRangeAsync(movements, cancellationToken);
         await articlesService.UpdateArticlesCount(toIncrement, cancellationToken);
-        
-        await publishEndpoint.Publish(new ArticleBuyPricesChangedEvent { ArticleIds = articleIds}, cancellationToken);
-        
+
+        await publishEndpoint.Publish(new ArticleBuyPricesChangedEvent { ArticleIds = articleIds }, cancellationToken);
+
         await unitOfWork.SaveChangesAsync(cancellationToken);
 
         await mediator.Publish(new ArticlesUpdatedNotification(articleIds), cancellationToken);
@@ -104,7 +108,10 @@ public class RemoveContentHandler(IStorageContentRepository contentRepository, I
         return new RemoveContentResult(result);
     }
 
-    private StorageMovement GetMovement(StorageContent content, StorageMovementType movementType, Guid whoMoved,
+    private StorageMovement GetMovement(
+        StorageContent content,
+        StorageMovementType movementType,
+        Guid whoMoved,
         int count)
     {
         var tempMovement = content.Adapt<StorageMovement>().SetActionType(movementType);

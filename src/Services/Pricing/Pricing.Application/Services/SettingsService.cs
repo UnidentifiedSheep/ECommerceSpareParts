@@ -8,7 +8,10 @@ using Pricing.Application.Handlers.Settings.SetSetting;
 
 namespace Pricing.Application.Services;
 
-public class SettingsService(ISettingsRepository settingsRepository, IMediator mediator, ISettingsContainer settingsContainer) 
+public class SettingsService(
+    ISettingsRepository settingsRepository,
+    IMediator mediator,
+    ISettingsContainer settingsContainer)
     : SettingsServiceBase(settingsContainer)
 {
     private readonly ISettingsContainer _settingsContainer = settingsContainer;
@@ -29,18 +32,21 @@ public class SettingsService(ISettingsRepository settingsRepository, IMediator m
 
             var typedValue = JsonSerializer.Deserialize(value, setting.Type) ??
                              throw new Exception("Не удалось десериализовать настройку.");
-            
+
             _settingsContainer.SetSetting(setting.Type, typedValue);
         }
     }
 
-    public override async Task SetSetting<T>(TypedSetting<T> setting, T value, CancellationToken cancellationToken = default)
+    public override async Task SetSetting<T>(
+        TypedSetting<T> setting,
+        T value,
+        CancellationToken cancellationToken = default)
     {
         ArgumentNullException.ThrowIfNull(value);
         var command = new SetSettingCommand(setting.Key, value);
         await mediator.Send(command, cancellationToken);
     }
-    
+
     public async Task SetSetting(TypedSetting setting, object value, CancellationToken cancellationToken = default)
     {
         ArgumentNullException.ThrowIfNull(value);

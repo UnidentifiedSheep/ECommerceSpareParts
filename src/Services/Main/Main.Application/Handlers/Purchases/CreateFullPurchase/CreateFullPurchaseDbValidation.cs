@@ -10,6 +10,5 @@ public class CreateFullPurchaseDbValidation : AbstractDbValidation<CreateFullPur
     {
         if (request is { WithLogistics: true, StorageFrom: not null })
             plan.ValidateStorageOwnerExistsPK((request.StorageFrom, request.SupplierId));
-        
     }
 }

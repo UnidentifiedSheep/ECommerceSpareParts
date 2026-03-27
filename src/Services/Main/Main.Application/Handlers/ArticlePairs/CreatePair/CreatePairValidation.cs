@@ -1,4 +1,5 @@
 using FluentValidation;
+using Localization.Domain.Extensions;
 
 namespace Main.Application.Handlers.ArticlePairs.CreatePair;
 
@@ -6,8 +7,8 @@ public class CreatePairValidation : AbstractValidator<CreatePairCommand>
 {
     public CreatePairValidation()
     {
-        RuleFor(x => new { x.LeftArticleId, x.RightArticleId })
+        RuleFor(x => x)
             .Must(x => x.LeftArticleId != x.RightArticleId)
-            .WithMessage("Артикул не может быть парой самому себе");
+            .WithLocalizationKey("article.pair.self.reference.not.allowed");
     }
 }

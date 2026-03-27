@@ -7,7 +7,7 @@ using Abstractions.Models;
 using Application.Common.Interfaces;
 using Attributes;
 using Exceptions.Base;
-using Exceptions.Exceptions.Auth;
+using Main.Abstractions.Exceptions.Auth;
 using Main.Abstractions.Interfaces.DbRepositories;
 using Main.Abstractions.Interfaces.Services;
 using Main.Enums;
@@ -32,11 +32,11 @@ public class LoginHandler(
     public async Task<LoginResult> Handle(LoginCommand request, CancellationToken cancellationToken)
     {
         var user = await userEmailRepository.GetUserByPrimaryMailAsync(request.Email, false, cancellationToken)
-                   ?? throw new WrongCredentialsException(request.Email);
+                   ?? throw new WrongCredentialsException(request.Email, null);
         if (user.UserInfo == null)
             throw new InternalServerException("Что то пошло не так...");
         if (!passwordManager.VerifyHashedPassword(user.PasswordHash, request.Password))
-            throw new WrongCredentialsException(request.Email + request.Password);
+            throw new WrongCredentialsException(request.Email, request.Password);
 
         var (roles, permissions) = await rolePermissionService
             .GetUserPermissionsAsync(user.Id, cancellationToken);
@@ -45,7 +45,8 @@ public class LoginHandler(
         var ip = request.IpAddress;
         var userAgent = request.UserAgent;
 
-        var token = tokenGenerator.CreateToken(user.Adapt<User>(), user.UserInfo.Adapt<UserInfo>(), deviceId, roles, permissions);
+        var token = tokenGenerator.CreateToken(user.Adapt<User>(), user.UserInfo.Adapt<UserInfo>(), deviceId, roles,
+            permissions);
         var refreshToken = tokenGenerator.CreateRefreshToken();
 
         await userTokenService.AddToken(refreshToken, user.Id, TokenType.RefreshToken, DateTime.UtcNow.AddMonths(1),

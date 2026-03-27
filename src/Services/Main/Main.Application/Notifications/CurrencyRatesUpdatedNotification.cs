@@ -2,4 +2,4 @@
 
 namespace Main.Application.Notifications;
 
-public record CurrencyRatesUpdatedNotification() : INotification;
+public record CurrencyRatesUpdatedNotification : INotification;

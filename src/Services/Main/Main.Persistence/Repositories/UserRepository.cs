@@ -11,17 +11,22 @@ namespace Main.Persistence.Repositories;
 
 public class UserRepository(DContext context) : IUserRepository
 {
-    public async Task<User?> GetUserByIdAsync(Guid userId, bool track = true,
-        CancellationToken cancellationToken = default, params Expression<Func<User, object?>>[] includes)
+    public async Task<User?> GetUserByIdAsync(
+        Guid userId,
+        bool track = true,
+        CancellationToken cancellationToken = default,
+        params Expression<Func<User, object?>>[] includes)
     {
         var query = context.Users.ConfigureTracking(track);
         foreach (var include in includes)
             query = query.Include(include);
-                
+
         return await query.FirstOrDefaultAsync(x => x.Id == userId, cancellationToken);
     }
 
-    public async Task<User?> GetUserByUserNameAsync(string userName, bool track = true,
+    public async Task<User?> GetUserByUserNameAsync(
+        string userName,
+        bool track = true,
         CancellationToken cancellationToken = default)
     {
         return await context.Users.ConfigureTracking(track)
@@ -29,7 +34,9 @@ public class UserRepository(DContext context) : IUserRepository
             .FirstOrDefaultAsync(x => x.NormalizedUserName == userName.ToNormalized(), cancellationToken);
     }
 
-    public async Task<User?> GetUserByEmailAsync(string email, bool track = true,
+    public async Task<User?> GetUserByEmailAsync(
+        string email,
+        bool track = true,
         CancellationToken cancellationToken = default)
     {
         var normalizedEmail = email.ToNormalizedEmail();
@@ -41,7 +48,9 @@ public class UserRepository(DContext context) : IUserRepository
         return userEmail?.User;
     }
 
-    public async Task<User?> GetUserByPhoneAsync(string phoneNumber, bool track = true,
+    public async Task<User?> GetUserByPhoneAsync(
+        string phoneNumber,
+        bool track = true,
         CancellationToken cancellationToken = default)
     {
         var normalizedPhone = phoneNumber.ToNormalizedPhoneNumber();
@@ -59,7 +68,9 @@ public class UserRepository(DContext context) : IUserRepository
     }
 
 
-    public async Task ChangeUsersDiscount(Guid userId, decimal discount,
+    public async Task ChangeUsersDiscount(
+        Guid userId,
+        decimal discount,
         CancellationToken cancellationToken = default)
     {
         await context.Database.ExecuteSqlAsync($"""
@@ -80,8 +91,13 @@ public class UserRepository(DContext context) : IUserRepository
 
 
     [SuppressMessage("ReSharper", "EntityFramework.ClientSideDbFunctionCall")]
-    public async Task<IEnumerable<User>> GetUserBySearchColumn(string? searchTerm, int page, int viewCount,
-        bool? isSupplier = null, bool track = true, CancellationToken cancellationToken = default)
+    public async Task<IEnumerable<User>> GetUserBySearchColumn(
+        string? searchTerm,
+        int page,
+        int viewCount,
+        bool? isSupplier = null,
+        bool track = true,
+        CancellationToken cancellationToken = default)
     {
         var normalizedSearchTerm = (searchTerm ?? "").ToNormalized();
         var searchBySearchTerm = !string.IsNullOrWhiteSpace(normalizedSearchTerm);
@@ -93,12 +109,11 @@ public class UserRepository(DContext context) : IUserRepository
                         || (x.UserInfo != null && x.UserInfo.IsSupplier == isSupplier));
 
         if (searchBySearchTerm)
-        {
             query = query
                 .Where(x => x.UserInfo != null)
                 .Select(x => new
                 {
-                    Rank = EF.Functions.TrigramsSimilarity(x.UserInfo!.SearchColumn, normalizedSearchTerm) + 
+                    Rank = EF.Functions.TrigramsSimilarity(x.UserInfo!.SearchColumn, normalizedSearchTerm) +
                            EF.Functions
                                .TrigramsWordSimilarity(x.UserInfo!.SearchColumn, normalizedSearchTerm) * 0.7,
                     User = x
@@ -106,10 +121,9 @@ public class UserRepository(DContext context) : IUserRepository
                 .Where(x => x.Rank >= 0.1)
                 .OrderByDescending(x => x.Rank)
                 .Select(x => x.User);
-        }
         else
             query = query.OrderByDescending(x => x.Id);
-        
+
 
         return await query
             .Skip(page * viewCount)
@@ -126,10 +140,19 @@ public class UserRepository(DContext context) : IUserRepository
     }
 
     [SuppressMessage("ReSharper", "EntityFramework.ClientSideDbFunctionCall")]
-    public async Task<IEnumerable<User>> GetUsersBySimilarityAsync(double similarityLevel, int page, int viewCount,
-        string? name = null, string? surname = null, string? email = null,
-        string? phone = null, string? userName = null, Guid? id = null,
-        string? description = null, bool? isSupplier = null, bool track = true,
+    public async Task<IEnumerable<User>> GetUsersBySimilarityAsync(
+        double similarityLevel,
+        int page,
+        int viewCount,
+        string? name = null,
+        string? surname = null,
+        string? email = null,
+        string? phone = null,
+        string? userName = null,
+        Guid? id = null,
+        string? description = null,
+        bool? isSupplier = null,
+        bool track = true,
         CancellationToken cancellationToken = default)
     {
         similarityLevel = similarityLevel >= 1 ? 0.999 : similarityLevel;

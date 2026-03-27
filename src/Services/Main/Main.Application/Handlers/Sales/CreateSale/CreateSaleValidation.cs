@@ -1,9 +1,8 @@
-using Abstractions.Interfaces;
 using Abstractions.Interfaces.Currency;
 using Application.Common.Extensions;
 using FluentValidation;
+using Localization.Domain.Extensions;
 using Main.Application.Handlers.Sales.BaseValidators;
-using Main.Application.Handlers.Sales.BaseValidators.Create;
 
 namespace Main.Application.Handlers.Sales.CreateSale;
 
@@ -15,7 +14,7 @@ public class CreateSaleValidation : AbstractValidator<CreateSaleCommand>
             .SetValidator(new SaleDateTimeValidator());
 
         RuleFor(x => x.SellContent)
-            .SetValidator(new SaleContentValidator());
+            .SetValidator(new NewSaleContentValidator());
 
         RuleFor(x => x.CurrencyId)
             .CurrencyMustExist(currencyConverter);
@@ -26,6 +25,6 @@ public class CreateSaleValidation : AbstractValidator<CreateSaleCommand>
                 var arts = x.SellContent.Select(z => z.ArticleId);
                 return x.StorageContentValues.All(z => arts.Contains(z.NewValue.ArticleId));
             })
-            .WithMessage("Не удалось найти Артикул для построения деталей продажи");
+            .WithLocalizationKey("sale.articles.missing");
     }
 }

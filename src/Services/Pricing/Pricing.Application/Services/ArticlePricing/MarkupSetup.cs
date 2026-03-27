@@ -1,20 +1,22 @@
 using Application.Common.Interfaces.Settings;
-using Exceptions.Exceptions.Markups;
 using Microsoft.Extensions.Logging;
 using Pricing.Abstractions.Constants;
+using Pricing.Abstractions.Exceptions.Markup;
 using Pricing.Abstractions.Interfaces.DbRepositories;
 using Pricing.Abstractions.Interfaces.Services.Pricing;
 
 namespace Pricing.Application.Services.ArticlePricing;
 
-public class MarkupSetup(IMarkupRepository markupRepository, ISettingsContainer settingsContainer, 
-    IMarkupService markupService, ILogger<MarkupSetup> logger) : IMarkupSetup
+public class MarkupSetup(
+    IMarkupRepository markupRepository,
+    ISettingsContainer settingsContainer,
+    IMarkupService markupService,
+    ILogger<MarkupSetup> logger) : IMarkupSetup
 {
-
     public async Task SetupAsync(CancellationToken cancellationToken = default)
     {
         var setting = settingsContainer.GetSetting(Settings.Pricing);
-        
+
         if (setting.SelectedMarkupId != -1)
         {
             await SetUserMarkupsAsync(setting.SelectedMarkupId, cancellationToken);
@@ -30,10 +32,11 @@ public class MarkupSetup(IMarkupRepository markupRepository, ISettingsContainer 
         var generatedMarkup = await markupRepository.GetGeneratedMarkupsAsync(true, cancellationToken);
         if (generatedMarkup == null)
         {
-            if (logger.IsEnabled(LogLevel.Warning)) 
+            if (logger.IsEnabled(LogLevel.Warning))
                 logger.LogWarning("Не удалось найти сгенерированную группу наценок.");
             return;
         }
+
         markupService.SetUp(generatedMarkup);
     }
 

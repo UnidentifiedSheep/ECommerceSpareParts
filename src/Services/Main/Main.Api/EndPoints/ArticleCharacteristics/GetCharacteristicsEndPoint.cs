@@ -1,6 +1,6 @@
 ﻿using Carter;
-using Main.Application.Handlers.ArticleCharacteristics.GetCharacteristics;
 using Main.Abstractions.Dtos.Anonymous.Articles;
+using Main.Application.Handlers.ArticleCharacteristics.GetCharacteristics;
 using Mapster;
 using MediatR;
 
@@ -20,7 +20,8 @@ public class GetCharacteristicsEndPoint : ICarterModule
                         .Where(x => x.HasValue)
                         .Select(x => x!.Value)
                         .ToList();
-                    var result = await sender.Send(new GetArticleCharacteristicsQuery(articleId, characteristicsIds), token);
+                    var result = await sender.Send(new GetArticleCharacteristicsQuery(articleId, characteristicsIds),
+                        token);
                     var response = result.Adapt<GetArticleCharacteristicsResponse>();
                     return Results.Ok(response);
                 }).WithName("Получение характеристик артикула по id")

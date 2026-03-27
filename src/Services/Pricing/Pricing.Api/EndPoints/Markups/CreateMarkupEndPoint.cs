@@ -8,8 +8,11 @@ using Pricing.Application.Handlers.Markups.CreateMarkup;
 
 namespace Pricing.Api.EndPoints.Markups;
 
-public record CreateMarkupRequest(IEnumerable<NewMarkupRangeDto> Ranges, int CurrencyId, 
-    string? GroupName, decimal MarkupForUnknownRange);
+public record CreateMarkupRequest(
+    IEnumerable<NewMarkupRangeDto> Ranges,
+    int CurrencyId,
+    string? GroupName,
+    decimal MarkupForUnknownRange);
 
 public record CreateMarkupResponse(int GroupId);
 
@@ -25,8 +28,8 @@ public class CreateMarkupEndPoint : ICarterModule
                     var response = new CreateMarkupResponse(result.GroupId);
                     return Results.Created($"/markups/{result.GroupId}", response);
                 }).WithTags("Markups")
-                .WithDescription("Создание группы наценок")
-                .WithDisplayName("Создание группы наценок")
-                .RequireAnyPermission(PermissionCodes.MARKUP_CREATE);
+            .WithDescription("Создание группы наценок")
+            .WithDisplayName("Создание группы наценок")
+            .RequireAnyPermission(PermissionCodes.MARKUP_CREATE);
     }
 }

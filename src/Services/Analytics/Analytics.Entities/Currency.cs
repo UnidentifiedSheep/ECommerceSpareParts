@@ -2,7 +2,7 @@
 
 namespace Analytics.Entities;
 
-public partial class Currency
+public class Currency
 {
     public int Id { get; set; }
 

@@ -8,16 +8,16 @@
     </PropertyGroup>
 
     <ItemGroup>
-      <ProjectReference Include="..\..\..\Core\Contracts\Contracts.csproj" />
-      <ProjectReference Include="..\..\..\Infrastructure\Localization\Localization.Abstractions\Localization.Abstractions.csproj" />
-      <ProjectReference Include="..\..\..\Infrastructure\Localization\Localization.Domain\Localization.Domain.csproj" />
-      <ProjectReference Include="..\..\Application.Common\Application.Common.csproj" />
-      <ProjectReference Include="..\Analytics.Abstractions\Analytics.Abstractions.csproj" />
-      <ProjectReference Include="..\Analytics.Utils\Analytics.Utils.csproj" />
+        <ProjectReference Include="..\..\..\Core\Contracts\Contracts.csproj"/>
+        <ProjectReference Include="..\..\..\Infrastructure\Localization\Localization.Abstractions\Localization.Abstractions.csproj"/>
+        <ProjectReference Include="..\..\..\Infrastructure\Localization\Localization.Domain\Localization.Domain.csproj"/>
+        <ProjectReference Include="..\..\Application.Common\Application.Common.csproj"/>
+        <ProjectReference Include="..\Analytics.Abstractions\Analytics.Abstractions.csproj"/>
+        <ProjectReference Include="..\Analytics.Utils\Analytics.Utils.csproj"/>
     </ItemGroup>
 
     <ItemGroup>
-      <PackageReference Include="MassTransit" Version="8.5.8" />
+        <PackageReference Include="MassTransit" Version="8.5.8"/>
     </ItemGroup>
 
 </Project>

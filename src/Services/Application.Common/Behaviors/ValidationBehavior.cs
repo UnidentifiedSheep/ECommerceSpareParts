@@ -8,7 +8,9 @@ public class ValidationBehavior<TRequest, TResponse>(IEnumerable<IValidator<TReq
     where TRequest : IRequest<TResponse>
     where TResponse : notnull
 {
-    public async Task<TResponse> Handle(TRequest request, RequestHandlerDelegate<TResponse> next,
+    public async Task<TResponse> Handle(
+        TRequest request,
+        RequestHandlerDelegate<TResponse> next,
         CancellationToken cancellationToken)
     {
         var context = new ValidationContext<TRequest>(request);

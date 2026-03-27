@@ -9,7 +9,7 @@
 
     <ItemGroup>
         <PackageReference Include="coverlet.collector" Version="6.0.4"/>
-        <PackageReference Include="FluentAssertions" Version="8.9.0" />
+        <PackageReference Include="FluentAssertions" Version="8.9.0"/>
         <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.14.1"/>
         <PackageReference Include="xunit" Version="2.9.3"/>
         <PackageReference Include="xunit.runner.visualstudio" Version="3.1.4"/>
@@ -20,22 +20,22 @@
     </ItemGroup>
 
     <ItemGroup>
-      <ProjectReference Include="..\..\..\Infrastructure\Localization\Localization.Domain\Localization.Domain.csproj" />
-      <ProjectReference Include="..\..\..\Infrastructure\Redis\Redis.csproj" />
-      <ProjectReference Include="..\..\Test.Common\Test.Common.csproj" />
-      <ProjectReference Include="..\Analytics.Application\Analytics.Application.csproj" />
-      <ProjectReference Include="..\Analytics.Persistence\Analytics.Persistence.csproj" />
+        <ProjectReference Include="..\..\..\Infrastructure\Localization\Localization.Domain\Localization.Domain.csproj"/>
+        <ProjectReference Include="..\..\..\Infrastructure\Redis\Redis.csproj"/>
+        <ProjectReference Include="..\..\Test.Common\Test.Common.csproj"/>
+        <ProjectReference Include="..\Analytics.Application\Analytics.Application.csproj"/>
+        <ProjectReference Include="..\Analytics.Persistence\Analytics.Persistence.csproj"/>
     </ItemGroup>
 
     <ItemGroup>
-      <Content Include="..\Analytics.Abstractions\Localization\purchase-fact\purchase-fact-localization-en.json">
-        <Link>Localization\purchase-fact\purchase-fact-localization-en.json</Link>
-        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-      </Content>
-      <Content Include="..\Analytics.Abstractions\Localization\purchase-fact\purchase-fact-localization-ru.json">
-        <Link>Localization\purchase-fact\purchase-fact-localization-ru.json</Link>
-        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-      </Content>
+        <Content Include="..\Analytics.Abstractions\Localization\purchase-fact\purchase-fact-localization-en.json">
+            <Link>Localization\purchase-fact\purchase-fact-localization-en.json</Link>
+            <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+        </Content>
+        <Content Include="..\Analytics.Abstractions\Localization\purchase-fact\purchase-fact-localization-ru.json">
+            <Link>Localization\purchase-fact\purchase-fact-localization-ru.json</Link>
+            <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+        </Content>
     </ItemGroup>
 
 </Project>

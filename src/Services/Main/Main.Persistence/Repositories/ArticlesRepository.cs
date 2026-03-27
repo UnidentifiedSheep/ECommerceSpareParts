@@ -11,8 +11,13 @@ namespace Main.Persistence.Repositories;
 
 public class ArticlesRepository(DContext context) : IArticlesRepository
 {
-    public async Task<List<Article>> GetArticlesByName(string searchTerm, int page, int viewCount,
-        string? sortBy, IEnumerable<int> producerIds, CancellationToken cancellationToken = default)
+    public async Task<List<Article>> GetArticlesByName(
+        string searchTerm,
+        int page,
+        int viewCount,
+        string? sortBy,
+        IEnumerable<int> producerIds,
+        CancellationToken cancellationToken = default)
     {
         var producerIdsSet = producerIds.ToHashSet();
         var query = context.Articles
@@ -23,7 +28,7 @@ public class ArticlesRepository(DContext context) : IArticlesRepository
 
         if (producerIdsSet.Any())
             query = query.Where(x => producerIdsSet.Contains(x.ProducerId));
-        
+
 
         query = query.SortBy(sortBy);
 
@@ -38,8 +43,13 @@ public class ArticlesRepository(DContext context) : IArticlesRepository
         return articles;
     }
 
-    public async Task<List<Article>> GetArticlesByExecNumber(string searchTerm, int page, int viewCount,
-        string? sortBy, IEnumerable<int> producerIds, CancellationToken cancellationToken = default)
+    public async Task<List<Article>> GetArticlesByExecNumber(
+        string searchTerm,
+        int page,
+        int viewCount,
+        string? sortBy,
+        IEnumerable<int> producerIds,
+        CancellationToken cancellationToken = default)
     {
         var normalizerArticle = searchTerm.ToNormalizedArticleNumber();
         var producerIdsSet = producerIds.ToHashSet();
@@ -75,7 +85,11 @@ public class ArticlesRepository(DContext context) : IArticlesRepository
             .ToListAsync(cancellationToken);
     }
 
-    public async Task<IEnumerable<Article>> GetArticleCrosses(int articleId, int page, int viewCount, string? sortBy,
+    public async Task<IEnumerable<Article>> GetArticleCrosses(
+        int articleId,
+        int page,
+        int viewCount,
+        string? sortBy,
         bool track = true,
         CancellationToken cancellationToken = default)
     {
@@ -96,8 +110,13 @@ public class ArticlesRepository(DContext context) : IArticlesRepository
             .ToListAsync(cancellationToken);
     }
 
-    public async Task<List<Article>> GetArticlesByStartNumber(string searchTerm, int page, int viewCount,
-        string? sortBy, IEnumerable<int> producerIds, CancellationToken cancellationToken = default)
+    public async Task<List<Article>> GetArticlesByStartNumber(
+        string searchTerm,
+        int page,
+        int viewCount,
+        string? sortBy,
+        IEnumerable<int> producerIds,
+        CancellationToken cancellationToken = default)
     {
         var normalizerArticle = searchTerm.ToNormalizedArticleNumber();
         var producerIdsSet = producerIds.ToHashSet();
@@ -141,7 +160,9 @@ public class ArticlesRepository(DContext context) : IArticlesRepository
             .FirstOrDefaultAsync(x => x.Id == id, cancellationToken);
     }
 
-    public async Task<List<Article>> GetArticlesByIds(IEnumerable<int> ids, bool track = true,
+    public async Task<List<Article>> GetArticlesByIds(
+        IEnumerable<int> ids,
+        bool track = true,
         CancellationToken token = default)
     {
         return await context.Articles.ConfigureTracking(track)
@@ -150,7 +171,9 @@ public class ArticlesRepository(DContext context) : IArticlesRepository
             .ToListAsync(token);
     }
 
-    public async Task<IEnumerable<Article>> GetArticlesForUpdate(IEnumerable<int> articleIds, bool track = true,
+    public async Task<IEnumerable<Article>> GetArticlesForUpdate(
+        IEnumerable<int> articleIds,
+        bool track = true,
         CancellationToken cancellationToken = default)
     {
         return await context.Articles
@@ -159,7 +182,8 @@ public class ArticlesRepository(DContext context) : IArticlesRepository
             .ToListAsync(cancellationToken);
     }
 
-    public async Task AddArticleLinkage(IEnumerable<(int id, int crossId)> crossIds,
+    public async Task AddArticleLinkage(
+        IEnumerable<(int id, int crossId)> crossIds,
         CancellationToken cancellationToken = default)
     {
         var hs = crossIds.ToHashSet();
@@ -188,7 +212,8 @@ public class ArticlesRepository(DContext context) : IArticlesRepository
             .ToHashSetAsync(cancellationToken);
     }
 
-    public async Task<int> UpdateArticlesCount(Dictionary<int, int> toIncrement,
+    public async Task<int> UpdateArticlesCount(
+        Dictionary<int, int> toIncrement,
         CancellationToken cancellationToken = default)
     {
         var valuesSql = string.Join(", ", toIncrement.Select(i => $"({i.Key}, {i.Value})"));

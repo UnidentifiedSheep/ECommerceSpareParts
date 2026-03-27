@@ -8,11 +8,15 @@ namespace Main.Application.Handlers.Permissions.CreatePermission;
 
 [Transactional]
 public record CreatePermissionCommand(string Name, string? Description) : ICommand<CreatePermissionResult>;
+
 public record CreatePermissionResult(string Name);
 
-public class CreatePermissionHandler(IUnitOfWork unitOfWork) : ICommandHandler<CreatePermissionCommand, CreatePermissionResult>
+public class CreatePermissionHandler(IUnitOfWork unitOfWork)
+    : ICommandHandler<CreatePermissionCommand, CreatePermissionResult>
 {
-    public async Task<CreatePermissionResult> Handle(CreatePermissionCommand request, CancellationToken cancellationToken)
+    public async Task<CreatePermissionResult> Handle(
+        CreatePermissionCommand request,
+        CancellationToken cancellationToken)
     {
         var permission = new Permission
         {

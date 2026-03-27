@@ -16,7 +16,9 @@ public class GetPurchaseContentHandler(IPurchaseRepository purchaseRepository)
 {
     public static readonly QueryOptions<PurchaseContent> Options = new QueryOptions<PurchaseContent>()
         .WithInclude(x => x.PurchaseContentLogistic);
-    public async Task<GetPurchaseContentResult> Handle(GetPurchaseContentQuery request,
+
+    public async Task<GetPurchaseContentResult> Handle(
+        GetPurchaseContentQuery request,
         CancellationToken cancellationToken)
     {
         var content = await purchaseRepository

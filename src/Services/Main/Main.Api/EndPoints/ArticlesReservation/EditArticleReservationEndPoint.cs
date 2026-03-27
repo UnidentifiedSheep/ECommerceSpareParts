@@ -1,10 +1,9 @@
-using System.Security.Claims;
 using Abstractions.Interfaces;
 using Api.Common.Extensions;
 using Carter;
 using Enums;
-using Main.Application.Handlers.ArticleReservations.EditArticleReservation;
 using Main.Abstractions.Dtos.Amw.ArticleReservations;
+using Main.Application.Handlers.ArticleReservations.EditArticleReservation;
 using MediatR;
 
 namespace Main.Api.EndPoints.ArticlesReservation;
@@ -15,8 +14,11 @@ public class EditArticleReservationEndPoint : ICarterModule
 {
     public void AddRoutes(IEndpointRouteBuilder app)
     {
-        app.MapPut("/articles/reservations/{reservationId}", async
-            (ISender sender, int reservationId, EditArticleReservationRequest request, IUserContext user,
+        app.MapPut("/articles/reservations/{reservationId}", async (
+                ISender sender,
+                int reservationId,
+                EditArticleReservationRequest request,
+                IUserContext user,
                 CancellationToken token) =>
             {
                 var command = new EditArticleReservationCommand(reservationId, request.NewValue, user.UserId);

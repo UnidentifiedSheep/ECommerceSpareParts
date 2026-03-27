@@ -1,8 +1,7 @@
 ﻿using Abstractions.Interfaces.Services;
 using Application.Common.Interfaces;
 using Attributes;
-using Exceptions.Exceptions.Roles;
-using Exceptions.Exceptions.Users;
+using Main.Abstractions.Exceptions.Auth;
 using Main.Abstractions.Interfaces.DbRepositories;
 using Main.Entities;
 using MediatR;
@@ -12,12 +11,15 @@ namespace Main.Application.Handlers.Users.AddRoleToUser;
 [Transactional]
 public record AddRoleToUserCommand(Guid UserId, string RoleName) : ICommand;
 
-public class AddRoleToUserHandler(IUserRepository userRepository, IRoleRepository roleRepository, 
-    IUserRoleRepository userRoleRepository, IUnitOfWork unitOfWork) : ICommandHandler<AddRoleToUserCommand>
+public class AddRoleToUserHandler(
+    IUserRepository userRepository,
+    IRoleRepository roleRepository,
+    IUserRoleRepository userRoleRepository,
+    IUnitOfWork unitOfWork) : ICommandHandler<AddRoleToUserCommand>
 {
     public async Task<Unit> Handle(AddRoleToUserCommand request, CancellationToken cancellationToken)
     {
-        var user = await userRepository.GetUserByIdAsync(request.UserId, cancellationToken: cancellationToken) ?? 
+        var user = await userRepository.GetUserByIdAsync(request.UserId, cancellationToken: cancellationToken) ??
                    throw new UserNotFoundException(request.UserId);
         var role = await roleRepository.GetRoleAsync(request.RoleName, true, cancellationToken) ??
                    throw new RoleNotFoundException(request.RoleName);

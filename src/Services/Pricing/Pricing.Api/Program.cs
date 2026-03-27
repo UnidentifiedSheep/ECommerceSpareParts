@@ -1,7 +1,7 @@
 using System.Reflection;
 using Abstractions.Interfaces.Currency;
 using Api.Common;
-using Api.Common.ExceptionHandlers;
+using Api.Common.Extensions;
 using Api.Common.Logging;
 using Api.Common.Middleware;
 using Api.Common.OperationFilters;
@@ -11,10 +11,11 @@ using Contracts.Currency;
 using Contracts.Currency.GetCurrencies;
 using Contracts.Markup;
 using Contracts.Settings;
-using Hangfire;
+using Localization.Domain.Extensions;
+using Localization.Domain.Middlewares;
+using MassTransit;
 using Microsoft.AspNetCore.HttpOverrides;
 using OpenTelemetry.Metrics;
-using MassTransit;
 using Persistence.Extensions;
 using Pricing.Abstractions.Constants;
 using Pricing.Api.EndPoints.Prices;
@@ -31,6 +32,9 @@ using Security.Utils;
 using Serilog;
 using Serilog.Sinks.Loki;
 using Serilog.Sinks.Loki.Labels;
+
+var localesPath = Assembly.GetExecutingAssembly().GetDefaultLocalizationPath();
+var locales = new[] { "ru-RU", "en-EN" };
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -54,7 +58,7 @@ Log.Logger = new LoggerConfiguration()
                 new LokiLabel(
                     "env",
                     Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT") ?? "unknown"
-                ),
+                )
             ])
         })
     )
@@ -68,10 +72,7 @@ builder.Services.AddHttpContextAccessor();
 
 builder.Services.AddOpenApi();
 builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen(c =>
-{
-    c.OperationFilter<PermissionsOperationFilter>();
-});
+builder.Services.AddSwaggerGen(c => { c.OperationFilter<PermissionsOperationFilter>(); });
 
 var brokerOptions = new MessageBrokerOptions
 {
@@ -86,7 +87,7 @@ var uniqQueueName = $"queue-of-pricing-{Environment.MachineName}";
 builder.Services.AddMassTransit(x =>
 {
     x.AddConsumers(Assembly.GetAssembly(typeof(Global)));
-    
+
     x.AddEntityFrameworkOutbox<DContext>(o =>
     {
         o.UsePostgres();
@@ -94,31 +95,31 @@ builder.Services.AddMassTransit(x =>
     });
 
     x.AddRequestClient<GetCurrenciesRequest>();
-    
+
     x.UsingRabbitMq((context, cfg) =>
     {
         cfg.ConfigureRabbitMq(brokerOptions);
-        
+
         cfg.ReceiveEndpoint(uniqQueueName, ep =>
         {
             ep.AutoDelete = true;
             ep.Durable = false;
-            
+
             ep.ConfigureConsumeTopology = false;
-            
+
             ep.ConfigureConsumer<SettingChangedConsumer>(context);
             ep.ConfigureConsumer<CurrencyRatesChangedConsumer>(context);
             ep.ConfigureConsumer<MarkupGroupChangedConsumer>(context);
             ep.ConfigureConsumer<MarkupGroupGeneratedConsumer>(context);
             ep.ConfigureConsumer<MarkupRangesChangedConsumer>(context);
-            
+
             ep.Bind<CurrencyRateChangedEvent>();
             ep.Bind<SettingChangedEvent>();
             ep.Bind<MarkupGroupChangedEvent>();
             ep.Bind<MarkupGroupGeneratedEvent>();
             ep.Bind<MarkupRangesUpdatedEvent>();
         });
-        
+
         cfg.ReceiveEndpoint("pricing-queue", ep =>
         {
             ep.Durable = true;
@@ -135,8 +136,6 @@ builder.Services
     .AddSecurityLayer(Environment.GetEnvironmentVariable("SIGN_SECRET")!, Global.JsonOptions)
     .AddApplicationLayer()
     .AddCommonLayer();
-
-
 
 
 builder.Services.AddBaseExceptionHandlers();
@@ -169,9 +168,20 @@ builder.Services.AddTransient<HeaderSecretMiddleware>(_ => new HeaderSecretMiddl
 
 var app = builder.Build();
 
+await app.LoadLocalesFromJson(localesPath);
+
 Pricing.Application.Configs.Mapster.Configure();
 
 app.UseMiddleware<HeaderSecretMiddleware>();
+
+app.UseRequestLocalization(options =>
+{
+    options.SetDefaultCulture(locales[0]);
+    options.AddSupportedCultures(locales);
+    options.AddSupportedUICultures(locales);
+});
+
+app.UseMiddleware<ScopedLocalizationMiddleware>();
 
 app.UseForwardedHeaders(new ForwardedHeadersOptions
 {

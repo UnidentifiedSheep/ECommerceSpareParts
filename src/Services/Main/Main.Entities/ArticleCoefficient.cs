@@ -1,6 +1,6 @@
 ﻿namespace Main.Entities;
 
-public partial class ArticleCoefficient
+public class ArticleCoefficient
 {
     public int ArticleId { get; set; }
 

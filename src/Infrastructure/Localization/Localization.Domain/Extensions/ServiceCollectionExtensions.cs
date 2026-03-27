@@ -13,10 +13,10 @@ public static class ServiceCollectionExtensions
             .AddScopedStringLocalizer();
 
         services.AddScoped<ScopedLocalizationMiddleware>();
-        
+
         return services;
     }
-    
+
     public static IServiceCollection AddLocales(this IServiceCollection services, params string[] locales)
     {
         foreach (var locale in locales)
@@ -24,14 +24,14 @@ public static class ServiceCollectionExtensions
         return services;
     }
 
-    public static IServiceCollection AddStringLocalizer<TLocalizer>(this IServiceCollection services) 
+    public static IServiceCollection AddStringLocalizer<TLocalizer>(this IServiceCollection services)
         where TLocalizer : class, IStringLocalizer
     {
         services.AddSingleton<IStringLocalizer, TLocalizer>();
         return services;
     }
-    
-    public static IServiceCollection AddStringLocalizer(this IServiceCollection services) 
+
+    public static IServiceCollection AddStringLocalizer(this IServiceCollection services)
     {
         return services.AddStringLocalizer<StringLocalizer>();
     }
@@ -42,7 +42,7 @@ public static class ServiceCollectionExtensions
         services.AddScoped<IScopedStringLocalizer, TLocalizer>();
         return services;
     }
-    
+
     public static IServiceCollection AddScopedStringLocalizer(this IServiceCollection services)
     {
         return services.AddScopedStringLocalizer<ScopedStringLocalizer>();

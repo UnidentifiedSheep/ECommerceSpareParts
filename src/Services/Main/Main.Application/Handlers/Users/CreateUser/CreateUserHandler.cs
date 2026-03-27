@@ -12,18 +12,23 @@ using Mapster;
 namespace Main.Application.Handlers.Users.CreateUser;
 
 [Transactional]
-public record CreateUserCommand(string UserName, string Password, UserInfoDto UserInfo, IEnumerable<EmailDto> Emails,
-    IEnumerable<string> Phones, IEnumerable<string> Roles) : ICommand<CreateUserResult>;
+public record CreateUserCommand(
+    string UserName,
+    string Password,
+    UserInfoDto UserInfo,
+    IEnumerable<EmailDto> Emails,
+    IEnumerable<string> Phones,
+    IEnumerable<string> Roles) : ICommand<CreateUserResult>;
 
 public record CreateUserResult(Guid UserId);
 
-public class CreateUserHandler(IRoleRepository roleRepository, IUnitOfWork unitOfWork, IPasswordManager passwordManager) 
+public class CreateUserHandler(IRoleRepository roleRepository, IUnitOfWork unitOfWork, IPasswordManager passwordManager)
     : ICommandHandler<CreateUserCommand, CreateUserResult>
 {
     public async Task<CreateUserResult> Handle(CreateUserCommand request, CancellationToken cancellationToken)
     {
         var userName = request.UserName.Trim();
-        
+
         var roles = await roleRepository.GetRolesAsync(request.Roles, true, cancellationToken);
         var passwordHash = passwordManager.GetHashOfPassword(request.Password);
         var user = new User

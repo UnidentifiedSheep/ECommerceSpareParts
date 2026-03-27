@@ -1,10 +1,9 @@
 ﻿using BulkValidation.Core.Attributes;
 using Enums;
-using Main.Enums;
 
 namespace Main.Entities;
 
-public partial class Purchase
+public class Purchase
 {
     [Validate]
     public string Id { get; set; } = null!;

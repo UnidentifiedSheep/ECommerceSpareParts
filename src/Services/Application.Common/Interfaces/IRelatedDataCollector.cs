@@ -2,8 +2,8 @@
 
 public interface IRelatedDataCollector
 {
+    IReadOnlyCollection<string> CurrentIds { get; }
     IDisposable BeginScope();
     void Add(string id);
     void AddRange(IEnumerable<string> ids);
-    IReadOnlyCollection<string> CurrentIds { get; }
 }

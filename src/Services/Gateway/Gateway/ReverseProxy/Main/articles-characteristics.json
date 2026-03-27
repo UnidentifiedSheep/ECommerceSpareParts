@@ -5,40 +5,56 @@
         "ClusterId": "main-cluster",
         "Match": {
           "Path": "/main/articles/{articleId}/characteristics/",
-          "Methods": [ "GET" ]
+          "Methods": [
+            "GET"
+          ]
         },
         "Transforms": [
-          { "PathRemovePrefix": "/main" }
+          {
+            "PathRemovePrefix": "/main"
+          }
         ]
       },
       "delete-article-characteristics": {
         "ClusterId": "main-cluster",
         "Match": {
           "Path": "/main/articles/characteristics/{id}",
-          "Methods": [ "DELETE" ]
+          "Methods": [
+            "DELETE"
+          ]
         },
         "Transforms": [
-          { "PathRemovePrefix": "/main" }
+          {
+            "PathRemovePrefix": "/main"
+          }
         ]
       },
       "edit-article-characteristics": {
         "ClusterId": "main-cluster",
         "Match": {
           "Path": "/main/articles/characteristics/{id}",
-          "Methods": [ "PATCH" ]
+          "Methods": [
+            "PATCH"
+          ]
         },
         "Transforms": [
-          { "PathRemovePrefix": "/main" }
+          {
+            "PathRemovePrefix": "/main"
+          }
         ]
       },
       "add-article-characteristics": {
         "ClusterId": "main-cluster",
         "Match": {
           "Path": "/main/articles/characteristics/",
-          "Methods": [ "POST" ]
+          "Methods": [
+            "POST"
+          ]
         },
         "Transforms": [
-          { "PathRemovePrefix": "/main" }
+          {
+            "PathRemovePrefix": "/main"
+          }
         ]
       }
     }

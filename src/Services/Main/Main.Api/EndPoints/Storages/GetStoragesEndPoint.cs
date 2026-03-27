@@ -1,8 +1,8 @@
 using Abstractions.Models;
 using Api.Common.Extensions;
 using Carter;
-using Exceptions.Exceptions.Storages;
 using Main.Abstractions.Dtos.Amw.Storage;
+using Main.Abstractions.Exceptions.Storages;
 using Main.Application.Handlers.Storages.GetStorage;
 using Main.Application.Handlers.Storages.GetStorageByName;
 using Main.Enums;
@@ -12,6 +12,7 @@ using MediatR;
 namespace Main.Api.EndPoints.Storages;
 
 public record GetStoragesResponse(IEnumerable<StorageDto> Storages);
+
 public record GetStorageByNameResponse(StorageDto Storage);
 
 public class GetStoragesEndPoint : ICarterModule
@@ -19,7 +20,13 @@ public class GetStoragesEndPoint : ICarterModule
     public void AddRoutes(IEndpointRouteBuilder app)
     {
         app.MapGet("/storages/",
-                async (ISender sender, int page, int limit, string? searchTerm, StorageType? type, CancellationToken token) =>
+                async (
+                    ISender sender,
+                    int page,
+                    int limit,
+                    string? searchTerm,
+                    StorageType? type,
+                    CancellationToken token) =>
                 {
                     var query = new GetStoragesQuery(new PaginationModel(page, limit), searchTerm, type);
                     var result = await sender.Send(query, token);
@@ -30,7 +37,7 @@ public class GetStoragesEndPoint : ICarterModule
             .Produces<GetStoragesResponse>()
             .WithDisplayName("Получение складов")
             .RequireAnyPermission("STORAGES.GET");
-        
+
         app.MapGet("/storages/{name}",
                 async (ISender sender, string name, CancellationToken token) =>
                 {

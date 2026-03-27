@@ -12,8 +12,8 @@ public static class DbProducerSeedExtensions
 
         var producers = ProducerFactory.Create(count);
         await ctx.AddRangeAsync(producers);
-        await  ctx.SaveChangesAsync();
-        
+        await ctx.SaveChangesAsync();
+
         return producers;
     }
 }

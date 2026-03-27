@@ -1,7 +1,7 @@
-using Abstractions.Interfaces;
 using Abstractions.Interfaces.Currency;
 using Application.Common.Extensions;
 using FluentValidation;
+using Localization.Domain.Extensions;
 using Main.Application.Handlers.BaseValidators;
 
 namespace Main.Application.Handlers.StorageContents.RestoreContent;
@@ -15,6 +15,7 @@ public class RestoreContentValidation : AbstractValidator<RestoreContentCommand>
             {
                 z.RuleFor(x => x.Detail.Count)
                     .SetValidator(new CountValidator());
+
                 z.RuleFor(x => x.Detail.BuyPrice)
                     .SetValidator(new PriceValidator());
 
@@ -24,10 +25,10 @@ public class RestoreContentValidation : AbstractValidator<RestoreContentCommand>
 
         RuleFor(x => x.ContentDetails)
             .NotEmpty()
-            .WithMessage("Список для восстановления не должен быть пуст");
+            .WithLocalizationKey("storage.content.restore.list.not.empty");
 
         RuleFor(x => x.UserId)
             .NotEmpty()
-            .WithMessage("Id пользователя не должен быть пуст");
+            .WithLocalizationKey("user.id.not.empty");
     }
 }

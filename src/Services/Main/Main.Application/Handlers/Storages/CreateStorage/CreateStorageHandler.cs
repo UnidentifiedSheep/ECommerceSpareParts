@@ -8,7 +8,8 @@ using Mapster;
 namespace Main.Application.Handlers.Storages.CreateStorage;
 
 [Transactional]
-public record CreateStorageCommand(string Name, string? Description, string? Location, StorageType Type) : ICommand<CreateStorageResult>;
+public record CreateStorageCommand(string Name, string? Description, string? Location, StorageType Type)
+    : ICommand<CreateStorageResult>;
 
 public record CreateStorageResult(string Name);
 

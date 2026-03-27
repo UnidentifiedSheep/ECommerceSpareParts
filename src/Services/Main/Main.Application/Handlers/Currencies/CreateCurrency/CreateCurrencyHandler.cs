@@ -23,13 +23,13 @@ public class CreateCurrencyHandler(IUnitOfWork unitOfWork, IPublishEndpoint publ
     {
         var model = request.Adapt<Currency>();
         await unitOfWork.AddAsync(model, cancellationToken);
-        
+
         await publishEndpoint.Publish(new CurrencyCreatedEvent
         {
-            Currency = model.Adapt<global::Contracts.Models.Currency.Currency>()
+            Currency = model.Adapt<Contracts.Models.Currency.Currency>()
         }, cancellationToken);
         await unitOfWork.SaveChangesAsync(cancellationToken);
-        
+
         await mediator.Publish(new CurrencyCreatedNotification(model.Id), cancellationToken);
         return new CreateCurrencyResult(model.Id);
     }

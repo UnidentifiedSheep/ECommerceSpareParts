@@ -12,7 +12,9 @@ namespace Main.Persistence.Repositories;
 
 public class PurchaseRepository(DContext context) : IPurchaseRepository
 {
-    public async Task<Purchase?> GetPurchase(string purchaseId, QueryOptions? config = null,
+    public async Task<Purchase?> GetPurchase(
+        string purchaseId,
+        QueryOptions? config = null,
         CancellationToken cancellationToken = default)
     {
         return await context.Purchases
@@ -21,7 +23,9 @@ public class PurchaseRepository(DContext context) : IPurchaseRepository
             .FirstOrDefaultAsync(cancellationToken);
     }
 
-    public async Task<IEnumerable<PurchaseContent>> GetPurchaseContent(string purchaseId, QueryOptions? config = null,
+    public async Task<IEnumerable<PurchaseContent>> GetPurchaseContent(
+        string purchaseId,
+        QueryOptions? config = null,
         CancellationToken cancellationToken = default)
     {
         return await context.PurchaseContents
@@ -30,8 +34,16 @@ public class PurchaseRepository(DContext context) : IPurchaseRepository
             .ToListAsync(cancellationToken);
     }
 
-    public async Task<IEnumerable<Purchase>> GetPurchases(DateTime rangeStart, DateTime rangeEnd, int page,
-        int viewCount, Guid? supplierId, int? currencyId, string? sortBy, string? searchTerm, bool track = true,
+    public async Task<IEnumerable<Purchase>> GetPurchases(
+        DateTime rangeStart,
+        DateTime rangeEnd,
+        int page,
+        int viewCount,
+        Guid? supplierId,
+        int? currencyId,
+        string? sortBy,
+        string? searchTerm,
+        bool track = true,
         CancellationToken cancellationToken = default)
     {
         var query = context.Purchases.ConfigureTracking(track);
@@ -70,7 +82,9 @@ public class PurchaseRepository(DContext context) : IPurchaseRepository
         return result;
     }
 
-    public async Task<IEnumerable<PurchaseContent>> GetPurchaseContentWithArticleData(string purchaseId, QueryOptions? config = null,
+    public async Task<IEnumerable<PurchaseContent>> GetPurchaseContentWithArticleData(
+        string purchaseId,
+        QueryOptions? config = null,
         CancellationToken cancellationToken = default)
     {
         return await context.PurchaseContents

@@ -18,10 +18,10 @@ public class MapImgsToArticleEndPoint : ICarterModule
                     await sender.Send(command, token);
                     return Results.Ok();
                 }).WithMetadata()
-                .WithTags("Articles")
-                .WithName("Добавить изображение к артикулу")
-                .Produces(200)
-                .ProducesProblem(404)
-                .RequireAnyPermission("ARTICLE.IMAGES.CREATE");
+            .WithTags("Articles")
+            .WithName("Добавить изображение к артикулу")
+            .Produces(200)
+            .ProducesProblem(404)
+            .RequireAnyPermission("ARTICLE.IMAGES.CREATE");
     }
 }

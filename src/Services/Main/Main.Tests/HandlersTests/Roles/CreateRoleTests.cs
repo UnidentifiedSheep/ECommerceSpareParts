@@ -1,6 +1,6 @@
 ﻿using Bogus;
-using Exceptions.Exceptions.Roles;
 using Extensions;
+using Main.Abstractions.Exceptions.Auth;
 using Main.Application.Handlers.Roles.CreateRole;
 using Main.Persistence.Context;
 using MediatR;
@@ -8,7 +8,6 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Test.Common.Extensions;
 using Test.Common.TestContainers.Combined;
-using Tests.MockData;
 using ValidationException = FluentValidation.ValidationException;
 
 namespace Tests.HandlersTests.Roles;
@@ -69,7 +68,7 @@ public class CreateRoleTests : IAsyncLifetime
 
         var roleInDb = await _context.Roles.AsNoTracking()
             .FirstOrDefaultAsync(x => x.NormalizedName == name.ToNormalized());
-        
+
         Assert.NotNull(roleInDb);
         Assert.Equal(name.ToNormalized(), roleInDb.NormalizedName);
         Assert.Equal(description, roleInDb.Description);

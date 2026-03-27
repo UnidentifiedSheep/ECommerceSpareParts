@@ -18,7 +18,7 @@ public interface ICurrencyConverter
     bool IsSupportedCurrency(int currencyId);
 
     /// <summary>
-    /// Changes base currency for all currency conversions.
+    ///     Changes base currency for all currency conversions.
     /// </summary>
     /// <param name="data">Data for conversion</param>
     /// <param name="newBase">Convert TO currency code</param>

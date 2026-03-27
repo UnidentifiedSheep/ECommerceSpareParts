@@ -9,8 +9,11 @@ public class TransactionalAttribute : Attribute
     /// <param name="retryDelayMs">Задержка перед повторением не удавшейся транзакции</param>
     /// <param name="retryCount">Количество повторных попыток</param>
     /// <param name="retryErrors">Ошибки при которых транзакция будет перезапускаться.</param>
-    public TransactionalAttribute(IsolationLevel isolationLevel = IsolationLevel.ReadCommitted, int retryDelayMs = 0,
-        int retryCount = 0, string[]? retryErrors = null)
+    public TransactionalAttribute(
+        IsolationLevel isolationLevel = IsolationLevel.ReadCommitted,
+        int retryDelayMs = 0,
+        int retryCount = 0,
+        string[]? retryErrors = null)
     {
         IsolationLevel = isolationLevel;
         RetryDelayMs = retryDelayMs;

@@ -17,19 +17,20 @@ public static class ServiceProvider
         services.AddSannr();
 
         //Add article command
-        services.AddTransient<IPipelineBehavior<AddArticleCommand, Unit>, ValidationBehavior<AddArticleCommand, Unit>>();
+        services
+            .AddTransient<IPipelineBehavior<AddArticleCommand, Unit>, ValidationBehavior<AddArticleCommand, Unit>>();
         services.AddTransient<IValidation<AddArticleCommand>, AddArticleValidation>();
-        
+
         //Get suggestions query
-        services.AddTransient<IPipelineBehavior<GetSuggestionsQuery, GetSuggestionsResult>, 
+        services.AddTransient<IPipelineBehavior<GetSuggestionsQuery, GetSuggestionsResult>,
             ValidationBehavior<GetSuggestionsQuery, GetSuggestionsResult>>();
         services.AddTransient<IValidation<GetSuggestionsQuery>, GetSuggestionsValidation>();
-        
+
         //Search Articles query
-        services.AddTransient<IPipelineBehavior<SearchArticlesQuery, SearchArticlesResult>,  
+        services.AddTransient<IPipelineBehavior<SearchArticlesQuery, SearchArticlesResult>,
             ValidationBehavior<SearchArticlesQuery, SearchArticlesResult>>();
         services.AddTransient<IValidation<SearchArticlesQuery>, SearchArticlesValidation>();
-        
+
         return services;
     }
 }

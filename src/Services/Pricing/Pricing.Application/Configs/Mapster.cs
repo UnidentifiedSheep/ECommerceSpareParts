@@ -1,7 +1,7 @@
 ﻿using Contracts.Models.ArticleCoefficients;
+using Contracts.Models.Currency;
 using Mapster;
 using Pricing.Abstractions.Dtos.Markups;
-using Pricing.Abstractions.Models;
 using Pricing.Abstractions.Models.Pricing;
 using Pricing.Entities;
 
@@ -11,10 +11,10 @@ public static class Mapster
 {
     public static void Configure()
     {
-        TypeAdapterConfig<Contracts.Models.Currency.Currency, Currency>.NewConfig()
+        TypeAdapterConfig<Currency, Abstractions.Models.Currency>.NewConfig()
             .Map(dest => dest.Id, src => src.Id)
             .Map(dest => dest.ToUsdRate, src => src.ToUsdRate);
-        
+
         //Markup
 
         TypeAdapterConfig<MarkupGroup, MarkupGroupDto>.NewConfig()
@@ -36,7 +36,7 @@ public static class Mapster
             .Map(dest => dest.Markup, src => src.MarkupRate)
             .Map(dest => dest.RangeEnd, src => src.RangeEnd)
             .Map(dest => dest.RangeStart, src => src.RangeStart);
-        
+
         TypeAdapterConfig<ArticleCoefficient, PriceCoefficient>.NewConfig()
             .Map(dest => dest.Name, src => src.Coefficient.Name)
             .Map(dest => dest.Order, src => src.Coefficient.Order)

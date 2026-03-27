@@ -5,10 +5,10 @@ using MassTransit;
 
 namespace Analytics.Application.Consumers;
 
-public class CurrencyRatesChangedConsumer(ICurrencyRepository currencyRepository, IUnitOfWork unitOfWork) : IConsumer<CurrencyRateChangedEvent>
+public class CurrencyRatesChangedConsumer(ICurrencyRepository currencyRepository, IUnitOfWork unitOfWork)
+    : IConsumer<CurrencyRateChangedEvent>
 {
     public async Task Consume(ConsumeContext<CurrencyRateChangedEvent> context)
     {
-        
     }
 }

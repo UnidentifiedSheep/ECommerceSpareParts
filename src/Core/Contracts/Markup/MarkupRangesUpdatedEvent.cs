@@ -1,3 +1,3 @@
 namespace Contracts.Markup;
 
-public record MarkupRangesUpdatedEvent();
+public record MarkupRangesUpdatedEvent;

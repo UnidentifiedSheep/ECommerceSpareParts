@@ -10,8 +10,8 @@ namespace Pricing.Application.Services;
 public class CurrencyService(ICurrencyCacheRepository currencyCache, IRequestClient<GetCurrenciesRequest> requestClient)
     : ICurrencyService
 {
-    private Task<List<Currency>>? _loadingTask;
     private readonly Lock _lock = new();
+    private Task<List<Currency>>? _loadingTask;
 
     public async Task<List<Currency>> GetCurrencies(CancellationToken cancellationToken = default)
     {
@@ -21,7 +21,7 @@ public class CurrencyService(ICurrencyCacheRepository currencyCache, IRequestCli
 
     public Task<List<Currency>> ReloadCurrencies(CancellationToken cancellationToken = default)
     {
-        return EnsureLoaded(cancellationToken, forceReload: true);
+        return EnsureLoaded(cancellationToken, true);
     }
 
     private Task<List<Currency>> EnsureLoaded(CancellationToken cancellationToken, bool forceReload = false)
@@ -40,7 +40,8 @@ public class CurrencyService(ICurrencyCacheRepository currencyCache, IRequestCli
     {
         try
         {
-            var response = await requestClient.GetResponse<GetCurrenciesResponse>(new GetCurrenciesRequest(), cancellationToken);
+            var response =
+                await requestClient.GetResponse<GetCurrenciesResponse>(new GetCurrenciesRequest(), cancellationToken);
 
             var currencies = response.Message.Currencies.Adapt<List<Currency>>();
             await currencyCache.SetCurrencies(currencies);
@@ -50,10 +51,11 @@ public class CurrencyService(ICurrencyCacheRepository currencyCache, IRequestCli
         catch
         {
             lock (_lock)
+            {
                 _loadingTask = null;
-            
+            }
+
             throw;
         }
     }
 }
-

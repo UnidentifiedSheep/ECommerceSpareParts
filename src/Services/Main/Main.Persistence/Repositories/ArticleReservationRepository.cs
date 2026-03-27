@@ -17,7 +17,9 @@ public class ArticleReservationRepository(DContext context) : IArticleReservatio
             .AnyAsync(x => x.Id == reservationId, cancellationToken);
     }
 
-    public async Task<StorageContentReservation?> GetReservationAsync(int reservationId, bool track = true,
+    public async Task<StorageContentReservation?> GetReservationAsync(
+        int reservationId,
+        bool track = true,
         CancellationToken cancellationToken = default)
     {
         return await context.StorageContentReservations
@@ -25,9 +27,14 @@ public class ArticleReservationRepository(DContext context) : IArticleReservatio
             .FirstOrDefaultAsync(x => x.Id == reservationId, cancellationToken);
     }
 
-    public async Task<IEnumerable<StorageContentReservation>> GetReservationsByExecAsync(string? searchTerm,
+    public async Task<IEnumerable<StorageContentReservation>> GetReservationsByExecAsync(
+        string? searchTerm,
         Guid? userId,
-        int offset, int limit, string? sortBy, bool track = true, CancellationToken cancellationToken = default)
+        int offset,
+        int limit,
+        string? sortBy,
+        bool track = true,
+        CancellationToken cancellationToken = default)
     {
         searchTerm = searchTerm?.Trim();
         var query = GetReservationsInternal(userId, track, sortBy);
@@ -40,9 +47,14 @@ public class ArticleReservationRepository(DContext context) : IArticleReservatio
             .ToListAsync(cancellationToken);
     }
 
-    public async Task<IEnumerable<StorageContentReservation>> GetReservationsBySimilarityAsync(string? searchTerm,
+    public async Task<IEnumerable<StorageContentReservation>> GetReservationsBySimilarityAsync(
+        string? searchTerm,
         Guid? userId,
-        int offset, int limit, string? sortBy, bool track = true, double similarity = 0.5,
+        int offset,
+        int limit,
+        string? sortBy,
+        bool track = true,
+        double similarity = 0.5,
         CancellationToken cancellationToken = default)
     {
         var query = GetReservationsInternal(userId, track, sortBy);
@@ -83,9 +95,14 @@ public class ArticleReservationRepository(DContext context) : IArticleReservatio
             .ToListAsync(cancellationToken);
     }
 
-    public async Task<IEnumerable<StorageContentReservation>> GetReservationsFromStartAsync(string? searchTerm,
+    public async Task<IEnumerable<StorageContentReservation>> GetReservationsFromStartAsync(
+        string? searchTerm,
         Guid? userId,
-        int offset, int limit, string? sortBy, bool track = true, CancellationToken cancellationToken = default)
+        int offset,
+        int limit,
+        string? sortBy,
+        bool track = true,
+        CancellationToken cancellationToken = default)
     {
         searchTerm = searchTerm?.Trim();
         var query = GetReservationsInternal(userId, track, sortBy);
@@ -106,9 +123,14 @@ public class ArticleReservationRepository(DContext context) : IArticleReservatio
             .ToListAsync(cancellationToken);
     }
 
-    public async Task<IEnumerable<StorageContentReservation>> GetReservationsContainsAsync(string? searchTerm,
+    public async Task<IEnumerable<StorageContentReservation>> GetReservationsContainsAsync(
+        string? searchTerm,
         Guid? userId,
-        int offset, int limit, string? sortBy, bool track = true, CancellationToken cancellationToken = default)
+        int offset,
+        int limit,
+        string? sortBy,
+        bool track = true,
+        CancellationToken cancellationToken = default)
     {
         searchTerm = searchTerm?.Trim();
         var query = GetReservationsInternal(userId, track, sortBy);
@@ -129,7 +151,9 @@ public class ArticleReservationRepository(DContext context) : IArticleReservatio
             .ToListAsync(cancellationToken);
     }
 
-    public Task<Dictionary<int, int>> GetReservationsCountForUserAsync(Guid userId, IEnumerable<int> articleIds,
+    public Task<Dictionary<int, int>> GetReservationsCountForUserAsync(
+        Guid userId,
+        IEnumerable<int> articleIds,
         CancellationToken cancellationToken = default)
     {
         return GetReservationsCountInternalAsync(
@@ -138,15 +162,20 @@ public class ArticleReservationRepository(DContext context) : IArticleReservatio
     }
 
     public Task<Dictionary<int, int>> GetReservationsCountForOthersAsync(
-        Guid userId, IEnumerable<int> articleIds, CancellationToken cancellationToken = default)
+        Guid userId,
+        IEnumerable<int> articleIds,
+        CancellationToken cancellationToken = default)
     {
         return GetReservationsCountInternalAsync(
             r => r.UserId != userId && articleIds.Contains(r.ArticleId) && !r.IsDone,
             cancellationToken);
     }
 
-    public async Task<Dictionary<int, List<StorageContentReservation>>> GetUserReservations(Guid userId,
-        IEnumerable<int> articleIds, bool isDone = false, bool track = true,
+    public async Task<Dictionary<int, List<StorageContentReservation>>> GetUserReservations(
+        Guid userId,
+        IEnumerable<int> articleIds,
+        bool isDone = false,
+        bool track = true,
         CancellationToken cancellationToken = default)
     {
         return await context.StorageContentReservations
@@ -159,8 +188,11 @@ public class ArticleReservationRepository(DContext context) : IArticleReservatio
                 g => g.ToList(), cancellationToken);
     }
 
-    public async Task<Dictionary<int, List<StorageContentReservation>>> GetUserReservationsForUpdate(Guid userId,
-        IEnumerable<int> articleIds, bool isDone = false, bool track = true,
+    public async Task<Dictionary<int, List<StorageContentReservation>>> GetUserReservationsForUpdate(
+        Guid userId,
+        IEnumerable<int> articleIds,
+        bool isDone = false,
+        bool track = true,
         CancellationToken cancellationToken = default)
     {
         var list = await context.StorageContentReservations

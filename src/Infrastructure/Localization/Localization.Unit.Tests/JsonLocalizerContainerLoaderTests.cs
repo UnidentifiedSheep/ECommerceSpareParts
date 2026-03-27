@@ -29,7 +29,7 @@ public class JsonLocalizerContainerLoaderTests
     [Fact]
     public async Task LoadAsync_ShouldIgnoreUnknownLocales()
     {
-        string locale = "fr";
+        var locale = "fr";
         var keyValues = new Dictionary<string, string>
         {
             ["key"] = "value"
@@ -53,7 +53,13 @@ public class JsonLocalizerContainerLoaderTests
         {
             BaseDir = baseDir;
         }
-        
+
+        public void Dispose()
+        {
+            if (Directory.Exists(BaseDir))
+                Directory.Delete(BaseDir, true);
+        }
+
         public static async Task<TempLocaleFile> Create(string locale, Dictionary<string, string> keyValues)
         {
             var dir = Path.Combine(Path.GetTempPath(), Guid.NewGuid().ToString());
@@ -61,9 +67,9 @@ public class JsonLocalizerContainerLoaderTests
 
             var subDir = Path.Combine(dir, "sub");
             Directory.CreateDirectory(subDir);
-            
+
             var filePath = Path.Combine(subDir, $"{locale}.json");
-            
+
             var model = new LocaleFullInfoModel
             {
                 Locale = locale,
@@ -72,12 +78,6 @@ public class JsonLocalizerContainerLoaderTests
 
             await File.WriteAllTextAsync(filePath, JsonSerializer.Serialize(model));
             return new TempLocaleFile(dir);
-        }
-
-        public void Dispose()
-        {
-            if (Directory.Exists(BaseDir))
-                Directory.Delete(BaseDir, true);
         }
     }
 }

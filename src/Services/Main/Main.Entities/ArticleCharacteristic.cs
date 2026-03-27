@@ -1,6 +1,6 @@
 ﻿namespace Main.Entities;
 
-public partial class ArticleCharacteristic
+public class ArticleCharacteristic
 {
     public int Id { get; set; }
 

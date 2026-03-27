@@ -1,4 +1,5 @@
 using FluentValidation;
+using Localization.Domain.Extensions;
 
 namespace Main.Application.Handlers.Storages.CreateStorage;
 
@@ -8,16 +9,18 @@ public class CreateStorageValidation : AbstractValidator<CreateStorageCommand>
     {
         RuleFor(x => x.Name)
             .NotEmpty()
-            .WithMessage("Название не может быть пустым")
+            .WithLocalizationKey("storage.name.not.empty")
             .Must(x => x.Trim().Length >= 6)
-            .WithMessage("Минимальная длина названия 6 символов")
-            .Must(x => x.Trim().Length <=128)
-            .WithMessage("Максимальная длина названия 128 символов");
+            .WithLocalizationKey("storage.name.min.length")
+            .Must(x => x.Trim().Length <= 128)
+            .WithLocalizationKey("storage.name.max.length");
+
         RuleFor(x => x.Description)
             .Must(x => x == null || x.Trim().Length <= 256)
-            .WithMessage("Максимальная длина описания 256 символов");
+            .WithLocalizationKey("storage.description.max.length");
+
         RuleFor(x => x.Location)
             .Must(x => x == null || x.Trim().Length <= 256)
-            .WithMessage("Максимальная длина локации 256 символов");
+            .WithLocalizationKey("storage.location.max.length");
     }
 }

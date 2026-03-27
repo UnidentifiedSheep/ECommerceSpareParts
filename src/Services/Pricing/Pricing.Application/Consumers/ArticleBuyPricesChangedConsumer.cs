@@ -5,7 +5,7 @@ using Pricing.Application.Handlers.Prices.RecalculateBasePrices;
 
 namespace Pricing.Application.Consumers;
 
-public class ArticleBuyPricesChangedConsumer(IMediator mediator) : IConsumer<ArticleBuyPricesChangedEvent >
+public class ArticleBuyPricesChangedConsumer(IMediator mediator) : IConsumer<ArticleBuyPricesChangedEvent>
 {
     public async Task Consume(ConsumeContext<ArticleBuyPricesChangedEvent> context)
     {

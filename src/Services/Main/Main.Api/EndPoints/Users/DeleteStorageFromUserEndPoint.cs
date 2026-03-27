@@ -2,7 +2,6 @@
 using Carter;
 using Enums;
 using Main.Application.Handlers.StorageOwners.DeleteStorageFromUser;
-using Main.Enums;
 using MediatR;
 
 namespace Main.Api.EndPoints.Users;
@@ -11,7 +10,7 @@ public class DeleteStorageFromUserEndPoint : ICarterModule
 {
     public void AddRoutes(IEndpointRouteBuilder app)
     {
-        app.MapDelete("/users/{userId:guid}/storages/{storageName}", 
+        app.MapDelete("/users/{userId:guid}/storages/{storageName}",
                 async (ISender sender, Guid userId, string storageName, CancellationToken token) =>
                 {
                     var command = new DeleteStorageFromUserCommand(userId, storageName);

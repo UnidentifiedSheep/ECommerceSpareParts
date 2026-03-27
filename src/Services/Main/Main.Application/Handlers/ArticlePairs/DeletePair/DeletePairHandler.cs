@@ -1,7 +1,7 @@
 using Abstractions.Interfaces.Services;
 using Application.Common.Interfaces;
 using Attributes;
-using Exceptions.Exceptions.ArticlePair;
+using Main.Abstractions.Exceptions.Articles;
 using Main.Abstractions.Interfaces.DbRepositories;
 using MediatR;
 
@@ -16,11 +16,11 @@ public class DeletePairHandler(IArticlePairsRepository pairsRepository, IUnitOfW
     public async Task<Unit> Handle(DeletePairCommand request, CancellationToken cancellationToken)
     {
         var pairs = (await pairsRepository
-            .GetRelatedPairsAsync(request.ArticleId, true, cancellationToken))
+                .GetRelatedPairsAsync(request.ArticleId, true, cancellationToken))
             .ToList();
 
         if (pairs.Count == 0) throw new ArticlePairNotFoundException(request.ArticleId);
-        
+
         unitOfWork.RemoveRange(pairs);
         await unitOfWork.SaveChangesAsync(cancellationToken);
         return Unit.Value;

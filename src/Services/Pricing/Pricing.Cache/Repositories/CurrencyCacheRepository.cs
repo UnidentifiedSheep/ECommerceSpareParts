@@ -15,17 +15,17 @@ public class CurrencyCacheRepository : ICurrencyCacheRepository
         _cache = cache;
         _ttl = ttl;
     }
-    
+
     public async Task<List<Currency>?> GetCurrencies()
     {
         return await _cache.StringGetAsync<List<Currency>>(CurrenciesKey);
     }
-    
+
     public async Task SetCurrencies(List<Currency> currencies)
     {
         await _cache.StringSetAsync(CurrenciesKey, currencies, _ttl);
     }
-    
+
     public async Task DeleteCurrencies()
     {
         await _cache.DeleteAsync(CurrenciesKey);

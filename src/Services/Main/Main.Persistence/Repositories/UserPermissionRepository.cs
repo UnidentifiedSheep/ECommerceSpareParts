@@ -8,7 +8,9 @@ namespace Main.Persistence.Repositories;
 
 public class UserPermissionRepository(DContext context) : IUserPermissionRepository
 {
-    public async Task<IEnumerable<Permission>> GetUserPermissionsAsync(Guid userId, bool track = true, 
+    public async Task<IEnumerable<Permission>> GetUserPermissionsAsync(
+        Guid userId,
+        bool track = true,
         CancellationToken cancellationToken = default)
     {
         var permission = await context.UserPermissions
@@ -18,5 +20,4 @@ public class UserPermissionRepository(DContext context) : IUserPermissionReposit
             .ToListAsync(cancellationToken);
         return permission.Select(x => x.PermissionNavigation);
     }
-    
 }

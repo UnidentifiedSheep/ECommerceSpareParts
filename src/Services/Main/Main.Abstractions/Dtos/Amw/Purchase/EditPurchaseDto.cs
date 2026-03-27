@@ -11,6 +11,6 @@ public class EditPurchaseDto
     public decimal Price { get; set; }
 
     public bool CalculateLogistics { get; set; }
-        
+
     public string? Comment { get; set; }
 }

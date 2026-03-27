@@ -9,7 +9,7 @@ public class RemoveContentDbValidation : AbstractDbValidation<RemoveContentComma
     public override void Build(IValidationPlan plan, RemoveContentCommand request)
     {
         plan.ValidateUserExistsId(request.UserId);
-        
+
         if (!request.TakeFromOtherStorages && !string.IsNullOrWhiteSpace(request.StorageName))
             plan.ValidateStorageExistsName(request.StorageName);
     }

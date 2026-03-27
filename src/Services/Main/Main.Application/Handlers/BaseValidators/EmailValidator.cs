@@ -1,5 +1,6 @@
 using Abstractions.Interfaces.Validators;
 using FluentValidation;
+using Localization.Domain.Extensions;
 using Main.Abstractions.Dtos.Emails;
 
 namespace Main.Application.Handlers.BaseValidators;
@@ -10,6 +11,6 @@ public class EmailValidator : AbstractValidator<EmailDto>
     {
         RuleFor(x => x.Email)
             .Must(emailValidator.IsValidEmail)
-            .WithMessage("Почта не является валидной");
+            .WithLocalizationKey("email.must.be.valid");
     }
 }

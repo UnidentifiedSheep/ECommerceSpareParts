@@ -7,7 +7,6 @@ using MediatR;
 using Microsoft.Extensions.DependencyInjection;
 using Test.Common.Extensions;
 using Test.Common.TestContainers.Combined;
-using Tests.MockData;
 
 namespace Tests.HandlersTests.Roles;
 
@@ -48,7 +47,6 @@ public class GetRolesTests : IAsyncLifetime
     {
         var roles = new[] { "Admin", "User", "Manager" };
         foreach (var r in roles)
-        {
             await _context.Roles.AddAsync(new Role
             {
                 Id = Guid.NewGuid(),
@@ -57,7 +55,6 @@ public class GetRolesTests : IAsyncLifetime
                 Description = r + " desc",
                 IsSystem = false
             });
-        }
         await _context.SaveChangesAsync();
 
         var queryAll = new GetRolesQuery(null, new PaginationModel(0, 10));

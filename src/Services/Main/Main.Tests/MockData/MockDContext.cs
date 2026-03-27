@@ -9,11 +9,11 @@ public static class MockDContext
     public static async Task AddArticleCross(this DContext context, int leftId, int rightId)
     {
         await context.Database.ExecuteSqlAsync($"""
-                                                   INSERT INTO article_crosses (article_id, article_cross_id) 
-                                                   values ({leftId}, {rightId})
-                                                   """);
+                                                INSERT INTO article_crosses (article_id, article_cross_id) 
+                                                values ({leftId}, {rightId})
+                                                """);
     }
-    
+
 
     public static async Task AddMockCurrencies(this DContext context)
     {
@@ -27,7 +27,7 @@ public static class MockDContext
             .Select(x => x.CurrencyId)
             .ToHashSetAsync();
 
-        var toAdd = new List<Currency>()
+        var toAdd = new List<Currency>
         {
             new()
             {
@@ -86,13 +86,9 @@ public static class MockDContext
         var newCurrencies = toAdd.Where(c => !existingIds.Contains(c.Id)).ToList();
 
         foreach (var c in newCurrencies)
-        {
             if (c.CurrencyToUsd != null &&
                 existingCurrencyToUsdIds.Contains(c.CurrencyToUsd.CurrencyId))
-            {
                 c.CurrencyToUsd = null;
-            }
-        }
 
         if (!newCurrencies.Any()) return;
 

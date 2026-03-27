@@ -1,6 +1,6 @@
 ﻿namespace Main.Entities;
 
-public partial class CurrencyToUsd
+public class CurrencyToUsd
 {
     public int CurrencyId { get; set; }
 

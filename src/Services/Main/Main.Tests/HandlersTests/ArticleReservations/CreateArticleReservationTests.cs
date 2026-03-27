@@ -1,6 +1,6 @@
 ﻿using Main.Abstractions.Constants;
-using Main.Application.Handlers.ArticleReservations.CreateArticleReservation;
 using Main.Abstractions.Dtos.Amw.ArticleReservations;
+using Main.Application.Handlers.ArticleReservations.CreateArticleReservation;
 using Main.Entities;
 using Main.Persistence.Context;
 using MediatR;
@@ -19,11 +19,11 @@ public class CreateArticleReservationTests : IAsyncLifetime
 {
     private readonly DContext _context;
     private readonly IMediator _mediator;
-
-    private User _whoCreated = null!;
-    private User _user = null!;
     private Article _article = null!;
     private Currency _currency = null!;
+    private User _user = null!;
+
+    private User _whoCreated = null!;
 
     public CreateArticleReservationTests(CombinedContainerFixture fixture)
     {
@@ -193,8 +193,7 @@ public class CreateArticleReservationTests : IAsyncLifetime
             }
         };
         var cmd = new CreateArticleReservationCommand(dto, _whoCreated.Id);
-        var exception = await Assert.ThrowsAsync<ValidationException>(() => _mediator.Send(cmd));
-        Assert.Equal("Не удалось найти валюту.", exception.Errors.First().ErrorMessage);
+        await Assert.ThrowsAsync<ValidationException>(() => _mediator.Send(cmd));
     }
 
     [Fact]

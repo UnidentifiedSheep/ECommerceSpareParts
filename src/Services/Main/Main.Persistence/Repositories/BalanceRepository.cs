@@ -10,7 +10,9 @@ namespace Main.Persistence.Repositories;
 
 public class BalanceRepository(DContext context) : IBalanceRepository
 {
-    public async Task<Transaction?> GetTransactionByIdAsync(Guid id, bool track = true,
+    public async Task<Transaction?> GetTransactionByIdAsync(
+        Guid id,
+        bool track = true,
         CancellationToken ct = default)
     {
         return await context.Transactions
@@ -19,8 +21,12 @@ public class BalanceRepository(DContext context) : IBalanceRepository
             .FirstOrDefaultAsync(ct);
     }
 
-    public async Task<Transaction?> GetPreviousTransactionAsync(DateTime dt, Guid userId, int currencyId,
-        bool track = true, CancellationToken ct = default)
+    public async Task<Transaction?> GetPreviousTransactionAsync(
+        DateTime dt,
+        Guid userId,
+        int currencyId,
+        bool track = true,
+        CancellationToken ct = default)
     {
         var sql = """
                       SELECT * FROM transactions
@@ -34,7 +40,7 @@ public class BalanceRepository(DContext context) : IBalanceRepository
 
         var dtParam = new NpgsqlParameter("dt", dt.ToUniversalTime())
         {
-            NpgsqlDbType = NpgsqlDbType.TimestampTz,
+            NpgsqlDbType = NpgsqlDbType.TimestampTz
         };
         var userIdParam = new NpgsqlParameter("userId", userId);
         var currencyIdParam = new NpgsqlParameter("currencyId", currencyId);
@@ -45,8 +51,12 @@ public class BalanceRepository(DContext context) : IBalanceRepository
             .FirstOrDefaultAsync(ct);
     }
 
-    public IAsyncEnumerable<Transaction> GetAffectedTransactions(Guid userId, int currencyId, DateTime dt,
-        Guid? excludeId = null, bool track = true)
+    public IAsyncEnumerable<Transaction> GetAffectedTransactions(
+        Guid userId,
+        int currencyId,
+        DateTime dt,
+        Guid? excludeId = null,
+        bool track = true)
     {
         var sql = excludeId is null
             ? """
@@ -98,7 +108,10 @@ public class BalanceRepository(DContext context) : IBalanceRepository
             .AsAsyncEnumerable();
     }
 
-    public async Task<UserBalance?> GetUserBalanceAsync(Guid userId, int currencyId, bool track = true,
+    public async Task<UserBalance?> GetUserBalanceAsync(
+        Guid userId,
+        int currencyId,
+        bool track = true,
         CancellationToken ct = default)
     {
         var sql = """
@@ -116,7 +129,9 @@ public class BalanceRepository(DContext context) : IBalanceRepository
             .FirstOrDefaultAsync(ct);
     }
 
-    public async Task<TransactionVersion?> GetLastTransactionVersionAsync(Guid transactionId, bool track = true,
+    public async Task<TransactionVersion?> GetLastTransactionVersionAsync(
+        Guid transactionId,
+        bool track = true,
         CancellationToken ct = default)
     {
         return await context.TransactionVersions
@@ -127,9 +142,16 @@ public class BalanceRepository(DContext context) : IBalanceRepository
             .FirstOrDefaultAsync(ct);
     }
 
-    public async Task<IEnumerable<Transaction>> GetTransactionsAsync(DateTime rangeStart, DateTime rangeEnd,
+    public async Task<IEnumerable<Transaction>> GetTransactionsAsync(
+        DateTime rangeStart,
+        DateTime rangeEnd,
         int? currencyId,
-        Guid? senderId, Guid? receiverId, int page, int viewCount, bool track = true, CancellationToken ct = default)
+        Guid? senderId,
+        Guid? receiverId,
+        int page,
+        int viewCount,
+        bool track = true,
+        CancellationToken ct = default)
     {
         var query = context.Transactions.ConfigureTracking(track)
             .Where(x =>

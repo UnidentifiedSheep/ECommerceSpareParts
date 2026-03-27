@@ -1,4 +1,3 @@
-using System.Security.Claims;
 using Abstractions.Interfaces;
 using Api.Common.Extensions;
 using Carter;
@@ -18,8 +17,8 @@ public class DeleteSaleEndPoint : ICarterModule
                     await sender.Send(command, token);
                     return Results.NoContent();
                 }).WithTags("Sales")
-                .WithDescription("Удаление продажи")
-                .WithDisplayName("Удаление продажи")
-                .RequireAnyPermission("SALES.DELETE");
+            .WithDescription("Удаление продажи")
+            .WithDisplayName("Удаление продажи")
+            .RequireAnyPermission("SALES.DELETE");
     }
 }

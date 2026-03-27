@@ -6,11 +6,15 @@ using Mapster;
 
 namespace Main.Application.Handlers.StorageRoutes.GetStorageRoutes;
 
-public record GetStorageRoutesQuery(string? StorageFrom, string? StorageTo, bool? IsActive, 
+public record GetStorageRoutesQuery(
+    string? StorageFrom,
+    string? StorageTo,
+    bool? IsActive,
     PaginationModel PaginationModel) : IQuery<GetStorageRoutesResult>;
+
 public record GetStorageRoutesResult(List<StorageRouteDto> StorageRoutes);
 
-public class GetStorageRoutesHandler(IStorageRoutesRepository storageRoutesRepository) 
+public class GetStorageRoutesHandler(IStorageRoutesRepository storageRoutesRepository)
     : IQueryHandler<GetStorageRoutesQuery, GetStorageRoutesResult>
 {
     public async Task<GetStorageRoutesResult> Handle(GetStorageRoutesQuery request, CancellationToken cancellationToken)
@@ -18,7 +22,7 @@ public class GetStorageRoutesHandler(IStorageRoutesRepository storageRoutesRepos
         var page = request.PaginationModel.Page;
         var limit = request.PaginationModel.Size;
         var routes = await storageRoutesRepository
-            .GetStorageRoutesAsync(request.StorageFrom, request.StorageTo, request.IsActive, 
+            .GetStorageRoutesAsync(request.StorageFrom, request.StorageTo, request.IsActive,
                 page, limit, false, cancellationToken, x => x.Currency);
 
         return new GetStorageRoutesResult(routes.Adapt<List<StorageRouteDto>>());

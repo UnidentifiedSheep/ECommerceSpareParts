@@ -1,0 +1,7 @@
+﻿{
+  "locale": "ru",
+  "keyValues": {
+    "cart.item.not.found": "Позиция не найдена в корзине.",
+    "item.already.in.cart": "позиция уже находится в корзине."
+  }
+}

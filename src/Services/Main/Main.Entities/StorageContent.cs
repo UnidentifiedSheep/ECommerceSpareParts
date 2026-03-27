@@ -2,7 +2,7 @@
 
 namespace Main.Entities;
 
-public partial class StorageContent
+public class StorageContent
 {
     [Validate]
     public int Id { get; set; }

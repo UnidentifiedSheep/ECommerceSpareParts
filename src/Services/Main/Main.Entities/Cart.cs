@@ -2,10 +2,11 @@
 
 namespace Main.Entities;
 
-public partial class Cart
+public class Cart
 {
     [ValidateTuple("PK")]
     public Guid UserId { get; set; }
+
     [ValidateTuple("PK")]
     public int ArticleId { get; set; }
 

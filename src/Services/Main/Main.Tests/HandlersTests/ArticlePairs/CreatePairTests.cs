@@ -68,13 +68,10 @@ public class CreatePairTests : IAsyncLifetime
     {
         var cmd = new CreatePairCommand(_leftArticleId, _rightArticleId);
         await _mediator.Send(cmd);
-        
+
         using var scope = _serviceProvider.CreateScope();
         var otherMediator = scope.ServiceProvider.GetRequiredService<IMediator>();
-        
-        await Assert.ThrowsAnyAsync<DbUpdateException>(async () =>
-        {
-            await otherMediator.Send(cmd);
-        });
+
+        await Assert.ThrowsAnyAsync<DbUpdateException>(async () => { await otherMediator.Send(cmd); });
     }
 }

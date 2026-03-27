@@ -1,4 +1,5 @@
 ﻿using FluentValidation;
+using Localization.Domain.Extensions;
 
 namespace Main.Application.Handlers.Logistics.CalculateDeliveryCost;
 
@@ -8,15 +9,14 @@ public class CalculateDeliveryCostValidation : AbstractValidator<CalculateDelive
     {
         RuleFor(x => x.Items)
             .NotEmpty()
-            .WithMessage("Список элементов не может быть пустым.");
+            .WithLocalizationKey("delivery.items.not.empty");
 
         RuleForEach(x => x.Items)
             .ChildRules(z =>
             {
                 z.RuleFor(x => x.Quantity)
                     .GreaterThan(0)
-                    .WithMessage("Количество должно быть больше нуля.");
+                    .WithLocalizationKey("delivery.item.quantity.greater.than.zero");
             });
-
     }
 }

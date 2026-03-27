@@ -5,5 +5,5 @@ public enum RecalculationTags
 {
     None = 0,
     RecalculationNeeded = 1 << 0,
-    Disabled = 1 << 1,
+    Disabled = 1 << 1
 }

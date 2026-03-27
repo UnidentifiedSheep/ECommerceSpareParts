@@ -9,13 +9,16 @@ namespace Main.Persistence.Repositories;
 
 public class ArticleCoefficients(DContext context) : IArticleCoefficients
 {
-    public async Task<Dictionary<int, List<ArticleCoefficient>>> GetArticlesCoefficients(IEnumerable<int> articleIds, 
-        bool track = true, CancellationToken cancellationToken = default, params Expression<Func<ArticleCoefficient, object>>[] includes)
+    public async Task<Dictionary<int, List<ArticleCoefficient>>> GetArticlesCoefficients(
+        IEnumerable<int> articleIds,
+        bool track = true,
+        CancellationToken cancellationToken = default,
+        params Expression<Func<ArticleCoefficient, object>>[] includes)
     {
         var query = context.ArticleCoefficients
             .ConfigureTracking(track)
             .Where(x => articleIds.Contains(x.ArticleId));
-        
+
         foreach (var include in includes)
             query = query.Include(include);
 

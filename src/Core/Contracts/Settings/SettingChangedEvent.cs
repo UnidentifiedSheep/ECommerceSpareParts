@@ -6,4 +6,3 @@ public record SettingChangedEvent
     public string? Value { get; init; }
     public DateTime ChangedAt { get; init; }
 }
-

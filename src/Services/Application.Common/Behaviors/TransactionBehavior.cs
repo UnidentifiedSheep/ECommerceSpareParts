@@ -12,7 +12,9 @@ public class TransactionBehavior<TRequest, TResponse>(IUnitOfWork unitOfWork) : 
     private static readonly TransactionalAttribute? Settings =
         typeof(TRequest).GetCustomAttribute<TransactionalAttribute>(true);
 
-    public async Task<TResponse> Handle(TRequest request, RequestHandlerDelegate<TResponse> next,
+    public async Task<TResponse> Handle(
+        TRequest request,
+        RequestHandlerDelegate<TResponse> next,
         CancellationToken cancellationToken)
     {
         if (Settings is null)

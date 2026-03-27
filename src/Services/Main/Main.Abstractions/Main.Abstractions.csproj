@@ -7,9 +7,94 @@
     </PropertyGroup>
 
     <ItemGroup>
-      <ProjectReference Include="..\..\..\Core\Abstractions\Abstractions.csproj" />
-      <ProjectReference Include="..\..\..\Core\Enums\Enums.csproj" />
-      <ProjectReference Include="..\Main.Entities\Main.Entities.csproj" />
+        <ProjectReference Include="..\..\..\Core\Abstractions\Abstractions.csproj"/>
+        <ProjectReference Include="..\..\..\Core\Enums\Enums.csproj"/>
+        <ProjectReference Include="..\..\..\Core\Exceptions\Exceptions.csproj"/>
+        <ProjectReference Include="..\Main.Entities\Main.Entities.csproj"/>
+    </ItemGroup>
+
+    <ItemGroup>
+        <Folder Include="Exceptions\"/>
+    </ItemGroup>
+
+    <ItemGroup>
+        <Content Include="..\..\Application.Common\Localization\common-localization-en.json">
+            <Link>Localization\common-localization-en.json</Link>
+            <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+        </Content>
+        <Content Include="..\..\Application.Common\Localization\common-localization-ru.json">
+            <Link>Localization\common-localization-ru.json</Link>
+            <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+        </Content>
+    </ItemGroup>
+
+    <ItemGroup>
+        <None Update="Localization\article-localization-en.json">
+            <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+        </None>
+        <None Update="Localization\article-localization-ru.json">
+            <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+        </None>
+        <None Update="Localization\auth-localization-en.json">
+            <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+        </None>
+        <None Update="Localization\auth-localization-ru.json">
+            <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+        </None>
+        <None Update="Localization\balance-localization-en.json">
+            <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+        </None>
+        <None Update="Localization\balance-localization-ru.json">
+            <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+        </None>
+        <None Update="Localization\base-localization-en.json">
+            <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+        </None>
+        <None Update="Localization\base-localization-ru.json">
+            <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+        </None>
+        <None Update="Localization\cart-localization-en.json">
+            <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+        </None>
+        <None Update="Localization\cart-localization-ru.json">
+            <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+        </None>
+        <None Update="Localization\currency-localization-en.json">
+            <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+        </None>
+        <None Update="Localization\currency-localization-ru.json">
+            <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+        </None>
+        <None Update="Localization\logistics-localization-en.json">
+            <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+        </None>
+        <None Update="Localization\logistics-localization-ru.json">
+            <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+        </None>
+        <None Update="Localization\producer-localization-en.json">
+            <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+        </None>
+        <None Update="Localization\producer-localization-ru.json">
+            <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+        </None>
+        <None Update="Localization\purchase-localization-en.json">
+            <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+        </None>
+        <None Update="Localization\purchase-localization-ru.json">
+            <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+        </None>
+        <None Update="Localization\sale-localization-en.json">
+            <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+        </None>
+        <None Update="Localization\sale-localization-ru.json">
+            <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+        </None>
+        <None Update="Localization\storage-localization-en.json">
+            <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+        </None>
+        <None Update="Localization\storage-localization-ru.json">
+            <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+        </None>
     </ItemGroup>
 
 </Project>

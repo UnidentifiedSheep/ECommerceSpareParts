@@ -2,7 +2,6 @@
 using Search.Abstractions.Dtos;
 using Search.Abstractions.Interfaces.Persistence;
 using Search.Application.Configs;
-using Search.Entities;
 
 namespace Search.Application.Handler.Articles.AddArticle;
 
@@ -12,7 +11,7 @@ internal class AddArticleHandler(IArticleWriteService articleWriteService) : ICo
 {
     public ValueTask<Unit> Handle(AddArticleCommand request, CancellationToken cancellationToken)
     {
-        Article article = request.Article.ToArticle();
+        var article = request.Article.ToArticle();
         articleWriteService.Add(article);
         return Unit.ValueTask;
     }

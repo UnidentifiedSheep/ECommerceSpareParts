@@ -1,7 +1,7 @@
-﻿using Exceptions.Exceptions.ArticleReservations;
+﻿using Main.Abstractions.Dtos.Amw.ArticleReservations;
+using Main.Abstractions.Exceptions.Articles;
 using Main.Application.Handlers.ArticleReservations.CreateArticleReservation;
 using Main.Application.Handlers.ArticleReservations.DeleteArticleReservation;
-using Main.Abstractions.Dtos.Amw.ArticleReservations;
 using Main.Entities;
 using Main.Persistence.Context;
 using MediatR;
@@ -18,10 +18,10 @@ public class DeleteArticleReservationTests : IAsyncLifetime
 {
     private readonly DContext _context;
     private readonly IMediator _mediator;
+    private Article _article = null!;
 
     private User _user = null!;
     private User _whoCreated = null!;
-    private Article _article = null!;
 
     public DeleteArticleReservationTests(CombinedContainerFixture fixture)
     {

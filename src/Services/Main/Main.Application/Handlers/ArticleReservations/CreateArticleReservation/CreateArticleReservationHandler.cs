@@ -16,10 +16,10 @@ public class CreateArticleReservationHandler(IUnitOfWork unitOfWork) : ICommandH
     public async Task<Unit> Handle(CreateArticleReservationCommand request, CancellationToken cancellationToken)
     {
         var adaptedReservations = request.Reservations.Adapt<List<StorageContentReservation>>();
-        
+
         foreach (var item in adaptedReservations)
             item.WhoCreated = request.WhoCreated;
-        
+
         await unitOfWork.AddRangeAsync(adaptedReservations, cancellationToken);
         await unitOfWork.SaveChangesAsync(cancellationToken);
 

@@ -42,10 +42,10 @@ public class MarkupService(ICurrencyConverter currencyConverter, ISettingsContai
             _markUps[toUsd.Key] = intervalMap;
         }
     }
-    
+
     public decimal GetMarkup(decimal value, int currencyId)
     {
-        double val = Convert.ToDouble(value);
+        var val = Convert.ToDouble(value);
         if (_markUps.Count == 0) return _defaultMarkUp;
         if (!_markUps.TryGetValue(currencyId, out var map))
         {

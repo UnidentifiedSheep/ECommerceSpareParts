@@ -6,19 +6,19 @@ public class MoneyConvertRatesResponse
 {
     [JsonPropertyName("base")]
     public string Base { get; set; } = null!;
-    
-    [JsonPropertyName("disclaimer")] 
+
+    [JsonPropertyName("disclaimer")]
     public string Disclaimer { get; set; } = null!;
-    
-    [JsonPropertyName("license")] 
+
+    [JsonPropertyName("license")]
     public string License { get; set; } = null!;
 
     [JsonPropertyName("ts")]
     public long Timestamp { get; set; }
-    
-    [JsonPropertyName("source")] 
+
+    [JsonPropertyName("source")]
     public string Source { get; set; } = null!;
 
-    [JsonPropertyName("rates")] 
+    [JsonPropertyName("rates")]
     public Dictionary<string, decimal> Rates { get; set; } = [];
 }

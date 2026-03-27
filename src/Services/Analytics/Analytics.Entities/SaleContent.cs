@@ -1,6 +1,6 @@
 ﻿namespace Analytics.Entities;
 
-public partial class SaleContent
+public class SaleContent
 {
     public int Id { get; set; }
 

@@ -2,6 +2,11 @@ namespace Main.Application.Extensions;
 
 public static class Price
 {
+    public static decimal GetDiscountFromPrices(decimal withDiscount, decimal withOutDiscount)
+    {
+        return (withOutDiscount - withDiscount) / withOutDiscount * 100;
+    }
+
     extension(decimal value)
     {
         public decimal GetDiscountedPrice(decimal discountFraction)
@@ -13,10 +18,5 @@ public static class Price
         {
             return value * (1 + markupFraction);
         }
-    }
-    
-    public static decimal GetDiscountFromPrices(decimal withDiscount, decimal withOutDiscount)
-    {
-        return (withOutDiscount - withDiscount) / withOutDiscount * 100;
     }
 }

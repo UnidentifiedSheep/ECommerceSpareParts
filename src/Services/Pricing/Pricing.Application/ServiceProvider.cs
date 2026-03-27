@@ -18,29 +18,29 @@ public static class ServiceProvider
     public static IServiceCollection AddApplicationLayer(this IServiceCollection collection)
     {
         collection.RegisterRelatedData();
-        
+
         collection.AddSingleton<ICurrencyConverter, CurrencyConverter>(_ => new CurrencyConverter(Global.UsdId));
-        
+
         collection.AddSingleton<IMarkupService, MarkupService>();
         collection.AddScoped<IMarkupSetup, MarkupSetup>();
-        
+
         collection.AddSingleton<ICurrencyConverter, CurrencyConverter>(_ => new CurrencyConverter(Global.UsdId));
         collection.AddScoped<ICurrencyConverterSetup, CurrencyConverterSetup>();
 
         collection.AddSingleton<ISettingsContainer, SettingsContainer>();
         collection.AddTransient<ISettingsService, SettingsService>();
-        
+
         collection.AddSingleton<IBasePriceStrategyFactory, BasePriceStrategyFactory>();
         collection.AddSingleton<IBasePriceStrategy, AverageBasePriceStrategy>();
         collection.AddSingleton<IBasePriceStrategy, HighestBasePriceStrategy>();
         collection.AddSingleton<IBasePriceStrategy, LowestBasePriceStrategy>();
         collection.AddSingleton<IBasePriceStrategy, MedianBasePriceStrategy>();
         collection.AddSingleton<IBasePricesService, BasePriceService>();
-        
+
         collection.AddSingleton<IDiscountService, DiscountService>();
         collection.AddSingleton<IPriceService, PriceService>();
         collection.AddScoped<ICurrencyService, CurrencyService>();
-        
+
         collection.AddMediatR(config =>
         {
             config.RegisterServicesFromAssembly(typeof(Global).Assembly);
@@ -51,7 +51,7 @@ public static class ServiceProvider
             config.AddOpenBehavior(typeof(TransactionBehavior<,>), ServiceLifetime.Scoped);
             config.AddOpenBehavior(typeof(DbValidationBehavior<,>), ServiceLifetime.Scoped);
         });
-        
+
         return collection;
     }
 }

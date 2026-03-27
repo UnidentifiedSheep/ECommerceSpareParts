@@ -11,7 +11,7 @@ public static class ServiceProvider
         assembly ??= Assembly.GetExecutingAssembly();
         var validationTypes = assembly.GetTypes()
             .Where(t => !t.IsAbstract && !t.IsInterface)
-            .Where(t => t.BaseType != null 
+            .Where(t => t.BaseType != null
                         && t.BaseType.IsGenericType
                         && t.BaseType.GetGenericTypeDefinition() == typeof(AbstractDbValidation<>));
 

@@ -1,15 +1,17 @@
 ﻿using Application.Common.Interfaces;
-using Exceptions.Exceptions.Producers;
 using Main.Abstractions.Dtos.Anonymous.Producers;
+using Main.Abstractions.Exceptions.Producers;
 using Main.Abstractions.Interfaces.DbRepositories;
 using Mapster;
 
 namespace Main.Application.Handlers.Producers.GetProducerById;
 
 public record GetProducerByIdQuery(int Id) : IQuery<GetProducerByIdResult>;
+
 public record GetProducerByIdResult(ProducerDto Producer);
 
-public class GetProducerByIdHandler(IProducerRepository producerRepository) : IQueryHandler<GetProducerByIdQuery, GetProducerByIdResult>
+public class GetProducerByIdHandler(IProducerRepository producerRepository)
+    : IQueryHandler<GetProducerByIdQuery, GetProducerByIdResult>
 {
     public async Task<GetProducerByIdResult> Handle(GetProducerByIdQuery request, CancellationToken cancellationToken)
     {

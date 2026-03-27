@@ -14,7 +14,8 @@ public record GetProducerOtherNamesResult(IEnumerable<ProducerOtherNameDto> Name
 public class GetProducerOtherNamesHandler(IProducerRepository producerRepository)
     : IQueryHandler<GetProducerOtherNamesQuery, GetProducerOtherNamesResult>
 {
-    public async Task<GetProducerOtherNamesResult> Handle(GetProducerOtherNamesQuery request,
+    public async Task<GetProducerOtherNamesResult> Handle(
+        GetProducerOtherNamesQuery request,
         CancellationToken cancellationToken)
     {
         var page = request.Pagination.Page;

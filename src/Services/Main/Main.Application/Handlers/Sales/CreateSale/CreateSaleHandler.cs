@@ -25,7 +25,7 @@ public record CreateSaleCommand(
 
 public record CreateSaleResult(Sale Sale);
 
-public class CreateSaleHandler(ISaleService saleService, IUnitOfWork unitOfWork) 
+public class CreateSaleHandler(ISaleService saleService, IUnitOfWork unitOfWork)
     : ICommandHandler<CreateSaleCommand, CreateSaleResult>
 {
     public async Task<CreateSaleResult> Handle(CreateSaleCommand request, CancellationToken cancellationToken)
@@ -71,7 +71,10 @@ public class CreateSaleHandler(ISaleService saleService, IUnitOfWork unitOfWork)
         return new CreateSaleResult(saleModel);
     }
 
-    private void DistributeDetails(int articleId, int requiredCount, SaleContent saleContent,
+    private void DistributeDetails(
+        int articleId,
+        int requiredCount,
+        SaleContent saleContent,
         Dictionary<int, Queue<SaleContentDetail>> detailGroups)
     {
         if (!detailGroups.TryGetValue(articleId, out var queue))

@@ -5,50 +5,70 @@
         "ClusterId": "main-cluster",
         "Match": {
           "Path": "/main/markups",
-          "Methods": [ "POST" ]
+          "Methods": [
+            "POST"
+          ]
         },
         "Transforms": [
-          { "PathRemovePrefix": "/main" }
+          {
+            "PathRemovePrefix": "/main"
+          }
         ]
       },
       "delete-markup": {
         "ClusterId": "main-cluster",
         "Match": {
           "Path": "/main/markups/{groupId}",
-          "Methods": [ "DELETE" ]
+          "Methods": [
+            "DELETE"
+          ]
         },
         "Transforms": [
-          { "PathRemovePrefix": "/main" }
+          {
+            "PathRemovePrefix": "/main"
+          }
         ]
       },
       "get-markup-group": {
         "ClusterId": "main-cluster",
         "Match": {
           "Path": "/main/markups/",
-          "Methods": [ "GET" ]
+          "Methods": [
+            "GET"
+          ]
         },
         "Transforms": [
-          { "PathRemovePrefix": "/main" }
+          {
+            "PathRemovePrefix": "/main"
+          }
         ]
       },
       "get-markup-ranges": {
         "ClusterId": "main-cluster",
         "Match": {
           "Path": "/main/markups/{groupId}",
-          "Methods": [ "GET" ]
+          "Methods": [
+            "GET"
+          ]
         },
         "Transforms": [
-          { "PathRemovePrefix": "/main" }
+          {
+            "PathRemovePrefix": "/main"
+          }
         ]
       },
       "select-default-markup": {
         "ClusterId": "main-cluster",
         "Match": {
           "Path": "/main/markups/default",
-          "Methods": [ "PUT" ]
+          "Methods": [
+            "PUT"
+          ]
         },
         "Transforms": [
-          { "PathRemovePrefix": "/main" }
+          {
+            "PathRemovePrefix": "/main"
+          }
         ]
       }
     }

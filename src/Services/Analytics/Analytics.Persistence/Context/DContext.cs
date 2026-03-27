@@ -1,5 +1,4 @@
-﻿using System.Text.Json;
-using Analytics.Entities;
+﻿using Analytics.Entities;
 using Analytics.Entities.Metrics;
 using MassTransit;
 using MassTransit.EntityFrameworkCoreIntegration;
@@ -32,7 +31,7 @@ public partial class DContext : DbContext
     public virtual DbSet<SaleContentDetail> SaleContentDetails { get; set; }
 
     public virtual DbSet<SalesFact> SalesFacts { get; set; }
-    
+
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         modelBuilder.AddOutboxMessageEntity();
@@ -42,7 +41,7 @@ public partial class DContext : DbContext
         modelBuilder.Entity<OutboxMessage>().ToTable("OutboxMessage", "msg");
         modelBuilder.Entity<OutboxState>().ToTable("OutboxState", "msg");
         modelBuilder.Entity<InboxState>().ToTable("InboxState", "msg");
-        
+
         modelBuilder.Entity<Currency>(entity =>
         {
             entity.HasKey(e => e.Id).HasName("currencies_pk");
@@ -57,12 +56,12 @@ public partial class DContext : DbContext
 
         modelBuilder.Entity<ArticleSalesMetric>(entity =>
         {
-            entity.HasIndex(e => new { e.Discriminator, e.ArticleId }, 
+            entity.HasIndex(e => new { e.Discriminator, e.ArticleId },
                 "metrics_discriminator_article_index");
-            
+
             entity.Property(e => e.ArticleId).HasColumnName("article_id");
         });
-        
+
         modelBuilder.Entity<Metric>(entity =>
         {
             entity.HasKey(e => e.Id).HasName("metrics_pk");
@@ -77,21 +76,21 @@ public partial class DContext : DbContext
 
             entity.HasIndex(e => e.Discriminator, "metrics_dirty_index")
                 .HasFilter("(tags & 1) = 1");
-            
+
             entity.HasIndex(m => new { m.DependsOn, m.RangeStart, m.RangeEnd },
                 "metrics_range_depends_index");
-            
-            entity.HasIndex(m => new { m.Discriminator, m.RangeStart, m.RangeEnd, m.DimensionHash }, 
+
+            entity.HasIndex(m => new { m.Discriminator, m.RangeStart, m.RangeEnd, m.DimensionHash },
                     "metrics_range_start_end_discriminator_u_index")
                 .IsUnique();
-            
+
             entity.Property(e => e.Id)
                 .HasDefaultValueSql("gen_random_uuid()")
                 .HasColumnName("id");
             entity.Property(e => e.Tags)
                 .HasColumnName("tags")
                 .HasConversion<long>();
-            
+
             entity.Property(m => m.DependsOn)
                 .HasConversion<long>()
                 .HasColumnName("depends_on");
@@ -107,9 +106,9 @@ public partial class DContext : DbContext
                 .HasMaxLength(200);
             entity.Property(e => e.DimensionHash).HasColumnName("dimension_hash")
                 .HasColumnType("bytea");
-            
+
             entity.Property(e => e.Json).HasColumnName("json");
-            
+
             entity.HasDiscriminator(e => e.Discriminator);
 
             entity.HasOne(d => d.Currency).WithMany(p => p.Metrics)
@@ -242,7 +241,7 @@ public partial class DContext : DbContext
         });
 
         modelBuilder.AllDateTimesToUtc();
-            
+
         OnModelCreatingPartial(modelBuilder);
     }
 

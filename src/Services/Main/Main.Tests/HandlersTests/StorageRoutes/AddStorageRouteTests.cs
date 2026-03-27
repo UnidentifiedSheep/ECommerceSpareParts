@@ -1,6 +1,5 @@
 ﻿using FluentValidation;
 using Main.Abstractions.Constants;
-using Main.Application.Configs;
 using Main.Application.Configs.Mapster;
 using Main.Application.Handlers.StorageRoutes.AddStorageRoute;
 using Main.Entities;
@@ -21,11 +20,11 @@ public class AddStorageRouteTests : IAsyncLifetime
 {
     private readonly DContext _context;
     private readonly IMediator _mediator;
+    private Currency _currency = null!;
     private Storage _storageFrom = null!;
     private Storage _storageTo = null!;
-    private Currency _currency = null!;
     private User _user = null!;
-    
+
     public AddStorageRouteTests(CombinedContainerFixture fixture)
     {
         MapsterConfig.Configure();
@@ -58,7 +57,7 @@ public class AddStorageRouteTests : IAsyncLifetime
         var command = new AddStorageRouteCommand(_storageFrom.Name, _storageTo.Name, 1000,
             RouteType.IntraCity, LogisticPricingType.PerOrder, 60, 10.5m, 20.5m,
             _currency.Id, 5.0m, null, _user.Id);
-        
+
         var result = await _mediator.Send(command);
 
         var route = await _context.StorageRoutes.FirstOrDefaultAsync(x => x.Id == result.RouteId);
@@ -83,7 +82,7 @@ public class AddStorageRouteTests : IAsyncLifetime
     public async Task AddStorageRoute_WithInvalidPricePrecision_ThrowsValidationException()
     {
         var command = new AddStorageRouteCommand(_storageFrom.Name, _storageTo.Name, 1000, RouteType.IntraCity,
-            LogisticPricingType.PerOrder, 60, 10.555m, 20.5m, _currency.Id, 5.0m, 
+            LogisticPricingType.PerOrder, 60, 10.555m, 20.5m, _currency.Id, 5.0m,
             null, _user.Id);
 
         await Assert.ThrowsAsync<ValidationException>(async () => await _mediator.Send(command));
@@ -92,8 +91,8 @@ public class AddStorageRouteTests : IAsyncLifetime
     [Fact]
     public async Task AddStorageRoute_WithNonExistentCurrency_ThrowsValidationException()
     {
-        var command = new AddStorageRouteCommand(_storageFrom.Name, _storageTo.Name, 1000, RouteType.IntraCity, 
-            LogisticPricingType.PerOrder, 60, 10.5m, 20.5m, 9999, 5.0m, 
+        var command = new AddStorageRouteCommand(_storageFrom.Name, _storageTo.Name, 1000, RouteType.IntraCity,
+            LogisticPricingType.PerOrder, 60, 10.5m, 20.5m, 9999, 5.0m,
             null, _user.Id);
 
         await Assert.ThrowsAsync<ValidationException>(async () => await _mediator.Send(command));
@@ -103,7 +102,7 @@ public class AddStorageRouteTests : IAsyncLifetime
     public async Task AddStorageRoute_WithNonExistentStorage_ThrowsDbValidationException()
     {
         var command = new AddStorageRouteCommand("NonExistentStorage", _storageTo.Name, 1000, RouteType.IntraCity,
-            LogisticPricingType.PerOrder, 60, 10.5m, 20.5m, _currency.Id, 5.0m, 
+            LogisticPricingType.PerOrder, 60, 10.5m, 20.5m, _currency.Id, 5.0m,
             null, _user.Id);
 
         var exception = await Assert.ThrowsAsync<DbValidationException>(async () => await _mediator.Send(command));

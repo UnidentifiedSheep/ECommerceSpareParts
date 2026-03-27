@@ -2,7 +2,7 @@
 
 namespace Main.Entities;
 
-public partial class Producer
+public class Producer
 {
     [Validate]
     public int Id { get; set; }

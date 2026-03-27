@@ -19,7 +19,9 @@ namespace Main.Application.Handlers.Sales.DeleteFullSale;
 [Transactional(IsolationLevel.Serializable, 20, 2)]
 public record DeleteFullSaleCommand(string SaleId, Guid UserId) : ICommand;
 
-public class DeleteFullSaleHandler(IMediator mediator, IPublishEndpoint publishEndpoint, 
+public class DeleteFullSaleHandler(
+    IMediator mediator,
+    IPublishEndpoint publishEndpoint,
     IUnitOfWork unitOfWork) : ICommandHandler<DeleteFullSaleCommand>
 {
     public async Task<Unit> Handle(DeleteFullSaleCommand request, CancellationToken cancellationToken)
@@ -36,7 +38,7 @@ public class DeleteFullSaleHandler(IMediator mediator, IPublishEndpoint publishE
 
         await publishEndpoint.Publish(new SaleDeletedEvent
         {
-            Sale = sale.Adapt<global::Contracts.Models.Sale.Sale>()
+            Sale = sale.Adapt<Contracts.Models.Sale.Sale>()
         }, cancellationToken);
         await unitOfWork.SaveChangesAsync(cancellationToken);
         return Unit.Value;
@@ -48,14 +50,18 @@ public class DeleteFullSaleHandler(IMediator mediator, IPublishEndpoint publishE
         return (await mediator.Send(command, cancellationToken)).Sale;
     }
 
-    private async Task DeleteTransaction(Guid transactionId, Guid userId,
+    private async Task DeleteTransaction(
+        Guid transactionId,
+        Guid userId,
         CancellationToken cancellationToken = default)
     {
         var command = new DeleteTransactionCommand(transactionId, userId, true);
         await mediator.Send(command, cancellationToken);
     }
 
-    private async Task RestoreStorageContents(IEnumerable<RestoreContentItem> details, Guid userId,
+    private async Task RestoreStorageContents(
+        IEnumerable<RestoreContentItem> details,
+        Guid userId,
         CancellationToken cancellationToken = default)
     {
         var command = new RestoreContentCommand(details, StorageMovementType.SaleDeletion, userId);

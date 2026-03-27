@@ -18,7 +18,7 @@ public static class ServiceProvider
     public static IServiceCollection AddPersistenceLayer(this IServiceCollection collection, string connectionString)
     {
         collection.AddDbContext<DContext>(options => options.UseNpgsql(connectionString));
-        
+
         collection.AddScoped<IUnitOfWork, UnitOfWork<DContext>>();
 
         collection.AddScoped<ICurrencyRepository, CurrencyRepository>();
@@ -28,7 +28,7 @@ public static class ServiceProvider
         collection.AddPgsqlDbValidators<DContext>();
 
         collection.AddScoped<ISeed<DContext>, CurrencySeed>();
-        
+
         return collection;
     }
 }

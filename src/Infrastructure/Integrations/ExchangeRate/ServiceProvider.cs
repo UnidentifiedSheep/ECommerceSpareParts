@@ -10,18 +10,14 @@ public static class ServiceProvider
 {
     public static IServiceCollection AddExchangeRates(this IServiceCollection services)
     {
-        services.AddHttpClient(nameof(ExchangeRateProvider.Cbr), client =>
+        services.AddHttpClient<IExchangeRateClient, CbrClient>((_, client) =>
         {
             client.BaseAddress = new Uri("https://www.cbr-xml-daily.ru/latest.js");
         });
-        
-        services.AddHttpClient(nameof(ExchangeRateProvider.MoneyConvert), client =>
+        services.AddHttpClient<IExchangeRateClient, MoneyConvertClient>((_, client) =>
         {
             client.BaseAddress = new Uri("https://cdn.moneyconvert.net/api/latest.json");
         });
-
-        services.AddTransient<IExchangeRateClient, CbrClient>();
-        services.AddTransient<IExchangeRateClient, MoneyConvertClient>();
 
         services.AddTransient<IExchangeRateClientFactory, ExchangeRateClientFactory>();
         return services;

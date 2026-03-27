@@ -1,7 +1,7 @@
-using Abstractions.Interfaces;
 using Abstractions.Interfaces.Currency;
 using Application.Common.Extensions;
 using FluentValidation;
+using Localization.Domain.Extensions;
 
 namespace Main.Application.Handlers.ArticleReservations.EditArticleReservation;
 
@@ -12,13 +12,15 @@ public class EditArticleReservationValidation : AbstractValidator<EditArticleRes
         RuleFor(z => z.NewValue.GivenPrice)
             .Must(z => Math.Round(z!.Value, 2) > 0)
             .When(z => z.NewValue.GivenPrice != null)
-            .WithMessage("Предложенная цена должна быть больше 0");
+            .WithLocalizationKey("article.reservation.given.price.must.be.positive");
+
         RuleFor(z => new { z.NewValue.InitialCount, z.NewValue.CurrentCount })
             .Must(z => z.InitialCount >= z.CurrentCount)
-            .WithMessage("Количество которое было зарезервировано, не может быть меньше текущего.");
+            .WithLocalizationKey("article.reservation.initial.count.not.less.than.current");
+
         RuleFor(z => z.NewValue.InitialCount)
             .GreaterThan(0)
-            .WithMessage("Общее количество для резервации должно быть больше 0");
+            .WithLocalizationKey("article.reservation.initial.count.must.be.positive");
 
         RuleFor(x => x.NewValue.GivenCurrencyId)
             .CurrencyMustExist(currencyConverter);

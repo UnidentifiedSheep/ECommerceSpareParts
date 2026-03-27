@@ -1,10 +1,10 @@
-using Exceptions.Exceptions.Articles;
 using Main.Abstractions.Constants;
-using Main.Application.Handlers.StorageContents.RestoreContent;
 using Main.Abstractions.Dtos.Amw.Sales;
+using Main.Abstractions.Exceptions.Articles;
+using Main.Abstractions.Models;
+using Main.Application.Handlers.StorageContents.RestoreContent;
 using Main.Entities;
 using Main.Enums;
-using Main.Abstractions.Models;
 using Main.Persistence.Context;
 using Mapster;
 using MediatR;
@@ -124,8 +124,7 @@ public class RestoreContentToStorageTests : IAsyncLifetime
         content[^1].Detail.CurrencyId = currencyId;
 
         var command = new RestoreContentCommand(content, StorageMovementType.StorageContentAddition, _user.Id);
-        var exception = await Assert.ThrowsAsync<ValidationException>(async () => await _mediator.Send(command));
-        Assert.Equal("Не удалось найти валюту.", exception.Errors.First().ErrorMessage);
+        await Assert.ThrowsAsync<ValidationException>(async () => await _mediator.Send(command));
     }
 
     [Fact]

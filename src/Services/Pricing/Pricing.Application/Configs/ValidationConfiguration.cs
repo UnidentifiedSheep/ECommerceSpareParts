@@ -14,16 +14,16 @@ public static class ValidationConfiguration
     {
         ConfigureMarkupGroup();
     }
-    
+
     private static void ConfigureMarkupGroup()
     {
-        ConfigureDbValidation.AddConfig(ValidationFunctions.ValidateMarkupGroupExistsId, KeyValueType.Single, 
+        ConfigureDbValidation.AddConfig(ValidationFunctions.ValidateMarkupGroupExistsId, KeyValueType.Single,
             config => config.WithErrorName(ApplicationErrors.MarkupGroupNotFound)
                 .WithMessageTemplate("Не удалось найти группу наценки.")
                 .WithErrorType(typeof(NotFoundException))
                 .WithErrorCode((int)HttpStatusCode.NotFound));
-        
-        ConfigureDbValidation.AddConfig(ValidationFunctions.ValidateMarkupGroupExistsId, KeyValueType.MultipleKeys, 
+
+        ConfigureDbValidation.AddConfig(ValidationFunctions.ValidateMarkupGroupExistsId, KeyValueType.MultipleKeys,
             config => config.WithErrorName(ApplicationErrors.MarkupGroupNotFound)
                 .WithMessageTemplate("Не удалось найти группы наценок.")
                 .WithErrorType(typeof(NotFoundException))

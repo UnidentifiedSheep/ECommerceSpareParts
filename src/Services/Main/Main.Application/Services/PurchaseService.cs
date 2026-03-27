@@ -22,24 +22,28 @@ public class PurchaseService(IMediator mediator) : IPurchaseService
         IEnumerable<PurchaseContent> contents,
         DeliveryCostDto costs,
         CancellationToken cancellationToken)
-        => AddLogisticsContentToPurchaseInternal(
+    {
+        return AddLogisticsContentToPurchaseInternal(
             contentDtos,
             contents,
             costs,
             x => x.CalculateLogistics,
             cancellationToken);
+    }
 
     public Task AddLogisticsContentToPurchase(
         List<NewPurchaseContentDto> contentDtos,
         IEnumerable<PurchaseContent> contents,
         DeliveryCostDto costs,
         CancellationToken cancellationToken)
-        => AddLogisticsContentToPurchaseInternal(
+    {
+        return AddLogisticsContentToPurchaseInternal(
             contentDtos,
             contents,
             costs,
             x => x.CalculateLogistics,
             cancellationToken);
+    }
 
     public async Task<(StorageRouteDto Route, DeliveryCostDto Cost)> CalculateDeliveryCost<TDto>(
         IEnumerable<TDto> content,
@@ -57,9 +61,14 @@ public class PurchaseService(IMediator mediator) : IPurchaseService
 
         return (result.Route, result.DeliveryCost);
     }
-    
-    public async Task<Transaction?> UpsertLogisticsTransaction(PurchaseLogistic? purchaseLogistic, StorageRouteDto route,
-        DeliveryCostDto deliveryCost, Guid whoUpdated, DateTime dateTime, CancellationToken cancellationToken)
+
+    public async Task<Transaction?> UpsertLogisticsTransaction(
+        PurchaseLogistic? purchaseLogistic,
+        StorageRouteDto route,
+        DeliveryCostDto deliveryCost,
+        Guid whoUpdated,
+        DateTime dateTime,
+        CancellationToken cancellationToken)
     {
         if (purchaseLogistic == null) return null;
 
@@ -70,8 +79,8 @@ public class PurchaseService(IMediator mediator) : IPurchaseService
 
         if (deliveryTransactionId != null && prevCarrierId == route.CarrierId)
             return (await mediator.Send(new EditTransactionCommand(deliveryTransactionId.Value, deliveryCost.CurrencyId,
-                    deliveryCost.TotalCost, TransactionStatus.Logistics, dateTime), cancellationToken)).Transaction;
-        
+                deliveryCost.TotalCost, TransactionStatus.Logistics, dateTime), cancellationToken)).Transaction;
+
 
         if (deliveryTransactionId != null)
             await mediator.Send(new DeleteTransactionCommand(deliveryTransactionId.Value, whoUpdated, true),
@@ -80,12 +89,12 @@ public class PurchaseService(IMediator mediator) : IPurchaseService
         if (route.CarrierId == null) return null;
 
         return (await mediator.Send(new CreateTransactionCommand(Global.SystemId, route.CarrierId.Value,
-                deliveryCost.TotalCost, deliveryCost.CurrencyId, whoUpdated, dateTime, 
-                TransactionStatus.Logistics), cancellationToken)).Transaction;
+            deliveryCost.TotalCost, deliveryCost.CurrencyId, whoUpdated, dateTime,
+            TransactionStatus.Logistics), cancellationToken)).Transaction;
     }
-    
+
     private async Task AddLogisticsContentToPurchaseInternal<TDto>(
-        List<TDto> contentDtos, 
+        List<TDto> contentDtos,
         IEnumerable<PurchaseContent> contents,
         DeliveryCostDto costs,
         Func<TDto, bool> shouldCalculate,
@@ -94,12 +103,12 @@ public class PurchaseService(IMediator mediator) : IPurchaseService
         List<PurchaseContentLogisticDto> contentLogistics = [];
         var contentsList = contents.ToList();
 
-        int costsIndex = 0;
+        var costsIndex = 0;
 
-        for (int i = 0; i < contentDtos.Count; i++)
+        for (var i = 0; i < contentDtos.Count; i++)
         {
             var dto = contentDtos[i];
-            if (!shouldCalculate(dto)) 
+            if (!shouldCalculate(dto))
                 continue;
 
             var content = contentsList[i];

@@ -1,6 +1,4 @@
-﻿using Localization.Abstractions.Interfaces;
-using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Hosting;
+﻿using Microsoft.Extensions.Hosting;
 
 namespace Localization.Domain.Extensions;
 

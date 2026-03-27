@@ -2,7 +2,6 @@ using Abstractions.Interfaces.Services;
 using Application.Common.Interfaces;
 using Attributes;
 using Main.Abstractions.Dtos.Amw.Producers;
-using Main.Abstractions.Interfaces.DbRepositories;
 using Main.Entities;
 using Mapster;
 
@@ -13,7 +12,8 @@ public record CreateProducerCommand(NewProducerDto NewProducer) : ICommand<Creat
 
 public record CreateProducerResult(int ProducerId);
 
-public class CreateProducerHandler(IUnitOfWork unitOfWork) : ICommandHandler<CreateProducerCommand, CreateProducerResult>
+public class CreateProducerHandler(IUnitOfWork unitOfWork)
+    : ICommandHandler<CreateProducerCommand, CreateProducerResult>
 {
     public async Task<CreateProducerResult> Handle(CreateProducerCommand request, CancellationToken cancellationToken)
     {

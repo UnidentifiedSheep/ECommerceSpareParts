@@ -1,0 +1,30 @@
+﻿{
+  "locale": "en",
+  "keyValues": {
+    "position.count.must.be.greater.than.zero": "The position count must be greater than 0.",
+    "email.must.be.valid": "The email address must be valid.",
+    "login.must.not.be.empty": "Login must not be empty.",
+    "login.min.length.5": "Login must be at least 5 characters long.",
+    "login.max.length.36": "Login must be at most 36 characters long.",
+    "login.cannot.contain.spaces": "Login cannot contain spaces.",
+    "password.must.not.be.empty": "Password must not be empty.",
+    "password.min.length": "Password must be at least {0} characters long.",
+    "password.max.length": "Password must be at most {0} characters long.",
+    "password.cannot.start.or.end.with.space": "Password cannot start or end with a space.",
+    "password.cannot.contain.spaces": "Password cannot contain spaces.",
+    "password.must.contain.uppercase": "Password must contain at least one uppercase letter.",
+    "password.must.contain.digit": "Password must contain at least one digit.",
+    "password.must.contain.special": "Password must contain at least one special character ({0}).",
+    "price.must.be.positive": "Price must be greater than 0.",
+    "price.max.two.decimal.places": "Price can have at most 2 decimal places.",
+    "user.name.required": "User must have a name.",
+    "user.name.min.length": "User name must be at least 3 characters long.",
+    "user.name.max.length": "User name must be at most 30 characters long.",
+    "user.name.no.special.chars": "User name cannot contain special characters.",
+    "user.surname.required": "User must have a surname.",
+    "user.surname.min.length": "User surname must be at least 3 characters long.",
+    "user.surname.max.length": "User surname must be at most 30 characters long.",
+    "user.surname.no.special.chars": "User surname cannot contain special characters.",
+    "user.description.max.length": "User description must be at most 300 characters long."
+  }
+}

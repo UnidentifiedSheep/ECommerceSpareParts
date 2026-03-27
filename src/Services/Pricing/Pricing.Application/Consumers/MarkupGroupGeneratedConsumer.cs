@@ -7,7 +7,8 @@ using Pricing.Application.Handlers.Markups.SetGeneratedMarkup;
 
 namespace Pricing.Application.Consumers;
 
-public class MarkupGroupGeneratedConsumer(IMediator mediator, IMarkupSetup markupSetup) : IConsumer<MarkupGroupGeneratedEvent>
+public class MarkupGroupGeneratedConsumer(IMediator mediator, IMarkupSetup markupSetup)
+    : IConsumer<MarkupGroupGeneratedEvent>
 {
     public async Task Consume(ConsumeContext<MarkupGroupGeneratedEvent> context)
     {

@@ -38,5 +38,5 @@ public abstract class RelatedDataBase(ICache cache, TimeSpan? ttl = null) : IRel
     public abstract string GetRelatedDataKey(string id);
 }
 
-public abstract class RelatedDataBase<TEntity>(ICache cache, TimeSpan? ttl = null) 
+public abstract class RelatedDataBase<TEntity>(ICache cache, TimeSpan? ttl = null)
     : RelatedDataBase(cache, ttl), IRelatedDataRepository<TEntity>;

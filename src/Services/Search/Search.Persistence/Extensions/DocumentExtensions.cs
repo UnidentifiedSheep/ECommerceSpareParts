@@ -33,6 +33,9 @@ public static class DocumentExtensions
         return new Article(id, articleNumber, title, producerId, producerName, popularity);
     }
 
-    
-    public static List<Article> ToArticles(this IEnumerable<Document> documents) => documents.Select(ToArticle).ToList();
+
+    public static List<Article> ToArticles(this IEnumerable<Document> documents)
+    {
+        return documents.Select(ToArticle).ToList();
+    }
 }

@@ -4,7 +4,8 @@ namespace Localization.Abstractions.Interfaces;
 
 public interface IScopedStringLocalizer : IDisposable
 {
+    string this[string key] { get; }
     void SetLocale(Locale locale);
     string Get(string key);
-    string this[string key] { get; }
+    bool TryGet(string key, out string? value);
 }

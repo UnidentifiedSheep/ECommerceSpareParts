@@ -7,15 +7,15 @@ using Analytics.Entities.Metrics.JsonDataModels;
 
 namespace Analytics.Application.MetricCalculators;
 
-public class ArticleSalesMetricCalculator(ISalesRepository salesRepository, ICurrencyConverter currencyConverter) 
+public class ArticleSalesMetricCalculator(ISalesRepository salesRepository, ICurrencyConverter currencyConverter)
     : MetricCalculatorBase<ArticleSalesMetric>
 {
     public override async Task CalculateMetric(ArticleSalesMetric metric, CancellationToken cancellationToken = default)
     {
-        decimal minPrice = decimal.MaxValue;
-        decimal maxPrice = decimal.MinValue;
+        var minPrice = decimal.MaxValue;
+        var maxPrice = decimal.MinValue;
         decimal totalAmount = 0;
-        int totalQuantity = 0;
+        var totalQuantity = 0;
 
         var (start, end) = await WithTimer(async () =>
         {
@@ -32,8 +32,8 @@ public class ArticleSalesMetricCalculator(ISalesRepository salesRepository, ICur
                 totalQuantity += neededArticle.Sum(x => x.Count);
             }
         });
-        
-        decimal avgPrice = totalAmount / totalQuantity;
+
+        var avgPrice = totalAmount / totalQuantity;
 
         var data = new ArticleInfoModel
         {
@@ -43,17 +43,19 @@ public class ArticleSalesMetricCalculator(ISalesRepository salesRepository, ICur
             {
                 AveragePrice = avgPrice,
                 MaximumPrice = maxPrice,
-                MinimumPrice = minPrice,
+                MinimumPrice = minPrice
             },
-            Timer = new MetricTimer(start, end),
+            Timer = new MetricTimer(start, end)
         };
-        
+
         metric.Data = data;
         metric.SetCalculated();
     }
-    
-    
+
+
     private static Expression<Func<SalesFact, bool>> GetWhere(ArticleSalesMetric metric)
-        => x => x.SaleContents.Any(z => z.ArticleId == metric.ArticleId) 
-                && metric.RangeStart <= x.CreatedAt && x.CreatedAt <= metric.RangeEnd;
+    {
+        return x => x.SaleContents.Any(z => z.ArticleId == metric.ArticleId)
+                    && metric.RangeStart <= x.CreatedAt && x.CreatedAt <= metric.RangeEnd;
+    }
 }

@@ -1,4 +1,5 @@
 using FluentValidation;
+using Localization.Domain.Extensions;
 
 namespace Main.Application.Handlers.Producers.AddOtherName;
 
@@ -8,14 +9,14 @@ public class AddOtherNameValidation : AbstractValidator<AddOtherNameCommand>
     {
         RuleFor(x => x.OtherName)
             .NotEmpty()
-            .WithMessage("Дополнительное имя не может быть пустым")
+            .WithLocalizationKey("producer.other.name.not.empty")
             .Must(name => name.Trim().Length >= 2)
-            .WithMessage("Длина дополнительного имени должна быть не менее 2 символов")
+            .WithLocalizationKey("producer.other.name.min.length")
             .Must(name => name.Trim().Length <= 64)
-            .WithMessage("Длина дополнительного имени не может превышать 64 символов");
+            .WithLocalizationKey("producer.other.name.max.length");
 
         RuleFor(x => x.WhereUsed)
             .Must(name => string.IsNullOrWhiteSpace(name) || name.Trim().Length <= 64)
-            .WithMessage("Длина обозначения применения имени не может превышать 64 символов");
+            .WithLocalizationKey("producer.other.name.where.used.max.length");
     }
 }

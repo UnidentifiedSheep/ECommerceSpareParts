@@ -7,6 +7,7 @@ using Mapster;
 namespace Main.Application.Handlers.Cart.GetCartItems;
 
 public record GetCartItemsQuery(Guid UserId, PaginationModel Pagination) : IQuery<GetCartItemsResult>;
+
 public record GetCartItemsResult(List<CartItemDto> CartItems);
 
 public class GetCartItemsHandler(ICartRepository cartRepository) : IQueryHandler<GetCartItemsQuery, GetCartItemsResult>

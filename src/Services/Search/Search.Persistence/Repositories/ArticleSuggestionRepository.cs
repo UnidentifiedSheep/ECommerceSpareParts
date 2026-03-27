@@ -11,17 +11,18 @@ using Search.Persistence.Interfaces.Repositories;
 namespace Search.Persistence.Repositories;
 
 internal sealed class ArticleSuggestionRepository(IIndexManager indexManager, IIndexDirectory indexDir)
-    : RepositoryBase<ArticleSuggestionsContext>(indexManager, IndexName.Article_Suggestions), IArticleSuggestionRepository
+    : RepositoryBase<ArticleSuggestionsContext>(indexManager, IndexName.Article_Suggestions),
+        IArticleSuggestionRepository
 {
     public int[] GetSuggestions(string query, int max = 10)
     {
         var lookupResult = IndexContext.Suggester.DoLookup(query, false, max);
         if (lookupResult == null) return [];
-        
+
         var result = lookupResult
             .Select(r => int.Parse(r.Payload.Utf8ToString()))
             .ToArray();
-        
+
         return result;
     }
 

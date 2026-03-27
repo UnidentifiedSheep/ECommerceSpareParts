@@ -18,7 +18,6 @@ public class BackgroundTaskQueue(ILogger<BackgroundTaskQueue> logger) : Backgrou
     protected override async Task ExecuteAsync(CancellationToken stoppingToken)
     {
         await foreach (var workItem in _queue.Reader.ReadAllAsync(stoppingToken))
-        {
             try
             {
                 await workItem(stoppingToken);
@@ -28,6 +27,5 @@ public class BackgroundTaskQueue(ILogger<BackgroundTaskQueue> logger) : Backgrou
             {
                 logger.LogError(ex, "Ошибка при выполнении фоновой задачи.");
             }
-        }
     }
 }

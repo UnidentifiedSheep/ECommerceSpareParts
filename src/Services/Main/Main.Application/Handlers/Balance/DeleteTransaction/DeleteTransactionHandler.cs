@@ -3,12 +3,11 @@ using System.Data;
 using Abstractions.Interfaces.Services;
 using Application.Common.Interfaces;
 using Attributes;
-using Exceptions.Exceptions.Balances;
+using Main.Abstractions.Exceptions.Balances;
 using Main.Abstractions.Interfaces.DbRepositories;
 using Main.Abstractions.Interfaces.Services;
 using Main.Entities;
 using Main.Enums;
-using MediatR;
 
 namespace Main.Application.Handlers.Balance.DeleteTransaction;
 
@@ -18,7 +17,9 @@ public record DeleteTransactionCommand(Guid TransactionId, Guid WhoDeleteUserId,
 
 public record DeleteTransactionResult(Transaction Transaction);
 
-public class DeleteTransactionHandler(IBalanceRepository balanceRepository, IUnitOfWork unitOfWork,
+public class DeleteTransactionHandler(
+    IBalanceRepository balanceRepository,
+    IUnitOfWork unitOfWork,
     IBalanceService balanceService) : ICommandHandler<DeleteTransactionCommand, DeleteTransactionResult>
 {
     private static readonly ImmutableHashSet<TransactionStatus> AllowedStatuses =
@@ -26,7 +27,9 @@ public class DeleteTransactionHandler(IBalanceRepository balanceRepository, IUni
         TransactionStatus.Normal
     ];
 
-    public async Task<DeleteTransactionResult> Handle(DeleteTransactionCommand request, CancellationToken cancellationToken)
+    public async Task<DeleteTransactionResult> Handle(
+        DeleteTransactionCommand request,
+        CancellationToken cancellationToken)
     {
         var transactionId = request.TransactionId;
         var whoDelete = request.WhoDeleteUserId;

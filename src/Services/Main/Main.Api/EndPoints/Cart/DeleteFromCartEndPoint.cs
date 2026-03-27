@@ -1,10 +1,8 @@
-﻿using System.Security.Claims;
-using Abstractions.Interfaces;
+﻿using Abstractions.Interfaces;
 using Api.Common.Extensions;
 using Carter;
 using Enums;
 using Main.Application.Handlers.Cart.DeleteFromCart;
-using Main.Enums;
 using MediatR;
 
 namespace Main.Api.EndPoints.Cart;
@@ -13,8 +11,11 @@ public class DeleteFromCartEndPoint : ICarterModule
 {
     public void AddRoutes(IEndpointRouteBuilder app)
     {
-        app.MapDelete("/cart/{articleId}", async (ISender sender, IUserContext user, int articleId, 
-            CancellationToken cancellationToken) =>
+        app.MapDelete("/cart/{articleId}", async (
+                ISender sender,
+                IUserContext user,
+                int articleId,
+                CancellationToken cancellationToken) =>
             {
                 var command = new DeleteFromCartCommand(user.UserId, articleId);
                 await sender.Send(command, cancellationToken);

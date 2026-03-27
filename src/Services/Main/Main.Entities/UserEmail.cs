@@ -3,7 +3,7 @@ using Main.Enums;
 
 namespace Main.Entities;
 
-public partial class UserEmail
+public class UserEmail
 {
     public Guid Id { get; set; }
 

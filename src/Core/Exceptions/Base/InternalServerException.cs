@@ -5,7 +5,6 @@ namespace Exceptions.Base;
 
 public class InternalServerException : Exception, IStatusCode
 {
-    public HttpStatusCode StatusCode => HttpStatusCode.InternalServerError;
     public InternalServerException(string message) : base(message)
     {
     }
@@ -16,4 +15,5 @@ public class InternalServerException : Exception, IStatusCode
     }
 
     public string? Details { get; }
+    public HttpStatusCode StatusCode => HttpStatusCode.InternalServerError;
 }

@@ -5,30 +5,42 @@
         "ClusterId": "main-cluster",
         "Match": {
           "Path": "/main/balances/transaction",
-          "Methods": [ "POST" ]
+          "Methods": [
+            "POST"
+          ]
         },
         "Transforms": [
-          { "PathRemovePrefix": "/main" }
+          {
+            "PathRemovePrefix": "/main"
+          }
         ]
       },
       "delete-transaction": {
         "ClusterId": "main-cluster",
         "Match": {
           "Path": "/main/balances/transaction/{id}",
-          "Methods": [ "DELETE" ]
+          "Methods": [
+            "DELETE"
+          ]
         },
         "Transforms": [
-          { "PathRemovePrefix": "/main" }
+          {
+            "PathRemovePrefix": "/main"
+          }
         ]
       },
       "get-transactions": {
         "ClusterId": "main-cluster",
         "Match": {
           "Path": "/main/balances/transactions",
-          "Methods": [ "GET" ]
+          "Methods": [
+            "GET"
+          ]
         },
         "Transforms": [
-          { "PathRemovePrefix": "/main" }
+          {
+            "PathRemovePrefix": "/main"
+          }
         ]
       }
     }

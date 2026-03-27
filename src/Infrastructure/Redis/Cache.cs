@@ -8,6 +8,7 @@ namespace Redis;
 public class Cache(IDatabase redis, string? prefix = null) : ICache
 {
     private readonly JsonCommands _json = redis.JSON();
+
     public async Task StringSetAsync<T>(string key, T value, TimeSpan? expiry = null)
     {
         key = AddPrefix(key);
@@ -15,6 +16,7 @@ public class Cache(IDatabase redis, string? prefix = null) : ICache
         await _json.SetAsync(key, "$", value, When.Always, Global.JsonOptions);
         await redis.KeyExpireAsync(key, expiry);
     }
+
     public async Task<T?> StringGetAsync<T>(string key, string path = "$")
     {
         key = AddPrefix(key);
@@ -136,6 +138,9 @@ public class Cache(IDatabase redis, string? prefix = null) : ICache
         batch.Execute();
         await Task.WhenAll(tasks);
     }
-    
-    private string AddPrefix(string key) => prefix == null ? key : $"{prefix}:{key}";
+
+    private string AddPrefix(string key)
+    {
+        return prefix == null ? key : $"{prefix}:{key}";
+    }
 }

@@ -12,8 +12,11 @@ namespace Main.Application.Handlers.Users.ChangeUserDiscount;
 [Transactional]
 public record ChangeUserDiscountCommand(Guid UserId, decimal DiscountRate) : ICommand;
 
-public class ChangeUserDiscountHandler(IUsersCacheRepository cacheUserRepository, IUserRepository usersRepository, 
-    IUnitOfWork unitOfWork, IPublishEndpoint publishEndpoint) 
+public class ChangeUserDiscountHandler(
+    IUsersCacheRepository cacheUserRepository,
+    IUserRepository usersRepository,
+    IUnitOfWork unitOfWork,
+    IPublishEndpoint publishEndpoint)
     : ICommandHandler<ChangeUserDiscountCommand>
 {
     public async Task<Unit> Handle(ChangeUserDiscountCommand request, CancellationToken cancellationToken)
@@ -25,13 +28,13 @@ public class ChangeUserDiscountHandler(IUsersCacheRepository cacheUserRepository
 
         await publishEndpoint.Publish(new UserDiscountChangedEvent
         {
-            UserId = userId, 
-            Discount = discount, 
+            UserId = userId,
+            Discount = discount,
             ChangedAt = DateTime.UtcNow
         }, cancellationToken);
-        
+
         await unitOfWork.SaveChangesAsync(cancellationToken);
-        
+
         return Unit.Value;
     }
 }

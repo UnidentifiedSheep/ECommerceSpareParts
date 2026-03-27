@@ -5,10 +5,14 @@
         "ClusterId": "main-cluster",
         "Match": {
           "Path": "/main/options/emails",
-          "Methods": [ "GET" ]
+          "Methods": [
+            "GET"
+          ]
         },
         "Transforms": [
-          { "PathRemovePrefix": "/main" }
+          {
+            "PathRemovePrefix": "/main"
+          }
         ]
       }
     }

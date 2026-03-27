@@ -14,7 +14,10 @@ public class LoginEndPoint : ICarterModule
     public void AddRoutes(IEndpointRouteBuilder app)
     {
         app.MapPost("/auth/login",
-                async (LoginRequest request, ISender sender, HttpContext context,
+                async (
+                    LoginRequest request,
+                    ISender sender,
+                    HttpContext context,
                     CancellationToken cancellationToken) =>
                 {
                     var userAgent = context.Request.Headers["User-Agent"].FirstOrDefault();

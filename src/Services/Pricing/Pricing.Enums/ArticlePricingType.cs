@@ -5,5 +5,5 @@ public enum ArticlePricingType
     Average,
     Median,
     Highest,
-    Lowest,
+    Lowest
 }

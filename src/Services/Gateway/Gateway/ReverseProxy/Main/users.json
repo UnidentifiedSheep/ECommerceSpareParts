@@ -5,110 +5,154 @@
         "ClusterId": "main-cluster",
         "Match": {
           "Path": "/main/users/{userId}/vehicles",
-          "Methods": [ "POST" ]
+          "Methods": [
+            "POST"
+          ]
         },
         "Transforms": [
-          { "PathRemovePrefix": "/main" }
+          {
+            "PathRemovePrefix": "/main"
+          }
         ]
       },
       "add-vehicle-to-garage-user": {
         "ClusterId": "main-cluster",
         "Match": {
           "Path": "/main/users/me/vehicles",
-          "Methods": [ "POST" ]
+          "Methods": [
+            "POST"
+          ]
         },
         "Transforms": [
-          { "PathRemovePrefix": "/main" }
+          {
+            "PathRemovePrefix": "/main"
+          }
         ]
       },
       "change-discount-for-user": {
         "ClusterId": "main-cluster",
         "Match": {
           "Path": "/main/users/{userId}/discount",
-          "Methods": [ "PATCH" ]
+          "Methods": [
+            "PATCH"
+          ]
         },
         "Transforms": [
-          { "PathRemovePrefix": "/main" }
+          {
+            "PathRemovePrefix": "/main"
+          }
         ]
       },
       "create-mail-for-user": {
         "ClusterId": "main-cluster",
         "Match": {
           "Path": "/main/users/{userId}/mail/corporate",
-          "Methods": [ "POST" ]
+          "Methods": [
+            "POST"
+          ]
         },
         "Transforms": [
-          { "PathRemovePrefix": "/main" }
+          {
+            "PathRemovePrefix": "/main"
+          }
         ]
       },
       "create-users": {
         "ClusterId": "main-cluster",
         "Match": {
           "Path": "/main/users",
-          "Methods": [ "POST" ]
+          "Methods": [
+            "POST"
+          ]
         },
         "Transforms": [
-          { "PathRemovePrefix": "/main" }
+          {
+            "PathRemovePrefix": "/main"
+          }
         ]
       },
       "get-users": {
         "ClusterId": "main-cluster",
         "Match": {
           "Path": "/main/users",
-          "Methods": [ "GET" ]
+          "Methods": [
+            "GET"
+          ]
         },
         "Transforms": [
-          { "PathRemovePrefix": "/main" }
+          {
+            "PathRemovePrefix": "/main"
+          }
         ]
       },
       "add-permission-to-user": {
         "ClusterId": "main-cluster",
         "Match": {
           "Path": "/main/users/{userId}/permissions",
-          "Methods": [ "POST" ]
+          "Methods": [
+            "POST"
+          ]
         },
         "Transforms": [
-          { "PathRemovePrefix": "/main" }
+          {
+            "PathRemovePrefix": "/main"
+          }
         ]
       },
       "get-user-full-info": {
         "ClusterId": "main-cluster",
         "Match": {
           "Path": "/main/users/{userId}/info",
-          "Methods": [ "GET" ]
+          "Methods": [
+            "GET"
+          ]
         },
         "Transforms": [
-          { "PathRemovePrefix": "/main" }
+          {
+            "PathRemovePrefix": "/main"
+          }
         ]
       },
       "get-user-discount": {
         "ClusterId": "main-cluster",
         "Match": {
           "Path": "/main/users/{userId}/discount",
-          "Methods": [ "GET" ]
+          "Methods": [
+            "GET"
+          ]
         },
         "Transforms": [
-          { "PathRemovePrefix": "/main" }
+          {
+            "PathRemovePrefix": "/main"
+          }
         ]
       },
       "add-storage-to-user": {
         "ClusterId": "main-cluster",
         "Match": {
           "Path": "/main/users/{userId}/storages/{storageName}",
-          "Methods": [ "POST" ]
+          "Methods": [
+            "POST"
+          ]
         },
         "Transforms": [
-          { "PathRemovePrefix": "/main" }
+          {
+            "PathRemovePrefix": "/main"
+          }
         ]
       },
       "get-user-storages": {
         "ClusterId": "main-cluster",
         "Match": {
           "Path": "/main/users/{userId}/storages",
-          "Methods": [ "GET" ]
+          "Methods": [
+            "GET"
+          ]
         },
         "Transforms": [
-          { "PathRemovePrefix": "/main" }
+          {
+            "PathRemovePrefix": "/main"
+          }
         ]
       }
     }

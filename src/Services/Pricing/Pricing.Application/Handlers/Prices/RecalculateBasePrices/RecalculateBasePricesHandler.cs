@@ -15,16 +15,19 @@ using Pricing.Enums;
 namespace Pricing.Application.Handlers.Prices.RecalculateBasePrices;
 
 public record RecalculateBasePricesCommand(IEnumerable<int> ArticleIds) : ICommand;
+
 /// <summary>
-/// All prices are in USD
+///     All prices are in USD
 /// </summary>
 /// <param name="Prices">Calculated prices</param>
 public record RecalculateBasePricesResult(List<BasePricingItemResult> Prices);
 
-public class RecalculateBasePricesHandler(IArticlePricesCacheRepository articlePricesCache,
+public class RecalculateBasePricesHandler(
+    IArticlePricesCacheRepository articlePricesCache,
     IRequestClient<GetStorageContentCostsRequest> costsRequestClient,
     IRequestClient<GetArticleCoefficientsRequest> coefficientsRequestClient,
-    ICurrencyConverter currencyConverter, IBasePricesService basePricesService,
+    ICurrencyConverter currencyConverter,
+    IBasePricesService basePricesService,
     ISettingsContainer settingsContainer)
     : ICommandHandler<RecalculateBasePricesCommand>
 {
@@ -33,14 +36,15 @@ public class RecalculateBasePricesHandler(IArticlePricesCacheRepository articleP
         var ids = request.ArticleIds.ToHashSet();
         var pricingType = GetPricingType();
         var pricesResponse = await costsRequestClient
-            .GetResponse<GetStorageContentCostsResponse>(new GetStorageContentCostsRequest { ArticleIds = ids}, cancellationToken);
-        
+            .GetResponse<GetStorageContentCostsResponse>(new GetStorageContentCostsRequest { ArticleIds = ids },
+                cancellationToken);
+
         var buyPrices = pricesResponse.Message.StorageContentCosts.GroupBy(x => x.ArticleId)
             .ToDictionary(g => g.Key, g => g.ToList());
 
         var coefficients = (await coefficientsRequestClient
             .GetResponse<GetArticleCoefficientsResponse>(ids, cancellationToken)).Message.Coefficients;
-        
+
         List<BasePricingItem> data = [];
         List<int> articlesWithQtyZero = [];
 
@@ -52,23 +56,23 @@ public class RecalculateBasePricesHandler(IArticlePricesCacheRepository articleP
                 continue;
             }
 
-            List<PriceCoefficient> coefs = coefficients.TryGetValue(articleId, out var articleCoefficients) 
-                ? articleCoefficients.Adapt<List<PriceCoefficient>>() 
+            var coefs = coefficients.TryGetValue(articleId, out var articleCoefficients)
+                ? articleCoefficients.Adapt<List<PriceCoefficient>>()
                 : [];
-            
 
-            List<ArticlePrice> prices = projections
+
+            var prices = projections
                 .Select(ContentCostToPrice)
                 .ToList();
-            
+
             data.Add(new BasePricingItem(articleId, prices, coefs));
         }
-        
+
         var calcResult = basePricesService.CalculatePrices(new BasePricingContext(data, pricingType));
         List<(BasePricingItemResult value, TimeSpan? exp)> itemsToCache = calcResult.Items
             .Select(x =>
                 {
-                    TimeSpan? ttl = x.AppliedCoefficients.Any() 
+                    TimeSpan? ttl = x.AppliedCoefficients.Any()
                         ? x.AppliedCoefficients.Min(z => z.ValidTill - DateTime.UtcNow)
                         : null;
                     if (ttl != null)
@@ -77,17 +81,17 @@ public class RecalculateBasePricesHandler(IArticlePricesCacheRepository articleP
                     return (x, ttl);
                 }
             ).ToList();
-        
+
         articlePricesCache.SetArticleBasePrices(itemsToCache);
         await articlePricesCache.DeleteArticleBasePrices(articlesWithQtyZero);
-        
+
         return Unit.Value;
     }
 
     private ArticlePrice ContentCostToPrice(StorageContentCost contentCost)
     {
-        decimal buyPrice = currencyConverter.ConvertToUsd(contentCost.Price, contentCost.CurrencyId);
-        decimal deliveryPrice = currencyConverter.ConvertToUsd(contentCost.DeliveryPrice, contentCost.DeliveryCurrencyId);
+        var buyPrice = currencyConverter.ConvertToUsd(contentCost.Price, contentCost.CurrencyId);
+        var deliveryPrice = currencyConverter.ConvertToUsd(contentCost.DeliveryPrice, contentCost.DeliveryCurrencyId);
         return new ArticlePrice(buyPrice, deliveryPrice);
     }
 

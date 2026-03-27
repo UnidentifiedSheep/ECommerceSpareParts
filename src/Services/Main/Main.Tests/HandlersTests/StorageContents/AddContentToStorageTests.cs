@@ -1,9 +1,8 @@
-using Exceptions.Exceptions.Articles;
 using Main.Abstractions.Constants;
-using Main.Application.Configs;
-using Main.Application.Handlers.StorageContents.AddContent;
 using Main.Abstractions.Dtos.Amw.Storage;
+using Main.Abstractions.Exceptions.Articles;
 using Main.Application.Configs.Mapster;
+using Main.Application.Handlers.StorageContents.AddContent;
 using Main.Entities;
 using Main.Enums;
 using Main.Persistence.Context;
@@ -107,8 +106,7 @@ public class AddContentToStorageTests : IAsyncLifetime
         storageContent.Last().CurrencyId = int.MaxValue;
         var command = new AddContentCommand(storageContent, _storage.Name, _user.Id,
             StorageMovementType.StorageContentAddition);
-        var exception = await Assert.ThrowsAsync<ValidationException>(async () => await _mediator.Send(command));
-        Assert.Equal("Не удалось найти валюту.", exception.Errors.First().ErrorMessage);
+        await Assert.ThrowsAsync<ValidationException>(async () => await _mediator.Send(command));
     }
 
     [Fact]

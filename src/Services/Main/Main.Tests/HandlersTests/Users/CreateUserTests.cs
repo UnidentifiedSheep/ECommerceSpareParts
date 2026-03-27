@@ -1,7 +1,7 @@
 using Bogus;
 using Main.Abstractions.Constants;
-using Main.Application.Handlers.Users.CreateUser;
 using Main.Abstractions.Dtos.Emails;
+using Main.Application.Handlers.Users.CreateUser;
 using Main.Enums;
 using Main.Persistence.Context;
 using MediatR;
@@ -9,7 +9,6 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Test.Common.Extensions;
 using Test.Common.TestContainers.Combined;
-using Tests.MockData;
 using ValidationException = FluentValidation.ValidationException;
 using DbValidationException = BulkValidation.Core.Exceptions.ValidationException;
 

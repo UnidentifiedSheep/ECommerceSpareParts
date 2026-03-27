@@ -1,7 +1,7 @@
 ﻿using Main.Abstractions.Constants;
+using Main.Abstractions.Dtos.Amw.ArticleReservations;
 using Main.Application.Handlers.ArticleReservations.CreateArticleReservation;
 using Main.Application.Handlers.ArticleReservations.GetArticlesWithNotEnoughStock;
-using Main.Abstractions.Dtos.Amw.ArticleReservations;
 using Main.Entities;
 using Main.Persistence.Context;
 using MediatR;
@@ -19,11 +19,11 @@ public class GetArticlesWithNotEnoughStockTests : IAsyncLifetime
 {
     private readonly DContext _context;
     private readonly IMediator _mediator;
+    private Article _article = null!;
 
     private User _buyer = null!;
-    private User _otherUser = null!;
-    private Article _article = null!;
     private Currency _currency = null!;
+    private User _otherUser = null!;
     private string _storageName = null!;
 
     public GetArticlesWithNotEnoughStockTests(CombinedContainerFixture fixture)
@@ -106,15 +106,18 @@ public class GetArticlesWithNotEnoughStockTests : IAsyncLifetime
     [Fact]
     public async Task ValidationErrors_ForMissingData()
     {
-        var badStorage = new GetArticlesWithNotEnoughStockQuery(_buyer.Id, "__no_storage__", false, new Dictionary<int, int> { { _article.Id, 1 } });
+        var badStorage = new GetArticlesWithNotEnoughStockQuery(_buyer.Id, "__no_storage__", false,
+            new Dictionary<int, int> { { _article.Id, 1 } });
         var exception = await Assert.ThrowsAsync<DbValidationException>(() => _mediator.Send(badStorage));
         Assert.Equal(ApplicationErrors.StoragesNotFound, exception.Failures[0].ErrorName);
-        
-        var badUser = new GetArticlesWithNotEnoughStockQuery(Guid.NewGuid(), _storageName, false, new Dictionary<int, int> { { _article.Id, 1 } });
+
+        var badUser = new GetArticlesWithNotEnoughStockQuery(Guid.NewGuid(), _storageName, false,
+            new Dictionary<int, int> { { _article.Id, 1 } });
         exception = await Assert.ThrowsAsync<DbValidationException>(() => _mediator.Send(badUser));
         Assert.Equal(ApplicationErrors.UsersNotFound, exception.Failures[0].ErrorName);
-        
-        var badArticle = new GetArticlesWithNotEnoughStockQuery(_buyer.Id, _storageName, false, new Dictionary<int, int> { { int.MaxValue, 1 } });
+
+        var badArticle = new GetArticlesWithNotEnoughStockQuery(_buyer.Id, _storageName, false,
+            new Dictionary<int, int> { { int.MaxValue, 1 } });
         exception = await Assert.ThrowsAsync<DbValidationException>(() => _mediator.Send(badArticle));
         Assert.Equal(ApplicationErrors.ArticlesNotFound, exception.Failures[0].ErrorName);
     }

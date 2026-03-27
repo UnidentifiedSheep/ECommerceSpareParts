@@ -16,8 +16,10 @@ namespace Main.Application.Handlers.StorageContents.MoveContentToOtherStorage;
 [Transactional(IsolationLevel.ReadCommitted, 0, 2)]
 public record MoveContentToOtherStorageCommand(IEnumerable<MoveStorageContentDto> Movements, Guid MovedBy) : ICommand;
 
-public class MoveContentToOtherStorageHandler(IStorageContentService storageContentService, 
-    IConcurrencyValidator<StorageContent> concurrencyValidator, IUnitOfWork unitOfWork) 
+public class MoveContentToOtherStorageHandler(
+    IStorageContentService storageContentService,
+    IConcurrencyValidator<StorageContent> concurrencyValidator,
+    IUnitOfWork unitOfWork)
     : ICommandHandler<MoveContentToOtherStorageCommand>
 {
     public async Task<Unit> Handle(MoveContentToOtherStorageCommand request, CancellationToken cancellationToken)
@@ -26,9 +28,9 @@ public class MoveContentToOtherStorageHandler(IStorageContentService storageCont
 
         var storageContents = await storageContentService
             .GetStorageContentsForUpdate(ids, cancellationToken);
-        
+
         var storageMovements = new List<StorageMovement>();
-        
+
         foreach (var move in request.Movements)
         {
             var content = storageContents[move.StorageContentId];
@@ -40,6 +42,7 @@ public class MoveContentToOtherStorageHandler(IStorageContentService storageCont
             storageMovements.AddRange(movements);
             content.StorageName = move.NewStorageName;
         }
+
         await unitOfWork.AddRangeAsync(storageMovements, cancellationToken);
         await unitOfWork.SaveChangesAsync(cancellationToken);
         return Unit.Value;
@@ -51,7 +54,7 @@ public class MoveContentToOtherStorageHandler(IStorageContentService storageCont
             .SetActionType(StorageMovementType.StorageContentMovement);
         movementF.Count = -content.Count;
         movementF.WhoMoved = whoMoved;
-        
+
         var movementS = content.Adapt<StorageMovement>()
             .SetActionType(StorageMovementType.StorageContentMovement);
         movementS.Count = content.Count;

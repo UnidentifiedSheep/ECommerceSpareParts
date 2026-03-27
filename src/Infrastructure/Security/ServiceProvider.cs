@@ -10,7 +10,8 @@ namespace Security;
 
 public static class ServiceProvider
 {
-    public static IServiceCollection AddSecurityLayer(this IServiceCollection collection,
+    public static IServiceCollection AddSecurityLayer(
+        this IServiceCollection collection,
         PasswordRules? passwordRules = null)
     {
         collection.AddSingleton<IJwtGenerator, JwtGenerator>();
@@ -22,8 +23,11 @@ public static class ServiceProvider
         return collection;
     }
 
-    public static IServiceCollection AddSecurityLayer(this IServiceCollection collection, string secret, 
-        JsonSerializerOptions? options = null, PasswordRules? passwordRules = null)
+    public static IServiceCollection AddSecurityLayer(
+        this IServiceCollection collection,
+        string secret,
+        JsonSerializerOptions? options = null,
+        PasswordRules? passwordRules = null)
     {
         collection.AddSingleton<IJsonSigner, JsonSigner>(_ => new JsonSigner(secret, options));
         collection.AddSecurityLayer(passwordRules);

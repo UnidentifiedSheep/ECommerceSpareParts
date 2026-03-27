@@ -48,7 +48,8 @@
         "Match": {
           "Path": "/main/storages/routes/{id}",
           "Methods": [
-            "PATCH", "DELETE"
+            "PATCH",
+            "DELETE"
           ]
         },
         "Transforms": [

@@ -9,8 +9,8 @@ public class StringLocalizerTests
     public void Get_ShouldReturnValue_WhenKeyExists()
     {
         var locale = "en";
-        string key = "Test.Key";
-        string value = "Test.Value";
+        var key = "Test.Key";
+        var value = "Test.Value";
         var container = new LocalizerContainer(locale);
         container.Initialize(new Dictionary<string, string>
         {
@@ -20,7 +20,7 @@ public class StringLocalizerTests
         var localizer = new StringLocalizer([container]);
 
         var result = localizer.Get(key, locale);
-        
+
         result.Should().Be(value);
     }
 

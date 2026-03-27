@@ -8,7 +8,10 @@ namespace Main.Application.Handlers.ArticleReservations.GetArticlesWithNotEnough
 ///     или есть резервации артикулов другими пользователями при этом количество на складе
 ///     не покрывает продажу и резервацию.
 /// </summary>
-public record GetArticlesWithNotEnoughStockQuery(Guid BuyerId, string StorageName, bool TakeFromOtherStorages,
+public record GetArticlesWithNotEnoughStockQuery(
+    Guid BuyerId,
+    string StorageName,
+    bool TakeFromOtherStorages,
     Dictionary<int, int> NeededCounts) : IQuery<GetArticlesWithNotEnoughStockResult>;
 
 /// <param name="NotEnoughByReservation">Список артикулов которых не хватает из-за резерваций</param>
@@ -17,11 +20,13 @@ public record GetArticlesWithNotEnoughStockResult(
     Dictionary<int, int> NotEnoughByReservation,
     Dictionary<int, int> NotEnoughByStock);
 
-public class GetArticlesWithNotEnoughStockHandler(IStorageContentRepository storageContentRepository,
+public class GetArticlesWithNotEnoughStockHandler(
+    IStorageContentRepository storageContentRepository,
     IArticleReservationRepository reservationRepository)
     : IQueryHandler<GetArticlesWithNotEnoughStockQuery, GetArticlesWithNotEnoughStockResult>
 {
-    public async Task<GetArticlesWithNotEnoughStockResult> Handle(GetArticlesWithNotEnoughStockQuery request,
+    public async Task<GetArticlesWithNotEnoughStockResult> Handle(
+        GetArticlesWithNotEnoughStockQuery request,
         CancellationToken cancellationToken)
     {
         var articleIds = request.NeededCounts.Keys;

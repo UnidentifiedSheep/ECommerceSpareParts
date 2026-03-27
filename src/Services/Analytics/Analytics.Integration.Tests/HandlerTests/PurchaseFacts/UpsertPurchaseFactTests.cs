@@ -16,11 +16,13 @@ namespace Analytics.Integration.Tests.HandlerTests.PurchaseFacts;
 public class UpsertPurchaseFactTests : IAsyncLifetime
 {
     private readonly PurchaseFactTestContext _context;
+
     public UpsertPurchaseFactTests(CombinedContainerFixture fixture)
     {
         var sp = ServiceProviderForTests.Build(fixture.PostgresConnectionString, fixture.RedisConnectionString);
         _context = sp.GetRequiredService<PurchaseFactTestContext>();
     }
+
     public async Task InitializeAsync()
     {
         await _context.InitializeAsync();
@@ -39,7 +41,7 @@ public class UpsertPurchaseFactTests : IAsyncLifetime
         var act = () => _context.Mediator.Send(new UpsertPurchaseFactCommand(dto));
         await act.Should().ThrowAsync<ValidationException>();
     }
-    
+
     [Theory]
     [InlineData(0)]
     [InlineData(0.001)]
@@ -52,11 +54,11 @@ public class UpsertPurchaseFactTests : IAsyncLifetime
         {
             Content = dto.Content.ReplaceAt(0, c => c with { Price = invalidPrice })
         };
-        
+
         var act = () => _context.Mediator.Send(new UpsertPurchaseFactCommand(dto));
         await act.Should().ThrowAsync<ValidationException>();
     }
-    
+
     [Theory]
     [InlineData(0)]
     [InlineData(-1)]
@@ -68,38 +70,38 @@ public class UpsertPurchaseFactTests : IAsyncLifetime
         {
             Content = dto.Content.ReplaceAt(0, c => c with { Count = invalidCount })
         };
-        
+
         var act = () => _context.Mediator.Send(new UpsertPurchaseFactCommand(dto));
         await act.Should().ThrowAsync<ValidationException>();
     }
-    
+
     [Theory]
     [InlineData("")]
     [InlineData("   ")]
     public async Task UpsertPurchaseFact_WithInvalidId_ValidationFails(string invalidId)
     {
         var dto = Generate() with { Id = invalidId };
-        
+
         var act = () => _context.Mediator.Send(new UpsertPurchaseFactCommand(dto));
         await act.Should().ThrowAsync<ValidationException>();
     }
-    
+
     [Fact]
     public async Task UpsertPurchaseFact_WithValidData_Succeeds()
     {
         var dto = Generate();
-        
+
         var act = () => _context.Mediator.Send(new UpsertPurchaseFactCommand(dto));
         await act.Should().NotThrowAsync();
 
         var facts = await GetAllFacts();
-        
+
         facts.Should().HaveCount(1);
-        
+
         var fact = facts.First();
         ValidateFields(dto, fact);
     }
-    
+
     [Fact]
     public async Task UpsertPurchaseFact_WhenNewContentAdded_InsertsIntoDatabase()
     {
@@ -116,7 +118,7 @@ public class UpsertPurchaseFactTests : IAsyncLifetime
 
         var contents = initDto.Content.ToList();
         contents.Add(newContent);
-        
+
         var updatedDto = initDto with
         {
             LastUpdatedAt = DateTime.UtcNow + TimeSpan.FromMinutes(10),
@@ -130,7 +132,7 @@ public class UpsertPurchaseFactTests : IAsyncLifetime
         fact.PurchaseContents.Should().HaveCount(3);
         fact.PurchaseContents.Any(x => x.Id == 999).Should().BeTrue();
     }
-    
+
     [Fact]
     public async Task UpsertPurchaseFact_MixedChanges_HandledCorrectly()
     {
@@ -169,7 +171,7 @@ public class UpsertPurchaseFactTests : IAsyncLifetime
 
         fact.PurchaseContents.Any(x => x.Id == initDto.Content[2].Id).Should().BeFalse();
     }
-    
+
     [Fact]
     public async Task UpsertPurchaseFact_WhenContentRemoved_DeletesFromDatabase()
     {
@@ -204,20 +206,20 @@ public class UpsertPurchaseFactTests : IAsyncLifetime
         dto = dto with
         {
             LastUpdatedAt = DateTime.UtcNow - TimeSpan.FromMinutes(10),
-            Content = dto.Content.ReplaceAt(0, x => x with{ Count = 1999})
+            Content = dto.Content.ReplaceAt(0, x => x with { Count = 1999 })
         };
 
         var act = () => _context.Mediator.Send(new UpsertPurchaseFactCommand(dto));
         await act.Should().NotThrowAsync();
-        
+
         var facts = await GetAllFacts();
-        
+
         facts.Should().HaveCount(1);
-        
+
         var fact = facts.First();
         ValidateFields(initDto, fact);
     }
-    
+
     [Fact]
     public async Task UpsertPurchaseFact_WhenRecordExists_UpdatesData()
     {
@@ -228,16 +230,16 @@ public class UpsertPurchaseFactTests : IAsyncLifetime
         dto = dto with
         {
             LastUpdatedAt = DateTime.UtcNow + TimeSpan.FromMinutes(10),
-            Content = dto.Content.ReplaceAt(0, x => x with{ Count = 1999})
+            Content = dto.Content.ReplaceAt(0, x => x with { Count = 1999 })
         };
 
         var act = () => _context.Mediator.Send(new UpsertPurchaseFactCommand(dto));
         await act.Should().NotThrowAsync();
-        
+
         var facts = await GetAllFacts();
-        
+
         facts.Should().HaveCount(1);
-        
+
         var fact = facts.First();
         ValidateFields(dto, fact);
     }
@@ -254,19 +256,19 @@ public class UpsertPurchaseFactTests : IAsyncLifetime
     private void ValidateFields(PurchaseFactUpsertDto dto, PurchasesFact fact)
     {
         var totalSum = dto.Content.Sum(x => x.Price * x.Count);
-        
+
         fact.CurrencyId.Should().Be(dto.CurrencyId);
         fact.Id.Should().Be(dto.Id).And.NotBeNullOrEmpty();
         fact.SupplierId.Should().Be(dto.SupplierId);
         fact.TotalSum.Should().Be(totalSum);
-        
+
         fact.PurchaseContents.Should().HaveSameCount(dto.Content);
 
         foreach (var factContent in fact.PurchaseContents)
         {
             var dtoContent = dto.Content.FirstOrDefault(x => x.Id == factContent.Id);
             dtoContent.Should().NotBeNull();
-            
+
             factContent.Id.Should().Be(dtoContent.Id);
             factContent.Price.Should().Be(dtoContent.Price);
             factContent.Count.Should().Be(dtoContent.Count);

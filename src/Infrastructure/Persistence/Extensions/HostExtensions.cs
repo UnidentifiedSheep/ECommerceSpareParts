@@ -22,10 +22,10 @@ public static class HostExtensions
     public static async Task SeedAsync<TContext>(this IServiceScope scope) where TContext : DbContext
     {
         var logger = scope.ServiceProvider.GetRequiredService<ILogger<TContext>>();
-        
+
         var context = scope.ServiceProvider.GetRequiredService<TContext>();
         await context.Database.EnsureCreatedAsync();
-        
+
         var seeds = scope.ServiceProvider.GetServices<ISeed<TContext>>()
             .OrderBy(x => x.GetPriority())
             .ToList();
@@ -34,14 +34,15 @@ public static class HostExtensions
             SeedEvents.NoSeedsFound(logger, typeof(TContext).Name, null);
             return;
         }
+
         DatabaseEvents.DatabaseEnsuredCreated(logger, typeof(TContext).Name, null);
-        
+
         SeedEvents.SeedStarted(logger, typeof(TContext).Name, null);
         foreach (var seed in seeds)
             await seed.SeedAsync(context);
         SeedEvents.SeedCompleted(logger, typeof(TContext).Name, null);
     }
-    
+
     public static async Task SeedAsync<TContext>(this IHost host) where TContext : DbContext
     {
         await using var scope = host.Services.CreateAsyncScope();

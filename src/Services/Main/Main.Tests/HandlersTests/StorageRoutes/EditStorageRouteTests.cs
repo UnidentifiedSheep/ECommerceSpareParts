@@ -1,18 +1,17 @@
 ﻿using Abstractions.Models;
 using FluentValidation;
-using Main.Application.Configs;
-using Main.Application.Handlers.StorageRoutes.EditStorageRoute;
 using Main.Abstractions.Dtos.Amw.StorageRoutes;
+using Main.Abstractions.Exceptions.Storages;
+using Main.Application.Configs.Mapster;
+using Main.Application.Handlers.StorageRoutes.EditStorageRoute;
 using Main.Entities;
 using Main.Persistence.Context;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
-using Tests.MockData;
-using Exceptions.Exceptions.StorageRoutes;
-using Main.Application.Configs.Mapster;
 using Test.Common.Extensions;
 using Test.Common.TestContainers.Combined;
+using Tests.MockData;
 using User = Main.Entities.User;
 
 namespace Tests.HandlersTests.StorageRoutes;
@@ -22,11 +21,11 @@ public class EditStorageRouteTests : IAsyncLifetime
 {
     private readonly DContext _context;
     private readonly IMediator _mediator;
+    private Currency _currency = null!;
     private Storage _storageFrom = null!;
     private Storage _storageTo = null!;
-    private Currency _currency = null!;
     private User _user = null!;
-    
+
     public EditStorageRouteTests(CombinedContainerFixture fixture)
     {
         MapsterConfig.Configure();
@@ -58,23 +57,23 @@ public class EditStorageRouteTests : IAsyncLifetime
     {
         await _mediator.AddMockStorageRoute(_storageFrom.Name, _storageTo.Name, _currency.Id, _user.Id);
         var route = await _context.StorageRoutes.AsNoTracking().FirstAsync();
-        
+
         var patchDto = new PatchStorageRouteDto
         {
             DistanceM = PatchField<int>.From(2000),
             PriceKg = PatchField<decimal>.From(15.5m),
             IsActive = PatchField<bool>.From(!route.IsActive)
         };
-        
+
         var command = new EditStorageRouteCommand(route.Id, patchDto);
-        
+
         await _mediator.Send(command);
 
         var updatedRoute = await _context.StorageRoutes.AsNoTracking().FirstAsync(x => x.Id == route.Id);
         Assert.Equal(2000, updatedRoute.DistanceM);
         Assert.Equal(15.5m, updatedRoute.PriceKg);
         Assert.Equal(!route.IsActive, updatedRoute.IsActive);
-        
+
         Assert.Equal(route.RouteType, updatedRoute.RouteType);
         Assert.Equal(route.PricingModel, updatedRoute.PricingModel);
         Assert.Equal(route.DeliveryTimeMinutes, updatedRoute.DeliveryTimeMinutes);
@@ -89,7 +88,7 @@ public class EditStorageRouteTests : IAsyncLifetime
             DistanceM = PatchField<int>.From(2000)
         };
         var command = new EditStorageRouteCommand(Guid.NewGuid(), patchDto);
-        
+
         await Assert.ThrowsAsync<StorageRouteNotFound>(async () => await _mediator.Send(command));
     }
 
@@ -98,12 +97,12 @@ public class EditStorageRouteTests : IAsyncLifetime
     {
         await _mediator.AddMockStorageRoute(_storageFrom.Name, _storageTo.Name, _currency.Id, _user.Id);
         var route = await _context.StorageRoutes.FirstAsync();
-        
+
         var patchDto = new PatchStorageRouteDto
         {
             DistanceM = PatchField<int>.From(0)
         };
-        
+
         var command = new EditStorageRouteCommand(route.Id, patchDto);
 
         await Assert.ThrowsAsync<ValidationException>(async () => await _mediator.Send(command));
@@ -114,14 +113,14 @@ public class EditStorageRouteTests : IAsyncLifetime
     {
         await _mediator.AddMockStorageRoute(_storageFrom.Name, _storageTo.Name, _currency.Id, _user.Id);
         var route = await _context.StorageRoutes.FirstAsync();
-        
+
         var patchDto = new PatchStorageRouteDto
         {
             PriceKg = PatchField<decimal>.From(10.555m)
         };
-        
+
         var command = new EditStorageRouteCommand(route.Id, patchDto);
-        
+
         await Assert.ThrowsAsync<ValidationException>(async () => await _mediator.Send(command));
     }
 }

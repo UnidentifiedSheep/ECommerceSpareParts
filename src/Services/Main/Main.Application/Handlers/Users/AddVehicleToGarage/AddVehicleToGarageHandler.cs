@@ -1,8 +1,8 @@
 using Abstractions.Interfaces.Services;
 using Application.Common.Interfaces;
 using Attributes;
-using Exceptions.Exceptions.Vehicles;
 using Main.Abstractions.Dtos.Member.Vehicles;
+using Main.Abstractions.Exceptions.Vehicles;
 using Main.Abstractions.Interfaces.DbRepositories;
 using Main.Entities;
 using Mapster;
@@ -13,7 +13,7 @@ namespace Main.Application.Handlers.Users.AddVehicleToGarage;
 [Transactional]
 public record AddVehicleToGarageCommand(VehicleDto Vehicle, Guid UserId) : ICommand<Unit>;
 
-public class AddVehicleToGarageHandler(IUserVehicleRepository vehicleRepository, IUnitOfWork unitOfWork) 
+public class AddVehicleToGarageHandler(IUserVehicleRepository vehicleRepository, IUnitOfWork unitOfWork)
     : ICommandHandler<AddVehicleToGarageCommand, Unit>
 {
     public async Task<Unit> Handle(AddVehicleToGarageCommand request, CancellationToken cancellationToken)

@@ -10,8 +10,8 @@ namespace Analytics.Persistence.Repositories;
 public class PurchaseFactRepository(DContext context) : IPurchaseFactRepository
 {
     public async Task<PurchasesFact?> GetFact(
-        string id, 
-        QueryOptions? options = null, 
+        string id,
+        QueryOptions? options = null,
         CancellationToken cancellationToken = default)
     {
         return await context.PurchasesFacts.ApplyOptions(options)

@@ -1,7 +1,7 @@
 ﻿using Abstractions.Interfaces.Services;
 using Application.Common.Interfaces;
 using Attributes;
-using Exceptions.Exceptions.StorageRoutes;
+using Main.Abstractions.Exceptions.Storages;
 using Main.Abstractions.Interfaces.DbRepositories;
 using MediatR;
 
@@ -10,7 +10,7 @@ namespace Main.Application.Handlers.StorageRoutes.DeleteStorageRoute;
 [Transactional]
 public record DeleteStorageRouteCommand(Guid Id) : ICommand;
 
-public class DeleteStorageRouteHandler(IStorageRoutesRepository storageRoutesRepository, IUnitOfWork unitOfWork) 
+public class DeleteStorageRouteHandler(IStorageRoutesRepository storageRoutesRepository, IUnitOfWork unitOfWork)
     : ICommandHandler<DeleteStorageRouteCommand>
 {
     public async Task<Unit> Handle(DeleteStorageRouteCommand request, CancellationToken cancellationToken)

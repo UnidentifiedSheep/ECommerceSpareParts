@@ -4,7 +4,7 @@ public record ArticlePrice
 {
     public ArticlePrice(decimal Price, decimal DeliveryPrice)
     {
-        if (Price <= 0) 
+        if (Price <= 0)
             throw new ArgumentOutOfRangeException(nameof(Price), "Цена не может быть меньше или равна нулю.");
         if (DeliveryPrice < 0)
             throw new ArgumentOutOfRangeException(nameof(DeliveryPrice), "Цена доставки не может быть меньше нуля.");

@@ -4,5 +4,5 @@ public enum WeightUnit
 {
     Gram,
     Kilogram,
-    Tonne,
+    Tonne
 }

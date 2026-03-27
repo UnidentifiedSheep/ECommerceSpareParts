@@ -12,10 +12,10 @@ public class PerOrderPricingTests
     [Fact]
     public void Calculate_ShouldReturnOrderPrice_RegardlessOfItems()
     {
-        var context = new LogisticsContext(priceKg: 10, priceM3: 100, pricePerOrder: 500);
+        var context = new LogisticsContext(10, 100, 500);
         var items = new List<LogisticsItem>
         {
-            new(Id: 1, Quantity: 10, Weight: 100, WeightUnit: WeightUnit.Kilogram, AreaM3: 10)
+            new(1, 10, 100, WeightUnit.Kilogram, 10)
         };
 
         var result = _strategy.Calculate(context, items);

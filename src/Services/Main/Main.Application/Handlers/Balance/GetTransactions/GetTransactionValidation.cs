@@ -1,4 +1,6 @@
+using Application.Common.Validators;
 using FluentValidation;
+using Localization.Domain.Extensions;
 
 namespace Main.Application.Handlers.Balance.GetTransactions;
 
@@ -8,26 +10,21 @@ public class GetTransactionsValidation : AbstractValidator<GetTransactionsQuery>
     {
         RuleFor(x => new { x.ReceiverId, x.SenderId })
             .Must(x => x.ReceiverId != x.SenderId || x.ReceiverId == null)
-            .WithMessage("Отправитель и получатель не могут быть одинаковы");
+            .WithLocalizationKey("transaction.sender.receiver.must.not.be.same");
 
         RuleFor(x => new { x.ReceiverId, x.SenderId })
             .Must(x => x.ReceiverId != null || x.SenderId != null)
-            .WithMessage("Должен быть указан хотя бы один: отправитель или получатель");
+            .WithLocalizationKey("transaction.sender.or.receiver.required");
 
         RuleFor(x => new { x.RangeStart, x.RangeEnd })
             .Must(x => x.RangeStart.Date <= x.RangeEnd.Date)
-            .WithMessage("Дата начала диапазона не может быть позже даты конца");
+            .WithLocalizationKey("transaction.range.start.before.end");
 
         RuleFor(x => new { x.RangeStart, x.RangeEnd })
             .Must(x => x.RangeEnd.Date <= x.RangeStart.Date.AddMonths(5))
-            .WithMessage("Максимальный диапазон выборки — 5 месяцев");
+            .WithLocalizationKey("transaction.range.max.months");
 
-        RuleFor(x => x.Page)
-            .GreaterThanOrEqualTo(0)
-            .WithMessage("Страница не может быть меньше 0");
-
-        RuleFor(x => x.Limit)
-            .InclusiveBetween(1, 100)
-            .WithMessage("Количество элементов должно быть от 1 до 100");
+        RuleFor(x => x.Pagination)
+            .SetValidator(new PaginationValidator());
     }
 }

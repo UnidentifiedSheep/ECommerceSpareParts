@@ -1,6 +1,6 @@
 ﻿namespace Main.Entities;
 
-public partial class UserPermission
+public class UserPermission
 {
     public Guid UserId { get; set; }
 

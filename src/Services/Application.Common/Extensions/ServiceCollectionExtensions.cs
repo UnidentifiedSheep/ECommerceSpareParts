@@ -12,7 +12,7 @@ public static class ServiceCollectionExtensions
     {
         collection.AddScoped<IRelatedDataFactory, RelatedDataFactory>();
         collection.AddScoped<IRelatedDataCollector, RelatedDataCollector>();
-        
+
         return collection;
     }
 }

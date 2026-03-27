@@ -2,9 +2,12 @@ namespace Analytics.Abstractions.Models;
 
 public class WelfordAccumulator
 {
-    public int Count { get; private set; } = 0;
-    public double Mean { get; private set; } = 0.0;
-    private double M2 = 0.0;
+    private double M2;
+    public int Count { get; private set; }
+    public double Mean { get; private set; }
+
+    // population variance: M2 / Count
+    public double VariancePopulation => Count > 0 ? M2 / Count : 0.0;
 
     public void Add(double x)
     {
@@ -14,7 +17,4 @@ public class WelfordAccumulator
         var delta2 = x - Mean;
         M2 += delta * delta2;
     }
-
-    // population variance: M2 / Count
-    public double VariancePopulation => Count > 0 ? M2 / Count : 0.0;
 }

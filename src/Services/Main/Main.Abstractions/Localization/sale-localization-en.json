@@ -1,0 +1,27 @@
+﻿{
+  "locale": "en",
+  "keyValues": {
+    "sale.content.not.found": "We couldn't find any content for this sale.",
+    "sale.not.found": "We couldn't find the sale you were looking for.",
+    "soft.confirmation.needed.for.sale.reservation.reason": "This sale requires confirmation because it conflicts with existing reservations. Confirmation code is '{0}'.",
+    "sale.date.min": "Sale date cannot be older than 3 months.",
+    "sale.date.max": "Sale date cannot be in the future.",
+    "sale.content.count.min": "Quantity must be greater than 0.",
+    "sale.content.comment.max": "Item comment must be at most 256 characters long.",
+    "sale.content.price.min": "Item price must be greater than 0.",
+    "sale.content.price.precision": "Price must have at most 2 decimal places.",
+    "sale.content.price.with.discount.min": "Discounted price must be greater than 0.",
+    "sale.content.price.with.discount.precision": "Discounted price must have at most 2 decimal places.",
+    "sale.content.price.with.discount.max": "Discounted price cannot exceed the original price.",
+    "sale.content.list.not.empty": "Sale content list must not be empty.",
+    "sale.content.list.duplicate": "Duplicate item IDs are not allowed.",
+    "sale.payed.sum.min": "Paid sum must be greater than or equal to 0 if specified.",
+    "sale.payed.sum.precision": "Paid sum must have at most 2 decimal places.",
+    "sale.buyer.id.not.empty": "Buyer ID must not be empty.",
+    "sale.created.user.id.not.empty": "Created user ID must not be empty.",
+    "sale.articles.missing": "We couldn't find articles required to build sale details.",
+    "sale.comment.max": "Overall comment must be at most 256 characters long.",
+    "sale.range.start.before.end": "Start date cannot be after end date.",
+    "sale.range.max5months": "Maximum query range is 5 months."
+  }
+}

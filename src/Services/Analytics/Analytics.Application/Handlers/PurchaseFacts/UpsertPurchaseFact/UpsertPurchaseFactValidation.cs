@@ -10,11 +10,11 @@ public class UpsertPurchaseFactValidation : AbstractValidator<UpsertPurchaseFact
         RuleFor(c => c.PurchaseFact)
             .NotNull()
             .WithLocalizationKey("purchase.fact.required");
-        
+
         RuleFor(x => x.PurchaseFact.Id)
             .NotEmpty()
             .WithLocalizationKey("purchase.fact.id.required");
-        
+
         RuleFor(x => x.PurchaseFact.Content)
             .NotEmpty()
             .WithLocalizationKey("purchase.fact.content.required");

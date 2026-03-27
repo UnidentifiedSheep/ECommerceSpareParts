@@ -6,8 +6,14 @@ using Mapster;
 
 namespace Main.Application.Handlers.Sales.GetSales;
 
-public record GetSalesQuery(DateTime RangeStartDate, DateTime RangeEndDate, PaginationModel Pagination,
-    Guid? BuyerId, int? CurrencyId, string? SortBy, string? SearchTerm) : IQuery<GetSalesResult>;
+public record GetSalesQuery(
+    DateTime RangeStartDate,
+    DateTime RangeEndDate,
+    PaginationModel Pagination,
+    Guid? BuyerId,
+    int? CurrencyId,
+    string? SortBy,
+    string? SearchTerm) : IQuery<GetSalesResult>;
 
 public record GetSalesResult(IEnumerable<SaleDto> Sales);
 

@@ -1,4 +1,5 @@
 using FluentValidation;
+using Localization.Domain.Extensions;
 
 namespace Main.Application.Handlers.Storages.DeleteStorage;
 
@@ -8,6 +9,6 @@ public class DeleteStorageValidation : AbstractValidator<DeleteStorageCommand>
     {
         RuleFor(x => x.StorageName)
             .NotEmpty()
-            .WithMessage("Название склада не должно быть пустым");
+            .WithLocalizationKey("storage.name.not.empty");
     }
 }

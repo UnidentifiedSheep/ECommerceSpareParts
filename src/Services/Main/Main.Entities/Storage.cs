@@ -3,7 +3,7 @@ using Main.Enums;
 
 namespace Main.Entities;
 
-public partial class Storage
+public class Storage
 {
     [Validate]
     public string Name { get; set; } = null!;
@@ -26,7 +26,9 @@ public partial class Storage
 
     public virtual ICollection<StorageOwner> StorageOwners { get; set; } = new List<StorageOwner>();
 
-    public virtual ICollection<StorageRoute> StorageRouteFromStorageNameNavigations { get; set; } = new List<StorageRoute>();
+    public virtual ICollection<StorageRoute> StorageRouteFromStorageNameNavigations { get; set; } =
+        new List<StorageRoute>();
 
-    public virtual ICollection<StorageRoute> StorageRouteToStorageNameNavigations { get; set; } = new List<StorageRoute>();
+    public virtual ICollection<StorageRoute> StorageRouteToStorageNameNavigations { get; set; } =
+        new List<StorageRoute>();
 }

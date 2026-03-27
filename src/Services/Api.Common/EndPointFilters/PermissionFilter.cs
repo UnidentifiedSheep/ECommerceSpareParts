@@ -5,8 +5,8 @@ namespace Api.Common.EndPointFilters;
 
 public sealed class PermissionFilter : IEndpointFilter
 {
-    private readonly string[] _permissions;
     private readonly PermissionCheck _check;
+    private readonly string[] _permissions;
 
     public PermissionFilter(PermissionCheck check, params string[] permissions)
     {
@@ -21,7 +21,7 @@ public sealed class PermissionFilter : IEndpointFilter
         if (!user.IsAuthenticated)
             return Results.Unauthorized();
 
-        bool allowed = _check == PermissionCheck.Any
+        var allowed = _check == PermissionCheck.Any
             ? _permissions.Any(p => user.Permissions.Contains(p))
             : _permissions.All(p => user.Permissions.Contains(p));
 

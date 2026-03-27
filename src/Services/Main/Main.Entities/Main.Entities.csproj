@@ -9,14 +9,14 @@
     </PropertyGroup>
 
     <ItemGroup>
-      <ProjectReference Include="..\..\..\Core\Enums\Enums.csproj" />
-      <ProjectReference Include="..\..\..\Core\Extensions\Extensions.csproj" />
-      <ProjectReference Include="..\Main.Enums\Main.Enums.csproj" />
+        <ProjectReference Include="..\..\..\Core\Enums\Enums.csproj"/>
+        <ProjectReference Include="..\..\..\Core\Extensions\Extensions.csproj"/>
+        <ProjectReference Include="..\Main.Enums\Main.Enums.csproj"/>
     </ItemGroup>
 
     <ItemGroup>
-      <PackageReference Include="BulkValidation.Core" Version="1.0.9" />
-      <PackageReference Include="BulkValidation.SourceGeneration" Version="1.0.5" />
+        <PackageReference Include="BulkValidation.Core" Version="1.0.9"/>
+        <PackageReference Include="BulkValidation.SourceGeneration" Version="1.0.5"/>
     </ItemGroup>
 
 </Project>

@@ -45,13 +45,11 @@ using AmwArticleDto = Main.Abstractions.Dtos.Amw.Articles.ArticleDto;
 using AnonymousArticleDto = Main.Abstractions.Dtos.Anonymous.Articles.ArticleDto;
 using AmwPurchaseDto = Main.Abstractions.Dtos.Amw.Purchase.PurchaseDto;
 using MemberPurchaseDto = Main.Abstractions.Dtos.Member.Purchase.PurchaseDto;
-
 using CoreUser = Abstractions.Models.User;
 using User = Main.Entities.User;
 using CoreUserInfo = Abstractions.Models.UserInfo;
 using Currency = Main.Entities.Currency;
 using UserInfo = Main.Entities.UserInfo;
-
 using ContractArticle = Contracts.Models.Articles.Article;
 using ArticleCoefficientContract = Contracts.Models.ArticleCoefficients.ArticleCoefficient;
 using CoefficientContract = Contracts.Models.Coefficients.Coefficient;
@@ -75,31 +73,31 @@ public static class MapsterConfig
             .Map(d => d.Indicator, s => s.Indicator)
             .Map(d => d.CategoryId, s => s.CategoryId)
             .Map(d => d.Popularity, s => s.Popularity);
-        
+
         TypeAdapterConfig<ArticleCoefficientDto, ArticleCoefficientContract>.NewConfig()
             .Map(d => d.ArticleId, s => s.ArticleId)
             .Map(d => d.ValidTill, s => s.ValidTill)
             .Map(d => d.CreatedAt, s => s.CreatedAt)
             .Map(d => d.Coefficient, s => s.Coefficient);
-        
+
         TypeAdapterConfig<Coefficient, CoefficientContract>.NewConfig()
             .Map(d => d.Value, s => s.Value)
             .Map(d => d.Name, s => s.Name)
             .Map(d => d.Order, s => s.Order)
             .Map(d => d.Type, s => s.Type);
-        
+
         TypeAdapterConfig<ArticleCoefficient, ArticleCoefficientDto>.NewConfig()
             .Map(d => d.ArticleId, s => s.ArticleId)
             .Map(d => d.ValidTill, s => s.ValidTill)
             .Map(d => d.CreatedAt, s => s.CreatedAt)
             .Map(d => d.Coefficient, s => s.CoefficientNameNavigation);
-        
+
         TypeAdapterConfig<Coefficient, CoefficientDto>.NewConfig()
             .Map(d => d.Value, s => s.Value)
             .Map(d => d.Name, s => s.Name)
             .Map(d => d.Order, s => s.Order)
             .Map(d => d.Type, s => s.Type);
-        
+
         TypeAdapterConfig<StorageContentPriceProjection, StorageContentCost>.NewConfig()
             .IgnoreNonMapped(true)
             .Map(d => d.ArticleId, s => s.ArticleId)
@@ -108,14 +106,14 @@ public static class MapsterConfig
             .Map(d => d.StorageContentId, s => s.StorageContentId)
             .Map(d => d.PurchaseContentId, s => s.PurchaseContentId)
             .Map(d => d.CurrentCount, s => s.CurrentCount)
-            .Map(d => d.DeliveryPrice, s => 
-                s.LogisticsPrice != null && s.PurchaseContentCount != null 
-                    ? s.LogisticsPrice / s.PurchaseContentCount 
-                    : 0)
-            .Map(d => d.DeliveryCurrencyId, s => 
+            .Map(d => d.DeliveryPrice, s =>
                 s.LogisticsPrice != null && s.PurchaseContentCount != null
-                ? s.LogisticsCurrencyId 
-                : s.CurrencyId)
+                    ? s.LogisticsPrice / s.PurchaseContentCount
+                    : 0)
+            .Map(d => d.DeliveryCurrencyId, s =>
+                s.LogisticsPrice != null && s.PurchaseContentCount != null
+                    ? s.LogisticsCurrencyId
+                    : s.CurrencyId)
             .Map(d => d.Price, s => s.Price)
             .Map(d => d.PurchaseContentCount, s => s.PurchaseContentCount)
             .Map(d => d.PurchaseDatetime, s => s.PurchaseDatetime);
@@ -127,7 +125,7 @@ public static class MapsterConfig
         TypeAdapterConfig<UserInfo, CoreUserInfo>.NewConfig()
             .Map(d => d.Name, s => s.Name)
             .Map(d => d.Surname, s => s.Surname);
-        
+
         TypeAdapterConfig<PurchaseContent, PurchaseContentDto>.NewConfig()
             .Map(dest => dest.Id, src => src.Id)
             .Map(dest => dest.Article, src => src.Article)
@@ -151,7 +149,7 @@ public static class MapsterConfig
         TypeAdapterConfig<NewPurchaseContentDto, LogisticsItemDto>.NewConfig()
             .Map(d => d.ArticleId, s => s.ArticleId)
             .Map(d => d.Quantity, s => s.Count);
-        
+
         TypeAdapterConfig<EditPurchaseDto, LogisticsItemDto>.NewConfig()
             .Map(d => d.ArticleId, s => s.ArticleId)
             .Map(d => d.Quantity, s => s.Count);
@@ -161,7 +159,7 @@ public static class MapsterConfig
             .Map(d => d.PurchaseContentId, s => s.PurchaseContentId)
             .Map(d => d.WeightKg, s => s.WeightKg)
             .Map(d => d.Price, s => s.Price);
-        
+
         TypeAdapterConfig<PurchaseContentLogistic, PurchaseContentLogisticDto>.NewConfig()
             .Map(d => d.AreaM3, s => s.AreaM3)
             .Map(d => d.PurchaseContentId, s => s.PurchaseContentId)
@@ -230,7 +228,7 @@ public static class MapsterConfig
             .Map(d => d.CurrentStock, s => s.TotalCount)
             .Map(d => d.IndicatorColor, s => s.Indicator);
 
-        
+
         TypeAdapterConfig<AmwArticleFullDto, MemberArticleFullDto>.NewConfig()
             .IgnoreNonMapped(true)
             .Map(d => d.Id, s => s.Id)
@@ -307,8 +305,8 @@ public static class MapsterConfig
             .Map(dest => dest.Currency, src => src.Currency)
             .Map(dest => dest.PurchaseDatetime, src => src.PurchaseDatetime)
             .Map(dest => dest.Comment, src => src.Comment);
-        
-        
+
+
         TypeAdapterConfig<StorageRoute, PurchaseLogistic>.NewConfig()
             .IgnoreNonMapped(true)
             .Map(d => d.RouteId, s => s.Id)
@@ -329,7 +327,7 @@ public static class MapsterConfig
             .Map(d => d.Price, s => s.Price)
             .Map(d => d.Count, s => s.Count)
             .Map(d => d.TotalSum, s => s.Price * s.Count);
-        
+
         TypeAdapterConfig<PurchaseLogistic, PurchaseLogisticDto>.NewConfig()
             .IgnoreNonMapped(true)
             .Map(d => d.PurchaseId, s => s.PurchaseId)
@@ -500,7 +498,7 @@ public static class MapsterConfig
             .Map(dest => dest.Count, src => src.Count)
             .Map(dest => dest.Price, src => src.PriceWithDiscount)
             .Map(dest => dest.TotalSum, src => src.PriceWithDiscount * src.Count)
-            .Map(dest => dest.Discount, 
+            .Map(dest => dest.Discount,
                 src => Price.GetDiscountFromPrices(src.PriceWithDiscount, src.Price));
 
         TypeAdapterConfig<EditSaleContentDto, SaleContent>.NewConfig()
@@ -509,7 +507,7 @@ public static class MapsterConfig
             .Map(dest => dest.Count, src => src.Count)
             .Map(dest => dest.Price, src => src.PriceWithDiscount)
             .Map(dest => dest.TotalSum, src => src.PriceWithDiscount * src.Count)
-            .Map(dest => dest.Discount, 
+            .Map(dest => dest.Discount,
                 src => Price.GetDiscountFromPrices(src.PriceWithDiscount, src.Price));
 
         TypeAdapterConfig<Sale, Contracts.Models.Sale.Sale>.NewConfig()
@@ -599,14 +597,14 @@ public static class MapsterConfig
             .Map(x => x.CurrencySign, src => src.CurrencySign.Trim())
             .Map(x => x.ShortName, src => src.ShortName.Trim());
 
-        TypeAdapterConfig<Currency, global::Contracts.Models.Currency.Currency>.NewConfig()
+        TypeAdapterConfig<Currency, Contracts.Models.Currency.Currency>.NewConfig()
             .Map(d => d.Code, s => s.Code)
             .Map(d => d.Name, s => s.Name)
             .Map(d => d.Id, s => s.Id)
             .Map(d => d.ShortName, s => s.ShortName)
             .Map(d => d.CurrencySign, s => s.CurrencySign)
             .Map(d => d.ToUsdRate, s => s.CurrencyToUsd == null ? 0 : s.CurrencyToUsd.ToUsd);
-        
+
         TypeAdapterConfig<Currency, CurrencyWithRateDto>.NewConfig()
             .Map(d => d.Code, s => s.Code)
             .Map(d => d.Name, s => s.Name)
@@ -615,7 +613,7 @@ public static class MapsterConfig
             .Map(d => d.CurrencySign, s => s.CurrencySign)
             .Map(d => d.ToUsdRate, s => s.CurrencyToUsd == null ? 0 : s.CurrencyToUsd.ToUsd);
 
-        TypeAdapterConfig<CurrencyWithRateDto, global::Contracts.Models.Currency.Currency>.NewConfig()
+        TypeAdapterConfig<CurrencyWithRateDto, Contracts.Models.Currency.Currency>.NewConfig()
             .Map(d => d.Code, s => s.Code)
             .Map(d => d.Name, s => s.Name)
             .Map(d => d.Id, s => s.Id)
@@ -631,7 +629,7 @@ public static class MapsterConfig
             .Map(dest => dest.EmailType, src => src.Type.ToString())
             .Map(dest => dest.Confirmed, src => src.IsConfirmed)
             .Map(dest => dest.ConfirmedAt, src => src.IsConfirmed ? DateTime.UtcNow : (DateTime?)null);
-        
+
         TypeAdapterConfig<UserEmail, FullEmailDto>.NewConfig()
             .Map(dest => dest.Id, src => src.Id)
             .Map(dest => dest.Email, src => src.Email)
@@ -652,10 +650,10 @@ public static class MapsterConfig
             .Map(d => d.Count, s => s.Count)
             .Map(d => d.CreatedAt, s => s.CreatedAt)
             .Map(d => d.Article, s => s.Article);
-        
-        
+
+
         //Storage Route
-        
+
         TypeAdapterConfig<AddStorageRouteCommand, StorageRoute>.NewConfig()
             .Map(d => d.CurrencyId, s => s.CurrencyId)
             .Map(d => d.FromStorageName, s => s.StorageFrom)
@@ -670,7 +668,7 @@ public static class MapsterConfig
             .Map(d => d.IsActive, s => false)
             .Map(d => d.MinimumPrice, s => s.MinimumPrice)
             .Map(d => d.CarrierId, s => s.CarrierId);
-        
+
         TypeAdapterConfig<StorageRoute, StorageRouteDto>.NewConfig()
             .IgnoreNonMapped(true)
             .Map(d => d.Id, s => s.Id)
@@ -689,7 +687,7 @@ public static class MapsterConfig
             .Map(d => d.CurrencyName, s => s.Currency.Name)
             .Map(d => d.MinimumPrice, s => s.MinimumPrice)
             .Map(d => d.CarrierId, s => s.CarrierId);
-        
+
         TypeAdapterConfig<PatchStorageRouteDto, StorageRoute>.NewConfig()
             .IgnorePatchIfNotSet()
             .Map(d => d.DistanceM, s => s.DistanceM.Value)
@@ -703,13 +701,13 @@ public static class MapsterConfig
             .Map(d => d.CurrencyId, s => s.CurrencyId.Value)
             .Map(d => d.MinimumPrice, s => s.MinimumPrice.Value)
             .Map(d => d.CarrierId, s => s.CarrierId.Value);
-        
+
         //Article weight
         TypeAdapterConfig<ArticleWeight, ArticleWeightDto>.NewConfig()
             .Map(d => d.ArticleId, s => s.ArticleId)
             .Map(d => d.Weight, s => s.Weight)
             .Map(d => d.Unit, s => s.Unit);
-        
+
         //Article size
         TypeAdapterConfig<ArticleSize, ArticleSizeDto>.NewConfig()
             .Map(d => d.ArticleId, s => s.ArticleId)
@@ -718,7 +716,7 @@ public static class MapsterConfig
             .Map(d => d.Length, s => s.Length)
             .Map(d => d.Unit, s => s.Unit)
             .Map(d => d.VolumeM3, s => s.VolumeM3);
-        
+
         //Logistics
         TypeAdapterConfig<LogisticsCalcItemResult, DeliveryCostItemDto>.NewConfig()
             .Map(d => d.ArticleId, s => s.Id)
@@ -731,7 +729,7 @@ public static class MapsterConfig
             .Map(d => d.Cost, s => s.Cost)
             .Map(d => d.Skipped, s => s.Skipped)
             .Map(d => d.Reasons, s => s.Reasons);
-        
+
         TypeAdapterConfig<LogisticsCalcResult, DeliveryCostDto>.NewConfig()
             .Map(d => d.WeightUnit, s => s.WeightUnit)
             .Map(d => d.TotalWeight, s => s.TotalWeight)
@@ -740,7 +738,6 @@ public static class MapsterConfig
             .Map(d => d.TotalCost, s => s.TotalCost)
             .Map(d => d.MinimalPrice, s => s.MinimalPrice)
             .Map(d => d.MinimalPriceApplied, s => s.MinimalPriceApplied)
-            .Map(d => d.PricingModel, s=> s.PricingModel);
-        
+            .Map(d => d.PricingModel, s => s.PricingModel);
     }
 }

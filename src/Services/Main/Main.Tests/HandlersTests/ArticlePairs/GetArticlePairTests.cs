@@ -1,4 +1,4 @@
-﻿using Exceptions.Exceptions.ArticlePair;
+﻿using Main.Abstractions.Exceptions.Articles;
 using Main.Application.Handlers.ArticlePairs.CreatePair;
 using Main.Application.Handlers.ArticlePairs.GetArticlePair;
 using Main.Persistence.Context;
@@ -16,10 +16,10 @@ public class GetArticlePairTests : IAsyncLifetime
 {
     private readonly DContext _context;
     private readonly IMediator _mediator;
+    private int _articleWithOutPair;
 
     private int _leftArticleId;
     private int _rightArticleId;
-    private int _articleWithOutPair;
 
     public GetArticlePairTests(CombinedContainerFixture fixture)
     {

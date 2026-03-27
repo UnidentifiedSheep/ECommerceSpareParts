@@ -13,7 +13,7 @@ public class CreateUserDbValidation : AbstractDbValidation<CreateUserCommand>
 
         var roles = request.Roles.Select(x => x.ToNormalized()).ToList();
         var emails = request.Emails.Select(x => x.Email.Trim().ToNormalizedEmail()).ToList();
-        
+
         if (emails.Count > 0) plan.ValidateUserEmailNotExistsNormalizedEmail(emails);
         if (roles.Count > 0) plan.ValidateRoleExistsNormalizedName(roles);
     }

@@ -1,9 +1,8 @@
-using System.Security.Claims;
 using Abstractions.Interfaces;
 using Api.Common.Extensions;
 using Carter;
-using Main.Application.Handlers.ArticleReservations.CreateArticleReservation;
 using Main.Abstractions.Dtos.Amw.ArticleReservations;
+using Main.Application.Handlers.ArticleReservations.CreateArticleReservation;
 using MediatR;
 
 namespace Main.Api.EndPoints.ArticlesReservation;
@@ -14,8 +13,11 @@ public class CreateArticleReservationEndPoint : ICarterModule
 {
     public void AddRoutes(IEndpointRouteBuilder app)
     {
-        app.MapPost("/articles/reservations", async (ISender sender, IUserContext user,
-                CreateArticleReservationQuery query, CancellationToken cancellationToken) =>
+        app.MapPost("/articles/reservations", async (
+                ISender sender,
+                IUserContext user,
+                CreateArticleReservationQuery query,
+                CancellationToken cancellationToken) =>
             {
                 var command = new CreateArticleReservationCommand(query.Reservations, user.UserId);
                 await sender.Send(command, cancellationToken);

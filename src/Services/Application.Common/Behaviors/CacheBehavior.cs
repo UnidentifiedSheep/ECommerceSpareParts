@@ -5,11 +5,15 @@ using MediatR;
 
 namespace Application.Common.Behaviors;
 
-public class CacheBehavior<TRequest, TResponse>(ICache cache, IRelatedDataFactory relatedDataFactory, 
+public class CacheBehavior<TRequest, TResponse>(
+    ICache cache,
+    IRelatedDataFactory relatedDataFactory,
     IRelatedDataCollector relatedDataCollector) : IPipelineBehavior<TRequest, TResponse>
     where TRequest : IRequest<TResponse> where TResponse : notnull
 {
-    public async Task<TResponse> Handle(TRequest request, RequestHandlerDelegate<TResponse> next, 
+    public async Task<TResponse> Handle(
+        TRequest request,
+        RequestHandlerDelegate<TResponse> next,
         CancellationToken cancellationToken)
     {
         if (request is not ICacheableQuery cacheable)

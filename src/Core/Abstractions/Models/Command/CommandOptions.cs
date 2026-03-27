@@ -3,7 +3,7 @@
 public class CommandOptions
 {
     /// <summary>
-    /// Indicates should command save changes at the end. <c>True</c> by default.
+    ///     Indicates should command save changes at the end. <c>True</c> by default.
     /// </summary>
     public bool SaveChanges { get; protected set; } = true;
 

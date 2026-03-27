@@ -1,7 +1,7 @@
 ﻿using Abstractions.Interfaces.Services;
 using Application.Common.Interfaces;
 using Attributes;
-using Exceptions.Exceptions.ArticleWeight;
+using Main.Abstractions.Exceptions.Articles;
 using Main.Abstractions.Interfaces.DbRepositories;
 using Main.Application.Notifications;
 using MediatR;
@@ -11,7 +11,10 @@ namespace Main.Application.Handlers.ArticleWeight.DeleteArticleWeight;
 [Transactional]
 public record DeleteArticleWeightCommand(int ArticleId) : ICommand;
 
-public class DeleteArticleWeightHandler(IArticleWeightRepository weightRepository, IUnitOfWork unitOfWork, IMediator mediator) 
+public class DeleteArticleWeightHandler(
+    IArticleWeightRepository weightRepository,
+    IUnitOfWork unitOfWork,
+    IMediator mediator)
     : ICommandHandler<DeleteArticleWeightCommand>
 {
     public async Task<Unit> Handle(DeleteArticleWeightCommand request, CancellationToken cancellationToken)

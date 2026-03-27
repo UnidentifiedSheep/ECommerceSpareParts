@@ -10,7 +10,9 @@ namespace Main.Persistence.Repositories;
 
 public class ProducerRepository(DContext context) : IProducerRepository
 {
-    public async Task<Producer?> GetProducer(int producerId, bool track = true,
+    public async Task<Producer?> GetProducer(
+        int producerId,
+        bool track = true,
         CancellationToken cancellationToken = default)
     {
         return await context.Producers.ConfigureTracking(track)
@@ -22,7 +24,10 @@ public class ProducerRepository(DContext context) : IProducerRepository
         return await context.Articles.AsNoTracking().AnyAsync(x => x.ProducerId == producerId, cancellationToken);
     }
 
-    public async Task<bool> OtherNameIsTaken(string otherName, int? producerId = null, string? whereUsed = null,
+    public async Task<bool> OtherNameIsTaken(
+        string otherName,
+        int? producerId = null,
+        string? whereUsed = null,
         CancellationToken cancellationToken = default)
     {
         var query = context.ProducersOtherNames
@@ -41,7 +46,10 @@ public class ProducerRepository(DContext context) : IProducerRepository
         return await context.Producers.AsNoTracking().AnyAsync(x => x.Name == producerName, cancellationToken);
     }
 
-    public async Task<ProducersOtherName?> GetOtherName(int producerId, string otherName, string? whereUsed,
+    public async Task<ProducersOtherName?> GetOtherName(
+        int producerId,
+        string otherName,
+        string? whereUsed,
         bool track = true,
         CancellationToken cancellationToken = default)
     {
@@ -52,8 +60,12 @@ public class ProducerRepository(DContext context) : IProducerRepository
             .FirstOrDefaultAsync(cancellationToken);
     }
 
-    public async Task<IEnumerable<Producer>> GetProducers(string? searchTerm, int page, int viewCount,
-        bool track = true, CancellationToken cancellationToken = default)
+    public async Task<IEnumerable<Producer>> GetProducers(
+        string? searchTerm,
+        int page,
+        int viewCount,
+        bool track = true,
+        CancellationToken cancellationToken = default)
     {
         var query = context.Producers.ConfigureTracking(track);
         if (!string.IsNullOrWhiteSpace(searchTerm))
@@ -72,14 +84,20 @@ public class ProducerRepository(DContext context) : IProducerRepository
             .ToListAsync(cancellationToken);
     }
 
-    public async Task<IEnumerable<Producer>> GetProducers(IEnumerable<int> ids, bool track = true, CancellationToken cancellationToken = default)
+    public async Task<IEnumerable<Producer>> GetProducers(
+        IEnumerable<int> ids,
+        bool track = true,
+        CancellationToken cancellationToken = default)
     {
         return await context.Producers.ConfigureTracking(track)
             .Where(x => ids.Contains(x.Id))
             .ToListAsync(cancellationToken);
     }
 
-    public async Task<IEnumerable<ProducersOtherName>> GetOtherNames(int producerId, int page, int viewCount,
+    public async Task<IEnumerable<ProducersOtherName>> GetOtherNames(
+        int producerId,
+        int page,
+        int viewCount,
         bool track = true,
         CancellationToken cancellationToken = default)
     {

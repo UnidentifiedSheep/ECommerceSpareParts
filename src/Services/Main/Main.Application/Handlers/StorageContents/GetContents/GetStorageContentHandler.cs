@@ -17,7 +17,8 @@ public record GetStorageContentResult(IEnumerable<StorageContentDto> Content);
 public class GetStorageContentHandler(IStorageContentRepository contentRepository)
     : IQueryHandler<GetStorageContentQuery, GetStorageContentResult>
 {
-    public async Task<GetStorageContentResult> Handle(GetStorageContentQuery request,
+    public async Task<GetStorageContentResult> Handle(
+        GetStorageContentQuery request,
         CancellationToken cancellationToken)
     {
         var page = request.Pagination.Page;

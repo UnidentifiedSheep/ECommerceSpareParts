@@ -4,19 +4,20 @@ namespace Exceptions.Base;
 
 public class BadRequestException : BaseValuedException
 {
-    public override HttpStatusCode StatusCode =>  HttpStatusCode.BadRequest;
-    public BadRequestException(string message) : base(message)
+    public BadRequestException(string? message) : base(message)
     {
     }
 
-    public BadRequestException(string message, string details) : base(message)
+    public BadRequestException(string? message, string details) : base(message)
     {
         Details = details;
     }
 
-    public BadRequestException(string message, object relatedData) : base(message, relatedData)
+    public BadRequestException(string? message, object relatedData) : base(message, relatedData)
     {
     }
+
+    public override HttpStatusCode StatusCode => HttpStatusCode.BadRequest;
 
     public string? Details { get; }
 }

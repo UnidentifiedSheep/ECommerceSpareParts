@@ -6,8 +6,14 @@ using Mapster;
 
 namespace Main.Application.Handlers.Purchases.GetPurchase;
 
-public record GetPurchasesQuery(DateTime RangeStartDate, DateTime RangeEndDate, PaginationModel Pagination,
-    Guid? SupplierId, int? CurrencyId, string? SortBy, string? SearchTerm) : IQuery<GetPurchasesResult>;
+public record GetPurchasesQuery(
+    DateTime RangeStartDate,
+    DateTime RangeEndDate,
+    PaginationModel Pagination,
+    Guid? SupplierId,
+    int? CurrencyId,
+    string? SortBy,
+    string? SearchTerm) : IQuery<GetPurchasesResult>;
 
 public record GetPurchasesResult(IEnumerable<PurchaseDto> Purchases);
 

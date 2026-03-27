@@ -15,11 +15,11 @@ using Search.Persistence.Interfaces.Repositories;
 
 namespace Search.Persistence.Repositories;
 
-internal class ArticleReadRepository(IIndexManager indexManager) 
+internal class ArticleReadRepository(IIndexManager indexManager)
     : RepositoryBase<ArticleIndexContext>(indexManager, IndexName.Articles), IArticleReadRepository
 {
     private IndexSearcher Searcher => IndexContext.Searcher;
-    
+
     public Article? GetArticle(int articleId)
     {
         var query = new TermQuery(new Term("IdString", articleId.ToString()));
@@ -34,7 +34,7 @@ internal class ArticleReadRepository(IIndexManager indexManager)
     public Article? GetNextArticle(int articleId = -1)
     {
         var query = new MatchAllDocsQuery();
-        Filter? filter = GetIdFilter(articleId);
+        var filter = GetIdFilter(articleId);
         var sort = SortById();
         var topDocs = Searcher.Search(query, filter, 1, sort);
 
@@ -55,32 +55,40 @@ internal class ArticleReadRepository(IIndexManager indexManager)
         return ToArticles(topDocs);
     }
 
-    public (IReadOnlyList<Article> result, SearchCursor? last) SearchByTitle(string title, SearchCursor? cursor = null, int limit = 20)
+    public (IReadOnlyList<Article> result, SearchCursor? last) SearchByTitle(
+        string title,
+        SearchCursor? cursor = null,
+        int limit = 20)
     {
-        QueryParser parser = new QueryParser(Global.LuceneVersion, "Title", IndexContext.Analyzer);
-        Query query = parser.Parse(title);
+        var parser = new QueryParser(Global.LuceneVersion, "Title", IndexContext.Analyzer);
+        var query = parser.Parse(title);
 
-        TopDocs topDocs = Searcher.SearchAfter(cursor?.ToScoreDoc(), query, limit);
+        var topDocs = Searcher.SearchAfter(cursor?.ToScoreDoc(), query, limit);
 
         return ToArticlesWithCursor(topDocs);
     }
 
 
-    public (IReadOnlyList<Article> result, SearchCursor? last) SearchByArticleNumberPrefix(string prefix, 
-        SearchCursor? cursor = null, int limit = 20)
+    public (IReadOnlyList<Article> result, SearchCursor? last) SearchByArticleNumberPrefix(
+        string prefix,
+        SearchCursor? cursor = null,
+        int limit = 20)
     {
         prefix = prefix.ToNormalizedArticleNumber();
         var query = new PrefixQuery(new Term("NormalizedArticleNumber", prefix));
-        
-        TopDocs topDocs = Searcher.SearchAfter(cursor?.ToScoreDoc(), query, limit);
-        
+
+        var topDocs = Searcher.SearchAfter(cursor?.ToScoreDoc(), query, limit);
+
         return ToArticlesWithCursor(topDocs);
     }
-    
-    public ArticleEnumerator GetEnumerator() => new(this);
+
+    public ArticleEnumerator GetEnumerator()
+    {
+        return new ArticleEnumerator(this);
+    }
 
     /// <summary>
-    /// Converts the given TopDocs object into a list of Article objects.
+    ///     Converts the given TopDocs object into a list of Article objects.
     /// </summary>
     private List<Article> ToArticles(TopDocs topDocs)
     {
@@ -91,7 +99,7 @@ internal class ArticleReadRepository(IIndexManager indexManager)
 
     private (List<Article>, SearchCursor? last) ToArticlesWithCursor(TopDocs topDocs)
     {
-        var result = new  List<Article>(topDocs.ScoreDocs.Length);
+        var result = new List<Article>(topDocs.ScoreDocs.Length);
         ScoreDoc? last = null;
 
         foreach (var sd in topDocs.ScoreDocs)
@@ -105,8 +113,8 @@ internal class ArticleReadRepository(IIndexManager indexManager)
     }
 
     /// <summary>
-    /// Returns a filter that selects articles with Id greater than the specified id.
-    /// If id is less than 0, no filter is applied.
+    ///     Returns a filter that selects articles with Id greater than the specified id.
+    ///     If id is less than 0, no filter is applied.
     /// </summary>
     /// <param name="id">The inclusive lower bound.</param>
     /// <returns>A filter to exclude articles with ids less than the specified value, or null if no filtering is required.</returns>

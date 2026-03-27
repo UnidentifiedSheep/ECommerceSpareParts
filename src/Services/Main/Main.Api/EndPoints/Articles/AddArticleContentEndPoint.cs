@@ -11,8 +11,11 @@ public class AddArticleContentEndPoint : ICarterModule
 {
     public void AddRoutes(IEndpointRouteBuilder app)
     {
-        app.MapPost("/articles/{articleId}/contents", async (ISender sender, int articleId,
-                AddArticleContentRequest request, CancellationToken cancellationToken) =>
+        app.MapPost("/articles/{articleId}/contents", async (
+                ISender sender,
+                int articleId,
+                AddArticleContentRequest request,
+                CancellationToken cancellationToken) =>
             {
                 var command = new AddArticleContentCommand(articleId, request.Content);
                 await sender.Send(command, cancellationToken);

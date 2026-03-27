@@ -1,6 +1,6 @@
 ﻿namespace Main.Entities;
 
-public partial class SaleContentDetail
+public class SaleContentDetail
 {
     public int Id { get; set; }
 

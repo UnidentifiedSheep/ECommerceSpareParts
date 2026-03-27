@@ -17,5 +17,5 @@ public interface IPasswordManager
     /// </summary>
     /// <param name="password">Пароль для проверки</param>
     /// <returns>isValid - соответствует ли правилам, errors - ошибки проверки</returns>
-    (bool isValid, IEnumerable<string> errors) IsPasswordMatchRules(string password);
+    (bool isValid, IEnumerable<(string key, object[]? args)> errors) IsPasswordMatchRules(string password);
 }

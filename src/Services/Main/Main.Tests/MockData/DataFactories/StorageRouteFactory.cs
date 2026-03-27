@@ -6,7 +6,7 @@ namespace Tests.MockData.DataFactories;
 
 public static class StorageRouteFactory
 {
-    private readonly static Faker<StorageRoute> Faker = new Faker<StorageRoute>()
+    private static readonly Faker<StorageRoute> Faker = new Faker<StorageRoute>()
         .RuleFor(x => x.FromStorageName, f => f.Lorem.Word())
         .RuleFor(x => x.ToStorageName, f => f.Lorem.Word())
         .RuleFor(x => x.CarrierId, f => f.Random.Guid())
@@ -20,10 +20,16 @@ public static class StorageRouteFactory
         .RuleFor(x => x.PricePerOrder, f => f.Random.Decimal(10, 100000))
         .RuleFor(x => x.PricingModel, f => f.PickRandom<LogisticPricingType>())
         .RuleFor(x => x.RouteType, f => f.PickRandom<RouteType>());
-    
-    public static List<StorageRoute> Create(int count) =>  Faker.Generate(count);
 
-    public static StorageRoute Create(string storageFrom, string storageTo, IEnumerable<Guid> userIds,
+    public static List<StorageRoute> Create(int count)
+    {
+        return Faker.Generate(count);
+    }
+
+    public static StorageRoute Create(
+        string storageFrom,
+        string storageTo,
+        IEnumerable<Guid> userIds,
         IEnumerable<int> currencyIds)
     {
         var clone = Faker.Clone()
@@ -33,7 +39,7 @@ public static class StorageRouteFactory
             .RuleFor(x => x.CurrencyId, f => f.PickRandom(currencyIds))
             .RuleFor(x => x.ToStorageName, storageTo)
             .RuleFor(x => x.PricingModel, LogisticPricingType.PerArea);
-        
+
         return clone.Generate();
     }
 }

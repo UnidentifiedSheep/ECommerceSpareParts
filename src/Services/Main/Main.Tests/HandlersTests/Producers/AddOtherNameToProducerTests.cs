@@ -1,6 +1,5 @@
 using Bogus;
 using Main.Abstractions.Constants;
-using Main.Application.Configs;
 using Main.Application.Configs.Mapster;
 using Main.Application.Handlers.Producers.AddOtherName;
 using Main.Application.Handlers.Producers.CreateProducer;
@@ -10,7 +9,6 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Test.Common.Extensions;
 using Test.Common.TestContainers.Combined;
-using Tests.MockData;
 using static Tests.MockData.MockData;
 using ValidationException = FluentValidation.ValidationException;
 using DbValidationException = BulkValidation.Core.Exceptions.ValidationException;

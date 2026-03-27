@@ -1,8 +1,8 @@
 using Abstractions.Interfaces.Services;
 using Application.Common.Interfaces;
 using Attributes;
-using Exceptions.Exceptions.ArticleReservations;
 using Main.Abstractions.Dtos.Amw.ArticleReservations;
+using Main.Abstractions.Exceptions.Articles;
 using Main.Abstractions.Interfaces.DbRepositories;
 using Mapster;
 using MediatR;
@@ -13,7 +13,8 @@ namespace Main.Application.Handlers.ArticleReservations.EditArticleReservation;
 public record EditArticleReservationCommand(int ReservationId, EditArticleReservationDto NewValue, Guid WhoUpdated)
     : ICommand;
 
-public class EditArticleReservationHandler(IArticleReservationRepository reservationRepository,
+public class EditArticleReservationHandler(
+    IArticleReservationRepository reservationRepository,
     IUnitOfWork unitOfWork) : ICommandHandler<EditArticleReservationCommand>
 {
     public async Task<Unit> Handle(EditArticleReservationCommand request, CancellationToken cancellationToken)

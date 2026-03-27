@@ -1,4 +1,5 @@
 using FluentValidation;
+using Localization.Domain.Extensions;
 
 namespace Main.Application.Handlers.Users.ChangeUserDiscount;
 
@@ -8,6 +9,6 @@ public class ChangeUserDiscountValidation : AbstractValidator<ChangeUserDiscount
     {
         RuleFor(command => command.DiscountRate)
             .InclusiveBetween(0, 0.99m)
-            .WithMessage("Скидка должна быть от 0 до 0.99");
+            .WithLocalizationKey("user.discount.range");
     }
 }

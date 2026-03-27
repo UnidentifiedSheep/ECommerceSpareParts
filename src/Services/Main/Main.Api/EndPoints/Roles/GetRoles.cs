@@ -22,8 +22,8 @@ public class GetRoles : ICarterModule
                     var response = result.Adapt<GetRolesResponse>();
                     return Results.Ok(response);
                 }).WithTags("Roles")
-                .WithDescription("Получение ролей")
-                .WithDisplayName("Получение ролей")
-                .RequireAnyPermission("ROLES.GET");
+            .WithDescription("Получение ролей")
+            .WithDisplayName("Получение ролей")
+            .RequireAnyPermission("ROLES.GET");
     }
 }

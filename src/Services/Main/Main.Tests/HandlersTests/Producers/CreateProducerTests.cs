@@ -7,7 +7,6 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Test.Common.Extensions;
 using Test.Common.TestContainers.Combined;
-using Tests.MockData;
 using ValidationException = FluentValidation.ValidationException;
 
 namespace Tests.HandlersTests.Producers;

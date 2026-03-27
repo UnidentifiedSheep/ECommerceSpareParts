@@ -8,10 +8,13 @@ using Pricing.Application.Handlers.Prices.RecalculateBasePrices;
 namespace Pricing.Application.Handlers.Prices.GetBasePrices;
 
 public record GetBasePricesQuery(IEnumerable<int> ArticleIds, int CurrencyId) : IQuery<GetBasePricesResult>;
+
 public record GetBasePricesResult(Dictionary<int, BasePricingItemResult?> Prices);
 
-public class GetBasePricesHandler(IArticlePricesCacheRepository articlePricesCache, ICurrencyConverter currencyConverter,
-    IMediator mediator) 
+public class GetBasePricesHandler(
+    IArticlePricesCacheRepository articlePricesCache,
+    ICurrencyConverter currencyConverter,
+    IMediator mediator)
     : IQueryHandler<GetBasePricesQuery, GetBasePricesResult>
 {
     public async Task<GetBasePricesResult> Handle(GetBasePricesQuery request, CancellationToken cancellationToken)
@@ -21,16 +24,18 @@ public class GetBasePricesHandler(IArticlePricesCacheRepository articlePricesCac
         Dictionary<int, BasePricingItemResult?> result = new();
         IterateOverPrices(foundPrices, result, notFoundIds, request.CurrencyId);
         await mediator.Send(new RecalculateBasePricesCommand(notFoundIds), cancellationToken);
-        
+
         foundPrices = await articlePricesCache.GetArticleBasePrices(notFoundIds);
         notFoundIds.Clear();
         IterateOverPrices(foundPrices, result, notFoundIds, request.CurrencyId);
         return new GetBasePricesResult(result);
     }
 
-    private void IterateOverPrices(Dictionary<int, BasePricingItemResult?> prices, 
-        Dictionary<int, BasePricingItemResult?> result, 
-        HashSet<int> notFoundIds, int currencyId)
+    private void IterateOverPrices(
+        Dictionary<int, BasePricingItemResult?> prices,
+        Dictionary<int, BasePricingItemResult?> result,
+        HashSet<int> notFoundIds,
+        int currencyId)
     {
         foreach (var (articleId, basePrice) in prices)
         {
@@ -40,15 +45,15 @@ public class GetBasePricesHandler(IArticlePricesCacheRepository articlePricesCac
                 result[articleId] = null;
                 continue;
             }
-            
+
             result[articleId] = ConvertPrice(basePrice, currencyId);
         }
     }
 
     private BasePricingItemResult ConvertPrice(BasePricingItemResult pricingItem, int targetCurrencyId)
     {
-        decimal basePrice = currencyConverter.ConvertFromUsd(pricingItem.BasePrice, targetCurrencyId);
-        decimal finalPrice = currencyConverter.ConvertFromUsd(pricingItem.FinalPrice, targetCurrencyId);
+        var basePrice = currencyConverter.ConvertFromUsd(pricingItem.BasePrice, targetCurrencyId);
+        var finalPrice = currencyConverter.ConvertFromUsd(pricingItem.FinalPrice, targetCurrencyId);
         return pricingItem with { BasePrice = basePrice, FinalPrice = finalPrice };
     }
 }

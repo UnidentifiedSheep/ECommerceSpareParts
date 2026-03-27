@@ -3,7 +3,7 @@ using Main.Abstractions.Interfaces.DbRepositories;
 
 namespace Main.Application.Services;
 
-public class CurrencyConverterSetup(ICurrencyConverter currencyConverter, ICurrencyRepository currencyRepository) 
+public class CurrencyConverterSetup(ICurrencyConverter currencyConverter, ICurrencyRepository currencyRepository)
     : ICurrencyConverterSetup
 {
     public async Task InitializeAsync()

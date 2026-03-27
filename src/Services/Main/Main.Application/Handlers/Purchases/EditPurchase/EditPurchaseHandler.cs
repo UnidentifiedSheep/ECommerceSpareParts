@@ -2,8 +2,8 @@ using Abstractions.Interfaces.Services;
 using Abstractions.Models.Repository;
 using Application.Common.Interfaces;
 using Attributes;
-using Exceptions.Exceptions.Purchase;
 using Main.Abstractions.Dtos.Amw.Purchase;
+using Main.Abstractions.Exceptions.Purchase;
 using Main.Abstractions.Interfaces.DbRepositories;
 using Main.Entities;
 using Mapster;
@@ -11,8 +11,13 @@ using Mapster;
 namespace Main.Application.Handlers.Purchases.EditPurchase;
 
 [Transactional]
-public record EditPurchaseCommand(IEnumerable<EditPurchaseDto> Content, string PurchaseId, int CurrencyId,
-    string? Comment, Guid UpdatedUserId, DateTime PurchaseDateTime) : ICommand<EditPurchaseResult>;
+public record EditPurchaseCommand(
+    IEnumerable<EditPurchaseDto> Content,
+    string PurchaseId,
+    int CurrencyId,
+    string? Comment,
+    Guid UpdatedUserId,
+    DateTime PurchaseDateTime) : ICommand<EditPurchaseResult>;
 
 /// <param name="EditedCounts">
 ///     Словарь где Key - айди артикула,
@@ -22,12 +27,13 @@ public record EditPurchaseCommand(IEnumerable<EditPurchaseDto> Content, string P
 /// </param>
 public record EditPurchaseResult(Dictionary<int, Dictionary<decimal, int>> EditedCounts);
 
-public class EditPurchaseHandler(IPurchaseRepository purchaseRepository, IUnitOfWork unitOfWork) 
+public class EditPurchaseHandler(IPurchaseRepository purchaseRepository, IUnitOfWork unitOfWork)
     : ICommandHandler<EditPurchaseCommand, EditPurchaseResult>
 {
     private static readonly QueryOptions<PurchaseContent> ContentOptions = new QueryOptions<PurchaseContent>()
         .WithForUpdate()
         .WithTracking();
+
     public async Task<EditPurchaseResult> Handle(EditPurchaseCommand request, CancellationToken cancellationToken)
     {
         var purchaseId = request.PurchaseId;
@@ -39,9 +45,9 @@ public class EditPurchaseHandler(IPurchaseRepository purchaseRepository, IUnitOf
         var content = request.Content.ToList();
 
         var purchase = await purchaseRepository.GetPurchase(
-                           purchaseId,
-                           QueryPresets.TrackForUpdate,
-                           cancellationToken) ?? throw new PurchaseNotFoundException(purchaseId);
+            purchaseId,
+            QueryPresets.TrackForUpdate,
+            cancellationToken) ?? throw new PurchaseNotFoundException(purchaseId);
 
         var purchaseContents = (await purchaseRepository
                 .GetPurchaseContent(purchaseId, ContentOptions, cancellationToken))
@@ -89,7 +95,7 @@ public class EditPurchaseHandler(IPurchaseRepository purchaseRepository, IUnitOf
                 if (!result[item.ArticleId].TryAdd(item.Price, delta))
                     result[item.ArticleId][item.Price] += delta;
             }
-            
+
             existingContent.PurchaseId = purchaseId;
         }
 
@@ -107,7 +113,11 @@ public class EditPurchaseHandler(IPurchaseRepository purchaseRepository, IUnitOf
         return new EditPurchaseResult(result);
     }
 
-    private void SetFields(Purchase purchase, int currencyId, DateTime purchaseDateTime, string? comment,
+    private void SetFields(
+        Purchase purchase,
+        int currencyId,
+        DateTime purchaseDateTime,
+        string? comment,
         Guid updatedUserId)
     {
         purchase.Comment = comment?.Trim();

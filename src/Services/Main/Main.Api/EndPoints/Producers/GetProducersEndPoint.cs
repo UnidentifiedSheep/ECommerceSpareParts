@@ -1,14 +1,15 @@
 using Abstractions.Models;
 using Carter;
+using Main.Abstractions.Dtos.Anonymous.Producers;
 using Main.Application.Handlers.Producers.GetProducerById;
 using Main.Application.Handlers.Producers.GetProducers;
-using Main.Abstractions.Dtos.Anonymous.Producers;
 using Mapster;
 using MediatR;
 
 namespace Main.Api.EndPoints.Producers;
 
 public record GetProducersResponse(IEnumerable<ProducerDto> Producers);
+
 public record GetProducerByIdResponse(ProducerDto Producer);
 
 public class GetProducersEndPoint : ICarterModule
@@ -23,7 +24,7 @@ public class GetProducersEndPoint : ICarterModule
             }).WithTags("Producers")
             .WithDescription("Получение производителей по ключевому слову либо просто списком")
             .Produces<GetProducersResponse>();
-        
+
         app.MapGet("/producers/{id}", async (ISender sender, int id) =>
             {
                 var query = new GetProducerByIdQuery(id);

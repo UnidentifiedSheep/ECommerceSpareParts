@@ -7,7 +7,7 @@ namespace Pricing.Application.Services.ArticlePricing.BasePriceStrategies;
 public class HighestBasePriceStrategy : IBasePriceStrategy
 {
     public ArticlePricingType Type => ArticlePricingType.Highest;
-    
+
     public decimal GetPrice(IEnumerable<ArticlePrice> prices)
     {
         var list = prices.ToList();

@@ -10,8 +10,8 @@ public static class ConfigurationBuilderExtensions
         var jsonFiles = Directory.GetFiles(directoryPath, "*.json", SearchOption.AllDirectories);
 
         foreach (var jsonFile in jsonFiles)
-            builder.AddJsonFile(jsonFile, optional: false, reloadOnChange: true);
-        
+            builder.AddJsonFile(jsonFile, false, true);
+
 
         return builder;
     }

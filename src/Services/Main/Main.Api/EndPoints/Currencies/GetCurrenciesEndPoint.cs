@@ -1,15 +1,16 @@
 using Abstractions.Models;
 using Api.Common.Extensions;
 using Carter;
+using Main.Abstractions.Dtos.Currencies;
 using Main.Application.Handlers.Currencies.GetCurrencies;
 using Main.Application.Handlers.Currencies.GetCurrencyById;
-using Main.Abstractions.Dtos.Currencies;
 using Mapster;
 using MediatR;
 
 namespace Main.Api.EndPoints.Currencies;
 
 public record GetCurrenciesResponse(IEnumerable<CurrencyDto> Currencies);
+
 public record GetCurrencyByIdResponse(CurrencyDto Currency);
 
 public class GetCurrenciesEndPoint : ICarterModule
@@ -25,7 +26,7 @@ public class GetCurrenciesEndPoint : ICarterModule
             .WithDescription("Получение списка валют")
             .WithDisplayName("Получение списка валют")
             .RequireAnyPermission("CURRENCIES.GET");
-        
+
         app.MapGet("/currencies/{id}", async (ISender sender, int id, CancellationToken cancellation) =>
             {
                 var command = new GetCurrencyByIdQuery(id);

@@ -1,7 +1,7 @@
 ﻿using Api.Common.Extensions;
 using Carter;
-using Main.Application.Handlers.ArticleCharacteristics.AddCharacteristics;
 using Main.Abstractions.Dtos.Amw.ArticleCharacteristics;
+using Main.Application.Handlers.ArticleCharacteristics.AddCharacteristics;
 using MediatR;
 
 namespace Main.Api.EndPoints.ArticleCharacteristics;
@@ -14,13 +14,13 @@ public class AddCharacteristicsEndPoint : ICarterModule
 {
     public void AddRoutes(IEndpointRouteBuilder app)
     {
-        app.MapPost("/articles/characteristics/", 
-            async (ISender sender, AddCharacteristicsRequest request, CancellationToken token) =>
-        {
-            var result = await sender.Send(new AddCharacteristicsCommand(request.Characteristics), token);
-            var response = new AddCharacteristicsResponse(result.Ids);
-            return Results.Created("/articles/characteristics/", response);
-        }).WithName("Создание характеристик артикула")
+        app.MapPost("/articles/characteristics/",
+                async (ISender sender, AddCharacteristicsRequest request, CancellationToken token) =>
+                {
+                    var result = await sender.Send(new AddCharacteristicsCommand(request.Characteristics), token);
+                    var response = new AddCharacteristicsResponse(result.Ids);
+                    return Results.Created("/articles/characteristics/", response);
+                }).WithName("Создание характеристик артикула")
             .WithTags("Article Characteristics")
             .WithDescription("Создание характеристик артикула")
             .ProducesProblem(StatusCodes.Status400BadRequest)

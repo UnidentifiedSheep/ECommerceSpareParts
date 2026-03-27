@@ -16,15 +16,15 @@ public static class ServiceProvider
     public static IServiceCollection AddPersistenceLayer(this IServiceCollection collection, string connectionString)
     {
         collection.AddDbContext<DContext>(options => options.UseNpgsql(connectionString));
-        
+
         collection.AddScoped<IMarkupRepository, MarkupRepository>();
         collection.AddScoped<ISettingsRepository, SettingsRepository>();
-        
+
         collection.AddScoped<IUnitOfWork, UnitOfWork<DContext>>();
 
         collection.AddScoped<IDbValidator, PgsqlDbValidator<DContext>>();
         collection.AddPgsqlDbValidators<DContext>();
-        
+
         return collection;
     }
 }

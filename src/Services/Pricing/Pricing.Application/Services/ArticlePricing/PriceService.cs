@@ -7,14 +7,14 @@ public class PriceService(IMarkupService markupService, IDiscountService discoun
 {
     public PricingResult GetPrice(PricingContext context)
     {
-        decimal basePrice = context.BasePrice;
-        decimal discount = context.Discount;
-        int currencyId = context.CurrencyId;
-        
-        decimal markup = markupService.GetMarkup(basePrice, currencyId);
-        decimal priceWithMarkup = markupService.WithMarkup(basePrice, markup);
-        decimal finalPrice = discountService.WithDiscount(priceWithMarkup, discount);
-        
+        var basePrice = context.BasePrice;
+        var discount = context.Discount;
+        var currencyId = context.CurrencyId;
+
+        var markup = markupService.GetMarkup(basePrice, currencyId);
+        var priceWithMarkup = markupService.WithMarkup(basePrice, markup);
+        var finalPrice = discountService.WithDiscount(priceWithMarkup, discount);
+
         return new PricingResult(basePrice, priceWithMarkup, finalPrice, markup, discount, currencyId);
     }
 }

@@ -6,7 +6,7 @@ using Pricing.Application.Handlers.Discount.SetUserDiscount;
 
 namespace Pricing.Application.Consumers;
 
-public class UserDiscountChangedConsumer(IMediator mediator, IUserCacheRepository userCacheRepository) 
+public class UserDiscountChangedConsumer(IMediator mediator, IUserCacheRepository userCacheRepository)
     : IConsumer<UserDiscountChangedEvent>
 {
     public async Task Consume(ConsumeContext<UserDiscountChangedEvent> context)

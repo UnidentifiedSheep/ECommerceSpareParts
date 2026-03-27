@@ -1,7 +1,7 @@
 using Abstractions.Interfaces.Services;
 using Application.Common.Interfaces;
-using Exceptions.Exceptions.Roles;
 using Extensions;
+using Main.Abstractions.Exceptions.Auth;
 using Main.Abstractions.Interfaces.DbRepositories;
 using Main.Entities;
 using MediatR;

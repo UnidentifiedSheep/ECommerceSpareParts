@@ -7,7 +7,7 @@ public interface IFile
     string FileName { get; }
     string Name { get; }
     string Extension { get; }
-    
+
     Stream OpenReadStream();
     Task CopyToAsync(Stream target, CancellationToken cancellationToken = default);
     void CopyTo(Stream target);

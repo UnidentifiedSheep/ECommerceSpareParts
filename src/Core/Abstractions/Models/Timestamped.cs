@@ -1,8 +1,8 @@
 ﻿namespace Abstractions.Models;
 
 /// <summary>
-/// Represents a value with the timestamp.
-/// Value can be null.
+///     Represents a value with the timestamp.
+///     Value can be null.
 /// </summary>
 /// <typeparam name="T"></typeparam>
 public record Timestamped<T>

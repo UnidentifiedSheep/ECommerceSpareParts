@@ -18,6 +18,7 @@ public static class EncodingUtils
             case 2: str += "=="; break;
             case 3: str += "="; break;
         }
+
         return Convert.FromBase64String(str);
     }
 }

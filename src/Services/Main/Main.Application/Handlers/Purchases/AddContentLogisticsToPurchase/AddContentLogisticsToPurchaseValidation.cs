@@ -1,4 +1,5 @@
 ﻿using FluentValidation;
+using Localization.Domain.Extensions;
 
 namespace Main.Application.Handlers.Purchases.AddContentLogisticsToPurchase;
 
@@ -11,15 +12,15 @@ public class AddContentLogisticsToPurchaseValidation : AbstractValidator<AddCont
             {
                 z.RuleFor(x => x.AreaM3)
                     .GreaterThanOrEqualTo(0)
-                    .WithMessage("Площадь должна быть больше или равна 0");
+                    .WithLocalizationKey("purchase.content.area.min.zero");
 
                 z.RuleFor(x => x.Price)
                     .GreaterThanOrEqualTo(0)
-                    .WithMessage("Цена должна быть больше или равна 0");
-                
+                    .WithLocalizationKey("purchase.content.price.min.zero");
+
                 z.RuleFor(x => x.WeightKg)
                     .GreaterThanOrEqualTo(0)
-                    .WithMessage("Вес должен быть больше или равна 0");
+                    .WithLocalizationKey("purchase.content.weight.min.zero");
             });
     }
 }

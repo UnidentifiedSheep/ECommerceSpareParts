@@ -19,13 +19,13 @@ public class PurchaseTestContext(DContext ctx, IMediator mediator) : SystemUserT
     public override async Task InitializeAsync(CancellationToken cancellationToken = default)
     {
         var users = await DbContext.CreateUsers(3);
-        
+
         User = users[0];
         Supplier = users[1];
         Carrier = users[2];
-        
+
         Currency = (await DbContext.CreateCurrencies())[0];
-        
+
         var storages = await DbContext.CreateStorages(2);
         var storageNames = storages.Select(x => x.Name).ToList();
         StorageTo = storages[0];
@@ -33,16 +33,16 @@ public class PurchaseTestContext(DContext ctx, IMediator mediator) : SystemUserT
 
         (_, Articles) = await DbContext.CreateProducerAndArticles(5, 10);
         await DbContext.AddStorageContentsAndIncreaseArticleCounts(
-            3, 
-            [Currency.Id], 
-            Articles.Select(x => x.Id), 
+            3,
+            [Currency.Id],
+            Articles.Select(x => x.Id),
             storageNames);
-        
+
         await DbContext.AddStorageToUser(Supplier, StorageFrom);
         await DbContext.CreateStorageRoutes(
-            StorageFrom.Name, 
-            StorageTo.Name, 
-            Carrier.Id, 
+            StorageFrom.Name,
+            StorageTo.Name,
+            Carrier.Id,
             [Currency.Id]);
 
         await base.InitializeAsync(cancellationToken);

@@ -1,4 +1,4 @@
-﻿using Exceptions.Exceptions.Suggestions;
+﻿using Search.Abstractions.Exceptions.Suggestions;
 using Search.Abstractions.Interfaces.Persistence;
 using Search.Entities;
 using Search.Enums;
@@ -8,11 +8,13 @@ using Search.Persistence.Interfaces.Repositories;
 
 namespace Search.Persistence.Services;
 
-internal class ArticleSuggestionService(IArticleReadRepository readRepository, 
-    IArticleSuggestionRepository suggestionRepository, IIndexManager indexManager) : IArticleSuggestionService
+internal class ArticleSuggestionService(
+    IArticleReadRepository readRepository,
+    IArticleSuggestionRepository suggestionRepository,
+    IIndexManager indexManager) : IArticleSuggestionService
 {
     private static readonly SemaphoreSlim RebuildLock = new(1, 1);
-    
+
     public IReadOnlyList<Article> GetSuggestions(string query, int max = 10)
     {
         var ids = suggestionRepository.GetSuggestions(query, max);
@@ -34,7 +36,7 @@ internal class ArticleSuggestionService(IArticleReadRepository readRepository,
             // Delete the old index directory and replace it with a new one
             if (mainDir.Exists) mainDir.Delete(true);
             newIndexDir.MoveTo(mainDir.FullName);
-            
+
             // Reopen the ctx
             ctx.Open();
         }

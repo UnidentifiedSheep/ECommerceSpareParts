@@ -1,8 +1,8 @@
 using Abstractions.Interfaces.Services;
 using Application.Common.Interfaces;
 using Attributes;
-using Exceptions.Exceptions.Storages;
 using Main.Abstractions.Dtos.Amw.Storage;
+using Main.Abstractions.Exceptions.Storages;
 using Main.Abstractions.Interfaces.DbRepositories;
 using Mapster;
 using MediatR;
@@ -21,9 +21,9 @@ public class EditStorageHandler(IStoragesRepository repository, IUnitOfWork unit
                           x => x.StorageOwners)
                       ?? throw new StorageNotFoundException(request.StorageName);
         var editType = request.EditStorage.Type;
-        if (editType.IsSet &&  storage.Type != editType.Value && storage.StorageOwners.Count > 0)
-            throw new ChangeOfStorageTypeRestrictedException("Присутствуют владельцы склада");
-        
+        if (editType.IsSet && storage.Type != editType.Value && storage.StorageOwners.Count > 0)
+            throw new ChangeOfStorageTypeRestrictedException();
+
         request.EditStorage.Adapt(storage);
         await unitOfWork.SaveChangesAsync(cancellationToken);
         return Unit.Value;

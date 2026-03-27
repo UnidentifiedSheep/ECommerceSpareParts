@@ -1,0 +1,19 @@
+﻿{
+  "locale": "ru",
+  "keyValues": {
+    "producer.with.articles.cannot.be.deleted": "Нельзя удалить производителя, у которого есть связанные статьи.",
+    "producer.not.found": "Не удалось найти указанного производителя.",
+    "producers.not.found": "Не удалось найти указанных производителей.",
+    "producer.additional.name.not.found": "Не удалось найти производителя с дополнительным названием '{0}'.",
+    "producer.name.not.empty": "Название производителя не должно быть пустым.",
+    "producer.name.min.length": "Название производителя должно быть не менее 2 символов.",
+    "producer.name.max.length": "Название производителя должно быть не более 64 символов.",
+    "producer.description.max.length": "Описание производителя должно быть не более 500 символов.",
+    "producer.other.name.not.found": "Не удалось найти дополнительное название производителя.",
+    "producer.other.name.already.taken": "Дополнительное название производителя уже занято.",
+    "producer.other.name.not.empty": "Дополнительное название не должно быть пустым.",
+    "producer.other.name.min.length": "Дополнительное название должно быть не менее 2 символов.",
+    "producer.other.name.max.length": "Дополнительное название должно быть не более 64 символов.",
+    "producer.other.name.where.used.max.length": "Поле 'where used' должно быть не более 64 символов."
+  }
+}

@@ -10,9 +10,9 @@ public static class ServiceProviderExtensions
         using var scope = sp.CreateScope();
 
         var loader = new JsonLocalizerContainerLoader(path);
-        IEnumerable<ILocalizerContainer> containers = scope.ServiceProvider.GetServices<ILocalizerContainer>();
+        var containers = scope.ServiceProvider.GetServices<ILocalizerContainer>();
         await loader.LoadAsync(containers);
-        
+
         return sp;
     }
 }

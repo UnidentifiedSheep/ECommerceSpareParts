@@ -1,7 +1,7 @@
 ﻿using Main.Abstractions.Constants;
+using Main.Abstractions.Dtos.Amw.ArticleReservations;
 using Main.Application.Handlers.ArticleReservations.CreateArticleReservation;
 using Main.Application.Handlers.ArticleReservations.SubtractCountFromReservations;
-using Main.Abstractions.Dtos.Amw.ArticleReservations;
 using Main.Entities;
 using Main.Persistence.Context;
 using MediatR;
@@ -19,10 +19,10 @@ public class SubtractCountFromReservationsTests : IAsyncLifetime
 {
     private readonly DContext _context;
     private readonly IMediator _mediator;
+    private Article _article = null!;
 
     private User _user = null!;
     private User _whoUpdated = null!;
-    private Article _article = null!;
 
     public SubtractCountFromReservationsTests(CombinedContainerFixture fixture)
     {
@@ -86,7 +86,8 @@ public class SubtractCountFromReservationsTests : IAsyncLifetime
         var result = await _mediator.Send(cmd);
         Assert.Empty(result.NotFoundReservations);
 
-        var reservations = await _context.StorageContentReservations.Where(x => x.UserId == _user.Id && x.ArticleId == _article.Id).OrderBy(x => x.Id).ToListAsync();
+        var reservations = await _context.StorageContentReservations
+            .Where(x => x.UserId == _user.Id && x.ArticleId == _article.Id).OrderBy(x => x.Id).ToListAsync();
         // First reservation had 3 -> should become 0 and IsDone true
         Assert.Equal(0, reservations[0].CurrentCount);
         Assert.True(reservations[0].IsDone);
@@ -107,7 +108,8 @@ public class SubtractCountFromReservationsTests : IAsyncLifetime
         var result = await _mediator.Send(cmd);
         Assert.True(result.NotFoundReservations.TryGetValue(_article.Id, out var remainder) && remainder > 0);
 
-        var totalLeft = await _context.StorageContentReservations.Where(x => x.UserId == _user.Id && x.ArticleId == _article.Id).SumAsync(x => x.CurrentCount);
+        var totalLeft = await _context.StorageContentReservations
+            .Where(x => x.UserId == _user.Id && x.ArticleId == _article.Id).SumAsync(x => x.CurrentCount);
         Assert.Equal(0, totalLeft);
     }
 

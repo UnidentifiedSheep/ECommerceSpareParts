@@ -1,4 +1,3 @@
-using System.Security.Claims;
 using Abstractions.Interfaces;
 using Api.Common.Extensions;
 using Carter;
@@ -20,8 +19,12 @@ public class EditPurchaseEndPoint : ICarterModule
 {
     public void AddRoutes(IEndpointRouteBuilder app)
     {
-        app.MapPut("/purchase/{purchaseId}", async (ISender sender, string purchaseId, EditPurchaseRequest request,
-                CancellationToken cancellationToken, IUserContext user) =>
+        app.MapPut("/purchase/{purchaseId}", async (
+                ISender sender,
+                string purchaseId,
+                EditPurchaseRequest request,
+                CancellationToken cancellationToken,
+                IUserContext user) =>
             {
                 var command = new EditFullPurchaseCommand(request.Content, purchaseId, request.CurrencyId,
                     request.Comment, request.PurchaseDateTime, user.UserId, request.WithLogistics, request.StorageFrom);

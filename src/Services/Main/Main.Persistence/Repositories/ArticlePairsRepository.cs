@@ -8,7 +8,9 @@ namespace Main.Persistence.Repositories;
 
 public class ArticlePairsRepository(DContext context) : IArticlePairsRepository
 {
-    public async Task<Article?> GetArticlePairAsync(int articleId, bool track = true,
+    public async Task<Article?> GetArticlePairAsync(
+        int articleId,
+        bool track = true,
         CancellationToken cancellationToken = default)
     {
         var pair = await context.ArticlesPairs
@@ -19,7 +21,9 @@ public class ArticlePairsRepository(DContext context) : IArticlePairsRepository
         return pair?.ArticleLeft == articleId ? pair.ArticleRightNavigation : pair?.ArticleLeftNavigation;
     }
 
-    public async Task<IEnumerable<ArticlesPair>> GetRelatedPairsAsync(int articleId, bool track = true,
+    public async Task<IEnumerable<ArticlesPair>> GetRelatedPairsAsync(
+        int articleId,
+        bool track = true,
         CancellationToken cancellationToken = default)
     {
         return await context.ArticlesPairs.ConfigureTracking(track)

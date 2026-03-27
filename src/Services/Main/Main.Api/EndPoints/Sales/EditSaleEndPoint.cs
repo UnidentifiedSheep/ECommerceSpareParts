@@ -1,4 +1,3 @@
-using System.Security.Claims;
 using Abstractions.Interfaces;
 using Api.Common.Extensions;
 using Carter;
@@ -19,8 +18,12 @@ public class EditSaleEndPoint : ICarterModule
 {
     public void AddRoutes(IEndpointRouteBuilder app)
     {
-        app.MapPut("/sales/{saleId}", async (ISender sender, string saleId, EditSaleRequest request,
-                IUserContext user, CancellationToken cancellationToken) =>
+        app.MapPut("/sales/{saleId}", async (
+                ISender sender,
+                string saleId,
+                EditSaleRequest request,
+                IUserContext user,
+                CancellationToken cancellationToken) =>
             {
                 var command = new EditFullSaleCommand(request.EditedContent, saleId, request.CurrencyId, user.UserId,
                     request.SaleDateTime, request.Comment, request.SellFromOtherStorages);

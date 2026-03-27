@@ -9,8 +9,15 @@ namespace Main.Application.Services;
 
 public class UserTokenService(IUnitOfWork unitOfWork, ITokenHasher tokenHasher) : IUserTokenService
 {
-    public async Task AddToken(string token, Guid userId, TokenType type, DateTime exp, IPAddress? ip,
-        string? userAgent, string? deviceId, IEnumerable<string> permissions,
+    public async Task AddToken(
+        string token,
+        Guid userId,
+        TokenType type,
+        DateTime exp,
+        IPAddress? ip,
+        string? userAgent,
+        string? deviceId,
+        IEnumerable<string> permissions,
         CancellationToken cancellationToken = default)
     {
         var tokenModel = new UserToken

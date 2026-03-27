@@ -3,7 +3,7 @@ using Pricing.Abstractions.Interfaces.Services;
 
 namespace Pricing.Application.Services;
 
-public class CurrencyConverterSetup(ICurrencyConverter currencyConverter, ICurrencyService currencyService) 
+public class CurrencyConverterSetup(ICurrencyConverter currencyConverter, ICurrencyService currencyService)
     : ICurrencyConverterSetup
 {
     public async Task InitializeAsync()
