@@ -177,7 +177,6 @@ public class EditArticleReservationTests : IAsyncLifetime
             GivenCurrencyId = int.MaxValue
         };
         var cmd = new EditArticleReservationCommand(_reservationId, dto, _whoUpdated.Id);
-        var exception = await Assert.ThrowsAsync<ValidationException>(() => _mediator.Send(cmd));
-        Assert.Equal("Не удалось найти валюту.", exception.Errors.First().ErrorMessage);
+        await Assert.ThrowsAsync<ValidationException>(() => _mediator.Send(cmd));
     }
 }

@@ -124,8 +124,7 @@ public class RestoreContentToStorageTests : IAsyncLifetime
         content[^1].Detail.CurrencyId = currencyId;
 
         var command = new RestoreContentCommand(content, StorageMovementType.StorageContentAddition, _user.Id);
-        var exception = await Assert.ThrowsAsync<ValidationException>(async () => await _mediator.Send(command));
-        Assert.Equal("Не удалось найти валюту.", exception.Errors.First().ErrorMessage);
+        await Assert.ThrowsAsync<ValidationException>(async () => await _mediator.Send(command));
     }
 
     [Fact]

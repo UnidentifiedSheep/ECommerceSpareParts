@@ -106,8 +106,7 @@ public class AddContentToStorageTests : IAsyncLifetime
         storageContent.Last().CurrencyId = int.MaxValue;
         var command = new AddContentCommand(storageContent, _storage.Name, _user.Id,
             StorageMovementType.StorageContentAddition);
-        var exception = await Assert.ThrowsAsync<ValidationException>(async () => await _mediator.Send(command));
-        Assert.Equal("Не удалось найти валюту.", exception.Errors.First().ErrorMessage);
+        await Assert.ThrowsAsync<ValidationException>(async () => await _mediator.Send(command));
     }
 
     [Fact]

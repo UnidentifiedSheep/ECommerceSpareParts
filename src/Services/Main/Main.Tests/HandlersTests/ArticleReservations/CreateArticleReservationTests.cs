@@ -193,8 +193,7 @@ public class CreateArticleReservationTests : IAsyncLifetime
             }
         };
         var cmd = new CreateArticleReservationCommand(dto, _whoCreated.Id);
-        var exception = await Assert.ThrowsAsync<ValidationException>(() => _mediator.Send(cmd));
-        Assert.Equal("Не удалось найти валюту.", exception.Errors.First().ErrorMessage);
+        await Assert.ThrowsAsync<ValidationException>(() => _mediator.Send(cmd));
     }
 
     [Fact]

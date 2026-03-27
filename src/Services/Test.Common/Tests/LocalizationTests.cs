@@ -1,6 +1,9 @@
 ﻿using System.Collections;
 using System.Reflection;
 using Abstractions.Interfaces.Exceptions;
+using BulkValidation.Core.Configuration;
+using BulkValidation.Core.Enums;
+using BulkValidation.Core.Models;
 using FluentAssertions;
 using FluentValidation;
 using Localization.Abstractions.Interfaces;
@@ -72,6 +75,38 @@ public class LocalizationTests
                 success.Should().BeTrue($"Missing key '{errorCode}' in {type.Name}");
             }
         }
+    }
+    
+    public async Task TestDbValidatorLocalization(IEnumerable<string> functionKeys, string path, Locale locale)
+    {
+        using var scoped = await CreateLocalizer(path, locale);
+        scoped.SetLocale(locale);
+
+        foreach (var key in functionKeys)
+        {
+            var configs = GetConfigs(key);
+            if (configs.Count == 0) continue;
+
+            foreach (var config in configs)
+            {
+                var messageKey = config.MessageTemplate;
+                var success = scoped.TryGet(messageKey, out _);
+
+                success.Should().BeTrue($"Missing key '{messageKey}' for function {key}");
+            }
+        }
+    }
+
+    private static List<ValidationConfig> GetConfigs(string key)
+    {
+        var res = new List<ValidationConfig?>()
+        {
+            ConfigureDbValidation.GetConfig(key, KeyValueType.Single),
+            ConfigureDbValidation.GetConfig(key, KeyValueType.MultipleKeys),
+            ConfigureDbValidation.GetConfig(key, KeyValueType.Tuple)
+        };
+
+        return res.Where(x => x != null).Select(x => x!).ToList();
     }
 
     private static IValidator CreateValidator(Type type)

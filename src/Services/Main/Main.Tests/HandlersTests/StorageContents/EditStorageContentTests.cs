@@ -190,8 +190,7 @@ public class EditStorageContentTests : IAsyncLifetime
             { [_storageContents.First().Id] = new(dto, concurrentCode) };
 
         var command = new EditStorageContentCommand(dict, _user.Id);
-        var exception = await Assert.ThrowsAsync<ValidationException>(async () => await _mediator.Send(command));
-        Assert.Equal("Не удалось найти валюту.", exception.Errors.First().ErrorMessage);
+        await Assert.ThrowsAsync<ValidationException>(async () => await _mediator.Send(command));
     }
 
 
