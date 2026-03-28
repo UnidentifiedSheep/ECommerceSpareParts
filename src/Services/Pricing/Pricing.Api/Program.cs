@@ -170,7 +170,7 @@ builder.Services.AddTransient<HeaderSecretMiddleware>(_ => new HeaderSecretMiddl
 
 var app = builder.Build();
 
-await app.LoadLocalesFromJson(localesPath);
+//await app.LoadLocalesFromJson(localesPath); //NO locales for now. turn on in future.
 
 Pricing.Application.Configs.Mapster.Configure();
 
