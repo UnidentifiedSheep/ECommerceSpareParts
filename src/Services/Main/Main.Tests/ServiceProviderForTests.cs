@@ -53,7 +53,8 @@ public static class ServiceProviderForTests
             RequireUppercase = false
         };
         CacheServiceProvider.AddCacheLayer(services, redisConnectionString)
-            .AddSecurityLayer("some secret", null, passwordRules)
+            .AddJsonSigner("some secret")
+            .AddFullSecurityLayer(passwordRules)
             .AddMailLayer()
             .AddCommonLayer()
             .AddAppCacheLayer();

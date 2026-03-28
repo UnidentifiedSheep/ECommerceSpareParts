@@ -1,3 +1,4 @@
+using System.Runtime.CompilerServices;
 using System.Text.Json;
 using Abstractions.Interfaces;
 using Abstractions.Interfaces.Services;
@@ -12,7 +13,7 @@ namespace Security;
 
 public static class ServiceProvider
 {
-    public static IServiceCollection AddSecurityLayer(
+    public static IServiceCollection AddFullSecurityLayer(
         this IServiceCollection collection,
         PasswordRules? passwordRules = null)
     {
@@ -20,19 +21,23 @@ public static class ServiceProvider
         collection.AddSingleton<IPasswordManager, PasswordManager>();
         collection.AddSingleton(passwordRules ?? new PasswordRules());
         collection.AddSingleton<ITokenHasher, TokenHasher>();
-        collection.AddScoped<IUserContext, UserContext>();
 
+        collection.AddMinimalSecurityLayer();
         return collection;
     }
 
-    public static IServiceCollection AddSecurityLayer(
+    public static IServiceCollection AddJsonSigner(
         this IServiceCollection collection,
         string secret,
-        JsonSerializerOptions? options = null,
-        PasswordRules? passwordRules = null)
+        JsonSerializerOptions? options = null)
     {
         collection.AddSingleton<IJsonSigner, JsonSigner>(_ => new JsonSigner(secret, options));
-        collection.AddSecurityLayer(passwordRules);
+        return collection;
+    }
+
+    public static IServiceCollection AddMinimalSecurityLayer(this IServiceCollection collection)
+    {
+        collection.AddScoped<IUserContext, UserContext>();
         return collection;
     }
 

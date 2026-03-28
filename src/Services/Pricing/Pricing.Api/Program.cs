@@ -133,8 +133,8 @@ builder.Services
     .AddPersistenceLayer(Environment.GetEnvironmentVariable("DB_CONNECTION_STRING")!)
     .AddCacheLayer(Environment.GetEnvironmentVariable("REDIS_CONNECTION_STRING")!, "pricing")
     .AddAppCacheLayer()
-    .AddSecurityLayer(Environment.GetEnvironmentVariable("SIGN_SECRET")!, Global.JsonOptions)
-    .AddJwtOptions(builder.Configuration)
+    .AddJsonSigner(Environment.GetEnvironmentVariable("SIGN_SECRET")!, Global.JsonOptions)
+    .AddMinimalSecurityLayer()
     .AddApplicationLayer()
     .AddCommonLayer();
 
