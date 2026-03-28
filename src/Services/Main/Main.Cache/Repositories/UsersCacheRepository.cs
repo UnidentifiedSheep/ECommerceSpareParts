@@ -1,5 +1,6 @@
 using Abstractions.Interfaces.Cache;
 using Main.Abstractions.Interfaces.CacheRepositories;
+using Main.Entities;
 
 namespace Main.Cache.Repositories;
 
@@ -27,6 +28,21 @@ public class UsersCacheRepository : IUsersCacheRepository
         var key = GetUserDiscountKey(userId);
         await _redis.StringSetAsync(key, discount.ToString(Global.Culture), _ttl);
     }
+
+    public async Task<User?> GetUserByEmail(string email)
+    {
+        var key = GetUserByEmailKey(email);
+        return await _redis.StringGetAsync<User>(key);
+    }
+
+    public async Task SetUserByEmail(string email, User user)
+    {
+        var key = GetUserByEmailKey(email);
+        await _redis.StringSetAsync(key, user, _ttl);
+    }
+
+    private static string GetUserByEmailKey(string email)
+        => $"user-by-email:{email}";
 
     private static string GetUserDiscountKey(Guid userId)
     {

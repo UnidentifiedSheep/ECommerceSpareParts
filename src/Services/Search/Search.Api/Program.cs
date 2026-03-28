@@ -68,6 +68,7 @@ builder.Services.AddHttpContextAccessor();
 
 builder.Services.AddPersistenceLayer(Environment.GetEnvironmentVariable("INDEX_FOLDER") ?? "./data")
     .AddSecurityLayer()
+    .AddJwtOptions(builder.Configuration)
     .AddApplicationLayer();
 
 var secret = Environment.GetEnvironmentVariable("GATEWAY_SUPER_KEY")!;

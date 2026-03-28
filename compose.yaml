@@ -46,7 +46,7 @@
     image: search.api
     build:
       context: .
-      dockerfile: Search.Api/Dockerfile
+      dockerfile: src/Services/Search/Search.Api/Dockerfile
     ports:
       - "4007:7292"
       - "4008:8080"

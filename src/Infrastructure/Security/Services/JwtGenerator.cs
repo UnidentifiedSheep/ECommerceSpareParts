@@ -1,16 +1,16 @@
 ﻿using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Security.Cryptography;
-using System.Text;
 using Abstractions.Interfaces;
 using Abstractions.Models;
-using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Tokens;
+using Security.Models;
 
 namespace Security.Services;
 
-public class JwtGenerator(IConfiguration configuration) : IJwtGenerator
+public class JwtGenerator(JwtOptions options) : IJwtGenerator
 {
+    private readonly JwtSecurityTokenHandler _tokenHandler = new();
     public string CreateToken(
         User user,
         UserInfo userInfo,
@@ -18,20 +18,15 @@ public class JwtGenerator(IConfiguration configuration) : IJwtGenerator
         IEnumerable<string> roles,
         IEnumerable<string> permissions)
     {
-        var handler = new JwtSecurityTokenHandler();
-        var privateKey = Encoding.UTF8.GetBytes(configuration["JwtBearer:IssuerSigningKey"]!);
-        var credentials = new SigningCredentials(
-            new SymmetricSecurityKey(privateKey),
-            SecurityAlgorithms.HmacSha256);
 
         var tokenDescriptor = new SecurityTokenDescriptor
         {
-            SigningCredentials = credentials,
-            Issuer = configuration["JwtBearer:ValidIssuer"],
-            Expires = DateTime.UtcNow.AddMinutes(5),
+            SigningCredentials = options.SigningCredentials,
+            Issuer = options.ValidIssuer,
+            Expires = DateTime.UtcNow.Add(options.ValidDuration),
             Subject = GetClaims(user, userInfo, deviceId, roles, permissions)
         };
-        return handler.WriteToken(handler.CreateToken(tokenDescriptor));
+        return _tokenHandler.WriteToken(_tokenHandler.CreateToken(tokenDescriptor));
     }
 
     public string CreateRefreshToken()
@@ -51,9 +46,8 @@ public class JwtGenerator(IConfiguration configuration) : IJwtGenerator
             ValidateAudience = false,
             ValidateLifetime = true,
             ValidateIssuerSigningKey = true,
-            ValidIssuer = configuration["JwtBearer:ValidIssuer"],
-            IssuerSigningKey =
-                new SymmetricSecurityKey(Encoding.UTF8.GetBytes(configuration["JwtBearer:IssuerSigningKey"]!))
+            ValidIssuer = options.ValidIssuer,
+            IssuerSigningKey = options.SigningCredentials.Key
         };
         return new JwtSecurityTokenHandler().ValidateToken(token, validation, out _);
     }
