@@ -136,7 +136,8 @@ builder.Services
     .AddJsonSigner(Environment.GetEnvironmentVariable("SIGN_SECRET")!, Global.JsonOptions)
     .AddMinimalSecurityLayer()
     .AddApplicationLayer()
-    .AddCommonLayer();
+    .AddCommonLayer()
+    .AddLocalization();
 
 
 builder.Services.AddBaseExceptionHandlers();
