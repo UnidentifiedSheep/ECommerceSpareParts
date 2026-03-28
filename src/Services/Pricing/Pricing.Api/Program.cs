@@ -137,7 +137,7 @@ builder.Services
     .AddMinimalSecurityLayer()
     .AddApplicationLayer()
     .AddCommonLayer()
-    .AddLocalization();
+    .AddLocalization(locales);
 
 
 builder.Services.AddBaseExceptionHandlers();
