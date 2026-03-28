@@ -34,6 +34,7 @@ using AnonymousArticleDto = Main.Abstractions.Dtos.Anonymous.Articles.ArticleDto
 using AmwArticleFullDto = Main.Abstractions.Dtos.Amw.Articles.ArticleFullDto;
 using Currency = Main.Entities.Currency;
 using MemberArticleFullDto = Main.Abstractions.Dtos.Member.Articles.ArticleFullDto;
+using User = Main.Entities.User;
 
 namespace Main.Application;
 
@@ -69,8 +70,8 @@ public static class ServiceProvider
         collection.AddScoped<IBalanceService, BalanceService>();
         collection.AddScoped<ISaleService, SaleService>();
         collection.AddScoped<IUserTokenService, UserTokenService>();
-        collection.AddScoped<IRolePermissionService, RolePermissionService>();
         collection.AddScoped<IPurchaseService, PurchaseService>();
+        collection.AddScoped<IUserService, UserService>();
 
         collection.RegisterRelatedData();
 
@@ -86,6 +87,12 @@ public static class ServiceProvider
         {
             var cache = sp.GetRequiredService<ICache>();
             return new ProducerRelatedData(cache, relatedDataTtl);
+        });
+        
+        collection.AddTransient<IRelatedDataRepository<User>, UserRelatedData>(sp =>
+        {
+            var cache = sp.GetRequiredService<ICache>();
+            return new UserRelatedData(cache, relatedDataTtl);
         });
 
         collection.AddTransient<IRelatedDataRepository<Currency>, CurrencyRelatedData>(sp =>

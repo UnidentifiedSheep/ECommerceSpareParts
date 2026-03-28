@@ -12,7 +12,7 @@ public interface ICache
     Task DeleteAsync(IEnumerable<string> keys);
     Task<IEnumerable<string?>> SetMembersAsync(string key);
     Task SetAddAsync(string key, string value);
-    Task SetAddAsync(string key, IEnumerable<string> members);
+    Task SetAddAsync(string key, IEnumerable<string> members, TimeSpan? expiry = null);
     Task SetAddAsync(IEnumerable<string> keys, string member, TimeSpan? expiry = null);
 
     /// <summary>

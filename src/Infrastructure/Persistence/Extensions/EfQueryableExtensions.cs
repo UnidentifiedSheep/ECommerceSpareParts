@@ -29,4 +29,55 @@ public static class EfQueryableExtensions
 
         return query;
     }
+
+    public static IQueryable<T> ApplyPaging<T>(
+        this IQueryable<T> query,
+        PageableQueryOptions<T>? options) where T : class
+    {
+        if (options == null) return query;
+        query = query.ApplyOrdering(options);
+        
+        var page = options.Page;
+        var size = options.Size;
+        
+        if (!size.HasValue) return query;
+        
+        if (page.HasValue)
+            query = query.Skip((page.Value - 1) * size.Value);
+
+        query = query.Take(size.Value);
+
+        return query;
+        
+    }
+
+    private static IQueryable<T> ApplyOrdering<T>(
+        this IQueryable<T> query,
+        PageableQueryOptions<T> options) where T : class
+    {
+        if (!options.OrderBy.Any())
+            return query;
+
+        IOrderedQueryable<T>? orderedQuery = null;
+
+        for (int i = 0; i < options.OrderBy.Count; i++)
+        {
+            var order = options.OrderBy[i];
+
+            if (i == 0)
+            {
+                orderedQuery = order.Descending
+                    ? query.OrderByDescending(order.KeySelector)
+                    : query.OrderBy(order.KeySelector);
+            }
+            else
+            {
+                orderedQuery = order.Descending
+                    ? orderedQuery!.ThenByDescending(order.KeySelector)
+                    : orderedQuery!.ThenBy(order.KeySelector);
+            }
+        }
+
+        return orderedQuery!;
+    }
 }

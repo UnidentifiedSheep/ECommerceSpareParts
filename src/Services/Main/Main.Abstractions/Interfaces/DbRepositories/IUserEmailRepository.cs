@@ -1,18 +1,17 @@
+using Abstractions.Models.Repository;
 using Main.Entities;
 
 namespace Main.Abstractions.Interfaces.DbRepositories;
 
 public interface IUserEmailRepository
 {
-    Task<IEnumerable<UserEmail>> GetUserEmailsAsync(
+    Task<IReadOnlyList<UserEmail>> GetUserEmailsAsync(
         Guid userId,
-        int? limit = null,
-        int? offset = null,
-        bool track = true,
+        PageableQueryOptions<UserEmail>? options = null,
         CancellationToken cancellationToken = default);
 
-    Task<User?> GetUserByPrimaryMailAsync(
+    Task<UserEmail?> GetPrimaryUserEmail(
         string email,
-        bool track = true,
+        QueryOptions<UserEmail>? options = null,
         CancellationToken cancellationToken = default);
 }

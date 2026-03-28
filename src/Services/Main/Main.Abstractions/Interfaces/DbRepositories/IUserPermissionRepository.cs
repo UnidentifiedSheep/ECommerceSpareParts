@@ -1,4 +1,5 @@
-﻿using Main.Entities;
+﻿using Abstractions.Models.Repository;
+using Main.Entities;
 
 namespace Main.Abstractions.Interfaces.DbRepositories;
 
@@ -6,6 +7,10 @@ public interface IUserPermissionRepository
 {
     Task<IEnumerable<Permission>> GetUserPermissionsAsync(
         Guid userId,
-        bool track = true,
+        QueryOptions? options = null,
+        CancellationToken cancellationToken = default);
+
+    Task<IReadOnlyList<string>> GetUserPermissionNamesAsync(
+        Guid userId,
         CancellationToken cancellationToken = default);
 }

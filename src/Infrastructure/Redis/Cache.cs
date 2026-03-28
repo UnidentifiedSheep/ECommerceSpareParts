@@ -92,11 +92,12 @@ public class Cache(IDatabase redis, string? prefix = null) : ICache
         await redis.SetAddAsync(key, value);
     }
 
-    public async Task SetAddAsync(string key, IEnumerable<string> members)
+    public async Task SetAddAsync(string key, IEnumerable<string> members, TimeSpan? expiry = null)
     {
         key = AddPrefix(key);
         var values = members.Select(k => new RedisValue(k)).ToArray();
         await redis.SetAddAsync(key, values);
+        await redis.KeyExpireAsync(key, expiry);
     }
 
     public async Task KeyExpireAsync(string key, TimeSpan? expiry = null)

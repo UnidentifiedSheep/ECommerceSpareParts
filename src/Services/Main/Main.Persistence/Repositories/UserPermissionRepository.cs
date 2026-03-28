@@ -1,4 +1,5 @@
-﻿using Main.Abstractions.Interfaces.DbRepositories;
+﻿using Abstractions.Models.Repository;
+using Main.Abstractions.Interfaces.DbRepositories;
 using Main.Entities;
 using Main.Persistence.Context;
 using Microsoft.EntityFrameworkCore;
@@ -10,14 +11,23 @@ public class UserPermissionRepository(DContext context) : IUserPermissionReposit
 {
     public async Task<IEnumerable<Permission>> GetUserPermissionsAsync(
         Guid userId,
-        bool track = true,
+        QueryOptions? options = null,
         CancellationToken cancellationToken = default)
     {
         var permission = await context.UserPermissions
-            .ConfigureTracking(track)
-            .Include(x => x.PermissionNavigation)
+            .ApplyOptions(options)
             .Where(x => x.UserId == userId)
             .ToListAsync(cancellationToken);
         return permission.Select(x => x.PermissionNavigation);
+    }
+
+    public async Task<IReadOnlyList<string>> GetUserPermissionNamesAsync(
+        Guid userId,
+        CancellationToken cancellationToken = default)
+    {
+        return await context.UserPermissions
+            .Where(x => x.UserId == userId)
+            .Select(x => x.Permission)
+            .ToListAsync(cancellationToken);
     }
 }

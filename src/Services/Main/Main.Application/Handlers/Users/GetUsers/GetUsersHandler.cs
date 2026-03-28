@@ -1,4 +1,5 @@
 using Abstractions.Models;
+using Abstractions.Models.Repository;
 using Application.Common.Interfaces;
 using Main.Abstractions.Dtos.Amw.Users;
 using Main.Abstractions.Interfaces.DbRepositories;
@@ -29,23 +30,30 @@ public class GetUsersHandler(IUserRepository usersRepositoryService) : IQueryHan
 {
     public async Task<GetUsersResult> Handle(GetUsersQuery request, CancellationToken cancellationToken)
     {
+        var options = new PageableQueryOptions<User>()
+            .WithTracking(false)
+            .WithInclude(x => x.UserInfo)
+            .WithPage(request.Pagination.Page)
+            .WithSize(request.Pagination.Size);
         var users = new List<User>();
-        var page = request.Pagination.Page;
-        var size = request.Pagination.Size;
         switch (request.SearchStrategy)
         {
             case GeneralSearchStrategy.General:
-                users.AddRange(await usersRepositoryService.GetUserBySearchColumn(request.SearchTerm, page,
-                    size, request.IsSupplier, false, cancellationToken));
+                users.AddRange(await usersRepositoryService.GetUserBySearchColumn(
+                    request.SearchTerm, 
+                    request.IsSupplier, 
+                    options, 
+                    cancellationToken));
                 break;
             case GeneralSearchStrategy.Exec:
                 break;
             case GeneralSearchStrategy.Similarity:
                 var simLevel = request.SimilarityLevel >= 1 ? 0.999 : request.SimilarityLevel;
-                users.AddRange(await usersRepositoryService.GetUsersBySimilarityAsync(simLevel ?? 0.4,
-                    page, size,
+                users.AddRange(await usersRepositoryService.GetUsersBySimilarityAsync(
+                    simLevel ?? 0.4,
+                    options,
                     request.Name, request.Surname, request.Email, request.Phone, request.UserName, request.Id,
-                    request.Description, request.IsSupplier, false, cancellationToken));
+                    request.Description, request.IsSupplier, cancellationToken));
                 break;
             case GeneralSearchStrategy.FromStart:
             case GeneralSearchStrategy.Contains:

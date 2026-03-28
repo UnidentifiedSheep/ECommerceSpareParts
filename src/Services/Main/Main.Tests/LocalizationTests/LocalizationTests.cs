@@ -1,6 +1,6 @@
 ﻿using System.Reflection;
 using Api.Common.Extensions;
-using Main.Abstractions.Utils;
+using Main.Abstractions.Constants;
 using Main.Application.Configs;
 using Main.Entities;
 

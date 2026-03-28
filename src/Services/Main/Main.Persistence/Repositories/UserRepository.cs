@@ -1,5 +1,5 @@
 using System.Diagnostics.CodeAnalysis;
-using System.Linq.Expressions;
+using Abstractions.Models.Repository;
 using Extensions;
 using Main.Abstractions.Interfaces.DbRepositories;
 using Main.Entities;
@@ -13,60 +13,13 @@ public class UserRepository(DContext context) : IUserRepository
 {
     public async Task<User?> GetUserByIdAsync(
         Guid userId,
-        bool track = true,
-        CancellationToken cancellationToken = default,
-        params Expression<Func<User, object?>>[] includes)
-    {
-        var query = context.Users.ConfigureTracking(track);
-        foreach (var include in includes)
-            query = query.Include(include);
-
-        return await query.FirstOrDefaultAsync(x => x.Id == userId, cancellationToken);
-    }
-
-    public async Task<User?> GetUserByUserNameAsync(
-        string userName,
-        bool track = true,
+        QueryOptions? options = null,
         CancellationToken cancellationToken = default)
     {
-        return await context.Users.ConfigureTracking(track)
-            .Include(x => x.UserInfo)
-            .FirstOrDefaultAsync(x => x.NormalizedUserName == userName.ToNormalized(), cancellationToken);
+        return await context.Users
+            .ApplyOptions(options)
+            .FirstOrDefaultAsync(x => x.Id == userId, cancellationToken);
     }
-
-    public async Task<User?> GetUserByEmailAsync(
-        string email,
-        bool track = true,
-        CancellationToken cancellationToken = default)
-    {
-        var normalizedEmail = email.ToNormalizedEmail();
-        var userEmail = await context.UserEmails
-            .ConfigureTracking(track)
-            .Include(x => x.User)
-            .ThenInclude(x => x.UserInfo)
-            .FirstOrDefaultAsync(x => x.NormalizedEmail == normalizedEmail, cancellationToken);
-        return userEmail?.User;
-    }
-
-    public async Task<User?> GetUserByPhoneAsync(
-        string phoneNumber,
-        bool track = true,
-        CancellationToken cancellationToken = default)
-    {
-        var normalizedPhone = phoneNumber.ToNormalizedPhoneNumber();
-        var userPhone = await context.UserPhones.ConfigureTracking(track)
-            .Include(x => x.User)
-            .ThenInclude(x => x.UserInfo)
-            .FirstOrDefaultAsync(x => x.NormalizedPhone == normalizedPhone, cancellationToken);
-        return userPhone?.User;
-    }
-
-    public async Task<bool> IsUserNameTakenAsync(string userName, CancellationToken cancellationToken = default)
-    {
-        var normalizedUserName = userName.ToNormalized();
-        return await context.Users.AnyAsync(x => x.NormalizedUserName == normalizedUserName, cancellationToken);
-    }
-
 
     public async Task ChangeUsersDiscount(
         Guid userId,
@@ -82,29 +35,25 @@ public class UserRepository(DContext context) : IUserRepository
     }
 
 
-    public async Task<UserInfo?> GetUserInfo(Guid id, bool track = true, CancellationToken cancellationToken = default)
+    public async Task<UserInfo?> GetUserInfo(Guid id, QueryOptions? options = null, CancellationToken cancellationToken = default)
     {
         return await context.UserInfos
-            .ConfigureTracking(track)
+            .ApplyOptions(options)
             .FirstOrDefaultAsync(x => x.UserId == id, cancellationToken);
     }
 
 
-    [SuppressMessage("ReSharper", "EntityFramework.ClientSideDbFunctionCall")]
     public async Task<IEnumerable<User>> GetUserBySearchColumn(
         string? searchTerm,
-        int page,
-        int viewCount,
         bool? isSupplier = null,
-        bool track = true,
+        PageableQueryOptions<User>? options = null,
         CancellationToken cancellationToken = default)
     {
         var normalizedSearchTerm = (searchTerm ?? "").ToNormalized();
         var searchBySearchTerm = !string.IsNullOrWhiteSpace(normalizedSearchTerm);
 
         var query = context.Users
-            .ConfigureTracking(track)
-            .Include(x => x.UserInfo)
+            .ApplyOptions(options)
             .Where(x => isSupplier == null
                         || (x.UserInfo != null && x.UserInfo.IsSupplier == isSupplier));
 
@@ -126,8 +75,7 @@ public class UserRepository(DContext context) : IUserRepository
 
 
         return await query
-            .Skip(page * viewCount)
-            .Take(viewCount)
+            .ApplyPaging(options)
             .ToListAsync(cancellationToken);
     }
 
@@ -142,8 +90,7 @@ public class UserRepository(DContext context) : IUserRepository
     [SuppressMessage("ReSharper", "EntityFramework.ClientSideDbFunctionCall")]
     public async Task<IEnumerable<User>> GetUsersBySimilarityAsync(
         double similarityLevel,
-        int page,
-        int viewCount,
+        PageableQueryOptions<User> options,
         string? name = null,
         string? surname = null,
         string? email = null,
@@ -152,13 +99,12 @@ public class UserRepository(DContext context) : IUserRepository
         Guid? id = null,
         string? description = null,
         bool? isSupplier = null,
-        bool track = true,
         CancellationToken cancellationToken = default)
     {
         similarityLevel = similarityLevel >= 1 ? 0.999 : similarityLevel;
         var query = context.Users
             .Include(x => x.UserInfo)
-            .ConfigureTracking(track);
+            .ApplyOptions(options);
         var isNameIncluded = false;
         var isSurnameIncluded = false;
         var isEmailIncluded = false;
@@ -264,8 +210,7 @@ public class UserRepository(DContext context) : IUserRepository
 
         var users = await queryWithScore
             .Select(x => x.User)
-            .Skip(page * viewCount)
-            .Take(viewCount)
+            .ApplyPaging(options)
             .ToListAsync(cancellationToken);
         return users;
     }

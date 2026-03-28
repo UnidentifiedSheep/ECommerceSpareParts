@@ -3,19 +3,19 @@
 namespace Abstractions.Models.Repository;
 
 /// <summary>
-///     Used for repository methods configuration.
+/// Used for repository methods configuration.
 /// </summary>
 public class QueryOptions
 {
     /// <summary>
-    ///     Indicates that ef should track entities.
-    ///     <c>False</c> by default
+    /// Indicates that ef should track entities.
+    /// <c>False</c> by default
     /// </summary>
     public bool Track { get; protected set; }
 
     /// <summary>
-    ///     Indicates that taken entities must be locked.
-    ///     <c>False</c> by default
+    /// Indicates that taken entities must be locked.
+    /// <c>False</c> by default
     /// </summary>
     public bool ForUpdate { get; protected set; }
 
@@ -37,7 +37,7 @@ public class QueryOptions<TEntity> : QueryOptions
     private readonly List<Expression<Func<TEntity, object?>>> _includes = [];
     public IReadOnlyList<Expression<Func<TEntity, object?>>> Includes => _includes;
 
-    public QueryOptions<TEntity> WithInclude(Expression<Func<TEntity, object?>> include)
+    public virtual QueryOptions<TEntity> WithInclude(Expression<Func<TEntity, object?>> include)
     {
         _includes.Add(include);
         return this;

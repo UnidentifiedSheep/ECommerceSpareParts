@@ -1,5 +1,5 @@
 ﻿using Abstractions.Interfaces.Cache;
-using Main.Abstractions.Utils;
+using Main.Abstractions.Constants;
 using Main.Application.Notifications;
 using MediatR;
 
