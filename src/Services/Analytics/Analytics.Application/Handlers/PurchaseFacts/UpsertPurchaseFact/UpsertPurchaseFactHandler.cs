@@ -1,4 +1,5 @@
-﻿using Abstractions.Interfaces.Services;
+﻿using System.Data;
+using Abstractions.Interfaces.Services;
 using Abstractions.Models.Repository;
 using Analytics.Abstractions.Dtos.PurchaseFact;
 using Analytics.Abstractions.Interfaces.DbRepositories;
@@ -11,7 +12,7 @@ using Microsoft.Extensions.Logging;
 
 namespace Analytics.Application.Handlers.PurchaseFacts.UpsertPurchaseFact;
 
-[Transactional]
+[Transactional(IsolationLevel.ReadCommitted, 2, 20)]
 public record UpsertPurchaseFactCommand(PurchaseFactUpsertDto PurchaseFact) : ICommand;
 
 public class UpsertPurchaseFactHandler(

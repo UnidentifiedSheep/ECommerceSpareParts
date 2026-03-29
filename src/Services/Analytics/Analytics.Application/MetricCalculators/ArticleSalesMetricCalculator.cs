@@ -7,7 +7,9 @@ using Analytics.Entities.Metrics.JsonDataModels;
 
 namespace Analytics.Application.MetricCalculators;
 
-public class ArticleSalesMetricCalculator(ISalesRepository salesRepository, ICurrencyConverter currencyConverter)
+public class ArticleSalesMetricCalculator(
+    ISalesRepository salesRepository,
+    ICurrencyConverter currencyConverter)
     : MetricCalculatorBase<ArticleSalesMetric>
 {
     public override async Task CalculateMetric(ArticleSalesMetric metric, CancellationToken cancellationToken = default)
@@ -17,23 +19,46 @@ public class ArticleSalesMetricCalculator(ISalesRepository salesRepository, ICur
         decimal totalAmount = 0;
         var totalQuantity = 0;
 
+        double mean = 0;
+        double m2 = 0;
+        long count = 0;
+
         var (start, end) = await WithTimer(async () =>
         {
             await foreach (var fact in salesRepository.GetFacts(GetWhere(metric)).WithCancellation(cancellationToken))
             {
                 var neededArticle = fact.SaleContents
                     .Where(x => x.ArticleId == metric.ArticleId)
-                    .Select(x => (currencyConverter.ConvertToUsd(x.Price, fact.CurrencyId), x.Count))
+                    .Select(x => (price: currencyConverter.ConvertToUsd(x.Price, fact.CurrencyId), quantity: x.Count))
                     .ToList();
 
-                minPrice = Math.Min(minPrice, neededArticle.Min(x => x.Item1));
-                maxPrice = Math.Max(maxPrice, neededArticle.Max(x => x.Item1));
-                totalAmount += neededArticle.Sum(x => x.Count * x.Item1);
-                totalQuantity += neededArticle.Sum(x => x.Count);
+                foreach (var (priceDecimal, quantity) in neededArticle)
+                {
+                    var price = (double)priceDecimal;
+
+                    minPrice = Math.Min(minPrice, priceDecimal);
+                    maxPrice = Math.Max(maxPrice, priceDecimal);
+
+                    totalAmount += priceDecimal * quantity;
+                    totalQuantity += quantity;
+
+                    for (int i = 0; i < quantity; i++)
+                    {
+                        count++;
+
+                        var delta = price - mean;
+                        mean += delta / count;
+                        var delta2 = price - mean;
+                        m2 += delta * delta2;
+                    }
+                }
             }
         });
 
-        var avgPrice = totalAmount / totalQuantity;
+        var variance = count > 1 ? m2 / count : 0.0;
+        var volatility = (decimal)Math.Sqrt(variance);
+
+        var avgPrice = totalQuantity == 0 ? 0 : totalAmount / totalQuantity;
 
         var data = new ArticleInfoModel
         {
@@ -43,7 +68,8 @@ public class ArticleSalesMetricCalculator(ISalesRepository salesRepository, ICur
             {
                 AveragePrice = avgPrice,
                 MaximumPrice = maxPrice,
-                MinimumPrice = minPrice
+                MinimumPrice = minPrice,
+                Volatility = volatility,
             },
             Timer = new MetricTimer(start, end)
         };
@@ -51,7 +77,6 @@ public class ArticleSalesMetricCalculator(ISalesRepository salesRepository, ICur
         metric.Data = data;
         metric.SetCalculated();
     }
-
 
     private static Expression<Func<SalesFact, bool>> GetWhere(ArticleSalesMetric metric)
     {

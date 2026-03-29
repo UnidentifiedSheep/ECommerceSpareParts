@@ -2,14 +2,17 @@
 
 namespace Analytics.Entities.Metrics.JsonDataModels;
 
-public class PriceInfoModel
+public record PriceInfoModel
 {
     [JsonPropertyName("min_price")]
-    public decimal MinimumPrice { get; set; }
+    public required decimal MinimumPrice { get; init; }
 
     [JsonPropertyName("max_price")]
-    public decimal MaximumPrice { get; set; }
+    public required decimal MaximumPrice { get; init; }
 
     [JsonPropertyName("average_price")]
-    public decimal AveragePrice { get; set; }
+    public required decimal AveragePrice { get; init; }
+    
+    [JsonPropertyName("volatility")]
+    public required decimal Volatility { get; init; }
 }

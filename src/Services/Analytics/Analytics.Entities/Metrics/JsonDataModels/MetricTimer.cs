@@ -2,11 +2,10 @@
 
 namespace Analytics.Entities.Metrics.JsonDataModels;
 
-public class MetricTimer
+public record MetricTimer
 {
-    public MetricTimer()
-    {
-    }
+    //for json serializer
+    public MetricTimer() { }
 
     public MetricTimer(DateTime start, DateTime end)
     {

@@ -256,7 +256,7 @@ if (app.Environment.IsDevelopment())
 RecurringJob.AddOrUpdate<UpdateCurrencyRate>("UpdateCurrencyTask",
     x => x.Run(), Cron.Daily);
 
-RecurringJob.AddOrUpdate<NotifySuggestionsRebuildNeeded>("UpdateCurrencyTask",
+RecurringJob.AddOrUpdate<NotifySuggestionsRebuildNeeded>("RebuildSuggestionsTask",
     x => x.Run(), Cron.Daily);
 
 app.UseOpenTelemetryPrometheusScrapingEndpoint();

@@ -2,7 +2,7 @@
 
 namespace Analytics.Entities.Metrics.JsonDataModels;
 
-public class ArticleInfoModel
+public record ArticleInfoModel
 {
     [JsonPropertyName("price_info")]
     public required PriceInfoModel PriceInfo { get; set; }

@@ -6,6 +6,7 @@
     "purchase.fact.content.required": "Содержимое факта закупки не может быть пустым.",
     "purchase.fact.content.price.required": "Цена содержимого факта закупки должна быть больше 0.",
     "purchase.fact.content.price.precision.scale": "Цена содержимого факта покупки может иметь максимум 2 знака после запятой.",
-    "purchase.fact.content.count.required": "Количество содержимого факта покупки должно быть больше 0."
+    "purchase.fact.content.count.required": "Количество содержимого факта покупки должно быть больше 0.",
+    "purchase.fact.not.found": "Не удалось найти файт закупки."
   }
 }
