@@ -1,7 +1,11 @@
 using Abstractions.Models;
+using Abstractions.Models.Repository;
 using Application.Common.Interfaces;
+using Extensions;
 using Main.Abstractions.Dtos.Amw.Purchase;
+using Main.Abstractions.Dtos.RepositoryOptionsData;
 using Main.Abstractions.Interfaces.DbRepositories;
+using Main.Entities;
 using Mapster;
 
 namespace Main.Application.Handlers.Purchases.GetPurchase;
@@ -22,11 +26,26 @@ public class GetPurchasesHandler(IPurchaseRepository purchaseRepository)
 {
     public async Task<GetPurchasesResult> Handle(GetPurchasesQuery request, CancellationToken cancellationToken)
     {
-        var page = request.Pagination.Page;
-        var size = request.Pagination.Size;
-        var result = await purchaseRepository.GetPurchases(request.RangeStartDate, request.RangeEndDate, page, size,
-            request.SupplierId,
-            request.CurrencyId, request.SortBy, request.SearchTerm, false, cancellationToken);
+        var options = new QueryOptions<Purchase, GetPurchaseOptionsData>
+            {
+                Data = new GetPurchaseOptionsData
+                {
+                    RangeStart = request.RangeStartDate,
+                    RangeEnd =  request.RangeEndDate,
+                    CurrencyId = request.CurrencyId,
+                    SearchTerm = request.SearchTerm,
+                    SupplierId = request.SupplierId
+                }
+            }
+            .WithPage(request.Pagination.Page)
+            .WithSize(request.Pagination.Size)
+            .WithInclude(x => x.Transaction)
+            .WithInclude(x => x.Supplier)
+            .WithInclude(x => x.Supplier.UserInfo)
+            .WithInclude(x => x.Currency)
+            .WithSorting(request.SortBy);
+        
+        var result = await purchaseRepository.GetPurchases(options, cancellationToken);
         return new GetPurchasesResult(result.Adapt<List<PurchaseDto>>());
     }
 }

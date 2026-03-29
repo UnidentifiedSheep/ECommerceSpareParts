@@ -14,15 +14,20 @@ public record GetPurchaseContentResult(List<PurchaseContentDto> Content);
 public class GetPurchaseContentHandler(IPurchaseRepository purchaseRepository)
     : IQueryHandler<GetPurchaseContentQuery, GetPurchaseContentResult>
 {
-    public static readonly QueryOptions<PurchaseContent> Options = new QueryOptions<PurchaseContent>()
-        .WithInclude(x => x.PurchaseContentLogistic);
-
     public async Task<GetPurchaseContentResult> Handle(
         GetPurchaseContentQuery request,
         CancellationToken cancellationToken)
     {
+        var options = new QueryOptions<PurchaseContent, string>()
+            {
+                Data = request.Id
+            }
+            .WithTracking(false)
+            .WithInclude(x => x.Article)
+            .WithInclude(x => x.Article.Producer)
+            .WithInclude(x => x.PurchaseContentLogistic);
         var content = await purchaseRepository
-            .GetPurchaseContentWithArticleData(request.Id, Options, cancellationToken);
+            .GetPurchaseContent(options, cancellationToken);
         return new GetPurchaseContentResult(content.Adapt<List<PurchaseContentDto>>());
     }
 }

@@ -6,7 +6,6 @@ namespace Main.Abstractions.Interfaces.DbRepositories;
 public interface IUserTokenRepository
 {
     Task<UserToken?> GetTokenByHashAsync(
-        string hash, 
-        QueryOptions? options = null, 
+        QueryOptions<UserToken, string> options,
         CancellationToken cancellationToken = default);
 }

@@ -32,14 +32,15 @@ public class LoginHandler(
     IUserService userService,
     IUnitOfWork unitOfWork) : ICommandHandler<LoginCommand, LoginResult>
 {
-    private static readonly QueryOptions<UserEmail> UserQueryOptions =
-        new QueryOptions<UserEmail>()
-            .WithTracking()
-            .WithInclude(x => x.User)
-            .WithInclude(x => x.User.UserInfo);
     public async Task<LoginResult> Handle(LoginCommand request, CancellationToken cancellationToken)
     {
-        var userEmail = await userEmailRepository.GetPrimaryUserEmail(request.Email, UserQueryOptions, cancellationToken)
+        var queryOptions = new QueryOptions<UserEmail, string>()
+        {
+            Data =  request.Email,
+        }.WithTracking()
+        .WithInclude(x => x.User)
+        .WithInclude(x => x.User.UserInfo);
+        var userEmail = await userEmailRepository.GetUserEmailByPrimary(queryOptions, cancellationToken)
                    ?? throw new WrongCredentialsException(request.Email, null);
         var user = userEmail.User;
         if (user.UserInfo == null)
@@ -48,7 +49,7 @@ public class LoginHandler(
             throw new WrongCredentialsException(request.Email, request.Password);
 
         var (roles, permissions) = 
-            await userService.TryGetUserRolesAndPermissionsAsync(user.Id, cancellationToken);
+            await userService.GetUserRolesAndPermissionsAsync(user.Id, cancellationToken);
 
         var deviceId = GenerateDeviceId();
         var ip = request.IpAddress;

@@ -15,7 +15,11 @@ public static class EfQueryableExtensions
         return forUpdate ? query.TagWith("ForUpdate") : query;
     }
 
-    public static IQueryable<T> ApplyOptions<T>(this IQueryable<T> query, QueryOptions? config) where T : class
+    public static IQueryable<T> ApplyOptions<T, TSelf>(
+        this IQueryable<T> query,
+        QueryOptionsBase<T, TSelf>? config)
+        where T : class
+        where TSelf : QueryOptionsBase<T, TSelf>
     {
         if (config == null) return query;
 
@@ -23,37 +27,40 @@ public static class EfQueryableExtensions
             .ConfigureTracking(config.Track)
             .ForUpdate(config.ForUpdate);
 
-        if (config is not QueryOptions<T> cfg) return query;
-        foreach (var include in cfg.Includes)
+        foreach (var include in config.Includes)
             query = query.Include(include);
 
         return query;
     }
-
-    public static IQueryable<T> ApplyPaging<T>(
+    
+    public static IQueryable<T> ApplyPaging<T, TSelf>(
         this IQueryable<T> query,
-        PageableQueryOptions<T>? options) where T : class
+        QueryOptionsBase<T, TSelf>? options)
+        where T : class
+        where TSelf : QueryOptionsBase<T, TSelf>
     {
         if (options == null) return query;
+
         query = query.ApplyOrdering(options);
-        
+
         var page = options.Page;
         var size = options.Size;
-        
+
         if (!size.HasValue) return query;
-        
+
         if (page.HasValue)
-            query = query.Skip((page.Value - 1) * size.Value);
+            query = query.Skip(page.Value * size.Value);
 
         query = query.Take(size.Value);
 
         return query;
-        
     }
-
-    private static IQueryable<T> ApplyOrdering<T>(
+    
+    private static IQueryable<T> ApplyOrdering<T, TSelf>(
         this IQueryable<T> query,
-        PageableQueryOptions<T> options) where T : class
+        QueryOptionsBase<T, TSelf> options)
+        where T : class
+        where TSelf : QueryOptionsBase<T, TSelf>
     {
         if (!options.OrderBy.Any())
             return query;

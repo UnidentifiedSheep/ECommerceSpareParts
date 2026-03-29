@@ -3,55 +3,82 @@
 namespace Abstractions.Models.Repository;
 
 /// <summary>
-/// Used for repository methods configuration.
+/// Base query options without entity-specific configuration.
 /// </summary>
-public class QueryOptions
+public class QueryOptionsBase<TEntity, TSelf>
+    where TSelf : QueryOptionsBase<TEntity, TSelf>
 {
-    /// <summary>
-    /// Indicates that ef should track entities.
-    /// <c>False</c> by default
-    /// </summary>
-    public bool Track { get; protected set; }
+    public bool Track { get; private set; }
+    public bool ForUpdate { get; private set; }
 
-    /// <summary>
-    /// Indicates that taken entities must be locked.
-    /// <c>False</c> by default
-    /// </summary>
-    public bool ForUpdate { get; protected set; }
+    protected readonly List<Expression<Func<TEntity, object?>>> _includes = [];
+    public IReadOnlyList<Expression<Func<TEntity, object?>>> Includes => _includes;
 
-    public virtual QueryOptions WithTracking(bool track = true)
+    protected readonly List<OrderExpression<TEntity>> _orderBy = [];
+    public IReadOnlyList<OrderExpression<TEntity>> OrderBy => _orderBy;
+
+    public int? Page { get; private set; }
+    public int? Size { get; private set; }
+
+    public TSelf WithTracking(bool track = true)
     {
         Track = track;
-        return this;
+        return (TSelf)this;
     }
 
-    public virtual QueryOptions WithForUpdate(bool forUpdate = true)
+    public TSelf WithForUpdate(bool forUpdate = true)
     {
         ForUpdate = forUpdate;
-        return this;
+        return (TSelf)this;
+    }
+
+    public TSelf WithInclude(Expression<Func<TEntity, object?>> include)
+    {
+        ArgumentNullException.ThrowIfNull(include);
+        _includes.Add(include);
+        return (TSelf)this;
+    }
+
+    public TSelf WithOrderBy(Expression<Func<TEntity, object?>> keySelector)
+    {
+        ArgumentNullException.ThrowIfNull(keySelector);
+        _orderBy.Add(new OrderExpression<TEntity>(keySelector, false));
+        return (TSelf)this;
+    }
+
+    public TSelf WithOrderByDescending(Expression<Func<TEntity, object?>> keySelector)
+    {
+        ArgumentNullException.ThrowIfNull(keySelector);
+        _orderBy.Add(new OrderExpression<TEntity>(keySelector, true));
+        return (TSelf)this;
+    }
+
+    public TSelf WithPage(int? page)
+    {
+        if (page.HasValue)
+            ArgumentOutOfRangeException.ThrowIfNegative(page.Value);
+
+        Page = page;
+        return (TSelf)this;
+    }
+
+    public TSelf WithSize(int? size)
+    {
+        if (size.HasValue)
+            ArgumentOutOfRangeException.ThrowIfNegative(size.Value);
+
+        Size = size;
+        return (TSelf)this;
     }
 }
 
-public class QueryOptions<TEntity> : QueryOptions
+public class QueryOptions<TEntity>
+    : QueryOptionsBase<TEntity, QueryOptions<TEntity>>
 {
-    private readonly List<Expression<Func<TEntity, object?>>> _includes = [];
-    public IReadOnlyList<Expression<Func<TEntity, object?>>> Includes => _includes;
+}
 
-    public virtual QueryOptions<TEntity> WithInclude(Expression<Func<TEntity, object?>> include)
-    {
-        _includes.Add(include);
-        return this;
-    }
-
-    public override QueryOptions<TEntity> WithTracking(bool track = true)
-    {
-        base.WithTracking(track);
-        return this;
-    }
-
-    public override QueryOptions<TEntity> WithForUpdate(bool forUpdate = true)
-    {
-        base.WithForUpdate(forUpdate);
-        return this;
-    }
+public class QueryOptions<TEntity, TData>
+    : QueryOptionsBase<TEntity, QueryOptions<TEntity, TData>>
+{
+    public required TData Data { get; init; }
 }

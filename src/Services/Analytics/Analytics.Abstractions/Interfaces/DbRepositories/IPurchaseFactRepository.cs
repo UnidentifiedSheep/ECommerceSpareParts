@@ -6,7 +6,6 @@ namespace Analytics.Abstractions.Interfaces.DbRepositories;
 public interface IPurchaseFactRepository
 {
     Task<PurchasesFact?> GetFact(
-        string id,
-        QueryOptions? options = null,
+        QueryOptions<PurchasesFact, string> options,
         CancellationToken cancellationToken = default);
 }

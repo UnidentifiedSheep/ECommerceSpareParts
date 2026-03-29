@@ -1,9 +1,7 @@
 ﻿using Api.Common.Extensions;
 using Carter;
 using Enums;
-using Main.Abstractions.Dtos.Amw.Permissions;
 using Main.Abstractions.Dtos.Amw.Users;
-using Main.Abstractions.Dtos.Roles;
 using Main.Abstractions.Dtos.Users;
 using Main.Application.Handlers.Users.GetUserFullInfo;
 using MediatR;
@@ -12,9 +10,9 @@ namespace Main.Api.EndPoints.Users;
 
 public record GetUserFullInfoResponse(
     UserInfoDto? UserInfo,
-    List<FullEmailDto> Emails,
-    List<RoleDto> Roles,
-    List<PermissionDto> Permissions);
+    IReadOnlyList<FullEmailDto> Emails,
+    IReadOnlyList<string> Roles,
+    IReadOnlyList<string> Permissions);
 
 public class GetUserFullInfoEndPoint : ICarterModule
 {

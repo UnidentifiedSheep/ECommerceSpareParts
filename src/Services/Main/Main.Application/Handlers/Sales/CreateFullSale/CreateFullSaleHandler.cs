@@ -1,5 +1,6 @@
 using System.Text;
 using Abstractions.Interfaces.Services;
+using Abstractions.Models.Repository;
 using Application.Common.Interfaces;
 using Attributes;
 using Contracts.Sale;
@@ -115,7 +116,11 @@ public class CreateFullSaleHandler(
 
         if (byReservation.Count != 0)
         {
-            var arts = (await articlesRepository.GetArticlesByIds(byReservation.Keys, false, cancellationToken))
+            var queryOptions = new QueryOptions<Article, IReadOnlyList<int>>()
+            {
+                Data = byReservation.Keys.ToList()
+            }.WithTracking(false);
+            var arts = (await articlesRepository.GetArticlesByIds(queryOptions, cancellationToken))
                 .ToDictionary(x => x.Id);
             var res = new Dictionary<string, int>();
             var codeBuilder = new StringBuilder();

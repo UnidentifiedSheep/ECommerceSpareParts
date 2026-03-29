@@ -1,5 +1,6 @@
 using Abstractions.Models.Repository;
 using Extensions;
+using Main.Abstractions.Dtos.RepositoryOptionsData;
 using Main.Abstractions.Interfaces.DbRepositories;
 using Main.Entities;
 using Main.Persistence.Context;
@@ -13,48 +14,39 @@ namespace Main.Persistence.Repositories;
 public class PurchaseRepository(DContext context) : IPurchaseRepository
 {
     public async Task<Purchase?> GetPurchase(
-        string purchaseId,
-        QueryOptions? config = null,
+        QueryOptions<Purchase, string> options,
         CancellationToken cancellationToken = default)
     {
         return await context.Purchases
-            .Where(x => x.Id == purchaseId)
-            .ApplyOptions(config)
+            .ApplyOptions(options)
+            .Where(x => x.Id == options.Data)
             .FirstOrDefaultAsync(cancellationToken);
     }
 
-    public async Task<IEnumerable<PurchaseContent>> GetPurchaseContent(
-        string purchaseId,
-        QueryOptions? config = null,
+    public async Task<IReadOnlyList<PurchaseContent>> GetPurchaseContent(
+        QueryOptions<PurchaseContent, string> options,
         CancellationToken cancellationToken = default)
     {
         return await context.PurchaseContents
-            .Where(x => x.PurchaseId == purchaseId)
-            .ApplyOptions(config)
+            .ApplyOptions(options)
+            .Where(x => x.PurchaseId == options.Data)
             .ToListAsync(cancellationToken);
     }
 
-    public async Task<IEnumerable<Purchase>> GetPurchases(
-        DateTime rangeStart,
-        DateTime rangeEnd,
-        int page,
-        int viewCount,
-        Guid? supplierId,
-        int? currencyId,
-        string? sortBy,
-        string? searchTerm,
-        bool track = true,
+    public async Task<IReadOnlyList<Purchase>> GetPurchases(
+        QueryOptions<Purchase, GetPurchaseOptionsData> options,
         CancellationToken cancellationToken = default)
     {
-        var query = context.Purchases.ConfigureTracking(track);
-        if (supplierId != null)
-            query = query.Where(x => x.SupplierId == supplierId);
+        IQueryable<Purchase> query = context.Purchases.ApplyOptions(options);
+        if (options.Data.SupplierId != null)
+            query = query.Where(x => x.SupplierId == options.Data.SupplierId);
 
-        if (currencyId != null) query = query.Where(x => x.CurrencyId == currencyId);
+        if (options.Data.CurrencyId != null) 
+            query = query.Where(x => x.CurrencyId == options.Data.CurrencyId);
 
-        if (!string.IsNullOrWhiteSpace(searchTerm))
+        if (!string.IsNullOrWhiteSpace(options.Data.SearchTerm))
         {
-            searchTerm = searchTerm.Trim();
+            var searchTerm = options.Data.SearchTerm.Trim();
             var normalizedSearchTerm = searchTerm.ToNormalizedArticleNumber();
             query = query.Where(x => x.PurchaseContents
                                          .Any(content => EF.Functions.ToTsVector("russian", content.Article.ArticleName)
@@ -67,31 +59,12 @@ public class PurchaseRepository(DContext context) : IPurchaseRepository
                                          z.Comment != null && EF.Functions.ILike(z.Comment, $"%{searchTerm}%")));
         }
 
-        var startDate = rangeStart.Date;
-        var endDate = rangeEnd.Date.AddDays(1);
+        var startDate = options.Data.RangeStart.Date;
+        var endDate = options.Data.RangeEnd.Date.AddDays(1);
         var result = await query.Where(x =>
                 x.PurchaseDatetime >= startDate.Date && x.PurchaseDatetime <= endDate.Date.AddDays(1))
-            .Include(x => x.Transaction)
-            .Include(x => x.Supplier)
-            .ThenInclude(x => x.UserInfo)
-            .Include(x => x.Currency)
-            .SortBy(sortBy)
-            .Skip(viewCount * page)
-            .Take(viewCount)
+            .ApplyPaging(options)
             .ToListAsync(cancellationToken);
         return result;
-    }
-
-    public async Task<IEnumerable<PurchaseContent>> GetPurchaseContentWithArticleData(
-        string purchaseId,
-        QueryOptions? config = null,
-        CancellationToken cancellationToken = default)
-    {
-        return await context.PurchaseContents
-            .Where(x => x.PurchaseId == purchaseId)
-            .Include(x => x.Article)
-            .ThenInclude(x => x.Producer)
-            .ApplyOptions(config)
-            .ToListAsync(cancellationToken);
     }
 }

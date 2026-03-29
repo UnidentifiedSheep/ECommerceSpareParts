@@ -1,7 +1,10 @@
 using Abstractions.Interfaces.Services;
+using Abstractions.Models.Repository;
 using Application.Common.Interfaces;
 using Attributes;
+using Main.Abstractions.Dtos.RepositoryOptionsData;
 using Main.Abstractions.Interfaces.DbRepositories;
+using Main.Entities;
 
 namespace Main.Application.Handlers.ArticleReservations.SubtractCountFromReservations;
 
@@ -27,8 +30,19 @@ public class SubtractCountFromReservationsHandler(
         var remaining = new Dictionary<int, int>(request.Contents);
 
         var articleIds = remaining.Keys;
+        
+        var queryOptions = new QueryOptions<StorageContentReservation, GetUserReservationsOptionsData>()
+        {
+            Data = new GetUserReservationsOptionsData
+            {
+                ArticleIds = articleIds.ToList(),
+                UserId = userId,
+                IsDone = false
+            }
+        }.WithTracking();
+        
         var reservationsByIds = await reservationRepository
-            .GetUserReservationsForUpdate(userId, articleIds, false, true, cancellationToken);
+            .GetUserReservations(queryOptions, cancellationToken);
         foreach (var articleId in articleIds)
         {
             if (!reservationsByIds.TryGetValue(articleId, out var reservations))

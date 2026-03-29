@@ -9,16 +9,15 @@ namespace Main.Persistence.Repositories;
 
 public class UserPermissionRepository(DContext context) : IUserPermissionRepository
 {
-    public async Task<IEnumerable<Permission>> GetUserPermissionsAsync(
-        Guid userId,
-        QueryOptions? options = null,
+    public async Task<IEnumerable<UserPermission>> GetUserPermissionsAsync(
+        QueryOptions<UserPermission, Guid> options,
         CancellationToken cancellationToken = default)
     {
-        var permission = await context.UserPermissions
+        return await context.UserPermissions
             .ApplyOptions(options)
-            .Where(x => x.UserId == userId)
+            .Where(x => x.UserId == options.Data)
+            .ApplyPaging(options)
             .ToListAsync(cancellationToken);
-        return permission.Select(x => x.PermissionNavigation);
     }
 
     public async Task<IReadOnlyList<string>> GetUserPermissionNamesAsync(

@@ -1,96 +1,17 @@
 using System.Text;
-using Extensions;
+using Abstractions.Models.Repository;
 using Main.Abstractions.Interfaces.DbRepositories;
 using Main.Entities;
 using Main.Persistence.Context;
 using Microsoft.EntityFrameworkCore;
-using NpgsqlTypes;
 using Persistence.Extensions;
 
 namespace Main.Persistence.Repositories;
 
 public class ArticlesRepository(DContext context) : IArticlesRepository
 {
-    public async Task<List<Article>> GetArticlesByName(
-        string searchTerm,
-        int page,
-        int viewCount,
-        string? sortBy,
-        IEnumerable<int> producerIds,
-        CancellationToken cancellationToken = default)
-    {
-        var producerIdsSet = producerIds.ToHashSet();
-        var query = context.Articles
-            .AsNoTracking()
-            .Where(x =>
-                EF.Property<NpgsqlTsVector>(x, "articlename_tsv")
-                    .Matches(EF.Functions.PlainToTsQuery("russian", searchTerm)));
-
-        if (producerIdsSet.Any())
-            query = query.Where(x => producerIdsSet.Contains(x.ProducerId));
-
-
-        query = query.SortBy(sortBy);
-
-        query = query
-            .Skip(viewCount * page)
-            .Take(viewCount);
-
-        var articles = await query
-            .AsSplitQuery()
-            .Include(x => x.Producer)
-            .ToListAsync(cancellationToken);
-        return articles;
-    }
-
-    public async Task<List<Article>> GetArticlesByExecNumber(
-        string searchTerm,
-        int page,
-        int viewCount,
-        string? sortBy,
-        IEnumerable<int> producerIds,
-        CancellationToken cancellationToken = default)
-    {
-        var normalizerArticle = searchTerm.ToNormalizedArticleNumber();
-        var producerIdsSet = producerIds.ToHashSet();
-
-        var queryWithRank = context.Articles
-            .AsNoTracking()
-            .Where(a => EF.Functions.Like(a.NormalizedArticleNumber, $"{normalizerArticle}") &&
-                        (!producerIdsSet.Any() || producerIdsSet.Contains(a.ProducerId)))
-            .Select(x => new
-            {
-                Article = x,
-                Rank = EF.Functions.TrigramsSimilarity(x.NormalizedArticleNumber, normalizerArticle)
-            });
-
-        if (string.IsNullOrWhiteSpace(sortBy) || sortBy.Contains("relevance"))
-            queryWithRank = sortBy?.Contains("asc") == true
-                ? queryWithRank.OrderBy(x => x.Rank)
-                : queryWithRank.OrderByDescending(x => x.Rank);
-
-        var query = queryWithRank
-            .Select(x => x.Article);
-
-        if (!string.IsNullOrWhiteSpace(sortBy) && !sortBy.Contains("relevance"))
-            query = query.SortBy(sortBy);
-
-        query = query
-            .Skip(viewCount * page)
-            .Take(viewCount);
-
-        return await query
-            .AsSplitQuery()
-            .Include(x => x.Producer)
-            .ToListAsync(cancellationToken);
-    }
-
-    public async Task<IEnumerable<Article>> GetArticleCrosses(
-        int articleId,
-        int page,
-        int viewCount,
-        string? sortBy,
-        bool track = true,
+    public async Task<IReadOnlyList<Article>> GetArticleCrosses(
+        QueryOptions<Article, int> options,
         CancellationToken cancellationToken = default)
     {
         return await context.Articles
@@ -98,88 +19,33 @@ public class ArticlesRepository(DContext context) : IArticlesRepository
                       SELECT Distinct on (a.id) a.* 
                       FROM articles a 
                       JOIN article_crosses c ON a.id = c.article_id OR a.id = c.article_cross_id 
-                                             WHERE c.article_id = {articleId} OR 
-                                                 c.article_cross_id = {articleId} 
+                                             WHERE c.article_id = {options.Data} OR 
+                                                 c.article_cross_id = {options.Data}
+                      ORDER BY a.id
                       """)
-            .SortBy(sortBy)
-            .Skip(page * viewCount)
-            .Include(x => x.ArticleImages)
-            .Take(viewCount)
-            .AsNoTracking()
-            .Include(x => x.Producer)
+            .ApplyOptions(options)
+            .ApplyPaging(options)
             .ToListAsync(cancellationToken);
     }
 
-    public async Task<List<Article>> GetArticlesByStartNumber(
-        string searchTerm,
-        int page,
-        int viewCount,
-        string? sortBy,
-        IEnumerable<int> producerIds,
-        CancellationToken cancellationToken = default)
-    {
-        var normalizerArticle = searchTerm.ToNormalizedArticleNumber();
-        var producerIdsSet = producerIds.ToHashSet();
-
-        var queryWithRank = context.Articles
-            .AsNoTracking()
-            .Where(a => EF.Functions.Like(a.NormalizedArticleNumber, $"{normalizerArticle}%") &&
-                        (!producerIdsSet.Any() || producerIdsSet.Contains(a.ProducerId)))
-            .Select(x => new
-            {
-                Article = x,
-                Rank = EF.Functions.TrigramsSimilarity(x.NormalizedArticleNumber, normalizerArticle)
-            });
-
-        if (string.IsNullOrWhiteSpace(sortBy) || sortBy.Contains("relevance"))
-            queryWithRank = sortBy?.Contains("asc") == true
-                ? queryWithRank.OrderBy(x => x.Rank)
-                : queryWithRank.OrderByDescending(x => x.Rank);
-
-        var query = queryWithRank
-            .Select(x => x.Article);
-
-        if (!string.IsNullOrWhiteSpace(sortBy) && !sortBy.Contains("relevance"))
-            query = query.SortBy(sortBy);
-
-        query = query
-            .Skip(viewCount * page)
-            .Take(viewCount);
-
-        return await query
-            .AsSplitQuery()
-            .Include(x => x.Producer)
-            .ToListAsync(cancellationToken);
-    }
-
-    public async Task<Article?> GetArticleById(int id, bool track = true, CancellationToken cancellationToken = default)
-    {
-        return await context.Articles.ConfigureTracking(track)
-            .Include(x => x.Producer)
-            .Include(x => x.ArticleImages)
-            .FirstOrDefaultAsync(x => x.Id == id, cancellationToken);
-    }
-
-    public async Task<List<Article>> GetArticlesByIds(
-        IEnumerable<int> ids,
-        bool track = true,
-        CancellationToken token = default)
-    {
-        return await context.Articles.ConfigureTracking(track)
-            .Include(x => x.Producer)
-            .Where(x => ids.Contains(x.Id))
-            .ToListAsync(token);
-    }
-
-    public async Task<IEnumerable<Article>> GetArticlesForUpdate(
-        IEnumerable<int> articleIds,
-        bool track = true,
+    public async Task<Article?> GetArticleById(
+        QueryOptions<Article, int> options, 
         CancellationToken cancellationToken = default)
     {
         return await context.Articles
-            .FromSql($"SELECT * from articles where id = ANY ({articleIds}) for update")
-            .ConfigureTracking(track)
-            .ToListAsync(cancellationToken);
+            .ApplyOptions(options)
+            .FirstOrDefaultAsync(x => x.Id == options.Data, cancellationToken);
+    }
+
+    public async Task<IReadOnlyList<Article>> GetArticlesByIds(
+        QueryOptions<Article, IReadOnlyList<int>> options,
+        CancellationToken token = default)
+    {
+        return await context.Articles
+            .ApplyOptions(options)
+            .Where(x => options.Data.Contains(x.Id))
+            .ApplyPaging(options)
+            .ToListAsync(token);
     }
 
     public async Task AddArticleLinkage(
@@ -195,7 +61,7 @@ public class ArticlesRepository(DContext context) : IArticlesRepository
         await context.Database.ExecuteSqlRawAsync(queryBuilder.ToString(), cancellationToken);
     }
 
-    public async Task<IEnumerable<int>> GetArticleCrossIds(int articleId, CancellationToken cancellationToken = default)
+    public async Task<IReadOnlyList<int>> GetArticleCrossIds(int articleId, CancellationToken cancellationToken = default)
     {
         return await context.Articles
             .FromSql($"""
@@ -209,7 +75,7 @@ public class ArticlesRepository(DContext context) : IArticlesRepository
                       """)
             .AsNoTracking()
             .Select(x => x.Id)
-            .ToHashSetAsync(cancellationToken);
+            .ToListAsync(cancellationToken);
     }
 
     public async Task<int> UpdateArticlesCount(

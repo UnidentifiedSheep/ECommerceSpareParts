@@ -1,6 +1,5 @@
 ﻿using Abstractions.Interfaces;
 using Abstractions.Interfaces.Services;
-using Abstractions.Models;
 using Abstractions.Models.Repository;
 using Application.Common.Interfaces;
 using Attributes;
@@ -8,8 +7,11 @@ using Exceptions.Base;
 using Main.Abstractions.Exceptions.Auth;
 using Main.Abstractions.Interfaces.DbRepositories;
 using Main.Abstractions.Interfaces.Services;
+using Main.Entities;
 using Main.Enums;
 using Mapster;
+using User = Abstractions.Models.User;
+using UserInfo = Abstractions.Models.UserInfo;
 
 namespace Main.Application.Handlers.Auth.RefreshToken;
 
@@ -29,7 +31,11 @@ public class RefreshTokenHandler(
     public async Task<RefreshTokenResult> Handle(RefreshTokenCommand request, CancellationToken cancellationToken)
     {
         var hashOfToken = tokenHasher.HashToken(request.RefreshToken);
-        var userToken = await tokenRepository.GetTokenByHashAsync(hashOfToken, QueryPresets.Default, cancellationToken)
+        var queryOptions = new QueryOptions<UserToken, string>()
+        {
+            Data = hashOfToken,
+        };
+        var userToken = await tokenRepository.GetTokenByHashAsync(queryOptions, cancellationToken)
                         ?? throw new InvalidTokenException(request.RefreshToken);
         if (userToken.ExpiresAt < DateTime.UtcNow || userToken.DeviceId != request.DeviceId)
             throw new InvalidTokenException(request.RefreshToken);
@@ -41,7 +47,7 @@ public class RefreshTokenHandler(
             throw new InternalServerException("User exists, but unable to get user info.");
         
         var (roles, permissions) = await userService
-            .TryGetUserRolesAndPermissionsAsync(userToken.UserId, cancellationToken);
+            .GetUserRolesAndPermissionsAsync(userToken.UserId, cancellationToken);
 
         var token = tokenGenerator.CreateToken(user.Adapt<User>(), user.UserInfo.Adapt<UserInfo>(),
             request.DeviceId, roles, permissions);

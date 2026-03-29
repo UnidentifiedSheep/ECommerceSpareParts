@@ -23,8 +23,9 @@ public class UpsertPurchaseFactHandler(
     {
         var newFact = request.PurchaseFact;
         var dbFact = await factRepository.GetFact(
-            newFact.Id,
-            QueryPresets.TrackForUpdate,
+            new QueryOptions<PurchasesFact, string>() { Data = newFact.Id }
+                .WithTracking()
+                .WithForUpdate(),
             cancellationToken);
 
         var shouldBeAdded = false;

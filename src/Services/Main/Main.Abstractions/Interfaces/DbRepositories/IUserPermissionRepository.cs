@@ -5,9 +5,8 @@ namespace Main.Abstractions.Interfaces.DbRepositories;
 
 public interface IUserPermissionRepository
 {
-    Task<IEnumerable<Permission>> GetUserPermissionsAsync(
-        Guid userId,
-        QueryOptions? options = null,
+    Task<IEnumerable<UserPermission>> GetUserPermissionsAsync(
+        QueryOptions<UserPermission, Guid> options,
         CancellationToken cancellationToken = default);
 
     Task<IReadOnlyList<string>> GetUserPermissionNamesAsync(

@@ -15,15 +15,15 @@ public record GetPurchaseLogisticResult(PurchaseLogisticDto PurchaseLogistic);
 public class GetPurchaseLogisticHandler(IPurchaseLogisticsRepository purchaseLogisticsRepository)
     : IQueryHandler<GetPurchaseLogisticQuery, GetPurchaseLogisticResult>
 {
-    private static readonly QueryOptions<PurchaseLogistic> QueryOptions = new QueryOptions<PurchaseLogistic>()
-        .WithInclude(x => x.Currency);
-
     public async Task<GetPurchaseLogisticResult> Handle(
         GetPurchaseLogisticQuery request,
         CancellationToken cancellationToken)
     {
+        var options = new QueryOptions<PurchaseLogistic, string>() { Data = request.PurchaseId }
+            .WithTracking(false)
+            .WithInclude(x => x.Currency);
         var logistic = await purchaseLogisticsRepository
-                           .GetPurchaseLogistics(request.PurchaseId, QueryOptions, cancellationToken)
+                           .GetPurchaseLogistics(options, cancellationToken)
                        ?? throw new PurchaseLogisticNotFoundException(request.PurchaseId);
 
         return new GetPurchaseLogisticResult(logistic.Adapt<PurchaseLogisticDto>());

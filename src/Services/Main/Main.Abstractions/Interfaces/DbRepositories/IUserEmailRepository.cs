@@ -6,12 +6,10 @@ namespace Main.Abstractions.Interfaces.DbRepositories;
 public interface IUserEmailRepository
 {
     Task<IReadOnlyList<UserEmail>> GetUserEmailsAsync(
-        Guid userId,
-        PageableQueryOptions<UserEmail>? options = null,
+        QueryOptions<UserEmail, Guid> options,
         CancellationToken cancellationToken = default);
 
-    Task<UserEmail?> GetPrimaryUserEmail(
-        string email,
-        QueryOptions<UserEmail>? options = null,
+    Task<UserEmail?> GetUserEmailByPrimary(
+        QueryOptions<UserEmail, string> options,
         CancellationToken cancellationToken = default);
 }

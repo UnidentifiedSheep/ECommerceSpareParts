@@ -10,13 +10,12 @@ namespace Main.Persistence.Repositories;
 public class UserRoleRepository(DContext context) : IUserRoleRepository
 {
     public async Task<IReadOnlyList<UserRole>> GetUserRolesAsync(
-        Guid userId,
-        PageableQueryOptions<UserRole>? options = null,
+        QueryOptions<UserRole, Guid> options,
         CancellationToken cancellationToken = default)
     {
         return await context.UserRoles
             .ApplyOptions(options)
-            .Where(x => x.UserId == userId)
+            .Where(x => x.UserId == options.Data)
             .ApplyPaging(options)
             .ToListAsync(cancellationToken);
     }

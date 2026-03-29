@@ -1,9 +1,11 @@
 using Abstractions.Interfaces.Services;
+using Abstractions.Models.Repository;
 using Application.Common.Interfaces;
 using Attributes;
 using Main.Abstractions.Dtos.Amw.ArticleReservations;
 using Main.Abstractions.Exceptions.Articles;
 using Main.Abstractions.Interfaces.DbRepositories;
+using Main.Entities;
 using Mapster;
 using MediatR;
 
@@ -19,8 +21,12 @@ public class EditArticleReservationHandler(
 {
     public async Task<Unit> Handle(EditArticleReservationCommand request, CancellationToken cancellationToken)
     {
+        var queryOptions = new QueryOptions<StorageContentReservation, int>()
+        {
+            Data = request.ReservationId
+        }.WithTracking();
         var reservation =
-            await reservationRepository.GetReservationAsync(request.ReservationId, true, cancellationToken)
+            await reservationRepository.GetReservationAsync(queryOptions, cancellationToken)
             ?? throw new ReservationNotFoundException(request.ReservationId);
         request.NewValue.Adapt(reservation);
         reservation.WhoUpdated = request.WhoUpdated;

@@ -1,3 +1,5 @@
+using Abstractions.Models.Repository;
+using Main.Abstractions.Dtos.RepositoryOptionsData;
 using Main.Entities;
 
 namespace Main.Abstractions.Interfaces.DbRepositories;
@@ -17,15 +19,7 @@ public interface ISaleRepository
         CancellationToken cancellationToken = default);
 
     Task<IEnumerable<Sale>> GetSales(
-        DateTime rangeStart,
-        DateTime rangeEnd,
-        int page,
-        int viewCount,
-        bool track = true,
-        string? sortBy = null,
-        string? searchTerm = null,
-        Guid? buyerId = null,
-        int? currencyId = null,
+        QueryOptions<Sale, GetSalesOptionsData> options,
         CancellationToken cancellationToken = default);
 
     Task<IEnumerable<SaleContent>> GetSaleContent(

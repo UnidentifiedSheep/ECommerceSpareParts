@@ -1,4 +1,5 @@
 ﻿using Abstractions.Interfaces.Services;
+using Abstractions.Models.Repository;
 using Application.Common.Interfaces;
 using Attributes;
 using Main.Abstractions.Exceptions.Auth;
@@ -21,9 +22,14 @@ public class AddRoleToUserHandler(
 {
     public async Task<Unit> Handle(AddRoleToUserCommand request, CancellationToken cancellationToken)
     {
-        var user = await userRepository.GetUserByIdAsync(request.UserId, cancellationToken: cancellationToken) ??
+        var queryOptions = new QueryOptions<User, Guid>
+        {
+            Data = request.UserId
+        }.WithTracking(false);
+        
+        var user = await userRepository.GetUserByIdAsync(queryOptions, cancellationToken) ??
                    throw new UserNotFoundException(request.UserId);
-        var role = await roleRepository.GetRoleAsync(request.RoleName, true, cancellationToken) ??
+        var role = await roleRepository.GetRoleAsync(request.RoleName, false, cancellationToken) ??
                    throw new RoleNotFoundException(request.RoleName);
 
         if (await userRoleRepository.ExistsAsync(user.Id, role.Id, cancellationToken))

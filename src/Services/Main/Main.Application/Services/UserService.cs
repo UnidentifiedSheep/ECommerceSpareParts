@@ -18,20 +18,18 @@ public class UserService(
     IUserPermissionRepository userPermissionRepository,
     IUserRoleRepository userRoleRepository) : IUserService
 {
-    private static readonly QueryOptions<DbUser> UserQueryOptions = new QueryOptions<DbUser>()
-        .WithInclude(x => x.UserInfo)
-        .WithTracking(false);
-
-    private static readonly PageableQueryOptions<UserRole> UserRoleQueryOptions = new PageableQueryOptions<UserRole>()
-        .WithTracking(false)
-        .WithInclude(x => x.Role)
-        .WithInclude(x => x.Role.PermissionNames);
     public async Task<FullUserDto?> TryGetUserAsync(Guid userId, CancellationToken token = default)
     {
         var cachedUser = await cacheRepository.GetUserById(userId);
         if (cachedUser != null) return cachedUser;
 
-        var dbUser = await userRepository.GetUserByIdAsync(userId, UserQueryOptions, token);
+        var queryOptions = new QueryOptions<DbUser, Guid>()
+            {
+                Data = userId
+            }
+            .WithInclude(x => x.UserInfo)
+            .WithTracking(false);
+        var dbUser = await userRepository.GetUserByIdAsync(queryOptions, token);
         var adapted = dbUser.Adapt<FullUserDto>();
         if (adapted != null) await SaveUserInCache(adapted);
         
@@ -46,7 +44,7 @@ public class UserService(
         return dbDiscount;
     }
 
-    public async Task<UserRolesAndPermissions> TryGetUserRolesAndPermissionsAsync(
+    public async Task<UserRolesAndPermissions> GetUserRolesAndPermissionsAsync(
         Guid userId, 
         CancellationToken token = default)
     {
@@ -55,8 +53,16 @@ public class UserService(
         
         if (roles.Count == 0 || permissions.Count == 0)
         {
+            var queryOptions = new QueryOptions<UserRole, Guid>()
+                {
+                    Data = userId
+                }
+                .WithTracking(false)
+                .WithInclude(x => x.Role)
+                .WithInclude(x => x.Role.PermissionNames);
+            
             var dbRoles = await userRoleRepository
-                .GetUserRolesAsync(userId, UserRoleQueryOptions, token);
+                .GetUserRolesAsync(queryOptions, token);
             var rolesPermissions = dbRoles
                 .SelectMany(x => x.Role.PermissionNames)
                 .Select(x => x.Name)

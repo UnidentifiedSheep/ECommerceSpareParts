@@ -1,10 +1,10 @@
 ﻿using Abstractions.Models.Repository;
 using Application.Common.Interfaces;
-using Main.Abstractions.Dtos.Amw.Permissions;
 using Main.Abstractions.Dtos.Amw.Users;
-using Main.Abstractions.Dtos.Roles;
 using Main.Abstractions.Dtos.Users;
+using Main.Abstractions.Exceptions.Auth;
 using Main.Abstractions.Interfaces.DbRepositories;
+using Main.Abstractions.Interfaces.Services;
 using Main.Entities;
 using Mapster;
 
@@ -15,37 +15,35 @@ public record GetUserFullInfoQuery(Guid UserId) : IQuery<GetUserFullInfoResult>;
 public record GetUserFullInfoResult(
     UserInfoDto? UserInfo,
     List<FullEmailDto> Emails,
-    List<RoleDto> Roles,
-    List<PermissionDto> Permissions);
+    IReadOnlyList<string> Roles,
+    IReadOnlyList<string> Permissions);
 
 public class GetUserFullInfoHandler(
     IUserRepository userRepository,
-    IUserEmailRepository userEmailRepository,
-    IUserRoleRepository userRoleRepository,
-    IUserPermissionRepository userPermissionRepository)
+    IUserService userService)
     : IQueryHandler<GetUserFullInfoQuery, GetUserFullInfoResult>
 {
-    private static readonly PageableQueryOptions<UserEmail> UserEmailsOptions =
-        new PageableQueryOptions<UserEmail>()
-            .WithTracking(false);
-    
-    private static readonly PageableQueryOptions<UserRole> UserRolesOptions =
-        new PageableQueryOptions<UserRole>()
-            .WithTracking(false)
-            .WithInclude(x => x.Role);
-    
     public async Task<GetUserFullInfoResult> Handle(GetUserFullInfoQuery request, CancellationToken cancellationToken)
     {
-        var userInfo = await userRepository.GetUserInfo(request.UserId, QueryPresets.Default, cancellationToken);
-        var emails = await userEmailRepository
-            .GetUserEmailsAsync(request.UserId, UserEmailsOptions, cancellationToken);
-        var roles = (await userRoleRepository
-                .GetUserRolesAsync(request.UserId, UserRolesOptions, cancellationToken))
-            .Select(x => x.Role);
-        var additionalPermissions = await userPermissionRepository
-            .GetUserPermissionsAsync(request.UserId, QueryPresets.Default, cancellationToken);
+        var queryOptions = new QueryOptions<User, Guid>()
+            {
+                Data = request.UserId
+            }.WithTracking(false)
+            .WithInclude(x => x.UserInfo)
+            .WithInclude(x => x.UserEmails)
+            .WithInclude(x => x.UserRoles);
+        
+        var user = await userRepository.GetUserByIdAsync(queryOptions, cancellationToken) ??
+                   throw new UserNotFoundException(request.UserId);
+        
+        var (roles, permissions) = await userService
+            .GetUserRolesAndPermissionsAsync(request.UserId, cancellationToken);
+        
 
-        return new GetUserFullInfoResult(userInfo.Adapt<UserInfoDto?>(), emails.Adapt<List<FullEmailDto>>(),
-            roles.Adapt<List<RoleDto>>(), additionalPermissions.Adapt<List<PermissionDto>>());
+        return new GetUserFullInfoResult(
+            user.UserInfo.Adapt<UserInfoDto?>(),
+            user.UserEmails.Adapt<List<FullEmailDto>>(),
+            roles,
+            permissions);
     }
 }

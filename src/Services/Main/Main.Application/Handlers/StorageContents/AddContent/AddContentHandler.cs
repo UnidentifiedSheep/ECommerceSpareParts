@@ -37,9 +37,8 @@ public class AddContentHandler(
 {
     public async Task<AddContentResult> Handle(AddContentCommand request, CancellationToken cancellationToken)
     {
-        var articleIds = request.StorageContent.Select(x => x.ArticleId).ToHashSet();
-
-        await articlesRepository.EnsureArticlesExistForUpdate(articleIds, false, cancellationToken);
+        var articleIds = request.StorageContent.Select(x => x.ArticleId).Distinct().ToList();
+        await articlesRepository.EnsureArticlesExistsForUpdateAsync(articleIds, cancellationToken);
 
         var toIncrement = new Dictionary<int, int>();
         var storageContents = new List<StorageContent>();

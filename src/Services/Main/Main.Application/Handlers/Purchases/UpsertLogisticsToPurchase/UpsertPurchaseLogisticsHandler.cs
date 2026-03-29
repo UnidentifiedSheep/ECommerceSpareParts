@@ -26,8 +26,11 @@ public class UpsertPurchaseLogisticsHandler(
     {
         var storageRoute = await storageRoutesRepository.GetStorageRouteAsync(request.RouteId, true, cancellationToken)
                            ?? throw new StorageRouteNotFound(request.RouteId);
-        var model = await purchaseLogisticsRepository.GetPurchaseLogistics(request.PurchaseId,
-            QueryPresets.Track, cancellationToken);
+        var options = new QueryOptions<PurchaseLogistic, string>()
+        {
+            Data = request.PurchaseId,
+        }.WithTracking();
+        var model = await purchaseLogisticsRepository.GetPurchaseLogistics(options, cancellationToken);
 
         if (model == null)
         {

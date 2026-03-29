@@ -10,12 +10,11 @@ namespace Main.Persistence.Repositories;
 public class UserTokenRepository(DContext context) : IUserTokenRepository
 {
     public async Task<UserToken?> GetTokenByHashAsync(
-        string hash,
-        QueryOptions? options = null, 
+        QueryOptions<UserToken, string> options,
         CancellationToken cancellationToken = default)
     {
         return await context.UserTokens
             .ApplyOptions(options)
-            .FirstOrDefaultAsync(x => x.TokenHash == hash, cancellationToken);
+            .FirstOrDefaultAsync(x => x.TokenHash == options.Data, cancellationToken);
     }
 }

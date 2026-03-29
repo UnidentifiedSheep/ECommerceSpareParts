@@ -10,32 +10,26 @@ namespace Main.Persistence.Repositories;
 
 public class UserEmailRepository(DContext context) : IUserEmailRepository
 {
-    private static readonly PageableQueryOptions<UserEmail> DefaultQueryOptions = 
-        new PageableQueryOptions<UserEmail>().WithOrderBy(x => x.Id); 
-    
     public async Task<IReadOnlyList<UserEmail>> GetUserEmailsAsync(
-        Guid userId,
-        PageableQueryOptions<UserEmail>? options = null,
+        QueryOptions<UserEmail, Guid> options,
         CancellationToken cancellationToken = default)
     {
-        options ??= DefaultQueryOptions;
-        
         return await context.UserEmails
             .ApplyOptions(options)
-            .Where(e => e.UserId == userId)
+            .Where(e => e.UserId == options.Data)
             .ApplyPaging(options)
             .ToListAsync(cancellationToken);
     }
 
-    public async Task<UserEmail?> GetPrimaryUserEmail(
-        string email,
-        QueryOptions<UserEmail>? options = null,
+    public async Task<UserEmail?> GetUserEmailByPrimary(
+        QueryOptions<UserEmail, string> options,
         CancellationToken cancellationToken = default)
     {
         var userEmail = await context.UserEmails
             .ApplyOptions(options)
-            .FirstOrDefaultAsync(x => x.NormalizedEmail == email.ToNormalizedEmail() &&
-                                      x.IsPrimary, cancellationToken);
+            .FirstOrDefaultAsync(x => 
+                x.NormalizedEmail == options.Data.ToNormalizedEmail() &&
+                x.IsPrimary, cancellationToken);
         return userEmail;
     }
 }

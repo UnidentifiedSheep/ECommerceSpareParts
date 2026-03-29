@@ -20,7 +20,7 @@ using Main.Abstractions.Models;
 using Main.Application.ConcurrencyValidator;
 using Main.Application.Configs;
 using Main.Application.Handlers.Articles.GetArticleCrosses;
-using Main.Application.Handlers.Articles.GetArticles;
+using Main.Application.Handlers.Users.GetUserDiscount;
 using Main.Application.HangFireTasks;
 using Main.Application.RelatedData;
 using Main.Application.Services;
@@ -29,8 +29,6 @@ using Main.Application.Services.Logistics.PricingStrategies;
 using Main.Entities;
 using MediatR;
 using Microsoft.Extensions.DependencyInjection;
-using AmwArticleDto = Main.Abstractions.Dtos.Amw.Articles.ArticleDto;
-using AnonymousArticleDto = Main.Abstractions.Dtos.Anonymous.Articles.ArticleDto;
 using AmwArticleFullDto = Main.Abstractions.Dtos.Amw.Articles.ArticleFullDto;
 using Currency = Main.Entities.Currency;
 using MemberArticleFullDto = Main.Abstractions.Dtos.Member.Articles.ArticleFullDto;
@@ -102,13 +100,7 @@ public static class ServiceProvider
         });
 
         collection.AddValidatorsFromAssembly(typeof(Global).Assembly);
-
-        collection
-            .AddScoped<IRequestHandler<GetArticlesQuery<AmwArticleDto>, GetArticlesResult<AmwArticleDto>>,
-                GetArticlesHandler<AmwArticleDto>>();
-        collection
-            .AddScoped<IRequestHandler<GetArticlesQuery<AnonymousArticleDto>, GetArticlesResult<AnonymousArticleDto>>,
-                GetArticlesHandler<AnonymousArticleDto>>();
+        
         collection
             .AddScoped<IRequestHandler<GetArticleCrossesQuery<AmwArticleFullDto>,
                 GetArticleCrossesResult<AmwArticleFullDto>>, GetArticleCrossesHandler<AmwArticleFullDto>>();
@@ -117,7 +109,7 @@ public static class ServiceProvider
                 GetArticleCrossesResult<MemberArticleFullDto>>, GetArticleCrossesHandler<MemberArticleFullDto>>();
 
         collection.Scan(scan => scan
-            .FromAssemblyOf<GetArticlesAmwLogSettings>()
+            .FromAssemblyOf<GetUserDiscountHandler>()
             .AddClasses(classes => classes.Where(type =>
                 type.GetInterfaces()
                     .Any(i => i.IsGenericType &&

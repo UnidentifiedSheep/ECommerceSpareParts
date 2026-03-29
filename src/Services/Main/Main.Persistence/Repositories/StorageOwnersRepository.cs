@@ -1,4 +1,5 @@
-﻿using Main.Abstractions.Interfaces.DbRepositories;
+﻿using Abstractions.Models.Repository;
+using Main.Abstractions.Interfaces.DbRepositories;
 using Main.Entities;
 using Main.Persistence.Context;
 using Microsoft.EntityFrameworkCore;
@@ -35,5 +36,16 @@ public class StorageOwnersRepository(DContext context) : IStorageOwnersRepositor
     {
         return await context.StorageOwners.ConfigureTracking(track)
             .FirstOrDefaultAsync(x => x.OwnerId == userId && x.StorageName == storageName, cancellationToken);
+    }
+
+    public async Task<IReadOnlyList<StorageOwner>> GetStorageOwnersAsync(
+        QueryOptions<StorageOwner, string> options,
+        CancellationToken cancellationToken = default)
+    {
+        return await context.StorageOwners
+            .ApplyOptions(options)
+            .Where(x => x.StorageName == options.Data)
+            .ApplyPaging(options)
+            .ToListAsync(cancellationToken);
     }
 }

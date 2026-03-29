@@ -1,6 +1,7 @@
 using System.Diagnostics.CodeAnalysis;
 using Abstractions.Models.Repository;
 using Extensions;
+using Main.Abstractions.Dtos.RepositoryOptionsData;
 using Main.Abstractions.Interfaces.DbRepositories;
 using Main.Entities;
 using Main.Persistence.Context;
@@ -12,13 +13,12 @@ namespace Main.Persistence.Repositories;
 public class UserRepository(DContext context) : IUserRepository
 {
     public async Task<User?> GetUserByIdAsync(
-        Guid userId,
-        QueryOptions? options = null,
+        QueryOptions<User, Guid> options,
         CancellationToken cancellationToken = default)
     {
         return await context.Users
             .ApplyOptions(options)
-            .FirstOrDefaultAsync(x => x.Id == userId, cancellationToken);
+            .FirstOrDefaultAsync(x => x.Id == options.Data, cancellationToken);
     }
 
     public async Task ChangeUsersDiscount(
@@ -35,23 +35,24 @@ public class UserRepository(DContext context) : IUserRepository
     }
 
 
-    public async Task<UserInfo?> GetUserInfo(Guid id, QueryOptions? options = null, CancellationToken cancellationToken = default)
+    public async Task<UserInfo?> GetUserInfo(
+        QueryOptions<UserInfo, Guid> options, 
+        CancellationToken cancellationToken = default)
     {
         return await context.UserInfos
             .ApplyOptions(options)
-            .FirstOrDefaultAsync(x => x.UserId == id, cancellationToken);
+            .FirstOrDefaultAsync(x => x.UserId == options.Data, cancellationToken);
     }
 
 
-    public async Task<IEnumerable<User>> GetUserBySearchColumn(
-        string? searchTerm,
-        bool? isSupplier = null,
-        PageableQueryOptions<User>? options = null,
+    public async Task<IReadOnlyList<User>> GetUserBySearchColumn(
+        QueryOptions<User, GetUserBySearchColumnOptionsData> options,
         CancellationToken cancellationToken = default)
     {
-        var normalizedSearchTerm = (searchTerm ?? "").ToNormalized();
+        var normalizedSearchTerm = (options.Data.SearchTerm ?? "").ToNormalized();
         var searchBySearchTerm = !string.IsNullOrWhiteSpace(normalizedSearchTerm);
-
+        var isSupplier = options.Data.IsSupplier;
+        
         var query = context.Users
             .ApplyOptions(options)
             .Where(x => isSupplier == null
@@ -88,22 +89,12 @@ public class UserRepository(DContext context) : IUserRepository
     }
 
     [SuppressMessage("ReSharper", "EntityFramework.ClientSideDbFunctionCall")]
-    public async Task<IEnumerable<User>> GetUsersBySimilarityAsync(
-        double similarityLevel,
-        PageableQueryOptions<User> options,
-        string? name = null,
-        string? surname = null,
-        string? email = null,
-        string? phone = null,
-        string? userName = null,
-        Guid? id = null,
-        string? description = null,
-        bool? isSupplier = null,
+    public async Task<IReadOnlyList<User>> GetUsersBySimilarityAsync(
+        QueryOptions<User, GetUsersBySimilarityOptionsData> options,
         CancellationToken cancellationToken = default)
     {
-        similarityLevel = similarityLevel >= 1 ? 0.999 : similarityLevel;
+        var similarityLevel = options.Data.SimilarityLevel >= 1 ? 0.999 : options.Data.SimilarityLevel;
         var query = context.Users
-            .Include(x => x.UserInfo)
             .ApplyOptions(options);
         var isNameIncluded = false;
         var isSurnameIncluded = false;
@@ -119,18 +110,18 @@ public class UserRepository(DContext context) : IUserRepository
         var normalizedPhone = "";
         var normalizedDescription = "";
 
-        if (!string.IsNullOrWhiteSpace(name))
+        if (!string.IsNullOrWhiteSpace(options.Data.Name))
         {
-            currName = name.Trim().ToUpperInvariant();
+            currName = options.Data.Name.Trim().ToUpperInvariant();
             query = query.Where(u => u.UserInfo != null &&
                                      EF.Functions.TrigramsSimilarity(u.UserInfo.Name.ToUpper(),
                                          currName) > similarityLevel);
             isNameIncluded = true;
         }
 
-        if (!string.IsNullOrWhiteSpace(surname))
+        if (!string.IsNullOrWhiteSpace(options.Data.Surname))
         {
-            currSurname = surname.Trim().ToUpperInvariant();
+            currSurname = options.Data.Surname.Trim().ToUpperInvariant();
             query = query.Where(u => u.UserInfo != null &&
                                      EF.Functions.TrigramsSimilarity(u.UserInfo.Surname.ToUpper(),
                                          currSurname) > similarityLevel);
@@ -138,46 +129,46 @@ public class UserRepository(DContext context) : IUserRepository
         }
 
 
-        if (!string.IsNullOrWhiteSpace(email))
+        if (!string.IsNullOrWhiteSpace(options.Data.Email))
         {
-            normalizedEmail = email.ToNormalizedEmail();
+            normalizedEmail = options.Data.Email.ToNormalizedEmail();
             query = query.Where(u => u.UserEmails.Any(e =>
                 EF.Functions.TrigramsSimilarity(e.NormalizedEmail,
                     normalizedEmail) > similarityLevel));
             isEmailIncluded = true;
         }
 
-        if (!string.IsNullOrWhiteSpace(phone))
+        if (!string.IsNullOrWhiteSpace(options.Data.Phone))
         {
-            normalizedPhone = phone.Trim().ToNormalizedPhoneNumber();
+            normalizedPhone = options.Data.Phone.Trim().ToNormalizedPhoneNumber();
             query = query.Where(u => u.UserPhones.Any(p =>
                 EF.Functions.TrigramsSimilarity(p.NormalizedPhone, normalizedPhone) > similarityLevel));
             isPhoneNumberIncluded = true;
         }
 
-        if (!string.IsNullOrWhiteSpace(userName))
+        if (!string.IsNullOrWhiteSpace(options.Data.UserName))
         {
-            normalizedUserName = userName.Trim().ToUpperInvariant();
+            normalizedUserName = options.Data.UserName.Trim().ToUpperInvariant();
             query = query.Where(u =>
                 EF.Functions.TrigramsSimilarity(u.NormalizedUserName, normalizedUserName) > similarityLevel);
             isUserNameIncluded = true;
         }
 
-        if (!string.IsNullOrWhiteSpace(description))
+        if (!string.IsNullOrWhiteSpace(options.Data.Description))
         {
-            normalizedDescription = description.ToNormalized();
+            normalizedDescription = options.Data.Description.ToNormalized();
             query = query.Where(u => u.UserInfo!.Description != null &&
                                      EF.Functions.TrigramsSimilarity(u.UserInfo.Description.ToUpper(),
                                          normalizedDescription) > similarityLevel);
             isDescriptionIncluded = true;
         }
 
-        if (id != null)
-            query = query.Where(u => u.Id == id);
+        if (options.Data.Id != null)
+            query = query.Where(u => u.Id == options.Data.Id);
 
 
-        if (isSupplier != null)
-            query = query.Where(u => u.UserInfo != null && u.UserInfo.IsSupplier == isSupplier);
+        if (options.Data.IsSupplier != null)
+            query = query.Where(u => u.UserInfo != null && u.UserInfo.IsSupplier == options.Data.IsSupplier);
 
         var queryWithScore = query.Select(u => new
             {

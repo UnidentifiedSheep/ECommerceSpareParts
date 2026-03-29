@@ -20,23 +20,22 @@ public class ClearPurchaseLogisticsHandler(
     IPurchaseRepository purchaseRepository)
     : ICommandHandler<ClearPurchaseLogisticsCommand, ClearPurchaseLogisticsResult>
 {
-    private static readonly QueryOptions<PurchaseContent> ContentOptions = new QueryOptions<PurchaseContent>()
-        .WithTracking()
-        .WithInclude(x => x.PurchaseContentLogistic);
-
-    private static readonly QueryOptions<PurchaseLogistic> LogisticsOptions = new QueryOptions<PurchaseLogistic>()
-        .WithTracking()
-        .WithInclude(x => x.Transaction);
-
     public async Task<ClearPurchaseLogisticsResult> Handle(
         ClearPurchaseLogisticsCommand request,
         CancellationToken cancellationToken)
     {
-        var purchaseLogistics =
-            await logisticsRepository.GetPurchaseLogistics(request.PurchaseId, LogisticsOptions, cancellationToken);
+        var purchaseLogistics = await logisticsRepository.GetPurchaseLogistics(
+            new QueryOptions<PurchaseLogistic, string>() { Data = request.PurchaseId }
+                .WithTracking()
+                .WithInclude(x => x.Transaction), 
+            cancellationToken);
 
         var contents = (await purchaseRepository
-                .GetPurchaseContent(request.PurchaseId, ContentOptions, cancellationToken))
+                .GetPurchaseContent(
+                    new QueryOptions<PurchaseContent, string>() { Data = request.PurchaseId }
+                        .WithTracking()
+                        .WithInclude(x => x.PurchaseContentLogistic), 
+                    cancellationToken))
             .ToList();
 
         foreach (var content in contents)
