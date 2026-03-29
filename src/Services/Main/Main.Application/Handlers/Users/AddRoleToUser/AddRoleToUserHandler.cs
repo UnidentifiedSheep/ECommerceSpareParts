@@ -3,6 +3,7 @@ using Application.Common.Interfaces;
 using Attributes;
 using Main.Abstractions.Exceptions.Auth;
 using Main.Abstractions.Interfaces.DbRepositories;
+using Main.Application.Notifications;
 using Main.Entities;
 using MediatR;
 
@@ -15,6 +16,7 @@ public class AddRoleToUserHandler(
     IUserRepository userRepository,
     IRoleRepository roleRepository,
     IUserRoleRepository userRoleRepository,
+    IMediator mediator,
     IUnitOfWork unitOfWork) : ICommandHandler<AddRoleToUserCommand>
 {
     public async Task<Unit> Handle(AddRoleToUserCommand request, CancellationToken cancellationToken)
@@ -35,6 +37,7 @@ public class AddRoleToUserHandler(
 
         await unitOfWork.AddAsync(userRole, cancellationToken);
         await unitOfWork.SaveChangesAsync(cancellationToken);
+        await mediator.Publish(new UserUpdatedNotification(request.UserId), cancellationToken);
         return Unit.Value;
     }
 }

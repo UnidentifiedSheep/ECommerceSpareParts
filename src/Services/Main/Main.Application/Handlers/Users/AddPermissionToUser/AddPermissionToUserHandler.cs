@@ -2,6 +2,7 @@
 using Application.Common.Interfaces;
 using Attributes;
 using Extensions;
+using Main.Application.Notifications;
 using Main.Entities;
 using MediatR;
 
@@ -10,7 +11,9 @@ namespace Main.Application.Handlers.Users.AddPermissionToUser;
 [Transactional]
 public record AddPermissionToUserCommand(Guid UserId, string PermissionName) : ICommand;
 
-public class AddPermissionToUserHandler(IUnitOfWork unitOfWork) : ICommandHandler<AddPermissionToUserCommand>
+public class AddPermissionToUserHandler(
+    IUnitOfWork unitOfWork, 
+    IMediator mediator) : ICommandHandler<AddPermissionToUserCommand>
 {
     public async Task<Unit> Handle(AddPermissionToUserCommand request, CancellationToken cancellationToken)
     {
@@ -22,6 +25,7 @@ public class AddPermissionToUserHandler(IUnitOfWork unitOfWork) : ICommandHandle
 
         await unitOfWork.AddAsync(model, cancellationToken);
         await unitOfWork.SaveChangesAsync(cancellationToken);
+        await mediator.Publish(new UserUpdatedNotification(request.UserId), cancellationToken);
         return Unit.Value;
     }
 }
