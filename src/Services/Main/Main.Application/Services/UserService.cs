@@ -6,6 +6,8 @@ using Main.Abstractions.Interfaces.CacheRepositories;
 using Main.Abstractions.Interfaces.DbRepositories;
 using Main.Abstractions.Interfaces.Services;
 using Main.Entities;
+using Mapster;
+using DbUser = Main.Entities.User;
 
 namespace Main.Application.Services;
 
@@ -16,7 +18,7 @@ public class UserService(
     IUserPermissionRepository userPermissionRepository,
     IUserRoleRepository userRoleRepository) : IUserService
 {
-    private static readonly QueryOptions<User> UserQueryOptions = new QueryOptions<User>()
+    private static readonly QueryOptions<DbUser> UserQueryOptions = new QueryOptions<DbUser>()
         .WithInclude(x => x.UserInfo)
         .WithTracking(false);
 
@@ -24,16 +26,16 @@ public class UserService(
         .WithTracking(false)
         .WithInclude(x => x.Role)
         .WithInclude(x => x.Role.PermissionNames);
-    public async Task<User?> TryGetUserAsync(Guid userId, CancellationToken token = default)
+    public async Task<FullUserDto?> TryGetUserAsync(Guid userId, CancellationToken token = default)
     {
         var cachedUser = await cacheRepository.GetUserById(userId);
         if (cachedUser != null) return cachedUser;
 
         var dbUser = await userRepository.GetUserByIdAsync(userId, UserQueryOptions, token);
+        var adapted = dbUser.Adapt<FullUserDto>();
+        if (adapted != null) await SaveUserInCache(adapted);
         
-        if (dbUser != null) await SaveUserInCache(dbUser);
-        
-        return dbUser;
+        return adapted;
     }
 
     public async Task<decimal?> GetUserDiscountAsync(Guid userId, CancellationToken token = default)
@@ -51,7 +53,7 @@ public class UserService(
         var permissions = (await cacheRepository.GetUserPermissions(userId)).ToHashSet();
         var roles = (await cacheRepository.GetUserRoles(userId)).ToHashSet();
         
-        if (roles.Count == 0)
+        if (roles.Count == 0 || permissions.Count == 0)
         {
             var dbRoles = await userRoleRepository
                 .GetUserRolesAsync(userId, UserRoleQueryOptions, token);
@@ -70,6 +72,9 @@ public class UserService(
             permissions.UnionWith(rolesPermissions);
         }
 
+        await cacheRepository.SetUserRoles(userId, roles);
+        await cacheRepository.SetUserPermissions(userId, permissions);
+
         return new UserRolesAndPermissions
         {
             Permissions = permissions.ToList(),
@@ -77,7 +82,7 @@ public class UserService(
         };
     }
 
-    private async Task SaveUserInCache(User user)
+    private async Task SaveUserInCache(FullUserDto user)
     {
         await AddRelatedDataKeys(user.Id);
         await cacheRepository.SetUserById(user);
@@ -89,7 +94,8 @@ public class UserService(
         var relatedDataKeys = new List<string>
         {
             string.Format(CacheKeys.UserRolesCacheKey, userId),
-            string.Format(CacheKeys.UserPermissionsCacheKey, userId)
+            string.Format(CacheKeys.UserPermissionsCacheKey, userId),
+            string.Format(CacheKeys.UserByIdCacheKey, userId),
         };
         await relatedRepository.AddRelatedDataAsync(userId.ToString(), relatedDataKeys);
     }

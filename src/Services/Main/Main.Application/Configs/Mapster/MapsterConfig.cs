@@ -27,7 +27,6 @@ using Main.Abstractions.Dtos.Emails;
 using Main.Abstractions.Dtos.Member.Vehicles;
 using Main.Abstractions.Dtos.Roles;
 using Main.Abstractions.Dtos.Services.Articles;
-using Main.Abstractions.Dtos.Users;
 using Main.Abstractions.Models;
 using Main.Abstractions.Models.Logistics;
 using Main.Application.Configs.Mapster.ContractMappings;
@@ -45,11 +44,7 @@ using AmwArticleDto = Main.Abstractions.Dtos.Amw.Articles.ArticleDto;
 using AnonymousArticleDto = Main.Abstractions.Dtos.Anonymous.Articles.ArticleDto;
 using AmwPurchaseDto = Main.Abstractions.Dtos.Amw.Purchase.PurchaseDto;
 using MemberPurchaseDto = Main.Abstractions.Dtos.Member.Purchase.PurchaseDto;
-using CoreUser = Abstractions.Models.User;
-using User = Main.Entities.User;
-using CoreUserInfo = Abstractions.Models.UserInfo;
 using Currency = Main.Entities.Currency;
-using UserInfo = Main.Entities.UserInfo;
 using ContractArticle = Contracts.Models.Articles.Article;
 using ArticleCoefficientContract = Contracts.Models.ArticleCoefficients.ArticleCoefficient;
 using CoefficientContract = Contracts.Models.Coefficients.Coefficient;
@@ -60,6 +55,7 @@ public static class MapsterConfig
 {
     public static void Configure()
     {
+        MapsterUserConfig.Configure();
         PurchaseContractConfig.Configure();
         TypeAdapterConfig<Article, ContractArticle>.NewConfig()
             .Map(d => d.Id, s => s.Id)
@@ -117,14 +113,6 @@ public static class MapsterConfig
             .Map(d => d.Price, s => s.Price)
             .Map(d => d.PurchaseContentCount, s => s.PurchaseContentCount)
             .Map(d => d.PurchaseDatetime, s => s.PurchaseDatetime);
-
-        TypeAdapterConfig<User, CoreUser>.NewConfig()
-            .Map(d => d.Id, s => s.Id)
-            .Map(d => d.UserName, s => s.UserName);
-
-        TypeAdapterConfig<UserInfo, CoreUserInfo>.NewConfig()
-            .Map(d => d.Name, s => s.Name)
-            .Map(d => d.Surname, s => s.Surname);
 
         TypeAdapterConfig<PurchaseContent, PurchaseContentDto>.NewConfig()
             .Map(dest => dest.Id, src => src.Id)
@@ -341,28 +329,7 @@ public static class MapsterConfig
             .Map(d => d.RouteId, s => s.RouteId)
             .Map(d => d.RouteType, s => s.RouteType)
             .Map(d => d.TransactionId, s => s.TransactionId);
-
-        //Users
-        TypeAdapterConfig<User, UserDto>.NewConfig()
-            .Map(d => d.Name, s => s.UserInfo == null ? "UNKNOWN" : s.UserInfo.Name)
-            .Map(d => d.Surname, s => s.UserInfo == null ? "UNKNOWN" : s.UserInfo.Surname)
-            .Map(d => d.UserName, s => s.UserName)
-            .Map(d => d.IsSupplier, s => s.UserInfo != null && s.UserInfo.IsSupplier)
-            .Map(d => d.Id, s => s.Id)
-            .Map(d => d.Description, s => s.UserInfo == null ? null : s.UserInfo.Description);
-
-        TypeAdapterConfig<UserInfoDto, UserInfo>.NewConfig()
-            .Map(d => d.Description, s => s.Description)
-            .Map(d => d.Name, s => s.Name)
-            .Map(d => d.Surname, s => s.Surname)
-            .Map(d => d.IsSupplier, s => s.IsSupplier)
-            .Map(d => d.SearchColumn, s => $"{s.Name} {s.Surname} {s.Description}".ToNormalized());
-
-        TypeAdapterConfig<UserInfo, UserInfoDto>.NewConfig()
-            .Map(d => d.Description, s => s.Description)
-            .Map(d => d.Name, s => s.Name)
-            .Map(d => d.Surname, s => s.Surname)
-            .Map(d => d.IsSupplier, s => s.IsSupplier);
+        
         //Vehicles
         TypeAdapterConfig<VehicleDto, UserVehicle>.NewConfig()
             .Map(d => d.Vin, s => s.Vin)

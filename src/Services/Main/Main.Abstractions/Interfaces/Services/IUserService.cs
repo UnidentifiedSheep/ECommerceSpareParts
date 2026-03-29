@@ -1,5 +1,4 @@
 ﻿using Main.Abstractions.Dtos.Users;
-using Main.Entities;
 
 namespace Main.Abstractions.Interfaces.Services;
 
@@ -12,7 +11,7 @@ public interface IUserService
     /// <param name="userId">Id of user to find</param>
     /// <param name="token">Cancellation token</param>
     /// <returns>User if found, null if not.</returns>
-    Task<User?> TryGetUserAsync(Guid userId, CancellationToken token = default);
+    Task<FullUserDto?> TryGetUserAsync(Guid userId, CancellationToken token = default);
 
     Task<decimal?> GetUserDiscountAsync(Guid userId, CancellationToken token = default);
 

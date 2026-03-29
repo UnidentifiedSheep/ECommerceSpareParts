@@ -34,7 +34,7 @@ public class LoginHandler(
 {
     private static readonly QueryOptions<UserEmail> UserQueryOptions =
         new QueryOptions<UserEmail>()
-            .WithTracking(false)
+            .WithTracking()
             .WithInclude(x => x.User)
             .WithInclude(x => x.User.UserInfo);
     public async Task<LoginResult> Handle(LoginCommand request, CancellationToken cancellationToken)
@@ -61,6 +61,8 @@ public class LoginHandler(
         await userTokenService.AddToken(refreshToken, user.Id, TokenType.RefreshToken, DateTime.UtcNow.AddMonths(1),
             ip, userAgent, deviceId, [], cancellationToken);
 
+        user.LastLoginAt = DateTime.UtcNow;
+        
         await unitOfWork.SaveChangesAsync(cancellationToken);
 
         return new LoginResult(token, refreshToken, deviceId);
