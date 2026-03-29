@@ -1,4 +1,6 @@
 using Abstractions.Interfaces.Cache;
+using Main.Abstractions.Constants;
+using Main.Abstractions.Dtos.Users;
 using Main.Abstractions.Interfaces.CacheRepositories;
 using Main.Entities;
 
@@ -29,23 +31,48 @@ public class UsersCacheRepository : IUsersCacheRepository
         await _redis.StringSetAsync(key, discount.ToString(Global.Culture), _ttl);
     }
 
-    public async Task<User?> GetUserByEmail(string email)
+    public async Task<FullUserDto?> GetUserById(Guid id)
     {
-        var key = GetUserByEmailKey(email);
-        return await _redis.StringGetAsync<User>(key);
+        var key = GetUserByIdKey(id);
+        return await _redis.StringGetAsync<FullUserDto>(key);
     }
 
-    public async Task SetUserByEmail(string email, User user)
+    public async Task SetUserById(FullUserDto user)
     {
-        var key = GetUserByEmailKey(email);
+        var key = GetUserByIdKey(user.Id);
         await _redis.StringSetAsync(key, user, _ttl);
     }
 
-    private static string GetUserByEmailKey(string email)
-        => $"user-by-email:{email}";
-
-    private static string GetUserDiscountKey(Guid userId)
+    public async Task<IReadOnlyList<string>> GetUserRoles(Guid userId)
     {
-        return $"user-discount:{userId}";
+        var key = GetUserRolesKey(userId);
+        var result = await _redis.SetMembersAsync(key);
+        return result.Where(x => x != null).Select(x => x!).ToList();
     }
+
+    public async Task SetUserRoles(Guid userId, IEnumerable<string> roles)
+    {
+        var key = GetUserRolesKey(userId);
+        await _redis.DeleteAsync(key);
+        await _redis.SetAddAsync(key, roles, _ttl);
+    }
+    
+    public async Task<IReadOnlyList<string>> GetUserPermissions(Guid userId)
+    {
+        var key = GetUserPermissionsKey(userId);
+        var result = await _redis.SetMembersAsync(key);
+        return result.Where(x => x != null).Select(x => x!).ToList();
+    }
+    
+    public async Task SetUserPermissions(Guid userId, IEnumerable<string> permissions)
+    {
+        var key = GetUserPermissionsKey(userId);
+        await _redis.DeleteAsync(key);
+        await _redis.SetAddAsync(key, permissions, _ttl);
+    }
+
+    private static string GetUserRolesKey(Guid userId) => string.Format(CacheKeys.UserRolesCacheKey, userId);
+    private static string GetUserPermissionsKey(Guid userId) => string.Format(CacheKeys.UserPermissionsCacheKey, userId);
+    private static string GetUserByIdKey(Guid userId) => string.Format(CacheKeys.UserByIdCacheKey, userId);
+    private static string GetUserDiscountKey(Guid userId) => string.Format(CacheKeys.UserDiscountCacheKey, userId);
 }

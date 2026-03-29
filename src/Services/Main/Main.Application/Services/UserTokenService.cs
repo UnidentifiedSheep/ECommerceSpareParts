@@ -1,13 +1,16 @@
 using System.Net;
 using Abstractions.Interfaces;
 using Abstractions.Interfaces.Services;
+using Main.Abstractions.Interfaces.DbRepositories;
 using Main.Abstractions.Interfaces.Services;
 using Main.Entities;
 using Main.Enums;
 
 namespace Main.Application.Services;
 
-public class UserTokenService(IUnitOfWork unitOfWork, ITokenHasher tokenHasher) : IUserTokenService
+public class UserTokenService(
+    IUnitOfWork unitOfWork, 
+    ITokenHasher tokenHasher) : IUserTokenService
 {
     public async Task AddToken(
         string token,

@@ -14,6 +14,7 @@ using MassTransit;
 using Persistence.Extensions;
 using RabbitMq.Extensions;
 using RabbitMq.Models;
+using Security;
 using Security.Utils;
 
 var localesPath = Assembly.GetExecutingAssembly().GetDefaultLocalizationPath();
@@ -26,7 +27,8 @@ if (!string.IsNullOrWhiteSpace(certsPath))
 builder.Services.AddOpenApi();
 
 builder.Services.AddPersistenceLayer(Environment.GetEnvironmentVariable("DB_CONNECTION_STRING")!)
-    .AddApplicationLayer();
+    .AddApplicationLayer()
+    .AddMinimalSecurityLayer();
 
 var brokerOptions = new MessageBrokerOptions
 {

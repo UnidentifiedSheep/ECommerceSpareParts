@@ -42,8 +42,8 @@ public class RemoveContentHandler(
         var userId = request.UserId;
         var storageName = request.StorageName;
         var articleIds = content.Keys;
-
-        await articlesRepository.EnsureArticlesExistForUpdate(articleIds, false, cancellationToken);
+        
+        await articlesRepository.EnsureArticlesExistsForUpdateAsync(articleIds, cancellationToken);
 
         var movements = new List<StorageMovement>();
         var toIncrement = new Dictionary<int, int>();

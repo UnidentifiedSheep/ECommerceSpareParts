@@ -18,6 +18,7 @@ using Main.Application.Handlers.Purchases.EditPurchase;
 using Main.Application.Handlers.Purchases.UpsertLogisticsToPurchase;
 using Main.Application.Handlers.StorageContents.AddContent;
 using Main.Application.Handlers.StorageContents.RemoveContent;
+using Main.Entities;
 using Main.Enums;
 using Mapster;
 using MassTransit;
@@ -55,8 +56,9 @@ public class EditFullPurchaseHandler(
         var totalSum = content.GetTotalSum();
 
         var purchase = await purchaseRepository.GetPurchase(
-            purchaseId,
-            QueryPresets.TrackForUpdate,
+            new QueryOptions<Purchase, string> { Data = purchaseId }
+                .WithTracking()
+                .WithForUpdate(),
             cancellationToken) ?? throw new PurchaseNotFoundException(purchaseId);
 
         var editedCounts = await EditPurchase(content, purchaseId, currencyId, comment,

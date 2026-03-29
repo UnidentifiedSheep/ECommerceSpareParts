@@ -1,8 +1,10 @@
 ﻿using Abstractions.Interfaces.Services;
+using Abstractions.Models.Repository;
 using Application.Common.Interfaces;
 using Attributes;
 using Main.Abstractions.Exceptions.Auth;
 using Main.Abstractions.Interfaces.DbRepositories;
+using Main.Application.Notifications;
 using Main.Entities;
 using MediatR;
 
@@ -15,13 +17,19 @@ public class AddRoleToUserHandler(
     IUserRepository userRepository,
     IRoleRepository roleRepository,
     IUserRoleRepository userRoleRepository,
+    IMediator mediator,
     IUnitOfWork unitOfWork) : ICommandHandler<AddRoleToUserCommand>
 {
     public async Task<Unit> Handle(AddRoleToUserCommand request, CancellationToken cancellationToken)
     {
-        var user = await userRepository.GetUserByIdAsync(request.UserId, cancellationToken: cancellationToken) ??
+        var queryOptions = new QueryOptions<User, Guid>
+        {
+            Data = request.UserId
+        }.WithTracking(false);
+        
+        var user = await userRepository.GetUserByIdAsync(queryOptions, cancellationToken) ??
                    throw new UserNotFoundException(request.UserId);
-        var role = await roleRepository.GetRoleAsync(request.RoleName, true, cancellationToken) ??
+        var role = await roleRepository.GetRoleAsync(request.RoleName, false, cancellationToken) ??
                    throw new RoleNotFoundException(request.RoleName);
 
         if (await userRoleRepository.ExistsAsync(user.Id, role.Id, cancellationToken))
@@ -35,6 +43,7 @@ public class AddRoleToUserHandler(
 
         await unitOfWork.AddAsync(userRole, cancellationToken);
         await unitOfWork.SaveChangesAsync(cancellationToken);
+        await mediator.Publish(new UserUpdatedNotification(request.UserId), cancellationToken);
         return Unit.Value;
     }
 }

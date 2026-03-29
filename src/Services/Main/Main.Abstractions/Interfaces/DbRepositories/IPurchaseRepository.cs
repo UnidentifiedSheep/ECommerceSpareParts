@@ -1,4 +1,5 @@
 using Abstractions.Models.Repository;
+using Main.Abstractions.Dtos.RepositoryOptionsData;
 using Main.Entities;
 
 namespace Main.Abstractions.Interfaces.DbRepositories;
@@ -6,29 +7,14 @@ namespace Main.Abstractions.Interfaces.DbRepositories;
 public interface IPurchaseRepository
 {
     Task<Purchase?> GetPurchase(
-        string purchaseId,
-        QueryOptions? config = null,
+        QueryOptions<Purchase, string> options,
         CancellationToken cancellationToken = default);
 
-    Task<IEnumerable<PurchaseContent>> GetPurchaseContent(
-        string purchaseId,
-        QueryOptions? config = null,
+    Task<IReadOnlyList<PurchaseContent>> GetPurchaseContent(
+        QueryOptions<PurchaseContent, string> options,
         CancellationToken cancellationToken = default);
 
-    Task<IEnumerable<Purchase>> GetPurchases(
-        DateTime rangeStart,
-        DateTime rangeEnd,
-        int page,
-        int viewCount,
-        Guid? supplierId,
-        int? currencyId,
-        string? sortBy,
-        string? searchTerm,
-        bool track = true,
-        CancellationToken cancellationToken = default);
-
-    Task<IEnumerable<PurchaseContent>> GetPurchaseContentWithArticleData(
-        string purchaseId,
-        QueryOptions? config = null,
+    Task<IReadOnlyList<Purchase>> GetPurchases(
+        QueryOptions<Purchase, GetPurchaseOptionsData> options,
         CancellationToken cancellationToken = default);
 }

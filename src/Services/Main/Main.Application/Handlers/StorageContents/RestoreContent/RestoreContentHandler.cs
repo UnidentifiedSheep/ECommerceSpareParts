@@ -45,8 +45,7 @@ public class RestoreContentHandler(
             if (detail.StorageContentId == null) continue;
             contentIdStorageIdMix.Add((detail.StorageContentId.Value, detail.Storage));
         }
-
-        await articlesRepository.EnsureArticlesExistForUpdate(articleIds, false, cancellationToken);
+        await articlesRepository.EnsureArticlesExistsForUpdateAsync(articleIds, cancellationToken);
 
         var toIncrement = new Dictionary<int, int>();
         var storageContents = await contentRepository

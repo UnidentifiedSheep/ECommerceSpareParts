@@ -1,9 +1,12 @@
 using Abstractions.Models;
+using Abstractions.Models.Repository;
 using Application.Common.Interfaces;
+using Extensions;
+using Main.Abstractions.Constants;
 using Main.Abstractions.Exceptions.Articles;
 using Main.Abstractions.Interfaces.DbRepositories;
 using Main.Abstractions.Models;
-using Main.Abstractions.Utils;
+using Main.Entities;
 using Mapster;
 
 namespace Main.Application.Handlers.Articles.GetArticleCrosses;
@@ -40,10 +43,9 @@ public class GetArticleCrossesHandler<TDto>(
         CancellationToken cancellationToken)
     {
         var pagination = request.Pagination;
-        var requestedArticle = await articlesRepository.GetArticleById(request.ArticleId, false, cancellationToken);
-        if (requestedArticle == null) throw new ArticleNotFoundException(request.ArticleId);
-        var crosses = await articlesRepository.GetArticleCrosses(request.ArticleId, pagination.Page,
-            pagination.Size, request.SortBy, false, cancellationToken);
+        var requestedArticle = await GetRequestedArticle(request.ArticleId, cancellationToken);
+        
+        var crosses = await GetCrosses(request.ArticleId, pagination, request.SortBy, cancellationToken);
 
         var requestedAdapted = requestedArticle.Adapt<TDto>();
         var crossArticlesAdapted = crosses.Adapt<List<TDto>>();
@@ -52,5 +54,35 @@ public class GetArticleCrossesHandler<TDto>(
         relatedDataCollector.Add(requestedArticle.Id.ToString());
 
         return new GetArticleCrossesResult<TDto>(crossArticlesAdapted, requestedAdapted);
+    }
+
+    private async Task<Article> GetRequestedArticle(int id, CancellationToken token)
+    {
+        var queryOptions = new QueryOptions<Article, int>()
+        {
+            Data = id
+        }.WithTracking(false)
+        .WithInclude(x => x.Producer);
+        var requestedArticle = await articlesRepository.GetArticleById(queryOptions, token);
+        if (requestedArticle == null) throw new ArticleNotFoundException(id);
+        return requestedArticle;
+    }
+
+    private async Task<IReadOnlyList<Article>> GetCrosses(
+        int articleId, 
+        PaginationModel pagination,
+        string? sortBy,
+        CancellationToken token)
+    {
+        var queryOptions = new QueryOptions<Article, int>
+            {
+                Data = articleId
+            }.WithPage(pagination.Page)
+            .WithSize(pagination.Size)
+            .WithTracking(false)
+            .WithInclude(x => x.Producer)
+            .WithSorting(sortBy);
+        
+        return await articlesRepository.GetArticleCrosses(queryOptions, token);
     }
 }

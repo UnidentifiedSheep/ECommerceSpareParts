@@ -1,6 +1,8 @@
 using Abstractions.Models;
+using Abstractions.Models.Repository;
 using Application.Common.Interfaces;
 using Main.Abstractions.Dtos.Amw.Users;
+using Main.Abstractions.Dtos.RepositoryOptionsData;
 using Main.Abstractions.Interfaces.DbRepositories;
 using Main.Enums;
 using Mapster;
@@ -30,22 +32,15 @@ public class GetUsersHandler(IUserRepository usersRepositoryService) : IQueryHan
     public async Task<GetUsersResult> Handle(GetUsersQuery request, CancellationToken cancellationToken)
     {
         var users = new List<User>();
-        var page = request.Pagination.Page;
-        var size = request.Pagination.Size;
         switch (request.SearchStrategy)
         {
             case GeneralSearchStrategy.General:
-                users.AddRange(await usersRepositoryService.GetUserBySearchColumn(request.SearchTerm, page,
-                    size, request.IsSupplier, false, cancellationToken));
+                users.AddRange(await GeneralSearch(request, cancellationToken));
                 break;
             case GeneralSearchStrategy.Exec:
                 break;
             case GeneralSearchStrategy.Similarity:
-                var simLevel = request.SimilarityLevel >= 1 ? 0.999 : request.SimilarityLevel;
-                users.AddRange(await usersRepositoryService.GetUsersBySimilarityAsync(simLevel ?? 0.4,
-                    page, size,
-                    request.Name, request.Surname, request.Email, request.Phone, request.UserName, request.Id,
-                    request.Description, request.IsSupplier, false, cancellationToken));
+                users.AddRange(await SimilaritySearch(request, cancellationToken));
                 break;
             case GeneralSearchStrategy.FromStart:
             case GeneralSearchStrategy.Contains:
@@ -58,5 +53,54 @@ public class GetUsersHandler(IUserRepository usersRepositoryService) : IQueryHan
         if (systemUser != null) users.Remove(systemUser);
 
         return new GetUsersResult(users.Adapt<List<UserDto>>());
+    }
+
+    private async Task<IReadOnlyList<User>> SimilaritySearch(
+        GetUsersQuery request, 
+        CancellationToken cancellationToken)
+    {
+        var simLevel = (request.SimilarityLevel >= 1 ? 0.999 : request.SimilarityLevel) ?? 0.4;
+        var options = new QueryOptions<User,GetUsersBySimilarityOptionsData>
+        {
+            Data = new GetUsersBySimilarityOptionsData
+            {
+                Description = request.Description,
+                IsSupplier = request.IsSupplier,
+                Name = request.Name,
+                Surname = request.Surname,
+                Email = request.Email,
+                Phone = request.Phone,
+                UserName = request.UserName,
+                Id = request.Id,
+                SimilarityLevel = simLevel
+            }
+        }.WithTracking(false)
+        .WithInclude(x => x.UserInfo)
+        .WithPage(request.Pagination.Page)
+        .WithSize(request.Pagination.Size);
+
+        return await usersRepositoryService.GetUsersBySimilarityAsync(options, cancellationToken);
+    }
+
+    private async Task<IReadOnlyList<User>> GeneralSearch(
+        GetUsersQuery request,
+        CancellationToken cancellationToken)
+    {
+        var options = new QueryOptions<User, GetUserBySearchColumnOptionsData>()
+            {
+                Data = new GetUserBySearchColumnOptionsData
+                {
+                    SearchTerm = request.SearchTerm,
+                    IsSupplier = request.IsSupplier,
+                }
+            }
+            .WithTracking(false)
+            .WithInclude(x => x.UserInfo)
+            .WithPage(request.Pagination.Page)
+            .WithSize(request.Pagination.Size);
+
+        return await usersRepositoryService.GetUserBySearchColumn(
+            options,
+            cancellationToken);
     }
 }

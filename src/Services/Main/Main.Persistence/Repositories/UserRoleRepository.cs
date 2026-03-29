@@ -1,4 +1,4 @@
-using System.Linq.Expressions;
+using Abstractions.Models.Repository;
 using Main.Abstractions.Interfaces.DbRepositories;
 using Main.Entities;
 using Main.Persistence.Context;
@@ -9,42 +9,15 @@ namespace Main.Persistence.Repositories;
 
 public class UserRoleRepository(DContext context) : IUserRoleRepository
 {
-    public async Task<IEnumerable<UserRole>> GetUserRolesAsync(
-        Guid userId,
-        bool track = true,
-        int? limit = null,
-        int? offset = null,
-        CancellationToken cancellationToken = default,
-        params Expression<Func<UserRole, object>>[] includes)
-    {
-        IQueryable<UserRole> query = context.UserRoles;
-
-        foreach (var include in includes)
-            query = query.Include(include);
-
-        query = query
-            .ConfigureTracking(track)
-            .Where(x => x.UserId == userId)
-            .OrderBy(x => x.RoleId);
-
-
-        if (offset.HasValue)
-            query = query.Skip(offset.Value);
-
-        if (limit.HasValue)
-            query = query.Take(limit.Value);
-
-        return await query.ToListAsync(cancellationToken);
-    }
-
-    public async Task<UserRole?> GetUserRoleAsync(
-        Guid userId,
-        Guid roleId,
-        bool track = true,
+    public async Task<IReadOnlyList<UserRole>> GetUserRolesAsync(
+        QueryOptions<UserRole, Guid> options,
         CancellationToken cancellationToken = default)
     {
-        return await context.UserRoles.ConfigureTracking(track)
-            .FirstOrDefaultAsync(x => x.UserId == userId && x.RoleId == roleId, cancellationToken);
+        return await context.UserRoles
+            .ApplyOptions(options)
+            .Where(x => x.UserId == options.Data)
+            .ApplyPaging(options)
+            .ToListAsync(cancellationToken);
     }
 
     public async Task<bool> ExistsAsync(Guid userId, Guid roleId, CancellationToken cancellationToken = default)

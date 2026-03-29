@@ -28,23 +28,25 @@ public class DeleteFullPurchaseHandler(
     IPublishEndpoint publishEndpoint,
     IMediator mediator) : ICommandHandler<DeleteFullPurchaseCommand>
 {
-    private static readonly QueryOptions<PurchaseContent> ContentOptions = new QueryOptions<PurchaseContent>()
-        .WithTracking()
-        .WithForUpdate();
-
     public async Task<Unit> Handle(DeleteFullPurchaseCommand request, CancellationToken cancellationToken)
     {
         var purchaseId = request.PurchaseId;
         var purchase = await purchaseRepository.GetPurchase(
-                           purchaseId,
-                           QueryPresets.TrackForUpdate,
+                           new QueryOptions<Purchase, string> { Data = purchaseId }
+                               .WithTracking()
+                               .WithForUpdate(),
                            cancellationToken)
                        ?? throw new PurchaseNotFoundException(purchaseId);
-        var purchaseLogistics = await purchaseLogisticsRepository
-            .GetPurchaseLogistics(purchaseId, QueryPresets.Track, cancellationToken);
+        var purchaseLogistics = await purchaseLogisticsRepository.GetPurchaseLogistics(
+                new QueryOptions<PurchaseLogistic, string>() { Data = purchaseId }
+                    .WithTracking(), 
+                cancellationToken);
 
-        var purchaseContents = (await purchaseRepository.GetPurchaseContent(purchaseId,
-            ContentOptions, cancellationToken)).ToList();
+        var purchaseContents = (await purchaseRepository.GetPurchaseContent(
+            new QueryOptions<PurchaseContent, string>() { Data = purchaseId }
+                .WithTracking()
+                .WithForUpdate(), 
+            cancellationToken)).ToList();
 
         await RemoveContentFromStorage(purchaseContents, request.WhoDeleted, purchase.Storage, cancellationToken);
         await DeletePurchase(purchaseId, cancellationToken);

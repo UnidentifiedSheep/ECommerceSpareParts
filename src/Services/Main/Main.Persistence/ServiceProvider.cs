@@ -24,7 +24,6 @@ public static class ServiceProvider
         collection.AddScoped<IUserVehicleRepository, UserVehicleRepository>();
         collection.AddScoped<IUserRepository, UserRepository>();
         collection.AddScoped<IRoleRepository, RoleRepository>();
-        collection.AddScoped<IUserPhoneRepository, UserPhoneRepository>();
         collection.AddScoped<IUserEmailRepository, UserEmailRepository>();
         collection.AddScoped<IUserTokenRepository, UserTokenRepository>();
         collection.AddScoped<IUserRoleRepository, UserRoleRepository>();

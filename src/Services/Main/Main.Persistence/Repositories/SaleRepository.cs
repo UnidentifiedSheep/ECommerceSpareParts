@@ -1,4 +1,6 @@
+using Abstractions.Models.Repository;
 using Extensions;
+using Main.Abstractions.Dtos.RepositoryOptionsData;
 using Main.Abstractions.Interfaces.DbRepositories;
 using Main.Entities;
 using Main.Persistence.Context;
@@ -48,26 +50,19 @@ public class SaleRepository(DContext context) : ISaleRepository
     }
 
     public async Task<IEnumerable<Sale>> GetSales(
-        DateTime rangeStart,
-        DateTime rangeEnd,
-        int page,
-        int viewCount,
-        bool track = true,
-        string? sortBy = null,
-        string? searchTerm = null,
-        Guid? buyerId = null,
-        int? currencyId = null,
+        QueryOptions<Sale, GetSalesOptionsData> options,
         CancellationToken cancellationToken = default)
     {
-        var query = context.Sales.ConfigureTracking(track);
-        if (buyerId.HasValue)
-            query = query.Where(x => x.BuyerId == buyerId);
+        IQueryable<Sale> query = context.Sales;
+        if (options.Data.BuyerId.HasValue)
+            query = query.Where(x => x.BuyerId == options.Data.BuyerId.Value);
 
-        if (currencyId != null) query = query.Where(x => x.CurrencyId == currencyId);
+        if (options.Data.CurrencyId != null) 
+            query = query.Where(x => x.CurrencyId == options.Data.CurrencyId);
 
-        if (!string.IsNullOrWhiteSpace(searchTerm))
+        if (!string.IsNullOrWhiteSpace(options.Data.SearchTerm))
         {
-            searchTerm = searchTerm.Trim();
+            var searchTerm = options.Data.SearchTerm.Trim();
             var normalizedSearchTerm = searchTerm.ToNormalizedArticleNumber();
             query = query.Where(x => x.SaleContents
                                          .Any(content => EF.Functions.ToTsVector("russian", content.Article.ArticleName)
@@ -80,16 +75,11 @@ public class SaleRepository(DContext context) : ISaleRepository
                                          z.Comment != null && EF.Functions.ILike(z.Comment, $"%{searchTerm}%")));
         }
 
-        var startDate = rangeStart.Date;
-        var endDate = rangeEnd.Date.AddDays(1);
-        return await query.Where(x => x.CreationDatetime >= startDate && x.CreationDatetime <= endDate)
-            .Include(x => x.Transaction)
-            .Include(x => x.Buyer)
-            .ThenInclude(x => x.UserInfo)
-            .Include(x => x.Currency)
-            .SortBy(sortBy)
-            .Skip(viewCount * page)
-            .Take(viewCount)
+        var startDate = options.Data.RangeStart.Date;
+        var endDate = options.Data.RangeEnd.Date.AddDays(1);
+        return await query
+            .Where(x => x.CreationDatetime >= startDate && x.CreationDatetime <= endDate)
+            .ApplyPaging(options)
             .ToListAsync(cancellationToken);
     }
 

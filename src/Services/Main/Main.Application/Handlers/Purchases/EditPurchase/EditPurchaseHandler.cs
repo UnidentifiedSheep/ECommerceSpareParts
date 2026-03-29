@@ -30,10 +30,6 @@ public record EditPurchaseResult(Dictionary<int, Dictionary<decimal, int>> Edite
 public class EditPurchaseHandler(IPurchaseRepository purchaseRepository, IUnitOfWork unitOfWork)
     : ICommandHandler<EditPurchaseCommand, EditPurchaseResult>
 {
-    private static readonly QueryOptions<PurchaseContent> ContentOptions = new QueryOptions<PurchaseContent>()
-        .WithForUpdate()
-        .WithTracking();
-
     public async Task<EditPurchaseResult> Handle(EditPurchaseCommand request, CancellationToken cancellationToken)
     {
         var purchaseId = request.PurchaseId;
@@ -44,14 +40,9 @@ public class EditPurchaseHandler(IPurchaseRepository purchaseRepository, IUnitOf
         var result = new Dictionary<int, Dictionary<decimal, int>>();
         var content = request.Content.ToList();
 
-        var purchase = await purchaseRepository.GetPurchase(
-            purchaseId,
-            QueryPresets.TrackForUpdate,
-            cancellationToken) ?? throw new PurchaseNotFoundException(purchaseId);
+        var purchase = await GetPurchase(purchaseId, cancellationToken);
 
-        var purchaseContents = (await purchaseRepository
-                .GetPurchaseContent(purchaseId, ContentOptions, cancellationToken))
-            .ToDictionary(x => x.Id);
+        var purchaseContents = await GetPurchaseContents(purchaseId, cancellationToken);
 
         var existingIds = content.Where(x => x.Id != null)
             .Select(x => x.Id!.Value).ToHashSet();
@@ -111,6 +102,28 @@ public class EditPurchaseHandler(IPurchaseRepository purchaseRepository, IUnitOf
         unitOfWork.RemoveRange(toDelete);
         await unitOfWork.SaveChangesAsync(cancellationToken);
         return new EditPurchaseResult(result);
+    }
+
+    private async Task<Purchase> GetPurchase(string id, CancellationToken cancellationToken)
+    {
+        var options = new QueryOptions<Purchase, string>() { Data = id }
+            .WithTracking()
+            .WithForUpdate();
+        return await purchaseRepository.GetPurchase(
+            options,
+            cancellationToken) ?? throw new PurchaseNotFoundException(id);
+    }
+
+    private async Task<Dictionary<int, PurchaseContent>> GetPurchaseContents(
+        string id, 
+        CancellationToken cancellationToken)
+    {
+        var options = new QueryOptions<PurchaseContent, string>() { Data = id }
+            .WithTracking()
+            .WithForUpdate();
+        return (await purchaseRepository
+                .GetPurchaseContent(options, cancellationToken))
+            .ToDictionary(x => x.Id);
     }
 
     private void SetFields(

@@ -1,10 +1,12 @@
 using Abstractions.Interfaces.Services;
+using Abstractions.Models.Repository;
 using Application.Common.Interfaces;
 using Attributes;
 using Main.Abstractions.Dtos.Amw.Articles;
 using Main.Abstractions.Exceptions.Articles;
 using Main.Abstractions.Interfaces.DbRepositories;
 using Main.Application.Notifications;
+using Main.Entities;
 using Main.Enums;
 using MediatR;
 
@@ -37,8 +39,12 @@ public class MakeLinkageBetweenArticlesHandler(
         NewArticleLinkageDto linkage,
         CancellationToken cancellationToken = default)
     {
+        var queryOptions = new QueryOptions<Article, IReadOnlyList<int>>()
+        {
+            Data = [linkage.ArticleId, linkage.CrossArticleId]
+        }.WithTracking(false);
         var lrArticles = await articlesRepository
-            .GetArticlesByIds([linkage.ArticleId, linkage.CrossArticleId], false, cancellationToken);
+            .GetArticlesByIds(queryOptions, cancellationToken);
 
         var leftArticle = lrArticles.FirstOrDefault(x => x.Id == linkage.ArticleId) ??
                           throw new ArticleNotFoundException(linkage.ArticleId);

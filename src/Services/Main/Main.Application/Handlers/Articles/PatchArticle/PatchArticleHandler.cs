@@ -1,4 +1,5 @@
 using Abstractions.Interfaces.Services;
+using Abstractions.Models.Repository;
 using Application.Common.Interfaces;
 using Attributes;
 using Contracts.Articles;
@@ -27,7 +28,11 @@ public class PatchArticleHandler(
 {
     public async Task<Unit> Handle(PatchArticleCommand request, CancellationToken cancellationToken)
     {
-        var article = await articlesRepository.GetArticleById(request.ArticleId, true, cancellationToken)
+        var queryOptions = new QueryOptions<Entities.Article, int>()
+        {
+            Data = request.ArticleId
+        }.WithTracking();
+        var article = await articlesRepository.GetArticleById(queryOptions, cancellationToken)
                       ?? throw new ArticleNotFoundException(request.ArticleId);
 
         request.PatchArticle.Adapt(article);

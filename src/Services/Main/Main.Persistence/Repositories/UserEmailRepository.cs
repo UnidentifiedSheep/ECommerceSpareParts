@@ -1,3 +1,4 @@
+using Abstractions.Models.Repository;
 using Extensions;
 using Main.Abstractions.Interfaces.DbRepositories;
 using Main.Entities;
@@ -9,37 +10,26 @@ namespace Main.Persistence.Repositories;
 
 public class UserEmailRepository(DContext context) : IUserEmailRepository
 {
-    public async Task<IEnumerable<UserEmail>> GetUserEmailsAsync(
-        Guid userId,
-        int? limit = null,
-        int? offset = null,
-        bool track = true,
+    public async Task<IReadOnlyList<UserEmail>> GetUserEmailsAsync(
+        QueryOptions<UserEmail, Guid> options,
         CancellationToken cancellationToken = default)
     {
-        var query = context.UserEmails
-            .ConfigureTracking(track)
-            .OrderBy(x => x.Id)
-            .Where(e => e.UserId == userId);
-
-        if (offset != null)
-            query = query.Skip(offset.Value);
-
-        if (limit != null)
-            query = query.Take(limit.Value);
-
-        return await query.ToListAsync(cancellationToken);
+        return await context.UserEmails
+            .ApplyOptions(options)
+            .Where(e => e.UserId == options.Data)
+            .ApplyPaging(options)
+            .ToListAsync(cancellationToken);
     }
 
-    public async Task<User?> GetUserByPrimaryMailAsync(
-        string email,
-        bool track = true,
+    public async Task<UserEmail?> GetUserEmailByPrimary(
+        QueryOptions<UserEmail, string> options,
         CancellationToken cancellationToken = default)
     {
-        var userEmail = await context.UserEmails.ConfigureTracking(track)
-            .Include(x => x.User)
-            .ThenInclude(x => x.UserInfo)
-            .FirstOrDefaultAsync(x => x.NormalizedEmail == email.ToNormalizedEmail() &&
-                                      x.IsPrimary, cancellationToken);
-        return userEmail?.User;
+        var userEmail = await context.UserEmails
+            .ApplyOptions(options)
+            .FirstOrDefaultAsync(x => 
+                x.NormalizedEmail == options.Data.ToNormalizedEmail() &&
+                x.IsPrimary, cancellationToken);
+        return userEmail;
     }
 }
