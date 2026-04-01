@@ -14,6 +14,7 @@ using MassTransit;
 using Persistence.Extensions;
 using RabbitMq.Extensions;
 using RabbitMq.Models;
+using Redis;
 using Security;
 using Security.Utils;
 
@@ -33,6 +34,7 @@ var env = Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT") ?? "unkno
 builder.Host.AddLokiLogger(builder.Configuration, "analytics.api", env, lokiUrl);
 
 builder.Services.AddPersistenceLayer(Environment.GetEnvironmentVariable("DB_CONNECTION_STRING")!)
+    .AddCacheLayer(Environment.GetEnvironmentVariable("REDIS_CONNECTION_STRING")!, "analytics")
     .AddApplicationLayer()
     .AddMinimalSecurityLayer();
 

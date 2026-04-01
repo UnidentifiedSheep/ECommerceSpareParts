@@ -1,0 +1,7 @@
+﻿{
+  "locale": "ru",
+  "keyValues": {
+    "ArticleSalesMetric.name": "Метрика продаж товара.",
+    "ArticlePurchasesMetric.name": "Метрика закупок товара."
+  }
+}

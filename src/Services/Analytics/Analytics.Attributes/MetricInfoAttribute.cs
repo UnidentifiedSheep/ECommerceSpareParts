@@ -13,14 +13,15 @@ public class MetricInfoAttribute : Attribute
     }
 
     /// <summary>
-    /// This constructor sets all fields as system name.
+    /// This constructor sets all fields as system name. Adds .description postfix for DescriptionKey
+    /// and .name for NameKey
     /// </summary>
     /// <param name="systemName"></param>
     public MetricInfoAttribute(string systemName)
     {
-        SystemName = systemName;
-        NameLocalizationKey = systemName;
-        DescriptionLocalizationKey = systemName;
+        SystemName = systemName.Trim();
+        NameLocalizationKey = SystemName + ".name";
+        DescriptionLocalizationKey = SystemName + ".description";
     }
 
     public string SystemName { get; }
