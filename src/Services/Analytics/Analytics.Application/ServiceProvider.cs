@@ -1,5 +1,8 @@
 using Abstractions.Interfaces.Currency;
+using Analytics.Abstractions.Interfaces.Application;
+using Analytics.Application.MetricCalculators;
 using Analytics.Application.Services;
+using Analytics.Entities.Metrics;
 using Application.Common.Behaviors;
 using Application.Common.Extensions;
 using Application.Common.Services;
@@ -12,13 +15,14 @@ public static class ServiceProvider
 {
     public static IServiceCollection AddApplicationLayer(this IServiceCollection collection)
     {
-        collection.RegisterRelatedData();
+        collection.RegisterRelatedData()
+            .RegisterMetricCalculators();
 
         collection.AddSingleton<ICurrencyConverter, CurrencyConverter>(_ => new CurrencyConverter(Global.UsdId));
         collection.AddScoped<ICurrencyConverterSetup, CurrencyConverterSetup>();
 
         collection.AddValidatorsFromAssembly(typeof(Global).Assembly);
-
+        
         collection.AddMediatR(config =>
         {
             config.RegisterServicesFromAssembly(typeof(Global).Assembly);
@@ -29,6 +33,14 @@ public static class ServiceProvider
             config.AddOpenBehavior(typeof(DbValidationBehavior<,>), ServiceLifetime.Scoped);
         });
 
+        return collection;
+    }
+
+    private static IServiceCollection RegisterMetricCalculators(this IServiceCollection collection)
+    {
+        collection.AddScoped<IMetricCalculatorFactory, MetricCalculatorFactory>();
+
+        collection.AddScoped<IMetricCalculator<ArticleSalesMetric>, ArticleSalesMetricCalculator>();
         return collection;
     }
 }
