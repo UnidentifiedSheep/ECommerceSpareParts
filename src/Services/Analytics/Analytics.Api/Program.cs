@@ -24,7 +24,13 @@ var builder = WebApplication.CreateBuilder(args);
 var certsPath = Environment.GetEnvironmentVariable("CERTS_PATH");
 if (!string.IsNullOrWhiteSpace(certsPath))
     Certs.RegisterCerts(certsPath);
+
 builder.Services.AddOpenApi();
+
+var lokiUrl = Environment.GetEnvironmentVariable("LOKI_URL");
+var env = Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT") ?? "unknown";
+
+builder.Host.AddLokiLogger(builder.Configuration, "analytics.api", env, lokiUrl);
 
 builder.Services.AddPersistenceLayer(Environment.GetEnvironmentVariable("DB_CONNECTION_STRING")!)
     .AddApplicationLayer()
