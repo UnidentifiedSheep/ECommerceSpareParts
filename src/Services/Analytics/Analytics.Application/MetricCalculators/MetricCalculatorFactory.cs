@@ -4,17 +4,17 @@ using Microsoft.Extensions.DependencyInjection;
 
 namespace Analytics.Application.MetricCalculators;
 
-public class MetricCalculatorFactory(IServiceScope scope) : IMetricCalculatorFactory
+public class MetricCalculatorFactory(IServiceProvider provider) : IMetricCalculatorFactory
 {
     public IMetricCalculator<TMetric>? TryGetCalculator<TMetric>() where TMetric : Metric
     {
-        return scope.ServiceProvider.GetService<IMetricCalculator<TMetric>>();
+        return provider.GetService<IMetricCalculator<TMetric>>();
     }
 
     public IMetricCalculator? TryGetCalculator(Type metricType)
     {
         var serviceType = typeof(IMetricCalculator<>).MakeGenericType(metricType);
-        return scope.ServiceProvider.GetService(serviceType) as IMetricCalculator;
+        return provider.GetService(serviceType) as IMetricCalculator;
     }
     
     public IMetricCalculator GetCalculator(Type metricType)

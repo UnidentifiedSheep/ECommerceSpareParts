@@ -1,5 +1,4 @@
 ﻿using Application.Common.Interfaces;
-using Main.Abstractions.Constants;
 using Main.Abstractions.Dtos.ArticleSizes;
 using Main.Abstractions.Exceptions.Articles;
 using Main.Abstractions.Interfaces.DbRepositories;
@@ -7,23 +6,7 @@ using Mapster;
 
 namespace Main.Application.Handlers.ArticleSizes.GetArticleSizes;
 
-public record GetArticleSizeQuery(int ArticleId) : IQuery<GetArticleSizeResult>, ICacheableQuery
-{
-    public string GetCacheKey()
-    {
-        return string.Format(CacheKeys.ArticleSizeCacheKey, ArticleId);
-    }
-
-    public Type? GetRelatedType()
-    {
-        return null;
-    }
-
-    public int GetDurationSeconds()
-    {
-        return 3600;
-    }
-}
+public record GetArticleSizeQuery(int ArticleId) : IQuery<GetArticleSizeResult>;
 
 public record GetArticleSizeResult(ArticleSizeDto ArticleSize);
 

@@ -190,6 +190,8 @@ app.UseOpenTelemetryPrometheusScrapingEndpoint();
 await InitSettings(app.Services);
 await SetupCurrencies(app.Services);
 
+app.MapHealthChecks("/health");
+
 await app.RunAsync();
 
 

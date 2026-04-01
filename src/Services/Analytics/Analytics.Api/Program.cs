@@ -88,6 +88,17 @@ builder.Services.AddMassTransit(x =>
     });
 });
 
+builder.Services.AddCors(options =>
+{
+    options.AddDefaultPolicy(policy =>
+    {
+        policy
+            .AllowAnyOrigin()
+            .AllowAnyHeader()
+            .AllowAnyMethod();
+    });
+});
+
 builder.Services.AddCarter();
 builder.Services.AddBaseExceptionHandlers();
 
@@ -97,6 +108,12 @@ builder.Services.AddTransient<HeaderSecretMiddleware>(_ => new HeaderSecretMiddl
 var app = builder.Build();
 
 app.UseExceptionHandler(_ => { });
+
+app.UseRouting();
+
+app.UseCors();
+
+app.MapCarter();
 
 await app.LoadLocalesFromJson(localesPath);
 
@@ -121,6 +138,7 @@ if (app.Environment.IsDevelopment()) app.MapOpenApi();
 if (Environment.GetEnvironmentVariable("USE_HTTPS_REDIRECTION") == "true")
     app.UseHttpsRedirection();
 
+app.MapHealthChecks("/health");
 
 await app.RunAsync();
 

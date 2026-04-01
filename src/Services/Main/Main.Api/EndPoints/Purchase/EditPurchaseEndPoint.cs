@@ -19,7 +19,7 @@ public class EditPurchaseEndPoint : ICarterModule
 {
     public void AddRoutes(IEndpointRouteBuilder app)
     {
-        app.MapPut("/purchase/{purchaseId}", async (
+        app.MapPut("/purchases/{purchaseId}", async (
                 ISender sender,
                 string purchaseId,
                 EditPurchaseRequest request,

@@ -23,7 +23,8 @@ public static class ServiceProvider
 
         collection.AddScoped<ICurrencyRepository, CurrencyRepository>();
         collection.AddScoped<IPurchaseFactRepository, PurchaseFactRepository>();
-
+        collection.AddScoped<ISalesRepository, SalesRepository>();
+        
         collection.AddScoped<IDbValidator, PgsqlDbValidator<DContext>>();
         collection.AddPgsqlDbValidators<DContext>();
 

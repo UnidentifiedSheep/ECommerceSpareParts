@@ -89,7 +89,9 @@ app.UseExceptionHandler(_ => { });
 app.MapSuggestionEndpoints()
     .MapDataEndpoints();
 
-app.Run();
+app.MapHealthChecks("/health");
+
+await app.RunAsync();
 
 void ConfigureKestrel()
 {

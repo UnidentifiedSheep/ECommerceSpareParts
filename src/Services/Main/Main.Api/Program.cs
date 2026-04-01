@@ -242,6 +242,8 @@ RecurringJob.AddOrUpdate<NotifySuggestionsRebuildNeeded>("RebuildSuggestionsTask
 
 app.UseOpenTelemetryPrometheusScrapingEndpoint();
 
+app.MapHealthChecks("/health");
+
 await app.RunAsync();
 
 

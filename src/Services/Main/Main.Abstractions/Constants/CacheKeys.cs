@@ -3,9 +3,9 @@ namespace Main.Abstractions.Constants;
 public static class CacheKeys
 {
     /// <summary>
-    /// 0 - DtoType, 1 - ArticleId, 2 - Page, 3 - ViewCount, 4 - SortBy
+    /// 1 - ArticleId, 2 - Page, 3 - ViewCount, 4 - SortBy
     /// </summary>
-    public const string ArticleCrossesCacheKey = "article-crosses-{0}:{1}-{2}-{3}-{4}";
+    public const string ArticleCrossesCacheKey = "article-crosses:{0}-{1}-{2}-{3}";
 
     /// <summary>
     /// 0 - SearchTerm, 1 - Page, 2 - ViewCount, 3 - SortBy

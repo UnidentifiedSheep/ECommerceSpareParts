@@ -1,30 +1,12 @@
 using Abstractions.Models;
 using Application.Common.Interfaces;
-using Main.Abstractions.Constants;
 using Main.Abstractions.Dtos.Currencies;
 using Main.Abstractions.Interfaces.DbRepositories;
 using Mapster;
-using Currency = Main.Entities.Currency;
 
 namespace Main.Application.Handlers.Currencies.GetCurrencies;
 
-public record GetCurrenciesQuery(PaginationModel Pagination) : IQuery<GetCurrenciesResult>, ICacheableQuery
-{
-    public string GetCacheKey()
-    {
-        return string.Format(CacheKeys.CurrenciesCacheKey, Pagination.Page, Pagination.Size);
-    }
-
-    public Type GetRelatedType()
-    {
-        return typeof(Currency);
-    }
-
-    public int GetDurationSeconds()
-    {
-        return 3600;
-    }
-}
+public record GetCurrenciesQuery(PaginationModel Pagination) : IQuery<GetCurrenciesResult>;
 
 public record GetCurrenciesResult(IEnumerable<CurrencyDto> Currencies);
 

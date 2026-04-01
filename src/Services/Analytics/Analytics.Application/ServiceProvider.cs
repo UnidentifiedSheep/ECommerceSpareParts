@@ -16,7 +16,8 @@ public static class ServiceProvider
     public static IServiceCollection AddApplicationLayer(this IServiceCollection collection)
     {
         collection.RegisterRelatedData()
-            .RegisterMetricCalculators();
+            .RegisterMetricCalculators()
+            .RegisterCachePolicies();
 
         collection.AddSingleton<ICurrencyConverter, CurrencyConverter>(_ => new CurrencyConverter(Global.UsdId));
         collection.AddScoped<ICurrencyConverterSetup, CurrencyConverterSetup>();

@@ -1,50 +1,25 @@
 using Application.Common.Interfaces;
-using AmwArticleDto = Main.Abstractions.Dtos.Amw.Articles.ArticleFullDto;
-using MemberArticleDto = Main.Abstractions.Dtos.Member.Articles.ArticleFullDto;
 
 namespace Main.Application.Handlers.Articles.GetArticleCrosses;
 
-public class GetArticleCrossesAmwLogSettings : ILoggableRequest<GetArticleCrossesQuery<AmwArticleDto>>
+public class GetArticleCrossesAmwLogSettings : ILoggableRequest<GetArticleCrossesQuery>
 {
-    public string GetLogPlace(GetArticleCrossesQuery<AmwArticleDto> request)
+    public string GetLogPlace(GetArticleCrossesQuery request)
     {
         return "Article Crosses | Кросс номера артикула";
     }
 
-    public object GetLogData(GetArticleCrossesQuery<AmwArticleDto> request)
+    public object GetLogData(GetArticleCrossesQuery request)
     {
         return request;
     }
 
-    public bool IsLoggingNeeded(GetArticleCrossesQuery<AmwArticleDto> request)
+    public bool IsLoggingNeeded(GetArticleCrossesQuery request)
     {
         return request.UserId != null && request.UserId != Guid.Empty;
     }
 
-    public Guid? GetUserId(GetArticleCrossesQuery<AmwArticleDto> request)
-    {
-        return request.UserId;
-    }
-}
-
-public class GetArticleCrossesMemberLogSettings : ILoggableRequest<GetArticleCrossesQuery<MemberArticleDto>>
-{
-    public string GetLogPlace(GetArticleCrossesQuery<MemberArticleDto> request)
-    {
-        return "Article Crosses | Кросс номера артикула";
-    }
-
-    public object GetLogData(GetArticleCrossesQuery<MemberArticleDto> request)
-    {
-        return request;
-    }
-
-    public bool IsLoggingNeeded(GetArticleCrossesQuery<MemberArticleDto> request)
-    {
-        return request.UserId != null && request.UserId != Guid.Empty;
-    }
-
-    public Guid? GetUserId(GetArticleCrossesQuery<MemberArticleDto> request)
+    public Guid? GetUserId(GetArticleCrossesQuery request)
     {
         return request.UserId;
     }

@@ -2,44 +2,26 @@ using Abstractions.Models;
 using Abstractions.Models.Repository;
 using Application.Common.Interfaces;
 using Extensions;
-using Main.Abstractions.Constants;
+using Main.Abstractions.Dtos.Amw.Articles;
 using Main.Abstractions.Exceptions.Articles;
 using Main.Abstractions.Interfaces.DbRepositories;
-using Main.Abstractions.Models;
 using Main.Entities;
 using Mapster;
 
 namespace Main.Application.Handlers.Articles.GetArticleCrosses;
 
-public record GetArticleCrossesQuery<TDto>(int ArticleId, PaginationModel Pagination, string? SortBy, Guid? UserId)
-    : IQuery<GetArticleCrossesResult<TDto>>, ICacheableQuery
-{
-    public string GetCacheKey()
-    {
-        return string.Format(CacheKeys.ArticleCrossesCacheKey, typeof(TDto).Name, ArticleId, Pagination.Page,
-            Pagination.Size, SortBy);
-    }
+public record GetArticleCrossesQuery(int ArticleId, PaginationModel Pagination, string? SortBy, Guid? UserId)
+    : IQuery<GetArticleCrossesResult>;
 
-    public Type GetRelatedType()
-    {
-        return typeof(ArticleCross);
-    }
+public record GetArticleCrossesResult(IEnumerable<ArticleFullDto> Crosses, ArticleFullDto RequestedArticle);
 
-    public int GetDurationSeconds()
-    {
-        return 600;
-    }
-}
-
-public record GetArticleCrossesResult<TDto>(IEnumerable<TDto> Crosses, TDto RequestedArticle);
-
-public class GetArticleCrossesHandler<TDto>(
+public class GetArticleCrossesHandler(
     IArticlesRepository articlesRepository,
     IRelatedDataCollector relatedDataCollector)
-    : IQueryHandler<GetArticleCrossesQuery<TDto>, GetArticleCrossesResult<TDto>>
+    : IQueryHandler<GetArticleCrossesQuery, GetArticleCrossesResult>
 {
-    public async Task<GetArticleCrossesResult<TDto>> Handle(
-        GetArticleCrossesQuery<TDto> request,
+    public async Task<GetArticleCrossesResult> Handle(
+        GetArticleCrossesQuery request,
         CancellationToken cancellationToken)
     {
         var pagination = request.Pagination;
@@ -47,13 +29,13 @@ public class GetArticleCrossesHandler<TDto>(
         
         var crosses = await GetCrosses(request.ArticleId, pagination, request.SortBy, cancellationToken);
 
-        var requestedAdapted = requestedArticle.Adapt<TDto>();
-        var crossArticlesAdapted = crosses.Adapt<List<TDto>>();
+        var requestedAdapted = requestedArticle.Adapt<ArticleFullDto>();
+        var crossArticlesAdapted = crosses.Adapt<List<ArticleFullDto>>();
 
         relatedDataCollector.AddRange(crosses.Select(x => x.Id.ToString()));
         relatedDataCollector.Add(requestedArticle.Id.ToString());
 
-        return new GetArticleCrossesResult<TDto>(crossArticlesAdapted, requestedAdapted);
+        return new GetArticleCrossesResult(crossArticlesAdapted, requestedAdapted);
     }
 
     private async Task<Article> GetRequestedArticle(int id, CancellationToken token)

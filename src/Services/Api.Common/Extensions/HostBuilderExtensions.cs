@@ -14,7 +14,7 @@ public static class HostBuilderExtensions
         string environment,
         string? lokiUrl)
     {
-        Log.Logger = new LoggerConfiguration()
+        var loggerConfiguration = new LoggerConfiguration()
             .ReadFrom.Configuration(configuration)
             .Enrich.FromLogContext()
             .WriteTo.Console()
@@ -28,10 +28,9 @@ public static class HostBuilderExtensions
                         new LokiLabel("env", environment)
                     ])
                 })
-            )
-            .CreateLogger();
+            );
 
-        hostBuilder.UseSerilog();
+        hostBuilder.UseSerilog(loggerConfiguration.CreateLogger());
         return  hostBuilder;
     }
 }
