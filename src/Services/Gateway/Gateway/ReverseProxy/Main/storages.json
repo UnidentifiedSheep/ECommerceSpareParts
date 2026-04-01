@@ -126,6 +126,20 @@
             "PathRemovePrefix": "/main"
           }
         ]
+      },
+      "get-storage-owners": {
+        "ClusterId": "main-cluster",
+        "Match": {
+          "Path": "/main/storages/{name}/owners",
+          "Methods": [
+            "GET"
+          ]
+        },
+        "Transforms": [
+          {
+            "PathRemovePrefix": "/main"
+          }
+        ]
       }
     }
   }

@@ -26,7 +26,8 @@ public class GetStorageOwnersHandler(
             .WithOrderBy(x => x.OwnerId)
             .WithPage(request.Pagination.Page)
             .WithSize(request.Pagination.Size)
-            .WithInclude(x => x.Owner);
+            .WithInclude(x => x.Owner)
+            .WithInclude(x => x.Owner.UserInfo);
 
         var result = await storageOwnersRepository.GetStorageOwnersAsync(queryOptions, cancellationToken);
         var owners = result.Select(x => x.Owner.Adapt<UserDto>()).ToList();

@@ -127,12 +127,13 @@
           }
         ]
       },
-      "add-storage-to-user": {
+      "storage-to-user": {
         "ClusterId": "main-cluster",
         "Match": {
           "Path": "/main/users/{userId}/storages/{storageName}",
           "Methods": [
-            "POST"
+            "POST", 
+            "DELETE"
           ]
         },
         "Transforms": [
