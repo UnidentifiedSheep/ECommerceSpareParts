@@ -27,29 +27,10 @@
         <Content Include="..\..\..\..\.dockerignore">
             <Link>.dockerignore</Link>
         </Content>
-        <Content Include="..\Analytics.Abstractions\Localization\metric-descriptions-localization-en.json">
-          <Link>Localization\metric-descriptions-localization-en.json</Link>
-          <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-        </Content>
-        <Content Include="..\Analytics.Abstractions\Localization\metric-descriptions-localization-ru.json">
-          <Link>Localization\metric-descriptions-localization-ru.json</Link>
-          <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-        </Content>
-        <Content Include="..\Analytics.Abstractions\Localization\metric-names-localization-en.json">
-          <Link>Localization\metric-names-localization-en.json</Link>
-          <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-        </Content>
-        <Content Include="..\Analytics.Abstractions\Localization\metric-names-localization-ru.json">
-          <Link>Localization\metric-names-localization-ru.json</Link>
-          <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-        </Content>
-        <Content Include="..\Analytics.Abstractions\Localization\purchase-fact\purchase-fact-localization-en.json">
-          <Link>Localization\purchase-fact\purchase-fact-localization-en.json</Link>
-          <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-        </Content>
-        <Content Include="..\Analytics.Abstractions\Localization\purchase-fact\purchase-fact-localization-ru.json">
-          <Link>Localization\purchase-fact\purchase-fact-localization-ru.json</Link>
-          <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+        <Content Include="..\Analytics.Abstractions\Localization\**\*">
+            <Link>Localization\%(RecursiveDir)%(Filename)%(Extension)</Link>
+            <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+            <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
         </Content>
     </ItemGroup>
 
