@@ -5,6 +5,7 @@ using Analytics.Application.Configs.Mapster;
 using Analytics.Integration.Tests.MockData;
 using Analytics.Persistence;
 using Analytics.Persistence.Context;
+using Localization.Abstractions.Models;
 using Localization.Domain.Extensions;
 using MassTransit;
 using Microsoft.Extensions.DependencyInjection;
@@ -29,7 +30,9 @@ public static class ServiceProviderForTests
             return scope.ServiceProvider;
         }
 
-        var locales = new[] { "ru-RU", "en-EN" };
+        Locale[] locales = ["ru-RU", "en-EN"];
+        Locale defaultLocale = "ru-RU";
+
         var localesPath = Assembly.GetExecutingAssembly().Location;
         localesPath = Path.Combine(Path.GetDirectoryName(localesPath)!, "Localization");
 
@@ -39,7 +42,7 @@ public static class ServiceProviderForTests
 
         services.AddPersistenceLayer(postgresConnectionString)
             .AddApplicationLayer()
-            .AddLocalization(locales)
+            .AddLocalization(defaultLocale, locales)
             .AddCacheLayer(redisConnectionString);
 
         services.RegisterTestContexts();

@@ -8,6 +8,7 @@ using Api.Common;
 using Api.Common.Extensions;
 using Api.Common.Middleware;
 using Carter;
+using Localization.Abstractions.Models;
 using Localization.Domain.Extensions;
 using Localization.Domain.Middlewares;
 using MassTransit;
@@ -19,7 +20,6 @@ using Security;
 using Security.Utils;
 
 var localesPath = Assembly.GetExecutingAssembly().GetDefaultLocalizationPath();
-var locales = new[] { "ru-RU", "en-EN" };
 
 var builder = WebApplication.CreateBuilder(args);
 var certsPath = Environment.GetEnvironmentVariable("CERTS_PATH");
@@ -46,7 +46,10 @@ var brokerOptions = new MessageBrokerOptions
 };
 builder.Services.AddSingleton(brokerOptions);
 
-builder.Services.AddLocalization(locales);
+Locale[] locales = ["ru-RU", "en-EN"];
+Locale defaultLocale = "ru-RU";
+
+builder.Services.AddLocalization(defaultLocale, locales);
 
 builder.Services.AddHttpContextAccessor();
 
@@ -123,13 +126,6 @@ if (Environment.GetEnvironmentVariable("SEED_DB") == "true")
     await app.SeedAsync<DContext>();
 
 app.UseMiddleware<HeaderSecretMiddleware>();
-
-app.UseRequestLocalization(options =>
-{
-    options.SetDefaultCulture(locales[0]);
-    options.AddSupportedCultures(locales);
-    options.AddSupportedUICultures(locales);
-});
 
 app.UseMiddleware<ScopedLocalizationMiddleware>();
 

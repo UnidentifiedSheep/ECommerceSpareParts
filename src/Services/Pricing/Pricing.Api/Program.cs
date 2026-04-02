@@ -11,6 +11,7 @@ using Contracts.Currency;
 using Contracts.Currency.GetCurrencies;
 using Contracts.Markup;
 using Contracts.Settings;
+using Localization.Abstractions.Models;
 using Localization.Domain.Extensions;
 using Localization.Domain.Middlewares;
 using MassTransit;
@@ -34,7 +35,6 @@ using Serilog.Sinks.Loki;
 using Serilog.Sinks.Loki.Labels;
 
 var localesPath = Assembly.GetExecutingAssembly().GetDefaultLocalizationPath();
-var locales = new[] { "ru-RU", "en-EN" };
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -109,6 +109,9 @@ builder.Services.AddMassTransit(x =>
     });
 });
 
+Locale[] locales = ["ru-RU", "en-EN"];
+Locale defaultLocale = "ru-RU";
+
 builder.Services
     .AddPersistenceLayer(Environment.GetEnvironmentVariable("DB_CONNECTION_STRING")!)
     .AddCacheLayer(Environment.GetEnvironmentVariable("REDIS_CONNECTION_STRING")!, "pricing")
@@ -117,7 +120,7 @@ builder.Services
     .AddMinimalSecurityLayer()
     .AddApplicationLayer()
     .AddCommonLayer()
-    .AddLocalization(locales);
+    .AddLocalization(defaultLocale, locales);
 
 
 builder.Services.AddBaseExceptionHandlers();
@@ -155,13 +158,6 @@ var app = builder.Build();
 Pricing.Application.Configs.Mapster.Configure();
 
 app.UseMiddleware<HeaderSecretMiddleware>();
-
-app.UseRequestLocalization(options =>
-{
-    options.SetDefaultCulture(locales[0]);
-    options.AddSupportedCultures(locales);
-    options.AddSupportedUICultures(locales);
-});
 
 app.UseMiddleware<ScopedLocalizationMiddleware>();
 
