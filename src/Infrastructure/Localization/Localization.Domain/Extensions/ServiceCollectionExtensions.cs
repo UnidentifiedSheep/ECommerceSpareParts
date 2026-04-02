@@ -1,4 +1,5 @@
 ﻿using Localization.Abstractions.Interfaces;
+using Localization.Abstractions.Models;
 using Localization.Domain.Middlewares;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -6,18 +7,24 @@ namespace Localization.Domain.Extensions;
 
 public static class ServiceCollectionExtensions
 {
-    public static IServiceCollection AddLocalization(this IServiceCollection services, params string[] locales)
+    public static IServiceCollection AddLocalization(
+        this IServiceCollection services, 
+        Locale defaultLocale,
+        params Locale[] locales)
     {
         services.AddLocales(locales)
             .AddStringLocalizer()
             .AddScopedStringLocalizer();
 
-        services.AddScoped<ScopedLocalizationMiddleware>();
+        services.AddScoped<ScopedLocalizationMiddleware>(sp => 
+            new ScopedLocalizationMiddleware(sp.GetRequiredService<IScopedStringLocalizer>()));
 
+        ScopedLocalizationMiddleware.Configure(defaultLocale, locales);
+        
         return services;
     }
 
-    public static IServiceCollection AddLocales(this IServiceCollection services, params string[] locales)
+    public static IServiceCollection AddLocales(this IServiceCollection services, params Locale[] locales)
     {
         foreach (var locale in locales)
             services.AddSingleton<ILocalizerContainer, LocalizerContainer>(_ => new LocalizerContainer(locale));

@@ -19,7 +19,6 @@ using Main.Abstractions.Interfaces.Services;
 using Main.Abstractions.Models;
 using Main.Application.ConcurrencyValidator;
 using Main.Application.Configs;
-using Main.Application.Handlers.Articles.GetArticleCrosses;
 using Main.Application.Handlers.Users.GetUserDiscount;
 using Main.Application.HangFireTasks;
 using Main.Application.RelatedData;
@@ -27,11 +26,8 @@ using Main.Application.Services;
 using Main.Application.Services.Logistics;
 using Main.Application.Services.Logistics.PricingStrategies;
 using Main.Entities;
-using MediatR;
 using Microsoft.Extensions.DependencyInjection;
-using AmwArticleFullDto = Main.Abstractions.Dtos.Amw.Articles.ArticleFullDto;
 using Currency = Main.Entities.Currency;
-using MemberArticleFullDto = Main.Abstractions.Dtos.Member.Articles.ArticleFullDto;
 using User = Main.Entities.User;
 
 namespace Main.Application;
@@ -100,13 +96,6 @@ public static class ServiceProvider
         });
 
         collection.AddValidatorsFromAssembly(typeof(Global).Assembly);
-        
-        collection
-            .AddScoped<IRequestHandler<GetArticleCrossesQuery<AmwArticleFullDto>,
-                GetArticleCrossesResult<AmwArticleFullDto>>, GetArticleCrossesHandler<AmwArticleFullDto>>();
-        collection
-            .AddScoped<IRequestHandler<GetArticleCrossesQuery<MemberArticleFullDto>,
-                GetArticleCrossesResult<MemberArticleFullDto>>, GetArticleCrossesHandler<MemberArticleFullDto>>();
 
         collection.Scan(scan => scan
             .FromAssemblyOf<GetUserDiscountHandler>()
@@ -122,7 +111,8 @@ public static class ServiceProvider
 
         ValidationConfiguration.Configure();
 
-        collection.RegisterDbValidations(Assembly.GetAssembly(typeof(Global)));
+        collection.RegisterDbValidations(Assembly.GetAssembly(typeof(Global)))
+            .RegisterCachePolicies(typeof(ServiceProvider).Assembly);
 
 
         collection.AddMediatR(config =>

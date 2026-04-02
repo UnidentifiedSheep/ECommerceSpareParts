@@ -8,7 +8,8 @@ namespace Application.Common.Behaviors;
 public class CacheBehavior<TRequest, TResponse>(
     ICache cache,
     IRelatedDataFactory relatedDataFactory,
-    IRelatedDataCollector relatedDataCollector) : IPipelineBehavior<TRequest, TResponse>
+    IRelatedDataCollector relatedDataCollector,
+    ICachePolicy<TRequest>? cachePolicy = null) : IPipelineBehavior<TRequest, TResponse>
     where TRequest : IRequest<TResponse> where TResponse : notnull
 {
     public async Task<TResponse> Handle(
@@ -16,17 +17,16 @@ public class CacheBehavior<TRequest, TResponse>(
         RequestHandlerDelegate<TResponse> next,
         CancellationToken cancellationToken)
     {
-        if (request is not ICacheableQuery cacheable)
+        if (cachePolicy == null)
             return await next(cancellationToken);
 
-        var cacheKey = cacheable.GetCacheKey();
+        var cacheKey = cachePolicy.GetCacheKey(request);
 
         var cached = await cache.StringGetAsync<TResponse>(cacheKey);
         if (cached != null)
             return cached;
 
-        var duration = cacheable.GetDurationSeconds();
-        var relatedType = cacheable.GetRelatedType();
+        var relatedType = cachePolicy.RelatedType;
 
         using var _ = relatedDataCollector.BeginScope();
 
@@ -41,7 +41,7 @@ public class CacheBehavior<TRequest, TResponse>(
                 await relatedRepo.AddRelatedDataAsync(ids, cacheKey);
         }
 
-        await cache.StringSetAsync(cacheKey, response, TimeSpan.FromSeconds(duration));
+        await cache.StringSetAsync(cacheKey, response, TimeSpan.FromSeconds(cachePolicy.DurationSeconds));
 
         return response;
     }

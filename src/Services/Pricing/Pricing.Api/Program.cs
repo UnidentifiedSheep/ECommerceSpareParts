@@ -11,6 +11,7 @@ using Contracts.Currency;
 using Contracts.Currency.GetCurrencies;
 using Contracts.Markup;
 using Contracts.Settings;
+using Localization.Abstractions.Models;
 using Localization.Domain.Extensions;
 using Localization.Domain.Middlewares;
 using MassTransit;
@@ -34,7 +35,6 @@ using Serilog.Sinks.Loki;
 using Serilog.Sinks.Loki.Labels;
 
 var localesPath = Assembly.GetExecutingAssembly().GetDefaultLocalizationPath();
-var locales = new[] { "ru-RU", "en-EN" };
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -43,29 +43,9 @@ if (!string.IsNullOrWhiteSpace(certsPath))
     Certs.RegisterCerts(certsPath);
 
 var lokiUrl = Environment.GetEnvironmentVariable("LOKI_URL");
+var env = Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT") ?? "unknown";
 
-Log.Logger = new LoggerConfiguration()
-    .ReadFrom.Configuration(builder.Configuration)
-    .Enrich.FromLogContext()
-    .WriteTo.Console()
-    .WriteTo.Conditional(
-        _ => !string.IsNullOrWhiteSpace(lokiUrl),
-        wt => wt.LokiHttp(() => new LokiSinkConfiguration
-        {
-            LokiUrl = lokiUrl!,
-            LogLabelProvider = new CustomLogLabelProvider([
-                new LokiLabel("service", "pricing.api"),
-                new LokiLabel(
-                    "env",
-                    Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT") ?? "unknown"
-                )
-            ])
-        })
-    )
-    .CreateLogger();
-
-
-builder.Host.UseSerilog();
+builder.Host.AddLokiLogger(builder.Configuration, "pricing.api", env, lokiUrl);
 
 builder.Services.AddHttpContextAccessor();
 
@@ -129,6 +109,9 @@ builder.Services.AddMassTransit(x =>
     });
 });
 
+Locale[] locales = ["ru-RU", "en-EN"];
+Locale defaultLocale = "ru-RU";
+
 builder.Services
     .AddPersistenceLayer(Environment.GetEnvironmentVariable("DB_CONNECTION_STRING")!)
     .AddCacheLayer(Environment.GetEnvironmentVariable("REDIS_CONNECTION_STRING")!, "pricing")
@@ -137,7 +120,7 @@ builder.Services
     .AddMinimalSecurityLayer()
     .AddApplicationLayer()
     .AddCommonLayer()
-    .AddLocalization(locales);
+    .AddLocalization(defaultLocale, locales);
 
 
 builder.Services.AddBaseExceptionHandlers();
@@ -176,13 +159,6 @@ Pricing.Application.Configs.Mapster.Configure();
 
 app.UseMiddleware<HeaderSecretMiddleware>();
 
-app.UseRequestLocalization(options =>
-{
-    options.SetDefaultCulture(locales[0]);
-    options.AddSupportedCultures(locales);
-    options.AddSupportedUICultures(locales);
-});
-
 app.UseMiddleware<ScopedLocalizationMiddleware>();
 
 app.UseForwardedHeaders(new ForwardedHeadersOptions
@@ -209,6 +185,8 @@ app.UseOpenTelemetryPrometheusScrapingEndpoint();
 
 await InitSettings(app.Services);
 await SetupCurrencies(app.Services);
+
+app.MapHealthChecks("/health");
 
 await app.RunAsync();
 

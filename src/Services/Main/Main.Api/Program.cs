@@ -3,6 +3,7 @@ using Abstractions.Interfaces.Currency;
 using Abstractions.Models;
 using Amazon.S3;
 using Api.Common;
+using Api.Common.Extensions;
 using Api.Common.Logging;
 using Api.Common.Middleware;
 using Api.Common.OperationFilters;
@@ -48,29 +49,9 @@ if (!string.IsNullOrWhiteSpace(certsPath))
     Certs.RegisterCerts(certsPath);
 
 var lokiUrl = Environment.GetEnvironmentVariable("LOKI_URL");
+var env = Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT") ?? "unknown";
 
-Log.Logger = new LoggerConfiguration()
-    .ReadFrom.Configuration(builder.Configuration)
-    .Enrich.FromLogContext()
-    .WriteTo.Console()
-    .WriteTo.Conditional(
-        _ => !string.IsNullOrWhiteSpace(lokiUrl),
-        wt => wt.LokiHttp(() => new LokiSinkConfiguration
-        {
-            LokiUrl = lokiUrl!,
-            LogLabelProvider = new CustomLogLabelProvider([
-                new LokiLabel("service", "main.api"),
-                new LokiLabel(
-                    "env",
-                    Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT") ?? "unknown"
-                )
-            ])
-        })
-    )
-    .CreateLogger();
-
-
-builder.Host.UseSerilog();
+builder.Host.AddLokiLogger(builder.Configuration, "main.api", env, lokiUrl);
 
 builder.Services.AddOpenApi();
 builder.Services.AddEndpointsApiExplorer();
@@ -260,6 +241,8 @@ RecurringJob.AddOrUpdate<NotifySuggestionsRebuildNeeded>("RebuildSuggestionsTask
     x => x.Run(), Cron.Daily);
 
 app.UseOpenTelemetryPrometheusScrapingEndpoint();
+
+app.MapHealthChecks("/health");
 
 await app.RunAsync();
 

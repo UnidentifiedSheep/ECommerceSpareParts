@@ -28,13 +28,10 @@
     </ItemGroup>
 
     <ItemGroup>
-        <Content Include="..\Analytics.Abstractions\Localization\purchase-fact\purchase-fact-localization-en.json">
-            <Link>Localization\purchase-fact\purchase-fact-localization-en.json</Link>
-            <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-        </Content>
-        <Content Include="..\Analytics.Abstractions\Localization\purchase-fact\purchase-fact-localization-ru.json">
-            <Link>Localization\purchase-fact\purchase-fact-localization-ru.json</Link>
-            <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+        <Content Include="..\Analytics.Abstractions\Localization\**\*">
+            <Link>Localization\%(RecursiveDir)%(Filename)%(Extension)</Link>
+            <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+            <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
         </Content>
     </ItemGroup>
 

@@ -1,0 +1,121 @@
+{
+  "ReverseProxy": {
+    "Routes": {
+      "route-api": {
+        "ClusterId": "main-cluster",
+        "Match": {
+          "Path": "/api/main/{**catch-all}"
+        },
+        "Transforms": [
+          {
+            "PathRemovePrefix": "/api/main"
+          }
+        ]
+      },
+      "route-analytics": {
+        "ClusterId": "analytics-cluster",
+        "Match": {
+          "Path": "/api/analytics/{**catch-all}"
+        },
+        "Transforms": [
+          {
+            "PathRemovePrefix": "/api/analytics"
+          }
+        ]
+      },
+      "route-search": {
+        "ClusterId": "search-cluster",
+        "Match": {
+          "Path": "/api/search/{**catch-all}",
+        },
+        "Transforms": [
+          {
+            "PathRemovePrefix": "/api/search"
+          }
+        ]
+      },
+      "route-pricing": {
+        "ClusterId": "pricing-cluster",
+        "Match": {
+          "Path": "/api/pricing/{**catch-all}"
+        },
+        "Transforms": [
+          {
+            "PathRemovePrefix": "/api/pricing"
+          }
+        ]
+      }
+    },
+    
+    "Clusters": {
+      "main-cluster": {
+        "LoadBalancingPolicy": "RoundRobin",
+        "HealthCheck": {
+          "Active": {
+            "Enabled": true,
+            "Interval": "00:00:30",
+            "Timeout": "00:00:02",
+            "Policy": "ConsecutiveFailures",
+            "Path": "/health"
+          }
+        },
+        "Destinations": {
+          "main-api": {
+            "Address": "http://main.api:8080/"
+          }
+        }
+      },
+      "analytics-cluster": {
+        "LoadBalancingPolicy": "RoundRobin",
+        "HealthCheck": {
+          "Active": {
+            "Enabled": true,
+            "Interval": "00:00:30",
+            "Timeout": "00:00:02",
+            "Policy": "ConsecutiveFailures",
+            "Path": "/health"
+          }
+        },
+        "Destinations": {
+          "analytics-api": {
+            "Address": "http://analytics.api:8080/"
+          }
+        }
+      },
+      "search-cluster": {
+        "LoadBalancingPolicy": "RoundRobin",
+        "HealthCheck": {
+          "Active": {
+            "Enabled": true,
+            "Interval": "00:00:30",
+            "Timeout": "00:00:02",
+            "Policy": "ConsecutiveFailures",
+            "Path": "/health"
+          }
+        },
+        "Destinations": {
+          "search-api": {
+            "Address": "http://search.api:8080/"
+          }
+        }
+      },
+      "pricing-cluster": {
+        "LoadBalancingPolicy": "RoundRobin",
+        "HealthCheck": {
+          "Active": {
+            "Enabled": true,
+            "Interval": "00:00:30",
+            "Timeout": "00:00:02",
+            "Policy": "ConsecutiveFailures",
+            "Path": "/health"
+          }
+        },
+        "Destinations": {
+          "pricing-api": {
+            "Address": "http://pricing.api:8080/"
+          }
+        }
+      }
+    }
+  }
+}

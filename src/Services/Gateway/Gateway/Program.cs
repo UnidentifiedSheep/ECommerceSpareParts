@@ -1,5 +1,6 @@
 using System.Security.Claims;
 using System.Text;
+using Api.Common.Extensions;
 using Api.Common.Logging;
 using Gateway.Extensions;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
@@ -8,8 +9,6 @@ using Microsoft.IdentityModel.Tokens;
 using OpenTelemetry.Metrics;
 using Security.Utils;
 using Serilog;
-using Serilog.Sinks.Loki;
-using Serilog.Sinks.Loki.Labels;
 using Yarp.ReverseProxy.Transforms;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -19,27 +18,10 @@ if (!string.IsNullOrWhiteSpace(certsPath))
 
 builder.Configuration.AddJsonFromDirectory("ReverseProxy");
 
+var env = Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT") ?? "unknown";
 var lokiUrl = Environment.GetEnvironmentVariable("LOKI_URL");
 
-Log.Logger = new LoggerConfiguration()
-    .ReadFrom.Configuration(builder.Configuration)
-    .Enrich.FromLogContext()
-    .WriteTo.Console()
-    .WriteTo.Conditional(
-        _ => !string.IsNullOrWhiteSpace(lokiUrl),
-        wt => wt.LokiHttp(() => new LokiSinkConfiguration
-        {
-            LokiUrl = lokiUrl!,
-            LogLabelProvider = new CustomLogLabelProvider([
-                new LokiLabel("service", "gateway"),
-                new LokiLabel(
-                    "env",
-                    Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT") ?? "unknown"
-                )
-            ])
-        })
-    )
-    .CreateLogger();
+builder.Host.AddLokiLogger(builder.Configuration, "gateway", env, lokiUrl);
 
 builder.Services.AddOpenTelemetry()
     .WithMetrics(metrics =>
@@ -121,8 +103,6 @@ builder.Services.AddReverseProxy()
         });
     });
 
-builder.Host.UseSerilog();
-
 builder.Services.AddCors(options =>
 {
     options.AddDefaultPolicy(policy =>
@@ -140,9 +120,6 @@ app.UseCors();
 
 app.UseAuthentication();
 app.UseAuthorization();
-
-app.MapMethods("{**any}", ["OPTIONS"], () => Results.Ok())
-    .AllowAnonymous();
 
 app.MapReverseProxy();
 

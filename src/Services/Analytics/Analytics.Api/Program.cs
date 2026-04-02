@@ -8,25 +8,33 @@ using Api.Common;
 using Api.Common.Extensions;
 using Api.Common.Middleware;
 using Carter;
+using Localization.Abstractions.Models;
 using Localization.Domain.Extensions;
 using Localization.Domain.Middlewares;
 using MassTransit;
 using Persistence.Extensions;
 using RabbitMq.Extensions;
 using RabbitMq.Models;
+using Redis;
 using Security;
 using Security.Utils;
 
 var localesPath = Assembly.GetExecutingAssembly().GetDefaultLocalizationPath();
-var locales = new[] { "ru-RU", "en-EN" };
 
 var builder = WebApplication.CreateBuilder(args);
 var certsPath = Environment.GetEnvironmentVariable("CERTS_PATH");
 if (!string.IsNullOrWhiteSpace(certsPath))
     Certs.RegisterCerts(certsPath);
+
 builder.Services.AddOpenApi();
 
+var lokiUrl = Environment.GetEnvironmentVariable("LOKI_URL");
+var env = Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT") ?? "unknown";
+
+builder.Host.AddLokiLogger(builder.Configuration, "analytics.api", env, lokiUrl);
+
 builder.Services.AddPersistenceLayer(Environment.GetEnvironmentVariable("DB_CONNECTION_STRING")!)
+    .AddCacheLayer(Environment.GetEnvironmentVariable("REDIS_CONNECTION_STRING")!, "analytics")
     .AddApplicationLayer()
     .AddMinimalSecurityLayer();
 
@@ -38,7 +46,10 @@ var brokerOptions = new MessageBrokerOptions
 };
 builder.Services.AddSingleton(brokerOptions);
 
-builder.Services.AddLocalization(locales);
+Locale[] locales = ["ru-RU", "en-EN"];
+Locale defaultLocale = "ru-RU";
+
+builder.Services.AddLocalization(defaultLocale, locales);
 
 builder.Services.AddHttpContextAccessor();
 
@@ -82,6 +93,17 @@ builder.Services.AddMassTransit(x =>
     });
 });
 
+builder.Services.AddCors(options =>
+{
+    options.AddDefaultPolicy(policy =>
+    {
+        policy
+            .AllowAnyOrigin()
+            .AllowAnyHeader()
+            .AllowAnyMethod();
+    });
+});
+
 builder.Services.AddCarter();
 builder.Services.AddBaseExceptionHandlers();
 
@@ -92,19 +114,18 @@ var app = builder.Build();
 
 app.UseExceptionHandler(_ => { });
 
+app.UseRouting();
+
+app.UseCors();
+
+app.MapCarter();
+
 await app.LoadLocalesFromJson(localesPath);
 
 if (Environment.GetEnvironmentVariable("SEED_DB") == "true")
     await app.SeedAsync<DContext>();
 
 app.UseMiddleware<HeaderSecretMiddleware>();
-
-app.UseRequestLocalization(options =>
-{
-    options.SetDefaultCulture(locales[0]);
-    options.AddSupportedCultures(locales);
-    options.AddSupportedUICultures(locales);
-});
 
 app.UseMiddleware<ScopedLocalizationMiddleware>();
 
@@ -115,6 +136,7 @@ if (app.Environment.IsDevelopment()) app.MapOpenApi();
 if (Environment.GetEnvironmentVariable("USE_HTTPS_REDIRECTION") == "true")
     app.UseHttpsRedirection();
 
+app.MapHealthChecks("/health");
 
 await app.RunAsync();
 

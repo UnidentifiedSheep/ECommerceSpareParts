@@ -1,26 +1,9 @@
 ﻿using Application.Common.Interfaces;
-using Main.Abstractions.Constants;
 using Main.Abstractions.Interfaces.DbRepositories;
 
 namespace Main.Application.Handlers.Currencies.GetCurrencyRates;
 
-public record GetCurrencyRatesQuery : IQuery<GetCurrencyRatesResult>, ICacheableQuery
-{
-    public string GetCacheKey()
-    {
-        return CacheKeys.CurrencyRatesCacheKey;
-    }
-
-    public Type? GetRelatedType()
-    {
-        return null;
-    }
-
-    public int GetDurationSeconds()
-    {
-        return 3600;
-    }
-}
+public record GetCurrencyRatesQuery : IQuery<GetCurrencyRatesResult>;
 
 public record GetCurrencyRatesResult(Dictionary<int, decimal> Rates);
 

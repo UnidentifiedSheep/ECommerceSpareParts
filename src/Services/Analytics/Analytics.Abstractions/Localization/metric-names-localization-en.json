@@ -1,0 +1,7 @@
+﻿{
+  "locale": "en",
+  "keyValues": {
+    "ArticleSalesMetric.name": "Article sales metric.",
+    "ArticlePurchasesMetric.name": "Article purchase metric."
+  }
+}

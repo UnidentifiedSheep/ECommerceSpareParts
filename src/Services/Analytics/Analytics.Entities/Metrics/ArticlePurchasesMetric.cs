@@ -1,8 +1,10 @@
-﻿using Analytics.Entities.Metrics.JsonDataModels;
+﻿using Analytics.Attributes;
+using Analytics.Entities.Metrics.JsonDataModels;
 using Analytics.Enums;
 
 namespace Analytics.Entities.Metrics;
 
+[MetricInfo("ArticlePurchasesMetric")]
 public class ArticlePurchasesMetric : Metric<ArticleInfoModel>
 {
     public ArticlePurchasesMetric(Guid createdBy, int articleId) : base(articleId.ToString())

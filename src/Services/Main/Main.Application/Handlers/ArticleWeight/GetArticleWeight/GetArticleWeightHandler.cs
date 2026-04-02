@@ -1,5 +1,4 @@
 ﻿using Application.Common.Interfaces;
-using Main.Abstractions.Constants;
 using Main.Abstractions.Dtos.ArticleWeight;
 using Main.Abstractions.Exceptions.Articles;
 using Main.Abstractions.Interfaces.DbRepositories;
@@ -7,23 +6,7 @@ using Mapster;
 
 namespace Main.Application.Handlers.ArticleWeight.GetArticleWeight;
 
-public record GetArticleWeightQuery(int ArticleId) : IQuery<GetArticleWeightResult>, ICacheableQuery
-{
-    public string GetCacheKey()
-    {
-        return string.Format(CacheKeys.ArticleWeightCacheKey, ArticleId);
-    }
-
-    public Type? GetRelatedType()
-    {
-        return null;
-    }
-
-    public int GetDurationSeconds()
-    {
-        return 3600;
-    }
-}
+public record GetArticleWeightQuery(int ArticleId) : IQuery<GetArticleWeightResult>;
 
 public record GetArticleWeightResult(ArticleWeightDto ArticleWeight);
 

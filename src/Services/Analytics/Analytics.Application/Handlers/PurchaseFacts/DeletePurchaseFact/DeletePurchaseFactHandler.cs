@@ -1,12 +1,12 @@
 ﻿using System.Data;
 using Abstractions.Interfaces.Services;
 using Abstractions.Models.Repository;
-using Analytics.Abstractions.Exceptions.PurchaseFacts;
 using Analytics.Abstractions.Interfaces.DbRepositories;
 using Analytics.Entities;
 using Application.Common.Interfaces;
 using Attributes;
 using MediatR;
+using Microsoft.Extensions.Logging;
 
 namespace Analytics.Application.Handlers.PurchaseFacts.DeletePurchaseFact;
 
@@ -15,7 +15,8 @@ public record DeletePurchaseFactCommand(string PurchaseId) : ICommand;
 
 public class DeletePurchaseFactHandler(
     IPurchaseFactRepository purchaseFactRepository,
-    IUnitOfWork unitOfWork) 
+    IUnitOfWork unitOfWork,
+    ILogger<DeletePurchaseFactCommand> logger) 
     : ICommandHandler<DeletePurchaseFactCommand>
 {
     public async Task<Unit> Handle(DeletePurchaseFactCommand request, CancellationToken cancellationToken)
@@ -24,7 +25,14 @@ public class DeletePurchaseFactHandler(
             new QueryOptions<PurchasesFact, string>() { Data = request.PurchaseId }
                 .WithForUpdate()
                 .WithTracking(),
-            cancellationToken) ?? throw new PurchaseFactNotFoundException(request.PurchaseId);
+            cancellationToken);
+
+        if (fact == null)
+        {
+            logger.LogWarning("Unable to to delete purchase fact {factId}, because it doesn't exist", 
+                request.PurchaseId);
+            return Unit.Value;
+        }
         
         unitOfWork.Remove(fact);
         await unitOfWork.SaveChangesAsync(cancellationToken);
