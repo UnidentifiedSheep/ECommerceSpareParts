@@ -17,7 +17,7 @@ public static class ServiceProvider
     {
         collection.RegisterRelatedData()
             .RegisterMetricCalculators()
-            .RegisterCachePolicies();
+            .RegisterCachePolicies(typeof(ServiceProvider).Assembly);
 
         collection.AddSingleton<ICurrencyConverter, CurrencyConverter>(_ => new CurrencyConverter(Global.UsdId));
         collection.AddScoped<ICurrencyConverterSetup, CurrencyConverterSetup>();

@@ -112,7 +112,7 @@ public static class ServiceProvider
         ValidationConfiguration.Configure();
 
         collection.RegisterDbValidations(Assembly.GetAssembly(typeof(Global)))
-            .RegisterCachePolicies();
+            .RegisterCachePolicies(typeof(ServiceProvider).Assembly);
 
 
         collection.AddMediatR(config =>
