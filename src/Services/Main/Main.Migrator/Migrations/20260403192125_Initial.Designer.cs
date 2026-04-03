@@ -15,7 +15,7 @@ using NpgsqlTypes;
 namespace Main.Migrator.Migrations
 {
     [DbContext(typeof(DContext))]
-    [Migration("20260403191846_Initial")]
+    [Migration("20260403192125_Initial")]
     partial class Initial
     {
         /// <inheritdoc />
