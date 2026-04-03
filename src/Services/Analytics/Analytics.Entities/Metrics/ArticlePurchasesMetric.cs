@@ -5,14 +5,13 @@ using Analytics.Enums;
 namespace Analytics.Entities.Metrics;
 
 [MetricInfo("ArticlePurchasesMetric")]
-public class ArticlePurchasesMetric : Metric<ArticleInfoModel>
+public class ArticlePurchasesMetric : ArticleMetric<ArticleInfoModel>
 {
-    public ArticlePurchasesMetric(Guid createdBy, int articleId) : base(articleId.ToString())
+    public ArticlePurchasesMetric(int articleId) : base(articleId)
     {
-        CreatedBy = createdBy;
         ArticleId = articleId;
     }
 
     public override DependsOn DependsOn { get; protected set; } = DependsOn.Purchase | DependsOn.Period;
-    public int ArticleId { get; private set; }
+    
 }

@@ -4,8 +4,9 @@ using Analytics.Abstractions.Interfaces.DbRepositories;
 using Analytics.Entities;
 using Analytics.Entities.Metrics;
 using Analytics.Entities.Metrics.JsonDataModels;
+using Analytics.Enums;
 
-namespace Analytics.Application.MetricCalculators;
+namespace Analytics.Application.Services.Metrics.Calculators;
 
 public class ArticleSalesMetricCalculator(
     ISalesRepository salesRepository,
@@ -75,7 +76,8 @@ public class ArticleSalesMetricCalculator(
         };
 
         metric.Data = data;
-        metric.SetCalculated();
+        metric.RecalculatedAt = DateTime.UtcNow;
+        metric.Tags = RecalculationTags.None;
     }
 
     private static Expression<Func<SalesFact, bool>> GetWhere(ArticleSalesMetric metric)

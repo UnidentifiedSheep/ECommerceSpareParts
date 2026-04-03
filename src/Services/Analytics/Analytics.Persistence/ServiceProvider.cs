@@ -21,9 +21,11 @@ public static class ServiceProvider
 
         collection.AddScoped<IUnitOfWork, UnitOfWork<DContext>>();
 
+        collection.AddScoped<IMetricRepository, MetricRepository>();
         collection.AddScoped<ICurrencyRepository, CurrencyRepository>();
         collection.AddScoped<IPurchaseFactRepository, PurchaseFactRepository>();
         collection.AddScoped<ISalesRepository, SalesRepository>();
+        collection.AddScoped<IMetricCalculationJobRepository, MetricCalculationJobRepository>();
         
         collection.AddScoped<IDbValidator, PgsqlDbValidator<DContext>>();
         collection.AddPgsqlDbValidators<DContext>();

@@ -21,6 +21,8 @@ public partial class DContext : DbContext
     public virtual DbSet<Currency> Currencies { get; set; }
 
     public virtual DbSet<Metric> Metrics { get; set; }
+    
+    public virtual DbSet<MetricCalculationJob> MetricCalculationJobs { get; set; }
 
     public virtual DbSet<PurchaseContent> PurchaseContents { get; set; }
 
@@ -52,6 +54,50 @@ public partial class DContext : DbContext
                 .ValueGeneratedNever()
                 .HasColumnName("id");
             entity.Property(e => e.ToUsd).HasColumnName("to_usd");
+        });
+
+        modelBuilder.Entity<MetricCalculationJob>(entity =>
+        {
+            entity.ToTable("metric_calculation_jobs");
+
+            entity.HasKey(e => e.RequestId).HasName("request_id_pk");
+
+            entity.Property(e => e.RequestId)
+                .HasColumnName("request_id");
+            
+            entity.Property(e => e.MetricId)
+                .HasColumnName("metric_id");
+            
+            entity.Property(e => e.MetricSystemName)
+                .HasColumnName("metric_system_name")
+                .HasMaxLength(128);
+
+            entity.Property(e => e.Status)
+                .HasColumnName("status")
+                .HasMaxLength(50);
+
+            entity.Property(e => e.CreateAt)
+                .HasColumnName("create_at");
+
+            entity.Property(e => e.UpdateAt)
+                .HasColumnName("update_at");
+
+            entity.Property(e => e.ErrorMessage)
+                .HasColumnName("error_message")
+                .HasMaxLength(512);
+
+            entity.Property(e => e.RowVersion)
+                .HasColumnName("xmin")
+                .IsRowVersion();
+
+            entity.HasIndex(e => e.MetricId, "metrics_calc_jobs_metric_id_index")
+                .IsUnique();
+            
+            entity.HasIndex(e => e.CreateAt, "metrics_calc_jobs_created_at_index");
+
+            entity.HasIndex(e =>
+                    new { e.Status, e.MetricSystemName },
+                "metrics_calc_jobs_status_name_index");
         });
 
         modelBuilder.Entity<ArticleSalesMetric>(entity =>

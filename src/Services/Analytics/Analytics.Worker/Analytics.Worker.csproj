@@ -1,0 +1,19 @@
+<Project Sdk="Microsoft.NET.Sdk.Worker">
+
+    <PropertyGroup>
+        <TargetFramework>net10.0</TargetFramework>
+        <Nullable>enable</Nullable>
+        <ImplicitUsings>enable</ImplicitUsings>
+        <UserSecretsId>dotnet-Analytics.Worker-04705b45-eb58-4513-b3e0-3603db44821f</UserSecretsId>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <PackageReference Include="MassTransit.Abstractions" Version="8.5.8" />
+        <PackageReference Include="Microsoft.Extensions.Hosting" Version="10.0.3"/>
+    </ItemGroup>
+
+    <ItemGroup>
+      <ProjectReference Include="..\..\..\Core\Contracts\Contracts.csproj" />
+      <ProjectReference Include="..\Analytics.Application\Analytics.Application.csproj" />
+    </ItemGroup>
+</Project>
