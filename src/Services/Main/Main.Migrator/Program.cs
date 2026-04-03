@@ -1,4 +1,4 @@
-﻿using Analytics.Persistence.Context;
+﻿using Main.Persistence.Context;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -15,7 +15,7 @@ builder.ConfigureServices((context, services) =>
     var connectionString = context.Configuration["ConnectionString"];
     services.AddDbContext<DContext>(
         options => options.UseNpgsql(connectionString, 
-            x => x.MigrationsAssembly("Analytics.Migrator")));
+            x => x.MigrationsAssembly("Main.Migrator")));
 });
 
 var host = builder.Build();
@@ -25,4 +25,4 @@ var db = scope.ServiceProvider.GetRequiredService<DContext>();
 
 await db.Database.MigrateAsync();
 
-Console.WriteLine("Analytics migrations applied successfully");
+Console.WriteLine("Main migrations applied successfully");
