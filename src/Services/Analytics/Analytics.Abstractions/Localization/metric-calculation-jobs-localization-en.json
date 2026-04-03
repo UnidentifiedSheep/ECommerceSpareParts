@@ -1,0 +1,7 @@
+﻿{
+  "locale": "en",
+  "keyValues": {
+    "metric.calculation.job.not.found": "Metric calculation job not found.",
+    "metric.calculation.job.metric.id.set.once": "Calculation job metric id can be set once."
+  }
+}

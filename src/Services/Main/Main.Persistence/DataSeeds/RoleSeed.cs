@@ -10,6 +10,7 @@ public class RoleSeed : ISeed<DContext>
     public async Task SeedAsync(DContext context)
     {
         var existingRoles = await context.Roles.Select(x => x.NormalizedName).ToHashSetAsync();
+        
         var roles = new[]
         {
             new Role { Name = "Admin", NormalizedName = "ADMIN", Description = "Administrator" },

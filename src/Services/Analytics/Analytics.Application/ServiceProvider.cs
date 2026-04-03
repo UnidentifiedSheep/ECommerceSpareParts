@@ -1,7 +1,9 @@
+using Abstractions.Interfaces;
 using Abstractions.Interfaces.Currency;
 using Analytics.Abstractions.Interfaces.Application;
-using Analytics.Application.MetricCalculators;
 using Analytics.Application.Services;
+using Analytics.Application.Services.Metrics;
+using Analytics.Application.Services.Metrics.Calculators;
 using Analytics.Entities.Metrics;
 using Application.Common.Behaviors;
 using Application.Common.Extensions;
@@ -19,6 +21,7 @@ public static class ServiceProvider
             .RegisterMetricCalculators()
             .RegisterCachePolicies(typeof(ServiceProvider).Assembly);
 
+        collection.AddSingleton<IJsonSerializer, JsonSerializer>();
         collection.AddSingleton<ICurrencyConverter, CurrencyConverter>(_ => new CurrencyConverter(Global.UsdId));
         collection.AddScoped<ICurrencyConverterSetup, CurrencyConverterSetup>();
 
@@ -39,7 +42,9 @@ public static class ServiceProvider
 
     private static IServiceCollection RegisterMetricCalculators(this IServiceCollection collection)
     {
+        collection.AddSingleton<IMetricCalculatorRegistry, MetricCalculatorRegistry>();
         collection.AddScoped<IMetricCalculatorFactory, MetricCalculatorFactory>();
+        collection.AddScoped<IMetricValidatorDispatcher, MetricValidatorDispatcher>();
 
         collection.AddScoped<IMetricCalculator<ArticleSalesMetric>, ArticleSalesMetricCalculator>();
         return collection;

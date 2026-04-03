@@ -1,7 +1,7 @@
 ﻿using Analytics.Abstractions.Interfaces.Application;
 using Analytics.Entities.Metrics;
 
-namespace Analytics.Application.MetricCalculators;
+namespace Analytics.Application.Services.Metrics.Calculators;
 
 public abstract class MetricCalculatorBase<T> : IMetricCalculator<T> where T : Metric
 {
