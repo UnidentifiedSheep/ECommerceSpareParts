@@ -1,0 +1,25 @@
+﻿services:
+  analytics.migrator:
+    image: analytics.migrator
+    build:
+      context: .
+      dockerfile: src/Services/Analytics/Analytics.Migrator/Dockerfile
+    environment:
+      - ConnectionString=Host=host.docker.internal;Port=5432;Database=analytics;Username=postgres;Password=PleasKillMe21
+
+  main.migrator:
+    image: main.migrator
+    build:
+      context: .
+      dockerfile: src/Services/Main/Main.Migrator/Dockerfile
+    environment:
+      - ConnectionString=Host=host.docker.internal;Port=5432;Database=main;Username=postgres;Password=PleasKillMe21
+
+  pricing.migrator:
+    image: pricing.migrator
+    build:
+      context: .
+      dockerfile: src/Services/Pricing/Pricing.Migrator/Dockerfile
+    environment:
+      - ConnectionString=Host=host.docker.internal;Port=5432;Database=pricing;Username=postgres;Password=PleasKillMe21
+
