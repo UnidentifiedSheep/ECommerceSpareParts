@@ -13,7 +13,7 @@ EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{120B2DB5-CC15-4A96-B757-B401B556F366}"
 	ProjectSection(SolutionItems) = preProject
 		README.md = README.md
-		.env = .env
+		.env.example = .env.example
 		prometheus.yml = prometheus.yml
 		compose.yaml = compose.yaml
 	EndProjectSection
