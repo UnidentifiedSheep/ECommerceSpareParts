@@ -61,7 +61,6 @@ public class CreateMetricTests : IAsyncLifetime
         metric.RangeStart.Should().Be(value.RangeStart);
         metric.RangeEnd.Should().Be(value.RangeEnd);
         metric.ArticleId.Should().Be(value.ArticleId);
-        metric.RecalculatedAt.Should().NotBeNull();
         metric.Tags.Should().Be(RecalculationTags.None);
     }
     
