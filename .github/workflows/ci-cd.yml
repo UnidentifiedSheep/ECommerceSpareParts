@@ -60,8 +60,8 @@ jobs:
         run: |
           echo "=== Collect images ==="
       
-          MIGRATOR_IMAGES=$(docker compose -f migrator-compose.yaml images -q)
-          APP_IMAGES=$(docker compose -f compose.yaml --env-file .env.example images -q)
+          MIGRATOR_IMAGES=$(docker compose -f migrator-compose.yaml config --images)
+          APP_IMAGES=$(docker compose -f compose.yaml --env-file .env.example config --images)
       
           ALL_IMAGES="$MIGRATOR_IMAGES $APP_IMAGES"
       
