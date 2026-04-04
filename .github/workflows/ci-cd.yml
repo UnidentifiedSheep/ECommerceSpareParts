@@ -88,25 +88,19 @@ jobs:
           docker save $APP_IMAGES | gzip > app-images.tar.gz
           ls -lh app-images.tar.gz
 
-      - name: Copy all files etc except /src
+      - name: Install rsync
+        run: sudo apt-get update && sudo apt-get install -y rsync
+        
+      - name: Copy all files except /src
         run: |
           echo "${{ secrets.VPS_SSH_KEY }}" > key.pem
           chmod 600 key.pem
-          
+
           rsync -avz \
             --exclude 'src/' \
             --exclude '.git/' \
             -e "ssh -i key.pem -o StrictHostKeyChecking=no" \
             ./ ${{ secrets.VPS_USER }}@${{ secrets.VPS_HOST }}:${{ secrets.VPS_PATH }}
-
-      - name: Copy to images VPS
-        uses: appleboy/scp-action@v0.1.7
-        with:
-          host: ${{ secrets.VPS_HOST }}
-          username: ${{ secrets.VPS_USER }}
-          key: ${{ secrets.VPS_SSH_KEY }}
-          source: "compose.yaml,migrator-compose.yaml,migrator-images.tar.gz,app-images.tar.gz"
-          target: ${{ secrets.VPS_PATH }}
 
       - name: Deploy on server
         uses: appleboy/ssh-action@v1.2.5
