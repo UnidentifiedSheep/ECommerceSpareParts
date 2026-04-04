@@ -1,0 +1,58 @@
+name: Deploy
+
+on:
+  push:
+    branches: [ "master" ]
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Build Migrator images
+        run: docker compose -f migrator-compose.yaml build
+
+      - name: Build Apps images
+        run: docker compose -f compose.yaml build
+
+      - name: Save all images
+        run: |
+          MIGRATOR_IMAGES=$(docker compose -f migrator-compose.yaml config --images)
+          APP_IMAGES=$(docker compose -f compose.yaml config --images)
+
+          docker save $MIGRATOR_IMAGES $APP_IMAGES | gzip > images.tar.gz
+
+      - name: Copy to VPS
+        uses: appleboy/scp-action@v1.0.0
+        with:
+          host: ${{ secrets.VPS_HOST }}
+          username: ${{ secrets.VPS_USER }}
+          key: ${{ secrets.VPS_SSH_KEY }}
+          source: "compose.yaml,migrator-compose.yaml,images.tar.gz"
+          target: ${{ secrets.VPS_PATH }}
+
+
+      - name: Deploy on server
+        uses: appleboy/ssh-action@v1.2.5
+        with:
+          host: ${{ secrets.VPS_HOST }}
+          username: ${{ secrets.VPS_USER }}
+          key: ${{ secrets.VPS_SSH_KEY }}
+          script: |
+            set -e
+
+            cd ${{ secrets.VPS_PATH }}
+
+            echo "=== Load images ==="
+            gunzip -c images.tar.gz | docker load
+
+            echo "=== Run migrators ==="
+            docker compose -f migrator-compose.yaml up --abort-on-container-exit
+
+            echo "=== Restart API ==="
+            docker compose -f compose.yaml up -d --force-recreate
+
+            echo "=== Done ==="
