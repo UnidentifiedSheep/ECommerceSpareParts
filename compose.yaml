@@ -84,7 +84,7 @@
       context: .
       dockerfile: src/Services/Gateway/Gateway/Dockerfile
     ports:
-      - "4004:7292"
+      - "443:7292"
     volumes:
       - ${CERTS_PATH}:/app/certs:ro
     environment:
