@@ -5,9 +5,9 @@
       context: .
       dockerfile: src/Services/Analytics/Analytics.Migrator/Dockerfile
     environment:
-      - ConnectionString=Host=${PGQL_HOST};Port=5432;Database=analytics;Username=${PGQL_USER};Password=${PGQL_PASSWORD}
-    networks:
-      - backend-network
+      - ConnectionString=Host=host.docker.internal;Port=5432;Database=analytics;Username=${PGQL_USER};Password=${PGQL_PASSWORD}
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
     
   main.migrator:
     image: main.migrator
@@ -15,9 +15,9 @@
       context: .
       dockerfile: src/Services/Main/Main.Migrator/Dockerfile
     environment:
-      - ConnectionString=Host=${PGQL_HOST};Port=5432;Database=main;Username=${PGQL_USER};Password=${PGQL_PASSWORD}
-    networks:
-      - backend-network
+      - ConnectionString=Host=host.docker.internal;Port=5432;Database=main;Username=${PGQL_USER};Password=${PGQL_PASSWORD}
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
     
   pricing.migrator:
     image: pricing.migrator
@@ -25,11 +25,6 @@
       context: .
       dockerfile: src/Services/Pricing/Pricing.Migrator/Dockerfile
     environment:
-      - ConnectionString=Host=${PGQL_HOST};Port=5432;Database=pricing;Username=${PGQL_USER};Password=${PGQL_PASSWORD}
-    networks:
-      - backend-network
-
-networks:
-  backend-network:
-    external: true
-    name: ecommercespareparts_backend-network
+      - ConnectionString=Host=host.docker.internal;Port=5432;Database=pricing;Username=${PGQL_USER};Password=${PGQL_PASSWORD}
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
