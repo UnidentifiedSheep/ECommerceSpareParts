@@ -71,7 +71,7 @@ jobs:
           fi
       
           echo "=== Saving images ==="
-          docker save $ALL_IMAGES -o images.tag | gzip > images.tar.gz
+          docker save $ALL_IMAGES | gzip > images.tar.gz
       
           ls -lh images.tar.gz
           
