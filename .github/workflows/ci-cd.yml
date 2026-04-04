@@ -120,7 +120,7 @@ jobs:
             docker compose up -d --no-build
             
             echo "=== Run migrators ==="
-            docker compose -f migrator-compose.yaml up --no-build --abort-on-container-exit
+            docker compose -f migrator-compose.yaml up --no-build
 
             echo "=== Load app images ==="
             gunzip -c app-images.tar.gz | docker load
