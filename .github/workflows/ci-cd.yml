@@ -58,11 +58,26 @@ jobs:
 
       - name: Save all images
         run: |
-          MIGRATOR_IMAGES=$(docker compose -f migrator-compose.yaml config --images)
-          APP_IMAGES=$(docker compose -f compose.yaml --env-file .env.example config --images)
-
-          docker save $MIGRATOR_IMAGES $APP_IMAGES | gzip > images.tar.gz
-
+          echo "=== Collect images ==="
+      
+          MIGRATOR_IMAGES=$(docker compose -f migrator-compose.yaml images -q)
+          APP_IMAGES=$(docker compose -f compose.yaml --env-file .env.example images -q)
+      
+          ALL_IMAGES="$MIGRATOR_IMAGES $APP_IMAGES"
+      
+          echo "Images:"
+          echo $ALL_IMAGES
+      
+          if [ -z "$ALL_IMAGES" ]; then
+            echo "No images found!"
+            exit 1
+          fi
+      
+          echo "=== Saving images ==="
+          docker save $ALL_IMAGES | gzip > images.tar.gz
+      
+          ls -lh images.tar.gz
+          
       - name: Copy to VPS
         uses: appleboy/scp-action@v0.1.7
         with:
