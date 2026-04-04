@@ -50,6 +50,7 @@
       - RABBITMQ_USERNAME=${RABBITMQ_DEFAULT_USER}
       - RABBITMQ_PASSWORD=${RABBITMQ_DEFAULT_PASS}
       - GATEWAY_SUPER_KEY=${GATEWAY_SUPER_KEY}
+      - LOKI_URL=http://${LOKI_HOST}:${LOKI_PORT}
     networks:
       - backend-network
 

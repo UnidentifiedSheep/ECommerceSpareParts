@@ -27,7 +27,7 @@ var builder = WebApplication.CreateBuilder(args);
 var lokiUrl = Environment.GetEnvironmentVariable("LOKI_URL");
 var env = Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT") ?? "unknown";
 
-builder.Host.AddLokiLogger(builder.Configuration, "main.api", env, lokiUrl);
+builder.Host.AddLokiLogger(builder.Configuration, "search.api", env, lokiUrl);
 
 builder.Services.AddOpenApi();
 builder.Services.AddEndpointsApiExplorer();
