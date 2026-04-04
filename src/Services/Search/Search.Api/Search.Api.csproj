@@ -29,4 +29,11 @@
       <ProjectReference Include="..\Search.Persistence\Search.Persistence.csproj" />
     </ItemGroup>
 
+    <ItemGroup>
+        <Content Include="..\Search.Abstractions\Localization\**\*">
+            <Link>Localization\%(RecursiveDir)%(Filename)%(Extension)</Link>
+            <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+            <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+        </Content>
+    </ItemGroup>
 </Project>

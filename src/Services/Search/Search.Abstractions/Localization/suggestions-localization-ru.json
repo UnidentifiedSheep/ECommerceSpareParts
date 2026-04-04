@@ -1,0 +1,8 @@
+﻿{
+  "locale": "ru",
+  "keyValues": {
+    "suggestion.already.rebuilding": "Процесс пересборки предложений уже запущен.",
+    "suggestion.search.query.empty": "Поисковый запрос для предложений не может быть пустым.",
+    "suggestion.search.limit.min": "Минимальное количество запрашиваемых предложений — 1."
+  }
+}

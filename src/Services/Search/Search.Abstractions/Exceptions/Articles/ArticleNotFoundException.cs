@@ -7,14 +7,12 @@ public class ArticleNotFoundException : NotFoundException, ILocalizableException
 {
     public ArticleNotFoundException(int id) : base(null, new { Id = id })
     {
-        MessageKey = "article.not.found";
     }
 
     public ArticleNotFoundException(IEnumerable<int> ids) : base(null, new { Ids = ids })
     {
-        MessageKey = "articles.not.found";
     }
 
-    public string MessageKey { get; }
+    public string MessageKey => "article.not.found";
     public object[]? Arguments => null;
 }

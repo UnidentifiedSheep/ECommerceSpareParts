@@ -9,10 +9,10 @@ public class SearchArticlesValidation : AbstractValidator<SearchArticlesQuery>
     {
         RuleFor(query => query.Query)
             .NotEmpty()
-            .WithLocalizationKey("");
+            .WithLocalizationKey("article.search.query.empty");
         
         RuleFor(query => query.Limit)
             .GreaterThan(0)
-            .WithLocalizationKey("");
+            .WithLocalizationKey("article.search.limit.min");
     }
 }

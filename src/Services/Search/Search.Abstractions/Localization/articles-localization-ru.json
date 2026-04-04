@@ -1,0 +1,8 @@
+﻿{
+  "locale": "ru",
+  "keyValues": {
+    "article.not.found": "Запрошенный артикул не найден.",
+    "article.search.query.empty": "Поисковый запрос для артикула не должен быть пустым.",
+    "article.search.limit.min": "Минимальное количество возвращаемых артикулов — 1."
+  }
+}
