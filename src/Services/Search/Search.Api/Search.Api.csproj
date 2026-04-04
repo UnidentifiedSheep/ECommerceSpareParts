@@ -5,12 +5,10 @@
         <Nullable>enable</Nullable>
         <ImplicitUsings>enable</ImplicitUsings>
         <InvariantGlobalization>true</InvariantGlobalization>
-        <PublishAot>true</PublishAot>
         <DockerDefaultTargetOS>Linux</DockerDefaultTargetOS>
     </PropertyGroup>
 
     <ItemGroup>
-        <PackageReference Include="Mediator.Abstractions" Version="3.1.0-preview.17"/>
         <PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="10.0.0"/>
     </ItemGroup>
 

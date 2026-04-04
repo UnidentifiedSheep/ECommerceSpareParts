@@ -5,7 +5,6 @@ using Api.Common.Middleware;
 using MassTransit;
 using RabbitMq.Extensions;
 using RabbitMq.Models;
-using Search.Api.Contexts;
 using Search.Api.EndPoints;
 using Search.Application;
 using Search.Application.Consumers;
@@ -40,12 +39,6 @@ builder.Services.AddMassTransit(x =>
     {
         cfg.ConfigureRabbitMq(brokerOptions);
 
-        cfg.ConfigureJsonSerializerOptions(options =>
-        {
-            options.TypeInfoResolverChain.Insert(0, AppJsonSerializerContext.Default);
-            return options;
-        });
-
         cfg.ReceiveEndpoint("search-queue", ep =>
         {
             ep.Durable = true;
@@ -73,10 +66,6 @@ builder.Services.AddPersistenceLayer(Environment.GetEnvironmentVariable("INDEX_F
 var secret = Environment.GetEnvironmentVariable("GATEWAY_SUPER_KEY")!;
 builder.Services.AddTransient<HeaderSecretMiddleware>(_ => new HeaderSecretMiddleware(secret));
 
-builder.Services.ConfigureHttpJsonOptions(options =>
-{
-    options.SerializerOptions.TypeInfoResolverChain.Insert(0, AppJsonSerializerContext.Default);
-});
 
 var app = builder.Build();
 
