@@ -54,12 +54,12 @@ jobs:
         run: docker compose -f migrator-compose.yaml build
 
       - name: Build Apps images
-        run: docker compose -f compose.yaml build
+        run: docker compose -f compose.yaml --env-file .env.example build
 
       - name: Save all images
         run: |
           MIGRATOR_IMAGES=$(docker compose -f migrator-compose.yaml config --images)
-          APP_IMAGES=$(docker compose -f compose.yaml config --images)
+          APP_IMAGES=$(docker compose -f compose.yaml --env-file .env.example config --images)
 
           docker save $MIGRATOR_IMAGES $APP_IMAGES | gzip > images.tar.gz
 
