@@ -90,9 +90,13 @@ jobs:
 
       - name: Copy all files etc except /src
         run: |
+          echo "${{ secrets.VPS_SSH_KEY }}" > key.pem
+          chmod 600 key.pem
+          
           rsync -avz \
             --exclude 'src/' \
-            -e "ssh -i ${{ secrets.VPS_SSH_KEY_PATH }} -o StrictHostKeyChecking=no" \
+            --exclude '.git/' \
+            -e "ssh -i key.pem -o StrictHostKeyChecking=no" \
             ./ ${{ secrets.VPS_USER }}@${{ secrets.VPS_HOST }}:${{ secrets.VPS_PATH }}
 
       - name: Copy to images VPS
