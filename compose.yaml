@@ -4,15 +4,9 @@
     build:
       context: .
       dockerfile: src/Services/Main/Main.Api/Dockerfile
-    ports:
-      - "4000:7292"
-      - "4001:8080"
-    volumes:
-      - ./certs:/app/certs:ro
+    expose:
+      - "8080"
     environment:
-      - ASPNETCORE_Kestrel__Certificates__Default__Path=${CERT_PATH}
-      - ASPNETCORE_Kestrel__Certificates__Default__Password=${CERT_PASSWORD}
-      - CERTS_PATH=${CERTS_PATH}
       - SEED_DB=${MAIN_SEED_DB}
       - SEED_ADMIN=${MAIN_SEED_ADMIN}
       - SEED_ADMIN_PASSWORD=${MAIN_SEED_ADMIN_PASSWORD}
@@ -31,7 +25,6 @@
       - S3_IMAGES_BUCKET=${MINIO_IMAGES_BUCKET}
       - GATEWAY_SUPER_KEY=${GATEWAY_SUPER_KEY}
       - SYSTEM_ID=${MAIN_SYSTEM_ID}
-      - USE_HTTPS_REDIRECTION=${MAIN_USE_HTTPS_REDIRECTION}
       - SIGN_SECRET=${MAIN_SIGN_SECRET}
       - LOKI_URL=http://${LOKI_HOST}:${LOKI_PORT}
     networks:
@@ -47,22 +40,16 @@
     build:
       context: .
       dockerfile: src/Services/Search/Search.Api/Dockerfile
-    ports:
-      - "4007:7292"
-      - "4008:8080"
+    expose:
+      - "8080"
     volumes:
-      - ./certs:/app/certs:ro
       - ./search_api_data:/app/data
     environment:
-      - ASPNETCORE_Kestrel__Certificates__Default__Path=${CERT_PATH}
-      - ASPNETCORE_Kestrel__Certificates__Default__Password=${CERT_PASSWORD}
-      - CERTS_PATH=${CERTS_PATH}
       - INDEX_FOLDER=/app/data
       - RABBITMQ_HOST=amqp://${RABBITMQ_HOST}:${RABBITMQ_PORT}
       - RABBITMQ_USERNAME=${RABBITMQ_DEFAULT_USER}
       - RABBITMQ_PASSWORD=${RABBITMQ_DEFAULT_PASS}
       - GATEWAY_SUPER_KEY=${GATEWAY_SUPER_KEY}
-      - USE_HTTPS_REDIRECTION=${SEARCH_USE_HTTPS_REDIRECTION}
     networks:
       - backend-network
 
@@ -71,22 +58,15 @@
     build:
       context: .
       dockerfile: src/Services/Pricing/Pricing.Api/Dockerfile
-    ports:
-      - "4005:7292"
-      - "4006:8080"
-    volumes:
-      - ./certs:/app/certs:ro
+    expose:
+      - "8080"
     environment:
-      - ASPNETCORE_Kestrel__Certificates__Default__Path=${CERT_PATH}
-      - ASPNETCORE_Kestrel__Certificates__Default__Password=${CERT_PASSWORD}
-      - CERTS_PATH=${CERTS_PATH}
       - REDIS_CONNECTION_STRING=${REDIS_HOST}:${REDIS_PORT},password=${REDIS_PASSWORD}
       - DB_CONNECTION_STRING=Host=${PGQL_HOST};Database=${PGQL_PRICING_DB};Username=${PGQL_USER};Password=${PGQL_PASSWORD}
       - RABBITMQ_HOST=amqp://${RABBITMQ_HOST}:${RABBITMQ_PORT}
       - RABBITMQ_USERNAME=${RABBITMQ_DEFAULT_USER}
       - RABBITMQ_PASSWORD=${RABBITMQ_DEFAULT_PASS}
       - GATEWAY_SUPER_KEY=${GATEWAY_SUPER_KEY}
-      - USE_HTTPS_REDIRECTION=${PRICING_USE_HTTPS_REDIRECTION}
       - SIGN_SECRET=${PRICING_SIGN_SECRET}
       - SEED_DB=${PRICING_SEED_DB}
       - LOKI_URL=http://${LOKI_HOST}:${LOKI_PORT}
@@ -106,11 +86,10 @@
     ports:
       - "4004:7292"
     volumes:
-      - ./certs:/app/certs:ro
+      - ${CERTS_PATH}:/app/certs:ro
     environment:
       - ASPNETCORE_Kestrel__Certificates__Default__Path=${CERT_PATH}
-      - ASPNETCORE_Kestrel__Certificates__Default__Password=${CERT_PASSWORD}
-      - CERTS_PATH=${CERTS_PATH}
+      - ASPNETCORE_Kestrel__Certificates__Default__KeyPath=${CERT_KEYPATH}
       - GATEWAY_SUPER_KEY=${GATEWAY_SUPER_KEY}
       - LOKI_URL=http://${LOKI_HOST}:${LOKI_PORT}
     networks:
@@ -122,15 +101,9 @@
     build:
       context: .
       dockerfile: src/Services/Analytics/Analytics.Api/Dockerfile
-    ports:
-      - "4002:7292"
-      - "4003:8080"
-    volumes:
-      - ./certs:/app/certs:ro
+    expose:
+      - "8080"
     environment:
-      - ASPNETCORE_Kestrel__Certificates__Default__Path=${CERT_PATH}
-      - ASPNETCORE_Kestrel__Certificates__Default__Password=${CERT_PASSWORD}
-      - CERTS_PATH=${CERTS_PATH}
       - REDIS_CONNECTION_STRING=${REDIS_HOST}:${REDIS_PORT},password=${REDIS_PASSWORD}
       - DB_CONNECTION_STRING=Host=${PGQL_HOST};Database=${PGQL_ANALYTICS_DB};Username=${PGQL_USER};Password=${PGQL_PASSWORD}
       - RABBITMQ_HOST=amqp://${RABBITMQ_HOST}:${RABBITMQ_PORT}
@@ -138,7 +111,6 @@
       - RABBITMQ_PASSWORD=${RABBITMQ_DEFAULT_PASS}
       - SEED_DB=${ANALYTICS_SEED_DB}
       - GATEWAY_SUPER_KEY=${GATEWAY_SUPER_KEY}
-      - USE_HTTPS_REDIRECTION=${ANALYTICS_USE_HTTPS_REDIRECTION}
       - LOKI_URL=http://${LOKI_HOST}:${LOKI_PORT}
     networks:
       - backend-network

@@ -38,10 +38,6 @@ var localesPath = Assembly.GetExecutingAssembly().GetDefaultLocalizationPath();
 
 var builder = WebApplication.CreateBuilder(args);
 
-var certsPath = Environment.GetEnvironmentVariable("CERTS_PATH");
-if (!string.IsNullOrWhiteSpace(certsPath))
-    Certs.RegisterCerts(certsPath);
-
 var lokiUrl = Environment.GetEnvironmentVariable("LOKI_URL");
 var env = Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT") ?? "unknown";
 
@@ -156,9 +152,6 @@ var app = builder.Build();
 //await app.LoadLocalesFromJson(localesPath); //NO locales for now. turn on in future.
 
 Pricing.Application.Configs.Mapster.Configure();
-
-if (Environment.GetEnvironmentVariable("USE_HTTPS_REDIRECTION") == "true")
-    app.UseHttpsRedirection();
 
 app.UseMiddleware<HeaderSecretMiddleware>();
 

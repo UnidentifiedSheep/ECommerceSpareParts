@@ -12,9 +12,6 @@ using Serilog;
 using Yarp.ReverseProxy.Transforms;
 
 var builder = WebApplication.CreateBuilder(args);
-var certsPath = Environment.GetEnvironmentVariable("CERTS_PATH");
-if (!string.IsNullOrWhiteSpace(certsPath))
-    Certs.RegisterCerts(certsPath);
 
 builder.Configuration.AddJsonFromDirectory("ReverseProxy");
 

@@ -22,9 +22,6 @@ using Security.Utils;
 var localesPath = Assembly.GetExecutingAssembly().GetDefaultLocalizationPath();
 
 var builder = WebApplication.CreateBuilder(args);
-var certsPath = Environment.GetEnvironmentVariable("CERTS_PATH");
-if (!string.IsNullOrWhiteSpace(certsPath))
-    Certs.RegisterCerts(certsPath);
 
 builder.Services.AddOpenApi();
 
@@ -133,8 +130,6 @@ await SetupCurrency(app.Services);
 
 if (app.Environment.IsDevelopment()) app.MapOpenApi();
 
-if (Environment.GetEnvironmentVariable("USE_HTTPS_REDIRECTION") == "true")
-    app.UseHttpsRedirection();
 
 app.MapHealthChecks("/health");
 
