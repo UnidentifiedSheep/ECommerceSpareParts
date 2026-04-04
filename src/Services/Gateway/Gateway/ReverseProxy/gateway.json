@@ -4,44 +4,44 @@
       "route-api": {
         "ClusterId": "main-cluster",
         "Match": {
-          "Path": "/api/main/{**catch-all}"
+          "Path": "/main/{**catch-all}"
         },
         "Transforms": [
           {
-            "PathRemovePrefix": "/api/main"
+            "PathRemovePrefix": "/main"
           }
         ]
       },
       "route-analytics": {
         "ClusterId": "analytics-cluster",
         "Match": {
-          "Path": "/api/analytics/{**catch-all}"
+          "Path": "/analytics/{**catch-all}"
         },
         "Transforms": [
           {
-            "PathRemovePrefix": "/api/analytics"
+            "PathRemovePrefix": "/analytics"
           }
         ]
       },
       "route-search": {
         "ClusterId": "search-cluster",
         "Match": {
-          "Path": "/api/search/{**catch-all}",
+          "Path": "/search/{**catch-all}",
         },
         "Transforms": [
           {
-            "PathRemovePrefix": "/api/search"
+            "PathRemovePrefix": "/search"
           }
         ]
       },
       "route-pricing": {
         "ClusterId": "pricing-cluster",
         "Match": {
-          "Path": "/api/pricing/{**catch-all}"
+          "Path": "/pricing/{**catch-all}"
         },
         "Transforms": [
           {
-            "PathRemovePrefix": "/api/pricing"
+            "PathRemovePrefix": "/pricing"
           }
         ]
       }

@@ -115,7 +115,9 @@ jobs:
 
             echo "=== Load migrator images ==="
             gunzip -c migrator-images.tar.gz | docker load
-
+            
+            docker network create backend-network
+            
             echo "=== Run migrators ==="
             docker compose -f migrator-compose.yaml up --no-build --abort-on-container-exit
 

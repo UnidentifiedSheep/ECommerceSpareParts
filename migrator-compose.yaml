@@ -24,6 +24,5 @@
       - ConnectionString=Host=pgql;Port=5432;Database=pricing;Username=postgres;Password=PleasKillMe21
 
 networks:
-  default:
-    external:
-      name: backend-network
+  backend-network:
+    external: true
