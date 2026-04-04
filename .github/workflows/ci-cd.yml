@@ -59,11 +59,8 @@ jobs:
       - name: Save all images
         run: |
           echo "=== Collect images ==="
-      
-          MIGRATOR_IMAGES=$(docker compose -f migrator-compose.yaml config --images)
-          APP_IMAGES=$(docker compose -f compose.yaml --env-file .env.example config --images)
-      
-          ALL_IMAGES="$MIGRATOR_IMAGES $APP_IMAGES"
+
+          ALL_IMAGES=$(docker images -q)
       
           echo "Images:"
           echo $ALL_IMAGES
