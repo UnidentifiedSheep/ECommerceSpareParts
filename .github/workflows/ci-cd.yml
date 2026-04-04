@@ -54,7 +54,7 @@ jobs:
         run: docker compose -f migrator-compose.yaml build
 
       - name: Build Apps images
-        run: docker compose -f compose.yaml --env-file .env.example build
+        run: docker compose -f compose-build.yaml --env-file .env.example build
 
       - name: Save all images
         run: |
@@ -81,7 +81,7 @@ jobs:
           host: ${{ secrets.VPS_HOST }}
           username: ${{ secrets.VPS_USER }}
           key: ${{ secrets.VPS_SSH_KEY }}
-          source: "compose.yaml,migrator-compose.yaml,images.tar.gz"
+          source: "compose.yaml,migrator-compose.yaml,compose-build.yaml,images.tar.gz"
           target: ${{ secrets.VPS_PATH }}
 
       - name: Deploy on server
