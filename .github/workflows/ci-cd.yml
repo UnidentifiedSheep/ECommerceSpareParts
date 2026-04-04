@@ -88,7 +88,14 @@ jobs:
           docker save $APP_IMAGES | gzip > app-images.tar.gz
           ls -lh app-images.tar.gz
 
-      - name: Copy to VPS
+      - name: Copy all files etc except /src
+        run: |
+          rsync -avz \
+            --exclude 'src/' \
+            -e "ssh -i ${{ secrets.VPS_SSH_KEY_PATH }} -o StrictHostKeyChecking=no" \
+            ./ ${{ secrets.VPS_USER }}@${{ secrets.VPS_HOST }}:${{ secrets.VPS_PATH }}
+
+      - name: Copy to images VPS
         uses: appleboy/scp-action@v0.1.7
         with:
           host: ${{ secrets.VPS_HOST }}
