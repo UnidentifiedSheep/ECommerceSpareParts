@@ -1,18 +1,18 @@
-﻿using Application.Common.Aot.Interfaces;
-using Sannr;
+﻿using FluentValidation;
+using Localization.Domain.Extensions;
 
 namespace Search.Application.Handler.Articles.GetSuggestions;
 
-public class GetSuggestionsValidation : IValidation<GetSuggestionsQuery>
+public class GetSuggestionsValidation : AbstractValidator<GetSuggestionsQuery>
 {
-    public Task<ValidationResult> ValidateAsync(GetSuggestionsQuery request)
+    public GetSuggestionsValidation()
     {
-        var validationResults = new ValidationResult();
-
-        if (string.IsNullOrWhiteSpace(request.Query))
-            validationResults.Add("Query", "Строка запроса не может быть пуста.");
-        if (request.Limit <= 0)
-            validationResults.Add("Limit", "Количество ожидаемых атодополнений должно быть больше 0");
-        return Task.FromResult(validationResults);
+        RuleFor(x => x.Query)
+            .NotEmpty()
+            .WithLocalizationKey("");
+        
+        RuleFor(x => x.Limit)
+            .GreaterThan(0)
+            .WithLocalizationKey("");
     }
 }

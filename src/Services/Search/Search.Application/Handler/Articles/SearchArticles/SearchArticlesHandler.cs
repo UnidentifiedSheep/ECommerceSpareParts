@@ -1,4 +1,4 @@
-﻿using Mediator;
+﻿using Application.Common.Interfaces;
 using Search.Abstractions.Dtos;
 using Search.Abstractions.Interfaces.Persistence;
 using Search.Application.Configs;
@@ -15,7 +15,7 @@ public record SearchArticlesResult(IReadOnlyList<ArticleDto> Articles, string? C
 public class SearchArticlesHandler(IArticleReadService readService)
     : IQueryHandler<SearchArticlesQuery, SearchArticlesResult>
 {
-    public ValueTask<SearchArticlesResult> Handle(SearchArticlesQuery query, CancellationToken cancellationToken)
+    public Task<SearchArticlesResult> Handle(SearchArticlesQuery query, CancellationToken cancellationToken)
     {
         IReadOnlyList<Article> articles;
         string? newCursor;
@@ -31,6 +31,6 @@ public class SearchArticlesHandler(IArticleReadService readService)
                 throw new ArgumentOutOfRangeException();
         }
 
-        return ValueTask.FromResult(new SearchArticlesResult(articles.ToDtos(), newCursor));
+        return Task.FromResult(new SearchArticlesResult(articles.ToDtos(), newCursor));
     }
 }

@@ -1,7 +1,7 @@
 ﻿using Abstractions.Interfaces.HostedServices;
 using Contracts.Search;
 using MassTransit;
-using Mediator;
+using MediatR;
 using Search.Application.Handler.Articles.IsSuggestionsRebuilding;
 using Search.Application.Handler.Articles.RebuildSuggestions;
 
