@@ -57,7 +57,7 @@ jobs:
         run: |
           echo "=== Migrator images ==="
 
-          MIGRATOR_IMAGES=$(docker images -q)
+          MIGRATOR_IMAGES=$(docker compose -f migrator-compose.yaml config --images | awk -F: 'NF==1 {print $0":latest"} NF>1 {print $0}')
 
           echo "$MIGRATOR_IMAGES"
 
@@ -69,9 +69,6 @@ jobs:
           docker save $MIGRATOR_IMAGES | gzip > migrator-images.tar.gz
           ls -lh migrator-images.tar.gz
 
-      - name: Cleanup Docker (after migrators)
-        run: docker system prune -af
-
       - name: Build App images
         run: docker compose -f compose.yaml --env-file .env.example build
 
@@ -79,7 +76,7 @@ jobs:
         run: |
           echo "=== App images ==="
 
-          APP_IMAGES=$(docker images -q)
+          APP_IMAGES=$(docker compose -f compose.yaml --env-file .env.example config --images | awk -F: 'NF==1 {print $0":latest"} NF>1 {print $0}')
 
           echo "$APP_IMAGES"
 
@@ -121,6 +118,6 @@ jobs:
             gunzip -c app-images.tar.gz | docker load
 
             echo "=== Restart app ==="
-            docker compose -f compose.yaml up --no-build -d --force-recreate
+            docker compose -f compose.yaml up -d --no-build --force-recreate
 
             echo "=== Done ==="
