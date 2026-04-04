@@ -16,9 +16,7 @@ public record UpdateCalculationJobCommand(
     Guid? MetricId) : ICommand<UpdateCalculationJobResult>;
 public record UpdateCalculationJobResult(MetricCalculationJob CalculationJob);
 
-public class UpdateCalculationJobHandler(
-    IMetricCalculationJobRepository jobRepository,
-    IUnitOfWork unitOfWork)
+public class UpdateCalculationJobHandler(IMetricCalculationJobRepository jobRepository)
     : ICommandHandler<UpdateCalculationJobCommand, UpdateCalculationJobResult>
 {
     public async Task<UpdateCalculationJobResult> Handle(UpdateCalculationJobCommand request, CancellationToken cancellationToken)
@@ -31,13 +29,12 @@ public class UpdateCalculationJobHandler(
         var job = await jobRepository.GetCalculationJob(queryOptions, cancellationToken)
                   ?? throw new CalculationJobNotFoundException(request.RequestId);
 
-        if (job.MetricId != null && request.MetricId != null)
+        if (job.MetricId != null && request.MetricId != null && job.MetricId != request.MetricId)
             throw new CalculationJobMetricIdUpdateException();
 
         job.MetricId = request.MetricId;
         job.Status = request.Status;
 
-        await unitOfWork.SaveChangesAsync(cancellationToken);
         return new UpdateCalculationJobResult(job);
     }
 }

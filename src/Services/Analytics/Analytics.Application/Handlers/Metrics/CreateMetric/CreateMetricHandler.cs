@@ -31,7 +31,6 @@ public class CreateMetricHandler(
         await validatorDispatcher.ValidateAsync(metricType, metric, cancellationToken);
 
         await unitOfWork.AddAsync(metric, cancellationToken);
-        await unitOfWork.SaveChangesAsync(cancellationToken);
         
         return new CreateMetricResult(metric);
     }
