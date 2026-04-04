@@ -1,6 +1,9 @@
 ﻿services:
   main.api:
     image: main.api
+    build:
+      context: .
+      dockerfile: src/Services/Main/Main.Api/Dockerfile
     expose:
       - "8080"
     environment:
@@ -34,6 +37,9 @@
 
   search.api:
     image: search.api
+    build:
+      context: .
+      dockerfile: src/Services/Search/Search.Api/Dockerfile
     expose:
       - "8080"
     volumes:
@@ -49,6 +55,9 @@
 
   pricing.api:
     image: pricing.api
+    build:
+      context: .
+      dockerfile: src/Services/Pricing/Pricing.Api/Dockerfile
     expose:
       - "8080"
     environment:
@@ -71,6 +80,9 @@
 
   gateway:
     image: gateway
+    build:
+      context: .
+      dockerfile: src/Services/Gateway/Gateway/Dockerfile
     ports:
       - "4004:7292"
     volumes:
@@ -86,6 +98,9 @@
 
   analytics.api:
     image: analytics.api
+    build:
+      context: .
+      dockerfile: src/Services/Analytics/Analytics.Api/Dockerfile
     expose:
       - "8080"
     environment:
@@ -108,6 +123,9 @@
 
   pgql:
     image: postgres-cron
+    build:
+      context: .
+      dockerfile: .dockerfiles/pgql-cron/Dockerfile
     environment:
       POSTGRES_USER: ${PGQL_USER}
       POSTGRES_PASSWORD: ${PGQL_PASSWORD}
