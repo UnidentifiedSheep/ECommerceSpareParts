@@ -1,19 +1,18 @@
-﻿using Application.Common.Aot.Interfaces;
-using Sannr;
+﻿using FluentValidation;
+using Localization.Domain.Extensions;
 
 namespace Search.Application.Handler.Articles.SearchArticles;
 
-public class SearchArticlesValidation : IValidation<SearchArticlesQuery>
+public class SearchArticlesValidation : AbstractValidator<SearchArticlesQuery>
 {
-    public Task<ValidationResult> ValidateAsync(SearchArticlesQuery request)
+    public SearchArticlesValidation()
     {
-        var validationResults = new ValidationResult();
-
-        if (string.IsNullOrWhiteSpace(request.Query))
-            validationResults.Add("Query", "Строка запроса не может быть пуста.");
-        if (request.Limit is <= 0 or > 100)
-            validationResults.Add("Limit", "Количество ожидаемых артикулов должно быть больше 0 и не больше 100.");
-
-        return Task.FromResult(validationResults);
+        RuleFor(query => query.Query)
+            .NotEmpty()
+            .WithLocalizationKey("article.search.query.empty");
+        
+        RuleFor(query => query.Limit)
+            .GreaterThan(0)
+            .WithLocalizationKey("article.search.limit.min");
     }
 }

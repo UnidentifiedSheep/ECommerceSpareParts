@@ -1,4 +1,5 @@
-﻿using Mediator;
+﻿using Application.Common.Interfaces;
+using MediatR;
 using Search.Abstractions.Dtos;
 using Search.Abstractions.Interfaces.Persistence;
 using Search.Application.Configs;
@@ -9,10 +10,10 @@ public record AddArticleCommand(ArticleDto Article) : ICommand;
 
 internal class AddArticleHandler(IArticleWriteService articleWriteService) : ICommandHandler<AddArticleCommand>
 {
-    public ValueTask<Unit> Handle(AddArticleCommand request, CancellationToken cancellationToken)
+    public Task<Unit> Handle(AddArticleCommand request, CancellationToken cancellationToken)
     {
         var article = request.Article.ToArticle();
         articleWriteService.Add(article);
-        return Unit.ValueTask;
+        return Unit.Task;
     }
 }

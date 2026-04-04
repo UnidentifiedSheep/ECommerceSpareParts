@@ -118,8 +118,8 @@ builder.Services
     .AddAppCacheLayer()
     .AddJsonSigner(Environment.GetEnvironmentVariable("SIGN_SECRET")!, Global.JsonOptions)
     .AddMinimalSecurityLayer()
-    .AddApplicationLayer()
     .AddCommonLayer()
+    .AddApplicationLayer()
     .AddLocalization(defaultLocale, locales);
 
 
@@ -157,6 +157,9 @@ var app = builder.Build();
 
 Pricing.Application.Configs.Mapster.Configure();
 
+if (Environment.GetEnvironmentVariable("USE_HTTPS_REDIRECTION") == "true")
+    app.UseHttpsRedirection();
+
 app.UseMiddleware<HeaderSecretMiddleware>();
 
 app.UseMiddleware<ScopedLocalizationMiddleware>();
@@ -166,8 +169,6 @@ app.UseForwardedHeaders(new ForwardedHeadersOptions
     ForwardedHeaders = ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto
 });
 
-if (Environment.GetEnvironmentVariable("USE_HTTPS_REDIRECTION") == "true")
-    app.UseHttpsRedirection();
 
 if (Environment.GetEnvironmentVariable("SEED_DB") == "true")
     await app.SeedAsync<DContext>();

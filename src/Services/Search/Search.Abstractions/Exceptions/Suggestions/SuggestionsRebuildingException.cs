@@ -1,10 +1,11 @@
-﻿using Exceptions.Base;
+﻿using Abstractions.Interfaces.Exceptions;
+using Exceptions.Base;
 
 namespace Search.Abstractions.Exceptions.Suggestions;
 
-public class SuggestionsRebuildingException : ConflictException
+public class SuggestionsRebuildingException() 
+    : ConflictException(null), ILocalizableException
 {
-    public SuggestionsRebuildingException() : base("Автодополнение в процессе перестраивания.")
-    {
-    }
+    public string MessageKey => "suggestion.already.rebuilding";
+    public object[]? Arguments => null;
 }

@@ -1,4 +1,4 @@
-﻿using Mediator;
+﻿using Application.Common.Interfaces;
 using Search.Abstractions.Exceptions.Suggestions;
 using Search.Abstractions.Interfaces.Persistence;
 
@@ -11,12 +11,12 @@ public record IsSuggestionsRebuildingResult(bool IsRebuilding);
 public class IsSuggestionsRebuildingHandler(IArticleSuggestionService suggestionService)
     : IQueryHandler<IsSuggestionsRebuildingQuery, IsSuggestionsRebuildingResult>
 {
-    public ValueTask<IsSuggestionsRebuildingResult> Handle(
+    public Task<IsSuggestionsRebuildingResult> Handle(
         IsSuggestionsRebuildingQuery query,
         CancellationToken cancellationToken)
     {
         var rebuilding = suggestionService.IsRebuildingNow();
         if (rebuilding && query.ThrowOnRebuilding) throw new SuggestionsRebuildingException();
-        return ValueTask.FromResult(new IsSuggestionsRebuildingResult(rebuilding));
+        return Task.FromResult(new IsSuggestionsRebuildingResult(rebuilding));
     }
 }

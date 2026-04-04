@@ -1,13 +1,12 @@
-﻿using Application.Common.Aot.Interfaces;
-using Sannr;
+﻿using FluentValidation;
 using Search.Abstractions.Dtos;
 
 namespace Search.Application.Handler.Articles.AddArticle;
 
-public class AddArticleValidation : IValidation<AddArticleCommand>
+public class AddArticleValidation : AbstractValidator<AddArticleCommand>
 {
-    public Task<ValidationResult> ValidateAsync(AddArticleCommand request)
+    public AddArticleValidation()
     {
-        return ArticleDto.ValidateAsync(request.Article);
+        
     }
 }

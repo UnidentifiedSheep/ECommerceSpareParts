@@ -1,0 +1,8 @@
+﻿{
+  "locale": "en",
+  "keyValues": {
+    "article.not.found": "Requested article not found.",
+    "article.search.query.empty": "Article search query mustn't be empty.",
+    "article.search.limit.min": "Minimum article return count is 1"
+  }
+}

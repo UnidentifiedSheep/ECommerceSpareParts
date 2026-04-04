@@ -1,10 +1,6 @@
-﻿using Application.Common.Aot.Behaviors;
-using Application.Common.Aot.Interfaces;
-using Mediator;
+﻿using Application.Common.Behaviors;
+using FluentValidation;
 using Microsoft.Extensions.DependencyInjection;
-using Sannr.AspNetCore;
-using Search.Application.Handler.Articles.AddArticle;
-using Search.Application.Handler.Articles.GetSuggestions;
 using Search.Application.Handler.Articles.SearchArticles;
 
 namespace Search.Application;
@@ -13,23 +9,18 @@ public static class ServiceProvider
 {
     public static IServiceCollection AddApplicationLayer(this IServiceCollection services)
     {
-        services.AddMediator();
-        services.AddSannr();
-
-        //Add article command
-        services
-            .AddTransient<IPipelineBehavior<AddArticleCommand, Unit>, ValidationBehavior<AddArticleCommand, Unit>>();
-        services.AddTransient<IValidation<AddArticleCommand>, AddArticleValidation>();
-
-        //Get suggestions query
-        services.AddTransient<IPipelineBehavior<GetSuggestionsQuery, GetSuggestionsResult>,
-            ValidationBehavior<GetSuggestionsQuery, GetSuggestionsResult>>();
-        services.AddTransient<IValidation<GetSuggestionsQuery>, GetSuggestionsValidation>();
-
-        //Search Articles query
-        services.AddTransient<IPipelineBehavior<SearchArticlesQuery, SearchArticlesResult>,
-            ValidationBehavior<SearchArticlesQuery, SearchArticlesResult>>();
-        services.AddTransient<IValidation<SearchArticlesQuery>, SearchArticlesValidation>();
+        services.AddValidatorsFromAssembly(typeof(SearchArticlesHandler).Assembly);
+        
+        services.AddMediatR(config =>
+        {
+            config.RegisterServicesFromAssembly(typeof(SearchArticlesHandler).Assembly);
+            config.AddOpenBehavior(typeof(ValidationBehavior<,>));
+            config.AddOpenBehavior(typeof(LoggingBehavior<,>));
+            config.AddOpenBehavior(typeof(RequestsDataLoggingBehavior<,>));
+            config.AddOpenBehavior(typeof(CacheBehavior<,>));
+            config.AddOpenBehavior(typeof(TransactionBehavior<,>), ServiceLifetime.Scoped);
+            config.AddOpenBehavior(typeof(DbValidationBehavior<,>), ServiceLifetime.Scoped);
+        });
 
         return services;
     }

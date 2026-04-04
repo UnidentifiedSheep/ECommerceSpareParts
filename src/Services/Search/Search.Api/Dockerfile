@@ -7,16 +7,9 @@ EXPOSE 7292
 ENV ASPNETCORE_URLS=http://+:8080;https://+:7292
 ENV TZ=Europe/Moscow
 
-RUN mkdir -p /app/data && chown -R app:app /app/data
-
 FROM mcr.microsoft.com/dotnet/sdk:10.0 AS build
 ARG BUILD_CONFIGURATION=Release
 WORKDIR /src
-
-RUN apt-get update && \
-    apt-get install -y --no-install-recommends clang libc6-dev build-essential && \
-    rm -rf /var/lib/apt/lists/*
-
 COPY ["src/Services/Search/Search.Api/Search.Api.csproj", "src/Services/Search/Search.Api/"]
 COPY ["src/Infrastructure/RabbitMq/RabbitMq.csproj", "src/Infrastructure/RabbitMq/"]
 COPY ["src/Infrastructure/Security/Security.csproj", "src/Infrastructure/Security/"]
@@ -35,30 +28,17 @@ COPY ["src/Services/Search/Search.Entities/Search.Entities.csproj", "src/Service
 COPY ["src/Services/Search/Search.Enums/Search.Enums.csproj", "src/Services/Search/Search.Enums/"]
 COPY ["src/Services/Search/Search.Application/Search.Application.csproj", "src/Services/Search/Search.Application/"]
 COPY ["src/Core/Contracts/Contracts.csproj", "src/Core/Contracts/"]
-COPY ["src/Services/Application.Common.Aot/Application.Common.Aot.csproj", "src/Services/Application.Common.Aot/"]
 COPY ["src/Services/Search/Search.Persistence/Search.Persistence.csproj", "src/Services/Search/Search.Persistence/"]
-RUN dotnet restore "Search.Api/Search.Api.csproj"
+RUN dotnet restore "src/Services/Search/Search.Api/Search.Api.csproj"
 COPY . .
-
-WORKDIR "/src/Search.Api"
-
+WORKDIR "/src/src/Services/Search/Search.Api"
 RUN dotnet build "./Search.Api.csproj" -c $BUILD_CONFIGURATION -o /app/build
 
 FROM build AS publish
 ARG BUILD_CONFIGURATION=Release
-
-RUN dotnet publish "./Search.Api.csproj" \
-    -c $BUILD_CONFIGURATION \
-    -r linux-x64 \
-    -p:PublishAot=true \
-    -p:SelfContained=true \
-    -p:PublishTrimmed=true \
-    -p:TrimMode=Link \
-    -p:StripSymbols=true \
-    -o /app/publish
+RUN dotnet publish "./Search.Api.csproj" -c $BUILD_CONFIGURATION -o /app/publish /p:UseAppHost=false
 
 FROM base AS final
 WORKDIR /app
-
 COPY --from=publish /app/publish .
-ENTRYPOINT ["sh", "-c", "chown -R $APP_UID:$APP_UID /app/data && exec ./Search.Api"]
+ENTRYPOINT ["dotnet", "Search.Api.dll"]

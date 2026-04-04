@@ -1,0 +1,8 @@
+﻿{
+  "locale": "en",
+  "keyValues": {
+    "suggestion.already.rebuilding": "Suggestions are already started rebuilding process.",
+    "suggestion.search.query.empty": "Suggestions search query can not be empty.",
+    "suggestion.search.limit.min": "The minimal count of requested suggestions is 1."
+  }
+}
