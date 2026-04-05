@@ -24,6 +24,7 @@ public class DbValidationExceptionHandler(
             problemDetails,
             dbValidationException);
 
+        httpContext.Response.StatusCode = problemDetails.Status ?? StatusCodes.Status500InternalServerError;
         await httpContext.Response.WriteAsJsonAsync(problemDetails, cancellationToken);
         return true;
     }

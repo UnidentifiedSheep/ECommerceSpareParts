@@ -21,6 +21,7 @@ public class ValidationExceptionHandler(
         var problemDetails = GetBaseDetails(validationException, httpContext, 400);
         AddValidationErrors(httpContext, problemDetails, validationException);
 
+        httpContext.Response.StatusCode = 400;
         await httpContext.Response.WriteAsJsonAsync(problemDetails, cancellationToken);
         return true;
     }

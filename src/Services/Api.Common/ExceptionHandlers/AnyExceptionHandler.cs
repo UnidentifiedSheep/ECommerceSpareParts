@@ -18,6 +18,7 @@ public class AnyExceptionHandler(
         SetLocalizedDetail(problemDetails, httpContext, exception);
         AddExceptionRelatedData(problemDetails, exception);
 
+        httpContext.Response.StatusCode = statusCode;
         await httpContext.Response.WriteAsJsonAsync(problemDetails, cancellationToken);
         return true;
     }
