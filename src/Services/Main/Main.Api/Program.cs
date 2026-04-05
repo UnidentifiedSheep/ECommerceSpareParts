@@ -14,6 +14,9 @@ using Contracts.Settings;
 using ExchangeRate;
 using Hangfire;
 using Hangfire.PostgreSql;
+using Localization.Abstractions.Models;
+using Localization.Domain.Extensions;
+using Localization.Domain.Middlewares;
 using Mail;
 using Main.Abstractions.Constants;
 using Main.Api.EndPoints.Articles;
@@ -118,6 +121,12 @@ builder.Services.AddMassTransit(x =>
     });
 });
 
+var localesPath = Assembly.GetExecutingAssembly().GetDefaultLocalizationPath();
+Locale[] locales = ["ru-RU", "en-EN"];
+Locale defaultLocale = "ru-RU";
+
+builder.Services.AddLocalization(defaultLocale, locales);
+
 builder.Services.AddHttpContextAccessor();
 
 builder.Services
@@ -179,6 +188,8 @@ SortByConfig.Configure();
 
 app.UseMiddleware<HeaderSecretMiddleware>();
 
+app.UseMiddleware<ScopedLocalizationMiddleware>();
+
 app.UseForwardedHeaders(new ForwardedHeadersOptions
 {
     ForwardedHeaders = ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto
@@ -190,6 +201,7 @@ Global.SetImageBucketName(Environment.GetEnvironmentVariable("S3_IMAGES_BUCKET")
 
 app.UseHangfireDashboard();
 
+await app.LoadLocalesFromJson(localesPath);
 await InitCurrencyConverter(app.Services);
 await InitSettings(app.Services);
 
