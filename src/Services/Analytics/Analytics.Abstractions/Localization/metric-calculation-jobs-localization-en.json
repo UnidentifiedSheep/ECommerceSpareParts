@@ -2,6 +2,7 @@
   "locale": "en",
   "keyValues": {
     "metric.calculation.job.not.found": "Metric calculation job not found.",
-    "metric.calculation.job.metric.id.set.once": "Calculation job metric id can be set once."
+    "metric.calculation.job.metric.id.set.once": "Calculation job metric id can be set once.",
+    "failed.creating.metric": "Failed to create metric, check if data is valid."
   }
 }

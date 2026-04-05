@@ -1,5 +1,6 @@
 using Abstractions.Interfaces;
 using Abstractions.Interfaces.Services;
+using Abstractions.Models;
 using Analytics.Abstractions.Interfaces.DbRepositories;
 using Analytics.Persistence.Context;
 using Analytics.Persistence.DataSeeds;
@@ -8,6 +9,7 @@ using BulkValidation.Pgsql.Extensions;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Persistence.DbValidator;
+using Persistence.Extensions;
 using Persistence.Interfaces;
 using Persistence.Services.UnitOfWork;
 
@@ -19,7 +21,7 @@ public static class ServiceProvider
     {
         collection.AddDbContext<DContext>(options => options.UseNpgsql(connectionString));
 
-        collection.AddScoped<IUnitOfWork, UnitOfWork<DContext>>();
+        collection.AddUnitOfWork<DContext>();
 
         collection.AddScoped<IMetricRepository, MetricRepository>();
         collection.AddScoped<ICurrencyRepository, CurrencyRepository>();

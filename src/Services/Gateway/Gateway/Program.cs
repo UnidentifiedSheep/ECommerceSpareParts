@@ -1,14 +1,11 @@
 using System.Security.Claims;
 using System.Text;
 using Api.Common.Extensions;
-using Api.Common.Logging;
 using Gateway.Extensions;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.IdentityModel.Tokens;
 using OpenTelemetry.Metrics;
-using Security.Utils;
-using Serilog;
 using Yarp.ReverseProxy.Transforms;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -55,7 +52,10 @@ builder.Services.AddAuthorizationBuilder()
         .RequireAuthenticatedUser()
         .Build());
 
-var secret = Environment.GetEnvironmentVariable("GATEWAY_SUPER_KEY");
+var secret = builder.Configuration["HeaderSecret:Key"];
+
+if (secret == null)
+    throw new ArgumentNullException(nameof(secret), "HeaderSecret:Key cannot be null.");
 
 builder.Services.AddReverseProxy()
     .LoadFromConfig(builder.Configuration.GetSection("ReverseProxy"))

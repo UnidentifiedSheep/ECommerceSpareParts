@@ -1,7 +1,7 @@
 ﻿using Analytics.Abstractions.Interfaces.Application;
 using FluentValidation;
 
-namespace Analytics.Application.Services.Metrics;
+namespace Analytics.Application.Services.Metrics.Validators;
 
 public class MetricValidatorDispatcher(IServiceProvider provider) : IMetricValidatorDispatcher
 {

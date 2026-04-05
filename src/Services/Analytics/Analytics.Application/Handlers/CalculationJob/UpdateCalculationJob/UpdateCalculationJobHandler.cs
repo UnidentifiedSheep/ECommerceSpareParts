@@ -1,24 +1,26 @@
-﻿using Abstractions.Interfaces.Services;
-using Abstractions.Models.Repository;
+﻿using Abstractions.Models.Repository;
 using Analytics.Abstractions.Exceptions.MetricCalculationJobs;
 using Analytics.Abstractions.Interfaces.DbRepositories;
 using Analytics.Entities;
 using Analytics.Enums;
 using Application.Common.Interfaces;
 using Attributes;
+using Localization.Abstractions.Interfaces;
 
 namespace Analytics.Application.Handlers.CalculationJob.UpdateCalculationJob;
 
+[AutoSave]
 [Transactional]
 public record UpdateCalculationJobCommand(
     Guid RequestId, 
     CalculationStatus Status,
-    Guid? MetricId) : ICommand<UpdateCalculationJobResult>;
+    Guid? MetricId,
+    string? ErrorMessageKey) : ICommand<UpdateCalculationJobResult>;
 public record UpdateCalculationJobResult(MetricCalculationJob CalculationJob);
 
 public class UpdateCalculationJobHandler(
     IMetricCalculationJobRepository jobRepository,
-    IUnitOfWork unitOfWork)
+    IScopedStringLocalizer localizer)
     : ICommandHandler<UpdateCalculationJobCommand, UpdateCalculationJobResult>
 {
     public async Task<UpdateCalculationJobResult> Handle(UpdateCalculationJobCommand request, CancellationToken cancellationToken)
@@ -31,13 +33,14 @@ public class UpdateCalculationJobHandler(
         var job = await jobRepository.GetCalculationJob(queryOptions, cancellationToken)
                   ?? throw new CalculationJobNotFoundException(request.RequestId);
 
-        if (job.MetricId != null && request.MetricId != null)
+        if (job.MetricId != null && request.MetricId != null && job.MetricId != request.MetricId)
             throw new CalculationJobMetricIdUpdateException();
 
         job.MetricId = request.MetricId;
         job.Status = request.Status;
+        if (request.ErrorMessageKey != null)
+            job.ErrorMessage = localizer[request.ErrorMessageKey];
 
-        await unitOfWork.SaveChangesAsync(cancellationToken);
         return new UpdateCalculationJobResult(job);
     }
 }

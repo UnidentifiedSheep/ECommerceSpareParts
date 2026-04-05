@@ -4,6 +4,7 @@ using BulkValidation.Pgsql.Extensions;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Persistence.DbValidator;
+using Persistence.Extensions;
 using Persistence.Services.UnitOfWork;
 using Pricing.Abstractions.Interfaces.DbRepositories;
 using Pricing.Persistence.Contexts;
@@ -20,7 +21,7 @@ public static class ServiceProvider
         collection.AddScoped<IMarkupRepository, MarkupRepository>();
         collection.AddScoped<ISettingsRepository, SettingsRepository>();
 
-        collection.AddScoped<IUnitOfWork, UnitOfWork<DContext>>();
+        collection.AddUnitOfWork<DContext>();
 
         collection.AddScoped<IDbValidator, PgsqlDbValidator<DContext>>();
         collection.AddPgsqlDbValidators<DContext>();
