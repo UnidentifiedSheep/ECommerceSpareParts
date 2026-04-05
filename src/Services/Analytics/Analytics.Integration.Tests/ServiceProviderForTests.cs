@@ -48,7 +48,6 @@ public static class ServiceProviderForTests
         services.RegisterTestContexts();
 
         services.AddTransient<IPublishEndpoint, MessageBrokerStub>();
-        MapsterConfig.Configure();
 
         var serviceProvider = services.BuildServiceProvider();
         _serviceProvider = serviceProvider;

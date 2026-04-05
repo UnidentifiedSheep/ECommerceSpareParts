@@ -2,7 +2,7 @@
 using Analytics.Entities.Metrics;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace Analytics.Application.Services.Metrics;
+namespace Analytics.Application.Services.Metrics.Calculators;
 
 public class MetricCalculatorFactory(IServiceProvider provider) : IMetricCalculatorFactory
 {

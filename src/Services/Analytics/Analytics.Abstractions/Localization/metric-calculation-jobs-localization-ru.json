@@ -2,6 +2,7 @@
   "locale": "ru",
   "keyValues": {
     "metric.calculation.job.not.found": "Не удалось найти запись о задаче расчета метрики.",
-    "metric.calculation.job.metric.id.set.once": "Идентификатор метрики может быть установлен только единожды в задаче расчета метрики."
+    "metric.calculation.job.metric.id.set.once": "Идентификатор метрики может быть установлен только единожды в задаче расчета метрики.",
+    "failed.creating.metric": "Не удалось создать метрику, проверьте корректность данных."
   }
 }

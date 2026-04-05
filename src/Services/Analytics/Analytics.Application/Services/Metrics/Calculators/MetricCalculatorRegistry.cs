@@ -3,7 +3,7 @@ using Analytics.Abstractions.Interfaces.Application;
 using Analytics.Attributes;
 using Analytics.Entities.Metrics;
 
-namespace Analytics.Application.Services.Metrics;
+namespace Analytics.Application.Services.Metrics.Calculators;
 
 public class MetricCalculatorRegistry : IMetricCalculatorRegistry
 {

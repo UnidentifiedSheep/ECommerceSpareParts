@@ -7,6 +7,7 @@ using Analytics.Persistence.Context;
 using Api.Common;
 using Api.Common.Extensions;
 using Api.Common.Middleware;
+using Api.Common.Models;
 using Carter;
 using Localization.Abstractions.Models;
 using Localization.Domain.Extensions;
@@ -30,18 +31,16 @@ var env = Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT") ?? "unkno
 
 builder.Host.AddLokiLogger(builder.Configuration, "analytics.api", env, lokiUrl);
 
-builder.Services.AddPersistenceLayer(Environment.GetEnvironmentVariable("DB_CONNECTION_STRING")!)
+builder.Services
+    .AddPersistenceLayer(Environment.GetEnvironmentVariable("DB_CONNECTION_STRING")!)
     .AddCacheLayer(Environment.GetEnvironmentVariable("REDIS_CONNECTION_STRING")!, "analytics")
     .AddApplicationLayer()
     .AddMinimalSecurityLayer();
 
-var brokerOptions = new MessageBrokerOptions
-{
-    Host = Environment.GetEnvironmentVariable("RABBITMQ_HOST")!,
-    Username = Environment.GetEnvironmentVariable("RABBITMQ_DEFAULT_USER")!,
-    Password = Environment.GetEnvironmentVariable("RABBITMQ_DEFAULT_PASS")!
-};
-builder.Services.AddSingleton(brokerOptions);
+builder.Services.AddOptions<HeaderSecretOptions>()
+    .BindConfiguration(HeaderSecretOptions.SectionName)
+    .ValidateDataAnnotations()
+    .ValidateOnStart();
 
 Locale[] locales = ["ru-RU", "en-EN"];
 Locale defaultLocale = "ru-RU";
@@ -49,6 +48,16 @@ Locale defaultLocale = "ru-RU";
 builder.Services.AddLocalization(defaultLocale, locales);
 
 builder.Services.AddHttpContextAccessor();
+
+builder.Services.AddOptions<MessageBrokerOptions>()
+    .BindConfiguration(MessageBrokerOptions.SectionName)
+    .ValidateDataAnnotations()
+    .ValidateOnStart();
+
+var brokerOptions = builder.Configuration
+                        .GetSection(MessageBrokerOptions.SectionName)
+                        .Get<MessageBrokerOptions>()
+                    ?? throw new NullReferenceException($"Missing {MessageBrokerOptions.SectionName} configuration options");
 
 var uniqQueueName = $"queue-of-analytics-{Environment.MachineName}";
 
@@ -104,8 +113,7 @@ builder.Services.AddCors(options =>
 builder.Services.AddCarter();
 builder.Services.AddBaseExceptionHandlers();
 
-var secret = Environment.GetEnvironmentVariable("GATEWAY_SUPER_KEY")!;
-builder.Services.AddTransient<HeaderSecretMiddleware>(_ => new HeaderSecretMiddleware(secret));
+builder.Services.AddTransient<HeaderSecretMiddleware>();
 
 var app = builder.Build();
 

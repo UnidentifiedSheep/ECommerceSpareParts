@@ -30,6 +30,6 @@ public class CalculateMetricHandler(
         
         await calculator.CalculateMetric(metric, cancellationToken);
         
-        return new  CalculateMetricResult(metric);
+        return new CalculateMetricResult(metric);
     }
 }

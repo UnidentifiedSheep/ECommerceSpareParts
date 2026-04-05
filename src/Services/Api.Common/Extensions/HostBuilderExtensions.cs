@@ -14,7 +14,40 @@ public static class HostBuilderExtensions
         string environment,
         string? lokiUrl)
     {
-        var loggerConfiguration = new LoggerConfiguration()
+        var loggerConfiguration = GetLoggerConfiguration(
+            configuration, 
+            serviceName, 
+            environment, 
+            lokiUrl);
+
+        hostBuilder.UseSerilog(loggerConfiguration.CreateLogger());
+        return  hostBuilder;
+    }
+
+    public static IHostApplicationBuilder AddLokiLogger(
+        this IHostApplicationBuilder builder,
+        IConfiguration configuration,
+        string serviceName,
+        string environment,
+        string? lokiUrl)
+    {
+        var logger = GetLoggerConfiguration(
+            configuration,
+            serviceName,
+            environment,
+            lokiUrl).CreateLogger();
+        builder.Logging.AddSerilog(logger);
+
+        return builder;
+    }
+
+    private static LoggerConfiguration GetLoggerConfiguration(
+        IConfiguration configuration,
+        string serviceName,
+        string environment,
+        string? lokiUrl)
+    {
+        return new LoggerConfiguration()
             .ReadFrom.Configuration(configuration)
             .Enrich.FromLogContext()
             .WriteTo.Console()
@@ -29,8 +62,5 @@ public static class HostBuilderExtensions
                     ])
                 })
             );
-
-        hostBuilder.UseSerilog(loggerConfiguration.CreateLogger());
-        return  hostBuilder;
     }
 }

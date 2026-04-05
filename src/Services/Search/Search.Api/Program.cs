@@ -4,6 +4,7 @@ using Api.Common;
 using Api.Common.Extensions;
 using Api.Common.HostedServices;
 using Api.Common.Middleware;
+using Api.Common.Models;
 using Api.Common.OperationFilters;
 using Carter;
 using Localization.Abstractions.Models;
@@ -18,7 +19,6 @@ using Search.Application;
 using Search.Application.Consumers;
 using Search.Persistence;
 using Security;
-using Security.Utils;
 
 var localesPath = Assembly.GetExecutingAssembly().GetDefaultLocalizationPath();
 
@@ -33,14 +33,20 @@ builder.Services.AddOpenApi();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen(c => { c.OperationFilter<PermissionsOperationFilter>(); });
 
-var brokerOptions = new MessageBrokerOptions
-{
-    Host = Environment.GetEnvironmentVariable("RABBITMQ_HOST")!,
-    Username = Environment.GetEnvironmentVariable("RABBITMQ_DEFAULT_USER")!,
-    Password = Environment.GetEnvironmentVariable("RABBITMQ_DEFAULT_PASS")!
-};
+builder.Services.AddOptions<HeaderSecretOptions>()
+    .BindConfiguration(HeaderSecretOptions.SectionName)
+    .ValidateDataAnnotations()
+    .ValidateOnStart();
 
-builder.Services.AddSingleton(brokerOptions);
+builder.Services.AddOptions<MessageBrokerOptions>()
+    .BindConfiguration(MessageBrokerOptions.SectionName)
+    .ValidateDataAnnotations()
+    .ValidateOnStart();
+
+var brokerOptions = builder.Configuration
+                        .GetSection(MessageBrokerOptions.SectionName)
+                        .Get<MessageBrokerOptions>()
+                    ?? throw new NullReferenceException($"Missing {MessageBrokerOptions.SectionName} configuration options");
 
 builder.Services.AddMassTransit(x =>
 {
@@ -95,8 +101,7 @@ builder.Services.AddCors(options =>
 var endpointAssembly = typeof(GetArticleRequest).Assembly;
 builder.Services.AddCarter(new DependencyContextAssemblyCatalog(endpointAssembly));
 
-var secret = Environment.GetEnvironmentVariable("GATEWAY_SUPER_KEY")!;
-builder.Services.AddTransient<HeaderSecretMiddleware>(_ => new HeaderSecretMiddleware(secret));
+builder.Services.AddTransient<HeaderSecretMiddleware>();
 
 var app = builder.Build();
 

@@ -1,8 +1,17 @@
+using System.ComponentModel.DataAnnotations;
+
 namespace RabbitMq.Models;
 
 public record MessageBrokerOptions
 {
-    public string Host { get; init; } = null!;
-    public string Username { get; init; } = null!;
-    public string Password { get; init; } = null!;
+    public const string SectionName = "MessageBroker";
+ 
+    [Required]
+    public required string Host { get; init; }
+    
+    [Required]
+    public required string Username { get; init; }
+    
+    [Required]
+    public required string Password { get; init; }
 }

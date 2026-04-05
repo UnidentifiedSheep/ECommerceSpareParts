@@ -114,16 +114,15 @@ public static class ServiceProvider
         collection.RegisterDbValidations(Assembly.GetAssembly(typeof(Global)))
             .RegisterCachePolicies(typeof(ServiceProvider).Assembly);
 
-
         collection.AddMediatR(config =>
         {
             config.RegisterServicesFromAssembly(typeof(Global).Assembly);
             config.AddOpenBehavior(typeof(ValidationBehavior<,>));
+            config.AddOpenBehavior(typeof(DbValidationBehavior<,>), ServiceLifetime.Scoped);
             config.AddOpenBehavior(typeof(LoggingBehavior<,>));
-            config.AddOpenBehavior(typeof(RequestsDataLoggingBehavior<,>));
             config.AddOpenBehavior(typeof(CacheBehavior<,>));
             config.AddOpenBehavior(typeof(TransactionBehavior<,>), ServiceLifetime.Scoped);
-            config.AddOpenBehavior(typeof(DbValidationBehavior<,>), ServiceLifetime.Scoped);
+            config.AddOpenBehavior(typeof(SaveChangesBehavior<,>), ServiceLifetime.Scoped);
         });
 
         return collection;

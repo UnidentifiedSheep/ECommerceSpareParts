@@ -5,6 +5,7 @@
         <Nullable>enable</Nullable>
         <ImplicitUsings>enable</ImplicitUsings>
         <UserSecretsId>dotnet-Analytics.Worker-04705b45-eb58-4513-b3e0-3603db44821f</UserSecretsId>
+        <DockerDefaultTargetOS>Linux</DockerDefaultTargetOS>
     </PropertyGroup>
 
     <ItemGroup>
@@ -14,6 +15,22 @@
 
     <ItemGroup>
       <ProjectReference Include="..\..\..\Core\Contracts\Contracts.csproj" />
+      <ProjectReference Include="..\..\..\Infrastructure\RabbitMq\RabbitMq.csproj" />
+      <ProjectReference Include="..\..\..\Infrastructure\Redis\Redis.csproj" />
+      <ProjectReference Include="..\..\..\Infrastructure\Security\Security.csproj" />
+      <ProjectReference Include="..\..\Api.Common\Api.Common.csproj" />
       <ProjectReference Include="..\Analytics.Application\Analytics.Application.csproj" />
+      <ProjectReference Include="..\Analytics.Persistence\Analytics.Persistence.csproj" />
+    </ItemGroup>
+    
+    <ItemGroup>
+        <Content Include="..\..\..\..\.dockerignore">
+          <Link>.dockerignore</Link>
+        </Content>
+        <Content Include="..\Analytics.Abstractions\Localization\**\*">
+            <Link>Localization\%(RecursiveDir)%(Filename)%(Extension)</Link>
+            <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+            <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+        </Content>
     </ItemGroup>
 </Project>

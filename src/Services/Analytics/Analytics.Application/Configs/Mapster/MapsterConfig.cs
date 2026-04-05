@@ -9,6 +9,7 @@ public static class MapsterConfig
     public static void Configure()
     {
         PurchaseFactMapsterConfig.Configure();
+        MetricMapsterConfig.Configure();
 
         TypeAdapterConfig<ContractCurrency, Currency>.NewConfig()
             .Map(dest => dest.Id, src => src.Id)

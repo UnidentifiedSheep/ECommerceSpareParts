@@ -8,6 +8,7 @@ using Main.Persistence.Repositories;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Persistence.DbValidator;
+using Persistence.Extensions;
 using Persistence.Interfaces;
 using Persistence.Services.UnitOfWork;
 
@@ -52,7 +53,7 @@ public static class ServiceProvider
         collection.AddScoped<IArticleCoefficients, ArticleCoefficients>();
         collection.AddScoped<ISettingsRepository, SettingsRepository>();
 
-        collection.AddScoped<IUnitOfWork, UnitOfWork<DContext>>();
+        collection.AddUnitOfWork<DContext>();
 
         //Seeds
         collection.AddScoped<ISeed<DContext>, PermissionSeed>();
