@@ -17,8 +17,7 @@ namespace Analytics.Application.Handlers.CalculationJob.CreateCalculationJob;
 public record CreateCalculationJobCommand(
     string MetricSystemName,
     MetricPayloadDto MetricPayload,
-    Guid CreatedBy,
-    CalculationStatus Status) : ICommand<CreateCalculationJobResult>;
+    Guid CreatedBy) : ICommand<CreateCalculationJobResult>;
 public record CreateCalculationJobResult(MetricCalculationJob CalculationJob);
 
 public class CreateCalculationJobHandler(
@@ -33,7 +32,7 @@ public class CreateCalculationJobHandler(
             RequestId = Guid.NewGuid(),
             CreateAt = DateTime.UtcNow,
             UpdateAt = DateTime.UtcNow,
-            Status = request.Status,
+            Status = CalculationStatus.AwaitingWorker,
             MetricSystemName = request.MetricSystemName,
         };
 
