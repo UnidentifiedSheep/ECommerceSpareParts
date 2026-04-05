@@ -3,13 +3,15 @@ using Abstractions.Interfaces.Services;
 using Analytics.Abstractions.Interfaces.Application;
 using Analytics.Entities.Metrics;
 using Application.Common.Interfaces;
+using Attributes;
 
 namespace Analytics.Application.Handlers.Metrics.CreateMetric;
 
+[AutoSave]
 public record CreateMetricCommand(
     string MetricSystemName, 
     string MetricPayload, 
-    Guid CreatedBy) : ICommand<CreateMetricResult>, IAutoSaveCommand;
+    Guid CreatedBy) : ICommand<CreateMetricResult>;
 
 public record CreateMetricResult(Metric Metric);
 

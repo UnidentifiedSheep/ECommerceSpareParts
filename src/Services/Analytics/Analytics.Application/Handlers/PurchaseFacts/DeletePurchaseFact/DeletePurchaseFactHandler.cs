@@ -10,8 +10,9 @@ using Microsoft.Extensions.Logging;
 
 namespace Analytics.Application.Handlers.PurchaseFacts.DeletePurchaseFact;
 
+[AutoSave]
 [Transactional(IsolationLevel.ReadCommitted, 2, 20)]
-public record DeletePurchaseFactCommand(string PurchaseId) : ICommand, IAutoSaveCommand;
+public record DeletePurchaseFactCommand(string PurchaseId) : ICommand;
 
 public class DeletePurchaseFactHandler(
     IPurchaseFactRepository purchaseFactRepository,

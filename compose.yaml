@@ -14,16 +14,16 @@
       - SEED_ADMIN_EMAIL=${MAIN_SEED_ADMIN_EMAIL}
       - REDIS_CONNECTION_STRING=${REDIS_HOST}:${REDIS_PORT},password=${REDIS_PASSWORD}
       - DB_CONNECTION_STRING=Host=${PGQL_HOST};Database=${PGQL_MAIN_DB};Username=${PGQL_USER};Password=${PGQL_PASSWORD}
-      - RABBITMQ_HOST=amqp://${RABBITMQ_HOST}:${RABBITMQ_PORT}
-      - RABBITMQ_USERNAME=${RABBITMQ_DEFAULT_USER}
-      - RABBITMQ_PASSWORD=${RABBITMQ_DEFAULT_PASS}
+      - MessageBroker__Host=amqp://${RABBITMQ_HOST}:${RABBITMQ_PORT}
+      - MessageBroker__Username=${RABBITMQ_DEFAULT_USER}
+      - MessageBroker__Password=${RABBITMQ_DEFAULT_PASS}
+      - HeaderSecret__Key=${GATEWAY_SUPER_KEY}
       - S3_URL=http://${S3_HOST}:${S3_PORT}
       - S3_FORCE_PATH_STYLE=${MAIN_S3_FORCE_PATH_STYLE}
       - S3_LOGIN=${MINIO_SERVICE_USER}
       - S3_PASSWORD=${MINIO_SERVICE_PASSWORD}
       - S3_REGION=${MINIO_REGION}
       - S3_IMAGES_BUCKET=${MINIO_IMAGES_BUCKET}
-      - GATEWAY_SUPER_KEY=${GATEWAY_SUPER_KEY}
       - SYSTEM_ID=${MAIN_SYSTEM_ID}
       - SIGN_SECRET=${MAIN_SIGN_SECRET}
       - LOKI_URL=http://${LOKI_HOST}:${LOKI_PORT}
@@ -46,10 +46,10 @@
       - ./search_api_data:/app/data
     environment:
       - INDEX_FOLDER=/app/data
-      - RABBITMQ_HOST=amqp://${RABBITMQ_HOST}:${RABBITMQ_PORT}
-      - RABBITMQ_USERNAME=${RABBITMQ_DEFAULT_USER}
-      - RABBITMQ_PASSWORD=${RABBITMQ_DEFAULT_PASS}
-      - GATEWAY_SUPER_KEY=${GATEWAY_SUPER_KEY}
+      - MessageBroker__Host=amqp://${RABBITMQ_HOST}:${RABBITMQ_PORT}
+      - MessageBroker__Username=${RABBITMQ_DEFAULT_USER}
+      - MessageBroker__Password=${RABBITMQ_DEFAULT_PASS}
+      - HeaderSecret__Key=${GATEWAY_SUPER_KEY}
       - LOKI_URL=http://${LOKI_HOST}:${LOKI_PORT}
     networks:
       - backend-network
@@ -64,10 +64,10 @@
     environment:
       - REDIS_CONNECTION_STRING=${REDIS_HOST}:${REDIS_PORT},password=${REDIS_PASSWORD}
       - DB_CONNECTION_STRING=Host=${PGQL_HOST};Database=${PGQL_PRICING_DB};Username=${PGQL_USER};Password=${PGQL_PASSWORD}
-      - RABBITMQ_HOST=amqp://${RABBITMQ_HOST}:${RABBITMQ_PORT}
-      - RABBITMQ_USERNAME=${RABBITMQ_DEFAULT_USER}
-      - RABBITMQ_PASSWORD=${RABBITMQ_DEFAULT_PASS}
-      - GATEWAY_SUPER_KEY=${GATEWAY_SUPER_KEY}
+      - MessageBroker__Host=amqp://${RABBITMQ_HOST}:${RABBITMQ_PORT}
+      - MessageBroker__Username=${RABBITMQ_DEFAULT_USER}
+      - MessageBroker__Password=${RABBITMQ_DEFAULT_PASS}
+      - HeaderSecret__Key=${GATEWAY_SUPER_KEY}
       - SIGN_SECRET=${PRICING_SIGN_SECRET}
       - SEED_DB=${PRICING_SEED_DB}
       - LOKI_URL=http://${LOKI_HOST}:${LOKI_PORT}
@@ -87,11 +87,13 @@
     ports:
       - "443:7292"
     volumes:
-      - ${CERTS_PATH}:/app/certs:ro
+      - ${CERTS_PATH:-./certs}:/app/certs:ro
     environment:
       - ASPNETCORE_Kestrel__Certificates__Default__Path=${CERT_PATH}
       - ASPNETCORE_Kestrel__Certificates__Default__KeyPath=${CERT_KEYPATH}
-      - GATEWAY_SUPER_KEY=${GATEWAY_SUPER_KEY}
+      - HeaderSecret__Key=${GATEWAY_SUPER_KEY}
+      - JwtBearer__ValidIssuer=${VALID_ISSUER}
+      - JwtBearer__IssuerSigningKey=${ISSUER_SIGNING_KEY}
       - LOKI_URL=http://${LOKI_HOST}:${LOKI_PORT}
     networks:
       - backend-network
@@ -107,11 +109,11 @@
     environment:
       - REDIS_CONNECTION_STRING=${REDIS_HOST}:${REDIS_PORT},password=${REDIS_PASSWORD}
       - DB_CONNECTION_STRING=Host=${PGQL_HOST};Database=${PGQL_ANALYTICS_DB};Username=${PGQL_USER};Password=${PGQL_PASSWORD}
-      - RABBITMQ_HOST=amqp://${RABBITMQ_HOST}:${RABBITMQ_PORT}
-      - RABBITMQ_USERNAME=${RABBITMQ_DEFAULT_USER}
-      - RABBITMQ_PASSWORD=${RABBITMQ_DEFAULT_PASS}
+      - MessageBroker__Host=amqp://${RABBITMQ_HOST}:${RABBITMQ_PORT}
+      - MessageBroker__Username=${RABBITMQ_DEFAULT_USER}
+      - MessageBroker__Password=${RABBITMQ_DEFAULT_PASS}
+      - HeaderSecret__Key=${GATEWAY_SUPER_KEY}
       - SEED_DB=${ANALYTICS_SEED_DB}
-      - GATEWAY_SUPER_KEY=${GATEWAY_SUPER_KEY}
       - LOKI_URL=http://${LOKI_HOST}:${LOKI_PORT}
     networks:
       - backend-network
@@ -120,7 +122,27 @@
       - redis
       - rabbitmq
     restart: unless-stopped
-
+  
+  analytics.worker:
+    image: analytics.worker
+    build:
+      context: .
+      dockerfile: src/Services/Analytics/Analytics.Worker/Dockerfile
+    environment:
+      - REDIS_CONNECTION_STRING=${REDIS_HOST}:${REDIS_PORT},password=${REDIS_PASSWORD}
+      - DB_CONNECTION_STRING=Host=${PGQL_HOST};Database=${PGQL_ANALYTICS_DB};Username=${PGQL_USER};Password=${PGQL_PASSWORD}
+      - MessageBroker__Host=amqp://${RABBITMQ_HOST}:${RABBITMQ_PORT}
+      - MessageBroker__Username=${RABBITMQ_DEFAULT_USER}
+      - MessageBroker__Password=${RABBITMQ_DEFAULT_PASS}
+      - HeaderSecret__Key=${GATEWAY_SUPER_KEY}
+      - LOKI_URL=http://${LOKI_HOST}:${LOKI_PORT}
+    networks:
+      - backend-network
+    depends_on:
+      - pgql
+      - redis
+      - rabbitmq
+    restart: unless-stopped
 
   pgql:
     image: postgres-cron
@@ -216,7 +238,7 @@
     image: grafana/loki:latest
     container_name: loki
     ports:
-      - "3100"
+      - "3100:3100"
     command: -config.file=/etc/loki/local-config.yaml
     networks:
       - backend-network
@@ -242,7 +264,7 @@
       - "3000:3000"
     volumes:
       - grafana_data:/var/lib/grafana
-      - ${CERTS_PATH}:/app/certs:ro
+      - ${CERTS_PATH:-./certs}:/app/certs:ro
     environment:
       - GF_SERVER_PROTOCOL=https
       - GF_SERVER_CERT_FILE=${CERT_PATH}

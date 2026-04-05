@@ -9,11 +9,12 @@ using Attributes;
 
 namespace Analytics.Application.Handlers.CalculationJob.UpdateCalculationJob;
 
+[AutoSave]
 [Transactional]
 public record UpdateCalculationJobCommand(
     Guid RequestId, 
     CalculationStatus Status,
-    Guid? MetricId) : ICommand<UpdateCalculationJobResult>, IAutoSaveCommand;
+    Guid? MetricId) : ICommand<UpdateCalculationJobResult>;
 public record UpdateCalculationJobResult(MetricCalculationJob CalculationJob);
 
 public class UpdateCalculationJobHandler(

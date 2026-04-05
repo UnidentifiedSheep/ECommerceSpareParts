@@ -11,7 +11,6 @@ public static class ServiceCollectionExtensions
     public static IServiceCollection AddUnitOfWork<T>(this IServiceCollection collection) where T : DbContext
     {
         collection.AddScoped<IUnitOfWork, UnitOfWork<T>>();
-        collection.AddScoped<IUnitOfWorkContext, UnitOfWorkContext>();
 
         return collection;
     }

@@ -12,8 +12,9 @@ using Microsoft.Extensions.Logging;
 
 namespace Analytics.Application.Handlers.PurchaseFacts.UpsertPurchaseFact;
 
+[AutoSave]
 [Transactional(IsolationLevel.ReadCommitted, 2, 20)]
-public record UpsertPurchaseFactCommand(PurchaseFactUpsertDto PurchaseFact) : ICommand, IAutoSaveCommand;
+public record UpsertPurchaseFactCommand(PurchaseFactUpsertDto PurchaseFact) : ICommand;
 
 public class UpsertPurchaseFactHandler(
     IPurchaseFactRepository factRepository,

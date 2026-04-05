@@ -8,12 +8,13 @@ using MassTransit;
 
 namespace Analytics.Application.Handlers.CalculationJob.CreateCalculationJob;
 
+[AutoSave]
 [Transactional]
 public record CreateCalculationJobCommand(
     string MetricSystemName,
     string MetricPayload,
     Guid CreatedBy,
-    CalculationStatus Status) : ICommand<CreateCalculationJobResult>, IAutoSaveCommand;
+    CalculationStatus Status) : ICommand<CreateCalculationJobResult>;
 public record CreateCalculationJobResult(MetricCalculationJob CalculationJob);
 
 public class CreateCalculationJobHandler(

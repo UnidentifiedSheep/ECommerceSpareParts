@@ -1,10 +1,11 @@
+using Abstractions.Models;
 using Attributes;
 
 namespace Abstractions.Interfaces.Services;
 
 public interface IUnitOfWork
 {
-    IUnitOfWorkContext Context { get; }
+    UnitOfWorkContext Context { get; }
     Task<T> ExecuteWithTransaction<T>(
         TransactionalAttribute settings,
         Func<Task<T>> action,

@@ -6,9 +6,9 @@ using Persistence.TransactionBuilder;
 
 namespace Persistence.Services.UnitOfWork;
 
-public class UnitOfWorkBase(DbContext context, IUnitOfWorkContext uowContext) : IUnitOfWork
+public class UnitOfWorkBase(DbContext context) : IUnitOfWork
 {
-    public IUnitOfWorkContext Context { get; } = uowContext;
+    public UnitOfWorkContext Context { get; } = new();
 
     public async Task<T> ExecuteWithTransaction<T>(
         TransactionalAttribute settings,
