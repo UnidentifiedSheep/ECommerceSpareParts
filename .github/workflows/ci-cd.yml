@@ -114,7 +114,7 @@ jobs:
             cd ${{ secrets.VPS_PATH }}
             
             docker compose -f compose.yaml down
-            docker compose -f compose.yaml up pgql
+            docker compose -f compose.yaml up pgql -d
 
             echo "=== Load migrator images ==="
             gunzip -c migrator-images.tar.gz | docker load
