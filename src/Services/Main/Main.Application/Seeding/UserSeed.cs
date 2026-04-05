@@ -32,6 +32,7 @@ public static class UserSeed
         
         try
         {
+            logger.LogInformation("Trying to create admin user: {login}", login);
             await mediator.Send(command);
         }
         catch (Exception e)
