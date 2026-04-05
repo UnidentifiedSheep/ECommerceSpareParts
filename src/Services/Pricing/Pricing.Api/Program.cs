@@ -40,7 +40,11 @@ var localesPath = Assembly.GetExecutingAssembly().GetDefaultLocalizationPath();
 var builder = WebApplication.CreateBuilder(args);
 
 var lokiUrl = Environment.GetEnvironmentVariable("LOKI_URL");
-var env = Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT") ?? "unknown";
+var env = Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT") ?? "";
+
+builder.Configuration
+    .AddConfigsFromJsons(env)
+    .AddConfigsFromJsons(env, "/app/configs");
 
 builder.Host.AddLokiLogger(builder.Configuration, "pricing.api", env, lokiUrl);
 

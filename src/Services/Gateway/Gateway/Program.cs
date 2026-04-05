@@ -10,10 +10,13 @@ using Yarp.ReverseProxy.Transforms;
 
 var builder = WebApplication.CreateBuilder(args);
 
-builder.Configuration.AddJsonFromDirectory("ReverseProxy");
 
-var env = Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT") ?? "unknown";
+var env = Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT") ?? "";
 var lokiUrl = Environment.GetEnvironmentVariable("LOKI_URL");
+
+builder.Configuration
+    .AddConfigsFromJsons(env)
+    .AddConfigsFromJsons(env, "/app/configs");
 
 builder.Host.AddLokiLogger(builder.Configuration, "gateway", env, lokiUrl);
 

@@ -14,7 +14,13 @@ using Redis;
 Locale[] locales = ["ru-RU", "en-EN"];
 Locale defaultLocale = "ru-RU";
 
+var env = Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT") ?? "";
+
 var builder = Host.CreateApplicationBuilder(args);
+
+builder.Configuration
+    .AddConfigsFromJsons(env)
+    .AddConfigsFromJsons(env, "/app/configs");
 
 AddLoki(builder);
 
@@ -44,7 +50,6 @@ async Task LoadLocalization(IHost hostApp)
 void AddLoki(IHostApplicationBuilder hostBuilder)
 {
     var lokiUrl = Environment.GetEnvironmentVariable("LOKI_URL");
-    var env = Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT") ?? "unknown";
 
     hostBuilder.AddLokiLogger(hostBuilder.Configuration, "analytics.worker", env, lokiUrl);
 }

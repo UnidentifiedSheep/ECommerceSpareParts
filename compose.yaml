@@ -6,6 +6,8 @@
       dockerfile: src/Services/Main/Main.Api/Dockerfile
     expose:
       - "8080"
+    volumes:
+      - ${CONFIGS_PATH:-./certs}:/app/configs:ro
     environment:
       - SEED_DB=${MAIN_SEED_DB}
       - SEED_ADMIN=${MAIN_SEED_ADMIN}
@@ -44,6 +46,7 @@
       - "8080"
     volumes:
       - ./search_api_data:/app/data
+      - ${CONFIGS_PATH:-./certs}:/app/configs:ro
     environment:
       - INDEX_FOLDER=/app/data
       - MessageBroker__Host=amqp://${RABBITMQ_HOST}:${RABBITMQ_PORT}
@@ -61,6 +64,8 @@
       dockerfile: src/Services/Pricing/Pricing.Api/Dockerfile
     expose:
       - "8080"
+    volumes:
+      - ${CONFIGS_PATH:-./certs}:/app/configs:ro
     environment:
       - REDIS_CONNECTION_STRING=${REDIS_HOST}:${REDIS_PORT},password=${REDIS_PASSWORD}
       - DB_CONNECTION_STRING=Host=${PGQL_HOST};Database=${PGQL_PRICING_DB};Username=${PGQL_USER};Password=${PGQL_PASSWORD}
@@ -88,6 +93,7 @@
       - "443:7292"
     volumes:
       - ${CERTS_PATH:-./certs}:/app/certs:ro
+      - ${CONFIGS_PATH:-./certs}:/app/configs:ro
     environment:
       - ASPNETCORE_Kestrel__Certificates__Default__Path=${CERT_PATH}
       - ASPNETCORE_Kestrel__Certificates__Default__KeyPath=${CERT_KEYPATH}
@@ -106,6 +112,8 @@
       dockerfile: src/Services/Analytics/Analytics.Api/Dockerfile
     expose:
       - "8080"
+    volumes:
+      - ${CONFIGS_PATH:-./certs}:/app/configs:ro
     environment:
       - REDIS_CONNECTION_STRING=${REDIS_HOST}:${REDIS_PORT},password=${REDIS_PASSWORD}
       - DB_CONNECTION_STRING=Host=${PGQL_HOST};Database=${PGQL_ANALYTICS_DB};Username=${PGQL_USER};Password=${PGQL_PASSWORD}
@@ -128,6 +136,8 @@
     build:
       context: .
       dockerfile: src/Services/Analytics/Analytics.Worker/Dockerfile
+    volumes:
+      - ${CONFIGS_PATH:-./certs}:/app/configs:ro
     environment:
       - REDIS_CONNECTION_STRING=${REDIS_HOST}:${REDIS_PORT},password=${REDIS_PASSWORD}
       - DB_CONNECTION_STRING=Host=${PGQL_HOST};Database=${PGQL_ANALYTICS_DB};Username=${PGQL_USER};Password=${PGQL_PASSWORD}

@@ -29,7 +29,6 @@ using Main.Persistence.Context;
 using MassTransit;
 using Microsoft.AspNetCore.HttpOverrides;
 using OpenTelemetry.Metrics;
-using Persistence.Extensions;
 using RabbitMq.Extensions;
 using RabbitMq.Models;
 using Redis;
@@ -40,7 +39,11 @@ using Global = Main.Application.Global;
 var builder = WebApplication.CreateBuilder(args);
 
 var lokiUrl = Environment.GetEnvironmentVariable("LOKI_URL");
-var env = Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT") ?? "unknown";
+var env = Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT") ?? "";
+
+builder.Configuration
+    .AddConfigsFromJsons(env)
+    .AddConfigsFromJsons(env, "/app/configs");
 
 builder.Host.AddLokiLogger(builder.Configuration, "main.api", env, lokiUrl);
 
