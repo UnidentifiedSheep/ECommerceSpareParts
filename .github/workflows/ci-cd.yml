@@ -126,6 +126,6 @@ jobs:
             gunzip -c app-images.tar.gz | docker load
 
             echo "=== Restart app ==="
-            docker compose -f compose.yaml up -d --no-build --force-recreate
+            docker compose -f compose.yaml up -d --no-build
 
             echo "=== Done ==="
