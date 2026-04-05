@@ -1,10 +1,14 @@
 ﻿using Abstractions.Interfaces.Services;
+using Analytics.Abstractions.Dtos.CalculationJob;
 using Analytics.Entities;
 using Analytics.Enums;
 using Application.Common.Interfaces;
 using Attributes;
 using Contracts.Analytics;
+using Mapster;
 using MassTransit;
+
+using ContractMetricPayload = Contracts.Models.Metric.MetricPayloadDto;
 
 namespace Analytics.Application.Handlers.CalculationJob.CreateCalculationJob;
 
@@ -12,7 +16,7 @@ namespace Analytics.Application.Handlers.CalculationJob.CreateCalculationJob;
 [Transactional]
 public record CreateCalculationJobCommand(
     string MetricSystemName,
-    string MetricPayload,
+    MetricPayloadDto MetricPayload,
     Guid CreatedBy,
     CalculationStatus Status) : ICommand<CreateCalculationJobResult>;
 public record CreateCalculationJobResult(MetricCalculationJob CalculationJob);
@@ -38,7 +42,7 @@ public class CreateCalculationJobHandler(
             RequestId = model.RequestId,
             CreatedBy = request.CreatedBy,
             MetricSystemName = model.MetricSystemName,
-            MetricPayload = request.MetricPayload,
+            MetricPayload = request.MetricPayload.Adapt<ContractMetricPayload>(),
         }, cancellationToken);
         
         await unitOfWork.AddAsync(model, cancellationToken);

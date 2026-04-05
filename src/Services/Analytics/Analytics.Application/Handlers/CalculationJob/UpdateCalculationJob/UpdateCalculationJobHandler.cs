@@ -1,11 +1,11 @@
-﻿using Abstractions.Interfaces.Services;
-using Abstractions.Models.Repository;
+﻿using Abstractions.Models.Repository;
 using Analytics.Abstractions.Exceptions.MetricCalculationJobs;
 using Analytics.Abstractions.Interfaces.DbRepositories;
 using Analytics.Entities;
 using Analytics.Enums;
 using Application.Common.Interfaces;
 using Attributes;
+using Localization.Abstractions.Interfaces;
 
 namespace Analytics.Application.Handlers.CalculationJob.UpdateCalculationJob;
 
@@ -14,11 +14,13 @@ namespace Analytics.Application.Handlers.CalculationJob.UpdateCalculationJob;
 public record UpdateCalculationJobCommand(
     Guid RequestId, 
     CalculationStatus Status,
-    Guid? MetricId) : ICommand<UpdateCalculationJobResult>;
+    Guid? MetricId,
+    string? ErrorMessageKey) : ICommand<UpdateCalculationJobResult>;
 public record UpdateCalculationJobResult(MetricCalculationJob CalculationJob);
 
 public class UpdateCalculationJobHandler(
-    IMetricCalculationJobRepository jobRepository)
+    IMetricCalculationJobRepository jobRepository,
+    IScopedStringLocalizer localizer)
     : ICommandHandler<UpdateCalculationJobCommand, UpdateCalculationJobResult>
 {
     public async Task<UpdateCalculationJobResult> Handle(UpdateCalculationJobCommand request, CancellationToken cancellationToken)
@@ -36,6 +38,8 @@ public class UpdateCalculationJobHandler(
 
         job.MetricId = request.MetricId;
         job.Status = request.Status;
+        if (request.ErrorMessageKey != null)
+            job.ErrorMessage = localizer[request.ErrorMessageKey];
 
         return new UpdateCalculationJobResult(job);
     }

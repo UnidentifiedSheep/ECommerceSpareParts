@@ -1,5 +1,6 @@
 ﻿using Abstractions.Interfaces.Services;
 using Abstractions.Models.Repository;
+using Analytics.Abstractions.Dtos.CalculationJob;
 using Analytics.Abstractions.Exceptions.MetricCalculationJobs;
 using Analytics.Abstractions.Interfaces.DbRepositories;
 using Analytics.Application.Handlers.CalculationJob.UpdateCalculationJob;
@@ -17,7 +18,7 @@ namespace Analytics.Application.Handlers.Metrics.CalculateFullMetric;
 public record CalculateFullMetricCommand(
     Guid RequestId,
     string MetricSystemName, 
-    string MetricPayload, 
+    MetricPayloadDto MetricPayload, 
     Guid CreatedBy) : ICommand;
 
 public class CalculateFullMetricHandler(
@@ -37,11 +38,13 @@ public class CalculateFullMetricHandler(
         unitOfWork.Context.SuppressAutoSave = true;
         
         var job = await GetAndValidateJob(request.RequestId, ct);
-        
-        var metric = await CreateMetricAndStartJob(request, job, ct);
+
+        Metric? metric = null;
 
         try
         {
+            metric = await CreateMetricAndStartJob(request, job, ct);
+            
             metric = await CalculateMetric(metric.Id, ct);
             
             await CompleteJobSuccessfully(job.RequestId, metric.Id, ct);
@@ -51,9 +54,13 @@ public class CalculateFullMetricHandler(
                 job.RequestId,
                 metric.Id);
         }
+        catch (OperationCanceledException)
+        {
+            throw;
+        }
         catch (Exception e)
         {
-            await FailJob(job.RequestId, metric, e, ct);
+            await FailJob(job.RequestId, metric, "failed.creating.metric", e, ct);
         }
 
         return Unit.Value;
@@ -81,14 +88,15 @@ public class CalculateFullMetricHandler(
         await sender.Send(new UpdateCalculationJobCommand(
             job.RequestId,
             CalculationStatus.Calculating,
-            metric.Id), ct);
+            metric.Id,
+            null), ct);
 
         logger.LogInformation(
             "Job status updated to Calculating. RequestId: {RequestId}",
             job.RequestId);
 
         await unitOfWork.SaveChangesAsync(ct);
-
+            
         logger.LogDebug(
             "Initial changes saved. RequestId: {RequestId}",
             job.RequestId);
@@ -125,7 +133,8 @@ public class CalculateFullMetricHandler(
         await sender.Send(new UpdateCalculationJobCommand(
             requestId,
             CalculationStatus.Succeeded,
-            metricId), ct);
+            metricId,
+            null), ct);
 
         await unitOfWork.SaveChangesAsync(ct);
 
@@ -136,28 +145,31 @@ public class CalculateFullMetricHandler(
 
     private async Task FailJob(
         Guid requestId,
-        Metric metric,
+        Metric? metric,
+        string? messageErrorKey,
         Exception e,
         CancellationToken ct)
     {
         logger.LogError(e,
             "Metric calculation failed. RequestId: {RequestId}, MetricId: {MetricId}",
             requestId,
-            metric.Id);
+            metric?.Id);
 
         await sender.Send(new UpdateCalculationJobCommand(
             requestId,
             CalculationStatus.Failed,
-            metric.Id), ct);
+            metric?.Id,
+            messageErrorKey), ct);
 
-        unitOfWork.Remove(metric);
+        if (metric != null)
+            unitOfWork.Remove(metric);
 
         await unitOfWork.SaveChangesAsync(ct);
 
         logger.LogInformation(
             "Failure state persisted and metric removed. RequestId: {RequestId}, MetricId: {MetricId}",
             requestId,
-            metric.Id);
+            metric?.Id);
 
         throw new InvalidOperationException(
             $"Failed to calculate metric for request id: {requestId}. Error: {e.Message}", e);

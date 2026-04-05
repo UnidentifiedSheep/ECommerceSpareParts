@@ -1,5 +1,7 @@
-﻿using Analytics.Application.Handlers.Metrics.CalculateFullMetric;
+﻿using Analytics.Abstractions.Dtos.CalculationJob;
+using Analytics.Application.Handlers.Metrics.CalculateFullMetric;
 using Contracts.Analytics;
+using Mapster;
 using MassTransit;
 using MediatR;
 
@@ -14,7 +16,7 @@ public class MetricCalculationRequestedConsumer(ISender sender) : IConsumer<Metr
         await sender.Send(new CalculateFullMetricCommand(
             @event.RequestId,
             @event.MetricSystemName,
-            @event.MetricPayload,
+            @event.MetricPayload.Adapt<MetricPayloadDto>(),
             @event.CreatedBy));
     }
 }

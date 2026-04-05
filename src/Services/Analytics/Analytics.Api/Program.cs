@@ -112,7 +112,7 @@ builder.Services.AddCors(options =>
 
 builder.Services.AddCarter();
 builder.Services.AddBaseExceptionHandlers();
-;
+
 builder.Services.AddTransient<HeaderSecretMiddleware>();
 
 var app = builder.Build();
