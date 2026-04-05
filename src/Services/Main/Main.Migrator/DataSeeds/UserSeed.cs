@@ -3,7 +3,7 @@ using Main.Persistence.Context;
 using Microsoft.EntityFrameworkCore;
 using Persistence.Interfaces;
 
-namespace Main.Persistence.DataSeeds;
+namespace Main.Migrator.DataSeeds;
 
 public class UserSeed : ISeed<DContext>
 {

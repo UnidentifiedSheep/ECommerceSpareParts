@@ -1,16 +1,12 @@
 using Abstractions.Interfaces;
-using Abstractions.Interfaces.Services;
 using BulkValidation.Pgsql.Extensions;
 using Main.Abstractions.Interfaces.DbRepositories;
 using Main.Persistence.Context;
-using Main.Persistence.DataSeeds;
 using Main.Persistence.Repositories;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Persistence.DbValidator;
 using Persistence.Extensions;
-using Persistence.Interfaces;
-using Persistence.Services.UnitOfWork;
 
 namespace Main.Persistence;
 
@@ -54,13 +50,6 @@ public static class ServiceProvider
         collection.AddScoped<ISettingsRepository, SettingsRepository>();
 
         collection.AddUnitOfWork<DContext>();
-
-        //Seeds
-        collection.AddScoped<ISeed<DContext>, PermissionSeed>();
-        collection.AddScoped<ISeed<DContext>, RoleSeed>();
-        collection.AddScoped<ISeed<DContext>, RolePermissionSeed>();
-        collection.AddScoped<ISeed<DContext>, UserSeed>();
-        collection.AddScoped<ISeed<DContext>, CurrencySeed>();
 
         collection.AddScoped<IDbValidator, PgsqlDbValidator<DContext>>();
         collection.AddPgsqlDbValidators<DContext>();

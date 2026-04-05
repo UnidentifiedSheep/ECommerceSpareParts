@@ -3,7 +3,7 @@ using Main.Entities;
 using Main.Persistence.Context;
 using Persistence.Interfaces;
 
-namespace Main.Persistence.DataSeeds;
+namespace Main.Migrator.DataSeeds;
 
 public class PermissionSeed : ISeed<DContext>
 {

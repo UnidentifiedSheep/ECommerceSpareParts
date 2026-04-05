@@ -23,7 +23,6 @@ using Main.Application.Configs;
 using Main.Application.Configs.Mapster;
 using Main.Application.Consumers;
 using Main.Application.HangFireTasks;
-using Main.Application.Seeding;
 using Main.Cache;
 using Main.Persistence;
 using Main.Persistence.Context;
@@ -174,22 +173,6 @@ var app = builder.Build();
 
 MapsterConfig.Configure();
 SortByConfig.Configure();
-
-if (Environment.GetEnvironmentVariable("SEED_DB") == "true")
-    await app.SeedAsync<DContext>();
-
-if (Environment.GetEnvironmentVariable("SEED_ADMIN") == "true")
-{
-    var login = Environment.GetEnvironmentVariable("SEED_ADMIN_LOGIN");
-    if (string.IsNullOrWhiteSpace(login)) login = "Administrator";
-    var password = Environment.GetEnvironmentVariable("SEED_ADMIN_PASSWORD");
-    if (string.IsNullOrWhiteSpace(password)) password = "Administrator12345";
-    var email = Environment.GetEnvironmentVariable("SEED_ADMIN_EMAIL");
-    if (string.IsNullOrWhiteSpace(email)) email = "emailNotProvided@some.com";
-
-    await UserSeed.SeedAdmin(login, password, email, app.Services);
-}
-
 
 app.UseMiddleware<HeaderSecretMiddleware>();
 

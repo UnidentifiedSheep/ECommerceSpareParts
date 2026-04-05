@@ -4,19 +4,18 @@ using Main.Entities;
 using Main.Persistence.Context;
 using Microsoft.EntityFrameworkCore;
 using Persistence.Interfaces;
+using Role = Main.Enums.Role;
 
-namespace Main.Persistence.DataSeeds;
+namespace Main.Migrator.DataSeeds;
 
 public class RolePermissionSeed : ISeed<DContext>
 {
     public async Task SeedAsync(DContext context)
     {
         var roles = await context.Roles
-            .Where(r => r.NormalizedName == "ADMIN" || r.NormalizedName == "WORKER" || r.NormalizedName == "MEMBER")
             .ToListAsync();
 
-        if (roles.Count == 0)
-            return;
+        if (roles.Count == 0) return;
 
         var permissions = await context.Permissions
             .ToDictionaryAsync(p => p.Name);
@@ -25,7 +24,9 @@ public class RolePermissionSeed : ISeed<DContext>
 
         foreach (var role in roles)
         {
-            if (!rolePermissions.TryGetValue(role.NormalizedName, out var needed))
+            if (!Enum.TryParse(role.NormalizedName, out Role parsedRole))
+                continue;
+            if (!rolePermissions.TryGetValue(parsedRole, out var needed))
                 continue;
 
             role.PermissionNames = ResolvePermissions(needed, permissions);
@@ -39,11 +40,11 @@ public class RolePermissionSeed : ISeed<DContext>
         return 1;
     }
 
-    private static IReadOnlyDictionary<string, PermissionCodes[]> BuildRolePermissions()
+    private static IReadOnlyDictionary<Role, PermissionCodes[]> BuildRolePermissions()
     {
-        return new Dictionary<string, PermissionCodes[]>
+        return new Dictionary<Role, PermissionCodes[]>
         {
-            ["ADMIN"] =
+            [Role.Admin] =
             [
                 PermissionCodes.STORAGES_CONTENT_GET_ALL,
                 PermissionCodes.STORAGES_GET,
@@ -135,7 +136,7 @@ public class RolePermissionSeed : ISeed<DContext>
                 PermissionCodes.LOGISTICS_CALCULATE
             ],
 
-            ["WORKER"] =
+            [Role.Worker] =
             [
                 PermissionCodes.ARTICLE_CHARACTERISTICS_CREATE,
                 PermissionCodes.ARTICLE_CHARACTERISTICS_UPDATE,
@@ -205,7 +206,7 @@ public class RolePermissionSeed : ISeed<DContext>
                 PermissionCodes.LOGISTICS_CALCULATE
             ],
 
-            ["MEMBER"] =
+            [Role.Member] =
             [
                 PermissionCodes.ARTICLE_CROSSES_GET,
                 PermissionCodes.ARTICLE_SIZES_GET,
