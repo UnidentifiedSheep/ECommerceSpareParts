@@ -13,7 +13,7 @@ public record CreateCalculationJobCommand(
     string MetricSystemName,
     string MetricPayload,
     Guid CreatedBy,
-    CalculationStatus Status) : ICommand<CreateCalculationJobResult>;
+    CalculationStatus Status) : ICommand<CreateCalculationJobResult>, IAutoSaveCommand;
 public record CreateCalculationJobResult(MetricCalculationJob CalculationJob);
 
 public class CreateCalculationJobHandler(
@@ -41,8 +41,6 @@ public class CreateCalculationJobHandler(
         }, cancellationToken);
         
         await unitOfWork.AddAsync(model, cancellationToken);
-
-        await unitOfWork.SaveChangesAsync(cancellationToken);
         
         return new CreateCalculationJobResult(model);
     }

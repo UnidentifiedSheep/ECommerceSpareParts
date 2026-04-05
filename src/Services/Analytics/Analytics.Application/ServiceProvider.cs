@@ -31,10 +31,11 @@ public static class ServiceProvider
         {
             config.RegisterServicesFromAssembly(typeof(Global).Assembly);
             config.AddOpenBehavior(typeof(ValidationBehavior<,>));
+            config.AddOpenBehavior(typeof(DbValidationBehavior<,>), ServiceLifetime.Scoped);
             config.AddOpenBehavior(typeof(LoggingBehavior<,>));
             config.AddOpenBehavior(typeof(CacheBehavior<,>));
             config.AddOpenBehavior(typeof(TransactionBehavior<,>), ServiceLifetime.Scoped);
-            config.AddOpenBehavior(typeof(DbValidationBehavior<,>), ServiceLifetime.Scoped);
+            config.AddOpenBehavior(typeof(SaveChangesBehavior<,>), ServiceLifetime.Scoped);
         });
 
         return collection;

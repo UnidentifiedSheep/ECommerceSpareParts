@@ -34,6 +34,8 @@ public class CalculateFullMetricHandler(
             request.RequestId,
             request.MetricSystemName);
 
+        unitOfWork.Context.SuppressAutoSave = true;
+        
         var job = await GetAndValidateJob(request.RequestId, ct);
         
         var metric = await CreateMetricAndStartJob(request, job, ct);

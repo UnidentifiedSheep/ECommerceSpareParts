@@ -9,7 +9,7 @@ namespace Analytics.Application.Handlers.Metrics.CreateMetric;
 public record CreateMetricCommand(
     string MetricSystemName, 
     string MetricPayload, 
-    Guid CreatedBy) : ICommand<CreateMetricResult>;
+    Guid CreatedBy) : ICommand<CreateMetricResult>, IAutoSaveCommand;
 
 public record CreateMetricResult(Metric Metric);
 

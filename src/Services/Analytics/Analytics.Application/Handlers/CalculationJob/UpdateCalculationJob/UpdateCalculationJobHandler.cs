@@ -13,10 +13,11 @@ namespace Analytics.Application.Handlers.CalculationJob.UpdateCalculationJob;
 public record UpdateCalculationJobCommand(
     Guid RequestId, 
     CalculationStatus Status,
-    Guid? MetricId) : ICommand<UpdateCalculationJobResult>;
+    Guid? MetricId) : ICommand<UpdateCalculationJobResult>, IAutoSaveCommand;
 public record UpdateCalculationJobResult(MetricCalculationJob CalculationJob);
 
-public class UpdateCalculationJobHandler(IMetricCalculationJobRepository jobRepository)
+public class UpdateCalculationJobHandler(
+    IMetricCalculationJobRepository jobRepository)
     : ICommandHandler<UpdateCalculationJobCommand, UpdateCalculationJobResult>
 {
     public async Task<UpdateCalculationJobResult> Handle(UpdateCalculationJobCommand request, CancellationToken cancellationToken)

@@ -13,7 +13,7 @@ using Microsoft.Extensions.Logging;
 namespace Analytics.Application.Handlers.PurchaseFacts.UpsertPurchaseFact;
 
 [Transactional(IsolationLevel.ReadCommitted, 2, 20)]
-public record UpsertPurchaseFactCommand(PurchaseFactUpsertDto PurchaseFact) : ICommand;
+public record UpsertPurchaseFactCommand(PurchaseFactUpsertDto PurchaseFact) : ICommand, IAutoSaveCommand;
 
 public class UpsertPurchaseFactHandler(
     IPurchaseFactRepository factRepository,
@@ -75,7 +75,6 @@ public class UpsertPurchaseFactHandler(
         if (shouldBeAdded)
             await unitOfWork.AddAsync(dbFact, cancellationToken);
 
-        await unitOfWork.SaveChangesAsync(cancellationToken);
         return Unit.Value;
     }
 }
