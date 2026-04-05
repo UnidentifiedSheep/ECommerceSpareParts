@@ -1,6 +1,11 @@
-﻿namespace Analytics.Application.Services.Metrics.Calculators;
+﻿using Analytics.Entities.Metrics;
 
-public class ArticlePurchasesMetricCalculator
+namespace Analytics.Application.Services.Metrics.Calculators;
+
+public class ArticlePurchasesMetricCalculator : MetricCalculatorBase<ArticlePurchasesMetric>
 {
-    
+    public override async Task CalculateMetric(ArticlePurchasesMetric metric, CancellationToken cancellationToken = default)
+    {
+        
+    }
 }

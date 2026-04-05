@@ -54,6 +54,7 @@ public static class ServiceProvider
         collection.AddScoped<IMetricValidatorDispatcher, MetricValidatorDispatcher>();
 
         collection.AddScoped<IMetricCalculator<ArticleSalesMetric>, ArticleSalesMetricCalculator>();
+        collection.AddScoped<IMetricCalculator<ArticlePurchasesMetric>, ArticlePurchasesMetricCalculator>();
         return collection;
     }
 
@@ -61,6 +62,7 @@ public static class ServiceProvider
     {
         collection.AddSingleton<IMetricConverterDispatcher, MetricConverterDispatcher>();
         collection.AddSingleton<IMetricConverter<ArticlePurchasesMetric>, ArticlePurchaseMetricConverter>();
+        collection.AddSingleton<IMetricConverter<ArticleSalesMetric>, ArticleSaleMetricConverter>();
         
         return collection;
     }

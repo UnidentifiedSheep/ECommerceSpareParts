@@ -26,32 +26,35 @@ public class ArticleSalesMetricCalculator(
 
         var (start, end) = await WithTimer(async () =>
         {
-            await foreach (var fact in salesRepository.GetFacts(GetWhere(metric)).WithCancellation(cancellationToken))
+            await foreach (var fact in salesRepository
+                               .GetFacts(GetWhere(metric))
+                               .WithCancellation(cancellationToken))
             {
-                var neededArticle = fact.SaleContents
-                    .Where(x => x.ArticleId == metric.ArticleId)
-                    .Select(x => (price: currencyConverter.ConvertToUsd(x.Price, fact.CurrencyId), quantity: x.Count))
-                    .ToList();
-
-                foreach (var (priceDecimal, quantity) in neededArticle)
+                foreach (var item in fact.SaleContents)
                 {
+                    if (item.ArticleId != metric.ArticleId)
+                        continue;
+
+                    var priceDecimal = currencyConverter.ConvertToUsd(item.Price, fact.CurrencyId);
+                    var quantity = item.Count;
+
+                    if (quantity <= 0)
+                        continue;
+
                     var price = (double)priceDecimal;
 
-                    minPrice = Math.Min(minPrice, priceDecimal);
-                    maxPrice = Math.Max(maxPrice, priceDecimal);
+                    if (priceDecimal < minPrice) minPrice = priceDecimal;
+                    if (priceDecimal > maxPrice) maxPrice = priceDecimal;
 
                     totalAmount += priceDecimal * quantity;
                     totalQuantity += quantity;
+                    
+                    count += quantity;
 
-                    for (int i = 0; i < quantity; i++)
-                    {
-                        count++;
-
-                        var delta = price - mean;
-                        mean += delta / count;
-                        var delta2 = price - mean;
-                        m2 += delta * delta2;
-                    }
+                    var delta = price - mean;
+                    mean += delta * quantity / count;
+                    var delta2 = price - mean;
+                    m2 += quantity * delta * delta2;
                 }
             }
         });
@@ -68,8 +71,8 @@ public class ArticleSalesMetricCalculator(
             PriceInfo = new PriceInfoModel
             {
                 AveragePrice = avgPrice,
-                MaximumPrice = maxPrice,
-                MinimumPrice = minPrice,
+                MaximumPrice = totalQuantity == 0 ? 0 : maxPrice,
+                MinimumPrice = totalQuantity == 0 ? 0 : minPrice,
                 Volatility = volatility,
             },
             Timer = new MetricTimer(start, end)
