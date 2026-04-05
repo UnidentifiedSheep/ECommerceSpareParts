@@ -13,7 +13,7 @@ public static class UserSeed
     public static async Task SeedAdmin(string login, string password, string email, IServiceProvider sp)
     {
         using var scope = sp.CreateScope();
-        var logger = scope.ServiceProvider.GetRequiredService<ILogger>();
+        var logger = scope.ServiceProvider.GetRequiredService<ILogger<CreateUserCommand>>();
         var mediator = scope.ServiceProvider.GetRequiredService<IMediator>();
         
         var command = new CreateUserCommand(login, password, new UserInfoDto
