@@ -1,8 +1,8 @@
-﻿using Main.Entities;
+﻿using System.Reflection;
+using Main.Entities;
 using MassTransit;
 using MassTransit.EntityFrameworkCoreIntegration;
 using Microsoft.EntityFrameworkCore;
-using NpgsqlTypes;
 using Persistence.Extensions;
 using Persistence.Interceptors;
 
@@ -21,7 +21,7 @@ public partial class DContext : DbContext
 
     public virtual DbSet<Product> Articles { get; set; }
 
-    public virtual DbSet<ArticleCharacteristic> ArticleCharacteristics { get; set; }
+    public virtual DbSet<ProductCharacteristic> ArticleCharacteristics { get; set; }
 
     public virtual DbSet<ArticleCoefficient> ArticleCoefficients { get; set; }
 
@@ -37,7 +37,7 @@ public partial class DContext : DbContext
 
     public virtual DbSet<ArticlesContent> ArticlesContents { get; set; }
 
-    public virtual DbSet<ArticlesPair> ArticlesPairs { get; set; }
+    public virtual DbSet<ProductPair> ArticlesPairs { get; set; }
 
     public virtual DbSet<Cart> Carts { get; set; }
 
@@ -143,29 +143,12 @@ public partial class DContext : DbContext
             .HasPostgresExtension("pg_trgm")
             .HasPostgresExtension("pgcrypto");
 
+        modelBuilder.ApplyConfigurationsFromAssembly(Assembly.GetAssembly(GetType()!));
 
-        modelBuilder.Entity<ArticleCharacteristic>(entity =>
+
+        modelBuilder.Entity<ProductCharacteristic>(entity =>
         {
-            entity.HasKey(e => e.Id).HasName("article_characteristics_pk");
-
-            entity.ToTable("article_characteristics");
-
-            entity.HasIndex(e => e.Value, "article_characteristics_value_index");
-
-            entity.HasIndex(e => e.ArticleId, "article_id__index");
-
-            entity.Property(e => e.Id).HasColumnName("id");
-            entity.Property(e => e.ArticleId).HasColumnName("article_id");
-            entity.Property(e => e.Name)
-                .HasMaxLength(128)
-                .HasColumnName("name");
-            entity.Property(e => e.Value)
-                .HasMaxLength(128)
-                .HasColumnName("value");
-
-            entity.HasOne(d => d.Product).WithMany(p => p.ArticleCharacteristics)
-                .HasForeignKey(d => d.ArticleId)
-                .HasConstraintName("article_id_fk");
+            
         });
 
         modelBuilder.Entity<ArticleCoefficient>(entity =>
@@ -336,25 +319,25 @@ public partial class DContext : DbContext
                 .HasConstraintName("articles_content_out_id___fk");
         });
 
-        modelBuilder.Entity<ArticlesPair>(entity =>
+        modelBuilder.Entity<ProductPair>(entity =>
         {
-            entity.HasKey(e => new { e.ArticleLeft, e.ArticleRight }).HasName("articles_pair_pk");
+            entity.HasKey(e => new { ArticleLeft = e.Left, ArticleRight = e.Right }).HasName("articles_pair_pk");
 
             entity.ToTable("articles_pair");
 
-            entity.HasIndex(e => e.ArticleRight, "IX_articles_pair_article_right");
+            entity.HasIndex(e => e.Right, "IX_articles_pair_article_right");
 
-            entity.HasIndex(e => e.ArticleLeft, "articles_pair_article_left_uindex").IsUnique();
+            entity.HasIndex(e => e.Left, "articles_pair_article_left_uindex").IsUnique();
 
-            entity.Property(e => e.ArticleLeft).HasColumnName("article_left");
-            entity.Property(e => e.ArticleRight).HasColumnName("article_right");
+            entity.Property(e => e.Left).HasColumnName("article_left");
+            entity.Property(e => e.Right).HasColumnName("article_right");
 
             entity.HasOne(d => d.ProductLeftNavigation).WithOne(p => p.ArticlesPairArticleLeftNavigation)
-                .HasForeignKey<ArticlesPair>(d => d.ArticleLeft)
+                .HasForeignKey<ProductPair>(d => d.Left)
                 .HasConstraintName("articles_pair_articles_id_fk");
 
             entity.HasOne(d => d.ProductRightNavigation).WithMany(p => p.ArticlesPairArticleRightNavigations)
-                .HasForeignKey(d => d.ArticleRight)
+                .HasForeignKey(d => d.Right)
                 .OnDelete(DeleteBehavior.ClientSetNull)
                 .HasConstraintName("articles_pair_articles_id_fk_2");
         });

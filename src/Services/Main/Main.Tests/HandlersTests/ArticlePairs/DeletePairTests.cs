@@ -45,8 +45,8 @@ public class DeletePairTests : IAsyncLifetime
     {
         // ensure created
         var before = await _context.ArticlesPairs.CountAsync(x =>
-            (x.ArticleLeft == _leftArticleId && x.ArticleRight == _rightArticleId) ||
-            (x.ArticleLeft == _rightArticleId && x.ArticleRight == _leftArticleId));
+            (x.Left == _leftArticleId && x.Right == _rightArticleId) ||
+            (x.Left == _rightArticleId && x.Right == _leftArticleId));
         Assert.Equal(2, before);
 
         var cmd = new DeletePairCommand(_leftArticleId);
@@ -54,8 +54,8 @@ public class DeletePairTests : IAsyncLifetime
         Assert.Equal(Unit.Value, result);
 
         var after = await _context.ArticlesPairs.CountAsync(x =>
-            x.ArticleLeft == _leftArticleId || x.ArticleRight == _leftArticleId ||
-            x.ArticleLeft == _rightArticleId || x.ArticleRight == _rightArticleId);
+            x.Left == _leftArticleId || x.Right == _leftArticleId ||
+            x.Left == _rightArticleId || x.Right == _rightArticleId);
         Assert.Equal(0, after);
     }
 

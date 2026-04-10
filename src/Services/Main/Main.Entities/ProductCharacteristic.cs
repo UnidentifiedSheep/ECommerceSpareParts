@@ -1,10 +1,8 @@
 ﻿namespace Main.Entities;
 
-public class ArticleCharacteristic
+public class ProductCharacteristic
 {
-    public int Id { get; set; }
-
-    public int ArticleId { get; set; }
+    public int ProductId { get; set; }
 
     public string Value { get; set; } = null!;
 

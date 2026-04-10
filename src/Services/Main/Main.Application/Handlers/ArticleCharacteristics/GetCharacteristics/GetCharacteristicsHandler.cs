@@ -18,7 +18,7 @@ public class GetCharacteristicsHandler(IArticleCharacteristicsRepository reposit
         GetArticleCharacteristicsQuery request,
         CancellationToken cancellationToken)
     {
-        IEnumerable<ArticleCharacteristic> character;
+        IEnumerable<ProductCharacteristic> character;
         if (request.CharacteristicsIds.Any())
             character = await repository
                 .GetArticleCharacteristicsByIds(request.ArticleId, request.CharacteristicsIds, false,

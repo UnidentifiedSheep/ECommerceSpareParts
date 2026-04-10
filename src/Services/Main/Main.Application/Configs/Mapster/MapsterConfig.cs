@@ -163,11 +163,11 @@ public static class MapsterConfig
             .Map(dest => dest.PurchaseDatetime,
                 src => src.PurchaseDate);
 
-        TypeAdapterConfig<CreatePairCommand, ArticlesPair>.NewConfig()
-            .Map(dest => dest.ArticleLeft, src => src.LeftArticleId)
-            .Map(dest => dest.ArticleRight, src => src.RightArticleId);
-        TypeAdapterConfig<NewCharacteristicsDto, ArticleCharacteristic>.NewConfig()
-            .Map(dest => dest.ArticleId, src => src.ArticleId)
+        TypeAdapterConfig<CreatePairCommand, ProductPair>.NewConfig()
+            .Map(dest => dest.Left, src => src.LeftArticleId)
+            .Map(dest => dest.Right, src => src.RightArticleId);
+        TypeAdapterConfig<NewCharacteristicsDto, ProductCharacteristic>.NewConfig()
+            .Map(dest => dest.ProductId, src => src.ArticleId)
             .Map(dest => dest.Name, src => src.Name == null ? null : src.Name.Trim())
             .Map(dest => dest.Value, src => src.Value.Trim());
         //Articles
@@ -228,7 +228,7 @@ public static class MapsterConfig
             .Map(d => d.Images, s => s.Images)
             .Map(d => d.CurrentStock, s => s.CurrentStock);
 
-        TypeAdapterConfig<PatchCharacteristicsDto, ArticleCharacteristic>.NewConfig()
+        TypeAdapterConfig<PatchCharacteristicsDto, ProductCharacteristic>.NewConfig()
             .IgnorePatchIfNotSet()
             .Map(d => d.Name, s => s.Name.Value == null ? null : s.Name.Value.Trim())
             .Map(d => d.Value, s => s.Value.Value == null ? null : s.Value.Value.Trim());

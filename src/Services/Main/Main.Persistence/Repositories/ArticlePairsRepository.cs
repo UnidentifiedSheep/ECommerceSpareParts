@@ -17,17 +17,17 @@ public class ArticlePairsRepository(DContext context) : IArticlePairsRepository
             .ConfigureTracking(track)
             .Include(articlesPair => articlesPair.ProductRightNavigation)
             .Include(articlesPair => articlesPair.ProductLeftNavigation)
-            .FirstOrDefaultAsync(x => x.ArticleLeft == articleId || x.ArticleRight == articleId, cancellationToken);
-        return pair?.ArticleLeft == articleId ? pair.ProductRightNavigation : pair?.ProductLeftNavigation;
+            .FirstOrDefaultAsync(x => x.Left == articleId || x.Right == articleId, cancellationToken);
+        return pair?.Left == articleId ? pair.ProductRightNavigation : pair?.ProductLeftNavigation;
     }
 
-    public async Task<IEnumerable<ArticlesPair>> GetRelatedPairsAsync(
+    public async Task<IEnumerable<ProductPair>> GetRelatedPairsAsync(
         int articleId,
         bool track = true,
         CancellationToken cancellationToken = default)
     {
         return await context.ArticlesPairs.ConfigureTracking(track)
-            .Where(x => x.ArticleLeft == articleId || x.ArticleRight == articleId)
+            .Where(x => x.Left == articleId || x.Right == articleId)
             .ToListAsync(cancellationToken);
     }
 }

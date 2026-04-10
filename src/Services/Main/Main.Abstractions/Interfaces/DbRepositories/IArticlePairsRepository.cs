@@ -6,7 +6,7 @@ public interface IArticlePairsRepository
 {
     Task<Product?> GetArticlePairAsync(int articleId, bool track = true, CancellationToken cancellationToken = default);
 
-    Task<IEnumerable<ArticlesPair>> GetRelatedPairsAsync(
+    Task<IEnumerable<ProductPair>> GetRelatedPairsAsync(
         int articleId,
         bool track = true,
         CancellationToken cancellationToken = default);

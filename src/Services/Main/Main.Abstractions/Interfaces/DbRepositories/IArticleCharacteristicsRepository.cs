@@ -4,18 +4,18 @@ namespace Main.Abstractions.Interfaces.DbRepositories;
 
 public interface IArticleCharacteristicsRepository
 {
-    Task<IEnumerable<ArticleCharacteristic>> GetArticleCharacteristics(
+    Task<IEnumerable<ProductCharacteristic>> GetArticleCharacteristics(
         int articleId,
         bool track = true,
         CancellationToken cancellationToken = default);
 
-    Task<IEnumerable<ArticleCharacteristic>> GetArticleCharacteristicsByIds(
+    Task<IEnumerable<ProductCharacteristic>> GetArticleCharacteristicsByIds(
         int? articleId,
         IEnumerable<int> ids,
         bool track = true,
         CancellationToken cancellationToken = default);
 
-    Task<ArticleCharacteristic?> GetCharacteristic(
+    Task<ProductCharacteristic?> GetCharacteristic(
         int id,
         bool track = true,
         CancellationToken cancellationToken = default);

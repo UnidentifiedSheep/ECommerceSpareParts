@@ -50,8 +50,8 @@ public class CreatePairTests : IAsyncLifetime
 
         // Two rows must be created: (left,right) and (right,left)
         var pairs = await _context.ArticlesPairs
-            .Where(p => (p.ArticleLeft == _leftArticleId && p.ArticleRight == _rightArticleId)
-                        || (p.ArticleLeft == _rightArticleId && p.ArticleRight == _leftArticleId))
+            .Where(p => (p.Left == _leftArticleId && p.Right == _rightArticleId)
+                        || (p.Left == _rightArticleId && p.Right == _leftArticleId))
             .ToListAsync();
         Assert.Equal(2, pairs.Count);
     }

@@ -20,7 +20,7 @@ public class AddCharacteristicsHandler(IUnitOfWork unitOfWork)
         AddCharacteristicsCommand request,
         CancellationToken cancellationToken)
     {
-        var adapted = request.Characteristics.Adapt<List<ArticleCharacteristic>>();
+        var adapted = request.Characteristics.Adapt<List<ProductCharacteristic>>();
         await unitOfWork.AddRangeAsync(adapted, cancellationToken);
         await unitOfWork.SaveChangesAsync(cancellationToken);
         return new AddCharacteristicsResult(adapted.Select(x => x.Id));

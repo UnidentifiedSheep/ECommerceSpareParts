@@ -8,16 +8,16 @@ namespace Main.Persistence.Repositories;
 
 public class ArticleCharacteristicsRepository(DContext context) : IArticleCharacteristicsRepository
 {
-    public async Task<IEnumerable<ArticleCharacteristic>> GetArticleCharacteristics(
+    public async Task<IEnumerable<ProductCharacteristic>> GetArticleCharacteristics(
         int articleId,
         bool track = true,
         CancellationToken cancellationToken = default)
     {
-        return await context.ArticleCharacteristics.ConfigureTracking(track).Where(x => x.ArticleId == articleId)
+        return await context.ArticleCharacteristics.ConfigureTracking(track).Where(x => x.ProductId == articleId)
             .ToListAsync(cancellationToken);
     }
 
-    public async Task<IEnumerable<ArticleCharacteristic>> GetArticleCharacteristicsByIds(
+    public async Task<IEnumerable<ProductCharacteristic>> GetArticleCharacteristicsByIds(
         int? articleId,
         IEnumerable<int> ids,
         bool track = true,
@@ -25,11 +25,11 @@ public class ArticleCharacteristicsRepository(DContext context) : IArticleCharac
     {
         return await context.ArticleCharacteristics
             .ConfigureTracking(track)
-            .Where(x => ids.Contains(x.Id) && (articleId == null || x.ArticleId == articleId))
+            .Where(x => ids.Contains(x.Id) && (articleId == null || x.ProductId == articleId))
             .ToListAsync(cancellationToken);
     }
 
-    public async Task<ArticleCharacteristic?> GetCharacteristic(
+    public async Task<ProductCharacteristic?> GetCharacteristic(
         int id,
         bool track = true,
         CancellationToken cancellationToken = default)
