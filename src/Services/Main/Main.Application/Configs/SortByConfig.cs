@@ -11,9 +11,9 @@ public static class SortByConfig
     {
         new Product().MapDefault(x => x.Id)
             .Map("id", x => x.Id)
-            .Map("articleNumber", x => x.ArticleNumber)
-            .Map("title", x => x.ArticleName)
-            .Map("count", x => x.TotalCount)
+            .Map("articleNumber", x => x.Sku)
+            .Map("title", x => x.Name)
+            .Map("count", x => x.Stock)
             .Map("producerName", x => x.Producer.Name)
             .Map("indicator", x => x.Indicator)
             .Map("popularity", x => x.Popularity);

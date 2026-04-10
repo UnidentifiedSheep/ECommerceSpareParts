@@ -7,13 +7,11 @@ public class Product
     [Validate]
     public int Id { get; set; }
 
-    public string ArticleNumber { get; set; } = null!;
+    public string Sku { get; set; } = null!;
 
-    public string NormalizedArticleNumber { get; set; } = null!;
+    public string NormalizedSku { get; set; } = null!;
 
-    public string ArticleName { get; set; } = null!;
-
-    public bool IsValid { get; set; }
+    public string Name { get; set; } = null!;
 
     public string? Description { get; set; }
 
@@ -21,9 +19,7 @@ public class Product
 
     public int ProducerId { get; set; }
 
-    public bool IsOe { get; set; }
-
-    public int TotalCount { get; set; }
+    public int Stock { get; set; }
 
     public string? Indicator { get; set; }
 

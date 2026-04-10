@@ -196,8 +196,8 @@ public class RestoreContentToStorageTests : IAsyncLifetime
         }
 
         foreach (var i in storageContents)
-            articles[i.Value.ArticleId].TotalCount -= i.Value.Count;
+            articles[i.Value.ArticleId].Stock -= i.Value.Count;
 
-        Assert.All(articles, x => Assert.Equal(0, x.Value.TotalCount));
+        Assert.All(articles, x => Assert.Equal(0, x.Value.Stock));
     }
 }

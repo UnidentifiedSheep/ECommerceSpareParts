@@ -168,7 +168,7 @@ public class EditStorageContentTests : IAsyncLifetime
         Assert.Equal(prevMovementCount + 1, currMovementCount);
         Assert.Equal(content.BuyPrice, movement.Price);
 
-        Assert.Equal(articleBefore.TotalCount, articleAfter.TotalCount - 5);
+        Assert.Equal(articleBefore.Stock, articleAfter.Stock - 5);
         Assert.NotNull(updated);
         Assert.Equal(content.Count + 5, updated.Count);
         Assert.Equal(content.BuyPrice + 10, updated.BuyPrice);

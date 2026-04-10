@@ -8,14 +8,14 @@ namespace Tests.MockData.DataFactories;
 public static class ArticleFactory
 {
     private static readonly Faker<Product> Faker = new Faker<Product>(Global.Locale)
-        .RuleFor(x => x.ArticleNumber, f => f.Lorem.Letter(20))
-        .RuleFor(x => x.ArticleName, f => f.Commerce.ProductName())
+        .RuleFor(x => x.Sku, f => f.Lorem.Letter(20))
+        .RuleFor(x => x.Name, f => f.Commerce.ProductName())
         .RuleFor(x => x.Description, f => f.Commerce.ProductDescription())
         .RuleFor(x => x.ProducerId, f => f.Random.Int(1))
         .RuleFor(x => x.Indicator, f => f.Commerce.Color())
         .RuleFor(x => x.IsOe, f => f.Random.Bool())
         .RuleFor(x => x.PackingUnit, f => f.Random.Int(1, 100))
-        .RuleFor(x => x.TotalCount, _ => 0)
+        .RuleFor(x => x.Stock, _ => 0)
         .RuleFor(x => x.ArticleSize, f =>
         {
             var h = Math.Round(f.Random.Decimal(1, 100), 2);
@@ -37,7 +37,7 @@ public static class ArticleFactory
             Weight = Math.Round(f.Random.Decimal(1, 100), 2),
             Unit = f.PickRandom<WeightUnit>()
         })
-        .FinishWith((_, x) => { x.NormalizedArticleNumber = x.ArticleNumber.ToNormalizedArticleNumber(); });
+        .FinishWith((_, x) => { x.NormalizedSku = x.Sku.ToNormalizedArticleNumber(); });
 
     public static List<Product> Create(int count, params int[] producerIds)
     {

@@ -212,7 +212,7 @@ public class AddContentToStorageTests : IAsyncLifetime
 
         // Проверка Article.TotalCount
         foreach (var (articleId, expectedTotal) in expectedTotals)
-            Assert.Equal(expectedTotal, dbArticles[articleId].TotalCount);
+            Assert.Equal(expectedTotal, dbArticles[articleId].Stock);
 
         // Проверка StorageContent
         Assert.Equal(allInputs.Count, dbStorageContents.Count);

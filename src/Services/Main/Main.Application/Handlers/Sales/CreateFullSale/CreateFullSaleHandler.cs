@@ -128,7 +128,7 @@ public class CreateFullSaleHandler(
             foreach (var (id, count) in byReservation.OrderBy(x => x.Key))
             {
                 var art = arts[id];
-                var key = $"{art.Producer.Name}_{art.ArticleNumber}";
+                var key = $"{art.Producer.Name}_{art.Sku}";
                 res[key] = count;
                 codeBuilder.Append(HashUtils.ComputeHash(key, count));
             }

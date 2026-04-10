@@ -65,10 +65,10 @@ public class SaleRepository(DContext context) : ISaleRepository
             var searchTerm = options.Data.SearchTerm.Trim();
             var normalizedSearchTerm = searchTerm.ToNormalizedArticleNumber();
             query = query.Where(x => x.SaleContents
-                                         .Any(content => EF.Functions.ToTsVector("russian", content.Product.ArticleName)
+                                         .Any(content => EF.Functions.ToTsVector("russian", content.Product.Name)
                                                              .Matches(
                                                                  EF.Functions.PlainToTsQuery("russian", searchTerm)) ||
-                                                         EF.Functions.ILike(content.Product.NormalizedArticleNumber,
+                                                         EF.Functions.ILike(content.Product.NormalizedSku,
                                                              $"%{normalizedSearchTerm}%")) ||
                                      (x.Comment != null && EF.Functions.ILike(x.Comment, $"%{searchTerm}%")) ||
                                      x.SaleContents.Any(z =>

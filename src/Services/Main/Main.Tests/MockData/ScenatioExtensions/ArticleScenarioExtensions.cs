@@ -49,7 +49,7 @@ public static class ArticleScenarioExtensions
             var storageContents = StorageContentFactory
                 .Create(count, currencyList, [id], storageList);
 
-            article.TotalCount += storageContents.Sum(x => x.Count);
+            article.Stock += storageContents.Sum(x => x.Count);
 
             await ctx.AddRangeAsync(storageContents);
         }

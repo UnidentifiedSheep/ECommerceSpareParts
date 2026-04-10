@@ -52,7 +52,7 @@ public class CreateArticleTests : IAsyncLifetime
 
         Assert.Equal(articleList.Count, result.CreatedIds.Count);
 
-        var saved = await _context.Articles.AnyAsync(a => a.ArticleNumber == articleList[0].ArticleNumber);
+        var saved = await _context.Articles.AnyAsync(a => a.Sku == articleList[0].ArticleNumber);
         Assert.True(saved);
     }
 
@@ -71,8 +71,8 @@ public class CreateArticleTests : IAsyncLifetime
         var saved = true;
         foreach (var item in articleList)
         {
-            saved = await _context.Articles.AnyAsync(a => a.ArticleNumber == item.ArticleNumber &&
-                                                          a.ArticleName == item.Name &&
+            saved = await _context.Articles.AnyAsync(a => a.Sku == item.ArticleNumber &&
+                                                          a.Name == item.Name &&
                                                           a.ProducerId == item.ProducerId);
             if (!saved) break;
         }

@@ -81,7 +81,7 @@ public class GetArticlesWithNotEnoughStockTests : IAsyncLifetime
 
         var query = new GetArticlesWithNotEnoughStockQuery(_buyer.Id, _storageName, false, new Dictionary<int, int>
         {
-            { _product.Id, articleCount.TotalCount + 15 } // deficit is 15
+            { _product.Id, articleCount.Stock + 15 } // deficit is 15
         });
         var result = await _mediator.Send(query);
         var found = result.NotEnoughByStock.TryGetValue(_product.Id, out var deficit);
@@ -96,7 +96,7 @@ public class GetArticlesWithNotEnoughStockTests : IAsyncLifetime
         // Needed 8, stock 10 -> stockDiff = 2; others 5; user 1 -> reservationsDiff = 2 - 5 + 1 = -2
         var query = new GetArticlesWithNotEnoughStockQuery(_buyer.Id, _storageName, false, new Dictionary<int, int>
         {
-            { _product.Id, article.TotalCount - 2 }
+            { _product.Id, article.Stock - 2 }
         });
         var result = await _mediator.Send(query);
         Assert.True(result.NotEnoughByReservation.TryGetValue(_product.Id, out var deficit) && deficit == 2);

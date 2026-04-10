@@ -120,7 +120,7 @@ public class RemoveContentFromStorageTests : IAsyncLifetime
         var article = await _context.Articles.AsNoTracking().FirstAsync(x => x.Id == storageContent.ArticleId);
         var content = new Dictionary<int, int>
         {
-            [article.Id] = article.TotalCount + 1000
+            [article.Id] = article.Stock + 1000
         };
 
         var command = new RemoveContentCommand(content, _user.Id, storageContent.StorageName, false,
