@@ -19,7 +19,7 @@ public partial class DContext : DbContext
     {
     }
 
-    public virtual DbSet<Article> Articles { get; set; }
+    public virtual DbSet<Product> Articles { get; set; }
 
     public virtual DbSet<ArticleCharacteristic> ArticleCharacteristics { get; set; }
 
@@ -143,7 +143,7 @@ public partial class DContext : DbContext
             .HasPostgresExtension("pg_trgm")
             .HasPostgresExtension("pgcrypto");
 
-        modelBuilder.Entity<Article>(entity =>
+        modelBuilder.Entity<Product>(entity =>
         {
             entity.HasKey(e => e.Id).HasName("articles_id_pk");
 
@@ -220,10 +220,10 @@ public partial class DContext : DbContext
             entity.HasMany(d => d.ArticleCrosses).WithMany(p => p.Articles)
                 .UsingEntity<Dictionary<string, object>>(
                     "ArticleCross",
-                    r => r.HasOne<Article>().WithMany()
+                    r => r.HasOne<Product>().WithMany()
                         .HasForeignKey("ArticleCrossId")
                         .HasConstraintName("article_crosses_articles_id_fk_2"),
-                    l => l.HasOne<Article>().WithMany()
+                    l => l.HasOne<Product>().WithMany()
                         .HasForeignKey("ArticleId")
                         .HasConstraintName("article_crosses_articles_id_fk"),
                     j =>
@@ -239,10 +239,10 @@ public partial class DContext : DbContext
             entity.HasMany(d => d.Articles).WithMany(p => p.ArticleCrosses)
                 .UsingEntity<Dictionary<string, object>>(
                     "ArticleCross",
-                    r => r.HasOne<Article>().WithMany()
+                    r => r.HasOne<Product>().WithMany()
                         .HasForeignKey("ArticleId")
                         .HasConstraintName("article_crosses_articles_id_fk"),
-                    l => l.HasOne<Article>().WithMany()
+                    l => l.HasOne<Product>().WithMany()
                         .HasForeignKey("ArticleCrossId")
                         .HasConstraintName("article_crosses_articles_id_fk_2"),
                     j =>
@@ -275,7 +275,7 @@ public partial class DContext : DbContext
                 .HasMaxLength(128)
                 .HasColumnName("value");
 
-            entity.HasOne(d => d.Article).WithMany(p => p.ArticleCharacteristics)
+            entity.HasOne(d => d.Product).WithMany(p => p.ArticleCharacteristics)
                 .HasForeignKey(d => d.ArticleId)
                 .HasConstraintName("article_id_fk");
         });
@@ -297,7 +297,7 @@ public partial class DContext : DbContext
                 .HasColumnName("created_at");
             entity.Property(e => e.ValidTill).HasColumnName("valid_till");
 
-            entity.HasOne(d => d.Article).WithMany(p => p.ArticleCoefficients)
+            entity.HasOne(d => d.Product).WithMany(p => p.ArticleCoefficients)
                 .HasForeignKey(d => d.ArticleId)
                 .HasConstraintName("article_coefficients_articles_id_fk");
 
@@ -322,7 +322,7 @@ public partial class DContext : DbContext
                 .HasMaxLength(24)
                 .HasColumnName("ean");
 
-            entity.HasOne(d => d.Article).WithMany(p => p.ArticleEans)
+            entity.HasOne(d => d.Product).WithMany(p => p.ArticleEans)
                 .HasForeignKey(d => d.ArticleId)
                 .HasConstraintName("article_id___fk");
         });
@@ -341,7 +341,7 @@ public partial class DContext : DbContext
                 .HasMaxLength(128)
                 .HasColumnName("description");
 
-            entity.HasOne(d => d.Article).WithMany(p => p.ArticleImages)
+            entity.HasOne(d => d.Product).WithMany(p => p.ArticleImages)
                 .HasForeignKey(d => d.ArticleId)
                 .HasConstraintName("article_id_fk");
         });
@@ -363,7 +363,7 @@ public partial class DContext : DbContext
             entity.Property(e => e.VolumeM3).HasColumnName("volume_m3");
             entity.Property(e => e.Width).HasColumnName("width");
 
-            entity.HasOne(d => d.Article).WithOne(p => p.ArticleSize)
+            entity.HasOne(d => d.Product).WithOne(p => p.ArticleSize)
                 .HasForeignKey<ArticleSize>(d => d.ArticleId)
                 .HasConstraintName("article_sizes_articles_id_fk");
         });
@@ -393,7 +393,7 @@ public partial class DContext : DbContext
             entity.Property(e => e.DeliveryIdDays).HasColumnName("delivery_id_days");
             entity.Property(e => e.WhoProposed).HasColumnName("who_proposed");
 
-            entity.HasOne(d => d.Article).WithMany(p => p.ArticleSupplierBuyInfos)
+            entity.HasOne(d => d.Product).WithMany(p => p.ArticleSupplierBuyInfos)
                 .HasForeignKey(d => d.ArticleId)
                 .HasConstraintName("article_supplier_buy_info_articles_id_fk");
 
@@ -420,7 +420,7 @@ public partial class DContext : DbContext
                 .HasColumnName("unit");
             entity.Property(e => e.Weight).HasColumnName("weight");
 
-            entity.HasOne(d => d.Article).WithOne(p => p.ArticleWeight)
+            entity.HasOne(d => d.Product).WithOne(p => p.ArticleWeight)
                 .HasForeignKey<ArticleWeight>(d => d.ArticleId)
                 .HasConstraintName("article_weight_articles_id_fk");
         });
@@ -439,11 +439,11 @@ public partial class DContext : DbContext
             entity.Property(e => e.InsideArticleId).HasColumnName("inside_article_id");
             entity.Property(e => e.Quantity).HasColumnName("quantity");
 
-            entity.HasOne(d => d.InsideArticle).WithMany(p => p.ArticlesContentInsideArticles)
+            entity.HasOne(d => d.InsideProduct).WithMany(p => p.ArticlesContentInsideArticles)
                 .HasForeignKey(d => d.InsideArticleId)
                 .HasConstraintName("articles_content_in_id___fk");
 
-            entity.HasOne(d => d.MainArticle).WithMany(p => p.ArticlesContentMainArticles)
+            entity.HasOne(d => d.MainProduct).WithMany(p => p.ArticlesContentMainArticles)
                 .HasForeignKey(d => d.MainArticleId)
                 .HasConstraintName("articles_content_out_id___fk");
         });
@@ -461,11 +461,11 @@ public partial class DContext : DbContext
             entity.Property(e => e.ArticleLeft).HasColumnName("article_left");
             entity.Property(e => e.ArticleRight).HasColumnName("article_right");
 
-            entity.HasOne(d => d.ArticleLeftNavigation).WithOne(p => p.ArticlesPairArticleLeftNavigation)
+            entity.HasOne(d => d.ProductLeftNavigation).WithOne(p => p.ArticlesPairArticleLeftNavigation)
                 .HasForeignKey<ArticlesPair>(d => d.ArticleLeft)
                 .HasConstraintName("articles_pair_articles_id_fk");
 
-            entity.HasOne(d => d.ArticleRightNavigation).WithMany(p => p.ArticlesPairArticleRightNavigations)
+            entity.HasOne(d => d.ProductRightNavigation).WithMany(p => p.ArticlesPairArticleRightNavigations)
                 .HasForeignKey(d => d.ArticleRight)
                 .OnDelete(DeleteBehavior.ClientSetNull)
                 .HasConstraintName("articles_pair_articles_id_fk_2");
@@ -487,7 +487,7 @@ public partial class DContext : DbContext
                 .HasDefaultValueSql("now()")
                 .HasColumnName("updated_at");
 
-            entity.HasOne(d => d.Article).WithMany(p => p.Carts)
+            entity.HasOne(d => d.Product).WithMany(p => p.Carts)
                 .HasForeignKey(d => d.ArticleId)
                 .HasConstraintName("cart_articles_id_fk");
 
@@ -676,7 +676,7 @@ public partial class DContext : DbContext
             entity.Property(e => e.OrderId).HasColumnName("order_id");
             entity.Property(e => e.SignedPrice).HasColumnName("signed_price");
 
-            entity.HasOne(d => d.Article).WithMany(p => p.OrderItems)
+            entity.HasOne(d => d.Product).WithMany(p => p.OrderItems)
                 .HasForeignKey(d => d.ArticleId)
                 .OnDelete(DeleteBehavior.Restrict)
                 .HasConstraintName("order_items_articles_id_fk");
@@ -935,7 +935,7 @@ public partial class DContext : DbContext
             entity.Property(e => e.StorageContentId).HasColumnName("storage_content_id");
             entity.Property(e => e.TotalSum).HasColumnName("total_sum");
 
-            entity.HasOne(d => d.Article).WithMany(p => p.PurchaseContents)
+            entity.HasOne(d => d.Product).WithMany(p => p.PurchaseContents)
                 .HasForeignKey(d => d.ArticleId)
                 .OnDelete(DeleteBehavior.Restrict)
                 .HasConstraintName("purchase_content_articles_id_fk");
@@ -1168,7 +1168,7 @@ public partial class DContext : DbContext
             entity.Property(e => e.SaleId).HasColumnName("sale_id");
             entity.Property(e => e.TotalSum).HasColumnName("total_sum");
 
-            entity.HasOne(d => d.Article).WithMany(p => p.SaleContents)
+            entity.HasOne(d => d.Product).WithMany(p => p.SaleContents)
                 .HasForeignKey(d => d.ArticleId)
                 .OnDelete(DeleteBehavior.Restrict)
                 .HasConstraintName("sale_content_articles_id_fk");
@@ -1293,7 +1293,7 @@ public partial class DContext : DbContext
                 .HasMaxLength(128)
                 .HasColumnName("storage_name");
 
-            entity.HasOne(d => d.Article).WithMany(p => p.StorageContents)
+            entity.HasOne(d => d.Product).WithMany(p => p.StorageContents)
                 .HasForeignKey(d => d.ArticleId)
                 .OnDelete(DeleteBehavior.Restrict)
                 .HasConstraintName("storage_content_articles_id_fk");
@@ -1356,7 +1356,7 @@ public partial class DContext : DbContext
             entity.Property(e => e.WhoCreated).HasColumnName("who_created");
             entity.Property(e => e.WhoUpdated).HasColumnName("who_updated");
 
-            entity.HasOne(d => d.Article).WithMany(p => p.StorageContentReservations)
+            entity.HasOne(d => d.Product).WithMany(p => p.StorageContentReservations)
                 .HasForeignKey(d => d.ArticleId)
                 .OnDelete(DeleteBehavior.Restrict)
                 .HasConstraintName("storage_content_reservations_articles_id_fk");
@@ -1418,7 +1418,7 @@ public partial class DContext : DbContext
                 .HasColumnName("storage_name");
             entity.Property(e => e.WhoMoved).HasColumnName("who_moved");
 
-            entity.HasOne(d => d.Article).WithMany(p => p.StorageMovements)
+            entity.HasOne(d => d.Product).WithMany(p => p.StorageMovements)
                 .HasForeignKey(d => d.ArticleId)
                 .OnDelete(DeleteBehavior.Restrict)
                 .HasConstraintName("storage_movement_articles_id_fk");

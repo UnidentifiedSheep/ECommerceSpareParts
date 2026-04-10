@@ -2,7 +2,7 @@
 
 namespace Main.Entities;
 
-public class Article
+public class Product
 {
     [Validate]
     public int Id { get; set; }
@@ -75,7 +75,7 @@ public class Article
 
     public virtual ICollection<StorageMovement> StorageMovements { get; set; } = new List<StorageMovement>();
 
-    public virtual ICollection<Article> ArticleCrosses { get; set; } = new List<Article>();
+    public virtual ICollection<Product> ArticleCrosses { get; set; } = new List<Product>();
 
-    public virtual ICollection<Article> Articles { get; set; } = new List<Article>();
+    public virtual ICollection<Product> Articles { get; set; } = new List<Product>();
 }

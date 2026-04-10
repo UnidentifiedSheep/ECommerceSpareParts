@@ -25,7 +25,7 @@ public class CreateArticlesHandler(
 {
     public async Task<CreateArticlesResult> Handle(CreateArticlesCommand request, CancellationToken cancellationToken)
     {
-        var articles = request.NewArticles.Adapt<List<Article>>();
+        var articles = request.NewArticles.Adapt<List<Product>>();
         await unitOfWork.AddRangeAsync(articles, cancellationToken);
         await unitOfWork.SaveChangesAsync(cancellationToken);
 
@@ -34,7 +34,7 @@ public class CreateArticlesHandler(
         return new CreateArticlesResult(articles.Select(x => x.Id).ToList());
     }
 
-    private async Task PublishEvent(List<Article> articles, CancellationToken cancellationToken)
+    private async Task PublishEvent(List<Product> articles, CancellationToken cancellationToken)
     {
         var producerIds = articles.Select(x => x.ProducerId).Distinct();
         var producers = (await producerRepository

@@ -57,7 +57,7 @@ public static class MapsterConfig
     {
         MapsterUserConfig.Configure();
         PurchaseContractConfig.Configure();
-        TypeAdapterConfig<Article, ContractArticle>.NewConfig()
+        TypeAdapterConfig<Product, ContractArticle>.NewConfig()
             .Map(d => d.Id, s => s.Id)
             .Map(d => d.ArticleNumber, s => s.ArticleNumber)
             .Map(d => d.NormalizedArticleNumber, s => s.NormalizedArticleNumber)
@@ -116,7 +116,7 @@ public static class MapsterConfig
 
         TypeAdapterConfig<PurchaseContent, PurchaseContentDto>.NewConfig()
             .Map(dest => dest.Id, src => src.Id)
-            .Map(dest => dest.Article, src => src.Article)
+            .Map(dest => dest.Article, src => src.Product)
             .Map(dest => dest.TotalSum, src => src.TotalSum)
             .Map(dest => dest.Comment, src => src.Comment)
             .Map(dest => dest.Price, src => src.Price)
@@ -172,7 +172,7 @@ public static class MapsterConfig
             .Map(dest => dest.Value, src => src.Value.Trim());
         //Articles
         //ALL
-        TypeAdapterConfig<Article, AmwArticleDto>.NewConfig()
+        TypeAdapterConfig<Product, AmwArticleDto>.NewConfig()
             .Map(dest => dest.Id, src => src.Id)
             .Map(dest => dest.ProducerId, src => src.ProducerId)
             .Map(dest => dest.ProducerName, src => src.Producer.Name)
@@ -181,7 +181,7 @@ public static class MapsterConfig
             .Map(dest => dest.CurrentStock, src => src.TotalCount)
             .Map(dest => dest.Indicator, src => src.Indicator);
 
-        TypeAdapterConfig<Article, AnonymousArticleDto>.NewConfig()
+        TypeAdapterConfig<Product, AnonymousArticleDto>.NewConfig()
             .Map(dest => dest.Id, src => src.Id)
             .Map(dest => dest.ProducerName, src => src.Producer.Name)
             .Map(dest => dest.Title, src => src.ArticleName)
@@ -191,10 +191,10 @@ public static class MapsterConfig
         TypeAdapterConfig<ArticlesContent, ContentArticleDto>.NewConfig()
             .IgnoreNonMapped(true)
             .Map(d => d.Quantity, src => src.Quantity)
-            .Map(d => d.Article, s => s.InsideArticle);
+            .Map(d => d.Article, s => s.InsideProduct);
 
         //AMW
-        TypeAdapterConfig<CreateArticleDto, Article>.NewConfig()
+        TypeAdapterConfig<CreateArticleDto, Product>.NewConfig()
             .Map(d => d.ArticleName, s => s.Name.Trim())
             .Map(d => d.ProducerId, s => s.ProducerId)
             .Map(d => d.Description, s => string.IsNullOrWhiteSpace(s.Description) ? null : s.Description.Trim())
@@ -205,7 +205,7 @@ public static class MapsterConfig
             .Map(d => d.PackingUnit, s => s.PackingUnit)
             .Map(d => d.Indicator, s => string.IsNullOrWhiteSpace(s.Indicator) ? null : s.Indicator.Trim())
             .Map(d => d.CategoryId, s => s.CategoryId);
-        TypeAdapterConfig<Article, AmwArticleFullDto>.NewConfig()
+        TypeAdapterConfig<Product, AmwArticleFullDto>.NewConfig()
             .Map(d => d.Id, s => s.Id)
             .Map(d => d.ArticleNumber, s => s.ArticleNumber)
             .Map(d => d.Title, s => s.ArticleName)
@@ -239,7 +239,7 @@ public static class MapsterConfig
             .Map(d => d.Location, s => s.Location == null ? null : s.Location.Trim())
             .Map(d => d.Type, s => s.Type.ToString());
 
-        TypeAdapterConfig<PatchArticleDto, Article>.NewConfig()
+        TypeAdapterConfig<PatchArticleDto, Product>.NewConfig()
             .IgnorePatchIfNotSet()
             .IgnoreIf((src, dest) => !src.ArticleNumber.IsSet, dest => dest.NormalizedArticleNumber)
             .Map(d => d.ArticleName, s => s.ArticleName.Value)
@@ -253,7 +253,7 @@ public static class MapsterConfig
             .Map(d => d.CategoryId, s => s.CategoryId.Value);
 
         //MEMBER
-        TypeAdapterConfig<Article, MemberArticleFullDto>.NewConfig()
+        TypeAdapterConfig<Product, MemberArticleFullDto>.NewConfig()
             .Map(d => d.Id, s => s.Id)
             .Map(d => d.ArticleNumber, s => s.ArticleNumber)
             .Map(d => d.Title, s => s.ArticleName)
@@ -384,7 +384,7 @@ public static class MapsterConfig
         TypeAdapterConfig<StorageContent, StorageMovement>.NewConfig()
             .Ignore(x => x.WhoMovedNavigation)
             .Ignore(x => x.StorageNameNavigation)
-            .Ignore(x => x.Article)
+            .Ignore(x => x.Product)
             .Ignore(x => x.Currency)
             .Ignore(x => x.Id)
             .Map(dest => dest.CurrencyId, src => src.CurrencyId)
@@ -394,7 +394,7 @@ public static class MapsterConfig
             .Map(dest => dest.ArticleId, s => s.ArticleId);
 
         TypeAdapterConfig<StorageContent, StorageContent>.NewConfig()
-            .Ignore(x => x.Article)
+            .Ignore(x => x.Product)
             .Ignore(x => x.Currency)
             .Ignore(x => x.StorageNameNavigation)
             .Ignore(x => x.SaleContentDetails)
@@ -446,7 +446,7 @@ public static class MapsterConfig
 
         TypeAdapterConfig<SaleContent, SaleContentDto>.NewConfig()
             .Map(dest => dest.Id, src => src.Id)
-            .Map(d => d.Article, s => s.Article)
+            .Map(d => d.Article, s => s.Product)
             .Map(d => d.Comment, s => s.Comment)
             .Map(d => d.Count, s => s.Count)
             .Map(d => d.Price, s => s.Price)
@@ -616,7 +616,7 @@ public static class MapsterConfig
             .Map(d => d.ArticleId, s => s.ArticleId)
             .Map(d => d.Count, s => s.Count)
             .Map(d => d.CreatedAt, s => s.CreatedAt)
-            .Map(d => d.Article, s => s.Article);
+            .Map(d => d.Article, s => s.Product);
 
 
         //Storage Route

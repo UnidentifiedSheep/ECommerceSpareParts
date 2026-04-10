@@ -7,7 +7,7 @@ namespace Tests.MockData.DataFactories;
 
 public static class ArticleFactory
 {
-    private static readonly Faker<Article> Faker = new Faker<Article>(Global.Locale)
+    private static readonly Faker<Product> Faker = new Faker<Product>(Global.Locale)
         .RuleFor(x => x.ArticleNumber, f => f.Lorem.Letter(20))
         .RuleFor(x => x.ArticleName, f => f.Commerce.ProductName())
         .RuleFor(x => x.Description, f => f.Commerce.ProductDescription())
@@ -39,7 +39,7 @@ public static class ArticleFactory
         })
         .FinishWith((_, x) => { x.NormalizedArticleNumber = x.ArticleNumber.ToNormalizedArticleNumber(); });
 
-    public static List<Article> Create(int count, params int[] producerIds)
+    public static List<Product> Create(int count, params int[] producerIds)
     {
         var faker = Faker.Clone();
         faker.RuleFor(x => x.ProducerId, f => f.PickRandom(producerIds));

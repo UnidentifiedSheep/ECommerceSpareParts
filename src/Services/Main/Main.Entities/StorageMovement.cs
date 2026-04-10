@@ -22,7 +22,7 @@ public class StorageMovement
 
     public Guid WhoMoved { get; set; }
 
-    public virtual Article Article { get; set; } = null!;
+    public virtual Product Product { get; set; } = null!;
 
     public virtual Currency Currency { get; set; } = null!;
 

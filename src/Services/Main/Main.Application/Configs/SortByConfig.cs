@@ -9,7 +9,7 @@ public static class SortByConfig
 {
     public static void Configure()
     {
-        new Article().MapDefault(x => x.Id)
+        new Product().MapDefault(x => x.Id)
             .Map("id", x => x.Id)
             .Map("articleNumber", x => x.ArticleNumber)
             .Map("title", x => x.ArticleName)

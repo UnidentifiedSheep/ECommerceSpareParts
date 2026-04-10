@@ -6,5 +6,5 @@ public class ArticleEan
 
     public string Ean { get; set; } = null!;
 
-    public virtual Article Article { get; set; } = null!;
+    public virtual Product Product { get; set; } = null!;
 }

@@ -18,7 +18,7 @@ public class SaleContent
 
     public decimal Discount { get; set; }
 
-    public virtual Article Article { get; set; } = null!;
+    public virtual Product Product { get; set; } = null!;
 
     public virtual Sale Sale { get; set; } = null!;
 

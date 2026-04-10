@@ -21,7 +21,7 @@ public class PurchaseContent
 
     public int? StorageContentId { get; set; }
 
-    public virtual Article Article { get; set; } = null!;
+    public virtual Product Product { get; set; } = null!;
 
     public virtual Purchase Purchase { get; set; } = null!;
 

@@ -23,7 +23,7 @@ public class AddContentToStorageTests : IAsyncLifetime
     private readonly DContext _context;
     private readonly IMediator _mediator;
     private readonly IServiceProvider _serviceProvider;
-    private List<Article> _articles = null!;
+    private List<Product> _articles = null!;
 
     private Currency _currency = null!;
     private Storage _storage = null!;

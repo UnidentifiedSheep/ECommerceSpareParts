@@ -22,7 +22,7 @@ public class EditFullPurchaseTests : IAsyncLifetime
 {
     private readonly DContext _context;
     private readonly IMediator _mediator;
-    private Article _article = null!;
+    private Product _product = null!;
     private User _carrier = null!;
 
     private Currency _currency = null!;
@@ -64,7 +64,7 @@ public class EditFullPurchaseTests : IAsyncLifetime
 
         await _mediator.MockMapStorageToUser(_supplier.Id, _storageFrom.Name);
 
-        _article = await _context.Articles.FirstAsync();
+        _product = await _context.Articles.FirstAsync();
         _currency = await _context.Currencies.FirstAsync();
 
         await CreateMockPurchase();
@@ -82,8 +82,8 @@ public class EditFullPurchaseTests : IAsyncLifetime
 
     private async Task CreateMockPurchase()
     {
-        await _mediator.Send(new SetArticleSizesCommand(_article.Id, 10, 10, 10, DimensionUnit.Centimeter));
-        await _mediator.Send(new SetArticleWeightCommand(_article.Id, 1, WeightUnit.Kilogram));
+        await _mediator.Send(new SetArticleSizesCommand(_product.Id, 10, 10, 10, DimensionUnit.Centimeter));
+        await _mediator.Send(new SetArticleWeightCommand(_product.Id, 1, WeightUnit.Kilogram));
 
         var result = await _mediator.Send(new AddStorageRouteCommand(
             _storageFrom.Name, _storageTo.Name, 1000, RouteType.InterCity, LogisticPricingType.PerWeight,
@@ -94,35 +94,35 @@ public class EditFullPurchaseTests : IAsyncLifetime
         {
             new()
             {
-                ArticleId = _article.Id,
+                ArticleId = _product.Id,
                 Count = 1,
                 Price = 100m,
                 CalculateLogistics = true
             },
             new()
             {
-                ArticleId = _article.Id,
+                ArticleId = _product.Id,
                 Count = 3,
                 Price = 100m,
                 CalculateLogistics = true
             },
             new()
             {
-                ArticleId = _article.Id,
+                ArticleId = _product.Id,
                 Count = 2,
                 Price = 100m,
                 CalculateLogistics = false
             },
             new()
             {
-                ArticleId = _article.Id,
+                ArticleId = _product.Id,
                 Count = 5,
                 Price = 100m,
                 CalculateLogistics = false
             },
             new()
             {
-                ArticleId = _article.Id,
+                ArticleId = _product.Id,
                 Count = 4,
                 Price = 100m,
                 CalculateLogistics = true
@@ -143,35 +143,35 @@ public class EditFullPurchaseTests : IAsyncLifetime
         {
             new()
             {
-                ArticleId = _article.Id,
+                ArticleId = _product.Id,
                 Count = 1,
                 Price = 100m,
                 CalculateLogistics = true
             },
             new()
             {
-                ArticleId = _article.Id,
+                ArticleId = _product.Id,
                 Count = 3,
                 Price = 100m,
                 CalculateLogistics = true
             },
             new()
             {
-                ArticleId = _article.Id,
+                ArticleId = _product.Id,
                 Count = 2,
                 Price = 100m,
                 CalculateLogistics = false
             },
             new()
             {
-                ArticleId = _article.Id,
+                ArticleId = _product.Id,
                 Count = 5,
                 Price = 100m,
                 CalculateLogistics = false
             },
             new()
             {
-                ArticleId = _article.Id,
+                ArticleId = _product.Id,
                 Count = 4,
                 Price = 100m,
                 CalculateLogistics = true

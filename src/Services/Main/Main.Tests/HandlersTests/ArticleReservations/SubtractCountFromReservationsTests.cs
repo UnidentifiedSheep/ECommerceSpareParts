@@ -19,7 +19,7 @@ public class SubtractCountFromReservationsTests : IAsyncLifetime
 {
     private readonly DContext _context;
     private readonly IMediator _mediator;
-    private Article _article = null!;
+    private Product _product = null!;
 
     private User _user = null!;
     private User _whoUpdated = null!;
@@ -39,7 +39,7 @@ public class SubtractCountFromReservationsTests : IAsyncLifetime
         await _mediator.AddMockStorage();
         await _context.AddMockCurrencies();
 
-        _article = await _context.Articles.FirstAsync();
+        _product = await _context.Articles.FirstAsync();
         _user = await _context.Users.FirstAsync();
         _whoUpdated = await _context.Users.FirstAsync(x => x.Id != _user.Id);
 
@@ -47,14 +47,14 @@ public class SubtractCountFromReservationsTests : IAsyncLifetime
         var create = new CreateArticleReservationCommand([
             new NewArticleReservationDto
             {
-                ArticleId = _article.Id,
+                ArticleId = _product.Id,
                 UserId = _user.Id,
                 InitialCount = 5,
                 CurrentCount = 3
             },
             new NewArticleReservationDto
             {
-                ArticleId = _article.Id,
+                ArticleId = _product.Id,
                 UserId = _user.Id,
                 InitialCount = 4,
                 CurrentCount = 4
@@ -81,13 +81,13 @@ public class SubtractCountFromReservationsTests : IAsyncLifetime
     {
         var cmd = new SubtractCountFromReservationsCommand(_user.Id, _whoUpdated.Id, new Dictionary<int, int>
         {
-            { _article.Id, 5 }
+            { _product.Id, 5 }
         });
         var result = await _mediator.Send(cmd);
         Assert.Empty(result.NotFoundReservations);
 
         var reservations = await _context.StorageContentReservations
-            .Where(x => x.UserId == _user.Id && x.ArticleId == _article.Id).OrderBy(x => x.Id).ToListAsync();
+            .Where(x => x.UserId == _user.Id && x.ArticleId == _product.Id).OrderBy(x => x.Id).ToListAsync();
         // First reservation had 3 -> should become 0 and IsDone true
         Assert.Equal(0, reservations[0].CurrentCount);
         Assert.True(reservations[0].IsDone);
@@ -103,13 +103,13 @@ public class SubtractCountFromReservationsTests : IAsyncLifetime
     {
         var cmd = new SubtractCountFromReservationsCommand(_user.Id, _whoUpdated.Id, new Dictionary<int, int>
         {
-            { _article.Id, 20 }
+            { _product.Id, 20 }
         });
         var result = await _mediator.Send(cmd);
-        Assert.True(result.NotFoundReservations.TryGetValue(_article.Id, out var remainder) && remainder > 0);
+        Assert.True(result.NotFoundReservations.TryGetValue(_product.Id, out var remainder) && remainder > 0);
 
         var totalLeft = await _context.StorageContentReservations
-            .Where(x => x.UserId == _user.Id && x.ArticleId == _article.Id).SumAsync(x => x.CurrentCount);
+            .Where(x => x.UserId == _user.Id && x.ArticleId == _product.Id).SumAsync(x => x.CurrentCount);
         Assert.Equal(0, totalLeft);
     }
 
@@ -118,7 +118,7 @@ public class SubtractCountFromReservationsTests : IAsyncLifetime
     {
         var cmd = new SubtractCountFromReservationsCommand(_user.Id, _whoUpdated.Id, new Dictionary<int, int>
         {
-            { _article.Id, 0 },
+            { _product.Id, 0 },
             { int.MaxValue, -5 }
         });
         var result = await _mediator.Send(cmd);
@@ -130,7 +130,7 @@ public class SubtractCountFromReservationsTests : IAsyncLifetime
     {
         var cmd = new SubtractCountFromReservationsCommand(Guid.NewGuid(), _whoUpdated.Id, new Dictionary<int, int>
         {
-            { _article.Id, 1 }
+            { _product.Id, 1 }
         });
         var exception = await Assert.ThrowsAsync<DbValidationException>(() => _mediator.Send(cmd));
         Assert.Equal(ApplicationErrors.UsersNotFound, exception.Failures[0].ErrorName);

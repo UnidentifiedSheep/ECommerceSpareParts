@@ -21,7 +21,7 @@ public class CreatePurchaseTests : IAsyncLifetime
 {
     private readonly DContext _context;
     private readonly IMediator _mediator;
-    private Article _article = null!;
+    private Product _product = null!;
 
     private Currency _currency = null!;
     private Storage _storage = null!;
@@ -46,10 +46,10 @@ public class CreatePurchaseTests : IAsyncLifetime
 
         _user = await _context.Users.FirstAsync();
         _storage = await _context.Storages.FirstAsync();
-        _article = await _context.Articles.FirstAsync();
+        _product = await _context.Articles.FirstAsync();
         _currency = await _context.Currencies.FirstAsync();
 
-        await _mediator.AddMockStorageContents([_article.Id], _currency.Id, _storage.Name, _user.Id);
+        await _mediator.AddMockStorageContents([_product.Id], _currency.Id, _storage.Name, _user.Id);
 
         var receiver = await _context.Users.FirstAsync(x => x.Id != _user.Id);
         await _mediator.AddMockTransaction(_user.Id, receiver.Id, _user.Id, 1000m);
@@ -69,7 +69,7 @@ public class CreatePurchaseTests : IAsyncLifetime
         {
             (new NewPurchaseContentDto
             {
-                ArticleId = _article.Id,
+                ArticleId = _product.Id,
                 Count = 10,
                 Price = 100.50m
             }, _storageContent.Id)
@@ -105,7 +105,7 @@ public class CreatePurchaseTests : IAsyncLifetime
         {
             (new NewPurchaseContentDto
             {
-                ArticleId = _article.Id,
+                ArticleId = _product.Id,
                 Count = 10,
                 Price = price
             }, _storageContent.Id)
@@ -126,7 +126,7 @@ public class CreatePurchaseTests : IAsyncLifetime
         {
             (new NewPurchaseContentDto
             {
-                ArticleId = _article.Id,
+                ArticleId = _product.Id,
                 Count = count,
                 Price = 100.50m
             }, _storageContent.Id)
@@ -145,7 +145,7 @@ public class CreatePurchaseTests : IAsyncLifetime
         {
             (new NewPurchaseContentDto
             {
-                ArticleId = _article.Id,
+                ArticleId = _product.Id,
                 Count = 10,
                 Price = 100.50m
             }, _storageContent.Id)

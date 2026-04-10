@@ -8,7 +8,7 @@ namespace Tests.MockData.ScenatioExtensions;
 
 public static class ArticleScenarioExtensions
 {
-    public static async Task<(List<Producer>, List<Article>)> CreateProducerAndArticles(
+    public static async Task<(List<Producer>, List<Product>)> CreateProducerAndArticles(
         this DContext ctx,
         int producersCount,
         int articlesCount)

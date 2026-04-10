@@ -25,7 +25,7 @@ public class RestoreContentToStorageTests : IAsyncLifetime
     private const int InvalidStorageNameLength = 100;
     private readonly DContext _context;
     private readonly IMediator _mediator;
-    private List<Article> _articles = null!;
+    private List<Product> _articles = null!;
 
     private List<Currency> _currency = null!;
     private Dictionary<int, StorageContent> _storageContent = null!;

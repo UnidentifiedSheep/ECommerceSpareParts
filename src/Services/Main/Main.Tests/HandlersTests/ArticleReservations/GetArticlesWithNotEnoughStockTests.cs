@@ -19,7 +19,7 @@ public class GetArticlesWithNotEnoughStockTests : IAsyncLifetime
 {
     private readonly DContext _context;
     private readonly IMediator _mediator;
-    private Article _article = null!;
+    private Product _product = null!;
 
     private User _buyer = null!;
     private Currency _currency = null!;
@@ -41,27 +41,27 @@ public class GetArticlesWithNotEnoughStockTests : IAsyncLifetime
         await _mediator.AddMockStorage();
         await _context.AddMockCurrencies();
 
-        _article = await _context.Articles.FirstAsync();
+        _product = await _context.Articles.FirstAsync();
         _buyer = await _context.Users.FirstAsync();
         _otherUser = await _context.Users.FirstAsync(x => x.Id != _buyer.Id);
         _currency = await _context.Currencies.FirstAsync();
         _storageName = (await _context.Storages.FirstAsync()).Name;
 
         // Seed storage contents: 10 storage content rows (random counts) for the article; rely on Article.TotalCount for stock
-        await _mediator.AddMockStorageContents([_article.Id], _currency.Id, _storageName, _buyer.Id, 10);
+        await _mediator.AddMockStorageContents([_product.Id], _currency.Id, _storageName, _buyer.Id, 10);
 
         // Create reservations: buyer reserves 1, other user reserves 5
         await _mediator.Send(new CreateArticleReservationCommand([
             new NewArticleReservationDto
             {
-                ArticleId = _article.Id,
+                ArticleId = _product.Id,
                 UserId = _buyer.Id,
                 InitialCount = 1,
                 CurrentCount = 1
             },
             new NewArticleReservationDto
             {
-                ArticleId = _article.Id,
+                ArticleId = _product.Id,
                 UserId = _otherUser.Id,
                 InitialCount = 5,
                 CurrentCount = 5
@@ -77,14 +77,14 @@ public class GetArticlesWithNotEnoughStockTests : IAsyncLifetime
     [Fact]
     public async Task NotEnoughByStock_WhenNeededExceedsStorage()
     {
-        var articleCount = await _context.Articles.AsNoTracking().FirstAsync(x => x.Id == _article.Id);
+        var articleCount = await _context.Articles.AsNoTracking().FirstAsync(x => x.Id == _product.Id);
 
         var query = new GetArticlesWithNotEnoughStockQuery(_buyer.Id, _storageName, false, new Dictionary<int, int>
         {
-            { _article.Id, articleCount.TotalCount + 15 } // deficit is 15
+            { _product.Id, articleCount.TotalCount + 15 } // deficit is 15
         });
         var result = await _mediator.Send(query);
-        var found = result.NotEnoughByStock.TryGetValue(_article.Id, out var deficit);
+        var found = result.NotEnoughByStock.TryGetValue(_product.Id, out var deficit);
         Assert.True(found && deficit == 15);
         Assert.Empty(result.NotEnoughByReservation);
     }
@@ -92,14 +92,14 @@ public class GetArticlesWithNotEnoughStockTests : IAsyncLifetime
     [Fact]
     public async Task NotEnoughByReservation_WhenOthersReservationsMakeItInsufficient()
     {
-        var article = await _context.Articles.AsNoTracking().FirstAsync(x => x.Id == _article.Id);
+        var article = await _context.Articles.AsNoTracking().FirstAsync(x => x.Id == _product.Id);
         // Needed 8, stock 10 -> stockDiff = 2; others 5; user 1 -> reservationsDiff = 2 - 5 + 1 = -2
         var query = new GetArticlesWithNotEnoughStockQuery(_buyer.Id, _storageName, false, new Dictionary<int, int>
         {
-            { _article.Id, article.TotalCount - 2 }
+            { _product.Id, article.TotalCount - 2 }
         });
         var result = await _mediator.Send(query);
-        Assert.True(result.NotEnoughByReservation.TryGetValue(_article.Id, out var deficit) && deficit == 2);
+        Assert.True(result.NotEnoughByReservation.TryGetValue(_product.Id, out var deficit) && deficit == 2);
         Assert.Empty(result.NotEnoughByStock);
     }
 
@@ -107,12 +107,12 @@ public class GetArticlesWithNotEnoughStockTests : IAsyncLifetime
     public async Task ValidationErrors_ForMissingData()
     {
         var badStorage = new GetArticlesWithNotEnoughStockQuery(_buyer.Id, "__no_storage__", false,
-            new Dictionary<int, int> { { _article.Id, 1 } });
+            new Dictionary<int, int> { { _product.Id, 1 } });
         var exception = await Assert.ThrowsAsync<DbValidationException>(() => _mediator.Send(badStorage));
         Assert.Equal(ApplicationErrors.StoragesNotFound, exception.Failures[0].ErrorName);
 
         var badUser = new GetArticlesWithNotEnoughStockQuery(Guid.NewGuid(), _storageName, false,
-            new Dictionary<int, int> { { _article.Id, 1 } });
+            new Dictionary<int, int> { { _product.Id, 1 } });
         exception = await Assert.ThrowsAsync<DbValidationException>(() => _mediator.Send(badUser));
         Assert.Equal(ApplicationErrors.UsersNotFound, exception.Failures[0].ErrorName);
 

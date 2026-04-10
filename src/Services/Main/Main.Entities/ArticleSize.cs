@@ -18,5 +18,5 @@ public class ArticleSize
 
     public decimal VolumeM3 { get; set; }
 
-    public virtual Article Article { get; set; } = null!;
+    public virtual Product Product { get; set; } = null!;
 }

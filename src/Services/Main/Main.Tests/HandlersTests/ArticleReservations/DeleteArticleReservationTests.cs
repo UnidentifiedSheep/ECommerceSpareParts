@@ -18,7 +18,7 @@ public class DeleteArticleReservationTests : IAsyncLifetime
 {
     private readonly DContext _context;
     private readonly IMediator _mediator;
-    private Article _article = null!;
+    private Product _product = null!;
 
     private User _user = null!;
     private User _whoCreated = null!;
@@ -38,14 +38,14 @@ public class DeleteArticleReservationTests : IAsyncLifetime
         await _mediator.AddMockStorage();
         await _context.AddMockCurrencies();
 
-        _article = await _context.Articles.FirstAsync();
+        _product = await _context.Articles.FirstAsync();
         _user = await _context.Users.FirstAsync();
         _whoCreated = await _context.Users.FirstAsync(x => x.Id != _user.Id);
 
         var create = new CreateArticleReservationCommand([
             new NewArticleReservationDto
             {
-                ArticleId = _article.Id,
+                ArticleId = _product.Id,
                 UserId = _user.Id,
                 InitialCount = 2,
                 CurrentCount = 2

@@ -116,7 +116,7 @@ public class CreateFullSaleHandler(
 
         if (byReservation.Count != 0)
         {
-            var queryOptions = new QueryOptions<Article, IReadOnlyList<int>>()
+            var queryOptions = new QueryOptions<Product, IReadOnlyList<int>>()
             {
                 Data = byReservation.Keys.ToList()
             }.WithTracking(false);

@@ -14,7 +14,7 @@ public class ArticleContentRepository(DContext context) : IArticleContentReposit
         CancellationToken cancellationToken = default)
     {
         return await context.ArticlesContents.ConfigureTracking(track)
-            .Include(x => x.InsideArticle)
+            .Include(x => x.InsideProduct)
             .ThenInclude(x => x.Producer)
             .Where(x => x.MainArticleId == articleId)
             .ToListAsync(cancellationToken);

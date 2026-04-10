@@ -27,7 +27,7 @@ public class CartRepository(DContext context) : ICartRepository
         CancellationToken cancellationToken = default)
     {
         var query = context.Carts
-            .Include(x => x.Article)
+            .Include(x => x.Product)
             .ThenInclude(x => x.Producer)
             .ConfigureTracking(track)
             .Where(x => x.UserId == userId);

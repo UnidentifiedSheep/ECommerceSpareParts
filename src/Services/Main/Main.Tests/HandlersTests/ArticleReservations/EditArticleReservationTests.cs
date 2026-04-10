@@ -21,7 +21,7 @@ public class EditArticleReservationTests : IAsyncLifetime
 {
     private readonly DContext _context;
     private readonly IMediator _mediator;
-    private Article _article = null!;
+    private Product _product = null!;
     private Currency _currency = null!;
 
     private int _reservationId;
@@ -44,7 +44,7 @@ public class EditArticleReservationTests : IAsyncLifetime
         await _mediator.AddMockStorage();
         await _context.AddMockCurrencies();
 
-        _article = await _context.Articles.FirstAsync();
+        _product = await _context.Articles.FirstAsync();
         _user = await _context.Users.FirstAsync();
         _whoUpdated = await _context.Users.FirstAsync(x => x.Id != _user.Id);
         _currency = await _context.Currencies.FirstAsync();
@@ -52,7 +52,7 @@ public class EditArticleReservationTests : IAsyncLifetime
         var create = new CreateArticleReservationCommand([
             new NewArticleReservationDto
             {
-                ArticleId = _article.Id,
+                ArticleId = _product.Id,
                 UserId = _user.Id,
                 InitialCount = 4,
                 CurrentCount = 3
@@ -72,7 +72,7 @@ public class EditArticleReservationTests : IAsyncLifetime
     {
         var dto = new EditArticleReservationDto
         {
-            ArticleId = _article.Id,
+            ArticleId = _product.Id,
             InitialCount = 5,
             CurrentCount = 1,
             GivenPrice = 9.99m,
@@ -98,7 +98,7 @@ public class EditArticleReservationTests : IAsyncLifetime
     {
         var dto = new EditArticleReservationDto
         {
-            ArticleId = _article.Id,
+            ArticleId = _product.Id,
             InitialCount = initial,
             CurrentCount = 1
         };
@@ -111,7 +111,7 @@ public class EditArticleReservationTests : IAsyncLifetime
     {
         var dto = new EditArticleReservationDto
         {
-            ArticleId = _article.Id,
+            ArticleId = _product.Id,
             InitialCount = 1,
             CurrentCount = 2
         };
@@ -128,7 +128,7 @@ public class EditArticleReservationTests : IAsyncLifetime
     {
         var dto = new EditArticleReservationDto
         {
-            ArticleId = _article.Id,
+            ArticleId = _product.Id,
             InitialCount = 2,
             CurrentCount = 1,
             GivenPrice = price,
@@ -143,7 +143,7 @@ public class EditArticleReservationTests : IAsyncLifetime
     {
         var dto = new EditArticleReservationDto
         {
-            ArticleId = _article.Id,
+            ArticleId = _product.Id,
             InitialCount = 2,
             CurrentCount = 1
         };
@@ -170,7 +170,7 @@ public class EditArticleReservationTests : IAsyncLifetime
     {
         var dto = new EditArticleReservationDto
         {
-            ArticleId = _article.Id,
+            ArticleId = _product.Id,
             InitialCount = 2,
             CurrentCount = 1,
             GivenPrice = 1,

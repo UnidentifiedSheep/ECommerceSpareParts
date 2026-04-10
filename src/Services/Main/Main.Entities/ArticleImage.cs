@@ -8,5 +8,5 @@ public class ArticleImage
 
     public string? Description { get; set; }
 
-    public virtual Article Article { get; set; } = null!;
+    public virtual Product Product { get; set; } = null!;
 }

@@ -6,7 +6,7 @@ namespace Tests.MockData.SeedExtensions;
 
 public static class DbArticleSeedExtensions
 {
-    public static async Task<List<Article>> CreateArticles(this DContext ctx, int count, params int[] producerIds)
+    public static async Task<List<Product>> CreateArticles(this DContext ctx, int count, params int[] producerIds)
     {
         ArgumentOutOfRangeException.ThrowIfNegativeOrZero(count);
 

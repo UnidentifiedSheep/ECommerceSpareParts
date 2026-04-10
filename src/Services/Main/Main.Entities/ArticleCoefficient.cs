@@ -10,7 +10,7 @@ public class ArticleCoefficient
 
     public DateTime CreatedAt { get; set; }
 
-    public virtual Article Article { get; set; } = null!;
+    public virtual Product Product { get; set; } = null!;
 
     public virtual Coefficient CoefficientNameNavigation { get; set; } = null!;
 }

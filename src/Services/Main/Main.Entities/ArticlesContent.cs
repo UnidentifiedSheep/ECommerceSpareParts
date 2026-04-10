@@ -8,7 +8,7 @@ public class ArticlesContent
 
     public int Quantity { get; set; }
 
-    public virtual Article InsideArticle { get; set; } = null!;
+    public virtual Product InsideProduct { get; set; } = null!;
 
-    public virtual Article MainArticle { get; set; } = null!;
+    public virtual Product MainProduct { get; set; } = null!;
 }

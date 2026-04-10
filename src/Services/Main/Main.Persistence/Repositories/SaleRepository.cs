@@ -65,10 +65,10 @@ public class SaleRepository(DContext context) : ISaleRepository
             var searchTerm = options.Data.SearchTerm.Trim();
             var normalizedSearchTerm = searchTerm.ToNormalizedArticleNumber();
             query = query.Where(x => x.SaleContents
-                                         .Any(content => EF.Functions.ToTsVector("russian", content.Article.ArticleName)
+                                         .Any(content => EF.Functions.ToTsVector("russian", content.Product.ArticleName)
                                                              .Matches(
                                                                  EF.Functions.PlainToTsQuery("russian", searchTerm)) ||
-                                                         EF.Functions.ILike(content.Article.NormalizedArticleNumber,
+                                                         EF.Functions.ILike(content.Product.NormalizedArticleNumber,
                                                              $"%{normalizedSearchTerm}%")) ||
                                      (x.Comment != null && EF.Functions.ILike(x.Comment, $"%{searchTerm}%")) ||
                                      x.SaleContents.Any(z =>
@@ -89,7 +89,7 @@ public class SaleRepository(DContext context) : ISaleRepository
         CancellationToken cancellationToken = default)
     {
         return await context.SaleContents.ConfigureTracking(track)
-            .Include(x => x.Article)
+            .Include(x => x.Product)
             .ThenInclude(x => x.Producer)
             .Where(x => x.SaleId == saleId)
             .ToListAsync(cancellationToken);

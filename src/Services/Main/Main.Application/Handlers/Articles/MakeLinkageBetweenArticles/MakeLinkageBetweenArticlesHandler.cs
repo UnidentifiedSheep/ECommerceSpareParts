@@ -39,7 +39,7 @@ public class MakeLinkageBetweenArticlesHandler(
         NewArticleLinkageDto linkage,
         CancellationToken cancellationToken = default)
     {
-        var queryOptions = new QueryOptions<Article, IReadOnlyList<int>>()
+        var queryOptions = new QueryOptions<Product, IReadOnlyList<int>>()
         {
             Data = [linkage.ArticleId, linkage.CrossArticleId]
         }.WithTracking(false);

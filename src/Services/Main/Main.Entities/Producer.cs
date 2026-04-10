@@ -16,7 +16,7 @@ public class Producer
 
     public string? Description { get; set; }
 
-    public virtual ICollection<Article> Articles { get; set; } = new List<Article>();
+    public virtual ICollection<Product> Articles { get; set; } = new List<Product>();
 
     public virtual ICollection<ProducerDetail> ProducerDetails { get; set; } = new List<ProducerDetail>();
 

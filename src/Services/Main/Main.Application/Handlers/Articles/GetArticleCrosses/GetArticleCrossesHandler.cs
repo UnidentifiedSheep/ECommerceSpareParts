@@ -38,9 +38,9 @@ public class GetArticleCrossesHandler(
         return new GetArticleCrossesResult(crossArticlesAdapted, requestedAdapted);
     }
 
-    private async Task<Article> GetRequestedArticle(int id, CancellationToken token)
+    private async Task<Product> GetRequestedArticle(int id, CancellationToken token)
     {
-        var queryOptions = new QueryOptions<Article, int>()
+        var queryOptions = new QueryOptions<Product, int>()
         {
             Data = id
         }.WithTracking(false)
@@ -50,13 +50,13 @@ public class GetArticleCrossesHandler(
         return requestedArticle;
     }
 
-    private async Task<IReadOnlyList<Article>> GetCrosses(
+    private async Task<IReadOnlyList<Product>> GetCrosses(
         int articleId, 
         PaginationModel pagination,
         string? sortBy,
         CancellationToken token)
     {
-        var queryOptions = new QueryOptions<Article, int>
+        var queryOptions = new QueryOptions<Product, int>
             {
                 Data = articleId
             }.WithPage(pagination.Page)

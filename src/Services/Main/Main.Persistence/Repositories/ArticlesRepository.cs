@@ -10,8 +10,8 @@ namespace Main.Persistence.Repositories;
 
 public class ArticlesRepository(DContext context) : IArticlesRepository
 {
-    public async Task<IReadOnlyList<Article>> GetArticleCrosses(
-        QueryOptions<Article, int> options,
+    public async Task<IReadOnlyList<Product>> GetArticleCrosses(
+        QueryOptions<Product, int> options,
         CancellationToken cancellationToken = default)
     {
         return await context.Articles
@@ -28,8 +28,8 @@ public class ArticlesRepository(DContext context) : IArticlesRepository
             .ToListAsync(cancellationToken);
     }
 
-    public async Task<Article?> GetArticleById(
-        QueryOptions<Article, int> options, 
+    public async Task<Product?> GetArticleById(
+        QueryOptions<Product, int> options, 
         CancellationToken cancellationToken = default)
     {
         return await context.Articles
@@ -37,8 +37,8 @@ public class ArticlesRepository(DContext context) : IArticlesRepository
             .FirstOrDefaultAsync(x => x.Id == options.Data, cancellationToken);
     }
 
-    public async Task<IReadOnlyList<Article>> GetArticlesByIds(
-        QueryOptions<Article, IReadOnlyList<int>> options,
+    public async Task<IReadOnlyList<Product>> GetArticlesByIds(
+        QueryOptions<Product, IReadOnlyList<int>> options,
         CancellationToken token = default)
     {
         return await context.Articles

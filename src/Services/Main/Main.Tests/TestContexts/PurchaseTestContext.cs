@@ -14,7 +14,7 @@ public class PurchaseTestContext(DContext ctx, IMediator mediator) : SystemUserT
     public Currency Currency { get; private set; } = null!;
     public Storage StorageTo { get; private set; } = null!;
     public Storage StorageFrom { get; private set; } = null!;
-    public List<Article> Articles { get; private set; } = null!;
+    public List<Product> Articles { get; private set; } = null!;
 
     public override async Task InitializeAsync(CancellationToken cancellationToken = default)
     {

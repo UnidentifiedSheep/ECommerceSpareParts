@@ -19,7 +19,7 @@ public class CreateArticleReservationTests : IAsyncLifetime
 {
     private readonly DContext _context;
     private readonly IMediator _mediator;
-    private Article _article = null!;
+    private Product _product = null!;
     private Currency _currency = null!;
     private User _user = null!;
 
@@ -40,7 +40,7 @@ public class CreateArticleReservationTests : IAsyncLifetime
         await _mediator.AddMockStorage();
         await _context.AddMockCurrencies();
 
-        _article = await _context.Articles.FirstAsync();
+        _product = await _context.Articles.FirstAsync();
         _user = await _context.Users.FirstAsync();
         _whoCreated = await _context.Users.FirstAsync(x => x.Id != _user.Id);
         _currency = await _context.Currencies.FirstAsync();
@@ -58,7 +58,7 @@ public class CreateArticleReservationTests : IAsyncLifetime
         {
             new()
             {
-                ArticleId = _article.Id,
+                ArticleId = _product.Id,
                 UserId = _user.Id,
                 InitialCount = 5,
                 CurrentCount = 3,
@@ -68,7 +68,7 @@ public class CreateArticleReservationTests : IAsyncLifetime
             },
             new()
             {
-                ArticleId = _article.Id,
+                ArticleId = _product.Id,
                 UserId = _user.Id,
                 InitialCount = 2,
                 CurrentCount = 2
@@ -89,7 +89,7 @@ public class CreateArticleReservationTests : IAsyncLifetime
     {
         var list = Enumerable.Range(0, 101).Select(_ => new NewArticleReservationDto
         {
-            ArticleId = _article.Id,
+            ArticleId = _product.Id,
             UserId = _user.Id,
             InitialCount = 1,
             CurrentCount = 1
@@ -108,7 +108,7 @@ public class CreateArticleReservationTests : IAsyncLifetime
         {
             new()
             {
-                ArticleId = _article.Id,
+                ArticleId = _product.Id,
                 UserId = _user.Id,
                 InitialCount = count,
                 CurrentCount = 1
@@ -127,7 +127,7 @@ public class CreateArticleReservationTests : IAsyncLifetime
         {
             new()
             {
-                ArticleId = _article.Id,
+                ArticleId = _product.Id,
                 UserId = _user.Id,
                 InitialCount = 2,
                 CurrentCount = count
@@ -144,7 +144,7 @@ public class CreateArticleReservationTests : IAsyncLifetime
         {
             new()
             {
-                ArticleId = _article.Id,
+                ArticleId = _product.Id,
                 UserId = _user.Id,
                 InitialCount = 1,
                 CurrentCount = 2
@@ -165,7 +165,7 @@ public class CreateArticleReservationTests : IAsyncLifetime
         {
             new()
             {
-                ArticleId = _article.Id,
+                ArticleId = _product.Id,
                 UserId = _user.Id,
                 InitialCount = 2,
                 CurrentCount = 2,
@@ -184,7 +184,7 @@ public class CreateArticleReservationTests : IAsyncLifetime
         {
             new()
             {
-                ArticleId = _article.Id,
+                ArticleId = _product.Id,
                 UserId = _user.Id,
                 InitialCount = 2,
                 CurrentCount = 2,
@@ -221,7 +221,7 @@ public class CreateArticleReservationTests : IAsyncLifetime
         {
             new()
             {
-                ArticleId = _article.Id,
+                ArticleId = _product.Id,
                 UserId = Guid.NewGuid(),
                 InitialCount = 2,
                 CurrentCount = 2

@@ -23,8 +23,8 @@ public class GetPurchaseContentHandler(IPurchaseRepository purchaseRepository)
                 Data = request.Id
             }
             .WithTracking(false)
-            .WithInclude(x => x.Article)
-            .WithInclude(x => x.Article.Producer)
+            .WithInclude(x => x.Product)
+            .WithInclude(x => x.Product.Producer)
             .WithInclude(x => x.PurchaseContentLogistic);
         var content = await purchaseRepository
             .GetPurchaseContent(options, cancellationToken);

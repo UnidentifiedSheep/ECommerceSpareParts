@@ -28,7 +28,7 @@ public class PatchArticleHandler(
 {
     public async Task<Unit> Handle(PatchArticleCommand request, CancellationToken cancellationToken)
     {
-        var queryOptions = new QueryOptions<Entities.Article, int>()
+        var queryOptions = new QueryOptions<Entities.Product, int>()
         {
             Data = request.ArticleId
         }.WithTracking();
