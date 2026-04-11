@@ -3,9 +3,9 @@ using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
 namespace Main.Persistence.Context.Configurations.Producer;
 
-public class ProducerConfiguration : IEntityTypeConfiguration<Entities.Producer>
+public class ProducerConfiguration : IEntityTypeConfiguration<Entities.Producer.Producer>
 {
-    public void Configure(EntityTypeBuilder<Entities.Producer> builder)
+    public void Configure(EntityTypeBuilder<Entities.Producer.Producer> builder)
     {
         builder.ToTable("producer");
         

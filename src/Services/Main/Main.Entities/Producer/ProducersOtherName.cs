@@ -1,6 +1,6 @@
 ﻿using BulkValidation.Core.Attributes;
 
-namespace Main.Entities;
+namespace Main.Entities.Producer;
 
 public class ProducersOtherName
 {

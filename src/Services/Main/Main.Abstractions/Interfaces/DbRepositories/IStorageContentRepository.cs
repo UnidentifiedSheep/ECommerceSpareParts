@@ -1,5 +1,6 @@
 using Main.Abstractions.Models;
 using Main.Entities;
+using Main.Entities.Storage;
 
 namespace Main.Abstractions.Interfaces.DbRepositories;
 
@@ -12,15 +13,6 @@ public interface IStorageContentRepository
 
     Task<IEnumerable<StorageContent>> GetStorageContentsForUpdate(
         IEnumerable<int> ids,
-        bool track = true,
-        CancellationToken cancellationToken = default);
-
-    Task<IEnumerable<StorageContent>> GetStorageContents(
-        string? storageName,
-        int? articleId,
-        int page,
-        int viewCount,
-        bool showZeroCount,
         bool track = true,
         CancellationToken cancellationToken = default);
 

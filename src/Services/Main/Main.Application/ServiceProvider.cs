@@ -26,9 +26,11 @@ using Main.Application.Services;
 using Main.Application.Services.Logistics;
 using Main.Application.Services.Logistics.PricingStrategies;
 using Main.Entities;
+using Main.Entities.Producer;
+using Main.Entities.Storage;
 using Microsoft.Extensions.DependencyInjection;
-using Currency = Main.Entities.Currency;
-using User = Main.Entities.User;
+using Currency = Main.Entities.Currency.Currency;
+using User = Main.Entities.User.User;
 
 namespace Main.Application;
 

@@ -1,4 +1,5 @@
 ﻿using Main.Entities;
+using Main.Entities.Currency;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
@@ -41,7 +42,7 @@ public class CurrencyHistoryConfiguration : IEntityTypeConfiguration<CurrencyHis
         builder.Property(e => e.PrevValue)
             .HasColumnName("prev_value");
 
-        builder.HasOne<Entities.Currency>()
+        builder.HasOne<Entities.Currency.Currency>()
             .WithMany(p => p.CurrencyHistories)
             .HasForeignKey(d => d.CurrencyId)
             .HasConstraintName("currency_history_currency_id_fk");

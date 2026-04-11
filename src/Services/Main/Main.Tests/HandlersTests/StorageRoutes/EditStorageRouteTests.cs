@@ -5,6 +5,8 @@ using Main.Abstractions.Exceptions.Storages;
 using Main.Application.Configs.Mapster;
 using Main.Application.Handlers.StorageRoutes.EditStorageRoute;
 using Main.Entities;
+using Main.Entities.Currency;
+using Main.Entities.Storage;
 using Main.Persistence.Context;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
@@ -12,7 +14,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Test.Common.Extensions;
 using Test.Common.TestContainers.Combined;
 using Tests.MockData;
-using User = Main.Entities.User;
+using User = Main.Entities.User.User;
 
 namespace Tests.HandlersTests.StorageRoutes;
 

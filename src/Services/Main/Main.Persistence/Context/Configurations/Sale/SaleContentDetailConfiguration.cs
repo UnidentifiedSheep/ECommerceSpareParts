@@ -1,4 +1,6 @@
 ﻿using Main.Entities;
+using Main.Entities.Sale;
+using Main.Entities.Storage;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
@@ -32,7 +34,7 @@ public class SaleContentDetailConfiguration : IEntityTypeConfiguration<SaleConte
         
         builder.Property(e => e.StorageContentId).HasColumnName("storage_content_id");
 
-        builder.HasOne<Entities.Currency>()
+        builder.HasOne<Entities.Currency.Currency>()
             .WithMany()
             .HasForeignKey(d => d.CurrencyId)
             .OnDelete(DeleteBehavior.Restrict)
@@ -43,7 +45,7 @@ public class SaleContentDetailConfiguration : IEntityTypeConfiguration<SaleConte
             .HasForeignKey(d => d.SaleContentId)
             .HasConstraintName("sale_content_details_sale_content_id_fk");
 
-        builder.HasOne<Entities.Storage>()
+        builder.HasOne<Entities.Storage.Storage>()
             .WithMany()
             .HasForeignKey(d => d.Storage)
             .OnDelete(DeleteBehavior.Restrict)

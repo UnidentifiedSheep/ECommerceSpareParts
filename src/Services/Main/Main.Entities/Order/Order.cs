@@ -1,6 +1,6 @@
 ﻿using Domain;
 
-namespace Main.Entities;
+namespace Main.Entities.Order;
 
 public class Order : AuditableEntity<Order, Guid>
 {

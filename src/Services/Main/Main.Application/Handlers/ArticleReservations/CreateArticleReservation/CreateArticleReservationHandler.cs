@@ -3,6 +3,7 @@ using Application.Common.Interfaces;
 using Attributes;
 using Main.Abstractions.Dtos.Amw.ArticleReservations;
 using Main.Entities;
+using Main.Entities.Storage;
 using Mapster;
 using MediatR;
 

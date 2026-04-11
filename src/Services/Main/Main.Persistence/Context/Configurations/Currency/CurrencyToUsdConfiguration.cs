@@ -1,4 +1,5 @@
 ﻿using Main.Entities;
+using Main.Entities.Currency;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
@@ -19,7 +20,7 @@ public class CurrencyToUsdConfiguration : IEntityTypeConfiguration<CurrencyToUsd
         
         builder.Property(e => e.ToUsd).HasColumnName("to_usd");
 
-        builder.HasOne<Entities.Currency>()
+        builder.HasOne<Entities.Currency.Currency>()
             .WithOne(p => p.CurrencyToUsd)
             .HasForeignKey<CurrencyToUsd>(d => d.CurrencyId)
             .OnDelete(DeleteBehavior.Cascade)

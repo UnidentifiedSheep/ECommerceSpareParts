@@ -2,6 +2,7 @@ using System.Diagnostics.CodeAnalysis;
 using Extensions;
 using Main.Abstractions.Interfaces.DbRepositories;
 using Main.Entities;
+using Main.Entities.Auth;
 using Main.Persistence.Context;
 using Microsoft.EntityFrameworkCore;
 using Persistence.Extensions;
@@ -10,10 +11,6 @@ namespace Main.Persistence.Repositories;
 
 public class RoleRepository(DContext context) : IRoleRepository
 {
-    public async Task<Role?> GetRoleAsync(Guid id, bool track = true, CancellationToken cancellationToken = default)
-    {
-        return await context.Roles.ConfigureTracking(track).FirstOrDefaultAsync(x => x.Id == id, cancellationToken);
-    }
 
     public async Task<Role?> GetRoleAsync(string name, bool track = true, CancellationToken cancellationToken = default)
     {
@@ -37,36 +34,6 @@ public class RoleRepository(DContext context) : IRoleRepository
     {
         return await context.Roles.AsNoTracking()
             .AnyAsync(x => x.NormalizedName == name.ToNormalized(), cancellationToken);
-    }
-
-    public async Task<bool> RoleExistsAsync(Guid id, CancellationToken cancellationToken = default)
-    {
-        return await context.Roles.AsNoTracking().AnyAsync(x => x.Id == id, cancellationToken);
-    }
-
-    public async Task<IEnumerable<Guid>> RolesExistsAsync(
-        IEnumerable<Guid> ids,
-        CancellationToken cancellationToken = default)
-    {
-        var set = ids.ToHashSet();
-        var foundRoles = await context.Roles.AsNoTracking()
-            .Where(x => set.Contains(x.Id))
-            .Select(x => x.Id).ToListAsync(cancellationToken);
-        return set.Except(foundRoles);
-    }
-
-    public async Task<IEnumerable<string>> RolesExistsAsync(
-        IEnumerable<string> roleNames,
-        CancellationToken cancellationToken = default)
-    {
-        var set = roleNames
-            .Select(x => x.ToNormalized())
-            .ToHashSet();
-        var foundRoles = await context.Roles.AsNoTracking()
-            .Where(x => set.Contains(x.NormalizedName))
-            .Select(x => x.NormalizedName)
-            .ToListAsync(cancellationToken);
-        return set.Except(foundRoles);
     }
 
     [SuppressMessage("ReSharper", "EntityFramework.ClientSideDbFunctionCall")]

@@ -7,6 +7,7 @@ using Exceptions.Base;
 using Main.Abstractions.Dtos.Amw.Storage;
 using Main.Abstractions.Interfaces.Services;
 using Main.Entities;
+using Main.Entities.Storage;
 using Main.Enums;
 using Mapster;
 using MediatR;

@@ -5,6 +5,10 @@ using Main.Abstractions.Dtos.Amw.Storage;
 using Main.Abstractions.Dtos.Services.Articles;
 using Main.Abstractions.Dtos.Users;
 using Main.Entities;
+using Main.Entities.Currency;
+using Main.Entities.Sale;
+using Main.Entities.Storage;
+using Main.Entities.Transaction;
 using Main.Enums;
 
 namespace Tests.MockData;

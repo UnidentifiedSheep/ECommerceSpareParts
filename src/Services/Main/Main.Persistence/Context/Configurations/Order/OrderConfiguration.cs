@@ -3,9 +3,9 @@ using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
 namespace Main.Persistence.Context.Configurations.Order;
 
-public class OrderConfiguration : IEntityTypeConfiguration<Entities.Order>
+public class OrderConfiguration : IEntityTypeConfiguration<Entities.Order.Order>
 {
-    public void Configure(EntityTypeBuilder<Entities.Order> builder)
+    public void Configure(EntityTypeBuilder<Entities.Order.Order> builder)
     {
         builder.ToTable("orders");
         
@@ -52,18 +52,18 @@ public class OrderConfiguration : IEntityTypeConfiguration<Entities.Order>
         builder.Property(e => e.WhoUpdated)
             .HasColumnName("who_updated");
 
-        builder.HasOne<Entities.Currency>()
+        builder.HasOne<Entities.Currency.Currency>()
             .WithMany()
             .HasForeignKey(d => d.CurrencyId)
             .OnDelete(DeleteBehavior.Restrict)
             .HasConstraintName("orders_currency_id_fk");
 
-        builder.HasOne<Entities.User>()
+        builder.HasOne<Entities.User.User>()
             .WithMany()
             .HasForeignKey(d => d.UserId)
             .HasConstraintName("orders_users_id_fk");
 
-        builder.HasOne<Entities.User>()
+        builder.HasOne<Entities.User.User>()
             .WithMany()
             .HasForeignKey(d => d.WhoUpdated)
             .OnDelete(DeleteBehavior.Restrict)

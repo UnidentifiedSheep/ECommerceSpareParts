@@ -3,9 +3,9 @@ using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
 namespace Main.Persistence.Context.Configurations.User;
 
-public class UserConfiguration : IEntityTypeConfiguration<Entities.User>
+public class UserConfiguration : IEntityTypeConfiguration<Entities.User.User>
 {
-    public void Configure(EntityTypeBuilder<Entities.User> builder)
+    public void Configure(EntityTypeBuilder<Entities.User.User> builder)
     {
         builder.ToTable("users", "auth");
         

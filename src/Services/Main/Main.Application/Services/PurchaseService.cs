@@ -9,6 +9,8 @@ using Main.Application.Handlers.Balance.EditTransaction;
 using Main.Application.Handlers.Logistics.CalculateDeliveryCost;
 using Main.Application.Handlers.Purchases.AddContentLogisticsToPurchase;
 using Main.Entities;
+using Main.Entities.Purchase;
+using Main.Entities.Transaction;
 using Main.Enums;
 using Mapster;
 using MediatR;

@@ -1,10 +1,10 @@
-﻿namespace Main.Entities;
+﻿namespace Main.Entities.Sale;
 
 public class SaleContent
 {
     public int Id { get; set; }
 
-    public string SaleId { get; set; } = null!;
+    public Guid SaleId { get; set; }
 
     public int ProductId { get; set; }
 

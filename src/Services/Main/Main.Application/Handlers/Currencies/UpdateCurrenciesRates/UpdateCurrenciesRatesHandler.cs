@@ -11,6 +11,7 @@ using Main.Abstractions.Interfaces.DbRepositories;
 using Main.Abstractions.Models.Settings;
 using Main.Application.Notifications;
 using Main.Entities;
+using Main.Entities.Currency;
 using MassTransit;
 using MediatR;
 using Microsoft.Extensions.Logging;

@@ -2,6 +2,7 @@
 using Main.Abstractions.Dtos.Anonymous.Articles;
 using Main.Abstractions.Interfaces.DbRepositories;
 using Main.Entities;
+using Main.Entities.Product;
 using Mapster;
 
 namespace Main.Application.Handlers.ArticleCharacteristics.GetCharacteristics;

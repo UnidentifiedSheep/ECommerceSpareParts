@@ -3,6 +3,7 @@ using Application.Common.Interfaces;
 using Attributes;
 using Main.Abstractions.Dtos.Amw.Producers;
 using Main.Entities;
+using Main.Entities.Producer;
 using Mapster;
 
 namespace Main.Application.Handlers.Producers.CreateProducer;

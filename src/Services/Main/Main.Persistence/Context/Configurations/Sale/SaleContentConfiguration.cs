@@ -1,4 +1,5 @@
 ﻿using Main.Entities;
+using Main.Entities.Sale;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
@@ -51,7 +52,7 @@ public class SaleContentConfiguration : IEntityTypeConfiguration<SaleContent>
             .OnDelete(DeleteBehavior.Restrict)
             .HasConstraintName("sale_content_products_id_fk");
 
-        builder.HasOne<Entities.Sale>()
+        builder.HasOne<Entities.Sale.Sale>()
             .WithMany(p => p.SaleContents)
             .HasForeignKey(d => d.SaleId)
             .HasConstraintName("sale_content_sale_id_fk");

@@ -1,6 +1,7 @@
 ﻿using Enums;
 using Extensions;
 using Main.Entities;
+using Main.Entities.Auth;
 using Main.Persistence.Context;
 using Microsoft.EntityFrameworkCore;
 using Persistence.Interfaces;
@@ -29,7 +30,7 @@ public class RolePermissionSeed : ISeed<DContext>
             if (!rolePermissions.TryGetValue(parsedRole, out var needed))
                 continue;
 
-            role.PermissionNames = ResolvePermissions(needed, permissions);
+            role.RolePermissions = ResolvePermissions(role.NormalizedName, needed, permissions);
         }
 
         await context.SaveChangesAsync();
@@ -221,11 +222,12 @@ public class RolePermissionSeed : ISeed<DContext>
     }
 
 
-    private static List<Permission> ResolvePermissions(
+    private static List<RolePermission> ResolvePermissions(
+        string role,
         IEnumerable<PermissionCodes> needed,
         IReadOnlyDictionary<string, Permission> permissions)
     {
-        var result = new List<Permission>();
+        var result = new List<RolePermission>();
 
         foreach (var code in needed)
         {
@@ -235,7 +237,11 @@ public class RolePermissionSeed : ISeed<DContext>
                 throw new InvalidOperationException(
                     $"Permission '{key}' not found in database");
 
-            result.Add(permission);
+            result.Add(new RolePermission
+            {
+                RoleName = role,
+                PermissionName = permission.Name,
+            });
         }
 
         return result;

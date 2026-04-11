@@ -1,6 +1,7 @@
 ﻿using Abstractions.Models.Repository;
 using Main.Abstractions.Interfaces.DbRepositories;
 using Main.Entities;
+using Main.Entities.Purchase;
 using Main.Persistence.Context;
 using Microsoft.EntityFrameworkCore;
 using Persistence.Extensions;
@@ -10,7 +11,7 @@ namespace Main.Persistence.Repositories;
 public class PurchaseLogisticsRepository(DContext context) : IPurchaseLogisticsRepository
 {
     public async Task<IEnumerable<PurchaseLogistic>> GetPurchaseLogistics(
-        QueryOptions<PurchaseLogistic, IReadOnlyList<string>> options,
+        QueryOptions<PurchaseLogistic, IReadOnlyList<Guid>> options,
         CancellationToken token = default)
     {
         return await context.PurchaseLogistics
@@ -20,7 +21,7 @@ public class PurchaseLogisticsRepository(DContext context) : IPurchaseLogisticsR
     }
 
     public async Task<PurchaseLogistic?> GetPurchaseLogistics(
-        QueryOptions<PurchaseLogistic, string> options,
+        QueryOptions<PurchaseLogistic, Guid> options,
         CancellationToken token = default)
     {
         return await context.PurchaseLogistics

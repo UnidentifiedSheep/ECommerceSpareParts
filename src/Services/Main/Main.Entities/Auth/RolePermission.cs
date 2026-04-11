@@ -1,4 +1,4 @@
-﻿namespace Main.Entities;
+﻿namespace Main.Entities.Auth;
 
 public class RolePermission
 {

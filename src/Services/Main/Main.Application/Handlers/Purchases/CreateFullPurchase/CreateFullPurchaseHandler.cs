@@ -13,6 +13,8 @@ using Main.Application.Handlers.Purchases.CreatePurchase;
 using Main.Application.Handlers.Purchases.UpsertLogisticsToPurchase;
 using Main.Application.Handlers.StorageContents.AddContent;
 using Main.Entities;
+using Main.Entities.Purchase;
+using Main.Entities.Transaction;
 using Main.Enums;
 using Mapster;
 using MassTransit;

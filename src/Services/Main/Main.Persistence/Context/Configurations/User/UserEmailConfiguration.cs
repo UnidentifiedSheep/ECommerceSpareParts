@@ -1,4 +1,5 @@
 ﻿using Main.Entities;
+using Main.Entities.User;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
@@ -52,7 +53,7 @@ public class UserEmailConfiguration : IEntityTypeConfiguration<UserEmail>
         
         builder.Property(e => e.UserId).HasColumnName("user_id");
 
-        builder.HasOne<Entities.User>()
+        builder.HasOne<Entities.User.User>()
             .WithMany(p => p.UserEmails)
             .HasForeignKey(d => d.UserId)
             .HasConstraintName("user_emails_users_id_fk");

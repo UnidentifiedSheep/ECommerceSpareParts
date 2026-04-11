@@ -8,6 +8,8 @@ using Main.Abstractions.Interfaces.Services;
 using Main.Abstractions.Models;
 using Main.Application.Extensions;
 using Main.Entities;
+using Main.Entities.Sale;
+using Main.Entities.Storage;
 using Mapster;
 using MediatR;
 

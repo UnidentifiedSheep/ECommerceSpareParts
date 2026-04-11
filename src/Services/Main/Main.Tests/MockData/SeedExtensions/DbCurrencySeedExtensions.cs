@@ -1,4 +1,5 @@
 ﻿using Main.Entities;
+using Main.Entities.Currency;
 using Main.Persistence.Context;
 using Microsoft.EntityFrameworkCore;
 

@@ -6,6 +6,8 @@ using Main.Abstractions.Dtos.Amw.Sales;
 using Main.Abstractions.Interfaces.Services;
 using Main.Abstractions.Models;
 using Main.Entities;
+using Main.Entities.Sale;
+using Main.Entities.Storage;
 using Main.Enums;
 using Mapster;
 

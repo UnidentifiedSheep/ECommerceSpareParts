@@ -9,6 +9,7 @@ using Main.Application.Handlers.Balance.DeleteTransaction;
 using Main.Application.Handlers.Sales.DeleteSale;
 using Main.Application.Handlers.StorageContents.RestoreContent;
 using Main.Entities;
+using Main.Entities.Sale;
 using Main.Enums;
 using Mapster;
 using MassTransit;

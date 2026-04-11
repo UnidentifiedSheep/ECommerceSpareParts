@@ -1,4 +1,5 @@
 ﻿using Main.Entities;
+using Main.Entities.Producer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
@@ -37,7 +38,7 @@ public class ProducerOtherNameConfiguration : IEntityTypeConfiguration<Producers
             .HasMaxLength(64)
             .HasColumnName("where_used");
 
-        builder.HasOne<Entities.Producer>()
+        builder.HasOne<Entities.Producer.Producer>()
             .WithMany()
             .HasForeignKey(d => d.ProducerId)
             .HasConstraintName("producers_other_names_producer_id_fk");

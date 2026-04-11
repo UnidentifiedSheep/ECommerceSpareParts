@@ -3,6 +3,7 @@ using Abstractions.Models.Repository;
 using Main.Abstractions.Dtos.RepositoryOptionsData;
 using Main.Abstractions.Interfaces.DbRepositories;
 using Main.Entities;
+using Main.Entities.Storage;
 using Main.Persistence.Context;
 using Microsoft.EntityFrameworkCore;
 using Persistence.Extensions;

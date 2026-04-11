@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Net;
 using Microsoft.EntityFrameworkCore.Migrations;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
-using NpgsqlTypes;
 
 #nullable disable
 
@@ -29,9 +28,6 @@ namespace Main.Migrator.Migrations
 
             migrationBuilder.CreateSequence<int>(
                 name: "storage_movement_id_seq");
-
-            migrationBuilder.CreateSequence<int>(
-                name: "table_name_id_seq");
 
             migrationBuilder.CreateTable(
                 name: "categories",
@@ -136,7 +132,8 @@ namespace Main.Migrator.Migrations
                 {
                     name = table.Column<string>(type: "text", nullable: false),
                     description = table.Column<string>(type: "text", nullable: true),
-                    created_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: false, defaultValueSql: "now()")
+                    created_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
+                    updated_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -164,17 +161,15 @@ namespace Main.Migrator.Migrations
                 schema: "auth",
                 columns: table => new
                 {
-                    id = table.Column<Guid>(type: "uuid", nullable: false, defaultValueSql: "gen_random_uuid()"),
-                    name = table.Column<string>(type: "character varying(24)", maxLength: 24, nullable: false),
                     normalized_name = table.Column<string>(type: "character varying(24)", maxLength: 24, nullable: false),
+                    name = table.Column<string>(type: "character varying(24)", maxLength: 24, nullable: false),
                     description = table.Column<string>(type: "character varying(255)", maxLength: 255, nullable: true),
-                    is_system = table.Column<bool>(type: "boolean", nullable: false),
-                    created_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: false, defaultValueSql: "now()"),
-                    updated_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: false, defaultValueSql: "now()")
+                    created_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
+                    updated_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("roles_pk", x => x.id);
+                    table.PrimaryKey("roles_pk", x => x.normalized_name);
                 });
 
             migrationBuilder.CreateTable(
@@ -199,13 +194,13 @@ namespace Main.Migrator.Migrations
                     id = table.Column<Guid>(type: "uuid", nullable: false, defaultValueSql: "gen_random_uuid()"),
                     user_name = table.Column<string>(type: "character varying(36)", maxLength: 36, nullable: false),
                     normalized_user_name = table.Column<string>(type: "character varying(36)", maxLength: 36, nullable: false),
-                    created_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: false, defaultValueSql: "now()"),
-                    updated_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: false, defaultValueSql: "now()"),
                     password_hash = table.Column<string>(type: "text", nullable: false),
                     two_factor_enabled = table.Column<bool>(type: "boolean", nullable: false),
                     lockout_end = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
                     access_failed_count = table.Column<int>(type: "integer", nullable: false),
-                    last_login_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: true)
+                    last_login_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
+                    created_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
+                    updated_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -298,72 +293,6 @@ namespace Main.Migrator.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "articles",
-                columns: table => new
-                {
-                    id = table.Column<int>(type: "integer", nullable: false)
-                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
-                    article_number = table.Column<string>(type: "character varying(128)", maxLength: 128, nullable: false),
-                    normalized_article_number = table.Column<string>(type: "character varying(128)", maxLength: 128, nullable: false),
-                    article_name = table.Column<string>(type: "character varying(255)", maxLength: 255, nullable: false),
-                    is_valid = table.Column<bool>(type: "boolean", nullable: false, defaultValue: true),
-                    description = table.Column<string>(type: "character varying(255)", maxLength: 255, nullable: true),
-                    packing_unit = table.Column<int>(type: "integer", nullable: true),
-                    producer_id = table.Column<int>(type: "integer", nullable: false),
-                    is_oe = table.Column<bool>(type: "boolean", nullable: false),
-                    total_count = table.Column<int>(type: "integer", nullable: false),
-                    indicator = table.Column<string>(type: "character varying(24)", maxLength: 24, nullable: true),
-                    category_id = table.Column<int>(type: "integer", nullable: true),
-                    popularity = table.Column<long>(type: "bigint", nullable: false, defaultValue: 1L),
-                    articlename_tsv = table.Column<NpgsqlTsVector>(type: "tsvector", nullable: true, computedColumnSql: "to_tsvector('russian'::regconfig, (article_name)::text)", stored: true)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("articles_id_pk", x => x.id);
-                    table.ForeignKey(
-                        name: "articles_categories_id_fk",
-                        column: x => x.category_id,
-                        principalTable: "categories",
-                        principalColumn: "id",
-                        onDelete: ReferentialAction.Restrict);
-                    table.ForeignKey(
-                        name: "producer_id_fk",
-                        column: x => x.producer_id,
-                        principalTable: "producer",
-                        principalColumn: "id",
-                        onDelete: ReferentialAction.Restrict);
-                });
-
-            migrationBuilder.CreateTable(
-                name: "producer_details",
-                columns: table => new
-                {
-                    id = table.Column<int>(type: "integer", nullable: false)
-                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
-                    producer_id = table.Column<int>(type: "integer", nullable: false),
-                    address_type = table.Column<string>(type: "character varying(32)", maxLength: 32, nullable: false),
-                    name = table.Column<string>(type: "character varying(128)", maxLength: 128, nullable: true),
-                    name_2 = table.Column<string>(type: "character varying(128)", maxLength: 128, nullable: true),
-                    country = table.Column<string>(type: "character varying(128)", maxLength: 128, nullable: true),
-                    city = table.Column<string>(type: "character varying(128)", maxLength: 128, nullable: true),
-                    country_code = table.Column<string>(type: "character varying(128)", maxLength: 128, nullable: true),
-                    street = table.Column<string>(type: "character varying(64)", maxLength: 64, nullable: true),
-                    street_2 = table.Column<string>(type: "character varying(64)", maxLength: 64, nullable: true),
-                    postal_country_code = table.Column<string>(type: "character varying(24)", maxLength: 24, nullable: true),
-                    phone = table.Column<string>(type: "character varying(20)", maxLength: 20, nullable: true)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("producer_details_pk", x => x.id);
-                    table.ForeignKey(
-                        name: "producer_details_id_fk",
-                        column: x => x.producer_id,
-                        principalTable: "producer",
-                        principalColumn: "id",
-                        onDelete: ReferentialAction.Cascade);
-                });
-
-            migrationBuilder.CreateTable(
                 name: "producers_other_names",
                 columns: table => new
                 {
@@ -383,28 +312,73 @@ namespace Main.Migrator.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "products",
+                columns: table => new
+                {
+                    id = table.Column<int>(type: "integer", nullable: false)
+                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
+                    PairId = table.Column<int>(type: "integer", nullable: true),
+                    sku = table.Column<string>(type: "character varying(128)", maxLength: 128, nullable: false),
+                    normalized_sku = table.Column<string>(type: "character varying(128)", maxLength: 128, nullable: false),
+                    article_name = table.Column<string>(type: "character varying(255)", maxLength: 255, nullable: false),
+                    description = table.Column<string>(type: "character varying(255)", maxLength: 255, nullable: true),
+                    packing_unit = table.Column<int>(type: "integer", nullable: true),
+                    producer_id = table.Column<int>(type: "integer", nullable: false),
+                    stock = table.Column<int>(type: "integer", nullable: false),
+                    indicator = table.Column<string>(type: "character varying(24)", maxLength: 24, nullable: true),
+                    category_id = table.Column<int>(type: "integer", nullable: true),
+                    popularity = table.Column<long>(type: "bigint", nullable: false, defaultValue: 1L),
+                    created_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
+                    updated_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("products_id_pk", x => x.id);
+                    table.ForeignKey(
+                        name: "FK_products_products_PairId",
+                        column: x => x.PairId,
+                        principalTable: "products",
+                        principalColumn: "id",
+                        onDelete: ReferentialAction.SetNull);
+                    table.ForeignKey(
+                        name: "producer_id_fk",
+                        column: x => x.producer_id,
+                        principalTable: "producer",
+                        principalColumn: "id",
+                        onDelete: ReferentialAction.Restrict);
+                    table.ForeignKey(
+                        name: "products_categories_id_fk",
+                        column: x => x.category_id,
+                        principalTable: "categories",
+                        principalColumn: "id",
+                        onDelete: ReferentialAction.Restrict);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "role_permissions",
                 schema: "auth",
                 columns: table => new
                 {
-                    role_id = table.Column<Guid>(type: "uuid", nullable: false),
-                    permission_name = table.Column<string>(type: "text", nullable: false)
+                    role = table.Column<string>(type: "character varying(24)", nullable: false),
+                    permission = table.Column<string>(type: "text", nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("role_permissions_pk", x => new { x.role_id, x.permission_name });
+                    table.PrimaryKey("role_permissions_pk", x => new { x.role, x.permission });
                     table.ForeignKey(
                         name: "role_permissions_permissions_name_fk",
-                        column: x => x.permission_name,
+                        column: x => x.permission,
                         principalSchema: "auth",
                         principalTable: "permissions",
-                        principalColumn: "name");
+                        principalColumn: "name",
+                        onDelete: ReferentialAction.Restrict);
                     table.ForeignKey(
                         name: "role_permissions_roles_id_fk",
-                        column: x => x.role_id,
+                        column: x => x.role,
                         principalSchema: "auth",
                         principalTable: "roles",
-                        principalColumn: "id");
+                        principalColumn: "normalized_name",
+                        onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateTable(
@@ -415,13 +389,13 @@ namespace Main.Migrator.Migrations
                     user_id = table.Column<Guid>(type: "uuid", nullable: false),
                     currency_id = table.Column<int>(type: "integer", nullable: false),
                     status = table.Column<string>(type: "text", nullable: false),
-                    create_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: false, defaultValueSql: "now()"),
-                    update_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
                     buyer_approved = table.Column<bool>(type: "boolean", nullable: false),
                     seller_approved = table.Column<bool>(type: "boolean", nullable: false),
                     signed_total_price = table.Column<string>(type: "text", nullable: false),
                     who_updated = table.Column<Guid>(type: "uuid", nullable: true),
-                    is_canceled = table.Column<bool>(type: "boolean", nullable: false)
+                    is_canceled = table.Column<bool>(type: "boolean", nullable: false),
+                    created_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
+                    updated_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -491,7 +465,9 @@ namespace Main.Migrator.Migrations
                     is_active = table.Column<bool>(type: "boolean", nullable: false, defaultValue: true),
                     currency_id = table.Column<int>(type: "integer", nullable: false),
                     minimum_price = table.Column<decimal>(type: "numeric", nullable: true),
-                    carrier_id = table.Column<Guid>(type: "uuid", nullable: true)
+                    carrier_id = table.Column<Guid>(type: "uuid", nullable: true),
+                    created_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
+                    updated_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -585,10 +561,12 @@ namespace Main.Migrator.Migrations
                 name: "user_balances",
                 columns: table => new
                 {
-                    id = table.Column<int>(type: "integer", nullable: false, defaultValueSql: "nextval('table_name_id_seq'::regclass)"),
+                    id = table.Column<int>(type: "integer", nullable: false)
+                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
                     user_id = table.Column<Guid>(type: "uuid", nullable: false),
                     currency_id = table.Column<int>(type: "integer", nullable: false),
-                    balance = table.Column<decimal>(type: "numeric", nullable: false)
+                    balance = table.Column<decimal>(type: "numeric", nullable: false),
+                    xmin = table.Column<uint>(type: "xid", rowVersion: true, nullable: false)
                 },
                 constraints: table =>
                 {
@@ -632,20 +610,19 @@ namespace Main.Migrator.Migrations
                 schema: "auth",
                 columns: table => new
                 {
-                    id = table.Column<Guid>(type: "uuid", nullable: false, defaultValueSql: "gen_random_uuid()"),
-                    user_id = table.Column<Guid>(type: "uuid", nullable: false),
                     normalized_email = table.Column<string>(type: "character varying(255)", maxLength: 255, nullable: false),
+                    user_id = table.Column<Guid>(type: "uuid", nullable: false),
                     email = table.Column<string>(type: "character varying(255)", maxLength: 255, nullable: false),
                     confirmed = table.Column<bool>(type: "boolean", nullable: false),
                     email_type = table.Column<string>(type: "character varying(50)", maxLength: 50, nullable: false),
                     is_primary = table.Column<bool>(type: "boolean", nullable: false),
                     confirmed_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
-                    created_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: false, defaultValueSql: "now()"),
-                    updated_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: false, defaultValueSql: "now()")
+                    created_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
+                    updated_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("user_emails_pk", x => x.id);
+                    table.PrimaryKey("user_emails_pk", x => x.normalized_email);
                     table.ForeignKey(
                         name: "user_emails_users_id_fk",
                         column: x => x.user_id,
@@ -686,7 +663,8 @@ namespace Main.Migrator.Migrations
                 {
                     user_id = table.Column<Guid>(type: "uuid", nullable: false),
                     permission = table.Column<string>(type: "text", nullable: false),
-                    created_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: false, defaultValueSql: "now()")
+                    created_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
+                    updated_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -712,20 +690,19 @@ namespace Main.Migrator.Migrations
                 schema: "auth",
                 columns: table => new
                 {
-                    id = table.Column<Guid>(type: "uuid", nullable: false, defaultValueSql: "gen_random_uuid()"),
+                    normalized_phone = table.Column<string>(type: "character varying(32)", maxLength: 32, nullable: false),
                     user_id = table.Column<Guid>(type: "uuid", nullable: false),
                     phone_number = table.Column<string>(type: "character varying(32)", maxLength: 32, nullable: false),
-                    normalized_phone = table.Column<string>(type: "character varying(32)", maxLength: 32, nullable: false),
                     confirmed = table.Column<bool>(type: "boolean", nullable: false),
                     is_primary = table.Column<bool>(type: "boolean", nullable: false),
                     phone_type = table.Column<string>(type: "character varying(32)", maxLength: 32, nullable: true),
                     confirmed_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
-                    created_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: false, defaultValueSql: "now()"),
-                    updated_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: false, defaultValueSql: "now()")
+                    created_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
+                    updated_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("user_phones_pk", x => x.id);
+                    table.PrimaryKey("user_phones_pk", x => x.normalized_phone);
                     table.ForeignKey(
                         name: "user_phones_user_id_fkey",
                         column: x => x.user_id,
@@ -741,18 +718,18 @@ namespace Main.Migrator.Migrations
                 columns: table => new
                 {
                     user_id = table.Column<Guid>(type: "uuid", nullable: false),
-                    role_id = table.Column<Guid>(type: "uuid", nullable: false),
-                    assigned_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: false, defaultValueSql: "now()")
+                    role_name = table.Column<string>(type: "character varying(24)", nullable: false),
+                    AssignedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("user_roles_pk", x => new { x.user_id, x.role_id });
+                    table.PrimaryKey("user_roles_pk", x => new { x.user_id, x.role_name });
                     table.ForeignKey(
-                        name: "user_roles_roles_id_fk",
-                        column: x => x.role_id,
+                        name: "user_roles_roles_name_fk",
+                        column: x => x.role_name,
                         principalSchema: "auth",
                         principalTable: "roles",
-                        principalColumn: "id",
+                        principalColumn: "normalized_name",
                         onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
                         name: "user_roles_users_id_fk",
@@ -772,7 +749,7 @@ namespace Main.Migrator.Migrations
                     user_id = table.Column<Guid>(type: "uuid", nullable: false),
                     search_place = table.Column<string>(type: "text", nullable: false),
                     query = table.Column<string>(type: "jsonb", nullable: false),
-                    search_date_time = table.Column<DateTime>(type: "timestamp with time zone", nullable: false, defaultValueSql: "now()")
+                    search_date_time = table.Column<DateTime>(type: "timestamp with time zone", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -796,15 +773,14 @@ namespace Main.Migrator.Migrations
                     token_hash = table.Column<string>(type: "text", nullable: false),
                     permissions = table.Column<List<string>>(type: "text[]", nullable: false),
                     type = table.Column<string>(type: "character varying(50)", maxLength: 50, nullable: false),
-                    issued_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: false, defaultValueSql: "now()"),
                     expires_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
                     revoked = table.Column<bool>(type: "boolean", nullable: false),
                     revoke_reason = table.Column<string>(type: "character varying(255)", maxLength: 255, nullable: true),
                     device_id = table.Column<string>(type: "character varying(255)", maxLength: 255, nullable: true),
                     ip_address = table.Column<IPAddress>(type: "inet", nullable: true),
                     user_agent = table.Column<string>(type: "text", nullable: true),
-                    created_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: false, defaultValueSql: "now()"),
-                    updated_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: false, defaultValueSql: "now()")
+                    created_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
+                    updated_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -822,7 +798,7 @@ namespace Main.Migrator.Migrations
                 name: "user_vehicles",
                 columns: table => new
                 {
-                    id = table.Column<string>(type: "text", nullable: false, defaultValueSql: "gen_random_uuid()"),
+                    id = table.Column<Guid>(type: "uuid", nullable: false, defaultValueSql: "gen_random_uuid()"),
                     user_id = table.Column<Guid>(type: "uuid", nullable: false),
                     vin = table.Column<string>(type: "character varying(50)", maxLength: 50, nullable: true),
                     plate_number = table.Column<string>(type: "text", nullable: false),
@@ -832,7 +808,8 @@ namespace Main.Migrator.Migrations
                     engine_code = table.Column<string>(type: "text", nullable: true),
                     production_year = table.Column<int>(type: "integer", nullable: true),
                     comment = table.Column<string>(type: "text", nullable: true),
-                    created_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: false, defaultValueSql: "now()")
+                    created_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
+                    updated_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -847,257 +824,22 @@ namespace Main.Migrator.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "article_characteristics",
-                columns: table => new
-                {
-                    id = table.Column<int>(type: "integer", nullable: false)
-                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
-                    article_id = table.Column<int>(type: "integer", nullable: false),
-                    value = table.Column<string>(type: "character varying(128)", maxLength: 128, nullable: false),
-                    name = table.Column<string>(type: "character varying(128)", maxLength: 128, nullable: true)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("article_characteristics_pk", x => x.id);
-                    table.ForeignKey(
-                        name: "article_id_fk",
-                        column: x => x.article_id,
-                        principalTable: "articles",
-                        principalColumn: "id",
-                        onDelete: ReferentialAction.Cascade);
-                });
-
-            migrationBuilder.CreateTable(
-                name: "article_coefficients",
-                columns: table => new
-                {
-                    article_id = table.Column<int>(type: "integer", nullable: false),
-                    coefficient_name = table.Column<string>(type: "character varying(56)", maxLength: 56, nullable: false),
-                    valid_till = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
-                    created_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: false, defaultValueSql: "now()")
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("article_coefficients_pk", x => new { x.article_id, x.coefficient_name });
-                    table.ForeignKey(
-                        name: "article_coefficients_articles_id_fk",
-                        column: x => x.article_id,
-                        principalTable: "articles",
-                        principalColumn: "id",
-                        onDelete: ReferentialAction.Cascade);
-                    table.ForeignKey(
-                        name: "article_coefficients_coefficients_name_fk",
-                        column: x => x.coefficient_name,
-                        principalTable: "coefficients",
-                        principalColumn: "name",
-                        onDelete: ReferentialAction.Restrict);
-                });
-
-            migrationBuilder.CreateTable(
-                name: "article_crosses",
-                columns: table => new
-                {
-                    article_id = table.Column<int>(type: "integer", nullable: false),
-                    article_cross_id = table.Column<int>(type: "integer", nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("article_crosses_pk", x => new { x.article_id, x.article_cross_id });
-                    table.ForeignKey(
-                        name: "article_crosses_articles_id_fk",
-                        column: x => x.article_id,
-                        principalTable: "articles",
-                        principalColumn: "id",
-                        onDelete: ReferentialAction.Cascade);
-                    table.ForeignKey(
-                        name: "article_crosses_articles_id_fk_2",
-                        column: x => x.article_cross_id,
-                        principalTable: "articles",
-                        principalColumn: "id",
-                        onDelete: ReferentialAction.Cascade);
-                });
-
-            migrationBuilder.CreateTable(
-                name: "article_ean",
-                columns: table => new
-                {
-                    article_id = table.Column<int>(type: "integer", nullable: false),
-                    ean = table.Column<string>(type: "character varying(24)", maxLength: 24, nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("article_ean_pk", x => new { x.article_id, x.ean });
-                    table.ForeignKey(
-                        name: "article_id___fk",
-                        column: x => x.article_id,
-                        principalTable: "articles",
-                        principalColumn: "id",
-                        onDelete: ReferentialAction.Cascade);
-                });
-
-            migrationBuilder.CreateTable(
-                name: "article_images",
-                columns: table => new
-                {
-                    path = table.Column<string>(type: "text", nullable: false),
-                    article_id = table.Column<int>(type: "integer", nullable: false),
-                    description = table.Column<string>(type: "character varying(128)", maxLength: 128, nullable: true)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("article_images_pk", x => x.path);
-                    table.ForeignKey(
-                        name: "article_id_fk",
-                        column: x => x.article_id,
-                        principalTable: "articles",
-                        principalColumn: "id",
-                        onDelete: ReferentialAction.Cascade);
-                });
-
-            migrationBuilder.CreateTable(
-                name: "article_sizes",
-                columns: table => new
-                {
-                    article_id = table.Column<int>(type: "integer", nullable: false),
-                    length = table.Column<decimal>(type: "numeric", nullable: false),
-                    width = table.Column<decimal>(type: "numeric", nullable: false),
-                    height = table.Column<decimal>(type: "numeric", nullable: false),
-                    unit = table.Column<string>(type: "character varying(24)", maxLength: 24, nullable: false),
-                    volume_m3 = table.Column<decimal>(type: "numeric", nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("article_sizes_pk", x => x.article_id);
-                    table.ForeignKey(
-                        name: "article_sizes_articles_id_fk",
-                        column: x => x.article_id,
-                        principalTable: "articles",
-                        principalColumn: "id",
-                        onDelete: ReferentialAction.Cascade);
-                });
-
-            migrationBuilder.CreateTable(
-                name: "article_supplier_buy_info",
-                columns: table => new
-                {
-                    id = table.Column<int>(type: "integer", nullable: false)
-                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
-                    article_id = table.Column<int>(type: "integer", nullable: false),
-                    who_proposed = table.Column<Guid>(type: "uuid", nullable: false),
-                    currency_id = table.Column<int>(type: "integer", nullable: false),
-                    buy_price = table.Column<decimal>(type: "numeric", nullable: false),
-                    delivery_id_days = table.Column<int>(type: "integer", nullable: false),
-                    creation_datetime = table.Column<DateTime>(type: "timestamp with time zone", nullable: false, defaultValueSql: "now()"),
-                    current_supplier_stock = table.Column<int>(type: "integer", nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("article_supplier_buy_info_pk", x => x.id);
-                    table.ForeignKey(
-                        name: "article_supplier_buy_info_articles_id_fk",
-                        column: x => x.article_id,
-                        principalTable: "articles",
-                        principalColumn: "id",
-                        onDelete: ReferentialAction.Cascade);
-                    table.ForeignKey(
-                        name: "article_supplier_buy_info_currency_id_fk",
-                        column: x => x.currency_id,
-                        principalTable: "currency",
-                        principalColumn: "id",
-                        onDelete: ReferentialAction.Cascade);
-                    table.ForeignKey(
-                        name: "article_supplier_buy_info_users_id_fk",
-                        column: x => x.who_proposed,
-                        principalSchema: "auth",
-                        principalTable: "users",
-                        principalColumn: "id",
-                        onDelete: ReferentialAction.Cascade);
-                });
-
-            migrationBuilder.CreateTable(
-                name: "article_weight",
-                columns: table => new
-                {
-                    article_id = table.Column<int>(type: "integer", nullable: false),
-                    weight = table.Column<decimal>(type: "numeric", nullable: false),
-                    unit = table.Column<string>(type: "character varying(24)", maxLength: 24, nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("article_weight_pk", x => x.article_id);
-                    table.ForeignKey(
-                        name: "article_weight_articles_id_fk",
-                        column: x => x.article_id,
-                        principalTable: "articles",
-                        principalColumn: "id",
-                        onDelete: ReferentialAction.Cascade);
-                });
-
-            migrationBuilder.CreateTable(
-                name: "articles_content",
-                columns: table => new
-                {
-                    main_article_id = table.Column<int>(type: "integer", nullable: false),
-                    inside_article_id = table.Column<int>(type: "integer", nullable: false),
-                    quantity = table.Column<int>(type: "integer", nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("articles_content_pk", x => new { x.main_article_id, x.inside_article_id });
-                    table.ForeignKey(
-                        name: "articles_content_in_id___fk",
-                        column: x => x.inside_article_id,
-                        principalTable: "articles",
-                        principalColumn: "id",
-                        onDelete: ReferentialAction.Cascade);
-                    table.ForeignKey(
-                        name: "articles_content_out_id___fk",
-                        column: x => x.main_article_id,
-                        principalTable: "articles",
-                        principalColumn: "id",
-                        onDelete: ReferentialAction.Cascade);
-                });
-
-            migrationBuilder.CreateTable(
-                name: "articles_pair",
-                columns: table => new
-                {
-                    article_left = table.Column<int>(type: "integer", nullable: false),
-                    article_right = table.Column<int>(type: "integer", nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("articles_pair_pk", x => new { x.article_left, x.article_right });
-                    table.ForeignKey(
-                        name: "articles_pair_articles_id_fk",
-                        column: x => x.article_left,
-                        principalTable: "articles",
-                        principalColumn: "id",
-                        onDelete: ReferentialAction.Cascade);
-                    table.ForeignKey(
-                        name: "articles_pair_articles_id_fk_2",
-                        column: x => x.article_right,
-                        principalTable: "articles",
-                        principalColumn: "id");
-                });
-
-            migrationBuilder.CreateTable(
                 name: "cart",
                 columns: table => new
                 {
                     user_id = table.Column<Guid>(type: "uuid", nullable: false),
-                    article_id = table.Column<int>(type: "integer", nullable: false),
+                    product_id = table.Column<int>(type: "integer", nullable: false),
                     count = table.Column<int>(type: "integer", nullable: false),
-                    created_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: false, defaultValueSql: "now()"),
-                    updated_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: false, defaultValueSql: "now()")
+                    created_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
+                    updated_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("cart_pk", x => new { x.user_id, x.article_id });
+                    table.PrimaryKey("cart_pk", x => new { x.user_id, x.product_id });
                     table.ForeignKey(
-                        name: "cart_articles_id_fk",
-                        column: x => x.article_id,
-                        principalTable: "articles",
+                        name: "cart_product_id_fk",
+                        column: x => x.product_id,
+                        principalTable: "products",
                         principalColumn: "id",
                         onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
@@ -1110,33 +852,183 @@ namespace Main.Migrator.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "product_characteristics",
+                columns: table => new
+                {
+                    product_id = table.Column<int>(type: "integer", nullable: false),
+                    name = table.Column<string>(type: "character varying(128)", maxLength: 128, nullable: false),
+                    value = table.Column<string>(type: "character varying(128)", maxLength: 128, nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("product_characteristics_pk", x => new { x.product_id, x.name });
+                    table.ForeignKey(
+                        name: "product_characteristics_product_id_fk",
+                        column: x => x.product_id,
+                        principalTable: "products",
+                        principalColumn: "id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "product_coefficients",
+                columns: table => new
+                {
+                    product_id = table.Column<int>(type: "integer", nullable: false),
+                    coefficient_name = table.Column<string>(type: "character varying(50)", maxLength: 50, nullable: false),
+                    valid_till = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
+                    created_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
+                    updated_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("product_coefficients_pk", x => new { x.product_id, x.coefficient_name });
+                    table.ForeignKey(
+                        name: "FK_product_coefficients_products_product_id",
+                        column: x => x.product_id,
+                        principalTable: "products",
+                        principalColumn: "id",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "article_coefficients_coefficients_name_fk",
+                        column: x => x.coefficient_name,
+                        principalTable: "coefficients",
+                        principalColumn: "name",
+                        onDelete: ReferentialAction.Restrict);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "product_contents",
+                columns: table => new
+                {
+                    parent_product_id = table.Column<int>(type: "integer", nullable: false),
+                    child_product_id = table.Column<int>(type: "integer", nullable: false),
+                    quantity = table.Column<int>(type: "integer", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("product_contents_pk", x => new { x.parent_product_id, x.child_product_id });
+                    table.ForeignKey(
+                        name: "product_contents_child_fk",
+                        column: x => x.child_product_id,
+                        principalTable: "products",
+                        principalColumn: "id",
+                        onDelete: ReferentialAction.Restrict);
+                    table.ForeignKey(
+                        name: "product_contents_parent_fk",
+                        column: x => x.parent_product_id,
+                        principalTable: "products",
+                        principalColumn: "id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "product_eans",
+                columns: table => new
+                {
+                    product_id = table.Column<int>(type: "integer", nullable: false),
+                    ean = table.Column<string>(type: "character varying(30)", maxLength: 30, nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("product_eans_pk", x => new { x.product_id, x.ean });
+                    table.ForeignKey(
+                        name: "product_eans_product_id_fk",
+                        column: x => x.product_id,
+                        principalTable: "products",
+                        principalColumn: "id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "product_images",
+                columns: table => new
+                {
+                    product_id = table.Column<int>(type: "integer", nullable: false),
+                    path = table.Column<string>(type: "character varying(255)", maxLength: 255, nullable: false),
+                    description = table.Column<string>(type: "character varying(512)", maxLength: 512, nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("product_images_pk", x => new { x.product_id, x.path });
+                    table.ForeignKey(
+                        name: "product_images_product_id_fk",
+                        column: x => x.product_id,
+                        principalTable: "products",
+                        principalColumn: "id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "product_sizes",
+                columns: table => new
+                {
+                    product_id = table.Column<int>(type: "integer", nullable: false),
+                    length = table.Column<decimal>(type: "numeric", nullable: false),
+                    width = table.Column<decimal>(type: "numeric", nullable: false),
+                    height = table.Column<decimal>(type: "numeric", nullable: false),
+                    unit = table.Column<string>(type: "character varying(24)", maxLength: 24, nullable: false),
+                    volume_m3 = table.Column<decimal>(type: "numeric", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("product_sizes_pk", x => x.product_id);
+                    table.ForeignKey(
+                        name: "product_sizes_products_id_fk",
+                        column: x => x.product_id,
+                        principalTable: "products",
+                        principalColumn: "id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "product_weights",
+                columns: table => new
+                {
+                    product_id = table.Column<int>(type: "integer", nullable: false),
+                    weight = table.Column<decimal>(type: "numeric", nullable: false),
+                    unit = table.Column<string>(type: "character varying(24)", maxLength: 24, nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("product_weights_pk", x => x.product_id);
+                    table.ForeignKey(
+                        name: "product_weight_products_id_fk",
+                        column: x => x.product_id,
+                        principalTable: "products",
+                        principalColumn: "id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "storage_content",
                 columns: table => new
                 {
                     id = table.Column<int>(type: "integer", nullable: false)
                         .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
                     storage_name = table.Column<string>(type: "character varying(128)", maxLength: 128, nullable: false),
-                    article_id = table.Column<int>(type: "integer", nullable: false),
+                    product_id = table.Column<int>(type: "integer", nullable: false),
                     count = table.Column<int>(type: "integer", nullable: false),
                     buy_price = table.Column<decimal>(type: "numeric", nullable: false),
                     currency_id = table.Column<int>(type: "integer", nullable: false),
                     buy_price_in_usd = table.Column<decimal>(type: "numeric", nullable: false),
-                    created_datetime = table.Column<DateTime>(type: "timestamp with time zone", nullable: false, defaultValueSql: "now()"),
-                    purchase_datetime = table.Column<DateTime>(type: "timestamp with time zone", nullable: false)
+                    purchase_datetime = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
+                    created_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
+                    updated_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: false)
                 },
                 constraints: table =>
                 {
                     table.PrimaryKey("storage_content_pk", x => x.id);
                     table.ForeignKey(
-                        name: "storage_content_articles_id_fk",
-                        column: x => x.article_id,
-                        principalTable: "articles",
-                        principalColumn: "id",
-                        onDelete: ReferentialAction.Restrict);
-                    table.ForeignKey(
                         name: "storage_content_currency_id_fk",
                         column: x => x.currency_id,
                         principalTable: "currency",
+                        principalColumn: "id",
+                        onDelete: ReferentialAction.Restrict);
+                    table.ForeignKey(
+                        name: "storage_content_products_id_fk",
+                        column: x => x.product_id,
+                        principalTable: "products",
                         principalColumn: "id",
                         onDelete: ReferentialAction.Restrict);
                     table.ForeignKey(
@@ -1154,33 +1046,33 @@ namespace Main.Migrator.Migrations
                     id = table.Column<int>(type: "integer", nullable: false)
                         .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
                     user_id = table.Column<Guid>(type: "uuid", nullable: false),
-                    article_id = table.Column<int>(type: "integer", nullable: false),
+                    product_id = table.Column<int>(type: "integer", nullable: false),
                     initial_count = table.Column<int>(type: "integer", nullable: false),
                     current_count = table.Column<int>(type: "integer", nullable: false),
-                    create_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: false, defaultValueSql: "now()"),
-                    updated_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
                     given_price = table.Column<decimal>(type: "numeric", nullable: true),
                     given_currency_id = table.Column<int>(type: "integer", nullable: true),
                     is_done = table.Column<bool>(type: "boolean", nullable: false),
                     comment = table.Column<string>(type: "text", nullable: true),
                     who_created = table.Column<Guid>(type: "uuid", nullable: false),
-                    who_updated = table.Column<Guid>(type: "uuid", nullable: true)
+                    who_updated = table.Column<Guid>(type: "uuid", nullable: true),
+                    created_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
+                    updated_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: false)
                 },
                 constraints: table =>
                 {
                     table.PrimaryKey("storage_content_reservations_pk", x => x.id);
-                    table.ForeignKey(
-                        name: "storage_content_reservations_articles_id_fk",
-                        column: x => x.article_id,
-                        principalTable: "articles",
-                        principalColumn: "id",
-                        onDelete: ReferentialAction.Restrict);
                     table.ForeignKey(
                         name: "storage_content_reservations_currency_id_fk",
                         column: x => x.given_currency_id,
                         principalTable: "currency",
                         principalColumn: "id",
                         onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "storage_content_reservations_products_id_fk",
+                        column: x => x.product_id,
+                        principalTable: "products",
+                        principalColumn: "id",
+                        onDelete: ReferentialAction.Restrict);
                     table.ForeignKey(
                         name: "storage_content_reservations_users_id_fk",
                         column: x => x.user_id,
@@ -1211,7 +1103,7 @@ namespace Main.Migrator.Migrations
                     id = table.Column<int>(type: "integer", nullable: false)
                         .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
                     storage_name = table.Column<string>(type: "character varying(128)", maxLength: 128, nullable: false),
-                    article_id = table.Column<int>(type: "integer", nullable: false),
+                    product_id = table.Column<int>(type: "integer", nullable: false),
                     currency_id = table.Column<int>(type: "integer", nullable: false),
                     price = table.Column<decimal>(type: "numeric", nullable: false),
                     count = table.Column<int>(type: "integer", nullable: false),
@@ -1223,15 +1115,15 @@ namespace Main.Migrator.Migrations
                 {
                     table.PrimaryKey("storage_movement_pk", x => x.id);
                     table.ForeignKey(
-                        name: "storage_movement_articles_id_fk",
-                        column: x => x.article_id,
-                        principalTable: "articles",
-                        principalColumn: "id",
-                        onDelete: ReferentialAction.Restrict);
-                    table.ForeignKey(
                         name: "storage_movement_currency_id_fk",
                         column: x => x.currency_id,
                         principalTable: "currency",
+                        principalColumn: "id",
+                        onDelete: ReferentialAction.Restrict);
+                    table.ForeignKey(
+                        name: "storage_movement_products_id_fk",
+                        column: x => x.product_id,
+                        principalTable: "products",
                         principalColumn: "id",
                         onDelete: ReferentialAction.Restrict);
                     table.ForeignKey(
@@ -1266,7 +1158,7 @@ namespace Main.Migrator.Migrations
                     table.ForeignKey(
                         name: "order_items_articles_id_fk",
                         column: x => x.article_id,
-                        principalTable: "articles",
+                        principalTable: "products",
                         principalColumn: "id",
                         onDelete: ReferentialAction.Restrict);
                     table.ForeignKey(
@@ -1319,18 +1211,18 @@ namespace Main.Migrator.Migrations
                 name: "purchase",
                 columns: table => new
                 {
-                    id = table.Column<string>(type: "text", nullable: false, defaultValueSql: "gen_random_uuid()"),
+                    id = table.Column<Guid>(type: "uuid", nullable: false, defaultValueSql: "gen_random_uuid()"),
                     created_user_id = table.Column<Guid>(type: "uuid", nullable: false),
                     supplier_id = table.Column<Guid>(type: "uuid", nullable: false),
                     comment = table.Column<string>(type: "character varying(256)", maxLength: 256, nullable: true),
                     purchase_datetime = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
-                    creation_datetime = table.Column<DateTime>(type: "timestamp with time zone", nullable: false, defaultValueSql: "now()"),
-                    update_datetime = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
                     currency_id = table.Column<int>(type: "integer", nullable: false),
                     transaction_id = table.Column<Guid>(type: "uuid", nullable: false),
                     updated_user_id = table.Column<Guid>(type: "uuid", nullable: true),
                     storage = table.Column<string>(type: "character varying(128)", maxLength: 128, nullable: false),
-                    state = table.Column<string>(type: "text", nullable: false)
+                    state = table.Column<string>(type: "text", nullable: false),
+                    created_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
+                    updated_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -1380,18 +1272,18 @@ namespace Main.Migrator.Migrations
                 name: "sale",
                 columns: table => new
                 {
-                    id = table.Column<string>(type: "text", nullable: false, defaultValueSql: "gen_random_uuid()"),
+                    id = table.Column<Guid>(type: "uuid", nullable: false, defaultValueSql: "gen_random_uuid()"),
                     created_user_id = table.Column<Guid>(type: "uuid", nullable: false),
                     buyer_id = table.Column<Guid>(type: "uuid", nullable: false),
                     comment = table.Column<string>(type: "character varying(256)", maxLength: 256, nullable: true),
                     sale_datetime = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
-                    creation_datetime = table.Column<DateTime>(type: "timestamp with time zone", nullable: false, defaultValueSql: "now()"),
-                    update_datetime = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
                     currency_id = table.Column<int>(type: "integer", nullable: false),
                     transaction_id = table.Column<Guid>(type: "uuid", nullable: false),
                     updated_user_id = table.Column<Guid>(type: "uuid", nullable: true),
                     main_storage_name = table.Column<string>(type: "character varying(128)", maxLength: 128, nullable: false),
-                    state = table.Column<string>(type: "text", nullable: false)
+                    state = table.Column<string>(type: "text", nullable: false),
+                    created_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
+                    updated_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -1489,8 +1381,8 @@ namespace Main.Migrator.Migrations
                 {
                     id = table.Column<int>(type: "integer", nullable: false)
                         .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
-                    purchase_id = table.Column<string>(type: "text", nullable: false),
-                    article_id = table.Column<int>(type: "integer", nullable: false),
+                    purchase_id = table.Column<Guid>(type: "uuid", nullable: false),
+                    product_id = table.Column<int>(type: "integer", nullable: false),
                     count = table.Column<int>(type: "integer", nullable: false),
                     price = table.Column<decimal>(type: "numeric", nullable: false),
                     total_sum = table.Column<decimal>(type: "numeric", nullable: false),
@@ -1501,9 +1393,9 @@ namespace Main.Migrator.Migrations
                 {
                     table.PrimaryKey("purchase_content_pk", x => x.id);
                     table.ForeignKey(
-                        name: "purchase_content_articles_id_fk",
-                        column: x => x.article_id,
-                        principalTable: "articles",
+                        name: "purchase_content_products_id_fk",
+                        column: x => x.product_id,
+                        principalTable: "products",
                         principalColumn: "id",
                         onDelete: ReferentialAction.Restrict);
                     table.ForeignKey(
@@ -1524,7 +1416,7 @@ namespace Main.Migrator.Migrations
                 name: "purchase_logistics",
                 columns: table => new
                 {
-                    purchase_id = table.Column<string>(type: "text", nullable: false),
+                    purchase_id = table.Column<Guid>(type: "uuid", nullable: false),
                     route_id = table.Column<Guid>(type: "uuid", nullable: false),
                     currency_id = table.Column<int>(type: "integer", nullable: false),
                     transaction_id = table.Column<Guid>(type: "uuid", nullable: true),
@@ -1571,8 +1463,8 @@ namespace Main.Migrator.Migrations
                 {
                     id = table.Column<int>(type: "integer", nullable: false)
                         .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
-                    sale_id = table.Column<string>(type: "text", nullable: false),
-                    article_id = table.Column<int>(type: "integer", nullable: false),
+                    sale_id = table.Column<Guid>(type: "uuid", nullable: false),
+                    product_id = table.Column<int>(type: "integer", nullable: false),
                     count = table.Column<int>(type: "integer", nullable: false),
                     price = table.Column<decimal>(type: "numeric", nullable: false),
                     total_sum = table.Column<decimal>(type: "numeric", nullable: false),
@@ -1583,9 +1475,9 @@ namespace Main.Migrator.Migrations
                 {
                     table.PrimaryKey("sale_content_pk", x => x.id);
                     table.ForeignKey(
-                        name: "sale_content_articles_id_fk",
-                        column: x => x.article_id,
-                        principalTable: "articles",
+                        name: "sale_content_products_id_fk",
+                        column: x => x.product_id,
+                        principalTable: "products",
                         principalColumn: "id",
                         onDelete: ReferentialAction.Restrict);
                     table.ForeignKey(
@@ -1660,148 +1552,9 @@ namespace Main.Migrator.Migrations
                 });
 
             migrationBuilder.CreateIndex(
-                name: "article_characteristics_value_index",
-                table: "article_characteristics",
-                column: "value");
-
-            migrationBuilder.CreateIndex(
-                name: "article_id__index",
-                table: "article_characteristics",
-                column: "article_id");
-
-            migrationBuilder.CreateIndex(
-                name: "article_coefficients_valid_till_index",
-                table: "article_coefficients",
-                column: "valid_till");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_article_coefficients_coefficient_name",
-                table: "article_coefficients",
-                column: "coefficient_name");
-
-            migrationBuilder.CreateIndex(
-                name: "article_crosses_article_cross_id_index",
-                table: "article_crosses",
-                column: "article_cross_id");
-
-            migrationBuilder.CreateIndex(
-                name: "article_crosses_article_id_index",
-                table: "article_crosses",
-                column: "article_id");
-
-            migrationBuilder.CreateIndex(
-                name: "article_ean_ean_index",
-                table: "article_ean",
-                column: "ean");
-
-            migrationBuilder.CreateIndex(
-                name: "article_ean_id__index",
-                table: "article_ean",
-                column: "article_id");
-
-            migrationBuilder.CreateIndex(
-                name: "article_images_id__index",
-                table: "article_images",
-                column: "article_id");
-
-            migrationBuilder.CreateIndex(
-                name: "article_supplier_buy_info_article_id_index",
-                table: "article_supplier_buy_info",
-                column: "article_id");
-
-            migrationBuilder.CreateIndex(
-                name: "article_supplier_buy_info_creation_datetime_index",
-                table: "article_supplier_buy_info",
-                column: "creation_datetime");
-
-            migrationBuilder.CreateIndex(
-                name: "article_supplier_buy_info_who_proposed_index",
-                table: "article_supplier_buy_info",
-                column: "who_proposed");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_article_supplier_buy_info_currency_id",
-                table: "article_supplier_buy_info",
-                column: "currency_id");
-
-            migrationBuilder.CreateIndex(
-                name: "articles_article_name_index",
-                table: "articles",
-                column: "article_name")
-                .Annotation("Npgsql:IndexMethod", "gin")
-                .Annotation("Npgsql:IndexOperators", new[] { "gin_trgm_ops" });
-
-            migrationBuilder.CreateIndex(
-                name: "articles_article_number_index",
-                table: "articles",
-                column: "article_number")
-                .Annotation("Npgsql:IndexMethod", "gin")
-                .Annotation("Npgsql:IndexOperators", new[] { "gin_trgm_ops" });
-
-            migrationBuilder.CreateIndex(
-                name: "articles_category_id_index",
-                table: "articles",
-                column: "category_id");
-
-            migrationBuilder.CreateIndex(
-                name: "articles_normalized_article_number_producer_id_index",
-                table: "articles",
-                columns: new[] { "normalized_article_number", "producer_id" },
-                unique: true);
-
-            migrationBuilder.CreateIndex(
-                name: "articles_popularity_index",
-                table: "articles",
-                column: "popularity");
-
-            migrationBuilder.CreateIndex(
-                name: "articles_producer_id_index",
-                table: "articles",
-                column: "producer_id");
-
-            migrationBuilder.CreateIndex(
-                name: "articles_total_count_index",
-                table: "articles",
-                column: "total_count");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_articles_articlename_tsv",
-                table: "articles",
-                column: "articlename_tsv")
-                .Annotation("Npgsql:IndexMethod", "gin");
-
-            migrationBuilder.CreateIndex(
-                name: "normalized_article_number__index",
-                table: "articles",
-                column: "normalized_article_number")
-                .Annotation("Npgsql:IndexMethod", "gin")
-                .Annotation("Npgsql:IndexOperators", new[] { "gin_trgm_ops" });
-
-            migrationBuilder.CreateIndex(
-                name: "article_main_inside_index",
-                table: "articles_content",
-                column: "inside_article_id");
-
-            migrationBuilder.CreateIndex(
-                name: "articles_content_main_article_id_index",
-                table: "articles_content",
-                column: "main_article_id");
-
-            migrationBuilder.CreateIndex(
-                name: "articles_pair_article_left_uindex",
-                table: "articles_pair",
-                column: "article_left",
-                unique: true);
-
-            migrationBuilder.CreateIndex(
-                name: "IX_articles_pair_article_right",
-                table: "articles_pair",
-                column: "article_right");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_cart_article_id",
+                name: "cart_product_id_idx",
                 table: "cart",
-                column: "article_id");
+                column: "product_id");
 
             migrationBuilder.CreateIndex(
                 name: "categories_name_index",
@@ -1833,24 +1586,24 @@ namespace Main.Migrator.Migrations
                 unique: true);
 
             migrationBuilder.CreateIndex(
-                name: "currency_history_datetime_index",
+                name: "IX_currency_history_currency_id",
+                table: "currency_history",
+                column: "currency_id");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_currency_history_datetime",
                 table: "currency_history",
                 column: "datetime");
 
             migrationBuilder.CreateIndex(
-                name: "currency_history_new_value_index",
+                name: "IX_currency_history_new_value",
                 table: "currency_history",
                 column: "new_value");
 
             migrationBuilder.CreateIndex(
-                name: "currency_history_prev_value_index",
+                name: "IX_currency_history_prev_value",
                 table: "currency_history",
                 column: "prev_value");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_currency_history_currency_id",
-                table: "currency_history",
-                column: "currency_id");
 
             migrationBuilder.CreateIndex(
                 name: "IX_InboxState_Delivered",
@@ -1859,14 +1612,14 @@ namespace Main.Migrator.Migrations
                 column: "Delivered");
 
             migrationBuilder.CreateIndex(
-                name: "order_items_article_id_index",
-                table: "order_items",
-                column: "article_id");
-
-            migrationBuilder.CreateIndex(
                 name: "order_items_order_id_index",
                 table: "order_items",
                 column: "order_id");
+
+            migrationBuilder.CreateIndex(
+                name: "order_items_product_id_index",
+                table: "order_items",
+                column: "article_id");
 
             migrationBuilder.CreateIndex(
                 name: "IX_order_versions_currency_id",
@@ -1957,11 +1710,6 @@ namespace Main.Migrator.Migrations
                 unique: true);
 
             migrationBuilder.CreateIndex(
-                name: "producer_details_producer_id_index",
-                table: "producer_details",
-                column: "producer_id");
-
-            migrationBuilder.CreateIndex(
                 name: "producers_other_names_producer_id_index",
                 table: "producers_other_names",
                 column: "producer_id");
@@ -1979,6 +1727,72 @@ namespace Main.Migrator.Migrations
                 column: "where_used")
                 .Annotation("Npgsql:IndexMethod", "gin")
                 .Annotation("Npgsql:IndexOperators", new[] { "gin_trgm_ops" });
+
+            migrationBuilder.CreateIndex(
+                name: "product_characteristics_id_index",
+                table: "product_characteristics",
+                column: "product_id");
+
+            migrationBuilder.CreateIndex(
+                name: "product_characteristics_name_value_index",
+                table: "product_characteristics",
+                columns: new[] { "name", "value" });
+
+            migrationBuilder.CreateIndex(
+                name: "IX_product_coefficients_coefficient_name",
+                table: "product_coefficients",
+                column: "coefficient_name");
+
+            migrationBuilder.CreateIndex(
+                name: "product_contents_child_id_idx",
+                table: "product_contents",
+                column: "child_product_id");
+
+            migrationBuilder.CreateIndex(
+                name: "normalized_sku_index",
+                table: "products",
+                column: "normalized_sku")
+                .Annotation("Npgsql:IndexMethod", "gin")
+                .Annotation("Npgsql:IndexOperators", new[] { "gin_trgm_ops" });
+
+            migrationBuilder.CreateIndex(
+                name: "products_category_id_index",
+                table: "products",
+                column: "category_id");
+
+            migrationBuilder.CreateIndex(
+                name: "products_normalized_sku_producer_id_index",
+                table: "products",
+                columns: new[] { "normalized_sku", "producer_id" },
+                unique: true);
+
+            migrationBuilder.CreateIndex(
+                name: "products_pair_id_index",
+                table: "products",
+                column: "PairId",
+                unique: true);
+
+            migrationBuilder.CreateIndex(
+                name: "products_popularity_index",
+                table: "products",
+                column: "popularity");
+
+            migrationBuilder.CreateIndex(
+                name: "products_producer_id_index",
+                table: "products",
+                column: "producer_id");
+
+            migrationBuilder.CreateIndex(
+                name: "products_sku_index",
+                table: "products",
+                column: "sku")
+                .Annotation("Npgsql:IndexMethod", "gin")
+                .Annotation("Npgsql:IndexOperators", new[] { "gin_trgm_ops" });
+
+            migrationBuilder.CreateIndex(
+                name: "products_total_count_index",
+                table: "products",
+                column: "stock");
 
             migrationBuilder.CreateIndex(
                 name: "purchase_comment_index",
@@ -2028,16 +1842,16 @@ namespace Main.Migrator.Migrations
                 column: "updated_user_id");
 
             migrationBuilder.CreateIndex(
-                name: "purchase_content_article_id_index",
-                table: "purchase_content",
-                column: "article_id");
-
-            migrationBuilder.CreateIndex(
                 name: "purchase_content_comment_index",
                 table: "purchase_content",
                 column: "comment")
                 .Annotation("Npgsql:IndexMethod", "gin")
                 .Annotation("Npgsql:IndexOperators", new[] { "gin_trgm_ops" });
+
+            migrationBuilder.CreateIndex(
+                name: "purchase_content_product_id_index",
+                table: "purchase_content",
+                column: "product_id");
 
             migrationBuilder.CreateIndex(
                 name: "purchase_content_purchase_id_index",
@@ -2051,12 +1865,12 @@ namespace Main.Migrator.Migrations
                 unique: true);
 
             migrationBuilder.CreateIndex(
-                name: "purchase_logistics_currency_id_index",
+                name: "IX_purchase_logistics_currency_id",
                 table: "purchase_logistics",
                 column: "currency_id");
 
             migrationBuilder.CreateIndex(
-                name: "purchase_logistics_route_id_index",
+                name: "IX_purchase_logistics_route_id",
                 table: "purchase_logistics",
                 column: "route_id");
 
@@ -2070,14 +1884,7 @@ namespace Main.Migrator.Migrations
                 name: "IX_role_permissions_permission_name",
                 schema: "auth",
                 table: "role_permissions",
-                column: "permission_name");
-
-            migrationBuilder.CreateIndex(
-                name: "roles_normalized_name_uindex",
-                schema: "auth",
-                table: "roles",
-                column: "normalized_name",
-                unique: true);
+                column: "permission");
 
             migrationBuilder.CreateIndex(
                 name: "sale_buyer_id_index",
@@ -2127,16 +1934,16 @@ namespace Main.Migrator.Migrations
                 column: "updated_user_id");
 
             migrationBuilder.CreateIndex(
-                name: "sale_content_article_id_index",
-                table: "sale_content",
-                column: "article_id");
-
-            migrationBuilder.CreateIndex(
                 name: "sale_content_comment_index",
                 table: "sale_content",
                 column: "comment")
                 .Annotation("Npgsql:IndexMethod", "gin")
                 .Annotation("Npgsql:IndexOperators", new[] { "gin_trgm_ops" });
+
+            migrationBuilder.CreateIndex(
+                name: "sale_content_product_id_index",
+                table: "sale_content",
+                column: "product_id");
 
             migrationBuilder.CreateIndex(
                 name: "sale_content_sale_id_index",
@@ -2164,21 +1971,6 @@ namespace Main.Migrator.Migrations
                 column: "storage");
 
             migrationBuilder.CreateIndex(
-                name: "storage_content_article_id_count_index",
-                table: "storage_content",
-                columns: new[] { "article_id", "count" });
-
-            migrationBuilder.CreateIndex(
-                name: "storage_content_article_id_index",
-                table: "storage_content",
-                column: "article_id");
-
-            migrationBuilder.CreateIndex(
-                name: "storage_content_article_id_storage_name_index",
-                table: "storage_content",
-                columns: new[] { "article_id", "storage_name" });
-
-            migrationBuilder.CreateIndex(
                 name: "storage_content_buy_price_in_usd_index",
                 table: "storage_content",
                 column: "buy_price_in_usd");
@@ -2194,14 +1986,19 @@ namespace Main.Migrator.Migrations
                 column: "currency_id");
 
             migrationBuilder.CreateIndex(
+                name: "storage_content_product_id_count_index",
+                table: "storage_content",
+                columns: new[] { "product_id", "count" });
+
+            migrationBuilder.CreateIndex(
+                name: "storage_content_product_id_storage_name_index",
+                table: "storage_content",
+                columns: new[] { "product_id", "storage_name" });
+
+            migrationBuilder.CreateIndex(
                 name: "storage_content_purchase_datetime_index",
                 table: "storage_content",
                 column: "purchase_datetime");
-
-            migrationBuilder.CreateIndex(
-                name: "storage_content_storage_name_article_id_index",
-                table: "storage_content",
-                columns: new[] { "storage_name", "article_id" });
 
             migrationBuilder.CreateIndex(
                 name: "storage_content_storage_name_index",
@@ -2209,6 +2006,11 @@ namespace Main.Migrator.Migrations
                 column: "storage_name")
                 .Annotation("Npgsql:IndexMethod", "gin")
                 .Annotation("Npgsql:IndexOperators", new[] { "gin_trgm_ops" });
+
+            migrationBuilder.CreateIndex(
+                name: "storage_content_storage_name_product_id_index",
+                table: "storage_content",
+                columns: new[] { "storage_name", "product_id" });
 
             migrationBuilder.CreateIndex(
                 name: "IX_storage_content_reservations_given_currency_id",
@@ -2226,16 +2028,6 @@ namespace Main.Migrator.Migrations
                 column: "who_updated");
 
             migrationBuilder.CreateIndex(
-                name: "storage_content_reservations_article_id_index",
-                table: "storage_content_reservations",
-                column: "article_id");
-
-            migrationBuilder.CreateIndex(
-                name: "storage_content_reservations_article_id_is_done_index",
-                table: "storage_content_reservations",
-                columns: new[] { "article_id", "is_done" });
-
-            migrationBuilder.CreateIndex(
                 name: "storage_content_reservations_comment_index",
                 table: "storage_content_reservations",
                 column: "comment")
@@ -2243,24 +2035,14 @@ namespace Main.Migrator.Migrations
                 .Annotation("Npgsql:IndexOperators", new[] { "gin_trgm_ops" });
 
             migrationBuilder.CreateIndex(
-                name: "storage_content_reservations_create_at_index",
-                table: "storage_content_reservations",
-                column: "create_at");
-
-            migrationBuilder.CreateIndex(
                 name: "storage_content_reservations_is_done_index",
                 table: "storage_content_reservations",
                 column: "is_done");
 
             migrationBuilder.CreateIndex(
-                name: "storage_content_reservations_updated_at_index",
+                name: "storage_content_reservations_product_id_is_done_index",
                 table: "storage_content_reservations",
-                column: "updated_at");
-
-            migrationBuilder.CreateIndex(
-                name: "storage_content_reservations_user_id_index",
-                table: "storage_content_reservations",
-                column: "user_id");
+                columns: new[] { "product_id", "is_done" });
 
             migrationBuilder.CreateIndex(
                 name: "storage_content_reservations_user_id_is_done_index",
@@ -2268,19 +2050,9 @@ namespace Main.Migrator.Migrations
                 columns: new[] { "user_id", "is_done" });
 
             migrationBuilder.CreateIndex(
-                name: "storage_movement_action_type_index",
+                name: "IX_storage_movement_currency_id",
                 table: "storage_movement",
-                column: "action_type");
-
-            migrationBuilder.CreateIndex(
-                name: "storage_movement_article_id_index",
-                table: "storage_movement",
-                column: "article_id");
-
-            migrationBuilder.CreateIndex(
-                name: "storage_movement_count_index",
-                table: "storage_movement",
-                column: "count");
+                column: "currency_id");
 
             migrationBuilder.CreateIndex(
                 name: "storage_movement_created_at_index",
@@ -2288,14 +2060,9 @@ namespace Main.Migrator.Migrations
                 column: "created_at");
 
             migrationBuilder.CreateIndex(
-                name: "storage_movement_currency_id_index",
+                name: "storage_movement_product_id_index",
                 table: "storage_movement",
-                column: "currency_id");
-
-            migrationBuilder.CreateIndex(
-                name: "storage_movement_price_index",
-                table: "storage_movement",
-                column: "price");
+                column: "product_id");
 
             migrationBuilder.CreateIndex(
                 name: "storage_movement_storage_name_index",
@@ -2354,7 +2121,7 @@ namespace Main.Migrator.Migrations
                 column: "type");
 
             migrationBuilder.CreateIndex(
-                name: "transaction_versions_currency_id_index",
+                name: "IX_transaction_versions_currency_id",
                 table: "transaction_versions",
                 column: "currency_id");
 
@@ -2367,21 +2134,6 @@ namespace Main.Migrator.Migrations
                 name: "transaction_versions_sender_id _index",
                 table: "transaction_versions",
                 column: "sender_id ");
-
-            migrationBuilder.CreateIndex(
-                name: "transaction_versions_status_index",
-                table: "transaction_versions",
-                column: "status");
-
-            migrationBuilder.CreateIndex(
-                name: "transaction_versions_transaction_datetime_index",
-                table: "transaction_versions",
-                column: "transaction_datetime");
-
-            migrationBuilder.CreateIndex(
-                name: "transaction_versions_transaction_id_index",
-                table: "transaction_versions",
-                column: "transaction_id");
 
             migrationBuilder.CreateIndex(
                 name: "transaction_versions_transaction_id_version_uindex",
@@ -2420,11 +2172,6 @@ namespace Main.Migrator.Migrations
                 column: "receiver_id");
 
             migrationBuilder.CreateIndex(
-                name: "transactions_sender_id_index",
-                table: "transactions",
-                column: "sender_id");
-
-            migrationBuilder.CreateIndex(
                 name: "transactions_sender_id_receiver_id_index",
                 table: "transactions",
                 columns: new[] { "sender_id", "receiver_id" });
@@ -2438,11 +2185,6 @@ namespace Main.Migrator.Migrations
                 name: "transactions_transaction_datetime_id_index",
                 table: "transactions",
                 columns: new[] { "transaction_datetime", "id" });
-
-            migrationBuilder.CreateIndex(
-                name: "transactions_transaction_datetime_index",
-                table: "transactions",
-                column: "transaction_datetime");
 
             migrationBuilder.CreateIndex(
                 name: "transactions_transaction_datetime_sender_id_receiver_id_idx",
@@ -2477,19 +2219,13 @@ namespace Main.Migrator.Migrations
                 column: "user_id");
 
             migrationBuilder.CreateIndex(
-                name: "user_emails_normalized_email_index",
-                schema: "auth",
-                table: "user_emails",
-                column: "normalized_email")
-                .Annotation("Npgsql:IndexMethod", "gin")
-                .Annotation("Npgsql:IndexOperators", new[] { "gin_trgm_ops" });
-
-            migrationBuilder.CreateIndex(
                 name: "user_emails_normalized_email_uindex",
                 schema: "auth",
                 table: "user_emails",
                 column: "normalized_email",
-                unique: true);
+                unique: true)
+                .Annotation("Npgsql:IndexMethod", "gin")
+                .Annotation("Npgsql:IndexOperators", new[] { "gin_trgm_ops" });
 
             migrationBuilder.CreateIndex(
                 name: "user_emails_user_id_index",
@@ -2558,13 +2294,6 @@ namespace Main.Migrator.Migrations
                 .Annotation("Npgsql:IndexOperators", new[] { "gin_trgm_ops" });
 
             migrationBuilder.CreateIndex(
-                name: "user_phones_normalized_phone_uindex",
-                schema: "auth",
-                table: "user_phones",
-                column: "normalized_phone",
-                unique: true);
-
-            migrationBuilder.CreateIndex(
                 name: "user_phones_user_id_is_primary_uindex",
                 schema: "auth",
                 table: "user_phones",
@@ -2576,7 +2305,7 @@ namespace Main.Migrator.Migrations
                 name: "IX_user_roles_role_id",
                 schema: "auth",
                 table: "user_roles",
-                column: "role_id");
+                column: "role_name");
 
             migrationBuilder.CreateIndex(
                 name: "user_search_history_search_date_time_index",
@@ -2587,11 +2316,6 @@ namespace Main.Migrator.Migrations
                 name: "user_search_history_search_place_index",
                 table: "user_search_history",
                 column: "search_place");
-
-            migrationBuilder.CreateIndex(
-                name: "user_search_history_user_id_index",
-                table: "user_search_history",
-                column: "user_id");
 
             migrationBuilder.CreateIndex(
                 name: "user_search_history_user_id_search_place_index",
@@ -2664,54 +2388,18 @@ namespace Main.Migrator.Migrations
                 unique: true);
 
             migrationBuilder.CreateIndex(
-                name: "users_normalized_user_name_index",
-                schema: "auth",
-                table: "users",
-                column: "normalized_user_name")
-                .Annotation("Npgsql:IndexMethod", "gin")
-                .Annotation("Npgsql:IndexOperators", new[] { "gin_trgm_ops" });
-
-            migrationBuilder.CreateIndex(
                 name: "users_normalized_user_name_uindex",
                 schema: "auth",
                 table: "users",
                 column: "normalized_user_name",
-                unique: true);
+                unique: true)
+                .Annotation("Npgsql:IndexMethod", "gin")
+                .Annotation("Npgsql:IndexOperators", new[] { "gin_trgm_ops" });
         }
 
         /// <inheritdoc />
         protected override void Down(MigrationBuilder migrationBuilder)
         {
-            migrationBuilder.DropTable(
-                name: "article_characteristics");
-
-            migrationBuilder.DropTable(
-                name: "article_coefficients");
-
-            migrationBuilder.DropTable(
-                name: "article_crosses");
-
-            migrationBuilder.DropTable(
-                name: "article_ean");
-
-            migrationBuilder.DropTable(
-                name: "article_images");
-
-            migrationBuilder.DropTable(
-                name: "article_sizes");
-
-            migrationBuilder.DropTable(
-                name: "article_supplier_buy_info");
-
-            migrationBuilder.DropTable(
-                name: "article_weight");
-
-            migrationBuilder.DropTable(
-                name: "articles_content");
-
-            migrationBuilder.DropTable(
-                name: "articles_pair");
-
             migrationBuilder.DropTable(
                 name: "cart");
 
@@ -2735,10 +2423,28 @@ namespace Main.Migrator.Migrations
                 schema: "msg");
 
             migrationBuilder.DropTable(
-                name: "producer_details");
+                name: "producers_other_names");
 
             migrationBuilder.DropTable(
-                name: "producers_other_names");
+                name: "product_characteristics");
+
+            migrationBuilder.DropTable(
+                name: "product_coefficients");
+
+            migrationBuilder.DropTable(
+                name: "product_contents");
+
+            migrationBuilder.DropTable(
+                name: "product_eans");
+
+            migrationBuilder.DropTable(
+                name: "product_images");
+
+            migrationBuilder.DropTable(
+                name: "product_sizes");
+
+            migrationBuilder.DropTable(
+                name: "product_weights");
 
             migrationBuilder.DropTable(
                 name: "purchase_content_logistics");
@@ -2802,9 +2508,6 @@ namespace Main.Migrator.Migrations
                 name: "user_vehicles");
 
             migrationBuilder.DropTable(
-                name: "coefficients");
-
-            migrationBuilder.DropTable(
                 name: "orders");
 
             migrationBuilder.DropTable(
@@ -2814,6 +2517,9 @@ namespace Main.Migrator.Migrations
             migrationBuilder.DropTable(
                 name: "OutboxState",
                 schema: "msg");
+
+            migrationBuilder.DropTable(
+                name: "coefficients");
 
             migrationBuilder.DropTable(
                 name: "purchase_content");
@@ -2842,7 +2548,7 @@ namespace Main.Migrator.Migrations
                 name: "sale");
 
             migrationBuilder.DropTable(
-                name: "articles");
+                name: "products");
 
             migrationBuilder.DropTable(
                 name: "storages");
@@ -2851,10 +2557,10 @@ namespace Main.Migrator.Migrations
                 name: "transactions");
 
             migrationBuilder.DropTable(
-                name: "categories");
+                name: "producer");
 
             migrationBuilder.DropTable(
-                name: "producer");
+                name: "categories");
 
             migrationBuilder.DropTable(
                 name: "currency");
@@ -2865,9 +2571,6 @@ namespace Main.Migrator.Migrations
 
             migrationBuilder.DropSequence(
                 name: "storage_movement_id_seq");
-
-            migrationBuilder.DropSequence(
-                name: "table_name_id_seq");
         }
     }
 }

@@ -8,6 +8,7 @@ using Main.Abstractions.Exceptions.Auth;
 using Main.Abstractions.Interfaces.DbRepositories;
 using Main.Abstractions.Interfaces.Services;
 using Main.Entities;
+using Main.Entities.Auth;
 using Main.Enums;
 using Mapster;
 using User = Abstractions.Models.User;

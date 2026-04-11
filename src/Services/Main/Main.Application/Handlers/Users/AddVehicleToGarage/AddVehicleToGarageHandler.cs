@@ -5,6 +5,7 @@ using Main.Abstractions.Dtos.Member.Vehicles;
 using Main.Abstractions.Exceptions.Vehicles;
 using Main.Abstractions.Interfaces.DbRepositories;
 using Main.Entities;
+using Main.Entities.User;
 using Mapster;
 using MediatR;
 

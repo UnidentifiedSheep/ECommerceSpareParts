@@ -5,6 +5,7 @@ using Attributes;
 using Main.Abstractions.Exceptions.Purchase;
 using Main.Abstractions.Interfaces.DbRepositories;
 using Main.Entities;
+using Main.Entities.Purchase;
 using MediatR;
 
 namespace Main.Application.Handlers.Purchases.DeletePurchase;

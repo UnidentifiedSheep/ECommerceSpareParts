@@ -1,6 +1,7 @@
 using Abstractions.Interfaces.Cache;
 using Application.Common.Abstractions.RelatedData;
 using Main.Entities;
+using Main.Entities.Producer;
 
 namespace Main.Application.RelatedData;
 

@@ -2,6 +2,8 @@ using FluentValidation;
 using Main.Application.Configs.Mapster;
 using Main.Application.Handlers.Balance.CreateTransaction;
 using Main.Entities;
+using Main.Entities.Currency;
+using Main.Entities.User;
 using Main.Enums;
 using Main.Persistence.Context;
 using MediatR;

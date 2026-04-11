@@ -1,6 +1,6 @@
 ﻿using BulkValidation.Core.Attributes;
 
-namespace Main.Entities;
+namespace Main.Entities.Storage;
 
 public class StorageOwner
 {
@@ -13,7 +13,7 @@ public class StorageOwner
 
     public DateTime CreatedAt { get; set; }
 
-    public virtual User Owner { get; set; } = null!;
+    public virtual User.User Owner { get; set; } = null!;
 
     public virtual Storage StorageNameNavigation { get; set; } = null!;
 }

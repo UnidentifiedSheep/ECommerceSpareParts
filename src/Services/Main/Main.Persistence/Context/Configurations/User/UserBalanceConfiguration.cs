@@ -1,4 +1,5 @@
 ﻿using Main.Entities;
+using Main.Entities.User;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
@@ -42,13 +43,13 @@ public class UserBalanceConfiguration : IEntityTypeConfiguration<UserBalance>
             .HasColumnName("xmin")
             .IsRowVersion();
 
-        builder.HasOne<Entities.Currency>()
+        builder.HasOne<Entities.Currency.Currency>()
             .WithMany()
             .HasForeignKey(d => d.CurrencyId)
             .OnDelete(DeleteBehavior.Restrict)
             .HasConstraintName("user_balances_currency_id_fk");
 
-        builder.HasOne<Entities.User>()
+        builder.HasOne<Entities.User.User>()
             .WithMany()
             .HasForeignKey(d => d.UserId)
             .OnDelete(DeleteBehavior.Restrict)

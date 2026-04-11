@@ -4,9 +4,9 @@ using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
 namespace Main.Persistence.Context.Configurations.Purchase;
 
-public class PurchaseConfiguration : IEntityTypeConfiguration<Entities.Purchase>
+public class PurchaseConfiguration : IEntityTypeConfiguration<Entities.Purchase.Purchase>
 {
-    public void Configure(EntityTypeBuilder<Entities.Purchase> builder)
+    public void Configure(EntityTypeBuilder<Entities.Purchase.Purchase> builder)
     {
         builder.ToTable("purchase");
         
@@ -68,7 +68,7 @@ public class PurchaseConfiguration : IEntityTypeConfiguration<Entities.Purchase>
         builder.Property(e => e.UpdatedUserId)
             .HasColumnName("updated_user_id");
 
-        builder.HasOne<Entities.User>()
+        builder.HasOne<Entities.User.User>()
             .WithMany()
             .HasForeignKey(d => d.CreatedUserId)
             .OnDelete(DeleteBehavior.Restrict)
@@ -80,7 +80,7 @@ public class PurchaseConfiguration : IEntityTypeConfiguration<Entities.Purchase>
             .OnDelete(DeleteBehavior.Restrict)
             .HasConstraintName("purchase_currency_id_fk");
 
-        builder.HasOne<Entities.Storage>()
+        builder.HasOne<Entities.Storage.Storage>()
             .WithMany()
             .HasForeignKey(d => d.Storage)
             .OnDelete(DeleteBehavior.Restrict)
@@ -98,7 +98,7 @@ public class PurchaseConfiguration : IEntityTypeConfiguration<Entities.Purchase>
             .OnDelete(DeleteBehavior.Restrict)
             .HasConstraintName("purchase_transactions_id_fk");
 
-        builder.HasOne<Entities.User>()
+        builder.HasOne<Entities.User.User>()
             .WithMany()
             .HasForeignKey(d => d.UpdatedUserId)
             .OnDelete(DeleteBehavior.Restrict)

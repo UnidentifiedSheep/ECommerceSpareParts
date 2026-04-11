@@ -1,6 +1,6 @@
 ﻿using Domain;
 
-namespace Main.Entities;
+namespace Main.Entities.Product;
 
 public class ProductCoefficient : AuditableEntity<ProductCoefficient, (int, string)>
 {

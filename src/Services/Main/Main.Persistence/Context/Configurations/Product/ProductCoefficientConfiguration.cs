@@ -1,4 +1,5 @@
 ﻿using Main.Entities;
+using Main.Entities.Product;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 

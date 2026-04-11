@@ -1,7 +1,7 @@
 ﻿using BulkValidation.Core.Attributes;
 using Domain;
 
-namespace Main.Entities;
+namespace Main.Entities.Auth;
 
 public class Role : AuditableEntity<Role, string>
 {

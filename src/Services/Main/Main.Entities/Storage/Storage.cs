@@ -1,7 +1,7 @@
 ﻿using BulkValidation.Core.Attributes;
 using Main.Enums;
 
-namespace Main.Entities;
+namespace Main.Entities.Storage;
 
 public class Storage
 {

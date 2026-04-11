@@ -1,4 +1,5 @@
 ﻿using Main.Entities;
+using Main.Entities.Storage;
 
 namespace Main.Abstractions.Interfaces.Services;
 

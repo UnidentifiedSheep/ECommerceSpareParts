@@ -3,6 +3,7 @@ using Extensions;
 using Main.Abstractions.Dtos.RepositoryOptionsData;
 using Main.Abstractions.Interfaces.DbRepositories;
 using Main.Entities;
+using Main.Entities.Purchase;
 using Main.Persistence.Context;
 using Microsoft.EntityFrameworkCore;
 using Persistence.Extensions;
@@ -14,7 +15,7 @@ namespace Main.Persistence.Repositories;
 public class PurchaseRepository(DContext context) : IPurchaseRepository
 {
     public async Task<Purchase?> GetPurchase(
-        QueryOptions<Purchase, string> options,
+        QueryOptions<Purchase, Guid> options,
         CancellationToken cancellationToken = default)
     {
         return await context.Purchases
@@ -24,7 +25,7 @@ public class PurchaseRepository(DContext context) : IPurchaseRepository
     }
 
     public async Task<IReadOnlyList<PurchaseContent>> GetPurchaseContent(
-        QueryOptions<PurchaseContent, string> options,
+        QueryOptions<PurchaseContent, Guid> options,
         CancellationToken cancellationToken = default)
     {
         return await context.PurchaseContents

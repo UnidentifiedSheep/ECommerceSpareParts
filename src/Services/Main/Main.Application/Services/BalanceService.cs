@@ -2,6 +2,8 @@ using Abstractions.Interfaces.Services;
 using Main.Abstractions.Interfaces.DbRepositories;
 using Main.Abstractions.Interfaces.Services;
 using Main.Entities;
+using Main.Entities.Transaction;
+using Main.Entities.User;
 
 namespace Main.Application.Services;
 

@@ -3,9 +3,9 @@ using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
 namespace Main.Persistence.Context.Configurations.Storage;
 
-public class StorageConfiguration : IEntityTypeConfiguration<Entities.Storage>
+public class StorageConfiguration : IEntityTypeConfiguration<Entities.Storage.Storage>
 {
-    public void Configure(EntityTypeBuilder<Entities.Storage> builder)
+    public void Configure(EntityTypeBuilder<Entities.Storage.Storage> builder)
     {
         builder.HasKey(e => e.Name).HasName("storages_pk");
 

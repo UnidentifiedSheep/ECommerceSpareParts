@@ -4,6 +4,7 @@ using Extensions;
 using Main.Abstractions.Exceptions.Auth;
 using Main.Abstractions.Interfaces.DbRepositories;
 using Main.Entities;
+using Main.Entities.Auth;
 using MediatR;
 
 namespace Main.Application.Handlers.Roles.CreateRole;

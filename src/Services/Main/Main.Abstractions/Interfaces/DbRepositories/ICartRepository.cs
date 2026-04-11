@@ -1,4 +1,5 @@
 ﻿using Main.Entities;
+using Main.Entities.Cart;
 
 namespace Main.Abstractions.Interfaces.DbRepositories;
 

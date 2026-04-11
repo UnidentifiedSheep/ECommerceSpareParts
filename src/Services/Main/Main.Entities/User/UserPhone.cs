@@ -1,6 +1,6 @@
 ﻿using Domain;
 
-namespace Main.Entities;
+namespace Main.Entities.User;
 
 public class UserPhone : AuditableEntity<UserPhone,  string>
 {

@@ -6,6 +6,7 @@ using Main.Abstractions.Dtos.Amw.Purchase;
 using Main.Abstractions.Dtos.RepositoryOptionsData;
 using Main.Abstractions.Interfaces.DbRepositories;
 using Main.Entities;
+using Main.Entities.Purchase;
 using Mapster;
 
 namespace Main.Application.Handlers.Purchases.GetPurchase;

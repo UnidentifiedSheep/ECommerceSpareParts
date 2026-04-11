@@ -1,6 +1,6 @@
 ﻿using Domain;
 
-namespace Main.Entities;
+namespace Main.Entities.Storage;
 
 public class StorageContentReservation : AuditableEntity<StorageContentReservation, int>
 {

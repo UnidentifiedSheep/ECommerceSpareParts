@@ -1,4 +1,6 @@
 using Main.Entities;
+using Main.Entities.Transaction;
+using Main.Entities.User;
 
 namespace Main.Abstractions.Interfaces.DbRepositories;
 

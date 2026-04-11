@@ -6,8 +6,9 @@ using Main.Abstractions.Interfaces.CacheRepositories;
 using Main.Abstractions.Interfaces.DbRepositories;
 using Main.Abstractions.Interfaces.Services;
 using Main.Entities;
+using Main.Entities.Auth;
 using Mapster;
-using DbUser = Main.Entities.User;
+using DbUser = Main.Entities.User.User;
 
 namespace Main.Application.Services;
 
@@ -96,7 +97,7 @@ public class UserService(
 
     private async Task AddRelatedDataKeys(Guid userId)
     {
-        var relatedRepository = relatedDataFactory.GetRepository<User>();
+        var relatedRepository = relatedDataFactory.GetRepository<DbUser>();
         var relatedDataKeys = new List<string>
         {
             string.Format(CacheKeys.UserRolesCacheKey, userId),

@@ -14,6 +14,8 @@ using Main.Application.Handlers.Sales.EditSale;
 using Main.Application.Handlers.StorageContents.RemoveContent;
 using Main.Application.Handlers.StorageContents.RestoreContent;
 using Main.Entities;
+using Main.Entities.Sale;
+using Main.Entities.Storage;
 using Main.Enums;
 using Mapster;
 using MassTransit;

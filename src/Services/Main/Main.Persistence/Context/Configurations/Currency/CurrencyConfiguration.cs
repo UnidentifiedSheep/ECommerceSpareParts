@@ -3,13 +3,13 @@ using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
 namespace Main.Persistence.Context.Configurations.Currency;
 
-public class CurrencyConfiguration : IEntityTypeConfiguration<Entities.Currency>
+public class CurrencyConfiguration : IEntityTypeConfiguration<Entities.Currency.Currency>
 {
-    public void Configure(EntityTypeBuilder<Entities.Currency> builder)
+    public void Configure(EntityTypeBuilder<Entities.Currency.Currency> builder)
     {
         builder.ToTable("currency");
         
-        builder.HasKey(e => e.Code)
+        builder.HasKey(e => e.Id)
             .HasName("currency_pk");
 
         builder.HasIndex(e => e.Code, "currency_code_uindex")

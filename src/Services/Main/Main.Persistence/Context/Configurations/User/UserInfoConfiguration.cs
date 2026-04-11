@@ -1,4 +1,5 @@
 ﻿using Main.Entities;
+using Main.Entities.User;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
@@ -55,7 +56,7 @@ public class UserInfoConfiguration : IEntityTypeConfiguration<UserInfo>
         builder.Property(e => e.Surname)
             .HasColumnName("surname");
 
-        builder.HasOne<Entities.User>()
+        builder.HasOne<Entities.User.User>()
             .WithOne(p => p.UserInfo)
             .HasForeignKey<UserInfo>(d => d.UserId)
             .OnDelete(DeleteBehavior.Cascade)

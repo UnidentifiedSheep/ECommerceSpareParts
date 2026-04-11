@@ -4,6 +4,7 @@ using Attributes;
 using Main.Abstractions.Exceptions.Sales;
 using Main.Abstractions.Interfaces.DbRepositories;
 using Main.Entities;
+using Main.Entities.Sale;
 
 namespace Main.Application.Handlers.Sales.DeleteSale;
 

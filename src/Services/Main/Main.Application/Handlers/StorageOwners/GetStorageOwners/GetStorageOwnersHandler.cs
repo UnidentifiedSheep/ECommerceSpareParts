@@ -4,6 +4,7 @@ using Application.Common.Interfaces;
 using Main.Abstractions.Dtos.Amw.Users;
 using Main.Abstractions.Interfaces.DbRepositories;
 using Main.Entities;
+using Main.Entities.Storage;
 using Mapster;
 
 namespace Main.Application.Handlers.StorageOwners.GetStorageOwners;

@@ -26,13 +26,13 @@ public class ProductContentConfiguration : IEntityTypeConfiguration<ProductConte
         builder.Property(e => e.Quantity)
             .HasColumnName("quantity");
         
-        builder.HasOne<Entities.Product.Product>()
+        builder.HasOne(x => x.ParentProduct)
             .WithMany(p => p.ProductContents)
             .HasForeignKey(x => x.ParentProductId)
             .OnDelete(DeleteBehavior.Cascade)
             .HasConstraintName("product_contents_parent_fk");
 
-        builder.HasOne<Entities.Product.Product>()
+        builder.HasOne(x => x.ChildProduct)
             .WithMany()
             .HasForeignKey(x => x.ChildProductId)
             .OnDelete(DeleteBehavior.Restrict)

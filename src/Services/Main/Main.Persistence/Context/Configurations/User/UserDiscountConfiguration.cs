@@ -1,4 +1,5 @@
 ﻿using Main.Entities;
+using Main.Entities.User;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
@@ -20,7 +21,7 @@ public class UserDiscountConfiguration : IEntityTypeConfiguration<UserDiscount>
         builder.Property(e => e.Discount)
             .HasColumnName("discount");
 
-        builder.HasOne<Entities.User>()
+        builder.HasOne<Entities.User.User>()
             .WithOne(p => p.UserDiscount)
             .HasForeignKey<UserDiscount>(d => d.UserId)
             .OnDelete(DeleteBehavior.Cascade)

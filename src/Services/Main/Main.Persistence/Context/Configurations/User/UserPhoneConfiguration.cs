@@ -1,4 +1,5 @@
 ﻿using Main.Entities;
+using Main.Entities.User;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
@@ -45,7 +46,7 @@ public class UserPhoneConfiguration : IEntityTypeConfiguration<UserPhone>
         builder.Property(e => e.UserId)
             .HasColumnName("user_id");
 
-        builder.HasOne<Entities.User>()
+        builder.HasOne<Entities.User.User>()
             .WithMany(p => p.UserPhones)
             .HasForeignKey(d => d.UserId)
             .HasConstraintName("user_phones_user_id_fkey");

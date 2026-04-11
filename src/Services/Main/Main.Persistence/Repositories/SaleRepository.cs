@@ -3,6 +3,7 @@ using Extensions;
 using Main.Abstractions.Dtos.RepositoryOptionsData;
 using Main.Abstractions.Interfaces.DbRepositories;
 using Main.Entities;
+using Main.Entities.Sale;
 using Main.Persistence.Context;
 using Microsoft.EntityFrameworkCore;
 using Persistence.Extensions;
@@ -78,13 +79,13 @@ public class SaleRepository(DContext context) : ISaleRepository
         var startDate = options.Data.RangeStart.Date;
         var endDate = options.Data.RangeEnd.Date.AddDays(1);
         return await query
-            .Where(x => x.CreationDatetime >= startDate && x.CreationDatetime <= endDate)
+            .Where(x => x.SaleDatetime >= startDate && x.SaleDatetime <= endDate)
             .ApplyPaging(options)
             .ToListAsync(cancellationToken);
     }
 
     public async Task<IEnumerable<SaleContent>> GetSaleContent(
-        string saleId,
+        Guid saleId,
         bool track = true,
         CancellationToken cancellationToken = default)
     {

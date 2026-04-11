@@ -1,4 +1,6 @@
 ﻿using Main.Entities;
+using Main.Entities.Purchase;
+using Main.Entities.Storage;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
@@ -54,7 +56,7 @@ public class PurchaseContentConfiguration : IEntityTypeConfiguration<PurchaseCon
             .OnDelete(DeleteBehavior.Restrict)
             .HasConstraintName("purchase_content_products_id_fk");
 
-        builder.HasOne<Entities.Purchase>()
+        builder.HasOne<Entities.Purchase.Purchase>()
             .WithMany(p => p.PurchaseContents)
             .HasForeignKey(d => d.PurchaseId)
             .HasConstraintName("purchase_content_purchase_id_fk");

@@ -1,4 +1,5 @@
 ﻿using Main.Entities;
+using Main.Entities.User;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
@@ -38,7 +39,7 @@ public class UserSearchHistoryConfiguration : IEntityTypeConfiguration<UserSearc
         builder.Property(e => e.UserId)
             .HasColumnName("user_id");
 
-        builder.HasOne<Entities.User>()
+        builder.HasOne<Entities.User.User>()
             .WithMany()
             .HasForeignKey(d => d.UserId)
             .HasConstraintName("user_search_history_users_id_fk");

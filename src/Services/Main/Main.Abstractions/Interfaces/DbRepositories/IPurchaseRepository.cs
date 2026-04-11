@@ -1,17 +1,18 @@
 using Abstractions.Models.Repository;
 using Main.Abstractions.Dtos.RepositoryOptionsData;
 using Main.Entities;
+using Main.Entities.Purchase;
 
 namespace Main.Abstractions.Interfaces.DbRepositories;
 
 public interface IPurchaseRepository
 {
     Task<Purchase?> GetPurchase(
-        QueryOptions<Purchase, string> options,
+        QueryOptions<Purchase, Guid> options,
         CancellationToken cancellationToken = default);
 
     Task<IReadOnlyList<PurchaseContent>> GetPurchaseContent(
-        QueryOptions<PurchaseContent, string> options,
+        QueryOptions<PurchaseContent, Guid> options,
         CancellationToken cancellationToken = default);
 
     Task<IReadOnlyList<Purchase>> GetPurchases(

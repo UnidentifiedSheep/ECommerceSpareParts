@@ -4,6 +4,7 @@ using Attributes;
 using Contracts.Currency;
 using Main.Application.Notifications;
 using Main.Entities;
+using Main.Entities.Currency;
 using Mapster;
 using MassTransit;
 using MediatR;

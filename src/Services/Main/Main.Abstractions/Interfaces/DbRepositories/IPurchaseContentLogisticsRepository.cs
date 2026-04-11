@@ -1,5 +1,6 @@
 ﻿using System.Linq.Expressions;
 using Main.Entities;
+using Main.Entities.Purchase;
 
 namespace Main.Abstractions.Interfaces.DbRepositories;
 

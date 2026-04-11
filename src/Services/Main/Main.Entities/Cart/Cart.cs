@@ -1,7 +1,7 @@
 ﻿using BulkValidation.Core.Attributes;
 using Domain;
 
-namespace Main.Entities;
+namespace Main.Entities.Cart;
 
 public class Cart : AuditableEntity<Cart, (Guid, int)>
 {

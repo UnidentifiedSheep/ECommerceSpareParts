@@ -1,5 +1,8 @@
 ﻿using Main.Entities;
+using Main.Entities.Currency;
 using Main.Entities.Product;
+using Main.Entities.Storage;
+using Main.Entities.User;
 using Main.Persistence.Context;
 using MediatR;
 using Tests.MockData.ScenatioExtensions;

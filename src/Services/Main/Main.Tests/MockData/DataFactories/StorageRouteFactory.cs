@@ -1,5 +1,6 @@
 ﻿using Bogus;
 using Main.Entities;
+using Main.Entities.Storage;
 using Main.Enums;
 
 namespace Tests.MockData.DataFactories;

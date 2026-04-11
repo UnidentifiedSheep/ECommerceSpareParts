@@ -2,6 +2,7 @@
 using Application.Common.Interfaces;
 using Attributes;
 using Main.Entities;
+using Main.Entities.Storage;
 using Main.Enums;
 using Mapster;
 

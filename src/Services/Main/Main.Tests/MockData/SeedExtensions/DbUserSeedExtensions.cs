@@ -1,4 +1,5 @@
 ﻿using Main.Entities;
+using Main.Entities.User;
 using Main.Persistence.Context;
 using Tests.MockData.DataFactories;
 

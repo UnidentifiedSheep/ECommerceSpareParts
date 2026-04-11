@@ -6,6 +6,7 @@ using Main.Abstractions.Dtos.Amw.ArticleReservations;
 using Main.Abstractions.Exceptions.Articles;
 using Main.Abstractions.Interfaces.DbRepositories;
 using Main.Entities;
+using Main.Entities.Storage;
 using Mapster;
 using MediatR;
 

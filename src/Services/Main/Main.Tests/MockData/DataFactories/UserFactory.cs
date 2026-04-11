@@ -1,6 +1,7 @@
 ﻿using Bogus;
 using Extensions;
 using Main.Entities;
+using Main.Entities.User;
 
 namespace Tests.MockData.DataFactories;
 

@@ -4,6 +4,7 @@ using Main.Application.Handlers.ArticleReservations.CreateArticleReservation;
 using Main.Application.Handlers.ArticleReservations.DeleteArticleReservation;
 using Main.Entities;
 using Main.Entities.Product;
+using Main.Entities.User;
 using Main.Persistence.Context;
 using MediatR;
 using Microsoft.EntityFrameworkCore;

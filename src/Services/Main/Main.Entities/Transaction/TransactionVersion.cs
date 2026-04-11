@@ -1,6 +1,6 @@
 ﻿using Main.Enums;
 
-namespace Main.Entities;
+namespace Main.Entities.Transaction;
 
 public class TransactionVersion
 {

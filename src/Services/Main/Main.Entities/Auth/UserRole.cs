@@ -1,6 +1,6 @@
 ﻿using Domain;
 
-namespace Main.Entities;
+namespace Main.Entities.Auth;
 
 public class UserRole : Entity<UserRole, (Guid, string)>
 {

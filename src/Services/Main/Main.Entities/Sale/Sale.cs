@@ -1,7 +1,7 @@
 ﻿using Domain;
 using Main.Enums;
 
-namespace Main.Entities;
+namespace Main.Entities.Sale;
 
 public class Sale : AuditableEntity<Sale, Guid>
 {
@@ -25,13 +25,13 @@ public class Sale : AuditableEntity<Sale, Guid>
 
     public SaleState State { get; set; }
 
-    public virtual User Buyer { get; set; } = null!;
+    public virtual User.User Buyer { get; set; } = null!;
 
-    public virtual Currency Currency { get; set; } = null!;
+    public virtual Currency.Currency Currency { get; set; } = null!;
 
     public virtual ICollection<SaleContent> SaleContents { get; set; } = new List<SaleContent>();
 
-    public virtual Transaction Transaction { get; set; } = null!;
+    public virtual Transaction.Transaction Transaction { get; set; } = null!;
 
     public override Guid GetId() => Id;
 }

@@ -47,6 +47,6 @@ public class Product : AuditableEntity<Product, int>
 
     public virtual Category? Category { get; set; }
 
-    public virtual Producer Producer { get; set; } = null!;
+    public virtual Producer.Producer Producer { get; set; } = null!;
     public override int GetId() => Id;
 }

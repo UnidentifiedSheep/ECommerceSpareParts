@@ -1,4 +1,5 @@
 ﻿using Main.Entities;
+using Main.Entities.Transaction;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
@@ -59,25 +60,25 @@ public class TransactionVersionConfiguration : IEntityTypeConfiguration<Transact
             .HasColumnName("version_created_datetime")
             .ValueGeneratedOnAdd();
 
-        builder.HasOne<Entities.Currency>()
+        builder.HasOne<Entities.Currency.Currency>()
             .WithMany()
             .HasForeignKey(d => d.CurrencyId)
             .OnDelete(DeleteBehavior.Restrict)
             .HasConstraintName("transaction_versions_currency_id_fk");
 
-        builder.HasOne<Entities.User>()
+        builder.HasOne<Entities.User.User>()
             .WithMany()
             .HasForeignKey(d => d.ReceiverId)
             .OnDelete(DeleteBehavior.Restrict)
             .HasConstraintName("transaction_versions_users_id_fk");
 
-        builder.HasOne<Entities.User>()
+        builder.HasOne<Entities.User.User>()
             .WithMany()
             .HasForeignKey(d => d.SenderId)
             .OnDelete(DeleteBehavior.Restrict)
             .HasConstraintName("transaction_versions_users_id_fk_2");
 
-        builder.HasOne<Entities.Transaction>()
+        builder.HasOne<Entities.Transaction.Transaction>()
             .WithMany()
             .HasForeignKey(d => d.TransactionId)
             .OnDelete(DeleteBehavior.Restrict)

@@ -1,5 +1,6 @@
 ﻿using Main.Abstractions.Interfaces.DbRepositories;
 using Main.Entities;
+using Main.Entities.Product;
 using Main.Persistence.Context;
 using Microsoft.EntityFrameworkCore;
 using Persistence.Extensions;
@@ -8,19 +9,19 @@ namespace Main.Persistence.Repositories;
 
 public class ArticleSizesRepository(DContext context) : IArticleSizesRepository
 {
-    public async Task<ArticleSize?> GetArticleSizes(int articleId, bool track = true, CancellationToken token = default)
+    public async Task<ProductSize?> GetArticleSizes(int articleId, bool track = true, CancellationToken token = default)
     {
         return await context.ProductSizes.ConfigureTracking(track)
-            .FirstOrDefaultAsync(x => x.ArticleId == articleId, token);
+            .FirstOrDefaultAsync(x => x.ProductId == articleId, token);
     }
 
-    public async Task<IEnumerable<ArticleSize>> GetArticleSizesByIds(
+    public async Task<IEnumerable<ProductSize>> GetArticleSizesByIds(
         IEnumerable<int> ids,
         bool track = true,
         CancellationToken token = default)
     {
         return await context.ProductSizes.ConfigureTracking(track)
-            .Where(x => ids.Contains(x.ArticleId))
+            .Where(x => ids.Contains(x.ProductId))
             .ToListAsync(token);
     }
 }

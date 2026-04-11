@@ -1,8 +1,9 @@
 ﻿using Main.Entities;
+using Main.Entities.Auth;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
-namespace Main.Persistence.Context.Configurations.User;
+namespace Main.Persistence.Context.Configurations.Auth;
 
 public class UserRoleConfiguration : IEntityTypeConfiguration<UserRole>
 {
@@ -27,7 +28,7 @@ public class UserRoleConfiguration : IEntityTypeConfiguration<UserRole>
             .HasForeignKey(d => d.RoleName)
             .HasConstraintName("user_roles_roles_name_fk");
 
-        builder.HasOne<Entities.User>()
+        builder.HasOne<Entities.User.User>()
             .WithMany(p => p.UserRoles)
             .HasForeignKey(d => d.UserId)
             .HasConstraintName("user_roles_users_id_fk");

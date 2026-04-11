@@ -2,6 +2,7 @@
 using Extensions;
 using Main.Application.Handlers.Roles.GetRoles;
 using Main.Entities;
+using Main.Entities.Auth;
 using Main.Persistence.Context;
 using MediatR;
 using Microsoft.Extensions.DependencyInjection;

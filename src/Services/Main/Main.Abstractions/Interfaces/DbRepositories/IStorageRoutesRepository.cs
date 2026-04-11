@@ -1,5 +1,6 @@
 ﻿using System.Linq.Expressions;
 using Main.Entities;
+using Main.Entities.Storage;
 
 namespace Main.Abstractions.Interfaces.DbRepositories;
 

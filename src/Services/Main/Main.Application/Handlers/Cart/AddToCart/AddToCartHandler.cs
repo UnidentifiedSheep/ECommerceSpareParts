@@ -12,7 +12,7 @@ public class AddToCartHandler(IUnitOfWork unitOfWork) : ICommandHandler<AddToCar
 {
     public async Task<Unit> Handle(AddToCartCommand request, CancellationToken cancellationToken)
     {
-        var cartItem = new Entities.Cart
+        var cartItem = new Entities.Cart.Cart
         {
             UserId = request.UserId,
             ProductId = request.ArticleId,

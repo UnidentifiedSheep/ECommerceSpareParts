@@ -6,6 +6,7 @@ using Main.Abstractions.Models;
 using Main.Application.Configs.Mapster;
 using Main.Application.Handlers.StorageContents.EditContent;
 using Main.Entities;
+using Main.Entities.Storage;
 using Main.Persistence.Context;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
@@ -13,7 +14,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Test.Common.Extensions;
 using Test.Common.TestContainers.Combined;
 using Tests.MockData;
-using User = Main.Entities.User;
+using User = Main.Entities.User.User;
 using ValidationException = FluentValidation.ValidationException;
 
 namespace Tests.HandlersTests.StorageContents;

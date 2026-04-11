@@ -2,7 +2,7 @@
 using Domain;
 using Enums;
 
-namespace Main.Entities;
+namespace Main.Entities.Purchase;
 
 public class Purchase : AuditableEntity<Purchase, Guid>
 {
@@ -27,15 +27,15 @@ public class Purchase : AuditableEntity<Purchase, Guid>
 
     public PurchaseState State { get; set; }
 
-    public virtual Currency Currency { get; set; } = null!;
+    public virtual Currency.Currency Currency { get; set; } = null!;
 
     public virtual ICollection<PurchaseContent> PurchaseContents { get; set; } = new List<PurchaseContent>();
 
     public virtual PurchaseLogistic? PurchaseLogistic { get; set; }
 
-    public virtual User Supplier { get; set; } = null!;
+    public virtual User.User Supplier { get; set; } = null!;
 
-    public virtual Transaction Transaction { get; set; } = null!;
+    public virtual Transaction.Transaction Transaction { get; set; } = null!;
 
     public override Guid GetId() => Id;
 }

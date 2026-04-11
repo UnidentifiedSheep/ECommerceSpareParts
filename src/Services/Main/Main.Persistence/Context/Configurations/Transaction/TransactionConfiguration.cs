@@ -3,9 +3,9 @@ using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
 namespace Main.Persistence.Context.Configurations.Transaction;
 
-public class TransactionConfiguration : IEntityTypeConfiguration<Entities.Transaction>
+public class TransactionConfiguration : IEntityTypeConfiguration<Entities.Transaction.Transaction>
 {
-    public void Configure(EntityTypeBuilder<Entities.Transaction> builder)
+    public void Configure(EntityTypeBuilder<Entities.Transaction.Transaction> builder)
     {
         builder.ToTable("transactions");
         
@@ -84,31 +84,31 @@ public class TransactionConfiguration : IEntityTypeConfiguration<Entities.Transa
             .HasColumnName("who_made_user_id");
 
             
-        builder.HasOne<Entities.Currency>()
+        builder.HasOne<Entities.Currency.Currency>()
             .WithMany()
             .HasForeignKey(d => d.CurrencyId)
             .OnDelete(DeleteBehavior.Restrict)
             .HasConstraintName("transactions_currency_id_fk");
 
-        builder.HasOne<Entities.User>()
+        builder.HasOne<Entities.User.User>()
             .WithMany()
             .HasForeignKey(d => d.DeletedBy)
             .OnDelete(DeleteBehavior.Restrict)
             .HasConstraintName("transactions_users_id_fk_4");
 
-            builder.HasOne<Entities.User>()
+            builder.HasOne<Entities.User.User>()
                 .WithMany()
                 .HasForeignKey(d => d.ReceiverId)
                 .OnDelete(DeleteBehavior.Restrict)
                 .HasConstraintName("transactions_users_id_fk_2");
 
-            builder.HasOne<Entities.User>()
+            builder.HasOne<Entities.User.User>()
                 .WithMany()
                 .HasForeignKey(d => d.SenderId)
                 .OnDelete(DeleteBehavior.Restrict)
                 .HasConstraintName("transactions_users_id_fk");
 
-            builder.HasOne<Entities.User>()
+            builder.HasOne<Entities.User.User>()
                 .WithMany()
                 .HasForeignKey(d => d.WhoMadeUserId)
                 .OnDelete(DeleteBehavior.Restrict)

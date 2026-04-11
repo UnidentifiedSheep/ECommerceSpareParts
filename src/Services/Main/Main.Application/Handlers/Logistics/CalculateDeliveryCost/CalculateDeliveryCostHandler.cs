@@ -10,6 +10,8 @@ using Main.Abstractions.Interfaces.DbRepositories;
 using Main.Abstractions.Interfaces.Logistics;
 using Main.Abstractions.Models.Logistics;
 using Main.Entities;
+using Main.Entities.Product;
+using Main.Entities.Storage;
 using Main.Enums;
 using Mapster;
 
@@ -69,7 +71,7 @@ public class CalculateDeliveryCostHandler(
             .ToDictionary(x => x.ArticleId);
     }
 
-    private async Task<Dictionary<int, Entities.ProductWeight>> GetWeights(
+    private async Task<Dictionary<int, ProductWeight>> GetWeights(
         IEnumerable<int> articleIds,
         CancellationToken cancellationToken)
     {
@@ -81,7 +83,7 @@ public class CalculateDeliveryCostHandler(
     private LogisticsCalcResult GetDeliveryCost(
         StorageRoute route,
         Dictionary<int, ProductId> sizes,
-        Dictionary<int, Entities.ProductWeight> weights,
+        Dictionary<int, ProductWeight> weights,
         IEnumerable<LogisticsItemDto> items,
         int currencyId,
         LogisticsCalculationMode mode)

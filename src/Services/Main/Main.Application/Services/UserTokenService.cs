@@ -4,6 +4,7 @@ using Abstractions.Interfaces.Services;
 using Main.Abstractions.Interfaces.DbRepositories;
 using Main.Abstractions.Interfaces.Services;
 using Main.Entities;
+using Main.Entities.Auth;
 using Main.Enums;
 
 namespace Main.Application.Services;

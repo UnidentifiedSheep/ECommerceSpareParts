@@ -1,7 +1,8 @@
 ﻿using BulkValidation.Core.Attributes;
 using Domain;
+using Main.Entities.Auth;
 
-namespace Main.Entities;
+namespace Main.Entities.User;
 
 public class User : AuditableEntity<User, Guid>
 {
@@ -22,6 +23,6 @@ public class User : AuditableEntity<User, Guid>
     public virtual ICollection<UserPhone> UserPhones { get; set; } = new List<UserPhone>();
     public virtual ICollection<UserRole> UserRoles { get; set; } = new List<UserRole>();
     public virtual ICollection<UserVehicle> UserVehicles { get; set; } = new List<UserVehicle>();
-    public virtual ICollection<Cart> CartItems { get; set; } = new List<Cart>();
+    public virtual ICollection<Cart.Cart> CartItems { get; set; } = new List<Cart.Cart>();
     public override Guid GetId() => Id;
 }

@@ -4,6 +4,7 @@ using Attributes;
 using Extensions;
 using Main.Application.Notifications;
 using Main.Entities;
+using Main.Entities.Auth;
 using MediatR;
 
 namespace Main.Application.Handlers.Users.AddPermissionToUser;

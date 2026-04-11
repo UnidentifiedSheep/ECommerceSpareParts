@@ -1,6 +1,7 @@
 using Main.Abstractions.Interfaces.DbRepositories;
 using Main.Abstractions.Models;
 using Main.Entities;
+using Main.Entities.Storage;
 using Main.Persistence.Context;
 using Microsoft.EntityFrameworkCore;
 using Npgsql;
@@ -51,30 +52,6 @@ public class StorageContentRepository(DContext context) : IStorageContentReposit
             .FromSql($"SELECT * FROM storage_content where id = ANY({ids}) FOR UPDATE")
             .ConfigureTracking(track)
             .ToListAsync(cancellationToken);
-    }
-
-    public async Task<IEnumerable<StorageContent>> GetStorageContents(
-        string? storageName,
-        int? articleId,
-        int page,
-        int viewCount,
-        bool showZeroCount,
-        bool track = true,
-        CancellationToken cancellationToken = default)
-    {
-        var query = context.StorageContents
-            .ConfigureTracking(true)
-            .Include(x => x.Currency)
-            .Where(c => string.IsNullOrWhiteSpace(storageName) || c.StorageName == storageName)
-            .Where(x => articleId == null || x.ProductId == articleId);
-        if (!showZeroCount)
-            query = query.Where(x => x.Count > 0);
-        var result = await query
-            .OrderByDescending(x => x.Count)
-            .Skip(page * viewCount)
-            .Take(viewCount)
-            .ToListAsync(cancellationToken);
-        return result;
     }
 
     public async Task<StorageContent?> GetStorageContentForUpdateAsync(

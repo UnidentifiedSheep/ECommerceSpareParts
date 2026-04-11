@@ -1,6 +1,7 @@
 using Abstractions.Models.Repository;
 using Main.Abstractions.Dtos.RepositoryOptionsData;
 using Main.Entities;
+using Main.Entities.Sale;
 
 namespace Main.Abstractions.Interfaces.DbRepositories;
 
@@ -23,7 +24,7 @@ public interface ISaleRepository
         CancellationToken cancellationToken = default);
 
     Task<IEnumerable<SaleContent>> GetSaleContent(
-        string saleId,
+        Guid saleId,
         bool track = true,
         CancellationToken cancellationToken = default);
 }

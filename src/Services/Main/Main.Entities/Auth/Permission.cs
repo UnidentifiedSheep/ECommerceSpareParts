@@ -3,7 +3,7 @@ using Domain;
 using Enums;
 using Extensions;
 
-namespace Main.Entities;
+namespace Main.Entities.Auth;
 
 public class Permission : AuditableEntity<Permission, string>
 {

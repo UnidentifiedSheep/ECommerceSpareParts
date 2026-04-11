@@ -2,7 +2,7 @@
 using Domain;
 using Main.Enums;
 
-namespace Main.Entities;
+namespace Main.Entities.Auth;
 
 public class UserToken : AuditableEntity<UserToken, Guid>
 {
@@ -28,6 +28,6 @@ public class UserToken : AuditableEntity<UserToken, Guid>
 
     public string? UserAgent { get; set; }
 
-    public virtual User User { get; set; } = null!;
+    public virtual User.User User { get; set; } = null!;
     public override Guid GetId() => Id;
 }

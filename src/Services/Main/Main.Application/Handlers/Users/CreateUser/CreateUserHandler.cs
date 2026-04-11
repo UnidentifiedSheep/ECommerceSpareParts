@@ -7,6 +7,8 @@ using Main.Abstractions.Dtos.Emails;
 using Main.Abstractions.Dtos.Users;
 using Main.Abstractions.Interfaces.DbRepositories;
 using Main.Entities;
+using Main.Entities.Auth;
+using Main.Entities.User;
 using Mapster;
 
 namespace Main.Application.Handlers.Users.CreateUser;

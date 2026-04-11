@@ -5,8 +5,8 @@ using Mapster;
 
 using CoreUserInfo = Abstractions.Models.UserInfo;
 using CoreUser = Abstractions.Models.User;
-using User = Main.Entities.User;
-using UserInfo = Main.Entities.UserInfo;
+using User = Main.Entities.User.User;
+using UserInfo = Main.Entities.User.UserInfo;
 
 namespace Main.Application.Configs.Mapster;
 

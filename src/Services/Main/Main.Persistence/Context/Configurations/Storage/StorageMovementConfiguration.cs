@@ -1,4 +1,5 @@
 ﻿using Main.Entities;
+using Main.Entities.Storage;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
@@ -57,19 +58,19 @@ public class StorageMovementConfiguration : IEntityTypeConfiguration<StorageMove
             .OnDelete(DeleteBehavior.Restrict)
             .HasConstraintName("storage_movement_products_id_fk");
 
-        builder.HasOne<Entities.Currency>()
+        builder.HasOne<Entities.Currency.Currency>()
             .WithMany()
             .HasForeignKey(d => d.CurrencyId)
             .OnDelete(DeleteBehavior.Restrict)
             .HasConstraintName("storage_movement_currency_id_fk");
 
-        builder.HasOne<Entities.Storage>()
+        builder.HasOne<Entities.Storage.Storage>()
             .WithMany()
             .HasForeignKey(d => d.StorageName)
             .OnDelete(DeleteBehavior.Restrict)
             .HasConstraintName("storage_movement_storages_name_fk");
 
-        builder.HasOne<Entities.User>()
+        builder.HasOne<Entities.User.User>()
             .WithMany()
             .HasForeignKey(d => d.WhoMoved)
             .OnDelete(DeleteBehavior.Restrict)

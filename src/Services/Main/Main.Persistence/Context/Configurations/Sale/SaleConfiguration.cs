@@ -4,9 +4,9 @@ using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
 namespace Main.Persistence.Context.Configurations.Sale;
 
-public class SaleConfiguration : IEntityTypeConfiguration<Entities.Sale>
+public class SaleConfiguration : IEntityTypeConfiguration<Entities.Sale.Sale>
 {
-    public void Configure(EntityTypeBuilder<Entities.Sale> builder)
+    public void Configure(EntityTypeBuilder<Entities.Sale.Sale> builder)
     {
         builder.ToTable("sale");
         
@@ -70,7 +70,7 @@ public class SaleConfiguration : IEntityTypeConfiguration<Entities.Sale>
             .OnDelete(DeleteBehavior.Restrict)
             .HasConstraintName("sale_users_id_fk");
 
-        builder.HasOne<Entities.User>()
+        builder.HasOne<Entities.User.User>()
             .WithMany()
             .HasForeignKey(d => d.CreatedUserId)
             .OnDelete(DeleteBehavior.Restrict)
@@ -82,7 +82,7 @@ public class SaleConfiguration : IEntityTypeConfiguration<Entities.Sale>
             .OnDelete(DeleteBehavior.Restrict)
             .HasConstraintName("sale_currency_id_fk");
 
-        builder.HasOne<Entities.Storage>()
+        builder.HasOne<Entities.Storage.Storage>()
             .WithMany()
             .HasForeignKey(d => d.MainStorageName)
             .OnDelete(DeleteBehavior.Restrict)
@@ -94,7 +94,7 @@ public class SaleConfiguration : IEntityTypeConfiguration<Entities.Sale>
             .OnDelete(DeleteBehavior.Restrict)
             .HasConstraintName("sale_transactions_id_fk");
 
-        builder.HasOne<Entities.User>()
+        builder.HasOne<Entities.User.User>()
             .WithMany()
             .HasForeignKey(d => d.UpdatedUserId)
             .OnDelete(DeleteBehavior.Restrict)

@@ -1,4 +1,5 @@
 ﻿using Enums;
+using Main.Entities.Product;
 
 namespace Main.Entities;
 

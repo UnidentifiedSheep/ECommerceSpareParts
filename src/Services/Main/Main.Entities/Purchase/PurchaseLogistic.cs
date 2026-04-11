@@ -1,10 +1,10 @@
 ﻿using Main.Enums;
 
-namespace Main.Entities;
+namespace Main.Entities.Purchase;
 
 public class PurchaseLogistic
 {
-    public string PurchaseId { get; set; } = null!;
+    public Guid PurchaseId { get; set; }
 
     public Guid RouteId { get; set; }
 
@@ -26,7 +26,7 @@ public class PurchaseLogistic
 
     public bool MinimumPriceApplied { get; set; }
 
-    public virtual Currency Currency { get; set; } = null!;
+    public virtual Currency.Currency Currency { get; set; } = null!;
 
-    public virtual Transaction Transaction { get; set; } = null!;
+    public virtual Transaction.Transaction Transaction { get; set; } = null!;
 }

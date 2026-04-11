@@ -1,4 +1,5 @@
 ﻿using Main.Entities;
+using Main.Entities.User;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
@@ -74,7 +75,7 @@ public class UserVehicleConfiguration : IEntityTypeConfiguration<UserVehicle>
             .HasMaxLength(50)
             .HasColumnName("vin");
 
-        builder.HasOne<Entities.User>()
+        builder.HasOne<Entities.User.User>()
             .WithMany(p => p.UserVehicles)
             .HasForeignKey(d => d.UserId)
             .HasConstraintName("user_vehicles_users_id_fk");

@@ -1,4 +1,5 @@
 ﻿using Main.Entities;
+using Main.Entities.Order;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
@@ -28,19 +29,19 @@ public class OrderVersionConfiguration : IEntityTypeConfiguration<OrderVersion>
         builder.Property(e => e.UpdatedAt).HasColumnName("updated_at");
         builder.Property(e => e.WhoUpdated).HasColumnName("who_updated");
 
-        builder.HasOne<Entities.Currency>()
+        builder.HasOne<Entities.Currency.Currency>()
             .WithMany()
             .HasForeignKey(d => d.CurrencyId)
             .OnDelete(DeleteBehavior.Restrict)
             .HasConstraintName("order_versions_currency_id_fk");
 
-        builder.HasOne<Entities.Order>()
+        builder.HasOne<Entities.Order.Order>()
             .WithMany()
             .HasForeignKey(d => d.OrderId)
             .OnDelete(DeleteBehavior.Restrict)
             .HasConstraintName("order_versions_orders_id_fk");
 
-        builder.HasOne<Entities.User>()
+        builder.HasOne<Entities.User.User>()
             .WithMany()
             .HasForeignKey(d => d.WhoUpdated)
             .OnDelete(DeleteBehavior.Restrict)

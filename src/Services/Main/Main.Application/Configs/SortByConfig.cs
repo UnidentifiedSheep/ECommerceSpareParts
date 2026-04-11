@@ -2,7 +2,11 @@ using Abstractions;
 using Extensions;
 using Main.Abstractions.Dtos.Amw.Articles;
 using Main.Entities;
+using Main.Entities.Producer;
 using Main.Entities.Product;
+using Main.Entities.Purchase;
+using Main.Entities.Sale;
+using Main.Entities.Storage;
 
 namespace Main.Application.Configs;
 

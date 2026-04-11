@@ -1,4 +1,6 @@
 ﻿using Main.Entities;
+using Main.Entities.Storage;
+using Main.Entities.User;
 using Main.Persistence.Context;
 
 namespace Tests.MockData.ScenatioExtensions;

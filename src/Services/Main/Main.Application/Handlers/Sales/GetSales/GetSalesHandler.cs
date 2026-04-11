@@ -6,6 +6,7 @@ using Main.Abstractions.Dtos.Amw.Sales;
 using Main.Abstractions.Dtos.RepositoryOptionsData;
 using Main.Abstractions.Interfaces.DbRepositories;
 using Main.Entities;
+using Main.Entities.Sale;
 using Mapster;
 
 namespace Main.Application.Handlers.Sales.GetSales;

@@ -4,6 +4,7 @@ using Attributes;
 using Enums;
 using Main.Abstractions.Dtos.Amw.Purchase;
 using Main.Entities;
+using Main.Entities.Purchase;
 using Mapster;
 
 namespace Main.Application.Handlers.Purchases.CreatePurchase;

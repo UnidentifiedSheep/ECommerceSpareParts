@@ -2,6 +2,7 @@
 using Abstractions.Interfaces.RelatedData;
 using Main.Application.Notifications;
 using Main.Entities;
+using Main.Entities.User;
 using MediatR;
 
 namespace Main.Application.NotificationHandlers;

@@ -1,7 +1,7 @@
 ﻿using BulkValidation.Core.Attributes;
 using Enums;
 
-namespace Main.Entities;
+namespace Main.Entities.Product;
 
 public class ProductSize
 {

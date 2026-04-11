@@ -1,4 +1,4 @@
-﻿namespace Main.Entities;
+﻿namespace Main.Entities.User;
 
 public class UserDiscount
 {

@@ -1,4 +1,5 @@
 ﻿using Main.Entities;
+using Main.Entities.Storage;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
@@ -68,23 +69,23 @@ public class StorageContentReservationConfiguration : IEntityTypeConfiguration<S
             .OnDelete(DeleteBehavior.Restrict)
             .HasConstraintName("storage_content_reservations_products_id_fk");
 
-        builder.HasOne<Entities.Currency>()
+        builder.HasOne<Entities.Currency.Currency>()
             .WithMany()
             .HasForeignKey(d => d.GivenCurrencyId)
             .OnDelete(DeleteBehavior.Cascade)
             .HasConstraintName("storage_content_reservations_currency_id_fk");
         
-        builder.HasOne<Entities.User>()
+        builder.HasOne<Entities.User.User>()
             .WithMany()
             .HasForeignKey(d => d.UserId)
             .HasConstraintName("storage_content_reservations_users_id_fk");
 
-        builder.HasOne<Entities.User>()
+        builder.HasOne<Entities.User.User>()
             .WithMany()
             .HasForeignKey(d => d.WhoCreated)
             .HasConstraintName("storage_content_reservations_users_id_fk_3");
 
-        builder.HasOne<Entities.User>()
+        builder.HasOne<Entities.User.User>()
             .WithMany()
             .HasForeignKey(d => d.WhoUpdated)
             .OnDelete(DeleteBehavior.Cascade)

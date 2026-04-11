@@ -10,6 +10,7 @@ using Main.Abstractions.Models;
 using Main.Application.Extensions;
 using Main.Application.Notifications;
 using Main.Entities;
+using Main.Entities.Storage;
 using Main.Enums;
 using Mapster;
 using MassTransit;

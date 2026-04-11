@@ -2,6 +2,8 @@
 using Extensions;
 using Main.Abstractions.Extensions;
 using Main.Entities;
+using Main.Entities.Auth;
+using Main.Entities.User;
 using Main.Enums;
 using Main.Persistence.Context;
 using Microsoft.EntityFrameworkCore;
@@ -26,8 +28,6 @@ public class AdminSeed(IPasswordManager passwordManager) : ISeed<DContext>
         {
             UserName = AdministratorName,
             NormalizedUserName = AdministratorName.ToNormalized(),
-            UpdatedAt = DateTime.UtcNow,
-            CreatedAt = DateTime.UtcNow,
             PasswordHash = passwordManager.GetHashOfPassword("SuperSecretPassword.21"),
             TwoFactorEnabled = false,
             AccessFailedCount = 0,
@@ -36,7 +36,7 @@ public class AdminSeed(IPasswordManager passwordManager) : ISeed<DContext>
                 new UserRole
                 {
                     AssignedAt = DateTime.UtcNow,
-                    Role = adminRole
+                    RoleName = adminRole.NormalizedName
                 }
             ],
             UserInfo = new UserInfo
@@ -53,12 +53,10 @@ public class AdminSeed(IPasswordManager passwordManager) : ISeed<DContext>
                 {
                     Confirmed = true,
                     ConfirmedAt = DateTime.UtcNow,
-                    CreatedAt = DateTime.UtcNow,
                     Email = email,
                     EmailType = EmailType.Personal,
                     IsPrimary = true,
                     NormalizedEmail = email.ToNormalizedEmail(),
-                    UpdatedAt = DateTime.UtcNow
                 }
             ]
         };

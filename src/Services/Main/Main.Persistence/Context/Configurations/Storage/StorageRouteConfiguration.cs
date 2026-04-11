@@ -1,4 +1,5 @@
 ﻿using Main.Entities;
+using Main.Entities.Storage;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
@@ -70,7 +71,7 @@ public class StorageRouteConfiguration : IEntityTypeConfiguration<StorageRoute>
             .HasMaxLength(128)
             .HasColumnName("to_storage_name");
         
-        builder.HasOne<Entities.User>()
+        builder.HasOne<Entities.User.User>()
             .WithMany()
             .HasForeignKey(d => d.CarrierId)
             .OnDelete(DeleteBehavior.Cascade)
@@ -82,12 +83,12 @@ public class StorageRouteConfiguration : IEntityTypeConfiguration<StorageRoute>
             .OnDelete(DeleteBehavior.Restrict)
             .HasConstraintName("storage_routes_currency_id_fk");
 
-        builder.HasOne<Entities.Storage>()
+        builder.HasOne<Entities.Storage.Storage>()
             .WithMany()
             .HasForeignKey(d => d.FromStorageName)
             .HasConstraintName("storage_routes_storages_name_fk");
 
-        builder.HasOne<Entities.Storage>()
+        builder.HasOne<Entities.Storage.Storage>()
             .WithMany()
             .HasForeignKey(d => d.ToStorageName)
             .HasConstraintName("storage_routes_storages_name_fk_2");

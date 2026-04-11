@@ -2,7 +2,7 @@
 using Domain;
 using Main.Enums;
 
-namespace Main.Entities;
+namespace Main.Entities.User;
 
 public class UserEmail : AuditableEntity<UserEmail, string>
 {

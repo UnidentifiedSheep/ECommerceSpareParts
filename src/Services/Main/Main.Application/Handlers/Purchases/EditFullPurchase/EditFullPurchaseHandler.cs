@@ -19,6 +19,7 @@ using Main.Application.Handlers.Purchases.UpsertLogisticsToPurchase;
 using Main.Application.Handlers.StorageContents.AddContent;
 using Main.Application.Handlers.StorageContents.RemoveContent;
 using Main.Entities;
+using Main.Entities.Purchase;
 using Main.Enums;
 using Mapster;
 using MassTransit;

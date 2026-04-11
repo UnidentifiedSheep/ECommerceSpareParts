@@ -1,8 +1,9 @@
 ﻿using Main.Entities;
+using Main.Entities.Auth;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
-namespace Main.Persistence.Context.Configurations.User;
+namespace Main.Persistence.Context.Configurations.Auth;
 
 public class UserPermissionConfiguration : IEntityTypeConfiguration<UserPermission>
 {
@@ -28,7 +29,7 @@ public class UserPermissionConfiguration : IEntityTypeConfiguration<UserPermissi
             .OnDelete(DeleteBehavior.Restrict)
             .HasConstraintName("user_permissions_permissions_name_fk");
 
-        builder.HasOne<Entities.User>()
+        builder.HasOne<Entities.User.User>()
             .WithMany(p => p.UserPermissions)
             .HasForeignKey(d => d.UserId)
             .OnDelete(DeleteBehavior.Restrict)

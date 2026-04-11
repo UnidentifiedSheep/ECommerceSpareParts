@@ -4,6 +4,7 @@ using Attributes;
 using Enums;
 using Main.Abstractions.Interfaces.DbRepositories;
 using Main.Application.Notifications;
+using Main.Entities.Product;
 using MediatR;
 
 namespace Main.Application.Handlers.ArticleWeight.SetArticleWeight;
@@ -23,7 +24,7 @@ public class SetArticleWeightHandler(
 
         if (weight == null)
         {
-            weight = new Entities.ProductWeight { ProductId = request.ArticleId };
+            weight = new ProductWeight { ProductId = request.ArticleId };
             await unitOfWork.AddAsync(weight, cancellationToken);
         }
 

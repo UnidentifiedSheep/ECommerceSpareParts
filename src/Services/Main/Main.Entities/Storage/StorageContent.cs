@@ -1,7 +1,7 @@
 ﻿using BulkValidation.Core.Attributes;
 using Domain;
 
-namespace Main.Entities;
+namespace Main.Entities.Storage;
 
 public class StorageContent : AuditableEntity<StorageContent, int>
 {

@@ -3,6 +3,7 @@ using Application.Common.Interfaces;
 using Attributes;
 using Main.Abstractions.Dtos.Amw.ArticleCharacteristics;
 using Main.Entities;
+using Main.Entities.Product;
 using Mapster;
 
 namespace Main.Application.Handlers.ArticleCharacteristics.AddCharacteristics;

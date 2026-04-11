@@ -2,6 +2,7 @@
 using Main.Abstractions.Interfaces.DbRepositories;
 using Main.Abstractions.Interfaces.Services;
 using Main.Entities;
+using Main.Entities.Storage;
 
 namespace Main.Application.Services;
 

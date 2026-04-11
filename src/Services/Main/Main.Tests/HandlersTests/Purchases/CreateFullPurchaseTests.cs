@@ -2,6 +2,8 @@
 using Main.Application.Handlers.Purchases.CreateFullPurchase;
 using Main.Entities;
 using Main.Entities.Product;
+using Main.Entities.Purchase;
+using Main.Entities.Transaction;
 using Main.Enums;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;

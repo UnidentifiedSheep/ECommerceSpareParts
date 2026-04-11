@@ -2,7 +2,7 @@
 using Domain;
 using Main.Enums;
 
-namespace Main.Entities;
+namespace Main.Entities.Storage;
 
 public class StorageRoute : AuditableEntity<StorageRoute, Guid>
 {
@@ -38,6 +38,6 @@ public class StorageRoute : AuditableEntity<StorageRoute, Guid>
 
     public Guid? CarrierId { get; set; }
 
-    public virtual Currency Currency { get; set; } = null!;
+    public virtual Currency.Currency Currency { get; set; } = null!;
     public override Guid GetId() => Id;
 }

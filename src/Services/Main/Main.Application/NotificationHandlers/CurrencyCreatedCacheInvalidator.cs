@@ -4,6 +4,7 @@ using Main.Abstractions.Constants;
 using Main.Abstractions.Interfaces.DbRepositories;
 using Main.Application.Notifications;
 using Main.Entities;
+using Main.Entities.Currency;
 using MediatR;
 
 namespace Main.Application.NotificationHandlers;

@@ -3,6 +3,7 @@ using Application.Common.Interfaces;
 using Attributes;
 using Main.Abstractions.Dtos.Amw.Purchase;
 using Main.Entities;
+using Main.Entities.Purchase;
 using Mapster;
 using MediatR;
 

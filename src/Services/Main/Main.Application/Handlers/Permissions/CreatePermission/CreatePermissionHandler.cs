@@ -3,6 +3,7 @@ using Application.Common.Interfaces;
 using Attributes;
 using Extensions;
 using Main.Entities;
+using Main.Entities.Auth;
 
 namespace Main.Application.Handlers.Permissions.CreatePermission;
 

@@ -1,6 +1,7 @@
 ﻿using Application.Common.Interfaces;
 using Main.Abstractions.Constants;
 using Main.Entities;
+using Main.Entities.Currency;
 
 namespace Main.Application.Handlers.Currencies.GetCurrencies;
 

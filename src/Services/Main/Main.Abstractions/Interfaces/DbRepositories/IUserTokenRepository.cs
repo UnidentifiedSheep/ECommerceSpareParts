@@ -1,6 +1,7 @@
 using Abstractions.Models.Repository;
 using Main.Abstractions.Dtos.RepositoryOptionsData;
 using Main.Entities;
+using Main.Entities.Auth;
 
 namespace Main.Abstractions.Interfaces.DbRepositories;
 

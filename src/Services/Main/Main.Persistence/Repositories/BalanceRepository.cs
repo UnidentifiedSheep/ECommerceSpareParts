@@ -1,5 +1,7 @@
 using Main.Abstractions.Interfaces.DbRepositories;
 using Main.Entities;
+using Main.Entities.Transaction;
+using Main.Entities.User;
 using Main.Persistence.Context;
 using Microsoft.EntityFrameworkCore;
 using Npgsql;

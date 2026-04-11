@@ -1,6 +1,8 @@
 using Main.Abstractions.Interfaces.Services;
 using Main.Abstractions.Models;
 using Main.Entities;
+using Main.Entities.Sale;
+using Main.Entities.Storage;
 using Mapster;
 
 namespace Main.Application.Services;

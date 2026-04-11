@@ -12,6 +12,8 @@ using Main.Application.Handlers.StorageRoutes.AddStorageRoute;
 using Main.Application.Handlers.Storages.CreateStorage;
 using Main.Application.Handlers.Users.CreateUser;
 using Main.Entities;
+using Main.Entities.Storage;
+using Main.Entities.Transaction;
 using Main.Enums;
 using Mapster;
 using MediatR;

@@ -1,13 +1,13 @@
 ﻿using BulkValidation.Core.Attributes;
 
-namespace Main.Entities;
+namespace Main.Entities.Purchase;
 
 public class PurchaseContent
 {
     [Validate]
     public int Id { get; set; }
 
-    public string PurchaseId { get; set; } = null!;
+    public Guid PurchaseId { get; set; }
 
     public int ProductId { get; set; }
 

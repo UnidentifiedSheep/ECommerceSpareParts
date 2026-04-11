@@ -1,4 +1,5 @@
 ﻿using Main.Entities;
+using Main.Entities.Order;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
@@ -42,7 +43,7 @@ public class OrderItemConfiguration : IEntityTypeConfiguration<OrderItem>
             .OnDelete(DeleteBehavior.Restrict)
             .HasConstraintName("order_items_articles_id_fk");
 
-        builder.HasOne<Entities.Order>()
+        builder.HasOne<Entities.Order.Order>()
             .WithMany()
             .HasForeignKey(d => d.OrderId)
             .HasConstraintName("order_items_orders_id_fk");

@@ -1,5 +1,6 @@
 using Main.Abstractions.Interfaces.DbRepositories;
 using Main.Entities;
+using Main.Entities.Product;
 using Main.Persistence.Context;
 using Microsoft.EntityFrameworkCore;
 using Persistence.Extensions;
@@ -25,7 +26,7 @@ public class ArticleCharacteristicsRepository(DContext context) : IArticleCharac
     {
         return await context.ProductCharacteristics
             .ConfigureTracking(track)
-            .Where(x => ids.Contains(x.Id) && (articleId == null || x.ProductId == articleId))
+            .Where(x => ids.Contains(x.ProductId) && (articleId == null || x.ProductId == articleId))
             .ToListAsync(cancellationToken);
     }
 
@@ -35,6 +36,6 @@ public class ArticleCharacteristicsRepository(DContext context) : IArticleCharac
         CancellationToken cancellationToken = default)
     {
         return await context.ProductCharacteristics.ConfigureTracking(track)
-            .FirstOrDefaultAsync(x => x.Id == id, cancellationToken);
+            .FirstOrDefaultAsync(x => x.ProductId == id, cancellationToken);
     }
 }

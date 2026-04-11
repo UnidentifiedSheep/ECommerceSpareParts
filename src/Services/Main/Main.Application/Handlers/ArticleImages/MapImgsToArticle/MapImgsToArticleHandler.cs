@@ -4,6 +4,7 @@ using Application.Common.Interfaces;
 using Attributes;
 using Main.Application.Notifications;
 using Main.Entities;
+using Main.Entities.Product;
 using MediatR;
 
 namespace Main.Application.Handlers.ArticleImages.MapImgsToArticle;

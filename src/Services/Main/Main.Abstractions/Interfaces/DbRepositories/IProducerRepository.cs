@@ -1,4 +1,5 @@
 using Main.Entities;
+using Main.Entities.Producer;
 
 namespace Main.Abstractions.Interfaces.DbRepositories;
 
