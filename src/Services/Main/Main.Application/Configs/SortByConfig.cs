@@ -39,9 +39,9 @@ public static class SortByConfig
             .Map("id", x => x.Id);
 
         new StorageContentReservation()
-            .MapDefault(x => x.CreateAt)
+            .MapDefault(x => x.CreatedAt)
             .Map("id", x => x.Id)
-            .Map("createAt", x => x.CreateAt)
+            .Map("createAt", x => x.CreatedAt)
             .Map("updatedAt", x => x.UpdatedAt)
             .Map("isDone", x => x.IsDone);
     }

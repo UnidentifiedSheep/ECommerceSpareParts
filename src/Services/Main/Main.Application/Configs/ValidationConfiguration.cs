@@ -194,18 +194,6 @@ public static class ValidationConfiguration
 
     private static void ConfigureRole()
     {
-        ConfigureDbValidation.AddConfig(ValidationFunctions.ValidateRoleExistsId, KeyValueType.Single,
-            config => config.WithErrorName(ApplicationErrors.RoleNotFound)
-                .WithMessageTemplate("role.not.found")
-                .WithErrorType(typeof(NotFoundException))
-                .WithErrorCode((int)HttpStatusCode.NotFound));
-
-        ConfigureDbValidation.AddConfig(ValidationFunctions.ValidateRoleExistsId, KeyValueType.MultipleKeys,
-            config => config.WithErrorName(ApplicationErrors.RoleNotFound)
-                .WithMessageTemplate("role.not.found")
-                .WithErrorType(typeof(NotFoundException))
-                .WithErrorCode((int)HttpStatusCode.NotFound));
-
         ConfigureDbValidation.AddConfig(ValidationFunctions.ValidateRoleExistsNormalizedName, KeyValueType.Single,
             config => config.WithErrorName(ApplicationErrors.RoleNotFound)
                 .WithMessageTemplate("role.not.found.with.role.name")
@@ -288,13 +276,13 @@ public static class ValidationConfiguration
 
     private static void ConfigureArticles()
     {
-        ConfigureDbValidation.AddConfig(ValidationFunctions.ValidateArticleExistsId, KeyValueType.Single,
+        ConfigureDbValidation.AddConfig(ValidationFunctions.ValidateProductExistsId, KeyValueType.Single,
             config => config.WithErrorName(ApplicationErrors.ArticlesNotFound)
                 .WithMessageTemplate("article.not.found")
                 .WithErrorType(typeof(NotFoundException))
                 .WithErrorCode((int)HttpStatusCode.NotFound));
 
-        ConfigureDbValidation.AddConfig(ValidationFunctions.ValidateArticleExistsId, KeyValueType.MultipleKeys,
+        ConfigureDbValidation.AddConfig(ValidationFunctions.ValidateProductExistsId, KeyValueType.MultipleKeys,
             config => config.WithErrorName(ApplicationErrors.ArticlesNotFound)
                 .WithMessageTemplate("articles.not.found")
                 .WithErrorType(typeof(NotFoundException))
