@@ -6,6 +6,7 @@ using Main.Abstractions.Dtos.Services.Articles;
 using Main.Abstractions.Exceptions.Producers;
 using Main.Abstractions.Interfaces.DbRepositories;
 using Main.Entities;
+using Main.Entities.Product;
 using Mapster;
 using MassTransit;
 using ContractArticle = Contracts.Models.Articles.Article;

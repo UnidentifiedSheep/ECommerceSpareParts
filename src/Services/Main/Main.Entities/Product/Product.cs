@@ -1,8 +1,9 @@
 ﻿using BulkValidation.Core.Attributes;
+using Domain;
 
-namespace Main.Entities;
+namespace Main.Entities.Product;
 
-public class Product
+public class Product : AuditableEntity<Product, int>
 {
     [Validate]
     public int Id { get; set; }
@@ -28,24 +29,24 @@ public class Product
     public int? CategoryId { get; set; }
     public long Popularity { get; set; }
 
-    public virtual ICollection<ProductCharacteristic> ArticleCharacteristics { get; set; } =
+    public virtual ICollection<ProductCharacteristic> ProductCharacteristics { get; set; } =
         new List<ProductCharacteristic>();
 
-    public virtual ICollection<ArticleCoefficient> ArticleCoefficients { get; set; } = new List<ArticleCoefficient>();
+    public ICollection<ProductCoefficient> ProductCoefficients { get; set; } = new List<ProductCoefficient>();
 
-    public virtual ICollection<ArticleEan> ArticleEans { get; set; } = new List<ArticleEan>();
+    public ICollection<ProductEan> ProductEans { get; set; } = new List<ProductEan>();
 
-    public virtual ICollection<ArticleImage> ArticleImages { get; set; } = new List<ArticleImage>();
+    public ICollection<ProductImage> ProductImages { get; set; } = new List<ProductImage>();
 
-    public virtual ArticleSize? ArticleSize { get; set; }
+    public ICollection<ProductContent> ProductContents { get; set; } = new List<ProductContent>();
+    public virtual ProductSize? ProductSize { get; set; }
 
-    public virtual ArticleWeight? ArticleWeight { get; set; }
-
-    public virtual ICollection<ArticlesContent> ArticlesContentMainArticles { get; set; } = new List<ArticlesContent>();
+    public virtual ProductWeight? ProductWeight { get; set; }
 
     public Product? Pair { get; set; }
 
     public virtual Category? Category { get; set; }
 
     public virtual Producer Producer { get; set; } = null!;
+    public override int GetId() => Id;
 }

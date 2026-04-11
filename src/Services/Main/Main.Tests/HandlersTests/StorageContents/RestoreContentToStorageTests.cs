@@ -4,6 +4,7 @@ using Main.Abstractions.Exceptions.Articles;
 using Main.Abstractions.Models;
 using Main.Application.Handlers.StorageContents.RestoreContent;
 using Main.Entities;
+using Main.Entities.Product;
 using Main.Enums;
 using Main.Persistence.Context;
 using Mapster;

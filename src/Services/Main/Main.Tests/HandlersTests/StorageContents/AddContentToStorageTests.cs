@@ -4,6 +4,7 @@ using Main.Abstractions.Exceptions.Articles;
 using Main.Application.Configs.Mapster;
 using Main.Application.Handlers.StorageContents.AddContent;
 using Main.Entities;
+using Main.Entities.Product;
 using Main.Enums;
 using Main.Persistence.Context;
 using MediatR;

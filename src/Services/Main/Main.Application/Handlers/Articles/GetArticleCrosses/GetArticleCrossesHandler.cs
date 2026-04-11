@@ -6,6 +6,7 @@ using Main.Abstractions.Dtos.Amw.Articles;
 using Main.Abstractions.Exceptions.Articles;
 using Main.Abstractions.Interfaces.DbRepositories;
 using Main.Entities;
+using Main.Entities.Product;
 using Mapster;
 
 namespace Main.Application.Handlers.Articles.GetArticleCrosses;

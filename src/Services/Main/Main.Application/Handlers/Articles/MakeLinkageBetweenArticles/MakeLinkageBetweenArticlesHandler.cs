@@ -7,6 +7,7 @@ using Main.Abstractions.Exceptions.Articles;
 using Main.Abstractions.Interfaces.DbRepositories;
 using Main.Application.Notifications;
 using Main.Entities;
+using Main.Entities.Product;
 using Main.Enums;
 using MediatR;
 

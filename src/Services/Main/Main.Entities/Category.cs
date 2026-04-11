@@ -6,5 +6,5 @@ public class Category
 
     public string Name { get; set; } = null!;
 
-    public virtual ICollection<Product> Articles { get; set; } = new List<Product>();
+    public virtual ICollection<Product.Product> Articles { get; set; } = new List<Product.Product>();
 }

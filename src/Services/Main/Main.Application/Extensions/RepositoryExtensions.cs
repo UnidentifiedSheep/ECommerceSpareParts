@@ -2,6 +2,7 @@
 using Main.Abstractions.Exceptions.Articles;
 using Main.Abstractions.Interfaces.DbRepositories;
 using Main.Entities;
+using Main.Entities.Product;
 
 namespace Main.Application.Extensions;
 

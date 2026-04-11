@@ -4,9 +4,9 @@ namespace Main.Abstractions.Interfaces.DbRepositories;
 
 public interface IArticleWeightRepository
 {
-    Task<ArticleWeight?> GetArticleWeight(int articleId, bool track = true, CancellationToken token = default);
+    Task<ProductWeight?> GetArticleWeight(int articleId, bool track = true, CancellationToken token = default);
 
-    Task<IEnumerable<ArticleWeight>> GetArticleWeightsByIds(
+    Task<IEnumerable<ProductWeight>> GetArticleWeightsByIds(
         IEnumerable<int> ids,
         bool track = true,
         CancellationToken token = default);

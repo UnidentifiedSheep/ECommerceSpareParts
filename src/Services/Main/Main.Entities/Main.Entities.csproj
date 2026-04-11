@@ -9,6 +9,7 @@
     </PropertyGroup>
 
     <ItemGroup>
+        <ProjectReference Include="..\..\..\Core\Domain\Domain.csproj" />
         <ProjectReference Include="..\..\..\Core\Enums\Enums.csproj"/>
         <ProjectReference Include="..\..\..\Core\Extensions\Extensions.csproj"/>
         <ProjectReference Include="..\Main.Enums\Main.Enums.csproj"/>
@@ -17,6 +18,10 @@
     <ItemGroup>
         <PackageReference Include="BulkValidation.Core" Version="1.0.9"/>
         <PackageReference Include="BulkValidation.SourceGeneration" Version="1.0.5"/>
+    </ItemGroup>
+
+    <ItemGroup>
+      <Folder Include="Transaction\" />
     </ItemGroup>
 
 </Project>

@@ -16,8 +16,8 @@ public class GetArticleImgsHandler(IArticleImageRepository imageRepository)
         var result = new Dictionary<int, HashSet<string>>();
 
         foreach (var img in imgs)
-            if (!result.TryAdd(img.ArticleId, [img.Path]))
-                result[img.ArticleId].Add(img.Path);
+            if (!result.TryAdd(img.ProductId, [img.Path]))
+                result[img.ProductId].Add(img.Path);
 
         return new GetArticleImgsResult(result);
     }

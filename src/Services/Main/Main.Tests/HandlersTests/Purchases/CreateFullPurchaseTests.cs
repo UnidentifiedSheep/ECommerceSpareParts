@@ -1,6 +1,7 @@
 ﻿using FluentAssertions;
 using Main.Application.Handlers.Purchases.CreateFullPurchase;
 using Main.Entities;
+using Main.Entities.Product;
 using Main.Enums;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;

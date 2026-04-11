@@ -2,6 +2,7 @@ using Abstractions.Interfaces.Services;
 using Application.Common.Interfaces;
 using Attributes;
 using Main.Entities;
+using Main.Entities.Product;
 using MediatR;
 
 namespace Main.Application.Handlers.ArticleContent.AddArticleContent;
@@ -13,10 +14,10 @@ public class AddArticleContentHandler(IUnitOfWork unitOfWork) : ICommandHandler<
 {
     public async Task<Unit> Handle(AddArticleContentCommand request, CancellationToken cancellationToken)
     {
-        var contents = request.Content.Select(x => new ArticlesContent
+        var contents = request.Content.Select(x => new ProductContent
         {
-            InsideArticleId = x.Key,
-            MainArticleId = request.ArticleId,
+            ChildProductId = x.Key,
+            ParentProductId = request.ArticleId,
             Quantity = x.Value
         }).ToList();
 

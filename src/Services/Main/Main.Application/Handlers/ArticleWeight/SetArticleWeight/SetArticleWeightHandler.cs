@@ -23,7 +23,7 @@ public class SetArticleWeightHandler(
 
         if (weight == null)
         {
-            weight = new Entities.ArticleWeight { ArticleId = request.ArticleId };
+            weight = new Entities.ProductWeight { ProductId = request.ArticleId };
             await unitOfWork.AddAsync(weight, cancellationToken);
         }
 

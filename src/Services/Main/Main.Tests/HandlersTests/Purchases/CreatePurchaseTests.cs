@@ -4,6 +4,7 @@ using Main.Abstractions.Dtos.Amw.Purchase;
 using Main.Abstractions.Dtos.Amw.Storage;
 using Main.Application.Handlers.Purchases.CreatePurchase;
 using Main.Entities;
+using Main.Entities.Product;
 using Main.Persistence.Context;
 using Mapster;
 using MediatR;

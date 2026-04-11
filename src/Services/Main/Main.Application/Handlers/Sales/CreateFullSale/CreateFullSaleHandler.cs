@@ -17,6 +17,7 @@ using Main.Application.Handlers.Sales.CreateSale;
 using Main.Application.Handlers.StorageContents.RemoveContent;
 using Main.Application.Notifications;
 using Main.Entities;
+using Main.Entities.Product;
 using Main.Enums;
 using Mapster;
 using MassTransit;

@@ -7,6 +7,4 @@ public class ProductCharacteristic
     public string Value { get; set; } = null!;
 
     public string? Name { get; set; }
-
-    public virtual Product Product { get; set; } = null!;
 }

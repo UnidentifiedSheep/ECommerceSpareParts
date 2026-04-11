@@ -23,7 +23,7 @@ public class StorageContent
 
     public DateTime PurchaseDatetime { get; set; }
 
-    public virtual Product Product { get; set; } = null!;
+    public virtual Product.Product Product { get; set; } = null!;
 
     public virtual Currency Currency { get; set; } = null!;
 

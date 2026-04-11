@@ -3,6 +3,7 @@ using Main.Abstractions.Dtos.Amw.ArticleReservations;
 using Main.Application.Handlers.ArticleReservations.CreateArticleReservation;
 using Main.Application.Handlers.ArticleReservations.GetArticlesWithNotEnoughStock;
 using Main.Entities;
+using Main.Entities.Product;
 using Main.Persistence.Context;
 using MediatR;
 using Microsoft.EntityFrameworkCore;

@@ -1,14 +1,12 @@
-﻿namespace Main.Entities;
+﻿using Domain;
 
-public class UserPermission
+namespace Main.Entities;
+
+public class UserPermission : AuditableEntity<UserPermission, (Guid, string)>
 {
     public Guid UserId { get; set; }
 
     public string Permission { get; set; } = null!;
 
-    public DateTime CreatedAt { get; set; }
-
-    public virtual Permission PermissionNavigation { get; set; } = null!;
-
-    public virtual User User { get; set; } = null!;
+    public override (Guid, string) GetId() => (UserId, Permission);
 }

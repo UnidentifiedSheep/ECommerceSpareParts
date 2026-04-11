@@ -1,5 +1,6 @@
 using Abstractions.Models.Repository;
 using Main.Entities;
+using Main.Entities.Product;
 
 namespace Main.Abstractions.Interfaces.DbRepositories;
 

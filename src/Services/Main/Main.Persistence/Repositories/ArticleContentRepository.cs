@@ -1,5 +1,6 @@
 using Main.Abstractions.Interfaces.DbRepositories;
 using Main.Entities;
+using Main.Entities.Product;
 using Main.Persistence.Context;
 using Microsoft.EntityFrameworkCore;
 using Persistence.Extensions;
@@ -8,7 +9,7 @@ namespace Main.Persistence.Repositories;
 
 public class ArticleContentRepository(DContext context) : IArticleContentRepository
 {
-    public async Task<IEnumerable<ArticlesContent>> GetArticleContents(
+    public async Task<IEnumerable<ProductContent>> GetArticleContents(
         int articleId,
         bool track = true,
         CancellationToken cancellationToken = default)
@@ -20,14 +21,14 @@ public class ArticleContentRepository(DContext context) : IArticleContentReposit
             .ToListAsync(cancellationToken);
     }
 
-    public async Task<ArticlesContent?> GetArticleContent(
+    public async Task<ProductContent?> GetArticleContent(
         int articleId,
         int insideArticleId,
         bool track = true,
         CancellationToken cancellationToken = default)
     {
         return await context.ArticlesContents.ConfigureTracking(track)
-            .FirstOrDefaultAsync(x => x.MainArticleId == articleId && x.InsideArticleId == insideArticleId,
+            .FirstOrDefaultAsync(x => x.ParentProductId == articleId && x.ChildProductId == insideArticleId,
                 cancellationToken);
     }
 }

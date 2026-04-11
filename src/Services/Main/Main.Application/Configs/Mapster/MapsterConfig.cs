@@ -36,6 +36,7 @@ using Main.Application.Handlers.Currencies.CreateCurrency;
 using Main.Application.Handlers.StorageRoutes.AddStorageRoute;
 using Main.Application.Handlers.Storages.CreateStorage;
 using Main.Entities;
+using Main.Entities.Product;
 using Mapster;
 using Utils;
 using AmwArticleFullDto = Main.Abstractions.Dtos.Amw.Articles.ArticleFullDto;
@@ -82,11 +83,11 @@ public static class MapsterConfig
             .Map(d => d.Order, s => s.Order)
             .Map(d => d.Type, s => s.Type);
 
-        TypeAdapterConfig<ArticleCoefficient, ArticleCoefficientDto>.NewConfig()
-            .Map(d => d.ArticleId, s => s.ArticleId)
+        TypeAdapterConfig<ProductCoefficient, ArticleCoefficientDto>.NewConfig()
+            .Map(d => d.ArticleId, s => s.ProductId)
             .Map(d => d.ValidTill, s => s.ValidTill)
             .Map(d => d.CreatedAt, s => s.CreatedAt)
-            .Map(d => d.Coefficient, s => s.CoefficientNameNavigation);
+            .Map(d => d.Coefficient, s => s.Coefficient);
 
         TypeAdapterConfig<Coefficient, CoefficientDto>.NewConfig()
             .Map(d => d.Value, s => s.Value)
@@ -188,7 +189,7 @@ public static class MapsterConfig
             .Map(dest => dest.ArticleNumber, src => src.Sku)
             .Map(dest => dest.CurrentStock, src => src.Stock);
 
-        TypeAdapterConfig<ArticlesContent, ContentArticleDto>.NewConfig()
+        TypeAdapterConfig<ProductContent, ContentArticleDto>.NewConfig()
             .IgnoreNonMapped(true)
             .Map(d => d.Quantity, src => src.Quantity)
             .Map(d => d.Article, s => s.InsideProduct);
@@ -212,7 +213,7 @@ public static class MapsterConfig
             .Map(d => d.Description, s => s.Description)
             .Map(d => d.ProducerName, s => s.Producer.Name)
             .Map(d => d.ProducerId, s => s.ProducerId)
-            .Map(d => d.Images, s => s.ArticleImages.Select(x => x.Path))
+            .Map(d => d.Images, s => s.ProductImages.Select(x => x.Path))
             .Map(d => d.CurrentStock, s => s.Stock)
             .Map(d => d.IndicatorColor, s => s.Indicator);
 
@@ -260,7 +261,7 @@ public static class MapsterConfig
             .Map(d => d.Description, s => s.Description)
             .Map(d => d.ProducerName, s => s.Producer.Name)
             .Map(d => d.ProducerId, s => s.ProducerId)
-            .Map(d => d.Images, s => s.ArticleImages.Select(x => x.Path))
+            .Map(d => d.Images, s => s.ProductImages.Select(x => x.Path))
             .Map(d => d.CurrentStock, s => s.Stock);
 
         //Producers
@@ -670,13 +671,13 @@ public static class MapsterConfig
             .Map(d => d.CarrierId, s => s.CarrierId.Value);
 
         //Article weight
-        TypeAdapterConfig<ArticleWeight, ArticleWeightDto>.NewConfig()
-            .Map(d => d.ArticleId, s => s.ArticleId)
+        TypeAdapterConfig<ProductWeight, ArticleWeightDto>.NewConfig()
+            .Map(d => d.ArticleId, s => s.ProductId)
             .Map(d => d.Weight, s => s.Weight)
             .Map(d => d.Unit, s => s.Unit);
 
         //Article size
-        TypeAdapterConfig<ArticleSize, ArticleSizeDto>.NewConfig()
+        TypeAdapterConfig<ProductId, ArticleSizeDto>.NewConfig()
             .Map(d => d.ArticleId, s => s.ArticleId)
             .Map(d => d.Height, s => s.Height)
             .Map(d => d.Width, s => s.Width)

@@ -8,25 +8,32 @@ public class ProductCharacteristicConfiguration : IEntityTypeConfiguration<Produ
 {
     public void Configure(EntityTypeBuilder<ProductCharacteristic> builder)
     {
-        builder.HasKey(e => e.ProductId).HasName("product_characteristics_pk");
-
         builder.ToTable("product_characteristics");
+        
+        builder.HasKey(e => new { e.ProductId, e.Name})
+            .HasName("product_characteristics_pk");
 
-        builder.HasIndex(e => e.Value, "product_characteristics_value_index");
-
-        builder.HasIndex(e => e.ProductId, "product_id__index");
-
-        builder.Property(e => e.ProductId).HasColumnName("product_id");
+        builder.HasIndex(e => e.ProductId)
+            .HasDatabaseName("product_characteristics_id_index");
+        
+        builder.HasIndex(e => new { e.Name, e.Value })
+            .HasDatabaseName("product_characteristics_name_value_index");
+        
+        builder.Property(e => e.ProductId)
+            .HasColumnName("product_id");
+        
         builder.Property(e => e.Name)
             .HasMaxLength(128)
             .HasColumnName("name");
+        
         builder.Property(e => e.Value)
             .HasMaxLength(128)
             .HasColumnName("value");
 
-        builder.HasOne(d => d.Product)
-            .WithMany(p => p.ArticleCharacteristics)
-            .HasForeignKey(d => d.ProductId)
-            .HasConstraintName("product_id_fk");
+        builder.HasOne<Entities.Product.Product>()
+            .WithMany(p => p.ProductCharacteristics)
+            .HasForeignKey(x => x.ProductId)
+            .OnDelete(DeleteBehavior.Cascade)
+            .HasConstraintName("product_characteristics_product_id_fk");
     }
 }

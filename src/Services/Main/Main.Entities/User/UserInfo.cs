@@ -13,6 +13,4 @@ public class UserInfo
     public string? Description { get; set; }
 
     public string SearchColumn { get; set; } = null!;
-
-    public virtual User User { get; set; } = null!;
 }

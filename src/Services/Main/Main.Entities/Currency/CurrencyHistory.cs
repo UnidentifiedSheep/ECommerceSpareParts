@@ -11,6 +11,4 @@ public class CurrencyHistory
     public decimal NewValue { get; set; }
 
     public DateTime Datetime { get; set; }
-
-    public virtual Currency Currency { get; set; } = null!;
 }

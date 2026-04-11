@@ -60,7 +60,7 @@ public class CalculateDeliveryCostHandler(
                ?? throw new StorageRouteNotFound(from, to);
     }
 
-    private async Task<Dictionary<int, ArticleSize>> GetSizes(
+    private async Task<Dictionary<int, ProductId>> GetSizes(
         IEnumerable<int> articleIds,
         CancellationToken cancellationToken)
     {
@@ -69,19 +69,19 @@ public class CalculateDeliveryCostHandler(
             .ToDictionary(x => x.ArticleId);
     }
 
-    private async Task<Dictionary<int, Entities.ArticleWeight>> GetWeights(
+    private async Task<Dictionary<int, Entities.ProductWeight>> GetWeights(
         IEnumerable<int> articleIds,
         CancellationToken cancellationToken)
     {
         return (await weightRepository
                 .GetArticleWeightsByIds(articleIds, false, cancellationToken))
-            .ToDictionary(x => x.ArticleId);
+            .ToDictionary(x => x.ProductId);
     }
 
     private LogisticsCalcResult GetDeliveryCost(
         StorageRoute route,
-        Dictionary<int, ArticleSize> sizes,
-        Dictionary<int, Entities.ArticleWeight> weights,
+        Dictionary<int, ProductId> sizes,
+        Dictionary<int, Entities.ProductWeight> weights,
         IEnumerable<LogisticsItemDto> items,
         int currencyId,
         LogisticsCalculationMode mode)

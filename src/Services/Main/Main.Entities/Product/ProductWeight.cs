@@ -3,14 +3,12 @@ using Enums;
 
 namespace Main.Entities;
 
-public class ArticleWeight
+public class ProductWeight
 {
     [Validate]
-    public int ArticleId { get; set; }
+    public int ProductId { get; set; }
 
     public decimal Weight { get; set; }
 
     public WeightUnit Unit { get; set; }
-
-    public virtual Product Product { get; set; } = null!;
 }

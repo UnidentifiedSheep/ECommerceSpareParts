@@ -1,5 +1,6 @@
 ﻿using System.Reflection;
 using Main.Entities;
+using Main.Entities.Product;
 using MassTransit;
 using MassTransit.EntityFrameworkCoreIntegration;
 using Microsoft.EntityFrameworkCore;
@@ -23,19 +24,19 @@ public partial class DContext : DbContext
 
     public virtual DbSet<ProductCharacteristic> ArticleCharacteristics { get; set; }
 
-    public virtual DbSet<ArticleCoefficient> ArticleCoefficients { get; set; }
+    public virtual DbSet<ProductCoefficient> ArticleCoefficients { get; set; }
 
-    public virtual DbSet<ArticleEan> ArticleEans { get; set; }
+    public virtual DbSet<ProductEan> ArticleEans { get; set; }
 
-    public virtual DbSet<ArticleImage> ArticleImages { get; set; }
+    public virtual DbSet<ProductImage> ArticleImages { get; set; }
 
     public virtual DbSet<ArticleSize> ArticleSizes { get; set; }
 
     public virtual DbSet<ArticleSupplierBuyInfo> ArticleSupplierBuyInfos { get; set; }
 
-    public virtual DbSet<ArticleWeight> ArticleWeights { get; set; }
+    public virtual DbSet<ProductWeight> ArticleWeights { get; set; }
 
-    public virtual DbSet<ArticlesContent> ArticlesContents { get; set; }
+    public virtual DbSet<ProductContent> ArticlesContents { get; set; }
 
     public virtual DbSet<ProductPair> ArticlesPairs { get; set; }
 
@@ -143,101 +144,9 @@ public partial class DContext : DbContext
             .HasPostgresExtension("pg_trgm")
             .HasPostgresExtension("pgcrypto");
 
-        modelBuilder.ApplyConfigurationsFromAssembly(Assembly.GetAssembly(GetType()!));
+        modelBuilder.ApplyConfigurationsFromAssembly(Assembly.GetAssembly(GetType())!);
 
-
-        modelBuilder.Entity<ProductCharacteristic>(entity =>
-        {
-            
-        });
-
-        modelBuilder.Entity<ArticleCoefficient>(entity =>
-        {
-            entity.HasKey(e => new { e.ArticleId, e.CoefficientName }).HasName("article_coefficients_pk");
-
-            entity.ToTable("article_coefficients");
-
-            entity.HasIndex(e => e.ValidTill, "article_coefficients_valid_till_index");
-
-            entity.Property(e => e.ArticleId).HasColumnName("article_id");
-            entity.Property(e => e.CoefficientName)
-                .HasMaxLength(56)
-                .HasColumnName("coefficient_name");
-            entity.Property(e => e.CreatedAt)
-                .HasDefaultValueSql("now()")
-                .HasColumnName("created_at");
-            entity.Property(e => e.ValidTill).HasColumnName("valid_till");
-
-            entity.HasOne(d => d.Product).WithMany(p => p.ArticleCoefficients)
-                .HasForeignKey(d => d.ArticleId)
-                .HasConstraintName("article_coefficients_articles_id_fk");
-
-            entity.HasOne(d => d.CoefficientNameNavigation).WithMany(p => p.ArticleCoefficients)
-                .HasForeignKey(d => d.CoefficientName)
-                .OnDelete(DeleteBehavior.Restrict)
-                .HasConstraintName("article_coefficients_coefficients_name_fk");
-        });
-
-        modelBuilder.Entity<ArticleEan>(entity =>
-        {
-            entity.HasKey(e => new { e.ArticleId, e.Ean }).HasName("article_ean_pk");
-
-            entity.ToTable("article_ean");
-
-            entity.HasIndex(e => e.Ean, "article_ean_ean_index");
-
-            entity.HasIndex(e => e.ArticleId, "article_ean_id__index");
-
-            entity.Property(e => e.ArticleId).HasColumnName("article_id");
-            entity.Property(e => e.Ean)
-                .HasMaxLength(24)
-                .HasColumnName("ean");
-
-            entity.HasOne(d => d.Product).WithMany(p => p.ArticleEans)
-                .HasForeignKey(d => d.ArticleId)
-                .HasConstraintName("article_id___fk");
-        });
-
-        modelBuilder.Entity<ArticleImage>(entity =>
-        {
-            entity.HasKey(e => e.Path).HasName("article_images_pk");
-
-            entity.ToTable("article_images");
-
-            entity.HasIndex(e => e.ArticleId, "article_images_id__index");
-
-            entity.Property(e => e.Path).HasColumnName("path");
-            entity.Property(e => e.ArticleId).HasColumnName("article_id");
-            entity.Property(e => e.Description)
-                .HasMaxLength(128)
-                .HasColumnName("description");
-
-            entity.HasOne(d => d.Product).WithMany(p => p.ArticleImages)
-                .HasForeignKey(d => d.ArticleId)
-                .HasConstraintName("article_id_fk");
-        });
-
-        modelBuilder.Entity<ArticleSize>(entity =>
-        {
-            entity.HasKey(e => e.ArticleId).HasName("article_sizes_pk");
-
-            entity.ToTable("article_sizes");
-
-            entity.Property(e => e.ArticleId)
-                .ValueGeneratedNever()
-                .HasColumnName("article_id");
-            entity.Property(e => e.Height).HasColumnName("height");
-            entity.Property(e => e.Length).HasColumnName("length");
-            entity.Property(e => e.Unit)
-                .HasMaxLength(24)
-                .HasColumnName("unit");
-            entity.Property(e => e.VolumeM3).HasColumnName("volume_m3");
-            entity.Property(e => e.Width).HasColumnName("width");
-
-            entity.HasOne(d => d.Product).WithOne(p => p.ArticleSize)
-                .HasForeignKey<ArticleSize>(d => d.ArticleId)
-                .HasConstraintName("article_sizes_articles_id_fk");
-        });
+        modelBuilder.AddFieldsForAuditableEntities();
 
         modelBuilder.Entity<ArticleSupplierBuyInfo>(entity =>
         {
@@ -277,70 +186,6 @@ public partial class DContext : DbContext
                 .HasConstraintName("article_supplier_buy_info_users_id_fk");
         });
 
-        modelBuilder.Entity<ArticleWeight>(entity =>
-        {
-            entity.HasKey(e => e.ArticleId).HasName("article_weight_pk");
-
-            entity.ToTable("article_weight");
-
-            entity.Property(e => e.ArticleId)
-                .ValueGeneratedNever()
-                .HasColumnName("article_id");
-            entity.Property(e => e.Unit)
-                .HasMaxLength(24)
-                .HasColumnName("unit");
-            entity.Property(e => e.Weight).HasColumnName("weight");
-
-            entity.HasOne(d => d.Product).WithOne(p => p.ArticleWeight)
-                .HasForeignKey<ArticleWeight>(d => d.ArticleId)
-                .HasConstraintName("article_weight_articles_id_fk");
-        });
-
-        modelBuilder.Entity<ArticlesContent>(entity =>
-        {
-            entity.HasKey(e => new { e.MainArticleId, e.InsideArticleId }).HasName("articles_content_pk");
-
-            entity.ToTable("articles_content");
-
-            entity.HasIndex(e => e.InsideArticleId, "article_main_inside_index");
-
-            entity.HasIndex(e => e.MainArticleId, "articles_content_main_article_id_index");
-
-            entity.Property(e => e.MainArticleId).HasColumnName("main_article_id");
-            entity.Property(e => e.InsideArticleId).HasColumnName("inside_article_id");
-            entity.Property(e => e.Quantity).HasColumnName("quantity");
-
-            entity.HasOne(d => d.InsideProduct).WithMany(p => p.ArticlesContentInsideArticles)
-                .HasForeignKey(d => d.InsideArticleId)
-                .HasConstraintName("articles_content_in_id___fk");
-
-            entity.HasOne(d => d.MainProduct).WithMany(p => p.ArticlesContentMainArticles)
-                .HasForeignKey(d => d.MainArticleId)
-                .HasConstraintName("articles_content_out_id___fk");
-        });
-
-        modelBuilder.Entity<ProductPair>(entity =>
-        {
-            entity.HasKey(e => new { ArticleLeft = e.Left, ArticleRight = e.Right }).HasName("articles_pair_pk");
-
-            entity.ToTable("articles_pair");
-
-            entity.HasIndex(e => e.Right, "IX_articles_pair_article_right");
-
-            entity.HasIndex(e => e.Left, "articles_pair_article_left_uindex").IsUnique();
-
-            entity.Property(e => e.Left).HasColumnName("article_left");
-            entity.Property(e => e.Right).HasColumnName("article_right");
-
-            entity.HasOne(d => d.ProductLeftNavigation).WithOne(p => p.ArticlesPairArticleLeftNavigation)
-                .HasForeignKey<ProductPair>(d => d.Left)
-                .HasConstraintName("articles_pair_articles_id_fk");
-
-            entity.HasOne(d => d.ProductRightNavigation).WithMany(p => p.ArticlesPairArticleRightNavigations)
-                .HasForeignKey(d => d.Right)
-                .OnDelete(DeleteBehavior.ClientSetNull)
-                .HasConstraintName("articles_pair_articles_id_fk_2");
-        });
 
         modelBuilder.Entity<Cart>(entity =>
         {
@@ -395,78 +240,6 @@ public partial class DContext : DbContext
                 .HasMaxLength(56)
                 .HasColumnName("type");
             entity.Property(e => e.Value).HasColumnName("value");
-        });
-
-        modelBuilder.Entity<Currency>(entity =>
-        {
-            entity.HasKey(e => e.Id).HasName("currency_pk");
-
-            entity.ToTable("currency");
-
-            entity.HasIndex(e => e.Code, "currency_code_uindex").IsUnique();
-
-            entity.HasIndex(e => e.CurrencySign, "currency_currency_sign_uindex").IsUnique();
-
-            entity.HasIndex(e => e.Name, "currency_name_uindex").IsUnique();
-
-            entity.HasIndex(e => e.ShortName, "currency_short_name_uindex").IsUnique();
-
-            entity.Property(e => e.Id).HasColumnName("id");
-            entity.Property(e => e.Code)
-                .HasMaxLength(26)
-                .HasColumnName("code");
-            entity.Property(e => e.CurrencySign)
-                .HasMaxLength(3)
-                .HasColumnName("currency_sign");
-            entity.Property(e => e.Name)
-                .HasMaxLength(128)
-                .HasColumnName("name");
-            entity.Property(e => e.ShortName)
-                .HasMaxLength(5)
-                .HasColumnName("short_name");
-        });
-
-        modelBuilder.Entity<CurrencyHistory>(entity =>
-        {
-            entity.HasKey(e => e.Id).HasName("currency_history_pk");
-
-            entity.ToTable("currency_history");
-
-            entity.HasIndex(e => e.CurrencyId, "IX_currency_history_currency_id");
-
-            entity.HasIndex(e => e.Datetime, "currency_history_datetime_index");
-
-            entity.HasIndex(e => e.NewValue, "currency_history_new_value_index");
-
-            entity.HasIndex(e => e.PrevValue, "currency_history_prev_value_index");
-
-            entity.Property(e => e.Id).HasColumnName("id");
-            entity.Property(e => e.CurrencyId).HasColumnName("currency_id");
-            entity.Property(e => e.Datetime)
-                .HasDefaultValueSql("now()")
-                .HasColumnName("datetime");
-            entity.Property(e => e.NewValue).HasColumnName("new_value");
-            entity.Property(e => e.PrevValue).HasColumnName("prev_value");
-
-            entity.HasOne(d => d.Currency).WithMany(p => p.CurrencyHistories)
-                .HasForeignKey(d => d.CurrencyId)
-                .HasConstraintName("currency_history_currency_id_fk");
-        });
-
-        modelBuilder.Entity<CurrencyToUsd>(entity =>
-        {
-            entity.HasKey(e => e.CurrencyId).HasName("currency_to_usd_pk");
-
-            entity.ToTable("currency_to_usd");
-
-            entity.Property(e => e.CurrencyId)
-                .ValueGeneratedNever()
-                .HasColumnName("currency_id");
-            entity.Property(e => e.ToUsd).HasColumnName("to_usd");
-
-            entity.HasOne(d => d.Currency).WithOne(p => p.CurrencyToUsd)
-                .HasForeignKey<CurrencyToUsd>(d => d.CurrencyId)
-                .HasConstraintName("currency_to_usd_currency_id_fk");
         });
 
         modelBuilder.Entity<DefaultSetting>(entity =>
@@ -1537,40 +1310,6 @@ public partial class DContext : DbContext
                 .HasConstraintName("transaction_versions_transactions_id_fk");
         });
 
-        modelBuilder.Entity<User>(entity =>
-        {
-            entity.HasKey(e => e.Id).HasName("users_pk");
-
-            entity.ToTable("users", "auth");
-
-            entity.HasIndex(e => e.NormalizedUserName, "users_normalized_user_name_index")
-                .HasMethod("gin")
-                .HasOperators("gin_trgm_ops");
-
-            entity.HasIndex(e => e.NormalizedUserName, "users_normalized_user_name_uindex").IsUnique();
-
-            entity.Property(e => e.Id)
-                .HasDefaultValueSql("gen_random_uuid()")
-                .HasColumnName("id");
-            entity.Property(e => e.AccessFailedCount).HasColumnName("access_failed_count");
-            entity.Property(e => e.CreatedAt)
-                .HasDefaultValueSql("now()")
-                .HasColumnName("created_at");
-            entity.Property(e => e.LastLoginAt).HasColumnName("last_login_at");
-            entity.Property(e => e.LockoutEnd).HasColumnName("lockout_end");
-            entity.Property(e => e.NormalizedUserName)
-                .HasMaxLength(36)
-                .HasColumnName("normalized_user_name");
-            entity.Property(e => e.PasswordHash).HasColumnName("password_hash");
-            entity.Property(e => e.TwoFactorEnabled).HasColumnName("two_factor_enabled");
-            entity.Property(e => e.UpdatedAt)
-                .HasDefaultValueSql("now()")
-                .HasColumnName("updated_at");
-            entity.Property(e => e.UserName)
-                .HasMaxLength(36)
-                .HasColumnName("user_name");
-        });
-
         modelBuilder.Entity<UserBalance>(entity =>
         {
             entity.HasKey(e => e.Id).HasName("user_balances_pk");
@@ -1602,176 +1341,6 @@ public partial class DContext : DbContext
                 .OnDelete(DeleteBehavior.Restrict)
                 .HasConstraintName("user_balances_users_id_fk");
         });
-
-        modelBuilder.Entity<UserDiscount>(entity =>
-        {
-            entity.HasKey(e => e.UserId).HasName("user_discounts_pk");
-
-            entity.ToTable("user_discounts");
-
-            entity.Property(e => e.UserId)
-                .ValueGeneratedNever()
-                .HasColumnName("user_id");
-            entity.Property(e => e.Discount).HasColumnName("discount");
-
-            entity.HasOne(d => d.User).WithOne(p => p.UserDiscount)
-                .HasForeignKey<UserDiscount>(d => d.UserId)
-                .HasConstraintName("user_discounts_users_id_fk");
-        });
-
-        modelBuilder.Entity<UserEmail>(entity =>
-        {
-            entity.HasKey(e => e.Id).HasName("user_emails_pk");
-
-            entity.ToTable("user_emails", "auth");
-
-            entity.HasIndex(e => e.NormalizedEmail, "user_emails_normalized_email_index")
-                .HasMethod("gin")
-                .HasOperators("gin_trgm_ops");
-
-            entity.HasIndex(e => e.NormalizedEmail, "user_emails_normalized_email_uindex").IsUnique();
-
-            entity.HasIndex(e => e.UserId, "user_emails_user_id_index");
-
-            entity.HasIndex(e => new { e.UserId, e.IsPrimary }, "user_emails_user_id_is_primary_uindex")
-                .IsUnique()
-                .HasFilter("(is_primary = true)");
-
-            entity.Property(e => e.Id)
-                .HasDefaultValueSql("gen_random_uuid()")
-                .HasColumnName("id");
-            entity.Property(e => e.Confirmed).HasColumnName("confirmed");
-            entity.Property(e => e.ConfirmedAt).HasColumnName("confirmed_at");
-            entity.Property(e => e.CreatedAt)
-                .HasDefaultValueSql("now()")
-                .HasColumnName("created_at");
-            entity.Property(e => e.Email)
-                .HasMaxLength(255)
-                .HasColumnName("email");
-            entity.Property(e => e.EmailType)
-                .HasMaxLength(50)
-                .HasColumnName("email_type");
-            entity.Property(e => e.IsPrimary).HasColumnName("is_primary");
-            entity.Property(e => e.NormalizedEmail)
-                .HasMaxLength(255)
-                .HasColumnName("normalized_email");
-            entity.Property(e => e.UpdatedAt)
-                .HasDefaultValueSql("now()")
-                .HasColumnName("updated_at");
-            entity.Property(e => e.UserId).HasColumnName("user_id");
-
-            entity.HasOne(d => d.User).WithMany(p => p.UserEmails)
-                .HasForeignKey(d => d.UserId)
-                .HasConstraintName("user_emails_users_id_fk");
-        });
-
-        modelBuilder.Entity<UserInfo>(entity =>
-        {
-            entity.HasKey(e => e.UserId).HasName("user_info_pk");
-
-            entity.ToTable("user_info", "auth");
-
-            entity.HasIndex(e => e.Description, "user_info_description_index")
-                .HasMethod("gin")
-                .HasOperators("gin_trgm_ops");
-
-            entity.HasIndex(e => e.IsSupplier, "user_info_is_supplier_index");
-
-            entity.HasIndex(e => e.Name, "user_info_name_index")
-                .HasMethod("gin")
-                .HasOperators("gin_trgm_ops");
-
-            entity.HasIndex(e => e.SearchColumn, "user_info_search_column_index")
-                .HasMethod("gin")
-                .HasOperators("gin_trgm_ops");
-
-            entity.HasIndex(e => e.Surname, "user_info_surname_index")
-                .HasMethod("gin")
-                .HasOperators("gin_trgm_ops");
-
-            entity.Property(e => e.UserId)
-                .ValueGeneratedNever()
-                .HasColumnName("user_id");
-            entity.Property(e => e.Description).HasColumnName("description");
-            entity.Property(e => e.IsSupplier).HasColumnName("is_supplier");
-            entity.Property(e => e.Name).HasColumnName("name");
-            entity.Property(e => e.SearchColumn).HasColumnName("search_column");
-            entity.Property(e => e.Surname).HasColumnName("surname");
-
-            entity.HasOne(d => d.User).WithOne(p => p.UserInfo)
-                .HasForeignKey<UserInfo>(d => d.UserId)
-                .HasConstraintName("user_info_users_id_fk");
-        });
-
-        modelBuilder.Entity<UserPermission>(entity =>
-        {
-            entity.HasKey(e => new { e.UserId, e.Permission }).HasName("user_permissions_pk");
-
-            entity.ToTable("user_permissions", "auth");
-
-            entity.HasIndex(e => e.Permission, "IX_user_permissions_permission");
-
-            entity.Property(e => e.UserId).HasColumnName("user_id");
-            entity.Property(e => e.Permission).HasColumnName("permission");
-            entity.Property(e => e.CreatedAt)
-                .HasDefaultValueSql("now()")
-                .HasColumnName("created_at");
-
-            entity.HasOne(d => d.PermissionNavigation).WithMany(p => p.UserPermissions)
-                .HasForeignKey(d => d.Permission)
-                .OnDelete(DeleteBehavior.Restrict)
-                .HasConstraintName("user_permissions_permissions_name_fk");
-
-            entity.HasOne(d => d.User).WithMany(p => p.UserPermissions)
-                .HasForeignKey(d => d.UserId)
-                .OnDelete(DeleteBehavior.Restrict)
-                .HasConstraintName("user_permissions_users_id_fk");
-        });
-
-        modelBuilder.Entity<UserPhone>(entity =>
-        {
-            entity.HasKey(e => e.Id).HasName("user_phones_pk");
-
-            entity.ToTable("user_phones", "auth");
-
-            entity.HasIndex(e => e.NormalizedPhone, "user_phones_normalized_phone_index")
-                .HasMethod("gin")
-                .HasOperators("gin_trgm_ops");
-
-            entity.HasIndex(e => e.NormalizedPhone, "user_phones_normalized_phone_uindex").IsUnique();
-
-            entity.HasIndex(e => new { e.UserId, e.IsPrimary }, "user_phones_user_id_is_primary_uindex")
-                .IsUnique()
-                .HasFilter("(is_primary = true)");
-
-            entity.Property(e => e.Id)
-                .HasDefaultValueSql("gen_random_uuid()")
-                .HasColumnName("id");
-            entity.Property(e => e.Confirmed).HasColumnName("confirmed");
-            entity.Property(e => e.ConfirmedAt).HasColumnName("confirmed_at");
-            entity.Property(e => e.CreatedAt)
-                .HasDefaultValueSql("now()")
-                .HasColumnName("created_at");
-            entity.Property(e => e.IsPrimary).HasColumnName("is_primary");
-            entity.Property(e => e.NormalizedPhone)
-                .HasMaxLength(32)
-                .HasColumnName("normalized_phone");
-            entity.Property(e => e.PhoneNumber)
-                .HasMaxLength(32)
-                .HasColumnName("phone_number");
-            entity.Property(e => e.PhoneType)
-                .HasMaxLength(32)
-                .HasColumnName("phone_type");
-            entity.Property(e => e.UpdatedAt)
-                .HasDefaultValueSql("now()")
-                .HasColumnName("updated_at");
-            entity.Property(e => e.UserId).HasColumnName("user_id");
-
-            entity.HasOne(d => d.User).WithMany(p => p.UserPhones)
-                .HasForeignKey(d => d.UserId)
-                .HasConstraintName("user_phones_user_id_fkey");
-        });
-
         modelBuilder.Entity<UserRole>(entity =>
         {
             entity.HasKey(e => new { e.UserId, e.RoleId }).HasName("user_roles_pk");

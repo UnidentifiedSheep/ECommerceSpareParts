@@ -28,7 +28,7 @@ public class StorageContentReservation
 
     public Guid? WhoUpdated { get; set; }
 
-    public virtual Product Product { get; set; } = null!;
+    public virtual Product.Product Product { get; set; } = null!;
 
     public virtual Currency? GivenCurrency { get; set; }
 

@@ -1,4 +1,5 @@
 ﻿using Main.Entities;
+using Main.Entities.Product;
 using Main.Persistence.Context;
 using MediatR;
 using Tests.MockData.ScenatioExtensions;

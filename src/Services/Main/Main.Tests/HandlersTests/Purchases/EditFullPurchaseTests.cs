@@ -6,6 +6,7 @@ using Main.Application.Handlers.Purchases.CreateFullPurchase;
 using Main.Application.Handlers.Purchases.EditFullPurchase;
 using Main.Application.Handlers.StorageRoutes.AddStorageRoute;
 using Main.Entities;
+using Main.Entities.Product;
 using Main.Enums;
 using Main.Persistence.Context;
 using MediatR;

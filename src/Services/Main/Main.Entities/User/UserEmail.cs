@@ -1,12 +1,11 @@
 ﻿using BulkValidation.Core.Attributes;
+using Domain;
 using Main.Enums;
 
 namespace Main.Entities;
 
-public class UserEmail
+public class UserEmail : AuditableEntity<UserEmail, string>
 {
-    public Guid Id { get; set; }
-
     public Guid UserId { get; set; }
 
     [Validate]
@@ -21,10 +20,6 @@ public class UserEmail
     public bool IsPrimary { get; set; }
 
     public DateTime? ConfirmedAt { get; set; }
-
-    public DateTime CreatedAt { get; set; }
-
-    public DateTime UpdatedAt { get; set; }
-
-    public virtual User User { get; set; } = null!;
+    
+    public override string GetId() => NormalizedEmail;
 }

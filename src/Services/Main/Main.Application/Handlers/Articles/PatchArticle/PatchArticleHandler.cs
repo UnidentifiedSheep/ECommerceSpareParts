@@ -9,6 +9,7 @@ using Main.Abstractions.Exceptions.Articles;
 using Main.Abstractions.Exceptions.Producers;
 using Main.Abstractions.Interfaces.DbRepositories;
 using Main.Application.Notifications;
+using Main.Entities.Product;
 using Mapster;
 using MassTransit;
 using MediatR;
@@ -28,7 +29,7 @@ public class PatchArticleHandler(
 {
     public async Task<Unit> Handle(PatchArticleCommand request, CancellationToken cancellationToken)
     {
-        var queryOptions = new QueryOptions<Entities.Product, int>()
+        var queryOptions = new QueryOptions<Product, int>()
         {
             Data = request.ArticleId
         }.WithTracking();

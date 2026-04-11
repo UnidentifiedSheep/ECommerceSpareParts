@@ -17,7 +17,7 @@ public class MapImgsToArticleHandler(IS3StorageService s3Storage, IUnitOfWork un
     public async Task<Unit> Handle(MapImgsToArticleCommand request, CancellationToken cancellationToken)
     {
         var keys = new HashSet<string>();
-        var toAdd = new List<ArticleImage>();
+        var toAdd = new List<ProductImage>();
         try
         {
             foreach (var img in request.Images)
@@ -27,9 +27,9 @@ public class MapImgsToArticleHandler(IS3StorageService s3Storage, IUnitOfWork un
                 var key = await s3Storage.UploadFileAsync(Global.ImageBucketName,
                     stream, path, "image/webp");
                 keys.Add(key);
-                toAdd.Add(new ArticleImage
+                toAdd.Add(new ProductImage
                 {
-                    ArticleId = request.ArticleId,
+                    ProductId = request.ArticleId,
                     Path = $"{Global.ServiceUrl}/{Global.ImageBucketName}/{path}"
                 });
             }

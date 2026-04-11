@@ -3,9 +3,9 @@ using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
 namespace Main.Persistence.Context.Configurations.Product;
 
-public class ProductConfiguration : IEntityTypeConfiguration<Entities.Product>
+public class ProductConfiguration : IEntityTypeConfiguration<Entities.Product.Product>
 {
-    public void Configure(EntityTypeBuilder<Entities.Product> builder)
+    public void Configure(EntityTypeBuilder<Entities.Product.Product> builder)
     {
         builder.HasKey(e => e.Id).HasName("products_id_pk");
 
@@ -74,19 +74,21 @@ public class ProductConfiguration : IEntityTypeConfiguration<Entities.Product>
             builder.Property(e => e.Stock)
                 .HasColumnName("stock");
 
-            builder.HasOne(d => d.Category).WithMany(p => p.Articles)
+            builder.HasOne(d => d.Category)
+                .WithMany(p => p.Articles)
                 .HasForeignKey(d => d.CategoryId)
                 .OnDelete(DeleteBehavior.Restrict)
                 .HasConstraintName("products_categories_id_fk");
 
-            builder.HasOne(d => d.Producer).WithMany(p => p.Articles)
+            builder.HasOne(d => d.Producer)
+                .WithMany(p => p.Articles)
                 .HasForeignKey(d => d.ProducerId)
                 .OnDelete(DeleteBehavior.Restrict)
                 .HasConstraintName("producer_id_fk");
 
             builder.HasOne(p => p.Pair)
                 .WithOne()
-                .HasForeignKey<Entities.Product>(p => p.PairId)
+                .HasForeignKey<Entities.Product.Product>(p => p.PairId)
                 .OnDelete(DeleteBehavior.SetNull);
     }
 }

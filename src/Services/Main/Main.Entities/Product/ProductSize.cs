@@ -3,10 +3,10 @@ using Enums;
 
 namespace Main.Entities;
 
-public class ArticleSize
+public class ProductSize
 {
     [Validate]
-    public int ArticleId { get; set; }
+    public int ProductId { get; set; }
 
     public decimal Length { get; set; }
 
@@ -17,6 +17,4 @@ public class ArticleSize
     public DimensionUnit Unit { get; set; }
 
     public decimal VolumeM3 { get; set; }
-
-    public virtual Product Product { get; set; } = null!;
 }

@@ -18,7 +18,7 @@ public class GetArticleCoefficientsHandler(IArticleCoefficients articleCoefficie
     {
         var coefficients = await articleCoefficientsRepository
             .GetArticlesCoefficients(request.ArticleIds, false, cancellationToken,
-                x => x.CoefficientNameNavigation);
+                x => x.Coefficient);
 
         var result = coefficients
             .ToDictionary(x => x.Key,

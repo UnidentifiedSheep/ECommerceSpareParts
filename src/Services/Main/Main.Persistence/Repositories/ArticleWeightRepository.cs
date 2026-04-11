@@ -8,22 +8,22 @@ namespace Main.Persistence.Repositories;
 
 public class ArticleWeightRepository(DContext context) : IArticleWeightRepository
 {
-    public async Task<ArticleWeight?> GetArticleWeight(
+    public async Task<ProductWeight?> GetArticleWeight(
         int articleId,
         bool track = true,
         CancellationToken token = default)
     {
         return await context.ArticleWeights.ConfigureTracking(track)
-            .FirstOrDefaultAsync(x => x.ArticleId == articleId, token);
+            .FirstOrDefaultAsync(x => x.ProductId == articleId, token);
     }
 
-    public async Task<IEnumerable<ArticleWeight>> GetArticleWeightsByIds(
+    public async Task<IEnumerable<ProductWeight>> GetArticleWeightsByIds(
         IEnumerable<int> ids,
         bool track = true,
         CancellationToken token = default)
     {
         return await context.ArticleWeights.ConfigureTracking(track)
-            .Where(x => ids.Contains(x.ArticleId))
+            .Where(x => ids.Contains(x.ProductId))
             .ToListAsync(token);
     }
 }

@@ -8,14 +8,14 @@ namespace Main.Persistence.Repositories;
 
 public class ArticleImageRepository(DContext context) : IArticleImageRepository
 {
-    public async Task<IEnumerable<ArticleImage>> GetArticlesImages(
+    public async Task<IEnumerable<ProductImage>> GetArticlesImages(
         IEnumerable<int> articleIds,
         bool track = true,
         CancellationToken cancellationToken = default)
     {
         return await context.ArticleImages
             .ConfigureTracking(track)
-            .Where(x => articleIds.Contains(x.ArticleId))
+            .Where(x => articleIds.Contains(x.ProductId))
             .ToListAsync(cancellationToken);
     }
 }
