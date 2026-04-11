@@ -119,7 +119,8 @@ public partial class DContext : DbContext
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
     {
         base.OnConfiguring(optionsBuilder);
-        optionsBuilder.AddInterceptors(new SelectForUpdateCommandInterceptor());
+        
+        RegisterInterceptors(optionsBuilder);
     }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
@@ -148,6 +149,12 @@ public partial class DContext : DbContext
             .AllEnumsToString();
 
         OnModelCreatingPartial(modelBuilder);
+    }
+
+    private void RegisterInterceptors(DbContextOptionsBuilder optionsBuilder)
+    {
+        optionsBuilder.AddInterceptors(new SelectForUpdateCommandInterceptor());
+        optionsBuilder.AddInterceptors(new AuditableEntitySaveChangesInterceptor());
     }
 
     partial void OnModelCreatingPartial(ModelBuilder modelBuilder);
