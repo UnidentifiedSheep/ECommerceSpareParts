@@ -614,7 +614,7 @@ public static class MapsterConfig
             .Map(d => d.Description, s => s.Description);
 
         TypeAdapterConfig<Cart, CartItemDto>.NewConfig()
-            .Map(d => d.ArticleId, s => s.ArticleId)
+            .Map(d => d.ArticleId, s => s.ProductId)
             .Map(d => d.Count, s => s.Count)
             .Map(d => d.CreatedAt, s => s.CreatedAt)
             .Map(d => d.Article, s => s.Product);

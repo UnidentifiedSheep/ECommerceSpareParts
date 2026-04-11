@@ -9,7 +9,7 @@ public class SearchLogModel
         UserId = userId;
         SearchPlace = searchPlace;
         Query = query ?? throw new ArgumentNullException(nameof(query), "Query cannot be null.");
-        SearchDateTime = DateTime.Now;
+        SearchDateTime = DateTime.UtcNow;
     }
 
     public Guid UserId { get; set; }

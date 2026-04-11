@@ -21,5 +21,6 @@ public class Permission : AuditableEntity<Permission, string>
     public string Name { get; set; } = null!;
 
     public string? Description { get; set; }
+    public virtual ICollection<RolePermission> RolePermissions { get; set; } = new List<RolePermission>();
     public override string GetId() => Name;
 }

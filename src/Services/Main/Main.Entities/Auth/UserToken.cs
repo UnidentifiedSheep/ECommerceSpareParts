@@ -1,9 +1,10 @@
 ﻿using System.Net;
+using Domain;
 using Main.Enums;
 
 namespace Main.Entities;
 
-public class UserToken
+public class UserToken : AuditableEntity<UserToken, Guid>
 {
     public Guid Id { get; set; }
 
@@ -14,8 +15,6 @@ public class UserToken
     public List<string> Permissions { get; set; } = null!;
 
     public TokenType Type { get; set; }
-
-    public DateTime IssuedAt { get; set; }
 
     public DateTime? ExpiresAt { get; set; }
 
@@ -29,9 +28,6 @@ public class UserToken
 
     public string? UserAgent { get; set; }
 
-    public DateTime CreatedAt { get; set; }
-
-    public DateTime UpdatedAt { get; set; }
-
     public virtual User User { get; set; } = null!;
+    public override Guid GetId() => Id;
 }

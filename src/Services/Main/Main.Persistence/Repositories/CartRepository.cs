@@ -16,7 +16,7 @@ public class CartRepository(DContext context) : ICartRepository
     {
         return await context.Carts
             .ConfigureTracking(track)
-            .FirstOrDefaultAsync(x => x.UserId == userId && x.ArticleId == articleId, cancellationToken);
+            .FirstOrDefaultAsync(x => x.UserId == userId && x.ProductId == articleId, cancellationToken);
     }
 
     public async Task<IEnumerable<Cart>> GetCartItemsAsync(

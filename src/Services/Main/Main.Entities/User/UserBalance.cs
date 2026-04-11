@@ -9,8 +9,6 @@ public class UserBalance
     public int CurrencyId { get; set; }
 
     public decimal Balance { get; set; }
-
-    public virtual Currency Currency { get; set; } = null!;
-
-    public virtual User User { get; set; } = null!;
+    
+    public uint RowVersion { get; set; }
 }

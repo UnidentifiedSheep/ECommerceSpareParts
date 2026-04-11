@@ -12,6 +12,4 @@ public class ProducersOtherName
 
     [ValidateTuple("PK")]
     public string WhereUsed { get; set; } = null!;
-
-    public virtual Producer Producer { get; set; } = null!;
 }

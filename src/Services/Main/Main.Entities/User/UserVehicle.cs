@@ -1,8 +1,10 @@
-﻿namespace Main.Entities;
+﻿using Domain;
 
-public class UserVehicle
+namespace Main.Entities;
+
+public class UserVehicle : AuditableEntity<UserVehicle, Guid>
 {
-    public string Id { get; set; } = null!;
+    public Guid Id { get; set; }
 
     public Guid UserId { get; set; }
 
@@ -21,8 +23,5 @@ public class UserVehicle
     public int? ProductionYear { get; set; }
 
     public string? Comment { get; set; }
-
-    public DateTime CreatedAt { get; set; }
-
-    public virtual User User { get; set; } = null!;
+    public override Guid GetId() => Id;
 }

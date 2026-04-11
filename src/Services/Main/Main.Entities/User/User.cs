@@ -22,5 +22,6 @@ public class User : AuditableEntity<User, Guid>
     public virtual ICollection<UserPhone> UserPhones { get; set; } = new List<UserPhone>();
     public virtual ICollection<UserRole> UserRoles { get; set; } = new List<UserRole>();
     public virtual ICollection<UserVehicle> UserVehicles { get; set; } = new List<UserVehicle>();
+    public virtual ICollection<Cart> CartItems { get; set; } = new List<Cart>();
     public override Guid GetId() => Id;
 }

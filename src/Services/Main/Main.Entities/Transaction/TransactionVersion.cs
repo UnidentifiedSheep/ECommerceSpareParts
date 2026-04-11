@@ -23,12 +23,4 @@ public class TransactionVersion
     public int Version { get; set; }
 
     public DateTime VersionCreatedDatetime { get; set; }
-
-    public virtual Currency Currency { get; set; } = null!;
-
-    public virtual User Receiver { get; set; } = null!;
-
-    public virtual User Sender { get; set; } = null!;
-
-    public virtual Transaction Transaction { get; set; } = null!;
 }

@@ -33,22 +33,4 @@ public class Transaction
     public DateTime? DeletedAt { get; set; }
 
     public Guid? DeletedBy { get; set; }
-
-    public virtual Currency Currency { get; set; } = null!;
-
-    public virtual User? DeletedByNavigation { get; set; }
-
-    public virtual PurchaseLogistic? PurchaseLogistic { get; set; }
-
-    public virtual ICollection<Purchase> Purchases { get; set; } = new List<Purchase>();
-
-    public virtual User Receiver { get; set; } = null!;
-
-    public virtual ICollection<Sale> Sales { get; set; } = new List<Sale>();
-
-    public virtual User Sender { get; set; } = null!;
-
-    public virtual ICollection<TransactionVersion> TransactionVersions { get; set; } = new List<TransactionVersion>();
-
-    public virtual User WhoMadeUser { get; set; } = null!;
 }

@@ -11,6 +11,4 @@ public class UserSearchHistory
     public string Query { get; set; } = null!;
 
     public DateTime SearchDateTime { get; set; }
-
-    public virtual User User { get; set; } = null!;
 }

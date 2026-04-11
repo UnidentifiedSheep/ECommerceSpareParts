@@ -15,7 +15,7 @@ public class AddToCartHandler(IUnitOfWork unitOfWork) : ICommandHandler<AddToCar
         var cartItem = new Entities.Cart
         {
             UserId = request.UserId,
-            ArticleId = request.ArticleId,
+            ProductId = request.ArticleId,
             Count = request.Count
         };
         await unitOfWork.AddAsync(cartItem, cancellationToken);

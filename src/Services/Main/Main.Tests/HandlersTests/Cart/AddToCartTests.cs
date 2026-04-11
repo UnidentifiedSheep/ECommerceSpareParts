@@ -75,7 +75,7 @@ public class AddToCartTests : IAsyncLifetime
 
         await _mediator.Send(command);
 
-        var cartItem = await _context.Carts.FirstOrDefaultAsync(x => x.UserId == _userId && x.ArticleId == _articleId);
+        var cartItem = await _context.Carts.FirstOrDefaultAsync(x => x.UserId == _userId && x.ProductId == _articleId);
         Assert.NotNull(cartItem);
         Assert.Equal(count, cartItem.Count);
     }

@@ -81,7 +81,7 @@ public class ProductConfiguration : IEntityTypeConfiguration<Entities.Product.Pr
                 .HasConstraintName("products_categories_id_fk");
 
             builder.HasOne(d => d.Producer)
-                .WithMany(p => p.Articles)
+                .WithMany()
                 .HasForeignKey(d => d.ProducerId)
                 .OnDelete(DeleteBehavior.Restrict)
                 .HasConstraintName("producer_id_fk");
