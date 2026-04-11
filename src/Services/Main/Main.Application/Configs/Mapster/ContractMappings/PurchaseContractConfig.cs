@@ -27,7 +27,7 @@ public static class PurchaseContractConfig
         TypeAdapterConfig<PurchaseContent, ContractPurchaseContent>.NewConfig()
             .Map(d => d.Id, s => s.Id)
             .Map(d => d.PurchaseId, s => s.PurchaseId)
-            .Map(d => d.ArticleId, s => s.ArticleId)
+            .Map(d => d.ArticleId, s => s.ProductId)
             .Map(d => d.Count, s => s.Count)
             .Map(d => d.Price, s => s.Price)
             .Map(d => d.TotalSum, s => s.TotalSum)

@@ -50,15 +50,15 @@ public class EditPurchaseHandler(IPurchaseRepository purchaseRepository, IUnitOf
             .Where(x => !existingIds.Contains(x.Id)).ToList();
 
         var allArticleIds = content.Select(x => x.ArticleId)
-            .Concat(purchaseContents.Values.Select(x => x.ArticleId))
+            .Concat(purchaseContents.Values.Select(x => x.ProductId))
             .Distinct();
 
         foreach (var articleId in allArticleIds)
             result[articleId] = new Dictionary<decimal, int>();
 
         foreach (var item in toDelete)
-            if (!result[item.ArticleId].TryAdd(item.Price, -item.Count))
-                result[item.ArticleId][item.Price] += -item.Count;
+            if (!result[item.ProductId].TryAdd(item.Price, -item.Count))
+                result[item.ProductId][item.Price] += -item.Count;
 
         SetFields(purchase, currencyId, purchaseDateTime, comment, whoUpdated);
 
@@ -78,7 +78,7 @@ public class EditPurchaseHandler(IPurchaseRepository purchaseRepository, IUnitOf
             }
             else
             {
-                if (item.ArticleId != existingContent!.ArticleId)
+                if (item.ArticleId != existingContent!.ProductId)
                     throw new ArticleDoesntMatchContentException(item.ArticleId);
                 var delta = item.Count - existingContent.Count;
                 item.Adapt(existingContent);

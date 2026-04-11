@@ -9,6 +9,4 @@ public class PurchaseContentLogistic
     public decimal AreaM3 { get; set; }
 
     public decimal Price { get; set; }
-
-    public virtual PurchaseContent PurchaseContent { get; set; } = null!;
 }

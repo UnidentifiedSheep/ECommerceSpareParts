@@ -28,9 +28,5 @@ public class PurchaseLogistic
 
     public virtual Currency Currency { get; set; } = null!;
 
-    public virtual Purchase Purchase { get; set; } = null!;
-
-    public virtual StorageRoute Route { get; set; } = null!;
-
     public virtual Transaction Transaction { get; set; } = null!;
 }

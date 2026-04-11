@@ -124,7 +124,7 @@ public static class MapsterConfig
             .Map(dest => dest.Count, src => src.Count);
 
         TypeAdapterConfig<NewPurchaseContentDto, PurchaseContent>.NewConfig()
-            .Map(dest => dest.ArticleId, src => src.ArticleId)
+            .Map(dest => dest.ProductId, src => src.ArticleId)
             .Map(dest => dest.Count, src => src.Count)
             .Map(dest => dest.Price, src => src.Price)
             .Map(dest => dest.TotalSum, src => src.Price * src.Count)
@@ -312,7 +312,7 @@ public static class MapsterConfig
             .IgnoreIf((src, dest) => src.Id == null, dest => dest.Id)
             .Map(d => d.Id, src => src.Id)
             .Map(d => d.Comment, s => s.Comment)
-            .Map(d => d.ArticleId, s => s.ArticleId)
+            .Map(d => d.ProductId, s => s.ArticleId)
             .Map(d => d.Price, s => s.Price)
             .Map(d => d.Count, s => s.Count)
             .Map(d => d.TotalSum, s => s.Price * s.Count);

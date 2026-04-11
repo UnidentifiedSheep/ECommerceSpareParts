@@ -87,7 +87,7 @@ public class DeleteFullPurchaseHandler(
         CancellationToken cancellationToken = default)
     {
         var toRemoveFromStorage = purchaseContents
-            .GroupBy(pc => pc.ArticleId)
+            .GroupBy(pc => pc.ProductId)
             .ToDictionary(
                 g => g.Key,
                 g => g.Sum(x => x.Count)

@@ -9,7 +9,7 @@ public class PurchaseContent
 
     public string PurchaseId { get; set; } = null!;
 
-    public int ArticleId { get; set; }
+    public int ProductId { get; set; }
 
     public int Count { get; set; }
 
@@ -23,9 +23,5 @@ public class PurchaseContent
 
     public virtual Product.Product Product { get; set; } = null!;
 
-    public virtual Purchase Purchase { get; set; } = null!;
-
     public virtual PurchaseContentLogistic? PurchaseContentLogistic { get; set; }
-
-    public virtual StorageContent? StorageContent { get; set; }
 }
