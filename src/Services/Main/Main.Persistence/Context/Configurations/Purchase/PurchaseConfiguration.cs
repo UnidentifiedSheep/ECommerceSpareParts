@@ -80,8 +80,8 @@ public class PurchaseConfiguration : IEntityTypeConfiguration<Entities.Purchase>
             .OnDelete(DeleteBehavior.Restrict)
             .HasConstraintName("purchase_currency_id_fk");
 
-        builder.HasOne<Storage>()
-            .WithMany(p => p.Purchases)
+        builder.HasOne<Entities.Storage>()
+            .WithMany()
             .HasForeignKey(d => d.Storage)
             .OnDelete(DeleteBehavior.Restrict)
             .HasConstraintName("purchase_storages_name_fk");

@@ -13,7 +13,7 @@ public class ArticleImageRepository(DContext context) : IArticleImageRepository
         bool track = true,
         CancellationToken cancellationToken = default)
     {
-        return await context.ArticleImages
+        return await context.ProductImages
             .ConfigureTracking(track)
             .Where(x => articleIds.Contains(x.ProductId))
             .ToListAsync(cancellationToken);

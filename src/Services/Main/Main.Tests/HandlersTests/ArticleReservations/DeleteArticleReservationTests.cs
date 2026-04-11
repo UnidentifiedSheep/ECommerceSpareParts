@@ -39,7 +39,7 @@ public class DeleteArticleReservationTests : IAsyncLifetime
         await _mediator.AddMockStorage();
         await _context.AddMockCurrencies();
 
-        _product = await _context.Articles.FirstAsync();
+        _product = await _context.Products.FirstAsync();
         _user = await _context.Users.FirstAsync();
         _whoCreated = await _context.Users.FirstAsync(x => x.Id != _user.Id);
 

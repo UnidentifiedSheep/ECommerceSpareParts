@@ -47,7 +47,7 @@ public class UpsertPurchaseLogisticsTests : IAsyncLifetime
         var user = await _context.Users.FirstAsync();
         var storage = await _context.Storages.FirstAsync();
         var storageTo = await _context.Storages.FirstAsync(x => x.Name != storage.Name);
-        var article = await _context.Articles.FirstAsync();
+        var article = await _context.Products.FirstAsync();
         var currency = await _context.Currencies.FirstAsync();
 
         await _mediator.AddMockStorageContents([article.Id], currency.Id, storage.Name, user.Id);

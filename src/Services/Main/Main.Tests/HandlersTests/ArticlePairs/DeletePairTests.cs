@@ -29,7 +29,7 @@ public class DeletePairTests : IAsyncLifetime
     public async Task InitializeAsync()
     {
         await _mediator.AddMockProducersAndArticles();
-        var articles = await _context.Articles.Take(2).ToListAsync();
+        var articles = await _context.Products.Take(2).ToListAsync();
         _leftArticleId = articles[0].Id;
         _rightArticleId = articles[1].Id;
         await _mediator.Send(new CreatePairCommand(_leftArticleId, _rightArticleId));
@@ -62,7 +62,7 @@ public class DeletePairTests : IAsyncLifetime
     [Fact]
     public async Task DeletePair_ForArticleWithoutPairs_DoesNothingAndSucceeds()
     {
-        var anyArticleId = await _context.Articles.Select(a => a.Id).FirstAsync();
+        var anyArticleId = await _context.Products.Select(a => a.Id).FirstAsync();
 
         var cmd = new DeletePairCommand(anyArticleId);
         var result = await _mediator.Send(cmd);

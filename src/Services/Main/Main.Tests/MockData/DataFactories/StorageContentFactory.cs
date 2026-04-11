@@ -6,7 +6,7 @@ namespace Tests.MockData.DataFactories;
 public static class StorageContentFactory
 {
     private static readonly Faker<StorageContent> _faker = new Faker<StorageContent>()
-        .RuleFor(x => x.ArticleId, f => f.UniqueIndex)
+        .RuleFor(x => x.ProductId, f => f.UniqueIndex)
         .RuleFor(x => x.CurrencyId, f => f.UniqueIndex)
         .RuleFor(x => x.BuyPrice, f => decimal.Parse(f.Commerce.Price()))
         .RuleFor(x => x.BuyPriceInUsd, f => decimal.Parse(f.Commerce.Price()))
@@ -25,7 +25,7 @@ public static class StorageContentFactory
         IEnumerable<string> storageNames)
     {
         var clone = _faker.Clone()
-            .RuleFor(x => x.ArticleId, f => f.PickRandom(articleIds))
+            .RuleFor(x => x.ProductId, f => f.PickRandom(articleIds))
             .RuleFor(x => x.StorageName, f => f.PickRandom(storageNames))
             .RuleFor(x => x.CurrencyId, f => f.PickRandom(currencyIds));
 

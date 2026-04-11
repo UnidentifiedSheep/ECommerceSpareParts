@@ -42,7 +42,7 @@ public class DeleteSaleTests : IAsyncLifetime
 
         _user = await _context.Users.FirstAsync();
         _storage = await _context.Storages.FirstAsync();
-        var articleIds = await _context.Articles.Select(a => a.Id).ToListAsync();
+        var articleIds = await _context.Products.Select(a => a.Id).ToListAsync();
         var storage = await _context.Storages.FirstAsync();
         var currency = await _context.Currencies.FirstAsync();
 

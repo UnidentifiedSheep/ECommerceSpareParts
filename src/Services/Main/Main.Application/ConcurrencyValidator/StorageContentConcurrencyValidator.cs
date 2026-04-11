@@ -8,7 +8,7 @@ public class StorageContentConcurrencyValidator : IConcurrencyValidator<StorageC
 {
     public bool IsValid(StorageContent item, string concurrencyCode, out string validCode)
     {
-        validCode = HashUtils.ComputeHash(item.Id, item.ArticleId,
+        validCode = HashUtils.ComputeHash(item.Id, item.ProductId,
             item.BuyPrice, item.CurrencyId, item.StorageName, item.BuyPriceInUsd, item.Count, item.PurchaseDatetime);
         return validCode == concurrencyCode;
     }

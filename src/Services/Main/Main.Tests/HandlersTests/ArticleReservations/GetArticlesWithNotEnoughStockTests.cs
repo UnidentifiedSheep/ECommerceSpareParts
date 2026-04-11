@@ -42,7 +42,7 @@ public class GetArticlesWithNotEnoughStockTests : IAsyncLifetime
         await _mediator.AddMockStorage();
         await _context.AddMockCurrencies();
 
-        _product = await _context.Articles.FirstAsync();
+        _product = await _context.Products.FirstAsync();
         _buyer = await _context.Users.FirstAsync();
         _otherUser = await _context.Users.FirstAsync(x => x.Id != _buyer.Id);
         _currency = await _context.Currencies.FirstAsync();
@@ -78,7 +78,7 @@ public class GetArticlesWithNotEnoughStockTests : IAsyncLifetime
     [Fact]
     public async Task NotEnoughByStock_WhenNeededExceedsStorage()
     {
-        var articleCount = await _context.Articles.AsNoTracking().FirstAsync(x => x.Id == _product.Id);
+        var articleCount = await _context.Products.AsNoTracking().FirstAsync(x => x.Id == _product.Id);
 
         var query = new GetArticlesWithNotEnoughStockQuery(_buyer.Id, _storageName, false, new Dictionary<int, int>
         {
@@ -93,7 +93,7 @@ public class GetArticlesWithNotEnoughStockTests : IAsyncLifetime
     [Fact]
     public async Task NotEnoughByReservation_WhenOthersReservationsMakeItInsufficient()
     {
-        var article = await _context.Articles.AsNoTracking().FirstAsync(x => x.Id == _product.Id);
+        var article = await _context.Products.AsNoTracking().FirstAsync(x => x.Id == _product.Id);
         // Needed 8, stock 10 -> stockDiff = 2; others 5; user 1 -> reservationsDiff = 2 - 5 + 1 = -2
         var query = new GetArticlesWithNotEnoughStockQuery(_buyer.Id, _storageName, false, new Dictionary<int, int>
         {

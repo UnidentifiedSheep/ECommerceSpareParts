@@ -172,7 +172,7 @@ public class CreateFullPurchaseTests : IAsyncLifetime
 
     private async Task<List<Product>> GetArticlesAsync()
     {
-        return await _testContext.DbContext.Articles
+        return await _testContext.DbContext.Products
             .ToListAsync();
     }
 }

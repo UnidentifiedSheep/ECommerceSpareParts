@@ -13,7 +13,7 @@ public class ArticleCharacteristicsRepository(DContext context) : IArticleCharac
         bool track = true,
         CancellationToken cancellationToken = default)
     {
-        return await context.ArticleCharacteristics.ConfigureTracking(track).Where(x => x.ProductId == articleId)
+        return await context.ProductCharacteristics.ConfigureTracking(track).Where(x => x.ProductId == articleId)
             .ToListAsync(cancellationToken);
     }
 
@@ -23,7 +23,7 @@ public class ArticleCharacteristicsRepository(DContext context) : IArticleCharac
         bool track = true,
         CancellationToken cancellationToken = default)
     {
-        return await context.ArticleCharacteristics
+        return await context.ProductCharacteristics
             .ConfigureTracking(track)
             .Where(x => ids.Contains(x.Id) && (articleId == null || x.ProductId == articleId))
             .ToListAsync(cancellationToken);
@@ -34,7 +34,7 @@ public class ArticleCharacteristicsRepository(DContext context) : IArticleCharac
         bool track = true,
         CancellationToken cancellationToken = default)
     {
-        return await context.ArticleCharacteristics.ConfigureTracking(track)
+        return await context.ProductCharacteristics.ConfigureTracking(track)
             .FirstOrDefaultAsync(x => x.Id == id, cancellationToken);
     }
 }

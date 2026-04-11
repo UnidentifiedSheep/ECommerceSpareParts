@@ -42,7 +42,7 @@ public class EditStorageContentTests : IAsyncLifetime
         await _context.AddMockCurrencies();
 
         _user = await _context.Users.FirstAsync();
-        var articleIds = await _context.Articles.Select(a => a.Id).ToListAsync();
+        var articleIds = await _context.Products.Select(a => a.Id).ToListAsync();
         var storage = await _context.Storages.FirstAsync();
         var currency = await _context.Currencies.FirstAsync();
 
@@ -126,9 +126,9 @@ public class EditStorageContentTests : IAsyncLifetime
         var prevMovementCount = await _context.StorageMovements.CountAsync();
         var content = await _context.StorageContents
             .AsNoTracking().FirstAsync();
-        var articleBefore = await _context.Articles
+        var articleBefore = await _context.Products
             .AsNoTracking()
-            .FirstAsync(x => x.Id == content.ArticleId);
+            .FirstAsync(x => x.Id == content.ProductId);
         var dto = new PatchStorageContentDto
         {
             Count = new PatchField<int>
@@ -158,9 +158,9 @@ public class EditStorageContentTests : IAsyncLifetime
         await _mediator.Send(command);
 
         var updated = await _context.StorageContents.FindAsync(content.Id);
-        var articleAfter = await _context.Articles
+        var articleAfter = await _context.Products
             .AsNoTracking()
-            .FirstAsync(x => x.Id == content.ArticleId);
+            .FirstAsync(x => x.Id == content.ProductId);
         var currMovementCount = await _context.StorageMovements.CountAsync();
         var movement = await _context.StorageMovements.OrderBy(x => x.Id).LastOrDefaultAsync();
 

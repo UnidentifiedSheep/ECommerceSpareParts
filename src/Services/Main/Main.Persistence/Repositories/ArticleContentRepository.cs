@@ -14,7 +14,7 @@ public class ArticleContentRepository(DContext context) : IArticleContentReposit
         bool track = true,
         CancellationToken cancellationToken = default)
     {
-        return await context.ArticlesContents.ConfigureTracking(track)
+        return await context.ProductContents.ConfigureTracking(track)
             .Include(x => x.InsideProduct)
             .ThenInclude(x => x.Producer)
             .Where(x => x.MainArticleId == articleId)
@@ -27,7 +27,7 @@ public class ArticleContentRepository(DContext context) : IArticleContentReposit
         bool track = true,
         CancellationToken cancellationToken = default)
     {
-        return await context.ArticlesContents.ConfigureTracking(track)
+        return await context.ProductContents.ConfigureTracking(track)
             .FirstOrDefaultAsync(x => x.ParentProductId == articleId && x.ChildProductId == insideArticleId,
                 cancellationToken);
     }

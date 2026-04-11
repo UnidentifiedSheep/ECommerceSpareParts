@@ -64,7 +64,7 @@ public class RestoreContentHandler(
             {
                 content = detail.Adapt<StorageContent>();
                 content.BuyPriceInUsd = currencyConverter.ConvertToUsd(content.BuyPrice, content.CurrencyId);
-                content.ArticleId = articleId;
+                content.ProductId = articleId;
                 await unitOfWork.AddAsync(content, cancellationToken);
             }
 

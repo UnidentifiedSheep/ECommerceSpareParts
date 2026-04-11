@@ -76,7 +76,7 @@ public class MakeLinkageBetweenArticlesTests : IAsyncLifetime
         var result = await _mediator.Send(command);
         Assert.Equal(Unit.Value, result);
 
-        var crosses = await _context.Articles
+        var crosses = await _context.Products
             .Where(x => (x.Id == 1 && x.ArticleCrosses.FirstOrDefault(z => z.Id == 2) != null) ||
                         (x.Id == 2 && x.ArticleCrosses.FirstOrDefault(z => z.Id == 1) != null))
             .CountAsync();
@@ -191,14 +191,14 @@ public class MakeLinkageBetweenArticlesTests : IAsyncLifetime
 
     private async Task ClearCrosses(DContext context)
     {
-        var articles = await context.Articles.Include(a => a.ArticleCrosses).ToListAsync();
+        var articles = await context.Products.Include(a => a.ArticleCrosses).ToListAsync();
         articles.ForEach(a => a.ArticleCrosses.Clear());
         await context.SaveChangesAsync();
     }
 
     public async Task<List<(int ArticleId, int ArticleCrossId)>> GetArticleCrosses(DContext context)
     {
-        var articles = await context.Articles
+        var articles = await context.Products
             .Include(a => a.ArticleCrosses)
             .ToDictionaryAsync(x => x.Id, z => z.ArticleCrosses);
         var crosses = articles.Select(x => x.Value.Select(y => (x.Key, y.Id)));

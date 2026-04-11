@@ -53,14 +53,14 @@ public class EditStorageContentHandler(
             if (storageMovement != null)
             {
                 storageMovements.Add(storageMovement);
-                toIncrement[content.ArticleId] = toIncrement.GetValueOrDefault(content.ArticleId) + diff;
+                toIncrement[content.ProductId] = toIncrement.GetValueOrDefault(content.ProductId) + diff;
             }
 
             patchDto.Adapt(content);
             if (patchDto.CurrencyId.IsSet || patchDto.BuyPrice.IsSet)
                 content.BuyPriceInUsd = currencyConverter.ConvertToUsd(content.BuyPrice, content.CurrencyId);
 
-            articleIds.Add(content.ArticleId);
+            articleIds.Add(content.ProductId);
         }
 
         if (toIncrement.Count > 0)

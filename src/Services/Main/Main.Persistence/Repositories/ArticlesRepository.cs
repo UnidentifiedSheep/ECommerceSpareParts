@@ -15,7 +15,7 @@ public class ArticlesRepository(DContext context) : IArticlesRepository
         QueryOptions<Product, int> options,
         CancellationToken cancellationToken = default)
     {
-        return await context.Articles
+        return await context.Products
             .FromSql($"""
                       SELECT Distinct on (a.id) a.* 
                       FROM articles a 
@@ -33,7 +33,7 @@ public class ArticlesRepository(DContext context) : IArticlesRepository
         QueryOptions<Product, int> options, 
         CancellationToken cancellationToken = default)
     {
-        return await context.Articles
+        return await context.Products
             .ApplyOptions(options)
             .FirstOrDefaultAsync(x => x.Id == options.Data, cancellationToken);
     }
@@ -42,7 +42,7 @@ public class ArticlesRepository(DContext context) : IArticlesRepository
         QueryOptions<Product, IReadOnlyList<int>> options,
         CancellationToken token = default)
     {
-        return await context.Articles
+        return await context.Products
             .ApplyOptions(options)
             .Where(x => options.Data.Contains(x.Id))
             .ApplyPaging(options)
@@ -64,7 +64,7 @@ public class ArticlesRepository(DContext context) : IArticlesRepository
 
     public async Task<IReadOnlyList<int>> GetArticleCrossIds(int articleId, CancellationToken cancellationToken = default)
     {
-        return await context.Articles
+        return await context.Products
             .FromSql($"""
                       SELECT DISTINCT a.id
                       FROM articles a

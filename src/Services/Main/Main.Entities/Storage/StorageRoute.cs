@@ -1,9 +1,10 @@
 ﻿using BulkValidation.Core.Attributes;
+using Domain;
 using Main.Enums;
 
 namespace Main.Entities;
 
-public class StorageRoute
+public class StorageRoute : AuditableEntity<StorageRoute, Guid>
 {
     [Validate]
     public Guid Id { get; set; }
@@ -37,13 +38,6 @@ public class StorageRoute
 
     public Guid? CarrierId { get; set; }
 
-    public virtual User? Carrier { get; set; }
-
     public virtual Currency Currency { get; set; } = null!;
-
-    public virtual Storage FromStorageNameNavigation { get; set; } = null!;
-
-    public virtual ICollection<PurchaseLogistic> PurchaseLogistics { get; set; } = new List<PurchaseLogistic>();
-
-    public virtual Storage ToStorageNameNavigation { get; set; } = null!;
+    public override Guid GetId() => Id;
 }

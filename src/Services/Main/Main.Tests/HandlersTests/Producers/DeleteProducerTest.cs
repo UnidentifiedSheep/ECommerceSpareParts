@@ -45,7 +45,7 @@ public class DeleteProducerTest : IAsyncLifetime
     [Fact]
     public async Task DeleteProducer_WhenProducerHasArticle_ThrowsCannotDeleteProducerWithArticles()
     {
-        var article = await _context.Articles.FirstOrDefaultAsync();
+        var article = await _context.Products.FirstOrDefaultAsync();
         Assert.NotNull(article);
         var command = new DeleteProducerCommand(article.ProducerId);
         await Assert.ThrowsAsync<CannotDeleteProducerWithArticlesException>(async () => await _mediator.Send(command));
@@ -59,7 +59,7 @@ public class DeleteProducerTest : IAsyncLifetime
             .FirstOrDefaultAsync();
         Assert.NotNull(producer);
 
-        _context.Articles.RemoveRange(producer.Articles);
+        _context.Products.RemoveRange(producer.Articles);
         await _context.SaveChangesAsync();
 
         var command = new DeleteProducerCommand(producer.Id);

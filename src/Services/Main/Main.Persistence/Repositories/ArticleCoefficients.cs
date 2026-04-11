@@ -15,7 +15,7 @@ public class ArticleCoefficients(DContext context) : IArticleCoefficients
         CancellationToken cancellationToken = default,
         params Expression<Func<ProductCoefficient, object>>[] includes)
     {
-        var query = context.ArticleCoefficients
+        var query = context.ProductCoefficients
             .ConfigureTracking(track)
             .Where(x => articleIds.Contains(x.ProductId));
 

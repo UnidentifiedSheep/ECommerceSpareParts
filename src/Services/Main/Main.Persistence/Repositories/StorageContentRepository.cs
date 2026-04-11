@@ -66,7 +66,7 @@ public class StorageContentRepository(DContext context) : IStorageContentReposit
             .ConfigureTracking(true)
             .Include(x => x.Currency)
             .Where(c => string.IsNullOrWhiteSpace(storageName) || c.StorageName == storageName)
-            .Where(x => articleId == null || x.ArticleId == articleId);
+            .Where(x => articleId == null || x.ProductId == articleId);
         if (!showZeroCount)
             query = query.Where(x => x.Count > 0);
         var result = await query
@@ -154,10 +154,10 @@ public class StorageContentRepository(DContext context) : IStorageContentReposit
             .Where(x => x.Count > countGreaterThen);
 
         if (articleId != null)
-            query = query.Where(x => x.ArticleId == articleId);
+            query = query.Where(x => x.ProductId == articleId);
 
         if (exceptArticles != null && exceptArticles.Count != 0)
-            query = query.Where(x => !exceptArticles.Contains(x.ArticleId));
+            query = query.Where(x => !exceptArticles.Contains(x.ProductId));
 
         if (storageName != null)
             query = query.Where(x => x.StorageName == storageName);
@@ -180,9 +180,9 @@ public class StorageContentRepository(DContext context) : IStorageContentReposit
         return await context.StorageContents
             .AsNoTracking()
             .Where(x => x.Count > 0 &&
-                        articleIds.Contains(x.ArticleId) &&
+                        articleIds.Contains(x.ProductId) &&
                         (takeFromOtherStorages || x.StorageName == storageName))
-            .GroupBy(x => x.ArticleId)
+            .GroupBy(x => x.ProductId)
             .Select(g => new
             {
                 ArticleId = g.Key,

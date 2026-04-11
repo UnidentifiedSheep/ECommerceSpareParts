@@ -26,7 +26,7 @@ public class ArticleReservationRepository(DContext context) : IArticleReservatio
         CancellationToken cancellationToken = default)
     {
         return GetReservationsCountInternalAsync(
-            r => r.UserId == userId && articleIds.Contains(r.ArticleId) && !r.IsDone,
+            r => r.UserId == userId && articleIds.Contains(r.ProductId) && !r.IsDone,
             cancellationToken);
     }
 
@@ -36,7 +36,7 @@ public class ArticleReservationRepository(DContext context) : IArticleReservatio
         CancellationToken cancellationToken = default)
     {
         return GetReservationsCountInternalAsync(
-            r => r.UserId != userId && articleIds.Contains(r.ArticleId) && !r.IsDone,
+            r => r.UserId != userId && articleIds.Contains(r.ProductId) && !r.IsDone,
             cancellationToken);
     }
 
@@ -47,9 +47,9 @@ public class ArticleReservationRepository(DContext context) : IArticleReservatio
         return await context.StorageContentReservations
             .ApplyOptions(options)
             .Where(x => x.UserId == options.Data.UserId &&
-                        options.Data.ArticleIds.Contains(x.ArticleId) &&
+                        options.Data.ArticleIds.Contains(x.ProductId) &&
                         x.IsDone == options.Data.IsDone)
-            .GroupBy(x => x.ArticleId)
+            .GroupBy(x => x.ProductId)
             .ToDictionaryAsync(g => g.Key,
                 g => g.ToList(), cancellationToken);
     }
@@ -61,7 +61,7 @@ public class ArticleReservationRepository(DContext context) : IArticleReservatio
         return context.StorageContentReservations
             .AsNoTracking()
             .Where(predicate)
-            .GroupBy(x => x.ArticleId)
+            .GroupBy(x => x.ProductId)
             .Select(g => new
             {
                 ArticleId = g.Key,

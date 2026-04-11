@@ -48,7 +48,7 @@ public class RestoreContentToStorageTests : IAsyncLifetime
         await _context.AddMockCurrencies();
 
         _user = await _context.Users.FirstAsync();
-        _articles = await _context.Articles.ToListAsync();
+        _articles = await _context.Products.ToListAsync();
         _storages = await _context.Storages.ToListAsync();
         _currency = await _context.Currencies.ToListAsync();
         var articleIds = _articles.Select(a => a.Id);
@@ -75,7 +75,7 @@ public class RestoreContentToStorageTests : IAsyncLifetime
             .Select(x => new RestoreContentItem(x.Adapt<SaleContentDetailDto>(),
                 x.StorageContentId == null
                     ? Global.Faker.PickRandom(articleIds)
-                    : _storageContent[x.StorageContentId.Value].ArticleId))
+                    : _storageContent[x.StorageContentId.Value].ProductId))
             .ToList();
         foreach (var (detail, _) in storageContent.Where(x => x.Detail.StorageContentId != null))
             detail.Storage = _storageContent[detail.StorageContentId!.Value].StorageName;
@@ -175,7 +175,7 @@ public class RestoreContentToStorageTests : IAsyncLifetime
             .AsNoTracking()
             .ToDictionaryAsync(x => x.Id);
 
-        var articles = await _context.Articles
+        var articles = await _context.Products
             .AsNoTracking()
             .ToDictionaryAsync(x => x.Id);
 
@@ -184,20 +184,20 @@ public class RestoreContentToStorageTests : IAsyncLifetime
         foreach (var (saleContent, articleId) in content)
         {
             var dbStorageContent = saleContent.StorageContentId == null
-                ? storageContents.FirstOrDefault(x => x.Value.ArticleId == articleId &&
+                ? storageContents.FirstOrDefault(x => x.Value.ProductId == articleId &&
                                                       x.Value.Count == saleContent.Count &&
                                                       x.Value.StorageName == saleContent.Storage).Value
                 : storageContents[saleContent.StorageContentId.Value];
 
             Assert.NotNull(dbStorageContent);
-            Assert.Equal(articleId, dbStorageContent.ArticleId);
+            Assert.Equal(articleId, dbStorageContent.ProductId);
 
             if (saleContent.StorageContentId == null)
                 Assert.Equal(saleContent.BuyPrice, dbStorageContent.BuyPrice);
         }
 
         foreach (var i in storageContents)
-            articles[i.Value.ArticleId].Stock -= i.Value.Count;
+            articles[i.Value.ProductId].Stock -= i.Value.Count;
 
         Assert.All(articles, x => Assert.Equal(0, x.Value.Stock));
     }

@@ -51,7 +51,7 @@ public class EditArticleTests : IAsyncLifetime
 
         Assert.Equal(Unit.Value, result);
 
-        var updatedArticle = await _context.Articles.FindAsync(1);
+        var updatedArticle = await _context.Products.FindAsync(1);
         Assert.Equal("67890", updatedArticle!.Sku);
         Assert.Equal("Updated Article", updatedArticle.Name);
     }

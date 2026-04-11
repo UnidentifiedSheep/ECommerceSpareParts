@@ -43,11 +43,11 @@ public class DeleteStorageContentHandler(
 
         await unitOfWork.AddAsync(storageMovement, cancellationToken);
         unitOfWork.Remove(content);
-        await articlesService.UpdateArticlesCount(new Dictionary<int, int> { [content.ArticleId] = -content.Count },
+        await articlesService.UpdateArticlesCount(new Dictionary<int, int> { [content.ProductId] = -content.Count },
             cancellationToken);
         await unitOfWork.SaveChangesAsync(cancellationToken);
 
-        await mediator.Publish(new ArticleUpdatedNotification(content.ArticleId), cancellationToken);
+        await mediator.Publish(new ArticleUpdatedNotification(content.ProductId), cancellationToken);
         return Unit.Value;
     }
 }

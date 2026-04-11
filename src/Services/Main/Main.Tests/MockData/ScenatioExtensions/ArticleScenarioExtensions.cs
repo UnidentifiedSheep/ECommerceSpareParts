@@ -42,7 +42,7 @@ public static class ArticleScenarioExtensions
         var articleList = articleIds.ToList();
         var storageList = storageNames.ToList();
 
-        var articles = await ctx.Articles
+        var articles = await ctx.Products
             .Where(x => articleList.Contains(x.Id))
             .ToDictionaryAsync(x => x.Id);
         foreach (var (id, article) in articles)

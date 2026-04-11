@@ -21,7 +21,7 @@ public class ProducerRepository(DContext context) : IProducerRepository
 
     public async Task<bool> ProducerHasAnyArticle(int producerId, CancellationToken cancellationToken = default)
     {
-        return await context.Articles.AsNoTracking().AnyAsync(x => x.ProducerId == producerId, cancellationToken);
+        return await context.Products.AsNoTracking().AnyAsync(x => x.ProducerId == producerId, cancellationToken);
     }
 
     public async Task<bool> OtherNameIsTaken(

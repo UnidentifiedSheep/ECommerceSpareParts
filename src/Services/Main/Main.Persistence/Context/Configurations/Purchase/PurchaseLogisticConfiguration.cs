@@ -63,7 +63,7 @@ public class PurchaseLogisticConfiguration : IEntityTypeConfiguration<PurchaseLo
             .HasConstraintName("purchase_logistics_purchase_id_fk");
 
         builder.HasOne<StorageRoute>()
-            .WithMany(p => p.PurchaseLogistics)
+            .WithMany()
             .HasForeignKey(d => d.RouteId)
             .OnDelete(DeleteBehavior.Restrict)
             .HasConstraintName("purchase_logistics_storage_routes_id_fk");

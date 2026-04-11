@@ -65,7 +65,7 @@ public class EditFullPurchaseTests : IAsyncLifetime
 
         await _mediator.MockMapStorageToUser(_supplier.Id, _storageFrom.Name);
 
-        _product = await _context.Articles.FirstAsync();
+        _product = await _context.Products.FirstAsync();
         _currency = await _context.Currencies.FirstAsync();
 
         await CreateMockPurchase();

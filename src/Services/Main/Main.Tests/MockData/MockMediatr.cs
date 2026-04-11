@@ -127,14 +127,14 @@ public static class MockMediatr
             newValue.Count = 0;
             saleContent.Add(new NewSaleContentDto
             {
-                ArticleId = content.ArticleId,
+                ArticleId = content.ProductId,
                 Count = content.Count,
                 Comment = Global.Faker.Lorem.Letter(10),
                 Price = content.BuyPrice,
                 PriceWithDiscount = content.BuyPrice
             });
-            articlesTakenCount[content.ArticleId] =
-                articlesTakenCount.GetValueOrDefault(content.ArticleId) + content.Count;
+            articlesTakenCount[content.ProductId] =
+                articlesTakenCount.GetValueOrDefault(content.ProductId) + content.Count;
 
             storageContentValues.Add(new PrevAndNewValue<StorageContent>(content.Adapt<StorageContent>(), newValue));
         }

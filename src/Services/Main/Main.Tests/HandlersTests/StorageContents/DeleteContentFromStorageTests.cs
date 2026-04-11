@@ -41,7 +41,7 @@ public class DeleteContentFromStorageTests : IAsyncLifetime
         _user = await _context.Users.FirstAsync();
         var currency = await _context.Currencies.FirstAsync();
         var storage = await _context.Storages.FirstAsync();
-        var articleIds = await _context.Articles.Select(a => a.Id).ToListAsync();
+        var articleIds = await _context.Products.Select(a => a.Id).ToListAsync();
         await _mediator.AddMockStorageContents(articleIds, currency.Id, storage.Name, _user.Id);
         _storageContents = await _context.StorageContents.ToListAsync();
     }

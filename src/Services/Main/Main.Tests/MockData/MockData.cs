@@ -65,7 +65,7 @@ public static class MockData
         var storages = availableStorages.Distinct().ToList();
         var currencyIds = availableCurrencyIds.Distinct().ToList();
         var f = new Faker<StorageContent>(Locale)
-            .RuleFor(x => x.ArticleId, f => f.PickRandom(articleIds))
+            .RuleFor(x => x.ProductId, f => f.PickRandom(articleIds))
             .RuleFor(x => x.StorageName, f => f.PickRandom(storages))
             .RuleFor(x => x.BuyPrice, f => Math.Round(f.Random.Decimal() * 100000 + 1, 2))
             .RuleFor(x => x.Count, f => f.Random.Int(1, 1200))

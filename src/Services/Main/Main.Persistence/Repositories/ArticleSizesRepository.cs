@@ -10,7 +10,7 @@ public class ArticleSizesRepository(DContext context) : IArticleSizesRepository
 {
     public async Task<ArticleSize?> GetArticleSizes(int articleId, bool track = true, CancellationToken token = default)
     {
-        return await context.ArticleSizes.ConfigureTracking(track)
+        return await context.ProductSizes.ConfigureTracking(track)
             .FirstOrDefaultAsync(x => x.ArticleId == articleId, token);
     }
 
@@ -19,7 +19,7 @@ public class ArticleSizesRepository(DContext context) : IArticleSizesRepository
         bool track = true,
         CancellationToken token = default)
     {
-        return await context.ArticleSizes.ConfigureTracking(track)
+        return await context.ProductSizes.ConfigureTracking(track)
             .Where(x => ids.Contains(x.ArticleId))
             .ToListAsync(token);
     }

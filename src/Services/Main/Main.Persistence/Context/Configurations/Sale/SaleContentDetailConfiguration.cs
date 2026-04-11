@@ -43,14 +43,14 @@ public class SaleContentDetailConfiguration : IEntityTypeConfiguration<SaleConte
             .HasForeignKey(d => d.SaleContentId)
             .HasConstraintName("sale_content_details_sale_content_id_fk");
 
-        builder.HasOne<Storage>()
-            .WithMany(p => p.SaleContentDetails)
+        builder.HasOne<Entities.Storage>()
+            .WithMany()
             .HasForeignKey(d => d.Storage)
             .OnDelete(DeleteBehavior.Restrict)
             .HasConstraintName("sale_content_details_storages_name_fk");
 
         builder.HasOne<StorageContent>()
-            .WithMany(p => p.SaleContentDetails)
+            .WithMany()
             .HasForeignKey(d => d.StorageContentId)
             .OnDelete(DeleteBehavior.SetNull)
             .HasConstraintName("sale_content_details_storage_content_id_fk");

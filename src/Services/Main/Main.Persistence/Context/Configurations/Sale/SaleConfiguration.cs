@@ -82,8 +82,8 @@ public class SaleConfiguration : IEntityTypeConfiguration<Entities.Sale>
             .OnDelete(DeleteBehavior.Restrict)
             .HasConstraintName("sale_currency_id_fk");
 
-        builder.HasOne<Storage>()
-            .WithMany(p => p.Sales)
+        builder.HasOne<Entities.Storage>()
+            .WithMany()
             .HasForeignKey(d => d.MainStorageName)
             .OnDelete(DeleteBehavior.Restrict)
             .HasConstraintName("sale_storages_name_fk");

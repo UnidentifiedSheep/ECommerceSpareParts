@@ -47,7 +47,7 @@ public class AddContentToStorageTests : IAsyncLifetime
         await _context.AddMockCurrencies();
         _currency = await _context.Currencies.FirstAsync();
         _storage = await _context.Storages.FirstAsync();
-        _articles = await _context.Articles.ToListAsync();
+        _articles = await _context.Products.ToListAsync();
         _user = await _context.Users.FirstAsync();
     }
 
@@ -201,7 +201,7 @@ public class AddContentToStorageTests : IAsyncLifetime
             if (!expectedTotals.TryAdd(kv.Key, kv.Value))
                 expectedTotals[kv.Key] += kv.Value;
 
-        var dbArticles = _context.Articles.AsNoTracking()
+        var dbArticles = _context.Products.AsNoTracking()
             .ToDictionaryAsync(x => x.Id).Result; // можно вызвать асинхронно, но для примера – синхронно
 
         var dbStorageContents = _context.StorageContents.AsNoTracking()
@@ -232,7 +232,7 @@ public class AddContentToStorageTests : IAsyncLifetime
         foreach (var exp in groupedExpectedContents)
         {
             var actual = dbStorageContents.FirstOrDefault(x =>
-                x.ArticleId == exp.ArticleId &&
+                x.ProductId == exp.ArticleId &&
                 x.BuyPrice == exp.BuyPrice &&
                 x.CurrencyId == exp.CurrencyId);
 
@@ -246,7 +246,7 @@ public class AddContentToStorageTests : IAsyncLifetime
         foreach (var sc in dbStorageContents)
         {
             var match = dbMovements.FirstOrDefault(m =>
-                m.ArticleId == sc.ArticleId &&
+                m.ProductId == sc.ProductId &&
                 m.Count == sc.Count &&
                 m.Price == sc.BuyPrice &&
                 m.CurrencyId == sc.CurrencyId &&

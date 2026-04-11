@@ -13,7 +13,7 @@ public class ArticleWeightRepository(DContext context) : IArticleWeightRepositor
         bool track = true,
         CancellationToken token = default)
     {
-        return await context.ArticleWeights.ConfigureTracking(track)
+        return await context.ProductWeights.ConfigureTracking(track)
             .FirstOrDefaultAsync(x => x.ProductId == articleId, token);
     }
 
@@ -22,7 +22,7 @@ public class ArticleWeightRepository(DContext context) : IArticleWeightRepositor
         bool track = true,
         CancellationToken token = default)
     {
-        return await context.ArticleWeights.ConfigureTracking(track)
+        return await context.ProductWeights.ConfigureTracking(track)
             .Where(x => ids.Contains(x.ProductId))
             .ToListAsync(token);
     }

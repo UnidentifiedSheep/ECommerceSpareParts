@@ -43,7 +43,7 @@ public class RemoveContentFromStorageTests : IAsyncLifetime
 
         _storages = await _context.Storages.ToListAsync();
         _user = await _context.Users.FirstAsync();
-        var articleIds = await _context.Articles.Select(a => a.Id).ToListAsync();
+        var articleIds = await _context.Products.Select(a => a.Id).ToListAsync();
         var currency = await _context.Currencies.FirstAsync();
 
         foreach (var storage in _storages)
@@ -117,7 +117,7 @@ public class RemoveContentFromStorageTests : IAsyncLifetime
     public async Task RemoveContentFromStorage_WithInsufficientStock_ThrowsNotEnoughCountOnStorageException()
     {
         var storageContent = _storageContents.First();
-        var article = await _context.Articles.AsNoTracking().FirstAsync(x => x.Id == storageContent.ArticleId);
+        var article = await _context.Products.AsNoTracking().FirstAsync(x => x.Id == storageContent.ProductId);
         var content = new Dictionary<int, int>
         {
             [article.Id] = article.Stock + 1000
@@ -134,14 +134,14 @@ public class RemoveContentFromStorageTests : IAsyncLifetime
     {
         var storageContent = _storageContents.First();
         var totalCount = _storageContents
-            .Where(x => x.ArticleId == storageContent.ArticleId &&
+            .Where(x => x.ProductId == storageContent.ProductId &&
                         x.StorageName == storageContent.StorageName)
             .Sum(x => x.Count);
         var countToRemove = Global.Faker.Random.Int(1, totalCount);
 
         var content = new Dictionary<int, int>
         {
-            [storageContent.ArticleId] = countToRemove
+            [storageContent.ProductId] = countToRemove
         };
 
         var command = new RemoveContentCommand(content, _user.Id, storageContent.StorageName, false,
@@ -153,7 +153,7 @@ public class RemoveContentFromStorageTests : IAsyncLifetime
         var updatedCount = await _context.StorageContents
             .AsNoTracking()
             .Where(x => x.StorageName == storageContent.StorageName
-                        && x.ArticleId == storageContent.ArticleId)
+                        && x.ProductId == storageContent.ProductId)
             .SumAsync(x => x.Count);
 
         Assert.NotEmpty(result.Changes);
@@ -164,9 +164,9 @@ public class RemoveContentFromStorageTests : IAsyncLifetime
     [Fact]
     public async Task RemoveContentFromStorage_TakeFromMultipleStorages_SuccessfullyRemoves()
     {
-        var articleId = _storageContents.First().ArticleId;
+        var articleId = _storageContents.First().ProductId;
         var totalCount = _storageContents
-            .Where(x => x.ArticleId == articleId)
+            .Where(x => x.ProductId == articleId)
             .Sum(x => x.Count);
 
         var content = new Dictionary<int, int>
@@ -180,7 +180,7 @@ public class RemoveContentFromStorageTests : IAsyncLifetime
         var result = await _mediator.Send(command);
 
         var updated = _context.StorageContents.AsNoTracking()
-            .Where(x => x.ArticleId == articleId).ToList();
+            .Where(x => x.ProductId == articleId).ToList();
         Assert.Equal(0, updated.Sum(x => x.Count));
         Assert.Equal(totalCount, result.Changes.Sum(r => r.Prev.Count - r.NewValue.Count));
     }
@@ -191,7 +191,7 @@ public class RemoveContentFromStorageTests : IAsyncLifetime
         var storageContent = _storageContents.First();
         var content = new Dictionary<int, int>
         {
-            [storageContent.ArticleId] = 1
+            [storageContent.ProductId] = 1
         };
 
         var command = new RemoveContentCommand(content, _user.Id, storageContent.StorageName, false,
@@ -199,7 +199,7 @@ public class RemoveContentFromStorageTests : IAsyncLifetime
         await _mediator.Send(command);
 
         var movement = await _context.StorageMovements
-            .Where(m => m.ArticleId == storageContent.ArticleId && m.StorageName == storageContent.StorageName)
+            .Where(m => m.ProductId == storageContent.ProductId && m.StorageName == storageContent.StorageName)
             .OrderByDescending(m => m.CreatedAt)
             .FirstOrDefaultAsync();
 

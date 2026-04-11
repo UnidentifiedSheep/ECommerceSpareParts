@@ -8,7 +8,7 @@ public class StorageMovement
 
     public string StorageName { get; set; } = null!;
 
-    public int ArticleId { get; set; }
+    public int ProductId { get; set; }
 
     public int CurrencyId { get; set; }
 
@@ -21,14 +21,6 @@ public class StorageMovement
     public DateTime CreatedAt { get; set; }
 
     public Guid WhoMoved { get; set; }
-
-    public virtual Product.Product Product { get; set; } = null!;
-
-    public virtual Currency Currency { get; set; } = null!;
-
-    public virtual Storage StorageNameNavigation { get; set; } = null!;
-
-    public virtual User WhoMovedNavigation { get; set; } = null!;
 
     public StorageMovement SetActionType(StorageMovementType type)
     {

@@ -44,7 +44,7 @@ public class CreateSaleTests : IAsyncLifetime
 
         _user = await _context.Users.FirstAsync();
         _storage = await _context.Storages.FirstAsync();
-        var articleIds = await _context.Articles.Select(a => a.Id).ToListAsync();
+        var articleIds = await _context.Products.Select(a => a.Id).ToListAsync();
         var storage = await _context.Storages.FirstAsync();
         var currency = await _context.Currencies.FirstAsync();
 
@@ -81,7 +81,7 @@ public class CreateSaleTests : IAsyncLifetime
         var currency = _currency;
         var transaction = _transaction;
 
-        var article = await _context.Articles.FirstAsync();
+        var article = await _context.Products.FirstAsync();
 
         var saleContent = new List<NewSaleContentDto>
         {
@@ -104,7 +104,7 @@ public class CreateSaleTests : IAsyncLifetime
     [InlineData(-1)]
     public async Task CreateSale_WithInvalidCount_ThrowsSaleContentPriceOrCountException(int count)
     {
-        var article = await _context.Articles.FirstAsync();
+        var article = await _context.Products.FirstAsync();
 
         var saleContent = new List<NewSaleContentDto>
         {
@@ -125,7 +125,7 @@ public class CreateSaleTests : IAsyncLifetime
     [Fact]
     public async Task CreateSale_WithNotEnoughDetails_ThrowsArgumentException()
     {
-        var article = await _context.Articles.FirstAsync();
+        var article = await _context.Products.FirstAsync();
 
         var saleContent = new List<NewSaleContentDto>
         {
@@ -147,7 +147,7 @@ public class CreateSaleTests : IAsyncLifetime
     public async Task CreateSale_WithInvalidTransaction_ThrowsTransactionNotFoundException()
     {
         var storageContent = await _context.StorageContents.FirstAsync();
-        var article = await _context.Articles.FirstAsync(x => x.Id == storageContent.ArticleId);
+        var article = await _context.Products.FirstAsync(x => x.Id == storageContent.ProductId);
         var saleContent = new List<NewSaleContentDto>
         {
             new()
@@ -180,7 +180,7 @@ public class CreateSaleTests : IAsyncLifetime
         {
             new()
             {
-                ArticleId = storageContent.ArticleId,
+                ArticleId = storageContent.ProductId,
                 Count = storageContent.Count,
                 Price = 10,
                 PriceWithDiscount = 9
@@ -214,14 +214,14 @@ public class CreateSaleTests : IAsyncLifetime
             newValue.Count = 0;
             saleContent.Add(new NewSaleContentDto
             {
-                ArticleId = content.ArticleId,
+                ArticleId = content.ProductId,
                 Count = content.Count,
                 Comment = Global.Faker.Lorem.Letter(10),
                 Price = content.BuyPrice,
                 PriceWithDiscount = content.BuyPrice
             });
-            articlesTakenCount[content.ArticleId] =
-                articlesTakenCount.GetValueOrDefault(content.ArticleId) + content.Count;
+            articlesTakenCount[content.ProductId] =
+                articlesTakenCount.GetValueOrDefault(content.ProductId) + content.Count;
 
             storageContentValues.Add(new PrevAndNewValue<StorageContent>(content.Adapt<StorageContent>(), newValue));
         }

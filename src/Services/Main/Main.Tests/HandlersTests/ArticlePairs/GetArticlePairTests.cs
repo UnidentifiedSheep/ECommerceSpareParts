@@ -31,7 +31,7 @@ public class GetArticlePairTests : IAsyncLifetime
     public async Task InitializeAsync()
     {
         await _mediator.AddMockProducersAndArticles();
-        var articles = await _context.Articles.Take(3).ToListAsync();
+        var articles = await _context.Products.Take(3).ToListAsync();
         _leftArticleId = articles[0].Id;
         _rightArticleId = articles[1].Id;
         _articleWithOutPair = articles[2].Id;

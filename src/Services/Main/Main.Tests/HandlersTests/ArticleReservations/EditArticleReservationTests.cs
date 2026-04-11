@@ -45,7 +45,7 @@ public class EditArticleReservationTests : IAsyncLifetime
         await _mediator.AddMockStorage();
         await _context.AddMockCurrencies();
 
-        _product = await _context.Articles.FirstAsync();
+        _product = await _context.Products.FirstAsync();
         _user = await _context.Users.FirstAsync();
         _whoUpdated = await _context.Users.FirstAsync(x => x.Id != _user.Id);
         _currency = await _context.Currencies.FirstAsync();

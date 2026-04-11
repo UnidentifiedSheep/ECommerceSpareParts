@@ -20,7 +20,7 @@ public class SaleService : ISaleService
                 var detail = x.NewValue.Adapt<SaleContentDetail>();
                 detail.Count = taken;
 
-                return (x.Prev.ArticleId, Detail: detail);
+                return (ArticleId: x.Prev.ProductId, Detail: detail);
             })
             .GroupBy(x => x.ArticleId)
             .ToDictionary(

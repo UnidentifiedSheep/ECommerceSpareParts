@@ -47,7 +47,7 @@ public class CreatePurchaseTests : IAsyncLifetime
 
         _user = await _context.Users.FirstAsync();
         _storage = await _context.Storages.FirstAsync();
-        _product = await _context.Articles.FirstAsync();
+        _product = await _context.Products.FirstAsync();
         _currency = await _context.Currencies.FirstAsync();
 
         await _mediator.AddMockStorageContents([_product.Id], _currency.Id, _storage.Name, _user.Id);

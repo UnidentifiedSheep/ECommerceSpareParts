@@ -157,7 +157,7 @@ public static class MapsterConfig
 
 
         TypeAdapterConfig<NewStorageContentDto, StorageContent>.NewConfig()
-            .Map(dest => dest.ArticleId, src => src.ArticleId)
+            .Map(dest => dest.ProductId, src => src.ArticleId)
             .Map(dest => dest.CurrencyId, src => src.CurrencyId)
             .Map(dest => dest.BuyPrice, src => src.BuyPrice)
             .Map(dest => dest.Count, src => src.Count)
@@ -392,7 +392,7 @@ public static class MapsterConfig
             .Map(dest => dest.Price, s => s.BuyPrice)
             .Map(dest => dest.Count, s => s.Count)
             .Map(dest => dest.StorageName, s => s.StorageName)
-            .Map(dest => dest.ArticleId, s => s.ArticleId);
+            .Map(dest => dest.ProductId, s => s.ProductId);
 
         TypeAdapterConfig<StorageContent, StorageContent>.NewConfig()
             .Ignore(x => x.Product)
@@ -401,7 +401,7 @@ public static class MapsterConfig
             .Ignore(x => x.SaleContentDetails)
             .Map(dest => dest.Id, src => src.Id)
             .Map(dest => dest.StorageName, s => s.StorageName)
-            .Map(dest => dest.ArticleId, s => s.ArticleId)
+            .Map(dest => dest.ProductId, s => s.ProductId)
             .Map(dest => dest.CurrencyId, s => s.CurrencyId)
             .Map(dest => dest.Count, s => s.Count)
             .Map(dest => dest.BuyPrice, s => s.BuyPrice)
@@ -418,14 +418,14 @@ public static class MapsterConfig
 
         TypeAdapterConfig<StorageContent, StorageContentDto>.NewConfig()
             .Map(dest => dest.Id, src => src.Id)
-            .Map(dest => dest.ArticleId, src => src.ArticleId)
+            .Map(dest => dest.ArticleId, src => src.ProductId)
             .Map(dest => dest.Count, src => src.Count)
             .Map(dest => dest.BuyPrice, src => src.BuyPrice)
             .Map(dest => dest.StorageName, src => src.StorageName)
             .Map(dest => dest.PurchaseDatetime, src => src.PurchaseDatetime)
             .Map(dest => dest.Currency, src => src.Currency)
             .Map(dest => dest.ConcurrencyCode, src =>
-                HashUtils.ComputeHash(src.Id, src.ArticleId, src.BuyPrice, src.CurrencyId,
+                HashUtils.ComputeHash(src.Id, src.ProductId, src.BuyPrice, src.CurrencyId,
                     src.StorageName, src.BuyPriceInUsd, src.Count, src.PurchaseDatetime));
 
         TypeAdapterConfig<PatchStorageContentDto, StorageContent>.NewConfig()
@@ -541,7 +541,7 @@ public static class MapsterConfig
         //Article Reservation 
         TypeAdapterConfig<EditArticleReservationDto, StorageContentReservation>.NewConfig()
             .IgnorePatchIfNotSet()
-            .Map(dest => dest.ArticleId, src => src.ArticleId)
+            .Map(dest => dest.ProductId, src => src.ArticleId)
             .Map(dest => dest.Comment, src => src.Comment == null ? null : src.Comment.Trim())
             .Map(dest => dest.InitialCount, src => src.InitialCount)
             .Map(dest => dest.CurrentCount, src => src.CurrentCount)
@@ -549,7 +549,7 @@ public static class MapsterConfig
             .Map(dest => dest.GivenPrice, src => src.GivenPrice);
 
         TypeAdapterConfig<NewArticleReservationDto, StorageContentReservation>.NewConfig()
-            .Map(dest => dest.ArticleId, src => src.ArticleId)
+            .Map(dest => dest.ProductId, src => src.ArticleId)
             .Map(dest => dest.Comment, src => src.Comment)
             .Map(dest => dest.GivenCurrencyId, src => src.GivenCurrencyId)
             .Map(dest => dest.GivenPrice,
