@@ -19,10 +19,4 @@ public class OrderVersion
     public bool SellerApproved { get; set; }
 
     public string SignedTotalPrice { get; set; } = null!;
-
-    public virtual Currency Currency { get; set; } = null!;
-
-    public virtual Order Order { get; set; } = null!;
-
-    public virtual User? WhoUpdatedNavigation { get; set; }
 }
