@@ -183,7 +183,7 @@ public static class MockData
     public static List<SaleContent> CreateSaleContent(IEnumerable<int> articleIds, int count)
     {
         var f = new Faker<SaleContent>(Locale)
-            .RuleFor(x => x.ArticleId, f => f.PickRandom(articleIds))
+            .RuleFor(x => x.ProductId, f => f.PickRandom(articleIds))
             .RuleFor(x => x.Count, f => f.Random.Int(1, 1200))
             .RuleFor(x => x.Price, f => f.Random.Decimal(0.01m, 2_000_000))
             .RuleFor(x => x.Discount, f => f.Random.Decimal(0.01m, 100));

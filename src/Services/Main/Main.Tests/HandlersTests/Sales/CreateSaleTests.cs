@@ -243,7 +243,7 @@ public class CreateSaleTests : IAsyncLifetime
             var details = content.SaleContentDetails;
             var countInDetail = details.Sum(detail => detail.Count);
             Assert.Equal(content.Count, countInDetail);
-            articlesTakenCount[content.ArticleId] -= countInDetail;
+            articlesTakenCount[content.ProductId] -= countInDetail;
         }
 
         Assert.All(articlesTakenCount, kvp => Assert.Equal(0, kvp.Value));

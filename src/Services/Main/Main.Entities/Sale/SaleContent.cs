@@ -6,7 +6,7 @@ public class SaleContent
 
     public string SaleId { get; set; } = null!;
 
-    public int ArticleId { get; set; }
+    public int ProductId { get; set; }
 
     public int Count { get; set; }
 
@@ -19,8 +19,6 @@ public class SaleContent
     public decimal Discount { get; set; }
 
     public virtual Product.Product Product { get; set; } = null!;
-
-    public virtual Sale Sale { get; set; } = null!;
 
     public virtual ICollection<SaleContentDetail> SaleContentDetails { get; set; } = new List<SaleContentDetail>();
 }

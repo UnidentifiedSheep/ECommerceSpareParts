@@ -461,7 +461,7 @@ public static class MapsterConfig
             .Map(d => d.Type, s => s.Type);
 
         TypeAdapterConfig<NewSaleContentDto, SaleContent>.NewConfig()
-            .Map(dest => dest.ArticleId, src => src.ArticleId)
+            .Map(dest => dest.ProductId, src => src.ArticleId)
             .Map(dest => dest.Comment, src => src.Comment)
             .Map(dest => dest.Count, src => src.Count)
             .Map(dest => dest.Price, src => src.PriceWithDiscount)
@@ -470,7 +470,7 @@ public static class MapsterConfig
                 src => Price.GetDiscountFromPrices(src.PriceWithDiscount, src.Price));
 
         TypeAdapterConfig<EditSaleContentDto, SaleContent>.NewConfig()
-            .Map(dest => dest.ArticleId, src => src.ArticleId)
+            .Map(dest => dest.ProductId, src => src.ArticleId)
             .Map(dest => dest.Comment, src => src.Comment)
             .Map(dest => dest.Count, src => src.Count)
             .Map(dest => dest.Price, src => src.PriceWithDiscount)
@@ -492,7 +492,7 @@ public static class MapsterConfig
 
         TypeAdapterConfig<SaleContent, Contracts.Models.Sale.SaleContent>.NewConfig()
             .Map(d => d.Id, s => s.Id)
-            .Map(d => d.ArticleId, s => s.ArticleId)
+            .Map(d => d.ArticleId, s => s.ProductId)
             .Map(d => d.Comment, s => s.Comment)
             .Map(d => d.Count, s => s.Count)
             .Map(d => d.Details, s => s.SaleContentDetails)

@@ -1,10 +1,11 @@
-﻿using Main.Enums;
+﻿using Domain;
+using Main.Enums;
 
 namespace Main.Entities;
 
-public class Sale
+public class Sale : AuditableEntity<Sale, Guid>
 {
-    public string Id { get; set; } = null!;
+    public Guid Id { get; set; }
 
     public Guid CreatedUserId { get; set; }
 
@@ -13,10 +14,6 @@ public class Sale
     public string? Comment { get; set; }
 
     public DateTime SaleDatetime { get; set; }
-
-    public DateTime CreationDatetime { get; set; }
-
-    public DateTime? UpdateDatetime { get; set; }
 
     public int CurrencyId { get; set; }
 
@@ -30,15 +27,11 @@ public class Sale
 
     public virtual User Buyer { get; set; } = null!;
 
-    public virtual User CreatedUser { get; set; } = null!;
-
     public virtual Currency Currency { get; set; } = null!;
-
-    public virtual Storage MainStorageNameNavigation { get; set; } = null!;
 
     public virtual ICollection<SaleContent> SaleContents { get; set; } = new List<SaleContent>();
 
     public virtual Transaction Transaction { get; set; } = null!;
 
-    public virtual User? UpdatedUser { get; set; }
+    public override Guid GetId() => Id;
 }

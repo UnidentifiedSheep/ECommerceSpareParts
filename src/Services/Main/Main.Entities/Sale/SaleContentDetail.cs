@@ -17,12 +17,4 @@ public class SaleContentDetail
     public int Count { get; set; }
 
     public DateTime PurchaseDatetime { get; set; }
-
-    public virtual Currency Currency { get; set; } = null!;
-
-    public virtual SaleContent SaleContent { get; set; } = null!;
-
-    public virtual StorageContent? StorageContent { get; set; }
-
-    public virtual Storage StorageNavigation { get; set; } = null!;
 }

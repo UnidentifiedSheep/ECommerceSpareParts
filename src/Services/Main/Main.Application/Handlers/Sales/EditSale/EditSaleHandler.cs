@@ -153,6 +153,6 @@ public class EditSaleHandler(IUnitOfWork unitOfWork, ISaleService saleService, I
         }
 
         if (counter > 0)
-            throw new ArgumentException($"Недостаточно деталей для артикула {saleContent.ArticleId}");
+            throw new ArgumentException($"Недостаточно деталей для артикула {saleContent.ProductId}");
     }
 }

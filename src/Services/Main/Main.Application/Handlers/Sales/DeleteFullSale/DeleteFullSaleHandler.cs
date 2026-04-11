@@ -30,7 +30,7 @@ public class DeleteFullSaleHandler(
         var transactionId = sale.TransactionId;
         var saleContentDetails = sale.SaleContents
             .SelectMany(x => x.SaleContentDetails.Select(detail =>
-                new RestoreContentItem(detail.Adapt<SaleContentDetailDto>(), x.ArticleId)))
+                new RestoreContentItem(detail.Adapt<SaleContentDetailDto>(), x.ProductId)))
             .ToList();
 
         await DeleteTransaction(transactionId, request.UserId, cancellationToken);

@@ -76,7 +76,7 @@ public class CreateFullSaleHandler(
                 dateTime, cancellationToken);
 
         var saleCounts = sale.SaleContents
-            .GroupBy(x => x.ArticleId)
+            .GroupBy(x => x.ProductId)
             .ToDictionary(x => x.Key, x => x.Sum(z => z.Count));
 
         await SubtractCountFromReservations(buyerId, whoCreated, saleCounts, cancellationToken);

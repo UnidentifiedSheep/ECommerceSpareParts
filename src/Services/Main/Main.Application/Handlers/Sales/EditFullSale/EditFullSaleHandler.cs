@@ -117,8 +117,8 @@ public class EditFullSaleHandler(
                 if (existingSaleContent.Count < content.Count)
                 {
                     var diff = content.Count - existingSaleContent.Count;
-                    contentGreaterCount[existingSaleContent.ArticleId] = contentGreaterCount
-                        .GetValueOrDefault(existingSaleContent.ArticleId) + diff;
+                    contentGreaterCount[existingSaleContent.ProductId] = contentGreaterCount
+                        .GetValueOrDefault(existingSaleContent.ProductId) + diff;
                 }
                 else if (existingSaleContent.Count > content.Count)
                 {
@@ -156,7 +156,7 @@ public class EditFullSaleHandler(
         {
             var details = saleContentDetails
                 .Where(x => x.SaleContentId == id);
-            removedDetails.AddRange(details.Select(detail => (detail, deletedContent.ArticleId)));
+            removedDetails.AddRange(details.Select(detail => (detail, ArticleId: deletedContent.ProductId)));
         }
 
         return removedDetails;
