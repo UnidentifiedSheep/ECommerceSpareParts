@@ -650,8 +650,8 @@ public static class MapsterConfig
             .Map(d => d.CarrierId, s => s.CarrierId.Value);
 
         //Article weight
-        TypeAdapterConfig<ProductWeight, ArticleWeightDto>.NewConfig()
-            .Map(d => d.ArticleId, s => s.ProductId)
+        TypeAdapterConfig<ProductWeight, ProductWeightDto>.NewConfig()
+            .Map(d => d.ProductId, s => s.ProductId)
             .Map(d => d.Weight, s => s.Weight)
             .Map(d => d.Unit, s => s.Unit);
 

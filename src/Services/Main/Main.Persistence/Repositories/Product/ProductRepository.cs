@@ -7,37 +7,14 @@ using Persistence.Extensions;
 
 namespace Main.Persistence.Repositories;
 
-public class ProductRepository(DContext context) : IProductRepository
+public class ProductRepository(DContext context) : RepositoryBase<Product, int>(context), IProductRepository
 {
-    public async ValueTask<Product?> GetById(
-        int id, 
-        CancellationToken ct = default)
-    {
-        return await context.Products.FindAsync([id], ct);
-    }
-
-    public async Task<Product?> FirstOrDefaultAsync(Criteria<Product>? criteria = null, CancellationToken ct = default)
-    {
-        var query = context.Products.AsQueryable();
-        if (criteria != null)
-            query = query.Apply(criteria);
-        return await query.FirstOrDefaultAsync(ct);
-    }
-
-    public async Task<List<Product>> ListAsync(Criteria<Product>? criteria = null, CancellationToken ct = default)
-    {
-        var query = context.Products.AsQueryable();
-        if (criteria != null)
-            query = query.Apply(criteria);
-        return await query.ToListAsync(ct);
-    }
-    
     public async Task<IReadOnlyList<Product>> GetProductCrosses(
         int productId,
         Criteria<Product> criteria,
         CancellationToken cancellationToken = default)
     {
-        return await context.Products
+        return await Context.Products
             .FromSql($"""
                       SELECT Distinct on (a.id) a.* 
                       FROM products a 

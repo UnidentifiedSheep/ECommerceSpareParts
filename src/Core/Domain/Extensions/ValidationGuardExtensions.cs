@@ -68,6 +68,15 @@ public static class ValidationGuardExtensions
         return value.CompareTo(default) < 0 ? throw new InvalidInputException(errorKey) : value;
     }
     
+    public static decimal AgainstTooManyDecimalPlaces(this decimal value, int maxDecimals, string errorKey)
+    {
+        var decimalPlaces = BitConverter.GetBytes(decimal.GetBits(value)[3])[2];
+    
+        return decimalPlaces > maxDecimals
+            ? throw new InvalidInputException(errorKey)
+            : value;
+    }
+    
     public static IEnumerable<T> AgainstEmpty<T>(this IEnumerable<T> value, string errorKey)
     {
         // ReSharper disable once PossibleMultipleEnumeration

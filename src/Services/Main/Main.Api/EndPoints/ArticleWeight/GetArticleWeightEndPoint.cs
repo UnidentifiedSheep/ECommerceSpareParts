@@ -7,7 +7,7 @@ using MediatR;
 
 namespace Main.Api.EndPoints.ArticleWeight;
 
-public record GetArticleWeightResponse(ArticleWeightDto ArticleWeight);
+public record GetArticleWeightResponse(ProductWeightDto ProductWeight);
 
 public class GetArticleWeightEndPoint : ICarterModule
 {
@@ -15,8 +15,8 @@ public class GetArticleWeightEndPoint : ICarterModule
     {
         app.MapGet("/articles/{id:int}/weights", async (ISender sender, int id, CancellationToken token) =>
             {
-                var result = await sender.Send(new GetArticleWeightQuery(id), token);
-                var response = new GetArticleWeightResponse(result.ArticleWeight);
+                var result = await sender.Send(new GetProductWeightQuery(id), token);
+                var response = new GetArticleWeightResponse(result.ProductWeight);
                 return Results.Ok(response);
             }).WithTags("Article Weight")
             .WithDescription("Установка веса артикула.")

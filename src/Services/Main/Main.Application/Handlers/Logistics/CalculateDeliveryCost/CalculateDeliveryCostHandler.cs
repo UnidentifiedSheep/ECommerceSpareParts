@@ -105,7 +105,7 @@ public class CalculateDeliveryCostHandler(
             if (mode == LogisticsCalculationMode.Strict)
             {
                 if (!sizeExists) throw new ArticleSizesNotFoundException(item.ArticleId);
-                if (!weightExists) throw new ArticleWeightNotFound(item.ArticleId);
+                if (!weightExists) throw new ProductWeightNotFoundException(item.ArticleId);
             }
 
             logisticsItems.Add(new LogisticsItem(item.ArticleId, item.Quantity, weight?.Weight ?? 0,

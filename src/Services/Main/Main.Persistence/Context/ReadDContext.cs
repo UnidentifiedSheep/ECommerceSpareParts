@@ -7,4 +7,5 @@ namespace Main.Persistence.Context;
 public class ReadDContext(DContext context) : IReadDContext
 {
     public IQueryable<Product> Products => context.Products.AsQueryable().AsNoTracking();
+    public IQueryable<ProductWeight> ProductWeights => context.ProductWeights.AsQueryable().AsNoTracking();
 }

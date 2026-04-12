@@ -12,7 +12,7 @@ public class DeleteArticleWeightEndPoint : ICarterModule
     {
         app.MapDelete("/articles/{id:int}/weights", async (ISender sender, int id, CancellationToken token) =>
             {
-                var command = new DeleteArticleWeightCommand(id);
+                var command = new DeleteProductWeightCommand(id);
                 await sender.Send(command, token);
                 return Results.NoContent();
             }).WithTags("Article Weight")

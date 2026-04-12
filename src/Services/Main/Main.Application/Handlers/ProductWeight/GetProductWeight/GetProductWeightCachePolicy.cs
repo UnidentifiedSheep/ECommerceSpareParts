@@ -3,10 +3,10 @@ using Main.Abstractions.Constants;
 
 namespace Main.Application.Handlers.ArticleWeight.GetArticleWeight;
 
-public class GetArticleWeightCachePolicy : ICachePolicy<GetArticleWeightQuery>
+public class GetProductWeightCachePolicy : ICachePolicy<GetProductWeightQuery>
 {
-    public string GetCacheKey(GetArticleWeightQuery request)
-        => string.Format(CacheKeys.ArticleWeightCacheKey, request.ArticleId);
+    public string GetCacheKey(GetProductWeightQuery request)
+        => string.Format(CacheKeys.ArticleWeightCacheKey, request.ProductId);
 
     public int DurationSeconds => 3600;
     public Type? RelatedType => null;

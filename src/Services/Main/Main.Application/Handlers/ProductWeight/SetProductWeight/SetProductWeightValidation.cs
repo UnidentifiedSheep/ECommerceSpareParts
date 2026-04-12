@@ -3,9 +3,9 @@ using Localization.Domain.Extensions;
 
 namespace Main.Application.Handlers.ArticleWeight.SetArticleWeight;
 
-public class SetArticleWeightValidation : AbstractValidator<SetArticleWeightCommand>
+public class SetProductWeightValidation : AbstractValidator<SetArticleWeightCommand>
 {
-    public SetArticleWeightValidation()
+    public SetProductWeightValidation()
     {
         RuleFor(x => x.Weight)
             .GreaterThan(0)

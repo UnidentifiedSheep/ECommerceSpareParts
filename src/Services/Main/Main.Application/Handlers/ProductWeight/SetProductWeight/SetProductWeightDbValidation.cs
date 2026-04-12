@@ -4,10 +4,10 @@ using Main.Entities;
 
 namespace Main.Application.Handlers.ArticleWeight.SetArticleWeight;
 
-public class SetArticleWeightDbValidation : AbstractDbValidation<SetArticleWeightCommand>
+public class SetProductWeightDbValidation : AbstractDbValidation<SetArticleWeightCommand>
 {
     public override void Build(IValidationPlan plan, SetArticleWeightCommand request)
     {
-        plan.ValidateArticleExistsId(request.ArticleId);
+        plan.ValidateProductExistsId(request.ProductId);
     }
 }

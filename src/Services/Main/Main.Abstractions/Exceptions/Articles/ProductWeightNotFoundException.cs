@@ -3,9 +3,9 @@ using Exceptions.Base;
 
 namespace Main.Abstractions.Exceptions.Articles;
 
-public class ArticleWeightNotFound : NotFoundException, ILocalizableException
+public class ProductWeightNotFoundException : NotFoundException, ILocalizableException
 {
-    public ArticleWeightNotFound(int articleId) : base(null, new { ArticleId = articleId })
+    public ProductWeightNotFoundException(int articleId) : base(null, new { ArticleId = articleId })
     {
     }
 
