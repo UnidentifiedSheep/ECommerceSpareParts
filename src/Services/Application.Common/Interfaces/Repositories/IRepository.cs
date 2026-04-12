@@ -5,8 +5,7 @@ namespace Application.Common.Interfaces.Repositories;
 public interface IRepository<TEntity, TKey> where TEntity : Entity<TEntity, TKey>
 {
     ValueTask<TEntity?> GetById(
-        TKey id, 
-        Criteria<TEntity>? criteria = null, 
+        TKey id,
         CancellationToken ct = default);
     
     Task<TEntity?> FirstOrDefaultAsync(

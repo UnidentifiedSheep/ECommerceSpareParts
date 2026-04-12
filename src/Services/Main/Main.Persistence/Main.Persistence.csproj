@@ -33,6 +33,7 @@
     <ItemGroup>
         <ProjectReference Include="..\..\..\Infrastructure\Persistence\Persistence.csproj"/>
         <ProjectReference Include="..\Main.Abstractions\Main.Abstractions.csproj"/>
+        <ProjectReference Include="..\Main.Application\Main.Application.csproj" />
         <ProjectReference Include="..\Main.Entities\Main.Entities.csproj"/>
     </ItemGroup>
 

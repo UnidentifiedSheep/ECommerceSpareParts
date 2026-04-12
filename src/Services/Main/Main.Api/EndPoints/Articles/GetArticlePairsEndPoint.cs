@@ -14,7 +14,7 @@ public class GetArticlePairsEndPoint : ICarterModule
     {
         app.MapGet("/articles/{articleId}/pairs", async (ISender sender, int articleId, CancellationToken token) =>
             {
-                var query = new GetArticlePairsQuery(articleId);
+                var query = new GetProductPairQuery(articleId);
                 var result = await sender.Send(query, token);
                 return Results.Ok(result.Adapt<GetArticlePairsResponse>());
             }).WithTags("Articles")

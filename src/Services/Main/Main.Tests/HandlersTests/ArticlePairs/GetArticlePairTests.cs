@@ -46,7 +46,7 @@ public class GetArticlePairTests : IAsyncLifetime
     [Fact]
     public async Task GetArticlePair_ForLeft_ReturnsRightArticleDto()
     {
-        var query = new GetArticlePairsQuery(_leftArticleId);
+        var query = new GetProductPairQuery(_leftArticleId);
         var result = await _mediator.Send(query);
         Assert.Equal(_rightArticleId, result.Pair.Id);
     }
@@ -54,7 +54,7 @@ public class GetArticlePairTests : IAsyncLifetime
     [Fact]
     public async Task GetArticlePair_ForRight_ReturnsLeftArticleDto()
     {
-        var query = new GetArticlePairsQuery(_rightArticleId);
+        var query = new GetProductPairQuery(_rightArticleId);
         var result = await _mediator.Send(query);
         Assert.Equal(_leftArticleId, result.Pair.Id);
     }
@@ -62,7 +62,7 @@ public class GetArticlePairTests : IAsyncLifetime
     [Fact]
     public async Task GetArticlePair_WhenNoPair_ThrowsNotFound()
     {
-        var query = new GetArticlePairsQuery(_articleWithOutPair);
+        var query = new GetProductPairQuery(_articleWithOutPair);
         await Assert.ThrowsAsync<ArticlePairNotFoundException>(() => _mediator.Send(query));
     }
 }

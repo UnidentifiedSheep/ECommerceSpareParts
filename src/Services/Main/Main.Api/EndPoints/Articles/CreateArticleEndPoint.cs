@@ -7,7 +7,7 @@ using MediatR;
 
 namespace Main.Api.EndPoints.Articles;
 
-public record CreateArticleRequest(List<CreateArticleDto> NewArticles);
+public record CreateArticleRequest(List<CreateProductDto> NewArticles);
 
 public record CreateArticleResponse(List<int> CreatedIds);
 

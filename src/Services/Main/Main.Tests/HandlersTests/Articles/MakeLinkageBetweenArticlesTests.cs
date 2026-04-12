@@ -52,26 +52,26 @@ public class MakeLinkageBetweenArticlesTests : IAsyncLifetime
     [Fact]
     public async Task MakeLinkage_SameIds_FailsValidation()
     {
-        var newLinkage = new NewArticleLinkageDto
+        var newLinkage = new NewProductLinkageDto
         {
             ArticleId = 1,
             CrossArticleId = 1,
-            LinkageType = ArticleLinkageType.FullCross
+            LinkageType = ProductLinkageType.FullCross
         };
-        var command = new MakeLinkageBetweenArticlesCommand([newLinkage]);
+        var command = new MakeLinkageBetweenProductsCommand([newLinkage]);
         await Assert.ThrowsAsync<ValidationException>(async () => await _mediator.Send(command));
     }
 
     [Fact]
     public async Task MakeLinkage_SingleCrosses_Succeeds()
     {
-        var newLinkage = new NewArticleLinkageDto
+        var newLinkage = new NewProductLinkageDto
         {
             ArticleId = 1,
             CrossArticleId = 2,
-            LinkageType = ArticleLinkageType.SingleCross
+            LinkageType = ProductLinkageType.SingleCross
         };
-        var command = new MakeLinkageBetweenArticlesCommand([newLinkage]);
+        var command = new MakeLinkageBetweenProductsCommand([newLinkage]);
 
         var result = await _mediator.Send(command);
         Assert.Equal(Unit.Value, result);
@@ -91,13 +91,13 @@ public class MakeLinkageBetweenArticlesTests : IAsyncLifetime
         await _context.AddArticleCross(1, 3);
         await _context.AddArticleCross(2, 4);
 
-        var newLinkage = new NewArticleLinkageDto
+        var newLinkage = new NewProductLinkageDto
         {
             ArticleId = 1,
             CrossArticleId = 2,
-            LinkageType = ArticleLinkageType.FullCross
+            LinkageType = ProductLinkageType.FullCross
         };
-        var command = new MakeLinkageBetweenArticlesCommand([newLinkage]);
+        var command = new MakeLinkageBetweenProductsCommand([newLinkage]);
 
         var result = await _mediator.Send(command);
 
@@ -127,13 +127,13 @@ public class MakeLinkageBetweenArticlesTests : IAsyncLifetime
         await ClearCrosses(_context);
         await _context.AddArticleCross(2, 4);
 
-        var newLinkage = new NewArticleLinkageDto
+        var newLinkage = new NewProductLinkageDto
         {
             ArticleId = 1,
             CrossArticleId = 2,
-            LinkageType = ArticleLinkageType.FullRightToLeftCross
+            LinkageType = ProductLinkageType.FullRightToLeftCross
         };
-        var command = new MakeLinkageBetweenArticlesCommand([newLinkage]);
+        var command = new MakeLinkageBetweenProductsCommand([newLinkage]);
 
         var result = await _mediator.Send(command);
 
@@ -161,13 +161,13 @@ public class MakeLinkageBetweenArticlesTests : IAsyncLifetime
         await ClearCrosses(_context);
         await _context.AddArticleCross(1, 3);
 
-        var newLinkage = new NewArticleLinkageDto
+        var newLinkage = new NewProductLinkageDto
         {
             ArticleId = 1,
             CrossArticleId = 2,
-            LinkageType = ArticleLinkageType.FullLeftToRightCross
+            LinkageType = ProductLinkageType.FullLeftToRightCross
         };
-        var command = new MakeLinkageBetweenArticlesCommand([newLinkage]);
+        var command = new MakeLinkageBetweenProductsCommand([newLinkage]);
 
         var result = await _mediator.Send(command);
 

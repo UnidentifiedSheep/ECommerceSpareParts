@@ -41,10 +41,10 @@ public class EditArticleTests : IAsyncLifetime
     public async Task EditArticle_NumberAndName_Succeeds()
     {
         var command = new PatchArticleCommand(1,
-            new PatchArticleDto
+            new PatchProductDto
             {
-                ArticleNumber = new PatchField<string> { IsSet = true, Value = "67890" },
-                ArticleName = new PatchField<string> { IsSet = true, Value = "Updated Article" }
+                Sku = new PatchField<string> { IsSet = true, Value = "67890" },
+                Name = new PatchField<string> { IsSet = true, Value = "Updated Article" }
             });
 
         var result = await _mediator.Send(command);
@@ -61,12 +61,12 @@ public class EditArticleTests : IAsyncLifetime
     {
         var command = new PatchArticleCommand(
             999,
-            new PatchArticleDto
+            new PatchProductDto
             {
-                ArticleNumber = new PatchField<string> { IsSet = true, Value = "67890" }
+                Sku = new PatchField<string> { IsSet = true, Value = "67890" }
             });
 
-        await Assert.ThrowsAsync<ArticleNotFoundException>(async () =>
+        await Assert.ThrowsAsync<ProductNotFoundException>(async () =>
             await _mediator.Send(command));
     }
 
@@ -75,9 +75,9 @@ public class EditArticleTests : IAsyncLifetime
     {
         var command = new PatchArticleCommand(
             1,
-            new PatchArticleDto
+            new PatchProductDto
             {
-                ArticleNumber = new PatchField<string> { IsSet = true, Value = "" }
+                Sku = new PatchField<string> { IsSet = true, Value = "" }
             });
 
         await Assert.ThrowsAsync<ValidationException>(async () => await _mediator.Send(command));
@@ -88,9 +88,9 @@ public class EditArticleTests : IAsyncLifetime
     {
         var command = new PatchArticleCommand(
             1,
-            new PatchArticleDto
+            new PatchProductDto
             {
-                ArticleNumber = new PatchField<string> { IsSet = false, Value = null }
+                Sku = new PatchField<string> { IsSet = false, Value = null }
             });
 
         var result = await _mediator.Send(command);
@@ -103,9 +103,9 @@ public class EditArticleTests : IAsyncLifetime
     {
         var command = new PatchArticleCommand(
             1,
-            new PatchArticleDto
+            new PatchProductDto
             {
-                ArticleNumber = new PatchField<string> { IsSet = true, Value = null }
+                Sku = new PatchField<string> { IsSet = true, Value = null }
             });
         await Assert.ThrowsAsync<ValidationException>(async () => await _mediator.Send(command));
     }

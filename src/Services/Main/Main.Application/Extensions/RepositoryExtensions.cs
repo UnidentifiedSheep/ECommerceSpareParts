@@ -21,7 +21,7 @@ public static class RepositoryExtensions
 
         foreach (var id in found.Select(x => x.Id)) requestedIds.Remove(id);
         return requestedIds.Count != 0 
-            ? throw new ArticleNotFoundException(requestedIds) 
+            ? throw new ProductNotFoundException(requestedIds) 
             : found;
     }
 }

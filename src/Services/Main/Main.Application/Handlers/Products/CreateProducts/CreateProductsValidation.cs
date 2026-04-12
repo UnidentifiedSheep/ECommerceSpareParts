@@ -7,15 +7,15 @@ public class CreateProductsValidation : AbstractValidator<CreateProductsCommand>
 {
     public CreateProductsValidation()
     {
-        RuleFor(x => x.NewArticles)
+        RuleFor(x => x.NewProducts)
             .NotEmpty()
             .WithLocalizationKey("article.create.articles.must.have.at.least.one");
 
-        RuleFor(x => x.NewArticles)
+        RuleFor(x => x.NewProducts)
             .Must(x => x.Count <= 100)
             .WithLocalizationKey("article.create.articles.max.100.at.once");
 
-        RuleForEach(x => x.NewArticles).ChildRules(content =>
+        RuleForEach(x => x.NewProducts).ChildRules(content =>
         {
             content.RuleFor(x => x.Sku)
                 .NotEmpty()

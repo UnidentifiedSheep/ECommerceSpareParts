@@ -23,7 +23,7 @@ public static class SortByConfig
             .Map("indicator", x => x.Indicator)
             .Map("popularity", x => x.Popularity);
 
-        new ArticleFullDto().Map("count", x => x.CurrentStock);
+        new ProductDto().Map("count", x => x.Stock);
 
         new Producer().MapDefault(x => x.Id)
             .Map("id", x => x.Id)

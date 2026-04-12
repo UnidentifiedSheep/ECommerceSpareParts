@@ -3,9 +3,6 @@ using Application.Common.Interfaces;
 using Attributes;
 using Contracts.Articles;
 using Main.Abstractions.Dtos.Services.Articles;
-using Main.Abstractions.Exceptions.Producers;
-using Main.Abstractions.Interfaces.DbRepositories;
-using Main.Entities;
 using Main.Entities.Product;
 using Mapster;
 using MassTransit;
@@ -15,13 +12,12 @@ namespace Main.Application.Handlers.Articles.CreateArticles;
 
 [AutoSave]
 [Transactional]
-public record CreateProductsCommand(List<CreateArticleDto> NewArticles) : ICommand<CreateProductsResult>;
+public record CreateProductsCommand(List<CreateProductDto> NewProducts) : ICommand<CreateProductsResult>;
 
 public record CreateProductsResult(List<int> CreatedIds);
 
 public class CreateProductsHandler(
     IUnitOfWork unitOfWork,
-    IProducerRepository producerRepository,
     IPublishEndpoint publishEndpoint)
     : ICommandHandler<CreateProductsCommand, CreateProductsResult>
 {
@@ -29,7 +25,7 @@ public class CreateProductsHandler(
     {
         var products = new List<Product>();
 
-        foreach (var @new in request.NewArticles)
+        foreach (var @new in request.NewProducts)
         {
             var product = Product.Create(@new.Sku, @new.Name, @new.ProducerId, @new.Description);
             product.SetIndicator(@new.Indicator);
@@ -45,28 +41,13 @@ public class CreateProductsHandler(
         return new CreateProductsResult(products.Select(x => x.Id).ToList());
     }
 
-    private async Task PublishEvent(List<Product> articles, CancellationToken cancellationToken)
+    private async Task PublishEvent(List<Product> products, CancellationToken cancellationToken)
     {
-        var producerIds = articles.Select(x => x.ProducerId).Distinct();
-        var producers = (await producerRepository
-                .GetProducers(producerIds, false, cancellationToken))
-            .ToDictionary(k => k.Id, v => v);
-
-        var adaptedArticles = new List<ContractArticle>();
-        foreach (var article in articles)
-        {
-            if (!producers.TryGetValue(article.ProducerId, out var producer))
-                throw new ProducerNotFoundException(article.ProducerId);
-            var adaptedArticle = article.Adapt<ContractArticle>() with
-            {
-                ProducerId = producer.Id,
-            };
-            adaptedArticles.Add(adaptedArticle);
-        }
+        var contractProducts = products.Adapt<List<ContractArticle>>();
 
         await publishEndpoint.Publish(new ArticlesCreatedEvent
         {
-            Articles = adaptedArticles
+            Articles = contractProducts
         }, cancellationToken);
         await unitOfWork.SaveChangesAsync(cancellationToken);
     }

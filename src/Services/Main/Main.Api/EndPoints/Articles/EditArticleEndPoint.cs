@@ -6,7 +6,7 @@ using MediatR;
 
 namespace Main.Api.EndPoints.Articles;
 
-public record EditArticleRequest(PatchArticleDto PatchArticle);
+public record EditArticleRequest(PatchProductDto PatchProduct);
 
 public class EditArticleEndPoint : ICarterModule
 {
@@ -15,7 +15,7 @@ public class EditArticleEndPoint : ICarterModule
         app.MapPatch("/articles/{articleId}",
                 async (ISender sender, int articleId, EditArticleRequest request, CancellationToken token) =>
                 {
-                    var command = new PatchArticleCommand(articleId, request.PatchArticle);
+                    var command = new PatchArticleCommand(articleId, request.PatchProduct);
                     await sender.Send(command, token);
                     return Results.NoContent();
                 }).WithTags("Articles")

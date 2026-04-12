@@ -31,6 +31,8 @@ public partial class DContext : DbContext
     }
 
     public virtual DbSet<Product> Products { get; set; }
+    
+    public virtual DbSet<ProductCross> ProductCrosses { get; set; }
 
     public virtual DbSet<ProductCharacteristic> ProductCharacteristics { get; set; }
 

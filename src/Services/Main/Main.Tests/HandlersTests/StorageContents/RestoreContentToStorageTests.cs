@@ -162,7 +162,7 @@ public class RestoreContentToStorageTests : IAsyncLifetime
         content[^1] = new RestoreContentItem(content[^1].Detail, invalidArticleId);
 
         var command = new RestoreContentCommand(content, StorageMovementType.StorageContentAddition, _user.Id);
-        await Assert.ThrowsAsync<ArticleNotFoundException>(async () => await _mediator.Send(command));
+        await Assert.ThrowsAsync<ProductNotFoundException>(async () => await _mediator.Send(command));
     }
 
     [Fact]

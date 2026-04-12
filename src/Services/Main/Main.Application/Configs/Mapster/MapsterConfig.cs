@@ -47,7 +47,6 @@ using Main.Entities.Transaction;
 using Main.Entities.User;
 using Mapster;
 using Utils;
-using AmwArticleFullDto = Main.Abstractions.Dtos.Amw.Articles.ArticleFullDto;
 using MemberArticleFullDto = Main.Abstractions.Dtos.Member.Articles.ArticleFullDto;
 using AmwArticleDto = Main.Abstractions.Dtos.Amw.Articles.ArticleDto;
 using AnonymousArticleDto = Main.Abstractions.Dtos.Anonymous.Articles.ArticleDto;
@@ -195,7 +194,7 @@ public static class MapsterConfig
 
 
         //AMW
-        TypeAdapterConfig<CreateArticleDto, Product>.NewConfig()
+        TypeAdapterConfig<CreateProductDto, Product>.NewConfig()
             .Map(d => d.Name, s => s.Name.Trim())
             .Map(d => d.ProducerId, s => s.ProducerId)
             .Map(d => d.Description, s => string.IsNullOrWhiteSpace(s.Description) ? null : s.Description.Trim())
@@ -204,28 +203,28 @@ public static class MapsterConfig
             .Map(d => d.PackingUnit, s => s.PackingUnit)
             .Map(d => d.Indicator, s => string.IsNullOrWhiteSpace(s.Indicator) ? null : s.Indicator.Trim())
             .Map(d => d.CategoryId, s => s.CategoryId);
-        TypeAdapterConfig<Product, AmwArticleFullDto>.NewConfig()
+        TypeAdapterConfig<Product, ProductDto>.NewConfig()
             .Map(d => d.Id, s => s.Id)
             .Map(d => d.ArticleNumber, s => s.Sku)
-            .Map(d => d.Title, s => s.Name)
+            .Map(d => d.Name, s => s.Name)
             .Map(d => d.Description, s => s.Description)
             .Map(d => d.ProducerName, s => s.Producer.Name)
             .Map(d => d.ProducerId, s => s.ProducerId)
             .Map(d => d.Images, s => s.Images.Select(x => x.Path))
-            .Map(d => d.CurrentStock, s => s.Stock)
-            .Map(d => d.IndicatorColor, s => s.Indicator);
+            .Map(d => d.Stock, s => s.Stock)
+            .Map(d => d.Indicator, s => s.Indicator);
 
 
-        TypeAdapterConfig<AmwArticleFullDto, MemberArticleFullDto>.NewConfig()
+        TypeAdapterConfig<ProductDto, MemberArticleFullDto>.NewConfig()
             .IgnoreNonMapped(true)
             .Map(d => d.Id, s => s.Id)
             .Map(d => d.ArticleNumber, s => s.ArticleNumber)
-            .Map(d => d.Title, s => s.Title)
+            .Map(d => d.Title, s => s.Name)
             .Map(d => d.Description, s => s.Description)
             .Map(d => d.ProducerName, s => s.ProducerName)
             .Map(d => d.ProducerId, s => s.ProducerId)
             .Map(d => d.Images, s => s.Images)
-            .Map(d => d.CurrentStock, s => s.CurrentStock);
+            .Map(d => d.CurrentStock, s => s.Stock);
 
         TypeAdapterConfig<PatchCharacteristicsDto, ProductCharacteristic>.NewConfig()
             .IgnorePatchIfNotSet()
@@ -238,14 +237,14 @@ public static class MapsterConfig
             .Map(d => d.Location, s => s.Location == null ? null : s.Location.Trim())
             .Map(d => d.Type, s => s.Type.ToString());
 
-        TypeAdapterConfig<PatchArticleDto, Product>.NewConfig()
+        TypeAdapterConfig<PatchProductDto, Product>.NewConfig()
             .IgnorePatchIfNotSet()
-            .IgnoreIf((src, dest) => !src.ArticleNumber.IsSet, dest => dest.NormalizedSku)
-            .Map(d => d.Name, s => s.ArticleName.Value)
+            .IgnoreIf((src, dest) => !src.Sku.IsSet, dest => dest.NormalizedSku)
+            .Map(d => d.Name, s => s.Name.Value)
             .Map(d => d.ProducerId, s => s.ProducerId.Value)
             .Map(d => d.Description, s => s.Description.Value)
-            .Map(d => d.Sku, s => s.ArticleNumber.Value)
-            .Map(d => d.NormalizedSku, s => s.ArticleNumber.Value!.ToNormalizedArticleNumber())
+            .Map(d => d.Sku, s => s.Sku.Value)
+            .Map(d => d.NormalizedSku, s => s.Sku.Value!.ToNormalizedArticleNumber())
             .Map(d => d.PackingUnit, s => s.PackingUnit.Value)
             .Map(d => d.Indicator, s => s.Indicator.Value)
             .Map(d => d.CategoryId, s => s.CategoryId.Value);

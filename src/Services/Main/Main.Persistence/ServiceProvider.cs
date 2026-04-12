@@ -1,6 +1,7 @@
 using Abstractions.Interfaces;
 using BulkValidation.Pgsql.Extensions;
 using Main.Abstractions.Interfaces.DbRepositories;
+using Main.Application.Interfaces.Repositories;
 using Main.Persistence.Context;
 using Main.Persistence.Repositories;
 using Microsoft.EntityFrameworkCore;
@@ -48,6 +49,9 @@ public static class ServiceProvider
         collection.AddScoped<IArticleCoefficients, ArticleCoefficients>();
         collection.AddScoped<ISettingsRepository, SettingsRepository>();
 
+        collection.AddScoped<IProductRepository, ProductRepository>();
+        collection.AddScoped<IReadDContext, ReadDContext>();
+        
         collection.AddUnitOfWork<DContext>();
 
         collection.AddScoped<IDbValidator, PgsqlDbValidator<DContext>>();

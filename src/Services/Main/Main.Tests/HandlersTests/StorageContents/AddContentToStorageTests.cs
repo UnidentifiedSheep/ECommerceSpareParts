@@ -149,7 +149,7 @@ public class AddContentToStorageTests : IAsyncLifetime
         storageContent.Last().ArticleId = int.MaxValue;
         var command = new AddContentCommand(storageContent, _storage.Name, _user.Id,
             StorageMovementType.StorageContentAddition);
-        await Assert.ThrowsAsync<ArticleNotFoundException>(async () => await _mediator.Send(command));
+        await Assert.ThrowsAsync<ProductNotFoundException>(async () => await _mediator.Send(command));
     }
 
     [Fact]
