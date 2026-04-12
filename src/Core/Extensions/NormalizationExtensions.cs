@@ -31,16 +31,6 @@ public static partial class NormalizationExtensions
         return permission.ToString().ToUpperInvariant().Replace('_', '.');
     }
 
-    /// <summary>
-    ///     Возвращает нормализованый артикул те состоящий только из букв и цифр.
-    /// </summary>
-    /// <param name="source"></param>
-    /// <returns></returns>
-    public static string ToNormalizedArticleNumber(this string source)
-    {
-        return OnlyCharacter().Replace(source, "").ToUpperInvariant();
-    }
-
     public static string ToNormalized(this string source)
     {
         return source.Trim().ToUpperInvariant();

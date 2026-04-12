@@ -22,7 +22,7 @@ public static class MockData
     public static List<CreateArticleDto> CreateNewArticleDto(int count)
     {
         var f = new Faker<CreateArticleDto>(Locale)
-            .RuleFor(x => x.ArticleNumber, f => f.Lorem.Letter(28))
+            .RuleFor(x => x.Sku, f => f.Lorem.Letter(28))
             .RuleFor(x => x.Name, f => string.Join(" ", f.Lorem.Words(4)))
             .RuleFor(x => x.Description, f => Random.Shared.Next(1, 2) == 1 ? string.Join(" ", f.Lorem.Words(9)) : null)
             .RuleFor(x => x.ProducerId, f => f.PickRandom(f.Random.Int(1, 5)))

@@ -1,52 +1,128 @@
 ﻿using BulkValidation.Core.Attributes;
 using Domain;
+using Main.Entities.Product.ValueObjects;
 
 namespace Main.Entities.Product;
 
 public class Product : AuditableEntity<Product, int>
 {
     [Validate]
-    public int Id { get; set; }
+    public int Id { get; private set; }
+    public int? PairId { get; private set; }
+    public Sku Sku { get; set; } = null!;
+    public Name Name { get; set; } = null!;
+    public Stock Stock { get; set; } = null!;
+    public string? Description { get; private set; }
+    public int? PackingUnit { get; private set; }
+    public int ProducerId { get; private set; }
+    public Indicator? Indicator { get; private set; }
+    public int? CategoryId { get; private set; }
+    public long Popularity { get; private set; }
+
+    private List<ProductCharacteristic> _characteristics = [];
+    public IReadOnlyCollection<ProductCharacteristic> Characteristics => _characteristics;
+
+    private List<ProductEan> _eans = [];
+    public IReadOnlyCollection<ProductEan> Eans => _eans;
+
+    private List<ProductImage> _images = [];
+    public IReadOnlyCollection<ProductImage> Images => _images;
+
+    private List<ProductContent> _contents = [];
+    public IReadOnlyCollection<ProductContent> Contents => _contents;
+    public ProductSize? ProductSize { get; private set; }
+
+    public ProductWeight? ProductWeight { get; private set; }
+
+    public Product? Pair { get; private set; }
+
+    public Category? Category { get; private set; }
+
+    public Producer.Producer Producer { get; private set; } = null!;
+
+
+    private Product(
+        Sku sku, 
+        Name name, 
+        int producerId, 
+        string? description)
+    {
+        Sku = sku;
+        Name = name;
+        ProducerId = producerId;
+        Description = description;
+        Stock = 0;
+    }
     
-    public int? PairId { get; set; }
+    private Product() {}
 
-    public string Sku { get; set; } = null!;
+    public static Product Create(
+        Sku sku, 
+        Name name, 
+        int producerId, 
+        string? description)
+    {
+        return new Product(sku, name, producerId, description);
+    }
 
-    public string NormalizedSku { get; set; } = null!;
+    public void SetDescription(string? description)
+    {
+        description = description?.Trim();
+        Description = string.IsNullOrWhiteSpace(description) ? null : description;
+    }
 
-    public string Name { get; set; } = null!;
+    public void SetSku(Sku sku)
+    {
+        Sku = sku;
+    }
 
-    public string? Description { get; set; }
+    public void SetName(Name name)
+    {
+        Name = name;
+    }
 
-    public int? PackingUnit { get; set; }
+    public void SetProducerId(int producerId)
+    {
+        ProducerId = producerId;
+    }
 
-    public int ProducerId { get; set; }
+    public void UpdateStock(Stock stock)
+    {
+        Stock = stock;
+    }
 
-    public int Stock { get; set; }
+    public void IncreaseStock(int value)
+    {
+        Stock = Stock.Value + value;
+    }
 
-    public string? Indicator { get; set; }
+    public void SetPackingUnit(int? packingUnit)
+    {
+        if (packingUnit.HasValue)
+            ArgumentOutOfRangeException.ThrowIfNegative(packingUnit.Value);
+        PackingUnit = packingUnit;
+    }
 
-    public int? CategoryId { get; set; }
-    public long Popularity { get; set; }
+    public void SetIndicator(Indicator indicator)
+    {
+        Indicator = indicator;
+    }
 
-    public virtual ICollection<ProductCharacteristic> ProductCharacteristics { get; set; } =
-        new List<ProductCharacteristic>();
+    public void SetCategory(int? categoryId)
+    {
+        CategoryId = categoryId;
+    }
 
-    public ICollection<ProductCoefficient> ProductCoefficients { get; set; } = new List<ProductCoefficient>();
+    public void SetPopularity(long popularity)
+    {
+        ArgumentOutOfRangeException.ThrowIfNegative(popularity);
+        Popularity = popularity;
+    }
 
-    public ICollection<ProductEan> ProductEans { get; set; } = new List<ProductEan>();
-
-    public ICollection<ProductImage> ProductImages { get; set; } = new List<ProductImage>();
-
-    public ICollection<ProductContent> ProductContents { get; set; } = new List<ProductContent>();
-    public virtual ProductSize? ProductSize { get; set; }
-
-    public virtual ProductWeight? ProductWeight { get; set; }
-
-    public Product? Pair { get; set; }
-
-    public virtual Category? Category { get; set; }
-
-    public virtual Producer.Producer Producer { get; set; } = null!;
+    public void SetPair(int? pairId)
+    {
+        PairId = pairId;
+    }
+    
     public override int GetId() => Id;
 }

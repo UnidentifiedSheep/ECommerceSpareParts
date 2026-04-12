@@ -9,8 +9,6 @@ public record Article
     public string? Description { get; init; }
     public int? PackingUnit { get; init; }
     public int ProducerId { get; init; }
-    public string ProducerName { get; init; } = null!;
-    public bool IsOe { get; init; }
     public int TotalCount { get; init; }
     public string? Indicator { get; init; }
     public int? CategoryId { get; init; }

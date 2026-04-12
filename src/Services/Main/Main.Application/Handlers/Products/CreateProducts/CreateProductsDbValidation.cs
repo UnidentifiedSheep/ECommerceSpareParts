@@ -4,9 +4,9 @@ using Main.Entities;
 
 namespace Main.Application.Handlers.Articles.CreateArticles;
 
-public class CreateProductsDbValidation : AbstractDbValidation<CreateArticlesCommand>
+public class CreateProductsDbValidation : AbstractDbValidation<CreateProductsCommand>
 {
-    public override void Build(IValidationPlan plan, CreateArticlesCommand request)
+    public override void Build(IValidationPlan plan, CreateProductsCommand request)
     {
         plan.ValidateProducerExistsId(request.NewArticles.Select(x => x.ProducerId));
     }

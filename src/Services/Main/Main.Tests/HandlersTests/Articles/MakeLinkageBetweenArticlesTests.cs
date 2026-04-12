@@ -40,7 +40,7 @@ public class MakeLinkageBetweenArticlesTests : IAsyncLifetime
         foreach (var article in articleList)
             article.ProducerId = producerId;
 
-        var articleCommand = new CreateArticlesCommand(articleList);
+        var articleCommand = new CreateProductsCommand(articleList);
         await _mediator.Send(articleCommand);
     }
 

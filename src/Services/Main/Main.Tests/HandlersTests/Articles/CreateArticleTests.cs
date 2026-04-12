@@ -46,13 +46,13 @@ public class CreateArticleTests : IAsyncLifetime
     {
         var articleList = MockData.MockData.CreateNewArticleDto(1);
         articleList[0].ProducerId = 1;
-        var command = new CreateArticlesCommand(articleList);
+        var command = new CreateProductsCommand(articleList);
 
         var result = await _mediator.Send(command);
 
         Assert.Equal(articleList.Count, result.CreatedIds.Count);
 
-        var saved = await _context.Products.AnyAsync(a => a.Sku == articleList[0].ArticleNumber);
+        var saved = await _context.Products.AnyAsync(a => a.Sku == articleList[0].Sku);
         Assert.True(saved);
     }
 
@@ -62,7 +62,7 @@ public class CreateArticleTests : IAsyncLifetime
         var articleList = MockData.MockData.CreateNewArticleDto(Random.Shared.Next(2, 50));
         foreach (var article in articleList)
             article.ProducerId = 1;
-        var command = new CreateArticlesCommand(articleList);
+        var command = new CreateProductsCommand(articleList);
 
         var result = await _mediator.Send(command, CancellationToken.None);
 
@@ -71,7 +71,7 @@ public class CreateArticleTests : IAsyncLifetime
         var saved = true;
         foreach (var item in articleList)
         {
-            saved = await _context.Products.AnyAsync(a => a.Sku == item.ArticleNumber &&
+            saved = await _context.Products.AnyAsync(a => a.Sku == item.Sku &&
                                                           a.Name == item.Name &&
                                                           a.ProducerId == item.ProducerId);
             if (!saved) break;
@@ -83,7 +83,7 @@ public class CreateArticleTests : IAsyncLifetime
     [Fact]
     public async Task CreateArticle_WithEmptyList_FailsValidation()
     {
-        var command = new CreateArticlesCommand([]);
+        var command = new CreateProductsCommand([]);
 
         await Assert.ThrowsAsync<ValidationException>(() => _mediator.Send(command));
     }
@@ -94,7 +94,7 @@ public class CreateArticleTests : IAsyncLifetime
         var articleList = MockData.MockData.CreateNewArticleDto(1);
 
         articleList[0].Name = string.Join(" ", _faker.Lorem.Words(100));
-        var command = new CreateArticlesCommand(articleList);
+        var command = new CreateProductsCommand(articleList);
 
         await Assert.ThrowsAsync<ValidationException>(() =>
             _mediator.Send(command));
@@ -104,7 +104,7 @@ public class CreateArticleTests : IAsyncLifetime
     public async Task CreateArticle_WithManyItems_FailsValidation()
     {
         var articleList = MockData.MockData.CreateNewArticleDto(200);
-        var command = new CreateArticlesCommand(articleList);
+        var command = new CreateProductsCommand(articleList);
         await Assert.ThrowsAsync<ValidationException>(() =>
             _mediator.Send(command));
     }
@@ -115,7 +115,7 @@ public class CreateArticleTests : IAsyncLifetime
         var articleList = MockData.MockData.CreateNewArticleDto(1);
         articleList[0].ProducerId = 9999; // несуществующий ProducerId
 
-        var command = new CreateArticlesCommand(articleList);
+        var command = new CreateProductsCommand(articleList);
 
         var exception = await Assert.ThrowsAsync<DbValidationException>(() => _mediator.Send(command));
         Assert.Equal(ApplicationErrors.ProducersNotFound, exception.Failures[0].ErrorName);

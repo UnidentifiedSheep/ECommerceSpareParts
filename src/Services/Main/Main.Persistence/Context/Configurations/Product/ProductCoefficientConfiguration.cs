@@ -25,7 +25,7 @@ public class ProductCoefficientConfiguration : IEntityTypeConfiguration<ProductC
             .HasColumnName("valid_till");
         
         builder.HasOne(d => d.Coefficient)
-            .WithMany(p => p.ArticleCoefficients)
+            .WithMany(p => p.ProductCoefficients)
             .HasForeignKey(d => d.CoefficientName)
             .OnDelete(DeleteBehavior.Restrict)
             .HasConstraintName("article_coefficients_coefficients_name_fk");

@@ -17,7 +17,7 @@ public class CreateArticleEndPoint : ICarterModule
     {
         app.MapPost("/articles", async (ISender sender, CreateArticleRequest request, CancellationToken token) =>
             {
-                var command = request.Adapt<CreateArticlesCommand>();
+                var command = request.Adapt<CreateProductsCommand>();
                 var result = await sender.Send(command, token);
                 var response = result.Adapt<CreateArticleResponse>();
                 return Results.Created("/articles", response);

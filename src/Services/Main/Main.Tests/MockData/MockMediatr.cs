@@ -38,7 +38,7 @@ public static class MockMediatr
         foreach (var article in articleList)
             article.ProducerId = Global.Faker.PickRandom(producerIds);
 
-        var articleCommand = new CreateArticlesCommand(articleList);
+        var articleCommand = new CreateProductsCommand(articleList);
         await mediator.Send(articleCommand);
     }
 

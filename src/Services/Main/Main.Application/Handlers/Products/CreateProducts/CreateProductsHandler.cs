@@ -13,26 +13,36 @@ using ContractArticle = Contracts.Models.Articles.Article;
 
 namespace Main.Application.Handlers.Articles.CreateArticles;
 
+[AutoSave]
 [Transactional]
-public record CreateArticlesCommand(List<CreateArticleDto> NewArticles) : ICommand<CreateArticlesResult>;
+public record CreateProductsCommand(List<CreateArticleDto> NewArticles) : ICommand<CreateProductsResult>;
 
-public record CreateArticlesResult(List<int> CreatedIds);
+public record CreateProductsResult(List<int> CreatedIds);
 
 public class CreateProductsHandler(
     IUnitOfWork unitOfWork,
     IProducerRepository producerRepository,
     IPublishEndpoint publishEndpoint)
-    : ICommandHandler<CreateArticlesCommand, CreateArticlesResult>
+    : ICommandHandler<CreateProductsCommand, CreateProductsResult>
 {
-    public async Task<CreateArticlesResult> Handle(CreateArticlesCommand request, CancellationToken cancellationToken)
+    public async Task<CreateProductsResult> Handle(CreateProductsCommand request, CancellationToken cancellationToken)
     {
-        var articles = request.NewArticles.Adapt<List<Product>>();
-        await unitOfWork.AddRangeAsync(articles, cancellationToken);
+        var products = new List<Product>();
+
+        foreach (var @new in request.NewArticles)
+        {
+            var product = Product.Create(@new.Sku, @new.Name, @new.ProducerId, @new.Description);
+            product.SetIndicator(@new.Indicator);
+            product.SetCategory(@new.CategoryId);
+            products.Add(product);
+        }
+        
+        await unitOfWork.AddRangeAsync(products, cancellationToken);
         await unitOfWork.SaveChangesAsync(cancellationToken);
 
-        await PublishEvent(articles, cancellationToken);
+        await PublishEvent(products, cancellationToken);
 
-        return new CreateArticlesResult(articles.Select(x => x.Id).ToList());
+        return new CreateProductsResult(products.Select(x => x.Id).ToList());
     }
 
     private async Task PublishEvent(List<Product> articles, CancellationToken cancellationToken)
@@ -50,7 +60,6 @@ public class CreateProductsHandler(
             var adaptedArticle = article.Adapt<ContractArticle>() with
             {
                 ProducerId = producer.Id,
-                ProducerName = producer.Name
             };
             adaptedArticles.Add(adaptedArticle);
         }

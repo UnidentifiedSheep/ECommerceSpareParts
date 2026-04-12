@@ -22,7 +22,7 @@ public class ProductEanConfiguration : IEntityTypeConfiguration<ProductEan>
             .HasMaxLength(30);
         
         builder.HasOne<Entities.Product.Product>()
-            .WithMany(p => p.ProductEans)
+            .WithMany(p => p.Eans)
             .HasForeignKey(x => x.ProductId)
             .OnDelete(DeleteBehavior.Cascade)
             .HasConstraintName("product_eans_product_id_fk");

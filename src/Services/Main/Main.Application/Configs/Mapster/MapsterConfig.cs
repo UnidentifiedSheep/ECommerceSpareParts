@@ -199,8 +199,8 @@ public static class MapsterConfig
             .Map(d => d.Name, s => s.Name.Trim())
             .Map(d => d.ProducerId, s => s.ProducerId)
             .Map(d => d.Description, s => string.IsNullOrWhiteSpace(s.Description) ? null : s.Description.Trim())
-            .Map(d => d.Sku, s => s.ArticleNumber.Trim())
-            .Map(d => d.NormalizedSku, s => s.ArticleNumber.ToNormalizedArticleNumber())
+            .Map(d => d.Sku, s => s.Sku.Trim())
+            .Map(d => d.NormalizedSku, s => s.Sku.ToNormalizedArticleNumber())
             .Map(d => d.PackingUnit, s => s.PackingUnit)
             .Map(d => d.Indicator, s => string.IsNullOrWhiteSpace(s.Indicator) ? null : s.Indicator.Trim())
             .Map(d => d.CategoryId, s => s.CategoryId);
@@ -211,7 +211,7 @@ public static class MapsterConfig
             .Map(d => d.Description, s => s.Description)
             .Map(d => d.ProducerName, s => s.Producer.Name)
             .Map(d => d.ProducerId, s => s.ProducerId)
-            .Map(d => d.Images, s => s.ProductImages.Select(x => x.Path))
+            .Map(d => d.Images, s => s.Images.Select(x => x.Path))
             .Map(d => d.CurrentStock, s => s.Stock)
             .Map(d => d.IndicatorColor, s => s.Indicator);
 
@@ -258,7 +258,7 @@ public static class MapsterConfig
             .Map(d => d.Description, s => s.Description)
             .Map(d => d.ProducerName, s => s.Producer.Name)
             .Map(d => d.ProducerId, s => s.ProducerId)
-            .Map(d => d.Images, s => s.ProductImages.Select(x => x.Path))
+            .Map(d => d.Images, s => s.Images.Select(x => x.Path))
             .Map(d => d.CurrentStock, s => s.Stock);
 
         //Producers

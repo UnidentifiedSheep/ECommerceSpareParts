@@ -56,7 +56,7 @@ public class DeleteFromCartTests : IAsyncLifetime
         // Create Article
         var articleList = MockData.MockData.CreateNewArticleDto(1);
         articleList[0].ProducerId = producerResult.ProducerId;
-        var createArticleCommand = new CreateArticlesCommand(articleList);
+        var createArticleCommand = new CreateProductsCommand(articleList);
         var articleResult = await _mediator.Send(createArticleCommand);
         _articleId = articleResult.CreatedIds[0];
 

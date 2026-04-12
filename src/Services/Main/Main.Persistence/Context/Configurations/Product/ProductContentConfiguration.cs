@@ -27,7 +27,7 @@ public class ProductContentConfiguration : IEntityTypeConfiguration<ProductConte
             .HasColumnName("quantity");
         
         builder.HasOne(x => x.ParentProduct)
-            .WithMany(p => p.ProductContents)
+            .WithMany(p => p.Contents)
             .HasForeignKey(x => x.ParentProductId)
             .OnDelete(DeleteBehavior.Cascade)
             .HasConstraintName("product_contents_parent_fk");

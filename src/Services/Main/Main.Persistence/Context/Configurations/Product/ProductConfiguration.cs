@@ -11,7 +11,7 @@ public class ProductConfiguration : IEntityTypeConfiguration<Entities.Product.Pr
 
             builder.ToTable("products");
 
-            builder.HasIndex(e => e.Sku, "products_sku_index")
+            builder.HasIndex(["sku"], "products_sku_index")
                 .HasMethod("gin")
                 .HasOperators("gin_trgm_ops");
 
@@ -20,7 +20,7 @@ public class ProductConfiguration : IEntityTypeConfiguration<Entities.Product.Pr
             builder.HasIndex(e => e.PairId, "products_pair_id_index")
                 .IsUnique();
 
-            builder.HasIndex(e => new { e.NormalizedSku, e.ProducerId },
+            builder.HasIndex(["normalized_sku", "producer_id"],
                 "products_normalized_sku_producer_id_index")
                 .IsUnique();
 
@@ -30,20 +30,48 @@ public class ProductConfiguration : IEntityTypeConfiguration<Entities.Product.Pr
 
             builder.HasIndex(e => e.Stock, "products_total_count_index");
 
-            builder.HasIndex(e => e.NormalizedSku, "normalized_sku_index")
+            builder.HasIndex(["normalized_sku"], "normalized_sku_index")
                 .HasMethod("gin")
                 .HasOperators("gin_trgm_ops");
 
             builder.Property(e => e.Id)
                 .HasColumnName("id");
+
+            builder.OwnsOne(
+                e => e.Sku,
+                b =>
+                {
+                    b.Property(e => e.Value)
+                        .HasColumnName("sku");
+
+                    b.Property(e => e.NormalizedValue)
+                        .HasColumnName("normalized_sku");
+                });
+
+            builder.OwnsOne(
+                e => e.Name,
+                b =>
+                {
+                    b.Property(e => e.Value)
+                        .HasColumnName("name")
+                        .HasMaxLength(255);
+                });
             
-            builder.Property(e => e.Name)
-                .HasMaxLength(255)
-                .HasColumnName("article_name");
-            
-            builder.Property(e => e.Sku)
-                .HasMaxLength(128)
-                .HasColumnName("sku");
+            builder.OwnsOne(
+                e => e.Stock,
+                b =>
+                {
+                    b.Property(e => e.Value)
+                        .HasColumnName("stock");
+                });
+
+            builder.OwnsOne(e => e.Indicator,
+                b =>
+                {
+                    b.Property(e => e.Value)
+                        .HasMaxLength(24)
+                        .HasColumnName("indicator");
+                });
             
             builder.Property(e => e.CategoryId)
                 .HasColumnName("category_id");
@@ -51,15 +79,6 @@ public class ProductConfiguration : IEntityTypeConfiguration<Entities.Product.Pr
             builder.Property(e => e.Description)
                 .HasMaxLength(255)
                 .HasColumnName("description");
-            
-            builder.Property(e => e.Indicator)
-                .HasMaxLength(24)
-                .HasColumnName("indicator");
-        
-            
-            builder.Property(e => e.NormalizedSku)
-                .HasMaxLength(128)
-                .HasColumnName("normalized_sku");
             
             builder.Property(e => e.PackingUnit)
                 .HasColumnName("packing_unit");
@@ -70,9 +89,6 @@ public class ProductConfiguration : IEntityTypeConfiguration<Entities.Product.Pr
             
             builder.Property(e => e.ProducerId)
                 .HasColumnName("producer_id");
-            
-            builder.Property(e => e.Stock)
-                .HasColumnName("stock");
 
             builder.HasOne(d => d.Category)
                 .WithMany(p => p.Articles)
@@ -90,5 +106,21 @@ public class ProductConfiguration : IEntityTypeConfiguration<Entities.Product.Pr
                 .WithOne()
                 .HasForeignKey<Entities.Product.Product>(p => p.PairId)
                 .OnDelete(DeleteBehavior.SetNull);
+            
+            builder.Navigation(e => e.Characteristics)
+                .HasField("_characteristics")
+                .UsePropertyAccessMode(PropertyAccessMode.Field);
+            
+            builder.Navigation(e => e.Eans)
+                .HasField("_eans")
+                .UsePropertyAccessMode(PropertyAccessMode.Field);
+            
+            builder.Navigation(e => e.Images)
+                .HasField("_images")
+                .UsePropertyAccessMode(PropertyAccessMode.Field);
+            
+            builder.Navigation(e => e.Contents)
+                .HasField("_contents")
+                .UsePropertyAccessMode(PropertyAccessMode.Field);
     }
 }

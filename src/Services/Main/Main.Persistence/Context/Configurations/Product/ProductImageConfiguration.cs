@@ -26,7 +26,7 @@ public class ProductImageConfiguration : IEntityTypeConfiguration<ProductImage>
             .HasMaxLength(512);
         
         builder.HasOne<Entities.Product.Product>()
-            .WithMany(p => p.ProductImages)
+            .WithMany(p => p.Images)
             .HasForeignKey(x => x.ProductId)
             .OnDelete(DeleteBehavior.Cascade)
             .HasConstraintName("product_images_product_id_fk");

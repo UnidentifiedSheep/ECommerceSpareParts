@@ -32,7 +32,7 @@ public class ProductCharacteristicConfiguration : IEntityTypeConfiguration<Produ
             .HasColumnName("value");
 
         builder.HasOne<Entities.Product.Product>()
-            .WithMany(p => p.ProductCharacteristics)
+            .WithMany(p => p.Characteristics)
             .HasForeignKey(x => x.ProductId)
             .OnDelete(DeleteBehavior.Cascade)
             .HasConstraintName("product_characteristics_product_id_fk");

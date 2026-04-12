@@ -1,13 +1,24 @@
+using System.Text.Json.Serialization;
+
 namespace Main.Abstractions.Dtos.Services.Articles;
 
 public class CreateArticleDto
 {
-    public string ArticleNumber { get; set; } = null!;
+    [JsonPropertyName("sku")]
+    public string Sku { get; set; } = null!;
+    
+    [JsonPropertyName("name")]
     public string Name { get; set; } = null!;
+    
+    [JsonPropertyName("producerId")]
     public int ProducerId { get; set; }
+    
+    [JsonPropertyName("description")]
     public string? Description { get; set; }
-    public bool IsOe { get; set; } = false;
-    public int? PackingUnit { get; set; }
+    
+    [JsonPropertyName("indicator")]
     public string? Indicator { get; set; }
+    
+    [JsonPropertyName("categoryId")]
     public int? CategoryId { get; set; }
 }
