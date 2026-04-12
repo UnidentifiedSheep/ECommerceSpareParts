@@ -8,6 +8,6 @@ public class AddCharacteristicsDbValidation : AbstractDbValidation<AddCharacteri
 {
     public override void Build(IValidationPlan plan, AddCharacteristicsCommand request)
     {
-        plan.ValidateArticleExistsId(request.Characteristics.Select(x => x.ArticleId));
+        plan.ValidateProductExistsId(request.Characteristics.Select(x => x.ArticleId));
     }
 }

@@ -18,7 +18,7 @@ public record CreateArticlesCommand(List<CreateArticleDto> NewArticles) : IComma
 
 public record CreateArticlesResult(List<int> CreatedIds);
 
-public class CreateArticlesHandler(
+public class CreateProductsHandler(
     IUnitOfWork unitOfWork,
     IProducerRepository producerRepository,
     IPublishEndpoint publishEndpoint)

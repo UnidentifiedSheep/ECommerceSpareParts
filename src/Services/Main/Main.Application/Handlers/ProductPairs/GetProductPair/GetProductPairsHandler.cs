@@ -10,7 +10,7 @@ public record GetArticlePairsQuery(int ArticleId) : IQuery<GetArticlePairsResult
 
 public record GetArticlePairsResult(ArticleDto Pair);
 
-public class GetArticlePairsHandler(IArticlePairsRepository pairsRepository)
+public class GetProductPairsHandler(IArticlePairsRepository pairsRepository)
     : IQueryHandler<GetArticlePairsQuery, GetArticlePairsResult>
 {
     public async Task<GetArticlePairsResult> Handle(GetArticlePairsQuery request, CancellationToken cancellationToken)

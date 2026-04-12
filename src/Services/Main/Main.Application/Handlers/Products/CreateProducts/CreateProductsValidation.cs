@@ -3,9 +3,9 @@ using Localization.Domain.Extensions;
 
 namespace Main.Application.Handlers.Articles.CreateArticles;
 
-public class CreateArticlesValidation : AbstractValidator<CreateArticlesCommand>
+public class CreateProductsValidation : AbstractValidator<CreateArticlesCommand>
 {
-    public CreateArticlesValidation()
+    public CreateProductsValidation()
     {
         RuleFor(x => x.NewArticles)
             .NotEmpty()

@@ -4,7 +4,7 @@ using Main.Entities;
 
 namespace Main.Application.Handlers.Articles.CreateArticles;
 
-public class CreateArticlesDbValidation : AbstractDbValidation<CreateArticlesCommand>
+public class CreateProductsDbValidation : AbstractDbValidation<CreateArticlesCommand>
 {
     public override void Build(IValidationPlan plan, CreateArticlesCommand request)
     {
