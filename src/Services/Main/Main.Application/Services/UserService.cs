@@ -59,8 +59,7 @@ public class UserService(
                     Data = userId
                 }
                 .WithTracking(false)
-                .WithInclude(x => x.Role)
-                .WithInclude(x => x.Role.PermissionNames);
+                .WithInclude(x => x.RoleName);
             
             var dbRoles = await userRoleRepository
                 .GetUserRolesAsync(queryOptions, token);

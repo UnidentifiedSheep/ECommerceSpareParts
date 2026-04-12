@@ -18,7 +18,6 @@ public record AddRoleToUserCommand(Guid UserId, string RoleName) : ICommand;
 public class AddRoleToUserHandler(
     IUserRepository userRepository,
     IRoleRepository roleRepository,
-    IUserRoleRepository userRoleRepository,
     IMediator mediator,
     IUnitOfWork unitOfWork) : ICommandHandler<AddRoleToUserCommand>
 {
@@ -34,13 +33,10 @@ public class AddRoleToUserHandler(
         var role = await roleRepository.GetRoleAsync(request.RoleName, false, cancellationToken) ??
                    throw new RoleNotFoundException(request.RoleName);
 
-        if (await userRoleRepository.ExistsAsync(user.Id, role.Id, cancellationToken))
-            throw new UserAlreadyContainsRoleException(user.Id, role.Name);
-
         var userRole = new UserRole
         {
             UserId = user.Id,
-            RoleId = role.Id
+            RoleName = role.NormalizedName
         };
 
         await unitOfWork.AddAsync(userRole, cancellationToken);

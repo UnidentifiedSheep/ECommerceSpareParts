@@ -40,7 +40,7 @@ public class CreateUserHandler(IRoleRepository roleRepository, IUnitOfWork unitO
             PasswordHash = passwordHash,
             UserRoles = roles.Select(x => new UserRole
             {
-                RoleId = x.Id
+                RoleName = x.NormalizedName
             }).ToList(),
             UserEmails = request.Emails.Adapt<List<UserEmail>>(),
             UserInfo = request.UserInfo.Adapt<UserInfo>()
