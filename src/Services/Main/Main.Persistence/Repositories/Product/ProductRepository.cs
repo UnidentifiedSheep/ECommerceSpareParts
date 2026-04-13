@@ -3,11 +3,12 @@ using Main.Application.Interfaces.Repositories;
 using Main.Entities.Product;
 using Main.Persistence.Context;
 using Microsoft.EntityFrameworkCore;
+using Persistence;
 using Persistence.Extensions;
 
 namespace Main.Persistence.Repositories;
 
-public class ProductRepository(DContext context) : RepositoryBase<Product, int>(context), IProductRepository
+public class ProductRepository(DContext context) : RepositoryBase<DContext, Product, int>(context), IProductRepository
 {
     public async Task<IReadOnlyList<Product>> GetProductCrosses(
         int productId,
