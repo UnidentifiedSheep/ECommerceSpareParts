@@ -3,9 +3,9 @@ using Localization.Domain.Extensions;
 
 namespace Main.Application.Handlers.ArticleSizes.SetArticleSizes;
 
-public class SetArticleSizesValidation : AbstractValidator<SetArticleSizesCommand>
+public class SetProductSizesValidation : AbstractValidator<SetProductSizesCommand>
 {
-    public SetArticleSizesValidation()
+    public SetProductSizesValidation()
     {
         RuleFor(x => x.Height)
             .GreaterThan(0)

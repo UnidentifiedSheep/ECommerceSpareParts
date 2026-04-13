@@ -19,7 +19,7 @@ public class UpdateArticleSizeEndPoint : ICarterModule
                 CancellationToken token) =>
             {
                 var command =
-                    new SetArticleSizesCommand(id, request.Length, request.Width, request.Height, request.Unit);
+                    new SetProductSizesCommand(id, request.Length, request.Width, request.Height, request.Unit);
                 await sender.Send(command, token);
                 return Results.NoContent();
             }).WithTags("Article Size")

@@ -656,8 +656,8 @@ public static class MapsterConfig
             .Map(d => d.Unit, s => s.Unit);
 
         //Article size
-        TypeAdapterConfig<ProductSize, ArticleSizeDto>.NewConfig()
-            .Map(d => d.ArticleId, s => s.ProductId)
+        TypeAdapterConfig<ProductSize, ProductSizeDto>.NewConfig()
+            .Map(d => d.ProductId, s => s.ProductId)
             .Map(d => d.Height, s => s.Height)
             .Map(d => d.Width, s => s.Width)
             .Map(d => d.Length, s => s.Length)

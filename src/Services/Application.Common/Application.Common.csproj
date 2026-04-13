@@ -22,8 +22,4 @@
         <ProjectReference Include="..\..\Infrastructure\Localization\Localization.Domain\Localization.Domain.csproj"/>
     </ItemGroup>
 
-    <ItemGroup>
-      <Folder Include="Persistence\" />
-    </ItemGroup>
-
 </Project>

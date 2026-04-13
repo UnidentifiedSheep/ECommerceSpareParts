@@ -1,6 +1,8 @@
 using Application.Common.Interfaces;
+using Application.Common.Interfaces.Repositories;
 using Main.Abstractions.Dtos.Amw.Articles;
 using Main.Application.Interfaces.Repositories;
+using Main.Entities.Product;
 using Mapster;
 using Microsoft.EntityFrameworkCore;
 
@@ -10,12 +12,12 @@ public record GetProductPairQuery(int ProductId) : IQuery<GetProductPairResult>;
 
 public record GetProductPairResult(ProductDto? Pair);
 
-public class GetProductPairHandler(IReadDContext context)
+public class GetProductPairHandler(IReadRepository<Product, int> context)
     : IQueryHandler<GetProductPairQuery, GetProductPairResult>
 {
     public async Task<GetProductPairResult> Handle(GetProductPairQuery request, CancellationToken cancellationToken)
     {
-        var product = await context.Products
+        var product = await context.Query
             .Include(x => x.Pair)
             .ThenInclude(p => p!.Producer)
             .FirstOrDefaultAsync(x => x.Id == request.ProductId, cancellationToken);

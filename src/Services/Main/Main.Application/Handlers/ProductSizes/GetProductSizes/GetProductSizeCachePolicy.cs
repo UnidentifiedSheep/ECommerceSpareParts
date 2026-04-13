@@ -3,10 +3,10 @@ using Main.Abstractions.Constants;
 
 namespace Main.Application.Handlers.ArticleSizes.GetArticleSizes;
 
-public class GetArticleSizeCachePolicy : ICachePolicy<GetArticleSizeQuery>
+public class GetProductSizeCachePolicy : ICachePolicy<GetProductSizeQuery>
 {
-    public string GetCacheKey(GetArticleSizeQuery request)
-        => string.Format(CacheKeys.ArticleSizeCacheKey, request.ArticleId);
+    public string GetCacheKey(GetProductSizeQuery request)
+        => string.Format(CacheKeys.ProductSizeCacheKey, request.ProductId);
 
     public int DurationSeconds => 3600;
     public Type? RelatedType => null;

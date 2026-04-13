@@ -1,7 +1,9 @@
 ﻿using Application.Common.Interfaces;
+using Application.Common.Interfaces.Repositories;
 using Main.Abstractions.Dtos.ArticleWeight;
 using Main.Abstractions.Exceptions.Articles;
 using Main.Application.Interfaces.Repositories;
+using Main.Entities.Product;
 using Microsoft.EntityFrameworkCore;
 
 namespace Main.Application.Handlers.ArticleWeight.GetArticleWeight;
@@ -10,12 +12,12 @@ public record GetProductWeightQuery(int ProductId) : IQuery<GetProductWeightResu
 
 public record GetProductWeightResult(ProductWeightDto ProductWeight);
 
-public class GetProductWeightHandler(IReadDContext context)
+public class GetProductWeightHandler(IReadRepository<ProductWeight, int> context)
     : IQueryHandler<GetProductWeightQuery, GetProductWeightResult>
 {
     public async Task<GetProductWeightResult> Handle(GetProductWeightQuery request, CancellationToken cancellationToken)
     {
-        var productWeight = await context.ProductWeights
+        var productWeight = await context.Query
             .Select(x => new ProductWeightDto
             {
                 ProductId = x.ProductId,

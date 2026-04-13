@@ -6,7 +6,7 @@ namespace Main.Application.Handlers.ArticleWeight.GetArticleWeight;
 public class GetProductWeightCachePolicy : ICachePolicy<GetProductWeightQuery>
 {
     public string GetCacheKey(GetProductWeightQuery request)
-        => string.Format(CacheKeys.ArticleWeightCacheKey, request.ProductId);
+        => string.Format(CacheKeys.ProductWeightCacheKey, request.ProductId);
 
     public int DurationSeconds => 3600;
     public Type? RelatedType => null;

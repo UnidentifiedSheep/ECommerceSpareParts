@@ -7,7 +7,7 @@ using MediatR;
 
 namespace Main.Api.EndPoints.ArticleSize;
 
-public record GetArticleSizeResponse(ArticleSizeDto ArticleSize);
+public record GetArticleSizeResponse(ProductSizeDto ProductSize);
 
 public class GetArticleSizeEndPoint : ICarterModule
 {
@@ -15,8 +15,8 @@ public class GetArticleSizeEndPoint : ICarterModule
     {
         app.MapGet("/articles/{id:int}/sizes", async (ISender sender, int id, CancellationToken token) =>
             {
-                var result = await sender.Send(new GetArticleSizeQuery(id), token);
-                var response = new GetArticleSizeResponse(result.ArticleSize);
+                var result = await sender.Send(new GetProductSizeQuery(id), token);
+                var response = new GetArticleSizeResponse(result.ProductSize);
                 return Results.Ok(response);
             }).WithTags("Article Size")
             .WithDescription("Получение размеров артикула.")

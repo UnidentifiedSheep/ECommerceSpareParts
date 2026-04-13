@@ -1,4 +1,5 @@
 using Abstractions.Interfaces;
+using Application.Common.Interfaces.Repositories;
 using BulkValidation.Pgsql.Extensions;
 using Main.Application.Interfaces.Repositories;
 using Main.Persistence.Context;
@@ -17,8 +18,8 @@ public static class ServiceProvider
         collection.AddDbContext<DContext>(options => options.UseNpgsql(connectionString));
         
         collection.AddScoped<IProductRepository, ProductRepository>();
-        collection.AddScoped<IProductWeightRepository, ProductWeightRepository>();
-        collection.AddScoped<IReadDContext, ReadDContext>();
+        collection.AddScoped(typeof(IRepository<,>), typeof(BasicEfRepository<,>));
+        collection.AddScoped(typeof(IReadRepository<,>), typeof(ReadRepository<,>));
         
         collection.AddUnitOfWork<DContext>();
 

@@ -16,6 +16,7 @@
     </ItemGroup>
 
     <ItemGroup>
+        <Folder Include="Dtos\ArticleSizes\" />
         <Folder Include="Handlers\Logistics\"/>
     </ItemGroup>
 

@@ -1,8 +1,8 @@
 ﻿using Abstractions.Interfaces.Services;
 using Application.Common.Interfaces;
+using Application.Common.Interfaces.Repositories;
 using Attributes;
 using Enums;
-using Main.Application.Interfaces.Repositories;
 using Main.Application.Notifications;
 using Main.Entities.Product;
 using MediatR;
@@ -15,7 +15,7 @@ public record SetArticleWeightCommand(int ProductId, decimal Weight, WeightUnit 
 
 public class SetProductWeightHandler(
     IPublisher publisher,
-    IProductWeightRepository repository,
+    IRepository<ProductWeight, int> repository,
     IUnitOfWork unitOfWork) : ICommandHandler<SetArticleWeightCommand>
 {
     public async Task<Unit> Handle(SetArticleWeightCommand request, CancellationToken cancellationToken)

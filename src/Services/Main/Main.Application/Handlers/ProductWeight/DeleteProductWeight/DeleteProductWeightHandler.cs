@@ -1,9 +1,11 @@
 ﻿using Abstractions.Interfaces.Services;
 using Application.Common.Interfaces;
+using Application.Common.Interfaces.Repositories;
 using Attributes;
 using Main.Abstractions.Exceptions.Articles;
 using Main.Application.Interfaces.Repositories;
 using Main.Application.Notifications;
+using Main.Entities.Product;
 using MediatR;
 
 namespace Main.Application.Handlers.ArticleWeight.DeleteArticleWeight;
@@ -13,7 +15,7 @@ namespace Main.Application.Handlers.ArticleWeight.DeleteArticleWeight;
 public record DeleteProductWeightCommand(int ProductId) : ICommand;
 
 public class DeleteProductWeightHandler(
-    IProductWeightRepository repository,
+    IRepository<ProductWeight, int> repository,
     IUnitOfWork unitOfWork,
     IPublisher publisher)
     : ICommandHandler<DeleteProductWeightCommand>
