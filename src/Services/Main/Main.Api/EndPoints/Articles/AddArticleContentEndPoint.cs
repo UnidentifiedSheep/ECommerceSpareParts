@@ -17,7 +17,7 @@ public class AddArticleContentEndPoint : ICarterModule
                 AddArticleContentRequest request,
                 CancellationToken cancellationToken) =>
             {
-                var command = new AddArticleContentCommand(articleId, request.Content);
+                var command = new AddProductContentCommand(articleId, request.Content);
                 await sender.Send(command, cancellationToken);
                 return Results.NoContent();
             }).WithTags("Articles")

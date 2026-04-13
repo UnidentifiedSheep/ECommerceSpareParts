@@ -39,7 +39,7 @@ public class CreateProducerTests : IAsyncLifetime
     public async Task CreateProducer_TooShortName_FailsValidation()
     {
         var newProducerModel = MockData.MockData.CreateNewProducerDto(1)[0];
-        newProducerModel.ProducerName = "a";
+        newProducerModel.Name = "a";
         var command = new CreateProducerCommand(newProducerModel);
         await Assert.ThrowsAsync<ValidationException>(async () => await _mediator.Send(command));
     }
@@ -48,7 +48,7 @@ public class CreateProducerTests : IAsyncLifetime
     public async Task CreateProducer_EmptyName_FailsValidation()
     {
         var newProducerModel = MockData.MockData.CreateNewProducerDto(1)[0];
-        newProducerModel.ProducerName = "   ";
+        newProducerModel.Name = "   ";
         var command = new CreateProducerCommand(newProducerModel);
         await Assert.ThrowsAsync<ValidationException>(async () => await _mediator.Send(command));
     }
@@ -73,7 +73,7 @@ public class CreateProducerTests : IAsyncLifetime
             .AsNoTracking().FirstOrDefaultAsync(x => x.Id == result.ProducerId);
         Assert.NotNull(createdProducer);
         Assert.Equal(createdProducer.Description, newProducerModel.Description);
-        Assert.Equal(createdProducer.Name, newProducerModel.ProducerName.ToNormalized());
+        Assert.Equal(createdProducer.Name, newProducerModel.Name.ToNormalized());
         Assert.Equal(createdProducer.IsOe, newProducerModel.IsOe);
     }
 }

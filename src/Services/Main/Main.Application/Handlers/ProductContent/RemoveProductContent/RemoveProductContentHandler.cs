@@ -1,0 +1,27 @@
+using Abstractions.Interfaces.Services;
+using Application.Common.Interfaces;
+using Application.Common.Interfaces.Repositories;
+using Attributes;
+using Main.Abstractions.Exceptions.Articles;
+using Main.Entities.Product;
+using MediatR;
+
+namespace Main.Application.Handlers.ArticleContent.RemoveArticleContent;
+
+[AutoSave]
+[Transactional]
+public record RemoveProductContentCommand(int ParentProductId, int ChildProductId) : ICommand;
+
+public class RemoveProductContentHandler(
+    IRepository<ProductContent, (int, int)> repository,
+    IUnitOfWork unitOfWork) : ICommandHandler<RemoveProductContentCommand>
+{
+    public async Task<Unit> Handle(RemoveProductContentCommand request, CancellationToken cancellationToken)
+    {
+        var content =
+            await repository.GetById((request.ParentProductId, request.ChildProductId), cancellationToken)
+            ?? throw new ProductContentNotFoundException(request.ParentProductId, request.ChildProductId);
+        unitOfWork.Remove(content);
+        return Unit.Value;
+    }
+}

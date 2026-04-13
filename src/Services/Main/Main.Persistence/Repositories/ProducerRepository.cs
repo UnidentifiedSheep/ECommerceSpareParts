@@ -33,7 +33,7 @@ public class ProducerRepository(DContext context) : IProducerRepository
     {
         var query = context.ProducersOtherNames
             .AsNoTracking()
-            .Where(x => x.ProducerOtherName == otherName)
+            .Where(x => x.OtherName == otherName)
             .Where(x => x.WhereUsed == whereUsed);
 
         if (producerId != null)
@@ -47,7 +47,7 @@ public class ProducerRepository(DContext context) : IProducerRepository
         return await context.Producers.AsNoTracking().AnyAsync(x => x.Name == producerName, cancellationToken);
     }
 
-    public async Task<ProducersOtherName?> GetOtherName(
+    public async Task<ProducerOtherName?> GetOtherName(
         int producerId,
         string otherName,
         string? whereUsed,
@@ -57,7 +57,7 @@ public class ProducerRepository(DContext context) : IProducerRepository
         return await context.ProducersOtherNames.ConfigureTracking(track)
             .Where(x => x.ProducerId == producerId)
             .Where(x => x.WhereUsed == whereUsed)
-            .Where(x => x.ProducerOtherName == otherName)
+            .Where(x => x.OtherName == otherName)
             .FirstOrDefaultAsync(cancellationToken);
     }
 
@@ -95,7 +95,7 @@ public class ProducerRepository(DContext context) : IProducerRepository
             .ToListAsync(cancellationToken);
     }
 
-    public async Task<IEnumerable<ProducersOtherName>> GetOtherNames(
+    public async Task<IEnumerable<ProducerOtherName>> GetOtherNames(
         int producerId,
         int page,
         int viewCount,

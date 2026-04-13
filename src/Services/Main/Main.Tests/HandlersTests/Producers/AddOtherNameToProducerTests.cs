@@ -91,7 +91,7 @@ public class AddOtherNameToProducerTests : IAsyncLifetime
         var producerOtherName = await _context.ProducersOtherNames
             .AsNoTracking()
             .Where(x => x.ProducerId == producer.Id &&
-                        x.ProducerOtherName == otherName && x.WhereUsed == usage)
+                        x.OtherName == otherName && x.WhereUsed == usage)
             .FirstOrDefaultAsync();
         Assert.NotNull(producerOtherName);
     }

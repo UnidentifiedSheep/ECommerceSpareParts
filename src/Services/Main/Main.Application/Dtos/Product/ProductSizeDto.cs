@@ -3,7 +3,7 @@ using Enums;
 
 namespace Main.Abstractions.Dtos.ArticleSizes;
 
-public class ProductSizeDto
+public record ProductSizeDto
 {
     [JsonPropertyName("productId")]
     public required int ProductId { get; init; }

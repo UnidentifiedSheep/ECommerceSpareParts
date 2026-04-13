@@ -1,5 +1,6 @@
 ﻿using Application.Common.Interfaces.Repositories;
 using Domain;
+using Domain.Interfaces;
 using Microsoft.EntityFrameworkCore;
 using Persistence.Extensions;
 
@@ -46,6 +47,7 @@ public abstract class RepositoryBase<TContext, TEntity, TKey>(TContext context) 
         {
             null => [],
             ValueTuple v => GetTupleValues(v),
+            ICompositeKey k => k.ToArray(), 
             _ => [key]
         };
     }

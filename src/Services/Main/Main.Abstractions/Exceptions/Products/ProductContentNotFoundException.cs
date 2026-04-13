@@ -3,9 +3,9 @@ using Exceptions.Base;
 
 namespace Main.Abstractions.Exceptions.Articles;
 
-public class ArticleContentNotFoundException : NotFoundException, ILocalizableException
+public class ProductContentNotFoundException : NotFoundException, ILocalizableException
 {
-    public ArticleContentNotFoundException(int articleId, int insideArticleId) : base(
+    public ProductContentNotFoundException(int articleId, int insideArticleId) : base(
         null,
         new { MainArticleId = articleId, InsideArticleId = insideArticleId })
     {

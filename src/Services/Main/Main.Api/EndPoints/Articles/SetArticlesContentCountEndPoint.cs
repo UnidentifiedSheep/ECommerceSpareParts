@@ -18,7 +18,7 @@ public class SetArticlesContentCountEndPoint : ICarterModule
                 SetArticlesContentCountRequest request,
                 CancellationToken token) =>
             {
-                var command = new SetArticlesContentCountCommand(articleId, insideArticleId, request.Count);
+                var command = new SetProductsContentCountCommand(articleId, insideArticleId, request.Count);
                 await sender.Send(command, token);
                 return Results.NoContent();
             }).WithTags("Articles")

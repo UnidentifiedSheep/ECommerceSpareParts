@@ -3,7 +3,7 @@ using Main.Enums;
 
 namespace Main.Abstractions.Dtos.Amw.Articles;
 
-public class NewProductLinkageDto
+public record NewProductLinkageDto
 {
     [JsonPropertyName("productId")]
     public int ProductId { get; set; }

@@ -9,7 +9,7 @@ public class AddOtherNameDbValidation : AbstractDbValidation<AddOtherNameCommand
     public override void Build(IValidationPlan plan, AddOtherNameCommand request)
     {
         plan.ValidateProducerExistsId(request.ProducerId)
-            .ValidateProducersOtherNameNotExistsPK((request.ProducerId, request.OtherName.Trim(),
-                request.WhereUsed.Trim()));
+            .ValidateProducerOtherNameNotExistsPK((request.ProducerId, request.OtherName.Trim(),
+                request.WhereUsed.ToUpperInvariant().Trim()));
     }
 }

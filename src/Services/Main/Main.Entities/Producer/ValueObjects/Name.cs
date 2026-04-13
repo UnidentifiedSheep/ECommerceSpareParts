@@ -1,6 +1,6 @@
 ﻿using Domain.Extensions;
 
-namespace Main.Entities.Product.ValueObjects;
+namespace Main.Entities.Producer.ValueObjects;
 
 public record Name
 {
@@ -12,9 +12,9 @@ public record Name
     {
         value = value.Trim();
 
-        value.AgainstNullOrWhiteSpace("producer.name.not.empty")
-            .AgainstTooShort(2, "producer.name.min.length")
-            .AgainstTooLong(64, "producer.name.max.length");
+        value.AgainstNullOrWhiteSpace("article.name.must.not.be.empty")
+            .AgainstTooShort(3, "article.name.min.length.3")
+            .AgainstTooLong(255, "article.name.max.length.255");
 
         Value = char.ToUpperInvariant(value[0]) + value[1..];
     }

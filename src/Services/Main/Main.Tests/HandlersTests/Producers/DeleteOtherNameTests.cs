@@ -20,7 +20,7 @@ public class DeleteOtherNameTests : IAsyncLifetime
     private readonly DContext _context;
     private readonly Faker _faker = new(Global.Locale);
     private readonly IMediator _mediator;
-    private ProducersOtherName _otherName = null!;
+    private ProducerOtherName _otherName = null!;
 
     public DeleteOtherNameTests(CombinedContainerFixture fixture)
     {
@@ -44,7 +44,7 @@ public class DeleteOtherNameTests : IAsyncLifetime
                               """);
         _otherName = await _context.ProducersOtherNames
             .FirstAsync(x => x.ProducerId == 1 &&
-                             x.ProducerOtherName == otherName &&
+                             x.OtherName == otherName &&
                              x.WhereUsed == usage);
     }
 
@@ -56,7 +56,7 @@ public class DeleteOtherNameTests : IAsyncLifetime
     [Fact]
     public async Task DeleteOtherName_InvalidProducerId_ThrowsProducerNotFound()
     {
-        var command = new DeleteOtherNameCommand(int.MaxValue, _otherName.ProducerOtherName, _otherName.WhereUsed);
+        var command = new DeleteOtherNameCommand(int.MaxValue, _otherName.OtherName, _otherName.WhereUsed);
         await Assert.ThrowsAsync<ProducersOtherNameNotFoundException>(async () => await _mediator.Send(command));
     }
 
@@ -72,13 +72,13 @@ public class DeleteOtherNameTests : IAsyncLifetime
     public async Task DeleteOtherName_Normal_Succeeds()
     {
         var command =
-            new DeleteOtherNameCommand(_otherName.ProducerId, _otherName.ProducerOtherName, _otherName.WhereUsed);
+            new DeleteOtherNameCommand(_otherName.ProducerId, _otherName.OtherName, _otherName.WhereUsed);
         await _mediator.Send(command);
         var otherName = await _context.ProducersOtherNames
             .AsNoTracking()
             .FirstOrDefaultAsync(x => x.ProducerId == _otherName.ProducerId &&
                                       x.WhereUsed == _otherName.WhereUsed &&
-                                      x.ProducerOtherName == _otherName.ProducerOtherName);
+                                      x.OtherName == _otherName.OtherName);
         Assert.Null(otherName);
     }
 }

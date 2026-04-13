@@ -18,5 +18,5 @@ public record Indicator
     
     public static implicit operator Indicator(string? value) => new(value);
 
-    public static implicit operator string?(Indicator indicator) => indicator.Value;
+    public static implicit operator string?(Indicator? indicator) => indicator?.Value;
 }

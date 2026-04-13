@@ -50,6 +50,12 @@ public static class ValidationGuardExtensions
             : value;
     }
 
+    public static T AgainstEqual<T>(this T value, T next, string errorKey)
+        where T : IComparable<T>
+    {
+        return value.CompareTo(next) == 0 ? throw new InvalidInputException(errorKey) : value;
+    }
+
     public static T AgainstTooBig<T>(this T value, T max, string errorKey)
         where T : IComparable<T>
     {

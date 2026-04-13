@@ -3,11 +3,11 @@ using Localization.Domain.Extensions;
 
 namespace Main.Application.Handlers.ArticleContent.SetArticleContentCount;
 
-public class SetArticlesContentCountValidation : AbstractValidator<SetArticlesContentCountCommand>
+public class SetProductContentQuantityValidation : AbstractValidator<SetProductsContentCountCommand>
 {
-    public SetArticlesContentCountValidation()
+    public SetProductContentQuantityValidation()
     {
-        RuleFor(x => x.Count)
+        RuleFor(x => x.Quantity)
             .GreaterThanOrEqualTo(0)
             .WithLocalizationKey("article.content.count.must.be.non.negative");
     }

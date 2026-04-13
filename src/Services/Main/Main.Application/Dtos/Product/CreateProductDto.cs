@@ -2,7 +2,7 @@ using System.Text.Json.Serialization;
 
 namespace Main.Abstractions.Dtos.Services.Articles;
 
-public class CreateProductDto
+public record CreateProductDto
 {
     [JsonPropertyName("sku")]
     public string Sku { get; set; } = null!;

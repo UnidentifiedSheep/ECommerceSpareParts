@@ -6,7 +6,7 @@ using MediatR;
 
 namespace Main.Api.EndPoints.Articles;
 
-public record GetArticleContentResponse(IEnumerable<ContentArticleDto> Content);
+public record GetArticleContentResponse(IEnumerable<ProductContentDto> Content);
 
 public class GetArticleContentEndPoint : ICarterModule
 {
@@ -14,7 +14,7 @@ public class GetArticleContentEndPoint : ICarterModule
     {
         app.MapGet("/articles/{articleId}/contents", async (ISender sender, int articleId, CancellationToken token) =>
             {
-                var result = await sender.Send(new GetArticleContentsQuery(articleId), token);
+                var result = await sender.Send(new GetProductContentsQuery(articleId), token);
                 var response = result.Adapt<GetArticleContentResponse>();
                 return Results.Ok(response);
             }).WithName("получить содержание артикула")

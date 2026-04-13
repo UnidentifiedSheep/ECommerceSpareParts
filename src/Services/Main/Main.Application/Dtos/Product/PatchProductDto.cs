@@ -3,7 +3,7 @@ using Abstractions.Models;
 
 namespace Main.Abstractions.Dtos.Amw.Articles;
 
-public class PatchProductDto
+public record PatchProductDto
 {
     [JsonPropertyName("sku")]
     public PatchField<string> Sku { get; set; } = PatchField<string>.NotSet();

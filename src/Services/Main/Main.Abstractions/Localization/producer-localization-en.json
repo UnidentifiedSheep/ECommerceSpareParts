@@ -14,6 +14,8 @@
     "producer.other.name.not.empty": "Additional name must not be empty.",
     "producer.other.name.min.length": "Additional name must be at least 2 characters long.",
     "producer.other.name.max.length": "Additional name must be at most 64 characters long.",
-    "producer.other.name.where.used.max.length": "Where-used designation must be at most 64 characters long."
+    "producer.other.name.where.used.max.length": "Where-used designation must be at most 64 characters long.",
+    "producer.other.name.where.used.min.length": "Where-used must be at least 2 characters long.",
+    "producer.image.too.long": "Image path must be shorter than 255 symbols."
   }
 }

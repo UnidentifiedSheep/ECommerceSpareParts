@@ -12,7 +12,7 @@ public class ProducerConfiguration : IEntityTypeConfiguration<Entities.Producer.
         builder.HasKey(e => e.Id)
             .HasName("producer_id");
 
-        builder.HasIndex(e => e.Name)
+        builder.HasIndex("name")
             .HasDatabaseName("producer_name_uindex")
             .IsUnique();
 
@@ -20,17 +20,19 @@ public class ProducerConfiguration : IEntityTypeConfiguration<Entities.Producer.
             .HasColumnName("id");
         
         builder.Property(e => e.Description)
-            .HasColumnName("description");
+            .HasColumnName("description")
+            .HasMaxLength(500);
         
         builder.Property(e => e.ImagePath)
             .HasMaxLength(255)
             .HasColumnName("image_path");
-        
-        builder.Property(e => e.IsOe)
-            .HasColumnName("is_oe");
-        
-        builder.Property(e => e.Name)
-            .HasMaxLength(64)
-            .HasColumnName("name");
+
+        builder.OwnsOne(b => b.Name,
+            b =>
+            {
+                b.Property(x => x.Value)
+                    .HasMaxLength(64)
+                    .HasColumnName("name");
+            });
     }
 }

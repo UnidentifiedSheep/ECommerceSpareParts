@@ -267,12 +267,12 @@ public static class MapsterConfig
             .Map(dest => dest.Name, src => src.Name)
             .Map(dest => dest.Description, src => src.Description);
         TypeAdapterConfig<NewProducerDto, Producer>.NewConfig()
-            .Map(d => d.Name, s => s.ProducerName.ToNormalized())
+            .Map(d => d.Name, s => s.Name.ToNormalized())
             .Map(d => d.IsOe, s => s.IsOe)
             .Map(d => d.Description, s => string.IsNullOrWhiteSpace(s.Description) ? null : s.Description.Trim());
-        TypeAdapterConfig<ProducersOtherName, ProducerOtherNameDto>.NewConfig()
+        TypeAdapterConfig<ProducerOtherName, ProducerOtherNameDto>.NewConfig()
             .Map(d => d.ProducerId, s => s.ProducerId)
-            .Map(d => d.OtherName, s => s.ProducerOtherName)
+            .Map(d => d.OtherName, s => s.OtherName)
             .Map(d => d.WhereUsed, s => s.WhereUsed);
         TypeAdapterConfig<PatchProducerDto, Producer>.NewConfig()
             .IgnorePatchIfNotSet()

@@ -8,6 +8,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Persistence.DbValidator;
 using Persistence.Extensions;
+using ProducerRepository = Main.Persistence.Repositories.Producer.ProducerRepository;
 
 namespace Main.Persistence;
 
@@ -18,6 +19,7 @@ public static class ServiceProvider
         collection.AddDbContext<DContext>(options => options.UseNpgsql(connectionString));
         
         collection.AddScoped<IProductRepository, ProductRepository>();
+        collection.AddScoped<IProducerRepository, ProducerRepository>();
         collection.AddScoped(typeof(IRepository<,>), typeof(BasicEfRepository<,>));
         collection.AddScoped(typeof(IReadRepository<,>), typeof(ReadRepository<,>));
         

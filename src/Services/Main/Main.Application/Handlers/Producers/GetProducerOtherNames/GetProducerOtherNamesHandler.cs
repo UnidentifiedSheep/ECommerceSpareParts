@@ -1,27 +1,35 @@
 using Abstractions.Models;
+using Application.Common.Extensions;
 using Application.Common.Interfaces;
+using Application.Common.Interfaces.Repositories;
 using Main.Abstractions.Dtos.Amw.Producers;
-using Main.Abstractions.Interfaces.DbRepositories;
-using Mapster;
+using Main.Entities.Producer;
+using Microsoft.EntityFrameworkCore;
 
 namespace Main.Application.Handlers.Producers.GetProducerOtherNames;
 
 public record GetProducerOtherNamesQuery(int ProducerId, PaginationModel Pagination)
     : IQuery<GetProducerOtherNamesResult>;
 
-public record GetProducerOtherNamesResult(IEnumerable<ProducerOtherNameDto> Names);
+public record GetProducerOtherNamesResult(IReadOnlyList<ProducerOtherNameDto> Names);
 
-public class GetProducerOtherNamesHandler(IProducerRepository producerRepository)
+public class GetProducerOtherNamesHandler(IReadRepository<ProducerOtherName, ProducerOtherNameKey> repository)
     : IQueryHandler<GetProducerOtherNamesQuery, GetProducerOtherNamesResult>
 {
     public async Task<GetProducerOtherNamesResult> Handle(
         GetProducerOtherNamesQuery request,
         CancellationToken cancellationToken)
     {
-        var page = request.Pagination.Page;
-        var size = request.Pagination.Size;
-        var result = await producerRepository.GetOtherNames(request.ProducerId, page,
-            size, false, cancellationToken);
-        return new GetProducerOtherNamesResult(result.Adapt<List<ProducerOtherNameDto>>());
+        var result = await repository.Query
+            .Where(x => x.ProducerId == request.ProducerId)
+            .Select(x => new ProducerOtherNameDto
+            {
+                ProducerId = x.ProducerId,
+                OtherName = x.OtherName,
+                WhereUsed = x.WhereUsed,
+            })
+            .ApplyPagination(request.Pagination)
+            .ToListAsync(cancellationToken);
+        return new GetProducerOtherNamesResult(result);
     }
 }

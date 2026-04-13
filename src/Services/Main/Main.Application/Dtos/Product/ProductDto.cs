@@ -2,32 +2,32 @@ using System.Text.Json.Serialization;
 
 namespace Main.Abstractions.Dtos.Amw.Articles;
 
-public class ProductDto
+public record ProductDto
 {
     [JsonPropertyName("id")]
-    public int Id { get; set; }
+    public required int Id { get; init; }
 
     [JsonPropertyName("sku")]
-    public string Sku { get; set; } = null!;
+    public required string Sku { get; init; }
     
     [JsonPropertyName("name")]
-    public string Name { get; set; } = null!;
+    public required string Name { get; init; }
     
     [JsonPropertyName("description")]
-    public string? Description { get; set; }
+    public required string? Description { get; init; }
     
     [JsonPropertyName("producerId")]
-    public int ProducerId { get; set; }
+    public required int ProducerId { get; init; }
     
     [JsonPropertyName("producerName")]
-    public string ProducerName { get; set; } = null!;
+    public required string ProducerName { get; init; }
     
     [JsonPropertyName("indicator")]
-    public string? Indicator { get; set; }
+    public required string? Indicator { get; init; }
     
     [JsonPropertyName("images")]
-    public List<string> Images { get; set; } = [];
+    public List<string> Images { get; init; } = [];
     
     [JsonPropertyName("stock")]
-    public int Stock { get; set; }
+    public required int Stock { get; init; }
 }

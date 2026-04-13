@@ -8,6 +8,6 @@ public class CreateProducerDbValidation : AbstractDbValidation<CreateProducerCom
 {
     public override void Build(IValidationPlan plan, CreateProducerCommand request)
     {
-        plan.ValidateProducerNotExistsName(request.NewProducer.ProducerName);
+        plan.ValidateProducerNotExistsName(request.NewProducer.Name);
     }
 }

@@ -3,15 +3,15 @@ using Localization.Domain.Extensions;
 
 namespace Main.Application.Handlers.ArticleContent.AddArticleContent;
 
-public class AddArticleContentValidation : AbstractValidator<AddArticleContentCommand>
+public class AddProductContentValidation : AbstractValidator<AddProductContentCommand>
 {
-    public AddArticleContentValidation()
+    public AddProductContentValidation()
     {
-        RuleForEach(cmd => cmd.Content)
-            .Must((parent, kvp) => kvp.Key != parent.ArticleId)
+        RuleForEach(cmd => cmd.Contents)
+            .Must((parent, kvp) => kvp.Key != parent.ParentProductId)
             .WithLocalizationKey("article.content.self.reference.not.allowed");
 
-        RuleForEach(cmd => cmd.Content)
+        RuleForEach(cmd => cmd.Contents)
             .Must(kvp => kvp.Value >= 0)
             .WithLocalizationKey("article.content.count.must.be.non.negative");
     }

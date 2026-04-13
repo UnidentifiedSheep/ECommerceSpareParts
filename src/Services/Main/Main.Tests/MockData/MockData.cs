@@ -35,7 +35,7 @@ public static class MockData
     public static List<NewProducerDto> CreateNewProducerDto(int count)
     {
         var f = new Faker<NewProducerDto>(Locale)
-            .RuleFor(x => x.ProducerName, f => f.Lorem.Letter(28))
+            .RuleFor(x => x.Name, f => f.Lorem.Letter(28))
             .RuleFor(x => x.Description, f => f.Commerce.ProductDescription())
             .RuleFor(x => x.IsOe, f => f.Random.Bool());
         return f.Generate(count);

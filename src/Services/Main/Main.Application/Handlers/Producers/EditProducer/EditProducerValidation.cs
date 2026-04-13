@@ -8,14 +8,14 @@ public class EditProducerValidation : AbstractValidator<EditProducerCommand>
 {
     public EditProducerValidation()
     {
-        RuleFor(x => x.EditProducer.Description.Value)
+        RuleFor(x => x.Producer.Description.Value)
             .SetValidator(new ProducerDescriptionValidator())
-            .When(x => x.EditProducer.Description.IsSet);
+            .When(x => x.Producer.Description.IsSet);
 
-        RuleFor(x => x.EditProducer.Name.Value)
+        RuleFor(x => x.Producer.Name.Value)
             .NotNull()
             .WithLocalizationKey("producer.name.not.empty")
             .SetValidator(new ProducerNameValidator())
-            .When(x => x.EditProducer.Name.IsSet);
+            .When(x => x.Producer.Name.IsSet);
     }
 }
