@@ -1,10 +1,9 @@
 using Abstractions.Models;
+using Application.Common.Extensions;
 using Application.Common.Interfaces;
 using Application.Common.Interfaces.Repositories;
 using Main.Abstractions.Dtos.Anonymous.Producers;
-using Main.Abstractions.Interfaces.DbRepositories;
 using Main.Entities.Producer;
-using Mapster;
 using Microsoft.EntityFrameworkCore;
 
 namespace Main.Application.Handlers.Producers.GetProducers;
@@ -19,21 +18,26 @@ public class GetProducersHandler(IReadRepository<Producer, int> repository)
     public async Task<GetProducersResult> Handle(GetProducersQuery request, CancellationToken cancellationToken)
     {
         var query = repository.Query;
-        if (!string.IsNullOrWhiteSpace(request.SearchTerm))
-            query = query.Where(x => EF.Functions.ILike(x.Name, $"%{searchTerm}%"));
+        var searchTerm = request.SearchTerm;
 
-        var queryWithRank = query.Select(z => new
-            {
-                Producer = z,
-                Rank = string.IsNullOrWhiteSpace(searchTerm) ? 0 : EF.Functions.TrigramsSimilarity(z.Name, searchTerm)
-            })
-            .OrderByDescending(x => x.Rank);
-        var result = await repository.Query
-            
+        if (!string.IsNullOrWhiteSpace(searchTerm))
+            query = query
+                .Where(x => EF.Functions.ILike(x.Name, $"%{searchTerm}%"))
+                .OrderByDescending(x => EF.Functions.TrigramsSimilarity(x.Name, searchTerm));
+        else
+            query = query.OrderBy(x => x.Name);
         
-        var page = request.Pagination.Page;
-        var size = request.Pagination.Size;
-        var result = await producerRepository.GetProducers(request.SearchTerm, page, size, false, cancellationToken);
-        return new GetProducersResult(result.Adapt<List<ProducerDto>>());
+
+        var result = await query
+            .Select(x => new ProducerDto
+            {
+                Id = x.Id,
+                Name = x.Name,
+                Description = x.Description,
+            })
+            .ApplyPagination(request.Pagination)
+            .ToListAsync(cancellationToken);
+
+        return new GetProducersResult(result);
     }
 }
