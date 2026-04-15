@@ -4,9 +4,9 @@ using Localization.Domain.Extensions;
 
 namespace Main.Application.Handlers.ArticleImages.MapImgsToArticle;
 
-public class MapImgsToArticleValidation : AbstractValidator<MapImgsToArticleCommand>
+public class MapImgsToProductValidation : AbstractValidator<MapImgsToProductCommand>
 {
-    public MapImgsToArticleValidation()
+    public MapImgsToProductValidation()
     {
         RuleForEach(x => x.Images)
             .ChildRules(z =>

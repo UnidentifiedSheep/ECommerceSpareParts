@@ -10,12 +10,12 @@ using MediatR;
 namespace Main.Application.Handlers.ArticleImages.MapImgsToArticle;
 
 [Transactional]
-public record MapImgsToArticleCommand(int ArticleId, IEnumerable<IFile> Images) : ICommand;
+public record MapImgsToProductCommand(int ProductId, IEnumerable<IFile> Images) : ICommand;
 
-public class MapImgsToArticleHandler(IS3StorageService s3Storage, IUnitOfWork unitOfWork, IMediator mediator)
-    : ICommandHandler<MapImgsToArticleCommand, Unit>
+public class MapImgsToProductHandler(IS3StorageService s3Storage, IUnitOfWork unitOfWork, IMediator mediator)
+    : ICommandHandler<MapImgsToProductCommand, Unit>
 {
-    public async Task<Unit> Handle(MapImgsToArticleCommand request, CancellationToken cancellationToken)
+    public async Task<Unit> Handle(MapImgsToProductCommand request, CancellationToken cancellationToken)
     {
         var keys = new HashSet<string>();
         var toAdd = new List<ProductImage>();
@@ -24,15 +24,14 @@ public class MapImgsToArticleHandler(IS3StorageService s3Storage, IUnitOfWork un
             foreach (var img in request.Images)
             {
                 await using var stream = img.OpenReadStream();
-                var path = $"imgs/articles/{request.ArticleId}_{Guid.NewGuid()}{img.Extension}";
+                var path = $"imgs/articles/{request.ProductId}_{Guid.NewGuid()}{img.Extension}";
                 var key = await s3Storage.UploadFileAsync(Global.ImageBucketName,
                     stream, path, "image/webp");
                 keys.Add(key);
-                toAdd.Add(new ProductImage
-                {
-                    ProductId = request.ArticleId,
-                    Path = $"{Global.ServiceUrl}/{Global.ImageBucketName}/{path}"
-                });
+                toAdd.Add(ProductImage.Create(
+                    productId: request.ProductId, 
+                    path: $"{Global.ServiceUrl}/{Global.ImageBucketName}/{path}", 
+                    description: key));
             }
 
             await unitOfWork.AddRangeAsync(toAdd, cancellationToken);
@@ -45,7 +44,7 @@ public class MapImgsToArticleHandler(IS3StorageService s3Storage, IUnitOfWork un
             throw;
         }
 
-        await mediator.Publish(new ArticleUpdatedNotification(request.ArticleId), cancellationToken);
+        await mediator.Publish(new ArticleUpdatedNotification(request.ProductId), cancellationToken);
         return Unit.Value;
     }
 }

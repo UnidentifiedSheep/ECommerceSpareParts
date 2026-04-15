@@ -14,7 +14,7 @@ public class MapImgsToArticleEndPoint : ICarterModule
                 async (ISender sender, int articleId, HttpContext context, CancellationToken token) =>
                 {
                     var files = FileModel.GetFileModels(context.Request.Form.Files);
-                    var command = new MapImgsToArticleCommand(articleId, files);
+                    var command = new MapImgsToProductCommand(articleId, files);
                     await sender.Send(command, token);
                     return Results.Ok();
                 }).WithMetadata()
