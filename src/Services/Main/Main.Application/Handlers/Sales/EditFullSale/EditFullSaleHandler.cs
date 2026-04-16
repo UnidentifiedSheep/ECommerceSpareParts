@@ -222,7 +222,7 @@ public class EditFullSaleHandler(
         Guid userId,
         CancellationToken cancellationToken = default)
     {
-        var command = new SubtractCountFromReservationsCommand(userId, whoUpdated, graterCount);
+        var command = new UpdateReservationsCountsCommand(userId, whoUpdated, graterCount);
         await mediator.Send(command, cancellationToken);
     }
 }

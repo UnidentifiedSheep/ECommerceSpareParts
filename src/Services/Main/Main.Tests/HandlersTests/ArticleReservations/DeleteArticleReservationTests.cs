@@ -65,7 +65,7 @@ public class DeleteArticleReservationTests : IAsyncLifetime
     public async Task DeleteReservation_Success_RemovesEntity()
     {
         var reservation = await _context.StorageContentReservations.FirstAsync();
-        var cmd = new DeleteArticleReservationCommand(reservation.Id);
+        var cmd = new DeleteProductReservationCommand(reservation.Id);
         await _mediator.Send(cmd);
 
         var exists = await _context.StorageContentReservations.AnyAsync(x => x.Id == reservation.Id);
@@ -75,7 +75,7 @@ public class DeleteArticleReservationTests : IAsyncLifetime
     [Fact]
     public async Task DeleteReservation_NotFound_Throws()
     {
-        var cmd = new DeleteArticleReservationCommand(int.MaxValue);
+        var cmd = new DeleteProductReservationCommand(int.MaxValue);
         await Assert.ThrowsAsync<ReservationNotFoundException>(() => _mediator.Send(cmd));
     }
 }

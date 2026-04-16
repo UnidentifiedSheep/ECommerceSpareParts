@@ -101,32 +101,18 @@ public class StorageContentReservation : AuditableEntity<StorageContentReservati
         
         CurrentCount = summed;
 
-        if (CurrentCount == ReservedCount)
-            MarkAsDone();
-        else
-            MarkAdNotDone();
+        UpdateDoneState();
+        UpdateLockState();
     }
 
-    public void Lock()
+    private void UpdateLockState()
     {
-        ThrowIfDone();
-        IsLocked = true;
+        IsLocked = CurrentCount > 0;
     }
 
-    public void Unlock()
+    private void UpdateDoneState()
     {
-        ThrowIfDone();
-        IsLocked = false;
-    }
-
-    private void MarkAsDone()
-    {
-        IsDone = true;
-    }
-
-    private void MarkAdNotDone()
-    {
-        IsDone = false;
+        IsDone = CurrentCount == ReservedCount;
     }
 
     private void PerformDomainChecks()

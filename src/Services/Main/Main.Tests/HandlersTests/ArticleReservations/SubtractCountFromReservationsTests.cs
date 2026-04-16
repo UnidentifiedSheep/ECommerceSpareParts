@@ -73,7 +73,7 @@ public class SubtractCountFromReservationsTests : IAsyncLifetime
     [Fact]
     public async Task Subtract_EmptyInput_ReturnsEmpty()
     {
-        var cmd = new SubtractCountFromReservationsCommand(_user.Id, _whoUpdated.Id, new Dictionary<int, int>());
+        var cmd = new UpdateReservationsCountsCommand(_user.Id, _whoUpdated.Id, new Dictionary<int, int>());
         var result = await _mediator.Send(cmd);
         Assert.Empty(result.NotFoundReservations);
     }
@@ -81,7 +81,7 @@ public class SubtractCountFromReservationsTests : IAsyncLifetime
     [Fact]
     public async Task Subtract_PartialAcrossMultipleReservations_UpdatesCorrectly()
     {
-        var cmd = new SubtractCountFromReservationsCommand(_user.Id, _whoUpdated.Id, new Dictionary<int, int>
+        var cmd = new UpdateReservationsCountsCommand(_user.Id, _whoUpdated.Id, new Dictionary<int, int>
         {
             { _product.Id, 5 }
         });
@@ -103,7 +103,7 @@ public class SubtractCountFromReservationsTests : IAsyncLifetime
     [Fact]
     public async Task Subtract_MoreThanExists_ReturnsNotFoundRemainder()
     {
-        var cmd = new SubtractCountFromReservationsCommand(_user.Id, _whoUpdated.Id, new Dictionary<int, int>
+        var cmd = new UpdateReservationsCountsCommand(_user.Id, _whoUpdated.Id, new Dictionary<int, int>
         {
             { _product.Id, 20 }
         });
@@ -118,7 +118,7 @@ public class SubtractCountFromReservationsTests : IAsyncLifetime
     [Fact]
     public async Task Subtract_ZeroOrNegativeCounts_IgnoredAndNotReturned()
     {
-        var cmd = new SubtractCountFromReservationsCommand(_user.Id, _whoUpdated.Id, new Dictionary<int, int>
+        var cmd = new UpdateReservationsCountsCommand(_user.Id, _whoUpdated.Id, new Dictionary<int, int>
         {
             { _product.Id, 0 },
             { int.MaxValue, -5 }
@@ -130,7 +130,7 @@ public class SubtractCountFromReservationsTests : IAsyncLifetime
     [Fact]
     public async Task Subtract_UserNotFound_Throws()
     {
-        var cmd = new SubtractCountFromReservationsCommand(Guid.NewGuid(), _whoUpdated.Id, new Dictionary<int, int>
+        var cmd = new UpdateReservationsCountsCommand(Guid.NewGuid(), _whoUpdated.Id, new Dictionary<int, int>
         {
             { _product.Id, 1 }
         });

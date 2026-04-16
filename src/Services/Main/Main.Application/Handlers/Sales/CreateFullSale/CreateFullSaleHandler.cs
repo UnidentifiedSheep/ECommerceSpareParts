@@ -82,7 +82,7 @@ public class CreateFullSaleHandler(
             .GroupBy(x => x.ProductId)
             .ToDictionary(x => x.Key, x => x.Sum(z => z.Count));
 
-        await SubtractCountFromReservations(buyerId, whoCreated, saleCounts, cancellationToken);
+        await SubtractCountFromReservations(buyerId, saleCounts, cancellationToken);
 
         await publishEndpoint.Publish(new SaleCreatedEvent
         {
@@ -95,11 +95,10 @@ public class CreateFullSaleHandler(
 
     private async Task SubtractCountFromReservations(
         Guid buyerId,
-        Guid whoCreated,
         Dictionary<int, int> toSubtract,
         CancellationToken cancellation = default)
     {
-        var command = new SubtractCountFromReservationsCommand(buyerId, whoCreated, toSubtract);
+        var command = new UpdateReservationsCountsCommand(buyerId, toSubtract);
         await mediator.Send(command, cancellation);
     }
 

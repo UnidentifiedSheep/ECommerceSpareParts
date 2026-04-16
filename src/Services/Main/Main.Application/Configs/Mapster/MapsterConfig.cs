@@ -519,7 +519,7 @@ public static class MapsterConfig
             .Map(dest => dest.SearchPlace, src => src.SearchPlace);
 
         //Article Reservation 
-        TypeAdapterConfig<EditArticleReservationDto, StorageContentReservation>.NewConfig()
+        TypeAdapterConfig<EditProductReservationDto, StorageContentReservation>.NewConfig()
             .IgnorePatchIfNotSet()
             .Map(dest => dest.ProductId, src => src.ArticleId)
             .Map(dest => dest.Comment, src => src.Comment == null ? null : src.Comment.Trim())

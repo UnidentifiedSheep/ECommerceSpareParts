@@ -8,7 +8,7 @@ using MediatR;
 
 namespace Main.Api.EndPoints.ArticlesReservation;
 
-public record EditArticleReservationRequest(EditArticleReservationDto NewValue);
+public record EditArticleReservationRequest(EditProductReservationDto NewValue);
 
 public class EditArticleReservationEndPoint : ICarterModule
 {
@@ -21,7 +21,7 @@ public class EditArticleReservationEndPoint : ICarterModule
                 IUserContext user,
                 CancellationToken token) =>
             {
-                var command = new EditArticleReservationCommand(reservationId, request.NewValue, user.UserId);
+                var command = new EditProductReservationCommand(reservationId, request.NewValue, user.UserId);
                 await sender.Send(command, token);
                 return Results.NoContent();
             }).WithTags("ArticleReservations")

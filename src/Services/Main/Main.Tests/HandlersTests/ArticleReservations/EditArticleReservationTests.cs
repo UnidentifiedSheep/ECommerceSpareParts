@@ -73,7 +73,7 @@ public class EditArticleReservationTests : IAsyncLifetime
     [Fact]
     public async Task EditReservation_Success_UpdatesFields()
     {
-        var dto = new EditArticleReservationDto
+        var dto = new EditProductReservationDto
         {
             ArticleId = _product.Id,
             InitialCount = 5,
@@ -83,7 +83,7 @@ public class EditArticleReservationTests : IAsyncLifetime
             Comment = "updated"
         };
 
-        var cmd = new EditArticleReservationCommand(_reservationId, dto, _whoUpdated.Id);
+        var cmd = new EditProductReservationCommand(_reservationId, dto, _whoUpdated.Id);
         await _mediator.Send(cmd);
 
         var updated = await _context.StorageContentReservations.FirstAsync(x => x.Id == _reservationId);
@@ -99,26 +99,26 @@ public class EditArticleReservationTests : IAsyncLifetime
     [InlineData(-1)]
     public async Task EditReservation_InvalidInitialCount_Validation(int initial)
     {
-        var dto = new EditArticleReservationDto
+        var dto = new EditProductReservationDto
         {
             ArticleId = _product.Id,
             InitialCount = initial,
             CurrentCount = 1
         };
-        var cmd = new EditArticleReservationCommand(_reservationId, dto, _whoUpdated.Id);
+        var cmd = new EditProductReservationCommand(_reservationId, dto, _whoUpdated.Id);
         await Assert.ThrowsAsync<ValidationException>(() => _mediator.Send(cmd));
     }
 
     [Fact]
     public async Task EditReservation_CurrentGreaterThanInitial_Validation()
     {
-        var dto = new EditArticleReservationDto
+        var dto = new EditProductReservationDto
         {
             ArticleId = _product.Id,
             InitialCount = 1,
             CurrentCount = 2
         };
-        var cmd = new EditArticleReservationCommand(_reservationId, dto, _whoUpdated.Id);
+        var cmd = new EditProductReservationCommand(_reservationId, dto, _whoUpdated.Id);
         await Assert.ThrowsAsync<ValidationException>(() => _mediator.Send(cmd));
     }
 
@@ -129,7 +129,7 @@ public class EditArticleReservationTests : IAsyncLifetime
     [InlineData(0.0001)]
     public async Task EditReservation_InvalidPrice_Validation(decimal price)
     {
-        var dto = new EditArticleReservationDto
+        var dto = new EditProductReservationDto
         {
             ArticleId = _product.Id,
             InitialCount = 2,
@@ -137,33 +137,33 @@ public class EditArticleReservationTests : IAsyncLifetime
             GivenPrice = price,
             GivenCurrencyId = _currency.Id
         };
-        var cmd = new EditArticleReservationCommand(_reservationId, dto, _whoUpdated.Id);
+        var cmd = new EditProductReservationCommand(_reservationId, dto, _whoUpdated.Id);
         await Assert.ThrowsAsync<ValidationException>(() => _mediator.Send(cmd));
     }
 
     [Fact]
     public async Task EditReservation_MissingReservation_Throws()
     {
-        var dto = new EditArticleReservationDto
+        var dto = new EditProductReservationDto
         {
             ArticleId = _product.Id,
             InitialCount = 2,
             CurrentCount = 1
         };
-        var cmd = new EditArticleReservationCommand(int.MaxValue, dto, _whoUpdated.Id);
+        var cmd = new EditProductReservationCommand(int.MaxValue, dto, _whoUpdated.Id);
         await Assert.ThrowsAsync<ReservationNotFoundException>(() => _mediator.Send(cmd));
     }
 
     [Fact]
     public async Task EditReservation_MissingArticle_Throws()
     {
-        var dto = new EditArticleReservationDto
+        var dto = new EditProductReservationDto
         {
             ArticleId = int.MaxValue,
             InitialCount = 2,
             CurrentCount = 1
         };
-        var cmd = new EditArticleReservationCommand(_reservationId, dto, _whoUpdated.Id);
+        var cmd = new EditProductReservationCommand(_reservationId, dto, _whoUpdated.Id);
         var exception = await Assert.ThrowsAsync<DbValidationException>(() => _mediator.Send(cmd));
         Assert.Equal(ApplicationErrors.ArticlesNotFound, exception.Failures[0].ErrorName);
     }
@@ -171,7 +171,7 @@ public class EditArticleReservationTests : IAsyncLifetime
     [Fact]
     public async Task EditReservation_MissingCurrency_Throws()
     {
-        var dto = new EditArticleReservationDto
+        var dto = new EditProductReservationDto
         {
             ArticleId = _product.Id,
             InitialCount = 2,
@@ -179,7 +179,7 @@ public class EditArticleReservationTests : IAsyncLifetime
             GivenPrice = 1,
             GivenCurrencyId = int.MaxValue
         };
-        var cmd = new EditArticleReservationCommand(_reservationId, dto, _whoUpdated.Id);
+        var cmd = new EditProductReservationCommand(_reservationId, dto, _whoUpdated.Id);
         await Assert.ThrowsAsync<ValidationException>(() => _mediator.Send(cmd));
     }
 }

@@ -9,7 +9,7 @@ namespace Main.Application.Handlers.ArticleReservations.CreateArticleReservation
 
 [AutoSave]
 [Transactional]
-public record CreateProductReservationCommand(List<NewProductReservationDto> Reservations, Guid WhoCreated) : ICommand;
+public record CreateProductReservationCommand(List<NewProductReservationDto> Reservations) : ICommand;
 
 public class CreateProductReservationHandler(IUnitOfWork unitOfWork) : ICommandHandler<CreateProductReservationCommand>
 {

@@ -12,7 +12,7 @@ public class DeleteArticleReservationEndPoint : ICarterModule
         app.MapDelete("/articles/reservations/{reservationId}",
                 async (ISender sender, int reservationId, CancellationToken cancellationToken) =>
                 {
-                    var command = new DeleteArticleReservationCommand(reservationId);
+                    var command = new DeleteProductReservationCommand(reservationId);
                     await sender.Send(command, cancellationToken);
                     return Results.NoContent();
                 }).WithTags("ArticleReservations")
