@@ -1,8 +1,12 @@
 using Abstractions.Models;
+using Application.Common.Extensions;
 using Application.Common.Interfaces;
+using Application.Common.Interfaces.Repositories;
 using Main.Abstractions.Dtos.Currencies;
-using Main.Abstractions.Interfaces.DbRepositories;
+using Main.Application.Handlers.Currencies.Projections;
+using Main.Entities.Currency;
 using Mapster;
+using Microsoft.EntityFrameworkCore;
 
 namespace Main.Application.Handlers.Currencies.GetCurrencies;
 
@@ -10,17 +14,21 @@ public record GetCurrenciesQuery(PaginationModel Pagination) : IQuery<GetCurrenc
 
 public record GetCurrenciesResult(IEnumerable<CurrencyDto> Currencies);
 
-public class GetCurrenciesHandler(ICurrencyRepository currencyRepository, IRelatedDataCollector relatedDataCollector)
+public class GetCurrenciesHandler(
+    IReadRepository<Currency, int> repository, 
+    IRelatedDataCollector relatedDataCollector)
     : IQueryHandler<GetCurrenciesQuery, GetCurrenciesResult>
 {
     public async Task<GetCurrenciesResult> Handle(GetCurrenciesQuery request, CancellationToken cancellationToken)
     {
-        var page = request.Pagination.Page;
-        var limit = request.Pagination.Size;
-        var currencies = await currencyRepository.GetCurrencies(page, limit, false, cancellationToken);
+        var result = await repository.Query
+            .AsNoTracking()
+            .Select(CurrencyProjections.ToDto)
+            .ApplyPagination(request.Pagination)
+            .ToListAsync(cancellationToken);
 
-        relatedDataCollector.AddRange(currencies.Select(x => x.Id.ToString()));
+        relatedDataCollector.AddRange(result.Select(x => x.Id.ToString()));
 
-        return new GetCurrenciesResult(currencies.Adapt<List<CurrencyDto>>());
+        return new GetCurrenciesResult(result);
     }
 }

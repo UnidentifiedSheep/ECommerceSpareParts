@@ -1,14 +1,24 @@
+﻿using System.Text.Json.Serialization;
+
 namespace Main.Abstractions.Dtos.Currencies;
 
-public class CurrencyDto
+public record CurrencyDto
 {
-    public int Id { get; set; }
+    [JsonPropertyName("id")]
+    public required int Id { get; init; }
 
-    public string ShortName { get; set; } = null!;
+    [JsonPropertyName("shortName")]
+    public required string ShortName { get; init; }
 
-    public string Name { get; set; } = null!;
+    [JsonPropertyName("name")]
+    public required string Name { get; init; }
 
-    public string CurrencySign { get; set; } = null!;
+    [JsonPropertyName("currencySign")]
+    public required string CurrencySign { get; init; }
 
-    public string Code { get; set; } = null!;
+    [JsonPropertyName("code")]
+    public required string Code { get; init; }
+
+    [JsonPropertyName("toUsdRate")]
+    public required decimal? ToUsdRate { get; init; }
 }

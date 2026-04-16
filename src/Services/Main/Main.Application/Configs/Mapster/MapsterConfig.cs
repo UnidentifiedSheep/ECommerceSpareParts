@@ -553,7 +553,7 @@ public static class MapsterConfig
             .Map(d => d.CurrencySign, s => s.CurrencySign)
             .Map(d => d.ToUsdRate, s => s.CurrencyToUsd == null ? 0 : s.CurrencyToUsd.ToUsd);
 
-        TypeAdapterConfig<Currency, CurrencyWithRateDto>.NewConfig()
+        TypeAdapterConfig<Currency, CurrencyDto>.NewConfig()
             .Map(d => d.Code, s => s.Code)
             .Map(d => d.Name, s => s.Name)
             .Map(d => d.Id, s => s.Id)
@@ -561,7 +561,7 @@ public static class MapsterConfig
             .Map(d => d.CurrencySign, s => s.CurrencySign)
             .Map(d => d.ToUsdRate, s => s.CurrencyToUsd == null ? 0 : s.CurrencyToUsd.ToUsd);
 
-        TypeAdapterConfig<CurrencyWithRateDto, Contracts.Models.Currency.Currency>.NewConfig()
+        TypeAdapterConfig<CurrencyDto, Contracts.Models.Currency.Currency>.NewConfig()
             .Map(d => d.Code, s => s.Code)
             .Map(d => d.Name, s => s.Name)
             .Map(d => d.Id, s => s.Id)

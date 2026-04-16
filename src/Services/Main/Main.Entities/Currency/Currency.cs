@@ -1,9 +1,10 @@
 ﻿using BulkValidation.Core.Attributes;
+using Domain;
 using Domain.Extensions;
 
 namespace Main.Entities.Currency;
 
-public class Currency
+public class Currency : Entity<Currency, int>
 {
     [Validate]
     public int Id { get; private set; }
@@ -74,4 +75,6 @@ public class Currency
             .AgainstTooLong(26, "currency.code.max.length")
             .AgainstTooShort(2, "currency.code.min.length");
     }
+
+    public override int GetId() => Id;
 }

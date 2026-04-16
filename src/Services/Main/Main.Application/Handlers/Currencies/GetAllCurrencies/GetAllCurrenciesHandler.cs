@@ -1,22 +1,27 @@
 ﻿using Application.Common.Interfaces;
+using Application.Common.Interfaces.Repositories;
 using Main.Abstractions.Dtos.Currencies;
-using Main.Abstractions.Interfaces.DbRepositories;
+using Main.Application.Handlers.Currencies.Projections;
+using Main.Entities.Currency;
 using Mapster;
+using Microsoft.EntityFrameworkCore;
 
 namespace Main.Application.Handlers.Currencies.GetAllCurrencies;
 
 public record GetAllCurrenciesQuery : IQuery<GetAllCurrenciesResult>;
 
-public record GetAllCurrenciesResult(List<CurrencyWithRateDto> Currencies);
+public record GetAllCurrenciesResult(List<CurrencyDto> Currencies);
 
-public class GetAllCurrenciesHandler(ICurrencyRepository currencyRepository)
+public class GetAllCurrenciesHandler(IReadRepository<Currency, int> repository)
     : IQueryHandler<GetAllCurrenciesQuery, GetAllCurrenciesResult>
 {
     public async Task<GetAllCurrenciesResult> Handle(GetAllCurrenciesQuery request, CancellationToken cancellationToken)
     {
-        var currencies = await currencyRepository.GetCurrencies(null, null, false, cancellationToken,
-            x => x.CurrencyToUsd);
+        var result = await repository.Query
+            .AsNoTracking()
+            .Select(CurrencyProjections.ToDto)
+            .ToListAsync(cancellationToken);
 
-        return new GetAllCurrenciesResult(currencies.Adapt<List<CurrencyWithRateDto>>());
+        return new GetAllCurrenciesResult(result);
     }
 }
