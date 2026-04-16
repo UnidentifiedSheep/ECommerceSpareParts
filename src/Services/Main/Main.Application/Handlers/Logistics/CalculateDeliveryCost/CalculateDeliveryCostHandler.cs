@@ -1,5 +1,6 @@
 ﻿using Abstractions.Interfaces.Currency;
 using Application.Common.Interfaces;
+using Application.Common.Interfaces.Repositories;
 using Enums;
 using Main.Abstractions.Dtos.Amw.Logistics;
 using Main.Abstractions.Dtos.Amw.StorageRoutes;
@@ -27,9 +28,9 @@ public record CalculateDeliveryCostResult(StorageRouteDto Route, DeliveryCostDto
 
 public class CalculateDeliveryCostHandler(
     ILogisticsCostService logisticsCostService,
-    IArticleSizesRepository sizesRepository,
-    IStorageRoutesRepository storageRoutesRepository,
-    IArticleWeightRepository weightRepository,
+    IRepository<ProductSize, int> sizesRepository,
+    IRepository<StorageRoute, Guid> storageRoutesRepository,
+    IRepository<ProductWeight, int> weightRepository,
     ICurrencyConverter currencyConverter)
     : IQueryHandler<CalculateDeliveryCostQuery, CalculateDeliveryCostResult>
 {
