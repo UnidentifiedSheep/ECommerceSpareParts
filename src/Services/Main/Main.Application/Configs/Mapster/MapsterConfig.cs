@@ -523,19 +523,19 @@ public static class MapsterConfig
             .IgnorePatchIfNotSet()
             .Map(dest => dest.ProductId, src => src.ArticleId)
             .Map(dest => dest.Comment, src => src.Comment == null ? null : src.Comment.Trim())
-            .Map(dest => dest.InitialCount, src => src.InitialCount)
+            .Map(dest => dest.ReservedCount, src => src.InitialCount)
             .Map(dest => dest.CurrentCount, src => src.CurrentCount)
-            .Map(dest => dest.GivenCurrencyId, src => src.GivenCurrencyId)
-            .Map(dest => dest.GivenPrice, src => src.GivenPrice);
+            .Map(dest => dest.ProposedCurrencyId, src => src.GivenCurrencyId)
+            .Map(dest => dest.ProposedPrice, src => src.GivenPrice);
 
-        TypeAdapterConfig<NewArticleReservationDto, StorageContentReservation>.NewConfig()
-            .Map(dest => dest.ProductId, src => src.ArticleId)
+        TypeAdapterConfig<NewProductReservationDto, StorageContentReservation>.NewConfig()
+            .Map(dest => dest.ProductId, src => src.ProductId)
             .Map(dest => dest.Comment, src => src.Comment)
-            .Map(dest => dest.GivenCurrencyId, src => src.GivenCurrencyId)
-            .Map(dest => dest.GivenPrice,
-                src => src.GivenPrice == null ? (decimal?)null : Math.Round(src.GivenPrice.Value, 2))
+            .Map(dest => dest.ProposedCurrencyId, src => src.GivenCurrencyId)
+            .Map(dest => dest.ProposedPrice,
+                src => src.ProposedPrice == null ? (decimal?)null : Math.Round(src.ProposedPrice.Value, 2))
             .Map(dest => dest.CurrentCount, src => src.CurrentCount)
-            .Map(dest => dest.InitialCount, src => src.InitialCount)
+            .Map(dest => dest.ReservedCount, src => src.ReservedCount)
             .Map(dest => dest.UserId, src => src.UserId);
 
         //CURRENCY

@@ -8,6 +8,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Persistence.DbValidator;
 using Persistence.Extensions;
+using Persistence.Interceptors;
 using ProducerRepository = Main.Persistence.Repositories.Producer.ProducerRepository;
 
 namespace Main.Persistence;
@@ -16,7 +17,12 @@ public static class ServiceProvider
 {
     public static IServiceCollection AddPersistenceLayer(this IServiceCollection collection, string connectionString)
     {
-        collection.AddDbContext<DContext>(options => options.UseNpgsql(connectionString));
+        collection.AddScoped<AuditableEntitySaveChangesInterceptor>();
+        collection.AddDbContext<DContext>((sp, options) =>
+        {
+            options.UseNpgsql(connectionString);
+            options.AddInterceptors(sp.GetRequiredService<AuditableEntitySaveChangesInterceptor>());
+        });
         
         collection.AddScoped<IProductRepository, ProductRepository>();
         collection.AddScoped<IProducerRepository, ProducerRepository>();

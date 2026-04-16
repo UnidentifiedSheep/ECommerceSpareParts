@@ -44,12 +44,12 @@ public class DeleteArticleReservationTests : IAsyncLifetime
         _user = await _context.Users.FirstAsync();
         _whoCreated = await _context.Users.FirstAsync(x => x.Id != _user.Id);
 
-        var create = new CreateArticleReservationCommand([
-            new NewArticleReservationDto
+        var create = new CreateProductReservationCommand([
+            new NewProductReservationDto
             {
-                ArticleId = _product.Id,
+                ProductId = _product.Id,
                 UserId = _user.Id,
-                InitialCount = 2,
+                ReservedCount = 2,
                 CurrentCount = 2
             }
         ], _whoCreated.Id);

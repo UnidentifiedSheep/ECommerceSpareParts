@@ -52,12 +52,12 @@ public class EditArticleReservationTests : IAsyncLifetime
         _whoUpdated = await _context.Users.FirstAsync(x => x.Id != _user.Id);
         _currency = await _context.Currencies.FirstAsync();
 
-        var create = new CreateArticleReservationCommand([
-            new NewArticleReservationDto
+        var create = new CreateProductReservationCommand([
+            new NewProductReservationDto
             {
-                ArticleId = _product.Id,
+                ProductId = _product.Id,
                 UserId = _user.Id,
-                InitialCount = 4,
+                ReservedCount = 4,
                 CurrentCount = 3
             }
         ], _whoUpdated.Id);
@@ -87,10 +87,10 @@ public class EditArticleReservationTests : IAsyncLifetime
         await _mediator.Send(cmd);
 
         var updated = await _context.StorageContentReservations.FirstAsync(x => x.Id == _reservationId);
-        Assert.Equal(5, updated.InitialCount);
+        Assert.Equal(5, updated.ReservedCount);
         Assert.Equal(1, updated.CurrentCount);
-        Assert.Equal(9.99m, updated.GivenPrice);
-        Assert.Equal(_currency.Id, updated.GivenCurrencyId);
+        Assert.Equal(9.99m, updated.ProposedPrice);
+        Assert.Equal(_currency.Id, updated.ProposedCurrencyId);
         Assert.Equal("updated", updated.Comment);
     }
 

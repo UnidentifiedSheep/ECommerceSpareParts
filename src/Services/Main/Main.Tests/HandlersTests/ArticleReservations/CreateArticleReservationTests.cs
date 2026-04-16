@@ -57,48 +57,48 @@ public class CreateArticleReservationTests : IAsyncLifetime
     [Fact]
     public async Task CreateReservations_Success_CreatesAll()
     {
-        var dto = new List<NewArticleReservationDto>
+        var dto = new List<NewProductReservationDto>
         {
             new()
             {
-                ArticleId = _product.Id,
+                ProductId = _product.Id,
                 UserId = _user.Id,
-                InitialCount = 5,
+                ReservedCount = 5,
                 CurrentCount = 3,
                 Comment = "test",
-                GivenPrice = 10.25m,
+                ProposedPrice = 10.25m,
                 GivenCurrencyId = _currency.Id
             },
             new()
             {
-                ArticleId = _product.Id,
+                ProductId = _product.Id,
                 UserId = _user.Id,
-                InitialCount = 2,
+                ReservedCount = 2,
                 CurrentCount = 2
             }
         };
 
-        var cmd = new CreateArticleReservationCommand(dto, _whoCreated.Id);
+        var cmd = new CreateProductReservationCommand(dto, _whoCreated.Id);
         await _mediator.Send(cmd);
 
         var reservations = await _context.StorageContentReservations.ToListAsync();
         Assert.Equal(2, reservations.Count);
         Assert.All(reservations, r => Assert.Equal(_whoCreated.Id, r.WhoCreated));
-        Assert.Contains(reservations, x => x.GivenCurrencyId == _currency.Id && x.GivenPrice == 10.25m);
+        Assert.Contains(reservations, x => x.ProposedCurrencyId == _currency.Id && x.ProposedPrice == 10.25m);
     }
 
     [Fact]
     public async Task CreateReservations_WithMoreThan100_ThrowsValidationException()
     {
-        var list = Enumerable.Range(0, 101).Select(_ => new NewArticleReservationDto
+        var list = Enumerable.Range(0, 101).Select(_ => new NewProductReservationDto
         {
-            ArticleId = _product.Id,
+            ProductId = _product.Id,
             UserId = _user.Id,
-            InitialCount = 1,
+            ReservedCount = 1,
             CurrentCount = 1
         }).ToList();
 
-        var cmd = new CreateArticleReservationCommand(list, _whoCreated.Id);
+        var cmd = new CreateProductReservationCommand(list, _whoCreated.Id);
         await Assert.ThrowsAsync<ValidationException>(() => _mediator.Send(cmd));
     }
 
@@ -107,17 +107,17 @@ public class CreateArticleReservationTests : IAsyncLifetime
     [InlineData(-1)]
     public async Task CreateReservations_WithNonPositiveInitialCount_ThrowsValidationException(int count)
     {
-        var dto = new List<NewArticleReservationDto>
+        var dto = new List<NewProductReservationDto>
         {
             new()
             {
-                ArticleId = _product.Id,
+                ProductId = _product.Id,
                 UserId = _user.Id,
-                InitialCount = count,
+                ReservedCount = count,
                 CurrentCount = 1
             }
         };
-        var cmd = new CreateArticleReservationCommand(dto, _whoCreated.Id);
+        var cmd = new CreateProductReservationCommand(dto, _whoCreated.Id);
         await Assert.ThrowsAsync<ValidationException>(() => _mediator.Send(cmd));
     }
 
@@ -126,34 +126,34 @@ public class CreateArticleReservationTests : IAsyncLifetime
     [InlineData(-1)]
     public async Task CreateReservations_WithNonPositiveCurrentCount_ThrowsValidationException(int count)
     {
-        var dto = new List<NewArticleReservationDto>
+        var dto = new List<NewProductReservationDto>
         {
             new()
             {
-                ArticleId = _product.Id,
+                ProductId = _product.Id,
                 UserId = _user.Id,
-                InitialCount = 2,
+                ReservedCount = 2,
                 CurrentCount = count
             }
         };
-        var cmd = new CreateArticleReservationCommand(dto, _whoCreated.Id);
+        var cmd = new CreateProductReservationCommand(dto, _whoCreated.Id);
         await Assert.ThrowsAsync<ValidationException>(() => _mediator.Send(cmd));
     }
 
     [Fact]
     public async Task CreateReservations_WithCurrentGreaterThanInitial_ThrowsValidationException()
     {
-        var dto = new List<NewArticleReservationDto>
+        var dto = new List<NewProductReservationDto>
         {
             new()
             {
-                ArticleId = _product.Id,
+                ProductId = _product.Id,
                 UserId = _user.Id,
-                InitialCount = 1,
+                ReservedCount = 1,
                 CurrentCount = 2
             }
         };
-        var cmd = new CreateArticleReservationCommand(dto, _whoCreated.Id);
+        var cmd = new CreateProductReservationCommand(dto, _whoCreated.Id);
         await Assert.ThrowsAsync<ValidationException>(() => _mediator.Send(cmd));
     }
 
@@ -164,55 +164,55 @@ public class CreateArticleReservationTests : IAsyncLifetime
     [InlineData(0.0001)]
     public async Task CreateReservations_WithInvalidGivenPrice_ThrowsValidationException(decimal price)
     {
-        var dto = new List<NewArticleReservationDto>
+        var dto = new List<NewProductReservationDto>
         {
             new()
             {
-                ArticleId = _product.Id,
+                ProductId = _product.Id,
                 UserId = _user.Id,
-                InitialCount = 2,
+                ReservedCount = 2,
                 CurrentCount = 2,
-                GivenPrice = price,
+                ProposedPrice = price,
                 GivenCurrencyId = _currency.Id
             }
         };
-        var cmd = new CreateArticleReservationCommand(dto, _whoCreated.Id);
+        var cmd = new CreateProductReservationCommand(dto, _whoCreated.Id);
         await Assert.ThrowsAsync<ValidationException>(() => _mediator.Send(cmd));
     }
 
     [Fact]
     public async Task CreateReservations_WithMissingCurrency_ThrowsCurrencyNotFound()
     {
-        var dto = new List<NewArticleReservationDto>
+        var dto = new List<NewProductReservationDto>
         {
             new()
             {
-                ArticleId = _product.Id,
+                ProductId = _product.Id,
                 UserId = _user.Id,
-                InitialCount = 2,
+                ReservedCount = 2,
                 CurrentCount = 2,
-                GivenPrice = 1,
+                ProposedPrice = 1,
                 GivenCurrencyId = int.MaxValue
             }
         };
-        var cmd = new CreateArticleReservationCommand(dto, _whoCreated.Id);
+        var cmd = new CreateProductReservationCommand(dto, _whoCreated.Id);
         await Assert.ThrowsAsync<ValidationException>(() => _mediator.Send(cmd));
     }
 
     [Fact]
     public async Task CreateReservations_WithMissingArticle_ThrowsArticleNotFound()
     {
-        var dto = new List<NewArticleReservationDto>
+        var dto = new List<NewProductReservationDto>
         {
             new()
             {
-                ArticleId = int.MaxValue,
+                ProductId = int.MaxValue,
                 UserId = _user.Id,
-                InitialCount = 2,
+                ReservedCount = 2,
                 CurrentCount = 2
             }
         };
-        var cmd = new CreateArticleReservationCommand(dto, _whoCreated.Id);
+        var cmd = new CreateProductReservationCommand(dto, _whoCreated.Id);
         var exception = await Assert.ThrowsAsync<DbValidationException>(() => _mediator.Send(cmd));
         Assert.Equal(ApplicationErrors.ArticlesNotFound, exception.Failures[0].ErrorName);
     }
@@ -220,17 +220,17 @@ public class CreateArticleReservationTests : IAsyncLifetime
     [Fact]
     public async Task CreateReservations_WithMissingUser_ThrowsUserNotFound()
     {
-        var dto = new List<NewArticleReservationDto>
+        var dto = new List<NewProductReservationDto>
         {
             new()
             {
-                ArticleId = _product.Id,
+                ProductId = _product.Id,
                 UserId = Guid.NewGuid(),
-                InitialCount = 2,
+                ReservedCount = 2,
                 CurrentCount = 2
             }
         };
-        var cmd = new CreateArticleReservationCommand(dto, _whoCreated.Id);
+        var cmd = new CreateProductReservationCommand(dto, _whoCreated.Id);
         var exception = await Assert.ThrowsAsync<DbValidationException>(() => _mediator.Send(cmd));
         Assert.Equal(ApplicationErrors.UsersNotFound, exception.Failures[0].ErrorName);
     }

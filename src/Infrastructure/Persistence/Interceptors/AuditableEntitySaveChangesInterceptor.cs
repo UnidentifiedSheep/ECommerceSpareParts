@@ -1,10 +1,11 @@
-﻿using Domain.Interfaces;
+﻿using Abstractions.Interfaces;
+using Domain.Interfaces;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Diagnostics;
 
 namespace Persistence.Interceptors;
 
-public class AuditableEntitySaveChangesInterceptor : SaveChangesInterceptor
+public class AuditableEntitySaveChangesInterceptor(IUserContext userContext) : SaveChangesInterceptor
 {
     public override InterceptionResult<int> SavingChanges(
         DbContextEventData eventData,
@@ -23,16 +24,20 @@ public class AuditableEntitySaveChangesInterceptor : SaveChangesInterceptor
         return base.SavingChangesAsync(eventData, result, cancellationToken);
     }
 
-    private static void UpdateAuditFields(DbContext? context)
+    private void UpdateAuditFields(DbContext? context)
     {
         if (context == null) return;
 
-        var entries = context.ChangeTracker
+        var modified = context.ChangeTracker
             .Entries<IAuditable>()
-            .Where(x => x.State == EntityState.Modified);
+            .Where(x => x.State is EntityState.Modified or EntityState.Added);
 
-        foreach (var entry in entries)
-            entry.Entity.Touch();
+        foreach (var entry in modified)
+        {
+            if (entry.State == EntityState.Added)
+                entry.Entity.SetCreatedUser(userContext.UserId);
+            entry.Entity.Touch(userContext.UserId);
+        }
         
     }
 }

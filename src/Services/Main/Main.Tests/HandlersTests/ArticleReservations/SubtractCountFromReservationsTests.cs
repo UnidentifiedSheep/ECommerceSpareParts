@@ -46,19 +46,19 @@ public class SubtractCountFromReservationsTests : IAsyncLifetime
         _whoUpdated = await _context.Users.FirstAsync(x => x.Id != _user.Id);
 
         // create two reservations for same article
-        var create = new CreateArticleReservationCommand([
-            new NewArticleReservationDto
+        var create = new CreateProductReservationCommand([
+            new NewProductReservationDto
             {
-                ArticleId = _product.Id,
+                ProductId = _product.Id,
                 UserId = _user.Id,
-                InitialCount = 5,
+                ReservedCount = 5,
                 CurrentCount = 3
             },
-            new NewArticleReservationDto
+            new NewProductReservationDto
             {
-                ArticleId = _product.Id,
+                ProductId = _product.Id,
                 UserId = _user.Id,
-                InitialCount = 4,
+                ReservedCount = 4,
                 CurrentCount = 4
             }
         ], _whoUpdated.Id);

@@ -56,6 +56,18 @@ public static class ModelBuilderExtensions
 
             builder.Property(nameof(IAuditable.UpdatedAt))
                 .HasColumnName("updated_at");
+            
+            builder.Property(nameof(IAuditable.WhoCreated))
+                .HasColumnName("who_created");
+            
+            builder.Property(nameof(IAuditable.WhoUpdated))
+                .HasColumnName("who_updated");
+
+            builder.HasIndex(nameof(IAuditable.WhoUpdated))
+                .HasDatabaseName($"{entityType.Name.ToLowerInvariant()}_who_updated_idx");
+            
+            builder.HasIndex(nameof(IAuditable.WhoCreated))
+                .HasDatabaseName($"{entityType.Name.ToLowerInvariant()}_who_created_idx");
         }
         return modelBuilder;
     }

@@ -54,19 +54,19 @@ public class GetArticlesWithNotEnoughStockTests : IAsyncLifetime
         await _mediator.AddMockStorageContents([_product.Id], _currency.Id, _storageName, _buyer.Id, 10);
 
         // Create reservations: buyer reserves 1, other user reserves 5
-        await _mediator.Send(new CreateArticleReservationCommand([
-            new NewArticleReservationDto
+        await _mediator.Send(new CreateProductReservationCommand([
+            new NewProductReservationDto
             {
-                ArticleId = _product.Id,
+                ProductId = _product.Id,
                 UserId = _buyer.Id,
-                InitialCount = 1,
+                ReservedCount = 1,
                 CurrentCount = 1
             },
-            new NewArticleReservationDto
+            new NewProductReservationDto
             {
-                ArticleId = _product.Id,
+                ProductId = _product.Id,
                 UserId = _otherUser.Id,
-                InitialCount = 5,
+                ReservedCount = 5,
                 CurrentCount = 5
             }
         ], _buyer.Id));

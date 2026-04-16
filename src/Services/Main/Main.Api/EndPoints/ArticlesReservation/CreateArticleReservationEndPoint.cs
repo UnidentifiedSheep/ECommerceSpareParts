@@ -7,7 +7,7 @@ using MediatR;
 
 namespace Main.Api.EndPoints.ArticlesReservation;
 
-public record CreateArticleReservationQuery(List<NewArticleReservationDto> Reservations);
+public record CreateArticleReservationQuery(List<NewProductReservationDto> Reservations);
 
 public class CreateArticleReservationEndPoint : ICarterModule
 {
@@ -19,7 +19,7 @@ public class CreateArticleReservationEndPoint : ICarterModule
                 CreateArticleReservationQuery query,
                 CancellationToken cancellationToken) =>
             {
-                var command = new CreateArticleReservationCommand(query.Reservations, user.UserId);
+                var command = new CreateProductReservationCommand(query.Reservations, user.UserId);
                 await sender.Send(command, cancellationToken);
                 return Results.NoContent();
             }).WithTags("ArticleReservations")

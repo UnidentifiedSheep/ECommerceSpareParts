@@ -132,7 +132,7 @@ public partial class DContext : DbContext
     {
         base.OnConfiguring(optionsBuilder);
         
-        RegisterInterceptors(optionsBuilder);
+        RegisterBaseInterceptors(optionsBuilder);
     }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
@@ -163,10 +163,9 @@ public partial class DContext : DbContext
         OnModelCreatingPartial(modelBuilder);
     }
 
-    private void RegisterInterceptors(DbContextOptionsBuilder optionsBuilder)
+    private void RegisterBaseInterceptors(DbContextOptionsBuilder optionsBuilder)
     {
         optionsBuilder.AddInterceptors(new SelectForUpdateCommandInterceptor());
-        optionsBuilder.AddInterceptors(new AuditableEntitySaveChangesInterceptor());
     }
 
     partial void OnModelCreatingPartial(ModelBuilder modelBuilder);

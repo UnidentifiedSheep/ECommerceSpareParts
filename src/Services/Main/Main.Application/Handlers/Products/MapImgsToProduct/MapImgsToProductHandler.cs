@@ -9,6 +9,7 @@ using MediatR;
 
 namespace Main.Application.Handlers.ArticleImages.MapImgsToArticle;
 
+[AutoSave]
 [Transactional]
 public record MapImgsToProductCommand(int ProductId, IEnumerable<IFile> Images) : ICommand;
 
