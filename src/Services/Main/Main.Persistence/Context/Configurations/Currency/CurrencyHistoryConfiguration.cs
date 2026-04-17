@@ -43,7 +43,7 @@ public class CurrencyHistoryConfiguration : IEntityTypeConfiguration<CurrencyHis
             .HasColumnName("prev_value");
 
         builder.HasOne<Entities.Currency.Currency>()
-            .WithMany(p => p.CurrencyHistories)
+            .WithMany(p => p.History)
             .HasForeignKey(d => d.CurrencyId)
             .HasConstraintName("currency_history_currency_id_fk");
     }

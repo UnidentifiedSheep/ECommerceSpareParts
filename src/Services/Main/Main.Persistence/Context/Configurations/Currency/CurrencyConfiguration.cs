@@ -42,5 +42,9 @@ public class CurrencyConfiguration : IEntityTypeConfiguration<Entities.Currency.
         builder.Property(e => e.ShortName)
             .HasMaxLength(5)
             .HasColumnName("short_name");
+        
+        builder.Navigation(e => e.History)
+            .HasField("_history")
+            .UsePropertyAccessMode(PropertyAccessMode.Field);
     }
 }

@@ -21,9 +21,10 @@ public class Currency : Entity<Currency, int>
     [Validate]
     public string Code { get; private set; } = null!;
 
-    public virtual ICollection<CurrencyHistory> CurrencyHistories { get; set; } = new List<CurrencyHistory>();
+    private readonly List<CurrencyHistory> _history = [];
+    public IReadOnlyCollection<CurrencyHistory> History => _history;
 
-    public virtual CurrencyToUsd? CurrencyToUsd { get; set; }
+    public virtual CurrencyToUsd? CurrencyToUsd { get; private set; }
     
     private Currency() {}
 
@@ -74,6 +75,20 @@ public class Currency : Entity<Currency, int>
             .AgainstNullOrWhiteSpace("currency.code.not.empty")
             .AgainstTooLong(26, "currency.code.max.length")
             .AgainstTooShort(2, "currency.code.min.length");
+    }
+
+    public void SetCurrencyToUsd(decimal toUsd)
+    {
+        if (CurrencyToUsd != null)
+            CurrencyToUsd.SetToUsd(toUsd);
+        else
+            CurrencyToUsd = CurrencyToUsd.Create(Id, toUsd);
+        
+        var prevRate = _history
+            .OrderByDescending(x => x.Datetime)
+            .FirstOrDefault()?.NewValue ?? 0;
+        
+        _history.Add(CurrencyHistory.Create(Id, prevRate, toUsd));
     }
 
     public override int GetId() => Id;
