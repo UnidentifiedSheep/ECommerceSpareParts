@@ -1,26 +1,28 @@
 ﻿using Abstractions.Interfaces.Services;
 using Application.Common.Interfaces;
+using Application.Common.Interfaces.Repositories;
 using Attributes;
 using Main.Abstractions.Exceptions.Cart;
-using Main.Abstractions.Interfaces.DbRepositories;
 using MediatR;
 
 namespace Main.Application.Handlers.Cart.DeleteFromCart;
 
+[AutoSave]
 [Transactional]
-public record DeleteFromCartCommand(Guid UserId, int ArticleId) : ICommand;
+public record DeleteFromCartCommand(Guid UserId, int ProductId) : ICommand;
 
-public class DeleteFromCartHandler(ICartRepository cartRepository, IUnitOfWork unitOfWork)
+public class DeleteFromCartHandler(
+    IRepository<Entities.Cart.Cart, (Guid, int)> repository, 
+    IUnitOfWork unitOfWork)
     : ICommandHandler<DeleteFromCartCommand>
 {
     public async Task<Unit> Handle(DeleteFromCartCommand request, CancellationToken cancellationToken)
     {
         var cartItem =
-            await cartRepository.GetCartItemAsync(request.UserId, request.ArticleId, true, cancellationToken) ??
-            throw new CartItemNotFoundException(request.ArticleId);
+            await repository.GetById((request.UserId, request.ProductId), cancellationToken) ??
+            throw new CartItemNotFoundException(request.ProductId);
 
         unitOfWork.Remove(cartItem);
-        await unitOfWork.SaveChangesAsync(cancellationToken);
         return Unit.Value;
     }
 }

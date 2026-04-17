@@ -5,21 +5,16 @@ using MediatR;
 
 namespace Main.Application.Handlers.Cart.AddToCart;
 
+[AutoSave]
 [Transactional]
-public record AddToCartCommand(Guid UserId, int ArticleId, int Count) : ICommand;
+public record AddToCartCommand(Guid UserId, int ProductId, int Count) : ICommand;
 
 public class AddToCartHandler(IUnitOfWork unitOfWork) : ICommandHandler<AddToCartCommand>
 {
     public async Task<Unit> Handle(AddToCartCommand request, CancellationToken cancellationToken)
     {
-        var cartItem = new Entities.Cart.Cart
-        {
-            UserId = request.UserId,
-            ProductId = request.ArticleId,
-            Count = request.Count
-        };
-        await unitOfWork.AddAsync(cartItem, cancellationToken);
-        await unitOfWork.SaveChangesAsync(cancellationToken);
+        var cart = Entities.Cart.Cart.Create(request.UserId, request.ProductId, request.Count);
+        await unitOfWork.AddAsync(cart, cancellationToken);
         return Unit.Value;
     }
 }
