@@ -1,4 +1,5 @@
 ﻿using System.Linq.Expressions;
+using Main.Abstractions.Dtos.Amw.Storage;
 using Main.Abstractions.Dtos.Amw.StorageRoutes;
 using Main.Abstractions.Dtos.Currencies;
 using Main.Entities.Storage;
@@ -7,7 +8,7 @@ namespace Main.Application.Handlers.Currencies.Projections;
 
 public static class StorageProjections
 {
-    public static Expression<Func<StorageRoute, StorageRouteDto>> StorageRouteProjection =
+    public static readonly Expression<Func<StorageRoute, StorageRouteDto>> StorageRouteProjection =
         x => new StorageRouteDto 
         {
             Id = x.Id,
@@ -32,5 +33,14 @@ public static class StorageProjections
             PricingModel = x.PricingModel,
             RouteType = x.RouteType,
             ToStorageName = x.ToStorageName,
+        };
+    
+    public static readonly Expression<Func<Storage, StorageDto>> StorageProjection =
+        x => new StorageDto 
+        {
+            Name = x.Name,
+            Location = x.Location,
+            Description = x.Description,
+            Type = x.Type,
         };
 }

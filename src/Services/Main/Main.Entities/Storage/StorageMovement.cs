@@ -18,10 +18,6 @@ public class StorageMovement
 
     public StorageMovementType ActionType { get; set; }
 
-    public DateTime CreatedAt { get; set; }
-
-    public Guid WhoMoved { get; set; }
-
     public StorageMovement SetActionType(StorageMovementType type)
     {
         ActionType = type;

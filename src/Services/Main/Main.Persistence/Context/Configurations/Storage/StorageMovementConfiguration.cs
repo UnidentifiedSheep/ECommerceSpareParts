@@ -15,11 +15,7 @@ public class StorageMovementConfiguration : IEntityTypeConfiguration<StorageMove
 
         builder.HasIndex(e => e.ProductId, "storage_movement_product_id_index");
 
-        builder.HasIndex(e => e.CreatedAt, "storage_movement_created_at_index");
-
         builder.HasIndex(e => e.StorageName, "storage_movement_storage_name_index");
-
-        builder.HasIndex(e => e.WhoMoved, "storage_movement_who_moved_index");
         
         builder.Property(e => e.Id)
             .HasColumnName("id");
@@ -34,11 +30,6 @@ public class StorageMovementConfiguration : IEntityTypeConfiguration<StorageMove
         builder.Property(e => e.Count)
             .HasColumnName("count");
         
-        builder.Property(e => e.CreatedAt)
-            .HasDefaultValueSql("now()")
-            .HasColumnName("created_at")
-            .ValueGeneratedOnAdd();
-        
         builder.Property(e => e.CurrencyId)
             .HasColumnName("currency_id");
         
@@ -48,9 +39,6 @@ public class StorageMovementConfiguration : IEntityTypeConfiguration<StorageMove
         builder.Property(e => e.StorageName)
             .HasMaxLength(128)
             .HasColumnName("storage_name");
-        
-        builder.Property(e => e.WhoMoved)
-            .HasColumnName("who_moved");
         
         builder.HasOne<Entities.Product.Product>()
             .WithMany()
@@ -69,11 +57,5 @@ public class StorageMovementConfiguration : IEntityTypeConfiguration<StorageMove
             .HasForeignKey(d => d.StorageName)
             .OnDelete(DeleteBehavior.Restrict)
             .HasConstraintName("storage_movement_storages_name_fk");
-
-        builder.HasOne<Entities.User.User>()
-            .WithMany()
-            .HasForeignKey(d => d.WhoMoved)
-            .OnDelete(DeleteBehavior.Restrict)
-            .HasConstraintName("storage_movement_users_id_fk");
     }
 }

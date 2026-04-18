@@ -33,5 +33,9 @@ public class StorageConfiguration : IEntityTypeConfiguration<Entities.Storage.St
         builder.Property(e => e.Type)
             .HasMaxLength(24)
             .HasColumnName("type");
+        
+        builder.Navigation(e => e.Owners)
+            .HasField("_owners")
+            .UsePropertyAccessMode(PropertyAccessMode.Field);
     }
 }

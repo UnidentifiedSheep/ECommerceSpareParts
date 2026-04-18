@@ -18,10 +18,9 @@ public class StorageOwnerConfiguration : IEntityTypeConfiguration<StorageOwner>
         builder.Property(e => e.StorageName)
             .HasMaxLength(128)
             .HasColumnName("storage_name");
-        builder.Property(e => e.OwnerId).HasColumnName("owner_id");
-        builder.Property(e => e.CreatedAt)
-            .HasDefaultValueSql("now()")
-            .HasColumnName("created_at");
+        
+        builder.Property(e => e.OwnerId)
+            .HasColumnName("owner_id");
 
         builder.HasOne(d => d.Owner)
             .WithMany()
@@ -29,8 +28,10 @@ public class StorageOwnerConfiguration : IEntityTypeConfiguration<StorageOwner>
             .HasConstraintName("storage_owners_users_id_fk");
 
         builder.HasOne(d => d.StorageNameNavigation)
-            .WithMany()
+            .WithMany(d => d.Owners)
             .HasForeignKey(d => d.StorageName)
             .HasConstraintName("storage_owners_storages_name_fk");
+        
+        
     }
 }
