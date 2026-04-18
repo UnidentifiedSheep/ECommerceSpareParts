@@ -9,7 +9,7 @@ using Mapster;
 namespace Main.Application.Handlers.StorageRoutes.AddStorageRoute;
 
 /// <summary>
-///     Creates a new logistics route between two storages.
+/// Creates a new logistics route between two storages.
 /// </summary>
 /// <param name="StorageFrom">Source storage name.</param>
 /// <param name="StorageTo">Destination storage name.</param>
@@ -32,7 +32,7 @@ public record AddStorageRouteCommand(
     decimal PriceM3,
     int CurrencyId,
     decimal PricePerOrder,
-    decimal? MinimumPrice,
+    decimal MinimumPrice,
     Guid? CarrierId) : ICommand<AddStorageRouteResult>;
 
 public record AddStorageRouteResult(Guid RouteId);
@@ -42,9 +42,21 @@ public class AddStorageRouteHandler(IUnitOfWork unitOfWork)
 {
     public async Task<AddStorageRouteResult> Handle(AddStorageRouteCommand request, CancellationToken cancellationToken)
     {
-        var storageRoute = request.Adapt<StorageRoute>();
+        var storageRoute = StorageRoute.Create(
+            request.StorageFrom, 
+            request.StorageTo,
+            request.Distance,
+            request.RouteType,
+            request.PricingType,
+            request.DeliveryTime,
+            request.PriceKg,
+            request.PriceM3,
+            request.PricePerOrder,
+            request.MinimumPrice,
+            request.CurrencyId,
+            request.CarrierId);
+        
         await unitOfWork.AddAsync(storageRoute, cancellationToken);
-        await unitOfWork.SaveChangesAsync(cancellationToken);
 
         return new AddStorageRouteResult(storageRoute.Id);
     }

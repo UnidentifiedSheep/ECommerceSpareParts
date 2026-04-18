@@ -33,6 +33,8 @@
     "storage.route.price.m3.precision": "Цена за м³ может содержать не более 2 знаков после запятой.",
     "storage.route.price.order.min": "Минимальная цена за заказ — 0.",
     "storage.route.price.order.precision": "Цена за заказ может содержать не более 2 знаков после запятой.",
+    "storage.route.minimum.price.precision": "Минимальная цена за заказ может содержать не более 2 знаков после запятой.",
+    "storage.route.minimum.price.min": "Минимальная цена за заказ должна быть больше или равна нулю",
     "storage.name.min.length": "Название склада должно быть не менее 6 символов.",
     "storage.name.max.length": "Название склада должно быть не более 128 символов.",
     "storage.description.max.length": "Описание склада должно быть не более 256 символов.",

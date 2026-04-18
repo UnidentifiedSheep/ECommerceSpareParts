@@ -4,6 +4,7 @@ using BulkValidation.Pgsql.Extensions;
 using Main.Application.Interfaces.Repositories;
 using Main.Persistence.Context;
 using Main.Persistence.Repositories;
+using Main.Persistence.Repositories.Storage;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Persistence.DbValidator;
@@ -26,6 +27,8 @@ public static class ServiceProvider
         
         collection.AddScoped<IProductRepository, ProductRepository>();
         collection.AddScoped<IProducerRepository, ProducerRepository>();
+        collection.AddScoped<IStorageRouteRepository, StorageRouteRepository>();
+        
         collection.AddScoped(typeof(IRepository<,>), typeof(BasicEfRepository<,>));
         collection.AddScoped(typeof(IReadRepository<,>), typeof(ReadRepository<,>));
         

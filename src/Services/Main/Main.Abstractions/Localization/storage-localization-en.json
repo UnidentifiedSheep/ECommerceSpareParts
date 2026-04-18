@@ -33,6 +33,8 @@
     "storage.route.price.m3.precision": "Price per m3 must have at most 2 decimal places.",
     "storage.route.price.order.min": "Minimum price per order is 0.",
     "storage.route.price.order.precision": "Price per order must have at most 2 decimal places.",
+    "storage.route.minimum.price.precision": "Minimum price per order must have at most 2 decimal places.",
+    "storage.route.minimum.price.min": "Minimum price per order must be greater or equal to zero.",
     "storage.name.min.length": "Storage name must be at least 6 characters long.",
     "storage.name.max.length": "Storage name must be at most 128 characters long.",
     "storage.description.max.length": "Storage description must be at most 256 characters long.",
