@@ -10,18 +10,18 @@ public class StorageOwner : AuditableEntity<StorageOwner, (string, Guid)>
     public string StorageName { get; private set; } = null!;
 
     [ValidateTuple("PK")]
-    public Guid OwnerId { get; private set; }
+    public Guid UserId { get; private set; }
 
-    public User.User Owner { get; private set; } = null!;
+    public User.User User { get; private set; } = null!;
 
-    public Storage StorageNameNavigation { get; private set; } = null!;
+    public Storage Storage { get; private set; } = null!;
 
     private StorageOwner() { }
 
-    private StorageOwner(string storageName, Guid ownerId)
+    private StorageOwner(string storageName, Guid userId)
     {
         StorageName = storageName;
-        OwnerId = ownerId;
+        UserId = userId;
     }
     
     public static StorageOwner Create(string storageName, Guid ownerId)
@@ -29,5 +29,5 @@ public class StorageOwner : AuditableEntity<StorageOwner, (string, Guid)>
         return new StorageOwner(storageName, ownerId);
     }
     
-    public override (string, Guid) GetId() => (StorageName, OwnerId);
+    public override (string, Guid) GetId() => (StorageName, UserId);
 }

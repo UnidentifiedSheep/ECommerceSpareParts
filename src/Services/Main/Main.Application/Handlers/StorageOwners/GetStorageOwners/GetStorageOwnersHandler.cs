@@ -25,8 +25,8 @@ public class GetStorageOwnersHandler(
     {
         var result = await repository.Query
             .Where(x => x.StorageName == request.Name)
-            .OrderByDescending(x => x.OwnerId)
-            .Select(x => x.Owner)
+            .OrderByDescending(x => x.UserId)
+            .Select(x => x.User)
             .AsExpandable()
             .Select(UserProjections.UserProjection)
             .ApplyPagination(request.Pagination)

@@ -67,13 +67,13 @@ public class Storage : AuditableEntity<Storage, string>
 
     public void AddOwner(Guid userId)
     {
-        if (_owners.Any(x => x.OwnerId == userId)) return;
+        if (_owners.Any(x => x.UserId == userId)) return;
         _owners.Add(StorageOwner.Create(Name, userId));
     }
 
     public void RemoveOwner(Guid userId)
     {
-        var found = _owners.FirstOrDefault(x => x.OwnerId == userId);
+        var found = _owners.FirstOrDefault(x => x.UserId == userId);
         if (found == null) return;
         _owners.Remove(found);
     }

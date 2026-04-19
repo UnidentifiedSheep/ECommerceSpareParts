@@ -12,7 +12,7 @@ public static class UserStorageScenarioExtensions
         user.StorageOwners.Add(new StorageOwner
         {
             CreatedAt = DateTime.UtcNow,
-            StorageNameNavigation = storage
+            Storage = storage
         });
         await context.SaveChangesAsync();
     }
