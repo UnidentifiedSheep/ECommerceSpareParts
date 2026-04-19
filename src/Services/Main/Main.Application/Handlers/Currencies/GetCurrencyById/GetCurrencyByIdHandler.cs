@@ -1,5 +1,6 @@
 using Application.Common.Interfaces;
 using Application.Common.Interfaces.Repositories;
+using LinqKit;
 using Main.Abstractions.Dtos.Currencies;
 using Main.Abstractions.Exceptions.Currencies;
 using Main.Application.Handlers.Currencies.Projections;
@@ -20,9 +21,10 @@ public class GetCurrencyByIdHandler(
     public async Task<GetCurrencyByIdResult> Handle(GetCurrencyByIdQuery request, CancellationToken cancellationToken)
     {
         var currency = await repository.Query
-            .Select(CurrencyProjections.ToDto)
-            .FirstOrDefaultAsync(cancellationToken)
-            ?? throw new CurrencyNotFoundException(request.Id);
+                           .AsExpandable()
+                           .Select(CurrencyProjections.ToDto)
+                           .FirstOrDefaultAsync(cancellationToken) 
+                       ?? throw new CurrencyNotFoundException(request.Id);
         
         return new GetCurrencyByIdResult(currency);
     }

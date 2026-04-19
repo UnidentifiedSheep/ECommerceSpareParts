@@ -10,7 +10,7 @@ namespace Main.Api.EndPoints.Users;
 
 public record GetUserFullInfoResponse(
     UserInfoDto? UserInfo,
-    IReadOnlyList<FullEmailDto> Emails,
+    IReadOnlyList<UserEmailDto> Emails,
     IReadOnlyList<string> Roles,
     IReadOnlyList<string> Permissions);
 

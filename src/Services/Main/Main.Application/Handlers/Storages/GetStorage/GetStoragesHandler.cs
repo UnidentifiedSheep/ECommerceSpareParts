@@ -2,6 +2,7 @@ using Abstractions.Models;
 using Application.Common.Extensions;
 using Application.Common.Interfaces;
 using Application.Common.Interfaces.Repositories;
+using LinqKit;
 using Main.Abstractions.Dtos.Amw.Storage;
 using Main.Application.Handlers.Currencies.Projections;
 using Main.Entities.Storage;
@@ -42,6 +43,7 @@ public class GetStoragesHandler(
 
         var result = await query
             .Where(x => request.Type == null || x.Type == request.Type)
+            .AsExpandable()
             .Select(StorageProjections.StorageProjection)
             .ApplyPagination(request.Pagination)
             .ToListAsync(cancellationToken);

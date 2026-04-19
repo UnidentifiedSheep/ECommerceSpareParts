@@ -1,5 +1,6 @@
 ﻿using Application.Common.Interfaces;
 using Application.Common.Interfaces.Repositories;
+using LinqKit;
 using Main.Abstractions.Dtos.Amw.Storage;
 using Main.Abstractions.Exceptions.Storages;
 using Main.Application.Handlers.Currencies.Projections;
@@ -20,6 +21,7 @@ public class GetStorageByNameHandler(
     public async Task<GetStorageByNameResult> Handle(GetStorageByNameQuery request, CancellationToken cancellationToken)
     {
         var storage = await repository.Query
+                          .AsExpandable()
                           .Select(StorageProjections.StorageProjection)
                           .FirstOrDefaultAsync(x => x.Name == request.StorageName.Trim(), cancellationToken)
                       ?? throw new StorageNotFoundException(request.StorageName);

@@ -22,7 +22,7 @@ public static class MapsterUserConfig
             .Map(d => d.Name, s => s.Name)
             .Map(d => d.Surname, s => s.Surname);
         
-        TypeAdapterConfig<FullUserDto, CoreUser>.NewConfig()
+        TypeAdapterConfig<UserDto, CoreUser>.NewConfig()
             .Map(d => d.Id, s => s.Id)
             .Map(d => d.UserName, s => s.UserName);
 
@@ -30,7 +30,7 @@ public static class MapsterUserConfig
             .Map(d => d.Name, s => s.Name)
             .Map(d => d.Surname, s => s.Surname);
         
-        TypeAdapterConfig<User, FullUserDto>.NewConfig()
+        TypeAdapterConfig<User, UserDto>.NewConfig()
             .IgnoreNonMapped(true)
             .Map(d => d.Id, s => s.Id)
             .Map(d => d.UserName, s => s.UserName)
@@ -44,7 +44,7 @@ public static class MapsterUserConfig
             .Map(d => d.PasswordHash, s => s.PasswordHash)
             .Map(d => d.UserInfo, s => s.UserInfo);
         
-        TypeAdapterConfig<FullUserDto, User>.NewConfig()
+        TypeAdapterConfig<UserDto, User>.NewConfig()
             .IgnoreNonMapped(true)
             .Map(d => d.Id, s => s.Id)
             .Map(d => d.UserName, s => s.UserName)

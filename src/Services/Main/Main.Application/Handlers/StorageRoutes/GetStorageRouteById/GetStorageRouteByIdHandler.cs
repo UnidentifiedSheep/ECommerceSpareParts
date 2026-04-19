@@ -1,5 +1,6 @@
 ﻿using Application.Common.Interfaces;
 using Application.Common.Interfaces.Repositories;
+using LinqKit;
 using Main.Abstractions.Dtos.Amw.StorageRoutes;
 using Main.Abstractions.Exceptions.Storages;
 using Main.Application.Handlers.Currencies.Projections;
@@ -23,6 +24,7 @@ public class GetStorageRouteByIdHandler(
         CancellationToken cancellationToken)
     {
         var route = await repository.Query
+            .AsExpandable()
             .Select(StorageProjections.StorageRouteProjection)
             .FirstOrDefaultAsync(cancellationToken) ?? throw new StorageRouteNotFound(request.Id);
         return new GetStorageRouteByIdResult(route);

@@ -15,7 +15,7 @@ public record GetUserFullInfoQuery(Guid UserId) : IQuery<GetUserFullInfoResult>;
 
 public record GetUserFullInfoResult(
     UserInfoDto? UserInfo,
-    List<FullEmailDto> Emails,
+    List<UserEmailDto> Emails,
     IReadOnlyList<string> Roles,
     IReadOnlyList<string> Permissions);
 
@@ -43,7 +43,7 @@ public class GetUserFullInfoHandler(
 
         return new GetUserFullInfoResult(
             user.UserInfo.Adapt<UserInfoDto?>(),
-            user.UserEmails.Adapt<List<FullEmailDto>>(),
+            user.UserEmails.Adapt<List<UserEmailDto>>(),
             roles,
             permissions);
     }

@@ -2,6 +2,7 @@
 using Application.Common.Extensions;
 using Application.Common.Interfaces;
 using Application.Common.Interfaces.Repositories;
+using LinqKit;
 using Main.Abstractions.Dtos.Cart;
 using Main.Application.Handlers.Currencies.Projections;
 using Mapster;
@@ -22,6 +23,7 @@ public class GetCartItemsHandler(
         var result = await repository
             .Query
             .Where(x => x.UserId == request.UserId)
+            .AsExpandable()
             .Select(CartProjections.ToCartItemDto)
             .ApplyPagination(request.Pagination)
             .ToListAsync(cancellationToken);

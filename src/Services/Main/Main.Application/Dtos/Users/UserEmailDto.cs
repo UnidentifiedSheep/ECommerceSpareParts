@@ -2,7 +2,7 @@
 
 namespace Main.Abstractions.Dtos.Amw.Users;
 
-public class FullEmailDto
+public class UserEmailDto
 {
     public Guid Id { get; set; }
     public string Email { get; set; } = null!;

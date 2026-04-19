@@ -1,5 +1,6 @@
 ﻿using Application.Common.Interfaces;
 using Application.Common.Interfaces.Repositories;
+using LinqKit;
 using Main.Abstractions.Dtos.Currencies;
 using Main.Application.Handlers.Currencies.Projections;
 using Main.Entities.Currency;
@@ -18,7 +19,7 @@ public class GetAllCurrenciesHandler(IReadRepository<Currency, int> repository)
     public async Task<GetAllCurrenciesResult> Handle(GetAllCurrenciesQuery request, CancellationToken cancellationToken)
     {
         var result = await repository.Query
-            .AsNoTracking()
+            .AsExpandable()
             .Select(CurrencyProjections.ToDto)
             .ToListAsync(cancellationToken);
 

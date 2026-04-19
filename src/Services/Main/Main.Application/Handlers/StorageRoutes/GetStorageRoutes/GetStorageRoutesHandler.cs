@@ -2,6 +2,7 @@
 using Application.Common.Extensions;
 using Application.Common.Interfaces;
 using Application.Common.Interfaces.Repositories;
+using LinqKit;
 using Main.Abstractions.Dtos.Amw.StorageRoutes;
 using Main.Application.Handlers.Currencies.Projections;
 using Main.Entities.Storage;
@@ -36,6 +37,7 @@ public class GetStorageRoutesHandler(
         query = query.ApplyPagination(request.PaginationModel);
 
         var routes = await query
+            .AsExpandable()
             .Select(StorageProjections.StorageRouteProjection)
             .ToListAsync(cancellationToken);
 

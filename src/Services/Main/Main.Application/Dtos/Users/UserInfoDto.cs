@@ -1,9 +1,15 @@
+using System.Text.Json.Serialization;
+
 namespace Main.Abstractions.Dtos.Users;
 
-public class UserInfoDto
+public record UserInfoDto
 {
-    public string Name { get; set; } = null!;
-    public string Surname { get; set; } = null!;
-    public bool IsSupplier { get; set; }
-    public string? Description { get; set; }
+    [JsonPropertyName("name")]
+    public required string Name { get; init; }
+    
+    [JsonPropertyName("surname")]
+    public required string Surname { get; init; }
+    
+    [JsonPropertyName("description")]
+    public string? Description { get; init; }
 }

@@ -19,7 +19,7 @@ public class UserService(
     IUserPermissionRepository userPermissionRepository,
     IUserRoleRepository userRoleRepository) : IUserService
 {
-    public async Task<FullUserDto?> TryGetUserAsync(Guid userId, CancellationToken token = default)
+    public async Task<UserDto?> TryGetUserAsync(Guid userId, CancellationToken token = default)
     {
         var cachedUser = await cacheRepository.GetUserById(userId);
         if (cachedUser != null) return cachedUser;
@@ -31,7 +31,7 @@ public class UserService(
             .WithInclude(x => x.UserInfo)
             .WithTracking(false);
         var dbUser = await userRepository.GetUserByIdAsync(queryOptions, token);
-        var adapted = dbUser.Adapt<FullUserDto>();
+        var adapted = dbUser.Adapt<UserDto>();
         if (adapted != null) await SaveUserInCache(adapted);
         
         return adapted;
@@ -88,7 +88,7 @@ public class UserService(
         };
     }
 
-    private async Task SaveUserInCache(FullUserDto user)
+    private async Task SaveUserInCache(UserDto user)
     {
         await AddRelatedDataKeys(user.Id);
         await cacheRepository.SetUserById(user);

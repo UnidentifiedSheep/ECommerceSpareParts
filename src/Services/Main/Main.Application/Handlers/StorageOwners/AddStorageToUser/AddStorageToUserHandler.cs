@@ -7,6 +7,7 @@ using MediatR;
 
 namespace Main.Application.Handlers.StorageOwners.AddStorageToUser;
 
+[AutoSave]
 [Transactional]
 public record AddStorageToUserCommand(Guid UserId, string StorageName) : ICommand;
 
@@ -14,14 +15,9 @@ public class AddStorageToUserHandler(IUnitOfWork unitOfWork) : ICommandHandler<A
 {
     public async Task<Unit> Handle(AddStorageToUserCommand request, CancellationToken cancellationToken)
     {
-        StorageOwner model = new()
-        {
-            OwnerId = request.UserId,
-            StorageName = request.StorageName
-        };
+        StorageOwner model = StorageOwner.Create(request.StorageName, request.UserId);
 
         await unitOfWork.AddAsync(model, cancellationToken);
-        await unitOfWork.SaveChangesAsync(cancellationToken);
         return Unit.Value;
     }
 }

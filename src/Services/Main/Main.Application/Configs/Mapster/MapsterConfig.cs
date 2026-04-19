@@ -578,7 +578,7 @@ public static class MapsterConfig
             .Map(dest => dest.Confirmed, src => src.IsConfirmed)
             .Map(dest => dest.ConfirmedAt, src => src.IsConfirmed ? DateTime.UtcNow : (DateTime?)null);
 
-        TypeAdapterConfig<UserEmail, FullEmailDto>.NewConfig()
+        TypeAdapterConfig<UserEmail, UserEmailDto>.NewConfig()
             .Map(dest => dest.Email, src => src.Email)
             .Map(dest => dest.IsPrimary, src => src.IsPrimary)
             .Map(dest => dest.EmailType, src => src.EmailType)

@@ -2,6 +2,7 @@ using Abstractions.Models;
 using Application.Common.Extensions;
 using Application.Common.Interfaces;
 using Application.Common.Interfaces.Repositories;
+using LinqKit;
 using Main.Abstractions.Dtos.Currencies;
 using Main.Application.Handlers.Currencies.Projections;
 using Main.Entities.Currency;
@@ -22,7 +23,7 @@ public class GetCurrenciesHandler(
     public async Task<GetCurrenciesResult> Handle(GetCurrenciesQuery request, CancellationToken cancellationToken)
     {
         var result = await repository.Query
-            .AsNoTracking()
+            .AsExpandable()
             .Select(CurrencyProjections.ToDto)
             .ApplyPagination(request.Pagination)
             .ToListAsync(cancellationToken);

@@ -1,11 +1,15 @@
 ﻿using Abstractions.Models;
-using Abstractions.Models.Repository;
+using Application.Common.Extensions;
 using Application.Common.Interfaces;
+using Application.Common.Interfaces.Repositories;
+using LinqKit;
 using Main.Abstractions.Dtos.Amw.Users;
-using Main.Abstractions.Interfaces.DbRepositories;
+using Main.Abstractions.Dtos.Users;
+using Main.Application.Handlers.Currencies.Projections;
 using Main.Entities;
 using Main.Entities.Storage;
 using Mapster;
+using Microsoft.EntityFrameworkCore;
 
 namespace Main.Application.Handlers.StorageOwners.GetStorageOwners;
 
@@ -14,24 +18,20 @@ public record GetStorageOwnersQuery(string Name, PaginationModel Pagination) : I
 public record GetStorageOwnersResult(IReadOnlyList<UserDto> Owners);
 
 public class GetStorageOwnersHandler(
-    IStorageOwnersRepository storageOwnersRepository) 
+    IReadRepository<StorageOwner, (string, Guid)> repository) 
     : IQueryHandler<GetStorageOwnersQuery, GetStorageOwnersResult>
 {
     public async Task<GetStorageOwnersResult> Handle(GetStorageOwnersQuery request, CancellationToken cancellationToken)
     {
-        var queryOptions = new QueryOptions<StorageOwner, string>()
-            {
-                Data = request.Name,
-            }
-            .WithTracking(false)
-            .WithOrderBy(x => x.OwnerId)
-            .WithPage(request.Pagination.Page)
-            .WithSize(request.Pagination.Size)
-            .WithInclude(x => x.Owner)
-            .WithInclude(x => x.Owner.UserInfo);
-
-        var result = await storageOwnersRepository.GetStorageOwnersAsync(queryOptions, cancellationToken);
-        var owners = result.Select(x => x.Owner.Adapt<UserDto>()).ToList();
-        return new GetStorageOwnersResult(owners);
+        var result = await repository.Query
+            .Where(x => x.StorageName == request.Name)
+            .OrderByDescending(x => x.OwnerId)
+            .Select(x => x.Owner)
+            .AsExpandable()
+            .Select(UserProjections.UserProjection)
+            .ApplyPagination(request.Pagination)
+            .ToListAsync(cancellationToken);
+        
+        return new GetStorageOwnersResult(result);
     }
 }
