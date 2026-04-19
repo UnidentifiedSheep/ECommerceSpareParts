@@ -17,6 +17,7 @@
     </ItemGroup>
 
     <ItemGroup>
+        <Folder Include="Dtos\Amw\Permissions\" />
         <Folder Include="Handlers\Logistics\"/>
     </ItemGroup>
 

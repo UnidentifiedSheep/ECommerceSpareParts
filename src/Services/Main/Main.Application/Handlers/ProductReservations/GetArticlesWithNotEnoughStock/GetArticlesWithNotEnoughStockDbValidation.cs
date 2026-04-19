@@ -10,6 +10,6 @@ public class GetArticlesWithNotEnoughStockDbValidation : AbstractDbValidation<Ge
     {
         plan.ValidateStorageExistsName(request.StorageName)
             .ValidateUserExistsId(request.BuyerId)
-            .ValidateArticleExistsId(request.NeededCounts.Keys);
+            .ValidateProductExistsId(request.NeededCounts.Keys);
     }
 }

@@ -9,7 +9,7 @@ public class CreateProductReservationDbValidation : AbstractDbValidation<CreateP
     public override void Build(IValidationPlan plan, CreateProductReservationCommand request)
     {
         var articleIds = new HashSet<int>();
-        var userIds = new HashSet<Guid> { request.WhoCreated };
+        var userIds = new HashSet<Guid>();
 
         foreach (var item in request.Reservations)
         {

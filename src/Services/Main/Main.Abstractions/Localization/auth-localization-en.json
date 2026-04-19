@@ -17,6 +17,7 @@
     "role.name.not.empty": "Role name must not be empty.",
     "role.name.min.length": "Role name must be at least 3 characters.",
     "role.name.max.length": "Role name must not exceed 24 characters.",
+    "role.description.max.length": "Role description must be not exceed 255 characters",
     "user.id.not.empty": "User ID must not be empty.",
     "user.similarity.level.range": "Similarity level must be between 0 and 1.",
     "user.discount.range": "Discount must be between 0 and 0.99.",

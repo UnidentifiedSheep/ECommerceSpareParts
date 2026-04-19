@@ -21,5 +21,8 @@ public class StorageContent : AuditableEntity<StorageContent, int>
     public decimal BuyPriceInUsd { get; set; }
 
     public DateTime PurchaseDatetime { get; set; }
+    
+    public Currency.Currency Currency { get; set; }
+    
     public override int GetId() => Id;
 }

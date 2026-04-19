@@ -62,7 +62,7 @@ public class StorageContentConfiguration : IEntityTypeConfiguration<StorageConte
             .OnDelete(DeleteBehavior.Restrict)
             .HasConstraintName("storage_content_products_id_fk");
 
-        builder.HasOne<Entities.Currency.Currency>()
+        builder.HasOne<Entities.Currency.Currency>(e => e.Currency)
             .WithMany()
             .HasForeignKey(d => d.CurrencyId)
             .OnDelete(DeleteBehavior.Restrict)

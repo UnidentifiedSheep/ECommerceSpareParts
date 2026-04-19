@@ -403,7 +403,7 @@ public static class MapsterConfig
 
         TypeAdapterConfig<StorageContent, StorageContentDto>.NewConfig()
             .Map(dest => dest.Id, src => src.Id)
-            .Map(dest => dest.ArticleId, src => src.ProductId)
+            .Map(dest => dest.ProductId, src => src.ProductId)
             .Map(dest => dest.Count, src => src.Count)
             .Map(dest => dest.BuyPrice, src => src.BuyPrice)
             .Map(dest => dest.StorageName, src => src.StorageName)

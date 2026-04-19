@@ -26,11 +26,6 @@ public static partial class NormalizationExtensions
         return permission.ToUpperInvariant().Replace('_', '.');
     }
 
-    public static string ToNormalizedPermission(this Enum permission)
-    {
-        return permission.ToString().ToUpperInvariant().Replace('_', '.');
-    }
-
     public static string ToNormalized(this string source)
     {
         return source.Trim().ToUpperInvariant();

@@ -1,31 +1,49 @@
 using Abstractions.Models;
+using Application.Common.Extensions;
 using Application.Common.Interfaces;
+using Application.Common.Interfaces.Repositories;
+using LinqKit;
 using Main.Abstractions.Dtos.Amw.Storage;
-using Main.Abstractions.Interfaces.DbRepositories;
+using Main.Application.Handlers.Currencies.Projections;
+using Main.Entities.Storage;
 using Mapster;
+using Microsoft.EntityFrameworkCore;
 
 namespace Main.Application.Handlers.StorageContents.GetContents;
 
 public record GetStorageContentQuery(
     string? StorageName,
-    int? ArticleId,
+    int? ProductId,
     PaginationModel Pagination,
     bool ShowZeroCount) : IQuery<GetStorageContentResult>;
 
 public record GetStorageContentResult(IEnumerable<StorageContentDto> Content);
 
-public class GetStorageContentHandler(IStorageContentRepository contentRepository)
+public class GetStorageContentHandler(
+    IReadRepository<StorageContent, int> repository)
     : IQueryHandler<GetStorageContentQuery, GetStorageContentResult>
 {
     public async Task<GetStorageContentResult> Handle(
         GetStorageContentQuery request,
         CancellationToken cancellationToken)
     {
-        var page = request.Pagination.Page;
-        var size = request.Pagination.Size;
-        var result = await contentRepository
-            .GetStorageContents(request.StorageName, request.ArticleId, page, size,
-                request.ShowZeroCount, false, cancellationToken);
-        return new GetStorageContentResult(result.Adapt<List<StorageContentDto>>());
+        var query = repository.Query;
+
+        if (request.ProductId.HasValue)
+            query = query.Where(x => x.ProductId == request.ProductId);
+
+        if (!string.IsNullOrWhiteSpace(request.StorageName))
+            query = query.Where(x => x.StorageName == request.StorageName);
+
+        if (!request.ShowZeroCount)
+            query = query.Where(x => x.Count != 0);
+
+        var result = await query
+            .AsExpandable()
+            .Select(StorageContentProjections.ToStorageContentDto)
+            .ApplyPagination(request.Pagination)
+            .ToListAsync(cancellationToken);
+        
+        return new GetStorageContentResult(result);
     }
 }

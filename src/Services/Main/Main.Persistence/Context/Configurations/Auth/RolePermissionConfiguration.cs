@@ -21,7 +21,7 @@ public class RolePermissionConfiguration : IEntityTypeConfiguration<RolePermissi
             .HasColumnName("permission");
 
         builder.HasOne(x => x.Permission)
-            .WithMany(x => x.RolePermissions)
+            .WithMany()
             .HasForeignKey(x => x.PermissionName)
             .OnDelete(DeleteBehavior.Restrict)
             .HasConstraintName("role_permissions_permissions_name_fk");

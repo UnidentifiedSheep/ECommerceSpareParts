@@ -7,20 +7,22 @@ namespace Main.Entities.Auth;
 
 public class Permission : AuditableEntity<Permission, string>
 {
-    public Permission()
-    {
-    }
+    [Validate]
+    public string Name { get; private set; } = null!;
 
+    public string? Description { get; private set; }
+    public override string GetId() => Name;
+    
+    private Permission() {}
+    
     public Permission(PermissionCodes name, string? description = null)
     {
-        Name = name.ToNormalizedPermission();
+        Name = ToNormalizedPermission(name);
         Description = description;
     }
-
-    [Validate]
-    public string Name { get; set; } = null!;
-
-    public string? Description { get; set; }
-    public virtual ICollection<RolePermission> RolePermissions { get; set; } = new List<RolePermission>();
-    public override string GetId() => Name;
+    
+    public static string ToNormalizedPermission(PermissionCodes permission)
+    {
+        return permission.ToString().ToUpperInvariant().Replace('_', '.');
+    }
 }
