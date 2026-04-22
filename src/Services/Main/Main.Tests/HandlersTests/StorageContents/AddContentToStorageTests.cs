@@ -146,7 +146,7 @@ public class AddContentToStorageTests : IAsyncLifetime
         var storageContent = MockData.MockData
             .CreateNewStorageContentDto(articleIds, [_currency.Id], 10)
             .ToList();
-        storageContent.Last().ArticleId = int.MaxValue;
+        storageContent.Last().ProductId = int.MaxValue;
         var command = new AddContentCommand(storageContent, _storage.Name, _user.Id,
             StorageMovementType.StorageContentAddition);
         await Assert.ThrowsAsync<ProductNotFoundException>(async () => await _mediator.Send(command));
@@ -187,7 +187,7 @@ public class AddContentToStorageTests : IAsyncLifetime
         await mediator.Send(command);
 
         var totalPerArticle = dtoList
-            .GroupBy(x => x.ArticleId)
+            .GroupBy(x => x.ProductId)
             .ToDictionary(g => g.Key, g => g.Sum(x => x.Count));
 
         return (dtoList, totalPerArticle);
@@ -222,7 +222,7 @@ public class AddContentToStorageTests : IAsyncLifetime
         Assert.Equal(allInputs.Count, dbStorageContents.Count);
 
         var groupedExpectedContents = allInputs
-            .GroupBy(x => new { x.ArticleId, x.BuyPrice, x.CurrencyId })
+            .GroupBy(x => new { ArticleId = x.ProductId, x.BuyPrice, x.CurrencyId })
             .Select(g => new
             {
                 g.Key.ArticleId,

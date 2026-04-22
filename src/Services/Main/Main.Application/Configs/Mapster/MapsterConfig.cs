@@ -137,7 +137,7 @@ public static class MapsterConfig
             .Map(dest => dest.Comment, src => src.Comment);
 
         TypeAdapterConfig<NewPurchaseContentDto, NewStorageContentDto>.NewConfig()
-            .Map(dest => dest.ArticleId, src => src.ArticleId)
+            .Map(dest => dest.ProductId, src => src.ArticleId)
             .Map(dest => dest.Count, src => src.Count)
             .Map(dest => dest.BuyPrice, src => src.Price);
 
@@ -163,7 +163,7 @@ public static class MapsterConfig
 
 
         TypeAdapterConfig<NewStorageContentDto, StorageContent>.NewConfig()
-            .Map(dest => dest.ProductId, src => src.ArticleId)
+            .Map(dest => dest.ProductId, src => src.ProductId)
             .Map(dest => dest.CurrencyId, src => src.CurrencyId)
             .Map(dest => dest.BuyPrice, src => src.BuyPrice)
             .Map(dest => dest.Count, src => src.Count)

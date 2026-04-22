@@ -5,9 +5,9 @@ using Search.Application.Configs;
 
 namespace Search.Application.Consumers;
 
-public class ArticledCreatedConsumer(IArticleWriteService articleWriteService) : IConsumer<ArticlesCreatedEvent>
+public class ArticledCreatedConsumer(IArticleWriteService articleWriteService) : IConsumer<ProductCreatedEvent>
 {
-    public Task Consume(ConsumeContext<ArticlesCreatedEvent> context)
+    public Task Consume(ConsumeContext<ProductCreatedEvent> context)
     {
         var adapted = context.Message.Articles.ToArticles();
         articleWriteService.AddRange(adapted);

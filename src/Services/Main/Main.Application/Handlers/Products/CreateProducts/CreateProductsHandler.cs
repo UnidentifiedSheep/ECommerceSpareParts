@@ -45,7 +45,7 @@ public class CreateProductsHandler(
     {
         var contractProducts = products.Adapt<List<ContractArticle>>();
 
-        await publishEndpoint.Publish(new ArticlesCreatedEvent
+        await publishEndpoint.Publish(new ProductCreatedEvent
         {
             Articles = contractProducts
         }, cancellationToken);

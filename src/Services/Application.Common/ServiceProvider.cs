@@ -1,26 +1,35 @@
 ﻿using System.Reflection;
 using Application.Common.Abstractions;
+using Application.Common.Behaviors;
+using Application.Common.Extensions;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace Application.Common;
 
 public static class ServiceProvider
 {
-    public static IServiceCollection RegisterDbValidations(this IServiceCollection services, Assembly? assembly)
+    public static IServiceCollection AddApplicationBase(this IServiceCollection services, Assembly? assembly = null)
     {
         assembly ??= Assembly.GetExecutingAssembly();
-        var validationTypes = assembly.GetTypes()
-            .Where(t => !t.IsAbstract && !t.IsInterface)
-            .Where(t => t.BaseType != null
-                        && t.BaseType.IsGenericType
-                        && t.BaseType.GetGenericTypeDefinition() == typeof(AbstractDbValidation<>));
-
-        foreach (var type in validationTypes)
+        services
+            .RegisterRelatedData()
+            .RegisterIntegrationEventScope()
+            .RegisterCachePolicies(assembly)
+            .RegisterDbValidations(assembly)
+            .RegisterFluentValidations(assembly);
+        
+        services.AddMediatR(config =>
         {
-            var baseType = type.BaseType!;
-            services.AddScoped(baseType, type);
-        }
-
+            config.RegisterServicesFromAssembly(assembly);
+            config.AddOpenBehavior(typeof(ValidationBehavior<,>));
+            config.AddOpenBehavior(typeof(DbValidationBehavior<,>), ServiceLifetime.Scoped);
+            config.AddOpenBehavior(typeof(LoggingBehavior<,>));
+            config.AddOpenBehavior(typeof(CacheBehavior<,>));
+            config.AddOpenBehavior(typeof(TransactionBehavior<,>), ServiceLifetime.Scoped);
+            config.AddOpenBehavior(typeof(IntegrationEventPublisherBehavior<,>), ServiceLifetime.Scoped);
+            config.AddOpenBehavior(typeof(SaveChangesBehavior<,>), ServiceLifetime.Scoped);
+        });
+        
         return services;
     }
 }

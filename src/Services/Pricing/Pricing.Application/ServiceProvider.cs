@@ -1,4 +1,5 @@
 ﻿using Abstractions.Interfaces.Currency;
+using Application.Common;
 using Application.Common.Abstractions.Settings;
 using Application.Common.Behaviors;
 using Application.Common.Extensions;
@@ -17,7 +18,7 @@ public static class ServiceProvider
 {
     public static IServiceCollection AddApplicationLayer(this IServiceCollection collection)
     {
-        collection.RegisterRelatedData();
+        collection.AddApplicationBase(typeof(Global).Assembly);
 
         collection.AddSingleton<ICurrencyConverter, CurrencyConverter>(_ => new CurrencyConverter(Global.UsdId));
 
@@ -40,17 +41,6 @@ public static class ServiceProvider
         collection.AddSingleton<IDiscountService, DiscountService>();
         collection.AddSingleton<IPriceService, PriceService>();
         collection.AddScoped<ICurrencyService, CurrencyService>();
-
-        collection.AddMediatR(config =>
-        {
-            config.RegisterServicesFromAssembly(typeof(Global).Assembly);
-            config.AddOpenBehavior(typeof(ValidationBehavior<,>));
-            config.AddOpenBehavior(typeof(DbValidationBehavior<,>), ServiceLifetime.Scoped);
-            config.AddOpenBehavior(typeof(LoggingBehavior<,>));
-            config.AddOpenBehavior(typeof(CacheBehavior<,>));
-            config.AddOpenBehavior(typeof(TransactionBehavior<,>), ServiceLifetime.Scoped);
-            config.AddOpenBehavior(typeof(SaveChangesBehavior<,>), ServiceLifetime.Scoped);
-        });
 
         return collection;
     }

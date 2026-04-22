@@ -1,79 +1,78 @@
 using System.Data;
-using Abstractions.Interfaces.Currency;
 using Abstractions.Interfaces.Services;
 using Application.Common.Interfaces;
 using Attributes;
 using Contracts.Articles;
 using Main.Abstractions.Dtos.Amw.Storage;
-using Main.Abstractions.Interfaces.DbRepositories;
-using Main.Abstractions.Interfaces.Services;
 using Main.Application.Extensions;
-using Main.Application.Notifications;
-using Main.Entities;
+using Main.Application.Handlers.Currencies.Projections;
+using Main.Application.Interfaces.Repositories;
+using Main.Entities.Event;
 using Main.Entities.Storage;
 using Main.Enums;
-using Mapster;
-using MassTransit;
-using MediatR;
+using Event = Main.Entities.Event.Event;
 
 namespace Main.Application.Handlers.StorageContents.AddContent;
 
-[Transactional(IsolationLevel.Serializable, 20, 2)]
+[AutoSave]
+[Transactional(IsolationLevel.ReadCommitted, 20, 2)]
 public record AddContentCommand(
     IEnumerable<NewStorageContentDto> StorageContent,
     string StorageName,
-    Guid UserId,
-    StorageMovementType MovementType,
-    bool RecalcPrices = true) : ICommand<AddContentResult>;
+    StorageMovementType MovementType
+    ) : ICommand<AddContentResult>;
 
-public record AddContentResult(List<StorageContentDto> StorageContents);
+public record AddContentResult(IReadOnlyList<StorageContentDto> StorageContents);
 
 public class AddContentHandler(
-    IArticlesRepository articlesRepository,
+    IProductRepository productRepository,
     IUnitOfWork unitOfWork,
-    ICurrencyConverter currencyConverter,
-    IArticlesService articlesService,
-    IMediator mediator,
-    IPublishEndpoint publishEndpoint) : ICommandHandler<AddContentCommand, AddContentResult>
+    IIntegrationEventScope integrationEventScope) : ICommandHandler<AddContentCommand, AddContentResult>
 {
     public async Task<AddContentResult> Handle(AddContentCommand request, CancellationToken cancellationToken)
     {
-        var articleIds = request.StorageContent.Select(x => x.ArticleId).Distinct().ToList();
-        await articlesRepository.EnsureArticlesExistsForUpdateAsync(articleIds, cancellationToken);
+        var productIds = request.StorageContent
+            .Select(x => x.ProductId)
+            .Distinct()
+            .ToList();
+        var products = (await productRepository.EnsureProductsExistsForUpdateAsync(productIds, cancellationToken))
+            .ToDictionary(x => x.Id);
 
-        var toIncrement = new Dictionary<int, int>();
         var storageContents = new List<StorageContent>();
-        var storageMovements = new List<StorageMovement>();
+        var events = new List<Event>();
 
         foreach (var item in request.StorageContent)
         {
-            var content = item.Adapt<StorageContent>();
-            content.BuyPriceInUsd = currencyConverter.ConvertToUsd(item.BuyPrice, item.CurrencyId);
-            content.StorageName = request.StorageName.Trim();
+            var content = StorageContent.Create(
+                request.StorageName,
+                item.ProductId,
+                item.Count,
+                item.BuyPrice,
+                item.CurrencyId,
+                item.PurchaseDate);
+            
             storageContents.Add(content);
 
-            var storageMovement = content
-                .Adapt<StorageMovement>()
-                .SetActionType(request.MovementType);
-            storageMovement.WhoMoved = request.UserId;
-            storageMovements.Add(storageMovement);
+            var storageMovementEvent = StorageMovementEvent.Create(content, request.MovementType);
+            events.Add(storageMovementEvent);
 
-            toIncrement[item.ArticleId] = toIncrement.GetValueOrDefault(item.ArticleId) + item.Count;
+            products[item.ProductId].IncreaseStock(item.Count);
         }
 
-        await unitOfWork.AddRangeAsync(storageMovements, cancellationToken);
         await unitOfWork.AddRangeAsync(storageContents, cancellationToken);
-        await articlesService.UpdateArticlesCount(toIncrement, cancellationToken);
+        await unitOfWork.AddRangeAsync(events, cancellationToken);
 
-        if (request.RecalcPrices)
-            await publishEndpoint.Publish(new ArticleBuyPricesChangedEvent { ArticleIds = articleIds },
-                cancellationToken);
+        foreach (var id in productIds)
+            integrationEventScope.Add(new ProductBuyPricesUpdatedEvent
+            {
+                ProductId = id
+            });
+        
 
-        await unitOfWork.SaveChangesAsync(cancellationToken);
-
-        await mediator.Publish(new ArticlesUpdatedNotification(articleIds), cancellationToken);
-
-
-        return new AddContentResult(storageContents.Adapt<List<StorageContentDto>>());
+        var adapted = storageContents
+            .Select(StorageContentProjections.ToStorageContentDtoFunc)
+            .ToList();
+        
+        return new AddContentResult(adapted);
     }
 }

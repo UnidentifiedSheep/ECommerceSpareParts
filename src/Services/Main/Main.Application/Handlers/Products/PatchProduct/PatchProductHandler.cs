@@ -46,7 +46,7 @@ public class PatchProductHandler(
         if (patch.PairId.IsSet) product.SetPair(patch.PairId.Value);
         
         var adaptedProduct = product.Adapt<Article>();
-        await publishEndpoint.Publish(new ArticleUpdatedEvent { Article = adaptedProduct }, cancellationToken);
+        await publishEndpoint.Publish(new ProductUpdatedEvent { Article = adaptedProduct }, cancellationToken);
 
         await publisher.Publish(new ArticleUpdatedNotification(request.ArticleId), cancellationToken);
 

@@ -62,14 +62,13 @@ public static class ServiceProvider
         collection.AddSingleton<ILogisticsCostService, LogisticsCostService>();
 
         collection.AddScoped<IStorageContentService, StorageContentService>();
-        collection.AddScoped<IArticlesService, ArticlesService>();
         collection.AddScoped<IBalanceService, BalanceService>();
         collection.AddScoped<ISaleService, SaleService>();
         collection.AddScoped<IUserTokenService, UserTokenService>();
         collection.AddScoped<IPurchaseService, PurchaseService>();
         collection.AddScoped<IUserService, UserService>();
 
-        collection.RegisterRelatedData();
+        collection.AddApplicationBase(typeof(Global).Assembly);
 
         collection.AddSingleton<IEmailValidator, EmailValidator>();
         collection.AddSingleton<IConcurrencyValidator<StorageContent>, StorageContentConcurrencyValidator>();
@@ -97,8 +96,6 @@ public static class ServiceProvider
             return new CurrencyRelatedData(cache, relatedDataTtl);
         });
 
-        collection.AddValidatorsFromAssembly(typeof(Global).Assembly);
-
         collection.Scan(scan => scan
             .FromAssemblyOf<GetUserDiscountHandler>()
             .AddClasses(classes => classes.Where(type =>
@@ -112,20 +109,6 @@ public static class ServiceProvider
         );
 
         ValidationConfiguration.Configure();
-
-        collection.RegisterDbValidations(Assembly.GetAssembly(typeof(Global)))
-            .RegisterCachePolicies(typeof(ServiceProvider).Assembly);
-
-        collection.AddMediatR(config =>
-        {
-            config.RegisterServicesFromAssembly(typeof(Global).Assembly);
-            config.AddOpenBehavior(typeof(ValidationBehavior<,>));
-            config.AddOpenBehavior(typeof(DbValidationBehavior<,>), ServiceLifetime.Scoped);
-            config.AddOpenBehavior(typeof(LoggingBehavior<,>));
-            config.AddOpenBehavior(typeof(CacheBehavior<,>));
-            config.AddOpenBehavior(typeof(TransactionBehavior<,>), ServiceLifetime.Scoped);
-            config.AddOpenBehavior(typeof(SaveChangesBehavior<,>), ServiceLifetime.Scoped);
-        });
 
         return collection;
     }

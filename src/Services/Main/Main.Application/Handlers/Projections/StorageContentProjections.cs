@@ -18,4 +18,7 @@ public static class StorageContentProjections
             PurchaseDatetime =  x.PurchaseDatetime,
             Currency = CurrencyProjections.ToDto.Invoke(x.Currency)
         };
+    
+    public static readonly Func<StorageContent, StorageContentDto> ToStorageContentDtoFunc =
+        ToStorageContentDto.Compile();
 }

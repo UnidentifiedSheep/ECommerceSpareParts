@@ -96,8 +96,6 @@ public partial class DContext : DbContext
 
     public virtual DbSet<StorageContentReservation> StorageContentReservations { get; set; }
 
-    public virtual DbSet<StorageMovement> StorageMovements { get; set; }
-
     public virtual DbSet<StorageOwner> StorageOwners { get; set; }
 
     public virtual DbSet<StorageRoute> StorageRoutes { get; set; }

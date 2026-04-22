@@ -8,6 +8,7 @@ using Analytics.Application.Services.Metrics.Calculators;
 using Analytics.Application.Services.Metrics.Converters;
 using Analytics.Application.Services.Metrics.Validators;
 using Analytics.Entities.Metrics;
+using Application.Common;
 using Application.Common.Behaviors;
 using Application.Common.Extensions;
 using Application.Common.Services;
@@ -22,27 +23,14 @@ public static class ServiceProvider
     {
         MapsterConfig.Configure();
         
-        collection.RegisterRelatedData()
+        collection
+            .AddApplicationBase(typeof(Global).Assembly)
             .RegisterMetricCalculators()
-            .RegisterMetricConverters()
-            .RegisterCachePolicies(typeof(ServiceProvider).Assembly);
+            .RegisterMetricConverters();
 
         collection.AddSingleton<IJsonSerializer, JsonSerializer>();
         collection.AddSingleton<ICurrencyConverter, CurrencyConverter>(_ => new CurrencyConverter(Global.UsdId));
         collection.AddScoped<ICurrencyConverterSetup, CurrencyConverterSetup>();
-
-        collection.AddValidatorsFromAssembly(typeof(Global).Assembly);
-        
-        collection.AddMediatR(config =>
-        {
-            config.RegisterServicesFromAssembly(typeof(Global).Assembly);
-            config.AddOpenBehavior(typeof(ValidationBehavior<,>));
-            config.AddOpenBehavior(typeof(DbValidationBehavior<,>), ServiceLifetime.Scoped);
-            config.AddOpenBehavior(typeof(LoggingBehavior<,>));
-            config.AddOpenBehavior(typeof(CacheBehavior<,>));
-            config.AddOpenBehavior(typeof(TransactionBehavior<,>), ServiceLifetime.Scoped);
-            config.AddOpenBehavior(typeof(SaveChangesBehavior<,>), ServiceLifetime.Scoped);
-        });
 
         return collection;
     }

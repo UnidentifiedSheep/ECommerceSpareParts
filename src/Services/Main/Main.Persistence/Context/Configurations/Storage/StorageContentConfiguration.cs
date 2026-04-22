@@ -17,8 +17,6 @@ public class StorageContentConfiguration : IEntityTypeConfiguration<StorageConte
 
         builder.HasIndex(e => new { e.ProductId, e.StorageName }, "storage_content_product_id_storage_name_index");
 
-        builder.HasIndex(e => e.BuyPriceInUsd, "storage_content_buy_price_in_usd_index");
-
         builder.HasIndex(e => e.BuyPrice, "storage_content_buy_price_index");
 
         builder.HasIndex(e => e.CurrencyId, "storage_content_currency_id_index");
@@ -39,9 +37,6 @@ public class StorageContentConfiguration : IEntityTypeConfiguration<StorageConte
         
         builder.Property(e => e.BuyPrice)
             .HasColumnName("buy_price");
-        
-        builder.Property(e => e.BuyPriceInUsd)
-            .HasColumnName("buy_price_in_usd");
         
         builder.Property(e => e.Count)
             .HasColumnName("count");

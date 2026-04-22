@@ -175,7 +175,7 @@ public class EditFullPurchaseHandler(
                 case > 0:
                     returnedToStorage.Add(new NewStorageContentDto
                     {
-                        ArticleId = articleId,
+                        ProductId = articleId,
                         BuyPrice = price,
                         Count = count,
                         CurrencyId = currencyId
