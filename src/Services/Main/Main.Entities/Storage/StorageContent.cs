@@ -3,6 +3,7 @@ using Domain;
 using Domain.Extensions;
 using Domain.Interfaces;
 using Exceptions;
+using Main.Entities.Purchase;
 
 namespace Main.Entities.Storage;
 

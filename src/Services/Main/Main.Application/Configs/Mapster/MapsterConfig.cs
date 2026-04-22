@@ -103,7 +103,7 @@ public static class MapsterConfig
 
         TypeAdapterConfig<StorageContentPriceProjection, StorageContentCost>.NewConfig()
             .IgnoreNonMapped(true)
-            .Map(d => d.ArticleId, s => s.ArticleId)
+            .Map(d => d.ArticleId, s => s.ProductId)
             .Map(d => d.PurchaseId, s => s.PurchaseId)
             .Map(d => d.CurrencyId, s => s.CurrencyId)
             .Map(d => d.StorageContentId, s => s.StorageContentId)

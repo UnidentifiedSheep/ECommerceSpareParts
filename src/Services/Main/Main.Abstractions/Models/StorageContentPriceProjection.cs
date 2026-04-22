@@ -1,16 +1,16 @@
 ﻿namespace Main.Abstractions.Models;
 
-public class StorageContentPriceProjection
+public record StorageContentPriceProjection
 {
-    public int ArticleId { get; set; }
-    public int StorageContentId { get; set; }
-    public decimal Price { get; set; }
-    public int CurrentCount { get; set; }
-    public int CurrencyId { get; set; }
-    public decimal? LogisticsPrice { get; set; }
-    public int? PurchaseContentId { get; set; }
-    public string? PurchaseId { get; set; }
-    public int? LogisticsCurrencyId { get; set; }
-    public int? PurchaseContentCount { get; set; }
-    public DateTime PurchaseDatetime { get; set; }
+    public required int ProductId { get; init; }
+    public required int StorageContentId { get; init; }
+    public required decimal Price { get; init; }
+    public required int CurrentCount { get; init; }
+    public required int CurrencyId { get; init; }
+    public required decimal? LogisticsPrice { get; init; }
+    public required int? PurchaseContentId { get; init; }
+    public required string? PurchaseId { get; init; }
+    public required int? LogisticsCurrencyId { get; init; }
+    public required int? PurchaseContentCount { get; init; }
+    public required DateTime PurchaseDatetime { get; init; }
 }
