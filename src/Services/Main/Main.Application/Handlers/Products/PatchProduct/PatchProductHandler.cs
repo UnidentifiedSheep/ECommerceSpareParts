@@ -1,13 +1,9 @@
 using Application.Common.Interfaces;
 using Attributes;
 using Contracts.Articles;
-using Contracts.Models.Articles;
 using Main.Abstractions.Dtos.Amw.Articles;
 using Main.Abstractions.Exceptions.Articles;
 using Main.Application.Interfaces.Repositories;
-using Main.Application.Notifications;
-using Mapster;
-using MassTransit;
 using MediatR;
 
 namespace Main.Application.Handlers.Articles.PatchArticle;
@@ -17,8 +13,7 @@ namespace Main.Application.Handlers.Articles.PatchArticle;
 public record PatchArticleCommand(int ArticleId, PatchProductDto PatchProduct) : ICommand;
 
 public class PatchProductHandler(
-    IPublisher publisher,
-    IPublishEndpoint publishEndpoint,
+    IIntegrationEventScope integrationEventScope,
     IProductRepository productRepository)
     : ICommandHandler<PatchArticleCommand>
 {
@@ -44,12 +39,12 @@ public class PatchProductHandler(
         if (patch.PackingUnit.IsSet) product.SetPackingUnit(patch.PackingUnit.Value);
 
         if (patch.PairId.IsSet) product.SetPair(patch.PairId.Value);
+
+        integrationEventScope.Add(new ProductUpdatedEvent
+        {
+            Id = product.Id,
+        });
         
-        var adaptedProduct = product.Adapt<Article>();
-        await publishEndpoint.Publish(new ProductUpdatedEvent { Article = adaptedProduct }, cancellationToken);
-
-        await publisher.Publish(new ArticleUpdatedNotification(request.ArticleId), cancellationToken);
-
         return Unit.Value;
     }
 }

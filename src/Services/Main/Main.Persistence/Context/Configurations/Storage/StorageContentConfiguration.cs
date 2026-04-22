@@ -50,6 +50,10 @@ public class StorageContentConfiguration : IEntityTypeConfiguration<StorageConte
         builder.Property(e => e.StorageName)
             .HasMaxLength(128)
             .HasColumnName("storage_name");
+        
+        builder.Property(e => e.RowVersion)
+            .HasColumnName("xmin")
+            .IsRowVersion();
 
         builder.HasOne<Entities.Product.Product>()
             .WithMany()

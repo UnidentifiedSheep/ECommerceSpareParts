@@ -9,7 +9,7 @@ using MediatR;
 namespace Main.Api.EndPoints.Storages;
 
 public record EditStorageContentRequest(
-    Dictionary<int, ModelWithCode<PatchStorageContentDto, string>> EditedFields);
+    Dictionary<int, ModelWithRowVersion<PatchStorageContentDto, string>> EditedFields);
 
 public class EditStorageContentEndPoint : ICarterModule
 {

@@ -2,13 +2,19 @@ using System.Data;
 using Abstractions.Interfaces;
 using Abstractions.Interfaces.Services;
 using Application.Common.Interfaces;
+using Application.Common.Interfaces.Repositories;
 using Attributes;
+using Contracts.Articles;
+using Domain.Extensions;
+using Exceptions;
 using Exceptions.Base;
 using Main.Abstractions.Exceptions.Storages;
-using Main.Abstractions.Interfaces.DbRepositories;
 using Main.Abstractions.Interfaces.Services;
+using Main.Application.Extensions;
+using Main.Application.Interfaces.Repositories;
 using Main.Application.Notifications;
 using Main.Entities;
+using Main.Entities.Event;
 using Main.Entities.Storage;
 using Main.Enums;
 using Mapster;
@@ -16,39 +22,39 @@ using MediatR;
 
 namespace Main.Application.Handlers.StorageContents.DeleteContent;
 
-[Transactional(IsolationLevel.Serializable, 20, 2)]
-public record DeleteStorageContentCommand(int ContentId, string ConcurrencyCode, Guid UserId) : ICommand;
+[AutoSave]
+[Transactional(IsolationLevel.ReadCommitted, 20, 2)]
+public record DeleteStorageContentCommand(int ContentId, uint RowVersion) : ICommand;
 
 public class DeleteStorageContentHandler(
-    IStorageContentRepository storageContentRepository,
+    IRepository<StorageContent, int> repository,
     IUnitOfWork unitOfWork,
-    IMediator mediator,
-    IConcurrencyValidator<StorageContent> concurrencyValidator,
-    IArticlesService articlesService) : ICommandHandler<DeleteStorageContentCommand>
+    IProductRepository productRepository,
+    IIntegrationEventScope integrationEventScope) : ICommandHandler<DeleteStorageContentCommand>
 {
     public async Task<Unit> Handle(DeleteStorageContentCommand request, CancellationToken cancellationToken)
     {
         var id = request.ContentId;
-        var userId = request.UserId;
-        var content =
-            await storageContentRepository.GetStorageContentForUpdateAsync(id, null, null, true, cancellationToken)
-            ?? throw new StorageContentNotFoundException(id);
+        var content = await repository.GetById(request.ContentId, cancellationToken)
+                      ?? throw new StorageContentNotFoundException(id);
 
-        if (!concurrencyValidator.IsValid(content, request.ConcurrencyCode, out var validCode))
-            throw new ConcurrencyCodeMismatchException(request.ConcurrencyCode, validCode);
+        content.ValidateVersion(request.RowVersion);
+        
+        var product = await productRepository.EnsureProductExistsForUpdateAsync(content.ProductId, cancellationToken);
 
-        var storageMovement = content.Adapt<StorageMovement>()
-            .SetActionType(StorageMovementType.StorageContentDeletion);
-        storageMovement.Count *= -1;
-        storageMovement.WhoMoved = userId;
-
-        await unitOfWork.AddAsync(storageMovement, cancellationToken);
-        unitOfWork.Remove(content);
-        await articlesService.UpdateArticlesCount(new Dictionary<int, int> { [content.ProductId] = -content.Count },
+        await unitOfWork.AddAsync(
+            StorageMovementEvent.Create(content, StorageMovementType.StorageContentDeletion), 
             cancellationToken);
-        await unitOfWork.SaveChangesAsync(cancellationToken);
 
-        await mediator.Publish(new ArticleUpdatedNotification(content.ProductId), cancellationToken);
+        product.IncreaseStock(-content.Count);
+        
+        unitOfWork.Remove(content);
+        
+        integrationEventScope.Add(new ProductUpdatedEvent
+        {
+            Id = content.ProductId
+        });
+
         return Unit.Value;
     }
 }

@@ -35,8 +35,8 @@ public class AddContentHandler(
             .Select(x => x.ProductId)
             .Distinct()
             .ToList();
-        var products = (await productRepository.EnsureProductsExistsForUpdateAsync(productIds, cancellationToken))
-            .ToDictionary(x => x.Id);
+        var products = await productRepository
+                .EnsureProductsExistsForUpdateAsync(productIds, cancellationToken);
 
         var storageContents = new List<StorageContent>();
         var events = new List<Event>();

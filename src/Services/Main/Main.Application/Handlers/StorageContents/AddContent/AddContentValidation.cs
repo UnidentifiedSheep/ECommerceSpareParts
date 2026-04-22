@@ -33,9 +33,5 @@ public class AddContentValidation : AbstractValidator<AddContentCommand>
         RuleFor(x => x.StorageName)
             .NotEmpty()
             .WithLocalizationKey("storage.name.not.empty");
-
-        RuleFor(x => x.UserId)
-            .NotEmpty()
-            .WithLocalizationKey("user.id.not.empty");
     }
 }

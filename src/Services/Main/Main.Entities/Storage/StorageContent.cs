@@ -1,10 +1,12 @@
 ﻿using BulkValidation.Core.Attributes;
 using Domain;
 using Domain.Extensions;
+using Domain.Interfaces;
+using Exceptions;
 
 namespace Main.Entities.Storage;
 
-public class StorageContent : AuditableEntity<StorageContent, int>
+public class StorageContent : AuditableEntity<StorageContent, int>, IVersionable<uint>
 {
     [Validate]
     public int Id { get; private set; }
@@ -18,6 +20,8 @@ public class StorageContent : AuditableEntity<StorageContent, int>
     public decimal BuyPrice { get; private set; }
 
     public int CurrencyId { get; private set; }
+    
+    public uint RowVersion { get; private set; }
 
     public DateTime PurchaseDatetime { get; private set; }
 
@@ -35,8 +39,8 @@ public class StorageContent : AuditableEntity<StorageContent, int>
     {
         StorageName = storageName;
         ProductId = productId;
-        CurrencyId = currencyId;
         PurchaseDatetime = purchaseDatetime;
+        SetCurrencyId(currencyId);
         SetCount(count);
         SetBuyPrice(buyPrice);
     }
@@ -67,6 +71,16 @@ public class StorageContent : AuditableEntity<StorageContent, int>
             .AgainstTooSmall(
                 min: 0.001m,
                 exceptionFactory: () => new InvalidOperationException("Buy price must be grater then 0."));
+    }
+
+    public void SetCurrencyId(int currencyId)
+    {
+        CurrencyId = currencyId;
+    }
+
+    public void SetPurchaseDate(DateTime purchaseDate)
+    {
+        PurchaseDatetime = purchaseDate;
     }
     
     public override int GetId() => Id;

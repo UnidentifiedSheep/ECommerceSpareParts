@@ -1,95 +1,91 @@
 using System.Data;
-using Abstractions.Interfaces;
-using Abstractions.Interfaces.Currency;
 using Abstractions.Interfaces.Services;
+using Application.Common.Extensions;
 using Application.Common.Interfaces;
+using Application.Common.Interfaces.Repositories;
 using Attributes;
 using Contracts.Articles;
-using Exceptions.Base;
+using Domain.Extensions;
 using Main.Abstractions.Dtos.Amw.Storage;
-using Main.Abstractions.Interfaces.Services;
 using Main.Abstractions.Models;
-using Main.Application.Notifications;
-using Main.Entities;
+using Main.Application.Extensions;
+using Main.Application.Interfaces.Repositories;
+using Main.Entities.Event;
+using Main.Entities.Product;
 using Main.Entities.Storage;
 using Main.Enums;
-using Mapster;
-using MassTransit;
 using MediatR;
+using Event = Main.Entities.Event.Event;
 
 namespace Main.Application.Handlers.StorageContents.EditContent;
 
-[Transactional(IsolationLevel.Serializable, 20, 2)]
+[AutoSave]
+[Transactional(IsolationLevel.ReadCommitted, 20, 2)]
 public record EditStorageContentCommand(
-    Dictionary<int, ModelWithCode<PatchStorageContentDto, string>> EditedFields,
-    Guid UserId) : ICommand;
+    Dictionary<int, ModelWithRowVersion<PatchStorageContentDto, uint>> EditedFields) : ICommand;
 
 public class EditStorageContentHandler(
-    IStorageContentService storageContentService,
+    IRepository<StorageContent, int> storageContentRepository,
+    IProductRepository productRepository,
     IUnitOfWork unitOfWork,
-    IConcurrencyValidator<StorageContent> concurrencyValidator,
-    ICurrencyConverter currencyConverter,
-    IMediator mediator,
-    IPublishEndpoint publishEndpoint,
-    IArticlesService articlesService) : ICommandHandler<EditStorageContentCommand>
+    IIntegrationEventScope integrationEventScope
+    ) : ICommandHandler<EditStorageContentCommand>
 {
     public async Task<Unit> Handle(EditStorageContentCommand request, CancellationToken cancellationToken)
     {
         var editedFields = request.EditedFields;
+        
+        var storageContents = await storageContentRepository
+            .EnsureStorageContentsExistsForUpdateAsync(editedFields.Keys, cancellationToken);
 
-        var storageContents = await storageContentService
-            .GetStorageContentsForUpdate(editedFields.Keys, cancellationToken);
-        var articleIds = new HashSet<int>();
-        var storageMovements = new List<StorageMovement>();
-        var toIncrement = new Dictionary<int, int>();
+        var products = await productRepository
+            .EnsureProductsExistsForUpdateAsync(
+                productIds: storageContents.Select(x => x.Value.ProductId), 
+                cancellationToken: cancellationToken);
+        
+        var storageMovements = new List<Event>();
+        
         foreach (var item in editedFields)
         {
-            var patchDto = item.Value.Model;
-            var content = storageContents[item.Key];
-            var clientConcurrencyCode = item.Value.Code;
-            if (!concurrencyValidator.IsValid(content, clientConcurrencyCode, out var validCode))
-                throw new ConcurrencyCodeMismatchException(clientConcurrencyCode, validCode);
+            PatchStorageContentDto patch = item.Value.Model;
+            StorageContent content = storageContents[item.Key];
+            Product product = products[item.Key];
+            
+            content.ValidateVersion(item.Value.RowVersion);
+            product.IncreaseStock(CalculateDiff(content, patch));
+            
+            var movementEvent = StorageMovementEvent.Create(content, StorageMovementType.StorageContentEditing);
 
-            var (diff, storageMovement) = CalculateDiffAndMovement(content, patchDto, request.UserId);
-            if (storageMovement != null)
-            {
-                storageMovements.Add(storageMovement);
-                toIncrement[content.ProductId] = toIncrement.GetValueOrDefault(content.ProductId) + diff;
-            }
-
-            patchDto.Adapt(content);
-            if (patchDto.CurrencyId.IsSet || patchDto.BuyPrice.IsSet)
-                content.BuyPriceInUsd = currencyConverter.ConvertToUsd(content.BuyPrice, content.CurrencyId);
-
-            articleIds.Add(content.ProductId);
+            patch.Count.Apply(content.SetCount);
+            patch.BuyPrice.Apply(content.SetBuyPrice);
+            patch.CurrencyId.Apply(content.SetCurrencyId);
+            patch.PurchaseDatetime.Apply(content.SetPurchaseDate);
+            
+            storageMovements.Add(movementEvent);
         }
-
-        if (toIncrement.Count > 0)
-            await articlesService.UpdateArticlesCount(toIncrement, cancellationToken);
         await unitOfWork.AddRangeAsync(storageMovements, cancellationToken);
 
-        await publishEndpoint.Publish(new ArticleBuyPricesChangedEvent { ArticleIds = articleIds }, cancellationToken);
-
-        await unitOfWork.SaveChangesAsync(cancellationToken);
-
-        await mediator.Publish(new ArticlesUpdatedNotification(articleIds), cancellationToken);
+        foreach (var productId in products.Keys)
+        {
+            integrationEventScope.Add(new ProductUpdatedEvent
+            {
+                Id = productId
+            });
+            
+            integrationEventScope.Add(new ProductBuyPricesUpdatedEvent
+            {
+                ProductId = productId
+            });
+        }
+        
         return Unit.Value;
     }
 
-    private (int diff, StorageMovement? movement) CalculateDiffAndMovement(
+    private int CalculateDiff(
         StorageContent content,
-        PatchStorageContentDto patch,
-        Guid userId)
+        PatchStorageContentDto patch)
     {
-        if (!patch.Count.IsSet || patch.Count.Value == content.Count)
-            return (0, null);
-
-        var diff = patch.Count.Value - content.Count;
-        var movement = content.Adapt<StorageMovement>()
-            .SetActionType(StorageMovementType.StorageContentEditing);
-        movement.Count = diff;
-        movement.WhoMoved = userId;
-
-        return (diff, movement);
+        if (!patch.Count.IsSet || patch.Count.Value == content.Count) return 0;
+        return patch.Count.Value - content.Count;
     }
 }

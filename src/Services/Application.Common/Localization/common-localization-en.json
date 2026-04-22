@@ -2,6 +2,7 @@
   "locale": "en",
   "keyValues": {
     "pagination.page.min": "Page must be greater than or equal to 0.",
-    "pagination.size.range": "Number of items must be between 1 and 100."
+    "pagination.size.range": "Number of items must be between 1 and 100.",
+    "row.is.out.dated": "The data you are trying to update, is out dated. Pleas reload the data."
   }
 }

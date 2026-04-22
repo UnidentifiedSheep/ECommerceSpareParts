@@ -4,9 +4,6 @@ using Attributes;
 using Contracts.Articles;
 using Main.Abstractions.Dtos.Services.Articles;
 using Main.Entities.Product;
-using Mapster;
-using MassTransit;
-using ContractArticle = Contracts.Models.Articles.Article;
 
 namespace Main.Application.Handlers.Articles.CreateArticles;
 
@@ -18,7 +15,7 @@ public record CreateProductsResult(List<int> CreatedIds);
 
 public class CreateProductsHandler(
     IUnitOfWork unitOfWork,
-    IPublishEndpoint publishEndpoint)
+    IIntegrationEventScope integrationEventScope)
     : ICommandHandler<CreateProductsCommand, CreateProductsResult>
 {
     public async Task<CreateProductsResult> Handle(CreateProductsCommand request, CancellationToken cancellationToken)
@@ -43,12 +40,12 @@ public class CreateProductsHandler(
 
     private async Task PublishEvent(List<Product> products, CancellationToken cancellationToken)
     {
-        var contractProducts = products.Adapt<List<ContractArticle>>();
-
-        await publishEndpoint.Publish(new ProductCreatedEvent
-        {
-            Articles = contractProducts
-        }, cancellationToken);
+        foreach (var product in products)
+            integrationEventScope.Add(new ProductCreatedEvent
+            {
+                Id = product.Id,
+            });
+        
         await unitOfWork.SaveChangesAsync(cancellationToken);
     }
 }
