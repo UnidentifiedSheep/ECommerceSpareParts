@@ -8,5 +8,5 @@ public interface ISettingsService
 {
     Task LoadAsync(CancellationToken cancellationToken = default);
     Task SetSetting<T>(T value, CancellationToken cancellationToken = default) where T : Setting;
-    Task<T> Get<T>(CancellationToken cancellationToken = default) where T : Setting, ISettingKey<T>;
+    Task<T> GetOrDefault<T>(CancellationToken cancellationToken = default) where T : Setting, ISetting<T>;
 }

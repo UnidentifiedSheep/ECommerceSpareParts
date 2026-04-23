@@ -58,12 +58,11 @@ public class SettingsService(
         settingsContainer.Set(value);
     }
 
-    public async Task<T> Get<T>(CancellationToken cancellationToken = default) where T : Setting, ISettingKey<T>
+    public async Task<T> GetOrDefault<T>(CancellationToken cancellationToken = default) where T : Setting, ISetting<T>
     {
         if (settingsContainer.TryGet<T>(out var setting)) return setting!;
         var dbSetting = await repository.GetById(T.SettingName, cancellationToken);
-        if (dbSetting == null)
-            throw new InvalidOperationException($"Unable to find setting '{T.SettingName}'");
+        if (dbSetting == null) return T.Default;
         
         var typed = (T)settingFactory.Create(dbSetting.Key, dbSetting.Json);
         settingsContainer.Set(typed);

@@ -15,8 +15,8 @@ public abstract class SettingFactoryBase : ISettingFactory
             : creator(json);
     }
 
-    public Setting Create<T>(string json) where T : Setting, ISettingKey<T> =>Create(T.SettingName, json);
+    public Setting Create<T>(string json) where T : Setting, ISetting<T> =>Create(T.SettingName, json);
 
-    public void Register<T>(Func<string, T> factory) where T : Setting, ISettingKey<T>
+    public void Register<T>(Func<string, T> factory) where T : Setting, ISetting<T>
         => Map[T.SettingName] = factory;
 }
