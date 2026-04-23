@@ -3,25 +3,22 @@ using Abstractions.Interfaces.Services;
 using Application.Common.Interfaces;
 using Attributes;
 using Contracts.Articles;
+using Contracts.StorageContent;
 using Main.Abstractions.Exceptions.Storages;
-using Main.Abstractions.Interfaces.DbRepositories;
-using Main.Abstractions.Interfaces.Services;
 using Main.Abstractions.Models;
 using Main.Application.Extensions;
-using Main.Application.Notifications;
-using Main.Entities;
+using Main.Application.Interfaces.Repositories;
+using Main.Entities.Event;
+using Main.Entities.Product;
 using Main.Entities.Storage;
 using Main.Enums;
-using Mapster;
-using MassTransit;
-using MediatR;
 
 namespace Main.Application.Handlers.StorageContents.RemoveContent;
 
+[AutoSave]
 [Transactional(IsolationLevel.Serializable, 20, 2)]
 public record RemoveContentCommand(
     Dictionary<int, int> Content,
-    Guid UserId,
     string? StorageName,
     bool TakeFromOtherStorages,
     StorageMovementType MovementType) : ICommand<RemoveContentResult>;
@@ -30,34 +27,32 @@ public record RemoveContentResult(IEnumerable<PrevAndNewValue<StorageContent>> C
 
 public class RemoveContentHandler(
     IStorageContentRepository contentRepository,
-    IArticlesRepository articlesRepository,
-    IArticlesService articlesService,
-    IUnitOfWork unitOfWork,
-    IPublishEndpoint publishEndpoint,
-    IMediator mediator) : ICommandHandler<RemoveContentCommand, RemoveContentResult>
+    IProductRepository productsRepository,
+    IIntegrationEventScope integrationEventScope,
+    IUnitOfWork unitOfWork) : ICommandHandler<RemoveContentCommand, RemoveContentResult>
 {
     public async Task<RemoveContentResult> Handle(RemoveContentCommand request, CancellationToken cancellationToken)
     {
         var content = request.Content;
         var takeFromOtherStorages = request.TakeFromOtherStorages;
-        var userId = request.UserId;
         var storageName = request.StorageName;
-        var articleIds = content.Keys;
+        var productIds = content.Keys;
         
-        await articlesRepository.EnsureArticlesExistsForUpdateAsync(articleIds, cancellationToken);
+        var products = await productsRepository
+            .EnsureProductsExistsForUpdateAsync(productIds, cancellationToken);
 
-        var movements = new List<StorageMovement>();
-        var toIncrement = new Dictionary<int, int>();
+        var movements = new List<Event>();
         var result = new List<PrevAndNewValue<StorageContent>>();
 
-        foreach (var (articleId, count) in content)
+        foreach (var (productId, count) in content)
         {
+            Product product = products[productId];
             List<StorageContent> storageContents = [];
 
             var availableCount = 0;
             if (!string.IsNullOrWhiteSpace(storageName))
                 await foreach (var dbItem in contentRepository
-                                   .GetStorageContentsForUpdateAsync(articleId, storageName)
+                                   .GetStorageContentsForUpdateAsync(productId, storageName)
                                    .WithCancellation(cancellationToken))
                 {
                     storageContents.Add(dbItem);
@@ -67,7 +62,7 @@ public class RemoveContentHandler(
 
             if (takeFromOtherStorages && availableCount < count)
                 await foreach (var dbItem in contentRepository
-                                   .GetStorageContentsForUpdateAsync(articleId, null, null,
+                                   .GetStorageContentsForUpdateAsync(productId, null, null,
                                        string.IsNullOrWhiteSpace(storageName) ? null : [storageName])
                                    .WithCancellation(cancellationToken))
                 {
@@ -76,48 +71,44 @@ public class RemoveContentHandler(
                     if (availableCount >= count) break;
                 }
 
-            if (availableCount < count) throw new NotEnoughCountOnStorageException(articleId, availableCount, count);
+            if (availableCount < count) throw new NotEnoughCountOnStorageException(productId, availableCount, count);
             var counter = count;
 
             foreach (var item in storageContents)
             {
-                var prevValue = item.Adapt<StorageContent>();
-                var temp = Math.Min(counter, item.Count);
-                item.Count -= temp;
+                StorageContent prevValue = StorageContent.CopyFrom(item);
+                
+                int temp = Math.Min(counter, item.Count);
+                item.IncreaseCount(-temp);
                 counter -= temp;
-                var newValue = item.Adapt<StorageContent>();
-
-                var movement = GetMovement(item, request.MovementType, userId, -temp);
-                movements.Add(movement);
+                
+                StorageContent newValue = StorageContent.CopyFrom(item);
+                
+                Event movementEvent = StorageMovementEvent.Create(item, request.MovementType);
+                movements.Add(movementEvent);
 
                 result.Add(new PrevAndNewValue<StorageContent>(prevValue, newValue));
                 if (counter <= 0) break;
             }
 
-            toIncrement[articleId] = -count;
+            product.IncreaseStock(-count);
         }
 
         await unitOfWork.AddRangeAsync(movements, cancellationToken);
-        await articlesService.UpdateArticlesCount(toIncrement, cancellationToken);
 
-        await publishEndpoint.Publish(new ArticleBuyPricesChangedEvent { ArticleIds = articleIds }, cancellationToken);
-
-        await unitOfWork.SaveChangesAsync(cancellationToken);
-
-        await mediator.Publish(new ArticlesUpdatedNotification(articleIds), cancellationToken);
+        foreach (var id in productIds)
+        {
+            integrationEventScope.Add(new StorageContentUpdatedEvent
+            {
+                ProductId = id
+            });
+            
+            integrationEventScope.Add(new ProductUpdatedEvent
+            {
+                Id = id
+            });
+        }
 
         return new RemoveContentResult(result);
-    }
-
-    private StorageMovement GetMovement(
-        StorageContent content,
-        StorageMovementType movementType,
-        Guid whoMoved,
-        int count)
-    {
-        var tempMovement = content.Adapt<StorageMovement>().SetActionType(movementType);
-        tempMovement.Count = count;
-        tempMovement.WhoMoved = whoMoved;
-        return tempMovement;
     }
 }

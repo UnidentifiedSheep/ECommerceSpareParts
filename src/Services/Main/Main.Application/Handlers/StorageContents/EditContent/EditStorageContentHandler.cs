@@ -5,6 +5,7 @@ using Application.Common.Interfaces;
 using Application.Common.Interfaces.Repositories;
 using Attributes;
 using Contracts.Articles;
+using Contracts.StorageContent;
 using Domain.Extensions;
 using Main.Abstractions.Dtos.Amw.Storage;
 using Main.Abstractions.Models;
@@ -72,7 +73,7 @@ public class EditStorageContentHandler(
                 Id = productId
             });
             
-            integrationEventScope.Add(new ProductBuyPricesUpdatedEvent
+            integrationEventScope.Add(new StorageContentUpdatedEvent
             {
                 ProductId = productId
             });

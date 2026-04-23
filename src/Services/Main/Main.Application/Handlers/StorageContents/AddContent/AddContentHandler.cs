@@ -2,7 +2,7 @@ using System.Data;
 using Abstractions.Interfaces.Services;
 using Application.Common.Interfaces;
 using Attributes;
-using Contracts.Articles;
+using Contracts.StorageContent;
 using Main.Abstractions.Dtos.Amw.Storage;
 using Main.Application.Extensions;
 using Main.Application.Handlers.Currencies.Projections;
@@ -63,7 +63,7 @@ public class AddContentHandler(
         await unitOfWork.AddRangeAsync(events, cancellationToken);
 
         foreach (var id in productIds)
-            integrationEventScope.Add(new ProductBuyPricesUpdatedEvent
+            integrationEventScope.Add(new StorageContentUpdatedEvent
             {
                 ProductId = id
             });

@@ -2,8 +2,6 @@
 using Domain;
 using Domain.Extensions;
 using Domain.Interfaces;
-using Exceptions;
-using Main.Entities.Purchase;
 
 namespace Main.Entities.Storage;
 
@@ -57,9 +55,26 @@ public class StorageContent : AuditableEntity<StorageContent, int>, IVersionable
         return new StorageContent(storageName, productId, count, buyPrice, currencyId, purchaseDatetime);
     }
 
+    public static StorageContent CopyFrom(StorageContent source)
+    {
+        return new StorageContent(
+            source.StorageName, 
+            source.ProductId, 
+            source.Count, 
+            source.BuyPrice, 
+            source.CurrencyId, 
+            source.PurchaseDatetime);
+    }
+
     public void SetCount(int count)
     {
         Count = count
+            .AgainstNegative(() => new InvalidOperationException("Count must be greater than or equal to zero."));
+    }
+
+    public void IncreaseCount(int amount)
+    {
+        Count = (Count + amount)
             .AgainstNegative(() => new InvalidOperationException("Count must be greater than or equal to zero."));
     }
 
