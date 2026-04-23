@@ -1,6 +1,6 @@
 using FluentValidation;
 using Localization.Domain.Extensions;
-using Main.Abstractions.Dtos.Amw.Purchase;
+using Main.Application.Dtos.Amw.Purchase;
 using Main.Application.Handlers.BaseValidators;
 
 namespace Main.Application.Handlers.Purchases.BaseValidators;

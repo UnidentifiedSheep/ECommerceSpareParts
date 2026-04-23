@@ -1,11 +1,9 @@
 ﻿using System.Linq.Expressions;
-using Main.Abstractions.Dtos.Amw.Storage;
-using Main.Abstractions.Dtos.Amw.StorageRoutes;
-using Main.Abstractions.Dtos.Currencies;
-using Main.Entities.Storage;
 using LinqKit;
+using Main.Application.Dtos.Storage;
+using Main.Entities.Storage;
 
-namespace Main.Application.Handlers.Currencies.Projections;
+namespace Main.Application.Handlers.Projections;
 
 public static class StorageProjections
 {

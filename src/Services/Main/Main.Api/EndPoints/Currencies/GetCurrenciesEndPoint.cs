@@ -1,7 +1,7 @@
 using Abstractions.Models;
 using Api.Common.Extensions;
 using Carter;
-using Main.Abstractions.Dtos.Currencies;
+using Main.Application.Dtos.Currencies;
 using Main.Application.Handlers.Currencies.GetCurrencies;
 using Main.Application.Handlers.Currencies.GetCurrencyById;
 using Mapster;

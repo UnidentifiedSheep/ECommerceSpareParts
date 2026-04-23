@@ -1,7 +1,7 @@
 using System.Text.Json.Serialization;
 using Main.Enums;
 
-namespace Main.Abstractions.Dtos.Amw.Articles;
+namespace Main.Application.Dtos.Product;
 
 public record NewProductLinkageDto
 {

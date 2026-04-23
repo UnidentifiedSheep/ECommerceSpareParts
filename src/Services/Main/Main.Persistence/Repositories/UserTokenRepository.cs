@@ -1,6 +1,6 @@
 using Abstractions.Models.Repository;
-using Main.Abstractions.Dtos.RepositoryOptionsData;
 using Main.Abstractions.Interfaces.DbRepositories;
+using Main.Application.Dtos.RepositoryOptionsData;
 using Main.Entities;
 using Main.Entities.Auth;
 using Main.Persistence.Context;

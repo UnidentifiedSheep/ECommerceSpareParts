@@ -2,8 +2,8 @@ using Abstractions.Interfaces;
 using Api.Common.Extensions;
 using Carter;
 using Enums;
-using Main.Abstractions.Dtos.Amw.ArticleReservations;
-using Main.Application.Handlers.ArticleReservations.EditArticleReservation;
+using Main.Application.Dtos.Product;
+using Main.Application.Handlers.ProductReservations.EditProductReservation;
 using MediatR;
 
 namespace Main.Api.EndPoints.ArticlesReservation;

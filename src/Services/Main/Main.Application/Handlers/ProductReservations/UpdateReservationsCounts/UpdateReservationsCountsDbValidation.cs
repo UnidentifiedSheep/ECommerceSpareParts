@@ -2,7 +2,7 @@
 using BulkValidation.Core.Interfaces;
 using Main.Entities;
 
-namespace Main.Application.Handlers.ArticleReservations.SubtractCountFromReservations;
+namespace Main.Application.Handlers.ProductReservations.UpdateReservationsCounts;
 
 public class UpdateReservationsCountsDbValidation : AbstractDbValidation<UpdateReservationsCountsCommand>
 {

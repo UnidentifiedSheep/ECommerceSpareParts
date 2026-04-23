@@ -1,6 +1,6 @@
 using Abstractions.Models;
 using Carter;
-using Main.Abstractions.Dtos.Amw.Producers;
+using Main.Application.Dtos.Producer;
 using Main.Application.Handlers.Producers.GetProducerOtherNames;
 using Mapster;
 using MediatR;

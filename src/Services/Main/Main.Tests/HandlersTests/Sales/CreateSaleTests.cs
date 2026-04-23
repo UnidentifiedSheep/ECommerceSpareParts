@@ -1,6 +1,6 @@
 using Main.Abstractions.Constants;
-using Main.Abstractions.Dtos.Amw.Sales;
 using Main.Abstractions.Models;
+using Main.Application.Dtos.Amw.Sales;
 using Main.Application.Handlers.Sales.CreateSale;
 using Main.Entities;
 using Main.Entities.Currency;

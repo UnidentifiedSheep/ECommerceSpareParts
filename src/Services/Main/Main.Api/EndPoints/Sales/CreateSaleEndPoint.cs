@@ -1,7 +1,7 @@
 using Abstractions.Interfaces;
 using Api.Common.Extensions;
 using Carter;
-using Main.Abstractions.Dtos.Amw.Sales;
+using Main.Application.Dtos.Amw.Sales;
 using Main.Application.Handlers.Sales.CreateFullSale;
 using MediatR;
 

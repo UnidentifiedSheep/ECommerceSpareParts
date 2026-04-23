@@ -1,12 +1,9 @@
-using Abstractions.Interfaces.Services;
 using Application.Common.Interfaces;
 using Application.Common.Interfaces.Repositories;
 using Attributes;
-using Main.Abstractions.Dtos.RepositoryOptionsData;
-using Main.Entities;
 using Main.Entities.Storage;
 
-namespace Main.Application.Handlers.ArticleReservations.SubtractCountFromReservations;
+namespace Main.Application.Handlers.ProductReservations.UpdateReservationsCounts;
 
 [AutoSave]
 [Transactional]

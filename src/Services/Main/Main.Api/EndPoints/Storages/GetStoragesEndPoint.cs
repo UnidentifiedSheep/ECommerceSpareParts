@@ -1,8 +1,8 @@
 using Abstractions.Models;
 using Api.Common.Extensions;
 using Carter;
-using Main.Abstractions.Dtos.Amw.Storage;
 using Main.Abstractions.Exceptions.Storages;
+using Main.Application.Dtos.Storage;
 using Main.Application.Handlers.Storages.GetStorage;
 using Main.Application.Handlers.Storages.GetStorageByName;
 using Main.Enums;

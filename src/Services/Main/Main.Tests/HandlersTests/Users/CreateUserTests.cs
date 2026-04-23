@@ -1,6 +1,6 @@
 using Bogus;
 using Main.Abstractions.Constants;
-using Main.Abstractions.Dtos.Emails;
+using Main.Application.Dtos.Emails;
 using Main.Application.Handlers.Users.CreateUser;
 using Main.Enums;
 using Main.Persistence.Context;

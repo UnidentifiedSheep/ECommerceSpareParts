@@ -1,14 +1,12 @@
-﻿using Abstractions.Interfaces.Services;
-using Application.Common.Interfaces;
+﻿using Application.Common.Interfaces;
 using Application.Common.Interfaces.Repositories;
 using Attributes;
-using Extensions;
 using Main.Abstractions.Exceptions.Auth;
 using Main.Entities.Auth;
 using Main.Entities.Auth.ValueObjects;
 using MediatR;
 
-namespace Main.Application.Handlers.Roles.AddPermissionToRole;
+namespace Main.Application.Handlers.Auth.AddPermissionToRole;
 
 [AutoSave]
 [Transactional]

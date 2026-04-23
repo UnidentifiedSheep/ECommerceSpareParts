@@ -1,8 +1,8 @@
 ﻿using Extensions;
-using Main.Abstractions.Dtos.Amw.Logistics;
-using Main.Abstractions.Dtos.Amw.Purchase;
-using Main.Abstractions.Dtos.Amw.StorageRoutes;
 using Main.Abstractions.Interfaces.Services;
+using Main.Application.Dtos.Amw.Logistics;
+using Main.Application.Dtos.Amw.Purchase;
+using Main.Application.Dtos.Storage;
 using Main.Application.Handlers.Balance.CreateTransaction;
 using Main.Application.Handlers.Balance.DeleteTransaction;
 using Main.Application.Handlers.Balance.EditTransaction;

@@ -2,7 +2,7 @@
 using Api.Common.Extensions;
 using Carter;
 using Enums;
-using Main.Abstractions.Dtos.Amw.Storage;
+using Main.Application.Dtos.Storage;
 using Main.Application.Handlers.Users.GetUserStorages;
 using MediatR;
 

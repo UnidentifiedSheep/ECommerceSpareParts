@@ -1,7 +1,7 @@
 using FluentValidation;
 using Localization.Domain.Extensions;
 
-namespace Main.Application.Handlers.Articles.MakeLinkageBetweenArticles;
+namespace Main.Application.Handlers.Products.MakeLinkageBetweenArticles;
 
 public class MakeLinkageBetweenProductsValidation : AbstractValidator<MakeLinkageBetweenProductsCommand>
 {

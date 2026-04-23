@@ -2,13 +2,13 @@ using Abstractions.Models;
 using Application.Common.Extensions;
 using Application.Common.Interfaces;
 using Application.Common.Interfaces.Repositories;
-using Main.Abstractions.Dtos.Amw.Articles;
 using Main.Abstractions.Exceptions.Articles;
-using Main.Application.Interfaces.Repositories;
+using Main.Application.Dtos.Product;
+using Main.Application.Interfaces.Persistence;
 using Main.Entities.Product;
 using Mapster;
 
-namespace Main.Application.Handlers.Articles.GetArticleCrosses;
+namespace Main.Application.Handlers.Products.GetProductCrosses;
 
 public record GetProductCrossesQuery(int ArticleId, PaginationModel Pagination, string? SortBy, Guid? UserId)
     : IQuery<GetProductCrossesResult>;

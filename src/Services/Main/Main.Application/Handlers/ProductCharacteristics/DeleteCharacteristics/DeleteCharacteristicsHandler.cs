@@ -2,10 +2,9 @@ using Abstractions.Interfaces.Services;
 using Application.Common.Interfaces;
 using Attributes;
 using Main.Abstractions.Exceptions.Articles;
-using Main.Abstractions.Interfaces.DbRepositories;
 using MediatR;
 
-namespace Main.Application.Handlers.ArticleCharacteristics.DeleteCharacteristics;
+namespace Main.Application.Handlers.ProductCharacteristics.DeleteCharacteristics;
 
 [Transactional]
 public record DeleteCharacteristicsCommand(int Id) : ICommand;

@@ -1,9 +1,9 @@
 using System.Drawing;
 using Bogus;
-using Main.Abstractions.Dtos.Amw.Producers;
-using Main.Abstractions.Dtos.Amw.Storage;
-using Main.Abstractions.Dtos.Services.Articles;
-using Main.Abstractions.Dtos.Users;
+using Main.Application.Dtos.Producer;
+using Main.Application.Dtos.Product;
+using Main.Application.Dtos.Storage;
+using Main.Application.Dtos.Users;
 using Main.Entities;
 using Main.Entities.Currency;
 using Main.Entities.Sale;

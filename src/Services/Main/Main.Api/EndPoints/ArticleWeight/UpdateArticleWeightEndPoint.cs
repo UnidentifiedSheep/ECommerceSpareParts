@@ -1,7 +1,7 @@
 ﻿using Api.Common.Extensions;
 using Carter;
 using Enums;
-using Main.Application.Handlers.ArticleWeight.SetArticleWeight;
+using Main.Application.Handlers.ProductWeight.SetProductWeight;
 using MediatR;
 
 namespace Main.Api.EndPoints.ArticleWeight;

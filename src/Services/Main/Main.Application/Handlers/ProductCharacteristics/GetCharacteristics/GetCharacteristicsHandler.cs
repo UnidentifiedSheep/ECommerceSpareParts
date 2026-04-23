@@ -1,11 +1,9 @@
 ﻿using Application.Common.Interfaces;
-using Main.Abstractions.Dtos.Anonymous.Articles;
-using Main.Abstractions.Interfaces.DbRepositories;
-using Main.Entities;
+using Main.Application.Dtos.Anonymous.Articles;
 using Main.Entities.Product;
 using Mapster;
 
-namespace Main.Application.Handlers.ArticleCharacteristics.GetCharacteristics;
+namespace Main.Application.Handlers.ProductCharacteristics.GetCharacteristics;
 
 public record GetArticleCharacteristicsQuery(int ArticleId, IEnumerable<int> CharacteristicsIds)
     : IQuery<GetArticleCharacteristicsResult>;

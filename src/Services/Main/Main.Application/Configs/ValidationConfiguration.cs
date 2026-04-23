@@ -102,13 +102,13 @@ public static class ValidationConfiguration
 
     private static void ConfigureProducerOtherNames()
     {
-        ConfigureDbValidation.AddConfig(ValidationFunctions.ValidateProducersOtherNameExistsPK, KeyValueType.Tuple,
+        ConfigureDbValidation.AddConfig(ValidationFunctions.ValidateProducerOtherNameExistsPK, KeyValueType.Tuple,
             config => config.WithErrorName(ApplicationErrors.ProducerOtherNameNotFound)
                 .WithMessageTemplate("producer.other.name.not.found")
                 .WithErrorType(typeof(NotFoundException))
                 .WithErrorCode((int)HttpStatusCode.NotFound));
 
-        ConfigureDbValidation.AddConfig(ValidationFunctions.ValidateProducersOtherNameNotExistsPK, KeyValueType.Tuple,
+        ConfigureDbValidation.AddConfig(ValidationFunctions.ValidateProducerOtherNameNotExistsPK, KeyValueType.Tuple,
             config => config.WithErrorName(ApplicationErrors.ProducerOtherNameAlreadyTaken)
                 .WithMessageTemplate("producer.other.name.already.taken")
                 .WithErrorType(typeof(ConflictException))

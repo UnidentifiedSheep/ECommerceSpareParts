@@ -1,7 +1,7 @@
 using Abstractions.Interfaces.Validators;
 using FluentValidation;
 using Localization.Domain.Extensions;
-using Main.Abstractions.Dtos.Emails;
+using Main.Application.Dtos.Emails;
 
 namespace Main.Application.Handlers.BaseValidators;
 

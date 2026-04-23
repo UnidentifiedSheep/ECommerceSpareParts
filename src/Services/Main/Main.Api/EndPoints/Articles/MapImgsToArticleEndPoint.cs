@@ -1,7 +1,7 @@
 ﻿using Api.Common.Extensions;
 using Api.Common.Models;
 using Carter;
-using Main.Application.Handlers.ArticleImages.MapImgsToArticle;
+using Main.Application.Handlers.Products.MapImgsToProduct;
 using MediatR;
 
 namespace Main.Api.EndPoints.Articles;

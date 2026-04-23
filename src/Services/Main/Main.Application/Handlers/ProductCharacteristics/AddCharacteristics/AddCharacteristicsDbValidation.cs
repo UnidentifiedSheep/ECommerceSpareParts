@@ -2,7 +2,7 @@
 using BulkValidation.Core.Interfaces;
 using Main.Entities;
 
-namespace Main.Application.Handlers.ArticleCharacteristics.AddCharacteristics;
+namespace Main.Application.Handlers.ProductCharacteristics.AddCharacteristics;
 
 public class AddCharacteristicsDbValidation : AbstractDbValidation<AddCharacteristicsCommand>
 {

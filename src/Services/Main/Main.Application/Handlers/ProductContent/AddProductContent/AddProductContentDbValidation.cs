@@ -2,7 +2,7 @@
 using BulkValidation.Core.Interfaces;
 using Main.Entities;
 
-namespace Main.Application.Handlers.ArticleContent.AddArticleContent;
+namespace Main.Application.Handlers.ProductContent.AddProductContent;
 
 public class AddProductContentDbValidation : AbstractDbValidation<AddProductContentCommand>
 {

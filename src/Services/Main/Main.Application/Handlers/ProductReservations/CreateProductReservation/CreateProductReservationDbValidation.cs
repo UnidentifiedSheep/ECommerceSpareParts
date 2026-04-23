@@ -2,7 +2,7 @@
 using BulkValidation.Core.Interfaces;
 using Main.Entities;
 
-namespace Main.Application.Handlers.ArticleReservations.CreateArticleReservation;
+namespace Main.Application.Handlers.ProductReservations.CreateProductReservation;
 
 public class CreateProductReservationDbValidation : AbstractDbValidation<CreateProductReservationCommand>
 {

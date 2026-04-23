@@ -3,7 +3,6 @@ using Abstractions.Models;
 using Api.Common.Extensions;
 using Carter;
 using Enums;
-using Main.Abstractions.Dtos.Amw.Users;
 using Main.Application.Handlers.Users.GetUsers;
 using Main.Enums;
 using Mapster;

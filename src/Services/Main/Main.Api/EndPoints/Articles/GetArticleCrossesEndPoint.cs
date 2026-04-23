@@ -3,8 +3,8 @@ using Abstractions.Models;
 using Api.Common.Extensions;
 using Carter;
 using Enums;
-using Main.Abstractions.Dtos.Amw.Articles;
-using Main.Application.Handlers.Articles.GetArticleCrosses;
+using Main.Application.Dtos.Product;
+using Main.Application.Handlers.Products.GetProductCrosses;
 using Mapster;
 using MediatR;
 

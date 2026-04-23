@@ -1,6 +1,6 @@
 using System.Text.Json.Serialization;
 
-namespace Main.Abstractions.Dtos.Amw.Storage;
+namespace Main.Application.Dtos.Storage;
 
 public record NewStorageContentDto
 {

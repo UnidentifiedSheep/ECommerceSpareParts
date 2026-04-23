@@ -1,4 +1,4 @@
-﻿namespace Main.Abstractions.Dtos.Users;
+﻿namespace Main.Application.Dtos.Users;
 
 public record UserRolesAndPermissions
 {

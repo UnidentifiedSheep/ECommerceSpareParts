@@ -1,7 +1,7 @@
 using System.Text.Json.Serialization;
 using Abstractions.Models;
 
-namespace Main.Abstractions.Dtos.Amw.Articles;
+namespace Main.Application.Dtos.Product;
 
 public record PatchProductDto
 {

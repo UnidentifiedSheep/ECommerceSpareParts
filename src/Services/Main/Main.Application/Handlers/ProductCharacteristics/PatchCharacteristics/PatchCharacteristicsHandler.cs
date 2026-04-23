@@ -1,13 +1,11 @@
 using Abstractions.Interfaces.Services;
 using Application.Common.Interfaces;
 using Attributes;
-using Main.Abstractions.Dtos.Amw.ArticleCharacteristics;
 using Main.Abstractions.Exceptions.Articles;
-using Main.Abstractions.Interfaces.DbRepositories;
-using Mapster;
+using Main.Application.Dtos.Amw.ArticleCharacteristics;
 using MediatR;
 
-namespace Main.Application.Handlers.ArticleCharacteristics.PatchCharacteristics;
+namespace Main.Application.Handlers.ProductCharacteristics.PatchCharacteristics;
 
 [Transactional]
 public record PatchCharacteristicsCommand(int Id, PatchCharacteristicsDto NewValues) : ICommand;

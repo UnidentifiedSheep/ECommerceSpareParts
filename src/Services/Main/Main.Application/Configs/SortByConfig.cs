@@ -1,6 +1,6 @@
 using Abstractions;
 using Extensions;
-using Main.Abstractions.Dtos.Amw.Articles;
+using Main.Application.Dtos.Product;
 using Main.Entities;
 using Main.Entities.Producer;
 using Main.Entities.Product;

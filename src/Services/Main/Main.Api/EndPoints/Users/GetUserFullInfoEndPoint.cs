@@ -1,8 +1,7 @@
 ﻿using Api.Common.Extensions;
 using Carter;
 using Enums;
-using Main.Abstractions.Dtos.Amw.Users;
-using Main.Abstractions.Dtos.Users;
+using Main.Application.Dtos.Users;
 using Main.Application.Handlers.Users.GetUserFullInfo;
 using MediatR;
 

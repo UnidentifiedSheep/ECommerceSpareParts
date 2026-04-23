@@ -2,7 +2,7 @@
 using BulkValidation.Core.Interfaces;
 using Main.Entities;
 
-namespace Main.Application.Handlers.ArticleReservations.GetArticlesWithNotEnoughStock;
+namespace Main.Application.Handlers.ProductReservations.GetArticlesWithNotEnoughStock;
 
 public class GetArticlesWithNotEnoughStockDbValidation : AbstractDbValidation<GetArticlesWithNotEnoughStockQuery>
 {

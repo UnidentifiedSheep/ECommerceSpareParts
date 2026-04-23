@@ -3,11 +3,10 @@ using Application.Common.Interfaces;
 using Application.Common.Interfaces.Repositories;
 using Attributes;
 using Main.Abstractions.Exceptions.Articles;
-using Main.Entities;
 using Main.Entities.Storage;
 using MediatR;
 
-namespace Main.Application.Handlers.ArticleReservations.DeleteArticleReservation;
+namespace Main.Application.Handlers.ProductReservations.DeleteProductReservation;
 
 [AutoSave]
 [Transactional]

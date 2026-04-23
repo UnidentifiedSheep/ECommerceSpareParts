@@ -1,8 +1,8 @@
 using Abstractions.Interfaces;
 using Api.Common.Extensions;
 using Carter;
-using Main.Abstractions.Dtos.Amw.ArticleReservations;
-using Main.Application.Handlers.ArticleReservations.CreateArticleReservation;
+using Main.Application.Dtos.Product;
+using Main.Application.Handlers.ProductReservations.CreateProductReservation;
 using MediatR;
 
 namespace Main.Api.EndPoints.ArticlesReservation;

@@ -1,7 +1,7 @@
 ﻿using Abstractions.Models;
 using Application.Common.Interfaces;
-using Main.Abstractions.Dtos.Amw.Storage;
 using Main.Abstractions.Interfaces.DbRepositories;
+using Main.Application.Dtos.Storage;
 using Mapster;
 
 namespace Main.Application.Handlers.Users.GetUserStorages;

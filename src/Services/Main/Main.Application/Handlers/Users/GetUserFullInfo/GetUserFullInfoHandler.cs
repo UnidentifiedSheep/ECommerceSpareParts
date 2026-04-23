@@ -1,10 +1,9 @@
 ﻿using Abstractions.Models.Repository;
 using Application.Common.Interfaces;
-using Main.Abstractions.Dtos.Amw.Users;
-using Main.Abstractions.Dtos.Users;
 using Main.Abstractions.Exceptions.Auth;
 using Main.Abstractions.Interfaces.DbRepositories;
 using Main.Abstractions.Interfaces.Services;
+using Main.Application.Dtos.Users;
 using Main.Entities;
 using Main.Entities.User;
 using Mapster;

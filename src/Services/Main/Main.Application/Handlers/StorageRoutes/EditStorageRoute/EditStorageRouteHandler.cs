@@ -1,9 +1,9 @@
 ﻿using Application.Common.Extensions;
 using Application.Common.Interfaces;
 using Attributes;
-using Main.Abstractions.Dtos.Amw.StorageRoutes;
 using Main.Abstractions.Exceptions.Storages;
-using Main.Application.Interfaces.Repositories;
+using Main.Application.Dtos.Storage;
+using Main.Application.Interfaces.Persistence;
 using MediatR;
 
 namespace Main.Application.Handlers.StorageRoutes.EditStorageRoute;

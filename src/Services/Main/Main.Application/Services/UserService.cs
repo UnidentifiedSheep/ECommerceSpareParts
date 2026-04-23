@@ -1,10 +1,10 @@
 ﻿using Abstractions.Interfaces.RelatedData;
 using Abstractions.Models.Repository;
 using Main.Abstractions.Constants;
-using Main.Abstractions.Dtos.Users;
 using Main.Abstractions.Interfaces.CacheRepositories;
 using Main.Abstractions.Interfaces.DbRepositories;
 using Main.Abstractions.Interfaces.Services;
+using Main.Application.Dtos.Users;
 using Main.Entities;
 using Main.Entities.Auth;
 using Mapster;

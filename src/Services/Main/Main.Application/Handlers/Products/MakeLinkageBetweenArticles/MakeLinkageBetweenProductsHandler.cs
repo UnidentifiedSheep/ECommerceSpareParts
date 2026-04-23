@@ -2,16 +2,15 @@ using Abstractions.Interfaces.Services;
 using Application.Common.Interfaces;
 using Application.Common.Interfaces.Repositories;
 using Attributes;
-using Main.Abstractions.Dtos.Amw.Articles;
 using Main.Abstractions.Exceptions.Articles;
-using Main.Application.Interfaces.Repositories;
+using Main.Application.Dtos.Product;
+using Main.Application.Interfaces.Persistence;
 using Main.Application.Notifications;
-using Main.Entities;
 using Main.Entities.Product;
 using Main.Enums;
 using MediatR;
 
-namespace Main.Application.Handlers.Articles.MakeLinkageBetweenArticles;
+namespace Main.Application.Handlers.Products.MakeLinkageBetweenArticles;
 
 [AutoSave]
 [Transactional]

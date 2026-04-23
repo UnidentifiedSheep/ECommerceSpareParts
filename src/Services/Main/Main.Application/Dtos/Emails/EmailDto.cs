@@ -1,6 +1,6 @@
 using Main.Enums;
 
-namespace Main.Abstractions.Dtos.Emails;
+namespace Main.Application.Dtos.Emails;
 
 public class EmailDto
 {

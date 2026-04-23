@@ -1,8 +1,8 @@
 ﻿using Abstractions.Models;
 using FluentValidation;
-using Main.Abstractions.Dtos.Amw.StorageRoutes;
 using Main.Abstractions.Exceptions.Storages;
 using Main.Application.Configs.Mapster;
+using Main.Application.Dtos.Storage;
 using Main.Application.Handlers.StorageRoutes.EditStorageRoute;
 using Main.Entities;
 using Main.Entities.Currency;

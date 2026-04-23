@@ -1,8 +1,8 @@
 ﻿using Abstractions.Models;
 using Api.Common.Extensions;
 using Carter;
-using Main.Abstractions.Dtos.Amw.Permissions;
-using Main.Application.Handlers.Permissions.GetPermission;
+using Main.Application.Dtos.Auth;
+using Main.Application.Handlers.Auth.GetPermission;
 using MediatR;
 
 namespace Main.Api.EndPoints.Permissions;

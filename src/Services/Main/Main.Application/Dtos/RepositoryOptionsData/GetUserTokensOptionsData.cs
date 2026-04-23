@@ -1,6 +1,6 @@
 ﻿using Main.Enums;
 
-namespace Main.Abstractions.Dtos.RepositoryOptionsData;
+namespace Main.Application.Dtos.RepositoryOptionsData;
 
 public record GetUserTokensOptionsData
 {

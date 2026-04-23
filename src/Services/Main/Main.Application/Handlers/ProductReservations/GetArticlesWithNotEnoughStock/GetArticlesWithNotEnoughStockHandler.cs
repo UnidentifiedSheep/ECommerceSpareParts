@@ -1,7 +1,6 @@
 using Application.Common.Interfaces;
-using Main.Abstractions.Interfaces.DbRepositories;
 
-namespace Main.Application.Handlers.ArticleReservations.GetArticlesWithNotEnoughStock;
+namespace Main.Application.Handlers.ProductReservations.GetArticlesWithNotEnoughStock;
 
 /// <summary>
 ///     Получение артикулов у которых не хватает количества на складе,

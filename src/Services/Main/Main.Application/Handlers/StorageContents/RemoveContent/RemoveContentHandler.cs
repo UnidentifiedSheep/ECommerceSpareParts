@@ -7,7 +7,7 @@ using Contracts.StorageContent;
 using Main.Abstractions.Exceptions.Storages;
 using Main.Abstractions.Models;
 using Main.Application.Extensions;
-using Main.Application.Interfaces.Repositories;
+using Main.Application.Interfaces.Persistence;
 using Main.Entities.Event;
 using Main.Entities.Product;
 using Main.Entities.Storage;

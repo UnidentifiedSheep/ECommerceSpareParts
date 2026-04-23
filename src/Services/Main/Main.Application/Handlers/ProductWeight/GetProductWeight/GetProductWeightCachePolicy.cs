@@ -1,7 +1,7 @@
 ﻿using Application.Common.Interfaces;
 using Main.Abstractions.Constants;
 
-namespace Main.Application.Handlers.ArticleWeight.GetArticleWeight;
+namespace Main.Application.Handlers.ProductWeight.GetProductWeight;
 
 public class GetProductWeightCachePolicy : ICachePolicy<GetProductWeightQuery>
 {

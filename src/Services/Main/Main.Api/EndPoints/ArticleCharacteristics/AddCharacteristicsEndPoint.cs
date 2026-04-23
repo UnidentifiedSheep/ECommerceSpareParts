@@ -1,7 +1,7 @@
 ﻿using Api.Common.Extensions;
 using Carter;
-using Main.Abstractions.Dtos.Amw.ArticleCharacteristics;
-using Main.Application.Handlers.ArticleCharacteristics.AddCharacteristics;
+using Main.Application.Dtos.Amw.ArticleCharacteristics;
+using Main.Application.Handlers.ProductCharacteristics.AddCharacteristics;
 using MediatR;
 
 namespace Main.Api.EndPoints.ArticleCharacteristics;

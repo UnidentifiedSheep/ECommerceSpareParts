@@ -1,8 +1,7 @@
 ﻿using System.Text.Json.Serialization;
-using Main.Abstractions.Dtos.Amw.Articles;
-using Main.Abstractions.Dtos.Anonymous.Articles;
+using Main.Application.Dtos.Product;
 
-namespace Main.Abstractions.Dtos.Cart;
+namespace Main.Application.Dtos.Cart;
 
 public record CartItemDto
 {

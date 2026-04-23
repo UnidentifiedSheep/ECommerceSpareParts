@@ -1,7 +1,7 @@
 ﻿using Application.Common.Validators;
 using FluentValidation;
 
-namespace Main.Application.Handlers.Permissions.GetPermission;
+namespace Main.Application.Handlers.Auth.GetPermission;
 
 public class GetPermissionsValidation : AbstractValidator<GetPermissionsQuery>
 {

@@ -1,13 +1,11 @@
 ﻿using Application.Common.Interfaces;
 using Application.Common.Interfaces.Repositories;
-using Main.Abstractions.Dtos.ArticleSizes;
 using Main.Abstractions.Exceptions.Articles;
-using Main.Application.Interfaces.Repositories;
+using Main.Application.Dtos.Product;
 using Main.Entities.Product;
-using Mapster;
 using Microsoft.EntityFrameworkCore;
 
-namespace Main.Application.Handlers.ArticleSizes.GetArticleSizes;
+namespace Main.Application.Handlers.ProductSizes.GetProductSizes;
 
 public record GetProductSizeQuery(int ProductId) : IQuery<GetProductSizesResult>;
 

@@ -1,7 +1,7 @@
 using Application.Common.Validators;
 using FluentValidation;
 
-namespace Main.Application.Handlers.Articles.GetArticleCrosses;
+namespace Main.Application.Handlers.Products.GetProductCrosses;
 
 public class GetArticleCrossesAmwValidation : AbstractValidator<GetProductCrossesQuery>
 {

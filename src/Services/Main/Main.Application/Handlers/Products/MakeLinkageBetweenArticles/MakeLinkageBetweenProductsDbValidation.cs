@@ -2,7 +2,7 @@
 using BulkValidation.Core.Interfaces;
 using Main.Entities;
 
-namespace Main.Application.Handlers.Articles.MakeLinkageBetweenArticles;
+namespace Main.Application.Handlers.Products.MakeLinkageBetweenArticles;
 
 public class MakeLinkageBetweenProductsDbValidation : AbstractDbValidation<MakeLinkageBetweenProductsCommand>
 {

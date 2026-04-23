@@ -1,7 +1,7 @@
 ﻿using Application.Common.Interfaces.Repositories;
 using Main.Entities.Product;
 
-namespace Main.Application.Interfaces.Repositories;
+namespace Main.Application.Interfaces.Persistence;
 
 public interface IProductRepository : IRepository<Product, int>
 {

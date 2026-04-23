@@ -1,9 +1,8 @@
 ﻿using System.Linq.Expressions;
-using Main.Abstractions.Dtos.Amw.Permissions;
-using Main.Abstractions.Dtos.Roles;
+using Main.Application.Dtos.Auth;
 using Main.Entities.Auth;
 
-namespace Main.Application.Handlers.Currencies.Projections;
+namespace Main.Application.Handlers.Projections;
 
 public static class AuthProjections
 {

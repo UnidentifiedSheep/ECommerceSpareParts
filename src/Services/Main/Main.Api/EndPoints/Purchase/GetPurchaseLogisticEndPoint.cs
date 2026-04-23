@@ -1,7 +1,7 @@
 ﻿using Api.Common.Extensions;
 using Carter;
 using Enums;
-using Main.Abstractions.Dtos.Amw.Purchase;
+using Main.Application.Dtos.Amw.Purchase;
 using Main.Application.Handlers.Purchases.GetPurchaseLogistic;
 using MediatR;
 

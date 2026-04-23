@@ -1,7 +1,7 @@
 ﻿using Api.Common.Extensions;
 using Carter;
 using Enums;
-using Main.Application.Handlers.ArticleSizes.SetArticleSizes;
+using Main.Application.Handlers.ProductSizes.SetProductSizes;
 using MediatR;
 
 namespace Main.Api.EndPoints.ArticleSize;

@@ -1,4 +1,4 @@
-﻿namespace Main.Abstractions.Dtos.Amw.Logistics;
+﻿namespace Main.Application.Dtos.Amw.Logistics;
 
 public class LogisticsItemDto
 {

@@ -1,7 +1,6 @@
-using Main.Abstractions.Dtos.Amw.Users;
-using Main.Abstractions.Dtos.Currencies;
+using Main.Application.Dtos.Currencies;
 
-namespace Main.Abstractions.Dtos.Amw.Purchase;
+namespace Main.Application.Dtos.Amw.Purchase;
 
 public class PurchaseDto
 {

@@ -1,6 +1,6 @@
 using Application.Common.Interfaces;
 
-namespace Main.Application.Handlers.Articles.GetArticleCrosses;
+namespace Main.Application.Handlers.Products.GetProductCrosses;
 
 public class GetArticleCrossesAmwLogSettings : ILoggableRequest<GetProductCrossesQuery>
 {

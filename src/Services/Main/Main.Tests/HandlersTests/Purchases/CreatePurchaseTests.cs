@@ -1,7 +1,7 @@
 ﻿using FluentValidation;
 using Main.Abstractions.Constants;
-using Main.Abstractions.Dtos.Amw.Purchase;
-using Main.Abstractions.Dtos.Amw.Storage;
+using Main.Application.Dtos.Amw.Purchase;
+using Main.Application.Dtos.Storage;
 using Main.Application.Handlers.Purchases.CreatePurchase;
 using Main.Entities;
 using Main.Entities.Currency;

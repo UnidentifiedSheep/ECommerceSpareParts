@@ -1,6 +1,6 @@
 ﻿using Api.Common.Extensions;
 using Carter;
-using Main.Application.Handlers.Roles.AddPermissionToRole;
+using Main.Application.Handlers.Auth.AddPermissionToRole;
 using MediatR;
 
 namespace Main.Api.EndPoints.Roles;

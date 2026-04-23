@@ -1,15 +1,12 @@
-using Abstractions.Interfaces.Services;
 using Application.Common.Interfaces;
 using Application.Common.Interfaces.Repositories;
 using Attributes;
-using Main.Abstractions.Dtos.Amw.ArticleReservations;
 using Main.Abstractions.Exceptions.Articles;
-using Main.Entities;
+using Main.Application.Dtos.Product;
 using Main.Entities.Storage;
-using Mapster;
 using MediatR;
 
-namespace Main.Application.Handlers.ArticleReservations.EditArticleReservation;
+namespace Main.Application.Handlers.ProductReservations.EditProductReservation;
 
 [AutoSave]
 [Transactional]

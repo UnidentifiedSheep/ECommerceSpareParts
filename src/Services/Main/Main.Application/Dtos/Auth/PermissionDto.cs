@@ -1,6 +1,6 @@
 ﻿using System.Text.Json.Serialization;
 
-namespace Main.Abstractions.Dtos.Amw.Permissions;
+namespace Main.Application.Dtos.Auth;
 
 public record PermissionDto
 {

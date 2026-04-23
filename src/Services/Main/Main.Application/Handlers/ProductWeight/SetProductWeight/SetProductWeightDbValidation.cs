@@ -2,7 +2,7 @@
 using BulkValidation.Core.Interfaces;
 using Main.Entities;
 
-namespace Main.Application.Handlers.ArticleWeight.SetArticleWeight;
+namespace Main.Application.Handlers.ProductWeight.SetProductWeight;
 
 public class SetProductWeightDbValidation : AbstractDbValidation<SetArticleWeightCommand>
 {

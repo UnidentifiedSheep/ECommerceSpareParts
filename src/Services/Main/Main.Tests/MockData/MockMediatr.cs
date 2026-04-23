@@ -1,10 +1,10 @@
 using Bogus;
-using Main.Abstractions.Dtos.Amw.Sales;
-using Main.Abstractions.Dtos.Emails;
 using Main.Abstractions.Models;
-using Main.Application.Handlers.Articles.CreateArticles;
+using Main.Application.Dtos.Amw.Sales;
+using Main.Application.Dtos.Emails;
 using Main.Application.Handlers.Balance.CreateTransaction;
 using Main.Application.Handlers.Producers.CreateProducer;
+using Main.Application.Handlers.Products.CreateProducts;
 using Main.Application.Handlers.Sales.CreateSale;
 using Main.Application.Handlers.StorageContents.AddContent;
 using Main.Application.Handlers.StorageOwners.AddStorageToUser;

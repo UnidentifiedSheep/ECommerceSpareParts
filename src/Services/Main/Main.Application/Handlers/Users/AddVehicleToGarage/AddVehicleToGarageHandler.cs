@@ -1,9 +1,9 @@
 using Abstractions.Interfaces.Services;
 using Application.Common.Interfaces;
 using Attributes;
-using Main.Abstractions.Dtos.Member.Vehicles;
 using Main.Abstractions.Exceptions.Vehicles;
 using Main.Abstractions.Interfaces.DbRepositories;
+using Main.Application.Dtos.Member.Vehicles;
 using Main.Entities;
 using Main.Entities.User;
 using Mapster;

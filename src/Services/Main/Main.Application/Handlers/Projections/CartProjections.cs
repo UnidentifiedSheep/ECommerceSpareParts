@@ -1,9 +1,8 @@
 ﻿using System.Linq.Expressions;
 using LinqKit;
-using Main.Abstractions.Dtos.Amw.Articles;
-using Main.Abstractions.Dtos.Cart;
+using Main.Application.Dtos.Cart;
 
-namespace Main.Application.Handlers.Currencies.Projections;
+namespace Main.Application.Handlers.Projections;
 
 public static class CartProjections
 {

@@ -1,7 +1,7 @@
 ﻿using Api.Common.Extensions;
 using Carter;
 using Enums;
-using Main.Application.Handlers.ArticleCharacteristics.DeleteCharacteristics;
+using Main.Application.Handlers.ProductCharacteristics.DeleteCharacteristics;
 using MediatR;
 
 namespace Main.Api.EndPoints.ArticleCharacteristics;

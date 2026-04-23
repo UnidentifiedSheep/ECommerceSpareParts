@@ -1,7 +1,7 @@
 ﻿using Enums;
-using Main.Abstractions.Dtos.Amw.Purchase;
-using Main.Application.Handlers.ArticleSizes.SetArticleSizes;
-using Main.Application.Handlers.ArticleWeight.SetArticleWeight;
+using Main.Application.Dtos.Amw.Purchase;
+using Main.Application.Handlers.ProductSizes.SetProductSizes;
+using Main.Application.Handlers.ProductWeight.SetProductWeight;
 using Main.Application.Handlers.Purchases.CreateFullPurchase;
 using Main.Application.Handlers.Purchases.EditFullPurchase;
 using Main.Application.Handlers.StorageRoutes.AddStorageRoute;

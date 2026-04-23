@@ -1,7 +1,7 @@
 using System.Text.Json.Serialization;
-using Main.Abstractions.Dtos.Currencies;
+using Main.Application.Dtos.Currencies;
 
-namespace Main.Abstractions.Dtos.Amw.Storage;
+namespace Main.Application.Dtos.Storage;
 
 public record StorageContentDto
 {

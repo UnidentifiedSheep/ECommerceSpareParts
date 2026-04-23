@@ -17,9 +17,6 @@ public class CoefficientConfiguration : IEntityTypeConfiguration<Coefficient>
             .HasMaxLength(256)
             .HasColumnName("name");
         
-        builder.Property(e => e.Order)
-            .HasColumnName("order");
-        
         builder.Property(e => e.Type)
             .HasMaxLength(56)
             .HasColumnName("type");

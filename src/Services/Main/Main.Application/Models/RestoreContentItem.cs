@@ -1,5 +1,5 @@
 using Main.Entities.Sale;
 
-namespace Main.Abstractions.Models;
+namespace Main.Application.Models;
 
 public record RestoreContentItem(SaleContentDetail Detail, int ProductId);

@@ -1,8 +1,8 @@
 using Abstractions.Models;
 using Api.Common.Extensions;
 using Carter;
-using Main.Abstractions.Dtos.Roles;
-using Main.Application.Handlers.Roles.GetRoles;
+using Main.Application.Dtos.Auth;
+using Main.Application.Handlers.Auth.GetRoles;
 using Mapster;
 using MediatR;
 

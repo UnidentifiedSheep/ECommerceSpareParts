@@ -1,4 +1,4 @@
-namespace Main.Abstractions.Dtos.Amw.Purchase;
+namespace Main.Application.Dtos.Amw.Purchase;
 
 public class NewPurchaseContentDto
 {

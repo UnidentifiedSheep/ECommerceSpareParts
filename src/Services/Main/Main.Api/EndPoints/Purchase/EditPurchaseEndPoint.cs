@@ -1,7 +1,7 @@
 using Abstractions.Interfaces;
 using Api.Common.Extensions;
 using Carter;
-using Main.Abstractions.Dtos.Amw.Purchase;
+using Main.Application.Dtos.Amw.Purchase;
 using Main.Application.Handlers.Purchases.EditFullPurchase;
 using MediatR;
 

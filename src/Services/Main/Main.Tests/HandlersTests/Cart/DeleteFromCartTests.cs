@@ -1,10 +1,10 @@
 ﻿using Bogus;
-using Main.Abstractions.Dtos.Emails;
 using Main.Abstractions.Exceptions.Cart;
-using Main.Application.Handlers.Articles.CreateArticles;
+using Main.Application.Dtos.Emails;
 using Main.Application.Handlers.Cart.AddToCart;
 using Main.Application.Handlers.Cart.DeleteFromCart;
 using Main.Application.Handlers.Producers.CreateProducer;
+using Main.Application.Handlers.Products.CreateProducts;
 using Main.Application.Handlers.Users.CreateUser;
 using Main.Enums;
 using Main.Persistence.Context;

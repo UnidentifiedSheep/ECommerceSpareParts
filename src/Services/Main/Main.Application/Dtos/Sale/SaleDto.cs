@@ -1,7 +1,7 @@
 using System.Text.Json.Serialization;
-using Main.Abstractions.Dtos.Currencies;
+using Main.Application.Dtos.Currencies;
 
-namespace Main.Abstractions.Dtos.Amw.Sales;
+namespace Main.Application.Dtos.Sale;
 
 public record SaleDto
 {

@@ -1,6 +1,6 @@
 using Carter;
-using Main.Abstractions.Dtos.Anonymous.Articles;
-using Main.Application.Handlers.ArticlePairs.GetArticlePair;
+using Main.Application.Dtos.Anonymous.Articles;
+using Main.Application.Handlers.Products.GetProductPair;
 using Mapster;
 using MediatR;
 

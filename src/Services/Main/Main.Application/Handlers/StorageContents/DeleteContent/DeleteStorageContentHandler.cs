@@ -11,7 +11,7 @@ using Exceptions.Base;
 using Main.Abstractions.Exceptions.Storages;
 using Main.Abstractions.Interfaces.Services;
 using Main.Application.Extensions;
-using Main.Application.Interfaces.Repositories;
+using Main.Application.Interfaces.Persistence;
 using Main.Application.Notifications;
 using Main.Entities;
 using Main.Entities.Event;

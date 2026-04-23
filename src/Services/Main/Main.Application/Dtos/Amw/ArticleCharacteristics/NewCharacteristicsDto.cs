@@ -1,4 +1,4 @@
-namespace Main.Abstractions.Dtos.Amw.ArticleCharacteristics;
+namespace Main.Application.Dtos.Amw.ArticleCharacteristics;
 
 public class NewCharacteristicsDto
 {

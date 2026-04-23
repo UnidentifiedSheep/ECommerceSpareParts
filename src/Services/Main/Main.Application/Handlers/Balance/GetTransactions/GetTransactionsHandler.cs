@@ -1,7 +1,7 @@
 using Abstractions.Models;
 using Application.Common.Interfaces;
-using Main.Abstractions.Dtos.Amw.Balances;
 using Main.Abstractions.Interfaces.DbRepositories;
+using Main.Application.Dtos.Amw.Balances;
 using Mapster;
 
 namespace Main.Application.Handlers.Balance.GetTransactions;

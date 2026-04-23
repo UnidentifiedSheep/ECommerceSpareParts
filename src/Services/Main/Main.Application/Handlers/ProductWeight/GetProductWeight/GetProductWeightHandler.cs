@@ -1,18 +1,16 @@
 ﻿using Application.Common.Interfaces;
 using Application.Common.Interfaces.Repositories;
-using Main.Abstractions.Dtos.ArticleWeight;
 using Main.Abstractions.Exceptions.Articles;
-using Main.Application.Interfaces.Repositories;
-using Main.Entities.Product;
+using Main.Application.Dtos.Product;
 using Microsoft.EntityFrameworkCore;
 
-namespace Main.Application.Handlers.ArticleWeight.GetArticleWeight;
+namespace Main.Application.Handlers.ProductWeight.GetProductWeight;
 
 public record GetProductWeightQuery(int ProductId) : IQuery<GetProductWeightResult>;
 
 public record GetProductWeightResult(ProductWeightDto ProductWeight);
 
-public class GetProductWeightHandler(IReadRepository<ProductWeight, int> context)
+public class GetProductWeightHandler(IReadRepository<Entities.Product.ProductWeight, int> context)
     : IQueryHandler<GetProductWeightQuery, GetProductWeightResult>
 {
     public async Task<GetProductWeightResult> Handle(GetProductWeightQuery request, CancellationToken cancellationToken)

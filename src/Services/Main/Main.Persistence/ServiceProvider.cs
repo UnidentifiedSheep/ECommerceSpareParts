@@ -1,7 +1,7 @@
 using Abstractions.Interfaces;
 using Application.Common.Interfaces.Repositories;
 using BulkValidation.Pgsql.Extensions;
-using Main.Application.Interfaces.Repositories;
+using Main.Application.Interfaces.Persistence;
 using Main.Persistence.Context;
 using Main.Persistence.Repositories;
 using Main.Persistence.Repositories.Storage;

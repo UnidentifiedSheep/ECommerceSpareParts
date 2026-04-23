@@ -2,7 +2,7 @@
 using Api.Common.Extensions;
 using Carter;
 using Enums;
-using Main.Abstractions.Dtos.Amw.StorageRoutes;
+using Main.Application.Dtos.Storage;
 using Main.Application.Handlers.StorageRoutes.GetStorageRoutes;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;

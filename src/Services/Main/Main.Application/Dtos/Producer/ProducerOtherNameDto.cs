@@ -1,6 +1,6 @@
 using System.Text.Json.Serialization;
 
-namespace Main.Abstractions.Dtos.Amw.Producers;
+namespace Main.Application.Dtos.Producer;
 
 public record ProducerOtherNameDto
 {

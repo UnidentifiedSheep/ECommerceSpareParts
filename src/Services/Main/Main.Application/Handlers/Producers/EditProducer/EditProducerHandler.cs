@@ -2,9 +2,9 @@ using Abstractions.Interfaces.Services;
 using Application.Common.Interfaces;
 using Application.Common.Interfaces.Repositories;
 using Attributes;
-using Main.Abstractions.Dtos.Amw.Producers;
 using Main.Abstractions.Exceptions.Producers;
-using Main.Application.Interfaces.Repositories;
+using Main.Application.Dtos.Producer;
+using Main.Application.Interfaces.Persistence;
 using Main.Entities.Producer;
 using MediatR;
 

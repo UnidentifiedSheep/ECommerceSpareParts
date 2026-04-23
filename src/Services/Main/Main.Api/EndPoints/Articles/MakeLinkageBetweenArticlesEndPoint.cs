@@ -1,7 +1,7 @@
 using Api.Common.Extensions;
 using Carter;
-using Main.Abstractions.Dtos.Amw.Articles;
-using Main.Application.Handlers.Articles.MakeLinkageBetweenArticles;
+using Main.Application.Dtos.Product;
+using Main.Application.Handlers.Products.MakeLinkageBetweenArticles;
 using Mapster;
 using MediatR;
 

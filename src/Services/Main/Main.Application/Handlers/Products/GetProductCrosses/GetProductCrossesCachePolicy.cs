@@ -2,7 +2,7 @@
 using Main.Abstractions.Constants;
 using Main.Abstractions.Models;
 
-namespace Main.Application.Handlers.Articles.GetArticleCrosses;
+namespace Main.Application.Handlers.Products.GetProductCrosses;
 
 public class GetProductCrossesCachePolicy : ICachePolicy<GetProductCrossesQuery>
 {

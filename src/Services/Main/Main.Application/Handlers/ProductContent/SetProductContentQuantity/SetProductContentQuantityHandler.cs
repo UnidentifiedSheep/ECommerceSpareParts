@@ -1,19 +1,17 @@
-using Abstractions.Interfaces.Services;
 using Application.Common.Interfaces;
 using Application.Common.Interfaces.Repositories;
 using Attributes;
 using Main.Abstractions.Exceptions.Articles;
-using Main.Entities.Product;
 using MediatR;
 
-namespace Main.Application.Handlers.ArticleContent.SetArticleContentCount;
+namespace Main.Application.Handlers.ProductContent.SetProductContentQuantity;
 
 [AutoSave]
 [Transactional]
 public record SetProductsContentCountCommand(int ParentProductId, int ChildProductId, int Quantity) : ICommand;
 
 public class SetProductContentQuantityHandler(
-    IRepository<ProductContent, (int, int)> contentRepository) 
+    IRepository<Entities.Product.ProductContent, (int, int)> contentRepository) 
     : ICommandHandler<SetProductsContentCountCommand>
 {
     public async Task<Unit> Handle(SetProductsContentCountCommand request, CancellationToken cancellationToken)

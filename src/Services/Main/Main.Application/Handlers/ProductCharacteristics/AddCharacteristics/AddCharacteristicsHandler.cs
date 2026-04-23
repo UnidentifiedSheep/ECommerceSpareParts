@@ -1,12 +1,11 @@
 using Abstractions.Interfaces.Services;
 using Application.Common.Interfaces;
 using Attributes;
-using Main.Abstractions.Dtos.Amw.ArticleCharacteristics;
-using Main.Entities;
+using Main.Application.Dtos.Amw.ArticleCharacteristics;
 using Main.Entities.Product;
 using Mapster;
 
-namespace Main.Application.Handlers.ArticleCharacteristics.AddCharacteristics;
+namespace Main.Application.Handlers.ProductCharacteristics.AddCharacteristics;
 
 [Transactional]
 public record AddCharacteristicsCommand(IEnumerable<NewCharacteristicsDto> Characteristics)

@@ -3,14 +3,11 @@ using Application.Common.Interfaces;
 using Application.Common.Interfaces.Repositories;
 using Attributes;
 using Enums;
-using Extensions;
-using Main.Abstractions.Exceptions.Articles;
 using Main.Application.Notifications;
-using Main.Entities;
 using Main.Entities.Product;
 using MediatR;
 
-namespace Main.Application.Handlers.ArticleSizes.SetArticleSizes;
+namespace Main.Application.Handlers.ProductSizes.SetProductSizes;
 
 [AutoSave]
 [Transactional]

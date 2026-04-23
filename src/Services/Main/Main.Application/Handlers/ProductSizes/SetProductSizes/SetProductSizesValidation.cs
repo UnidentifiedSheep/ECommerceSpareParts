@@ -1,7 +1,7 @@
 ﻿using FluentValidation;
 using Localization.Domain.Extensions;
 
-namespace Main.Application.Handlers.ArticleSizes.SetArticleSizes;
+namespace Main.Application.Handlers.ProductSizes.SetProductSizes;
 
 public class SetProductSizesValidation : AbstractValidator<SetProductSizesCommand>
 {

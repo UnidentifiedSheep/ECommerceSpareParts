@@ -1,6 +1,6 @@
 using Abstractions.Models;
 using Bogus;
-using Main.Abstractions.Dtos.Amw.Producers;
+using Main.Application.Dtos.Producer;
 using Main.Application.Handlers.Producers.EditProducer;
 using Main.Persistence.Context;
 using MediatR;

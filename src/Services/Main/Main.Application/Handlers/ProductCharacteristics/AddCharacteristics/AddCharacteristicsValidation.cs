@@ -1,7 +1,7 @@
 using FluentValidation;
 using Localization.Domain.Extensions;
 
-namespace Main.Application.Handlers.ArticleCharacteristics.AddCharacteristics;
+namespace Main.Application.Handlers.ProductCharacteristics.AddCharacteristics;
 
 public class AddCharacteristicsValidation : AbstractValidator<AddCharacteristicsCommand>
 {

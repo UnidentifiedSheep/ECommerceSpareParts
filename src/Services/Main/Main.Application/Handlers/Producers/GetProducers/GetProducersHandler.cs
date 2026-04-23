@@ -2,7 +2,7 @@ using Abstractions.Models;
 using Application.Common.Extensions;
 using Application.Common.Interfaces;
 using Application.Common.Interfaces.Repositories;
-using Main.Abstractions.Dtos.Anonymous.Producers;
+using Main.Application.Dtos.Producer;
 using Main.Entities.Producer;
 using Microsoft.EntityFrameworkCore;
 

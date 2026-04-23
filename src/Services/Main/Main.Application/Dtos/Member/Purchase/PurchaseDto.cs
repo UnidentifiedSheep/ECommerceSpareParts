@@ -1,4 +1,4 @@
-namespace Main.Abstractions.Dtos.Member.Purchase;
+namespace Main.Application.Dtos.Member.Purchase;
 
 public class PurchaseDto
 {

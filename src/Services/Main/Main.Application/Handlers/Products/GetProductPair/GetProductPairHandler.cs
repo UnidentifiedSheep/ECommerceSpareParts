@@ -1,12 +1,11 @@
 using Application.Common.Interfaces;
 using Application.Common.Interfaces.Repositories;
-using Main.Abstractions.Dtos.Amw.Articles;
-using Main.Application.Interfaces.Repositories;
+using Main.Application.Dtos.Product;
 using Main.Entities.Product;
 using Mapster;
 using Microsoft.EntityFrameworkCore;
 
-namespace Main.Application.Handlers.ArticlePairs.GetArticlePair;
+namespace Main.Application.Handlers.Products.GetProductPair;
 
 public record GetProductPairQuery(int ProductId) : IQuery<GetProductPairResult>;
 

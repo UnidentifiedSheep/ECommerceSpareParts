@@ -4,10 +4,9 @@ using Application.Common.Interfaces.Repositories;
 using Attributes;
 using Enums;
 using Main.Application.Notifications;
-using Main.Entities.Product;
 using MediatR;
 
-namespace Main.Application.Handlers.ArticleWeight.SetArticleWeight;
+namespace Main.Application.Handlers.ProductWeight.SetProductWeight;
 
 [AutoSave]
 [Transactional]
@@ -15,7 +14,7 @@ public record SetArticleWeightCommand(int ProductId, decimal Weight, WeightUnit 
 
 public class SetProductWeightHandler(
     IPublisher publisher,
-    IRepository<ProductWeight, int> repository,
+    IRepository<Entities.Product.ProductWeight, int> repository,
     IUnitOfWork unitOfWork) : ICommandHandler<SetArticleWeightCommand>
 {
     public async Task<Unit> Handle(SetArticleWeightCommand request, CancellationToken cancellationToken)
@@ -24,7 +23,7 @@ public class SetProductWeightHandler(
 
         if (weight == null)
         {
-            weight = ProductWeight.Create(request.ProductId, request.Weight, request.Unit);
+            weight = Entities.Product.ProductWeight.Create(request.ProductId, request.Weight, request.Unit);
             await unitOfWork.AddAsync(weight, cancellationToken);
         }
         else

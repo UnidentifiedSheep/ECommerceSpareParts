@@ -1,7 +1,7 @@
 ﻿using FluentValidation;
 using Localization.Domain.Extensions;
 
-namespace Main.Application.Handlers.ArticleWeight.SetArticleWeight;
+namespace Main.Application.Handlers.ProductWeight.SetProductWeight;
 
 public class SetProductWeightValidation : AbstractValidator<SetArticleWeightCommand>
 {

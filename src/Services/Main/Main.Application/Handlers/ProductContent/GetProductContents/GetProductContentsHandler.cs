@@ -1,18 +1,15 @@
 ﻿using Application.Common.Interfaces;
 using Application.Common.Interfaces.Repositories;
-using Main.Abstractions.Dtos.Amw.Articles;
-using Main.Abstractions.Dtos.Anonymous.Articles;
-using Main.Entities.Product;
-using Mapster;
+using Main.Application.Dtos.Product;
 using Microsoft.EntityFrameworkCore;
 
-namespace Main.Application.Handlers.ArticleContent.GetArticleContents;
+namespace Main.Application.Handlers.ProductContent.GetProductContents;
 
 public record GetProductContentsQuery(int ProductId) : IQuery<GetProductContentsResult>;
 
 public record GetProductContentsResult(IReadOnlyList<ProductContentDto> Contents);
 
-public class GetProductContentsHandler(IReadRepository<ProductContent, (int, int)> repository)
+public class GetProductContentsHandler(IReadRepository<Entities.Product.ProductContent, (int, int)> repository)
     : IQueryHandler<GetProductContentsQuery, GetProductContentsResult>
 {
     public async Task<GetProductContentsResult> Handle(

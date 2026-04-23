@@ -1,7 +1,7 @@
 using Abstractions.Interfaces;
 using Api.Common.Extensions;
 using Carter;
-using Main.Abstractions.Dtos.Amw.Storage;
+using Main.Application.Dtos.Storage;
 using Main.Application.Handlers.StorageContents.AddContent;
 using Main.Enums;
 using MediatR;

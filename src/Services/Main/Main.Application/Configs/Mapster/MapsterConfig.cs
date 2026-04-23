@@ -3,33 +3,27 @@ using Application.Common.Extensions;
 using Application.Common.Models;
 using Contracts.Models.StorageContent;
 using Extensions;
-using Main.Abstractions.Dtos.Amw.ArticleCharacteristics;
-using Main.Abstractions.Dtos.Amw.ArticleCoefficients;
-using Main.Abstractions.Dtos.Amw.ArticleReservations;
-using Main.Abstractions.Dtos.Amw.Articles;
-using Main.Abstractions.Dtos.Amw.Balances;
-using Main.Abstractions.Dtos.Amw.Coefficients;
-using Main.Abstractions.Dtos.Amw.Logistics;
-using Main.Abstractions.Dtos.Amw.Permissions;
-using Main.Abstractions.Dtos.Amw.Producers;
-using Main.Abstractions.Dtos.Amw.Purchase;
-using Main.Abstractions.Dtos.Amw.Sales;
-using Main.Abstractions.Dtos.Amw.Storage;
-using Main.Abstractions.Dtos.Amw.StorageRoutes;
-using Main.Abstractions.Dtos.Amw.Users;
-using Main.Abstractions.Dtos.Anonymous.Articles;
-using Main.Abstractions.Dtos.Anonymous.Producers;
-using Main.Abstractions.Dtos.ArticleSizes;
-using Main.Abstractions.Dtos.ArticleWeight;
-using Main.Abstractions.Dtos.Cart;
-using Main.Abstractions.Dtos.Currencies;
-using Main.Abstractions.Dtos.Emails;
-using Main.Abstractions.Dtos.Member.Vehicles;
-using Main.Abstractions.Dtos.Roles;
-using Main.Abstractions.Dtos.Services.Articles;
 using Main.Abstractions.Models;
 using Main.Abstractions.Models.Logistics;
 using Main.Application.Configs.Mapster.ContractMappings;
+using Main.Application.Dtos.Amw.ArticleCharacteristics;
+using Main.Application.Dtos.Amw.ArticleCoefficients;
+using Main.Application.Dtos.Amw.Balances;
+using Main.Application.Dtos.Amw.Coefficients;
+using Main.Application.Dtos.Amw.Logistics;
+using Main.Application.Dtos.Amw.Purchase;
+using Main.Application.Dtos.Amw.Sales;
+using Main.Application.Dtos.Amw.Storage;
+using Main.Application.Dtos.Auth;
+using Main.Application.Dtos.Cart;
+using Main.Application.Dtos.Currencies;
+using Main.Application.Dtos.Emails;
+using Main.Application.Dtos.Member.Vehicles;
+using Main.Application.Dtos.Producer;
+using Main.Application.Dtos.Product;
+using Main.Application.Dtos.Sale;
+using Main.Application.Dtos.Storage;
+using Main.Application.Dtos.Users;
 using Main.Application.Extensions;
 using Main.Application.Handlers.ArticlePairs.CreatePair;
 using Main.Application.Handlers.Currencies.CreateCurrency;
@@ -47,11 +41,11 @@ using Main.Entities.Transaction;
 using Main.Entities.User;
 using Mapster;
 using Utils;
-using MemberArticleFullDto = Main.Abstractions.Dtos.Member.Articles.ArticleFullDto;
+using MemberArticleFullDto = Main.Application.Dtos.Member.Articles.ArticleFullDto;
 using AmwArticleDto = Main.Abstractions.Dtos.Amw.Articles.ArticleDto;
-using AnonymousArticleDto = Main.Abstractions.Dtos.Anonymous.Articles.ArticleDto;
-using AmwPurchaseDto = Main.Abstractions.Dtos.Amw.Purchase.PurchaseDto;
-using MemberPurchaseDto = Main.Abstractions.Dtos.Member.Purchase.PurchaseDto;
+using AnonymousArticleDto = Main.Application.Dtos.Anonymous.Articles.ArticleDto;
+using AmwPurchaseDto = Main.Application.Dtos.Amw.Purchase.PurchaseDto;
+using MemberPurchaseDto = Main.Application.Dtos.Member.Purchase.PurchaseDto;
 using Currency = Main.Entities.Currency.Currency;
 using ContractArticle = Contracts.Models.Articles.Article;
 using ArticleCoefficientContract = Contracts.Models.ArticleCoefficients.ArticleCoefficient;
@@ -77,7 +71,7 @@ public static class MapsterConfig
             .Map(d => d.CategoryId, s => s.CategoryId)
             .Map(d => d.Popularity, s => s.Popularity);
 
-        TypeAdapterConfig<ArticleCoefficientDto, ArticleCoefficientContract>.NewConfig()
+        TypeAdapterConfig<ProductCoefficientDto, ArticleCoefficientContract>.NewConfig()
             .Map(d => d.ArticleId, s => s.ArticleId)
             .Map(d => d.ValidTill, s => s.ValidTill)
             .Map(d => d.CreatedAt, s => s.CreatedAt)
@@ -89,7 +83,7 @@ public static class MapsterConfig
             .Map(d => d.Order, s => s.Order)
             .Map(d => d.Type, s => s.Type);
 
-        TypeAdapterConfig<ProductCoefficient, ArticleCoefficientDto>.NewConfig()
+        TypeAdapterConfig<ProductCoefficient, ProductCoefficientDto>.NewConfig()
             .Map(d => d.ArticleId, s => s.ProductId)
             .Map(d => d.ValidTill, s => s.ValidTill)
             .Map(d => d.CreatedAt, s => s.CreatedAt)

@@ -1,6 +1,6 @@
 using System.Text.Json.Serialization;
 
-namespace Main.Abstractions.Dtos.Amw.ArticleReservations;
+namespace Main.Application.Dtos.Product;
 
 public class EditProductReservationDto
 {

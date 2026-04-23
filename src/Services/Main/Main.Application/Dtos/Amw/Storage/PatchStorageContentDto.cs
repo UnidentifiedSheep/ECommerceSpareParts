@@ -1,6 +1,6 @@
 using Abstractions.Models;
 
-namespace Main.Abstractions.Dtos.Amw.Storage;
+namespace Main.Application.Dtos.Amw.Storage;
 
 public class PatchStorageContentDto
 {

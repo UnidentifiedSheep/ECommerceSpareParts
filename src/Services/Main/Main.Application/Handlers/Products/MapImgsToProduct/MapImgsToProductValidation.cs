@@ -2,7 +2,7 @@
 using FluentValidation;
 using Localization.Domain.Extensions;
 
-namespace Main.Application.Handlers.ArticleImages.MapImgsToArticle;
+namespace Main.Application.Handlers.Products.MapImgsToProduct;
 
 public class MapImgsToProductValidation : AbstractValidator<MapImgsToProductCommand>
 {

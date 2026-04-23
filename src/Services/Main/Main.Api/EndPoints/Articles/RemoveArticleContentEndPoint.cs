@@ -1,6 +1,6 @@
 using Api.Common.Extensions;
 using Carter;
-using Main.Application.Handlers.ArticleContent.RemoveArticleContent;
+using Main.Application.Handlers.ProductContent.RemoveProductContent;
 using MediatR;
 
 namespace Main.Api.EndPoints.Articles;

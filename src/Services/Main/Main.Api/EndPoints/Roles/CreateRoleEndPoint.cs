@@ -1,6 +1,6 @@
 using Api.Common.Extensions;
 using Carter;
-using Main.Application.Handlers.Roles.CreateRole;
+using Main.Application.Handlers.Auth.CreateRole;
 using MediatR;
 
 namespace Main.Api.EndPoints.Roles;

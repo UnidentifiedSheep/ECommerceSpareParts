@@ -1,6 +1,6 @@
 using System.Text.Json.Serialization;
 
-namespace Main.Abstractions.Dtos.Roles;
+namespace Main.Application.Dtos.Auth;
 
 public record RoleDto
 {

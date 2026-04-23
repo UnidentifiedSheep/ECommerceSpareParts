@@ -1,7 +1,7 @@
 using FluentValidation;
 using Localization.Domain.Extensions;
 
-namespace Main.Application.Handlers.Roles.CreateRole;
+namespace Main.Application.Handlers.Auth.CreateRole;
 
 public class CreateRoleValidation : AbstractValidator<CreateRoleCommand>
 {

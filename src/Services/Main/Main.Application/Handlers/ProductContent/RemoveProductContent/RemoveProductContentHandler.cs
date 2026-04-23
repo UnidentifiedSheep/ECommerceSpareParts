@@ -3,17 +3,16 @@ using Application.Common.Interfaces;
 using Application.Common.Interfaces.Repositories;
 using Attributes;
 using Main.Abstractions.Exceptions.Articles;
-using Main.Entities.Product;
 using MediatR;
 
-namespace Main.Application.Handlers.ArticleContent.RemoveArticleContent;
+namespace Main.Application.Handlers.ProductContent.RemoveProductContent;
 
 [AutoSave]
 [Transactional]
 public record RemoveProductContentCommand(int ParentProductId, int ChildProductId) : ICommand;
 
 public class RemoveProductContentHandler(
-    IRepository<ProductContent, (int, int)> repository,
+    IRepository<Entities.Product.ProductContent, (int, int)> repository,
     IUnitOfWork unitOfWork) : ICommandHandler<RemoveProductContentCommand>
 {
     public async Task<Unit> Handle(RemoveProductContentCommand request, CancellationToken cancellationToken)

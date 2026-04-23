@@ -1,7 +1,7 @@
 ﻿using Application.Common.Interfaces.Repositories;
 using Main.Entities.Storage;
 
-namespace Main.Application.Interfaces.Repositories;
+namespace Main.Application.Interfaces.Persistence;
 
 public interface IStorageRouteRepository : IRepository<StorageRoute, Guid>
 {

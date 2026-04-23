@@ -1,8 +1,8 @@
 ﻿using Api.Common.Extensions;
 using Carter;
 using Enums;
-using Main.Abstractions.Dtos.ArticleSizes;
-using Main.Application.Handlers.ArticleSizes.GetArticleSizes;
+using Main.Application.Dtos.Product;
+using Main.Application.Handlers.ProductSizes.GetProductSizes;
 using MediatR;
 
 namespace Main.Api.EndPoints.ArticleSize;

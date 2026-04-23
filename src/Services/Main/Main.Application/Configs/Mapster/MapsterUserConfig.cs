@@ -1,6 +1,5 @@
 ﻿using Extensions;
-using Main.Abstractions.Dtos.Amw.Users;
-using Main.Abstractions.Dtos.Users;
+using Main.Application.Dtos.Users;
 using Mapster;
 
 using CoreUserInfo = Abstractions.Models.UserInfo;

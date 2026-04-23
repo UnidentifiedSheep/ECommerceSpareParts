@@ -3,13 +3,12 @@ using Application.Common.Extensions;
 using Application.Common.Interfaces;
 using Application.Common.Interfaces.Repositories;
 using LinqKit;
-using Main.Abstractions.Dtos.Roles;
-using Main.Application.Handlers.Currencies.Projections;
+using Main.Application.Dtos.Auth;
+using Main.Application.Handlers.Projections;
 using Main.Entities.Auth;
-using Mapster;
 using Microsoft.EntityFrameworkCore;
 
-namespace Main.Application.Handlers.Roles.GetRoles;
+namespace Main.Application.Handlers.Auth.GetRoles;
 
 public record GetRolesQuery(string? SearchTerm, PaginationModel Pagination) : IQuery<GetRolesResult>;
 

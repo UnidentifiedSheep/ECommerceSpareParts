@@ -2,13 +2,12 @@
 using Application.Common.Extensions;
 using Application.Common.Interfaces;
 using Application.Common.Interfaces.Repositories;
-using Main.Abstractions.Dtos.Amw.Permissions;
-using Main.Application.Handlers.Currencies.Projections;
+using Main.Application.Dtos.Auth;
+using Main.Application.Handlers.Projections;
 using Main.Entities.Auth;
-using Mapster;
 using Microsoft.EntityFrameworkCore;
 
-namespace Main.Application.Handlers.Permissions.GetPermission;
+namespace Main.Application.Handlers.Auth.GetPermission;
 
 public record GetPermissionsQuery(PaginationModel Pagination) : IQuery<GetPermissionsResult>;
 

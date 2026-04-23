@@ -1,4 +1,4 @@
-namespace Main.Abstractions.Dtos.Amw.Sales;
+namespace Main.Application.Dtos.Amw.Sales;
 
 public class EditSaleContentDto
 {

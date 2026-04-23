@@ -1,11 +1,9 @@
 using Abstractions.Interfaces.Services;
 using Application.Common.Interfaces;
 using Attributes;
-using Main.Entities;
-using Main.Entities.Product;
 using MediatR;
 
-namespace Main.Application.Handlers.ArticleContent.AddArticleContent;
+namespace Main.Application.Handlers.ProductContent.AddProductContent;
 
 [AutoSave]
 [Transactional]
@@ -17,7 +15,7 @@ public class AddProductContentHandler(IUnitOfWork unitOfWork) : ICommandHandler<
     {
         var contents = request.Contents
             .Select(x =>
-                ProductContent.Create(request.ParentProductId, x.Key, x.Value)
+                Entities.Product.ProductContent.Create(request.ParentProductId, x.Key, x.Value)
             ).ToList();
 
         await unitOfWork.AddRangeAsync(contents, cancellationToken);

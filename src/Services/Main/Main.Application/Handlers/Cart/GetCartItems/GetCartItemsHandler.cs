@@ -3,8 +3,8 @@ using Application.Common.Extensions;
 using Application.Common.Interfaces;
 using Application.Common.Interfaces.Repositories;
 using LinqKit;
-using Main.Abstractions.Dtos.Cart;
-using Main.Application.Handlers.Currencies.Projections;
+using Main.Application.Dtos.Cart;
+using Main.Application.Handlers.Projections;
 using Mapster;
 using Microsoft.EntityFrameworkCore;
 

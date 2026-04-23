@@ -1,7 +1,7 @@
 using FluentValidation;
 using Localization.Domain.Extensions;
 
-namespace Main.Application.Handlers.ArticleReservations.GetArticlesWithNotEnoughStock;
+namespace Main.Application.Handlers.ProductReservations.GetArticlesWithNotEnoughStock;
 
 public class GetArticlesWithNotEnoughStockValidation : AbstractValidator<GetArticlesWithNotEnoughStockQuery>
 {

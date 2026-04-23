@@ -1,8 +1,8 @@
 ﻿using Api.Common.Extensions;
 using Carter;
 using Enums;
-using Main.Abstractions.Dtos.Amw.Logistics;
-using Main.Abstractions.Dtos.Amw.StorageRoutes;
+using Main.Application.Dtos.Amw.Logistics;
+using Main.Application.Dtos.Storage;
 using Main.Application.Handlers.Logistics.CalculateDeliveryCost;
 using Main.Enums;
 using MediatR;

@@ -1,7 +1,7 @@
 using FluentValidation;
 using Localization.Domain.Extensions;
 
-namespace Main.Application.Handlers.ArticleContent.AddArticleContent;
+namespace Main.Application.Handlers.ProductContent.AddProductContent;
 
 public class AddProductContentValidation : AbstractValidator<AddProductContentCommand>
 {

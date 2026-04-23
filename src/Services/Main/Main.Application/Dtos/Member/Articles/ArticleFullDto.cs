@@ -1,4 +1,4 @@
-namespace Main.Abstractions.Dtos.Member.Articles;
+namespace Main.Application.Dtos.Member.Articles;
 
 public class ArticleFullDto
 {

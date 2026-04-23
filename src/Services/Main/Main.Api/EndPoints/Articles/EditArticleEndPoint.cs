@@ -1,7 +1,7 @@
 using Api.Common.Extensions;
 using Carter;
-using Main.Abstractions.Dtos.Amw.Articles;
-using Main.Application.Handlers.Articles.PatchArticle;
+using Main.Application.Dtos.Product;
+using Main.Application.Handlers.Products.PatchProduct;
 using MediatR;
 
 namespace Main.Api.EndPoints.Articles;

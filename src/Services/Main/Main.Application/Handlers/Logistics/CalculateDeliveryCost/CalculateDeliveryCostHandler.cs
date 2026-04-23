@@ -2,14 +2,14 @@
 using Application.Common.Interfaces;
 using Application.Common.Interfaces.Repositories;
 using Enums;
-using Main.Abstractions.Dtos.Amw.Logistics;
-using Main.Abstractions.Dtos.Amw.StorageRoutes;
 using Main.Abstractions.Exceptions.Articles;
 using Main.Abstractions.Exceptions.Logistics;
 using Main.Abstractions.Exceptions.Storages;
-using Main.Abstractions.Interfaces.DbRepositories;
 using Main.Abstractions.Interfaces.Logistics;
 using Main.Abstractions.Models.Logistics;
+using Main.Application.Dtos.Amw.Logistics;
+using Main.Application.Dtos.Storage;
+using Main.Application.Interfaces.Persistence;
 using Main.Entities;
 using Main.Entities.Product;
 using Main.Entities.Storage;
@@ -29,7 +29,7 @@ public record CalculateDeliveryCostResult(StorageRouteDto Route, DeliveryCostDto
 public class CalculateDeliveryCostHandler(
     ILogisticsCostService logisticsCostService,
     IRepository<ProductSize, int> sizesRepository,
-    IRepository<StorageRoute, Guid> storageRoutesRepository,
+    IStorageRouteRepository storageRoutesRepository,
     IRepository<ProductWeight, int> weightRepository,
     ICurrencyConverter currencyConverter)
     : IQueryHandler<CalculateDeliveryCostQuery, CalculateDeliveryCostResult>
@@ -58,8 +58,12 @@ public class CalculateDeliveryCostHandler(
 
     private async Task<StorageRoute> GetStorageRoute(string from, string to, CancellationToken cancellationToken)
     {
-        return await storageRoutesRepository.GetStorageRouteAsync(from, to, true, false,
-                   cancellationToken, x => x.Currency)
+        var criteria = Criteria<StorageRoute>.New()
+            .Include(x => x.Currency)
+            .Track(false)
+            .Build();
+        
+        return await storageRoutesRepository.GetActiveRouteAsync(from, to, criteria, cancellationToken)
                ?? throw new StorageRouteNotFound(from, to);
     }
 

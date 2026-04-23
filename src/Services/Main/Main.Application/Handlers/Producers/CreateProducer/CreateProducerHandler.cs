@@ -1,7 +1,7 @@
 using Abstractions.Interfaces.Services;
 using Application.Common.Interfaces;
 using Attributes;
-using Main.Abstractions.Dtos.Amw.Producers;
+using Main.Application.Dtos.Producer;
 using Main.Entities;
 using Main.Entities.Producer;
 using Mapster;

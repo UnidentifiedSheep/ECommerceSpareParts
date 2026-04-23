@@ -1,7 +1,7 @@
-﻿using Main.Abstractions.Dtos.Currencies;
+﻿using Main.Application.Dtos.Currencies;
 using Main.Enums;
 
-namespace Main.Abstractions.Dtos.Amw.Purchase;
+namespace Main.Application.Dtos.Amw.Purchase;
 
 public class PurchaseLogisticDto
 {

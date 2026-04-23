@@ -1,9 +1,9 @@
 using FluentValidation;
-using Main.Abstractions.Dtos.Amw.Articles;
 using Main.Application.Configs.Mapster;
-using Main.Application.Handlers.Articles.CreateArticles;
-using Main.Application.Handlers.Articles.MakeLinkageBetweenArticles;
+using Main.Application.Dtos.Product;
 using Main.Application.Handlers.Producers.CreateProducer;
+using Main.Application.Handlers.Products.CreateProducts;
+using Main.Application.Handlers.Products.MakeLinkageBetweenArticles;
 using Main.Enums;
 using Main.Persistence.Context;
 using MediatR;

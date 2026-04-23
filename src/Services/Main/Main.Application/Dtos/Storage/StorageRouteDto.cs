@@ -1,8 +1,8 @@
 ﻿using System.Text.Json.Serialization;
-using Main.Abstractions.Dtos.Currencies;
+using Main.Application.Dtos.Currencies;
 using Main.Enums;
 
-namespace Main.Abstractions.Dtos.Amw.StorageRoutes;
+namespace Main.Application.Dtos.Storage;
 
 public record StorageRouteDto
 {

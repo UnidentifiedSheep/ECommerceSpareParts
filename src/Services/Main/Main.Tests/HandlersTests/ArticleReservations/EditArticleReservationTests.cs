@@ -1,8 +1,8 @@
 ﻿using Main.Abstractions.Constants;
-using Main.Abstractions.Dtos.Amw.ArticleReservations;
 using Main.Abstractions.Exceptions.Articles;
-using Main.Application.Handlers.ArticleReservations.CreateArticleReservation;
-using Main.Application.Handlers.ArticleReservations.EditArticleReservation;
+using Main.Application.Dtos.Product;
+using Main.Application.Handlers.ProductReservations.CreateProductReservation;
+using Main.Application.Handlers.ProductReservations.EditProductReservation;
 using Main.Entities;
 using Main.Entities.Currency;
 using Main.Entities.Product;

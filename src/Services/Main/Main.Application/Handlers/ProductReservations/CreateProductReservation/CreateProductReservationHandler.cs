@@ -1,11 +1,11 @@
 using Abstractions.Interfaces.Services;
 using Application.Common.Interfaces;
 using Attributes;
-using Main.Abstractions.Dtos.Amw.ArticleReservations;
+using Main.Application.Dtos.Product;
 using Main.Entities.Storage;
 using MediatR;
 
-namespace Main.Application.Handlers.ArticleReservations.CreateArticleReservation;
+namespace Main.Application.Handlers.ProductReservations.CreateProductReservation;
 
 [AutoSave]
 [Transactional]

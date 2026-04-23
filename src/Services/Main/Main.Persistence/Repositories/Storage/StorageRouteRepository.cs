@@ -1,5 +1,5 @@
 ﻿using Application.Common.Interfaces.Repositories;
-using Main.Application.Interfaces.Repositories;
+using Main.Application.Interfaces.Persistence;
 using Main.Entities.Storage;
 using Main.Persistence.Context;
 using Microsoft.EntityFrameworkCore;

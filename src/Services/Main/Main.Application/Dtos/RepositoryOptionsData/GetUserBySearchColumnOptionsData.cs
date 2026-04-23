@@ -1,4 +1,4 @@
-﻿namespace Main.Abstractions.Dtos.RepositoryOptionsData;
+﻿namespace Main.Application.Dtos.RepositoryOptionsData;
 
 public record GetUserBySearchColumnOptionsData
 {

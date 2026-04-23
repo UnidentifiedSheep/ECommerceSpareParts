@@ -1,6 +1,6 @@
 using Api.Common.Extensions;
 using Carter;
-using Main.Application.Handlers.ArticleReservations.DeleteArticleReservation;
+using Main.Application.Handlers.ProductReservations.DeleteProductReservation;
 using MediatR;
 
 namespace Main.Api.EndPoints.ArticlesReservation;

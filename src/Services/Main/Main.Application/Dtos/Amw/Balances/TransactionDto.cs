@@ -1,6 +1,6 @@
 using System.Transactions;
 
-namespace Main.Abstractions.Dtos.Amw.Balances;
+namespace Main.Application.Dtos.Amw.Balances;
 
 public class TransactionDto
 {

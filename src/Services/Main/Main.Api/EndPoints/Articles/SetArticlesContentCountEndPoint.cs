@@ -1,6 +1,6 @@
 using Api.Common.Extensions;
 using Carter;
-using Main.Application.Handlers.ArticleContent.SetArticleContentCount;
+using Main.Application.Handlers.ProductContent.SetProductContentQuantity;
 using MediatR;
 
 namespace Main.Api.EndPoints.Articles;

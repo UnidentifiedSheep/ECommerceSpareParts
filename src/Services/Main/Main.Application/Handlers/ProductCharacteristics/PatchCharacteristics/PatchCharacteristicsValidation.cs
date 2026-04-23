@@ -1,7 +1,7 @@
 using FluentValidation;
 using Localization.Domain.Extensions;
 
-namespace Main.Application.Handlers.ArticleCharacteristics.PatchCharacteristics;
+namespace Main.Application.Handlers.ProductCharacteristics.PatchCharacteristics;
 
 public class PatchCharacteristicsValidation : AbstractValidator<PatchCharacteristicsCommand>
 {

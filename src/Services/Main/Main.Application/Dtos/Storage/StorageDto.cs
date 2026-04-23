@@ -1,7 +1,7 @@
 using System.Text.Json.Serialization;
 using Main.Enums;
 
-namespace Main.Abstractions.Dtos.Amw.Storage;
+namespace Main.Application.Dtos.Storage;
 
 public record StorageDto
 {

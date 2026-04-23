@@ -2,7 +2,7 @@
 using Abstractions.Models;
 using Main.Enums;
 
-namespace Main.Abstractions.Dtos.Amw.StorageRoutes;
+namespace Main.Application.Dtos.Storage;
 
 public record PatchStorageRouteDto
 {

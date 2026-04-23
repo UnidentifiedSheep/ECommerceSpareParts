@@ -1,8 +1,9 @@
 using Main.Abstractions.Constants;
-using Main.Abstractions.Dtos.Amw.Sales;
 using Main.Abstractions.Exceptions.Articles;
 using Main.Abstractions.Models;
+using Main.Application.Dtos.Sale;
 using Main.Application.Handlers.StorageContents.RestoreContent;
+using Main.Application.Models;
 using Main.Entities;
 using Main.Entities.Currency;
 using Main.Entities.Product;

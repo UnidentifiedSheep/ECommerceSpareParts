@@ -1,6 +1,6 @@
 ﻿using Contracts.ArticleCoefficients.GetArticleCoefficients;
 using Contracts.Models.ArticleCoefficients;
-using Main.Application.Handlers.ArticleCoefficient.GetArticleCoefficients;
+using Main.Application.Handlers.ProductCoefficient.GetArticleCoefficients;
 using Mapster;
 using MassTransit;
 using MediatR;

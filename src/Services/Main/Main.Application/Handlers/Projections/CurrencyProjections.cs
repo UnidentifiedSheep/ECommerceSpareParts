@@ -1,8 +1,8 @@
 ﻿using System.Linq.Expressions;
-using Main.Abstractions.Dtos.Currencies;
+using Main.Application.Dtos.Currencies;
 using Main.Entities.Currency;
 
-namespace Main.Application.Handlers.Currencies.Projections;
+namespace Main.Application.Handlers.Projections;
 
 public static class CurrencyProjections
 {

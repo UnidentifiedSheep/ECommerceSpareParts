@@ -1,7 +1,7 @@
 using FluentValidation;
 using Localization.Domain.Extensions;
 
-namespace Main.Application.Handlers.Articles.PatchArticle;
+namespace Main.Application.Handlers.Products.PatchProduct;
 
 public class PatchProductValidation : AbstractValidator<PatchArticleCommand>
 {

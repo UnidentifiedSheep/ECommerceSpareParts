@@ -3,7 +3,7 @@ using Abstractions.Models;
 using Api.Common.Extensions;
 using Carter;
 using Enums;
-using Main.Abstractions.Dtos.Cart;
+using Main.Application.Dtos.Cart;
 using Main.Application.Handlers.Cart.GetCartItems;
 using MediatR;
 

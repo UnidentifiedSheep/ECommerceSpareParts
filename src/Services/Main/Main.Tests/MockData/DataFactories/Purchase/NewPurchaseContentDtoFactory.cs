@@ -1,5 +1,5 @@
 ﻿using Bogus;
-using Main.Abstractions.Dtos.Amw.Purchase;
+using Main.Application.Dtos.Amw.Purchase;
 
 namespace Tests.MockData.DataFactories.Purchase;
 

@@ -7,7 +7,7 @@ using Main.Application.Notifications;
 using Main.Entities.Product;
 using MediatR;
 
-namespace Main.Application.Handlers.ArticleSizes.DeleteArticleSizes;
+namespace Main.Application.Handlers.ProductSizes.DeleteProductSizes;
 
 [AutoSave]
 [Transactional]

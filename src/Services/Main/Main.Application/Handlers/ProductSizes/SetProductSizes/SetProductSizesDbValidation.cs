@@ -2,7 +2,7 @@
 using BulkValidation.Core.Interfaces;
 using Main.Entities;
 
-namespace Main.Application.Handlers.ArticleSizes.SetArticleSizes;
+namespace Main.Application.Handlers.ProductSizes.SetProductSizes;
 
 public class SetProductSizesDbValidation : AbstractDbValidation<SetProductSizesCommand>
 {

@@ -1,7 +1,7 @@
 ﻿using BulkValidation.Core.Exceptions;
-using Main.Abstractions.Dtos.Amw.Purchase;
-using Main.Abstractions.Dtos.Amw.Storage;
 using Main.Abstractions.Exceptions.Storages;
+using Main.Application.Dtos.Amw.Purchase;
+using Main.Application.Dtos.Storage;
 using Main.Application.Handlers.Purchases.CreatePurchase;
 using Main.Application.Handlers.Purchases.UpsertLogisticsToPurchase;
 using Main.Application.Handlers.StorageRoutes.AddStorageRoute;

@@ -1,6 +1,6 @@
 using Abstractions.Models;
 using Carter;
-using Main.Abstractions.Dtos.Anonymous.Producers;
+using Main.Application.Dtos.Producer;
 using Main.Application.Handlers.Producers.GetProducerById;
 using Main.Application.Handlers.Producers.GetProducers;
 using Mapster;

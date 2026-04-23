@@ -1,7 +1,7 @@
 ﻿using Application.Common.Interfaces;
 using Attributes;
-using Main.Abstractions.Dtos.Emails;
-using Main.Abstractions.Dtos.Users;
+using Main.Application.Dtos.Emails;
+using Main.Application.Dtos.Users;
 using Main.Application.Handlers.Users.CreateUser;
 using Main.Enums;
 using MediatR;

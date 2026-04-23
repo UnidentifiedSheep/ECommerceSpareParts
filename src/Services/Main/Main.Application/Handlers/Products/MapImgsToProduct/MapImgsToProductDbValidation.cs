@@ -2,7 +2,7 @@
 using BulkValidation.Core.Interfaces;
 using Main.Entities;
 
-namespace Main.Application.Handlers.ArticleImages.MapImgsToArticle;
+namespace Main.Application.Handlers.Products.MapImgsToProduct;
 
 public class MapImgsToProductDbValidation : AbstractDbValidation<MapImgsToProductCommand>
 {

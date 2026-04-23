@@ -1,4 +1,4 @@
-namespace Main.Abstractions.Dtos.Anonymous.Articles;
+namespace Main.Application.Dtos.Anonymous.Articles;
 
 public class CharacteristicsDto
 {

@@ -1,8 +1,8 @@
 ﻿using Application.Common.Interfaces;
 using Application.Common.Interfaces.Repositories;
 using LinqKit;
-using Main.Abstractions.Dtos.Currencies;
-using Main.Application.Handlers.Currencies.Projections;
+using Main.Application.Dtos.Currencies;
+using Main.Application.Handlers.Projections;
 using Main.Entities.Currency;
 using Mapster;
 using Microsoft.EntityFrameworkCore;

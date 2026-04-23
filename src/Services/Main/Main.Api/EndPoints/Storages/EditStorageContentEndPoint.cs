@@ -1,8 +1,8 @@
 using Abstractions.Interfaces;
 using Api.Common.Extensions;
 using Carter;
-using Main.Abstractions.Dtos.Amw.Storage;
 using Main.Abstractions.Models;
+using Main.Application.Dtos.Amw.Storage;
 using Main.Application.Handlers.StorageContents.EditContent;
 using MediatR;
 

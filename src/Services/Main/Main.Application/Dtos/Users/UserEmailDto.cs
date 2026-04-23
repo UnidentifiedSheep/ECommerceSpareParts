@@ -1,6 +1,6 @@
 ﻿using Main.Enums;
 
-namespace Main.Abstractions.Dtos.Amw.Users;
+namespace Main.Application.Dtos.Users;
 
 public class UserEmailDto
 {

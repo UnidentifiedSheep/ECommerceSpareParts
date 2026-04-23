@@ -1,9 +1,9 @@
 ﻿using System.Linq.Expressions;
-using Main.Abstractions.Dtos.Users;
-using Main.Entities.User;
 using LinqKit;
+using Main.Application.Dtos.Users;
+using Main.Entities.User;
 
-namespace Main.Application.Handlers.Currencies.Projections;
+namespace Main.Application.Handlers.Projections;
 
 public static class UserProjections
 {

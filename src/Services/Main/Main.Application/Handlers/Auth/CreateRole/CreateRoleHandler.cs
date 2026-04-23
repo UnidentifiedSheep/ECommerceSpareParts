@@ -4,7 +4,7 @@ using Attributes;
 using Main.Entities.Auth;
 using MediatR;
 
-namespace Main.Application.Handlers.Roles.CreateRole;
+namespace Main.Application.Handlers.Auth.CreateRole;
 
 [AutoSave]
 [Transactional]

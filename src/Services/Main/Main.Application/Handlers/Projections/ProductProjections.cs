@@ -1,8 +1,10 @@
 ﻿using System.Linq.Expressions;
-using Main.Abstractions.Dtos.Amw.Articles;
+using LinqKit;
+using Main.Application.Dtos.Amw.ArticleCoefficients;
+using Main.Application.Dtos.Product;
 using Main.Entities.Product;
 
-namespace Main.Application.Handlers.Currencies.Projections;
+namespace Main.Application.Handlers.Projections;
 
 public static class ProductProjections
 {
@@ -18,5 +20,15 @@ public static class ProductProjections
             ProducerName = x.Producer.Name,
             Indicator = x.Indicator,
             Images = x.Images.Select(z => z.Path).ToList(),
+        };
+
+    public static Expression<Func<Entities.Product.ProductCoefficient, ProductCoefficientDto>> ToProductCoefficientDto =
+        x => new ProductCoefficientDto
+        {
+            ProductId = x.ProductId,
+            ValidTill = x.ValidTill,
+            CreatedAt = x.CreatedAt,
+            UpdatedAt = x.UpdatedAt,
+            Coefficient = CoefficientProjections.ToDto.Invoke(x.Coefficient),
         };
 }

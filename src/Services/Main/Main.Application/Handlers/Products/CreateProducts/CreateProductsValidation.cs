@@ -1,7 +1,7 @@
 using FluentValidation;
 using Localization.Domain.Extensions;
 
-namespace Main.Application.Handlers.Articles.CreateArticles;
+namespace Main.Application.Handlers.Products.CreateProducts;
 
 public class CreateProductsValidation : AbstractValidator<CreateProductsCommand>
 {

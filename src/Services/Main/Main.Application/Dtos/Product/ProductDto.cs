@@ -1,6 +1,6 @@
 using System.Text.Json.Serialization;
 
-namespace Main.Abstractions.Dtos.Amw.Articles;
+namespace Main.Application.Dtos.Product;
 
 public record ProductDto
 {

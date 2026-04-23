@@ -1,4 +1,4 @@
-namespace Main.Abstractions.Dtos.Member.Vehicles;
+namespace Main.Application.Dtos.Member.Vehicles;
 
 public class VehicleDto
 {

@@ -2,10 +2,10 @@
 using Application.Common.Interfaces;
 using Attributes;
 using Contracts.Articles;
-using Main.Abstractions.Dtos.Services.Articles;
+using Main.Application.Dtos.Product;
 using Main.Entities.Product;
 
-namespace Main.Application.Handlers.Articles.CreateArticles;
+namespace Main.Application.Handlers.Products.CreateProducts;
 
 [AutoSave]
 [Transactional]

@@ -1,4 +1,4 @@
-namespace Main.Abstractions.Dtos.Amw.ArticleReservations;
+namespace Main.Application.Dtos.Amw.ArticleReservations;
 
 public class ArticleReservationDto
 {

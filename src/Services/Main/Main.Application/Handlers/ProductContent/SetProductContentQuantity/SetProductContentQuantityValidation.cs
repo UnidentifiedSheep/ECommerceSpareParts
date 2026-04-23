@@ -1,7 +1,7 @@
 using FluentValidation;
 using Localization.Domain.Extensions;
 
-namespace Main.Application.Handlers.ArticleContent.SetArticleContentCount;
+namespace Main.Application.Handlers.ProductContent.SetProductContentQuantity;
 
 public class SetProductContentQuantityValidation : AbstractValidator<SetProductsContentCountCommand>
 {

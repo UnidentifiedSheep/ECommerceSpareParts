@@ -3,7 +3,7 @@ using Application.Common.Extensions;
 using FluentValidation;
 using Localization.Domain.Extensions;
 
-namespace Main.Application.Handlers.ArticleReservations.CreateArticleReservation;
+namespace Main.Application.Handlers.ProductReservations.CreateProductReservation;
 
 public class CreateProductReservationValidation : AbstractValidator<CreateProductReservationCommand>
 {

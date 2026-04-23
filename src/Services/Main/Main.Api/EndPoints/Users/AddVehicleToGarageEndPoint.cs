@@ -2,7 +2,7 @@ using Abstractions.Interfaces;
 using Api.Common.Extensions;
 using Carter;
 using Enums;
-using Main.Abstractions.Dtos.Member.Vehicles;
+using Main.Application.Dtos.Member.Vehicles;
 using Main.Application.Handlers.Users.AddVehicleToGarage;
 using MediatR;
 

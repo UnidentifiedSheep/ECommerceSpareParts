@@ -1,8 +1,8 @@
 using Bogus;
 using Main.Abstractions.Constants;
 using Main.Application.Configs.Mapster;
-using Main.Application.Handlers.Articles.CreateArticles;
 using Main.Application.Handlers.Producers.CreateProducer;
+using Main.Application.Handlers.Products.CreateProducts;
 using Main.Persistence.Context;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
