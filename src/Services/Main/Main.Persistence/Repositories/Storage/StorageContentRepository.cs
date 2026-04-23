@@ -39,4 +39,25 @@ public class StorageContentRepository(DContext context)
             .ForUpdate()
             .AsAsyncEnumerable();
     }
+    
+    public async Task<Dictionary<int, int>> GetStorageContentCounts(
+        string storageName,
+        IEnumerable<int> productIds,
+        bool takeFromOtherStorages,
+        CancellationToken cancellationToken = default)
+    {
+        return await Context.StorageContents
+            .AsNoTracking()
+            .Where(x => x.Count > 0 &&
+                        productIds.Contains(x.ProductId) &&
+                        (takeFromOtherStorages || x.StorageName == storageName))
+            .GroupBy(x => x.ProductId)
+            .Select(g => new
+            {
+                ProductId = g.Key,
+                TotalCount = g.Sum(x => x.Count)
+            })
+            .ToDictionaryAsync(x => x.ProductId,
+                x => x.TotalCount, cancellationToken);
+    }
 }

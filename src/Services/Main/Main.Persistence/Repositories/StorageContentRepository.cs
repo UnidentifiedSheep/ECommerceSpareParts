@@ -87,24 +87,5 @@ public class StorageContentRepository(DContext context) : IStorageContentReposit
 
     
 
-    public async Task<Dictionary<int, int>> GetStorageContentCounts(
-        string storageName,
-        IEnumerable<int> articleIds,
-        bool takeFromOtherStorages,
-        CancellationToken cancellationToken = default)
-    {
-        return await context.StorageContents
-            .AsNoTracking()
-            .Where(x => x.Count > 0 &&
-                        articleIds.Contains(x.ProductId) &&
-                        (takeFromOtherStorages || x.StorageName == storageName))
-            .GroupBy(x => x.ProductId)
-            .Select(g => new
-            {
-                ArticleId = g.Key,
-                TotalCount = g.Sum(x => x.Count)
-            })
-            .ToDictionaryAsync(x => x.ArticleId,
-                x => x.TotalCount, cancellationToken);
-    }
+    
 }

@@ -1,4 +1,5 @@
 using Application.Common.Interfaces;
+using Main.Application.Interfaces.Persistence;
 
 namespace Main.Application.Handlers.ProductReservations.GetArticlesWithNotEnoughStock;
 
@@ -21,7 +22,7 @@ public record GetArticlesWithNotEnoughStockResult(
 
 public class GetArticlesWithNotEnoughStockHandler(
     IStorageContentRepository storageContentRepository,
-    IArticleReservationRepository reservationRepository)
+    IStorageContentReservationRepository reservationRepository)
     : IQueryHandler<GetArticlesWithNotEnoughStockQuery, GetArticlesWithNotEnoughStockResult>
 {
     public async Task<GetArticlesWithNotEnoughStockResult> Handle(

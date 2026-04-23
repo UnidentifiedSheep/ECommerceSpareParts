@@ -30,6 +30,7 @@ public static class ServiceProvider
         collection.AddScoped<IProducerRepository, ProducerRepository>();
         collection.AddScoped<IStorageRouteRepository, StorageRouteRepository>();
         collection.AddScoped<IStorageContentRepository, StorageContentRepository>();
+        collection.AddScoped<IStorageContentReservationRepository, StorageContentReservationRepository>();
         
         collection.AddScoped(typeof(IRepository<,>), typeof(BasicEfRepository<,>));
         collection.AddScoped(typeof(IReadRepository<,>), typeof(ReadRepository<,>));

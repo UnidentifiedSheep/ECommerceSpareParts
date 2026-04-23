@@ -11,4 +11,10 @@ public interface IStorageContentRepository : IRepository<StorageContent, int>
         IEnumerable<int>? exceptProductIds = null,
         IEnumerable<string>? exceptStorages = null,
         int countGreaterThen = 0);
+
+    Task<Dictionary<int, int>> GetStorageContentCounts(
+        string storageName,
+        IEnumerable<int> productIds,
+        bool takeFromOtherStorages,
+        CancellationToken cancellationToken = default);
 }
