@@ -1,24 +1,26 @@
 using Abstractions.Interfaces.Services;
 using Application.Common.Interfaces;
+using Application.Common.Interfaces.Repositories;
 using Attributes;
 using Main.Abstractions.Exceptions.Articles;
+using Main.Entities.Product;
 using MediatR;
 
 namespace Main.Application.Handlers.ProductCharacteristics.DeleteCharacteristics;
 
+[AutoSave]
 [Transactional]
-public record DeleteCharacteristicsCommand(int Id) : ICommand;
+public record DeleteCharacteristicsCommand(int ProductId, string Name) : ICommand;
 
 public class DeleteCharacteristicsHandler(
-    IArticleCharacteristicsRepository repository,
+    IRepository<ProductCharacteristic, (int, string)> repository,
     IUnitOfWork unitOfWork) : ICommandHandler<DeleteCharacteristicsCommand>
 {
     public async Task<Unit> Handle(DeleteCharacteristicsCommand request, CancellationToken cancellationToken)
     {
-        var entity = await repository.GetCharacteristic(request.Id, true, cancellationToken)
-                     ?? throw new ArticleCharacteristicsNotFoundException(request.Id);
+        var entity = await repository.GetById((request.ProductId, request.Name))
+                     ?? throw new ProductCharacteristicsNotFoundException(request.ProductId, request.Name);
         unitOfWork.Remove(entity);
-        await unitOfWork.SaveChangesAsync(cancellationToken);
         return Unit.Value;
     }
 }

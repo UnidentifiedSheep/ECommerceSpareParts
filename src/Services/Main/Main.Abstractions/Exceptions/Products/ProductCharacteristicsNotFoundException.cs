@@ -3,9 +3,10 @@ using Exceptions.Base;
 
 namespace Main.Abstractions.Exceptions.Articles;
 
-public class ArticleCharacteristicsNotFoundException : NotFoundException, ILocalizableException
+public class ProductCharacteristicsNotFoundException : NotFoundException, ILocalizableException
 {
-    public ArticleCharacteristicsNotFoundException(int id) : base(null, new { Id = id })
+    public ProductCharacteristicsNotFoundException(int id, string name) 
+        : base(null, new { Id = id, Name = name })
     {
     }
 

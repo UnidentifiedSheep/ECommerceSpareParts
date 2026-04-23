@@ -165,7 +165,7 @@ public static class MapsterConfig
                 src => src.PurchaseDate);
 
         TypeAdapterConfig<NewCharacteristicsDto, ProductCharacteristic>.NewConfig()
-            .Map(dest => dest.ProductId, src => src.ArticleId)
+            .Map(dest => dest.ProductId, src => src.ProductId)
             .Map(dest => dest.Name, src => src.Name == null ? null : src.Name.Trim())
             .Map(dest => dest.Value, src => src.Value.Trim());
         //Articles

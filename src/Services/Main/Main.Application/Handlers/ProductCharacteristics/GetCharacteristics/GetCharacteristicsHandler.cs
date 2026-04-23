@@ -1,29 +1,37 @@
-﻿using Application.Common.Interfaces;
+﻿using Abstractions.Models;
+using Application.Common.Extensions;
+using Application.Common.Interfaces;
+using Application.Common.Interfaces.Repositories;
 using Main.Application.Dtos.Anonymous.Articles;
 using Main.Entities.Product;
-using Mapster;
+using Microsoft.EntityFrameworkCore;
 
 namespace Main.Application.Handlers.ProductCharacteristics.GetCharacteristics;
 
-public record GetArticleCharacteristicsQuery(int ArticleId, IEnumerable<int> CharacteristicsIds)
-    : IQuery<GetArticleCharacteristicsResult>;
+public record GetCharacteristicsQuery(int ProductId, PaginationModel Pagination)
+    : IQuery<GetCharacteristicsResult>;
 
-public record GetArticleCharacteristicsResult(IEnumerable<CharacteristicsDto> Characteristics);
+public record GetCharacteristicsResult(IReadOnlyList<ProductCharacteristicDto> Characteristics);
 
-public class GetCharacteristicsHandler(IArticleCharacteristicsRepository repository)
-    : IQueryHandler<GetArticleCharacteristicsQuery, GetArticleCharacteristicsResult>
+public class GetCharacteristicsHandler(
+    IReadRepository<ProductCharacteristic, (int, string)> repository)
+    : IQueryHandler<GetCharacteristicsQuery, GetCharacteristicsResult>
 {
-    public async Task<GetArticleCharacteristicsResult> Handle(
-        GetArticleCharacteristicsQuery request,
+    public async Task<GetCharacteristicsResult> Handle(
+        GetCharacteristicsQuery request,
         CancellationToken cancellationToken)
     {
-        IEnumerable<ProductCharacteristic> character;
-        if (request.CharacteristicsIds.Any())
-            character = await repository
-                .GetArticleCharacteristicsByIds(request.ArticleId, request.CharacteristicsIds, false,
-                    cancellationToken);
-        else
-            character = await repository.GetArticleCharacteristics(request.ArticleId, false, cancellationToken);
-        return new GetArticleCharacteristicsResult(character.Adapt<List<CharacteristicsDto>>());
+        var result = await repository.Query
+            .Where(x => x.ProductId == request.ProductId)
+            .Select(x => new ProductCharacteristicDto
+            {
+                ProductId = x.ProductId,
+                Name = x.Name,
+                Value = x.Value,
+            })
+            .ApplyPagination(request.Pagination)
+            .ToListAsync(cancellationToken);
+        
+        return new GetCharacteristicsResult(result);
     }
 }

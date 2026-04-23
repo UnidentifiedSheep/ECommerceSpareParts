@@ -6,7 +6,7 @@ using MediatR;
 
 namespace Main.Api.EndPoints.ArticleCharacteristics;
 
-public record GetArticleCharacteristicsResponse(IEnumerable<CharacteristicsDto> Characteristics);
+public record GetArticleCharacteristicsResponse(IEnumerable<ProductCharacteristicDto> Characteristics);
 
 public class GetCharacteristicsEndPoint : ICarterModule
 {
@@ -20,7 +20,7 @@ public class GetCharacteristicsEndPoint : ICarterModule
                         .Where(x => x.HasValue)
                         .Select(x => x!.Value)
                         .ToList();
-                    var result = await sender.Send(new GetArticleCharacteristicsQuery(articleId, characteristicsIds),
+                    var result = await sender.Send(new GetCharacteristicsQuery(articleId, characteristicsIds),
                         token);
                     var response = result.Adapt<GetArticleCharacteristicsResponse>();
                     return Results.Ok(response);

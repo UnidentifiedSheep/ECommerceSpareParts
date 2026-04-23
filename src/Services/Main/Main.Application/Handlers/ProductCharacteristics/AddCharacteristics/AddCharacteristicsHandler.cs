@@ -3,26 +3,27 @@ using Application.Common.Interfaces;
 using Attributes;
 using Main.Application.Dtos.Amw.ArticleCharacteristics;
 using Main.Entities.Product;
-using Mapster;
+using MediatR;
 
 namespace Main.Application.Handlers.ProductCharacteristics.AddCharacteristics;
 
+[AutoSave]
 [Transactional]
 public record AddCharacteristicsCommand(IEnumerable<NewCharacteristicsDto> Characteristics)
-    : ICommand<AddCharacteristicsResult>;
-
-public record AddCharacteristicsResult(IEnumerable<int> Ids);
+    : ICommand;
 
 public class AddCharacteristicsHandler(IUnitOfWork unitOfWork)
-    : ICommandHandler<AddCharacteristicsCommand, AddCharacteristicsResult>
+    : ICommandHandler<AddCharacteristicsCommand>
 {
-    public async Task<AddCharacteristicsResult> Handle(
+    public async Task<Unit> Handle(
         AddCharacteristicsCommand request,
         CancellationToken cancellationToken)
     {
-        var adapted = request.Characteristics.Adapt<List<ProductCharacteristic>>();
-        await unitOfWork.AddRangeAsync(adapted, cancellationToken);
-        await unitOfWork.SaveChangesAsync(cancellationToken);
-        return new AddCharacteristicsResult(adapted.Select(x => x.Id));
+        var toAdd = new List<ProductCharacteristic>();
+        foreach (var @new in request.Characteristics)
+            toAdd.Add(ProductCharacteristic.Create(@new.ProductId, @new.Name, @new.Value));
+        
+        await unitOfWork.AddRangeAsync(toAdd, cancellationToken);
+        return Unit.Value;
     }
 }
