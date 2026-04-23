@@ -51,9 +51,9 @@ public class UpdateCurrenciesRatesHandler(
         return Unit.Value;
     }
 
-    private IExchangeRateClient GetRateProvider(CurrencySettings settings)
+    private IExchangeRateClient GetRateProvider(CurrencySetting setting)
     {
-        return exchangeFactory.GetClient(settings.RateProvider);
+        return exchangeFactory.GetClient(setting.RateProvider);
     }
 
     private async Task<Dictionary<string, Currency>> LoadCurrencies(CancellationToken cancellationToken)

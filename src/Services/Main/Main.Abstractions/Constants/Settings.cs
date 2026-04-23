@@ -5,7 +5,7 @@ namespace Main.Abstractions.Constants;
 
 public sealed class Settings
 {
-    public static readonly TypedSetting<CurrencySettings> Currency = new("currency", new CurrencySettings());
+    public static readonly TypedSetting<CurrencySetting> Currency = new("currency", new CurrencySetting());
 
     public static readonly TypedSetting[] AllSettings =
     [

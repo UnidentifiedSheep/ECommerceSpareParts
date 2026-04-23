@@ -1,4 +1,5 @@
 ﻿using System.Reflection;
+using Domain.CommonEntities;
 using Main.Entities;
 using Main.Entities.Auth;
 using Main.Entities.Cart;
@@ -14,6 +15,7 @@ using Main.Entities.User;
 using MassTransit;
 using MassTransit.EntityFrameworkCoreIntegration;
 using Microsoft.EntityFrameworkCore;
+using Persistence.BaseTableConfigurations;
 using Persistence.Extensions;
 using Persistence.Interceptors;
 
@@ -60,7 +62,7 @@ public partial class DContext : DbContext
 
     public virtual DbSet<CurrencyToUsd> CurrencyToUsds { get; set; }
 
-    public virtual DbSet<DefaultSetting> DefaultSettings { get; set; }
+    public virtual DbSet<Setting> DefaultSettings { get; set; }
 
     public virtual DbSet<Order> Orders { get; set; }
 
@@ -149,7 +151,8 @@ public partial class DContext : DbContext
             .HasPostgresExtension("pg_trgm")
             .HasPostgresExtension("pgcrypto");
 
-        modelBuilder.ApplyConfigurationsFromAssembly(Assembly.GetAssembly(GetType())!);
+        modelBuilder.ApplyConfigurationsFromAssembly(Assembly.GetAssembly(GetType())!)
+            .ApplyConfiguration(new SettingConfiguration());
 
         modelBuilder.AddFieldsForAuditableEntities();
 

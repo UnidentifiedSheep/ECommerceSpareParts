@@ -12,6 +12,7 @@ using Application.Common.Extensions;
 using Application.Common.Interfaces;
 using Application.Common.Interfaces.Settings;
 using Application.Common.Services;
+using Application.Common.Services.Settings;
 using Application.Common.Validators;
 using FluentValidation;
 using Main.Abstractions.Interfaces.Logistics;
@@ -50,8 +51,7 @@ public static class ServiceProvider
         collection.AddSingleton<ICurrencyConverter, CurrencyConverter>(_ => new CurrencyConverter(Global.UsdId));
         collection.AddScoped<ICurrencyConverterSetup, CurrencyConverterSetup>();
 
-        collection.AddSingleton<ISettingsContainer, SettingsContainer>();
-        collection.AddScoped<ISettingsService, SettingsService>();
+        collection.AddSingleton<ISettingFactory, SettingFactory>();
 
         collection.AddSingleton<ILogisticsPricingStrategy, NonePricing>();
         collection.AddSingleton<ILogisticsPricingStrategy, PerAreaAndWeight>();

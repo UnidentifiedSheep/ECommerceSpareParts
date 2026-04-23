@@ -1,7 +1,10 @@
 ﻿using System.Reflection;
 using Application.Common.Abstractions;
+using Application.Common.Abstractions.Settings;
 using Application.Common.Behaviors;
 using Application.Common.Extensions;
+using Application.Common.Interfaces.Settings;
+using Application.Common.Services.Settings;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace Application.Common;
@@ -17,6 +20,9 @@ public static class ServiceProvider
             .RegisterCachePolicies(assembly)
             .RegisterDbValidations(assembly)
             .RegisterFluentValidations(assembly);
+
+        services.AddSingleton<ISettingsContainer, SettingsContainer>();
+        services.AddScoped<ISettingsService, SettingsService>();
         
         services.AddMediatR(config =>
         {
