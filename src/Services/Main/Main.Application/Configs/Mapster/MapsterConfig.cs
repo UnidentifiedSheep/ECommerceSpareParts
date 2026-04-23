@@ -431,7 +431,7 @@ public static class MapsterConfig
 
         TypeAdapterConfig<SaleContent, SaleContentDto>.NewConfig()
             .Map(dest => dest.Id, src => src.Id)
-            .Map(d => d.Article, s => s.Product)
+            .Map(d => d.Product, s => s.Product)
             .Map(d => d.Comment, s => s.Comment)
             .Map(d => d.Count, s => s.Count)
             .Map(d => d.Price, s => s.Price)

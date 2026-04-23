@@ -26,9 +26,5 @@ public class RestoreContentValidation : AbstractValidator<RestoreContentCommand>
         RuleFor(x => x.ContentDetails)
             .NotEmpty()
             .WithLocalizationKey("storage.content.restore.list.not.empty");
-
-        RuleFor(x => x.UserId)
-            .NotEmpty()
-            .WithLocalizationKey("user.id.not.empty");
     }
 }

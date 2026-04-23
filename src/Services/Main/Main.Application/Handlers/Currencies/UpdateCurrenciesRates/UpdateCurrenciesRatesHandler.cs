@@ -29,11 +29,11 @@ public class UpdateCurrenciesRatesHandler(
     IRepository<Currency, int> currencyRepository,
     ICurrencyConverter currencyConverter,
     IPublisher publisher,
-    ISettingsContainer settingsContainer) : ICommandHandler<UpdateCurrenciesRatesCommand>
+    ISettingsService settingsService) : ICommandHandler<UpdateCurrenciesRatesCommand>
 {
     public async Task<Unit> Handle(UpdateCurrenciesRatesCommand request, CancellationToken cancellationToken)
     {
-        var settings = settingsContainer.GetSetting(Abstractions.Constants.Settings.Currency);
+        var settings = await settingsService.GetOrDefault<CurrencySetting>(cancellationToken);
         var provider = GetRateProvider(settings);
         var currencies = await LoadCurrencies(cancellationToken);
 
@@ -53,7 +53,7 @@ public class UpdateCurrenciesRatesHandler(
 
     private IExchangeRateClient GetRateProvider(CurrencySetting setting)
     {
-        return exchangeFactory.GetClient(setting.RateProvider);
+        return exchangeFactory.GetClient(setting.Data.RateProvider);
     }
 
     private async Task<Dictionary<string, Currency>> LoadCurrencies(CancellationToken cancellationToken)

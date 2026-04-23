@@ -1,8 +1,9 @@
-﻿using Main.Entities.Storage;
+﻿using Application.Common.Interfaces.Repositories;
+using Main.Entities.Storage;
 
 namespace Main.Application.Interfaces.Repositories;
 
-public interface IStorageContentRepository
+public interface IStorageContentRepository : IRepository<StorageContent, int>
 {
     IAsyncEnumerable<StorageContent> GetStorageContentsForUpdateAsync(
         int? productId,
