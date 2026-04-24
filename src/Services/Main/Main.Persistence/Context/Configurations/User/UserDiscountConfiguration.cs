@@ -22,7 +22,7 @@ public class UserDiscountConfiguration : IEntityTypeConfiguration<UserDiscount>
             .HasColumnName("discount");
 
         builder.HasOne<Entities.User.User>()
-            .WithOne(p => p.UserDiscount)
+            .WithOne(p => p.Discount)
             .HasForeignKey<UserDiscount>(d => d.UserId)
             .OnDelete(DeleteBehavior.Cascade)
             .HasConstraintName("user_discounts_users_id_fk");

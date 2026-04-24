@@ -5,7 +5,7 @@ namespace Application.Common.Interfaces.Repositories;
 public sealed class CriteriaBuilder<T> where T : class
 {
     private Expression<Func<T, bool>>? _where;
-    private readonly List<Expression<Func<T, object>>> _includes = new();
+    private readonly List<Expression<Func<T, object?>>> _includes = new();
     private Func<IQueryable<T>, IOrderedQueryable<T>>? _orderBy;
     
     private int? _page;
@@ -20,7 +20,7 @@ public sealed class CriteriaBuilder<T> where T : class
         return this;
     }
 
-    public CriteriaBuilder<T> Include(Expression<Func<T, object>> include)
+    public CriteriaBuilder<T> Include(Expression<Func<T, object?>> include)
     {
         _includes.Add(include);
         return this;

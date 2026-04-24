@@ -7,7 +7,7 @@ public class ChangeUserDiscountValidation : AbstractValidator<ChangeUserDiscount
 {
     public ChangeUserDiscountValidation()
     {
-        RuleFor(command => command.DiscountRate)
+        RuleFor(command => command.Discount)
             .InclusiveBetween(0, 0.99m)
             .WithLocalizationKey("user.discount.range");
     }

@@ -7,9 +7,9 @@ using Pricing.Application.Handlers.Discount.SetUserDiscount;
 namespace Pricing.Application.Consumers;
 
 public class UserDiscountChangedConsumer(IMediator mediator, IUserCacheRepository userCacheRepository)
-    : IConsumer<UserDiscountChangedEvent>
+    : IConsumer<UserDiscountUpdatedEvent>
 {
-    public async Task Consume(ConsumeContext<UserDiscountChangedEvent> context)
+    public async Task Consume(ConsumeContext<UserDiscountUpdatedEvent> context)
     {
         var discount = await userCacheRepository.GetUserDiscount(context.Message.UserId);
         if (discount?.Timestamp >= context.Message.ChangedAt) return;
