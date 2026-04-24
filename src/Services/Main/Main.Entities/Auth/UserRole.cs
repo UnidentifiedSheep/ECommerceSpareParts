@@ -8,6 +8,8 @@ public class UserRole : AuditableEntity<UserRole, (Guid, string)>
 
     public string RoleName { get; private set; } = null!;
 
+    public Role Role { get; private set; } = null!;
+
     private UserRole() {}
 
     private UserRole(Guid userId, string roleName)

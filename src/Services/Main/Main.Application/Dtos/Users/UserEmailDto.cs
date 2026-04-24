@@ -1,15 +1,29 @@
-﻿using Main.Enums;
+﻿using System.Text.Json.Serialization;
+using Main.Enums;
 
 namespace Main.Application.Dtos.Users;
 
-public class UserEmailDto
+public record UserEmailDto
 {
-    public Guid Id { get; set; }
-    public string Email { get; set; } = null!;
-    public bool Confirmed { get; set; }
-    public EmailType EmailType { get; set; }
-    public bool IsPrimary { get; set; }
-    public DateTime? ConfirmedAt { get; set; }
-    public DateTime CreatedAt { get; set; }
-    public DateTime UpdatedAt { get; set; }
+    [JsonPropertyName("email")]
+    public required string Email { get; init; } = null!;
+    
+    [JsonPropertyName("confirmed")]
+    public required bool Confirmed { get; init; }
+    
+    [JsonPropertyName("emailType")]
+    [JsonConverter(typeof(JsonStringEnumConverter<EmailType>))]
+    public required EmailType EmailType { get; init; }
+    
+    [JsonPropertyName("isPrimary")]
+    public required bool IsPrimary { get; init; }
+    
+    [JsonPropertyName("confirmedAt")]
+    public required DateTime? ConfirmedAt { get; init; }
+    
+    [JsonPropertyName("createdAt")]
+    public required DateTime CreatedAt { get; init; }
+    
+    [JsonPropertyName("updatedAt")]
+    public required DateTime UpdatedAt { get; init; }
 }

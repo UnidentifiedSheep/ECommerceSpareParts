@@ -23,7 +23,7 @@ public class UserRoleConfiguration : IEntityTypeConfiguration<UserRole>
         builder.Property(e => e.RoleName)
             .HasColumnName("role_name");
 
-        builder.HasOne<Role>()
+        builder.HasOne<Role>(x => x.Role)
             .WithMany()
             .HasForeignKey(d => d.RoleName)
             .HasConstraintName("user_roles_roles_name_fk");

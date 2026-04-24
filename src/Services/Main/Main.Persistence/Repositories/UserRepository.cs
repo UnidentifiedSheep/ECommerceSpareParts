@@ -81,13 +81,7 @@ public class UserRepository(DContext context) : IUserRepository
             .ToListAsync(cancellationToken);
     }
 
-    public async Task<decimal?> GetUsersDiscountAsync(Guid userId, CancellationToken cancellationToken = default)
-    {
-        return await context.UserDiscounts.AsNoTracking()
-            .Where(x => x.UserId == userId)
-            .Select(x => x.Discount)
-            .FirstOrDefaultAsync(cancellationToken);
-    }
+    
 
     [SuppressMessage("ReSharper", "EntityFramework.ClientSideDbFunctionCall")]
     public async Task<IReadOnlyList<User>> GetUsersBySimilarityAsync(

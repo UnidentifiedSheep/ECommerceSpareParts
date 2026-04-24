@@ -12,6 +12,7 @@ using Persistence.Extensions;
 using Persistence.Interceptors;
 using ProducerRepository = Main.Persistence.Repositories.Producer.ProducerRepository;
 using StorageContentRepository = Main.Persistence.Repositories.Storage.StorageContentRepository;
+using UserRepository = Main.Persistence.Repositories.User.UserRepository;
 
 namespace Main.Persistence;
 
@@ -31,6 +32,7 @@ public static class ServiceProvider
         collection.AddScoped<IStorageRouteRepository, StorageRouteRepository>();
         collection.AddScoped<IStorageContentRepository, StorageContentRepository>();
         collection.AddScoped<IStorageContentReservationRepository, StorageContentReservationRepository>();
+        collection.AddScoped<IUserRepository, UserRepository>();
         
         collection.AddScoped(typeof(IRepository<,>), typeof(BasicEfRepository<,>));
         collection.AddScoped(typeof(IReadRepository<,>), typeof(ReadRepository<,>));

@@ -7,6 +7,7 @@ using Exceptions.Base;
 using Main.Abstractions.Exceptions.Auth;
 using Main.Abstractions.Interfaces.DbRepositories;
 using Main.Abstractions.Interfaces.Services;
+using Main.Application.Interfaces.Services;
 using Main.Entities;
 using Main.Entities.Auth;
 using Main.Enums;

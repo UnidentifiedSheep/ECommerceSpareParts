@@ -1,13 +1,11 @@
 ﻿using Abstractions.Interfaces.RelatedData;
-using Abstractions.Models.Repository;
+using Application.Common.Interfaces.Repositories;
 using Main.Abstractions.Constants;
-using Main.Abstractions.Interfaces.CacheRepositories;
-using Main.Abstractions.Interfaces.DbRepositories;
-using Main.Abstractions.Interfaces.Services;
 using Main.Application.Dtos.Users;
-using Main.Entities;
-using Main.Entities.Auth;
-using Mapster;
+using Main.Application.Handlers.Projections;
+using Main.Application.Interfaces.CacheRepositories;
+using Main.Application.Interfaces.Persistence;
+using Main.Application.Interfaces.Services;
 using DbUser = Main.Entities.User.User;
 
 namespace Main.Application.Services;
@@ -15,26 +13,17 @@ namespace Main.Application.Services;
 public class UserService(
     IRelatedDataFactory relatedDataFactory, 
     IUsersCacheRepository cacheRepository,
-    IUserRepository userRepository,
-    IUserPermissionRepository userPermissionRepository,
-    IUserRoleRepository userRoleRepository) : IUserService
+    IUserRepository userRepository) : IUserService
 {
     public async Task<UserDto?> TryGetUserAsync(Guid userId, CancellationToken token = default)
     {
         var cachedUser = await cacheRepository.GetUserById(userId);
         if (cachedUser != null) return cachedUser;
 
-        var queryOptions = new QueryOptions<DbUser, Guid>()
-            {
-                Data = userId
-            }
-            .WithInclude(x => x.UserInfo)
-            .WithTracking(false);
-        var dbUser = await userRepository.GetUserByIdAsync(queryOptions, token);
-        var adapted = dbUser.Adapt<UserDto>();
-        if (adapted != null) await SaveUserInCache(adapted);
+        var dbUser = await TryGetUserFromDb(userId, token);
+        if (dbUser != null) await SaveUserInCache(dbUser);
         
-        return adapted;
+        return dbUser;
     }
 
     public async Task<decimal?> GetUserDiscountAsync(Guid userId, CancellationToken token = default)
@@ -45,47 +34,39 @@ public class UserService(
         return dbDiscount;
     }
 
-    public async Task<UserRolesAndPermissions> GetUserRolesAndPermissionsAsync(
+    public async Task<UserRolesAndPermissions?> GetUserRolesAndPermissionsAsync(
         Guid userId, 
         CancellationToken token = default)
     {
-        var permissions = (await cacheRepository.GetUserPermissions(userId)).ToHashSet();
-        var roles = (await cacheRepository.GetUserRoles(userId)).ToHashSet();
-        
-        if (roles.Count == 0 || permissions.Count == 0)
+        var rp = new UserRolesAndPermissions
         {
-            var queryOptions = new QueryOptions<UserRole, Guid>()
-                {
-                    Data = userId
-                }
-                .WithTracking(false)
-                .WithInclude(x => x.RoleName);
-            
-            var dbRoles = await userRoleRepository
-                .GetUserRolesAsync(queryOptions, token);
-            var rolesPermissions = dbRoles
-                .SelectMany(x => x.Role.PermissionNames)
-                .Select(x => x.Name)
-                .ToList();
-            var userPermissions = await userPermissionRepository
-                .GetUserPermissionNamesAsync(userId, token);
-            
-            roles.Clear();
-            roles.UnionWith(dbRoles.Select(x => x.Role.Name));
-            
-            permissions.Clear();
-            permissions.UnionWith(userPermissions);
-            permissions.UnionWith(rolesPermissions);
-        }
-
-        await cacheRepository.SetUserRoles(userId, roles);
-        await cacheRepository.SetUserPermissions(userId, permissions);
-
-        return new UserRolesAndPermissions
-        {
-            Permissions = permissions.ToList(),
-            Roles = roles.ToList()
+            Permissions = await cacheRepository.GetUserPermissions(userId),
+            Roles = await cacheRepository.GetUserRoles(userId)
         };
+
+        if (rp.Roles.Count != 0 && rp.Permissions.Count != 0)
+            return rp;
+        
+        rp = await userRepository.GetUserRolesAndPermissionsAsync(userId, token);
+        if (rp == null) return null;
+            
+        await cacheRepository.SetUserRoles(userId, rp.Roles);
+        await cacheRepository.SetUserPermissions(userId, rp.Permissions);
+
+        return rp;
+    }
+
+    private async Task<UserDto?> TryGetUserFromDb(Guid userId, CancellationToken token)
+    {
+        var criteria = Criteria<DbUser>.New()
+            .Where(x => x.Id == userId)
+            .Include(x => x.UserInfo)
+            .Track(false)
+            .Build();
+        
+        DbUser? user = await userRepository.FirstOrDefaultAsync(criteria, token);
+        if (user == null) return null;
+        return UserProjections.UserProjectionFunc(user);
     }
 
     private async Task SaveUserInCache(UserDto user)

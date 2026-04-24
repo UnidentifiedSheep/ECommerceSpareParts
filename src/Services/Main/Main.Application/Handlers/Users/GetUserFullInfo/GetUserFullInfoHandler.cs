@@ -1,48 +1,46 @@
-﻿using Abstractions.Models.Repository;
-using Application.Common.Interfaces;
+﻿using Application.Common.Interfaces;
+using Application.Common.Interfaces.Repositories;
+using LinqKit;
 using Main.Abstractions.Exceptions.Auth;
-using Main.Abstractions.Interfaces.DbRepositories;
-using Main.Abstractions.Interfaces.Services;
 using Main.Application.Dtos.Users;
-using Main.Entities;
+using Main.Application.Handlers.Projections;
 using Main.Entities.User;
-using Mapster;
+using Microsoft.EntityFrameworkCore;
 
 namespace Main.Application.Handlers.Users.GetUserFullInfo;
 
 public record GetUserFullInfoQuery(Guid UserId) : IQuery<GetUserFullInfoResult>;
 
 public record GetUserFullInfoResult(
-    UserInfoDto? UserInfo,
-    List<UserEmailDto> Emails,
+    UserDto User,
+    IReadOnlyList<UserEmailDto> Emails,
     IReadOnlyList<string> Roles,
     IReadOnlyList<string> Permissions);
 
 public class GetUserFullInfoHandler(
-    IUserRepository userRepository,
-    IUserService userService)
+    IReadRepository<User, Guid> repository)
     : IQueryHandler<GetUserFullInfoQuery, GetUserFullInfoResult>
 {
     public async Task<GetUserFullInfoResult> Handle(GetUserFullInfoQuery request, CancellationToken cancellationToken)
     {
-        var queryOptions = new QueryOptions<User, Guid>()
-            {
-                Data = request.UserId
-            }.WithTracking(false)
-            .WithInclude(x => x.UserInfo)
-            .WithInclude(x => x.UserEmails)
-            .WithInclude(x => x.UserRoles);
-        
-        var user = await userRepository.GetUserByIdAsync(queryOptions, cancellationToken) ??
-                   throw new UserNotFoundException(request.UserId);
+        var user = await repository.Query
+                .Where(x => x.Id == request.UserId)
+                .AsExpandable()
+                .Select(x => new 
+                { 
+                    User = UserProjections.UserProjection.InvokeEFCore(x),
+                    Emails = x.Emails.Select(z => UserProjections.UserEmailProjection.InvokeEFCore(z))
+                })
+                .FirstOrDefaultAsync(cancellationToken) 
+                   ?? throw new UserNotFoundException(request.UserId);
         
         var (roles, permissions) = await userService
             .GetUserRolesAndPermissionsAsync(request.UserId, cancellationToken);
         
 
         return new GetUserFullInfoResult(
-            user.UserInfo.Adapt<UserInfoDto?>(),
-            user.UserEmails.Adapt<List<UserEmailDto>>(),
+            user.User,
+            user.Emails.ToList(),
             roles,
             permissions);
     }

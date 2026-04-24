@@ -11,8 +11,8 @@ public static class UserProjections
         x => new UserDto
         {
             Id = x.Id,
-            UserName = x.UserName,
-            NormalizedUserName = x.NormalizedUserName,
+            UserName = x.UserName.Value,
+            NormalizedUserName = x.UserName.NormalizedValue,
             CreatedAt = x.CreatedAt,
             UpdatedAt = x.UpdatedAt,
             TwoFactorEnabled = x.TwoFactorEnabled,
@@ -24,11 +24,27 @@ public static class UserProjections
                 : UserInfoProjection.Invoke(x.UserInfo)
         };
     
+    public static readonly Func<User, UserDto> UserProjectionFunc =
+        UserProjection.Compile();
+    
+    
     public static readonly Expression<Func<UserInfo, UserInfoDto>> UserInfoProjection =
         x => new UserInfoDto
         {
             Description = x.Description,
             Name = x.Name,
             Surname = x.Surname,
+        };
+
+    public static readonly Expression<Func<UserEmail, UserEmailDto>> UserEmailProjection =
+        x => new UserEmailDto
+        {
+            Email = x.Email.Value,
+            Confirmed = x.Confirmed,
+            ConfirmedAt = x.ConfirmedAt,
+            CreatedAt = x.CreatedAt,
+            UpdatedAt = x.UpdatedAt,
+            EmailType = x.EmailType,
+            IsPrimary = x.IsPrimary,
         };
 }

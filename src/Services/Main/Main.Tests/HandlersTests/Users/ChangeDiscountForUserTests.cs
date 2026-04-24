@@ -1,7 +1,7 @@
 using FluentValidation;
-using Main.Abstractions.Interfaces.CacheRepositories;
 using Main.Application.Configs.Mapster;
 using Main.Application.Handlers.Users.ChangeUserDiscount;
+using Main.Application.Interfaces.CacheRepositories;
 using Main.Entities;
 using Main.Entities.User;
 using Main.Persistence.Context;

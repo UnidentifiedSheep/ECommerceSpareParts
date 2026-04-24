@@ -14,6 +14,7 @@ using Main.Abstractions.Models;
 using Main.Application.Configs;
 using Main.Application.Handlers.Users.GetUserDiscount;
 using Main.Application.HangFireTasks;
+using Main.Application.Interfaces.Services;
 using Main.Application.RelatedData;
 using Main.Application.Services;
 using Main.Application.Services.Logistics;
