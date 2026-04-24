@@ -9,12 +9,11 @@ using Main.Abstractions.Interfaces.Logistics;
 using Main.Abstractions.Models.Logistics;
 using Main.Application.Dtos.Amw.Logistics;
 using Main.Application.Dtos.Storage;
+using Main.Application.Handlers.Projections;
 using Main.Application.Interfaces.Persistence;
-using Main.Entities;
 using Main.Entities.Product;
 using Main.Entities.Storage;
 using Main.Enums;
-using Mapster;
 
 namespace Main.Application.Handlers.Logistics.CalculateDeliveryCost;
 
@@ -22,7 +21,8 @@ public record CalculateDeliveryCostQuery(
     string StorageFrom,
     string StorageTo,
     IEnumerable<LogisticsItemDto> Items,
-    LogisticsCalculationMode Mode = LogisticsCalculationMode.Strict) : IQuery<CalculateDeliveryCostResult>;
+    LogisticsCalculationMode Mode = LogisticsCalculationMode.Strict
+    ) : IQuery<CalculateDeliveryCostResult>;
 
 public record CalculateDeliveryCostResult(StorageRouteDto Route, DeliveryCostDto DeliveryCost);
 
@@ -30,7 +30,7 @@ public class CalculateDeliveryCostHandler(
     ILogisticsCostService logisticsCostService,
     IRepository<ProductSize, int> sizesRepository,
     IStorageRouteRepository storageRoutesRepository,
-    IRepository<ProductWeight, int> weightRepository,
+    IRepository<Entities.Product.ProductWeight, int> weightRepository,
     ICurrencyConverter currencyConverter)
     : IQueryHandler<CalculateDeliveryCostQuery, CalculateDeliveryCostResult>
 {
@@ -42,18 +42,40 @@ public class CalculateDeliveryCostHandler(
         var to = request.StorageTo;
 
         var route = await GetStorageRoute(from, to, cancellationToken);
-        var usableArticleIds = request.Items
-            .Select(x => x.ArticleId)
+        var usableProductIds = request.Items
+            .Select(x => x.ProductId)
             .ToHashSet();
 
-        var sizes = await GetSizes(usableArticleIds, cancellationToken);
-        var weights = await GetWeights(usableArticleIds, cancellationToken);
+        var sizes = await GetSizes(usableProductIds, cancellationToken);
+        var weights = await GetWeights(usableProductIds, cancellationToken);
 
-        var deliveryCost = GetDeliveryCost(route, sizes, weights, request.Items, route.CurrencyId, request.Mode)
-            .Adapt<DeliveryCostDto>();
-        deliveryCost.CurrencyId = route.CurrencyId;
+        var calcResult = CalculateLogistics(route, sizes, weights, request.Items, route.CurrencyId, request.Mode);
+        DeliveryCostDto deliveryCost = new()
+        {
+            TotalAreaM3 = calcResult.TotalAreaM3,
+            TotalWeight = calcResult.TotalWeight,
+            TotalCost = calcResult.TotalCost,
+            CurrencyId = route.CurrencyId,
+            Items = calcResult.Items.Select(x => new DeliveryCostItemDto
+            {
+                AreaM3 = x.AreaM3,
+                AreaPerItem = x.AreaPerItem,
+                Cost = x.Cost,
+                ProductId = x.Id,
+                Quantity = x.Quantity,
+                Reasons = x.Reasons,
+                Skipped = x.Skipped,
+                Weight = x.Weight,
+                WeightPerItem = x.WeightPerItem,
+                WeightUnit = x.WeightUnit
+            }).ToList(),
+            MinimalPrice = calcResult.MinimalPrice,
+            MinimalPriceApplied = calcResult.MinimalPriceApplied,
+            PricingModel = calcResult.PricingModel,
+            WeightUnit = calcResult.WeightUnit
+        };
 
-        return new CalculateDeliveryCostResult(route.Adapt<StorageRouteDto>(), deliveryCost);
+        return new CalculateDeliveryCostResult(StorageProjections.StorageRouteProjectionFunc(route), deliveryCost);
     }
 
     private async Task<StorageRoute> GetStorageRoute(string from, string to, CancellationToken cancellationToken)
@@ -67,28 +89,36 @@ public class CalculateDeliveryCostHandler(
                ?? throw new StorageRouteNotFound(from, to);
     }
 
-    private async Task<Dictionary<int, ProductId>> GetSizes(
-        IEnumerable<int> articleIds,
+    private async Task<Dictionary<int, ProductSize>> GetSizes(
+        IEnumerable<int> productIds,
         CancellationToken cancellationToken)
     {
+        var criteria = Criteria<ProductSize>.New()
+            .Where(x => productIds.Contains(x.ProductId))
+            .Track(false)
+            .Build();
+            
         return (await sizesRepository
-                .GetArticleSizesByIds(articleIds, false, cancellationToken))
-            .ToDictionary(x => x.ArticleId);
-    }
-
-    private async Task<Dictionary<int, ProductWeight>> GetWeights(
-        IEnumerable<int> articleIds,
-        CancellationToken cancellationToken)
-    {
-        return (await weightRepository
-                .GetArticleWeightsByIds(articleIds, false, cancellationToken))
+                .ListAsync(criteria, cancellationToken))
             .ToDictionary(x => x.ProductId);
     }
 
-    private LogisticsCalcResult GetDeliveryCost(
+    private async Task<Dictionary<int, Entities.Product.ProductWeight>> GetWeights(
+        IEnumerable<int> productIds,
+        CancellationToken cancellationToken)
+    {
+        var criteria = Criteria<Entities.Product.ProductWeight>.New()
+            .Where(x => productIds.Contains(x.ProductId))
+            .Track(false)
+            .Build();
+        return (await weightRepository.ListAsync(criteria, cancellationToken))
+            .ToDictionary(x => x.ProductId);
+    }
+
+    private LogisticsCalcResult CalculateLogistics(
         StorageRoute route,
-        Dictionary<int, ProductId> sizes,
-        Dictionary<int, ProductWeight> weights,
+        Dictionary<int, ProductSize> sizes,
+        Dictionary<int, Entities.Product.ProductWeight> weights,
         IEnumerable<LogisticsItemDto> items,
         int currencyId,
         LogisticsCalculationMode mode)
@@ -96,24 +126,23 @@ public class CalculateDeliveryCostHandler(
         var priceKg = Math.Round(currencyConverter.ConvertTo(route.PriceKg, route.CurrencyId, currencyId), 2);
         var priceArea = Math.Round(currencyConverter.ConvertTo(route.PricePerM3, route.CurrencyId, currencyId), 2);
         var priceOrder = Math.Round(currencyConverter.ConvertTo(route.PricePerOrder, route.CurrencyId, currencyId), 2);
-        var minimalPrice =
-            Math.Round(currencyConverter.ConvertTo(route.MinimumPrice ?? 0, route.CurrencyId, currencyId), 2);
+        var minimalPrice = Math.Round(currencyConverter.ConvertTo(route.MinimumPrice, route.CurrencyId, currencyId), 2);
 
         var context = new LogisticsContext(priceKg, priceArea, priceOrder, minimalPrice);
         List<LogisticsItem> logisticsItems = [];
 
         foreach (var item in items)
         {
-            var sizeExists = sizes.TryGetValue(item.ArticleId, out var size);
-            var weightExists = weights.TryGetValue(item.ArticleId, out var weight);
+            var sizeExists = sizes.TryGetValue(item.ProductId, out var size);
+            var weightExists = weights.TryGetValue(item.ProductId, out var weight);
 
             if (mode == LogisticsCalculationMode.Strict)
             {
-                if (!sizeExists) throw new ProductSizesNotFoundException(item.ArticleId);
-                if (!weightExists) throw new ProductWeightNotFoundException(item.ArticleId);
+                if (!sizeExists) throw new ProductSizesNotFoundException(item.ProductId);
+                if (!weightExists) throw new ProductWeightNotFoundException(item.ProductId);
             }
 
-            logisticsItems.Add(new LogisticsItem(item.ArticleId, item.Quantity, weight?.Weight ?? 0,
+            logisticsItems.Add(new LogisticsItem(item.ProductId, item.Quantity, weight?.Weight ?? 0,
                 weight?.Unit ?? WeightUnit.Kilogram, size?.VolumeM3 ?? 0));
         }
 

@@ -136,11 +136,11 @@ public static class MapsterConfig
             .Map(dest => dest.BuyPrice, src => src.Price);
 
         TypeAdapterConfig<NewPurchaseContentDto, LogisticsItemDto>.NewConfig()
-            .Map(d => d.ArticleId, s => s.ArticleId)
+            .Map(d => d.ProductId, s => s.ArticleId)
             .Map(d => d.Quantity, s => s.Count);
 
         TypeAdapterConfig<EditPurchaseDto, LogisticsItemDto>.NewConfig()
-            .Map(d => d.ArticleId, s => s.ArticleId)
+            .Map(d => d.ProductId, s => s.ArticleId)
             .Map(d => d.Quantity, s => s.Count);
 
         TypeAdapterConfig<PurchaseContentLogisticDto, PurchaseContentLogistic>.NewConfig()
@@ -660,7 +660,7 @@ public static class MapsterConfig
 
         //Logistics
         TypeAdapterConfig<LogisticsCalcItemResult, DeliveryCostItemDto>.NewConfig()
-            .Map(d => d.ArticleId, s => s.Id)
+            .Map(d => d.ProductId, s => s.Id)
             .Map(d => d.Quantity, s => s.Quantity)
             .Map(d => d.Weight, s => s.Weight)
             .Map(d => d.WeightPerItem, s => s.WeightPerItem)

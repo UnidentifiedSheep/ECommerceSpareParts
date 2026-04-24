@@ -8,10 +8,11 @@ public class CalculateDeliveryCostDbValidation : AbstractDbValidation<CalculateD
 {
     public override void Build(IValidationPlan plan, CalculateDeliveryCostQuery request)
     {
-        var usableArticleIds = request.Items
-            .Select(x => x.ArticleId)
+        var usableProductIds = request.Items
+            .Select(x => x.ProductId)
             .ToHashSet();
+        
         plan.ValidateStorageRouteExistsFromTo((request.StorageFrom, request.StorageTo, true))
-            .ValidateArticleExistsId(usableArticleIds);
+            .ValidateProductExistsId(usableProductIds);
     }
 }

@@ -26,6 +26,9 @@ public static class StorageProjections
             ToStorageName = x.ToStorageName,
         };
     
+    public static readonly Func<StorageRoute, StorageRouteDto> StorageRouteProjectionFunc =
+        StorageRouteProjection.Compile();
+    
     public static readonly Expression<Func<Storage, StorageDto>> StorageProjection =
         x => new StorageDto 
         {
