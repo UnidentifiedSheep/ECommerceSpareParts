@@ -1,32 +1,30 @@
 ﻿using Abstractions.Interfaces.Services;
 using Application.Common.Interfaces;
 using Attributes;
-using Extensions;
-using Main.Application.Notifications;
-using Main.Entities;
+using Contracts.User;
 using Main.Entities.Auth;
 using MediatR;
 
 namespace Main.Application.Handlers.Users.AddPermissionToUser;
 
+[AutoSave]
 [Transactional]
 public record AddPermissionToUserCommand(Guid UserId, string PermissionName) : ICommand;
 
 public class AddPermissionToUserHandler(
-    IUnitOfWork unitOfWork, 
-    IMediator mediator) : ICommandHandler<AddPermissionToUserCommand>
+    IUnitOfWork unitOfWork,
+    IIntegrationEventScope interfaceScope
+    ) : ICommandHandler<AddPermissionToUserCommand>
 {
     public async Task<Unit> Handle(AddPermissionToUserCommand request, CancellationToken cancellationToken)
     {
-        var model = new UserPermission
-        {
-            Permission = request.PermissionName.ToNormalized(),
-            UserId = request.UserId
-        };
+        UserPermission model = UserPermission.Create(request.UserId, request.PermissionName);
 
         await unitOfWork.AddAsync(model, cancellationToken);
-        await unitOfWork.SaveChangesAsync(cancellationToken);
-        await mediator.Publish(new UserUpdatedNotification(request.UserId), cancellationToken);
+        interfaceScope.Add(new UserUpdatedEvent
+        {
+            UserId = request.UserId,
+        });
         return Unit.Value;
     }
 }
