@@ -3,9 +3,9 @@ using Exceptions.Base;
 
 namespace Main.Entities.Exceptions.Balances;
 
-public class TransactionNotFoundExcpetion : NotFoundException, ILocalizableException
+public class TransactionNotFoundException : NotFoundException, ILocalizableException
 {
-    public TransactionNotFoundExcpetion(Guid transactionId)
+    public TransactionNotFoundException(Guid transactionId)
         : base(null, new { TransactionId = transactionId })
     {
     }

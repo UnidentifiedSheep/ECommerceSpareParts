@@ -9,6 +9,6 @@ public class CreateTransactionDbValidation : AbstractDbValidation<CreateTransact
 {
     public override void Build(IValidationPlan plan, CreateTransactionCommand request)
     {
-        plan.ValidateUserExistsId(Quantifier.All, request.ReceiverId, request.SenderId, request.WhoCreatedTransaction);
+        plan.ValidateUserExistsId(Quantifier.All, request.ReceiverId, request.SenderId);
     }
 }

@@ -1,14 +1,13 @@
 using System.Data;
 using Abstractions.Interfaces.Services;
 using Application.Common.Interfaces;
+using Application.Common.Interfaces.Repositories;
 using Attributes;
-using Main.Abstractions.Interfaces.DbRepositories;
 using Main.Abstractions.Interfaces.Services;
-using Main.Entities;
+using Main.Application.Interfaces.Persistence;
+using Main.Entities.Event;
 using Main.Entities.Exceptions.Balances;
 using Main.Entities.Transaction;
-using Main.Enums;
-using Mapster;
 
 namespace Main.Application.Handlers.Balance.EditTransaction;
 
@@ -17,13 +16,12 @@ public record EditTransactionCommand(
     Guid TransactionId,
     int CurrencyId,
     decimal Amount,
-    TransactionStatus Status,
     DateTime TransactionDateTime) : ICommand<EditTransactionResult>;
 
 public record EditTransactionResult(Transaction Transaction);
 
 public class EditTransactionHandler(
-    IBalanceRepository balanceRepository,
+    ITransactionRepository transactionRepository,
     IBalanceService balanceService,
     IUnitOfWork unitOfWork) : ICommandHandler<EditTransactionCommand, EditTransactionResult>
 {
@@ -32,10 +30,12 @@ public class EditTransactionHandler(
         var transaction = await GetAndValidateTransactionAsync(request, cancellationToken);
         await CreateTransactionVersionAsync(transaction, cancellationToken);
         await RollbackTransactionAsync(transaction, cancellationToken);
+        
+        transaction.SetTransactionSum(request.Amount);
+        transaction.SetTransactionDatetime(request.TransactionDateTime);
+        transaction.SetCurrencyId(request.CurrencyId);
 
-        ApplyNewParameters(transaction, request);
-
-        await RecalculateBalancesAsync(transaction, request, cancellationToken);
+        await RecalculateBalancesAsync(transaction, cancellationToken);
         await ApplyNewTransactionVersionAsync(transaction, cancellationToken);
 
         await unitOfWork.SaveChangesAsync(cancellationToken);
@@ -44,8 +44,14 @@ public class EditTransactionHandler(
 
     private async Task<Transaction> GetAndValidateTransactionAsync(EditTransactionCommand request, CancellationToken ct)
     {
-        var transaction = await balanceRepository.GetTransactionByIdAsync(request.TransactionId, true, ct)
-                          ?? throw new TransactionNotFoundExcpetion(request.TransactionId);
+        var criteria = Criteria<Transaction>.New()
+            .Where(x => x.Id == request.TransactionId)
+            .ForUpdate()
+            .Track()
+            .Build();
+        
+        var transaction = await transactionRepository.FirstOrDefaultAsync(criteria, ct)
+                          ?? throw new TransactionNotFoundException(request.TransactionId);
 
         return transaction.IsDeleted
             ? throw new EditingDeletedTransactionException(request.TransactionId)
@@ -54,48 +60,34 @@ public class EditTransactionHandler(
 
     private async Task CreateTransactionVersionAsync(Transaction transaction, CancellationToken ct)
     {
-        var lastVersion = await balanceRepository.GetLastTransactionVersionAsync(transaction.Id, false, ct);
-        var transactionVersion = transaction.Adapt<TransactionVersion>();
-        transactionVersion.Version = lastVersion?.Version + 1 ?? 0;
-
-        await unitOfWork.AddAsync(transactionVersion, ct);
+        var version = TransactionUpdatedEvent.Create(transaction);
+        await unitOfWork.AddAsync(version, ct);
     }
 
     private async Task RollbackTransactionAsync(Transaction transaction, CancellationToken ct)
     {
-        transaction.IsDeleted = true;
+        Transaction copy = Transaction.CopyFrom(transaction);
+        copy.Delete(Guid.Empty, true);
+        
         await balanceService.RecalculateBalanceAsync(transaction, transaction.Id, ct);
         await balanceService.ChangeSenderReceiverBalancesAsync(transaction, ct);
     }
 
-    private void ApplyNewParameters(Transaction transaction, EditTransactionCommand request)
-    {
-        transaction.IsDeleted = false;
-        transaction.TransactionDatetime = request.TransactionDateTime;
-        transaction.TransactionSum = request.Amount;
-        transaction.Status = request.Status;
-        transaction.CurrencyId = request.CurrencyId;
-    }
-
     private async Task RecalculateBalancesAsync(
         Transaction transaction,
-        EditTransactionCommand request,
         CancellationToken ct)
     {
-        var prevSenderTransaction = await balanceRepository
-            .GetPreviousTransactionAsync(transaction.TransactionDatetime, transaction.SenderId, request.CurrencyId,
-                true, ct);
-        var prevReceiverTransaction = await balanceRepository
-            .GetPreviousTransactionAsync(transaction.TransactionDatetime, transaction.ReceiverId, request.CurrencyId,
-                true, ct);
+        var criteria = Criteria<Transaction>.New()
+            .ForUpdate()
+            .Build();
+        var prevSenderTransaction = await transactionRepository
+            .GetPreviousTransactionAsync(transaction.TransactionDatetime, transaction.SenderId, transaction.CurrencyId,
+                criteria, ct);
+        var prevReceiverTransaction = await transactionRepository
+            .GetPreviousTransactionAsync(transaction.TransactionDatetime, transaction.ReceiverId, transaction.CurrencyId,
+                criteria, ct);
 
-        transaction.SenderBalanceAfterTransaction = prevSenderTransaction?.SenderId == transaction.SenderId
-            ? prevSenderTransaction.SenderBalanceAfterTransaction - request.Amount
-            : (prevSenderTransaction?.ReceiverBalanceAfterTransaction ?? 0) - request.Amount;
-
-        transaction.ReceiverBalanceAfterTransaction = prevReceiverTransaction?.ReceiverId == transaction.ReceiverId
-            ? prevReceiverTransaction.ReceiverBalanceAfterTransaction + request.Amount
-            : (prevReceiverTransaction?.SenderBalanceAfterTransaction ?? 0) + request.Amount;
+        transaction.SetPrevBalances(prevSenderTransaction, prevReceiverTransaction);
     }
 
     private async Task ApplyNewTransactionVersionAsync(Transaction transaction, CancellationToken ct)

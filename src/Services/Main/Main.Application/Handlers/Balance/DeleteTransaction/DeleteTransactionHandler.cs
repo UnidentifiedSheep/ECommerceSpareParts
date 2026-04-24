@@ -2,9 +2,10 @@ using System.Collections.Immutable;
 using System.Data;
 using Abstractions.Interfaces.Services;
 using Application.Common.Interfaces;
+using Application.Common.Interfaces.Repositories;
 using Attributes;
-using Main.Abstractions.Interfaces.DbRepositories;
 using Main.Abstractions.Interfaces.Services;
+using Main.Application.Interfaces.Persistence;
 using Main.Entities;
 using Main.Entities.Exceptions.Balances;
 using Main.Entities.Transaction;
@@ -19,14 +20,11 @@ public record DeleteTransactionCommand(Guid TransactionId, Guid WhoDeleteUserId,
 public record DeleteTransactionResult(Transaction Transaction);
 
 public class DeleteTransactionHandler(
-    IBalanceRepository balanceRepository,
+    ITransactionRepository transactionRepository,
     IUnitOfWork unitOfWork,
     IBalanceService balanceService) : ICommandHandler<DeleteTransactionCommand, DeleteTransactionResult>
 {
-    private static readonly ImmutableHashSet<TransactionStatus> AllowedStatuses =
-    [
-        TransactionStatus.Normal
-    ];
+    
 
     public async Task<DeleteTransactionResult> Handle(
         DeleteTransactionCommand request,
@@ -34,26 +32,21 @@ public class DeleteTransactionHandler(
     {
         var transactionId = request.TransactionId;
         var whoDelete = request.WhoDeleteUserId;
-        var transaction = await balanceRepository.GetTransactionByIdAsync(transactionId, true, cancellationToken)
-                          ?? throw new TransactionNotFoundExcpetion(transactionId);
-        CheckTransaction(transaction, request.IsSystem);
+        var criteria = Criteria<Transaction>.New()
+            .Where(x => x.Id == transactionId)
+            .ForUpdate()
+            .Track()
+            .Build();
+        
+        var transaction = await transactionRepository.FirstOrDefaultAsync(criteria, cancellationToken)
+                          ?? throw new TransactionNotFoundException(transactionId);
 
-        transaction.IsDeleted = true;
-        transaction.DeletedAt = DateTime.Now;
-        transaction.DeletedBy = whoDelete;
+        transaction.Delete(request.WhoDeleteUserId, request.IsSystem);
 
         await balanceService.ChangeSenderReceiverBalancesAsync(transaction, cancellationToken);
         await balanceService.RecalculateBalanceAsync(transaction, transaction.Id, cancellationToken);
 
         await unitOfWork.SaveChangesAsync(cancellationToken);
         return new DeleteTransactionResult(transaction);
-    }
-
-    private void CheckTransaction(Transaction transaction, bool isSystem)
-    {
-        if (transaction.IsDeleted)
-            throw new TransactionAlreadyDeletedException(transaction.Id);
-        if (!isSystem && !AllowedStatuses.Contains(transaction.Status))
-            throw new BadTransactionStatusException(transaction.Status.ToString());
     }
 }

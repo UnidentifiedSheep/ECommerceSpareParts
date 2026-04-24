@@ -1,4 +1,5 @@
-﻿using BulkValidation.Core.Attributes;
+﻿using System.Collections.Immutable;
+using BulkValidation.Core.Attributes;
 using Domain;
 using Domain.Extensions;
 using Main.Entities.Exceptions.Balances;
@@ -43,9 +44,7 @@ public class Transaction : AuditableEntity<Transaction, Guid>
         CurrencyId = currencyId;
         Status = status;
         TransactionDatetime = transactionDatetime;
-        SetPrevBalances(
-            ExtractPrevBalance(senderId, prevSenderTransaction), 
-            ExtractPrevBalance(receiverId, prevReceiverTransaction));
+        SetPrevBalances(prevSenderTransaction, prevReceiverTransaction);
         SetTransactionSum(transactionSum);
     }
 
@@ -63,38 +62,54 @@ public class Transaction : AuditableEntity<Transaction, Guid>
             prevReceiverTransaction, transactionDatetime);
     }
 
-    public void Delete(Guid deletedBy)
+    public static Transaction CopyFrom(Transaction source)
+    {
+        return new Transaction
+        {
+            CurrencyId = source.CurrencyId,
+            DeletedAt = source.DeletedAt,
+            DeletedBy = source.DeletedBy,
+            Id = source.Id,
+            IsDeleted = source.IsDeleted,
+            ReceiverBalanceAfterTransaction = source.ReceiverBalanceAfterTransaction,
+            ReceiverId = source.ReceiverId,
+            RowVersion = source.RowVersion,
+            SenderId = source.SenderId,
+            SenderBalanceAfterTransaction = source.SenderBalanceAfterTransaction,
+            Status = source.Status,
+            TransactionDatetime = source.TransactionDatetime,
+            TransactionSum = source.TransactionSum,
+        };
+    }
+    
+    private static readonly ImmutableHashSet<TransactionStatus> AllowedToDeleteStatuses =
+    [
+        TransactionStatus.Normal
+    ];
+
+    public void Delete(Guid deletedBy, bool isSystem)
     {
         IsDeleted.AgainstEqual(
             next: true,
             () => new TransactionAlreadyDeletedException(Id));
+
+        if (!isSystem && !AllowedToDeleteStatuses.Contains(Status))
+            throw new BadTransactionStatusException(Status.ToString());
         
         IsDeleted = true;
         DeletedAt = DateTime.UtcNow;
         DeletedBy = deletedBy;
     }
 
-    public void SetPrevBalances(decimal prevReceiverBalance, decimal prevSenderBalance)
+    public void SetPrevBalances(Transaction? prevSenderTransaction, Transaction? prevReceiverTransaction)
     {
-        prevReceiverBalance
-            .AgainstTooManyDecimalPlaces(
-                maxDecimals: 2, 
-                exceptionFactory: () => new InvalidOperationException("Prev balance must have maximum 2 decimal places"))
-            .AgainstLessOrEqual(
-                min: 0m, 
-                exceptionFactory: () => new InvalidOperationException("Prev balance must be greater than 0"));
-        
-        prevSenderBalance
-            .AgainstTooManyDecimalPlaces(
-                maxDecimals: 2, 
-                exceptionFactory: () => new InvalidOperationException("Prev balance must have maximum 2 decimal places"))
-            .AgainstLessOrEqual(
-                min: 0m, 
-                exceptionFactory: () => new InvalidOperationException("Prev balance must be greater than 0"));
+        var prevSenderBalance = ExtractPrevBalance(SenderId, prevSenderTransaction);
+        var prevReceiverBalance = ExtractPrevBalance(ReceiverId, prevReceiverTransaction);
         
         ReceiverBalanceAfterTransaction = prevReceiverBalance + TransactionSum;
         SenderBalanceAfterTransaction = prevSenderBalance - TransactionSum;
     }
+    
     public void SetTransactionSum(decimal newAmount)
     {
         newAmount.AgainstTooManyDecimalPlaces(2, "transaction.amount.max.two.decimal.places")
@@ -113,6 +128,16 @@ public class Transaction : AuditableEntity<Transaction, Guid>
                     "SenderBalanceAfterTransaction after calculation is less or equal to 0"));
         
         TransactionSum = newAmount;
+    }
+
+    public void SetCurrencyId(int currencyId)
+    {
+        CurrencyId = currencyId;
+    }
+
+    public void SetTransactionDatetime(DateTime newDatetime)
+    {
+        TransactionDatetime = newDatetime;
     }
 
     private static decimal ExtractPrevBalance(Guid userId, Transaction? prevTransaction)
