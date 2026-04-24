@@ -10,15 +10,10 @@ public class UserSeed : ISeed<DContext>
     private const string System = "SYSTEM";
     public async Task SeedAsync(DContext context)
     {
-        if (await context.Users.AnyAsync(x => x.NormalizedUserName == System))
+        if (await context.Users.AnyAsync(x => x.UserName.NormalizedValue == System))
             return;
-        
-        var systemUser = new User
-        {
-            UserName = System,
-            NormalizedUserName = System,
-            PasswordHash = ""
-        };
+
+        var systemUser = User.Create(System, "");
 
         await context.Users.AddAsync(systemUser);
         await context.SaveChangesAsync();
