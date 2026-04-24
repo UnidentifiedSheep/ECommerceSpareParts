@@ -12,47 +12,6 @@ namespace Main.Persistence.Repositories;
 
 public class BalanceRepository(DContext context) : IBalanceRepository
 {
-    public async Task<Transaction?> GetTransactionByIdAsync(
-        Guid id,
-        bool track = true,
-        CancellationToken ct = default)
-    {
-        return await context.Transactions
-            .FromSql($"SELECT * FROM transactions WHERE id = {id} FOR UPDATE")
-            .ConfigureTracking(track)
-            .FirstOrDefaultAsync(ct);
-    }
-
-    public async Task<Transaction?> GetPreviousTransactionAsync(
-        DateTime dt,
-        Guid userId,
-        int currencyId,
-        bool track = true,
-        CancellationToken ct = default)
-    {
-        var sql = """
-                      SELECT * FROM transactions
-                      WHERE transaction_datetime <= @dt
-                        AND (sender_id = @userId OR receiver_id = @userId)
-                        AND currency_id = @currencyId
-                      ORDER BY transaction_datetime DESC, id DESC
-                      LIMIT 1
-                      FOR UPDATE
-                  """;
-
-        var dtParam = new NpgsqlParameter("dt", dt.ToUniversalTime())
-        {
-            NpgsqlDbType = NpgsqlDbType.TimestampTz
-        };
-        var userIdParam = new NpgsqlParameter("userId", userId);
-        var currencyIdParam = new NpgsqlParameter("currencyId", currencyId);
-
-        return await context.Transactions
-            .FromSqlRaw(sql, dtParam, userIdParam, currencyIdParam)
-            .ConfigureTracking(track)
-            .FirstOrDefaultAsync(ct);
-    }
-
     public IAsyncEnumerable<Transaction> GetAffectedTransactions(
         Guid userId,
         int currencyId,
@@ -129,54 +88,5 @@ public class BalanceRepository(DContext context) : IBalanceRepository
             .FromSqlRaw(sql, userIdParam, currencyIdParam)
             .ConfigureTracking(track)
             .FirstOrDefaultAsync(ct);
-    }
-
-    public async Task<TransactionVersion?> GetLastTransactionVersionAsync(
-        Guid transactionId,
-        bool track = true,
-        CancellationToken ct = default)
-    {
-        return await context.TransactionVersions
-            .AsNoTracking()
-            .Where(x => x.TransactionId == transactionId)
-            .OrderByDescending(x => x.Version)
-            .ConfigureTracking(track)
-            .FirstOrDefaultAsync(ct);
-    }
-
-    public async Task<IEnumerable<Transaction>> GetTransactionsAsync(
-        DateTime rangeStart,
-        DateTime rangeEnd,
-        int? currencyId,
-        Guid? senderId,
-        Guid? receiverId,
-        int page,
-        int viewCount,
-        bool track = true,
-        CancellationToken ct = default)
-    {
-        var query = context.Transactions.ConfigureTracking(track)
-            .Where(x =>
-                x.TransactionDatetime >= rangeStart &&
-                x.TransactionDatetime <= rangeEnd &&
-                (currencyId == null || x.CurrencyId == currencyId));
-
-        if (senderId != null && receiverId != null)
-            query = query.Where(x =>
-                (x.SenderId == senderId && x.ReceiverId == receiverId) ||
-                (x.SenderId == receiverId && x.ReceiverId == senderId));
-        else if (senderId != null)
-            query = query.Where(x => x.SenderId == senderId || x.ReceiverId == senderId);
-        else if (receiverId != null)
-            query = query.Where(x => x.SenderId == receiverId || x.ReceiverId == receiverId);
-
-
-        query = query
-            .OrderBy(x => x.TransactionDatetime)
-            .ThenBy(x => x.Id)
-            .Skip(page * viewCount)
-            .Take(viewCount);
-
-        return await query.ToListAsync(ct);
     }
 }

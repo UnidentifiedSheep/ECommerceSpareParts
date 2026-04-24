@@ -1,9 +1,10 @@
 ﻿using Application.Common.Interfaces;
 using Application.Common.Interfaces.Repositories;
 using LinqKit;
-using Main.Abstractions.Exceptions.Auth;
 using Main.Application.Dtos.Users;
 using Main.Application.Handlers.Projections;
+using Main.Application.Interfaces.Services;
+using Main.Entities.Exceptions.Auth;
 using Main.Entities.User;
 using Microsoft.EntityFrameworkCore;
 
@@ -18,7 +19,8 @@ public record GetUserFullInfoResult(
     IReadOnlyList<string> Permissions);
 
 public class GetUserFullInfoHandler(
-    IReadRepository<User, Guid> repository)
+    IReadRepository<User, Guid> repository,
+    IUserService userService)
     : IQueryHandler<GetUserFullInfoQuery, GetUserFullInfoResult>
 {
     public async Task<GetUserFullInfoResult> Handle(GetUserFullInfoQuery request, CancellationToken cancellationToken)
@@ -33,9 +35,10 @@ public class GetUserFullInfoHandler(
                 })
                 .FirstOrDefaultAsync(cancellationToken) 
                    ?? throw new UserNotFoundException(request.UserId);
-        
+
         var (roles, permissions) = await userService
-            .GetUserRolesAndPermissionsAsync(request.UserId, cancellationToken);
+                                       .GetUserRolesAndPermissionsAsync(request.UserId, cancellationToken)
+                                   ?? throw new UserNotFoundException(request.UserId);
         
 
         return new GetUserFullInfoResult(

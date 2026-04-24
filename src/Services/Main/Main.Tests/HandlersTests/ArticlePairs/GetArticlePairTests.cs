@@ -1,6 +1,6 @@
-﻿using Main.Abstractions.Exceptions.Articles;
-using Main.Application.Handlers.ArticlePairs.CreatePair;
+﻿using Main.Application.Handlers.ArticlePairs.CreatePair;
 using Main.Application.Handlers.Products.GetProductPair;
+using Main.Entities.Exceptions.Products;
 using Main.Persistence.Context;
 using MediatR;
 using Microsoft.EntityFrameworkCore;

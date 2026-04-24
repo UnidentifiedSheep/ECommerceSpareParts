@@ -1,8 +1,8 @@
 ﻿using Abstractions.Interfaces.Services;
 using Application.Common.Interfaces;
 using Attributes;
-using Main.Abstractions.Exceptions.Storages;
 using Main.Application.Interfaces.Persistence;
+using Main.Entities.Exceptions.Storages;
 using MediatR;
 
 namespace Main.Application.Handlers.StorageRoutes.DeleteStorageRoute;

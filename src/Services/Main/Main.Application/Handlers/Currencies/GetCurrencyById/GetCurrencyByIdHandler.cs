@@ -1,10 +1,10 @@
 using Application.Common.Interfaces;
 using Application.Common.Interfaces.Repositories;
 using LinqKit;
-using Main.Abstractions.Exceptions.Currencies;
 using Main.Application.Dtos.Currencies;
 using Main.Application.Handlers.Projections;
 using Main.Entities.Currency;
+using Main.Entities.Exceptions.Currencies;
 using Mapster;
 using Microsoft.EntityFrameworkCore;
 

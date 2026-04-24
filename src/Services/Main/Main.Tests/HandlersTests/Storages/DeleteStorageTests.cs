@@ -1,5 +1,5 @@
-﻿using Main.Abstractions.Exceptions.Storages;
-using Main.Application.Handlers.Storages.DeleteStorage;
+﻿using Main.Application.Handlers.Storages.DeleteStorage;
+using Main.Entities.Exceptions.Storages;
 using Main.Persistence.Context;
 using MediatR;
 using Microsoft.EntityFrameworkCore;

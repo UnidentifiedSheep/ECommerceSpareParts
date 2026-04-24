@@ -1,9 +1,9 @@
 using Application.Common.Interfaces;
 using Attributes;
 using Contracts.Articles;
-using Main.Abstractions.Exceptions.Articles;
 using Main.Application.Dtos.Product;
 using Main.Application.Interfaces.Persistence;
+using Main.Entities.Exceptions.Products;
 using MediatR;
 
 namespace Main.Application.Handlers.Products.PatchProduct;

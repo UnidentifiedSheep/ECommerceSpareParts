@@ -1,11 +1,11 @@
 using Main.Abstractions.Constants;
-using Main.Abstractions.Exceptions.Articles;
 using Main.Abstractions.Models;
 using Main.Application.Dtos.Sale;
 using Main.Application.Handlers.StorageContents.RestoreContent;
 using Main.Application.Models;
 using Main.Entities;
 using Main.Entities.Currency;
+using Main.Entities.Exceptions.Products;
 using Main.Entities.Product;
 using Main.Entities.Storage;
 using Main.Entities.User;

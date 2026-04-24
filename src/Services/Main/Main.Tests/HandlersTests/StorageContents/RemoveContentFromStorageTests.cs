@@ -1,8 +1,8 @@
 using Main.Abstractions.Constants;
-using Main.Abstractions.Exceptions.Storages;
 using Main.Application.Configs.Mapster;
 using Main.Application.Handlers.StorageContents.RemoveContent;
 using Main.Entities;
+using Main.Entities.Exceptions.Storages;
 using Main.Entities.Storage;
 using Main.Entities.User;
 using Main.Enums;

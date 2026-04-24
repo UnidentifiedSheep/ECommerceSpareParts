@@ -1,8 +1,8 @@
 using Application.Common.Interfaces;
 using Application.Common.Interfaces.Repositories;
 using Attributes;
-using Main.Abstractions.Exceptions.Articles;
 using Main.Application.Dtos.Product;
+using Main.Entities.Exceptions.Products;
 using Main.Entities.Storage;
 using MediatR;
 

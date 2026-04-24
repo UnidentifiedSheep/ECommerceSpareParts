@@ -1,7 +1,7 @@
 using Application.Common.Interfaces;
 using Application.Common.Interfaces.Repositories;
 using Attributes;
-using Main.Abstractions.Exceptions.Articles;
+using Main.Entities.Exceptions.Products;
 using MediatR;
 
 namespace Main.Application.Handlers.ProductContent.SetProductContentQuantity;

@@ -1,9 +1,9 @@
 ﻿using Application.Common.Interfaces;
 using Application.Common.Interfaces.Repositories;
 using LinqKit;
-using Main.Abstractions.Exceptions.Storages;
 using Main.Application.Dtos.Storage;
 using Main.Application.Handlers.Projections;
+using Main.Entities.Exceptions.Storages;
 using Main.Entities.Storage;
 using Mapster;
 using Microsoft.EntityFrameworkCore;

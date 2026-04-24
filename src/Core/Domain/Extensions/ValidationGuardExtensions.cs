@@ -67,6 +67,18 @@ public static class ValidationGuardExtensions
     {
         return value.CompareTo(min) < 0 ? throw new InvalidInputException(errorKey) : value;
     }
+    
+    public static T AgainstLessOrEqual<T>(this T value, T min, string errorKey)
+        where T : IComparable<T>
+    {
+        return value.CompareTo(min) <= 0 ? throw new InvalidInputException(errorKey) : value;
+    }
+
+    public static T AgainstGreaterOrEqual<T>(this T value, T max, string errorKey)
+        where T : IComparable<T>
+    {
+        return value.CompareTo(max) >= 0 ? throw new InvalidInputException(errorKey) : value;
+    }
 
     public static T AgainstNegative<T>(this T value, string errorKey)
         where T : struct, IComparable<T>
@@ -152,6 +164,19 @@ public static class ValidationGuardExtensions
     {
         return value.CompareTo(min) < 0 ? throw exceptionFactory() : value;
     }
+    
+    public static T AgainstLessOrEqual<T>(this T value, T min, Func<Exception> exceptionFactory)
+        where T : IComparable<T>
+    {
+        return value.CompareTo(min) <= 0 ? throw exceptionFactory() : value;
+    }
+
+    public static T AgainstGreaterOrEqual<T>(this T value, T max, Func<Exception> exceptionFactory)
+        where T : IComparable<T>
+    {
+        return value.CompareTo(max) >= 0 ? throw exceptionFactory() : value;
+    }
+    
 
     public static T AgainstNegative<T>(this T value, Func<Exception> exceptionFactory)
         where T : struct, IComparable<T>

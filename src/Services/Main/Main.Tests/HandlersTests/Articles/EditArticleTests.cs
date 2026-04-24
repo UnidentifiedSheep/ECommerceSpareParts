@@ -1,9 +1,9 @@
 using Abstractions.Models;
 using FluentValidation;
-using Main.Abstractions.Exceptions.Articles;
 using Main.Application.Configs.Mapster;
 using Main.Application.Dtos.Product;
 using Main.Application.Handlers.Products.PatchProduct;
+using Main.Entities.Exceptions.Products;
 using Main.Persistence.Context;
 using MediatR;
 using Microsoft.Extensions.DependencyInjection;

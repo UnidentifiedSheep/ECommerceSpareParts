@@ -2,9 +2,9 @@ using Abstractions.Models;
 using Application.Common.Extensions;
 using Application.Common.Interfaces;
 using Application.Common.Interfaces.Repositories;
-using Main.Abstractions.Exceptions.Articles;
 using Main.Application.Dtos.Product;
 using Main.Application.Interfaces.Persistence;
+using Main.Entities.Exceptions.Products;
 using Main.Entities.Product;
 using Mapster;
 

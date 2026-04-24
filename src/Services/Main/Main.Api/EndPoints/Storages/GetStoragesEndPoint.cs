@@ -1,10 +1,10 @@
 using Abstractions.Models;
 using Api.Common.Extensions;
 using Carter;
-using Main.Abstractions.Exceptions.Storages;
 using Main.Application.Dtos.Storage;
 using Main.Application.Handlers.Storages.GetStorage;
 using Main.Application.Handlers.Storages.GetStorageByName;
+using Main.Entities.Exceptions.Storages;
 using Main.Enums;
 using Mapster;
 using MediatR;

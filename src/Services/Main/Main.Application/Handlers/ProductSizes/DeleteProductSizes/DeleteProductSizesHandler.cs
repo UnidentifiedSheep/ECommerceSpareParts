@@ -2,8 +2,8 @@
 using Application.Common.Interfaces;
 using Application.Common.Interfaces.Repositories;
 using Attributes;
-using Main.Abstractions.Exceptions.Articles;
 using Main.Application.Notifications;
+using Main.Entities.Exceptions.Products;
 using Main.Entities.Product;
 using MediatR;
 

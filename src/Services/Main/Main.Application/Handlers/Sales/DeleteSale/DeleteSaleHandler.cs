@@ -1,9 +1,9 @@
 using Abstractions.Interfaces.Services;
 using Application.Common.Interfaces;
 using Attributes;
-using Main.Abstractions.Exceptions.Sales;
 using Main.Abstractions.Interfaces.DbRepositories;
 using Main.Entities;
+using Main.Entities.Exceptions.Sales;
 using Main.Entities.Sale;
 
 namespace Main.Application.Handlers.Sales.DeleteSale;

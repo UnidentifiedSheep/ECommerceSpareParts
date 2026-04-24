@@ -1,10 +1,10 @@
 ﻿using Main.Abstractions.Constants;
-using Main.Abstractions.Exceptions.Articles;
 using Main.Application.Dtos.Product;
 using Main.Application.Handlers.ProductReservations.CreateProductReservation;
 using Main.Application.Handlers.ProductReservations.EditProductReservation;
 using Main.Entities;
 using Main.Entities.Currency;
+using Main.Entities.Exceptions.Products;
 using Main.Entities.Product;
 using Main.Entities.User;
 using Main.Persistence.Context;

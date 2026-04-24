@@ -1,10 +1,10 @@
 using System.Data;
 using Abstractions.Interfaces.Services;
 using Application.Common.Interfaces;
+using Application.Common.Interfaces.Repositories;
 using Attributes;
-using Main.Abstractions.Interfaces.DbRepositories;
 using Main.Abstractions.Interfaces.Services;
-using Main.Entities;
+using Main.Application.Interfaces.Persistence;
 using Main.Entities.Transaction;
 using Main.Enums;
 
@@ -16,14 +16,13 @@ public record CreateTransactionCommand(
     Guid ReceiverId,
     decimal Amount,
     int CurrencyId,
-    Guid WhoCreatedTransaction,
     DateTime TransactionDateTime,
     TransactionStatus TransactionStatus) : ICommand<CreateTransactionResult>;
 
 public record CreateTransactionResult(Transaction Transaction);
 
 public class CreateTransactionHandler(
-    IBalanceRepository balanceRepository,
+    ITransactionRepository transactionRepository,
     IBalanceService balanceService,
     IUnitOfWork unitOfWork) : ICommandHandler<CreateTransactionCommand, CreateTransactionResult>
 {
@@ -33,54 +32,26 @@ public class CreateTransactionHandler(
     {
         var senderId = request.SenderId;
         var receiverId = request.ReceiverId;
-        var whoCreatedTransaction = request.WhoCreatedTransaction;
         var amount = request.Amount;
         var currencyId = request.CurrencyId;
         var transactionDateTime = request.TransactionDateTime;
 
-        var prevSenderTransaction = await balanceRepository.GetPreviousTransactionAsync(transactionDateTime, senderId,
-            currencyId, true, cancellationToken);
-        var prevReceiverTransaction = await balanceRepository.GetPreviousTransactionAsync(transactionDateTime,
-            receiverId,
-            currencyId, true, cancellationToken);
+        var criteria = Criteria<Transaction>.New()
+            .ForUpdate()
+            .Build();
 
-        var transaction = CreateTransaction(senderId, receiverId, currencyId, whoCreatedTransaction, amount,
-            transactionDateTime,
-            request.TransactionStatus, prevSenderTransaction, prevReceiverTransaction);
+        var prevSenderTransaction = await transactionRepository.GetPreviousTransactionAsync(transactionDateTime, 
+            senderId, currencyId, criteria, cancellationToken);
+        var prevReceiverTransaction = await transactionRepository.GetPreviousTransactionAsync(transactionDateTime,
+            receiverId, currencyId, criteria, cancellationToken);
+
+        Transaction transaction = Transaction.Create(senderId, receiverId, currencyId, request.TransactionStatus,
+            amount, prevSenderTransaction, prevReceiverTransaction, transactionDateTime);
 
         await unitOfWork.AddAsync(transaction, cancellationToken);
         await balanceService.ChangeSenderReceiverBalancesAsync(transaction, cancellationToken);
         await balanceService.RecalculateBalanceAsync(transaction, null, cancellationToken);
         await unitOfWork.SaveChangesAsync(cancellationToken);
         return new CreateTransactionResult(transaction);
-    }
-
-    private Transaction CreateTransaction(
-        Guid senderId,
-        Guid receiverId,
-        int currencyId,
-        Guid whoCreatedTransaction,
-        decimal amount,
-        DateTime transactionDateTime,
-        TransactionStatus transactionStatus,
-        Transaction? prevSenderTransaction,
-        Transaction? prevReceiverTransaction)
-    {
-        return new Transaction
-        {
-            SenderId = senderId,
-            ReceiverId = receiverId,
-            CurrencyId = currencyId,
-            WhoMadeUserId = whoCreatedTransaction,
-            TransactionSum = amount,
-            TransactionDatetime = transactionDateTime,
-            ReceiverBalanceAfterTransaction = prevReceiverTransaction?.ReceiverId == receiverId
-                ? prevReceiverTransaction.ReceiverBalanceAfterTransaction + amount
-                : (prevReceiverTransaction?.SenderBalanceAfterTransaction ?? 0) + amount,
-            SenderBalanceAfterTransaction = prevSenderTransaction?.SenderId == senderId
-                ? prevSenderTransaction.SenderBalanceAfterTransaction - amount
-                : (prevSenderTransaction?.ReceiverBalanceAfterTransaction ?? 0) - amount,
-            Status = transactionStatus
-        };
     }
 }

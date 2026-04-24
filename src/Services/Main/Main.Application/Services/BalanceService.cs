@@ -1,13 +1,12 @@
 using Abstractions.Interfaces.Services;
-using Main.Abstractions.Interfaces.DbRepositories;
 using Main.Abstractions.Interfaces.Services;
-using Main.Entities;
+using Main.Application.Interfaces.Persistence;
 using Main.Entities.Transaction;
 using Main.Entities.User;
 
 namespace Main.Application.Services;
 
-public class BalanceService(IBalanceRepository balanceRepository, IUnitOfWork unitOfWork) : IBalanceService
+public class BalanceService(ITransactionRepository balanceRepository, IUnitOfWork unitOfWork) : IBalanceService
 {
     public async Task ChangeSenderReceiverBalancesAsync(
         Transaction transaction,

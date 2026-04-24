@@ -1,11 +1,11 @@
 using Abstractions.Models;
 using Exceptions.Base;
-using Main.Abstractions.Exceptions.Storages;
 using Main.Abstractions.Models;
 using Main.Application.Configs.Mapster;
 using Main.Application.Dtos.Amw.Storage;
 using Main.Application.Handlers.StorageContents.EditContent;
 using Main.Entities;
+using Main.Entities.Exceptions.Storages;
 using Main.Entities.Storage;
 using Main.Persistence.Context;
 using MediatR;

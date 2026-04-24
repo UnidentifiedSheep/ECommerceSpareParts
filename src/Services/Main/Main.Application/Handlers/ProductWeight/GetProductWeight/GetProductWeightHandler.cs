@@ -1,7 +1,7 @@
 ﻿using Application.Common.Interfaces;
 using Application.Common.Interfaces.Repositories;
-using Main.Abstractions.Exceptions.Articles;
 using Main.Application.Dtos.Product;
+using Main.Entities.Exceptions.Products;
 using Microsoft.EntityFrameworkCore;
 
 namespace Main.Application.Handlers.ProductWeight.GetProductWeight;

@@ -1,9 +1,9 @@
 using Exceptions.Base;
 using Main.Abstractions.Constants;
-using Main.Abstractions.Exceptions.Storages;
 using Main.Application.Configs.Mapster;
 using Main.Application.Handlers.StorageContents.DeleteContent;
 using Main.Entities;
+using Main.Entities.Exceptions.Storages;
 using Main.Entities.Storage;
 using Main.Entities.User;
 using Main.Persistence.Context;

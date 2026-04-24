@@ -1,10 +1,10 @@
 using Main.Abstractions.Constants;
-using Main.Abstractions.Exceptions.Articles;
 using Main.Application.Configs.Mapster;
 using Main.Application.Dtos.Storage;
 using Main.Application.Handlers.StorageContents.AddContent;
 using Main.Entities;
 using Main.Entities.Currency;
+using Main.Entities.Exceptions.Products;
 using Main.Entities.Product;
 using Main.Entities.Storage;
 using Main.Entities.User;

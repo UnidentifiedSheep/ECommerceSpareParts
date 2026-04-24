@@ -2,7 +2,7 @@ using Abstractions.Interfaces.Services;
 using Application.Common.Interfaces;
 using Application.Common.Interfaces.Repositories;
 using Attributes;
-using Main.Abstractions.Exceptions.Storages;
+using Main.Entities.Exceptions.Storages;
 using Main.Entities.Storage;
 using MediatR;
 

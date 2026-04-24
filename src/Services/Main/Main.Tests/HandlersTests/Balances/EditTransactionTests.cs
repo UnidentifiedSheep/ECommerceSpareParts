@@ -1,9 +1,9 @@
 using FluentValidation;
-using Main.Abstractions.Exceptions.Balances;
 using Main.Application.Configs.Mapster;
 using Main.Application.Handlers.Balance.EditTransaction;
 using Main.Entities;
 using Main.Entities.Currency;
+using Main.Entities.Exceptions.Balances;
 using Main.Entities.Transaction;
 using Main.Entities.User;
 using Main.Enums;

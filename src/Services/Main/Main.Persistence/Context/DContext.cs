@@ -104,8 +104,6 @@ public partial class DContext : DbContext
 
     public virtual DbSet<Transaction> Transactions { get; set; }
 
-    public virtual DbSet<TransactionVersion> TransactionVersions { get; set; }
-
     public virtual DbSet<User> Users { get; set; }
 
     public virtual DbSet<UserBalance> UserBalances { get; set; }

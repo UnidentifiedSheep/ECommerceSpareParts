@@ -1,11 +1,11 @@
 ﻿using Bogus;
-using Main.Abstractions.Exceptions.Cart;
 using Main.Application.Dtos.Emails;
 using Main.Application.Handlers.Cart.AddToCart;
 using Main.Application.Handlers.Cart.ChangeCartItemCount;
 using Main.Application.Handlers.Producers.CreateProducer;
 using Main.Application.Handlers.Products.CreateProducts;
 using Main.Application.Handlers.Users.CreateUser;
+using Main.Entities.Exceptions.Cart;
 using Main.Enums;
 using Main.Persistence.Context;
 using MediatR;

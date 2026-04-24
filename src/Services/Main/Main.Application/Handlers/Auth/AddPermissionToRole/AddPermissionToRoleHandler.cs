@@ -1,9 +1,9 @@
 ﻿using Application.Common.Interfaces;
 using Application.Common.Interfaces.Repositories;
 using Attributes;
-using Main.Abstractions.Exceptions.Auth;
 using Main.Entities.Auth;
 using Main.Entities.Auth.ValueObjects;
+using Main.Entities.Exceptions.Auth;
 using MediatR;
 
 namespace Main.Application.Handlers.Auth.AddPermissionToRole;

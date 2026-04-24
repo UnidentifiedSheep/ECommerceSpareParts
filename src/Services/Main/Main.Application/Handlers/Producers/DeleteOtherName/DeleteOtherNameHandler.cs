@@ -2,7 +2,7 @@ using Abstractions.Interfaces.Services;
 using Application.Common.Interfaces;
 using Application.Common.Interfaces.Repositories;
 using Attributes;
-using Main.Abstractions.Exceptions.Producers;
+using Main.Entities.Exceptions.Producers;
 using Main.Entities.Producer;
 using MediatR;
 

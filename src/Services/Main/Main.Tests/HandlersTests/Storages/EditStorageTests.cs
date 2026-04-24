@@ -1,10 +1,10 @@
 using Abstractions.Models;
 using Bogus;
-using Main.Abstractions.Exceptions.Storages;
 using Main.Application.Configs.Mapster;
 using Main.Application.Dtos.Storage;
 using Main.Application.Handlers.Storages.EditStorage;
 using Main.Entities;
+using Main.Entities.Exceptions.Storages;
 using Main.Entities.Storage;
 using Main.Enums;
 using Main.Persistence.Context;

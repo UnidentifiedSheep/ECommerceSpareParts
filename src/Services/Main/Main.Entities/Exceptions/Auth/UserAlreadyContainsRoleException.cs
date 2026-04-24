@@ -1,0 +1,16 @@
+﻿using Abstractions.Interfaces.Exceptions;
+using Exceptions.Base;
+
+namespace Main.Entities.Exceptions.Auth;
+
+public class UserAlreadyContainsRoleException : ConflictException, ILocalizableException
+{
+    public UserAlreadyContainsRoleException(Guid userId, string role)
+        : base(null, new { UserId = userId, Role = role })
+    {
+        Arguments = [role];
+    }
+
+    public string MessageKey => "user.already.have.this.role";
+    public object[]? Arguments { get; }
+}
