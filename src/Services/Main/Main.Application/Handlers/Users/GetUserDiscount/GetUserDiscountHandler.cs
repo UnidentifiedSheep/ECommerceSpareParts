@@ -1,6 +1,4 @@
 ﻿using Application.Common.Interfaces;
-using Main.Abstractions.Interfaces.CacheRepositories;
-using Main.Abstractions.Interfaces.DbRepositories;
 using Main.Abstractions.Interfaces.Services;
 
 namespace Main.Application.Handlers.Users.GetUserDiscount;
