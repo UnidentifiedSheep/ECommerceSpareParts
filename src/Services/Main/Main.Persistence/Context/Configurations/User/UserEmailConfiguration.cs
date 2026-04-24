@@ -11,15 +11,15 @@ public class UserEmailConfiguration : IEntityTypeConfiguration<UserEmail>
     {
         builder.ToTable("user_emails", "auth");
         
-        builder.HasKey(e => e.NormalizedEmail)
+        builder.HasKey("normalized_email")
             .HasName("user_emails_pk");
 
-        builder.HasIndex(e => e.NormalizedEmail)
+        builder.HasIndex("normalized_email")
             .HasDatabaseName("user_emails_normalized_email_index")
             .HasMethod("gin")
             .HasOperators("gin_trgm_ops");
 
-        builder.HasIndex(e => e.NormalizedEmail)
+        builder.HasIndex("normalized_email")
             .HasDatabaseName("user_emails_normalized_email_uindex")
             .IsUnique();
 
@@ -37,24 +37,29 @@ public class UserEmailConfiguration : IEntityTypeConfiguration<UserEmail>
         builder.Property(e => e.ConfirmedAt)
             .HasColumnName("confirmed_at");
         
-        builder.Property(e => e.Email)
-            .HasMaxLength(255)
-            .HasColumnName("email");
-        
         builder.Property(e => e.EmailType)
             .HasMaxLength(50)
             .HasColumnName("email_type");
         
         builder.Property(e => e.IsPrimary).HasColumnName("is_primary");
-        
-        builder.Property(e => e.NormalizedEmail)
-            .HasMaxLength(255)
-            .HasColumnName("normalized_email");
+
+        builder.OwnsOne(
+            b => b.Email,
+            b =>
+            {
+                b.Property(e => e.NormalizedValue)
+                    .HasMaxLength(255)
+                    .HasColumnName("normalized_email");
+                
+                b.Property(e => e.Value)
+                    .HasMaxLength(255)
+                    .HasColumnName("email");
+            });
         
         builder.Property(e => e.UserId).HasColumnName("user_id");
 
         builder.HasOne<Entities.User.User>()
-            .WithMany(p => p.UserEmails)
+            .WithMany(p => p.Emails)
             .HasForeignKey(d => d.UserId)
             .HasConstraintName("user_emails_users_id_fk");
     }

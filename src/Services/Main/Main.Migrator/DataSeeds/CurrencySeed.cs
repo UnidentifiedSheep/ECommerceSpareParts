@@ -1,5 +1,4 @@
-﻿using Main.Entities;
-using Main.Entities.Currency;
+﻿using Main.Entities.Currency;
 using Main.Persistence.Context;
 using Microsoft.EntityFrameworkCore;
 using Persistence.Interfaces;
@@ -12,15 +11,8 @@ public class CurrencySeed : ISeed<DContext>
     {
         if (await context.Currencies.AnyAsync(x => x.Id == 1))
             return;
-        
-        var usd = new Currency
-        {
-            Id = 1,
-            ShortName = "Дол.",
-            Name = "Доллар США",
-            CurrencySign = "$",
-            Code = "USD"
-        };
+
+        var usd = Currency.Create("Доллар США", "Дол.", "$", "USD");
 
         await context.Currencies.AddAsync(usd);
         await context.SaveChangesAsync();

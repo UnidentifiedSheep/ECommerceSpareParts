@@ -76,7 +76,7 @@ public class UserVehicleConfiguration : IEntityTypeConfiguration<UserVehicle>
             .HasColumnName("vin");
 
         builder.HasOne<Entities.User.User>()
-            .WithMany(p => p.UserVehicles)
+            .WithMany(p => p.Vehicles)
             .HasForeignKey(d => d.UserId)
             .HasConstraintName("user_vehicles_users_id_fk");
     }

@@ -49,5 +49,29 @@ public class UserConfiguration : IEntityTypeConfiguration<Entities.User.User>
         
         builder.Property(e => e.TwoFactorEnabled)
             .HasColumnName("two_factor_enabled");
+        
+        builder.Navigation(e => e.Emails)
+            .HasField("_emails")
+            .UsePropertyAccessMode(PropertyAccessMode.Field);
+        
+        builder.Navigation(e => e.Permissions)
+            .HasField("_permissions")
+            .UsePropertyAccessMode(PropertyAccessMode.Field);
+        
+        builder.Navigation(e => e.Phones)
+            .HasField("_phones")
+            .UsePropertyAccessMode(PropertyAccessMode.Field);
+        
+        builder.Navigation(e => e.Roles)
+            .HasField("_roles")
+            .UsePropertyAccessMode(PropertyAccessMode.Field);
+        
+        builder.Navigation(e => e.Vehicles)
+            .HasField("_vehicles")
+            .UsePropertyAccessMode(PropertyAccessMode.Field);
+        
+        builder.Navigation(e => e.CartItems)
+            .HasField("_cartItems")
+            .UsePropertyAccessMode(PropertyAccessMode.Field);
     }
 }

@@ -30,7 +30,7 @@ public class UserPermissionConfiguration : IEntityTypeConfiguration<UserPermissi
             .HasConstraintName("user_permissions_permissions_name_fk");
 
         builder.HasOne<Entities.User.User>()
-            .WithMany(p => p.UserPermissions)
+            .WithMany(p => p.Permissions)
             .HasForeignKey(d => d.UserId)
             .OnDelete(DeleteBehavior.Restrict)
             .HasConstraintName("user_permissions_users_id_fk");

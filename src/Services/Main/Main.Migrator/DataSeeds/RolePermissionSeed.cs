@@ -1,6 +1,4 @@
 ﻿using Enums;
-using Extensions;
-using Main.Entities;
 using Main.Entities.Auth;
 using Main.Persistence.Context;
 using Microsoft.EntityFrameworkCore;
@@ -25,12 +23,12 @@ public class RolePermissionSeed : ISeed<DContext>
 
         foreach (var role in roles)
         {
-            if (!Enum.TryParse(role.NormalizedName, out Role parsedRole))
+            if (!Enum.TryParse(role.Name.NormalizedValue, out Role parsedRole))
                 continue;
             if (!rolePermissions.TryGetValue(parsedRole, out var needed))
                 continue;
 
-            role.RolePermissions = ResolvePermissions(role.NormalizedName, needed, permissions);
+            await context.AddRangeAsync(ResolvePermissions(role.Name.NormalizedValue, needed, permissions));
         }
 
         await context.SaveChangesAsync();
@@ -217,7 +215,9 @@ public class RolePermissionSeed : ISeed<DContext>
                 PermissionCodes.STORAGES_CONTENT_GET_STANDARD,
                 PermissionCodes.USERS_VEHICLES_CREATE_ME,
                 PermissionCodes.ARTICLES_GET_MAIN
-            ]
+            ],
+            
+            [Role.Supplier] = []
         };
     }
 
@@ -231,17 +231,13 @@ public class RolePermissionSeed : ISeed<DContext>
 
         foreach (var code in needed)
         {
-            var key = code.ToNormalizedPermission();
+            var key = Permission.ToNormalizedPermission(code);
 
             if (!permissions.TryGetValue(key, out var permission))
                 throw new InvalidOperationException(
                     $"Permission '{key}' not found in database");
 
-            result.Add(new RolePermission
-            {
-                RoleName = role,
-                PermissionName = permission.Name,
-            });
+            result.Add(RolePermission.Create(role, permission.Name));
         }
 
         return result;

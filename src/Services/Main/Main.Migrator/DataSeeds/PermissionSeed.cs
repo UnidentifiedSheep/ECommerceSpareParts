@@ -1,5 +1,4 @@
 ﻿using Enums;
-using Main.Entities;
 using Main.Entities.Auth;
 using Main.Persistence.Context;
 using Persistence.Interfaces;
