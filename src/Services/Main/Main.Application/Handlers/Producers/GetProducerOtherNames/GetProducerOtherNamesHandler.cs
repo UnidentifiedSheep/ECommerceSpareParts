@@ -8,7 +8,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Main.Application.Handlers.Producers.GetProducerOtherNames;
 
-public record GetProducerOtherNamesQuery(int ProducerId, PaginationModel Pagination)
+public record GetProducerOtherNamesQuery(int ProducerId, Pagination Pagination)
     : IQuery<GetProducerOtherNamesResult>;
 
 public record GetProducerOtherNamesResult(IReadOnlyList<ProducerOtherNameDto> Names);

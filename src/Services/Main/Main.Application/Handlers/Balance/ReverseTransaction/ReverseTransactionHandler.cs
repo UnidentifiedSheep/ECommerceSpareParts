@@ -6,32 +6,32 @@ using Application.Common.Interfaces.Repositories;
 using Attributes;
 using Main.Abstractions.Interfaces.Services;
 using Main.Application.Interfaces.Persistence;
+using Main.Application.Interfaces.Services;
 using Main.Entities;
+using Main.Entities.Balance;
 using Main.Entities.Exceptions.Balances;
-using Main.Entities.Transaction;
 using Main.Enums;
 
 namespace Main.Application.Handlers.Balance.DeleteTransaction;
 
+[AutoSave]
 [Transactional(IsolationLevel.Serializable, 20, 3)]
-public record DeleteTransactionCommand(Guid TransactionId, Guid WhoDeleteUserId, bool IsSystem = false)
-    : ICommand<DeleteTransactionResult>;
+public record ReverseTransactionCommand(Guid TransactionId, Guid WhoReversed, bool IsSystem = false)
+    : ICommand<ReverseTransactionResult>;
 
-public record DeleteTransactionResult(Transaction Transaction);
+public record ReverseTransactionResult(Transaction Transaction);
 
-public class DeleteTransactionHandler(
+public class ReverseTransactionHandler(
     ITransactionRepository transactionRepository,
-    IUnitOfWork unitOfWork,
-    IBalanceService balanceService) : ICommandHandler<DeleteTransactionCommand, DeleteTransactionResult>
+    IBalanceService balanceService) : ICommandHandler<ReverseTransactionCommand, ReverseTransactionResult>
 {
     
 
-    public async Task<DeleteTransactionResult> Handle(
-        DeleteTransactionCommand request,
+    public async Task<ReverseTransactionResult> Handle(
+        ReverseTransactionCommand request,
         CancellationToken cancellationToken)
     {
         var transactionId = request.TransactionId;
-        var whoDelete = request.WhoDeleteUserId;
         var criteria = Criteria<Transaction>.New()
             .Where(x => x.Id == transactionId)
             .ForUpdate()
@@ -41,12 +41,8 @@ public class DeleteTransactionHandler(
         var transaction = await transactionRepository.FirstOrDefaultAsync(criteria, cancellationToken)
                           ?? throw new TransactionNotFoundException(transactionId);
 
-        transaction.Delete(request.WhoDeleteUserId, request.IsSystem);
-
+        transaction.Reverse(request.WhoReversed);
         await balanceService.ChangeSenderReceiverBalancesAsync(transaction, cancellationToken);
-        await balanceService.RecalculateBalanceAsync(transaction, transaction.Id, cancellationToken);
-
-        await unitOfWork.SaveChangesAsync(cancellationToken);
-        return new DeleteTransactionResult(transaction);
+        return new ReverseTransactionResult(transaction);
     }
 }

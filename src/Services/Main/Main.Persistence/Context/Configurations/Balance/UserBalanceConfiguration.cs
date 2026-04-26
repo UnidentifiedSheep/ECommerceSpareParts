@@ -11,7 +11,7 @@ public class UserBalanceConfiguration : IEntityTypeConfiguration<UserBalance>
     {
         builder.ToTable("user_balances");
         
-        builder.HasKey(e => e.Id)
+        builder.HasKey(e => new { e.UserId, e.CurrencyId })
             .HasName("user_balances_pk");
 
         builder.HasIndex(e => e.Balance)
@@ -26,9 +26,6 @@ public class UserBalanceConfiguration : IEntityTypeConfiguration<UserBalance>
 
         builder.HasIndex(e => e.UserId)
             .HasDatabaseName("user_balances_user_id_index");
-
-        builder.Property(e => e.Id)
-            .HasColumnName("id");
         
         builder.Property(e => e.Balance)
             .HasColumnName("balance");

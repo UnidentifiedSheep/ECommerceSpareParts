@@ -2,9 +2,9 @@ using FluentValidation;
 using Main.Application.Configs.Mapster;
 using Main.Application.Handlers.Balance.EditTransaction;
 using Main.Entities;
+using Main.Entities.Balance;
 using Main.Entities.Currency;
 using Main.Entities.Exceptions.Balances;
-using Main.Entities.Transaction;
 using Main.Entities.User;
 using Main.Enums;
 using Main.Persistence.Context;
@@ -67,7 +67,7 @@ public class EditTransactionTests : IAsyncLifetime
             .FirstAsync();
 
         var newAmount = 999.99m;
-        var newStatus = TransactionStatus.Purchase;
+        var newStatus = TransactionType.Purchase;
         var newDate = DateTime.Now.AddDays(-1);
         var newCurrency = await _context.Currencies.AsNoTracking().FirstAsync(x => x.Id != _currency.Id);
 
@@ -111,7 +111,7 @@ public class EditTransactionTests : IAsyncLifetime
                 senderBalance = 0;
             if (!balancesDict.TryGetValue(tr.ReceiverId.ToString() + tr.CurrencyId, out var receiverBalance))
                 receiverBalance = 0;
-            var amount = tr.TransactionSum;
+            var amount = tr.Amount;
             balancesDict[tr.SenderId.ToString() + tr.CurrencyId] = senderBalance - amount;
             balancesDict[tr.ReceiverId.ToString() + tr.CurrencyId] = receiverBalance + amount;
             Assert.Equal(balancesDict[tr.SenderId.ToString() + tr.CurrencyId], tr.SenderBalanceAfterTransaction);
@@ -120,9 +120,9 @@ public class EditTransactionTests : IAsyncLifetime
 
         Assert.False(updatedTransaction.IsDeleted);
         //balances assert
-        Assert.Equal(senderBalanceBeforeFirstCurrency.Balance + transaction.TransactionSum,
+        Assert.Equal(senderBalanceBeforeFirstCurrency.Balance + transaction.Amount,
             senderBalanceAfterFirstCurrency.Balance);
-        Assert.Equal(receiverBalanceBeforeFirstCurrency.Balance - transaction.TransactionSum,
+        Assert.Equal(receiverBalanceBeforeFirstCurrency.Balance - transaction.Amount,
             receiverBalanceAfterFirstCurrency.Balance);
         Assert.NotNull(senderBalanceAfterSecondCurrency);
         Assert.NotNull(receiverBalanceAfterSecondCurrency);
@@ -131,8 +131,8 @@ public class EditTransactionTests : IAsyncLifetime
 
         Assert.NotNull(updatedTransaction);
         Assert.Equal(newCurrency.Id, updatedTransaction.CurrencyId);
-        Assert.Equal(newAmount, updatedTransaction.TransactionSum);
-        Assert.Equal(newStatus, updatedTransaction.Status);
+        Assert.Equal(newAmount, updatedTransaction.Amount);
+        Assert.Equal(newStatus, updatedTransaction.Type);
         Assert.True(
             Math.Abs((updatedTransaction.TransactionDatetime - newDate.ToUniversalTime()).TotalMilliseconds) < 1);
 
@@ -142,8 +142,8 @@ public class EditTransactionTests : IAsyncLifetime
             .FirstOrDefaultAsync();
 
         Assert.NotNull(version);
-        Assert.Equal(transaction.TransactionSum, version.TransactionSum);
-        Assert.Equal(transaction.Status, version.Status);
+        Assert.Equal(transaction.Amount, version.TransactionSum);
+        Assert.Equal(transaction.Type, version.Status);
         Assert.True(Math.Abs((transaction.TransactionDatetime.ToUniversalTime() -
                               version.TransactionDatetime.ToUniversalTime()).TotalMilliseconds) < 1);
     }
@@ -159,12 +159,12 @@ public class EditTransactionTests : IAsyncLifetime
             .Skip(5)
             .FirstAsync();
 
-        var oldAmount = transaction.TransactionSum;
-        var oldStatus = transaction.Status;
+        var oldAmount = transaction.Amount;
+        var oldStatus = transaction.Type;
         var oldDate = transaction.TransactionDatetime;
 
         var newAmount = 999.99m;
-        var newStatus = TransactionStatus.Purchase;
+        var newStatus = TransactionType.Purchase;
         var newDate = transaction.TransactionDatetime.AddSeconds(-1);
 
         var senderBalanceBefore = await _context.UserBalances
@@ -184,8 +184,8 @@ public class EditTransactionTests : IAsyncLifetime
 
         Assert.NotNull(updatedTransaction);
         Assert.False(updatedTransaction.IsDeleted);
-        Assert.Equal(newAmount, updatedTransaction.TransactionSum);
-        Assert.Equal(newStatus, updatedTransaction.Status);
+        Assert.Equal(newAmount, updatedTransaction.Amount);
+        Assert.Equal(newStatus, updatedTransaction.Type);
         Assert.True(Math.Abs((updatedTransaction.TransactionDatetime - newDate).TotalSeconds) < 1);
 
         var senderBalanceAfter = await _context.UserBalances
@@ -219,8 +219,8 @@ public class EditTransactionTests : IAsyncLifetime
             if (!balances.TryGetValue(receiverKey, out var receiverBalance))
                 receiverBalance = 0;
 
-            balances[senderKey] = senderBalance - tr.TransactionSum;
-            balances[receiverKey] = receiverBalance + tr.TransactionSum;
+            balances[senderKey] = senderBalance - tr.Amount;
+            balances[receiverKey] = receiverBalance + tr.Amount;
 
             Assert.Equal(balances[senderKey], tr.SenderBalanceAfterTransaction);
             Assert.Equal(balances[receiverKey], tr.ReceiverBalanceAfterTransaction);
@@ -248,7 +248,7 @@ public class EditTransactionTests : IAsyncLifetime
         var transaction = _transactions.First();
 
         var command = new EditTransactionCommand(transaction.Id, transaction.CurrencyId, amount,
-            TransactionStatus.Normal, DateTime.Now);
+            TransactionType.Normal, DateTime.Now);
 
         await Assert.ThrowsAsync<ValidationException>(async () => await _mediator.Send(command));
     }
@@ -261,7 +261,7 @@ public class EditTransactionTests : IAsyncLifetime
         await _context.SaveChangesAsync();
 
         var command = new EditTransactionCommand(transaction.Id, transaction.CurrencyId, 123.45m,
-            TransactionStatus.Normal, DateTime.Now);
+            TransactionType.Normal, DateTime.Now);
 
         await Assert.ThrowsAsync<TransactionNotFoundException>(async () => await _mediator.Send(command));
     }
@@ -270,7 +270,7 @@ public class EditTransactionTests : IAsyncLifetime
     public async Task EditTransaction_WithInvalidTransactionId_ThrowsTransactionNotFoundException()
     {
         var command =
-            new EditTransactionCommand(Guid.NewGuid(), _currency.Id, 100m, TransactionStatus.Normal, DateTime.Now);
+            new EditTransactionCommand(Guid.NewGuid(), _currency.Id, 100m, TransactionType.Normal, DateTime.Now);
 
         await Assert.ThrowsAsync<TransactionNotFoundException>(async () => await _mediator.Send(command));
     }

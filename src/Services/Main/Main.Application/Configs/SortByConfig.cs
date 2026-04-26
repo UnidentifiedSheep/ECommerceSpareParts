@@ -30,12 +30,12 @@ public static class SortByConfig
             .Map("name", x => x.Name);
         new Purchase().MapDefault(x => x.PurchaseDatetime)
             .Map("dateTime", x => x.PurchaseDatetime)
-            .Map("totalSum", x => x.Transaction.TransactionSum)
+            .Map("totalSum", x => x.Transaction.Amount)
             .Map("id", x => x.Id);
 
         new Sale().MapDefault(x => x.SaleDatetime)
             .Map("dateTime", x => x.SaleDatetime)
-            .Map("totalSum", x => x.Transaction.TransactionSum)
+            .Map("totalSum", x => x.Transaction.Amount)
             .Map("id", x => x.Id);
 
         new StorageContentReservation()

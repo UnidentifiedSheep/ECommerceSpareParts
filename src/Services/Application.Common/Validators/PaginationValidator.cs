@@ -4,7 +4,7 @@ using Localization.Domain.Extensions;
 
 namespace Application.Common.Validators;
 
-public class PaginationValidator : AbstractValidator<PaginationModel>
+public class PaginationValidator : AbstractValidator<Pagination>
 {
     public PaginationValidator()
     {

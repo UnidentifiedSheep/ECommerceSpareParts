@@ -37,7 +37,7 @@ public class GetRolesTests : IAsyncLifetime
     [Fact]
     public async Task GetRoles_EmptyDb_ReturnsEmpty()
     {
-        var query = new GetRolesQuery(null, new PaginationModel(0, 10));
+        var query = new GetRolesQuery(null, new Pagination(0, 10));
         var result = await _mediator.Send(query);
         Assert.NotNull(result);
         Assert.Empty(result.Roles);
@@ -58,11 +58,11 @@ public class GetRolesTests : IAsyncLifetime
             });
         await _context.SaveChangesAsync();
 
-        var queryAll = new GetRolesQuery(null, new PaginationModel(0, 10));
+        var queryAll = new GetRolesQuery(null, new Pagination(0, 10));
         var resultAll = await _mediator.Send(queryAll);
         Assert.Equal(3, resultAll.Roles.Count());
 
-        var querySearch = new GetRolesQuery("adm", new PaginationModel(0, 10));
+        var querySearch = new GetRolesQuery("adm", new Pagination(0, 10));
         var resultSearch = await _mediator.Send(querySearch);
         Assert.Single(resultSearch.Roles);
     }

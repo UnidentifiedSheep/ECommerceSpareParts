@@ -9,8 +9,8 @@ using Main.Application.Handlers.Balance.EditTransaction;
 using Main.Application.Handlers.Logistics.CalculateDeliveryCost;
 using Main.Application.Handlers.Purchases.AddContentLogisticsToPurchase;
 using Main.Entities;
+using Main.Entities.Balance;
 using Main.Entities.Purchase;
-using Main.Entities.Transaction;
 using Main.Enums;
 using Mapster;
 using MediatR;
@@ -81,18 +81,18 @@ public class PurchaseService(IMediator mediator) : IPurchaseService
 
         if (deliveryTransactionId != null && prevCarrierId == route.CarrierId)
             return (await mediator.Send(new EditTransactionCommand(deliveryTransactionId.Value, deliveryCost.CurrencyId,
-                deliveryCost.TotalCost, TransactionStatus.Logistics, dateTime), cancellationToken)).Transaction;
+                deliveryCost.TotalCost, TransactionType.Fee, dateTime), cancellationToken)).Transaction;
 
 
         if (deliveryTransactionId != null)
-            await mediator.Send(new DeleteTransactionCommand(deliveryTransactionId.Value, whoUpdated, true),
+            await mediator.Send(new ReverseTransactionCommand(deliveryTransactionId.Value, whoUpdated, true),
                 cancellationToken);
 
         if (route.CarrierId == null) return null;
 
         return (await mediator.Send(new CreateTransactionCommand(Global.SystemId, route.CarrierId.Value,
             deliveryCost.TotalCost, deliveryCost.CurrencyId, whoUpdated, dateTime,
-            TransactionStatus.Logistics), cancellationToken)).Transaction;
+            TransactionType.Fee), cancellationToken)).Transaction;
     }
 
     private async Task AddLogisticsContentToPurchaseInternal<TDto>(

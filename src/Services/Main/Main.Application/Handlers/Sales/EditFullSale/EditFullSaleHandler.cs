@@ -195,7 +195,7 @@ public class EditFullSaleHandler(
         CancellationToken cancellationToken = default)
     {
         var command =
-            new EditTransactionCommand(transactionId, currencyId, totalSum, TransactionStatus.Sale, saleDateTime);
+            new EditTransactionCommand(transactionId, currencyId, totalSum, TransactionType.Sale, saleDateTime);
         await mediator.Send(command, cancellationToken);
     }
 

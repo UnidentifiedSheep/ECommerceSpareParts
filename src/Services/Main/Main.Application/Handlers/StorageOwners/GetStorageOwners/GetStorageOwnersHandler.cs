@@ -12,7 +12,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Main.Application.Handlers.StorageOwners.GetStorageOwners;
 
-public record GetStorageOwnersQuery(string Name, PaginationModel Pagination) : IQuery<GetStorageOwnersResult>;
+public record GetStorageOwnersQuery(string Name, Pagination Pagination) : IQuery<GetStorageOwnersResult>;
 
 public record GetStorageOwnersResult(IReadOnlyList<UserDto> Owners);
 

@@ -1,19 +1,18 @@
 ﻿using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Security.Cryptography;
-using Abstractions.Interfaces;
-using Abstractions.Models;
+using Main.Application.Dtos.Users;
+using Main.Application.Interfaces.Services;
+using Main.Application.Models;
 using Microsoft.IdentityModel.Tokens;
-using Security.Models;
 
-namespace Security.Services;
+namespace Main.Application.Services;
 
 public class JwtGenerator(JwtOptions options) : IJwtGenerator
 {
     private readonly JwtSecurityTokenHandler _tokenHandler = new();
     public string CreateToken(
-        User user,
-        UserInfo userInfo,
+        UserDto user,
         string deviceId,
         IEnumerable<string> roles,
         IEnumerable<string> permissions)
@@ -24,7 +23,7 @@ public class JwtGenerator(JwtOptions options) : IJwtGenerator
             SigningCredentials = options.SigningCredentials,
             Issuer = options.ValidIssuer,
             Expires = DateTime.UtcNow.Add(options.ValidDuration),
-            Subject = GetClaims(user, userInfo, deviceId, roles, permissions)
+            Subject = GetClaims(user, deviceId, roles, permissions)
         };
         return _tokenHandler.WriteToken(_tokenHandler.CreateToken(tokenDescriptor));
     }
@@ -53,14 +52,13 @@ public class JwtGenerator(JwtOptions options) : IJwtGenerator
     }
 
     private ClaimsIdentity GetClaims(
-        User user,
-        UserInfo userInfo,
+        UserDto user,
         string deviceId,
         IEnumerable<string> roles,
         IEnumerable<string> permissions)
     {
         var claims = new ClaimsIdentity();
-        claims.AddClaim(new Claim(ClaimTypes.GivenName, userInfo.Name + " " + userInfo.Surname));
+        claims.AddClaim(new Claim(ClaimTypes.GivenName, user.UserInfo?.Name + " " + user.UserInfo?.Surname));
         claims.AddClaim(new Claim(ClaimTypes.Name, user.UserName));
         claims.AddClaim(new Claim("device_id", deviceId));
         claims.AddClaim(new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()));

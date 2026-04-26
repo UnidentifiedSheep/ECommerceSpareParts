@@ -58,7 +58,7 @@ public class UserEmailConfiguration : IEntityTypeConfiguration<UserEmail>
         
         builder.Property(e => e.UserId).HasColumnName("user_id");
 
-        builder.HasOne<Entities.User.User>()
+        builder.HasOne<Entities.User.User>(e => e.User)
             .WithMany(p => p.Emails)
             .HasForeignKey(d => d.UserId)
             .HasConstraintName("user_emails_users_id_fk");

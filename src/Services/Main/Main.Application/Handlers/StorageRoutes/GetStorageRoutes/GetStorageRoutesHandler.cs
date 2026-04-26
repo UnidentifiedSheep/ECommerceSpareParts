@@ -15,7 +15,7 @@ public record GetStorageRoutesQuery(
     string? StorageFrom,
     string? StorageTo,
     bool? IsActive,
-    PaginationModel PaginationModel) : IQuery<GetStorageRoutesResult>;
+    Pagination Pagination) : IQuery<GetStorageRoutesResult>;
 
 public record GetStorageRoutesResult(List<StorageRouteDto> StorageRoutes);
 
@@ -34,7 +34,7 @@ public class GetStorageRoutesHandler(
         if (request.IsActive.HasValue)
             query = query.Where(x => x.IsActive == request.IsActive);
         
-        query = query.ApplyPagination(request.PaginationModel);
+        query = query.ApplyPagination(request.Pagination);
 
         var routes = await query
             .AsExpandable()

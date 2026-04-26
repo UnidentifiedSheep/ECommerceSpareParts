@@ -8,7 +8,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Main.Application.Handlers.ProductCharacteristics.GetCharacteristics;
 
-public record GetCharacteristicsQuery(int ProductId, PaginationModel Pagination)
+public record GetCharacteristicsQuery(int ProductId, Pagination Pagination)
     : IQuery<GetCharacteristicsResult>;
 
 public record GetCharacteristicsResult(IReadOnlyList<ProductCharacteristicDto> Characteristics);

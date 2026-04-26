@@ -31,7 +31,7 @@ public class GetStorageContentEndPoint : ICarterModule
                 async (ISender sender, CancellationToken token, [AsParameters] GetStorageContentRequest request) =>
                 {
                     var query = new GetStorageContentQuery(request.StorageName, request.ArticleId,
-                        new PaginationModel(request.Page, request.Limit),
+                        new Pagination(request.Page, request.Limit),
                         request.ShowZeroCount);
                     var result = await sender.Send(query, token);
                     var response = result.Adapt<GetStorageContentResponse>();

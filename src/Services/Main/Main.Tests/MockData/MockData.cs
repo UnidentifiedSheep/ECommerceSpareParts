@@ -5,10 +5,10 @@ using Main.Application.Dtos.Product;
 using Main.Application.Dtos.Storage;
 using Main.Application.Dtos.Users;
 using Main.Entities;
+using Main.Entities.Balance;
 using Main.Entities.Currency;
 using Main.Entities.Sale;
 using Main.Entities.Storage;
-using Main.Entities.Transaction;
 using Main.Enums;
 
 namespace Tests.MockData;
@@ -134,7 +134,7 @@ public static class MockData
         var r = receiverIds.ToList();
         var balanceCounter = new Dictionary<string, decimal>();
         var f = new Faker<Transaction>(Locale)
-            .RuleFor(x => x.TransactionSum, f => Math.Round(f.Random.Decimal(1, 100000), 2))
+            .RuleFor(x => x.Amount, f => Math.Round(f.Random.Decimal(1, 100000), 2))
             .RuleFor(x => x.SenderId, f => f.PickRandom(senderIds))
             .RuleFor(x => x.ReceiverId, (f, t) =>
             {
@@ -149,7 +149,7 @@ public static class MockData
             .RuleFor(x => x.TransactionDatetime,
                 f => f.Date.Between(DateTime.Now.AddMonths(-2), DateTime.Now.AddMonths(2)))
             .RuleFor(x => x.CurrencyId, f => f.PickRandom(currencyIds))
-            .RuleFor(x => x.Status, _ => TransactionStatus.Normal)
+            .RuleFor(x => x.Type, _ => TransactionType.Normal)
             .RuleFor(x => x.WhoMadeUserId, _ => whoMade);
 
         var tr = f.Generate(count);
@@ -162,8 +162,8 @@ public static class MockData
                 receiverBalance = 0;
             item.SenderBalanceAfterTransaction = senderBalance;
             item.ReceiverBalanceAfterTransaction = receiverBalance;
-            item.SenderBalanceAfterTransaction -= item.TransactionSum;
-            item.ReceiverBalanceAfterTransaction += item.TransactionSum;
+            item.SenderBalanceAfterTransaction -= item.Amount;
+            item.ReceiverBalanceAfterTransaction += item.Amount;
             balanceCounter[item.SenderId.ToString() + item.CurrencyId] = item.SenderBalanceAfterTransaction;
             balanceCounter[item.ReceiverId.ToString() + item.CurrencyId] = item.ReceiverBalanceAfterTransaction;
         }

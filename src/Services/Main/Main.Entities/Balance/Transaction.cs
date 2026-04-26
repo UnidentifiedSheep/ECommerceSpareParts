@@ -1,11 +1,11 @@
-﻿using System.Collections.Immutable;
-using BulkValidation.Core.Attributes;
+﻿using BulkValidation.Core.Attributes;
 using Domain;
 using Domain.Extensions;
-using Main.Entities.Exceptions.Balances;
+using Exceptions;
+using Main.Entities.User;
 using Main.Enums;
 
-namespace Main.Entities.Transaction;
+namespace Main.Entities.Balance;
 
 public class Transaction : AuditableEntity<Transaction, Guid>
 {
@@ -14,18 +14,19 @@ public class Transaction : AuditableEntity<Transaction, Guid>
     public int CurrencyId { get; private set; }
     public Guid SenderId { get; private set; }
     public Guid ReceiverId { get; private set; }
-    public decimal TransactionSum { get; private set; }
+    public decimal Amount { get; private set; }
+    public TransactionType Type { get; private set; }
     public TransactionStatus Status { get; private set; }
     public DateTime TransactionDatetime { get; private set; }
-
-    public decimal ReceiverBalanceAfterTransaction { get; private set; }
-    public decimal SenderBalanceAfterTransaction { get; private set; }
-
-    public bool IsDeleted { get; private set; }
-    public DateTime? DeletedAt { get; private set; }
-    public Guid? DeletedBy { get; private set; }
-    
+    public DateTime? ReversedAt { get; private set; }
+    public Guid? ReversedBy { get; private set; }
     public uint RowVersion { get; private set; }
+    
+    public bool IsCompleted => Status.HasFlag(TransactionStatus.Completed);
+    public bool IsCompletionApplied => Status.HasFlag(TransactionStatus.CompletionApplied);
+
+    public bool IsReversed => Status.HasFlag(TransactionStatus.Reversed);
+    public bool IsReversalApplied => Status.HasFlag(TransactionStatus.ReversedApplied);
     
     private Transaction() {}
 
@@ -33,119 +34,136 @@ public class Transaction : AuditableEntity<Transaction, Guid>
         Guid senderId, 
         Guid receiverId, 
         int currencyId, 
-        TransactionStatus status, 
-        decimal transactionSum, 
-        Transaction? prevSenderTransaction,
-        Transaction? prevReceiverTransaction,
+        TransactionType type, 
+        decimal transactionSum,
         DateTime transactionDatetime)
     {
+        if (senderId == receiverId)
+            throw new InvalidInputException(""); //TODO: create error message.
         SenderId = senderId;
         ReceiverId = receiverId;
-        CurrencyId = currencyId;
-        Status = status;
-        TransactionDatetime = transactionDatetime;
-        SetPrevBalances(prevSenderTransaction, prevReceiverTransaction);
-        SetTransactionSum(transactionSum);
+        Type = type;
+        Status = TransactionStatus.Pending;
+        SetTransactionDatetime(transactionDatetime);
+        SetCurrencyId(currencyId);
+        SetAmount(transactionSum);
     }
 
     public static Transaction Create(
         Guid senderId,
         Guid receiverId,
         int currencyId,
-        TransactionStatus status,
+        TransactionType type,
         decimal transactionSum,
-        Transaction? prevSenderTransaction,
-        Transaction? prevReceiverTransaction,
         DateTime transactionDatetime)
     {
-        return new Transaction(senderId, receiverId, currencyId, status, transactionSum, prevSenderTransaction,
-            prevReceiverTransaction, transactionDatetime);
-    }
-
-    public static Transaction CopyFrom(Transaction source)
-    {
-        return new Transaction
-        {
-            CurrencyId = source.CurrencyId,
-            DeletedAt = source.DeletedAt,
-            DeletedBy = source.DeletedBy,
-            Id = source.Id,
-            IsDeleted = source.IsDeleted,
-            ReceiverBalanceAfterTransaction = source.ReceiverBalanceAfterTransaction,
-            ReceiverId = source.ReceiverId,
-            RowVersion = source.RowVersion,
-            SenderId = source.SenderId,
-            SenderBalanceAfterTransaction = source.SenderBalanceAfterTransaction,
-            Status = source.Status,
-            TransactionDatetime = source.TransactionDatetime,
-            TransactionSum = source.TransactionSum,
-        };
+        return new Transaction(senderId, receiverId, currencyId, type, transactionSum, transactionDatetime);
     }
     
-    private static readonly ImmutableHashSet<TransactionStatus> AllowedToDeleteStatuses =
-    [
-        TransactionStatus.Normal
-    ];
-
-    public void Delete(Guid deletedBy, bool isSystem)
+    private void SetAmount(decimal newAmount)
     {
-        IsDeleted.AgainstEqual(
-            next: true,
-            () => new TransactionAlreadyDeletedException(Id));
-
-        if (!isSystem && !AllowedToDeleteStatuses.Contains(Status))
-            throw new BadTransactionStatusException(Status.ToString());
-        
-        IsDeleted = true;
-        DeletedAt = DateTime.UtcNow;
-        DeletedBy = deletedBy;
-    }
-
-    public void SetPrevBalances(Transaction? prevSenderTransaction, Transaction? prevReceiverTransaction)
-    {
-        var prevSenderBalance = ExtractPrevBalance(SenderId, prevSenderTransaction);
-        var prevReceiverBalance = ExtractPrevBalance(ReceiverId, prevReceiverTransaction);
-        
-        ReceiverBalanceAfterTransaction = prevReceiverBalance + TransactionSum;
-        SenderBalanceAfterTransaction = prevSenderBalance - TransactionSum;
-    }
-    
-    public void SetTransactionSum(decimal newAmount)
-    {
-        newAmount.AgainstTooManyDecimalPlaces(2, "transaction.amount.max.two.decimal.places")
+        Amount = newAmount.AgainstTooManyDecimalPlaces(2, "transaction.amount.max.two.decimal.places")
             .AgainstLessOrEqual(0m, "transaction.amount.must.be.positive");
-        
-        ReceiverBalanceAfterTransaction = (ReceiverBalanceAfterTransaction - TransactionSum + newAmount)
-            .AgainstLessOrEqual(
-                min: 0m,
-                exceptionFactory: () => new InvalidOperationException(
-                    "ReceiverBalanceAfterTransaction after calculation is less or equal to 0"));
-        
-        SenderBalanceAfterTransaction = (SenderBalanceAfterTransaction + TransactionSum - newAmount)
-            .AgainstLessOrEqual(
-                min: 0m,
-                exceptionFactory: () => new InvalidOperationException(
-                    "SenderBalanceAfterTransaction after calculation is less or equal to 0"));
-        
-        TransactionSum = newAmount;
     }
 
-    public void SetCurrencyId(int currencyId)
+    private void SetCurrencyId(int currencyId)
     {
+        currencyId.AgainstLessOrEqual(
+            min: 0,
+            exceptionFactory: () => new ArgumentException("CurrencyId must be greater than zero"));
         CurrencyId = currencyId;
     }
 
-    public void SetTransactionDatetime(DateTime newDatetime)
+    private void SetTransactionDatetime(DateTime newDatetime)
     {
         TransactionDatetime = newDatetime;
     }
 
-    private static decimal ExtractPrevBalance(Guid userId, Transaction? prevTransaction)
+    public void Complete()
     {
-        if (prevTransaction == null) return 0m;
-        return prevTransaction.SenderId == userId 
-            ? prevTransaction.SenderBalanceAfterTransaction 
-            : prevTransaction.ReceiverBalanceAfterTransaction;
+        EnsureCanMutate();
+
+        if (Status != TransactionStatus.Pending)
+            throw new InvalidOperationException("Only Pending transactions can be completed");
+
+        Status |= TransactionStatus.Completed;
     }
+
+    public void Reverse(Guid reversedBy)
+    {
+        EnsureCanMutate();
+
+        if (!IsCompleted)
+            throw new InvalidOperationException("Only Completed transactions can be reversed");
+
+        if (!IsCompletionApplied)
+            throw new InvalidOperationException("Cannot reverse before completion is applied");
+
+        Status |= TransactionStatus.Reversed;
+        ReversedAt = DateTime.UtcNow;
+        ReversedBy = reversedBy;
+    }
+
+    public void Apply(UserBalance senderBalance, UserBalance receiverBalance)
+    {
+        ValidateBalances(senderBalance, receiverBalance);
+        
+        if (!IsCompleted && !IsReversed)
+            throw new InvalidOperationException("Nothing to apply");
+        
+        if (IsReversed)
+        {
+            if (!IsCompletionApplied)
+                throw new InvalidOperationException("Cannot reverse before completion is applied");
+            if (IsReversalApplied)
+                throw new InvalidOperationException("Reversed already applied.");
+            ApplyReversed(senderBalance, receiverBalance);
+            Status |= TransactionStatus.ReversedApplied;
+            return;
+        }
+        
+        if (IsCompleted)
+        {
+            if (IsCompletionApplied)
+                throw new InvalidOperationException("Completion already applied.");
+            ApplyCompleted(senderBalance, receiverBalance);
+            Status |= TransactionStatus.CompletionApplied;
+        }
+    }
+
+    private void ValidateBalances(UserBalance senderBalance, UserBalance receiverBalance)
+    {
+        if (senderBalance.CurrencyId != CurrencyId)
+            throw new InvalidOperationException("Sender balance currency mismatch");
+        if (receiverBalance.CurrencyId != CurrencyId)
+            throw new InvalidOperationException("Receiver balance currency mismatch");
+        if (senderBalance.UserId != SenderId)
+            throw new InvalidOperationException("Sender balance user mismatch");
+        if (receiverBalance.UserId != ReceiverId)
+            throw new InvalidOperationException("Receiver balance user mismatch");
+    }
+
+    private void ApplyCompleted(UserBalance sender, UserBalance receiver)
+    {
+        sender.IncrementBalance(-Amount);
+        receiver.IncrementBalance(Amount);
+    }
+
+    private void ApplyReversed(UserBalance sender, UserBalance receiver)
+    {
+        sender.IncrementBalance(Amount);
+        receiver.IncrementBalance(-Amount);
+    }
+    
+    private void EnsureCanMutate()
+    {
+        if (IsCompleted && IsReversed)
+            throw new InvalidOperationException("Invalid state: both Completed and Reversed");
+
+        if (IsReversed)
+            throw new InvalidOperationException("Transaction is in terminal state");
+        
+    }
+
     public override Guid GetId() => Id;
 }

@@ -19,8 +19,7 @@ internal class RegisterHandler(IMediator mediator) : ICommandHandler<RegisterCom
         var userInfo = new UserInfoDto
         {
             Name = request.Name,
-            Surname = request.Surname,
-            IsSupplier = false
+            Surname = request.Surname
         };
         var email = new EmailDto
         {
@@ -29,8 +28,8 @@ internal class RegisterHandler(IMediator mediator) : ICommandHandler<RegisterCom
             IsPrimary = true,
             Type = EmailType.Unknown
         };
-        var command = new CreateUserCommand(request.UserName, request.Password, userInfo,
-            [email], [], ["Member"]);
+        var command = new CreateUserCommand(request.UserName, request.Password, userInfo, 
+            [email], [nameof(Role.Member)]);
         await mediator.Send(command, cancellationToken);
         return Unit.Value;
     }

@@ -10,7 +10,7 @@ using Mapster;
 
 namespace Main.Application.Handlers.Products.GetProductCrosses;
 
-public record GetProductCrossesQuery(int ArticleId, PaginationModel Pagination, string? SortBy, Guid? UserId)
+public record GetProductCrossesQuery(int ArticleId, Pagination Pagination, string? SortBy, Guid? UserId)
     : IQuery<GetProductCrossesResult>;
 
 public record GetProductCrossesResult(IEnumerable<ProductDto> Crosses, ProductDto RequestedProduct);
@@ -54,7 +54,7 @@ public class GetProductCrossesHandler(
 
     private async Task<IReadOnlyList<Product>> GetCrosses(
         int articleId, 
-        PaginationModel pagination,
+        Pagination pagination,
         string? sortBy,
         CancellationToken token)
     {

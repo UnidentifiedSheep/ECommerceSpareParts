@@ -19,7 +19,7 @@ public class GetCurrenciesEndPoint : ICarterModule
     {
         app.MapGet("/currencies", async (ISender sender, int page, int limit, CancellationToken cancellation) =>
             {
-                var query = new GetCurrenciesQuery(new PaginationModel(page, limit));
+                var query = new GetCurrenciesQuery(new Pagination(page, limit));
                 var result = await sender.Send(query, cancellation);
                 return Results.Ok(result.Adapt<GetCurrenciesResponse>());
             }).WithTags("Currencies")

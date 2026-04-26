@@ -34,7 +34,7 @@ public class UserService(
         return dbDiscount;
     }
 
-    public async Task<UserRolesAndPermissions?> GetUserRolesAndPermissionsAsync(
+    public async Task<UserRolesAndPermissions> GetUserRolesAndPermissionsAsync(
         Guid userId, 
         CancellationToken token = default)
     {
@@ -48,7 +48,11 @@ public class UserService(
             return rp;
         
         rp = await userRepository.GetUserRolesAndPermissionsAsync(userId, token);
-        if (rp == null) return null;
+        if (rp == null) return new UserRolesAndPermissions
+        {
+            Permissions = [],
+            Roles = []
+        };
             
         await cacheRepository.SetUserRoles(userId, rp.Roles);
         await cacheRepository.SetUserPermissions(userId, rp.Permissions);

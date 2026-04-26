@@ -31,13 +31,13 @@ using Main.Application.Handlers.StorageRoutes.AddStorageRoute;
 using Main.Application.Handlers.Storages.CreateStorage;
 using Main.Entities;
 using Main.Entities.Auth;
+using Main.Entities.Balance;
 using Main.Entities.Cart;
 using Main.Entities.Producer;
 using Main.Entities.Product;
 using Main.Entities.Purchase;
 using Main.Entities.Sale;
 using Main.Entities.Storage;
-using Main.Entities.Transaction;
 using Main.Entities.User;
 using Mapster;
 using Utils;
@@ -279,7 +279,7 @@ public static class MapsterConfig
             .Map(dest => dest.Id, src => src.Id)
             .Map(dest => dest.Storage, s => s.Storage)
             .Map(dest => dest.Supplier, src => src.Supplier)
-            .Map(dest => dest.TotalSum, src => src.Transaction.TransactionSum)
+            .Map(dest => dest.TotalSum, src => src.Transaction.Amount)
             .Map(dest => dest.TransactionId, src => src.TransactionId)
             .Map(dest => dest.Currency, src => src.Currency)
             .Map(dest => dest.PurchaseDatetime, src => src.PurchaseDatetime)
@@ -335,7 +335,7 @@ public static class MapsterConfig
         //Purchase
         TypeAdapterConfig<Sale, MemberPurchaseDto>.NewConfig()
             .Map(dest => dest.Id, src => src.Id)
-            .Map(dest => dest.TotalSum, src => src.Transaction.TransactionSum)
+            .Map(dest => dest.TotalSum, src => src.Transaction.Amount)
             .Map(dest => dest.CurrencyId, src => src.CurrencyId)
             .Map(dest => dest.PurchaseDatetime, src => src.SaleDatetime);
 
@@ -352,8 +352,8 @@ public static class MapsterConfig
             .Map(dest => dest.Id, src => src.Id)
             .Map(dest => dest.SenderId, s => s.SenderId)
             .Map(dest => dest.ReceiverId, s => s.ReceiverId)
-            .Map(dest => dest.Amount, s => s.TransactionSum)
-            .Map(dest => dest.Status, s => s.Status)
+            .Map(dest => dest.Amount, s => s.Amount)
+            .Map(dest => dest.Status, s => s.Type)
             .Map(dest => dest.TransactionDate, dest => dest.TransactionDatetime)
             .Map(dest => dest.CurrencyId, s => s.CurrencyId);
 
@@ -363,10 +363,10 @@ public static class MapsterConfig
             .Map(dest => dest.SenderId, s => s.SenderId)
             .Map(dest => dest.ReceiverId, s => s.ReceiverId)
             .Map(dest => dest.CurrencyId, s => s.CurrencyId)
-            .Map(dest => dest.Status, s => s.Status)
+            .Map(dest => dest.Status, s => s.Type)
             .Map(dest => dest.TransactionDatetime,
                 dest => dest.TransactionDatetime)
-            .Map(dest => dest.TransactionSum, dest => dest.TransactionSum);
+            .Map(dest => dest.TransactionSum, dest => dest.Amount);
 
         //STORAGES
 
@@ -416,7 +416,7 @@ public static class MapsterConfig
         TypeAdapterConfig<Sale, SaleDto>.NewConfig()
             .Map(dest => dest.Id, src => src.Id)
             .Map(dest => dest.Buyer, src => src.Buyer)
-            .Map(dest => dest.TotalSum, src => src.Transaction.TransactionSum)
+            .Map(dest => dest.TotalSum, src => src.Transaction.Amount)
             .Map(dest => dest.TransactionId, src => src.TransactionId)
             .Map(dest => dest.Currency, src => src.Currency)
             .Map(dest => dest.SaleDatetime, src => src.SaleDatetime)

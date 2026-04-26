@@ -17,7 +17,6 @@ public static class ServiceProvider
         this IServiceCollection collection,
         PasswordRules? passwordRules = null)
     {
-        collection.AddSingleton<IJwtGenerator, JwtGenerator>();
         collection.AddSingleton<IPasswordManager, PasswordManager>();
         collection.AddSingleton(passwordRules ?? new PasswordRules());
         collection.AddSingleton<ITokenHasher, TokenHasher>();

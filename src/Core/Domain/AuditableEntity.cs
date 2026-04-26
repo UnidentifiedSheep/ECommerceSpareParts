@@ -12,7 +12,7 @@ public abstract class AuditableEntity<TModel, TKey> : Entity<TModel, TKey>, IAud
 
     public void SetCreatedUser(Guid userId)
     {
-        if (WhoCreated == Guid.Empty)
+        if (WhoCreated != Guid.Empty)
             throw new InvalidOperationException("Can't set created user, it's already set");
         
         WhoCreated = userId;

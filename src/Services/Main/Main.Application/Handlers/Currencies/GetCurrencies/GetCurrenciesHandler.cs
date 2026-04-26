@@ -11,7 +11,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Main.Application.Handlers.Currencies.GetCurrencies;
 
-public record GetCurrenciesQuery(PaginationModel Pagination) : IQuery<GetCurrenciesResult>;
+public record GetCurrenciesQuery(Pagination Pagination) : IQuery<GetCurrenciesResult>;
 
 public record GetCurrenciesResult(IEnumerable<CurrencyDto> Currencies);
 

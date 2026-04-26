@@ -17,7 +17,7 @@ public class GetMarkupGroupsEndPoint : ICarterModule
     {
         app.MapGet("/markups/", async (ISender sender, int page, int limit, CancellationToken cancellationToken) =>
             {
-                var query = new GetMarkupGroupsQuery(new PaginationModel(page, limit));
+                var query = new GetMarkupGroupsQuery(new Pagination(page, limit));
                 var result = await sender.Send(query, cancellationToken);
                 var response = result.Adapt<GetMarkupGroupsResponse>();
                 return Results.Ok(response);

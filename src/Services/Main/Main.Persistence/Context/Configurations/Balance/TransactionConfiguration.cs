@@ -3,9 +3,9 @@ using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
 namespace Main.Persistence.Context.Configurations.Transaction;
 
-public class TransactionConfiguration : IEntityTypeConfiguration<Entities.Transaction.Transaction>
+public class TransactionConfiguration : IEntityTypeConfiguration<Entities.Balance.Transaction>
 {
-    public void Configure(EntityTypeBuilder<Entities.Transaction.Transaction> builder)
+    public void Configure(EntityTypeBuilder<Entities.Balance.Transaction> builder)
     {
         builder.ToTable("transactions");
         
@@ -15,18 +15,15 @@ public class TransactionConfiguration : IEntityTypeConfiguration<Entities.Transa
 
         builder.HasIndex(e => e.CurrencyId, "IX_transactions_currency_id");
 
-        builder.HasIndex(e => e.DeletedBy, "transactions_deleted_by_index");
-
-        builder.HasIndex(e => e.IsDeleted, "transactions_is_deleted_index");
+        builder.HasIndex(e => e.ReversedBy, "transactions_deleted_by_index");
 
         builder.HasIndex(e => e.ReceiverId, "transactions_receiver_id_index");
 
         builder.HasIndex(e => new { e.SenderId, e.ReceiverId }, "transactions_sender_id_receiver_id_index");
 
-        builder.HasIndex(e => e.Status, "transactions_status_index");
+        builder.HasIndex(e => e.Type, "transactions_type_index");
 
         builder.HasIndex(e => new { e.TransactionDatetime, e.Id }, "transactions_transaction_datetime_id_index");
-
 
         builder.HasIndex(e => e.TransactionDatetime, "transactions_transaction_datetime_sender_id_receiver_id_idx")
             .IsDescending();
@@ -39,36 +36,31 @@ public class TransactionConfiguration : IEntityTypeConfiguration<Entities.Transa
         builder.Property(e => e.CurrencyId)
             .HasColumnName("currency_id");
         
-        builder.Property(e => e.DeletedAt)
-            .HasColumnName("deleted_at");
+        builder.Property(e => e.ReversedAt)
+            .HasColumnName("reversed_at");
             
-        builder.Property(e => e.DeletedBy)
-            .HasColumnName("deleted_by");
-        
-        builder.Property(e => e.IsDeleted)
-            .HasColumnName("is_deleted");
-        
-        builder.Property(e => e.ReceiverBalanceAfterTransaction)
-            .HasColumnName("receiver_balance_after_transaction");
+        builder.Property(e => e.ReversedBy)
+            .HasColumnName("reversed_by");
             
         builder.Property(e => e.ReceiverId)
             .HasColumnName("receiver_id");
-        
-        builder.Property(e => e.SenderBalanceAfterTransaction)
-            .HasColumnName("sender_balance_after_transaction");
             
         builder.Property(e => e.SenderId)
             .HasColumnName("sender_id");
         
-        builder.Property(e => e.Status)
+        builder.Property(e => e.Type)
             .HasMaxLength(28)
+            .HasColumnName("type");
+        
+        builder.Property(e => e.Status)
+            .HasConversion<long>()
             .HasColumnName("status");
         
         builder.Property(e => e.TransactionDatetime)
             .HasColumnName("transaction_datetime");
             
-        builder.Property(e => e.TransactionSum)
-            .HasColumnName("transaction_sum");
+        builder.Property(e => e.Amount)
+            .HasColumnName("amount");
         
         builder.Property(e => e.RowVersion)
             .HasColumnName("xmin")
@@ -83,22 +75,20 @@ public class TransactionConfiguration : IEntityTypeConfiguration<Entities.Transa
 
         builder.HasOne<Entities.User.User>()
             .WithMany()
-            .HasForeignKey(d => d.DeletedBy)
+            .HasForeignKey(d => d.ReversedBy)
             .OnDelete(DeleteBehavior.Restrict)
             .HasConstraintName("transactions_users_id_fk_4");
 
-            builder.HasOne<Entities.User.User>()
-                .WithMany()
-                .HasForeignKey(d => d.ReceiverId)
-                .OnDelete(DeleteBehavior.Restrict)
-                .HasConstraintName("transactions_users_id_fk_2");
+        builder.HasOne<Entities.User.User>()
+            .WithMany()
+            .HasForeignKey(d => d.ReceiverId)
+            .OnDelete(DeleteBehavior.Restrict)
+            .HasConstraintName("transactions_users_id_fk_2");
 
-            builder.HasOne<Entities.User.User>()
-                .WithMany()
-                .HasForeignKey(d => d.SenderId)
-                .OnDelete(DeleteBehavior.Restrict)
-                .HasConstraintName("transactions_users_id_fk");
-
-            builder.HasQueryFilter(x => !x.IsDeleted);
+        builder.HasOne<Entities.User.User>()
+            .WithMany()
+            .HasForeignKey(d => d.SenderId)
+            .OnDelete(DeleteBehavior.Restrict)
+            .HasConstraintName("transactions_users_id_fk");
     }
 }

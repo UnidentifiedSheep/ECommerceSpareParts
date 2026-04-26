@@ -2,9 +2,9 @@ using FluentValidation;
 using Main.Application.Configs.Mapster;
 using Main.Application.Handlers.Balance.DeleteTransaction;
 using Main.Entities;
+using Main.Entities.Balance;
 using Main.Entities.Currency;
 using Main.Entities.Exceptions.Balances;
-using Main.Entities.Transaction;
 using Main.Entities.User;
 using Main.Enums;
 using Main.Persistence.Context;
@@ -66,21 +66,21 @@ public class DeleteTransactionTest : IAsyncLifetime
     [Fact]
     public async Task DeleteTransaction_EmptyTransactionId_FailsValidation()
     {
-        var command = new DeleteTransactionCommand(Guid.Empty, _mockUser.Id);
+        var command = new ReverseTransactionCommand(Guid.Empty, _mockUser.Id);
         await Assert.ThrowsAsync<ValidationException>(async () => await _mediator.Send(command));
     }
 
     [Fact]
     public async Task DeleteTransaction_EmptyUserId_FailsValidation()
     {
-        var command = new DeleteTransactionCommand(_transaction.Id, Guid.Empty);
+        var command = new ReverseTransactionCommand(_transaction.Id, Guid.Empty);
         await Assert.ThrowsAsync<ValidationException>(async () => await _mediator.Send(command));
     }
 
     [Fact]
     public async Task DeleteTransaction_Normal_Succeeds()
     {
-        var command = new DeleteTransactionCommand(_transaction.Id, _mockUser.Id);
+        var command = new ReverseTransactionCommand(_transaction.Id, _mockUser.Id);
         await _mediator.Send(command);
 
         var transactions = await _context.Transactions
@@ -113,10 +113,10 @@ public class DeleteTransactionTest : IAsyncLifetime
     [Fact]
     public async Task DeleteTransaction_NotNormalStatus_ThrowBadTransactionStatusException()
     {
-        _transaction.Status = TransactionStatus.Purchase;
+        _transaction.Type = TransactionType.Purchase;
         await _context.SaveChangesAsync();
 
-        var command = new DeleteTransactionCommand(_transaction.Id, _mockUser.Id);
+        var command = new ReverseTransactionCommand(_transaction.Id, _mockUser.Id);
         await Assert.ThrowsAsync<BadTransactionStatusException>(async () => await _mediator.Send(command));
     }
 }

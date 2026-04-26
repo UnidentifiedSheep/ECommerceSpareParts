@@ -6,7 +6,7 @@ using Pricing.Abstractions.Interfaces.DbRepositories;
 
 namespace Pricing.Application.Handlers.Markups.GetMarkupGroups;
 
-public record GetMarkupGroupsQuery(PaginationModel Pagination) : IQuery<GetMarkupGroupsResult>;
+public record GetMarkupGroupsQuery(Pagination Pagination) : IQuery<GetMarkupGroupsResult>;
 
 public record GetMarkupGroupsResult(IEnumerable<MarkupGroupDto> Groups);
 

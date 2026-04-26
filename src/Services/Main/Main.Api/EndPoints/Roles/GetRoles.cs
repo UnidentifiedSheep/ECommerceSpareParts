@@ -17,7 +17,7 @@ public class GetRoles : ICarterModule
         app.MapGet("/roles",
                 async (ISender sender, int page, int limit, string? searchTerm, CancellationToken cancellationToken) =>
                 {
-                    var command = new GetRolesQuery(searchTerm, new PaginationModel(page, limit));
+                    var command = new GetRolesQuery(searchTerm, new Pagination(page, limit));
                     var result = await sender.Send(command, cancellationToken);
                     var response = result.Adapt<GetRolesResponse>();
                     return Results.Ok(response);

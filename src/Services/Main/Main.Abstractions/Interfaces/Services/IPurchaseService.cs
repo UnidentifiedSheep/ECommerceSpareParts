@@ -2,8 +2,8 @@
 using Main.Abstractions.Dtos.Amw.Purchase;
 using Main.Abstractions.Dtos.Amw.StorageRoutes;
 using Main.Entities;
+using Main.Entities.Balance;
 using Main.Entities.Purchase;
-using Main.Entities.Transaction;
 
 namespace Main.Abstractions.Interfaces.Services;
 

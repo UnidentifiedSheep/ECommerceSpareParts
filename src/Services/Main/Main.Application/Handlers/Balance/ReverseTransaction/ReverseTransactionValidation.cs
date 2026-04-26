@@ -3,15 +3,15 @@ using Localization.Domain.Extensions;
 
 namespace Main.Application.Handlers.Balance.DeleteTransaction;
 
-public class DeleteTransactionValidation : AbstractValidator<DeleteTransactionCommand>
+public class ReverseTransactionValidation : AbstractValidator<ReverseTransactionCommand>
 {
-    public DeleteTransactionValidation()
+    public ReverseTransactionValidation()
     {
         RuleFor(x => x.TransactionId)
             .NotEmpty()
             .WithLocalizationKey("transaction.id.required");
 
-        RuleFor(x => x.WhoDeleteUserId)
+        RuleFor(x => x.WhoReversed)
             .NotEmpty()
             .WithLocalizationKey("transaction.who.delete.user.id.required");
     }

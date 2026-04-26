@@ -13,8 +13,8 @@ using Main.Application.Handlers.Purchases.CreatePurchase;
 using Main.Application.Handlers.Purchases.UpsertLogisticsToPurchase;
 using Main.Application.Handlers.StorageContents.AddContent;
 using Main.Entities;
+using Main.Entities.Balance;
 using Main.Entities.Purchase;
-using Main.Entities.Transaction;
 using Main.Enums;
 using Mapster;
 using MassTransit;
@@ -53,7 +53,7 @@ public class CreateFullPurchaseHandler(
         var dateTime = request.PurchaseDate;
         var totalSum = content.GetTotalSum();
 
-        var transaction = await CreateTransaction(supplierId, Global.SystemId, totalSum, TransactionStatus.Purchase,
+        var transaction = await CreateTransaction(supplierId, Global.SystemId, totalSum, TransactionType.Purchase,
             currencyId, whoCreated, dateTime, cancellationToken);
 
         var storageContents = await AddContentToStorage(content, storageName, whoCreated,
@@ -64,7 +64,7 @@ public class CreateFullPurchaseHandler(
 
 
         if (payedSum > 0)
-            await CreateTransaction(Global.SystemId, supplierId, payedSum, TransactionStatus.Normal, currencyId,
+            await CreateTransaction(Global.SystemId, supplierId, payedSum, TransactionType.Normal, currencyId,
                 whoCreated, dateTime, cancellationToken);
 
         if (!request.WithLogistics) return Unit.Value;
@@ -75,7 +75,7 @@ public class CreateFullPurchaseHandler(
         Transaction? logisticsTransaction = null;
         if (usedRoute.CarrierId != null)
             logisticsTransaction = await CreateTransaction(Global.SystemId, usedRoute.CarrierId.Value,
-                deliveryCost.TotalCost, TransactionStatus.Logistics, deliveryCost.CurrencyId, whoCreated, dateTime,
+                deliveryCost.TotalCost, TransactionType.Fee, deliveryCost.CurrencyId, whoCreated, dateTime,
                 cancellationToken);
 
         await UpsertPurchaseLogistics(purchase.Id, usedRoute.Id, logisticsTransaction?.Id,
@@ -114,14 +114,14 @@ public class CreateFullPurchaseHandler(
         Guid senderId,
         Guid receiverId,
         decimal amount,
-        TransactionStatus status,
+        TransactionType type,
         int currencyId,
         Guid whoCreatedUserId,
         DateTime dateTime,
         CancellationToken cancellationToken = default)
     {
         var command = new CreateTransactionCommand(senderId, receiverId, amount, currencyId, whoCreatedUserId, dateTime,
-            status);
+            type);
         return (await mediator.Send(command, cancellationToken)).Transaction;
     }
 

@@ -27,7 +27,7 @@ public class GetArticleCrossesEndPoint : ICarterModule
             {
                 var userId = user.UserId;
 
-                var query = new GetProductCrossesQuery(articleId, new PaginationModel(page, limit), sortBy, userId);
+                var query = new GetProductCrossesQuery(articleId, new Pagination(page, limit), sortBy, userId);
                 var result = await sender.Send(query, token);
                 var response = result.Adapt<GetArticleCrossesAmwResponse>();
                 return Results.Ok(response);

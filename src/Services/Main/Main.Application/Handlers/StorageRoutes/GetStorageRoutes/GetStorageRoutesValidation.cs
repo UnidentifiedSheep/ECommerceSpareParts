@@ -7,7 +7,7 @@ public class GetStorageRoutesValidation : AbstractValidator<GetStorageRoutesQuer
 {
     public GetStorageRoutesValidation()
     {
-        RuleFor(x => x.PaginationModel)
+        RuleFor(x => x.Pagination)
             .SetValidator(new PaginationValidator());
     }
 }

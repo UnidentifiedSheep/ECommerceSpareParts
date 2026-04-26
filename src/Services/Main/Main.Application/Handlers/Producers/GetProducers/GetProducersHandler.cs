@@ -8,7 +8,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Main.Application.Handlers.Producers.GetProducers;
 
-public record GetProducersQuery(string? SearchTerm, PaginationModel Pagination) : IQuery<GetProducersResult>;
+public record GetProducersQuery(string? SearchTerm, Pagination Pagination) : IQuery<GetProducersResult>;
 
 public record GetProducersResult(IEnumerable<ProducerDto> Producers);
 

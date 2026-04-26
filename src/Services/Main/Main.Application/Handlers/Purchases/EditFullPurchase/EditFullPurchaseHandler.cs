@@ -65,7 +65,7 @@ public class EditFullPurchaseHandler(
         var editedCounts = await EditPurchase(content, purchaseId, currencyId, comment,
             whoUpdated, dateTime, cancellationToken);
 
-        await EditTransaction(purchase.TransactionId, currencyId, totalSum, dateTime, TransactionStatus.Purchase,
+        await EditTransaction(purchase.TransactionId, currencyId, totalSum, dateTime, TransactionType.Purchase,
             cancellationToken);
 
         await AddOrRemoveContentToStorage(editedCounts, purchase.Storage, currencyId, whoUpdated, cancellationToken);
@@ -141,11 +141,11 @@ public class EditFullPurchaseHandler(
         int currencyId,
         decimal amount,
         DateTime dateTime,
-        TransactionStatus status,
+        TransactionType type,
         CancellationToken cancellationToken = default)
     {
         var command =
-            new EditTransactionCommand(transactionId, currencyId, amount, status, dateTime);
+            new EditTransactionCommand(transactionId, currencyId, amount, type, dateTime);
         await mediator.Send(command, cancellationToken);
     }
 
@@ -154,7 +154,7 @@ public class EditFullPurchaseHandler(
         Guid whoDeleted,
         CancellationToken cancellationToken = default)
     {
-        var command = new DeleteTransactionCommand(transactionId, whoDeleted, true);
+        var command = new ReverseTransactionCommand(transactionId, whoDeleted, true);
         await mediator.Send(command, cancellationToken);
     }
 

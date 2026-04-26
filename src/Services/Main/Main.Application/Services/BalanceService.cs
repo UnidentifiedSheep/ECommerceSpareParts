@@ -1,72 +1,43 @@
 using Abstractions.Interfaces.Services;
-using Main.Abstractions.Interfaces.Services;
-using Main.Application.Interfaces.Persistence;
-using Main.Entities.Transaction;
+using Application.Common.Interfaces.Repositories;
+using Main.Application.Interfaces.Services;
+using Main.Entities.Balance;
 using Main.Entities.User;
 
 namespace Main.Application.Services;
 
-public class BalanceService(ITransactionRepository balanceRepository, IUnitOfWork unitOfWork) : IBalanceService
+public class BalanceService(
+    IRepository<UserBalance, UserBalanceKey> userBalanceRepository,
+    IUnitOfWork unitOfWork) : IBalanceService
 {
     public async Task ChangeSenderReceiverBalancesAsync(
         Transaction transaction,
         CancellationToken cancellationToken = default)
     {
-        var senderBalance = await balanceRepository.GetUserBalanceAsync(transaction.SenderId, transaction.CurrencyId,
-            true, cancellationToken);
-        var receiverBalance = await balanceRepository.GetUserBalanceAsync(transaction.ReceiverId,
-            transaction.CurrencyId,
-            true, cancellationToken);
-        if (senderBalance == null)
-        {
-            senderBalance = new UserBalance
-            {
-                CurrencyId = transaction.CurrencyId,
-                UserId = transaction.SenderId,
-                Balance = 0
-            };
-            await unitOfWork.AddAsync(senderBalance, cancellationToken);
-        }
+        var senderBalance = await GetUserBalanceAsync(transaction.SenderId, transaction.CurrencyId, cancellationToken);
+        var receiverBalance = await GetUserBalanceAsync(transaction.ReceiverId, transaction.CurrencyId, cancellationToken);
 
-        if (receiverBalance == null)
-        {
-            receiverBalance = new UserBalance
-            {
-                CurrencyId = transaction.CurrencyId,
-                UserId = transaction.ReceiverId,
-                Balance = 0
-            };
-            await unitOfWork.AddAsync(receiverBalance, cancellationToken);
-        }
-
-        var multiplier = transaction.IsDeleted ? -1 : 1;
-        receiverBalance.Balance += multiplier * transaction.TransactionSum;
-        senderBalance.Balance -= multiplier * transaction.TransactionSum;
+        transaction.Apply(senderBalance, receiverBalance);
     }
 
-    public async Task RecalculateBalanceAsync(
-        Transaction transaction,
-        Guid? withOut = null,
+    private async Task<UserBalance> GetUserBalanceAsync(
+        Guid userId,
+        int currencyId,
         CancellationToken cancellationToken = default)
     {
-        await foreach (var tr in balanceRepository.GetAffectedTransactions(transaction.ReceiverId,
-                               transaction.CurrencyId, transaction.TransactionDatetime, withOut)
-                           .WithCancellation(cancellationToken))
-        {
-            var amountDelta = transaction.IsDeleted ? -transaction.TransactionSum : transaction.TransactionSum;
+        var criteria = Criteria<UserBalance>.New()
+            .Where(x => x.UserId == userId && x.CurrencyId == currencyId)
+            .ForUpdate()
+            .Track()
+            .Build();
 
-            if (tr.SenderId == transaction.ReceiverId) tr.SenderBalanceAfterTransaction += amountDelta;
-            else tr.ReceiverBalanceAfterTransaction += amountDelta;
-        }
+        var dbValue = await userBalanceRepository.FirstOrDefaultAsync(criteria, cancellationToken);
 
-        await foreach (var tr in balanceRepository.GetAffectedTransactions(transaction.SenderId, transaction.CurrencyId,
-                               transaction.TransactionDatetime, withOut)
-                           .WithCancellation(cancellationToken))
-        {
-            var amountDelta = transaction.IsDeleted ? transaction.TransactionSum : -transaction.TransactionSum;
+        if (dbValue != null) return dbValue;
+        
+        dbValue = UserBalance.Create(userId, currencyId);
+        await unitOfWork.AddAsync(dbValue, cancellationToken);
 
-            if (tr.SenderId == transaction.SenderId) tr.SenderBalanceAfterTransaction += amountDelta;
-            else tr.ReceiverBalanceAfterTransaction += amountDelta;
-        }
+        return dbValue;
     }
 }

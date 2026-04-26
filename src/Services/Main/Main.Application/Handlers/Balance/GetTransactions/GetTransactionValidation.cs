@@ -24,7 +24,7 @@ public class GetTransactionsValidation : AbstractValidator<GetTransactionsQuery>
             .Must(x => x.RangeEnd.Date <= x.RangeStart.Date.AddMonths(5))
             .WithLocalizationKey("transaction.range.max.months");
 
-        RuleFor(x => x.Pagination)
-            .SetValidator(new PaginationValidator());
+        RuleFor(x => x.Cursor)
+            .SetValidator(new CursorValidator<(Guid id, DateTime dt)>());
     }
 }

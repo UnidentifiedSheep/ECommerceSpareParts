@@ -11,7 +11,7 @@ namespace Main.Application.Handlers.Users.GetUsers;
 
 public record GetUsersQuery(
     string? SearchTerm,
-    PaginationModel Pagination,
+    Pagination Pagination,
     double? SimilarityLevel,
     Guid? WhoSearchedUserId,
     string? Name,

@@ -17,6 +17,7 @@ public class UserEmail : AuditableEntity<UserEmail, string>
     public bool IsPrimary { get; private set; }
 
     public DateTime? ConfirmedAt { get; private set; }
+    public User User { get; private set; } = null!;
     
     private UserEmail() {}
 

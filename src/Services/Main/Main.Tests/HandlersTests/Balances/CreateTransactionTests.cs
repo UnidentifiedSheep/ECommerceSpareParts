@@ -62,7 +62,7 @@ public class CreateTransactionTests : IAsyncLifetime
             _currency.Id,
             _adminUser.Id,
             DateTime.Now,
-            TransactionStatus.Normal
+            TransactionType.Normal
         );
 
         var createdTransaction = (await _mediator.Send(command)).Transaction;
@@ -72,7 +72,7 @@ public class CreateTransactionTests : IAsyncLifetime
                                       x.ReceiverId == _mockUser.Id &&
                                       x.TransactionDatetime == command.TransactionDateTime);
         Assert.NotNull(transaction);
-        Assert.Equal(createdTransaction.TransactionSum, transaction.TransactionSum);
+        Assert.Equal(createdTransaction.Amount, transaction.Amount);
     }
 
     [Fact]
@@ -85,7 +85,7 @@ public class CreateTransactionTests : IAsyncLifetime
             _currency.Id,
             _adminUser.Id,
             DateTime.Now,
-            TransactionStatus.Normal
+            TransactionType.Normal
         );
 
         await Assert.ThrowsAsync<ValidationException>(async () => await _mediator.Send(command));
@@ -101,7 +101,7 @@ public class CreateTransactionTests : IAsyncLifetime
             _currency.Id,
             _adminUser.Id,
             DateTime.Now,
-            TransactionStatus.Normal
+            TransactionType.Normal
         );
 
         await Assert.ThrowsAsync<ValidationException>(async () => await _mediator.Send(command));
@@ -117,7 +117,7 @@ public class CreateTransactionTests : IAsyncLifetime
             _currency.Id,
             _adminUser.Id,
             DateTime.Now.AddMonths(-4),
-            TransactionStatus.Normal
+            TransactionType.Normal
         );
 
         await Assert.ThrowsAsync<ValidationException>(async () => await _mediator.Send(command));
@@ -133,7 +133,7 @@ public class CreateTransactionTests : IAsyncLifetime
             _currency.Id,
             _adminUser.Id,
             DateTime.Now.AddMonths(1),
-            TransactionStatus.Normal
+            TransactionType.Normal
         );
 
         await Assert.ThrowsAsync<ValidationException>(async () => await _mediator.Send(command));
@@ -149,7 +149,7 @@ public class CreateTransactionTests : IAsyncLifetime
             _currency.Id,
             _adminUser.Id,
             DateTime.Now,
-            TransactionStatus.Normal
+            TransactionType.Normal
         );
 
         await Assert.ThrowsAsync<ValidationException>(async () => await _mediator.Send(command));
@@ -171,7 +171,7 @@ public class CreateTransactionTests : IAsyncLifetime
             _currency.Id,
             _adminUser.Id,
             DateTime.Now,
-            TransactionStatus.Normal
+            TransactionType.Normal
         );
 
         await Assert.ThrowsAsync<ValidationException>(async () => await _mediator.Send(command));

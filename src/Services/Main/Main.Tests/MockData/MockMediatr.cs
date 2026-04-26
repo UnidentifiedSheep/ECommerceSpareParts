@@ -12,8 +12,8 @@ using Main.Application.Handlers.StorageRoutes.AddStorageRoute;
 using Main.Application.Handlers.Storages.CreateStorage;
 using Main.Application.Handlers.Users.CreateUser;
 using Main.Entities;
+using Main.Entities.Balance;
 using Main.Entities.Storage;
-using Main.Entities.Transaction;
 using Main.Enums;
 using Mapster;
 using MediatR;
@@ -82,7 +82,7 @@ public static class MockMediatr
             1,
             whoCreated,
             when ?? DateTime.Now,
-            TransactionStatus.Normal
+            TransactionType.Normal
         );
         var result = await mediator.Send(command);
         return result.Transaction;

@@ -1,11 +1,20 @@
+using System.Text.Json.Serialization;
 using Main.Enums;
 
 namespace Main.Application.Dtos.Emails;
 
-public class EmailDto
+public record EmailDto
 {
-    public string Email { get; set; } = null!;
-    public bool IsConfirmed { get; set; }
-    public bool IsPrimary { get; set; }
-    public EmailType Type { get; set; }
+    [JsonPropertyName("email")]
+    public required string Email { get; init; }
+    
+    [JsonPropertyName("isConfirmed")]
+    public bool IsConfirmed { get; init; }
+    
+    [JsonPropertyName("isPrimary")]
+    public bool IsPrimary { get; init; }
+    
+    [JsonPropertyName("type")]
+    [JsonConverter(typeof(JsonStringEnumConverter<EmailType>))]
+    public EmailType Type { get; init; }
 }

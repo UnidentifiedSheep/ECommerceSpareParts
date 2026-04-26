@@ -14,7 +14,7 @@ namespace Main.Application.Handlers.Sales.GetSales;
 public record GetSalesQuery(
     DateTime RangeStartDate,
     DateTime RangeEndDate,
-    PaginationModel Pagination,
+    Pagination Pagination,
     Guid? BuyerId,
     int? CurrencyId,
     string? SortBy,

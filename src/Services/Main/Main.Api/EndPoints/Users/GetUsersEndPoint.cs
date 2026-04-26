@@ -54,7 +54,7 @@ public class GetUsersEndPoint : ICarterModule
                 {
                     var userId = user.UserId;
 
-                    var pagination = new PaginationModel(request.Page, request.Limit);
+                    var pagination = new Pagination(request.Page, request.Limit);
                     var query = new GetUsersQuery(request.SearchTerm, pagination, request.SimilarityLevel,
                         userId, request.Name, request.Surname, request.Email, request.Phone, request.UserName,
                         request.Id,

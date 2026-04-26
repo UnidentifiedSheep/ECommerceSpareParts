@@ -91,6 +91,11 @@ public class User : AuditableEntity<User, Guid>
         else
             Discount.SetDiscount(discount);
     }
+
+    public void Login()
+    {
+        LastLoginAt = DateTime.UtcNow;
+    }
     
     public override Guid GetId() => Id;
 }

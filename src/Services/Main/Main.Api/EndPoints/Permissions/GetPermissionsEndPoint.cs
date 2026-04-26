@@ -15,7 +15,7 @@ public class GetPermissionsEndPoint : ICarterModule
     {
         app.MapGet("/permissions/", async (ISender sender, int page, int limit, CancellationToken ct) =>
             {
-                var query = new GetPermissionsQuery(new PaginationModel(page, limit));
+                var query = new GetPermissionsQuery(new Pagination(page, limit));
                 var result = await sender.Send(query, ct);
                 var response = new GetPermissionsResponse(result.Permissions);
                 return Results.Ok(response);

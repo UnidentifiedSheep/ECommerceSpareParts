@@ -1,8 +1,11 @@
 using Abstractions.Models;
 using Application.Common.Interfaces;
-using Main.Abstractions.Interfaces.DbRepositories;
+using Application.Common.Interfaces.Repositories;
+using LinqKit;
 using Main.Application.Dtos.Amw.Balances;
-using Mapster;
+using Main.Application.Handlers.Projections;
+using Main.Entities.Balance;
+using Microsoft.EntityFrameworkCore;
 
 namespace Main.Application.Handlers.Balance.GetTransactions;
 
@@ -12,19 +15,39 @@ public record GetTransactionsQuery(
     int? CurrencyId,
     Guid? SenderId,
     Guid? ReceiverId,
-    PaginationModel Pagination) : IQuery<GetTransactionsResult>;
+    Cursor<(Guid id, DateTime dt)> Cursor) : IQuery<GetTransactionsResult>;
 
-public record GetTransactionsResult(IEnumerable<TransactionDto> Transactions);
+public record GetTransactionsResult(IReadOnlyList<TransactionDto> Transactions);
 
-public class GetTransactionsHandler(IBalanceRepository balanceRepository)
+public class GetTransactionsHandler(
+    IReadRepository<Transaction, Guid> repository)
     : IQueryHandler<GetTransactionsQuery, GetTransactionsResult>
 {
     public async Task<GetTransactionsResult> Handle(GetTransactionsQuery request, CancellationToken cancellationToken)
     {
-        var pagination = request.Pagination;
-        var res = await balanceRepository.GetTransactionsAsync(request.RangeStart, request.RangeEnd,
-            request.CurrencyId, request.SenderId, request.ReceiverId, pagination.Page, pagination.Size, false,
-            cancellationToken);
-        return new GetTransactionsResult(res.Adapt<List<TransactionDto>>());
+        var cursor = request.Cursor;
+        var query = repository.Query;
+
+        if (request.CurrencyId.HasValue)
+            query = query.Where(e => e.CurrencyId == request.CurrencyId.Value);
+        
+        if (request.SenderId.HasValue)
+            query = query.Where(e => e.SenderId == request.SenderId.Value);
+        
+        if (request.ReceiverId.HasValue)
+            query = query.Where(e => e.ReceiverId == request.ReceiverId.Value);
+
+        var res = await query
+            .Where(x =>
+                x.TransactionDatetime > cursor.CursorValue.dt ||
+                (x.TransactionDatetime == cursor.CursorValue.dt && x.Id > cursor.CursorValue.id))
+            .OrderByDescending(x => x.TransactionDatetime)
+            .ThenByDescending(x => x.Id)
+            .Take(cursor.Size)
+            .AsExpandable()
+            .Select(BalanceProjections.ToTransactionDto)
+            .ToListAsync(cancellationToken);
+        
+        return new GetTransactionsResult(res);
     }
 }

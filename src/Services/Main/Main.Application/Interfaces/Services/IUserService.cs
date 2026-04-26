@@ -15,7 +15,7 @@ public interface IUserService
 
     Task<decimal?> GetUserDiscountAsync(Guid userId, CancellationToken token = default);
 
-    Task<UserRolesAndPermissions?> GetUserRolesAndPermissionsAsync(
+    Task<UserRolesAndPermissions> GetUserRolesAndPermissionsAsync(
         Guid userId,
         CancellationToken token = default);
 }

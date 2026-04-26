@@ -1,4 +1,5 @@
-﻿using Main.Enums;
+﻿using Main.Entities.Balance;
+using Main.Enums;
 
 namespace Main.Entities.Purchase;
 
@@ -28,5 +29,5 @@ public class PurchaseLogistic
 
     public virtual Currency.Currency Currency { get; set; } = null!;
 
-    public virtual Transaction.Transaction Transaction { get; set; } = null!;
+    public virtual Transaction Transaction { get; set; } = null!;
 }

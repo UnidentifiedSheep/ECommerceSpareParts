@@ -1,9 +1,9 @@
 ﻿using FluentAssertions;
 using Main.Application.Handlers.Purchases.CreateFullPurchase;
 using Main.Entities;
+using Main.Entities.Balance;
 using Main.Entities.Product;
 using Main.Entities.Purchase;
-using Main.Entities.Transaction;
 using Main.Enums;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
@@ -71,7 +71,7 @@ public class CreateFullPurchaseTests : IAsyncLifetime
 
         transaction.SenderId.Should().Be(_testContext.Supplier.Id);
         transaction.ReceiverId.Should().Be(Main.Application.Global.SystemId);
-        transaction.TransactionSum.Should().Be(totalSum);
+        transaction.Amount.Should().Be(totalSum);
     }
 
     [Fact]
@@ -95,8 +95,8 @@ public class CreateFullPurchaseTests : IAsyncLifetime
         var transactions = await GetTransactionsAsync();
 
         transactions.Should().HaveCount(2);
-        transactions.Should().Contain(x => x.TransactionSum == 500m && x.Status == TransactionStatus.Normal);
-        transactions.Should().Contain(x => x.TransactionSum == totalSum && x.Status == TransactionStatus.Purchase);
+        transactions.Should().Contain(x => x.Amount == 500m && x.Type == TransactionType.Normal);
+        transactions.Should().Contain(x => x.Amount == totalSum && x.Type == TransactionType.Purchase);
     }
 
     [Fact]
@@ -152,8 +152,8 @@ public class CreateFullPurchaseTests : IAsyncLifetime
         var transactions = await GetTransactionsAsync();
         transactions.Should().HaveCount(2);
 
-        transactions.Should().Contain(x => x.TransactionSum == totalSum && x.Status == TransactionStatus.Purchase);
-        transactions.Should().Contain(x => x.Status == TransactionStatus.Logistics &&
+        transactions.Should().Contain(x => x.Amount == totalSum && x.Type == TransactionType.Purchase);
+        transactions.Should().Contain(x => x.Type == TransactionType.Fee &&
                                            x.ReceiverId == _testContext.Carrier.Id);
     }
 

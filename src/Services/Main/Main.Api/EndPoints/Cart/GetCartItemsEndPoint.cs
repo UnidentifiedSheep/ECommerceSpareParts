@@ -22,7 +22,7 @@ public class GetCartItemsEndPoint : ICarterModule
                 int limit,
                 CancellationToken cancellationToken) =>
             {
-                var query = new GetCartItemsQuery(user.UserId, new PaginationModel(page, limit));
+                var query = new GetCartItemsQuery(user.UserId, new Pagination(page, limit));
                 var result = await sender.Send(query, cancellationToken);
                 var response = new GetCartItemsResponse(result.CartItems);
 

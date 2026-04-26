@@ -28,7 +28,7 @@ public class GetStoragesEndPoint : ICarterModule
                     StorageType? type,
                     CancellationToken token) =>
                 {
-                    var query = new GetStoragesQuery(new PaginationModel(page, limit), searchTerm, type);
+                    var query = new GetStoragesQuery(new Pagination(page, limit), searchTerm, type);
                     var result = await sender.Send(query, token);
                     var response = result.Adapt<GetStoragesResponse>();
                     return Results.Ok(response);

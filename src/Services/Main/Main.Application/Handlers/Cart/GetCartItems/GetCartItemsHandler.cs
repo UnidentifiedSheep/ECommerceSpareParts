@@ -10,7 +10,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Main.Application.Handlers.Cart.GetCartItems;
 
-public record GetCartItemsQuery(Guid UserId, PaginationModel Pagination) : IQuery<GetCartItemsResult>;
+public record GetCartItemsQuery(Guid UserId, Pagination Pagination) : IQuery<GetCartItemsResult>;
 
 public record GetCartItemsResult(List<CartItemDto> CartItems);
 

@@ -15,12 +15,12 @@ using Main.Application.Handlers.Sales.CreateSale;
 using Main.Application.Handlers.StorageContents.RemoveContent;
 using Main.Application.Notifications;
 using Main.Entities;
+using Main.Entities.Balance;
 using Main.Entities.Exceptions.Sales;
 using Main.Entities.Exceptions.Storages;
 using Main.Entities.Product;
 using Main.Entities.Sale;
 using Main.Entities.Storage;
-using Main.Entities.Transaction;
 using Main.Enums;
 using Mapster;
 using MassTransit;
@@ -170,7 +170,7 @@ public class CreateFullSaleHandler(
         CancellationToken cancellationToken = default)
     {
         var command = new CreateTransactionCommand(sender, receiver, amount, currencyId, createdUserId,
-            transactionDateTime, TransactionStatus.Sale);
+            transactionDateTime, TransactionType.Sale);
         var result = await mediator.Send(command, cancellationToken);
         return result.Transaction;
     }

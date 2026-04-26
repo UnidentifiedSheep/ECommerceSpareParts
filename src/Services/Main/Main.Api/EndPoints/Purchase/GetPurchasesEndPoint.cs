@@ -48,7 +48,7 @@ public class GetPurchasesEndPoint : ICarterModule
                 CancellationToken token) =>
             {
                 var query = new GetPurchasesQuery(request.RangeStartDate, request.RangeEndDate,
-                    new PaginationModel(request.Page, request.Limit),
+                    new Pagination(request.Page, request.Limit),
                     request.SupplierId, request.CurrencyId, request.SortBy, request.SearchTerm);
                 var result = await sender.Send(query, token);
                 var response = result.Adapt<GetPurchasesResponse>();

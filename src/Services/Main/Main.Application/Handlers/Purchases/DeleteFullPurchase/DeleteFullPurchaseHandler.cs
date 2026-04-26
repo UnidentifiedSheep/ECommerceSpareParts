@@ -71,7 +71,7 @@ public class DeleteFullPurchaseHandler(
         Guid whoDeleted,
         CancellationToken cancellationToken = default)
     {
-        var command = new DeleteTransactionCommand(transactionId, whoDeleted, true);
+        var command = new ReverseTransactionCommand(transactionId, whoDeleted, true);
         await mediator.Send(command, cancellationToken);
     }
 

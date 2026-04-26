@@ -10,7 +10,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Main.Application.Handlers.Auth.GetRoles;
 
-public record GetRolesQuery(string? SearchTerm, PaginationModel Pagination) : IQuery<GetRolesResult>;
+public record GetRolesQuery(string? SearchTerm, Pagination Pagination) : IQuery<GetRolesResult>;
 
 public record GetRolesResult(IEnumerable<RoleDto> Roles);
 

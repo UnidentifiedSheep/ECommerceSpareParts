@@ -12,7 +12,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Main.Application.Handlers.Storages.GetStorage;
 
-public record GetStoragesQuery(PaginationModel Pagination, string? SearchTerm, StorageType? Type)
+public record GetStoragesQuery(Pagination Pagination, string? SearchTerm, StorageType? Type)
     : IQuery<GetStoragesResult>;
 
 public record GetStoragesResult(IReadOnlyList<StorageDto> Storages);

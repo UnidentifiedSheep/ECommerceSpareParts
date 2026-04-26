@@ -1,4 +1,5 @@
 ﻿using System.Text.Json.Serialization;
+using Main.Entities.Balance;
 using Main.Enums;
 
 namespace Main.Entities.Event;
@@ -10,7 +11,7 @@ public class TransactionUpdatedEvent(TransactionUpdatedEventData data) : Event<T
         return new TransactionUpdatedEvent(data);
     }
 
-    public static TransactionUpdatedEvent Create(Transaction.Transaction transaction)
+    public static TransactionUpdatedEvent Create(Transaction transaction)
     {
         var data = new TransactionUpdatedEventData
         {
@@ -18,14 +19,14 @@ public class TransactionUpdatedEvent(TransactionUpdatedEventData data) : Event<T
             CurrencyId = transaction.CurrencyId,
             SenderId = transaction.SenderId,
             ReceiverId = transaction.ReceiverId,
-            TransactionSum = transaction.TransactionSum,
-            Status = transaction.Status,
+            TransactionSum = transaction.Amount,
+            Type = transaction.Type,
             TransactionDatetime = transaction.TransactionDatetime,
             WhoCreated = transaction.WhoCreated,
             WhoUpdated = transaction.WhoUpdated,
             IsDeleted = transaction.IsDeleted,
-            DeletedBy = transaction.DeletedBy,
-            DeletedAt = transaction.DeletedAt,
+            DeletedBy = transaction.ReversedBy,
+            DeletedAt = transaction.ReversedAt,
             RowVersion = transaction.RowVersion,
             CreatedAt = transaction.CreatedAt,
             UpdatedAt = transaction.UpdatedAt
@@ -53,8 +54,8 @@ public record TransactionUpdatedEventData
     public required decimal TransactionSum { get; init; }
     
     [JsonPropertyName("status")]
-    [JsonConverter(typeof(JsonStringEnumConverter<TransactionStatus>))]
-    public required TransactionStatus Status { get; init; }
+    [JsonConverter(typeof(JsonStringEnumConverter<TransactionType>))]
+    public required TransactionType Type { get; init; }
     
     [JsonPropertyName("transactionDatetime")]
     public required DateTime TransactionDatetime { get; init; }

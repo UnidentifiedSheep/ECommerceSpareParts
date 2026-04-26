@@ -1,11 +1,11 @@
 using Main.Application.Configs.Mapster;
 using Main.Application.Handlers.Sales.DeleteSale;
 using Main.Entities;
+using Main.Entities.Balance;
 using Main.Entities.Currency;
 using Main.Entities.Exceptions.Sales;
 using Main.Entities.Sale;
 using Main.Entities.Storage;
-using Main.Entities.Transaction;
 using Main.Entities.User;
 using Main.Persistence.Context;
 using MediatR;

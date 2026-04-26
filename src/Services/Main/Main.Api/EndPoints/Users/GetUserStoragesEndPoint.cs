@@ -17,7 +17,7 @@ public class GetUserStoragesEndPoint : ICarterModule
         app.MapGet("/users/{userId:guid}/storages",
                 async (ISender sender, Guid userId, int page, int limit, CancellationToken token) =>
                 {
-                    var query = new GetUserStoragesQuery(userId, new PaginationModel(page, limit));
+                    var query = new GetUserStoragesQuery(userId, new Pagination(page, limit));
                     var result = await sender.Send(query, token);
                     return Results.Ok(new GetUserStoragesResponse(result.Storages));
                 }).WithTags("Users")

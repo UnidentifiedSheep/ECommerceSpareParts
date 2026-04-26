@@ -1,6 +1,7 @@
 ﻿using BulkValidation.Core.Attributes;
 using Domain;
 using Enums;
+using Main.Entities.Balance;
 
 namespace Main.Entities.Purchase;
 
@@ -35,7 +36,7 @@ public class Purchase : AuditableEntity<Purchase, Guid>
 
     public virtual User.User Supplier { get; set; } = null!;
 
-    public virtual Transaction.Transaction Transaction { get; set; } = null!;
+    public virtual Transaction Transaction { get; set; } = null!;
 
     public override Guid GetId() => Id;
 }

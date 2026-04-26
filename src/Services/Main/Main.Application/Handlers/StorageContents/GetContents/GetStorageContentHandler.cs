@@ -14,7 +14,7 @@ namespace Main.Application.Handlers.StorageContents.GetContents;
 public record GetStorageContentQuery(
     string? StorageName,
     int? ProductId,
-    PaginationModel Pagination,
+    Pagination Pagination,
     bool ShowZeroCount) : IQuery<GetStorageContentResult>;
 
 public record GetStorageContentResult(IEnumerable<StorageContentDto> Content);

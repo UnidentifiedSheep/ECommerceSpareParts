@@ -35,6 +35,7 @@ public static class ServiceProvider
     {
         var relatedDataTtl = TimeSpan.FromHours(10);
 
+        collection.AddSingleton<IJwtGenerator, JwtGenerator>();
         collection.AddSingleton<UpdateCurrencyRate>();
         collection.AddSingleton(emailOptions ?? new UserEmailOptions());
         collection.AddSingleton(phoneOptions ?? new UserPhoneOptions());

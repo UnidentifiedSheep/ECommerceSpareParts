@@ -2,6 +2,7 @@
 using Domain.CommonEntities;
 using Main.Entities;
 using Main.Entities.Auth;
+using Main.Entities.Balance;
 using Main.Entities.Cart;
 using Main.Entities.Currency;
 using Main.Entities.Order;
@@ -10,7 +11,6 @@ using Main.Entities.Product;
 using Main.Entities.Purchase;
 using Main.Entities.Sale;
 using Main.Entities.Storage;
-using Main.Entities.Transaction;
 using Main.Entities.User;
 using MassTransit;
 using MassTransit.EntityFrameworkCoreIntegration;

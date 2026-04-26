@@ -1,4 +1,5 @@
 ﻿using Domain;
+using Main.Entities.Balance;
 using Main.Enums;
 
 namespace Main.Entities.Sale;
@@ -31,7 +32,7 @@ public class Sale : AuditableEntity<Sale, Guid>
 
     public virtual ICollection<SaleContent> SaleContents { get; set; } = new List<SaleContent>();
 
-    public virtual Transaction.Transaction Transaction { get; set; } = null!;
+    public virtual Transaction Transaction { get; set; } = null!;
 
     public override Guid GetId() => Id;
 }

@@ -1,13 +1,12 @@
 ﻿using System.Security.Claims;
-using Abstractions.Models;
+using Main.Application.Dtos.Users;
 
-namespace Abstractions.Interfaces;
+namespace Main.Application.Interfaces.Services;
 
 public interface IJwtGenerator
 {
     string CreateToken(
-        User user,
-        UserInfo userInfo,
+        UserDto user,
         string deviceId,
         IEnumerable<string> roles,
         IEnumerable<string> permissions);

@@ -26,7 +26,7 @@ public class CreateTransactionEndPoint : ICarterModule
             {
                 var command = new CreateTransactionCommand(request.SenderId, request.ReceiverId,
                     request.Amount, request.CurrencyId, user.UserId, request.TransactionDateTime,
-                    TransactionStatus.Normal);
+                    TransactionType.Normal);
                 await sender.Send(command, token);
                 return Results.Ok();
             }).WithTags("Balances")

@@ -42,7 +42,7 @@ public class GetTransactionsEndPoint : ICarterModule
                     request.CurrencyId,
                     request.SenderId,
                     request.ReceiverId,
-                    new PaginationModel(request.Page, request.Limit));
+                    new Pagination(request.Page, request.Limit));
                 var result = await sender.Send(query, token);
                 var response = result.Adapt<GetTransactionsAmwResponse>();
                 return Results.Ok(response);

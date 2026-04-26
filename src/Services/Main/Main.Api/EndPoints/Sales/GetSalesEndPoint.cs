@@ -44,7 +44,7 @@ public class GetSalesEndPoint : ICarterModule
     {
         app.MapGet("/sales/", async (ISender sender, [AsParameters] GetSalesRequest request, CancellationToken token) =>
             {
-                var pagination = new PaginationModel(request.Page, request.Limit);
+                var pagination = new Pagination(request.Page, request.Limit);
                 var query = new GetSalesQuery(request.RangeStartDate, request.RangeEndDate, pagination,
                     request.BuyerId, request.CurrencyId, request.SortBy, request.SearchTerm);
                 var result = await sender.Send(query, token);

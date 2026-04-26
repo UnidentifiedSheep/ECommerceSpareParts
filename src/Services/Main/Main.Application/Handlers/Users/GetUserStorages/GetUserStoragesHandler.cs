@@ -10,7 +10,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Main.Application.Handlers.Users.GetUserStorages;
 
-public record GetUserStoragesQuery(Guid UserId, PaginationModel Pagination) : IQuery<GetUserStoragesResult>;
+public record GetUserStoragesQuery(Guid UserId, Pagination Pagination) : IQuery<GetUserStoragesResult>;
 
 public record GetUserStoragesResult(List<StorageDto> Storages);
 

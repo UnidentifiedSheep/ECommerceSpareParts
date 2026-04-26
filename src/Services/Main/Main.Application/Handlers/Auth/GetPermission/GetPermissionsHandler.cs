@@ -9,7 +9,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Main.Application.Handlers.Auth.GetPermission;
 
-public record GetPermissionsQuery(PaginationModel Pagination) : IQuery<GetPermissionsResult>;
+public record GetPermissionsQuery(Pagination Pagination) : IQuery<GetPermissionsResult>;
 
 public record GetPermissionsResult(IEnumerable<PermissionDto> Permissions);
 
