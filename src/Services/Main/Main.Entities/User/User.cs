@@ -1,5 +1,6 @@
 ﻿using BulkValidation.Core.Attributes;
 using Domain;
+using Domain.Extensions;
 using Exceptions;
 using Main.Entities.Auth;
 using Main.Entities.Auth.ValueObjects;
@@ -90,6 +91,12 @@ public class User : AuditableEntity<User, Guid>
             Discount = UserDiscount.Create(Id, discount);
         else
             Discount.SetDiscount(discount);
+    }
+
+    public void SetPasswordHash(string passwordHash)
+    {
+        PasswordHash = passwordHash
+            .AgainstNullOrWhiteSpace(() => new InvalidOperationException("Password hash must not be null or empty."));
     }
 
     public void Login()

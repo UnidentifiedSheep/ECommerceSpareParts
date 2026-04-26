@@ -1,4 +1,5 @@
 ﻿using Abstractions.Interfaces.RelatedData;
+using Application.Common.Extensions;
 using Application.Common.Interfaces.Repositories;
 using Main.Abstractions.Constants;
 using Main.Application.Dtos.Users;
@@ -70,7 +71,7 @@ public class UserService(
         
         DbUser? user = await userRepository.FirstOrDefaultAsync(criteria, token);
         if (user == null) return null;
-        return UserProjections.UserProjectionFunc(user);
+        return UserProjections.UserProjection.AsFunc()(user);
     }
 
     private async Task SaveUserInCache(UserDto user)

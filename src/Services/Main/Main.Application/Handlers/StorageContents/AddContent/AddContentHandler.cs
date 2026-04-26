@@ -1,5 +1,6 @@
 using System.Data;
 using Abstractions.Interfaces.Services;
+using Application.Common.Extensions;
 using Application.Common.Interfaces;
 using Attributes;
 using Contracts.StorageContent;
@@ -70,7 +71,7 @@ public class AddContentHandler(
         
 
         var adapted = storageContents
-            .Select(StorageContentProjections.ToStorageContentDtoFunc)
+            .Select(StorageContentProjections.ToStorageContentDto.AsFunc())
             .ToList();
         
         return new AddContentResult(adapted);

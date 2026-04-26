@@ -25,4 +25,7 @@ public record SaleContentDto
     
     [JsonPropertyName("product")]
     public required ProductDto Product { get; init; }
+    
+    [JsonPropertyName("details")]
+    public required List<SaleContentDetailDto> Details { get; init; }
 }

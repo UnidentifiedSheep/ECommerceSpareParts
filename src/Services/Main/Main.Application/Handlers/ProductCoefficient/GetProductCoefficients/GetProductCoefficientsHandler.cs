@@ -7,16 +7,16 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Main.Application.Handlers.ProductCoefficient.GetArticleCoefficients;
 
-public record GetArticleCoefficientsQuery(IEnumerable<int> ProductIds) : IQuery<GetArticleCoefficientsResult>;
+public record GetProductCoefficientsQuery(IEnumerable<int> ProductIds) : IQuery<GetProductCoefficientsResult>;
 
-public record GetArticleCoefficientsResult(List<ProductCoefficientDto> Coefficients);
+public record GetProductCoefficientsResult(List<ProductCoefficientDto> Coefficients);
 
-public class GetArticleCoefficientsHandler(
+public class GetProductCoefficientsHandler(
     IReadRepository<Entities.Product.ProductCoefficient, (int, string)> repository)
-    : IQueryHandler<GetArticleCoefficientsQuery, GetArticleCoefficientsResult>
+    : IQueryHandler<GetProductCoefficientsQuery, GetProductCoefficientsResult>
 {
-    public async Task<GetArticleCoefficientsResult> Handle(
-        GetArticleCoefficientsQuery request,
+    public async Task<GetProductCoefficientsResult> Handle(
+        GetProductCoefficientsQuery request,
         CancellationToken cancellationToken)
     {
         var coefficients = await repository.Query
@@ -25,6 +25,6 @@ public class GetArticleCoefficientsHandler(
             .Select(ProductProjections.ToProductCoefficientDto)
             .ToListAsync(cancellationToken);
 
-        return new GetArticleCoefficientsResult(coefficients);
+        return new GetProductCoefficientsResult(coefficients);
     }
 }

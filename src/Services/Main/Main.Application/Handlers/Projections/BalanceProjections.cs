@@ -6,7 +6,7 @@ namespace Main.Application.Handlers.Projections;
 
 public static class BalanceProjections
 {
-    public static Expression<Func<Transaction, TransactionDto>> ToTransactionDto =
+    public static readonly Expression<Func<Transaction, TransactionDto>> ToTransactionDto =
         x => new TransactionDto
         {
             Amount = x.Amount,

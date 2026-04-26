@@ -1,15 +1,9 @@
-﻿using Abstractions.Interfaces.Services;
-using Abstractions.Interfaces.Validators;
-using Abstractions.Models.Repository;
+﻿using Abstractions.Interfaces.Validators;
 using Application.Common.Interfaces;
 using Attributes;
-using Main.Abstractions.Interfaces.DbRepositories;
-using Main.Application.Dtos.RepositoryOptionsData;
-using Main.Entities;
-using Main.Entities.Auth;
+using Contracts.User;
+using Main.Application.Interfaces.Persistence;
 using Main.Entities.Exceptions.Auth;
-using Main.Entities.User;
-using Main.Enums;
 using MediatR;
 
 namespace Main.Application.Handlers.Auth.ChangePassword;
@@ -24,46 +18,22 @@ public record ChangePasswordCommand(
 public class ChangePasswordHandler(
     IUserRepository userRepository,
     IPasswordManager passwordManager,
-    IUserTokenRepository tokenRepository,
-    IUnitOfWork unitOfWork) : ICommandHandler<ChangePasswordCommand>
+    IIntegrationEventScope integrationEventScope) : ICommandHandler<ChangePasswordCommand>
 {
     public async Task<Unit> Handle(ChangePasswordCommand request, CancellationToken cancellationToken)
     {
-        var user = await GetUser(request, cancellationToken);
+        var user = await userRepository.GetById(request.UserId, cancellationToken)
+            ?? throw new UserNotFoundException(request.UserId);
         
         if (!passwordManager.VerifyHashedPassword(user.PasswordHash, request.PreviousPassword))
             throw new WrongCredentialsException(null, request.PreviousPassword);
         
-        user.PasswordHash = passwordManager.GetHashOfPassword(request.NewPassword);
-        
-        var tokens = await GetAllRefreshTokens(user.Id, cancellationToken);
-        unitOfWork.RemoveRange(tokens);
+        user.SetPasswordHash(passwordManager.GetHashOfPassword(request.NewPassword));
+        integrationEventScope.Add(new UserPasswordChangedEvent
+        {
+            UserId = request.UserId
+        });
         
         return Unit.Value;
-    }
-
-    private async Task<IReadOnlyList<UserToken>> GetAllRefreshTokens(Guid userId, CancellationToken cancellationToken)
-    {
-        var queryOptions = new QueryOptions<UserToken, GetUserTokensOptionsData>()
-        {
-            Data = new GetUserTokensOptionsData
-            {
-                UserId = userId,
-                TokenType = TokenType.RefreshToken
-            }
-        }.WithTracking();
-        
-        return await tokenRepository.GetTokensAsync(queryOptions, cancellationToken);
-    }
-
-    private async Task<User> GetUser(ChangePasswordCommand request, CancellationToken cancellationToken)
-    {
-        var queryOptions = new QueryOptions<User, Guid>()
-            {
-                Data = request.UserId
-            }.WithTracking()
-            .WithForUpdate();
-        return await userRepository.GetUserByIdAsync(queryOptions, cancellationToken)
-                   ?? throw new UserNotFoundException(request.UserId);
     }
 }

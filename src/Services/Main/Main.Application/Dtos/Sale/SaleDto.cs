@@ -1,12 +1,13 @@
 using System.Text.Json.Serialization;
 using Main.Application.Dtos.Currencies;
+using Main.Application.Dtos.Users;
 
 namespace Main.Application.Dtos.Sale;
 
 public record SaleDto
 {
     [JsonPropertyName("id")]
-    public required string Id { get; init; }
+    public required Guid Id { get; init; }
     
     [JsonPropertyName("buyer")]
     public required UserDto Buyer { get; init; }
@@ -18,7 +19,7 @@ public record SaleDto
     public required DateTime SaleDatetime { get; init; }
     
     [JsonPropertyName("transactionId")]
-    public required string TransactionId { get; init; }
+    public required Guid TransactionId { get; init; }
     
     [JsonPropertyName("totalSum")]
     public required decimal TotalSum { get; init; }

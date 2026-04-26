@@ -1,5 +1,6 @@
 ﻿using Contracts.ArticleCoefficients.GetArticleCoefficients;
 using Contracts.Models.ArticleCoefficients;
+using Contracts.Models.Coefficients;
 using Main.Application.Handlers.ProductCoefficient.GetArticleCoefficients;
 using Mapster;
 using MassTransit;
@@ -11,11 +12,28 @@ public class GetArticleCoefficientsConsumer(IMediator mediator) : IConsumer<GetA
 {
     public async Task Consume(ConsumeContext<GetArticleCoefficientsRequest> context)
     {
-        var result = await mediator.Send(new GetArticleCoefficientsQuery(context.Message.ArticleIds));
+        var result = await mediator.Send(new GetProductCoefficientsQuery(context.Message.ArticleIds));
 
-        var adapted = result.Coefficients.ToDictionary(x => x.Key,
-            x => x.Value.Adapt<List<ArticleCoefficient>>());
+        var response = new GetArticleCoefficientsResponse
+        {
+            Coefficients = result.Coefficients
+                .GroupBy(x => x.ProductId)
+                .ToDictionary(
+                    x => x.Key,
+                    x => x.Select(z => new ArticleCoefficient
+                    {
+                        ArticleId = z.ProductId,
+                        Coefficient = new Coefficient
+                        {
+                            Name = z.Coefficient.Name,
+                            Type = z.Coefficient.Type,
+                            Value = z.Coefficient.Value
+                        },
+                        CreatedAt = z.CreatedAt,
+                        ValidTill = z.ValidTill
+                    }).ToList())
+        };
 
-        await context.RespondAsync<GetArticleCoefficientsResponse>(adapted);
+        await context.RespondAsync(response);
     }
 }

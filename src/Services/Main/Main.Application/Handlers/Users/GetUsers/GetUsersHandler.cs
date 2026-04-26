@@ -1,11 +1,8 @@
 using Abstractions.Models;
-using Abstractions.Models.Repository;
 using Application.Common.Interfaces;
-using Main.Abstractions.Interfaces.DbRepositories;
 using Main.Application.Dtos.RepositoryOptionsData;
 using Main.Enums;
 using Mapster;
-using User = Main.Entities.User.User;
 
 namespace Main.Application.Handlers.Users.GetUsers;
 

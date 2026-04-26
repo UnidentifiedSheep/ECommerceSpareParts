@@ -1,6 +1,7 @@
 ﻿using System.Net;
 using System.Security.Cryptography;
 using Abstractions.Interfaces.Validators;
+using Application.Common.Extensions;
 using Application.Common.Interfaces;
 using Application.Common.Interfaces.Repositories;
 using Attributes;
@@ -50,7 +51,7 @@ public class LoginHandler(
         var ip = request.IpAddress;
         var userAgent = request.UserAgent;
 
-        UserDto userDto = UserProjections.UserProjectionFunc(user);
+        UserDto userDto = UserProjections.UserProjection.AsFunc()(user);
         var token = tokenGenerator.CreateToken(userDto, deviceId, roles, permissions);
         var refreshToken = tokenGenerator.CreateRefreshToken();
 

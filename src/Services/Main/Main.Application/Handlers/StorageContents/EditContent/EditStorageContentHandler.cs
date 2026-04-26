@@ -8,7 +8,7 @@ using Contracts.Articles;
 using Contracts.StorageContent;
 using Domain.Extensions;
 using Main.Abstractions.Models;
-using Main.Application.Dtos.Amw.Storage;
+using Main.Application.Dtos.Storage;
 using Main.Application.Extensions;
 using Main.Application.Interfaces.Persistence;
 using Main.Entities.Event;

@@ -1,4 +1,5 @@
 ﻿using Abstractions.Interfaces.Currency;
+using Application.Common.Extensions;
 using Application.Common.Interfaces;
 using Application.Common.Interfaces.Repositories;
 using Enums;
@@ -75,7 +76,7 @@ public class CalculateDeliveryCostHandler(
             WeightUnit = calcResult.WeightUnit
         };
 
-        return new CalculateDeliveryCostResult(StorageProjections.StorageRouteProjectionFunc(route), deliveryCost);
+        return new CalculateDeliveryCostResult(StorageProjections.StorageRouteProjection.AsFunc()(route), deliveryCost);
     }
 
     private async Task<StorageRoute> GetStorageRoute(string from, string to, CancellationToken cancellationToken)

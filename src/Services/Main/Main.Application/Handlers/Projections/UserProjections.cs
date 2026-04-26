@@ -24,9 +24,6 @@ public static class UserProjections
                 : UserInfoProjection.Invoke(x.UserInfo)
         };
     
-    public static readonly Func<User, UserDto> UserProjectionFunc =
-        UserProjection.Compile();
-    
     
     public static readonly Expression<Func<UserInfo, UserInfoDto>> UserInfoProjection =
         x => new UserInfoDto

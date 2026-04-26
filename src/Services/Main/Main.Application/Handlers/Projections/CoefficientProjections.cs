@@ -6,7 +6,7 @@ namespace Main.Application.Handlers.Projections;
 
 public static class CoefficientProjections
 {
-    public static Expression<Func<Coefficient, CoefficientDto>> ToDto =
+    public static readonly Expression<Func<Coefficient, CoefficientDto>> ToDto =
         x => new CoefficientDto
         {
             Name = x.Name,

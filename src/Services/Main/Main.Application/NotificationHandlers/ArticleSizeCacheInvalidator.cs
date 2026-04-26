@@ -9,7 +9,7 @@ public class ArticleSizeCacheInvalidator(ICache cache) : INotificationHandler<Ar
 {
     public async Task Handle(ArticleSizeUpdatedNotification notification, CancellationToken cancellationToken)
     {
-        var key = string.Format(CacheKeys.ArticleSizeCacheKey, notification.ArticleId);
+        var key = string.Format(CacheKeys.ProductSizeCacheKey, notification.ArticleId);
         await cache.DeleteAsync(key);
     }
 }

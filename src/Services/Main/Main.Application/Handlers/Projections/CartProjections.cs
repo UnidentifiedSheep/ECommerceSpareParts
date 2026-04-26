@@ -6,7 +6,7 @@ namespace Main.Application.Handlers.Projections;
 
 public static class CartProjections
 {
-    public static Expression<Func<Entities.Cart.Cart, CartItemDto>> ToCartItemDto =
+    public static readonly Expression<Func<Entities.Cart.Cart, CartItemDto>> ToCartItemDto =
         x => new CartItemDto
         {
             Count = x.Count,
