@@ -94,7 +94,7 @@ public static class MapsterConfig
             .Map(d => d.Order, s => s.Order)
             .Map(d => d.Type, s => s.Type);
 
-        TypeAdapterConfig<StorageContentPriceProjection, StorageContentCost>.NewConfig()
+        TypeAdapterConfig<StorageContentPriceDto, StorageContentCost>.NewConfig()
             .IgnoreNonMapped(true)
             .Map(d => d.ArticleId, s => s.ProductId)
             .Map(d => d.PurchaseId, s => s.PurchaseId)

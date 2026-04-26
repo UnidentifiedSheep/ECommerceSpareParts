@@ -8,7 +8,7 @@ namespace Main.Application.Handlers.StorageContents.GetStorageContentCosts;
 public record GetStorageContentCostsQuery(IEnumerable<int> ProductIds, bool OnlyPositiveQty)
     : IQuery<GetStorageContentCostsResult>;
 
-public record GetStorageContentCostsResult(IEnumerable<StorageContentPriceProjection> StorageContentCosts);
+public record GetStorageContentCostsResult(IEnumerable<StorageContentPriceDto> StorageContentCosts);
 
 public class GetStorageContentCostsHandler(
     IReadRepository<StorageContent, int> repository)
@@ -41,7 +41,7 @@ public class GetStorageContentCostsHandler(
                AND (@onlyPositive OR sc.count > 0)
              """;
         
-        var result = await repository.QuerySqlAsync<StorageContentPriceProjection>(
+        var result = await repository.QuerySqlAsync<StorageContentPriceDto>(
             sql: sql,
             param: new
             {

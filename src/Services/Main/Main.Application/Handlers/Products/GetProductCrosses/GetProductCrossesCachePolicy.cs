@@ -1,6 +1,7 @@
 ﻿using Application.Common.Interfaces;
 using Main.Abstractions.Constants;
 using Main.Abstractions.Models;
+using Main.Entities.Product;
 
 namespace Main.Application.Handlers.Products.GetProductCrosses;
 
@@ -11,5 +12,5 @@ public class GetProductCrossesCachePolicy : ICachePolicy<GetProductCrossesQuery>
             request.Pagination.Size, request.SortBy);
 
     public int DurationSeconds => 600;
-    public Type? RelatedType => typeof(ArticleCross);
+    public Type? RelatedType => typeof(ProductCross);
 }

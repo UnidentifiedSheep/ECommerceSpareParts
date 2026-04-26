@@ -1,4 +1,6 @@
-﻿using Main.Entities.User;
+﻿using Main.Entities.Auth.ValueObjects;
+using Main.Entities.User;
+using Main.Enums;
 using Main.Persistence.Context;
 using Microsoft.EntityFrameworkCore;
 using Persistence.Interfaces;
@@ -14,6 +16,7 @@ public class UserSeed : ISeed<DContext>
             return;
 
         var systemUser = User.Create(System, "");
+        systemUser.AddUserRole(RoleName.ToNormalized(nameof(Role.System)));
 
         await context.Users.AddAsync(systemUser);
         await context.SaveChangesAsync();

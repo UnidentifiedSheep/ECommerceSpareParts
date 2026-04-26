@@ -14,10 +14,6 @@
     </ItemGroup>
 
     <ItemGroup>
-        <Folder Include="Models\Settings\" />
-    </ItemGroup>
-
-    <ItemGroup>
         <Content Include="..\..\Application.Common\Localization\common-localization-en.json">
             <Link>Localization\common-localization-en.json</Link>
             <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>

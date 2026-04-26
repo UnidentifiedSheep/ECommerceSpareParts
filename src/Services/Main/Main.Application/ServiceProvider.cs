@@ -20,6 +20,7 @@ using Main.Application.Services;
 using Main.Application.Services.Logistics;
 using Main.Application.Services.Logistics.PricingStrategies;
 using Main.Entities.Producer;
+using Main.Entities.Product;
 using Microsoft.Extensions.DependencyInjection;
 using Currency = Main.Entities.Currency.Currency;
 using User = Main.Entities.User.User;
@@ -63,10 +64,10 @@ public static class ServiceProvider
 
         collection.AddSingleton<IEmailValidator, EmailValidator>();
 
-        collection.AddTransient<IRelatedDataRepository<ArticleCross>, ArticleCrossesRelatedData>(sp =>
+        collection.AddTransient<IRelatedDataRepository<ProductCross>, ProductCrossesRelatedData>(sp =>
         {
             var cache = sp.GetRequiredService<ICache>();
-            return new ArticleCrossesRelatedData(cache, relatedDataTtl);
+            return new ProductCrossesRelatedData(cache, relatedDataTtl);
         });
         collection.AddTransient<IRelatedDataRepository<Producer>, ProducerRelatedData>(sp =>
         {
