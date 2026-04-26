@@ -1,10 +1,8 @@
 using System.Text;
-using Abstractions.Interfaces.Services;
-using Abstractions.Models.Repository;
 using Application.Common.Interfaces;
+using Application.Common.Interfaces.Repositories;
 using Attributes;
-using Contracts.Sale;
-using Main.Abstractions.Interfaces.DbRepositories;
+using Contracts.Articles;
 using Main.Abstractions.Models;
 using Main.Application.Dtos.Amw.Sales;
 using Main.Application.Extensions;
@@ -13,8 +11,7 @@ using Main.Application.Handlers.ProductReservations.GetArticlesWithNotEnoughStoc
 using Main.Application.Handlers.ProductReservations.UpdateReservationsCounts;
 using Main.Application.Handlers.Sales.CreateSale;
 using Main.Application.Handlers.StorageContents.RemoveContent;
-using Main.Application.Notifications;
-using Main.Entities;
+using Main.Application.Interfaces.Persistence;
 using Main.Entities.Balance;
 using Main.Entities.Exceptions.Sales;
 using Main.Entities.Exceptions.Storages;
@@ -22,17 +19,15 @@ using Main.Entities.Product;
 using Main.Entities.Sale;
 using Main.Entities.Storage;
 using Main.Enums;
-using Mapster;
-using MassTransit;
 using MediatR;
 using Utils;
 using IsolationLevel = System.Data.IsolationLevel;
 
 namespace Main.Application.Handlers.Sales.CreateFullSale;
 
+[AutoSave]
 [Transactional(IsolationLevel.Serializable, 20, 2)]
 public record CreateFullSaleCommand(
-    Guid CreatedUserId,
     Guid BuyerId,
     int CurrencyId,
     string StorageName,
@@ -44,52 +39,59 @@ public record CreateFullSaleCommand(
     string? ConfirmationCode) : ICommand;
 
 public class CreateFullSaleHandler(
-    IMediator mediator,
-    IArticlesRepository articlesRepository,
-    IUnitOfWork unitOfWork,
-    IPublishEndpoint publishEndpoint)
+    ISender sender,
+    IProductRepository productRepository,
+    IIntegrationEventScope integrationEventScope)
     : ICommandHandler<CreateFullSaleCommand, Unit>
 {
     public async Task<Unit> Handle(CreateFullSaleCommand request, CancellationToken cancellationToken)
     {
         var buyerId = request.BuyerId;
-        var whoCreated = request.CreatedUserId;
         var currencyId = request.CurrencyId;
         var storageName = request.StorageName;
         var sellFromOtherStorages = request.SellFromOtherStorages;
         var saleContentList = request.SaleContent.ToList();
         var dateTime = request.SaleDateTime;
 
-        await CheckReservations(saleContentList, buyerId, whoCreated, storageName, sellFromOtherStorages,
+        await CheckReservations(saleContentList, buyerId, storageName, sellFromOtherStorages,
             request.ConfirmationCode, cancellationToken);
 
-        var totalSum = saleContentList.GetTotalSum();
-        var transaction = await CreateTransaction(totalSum, Global.SystemId, buyerId, currencyId, whoCreated,
-            dateTime, cancellationToken);
+        var transaction = await CreateTransaction(
+            amount: saleContentList.GetTotalSum(), 
+            senderId: Global.SystemId, 
+            receiverId: buyerId, 
+            currencyId: currencyId, 
+            transactionDateTime: dateTime, 
+            cancellationToken: cancellationToken);
 
-        var changedStorageContents = (await RemoveContentFromStorage(saleContentList,
-            whoCreated, storageName, sellFromOtherStorages, cancellationToken)).ToList();
+        var changedStorageContents = (await RemoveContentFromStorage(saleContentList, 
+            storageName, sellFromOtherStorages, cancellationToken)).ToList();
 
-        var sale = await CreateSale(changedStorageContents, saleContentList, currencyId, buyerId, whoCreated,
+        var sale = await CreateSale(changedStorageContents, saleContentList, currencyId, buyerId,
             transaction.Id,
             storageName, dateTime, request.Comment, cancellationToken);
 
         if (request.PayedSum > 0)
-            await CreateTransaction(request.PayedSum.Value, buyerId, Global.SystemId, currencyId, whoCreated,
-                dateTime, cancellationToken);
+            await CreateTransaction(
+                amount: request.PayedSum.Value, 
+                senderId: buyerId, 
+                receiverId: Global.SystemId, 
+                currencyId: currencyId, 
+                transactionDateTime: dateTime, 
+                cancellationToken: cancellationToken);
 
-        var saleCounts = sale.SaleContents
+        var saleCounts = sale.Contents
             .GroupBy(x => x.ProductId)
             .ToDictionary(x => x.Key, x => x.Sum(z => z.Count));
 
         await SubtractCountFromReservations(buyerId, saleCounts, cancellationToken);
-
-        await publishEndpoint.Publish(new SaleCreatedEvent
-        {
-            Sale = sale.Adapt<Contracts.Models.Sale.Sale>()
-        }, cancellationToken);
-        await unitOfWork.SaveChangesAsync(cancellationToken);
-        await mediator.Publish(new ArticlesUpdatedNotification(saleCounts.Keys), cancellationToken);
+        
+        foreach (var productId in saleCounts.Keys)
+            integrationEventScope.Add(new ProductUpdatedEvent
+            {
+                Id = productId
+            });
+        
         return Unit.Value;
     }
 
@@ -99,13 +101,12 @@ public class CreateFullSaleHandler(
         CancellationToken cancellation = default)
     {
         var command = new UpdateReservationsCountsCommand(buyerId, toSubtract);
-        await mediator.Send(command, cancellation);
+        await sender.Send(command, cancellation);
     }
 
     private async Task CheckReservations(
         IEnumerable<NewSaleContentDto> saleContent,
         Guid buyerId,
-        Guid whoCreateUserId,
         string storageName,
         bool sellFromOtherStorages,
         string? confirmationCode,
@@ -119,19 +120,20 @@ public class CreateFullSaleHandler(
 
         if (byReservation.Count != 0)
         {
-            var queryOptions = new QueryOptions<Product, IReadOnlyList<int>>()
-            {
-                Data = byReservation.Keys.ToList()
-            }.WithTracking(false);
-            var arts = (await articlesRepository.GetArticlesByIds(queryOptions, cancellationToken))
+            var criteria = Criteria<Product>.New()
+                .Track(false)
+                .Where(x => byReservation.Keys.Contains(x.Id))
+                .Build();
+            
+            var products = (await productRepository.ListAsync(criteria, cancellationToken))
                 .ToDictionary(x => x.Id);
+            
             var res = new Dictionary<string, int>();
             var codeBuilder = new StringBuilder();
-            codeBuilder.Append(HashUtils.ComputeHash(whoCreateUserId));
             foreach (var (id, count) in byReservation.OrderBy(x => x.Key))
             {
-                var art = arts[id];
-                var key = $"{art.Producer.Name}_{art.Sku}";
+                var art = products[id];
+                var key = $"{art.Producer.Name}_{art.Sku.NormalizedValue}";
                 res[key] = count;
                 codeBuilder.Append(HashUtils.ComputeHash(key, count));
             }
@@ -154,7 +156,7 @@ public class CreateFullSaleHandler(
             .ToDictionary(x => x.Key,
                 x => x.Sum(z => z.Count));
 
-        var result = await mediator.Send(new GetArticlesWithNotEnoughStockQuery(buyerId, storageName,
+        var result = await sender.Send(new GetArticlesWithNotEnoughStockQuery(buyerId, storageName,
             sellFromOtherStorages, neededArticlesCounts), cancellationToken);
 
         return (result.NotEnoughByReservation, result.NotEnoughByStock);
@@ -162,31 +164,27 @@ public class CreateFullSaleHandler(
 
     private async Task<Transaction> CreateTransaction(
         decimal amount,
-        Guid sender,
-        Guid receiver,
+        Guid senderId,
+        Guid receiverId,
         int currencyId,
-        Guid createdUserId,
         DateTime transactionDateTime,
         CancellationToken cancellationToken = default)
     {
-        var command = new CreateTransactionCommand(sender, receiver, amount, currencyId, createdUserId,
-            transactionDateTime, TransactionType.Sale);
-        var result = await mediator.Send(command, cancellationToken);
+        var command = new CreateTransactionCommand(senderId, receiverId, amount, currencyId, transactionDateTime);
+        var result = await sender.Send(command, cancellationToken);
         return result.Transaction;
     }
 
     private async Task<IEnumerable<PrevAndNewValue<StorageContent>>> RemoveContentFromStorage(
         IEnumerable<NewSaleContentDto> saleContent,
-        Guid whoCreateUserId,
         string storageName,
         bool saleFromOtherStorages,
         CancellationToken cancellationToken = default)
     {
         var dict = saleContent.GroupBy(x => x.ProductId)
             .ToDictionary(x => x.Key, x => x.Sum(z => z.Count));
-        var command = new RemoveContentCommand(dict, whoCreateUserId, storageName, saleFromOtherStorages,
-            StorageMovementType.Sale);
-        var result = await mediator.Send(command, cancellationToken);
+        var command = new RemoveContentCommand(dict, storageName, saleFromOtherStorages, StorageMovementType.Sale);
+        var result = await sender.Send(command, cancellationToken);
         return result.Changes;
     }
 
@@ -195,16 +193,15 @@ public class CreateFullSaleHandler(
         IEnumerable<NewSaleContentDto> saleContent,
         int currencyId,
         Guid buyerId,
-        Guid whoCreatedUserId,
         Guid transactionId,
         string mainStorage,
         DateTime saleDateTime,
         string? comment,
         CancellationToken cancellationToken = default)
     {
-        var command = new CreateSaleCommand(saleContent, storageContents, currencyId, buyerId, whoCreatedUserId,
+        var command = new CreateSaleCommand(saleContent, storageContents, currencyId, buyerId,
             transactionId, mainStorage, saleDateTime, comment);
-        var result = await mediator.Send(command, cancellationToken);
+        var result = await sender.Send(command, cancellationToken);
         return result.Sale;
     }
 }
