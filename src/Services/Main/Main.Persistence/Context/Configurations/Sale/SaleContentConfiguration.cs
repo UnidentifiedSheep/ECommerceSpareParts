@@ -53,8 +53,12 @@ public class SaleContentConfiguration : IEntityTypeConfiguration<SaleContent>
             .HasConstraintName("sale_content_products_id_fk");
 
         builder.HasOne<Entities.Sale.Sale>()
-            .WithMany(p => p.SaleContents)
+            .WithMany(p => p.Contents)
             .HasForeignKey(d => d.SaleId)
             .HasConstraintName("sale_content_sale_id_fk");
+        
+        builder.Navigation(e => e.Details)
+            .HasField("_details")
+            .UsePropertyAccessMode(PropertyAccessMode.Field);
     }
 }

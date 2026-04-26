@@ -179,7 +179,7 @@ public static class MockData
             .RuleFor(x => x.BuyerId, buyerId)
             .RuleFor(x => x.TransactionId, transactionId)
             .RuleFor(x => x.CurrencyId, currencyId)
-            .RuleFor(x => x.MainStorageName, storageName)
+            .RuleFor(x => x.StorageName, storageName)
             .RuleFor(x => x.SaleDatetime, f => f.Date.Between(DateTime.Now.AddMonths(-2), DateTime.Now.AddMonths(2)));
         return f.Generate(1).Single();
     }

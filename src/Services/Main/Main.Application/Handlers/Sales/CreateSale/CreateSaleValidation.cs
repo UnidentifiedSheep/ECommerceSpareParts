@@ -22,7 +22,7 @@ public class CreateSaleValidation : AbstractValidator<CreateSaleCommand>
         RuleFor(x => new { x.SellContent, x.StorageContentValues })
             .Must(x =>
             {
-                var arts = x.SellContent.Select(z => z.ArticleId);
+                var arts = x.SellContent.Select(z => z.ProductId);
                 return x.StorageContentValues.All(z => arts.Contains(z.NewValue.ProductId));
             })
             .WithLocalizationKey("sale.articles.missing");

@@ -9,7 +9,7 @@ namespace Main.Application.Services;
 
 public class SaleService : ISaleService
 {
-    public Dictionary<int, Queue<SaleContentDetail>> GetDetailsGroup(
+    public Dictionary<int, List<SaleContentDetail>> GetDetailsGroup(
         IEnumerable<PrevAndNewValue<StorageContent>> storageContentValues)
     {
         return storageContentValues.Select(x =>
@@ -19,19 +19,20 @@ public class SaleService : ISaleService
                     throw new ArgumentException("Некорректное taken количество");
                 if (x.Prev.Id != x.NewValue.Id)
                     throw new ArgumentException("Не совпадает Id в старом и новом значении");
-                var detail = x.NewValue.Adapt<SaleContentDetail>();
-                detail.Count = taken;
+                var prev = x.Prev;
+                var detail = SaleContentDetail.Create(prev.Id, prev.CurrencyId, prev.BuyPrice, taken,
+                    prev.PurchaseDatetime);
 
-                return (ArticleId: x.Prev.ProductId, Detail: detail);
+                return (x.Prev.ProductId, Detail: detail);
             })
-            .GroupBy(x => x.ArticleId)
+            .GroupBy(x => x.ProductId)
             .ToDictionary(
                 g => g.Key,
-                g => new Queue<SaleContentDetail>(
-                    g.Select(x => x.Detail)
-                        .OrderByDescending(x => x.Count)
-                        .ThenByDescending(x => x.BuyPrice)
-                )
+                g => g
+                    .Select(x => x.Detail)
+                    .OrderByDescending(x => x.Count)
+                    .ThenByDescending(x => x.BuyPrice)
+                    .ToList()
             );
     }
 }

@@ -1,6 +1,5 @@
 using Application.Common.Interfaces;
 using FluentValidation;
-using Main.Abstractions.Interfaces.DbRepositories;
 
 namespace Main.Application.Handlers.Users;
 
@@ -23,7 +22,7 @@ public class CreateMailForUserValidation : AbstractValidator<CreateMailForUserCo
     }
 }
 
-public class CreateMailForUserHandler(IUserEmailRepository emailRepository)
+public class CreateMailForUserHandler()
     : ICommandHandler<CreateMailForUserCommand, CreateMailForUserResult>
 {
     public async Task<CreateMailForUserResult> Handle(

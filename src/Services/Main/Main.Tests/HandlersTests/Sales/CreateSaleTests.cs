@@ -91,7 +91,7 @@ public class CreateSaleTests : IAsyncLifetime
         {
             new()
             {
-                ArticleId = article.Id,
+                ProductId = article.Id,
                 Count = 1,
                 Price = price,
                 PriceWithDiscount = price
@@ -114,7 +114,7 @@ public class CreateSaleTests : IAsyncLifetime
         {
             new()
             {
-                ArticleId = article.Id,
+                ProductId = article.Id,
                 Count = count,
                 Price = 10,
                 PriceWithDiscount = 10
@@ -135,7 +135,7 @@ public class CreateSaleTests : IAsyncLifetime
         {
             new()
             {
-                ArticleId = article.Id,
+                ProductId = article.Id,
                 Count = 100000,
                 Price = 10,
                 PriceWithDiscount = 9.5m
@@ -156,7 +156,7 @@ public class CreateSaleTests : IAsyncLifetime
         {
             new()
             {
-                ArticleId = article.Id,
+                ProductId = article.Id,
                 Count = storageContent.Count,
                 Price = 10,
                 PriceWithDiscount = 9
@@ -184,7 +184,7 @@ public class CreateSaleTests : IAsyncLifetime
         {
             new()
             {
-                ArticleId = storageContent.ProductId,
+                ProductId = storageContent.ProductId,
                 Count = storageContent.Count,
                 Price = 10,
                 PriceWithDiscount = 9
@@ -218,7 +218,7 @@ public class CreateSaleTests : IAsyncLifetime
             newValue.Count = 0;
             saleContent.Add(new NewSaleContentDto
             {
-                ArticleId = content.ProductId,
+                ProductId = content.ProductId,
                 Count = content.Count,
                 Comment = Global.Faker.Lorem.Letter(10),
                 Price = content.BuyPrice,

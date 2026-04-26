@@ -41,7 +41,7 @@ public class SaleContentDetailConfiguration : IEntityTypeConfiguration<SaleConte
             .HasConstraintName("sale_content_details_currency_id_fk");
 
         builder.HasOne<SaleContent>()
-            .WithMany(p => p.SaleContentDetails)
+            .WithMany(p => p.Details)
             .HasForeignKey(d => d.SaleContentId)
             .HasConstraintName("sale_content_details_sale_content_id_fk");
 

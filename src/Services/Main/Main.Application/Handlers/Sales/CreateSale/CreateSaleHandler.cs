@@ -5,23 +5,20 @@ using Attributes;
 using Main.Abstractions.Interfaces.Services;
 using Main.Abstractions.Models;
 using Main.Application.Dtos.Amw.Sales;
-using Main.Entities;
 using Main.Entities.Sale;
 using Main.Entities.Storage;
-using Main.Enums;
-using Mapster;
 
 namespace Main.Application.Handlers.Sales.CreateSale;
 
+[AutoSave]
 [Transactional(IsolationLevel.Serializable, 20, 2)]
 public record CreateSaleCommand(
     IEnumerable<NewSaleContentDto> SellContent,
     IEnumerable<PrevAndNewValue<StorageContent>> StorageContentValues,
     int CurrencyId,
     Guid BuyerId,
-    Guid CreatedUserId,
     Guid TransactionId,
-    string MainStorage,
+    string Storage,
     DateTime SaleDateTime,
     string? Comment) : ICommand<CreateSaleResult>;
 
@@ -34,75 +31,28 @@ public class CreateSaleHandler(ISaleService saleService, IUnitOfWork unitOfWork)
     {
         var transactionId = request.TransactionId;
         var buyerId = request.BuyerId;
-        var createdUserId = request.CreatedUserId;
         var currencyId = request.CurrencyId;
-        var mainStorage = request.MainStorage;
+        var storageName = request.Storage;
+
+        Sale sale = Sale.Create(buyerId, transactionId, currencyId, storageName, request.SaleDateTime);
+        sale.SetComment(request.Comment);
 
         var saleContentList = request.SellContent.ToList();
-
         var detailGroups = saleService.GetDetailsGroup(request.StorageContentValues);
 
-        var saleContents = new List<SaleContent>();
-
-        foreach (var item in saleContentList)
+        foreach (var newContent in saleContentList)
         {
-            var saleContent = item.Adapt<SaleContent>();
-            saleContents.Add(saleContent);
-
-            DistributeDetails(item.ArticleId, item.Count, saleContent, detailGroups);
+            var saleContent = SaleContent.Create(
+                newContent.Count,
+                newContent.Price,
+                newContent.PriceWithDiscount,
+                newContent.Count,
+                detailGroups[newContent.ProductId]);
+            
+            sale.AddContent(saleContent);
         }
-
-        if (detailGroups.Any(x => x.Value.Count > 0))
-            throw new ArgumentException("Несовпадение количества в деталях и продажах");
-
-        var saleModel = new Sale
-        {
-            TransactionId = transactionId,
-            SaleDatetime = request.SaleDateTime,
-            BuyerId = buyerId,
-            CreatedUserId = createdUserId,
-            Comment = request.Comment,
-            SaleContents = saleContents,
-            CurrencyId = currencyId,
-            MainStorageName = mainStorage,
-            State = SaleState.Draft
-        };
-
-        await unitOfWork.AddAsync(saleModel, cancellationToken);
-        await unitOfWork.SaveChangesAsync(cancellationToken);
-        return new CreateSaleResult(saleModel);
-    }
-
-    private void DistributeDetails(
-        int articleId,
-        int requiredCount,
-        SaleContent saleContent,
-        Dictionary<int, Queue<SaleContentDetail>> detailGroups)
-    {
-        if (!detailGroups.TryGetValue(articleId, out var queue))
-            throw new ArgumentException($"Не найдены детали для артикула {articleId}");
-
-        var counter = requiredCount;
-        while (counter > 0 && queue.Count > 0)
-        {
-            var detail = queue.Peek();
-            if (detail.Count <= counter)
-            {
-                counter -= detail.Count;
-                saleContent.SaleContentDetails.Add(detail);
-                queue.Dequeue();
-            }
-            else
-            {
-                var partial = detail.Adapt<SaleContentDetail>();
-                partial.Count = counter;
-                detail.Count -= counter;
-                counter = 0;
-                saleContent.SaleContentDetails.Add(partial);
-            }
-        }
-
-        if (counter > 0)
-            throw new ArgumentException($"Недостаточно деталей для артикула {articleId}");
+        
+        await unitOfWork.AddAsync(sale, cancellationToken);
+        return new CreateSaleResult(sale);
     }
 }

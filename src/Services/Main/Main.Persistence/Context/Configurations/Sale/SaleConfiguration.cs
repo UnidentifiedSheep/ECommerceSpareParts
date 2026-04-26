@@ -18,19 +18,15 @@ public class SaleConfiguration : IEntityTypeConfiguration<Entities.Sale.Sale>
             .HasMethod("gin")
             .HasOperators("gin_trgm_ops");
 
-        builder.HasIndex(e => e.CreatedUserId, "sale_created_user_id_index");
-
         builder.HasIndex(e => e.CurrencyId, "sale_currency_id_index");
 
-        builder.HasIndex(e => e.MainStorageName, "sale_main_storage_name_index");
+        builder.HasIndex(e => e.StorageName, "sale_storage_name_index");
 
         builder.HasIndex(e => e.SaleDatetime, "sale_sale_datetime_index");
 
         builder.HasIndex(e => e.State, "sale_state_index");
 
         builder.HasIndex(e => e.TransactionId, "sale_transaction_id_index");
-
-        builder.HasIndex(e => e.UpdatedUserId, "sale_updated_user_id_index");
         
         builder.Property(e => e.Id)
             .HasDefaultValueSql("gen_random_uuid()")
@@ -44,13 +40,10 @@ public class SaleConfiguration : IEntityTypeConfiguration<Entities.Sale.Sale>
             .HasMaxLength(256)
             .HasColumnName("comment");
         
-        builder.Property(e => e.CreatedUserId)
-            .HasColumnName("created_user_id");
-        
         builder.Property(e => e.CurrencyId).HasColumnName("currency_id");
-        builder.Property(e => e.MainStorageName)
+        builder.Property(e => e.StorageName)
             .HasMaxLength(128)
-            .HasColumnName("main_storage_name");
+            .HasColumnName("storage_name");
         
         builder.Property(e => e.SaleDatetime)
             .HasColumnName("sale_datetime");
@@ -61,20 +54,11 @@ public class SaleConfiguration : IEntityTypeConfiguration<Entities.Sale.Sale>
         builder.Property(e => e.TransactionId)
             .HasColumnName("transaction_id");
         
-        builder.Property(e => e.UpdatedUserId)
-            .HasColumnName("updated_user_id");
-        
         builder.HasOne(d => d.Buyer)
             .WithMany()
             .HasForeignKey(d => d.BuyerId)
             .OnDelete(DeleteBehavior.Restrict)
             .HasConstraintName("sale_users_id_fk");
-
-        builder.HasOne<Entities.User.User>()
-            .WithMany()
-            .HasForeignKey(d => d.CreatedUserId)
-            .OnDelete(DeleteBehavior.Restrict)
-            .HasConstraintName("sale_users_id_fk_2");
 
         builder.HasOne(d => d.Currency)
             .WithMany()
@@ -84,7 +68,7 @@ public class SaleConfiguration : IEntityTypeConfiguration<Entities.Sale.Sale>
 
         builder.HasOne<Entities.Storage.Storage>()
             .WithMany()
-            .HasForeignKey(d => d.MainStorageName)
+            .HasForeignKey(d => d.StorageName)
             .OnDelete(DeleteBehavior.Restrict)
             .HasConstraintName("sale_storages_name_fk");
 
@@ -93,11 +77,9 @@ public class SaleConfiguration : IEntityTypeConfiguration<Entities.Sale.Sale>
             .HasForeignKey(d => d.TransactionId)
             .OnDelete(DeleteBehavior.Restrict)
             .HasConstraintName("sale_transactions_id_fk");
-
-        builder.HasOne<Entities.User.User>()
-            .WithMany()
-            .HasForeignKey(d => d.UpdatedUserId)
-            .OnDelete(DeleteBehavior.Restrict)
-            .HasConstraintName("sale_users_id_fk_3");
+        
+        builder.Navigation(e => e.Contents)
+            .HasField("_contents")
+            .UsePropertyAccessMode(PropertyAccessMode.Field);
     }
 }

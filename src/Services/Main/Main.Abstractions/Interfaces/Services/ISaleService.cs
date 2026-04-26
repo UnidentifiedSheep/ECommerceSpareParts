@@ -7,6 +7,6 @@ namespace Main.Abstractions.Interfaces.Services;
 
 public interface ISaleService
 {
-    Dictionary<int, Queue<SaleContentDetail>> GetDetailsGroup(
+    Dictionary<int, List<SaleContentDetail>> GetDetailsGroup(
         IEnumerable<PrevAndNewValue<StorageContent>> storageContentValues);
 }

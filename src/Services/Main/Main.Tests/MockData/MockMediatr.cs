@@ -129,7 +129,7 @@ public static class MockMediatr
             newValue.Count = 0;
             saleContent.Add(new NewSaleContentDto
             {
-                ArticleId = content.ProductId,
+                ProductId = content.ProductId,
                 Count = content.Count,
                 Comment = Global.Faker.Lorem.Letter(10),
                 Price = content.BuyPrice,

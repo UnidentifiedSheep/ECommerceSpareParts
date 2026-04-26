@@ -421,7 +421,7 @@ public static class MapsterConfig
             .Map(dest => dest.Currency, src => src.Currency)
             .Map(dest => dest.SaleDatetime, src => src.SaleDatetime)
             .Map(dest => dest.Comment, src => src.Comment)
-            .Map(dest => dest.Storage, src => src.MainStorageName);
+            .Map(dest => dest.Storage, src => src.StorageName);
 
         TypeAdapterConfig<SaleContent, SaleContentDto>.NewConfig()
             .Map(dest => dest.Id, src => src.Id)
@@ -439,7 +439,7 @@ public static class MapsterConfig
             .Map(d => d.Type, s => s.Type);
 
         TypeAdapterConfig<NewSaleContentDto, SaleContent>.NewConfig()
-            .Map(dest => dest.ProductId, src => src.ArticleId)
+            .Map(dest => dest.ProductId, src => src.ProductId)
             .Map(dest => dest.Comment, src => src.Comment)
             .Map(dest => dest.Count, src => src.Count)
             .Map(dest => dest.Price, src => src.PriceWithDiscount)
@@ -463,7 +463,7 @@ public static class MapsterConfig
             .Map(d => d.CreatedUserId, s => s.CreatedUserId)
             .Map(d => d.CreationDatetime, s => s.CreatedAt)
             .Map(d => d.CurrencyId, s => s.CurrencyId)
-            .Map(d => d.MainStorageName, s => s.MainStorageName)
+            .Map(d => d.MainStorageName, s => s.StorageName)
             .Map(d => d.SaleContents, s => s.SaleContents)
             .Map(d => d.SaleDatetime, s => s.SaleDatetime)
             .Map(d => d.TransactionId, s => s.TransactionId);

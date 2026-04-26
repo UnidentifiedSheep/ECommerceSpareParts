@@ -150,7 +150,7 @@ public class CreateFullSaleHandler(
         CancellationToken cancellationToken = default)
     {
         var neededArticlesCounts = saleContent
-            .GroupBy(x => x.ArticleId)
+            .GroupBy(x => x.ProductId)
             .ToDictionary(x => x.Key,
                 x => x.Sum(z => z.Count));
 
@@ -182,7 +182,7 @@ public class CreateFullSaleHandler(
         bool saleFromOtherStorages,
         CancellationToken cancellationToken = default)
     {
-        var dict = saleContent.GroupBy(x => x.ArticleId)
+        var dict = saleContent.GroupBy(x => x.ProductId)
             .ToDictionary(x => x.Key, x => x.Sum(z => z.Count));
         var command = new RemoveContentCommand(dict, whoCreateUserId, storageName, saleFromOtherStorages,
             StorageMovementType.Sale);

@@ -37,6 +37,11 @@ public class GetTransactionsHandler(
         if (request.ReceiverId.HasValue)
             query = query.Where(e => e.ReceiverId == request.ReceiverId.Value);
 
+        var fixedStart = request.RangeStart.Date;
+        var fixedEnd = request.RangeEnd.Date.AddDays(1);
+        query = query.Where(x => x.TransactionDatetime >= fixedStart && 
+                                 x.TransactionDatetime <= fixedEnd);
+
         var res = await query
             .Where(x =>
                 x.TransactionDatetime > cursor.CursorValue.dt ||
