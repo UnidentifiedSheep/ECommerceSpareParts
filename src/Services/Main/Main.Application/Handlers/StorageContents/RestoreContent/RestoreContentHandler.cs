@@ -4,7 +4,6 @@ using Application.Common.Interfaces;
 using Attributes;
 using Contracts.Articles;
 using Contracts.StorageContent;
-using Main.Abstractions.Models;
 using Main.Application.Extensions;
 using Main.Application.Interfaces.Persistence;
 using Main.Application.Models;

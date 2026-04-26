@@ -1,22 +1,17 @@
-using System.Collections.Immutable;
 using System.Data;
-using Abstractions.Interfaces.Services;
 using Application.Common.Interfaces;
 using Application.Common.Interfaces.Repositories;
 using Attributes;
-using Main.Abstractions.Interfaces.Services;
 using Main.Application.Interfaces.Persistence;
 using Main.Application.Interfaces.Services;
-using Main.Entities;
 using Main.Entities.Balance;
 using Main.Entities.Exceptions.Balances;
-using Main.Enums;
 
 namespace Main.Application.Handlers.Balance.DeleteTransaction;
 
 [AutoSave]
 [Transactional(IsolationLevel.Serializable, 20, 3)]
-public record ReverseTransactionCommand(Guid TransactionId, Guid WhoReversed, bool IsSystem = false)
+public record ReverseTransactionCommand(Guid TransactionId, Guid WhoReversed)
     : ICommand<ReverseTransactionResult>;
 
 public record ReverseTransactionResult(Transaction Transaction);

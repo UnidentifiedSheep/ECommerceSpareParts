@@ -5,7 +5,7 @@ namespace Main.Entities.Exceptions.Sales;
 
 public class SaleNotFoundException : NotFoundException, ILocalizableException
 {
-    public SaleNotFoundException(string id) : base(null, new { Id = id })
+    public SaleNotFoundException(Guid id) : base(null, new { Id = id })
     {
     }
 
