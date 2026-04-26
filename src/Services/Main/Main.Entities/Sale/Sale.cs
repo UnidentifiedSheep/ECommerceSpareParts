@@ -49,5 +49,20 @@ public class Sale : AuditableEntity<Sale, Guid>
         _contents.Add(content);
     }
 
+    public void RemoveContent(SaleContent content)
+    {
+        _contents.Remove(content);
+    }
+
+    public void SetDateTime(DateTime dateTime)
+    {
+        SaleDatetime = dateTime;
+    }
+
+    public void SetCurrency(int currencyId)
+    {
+        CurrencyId = currencyId;
+    }
+
     public override Guid GetId() => Id;
 }

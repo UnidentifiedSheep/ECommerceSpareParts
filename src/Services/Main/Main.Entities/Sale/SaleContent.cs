@@ -1,8 +1,9 @@
-﻿using Domain.Extensions;
+﻿using Domain;
+using Domain.Extensions;
 
 namespace Main.Entities.Sale;
 
-public class SaleContent
+public class SaleContent : Entity<SaleContent, int>
 {
     public int Id { get; private set; }
 
@@ -101,4 +102,6 @@ public class SaleContent
             .NullIfWhiteSpace()?
             .AgainstTooLong(256, "sale.content.comment.max");
     }
+
+    public override int GetId() => Id;
 }

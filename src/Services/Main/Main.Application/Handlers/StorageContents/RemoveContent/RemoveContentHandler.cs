@@ -4,9 +4,9 @@ using Application.Common.Interfaces;
 using Attributes;
 using Contracts.Articles;
 using Contracts.StorageContent;
-using Main.Abstractions.Models;
 using Main.Application.Extensions;
 using Main.Application.Interfaces.Persistence;
+using Main.Application.Models.SaleService;
 using Main.Entities.Event;
 using Main.Entities.Exceptions.Storages;
 using Main.Entities.Product;
@@ -23,7 +23,7 @@ public record RemoveContentCommand(
     bool TakeFromOtherStorages,
     StorageMovementType MovementType) : ICommand<RemoveContentResult>;
 
-public record RemoveContentResult(IEnumerable<PrevAndNewValue<StorageContent>> Changes);
+public record RemoveContentResult(IReadOnlyList<StorageLot> Changes);
 
 public class RemoveContentHandler(
     IStorageContentRepository contentRepository,
@@ -42,7 +42,7 @@ public class RemoveContentHandler(
             .EnsureProductsExistsForUpdateAsync(productIds, cancellationToken);
 
         var movements = new List<Event>();
-        var result = new List<PrevAndNewValue<StorageContent>>();
+        var result = new List<StorageLot>();
 
         foreach (var (productId, count) in content)
         {
@@ -76,18 +76,21 @@ public class RemoveContentHandler(
 
             foreach (var item in storageContents)
             {
-                StorageContent prevValue = StorageContent.CopyFrom(item);
+                StorageMovementEvent movementEvent = StorageMovementEvent.Create(item, request.MovementType);
                 
                 int temp = Math.Min(counter, item.Count);
                 item.IncreaseCount(-temp);
                 counter -= temp;
                 
-                StorageContent newValue = StorageContent.CopyFrom(item);
-                
-                Event movementEvent = StorageMovementEvent.Create(item, request.MovementType);
                 movements.Add(movementEvent);
 
-                result.Add(new PrevAndNewValue<StorageContent>(prevValue, newValue));
+                result.Add(new StorageLot(
+                    item.Id,
+                    item.ProductId,
+                    item.CurrencyId,
+                    item.BuyPrice,
+                    movementEvent.Data.Count - item.Count,
+                    item.PurchaseDatetime));
                 if (counter <= 0) break;
             }
 

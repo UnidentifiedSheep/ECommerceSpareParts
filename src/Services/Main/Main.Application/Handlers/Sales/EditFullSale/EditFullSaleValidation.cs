@@ -1,4 +1,4 @@
-using FluentValidation;
+/*using FluentValidation;
 using Localization.Domain.Extensions;
 using Main.Application.Handlers.Sales.BaseValidators;
 
@@ -18,4 +18,4 @@ public class EditFullSaleValidation : AbstractValidator<EditFullSaleCommand>
         RuleFor(x => x.EditedContent)
             .SetValidator(new EditSaleContentsValidator());
     }
-}
+}*/

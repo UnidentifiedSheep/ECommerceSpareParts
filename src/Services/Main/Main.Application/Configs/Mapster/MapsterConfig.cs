@@ -448,7 +448,7 @@ public static class MapsterConfig
                 src => Price.GetDiscountFromPrices(src.PriceWithDiscount, src.Price));
 
         TypeAdapterConfig<EditSaleContentDto, SaleContent>.NewConfig()
-            .Map(dest => dest.ProductId, src => src.ArticleId)
+            .Map(dest => dest.ProductId, src => src.ProductId)
             .Map(dest => dest.Comment, src => src.Comment)
             .Map(dest => dest.Count, src => src.Count)
             .Map(dest => dest.Price, src => src.PriceWithDiscount)

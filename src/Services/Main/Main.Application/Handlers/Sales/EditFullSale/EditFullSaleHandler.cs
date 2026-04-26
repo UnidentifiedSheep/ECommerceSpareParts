@@ -1,4 +1,4 @@
-using System.Data;
+/*using System.Data;
 using Abstractions.Interfaces.Services;
 using Application.Common.Interfaces;
 using Attributes;
@@ -137,14 +137,14 @@ public class EditFullSaleHandler(
                         var newDetail = detail.Adapt<SaleContentDetail>();
                         newDetail.Count = tempCount;
                         diff -= tempCount;
-                        contentLessCount.Add((newDetail, content.ArticleId));
+                        contentLessCount.Add((newDetail, content.ProductId));
                     }
                 }
             }
             else
             {
-                contentGreaterCount[content.ArticleId] = contentGreaterCount
-                    .GetValueOrDefault(content.ArticleId) + content.Count;
+                contentGreaterCount[content.ProductId] = contentGreaterCount
+                    .GetValueOrDefault(content.ProductId) + content.Count;
             }
 
         return (contentGreaterCount, contentLessCount);
@@ -227,4 +227,4 @@ public class EditFullSaleHandler(
         var command = new UpdateReservationsCountsCommand(userId, whoUpdated, graterCount);
         await mediator.Send(command, cancellationToken);
     }
-}
+}*/ //TODO: fix this

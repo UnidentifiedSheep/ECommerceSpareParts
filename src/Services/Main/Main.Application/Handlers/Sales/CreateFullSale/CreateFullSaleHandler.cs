@@ -12,6 +12,7 @@ using Main.Application.Handlers.ProductReservations.UpdateReservationsCounts;
 using Main.Application.Handlers.Sales.CreateSale;
 using Main.Application.Handlers.StorageContents.RemoveContent;
 using Main.Application.Interfaces.Persistence;
+using Main.Application.Models.SaleService;
 using Main.Entities.Balance;
 using Main.Entities.Exceptions.Sales;
 using Main.Entities.Exceptions.Storages;
@@ -175,7 +176,7 @@ public class CreateFullSaleHandler(
         return result.Transaction;
     }
 
-    private async Task<IEnumerable<PrevAndNewValue<StorageContent>>> RemoveContentFromStorage(
+    private async Task<IReadOnlyList<StorageLot>> RemoveContentFromStorage(
         IEnumerable<NewSaleContentDto> saleContent,
         string storageName,
         bool saleFromOtherStorages,
@@ -189,7 +190,7 @@ public class CreateFullSaleHandler(
     }
 
     private async Task<Sale> CreateSale(
-        IEnumerable<PrevAndNewValue<StorageContent>> storageContents,
+        IReadOnlyList<StorageLot> storageContents,
         IEnumerable<NewSaleContentDto> saleContent,
         int currencyId,
         Guid buyerId,

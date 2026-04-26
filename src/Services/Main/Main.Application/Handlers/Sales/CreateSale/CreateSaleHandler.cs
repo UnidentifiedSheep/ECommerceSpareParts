@@ -5,6 +5,7 @@ using Attributes;
 using Main.Abstractions.Interfaces.Services;
 using Main.Abstractions.Models;
 using Main.Application.Dtos.Amw.Sales;
+using Main.Application.Models.SaleService;
 using Main.Entities.Sale;
 using Main.Entities.Storage;
 
@@ -14,7 +15,7 @@ namespace Main.Application.Handlers.Sales.CreateSale;
 [Transactional(IsolationLevel.Serializable, 20, 2)]
 public record CreateSaleCommand(
     IEnumerable<NewSaleContentDto> SellContent,
-    IEnumerable<PrevAndNewValue<StorageContent>> StorageContentValues,
+    IEnumerable<StorageLot> StorageContentValues,
     int CurrencyId,
     Guid BuyerId,
     Guid TransactionId,
@@ -38,19 +39,9 @@ public class CreateSaleHandler(ISaleService saleService, IUnitOfWork unitOfWork)
         sale.SetComment(request.Comment);
 
         var saleContentList = request.SellContent.ToList();
-        var detailGroups = saleService.GetDetailsGroup(request.StorageContentValues);
 
-        foreach (var newContent in saleContentList)
-        {
-            var saleContent = SaleContent.Create(
-                newContent.Count,
-                newContent.Price,
-                newContent.PriceWithDiscount,
-                newContent.Count,
-                detailGroups[newContent.ProductId]);
-            
+        foreach (var saleContent in saleService.DistributeDetails(request.StorageContentValues, saleContentList))
             sale.AddContent(saleContent);
-        }
         
         await unitOfWork.AddAsync(sale, cancellationToken);
         return new CreateSaleResult(sale);
