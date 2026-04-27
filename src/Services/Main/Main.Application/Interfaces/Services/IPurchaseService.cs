@@ -1,7 +1,6 @@
-﻿using Main.Abstractions.Dtos.Amw.Logistics;
-using Main.Abstractions.Dtos.Amw.Purchase;
-using Main.Abstractions.Dtos.Amw.StorageRoutes;
-using Main.Entities;
+﻿using Main.Application.Dtos.Amw.Logistics;
+using Main.Application.Dtos.Amw.Purchase;
+using Main.Application.Dtos.Storage;
 using Main.Entities.Balance;
 using Main.Entities.Purchase;
 

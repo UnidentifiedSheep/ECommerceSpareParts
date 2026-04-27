@@ -2,7 +2,7 @@
 using Application.Common.Interfaces;
 using Application.Common.Interfaces.Repositories;
 using Attributes;
-using Main.Application.Notifications;
+using Contracts.Articles;
 using MediatR;
 
 namespace Main.Application.Handlers.ProductWeight.DeleteProductWeight;
@@ -14,7 +14,7 @@ public record DeleteProductWeightCommand(int ProductId) : ICommand;
 public class DeleteProductWeightHandler(
     IRepository<Entities.Product.ProductWeight, int> repository,
     IUnitOfWork unitOfWork,
-    IPublisher publisher)
+    IIntegrationEventScope integrationEventScope)
     : ICommandHandler<DeleteProductWeightCommand>
 {
     public async Task<Unit> Handle(DeleteProductWeightCommand request, CancellationToken cancellationToken)
@@ -22,7 +22,7 @@ public class DeleteProductWeightHandler(
         var weight = await repository.GetById(request.ProductId, cancellationToken);
         unitOfWork.Remove(weight);
         
-        await publisher.Publish(new ArticleWeightUpdatedNotification(request.ProductId), cancellationToken);
+        integrationEventScope.Add(new ProductWeightUpdatedEvent { ProductId = request.ProductId });
         return Unit.Value;
     }
 }

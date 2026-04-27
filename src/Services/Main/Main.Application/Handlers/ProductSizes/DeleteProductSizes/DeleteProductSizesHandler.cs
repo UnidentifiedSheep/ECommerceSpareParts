@@ -2,7 +2,7 @@
 using Application.Common.Interfaces;
 using Application.Common.Interfaces.Repositories;
 using Attributes;
-using Main.Application.Notifications;
+using Contracts.Articles;
 using Main.Entities.Exceptions.Products;
 using Main.Entities.Product;
 using MediatR;
@@ -16,7 +16,7 @@ public record DeleteArticleSizesCommand(int ProductId) : ICommand;
 public class DeleteProductSizesHandler(
     IRepository<ProductSize, int> repository,
     IUnitOfWork unitOfWork,
-    IPublisher publisher)
+    IIntegrationEventScope integrationEventScope)
     : ICommandHandler<DeleteArticleSizesCommand>
 {
     public async Task<Unit> Handle(DeleteArticleSizesCommand request, CancellationToken cancellationToken)
@@ -26,7 +26,7 @@ public class DeleteProductSizesHandler(
         
         unitOfWork.Remove(sizes);
 
-        await publisher.Publish(new ArticleSizeUpdatedNotification(request.ProductId), cancellationToken);
+        integrationEventScope.Add(new ProductSizesUpdatedEvent { ProductId = request.ProductId });
         return Unit.Value;
     }
 }

@@ -1,6 +1,5 @@
 using Abstractions.Interfaces.Currency;
 using Abstractions.Interfaces.Integrations.ExchangeRate;
-using Abstractions.Interfaces.Services;
 using Abstractions.Models;
 using Application.Common.Interfaces;
 using Application.Common.Interfaces.Repositories;
@@ -8,11 +7,8 @@ using Application.Common.Interfaces.Settings;
 using Attributes;
 using Contracts.Currency;
 using Main.Abstractions.Models.Settings;
-using Main.Application.Notifications;
-using Main.Entities;
 using Main.Entities.Currency;
 using Main.Entities.Exceptions.Currencies;
-using MassTransit;
 using MediatR;
 using Microsoft.Extensions.Logging;
 
@@ -25,10 +21,9 @@ public record UpdateCurrenciesRatesCommand : ICommand;
 public class UpdateCurrenciesRatesHandler(
     ILogger<UpdateCurrenciesRatesCommand> logger,
     IExchangeRateClientFactory exchangeFactory,
-    IPublishEndpoint publishEndpoint,
+    IIntegrationEventScope integrationEventScope,
     IRepository<Currency, int> currencyRepository,
     ICurrencyConverter currencyConverter,
-    IPublisher publisher,
     ISettingsService settingsService) : ICommandHandler<UpdateCurrenciesRatesCommand>
 {
     public async Task<Unit> Handle(UpdateCurrenciesRatesCommand request, CancellationToken cancellationToken)
@@ -46,7 +41,8 @@ public class UpdateCurrenciesRatesHandler(
             logger.LogWarning("Курсы валют для {@Currencies} не найдены у {Provider} на {Time}", notFoundRates,
                 provider, DateTime.UtcNow);
 
-        await PublishEvents(changedRates, cancellationToken);
+        if (changedRates.Count != 0)
+            integrationEventScope.Add(new CurrencyRateChangedEvent { Rates = changedRates });
 
         return Unit.Value;
     }
@@ -102,13 +98,5 @@ public class UpdateCurrenciesRatesHandler(
         }
 
         return (changedRates, notFoundRates);
-    }
-
-    private async Task PublishEvents(Dictionary<int, decimal> changedRates, CancellationToken cancellationToken)
-    {
-        if (changedRates.Count == 0) return;
-
-        await publishEndpoint.Publish(new CurrencyRateChangedEvent { Rates = changedRates }, cancellationToken);
-        await publisher.Publish(new CurrencyRatesUpdatedNotification(), cancellationToken);
     }
 }

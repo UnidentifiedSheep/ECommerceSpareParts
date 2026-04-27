@@ -2,9 +2,9 @@ using Abstractions.Interfaces.Services;
 using Application.Common.Interfaces;
 using Application.Common.Interfaces.Repositories;
 using Attributes;
+using Contracts.Articles;
 using Main.Application.Dtos.Product;
 using Main.Application.Interfaces.Persistence;
-using Main.Application.Notifications;
 using Main.Entities.Exceptions.Products;
 using Main.Entities.Product;
 using Main.Enums;
@@ -17,7 +17,7 @@ namespace Main.Application.Handlers.Products.MakeLinkageBetweenArticles;
 public record MakeLinkageBetweenProductsCommand(List<NewProductLinkageDto> Linkages) : ICommand<Unit>;
 
 public class MakeLinkageBetweenProductsHandler(
-    IPublisher publisher,
+    IIntegrationEventScope integrationEventScope,
     IUnitOfWork unitOfWork,
     IProductRepository repository) : ICommandHandler<MakeLinkageBetweenProductsCommand, Unit>
 {
@@ -32,7 +32,8 @@ public class MakeLinkageBetweenProductsHandler(
             updatedIds.UnionWith(ids);
         }
 
-        await publisher.Publish(new ArticlesUpdatedNotification(updatedIds), cancellationToken);
+        foreach (var id in updatedIds)
+            integrationEventScope.Add(new ProductUpdatedEvent { Id = id });
         return Unit.Value;
     }
 

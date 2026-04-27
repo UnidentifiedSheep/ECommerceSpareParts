@@ -1,10 +1,7 @@
 ﻿using Abstractions.Interfaces.Services;
 using Abstractions.Models.Command;
-using Abstractions.Models.Repository;
 using Application.Common.Interfaces;
 using Attributes;
-using Main.Abstractions.Interfaces.DbRepositories;
-using Main.Entities;
 using Main.Entities.Purchase;
 
 namespace Main.Application.Handlers.Purchases.ClearPurchaseLogistics;

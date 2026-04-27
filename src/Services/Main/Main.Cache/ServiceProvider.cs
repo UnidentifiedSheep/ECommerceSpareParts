@@ -1,5 +1,5 @@
 using Abstractions.Interfaces.Cache;
-using Main.Abstractions.Interfaces.CacheRepositories;
+using Main.Application.Interfaces.CacheRepositories;
 using Main.Cache.Repositories;
 using Microsoft.Extensions.DependencyInjection;
 

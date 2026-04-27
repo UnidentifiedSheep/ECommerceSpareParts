@@ -1,8 +1,7 @@
 using Abstractions.Interfaces.Cache;
 using Main.Abstractions.Constants;
-using Main.Abstractions.Dtos.Users;
-using Main.Abstractions.Interfaces.CacheRepositories;
-using Main.Entities;
+using Main.Application.Dtos.Users;
+using Main.Application.Interfaces.CacheRepositories;
 
 namespace Main.Cache.Repositories;
 
@@ -31,13 +30,13 @@ public class UsersCacheRepository : IUsersCacheRepository
         await _redis.StringSetAsync(key, discount.ToString(Global.Culture), _ttl);
     }
 
-    public async Task<FullUserDto?> GetUserById(Guid id)
+    public async Task<UserDto?> GetUserById(Guid id)
     {
         var key = GetUserByIdKey(id);
-        return await _redis.StringGetAsync<FullUserDto>(key);
+        return await _redis.StringGetAsync<UserDto>(key);
     }
 
-    public async Task SetUserById(FullUserDto user)
+    public async Task SetUserById(UserDto user)
     {
         var key = GetUserByIdKey(user.Id);
         await _redis.StringSetAsync(key, user, _ttl);

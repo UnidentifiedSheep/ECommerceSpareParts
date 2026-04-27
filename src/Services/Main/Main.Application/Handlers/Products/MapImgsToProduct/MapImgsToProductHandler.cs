@@ -2,7 +2,7 @@
 using Abstractions.Interfaces.Services;
 using Application.Common.Interfaces;
 using Attributes;
-using Main.Application.Notifications;
+using Contracts.Articles;
 using Main.Entities.Product;
 using MediatR;
 
@@ -12,7 +12,10 @@ namespace Main.Application.Handlers.Products.MapImgsToProduct;
 [Transactional]
 public record MapImgsToProductCommand(int ProductId, IEnumerable<IFile> Images) : ICommand;
 
-public class MapImgsToProductHandler(IS3StorageService s3Storage, IUnitOfWork unitOfWork, IMediator mediator)
+public class MapImgsToProductHandler(
+    IS3StorageService s3Storage, 
+    IUnitOfWork unitOfWork, 
+    IIntegrationEventScope integrationEventScope)
     : ICommandHandler<MapImgsToProductCommand, Unit>
 {
     public async Task<Unit> Handle(MapImgsToProductCommand request, CancellationToken cancellationToken)
@@ -44,7 +47,7 @@ public class MapImgsToProductHandler(IS3StorageService s3Storage, IUnitOfWork un
             throw;
         }
 
-        await mediator.Publish(new ArticleUpdatedNotification(request.ProductId), cancellationToken);
+        integrationEventScope.Add(new ProductUpdatedEvent { Id = request.ProductId });
         return Unit.Value;
     }
 }

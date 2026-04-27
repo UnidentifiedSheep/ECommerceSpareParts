@@ -2,8 +2,8 @@
 using Application.Common.Interfaces;
 using Application.Common.Interfaces.Repositories;
 using Attributes;
+using Contracts.Articles;
 using Enums;
-using Main.Application.Notifications;
 using Main.Entities.Product;
 using MediatR;
 
@@ -17,7 +17,7 @@ public record SetProductSizesCommand(int ProductId, decimal Length, decimal Widt
 public class SetProductSizesHandler(
     IRepository<ProductSize, int> repository,
     IUnitOfWork unitOfWork,
-    IPublisher mediator)
+    IIntegrationEventScope integrationEventScope)
     : ICommandHandler<SetProductSizesCommand>
 {
     public async Task<Unit> Handle(SetProductSizesCommand request, CancellationToken cancellationToken)
@@ -39,8 +39,10 @@ public class SetProductSizesHandler(
         sizes.SetHeight(height);
         sizes.SetUnit(unit);
 
-        //publish notification to invalidate cache
-        await mediator.Publish(new ArticleSizeUpdatedNotification(request.ProductId), cancellationToken);
+        integrationEventScope.Add(new ProductSizesUpdatedEvent
+        {
+            ProductId = request.ProductId
+        });
 
         return Unit.Value;
     }

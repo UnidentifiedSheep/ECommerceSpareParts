@@ -15,11 +15,11 @@ public static class ValidationConfiguration
         ConfigureArticles();
         ConfigureProducer();
         ConfigureUser();
-        ConfigureUserEmail();
+        //ConfigureUserEmail();
         ConfigureTransaction();
         ConfigureStorage();
         ConfigurePermission();
-        ConfigureRole();
+        //ConfigureRole();
         ConfigureCurrency();
         ConfigureProducerOtherNames();
         ConfigureCart();
@@ -192,7 +192,7 @@ public static class ValidationConfiguration
                 .WithErrorCode((int)HttpStatusCode.Conflict));
     }
 
-    private static void ConfigureRole()
+    /*private static void ConfigureRole()
     {
         ConfigureDbValidation.AddConfig(ValidationFunctions.ValidateRoleExistsNormalizedName, KeyValueType.Single,
             config => config.WithErrorName(ApplicationErrors.RoleNotFound)
@@ -218,7 +218,7 @@ public static class ValidationConfiguration
                 .WithMessageTemplate("role.already.exists")
                 .WithErrorType(typeof(ConflictException))
                 .WithErrorCode((int)HttpStatusCode.Conflict));
-    }
+    }*/ //TODO: turn on after bulk pack updated
 
     private static void ConfigurePermission()
     {
@@ -330,7 +330,7 @@ public static class ValidationConfiguration
                 .WithErrorCode((int)HttpStatusCode.NotFound)
                 .WithErrorType(typeof(NotFoundException)));
 
-        ConfigureDbValidation.AddConfig(ValidationFunctions.ValidateUserNotExistsNormalizedUserName,
+        /*ConfigureDbValidation.AddConfig(ValidationFunctions.ValidateUserNotExistsNormalizedUserName,
             KeyValueType.Single,
             config => config.WithErrorName(ApplicationErrors.UserNameAlreadyTaken)
                 .WithMessageTemplate("user.name.already.taken")
@@ -342,10 +342,10 @@ public static class ValidationConfiguration
             config => config.WithErrorName(ApplicationErrors.UserNameAlreadyTaken)
                 .WithMessageTemplate("user.name.already.taken")
                 .WithErrorCode((int)HttpStatusCode.Conflict)
-                .WithErrorType(typeof(ConflictException)));
+                .WithErrorType(typeof(ConflictException)));*/ //TODO: turn on after bulk pack updated
     }
 
-    private static void ConfigureUserEmail()
+    /*private static void ConfigureUserEmail()
     {
         ConfigureDbValidation.AddConfig(ValidationFunctions.ValidateUserEmailExistsNormalizedEmail, KeyValueType.Single,
             config => config.WithErrorName(ApplicationErrors.UserEmailNotFound)
@@ -373,7 +373,7 @@ public static class ValidationConfiguration
                 .WithMessageTemplate("user.email.already.in.use")
                 .WithErrorCode((int)HttpStatusCode.Conflict)
                 .WithErrorType(typeof(ConflictException)));
-    }
+    }*/ //TODO: turn on after bulk pack updated
 
     private static void ConfigureTransaction()
     {

@@ -1,10 +1,8 @@
 using System.Data;
 using Abstractions.Interfaces.Services;
-using Abstractions.Models.Repository;
 using Application.Common.Interfaces;
 using Attributes;
 using Contracts.Purchase;
-using Main.Abstractions.Interfaces.DbRepositories;
 using Main.Application.Handlers.Balance.DeleteTransaction;
 using Main.Application.Handlers.Purchases.DeletePurchase;
 using Main.Application.Handlers.StorageContents.RemoveContent;

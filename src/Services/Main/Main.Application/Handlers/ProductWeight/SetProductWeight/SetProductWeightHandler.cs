@@ -2,8 +2,8 @@
 using Application.Common.Interfaces;
 using Application.Common.Interfaces.Repositories;
 using Attributes;
+using Contracts.Articles;
 using Enums;
-using Main.Application.Notifications;
 using MediatR;
 
 namespace Main.Application.Handlers.ProductWeight.SetProductWeight;
@@ -13,7 +13,7 @@ namespace Main.Application.Handlers.ProductWeight.SetProductWeight;
 public record SetArticleWeightCommand(int ProductId, decimal Weight, WeightUnit Unit) : ICommand;
 
 public class SetProductWeightHandler(
-    IPublisher publisher,
+    IIntegrationEventScope integrationEventScope,
     IRepository<Entities.Product.ProductWeight, int> repository,
     IUnitOfWork unitOfWork) : ICommandHandler<SetArticleWeightCommand>
 {
@@ -29,7 +29,10 @@ public class SetProductWeightHandler(
         else
             weight.Update(request.Weight, request.Unit);
         
-        await publisher.Publish(new ArticleWeightUpdatedNotification(request.ProductId), cancellationToken);
+        integrationEventScope.Add(new ProductWeightUpdatedEvent
+        {
+            ProductId = request.ProductId,
+        });
         return Unit.Value;
     }
 }
