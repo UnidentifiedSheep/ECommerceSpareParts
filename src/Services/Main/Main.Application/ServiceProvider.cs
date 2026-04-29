@@ -41,7 +41,7 @@ public static class ServiceProvider
         collection.AddSingleton(emailOptions ?? new UserEmailOptions());
         collection.AddSingleton(phoneOptions ?? new UserPhoneOptions());
 
-        collection.AddSingleton<ICurrencyConverter, CurrencyConverter>(_ => new CurrencyConverter(Global.UsdId));
+        collection.AddSingleton<ICurrencyConverter, CurrencyConverter>();
         collection.AddScoped<ICurrencyConverterSetup, CurrencyConverterSetup>();
 
         collection.AddSingleton<ISettingFactory, SettingFactory>();

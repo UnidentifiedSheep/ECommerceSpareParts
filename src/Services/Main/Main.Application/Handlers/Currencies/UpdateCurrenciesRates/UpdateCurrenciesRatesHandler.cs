@@ -32,7 +32,7 @@ public class UpdateCurrenciesRatesHandler(
         var provider = GetRateProvider(settings);
         var currencies = await LoadCurrencies(cancellationToken);
 
-        var convertedRates = await GetConvertedRates(provider, currencies, cancellationToken);
+        var convertedRates = await GetConvertedRates(provider, settings, currencies, cancellationToken);
 
         var (changedRates, notFoundRates)
             = ApplyRates(currencies, convertedRates);
@@ -61,12 +61,13 @@ public class UpdateCurrenciesRatesHandler(
 
     private async Task<ExchangeRates> GetConvertedRates(
         IExchangeRateClient provider,
+        CurrencySetting setting,
         Dictionary<string, Currency> currencies,
         CancellationToken cancellationToken)
     {
-        var usd = currencies.Values.FirstOrDefault(x => x.Id == Global.UsdId);
+        var usd = currencies.Values.FirstOrDefault(x => x.Id == setting.Data.UsdId);
         if (usd == null)
-            throw new CurrencyNotFoundException(Global.UsdId);
+            throw new CurrencyNotFoundException(setting.Data.UsdId);
 
         var rates = await provider.GetRates(cancellationToken);
 

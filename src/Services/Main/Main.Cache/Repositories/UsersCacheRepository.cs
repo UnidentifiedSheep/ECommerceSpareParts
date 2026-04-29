@@ -1,5 +1,5 @@
 using Abstractions.Interfaces.Cache;
-using Main.Abstractions.Constants;
+using Application.Common.Interfaces;
 using Main.Application.Dtos.Users;
 using Main.Application.Interfaces.CacheRepositories;
 
@@ -9,10 +9,12 @@ public class UsersCacheRepository : IUsersCacheRepository
 {
     private readonly ICache _redis;
     private readonly TimeSpan? _ttl;
+    private readonly ICacheKeyRegistry _keyRegistry;
 
-    public UsersCacheRepository(ICache redis, TimeSpan? ttl = null)
+    public UsersCacheRepository(ICache redis, ICacheKeyRegistry keyRegistry, TimeSpan? ttl = null)
     {
         _redis = redis;
+        _keyRegistry = keyRegistry;
         _ttl = ttl;
     }
 
@@ -70,7 +72,7 @@ public class UsersCacheRepository : IUsersCacheRepository
         await _redis.SetAddAsync(key, permissions, _ttl);
     }
 
-    private static string GetUserRolesKey(Guid userId) => string.Format(CacheKeys.UserRolesCacheKey, userId);
+    private string GetUserRolesKey(Guid userId) => string.Format(CacheKeys.UserRolesCacheKey, userId);
     private static string GetUserPermissionsKey(Guid userId) => string.Format(CacheKeys.UserPermissionsCacheKey, userId);
     private static string GetUserByIdKey(Guid userId) => string.Format(CacheKeys.UserByIdCacheKey, userId);
     private static string GetUserDiscountKey(Guid userId) => string.Format(CacheKeys.UserDiscountCacheKey, userId);

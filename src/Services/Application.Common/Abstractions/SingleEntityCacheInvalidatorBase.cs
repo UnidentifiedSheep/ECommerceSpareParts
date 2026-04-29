@@ -5,23 +5,20 @@ namespace Application.Common.Abstractions;
 
 public abstract class SingleEntityCacheInvalidatorBase<TEntity, TKey>(
     ICache cache, 
-    ICacheKey<TEntity> cacheKey) : ICacheInvalidator<TEntity, TKey>
+    ICacheKeyRegistry keyRegistry) : ICacheInvalidator<TEntity, TKey>
 {
     protected ICache Cache => cache;
-    protected ICacheKey<TEntity> CacheKey => cacheKey;
     
-    public Task Invalidate(TKey key)
+    public async Task Invalidate(TKey key)
     {
-        Cache.DeleteAsync(CacheKey.FormatKey(key));
-        return Task.CompletedTask;
+        await Cache.DeleteAsync(keyRegistry.FormatKey<TEntity>(key));
     }
 
-    public Task Invalidate(IEnumerable<TKey> keys)
+    public async Task Invalidate(IEnumerable<TKey> keys)
     {
         var cacheKeys = keys
-            .Select(x => CacheKey.FormatKey(x))
+            .Select(x => keyRegistry.FormatKey<TEntity>(x))
             .ToHashSet();
-        Cache.DeleteAsync(cacheKeys);
-        return Task.CompletedTask;
+        await Cache.DeleteAsync(cacheKeys);
     }
 }

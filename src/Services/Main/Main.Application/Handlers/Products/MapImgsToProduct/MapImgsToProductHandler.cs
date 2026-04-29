@@ -1,8 +1,10 @@
 ﻿using Abstractions.Interfaces;
 using Abstractions.Interfaces.Services;
 using Application.Common.Interfaces;
+using Application.Common.Interfaces.Settings;
 using Attributes;
 using Contracts.Articles;
+using Main.Abstractions.Models.Settings;
 using Main.Entities.Product;
 using MediatR;
 
@@ -15,6 +17,7 @@ public record MapImgsToProductCommand(int ProductId, IEnumerable<IFile> Images) 
 public class MapImgsToProductHandler(
     IS3StorageService s3Storage, 
     IUnitOfWork unitOfWork, 
+    ISettingsService settingsService,
     IIntegrationEventScope integrationEventScope)
     : ICommandHandler<MapImgsToProductCommand, Unit>
 {
@@ -22,18 +25,19 @@ public class MapImgsToProductHandler(
     {
         var keys = new HashSet<string>();
         var toAdd = new List<ProductImage>();
+        var applicationSettings = (await settingsService.GetOrDefault<GlobalApplicationSetting>(cancellationToken)).Data;
         try
         {
             foreach (var img in request.Images)
             {
                 await using var stream = img.OpenReadStream();
                 var path = $"imgs/articles/{request.ProductId}_{Guid.NewGuid()}{img.Extension}";
-                var key = await s3Storage.UploadFileAsync(Global.ImageBucketName,
+                var key = await s3Storage.UploadFileAsync(applicationSettings.ImageBucketName,
                     stream, path, "image/webp");
                 keys.Add(key);
                 toAdd.Add(ProductImage.Create(
                     productId: request.ProductId, 
-                    path: $"{Global.ServiceUrl}/{Global.ImageBucketName}/{path}", 
+                    path: $"{applicationSettings.ServiceUrl}/{applicationSettings.ImageBucketName}/{path}", 
                     description: key));
             }
 
@@ -43,7 +47,7 @@ public class MapImgsToProductHandler(
         catch (Exception)
         {
             foreach (var key in keys)
-                await s3Storage.DeleteFileAsync(Global.ImageBucketName, key);
+                await s3Storage.DeleteFileAsync(applicationSettings.ImageBucketName, key);
             throw;
         }
 

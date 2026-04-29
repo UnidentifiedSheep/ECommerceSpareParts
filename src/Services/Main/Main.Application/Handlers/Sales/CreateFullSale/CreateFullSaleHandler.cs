@@ -1,9 +1,11 @@
 using System.Text;
 using Application.Common.Interfaces;
 using Application.Common.Interfaces.Repositories;
+using Application.Common.Interfaces.Settings;
 using Attributes;
 using Contracts.Articles;
 using Main.Abstractions.Models;
+using Main.Abstractions.Models.Settings;
 using Main.Application.Dtos.Amw.Sales;
 using Main.Application.Extensions;
 using Main.Application.Handlers.Balance.CreateTransaction;
@@ -42,11 +44,13 @@ public record CreateFullSaleCommand(
 public class CreateFullSaleHandler(
     ISender sender,
     IProductRepository productRepository,
+    ISettingsService settingsService,
     IIntegrationEventScope integrationEventScope)
     : ICommandHandler<CreateFullSaleCommand, Unit>
 {
     public async Task<Unit> Handle(CreateFullSaleCommand request, CancellationToken cancellationToken)
     {
+        var applicationSettings = await settingsService.GetOrDefault<GlobalApplicationSetting>(cancellationToken);
         var buyerId = request.BuyerId;
         var currencyId = request.CurrencyId;
         var storageName = request.StorageName;
@@ -59,7 +63,7 @@ public class CreateFullSaleHandler(
 
         var transaction = await CreateTransaction(
             amount: saleContentList.GetTotalSum(), 
-            senderId: Global.SystemId, 
+            senderId: applicationSettings.Data.SystemId, 
             receiverId: buyerId, 
             currencyId: currencyId, 
             transactionDateTime: dateTime, 
@@ -76,7 +80,7 @@ public class CreateFullSaleHandler(
             await CreateTransaction(
                 amount: request.PayedSum.Value, 
                 senderId: buyerId, 
-                receiverId: Global.SystemId, 
+                receiverId: applicationSettings.Data.SystemId, 
                 currencyId: currencyId, 
                 transactionDateTime: dateTime, 
                 cancellationToken: cancellationToken);

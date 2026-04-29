@@ -5,5 +5,5 @@ public interface ICurrencyConverterSetup
     /// <summary>
     ///     Initialize currency converter
     /// </summary>
-    Task InitializeAsync();
+    Task InitializeAsync(int usdId);
 }

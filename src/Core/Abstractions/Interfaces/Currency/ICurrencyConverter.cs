@@ -15,6 +15,7 @@ public interface ICurrencyConverter
     decimal ConvertFromUsd(decimal value, int to);
     decimal GetRateDecimal(int currencyId);
     double GetRateDouble(int currencyId);
+    void SetUsdId(int usdId);
     bool IsSupportedCurrency(int currencyId);
 
     /// <summary>

@@ -19,11 +19,11 @@ using Localization.Domain.Extensions;
 using Localization.Domain.Middlewares;
 using Mail;
 using Main.Abstractions.Constants;
+using Main.Abstractions.Models.Settings;
 using Main.Api.EndPoints.Articles;
 using Main.Application;
 using Main.Application.BackgroundServices;
 using Main.Application.Configs;
-using Main.Application.Configs.Mapster;
 using Main.Application.Consumers;
 using Main.Application.HangFireTasks;
 using Main.Cache;
@@ -183,7 +183,6 @@ builder.Services.AddTransient<HeaderSecretMiddleware>();
 
 var app = builder.Build();
 
-MapsterConfig.Configure();
 SortByConfig.Configure();
 
 app.UseMiddleware<HeaderSecretMiddleware>();
@@ -246,13 +245,15 @@ return;
 async Task InitCurrencyConverter(IServiceProvider serviceProvider)
 {
     using var scope = serviceProvider.CreateScope();
+    var sr = scope.ServiceProvider.GetRequiredService<ISettingsService>();
     var currencyConverterSetup = scope.ServiceProvider.GetRequiredService<ICurrencyConverterSetup>();
-    await currencyConverterSetup.InitializeAsync();
+    var usdId = (await sr.GetOrDefault<CurrencySetting>()).Data.UsdId;
+    await currencyConverterSetup.InitializeAsync(usdId);
 }
 
 async Task InitSettings(IServiceProvider serviceProvider)
 {
     using var scope = serviceProvider.CreateScope();
     var sr = scope.ServiceProvider.GetRequiredService<ISettingsService>();
-    await sr.LoadAsync(Settings.AllSettings);
+    await sr.LoadAsync();
 }

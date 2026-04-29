@@ -3,11 +3,17 @@ using Abstractions.Models;
 
 namespace Application.Common.Services;
 
-public class CurrencyConverter(int usdId) : ICurrencyConverter
+public class CurrencyConverter: ICurrencyConverter
 {
+    private int _usdId = -1;
     public Dictionary<int, decimal> ToUsd { get; } = new();
 
     public Dictionary<int, double> ToUsdDoub { get; } = new();
+
+    public void SetUsdId(int usdId)
+    {
+        _usdId = usdId;
+    }
 
     public void LoadRates(Dictionary<int, decimal> rawRates)
     {
@@ -20,8 +26,8 @@ public class CurrencyConverter(int usdId) : ICurrencyConverter
             ToUsdDoub[currencyId] = (double)rate;
         }
 
-        ToUsd[usdId] = 1;
-        ToUsdDoub[usdId] = 1;
+        ToUsd[_usdId] = 1;
+        ToUsdDoub[_usdId] = 1;
     }
 
     // === DECIMAL API ===
@@ -41,12 +47,12 @@ public class CurrencyConverter(int usdId) : ICurrencyConverter
 
     public decimal ConvertToUsd(decimal value, int from)
     {
-        return ConvertTo(value, from, usdId);
+        return ConvertTo(value, from, _usdId);
     }
 
     public decimal ConvertFromUsd(decimal value, int to)
     {
-        return ConvertTo(value, usdId, to);
+        return ConvertTo(value, _usdId, to);
     }
 
     // === DOUBLE API ===
@@ -66,12 +72,12 @@ public class CurrencyConverter(int usdId) : ICurrencyConverter
 
     public double ConvertToUsd(double value, int from)
     {
-        return ConvertTo(value, from, usdId);
+        return ConvertTo(value, from, _usdId);
     }
 
     public double ConvertFromUsd(double value, int to)
     {
-        return ConvertTo(value, usdId, to);
+        return ConvertTo(value, _usdId, to);
     }
 
     // === Accessors ===
