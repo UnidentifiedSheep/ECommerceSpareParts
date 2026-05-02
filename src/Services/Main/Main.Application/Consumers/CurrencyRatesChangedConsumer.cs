@@ -7,14 +7,11 @@ using MassTransit;
 namespace Main.Application.Consumers;
 
 public class CurrencyRatesChangedConsumer(
-    ICurrencyConverterSetup converterSetup,
-    ICacheInvalidator<Currency, int> cacheInvalidator)
+    ICurrencyConverterSetup converterSetup)
     : IConsumer<CurrencyRateChangedEvent>
 {
     public async Task Consume(ConsumeContext<CurrencyRateChangedEvent> context)
     {
-        await converterSetup.InitializeAsync();
-
-        await cacheInvalidator.Invalidate(context.Message.Rates.Keys);
+        await converterSetup.InitializeAsync(null);
     }
 }

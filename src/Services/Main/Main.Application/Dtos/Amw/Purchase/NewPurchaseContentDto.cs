@@ -1,10 +1,21 @@
+using System.Text.Json.Serialization;
+
 namespace Main.Application.Dtos.Amw.Purchase;
 
-public class NewPurchaseContentDto
+public record NewPurchaseContentDto
 {
-    public int ArticleId { get; set; }
-    public int Count { get; set; }
-    public decimal Price { get; set; }
-    public string? Comment { get; set; }
-    public bool CalculateLogistics { get; set; }
+    [JsonPropertyName("productId")]
+    public required int ProductId { get; init; }
+    
+    [JsonPropertyName("count")]
+    public required int Count { get; init; }
+    
+    [JsonPropertyName("price")]
+    public required decimal Price { get; init; }
+    
+    [JsonPropertyName("calculateLogistics")]
+    public required bool CalculateLogistics { get; init; }
+    
+    [JsonPropertyName("comment")]
+    public string? Comment { get; init; }
 }

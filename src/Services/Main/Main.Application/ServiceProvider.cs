@@ -1,6 +1,4 @@
-using Abstractions.Interfaces.Cache;
 using Abstractions.Interfaces.Currency;
-using Abstractions.Interfaces.RelatedData;
 using Abstractions.Interfaces.Validators;
 using Abstractions.Models;
 using Application.Common;
@@ -10,20 +8,15 @@ using Application.Common.Services;
 using Application.Common.Validators;
 using Main.Abstractions.Interfaces.Logistics;
 using Main.Abstractions.Interfaces.Services;
-using Main.Abstractions.Models;
 using Main.Application.Configs;
 using Main.Application.Handlers.Users.GetUserDiscount;
 using Main.Application.HangFireTasks;
 using Main.Application.Interfaces.Services;
-using Main.Application.RelatedData;
 using Main.Application.Services;
 using Main.Application.Services.Logistics;
 using Main.Application.Services.Logistics.PricingStrategies;
-using Main.Entities.Producer;
-using Main.Entities.Product;
 using Microsoft.Extensions.DependencyInjection;
-using Currency = Main.Entities.Currency.Currency;
-using User = Main.Entities.User.User;
+using ZiggyCreatures.Caching.Fusion;
 
 namespace Main.Application;
 
@@ -34,7 +27,10 @@ public static class ServiceProvider
         UserEmailOptions? emailOptions = null,
         UserPhoneOptions? phoneOptions = null)
     {
-        var relatedDataTtl = TimeSpan.FromHours(10);
+        collection.AddFusionCache("main")
+            .WithRegisteredDistributedCache()
+            .WithRegisteredBackplane()
+            .WithSystemTextJsonSerializer();
 
         collection.AddSingleton<IJwtGenerator, JwtGenerator>();
         collection.AddSingleton<UpdateCurrencyRate>();
@@ -63,29 +59,6 @@ public static class ServiceProvider
         collection.AddApplicationBase(typeof(Global).Assembly);
 
         collection.AddSingleton<IEmailValidator, EmailValidator>();
-
-        collection.AddTransient<IRelatedDataRepository<ProductCross>, ProductCrossesRelatedData>(sp =>
-        {
-            var cache = sp.GetRequiredService<ICache>();
-            return new ProductCrossesRelatedData(cache, relatedDataTtl);
-        });
-        collection.AddTransient<IRelatedDataRepository<Producer>, ProducerRelatedData>(sp =>
-        {
-            var cache = sp.GetRequiredService<ICache>();
-            return new ProducerRelatedData(cache, relatedDataTtl);
-        });
-        
-        collection.AddTransient<IRelatedDataRepository<User>, UserRelatedData>(sp =>
-        {
-            var cache = sp.GetRequiredService<ICache>();
-            return new UserRelatedData(cache, relatedDataTtl);
-        });
-
-        collection.AddTransient<IRelatedDataRepository<Currency>, CurrencyRelatedData>(sp =>
-        {
-            var cache = sp.GetRequiredService<ICache>();
-            return new CurrencyRelatedData(cache, relatedDataTtl);
-        });
 
         collection.Scan(scan => scan
             .FromAssemblyOf<GetUserDiscountHandler>()

@@ -1,24 +1,20 @@
 using Abstractions.Interfaces.Services;
 using Application.Common.Interfaces;
 using Attributes;
-using Enums;
 using Main.Application.Dtos.Amw.Purchase;
-using Main.Entities;
 using Main.Entities.Purchase;
-using Mapster;
 
 namespace Main.Application.Handlers.Purchases.CreatePurchase;
 
-[Transactional]
+[Transactional, AutoSave]
 public record CreatePurchaseCommand(
     IEnumerable<(NewPurchaseContentDto content, int? storageContentId)> Content,
     int CurrencyId,
-    string? Comment,
-    Guid CreatedUserId,
+    Guid SupplierId,
     Guid TransactionId,
     string StorageName,
-    Guid SupplierId,
-    DateTime PurchaseDateTime) : ICommand<CreatePurchaseResult>;
+    DateTime PurchaseDateTime,
+    string? Comment) : ICommand<CreatePurchaseResult>;
 
 public record CreatePurchaseResult(Purchase Purchase);
 
@@ -27,32 +23,24 @@ public class CreatePurchaseHandler(IUnitOfWork unitOfWork)
 {
     public async Task<CreatePurchaseResult> Handle(CreatePurchaseCommand request, CancellationToken cancellationToken)
     {
-        var content = request.Content.ToList();
-        var whoCreated = request.CreatedUserId;
-        var supplierId = request.SupplierId;
-        var currencyId = request.CurrencyId;
-        var storageName = request.StorageName;
-        var transactionId = request.TransactionId;
+        var purchase = Purchase.Create(
+            request.SupplierId, 
+            request.CurrencyId, 
+            request.TransactionId, 
+            request.StorageName, 
+            request.PurchaseDateTime);
+        
+        purchase.SetComment(request.Comment);
 
-        var purchaseContents = content.Select(x => x.content)
-            .Adapt<List<PurchaseContent>>();
-        for (var i = 0; i < purchaseContents.Count; i++)
-            purchaseContents[i].StorageContentId = content[i].storageContentId;
+        foreach (var (content, storageContentId) in request.Content)
+            purchase.AddContent(PurchaseContent.Create(
+                content.ProductId,
+                content.Count,
+                content.Price,
+                storageContentId,
+                content.Comment));
 
-        var purchaseModel = new Purchase
-        {
-            CurrencyId = currencyId,
-            Comment = request.Comment,
-            Storage = storageName,
-            CreatedUserId = whoCreated,
-            SupplierId = supplierId,
-            PurchaseDatetime = request.PurchaseDateTime,
-            PurchaseContents = purchaseContents,
-            TransactionId = transactionId,
-            State = PurchaseState.Draft
-        };
-        await unitOfWork.AddAsync(purchaseModel, cancellationToken);
-        await unitOfWork.SaveChangesAsync(cancellationToken);
-        return new CreatePurchaseResult(purchaseModel);
+        await unitOfWork.AddAsync(purchase, cancellationToken);
+        return new CreatePurchaseResult(purchase);
     }
 }

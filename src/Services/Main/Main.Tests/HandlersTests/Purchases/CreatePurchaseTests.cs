@@ -74,7 +74,7 @@ public class CreatePurchaseTests : IAsyncLifetime
         {
             (new NewPurchaseContentDto
             {
-                ArticleId = _product.Id,
+                ProductId = _product.Id,
                 Count = 10,
                 Price = 100.50m
             }, _storageContent.Id)
@@ -110,7 +110,7 @@ public class CreatePurchaseTests : IAsyncLifetime
         {
             (new NewPurchaseContentDto
             {
-                ArticleId = _product.Id,
+                ProductId = _product.Id,
                 Count = 10,
                 Price = price
             }, _storageContent.Id)
@@ -131,7 +131,7 @@ public class CreatePurchaseTests : IAsyncLifetime
         {
             (new NewPurchaseContentDto
             {
-                ArticleId = _product.Id,
+                ProductId = _product.Id,
                 Count = count,
                 Price = 100.50m
             }, _storageContent.Id)
@@ -150,7 +150,7 @@ public class CreatePurchaseTests : IAsyncLifetime
         {
             (new NewPurchaseContentDto
             {
-                ArticleId = _product.Id,
+                ProductId = _product.Id,
                 Count = 10,
                 Price = 100.50m
             }, _storageContent.Id)
@@ -170,7 +170,7 @@ public class CreatePurchaseTests : IAsyncLifetime
         {
             (new NewPurchaseContentDto
             {
-                ArticleId = 999999,
+                ProductId = 999999,
                 Count = 10,
                 Price = 100.50m
             }, _storageContent.Id)

@@ -2,14 +2,12 @@
 using Application.Common.Interfaces;
 using Attributes;
 using Main.Application.Dtos.Amw.Purchase;
-using Main.Entities;
 using Main.Entities.Purchase;
-using Mapster;
 using MediatR;
 
 namespace Main.Application.Handlers.Purchases.AddContentLogisticsToPurchase;
 
-[Transactional]
+[Transactional, AutoSave]
 public record AddContentLogisticsToPurchaseCommand(IEnumerable<PurchaseContentLogisticDto> Contents) : ICommand;
 
 public class AddContentLogisticsToPurchaseHandler(IUnitOfWork unitOfWork)
@@ -17,9 +15,10 @@ public class AddContentLogisticsToPurchaseHandler(IUnitOfWork unitOfWork)
 {
     public async Task<Unit> Handle(AddContentLogisticsToPurchaseCommand request, CancellationToken cancellationToken)
     {
-        var models = request.Contents.Adapt<List<PurchaseContentLogistic>>();
-        await unitOfWork.AddRangeAsync(models, cancellationToken);
-        await unitOfWork.SaveChangesAsync(cancellationToken);
+        var contentLogistics = request
+            .Contents
+            .Select(x => PurchaseContentLogistic.Create(x.PurchaseContentId, x.WeightKg, x.AreaM3, x.Price));
+        await unitOfWork.AddRangeAsync(contentLogistics, cancellationToken);
         return Unit.Value;
     }
 }

@@ -1,3 +1,5 @@
+using Main.Application.Dtos.Product;
+
 namespace Main.Application.Dtos.Amw.Purchase;
 
 public class PurchaseContentDto
@@ -7,6 +9,6 @@ public class PurchaseContentDto
     public decimal Price { get; set; }
     public decimal TotalSum { get; set; }
     public string? Comment { get; set; }
-    public ArticleDto Article { get; set; } = null!;
+    public ProductDto Article { get; set; } = null!;
     public PurchaseContentLogisticDto? ContentLogistics { get; set; }
 }

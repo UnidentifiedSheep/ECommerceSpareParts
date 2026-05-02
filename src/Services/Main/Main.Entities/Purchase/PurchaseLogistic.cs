@@ -1,9 +1,10 @@
-﻿using Main.Entities.Balance;
+﻿using Domain;
+using Main.Entities.Balance;
 using Main.Enums;
 
 namespace Main.Entities.Purchase;
 
-public class PurchaseLogistic
+public class PurchaseLogistic : Entity<PurchaseLogistic, Guid>
 {
     public Guid PurchaseId { get; set; }
 
@@ -30,4 +31,5 @@ public class PurchaseLogistic
     public virtual Currency.Currency Currency { get; set; } = null!;
 
     public virtual Transaction Transaction { get; set; } = null!;
+    public override Guid GetId() => PurchaseId;
 }

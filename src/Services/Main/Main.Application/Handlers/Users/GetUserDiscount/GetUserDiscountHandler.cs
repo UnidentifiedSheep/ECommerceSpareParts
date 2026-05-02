@@ -8,11 +8,14 @@ public record GetUserDiscountQuery(Guid UserId) : IQuery<GetUserDiscountResult>;
 
 public record GetUserDiscountResult(decimal? Discount);
 
-public class GetUserDiscountHandler(IUserService usersService)
+public class GetUserDiscountHandler(
+    IUserService usersService,
+    IIdsCollector idsCollector)
     : IQueryHandler<GetUserDiscountQuery, GetUserDiscountResult>
 {
     public async Task<GetUserDiscountResult> Handle(GetUserDiscountQuery request, CancellationToken cancellationToken)
     {
+        idsCollector.Add(request.UserId.ToString());
         var discount = await usersService.GetUserDiscountAsync(request.UserId, cancellationToken);
         return new GetUserDiscountResult(discount);
     }

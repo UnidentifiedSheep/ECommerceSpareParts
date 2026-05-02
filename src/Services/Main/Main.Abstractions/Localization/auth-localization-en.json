@@ -33,6 +33,7 @@
     "user.email.not.found": "Unable to find email.",
     "user.email.already.in.use": "Email is already in use by some user.",
     "user.min.email.count": "User must have at least {0} emails.",
-    "user.max.email.count": "User must have no more than {0} emails."
+    "user.max.email.count": "User must have no more than {0} emails.",
+    "user.search.strategy.not.valid.input": "Provided input is invalid, for general search you must provide SearchColumn. For similarity search any other columns"
   }
 }

@@ -1,6 +1,5 @@
 using System.Data;
 using Abstractions.Interfaces.Services;
-using Abstractions.Models.Command;
 using Application.Common.Interfaces;
 using Attributes;
 using Contracts.Purchase;
@@ -9,7 +8,6 @@ using Main.Application.Dtos.Amw.Purchase;
 using Main.Application.Dtos.Storage;
 using Main.Application.Extensions;
 using Main.Application.Handlers.Balance.DeleteTransaction;
-using Main.Application.Handlers.Purchases.ClearPurchaseLogistics;
 using Main.Application.Handlers.Purchases.EditPurchase;
 using Main.Application.Handlers.Purchases.UpsertLogisticsToPurchase;
 using Main.Application.Handlers.StorageContents.AddContent;

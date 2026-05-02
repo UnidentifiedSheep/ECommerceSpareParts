@@ -2,7 +2,7 @@
 
 namespace Application.Common.Services;
 
-public class RelatedDataCollector : IRelatedDataCollector
+public class IdsCollector : IIdsCollector
 {
     private readonly Stack<HashSet<string>> _stack = new();
 
@@ -29,7 +29,7 @@ public class RelatedDataCollector : IRelatedDataCollector
         _stack.Pop();
     }
 
-    private class Scope(RelatedDataCollector collector) : IDisposable
+    private class Scope(IdsCollector collector) : IDisposable
     {
         public void Dispose()
         {

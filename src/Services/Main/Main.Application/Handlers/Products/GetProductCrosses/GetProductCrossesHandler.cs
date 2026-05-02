@@ -17,7 +17,7 @@ public record GetProductCrossesResult(IEnumerable<ProductDto> Crosses, ProductDt
 
 public class GetProductCrossesHandler(
     IProductRepository repository,
-    IRelatedDataCollector relatedDataCollector)
+    IIdsCollector idsCollector)
     : IQueryHandler<GetProductCrossesQuery, GetProductCrossesResult>
 {
     public async Task<GetProductCrossesResult> Handle(
@@ -32,8 +32,8 @@ public class GetProductCrossesHandler(
         var requestedAdapted = requestedArticle.Adapt<ProductDto>();
         var crossArticlesAdapted = crosses.Adapt<List<ProductDto>>();
 
-        relatedDataCollector.AddRange(crosses.Select(x => x.Id.ToString()));
-        relatedDataCollector.Add(requestedArticle.Id.ToString());
+        idsCollector.AddRange(crosses.Select(x => x.Id.ToString()));
+        idsCollector.Add(requestedArticle.Id.ToString());
 
         return new GetProductCrossesResult(crossArticlesAdapted, requestedAdapted);
     }

@@ -1,13 +1,7 @@
 using Abstractions.Models;
-using Abstractions.Models.Repository;
 using Application.Common.Interfaces;
-using Extensions;
-using Main.Abstractions.Interfaces.DbRepositories;
 using Main.Application.Dtos.Amw.Purchase;
-using Main.Application.Dtos.RepositoryOptionsData;
-using Main.Entities;
 using Main.Entities.Purchase;
-using Mapster;
 
 namespace Main.Application.Handlers.Purchases.GetPurchase;
 

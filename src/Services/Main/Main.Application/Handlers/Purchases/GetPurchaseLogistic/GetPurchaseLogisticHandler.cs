@@ -1,6 +1,4 @@
-﻿using Abstractions.Models.Repository;
-using Application.Common.Interfaces;
-using Main.Abstractions.Interfaces.DbRepositories;
+﻿using Application.Common.Interfaces;
 using Main.Application.Dtos.Amw.Purchase;
 using Main.Entities;
 using Main.Entities.Exceptions.Purchase;

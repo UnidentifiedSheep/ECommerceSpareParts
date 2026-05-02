@@ -1,6 +1,6 @@
 ﻿namespace Application.Common.Interfaces;
 
-public interface IRelatedDataCollector
+public interface IIdsCollector
 {
     IReadOnlyCollection<string> CurrentIds { get; }
     IDisposable BeginScope();

@@ -7,8 +7,7 @@ using MediatR;
 
 namespace Main.Application.Handlers.Users.AddPermissionToUser;
 
-[AutoSave]
-[Transactional]
+[Transactional, AutoSave]
 public record AddPermissionToUserCommand(Guid UserId, string PermissionName) : ICommand;
 
 public class AddPermissionToUserHandler(
@@ -23,7 +22,7 @@ public class AddPermissionToUserHandler(
         await unitOfWork.AddAsync(model, cancellationToken);
         interfaceScope.Add(new UserUpdatedEvent
         {
-            UserId = request.UserId,
+            UserId = request.UserId
         });
         return Unit.Value;
     }

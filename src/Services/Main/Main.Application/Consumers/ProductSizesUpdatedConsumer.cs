@@ -2,14 +2,19 @@
 using Contracts.Articles;
 using Main.Application.Handlers.ProductSizes.GetProductSizes;
 using MassTransit;
+using ZiggyCreatures.Caching.Fusion;
 
 namespace Main.Application.Consumers;
 
 public class ProductSizesUpdatedConsumer(
-    ICacheInvalidator<GetProductSizesResult, int> cacheInvalidator) : IConsumer<ProductSizesUpdatedEvent>
+    IFusionCache cache,
+    ICachePolicy<GetProductSizeQuery> cachePolicy) : IConsumer<ProductSizesUpdatedEvent>
 {
     public async Task Consume(ConsumeContext<ProductSizesUpdatedEvent> context)
     {
-        await cacheInvalidator.Invalidate(context.Message.ProductId);
+        var key = cachePolicy.GetCacheKey(new GetProductSizeQuery(context.Message.ProductId));
+        await cache.RemoveAsync(
+            key: key,
+            token: context.CancellationToken);
     }
 }

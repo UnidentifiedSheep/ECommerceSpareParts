@@ -9,12 +9,13 @@ public class CurrencyConverterSetup(
     ISender sender)
     : ICurrencyConverterSetup
 {
-    public async Task InitializeAsync(int usdId)
+    public async Task InitializeAsync(int? usdId)
     {
         var rates = (await sender.Send(new GetAllCurrenciesQuery()))
             .Currencies
             .ToDictionary(x => x.Id, x => x.ToUsdRate ?? 0);
         currencyConverter.LoadRates(rates);
-        currencyConverter.SetUsdId(usdId);
+        if (usdId == null) return;
+        currencyConverter.SetUsdId(usdId.Value);
     }
 }

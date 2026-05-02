@@ -1,4 +1,5 @@
 using Main.Application.Dtos.Currencies;
+using Main.Application.Dtos.Users;
 
 namespace Main.Application.Dtos.Amw.Purchase;
 

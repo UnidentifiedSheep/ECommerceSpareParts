@@ -1,21 +1,12 @@
-﻿using Abstractions.Interfaces.Cache;
-using Application.Common.Abstractions;
-using Application.Common.Interfaces;
-using Main.Abstractions.Constants;
+﻿using Application.Common.Interfaces;
 
 namespace Main.Application.Handlers.ProductWeight.GetProductWeight;
 
-public class GetProductWeightCache(ICacheKeyRegistry keyRegistry) : ICachePolicy<GetProductWeightQuery>
+public class GetProductWeightCache : ICachePolicy<GetProductWeightQuery>
 {
     public string GetCacheKey(GetProductWeightQuery request)
-        => keyRegistry.FormatKey<GetProductWeightResult, int>(request.ProductId);
+        => $"product:{request.ProductId}:weight";
 
-    public int DurationSeconds => 3600;
-    public Type? RelatedType => null;
-}
-
-public sealed class GetProductWeightCacheInvalidator(
-    ICacheKeyRegistry keyRegistry,
-    ICache cache) : SingleEntityCacheInvalidatorBase<GetProductWeightResult, int>(cache, keyRegistry)
-{
+    public TimeSpan TimeToLive => TimeSpan.FromDays(1);
+    public IReadOnlyCollection<string> Tags => ["product"];
 }

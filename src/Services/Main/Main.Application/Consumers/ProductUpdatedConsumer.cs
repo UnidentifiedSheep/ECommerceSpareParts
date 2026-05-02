@@ -1,15 +1,18 @@
 ﻿using Application.Common.Interfaces;
 using Contracts.Articles;
-using Main.Entities.Product;
+using Main.Application.Handlers.Products.GetProductCrosses;
 using MassTransit;
+using ZiggyCreatures.Caching.Fusion;
 
 namespace Main.Application.Consumers;
 
 public class ProductUpdatedConsumer(
-    ICacheInvalidator<ProductCross, int> cacheInvalidator) : IConsumer<ProductUpdatedEvent>
+    IFusionCache cache) : IConsumer<ProductUpdatedEvent>
 {
     public async Task Consume(ConsumeContext<ProductUpdatedEvent> context)
     {
-        await cacheInvalidator.Invalidate(context.Message.Id);
+        await cache.RemoveByTagAsync(
+            tags: ["product-crosses"],
+            token: context.CancellationToken);
     }
 }

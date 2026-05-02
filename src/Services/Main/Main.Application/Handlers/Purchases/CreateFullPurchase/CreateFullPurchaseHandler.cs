@@ -86,7 +86,7 @@ public class CreateFullPurchaseHandler(
 
         await publishEndpoint.Publish(new ArticleBuyPricesChangedEvent
         {
-            ArticleIds = content.Select(x => x.ArticleId)
+            ArticleIds = content.Select(x => x.ProductId)
         }, cancellationToken);
 
         await publishEndpoint.Publish(new PurchaseCreatedEvent

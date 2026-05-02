@@ -66,7 +66,7 @@ public class UpsertPurchaseLogisticsTests : IAsyncLifetime
         {
             (new NewPurchaseContentDto
             {
-                ArticleId = article.Id,
+                ProductId = article.Id,
                 Count = 10,
                 Price = 100.50m
             }, storageContent.Id)

@@ -17,7 +17,7 @@ public record GetCurrenciesResult(IEnumerable<CurrencyDto> Currencies);
 
 public class GetCurrenciesHandler(
     IReadRepository<Currency, int> repository, 
-    IRelatedDataCollector relatedDataCollector)
+    IIdsCollector idsCollector)
     : IQueryHandler<GetCurrenciesQuery, GetCurrenciesResult>
 {
     public async Task<GetCurrenciesResult> Handle(GetCurrenciesQuery request, CancellationToken cancellationToken)
@@ -28,7 +28,7 @@ public class GetCurrenciesHandler(
             .ApplyPagination(request.Pagination)
             .ToListAsync(cancellationToken);
 
-        relatedDataCollector.AddRange(result.Select(x => x.Id.ToString()));
+        idsCollector.AddRange(result.Select(x => x.Id.ToString()));
 
         return new GetCurrenciesResult(result);
     }

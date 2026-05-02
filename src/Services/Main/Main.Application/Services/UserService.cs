@@ -1,65 +1,55 @@
-﻿using Abstractions.Interfaces.RelatedData;
-using Application.Common.Extensions;
+﻿using Application.Common.Extensions;
 using Application.Common.Interfaces.Repositories;
-using Main.Abstractions.Constants;
 using Main.Application.Dtos.Users;
 using Main.Application.Handlers.Projections;
-using Main.Application.Interfaces.CacheRepositories;
 using Main.Application.Interfaces.Persistence;
 using Main.Application.Interfaces.Services;
+using Main.Application.Models.Cache;
+using Microsoft.Extensions.Options;
+using ZiggyCreatures.Caching.Fusion;
 using DbUser = Main.Entities.User.User;
 
 namespace Main.Application.Services;
 
 public class UserService(
-    IRelatedDataFactory relatedDataFactory, 
-    IUsersCacheRepository cacheRepository,
-    IUserRepository userRepository) : IUserService
+    IFusionCache cache,
+    IUserRepository userRepository,
+    IOptions<CacheSettings> cacheSettings) : IUserService
 {
+    private UserCacheSettings UserSettings => cacheSettings.Value.User;
     public async Task<UserDto?> TryGetUserAsync(Guid userId, CancellationToken token = default)
     {
-        var cachedUser = await cacheRepository.GetUserById(userId);
-        if (cachedUser != null) return cachedUser;
-
-        var dbUser = await TryGetUserFromDb(userId, token);
-        if (dbUser != null) await SaveUserInCache(dbUser);
-        
-        return dbUser;
+        var key = UserSettings.GetUserCacheKey(userId);
+        return await cache.GetOrSetAsync(
+            key: key,
+            factory: ct => TryGetUserFromDb(userId, ct),
+            tags: [key],
+            duration: UserSettings.Duration,
+            token: token);
     }
 
     public async Task<decimal?> GetUserDiscountAsync(Guid userId, CancellationToken token = default)
     {
-        var cacheValue = await cacheRepository.GetUserDiscount(userId);
-        if (cacheValue != null) return cacheValue;
-        var dbDiscount = await userRepository.GetUsersDiscountAsync(userId, token);
-        return dbDiscount;
+        return await cache.GetOrSetAsync(
+            key: UserSettings.GetUserDiscountCacheKey(userId),
+            factory: ct => userRepository.GetUsersDiscountAsync(userId, ct),
+            tags: [UserSettings.GetUserCacheKey(userId)],
+            duration: UserSettings.Duration,
+            token: token);
     }
 
-    public async Task<UserRolesAndPermissions> GetUserRolesAndPermissionsAsync(
+    public async Task<UserRolesAndPermissions?> GetUserRolesAndPermissionsAsync(
         Guid userId, 
         CancellationToken token = default)
     {
-        var rp = new UserRolesAndPermissions
-        {
-            Permissions = await cacheRepository.GetUserPermissions(userId),
-            Roles = await cacheRepository.GetUserRoles(userId)
-        };
-
-        if (rp.Roles.Count != 0 && rp.Permissions.Count != 0)
-            return rp;
-        
-        rp = await userRepository.GetUserRolesAndPermissionsAsync(userId, token);
-        if (rp == null) return new UserRolesAndPermissions
-        {
-            Permissions = [],
-            Roles = []
-        };
-            
-        await cacheRepository.SetUserRoles(userId, rp.Roles);
-        await cacheRepository.SetUserPermissions(userId, rp.Permissions);
-
-        return rp;
+        return await cache.GetOrSetAsync(
+            key: UserSettings.GetUserRolesAndPermissionsCacheKey(userId),
+            factory: ct => userRepository.GetUserRolesAndPermissionsAsync(userId, ct),
+            tags: [UserSettings.GetUserCacheKey(userId), "roles"],
+            duration: UserSettings.Duration,
+            token: token);
     }
+    
 
     private async Task<UserDto?> TryGetUserFromDb(Guid userId, CancellationToken token)
     {
@@ -70,25 +60,8 @@ public class UserService(
             .Build();
         
         DbUser? user = await userRepository.FirstOrDefaultAsync(criteria, token);
-        if (user == null) return null;
-        return UserProjections.UserProjection.AsFunc()(user);
-    }
-
-    private async Task SaveUserInCache(UserDto user)
-    {
-        await AddRelatedDataKeys(user.Id);
-        await cacheRepository.SetUserById(user);
-    }
-
-    private async Task AddRelatedDataKeys(Guid userId)
-    {
-        var relatedRepository = relatedDataFactory.GetRepository<DbUser>();
-        var relatedDataKeys = new List<string>
-        {
-            string.Format(CacheKeys.UserRolesCacheKey, userId),
-            string.Format(CacheKeys.UserPermissionsCacheKey, userId),
-            string.Format(CacheKeys.UserByIdCacheKey, userId),
-        };
-        await relatedRepository.AddRelatedDataAsync(userId.ToString(), relatedDataKeys);
+        return user == null 
+            ? null 
+            : UserProjections.UserProjection.AsFunc()(user);
     }
 }

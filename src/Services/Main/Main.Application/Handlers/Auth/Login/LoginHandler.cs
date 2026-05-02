@@ -45,7 +45,8 @@ public class LoginHandler(
             throw new WrongCredentialsException(request.Email, request.Password);
 
         var (roles, permissions) =
-            await userService.GetUserRolesAndPermissionsAsync(user.Id, cancellationToken);
+            await userService.GetUserRolesAndPermissionsAsync(user.Id, cancellationToken)
+            ?? throw new UserNotFoundException(user.Id);
 
         var deviceId = GenerateDeviceId();
         var ip = request.IpAddress;

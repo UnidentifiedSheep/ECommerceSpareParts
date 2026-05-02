@@ -4,10 +4,11 @@ using Main.Entities.Currency;
 
 namespace Main.Application.Handlers.Currencies.GetCurrencyById;
 
-public class GetCurrencyByIdCachePolicy(ICacheKeyRegistry keyRegistry) : ICachePolicy<GetCurrencyByIdQuery>
+public class GetCurrencyByIdCachePolicy : ICachePolicy<GetCurrencyByIdQuery>
 {
-    public string GetCacheKey(GetCurrencyByIdQuery request) 
-        => keyRegistry.FormatKey<GetCurrencyByIdResult, int>(request.Id);
-    public int DurationSeconds => 6000;
-    public Type RelatedType => typeof(Currency);
+    public string GetCacheKey(GetCurrencyByIdQuery request)
+        => $"currency:{request.Id}";
+
+    public TimeSpan TimeToLive => TimeSpan.FromDays(1);
+    public IReadOnlyCollection<string> Tags => ["currency"];
 }

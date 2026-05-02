@@ -1,17 +1,12 @@
-﻿using Abstractions.Models;
-using Application.Common.Interfaces;
-using Main.Entities.Product;
+﻿using Application.Common.Interfaces;
 
 namespace Main.Application.Handlers.Products.GetProductCrosses;
 
-public class GetProductCrossesCachePolicy(
-    ICacheKeyRegistry keyRegistry) 
-    : ICachePolicy<GetProductCrossesQuery>
+public class GetProductCrossesCachePolicy : ICachePolicy<GetProductCrossesQuery>
 {
     public string GetCacheKey(GetProductCrossesQuery request) 
-        => keyRegistry.FormatKey<GetProductCrossesResult, (int id, Pagination pagination, string? sortBy)>
-            ((request.ProductId, request.Pagination, request.SortBy));
-    
-    public int DurationSeconds => 600;
-    public Type RelatedType => typeof(ProductCross);
+        => $"product:{request.ProductId}:crosses";
+
+    public TimeSpan TimeToLive => TimeSpan.FromDays(1);
+    public IReadOnlyCollection<string> Tags => ["product-crosses", "product"];
 }

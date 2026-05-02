@@ -16,7 +16,6 @@
     <ItemGroup>
       <ProjectReference Include="..\..\..\Core\Contracts\Contracts.csproj" />
       <ProjectReference Include="..\..\..\Infrastructure\RabbitMq\RabbitMq.csproj" />
-      <ProjectReference Include="..\..\..\Infrastructure\Redis\Redis.csproj" />
       <ProjectReference Include="..\..\..\Infrastructure\Security\Security.csproj" />
       <ProjectReference Include="..\..\Api.Common\Api.Common.csproj" />
       <ProjectReference Include="..\Analytics.Application\Analytics.Application.csproj" />

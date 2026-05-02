@@ -1,6 +1,7 @@
 ﻿using Application.Common.Interfaces;
 using Application.Common.Interfaces.Repositories;
 using Attributes;
+using Contracts.Auth;
 using Main.Entities.Auth;
 using Main.Entities.Auth.ValueObjects;
 using Main.Entities.Exceptions.Auth;
@@ -8,12 +9,12 @@ using MediatR;
 
 namespace Main.Application.Handlers.Auth.AddPermissionToRole;
 
-[AutoSave]
-[Transactional]
+[Transactional, AutoSave]
 public record AddPermissionToRoleCommand(string RoleName, string PermissionName) : ICommand;
 
 public class AddPermissionToRoleHandler(
-    IRepository<Role, string> repository) : ICommandHandler<AddPermissionToRoleCommand>
+    IRepository<Role, string> repository,
+    IIntegrationEventScope integrationEventScope) : ICommandHandler<AddPermissionToRoleCommand>
 {
     public async Task<Unit> Handle(AddPermissionToRoleCommand request, CancellationToken cancellationToken)
     {
@@ -27,6 +28,11 @@ public class AddPermissionToRoleHandler(
             ?? throw new RoleNotFoundException(request.RoleName);
         
         role.AddPermission(request.PermissionName);
+        
+        integrationEventScope.Add(new RoleUpdatedEvent
+        {
+            RoleName = request.RoleName
+        });
         
         return Unit.Value;
     }

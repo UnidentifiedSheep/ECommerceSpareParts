@@ -44,7 +44,8 @@ public class RefreshTokenHandler(
             throw new InternalServerException("User exists, but unable to get user info.");
         
         var (roles, permissions) = await userService
-            .GetUserRolesAndPermissionsAsync(userToken.UserId, cancellationToken);
+            .GetUserRolesAndPermissionsAsync(userToken.UserId, cancellationToken)
+            ?? throw new UserNotFoundException(userToken.UserId);
         
         var token = tokenGenerator.CreateToken(user, request.DeviceId, roles, permissions);
         var refreshToken = tokenGenerator.CreateRefreshToken();

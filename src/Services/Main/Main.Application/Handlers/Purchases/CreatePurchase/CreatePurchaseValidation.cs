@@ -16,10 +16,6 @@ public class CreatePurchaseValidator : AbstractValidator<CreatePurchaseCommand>
             .NotEmpty()
             .WithLocalizationKey("purchase.supplier.id.not.empty");
 
-        RuleFor(x => x.CreatedUserId)
-            .NotEmpty()
-            .WithLocalizationKey("purchase.created.user.id.not.empty");
-
         RuleForEach(x => x.Content)
             .ChildRules(z =>
             {

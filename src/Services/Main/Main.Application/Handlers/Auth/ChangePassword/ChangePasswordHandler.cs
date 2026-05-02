@@ -29,7 +29,7 @@ public class ChangePasswordHandler(
             throw new WrongCredentialsException(null, request.PreviousPassword);
         
         user.SetPasswordHash(passwordManager.GetHashOfPassword(request.NewPassword));
-        integrationEventScope.Add(new UserPasswordChangedEvent
+        integrationEventScope.Add(new UserUpdatedEvent
         {
             UserId = request.UserId
         });

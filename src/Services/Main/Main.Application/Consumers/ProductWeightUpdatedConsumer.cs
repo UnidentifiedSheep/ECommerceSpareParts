@@ -1,17 +1,18 @@
-﻿using Abstractions.Interfaces.Cache;
-using Application.Common.Interfaces;
+﻿using Application.Common.Interfaces;
 using Contracts.Articles;
-using Main.Abstractions.Constants;
 using Main.Application.Handlers.ProductWeight.GetProductWeight;
 using MassTransit;
+using ZiggyCreatures.Caching.Fusion;
 
 namespace Main.Application.Consumers;
 
-public class ProductWeightUpdatedConsumer(
-    ICacheInvalidator<GetProductWeightResult, int> cacheInvalidator) : IConsumer<ProductWeightUpdatedEvent>
+public class ProductWeightUpdatedConsumer(IFusionCache fusionCache,
+    ICachePolicy<GetProductWeightQuery> cachePolicy) : IConsumer<ProductWeightUpdatedEvent>
 {
     public async Task Consume(ConsumeContext<ProductWeightUpdatedEvent> context)
     {
-        await cacheInvalidator.Invalidate(context.Message.ProductId);
+        await fusionCache.RemoveAsync(
+            key: cachePolicy.GetCacheKey(new GetProductWeightQuery(context.Message.ProductId)),
+            token: context.CancellationToken);
     }
 }

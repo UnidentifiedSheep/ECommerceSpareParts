@@ -57,7 +57,7 @@ public class PurchaseContentConfiguration : IEntityTypeConfiguration<PurchaseCon
             .HasConstraintName("purchase_content_products_id_fk");
 
         builder.HasOne<Entities.Purchase.Purchase>()
-            .WithMany(p => p.PurchaseContents)
+            .WithMany(p => p.Contents)
             .HasForeignKey(d => d.PurchaseId)
             .HasConstraintName("purchase_content_purchase_id_fk");
 

@@ -1,5 +1,4 @@
-﻿using Main.Entities;
-using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
 namespace Main.Persistence.Context.Configurations.Purchase;
@@ -18,8 +17,6 @@ public class PurchaseConfiguration : IEntityTypeConfiguration<Entities.Purchase.
             .HasMethod("gin")
             .HasOperators("gin_trgm_ops");
 
-        builder.HasIndex(e => e.CreatedUserId, "purchase_created_user_id_index");
-
         builder.HasIndex(e => e.CurrencyId, "purchase_currency_id_index");
 
         builder.HasIndex(e => e.PurchaseDatetime, "purchase_purchase_datetime_index");
@@ -32,8 +29,6 @@ public class PurchaseConfiguration : IEntityTypeConfiguration<Entities.Purchase.
 
         builder.HasIndex(e => e.TransactionId, "purchase_transaction_id_index");
 
-        builder.HasIndex(e => e.UpdatedUserId, "purchase_updated_user_id_index");
-
         builder.Property(e => e.Id)
             .HasDefaultValueSql("gen_random_uuid()")
             .HasColumnName("id")
@@ -42,9 +37,7 @@ public class PurchaseConfiguration : IEntityTypeConfiguration<Entities.Purchase.
         builder.Property(e => e.Comment)
             .HasMaxLength(256)
             .HasColumnName("comment");
-            
-        builder.Property(e => e.CreatedUserId)
-            .HasColumnName("created_user_id");
+        
             
         builder.Property(e => e.CurrencyId)
             .HasColumnName("currency_id");
@@ -64,15 +57,6 @@ public class PurchaseConfiguration : IEntityTypeConfiguration<Entities.Purchase.
             
         builder.Property(e => e.TransactionId)
             .HasColumnName("transaction_id");
-            
-        builder.Property(e => e.UpdatedUserId)
-            .HasColumnName("updated_user_id");
-
-        builder.HasOne<Entities.User.User>()
-            .WithMany()
-            .HasForeignKey(d => d.CreatedUserId)
-            .OnDelete(DeleteBehavior.Restrict)
-            .HasConstraintName("purchase_users_id_fk");
 
         builder.HasOne(d => d.Currency)
             .WithMany()
@@ -97,11 +81,9 @@ public class PurchaseConfiguration : IEntityTypeConfiguration<Entities.Purchase.
             .HasForeignKey(d => d.TransactionId)
             .OnDelete(DeleteBehavior.Restrict)
             .HasConstraintName("purchase_transactions_id_fk");
-
-        builder.HasOne<Entities.User.User>()
-            .WithMany()
-            .HasForeignKey(d => d.UpdatedUserId)
-            .OnDelete(DeleteBehavior.Restrict)
-            .HasConstraintName("purchase_users_id_fk_3");
+        
+        builder.Navigation(e => e.Contents)
+            .HasField("_contents")
+            .UsePropertyAccessMode(PropertyAccessMode.Field);
     }
 }

@@ -9,11 +9,11 @@ public class CreatePurchaseDbValidation : AbstractDbValidation<CreatePurchaseCom
 {
     public override void Build(IValidationPlan plan, CreatePurchaseCommand request)
     {
-        plan.ValidateUserExistsId(Quantifier.All, request.CreatedUserId, request.SupplierId)
+        plan.ValidateUserExistsId(request.SupplierId)
             .ValidateCurrencyExistsId(request.CurrencyId)
             .ValidateTransactionExistsId(request.TransactionId)
             .ValidateStorageExistsName(request.StorageName)
-            .ValidateArticleExistsId(request.Content.Select(x => x.content.ArticleId).ToHashSet());
+            .ValidateProductExistsId(request.Content.Select(x => x.content.ProductId).ToHashSet());
 
         var storageContentIds = request.Content
             .Where(x => x.storageContentId != null)
