@@ -1,4 +1,6 @@
-﻿namespace Main.Entities.Product.ValueObjects;
+﻿using Domain.Extensions;
+
+namespace Main.Entities.Product.ValueObjects;
 
 public record Stock
 {
@@ -8,6 +10,7 @@ public record Stock
 
     public Stock(int value)
     {
+        value.AgainstNegative(() => new InvalidOperationException("Stock can not be negative"));
         ArgumentOutOfRangeException.ThrowIfNegative(value);
         Value = value;
     }

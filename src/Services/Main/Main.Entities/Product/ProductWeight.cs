@@ -41,7 +41,7 @@ public class ProductWeight : Entity<ProductWeight, int>
 
     private static void ValidateWeight(decimal weight)
     {
-        weight.AgainstTooSmall(0, "article.weight.must.be.greater.than.zero")
+        weight.AgainstLessOrEqual(0, "article.weight.must.be.greater.than.zero")
             .AgainstTooManyDecimalPlaces(2, "article.weight.max.two.decimals");
     }
 }

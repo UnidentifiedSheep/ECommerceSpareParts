@@ -9,9 +9,9 @@ public class Product : AuditableEntity<Product, int>
     [Validate]
     public int Id { get; private set; }
     public int? PairId { get; private set; }
-    public Sku Sku { get; set; } = null!;
-    public Name Name { get; set; } = null!;
-    public Stock Stock { get; set; } = null!;
+    public Sku Sku { get; private set; } = null!;
+    public Name Name { get; private set; } = null!;
+    public Stock Stock { get; private set; } = null!;
     public string? Description { get; private set; }
     public int? PackingUnit { get; private set; }
     public int ProducerId { get; private set; }
@@ -90,7 +90,8 @@ public class Product : AuditableEntity<Product, int>
 
     public void IncreaseStock(int value)
     {
-        Stock = Stock.Value + value;
+        var newValue = Stock.Value + value;
+        Stock = newValue;
     }
 
     public void SetPackingUnit(int? packingUnit)

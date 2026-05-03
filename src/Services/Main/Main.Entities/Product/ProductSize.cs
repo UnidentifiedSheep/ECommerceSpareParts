@@ -40,7 +40,7 @@ public class ProductSize : Entity<ProductSize, int>
 
     public void SetLength(decimal length)
     {
-        length.AgainstTooSmall(0.001m, "article.size.length.must.be.greater.than.zero")
+        length.AgainstLessOrEqual(0, "article.size.length.must.be.greater.than.zero")
             .AgainstTooManyDecimalPlaces(2, "article.size.length.max.two.decimals");
         
         Length = length;
@@ -49,7 +49,7 @@ public class ProductSize : Entity<ProductSize, int>
 
     public void SetWidth(decimal width)
     {
-        width.AgainstTooSmall(0.001m, "article.size.width.must.be.greater.than.zero")
+        width.AgainstLessOrEqual(0, "article.size.width.must.be.greater.than.zero")
             .AgainstTooManyDecimalPlaces(2, "article.size.width.max.two.decimals");
         Width = width;
         RecalculateVolume();
@@ -57,7 +57,7 @@ public class ProductSize : Entity<ProductSize, int>
 
     public void SetHeight(decimal height)
     {
-        height.AgainstTooSmall(0.001m, "article.size.height.must.be.greater.than.zero")
+        height.AgainstLessOrEqual(0, "article.size.height.must.be.greater.than.zero")
             .AgainstTooManyDecimalPlaces(2, "article.size.height.max.two.decimals");
         
         Height = height;

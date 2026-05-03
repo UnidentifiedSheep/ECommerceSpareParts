@@ -8,8 +8,8 @@ public class ProductCross : Entity<ProductCross, (int, int)>
     public int LeftProductId { get; private set; }
     public int RightProductId { get; private set; }
 
-    public Product LeftProduct { get; set; } = null!;
-    public Product RightProduct { get; set; } = null!;
+    public Product LeftProduct { get; private set; } = null!;
+    public Product RightProduct { get; private set; } = null!;
     
     private ProductCross() {}
 
