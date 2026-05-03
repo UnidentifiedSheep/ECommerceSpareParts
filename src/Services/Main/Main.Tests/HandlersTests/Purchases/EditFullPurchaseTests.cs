@@ -88,7 +88,7 @@ public class EditFullPurchaseTests : IAsyncLifetime
     private async Task CreateMockPurchase()
     {
         await _mediator.Send(new SetProductSizesCommand(_product.Id, 10, 10, 10, DimensionUnit.Centimeter));
-        await _mediator.Send(new SetArticleWeightCommand(_product.Id, 1, WeightUnit.Kilogram));
+        await _mediator.Send(new SetProductWeightCommand(_product.Id, 1, WeightUnit.Kilogram));
 
         var result = await _mediator.Send(new AddStorageRouteCommand(
             _storageFrom.Name, _storageTo.Name, 1000, RouteType.InterCity, LogisticPricingType.PerWeight,

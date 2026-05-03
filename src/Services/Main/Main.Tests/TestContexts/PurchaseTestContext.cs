@@ -7,10 +7,11 @@ using Main.Persistence.Context;
 using MediatR;
 using Tests.MockData.ScenatioExtensions;
 using Tests.MockData.SeedExtensions;
+using Tests.TestContexts.Base;
 
 namespace Tests.TestContexts;
 
-public class PurchaseTestContext(DContext ctx, IMediator mediator) : SystemUserTestContext(ctx, mediator)
+public class PurchaseTestContext(DContext ctx, IMediator mediator) : GlobalApplicationSettingTestContext(ctx, mediator)
 {
     public User User { get; private set; } = null!;
     public User Supplier { get; private set; } = null!;

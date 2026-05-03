@@ -9,7 +9,7 @@ using MediatR;
 namespace Main.Api.EndPoints.Storages;
 
 public record EditStorageContentRequest(
-    Dictionary<int, ModelWithRowVersion<PatchStorageContentDto, string>> EditedFields);
+    Dictionary<int, ModelWithRowVersion<PatchStorageContentDto, uint>> EditedFields);
 
 public class EditStorageContentEndPoint : ICarterModule
 {
@@ -18,10 +18,9 @@ public class EditStorageContentEndPoint : ICarterModule
         app.MapPatch("/storages/content", async (
                 ISender sender,
                 EditStorageContentRequest request,
-                IUserContext user,
                 CancellationToken cancellationToken) =>
             {
-                var command = new EditStorageContentCommand(request.EditedFields, user.UserId);
+                var command = new EditStorageContentCommand(request.EditedFields);
                 await sender.Send(command, cancellationToken);
                 return Results.NoContent();
             }).WithTags("Storages")

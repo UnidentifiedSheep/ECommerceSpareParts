@@ -9,4 +9,5 @@ public class GetProductWeightCache : ICachePolicy<GetProductWeightQuery>
 
     public TimeSpan TimeToLive => TimeSpan.FromDays(1);
     public IReadOnlyCollection<string> Tags => ["product"];
+    public string? BaseTag => null;
 }

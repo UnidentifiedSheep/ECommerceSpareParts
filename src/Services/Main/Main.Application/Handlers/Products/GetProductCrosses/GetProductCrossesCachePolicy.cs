@@ -9,4 +9,5 @@ public class GetProductCrossesCachePolicy : ICachePolicy<GetProductCrossesQuery>
 
     public TimeSpan TimeToLive => TimeSpan.FromDays(1);
     public IReadOnlyCollection<string> Tags => ["product-crosses", "product"];
+    public string? BaseTag => null;
 }

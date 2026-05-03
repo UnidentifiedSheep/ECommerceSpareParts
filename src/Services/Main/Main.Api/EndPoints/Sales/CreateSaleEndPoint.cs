@@ -25,11 +25,11 @@ public class CreateSaleEndPoint : ICarterModule
         app.MapPost("/sales/",
                 async (IUserContext user, ISender sender, CreateSaleRequest request, CancellationToken token) =>
                 {
-                    var command = new CreateFullSaleCommand(user.UserId, request.BuyerId, request.CurrencyId,
+                    /*var command = new CreateFullSaleCommand(user.UserId, request.BuyerId, request.CurrencyId,
                         request.StorageName, request.SellFromOtherStorages,
                         request.SaleDateTime, request.SaleContent, request.Comment, request.PayedSum,
                         request.ConfirmationCode);
-                    await sender.Send(command, token);
+                    await sender.Send(command, token);*/
                     return Results.Ok();
                 }).WithTags("Sales")
             .WithDescription("Создание новой продажи")

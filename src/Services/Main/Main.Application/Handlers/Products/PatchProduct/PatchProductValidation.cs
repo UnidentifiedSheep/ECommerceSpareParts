@@ -3,7 +3,7 @@ using Localization.Domain.Extensions;
 
 namespace Main.Application.Handlers.Products.PatchProduct;
 
-public class PatchProductValidation : AbstractValidator<PatchArticleCommand>
+public class PatchProductValidation : AbstractValidator<PatchProductCommand>
 {
     public PatchProductValidation()
     {

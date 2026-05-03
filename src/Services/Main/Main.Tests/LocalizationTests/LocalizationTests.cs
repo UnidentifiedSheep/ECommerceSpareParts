@@ -3,6 +3,7 @@ using Api.Common.Extensions;
 using Main.Abstractions.Constants;
 using Main.Application.Configs;
 using Main.Entities;
+using Main.Entities.Product;
 
 namespace Tests.LocalizationTests;
 
@@ -21,7 +22,7 @@ public class LocalizationTests
     public async Task All_LocalizableExceptions_Should_Have_Valid_Localization(string locale)
     {
         var localesPath = Assembly.GetExecutingAssembly().GetDefaultLocalizationPath();
-        var assembly = Assembly.GetAssembly(typeof(CacheKeys))!;
+        var assembly = Assembly.GetAssembly(typeof(Product))!;
 
         await _localizationTests.TestLocalizableExceptions(assembly, localesPath, locale);
     }

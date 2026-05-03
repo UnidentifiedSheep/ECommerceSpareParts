@@ -11,13 +11,13 @@ public class AddPermissionToRoleEndPoint : ICarterModule
 {
     public void AddRoutes(IEndpointRouteBuilder app)
     {
-        app.MapPost("/roles/{roleId:guid}/permissions/", async (
+        app.MapPost("/roles/{roleName}/permissions/", async (
                 ISender sender,
-                Guid roleId,
+                string roleName,
                 AddPermissionToRoleRequest request,
                 CancellationToken ct) =>
             {
-                var command = new AddPermissionToRoleCommand(roleId, request.PermissionName);
+                var command = new AddPermissionToRoleCommand(roleName, request.PermissionName);
                 await sender.Send(command, ct);
                 return Results.NoContent();
             }).WithTags("Roles")

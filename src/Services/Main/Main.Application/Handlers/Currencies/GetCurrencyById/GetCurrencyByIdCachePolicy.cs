@@ -11,4 +11,5 @@ public class GetCurrencyByIdCachePolicy : ICachePolicy<GetCurrencyByIdQuery>
 
     public TimeSpan TimeToLive => TimeSpan.FromDays(1);
     public IReadOnlyCollection<string> Tags => ["currency"];
+    public string BaseTag => "currency";
 }

@@ -66,7 +66,7 @@ public class User : AuditableEntity<User, Guid>
             UserInfo = UserInfo.Create(Id, name, surname, description);
     }
 
-    public void AddUserRole(string roleName)
+    public void AddRole(string roleName)
     {
         if (_roles.Any(r => r.RoleName == RoleName.ToNormalized(roleName))) return;
         _roles.Add(UserRole.Create(Id, roleName));

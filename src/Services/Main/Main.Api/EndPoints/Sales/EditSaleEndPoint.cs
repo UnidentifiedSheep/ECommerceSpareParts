@@ -2,7 +2,6 @@ using Abstractions.Interfaces;
 using Api.Common.Extensions;
 using Carter;
 using Main.Application.Dtos.Amw.Sales;
-using Main.Application.Handlers.Sales.EditFullSale;
 using MediatR;
 
 namespace Main.Api.EndPoints.Sales;
@@ -25,9 +24,9 @@ public class EditSaleEndPoint : ICarterModule
                 IUserContext user,
                 CancellationToken cancellationToken) =>
             {
-                var command = new EditFullSaleCommand(request.EditedContent, saleId, request.CurrencyId, user.UserId,
+                /*var command = new EditFullSaleCommand(request.EditedContent, saleId, request.CurrencyId, user.UserId,
                     request.SaleDateTime, request.Comment, request.SellFromOtherStorages);
-                await sender.Send(command, cancellationToken);
+                await sender.Send(command, cancellationToken);*/
                 return Results.Ok();
             }).WithTags("Sales")
             .WithDescription("Редактирование продажи")

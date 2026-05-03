@@ -3,8 +3,6 @@ using Abstractions.Models;
 using Api.Common;
 using Mail;
 using Main.Application.Configs;
-using Main.Application.Configs.Mapster;
-using Main.Cache;
 using Main.Persistence;
 using Main.Persistence.Context;
 using MassTransit;
@@ -16,26 +14,15 @@ using Test.Common.Extensions;
 using Test.Common.Stubs;
 using Tests.MockData;
 using ApplicationServiceProvider = Main.Application.ServiceProvider;
-using CacheServiceProvider = Redis.ServiceProvider;
-using ServiceProvider = Microsoft.Extensions.DependencyInjection.ServiceProvider;
 
 namespace Tests;
 
-public static class ServiceProviderForTests
+public class ServiceProviderForTests
 {
-    private static bool _isConfiguredBefore;
-    private static ServiceProvider? _serviceProvider;
-
-    public static IServiceProvider Build(string postgresConnectionString, string redisConnectionString)
+    public async Task<IServiceProvider> Build(string postgresConnectionString, string redisConnectionString)
     {
-        if (_isConfiguredBefore)
-        {
-            var scope = _serviceProvider!.CreateScope();
-            return scope.ServiceProvider;
-        }
-
         var services = new ServiceCollection();
-
+        
         services.RegisterTestContexts();
 
         services.AddLogging();
@@ -52,23 +39,20 @@ public static class ServiceProviderForTests
             RequireDigit = false,
             RequireUppercase = false
         };
-        CacheServiceProvider.AddCacheLayer(services, redisConnectionString)
-            .AddJsonSigner("some secret")
+            
+            services.AddJsonSigner("some secret")
             .AddFullSecurityLayer(passwordRules)
             .AddMailLayer()
-            .AddCommonLayer()
-            .AddAppCacheLayer();
+            .AddCommonLayer();
 
         services.AddTransient<IPublishEndpoint, MessageBrokerStub>();
-        MapsterConfig.Configure();
         SortByConfig.Configure();
 
 
         var serviceProvider = services.BuildServiceProvider();
-        _isConfiguredBefore = true;
-        _serviceProvider = serviceProvider;
-        SeedDb(serviceProvider).Wait();
-        SetupPrice(_serviceProvider).Wait();
+
+        await SeedDb(serviceProvider);
+        await SetupPrice(serviceProvider);
         return serviceProvider;
     }
 
@@ -86,6 +70,6 @@ public static class ServiceProviderForTests
         var currencyConverterSetup = scope.ServiceProvider.GetRequiredService<ICurrencyConverterSetup>();
 
         await context.AddMockCurrencies();
-        await currencyConverterSetup.InitializeAsync();
+        await currencyConverterSetup.InitializeAsync(null);
     }
 }

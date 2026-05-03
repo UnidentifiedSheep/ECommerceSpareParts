@@ -5,20 +5,20 @@ namespace Main.Application.Dtos.Product;
 public record CreateProductDto
 {
     [JsonPropertyName("sku")]
-    public string Sku { get; set; } = null!;
+    public required string Sku { get; init; }
     
     [JsonPropertyName("name")]
-    public string Name { get; set; } = null!;
+    public required string Name { get; init; }
     
     [JsonPropertyName("producerId")]
-    public int ProducerId { get; set; }
+    public required int ProducerId { get; init; }
     
     [JsonPropertyName("description")]
-    public string? Description { get; set; }
+    public string? Description { get; init; }
     
     [JsonPropertyName("indicator")]
-    public string? Indicator { get; set; }
+    public string? Indicator { get; init; }
     
     [JsonPropertyName("categoryId")]
-    public int? CategoryId { get; set; }
+    public int? CategoryId { get; init; }
 }

@@ -1,4 +1,5 @@
 ﻿using Abstractions.Interfaces.Tests;
+using Bogus;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 
@@ -9,6 +10,7 @@ public abstract class TestContextBase<TDbContext>(TDbContext ctx, IMediator medi
 {
     public TDbContext DbContext => ctx;
     public IMediator Mediator => mediator;
+    public Faker Faker => new();
 
     public abstract Task InitializeAsync(CancellationToken cancellationToken = default);
 }

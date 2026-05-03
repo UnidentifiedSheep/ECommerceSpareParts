@@ -28,7 +28,7 @@ public class CreateUserHandler(IUnitOfWork unitOfWork, IPasswordManager password
         user.SetUserInfo(request.UserInfo.Name, request.UserInfo.Surname, request.UserInfo.Description);
 
         foreach (var role in request.Roles)
-            user.AddUserRole(role);
+            user.AddRole(role);
 
         foreach (var email in request.Emails)
             user.AddUserEmail(email.Email, email.Type, email.IsPrimary, email.IsConfirmed);

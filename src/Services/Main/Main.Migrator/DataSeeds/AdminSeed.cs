@@ -21,7 +21,7 @@ public class AdminSeed(IPasswordManager passwordManager) : ISeed<DContext>
         var email = $"{upperName}@example.com";
 
         var user = User.Create(AdministratorName, passwordManager.GetHashOfPassword("SuperSecretPassword.21"));
-        user.AddUserRole(RoleName.ToNormalized(nameof(Role.Admin)));
+        user.AddRole(RoleName.ToNormalized(nameof(Role.Admin)));
         user.SetUserInfo(AdministratorName, AdministratorName, null);
         user.AddUserEmail(email, EmailType.Personal, true, true);
         

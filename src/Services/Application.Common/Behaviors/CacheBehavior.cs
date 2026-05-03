@@ -24,6 +24,8 @@ public class CacheBehavior<TRequest, TResponse>(
         if (cachePolicy.Tags is { Count: > 0 })
         {
             tags = [];
+            if (cachePolicy.BaseTag != null)
+                tags.Add(cachePolicy.BaseTag);
             foreach (var id in idsCollector.CurrentIds)
                 tags.AddRange(cachePolicy.Tags.Select(tag => $"{tag}:{id}"));
         }

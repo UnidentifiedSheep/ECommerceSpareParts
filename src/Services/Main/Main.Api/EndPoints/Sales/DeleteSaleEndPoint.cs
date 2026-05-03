@@ -13,8 +13,8 @@ public class DeleteSaleEndPoint : ICarterModule
         app.MapDelete("/sales/{saleId}",
                 async (ISender sender, IUserContext user, string saleId, CancellationToken token) =>
                 {
-                    var command = new DeleteFullSaleCommand(saleId, user.UserId);
-                    await sender.Send(command, token);
+                    /*var command = new DeleteFullSaleCommand(saleId, user.UserId);
+                    await sender.Send(command, token);*/
                     return Results.NoContent();
                 }).WithTags("Sales")
             .WithDescription("Удаление продажи")

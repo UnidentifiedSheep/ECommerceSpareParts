@@ -11,7 +11,7 @@ namespace Main.Application.Handlers.Auth.GetPermission;
 
 public record GetPermissionsQuery(Pagination Pagination) : IQuery<GetPermissionsResult>;
 
-public record GetPermissionsResult(IEnumerable<PermissionDto> Permissions);
+public record GetPermissionsResult(IReadOnlyList<PermissionDto> Permissions);
 
 public class GetPermissionsHandler(IReadRepository<Permission, string> repository)
     : IQueryHandler<GetPermissionsQuery, GetPermissionsResult>

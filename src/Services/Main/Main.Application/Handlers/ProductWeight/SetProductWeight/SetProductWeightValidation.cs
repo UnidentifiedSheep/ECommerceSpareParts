@@ -3,7 +3,7 @@ using Localization.Domain.Extensions;
 
 namespace Main.Application.Handlers.ProductWeight.SetProductWeight;
 
-public class SetProductWeightValidation : AbstractValidator<SetArticleWeightCommand>
+public class SetProductWeightValidation : AbstractValidator<SetProductWeightCommand>
 {
     public SetProductWeightValidation()
     {

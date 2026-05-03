@@ -16,7 +16,7 @@ public class UserSeed : ISeed<DContext>
             return;
 
         var systemUser = User.Create(System, "");
-        systemUser.AddUserRole(RoleName.ToNormalized(nameof(Role.System)));
+        systemUser.AddRole(nameof(Role.System));
 
         await context.Users.AddAsync(systemUser);
         await context.SaveChangesAsync();

@@ -26,7 +26,6 @@ using Main.Application.BackgroundServices;
 using Main.Application.Configs;
 using Main.Application.Consumers;
 using Main.Application.HangFireTasks;
-using Main.Cache;
 using Main.Persistence;
 using Main.Persistence.Context;
 using MassTransit;
@@ -34,7 +33,6 @@ using Microsoft.AspNetCore.HttpOverrides;
 using OpenTelemetry.Metrics;
 using RabbitMq.Extensions;
 using RabbitMq.Models;
-using Redis;
 using S3;
 using Security;
 using Global = Main.Application.Global;
@@ -114,9 +112,12 @@ builder.Services.AddMassTransit(x =>
         {
             ep.Durable = true;
 
-            ep.ConfigureConsumer<GetArticleCoefficientsConsumer>(context);
-            ep.ConfigureConsumer<GetCurrenciesConsumer>(context);
-            ep.ConfigureConsumer<GetStorageContentCostsConsumer>(context);
+            ep.ConfigureConsumer<CurrencyCreatedConsumer>(context);
+            ep.ConfigureConsumer<ProductSizesUpdatedConsumer>(context);
+            ep.ConfigureConsumer<ProductWeightUpdatedConsumer>(context);
+            ep.ConfigureConsumer<ProductUpdatedConsumer>(context);
+            ep.ConfigureConsumer<RoleUpdatedConsumer>(context);
+            ep.ConfigureConsumer<UserUpdatedConsumer>(context);
         });
     });
 });
@@ -131,11 +132,8 @@ builder.Services.AddHttpContextAccessor();
 
 builder.Services
     .AddPersistenceLayer(Environment.GetEnvironmentVariable("DB_CONNECTION_STRING")!)
-    .AddCacheLayer(Environment.GetEnvironmentVariable("REDIS_CONNECTION_STRING")!, "main")
-    .AddAppCacheLayer()
     .AddJsonSigner( Environment.GetEnvironmentVariable("SIGN_SECRET")!, Global.JsonOptions)
     .AddFullSecurityLayer()
-    .AddJwtOptions(builder.Configuration)
     .AddMailLayer()
     .AddCommonLayer()
     .AddS3(() =>
@@ -193,10 +191,6 @@ app.UseForwardedHeaders(new ForwardedHeadersOptions
 {
     ForwardedHeaders = ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto
 });
-
-Global.SetSystemId(Environment.GetEnvironmentVariable("SYSTEM_ID")!);
-Global.SetServiceUrl(Environment.GetEnvironmentVariable("S3_SERVICE_URL")!);
-Global.SetImageBucketName(Environment.GetEnvironmentVariable("S3_IMAGES_BUCKET")!);
 
 app.UseHangfireDashboard();
 

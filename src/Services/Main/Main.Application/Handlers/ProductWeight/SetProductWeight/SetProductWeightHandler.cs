@@ -10,14 +10,14 @@ namespace Main.Application.Handlers.ProductWeight.SetProductWeight;
 
 [AutoSave]
 [Transactional]
-public record SetArticleWeightCommand(int ProductId, decimal Weight, WeightUnit Unit) : ICommand;
+public record SetProductWeightCommand(int ProductId, decimal Weight, WeightUnit Unit) : ICommand;
 
 public class SetProductWeightHandler(
     IIntegrationEventScope integrationEventScope,
     IRepository<Entities.Product.ProductWeight, int> repository,
-    IUnitOfWork unitOfWork) : ICommandHandler<SetArticleWeightCommand>
+    IUnitOfWork unitOfWork) : ICommandHandler<SetProductWeightCommand>
 {
-    public async Task<Unit> Handle(SetArticleWeightCommand request, CancellationToken cancellationToken)
+    public async Task<Unit> Handle(SetProductWeightCommand request, CancellationToken cancellationToken)
     {
         var weight = await repository.GetById(request.ProductId, cancellationToken);
 

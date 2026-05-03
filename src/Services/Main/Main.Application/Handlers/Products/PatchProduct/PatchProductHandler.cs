@@ -8,20 +8,19 @@ using MediatR;
 
 namespace Main.Application.Handlers.Products.PatchProduct;
 
-[AutoSave]
-[Transactional]
-public record PatchArticleCommand(int ArticleId, PatchProductDto PatchProduct) : ICommand;
+[Transactional, AutoSave]
+public record PatchProductCommand(int ProductId, PatchProductDto PatchProduct) : ICommand;
 
 public class PatchProductHandler(
     IIntegrationEventScope integrationEventScope,
     IProductRepository productRepository)
-    : ICommandHandler<PatchArticleCommand>
+    : ICommandHandler<PatchProductCommand>
 {
-    public async Task<Unit> Handle(PatchArticleCommand request, CancellationToken cancellationToken)
+    public async Task<Unit> Handle(PatchProductCommand request, CancellationToken cancellationToken)
     {
         var patch = request.PatchProduct;
-        var product = await productRepository.GetById(request.ArticleId, cancellationToken)
-            ?? throw new ProductNotFoundException(request.ArticleId);
+        var product = await productRepository.GetById(request.ProductId, cancellationToken)
+            ?? throw new ProductNotFoundException(request.ProductId);
 
         if (patch.Description.IsSet) product.SetDescription(patch.Description);
         if (patch.CategoryId.IsSet) product.SetCategory(patch.CategoryId);

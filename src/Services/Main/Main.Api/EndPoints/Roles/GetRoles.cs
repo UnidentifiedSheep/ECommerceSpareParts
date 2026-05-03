@@ -1,25 +1,33 @@
 using Abstractions.Models;
 using Api.Common.Extensions;
+using Api.Common.Models.Requests;
 using Carter;
 using Main.Application.Dtos.Auth;
 using Main.Application.Handlers.Auth.GetRoles;
 using Mapster;
 using MediatR;
+using Microsoft.AspNetCore.Mvc;
 
 namespace Main.Api.EndPoints.Roles;
 
-public record GetRolesResponse(IEnumerable<RoleDto> Roles);
+public record GetRolesResponse(IReadOnlyList<RoleDto> Roles);
+
+public record GetRolesRequest : SortablePaginationQueryModel
+{
+    [FromQuery(Name = "searchTerm")]
+    public string? SearchTerm { get; init; }
+}
 
 public class GetRoles : ICarterModule
 {
     public void AddRoutes(IEndpointRouteBuilder app)
     {
         app.MapGet("/roles",
-                async (ISender sender, int page, int limit, string? searchTerm, CancellationToken cancellationToken) =>
+                async (ISender sender, GetRolesRequest queryParams, CancellationToken cancellationToken) =>
                 {
-                    var command = new GetRolesQuery(searchTerm, new Pagination(page, limit));
+                    var command = new GetRolesQuery(queryParams.SearchTerm, queryParams);
                     var result = await sender.Send(command, cancellationToken);
-                    var response = result.Adapt<GetRolesResponse>();
+                    var response = new GetRolesResponse(result.Roles);
                     return Results.Ok(response);
                 }).WithTags("Roles")
             .WithDescription("Получение ролей")

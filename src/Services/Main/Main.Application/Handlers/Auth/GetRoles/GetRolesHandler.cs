@@ -12,7 +12,7 @@ namespace Main.Application.Handlers.Auth.GetRoles;
 
 public record GetRolesQuery(string? SearchTerm, Pagination Pagination) : IQuery<GetRolesResult>;
 
-public record GetRolesResult(IEnumerable<RoleDto> Roles);
+public record GetRolesResult(IReadOnlyList<RoleDto> Roles);
 
 public class GetRolesHandler(IReadRepository<Role, string> repository) : IQueryHandler<GetRolesQuery, GetRolesResult>
 {

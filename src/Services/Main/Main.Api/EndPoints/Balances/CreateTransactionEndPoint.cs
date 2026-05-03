@@ -21,12 +21,10 @@ public class CreateTransactionEndPoint : ICarterModule
         app.MapPost("/balances/transaction", async (
                 ISender sender,
                 CreateTransactionRequest request,
-                CancellationToken token,
-                IUserContext user) =>
+                CancellationToken token) =>
             {
                 var command = new CreateTransactionCommand(request.SenderId, request.ReceiverId,
-                    request.Amount, request.CurrencyId, user.UserId, request.TransactionDateTime,
-                    TransactionType.Normal);
+                    request.Amount, request.CurrencyId, request.TransactionDateTime);
                 await sender.Send(command, token);
                 return Results.Ok();
             }).WithTags("Balances")

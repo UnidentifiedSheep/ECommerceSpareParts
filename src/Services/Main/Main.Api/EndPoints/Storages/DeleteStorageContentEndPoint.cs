@@ -13,11 +13,10 @@ public class DeleteStorageContentEndPoint : ICarterModule
         app.MapDelete("/storages/content/{contentId}", async (
                 ISender sender,
                 int contentId,
-                string concurrencyCode,
-                IUserContext user,
+                uint rowVersion,
                 CancellationToken cancellationToken) =>
             {
-                var command = new DeleteStorageContentCommand(contentId, concurrencyCode, user.UserId);
+                var command = new DeleteStorageContentCommand(contentId, rowVersion);
                 await sender.Send(command, cancellationToken);
                 return Results.NoContent();
             }).WithTags("Storages")

@@ -15,10 +15,10 @@ public class GetSaleContentEndPoint : ICarterModule
     {
         app.MapGet("/sales/{id}/content", async (ISender sender, string id, CancellationToken cancellationToken) =>
             {
-                var query = new GetSaleContentQuery(id);
+                /*var query = new GetSaleContentQuery(id);
                 var result = await sender.Send(query, cancellationToken);
-                var response = result.Adapt<GetSaleContentResponse>();
-                return Results.Ok(response);
+                var response = result.Adapt<GetSaleContentResponse>();*/
+                return Results.Ok();
             }).WithTags("Sales")
             .WithDescription("Получение содержания продажи")
             .WithDisplayName("Получение содержания продажи")

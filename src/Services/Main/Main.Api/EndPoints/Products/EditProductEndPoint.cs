@@ -15,7 +15,7 @@ public class EditProductEndPoint : ICarterModule
         app.MapPatch("/products/{productId}",
                 async (ISender sender, int productId, EditProductRequest request, CancellationToken token) =>
                 {
-                    var command = new PatchArticleCommand(productId, request.PatchProduct);
+                    var command = new PatchProductCommand(productId, request.PatchProduct);
                     await sender.Send(command, token);
                     return Results.NoContent();
                 }).WithTags("Articles")

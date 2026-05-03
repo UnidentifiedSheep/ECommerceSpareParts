@@ -23,6 +23,6 @@ public class Permission : AuditableEntity<Permission, string>
     
     public static string ToNormalizedPermission(PermissionCodes permission)
     {
-        return permission.ToString().ToUpperInvariant().Replace('_', '.');
+        return permission.ToString().ToNormalizedPermission();
     }
 }

@@ -2,6 +2,7 @@
 using Api.Common.Extensions;
 using Carter;
 using Enums;
+using Main.Application.Dtos.Users;
 using Main.Application.Handlers.StorageOwners.GetStorageOwners;
 using MediatR;
 
