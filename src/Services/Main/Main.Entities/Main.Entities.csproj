@@ -20,4 +20,8 @@
         <PackageReference Include="BulkValidation.SourceGeneration" Version="1.0.5"/>
     </ItemGroup>
 
+    <ItemGroup>
+        <InternalsVisibleTo Include="Main.Tests.Domain" />
+    </ItemGroup>
+
 </Project>
