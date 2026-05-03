@@ -9,7 +9,7 @@ public class ProductImageConfiguration : IEntityTypeConfiguration<ProductImage>
 {
     public void Configure(EntityTypeBuilder<ProductImage> builder)
     {
-        builder.ToTable("product_images");
+        builder.ToTable("product_images", "public");
         
         builder.HasKey(e => new { e.ProductId, e.Path})
             .HasName("product_images_pk");

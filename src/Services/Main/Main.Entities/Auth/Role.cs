@@ -38,7 +38,7 @@ public class Role : AuditableEntity<Role, string>
         if (_rolePermissions.Any(x => x.PermissionName == name.Trim()))
             return;
         
-        _rolePermissions.Add(RolePermission.Create(Name.NormalizedValue, name));
+        _rolePermissions.Add(RolePermission.Create(Name.Value, name));
     }
 
     public void RemovePermission(string name)
@@ -47,5 +47,5 @@ public class Role : AuditableEntity<Role, string>
         if (first != null) _rolePermissions.Remove(first);
     }
     
-    public override string GetId() => Name.NormalizedValue;
+    public override string GetId() => Name.Value;
 }

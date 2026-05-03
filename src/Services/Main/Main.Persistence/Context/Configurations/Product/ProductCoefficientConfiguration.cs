@@ -9,7 +9,7 @@ public class ProductCoefficientConfiguration : IEntityTypeConfiguration<ProductC
 {
     public void Configure(EntityTypeBuilder<ProductCoefficient> builder)
     {
-        builder.ToTable("product_coefficients");
+        builder.ToTable("product_coefficients", "public");
         
         builder.HasKey(e => new { e.ProductId, e.CoefficientName })
             .HasName("product_coefficients_pk");

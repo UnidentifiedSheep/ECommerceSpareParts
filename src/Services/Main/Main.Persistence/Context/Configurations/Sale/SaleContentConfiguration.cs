@@ -9,7 +9,7 @@ public class SaleContentConfiguration : IEntityTypeConfiguration<SaleContent>
 {
     public void Configure(EntityTypeBuilder<SaleContent> builder)
     {
-        builder.ToTable("sale_content");
+        builder.ToTable("sale_content", "public");
         
         builder.HasKey(e => e.Id).HasName("sale_content_pk");
 

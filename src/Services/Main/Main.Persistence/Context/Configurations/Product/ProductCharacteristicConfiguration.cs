@@ -9,7 +9,7 @@ public class ProductCharacteristicConfiguration : IEntityTypeConfiguration<Produ
 {
     public void Configure(EntityTypeBuilder<ProductCharacteristic> builder)
     {
-        builder.ToTable("product_characteristics");
+        builder.ToTable("product_characteristics", "public");
         
         builder.HasKey(e => new { e.ProductId, e.Name})
             .HasName("product_characteristics_pk");

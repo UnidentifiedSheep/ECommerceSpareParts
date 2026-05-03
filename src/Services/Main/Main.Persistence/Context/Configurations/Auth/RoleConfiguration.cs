@@ -1,5 +1,6 @@
 ﻿using Main.Entities;
 using Main.Entities.Auth;
+using Main.Entities.Auth.ValueObjects;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
@@ -11,22 +12,15 @@ public class RoleConfiguration : IEntityTypeConfiguration<Role>
     {
         builder.ToTable("roles", "auth");
 
-        builder.OwnsOne(
-            e => e.Name,
-            b =>
-            {
-                b.Property(e => e.Value)
-                    .HasColumnName("name")
-                    .HasMaxLength(24);
-                
-                b.Property(e => e.NormalizedValue)
-                    .HasColumnName("normalized_name")
-                    .HasMaxLength(24);
-            });
+        builder.HasKey(e => e.Name);
         
-        builder
-            .HasKey("normalized_name")
-            .HasName("roles_pk");
+        builder.Property(e => e.Name)
+            .HasConversion(
+                v => v.Value,
+                v => new RoleName(v)
+            )
+            .HasMaxLength(24)
+            .HasColumnName("normalized_name");
         
         builder.Property(e => e.Description)
             .HasMaxLength(255)

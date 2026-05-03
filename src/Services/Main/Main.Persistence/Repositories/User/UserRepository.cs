@@ -19,7 +19,7 @@ public class UserRepository(DContext context) : RepositoryBase<DContext, Entitie
             .Select(u => new UserRolesAndPermissions
             {
                 Roles = u.Roles
-                    .Select(r => r.RoleName)
+                    .Select(r => r.RoleName.Value)
                     .ToList(),
 
                 Permissions =
@@ -48,7 +48,7 @@ public class UserRepository(DContext context) : RepositoryBase<DContext, Entitie
         CancellationToken cancellationToken = default)
     {
         var query = Context.UserEmails
-            .Where(x => x.Email.NormalizedValue == Email.ToNormalized(email) && x.IsPrimary)
+            .Where(x => x.Email.Value == Email.ToNormalized(email) && x.IsPrimary)
             .Select(x => x.User);
 
         if (criteria != null)

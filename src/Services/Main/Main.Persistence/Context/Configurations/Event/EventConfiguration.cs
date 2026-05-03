@@ -7,7 +7,7 @@ public class EventConfiguration : IEntityTypeConfiguration<Entities.Event.Event>
 {
     public void Configure(EntityTypeBuilder<Entities.Event.Event> builder)
     {
-        builder.ToTable("events");
+        builder.ToTable("events", "public");
         
         builder.HasIndex(e => e.Discriminator)
             .HasDatabaseName("event_discriminator_idx");

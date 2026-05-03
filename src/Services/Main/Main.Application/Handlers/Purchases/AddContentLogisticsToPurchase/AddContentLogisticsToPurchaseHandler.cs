@@ -15,10 +15,6 @@ public class AddContentLogisticsToPurchaseHandler(IUnitOfWork unitOfWork)
 {
     public async Task<Unit> Handle(AddContentLogisticsToPurchaseCommand request, CancellationToken cancellationToken)
     {
-        var contentLogistics = request
-            .Contents
-            .Select(x => PurchaseContentLogistic.Create(x.PurchaseContentId, x.WeightKg, x.AreaM3, x.Price));
-        await unitOfWork.AddRangeAsync(contentLogistics, cancellationToken);
-        return Unit.Value;
+        throw new NotImplementedException();
     }
 }

@@ -148,35 +148,35 @@ public class EditFullPurchaseTests : IAsyncLifetime
         {
             new()
             {
-                ArticleId = _product.Id,
+                ProductId = _product.Id,
                 Count = 1,
                 Price = 100m,
                 CalculateLogistics = true
             },
             new()
             {
-                ArticleId = _product.Id,
+                ProductId = _product.Id,
                 Count = 3,
                 Price = 100m,
                 CalculateLogistics = true
             },
             new()
             {
-                ArticleId = _product.Id,
+                ProductId = _product.Id,
                 Count = 2,
                 Price = 100m,
                 CalculateLogistics = false
             },
             new()
             {
-                ArticleId = _product.Id,
+                ProductId = _product.Id,
                 Count = 5,
                 Price = 100m,
                 CalculateLogistics = false
             },
             new()
             {
-                ArticleId = _product.Id,
+                ProductId = _product.Id,
                 Count = 4,
                 Price = 100m,
                 CalculateLogistics = true

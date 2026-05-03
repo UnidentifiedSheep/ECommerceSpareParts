@@ -49,5 +49,5 @@ public class UserEmail : AuditableEntity<UserEmail, string>
         IsPrimary = isPrimary;
     }
     
-    public override string GetId() => Email.NormalizedValue;
+    public override string GetId() => Email.Value;
 }

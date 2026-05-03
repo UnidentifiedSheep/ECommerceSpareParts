@@ -10,7 +10,7 @@ public class PurchaseContentConfiguration : IEntityTypeConfiguration<PurchaseCon
 {
     public void Configure(EntityTypeBuilder<PurchaseContent> builder)
     {
-        builder.ToTable("purchase_content");
+        builder.ToTable("purchase_content", "public");
         
         builder.HasKey(e => e.Id).HasName("purchase_content_pk");
 

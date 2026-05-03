@@ -9,7 +9,7 @@ public class ProductEanConfiguration : IEntityTypeConfiguration<ProductEan>
 {
     public void Configure(EntityTypeBuilder<ProductEan> builder)
     {
-        builder.ToTable("product_eans");
+        builder.ToTable("product_eans", "public");
         
         builder.HasKey(e => new { e.ProductId, e.Ean })
             .HasName("product_eans_pk");

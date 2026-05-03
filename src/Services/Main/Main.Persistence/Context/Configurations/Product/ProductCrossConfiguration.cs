@@ -8,7 +8,7 @@ public class ProductCrossConfiguration : IEntityTypeConfiguration<ProductCross>
 {
     public void Configure(EntityTypeBuilder<ProductCross> builder)
     {
-        builder.ToTable("product_crosses");
+        builder.ToTable("product_crosses", "public");
 
         builder.HasKey(x => new { x.LeftProductId, x.RightProductId })
             .HasName("product_crosses_pk");

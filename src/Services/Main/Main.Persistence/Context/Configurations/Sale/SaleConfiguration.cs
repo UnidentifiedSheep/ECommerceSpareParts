@@ -8,7 +8,7 @@ public class SaleConfiguration : IEntityTypeConfiguration<Entities.Sale.Sale>
 {
     public void Configure(EntityTypeBuilder<Entities.Sale.Sale> builder)
     {
-        builder.ToTable("sale");
+        builder.ToTable("sale", "public");
         
         builder.HasKey(e => e.Id).HasName("sale_pk");
 

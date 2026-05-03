@@ -7,7 +7,7 @@ public class TransactionConfiguration : IEntityTypeConfiguration<Entities.Balanc
 {
     public void Configure(EntityTypeBuilder<Entities.Balance.Transaction> builder)
     {
-        builder.ToTable("transactions");
+        builder.ToTable("transactions", "public");
         
         builder.HasKey(e => e.Id)
             .HasName("transactions_pk");

@@ -7,7 +7,7 @@ public class CurrencyConfiguration : IEntityTypeConfiguration<Entities.Currency.
 {
     public void Configure(EntityTypeBuilder<Entities.Currency.Currency> builder)
     {
-        builder.ToTable("currency");
+        builder.ToTable("currency", "public");
         
         builder.HasKey(e => e.Id)
             .HasName("currency_pk");

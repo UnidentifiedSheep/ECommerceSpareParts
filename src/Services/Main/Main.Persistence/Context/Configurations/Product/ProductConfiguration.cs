@@ -1,4 +1,7 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using EFCore.ComplexIndexes;
+using EFCore.ComplexIndexes.PostgreSQL;
+using Main.Entities.Product.ValueObjects;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
 namespace Main.Persistence.Context.Configurations.Product;
@@ -9,43 +12,38 @@ public class ProductConfiguration : IEntityTypeConfiguration<Entities.Product.Pr
     {
         builder.HasKey(e => e.Id).HasName("products_id_pk");
 
-            builder.ToTable("products");
-
-            builder.HasIndex(["sku"], "products_sku_index")
-                .HasMethod("gin")
-                .HasOperators("gin_trgm_ops");
+            builder.ToTable("products", "public");
 
             builder.HasIndex(e => e.CategoryId, "products_category_id_index");
             
             builder.HasIndex(e => e.PairId, "products_pair_id_index")
                 .IsUnique();
 
-            builder.HasIndex(["normalized_sku", "producer_id"],
-                "products_normalized_sku_producer_id_index")
-                .IsUnique();
-
             builder.HasIndex(e => e.Popularity, "products_popularity_index");
 
             builder.HasIndex(e => e.ProducerId, "products_producer_id_index");
 
-            builder.HasIndex(e => e.Stock, "products_total_count_index");
-
-            builder.HasIndex(["normalized_sku"], "normalized_sku_index")
-                .HasMethod("gin")
-                .HasOperators("gin_trgm_ops");
+            builder.HasComplexCompositeIndex(
+                columns: x => new { x.Sku.NormalizedValue, x.ProducerId },
+                indexName: "products_normalized_sku_producer_id_index",
+                isUnique: true);
 
             builder.Property(e => e.Id)
                 .HasColumnName("id");
 
-            builder.OwnsOne(
-                e => e.Sku,
+            builder.ComplexProperty(x => x.Sku,
                 b =>
                 {
                     b.Property(e => e.Value)
                         .HasColumnName("sku");
 
                     b.Property(e => e.NormalizedValue)
-                        .HasColumnName("normalized_sku");
+                        .HasColumnName("normalized_sku")
+                        .HasComplexIndex(e =>
+                        {
+                            e.UseGin().HasName("products_sku_index")
+                                .HasOperators("gin_trgm_ops");
+                        });
                 });
 
             builder.OwnsOne(
@@ -57,21 +55,19 @@ public class ProductConfiguration : IEntityTypeConfiguration<Entities.Product.Pr
                         .HasMaxLength(255);
                 });
             
-            builder.OwnsOne(
+            builder.ComplexProperty(
                 e => e.Stock,
                 b =>
                 {
                     b.Property(e => e.Value)
-                        .HasColumnName("stock");
+                        .HasColumnName("stock")
+                        .HasComplexIndex(indexName: "products_stock_index");
                 });
 
-            builder.OwnsOne(e => e.Indicator,
-                b =>
-                {
-                    b.Property(e => e.Value)
-                        .HasMaxLength(24)
-                        .HasColumnName("indicator");
-                });
+            builder.Property(e => e.Indicator)
+                .HasConversion(e => e == null ? null : e.Value, x => new Indicator(x))
+                .HasMaxLength(24)
+                .HasColumnName("indicator");
             
             builder.Property(e => e.CategoryId)
                 .HasColumnName("category_id");
@@ -117,10 +113,6 @@ public class ProductConfiguration : IEntityTypeConfiguration<Entities.Product.Pr
             
             builder.Navigation(e => e.Images)
                 .HasField("_images")
-                .UsePropertyAccessMode(PropertyAccessMode.Field);
-            
-            builder.Navigation(e => e.Contents)
-                .HasField("_contents")
                 .UsePropertyAccessMode(PropertyAccessMode.Field);
     }
 }

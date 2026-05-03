@@ -9,7 +9,7 @@ public class CurrencyHistoryConfiguration : IEntityTypeConfiguration<CurrencyHis
 {
     public void Configure(EntityTypeBuilder<CurrencyHistory> builder)
     {
-        builder.ToTable("currency_history");
+        builder.ToTable("currency_history", "public");
         
         builder.HasKey(e => e.Id)
             .HasName("currency_history_pk");

@@ -7,9 +7,9 @@ public class StorageConfiguration : IEntityTypeConfiguration<Entities.Storage.St
 {
     public void Configure(EntityTypeBuilder<Entities.Storage.Storage> builder)
     {
+        builder.ToTable("storages", "public");
+        
         builder.HasKey(e => e.Name).HasName("storages_pk");
-
-        builder.ToTable("storages");
 
         builder.HasIndex(e => e.Description, "storages_description_index")
             .HasMethod("gin")

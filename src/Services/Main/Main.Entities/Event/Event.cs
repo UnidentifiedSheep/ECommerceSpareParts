@@ -12,7 +12,7 @@ public abstract class Event : AuditableEntity<Event, int>
     
     public string Json { get; protected set; } = null!;
     
-    private Event() {}
+    protected Event() {}
 
     protected Event(string json)
     {
@@ -36,6 +36,8 @@ public abstract class Event<T> : Event
 
     protected Event(string json) : base(json) { }
 
+    protected Event() {}
+    
     protected Event(T data)
         : base(Serialize(data))
     {

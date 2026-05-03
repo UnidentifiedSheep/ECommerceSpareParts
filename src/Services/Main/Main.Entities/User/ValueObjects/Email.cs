@@ -6,21 +6,18 @@ namespace Main.Entities.User.ValueObjects;
 public record Email
 {
     public string Value { get; } = null!;
-    public string NormalizedValue { get; } = null!;
 
     private Email() {}
 
     public Email(string value)
     {
         value = value.Trim().Against(z => !IsValid(z), "email.must.be.valid");
-        
-        Value = value;
-        NormalizedValue = ToNormalized(Value);
+        Value = ToNormalized(value);
     }
 
     public static string ToNormalized(string source)
     {
-        return source.Trim().ToUpperInvariant();
+        return source.Trim().ToLowerInvariant();
     }
     
     private static bool IsValid(string email)

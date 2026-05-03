@@ -9,7 +9,7 @@ public class UserVehicleConfiguration : IEntityTypeConfiguration<UserVehicle>
 {
     public void Configure(EntityTypeBuilder<UserVehicle> builder)
     {
-        builder.ToTable("user_vehicles");
+        builder.ToTable("user_vehicles", "public");
         
         builder.HasKey(e => e.Id)
             .HasName("user_vehicles_pk");

@@ -17,9 +17,6 @@ public class Order : AuditableEntity<Order, Guid>
     public bool SellerApproved { get; set; }
 
     public string SignedTotalPrice { get; set; } = null!;
-
-    public Guid? WhoUpdated { get; set; }
-
     public bool IsCanceled { get; set; }
 
     public override Guid GetId() => Id;

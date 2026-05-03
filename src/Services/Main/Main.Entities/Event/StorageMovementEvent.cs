@@ -4,8 +4,12 @@ using Main.Enums;
 
 namespace Main.Entities.Event;
 
-public class StorageMovementEvent(StorageMovementEventData data) : Event<StorageMovementEventData>(data)
+public class StorageMovementEvent : Event<StorageMovementEventData>
 {
+    public StorageMovementEvent(StorageMovementEventData data) : base(data) { }
+    
+    private StorageMovementEvent() : base() {}
+
     public static StorageMovementEvent Create(StorageMovementEventData data)
     {
         return new StorageMovementEvent(data);

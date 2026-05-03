@@ -1,4 +1,5 @@
 ﻿using Domain;
+using Main.Entities.Auth.ValueObjects;
 
 namespace Main.Entities.Auth;
 
@@ -6,16 +7,16 @@ public class UserRole : AuditableEntity<UserRole, (Guid, string)>
 {
     public Guid UserId { get; private set; }
 
-    public string RoleName { get; private set; } = null!;
+    public RoleName RoleName { get; private set; } = null!;
 
     public Role Role { get; private set; } = null!;
 
     private UserRole() {}
 
-    private UserRole(Guid userId, string roleName)
+    private UserRole(Guid userId, RoleName roleName)
     {
         UserId = userId;
-        RoleName = ValueObjects.RoleName.ToNormalized(roleName);
+        RoleName = roleName;
     }
 
     public static UserRole Create(Guid userId, string roleName)

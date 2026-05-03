@@ -9,7 +9,7 @@ public class UserBalanceConfiguration : IEntityTypeConfiguration<UserBalance>
 {
     public void Configure(EntityTypeBuilder<UserBalance> builder)
     {
-        builder.ToTable("user_balances");
+        builder.ToTable("user_balances", "public");
         
         builder.HasKey(e => new { e.UserId, e.CurrencyId })
             .HasName("user_balances_pk");

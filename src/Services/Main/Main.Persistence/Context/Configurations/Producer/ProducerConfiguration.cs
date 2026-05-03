@@ -1,4 +1,5 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using Main.Entities.Producer.ValueObjects;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
 namespace Main.Persistence.Context.Configurations.Producer;
@@ -7,14 +8,10 @@ public class ProducerConfiguration : IEntityTypeConfiguration<Entities.Producer.
 {
     public void Configure(EntityTypeBuilder<Entities.Producer.Producer> builder)
     {
-        builder.ToTable("producer");
+        builder.ToTable("producer", "public");
         
         builder.HasKey(e => e.Id)
             .HasName("producer_id");
-
-        builder.HasIndex("name")
-            .HasDatabaseName("producer_name_uindex")
-            .IsUnique();
 
         builder.Property(e => e.Id)
             .HasColumnName("id");
@@ -33,6 +30,10 @@ public class ProducerConfiguration : IEntityTypeConfiguration<Entities.Producer.
                 b.Property(x => x.Value)
                     .HasMaxLength(64)
                     .HasColumnName("name");
+                
+                b.HasIndex(e => e.Value)
+                    .HasDatabaseName("producer_name_uindex")
+                    .IsUnique();
             });
     }
 }

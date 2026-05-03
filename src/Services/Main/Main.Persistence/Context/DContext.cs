@@ -68,8 +68,6 @@ public partial class DContext : DbContext
 
     public virtual DbSet<OrderItem> OrderItems { get; set; }
 
-    public virtual DbSet<OrderVersion> OrderVersions { get; set; }
-
     public virtual DbSet<Permission> Permissions { get; set; }
 
     public virtual DbSet<Producer> Producers { get; set; }
@@ -135,6 +133,8 @@ public partial class DContext : DbContext
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
+        modelBuilder.HasDefaultSchema("public");
+        
         modelBuilder.AddOutboxMessageEntity();
         modelBuilder.AddOutboxStateEntity();
         modelBuilder.AddInboxStateEntity();
@@ -144,7 +144,6 @@ public partial class DContext : DbContext
         modelBuilder.Entity<InboxState>().ToTable("InboxState", "msg");
 
         modelBuilder
-            .HasPostgresEnum("car_types", new[] { "PassengerCar", "CommercialVehicle", "Motorbike" })
             .HasPostgresExtension("dblink")
             .HasPostgresExtension("pg_trgm")
             .HasPostgresExtension("pgcrypto");
@@ -153,8 +152,6 @@ public partial class DContext : DbContext
             .ApplyConfiguration(new SettingConfiguration());
 
         modelBuilder.AddFieldsForAuditableEntities();
-
-        modelBuilder.HasSequence<int>("storage_movement_id_seq");
 
         modelBuilder.AllDateTimesToUtc()
             .AllEnumsToString();

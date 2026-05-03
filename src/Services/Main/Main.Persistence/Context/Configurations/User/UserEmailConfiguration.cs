@@ -1,5 +1,8 @@
-﻿using Main.Entities;
+﻿using EFCore.ComplexIndexes;
+using EFCore.ComplexIndexes.PostgreSQL;
+using Main.Entities;
 using Main.Entities.User;
+using Main.Entities.User.ValueObjects;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
@@ -11,18 +14,9 @@ public class UserEmailConfiguration : IEntityTypeConfiguration<UserEmail>
     {
         builder.ToTable("user_emails", "auth");
         
-        builder.HasKey("normalized_email")
-            .HasName("user_emails_pk");
-
-        builder.HasIndex("normalized_email")
-            .HasDatabaseName("user_emails_normalized_email_index")
-            .HasMethod("gin")
-            .HasOperators("gin_trgm_ops");
-
-        builder.HasIndex("normalized_email")
-            .HasDatabaseName("user_emails_normalized_email_uindex")
-            .IsUnique();
-
+        builder.HasKey(e => e.Email)
+            .HasName("user_emails_primary_key");
+        
         builder.HasIndex(e => e.UserId)
             .HasDatabaseName("user_emails_user_id_index");
 
@@ -43,18 +37,14 @@ public class UserEmailConfiguration : IEntityTypeConfiguration<UserEmail>
         
         builder.Property(e => e.IsPrimary).HasColumnName("is_primary");
 
-        builder.OwnsOne(
-            b => b.Email,
-            b =>
-            {
-                b.Property(e => e.NormalizedValue)
-                    .HasMaxLength(255)
-                    .HasColumnName("normalized_email");
-                
-                b.Property(e => e.Value)
-                    .HasMaxLength(255)
-                    .HasColumnName("email");
-            });
+        builder.Property(e => e.Email)
+            .HasConversion(e => e.Value, e => new Email(e))
+            .HasMaxLength(255)
+            .HasColumnName("normalized_email");
+
+        builder.HasIndex(e => e.Email, "user_emails_normalized_email_index")
+            .HasMethod("gin")
+            .HasOperators("gin_trgm_ops");
         
         builder.Property(e => e.UserId).HasColumnName("user_id");
 

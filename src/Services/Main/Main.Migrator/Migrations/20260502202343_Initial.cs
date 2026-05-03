@@ -15,22 +15,22 @@ namespace Main.Migrator.Migrations
         protected override void Up(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.EnsureSchema(
+                name: "public");
+
+            migrationBuilder.EnsureSchema(
                 name: "msg");
 
             migrationBuilder.EnsureSchema(
                 name: "auth");
 
             migrationBuilder.AlterDatabase()
-                .Annotation("Npgsql:Enum:car_types", "PassengerCar,CommercialVehicle,Motorbike")
                 .Annotation("Npgsql:PostgresExtension:dblink", ",,")
                 .Annotation("Npgsql:PostgresExtension:pg_trgm", ",,")
                 .Annotation("Npgsql:PostgresExtension:pgcrypto", ",,");
 
-            migrationBuilder.CreateSequence<int>(
-                name: "storage_movement_id_seq");
-
             migrationBuilder.CreateTable(
                 name: "categories",
+                schema: "public",
                 columns: table => new
                 {
                     id = table.Column<int>(type: "integer", nullable: false)
@@ -44,10 +44,10 @@ namespace Main.Migrator.Migrations
 
             migrationBuilder.CreateTable(
                 name: "coefficients",
+                schema: "public",
                 columns: table => new
                 {
                     name = table.Column<string>(type: "character varying(256)", maxLength: 256, nullable: false),
-                    order = table.Column<int>(type: "integer", nullable: false),
                     value = table.Column<decimal>(type: "numeric", nullable: false),
                     type = table.Column<string>(type: "character varying(56)", maxLength: 56, nullable: false)
                 },
@@ -58,6 +58,7 @@ namespace Main.Migrator.Migrations
 
             migrationBuilder.CreateTable(
                 name: "currency",
+                schema: "public",
                 columns: table => new
                 {
                     id = table.Column<int>(type: "integer", nullable: false)
@@ -73,15 +74,22 @@ namespace Main.Migrator.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "default_settings",
+                name: "events",
+                schema: "public",
                 columns: table => new
                 {
-                    key = table.Column<string>(type: "text", nullable: false),
-                    value = table.Column<string>(type: "text", nullable: false)
+                    id = table.Column<int>(type: "integer", nullable: false)
+                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
+                    discriminator = table.Column<string>(type: "character varying(21)", maxLength: 21, nullable: false),
+                    json = table.Column<string>(type: "jsonb", nullable: false),
+                    created_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
+                    updated_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
+                    who_created = table.Column<Guid>(type: "uuid", nullable: false),
+                    who_updated = table.Column<Guid>(type: "uuid", nullable: true)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("default_settings_pk", x => x.key);
+                    table.PrimaryKey("events_id_pk", x => x.id);
                 });
 
             migrationBuilder.CreateTable(
@@ -133,7 +141,9 @@ namespace Main.Migrator.Migrations
                     name = table.Column<string>(type: "text", nullable: false),
                     description = table.Column<string>(type: "text", nullable: true),
                     created_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
-                    updated_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: false)
+                    updated_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
+                    who_created = table.Column<Guid>(type: "uuid", nullable: false),
+                    who_updated = table.Column<Guid>(type: "uuid", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -142,14 +152,18 @@ namespace Main.Migrator.Migrations
 
             migrationBuilder.CreateTable(
                 name: "producer",
+                schema: "public",
                 columns: table => new
                 {
                     id = table.Column<int>(type: "integer", nullable: false)
                         .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
                     name = table.Column<string>(type: "character varying(64)", maxLength: 64, nullable: false),
-                    is_oe = table.Column<bool>(type: "boolean", nullable: false),
                     image_path = table.Column<string>(type: "character varying(255)", maxLength: 255, nullable: true),
-                    description = table.Column<string>(type: "text", nullable: true)
+                    description = table.Column<string>(type: "character varying(500)", maxLength: 500, nullable: true),
+                    created_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
+                    updated_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
+                    who_created = table.Column<Guid>(type: "uuid", nullable: false),
+                    who_updated = table.Column<Guid>(type: "uuid", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -162,24 +176,47 @@ namespace Main.Migrator.Migrations
                 columns: table => new
                 {
                     normalized_name = table.Column<string>(type: "character varying(24)", maxLength: 24, nullable: false),
-                    name = table.Column<string>(type: "character varying(24)", maxLength: 24, nullable: false),
                     description = table.Column<string>(type: "character varying(255)", maxLength: 255, nullable: true),
                     created_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
-                    updated_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: false)
+                    updated_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
+                    who_created = table.Column<Guid>(type: "uuid", nullable: false),
+                    who_updated = table.Column<Guid>(type: "uuid", nullable: true)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("roles_pk", x => x.normalized_name);
+                    table.PrimaryKey("PK_roles", x => x.normalized_name);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "settings",
+                schema: "public",
+                columns: table => new
+                {
+                    key = table.Column<string>(type: "text", nullable: false),
+                    json = table.Column<string>(type: "jsonb", nullable: false),
+                    created_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
+                    updated_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
+                    who_created = table.Column<Guid>(type: "uuid", nullable: false),
+                    who_updated = table.Column<Guid>(type: "uuid", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("settings_pk", x => x.key);
                 });
 
             migrationBuilder.CreateTable(
                 name: "storages",
+                schema: "public",
                 columns: table => new
                 {
                     name = table.Column<string>(type: "character varying(128)", maxLength: 128, nullable: false),
                     description = table.Column<string>(type: "character varying(256)", maxLength: 256, nullable: true),
                     location = table.Column<string>(type: "character varying(256)", maxLength: 256, nullable: true),
-                    type = table.Column<string>(type: "character varying(24)", maxLength: 24, nullable: false)
+                    type = table.Column<string>(type: "character varying(24)", maxLength: 24, nullable: false),
+                    created_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
+                    updated_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
+                    who_created = table.Column<Guid>(type: "uuid", nullable: false),
+                    who_updated = table.Column<Guid>(type: "uuid", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -192,15 +229,17 @@ namespace Main.Migrator.Migrations
                 columns: table => new
                 {
                     id = table.Column<Guid>(type: "uuid", nullable: false, defaultValueSql: "gen_random_uuid()"),
-                    user_name = table.Column<string>(type: "character varying(36)", maxLength: 36, nullable: false),
-                    normalized_user_name = table.Column<string>(type: "character varying(36)", maxLength: 36, nullable: false),
                     password_hash = table.Column<string>(type: "text", nullable: false),
                     two_factor_enabled = table.Column<bool>(type: "boolean", nullable: false),
                     lockout_end = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
                     access_failed_count = table.Column<int>(type: "integer", nullable: false),
                     last_login_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
+                    normalized_user_name = table.Column<string>(type: "character varying(36)", maxLength: 36, nullable: false),
+                    user_name = table.Column<string>(type: "character varying(36)", maxLength: 36, nullable: false),
                     created_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
-                    updated_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: false)
+                    updated_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
+                    who_created = table.Column<Guid>(type: "uuid", nullable: false),
+                    who_updated = table.Column<Guid>(type: "uuid", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -208,7 +247,33 @@ namespace Main.Migrator.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "product_coefficients",
+                schema: "public",
+                columns: table => new
+                {
+                    product_id = table.Column<int>(type: "integer", nullable: false),
+                    coefficient_name = table.Column<string>(type: "character varying(50)", maxLength: 50, nullable: false),
+                    valid_till = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
+                    created_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
+                    updated_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
+                    who_created = table.Column<Guid>(type: "uuid", nullable: false),
+                    who_updated = table.Column<Guid>(type: "uuid", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("product_coefficients_pk", x => new { x.product_id, x.coefficient_name });
+                    table.ForeignKey(
+                        name: "article_coefficients_coefficients_name_fk",
+                        column: x => x.coefficient_name,
+                        principalSchema: "public",
+                        principalTable: "coefficients",
+                        principalColumn: "name",
+                        onDelete: ReferentialAction.Restrict);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "currency_history",
+                schema: "public",
                 columns: table => new
                 {
                     id = table.Column<int>(type: "integer", nullable: false)
@@ -224,6 +289,7 @@ namespace Main.Migrator.Migrations
                     table.ForeignKey(
                         name: "currency_history_currency_id_fk",
                         column: x => x.currency_id,
+                        principalSchema: "public",
                         principalTable: "currency",
                         principalColumn: "id",
                         onDelete: ReferentialAction.Cascade);
@@ -231,6 +297,7 @@ namespace Main.Migrator.Migrations
 
             migrationBuilder.CreateTable(
                 name: "currency_to_usd",
+                schema: "public",
                 columns: table => new
                 {
                     currency_id = table.Column<int>(type: "integer", nullable: false),
@@ -242,6 +309,7 @@ namespace Main.Migrator.Migrations
                     table.ForeignKey(
                         name: "currency_to_usd_currency_id_fk",
                         column: x => x.currency_id,
+                        principalSchema: "public",
                         principalTable: "currency",
                         principalColumn: "id",
                         onDelete: ReferentialAction.Cascade);
@@ -294,18 +362,20 @@ namespace Main.Migrator.Migrations
 
             migrationBuilder.CreateTable(
                 name: "producers_other_names",
+                schema: "public",
                 columns: table => new
                 {
                     producer_id = table.Column<int>(type: "integer", nullable: false),
-                    producer_other_name = table.Column<string>(type: "character varying(64)", maxLength: 64, nullable: false),
+                    other_name = table.Column<string>(type: "character varying(64)", maxLength: 64, nullable: false),
                     where_used = table.Column<string>(type: "character varying(64)", maxLength: 64, nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("producers_other_names_pk", x => new { x.producer_id, x.producer_other_name, x.where_used });
+                    table.PrimaryKey("producers_other_names_pk", x => new { x.producer_id, x.other_name, x.where_used });
                     table.ForeignKey(
                         name: "producers_other_names_producer_id_fk",
                         column: x => x.producer_id,
+                        principalSchema: "public",
                         principalTable: "producer",
                         principalColumn: "id",
                         onDelete: ReferentialAction.Cascade);
@@ -313,23 +383,26 @@ namespace Main.Migrator.Migrations
 
             migrationBuilder.CreateTable(
                 name: "products",
+                schema: "public",
                 columns: table => new
                 {
                     id = table.Column<int>(type: "integer", nullable: false)
                         .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
                     PairId = table.Column<int>(type: "integer", nullable: true),
-                    sku = table.Column<string>(type: "character varying(128)", maxLength: 128, nullable: false),
-                    normalized_sku = table.Column<string>(type: "character varying(128)", maxLength: 128, nullable: false),
-                    article_name = table.Column<string>(type: "character varying(255)", maxLength: 255, nullable: false),
+                    name = table.Column<string>(type: "character varying(255)", maxLength: 255, nullable: false),
                     description = table.Column<string>(type: "character varying(255)", maxLength: 255, nullable: true),
                     packing_unit = table.Column<int>(type: "integer", nullable: true),
                     producer_id = table.Column<int>(type: "integer", nullable: false),
-                    stock = table.Column<int>(type: "integer", nullable: false),
                     indicator = table.Column<string>(type: "character varying(24)", maxLength: 24, nullable: true),
                     category_id = table.Column<int>(type: "integer", nullable: true),
                     popularity = table.Column<long>(type: "bigint", nullable: false, defaultValue: 1L),
+                    normalized_sku = table.Column<string>(type: "text", nullable: false),
+                    sku = table.Column<string>(type: "text", nullable: false),
+                    stock = table.Column<int>(type: "integer", nullable: false),
                     created_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
-                    updated_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: false)
+                    updated_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
+                    who_created = table.Column<Guid>(type: "uuid", nullable: false),
+                    who_updated = table.Column<Guid>(type: "uuid", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -337,18 +410,21 @@ namespace Main.Migrator.Migrations
                     table.ForeignKey(
                         name: "FK_products_products_PairId",
                         column: x => x.PairId,
+                        principalSchema: "public",
                         principalTable: "products",
                         principalColumn: "id",
                         onDelete: ReferentialAction.SetNull);
                     table.ForeignKey(
                         name: "producer_id_fk",
                         column: x => x.producer_id,
+                        principalSchema: "public",
                         principalTable: "producer",
                         principalColumn: "id",
                         onDelete: ReferentialAction.Restrict);
                     table.ForeignKey(
                         name: "products_categories_id_fk",
                         column: x => x.category_id,
+                        principalSchema: "public",
                         principalTable: "categories",
                         principalColumn: "id",
                         onDelete: ReferentialAction.Restrict);
@@ -383,6 +459,7 @@ namespace Main.Migrator.Migrations
 
             migrationBuilder.CreateTable(
                 name: "orders",
+                schema: "public",
                 columns: table => new
                 {
                     id = table.Column<Guid>(type: "uuid", nullable: false, defaultValueSql: "gen_random_uuid()"),
@@ -392,10 +469,11 @@ namespace Main.Migrator.Migrations
                     buyer_approved = table.Column<bool>(type: "boolean", nullable: false),
                     seller_approved = table.Column<bool>(type: "boolean", nullable: false),
                     signed_total_price = table.Column<string>(type: "text", nullable: false),
-                    who_updated = table.Column<Guid>(type: "uuid", nullable: true),
                     is_canceled = table.Column<bool>(type: "boolean", nullable: false),
                     created_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
-                    updated_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: false)
+                    updated_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
+                    who_created = table.Column<Guid>(type: "uuid", nullable: false),
+                    who_updated = table.Column<Guid>(type: "uuid", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -403,6 +481,7 @@ namespace Main.Migrator.Migrations
                     table.ForeignKey(
                         name: "orders_currency_id_fk",
                         column: x => x.currency_id,
+                        principalSchema: "public",
                         principalTable: "currency",
                         principalColumn: "id",
                         onDelete: ReferentialAction.Restrict);
@@ -413,35 +492,33 @@ namespace Main.Migrator.Migrations
                         principalTable: "users",
                         principalColumn: "id",
                         onDelete: ReferentialAction.Cascade);
-                    table.ForeignKey(
-                        name: "orders_users_id_fk_2",
-                        column: x => x.who_updated,
-                        principalSchema: "auth",
-                        principalTable: "users",
-                        principalColumn: "id",
-                        onDelete: ReferentialAction.Restrict);
                 });
 
             migrationBuilder.CreateTable(
                 name: "storage_owners",
+                schema: "public",
                 columns: table => new
                 {
                     storage_name = table.Column<string>(type: "character varying(128)", maxLength: 128, nullable: false),
-                    owner_id = table.Column<Guid>(type: "uuid", nullable: false),
-                    created_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: false, defaultValueSql: "now()")
+                    user_id = table.Column<Guid>(type: "uuid", nullable: false),
+                    created_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
+                    updated_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
+                    who_created = table.Column<Guid>(type: "uuid", nullable: false),
+                    who_updated = table.Column<Guid>(type: "uuid", nullable: true)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("storage_owners_pk", x => new { x.storage_name, x.owner_id });
+                    table.PrimaryKey("storage_owners_pk", x => new { x.storage_name, x.user_id });
                     table.ForeignKey(
                         name: "storage_owners_storages_name_fk",
                         column: x => x.storage_name,
+                        principalSchema: "public",
                         principalTable: "storages",
                         principalColumn: "name",
                         onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
                         name: "storage_owners_users_id_fk",
-                        column: x => x.owner_id,
+                        column: x => x.user_id,
                         principalSchema: "auth",
                         principalTable: "users",
                         principalColumn: "id",
@@ -450,6 +527,7 @@ namespace Main.Migrator.Migrations
 
             migrationBuilder.CreateTable(
                 name: "storage_routes",
+                schema: "public",
                 columns: table => new
                 {
                     id = table.Column<Guid>(type: "uuid", nullable: false, defaultValueSql: "gen_random_uuid()"),
@@ -464,10 +542,12 @@ namespace Main.Migrator.Migrations
                     price_per_order = table.Column<decimal>(type: "numeric", nullable: false),
                     is_active = table.Column<bool>(type: "boolean", nullable: false, defaultValue: true),
                     currency_id = table.Column<int>(type: "integer", nullable: false),
-                    minimum_price = table.Column<decimal>(type: "numeric", nullable: true),
+                    minimum_price = table.Column<decimal>(type: "numeric", nullable: false),
                     carrier_id = table.Column<Guid>(type: "uuid", nullable: true),
                     created_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
-                    updated_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: false)
+                    updated_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
+                    who_created = table.Column<Guid>(type: "uuid", nullable: false),
+                    who_updated = table.Column<Guid>(type: "uuid", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -475,18 +555,21 @@ namespace Main.Migrator.Migrations
                     table.ForeignKey(
                         name: "storage_routes_currency_id_fk",
                         column: x => x.currency_id,
+                        principalSchema: "public",
                         principalTable: "currency",
                         principalColumn: "id",
                         onDelete: ReferentialAction.Restrict);
                     table.ForeignKey(
                         name: "storage_routes_storages_name_fk",
                         column: x => x.from_storage_name,
+                        principalSchema: "public",
                         principalTable: "storages",
                         principalColumn: "name",
                         onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
                         name: "storage_routes_storages_name_fk_2",
                         column: x => x.to_storage_name,
+                        principalSchema: "public",
                         principalTable: "storages",
                         principalColumn: "name",
                         onDelete: ReferentialAction.Cascade);
@@ -501,22 +584,24 @@ namespace Main.Migrator.Migrations
 
             migrationBuilder.CreateTable(
                 name: "transactions",
+                schema: "public",
                 columns: table => new
                 {
                     id = table.Column<Guid>(type: "uuid", nullable: false, defaultValueSql: "uuidv7()"),
                     currency_id = table.Column<int>(type: "integer", nullable: false),
                     sender_id = table.Column<Guid>(type: "uuid", nullable: false),
                     receiver_id = table.Column<Guid>(type: "uuid", nullable: false),
-                    transaction_sum = table.Column<decimal>(type: "numeric", nullable: false),
-                    creation_date = table.Column<DateTime>(type: "timestamp with time zone", nullable: false, defaultValueSql: "now()"),
-                    status = table.Column<string>(type: "character varying(28)", maxLength: 28, nullable: false),
-                    who_made_user_id = table.Column<Guid>(type: "uuid", nullable: false),
+                    amount = table.Column<decimal>(type: "numeric", nullable: false),
+                    type = table.Column<string>(type: "character varying(28)", maxLength: 28, nullable: false),
+                    status = table.Column<string>(type: "text", nullable: false),
                     transaction_datetime = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
-                    receiver_balance_after_transaction = table.Column<decimal>(type: "numeric", nullable: false),
-                    sender_balance_after_transaction = table.Column<decimal>(type: "numeric", nullable: false),
-                    is_deleted = table.Column<bool>(type: "boolean", nullable: false),
-                    deleted_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
-                    deleted_by = table.Column<Guid>(type: "uuid", nullable: true)
+                    reversed_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
+                    reversed_by = table.Column<Guid>(type: "uuid", nullable: true),
+                    xmin = table.Column<uint>(type: "xid", rowVersion: true, nullable: false),
+                    created_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
+                    updated_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
+                    who_created = table.Column<Guid>(type: "uuid", nullable: false),
+                    who_updated = table.Column<Guid>(type: "uuid", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -524,6 +609,7 @@ namespace Main.Migrator.Migrations
                     table.ForeignKey(
                         name: "transactions_currency_id_fk",
                         column: x => x.currency_id,
+                        principalSchema: "public",
                         principalTable: "currency",
                         principalColumn: "id",
                         onDelete: ReferentialAction.Restrict);
@@ -542,15 +628,8 @@ namespace Main.Migrator.Migrations
                         principalColumn: "id",
                         onDelete: ReferentialAction.Restrict);
                     table.ForeignKey(
-                        name: "transactions_users_id_fk_3",
-                        column: x => x.who_made_user_id,
-                        principalSchema: "auth",
-                        principalTable: "users",
-                        principalColumn: "id",
-                        onDelete: ReferentialAction.Restrict);
-                    table.ForeignKey(
                         name: "transactions_users_id_fk_4",
-                        column: x => x.deleted_by,
+                        column: x => x.reversed_by,
                         principalSchema: "auth",
                         principalTable: "users",
                         principalColumn: "id",
@@ -559,21 +638,25 @@ namespace Main.Migrator.Migrations
 
             migrationBuilder.CreateTable(
                 name: "user_balances",
+                schema: "public",
                 columns: table => new
                 {
-                    id = table.Column<int>(type: "integer", nullable: false)
-                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
                     user_id = table.Column<Guid>(type: "uuid", nullable: false),
                     currency_id = table.Column<int>(type: "integer", nullable: false),
                     balance = table.Column<decimal>(type: "numeric", nullable: false),
-                    xmin = table.Column<uint>(type: "xid", rowVersion: true, nullable: false)
+                    xmin = table.Column<uint>(type: "xid", rowVersion: true, nullable: false),
+                    created_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
+                    updated_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
+                    who_created = table.Column<Guid>(type: "uuid", nullable: false),
+                    who_updated = table.Column<Guid>(type: "uuid", nullable: true)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("user_balances_pk", x => x.id);
+                    table.PrimaryKey("user_balances_pk", x => new { x.user_id, x.currency_id });
                     table.ForeignKey(
                         name: "user_balances_currency_id_fk",
                         column: x => x.currency_id,
+                        principalSchema: "public",
                         principalTable: "currency",
                         principalColumn: "id",
                         onDelete: ReferentialAction.Restrict);
@@ -588,10 +671,11 @@ namespace Main.Migrator.Migrations
 
             migrationBuilder.CreateTable(
                 name: "user_discounts",
+                schema: "public",
                 columns: table => new
                 {
                     user_id = table.Column<Guid>(type: "uuid", nullable: false),
-                    discount = table.Column<decimal>(type: "numeric", nullable: true)
+                    discount = table.Column<decimal>(type: "numeric", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -612,17 +696,18 @@ namespace Main.Migrator.Migrations
                 {
                     normalized_email = table.Column<string>(type: "character varying(255)", maxLength: 255, nullable: false),
                     user_id = table.Column<Guid>(type: "uuid", nullable: false),
-                    email = table.Column<string>(type: "character varying(255)", maxLength: 255, nullable: false),
                     confirmed = table.Column<bool>(type: "boolean", nullable: false),
                     email_type = table.Column<string>(type: "character varying(50)", maxLength: 50, nullable: false),
                     is_primary = table.Column<bool>(type: "boolean", nullable: false),
                     confirmed_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
                     created_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
-                    updated_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: false)
+                    updated_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
+                    who_created = table.Column<Guid>(type: "uuid", nullable: false),
+                    who_updated = table.Column<Guid>(type: "uuid", nullable: true)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("user_emails_pk", x => x.normalized_email);
+                    table.PrimaryKey("user_emails_primary_key", x => x.normalized_email);
                     table.ForeignKey(
                         name: "user_emails_users_id_fk",
                         column: x => x.user_id,
@@ -640,7 +725,6 @@ namespace Main.Migrator.Migrations
                     user_id = table.Column<Guid>(type: "uuid", nullable: false),
                     name = table.Column<string>(type: "text", nullable: false),
                     surname = table.Column<string>(type: "text", nullable: false),
-                    is_supplier = table.Column<bool>(type: "boolean", nullable: false),
                     description = table.Column<string>(type: "text", nullable: true),
                     search_column = table.Column<string>(type: "text", nullable: false)
                 },
@@ -664,7 +748,9 @@ namespace Main.Migrator.Migrations
                     user_id = table.Column<Guid>(type: "uuid", nullable: false),
                     permission = table.Column<string>(type: "text", nullable: false),
                     created_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
-                    updated_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: false)
+                    updated_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
+                    who_created = table.Column<Guid>(type: "uuid", nullable: false),
+                    who_updated = table.Column<Guid>(type: "uuid", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -698,7 +784,9 @@ namespace Main.Migrator.Migrations
                     phone_type = table.Column<string>(type: "character varying(32)", maxLength: 32, nullable: true),
                     confirmed_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
                     created_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
-                    updated_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: false)
+                    updated_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
+                    who_created = table.Column<Guid>(type: "uuid", nullable: false),
+                    who_updated = table.Column<Guid>(type: "uuid", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -719,7 +807,10 @@ namespace Main.Migrator.Migrations
                 {
                     user_id = table.Column<Guid>(type: "uuid", nullable: false),
                     role_name = table.Column<string>(type: "character varying(24)", nullable: false),
-                    AssignedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false)
+                    created_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
+                    updated_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
+                    who_created = table.Column<Guid>(type: "uuid", nullable: false),
+                    who_updated = table.Column<Guid>(type: "uuid", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -742,6 +833,7 @@ namespace Main.Migrator.Migrations
 
             migrationBuilder.CreateTable(
                 name: "user_search_history",
+                schema: "public",
                 columns: table => new
                 {
                     id = table.Column<int>(type: "integer", nullable: false)
@@ -780,7 +872,9 @@ namespace Main.Migrator.Migrations
                     ip_address = table.Column<IPAddress>(type: "inet", nullable: true),
                     user_agent = table.Column<string>(type: "text", nullable: true),
                     created_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
-                    updated_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: false)
+                    updated_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
+                    who_created = table.Column<Guid>(type: "uuid", nullable: false),
+                    who_updated = table.Column<Guid>(type: "uuid", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -796,6 +890,7 @@ namespace Main.Migrator.Migrations
 
             migrationBuilder.CreateTable(
                 name: "user_vehicles",
+                schema: "public",
                 columns: table => new
                 {
                     id = table.Column<Guid>(type: "uuid", nullable: false, defaultValueSql: "gen_random_uuid()"),
@@ -809,7 +904,9 @@ namespace Main.Migrator.Migrations
                     production_year = table.Column<int>(type: "integer", nullable: true),
                     comment = table.Column<string>(type: "text", nullable: true),
                     created_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
-                    updated_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: false)
+                    updated_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
+                    who_created = table.Column<Guid>(type: "uuid", nullable: false),
+                    who_updated = table.Column<Guid>(type: "uuid", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -825,13 +922,16 @@ namespace Main.Migrator.Migrations
 
             migrationBuilder.CreateTable(
                 name: "cart",
+                schema: "public",
                 columns: table => new
                 {
                     user_id = table.Column<Guid>(type: "uuid", nullable: false),
                     product_id = table.Column<int>(type: "integer", nullable: false),
                     count = table.Column<int>(type: "integer", nullable: false),
                     created_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
-                    updated_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: false)
+                    updated_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
+                    who_created = table.Column<Guid>(type: "uuid", nullable: false),
+                    who_updated = table.Column<Guid>(type: "uuid", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -839,6 +939,7 @@ namespace Main.Migrator.Migrations
                     table.ForeignKey(
                         name: "cart_product_id_fk",
                         column: x => x.product_id,
+                        principalSchema: "public",
                         principalTable: "products",
                         principalColumn: "id",
                         onDelete: ReferentialAction.Cascade);
@@ -853,6 +954,7 @@ namespace Main.Migrator.Migrations
 
             migrationBuilder.CreateTable(
                 name: "product_characteristics",
+                schema: "public",
                 columns: table => new
                 {
                     product_id = table.Column<int>(type: "integer", nullable: false),
@@ -865,40 +967,15 @@ namespace Main.Migrator.Migrations
                     table.ForeignKey(
                         name: "product_characteristics_product_id_fk",
                         column: x => x.product_id,
+                        principalSchema: "public",
                         principalTable: "products",
                         principalColumn: "id",
                         onDelete: ReferentialAction.Cascade);
-                });
-
-            migrationBuilder.CreateTable(
-                name: "product_coefficients",
-                columns: table => new
-                {
-                    product_id = table.Column<int>(type: "integer", nullable: false),
-                    coefficient_name = table.Column<string>(type: "character varying(50)", maxLength: 50, nullable: false),
-                    valid_till = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
-                    created_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
-                    updated_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("product_coefficients_pk", x => new { x.product_id, x.coefficient_name });
-                    table.ForeignKey(
-                        name: "FK_product_coefficients_products_product_id",
-                        column: x => x.product_id,
-                        principalTable: "products",
-                        principalColumn: "id",
-                        onDelete: ReferentialAction.Cascade);
-                    table.ForeignKey(
-                        name: "article_coefficients_coefficients_name_fk",
-                        column: x => x.coefficient_name,
-                        principalTable: "coefficients",
-                        principalColumn: "name",
-                        onDelete: ReferentialAction.Restrict);
                 });
 
             migrationBuilder.CreateTable(
                 name: "product_contents",
+                schema: "public",
                 columns: table => new
                 {
                     parent_product_id = table.Column<int>(type: "integer", nullable: false),
@@ -911,12 +988,41 @@ namespace Main.Migrator.Migrations
                     table.ForeignKey(
                         name: "product_contents_child_fk",
                         column: x => x.child_product_id,
+                        principalSchema: "public",
                         principalTable: "products",
                         principalColumn: "id",
                         onDelete: ReferentialAction.Restrict);
                     table.ForeignKey(
                         name: "product_contents_parent_fk",
                         column: x => x.parent_product_id,
+                        principalSchema: "public",
+                        principalTable: "products",
+                        principalColumn: "id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "product_crosses",
+                schema: "public",
+                columns: table => new
+                {
+                    left_product_id = table.Column<int>(type: "integer", nullable: false),
+                    right_product_id = table.Column<int>(type: "integer", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("product_crosses_pk", x => new { x.left_product_id, x.right_product_id });
+                    table.ForeignKey(
+                        name: "FK_product_crosses_products_left_product_id",
+                        column: x => x.left_product_id,
+                        principalSchema: "public",
+                        principalTable: "products",
+                        principalColumn: "id",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_product_crosses_products_right_product_id",
+                        column: x => x.right_product_id,
+                        principalSchema: "public",
                         principalTable: "products",
                         principalColumn: "id",
                         onDelete: ReferentialAction.Cascade);
@@ -924,6 +1030,7 @@ namespace Main.Migrator.Migrations
 
             migrationBuilder.CreateTable(
                 name: "product_eans",
+                schema: "public",
                 columns: table => new
                 {
                     product_id = table.Column<int>(type: "integer", nullable: false),
@@ -935,6 +1042,7 @@ namespace Main.Migrator.Migrations
                     table.ForeignKey(
                         name: "product_eans_product_id_fk",
                         column: x => x.product_id,
+                        principalSchema: "public",
                         principalTable: "products",
                         principalColumn: "id",
                         onDelete: ReferentialAction.Cascade);
@@ -942,6 +1050,7 @@ namespace Main.Migrator.Migrations
 
             migrationBuilder.CreateTable(
                 name: "product_images",
+                schema: "public",
                 columns: table => new
                 {
                     product_id = table.Column<int>(type: "integer", nullable: false),
@@ -954,6 +1063,7 @@ namespace Main.Migrator.Migrations
                     table.ForeignKey(
                         name: "product_images_product_id_fk",
                         column: x => x.product_id,
+                        principalSchema: "public",
                         principalTable: "products",
                         principalColumn: "id",
                         onDelete: ReferentialAction.Cascade);
@@ -961,6 +1071,7 @@ namespace Main.Migrator.Migrations
 
             migrationBuilder.CreateTable(
                 name: "product_sizes",
+                schema: "public",
                 columns: table => new
                 {
                     product_id = table.Column<int>(type: "integer", nullable: false),
@@ -976,6 +1087,7 @@ namespace Main.Migrator.Migrations
                     table.ForeignKey(
                         name: "product_sizes_products_id_fk",
                         column: x => x.product_id,
+                        principalSchema: "public",
                         principalTable: "products",
                         principalColumn: "id",
                         onDelete: ReferentialAction.Cascade);
@@ -983,6 +1095,7 @@ namespace Main.Migrator.Migrations
 
             migrationBuilder.CreateTable(
                 name: "product_weights",
+                schema: "public",
                 columns: table => new
                 {
                     product_id = table.Column<int>(type: "integer", nullable: false),
@@ -995,6 +1108,7 @@ namespace Main.Migrator.Migrations
                     table.ForeignKey(
                         name: "product_weight_products_id_fk",
                         column: x => x.product_id,
+                        principalSchema: "public",
                         principalTable: "products",
                         principalColumn: "id",
                         onDelete: ReferentialAction.Cascade);
@@ -1002,6 +1116,7 @@ namespace Main.Migrator.Migrations
 
             migrationBuilder.CreateTable(
                 name: "storage_content",
+                schema: "public",
                 columns: table => new
                 {
                     id = table.Column<int>(type: "integer", nullable: false)
@@ -1011,10 +1126,12 @@ namespace Main.Migrator.Migrations
                     count = table.Column<int>(type: "integer", nullable: false),
                     buy_price = table.Column<decimal>(type: "numeric", nullable: false),
                     currency_id = table.Column<int>(type: "integer", nullable: false),
-                    buy_price_in_usd = table.Column<decimal>(type: "numeric", nullable: false),
+                    xmin = table.Column<uint>(type: "xid", rowVersion: true, nullable: false),
                     purchase_datetime = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
                     created_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
-                    updated_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: false)
+                    updated_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
+                    who_created = table.Column<Guid>(type: "uuid", nullable: false),
+                    who_updated = table.Column<Guid>(type: "uuid", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -1022,18 +1139,21 @@ namespace Main.Migrator.Migrations
                     table.ForeignKey(
                         name: "storage_content_currency_id_fk",
                         column: x => x.currency_id,
+                        principalSchema: "public",
                         principalTable: "currency",
                         principalColumn: "id",
                         onDelete: ReferentialAction.Restrict);
                     table.ForeignKey(
                         name: "storage_content_products_id_fk",
                         column: x => x.product_id,
+                        principalSchema: "public",
                         principalTable: "products",
                         principalColumn: "id",
                         onDelete: ReferentialAction.Restrict);
                     table.ForeignKey(
                         name: "storage_content_storages_name_fk",
                         column: x => x.storage_name,
+                        principalSchema: "public",
                         principalTable: "storages",
                         principalColumn: "name",
                         onDelete: ReferentialAction.Restrict);
@@ -1041,35 +1161,39 @@ namespace Main.Migrator.Migrations
 
             migrationBuilder.CreateTable(
                 name: "storage_content_reservations",
+                schema: "public",
                 columns: table => new
                 {
                     id = table.Column<int>(type: "integer", nullable: false)
                         .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
                     user_id = table.Column<Guid>(type: "uuid", nullable: false),
                     product_id = table.Column<int>(type: "integer", nullable: false),
-                    initial_count = table.Column<int>(type: "integer", nullable: false),
+                    reserved_count = table.Column<int>(type: "integer", nullable: false),
                     current_count = table.Column<int>(type: "integer", nullable: false),
-                    given_price = table.Column<decimal>(type: "numeric", nullable: true),
-                    given_currency_id = table.Column<int>(type: "integer", nullable: true),
+                    proposed_price = table.Column<decimal>(type: "numeric", nullable: true),
+                    proposed_currency_id = table.Column<int>(type: "integer", nullable: true),
                     is_done = table.Column<bool>(type: "boolean", nullable: false),
-                    comment = table.Column<string>(type: "text", nullable: true),
-                    who_created = table.Column<Guid>(type: "uuid", nullable: false),
-                    who_updated = table.Column<Guid>(type: "uuid", nullable: true),
+                    is_locked = table.Column<bool>(type: "boolean", nullable: false),
+                    comment = table.Column<string>(type: "character varying(500)", maxLength: 500, nullable: true),
                     created_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
-                    updated_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: false)
+                    updated_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
+                    who_created = table.Column<Guid>(type: "uuid", nullable: false),
+                    who_updated = table.Column<Guid>(type: "uuid", nullable: true)
                 },
                 constraints: table =>
                 {
                     table.PrimaryKey("storage_content_reservations_pk", x => x.id);
                     table.ForeignKey(
                         name: "storage_content_reservations_currency_id_fk",
-                        column: x => x.given_currency_id,
+                        column: x => x.proposed_currency_id,
+                        principalSchema: "public",
                         principalTable: "currency",
                         principalColumn: "id",
                         onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
                         name: "storage_content_reservations_products_id_fk",
                         column: x => x.product_id,
+                        principalSchema: "public",
                         principalTable: "products",
                         principalColumn: "id",
                         onDelete: ReferentialAction.Restrict);
@@ -1097,52 +1221,8 @@ namespace Main.Migrator.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "storage_movement",
-                columns: table => new
-                {
-                    id = table.Column<int>(type: "integer", nullable: false)
-                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
-                    storage_name = table.Column<string>(type: "character varying(128)", maxLength: 128, nullable: false),
-                    product_id = table.Column<int>(type: "integer", nullable: false),
-                    currency_id = table.Column<int>(type: "integer", nullable: false),
-                    price = table.Column<decimal>(type: "numeric", nullable: false),
-                    count = table.Column<int>(type: "integer", nullable: false),
-                    action_type = table.Column<string>(type: "character varying(24)", maxLength: 24, nullable: false),
-                    created_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: false, defaultValueSql: "now()"),
-                    who_moved = table.Column<Guid>(type: "uuid", nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("storage_movement_pk", x => x.id);
-                    table.ForeignKey(
-                        name: "storage_movement_currency_id_fk",
-                        column: x => x.currency_id,
-                        principalTable: "currency",
-                        principalColumn: "id",
-                        onDelete: ReferentialAction.Restrict);
-                    table.ForeignKey(
-                        name: "storage_movement_products_id_fk",
-                        column: x => x.product_id,
-                        principalTable: "products",
-                        principalColumn: "id",
-                        onDelete: ReferentialAction.Restrict);
-                    table.ForeignKey(
-                        name: "storage_movement_storages_name_fk",
-                        column: x => x.storage_name,
-                        principalTable: "storages",
-                        principalColumn: "name",
-                        onDelete: ReferentialAction.Restrict);
-                    table.ForeignKey(
-                        name: "storage_movement_users_id_fk",
-                        column: x => x.who_moved,
-                        principalSchema: "auth",
-                        principalTable: "users",
-                        principalColumn: "id",
-                        onDelete: ReferentialAction.Restrict);
-                });
-
-            migrationBuilder.CreateTable(
                 name: "order_items",
+                schema: "public",
                 columns: table => new
                 {
                     id = table.Column<Guid>(type: "uuid", nullable: false, defaultValueSql: "gen_random_uuid()"),
@@ -1158,71 +1238,36 @@ namespace Main.Migrator.Migrations
                     table.ForeignKey(
                         name: "order_items_articles_id_fk",
                         column: x => x.article_id,
+                        principalSchema: "public",
                         principalTable: "products",
                         principalColumn: "id",
                         onDelete: ReferentialAction.Restrict);
                     table.ForeignKey(
                         name: "order_items_orders_id_fk",
                         column: x => x.order_id,
+                        principalSchema: "public",
                         principalTable: "orders",
                         principalColumn: "id",
                         onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateTable(
-                name: "order_versions",
-                columns: table => new
-                {
-                    id = table.Column<Guid>(type: "uuid", nullable: false, defaultValueSql: "uuidv7()"),
-                    order_id = table.Column<Guid>(type: "uuid", nullable: false),
-                    who_updated = table.Column<Guid>(type: "uuid", nullable: true),
-                    currency_id = table.Column<int>(type: "integer", nullable: false),
-                    status = table.Column<string>(type: "text", nullable: false),
-                    updated_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
-                    buyer_approved = table.Column<bool>(type: "boolean", nullable: false),
-                    seller_approved = table.Column<bool>(type: "boolean", nullable: false),
-                    signed_total_price = table.Column<string>(type: "text", nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("order_versions_pk", x => x.id);
-                    table.ForeignKey(
-                        name: "order_versions_currency_id_fk",
-                        column: x => x.currency_id,
-                        principalTable: "currency",
-                        principalColumn: "id",
-                        onDelete: ReferentialAction.Restrict);
-                    table.ForeignKey(
-                        name: "order_versions_orders_id_fk",
-                        column: x => x.order_id,
-                        principalTable: "orders",
-                        principalColumn: "id",
-                        onDelete: ReferentialAction.Restrict);
-                    table.ForeignKey(
-                        name: "order_versions_users_id_fk",
-                        column: x => x.who_updated,
-                        principalSchema: "auth",
-                        principalTable: "users",
-                        principalColumn: "id",
-                        onDelete: ReferentialAction.Restrict);
-                });
-
-            migrationBuilder.CreateTable(
                 name: "purchase",
+                schema: "public",
                 columns: table => new
                 {
                     id = table.Column<Guid>(type: "uuid", nullable: false, defaultValueSql: "gen_random_uuid()"),
-                    created_user_id = table.Column<Guid>(type: "uuid", nullable: false),
                     supplier_id = table.Column<Guid>(type: "uuid", nullable: false),
-                    comment = table.Column<string>(type: "character varying(256)", maxLength: 256, nullable: true),
-                    purchase_datetime = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
                     currency_id = table.Column<int>(type: "integer", nullable: false),
                     transaction_id = table.Column<Guid>(type: "uuid", nullable: false),
-                    updated_user_id = table.Column<Guid>(type: "uuid", nullable: true),
                     storage = table.Column<string>(type: "character varying(128)", maxLength: 128, nullable: false),
+                    purchase_datetime = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
+                    comment = table.Column<string>(type: "character varying(256)", maxLength: 256, nullable: true),
                     state = table.Column<string>(type: "text", nullable: false),
                     created_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
-                    updated_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: false)
+                    updated_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
+                    who_created = table.Column<Guid>(type: "uuid", nullable: false),
+                    who_updated = table.Column<Guid>(type: "uuid", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -1230,26 +1275,22 @@ namespace Main.Migrator.Migrations
                     table.ForeignKey(
                         name: "purchase_currency_id_fk",
                         column: x => x.currency_id,
+                        principalSchema: "public",
                         principalTable: "currency",
                         principalColumn: "id",
                         onDelete: ReferentialAction.Restrict);
                     table.ForeignKey(
                         name: "purchase_storages_name_fk",
                         column: x => x.storage,
+                        principalSchema: "public",
                         principalTable: "storages",
                         principalColumn: "name",
                         onDelete: ReferentialAction.Restrict);
                     table.ForeignKey(
                         name: "purchase_transactions_id_fk",
                         column: x => x.transaction_id,
+                        principalSchema: "public",
                         principalTable: "transactions",
-                        principalColumn: "id",
-                        onDelete: ReferentialAction.Restrict);
-                    table.ForeignKey(
-                        name: "purchase_users_id_fk",
-                        column: x => x.created_user_id,
-                        principalSchema: "auth",
-                        principalTable: "users",
                         principalColumn: "id",
                         onDelete: ReferentialAction.Restrict);
                     table.ForeignKey(
@@ -1259,31 +1300,25 @@ namespace Main.Migrator.Migrations
                         principalTable: "users",
                         principalColumn: "id",
                         onDelete: ReferentialAction.Restrict);
-                    table.ForeignKey(
-                        name: "purchase_users_id_fk_3",
-                        column: x => x.updated_user_id,
-                        principalSchema: "auth",
-                        principalTable: "users",
-                        principalColumn: "id",
-                        onDelete: ReferentialAction.Restrict);
                 });
 
             migrationBuilder.CreateTable(
                 name: "sale",
+                schema: "public",
                 columns: table => new
                 {
                     id = table.Column<Guid>(type: "uuid", nullable: false, defaultValueSql: "gen_random_uuid()"),
-                    created_user_id = table.Column<Guid>(type: "uuid", nullable: false),
                     buyer_id = table.Column<Guid>(type: "uuid", nullable: false),
+                    transaction_id = table.Column<Guid>(type: "uuid", nullable: false),
+                    currency_id = table.Column<int>(type: "integer", nullable: false),
+                    storage_name = table.Column<string>(type: "character varying(128)", maxLength: 128, nullable: false),
                     comment = table.Column<string>(type: "character varying(256)", maxLength: 256, nullable: true),
                     sale_datetime = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
-                    currency_id = table.Column<int>(type: "integer", nullable: false),
-                    transaction_id = table.Column<Guid>(type: "uuid", nullable: false),
-                    updated_user_id = table.Column<Guid>(type: "uuid", nullable: true),
-                    main_storage_name = table.Column<string>(type: "character varying(128)", maxLength: 128, nullable: false),
                     state = table.Column<string>(type: "text", nullable: false),
                     created_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
-                    updated_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: false)
+                    updated_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
+                    who_created = table.Column<Guid>(type: "uuid", nullable: false),
+                    who_updated = table.Column<Guid>(type: "uuid", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -1291,18 +1326,21 @@ namespace Main.Migrator.Migrations
                     table.ForeignKey(
                         name: "sale_currency_id_fk",
                         column: x => x.currency_id,
+                        principalSchema: "public",
                         principalTable: "currency",
                         principalColumn: "id",
                         onDelete: ReferentialAction.Restrict);
                     table.ForeignKey(
                         name: "sale_storages_name_fk",
-                        column: x => x.main_storage_name,
+                        column: x => x.storage_name,
+                        principalSchema: "public",
                         principalTable: "storages",
                         principalColumn: "name",
                         onDelete: ReferentialAction.Restrict);
                     table.ForeignKey(
                         name: "sale_transactions_id_fk",
                         column: x => x.transaction_id,
+                        principalSchema: "public",
                         principalTable: "transactions",
                         principalColumn: "id",
                         onDelete: ReferentialAction.Restrict);
@@ -1313,81 +1351,22 @@ namespace Main.Migrator.Migrations
                         principalTable: "users",
                         principalColumn: "id",
                         onDelete: ReferentialAction.Restrict);
-                    table.ForeignKey(
-                        name: "sale_users_id_fk_2",
-                        column: x => x.created_user_id,
-                        principalSchema: "auth",
-                        principalTable: "users",
-                        principalColumn: "id",
-                        onDelete: ReferentialAction.Restrict);
-                    table.ForeignKey(
-                        name: "sale_users_id_fk_3",
-                        column: x => x.updated_user_id,
-                        principalSchema: "auth",
-                        principalTable: "users",
-                        principalColumn: "id",
-                        onDelete: ReferentialAction.Restrict);
-                });
-
-            migrationBuilder.CreateTable(
-                name: "transaction_versions",
-                columns: table => new
-                {
-                    id = table.Column<string>(type: "text", nullable: false, defaultValueSql: "gen_random_uuid()"),
-                    transaction_id = table.Column<Guid>(type: "uuid", nullable: false),
-                    currency_id = table.Column<int>(type: "integer", nullable: false),
-                    sender_id = table.Column<Guid>(name: "sender_id ", type: "uuid", nullable: false),
-                    receiver_id = table.Column<Guid>(type: "uuid", nullable: false),
-                    transaction_sum = table.Column<decimal>(type: "numeric", nullable: false),
-                    status = table.Column<string>(type: "character varying(28)", maxLength: 28, nullable: false),
-                    transaction_datetime = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
-                    version = table.Column<int>(type: "integer", nullable: false),
-                    version_created_datetime = table.Column<DateTime>(type: "timestamp with time zone", nullable: false, defaultValueSql: "now()")
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("transaction_versions_pk", x => x.id);
-                    table.ForeignKey(
-                        name: "transaction_versions_currency_id_fk",
-                        column: x => x.currency_id,
-                        principalTable: "currency",
-                        principalColumn: "id",
-                        onDelete: ReferentialAction.Restrict);
-                    table.ForeignKey(
-                        name: "transaction_versions_transactions_id_fk",
-                        column: x => x.transaction_id,
-                        principalTable: "transactions",
-                        principalColumn: "id",
-                        onDelete: ReferentialAction.Restrict);
-                    table.ForeignKey(
-                        name: "transaction_versions_users_id_fk",
-                        column: x => x.receiver_id,
-                        principalSchema: "auth",
-                        principalTable: "users",
-                        principalColumn: "id",
-                        onDelete: ReferentialAction.Restrict);
-                    table.ForeignKey(
-                        name: "transaction_versions_users_id_fk_2",
-                        column: x => x.sender_id,
-                        principalSchema: "auth",
-                        principalTable: "users",
-                        principalColumn: "id",
-                        onDelete: ReferentialAction.Restrict);
                 });
 
             migrationBuilder.CreateTable(
                 name: "purchase_content",
+                schema: "public",
                 columns: table => new
                 {
                     id = table.Column<int>(type: "integer", nullable: false)
                         .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
                     purchase_id = table.Column<Guid>(type: "uuid", nullable: false),
                     product_id = table.Column<int>(type: "integer", nullable: false),
+                    storage_content_id = table.Column<int>(type: "integer", nullable: true),
                     count = table.Column<int>(type: "integer", nullable: false),
                     price = table.Column<decimal>(type: "numeric", nullable: false),
                     total_sum = table.Column<decimal>(type: "numeric", nullable: false),
-                    comment = table.Column<string>(type: "character varying(256)", maxLength: 256, nullable: true),
-                    storage_content_id = table.Column<int>(type: "integer", nullable: true)
+                    comment = table.Column<string>(type: "character varying(256)", maxLength: 256, nullable: true)
                 },
                 constraints: table =>
                 {
@@ -1395,18 +1374,21 @@ namespace Main.Migrator.Migrations
                     table.ForeignKey(
                         name: "purchase_content_products_id_fk",
                         column: x => x.product_id,
+                        principalSchema: "public",
                         principalTable: "products",
                         principalColumn: "id",
                         onDelete: ReferentialAction.Restrict);
                     table.ForeignKey(
                         name: "purchase_content_purchase_id_fk",
                         column: x => x.purchase_id,
+                        principalSchema: "public",
                         principalTable: "purchase",
                         principalColumn: "id",
                         onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
                         name: "purchase_content_storage_content_id_fk",
                         column: x => x.storage_content_id,
+                        principalSchema: "public",
                         principalTable: "storage_content",
                         principalColumn: "id",
                         onDelete: ReferentialAction.SetNull);
@@ -1414,6 +1396,7 @@ namespace Main.Migrator.Migrations
 
             migrationBuilder.CreateTable(
                 name: "purchase_logistics",
+                schema: "public",
                 columns: table => new
                 {
                     purchase_id = table.Column<Guid>(type: "uuid", nullable: false),
@@ -1434,24 +1417,28 @@ namespace Main.Migrator.Migrations
                     table.ForeignKey(
                         name: "purchase_logistics_currency_id_fk",
                         column: x => x.currency_id,
+                        principalSchema: "public",
                         principalTable: "currency",
                         principalColumn: "id",
                         onDelete: ReferentialAction.Restrict);
                     table.ForeignKey(
                         name: "purchase_logistics_purchase_id_fk",
                         column: x => x.purchase_id,
+                        principalSchema: "public",
                         principalTable: "purchase",
                         principalColumn: "id",
                         onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
                         name: "purchase_logistics_storage_routes_id_fk",
                         column: x => x.route_id,
+                        principalSchema: "public",
                         principalTable: "storage_routes",
                         principalColumn: "id",
                         onDelete: ReferentialAction.Restrict);
                     table.ForeignKey(
                         name: "purchase_logistics_transactions_id_fk",
                         column: x => x.transaction_id,
+                        principalSchema: "public",
                         principalTable: "transactions",
                         principalColumn: "id",
                         onDelete: ReferentialAction.Restrict);
@@ -1459,6 +1446,7 @@ namespace Main.Migrator.Migrations
 
             migrationBuilder.CreateTable(
                 name: "sale_content",
+                schema: "public",
                 columns: table => new
                 {
                     id = table.Column<int>(type: "integer", nullable: false)
@@ -1477,12 +1465,14 @@ namespace Main.Migrator.Migrations
                     table.ForeignKey(
                         name: "sale_content_products_id_fk",
                         column: x => x.product_id,
+                        principalSchema: "public",
                         principalTable: "products",
                         principalColumn: "id",
                         onDelete: ReferentialAction.Restrict);
                     table.ForeignKey(
                         name: "sale_content_sale_id_fk",
                         column: x => x.sale_id,
+                        principalSchema: "public",
                         principalTable: "sale",
                         principalColumn: "id",
                         onDelete: ReferentialAction.Cascade);
@@ -1490,6 +1480,7 @@ namespace Main.Migrator.Migrations
 
             migrationBuilder.CreateTable(
                 name: "purchase_content_logistics",
+                schema: "public",
                 columns: table => new
                 {
                     purchase_content_id = table.Column<int>(type: "integer", nullable: false),
@@ -1503,6 +1494,7 @@ namespace Main.Migrator.Migrations
                     table.ForeignKey(
                         name: "purchase_content_logistics_purchase_content_id_fk",
                         column: x => x.purchase_content_id,
+                        principalSchema: "public",
                         principalTable: "purchase_content",
                         principalColumn: "id",
                         onDelete: ReferentialAction.Cascade);
@@ -1510,6 +1502,7 @@ namespace Main.Migrator.Migrations
 
             migrationBuilder.CreateTable(
                 name: "sale_content_details",
+                schema: "public",
                 columns: table => new
                 {
                     id = table.Column<int>(type: "integer", nullable: false)
@@ -1528,24 +1521,28 @@ namespace Main.Migrator.Migrations
                     table.ForeignKey(
                         name: "sale_content_details_currency_id_fk",
                         column: x => x.currency_id,
+                        principalSchema: "public",
                         principalTable: "currency",
                         principalColumn: "id",
                         onDelete: ReferentialAction.Restrict);
                     table.ForeignKey(
                         name: "sale_content_details_sale_content_id_fk",
                         column: x => x.sale_content_id,
+                        principalSchema: "public",
                         principalTable: "sale_content",
                         principalColumn: "id",
                         onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
                         name: "sale_content_details_storage_content_id_fk",
                         column: x => x.storage_content_id,
+                        principalSchema: "public",
                         principalTable: "storage_content",
                         principalColumn: "id",
                         onDelete: ReferentialAction.SetNull);
                     table.ForeignKey(
                         name: "sale_content_details_storages_name_fk",
                         column: x => x.storage,
+                        principalSchema: "public",
                         principalTable: "storages",
                         principalColumn: "name",
                         onDelete: ReferentialAction.Restrict);
@@ -1553,57 +1550,97 @@ namespace Main.Migrator.Migrations
 
             migrationBuilder.CreateIndex(
                 name: "cart_product_id_idx",
+                schema: "public",
                 table: "cart",
                 column: "product_id");
 
             migrationBuilder.CreateIndex(
+                name: "main.entities.cart.cart_who_created_idx",
+                schema: "public",
+                table: "cart",
+                column: "who_created");
+
+            migrationBuilder.CreateIndex(
+                name: "main.entities.cart.cart_who_updated_idx",
+                schema: "public",
+                table: "cart",
+                column: "who_updated");
+
+            migrationBuilder.CreateIndex(
                 name: "categories_name_index",
+                schema: "public",
                 table: "categories",
                 column: "name");
 
             migrationBuilder.CreateIndex(
                 name: "currency_code_uindex",
+                schema: "public",
                 table: "currency",
                 column: "code",
                 unique: true);
 
             migrationBuilder.CreateIndex(
                 name: "currency_currency_sign_uindex",
+                schema: "public",
                 table: "currency",
                 column: "currency_sign",
                 unique: true);
 
             migrationBuilder.CreateIndex(
                 name: "currency_name_uindex",
+                schema: "public",
                 table: "currency",
                 column: "name",
                 unique: true);
 
             migrationBuilder.CreateIndex(
                 name: "currency_short_name_uindex",
+                schema: "public",
                 table: "currency",
                 column: "short_name",
                 unique: true);
 
             migrationBuilder.CreateIndex(
                 name: "IX_currency_history_currency_id",
+                schema: "public",
                 table: "currency_history",
                 column: "currency_id");
 
             migrationBuilder.CreateIndex(
                 name: "IX_currency_history_datetime",
+                schema: "public",
                 table: "currency_history",
                 column: "datetime");
 
             migrationBuilder.CreateIndex(
                 name: "IX_currency_history_new_value",
+                schema: "public",
                 table: "currency_history",
                 column: "new_value");
 
             migrationBuilder.CreateIndex(
                 name: "IX_currency_history_prev_value",
+                schema: "public",
                 table: "currency_history",
                 column: "prev_value");
+
+            migrationBuilder.CreateIndex(
+                name: "event_discriminator_idx",
+                schema: "public",
+                table: "events",
+                column: "discriminator");
+
+            migrationBuilder.CreateIndex(
+                name: "main.entities.event.storagemovementevent_who_created_idx",
+                schema: "public",
+                table: "events",
+                column: "who_created");
+
+            migrationBuilder.CreateIndex(
+                name: "main.entities.event.storagemovementevent_who_updated_idx",
+                schema: "public",
+                table: "events",
+                column: "who_updated");
 
             migrationBuilder.CreateIndex(
                 name: "IX_InboxState_Delivered",
@@ -1613,61 +1650,61 @@ namespace Main.Migrator.Migrations
 
             migrationBuilder.CreateIndex(
                 name: "order_items_order_id_index",
+                schema: "public",
                 table: "order_items",
                 column: "order_id");
 
             migrationBuilder.CreateIndex(
                 name: "order_items_product_id_index",
+                schema: "public",
                 table: "order_items",
                 column: "article_id");
 
             migrationBuilder.CreateIndex(
-                name: "IX_order_versions_currency_id",
-                table: "order_versions",
-                column: "currency_id");
+                name: "main.entities.order.order_who_created_idx",
+                schema: "public",
+                table: "orders",
+                column: "who_created");
 
             migrationBuilder.CreateIndex(
-                name: "IX_order_versions_who_updated",
-                table: "order_versions",
-                column: "who_updated");
-
-            migrationBuilder.CreateIndex(
-                name: "order_versions_order_id_id_index",
-                table: "order_versions",
-                columns: new[] { "order_id", "id" });
-
-            migrationBuilder.CreateIndex(
-                name: "IX_orders_who_updated",
+                name: "main.entities.order.order_who_updated_idx",
+                schema: "public",
                 table: "orders",
                 column: "who_updated");
 
             migrationBuilder.CreateIndex(
                 name: "orders_buyer_approved_index",
+                schema: "public",
                 table: "orders",
                 column: "buyer_approved");
 
             migrationBuilder.CreateIndex(
                 name: "orders_currency_id_index",
+                schema: "public",
                 table: "orders",
                 column: "currency_id");
 
             migrationBuilder.CreateIndex(
                 name: "orders_is_canceled_index",
+                schema: "public",
                 table: "orders",
                 column: "is_canceled");
 
             migrationBuilder.CreateIndex(
                 name: "orders_seller_approved_index",
+                schema: "public",
                 table: "orders",
                 column: "seller_approved");
 
             migrationBuilder.CreateIndex(
                 name: "orders_status_index",
+                schema: "public",
                 table: "orders",
                 column: "status");
 
             migrationBuilder.CreateIndex(
                 name: "orders_user_id_is_canceled_index",
+                schema: "public",
                 table: "orders",
                 columns: new[] { "user_id", "is_canceled" });
 
@@ -1704,25 +1741,53 @@ namespace Main.Migrator.Migrations
                 column: "Created");
 
             migrationBuilder.CreateIndex(
+                name: "main.entities.auth.permission_who_created_idx",
+                schema: "auth",
+                table: "permissions",
+                column: "who_created");
+
+            migrationBuilder.CreateIndex(
+                name: "main.entities.auth.permission_who_updated_idx",
+                schema: "auth",
+                table: "permissions",
+                column: "who_updated");
+
+            migrationBuilder.CreateIndex(
+                name: "main.entities.producer.producer_who_created_idx",
+                schema: "public",
+                table: "producer",
+                column: "who_created");
+
+            migrationBuilder.CreateIndex(
+                name: "main.entities.producer.producer_who_updated_idx",
+                schema: "public",
+                table: "producer",
+                column: "who_updated");
+
+            migrationBuilder.CreateIndex(
                 name: "producer_name_uindex",
+                schema: "public",
                 table: "producer",
                 column: "name",
                 unique: true);
 
             migrationBuilder.CreateIndex(
                 name: "producers_other_names_producer_id_index",
+                schema: "public",
                 table: "producers_other_names",
                 column: "producer_id");
 
             migrationBuilder.CreateIndex(
                 name: "producers_other_names_producer_other_name_index",
+                schema: "public",
                 table: "producers_other_names",
-                column: "producer_other_name")
+                column: "other_name")
                 .Annotation("Npgsql:IndexMethod", "gin")
                 .Annotation("Npgsql:IndexOperators", new[] { "gin_trgm_ops" });
 
             migrationBuilder.CreateIndex(
                 name: "producers_other_names_where_used_index",
+                schema: "public",
                 table: "producers_other_names",
                 column: "where_used")
                 .Annotation("Npgsql:IndexMethod", "gin")
@@ -1730,119 +1795,142 @@ namespace Main.Migrator.Migrations
 
             migrationBuilder.CreateIndex(
                 name: "product_characteristics_id_index",
+                schema: "public",
                 table: "product_characteristics",
                 column: "product_id");
 
             migrationBuilder.CreateIndex(
                 name: "product_characteristics_name_value_index",
+                schema: "public",
                 table: "product_characteristics",
                 columns: new[] { "name", "value" });
 
             migrationBuilder.CreateIndex(
                 name: "IX_product_coefficients_coefficient_name",
+                schema: "public",
                 table: "product_coefficients",
                 column: "coefficient_name");
 
             migrationBuilder.CreateIndex(
+                name: "main.entities.product.productcoefficient_who_created_idx",
+                schema: "public",
+                table: "product_coefficients",
+                column: "who_created");
+
+            migrationBuilder.CreateIndex(
+                name: "main.entities.product.productcoefficient_who_updated_idx",
+                schema: "public",
+                table: "product_coefficients",
+                column: "who_updated");
+
+            migrationBuilder.CreateIndex(
                 name: "product_contents_child_id_idx",
+                schema: "public",
                 table: "product_contents",
                 column: "child_product_id");
 
             migrationBuilder.CreateIndex(
-                name: "normalized_sku_index",
+                name: "product_crosses_right_id_idx",
+                schema: "public",
+                table: "product_crosses",
+                column: "right_product_id");
+
+            migrationBuilder.CreateIndex(
+                name: "main.entities.product.product_who_created_idx",
+                schema: "public",
                 table: "products",
-                column: "normalized_sku")
-                .Annotation("Npgsql:IndexMethod", "gin")
-                .Annotation("Npgsql:IndexOperators", new[] { "gin_trgm_ops" });
+                column: "who_created");
+
+            migrationBuilder.CreateIndex(
+                name: "main.entities.product.product_who_updated_idx",
+                schema: "public",
+                table: "products",
+                column: "who_updated");
 
             migrationBuilder.CreateIndex(
                 name: "products_category_id_index",
+                schema: "public",
                 table: "products",
                 column: "category_id");
 
             migrationBuilder.CreateIndex(
-                name: "products_normalized_sku_producer_id_index",
-                table: "products",
-                columns: new[] { "normalized_sku", "producer_id" },
-                unique: true);
-
-            migrationBuilder.CreateIndex(
                 name: "products_pair_id_index",
+                schema: "public",
                 table: "products",
                 column: "PairId",
                 unique: true);
 
             migrationBuilder.CreateIndex(
                 name: "products_popularity_index",
+                schema: "public",
                 table: "products",
                 column: "popularity");
 
             migrationBuilder.CreateIndex(
                 name: "products_producer_id_index",
+                schema: "public",
                 table: "products",
                 column: "producer_id");
 
             migrationBuilder.CreateIndex(
-                name: "products_sku_index",
-                table: "products",
-                column: "sku")
-                .Annotation("Npgsql:IndexMethod", "gin")
-                .Annotation("Npgsql:IndexOperators", new[] { "gin_trgm_ops" });
+                name: "main.entities.purchase.purchase_who_created_idx",
+                schema: "public",
+                table: "purchase",
+                column: "who_created");
 
             migrationBuilder.CreateIndex(
-                name: "products_total_count_index",
-                table: "products",
-                column: "stock");
+                name: "main.entities.purchase.purchase_who_updated_idx",
+                schema: "public",
+                table: "purchase",
+                column: "who_updated");
 
             migrationBuilder.CreateIndex(
                 name: "purchase_comment_index",
+                schema: "public",
                 table: "purchase",
                 column: "comment")
                 .Annotation("Npgsql:IndexMethod", "gin")
                 .Annotation("Npgsql:IndexOperators", new[] { "gin_trgm_ops" });
 
             migrationBuilder.CreateIndex(
-                name: "purchase_created_user_id_index",
-                table: "purchase",
-                column: "created_user_id");
-
-            migrationBuilder.CreateIndex(
                 name: "purchase_currency_id_index",
+                schema: "public",
                 table: "purchase",
                 column: "currency_id");
 
             migrationBuilder.CreateIndex(
                 name: "purchase_purchase_datetime_index",
+                schema: "public",
                 table: "purchase",
                 column: "purchase_datetime");
 
             migrationBuilder.CreateIndex(
                 name: "purchase_state_index",
+                schema: "public",
                 table: "purchase",
                 column: "state");
 
             migrationBuilder.CreateIndex(
                 name: "purchase_storage_index",
+                schema: "public",
                 table: "purchase",
                 column: "storage");
 
             migrationBuilder.CreateIndex(
                 name: "purchase_supplier_id_index",
+                schema: "public",
                 table: "purchase",
                 column: "supplier_id");
 
             migrationBuilder.CreateIndex(
                 name: "purchase_transaction_id_index",
+                schema: "public",
                 table: "purchase",
                 column: "transaction_id");
 
             migrationBuilder.CreateIndex(
-                name: "purchase_updated_user_id_index",
-                table: "purchase",
-                column: "updated_user_id");
-
-            migrationBuilder.CreateIndex(
                 name: "purchase_content_comment_index",
+                schema: "public",
                 table: "purchase_content",
                 column: "comment")
                 .Annotation("Npgsql:IndexMethod", "gin")
@@ -1850,32 +1938,38 @@ namespace Main.Migrator.Migrations
 
             migrationBuilder.CreateIndex(
                 name: "purchase_content_product_id_index",
+                schema: "public",
                 table: "purchase_content",
                 column: "product_id");
 
             migrationBuilder.CreateIndex(
                 name: "purchase_content_purchase_id_index",
+                schema: "public",
                 table: "purchase_content",
                 column: "purchase_id");
 
             migrationBuilder.CreateIndex(
                 name: "purchase_content_storage_content_id_uindex",
+                schema: "public",
                 table: "purchase_content",
                 column: "storage_content_id",
                 unique: true);
 
             migrationBuilder.CreateIndex(
                 name: "IX_purchase_logistics_currency_id",
+                schema: "public",
                 table: "purchase_logistics",
                 column: "currency_id");
 
             migrationBuilder.CreateIndex(
                 name: "IX_purchase_logistics_route_id",
+                schema: "public",
                 table: "purchase_logistics",
                 column: "route_id");
 
             migrationBuilder.CreateIndex(
                 name: "purchase_logistics_transaction_id_uindex",
+                schema: "public",
                 table: "purchase_logistics",
                 column: "transaction_id",
                 unique: true);
@@ -1887,54 +1981,76 @@ namespace Main.Migrator.Migrations
                 column: "permission");
 
             migrationBuilder.CreateIndex(
+                name: "main.entities.auth.role_who_created_idx",
+                schema: "auth",
+                table: "roles",
+                column: "who_created");
+
+            migrationBuilder.CreateIndex(
+                name: "main.entities.auth.role_who_updated_idx",
+                schema: "auth",
+                table: "roles",
+                column: "who_updated");
+
+            migrationBuilder.CreateIndex(
+                name: "main.entities.sale.sale_who_created_idx",
+                schema: "public",
+                table: "sale",
+                column: "who_created");
+
+            migrationBuilder.CreateIndex(
+                name: "main.entities.sale.sale_who_updated_idx",
+                schema: "public",
+                table: "sale",
+                column: "who_updated");
+
+            migrationBuilder.CreateIndex(
                 name: "sale_buyer_id_index",
+                schema: "public",
                 table: "sale",
                 column: "buyer_id");
 
             migrationBuilder.CreateIndex(
                 name: "sale_comment_index",
+                schema: "public",
                 table: "sale",
                 column: "comment")
                 .Annotation("Npgsql:IndexMethod", "gin")
                 .Annotation("Npgsql:IndexOperators", new[] { "gin_trgm_ops" });
 
             migrationBuilder.CreateIndex(
-                name: "sale_created_user_id_index",
-                table: "sale",
-                column: "created_user_id");
-
-            migrationBuilder.CreateIndex(
                 name: "sale_currency_id_index",
+                schema: "public",
                 table: "sale",
                 column: "currency_id");
 
             migrationBuilder.CreateIndex(
-                name: "sale_main_storage_name_index",
-                table: "sale",
-                column: "main_storage_name");
-
-            migrationBuilder.CreateIndex(
                 name: "sale_sale_datetime_index",
+                schema: "public",
                 table: "sale",
                 column: "sale_datetime");
 
             migrationBuilder.CreateIndex(
                 name: "sale_state_index",
+                schema: "public",
                 table: "sale",
                 column: "state");
 
             migrationBuilder.CreateIndex(
+                name: "sale_storage_name_index",
+                schema: "public",
+                table: "sale",
+                column: "storage_name");
+
+            migrationBuilder.CreateIndex(
                 name: "sale_transaction_id_index",
+                schema: "public",
                 table: "sale",
                 column: "transaction_id");
 
             migrationBuilder.CreateIndex(
-                name: "sale_updated_user_id_index",
-                table: "sale",
-                column: "updated_user_id");
-
-            migrationBuilder.CreateIndex(
                 name: "sale_content_comment_index",
+                schema: "public",
                 table: "sale_content",
                 column: "comment")
                 .Annotation("Npgsql:IndexMethod", "gin")
@@ -1942,66 +2058,97 @@ namespace Main.Migrator.Migrations
 
             migrationBuilder.CreateIndex(
                 name: "sale_content_product_id_index",
+                schema: "public",
                 table: "sale_content",
                 column: "product_id");
 
             migrationBuilder.CreateIndex(
                 name: "sale_content_sale_id_index",
+                schema: "public",
                 table: "sale_content",
                 column: "sale_id");
 
             migrationBuilder.CreateIndex(
                 name: "sale_content_details_currency_id_index",
+                schema: "public",
                 table: "sale_content_details",
                 column: "currency_id");
 
             migrationBuilder.CreateIndex(
                 name: "sale_content_details_sale_content_id_index",
+                schema: "public",
                 table: "sale_content_details",
                 column: "sale_content_id");
 
             migrationBuilder.CreateIndex(
                 name: "sale_content_details_storage_content_id_index",
+                schema: "public",
                 table: "sale_content_details",
                 column: "storage_content_id");
 
             migrationBuilder.CreateIndex(
                 name: "sale_content_details_storage_index",
+                schema: "public",
                 table: "sale_content_details",
                 column: "storage");
 
             migrationBuilder.CreateIndex(
-                name: "storage_content_buy_price_in_usd_index",
+                name: "domain.commonentities.setting_who_created_idx",
+                schema: "public",
+                table: "settings",
+                column: "who_created");
+
+            migrationBuilder.CreateIndex(
+                name: "domain.commonentities.setting_who_updated_idx",
+                schema: "public",
+                table: "settings",
+                column: "who_updated");
+
+            migrationBuilder.CreateIndex(
+                name: "main.entities.storage.storagecontent_who_created_idx",
+                schema: "public",
                 table: "storage_content",
-                column: "buy_price_in_usd");
+                column: "who_created");
+
+            migrationBuilder.CreateIndex(
+                name: "main.entities.storage.storagecontent_who_updated_idx",
+                schema: "public",
+                table: "storage_content",
+                column: "who_updated");
 
             migrationBuilder.CreateIndex(
                 name: "storage_content_buy_price_index",
+                schema: "public",
                 table: "storage_content",
                 column: "buy_price");
 
             migrationBuilder.CreateIndex(
                 name: "storage_content_currency_id_index",
+                schema: "public",
                 table: "storage_content",
                 column: "currency_id");
 
             migrationBuilder.CreateIndex(
                 name: "storage_content_product_id_count_index",
+                schema: "public",
                 table: "storage_content",
                 columns: new[] { "product_id", "count" });
 
             migrationBuilder.CreateIndex(
                 name: "storage_content_product_id_storage_name_index",
+                schema: "public",
                 table: "storage_content",
                 columns: new[] { "product_id", "storage_name" });
 
             migrationBuilder.CreateIndex(
                 name: "storage_content_purchase_datetime_index",
+                schema: "public",
                 table: "storage_content",
                 column: "purchase_datetime");
 
             migrationBuilder.CreateIndex(
                 name: "storage_content_storage_name_index",
+                schema: "public",
                 table: "storage_content",
                 column: "storage_name")
                 .Annotation("Npgsql:IndexMethod", "gin")
@@ -2009,26 +2156,31 @@ namespace Main.Migrator.Migrations
 
             migrationBuilder.CreateIndex(
                 name: "storage_content_storage_name_product_id_index",
+                schema: "public",
                 table: "storage_content",
                 columns: new[] { "storage_name", "product_id" });
 
             migrationBuilder.CreateIndex(
-                name: "IX_storage_content_reservations_given_currency_id",
+                name: "IX_storage_content_reservations_proposed_currency_id",
+                schema: "public",
                 table: "storage_content_reservations",
-                column: "given_currency_id");
+                column: "proposed_currency_id");
 
             migrationBuilder.CreateIndex(
-                name: "IX_storage_content_reservations_who_created",
+                name: "main.entities.storage.storagecontentreservation_who_created_idx",
+                schema: "public",
                 table: "storage_content_reservations",
                 column: "who_created");
 
             migrationBuilder.CreateIndex(
-                name: "IX_storage_content_reservations_who_updated",
+                name: "main.entities.storage.storagecontentreservation_who_updated_idx",
+                schema: "public",
                 table: "storage_content_reservations",
                 column: "who_updated");
 
             migrationBuilder.CreateIndex(
                 name: "storage_content_reservations_comment_index",
+                schema: "public",
                 table: "storage_content_reservations",
                 column: "comment")
                 .Annotation("Npgsql:IndexMethod", "gin")
@@ -2036,56 +2188,67 @@ namespace Main.Migrator.Migrations
 
             migrationBuilder.CreateIndex(
                 name: "storage_content_reservations_is_done_index",
+                schema: "public",
                 table: "storage_content_reservations",
                 column: "is_done");
 
             migrationBuilder.CreateIndex(
                 name: "storage_content_reservations_product_id_is_done_index",
+                schema: "public",
                 table: "storage_content_reservations",
                 columns: new[] { "product_id", "is_done" });
 
             migrationBuilder.CreateIndex(
+                name: "storage_content_reservations_product_id_is_locked_index",
+                schema: "public",
+                table: "storage_content_reservations",
+                columns: new[] { "product_id", "is_locked" });
+
+            migrationBuilder.CreateIndex(
                 name: "storage_content_reservations_user_id_is_done_index",
+                schema: "public",
                 table: "storage_content_reservations",
                 columns: new[] { "user_id", "is_done" });
 
             migrationBuilder.CreateIndex(
-                name: "IX_storage_movement_currency_id",
-                table: "storage_movement",
-                column: "currency_id");
+                name: "main.entities.storage.storageowner_who_created_idx",
+                schema: "public",
+                table: "storage_owners",
+                column: "who_created");
 
             migrationBuilder.CreateIndex(
-                name: "storage_movement_created_at_index",
-                table: "storage_movement",
-                column: "created_at");
-
-            migrationBuilder.CreateIndex(
-                name: "storage_movement_product_id_index",
-                table: "storage_movement",
-                column: "product_id");
-
-            migrationBuilder.CreateIndex(
-                name: "storage_movement_storage_name_index",
-                table: "storage_movement",
-                column: "storage_name");
-
-            migrationBuilder.CreateIndex(
-                name: "storage_movement_who_moved_index",
-                table: "storage_movement",
-                column: "who_moved");
+                name: "main.entities.storage.storageowner_who_updated_idx",
+                schema: "public",
+                table: "storage_owners",
+                column: "who_updated");
 
             migrationBuilder.CreateIndex(
                 name: "storage_owners_owner_id_index",
+                schema: "public",
                 table: "storage_owners",
-                column: "owner_id");
+                column: "user_id");
 
             migrationBuilder.CreateIndex(
                 name: "IX_storage_routes_to_storage_name",
+                schema: "public",
                 table: "storage_routes",
                 column: "to_storage_name");
 
             migrationBuilder.CreateIndex(
+                name: "main.entities.storage.storageroute_who_created_idx",
+                schema: "public",
+                table: "storage_routes",
+                column: "who_created");
+
+            migrationBuilder.CreateIndex(
+                name: "main.entities.storage.storageroute_who_updated_idx",
+                schema: "public",
+                table: "storage_routes",
+                column: "who_updated");
+
+            migrationBuilder.CreateIndex(
                 name: "storage_from_to_active_uindex",
+                schema: "public",
                 table: "storage_routes",
                 columns: new[] { "from_storage_name", "to_storage_name", "is_active" },
                 unique: true,
@@ -2093,16 +2256,31 @@ namespace Main.Migrator.Migrations
 
             migrationBuilder.CreateIndex(
                 name: "storage_routes_carrier_id_index",
+                schema: "public",
                 table: "storage_routes",
                 column: "carrier_id");
 
             migrationBuilder.CreateIndex(
                 name: "storage_routes_currency_id_index",
+                schema: "public",
                 table: "storage_routes",
                 column: "currency_id");
 
             migrationBuilder.CreateIndex(
+                name: "main.entities.storage.storage_who_created_idx",
+                schema: "public",
+                table: "storages",
+                column: "who_created");
+
+            migrationBuilder.CreateIndex(
+                name: "main.entities.storage.storage_who_updated_idx",
+                schema: "public",
+                table: "storages",
+                column: "who_updated");
+
+            migrationBuilder.CreateIndex(
                 name: "storages_description_index",
+                schema: "public",
                 table: "storages",
                 column: "description")
                 .Annotation("Npgsql:IndexMethod", "gin")
@@ -2110,6 +2288,7 @@ namespace Main.Migrator.Migrations
 
             migrationBuilder.CreateIndex(
                 name: "storages_location_index",
+                schema: "public",
                 table: "storages",
                 column: "location")
                 .Annotation("Npgsql:IndexMethod", "gin")
@@ -2117,113 +2296,119 @@ namespace Main.Migrator.Migrations
 
             migrationBuilder.CreateIndex(
                 name: "storages_type_index",
+                schema: "public",
                 table: "storages",
                 column: "type");
 
             migrationBuilder.CreateIndex(
-                name: "IX_transaction_versions_currency_id",
-                table: "transaction_versions",
-                column: "currency_id");
-
-            migrationBuilder.CreateIndex(
-                name: "transaction_versions_receiver_id_index",
-                table: "transaction_versions",
-                column: "receiver_id");
-
-            migrationBuilder.CreateIndex(
-                name: "transaction_versions_sender_id _index",
-                table: "transaction_versions",
-                column: "sender_id ");
-
-            migrationBuilder.CreateIndex(
-                name: "transaction_versions_transaction_id_version_uindex",
-                table: "transaction_versions",
-                columns: new[] { "transaction_id", "version" },
-                unique: true);
-
-            migrationBuilder.CreateIndex(
-                name: "transaction_versions_version_created_datetime_index",
-                table: "transaction_versions",
-                column: "version_created_datetime");
-
-            migrationBuilder.CreateIndex(
                 name: "IX_transactions_currency_id",
+                schema: "public",
                 table: "transactions",
                 column: "currency_id");
 
             migrationBuilder.CreateIndex(
-                name: "transactions_creation_date_index",
+                name: "main.entities.balance.transaction_who_created_idx",
+                schema: "public",
                 table: "transactions",
-                column: "creation_date");
+                column: "who_created");
+
+            migrationBuilder.CreateIndex(
+                name: "main.entities.balance.transaction_who_updated_idx",
+                schema: "public",
+                table: "transactions",
+                column: "who_updated");
 
             migrationBuilder.CreateIndex(
                 name: "transactions_deleted_by_index",
+                schema: "public",
                 table: "transactions",
-                column: "deleted_by");
-
-            migrationBuilder.CreateIndex(
-                name: "transactions_is_deleted_index",
-                table: "transactions",
-                column: "is_deleted");
+                column: "reversed_by");
 
             migrationBuilder.CreateIndex(
                 name: "transactions_receiver_id_index",
+                schema: "public",
                 table: "transactions",
                 column: "receiver_id");
 
             migrationBuilder.CreateIndex(
                 name: "transactions_sender_id_receiver_id_index",
+                schema: "public",
                 table: "transactions",
                 columns: new[] { "sender_id", "receiver_id" });
 
             migrationBuilder.CreateIndex(
-                name: "transactions_status_index",
-                table: "transactions",
-                column: "status");
-
-            migrationBuilder.CreateIndex(
                 name: "transactions_transaction_datetime_id_index",
+                schema: "public",
                 table: "transactions",
                 columns: new[] { "transaction_datetime", "id" });
 
             migrationBuilder.CreateIndex(
                 name: "transactions_transaction_datetime_sender_id_receiver_id_idx",
+                schema: "public",
                 table: "transactions",
                 column: "transaction_datetime",
                 descending: new bool[0]);
 
             migrationBuilder.CreateIndex(
-                name: "transactions_who_made_user_id_index",
+                name: "transactions_type_index",
+                schema: "public",
                 table: "transactions",
-                column: "who_made_user_id");
+                column: "type");
+
+            migrationBuilder.CreateIndex(
+                name: "main.entities.user.userbalance_who_created_idx",
+                schema: "public",
+                table: "user_balances",
+                column: "who_created");
+
+            migrationBuilder.CreateIndex(
+                name: "main.entities.user.userbalance_who_updated_idx",
+                schema: "public",
+                table: "user_balances",
+                column: "who_updated");
 
             migrationBuilder.CreateIndex(
                 name: "user_balances_balance_index",
+                schema: "public",
                 table: "user_balances",
                 column: "balance");
 
             migrationBuilder.CreateIndex(
                 name: "user_balances_currency_id_index",
+                schema: "public",
                 table: "user_balances",
                 column: "currency_id");
 
             migrationBuilder.CreateIndex(
                 name: "user_balances_currency_id_user_id_uindex",
+                schema: "public",
                 table: "user_balances",
                 columns: new[] { "currency_id", "user_id" },
                 unique: true);
 
             migrationBuilder.CreateIndex(
                 name: "user_balances_user_id_index",
+                schema: "public",
                 table: "user_balances",
                 column: "user_id");
 
             migrationBuilder.CreateIndex(
-                name: "user_emails_normalized_email_uindex",
+                name: "main.entities.user.useremail_who_created_idx",
                 schema: "auth",
                 table: "user_emails",
-                column: "normalized_email",
-                unique: true)
+                column: "who_created");
+
+            migrationBuilder.CreateIndex(
+                name: "main.entities.user.useremail_who_updated_idx",
+                schema: "auth",
+                table: "user_emails",
+                column: "who_updated");
+
+            migrationBuilder.CreateIndex(
+                name: "user_emails_normalized_email_index",
+                schema: "auth",
+                table: "user_emails",
+                column: "normalized_email")
                 .Annotation("Npgsql:IndexMethod", "gin")
                 .Annotation("Npgsql:IndexOperators", new[] { "gin_trgm_ops" });
 
@@ -2248,12 +2433,6 @@ namespace Main.Migrator.Migrations
                 column: "description")
                 .Annotation("Npgsql:IndexMethod", "gin")
                 .Annotation("Npgsql:IndexOperators", new[] { "gin_trgm_ops" });
-
-            migrationBuilder.CreateIndex(
-                name: "user_info_is_supplier_index",
-                schema: "auth",
-                table: "user_info",
-                column: "is_supplier");
 
             migrationBuilder.CreateIndex(
                 name: "user_info_name_index",
@@ -2286,6 +2465,30 @@ namespace Main.Migrator.Migrations
                 column: "permission");
 
             migrationBuilder.CreateIndex(
+                name: "main.entities.auth.userpermission_who_created_idx",
+                schema: "auth",
+                table: "user_permissions",
+                column: "who_created");
+
+            migrationBuilder.CreateIndex(
+                name: "main.entities.auth.userpermission_who_updated_idx",
+                schema: "auth",
+                table: "user_permissions",
+                column: "who_updated");
+
+            migrationBuilder.CreateIndex(
+                name: "main.entities.user.userphone_who_created_idx",
+                schema: "auth",
+                table: "user_phones",
+                column: "who_created");
+
+            migrationBuilder.CreateIndex(
+                name: "main.entities.user.userphone_who_updated_idx",
+                schema: "auth",
+                table: "user_phones",
+                column: "who_updated");
+
+            migrationBuilder.CreateIndex(
                 name: "user_phones_normalized_phone_index",
                 schema: "auth",
                 table: "user_phones",
@@ -2308,19 +2511,46 @@ namespace Main.Migrator.Migrations
                 column: "role_name");
 
             migrationBuilder.CreateIndex(
+                name: "main.entities.auth.userrole_who_created_idx",
+                schema: "auth",
+                table: "user_roles",
+                column: "who_created");
+
+            migrationBuilder.CreateIndex(
+                name: "main.entities.auth.userrole_who_updated_idx",
+                schema: "auth",
+                table: "user_roles",
+                column: "who_updated");
+
+            migrationBuilder.CreateIndex(
                 name: "user_search_history_search_date_time_index",
+                schema: "public",
                 table: "user_search_history",
                 column: "search_date_time");
 
             migrationBuilder.CreateIndex(
                 name: "user_search_history_search_place_index",
+                schema: "public",
                 table: "user_search_history",
                 column: "search_place");
 
             migrationBuilder.CreateIndex(
                 name: "user_search_history_user_id_search_place_index",
+                schema: "public",
                 table: "user_search_history",
                 columns: new[] { "user_id", "search_place" });
+
+            migrationBuilder.CreateIndex(
+                name: "main.entities.auth.usertoken_who_created_idx",
+                schema: "auth",
+                table: "user_tokens",
+                column: "who_created");
+
+            migrationBuilder.CreateIndex(
+                name: "main.entities.auth.usertoken_who_updated_idx",
+                schema: "auth",
+                table: "user_tokens",
+                column: "who_updated");
 
             migrationBuilder.CreateIndex(
                 name: "user_tokens_expires_at_index",
@@ -2350,7 +2580,20 @@ namespace Main.Migrator.Migrations
                 column: "user_id");
 
             migrationBuilder.CreateIndex(
+                name: "main.entities.user.uservehicle_who_created_idx",
+                schema: "public",
+                table: "user_vehicles",
+                column: "who_created");
+
+            migrationBuilder.CreateIndex(
+                name: "main.entities.user.uservehicle_who_updated_idx",
+                schema: "public",
+                table: "user_vehicles",
+                column: "who_updated");
+
+            migrationBuilder.CreateIndex(
                 name: "user_vehicles_comment_index",
+                schema: "public",
                 table: "user_vehicles",
                 column: "comment")
                 .Annotation("Npgsql:IndexMethod", "gin")
@@ -2358,6 +2601,7 @@ namespace Main.Migrator.Migrations
 
             migrationBuilder.CreateIndex(
                 name: "user_vehicles_manufacture_index",
+                schema: "public",
                 table: "user_vehicles",
                 column: "manufacture")
                 .Annotation("Npgsql:IndexMethod", "gin")
@@ -2365,6 +2609,7 @@ namespace Main.Migrator.Migrations
 
             migrationBuilder.CreateIndex(
                 name: "user_vehicles_model_index",
+                schema: "public",
                 table: "user_vehicles",
                 column: "model")
                 .Annotation("Npgsql:IndexMethod", "gin")
@@ -2372,110 +2617,168 @@ namespace Main.Migrator.Migrations
 
             migrationBuilder.CreateIndex(
                 name: "user_vehicles_plate_number_uindex",
+                schema: "public",
                 table: "user_vehicles",
                 column: "plate_number",
                 unique: true);
 
             migrationBuilder.CreateIndex(
                 name: "user_vehicles_user_id_index",
+                schema: "public",
                 table: "user_vehicles",
                 column: "user_id");
 
             migrationBuilder.CreateIndex(
                 name: "user_vehicles_vin_uindex",
+                schema: "public",
                 table: "user_vehicles",
                 column: "vin",
                 unique: true);
 
             migrationBuilder.CreateIndex(
-                name: "users_normalized_user_name_uindex",
+                name: "main.entities.user.user_who_created_idx",
                 schema: "auth",
                 table: "users",
-                column: "normalized_user_name",
-                unique: true)
+                column: "who_created");
+
+            migrationBuilder.CreateIndex(
+                name: "main.entities.user.user_who_updated_idx",
+                schema: "auth",
+                table: "users",
+                column: "who_updated");
+
+            migrationBuilder.CreateIndex(
+                name: "products_sku_index",
+                schema: "public",
+                table: "products",
+                column: "normalized_sku")
                 .Annotation("Npgsql:IndexMethod", "gin")
-                .Annotation("Npgsql:IndexOperators", new[] { "gin_trgm_ops" });
+                .Annotation("Npgsql:IndexOperators", new[] { "gin_trgm_ops" })
+                .Annotation("Relational:ColumnName", "normalized_sku");
+
+            migrationBuilder.CreateIndex(
+                name: "products_stock_index",
+                schema: "public",
+                table: "products",
+                column: "stock")
+                .Annotation("Relational:ColumnName", "stock");
+
+            migrationBuilder.CreateIndex(
+                name: "products_normalized_sku_producer_id_index",
+                schema: "public",
+                table: "products",
+                columns: new[] { "normalized_sku", "producer_id" },
+                unique: true);
+
+            migrationBuilder.CreateIndex(
+                name: "users_normalized_user_name_index",
+                schema: "auth",
+                table: "users",
+                column: "normalized_user_name")
+                .Annotation("MaxLength", 36)
+                .Annotation("Npgsql:IndexMethod", "gin")
+                .Annotation("Npgsql:IndexOperators", new[] { "gin_trgm_ops" })
+                .Annotation("Relational:ColumnName", "normalized_user_name");
         }
 
         /// <inheritdoc />
         protected override void Down(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.DropTable(
-                name: "cart");
+                name: "cart",
+                schema: "public");
 
             migrationBuilder.DropTable(
-                name: "currency_history");
+                name: "currency_history",
+                schema: "public");
 
             migrationBuilder.DropTable(
-                name: "currency_to_usd");
+                name: "currency_to_usd",
+                schema: "public");
 
             migrationBuilder.DropTable(
-                name: "default_settings");
+                name: "events",
+                schema: "public");
 
             migrationBuilder.DropTable(
-                name: "order_items");
-
-            migrationBuilder.DropTable(
-                name: "order_versions");
+                name: "order_items",
+                schema: "public");
 
             migrationBuilder.DropTable(
                 name: "OutboxMessage",
                 schema: "msg");
 
             migrationBuilder.DropTable(
-                name: "producers_other_names");
+                name: "producers_other_names",
+                schema: "public");
 
             migrationBuilder.DropTable(
-                name: "product_characteristics");
+                name: "product_characteristics",
+                schema: "public");
 
             migrationBuilder.DropTable(
-                name: "product_coefficients");
+                name: "product_coefficients",
+                schema: "public");
 
             migrationBuilder.DropTable(
-                name: "product_contents");
+                name: "product_contents",
+                schema: "public");
 
             migrationBuilder.DropTable(
-                name: "product_eans");
+                name: "product_crosses",
+                schema: "public");
 
             migrationBuilder.DropTable(
-                name: "product_images");
+                name: "product_eans",
+                schema: "public");
 
             migrationBuilder.DropTable(
-                name: "product_sizes");
+                name: "product_images",
+                schema: "public");
 
             migrationBuilder.DropTable(
-                name: "product_weights");
+                name: "product_sizes",
+                schema: "public");
 
             migrationBuilder.DropTable(
-                name: "purchase_content_logistics");
+                name: "product_weights",
+                schema: "public");
 
             migrationBuilder.DropTable(
-                name: "purchase_logistics");
+                name: "purchase_content_logistics",
+                schema: "public");
+
+            migrationBuilder.DropTable(
+                name: "purchase_logistics",
+                schema: "public");
 
             migrationBuilder.DropTable(
                 name: "role_permissions",
                 schema: "auth");
 
             migrationBuilder.DropTable(
-                name: "sale_content_details");
+                name: "sale_content_details",
+                schema: "public");
 
             migrationBuilder.DropTable(
-                name: "storage_content_reservations");
+                name: "settings",
+                schema: "public");
 
             migrationBuilder.DropTable(
-                name: "storage_movement");
+                name: "storage_content_reservations",
+                schema: "public");
 
             migrationBuilder.DropTable(
-                name: "storage_owners");
+                name: "storage_owners",
+                schema: "public");
 
             migrationBuilder.DropTable(
-                name: "transaction_versions");
+                name: "user_balances",
+                schema: "public");
 
             migrationBuilder.DropTable(
-                name: "user_balances");
-
-            migrationBuilder.DropTable(
-                name: "user_discounts");
+                name: "user_discounts",
+                schema: "public");
 
             migrationBuilder.DropTable(
                 name: "user_emails",
@@ -2498,17 +2801,20 @@ namespace Main.Migrator.Migrations
                 schema: "auth");
 
             migrationBuilder.DropTable(
-                name: "user_search_history");
+                name: "user_search_history",
+                schema: "public");
 
             migrationBuilder.DropTable(
                 name: "user_tokens",
                 schema: "auth");
 
             migrationBuilder.DropTable(
-                name: "user_vehicles");
+                name: "user_vehicles",
+                schema: "public");
 
             migrationBuilder.DropTable(
-                name: "orders");
+                name: "orders",
+                schema: "public");
 
             migrationBuilder.DropTable(
                 name: "InboxState",
@@ -2519,16 +2825,20 @@ namespace Main.Migrator.Migrations
                 schema: "msg");
 
             migrationBuilder.DropTable(
-                name: "coefficients");
+                name: "coefficients",
+                schema: "public");
 
             migrationBuilder.DropTable(
-                name: "purchase_content");
+                name: "purchase_content",
+                schema: "public");
 
             migrationBuilder.DropTable(
-                name: "storage_routes");
+                name: "storage_routes",
+                schema: "public");
 
             migrationBuilder.DropTable(
-                name: "sale_content");
+                name: "sale_content",
+                schema: "public");
 
             migrationBuilder.DropTable(
                 name: "permissions",
@@ -2539,38 +2849,44 @@ namespace Main.Migrator.Migrations
                 schema: "auth");
 
             migrationBuilder.DropTable(
-                name: "purchase");
+                name: "purchase",
+                schema: "public");
 
             migrationBuilder.DropTable(
-                name: "storage_content");
+                name: "storage_content",
+                schema: "public");
 
             migrationBuilder.DropTable(
-                name: "sale");
+                name: "sale",
+                schema: "public");
 
             migrationBuilder.DropTable(
-                name: "products");
+                name: "products",
+                schema: "public");
 
             migrationBuilder.DropTable(
-                name: "storages");
+                name: "storages",
+                schema: "public");
 
             migrationBuilder.DropTable(
-                name: "transactions");
+                name: "transactions",
+                schema: "public");
 
             migrationBuilder.DropTable(
-                name: "producer");
+                name: "producer",
+                schema: "public");
 
             migrationBuilder.DropTable(
-                name: "categories");
+                name: "categories",
+                schema: "public");
 
             migrationBuilder.DropTable(
-                name: "currency");
+                name: "currency",
+                schema: "public");
 
             migrationBuilder.DropTable(
                 name: "users",
                 schema: "auth");
-
-            migrationBuilder.DropSequence(
-                name: "storage_movement_id_seq");
         }
     }
 }

@@ -9,7 +9,7 @@ public class ProductSizeConfiguration : IEntityTypeConfiguration<ProductSize>
 {
     public void Configure(EntityTypeBuilder<ProductSize> builder)
     {
-        builder.ToTable("product_sizes");
+        builder.ToTable("product_sizes", "public");
         
         builder.HasKey(e => e.ProductId)
             .HasName("product_sizes_pk");

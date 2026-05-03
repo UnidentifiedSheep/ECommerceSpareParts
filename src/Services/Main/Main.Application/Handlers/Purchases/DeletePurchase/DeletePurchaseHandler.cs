@@ -11,18 +11,11 @@ namespace Main.Application.Handlers.Purchases.DeletePurchase;
 [Transactional]
 public record DeletePurchaseCommand(string PurchaseId) : ICommand<Unit>;
 
-public class DeletePurchaseHandler(IPurchaseRepository purchaseRepository, IUnitOfWork unitOfWork)
+public class DeletePurchaseHandler(IUnitOfWork unitOfWork)
     : ICommandHandler<DeletePurchaseCommand, Unit>
 {
     public async Task<Unit> Handle(DeletePurchaseCommand request, CancellationToken cancellationToken)
     {
-        var purchase = await purchaseRepository.GetPurchase(
-            new QueryOptions<Purchase, string>() { Data = request.PurchaseId }
-                .WithTracking()
-                .WithForUpdate(),
-            cancellationToken) ?? throw new PurchaseNotFoundException(request.PurchaseId);
-        unitOfWork.Remove(purchase);
-        await unitOfWork.SaveChangesAsync(cancellationToken);
-        return Unit.Value;
+        throw new NotImplementedException();
     }
 }

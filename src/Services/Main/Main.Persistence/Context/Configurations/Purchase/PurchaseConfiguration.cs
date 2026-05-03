@@ -7,7 +7,7 @@ public class PurchaseConfiguration : IEntityTypeConfiguration<Entities.Purchase.
 {
     public void Configure(EntityTypeBuilder<Entities.Purchase.Purchase> builder)
     {
-        builder.ToTable("purchase");
+        builder.ToTable("purchase", "public");
         
         builder.HasKey(e => e.Id)
             .HasName("purchase_pk");

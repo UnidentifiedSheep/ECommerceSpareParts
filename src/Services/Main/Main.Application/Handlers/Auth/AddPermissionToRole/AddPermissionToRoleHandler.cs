@@ -21,7 +21,7 @@ public class AddPermissionToRoleHandler(
         var criteria = Criteria<Role>.New()
             .Include(x => x.RolePermissions)
             .Track()
-            .Where(x => x.Name.NormalizedValue == RoleName.ToNormalized(request.RoleName))
+            .Where(x => x.Name.Value == RoleName.ToNormalized(request.RoleName))
             .Build();
         
         var role = await repository.FirstOrDefaultAsync(criteria, cancellationToken)

@@ -23,12 +23,12 @@ public class RolePermissionSeed : ISeed<DContext>
 
         foreach (var role in roles)
         {
-            if (!Enum.TryParse(role.Name.NormalizedValue, out Role parsedRole))
+            if (!Enum.TryParse(role.Name.Value, out Role parsedRole))
                 continue;
             if (!rolePermissions.TryGetValue(parsedRole, out var needed))
                 continue;
 
-            await context.AddRangeAsync(ResolvePermissions(role.Name.NormalizedValue, needed, permissions));
+            await context.AddRangeAsync(ResolvePermissions(role.Name.Value, needed, permissions));
         }
 
         await context.SaveChangesAsync();

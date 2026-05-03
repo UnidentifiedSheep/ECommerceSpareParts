@@ -9,7 +9,7 @@ public class StorageContentReservationConfiguration : IEntityTypeConfiguration<S
 {
     public void Configure(EntityTypeBuilder<StorageContentReservation> builder)
     {
-        builder.ToTable("storage_content_reservations");
+        builder.ToTable("storage_content_reservations", "public");
 
         builder.HasKey(e => e.Id).HasName("storage_content_reservations_pk");
 

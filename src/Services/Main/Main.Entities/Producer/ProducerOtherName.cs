@@ -12,7 +12,7 @@ public class ProducerOtherName : Entity<ProducerOtherName, ProducerOtherNameKey>
     public int ProducerId { get; private set; }
 
     [ValidateTuple("PK")]
-    public Name OtherName { get; private set; } = null!;
+    public string OtherName { get; private set; } = null!;
 
     [ValidateTuple("PK")]
     public string WhereUsed { get; private set; } = null!;

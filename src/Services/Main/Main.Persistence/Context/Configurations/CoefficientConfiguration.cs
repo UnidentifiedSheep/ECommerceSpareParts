@@ -8,7 +8,7 @@ public class CoefficientConfiguration : IEntityTypeConfiguration<Coefficient>
 {
     public void Configure(EntityTypeBuilder<Coefficient> builder)
     {
-        builder.ToTable("coefficients");
+        builder.ToTable("coefficients", "public");
         
         builder.HasKey(e => e.Name)
             .HasName("coefficients_pk");

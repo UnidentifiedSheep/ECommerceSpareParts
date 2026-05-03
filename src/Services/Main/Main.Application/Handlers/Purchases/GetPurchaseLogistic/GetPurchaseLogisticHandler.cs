@@ -11,20 +11,13 @@ public record GetPurchaseLogisticQuery(string PurchaseId) : IQuery<GetPurchaseLo
 
 public record GetPurchaseLogisticResult(PurchaseLogisticDto PurchaseLogistic);
 
-public class GetPurchaseLogisticHandler(IPurchaseLogisticsRepository purchaseLogisticsRepository)
+public class GetPurchaseLogisticHandler()
     : IQueryHandler<GetPurchaseLogisticQuery, GetPurchaseLogisticResult>
 {
     public async Task<GetPurchaseLogisticResult> Handle(
         GetPurchaseLogisticQuery request,
         CancellationToken cancellationToken)
     {
-        var options = new QueryOptions<PurchaseLogistic, string>() { Data = request.PurchaseId }
-            .WithTracking(false)
-            .WithInclude(x => x.Currency);
-        var logistic = await purchaseLogisticsRepository
-                           .GetPurchaseLogistics(options, cancellationToken)
-                       ?? throw new PurchaseLogisticNotFoundException(request.PurchaseId);
-
-        return new GetPurchaseLogisticResult(logistic.Adapt<PurchaseLogisticDto>());
+        throw new NotImplementedException();
     }
 }

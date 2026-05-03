@@ -7,7 +7,7 @@ public class CartConfiguration : IEntityTypeConfiguration<Entities.Cart.Cart>
 {
     public void Configure(EntityTypeBuilder<Entities.Cart.Cart> builder)
     {
-        builder.ToTable("cart");
+        builder.ToTable("cart", "public");
         
         builder.HasKey(e => new { e.UserId, e.ProductId })
             .HasName("cart_pk");

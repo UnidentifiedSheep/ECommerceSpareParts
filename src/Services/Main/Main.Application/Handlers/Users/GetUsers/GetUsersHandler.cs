@@ -94,7 +94,7 @@ public class GetUsersHandler(IReadRepository<User, Guid> readRepository) : IQuer
         {
             normalizedEmail = Email.ToNormalized(request.Email);
             query = query.Where(u => u.Emails.Any(e =>
-                EF.Functions.TrigramsSimilarity(e.Email.NormalizedValue,
+                EF.Functions.TrigramsSimilarity(e.Email.Value,
                     normalizedEmail) > simLevel));
             isEmailIncluded = true;
         }
@@ -138,9 +138,9 @@ public class GetUsersHandler(IReadRepository<User, Guid> readRepository) : IQuer
                         : 0) +
                     (isEmailIncluded
                         ? u.Emails
-                            .OrderByDescending(x => EF.Functions.TrigramsSimilarity(x.Email.NormalizedValue, normalizedEmail))
+                            .OrderByDescending(x => EF.Functions.TrigramsSimilarity(x.Email.Value, normalizedEmail))
                             .Select(x => EF.Functions.Greatest(
-                                EF.Functions.TrigramsSimilarity(x.Email.NormalizedValue, normalizedEmail)))
+                                EF.Functions.TrigramsSimilarity(x.Email.Value, normalizedEmail)))
                             .FirstOrDefault()
                         : 0) +
                     (isDescriptionIncluded

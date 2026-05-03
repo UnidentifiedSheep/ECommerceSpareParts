@@ -27,9 +27,6 @@ public class Product : AuditableEntity<Product, int>
 
     private List<ProductImage> _images = [];
     public IReadOnlyCollection<ProductImage> Images => _images;
-
-    private List<ProductContent> _contents = [];
-    public IReadOnlyCollection<ProductContent> Contents => _contents;
     public ProductSize? ProductSize { get; private set; }
 
     public ProductWeight? ProductWeight { get; private set; }

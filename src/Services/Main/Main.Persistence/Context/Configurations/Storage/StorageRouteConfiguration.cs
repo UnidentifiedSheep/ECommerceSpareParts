@@ -9,7 +9,7 @@ public class StorageRouteConfiguration : IEntityTypeConfiguration<StorageRoute>
 {
     public void Configure(EntityTypeBuilder<StorageRoute> builder)
     {
-        builder.ToTable("storage_routes");
+        builder.ToTable("storage_routes", "public");
         
         builder.HasKey(e => e.Id).HasName("storage_routes_pk");
 

@@ -9,7 +9,7 @@ public class CurrencyToUsdConfiguration : IEntityTypeConfiguration<CurrencyToUsd
 {
     public void Configure(EntityTypeBuilder<CurrencyToUsd> builder)
     {
-        builder.ToTable("currency_to_usd");
+        builder.ToTable("currency_to_usd", "public");
         
         builder.HasKey(e => e.CurrencyId)
             .HasName("currency_to_usd_pk");

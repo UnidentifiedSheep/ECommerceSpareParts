@@ -9,9 +9,9 @@ public class StorageOwnerConfiguration : IEntityTypeConfiguration<StorageOwner>
 {
     public void Configure(EntityTypeBuilder<StorageOwner> builder)
     {
+        builder.ToTable("storage_owners", "public");
+        
         builder.HasKey(e => new { e.StorageName, e.UserId }).HasName("storage_owners_pk");
-
-        builder.ToTable("storage_owners");
 
         builder.HasIndex(e => e.UserId, "storage_owners_owner_id_index");
 

@@ -74,7 +74,7 @@ public class User : AuditableEntity<User, Guid>
 
     public void AddUserEmail(Email email, EmailType emailType, bool isPrimary, bool isConfirmed)
     {
-        if (_emails.Any(x => x.Email.NormalizedValue == email.NormalizedValue))
+        if (_emails.Any(x => x.Email.Value == email.Value))
             throw new InvalidInputException("user.have.duplicate.email");
         if (isPrimary && _emails.Any(x => x.IsPrimary))
             throw new InvalidInputException("user.email.primary.count");

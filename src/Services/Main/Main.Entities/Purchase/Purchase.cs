@@ -35,10 +35,10 @@ public class Purchase : AuditableEntity<Purchase, Guid>
         DateTime purchaseDatetime)
     {
         SupplierId = supplierId;
-        CurrencyId = currencyId;
+        SetPurchaseDate(purchaseDatetime);
+        SetCurrencyId(currencyId);
         TransactionId = transactionId;
         Storage = storage;
-        PurchaseDatetime = purchaseDatetime;
         State = PurchaseState.Draft;
     }
 
@@ -59,6 +59,16 @@ public class Purchase : AuditableEntity<Purchase, Guid>
             .AgainstTooLong(
                 max: 256,
                 exceptionFactory: () => throw new InvalidInputException("purchase.comment.too.long"));
+    }
+
+    public void SetCurrencyId(int currencyId)
+    {
+        CurrencyId = currencyId;
+    }
+
+    public void SetPurchaseDate(DateTime purchaseDatetime)
+    {
+        PurchaseDatetime = purchaseDatetime;
     }
 
     public void AddContent(PurchaseContent content)

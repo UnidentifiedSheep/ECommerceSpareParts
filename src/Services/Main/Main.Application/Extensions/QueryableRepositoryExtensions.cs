@@ -38,8 +38,8 @@ public static class QueryableRepositoryExtensions
         if (normalizedRoles.Count == 0) return query;
 
         return include
-            ? query.Where(u => u.Roles.Any(r => normalizedRoles.Contains(r.RoleName)))
-            : query.Where(u => !u.Roles.Any(r => normalizedRoles.Contains(r.RoleName)));
+            ? query.Where(u => u.Roles.Any(r => normalizedRoles.Contains(r.RoleName.Value)))
+            : query.Where(u => !u.Roles.Any(r => normalizedRoles.Contains(r.RoleName.Value)));
     }
 
     private static string Normalize(string role)

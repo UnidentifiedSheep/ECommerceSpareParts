@@ -9,7 +9,7 @@ public class OrderItemConfiguration : IEntityTypeConfiguration<OrderItem>
 {
     public void Configure(EntityTypeBuilder<OrderItem> builder)
     {
-        builder.ToTable("order_items");
+        builder.ToTable("order_items", "public");
         
         builder.HasKey(e => e.Id).HasName("order_items_pk");
 

@@ -1,10 +1,11 @@
 ﻿using Domain;
+using Main.Entities.Auth.ValueObjects;
 
 namespace Main.Entities.Auth;
 
 public class RolePermission : Entity<RolePermission, (string, string)>
 {
-    public string RoleName { get; private set; } = null!;
+    public RoleName RoleName { get; private set; } = null!;
     public string PermissionName { get; private set; } = null!;
 
     public Role Role { get; set; } = null!;
@@ -12,13 +13,13 @@ public class RolePermission : Entity<RolePermission, (string, string)>
     
     private RolePermission() {}
 
-    private RolePermission(string roleName, string permissionName)
+    private RolePermission(RoleName roleName, string permissionName)
     {
         RoleName = roleName;
         PermissionName = permissionName;
     }
 
-    public static RolePermission Create(string roleName, string permissionName)
+    public static RolePermission Create(RoleName roleName, string permissionName)
     {
         return new RolePermission(roleName, permissionName);
     }

@@ -9,7 +9,7 @@ public class UserDiscountConfiguration : IEntityTypeConfiguration<UserDiscount>
 {
     public void Configure(EntityTypeBuilder<UserDiscount> builder)
     {
-        builder.ToTable("user_discounts");
+        builder.ToTable("user_discounts", "public");
         
         builder.HasKey(e => e.UserId)
             .HasName("user_discounts_pk");

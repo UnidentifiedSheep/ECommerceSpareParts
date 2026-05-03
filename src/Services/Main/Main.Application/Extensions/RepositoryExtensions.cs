@@ -1,8 +1,10 @@
 ﻿using Application.Common.Interfaces.Repositories;
 using Main.Application.Interfaces.Persistence;
 using Main.Entities.Exceptions.Products;
+using Main.Entities.Exceptions.Purchase;
 using Main.Entities.Exceptions.Storages;
 using Main.Entities.Product;
+using Main.Entities.Purchase;
 using Main.Entities.Storage;
 
 namespace Main.Application.Extensions;

@@ -10,9 +10,9 @@ public class SaleContentDetailConfiguration : IEntityTypeConfiguration<SaleConte
 {
     public void Configure(EntityTypeBuilder<SaleContentDetail> builder)
     {
+        builder.ToTable("sale_content_details", "public");
+        
         builder.HasKey(e => e.Id).HasName("sale_content_details_pk");
-
-        builder.ToTable("sale_content_details");
 
         builder.HasIndex(e => e.CurrencyId, "sale_content_details_currency_id_index");
 

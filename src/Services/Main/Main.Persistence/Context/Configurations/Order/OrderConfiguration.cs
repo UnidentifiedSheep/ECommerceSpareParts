@@ -7,7 +7,7 @@ public class OrderConfiguration : IEntityTypeConfiguration<Entities.Order.Order>
 {
     public void Configure(EntityTypeBuilder<Entities.Order.Order> builder)
     {
-        builder.ToTable("orders");
+        builder.ToTable("orders", "public");
         
         builder.HasKey(e => e.Id).HasName("orders_pk");
         
@@ -49,8 +49,6 @@ public class OrderConfiguration : IEntityTypeConfiguration<Entities.Order.Order>
         builder.Property(e => e.UserId)
             .HasColumnName("user_id");
         
-        builder.Property(e => e.WhoUpdated)
-            .HasColumnName("who_updated");
 
         builder.HasOne<Entities.Currency.Currency>()
             .WithMany()
@@ -62,11 +60,5 @@ public class OrderConfiguration : IEntityTypeConfiguration<Entities.Order.Order>
             .WithMany()
             .HasForeignKey(d => d.UserId)
             .HasConstraintName("orders_users_id_fk");
-
-        builder.HasOne<Entities.User.User>()
-            .WithMany()
-            .HasForeignKey(d => d.WhoUpdated)
-            .OnDelete(DeleteBehavior.Restrict)
-            .HasConstraintName("orders_users_id_fk_2");
     }
 }

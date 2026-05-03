@@ -1,4 +1,6 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using EFCore.ComplexIndexes;
+using EFCore.ComplexIndexes.PostgreSQL;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
 namespace Main.Persistence.Context.Configurations.User;
@@ -12,15 +14,6 @@ public class UserConfiguration : IEntityTypeConfiguration<Entities.User.User>
         builder.HasKey(e => e.Id)
             .HasName("users_pk");
 
-        builder.HasIndex("normalized_user_name")
-            .HasDatabaseName("users_normalized_user_name_index")
-            .HasMethod("gin")
-            .HasOperators("gin_trgm_ops");
-
-        builder.HasIndex("normalized_user_name")
-            .HasDatabaseName("users_normalized_user_name_uindex")
-            .IsUnique();
-
         builder.Property(e => e.Id)
             .HasDefaultValueSql("gen_random_uuid()")
             .HasColumnName("id");
@@ -30,8 +23,8 @@ public class UserConfiguration : IEntityTypeConfiguration<Entities.User.User>
         
         builder.Property(e => e.LastLoginAt).HasColumnName("last_login_at");
         builder.Property(e => e.LockoutEnd).HasColumnName("lockout_end");
-
-        builder.OwnsOne(
+        
+        builder.ComplexProperty(
             b => b.UserName,
             b =>
             {
@@ -40,8 +33,20 @@ public class UserConfiguration : IEntityTypeConfiguration<Entities.User.User>
                     .HasColumnName("user_name");
 
                 b.Property(e => e.NormalizedValue)
+                    .HasComplexIndex(true, null, "users_normalized_user_name_uindex");
+                
+                b.Property(e => e.NormalizedValue)
                     .HasMaxLength(36)
-                    .HasColumnName("normalized_user_name");
+                    .HasColumnName("normalized_user_name")
+                    .HasComplexIndex(x =>
+                    {
+                        x.UseGin()
+                            .IsUnique(false)
+                            .HasOperators("gin_trgm_ops")
+                            .HasName("users_normalized_user_name_index");
+                    });
+                
+                
             });
         
         builder.Property(e => e.PasswordHash)

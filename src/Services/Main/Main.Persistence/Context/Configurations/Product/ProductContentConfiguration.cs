@@ -9,7 +9,7 @@ public class ProductContentConfiguration : IEntityTypeConfiguration<ProductConte
 {
     public void Configure(EntityTypeBuilder<ProductContent> builder)
     {
-        builder.ToTable("product_contents");
+        builder.ToTable("product_contents", "public");
         
         builder.HasKey(e => new { e.ParentProductId, e.ChildProductId })
             .HasName("product_contents_pk");
@@ -27,7 +27,7 @@ public class ProductContentConfiguration : IEntityTypeConfiguration<ProductConte
             .HasColumnName("quantity");
         
         builder.HasOne(x => x.ParentProduct)
-            .WithMany(p => p.Contents)
+            .WithMany()
             .HasForeignKey(x => x.ParentProductId)
             .OnDelete(DeleteBehavior.Cascade)
             .HasConstraintName("product_contents_parent_fk");

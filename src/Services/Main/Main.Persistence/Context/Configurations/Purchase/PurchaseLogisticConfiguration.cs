@@ -10,7 +10,7 @@ public class PurchaseLogisticConfiguration : IEntityTypeConfiguration<PurchaseLo
 {
     public void Configure(EntityTypeBuilder<PurchaseLogistic> builder)
     {
-        builder.ToTable("purchase_logistics");
+        builder.ToTable("purchase_logistics", "public");
         
         builder.HasKey(e => e.PurchaseId).HasName("purchase_logistics_pk");
 

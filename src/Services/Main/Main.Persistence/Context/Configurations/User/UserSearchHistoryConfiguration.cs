@@ -9,7 +9,7 @@ public class UserSearchHistoryConfiguration : IEntityTypeConfiguration<UserSearc
 {
     public void Configure(EntityTypeBuilder<UserSearchHistory> builder)
     {
-        builder.ToTable("user_search_history");
+        builder.ToTable("user_search_history", "public");
         
         builder.HasKey(e => e.Id)
             .HasName("user_search_history_pk");

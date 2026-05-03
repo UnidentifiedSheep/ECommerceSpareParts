@@ -2,7 +2,7 @@
 
 namespace Application.Common.Interfaces.Repositories;
 
-public interface IRepository<TEntity, TKey> where TEntity : Entity<TEntity, TKey>
+public interface IRepository<TEntity, in TKey> where TEntity : Entity<TEntity, TKey>
 {
     ValueTask<TEntity?> GetById(
         TKey id,

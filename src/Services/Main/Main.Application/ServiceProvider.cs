@@ -53,7 +53,6 @@ public static class ServiceProvider
         collection.AddScoped<IBalanceService, BalanceService>();
         collection.AddScoped<ISaleService, SaleService>();
         collection.AddScoped<IUserTokenService, UserTokenService>();
-        collection.AddScoped<IPurchaseService, PurchaseService>();
         collection.AddScoped<IUserService, UserService>();
 
         collection.AddApplicationBase(typeof(Global).Assembly);

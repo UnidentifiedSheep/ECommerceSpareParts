@@ -9,15 +9,15 @@ public class ProducerOtherNameConfiguration : IEntityTypeConfiguration<ProducerO
 {
     public void Configure(EntityTypeBuilder<ProducerOtherName> builder)
     {
-        builder.ToTable("producers_other_names");
+        builder.ToTable("producers_other_names", "public");
         
-        builder.HasKey("producer_id", "other_name", "where_used")
+        builder.HasKey(e => new { e.ProducerId, e.OtherName, e.WhereUsed })
             .HasName("producers_other_names_pk");
 
         builder.HasIndex(e => e.ProducerId)
             .HasDatabaseName("producers_other_names_producer_id_index");
 
-        builder.HasIndex("other_name")
+        builder.HasIndex(e => e.OtherName)
             .HasDatabaseName("producers_other_names_producer_other_name_index")
             .HasMethod("gin")
             .HasOperators("gin_trgm_ops");
@@ -30,14 +30,9 @@ public class ProducerOtherNameConfiguration : IEntityTypeConfiguration<ProducerO
         builder.Property(e => e.ProducerId)
             .HasColumnName("producer_id");
 
-        builder.OwnsOne(
-            v => v.OtherName,
-            b =>
-            {
-                b.Property(x => x.Value)
-                    .HasMaxLength(64)
-                    .HasColumnName("other_name");
-            });
+        builder.Property(e => e.OtherName)
+            .HasMaxLength(64)
+            .HasColumnName("other_name");
         
         builder.Property(e => e.WhereUsed)
             .HasMaxLength(64)

@@ -5,7 +5,7 @@ namespace Main.Entities.Exceptions.Purchase;
 
 public class PurchaseNotFoundException : NotFoundException, ILocalizableException
 {
-    public PurchaseNotFoundException(string id) : base(null, new { Id = id })
+    public PurchaseNotFoundException(Guid id) : base(null, new { Id = id })
     {
     }
 
