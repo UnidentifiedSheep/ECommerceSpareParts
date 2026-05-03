@@ -1,22 +1,25 @@
 using Carter;
 using Main.Application.Dtos.Anonymous.Articles;
+using Main.Application.Dtos.Product;
 using Main.Application.Handlers.Products.GetProductPair;
 using Mapster;
 using MediatR;
 
 namespace Main.Api.EndPoints.Articles;
 
-public record GetArticlePairsResponse(IEnumerable<ArticleDto> Pairs);
+public record GetProductPairResponse(ProductDto? Pair);
 
-public class GetArticlePairsEndPoint : ICarterModule
+public class GetProductPairEndPoint : ICarterModule
 {
     public void AddRoutes(IEndpointRouteBuilder app)
     {
-        app.MapGet("/articles/{articleId}/pairs", async (ISender sender, int articleId, CancellationToken token) =>
+        app.MapGet(
+                pattern: "/products/{productId}/pairs", 
+                handler: async (ISender sender, int productId, CancellationToken token) =>
             {
-                var query = new GetProductPairQuery(articleId);
+                var query = new GetProductPairQuery(productId);
                 var result = await sender.Send(query, token);
-                return Results.Ok(result.Adapt<GetArticlePairsResponse>());
+                return Results.Ok(new GetProductPairResponse(result.Pair));
             }).WithTags("Articles")
             .WithDescription("Поиск пар артикула")
             .WithSummary("Поиск пар артикула");

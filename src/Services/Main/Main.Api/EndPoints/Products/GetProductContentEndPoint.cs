@@ -6,21 +6,23 @@ using MediatR;
 
 namespace Main.Api.EndPoints.Articles;
 
-public record GetArticleContentResponse(IEnumerable<ProductContentDto> Content);
+public record GetProductContentResponse(IReadOnlyList<ProductContentDto> Content);
 
-public class GetArticleContentEndPoint : ICarterModule
+public class GetProductContentEndPoint : ICarterModule
 {
     public void AddRoutes(IEndpointRouteBuilder app)
     {
-        app.MapGet("/articles/{articleId}/contents", async (ISender sender, int articleId, CancellationToken token) =>
+        app.MapGet(
+                pattern: "/products/{productId}/contents", 
+                handler: async (ISender sender, int productId, CancellationToken token) =>
             {
-                var result = await sender.Send(new GetProductContentsQuery(articleId), token);
-                var response = result.Adapt<GetArticleContentResponse>();
+                var result = await sender.Send(new GetProductContentsQuery(productId), token);
+                var response = new GetProductContentResponse(result.Contents);
                 return Results.Ok(response);
             }).WithName("получить содержание артикула")
             .WithTags("Articles")
             .WithDescription("Получить содержимое артикула по id.")
-            .Produces<GetArticleContentResponse>()
+            .Produces<GetProductContentResponse>()
             .ProducesProblem(StatusCodes.Status400BadRequest)
             .WithSummary("получить содержание артикула");
     }

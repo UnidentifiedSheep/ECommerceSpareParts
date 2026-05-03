@@ -176,7 +176,7 @@ builder.Services.AddCors(options =>
     });
 });
 
-var endpointAssembly = typeof(AddArticleContentEndPoint).Assembly;
+var endpointAssembly = typeof(AddProductContentEndPoint).Assembly;
 builder.Services.AddCarter(new DependencyContextAssemblyCatalog(endpointAssembly));
 
 builder.Services.AddTransient<HeaderSecretMiddleware>();

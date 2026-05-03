@@ -1,4 +1,5 @@
-﻿using Carter;
+﻿using Api.Common.Models.Requests;
+using Carter;
 using Main.Application.Dtos.Anonymous.Articles;
 using Main.Application.Handlers.ProductCharacteristics.GetCharacteristics;
 using Mapster;
@@ -6,28 +7,24 @@ using MediatR;
 
 namespace Main.Api.EndPoints.ArticleCharacteristics;
 
-public record GetArticleCharacteristicsResponse(IEnumerable<ProductCharacteristicDto> Characteristics);
+public record GetProductCharacteristicsResponse(IReadOnlyList<ProductCharacteristicDto> Characteristics);
 
 public class GetCharacteristicsEndPoint : ICarterModule
 {
     public void AddRoutes(IEndpointRouteBuilder app)
     {
-        app.MapGet("/articles/{articleId:int}/characteristics/",
-                async (ISender sender, int articleId, HttpContext context, CancellationToken token) =>
+        app.MapGet("/products/{productId:int}/characteristics",
+                async (ISender sender, int productId, [AsParameters] PaginationQueryModel queryParams, 
+                    CancellationToken token) =>
                 {
-                    var characteristicsIds = context.Request.Query["id"]
-                        .Select(x => int.TryParse(x, out var id) ? id : (int?)null)
-                        .Where(x => x.HasValue)
-                        .Select(x => x!.Value)
-                        .ToList();
-                    var result = await sender.Send(new GetCharacteristicsQuery(articleId, characteristicsIds),
+                    var result = await sender.Send(new GetCharacteristicsQuery(productId, queryParams),
                         token);
-                    var response = result.Adapt<GetArticleCharacteristicsResponse>();
+                    var response = result.Adapt<GetProductCharacteristicsResponse>();
                     return Results.Ok(response);
                 }).WithName("Получение характеристик артикула по id")
             .WithTags("Article Characteristics")
             .WithDescription("Получить характеристики артикула")
-            .Produces<GetArticleCharacteristicsResponse>()
+            .Produces<GetProductCharacteristicsResponse>()
             .ProducesProblem(StatusCodes.Status400BadRequest)
             .WithSummary("Получение характеристик артикула по id");
     }

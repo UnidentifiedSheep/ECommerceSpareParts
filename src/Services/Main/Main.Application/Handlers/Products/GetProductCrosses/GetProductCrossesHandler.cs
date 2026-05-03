@@ -13,7 +13,7 @@ namespace Main.Application.Handlers.Products.GetProductCrosses;
 public record GetProductCrossesQuery(int ProductId, Pagination Pagination, string? SortBy, Guid? UserId)
     : IQuery<GetProductCrossesResult>;
 
-public record GetProductCrossesResult(IEnumerable<ProductDto> Crosses, ProductDto RequestedProduct);
+public record GetProductCrossesResult(IReadOnlyList<ProductDto> Crosses, ProductDto RequestedProduct);
 
 public class GetProductCrossesHandler(
     IProductRepository repository,

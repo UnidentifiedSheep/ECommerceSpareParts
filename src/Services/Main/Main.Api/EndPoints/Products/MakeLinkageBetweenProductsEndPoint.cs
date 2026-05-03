@@ -7,14 +7,14 @@ using MediatR;
 
 namespace Main.Api.EndPoints.Articles;
 
-public record MakeLinkageBetweenArticlesRequest(List<NewProductLinkageDto> Linkages);
+public record MakeLinkageBetweenProductsRequest(List<NewProductLinkageDto> Linkages);
 
-public class MakeLinkageBetweenArticlesEndPoint : ICarterModule
+public class MakeLinkageBetweenProductsEndPoint : ICarterModule
 {
     public void AddRoutes(IEndpointRouteBuilder app)
     {
-        app.MapPost("/articles/crosses",
-                async (ISender sender, MakeLinkageBetweenArticlesRequest request, CancellationToken token) =>
+        app.MapPost("/products/crosses",
+                async (ISender sender, MakeLinkageBetweenProductsRequest request, CancellationToken token) =>
                 {
                     var command = request.Adapt<MakeLinkageBetweenProductsCommand>();
                     await sender.Send(command, token);

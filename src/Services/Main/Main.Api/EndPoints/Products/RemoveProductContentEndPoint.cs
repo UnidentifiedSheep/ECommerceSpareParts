@@ -5,14 +5,14 @@ using MediatR;
 
 namespace Main.Api.EndPoints.Articles;
 
-public class RemoveArticleContentEndPoint : ICarterModule
+public class RemoveProductContentEndPoint : ICarterModule
 {
     public void AddRoutes(IEndpointRouteBuilder app)
     {
-        app.MapDelete("/articles/{articleId}/contents/{insideArticleId}",
-                async (ISender sender, int articleId, int insideArticleId, CancellationToken token) =>
+        app.MapDelete("/products/{productId}/contents/{childProductId}",
+                async (ISender sender, int productId, int childProductId, CancellationToken token) =>
                 {
-                    var command = new RemoveProductContentCommand(articleId, insideArticleId);
+                    var command = new RemoveProductContentCommand(productId, childProductId);
                     await sender.Send(command, token);
                     return Results.NoContent();
                 }).WithTags("Articles")

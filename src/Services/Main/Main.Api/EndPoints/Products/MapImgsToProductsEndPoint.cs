@@ -6,15 +6,15 @@ using MediatR;
 
 namespace Main.Api.EndPoints.Articles;
 
-public class MapImgsToArticleEndPoint : ICarterModule
+public class MapImgsToProductsEndPoint : ICarterModule
 {
     public void AddRoutes(IEndpointRouteBuilder app)
     {
-        app.MapPost("/articles/{articleId}/imgs/",
-                async (ISender sender, int articleId, HttpContext context, CancellationToken token) =>
+        app.MapPost("/products/{productId}/imgs/",
+                async (ISender sender, int productId, HttpContext context, CancellationToken token) =>
                 {
                     var files = FileModel.GetFileModels(context.Request.Form.Files);
-                    var command = new MapImgsToProductCommand(articleId, files);
+                    var command = new MapImgsToProductCommand(productId, files);
                     await sender.Send(command, token);
                     return Results.Ok();
                 }).WithMetadata()

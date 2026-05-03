@@ -12,10 +12,12 @@ public class EditCharacteristicsEndPoint : ICarterModule
 {
     public void AddRoutes(IEndpointRouteBuilder app)
     {
-        app.MapPatch("/articles/characteristics/{id:int}",
-                async (ISender sender, int id, EditCharacteristicsRequest request, CancellationToken token) =>
+        app.MapPatch(
+                pattern: "/products/{productId}/characteristics/{name}",
+                handler: async (ISender sender, int productId, string name, 
+                    EditCharacteristicsRequest request, CancellationToken token) =>
                 {
-                    var command = new PatchCharacteristicsCommand(id, request.Value);
+                    var command = new PatchCharacteristicsCommand(productId, name, request.Value);
                     await sender.Send(command, token);
                     return Results.Ok();
                 }).WithName("Редактирование характеристики артикула по id")

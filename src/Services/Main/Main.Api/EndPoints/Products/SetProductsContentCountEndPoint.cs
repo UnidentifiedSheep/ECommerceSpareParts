@@ -5,20 +5,20 @@ using MediatR;
 
 namespace Main.Api.EndPoints.Articles;
 
-public record SetArticlesContentCountRequest(int Count);
+public record SetProductsContentCountRequest(int Count);
 
-public class SetArticlesContentCountEndPoint : ICarterModule
+public class SetProductsContentCountEndPoint : ICarterModule
 {
     public void AddRoutes(IEndpointRouteBuilder app)
     {
-        app.MapPatch("/articles/{articleId}/contents/{insideArticleId}", async (
+        app.MapPatch("/products/{productId}/contents/{childProductId}", async (
                 ISender sender,
-                int articleId,
-                int insideArticleId,
-                SetArticlesContentCountRequest request,
+                int productId,
+                int childProductId,
+                SetProductsContentCountRequest request,
                 CancellationToken token) =>
             {
-                var command = new SetProductsContentCountCommand(articleId, insideArticleId, request.Count);
+                var command = new SetProductsContentCountCommand(productId, childProductId, request.Count);
                 await sender.Send(command, token);
                 return Results.NoContent();
             }).WithTags("Articles")

@@ -6,22 +6,22 @@ using MediatR;
 
 namespace Main.Api.EndPoints.Articles;
 
-public record EditArticleRequest(PatchProductDto PatchProduct);
+public record EditProductRequest(PatchProductDto PatchProduct);
 
-public class EditArticleEndPoint : ICarterModule
+public class EditProductEndPoint : ICarterModule
 {
     public void AddRoutes(IEndpointRouteBuilder app)
     {
-        app.MapPatch("/articles/{articleId}",
-                async (ISender sender, int articleId, EditArticleRequest request, CancellationToken token) =>
+        app.MapPatch("/products/{productId}",
+                async (ISender sender, int productId, EditProductRequest request, CancellationToken token) =>
                 {
-                    var command = new PatchArticleCommand(articleId, request.PatchProduct);
+                    var command = new PatchArticleCommand(productId, request.PatchProduct);
                     await sender.Send(command, token);
                     return Results.NoContent();
                 }).WithTags("Articles")
             .WithDescription("Редактирование артикула")
             .WithDisplayName("Редактирование артикула")
-            .Accepts<EditArticleRequest>(false, "application/json")
+            .Accepts<EditProductRequest>(false, "application/json")
             .RequireAnyPermission("ARTICLES.EDIT");
     }
 }

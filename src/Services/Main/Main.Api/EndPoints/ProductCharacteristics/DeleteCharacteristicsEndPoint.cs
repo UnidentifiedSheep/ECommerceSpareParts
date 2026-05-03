@@ -10,9 +10,11 @@ public class DeleteCharacteristicsEndPoint : ICarterModule
 {
     public void AddRoutes(IEndpointRouteBuilder app)
     {
-        app.MapDelete("/articles/characteristics/{id:int}", async (ISender sender, int id, CancellationToken token) =>
+        app.MapDelete(
+                pattern: "/products/{productId}/characteristics/{name}", 
+                handler: async (ISender sender, int productId, string name, CancellationToken token) =>
             {
-                await sender.Send(new DeleteCharacteristicsCommand(id), token);
+                await sender.Send(new DeleteCharacteristicsCommand(productId, name), token);
                 return Results.Ok();
             }).WithName("Удаление характеристики артикула по id")
             .WithTags("Article Characteristics")
