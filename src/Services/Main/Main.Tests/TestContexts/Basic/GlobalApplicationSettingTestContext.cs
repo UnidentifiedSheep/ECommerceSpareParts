@@ -1,6 +1,7 @@
 ﻿using Abstractions.Interfaces.Services;
 using Application.Common.Interfaces.Settings;
 using Main.Abstractions.Models.Settings;
+using Main.Entities.User;
 using Main.Persistence.Context;
 using MediatR;
 using Test.Common.Abstractions;
@@ -12,22 +13,20 @@ namespace Tests.TestContexts.Base;
 public abstract class GlobalApplicationSettingTestContext(
     DContext context, 
     IMediator mediator, 
-    ISettingsService settingsService,
-    IUnitOfWork unitOfWork)
-    : TestContextBase<DContext>(context, mediator)
+    ISettingsService settingsService
+    ) : TestContextBase<DContext>(context, mediator)
 {
-    protected IUnitOfWork UnitOfWork => unitOfWork;
-    protected ISettingsService SettingsService => settingsService;
+    public User SystemUser { get; private set; } = null!;
     
     public override async Task InitializeAsync(CancellationToken cancellationToken = default)
     {
-        var user = await new SystemUserBuilder(Faker)
+        SystemUser = await new SystemUserBuilder(Faker)
             .WithUserName("SYSTEM")
-            .BuildAndAddToDb(unitOfWork);
+            .BuildAndAddToDb(DbContext);
 
         var setting = new GlobalApplicationSetting(new GlobalApplicationSettingData
         {
-            SystemId = user.Id,
+            SystemId = SystemUser.Id,
             ImageBucketName = "images",
             ServiceUrl = "https://www.somewebsite.com",
         });

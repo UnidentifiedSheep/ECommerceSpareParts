@@ -10,8 +10,8 @@ namespace Tests.TestContexts.Base;
 
 public class ProducerTestContext(
     DContext context, 
-    IMediator mediator,
-    IUnitOfWork unitOfWork) : TestContextBase<DContext>(context, mediator)
+    IMediator mediator
+    ) : TestContextBase<DContext>(context, mediator)
 {
     private readonly List<Producer> _producers = [];
     public IReadOnlyList<Producer> Producers => _producers;
@@ -19,6 +19,6 @@ public class ProducerTestContext(
     public override async Task InitializeAsync(CancellationToken cancellationToken = default)
     {
         _producers.AddRange(await new ProducerBuilder(Faker)
-            .BuildManyAndAddToDb(unitOfWork, 5));
+            .BuildManyAndAddToDb(DbContext, 5));
     }
 }

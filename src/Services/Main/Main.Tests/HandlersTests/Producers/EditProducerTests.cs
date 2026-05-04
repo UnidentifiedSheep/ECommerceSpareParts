@@ -1,81 +1,38 @@
 using Abstractions.Models;
-using Bogus;
+using FluentAssertions;
 using Main.Application.Dtos.Producer;
 using Main.Application.Handlers.Producers.EditProducer;
-using Main.Persistence.Context;
-using MediatR;
+using Main.Entities.Producer;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.DependencyInjection;
-using Test.Common.Extensions;
 using Test.Common.TestContainers.Combined;
-using Tests.MockData;
+using Tests.TestContexts.Base;
 using ValidationException = FluentValidation.ValidationException;
 
 namespace Tests.HandlersTests.Producers;
 
-[Collection("Combined collection")]
-public class EditProducerTests : IAsyncLifetime
+public class EditProducerTests(CombinedContainerFixture fixture) : TestBase<ProducerTestContext>(fixture)
 {
-    private readonly DContext _context;
-    private readonly Faker _faker = new(Global.Locale);
-    private readonly IMediator _mediator;
-
-    public EditProducerTests(CombinedContainerFixture fixture)
+    [Theory]
+    [InlineData("tooBig")]
+    [InlineData("в")]
+    public async Task EditProducer_TooLargeName_FailsValidation(string? name)
     {
-        var sp = ServiceProviderForTests.Build(fixture.PostgresConnectionString, fixture.RedisConnectionString);
-        _mediator = sp.GetService<IMediator>()!;
-        _context = sp.GetRequiredService<DContext>();
-    }
-
-    public async Task InitializeAsync()
-    {
-        await _mediator.AddMockProducersAndArticles();
-    }
-
-    public async Task DisposeAsync()
-    {
-        await _context.ClearDatabase();
-    }
-
-    [Fact]
-    public async Task EditProducer_TooLargeName_FailsValidation()
-    {
-        var producer = await _context.Producers.AsNoTracking().FirstOrDefaultAsync();
-        Assert.NotNull(producer);
+        if (name == "tooBig") name = Faker.Lorem.Letter(200);
         var model = new PatchProducerDto
         {
             Name = new PatchField<string>
             {
                 IsSet = true,
-                Value = _faker.Lorem.Letter(200)
+                Value = name
             }
         };
-        var command = new EditProducerCommand(producer.Id, model);
-        await Assert.ThrowsAsync<ValidationException>(async () => await _mediator.Send(command));
-    }
-
-    [Fact]
-    public async Task EditProducer_TooSmallName_FailsValidation()
-    {
-        var producer = await _context.Producers.AsNoTracking().FirstOrDefaultAsync();
-        Assert.NotNull(producer);
-        var model = new PatchProducerDto
-        {
-            Name = new PatchField<string>
-            {
-                IsSet = true,
-                Value = _faker.Lorem.Letter()
-            }
-        };
-        var command = new EditProducerCommand(producer.Id, model);
-        await Assert.ThrowsAsync<ValidationException>(async () => await _mediator.Send(command));
+        var command = new EditProducerCommand(GetFirstProducer().Id, model);
+        await Assert.ThrowsAsync<ValidationException>(async () => await Mediator.Send(command));
     }
 
     [Fact]
     public async Task EditProducer_IsSetButNullValue_FailsValidation()
     {
-        var producer = await _context.Producers.AsNoTracking().FirstOrDefaultAsync();
-        Assert.NotNull(producer);
         var model = new PatchProducerDto
         {
             Name = new PatchField<string>
@@ -84,68 +41,72 @@ public class EditProducerTests : IAsyncLifetime
                 Value = null
             }
         };
-        var command = new EditProducerCommand(producer.Id, model);
-        await Assert.ThrowsAsync<ValidationException>(async () => await _mediator.Send(command));
+        var command = new EditProducerCommand(GetFirstProducer().Id, model);
+        await Assert.ThrowsAsync<ValidationException>(async () => await Mediator.Send(command));
     }
 
     [Fact]
     public async Task EditProducer_DescriptionTooLarge_FailsValidation()
     {
-        var producer = await _context.Producers.AsNoTracking().FirstOrDefaultAsync();
-        Assert.NotNull(producer);
         var model = new PatchProducerDto
         {
             Description = new PatchField<string?>
             {
                 IsSet = true,
-                Value = _faker.Lorem.Letter(1000)
+                Value = Faker.Lorem.Letter(1000)
             }
         };
-        var command = new EditProducerCommand(producer.Id, model);
-        await Assert.ThrowsAsync<ValidationException>(async () => await _mediator.Send(command));
+        var command = new EditProducerCommand(GetFirstProducer().Id, model);
+        await Assert.ThrowsAsync<ValidationException>(async () => await Mediator.Send(command));
     }
 
     [Fact]
     public async Task EditProducer_NoValuesSet_Succeeds()
     {
-        var producer = await _context.Producers.AsNoTracking().FirstOrDefaultAsync();
-        Assert.NotNull(producer);
-        var model = new PatchProducerDto();
-        var command = new EditProducerCommand(producer.Id, model);
-        await _mediator.Send(command);
+        var producer = GetFirstProducer();
+        
+        var act = () => Mediator.Send(
+            new EditProducerCommand(
+                producer.Id, 
+                new PatchProducerDto()));
 
-        var afterEditing = await _context.Producers.AsNoTracking().FirstOrDefaultAsync(x => x.Id == producer.Id);
-        Assert.NotNull(afterEditing);
-        Assert.Equal(producer.Name, afterEditing.Name);
-        Assert.Equal(producer.Description, afterEditing.Description);
-        Assert.Equal(producer.IsOe, afterEditing.IsOe);
+        await act.Should().NotThrowAsync();
+        
+        var dbProducer = await Context.Producers.AsNoTracking().FirstOrDefaultAsync(x => x.Id == producer.Id);
+        dbProducer.Should().NotBeNull();
+        
+        dbProducer.Name.Value.Should().Be(producer.Name.Value);
+        dbProducer.Description.Should().Be(producer.Description);
     }
 
     [Fact]
     public async Task EditProducer_Normal_Succeeds()
     {
-        var producer = await _context.Producers.AsNoTracking().FirstOrDefaultAsync();
-        Assert.NotNull(producer);
+        var producer = GetFirstProducer();
         var model = new PatchProducerDto
         {
             Name = new PatchField<string>
             {
                 IsSet = true,
-                Value = _faker.Lorem.Letter(30)
+                Value = Faker.Lorem.Letter(30)
             },
             Description =
             {
                 IsSet = true,
-                Value = _faker.Lorem.Letter(30)
+                Value = Faker.Lorem.Letter(30)
             }
         };
         var command = new EditProducerCommand(producer.Id, model);
-        await _mediator.Send(command);
+        var act = () => Mediator.Send(command);
 
-        var afterEditing = await _context.Producers.AsNoTracking().FirstOrDefaultAsync(x => x.Id == producer.Id);
-        Assert.NotNull(afterEditing);
-        Assert.Equal(model.Name, afterEditing.Name);
-        Assert.Equal(model.Description, afterEditing.Description);
-        Assert.Equal(producer.IsOe, afterEditing.IsOe);
+        await act.Should().NotThrowAsync();
+        
+        var dbProducer = await Context.Producers.AsNoTracking().FirstOrDefaultAsync(x => x.Id == producer.Id);
+        dbProducer.Should().NotBeNull();
+        
+        dbProducer.Name.Value.Should().Be(model.Name.Value);
+        dbProducer.Description.Should().Be(model.Description.Value);
     }
+
+    private Producer GetFirstProducer() => TestContext.Producers[0];
 }

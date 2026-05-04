@@ -4,6 +4,7 @@ using Analytics.Persistence.Context;
 using Localization.Abstractions.Interfaces;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
+using Test.Common.TestContexts;
 
 namespace Analytics.Integration.Tests.TestContexts;
 

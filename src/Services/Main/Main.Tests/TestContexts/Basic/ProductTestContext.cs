@@ -12,8 +12,8 @@ namespace Tests.TestContexts.Base;
 public class ProductTestContext(
     DContext context, 
     IMediator mediator,
-    ProducerTestContext producerTestContext,
-    IUnitOfWork unitOfWork) : TestContextBase<DContext>(context, mediator)
+    ProducerTestContext producerTestContext
+    ) : TestContextBase<DContext>(context, mediator)
 {
     public ProducerTestContext ProducerTestContext => producerTestContext;
     
@@ -25,6 +25,6 @@ public class ProductTestContext(
         await producerTestContext.InitializeAsync(cancellationToken);
         _products.AddRange(await new ProductBuilder(Faker)
             .WithProducers(producerTestContext.Producers)
-            .BuildManyAndAddToDb(unitOfWork, 10));
+            .BuildManyAndAddToDb(DbContext, 10));
     }
 }

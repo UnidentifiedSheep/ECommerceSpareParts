@@ -1,9 +1,9 @@
 ﻿using Abstractions.Interfaces.Tests;
 using Localization.Abstractions.Interfaces;
 
-namespace Analytics.Integration.Tests.TestContexts;
+namespace Test.Common.TestContexts;
 
-public abstract class LocalizedTestContext(IScopedStringLocalizer localizer) : ITestContext
+public class LocalizedTestContext(IScopedStringLocalizer localizer) : ITestContext
 {
     public virtual Task InitializeAsync(CancellationToken cancellationToken = default)
     {
