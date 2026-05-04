@@ -1,0 +1,36 @@
+﻿using Main.Entities.Storage;
+using Main.Enums;
+using Main.Persistence.Context;
+using MediatR;
+using Test.Common.Abstractions;
+using Test.Common.Extensions;
+using Tests.DataBuilders.Storage;
+
+namespace Tests.TestContexts;
+
+public class StorageContentTestContext(
+    DContext ctx, 
+    IMediator mediator,
+    StorageTestContext storage,
+    ProductTestContext product,
+    CurrencyTestContext currency) 
+    : TestContextBase<DContext>(ctx, mediator)
+{
+    public IReadOnlyCollection<StorageContent> StorageContents { get; private set; } = null!;
+    public override async Task InitializeAsync(CancellationToken cancellationToken = default)
+    {
+        StorageContents = await new StorageContentBuilder(Faker)
+            .WithCurrencyId(currency.Currencies.First().Id)
+            .WithProducts(product.Products)
+            .WithStorageName(storage.Storages.First(x => x.Type == StorageType.Warehouse).Name)
+            .BuildManyAndAddToDb(DbContext, 10);
+    }
+
+    public static void Register(TestBase test)
+    {
+        test.RegisterBasicContext<CurrencyTestContext>();
+        ProductTestContext.Register(test);
+        test.RegisterBasicContext<StorageTestContext>();
+        test.RegisterBasicContext<StorageContentTestContext>();
+    }
+}

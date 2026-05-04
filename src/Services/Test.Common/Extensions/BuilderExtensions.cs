@@ -27,4 +27,18 @@ public static class BuilderExtensions
         await context.SaveChangesAsync();
         return entities;
     }
+
+    public static async Task<IReadOnlyCollection<T>> BuildManyCombinedAndAddToDb<T>(
+        DbContext context,
+        int count,
+        params IBuilder<T>[] builders) where T : class
+    {
+        var entities = new List<T>();
+        foreach (var builder in builders)
+            entities.AddRange(builder.BuildMany(count));
+        
+        await context.AddRangeAsync(entities);
+        await context.SaveChangesAsync();
+        return entities;
+    }
 }
