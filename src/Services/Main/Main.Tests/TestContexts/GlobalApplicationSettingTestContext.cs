@@ -1,5 +1,4 @@
-﻿using Abstractions.Interfaces.Services;
-using Application.Common.Interfaces.Settings;
+﻿using Application.Common.Interfaces.Settings;
 using Main.Abstractions.Models.Settings;
 using Main.Entities.User;
 using Main.Persistence.Context;
@@ -8,7 +7,7 @@ using Test.Common.Abstractions;
 using Test.Common.Extensions;
 using Tests.DataBuilders.User;
 
-namespace Tests.TestContexts.Base;
+namespace Tests.TestContexts;
 
 public abstract class GlobalApplicationSettingTestContext(
     DContext context, 

@@ -6,8 +6,7 @@ using Main.Entities.Product;
 using Main.Enums;
 using Microsoft.EntityFrameworkCore;
 using Test.Common.TestContainers.Combined;
-using Tests.TestContexts.Base;
-
+using Tests.TestContexts;
 using DbValidationException = BulkValidation.Core.Exceptions.ValidationException;
 
 namespace Tests.HandlersTests.Products;

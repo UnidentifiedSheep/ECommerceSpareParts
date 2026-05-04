@@ -3,7 +3,7 @@ using Main.Application.Handlers.Producers.DeleteProducer;
 using Main.Entities.Exceptions.Producers;
 using Microsoft.EntityFrameworkCore;
 using Test.Common.TestContainers.Combined;
-using Tests.TestContexts.Base;
+using Tests.TestContexts;
 
 namespace Tests.HandlersTests.Producers;
 

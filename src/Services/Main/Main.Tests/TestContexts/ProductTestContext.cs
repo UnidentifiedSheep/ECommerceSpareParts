@@ -1,13 +1,11 @@
-﻿using Abstractions.Interfaces.Services;
-using Main.Entities.Producer;
-using Main.Entities.Product;
+﻿using Main.Entities.Product;
 using Main.Persistence.Context;
 using MediatR;
 using Test.Common.Abstractions;
 using Test.Common.Extensions;
 using Tests.DataBuilders;
 
-namespace Tests.TestContexts.Base;
+namespace Tests.TestContexts;
 
 public class ProductTestContext(
     DContext context, 

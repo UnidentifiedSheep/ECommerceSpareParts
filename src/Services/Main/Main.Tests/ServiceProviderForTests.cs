@@ -15,7 +15,7 @@ using Serilog;
 using Test.Common.Extensions;
 using Test.Common.Stubs;
 using Test.Common.TestContexts;
-using Tests.TestContexts.Basic;
+using Tests.TestContexts;
 using ApplicationServiceProvider = Main.Application.ServiceProvider;
 
 namespace Tests;

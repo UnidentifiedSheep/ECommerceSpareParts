@@ -1,7 +1,6 @@
 ﻿using Test.Common.TestContainers.Combined;
-using Xunit;
 
-namespace Test.Common.TestContainers;
+namespace Tests;
 
 [CollectionDefinition("Combined collection")]
 public class CombinedCollection : ICollectionFixture<CombinedContainerFixture>

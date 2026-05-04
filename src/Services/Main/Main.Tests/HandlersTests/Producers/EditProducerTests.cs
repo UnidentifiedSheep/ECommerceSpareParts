@@ -5,7 +5,7 @@ using Main.Application.Handlers.Producers.EditProducer;
 using Main.Entities.Producer;
 using Microsoft.EntityFrameworkCore;
 using Test.Common.TestContainers.Combined;
-using Tests.TestContexts.Base;
+using Tests.TestContexts;
 using ValidationException = FluentValidation.ValidationException;
 
 namespace Tests.HandlersTests.Producers;

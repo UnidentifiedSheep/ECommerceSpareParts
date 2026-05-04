@@ -5,8 +5,7 @@ using Main.Entities.Product;
 using Main.Entities.User;
 using Microsoft.EntityFrameworkCore;
 using Test.Common.TestContainers.Combined;
-using Tests.TestContexts.Base;
-using Tests.TestContexts.Basic;
+using Tests.TestContexts;
 using ValidationException = FluentValidation.ValidationException;
 using DbValidationException = BulkValidation.Core.Exceptions.ValidationException;
 

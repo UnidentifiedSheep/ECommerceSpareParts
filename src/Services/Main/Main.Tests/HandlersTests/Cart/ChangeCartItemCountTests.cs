@@ -4,8 +4,7 @@ using Microsoft.EntityFrameworkCore;
 using Test.Common.Extensions;
 using Test.Common.TestContainers.Combined;
 using Tests.DataBuilders;
-using Tests.TestContexts.Base;
-using Tests.TestContexts.Basic;
+using Tests.TestContexts;
 using ValidationException = FluentValidation.ValidationException;
 
 namespace Tests.HandlersTests.Cart;

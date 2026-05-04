@@ -1,12 +1,10 @@
 ﻿using Abstractions.Interfaces;
-using Abstractions.Interfaces.Services;
 using Application.Common.Interfaces.Settings;
 using Main.Persistence.Context;
 using MediatR;
 using Test.Common.Stubs;
-using Tests.TestContexts.Base;
 
-namespace Tests.TestContexts.Basic;
+namespace Tests.TestContexts;
 
 public class UserContextTestContext(
     DContext context, 

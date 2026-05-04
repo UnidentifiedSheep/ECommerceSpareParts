@@ -5,7 +5,7 @@ using Test.Common.Abstractions;
 using Test.Common.Extensions;
 using Tests.DataBuilders.User;
 
-namespace Tests.TestContexts.Basic;
+namespace Tests.TestContexts;
 
 public class UsersTestContext(
     DContext context, 

@@ -5,7 +5,7 @@ using Test.Common.Abstractions;
 using Test.Common.Extensions;
 using Tests.DataBuilders;
 
-namespace Tests.TestContexts.Basic;
+namespace Tests.TestContexts;
 
 public class CurrencyTestContext(
     DContext context, 
