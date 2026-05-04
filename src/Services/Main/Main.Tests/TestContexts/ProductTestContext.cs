@@ -3,6 +3,7 @@ using Main.Persistence.Context;
 using MediatR;
 using Test.Common.Abstractions;
 using Test.Common.Extensions;
+using Test.Common.Interfaces;
 using Tests.DataBuilders;
 
 namespace Tests.TestContexts;
@@ -11,7 +12,7 @@ public class ProductTestContext(
     DContext context, 
     IMediator mediator,
     ProducerTestContext producerTestContext
-    ) : TestContextBase<DContext>(context, mediator)
+    ) : TestContextBase<DContext>(context, mediator), ITestContextRegistrator
 {
     public ProducerTestContext ProducerTestContext => producerTestContext;
     
@@ -24,8 +25,8 @@ public class ProductTestContext(
             .WithProducers(producerTestContext.Producers)
             .BuildManyAndAddToDb(DbContext, 10));
     }
-
-    public static void Register(TestBase test)
+    
+    public static void Register(ITest test)
     {
         test.RegisterBasicContext<ProducerTestContext>();
         test.RegisterBasicContext<ProductTestContext>();

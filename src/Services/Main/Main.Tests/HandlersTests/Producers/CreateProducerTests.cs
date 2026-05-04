@@ -7,7 +7,7 @@ using ValidationException = FluentValidation.ValidationException;
 
 namespace Tests.HandlersTests.Producers;
 
-public class CreateProducerTests(CombinedContainerFixture fixture) : TestBase(fixture)
+public class CreateProducerTests(CombinedContainerFixture fixture) : Test(fixture)
 {
     [Theory]
     [InlineData("")]

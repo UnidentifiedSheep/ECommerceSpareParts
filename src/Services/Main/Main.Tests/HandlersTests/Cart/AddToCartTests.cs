@@ -11,7 +11,7 @@ using DbValidationException = BulkValidation.Core.Exceptions.ValidationException
 
 namespace Tests.HandlersTests.Cart;
 
-public class AddToCartTests : TestBase
+public class AddToCartTests : Test
 {
     private UsersTestContext _usersContext = null!;
     private ProductTestContext _productContext = null!;

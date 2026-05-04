@@ -10,7 +10,7 @@ using DbValidationException = BulkValidation.Core.Exceptions.ValidationException
 namespace Tests.HandlersTests.Currencies;
 
 [Collection("Combined collection")]
-public class CreateCurrencyTests(CombinedContainerFixture fixture) : TestBase(fixture)
+public class CreateCurrencyTests(CombinedContainerFixture fixture) : Test(fixture)
 {
     private string GetValidName()
     {

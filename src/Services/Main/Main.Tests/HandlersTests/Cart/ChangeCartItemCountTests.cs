@@ -9,12 +9,12 @@ using ValidationException = FluentValidation.ValidationException;
 
 namespace Tests.HandlersTests.Cart;
 
-public class ChangeCartItemCountTests : TestBase
+public class ChangeCartItemCountTests : Test
 {
     private Main.Entities.Cart.Cart _cartItem = null!;
     public ChangeCartItemCountTests(CombinedContainerFixture fixture) : base(fixture)
     {
-        ProductTestContext.Register(this);
+        RegisterBasicContext<ProductTestContext>();
         RegisterBasicContext<UsersTestContext>();
     }
 

@@ -1,52 +1,42 @@
+﻿using System.Reflection;
 using Abstractions.Interfaces.Tests;
 using Bogus;
-using Main.Persistence.Context;
-using MediatR;
 using Microsoft.Extensions.DependencyInjection;
-using Test.Common.Extensions;
-using Test.Common.TestContainers.Combined;
+using Test.Common.Interfaces;
+using Xunit;
 
-namespace Tests;
+namespace Test.Common.Abstractions;
 
-[Collection("Combined collection")]
-public abstract class TestBase(CombinedContainerFixture fixture) : IAsyncLifetime
+public abstract class TestBase : IAsyncLifetime, ITest
 {
     private static readonly HashSet<Type> GlobalBasicContexts = [];
     private readonly HashSet<Type> _basicContexts = []; 
     private readonly Dictionary<Type, ITestContext> _initedBasicContexts = new();
-    protected IServiceProvider Sp { get; private set; } = null!;
-    protected IServiceScope Scope { get; private set; } = null!;
+    protected abstract IServiceProvider Sp { get; }
+    protected abstract IServiceScope Scope { get; }
     
-    protected DContext Context { get; private set; } = null!;
-    protected IMediator Mediator { get; private set; } = null!;
     protected readonly Faker Faker = new();
     
+    public void RegisterBasicContext<TContext>() 
+        where TContext : class, ITestContext
+    {
+        var type = typeof(TContext);
 
-    public virtual async Task InitializeAsync()
-    {
-        Sp = await new ServiceProviderForTests().Build(
-            fixture.PostgresConnectionString,
-            fixture.RedisConnectionString);
-        
-        Scope = Sp.CreateScope();
-        
-        Context = Scope.ServiceProvider.GetRequiredService<DContext>();
-        Mediator = Scope.ServiceProvider.GetRequiredService<IMediator>();
-        
-        await InitializeBasicContexts();
-    }
+        if (!_basicContexts.Add(type))
+            return;
 
-    public virtual async Task DisposeAsync()
-    {
-        await ResetDb();
-        Scope.Dispose();
-    }
-    
-    protected Task ResetDb() => Context.ClearDatabase();
-    
-    public void RegisterBasicContext<TContext>() where TContext : class, ITestContext
-    {
-        _basicContexts.Add(typeof(TContext));
+        if (!typeof(ITestContextRegistrator).IsAssignableFrom(type))
+            return;
+
+        var method = type.GetMethod(
+            nameof(ITestContextRegistrator.Register),
+            BindingFlags.Public | BindingFlags.Static,
+            binder: null,
+            types: [typeof(ITest)],
+            modifiers: null) ?? throw new InvalidOperationException(
+            $"Type {type.Name} implements ITestContextRegistrator but does not have correct static Register(ITest) method.");
+
+        method.Invoke(null, [this]);
     }
 
     public void RemoveBasicContext<TContext>() where TContext : class, ITestContext
@@ -71,7 +61,7 @@ public abstract class TestBase(CombinedContainerFixture fixture) : IAsyncLifetim
         throw new InvalidOperationException($"No context found for {typeof(T).Name}. Try register it first");
     }
 
-    private async Task InitializeBasicContexts()
+    protected async Task InitializeBasicContexts()
     {
         var merged = GlobalBasicContexts.ToHashSet();
         merged.UnionWith(_basicContexts);
@@ -82,4 +72,8 @@ public abstract class TestBase(CombinedContainerFixture fixture) : IAsyncLifetim
             await ctx.InitializeAsync();
         }
     }
+
+    public abstract Task InitializeAsync();
+
+    public abstract Task DisposeAsync();
 }

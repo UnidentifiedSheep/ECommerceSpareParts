@@ -9,7 +9,7 @@ using DbValidationException = BulkValidation.Core.Exceptions.ValidationException
 
 namespace Tests.HandlersTests.Storages;
 
-public class CreateStorageTests(CombinedContainerFixture fixture) : TestBase(fixture)
+public class CreateStorageTests(CombinedContainerFixture fixture) : Test(fixture)
 {
     [Fact]
     public async Task CreateStorage_TooLargeName_FailsValidation()

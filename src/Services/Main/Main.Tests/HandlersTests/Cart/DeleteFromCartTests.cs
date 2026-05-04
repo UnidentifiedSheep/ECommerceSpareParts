@@ -8,12 +8,12 @@ using Tests.TestContexts;
 
 namespace Tests.HandlersTests.Cart;
 
-public class DeleteFromCartTests : TestBase
+public class DeleteFromCartTests : Test
 {
     private Main.Entities.Cart.Cart _cartItem = null!;
     public DeleteFromCartTests(CombinedContainerFixture fixture) : base(fixture)
     {
-        ProductTestContext.Register(this);
+        RegisterBasicContext<ProductTestContext>();
         RegisterBasicContext<UsersTestContext>();
     }
 

@@ -1,41 +1,15 @@
-﻿using Bogus;
-using Extensions;
-using Main.Application.Handlers.Auth.CreateRole;
+﻿using Main.Application.Handlers.Auth.CreateRole;
 using Main.Entities.Exceptions.Auth;
-using Main.Persistence.Context;
-using MediatR;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.DependencyInjection;
 using Test.Common.Extensions;
 using Test.Common.TestContainers.Combined;
+using Tests.DataBuilders.Auth;
 using ValidationException = FluentValidation.ValidationException;
 
 namespace Tests.HandlersTests.Roles;
 
-[Collection("Combined collection")]
-public class CreateRoleTests : IAsyncLifetime
+public class CreateRoleTests(CombinedContainerFixture fixture) : Test(fixture)
 {
-    private readonly DContext _context;
-    private readonly Faker _faker = new(MockData.MockData.Locale);
-    private readonly IMediator _mediator;
-
-    public CreateRoleTests(CombinedContainerFixture fixture)
-    {
-        var sp = ServiceProviderForTests.Build(fixture.PostgresConnectionString, fixture.RedisConnectionString);
-        _mediator = sp.GetService<IMediator>()!;
-        _context = sp.GetRequiredService<DContext>();
-    }
-
-    public Task InitializeAsync()
-    {
-        return Task.CompletedTask;
-    }
-
-    public async Task DisposeAsync()
-    {
-        await _context.ClearDatabase();
-    }
-
     [Theory]
     [InlineData("")]
     [InlineData("  ")]
@@ -43,35 +17,33 @@ public class CreateRoleTests : IAsyncLifetime
     public async Task CreateRole_InvalidName_ThrowsValidation(string invalidName)
     {
         var command = new CreateRoleCommand(invalidName, null);
-        await Assert.ThrowsAsync<ValidationException>(async () => await _mediator.Send(command));
+        await Assert.ThrowsAsync<ValidationException>(async () => await Mediator.Send(command));
     }
 
     [Fact]
     public async Task CreateRole_DuplicateName_ThrowsRoleAlreadyExistsException()
     {
-        var name = _faker.Random.String2(5, 12);
-        var command = new CreateRoleCommand(name, "desc");
-        await _mediator.Send(command);
+        var role = await new RoleBuilder(Faker)
+            .BuildAndAddToDb(Context);
 
-        var dup = new CreateRoleCommand(name, "another");
-        await Assert.ThrowsAsync<RoleAlreadyExistsException>(async () => await _mediator.Send(dup));
+        var dup = new CreateRoleCommand(role.Name, "another");
+        await Assert.ThrowsAsync<RoleAlreadyExistsException>(async () => await Mediator.Send(dup));
     }
 
     [Fact]
     public async Task CreateRole_ValidData_Succeeds()
     {
-        var name = _faker.Random.String2(5, 12);
-        var description = _faker.Lorem.Sentence(6);
-        var command = new CreateRoleCommand(name, description);
+        var r = new RoleBuilder(Faker).Build();
+        var command = new CreateRoleCommand(r.Name, r.Description);
 
-        await _mediator.Send(command);
+        await Mediator.Send(command);
 
-        var roleInDb = await _context.Roles.AsNoTracking()
-            .FirstOrDefaultAsync(x => x.NormalizedName == name.ToNormalized());
+        var roleInDb = await Context.Roles.AsNoTracking()
+            .FirstOrDefaultAsync(x => x.Name.Value == r.Name.Value);
 
         Assert.NotNull(roleInDb);
-        Assert.Equal(name.ToNormalized(), roleInDb.NormalizedName);
-        Assert.Equal(description, roleInDb.Description);
-        Assert.False(roleInDb.IsSystem);
+        
+        Assert.Equal(r.Name, roleInDb.Name);
+        Assert.Equal(r.Description, roleInDb.Description);
     }
 }

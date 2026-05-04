@@ -41,4 +41,10 @@ public static class BuilderExtensions
         await context.SaveChangesAsync();
         return entities;
     }
+
+    public static Task<IReadOnlyCollection<T>> BuildManyCombinedAndAddToDb<T>(
+        this IEnumerable<IBuilder<T>> builders,
+        DbContext context,
+        int count) where T : class
+        => BuildManyCombinedAndAddToDb(context, count, builders.ToArray());
 }

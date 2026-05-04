@@ -9,11 +9,11 @@ namespace Tests.LocalizationTests;
 
 public class LocalizationTests
 {
-    private readonly Test.Common.Tests.LocalizationTests _localizationTests;
+    private readonly global::Test.Common.Tests.LocalizationTests _localizationTests;
 
     public LocalizationTests()
     {
-        _localizationTests = new Test.Common.Tests.LocalizationTests();
+        _localizationTests = new global::Test.Common.Tests.LocalizationTests();
     }
 
     [Theory]

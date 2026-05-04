@@ -10,7 +10,7 @@ using Tests.TestContexts;
 
 namespace Tests.HandlersTests.Producers;
 
-public class DeleteOtherNameTests: TestBase
+public class DeleteOtherNameTests: Test
 {
     public DeleteOtherNameTests(CombinedContainerFixture fixture) : base(fixture)
     {

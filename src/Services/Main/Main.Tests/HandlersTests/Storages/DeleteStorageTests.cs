@@ -7,11 +7,11 @@ using ValidationException = FluentValidation.ValidationException;
 
 namespace Tests.HandlersTests.Storages;
 
-public class DeleteStorageTests : TestBase
+public class DeleteStorageTests : Test
 {
     public DeleteStorageTests(CombinedContainerFixture fixture) : base(fixture)
     {
-        StorageContentTestContext.Register(this);
+        RegisterBasicContext<StorageContentTestContext>();
     }
 
     [Fact]

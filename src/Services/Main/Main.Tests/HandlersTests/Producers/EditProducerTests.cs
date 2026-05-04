@@ -10,7 +10,7 @@ using ValidationException = FluentValidation.ValidationException;
 
 namespace Tests.HandlersTests.Producers;
 
-public class EditProducerTests : TestBase
+public class EditProducerTests : Test
 {
     public EditProducerTests(CombinedContainerFixture fixture) : base(fixture)
     {

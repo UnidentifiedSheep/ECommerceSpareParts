@@ -1,72 +1,59 @@
 ﻿using FluentValidation;
 using Main.Abstractions.Constants;
-using Main.Application.Configs.Mapster;
 using Main.Application.Handlers.StorageRoutes.AddStorageRoute;
-using Main.Entities;
 using Main.Entities.Currency;
 using Main.Entities.Storage;
 using Main.Entities.User;
 using Main.Enums;
-using Main.Persistence.Context;
-using MediatR;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.DependencyInjection;
 using Test.Common.Extensions;
 using Test.Common.TestContainers.Combined;
-using Tests.MockData;
+using Tests.DataBuilders.User;
+using Tests.TestContexts;
 using DbValidationException = BulkValidation.Core.Exceptions.ValidationException;
 
 namespace Tests.HandlersTests.StorageRoutes;
 
-[Collection("Combined collection")]
-public class AddStorageRouteTests : IAsyncLifetime
+public class AddStorageRouteTests : Test
 {
-    private readonly DContext _context;
-    private readonly IMediator _mediator;
+    private User _carrier = null!;
+    private Storage _fromStorage = null!;
+    private Storage _toStorage = null!;
     private Currency _currency = null!;
-    private Storage _storageFrom = null!;
-    private Storage _storageTo = null!;
-    private User _user = null!;
-
-    public AddStorageRouteTests(CombinedContainerFixture fixture)
+    public AddStorageRouteTests(CombinedContainerFixture fixture) : base(fixture)
     {
-        MapsterConfig.Configure();
-        var sp = ServiceProviderForTests.Build(fixture.PostgresConnectionString, fixture.RedisConnectionString);
-        _context = sp.GetRequiredService<DContext>();
-        _mediator = sp.GetRequiredService<IMediator>();
+        RegisterBasicContext<CurrencyTestContext>();
+        RegisterBasicContext<StorageTestContext>();
     }
 
-    public async Task InitializeAsync()
+    public override async Task InitializeAsync()
     {
-        await _mediator.AddMockStorage();
-        await _mediator.AddMockStorage();
-        await _context.AddMockCurrencies();
-        await _mediator.AddMockUser();
-
-        _currency = await _context.Currencies.FirstAsync();
-        _storageFrom = await _context.Storages.FirstAsync();
-        _storageTo = await _context.Storages.FirstAsync(x => x.Name != _storageFrom.Name);
-        _user = await _context.Users.FirstAsync();
-    }
-
-    public async Task DisposeAsync()
-    {
-        await _context.ClearDatabase();
+        await base.InitializeAsync();
+        _carrier = await new MemberUserBuilder(Faker)
+            .BuildAndAddToDb(Context);
+        
+        _fromStorage = GetContext<StorageTestContext>()
+            .Storages.First(x => x.Type == StorageType.Warehouse);
+        
+        _toStorage = GetContext<StorageTestContext>()
+            .Storages.First(x => x.Type == StorageType.SupplierStorage);
+        
+        _currency = GetContext<CurrencyTestContext>().Currencies[0];
     }
 
     [Fact]
     public async Task AddStorageRoute_WithValidData_Succeeds()
     {
-        var command = new AddStorageRouteCommand(_storageFrom.Name, _storageTo.Name, 1000,
+        var command = new AddStorageRouteCommand(_toStorage.Name, _fromStorage.Name, 1000,
             RouteType.IntraCity, LogisticPricingType.PerOrder, 60, 10.5m, 20.5m,
-            _currency.Id, 5.0m, null, _user.Id);
+            _currency.Id, 5.0m, 0, _carrier.Id);
 
-        var result = await _mediator.Send(command);
+        var result = await Mediator.Send(command);
 
-        var route = await _context.StorageRoutes.FirstOrDefaultAsync(x => x.Id == result.RouteId);
+        var route = await Context.StorageRoutes.FirstOrDefaultAsync(x => x.Id == result.RouteId);
         Assert.NotNull(route);
-        Assert.Equal(_storageFrom.Name, route.FromStorageName);
-        Assert.Equal(_storageTo.Name, route.ToStorageName);
+        Assert.Equal(_toStorage.Name, route.FromStorageName);
+        Assert.Equal(_fromStorage.Name, route.ToStorageName);
         Assert.Equal(1000, route.DistanceM);
         Assert.Equal(10.5m, route.PriceKg);
     }
@@ -74,41 +61,41 @@ public class AddStorageRouteTests : IAsyncLifetime
     [Fact]
     public async Task AddStorageRoute_WithInvalidDistance_ThrowsValidationException()
     {
-        var command = new AddStorageRouteCommand(_storageFrom.Name, _storageTo.Name, 0, RouteType.IntraCity,
+        var command = new AddStorageRouteCommand(_fromStorage.Name, _toStorage.Name, 0, RouteType.IntraCity,
             LogisticPricingType.PerOrder, 60, 10.5m, 20.5m, _currency.Id,
-            5.0m, null, _user.Id);
+            5.0m, 0, _carrier.Id);
 
-        await Assert.ThrowsAsync<ValidationException>(async () => await _mediator.Send(command));
+        await Assert.ThrowsAsync<ValidationException>(async () => await Mediator.Send(command));
     }
 
     [Fact]
     public async Task AddStorageRoute_WithInvalidPricePrecision_ThrowsValidationException()
     {
-        var command = new AddStorageRouteCommand(_storageFrom.Name, _storageTo.Name, 1000, RouteType.IntraCity,
+        var command = new AddStorageRouteCommand(_fromStorage.Name, _toStorage.Name, 1000, RouteType.IntraCity,
             LogisticPricingType.PerOrder, 60, 10.555m, 20.5m, _currency.Id, 5.0m,
-            null, _user.Id);
+            0, _carrier.Id);
 
-        await Assert.ThrowsAsync<ValidationException>(async () => await _mediator.Send(command));
+        await Assert.ThrowsAsync<ValidationException>(async () => await Mediator.Send(command));
     }
 
     [Fact]
     public async Task AddStorageRoute_WithNonExistentCurrency_ThrowsValidationException()
     {
-        var command = new AddStorageRouteCommand(_storageFrom.Name, _storageTo.Name, 1000, RouteType.IntraCity,
+        var command = new AddStorageRouteCommand(_fromStorage.Name, _toStorage.Name, 1000, RouteType.IntraCity,
             LogisticPricingType.PerOrder, 60, 10.5m, 20.5m, 9999, 5.0m,
-            null, _user.Id);
+            0, _carrier.Id);
 
-        await Assert.ThrowsAsync<ValidationException>(async () => await _mediator.Send(command));
+        await Assert.ThrowsAsync<ValidationException>(async () => await Mediator.Send(command));
     }
 
     [Fact]
     public async Task AddStorageRoute_WithNonExistentStorage_ThrowsDbValidationException()
     {
-        var command = new AddStorageRouteCommand("NonExistentStorage", _storageTo.Name, 1000, RouteType.IntraCity,
+        var command = new AddStorageRouteCommand("NonExistentStorage", _toStorage.Name, 1000, RouteType.IntraCity,
             LogisticPricingType.PerOrder, 60, 10.5m, 20.5m, _currency.Id, 5.0m,
-            null, _user.Id);
+            0, _carrier.Id);
 
-        var exception = await Assert.ThrowsAsync<DbValidationException>(async () => await _mediator.Send(command));
+        var exception = await Assert.ThrowsAsync<DbValidationException>(async () => await Mediator.Send(command));
         Assert.Contains(exception.Failures, f => f.ErrorName == ApplicationErrors.StoragesNotFound);
     }
 }

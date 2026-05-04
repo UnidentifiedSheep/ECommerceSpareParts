@@ -11,11 +11,11 @@ using Tests.TestContexts;
 
 namespace Tests.HandlersTests.Products;
 
-public class EditProductTests : TestBase
+public class EditProductTests : Test
 {
     public EditProductTests(CombinedContainerFixture fixture) : base(fixture)
     {
-        ProductTestContext.Register(this);
+        RegisterBasicContext<ProductTestContext>();
     }
     
     private ProductTestContext TestContext => GetContext<ProductTestContext>();

@@ -11,12 +11,12 @@ using DbValidationException = BulkValidation.Core.Exceptions.ValidationException
 
 namespace Tests.HandlersTests.Products;
 
-public class MakeLinkageBetweenProductsTests : TestBase
+public class MakeLinkageBetweenProductsTests : Test
 {
     
     public MakeLinkageBetweenProductsTests(CombinedContainerFixture fixture) : base(fixture)
     {
-        ProductTestContext.Register(this);
+        RegisterBasicContext<ProductTestContext>();
     }
     
     private ProductTestContext TestContext => GetContext<ProductTestContext>();

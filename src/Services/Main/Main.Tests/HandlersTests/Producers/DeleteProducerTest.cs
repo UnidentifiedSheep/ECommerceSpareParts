@@ -7,11 +7,11 @@ using Tests.TestContexts;
 
 namespace Tests.HandlersTests.Producers;
 
-public class DeleteProducerTest : TestBase
+public class DeleteProducerTest : Test
 {
     public DeleteProducerTest(CombinedContainerFixture fixture) : base(fixture)
     {
-        ProductTestContext.Register(this);
+        RegisterBasicContext<ProductTestContext>();
     }
     
     private ProductTestContext TestContext => GetContext<ProductTestContext>();
