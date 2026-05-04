@@ -11,8 +11,15 @@ using DbValidationException = BulkValidation.Core.Exceptions.ValidationException
 
 namespace Tests.HandlersTests.Producers;
 
-public class AddOtherNameToProducerTests(CombinedContainerFixture fixture) : TestBase<ProducerTestContext>(fixture)
+public class AddOtherNameToProducerTests : TestBase
 {
+    public AddOtherNameToProducerTests(CombinedContainerFixture fixture) : base(fixture)
+    {
+        RegisterBasicContext<ProducerTestContext>();
+    }
+    
+    private ProducerTestContext TestContext => GetContext<ProducerTestContext>();
+    
     [Theory]
     [InlineData(" ")]
     [InlineData("tooBig")]

@@ -10,8 +10,15 @@ using ValidationException = FluentValidation.ValidationException;
 
 namespace Tests.HandlersTests.Producers;
 
-public class EditProducerTests(CombinedContainerFixture fixture) : TestBase<ProducerTestContext>(fixture)
+public class EditProducerTests : TestBase
 {
+    public EditProducerTests(CombinedContainerFixture fixture) : base(fixture)
+    {
+        RegisterBasicContext<ProducerTestContext>();
+    }
+    
+    private ProducerTestContext TestContext => GetContext<ProducerTestContext>();
+    
     [Theory]
     [InlineData("tooBig")]
     [InlineData("в")]

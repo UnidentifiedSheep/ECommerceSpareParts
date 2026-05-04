@@ -13,6 +13,7 @@ public abstract class TestBase(CombinedContainerFixture fixture) : IAsyncLifetim
 {
     private static readonly HashSet<Type> GlobalBasicContexts = [];
     private readonly HashSet<Type> _basicContexts = []; 
+    private readonly Dictionary<Type, ITestContext> _initedBasicContexts = new();
     protected IServiceProvider Sp { get; private set; } = null!;
     protected IServiceScope Scope { get; private set; } = null!;
     
@@ -43,12 +44,12 @@ public abstract class TestBase(CombinedContainerFixture fixture) : IAsyncLifetim
     
     protected Task ResetDb() => Context.ClearDatabase();
     
-    protected void RegisterBasicContext<TContext>() where TContext : class, ITestContext
+    public void RegisterBasicContext<TContext>() where TContext : class, ITestContext
     {
         _basicContexts.Add(typeof(TContext));
     }
 
-    protected void RemoveBasicContext<TContext>() where TContext : class, ITestContext
+    public void RemoveBasicContext<TContext>() where TContext : class, ITestContext
     {
         _basicContexts.Remove(typeof(TContext));
     }
@@ -63,23 +64,22 @@ public abstract class TestBase(CombinedContainerFixture fixture) : IAsyncLifetim
         GlobalBasicContexts.Remove(typeof(TContext));
     }
 
+    protected T GetContext<T>() where T : class, ITestContext
+    {
+        if (_initedBasicContexts.TryGetValue(typeof(T), out var ctx))
+            return (T)ctx;
+        throw new InvalidOperationException($"No context found for {typeof(T).Name}. Try register it first");
+    }
+
     private async Task InitializeBasicContexts()
     {
         var merged = GlobalBasicContexts.ToHashSet();
         merged.UnionWith(_basicContexts);
         foreach (var context in merged)
-            await ((ITestContext)Scope.ServiceProvider.GetService(context)!).InitializeAsync();
-    }
-}
-
-public abstract class TestBase<TTestContext>(CombinedContainerFixture fixture) : TestBase(fixture) 
-    where TTestContext : class, ITestContext
-{
-    protected TTestContext TestContext { get; private set; } = null!;
-
-    public override async Task InitializeAsync()
-    {
-        RegisterBasicContext<TTestContext>();
-        await base.InitializeAsync();
+        {
+            var ctx = (ITestContext)Scope.ServiceProvider.GetService(context)!;
+            _initedBasicContexts.Add(ctx.GetType(), ctx);
+            await ctx.InitializeAsync();
+        }
     }
 }

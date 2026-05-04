@@ -10,14 +10,19 @@ using Tests.TestContexts.Base;
 
 namespace Tests.HandlersTests.Producers;
 
-public class DeleteOtherNameTests(CombinedContainerFixture fixture) : TestBase<ProducerTestContext>(fixture)
+public class DeleteOtherNameTests: TestBase
 {
+    public DeleteOtherNameTests(CombinedContainerFixture fixture) : base(fixture)
+    {
+        RegisterBasicContext<ProducerTestContext>();
+    }
+    
     private ProducerOtherName _otherName = null!;
     public override async Task InitializeAsync()
     {
         await base.InitializeAsync();
         _otherName = await new ProducerOtherNameBuilder(Faker)
-            .WithProducerId(TestContext.Producers[0].Id)
+            .WithProducerId(GetContext<ProducerTestContext>().Producers[0].Id)
             .BuildAndAddToDb(Context);
     }
 

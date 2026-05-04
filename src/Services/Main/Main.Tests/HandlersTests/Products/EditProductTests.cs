@@ -11,8 +11,15 @@ using Tests.TestContexts.Base;
 
 namespace Tests.HandlersTests.Products;
 
-public class EditProductTests(CombinedContainerFixture fixture) : TestBase<ProductTestContext>(fixture)
+public class EditProductTests : TestBase
 {
+    public EditProductTests(CombinedContainerFixture fixture) : base(fixture)
+    {
+        ProductTestContext.Register(this);
+    }
+    
+    private ProductTestContext TestContext => GetContext<ProductTestContext>();
+    
     [Fact]
     public async Task EditArticle_NumberAndName_Succeeds()
     {

@@ -7,8 +7,15 @@ using Tests.TestContexts.Base;
 
 namespace Tests.HandlersTests.Producers;
 
-public class DeleteProducerTest(CombinedContainerFixture fixture) : TestBase<ProductTestContext>(fixture)
+public class DeleteProducerTest : TestBase
 {
+    public DeleteProducerTest(CombinedContainerFixture fixture) : base(fixture)
+    {
+        ProductTestContext.Register(this);
+    }
+    
+    private ProductTestContext TestContext => GetContext<ProductTestContext>();
+    
     [Fact]
     public async Task DeleteProducer_InvalidProducerId_ThrowsProducerNotFound()
     {

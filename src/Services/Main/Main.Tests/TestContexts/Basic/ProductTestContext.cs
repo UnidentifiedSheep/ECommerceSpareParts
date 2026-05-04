@@ -22,9 +22,14 @@ public class ProductTestContext(
     
     public override async Task InitializeAsync(CancellationToken cancellationToken = default)
     {
-        await producerTestContext.InitializeAsync(cancellationToken);
         _products.AddRange(await new ProductBuilder(Faker)
             .WithProducers(producerTestContext.Producers)
             .BuildManyAndAddToDb(DbContext, 10));
+    }
+
+    public static void Register(TestBase test)
+    {
+        test.RegisterBasicContext<ProducerTestContext>();
+        test.RegisterBasicContext<ProductTestContext>();
     }
 }

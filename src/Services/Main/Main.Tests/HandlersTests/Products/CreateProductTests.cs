@@ -10,8 +10,15 @@ using DbValidationException = BulkValidation.Core.Exceptions.ValidationException
 
 namespace Tests.HandlersTests.Products;
 
-public class CreateProductTests(CombinedContainerFixture fixture) : TestBase<ProducerTestContext>(fixture)
+public class CreateProductTests : TestBase
 {
+    public CreateProductTests(CombinedContainerFixture fixture) : base(fixture)
+    {
+        RegisterBasicContext<ProducerTestContext>();
+    }
+    
+    private ProducerTestContext TestContext => GetContext<ProducerTestContext>();
+
     [Fact]
     public async Task CreateManyArticles_Succeeds()
     {

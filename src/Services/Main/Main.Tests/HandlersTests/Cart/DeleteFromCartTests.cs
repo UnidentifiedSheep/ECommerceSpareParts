@@ -1,91 +1,51 @@
-﻿using Bogus;
-using Main.Application.Dtos.Emails;
-using Main.Application.Handlers.Cart.AddToCart;
-using Main.Application.Handlers.Cart.DeleteFromCart;
-using Main.Application.Handlers.Producers.CreateProducer;
-using Main.Application.Handlers.Products.CreateProducts;
-using Main.Application.Handlers.Users.CreateUser;
+﻿using Main.Application.Handlers.Cart.DeleteFromCart;
 using Main.Entities.Exceptions.Cart;
-using Main.Enums;
-using Main.Persistence.Context;
-using MediatR;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.DependencyInjection;
 using Test.Common.Extensions;
 using Test.Common.TestContainers.Combined;
+using Tests.DataBuilders;
+using Tests.TestContexts.Base;
+using Tests.TestContexts.Basic;
 
 namespace Tests.HandlersTests.Cart;
 
-[Collection("Combined collection")]
-public class DeleteFromCartTests : IAsyncLifetime
+public class DeleteFromCartTests : TestBase
 {
-    private readonly DContext _context;
-    private readonly Faker _faker = new(MockData.MockData.Locale);
-    private readonly IMediator _mediator;
-    private int _articleId;
-    private Guid _userId;
-
-    public DeleteFromCartTests(CombinedContainerFixture fixture)
+    private Main.Entities.Cart.Cart _cartItem = null!;
+    public DeleteFromCartTests(CombinedContainerFixture fixture) : base(fixture)
     {
-        var sp = ServiceProviderForTests.Build(fixture.PostgresConnectionString, fixture.RedisConnectionString);
-        _mediator = sp.GetService<IMediator>()!;
-        _context = sp.GetRequiredService<DContext>();
+        ProductTestContext.Register(this);
+        RegisterBasicContext<UsersTestContext>();
     }
 
-    public async Task InitializeAsync()
+    public override async Task InitializeAsync()
     {
-        // Create User
-        var email = new EmailDto
-        {
-            Email = _faker.Person.Email,
-            IsConfirmed = false,
-            IsPrimary = true,
-            Type = EmailType.Personal
-        };
-        var userInfo = MockData.MockData.CreateUserInfoDto();
-        var createUserCommand = new CreateUserCommand(_faker.Person.UserName, _faker.Lorem.Letter(10),
-            userInfo, [email], [], []);
-        var userResult = await _mediator.Send(createUserCommand);
-        _userId = userResult.UserId;
+        await base.InitializeAsync();
 
-        // Create Producer
-        var newProducerModel = MockData.MockData.CreateNewProducerDto(1)[0];
-        var createProducerCommand = new CreateProducerCommand(newProducerModel);
-        var producerResult = await _mediator.Send(createProducerCommand);
-
-        // Create Article
-        var articleList = MockData.MockData.CreateNewArticleDto(1);
-        articleList[0].ProducerId = producerResult.ProducerId;
-        var createArticleCommand = new CreateProductsCommand(articleList);
-        var articleResult = await _mediator.Send(createArticleCommand);
-        _articleId = articleResult.CreatedIds[0];
-
-        // Add to Cart
-        var addToCartCommand = new AddToCartCommand(_userId, _articleId, 5);
-        await _mediator.Send(addToCartCommand);
-    }
-
-    public async Task DisposeAsync()
-    {
-        await _context.ClearDatabase();
+        _cartItem = await new CartItemBuilder(Faker)
+            .WithProductId(GetContext<ProductTestContext>().Products[0].Id)
+            .WithUserId(GetContext<UsersTestContext>().Users.First().Id)
+            .BuildAndAddToDb(Context);
     }
 
     [Fact]
     public async Task DeleteFromCart_ValidData_Succeeds()
     {
-        var command = new DeleteFromCartCommand(_userId, _articleId);
+        var command = new DeleteFromCartCommand(_cartItem.UserId, _cartItem.ProductId);
 
-        await _mediator.Send(command);
+        await Mediator.Send(command);
 
-        var cartItem = await _context.Carts.FirstOrDefaultAsync(x => x.UserId == _userId && x.ProductId == _articleId);
+        var cartItem = await Context.Carts
+            .AsNoTracking()
+            .FirstOrDefaultAsync(x => x.UserId == command.UserId && x.ProductId == command.ProductId);
         Assert.Null(cartItem);
     }
 
     [Fact]
     public async Task DeleteFromCart_ItemNotFound_ThrowsCartItemNotFoundException()
     {
-        var command = new DeleteFromCartCommand(_userId, 999999);
+        var command = new DeleteFromCartCommand(_cartItem.UserId, 999999);
 
-        await Assert.ThrowsAsync<CartItemNotFoundException>(() => _mediator.Send(command));
+        await Assert.ThrowsAsync<CartItemNotFoundException>(() => Mediator.Send(command));
     }
 }

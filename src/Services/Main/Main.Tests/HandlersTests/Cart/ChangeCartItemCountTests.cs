@@ -1,85 +1,44 @@
-﻿using Bogus;
-using Main.Application.Dtos.Emails;
-using Main.Application.Handlers.Cart.AddToCart;
-using Main.Application.Handlers.Cart.ChangeCartItemCount;
-using Main.Application.Handlers.Producers.CreateProducer;
-using Main.Application.Handlers.Products.CreateProducts;
-using Main.Application.Handlers.Users.CreateUser;
+﻿using Main.Application.Handlers.Cart.ChangeCartItemCount;
 using Main.Entities.Exceptions.Cart;
-using Main.Enums;
-using Main.Persistence.Context;
-using MediatR;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.DependencyInjection;
 using Test.Common.Extensions;
 using Test.Common.TestContainers.Combined;
+using Tests.DataBuilders;
+using Tests.TestContexts.Base;
+using Tests.TestContexts.Basic;
 using ValidationException = FluentValidation.ValidationException;
 
 namespace Tests.HandlersTests.Cart;
 
-[Collection("Combined collection")]
-public class ChangeCartItemCountTests : IAsyncLifetime
+public class ChangeCartItemCountTests : TestBase
 {
-    private readonly DContext _context;
-    private readonly Faker _faker = new(MockData.MockData.Locale);
-    private readonly IMediator _mediator;
-    private int _articleId;
-    private Guid _userId;
-
-    public ChangeCartItemCountTests(CombinedContainerFixture fixture)
+    private Main.Entities.Cart.Cart _cartItem = null!;
+    public ChangeCartItemCountTests(CombinedContainerFixture fixture) : base(fixture)
     {
-        var sp = ServiceProviderForTests.Build(fixture.PostgresConnectionString, fixture.RedisConnectionString);
-        _mediator = sp.GetService<IMediator>()!;
-        _context = sp.GetRequiredService<DContext>();
+        ProductTestContext.Register(this);
+        RegisterBasicContext<UsersTestContext>();
     }
 
-    public async Task InitializeAsync()
+    public override async Task InitializeAsync()
     {
-        // Create User
-        var email = new EmailDto
-        {
-            Email = _faker.Person.Email,
-            IsConfirmed = false,
-            IsPrimary = true,
-            Type = EmailType.Personal
-        };
-        var userInfo = MockData.MockData.CreateUserInfoDto();
-        var createUserCommand = new CreateUserCommand(_faker.Person.UserName, _faker.Lorem.Letter(10),
-            userInfo, [email], [], []);
-        var userResult = await _mediator.Send(createUserCommand);
-        _userId = userResult.UserId;
+        await base.InitializeAsync();
 
-        // Create Producer
-        var newProducerModel = MockData.MockData.CreateNewProducerDto(1)[0];
-        var createProducerCommand = new CreateProducerCommand(newProducerModel);
-        var producerResult = await _mediator.Send(createProducerCommand);
-
-        // Create Article
-        var articleList = MockData.MockData.CreateNewArticleDto(1);
-        articleList[0].ProducerId = producerResult.ProducerId;
-        var createArticleCommand = new CreateProductsCommand(articleList);
-        var articleResult = await _mediator.Send(createArticleCommand);
-        _articleId = articleResult.CreatedIds[0];
-
-        // Add to Cart
-        var addToCartCommand = new AddToCartCommand(_userId, _articleId, 5);
-        await _mediator.Send(addToCartCommand);
-    }
-
-    public async Task DisposeAsync()
-    {
-        await _context.ClearDatabase();
+        _cartItem = await new CartItemBuilder(Faker)
+            .WithProductId(GetContext<ProductTestContext>().Products[0].Id)
+            .WithUserId(GetContext<UsersTestContext>().Users.First().Id)
+            .BuildAndAddToDb(Context);
     }
 
     [Fact]
     public async Task ChangeCartItemCount_ValidData_Succeeds()
     {
-        var newCount = _faker.Random.Int(1, 100);
-        var command = new ChangeCartItemCountCommand(_userId, _articleId, newCount);
+        var newCount = Faker.Random.Int(1, 100);
+        var command = new ChangeCartItemCountCommand(_cartItem.UserId, _cartItem.ProductId, newCount);
 
-        await _mediator.Send(command);
+        await Mediator.Send(command);
 
-        var cartItem = await _context.Carts.FirstOrDefaultAsync(x => x.UserId == _userId && x.ProductId == _articleId);
+        var cartItem = await Context.Carts
+            .FirstOrDefaultAsync(x => x.UserId == command.UserId && x.ProductId == command.ProductId);
         Assert.NotNull(cartItem);
         Assert.Equal(newCount, cartItem.Count);
     }
@@ -87,9 +46,9 @@ public class ChangeCartItemCountTests : IAsyncLifetime
     [Fact]
     public async Task ChangeCartItemCount_ItemNotFound_ThrowsCartItemNotFoundException()
     {
-        var command = new ChangeCartItemCountCommand(_userId, 999999, 10);
+        var command = new ChangeCartItemCountCommand(_cartItem.UserId, 999999, 10);
 
-        await Assert.ThrowsAsync<CartItemNotFoundException>(() => _mediator.Send(command));
+        await Assert.ThrowsAsync<CartItemNotFoundException>(() => Mediator.Send(command));
     }
 
     [Theory]
@@ -97,8 +56,8 @@ public class ChangeCartItemCountTests : IAsyncLifetime
     [InlineData(-1)]
     public async Task ChangeCartItemCount_InvalidCount_ThrowsValidationException(int newCount)
     {
-        var command = new ChangeCartItemCountCommand(_userId, _articleId, newCount);
+        var command = new ChangeCartItemCountCommand(_cartItem.UserId, _cartItem.ProductId, newCount);
 
-        await Assert.ThrowsAsync<ValidationException>(() => _mediator.Send(command));
+        await Assert.ThrowsAsync<ValidationException>(() => Mediator.Send(command));
     }
 }

@@ -12,9 +12,16 @@ using DbValidationException = BulkValidation.Core.Exceptions.ValidationException
 
 namespace Tests.HandlersTests.Products;
 
-public class MakeLinkageBetweenProductsTests(CombinedContainerFixture fixture) 
-    : TestBase<ProductTestContext>(fixture)
+public class MakeLinkageBetweenProductsTests : TestBase
 {
+    
+    public MakeLinkageBetweenProductsTests(CombinedContainerFixture fixture) : base(fixture)
+    {
+        ProductTestContext.Register(this);
+    }
+    
+    private ProductTestContext TestContext => GetContext<ProductTestContext>();
+    
     [Fact]
     public async Task MakeLinkage_SameIds_FailsValidation()
     {

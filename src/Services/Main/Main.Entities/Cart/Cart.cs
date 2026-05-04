@@ -32,7 +32,7 @@ public class Cart : AuditableEntity<Cart, (Guid, int)>
 
     public void SetCount(int count)
     {
-        count.AgainstTooSmall(1, "position.count.must.be.greater.than.zero");
+        count.AgainstLessOrEqual(0, "position.count.must.be.greater.than.zero");
         Count = count;
     }
     
