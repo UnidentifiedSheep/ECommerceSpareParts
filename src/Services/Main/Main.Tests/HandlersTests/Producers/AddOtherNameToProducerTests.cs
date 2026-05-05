@@ -11,7 +11,7 @@ using DbValidationException = BulkValidation.Core.Exceptions.ValidationException
 
 namespace Tests.HandlersTests.Producers;
 
-public class AddOtherNameToProducerTests : Test
+public class AddOtherNameToProducerTests : IntegrationTest
 {
     public AddOtherNameToProducerTests(CombinedContainerFixture fixture) : base(fixture)
     {

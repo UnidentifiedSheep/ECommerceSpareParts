@@ -1,89 +1,48 @@
-using Exceptions.Base;
-using Main.Abstractions.Constants;
-using Main.Application.Configs.Mapster;
+using FluentAssertions;
 using Main.Application.Handlers.StorageContents.DeleteContent;
-using Main.Entities;
 using Main.Entities.Exceptions.Storages;
-using Main.Entities.Storage;
-using Main.Entities.User;
-using Main.Persistence.Context;
-using MediatR;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.DependencyInjection;
-using Test.Common.Extensions;
 using Test.Common.TestContainers.Combined;
-using Tests.MockData;
-using DbValidationException = BulkValidation.Core.Exceptions.ValidationException;
+using Tests.TestContexts;
 
 namespace Tests.HandlersTests.StorageContents;
 
-[Collection("Combined collection")]
-public class DeleteContentFromStorageTests : IAsyncLifetime
+public class DeleteContentFromStorageTests : IntegrationTest
 {
-    private readonly DContext _context;
-    private readonly IMediator _mediator;
-    private List<StorageContent> _storageContents = null!;
-    private User _user = null!;
-
-    public DeleteContentFromStorageTests(CombinedContainerFixture fixture)
+    public DeleteContentFromStorageTests(CombinedContainerFixture fixture) : base(fixture)
     {
-        MapsterConfig.Configure();
-        var sp = ServiceProviderForTests.Build(fixture.PostgresConnectionString, fixture.RedisConnectionString);
-        _context = sp.GetRequiredService<DContext>();
-        _mediator = sp.GetRequiredService<IMediator>();
+        RegisterBasicContext<StorageContentTestContext>();
     }
 
-    public async Task InitializeAsync()
-    {
-        await _mediator.AddMockProducersAndArticles();
-        await _mediator.AddMockStorage();
-        await _context.AddMockCurrencies();
-        await _mediator.AddMockUser();
-
-        _user = await _context.Users.FirstAsync();
-        var currency = await _context.Currencies.FirstAsync();
-        var storage = await _context.Storages.FirstAsync();
-        var articleIds = await _context.Products.Select(a => a.Id).ToListAsync();
-        await _mediator.AddMockStorageContents(articleIds, currency.Id, storage.Name, _user.Id);
-        _storageContents = await _context.StorageContents.ToListAsync();
-    }
-
-    public async Task DisposeAsync()
-    {
-        await _context.ClearDatabase();
-    }
-
-    [Fact]
-    public async Task DeleteContentFromStorage_WithInvalidUserId_ThrowsUserNotFoundException()
-    {
-        var contentId = _storageContents.First().Id;
-        var command = new DeleteStorageContentCommand(contentId, "", Guid.Empty);
-        var exception = await Assert.ThrowsAsync<DbValidationException>(async () => await _mediator.Send(command));
-        Assert.Equal(ApplicationErrors.UsersNotFound, exception.Failures[0].ErrorName);
-    }
+    private StorageContentTestContext TestContext => GetContext<StorageContentTestContext>();
 
     [Fact]
     public async Task DeleteContentFromStorage_WithInvalidContentId_ThrowsStorageContentNotFoundException()
     {
-        var command = new DeleteStorageContentCommand(99999, "", _user.Id);
-        await Assert.ThrowsAsync<StorageContentNotFoundException>(async () => await _mediator.Send(command));
+        var command = new DeleteStorageContentCommand(99999, 0);
+        await Assert.ThrowsAsync<StorageContentNotFoundException>(async () => await Mediator.Send(command));
     }
 
     [Fact]
     public async Task DeleteContentFromStorage_WithValidData_Succeeds()
     {
-        var content = _storageContents.First();
-        var prevStorageMovements = await _context.StorageMovements.CountAsync();
+        var eventsCount = await Context.Events.CountAsync();
+        var content = TestContext.StorageContents.First();
+        var productCountBefore = (await Context.Products
+            .FirstAsync(x => x.Id == content.ProductId))
+            .Stock;
 
-        var concurrencyCode = "";
-        var command = new DeleteStorageContentCommand(content.Id, concurrencyCode, _user.Id);
-        var ex = await Assert.ThrowsAsync<ConcurrencyCodeMismatchException>(async () => await _mediator.Send(command));
+        var command = new DeleteStorageContentCommand(content.Id, content.RowVersion);
 
-        concurrencyCode = ex.ServerCode!;
-        command = new DeleteStorageContentCommand(content.Id, concurrencyCode, _user.Id);
-
-        await _mediator.Send(command);
-        var currStorageMovements = await _context.StorageMovements.CountAsync();
-        Assert.Equal(prevStorageMovements + 1, currStorageMovements);
+        await Mediator.Send(command);
+        
+        var productCountAfter = (await Context.Products
+                .FirstAsync(x => x.Id == content.ProductId))
+            .Stock;
+        
+        var currStorageMovements = await Context.Events.CountAsync();
+        
+        currStorageMovements.Should().Be(eventsCount + 1);
+        productCountBefore.Value.Should().Be(productCountAfter - content.Count);
     }
 }

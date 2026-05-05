@@ -9,7 +9,7 @@ using Tests.TestContexts;
 
 namespace Tests.HandlersTests.StorageRoutes;
 
-public class EditStorageRouteTests : Test
+public class EditStorageRouteTests : IntegrationTest
 {
     private StorageRouteTestContext _testContext = null!;
     public EditStorageRouteTests(CombinedContainerFixture fixture) : base(fixture)

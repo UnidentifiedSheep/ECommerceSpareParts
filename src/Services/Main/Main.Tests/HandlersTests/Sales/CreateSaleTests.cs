@@ -220,7 +220,7 @@ public class CreateSaleTests : IAsyncLifetime
             {
                 ProductId = content.ProductId,
                 Count = content.Count,
-                Comment = Global.Faker.Lorem.Letter(10),
+                Comment = Faker.Lorem.Letter(10),
                 Price = content.BuyPrice,
                 PriceWithDiscount = content.BuyPrice
             });

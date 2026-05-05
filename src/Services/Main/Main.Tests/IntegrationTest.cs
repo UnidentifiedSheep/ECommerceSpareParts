@@ -8,7 +8,7 @@ using Test.Common.TestContainers.Combined;
 namespace Tests;
 
 [Collection("Combined collection")]
-public abstract class Test(CombinedContainerFixture fixture) : TestBase
+public abstract class IntegrationTest(CombinedContainerFixture fixture) : TestBase
 {
     private IServiceProvider _sp = null!;
     protected override IServiceProvider Sp => _sp;

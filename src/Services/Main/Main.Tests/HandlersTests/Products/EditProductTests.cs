@@ -11,7 +11,7 @@ using Tests.TestContexts;
 
 namespace Tests.HandlersTests.Products;
 
-public class EditProductTests : Test
+public class EditProductTests : IntegrationTest
 {
     public EditProductTests(CombinedContainerFixture fixture) : base(fixture)
     {

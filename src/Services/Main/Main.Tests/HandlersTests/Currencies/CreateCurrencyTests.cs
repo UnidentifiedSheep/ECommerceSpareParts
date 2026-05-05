@@ -10,26 +10,26 @@ using DbValidationException = BulkValidation.Core.Exceptions.ValidationException
 namespace Tests.HandlersTests.Currencies;
 
 [Collection("Combined collection")]
-public class CreateCurrencyTests(CombinedContainerFixture fixture) : Test(fixture)
+public class CreateCurrencyTests(CombinedContainerFixture fixture) : IntegrationTest(fixture)
 {
     private string GetValidName()
     {
-        return Global.Faker.Lorem.Letter(10);
+        return Faker.Lorem.Letter(10);
     }
 
     private string GetValidCurrencyCode()
     {
-        return Global.Faker.Lorem.Letter(2);
+        return Faker.Lorem.Letter(2);
     }
 
     private string GetValidCurrencySign()
     {
-        return Global.Faker.Lorem.Letter();
+        return Faker.Lorem.Letter();
     }
 
     private string GetValidShortName()
     {
-        return Global.Faker.Lorem.Letter(3);
+        return Faker.Lorem.Letter(3);
     }
 
     [Theory]

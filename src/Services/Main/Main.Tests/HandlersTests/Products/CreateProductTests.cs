@@ -10,7 +10,7 @@ using DbValidationException = BulkValidation.Core.Exceptions.ValidationException
 
 namespace Tests.HandlersTests.Products;
 
-public class CreateProductTests : Test
+public class CreateProductTests : IntegrationTest
 {
     public CreateProductTests(CombinedContainerFixture fixture) : base(fixture)
     {

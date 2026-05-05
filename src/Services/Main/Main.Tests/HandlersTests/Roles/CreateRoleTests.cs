@@ -8,7 +8,7 @@ using ValidationException = FluentValidation.ValidationException;
 
 namespace Tests.HandlersTests.Roles;
 
-public class CreateRoleTests(CombinedContainerFixture fixture) : Test(fixture)
+public class CreateRoleTests(CombinedContainerFixture fixture) : IntegrationTest(fixture)
 {
     [Theory]
     [InlineData("")]

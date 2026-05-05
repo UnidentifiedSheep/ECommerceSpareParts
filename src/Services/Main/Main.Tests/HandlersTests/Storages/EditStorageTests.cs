@@ -11,7 +11,7 @@ using ValidationException = FluentValidation.ValidationException;
 
 namespace Tests.HandlersTests.Storages;
 
-public class EditStorageTests : Test
+public class EditStorageTests : IntegrationTest
 {
     public EditStorageTests(CombinedContainerFixture fixture) : base(fixture)
     {

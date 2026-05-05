@@ -7,7 +7,7 @@ using ValidationException = FluentValidation.ValidationException;
 
 namespace Tests.HandlersTests.Storages;
 
-public class DeleteStorageTests : Test
+public class DeleteStorageTests : IntegrationTest
 {
     public DeleteStorageTests(CombinedContainerFixture fixture) : base(fixture)
     {

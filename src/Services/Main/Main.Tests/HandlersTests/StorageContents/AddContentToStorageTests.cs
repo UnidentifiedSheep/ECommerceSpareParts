@@ -1,69 +1,36 @@
 using Main.Abstractions.Constants;
-using Main.Application.Configs.Mapster;
 using Main.Application.Dtos.Storage;
 using Main.Application.Handlers.StorageContents.AddContent;
-using Main.Entities;
-using Main.Entities.Currency;
+using Main.Entities.Event;
 using Main.Entities.Exceptions.Products;
-using Main.Entities.Product;
 using Main.Entities.Storage;
-using Main.Entities.User;
 using Main.Enums;
-using Main.Persistence.Context;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
-using Test.Common.Extensions;
 using Test.Common.TestContainers.Combined;
-using Tests.MockData;
+using Tests.DataBuilders.Storage;
+using Tests.TestContexts;
 using ValidationException = FluentValidation.ValidationException;
 using DbValidationException = BulkValidation.Core.Exceptions.ValidationException;
 
 namespace Tests.HandlersTests.StorageContents;
 
-[Collection("Combined collection")]
-public class AddContentToStorageTests : IAsyncLifetime
+public class AddContentToStorageTests : IntegrationTest
 {
-    private readonly DContext _context;
-    private readonly IMediator _mediator;
-    private readonly IServiceProvider _serviceProvider;
-    private List<Product> _articles = null!;
-
-    private Currency _currency = null!;
-    private Storage _storage = null!;
-    private User _user = null!;
-
-    public AddContentToStorageTests(CombinedContainerFixture fixture)
+    public AddContentToStorageTests(CombinedContainerFixture fixture) : base(fixture)
     {
-        MapsterConfig.Configure();
-        var sp = ServiceProviderForTests.Build(fixture.PostgresConnectionString, fixture.RedisConnectionString);
-        _serviceProvider = sp;
-        _mediator = sp.GetRequiredService<IMediator>();
-        _context = sp.GetRequiredService<DContext>();
-    }
-
-    public async Task InitializeAsync()
-    {
-        await _mediator.AddMockProducersAndArticles();
-        await _mediator.AddMockStorage();
-        await _mediator.AddMockUser();
-        await _context.AddMockCurrencies();
-        _currency = await _context.Currencies.FirstAsync();
-        _storage = await _context.Storages.FirstAsync();
-        _articles = await _context.Products.ToListAsync();
-        _user = await _context.Users.FirstAsync();
-    }
-
-    public async Task DisposeAsync()
-    {
-        await _context.ClearDatabase();
+        RegisterBasicContext<ProductTestContext>();
+        RegisterBasicContext<CurrencyTestContext>();
+        RegisterBasicContext<StorageTestContext>();
     }
 
     [Fact]
     public async Task AddContentToStorage_WithEmptyContentList_ThrowsValidationException()
     {
-        var command = new AddContentCommand([], _storage.Name, _user.Id, StorageMovementType.StorageContentAddition);
-        await Assert.ThrowsAsync<ValidationException>(async () => await _mediator.Send(command));
+        var storage = GetContext<StorageTestContext>().Storages.First();
+        var command = new AddContentCommand([], storage.Name, StorageMovementType.StorageContentAddition);
+        await Assert.ThrowsAsync<ValidationException>(async () => await Mediator.Send(command));
     }
 
     [Theory]
@@ -74,14 +41,11 @@ public class AddContentToStorageTests : IAsyncLifetime
     public async Task AddContentToStorage_WithInvalidPrice_ThrowsStorageContentPriceCannotBeNegativeException(
         decimal price)
     {
-        var articleIds = _articles.Select(x => x.Id).ToArray();
-        var storageContent = MockData.MockData
-            .CreateNewStorageContentDto(articleIds, [_currency.Id], 10)
-            .ToList();
-        storageContent.Last().BuyPrice = price;
-        var command = new AddContentCommand(storageContent, _storage.Name, _user.Id,
-            StorageMovementType.StorageContentAddition);
-        await Assert.ThrowsAsync<ValidationException>(async () => await _mediator.Send(command));
+        var storage = GetContext<StorageTestContext>().Storages.First();
+        var storageContent = GetNewStorageContents(3);
+        storageContent[^1] = storageContent[^1] with { BuyPrice = price };
+        var command = new AddContentCommand(storageContent, storage.Name, StorageMovementType.StorageContentAddition);
+        await Assert.ThrowsAsync<ValidationException>(async () => await Mediator.Send(command));
     }
 
     [Theory]
@@ -90,111 +54,91 @@ public class AddContentToStorageTests : IAsyncLifetime
     public async Task AddContentToStorage_WithInvalidItemCount_ThrowsStorageContentCountCantBeNegativeException(
         int count)
     {
-        var articleIds = _articles.Select(x => x.Id).ToArray();
-        var storageContent = MockData.MockData
-            .CreateNewStorageContentDto(articleIds, [_currency.Id], 10)
-            .ToList();
-        storageContent.Last().Count = count;
-        var command = new AddContentCommand(storageContent, _storage.Name, _user.Id,
+        var storage = GetContext<StorageTestContext>().Storages.First();
+        var storageContent = GetNewStorageContents(3);
+        storageContent[^1] = storageContent[^1] with { Count = count };
+        var command = new AddContentCommand(storageContent, storage.Name,
             StorageMovementType.StorageContentAddition);
-        await Assert.ThrowsAsync<ValidationException>(async () => await _mediator.Send(command));
+        await Assert.ThrowsAsync<ValidationException>(async () => await Mediator.Send(command));
     }
 
     [Fact]
     public async Task AddContentToStorage_WithInvalidCurrencyId_ThrowsCurrencyNotFoundException()
     {
-        var articleIds = _articles.Select(x => x.Id).ToArray();
-        var storageContent = MockData.MockData
-            .CreateNewStorageContentDto(articleIds, [_currency.Id], 10)
-            .ToList();
-        storageContent.Last().CurrencyId = int.MaxValue;
-        var command = new AddContentCommand(storageContent, _storage.Name, _user.Id,
+        var storage = GetContext<StorageTestContext>().Storages.First();
+        var storageContent = GetNewStorageContents(3);
+        storageContent[^1] = storageContent[^1] with { CurrencyId = int.MaxValue};
+        var command = new AddContentCommand(storageContent, storage.Name,
             StorageMovementType.StorageContentAddition);
-        await Assert.ThrowsAsync<ValidationException>(async () => await _mediator.Send(command));
+        await Assert.ThrowsAsync<ValidationException>(async () => await Mediator.Send(command));
     }
 
     [Fact]
     public async Task AddContentToStorage_WithInvalidStorageName_ThrowsStorageNotFoundException()
     {
-        var articleIds = _articles.Select(x => x.Id).ToArray();
-        var storageContent = MockData.MockData
-            .CreateNewStorageContentDto(articleIds, [_currency.Id], 10)
-            .ToList();
-        var command = new AddContentCommand(storageContent, Global.Faker.Lorem.Letter(200), _user.Id,
+        var storageContent = GetNewStorageContents(3);
+        var command = new AddContentCommand(storageContent, Faker.Lorem.Letter(200),
             StorageMovementType.StorageContentAddition);
-        var exception = await Assert.ThrowsAsync<DbValidationException>(async () => await _mediator.Send(command));
+        var exception = await Assert.ThrowsAsync<DbValidationException>(async () => await Mediator.Send(command));
         Assert.Equal(ApplicationErrors.StoragesNotFound, exception.Failures[0].ErrorName);
-    }
-
-    [Fact]
-    public async Task AddContentToStorage_WithInvalidUserId_ThrowsUserNotFoundException()
-    {
-        var articleIds = _articles.Select(x => x.Id).ToArray();
-        var storageContent = MockData.MockData
-            .CreateNewStorageContentDto(articleIds, [_currency.Id], 10)
-            .ToList();
-        var command = new AddContentCommand(storageContent, _storage.Name, Global.Faker.Random.Guid(),
-            StorageMovementType.StorageContentAddition);
-        var exception = await Assert.ThrowsAsync<DbValidationException>(async () => await _mediator.Send(command));
-        Assert.Equal(ApplicationErrors.UsersNotFound, exception.Failures[0].ErrorName);
     }
 
     [Fact]
     public async Task AddContentToStorage_WithInvalidArticleId_ThrowsArticleNotFoundException()
     {
-        var articleIds = _articles.Select(x => x.Id).ToArray();
-        var storageContent = MockData.MockData
-            .CreateNewStorageContentDto(articleIds, [_currency.Id], 10)
-            .ToList();
-        storageContent.Last().ProductId = int.MaxValue;
-        var command = new AddContentCommand(storageContent, _storage.Name, _user.Id,
+        var storage = GetContext<StorageTestContext>().Storages.First();
+        var storageContent = GetNewStorageContents(3);
+        storageContent[^1] = storageContent[^1] with { ProductId = int.MaxValue };
+        var command = new AddContentCommand(storageContent, storage.Name,
             StorageMovementType.StorageContentAddition);
-        await Assert.ThrowsAsync<ProductNotFoundException>(async () => await _mediator.Send(command));
+        await Assert.ThrowsAsync<ProductNotFoundException>(async () => await Mediator.Send(command));
     }
 
     [Fact]
     public async Task AddContentToStorage_Normal_Succeeds()
     {
-        var result = await RunSingleAddAsync(_mediator);
-        AssertCorrectResult(result);
+        var storage = GetContext<StorageTestContext>().Storages.First();
+        var result = await RunSingleAddAsync(storage, Mediator);
+        await AssertCorrectResult(storage, result);
     }
 
     [Fact]
     public async Task AddContentToStorage_ParallelExecution_Succeeds()
     {
-        using var sc = _serviceProvider.CreateScope();
+        using var sc = Sp.CreateScope();
         var mediator = sc.ServiceProvider.GetRequiredService<IMediator>();
-        var task1 = RunSingleAddAsync(_mediator);
-        var task2 = RunSingleAddAsync(mediator);
+        var storage = GetContext<StorageTestContext>().Storages.First();
+        var task1 = RunSingleAddAsync(storage, Mediator);
+        var task2 = RunSingleAddAsync(storage, mediator);
 
         var results = await Task.WhenAll(task1, task2);
 
         var res1 = results[0];
         var res2 = results[1];
 
-        AssertCorrectResult(res1, res2);
+        await AssertCorrectResult(storage, res1, res2);
     }
 
-    private async Task<(List<NewStorageContentDto> Inputs, Dictionary<int, int> TotalPerArticle)> RunSingleAddAsync(
+    private async Task<(List<NewStorageContentDto> Inputs, Dictionary<int, int> TotalPerProduct)> RunSingleAddAsync(
+        Storage storage,
         IMediator mediator)
     {
-        var articleIds = _articles.Select(x => x.Id).ToArray();
-        var dtoList = MockData.MockData.CreateNewStorageContentDto(articleIds, [_currency.Id], 40)
-            .ToList();
+        var storageContent = GetNewStorageContents(3);
 
         var command =
-            new AddContentCommand(dtoList, _storage.Name, _user.Id, StorageMovementType.StorageContentAddition);
+            new AddContentCommand(storageContent, storage.Name, StorageMovementType.StorageContentAddition);
         await mediator.Send(command);
 
-        var totalPerArticle = dtoList
+        var totalPerArticle = storageContent
             .GroupBy(x => x.ProductId)
             .ToDictionary(g => g.Key, g => g.Sum(x => x.Count));
 
-        return (dtoList, totalPerArticle);
+        return (storageContent, totalPerArticle);
     }
 
-    private void AssertCorrectResult(
-        params (List<NewStorageContentDto> Inputs, Dictionary<int, int> TotalPerArticle)[] results)
+    private async Task AssertCorrectResult(
+        Storage storage,
+        params (List<NewStorageContentDto> Inputs, Dictionary<int, int> TotalPerProduct)[] results)
     {
         var allInputs = results.SelectMany(r => r.Inputs).ToList();
 
@@ -204,21 +148,18 @@ public class AddContentToStorageTests : IAsyncLifetime
             if (!expectedTotals.TryAdd(kv.Key, kv.Value))
                 expectedTotals[kv.Key] += kv.Value;
 
-        var dbArticles = _context.Products.AsNoTracking()
-            .ToDictionaryAsync(x => x.Id).Result; // можно вызвать асинхронно, но для примера – синхронно
+        var dbArticles = await Context.Products.AsNoTracking()
+            .ToDictionaryAsync(x => x.Id);
 
-        var dbStorageContents = _context.StorageContents.AsNoTracking()
-            .Where(x => x.StorageName == _storage.Name)
-            .ToListAsync().Result;
+        var dbStorageContents = await Context.StorageContents.AsNoTracking()
+            .Where(x => x.StorageName == storage.Name)
+            .ToListAsync();
 
-        var dbMovements = _context.StorageMovements.AsNoTracking()
-            .ToListAsync().Result;
+        var events = await Context.Events.OfType<StorageMovementEvent>().ToListAsync();
 
-        // Проверка Article.TotalCount
-        foreach (var (articleId, expectedTotal) in expectedTotals)
-            Assert.Equal(expectedTotal, dbArticles[articleId].Stock);
+        foreach (var (productId, expectedTotal) in expectedTotals)
+            Assert.Equal(expectedTotal, dbArticles[productId].Stock.Value);
 
-        // Проверка StorageContent
         Assert.Equal(allInputs.Count, dbStorageContents.Count);
 
         var groupedExpectedContents = allInputs
@@ -241,23 +182,43 @@ public class AddContentToStorageTests : IAsyncLifetime
 
             Assert.NotNull(actual);
             Assert.Equal(exp.Count, actual.Count);
-            Assert.Equal(_storage.Name, actual.StorageName);
+            Assert.Equal(storage.Name, actual.StorageName);
         }
 
-        // Проверка StorageMovements
-        Assert.Equal(dbStorageContents.Count, dbMovements.Count);
+        Assert.Equal(dbStorageContents.Count, events.Count);
         foreach (var sc in dbStorageContents)
         {
-            var match = dbMovements.FirstOrDefault(m =>
-                m.ProductId == sc.ProductId &&
-                m.Count == sc.Count &&
-                m.Price == sc.BuyPrice &&
-                m.CurrencyId == sc.CurrencyId &&
-                m.StorageName == sc.StorageName &&
-                m.ActionType == StorageMovementType.StorageContentAddition &&
-                m.WhoMoved == _user.Id);
+            var match = events.FirstOrDefault(m =>
+                m.Data.ProductId == sc.ProductId &&
+                m.Data.Count == sc.Count &&
+                m.Data.BuyPrice == sc.BuyPrice &&
+                m.Data.CurrencyId == sc.CurrencyId &&
+                m.Data.StorageName == sc.StorageName &&
+                m.Data.MovementType == StorageMovementType.StorageContentAddition);
 
             Assert.NotNull(match);
         }
+    }
+
+    private List<NewStorageContentDto> GetNewStorageContents(int count)
+    {
+        var products = GetContext<ProductTestContext>().Products;
+        var currency = GetContext<CurrencyTestContext>().Currencies[0];
+        var storage = GetContext<StorageTestContext>().Storages.First();
+        
+        return new StorageContentBuilder(Faker)
+            .WithProducts(products)
+            .WithCurrencyId(currency.Id)
+            .WithStorageName(storage.Name)
+            .BuildMany(count)
+            .Select(x => new NewStorageContentDto
+            {
+                BuyPrice = x.BuyPrice,
+                Count = x.Count,
+                CurrencyId = x.CurrencyId,
+                ProductId = x.ProductId,
+                PurchaseDate = x.PurchaseDatetime
+            })
+            .ToList();
     }
 }

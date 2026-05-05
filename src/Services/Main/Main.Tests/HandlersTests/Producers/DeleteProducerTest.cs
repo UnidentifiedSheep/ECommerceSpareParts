@@ -7,7 +7,7 @@ using Tests.TestContexts;
 
 namespace Tests.HandlersTests.Producers;
 
-public class DeleteProducerTest : Test
+public class DeleteProducerTest : IntegrationTest
 {
     public DeleteProducerTest(CombinedContainerFixture fixture) : base(fixture)
     {

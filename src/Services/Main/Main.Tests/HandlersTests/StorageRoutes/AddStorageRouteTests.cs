@@ -14,7 +14,7 @@ using DbValidationException = BulkValidation.Core.Exceptions.ValidationException
 
 namespace Tests.HandlersTests.StorageRoutes;
 
-public class AddStorageRouteTests : Test
+public class AddStorageRouteTests : IntegrationTest
 {
     private User _carrier = null!;
     private Storage _fromStorage = null!;

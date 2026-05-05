@@ -65,10 +65,10 @@ public class ServiceProviderForTests
 
     private static void RegisterGlobalBasicContexts()
     {
-        Test.RegisterGlobalBasicContext<RolesTestContext>();
-        Test.RegisterGlobalBasicContext<GlobalApplicationSettingTestContext>();
-        Test.RegisterGlobalBasicContext<UserContextTestContext>();
-        Test.RegisterGlobalBasicContext<LocalizedTestContext>();
+        IntegrationTest.RegisterGlobalBasicContext<RolesTestContext>();
+        IntegrationTest.RegisterGlobalBasicContext<GlobalApplicationSettingTestContext>();
+        IntegrationTest.RegisterGlobalBasicContext<UserContextTestContext>();
+        IntegrationTest.RegisterGlobalBasicContext<LocalizedTestContext>();
     }
 
     private static async Task SeedDb(IServiceProvider serviceProvider)

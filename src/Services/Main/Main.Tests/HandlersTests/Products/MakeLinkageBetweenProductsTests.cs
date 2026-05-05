@@ -11,7 +11,7 @@ using DbValidationException = BulkValidation.Core.Exceptions.ValidationException
 
 namespace Tests.HandlersTests.Products;
 
-public class MakeLinkageBetweenProductsTests : Test
+public class MakeLinkageBetweenProductsTests : IntegrationTest
 {
     
     public MakeLinkageBetweenProductsTests(CombinedContainerFixture fixture) : base(fixture)

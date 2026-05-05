@@ -18,6 +18,7 @@ using Microsoft.EntityFrameworkCore;
 using Persistence.BaseTableConfigurations;
 using Persistence.Extensions;
 using Persistence.Interceptors;
+using Event = Main.Entities.Event.Event;
 
 namespace Main.Persistence.Context;
 
@@ -49,7 +50,8 @@ public partial class DContext : DbContext
     public virtual DbSet<ProductWeight> ProductWeights { get; set; }
 
     public virtual DbSet<ProductContent> ProductContents { get; set; }
-
+    
+    public virtual DbSet<Event> Events { get; set; }
     public virtual DbSet<Cart> Carts { get; set; }
 
     public virtual DbSet<Category> Categories { get; set; }
