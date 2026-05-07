@@ -17,6 +17,9 @@ public class StorageContent : AuditableEntity<StorageContent, int>, IVersionable
     public int Count { get; private set; }
 
     public decimal BuyPrice { get; private set; }
+    
+    public decimal BuyPriceInBaseCurrency { get; private set; }
+    public int BaseCurrencyId { get; private set; }
 
     public int CurrencyId { get; private set; }
     
@@ -34,14 +37,17 @@ public class StorageContent : AuditableEntity<StorageContent, int>, IVersionable
         int count,
         decimal buyPrice,
         int currencyId,
+        decimal buyPriceInBaseCurrency,
+        int buyPriceInBaseCurrencyId,
         DateTime purchaseDatetime)
     {
         StorageName = storageName;
         ProductId = productId;
         PurchaseDatetime = purchaseDatetime;
         SetCurrencyId(currencyId);
+        SetBaseCurrencyId(buyPriceInBaseCurrencyId);
         SetCount(count);
-        SetBuyPrice(buyPrice);
+        SetBuyPrice(buyPrice, buyPriceInBaseCurrency);
     }
 
     public static StorageContent Create(
@@ -50,20 +56,19 @@ public class StorageContent : AuditableEntity<StorageContent, int>, IVersionable
         int count,
         decimal buyPrice,
         int currencyId,
+        decimal buyPriceInBaseCurrency,
+        int buyPriceInBaseCurrencyId,
         DateTime purchaseDatetime)
     {
-        return new StorageContent(storageName, productId, count, buyPrice, currencyId, purchaseDatetime);
-    }
-
-    public static StorageContent CopyFrom(StorageContent source)
-    {
         return new StorageContent(
-            source.StorageName, 
-            source.ProductId, 
-            source.Count, 
-            source.BuyPrice, 
-            source.CurrencyId, 
-            source.PurchaseDatetime);
+            storageName, 
+            productId, 
+            count, 
+            buyPrice, 
+            currencyId,
+            buyPriceInBaseCurrency,
+            buyPriceInBaseCurrencyId,
+            purchaseDatetime);
     }
 
     public void SetCount(int count)
@@ -78,20 +83,33 @@ public class StorageContent : AuditableEntity<StorageContent, int>, IVersionable
             .AgainstNegative(() => new InvalidOperationException("Count must be greater than or equal to zero."));
     }
 
-    public void SetBuyPrice(decimal buyPrice)
+    public void SetBuyPrice(decimal buyPrice, decimal buyPriceInBaseCurrency)
     {
-        BuyPrice = buyPrice
+        buyPrice
             .AgainstTooManyDecimalPlaces(
                 maxDecimals: 2,
                 exceptionFactory: () => new InvalidOperationException("Buy price must have maximum 2 decimal places."))
             .AgainstTooSmall(
                 min: 0.001m,
                 exceptionFactory: () => new InvalidOperationException("Buy price must be grater then 0."));
+
+        buyPriceInBaseCurrency
+            .AgainstLessOrEqual(
+                min: 0, 
+                exceptionFactory: () => new InvalidOperationException("Buy price in base currency must be greater then 0."));
+        
+        BuyPrice = buyPrice;
+        BuyPriceInBaseCurrency = buyPriceInBaseCurrency;
     }
 
     public void SetCurrencyId(int currencyId)
     {
         CurrencyId = currencyId;
+    }
+
+    public void SetBaseCurrencyId(int baseCurrencyId)
+    {
+        BaseCurrencyId = baseCurrencyId;
     }
 
     public void SetPurchaseDate(DateTime purchaseDate)

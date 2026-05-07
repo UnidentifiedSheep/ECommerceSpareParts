@@ -1,12 +1,12 @@
 ﻿using Application.Common.Interfaces.Currency;
 using ZiggyCreatures.Caching.Fusion;
 
-namespace Application.Common.Services;
+namespace Application.Common.Services.Currency;
 
 public abstract class CurrencyRatesProviderBase(
     IFusionCache cache) : ICurrencyRatesProvider
 {
-    public async Task<decimal> GetRate(int currencyId, CancellationToken cancellationToken = default)
+    public virtual async Task<decimal> GetRate(int currencyId, CancellationToken cancellationToken = default)
     {
         return await cache.GetOrSetAsync(
             key: $"currency:{currencyId}:rate",

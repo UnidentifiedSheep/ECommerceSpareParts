@@ -9,7 +9,6 @@ using Main.Application.Interfaces.Persistence;
 using Main.Application.Models;
 using Main.Entities.Event;
 using Main.Entities.Product;
-using Main.Entities.Storage;
 using Main.Enums;
 using MediatR;
 
@@ -33,11 +32,10 @@ public class RestoreContentHandler(
         var productIds = new HashSet<int>();
         var storageContentIds = new HashSet<int>();
 
-        foreach (var (detail, articleId) in contentDetailsList)
+        foreach (var (detail, productId) in contentDetailsList)
         {
-            productIds.Add(articleId);
-            if (detail.StorageContentId == null) continue;
-            storageContentIds.Add(detail.StorageContentId.Value);
+            productIds.Add(productId);
+            storageContentIds.Add(detail.StorageContentId);
         }
         var products = await productRepository
             .EnsureProductsExistsForUpdateAsync(productIds, cancellationToken);
@@ -51,25 +49,9 @@ public class RestoreContentHandler(
         {
             Product product = products[productId];
             
-            if (detail.StorageContentId != null)
-            {
-                var content = storageContents[detail.StorageContentId.Value];
-                events.Add(StorageMovementEvent.Create(content, request.MovementType));
-                content.IncreaseCount(detail.Count);
-            }
-            else
-            {
-                var content = StorageContent.Create(
-                    detail.Storage,
-                    productId,
-                    detail.Count,
-                    detail.BuyPrice,
-                    detail.CurrencyId,
-                    detail.PurchaseDatetime);
-                
-                events.Add(StorageMovementEvent.Create(content, request.MovementType));
-                await unitOfWork.AddAsync(content, cancellationToken);
-            }
+            var content = storageContents[detail.StorageContentId];
+            events.Add(StorageMovementEvent.Create(content, request.MovementType));
+            content.IncreaseCount(detail.Count);
             
             product.IncreaseStock(detail.Count);
         }

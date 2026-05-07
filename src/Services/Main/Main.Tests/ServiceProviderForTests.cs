@@ -1,17 +1,15 @@
 using Abstractions.Interfaces;
-using Abstractions.Interfaces.Currency;
 using Abstractions.Models;
 using Api.Common;
 using Mail;
 using Main.Application.Configs;
 using Main.Persistence;
-using Main.Persistence.Context;
 using MassTransit;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
-using Persistence.Extensions;
 using Security;
 using Serilog;
+using Test.Common.Abstractions;
 using Test.Common.Extensions;
 using Test.Common.Stubs;
 using Test.Common.TestContexts;
@@ -22,7 +20,7 @@ namespace Tests;
 
 public class ServiceProviderForTests
 {
-    public async Task<IServiceProvider> Build(string postgresConnectionString, string redisConnectionString)
+    public IServiceProvider Build(string postgresConnectionString, string redisConnectionString)
     {
         RegisterGlobalBasicContexts();
         var services = new ServiceCollection();
@@ -57,30 +55,14 @@ public class ServiceProviderForTests
 
 
         var serviceProvider = services.BuildServiceProvider();
-
-        await SeedDb(serviceProvider);
-        await SetupPrice(serviceProvider);
         return serviceProvider;
     }
 
     private static void RegisterGlobalBasicContexts()
     {
-        IntegrationTest.RegisterGlobalBasicContext<RolesTestContext>();
-        IntegrationTest.RegisterGlobalBasicContext<GlobalApplicationSettingTestContext>();
-        IntegrationTest.RegisterGlobalBasicContext<UserContextTestContext>();
-        IntegrationTest.RegisterGlobalBasicContext<LocalizedTestContext>();
-    }
-
-    private static async Task SeedDb(IServiceProvider serviceProvider)
-    {
-        using var scope = serviceProvider.CreateScope();
-        await scope.SeedAsync<DContext>();
-    }
-
-    private static async Task SetupPrice(IServiceProvider serviceProvider)
-    {
-        using var scope = serviceProvider.CreateScope();
-        var currencyConverterSetup = scope.ServiceProvider.GetRequiredService<ICurrencyConverterSetup>();
-        await currencyConverterSetup.InitializeAsync(null);
+        TestBase.RegisterGlobalBasicContext<RolesTestContext>();
+        TestBase.RegisterGlobalBasicContext<GlobalApplicationSettingTestContext>();
+        TestBase.RegisterGlobalBasicContext<UserContextTestContext>();
+        TestBase.RegisterGlobalBasicContext<LocalizedTestContext>();
     }
 }

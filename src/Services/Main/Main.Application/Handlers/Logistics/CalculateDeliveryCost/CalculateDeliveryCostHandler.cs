@@ -31,7 +31,6 @@ public class CalculateDeliveryCostHandler(
     ILogisticsCostService logisticsCostService,
     IRepository<ProductSize, int> sizesRepository,
     IStorageRouteRepository storageRoutesRepository,
-    ICurrencyRatesProvider currencyRatesProvider,
     IRepository<Entities.Product.ProductWeight, int> weightRepository,
     ICurrencyConverter currencyConverter)
     : IQueryHandler<CalculateDeliveryCostQuery, CalculateDeliveryCostResult>
@@ -131,13 +130,25 @@ public class CalculateDeliveryCostHandler(
         int currencyId,
         LogisticsCalculationMode mode)
     {
-        var fromRate = await currencyRatesProvider.GetRate(route.CurrencyId);
-        var toRate = await currencyRatesProvider.GetRate(currencyId);
-        
-        var priceKg = Math.Round(currencyConverter.Convert(route.PriceKg, fromRate, toRate), 2);
-        var priceArea = Math.Round(currencyConverter.Convert(route.PricePerM3, fromRate, toRate), 2);
-        var priceOrder = Math.Round(currencyConverter.Convert(route.PricePerOrder, fromRate, toRate), 2);
-        var minimalPrice = Math.Round(currencyConverter.Convert(route.MinimumPrice, fromRate, toRate), 2);
+        var priceKg = Math.Round(await currencyConverter
+            .ConvertAsync(
+                route.PriceKg, 
+                route.CurrencyId, 
+                currencyId), 2);
+        var priceArea = Math.Round(await currencyConverter
+            .ConvertAsync(
+                route.PricePerM3, 
+                route.CurrencyId, 
+                currencyId), 2);
+        var priceOrder = Math.Round(await currencyConverter
+            .ConvertAsync(
+                route.PricePerOrder, 
+                route.CurrencyId, 
+                currencyId), 2);
+        var minimalPrice = Math.Round(await currencyConverter.ConvertAsync(
+            route.MinimumPrice, 
+            route.CurrencyId, 
+            currencyId), 2);
 
         var context = new LogisticsContext(priceKg, priceArea, priceOrder, minimalPrice);
         List<LogisticsItem> logisticsItems = [];

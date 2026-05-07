@@ -9,5 +9,19 @@ public interface ICurrencyConverter
     decimal ToBase(decimal value, decimal fromRate);
     decimal FromBase(decimal value, decimal toRate);
 
+    Task<decimal> ConvertAsync(
+        decimal value, 
+        int fromCurrencyId, 
+        int toCurrencyId, 
+        CancellationToken cancellationToken = default);
+    Task<decimal> ConvertFromBaseAsync(
+        decimal value, 
+        int toCurrencyId, 
+        CancellationToken cancellationToken = default);
+    Task<decimal> ConvertToBaseAsync(
+        decimal value, 
+        int fromCurrencyId, 
+        CancellationToken cancellationToken = default);
+
     ExchangeRates ChangeBaseCurrency(ExchangeRates data, string newBase);
 }

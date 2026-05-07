@@ -1,9 +1,12 @@
 ﻿using System.Reflection;
 using Application.Common.Abstractions;
 using Application.Common.Interfaces;
+using Application.Common.Interfaces.NamedObject;
 using Application.Common.Services;
+using Application.Common.Services.NamedObject;
 using FluentValidation;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.DependencyInjection.Extensions;
 
 namespace Application.Common.Extensions;
 
@@ -70,6 +73,46 @@ public static class ServiceCollectionExtensions
         assembly ??= Assembly.GetExecutingAssembly();
         services.AddValidatorsFromAssembly(assembly);
         
+        return services;
+    }
+
+    public static IServiceCollection RegisterNamedObject<TBaseObject>(
+        this IServiceCollection services,
+        Assembly? assembly = null,
+        ServiceLifetime objectsLifetime = ServiceLifetime.Scoped)
+        where TBaseObject : class, INamedObject
+    {
+        assembly ??= typeof(TBaseObject).Assembly;
+
+        services.Scan(scan =>
+        {
+            var registration = scan
+                .FromAssemblies(assembly)
+                .AddClasses(classes => classes.AssignableTo<TBaseObject>())
+                .AsSelf()
+                .AsImplementedInterfaces();
+
+            switch (objectsLifetime)
+            {
+                case ServiceLifetime.Singleton:
+                    registration.WithSingletonLifetime();
+                    break;
+
+                case ServiceLifetime.Scoped:
+                    registration.WithScopedLifetime();
+                    break;
+
+                case ServiceLifetime.Transient:
+                    registration.WithTransientLifetime();
+                    break;
+
+                default:
+                    throw new ArgumentOutOfRangeException(nameof(objectsLifetime), objectsLifetime, null);
+            }
+        });
+
+        services.TryAddScoped(typeof(INamedObjectRegistry<>), typeof(NamedObjectRegistry<>));
+
         return services;
     }
 }

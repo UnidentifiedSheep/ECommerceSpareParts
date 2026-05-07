@@ -1,6 +1,7 @@
 using Main.Persistence.Context;
 using MediatR;
 using Microsoft.Extensions.DependencyInjection;
+using Persistence.Extensions;
 using Test.Common.Abstractions;
 using Test.Common.Extensions;
 using Test.Common.TestContainers.Combined;
@@ -21,7 +22,7 @@ public abstract class IntegrationTest(CombinedContainerFixture fixture) : TestBa
 
     public override async Task InitializeAsync()
     {
-        _sp = await new ServiceProviderForTests().Build(
+        _sp = new ServiceProviderForTests().Build(
             fixture.PostgresConnectionString,
             fixture.RedisConnectionString);
         
@@ -30,6 +31,7 @@ public abstract class IntegrationTest(CombinedContainerFixture fixture) : TestBa
         Context = Scope.ServiceProvider.GetRequiredService<DContext>();
         Mediator = Scope.ServiceProvider.GetRequiredService<IMediator>();
         
+        await SeedDb();
         await InitializeBasicContexts();
     }
 
@@ -37,6 +39,12 @@ public abstract class IntegrationTest(CombinedContainerFixture fixture) : TestBa
     {
         await ResetDb();
         Scope.Dispose();
+    }
+    
+    private async Task SeedDb()
+    {
+        using var scope = Sp.CreateScope();
+        await scope.SeedAsync<DContext>();
     }
     
     protected Task ResetDb() => Context.ClearDatabase();

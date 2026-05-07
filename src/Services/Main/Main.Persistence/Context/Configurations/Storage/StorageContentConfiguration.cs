@@ -44,6 +44,12 @@ public class StorageContentConfiguration : IEntityTypeConfiguration<StorageConte
         builder.Property(e => e.CurrencyId)
             .HasColumnName("currency_id");
         
+        builder.Property(e => e.BaseCurrencyId)
+            .HasColumnName("base_currency_id");
+        
+        builder.Property(e => e.BuyPriceInBaseCurrency)
+            .HasColumnName("base_currency_id");
+        
         builder.Property(e => e.PurchaseDatetime)
             .HasColumnName("purchase_datetime");
         
@@ -66,6 +72,12 @@ public class StorageContentConfiguration : IEntityTypeConfiguration<StorageConte
             .HasForeignKey(d => d.CurrencyId)
             .OnDelete(DeleteBehavior.Restrict)
             .HasConstraintName("storage_content_currency_id_fk");
+        
+        builder.HasOne<Entities.Currency.Currency>()
+            .WithMany()
+            .HasForeignKey(d => d.BaseCurrencyId)
+            .OnDelete(DeleteBehavior.Restrict)
+            .HasConstraintName("storage_content_base_currency_id_fk");
 
         builder.HasOne<Entities.Storage.Storage>()
             .WithMany()

@@ -1,5 +1,6 @@
 ﻿using Application.Common.Interfaces.Settings;
 using Application.Common.Services;
+using Application.Common.Services.Currency;
 using Main.Abstractions.Models.Settings;
 using Main.Application.Interfaces.Persistence;
 using Main.Entities.Exceptions.Currencies;
@@ -16,7 +17,7 @@ public class CurrencyRatesProvider(
     {
         var baseCurrencyId = (await settingsService.GetOrDefault<CurrencySetting>(cancellationToken))
             .Data
-            .BaseCurrency;
+            .BaseCurrencyId;
 
         var rate = await rateRepository.GetById((currencyId, baseCurrencyId), cancellationToken)
                    ?? throw new CurrencyRateNotFoundException(currencyId);

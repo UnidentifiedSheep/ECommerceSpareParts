@@ -41,6 +41,10 @@
     "storage.location.max.length": "Местоположение склада должно быть не более 256 символов.",
     "storage.name.taken": "Данное название склада занято.",
     "fifo.storage.content.extract.policy.name": "Первое включение, первым вылетает",
-    "fifo.storage.content.extract.policy.description": "Сначала списываются старые поступления, затем новые"
+    "fifo.storage.content.extract.policy.description": "Сначала списываются старые поступления, затем новые",
+    "lifo.storage.content.extract.policy.name": "Последнее включение, первым вылетает",
+    "lifo.storage.content.extract.policy.description": "Сначала списываются последние поступления, затем более ранние",
+    "first.cheapest.storage.content.extract.policy.name": "Сначала самые дешёвые",
+    "first.cheapest.storage.content.extract.policy.description": "Сначала списываются поступления с наименьшей стоимостью, затем более дорогие"
   }
 }

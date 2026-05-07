@@ -30,7 +30,7 @@ public static class ServiceProvider
             .RegisterMetricConverters();
 
         collection.AddSingleton<IJsonSerializer, JsonSerializer>();
-        collection.AddSingleton<ICurrencyConverter, CurrencyConverter>(_ => new CurrencyConverter(Global.UsdId));
+        collection.AddSingleton<ICurrencyConverter, CurrencyConverterBase>(_ => new CurrencyConverterBase(Global.UsdId));
         collection.AddScoped<ICurrencyConverterSetup, CurrencyConverterSetup>();
 
         return collection;

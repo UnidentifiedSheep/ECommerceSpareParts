@@ -3,12 +3,11 @@ using Application.Common.Interfaces.Currency;
 
 namespace Application.Common.Services;
 
-public class CurrencyConverter: ICurrencyConverter
+public abstract class CurrencyConverterBase : ICurrencyConverter
 {
     public decimal Convert(decimal value, decimal fromRate, decimal toRate)
     {
-        if (fromRate == toRate)
-            return value;
+        if (fromRate == toRate) return value;
 
         var baseValue = value / fromRate;
         return baseValue * toRate;
@@ -17,6 +16,21 @@ public class CurrencyConverter: ICurrencyConverter
     public decimal ToBase(decimal value, decimal fromRate) => value / fromRate;
 
     public decimal FromBase(decimal value, decimal toRate) => value * toRate;
+    public abstract Task<decimal> ConvertAsync(
+        decimal value, 
+        int fromCurrencyId, 
+        int toCurrencyId, 
+        CancellationToken cancellationToken = default);
+
+    public abstract Task<decimal> ConvertFromBaseAsync(
+        decimal value, 
+        int toCurrencyId, 
+        CancellationToken cancellationToken = default);
+
+    public abstract Task<decimal> ConvertToBaseAsync(
+        decimal value, 
+        int fromCurrencyId, 
+        CancellationToken cancellationToken = default);
 
     public ExchangeRates ChangeBaseCurrency(ExchangeRates data, string newBase)
     {

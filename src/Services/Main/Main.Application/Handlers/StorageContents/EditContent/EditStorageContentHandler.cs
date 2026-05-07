@@ -2,6 +2,7 @@ using System.Data;
 using Abstractions.Interfaces.Services;
 using Application.Common.Extensions;
 using Application.Common.Interfaces;
+using Application.Common.Interfaces.Currency;
 using Application.Common.Interfaces.Repositories;
 using Attributes;
 using Contracts.Articles;
@@ -29,7 +30,8 @@ public class EditStorageContentHandler(
     IRepository<StorageContent, int> storageContentRepository,
     IProductRepository productRepository,
     IUnitOfWork unitOfWork,
-    IIntegrationEventScope integrationEventScope
+    IIntegrationEventScope integrationEventScope,
+    ICurrencyConverter currencyConverter
     ) : ICommandHandler<EditStorageContentCommand>
 {
     public async Task<Unit> Handle(EditStorageContentCommand request, CancellationToken cancellationToken)
@@ -58,8 +60,16 @@ public class EditStorageContentHandler(
             var movementEvent = StorageMovementEvent.Create(content, StorageMovementType.StorageContentEditing);
 
             patch.Count.Apply(content.SetCount);
-            patch.BuyPrice.Apply(content.SetBuyPrice);
             patch.CurrencyId.Apply(content.SetCurrencyId);
+            
+            if (patch.BuyPrice.IsSet)
+            {
+                var value = patch.BuyPrice.Value;
+                var inBaseCurrency = await currencyConverter
+                    .ConvertToBaseAsync(value, content.CurrencyId, cancellationToken);
+                content.SetBuyPrice(value, inBaseCurrency);
+            }
+            
             patch.PurchaseDatetime.Apply(content.SetPurchaseDate);
             
             storageMovements.Add(movementEvent);

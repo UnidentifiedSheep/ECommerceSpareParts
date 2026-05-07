@@ -1,5 +1,4 @@
-﻿using Abstractions.Interfaces.Currency;
-using Abstractions.Interfaces.Integrations.ExchangeRate;
+﻿using Abstractions.Interfaces.Integrations.ExchangeRate;
 using Abstractions.Interfaces.Services;
 using Abstractions.Models;
 using Application.Common.Interfaces.Currency;
@@ -22,8 +21,8 @@ public class CurrencyRateUpdater(
 {
     public async Task<UpdateRatesResult> UpdateAsync(CurrencySetting setting, CancellationToken ct)
     {
-        var baseCurrency = await currencyRepository.GetById(setting.Data.BaseCurrency, ct)
-            ?? throw new CurrencyNotFoundException(setting.Data.BaseCurrency);
+        var baseCurrency = await currencyRepository.GetById(setting.Data.BaseCurrencyId, ct)
+            ?? throw new CurrencyNotFoundException(setting.Data.BaseCurrencyId);
 
         var client = clientFactory.GetClient(setting.Data.RateProvider);
 

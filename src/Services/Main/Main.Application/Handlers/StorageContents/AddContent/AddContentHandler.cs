@@ -2,8 +2,11 @@ using System.Data;
 using Abstractions.Interfaces.Services;
 using Application.Common.Extensions;
 using Application.Common.Interfaces;
+using Application.Common.Interfaces.Currency;
+using Application.Common.Interfaces.Settings;
 using Attributes;
 using Contracts.StorageContent;
+using Main.Abstractions.Models.Settings;
 using Main.Application.Dtos.Storage;
 using Main.Application.Extensions;
 using Main.Application.Handlers.Projections;
@@ -27,11 +30,16 @@ public record AddContentResult(IReadOnlyList<StorageContentDto> StorageContents)
 
 public class AddContentHandler(
     IProductRepository productRepository,
+    ICurrencyConverter converter,
+    ISettingsService settingsService,
     IUnitOfWork unitOfWork,
     IIntegrationEventScope integrationEventScope) : ICommandHandler<AddContentCommand, AddContentResult>
 {
     public async Task<AddContentResult> Handle(AddContentCommand request, CancellationToken cancellationToken)
     {
+        var baseCurrencyId = (await settingsService.GetOrDefault<CurrencySetting>(cancellationToken))
+            .Data.BaseCurrencyId;
+        
         var productIds = request.StorageContent
             .Select(x => x.ProductId)
             .Distinct()
@@ -45,12 +53,14 @@ public class AddContentHandler(
         foreach (var item in request.StorageContent)
         {
             var content = StorageContent.Create(
-                request.StorageName,
-                item.ProductId,
-                item.Count,
-                item.BuyPrice,
-                item.CurrencyId,
-                item.PurchaseDate);
+                storageName: request.StorageName,
+                productId: item.ProductId,
+                count: item.Count,
+                buyPrice: item.BuyPrice,
+                currencyId: item.CurrencyId,
+                buyPriceInBaseCurrency: await converter.ConvertToBaseAsync(item.BuyPrice, item.CurrencyId, cancellationToken),
+                buyPriceInBaseCurrencyId: baseCurrencyId,
+                purchaseDatetime: item.PurchaseDate);
             
             storageContents.Add(content);
 

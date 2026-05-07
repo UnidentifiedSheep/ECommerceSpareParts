@@ -7,7 +7,7 @@ public class SaleContentDetail : Entity<SaleContentDetail, int>
 {
     public int Id { get; private set; }
     public int SaleContentId { get; private set; }
-    public int? StorageContentId { get; private set; }
+    public int StorageContentId { get; private set; }
     public string Storage { get; private set; } = null!;
     public int CurrencyId { get; private set; }
     public decimal BuyPrice { get; private set; }
@@ -17,7 +17,7 @@ public class SaleContentDetail : Entity<SaleContentDetail, int>
     private SaleContentDetail() {}
 
     private SaleContentDetail(
-        int? storageContentId, 
+        int storageContentId, 
         int currencyId, 
         decimal buyPrice, 
         int count, 
@@ -31,7 +31,7 @@ public class SaleContentDetail : Entity<SaleContentDetail, int>
     }
 
     public static SaleContentDetail Create(
-        int? storageContentId,
+        int storageContentId,
         int currencyId,
         decimal buyPrice,
         int count,

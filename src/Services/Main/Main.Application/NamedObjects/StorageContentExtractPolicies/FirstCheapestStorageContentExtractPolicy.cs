@@ -1,26 +1,16 @@
-﻿using Main.Entities.Storage;
+﻿using Main.Abstractions.Models.Settings;
+using Main.Entities.Storage;
 
 namespace Main.Application.NamedObjects.StorageContentExtractPolicies;
 
 public class FirstCheapestStorageContentExtractPolicy : StorageContentExtractPolicyBase
 {
-    public override string SystemName { get; }
-    protected override string NameLocalizationKey { get; }
-    protected override string DescriptionLocalizationKey { get; }
+    public override string SystemName => "FirstCheapestStorageContentExtractPolicy";
+    protected override string NameLocalizationKey => "first.cheapest.storage.content.extract.policy.name";
+    protected override string DescriptionLocalizationKey => "first.cheapest.storage.content.extract.policy.description";
     
     public override IQueryable<StorageContent> Apply(IQueryable<StorageContent> query)
     {
-        return query
-            .Select(x => new
-            {
-                x,
-                PriceInUsd =
-                    x.Currency.CurrencyToUsd == null
-                        ? (decimal?)null
-                        : x.BuyPrice * x.Currency.CurrencyToUsd.ToUsd
-            })
-            .OrderBy(x => x.PriceInUsd == null)
-            .ThenBy(x => x.PriceInUsd)
-            .Select(x => x.x);//TODO
+        return query.OrderBy(x => x.BuyPriceInBaseCurrency);
     }
 }

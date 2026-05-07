@@ -29,11 +29,13 @@ public static class ServiceProvider
         UserEmailOptions? emailOptions = null,
         UserPhoneOptions? phoneOptions = null)
     {
-        collection.AddFusionCache("main")
+        collection
+            .AddNamedObjects()
+            .AddFusionCache("main")
             .WithRegisteredDistributedCache()
             .WithRegisteredBackplane()
             .WithSystemTextJsonSerializer();
-
+        
         collection.AddSingleton<IJwtGenerator, JwtGenerator>();
         collection.AddSingleton<UpdateCurrencyRate>();
         collection.AddSingleton(emailOptions ?? new UserEmailOptions());
