@@ -10,14 +10,18 @@ public class CreateProductReservationDbValidation : AbstractDbValidation<CreateP
     {
         var articleIds = new HashSet<int>();
         var userIds = new HashSet<Guid>();
+        var currencyIds = new HashSet<int>();
 
         foreach (var item in request.Reservations)
         {
             articleIds.Add(item.ProductId);
             userIds.Add(item.UserId);
+            if (item.GivenCurrencyId.HasValue)
+                currencyIds.Add(item.GivenCurrencyId.Value);
         }
 
         plan.ValidateProductExistsId(articleIds)
-            .ValidateUserExistsId(userIds);
+            .ValidateUserExistsId(userIds)
+            .ValidateCurrencyExistsId(currencyIds);
     }
 }

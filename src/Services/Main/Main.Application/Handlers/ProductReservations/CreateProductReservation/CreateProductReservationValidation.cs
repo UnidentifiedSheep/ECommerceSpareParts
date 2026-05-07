@@ -1,5 +1,5 @@
-using Abstractions.Interfaces.Currency;
 using Application.Common.Extensions;
+using Application.Common.Interfaces.Currency;
 using FluentValidation;
 using Localization.Domain.Extensions;
 
@@ -32,9 +32,6 @@ public class CreateProductReservationValidation : AbstractValidator<CreateProduc
                 x.RuleFor(z => z.ReservedCount)
                     .GreaterThanOrEqualTo(z => z.CurrentCount)
                     .WithLocalizationKey("article.reservation.initial.count.not.less.than.current");
-
-                x.RuleFor(z => z.GivenCurrencyId)
-                    .CurrencyMustExist(currencyConverter);
             });
     }
 }

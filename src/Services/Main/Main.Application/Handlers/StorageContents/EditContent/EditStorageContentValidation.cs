@@ -1,5 +1,3 @@
-using Abstractions.Interfaces.Currency;
-using Application.Common.Extensions;
 using FluentValidation;
 using Localization.Domain.Extensions;
 using Main.Application.Handlers.BaseValidators;
@@ -8,7 +6,7 @@ namespace Main.Application.Handlers.StorageContents.EditContent;
 
 public class EditStorageContentValidation : AbstractValidator<EditStorageContentCommand>
 {
-    public EditStorageContentValidation(ICurrencyConverter currencyConverter)
+    public EditStorageContentValidation()
     {
         RuleFor(x => x.EditedFields)
             .NotEmpty()
@@ -34,10 +32,6 @@ public class EditStorageContentValidation : AbstractValidator<EditStorageContent
                     .InclusiveBetween(DateTime.UtcNow.AddMonths(-3), DateTime.UtcNow.AddMinutes(10))
                     .When(x => x.Model.PurchaseDatetime.IsSet)
                     .WithLocalizationKey("storage.content.purchase.date.range");
-
-                z.RuleFor(x => x.Model.CurrencyId.Value)
-                    .CurrencyMustExist(currencyConverter)
-                    .When(x => x.Model.CurrencyId.IsSet);
             });
     }
 }

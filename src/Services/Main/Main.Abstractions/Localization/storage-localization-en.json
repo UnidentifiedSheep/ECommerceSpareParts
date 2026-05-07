@@ -39,6 +39,8 @@
     "storage.name.max.length": "Storage name must be at most 128 characters long.",
     "storage.description.max.length": "Storage description must be at most 256 characters long.",
     "storage.location.max.length": "Storage location must be at most 256 characters long.",
-    "storage.name.taken": "This storage name already taken."
+    "storage.name.taken": "This storage name already taken.",
+    "fifo.storage.content.extract.policy.name": "First in first out",
+    "fifo.storage.content.extract.policy.description": "Oldest stock is used first, then newer stock"
   }
 }

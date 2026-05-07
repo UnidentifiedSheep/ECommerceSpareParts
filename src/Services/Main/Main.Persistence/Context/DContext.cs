@@ -60,9 +60,9 @@ public partial class DContext : DbContext
 
     public virtual DbSet<Currency> Currencies { get; set; }
 
-    public virtual DbSet<CurrencyHistory> CurrencyHistories { get; set; }
+    public virtual DbSet<CurrencyRateHistory> CurrencyRateHistories { get; set; }
 
-    public virtual DbSet<CurrencyToUsd> CurrencyToUsds { get; set; }
+    public virtual DbSet<CurrencyRate> CurrencyRates { get; set; }
 
     public virtual DbSet<Setting> DefaultSettings { get; set; }
 

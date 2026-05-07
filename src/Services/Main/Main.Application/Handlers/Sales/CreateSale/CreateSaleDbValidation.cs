@@ -11,6 +11,7 @@ public class CreateSaleDbValidation : AbstractDbValidation<CreateSaleCommand>
         plan.ValidateTransactionExistsId(request.TransactionId)
             .ValidateProductExistsId(request.SellContent.Select(x => x.ProductId).ToHashSet())
             .ValidateUserExistsId(request.BuyerId)
+            .ValidateCurrencyExistsId(request.CurrencyId)
             .ValidateStorageExistsName(request.Storage);
     }
 }

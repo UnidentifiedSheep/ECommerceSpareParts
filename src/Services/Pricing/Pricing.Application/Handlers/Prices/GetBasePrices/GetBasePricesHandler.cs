@@ -1,5 +1,6 @@
 ﻿using Abstractions.Interfaces.Currency;
 using Application.Common.Interfaces;
+using Application.Common.Interfaces.Currency;
 using MediatR;
 using Pricing.Abstractions.Interfaces.CacheRepositories;
 using Pricing.Abstractions.Models.Pricing;

@@ -1,6 +1,6 @@
-﻿using Abstractions.Interfaces.Currency;
-using Application.Common.Extensions;
+﻿using Application.Common.Extensions;
 using Application.Common.Interfaces;
+using Application.Common.Interfaces.Currency;
 using Application.Common.Interfaces.Repositories;
 using Enums;
 using Main.Abstractions.Interfaces.Logistics;
@@ -31,6 +31,7 @@ public class CalculateDeliveryCostHandler(
     ILogisticsCostService logisticsCostService,
     IRepository<ProductSize, int> sizesRepository,
     IStorageRouteRepository storageRoutesRepository,
+    ICurrencyRatesProvider currencyRatesProvider,
     IRepository<Entities.Product.ProductWeight, int> weightRepository,
     ICurrencyConverter currencyConverter)
     : IQueryHandler<CalculateDeliveryCostQuery, CalculateDeliveryCostResult>
@@ -50,7 +51,13 @@ public class CalculateDeliveryCostHandler(
         var sizes = await GetSizes(usableProductIds, cancellationToken);
         var weights = await GetWeights(usableProductIds, cancellationToken);
 
-        var calcResult = CalculateLogistics(route, sizes, weights, request.Items, route.CurrencyId, request.Mode);
+        var calcResult = await CalculateLogistics(
+            route, 
+            sizes, 
+            weights, 
+            request.Items, 
+            route.CurrencyId, 
+            request.Mode);
         DeliveryCostDto deliveryCost = new()
         {
             TotalAreaM3 = calcResult.TotalAreaM3,
@@ -116,7 +123,7 @@ public class CalculateDeliveryCostHandler(
             .ToDictionary(x => x.ProductId);
     }
 
-    private LogisticsCalcResult CalculateLogistics(
+    private async Task<LogisticsCalcResult> CalculateLogistics(
         StorageRoute route,
         Dictionary<int, ProductSize> sizes,
         Dictionary<int, Entities.Product.ProductWeight> weights,
@@ -124,10 +131,13 @@ public class CalculateDeliveryCostHandler(
         int currencyId,
         LogisticsCalculationMode mode)
     {
-        var priceKg = Math.Round(currencyConverter.ConvertTo(route.PriceKg, route.CurrencyId, currencyId), 2);
-        var priceArea = Math.Round(currencyConverter.ConvertTo(route.PricePerM3, route.CurrencyId, currencyId), 2);
-        var priceOrder = Math.Round(currencyConverter.ConvertTo(route.PricePerOrder, route.CurrencyId, currencyId), 2);
-        var minimalPrice = Math.Round(currencyConverter.ConvertTo(route.MinimumPrice, route.CurrencyId, currencyId), 2);
+        var fromRate = await currencyRatesProvider.GetRate(route.CurrencyId);
+        var toRate = await currencyRatesProvider.GetRate(currencyId);
+        
+        var priceKg = Math.Round(currencyConverter.Convert(route.PriceKg, fromRate, toRate), 2);
+        var priceArea = Math.Round(currencyConverter.Convert(route.PricePerM3, fromRate, toRate), 2);
+        var priceOrder = Math.Round(currencyConverter.Convert(route.PricePerOrder, fromRate, toRate), 2);
+        var minimalPrice = Math.Round(currencyConverter.Convert(route.MinimumPrice, fromRate, toRate), 2);
 
         var context = new LogisticsContext(priceKg, priceArea, priceOrder, minimalPrice);
         List<LogisticsItem> logisticsItems = [];

@@ -1,8 +1,8 @@
-using Abstractions.Interfaces.Currency;
 using Abstractions.Interfaces.Validators;
 using Abstractions.Models;
 using Application.Common;
 using Application.Common.Interfaces;
+using Application.Common.Interfaces.Currency;
 using Application.Common.Interfaces.Settings;
 using Application.Common.Services;
 using Application.Common.Validators;
@@ -12,7 +12,9 @@ using Main.Application.Configs;
 using Main.Application.Handlers.Users.GetUserDiscount;
 using Main.Application.HangFireTasks;
 using Main.Application.Interfaces.Services;
+using Main.Application.Interfaces.Services.Currency;
 using Main.Application.Services;
+using Main.Application.Services.Currency;
 using Main.Application.Services.Logistics;
 using Main.Application.Services.Logistics.PricingStrategies;
 using Microsoft.Extensions.DependencyInjection;
@@ -38,7 +40,6 @@ public static class ServiceProvider
         collection.AddSingleton(phoneOptions ?? new UserPhoneOptions());
 
         collection.AddSingleton<ICurrencyConverter, CurrencyConverter>();
-        collection.AddScoped<ICurrencyConverterSetup, CurrencyConverterSetup>();
 
         collection.AddSingleton<ISettingFactory, SettingFactory>();
 
@@ -54,6 +55,8 @@ public static class ServiceProvider
         collection.AddScoped<ISaleService, SaleService>();
         collection.AddScoped<IUserTokenService, UserTokenService>();
         collection.AddScoped<IUserService, UserService>();
+        collection.AddScoped<ICurrencyRateUpdater, CurrencyRateUpdater>();
+        collection.AddScoped<ICurrencyRatesProvider, CurrencyRatesProvider>();
 
         collection.AddApplicationBase(typeof(Global).Assembly);
 

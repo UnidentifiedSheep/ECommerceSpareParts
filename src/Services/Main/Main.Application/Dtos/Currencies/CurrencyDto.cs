@@ -18,7 +18,4 @@ public record CurrencyDto
 
     [JsonPropertyName("code")]
     public required string Code { get; init; }
-
-    [JsonPropertyName("toUsdRate")]
-    public required decimal? ToUsdRate { get; init; }
 }

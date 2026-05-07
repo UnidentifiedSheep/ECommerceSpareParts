@@ -5,6 +5,7 @@ using Analytics.Entities;
 using Analytics.Entities.Metrics;
 using Analytics.Entities.Metrics.JsonDataModels;
 using Analytics.Enums;
+using Application.Common.Interfaces.Currency;
 
 namespace Analytics.Application.Services.Metrics.Calculators;
 

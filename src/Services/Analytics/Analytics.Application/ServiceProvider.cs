@@ -11,6 +11,7 @@ using Analytics.Entities.Metrics;
 using Application.Common;
 using Application.Common.Behaviors;
 using Application.Common.Extensions;
+using Application.Common.Interfaces.Currency;
 using Application.Common.Services;
 using FluentValidation;
 using Microsoft.Extensions.DependencyInjection;

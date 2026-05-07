@@ -10,5 +10,8 @@ public class EditStorageRouteDbValidation : AbstractDbValidation<EditStorageRout
     {
         if (request.PatchStorageRoute.CarrierId is { IsSet: true, Value: not null })
             plan.ValidateUserExistsId(request.PatchStorageRoute.CarrierId.Value.Value);
+
+        if (request.PatchStorageRoute.CurrencyId.IsSet)
+            plan.ValidateCurrencyExistsId(request.PatchStorageRoute.CurrencyId.Value);
     }
 }

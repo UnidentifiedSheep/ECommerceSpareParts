@@ -8,5 +8,6 @@ public class EditPurchaseDbValidation : AbstractDbValidation<EditPurchaseCommand
 {
     public override void Build(IValidationPlan plan, EditPurchaseCommand request)
     {
+        plan.ValidateCurrencyExistsId(request.CurrencyId);
     }
 }

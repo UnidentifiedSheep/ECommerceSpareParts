@@ -1,5 +1,6 @@
 ﻿using Abstractions.Interfaces.Currency;
 using Application.Common.Extensions;
+using Application.Common.Interfaces.Currency;
 using FluentValidation;
 
 namespace Pricing.Application.Handlers.Prices.GetDetailedPrices;

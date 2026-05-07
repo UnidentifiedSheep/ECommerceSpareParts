@@ -1,103 +1,35 @@
-using Abstractions.Interfaces.Currency;
-using Abstractions.Interfaces.Integrations.ExchangeRate;
-using Abstractions.Models;
 using Application.Common.Interfaces;
-using Application.Common.Interfaces.Repositories;
 using Application.Common.Interfaces.Settings;
 using Attributes;
 using Contracts.Currency;
 using Main.Abstractions.Models.Settings;
-using Main.Entities.Currency;
-using Main.Entities.Exceptions.Currencies;
+using Main.Application.Interfaces.Services.Currency;
 using MediatR;
 using Microsoft.Extensions.Logging;
 
 namespace Main.Application.Handlers.Currencies.UpdateCurrenciesRates;
 
-[AutoSave]
-[Transactional]
+[Transactional, AutoSave]
 public record UpdateCurrenciesRatesCommand : ICommand;
 
 public class UpdateCurrenciesRatesHandler(
     ILogger<UpdateCurrenciesRatesCommand> logger,
-    IExchangeRateClientFactory exchangeFactory,
+    ICurrencyRateUpdater updater,
     IIntegrationEventScope integrationEventScope,
-    IRepository<Currency, int> currencyRepository,
-    ICurrencyConverter currencyConverter,
     ISettingsService settingsService) : ICommandHandler<UpdateCurrenciesRatesCommand>
 {
     public async Task<Unit> Handle(UpdateCurrenciesRatesCommand request, CancellationToken cancellationToken)
     {
         var settings = await settingsService.GetOrDefault<CurrencySetting>(cancellationToken);
-        var provider = GetRateProvider(settings);
-        var currencies = await LoadCurrencies(cancellationToken);
 
-        var convertedRates = await GetConvertedRates(provider, settings, currencies, cancellationToken);
+        var result = await updater.UpdateAsync(settings, cancellationToken);
 
-        var (changedRates, notFoundRates)
-            = ApplyRates(currencies, convertedRates);
+        if (result.NotFound.Count > 0)
+            logger.LogWarning("Missing rates: {@Currencies}", result.NotFound);
 
-        if (notFoundRates.Count > 0)
-            logger.LogWarning("Курсы валют для {@Currencies} не найдены у {Provider} на {Time}", notFoundRates,
-                provider, DateTime.UtcNow);
-
-        if (changedRates.Count != 0)
-            integrationEventScope.Add(new CurrencyRateChangedEvent { Rates = changedRates });
+        if (result.Changed.Count > 0)
+            integrationEventScope.Add(new CurrencyRateChangedEvent { Rates = result.Changed });
 
         return Unit.Value;
-    }
-
-    private IExchangeRateClient GetRateProvider(CurrencySetting setting)
-    {
-        return exchangeFactory.GetClient(setting.Data.RateProvider);
-    }
-
-    private async Task<Dictionary<string, Currency>> LoadCurrencies(CancellationToken cancellationToken)
-    {
-        var list = await currencyRepository.ListAsync(ct: cancellationToken);
-
-        return list.ToDictionary(x => x.Code, x => x);
-    }
-
-    private async Task<ExchangeRates> GetConvertedRates(
-        IExchangeRateClient provider,
-        CurrencySetting setting,
-        Dictionary<string, Currency> currencies,
-        CancellationToken cancellationToken)
-    {
-        var usd = currencies.Values.FirstOrDefault(x => x.Id == setting.Data.UsdId);
-        if (usd == null)
-            throw new CurrencyNotFoundException(setting.Data.UsdId);
-
-        var rates = await provider.GetRates(cancellationToken);
-
-        return currencyConverter.ChangeBaseCurrency(rates, usd.Code);
-    }
-
-    private (Dictionary<int, decimal> changedRates, List<string> notFoundRates)
-        ApplyRates(Dictionary<string, Currency> currencies, ExchangeRates convertedRates)
-    {
-        var changedRates = new Dictionary<int, decimal>();
-        var notFoundRates = new List<string>();
-
-        foreach (var currency in currencies.Values)
-        {
-            if (!convertedRates.Rates.TryGetValue(currency.Code, out var rate))
-            {
-                notFoundRates.Add(currency.Code);
-                continue;
-            }
-
-            var prevValue = currency.CurrencyToUsd?.ToUsd ?? 0;
-
-            if (prevValue == rate)
-                continue;
-
-            currency.SetCurrencyToUsd(rate);
-
-            changedRates[currency.Id] = rate;
-        }
-
-        return (changedRates, notFoundRates);
     }
 }

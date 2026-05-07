@@ -1,4 +1,5 @@
 using Abstractions.Interfaces.Services;
+using Application.Common.Extensions.Entities;
 using Application.Common.Interfaces;
 using Attributes;
 using Contracts.Currency;
@@ -25,15 +26,7 @@ public class CreateCurrencyHandler(
 
         integrationEventScope.Add(new CurrencyCreatedEvent
         {
-            Currency = new Contracts.Models.Currency.Currency
-            {
-                Id = model.Id,
-                Name = model.Name,
-                CurrencySign = model.CurrencySign,
-                Code = model.Code,
-                ShortName = model.ShortName,
-                ToUsdRate = model.CurrencyToUsd?.ToUsd ?? 0
-            }
+            Currency = model.ToContract()
         });
         
         return new CreateCurrencyResult(model.Id);

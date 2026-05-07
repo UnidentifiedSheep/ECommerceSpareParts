@@ -39,6 +39,8 @@
     "storage.name.max.length": "Название склада должно быть не более 128 символов.",
     "storage.description.max.length": "Описание склада должно быть не более 256 символов.",
     "storage.location.max.length": "Местоположение склада должно быть не более 256 символов.",
-    "storage.name.taken": "Данное название склада занято."
+    "storage.name.taken": "Данное название склада занято.",
+    "fifo.storage.content.extract.policy.name": "Первое включение, первым вылетает",
+    "fifo.storage.content.extract.policy.description": "Сначала списываются старые поступления, затем новые"
   }
 }

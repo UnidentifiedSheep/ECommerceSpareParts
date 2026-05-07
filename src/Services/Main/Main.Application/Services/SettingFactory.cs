@@ -9,5 +9,6 @@ public class SettingFactory : SettingFactoryBase
     {
         Register(json => new CurrencySetting(json));
         Register(json => new GlobalApplicationSetting(json));
+        Register(json => new StorageContentSetting(json));
     }
 }

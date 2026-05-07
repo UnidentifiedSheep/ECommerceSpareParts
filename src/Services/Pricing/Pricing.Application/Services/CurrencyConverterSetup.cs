@@ -1,4 +1,5 @@
 ﻿using Abstractions.Interfaces.Currency;
+using Application.Common.Interfaces.Currency;
 using Pricing.Abstractions.Interfaces.Services;
 
 namespace Pricing.Application.Services;

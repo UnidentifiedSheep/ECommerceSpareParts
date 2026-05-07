@@ -14,6 +14,5 @@ public static class CurrencyProjections
             ShortName = x.ShortName,
             CurrencySign = x.CurrencySign,
             Code = x.Code,
-            ToUsdRate = x.CurrencyToUsd == null ? null : x.CurrencyToUsd.ToUsd
         };
 }

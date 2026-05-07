@@ -3,6 +3,7 @@ using Application.Common;
 using Application.Common.Abstractions.Settings;
 using Application.Common.Behaviors;
 using Application.Common.Extensions;
+using Application.Common.Interfaces.Currency;
 using Application.Common.Interfaces.Settings;
 using Application.Common.Services;
 using Microsoft.Extensions.DependencyInjection;

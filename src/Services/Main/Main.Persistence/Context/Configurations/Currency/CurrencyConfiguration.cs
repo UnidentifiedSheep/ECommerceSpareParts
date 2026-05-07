@@ -43,8 +43,12 @@ public class CurrencyConfiguration : IEntityTypeConfiguration<Entities.Currency.
             .HasMaxLength(5)
             .HasColumnName("short_name");
         
-        builder.Navigation(e => e.History)
-            .HasField("_history")
+        builder.Navigation(e => e.RatesTo)
+            .HasField("_ratesTo")
+            .UsePropertyAccessMode(PropertyAccessMode.Field);
+        
+        builder.Navigation(e => e.RatesFrom)
+            .HasField("_ratesFrom")
             .UsePropertyAccessMode(PropertyAccessMode.Field);
     }
 }
