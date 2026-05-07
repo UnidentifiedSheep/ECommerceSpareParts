@@ -49,11 +49,10 @@ public class StorageRouteTestContext(
         UnactiveRoute = routes.First(x => !x.IsActive);
     }
 
-    public static void Register(ITest test)
-    {
-        test.RegisterBasicContext<StorageTestContext>();
-        test.RegisterBasicContext<CurrencyTestContext>();
-        test.RegisterBasicContext<UsersTestContext>();
-        test.RegisterBasicContext<StorageRouteTestContext>();
-    }
+    public static Type[] DependsOn { get; } =
+    [
+        typeof(StorageTestContext),
+        typeof(CurrencyTestContext),
+        typeof(UsersTestContext)
+    ];
 }

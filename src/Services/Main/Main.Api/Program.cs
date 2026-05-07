@@ -1,5 +1,4 @@
 using System.Reflection;
-using Abstractions.Interfaces.Currency;
 using Abstractions.Models;
 using Amazon.S3;
 using Api.Common;
@@ -8,6 +7,7 @@ using Api.Common.Middleware;
 using Api.Common.Models;
 using Api.Common.OperationFilters;
 using Application.Common.Interfaces.Settings;
+using Cache;
 using Carter;
 using Contracts.Currency;
 using Contracts.Settings;
@@ -18,8 +18,6 @@ using Localization.Abstractions.Models;
 using Localization.Domain.Extensions;
 using Localization.Domain.Middlewares;
 using Mail;
-using Main.Abstractions.Constants;
-using Main.Abstractions.Models.Settings;
 using Main.Api.EndPoints.Articles;
 using Main.Application;
 using Main.Application.BackgroundServices;
@@ -122,16 +120,11 @@ builder.Services.AddMassTransit(x =>
     });
 });
 
-var localesPath = Assembly.GetExecutingAssembly().GetDefaultLocalizationPath();
-Locale[] locales = ["ru-RU", "en-EN"];
-Locale defaultLocale = "ru-RU";
-
-builder.Services.AddLocalization(defaultLocale, locales);
-
 builder.Services.AddHttpContextAccessor();
 
 builder.Services
     .AddPersistenceLayer(Environment.GetEnvironmentVariable("DB_CONNECTION_STRING")!)
+    .AddCacheLayer(Environment.GetEnvironmentVariable("REDIS_CONNECTION_STRING")!)
     .AddJsonSigner( Environment.GetEnvironmentVariable("SIGN_SECRET")!, Global.JsonOptions)
     .AddFullSecurityLayer()
     .AddMailLayer()
@@ -194,8 +187,8 @@ app.UseForwardedHeaders(new ForwardedHeadersOptions
 
 app.UseHangfireDashboard();
 
+var localesPath = Assembly.GetExecutingAssembly().GetDefaultLocalizationPath();
 await app.LoadLocalesFromJson(localesPath);
-await InitCurrencyConverter(app.Services);
 await InitSettings(app.Services);
 
 app.UseExceptionHandler(_ => { });
@@ -235,15 +228,6 @@ await app.RunAsync();
 
 
 return;
-
-async Task InitCurrencyConverter(IServiceProvider serviceProvider)
-{
-    using var scope = serviceProvider.CreateScope();
-    var sr = scope.ServiceProvider.GetRequiredService<ISettingsService>();
-    var currencyConverterSetup = scope.ServiceProvider.GetRequiredService<ICurrencyConverterSetup>();
-    var usdId = (await sr.GetOrDefault<CurrencySetting>()).Data.UsdId;
-    await currencyConverterSetup.InitializeAsync(usdId);
-}
 
 async Task InitSettings(IServiceProvider serviceProvider)
 {

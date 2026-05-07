@@ -11,32 +11,59 @@ public abstract class TestBase : IAsyncLifetime, ITest
 {
     private static readonly HashSet<Type> GlobalBasicContexts = [];
     private readonly HashSet<Type> _basicContexts = []; 
+    private readonly HashSet<Type> _registeringContexts = [];
     private readonly Dictionary<Type, ITestContext> _initedBasicContexts = new();
     protected abstract IServiceProvider Sp { get; }
     protected abstract IServiceScope Scope { get; }
     
     protected readonly Faker Faker = new();
     
-    public void RegisterBasicContext<TContext>() 
+    public void RegisterBasicContext<TContext>()
         where TContext : class, ITestContext
     {
-        var type = typeof(TContext);
+        RegisterBasicContext(typeof(TContext));
+    }
 
-        if (!_basicContexts.Add(type))
+    private void RegisterBasicContext(Type type)
+    {
+        if (_basicContexts.Contains(type))
             return;
 
-        if (!typeof(ITestContextRegistrator).IsAssignableFrom(type))
-            return;
+        if (!_registeringContexts.Add(type))
+        {
+            throw new InvalidOperationException(
+                $"Circular dependency detected for context {type.Name}");
+        }
 
-        var method = type.GetMethod(
-            nameof(ITestContextRegistrator.Register),
-            BindingFlags.Public | BindingFlags.Static,
-            binder: null,
-            types: [typeof(ITest)],
-            modifiers: null) ?? throw new InvalidOperationException(
-            $"Type {type.Name} implements ITestContextRegistrator but does not have correct static Register(ITest) method.");
+        try
+        {
+            if (typeof(ITestContextRegistrator).IsAssignableFrom(type))
+            {
+                var dependsOnProperty = type.GetProperty(
+                    nameof(ITestContextRegistrator.DependsOn),
+                    BindingFlags.Public | BindingFlags.Static);
 
-        method.Invoke(null, [this]);
+                if (dependsOnProperty == null)
+                {
+                    throw new InvalidOperationException(
+                        $"Type {type.Name} implements ITestContextRegistrator but does not define DependsOn.");
+                }
+
+                var dependencies = dependsOnProperty.GetValue(null) as Type[]
+                                   ?? [];
+
+                foreach (var dependency in dependencies)
+                {
+                    RegisterBasicContext(dependency);
+                }
+            }
+
+            _basicContexts.Add(type);
+        }
+        finally
+        {
+            _registeringContexts.Remove(type);
+        }
     }
 
     public void RemoveBasicContext<TContext>() where TContext : class, ITestContext
@@ -61,7 +88,7 @@ public abstract class TestBase : IAsyncLifetime, ITest
         throw new InvalidOperationException($"No context found for {typeof(T).Name}. Try register it first");
     }
 
-    protected async Task InitializeBasicContexts()
+    protected virtual async Task InitializeBasicContexts()
     {
         var merged = GlobalBasicContexts.ToHashSet();
         merged.UnionWith(_basicContexts);

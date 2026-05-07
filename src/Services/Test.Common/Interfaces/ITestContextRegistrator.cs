@@ -2,5 +2,5 @@
 
 public interface ITestContextRegistrator
 {
-    public static abstract void Register(ITest test);
+    public static abstract Type[] DependsOn { get; }
 }

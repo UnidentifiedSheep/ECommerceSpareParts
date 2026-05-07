@@ -16,10 +16,13 @@ public static class ServiceCollectionExtensions
             .AddStringLocalizer()
             .AddScopedStringLocalizer();
 
+        var hs = locales.ToHashSet();
+        
         services.AddScoped<ScopedLocalizationMiddleware>(sp => 
-            new ScopedLocalizationMiddleware(sp.GetRequiredService<IScopedStringLocalizer>()));
-
-        ScopedLocalizationMiddleware.Configure(defaultLocale, locales);
+            new ScopedLocalizationMiddleware(
+                defaultLocale, 
+                hs,
+                sp.GetRequiredService<IScopedStringLocalizer>()));
         
         return services;
     }

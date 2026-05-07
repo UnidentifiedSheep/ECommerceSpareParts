@@ -38,7 +38,7 @@ public class EditProductTests : IntegrationTest
         var updatedProduct = await GetProduct(id);
         updatedProduct.Should().NotBeNull();
         
-        updatedProduct.Name.Should().Be("Updated Article");
+        updatedProduct.Name.Value.Should().Be("Updated Article");
         updatedProduct.Sku.Value.Should().Be("67890");
     }
 

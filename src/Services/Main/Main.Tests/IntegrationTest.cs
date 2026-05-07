@@ -1,3 +1,8 @@
+using System.Reflection;
+using Abstractions.Interfaces.Services;
+using Api.Common.Extensions;
+using Attributes;
+using Localization.Domain.Extensions;
 using Main.Persistence.Context;
 using MediatR;
 using Microsoft.Extensions.DependencyInjection;
@@ -32,13 +37,26 @@ public abstract class IntegrationTest(CombinedContainerFixture fixture) : TestBa
         Mediator = Scope.ServiceProvider.GetRequiredService<IMediator>();
         
         await SeedDb();
+        await LoadLocales();
         await InitializeBasicContexts();
+    }
+
+    protected override async Task InitializeBasicContexts()
+    {
+        var unitOfWork = Sp.GetRequiredService<IUnitOfWork>();
+        await unitOfWork.ExecuteWithTransaction(new TransactionalAttribute(), () => base.InitializeBasicContexts());
     }
 
     public override async Task DisposeAsync()
     {
         await ResetDb();
         Scope.Dispose();
+    }
+
+    private async Task LoadLocales()
+    {
+        var localesPath = Assembly.GetExecutingAssembly().GetDefaultLocalizationPath();
+        await Sp.LoadLocalesFromJson(localesPath);
     }
     
     private async Task SeedDb()

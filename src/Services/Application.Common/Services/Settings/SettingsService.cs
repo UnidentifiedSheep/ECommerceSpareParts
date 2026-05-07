@@ -19,7 +19,7 @@ public class SettingsService(
     : ISettingsService
 {
     private static readonly TransactionalAttribute TransactionSettings 
-        = new(IsolationLevel.Snapshot, 20, 3);
+        = new(IsolationLevel.ReadCommitted, 20, 3);
     
     public async Task LoadAsync(CancellationToken cancellationToken = default)
     {

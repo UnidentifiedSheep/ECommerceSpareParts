@@ -148,7 +148,7 @@ public class EditStorageTests : IntegrationTest
             }
         };
         var command = new EditStorageCommand(Faker.Lorem.Letter(100), model);
-        await Assert.ThrowsAsync<StorageNotFoundException>(async () => await Mediator.Send(command));
+        await Assert.ThrowsAsync<StorageNotFoundException>(() => Mediator.Send(command));
     }
 
     private Storage GetStorage() 

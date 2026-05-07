@@ -25,10 +25,9 @@ public class ProductTestContext(
             .WithProducers(producerTestContext.Producers)
             .BuildManyAndAddToDb(DbContext, 10));
     }
-    
-    public static void Register(ITest test)
-    {
-        test.RegisterBasicContext<ProducerTestContext>();
-        test.RegisterBasicContext<ProductTestContext>();
-    }
+
+    public static Type[] DependsOn { get; } =
+    [
+        typeof(ProducerTestContext)
+    ];
 }

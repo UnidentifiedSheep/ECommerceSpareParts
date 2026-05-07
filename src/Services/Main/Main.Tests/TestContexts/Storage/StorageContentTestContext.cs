@@ -27,11 +27,10 @@ public class StorageContentTestContext(
             .BuildManyAndAddToDb(DbContext, 10);
     }
 
-    public static void Register(ITest test)
-    {
-        test.RegisterBasicContext<CurrencyTestContext>();
-        test.RegisterBasicContext<ProductTestContext>();
-        test.RegisterBasicContext<StorageTestContext>();
-        test.RegisterBasicContext<StorageContentTestContext>();
-    }
+    public static Type[] DependsOn { get; } =
+    [
+        typeof(CurrencyTestContext),
+        typeof(ProductTestContext),
+        typeof(StorageTestContext)
+    ];
 }

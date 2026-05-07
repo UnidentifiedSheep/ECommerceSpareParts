@@ -38,7 +38,7 @@ public class StorageBuilder(Faker faker) : BuilderBase<Main.Entities.Storage.Sto
     public override Main.Entities.Storage.Storage Build()
     {
         var storage = Main.Entities.Storage.Storage.Create(
-            Name ?? Faker.Lorem.Word(),
+            Name ?? Faker.Lorem.Letter(7),
             Type ?? Faker.PickRandom<StorageType>());
 
         storage.SetDescription(Description);

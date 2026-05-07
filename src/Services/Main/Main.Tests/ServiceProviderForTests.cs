@@ -1,6 +1,7 @@
 using Abstractions.Interfaces;
 using Abstractions.Models;
 using Api.Common;
+using Cache;
 using Mail;
 using Main.Application.Configs;
 using Main.Persistence;
@@ -44,6 +45,7 @@ public class ServiceProviderForTests
         };
             
         services.AddJsonSigner("some secret")
+            .AddCacheLayer(redisConnectionString)
             .AddFullSecurityLayer(passwordRules)
             .AddMailLayer()
             .AddCommonLayer();
@@ -65,9 +67,8 @@ public class ServiceProviderForTests
 
     private static void RegisterGlobalBasicContexts()
     {
-        TestBase.RegisterGlobalBasicContext<RolesTestContext>();
-        TestBase.RegisterGlobalBasicContext<GlobalApplicationSettingTestContext>();
-        TestBase.RegisterGlobalBasicContext<UserContextTestContext>();
         TestBase.RegisterGlobalBasicContext<LocalizedTestContext>();
+        TestBase.RegisterGlobalBasicContext<RolesTestContext>();
+        TestBase.RegisterGlobalBasicContext<UserContextTestContext>();
     }
 }

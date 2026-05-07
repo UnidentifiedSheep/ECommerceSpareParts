@@ -41,7 +41,7 @@ public class CurrencyBuilder(Faker faker) : BuilderBase<Currency>(faker)
         return Currency.Create(
             Name ?? rndCurrency.Description,
             ShortName ?? rndCurrency.Description[..3],
-            Sign ?? rndCurrency.Symbol,
+            Sign ?? Faker.Lorem.Letter(3),
             Code ?? rndCurrency.Code);
     }
 }

@@ -4,8 +4,9 @@ using Application.Common;
 using Application.Common.Interfaces;
 using Application.Common.Interfaces.Currency;
 using Application.Common.Interfaces.Settings;
-using Application.Common.Services;
 using Application.Common.Validators;
+using Localization.Abstractions.Models;
+using Localization.Domain.Extensions;
 using Main.Abstractions.Interfaces.Logistics;
 using Main.Abstractions.Interfaces.Services;
 using Main.Application.Configs;
@@ -29,9 +30,13 @@ public static class ServiceProvider
         UserEmailOptions? emailOptions = null,
         UserPhoneOptions? phoneOptions = null)
     {
+        Locale[] locales = ["ru-RU", "en-EN"];
+        Locale defaultLocale = "ru-RU";
+
         collection
             .AddNamedObjects()
-            .AddFusionCache("main")
+            .AddLocalization(defaultLocale, locales)
+            .AddFusionCache()
             .WithRegisteredDistributedCache()
             .WithRegisteredBackplane()
             .WithSystemTextJsonSerializer();
