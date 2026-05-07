@@ -272,47 +272,35 @@ namespace Main.Migrator.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "currency_history",
+                name: "currency_rates",
                 schema: "public",
                 columns: table => new
                 {
-                    id = table.Column<int>(type: "integer", nullable: false)
-                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
-                    currency_id = table.Column<int>(type: "integer", nullable: false),
-                    prev_value = table.Column<decimal>(type: "numeric", nullable: false),
-                    new_value = table.Column<decimal>(type: "numeric", nullable: false),
-                    datetime = table.Column<DateTime>(type: "timestamp with time zone", nullable: false, defaultValueSql: "now()")
+                    from_currency_id = table.Column<int>(type: "integer", nullable: false),
+                    to_currency_id = table.Column<int>(type: "integer", nullable: false),
+                    rate = table.Column<decimal>(type: "numeric", nullable: false),
+                    created_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
+                    updated_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
+                    who_created = table.Column<Guid>(type: "uuid", nullable: false),
+                    who_updated = table.Column<Guid>(type: "uuid", nullable: true)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("currency_history_pk", x => x.id);
+                    table.PrimaryKey("currency_to_usd_pk", x => new { x.from_currency_id, x.to_currency_id });
                     table.ForeignKey(
-                        name: "currency_history_currency_id_fk",
-                        column: x => x.currency_id,
+                        name: "FK_currency_rates_currency_from_currency_id",
+                        column: x => x.from_currency_id,
                         principalSchema: "public",
                         principalTable: "currency",
                         principalColumn: "id",
-                        onDelete: ReferentialAction.Cascade);
-                });
-
-            migrationBuilder.CreateTable(
-                name: "currency_to_usd",
-                schema: "public",
-                columns: table => new
-                {
-                    currency_id = table.Column<int>(type: "integer", nullable: false),
-                    to_usd = table.Column<decimal>(type: "numeric", nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("currency_to_usd_pk", x => x.currency_id);
+                        onDelete: ReferentialAction.Restrict);
                     table.ForeignKey(
-                        name: "currency_to_usd_currency_id_fk",
-                        column: x => x.currency_id,
+                        name: "FK_currency_rates_currency_to_currency_id",
+                        column: x => x.to_currency_id,
                         principalSchema: "public",
                         principalTable: "currency",
                         principalColumn: "id",
-                        onDelete: ReferentialAction.Cascade);
+                        onDelete: ReferentialAction.Restrict);
                 });
 
             migrationBuilder.CreateTable(
@@ -921,6 +909,34 @@ namespace Main.Migrator.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "currency_rate_history",
+                schema: "public",
+                columns: table => new
+                {
+                    id = table.Column<int>(type: "integer", nullable: false)
+                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
+                    from_currency_id = table.Column<int>(type: "integer", nullable: false),
+                    to_currency_id = table.Column<int>(type: "integer", nullable: false),
+                    prev_rate = table.Column<decimal>(type: "numeric", nullable: false),
+                    new_rate = table.Column<decimal>(type: "numeric", nullable: false),
+                    created_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
+                    updated_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
+                    who_created = table.Column<Guid>(type: "uuid", nullable: false),
+                    who_updated = table.Column<Guid>(type: "uuid", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_currency_rate_history", x => x.id);
+                    table.ForeignKey(
+                        name: "FK_currency_rate_history_currency_rates_from_currency_id_to_cu~",
+                        columns: x => new { x.from_currency_id, x.to_currency_id },
+                        principalSchema: "public",
+                        principalTable: "currency_rates",
+                        principalColumns: new[] { "from_currency_id", "to_currency_id" },
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "cart",
                 schema: "public",
                 columns: table => new
@@ -1125,6 +1141,8 @@ namespace Main.Migrator.Migrations
                     product_id = table.Column<int>(type: "integer", nullable: false),
                     count = table.Column<int>(type: "integer", nullable: false),
                     buy_price = table.Column<decimal>(type: "numeric", nullable: false),
+                    buy_price_in_base_currency = table.Column<decimal>(type: "numeric", nullable: false),
+                    base_currency_id = table.Column<int>(type: "integer", nullable: false),
                     currency_id = table.Column<int>(type: "integer", nullable: false),
                     xmin = table.Column<uint>(type: "xid", rowVersion: true, nullable: false),
                     purchase_datetime = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
@@ -1136,6 +1154,13 @@ namespace Main.Migrator.Migrations
                 constraints: table =>
                 {
                     table.PrimaryKey("storage_content_pk", x => x.id);
+                    table.ForeignKey(
+                        name: "storage_content_base_currency_id_fk",
+                        column: x => x.base_currency_id,
+                        principalSchema: "public",
+                        principalTable: "currency",
+                        principalColumn: "id",
+                        onDelete: ReferentialAction.Restrict);
                     table.ForeignKey(
                         name: "storage_content_currency_id_fk",
                         column: x => x.currency_id,
@@ -1508,7 +1533,7 @@ namespace Main.Migrator.Migrations
                     id = table.Column<int>(type: "integer", nullable: false)
                         .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
                     sale_content_id = table.Column<int>(type: "integer", nullable: false),
-                    storage_content_id = table.Column<int>(type: "integer", nullable: true),
+                    storage_content_id = table.Column<int>(type: "integer", nullable: false),
                     storage = table.Column<string>(type: "character varying(128)", maxLength: 128, nullable: false),
                     currency_id = table.Column<int>(type: "integer", nullable: false),
                     buy_price = table.Column<decimal>(type: "numeric", nullable: false),
@@ -1601,28 +1626,40 @@ namespace Main.Migrator.Migrations
                 unique: true);
 
             migrationBuilder.CreateIndex(
-                name: "IX_currency_history_currency_id",
+                name: "IX_currency_rate_history_from_currency_id_to_currency_id",
                 schema: "public",
-                table: "currency_history",
-                column: "currency_id");
+                table: "currency_rate_history",
+                columns: new[] { "from_currency_id", "to_currency_id" });
 
             migrationBuilder.CreateIndex(
-                name: "IX_currency_history_datetime",
+                name: "main.entities.currency.currencyratehistory_who_created_idx",
                 schema: "public",
-                table: "currency_history",
-                column: "datetime");
+                table: "currency_rate_history",
+                column: "who_created");
 
             migrationBuilder.CreateIndex(
-                name: "IX_currency_history_new_value",
+                name: "main.entities.currency.currencyratehistory_who_updated_idx",
                 schema: "public",
-                table: "currency_history",
-                column: "new_value");
+                table: "currency_rate_history",
+                column: "who_updated");
 
             migrationBuilder.CreateIndex(
-                name: "IX_currency_history_prev_value",
+                name: "currency_to_usd_index",
                 schema: "public",
-                table: "currency_history",
-                column: "prev_value");
+                table: "currency_rates",
+                column: "to_currency_id");
+
+            migrationBuilder.CreateIndex(
+                name: "main.entities.currency.currencyrate_who_created_idx",
+                schema: "public",
+                table: "currency_rates",
+                column: "who_created");
+
+            migrationBuilder.CreateIndex(
+                name: "main.entities.currency.currencyrate_who_updated_idx",
+                schema: "public",
+                table: "currency_rates",
+                column: "who_updated");
 
             migrationBuilder.CreateIndex(
                 name: "event_discriminator_idx",
@@ -2103,6 +2140,12 @@ namespace Main.Migrator.Migrations
                 schema: "public",
                 table: "settings",
                 column: "who_updated");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_storage_content_base_currency_id",
+                schema: "public",
+                table: "storage_content",
+                column: "base_currency_id");
 
             migrationBuilder.CreateIndex(
                 name: "main.entities.storage.storagecontent_who_created_idx",
@@ -2689,11 +2732,7 @@ namespace Main.Migrator.Migrations
                 schema: "public");
 
             migrationBuilder.DropTable(
-                name: "currency_history",
-                schema: "public");
-
-            migrationBuilder.DropTable(
-                name: "currency_to_usd",
+                name: "currency_rate_history",
                 schema: "public");
 
             migrationBuilder.DropTable(
@@ -2810,6 +2849,10 @@ namespace Main.Migrator.Migrations
 
             migrationBuilder.DropTable(
                 name: "user_vehicles",
+                schema: "public");
+
+            migrationBuilder.DropTable(
+                name: "currency_rates",
                 schema: "public");
 
             migrationBuilder.DropTable(

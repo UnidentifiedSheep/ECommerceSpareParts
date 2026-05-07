@@ -584,7 +584,52 @@ namespace Main.Migrator.Migrations
                     b.ToTable("currency", "public");
                 });
 
-            modelBuilder.Entity("Main.Entities.Currency.CurrencyHistory", b =>
+            modelBuilder.Entity("Main.Entities.Currency.CurrencyRate", b =>
+                {
+                    b.Property<int>("FromCurrencyId")
+                        .HasColumnType("integer")
+                        .HasColumnName("from_currency_id");
+
+                    b.Property<int>("ToCurrencyId")
+                        .HasColumnType("integer")
+                        .HasColumnName("to_currency_id");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("created_at");
+
+                    b.Property<decimal>("Rate")
+                        .HasColumnType("numeric")
+                        .HasColumnName("rate");
+
+                    b.Property<DateTime>("UpdatedAt")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("updated_at");
+
+                    b.Property<Guid>("WhoCreated")
+                        .HasColumnType("uuid")
+                        .HasColumnName("who_created");
+
+                    b.Property<Guid?>("WhoUpdated")
+                        .HasColumnType("uuid")
+                        .HasColumnName("who_updated");
+
+                    b.HasKey("FromCurrencyId", "ToCurrencyId")
+                        .HasName("currency_to_usd_pk");
+
+                    b.HasIndex("ToCurrencyId")
+                        .HasDatabaseName("currency_to_usd_index");
+
+                    b.HasIndex("WhoCreated")
+                        .HasDatabaseName("main.entities.currency.currencyrate_who_created_idx");
+
+                    b.HasIndex("WhoUpdated")
+                        .HasDatabaseName("main.entities.currency.currencyrate_who_updated_idx");
+
+                    b.ToTable("currency_rates", "public");
+                });
+
+            modelBuilder.Entity("Main.Entities.Currency.CurrencyRateHistory", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -593,56 +638,49 @@ namespace Main.Migrator.Migrations
 
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
-                    b.Property<int>("CurrencyId")
-                        .HasColumnType("integer")
-                        .HasColumnName("currency_id");
-
-                    b.Property<DateTime>("Datetime")
-                        .ValueGeneratedOnAdd()
+                    b.Property<DateTime>("CreatedAt")
                         .HasColumnType("timestamp with time zone")
-                        .HasColumnName("datetime")
-                        .HasDefaultValueSql("now()");
+                        .HasColumnName("created_at");
 
-                    b.Property<decimal>("NewValue")
-                        .HasColumnType("numeric")
-                        .HasColumnName("new_value");
-
-                    b.Property<decimal>("PrevValue")
-                        .HasColumnType("numeric")
-                        .HasColumnName("prev_value");
-
-                    b.HasKey("Id")
-                        .HasName("currency_history_pk");
-
-                    b.HasIndex("CurrencyId")
-                        .HasDatabaseName("IX_currency_history_currency_id");
-
-                    b.HasIndex("Datetime")
-                        .HasDatabaseName("IX_currency_history_datetime");
-
-                    b.HasIndex("NewValue")
-                        .HasDatabaseName("IX_currency_history_new_value");
-
-                    b.HasIndex("PrevValue")
-                        .HasDatabaseName("IX_currency_history_prev_value");
-
-                    b.ToTable("currency_history", "public");
-                });
-
-            modelBuilder.Entity("Main.Entities.Currency.CurrencyToUsd", b =>
-                {
-                    b.Property<int>("CurrencyId")
+                    b.Property<int>("FromCurrencyId")
                         .HasColumnType("integer")
-                        .HasColumnName("currency_id");
+                        .HasColumnName("from_currency_id");
 
-                    b.Property<decimal>("ToUsd")
+                    b.Property<decimal>("NewRate")
                         .HasColumnType("numeric")
-                        .HasColumnName("to_usd");
+                        .HasColumnName("new_rate");
 
-                    b.HasKey("CurrencyId")
-                        .HasName("currency_to_usd_pk");
+                    b.Property<decimal>("PrevRate")
+                        .HasColumnType("numeric")
+                        .HasColumnName("prev_rate");
 
-                    b.ToTable("currency_to_usd", "public");
+                    b.Property<int>("ToCurrencyId")
+                        .HasColumnType("integer")
+                        .HasColumnName("to_currency_id");
+
+                    b.Property<DateTime>("UpdatedAt")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("updated_at");
+
+                    b.Property<Guid>("WhoCreated")
+                        .HasColumnType("uuid")
+                        .HasColumnName("who_created");
+
+                    b.Property<Guid?>("WhoUpdated")
+                        .HasColumnType("uuid")
+                        .HasColumnName("who_updated");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("WhoCreated")
+                        .HasDatabaseName("main.entities.currency.currencyratehistory_who_created_idx");
+
+                    b.HasIndex("WhoUpdated")
+                        .HasDatabaseName("main.entities.currency.currencyratehistory_who_updated_idx");
+
+                    b.HasIndex("FromCurrencyId", "ToCurrencyId");
+
+                    b.ToTable("currency_rate_history", "public");
                 });
 
             modelBuilder.Entity("Main.Entities.Event.Event", b =>
@@ -1623,7 +1661,7 @@ namespace Main.Migrator.Migrations
                         .HasColumnType("character varying(128)")
                         .HasColumnName("storage");
 
-                    b.Property<int?>("StorageContentId")
+                    b.Property<int>("StorageContentId")
                         .HasColumnType("integer")
                         .HasColumnName("storage_content_id");
 
@@ -1713,9 +1751,17 @@ namespace Main.Migrator.Migrations
 
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
+                    b.Property<int>("BaseCurrencyId")
+                        .HasColumnType("integer")
+                        .HasColumnName("base_currency_id");
+
                     b.Property<decimal>("BuyPrice")
                         .HasColumnType("numeric")
                         .HasColumnName("buy_price");
+
+                    b.Property<decimal>("BuyPriceInBaseCurrency")
+                        .HasColumnType("numeric")
+                        .HasColumnName("buy_price_in_base_currency");
 
                     b.Property<int>("Count")
                         .HasColumnType("integer")
@@ -1763,6 +1809,8 @@ namespace Main.Migrator.Migrations
 
                     b.HasKey("Id")
                         .HasName("storage_content_pk");
+
+                    b.HasIndex("BaseCurrencyId");
 
                     b.HasIndex("WhoCreated")
                         .HasDatabaseName("main.entities.storage.storagecontent_who_created_idx");
@@ -2822,24 +2870,34 @@ namespace Main.Migrator.Migrations
                     b.Navigation("Product");
                 });
 
-            modelBuilder.Entity("Main.Entities.Currency.CurrencyHistory", b =>
+            modelBuilder.Entity("Main.Entities.Currency.CurrencyRate", b =>
                 {
-                    b.HasOne("Main.Entities.Currency.Currency", null)
-                        .WithMany("History")
-                        .HasForeignKey("CurrencyId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired()
-                        .HasConstraintName("currency_history_currency_id_fk");
+                    b.HasOne("Main.Entities.Currency.Currency", "FromCurrency")
+                        .WithMany("RatesFrom")
+                        .HasForeignKey("FromCurrencyId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("Main.Entities.Currency.Currency", "ToCurrency")
+                        .WithMany("RatesTo")
+                        .HasForeignKey("ToCurrencyId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("FromCurrency");
+
+                    b.Navigation("ToCurrency");
                 });
 
-            modelBuilder.Entity("Main.Entities.Currency.CurrencyToUsd", b =>
+            modelBuilder.Entity("Main.Entities.Currency.CurrencyRateHistory", b =>
                 {
-                    b.HasOne("Main.Entities.Currency.Currency", null)
-                        .WithOne("CurrencyToUsd")
-                        .HasForeignKey("Main.Entities.Currency.CurrencyToUsd", "CurrencyId")
+                    b.HasOne("Main.Entities.Currency.CurrencyRate", "CurrencyRate")
+                        .WithMany("History")
+                        .HasForeignKey("FromCurrencyId", "ToCurrencyId")
                         .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired()
-                        .HasConstraintName("currency_to_usd_currency_id_fk");
+                        .IsRequired();
+
+                    b.Navigation("CurrencyRate");
                 });
 
             modelBuilder.Entity("Main.Entities.Order.Order", b =>
@@ -3255,11 +3313,19 @@ namespace Main.Migrator.Migrations
                         .WithMany()
                         .HasForeignKey("StorageContentId")
                         .OnDelete(DeleteBehavior.SetNull)
+                        .IsRequired()
                         .HasConstraintName("sale_content_details_storage_content_id_fk");
                 });
 
             modelBuilder.Entity("Main.Entities.Storage.StorageContent", b =>
                 {
+                    b.HasOne("Main.Entities.Currency.Currency", null)
+                        .WithMany()
+                        .HasForeignKey("BaseCurrencyId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired()
+                        .HasConstraintName("storage_content_base_currency_id_fk");
+
                     b.HasOne("Main.Entities.Currency.Currency", "Currency")
                         .WithMany()
                         .HasForeignKey("CurrencyId")
@@ -3481,8 +3547,13 @@ namespace Main.Migrator.Migrations
 
             modelBuilder.Entity("Main.Entities.Currency.Currency", b =>
                 {
-                    b.Navigation("CurrencyToUsd");
+                    b.Navigation("RatesFrom");
 
+                    b.Navigation("RatesTo");
+                });
+
+            modelBuilder.Entity("Main.Entities.Currency.CurrencyRate", b =>
+                {
                     b.Navigation("History");
                 });
 

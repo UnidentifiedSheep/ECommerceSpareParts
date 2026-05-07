@@ -19,7 +19,7 @@ public class DeleteContentFromStorageTests : IntegrationTest
     [Fact]
     public async Task DeleteContentFromStorage_WithInvalidContentId_ThrowsStorageContentNotFoundException()
     {
-        var command = new DeleteStorageContentCommand(99999, 0);
+        var command = new SetToZeroContentCommand(99999, 0);
         await Assert.ThrowsAsync<StorageContentNotFoundException>(async () => await Mediator.Send(command));
     }
 
@@ -32,7 +32,7 @@ public class DeleteContentFromStorageTests : IntegrationTest
             .FirstAsync(x => x.Id == content.ProductId))
             .Stock;
 
-        var command = new DeleteStorageContentCommand(content.Id, content.RowVersion);
+        var command = new SetToZeroContentCommand(content.Id, content.RowVersion);
 
         await Mediator.Send(command);
         

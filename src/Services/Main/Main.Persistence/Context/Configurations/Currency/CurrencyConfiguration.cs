@@ -43,6 +43,16 @@ public class CurrencyConfiguration : IEntityTypeConfiguration<Entities.Currency.
             .HasMaxLength(5)
             .HasColumnName("short_name");
         
+        builder.HasMany(e => e.RatesFrom)
+            .WithOne(e => e.FromCurrency)
+            .HasForeignKey(e => e.FromCurrencyId)
+            .OnDelete(DeleteBehavior.Restrict);
+
+        builder.HasMany(e => e.RatesTo)
+            .WithOne(e => e.ToCurrency)
+            .HasForeignKey(e => e.ToCurrencyId)
+            .OnDelete(DeleteBehavior.Restrict);
+        
         builder.Navigation(e => e.RatesTo)
             .HasField("_ratesTo")
             .UsePropertyAccessMode(PropertyAccessMode.Field);

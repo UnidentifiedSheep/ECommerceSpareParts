@@ -1,41 +1,34 @@
 using System.Data;
-using Abstractions.Interfaces;
 using Abstractions.Interfaces.Services;
 using Application.Common.Interfaces;
 using Application.Common.Interfaces.Repositories;
 using Attributes;
 using Contracts.Articles;
 using Domain.Extensions;
-using Exceptions;
-using Exceptions.Base;
-using Main.Abstractions.Interfaces.Services;
 using Main.Application.Extensions;
 using Main.Application.Interfaces.Persistence;
-using Main.Entities;
 using Main.Entities.Event;
 using Main.Entities.Exceptions.Storages;
 using Main.Entities.Storage;
 using Main.Enums;
-using Mapster;
 using MediatR;
 
 namespace Main.Application.Handlers.StorageContents.DeleteContent;
 
 [AutoSave]
 [Transactional(IsolationLevel.ReadCommitted, 20, 2)]
-public record DeleteStorageContentCommand(int ContentId, uint RowVersion) : ICommand;
+public record SetToZeroContentCommand(int ContentId, uint RowVersion) : ICommand;
 
-public class DeleteStorageContentHandler(
+public class SetToZeroContentHandler(
     IRepository<StorageContent, int> repository,
     IUnitOfWork unitOfWork,
     IProductRepository productRepository,
-    IIntegrationEventScope integrationEventScope) : ICommandHandler<DeleteStorageContentCommand>
+    IIntegrationEventScope integrationEventScope) : ICommandHandler<SetToZeroContentCommand>
 {
-    public async Task<Unit> Handle(DeleteStorageContentCommand request, CancellationToken cancellationToken)
+    public async Task<Unit> Handle(SetToZeroContentCommand request, CancellationToken cancellationToken)
     {
-        var id = request.ContentId;
         var content = await repository.GetById(request.ContentId, cancellationToken)
-                      ?? throw new StorageContentNotFoundException(id);
+                      ?? throw new StorageContentNotFoundException(request.ContentId);
 
         content.ValidateVersion(request.RowVersion);
         
@@ -46,8 +39,7 @@ public class DeleteStorageContentHandler(
             cancellationToken);
 
         product.IncreaseStock(-content.Count);
-        
-        unitOfWork.Remove(content);
+        content.IncreaseCount(-content.Count);
         
         integrationEventScope.Add(new ProductUpdatedEvent
         {

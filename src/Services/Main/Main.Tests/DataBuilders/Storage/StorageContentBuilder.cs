@@ -66,6 +66,8 @@ public class StorageContentBuilder(Faker faker) : BuilderBase<StorageContent>(fa
             Count ?? Faker.Random.Int(1),
             BuyPrice ?? Math.Round(Faker.Random.Decimal(1, 1000), 2),
             CurrencyId ?? Faker.Random.Int(1),
+            BuyPrice ?? Math.Round(Faker.Random.Decimal(1, 1000), 2),
+            CurrencyId ?? Faker.Random.Int(1),
             PurchaseDate ?? Faker.Date.Future());
     }
 }

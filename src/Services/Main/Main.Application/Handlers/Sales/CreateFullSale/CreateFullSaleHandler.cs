@@ -3,16 +3,11 @@ using Application.Common.Interfaces;
 using Application.Common.Interfaces.Repositories;
 using Application.Common.Interfaces.Settings;
 using Attributes;
-using Contracts.Articles;
-using Main.Abstractions.Models;
-using Main.Abstractions.Models.Settings;
 using Main.Application.Dtos.Amw.Sales;
-using Main.Application.Extensions;
 using Main.Application.Handlers.Balance.CreateTransaction;
 using Main.Application.Handlers.ProductReservations.GetArticlesWithNotEnoughStock;
 using Main.Application.Handlers.ProductReservations.UpdateReservationsCounts;
 using Main.Application.Handlers.Sales.CreateSale;
-using Main.Application.Handlers.StorageContents.RemoveContent;
 using Main.Application.Interfaces.Persistence;
 using Main.Application.Models.SaleService;
 using Main.Entities.Balance;
@@ -20,8 +15,6 @@ using Main.Entities.Exceptions.Sales;
 using Main.Entities.Exceptions.Storages;
 using Main.Entities.Product;
 using Main.Entities.Sale;
-using Main.Entities.Storage;
-using Main.Enums;
 using MediatR;
 using Utils;
 using IsolationLevel = System.Data.IsolationLevel;
@@ -50,7 +43,7 @@ public class CreateFullSaleHandler(
 {
     public async Task<Unit> Handle(CreateFullSaleCommand request, CancellationToken cancellationToken)
     {
-        var applicationSettings = await settingsService.GetOrDefault<GlobalApplicationSetting>(cancellationToken);
+        /*var applicationSettings = await settingsService.GetOrDefault<GlobalApplicationSetting>(cancellationToken);
         var buyerId = request.BuyerId;
         var currencyId = request.CurrencyId;
         var storageName = request.StorageName;
@@ -95,7 +88,7 @@ public class CreateFullSaleHandler(
             integrationEventScope.Add(new ProductUpdatedEvent
             {
                 Id = productId
-            });
+            });*/
         
         return Unit.Value;
     }
@@ -178,19 +171,6 @@ public class CreateFullSaleHandler(
         var command = new CreateTransactionCommand(senderId, receiverId, amount, currencyId, transactionDateTime);
         var result = await sender.Send(command, cancellationToken);
         return result.Transaction;
-    }
-
-    private async Task<IReadOnlyList<StorageLot>> RemoveContentFromStorage(
-        IEnumerable<NewSaleContentDto> saleContent,
-        string storageName,
-        bool saleFromOtherStorages,
-        CancellationToken cancellationToken = default)
-    {
-        var dict = saleContent.GroupBy(x => x.ProductId)
-            .ToDictionary(x => x.Key, x => x.Sum(z => z.Count));
-        var command = new RemoveContentCommand(dict, storageName, saleFromOtherStorages, StorageMovementType.Sale);
-        var result = await sender.Send(command, cancellationToken);
-        return result.Changes;
     }
 
     private async Task<Sale> CreateSale(

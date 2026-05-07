@@ -20,6 +20,7 @@ namespace Tests;
 
 public class ServiceProviderForTests
 {
+    private static bool _staticsConfigured;
     public IServiceProvider Build(string postgresConnectionString, string redisConnectionString)
     {
         RegisterGlobalBasicContexts();
@@ -51,8 +52,12 @@ public class ServiceProviderForTests
         services.AddScoped<IUserContext, UserContextMock>();
         
         services.AddTransient<IPublishEndpoint, MessageBrokerStub>();
-        SortByConfig.Configure();
 
+        if (!_staticsConfigured)
+        {
+            _staticsConfigured = true;
+            SortByConfig.Configure();
+        }
 
         var serviceProvider = services.BuildServiceProvider();
         return serviceProvider;

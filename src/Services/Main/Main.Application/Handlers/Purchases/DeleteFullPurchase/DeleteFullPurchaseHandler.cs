@@ -2,18 +2,8 @@ using System.Data;
 using Abstractions.Interfaces.Services;
 using Application.Common.Interfaces;
 using Attributes;
-using Contracts.Purchase;
-using Main.Application.Handlers.Balance.DeleteTransaction;
-using Main.Application.Handlers.Purchases.DeletePurchase;
-using Main.Application.Handlers.StorageContents.RemoveContent;
-using Main.Entities;
-using Main.Entities.Exceptions.Purchase;
-using Main.Entities.Purchase;
-using Main.Enums;
-using Mapster;
 using MassTransit;
 using MediatR;
-using ContractPurchase = Contracts.Models.Purchase.Purchase;
 
 namespace Main.Application.Handlers.Purchases.DeleteFullPurchase;
 

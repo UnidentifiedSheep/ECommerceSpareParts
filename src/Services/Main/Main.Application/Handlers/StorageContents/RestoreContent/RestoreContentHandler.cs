@@ -9,6 +9,7 @@ using Main.Application.Interfaces.Persistence;
 using Main.Application.Models;
 using Main.Entities.Event;
 using Main.Entities.Product;
+using Main.Entities.Storage;
 using Main.Enums;
 using MediatR;
 
@@ -48,11 +49,11 @@ public class RestoreContentHandler(
         foreach (var (detail, productId) in contentDetailsList)
         {
             Product product = products[productId];
+            StorageContent content = storageContents[detail.StorageContentId];
             
-            var content = storageContents[detail.StorageContentId];
             events.Add(StorageMovementEvent.Create(content, request.MovementType));
-            content.IncreaseCount(detail.Count);
             
+            content.IncreaseCount(detail.Count);
             product.IncreaseStock(detail.Count);
         }
         

@@ -48,7 +48,7 @@ public class StorageContentConfiguration : IEntityTypeConfiguration<StorageConte
             .HasColumnName("base_currency_id");
         
         builder.Property(e => e.BuyPriceInBaseCurrency)
-            .HasColumnName("base_currency_id");
+            .HasColumnName("buy_price_in_base_currency");
         
         builder.Property(e => e.PurchaseDatetime)
             .HasColumnName("purchase_datetime");

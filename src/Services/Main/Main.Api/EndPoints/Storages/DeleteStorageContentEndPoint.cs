@@ -16,7 +16,7 @@ public class DeleteStorageContentEndPoint : ICarterModule
                 uint rowVersion,
                 CancellationToken cancellationToken) =>
             {
-                var command = new DeleteStorageContentCommand(contentId, rowVersion);
+                var command = new SetToZeroContentCommand(contentId, rowVersion);
                 await sender.Send(command, cancellationToken);
                 return Results.NoContent();
             }).WithTags("Storages")
