@@ -9,5 +9,4 @@ public interface IReadRepository<TEntity, TKey> where TEntity : Entity<TEntity, 
     Task<IEnumerable<T>> QuerySqlAsync<T>(
         string sql,
         object param);
-
 }

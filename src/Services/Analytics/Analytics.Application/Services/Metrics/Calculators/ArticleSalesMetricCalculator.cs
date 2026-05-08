@@ -1,5 +1,4 @@
 ﻿using System.Linq.Expressions;
-using Abstractions.Interfaces.Currency;
 using Analytics.Abstractions.Interfaces.DbRepositories;
 using Analytics.Entities;
 using Analytics.Entities.Metrics;
@@ -30,33 +29,31 @@ public class ArticleSalesMetricCalculator(
             await foreach (var fact in salesRepository
                                .GetFacts(GetWhere(metric))
                                .WithCancellation(cancellationToken))
+            foreach (var item in fact.SaleContents)
             {
-                foreach (var item in fact.SaleContents)
-                {
-                    if (item.ArticleId != metric.ArticleId)
-                        continue;
+                if (item.ArticleId != metric.ArticleId)
+                    continue;
 
-                    var priceDecimal = currencyConverter.ConvertToUsd(item.Price, fact.CurrencyId);
-                    var quantity = item.Count;
+                var priceDecimal = currencyConverter.ConvertToUsd(item.Price, fact.CurrencyId);
+                var quantity = item.Count;
 
-                    if (quantity <= 0)
-                        continue;
+                if (quantity <= 0)
+                    continue;
 
-                    var price = (double)priceDecimal;
+                var price = (double)priceDecimal;
 
-                    if (priceDecimal < minPrice) minPrice = priceDecimal;
-                    if (priceDecimal > maxPrice) maxPrice = priceDecimal;
+                if (priceDecimal < minPrice) minPrice = priceDecimal;
+                if (priceDecimal > maxPrice) maxPrice = priceDecimal;
 
-                    totalAmount += priceDecimal * quantity;
-                    totalQuantity += quantity;
-                    
-                    count += quantity;
+                totalAmount += priceDecimal * quantity;
+                totalQuantity += quantity;
 
-                    var delta = price - mean;
-                    mean += delta * quantity / count;
-                    var delta2 = price - mean;
-                    m2 += quantity * delta * delta2;
-                }
+                count += quantity;
+
+                var delta = price - mean;
+                mean += delta * quantity / count;
+                var delta2 = price - mean;
+                m2 += quantity * delta * delta2;
             }
         });
 
@@ -74,7 +71,7 @@ public class ArticleSalesMetricCalculator(
                 AveragePrice = avgPrice,
                 MaximumPrice = totalQuantity == 0 ? 0 : maxPrice,
                 MinimumPrice = totalQuantity == 0 ? 0 : minPrice,
-                Volatility = volatility,
+                Volatility = volatility
             },
             Timer = new MetricTimer(start, end)
         };

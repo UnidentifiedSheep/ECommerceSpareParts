@@ -8,7 +8,7 @@ using Persistence.Extensions;
 
 namespace Main.Persistence.Repositories.Storage;
 
-public class StorageContentRepository(DContext context) 
+public class StorageContentRepository(DContext context)
     : RepositoryBase<DContext, StorageContent, int>(context), IStorageContentRepository
 {
     public IAsyncEnumerable<StorageContent> GetStorageContentsForUpdateAsync(
@@ -40,7 +40,7 @@ public class StorageContentRepository(DContext context)
             .ForUpdate()
             .AsAsyncEnumerable();
     }
-    
+
     public async Task<Dictionary<int, int>> GetStorageContentCounts(
         string storageName,
         IEnumerable<int> productIds,
@@ -63,8 +63,8 @@ public class StorageContentRepository(DContext context)
     }
 
     public override Task<Dictionary<int, StorageContent>> FindByIdsAsync(
-        IEnumerable<int> ids, 
-        Criteria<StorageContent>? criteria = null, 
+        IEnumerable<int> ids,
+        Criteria<StorageContent>? criteria = null,
         CancellationToken ct = default)
     {
         return Context.StorageContents

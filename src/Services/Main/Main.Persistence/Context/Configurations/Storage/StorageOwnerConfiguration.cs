@@ -1,5 +1,4 @@
-﻿using Main.Entities;
-using Main.Entities.Storage;
+﻿using Main.Entities.Storage;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
@@ -10,7 +9,7 @@ public class StorageOwnerConfiguration : IEntityTypeConfiguration<StorageOwner>
     public void Configure(EntityTypeBuilder<StorageOwner> builder)
     {
         builder.ToTable("storage_owners", "public");
-        
+
         builder.HasKey(e => new { e.StorageName, e.UserId }).HasName("storage_owners_pk");
 
         builder.HasIndex(e => e.UserId, "storage_owners_owner_id_index");
@@ -18,7 +17,7 @@ public class StorageOwnerConfiguration : IEntityTypeConfiguration<StorageOwner>
         builder.Property(e => e.StorageName)
             .HasMaxLength(128)
             .HasColumnName("storage_name");
-        
+
         builder.Property(e => e.UserId)
             .HasColumnName("user_id");
 
@@ -31,7 +30,5 @@ public class StorageOwnerConfiguration : IEntityTypeConfiguration<StorageOwner>
             .WithMany(d => d.Owners)
             .HasForeignKey(d => d.StorageName)
             .HasConstraintName("storage_owners_storages_name_fk");
-        
-        
     }
 }

@@ -11,13 +11,14 @@ using Tests.DataBuilders;
 namespace Tests.TestContexts;
 
 public class CurrencyTestContext(
-    DContext context, 
+    DContext context,
     IMediator mediator,
     ISettingsService settingsService
-    ) : TestContextBase<DContext>(context, mediator)
+) : TestContextBase<DContext>(context, mediator)
 {
     private readonly List<Currency> _currencies = [];
     public IReadOnlyList<Currency> Currencies => _currencies;
+
     public override async Task InitializeAsync(CancellationToken cancellationToken = default)
     {
         var created = await new CurrencyBuilder(Faker)
@@ -29,7 +30,7 @@ public class CurrencyTestContext(
             BaseCurrencyId = created.First().Id,
             RateProvider = ExchangeRateProvider.Cbr
         }), cancellationToken);
-        
+
         _currencies.AddRange(created);
     }
 }

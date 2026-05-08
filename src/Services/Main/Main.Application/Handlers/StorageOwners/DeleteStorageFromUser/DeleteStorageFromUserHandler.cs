@@ -13,13 +13,13 @@ namespace Main.Application.Handlers.StorageOwners.DeleteStorageFromUser;
 public record DeleteStorageFromUserCommand(Guid UserId, string StorageName) : ICommand;
 
 public class DeleteStorageFromUserHandler(
-    IRepository<StorageOwner, (string, Guid)> repository, 
+    IRepository<StorageOwner, (string, Guid)> repository,
     IUnitOfWork unitOfWork)
     : ICommandHandler<DeleteStorageFromUserCommand>
 {
     public async Task<Unit> Handle(DeleteStorageFromUserCommand request, CancellationToken cancellationToken)
     {
-        var model = await repository.GetById((request.StorageName, request.UserId), cancellationToken) 
+        var model = await repository.GetById((request.StorageName, request.UserId), cancellationToken)
                     ?? throw new StorageOwnerNotFoundException(request.UserId, request.StorageName);
         unitOfWork.Remove(model);
         return Unit.Value;

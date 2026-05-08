@@ -1,5 +1,4 @@
-﻿using Main.Entities;
-using Main.Entities.Order;
+﻿using Main.Entities.Order;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
@@ -10,7 +9,7 @@ public class OrderItemConfiguration : IEntityTypeConfiguration<OrderItem>
     public void Configure(EntityTypeBuilder<OrderItem> builder)
     {
         builder.ToTable("order_items", "public");
-        
+
         builder.HasKey(e => e.Id).HasName("order_items_pk");
 
         builder.HasIndex(e => e.ProductId, "order_items_product_id_index");
@@ -21,19 +20,19 @@ public class OrderItemConfiguration : IEntityTypeConfiguration<OrderItem>
             .HasDefaultValueSql("gen_random_uuid()")
             .HasColumnName("id")
             .ValueGeneratedOnAdd();
-        
+
         builder.Property(e => e.ProductId)
             .HasColumnName("article_id");
-        
+
         builder.Property(e => e.Count)
             .HasColumnName("count");
-        
+
         builder.Property(e => e.LockedPrice)
             .HasColumnName("locked_price");
-        
+
         builder.Property(e => e.OrderId)
             .HasColumnName("order_id");
-        
+
         builder.Property(e => e.SignedPrice)
             .HasColumnName("signed_price");
 

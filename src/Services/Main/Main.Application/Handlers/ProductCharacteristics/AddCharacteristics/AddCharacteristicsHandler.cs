@@ -22,7 +22,7 @@ public class AddCharacteristicsHandler(IUnitOfWork unitOfWork)
         var toAdd = new List<ProductCharacteristic>();
         foreach (var @new in request.Characteristics)
             toAdd.Add(ProductCharacteristic.Create(@new.ProductId, @new.Name, @new.Value));
-        
+
         await unitOfWork.AddRangeAsync(toAdd, cancellationToken);
         return Unit.Value;
     }

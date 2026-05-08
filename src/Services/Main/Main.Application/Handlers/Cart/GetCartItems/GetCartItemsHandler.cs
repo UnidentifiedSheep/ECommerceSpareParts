@@ -5,7 +5,6 @@ using Application.Common.Interfaces.Repositories;
 using LinqKit;
 using Main.Application.Dtos.Cart;
 using Main.Application.Handlers.Projections;
-using Mapster;
 using Microsoft.EntityFrameworkCore;
 
 namespace Main.Application.Handlers.Cart.GetCartItems;
@@ -15,7 +14,7 @@ public record GetCartItemsQuery(Guid UserId, Pagination Pagination) : IQuery<Get
 public record GetCartItemsResult(List<CartItemDto> CartItems);
 
 public class GetCartItemsHandler(
-    IReadRepository<Entities.Cart.Cart, (Guid, int)> repository) 
+    IReadRepository<Entities.Cart.Cart, (Guid, int)> repository)
     : IQueryHandler<GetCartItemsQuery, GetCartItemsResult>
 {
     public async Task<GetCartItemsResult> Handle(GetCartItemsQuery request, CancellationToken cancellationToken)
@@ -27,7 +26,7 @@ public class GetCartItemsHandler(
             .Select(CartProjections.ToCartItemDto)
             .ApplyPagination(request.Pagination)
             .ToListAsync(cancellationToken);
-        
+
         return new GetCartItemsResult(result);
     }
 }

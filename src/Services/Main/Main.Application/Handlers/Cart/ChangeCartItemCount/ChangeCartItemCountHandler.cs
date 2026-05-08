@@ -1,5 +1,4 @@
-﻿using Abstractions.Interfaces.Services;
-using Application.Common.Interfaces;
+﻿using Application.Common.Interfaces;
 using Application.Common.Interfaces.Repositories;
 using Attributes;
 using Main.Entities.Exceptions.Cart;
@@ -16,7 +15,7 @@ public class ChangeCartItemCountHandler(
 {
     public async Task<Unit> Handle(ChangeCartItemCountCommand request, CancellationToken cancellationToken)
     {
-        var cartItem = await repository.GetById((request.UserId, request.ProductId), cancellationToken) 
+        var cartItem = await repository.GetById((request.UserId, request.ProductId), cancellationToken)
                        ?? throw new CartItemNotFoundException(request.ProductId);
 
         cartItem.SetCount(request.NewCount);

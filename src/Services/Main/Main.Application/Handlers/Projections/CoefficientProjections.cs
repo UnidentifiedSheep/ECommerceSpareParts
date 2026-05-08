@@ -11,6 +11,6 @@ public static class CoefficientProjections
         {
             Name = x.Name,
             Value = x.Value,
-            Type = x.Type,
+            Type = x.Type
         };
 }

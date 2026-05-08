@@ -1,11 +1,9 @@
-using Abstractions.Models;
 using Api.Common.Extensions;
 using Api.Common.Models.Requests;
 using Carter;
 using Main.Application.Dtos.Currencies;
 using Main.Application.Handlers.Currencies.GetCurrencies;
 using Main.Application.Handlers.Currencies.GetCurrencyById;
-using Mapster;
 using MediatR;
 
 namespace Main.Api.EndPoints.Currencies;
@@ -18,7 +16,10 @@ public class GetCurrenciesEndPoint : ICarterModule
 {
     public void AddRoutes(IEndpointRouteBuilder app)
     {
-        app.MapGet("/currencies", async (ISender sender, PaginationQueryModel queryParams, CancellationToken cancellation) =>
+        app.MapGet("/currencies", async (
+                ISender sender,
+                PaginationQueryModel queryParams,
+                CancellationToken cancellation) =>
             {
                 var query = new GetCurrenciesQuery(queryParams);
                 var result = await sender.Send(query, cancellation);

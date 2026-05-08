@@ -2,7 +2,6 @@
 using Main.Persistence.Context;
 using Microsoft.EntityFrameworkCore;
 using Persistence.Interfaces;
-
 using RoleEnum = Main.Enums.Role;
 
 namespace Main.Migrator.DataSeeds;
@@ -14,7 +13,7 @@ public class RoleSeed : ISeed<DContext>
         var existingRoles = await context.Roles
             .Select(x => x.Name.Value)
             .ToHashSetAsync();
-        
+
         var roles = new[]
         {
             Role.Create(nameof(RoleEnum.Admin)),
@@ -23,7 +22,7 @@ public class RoleSeed : ISeed<DContext>
             Role.Create(nameof(RoleEnum.Member)),
             Role.Create(nameof(RoleEnum.Supplier))
         };
-        
+
         var notExistingRoles = roles
             .Where(x => !existingRoles.Contains(x.Name.Value))
             .ToList();

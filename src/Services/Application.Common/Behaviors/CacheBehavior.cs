@@ -31,10 +31,10 @@ public class CacheBehavior<TRequest, TResponse>(
         }
 
         return await cache.GetOrSetAsync<TResponse>(
-            key: cacheKey,
-            factory: ct => next(ct),
-            duration: cachePolicy.TimeToLive,
-            tags: tags,
-            token: cancellationToken);
+            cacheKey,
+            ct => next(ct),
+            cachePolicy.TimeToLive,
+            tags,
+            cancellationToken);
     }
 }

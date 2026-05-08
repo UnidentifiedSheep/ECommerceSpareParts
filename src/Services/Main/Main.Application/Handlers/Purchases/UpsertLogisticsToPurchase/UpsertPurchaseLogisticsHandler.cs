@@ -1,10 +1,6 @@
 ﻿using Abstractions.Interfaces.Services;
 using Application.Common.Interfaces;
 using Attributes;
-using Main.Entities;
-using Main.Entities.Exceptions.Storages;
-using Main.Entities.Purchase;
-using Mapster;
 using MediatR;
 
 namespace Main.Application.Handlers.Purchases.UpsertLogisticsToPurchase;

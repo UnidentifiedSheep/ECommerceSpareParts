@@ -1,5 +1,4 @@
-﻿using Main.Entities;
-using Main.Entities.Sale;
+﻿using Main.Entities.Sale;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
@@ -10,7 +9,7 @@ public class SaleContentConfiguration : IEntityTypeConfiguration<SaleContent>
     public void Configure(EntityTypeBuilder<SaleContent> builder)
     {
         builder.ToTable("sale_content", "public");
-        
+
         builder.HasKey(e => e.Id).HasName("sale_content_pk");
 
         builder.HasIndex(e => e.ProductId, "sale_content_product_id_index");
@@ -23,26 +22,26 @@ public class SaleContentConfiguration : IEntityTypeConfiguration<SaleContent>
 
         builder.Property(e => e.Id)
             .HasColumnName("id");
-        
+
         builder.Property(e => e.ProductId)
             .HasColumnName("product_id");
-        
+
         builder.Property(e => e.Comment)
             .HasMaxLength(256)
             .HasColumnName("comment");
-        
+
         builder.Property(e => e.Count)
             .HasColumnName("count");
-        
+
         builder.Property(e => e.Discount)
             .HasColumnName("discount");
-        
+
         builder.Property(e => e.Price)
             .HasColumnName("price");
-        
+
         builder.Property(e => e.SaleId)
             .HasColumnName("sale_id");
-        
+
         builder.Property(e => e.TotalSum)
             .HasColumnName("total_sum");
 
@@ -56,7 +55,7 @@ public class SaleContentConfiguration : IEntityTypeConfiguration<SaleContent>
             .WithMany(p => p.Contents)
             .HasForeignKey(d => d.SaleId)
             .HasConstraintName("sale_content_sale_id_fk");
-        
+
         builder.Navigation(e => e.Details)
             .HasField("_details")
             .UsePropertyAccessMode(PropertyAccessMode.Field);

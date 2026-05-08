@@ -1,5 +1,4 @@
-﻿using Main.Entities;
-using Main.Entities.Purchase;
+﻿using Main.Entities.Purchase;
 using Main.Entities.Storage;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
@@ -11,7 +10,7 @@ public class PurchaseLogisticConfiguration : IEntityTypeConfiguration<PurchaseLo
     public void Configure(EntityTypeBuilder<PurchaseLogistic> builder)
     {
         builder.ToTable("purchase_logistics", "public");
-        
+
         builder.HasKey(e => e.PurchaseId).HasName("purchase_logistics_pk");
 
         builder.HasIndex(e => e.TransactionId, "purchase_logistics_transaction_id_uindex")
@@ -19,40 +18,40 @@ public class PurchaseLogisticConfiguration : IEntityTypeConfiguration<PurchaseLo
 
         builder.Property(e => e.PurchaseId)
             .HasColumnName("purchase_id");
-        
+
         builder.Property(e => e.CurrencyId)
             .HasColumnName("currency_id");
-        
+
         builder.Property(e => e.MinimumPrice)
             .HasColumnName("minimum_price");
-            
+
         builder.Property(e => e.MinimumPriceApplied)
             .HasColumnName("minimum_price_applied");
-            
+
         builder.Property(e => e.PriceKg)
             .HasColumnName("price_kg");
-            
+
         builder.Property(e => e.PricePerM3)
             .HasColumnName("price_per_m3");
-        
+
         builder.Property(e => e.PricePerOrder)
             .HasColumnName("price_per_order");
-        
+
         builder.Property(e => e.PricingModel)
             .HasMaxLength(24)
             .HasColumnName("pricing_model");
-            
+
         builder.Property(e => e.RouteId)
             .HasColumnName("route_id");
-            
+
         builder.Property(e => e.RouteType)
             .HasMaxLength(24)
             .HasColumnName("route_type");
-            
+
         builder.Property(e => e.TransactionId)
             .HasColumnName("transaction_id");
 
-            
+
         builder.HasOne(d => d.Currency)
             .WithMany()
             .HasForeignKey(d => d.CurrencyId)

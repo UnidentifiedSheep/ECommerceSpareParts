@@ -28,7 +28,7 @@ public static class ServiceProvider
             options.UseNpgsql(connectionString);
             options.AddInterceptors(sp.GetRequiredService<AuditableEntitySaveChangesInterceptor>());
         });
-        
+
         collection.AddScoped<IProductRepository, ProductRepository>();
         collection.AddScoped<IProducerRepository, ProducerRepository>();
         collection.AddScoped<IStorageRouteRepository, StorageRouteRepository>();
@@ -37,10 +37,10 @@ public static class ServiceProvider
         collection.AddScoped<IUserRepository, UserRepository>();
         collection.AddScoped<ITransactionRepository, TransactionRepository>();
         collection.AddScoped<ICurrencyRateRepository, CurrencyRateRepository>();
-        
+
         collection.AddScoped(typeof(IRepository<,>), typeof(BasicEfRepository<,>));
         collection.AddScoped(typeof(IReadRepository<,>), typeof(ReadRepository<,>));
-        
+
         collection.AddUnitOfWork<DContext>();
 
         collection.AddScoped<IDbValidator, PgsqlDbValidator<DContext>>();

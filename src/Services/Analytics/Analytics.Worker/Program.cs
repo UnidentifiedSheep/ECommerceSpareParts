@@ -1,5 +1,4 @@
 using System.Reflection;
-using Analytics.Application;
 using Analytics.Persistence;
 using Analytics.Persistence.Context;
 using Analytics.Worker.Consumers;
@@ -9,7 +8,6 @@ using Localization.Domain.Extensions;
 using MassTransit;
 using RabbitMq.Extensions;
 using RabbitMq.Models;
-using Redis;
 
 Locale[] locales = ["ru-RU", "en-EN"];
 Locale defaultLocale = "ru-RU";
@@ -64,8 +62,9 @@ void AddMassTransit(IHostApplicationBuilder hostBuilder)
     var brokerOptions = hostBuilder.Configuration
                             .GetSection(MessageBrokerOptions.SectionName)
                             .Get<MessageBrokerOptions>()
-                        ?? throw new NullReferenceException($"Missing {MessageBrokerOptions.SectionName} configuration options");
-    
+                        ?? throw new NullReferenceException(
+                            $"Missing {MessageBrokerOptions.SectionName} configuration options");
+
     hostBuilder.Services.AddMassTransit(x =>
     {
         x.AddConsumers(Assembly.GetAssembly(typeof(MetricCalculationRequestedConsumer)));
@@ -79,14 +78,14 @@ void AddMassTransit(IHostApplicationBuilder hostBuilder)
         x.UsingRabbitMq((context, cfg) =>
         {
             cfg.ConfigureRabbitMq(brokerOptions);
-            
+
             cfg.ReceiveEndpoint("analytics-work-queue", ep =>
             {
                 ep.Durable = true;
 
                 ep.ConcurrentMessageLimit = 4;
                 ep.PrefetchCount = 4;
-                
+
                 ep.ConfigureConsumer<MetricCalculationRequestedConsumer>(context);
             });
         });

@@ -14,7 +14,10 @@ public class GetCharacteristicsEndPoint : ICarterModule
     public void AddRoutes(IEndpointRouteBuilder app)
     {
         app.MapGet("/products/{productId:int}/characteristics",
-                async (ISender sender, int productId, [AsParameters] PaginationQueryModel queryParams, 
+                async (
+                    ISender sender,
+                    int productId,
+                    [AsParameters] PaginationQueryModel queryParams,
                     CancellationToken token) =>
                 {
                     var result = await sender.Send(new GetCharacteristicsQuery(productId, queryParams),

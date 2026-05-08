@@ -14,6 +14,19 @@ public class MetricCalculatorRegistry : IMetricCalculatorRegistry
         RegisterFromAssembly(assembly ?? Assembly.GetExecutingAssembly());
     }
 
+    public Type GetMetricType(string name)
+    {
+        if (_nameToType.TryGetValue(name, out var type))
+            return type;
+
+        throw new NotSupportedException($"Metric '{name}' is not supported");
+    }
+
+    public bool TryGetMetricType(string name, out Type? type)
+    {
+        return _nameToType.TryGetValue(name, out type);
+    }
+
     private void RegisterFromAssembly(Assembly assembly)
     {
         var result = assembly.GetTypes()
@@ -30,24 +43,11 @@ public class MetricCalculatorRegistry : IMetricCalculatorRegistry
                 x.MetricType.GetCustomAttribute<MetricInfoAttribute>() != null)
             .Select(x => new
             {
-                Type = x.MetricType, 
+                Type = x.MetricType,
                 x.MetricType.GetCustomAttribute<MetricInfoAttribute>()!.SystemName
             });
 
         foreach (var type in result)
             _nameToType.Add(type.SystemName, type.Type);
-    }
-
-    public Type GetMetricType(string name)
-    {
-        if (_nameToType.TryGetValue(name, out var type))
-            return type;
-
-        throw new NotSupportedException($"Metric '{name}' is not supported");
-    }
-
-    public bool TryGetMetricType(string name, out Type? type)
-    {
-        return _nameToType.TryGetValue(name, out type);
     }
 }

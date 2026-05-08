@@ -5,13 +5,9 @@ namespace Main.Entities.Product;
 
 public class ProductCross : Entity<ProductCross, (int, int)>
 {
-    public int LeftProductId { get; private set; }
-    public int RightProductId { get; private set; }
-
-    public Product LeftProduct { get; private set; } = null!;
-    public Product RightProduct { get; private set; } = null!;
-    
-    private ProductCross() {}
+    private ProductCross()
+    {
+    }
 
     private ProductCross(int left, int right)
     {
@@ -19,15 +15,24 @@ public class ProductCross : Entity<ProductCross, (int, int)>
             throw new InvalidInputException("article.linkage.article.cannot.equal.cross.article");
         var min = Math.Min(left, right);
         var max = Math.Max(left, right);
-        
+
         LeftProductId = min;
         RightProductId = max;
     }
+
+    public int LeftProductId { get; }
+    public int RightProductId { get; }
+
+    public Product LeftProduct { get; private set; } = null!;
+    public Product RightProduct { get; private set; } = null!;
 
     public static ProductCross Create(int id, int crossId)
     {
         return new ProductCross(id, crossId);
     }
 
-    public override (int, int) GetId() => (LeftProductId, RightProductId);
+    public override (int, int) GetId()
+    {
+        return (LeftProductId, RightProductId);
+    }
 }

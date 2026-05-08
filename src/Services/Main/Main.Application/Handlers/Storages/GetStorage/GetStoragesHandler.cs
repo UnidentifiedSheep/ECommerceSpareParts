@@ -7,7 +7,6 @@ using Main.Application.Dtos.Storage;
 using Main.Application.Handlers.Projections;
 using Main.Entities.Storage;
 using Main.Enums;
-using Mapster;
 using Microsoft.EntityFrameworkCore;
 
 namespace Main.Application.Handlers.Storages.GetStorage;
@@ -19,13 +18,13 @@ public record GetStoragesResult(IReadOnlyList<StorageDto> Storages);
 
 public class GetStoragesHandler(
     IReadRepository<Storage, string> repository
-    ) : IQueryHandler<GetStoragesQuery, GetStoragesResult>
+) : IQueryHandler<GetStoragesQuery, GetStoragesResult>
 {
     public async Task<GetStoragesResult> Handle(GetStoragesQuery request, CancellationToken cancellationToken)
     {
         var query = repository.Query;
         var searchTerm = request.SearchTerm?.Trim();
-        
+
         if (!string.IsNullOrWhiteSpace(searchTerm))
             query = query.Select(x => new
                 {
@@ -47,7 +46,7 @@ public class GetStoragesHandler(
             .Select(StorageProjections.StorageProjection)
             .ApplyPagination(request.Pagination)
             .ToListAsync(cancellationToken);
-        
+
         return new GetStoragesResult(result);
     }
 }

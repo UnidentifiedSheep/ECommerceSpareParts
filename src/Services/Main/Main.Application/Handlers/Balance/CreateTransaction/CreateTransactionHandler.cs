@@ -27,17 +27,17 @@ public class CreateTransactionHandler(
         CreateTransactionCommand request,
         CancellationToken cancellationToken)
     {
-        Transaction transaction = Transaction.Create(
-            request.SenderId, 
-            request.ReceiverId, 
-            request.CurrencyId, 
+        var transaction = Transaction.Create(
+            request.SenderId,
+            request.ReceiverId,
+            request.CurrencyId,
             TransactionType.Transfer,
-            request.Amount, 
+            request.Amount,
             request.TransactionDateTime);
-        
+
         transaction.Complete();
         await balanceService.ChangeSenderReceiverBalancesAsync(transaction, cancellationToken);
-        
+
         await unitOfWork.AddAsync(transaction, cancellationToken);
         return new CreateTransactionResult(transaction);
     }

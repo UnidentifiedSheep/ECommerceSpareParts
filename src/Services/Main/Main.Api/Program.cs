@@ -14,7 +14,6 @@ using Contracts.Settings;
 using ExchangeRate;
 using Hangfire;
 using Hangfire.PostgreSql;
-using Localization.Abstractions.Models;
 using Localization.Domain.Extensions;
 using Localization.Domain.Middlewares;
 using Mail;
@@ -74,7 +73,8 @@ builder.Services.AddOptions<MessageBrokerOptions>()
 var brokerOptions = builder.Configuration
                         .GetSection(MessageBrokerOptions.SectionName)
                         .Get<MessageBrokerOptions>()
-                    ?? throw new NullReferenceException($"Missing {MessageBrokerOptions.SectionName} configuration options");
+                    ?? throw new NullReferenceException(
+                        $"Missing {MessageBrokerOptions.SectionName} configuration options");
 
 var uniqQueueName = $"queue-of-main-{Environment.MachineName}";
 
@@ -125,7 +125,7 @@ builder.Services.AddHttpContextAccessor();
 builder.Services
     .AddPersistenceLayer(Environment.GetEnvironmentVariable("DB_CONNECTION_STRING")!)
     .AddCacheLayer(Environment.GetEnvironmentVariable("REDIS_CONNECTION_STRING")!)
-    .AddJsonSigner( Environment.GetEnvironmentVariable("SIGN_SECRET")!, Global.JsonOptions)
+    .AddJsonSigner(Environment.GetEnvironmentVariable("SIGN_SECRET")!, Global.JsonOptions)
     .AddFullSecurityLayer()
     .AddMailLayer()
     .AddCommonLayer()

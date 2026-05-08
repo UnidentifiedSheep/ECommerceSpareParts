@@ -1,4 +1,3 @@
-using Abstractions.Interfaces.Cache;
 using Microsoft.Extensions.DependencyInjection;
 using Pricing.Abstractions.Interfaces.CacheRepositories;
 using Pricing.Cache.Repositories;

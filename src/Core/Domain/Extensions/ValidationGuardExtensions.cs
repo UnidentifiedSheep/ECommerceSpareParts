@@ -18,7 +18,7 @@ public static class ValidationGuardExtensions
     {
         return value.Contains(' ') ? throw new InvalidInputException(errorKey) : value;
     }
-    
+
     public static string AgainstNullOrEmpty(this string value, string errorKey)
     {
         return string.IsNullOrEmpty(value) ? throw new InvalidInputException(errorKey) : value;
@@ -34,7 +34,7 @@ public static class ValidationGuardExtensions
     {
         return value is null ? throw new InvalidInputException(errorKey) : value;
     }
-    
+
     public static T AgainstOutOfRange<T>(this T value, T min, T max, string errorKey)
         where T : IComparable<T>
     {
@@ -42,7 +42,7 @@ public static class ValidationGuardExtensions
             ? throw new InvalidInputException(errorKey)
             : value;
     }
-    
+
     public static T Against<T>(this T value, Func<T, bool> predicate, string errorKey)
     {
         return predicate(value)
@@ -67,7 +67,7 @@ public static class ValidationGuardExtensions
     {
         return value.CompareTo(min) < 0 ? throw new InvalidInputException(errorKey) : value;
     }
-    
+
     public static T AgainstLessOrEqual<T>(this T value, T min, string errorKey)
         where T : IComparable<T>
     {
@@ -85,22 +85,22 @@ public static class ValidationGuardExtensions
     {
         return value.CompareTo(default) < 0 ? throw new InvalidInputException(errorKey) : value;
     }
-    
+
     public static decimal AgainstTooManyDecimalPlaces(this decimal value, int maxDecimals, string errorKey)
     {
         var decimalPlaces = BitConverter.GetBytes(decimal.GetBits(value)[3])[2];
-    
+
         return decimalPlaces > maxDecimals
             ? throw new InvalidInputException(errorKey)
             : value;
     }
-    
+
     public static IEnumerable<T> AgainstEmpty<T>(this IEnumerable<T> value, string errorKey)
     {
         // ReSharper disable once PossibleMultipleEnumeration
-        return !value.Any() ? throw new  InvalidInputException(errorKey) : value;
+        return !value.Any() ? throw new InvalidInputException(errorKey) : value;
     }
-    
+
     public static string AgainstTooShort(this string value, int min, Func<Exception> exceptionFactory)
     {
         return value.Length < min ? throw exceptionFactory() : value;
@@ -115,7 +115,7 @@ public static class ValidationGuardExtensions
     {
         return value.Contains(' ') ? throw exceptionFactory() : value;
     }
-    
+
     public static string AgainstNullOrEmpty(this string value, Func<Exception> exceptionFactory)
     {
         return string.IsNullOrEmpty(value) ? throw exceptionFactory() : value;
@@ -131,7 +131,7 @@ public static class ValidationGuardExtensions
     {
         return value is null ? throw exceptionFactory() : value;
     }
-    
+
     public static T AgainstOutOfRange<T>(this T value, T min, T max, Func<Exception> exceptionFactory)
         where T : IComparable<T>
     {
@@ -139,7 +139,7 @@ public static class ValidationGuardExtensions
             ? throw exceptionFactory()
             : value;
     }
-    
+
     public static T Against<T>(this T value, Func<T, bool> predicate, Func<Exception> exceptionFactory)
     {
         return predicate(value)
@@ -164,7 +164,7 @@ public static class ValidationGuardExtensions
     {
         return value.CompareTo(min) < 0 ? throw exceptionFactory() : value;
     }
-    
+
     public static T AgainstLessOrEqual<T>(this T value, T min, Func<Exception> exceptionFactory)
         where T : IComparable<T>
     {
@@ -176,23 +176,26 @@ public static class ValidationGuardExtensions
     {
         return value.CompareTo(max) >= 0 ? throw exceptionFactory() : value;
     }
-    
+
 
     public static T AgainstNegative<T>(this T value, Func<Exception> exceptionFactory)
         where T : struct, IComparable<T>
     {
         return value.CompareTo(default) < 0 ? throw exceptionFactory() : value;
     }
-    
-    public static decimal AgainstTooManyDecimalPlaces(this decimal value, int maxDecimals, Func<Exception> exceptionFactory)
+
+    public static decimal AgainstTooManyDecimalPlaces(
+        this decimal value,
+        int maxDecimals,
+        Func<Exception> exceptionFactory)
     {
         var decimalPlaces = BitConverter.GetBytes(decimal.GetBits(value)[3])[2];
-    
+
         return decimalPlaces > maxDecimals
             ? throw exceptionFactory()
             : value;
     }
-    
+
     public static IEnumerable<T> AgainstEmpty<T>(this IEnumerable<T> value, Func<Exception> exceptionFactory)
     {
         // ReSharper disable once PossibleMultipleEnumeration

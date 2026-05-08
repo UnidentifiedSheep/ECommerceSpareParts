@@ -7,6 +7,22 @@ namespace Main.Entities.Sale;
 
 public class Sale : AuditableEntity<Sale, Guid>
 {
+    private readonly List<SaleContent> _contents = [];
+
+    private Sale()
+    {
+    }
+
+    private Sale(Guid buyerId, Guid transactionId, int currencyId, string storageName, DateTime saleDate)
+    {
+        TransactionId = transactionId;
+        CurrencyId = currencyId;
+        BuyerId = buyerId;
+        StorageName = storageName;
+        SaleDatetime = saleDate;
+        State = SaleState.Draft;
+    }
+
     public Guid Id { get; private set; }
     public Guid BuyerId { get; private set; }
     public Guid TransactionId { get; private set; }
@@ -18,20 +34,7 @@ public class Sale : AuditableEntity<Sale, Guid>
     public User.User Buyer { get; private set; } = null!;
     public Currency.Currency Currency { get; private set; } = null!;
     public Transaction Transaction { get; private set; } = null!;
-    private readonly List<SaleContent> _contents = [];
     public IReadOnlyList<SaleContent> Contents => _contents;
-    
-    private Sale() {}
-
-    private Sale(Guid buyerId, Guid transactionId, int currencyId, string storageName, DateTime saleDate)
-    {
-        TransactionId = transactionId;
-        CurrencyId = currencyId;
-        BuyerId = buyerId;
-        StorageName = storageName;
-        SaleDatetime = saleDate;
-        State = SaleState.Draft;
-    }
 
     public static Sale Create(Guid buyerId, Guid transactionId, int currencyId, string storageName, DateTime saleDate)
     {
@@ -64,5 +67,8 @@ public class Sale : AuditableEntity<Sale, Guid>
         CurrencyId = currencyId;
     }
 
-    public override Guid GetId() => Id;
+    public override Guid GetId()
+    {
+        return Id;
+    }
 }

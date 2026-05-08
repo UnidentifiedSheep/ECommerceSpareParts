@@ -9,8 +9,30 @@ namespace Main.Entities.Purchase;
 
 public class Purchase : AuditableEntity<Purchase, Guid>
 {
+    private readonly List<PurchaseContent> _contents = [];
+
+    private Purchase()
+    {
+    }
+
+    private Purchase(
+        Guid supplierId,
+        int currencyId,
+        Guid transactionId,
+        string storage,
+        DateTime purchaseDatetime)
+    {
+        SupplierId = supplierId;
+        SetPurchaseDate(purchaseDatetime);
+        SetCurrencyId(currencyId);
+        TransactionId = transactionId;
+        Storage = storage;
+        State = PurchaseState.Draft;
+    }
+
     [Validate]
     public Guid Id { get; private set; }
+
     public Guid SupplierId { get; private set; }
     public int CurrencyId { get; private set; }
     public Guid TransactionId { get; private set; }
@@ -22,25 +44,7 @@ public class Purchase : AuditableEntity<Purchase, Guid>
     public virtual PurchaseLogistic? PurchaseLogistic { get; private set; }
     public virtual User.User Supplier { get; private set; } = null!;
     public virtual Transaction Transaction { get; private set; } = null!;
-    private readonly List<PurchaseContent> _contents = [];
     public IReadOnlyCollection<PurchaseContent> Contents => _contents;
-
-    private Purchase() {}
-
-    private Purchase(
-        Guid supplierId, 
-        int currencyId, 
-        Guid transactionId, 
-        string storage, 
-        DateTime purchaseDatetime)
-    {
-        SupplierId = supplierId;
-        SetPurchaseDate(purchaseDatetime);
-        SetCurrencyId(currencyId);
-        TransactionId = transactionId;
-        Storage = storage;
-        State = PurchaseState.Draft;
-    }
 
     public static Purchase Create(
         Guid supplierId,
@@ -57,8 +61,8 @@ public class Purchase : AuditableEntity<Purchase, Guid>
         Comment = comment
             .NullIfWhiteSpace()?
             .AgainstTooLong(
-                max: 256,
-                exceptionFactory: () => throw new InvalidInputException("purchase.comment.too.long"));
+                256,
+                () => throw new InvalidInputException("purchase.comment.too.long"));
     }
 
     public void SetCurrencyId(int currencyId)
@@ -83,6 +87,9 @@ public class Purchase : AuditableEntity<Purchase, Guid>
     {
         State = PurchaseState.Completed;
     }
-    
-    public override Guid GetId() => Id;
+
+    public override Guid GetId()
+    {
+        return Id;
+    }
 }

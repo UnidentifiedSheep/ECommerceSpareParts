@@ -29,19 +29,19 @@ public class DeleteContentFromStorageTests : IntegrationTest
         var eventsCount = await Context.Events.CountAsync();
         var content = TestContext.StorageContents.First();
         var productCountBefore = (await Context.Products
-            .FirstAsync(x => x.Id == content.ProductId))
+                .FirstAsync(x => x.Id == content.ProductId))
             .Stock;
 
         var command = new SetToZeroContentCommand(content.Id, content.RowVersion);
 
         await Mediator.Send(command);
-        
+
         var productCountAfter = (await Context.Products
                 .FirstAsync(x => x.Id == content.ProductId))
             .Stock;
-        
+
         var currStorageMovements = await Context.Events.CountAsync();
-        
+
         currStorageMovements.Should().Be(eventsCount + 1);
         productCountBefore.Value.Should().Be(productCountAfter - content.Count);
     }

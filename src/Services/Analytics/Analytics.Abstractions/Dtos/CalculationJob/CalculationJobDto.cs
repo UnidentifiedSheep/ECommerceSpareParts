@@ -8,9 +8,9 @@ public class CalculationJobDto
     public Guid? MetricId { get; set; }
     public string MetricSystemName { get; set; } = null!;
     public CalculationStatus Status { get; set; }
-    
+
     public DateTime CreateAt { get; set; }
     public DateTime UpdateAt { get; set; }
-    
+
     public string? ErrorMessage { get; set; }
 }

@@ -1,19 +1,17 @@
-﻿using System.Collections;
-using Bogus;
+﻿using Bogus;
 using Main.Entities.Producer;
 using Main.Entities.Product;
 using Main.Entities.Product.ValueObjects;
 using Test.Common.Abstractions;
 
-
 namespace Tests.DataBuilders;
 
 public class ProductBuilder(Faker faker) : BuilderBase<Product>(faker)
 {
+    private readonly HashSet<int> _producerIds = [];
     public Sku? Sku { get; private set; }
     public Name? Name { get; private set; }
     public string? Description { get; private set; }
-    private readonly HashSet<int> _producerIds = [];
     public IReadOnlyCollection<int> ProducerIds => _producerIds.AsReadOnly();
 
     public ProductBuilder WithSku(Sku sku)
@@ -39,7 +37,7 @@ public class ProductBuilder(Faker faker) : BuilderBase<Product>(faker)
         _producerIds.UnionWith(producerIds);
         return this;
     }
-    
+
     public ProductBuilder WithProducers(IEnumerable<Producer> producers)
     {
         _producerIds.UnionWith(producers.Select(p => p.Id));
@@ -51,13 +49,13 @@ public class ProductBuilder(Faker faker) : BuilderBase<Product>(faker)
         Description = description;
         return this;
     }
-    
+
     public override Product Build()
     {
         return Product.Create(
-            Sku ?? Faker.Lorem.Letter(10), 
-            Name ?? Faker.Commerce.ProductName(), 
-            Faker.PickRandom<int>(ProducerIds), 
+            Sku ?? Faker.Lorem.Letter(10),
+            Name ?? Faker.Commerce.ProductName(),
+            Faker.PickRandom<int>(ProducerIds),
             Description);
     }
 }

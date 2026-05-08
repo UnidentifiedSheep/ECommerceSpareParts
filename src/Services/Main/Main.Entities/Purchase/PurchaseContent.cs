@@ -6,8 +6,21 @@ namespace Main.Entities.Purchase;
 
 public class PurchaseContent : Entity<PurchaseContent, int>
 {
+    private PurchaseContent()
+    {
+    }
+
+    private PurchaseContent(int productId, int count, decimal price, int? storageContentId)
+    {
+        ProductId = productId;
+        StorageContentId = storageContentId;
+        SetCount(count);
+        SetPrice(price);
+    }
+
     [Validate]
     public int Id { get; private set; }
+
     public Guid PurchaseId { get; private set; }
     public int ProductId { get; private set; }
     public int? StorageContentId { get; private set; }
@@ -17,16 +30,6 @@ public class PurchaseContent : Entity<PurchaseContent, int>
     public string? Comment { get; private set; }
     public Product.Product Product { get; private set; } = null!;
     public PurchaseContentLogistic? PurchaseContentLogistic { get; private set; }
-    
-    private PurchaseContent() {}
-
-    private PurchaseContent(int productId, int count, decimal price, int? storageContentId)
-    {
-        ProductId = productId;
-        StorageContentId = storageContentId;
-        SetCount(count);
-        SetPrice(price);
-    }
 
     public static PurchaseContent Create(
         int productId,
@@ -44,8 +47,8 @@ public class PurchaseContent : Entity<PurchaseContent, int>
     {
         Count = count
             .AgainstLessOrEqual(
-                min: 0, 
-                exceptionFactory: () => new InvalidOperationException("Count must be greater than zero."));
+                0,
+                () => new InvalidOperationException("Count must be greater than zero."));
         CalculateTotalSum();
     }
 
@@ -53,11 +56,11 @@ public class PurchaseContent : Entity<PurchaseContent, int>
     {
         Price = price
             .AgainstTooManyDecimalPlaces(
-                maxDecimals: 2, 
-                exceptionFactory: () => new InvalidOperationException("Price must have maximum 2 decimal places."))
+                2,
+                () => new InvalidOperationException("Price must have maximum 2 decimal places."))
             .AgainstLessOrEqual(
-                min: 0,
-                exceptionFactory: () => new InvalidOperationException("Price must be greater than zero."));
+                0,
+                () => new InvalidOperationException("Price must be greater than zero."));
         CalculateTotalSum();
     }
 
@@ -67,8 +70,8 @@ public class PurchaseContent : Entity<PurchaseContent, int>
         Comment = comment
             .NullIfWhiteSpace()?
             .AgainstTooLong(
-                max: 256,
-                errorKey: "purchase.content.comment.too.long");
+                256,
+                "purchase.content.comment.too.long");
     }
 
     public void SetLogistic(decimal weightKg, decimal areaM3, decimal price)
@@ -78,11 +81,14 @@ public class PurchaseContent : Entity<PurchaseContent, int>
         else
             PurchaseContentLogistic.Update(weightKg, areaM3, price);
     }
-    
+
     private void CalculateTotalSum()
     {
         TotalSum = Price * Count;
     }
-    
-    public override int GetId() => Id;
+
+    public override int GetId()
+    {
+        return Id;
+    }
 }

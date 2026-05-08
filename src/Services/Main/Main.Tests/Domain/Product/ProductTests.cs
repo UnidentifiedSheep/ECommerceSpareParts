@@ -1,6 +1,5 @@
 ﻿using FluentAssertions;
 using Main.Entities.Product.ValueObjects;
-
 using ProductDomain = Main.Entities.Product.Product;
 
 namespace Main.Tests.Domain.Product;

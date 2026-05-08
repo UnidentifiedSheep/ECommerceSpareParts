@@ -16,24 +16,24 @@ public class CreateProductTests : IntegrationTest
     {
         RegisterBasicContext<ProducerTestContext>();
     }
-    
+
     private ProducerTestContext TestContext => GetContext<ProducerTestContext>();
 
     [Fact]
     public async Task CreateManyArticles_Succeeds()
     {
         var dtos = CreateDtos(10);
-        
+
         var command = new CreateProductsCommand(dtos);
-        
+
         var act = () => TestContext.Mediator.Send(command);
         await act.Should().NotThrowAsync();
-        
+
         var products = await GetProducts();
-        
+
         products.Should().HaveCount(dtos.Count);
 
-        for (int i = 0; i < dtos.Count; i++)
+        for (var i = 0; i < dtos.Count; i++)
             Validate(dtos[i], products[i]);
     }
 
@@ -52,7 +52,7 @@ public class CreateProductTests : IntegrationTest
         {
             Name = string.Join(" ", TestContext.Faker.Lorem.Words(100))
         };
-        
+
         var command = new CreateProductsCommand([dtos]);
         var act = () => TestContext.Mediator.Send(command);
 
@@ -73,7 +73,7 @@ public class CreateProductTests : IntegrationTest
         {
             ProducerId = int.MaxValue
         };
-        
+
         var act = () => TestContext.Mediator.Send(new CreateProductsCommand([dto]));
 
         await act.Should().ThrowAsync<DbValidationException>();

@@ -19,6 +19,13 @@ public class StorageRouteTestContext(
     public StorageRoute ActiveRoute { get; private set; } = null!;
     public StorageRoute UnactiveRoute { get; private set; } = null!;
 
+    public static Type[] DependsOn { get; } =
+    [
+        typeof(StorageTestContext),
+        typeof(CurrencyRatesTestContext),
+        typeof(UsersTestContext)
+    ];
+
     public override async Task InitializeAsync(CancellationToken cancellationToken = default)
     {
         var storages = storageTestContext.Storages.ToList();
@@ -48,11 +55,4 @@ public class StorageRouteTestContext(
         ActiveRoute = routes.First(x => x.IsActive);
         UnactiveRoute = routes.First(x => !x.IsActive);
     }
-
-    public static Type[] DependsOn { get; } =
-    [
-        typeof(StorageTestContext),
-        typeof(CurrencyRatesTestContext),
-        typeof(UsersTestContext)
-    ];
 }

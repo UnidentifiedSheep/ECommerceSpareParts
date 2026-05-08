@@ -8,5 +8,4 @@ public static class Global
     {
         PropertyNamingPolicy = JsonNamingPolicy.CamelCase
     };
-
 }

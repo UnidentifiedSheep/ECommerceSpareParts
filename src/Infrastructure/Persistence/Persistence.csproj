@@ -9,8 +9,8 @@
 
     <ItemGroup>
         <PackageReference Include="BulkValidation.Base" Version="1.0.3"/>
-        <PackageReference Include="Dapper" Version="2.1.72" />
-        <PackageReference Include="EFCore.ComplexIndexes.PostgreSQL" Version="2.0.0" />
+        <PackageReference Include="Dapper" Version="2.1.72"/>
+        <PackageReference Include="EFCore.ComplexIndexes.PostgreSQL" Version="2.0.0"/>
         <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="10.0.0">
             <PrivateAssets>all</PrivateAssets>
             <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
@@ -21,13 +21,13 @@
         </PackageReference>
         <PackageReference Include="Microsoft.Extensions.Hosting.Abstractions" Version="10.0.0"/>
         <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="10.0.0"/>
-        <PackageReference Include="System.Security.Cryptography.Pkcs" Version="10.0.7" />
+        <PackageReference Include="System.Security.Cryptography.Pkcs" Version="10.0.7"/>
     </ItemGroup>
 
     <ItemGroup>
         <ProjectReference Include="..\..\Core\Abstractions\Abstractions.csproj"/>
-        <ProjectReference Include="..\..\Core\Domain\Domain.csproj" />
-        <ProjectReference Include="..\..\Services\Application.Common\Application.Common.csproj" />
+        <ProjectReference Include="..\..\Core\Domain\Domain.csproj"/>
+        <ProjectReference Include="..\..\Services\Application.Common\Application.Common.csproj"/>
     </ItemGroup>
 
 

@@ -1,6 +1,4 @@
 using System.Reflection;
-using Abstractions.Interfaces.Currency;
-using Analytics.Application;
 using Analytics.Application.Consumers;
 using Analytics.Persistence;
 using Analytics.Persistence.Context;
@@ -16,9 +14,6 @@ using MassTransit;
 using Persistence.Extensions;
 using RabbitMq.Extensions;
 using RabbitMq.Models;
-using Redis;
-using Security;
-using Security.Utils;
 
 var localesPath = Assembly.GetExecutingAssembly().GetDefaultLocalizationPath();
 
@@ -61,7 +56,8 @@ builder.Services.AddOptions<MessageBrokerOptions>()
 var brokerOptions = builder.Configuration
                         .GetSection(MessageBrokerOptions.SectionName)
                         .Get<MessageBrokerOptions>()
-                    ?? throw new NullReferenceException($"Missing {MessageBrokerOptions.SectionName} configuration options");
+                    ?? throw new NullReferenceException(
+                        $"Missing {MessageBrokerOptions.SectionName} configuration options");
 
 var uniqQueueName = $"queue-of-analytics-{Environment.MachineName}";
 

@@ -20,11 +20,11 @@ public class CreateProductReservationHandler(IUnitOfWork unitOfWork) : ICommandH
         foreach (var dto in request.Reservations)
         {
             var newReservation = StorageContentReservation.Create(dto.UserId, dto.ProductId, dto.ReservedCount);
-            
+
             newReservation.AddCount(dto.CurrentCount);
             newReservation.SetComment(dto.Comment);
             newReservation.ProposePrice(dto.ProposedPrice, dto.GivenCurrencyId);
-            
+
             reservations.Add(newReservation);
         }
 

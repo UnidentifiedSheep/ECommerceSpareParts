@@ -1,9 +1,6 @@
-﻿using Abstractions.Models.Repository;
-using Analytics.Abstractions.Interfaces.DbRepositories;
+﻿using Analytics.Abstractions.Interfaces.DbRepositories;
 using Analytics.Entities;
 using Analytics.Persistence.Context;
-using Microsoft.EntityFrameworkCore;
-using Persistence.Extensions;
 
 namespace Analytics.Persistence.Repositories;
 

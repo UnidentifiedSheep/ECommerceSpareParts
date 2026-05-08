@@ -31,22 +31,22 @@ public class RefreshTokenHandler(
         var criteria = Criteria<UserToken>.New()
             .Where(x => x.TokenHash == hashOfToken)
             .Build();
-        
+
         var userToken = await repository.FirstOrDefaultAsync(criteria, cancellationToken)
                         ?? throw new InvalidTokenException(request.RefreshToken);
         if (userToken.ExpiresAt < DateTime.UtcNow || userToken.DeviceId != request.DeviceId)
             throw new InvalidTokenException(request.RefreshToken);
-        
+
         var user = await userService.TryGetUserAsync(userToken.UserId, cancellationToken)
-            ?? throw new UserNotFoundException(userToken.UserId);
+                   ?? throw new UserNotFoundException(userToken.UserId);
 
         if (user.UserInfo == null)
             throw new InternalServerException("User exists, but unable to get user info.");
-        
+
         var (roles, permissions) = await userService
-            .GetUserRolesAndPermissionsAsync(userToken.UserId, cancellationToken)
-            ?? throw new UserNotFoundException(userToken.UserId);
-        
+                                       .GetUserRolesAndPermissionsAsync(userToken.UserId, cancellationToken)
+                                   ?? throw new UserNotFoundException(userToken.UserId);
+
         var token = tokenGenerator.CreateToken(user, request.DeviceId, roles, permissions);
         var refreshToken = tokenGenerator.CreateRefreshToken();
 

@@ -11,29 +11,24 @@ using Persistence.Interfaces;
 using Security.Services;
 
 var builder = Host.CreateDefaultBuilder(args)
-    .ConfigureAppConfiguration((_, config) =>
-    {
-        config.AddCommandLine(args);
-    });
+    .ConfigureAppConfiguration((_, config) => { config.AddCommandLine(args); });
 
-bool seedingRequested = false;
+var seedingRequested = false;
 
 builder.ConfigureServices((context, services) =>
 {
     var connectionString = context.Configuration["ConnectionString"];
-    
+
     var seedValue = context.Configuration.GetValue<string?>("Seed");
     if (seedValue == "true")
         seedingRequested = true;
-    
+
     //add db context
-    services.AddDbContext<DContext>(
-        options => options.UseNpgsql(connectionString, 
-            x => x.MigrationsAssembly("Main.Migrator")));
-    
+    services.AddDbContext<DContext>(options => options.UseNpgsql(connectionString,
+        x => x.MigrationsAssembly("Main.Migrator")));
+
     //used for password hash etc
-    services.AddSingleton<IPasswordManager, PasswordManager>(
-        _ => new PasswordManager(new PasswordRules()));
+    services.AddSingleton<IPasswordManager, PasswordManager>(_ => new PasswordManager(new PasswordRules()));
 });
 
 builder.ConfigureServices((_, services) =>

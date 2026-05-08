@@ -1,5 +1,4 @@
 ﻿using Application.Common.Interfaces.Settings;
-using Application.Common.Services;
 using Application.Common.Services.Currency;
 using Main.Abstractions.Models.Settings;
 using Main.Application.Interfaces.Persistence;

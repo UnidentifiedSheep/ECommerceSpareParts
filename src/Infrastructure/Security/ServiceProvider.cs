@@ -4,7 +4,6 @@ using Abstractions.Interfaces.Services;
 using Abstractions.Interfaces.Validators;
 using Abstractions.Models;
 using Microsoft.Extensions.DependencyInjection;
-
 using Security.Services;
 
 namespace Security;

@@ -1,5 +1,4 @@
-﻿using BulkValidation.Core.Attributes;
-using Domain;
+﻿using Domain;
 using Domain.Extensions;
 using Main.Entities.Auth.ValueObjects;
 
@@ -7,19 +6,21 @@ namespace Main.Entities.Auth;
 
 public class Role : AuditableEntity<Role, string>
 {
-    public RoleName Name { get; private set; } = null!;
+    private readonly List<RolePermission> _rolePermissions = [];
 
-    public string? Description { get; private set; }
-
-    private List<RolePermission> _rolePermissions = [];
-    public IReadOnlyCollection<RolePermission> RolePermissions => _rolePermissions;
-    
-    private Role() {}
+    private Role()
+    {
+    }
 
     private Role(RoleName name)
     {
         Name = name;
     }
+
+    public RoleName Name { get; } = null!;
+
+    public string? Description { get; private set; }
+    public IReadOnlyCollection<RolePermission> RolePermissions => _rolePermissions;
 
     public static Role Create(RoleName name)
     {
@@ -37,7 +38,7 @@ public class Role : AuditableEntity<Role, string>
         name = name.Trim();
         if (_rolePermissions.Any(x => x.PermissionName == name.Trim()))
             return;
-        
+
         _rolePermissions.Add(RolePermission.Create(Name.Value, name));
     }
 
@@ -46,6 +47,9 @@ public class Role : AuditableEntity<Role, string>
         var first = _rolePermissions.FirstOrDefault(x => x.PermissionName == name.Trim());
         if (first != null) _rolePermissions.Remove(first);
     }
-    
-    public override string GetId() => Name.Value;
+
+    public override string GetId()
+    {
+        return Name.Value;
+    }
 }

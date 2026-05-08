@@ -1,6 +1,6 @@
 ﻿namespace Domain.Interfaces;
 
-public interface IEntity<out TKey> :  IEntity
+public interface IEntity<out TKey> : IEntity
 {
     new TKey GetId();
 }

@@ -46,12 +46,12 @@ public class MakeLinkageBetweenProductsHandler(
             .Where(x => productIds.Contains(x.Id))
             .Track(false)
             .Build();
-        
+
         var lrArticles = await repository.ListAsync(criteria, cancellationToken);
 
-        var leftArticle = lrArticles.FirstOrDefault(x => x.Id == linkage.ProductId) 
+        var leftArticle = lrArticles.FirstOrDefault(x => x.Id == linkage.ProductId)
                           ?? throw new ProductNotFoundException(linkage.ProductId);
-        var rightArticle = lrArticles.FirstOrDefault(x => x.Id == linkage.CrossProductId) 
+        var rightArticle = lrArticles.FirstOrDefault(x => x.Id == linkage.CrossProductId)
                            ?? throw new ProductNotFoundException(linkage.CrossProductId);
 
         var toAdd = new List<ProductCross>();
@@ -68,15 +68,16 @@ public class MakeLinkageBetweenProductsHandler(
 
                 leftIds.Add(leftArticle.Id);
                 rightIds.Add(rightArticle.Id);
-                
+
                 var been = new HashSet<(int, int)>();
-                
+
                 foreach (var l in leftIds)
                 foreach (var r in rightIds)
                 {
                     var cross = ProductCross.Create(l, r);
                     if (been.Add(cross.GetId())) toAdd.Add(cross);
                 }
+
                 break;
 
             case ProductLinkageType.FullLeftToRightCross:
@@ -104,7 +105,7 @@ public class MakeLinkageBetweenProductsHandler(
             ids.Add(cross.RightProductId);
             ids.Add(cross.LeftProductId);
         }
-        
+
         return ids;
     }
 

@@ -6,9 +6,20 @@ namespace Main.Entities.User;
 
 public class UserEmail : AuditableEntity<UserEmail, string>
 {
+    private UserEmail()
+    {
+    }
+
+    private UserEmail(Guid userId, Email email, EmailType emailType)
+    {
+        UserId = userId;
+        Email = email;
+        EmailType = emailType;
+    }
+
     public Guid UserId { get; private set; }
 
-    public Email Email { get; private set; } = null!;
+    public Email Email { get; } = null!;
 
     public bool Confirmed { get; private set; }
 
@@ -18,15 +29,6 @@ public class UserEmail : AuditableEntity<UserEmail, string>
 
     public DateTime? ConfirmedAt { get; private set; }
     public User User { get; private set; } = null!;
-    
-    private UserEmail() {}
-
-    private UserEmail(Guid userId, Email email, EmailType emailType)
-    {
-        UserId = userId;
-        Email = email;
-        EmailType = emailType;
-    }
 
     internal static UserEmail Create(Guid userId, Email email, EmailType emailType)
     {
@@ -48,6 +50,9 @@ public class UserEmail : AuditableEntity<UserEmail, string>
     {
         IsPrimary = isPrimary;
     }
-    
-    public override string GetId() => Email.Value;
+
+    public override string GetId()
+    {
+        return Email.Value;
+    }
 }

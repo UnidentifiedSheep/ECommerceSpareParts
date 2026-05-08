@@ -40,7 +40,7 @@ public static class ServiceProvider
             .WithRegisteredDistributedCache()
             .WithRegisteredBackplane()
             .WithSystemTextJsonSerializer();
-        
+
         collection.AddSingleton<IJwtGenerator, JwtGenerator>();
         collection.AddSingleton<UpdateCurrencyRate>();
         collection.AddSingleton(emailOptions ?? new UserEmailOptions());

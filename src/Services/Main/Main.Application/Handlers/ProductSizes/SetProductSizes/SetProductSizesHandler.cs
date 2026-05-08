@@ -33,7 +33,7 @@ public class SetProductSizesHandler(
             sizes = ProductSize.Create(request.ProductId, length, width, height, unit);
             await unitOfWork.AddAsync(sizes, cancellationToken);
         }
-        
+
         sizes.SetLength(length);
         sizes.SetWidth(width);
         sizes.SetHeight(height);

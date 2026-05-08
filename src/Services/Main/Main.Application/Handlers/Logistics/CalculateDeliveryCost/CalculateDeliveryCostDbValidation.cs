@@ -11,7 +11,7 @@ public class CalculateDeliveryCostDbValidation : AbstractDbValidation<CalculateD
         var usableProductIds = request.Items
             .Select(x => x.ProductId)
             .ToHashSet();
-        
+
         plan.ValidateStorageRouteExistsFromTo((request.StorageFrom, request.StorageTo, true))
             .ValidateProductExistsId(usableProductIds);
     }

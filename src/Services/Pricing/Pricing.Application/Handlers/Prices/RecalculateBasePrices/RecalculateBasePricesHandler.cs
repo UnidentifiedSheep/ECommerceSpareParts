@@ -1,11 +1,7 @@
-using Abstractions.Interfaces.Currency;
 using Application.Common.Interfaces;
 using Application.Common.Interfaces.Currency;
 using Application.Common.Interfaces.Settings;
-using Contracts.ArticleCoefficients.GetArticleCoefficients;
 using Contracts.Models.StorageContent;
-using Contracts.StorageContent.GetStorageContentCosts;
-using Mapster;
 using MassTransit;
 using MediatR;
 using Pricing.Abstractions.Interfaces.CacheRepositories;

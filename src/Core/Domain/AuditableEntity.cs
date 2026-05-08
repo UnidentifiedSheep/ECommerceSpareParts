@@ -2,13 +2,13 @@
 
 namespace Domain;
 
-public abstract class AuditableEntity<TModel, TKey> 
-    : Entity<TModel, TKey>, IAuditable 
+public abstract class AuditableEntity<TModel, TKey>
+    : Entity<TModel, TKey>, IAuditable
     where TModel : Entity<TModel, TKey> where TKey : notnull
 {
-    public DateTime CreatedAt { get; private set; } = DateTime.UtcNow;
+    public DateTime CreatedAt { get; } = DateTime.UtcNow;
     public DateTime UpdatedAt { get; private set; } = DateTime.UtcNow;
-    
+
     public Guid WhoCreated { get; private set; }
     public Guid? WhoUpdated { get; private set; }
 
@@ -16,10 +16,10 @@ public abstract class AuditableEntity<TModel, TKey>
     {
         if (WhoCreated != Guid.Empty)
             throw new InvalidOperationException("Can't set created user, it's already set");
-        
+
         WhoCreated = userId;
     }
-    
+
     public void Touch(Guid userId)
     {
         UpdatedAt = DateTime.UtcNow;

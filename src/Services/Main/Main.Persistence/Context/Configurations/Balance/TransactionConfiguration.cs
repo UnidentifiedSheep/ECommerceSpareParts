@@ -8,7 +8,7 @@ public class TransactionConfiguration : IEntityTypeConfiguration<Entities.Balanc
     public void Configure(EntityTypeBuilder<Entities.Balance.Transaction> builder)
     {
         builder.ToTable("transactions", "public");
-        
+
         builder.HasKey(e => e.Id)
             .HasName("transactions_pk");
 
@@ -27,46 +27,46 @@ public class TransactionConfiguration : IEntityTypeConfiguration<Entities.Balanc
 
         builder.HasIndex(e => e.TransactionDatetime, "transactions_transaction_datetime_sender_id_receiver_id_idx")
             .IsDescending();
-        
+
         builder.Property(e => e.Id)
             .HasDefaultValueSql("uuidv7()")
             .HasColumnName("id")
             .ValueGeneratedOnAdd();
-        
+
         builder.Property(e => e.CurrencyId)
             .HasColumnName("currency_id");
-        
+
         builder.Property(e => e.ReversedAt)
             .HasColumnName("reversed_at");
-            
+
         builder.Property(e => e.ReversedBy)
             .HasColumnName("reversed_by");
-            
+
         builder.Property(e => e.ReceiverId)
             .HasColumnName("receiver_id");
-            
+
         builder.Property(e => e.SenderId)
             .HasColumnName("sender_id");
-        
+
         builder.Property(e => e.Type)
             .HasMaxLength(28)
             .HasColumnName("type");
-        
+
         builder.Property(e => e.Status)
             .HasConversion<long>()
             .HasColumnName("status");
-        
+
         builder.Property(e => e.TransactionDatetime)
             .HasColumnName("transaction_datetime");
-            
+
         builder.Property(e => e.Amount)
             .HasColumnName("amount");
-        
+
         builder.Property(e => e.RowVersion)
             .HasColumnName("xmin")
             .IsRowVersion();
 
-            
+
         builder.HasOne<Entities.Currency.Currency>()
             .WithMany()
             .HasForeignKey(d => d.CurrencyId)

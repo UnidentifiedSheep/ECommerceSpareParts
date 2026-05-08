@@ -1,5 +1,4 @@
-﻿using Abstractions.Models;
-using Domain.CommonEntities;
+﻿using Domain.CommonEntities;
 using Domain.Interfaces;
 
 namespace Application.Common.Interfaces.Settings;

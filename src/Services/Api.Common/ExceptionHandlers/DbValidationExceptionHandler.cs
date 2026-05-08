@@ -32,7 +32,7 @@ public class DbValidationExceptionHandler(
     private void AddDbValidationErrors(HttpContext httpContext, ProblemDetails details, ValidationException bulkEx)
     {
         var localizer = httpContext.RequestServices.GetService<IScopedStringLocalizer>();
-        
+
         var errors = new List<ProblemDetails>();
 
         foreach (var fail in bulkEx.Failures)
@@ -45,13 +45,13 @@ public class DbValidationExceptionHandler(
                 {
                     Title = errorName,
                     Detail = fail.Message,
-                    Status = errorCode,
+                    Status = errorCode
                 });
                 continue;
             }
-            
-            string key = fail.Message;
-            string template = localizer[key];
+
+            var key = fail.Message;
+            var template = localizer[key];
             object[]? arguments = null;
 
             if (fail.AttemptedValue is IEnumerable<object?> args)
@@ -63,12 +63,12 @@ public class DbValidationExceptionHandler(
                 arguments = [fail.AttemptedValue];
 
             TryFormatLocalizableMessage(template, arguments, out template);
-            
+
             errors.Add(new ProblemDetails
             {
                 Title = errorName,
                 Detail = template,
-                Status = errorCode,
+                Status = errorCode
             });
         }
 

@@ -5,7 +5,9 @@ namespace Main.Application.Handlers.ProductSizes.GetProductSizes;
 public class GetProductSizeCachePolicy : ICachePolicy<GetProductSizeQuery>
 {
     public string GetCacheKey(GetProductSizeQuery request)
-        => $"product:{request.ProductId}:sizes";
+    {
+        return $"product:{request.ProductId}:sizes";
+    }
 
     public TimeSpan TimeToLive => TimeSpan.FromDays(1);
     public IReadOnlyCollection<string> Tags => ["product"];

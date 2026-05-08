@@ -30,16 +30,16 @@ public class GetTransactionsHandler(
 
         if (request.CurrencyId.HasValue)
             query = query.Where(e => e.CurrencyId == request.CurrencyId.Value);
-        
+
         if (request.SenderId.HasValue)
             query = query.Where(e => e.SenderId == request.SenderId.Value);
-        
+
         if (request.ReceiverId.HasValue)
             query = query.Where(e => e.ReceiverId == request.ReceiverId.Value);
 
         var fixedStart = request.RangeStart.Date;
         var fixedEnd = request.RangeEnd.Date.AddDays(1);
-        query = query.Where(x => x.TransactionDatetime >= fixedStart && 
+        query = query.Where(x => x.TransactionDatetime >= fixedStart &&
                                  x.TransactionDatetime <= fixedEnd);
 
         var res = await query
@@ -52,7 +52,7 @@ public class GetTransactionsHandler(
             .AsExpandable()
             .Select(BalanceProjections.ToTransactionDto)
             .ToListAsync(cancellationToken);
-        
+
         return new GetTransactionsResult(res);
     }
 }

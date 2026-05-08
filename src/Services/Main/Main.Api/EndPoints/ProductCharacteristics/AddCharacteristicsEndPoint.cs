@@ -7,6 +7,7 @@ using MediatR;
 namespace Main.Api.EndPoints.ArticleCharacteristics;
 
 public record AddCharacteristicsRequest(IEnumerable<NewCharacteristicsDto> Characteristics);
+
 public class AddCharacteristicsEndPoint : ICarterModule
 {
     public void AddRoutes(IEndpointRouteBuilder app)

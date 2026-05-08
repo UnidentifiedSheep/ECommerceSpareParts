@@ -16,9 +16,9 @@ public class EditProducerTests : IntegrationTest
     {
         RegisterBasicContext<ProducerTestContext>();
     }
-    
+
     private ProducerTestContext TestContext => GetContext<ProducerTestContext>();
-    
+
     [Theory]
     [InlineData("tooBig")]
     [InlineData("в")]
@@ -71,17 +71,17 @@ public class EditProducerTests : IntegrationTest
     public async Task EditProducer_NoValuesSet_Succeeds()
     {
         var producer = GetFirstProducer();
-        
+
         var act = () => Mediator.Send(
             new EditProducerCommand(
-                producer.Id, 
+                producer.Id,
                 new PatchProducerDto()));
 
         await act.Should().NotThrowAsync();
-        
+
         var dbProducer = await Context.Producers.AsNoTracking().FirstOrDefaultAsync(x => x.Id == producer.Id);
         dbProducer.Should().NotBeNull();
-        
+
         dbProducer.Name.Value.Should().Be(producer.Name.Value);
         dbProducer.Description.Should().Be(producer.Description);
     }
@@ -107,13 +107,16 @@ public class EditProducerTests : IntegrationTest
         var act = () => Mediator.Send(command);
 
         await act.Should().NotThrowAsync();
-        
+
         var dbProducer = await Context.Producers.AsNoTracking().FirstOrDefaultAsync(x => x.Id == producer.Id);
         dbProducer.Should().NotBeNull();
-        
+
         dbProducer.Name.Value.Should().Be(model.Name.Value);
         dbProducer.Description.Should().Be(model.Description.Value);
     }
 
-    private Producer GetFirstProducer() => TestContext.Producers[0];
+    private Producer GetFirstProducer()
+    {
+        return TestContext.Producers[0];
+    }
 }

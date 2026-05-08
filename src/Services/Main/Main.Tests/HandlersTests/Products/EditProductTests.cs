@@ -17,9 +17,9 @@ public class EditProductTests : IntegrationTest
     {
         RegisterBasicContext<ProductTestContext>();
     }
-    
+
     private ProductTestContext TestContext => GetContext<ProductTestContext>();
-    
+
     [Fact]
     public async Task EditArticle_NumberAndName_Succeeds()
     {
@@ -37,7 +37,7 @@ public class EditProductTests : IntegrationTest
 
         var updatedProduct = await GetProduct(id);
         updatedProduct.Should().NotBeNull();
-        
+
         updatedProduct.Name.Value.Should().Be("Updated Article");
         updatedProduct.Sku.Value.Should().Be("67890");
     }
@@ -51,7 +51,7 @@ public class EditProductTests : IntegrationTest
             {
                 Sku = new PatchField<string> { IsSet = true, Value = "67890" }
             });
-        
+
         var act = () => TestContext.Mediator.Send(command);
 
         await act.Should().ThrowAsync<ProductNotFoundException>();
@@ -97,8 +97,13 @@ public class EditProductTests : IntegrationTest
         await Assert.ThrowsAsync<ValidationException>(async () => await TestContext.Mediator.Send(command));
     }
 
-    private int GetFirstId() => TestContext.Products[0].Id;
+    private int GetFirstId()
+    {
+        return TestContext.Products[0].Id;
+    }
 
     private async Task<Product?> GetProduct(int productId)
-        => await TestContext.DbContext.Products.FirstOrDefaultAsync(x => x.Id == productId);
+    {
+        return await TestContext.DbContext.Products.FirstOrDefaultAsync(x => x.Id == productId);
+    }
 }

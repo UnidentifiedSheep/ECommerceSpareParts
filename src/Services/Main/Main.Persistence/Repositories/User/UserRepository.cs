@@ -9,9 +9,12 @@ using Persistence.Extensions;
 
 namespace Main.Persistence.Repositories.User;
 
-public class UserRepository(DContext context) : RepositoryBase<DContext, Entities.User.User, Guid>(context), IUserRepository
+public class UserRepository(DContext context)
+    : RepositoryBase<DContext, Entities.User.User, Guid>(context), IUserRepository
 {
-    public Task<UserRolesAndPermissions?> GetUserRolesAndPermissionsAsync(Guid userId, CancellationToken cancellationToken)
+    public Task<UserRolesAndPermissions?> GetUserRolesAndPermissionsAsync(
+        Guid userId,
+        CancellationToken cancellationToken)
     {
         return Context.Users
             .AsNoTracking()
@@ -24,16 +27,15 @@ public class UserRepository(DContext context) : RepositoryBase<DContext, Entitie
 
                 Permissions =
                     u.Permissions.Select(p => p.Permission)
-                    .Union(
-                        u.Roles.SelectMany(
-                            r => r.Role.RolePermissions
+                        .Union(
+                            u.Roles.SelectMany(r => r.Role.RolePermissions
                                 .Select(p => p.PermissionName))
-                    )
-                    .ToList()
+                        )
+                        .ToList()
             })
             .FirstOrDefaultAsync(cancellationToken);
     }
-    
+
     public async Task<decimal?> GetUsersDiscountAsync(Guid userId, CancellationToken cancellationToken = default)
     {
         return await Context.UserDiscounts.AsNoTracking()
@@ -43,8 +45,8 @@ public class UserRepository(DContext context) : RepositoryBase<DContext, Entitie
     }
 
     public Task<Entities.User.User?> GetUserByPrimaryEmailAsync(
-        string email, 
-        Criteria<Entities.User.User>? criteria = null, 
+        string email,
+        Criteria<Entities.User.User>? criteria = null,
         CancellationToken cancellationToken = default)
     {
         var query = Context.UserEmails
@@ -53,13 +55,13 @@ public class UserRepository(DContext context) : RepositoryBase<DContext, Entitie
 
         if (criteria != null)
             query = query.Apply(criteria);
-        
+
         return query.FirstOrDefaultAsync(cancellationToken);
     }
 
     public override Task<Dictionary<Guid, Entities.User.User>> FindByIdsAsync(
-        IEnumerable<Guid> ids, 
-        Criteria<Entities.User.User>? criteria = null, 
+        IEnumerable<Guid> ids,
+        Criteria<Entities.User.User>? criteria = null,
         CancellationToken ct = default)
     {
         return Context.Users

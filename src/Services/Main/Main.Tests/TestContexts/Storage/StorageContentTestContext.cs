@@ -10,14 +10,22 @@ using Tests.DataBuilders.Storage;
 namespace Tests.TestContexts;
 
 public class StorageContentTestContext(
-    DContext ctx, 
+    DContext ctx,
     IMediator mediator,
     StorageTestContext storage,
     ProductTestContext product,
-    CurrencyTestContext currency) 
+    CurrencyTestContext currency)
     : TestContextBase<DContext>(ctx, mediator), IDependentTestContext
 {
     public IReadOnlyCollection<StorageContent> StorageContents { get; private set; } = null!;
+
+    public static Type[] DependsOn { get; } =
+    [
+        typeof(CurrencyRatesTestContext),
+        typeof(ProductTestContext),
+        typeof(StorageTestContext)
+    ];
+
     public override async Task InitializeAsync(CancellationToken cancellationToken = default)
     {
         StorageContents = await new StorageContentBuilder(Faker)
@@ -26,11 +34,4 @@ public class StorageContentTestContext(
             .WithStorageName(storage.Storages.First(x => x.Type == StorageType.Warehouse).Name)
             .BuildManyAndAddToDb(DbContext, 10);
     }
-
-    public static Type[] DependsOn { get; } =
-    [
-        typeof(CurrencyRatesTestContext),
-        typeof(ProductTestContext),
-        typeof(StorageTestContext)
-    ];
 }

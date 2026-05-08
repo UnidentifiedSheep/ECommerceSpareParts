@@ -28,7 +28,7 @@ public class ProducerBuilder(Faker faker) : BuilderBase<Producer>(faker)
         ImageUrl = imageUrl;
         return this;
     }
-    
+
     public override Producer Build()
     {
         return Producer.Create(

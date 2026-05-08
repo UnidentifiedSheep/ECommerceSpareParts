@@ -55,14 +55,14 @@ public class CreateFullSaleHandler(
             request.ConfirmationCode, cancellationToken);
 
         var transaction = await CreateTransaction(
-            amount: saleContentList.GetTotalSum(), 
-            senderId: applicationSettings.Data.SystemId, 
-            receiverId: buyerId, 
-            currencyId: currencyId, 
-            transactionDateTime: dateTime, 
+            amount: saleContentList.GetTotalSum(),
+            senderId: applicationSettings.Data.SystemId,
+            receiverId: buyerId,
+            currencyId: currencyId,
+            transactionDateTime: dateTime,
             cancellationToken: cancellationToken);
 
-        var changedStorageContents = (await RemoveContentFromStorage(saleContentList, 
+        var changedStorageContents = (await RemoveContentFromStorage(saleContentList,
             storageName, sellFromOtherStorages, cancellationToken)).ToList();
 
         var sale = await CreateSale(changedStorageContents, saleContentList, currencyId, buyerId,
@@ -71,11 +71,11 @@ public class CreateFullSaleHandler(
 
         if (request.PayedSum > 0)
             await CreateTransaction(
-                amount: request.PayedSum.Value, 
-                senderId: buyerId, 
-                receiverId: applicationSettings.Data.SystemId, 
-                currencyId: currencyId, 
-                transactionDateTime: dateTime, 
+                amount: request.PayedSum.Value,
+                senderId: buyerId,
+                receiverId: applicationSettings.Data.SystemId,
+                currencyId: currencyId,
+                transactionDateTime: dateTime,
                 cancellationToken: cancellationToken);
 
         var saleCounts = sale.Contents
@@ -83,13 +83,13 @@ public class CreateFullSaleHandler(
             .ToDictionary(x => x.Key, x => x.Sum(z => z.Count));
 
         await SubtractCountFromReservations(buyerId, saleCounts, cancellationToken);
-        
+
         foreach (var productId in saleCounts.Keys)
             integrationEventScope.Add(new ProductUpdatedEvent
             {
                 Id = productId
             });*/
-        
+
         return Unit.Value;
     }
 
@@ -122,10 +122,10 @@ public class CreateFullSaleHandler(
                 .Track(false)
                 .Where(x => byReservation.Keys.Contains(x.Id))
                 .Build();
-            
+
             var products = (await productRepository.ListAsync(criteria, cancellationToken))
                 .ToDictionary(x => x.Id);
-            
+
             var res = new Dictionary<string, int>();
             var codeBuilder = new StringBuilder();
             foreach (var (id, count) in byReservation.OrderBy(x => x.Key))

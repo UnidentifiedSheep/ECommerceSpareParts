@@ -1,5 +1,4 @@
-﻿using Main.Entities;
-using Main.Entities.Purchase;
+﻿using Main.Entities.Purchase;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
@@ -10,20 +9,20 @@ public class PurchaseContentLogisticConfiguration : IEntityTypeConfiguration<Pur
     public void Configure(EntityTypeBuilder<PurchaseContentLogistic> builder)
     {
         builder.ToTable("purchase_content_logistics", "public");
-        
+
         builder.HasKey(e => e.PurchaseContentId)
             .HasName("purchase_content_logistics_pk");
 
         builder.Property(e => e.PurchaseContentId)
             .ValueGeneratedNever()
             .HasColumnName("purchase_content_id");
-        
+
         builder.Property(e => e.AreaM3)
             .HasColumnName("area_m3");
-        
+
         builder.Property(e => e.Price)
             .HasColumnName("price");
-        
+
         builder.Property(e => e.WeightKg)
             .HasColumnName("weight_kg");
 

@@ -1,5 +1,4 @@
-﻿using Main.Entities;
-using Main.Entities.Product;
+﻿using Main.Entities.Product;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
@@ -10,8 +9,8 @@ public class ProductImageConfiguration : IEntityTypeConfiguration<ProductImage>
     public void Configure(EntityTypeBuilder<ProductImage> builder)
     {
         builder.ToTable("product_images", "public");
-        
-        builder.HasKey(e => new { e.ProductId, e.Path})
+
+        builder.HasKey(e => new { e.ProductId, e.Path })
             .HasName("product_images_pk");
 
         builder.Property(e => e.ProductId)
@@ -20,11 +19,11 @@ public class ProductImageConfiguration : IEntityTypeConfiguration<ProductImage>
         builder.Property(e => e.Path)
             .HasColumnName("path")
             .HasMaxLength(255);
-        
+
         builder.Property(e => e.Description)
             .HasColumnName("description")
             .HasMaxLength(512);
-        
+
         builder.HasOne<Entities.Product.Product>()
             .WithMany(p => p.Images)
             .HasForeignKey(x => x.ProductId)

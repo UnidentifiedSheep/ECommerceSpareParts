@@ -26,7 +26,7 @@ public class GetProductCrossesHandler(
     {
         var pagination = request.Pagination;
         var requestedArticle = await GetRequestedArticle(request.ProductId, cancellationToken);
-        
+
         var crosses = await GetCrosses(request.ProductId, pagination, request.SortBy, cancellationToken);
 
         var requestedAdapted = requestedArticle.Adapt<ProductDto>();
@@ -45,15 +45,15 @@ public class GetProductCrossesHandler(
             .Include(x => x.Producer)
             .Where(x => x.Id == id)
             .Build();
-        
+
         var requestedArticle = await repository.FirstOrDefaultAsync(criteria, token)
                                ?? throw new ProductNotFoundException(id);
-        
+
         return requestedArticle;
     }
 
     private async Task<IReadOnlyList<Product>> GetCrosses(
-        int articleId, 
+        int articleId,
         Pagination pagination,
         string? sortBy,
         CancellationToken token)
@@ -65,7 +65,7 @@ public class GetProductCrossesHandler(
             .Size(pagination.Size)
             .WithSorting(sortBy)
             .Build();
-        
+
         return await repository.GetProductCrosses(articleId, criteria, token);
     }
 }

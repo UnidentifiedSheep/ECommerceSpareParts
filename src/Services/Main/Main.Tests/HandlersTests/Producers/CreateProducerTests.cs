@@ -17,7 +17,7 @@ public class CreateProducerTests(CombinedContainerFixture fixture) : Integration
     {
         var producer = CreateDto() with { Name = name };
         var command = new CreateProducerCommand(producer);
-        
+
         var act = () => Mediator.Send(command);
 
         await act.Should().ThrowAsync<ValidationException>();
@@ -28,9 +28,9 @@ public class CreateProducerTests(CombinedContainerFixture fixture) : Integration
     {
         var producer = CreateDto() with { Description = Faker.Lorem.Letter(600) };
         var command = new CreateProducerCommand(producer);
-        
+
         var act = () => Mediator.Send(command);
-        
+
         await act.Should().ThrowAsync<ValidationException>();
     }
 
@@ -39,23 +39,25 @@ public class CreateProducerTests(CombinedContainerFixture fixture) : Integration
     {
         var producer = CreateDto();
         var command = new CreateProducerCommand(producer);
-        
+
         var act = () => Mediator.Send(command);
 
         await act.Should().NotThrowAsync();
-        
+
         var createdProducer = await Context.Producers.AsNoTracking().FirstOrDefaultAsync();
-        
+
         createdProducer.Should().NotBeNull();
-        
+
         createdProducer.Name.Should().Be(producer.Name);
         createdProducer.Description.Should().Be(producer.Description);
     }
 
     private NewProducerDto CreateDto()
-        => new()
+    {
+        return new NewProducerDto
         {
             Name = Faker.Lorem.Word(),
             Description = Faker.Lorem.Sentence()
         };
+    }
 }

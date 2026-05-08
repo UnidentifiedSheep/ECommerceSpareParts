@@ -11,20 +11,25 @@ using Tests.DataBuilders;
 namespace Tests.TestContexts;
 
 public class CurrencyRatesTestContext(
-    DContext context, 
+    DContext context,
     IMediator mediator,
     CurrencyTestContext currencyTestContext,
     ISettingsService settingsService
-    ) : TestContextBase<DContext>(context, mediator), IDependentTestContext
+) : TestContextBase<DContext>(context, mediator), IDependentTestContext
 {
     public CurrencyTestContext CurrencyTestContext => currencyTestContext;
 
     public IReadOnlyCollection<CurrencyRate> Rates { get; private set; } = null!;
-    
+
+    public static Type[] DependsOn { get; } =
+    [
+        typeof(CurrencyTestContext)
+    ];
+
     public override async Task InitializeAsync(CancellationToken cancellationToken = default)
     {
         var currencySetting = await settingsService.GetOrDefault<CurrencySetting>(cancellationToken);
-        int baseCurrencyId = currencySetting.Data.BaseCurrencyId;
+        var baseCurrencyId = currencySetting.Data.BaseCurrencyId;
         var builders = CurrencyTestContext
             .Currencies
             .Where(x => x.Id != baseCurrencyId)
@@ -34,9 +39,4 @@ public class CurrencyRatesTestContext(
 
         Rates = await builders.BuildManyCombinedAndAddToDb(DbContext, 1);
     }
-
-    public static Type[] DependsOn { get; } =
-    [
-        typeof(CurrencyTestContext)
-    ];
 }

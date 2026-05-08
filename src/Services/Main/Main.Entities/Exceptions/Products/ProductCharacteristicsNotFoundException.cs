@@ -5,7 +5,7 @@ namespace Main.Entities.Exceptions.Products;
 
 public class ProductCharacteristicsNotFoundException : NotFoundException, ILocalizableException
 {
-    public ProductCharacteristicsNotFoundException(int id, string name) 
+    public ProductCharacteristicsNotFoundException(int id, string name)
         : base(null, new { Id = id, Name = name })
     {
     }

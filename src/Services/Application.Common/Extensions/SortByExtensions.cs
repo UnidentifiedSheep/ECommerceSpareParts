@@ -16,9 +16,9 @@ public static class SortByExtensions
             ? query.OrderByDescending(map)
             : query.OrderBy(map);
     }
-    
+
     public static CriteriaBuilder<TEntity> WithSorting<TEntity>(
-        this CriteriaBuilder<TEntity> builder, 
+        this CriteriaBuilder<TEntity> builder,
         string? sortParam) where TEntity : class
     {
         var sort = Parse(sortParam);
@@ -51,8 +51,10 @@ public static class SortByExtensions
         return new SortDefinition(field, IsDesc(dir));
     }
 
-    private static bool IsDesc(string? way) =>
-        string.Equals(way, "desc", StringComparison.OrdinalIgnoreCase);
+    private static bool IsDesc(string? way)
+    {
+        return string.Equals(way, "desc", StringComparison.OrdinalIgnoreCase);
+    }
 
     private sealed record SortDefinition(string Field, bool Desc);
 }

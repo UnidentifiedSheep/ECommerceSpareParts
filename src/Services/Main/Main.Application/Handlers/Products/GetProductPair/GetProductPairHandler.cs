@@ -22,7 +22,7 @@ public class GetProductPairHandler(IReadRepository<Product, int> context)
             .FirstOrDefaultAsync(x => x.Id == request.ProductId, cancellationToken);
 
         if (product?.Pair == null) return new GetProductPairResult(null);
-        
+
         var adapted = product.Pair.Adapt<ProductDto>();
         return new GetProductPairResult(adapted);
     }

@@ -1,6 +1,5 @@
 ﻿using System.Data;
 using Abstractions.Interfaces.Services;
-using Abstractions.Models.Repository;
 using Analytics.Abstractions.Dtos.PurchaseFact;
 using Analytics.Abstractions.Interfaces.DbRepositories;
 using Analytics.Entities;
@@ -25,7 +24,7 @@ public class UpsertPurchaseFactHandler(
     {
         var newFact = request.PurchaseFact;
         var dbFact = await factRepository.GetFact(
-            new QueryOptions<PurchasesFact, string>() { Data = newFact.Id }
+            new QueryOptions<PurchasesFact, string> { Data = newFact.Id }
                 .WithTracking()
                 .WithForUpdate(),
             cancellationToken);

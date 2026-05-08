@@ -7,7 +7,6 @@ using Attributes;
 using Contracts.Analytics;
 using Mapster;
 using MassTransit;
-
 using ContractMetricPayload = Contracts.Models.Metric.MetricPayloadDto;
 
 namespace Analytics.Application.Handlers.CalculationJob.CreateCalculationJob;
@@ -18,14 +17,17 @@ public record CreateCalculationJobCommand(
     string MetricSystemName,
     MetricPayloadDto MetricPayload,
     Guid CreatedBy) : ICommand<CreateCalculationJobResult>;
+
 public record CreateCalculationJobResult(MetricCalculationJob CalculationJob);
 
 public class CreateCalculationJobHandler(
     IUnitOfWork unitOfWork,
     IPublishEndpoint publishEndpoint
-    ) : ICommandHandler<CreateCalculationJobCommand, CreateCalculationJobResult>
+) : ICommandHandler<CreateCalculationJobCommand, CreateCalculationJobResult>
 {
-    public async Task<CreateCalculationJobResult> Handle(CreateCalculationJobCommand request, CancellationToken cancellationToken)
+    public async Task<CreateCalculationJobResult> Handle(
+        CreateCalculationJobCommand request,
+        CancellationToken cancellationToken)
     {
         var model = new MetricCalculationJob
         {
@@ -33,7 +35,7 @@ public class CreateCalculationJobHandler(
             CreateAt = DateTime.UtcNow,
             UpdateAt = DateTime.UtcNow,
             Status = CalculationStatus.AwaitingWorker,
-            MetricSystemName = request.MetricSystemName,
+            MetricSystemName = request.MetricSystemName
         };
 
         await publishEndpoint.Publish(new MetricCalculationRequestedEvent
@@ -41,11 +43,11 @@ public class CreateCalculationJobHandler(
             RequestId = model.RequestId,
             CreatedBy = request.CreatedBy,
             MetricSystemName = model.MetricSystemName,
-            MetricPayload = request.MetricPayload.Adapt<ContractMetricPayload>(),
+            MetricPayload = request.MetricPayload.Adapt<ContractMetricPayload>()
         }, cancellationToken);
-        
+
         await unitOfWork.AddAsync(model, cancellationToken);
-        
+
         return new CreateCalculationJobResult(model);
     }
 }

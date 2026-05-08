@@ -10,11 +10,11 @@ public class ScopedLocalizationMiddleware(
     HashSet<Locale> locales,
     IScopedStringLocalizer localizer) : IMiddleware
 {
+    private const int MaxCacheSize = 2000;
     private static readonly ConcurrentDictionary<string, Locale> Cache = new();
     private static readonly Lock LockObj = new();
-    
+
     private static int _cacheSize;
-    private const int MaxCacheSize = 2000;
 
     public async Task InvokeAsync(HttpContext context, RequestDelegate next)
     {
@@ -22,12 +22,12 @@ public class ScopedLocalizationMiddleware(
 
         if (context.Request.Headers.TryGetValue("Accept-Language", out var header))
             locale = ResolveLocale(header.ToString());
-        
+
         localizer.SetLocale(locale);
 
         await next(context);
     }
-    
+
     private Locale ResolveLocale(string header)
     {
         if (Cache.TryGetValue(header, out var cached))
@@ -54,7 +54,6 @@ public class ScopedLocalizationMiddleware(
     private static void AddToCache(string key, Locale value)
     {
         if (Interlocked.Increment(ref _cacheSize) > MaxCacheSize)
-        {
             lock (LockObj)
             {
                 if (_cacheSize > MaxCacheSize)
@@ -63,7 +62,6 @@ public class ScopedLocalizationMiddleware(
                     _cacheSize = 0;
                 }
             }
-        }
 
         Cache[key] = value;
     }

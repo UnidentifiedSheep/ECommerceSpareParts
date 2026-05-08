@@ -26,7 +26,7 @@ public class GetUserStoragesHandler(IReadRepository<StorageOwner, (string, Guid)
             .Select(StorageProjections.StorageProjection)
             .ApplyPagination(request.Pagination)
             .ToListAsync(cancellationToken);
-        
+
         return new GetUserStoragesResult(storages);
     }
 }

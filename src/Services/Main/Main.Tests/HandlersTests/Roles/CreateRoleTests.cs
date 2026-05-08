@@ -42,7 +42,7 @@ public class CreateRoleTests(CombinedContainerFixture fixture) : IntegrationTest
             .FirstOrDefaultAsync(x => x.Name == r.Name);
 
         Assert.NotNull(roleInDb);
-        
+
         Assert.Equal(r.Name, roleInDb.Name);
         Assert.Equal(r.Description, roleInDb.Description);
     }

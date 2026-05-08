@@ -1,10 +1,8 @@
-using Abstractions.Models;
 using Api.Common.Extensions;
 using Api.Common.Models.Requests;
 using Carter;
 using Main.Application.Dtos.Auth;
 using Main.Application.Handlers.Auth.GetRoles;
-using Mapster;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
 

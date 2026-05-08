@@ -2,9 +2,8 @@
 
 public interface IStorageContentExtractor
 {
-    
     /// <summary>
-    /// Extracts needed counts from storage count by product id
+    ///     Extracts needed counts from storage count by product id
     /// </summary>
     /// <param name="storageName"></param>
     /// <param name="productCounts"></param>

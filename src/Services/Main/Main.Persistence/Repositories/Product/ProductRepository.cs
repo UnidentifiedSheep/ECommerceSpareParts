@@ -29,8 +29,8 @@ public class ProductRepository(DContext context) : RepositoryBase<DContext, Prod
     }
 
     public override Task<Dictionary<int, Product>> FindByIdsAsync(
-        IEnumerable<int> ids, 
-        Criteria<Product>? criteria = null, 
+        IEnumerable<int> ids,
+        Criteria<Product>? criteria = null,
         CancellationToken ct = default)
     {
         return Context.Products

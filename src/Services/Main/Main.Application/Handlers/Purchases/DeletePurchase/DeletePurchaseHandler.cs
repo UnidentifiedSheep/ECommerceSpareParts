@@ -1,9 +1,6 @@
 using Abstractions.Interfaces.Services;
 using Application.Common.Interfaces;
 using Attributes;
-using Main.Entities;
-using Main.Entities.Exceptions.Purchase;
-using Main.Entities.Purchase;
 using MediatR;
 
 namespace Main.Application.Handlers.Purchases.DeletePurchase;

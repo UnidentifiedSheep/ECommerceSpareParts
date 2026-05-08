@@ -1,4 +1,3 @@
-using Abstractions.Interfaces.Services;
 using Application.Common.Interfaces;
 using Application.Common.Interfaces.Repositories;
 using Attributes;
@@ -20,18 +19,18 @@ public class ChangeUserDiscountHandler(
 {
     public async Task<Unit> Handle(ChangeUserDiscountCommand request, CancellationToken cancellationToken)
     {
-        Guid userId = request.UserId;
+        var userId = request.UserId;
         var criteria = Criteria<User>.New()
             .Track()
             .Where(x => x.Id == userId)
             .Include(x => x.Discount)
             .Build();
-        
-        User user = await usersRepository.FirstOrDefaultAsync(criteria, cancellationToken)
-                    ?? throw new UserNotFoundException(userId);
-        
+
+        var user = await usersRepository.FirstOrDefaultAsync(criteria, cancellationToken)
+                   ?? throw new UserNotFoundException(userId);
+
         user.SetDiscount(request.Discount);
-        
+
         integrationEventScope.Add(new UserDiscountUpdatedEvent
         {
             UserId = userId,

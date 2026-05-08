@@ -15,10 +15,10 @@ public class ProductWeightTests
     {
         var act = () => ProductWeight.Create(1, weight, unit);
         var model = act.Should().NotThrow().Subject;
-        
+
         ValidateModel(model, 1, weight, unit);
     }
-    
+
     [Theory]
     [InlineData(-1)]
     [InlineData(-1000.2222)]
@@ -39,9 +39,9 @@ public class ProductWeightTests
         var model = ProductWeight.Create(1, 1, WeightUnit.Kilogram);
 
         var act = () => model.Update(weight, unit);
-        
+
         act.Should().NotThrow();
-        
+
         ValidateModel(model, 1, weight, unit);
     }
 
@@ -53,17 +53,17 @@ public class ProductWeightTests
     public void UpdateWeight_InvalidWeight_Throws(decimal weight)
     {
         var model = ProductWeight.Create(1, 1, WeightUnit.Kilogram);
-        
+
         var act = () => model.Update(weight, WeightUnit.Kilogram);
         act.Should().Throw<InvalidInputException>();
-        
+
         ValidateModel(model, 1, 1, WeightUnit.Kilogram);
     }
-    
+
     private static void ValidateModel(
-        ProductWeight model, 
-        int productId, 
-        decimal weight, 
+        ProductWeight model,
+        int productId,
+        decimal weight,
         WeightUnit unit)
     {
         model.Should().NotBeNull();

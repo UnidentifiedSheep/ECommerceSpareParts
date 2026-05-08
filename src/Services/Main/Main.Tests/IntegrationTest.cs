@@ -16,10 +16,9 @@ namespace Tests;
 [Collection("Combined collection")]
 public abstract class IntegrationTest(CombinedContainerFixture fixture) : TestBase
 {
+    private IServiceScope _scope = null!;
     private IServiceProvider _sp = null!;
     protected override IServiceProvider Sp => _sp;
-
-    private IServiceScope _scope = null!;
     protected override IServiceScope Scope => _scope;
 
     protected DContext Context { get; private set; } = null!;
@@ -30,12 +29,12 @@ public abstract class IntegrationTest(CombinedContainerFixture fixture) : TestBa
         _sp = new ServiceProviderForTests().Build(
             fixture.PostgresConnectionString,
             fixture.RedisConnectionString);
-        
+
         _scope = Sp.CreateScope();
-        
+
         Context = Scope.ServiceProvider.GetRequiredService<DContext>();
         Mediator = Scope.ServiceProvider.GetRequiredService<IMediator>();
-        
+
         await SeedDb();
         await LoadLocales();
         await InitializeBasicContexts();
@@ -58,12 +57,15 @@ public abstract class IntegrationTest(CombinedContainerFixture fixture) : TestBa
         var localesPath = Assembly.GetExecutingAssembly().GetDefaultLocalizationPath();
         await Sp.LoadLocalesFromJson(localesPath);
     }
-    
+
     private async Task SeedDb()
     {
         using var scope = Sp.CreateScope();
         await scope.SeedAsync<DContext>();
     }
-    
-    protected Task ResetDb() => Context.ClearDatabase();
+
+    protected Task ResetDb()
+    {
+        return Context.ClearDatabase();
+    }
 }

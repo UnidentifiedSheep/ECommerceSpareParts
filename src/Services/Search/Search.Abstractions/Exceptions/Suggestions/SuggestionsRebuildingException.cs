@@ -3,7 +3,7 @@ using Exceptions.Base;
 
 namespace Search.Abstractions.Exceptions.Suggestions;
 
-public class SuggestionsRebuildingException() 
+public class SuggestionsRebuildingException()
     : ConflictException(null), ILocalizableException
 {
     public string MessageKey => "suggestion.already.rebuilding";

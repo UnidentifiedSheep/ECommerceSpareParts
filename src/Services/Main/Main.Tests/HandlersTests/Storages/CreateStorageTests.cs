@@ -14,7 +14,7 @@ public class CreateStorageTests(CombinedContainerFixture fixture) : IntegrationT
     [Fact]
     public async Task CreateStorage_TooLargeName_FailsValidation()
     {
-        var command = GetCommand() with{ Name = Faker.Lorem.Letter(500) };
+        var command = GetCommand() with { Name = Faker.Lorem.Letter(500) };
         await Assert.ThrowsAsync<ValidationException>(async () => await Mediator.Send(command));
     }
 
@@ -37,12 +37,12 @@ public class CreateStorageTests(CombinedContainerFixture fixture) : IntegrationT
     {
         var storageModel = await new StorageBuilder(Faker)
             .BuildAndAddToDb(Context);
-        
+
         var command = new CreateStorageCommand(
-                storageModel.Name, 
-                storageModel.Description, 
-                storageModel.Location, 
-                storageModel.Type);
+            storageModel.Name,
+            storageModel.Description,
+            storageModel.Location,
+            storageModel.Type);
         var exception = await Assert.ThrowsAsync<DbValidationException>(async () => await Mediator.Send(command));
         Assert.Equal(ApplicationErrors.StoragesNameAlreadyTaken, exception.Failures[0].ErrorName);
     }
@@ -65,9 +65,9 @@ public class CreateStorageTests(CombinedContainerFixture fixture) : IntegrationT
     {
         var storageModel = new StorageBuilder(Faker).Build();
         return new CreateStorageCommand(
-            storageModel.Name, 
-            storageModel.Description, 
-            storageModel.Location, 
+            storageModel.Name,
+            storageModel.Description,
+            storageModel.Location,
             storageModel.Type);
     }
 }

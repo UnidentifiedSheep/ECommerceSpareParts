@@ -8,7 +8,7 @@ namespace Main.Tests.Domain.Balance;
 
 public class TransactionTests
 {
-     [Fact]
+    [Fact]
     public void Create_ValidData_Succeeds()
     {
         var tx = Create();
@@ -135,7 +135,7 @@ public class TransactionTests
 
         act.Should().Throw<InvalidOperationException>();
     }
-    
+
     [Fact]
     public void Apply_WithoutCompletionOrReverse_Throws()
     {
@@ -149,7 +149,7 @@ public class TransactionTests
         act.Should().Throw<InvalidOperationException>()
             .WithMessage("Nothing to apply");
     }
-    
+
     [Fact]
     public void Apply_ReversalAppliedTwice_Throws()
     {
@@ -171,7 +171,7 @@ public class TransactionTests
         act.Should().Throw<InvalidOperationException>()
             .WithMessage("Reversed already applied.");
     }
-    
+
     [Fact]
     public void Apply_CompletedTwice_Throws()
     {
@@ -190,7 +190,7 @@ public class TransactionTests
         act.Should().Throw<InvalidOperationException>()
             .WithMessage("Completion already applied.");
     }
-    
+
     [Fact]
     public void Reverse_Twice_Throws()
     {
@@ -210,7 +210,7 @@ public class TransactionTests
 
         act.Should().Throw<InvalidOperationException>();
     }
-    
+
     [Fact]
     public void Apply_SenderMismatch_Throws()
     {
@@ -225,7 +225,7 @@ public class TransactionTests
 
         act.Should().Throw<InvalidOperationException>();
     }
-    
+
     [Fact]
     public void Apply_ReceiverMismatch_Throws()
     {

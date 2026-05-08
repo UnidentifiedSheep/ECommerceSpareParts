@@ -15,16 +15,16 @@ public record EditProductReservationCommand(int ReservationId, EditProductReserv
 
 public class EditProductReservationHandler(
     IRepository<StorageContentReservation, int> repository
-    ) : ICommandHandler<EditProductReservationCommand>
+) : ICommandHandler<EditProductReservationCommand>
 {
     public async Task<Unit> Handle(EditProductReservationCommand request, CancellationToken cancellationToken)
     {
         var reservation = await repository.GetById(request.ReservationId, cancellationToken)
-            ?? throw new ReservationNotFoundException(request.ReservationId);
-        
+                          ?? throw new ReservationNotFoundException(request.ReservationId);
+
         reservation.SetComment(request.NewValue.Comment);
         reservation.ProposePrice(request.NewValue.GivenPrice, request.NewValue.GivenCurrencyId);
-        
+
         return Unit.Value;
     }
 }

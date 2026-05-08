@@ -1,5 +1,4 @@
-﻿using Main.Entities;
-using Main.Entities.Purchase;
+﻿using Main.Entities.Purchase;
 using Main.Entities.Storage;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
@@ -11,7 +10,7 @@ public class PurchaseContentConfiguration : IEntityTypeConfiguration<PurchaseCon
     public void Configure(EntityTypeBuilder<PurchaseContent> builder)
     {
         builder.ToTable("purchase_content", "public");
-        
+
         builder.HasKey(e => e.Id).HasName("purchase_content_pk");
 
         builder.HasIndex(e => e.ProductId, "purchase_content_product_id_index");
@@ -27,26 +26,26 @@ public class PurchaseContentConfiguration : IEntityTypeConfiguration<PurchaseCon
 
         builder.Property(e => e.Id)
             .HasColumnName("id");
-        
+
         builder.Property(e => e.ProductId)
             .HasColumnName("product_id");
-        
+
         builder.Property(e => e.Comment)
             .HasMaxLength(256)
             .HasColumnName("comment");
-        
+
         builder.Property(e => e.Count)
             .HasColumnName("count");
-        
+
         builder.Property(e => e.Price)
             .HasColumnName("price");
-        
+
         builder.Property(e => e.PurchaseId)
             .HasColumnName("purchase_id");
-        
+
         builder.Property(e => e.StorageContentId)
             .HasColumnName("storage_content_id");
-        
+
         builder.Property(e => e.TotalSum)
             .HasColumnName("total_sum");
 

@@ -5,7 +5,6 @@ using Main.Application.Dtos.Currencies;
 using Main.Application.Handlers.Projections;
 using Main.Entities.Currency;
 using Main.Entities.Exceptions.Currencies;
-using Mapster;
 using Microsoft.EntityFrameworkCore;
 
 namespace Main.Application.Handlers.Currencies.GetCurrencyById;
@@ -23,9 +22,9 @@ public class GetCurrencyByIdHandler(
         var currency = await repository.Query
                            .AsExpandable()
                            .Select(CurrencyProjections.ToDto)
-                           .FirstOrDefaultAsync(cancellationToken) 
+                           .FirstOrDefaultAsync(cancellationToken)
                        ?? throw new CurrencyNotFoundException(request.Id);
-        
+
         return new GetCurrencyByIdResult(currency);
     }
 }

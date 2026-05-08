@@ -22,7 +22,7 @@ public class CurrencyRateUpdater(
     public async Task<UpdateRatesResult> UpdateAsync(CurrencySetting setting, CancellationToken ct)
     {
         var baseCurrency = await currencyRepository.GetById(setting.Data.BaseCurrencyId, ct)
-            ?? throw new CurrencyNotFoundException(setting.Data.BaseCurrencyId);
+                           ?? throw new CurrencyNotFoundException(setting.Data.BaseCurrencyId);
 
         var client = clientFactory.GetClient(setting.Data.RateProvider);
 
@@ -35,12 +35,12 @@ public class CurrencyRateUpdater(
         var currencies = await currencyRepository.ListAsync(ct: ct);
 
         var dbRates = (await rateRepository
-            .GetByBaseCurrency(baseCurrency.Id, null, ct))
+                .GetByBaseCurrency(baseCurrency.Id, null, ct))
             .ToDictionary(x => x.GetId());
 
         return ApplyDiff(currencies, baseCurrency, normalized, dbRates, ct);
     }
-    
+
     private UpdateRatesResult ApplyDiff(
         List<Entities.Currency.Currency> currencies,
         Entities.Currency.Currency baseCurrency,

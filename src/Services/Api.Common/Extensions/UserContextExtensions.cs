@@ -1,5 +1,4 @@
 ﻿using Abstractions.Interfaces;
-using Extensions;
 
 namespace Api.Common.Extensions;
 

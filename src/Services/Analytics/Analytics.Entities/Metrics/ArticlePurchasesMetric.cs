@@ -13,5 +13,4 @@ public class ArticlePurchasesMetric : ArticleMetric<ArticleInfoModel>
     }
 
     public override DependsOn DependsOn { get; protected set; } = DependsOn.Purchase | DependsOn.Period;
-    
 }

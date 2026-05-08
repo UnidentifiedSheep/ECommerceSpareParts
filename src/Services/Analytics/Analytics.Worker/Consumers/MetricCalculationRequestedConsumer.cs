@@ -12,7 +12,7 @@ public class MetricCalculationRequestedConsumer(ISender sender) : IConsumer<Metr
     public async Task Consume(ConsumeContext<MetricCalculationRequestedEvent> context)
     {
         var @event = context.Message;
-        
+
         await sender.Send(new CalculateFullMetricCommand(
             @event.RequestId,
             @event.MetricSystemName,

@@ -127,7 +127,7 @@ public class StorageRouteBuilder(Faker faker) : BuilderBase<StorageRoute>(faker)
         );
 
         if (!IsActive.HasValue) return route;
-        
+
         if (IsActive.Value)
             route.Activate();
         else

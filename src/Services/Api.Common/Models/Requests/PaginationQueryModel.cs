@@ -11,6 +11,8 @@ public record PaginationQueryModel
     [FromQuery(Name = "size")]
     public int Size { get; init; } = 20;
 
-    public static implicit operator Pagination(PaginationQueryModel queryModel) 
-        => new(queryModel.Page, queryModel.Size);
+    public static implicit operator Pagination(PaginationQueryModel queryModel)
+    {
+        return new Pagination(queryModel.Page, queryModel.Size);
+    }
 }

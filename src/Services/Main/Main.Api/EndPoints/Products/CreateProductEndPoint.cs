@@ -2,7 +2,6 @@
 using Carter;
 using Main.Application.Dtos.Product;
 using Main.Application.Handlers.Products.CreateProducts;
-using Mapster;
 using MediatR;
 
 namespace Main.Api.EndPoints.Articles;

@@ -1,7 +1,6 @@
 ﻿using Contracts.Articles;
 using MassTransit;
 using Search.Abstractions.Interfaces.Persistence;
-using Search.Application.Configs;
 
 namespace Search.Application.Consumers;
 

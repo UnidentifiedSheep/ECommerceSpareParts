@@ -4,15 +4,15 @@ namespace Application.Common.Interfaces.Repositories;
 
 public sealed class CriteriaBuilder<T> where T : class
 {
-    private Expression<Func<T, bool>>? _where;
     private readonly List<Expression<Func<T, object?>>> _includes = new();
+    private bool _forUpdate;
     private Func<IQueryable<T>, IOrderedQueryable<T>>? _orderBy;
-    
+
     private int? _page;
     private int? _size;
 
     private bool _track;
-    private bool _forUpdate;
+    private Expression<Func<T, bool>>? _where;
 
     public CriteriaBuilder<T> Where(Expression<Func<T, bool>> predicate)
     {
@@ -61,15 +61,18 @@ public sealed class CriteriaBuilder<T> where T : class
         _forUpdate = forUpdate;
         return this;
     }
-    
-    public Criteria<T> Build() => new()
+
+    public Criteria<T> Build()
     {
-        Where = _where,
-        OrderBy = _orderBy,
-        Page = _page,
-        Size = _size,
-        Includes = _includes.ToList(),
-        Track = _track,
-        ForUpdate = _forUpdate
-    };
+        return new Criteria<T>
+        {
+            Where = _where,
+            OrderBy = _orderBy,
+            Page = _page,
+            Size = _size,
+            Includes = _includes.ToList(),
+            Track = _track,
+            ForUpdate = _forUpdate
+        };
+    }
 }

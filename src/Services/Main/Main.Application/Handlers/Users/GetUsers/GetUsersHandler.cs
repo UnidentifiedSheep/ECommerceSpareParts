@@ -50,7 +50,7 @@ public class GetUsersHandler(IReadRepository<User, Guid> readRepository) : IQuer
     }
 
     private async Task<IReadOnlyList<UserDto>> SimilaritySearch(
-        GetUsersQuery request, 
+        GetUsersQuery request,
         CancellationToken cancellationToken)
     {
         var simLevel = (request.SimilarityLevel >= 1 ? 0.999 : request.SimilarityLevel) ?? 0.4;
@@ -58,7 +58,7 @@ public class GetUsersHandler(IReadRepository<User, Guid> readRepository) : IQuer
             .Where(x => x.UserInfo != null)
             .ExcludeUsersWithRole(Role.System)
             .IncludeUsersWithRoles(request.Roles ?? []);
-        
+
         var isNameIncluded = false;
         var isSurnameIncluded = false;
         var isEmailIncluded = false;
@@ -77,7 +77,7 @@ public class GetUsersHandler(IReadRepository<User, Guid> readRepository) : IQuer
         {
             currName = request.Name.Trim().ToUpperInvariant();
             query = query.Where(u => EF.Functions.TrigramsSimilarity(u.UserInfo!.Name.ToUpper(),
-                                         currName) > simLevel);
+                currName) > simLevel);
             isNameIncluded = true;
         }
 
@@ -85,7 +85,7 @@ public class GetUsersHandler(IReadRepository<User, Guid> readRepository) : IQuer
         {
             currSurname = request.Surname.Trim().ToUpperInvariant();
             query = query.Where(u => EF.Functions.TrigramsSimilarity(u.UserInfo!.Surname.ToUpper(),
-                                         currSurname) > simLevel);
+                currSurname) > simLevel);
             isSurnameIncluded = true;
         }
 
@@ -169,7 +169,7 @@ public class GetUsersHandler(IReadRepository<User, Guid> readRepository) : IQuer
     {
         if (string.IsNullOrWhiteSpace(request.SearchColumn))
             throw new InvalidInputException("user.search.strategy.not.valid.input");
-        
+
         var trimmed = request.SearchColumn.Trim();
         return await readRepository.Query
             .Where(x => x.UserInfo != null)

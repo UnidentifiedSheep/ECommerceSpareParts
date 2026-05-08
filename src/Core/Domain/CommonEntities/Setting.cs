@@ -5,26 +5,28 @@ namespace Domain.CommonEntities;
 
 public class Setting : AuditableEntity<Setting, string>
 {
-    public string Key { get; protected set; } = null!;
-
-    public string Json { get; protected set; } = null!;
-
-    private Setting() {}
+    private Setting()
+    {
+    }
 
     protected Setting(string json)
     {
         Json = json;
     }
 
-    public override string GetId() => Key;
+    public string Key { get; protected set; } = null!;
+
+    public string Json { get; protected set; } = null!;
+
+    public override string GetId()
+    {
+        return Key;
+    }
 }
 
 public abstract class Setting<T> : Setting
 {
     private T? _data;
-    
-    [NotMapped]
-    public T Data => _data ??= Deserialize(Json);
 
     protected Setting(string key, string json) : base(json)
     {
@@ -37,6 +39,9 @@ public abstract class Setting<T> : Setting
         _data = data;
     }
 
+    [NotMapped]
+    public T Data => _data ??= Deserialize(Json);
+
     public void SetData(T data)
     {
         Json = Serialize(data);
@@ -44,8 +49,12 @@ public abstract class Setting<T> : Setting
     }
 
     private static string Serialize(T data)
-        => JsonSerializer.Serialize(data);
+    {
+        return JsonSerializer.Serialize(data);
+    }
 
     private static T Deserialize(string json)
-        => JsonSerializer.Deserialize<T>(json)!;
+    {
+        return JsonSerializer.Deserialize<T>(json)!;
+    }
 }

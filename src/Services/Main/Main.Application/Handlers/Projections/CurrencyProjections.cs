@@ -13,6 +13,6 @@ public static class CurrencyProjections
             Name = x.Name,
             ShortName = x.ShortName,
             CurrencySign = x.CurrencySign,
-            Code = x.Code,
+            Code = x.Code
         };
 }

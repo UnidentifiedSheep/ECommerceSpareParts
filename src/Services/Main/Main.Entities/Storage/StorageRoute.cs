@@ -7,6 +7,35 @@ namespace Main.Entities.Storage;
 
 public class StorageRoute : AuditableEntity<StorageRoute, Guid>
 {
+    private StorageRoute()
+    {
+    }
+
+    private StorageRoute(
+        string from,
+        string to,
+        int distanceM,
+        RouteType routeType,
+        LogisticPricingType pricingModel,
+        int deliveryTimeMinutes,
+        decimal priceKg,
+        decimal pricePerM3,
+        decimal pricePerOrder,
+        decimal minimumPrice,
+        int currencyId,
+        Guid? carrierId)
+    {
+        SetRoute(from, to);
+        SetDistanceM(distanceM);
+        SetPrices(priceKg, pricePerM3, pricePerOrder);
+        SetDeliveryTime(deliveryTimeMinutes);
+        SetMinimumPrice(minimumPrice);
+        SetCurrencyId(currencyId);
+        SetCarrierId(carrierId);
+        SetRouteType(routeType);
+        SetPricingModel(pricingModel);
+    }
+
     [Validate]
     public Guid Id { get; private set; }
 
@@ -40,33 +69,6 @@ public class StorageRoute : AuditableEntity<StorageRoute, Guid>
     public Guid? CarrierId { get; private set; }
 
     public Currency.Currency Currency { get; private set; } = null!;
-    
-    private StorageRoute() {}
-
-    private StorageRoute(
-        string from, 
-        string to, 
-        int distanceM, 
-        RouteType routeType, 
-        LogisticPricingType pricingModel,
-        int deliveryTimeMinutes,
-        decimal priceKg,
-        decimal pricePerM3,
-        decimal pricePerOrder,
-        decimal minimumPrice,
-        int currencyId,
-        Guid? carrierId)
-    {
-        SetRoute(from, to);
-        SetDistanceM(distanceM);
-        SetPrices(priceKg, pricePerM3, pricePerOrder);
-        SetDeliveryTime(deliveryTimeMinutes);
-        SetMinimumPrice(minimumPrice);
-        SetCurrencyId(currencyId);
-        SetCarrierId(carrierId);
-        SetRouteType(routeType);
-        SetPricingModel(pricingModel);
-    }
 
     public static StorageRoute Create(
         string from,
@@ -83,17 +85,17 @@ public class StorageRoute : AuditableEntity<StorageRoute, Guid>
         Guid? carrierId)
     {
         return new StorageRoute(
-            from, 
-            to, 
-            distanceM, 
-            routeType, 
-            pricingModel, 
-            deliveryTimeMinutes, 
-            priceKg, 
+            from,
+            to,
+            distanceM,
+            routeType,
+            pricingModel,
+            deliveryTimeMinutes,
+            priceKg,
             pricePerM3,
-            pricePerOrder, 
-            minimumPrice, 
-            currencyId, 
+            pricePerOrder,
+            minimumPrice,
+            currencyId,
             carrierId);
     }
 
@@ -150,7 +152,7 @@ public class StorageRoute : AuditableEntity<StorageRoute, Guid>
     {
         CurrencyId = currencyId;
     }
-    
+
     public void SetCarrierId(Guid? carrierId)
     {
         CarrierId = carrierId;
@@ -175,6 +177,9 @@ public class StorageRoute : AuditableEntity<StorageRoute, Guid>
     {
         IsActive = false;
     }
-    
-    public override Guid GetId() => Id;
+
+    public override Guid GetId()
+    {
+        return Id;
+    }
 }

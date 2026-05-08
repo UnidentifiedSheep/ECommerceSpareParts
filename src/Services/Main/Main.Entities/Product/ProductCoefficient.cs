@@ -9,8 +9,11 @@ public class ProductCoefficient : AuditableEntity<ProductCoefficient, (int, stri
     public string CoefficientName { get; set; } = null!;
 
     public DateTime ValidTill { get; set; }
-    
+
     public virtual Coefficient Coefficient { get; set; } = null!;
-    
-    public override (int, string) GetId() => (ProductId, CoefficientName);
+
+    public override (int, string) GetId()
+    {
+        return (ProductId, CoefficientName);
+    }
 }

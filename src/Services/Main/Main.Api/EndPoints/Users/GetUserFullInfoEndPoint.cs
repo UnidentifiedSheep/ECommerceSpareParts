@@ -21,8 +21,8 @@ public class GetUserFullInfoEndPoint : ICarterModule
             {
                 var result = await sender.Send(new GetUserFullInfoQuery(id), token);
                 return Results.Ok(new GetUserFullInfoResponse(
-                    result.User, 
-                    result.Emails, 
+                    result.User,
+                    result.Emails,
                     result.Roles,
                     result.Permissions));
             }).WithTags("Users")

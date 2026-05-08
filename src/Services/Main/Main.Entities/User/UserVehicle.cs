@@ -23,5 +23,9 @@ public class UserVehicle : AuditableEntity<UserVehicle, Guid>
     public int? ProductionYear { get; set; }
 
     public string? Comment { get; set; }
-    public override Guid GetId() => Id;
+
+    public override Guid GetId()
+    {
+        return Id;
+    }
 }

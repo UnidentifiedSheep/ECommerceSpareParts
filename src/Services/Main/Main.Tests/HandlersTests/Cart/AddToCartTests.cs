@@ -13,8 +13,9 @@ namespace Tests.HandlersTests.Cart;
 
 public class AddToCartTests : IntegrationTest
 {
-    private UsersTestContext _usersContext = null!;
     private ProductTestContext _productContext = null!;
+    private UsersTestContext _usersContext = null!;
+
     public AddToCartTests(CombinedContainerFixture fixture) : base(fixture)
     {
         RegisterBasicContext<UsersTestContext>();
@@ -37,7 +38,7 @@ public class AddToCartTests : IntegrationTest
         var act = () => Mediator.Send(new AddToCartCommand(user.Id, product.Id, count));
 
         await act.Should().NotThrowAsync();
-        
+
         var cartItem = await Context.Carts
             .AsNoTracking()
             .FirstOrDefaultAsync(x => x.UserId == user.Id && x.ProductId == product.Id);

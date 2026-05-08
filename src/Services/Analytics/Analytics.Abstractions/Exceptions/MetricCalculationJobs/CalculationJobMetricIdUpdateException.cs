@@ -3,7 +3,7 @@ using Exceptions.Base;
 
 namespace Analytics.Abstractions.Exceptions.MetricCalculationJobs;
 
-public class CalculationJobMetricIdUpdateException() 
+public class CalculationJobMetricIdUpdateException()
     : BadRequestException(null), ILocalizableException
 {
     public string MessageKey => "metric.calculation.job.metric.id.set.once";

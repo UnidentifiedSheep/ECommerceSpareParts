@@ -19,3 +19,4 @@ public class EditFullSaleValidation : AbstractValidator<EditFullSaleCommand>
             .SetValidator(new EditSaleContentsValidator());
     }
 }*/
+

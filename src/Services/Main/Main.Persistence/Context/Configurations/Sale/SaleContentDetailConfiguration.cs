@@ -1,5 +1,4 @@
-﻿using Main.Entities;
-using Main.Entities.Sale;
+﻿using Main.Entities.Sale;
 using Main.Entities.Storage;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
@@ -11,7 +10,7 @@ public class SaleContentDetailConfiguration : IEntityTypeConfiguration<SaleConte
     public void Configure(EntityTypeBuilder<SaleContentDetail> builder)
     {
         builder.ToTable("sale_content_details", "public");
-        
+
         builder.HasKey(e => e.Id).HasName("sale_content_details_pk");
 
         builder.HasIndex(e => e.CurrencyId, "sale_content_details_currency_id_index");
@@ -31,7 +30,7 @@ public class SaleContentDetailConfiguration : IEntityTypeConfiguration<SaleConte
         builder.Property(e => e.Storage)
             .HasMaxLength(128)
             .HasColumnName("storage");
-        
+
         builder.Property(e => e.StorageContentId).HasColumnName("storage_content_id");
 
         builder.HasOne<Entities.Currency.Currency>()

@@ -1,5 +1,4 @@
-﻿using Main.Entities;
-using Main.Entities.Auth;
+﻿using Main.Entities.Auth;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
@@ -25,7 +24,7 @@ public class RolePermissionConfiguration : IEntityTypeConfiguration<RolePermissi
             .HasForeignKey(x => x.PermissionName)
             .OnDelete(DeleteBehavior.Restrict)
             .HasConstraintName("role_permissions_permissions_name_fk");
-        
+
         builder.HasOne(x => x.Role)
             .WithMany(x => x.RolePermissions)
             .HasForeignKey(x => x.RoleName)

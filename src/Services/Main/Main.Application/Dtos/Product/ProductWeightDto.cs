@@ -7,10 +7,10 @@ public record ProductWeightDto
 {
     [JsonPropertyName("productId")]
     public required int ProductId { get; init; }
-    
+
     [JsonPropertyName("weight")]
     public required decimal Weight { get; init; }
-    
+
     [JsonPropertyName("unit")]
     [JsonConverter(typeof(JsonStringEnumConverter<WeightUnit>))]
     public required WeightUnit Unit { get; init; }

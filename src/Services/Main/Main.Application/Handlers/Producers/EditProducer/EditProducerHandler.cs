@@ -1,11 +1,8 @@
-using Abstractions.Interfaces.Services;
 using Application.Common.Interfaces;
-using Application.Common.Interfaces.Repositories;
 using Attributes;
 using Main.Application.Dtos.Producer;
 using Main.Application.Interfaces.Persistence;
 using Main.Entities.Exceptions.Producers;
-using Main.Entities.Producer;
 using MediatR;
 
 namespace Main.Application.Handlers.Producers.EditProducer;
@@ -20,15 +17,15 @@ public class EditProducerHandler(IProducerRepository repository) : ICommandHandl
     {
         var producer = await repository.GetById(request.ProducerId, cancellationToken)
                        ?? throw new ProducerNotFoundException(request.ProducerId);
-        
-        PatchProducerDto patch = request.Producer;
 
-        if (patch.Name.IsSet && patch.Name.Value != null) 
+        var patch = request.Producer;
+
+        if (patch.Name.IsSet && patch.Name.Value != null)
             producer.SetName(patch.Name.Value);
 
         if (patch.Description.IsSet)
             producer.SetDescription(patch.Description.Value);
-        
+
         return Unit.Value;
     }
 }

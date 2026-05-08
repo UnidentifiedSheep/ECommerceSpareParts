@@ -1,5 +1,4 @@
-﻿using Main.Entities;
-using Main.Entities.Product;
+﻿using Main.Entities.Product;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
@@ -10,13 +9,13 @@ public class ProductSizeConfiguration : IEntityTypeConfiguration<ProductSize>
     public void Configure(EntityTypeBuilder<ProductSize> builder)
     {
         builder.ToTable("product_sizes", "public");
-        
+
         builder.HasKey(e => e.ProductId)
             .HasName("product_sizes_pk");
 
         builder.Property(e => e.ProductId)
             .HasColumnName("product_id");
-        
+
         builder.Property(e => e.Height).HasColumnName("height");
         builder.Property(e => e.Length).HasColumnName("length");
         builder.Property(e => e.Unit)

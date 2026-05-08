@@ -5,12 +5,9 @@ namespace Main.Entities.Product;
 
 public class ProductCharacteristic : Entity<ProductCharacteristic, (int, string)>
 {
-    public int ProductId { get; private set; }
-
-    public string Name { get; private set; } = null!;
-    public string Value { get; private set; } = null!;
-    
-    private ProductCharacteristic() {}
+    private ProductCharacteristic()
+    {
+    }
 
     private ProductCharacteristic(int productId, string name, string value)
     {
@@ -18,6 +15,11 @@ public class ProductCharacteristic : Entity<ProductCharacteristic, (int, string)
         SetName(name);
         SetValue(value);
     }
+
+    public int ProductId { get; }
+
+    public string Name { get; private set; } = null!;
+    public string Value { get; private set; } = null!;
 
     public static ProductCharacteristic Create(int productId, string name, string value)
     {
@@ -34,9 +36,13 @@ public class ProductCharacteristic : Entity<ProductCharacteristic, (int, string)
     public void SetName(string name)
     {
         Name = name.Trim()
-            .AgainstNullOrWhiteSpace(() => throw new InvalidOperationException("Product characteristic name cannot be null or empty."))
+            .AgainstNullOrWhiteSpace(() =>
+                throw new InvalidOperationException("Product characteristic name cannot be null or empty."))
             .AgainstTooLong(128, "article.characteristic.name.max.length");
     }
 
-    public override (int, string) GetId() => (ProductId, Name);
+    public override (int, string) GetId()
+    {
+        return (ProductId, Name);
+    }
 }

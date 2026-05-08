@@ -11,7 +11,7 @@ public class CurrencyRateHistoryConfiguration : IEntityTypeConfiguration<Currenc
         builder.ToTable("currency_rate_history", "public");
 
         builder.HasKey(e => e.Id);
-        
+
         builder.HasIndex(e => new { e.FromCurrencyId, e.ToCurrencyId });
 
         builder.Property(e => e.Id)
@@ -28,11 +28,10 @@ public class CurrencyRateHistoryConfiguration : IEntityTypeConfiguration<Currenc
 
         builder.Property(e => e.NewRate)
             .HasColumnName("new_rate");
-        
+
         builder.HasOne(e => e.CurrencyRate)
             .WithMany(r => r.History)
             .HasForeignKey(e => new { e.FromCurrencyId, e.ToCurrencyId })
             .OnDelete(DeleteBehavior.Cascade);
-
     }
 }

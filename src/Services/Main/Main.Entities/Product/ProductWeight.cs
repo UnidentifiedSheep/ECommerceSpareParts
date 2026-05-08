@@ -7,23 +7,25 @@ namespace Main.Entities.Product;
 
 public class ProductWeight : Entity<ProductWeight, int>
 {
-    [Validate]
-    public int ProductId { get; private set; }
-
-    public decimal Weight { get; private set; }
-
-    public WeightUnit Unit { get; private set; }
-
-    private ProductWeight() {}
+    private ProductWeight()
+    {
+    }
 
     private ProductWeight(int productId, decimal weight, WeightUnit unit)
     {
         ValidateWeight(weight);
-        
+
         ProductId = productId;
         Weight = weight;
         Unit = unit;
     }
+
+    [Validate]
+    public int ProductId { get; }
+
+    public decimal Weight { get; private set; }
+
+    public WeightUnit Unit { get; private set; }
 
     public static ProductWeight Create(int productId, decimal weight, WeightUnit unit)
     {
@@ -37,7 +39,10 @@ public class ProductWeight : Entity<ProductWeight, int>
         Unit = unit;
     }
 
-    public override int GetId() => ProductId;
+    public override int GetId()
+    {
+        return ProductId;
+    }
 
     private static void ValidateWeight(decimal weight)
     {

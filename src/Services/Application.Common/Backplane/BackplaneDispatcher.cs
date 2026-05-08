@@ -12,7 +12,7 @@ public interface IBackplaneDispatcher
 public class BackplaneDispatcher : IBackplaneDispatcher
 {
     public Func<BackplaneMessage, ValueTask>? Handler { get; set; }
-    
+
     public void Subscribe(BackplaneSubscriptionOptions options)
     {
         Handler = options.IncomingMessageHandlerAsync;

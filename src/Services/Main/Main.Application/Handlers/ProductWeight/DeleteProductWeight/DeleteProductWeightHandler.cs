@@ -21,7 +21,7 @@ public class DeleteProductWeightHandler(
     {
         var weight = await repository.GetById(request.ProductId, cancellationToken);
         unitOfWork.Remove(weight);
-        
+
         integrationEventScope.Add(new ProductWeightUpdatedEvent { ProductId = request.ProductId });
         return Unit.Value;
     }

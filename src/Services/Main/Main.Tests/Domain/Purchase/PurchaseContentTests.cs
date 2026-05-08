@@ -20,10 +20,10 @@ public class PurchaseContentTests
     public void Create_ZeroValues_Throws(int count, decimal price)
     {
         var act = () => PurchaseContent.Create(
-            productId: 1,
-            count: count,
-            price: price,
-            storageContentId: null);
+            1,
+            count,
+            price,
+            null);
 
         act.Should().Throw<InvalidOperationException>();
     }
@@ -138,8 +138,10 @@ public class PurchaseContentTests
     [InlineData(2, 3, 4, 5, 20)]
     [InlineData(1, 2, 3, 4, 12)]
     public void TotalSum_MultipleChanges_IsConsistent(
-        decimal p1, int c1,
-        decimal p2, int c2,
+        decimal p1,
+        int c1,
+        decimal p2,
+        int c2,
         decimal expected)
     {
         var item = Create();
@@ -170,9 +172,9 @@ public class PurchaseContentTests
     private static PurchaseContent Create()
     {
         return PurchaseContent.Create(
-            productId: 1,
-            count: 2,
-            price: 10m,
-            storageContentId: null);
+            1,
+            2,
+            10m,
+            null);
     }
 }

@@ -1,5 +1,4 @@
-﻿using Main.Entities;
-using Main.Entities.User;
+﻿using Main.Entities.User;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
@@ -10,14 +9,14 @@ public class UserDiscountConfiguration : IEntityTypeConfiguration<UserDiscount>
     public void Configure(EntityTypeBuilder<UserDiscount> builder)
     {
         builder.ToTable("user_discounts", "public");
-        
+
         builder.HasKey(e => e.UserId)
             .HasName("user_discounts_pk");
 
         builder.Property(e => e.UserId)
             .ValueGeneratedNever()
             .HasColumnName("user_id");
-        
+
         builder.Property(e => e.Discount)
             .HasColumnName("discount");
 

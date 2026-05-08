@@ -10,8 +10,6 @@ using Main.Application.Models;
 using Main.Entities.Event;
 using Main.Entities.Exceptions.Products;
 using Main.Entities.Exceptions.Storages;
-using Main.Entities.Product;
-using Main.Entities.Storage;
 using Main.Enums;
 using MediatR;
 
@@ -40,43 +38,44 @@ public class RestoreContentHandler(
             productIds.Add(productId);
             storageContentIds.Add(detail.StorageContentId);
         }
+
         var products = await productRepository
             .EnsureExistsForUpdateAsync(
-                ids: productIds,
-                errorFactory: (nf) => new ProductNotFoundException(nf),
-                ct: cancellationToken);
+                productIds,
+                nf => new ProductNotFoundException(nf),
+                cancellationToken);
 
         var storageContents = await contentRepository
             .EnsureExistsForUpdateAsync(
-                ids: storageContentIds,
-                errorFactory: (nf) => new StorageContentNotFoundException(nf),
-                ct: cancellationToken);
+                storageContentIds,
+                nf => new StorageContentNotFoundException(nf),
+                cancellationToken);
 
         var events = new List<Event>();
 
         foreach (var (detail, productId) in contentDetailsList)
         {
-            Product product = products[productId];
-            StorageContent content = storageContents[detail.StorageContentId];
-            
+            var product = products[productId];
+            var content = storageContents[detail.StorageContentId];
+
             events.Add(StorageMovementEvent.Create(content, request.MovementType));
-            
+
             content.IncreaseCount(detail.Count);
             product.IncreaseStock(detail.Count);
         }
-        
+
         await unitOfWork.AddRangeAsync(events, cancellationToken);
 
         foreach (var id in productIds)
         {
             integrationEventScope.Add(new StorageContentUpdatedEvent
             {
-                ProductId = id,
+                ProductId = id
             });
-            
+
             integrationEventScope.Add(new ProductUpdatedEvent
             {
-                Id = id,
+                Id = id
             });
         }
 

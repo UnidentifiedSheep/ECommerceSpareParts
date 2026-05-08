@@ -9,7 +9,7 @@
     </PropertyGroup>
 
     <ItemGroup>
-        <PackageReference Include="Carter" Version="10.0.0" />
+        <PackageReference Include="Carter" Version="10.0.0"/>
         <PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="10.0.0"/>
     </ItemGroup>
 
@@ -20,13 +20,13 @@
     </ItemGroup>
 
     <ItemGroup>
-      <ProjectReference Include="..\..\..\Infrastructure\RabbitMq\RabbitMq.csproj" />
-      <ProjectReference Include="..\..\..\Infrastructure\Security\Security.csproj" />
-      <ProjectReference Include="..\..\Api.Common\Api.Common.csproj" />
-      <ProjectReference Include="..\Search.Abstractions\Search.Abstractions.csproj" />
-      <ProjectReference Include="..\Search.Application\Search.Application.csproj" />
-      <ProjectReference Include="..\Search.Enums\Search.Enums.csproj" />
-      <ProjectReference Include="..\Search.Persistence\Search.Persistence.csproj" />
+        <ProjectReference Include="..\..\..\Infrastructure\RabbitMq\RabbitMq.csproj"/>
+        <ProjectReference Include="..\..\..\Infrastructure\Security\Security.csproj"/>
+        <ProjectReference Include="..\..\Api.Common\Api.Common.csproj"/>
+        <ProjectReference Include="..\Search.Abstractions\Search.Abstractions.csproj"/>
+        <ProjectReference Include="..\Search.Application\Search.Application.csproj"/>
+        <ProjectReference Include="..\Search.Enums\Search.Enums.csproj"/>
+        <ProjectReference Include="..\Search.Persistence\Search.Persistence.csproj"/>
     </ItemGroup>
 
     <ItemGroup>

@@ -1,5 +1,4 @@
-﻿using Main.Entities;
-using Main.Entities.Product;
+﻿using Main.Entities.Product;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
@@ -10,7 +9,7 @@ public class ProductEanConfiguration : IEntityTypeConfiguration<ProductEan>
     public void Configure(EntityTypeBuilder<ProductEan> builder)
     {
         builder.ToTable("product_eans", "public");
-        
+
         builder.HasKey(e => new { e.ProductId, e.Ean })
             .HasName("product_eans_pk");
 
@@ -20,7 +19,7 @@ public class ProductEanConfiguration : IEntityTypeConfiguration<ProductEan>
         builder.Property(e => e.Ean)
             .HasColumnName("ean")
             .HasMaxLength(30);
-        
+
         builder.HasOne<Entities.Product.Product>()
             .WithMany(p => p.Eans)
             .HasForeignKey(x => x.ProductId)

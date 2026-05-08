@@ -1,5 +1,4 @@
-﻿using Main.Entities;
-using Main.Entities.Auth;
+﻿using Main.Entities.Auth;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
@@ -10,7 +9,7 @@ public class UserRoleConfiguration : IEntityTypeConfiguration<UserRole>
     public void Configure(EntityTypeBuilder<UserRole> builder)
     {
         builder.ToTable("user_roles", "auth");
-        
+
         builder.HasKey(e => new { e.UserId, e.RoleName })
             .HasName("user_roles_pk");
 
@@ -19,7 +18,7 @@ public class UserRoleConfiguration : IEntityTypeConfiguration<UserRole>
 
         builder.Property(e => e.UserId)
             .HasColumnName("user_id");
-        
+
         builder.Property(e => e.RoleName)
             .HasColumnName("role_name");
 

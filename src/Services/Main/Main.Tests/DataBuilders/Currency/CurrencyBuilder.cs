@@ -34,7 +34,7 @@ public class CurrencyBuilder(Faker faker) : BuilderBase<Currency>(faker)
         Sign = sign;
         return this;
     }
-    
+
     public override Currency Build()
     {
         var rndCurrency = Faker.Finance.Currency(true);

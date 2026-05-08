@@ -16,6 +16,6 @@ public static class BalanceProjections
             SenderId = x.SenderId,
             Status = x.Status,
             Type = x.Type,
-            TransactionDate = x.TransactionDatetime,
+            TransactionDate = x.TransactionDatetime
         };
 }

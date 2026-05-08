@@ -20,8 +20,8 @@ public class NamedObjectRegistry<TBaseObject>
 
     public TBaseObject GetBySystemName(string systemName)
     {
-        return !_objects.TryGetValue(systemName, out var obj) 
-            ? throw new KeyNotFoundException($"Named object '{systemName}' not found") 
+        return !_objects.TryGetValue(systemName, out var obj)
+            ? throw new KeyNotFoundException($"Named object '{systemName}' not found")
             : obj;
     }
 

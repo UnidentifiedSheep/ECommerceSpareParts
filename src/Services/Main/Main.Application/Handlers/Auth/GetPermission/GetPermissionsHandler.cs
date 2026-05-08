@@ -23,7 +23,7 @@ public class GetPermissionsHandler(IReadRepository<Permission, string> repositor
             .Select(AuthProjections.ToPermissionDto)
             .ApplyPagination(request.Pagination)
             .ToListAsync(cancellationToken);
-        
+
         return new GetPermissionsResult(permissions);
     }
 }

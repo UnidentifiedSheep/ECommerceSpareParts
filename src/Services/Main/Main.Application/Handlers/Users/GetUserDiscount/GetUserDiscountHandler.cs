@@ -1,5 +1,4 @@
 ﻿using Application.Common.Interfaces;
-using Main.Abstractions.Interfaces.Services;
 using Main.Application.Interfaces.Services;
 
 namespace Main.Application.Handlers.Users.GetUserDiscount;

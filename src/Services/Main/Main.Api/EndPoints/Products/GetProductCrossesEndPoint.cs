@@ -1,12 +1,10 @@
 using Abstractions.Interfaces;
-using Abstractions.Models;
 using Api.Common.Extensions;
 using Api.Common.Models.Requests;
 using Carter;
 using Enums;
 using Main.Application.Dtos.Product;
 using Main.Application.Handlers.Products.GetProductCrosses;
-using Mapster;
 using MediatR;
 
 namespace Main.Api.EndPoints.Articles;

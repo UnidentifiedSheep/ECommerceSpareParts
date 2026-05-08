@@ -27,11 +27,13 @@ public class SetProductWeightHandler(
             await unitOfWork.AddAsync(weight, cancellationToken);
         }
         else
+        {
             weight.Update(request.Weight, request.Unit);
-        
+        }
+
         integrationEventScope.Add(new ProductWeightUpdatedEvent
         {
-            ProductId = request.ProductId,
+            ProductId = request.ProductId
         });
         return Unit.Value;
     }

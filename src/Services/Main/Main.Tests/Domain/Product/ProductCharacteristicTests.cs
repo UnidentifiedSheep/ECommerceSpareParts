@@ -6,7 +6,7 @@ namespace Main.Tests.Domain.Product;
 
 public class ProductCharacteristicTests
 {
-     [Theory]
+    [Theory]
     [InlineData(1, "Color", "Red")]
     [InlineData(2, "Size", "Large")]
     [InlineData(3, "Weight", "100g")]

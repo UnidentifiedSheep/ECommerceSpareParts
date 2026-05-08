@@ -9,7 +9,8 @@ using MediatR;
 
 namespace Main.Application.Handlers.Auth.AddPermissionToRole;
 
-[Transactional, AutoSave]
+[Transactional]
+[AutoSave]
 public record AddPermissionToRoleCommand(string RoleName, string PermissionName) : ICommand;
 
 public class AddPermissionToRoleHandler(
@@ -23,17 +24,17 @@ public class AddPermissionToRoleHandler(
             .Track()
             .Where(x => x.Name.Value == RoleName.ToNormalized(request.RoleName))
             .Build();
-        
+
         var role = await repository.FirstOrDefaultAsync(criteria, cancellationToken)
-            ?? throw new RoleNotFoundException(request.RoleName);
-        
+                   ?? throw new RoleNotFoundException(request.RoleName);
+
         role.AddPermission(request.PermissionName);
-        
+
         integrationEventScope.Add(new RoleUpdatedEvent
         {
             RoleName = request.RoleName
         });
-        
+
         return Unit.Value;
     }
 }

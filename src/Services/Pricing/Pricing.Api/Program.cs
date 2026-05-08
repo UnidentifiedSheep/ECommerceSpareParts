@@ -1,19 +1,15 @@
 using System.Reflection;
-using Abstractions.Interfaces.Currency;
 using Api.Common;
 using Api.Common.Extensions;
-using Api.Common.Logging;
 using Api.Common.Middleware;
 using Api.Common.Models;
 using Api.Common.OperationFilters;
 using Application.Common.Interfaces.Settings;
 using Carter;
 using Contracts.Currency;
-using Contracts.Currency.GetCurrencies;
 using Contracts.Markup;
 using Contracts.Settings;
 using Localization.Abstractions.Models;
-using Localization.Domain.Extensions;
 using Localization.Domain.Middlewares;
 using MassTransit;
 using Microsoft.AspNetCore.HttpOverrides;
@@ -23,17 +19,10 @@ using Pricing.Abstractions.Constants;
 using Pricing.Api.EndPoints.Prices;
 using Pricing.Application;
 using Pricing.Application.Consumers;
-using Pricing.Cache;
 using Pricing.Persistence;
 using Pricing.Persistence.Contexts;
 using RabbitMq.Extensions;
 using RabbitMq.Models;
-using Redis;
-using Security;
-using Security.Utils;
-using Serilog;
-using Serilog.Sinks.Loki;
-using Serilog.Sinks.Loki.Labels;
 
 var localesPath = Assembly.GetExecutingAssembly().GetDefaultLocalizationPath();
 
@@ -68,7 +57,8 @@ builder.Services.AddOptions<MessageBrokerOptions>()
 var brokerOptions = builder.Configuration
                         .GetSection(MessageBrokerOptions.SectionName)
                         .Get<MessageBrokerOptions>()
-                    ?? throw new NullReferenceException($"Missing {MessageBrokerOptions.SectionName} configuration options");
+                    ?? throw new NullReferenceException(
+                        $"Missing {MessageBrokerOptions.SectionName} configuration options");
 
 var uniqQueueName = $"queue-of-pricing-{Environment.MachineName}";
 

@@ -31,14 +31,17 @@ public class EditStorageRouteHandler(
                     storageRoute.FromStorageName,
                     storageRoute.ToStorageName,
                     cancellationToken);
-                
+
                 if (isActiveExists)
-                    throw new StorageRouteActiveExistsException(storageRoute.FromStorageName, storageRoute.ToStorageName);
-                
+                    throw new StorageRouteActiveExistsException(storageRoute.FromStorageName,
+                        storageRoute.ToStorageName);
+
                 storageRoute.Activate();
             }
             else
+            {
                 storageRoute.Deactivate();
+            }
         }
 
         patch.DistanceM.Apply(storageRoute.SetDistanceM);

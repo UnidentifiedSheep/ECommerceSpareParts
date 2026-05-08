@@ -5,7 +5,9 @@ namespace Analytics.Entities.Metrics.JsonDataModels;
 public record MetricTimer
 {
     //for json serializer
-    public MetricTimer() { }
+    public MetricTimer()
+    {
+    }
 
     public MetricTimer(DateTime start, DateTime end)
     {

@@ -13,7 +13,7 @@ namespace Main.Application.Handlers.Storages.DeleteStorage;
 public record DeleteStorageCommand(string StorageName) : ICommand;
 
 public class DeleteStorageHandler(
-    IRepository<Storage, string> repository, 
+    IRepository<Storage, string> repository,
     IUnitOfWork unitOfWork)
     : ICommandHandler<DeleteStorageCommand>
 {
@@ -21,7 +21,7 @@ public class DeleteStorageHandler(
     {
         var storage = await repository.GetById(request.StorageName, cancellationToken)
                       ?? throw new StorageNotFoundException(request.StorageName);
-        
+
         unitOfWork.Remove(storage);
         return Unit.Value;
     }

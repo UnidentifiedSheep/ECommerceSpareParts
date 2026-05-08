@@ -1,6 +1,4 @@
-﻿using Contracts.Currency.GetCurrencies;
-using Mapster;
-using MassTransit;
+﻿using MassTransit;
 using Pricing.Abstractions.Interfaces.CacheRepositories;
 using Pricing.Abstractions.Interfaces.Services;
 using Pricing.Abstractions.Models;

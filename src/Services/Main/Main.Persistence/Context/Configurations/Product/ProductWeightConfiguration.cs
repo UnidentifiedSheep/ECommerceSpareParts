@@ -1,5 +1,4 @@
-﻿using Main.Entities;
-using Main.Entities.Product;
+﻿using Main.Entities.Product;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
@@ -10,7 +9,7 @@ public class ProductWeightConfiguration : IEntityTypeConfiguration<ProductWeight
     public void Configure(EntityTypeBuilder<ProductWeight> builder)
     {
         builder.ToTable("product_weights", "public");
-        
+
         builder.HasKey(e => e.ProductId)
             .HasName("product_weights_pk");
 
@@ -19,7 +18,7 @@ public class ProductWeightConfiguration : IEntityTypeConfiguration<ProductWeight
 
         builder.Property(e => e.Weight)
             .HasColumnName("weight");
-        
+
         builder.Property(e => e.Unit)
             .HasMaxLength(24)
             .HasColumnName("unit");

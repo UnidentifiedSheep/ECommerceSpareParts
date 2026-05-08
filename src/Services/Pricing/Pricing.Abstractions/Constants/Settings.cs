@@ -1,5 +1,4 @@
-﻿using Abstractions.Models;
-using Pricing.Abstractions.Models.Settings;
+﻿using Pricing.Abstractions.Models.Settings;
 using Pricing.Enums;
 
 namespace Pricing.Abstractions.Constants;

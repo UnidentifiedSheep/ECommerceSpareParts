@@ -18,7 +18,7 @@ public record NewProductReservationDto
 
     [JsonPropertyName("proposedPrice")]
     public required decimal? ProposedPrice { get; init; }
-    
+
     [JsonPropertyName("givenCurrencyId")]
     public required int? GivenCurrencyId { get; init; }
 

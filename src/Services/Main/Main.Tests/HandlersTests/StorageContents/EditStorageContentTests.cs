@@ -16,7 +16,7 @@ public class EditStorageContentTests : IntegrationTest
     {
         RegisterBasicContext<StorageContentTestContext>();
     }
-    
+
     public StorageContentTestContext TestContext => GetContext<StorageContentTestContext>();
 
     [Fact]
@@ -31,7 +31,7 @@ public class EditStorageContentTests : IntegrationTest
             }
         };
         var content = TestContext.StorageContents.First();
-        
+
         var dict = new Dictionary<int, ModelWithRowVersion<PatchStorageContentDto, uint>>
         {
             [content.Id] = new(dto, content.RowVersion)
@@ -58,7 +58,7 @@ public class EditStorageContentTests : IntegrationTest
                 Value = price
             }
         };
-        
+
         var content = TestContext.StorageContents.First();
         var dict = new Dictionary<int, ModelWithRowVersion<PatchStorageContentDto, uint>>
             { [content.Id] = new(dto, content.RowVersion) };
@@ -168,7 +168,7 @@ public class EditStorageContentTests : IntegrationTest
                 Value = 1
             }
         };
-        
+
         var dict = new Dictionary<int, ModelWithRowVersion<PatchStorageContentDto, uint>>
             { [content.Id] = new(dto, content.RowVersion) };
 

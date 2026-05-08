@@ -23,14 +23,14 @@ public static class UserProjections
                 ? null
                 : UserInfoProjection.Invoke(x.UserInfo)
         };
-    
-    
+
+
     public static readonly Expression<Func<UserInfo, UserInfoDto>> UserInfoProjection =
         x => new UserInfoDto
         {
             Description = x.Description,
             Name = x.Name,
-            Surname = x.Surname,
+            Surname = x.Surname
         };
 
     public static readonly Expression<Func<UserEmail, UserEmailDto>> UserEmailProjection =
@@ -42,6 +42,6 @@ public static class UserProjections
             CreatedAt = x.CreatedAt,
             UpdatedAt = x.UpdatedAt,
             EmailType = x.EmailType,
-            IsPrimary = x.IsPrimary,
+            IsPrimary = x.IsPrimary
         };
 }

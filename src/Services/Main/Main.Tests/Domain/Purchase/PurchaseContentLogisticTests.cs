@@ -22,7 +22,7 @@ public class PurchaseContentLogisticTests
 
         act.Should().Throw<InvalidOperationException>();
     }
-    
+
     [Fact]
     public void Update_PartialConsistency_AllFieldsUpdatedAtomically()
     {
@@ -34,7 +34,7 @@ public class PurchaseContentLogisticTests
         log.AreaM3.Should().Be(20);
         log.Price.Should().Be(30);
     }
-    
+
     [Fact]
     public void Update_MultipleCalls_KeepsConsistentState()
     {
@@ -58,7 +58,7 @@ public class PurchaseContentLogisticTests
         log.AreaM3.Should().Be(2.456m);
         log.Price.Should().Be(3.789m);
     }
-    
+
     [Fact]
     public void Update_ChangesValues()
     {

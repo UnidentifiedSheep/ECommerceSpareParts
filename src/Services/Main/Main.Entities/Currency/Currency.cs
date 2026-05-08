@@ -6,6 +6,22 @@ namespace Main.Entities.Currency;
 
 public class Currency : Entity<Currency, int>
 {
+    private readonly List<CurrencyRate> _ratesFrom = [];
+
+    private readonly List<CurrencyRate> _ratesTo = [];
+
+    private Currency()
+    {
+    }
+
+    private Currency(string name, string shortName, string currencySign, string code)
+    {
+        SetName(name);
+        SetShortName(shortName);
+        SetCurrencySign(currencySign);
+        SetCode(code);
+    }
+
     [Validate]
     public int Id { get; private set; }
 
@@ -21,21 +37,8 @@ public class Currency : Entity<Currency, int>
     [Validate]
     public string Code { get; private set; } = null!;
 
-    private readonly List<CurrencyRate> _ratesFrom = [];
     public IReadOnlyCollection<CurrencyRate> RatesFrom => _ratesFrom;
-    
-    private readonly List<CurrencyRate> _ratesTo = [];
     public IReadOnlyCollection<CurrencyRate> RatesTo => _ratesTo;
-    
-    private Currency() {}
-
-    private Currency(string name, string shortName, string currencySign, string code)
-    {
-        SetName(name);
-        SetShortName(shortName);
-        SetCurrencySign(currencySign);
-        SetCode(code);
-    }
 
     public static Currency Create(string name, string shortName, string currencySign, string code)
     {
@@ -78,5 +81,8 @@ public class Currency : Entity<Currency, int>
             .AgainstTooShort(2, "currency.code.min.length");
     }
 
-    public override int GetId() => Id;
+    public override int GetId()
+    {
+        return Id;
+    }
 }

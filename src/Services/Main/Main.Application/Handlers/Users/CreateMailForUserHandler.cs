@@ -22,8 +22,7 @@ public class CreateMailForUserValidation : AbstractValidator<CreateMailForUserCo
     }
 }
 
-public class CreateMailForUserHandler()
-    : ICommandHandler<CreateMailForUserCommand, CreateMailForUserResult>
+public class CreateMailForUserHandler : ICommandHandler<CreateMailForUserCommand, CreateMailForUserResult>
 {
     public async Task<CreateMailForUserResult> Handle(
         CreateMailForUserCommand request,

@@ -8,8 +8,9 @@ public interface IAuditable
     public Guid? WhoUpdated { get; }
 
     /// <summary>
-    /// Touches entity, updates updated at value
+    ///     Touches entity, updates updated at value
     /// </summary>
     void Touch(Guid userId);
+
     void SetCreatedUser(Guid userId);
 }

@@ -18,15 +18,15 @@ public class SettingsService(
     ISettingFactory settingFactory)
     : ISettingsService
 {
-    private static readonly TransactionalAttribute TransactionSettings 
+    private static readonly TransactionalAttribute TransactionSettings
         = new(IsolationLevel.ReadCommitted, 20, 3);
-    
+
     public async Task LoadAsync(CancellationToken cancellationToken = default)
     {
         var criteria = Criteria<Setting>.New()
             .Track(false)
             .Build();
-        
+
         var dbSettings = await repository.ListAsync(criteria, cancellationToken);
         foreach (var setting in dbSettings)
         {
@@ -36,25 +36,25 @@ public class SettingsService(
     }
 
     public async Task SetSetting<T>(
-        T value, 
+        T value,
         CancellationToken cancellationToken = default
-        ) where T : Setting
+    ) where T : Setting
     {
         await unitOfWork.ExecuteWithTransaction(
-            settings: TransactionSettings,
-            action: async () =>
+            TransactionSettings,
+            async () =>
             {
                 await unitOfWork.AddAsync(value, cancellationToken);
                 await publishEndpoint.Publish(new SettingChangedEvent
                 {
                     Key = value.Key,
                     Value = value.Json,
-                    ChangedAt = DateTime.UtcNow,
+                    ChangedAt = DateTime.UtcNow
                 }, cancellationToken);
                 await unitOfWork.SaveChangesAsync(cancellationToken);
             },
-            cancellationToken: cancellationToken);
-        
+            cancellationToken);
+
         settingsContainer.Set(value);
     }
 
@@ -63,7 +63,7 @@ public class SettingsService(
         if (settingsContainer.TryGet<T>(out var setting)) return setting!;
         var dbSetting = await repository.GetById(T.SettingName, cancellationToken);
         if (dbSetting == null) return T.Default;
-        
+
         var typed = (T)settingFactory.Create(dbSetting.Key, dbSetting.Json);
         settingsContainer.Set(typed);
 

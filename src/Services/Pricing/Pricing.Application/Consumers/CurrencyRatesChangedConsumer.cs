@@ -1,4 +1,3 @@
-using Abstractions.Interfaces.Currency;
 using Contracts.Currency;
 using MassTransit;
 

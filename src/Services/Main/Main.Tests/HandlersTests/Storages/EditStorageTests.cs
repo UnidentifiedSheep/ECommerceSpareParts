@@ -32,7 +32,7 @@ public class EditStorageTests : IntegrationTest
         };
         var command = new EditStorageCommand(storage.Name, model);
         await Mediator.Send(command);
-        
+
         var dbStorage = await Context.Storages
             .AsNoTracking()
             .FirstOrDefaultAsync(x => x.Name == storage.Name);
@@ -61,7 +61,7 @@ public class EditStorageTests : IntegrationTest
         var dbStorage = await Context.Storages
             .AsNoTracking()
             .FirstOrDefaultAsync(x => x.Name == storage.Name);
-        
+
         Assert.NotNull(dbStorage);
 
         Assert.Equal(storage.Name, dbStorage.Name);
@@ -129,7 +129,7 @@ public class EditStorageTests : IntegrationTest
         var dbStorage = await Context.Storages
             .AsNoTracking()
             .FirstOrDefaultAsync(x => x.Name == storage.Name);
-        
+
         Assert.NotNull(dbStorage);
         Assert.Equal(dbStorage.Description, model.Description);
         Assert.Equal(dbStorage.Location, model.Location);
@@ -151,8 +151,10 @@ public class EditStorageTests : IntegrationTest
         await Assert.ThrowsAsync<StorageNotFoundException>(() => Mediator.Send(command));
     }
 
-    private Storage GetStorage() 
-        => GetContext<StorageTestContext>()
+    private Storage GetStorage()
+    {
+        return GetContext<StorageTestContext>()
             .Storages
             .First(x => x.Type == StorageType.Warehouse);
+    }
 }

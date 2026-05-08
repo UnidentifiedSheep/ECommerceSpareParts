@@ -1,6 +1,4 @@
 ﻿using System.Text.Json;
-using Abstractions.Models;
-using Application.Common.Abstractions.Settings;
 using Application.Common.Interfaces.Settings;
 using MediatR;
 using Pricing.Abstractions.Interfaces.DbRepositories;

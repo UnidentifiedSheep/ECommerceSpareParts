@@ -53,17 +53,17 @@ public abstract class RepositoryBase<TContext, TEntity, TKey>(TContext context) 
         {
             null => [],
             ITuple v => GetTupleValues(v),
-            ICompositeKey k => k.ToArray(), 
+            ICompositeKey k => k.ToArray(),
             _ => [key]
         };
     }
-    
-    
+
+
     private static object[] GetTupleValues(ITuple tuple)
     {
         var values = new object[tuple.Length];
 
-        for (int i = 0; i < tuple.Length; i++)
+        for (var i = 0; i < tuple.Length; i++)
             values[i] = tuple[i]!;
 
         return values;

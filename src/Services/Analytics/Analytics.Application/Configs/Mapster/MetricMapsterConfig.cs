@@ -1,7 +1,6 @@
 ﻿using Analytics.Abstractions.Dtos.CalculationJob;
 using Analytics.Entities;
 using Mapster;
-
 using ContractMetricPayload = Contracts.Models.Metric.MetricPayloadDto;
 using MetricPayloadDto = Analytics.Abstractions.Dtos.CalculationJob.MetricPayloadDto;
 
@@ -17,7 +16,7 @@ public static class MetricMapsterConfig
             .Map(d => d.RangeEnd, s => s.RangeEnd)
             .Map(d => d.RangeStart, s => s.RangeStart)
             .Map(d => d.CurrencyId, s => s.CurrencyId);
-        
+
         TypeAdapterConfig<ContractMetricPayload, MetricPayloadDto>.NewConfig()
             .IgnoreNonMapped(true)
             .Map(d => d.ArticleId, s => s.ArticleId)

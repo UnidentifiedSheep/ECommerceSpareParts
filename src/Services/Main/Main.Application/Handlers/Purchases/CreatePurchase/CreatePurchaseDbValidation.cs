@@ -1,5 +1,4 @@
 ﻿using Application.Common.Abstractions;
-using BulkValidation.Core.Enums;
 using BulkValidation.Core.Interfaces;
 using Main.Entities;
 

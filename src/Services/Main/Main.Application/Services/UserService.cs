@@ -17,12 +17,13 @@ public class UserService(
     IOptions<CacheSettings> cacheSettings) : IUserService
 {
     private UserCacheSettings UserSettings => cacheSettings.Value.User;
+
     public async Task<UserDto?> TryGetUserAsync(Guid userId, CancellationToken token = default)
     {
         var key = UserSettings.GetUserCacheKey(userId);
         return await cache.GetOrSetAsync(
-            key: key,
-            factory: ct => TryGetUserFromDb(userId, ct),
+            key,
+            ct => TryGetUserFromDb(userId, ct),
             tags: [key],
             duration: UserSettings.Duration,
             token: token);
@@ -31,25 +32,25 @@ public class UserService(
     public async Task<decimal?> GetUserDiscountAsync(Guid userId, CancellationToken token = default)
     {
         return await cache.GetOrSetAsync(
-            key: UserSettings.GetUserDiscountCacheKey(userId),
-            factory: ct => userRepository.GetUsersDiscountAsync(userId, ct),
+            UserSettings.GetUserDiscountCacheKey(userId),
+            ct => userRepository.GetUsersDiscountAsync(userId, ct),
             tags: [UserSettings.GetUserCacheKey(userId)],
             duration: UserSettings.Duration,
             token: token);
     }
 
     public async Task<UserRolesAndPermissions?> GetUserRolesAndPermissionsAsync(
-        Guid userId, 
+        Guid userId,
         CancellationToken token = default)
     {
         return await cache.GetOrSetAsync(
-            key: UserSettings.GetUserRolesAndPermissionsCacheKey(userId),
-            factory: ct => userRepository.GetUserRolesAndPermissionsAsync(userId, ct),
+            UserSettings.GetUserRolesAndPermissionsCacheKey(userId),
+            ct => userRepository.GetUserRolesAndPermissionsAsync(userId, ct),
             tags: [UserSettings.GetUserCacheKey(userId), "roles"],
             duration: UserSettings.Duration,
             token: token);
     }
-    
+
 
     private async Task<UserDto?> TryGetUserFromDb(Guid userId, CancellationToken token)
     {
@@ -58,10 +59,10 @@ public class UserService(
             .Include(x => x.UserInfo)
             .Track(false)
             .Build();
-        
-        DbUser? user = await userRepository.FirstOrDefaultAsync(criteria, token);
-        return user == null 
-            ? null 
+
+        var user = await userRepository.FirstOrDefaultAsync(criteria, token);
+        return user == null
+            ? null
             : UserProjections.UserProjection.AsFunc()(user);
     }
 }

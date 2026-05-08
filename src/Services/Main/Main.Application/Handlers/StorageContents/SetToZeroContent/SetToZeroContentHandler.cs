@@ -31,16 +31,16 @@ public class SetToZeroContentHandler(
                       ?? throw new StorageContentNotFoundException(request.ContentId);
 
         content.ValidateVersion(request.RowVersion);
-        
+
         var product = await productRepository.EnsureProductExistsForUpdateAsync(content.ProductId, cancellationToken);
 
         await unitOfWork.AddAsync(
-            StorageMovementEvent.Create(content, StorageMovementType.StorageContentDeletion), 
+            StorageMovementEvent.Create(content, StorageMovementType.StorageContentDeletion),
             cancellationToken);
 
         product.IncreaseStock(-content.Count);
         content.IncreaseCount(-content.Count);
-        
+
         integrationEventScope.Add(new ProductUpdatedEvent
         {
             Id = content.ProductId

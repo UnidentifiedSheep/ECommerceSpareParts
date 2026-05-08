@@ -35,7 +35,7 @@ public record PatchStorageRouteDto
 
     [JsonPropertyName("minimumPrice")]
     public PatchField<decimal?> MinimumPrice { get; init; } = PatchField<decimal?>.NotSet();
-    
+
     [JsonPropertyName("carrierId")]
     public PatchField<Guid?> CarrierId { get; init; } = PatchField<Guid?>.NotSet();
 }

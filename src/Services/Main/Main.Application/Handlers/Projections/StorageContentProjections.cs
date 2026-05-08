@@ -15,7 +15,7 @@ public static class StorageContentProjections
             ProductId = x.ProductId,
             Count = x.Count,
             BuyPrice = x.BuyPrice,
-            PurchaseDatetime =  x.PurchaseDatetime,
+            PurchaseDatetime = x.PurchaseDatetime,
             Currency = CurrencyProjections.ToDto.Invoke(x.Currency)
         };
 }

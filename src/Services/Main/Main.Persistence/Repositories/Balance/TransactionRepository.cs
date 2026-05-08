@@ -8,11 +8,12 @@ using Persistence.Extensions;
 
 namespace Main.Persistence.Repositories.Balance;
 
-public class TransactionRepository(DContext context) : RepositoryBase<DContext, Transaction, Guid>(context), ITransactionRepository
+public class TransactionRepository(DContext context)
+    : RepositoryBase<DContext, Transaction, Guid>(context), ITransactionRepository
 {
     public override Task<Dictionary<Guid, Transaction>> FindByIdsAsync(
-        IEnumerable<Guid> ids, 
-        Criteria<Transaction>? criteria = null, 
+        IEnumerable<Guid> ids,
+        Criteria<Transaction>? criteria = null,
         CancellationToken ct = default)
     {
         return Context.Transactions

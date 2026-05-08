@@ -8,12 +8,13 @@ using Persistence.Extensions;
 
 namespace Main.Persistence.Repositories.Storage;
 
-public class StorageRouteRepository(DContext context) : RepositoryBase<DContext, StorageRoute, Guid>(context), IStorageRouteRepository
+public class StorageRouteRepository(DContext context)
+    : RepositoryBase<DContext, StorageRoute, Guid>(context), IStorageRouteRepository
 {
     public async Task<StorageRoute?> GetActiveRouteAsync(
-        string from, 
-        string to, 
-        Criteria<StorageRoute>? criteria = null, 
+        string from,
+        string to,
+        Criteria<StorageRoute>? criteria = null,
         CancellationToken ct = default)
     {
         var query = Context.StorageRoutes.AsQueryable();
@@ -23,23 +24,23 @@ public class StorageRouteRepository(DContext context) : RepositoryBase<DContext,
 
         return await query
             .FirstOrDefaultAsync(
-                x => x.FromStorageName == from 
-                     && x.ToStorageName == to 
+                x => x.FromStorageName == from
+                     && x.ToStorageName == to
                      && x.IsActive, ct);
     }
 
     public async Task<bool> IsAnyRouteActiveAsync(string from, string to, CancellationToken ct = default)
     {
         return await Context.StorageRoutes
-            .AnyAsync(x => 
-                x.FromStorageName == from && 
-                x.ToStorageName == to && 
-                x.IsActive, ct); 
+            .AnyAsync(x =>
+                x.FromStorageName == from &&
+                x.ToStorageName == to &&
+                x.IsActive, ct);
     }
 
     public override Task<Dictionary<Guid, StorageRoute>> FindByIdsAsync(
-        IEnumerable<Guid> ids, 
-        Criteria<StorageRoute>? criteria = null, 
+        IEnumerable<Guid> ids,
+        Criteria<StorageRoute>? criteria = null,
         CancellationToken ct = default)
     {
         return Context.StorageRoutes

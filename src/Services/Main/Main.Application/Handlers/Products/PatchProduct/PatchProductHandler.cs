@@ -8,7 +8,8 @@ using MediatR;
 
 namespace Main.Application.Handlers.Products.PatchProduct;
 
-[Transactional, AutoSave]
+[Transactional]
+[AutoSave]
 public record PatchProductCommand(int ProductId, PatchProductDto PatchProduct) : ICommand;
 
 public class PatchProductHandler(
@@ -20,12 +21,12 @@ public class PatchProductHandler(
     {
         var patch = request.PatchProduct;
         var product = await productRepository.GetById(request.ProductId, cancellationToken)
-            ?? throw new ProductNotFoundException(request.ProductId);
+                      ?? throw new ProductNotFoundException(request.ProductId);
 
         if (patch.Description.IsSet) product.SetDescription(patch.Description);
         if (patch.CategoryId.IsSet) product.SetCategory(patch.CategoryId);
-        
-        if (patch.Sku is { IsSet: true, Value: not null }) 
+
+        if (patch.Sku is { IsSet: true, Value: not null })
             product.SetSku(patch.Sku.Value);
 
         if (patch.Name is { IsSet: true, Value: not null })
@@ -41,9 +42,9 @@ public class PatchProductHandler(
 
         integrationEventScope.Add(new ProductUpdatedEvent
         {
-            Id = product.Id,
+            Id = product.Id
         });
-        
+
         return Unit.Value;
     }
 }

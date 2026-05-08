@@ -10,14 +10,15 @@ using Tests.TestContexts;
 
 namespace Tests.HandlersTests.Producers;
 
-public class DeleteOtherNameTests: IntegrationTest
+public class DeleteOtherNameTests : IntegrationTest
 {
+    private ProducerOtherName _otherName = null!;
+
     public DeleteOtherNameTests(CombinedContainerFixture fixture) : base(fixture)
     {
         RegisterBasicContext<ProducerTestContext>();
     }
-    
-    private ProducerOtherName _otherName = null!;
+
     public override async Task InitializeAsync()
     {
         await base.InitializeAsync();
@@ -49,7 +50,7 @@ public class DeleteOtherNameTests: IntegrationTest
 
         var act = () => Mediator.Send(command);
         await act.Should().NotThrowAsync();
-        
+
         var dbOtherNames = await Context.ProducersOtherNames.AsNoTracking().ToListAsync();
         dbOtherNames.Should().HaveCount(0);
     }

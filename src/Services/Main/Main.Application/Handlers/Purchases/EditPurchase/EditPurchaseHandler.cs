@@ -3,15 +3,12 @@ using Application.Common.Interfaces;
 using Application.Common.Interfaces.Repositories;
 using Attributes;
 using Main.Application.Dtos.Amw.Purchase;
-using Main.Application.Extensions.Repository;
-using Main.Entities;
-using Main.Entities.Exceptions.Purchase;
 using Main.Entities.Purchase;
-using Mapster;
 
 namespace Main.Application.Handlers.Purchases.EditPurchase;
 
-[Transactional, AutoSave]
+[Transactional]
+[AutoSave]
 public record EditPurchaseCommand(
     IEnumerable<EditPurchaseDto> Content,
     Guid PurchaseId,
@@ -28,7 +25,7 @@ public record EditPurchaseCommand(
 public record EditPurchaseResult(Dictionary<int, Dictionary<decimal, int>> EditedCounts);
 
 public class EditPurchaseHandler(
-    IRepository<Purchase, Guid> purchaseRepository, 
+    IRepository<Purchase, Guid> purchaseRepository,
     IRepository<PurchaseContent, int> contentRepository,
     IUnitOfWork unitOfWork)
     : ICommandHandler<EditPurchaseCommand, EditPurchaseResult>
@@ -37,5 +34,4 @@ public class EditPurchaseHandler(
     {
         throw new NotImplementedException();
     }
-
 }

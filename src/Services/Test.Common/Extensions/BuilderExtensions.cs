@@ -6,17 +6,17 @@ namespace Test.Common.Extensions;
 public static class BuilderExtensions
 {
     public static async Task<T> BuildAndAddToDb<T>(
-        this IBuilder<T> builder, 
+        this IBuilder<T> builder,
         DbContext context)
     {
         var entity = builder.Build();
         ArgumentNullException.ThrowIfNull(entity);
-        
+
         await context.AddAsync(entity);
         await context.SaveChangesAsync();
         return entity;
     }
-    
+
     public static async Task<IReadOnlyCollection<T>> BuildManyAndAddToDb<T>(
         this IBuilder<T> builder,
         DbContext context,
@@ -36,7 +36,7 @@ public static class BuilderExtensions
         var entities = new List<T>();
         foreach (var builder in builders)
             entities.AddRange(builder.BuildMany(count));
-        
+
         await context.AddRangeAsync(entities);
         await context.SaveChangesAsync();
         return entities;
@@ -46,5 +46,7 @@ public static class BuilderExtensions
         this IEnumerable<IBuilder<T>> builders,
         DbContext context,
         int count) where T : class
-        => BuildManyCombinedAndAddToDb(context, count, builders.ToArray());
+    {
+        return BuildManyCombinedAndAddToDb(context, count, builders.ToArray());
+    }
 }

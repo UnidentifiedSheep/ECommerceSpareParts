@@ -6,7 +6,6 @@ using LinqKit;
 using Main.Application.Dtos.Storage;
 using Main.Application.Handlers.Projections;
 using Main.Entities.Storage;
-using Mapster;
 using Microsoft.EntityFrameworkCore;
 
 namespace Main.Application.Handlers.StorageContents.GetContents;
@@ -43,7 +42,7 @@ public class GetStorageContentHandler(
             .Select(StorageContentProjections.ToStorageContentDto)
             .ApplyPagination(request.Pagination)
             .ToListAsync(cancellationToken);
-        
+
         return new GetStorageContentResult(result);
     }
 }

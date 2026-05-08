@@ -8,7 +8,7 @@ public class CurrencyRateBuilder(Faker faker) : BuilderBase<CurrencyRate>(faker)
 {
     public int? FromCurrencyId { get; private set; }
     public int? ToCurrencyId { get; private set; }
-    
+
     public decimal? Rate { get; private set; }
 
     public CurrencyRateBuilder WithFromCurrencyId(int fromCurrencyId)
@@ -28,7 +28,7 @@ public class CurrencyRateBuilder(Faker faker) : BuilderBase<CurrencyRate>(faker)
         Rate = rate;
         return this;
     }
-    
+
     public override CurrencyRate Build()
     {
         return CurrencyRate.Create(

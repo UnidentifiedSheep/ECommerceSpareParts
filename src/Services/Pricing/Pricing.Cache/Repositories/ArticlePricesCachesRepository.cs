@@ -1,4 +1,3 @@
-using Abstractions.Interfaces.Cache;
 using Pricing.Abstractions.Interfaces.CacheRepositories;
 using Pricing.Abstractions.Models.Pricing;
 

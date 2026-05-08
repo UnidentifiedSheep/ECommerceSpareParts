@@ -6,7 +6,6 @@ using LinqKit;
 using Main.Application.Dtos.Storage;
 using Main.Application.Handlers.Projections;
 using Main.Entities.Storage;
-using Mapster;
 using Microsoft.EntityFrameworkCore;
 
 namespace Main.Application.Handlers.StorageRoutes.GetStorageRoutes;
@@ -26,14 +25,14 @@ public class GetStorageRoutesHandler(
     public async Task<GetStorageRoutesResult> Handle(GetStorageRoutesQuery request, CancellationToken cancellationToken)
     {
         var query = repository.Query;
-        
+
         if (!string.IsNullOrWhiteSpace(request.StorageFrom))
             query = query.Where(x => x.FromStorageName == request.StorageFrom);
         if (!string.IsNullOrWhiteSpace(request.StorageTo))
             query = query.Where(x => x.ToStorageName == request.StorageTo);
         if (request.IsActive.HasValue)
             query = query.Where(x => x.IsActive == request.IsActive);
-        
+
         query = query.ApplyPagination(request.Pagination);
 
         var routes = await query

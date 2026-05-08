@@ -43,7 +43,7 @@ public class UserBalanceTests
 
         act.Should().Throw<InvalidOperationException>();
     }
-    
+
     [Fact]
     public void Create_SetsCurrencyId()
     {
@@ -54,7 +54,7 @@ public class UserBalanceTests
         balance.CurrencyId.Should().Be(42);
         balance.UserId.Should().Be(userId);
     }
-    
+
     [Fact]
     public void IncrementBalance_AllowsExactlyTwoDecimals()
     {
@@ -64,7 +64,7 @@ public class UserBalanceTests
 
         balance.Balance.Should().Be(1.23m);
     }
-    
+
     [Fact]
     public void IncrementBalance_MultipleOperations_PrecisionStable()
     {
@@ -76,7 +76,7 @@ public class UserBalanceTests
 
         balance.Balance.Should().Be(0.60m);
     }
-    
+
     [Fact]
     public void IncrementBalance_LargeValues_HandlesCorrectly()
     {
@@ -87,7 +87,7 @@ public class UserBalanceTests
 
         balance.Balance.Should().Be(3_000_000m);
     }
-    
+
     [Fact]
     public void IncrementBalance_AllowsNegativeBalance()
     {

@@ -19,7 +19,7 @@ public static class ServiceCollectionExtensions
     }
 
     public static IServiceCollection RegisterCachePolicies(
-        this IServiceCollection services, 
+        this IServiceCollection services,
         Assembly? assembly = null)
     {
         assembly ??= Assembly.GetExecutingAssembly();
@@ -36,12 +36,12 @@ public static class ServiceCollectionExtensions
             .Where(x => x.Interfaces.Any());
 
         foreach (var type in types)
-            foreach (var @interface in type.Interfaces)
-                services.AddScoped(@interface, type.Implementation);
+        foreach (var @interface in type.Interfaces)
+            services.AddScoped(@interface, type.Implementation);
 
         return services;
     }
-    
+
     public static IServiceCollection RegisterDbValidations(this IServiceCollection services, Assembly? assembly = null)
     {
         assembly ??= Assembly.GetExecutingAssembly();
@@ -72,7 +72,7 @@ public static class ServiceCollectionExtensions
     {
         assembly ??= Assembly.GetExecutingAssembly();
         services.AddValidatorsFromAssembly(assembly);
-        
+
         return services;
     }
 

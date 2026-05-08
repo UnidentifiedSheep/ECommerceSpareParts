@@ -1,9 +1,6 @@
-using Abstractions.Models;
 using Api.Common.Extensions;
 using Carter;
 using Main.Application.Dtos.Sale;
-using Main.Application.Handlers.Sales.GetSales;
-using Mapster;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
 

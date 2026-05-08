@@ -2,7 +2,7 @@
 
 namespace Main.Entities.User;
 
-public class UserPhone : AuditableEntity<UserPhone,  string>
+public class UserPhone : AuditableEntity<UserPhone, string>
 {
     public Guid UserId { get; set; }
 
@@ -17,5 +17,9 @@ public class UserPhone : AuditableEntity<UserPhone,  string>
     public string? PhoneType { get; set; }
 
     public DateTime? ConfirmedAt { get; set; }
-    public override string GetId() => NormalizedPhone;
+
+    public override string GetId()
+    {
+        return NormalizedPhone;
+    }
 }

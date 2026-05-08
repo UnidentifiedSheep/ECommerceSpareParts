@@ -15,7 +15,7 @@ public record UpdateReservationsCountsResult(Dictionary<int, int> NotFoundReserv
 
 public class UpdateReservationsCountsHandler(
     IRepository<StorageContentReservation, int> repository
-    ) : ICommandHandler<UpdateReservationsCountsCommand, UpdateReservationsCountsResult>
+) : ICommandHandler<UpdateReservationsCountsCommand, UpdateReservationsCountsResult>
 {
     public async Task<UpdateReservationsCountsResult> Handle(
         UpdateReservationsCountsCommand request,
@@ -23,23 +23,23 @@ public class UpdateReservationsCountsHandler(
     {
         if (request.Contents.Count == 0)
             return new UpdateReservationsCountsResult([]);
-        
+
         var userId = request.UserId;
         var remaining = new Dictionary<int, int>(request.Contents);
         var productIds = remaining.Keys;
-        
+
         var criteria = Criteria<StorageContentReservation>.New()
-            .Where(x => x.UserId == userId && 
-                        productIds.Contains(x.ProductId) && 
+            .Where(x => x.UserId == userId &&
+                        productIds.Contains(x.ProductId) &&
                         !x.IsDone)
             .Track()
             .ForUpdate()
             .Build();
-        
+
         var reservationsByIds = (await repository.ListAsync(criteria, cancellationToken))
             .GroupBy(x => x.ProductId)
             .ToDictionary(x => x.Key, x => x.ToList());
-        
+
         foreach (var productId in productIds)
         {
             if (!reservationsByIds.TryGetValue(productId, out var reservations))
@@ -51,18 +51,18 @@ public class UpdateReservationsCountsHandler(
                 if (remainingCount <= 0)
                     break;
 
-                int canBeTaken = reservation.ReservedCount - reservation.CurrentCount;
+                var canBeTaken = reservation.ReservedCount - reservation.CurrentCount;
                 var min = Math.Min(remainingCount, canBeTaken);
                 reservation.AddCount(min);
-                
+
                 remaining[productId] -= min;
             }
         }
-        
+
         var notFoundReservations = remaining
             .Where(x => x.Value > 0)
             .ToDictionary(x => x.Key, x => x.Value);
-        
+
         return new UpdateReservationsCountsResult(notFoundReservations);
     }
 }

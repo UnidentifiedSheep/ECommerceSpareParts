@@ -13,9 +13,13 @@ public class EditCharacteristicsEndPoint : ICarterModule
     public void AddRoutes(IEndpointRouteBuilder app)
     {
         app.MapPatch(
-                pattern: "/products/{productId}/characteristics/{name}",
-                handler: async (ISender sender, int productId, string name, 
-                    EditCharacteristicsRequest request, CancellationToken token) =>
+                "/products/{productId}/characteristics/{name}",
+                async (
+                    ISender sender,
+                    int productId,
+                    string name,
+                    EditCharacteristicsRequest request,
+                    CancellationToken token) =>
                 {
                     var command = new PatchCharacteristicsCommand(productId, name, request.Value);
                     await sender.Send(command, token);

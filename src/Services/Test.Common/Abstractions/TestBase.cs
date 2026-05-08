@@ -10,18 +10,27 @@ namespace Test.Common.Abstractions;
 public abstract class TestBase : IAsyncLifetime, ITest
 {
     private static readonly HashSet<Type> GlobalBasicContexts = [];
-    private readonly HashSet<Type> _basicContexts = []; 
-    private readonly HashSet<Type> _registeringContexts = [];
+    private readonly HashSet<Type> _basicContexts = [];
     private readonly Dictionary<Type, ITestContext> _initedBasicContexts = new();
+    private readonly HashSet<Type> _registeringContexts = [];
+
+    protected readonly Faker Faker = new();
     protected abstract IServiceProvider Sp { get; }
     protected abstract IServiceScope Scope { get; }
-    
-    protected readonly Faker Faker = new();
-    
+
+    public abstract Task InitializeAsync();
+
+    public abstract Task DisposeAsync();
+
     public void RegisterBasicContext<TContext>()
         where TContext : class, ITestContext
     {
         RegisterBasicContext(typeof(TContext));
+    }
+
+    public void RemoveBasicContext<TContext>() where TContext : class, ITestContext
+    {
+        _basicContexts.Remove(typeof(TContext));
     }
 
     private void RegisterBasicContext(Type type)
@@ -30,10 +39,8 @@ public abstract class TestBase : IAsyncLifetime, ITest
             return;
 
         if (!_registeringContexts.Add(type))
-        {
             throw new InvalidOperationException(
                 $"Circular dependency detected for context {type.Name}");
-        }
 
         try
         {
@@ -44,18 +51,13 @@ public abstract class TestBase : IAsyncLifetime, ITest
                     BindingFlags.Public | BindingFlags.Static);
 
                 if (dependsOnProperty == null)
-                {
                     throw new InvalidOperationException(
                         $"Type {type.Name} implements ITestContextRegistrator but does not define DependsOn.");
-                }
 
                 var dependencies = dependsOnProperty.GetValue(null) as Type[]
                                    ?? [];
 
-                foreach (var dependency in dependencies)
-                {
-                    RegisterBasicContext(dependency);
-                }
+                foreach (var dependency in dependencies) RegisterBasicContext(dependency);
             }
 
             _basicContexts.Add(type);
@@ -66,11 +68,6 @@ public abstract class TestBase : IAsyncLifetime, ITest
         }
     }
 
-    public void RemoveBasicContext<TContext>() where TContext : class, ITestContext
-    {
-        _basicContexts.Remove(typeof(TContext));
-    }
-    
     public static void RegisterGlobalBasicContext<TContext>() where TContext : class, ITestContext
     {
         GlobalBasicContexts.Add(typeof(TContext));
@@ -99,8 +96,4 @@ public abstract class TestBase : IAsyncLifetime, ITest
             await ctx.InitializeAsync();
         }
     }
-
-    public abstract Task InitializeAsync();
-
-    public abstract Task DisposeAsync();
 }

@@ -7,31 +7,47 @@ namespace Main.Application.Extensions;
 public static class QueryableRepositoryExtensions
 {
     public static IQueryable<User> ExcludeUsersWithRole(this IQueryable<User> query, Role role)
-        => ExcludeUsersWithRoles(query, [role]);
+    {
+        return query.ExcludeUsersWithRoles([role]);
+    }
 
     public static IQueryable<User> ExcludeUsersWithRole(this IQueryable<User> query, string role)
-        => ExcludeUsersWithRoles(query, [role]);
+    {
+        return query.ExcludeUsersWithRoles([role]);
+    }
 
     public static IQueryable<User> ExcludeUsersWithRoles(this IQueryable<User> query, IEnumerable<Role> roles)
-        => ApplyRoleFilter(query, NormalizeMany(roles), include: false);
+    {
+        return ApplyRoleFilter(query, NormalizeMany(roles), false);
+    }
 
     public static IQueryable<User> ExcludeUsersWithRoles(this IQueryable<User> query, IEnumerable<string> roles)
-        => ApplyRoleFilter(query, NormalizeMany(roles), include: false);
+    {
+        return ApplyRoleFilter(query, NormalizeMany(roles), false);
+    }
 
     public static IQueryable<User> IncludeUsersWithRole(this IQueryable<User> query, Role role)
-        => IncludeUsersWithRoles(query, [role]);
+    {
+        return query.IncludeUsersWithRoles([role]);
+    }
 
     public static IQueryable<User> IncludeUsersWithRole(this IQueryable<User> query, string role)
-        => IncludeUsersWithRoles(query, [role]);
+    {
+        return query.IncludeUsersWithRoles([role]);
+    }
 
     public static IQueryable<User> IncludeUsersWithRoles(this IQueryable<User> query, IEnumerable<Role> roles)
-        => ApplyRoleFilter(query, NormalizeMany(roles), include: true);
+    {
+        return ApplyRoleFilter(query, NormalizeMany(roles), true);
+    }
 
     public static IQueryable<User> IncludeUsersWithRoles(this IQueryable<User> query, IEnumerable<string> roles)
-        => ApplyRoleFilter(query, NormalizeMany(roles), include: true);
+    {
+        return ApplyRoleFilter(query, NormalizeMany(roles), true);
+    }
 
     private static IQueryable<User> ApplyRoleFilter(
-        IQueryable<User> query, 
+        IQueryable<User> query,
         IReadOnlyCollection<string> normalizedRoles,
         bool include)
     {
@@ -43,14 +59,22 @@ public static class QueryableRepositoryExtensions
     }
 
     private static string Normalize(string role)
-        => RoleName.ToNormalized(role);
+    {
+        return RoleName.ToNormalized(role);
+    }
 
     private static string Normalize(Role role)
-        => Normalize(role.ToString());
+    {
+        return Normalize(role.ToString());
+    }
 
     private static IReadOnlyCollection<string> NormalizeMany(IEnumerable<string> roles)
-        => roles.Select(Normalize).Distinct().ToArray();
+    {
+        return roles.Select(Normalize).Distinct().ToArray();
+    }
 
     private static IReadOnlyCollection<string> NormalizeMany(IEnumerable<Role> roles)
-        => roles.Select(Normalize).Distinct().ToArray();
+    {
+        return roles.Select(Normalize).Distinct().ToArray();
+    }
 }

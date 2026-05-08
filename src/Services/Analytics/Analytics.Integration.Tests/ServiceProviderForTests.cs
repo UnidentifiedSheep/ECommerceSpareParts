@@ -1,7 +1,5 @@
 ﻿using System.Reflection;
-using Abstractions.Interfaces.Currency;
 using Analytics.Application;
-using Analytics.Application.Configs.Mapster;
 using Analytics.Integration.Tests.MockData;
 using Analytics.Persistence;
 using Analytics.Persistence.Context;
@@ -10,7 +8,6 @@ using Localization.Domain.Extensions;
 using MassTransit;
 using Microsoft.Extensions.DependencyInjection;
 using Persistence.Extensions;
-using Redis;
 using Test.Common.Extensions;
 using Test.Common.Stubs;
 using MsServiceProvider = Microsoft.Extensions.DependencyInjection.ServiceProvider;

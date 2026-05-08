@@ -22,8 +22,8 @@ public record EditSaleCommand(
     string? Comment) : ICommand;
 
 public class EditSaleHandler(
-    IUnitOfWork unitOfWork, 
-    ISaleService saleService, 
+    IUnitOfWork unitOfWork,
+    ISaleService saleService,
     IRepository<Sale, Guid> saleRepository,
     IRepository<SaleContent, int> saleContentRepository)
     : ICommandHandler<EditSaleCommand>
@@ -39,17 +39,15 @@ public class EditSaleHandler(
         sale.SetComment(request.Comment);
         sale.SetDateTime(request.SaleDateTime);
         sale.SetCurrency(request.CurrencyId);
-        
+
         var saleContents = await GetContents(saleId, cancellationToken);
 
         var deletedContentIds = new HashSet<int>(saleContents.Keys);
 
         foreach (var item in editedContent)
-        {
-            if (item.Id.HasValue) deletedContentIds.Remove(item.Id.Value);
-            
-        }
-        
+            if (item.Id.HasValue)
+                deletedContentIds.Remove(item.Id.Value);
+
         foreach (var saleContent in saleService.DistributeDetails(request.StorageContentValues, editedContent))
             sale.AddContent(saleContent);
 
@@ -57,7 +55,7 @@ public class EditSaleHandler(
             .Where(kvp => deletedContentIds.Contains(kvp.Key))
             .Select(x => x.Value)
             .ToList();
-        
+
         unitOfWork.RemoveRange(deletedContents);
         return Unit.Value;
     }
@@ -69,7 +67,7 @@ public class EditSaleHandler(
             .Include(x => x.Details)
             .Track()
             .Build();
-        
+
         return (await saleContentRepository.ListAsync(criteria, cancellationToken)).ToDictionary(x => x.Id);
     }
 }

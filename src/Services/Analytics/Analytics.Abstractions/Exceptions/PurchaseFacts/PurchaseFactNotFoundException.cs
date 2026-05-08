@@ -3,7 +3,7 @@ using Exceptions.Base;
 
 namespace Analytics.Abstractions.Exceptions.PurchaseFacts;
 
-public class PurchaseFactNotFoundException(string id) 
+public class PurchaseFactNotFoundException(string id)
     : NotFoundException(null, new { Id = id }), ILocalizableException
 {
     public string MessageKey => "purchase.fact.not.found";

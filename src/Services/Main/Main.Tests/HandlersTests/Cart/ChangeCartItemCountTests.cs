@@ -12,6 +12,7 @@ namespace Tests.HandlersTests.Cart;
 public class ChangeCartItemCountTests : IntegrationTest
 {
     private Main.Entities.Cart.Cart _cartItem = null!;
+
     public ChangeCartItemCountTests(CombinedContainerFixture fixture) : base(fixture)
     {
         RegisterBasicContext<ProductTestContext>();

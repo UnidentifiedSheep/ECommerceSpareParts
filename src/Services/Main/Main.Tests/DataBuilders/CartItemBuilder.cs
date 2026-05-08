@@ -27,12 +27,12 @@ public class CartItemBuilder(Faker faker) : BuilderBase<Cart>(faker)
         Quantity = quantity;
         return this;
     }
-    
+
     public override Cart Build()
     {
         return Cart.Create(
-            userId: UserId ?? Guid.NewGuid(),
-            productId: ProductId ?? Faker.GlobalUniqueIndex,
-            count: Quantity ?? Faker.Random.Int(1));
+            UserId ?? Guid.NewGuid(),
+            ProductId ?? Faker.GlobalUniqueIndex,
+            Quantity ?? Faker.Random.Int(1));
     }
 }

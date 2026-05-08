@@ -2,7 +2,18 @@
 
 public record UserCacheSettings : CacheSetting
 {
-    public string GetUserCacheKey(Guid userId) => $"user:{userId}";
-    public string GetUserDiscountCacheKey(Guid userId) => $"user:{userId}:discount";
-    public string GetUserRolesAndPermissionsCacheKey(Guid userId) => $"user:{userId}:roles:permissions";
+    public string GetUserCacheKey(Guid userId)
+    {
+        return $"user:{userId}";
+    }
+
+    public string GetUserDiscountCacheKey(Guid userId)
+    {
+        return $"user:{userId}:discount";
+    }
+
+    public string GetUserRolesAndPermissionsCacheKey(Guid userId)
+    {
+        return $"user:{userId}:roles:permissions";
+    }
 }

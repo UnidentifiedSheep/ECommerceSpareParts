@@ -52,9 +52,9 @@ public class CreateCurrencyTests(CombinedContainerFixture fixture) : Integration
     {
         if (name == "tooBig") name = Faker.Lorem.Letter(200);
         var command = new CreateCurrencyCommand(
-            GetValidShortName(), 
-            name, 
-            GetValidCurrencySign(), 
+            GetValidShortName(),
+            name,
+            GetValidCurrencySign(),
             GetValidCurrencyCode());
         await Assert.ThrowsAsync<ValidationException>(async () => await Mediator.Send(command));
     }
@@ -85,29 +85,29 @@ public class CreateCurrencyTests(CombinedContainerFixture fixture) : Integration
     {
         var created = await new CurrencyBuilder(Faker)
             .BuildAndAddToDb(Context);
-        
+
         var exception = await Assert.ThrowsAsync<DbValidationException>(async () =>
             await Mediator.Send(new CreateCurrencyCommand(GetValidShortName(), GetValidName(), GetValidCurrencySign(),
                 created.Code)));
-        
+
         Assert.Equal(ApplicationErrors.CurrencyCodeAlreadyTaken, exception.Failures[0].ErrorName);
 
         exception = await Assert.ThrowsAsync<DbValidationException>(async () =>
             await Mediator.Send(new CreateCurrencyCommand(GetValidShortName(), created.Name, GetValidCurrencySign(),
                 GetValidCurrencyCode())));
-        
+
         Assert.Equal(ApplicationErrors.CurrencyNameAlreadyTaken, exception.Failures[0].ErrorName);
 
         exception = await Assert.ThrowsAsync<DbValidationException>(async () =>
             await Mediator.Send(new CreateCurrencyCommand(GetValidShortName(), GetValidName(), created.CurrencySign,
                 GetValidCurrencyCode())));
-        
+
         Assert.Equal(ApplicationErrors.CurrencySignAlreadyTaken, exception.Failures[0].ErrorName);
 
         exception = await Assert.ThrowsAsync<DbValidationException>(async () =>
             await Mediator.Send(new CreateCurrencyCommand(created.ShortName, GetValidName(), GetValidCurrencySign(),
                 GetValidCurrencyCode())));
-        
+
         Assert.Equal(ApplicationErrors.CurrencyShortNameAlreadyTaken, exception.Failures[0].ErrorName);
     }
 

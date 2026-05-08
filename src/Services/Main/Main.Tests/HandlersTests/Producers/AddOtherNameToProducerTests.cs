@@ -17,9 +17,9 @@ public class AddOtherNameToProducerTests : IntegrationTest
     {
         RegisterBasicContext<ProducerTestContext>();
     }
-    
+
     private ProducerTestContext TestContext => GetContext<ProducerTestContext>();
-    
+
     [Theory]
     [InlineData(" ")]
     [InlineData("tooBig")]
@@ -37,9 +37,9 @@ public class AddOtherNameToProducerTests : IntegrationTest
     {
         var producer = TestContext.Producers[0];
         var command = new AddOtherNameCommand(
-            ProducerId: producer.Id, 
-            OtherName: Faker.Lorem.Letter(40),
-            WhereUsed: Faker.Lorem.Letter(200));
+            producer.Id,
+            Faker.Lorem.Letter(40),
+            Faker.Lorem.Letter(200));
         await Assert.ThrowsAsync<ValidationException>(async () => await Mediator.Send(command));
     }
 
@@ -47,9 +47,9 @@ public class AddOtherNameToProducerTests : IntegrationTest
     public async Task AddOtherProducerName_InvalidProducerId_ThrowsProducerNotFound()
     {
         var command = new AddOtherNameCommand(
-            ProducerId: int.MaxValue, 
-            OtherName: Faker.Lorem.Letter(40), 
-            WhereUsed: Faker.Lorem.Letter(10));
+            int.MaxValue,
+            Faker.Lorem.Letter(40),
+            Faker.Lorem.Letter(10));
         var exception = await Assert.ThrowsAsync<DbValidationException>(async () => await Mediator.Send(command));
         Assert.Equal(ApplicationErrors.ProducersNotFound, exception.Failures[0].ErrorName);
     }
@@ -60,18 +60,18 @@ public class AddOtherNameToProducerTests : IntegrationTest
         var producer = TestContext.Producers[0];
 
         var command = new AddOtherNameCommand(
-            ProducerId: producer.Id, 
-            OtherName: Faker.Lorem.Letter(40), 
-            WhereUsed: Faker.Lorem.Letter(10));
-        
+            producer.Id,
+            Faker.Lorem.Letter(40),
+            Faker.Lorem.Letter(10));
+
         var act = () => Mediator.Send(command);
 
         await act.Should().NotThrowAsync();
 
         var otherName = await Context.ProducersOtherNames.AsNoTracking().FirstOrDefaultAsync();
-        
+
         otherName.Should().NotBeNull();
-        
+
         otherName.ProducerId.Should().Be(producer.Id);
         otherName.OtherName.Should().Be(command.OtherName);
         otherName.WhereUsed.Should().Be(command.WhereUsed);

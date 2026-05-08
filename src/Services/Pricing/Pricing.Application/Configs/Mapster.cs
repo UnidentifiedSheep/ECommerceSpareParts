@@ -11,9 +11,8 @@ public static class Mapster
 {
     public static void Configure()
     {
-        TypeAdapterConfig<Currency, Abstractions.Models.Currency>.NewConfig()
-            .Map(dest => dest.Id, src => src.Id)
-            .Map(dest => dest.ToUsdRate, src => src.ToUsdRate);
+        global::Mapster.TypeAdapterConfig<Currency, Abstractions.Models.Currency>.NewConfig()
+            .Map(dest => dest.Id, src => src.Id).Map<decimal,>(dest => dest.ToUsdRate, src => src.ToUsdRate);
 
         //Markup
 
@@ -39,7 +38,7 @@ public static class Mapster
 
         TypeAdapterConfig<ArticleCoefficient, PriceCoefficient>.NewConfig()
             .Map(dest => dest.Name, src => src.Coefficient.Name)
-            .Map(dest => dest.Order, src => src.Coefficient.Order)
+            .Map<int,>(dest => dest.Order, src => src.Coefficient.Order)
             .Map(dest => dest.Value, src => src.Coefficient.Value)
             .Map(dest => dest.Type, src => src.Coefficient.Type)
             .Map(dest => dest.ValidTill, src => src.ValidTill);

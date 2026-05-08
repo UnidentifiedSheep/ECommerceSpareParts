@@ -4,7 +4,6 @@ using LinqKit;
 using Main.Application.Dtos.Currencies;
 using Main.Application.Handlers.Projections;
 using Main.Entities.Currency;
-using Mapster;
 using Microsoft.EntityFrameworkCore;
 
 namespace Main.Application.Handlers.Currencies.GetAllCurrencies;

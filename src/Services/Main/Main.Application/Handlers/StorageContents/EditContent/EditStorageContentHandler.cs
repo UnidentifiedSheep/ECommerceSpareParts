@@ -3,7 +3,6 @@ using Abstractions.Interfaces.Services;
 using Application.Common.Extensions;
 using Application.Common.Interfaces;
 using Application.Common.Interfaces.Currency;
-using Application.Common.Interfaces.Repositories;
 using Attributes;
 using Contracts.Articles;
 using Contracts.StorageContent;
@@ -15,7 +14,6 @@ using Main.Application.Interfaces.Persistence;
 using Main.Entities.Event;
 using Main.Entities.Exceptions.Products;
 using Main.Entities.Exceptions.Storages;
-using Main.Entities.Product;
 using Main.Entities.Storage;
 using Main.Enums;
 using MediatR;
@@ -34,7 +32,7 @@ public class EditStorageContentHandler(
     IUnitOfWork unitOfWork,
     IIntegrationEventScope integrationEventScope,
     ICurrencyConverter currencyConverter
-    ) : ICommandHandler<EditStorageContentCommand>
+) : ICommandHandler<EditStorageContentCommand>
 {
     public async Task<Unit> Handle(EditStorageContentCommand request, CancellationToken cancellationToken)
     {
@@ -42,32 +40,32 @@ public class EditStorageContentHandler(
 
         var storageContents = await storageContentRepository
             .EnsureExistsForUpdateAsync(
-                ids: editedFields.Keys,
-                errorFactory: nf => new StorageContentNotFoundException(nf),
-                ct: cancellationToken);
+                editedFields.Keys,
+                nf => new StorageContentNotFoundException(nf),
+                cancellationToken);
 
         var products = await productRepository
             .EnsureExistsForUpdateAsync(
-                ids: storageContents.Select(x => x.Value.ProductId),
-                errorFactory: (nf) => new ProductNotFoundException(nf),
-                ct: cancellationToken);
-        
+                storageContents.Select(x => x.Value.ProductId),
+                nf => new ProductNotFoundException(nf),
+                cancellationToken);
+
         var storageMovements = new List<Event>();
-        
+
         foreach (var item in editedFields)
         {
-            PatchStorageContentDto patch = item.Value.Model;
-            StorageContent content = storageContents[item.Key];
-            Product product = products[item.Key];
-            
+            var patch = item.Value.Model;
+            var content = storageContents[item.Key];
+            var product = products[item.Key];
+
             content.ValidateVersion(item.Value.RowVersion);
             product.IncreaseStock(CalculateDiff(content, patch));
-            
+
             var movementEvent = StorageMovementEvent.Create(content, StorageMovementType.StorageContentEditing);
 
             patch.Count.Apply(content.SetCount);
             patch.CurrencyId.Apply(content.SetCurrencyId);
-            
+
             if (patch.BuyPrice.IsSet)
             {
                 var value = patch.BuyPrice.Value;
@@ -75,11 +73,12 @@ public class EditStorageContentHandler(
                     .ConvertToBaseAsync(value, content.CurrencyId, cancellationToken);
                 content.SetBuyPrice(value, inBaseCurrency);
             }
-            
+
             patch.PurchaseDatetime.Apply(content.SetPurchaseDate);
-            
+
             storageMovements.Add(movementEvent);
         }
+
         await unitOfWork.AddRangeAsync(storageMovements, cancellationToken);
 
         foreach (var productId in products.Keys)
@@ -88,13 +87,13 @@ public class EditStorageContentHandler(
             {
                 Id = productId
             });
-            
+
             integrationEventScope.Add(new StorageContentUpdatedEvent
             {
                 ProductId = productId
             });
         }
-        
+
         return Unit.Value;
     }
 

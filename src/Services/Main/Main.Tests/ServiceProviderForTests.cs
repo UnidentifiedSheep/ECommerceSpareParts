@@ -22,11 +22,12 @@ namespace Tests;
 public class ServiceProviderForTests
 {
     private static bool _staticsConfigured;
+
     public IServiceProvider Build(string postgresConnectionString, string redisConnectionString)
     {
         RegisterGlobalBasicContexts();
         var services = new ServiceCollection();
-        
+
         services.RegisterTestContexts();
 
         services.AddLogging();
@@ -43,16 +44,16 @@ public class ServiceProviderForTests
             RequireDigit = false,
             RequireUppercase = false
         };
-            
+
         services.AddJsonSigner("some secret")
             .AddCacheLayer(redisConnectionString)
             .AddFullSecurityLayer(passwordRules)
             .AddMailLayer()
             .AddCommonLayer();
-        
+
         services.RemoveAll<IUserContext>();
         services.AddScoped<IUserContext, UserContextMock>();
-        
+
         services.AddTransient<IPublishEndpoint, MessageBrokerStub>();
 
         if (!_staticsConfigured)

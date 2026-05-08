@@ -13,7 +13,7 @@ public class EditStorageContentDbValidation : AbstractDbValidation<EditStorageCo
             .Select(x => x.Value.Model.CurrencyId.Value)
             .Distinct()
             .ToArray();
-        
+
         if (currencyIds.Length != 0)
             plan.ValidateCurrencyExistsId(currencyIds);
     }

@@ -5,17 +5,13 @@ using Microsoft.Extensions.Hosting;
 using Pricing.Persistence.Contexts;
 
 var builder = Host.CreateDefaultBuilder(args)
-    .ConfigureAppConfiguration((_, config) =>
-    {
-        config.AddCommandLine(args);
-    });
+    .ConfigureAppConfiguration((_, config) => { config.AddCommandLine(args); });
 
 builder.ConfigureServices((context, services) =>
 {
     var connectionString = context.Configuration["ConnectionString"];
-    services.AddDbContext<DContext>(
-        options => options.UseNpgsql(connectionString, 
-            x => x.MigrationsAssembly("Pricing.Migrator")));
+    services.AddDbContext<DContext>(options => options.UseNpgsql(connectionString,
+        x => x.MigrationsAssembly("Pricing.Migrator")));
 });
 
 var host = builder.Build();

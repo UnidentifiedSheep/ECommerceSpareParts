@@ -4,10 +4,9 @@ namespace Main.Entities.User.ValueObjects;
 
 public record UserName
 {
-    public string Value { get; } = null!;
-    public string NormalizedValue { get; } = null!;
-
-    private UserName() {}
+    private UserName()
+    {
+    }
 
     public UserName(string value)
     {
@@ -22,12 +21,21 @@ public record UserName
         NormalizedValue = ToNormalized(Value);
     }
 
+    public string Value { get; } = null!;
+    public string NormalizedValue { get; } = null!;
+
     public static string ToNormalized(string source)
     {
         return source.Trim().ToUpperInvariant();
     }
-    
-    public static implicit operator UserName(string value) => new(value);
 
-    public static implicit operator string(UserName sku) => sku.Value;
+    public static implicit operator UserName(string value)
+    {
+        return new UserName(value);
+    }
+
+    public static implicit operator string(UserName sku)
+    {
+        return sku.Value;
+    }
 }

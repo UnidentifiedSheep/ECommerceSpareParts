@@ -8,7 +8,7 @@ public class CurrencyConfiguration : IEntityTypeConfiguration<Entities.Currency.
     public void Configure(EntityTypeBuilder<Entities.Currency.Currency> builder)
     {
         builder.ToTable("currency", "public");
-        
+
         builder.HasKey(e => e.Id)
             .HasName("currency_pk");
 
@@ -26,23 +26,23 @@ public class CurrencyConfiguration : IEntityTypeConfiguration<Entities.Currency.
 
         builder.Property(e => e.Id)
             .HasColumnName("id");
-        
+
         builder.Property(e => e.Code)
             .HasMaxLength(26)
             .HasColumnName("code");
-        
+
         builder.Property(e => e.CurrencySign)
             .HasMaxLength(3)
             .HasColumnName("currency_sign");
-        
+
         builder.Property(e => e.Name)
             .HasMaxLength(128)
             .HasColumnName("name");
-        
+
         builder.Property(e => e.ShortName)
             .HasMaxLength(5)
             .HasColumnName("short_name");
-        
+
         builder.HasMany(e => e.RatesFrom)
             .WithOne(e => e.FromCurrency)
             .HasForeignKey(e => e.FromCurrencyId)
@@ -52,11 +52,11 @@ public class CurrencyConfiguration : IEntityTypeConfiguration<Entities.Currency.
             .WithOne(e => e.ToCurrency)
             .HasForeignKey(e => e.ToCurrencyId)
             .OnDelete(DeleteBehavior.Restrict);
-        
+
         builder.Navigation(e => e.RatesTo)
             .HasField("_ratesTo")
             .UsePropertyAccessMode(PropertyAccessMode.Field);
-        
+
         builder.Navigation(e => e.RatesFrom)
             .HasField("_ratesFrom")
             .UsePropertyAccessMode(PropertyAccessMode.Field);

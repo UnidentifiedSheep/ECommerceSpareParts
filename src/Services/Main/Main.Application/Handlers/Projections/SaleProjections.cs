@@ -19,7 +19,7 @@ public static class SaleProjections
             TotalSum = x.Transaction.Amount,
             TransactionId = x.TransactionId
         };
-    
+
     public static readonly Expression<Func<SaleContent, SaleContentDto>> ToSaleContentDto =
         x => new SaleContentDto
         {

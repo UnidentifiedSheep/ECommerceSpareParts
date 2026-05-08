@@ -13,7 +13,7 @@ public static class EnumerableExtensions
         foreach (var id in otherIds)
             if (!set.Contains(id))
                 notFoundIds.Add(id);
-        
+
         if (notFoundIds.Count > 0) throw errorFactory(notFoundIds);
     }
 }

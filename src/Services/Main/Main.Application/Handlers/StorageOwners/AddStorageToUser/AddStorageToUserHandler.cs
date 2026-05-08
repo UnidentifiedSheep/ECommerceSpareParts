@@ -1,7 +1,6 @@
 ﻿using Abstractions.Interfaces.Services;
 using Application.Common.Interfaces;
 using Attributes;
-using Main.Entities;
 using Main.Entities.Storage;
 using MediatR;
 
@@ -15,7 +14,7 @@ public class AddStorageToUserHandler(IUnitOfWork unitOfWork) : ICommandHandler<A
 {
     public async Task<Unit> Handle(AddStorageToUserCommand request, CancellationToken cancellationToken)
     {
-        StorageOwner model = StorageOwner.Create(request.StorageName, request.UserId);
+        var model = StorageOwner.Create(request.StorageName, request.UserId);
 
         await unitOfWork.AddAsync(model, cancellationToken);
         return Unit.Value;

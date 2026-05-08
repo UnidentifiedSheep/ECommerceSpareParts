@@ -5,10 +5,9 @@ namespace Main.Entities.Product.ValueObjects;
 
 public partial record Sku
 {
-    public string Value { get; } = null!;
-    public string NormalizedValue { get; } = null!;
-
-    private Sku() {}
+    private Sku()
+    {
+    }
 
     public Sku(string value)
     {
@@ -21,7 +20,10 @@ public partial record Sku
         Value = value;
         NormalizedValue = ToNormalized(Value);
     }
-    
+
+    public string Value { get; } = null!;
+    public string NormalizedValue { get; } = null!;
+
     [GeneratedRegex("[^a-zA-Z0-9а-яА-Я]+")]
     private static partial Regex OnlyCharacter();
 
@@ -29,8 +31,14 @@ public partial record Sku
     {
         return OnlyCharacter().Replace(source, "").ToUpperInvariant();
     }
-    
-    public static implicit operator Sku(string value) => new(value);
 
-    public static implicit operator string(Sku sku) => sku.Value;
+    public static implicit operator Sku(string value)
+    {
+        return new Sku(value);
+    }
+
+    public static implicit operator string(Sku sku)
+    {
+        return sku.Value;
+    }
 }

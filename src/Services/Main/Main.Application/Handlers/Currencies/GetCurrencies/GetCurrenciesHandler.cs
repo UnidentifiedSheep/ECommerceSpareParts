@@ -6,7 +6,6 @@ using LinqKit;
 using Main.Application.Dtos.Currencies;
 using Main.Application.Handlers.Projections;
 using Main.Entities.Currency;
-using Mapster;
 using Microsoft.EntityFrameworkCore;
 
 namespace Main.Application.Handlers.Currencies.GetCurrencies;
@@ -16,7 +15,7 @@ public record GetCurrenciesQuery(Pagination Pagination) : IQuery<GetCurrenciesRe
 public record GetCurrenciesResult(IReadOnlyList<CurrencyDto> Currencies);
 
 public class GetCurrenciesHandler(
-    IReadRepository<Currency, int> repository, 
+    IReadRepository<Currency, int> repository,
     IIdsCollector idsCollector)
     : IQueryHandler<GetCurrenciesQuery, GetCurrenciesResult>
 {

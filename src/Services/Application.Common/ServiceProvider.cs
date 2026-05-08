@@ -1,5 +1,4 @@
 ﻿using System.Reflection;
-using Application.Common.Abstractions;
 using Application.Common.Abstractions.Settings;
 using Application.Common.Backplane;
 using Application.Common.Behaviors;
@@ -25,10 +24,10 @@ public static class ServiceProvider
 
         services.AddSingleton<ISettingsContainer, SettingsContainer>();
         services.AddScoped<ISettingsService, SettingsService>();
-        
+
         services.AddSingleton<IBackplaneDispatcher, BackplaneDispatcher>();
         services.AddScoped<IFusionCacheBackplane, MassTransitBackplane>();
-        
+
         services.AddMediatR(config =>
         {
             config.RegisterServicesFromAssembly(assembly);
@@ -40,7 +39,7 @@ public static class ServiceProvider
             config.AddOpenBehavior(typeof(IntegrationEventPublisherBehavior<,>), ServiceLifetime.Scoped);
             config.AddOpenBehavior(typeof(SaveChangesBehavior<,>), ServiceLifetime.Scoped);
         });
-        
+
         return services;
     }
 }

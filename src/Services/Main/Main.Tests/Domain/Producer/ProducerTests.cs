@@ -1,6 +1,5 @@
 ﻿using FluentAssertions;
 using Main.Entities.Producer.ValueObjects;
-
 using ProducerDomain = Main.Entities.Producer.Producer;
 
 namespace Main.Tests.Domain.Producer;

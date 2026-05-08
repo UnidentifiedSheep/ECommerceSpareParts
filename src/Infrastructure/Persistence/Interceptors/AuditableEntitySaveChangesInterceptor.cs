@@ -38,6 +38,5 @@ public class AuditableEntitySaveChangesInterceptor(IUserContext userContext) : S
                 entry.Entity.SetCreatedUser(userContext.UserId);
             entry.Entity.Touch(userContext.UserId);
         }
-        
     }
 }

@@ -1,5 +1,4 @@
-﻿using Main.Entities;
-using Main.Entities.User;
+﻿using Main.Entities.User;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
@@ -10,7 +9,7 @@ public class UserPhoneConfiguration : IEntityTypeConfiguration<UserPhone>
     public void Configure(EntityTypeBuilder<UserPhone> builder)
     {
         builder.ToTable("user_phones", "auth");
-        
+
         builder.HasKey(e => e.NormalizedPhone)
             .HasName("user_phones_pk");
 
@@ -24,25 +23,25 @@ public class UserPhoneConfiguration : IEntityTypeConfiguration<UserPhone>
 
         builder.Property(e => e.Confirmed)
             .HasColumnName("confirmed");
-        
+
         builder.Property(e => e.ConfirmedAt)
             .HasColumnName("confirmed_at");
-        
+
         builder.Property(e => e.IsPrimary)
             .HasColumnName("is_primary");
-        
+
         builder.Property(e => e.NormalizedPhone)
             .HasMaxLength(32)
             .HasColumnName("normalized_phone");
-        
+
         builder.Property(e => e.PhoneNumber)
             .HasMaxLength(32)
             .HasColumnName("phone_number");
-        
+
         builder.Property(e => e.PhoneType)
             .HasMaxLength(32)
             .HasColumnName("phone_type");
-        
+
         builder.Property(e => e.UserId)
             .HasColumnName("user_id");
 

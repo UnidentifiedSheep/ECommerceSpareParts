@@ -10,7 +10,7 @@ public static class AuthProjections
         x => new PermissionDto
         {
             Name = x.Name,
-            Description = x.Description,
+            Description = x.Description
         };
 
     public static readonly Expression<Func<Role, RoleDto>> ToRoleDto =

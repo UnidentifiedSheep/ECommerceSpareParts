@@ -23,7 +23,7 @@ public record CalculateDeliveryCostQuery(
     string StorageTo,
     IEnumerable<LogisticsItemDto> Items,
     LogisticsCalculationMode Mode = LogisticsCalculationMode.Strict
-    ) : IQuery<CalculateDeliveryCostResult>;
+) : IQuery<CalculateDeliveryCostResult>;
 
 public record CalculateDeliveryCostResult(StorageRouteDto Route, DeliveryCostDto DeliveryCost);
 
@@ -51,11 +51,11 @@ public class CalculateDeliveryCostHandler(
         var weights = await GetWeights(usableProductIds, cancellationToken);
 
         var calcResult = await CalculateLogistics(
-            route, 
-            sizes, 
-            weights, 
-            request.Items, 
-            route.CurrencyId, 
+            route,
+            sizes,
+            weights,
+            request.Items,
+            route.CurrencyId,
             request.Mode);
         DeliveryCostDto deliveryCost = new()
         {
@@ -91,7 +91,7 @@ public class CalculateDeliveryCostHandler(
             .Include(x => x.Currency)
             .Track(false)
             .Build();
-        
+
         return await storageRoutesRepository.GetActiveRouteAsync(from, to, criteria, cancellationToken)
                ?? throw new StorageRouteNotFound(from, to);
     }
@@ -104,7 +104,7 @@ public class CalculateDeliveryCostHandler(
             .Where(x => productIds.Contains(x.ProductId))
             .Track(false)
             .Build();
-            
+
         return (await sizesRepository
                 .ListAsync(criteria, cancellationToken))
             .ToDictionary(x => x.ProductId);
@@ -132,22 +132,22 @@ public class CalculateDeliveryCostHandler(
     {
         var priceKg = Math.Round(await currencyConverter
             .ConvertAsync(
-                route.PriceKg, 
-                route.CurrencyId, 
+                route.PriceKg,
+                route.CurrencyId,
                 currencyId), 2);
         var priceArea = Math.Round(await currencyConverter
             .ConvertAsync(
-                route.PricePerM3, 
-                route.CurrencyId, 
+                route.PricePerM3,
+                route.CurrencyId,
                 currencyId), 2);
         var priceOrder = Math.Round(await currencyConverter
             .ConvertAsync(
-                route.PricePerOrder, 
-                route.CurrencyId, 
+                route.PricePerOrder,
+                route.CurrencyId,
                 currencyId), 2);
         var minimalPrice = Math.Round(await currencyConverter.ConvertAsync(
-            route.MinimumPrice, 
-            route.CurrencyId, 
+            route.MinimumPrice,
+            route.CurrencyId,
             currencyId), 2);
 
         var context = new LogisticsContext(priceKg, priceArea, priceOrder, minimalPrice);

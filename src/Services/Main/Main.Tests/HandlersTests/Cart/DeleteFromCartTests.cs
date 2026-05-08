@@ -11,6 +11,7 @@ namespace Tests.HandlersTests.Cart;
 public class DeleteFromCartTests : IntegrationTest
 {
     private Main.Entities.Cart.Cart _cartItem = null!;
+
     public DeleteFromCartTests(CombinedContainerFixture fixture) : base(fixture)
     {
         RegisterBasicContext<ProductTestContext>();

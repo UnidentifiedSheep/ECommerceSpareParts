@@ -2,12 +2,12 @@
 using Application.Common.Interfaces;
 using Attributes;
 using Main.Application.Dtos.Amw.Purchase;
-using Main.Entities.Purchase;
 using MediatR;
 
 namespace Main.Application.Handlers.Purchases.AddContentLogisticsToPurchase;
 
-[Transactional, AutoSave]
+[Transactional]
+[AutoSave]
 public record AddContentLogisticsToPurchaseCommand(IEnumerable<PurchaseContentLogisticDto> Contents) : ICommand;
 
 public class AddContentLogisticsToPurchaseHandler(IUnitOfWork unitOfWork)

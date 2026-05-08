@@ -1,5 +1,4 @@
 ﻿using Abstractions.Interfaces.Services;
-using Abstractions.Models.Repository;
 using Analytics.Abstractions.Dtos.CalculationJob;
 using Analytics.Abstractions.Exceptions.MetricCalculationJobs;
 using Analytics.Abstractions.Interfaces.DbRepositories;
@@ -17,8 +16,8 @@ namespace Analytics.Application.Handlers.Metrics.CalculateFullMetric;
 
 public record CalculateFullMetricCommand(
     Guid RequestId,
-    string MetricSystemName, 
-    MetricPayloadDto MetricPayload, 
+    string MetricSystemName,
+    MetricPayloadDto MetricPayload,
     Guid CreatedBy) : ICommand;
 
 public class CalculateFullMetricHandler(
@@ -36,7 +35,7 @@ public class CalculateFullMetricHandler(
             request.MetricSystemName);
 
         unitOfWork.Context.SuppressAutoSave = true;
-        
+
         var job = await GetAndValidateJob(request.RequestId, ct);
 
         Metric? metric = null;
@@ -44,9 +43,9 @@ public class CalculateFullMetricHandler(
         try
         {
             metric = await CreateMetricAndStartJob(request, job, ct);
-            
+
             metric = await CalculateMetric(metric.Id, ct);
-            
+
             await CompleteJobSuccessfully(job.RequestId, metric.Id, ct);
 
             logger.LogInformation(
@@ -65,7 +64,7 @@ public class CalculateFullMetricHandler(
 
         return Unit.Value;
     }
-    
+
     private async Task<Metric> CreateMetricAndStartJob(
         CalculateFullMetricCommand request,
         MetricCalculationJob job,
@@ -96,14 +95,14 @@ public class CalculateFullMetricHandler(
             job.RequestId);
 
         await unitOfWork.SaveChangesAsync(ct);
-            
+
         logger.LogDebug(
             "Initial changes saved. RequestId: {RequestId}",
             job.RequestId);
 
         return metric;
     }
-    
+
     private async Task<Metric> CalculateMetric(Guid metricId, CancellationToken ct)
     {
         logger.LogInformation(
@@ -119,7 +118,7 @@ public class CalculateFullMetricHandler(
 
         return result;
     }
-    
+
     private async Task CompleteJobSuccessfully(
         Guid requestId,
         Guid metricId,
@@ -183,16 +182,16 @@ public class CalculateFullMetricHandler(
             "Fetching calculation job. RequestId: {RequestId}",
             requestId);
 
-        var queryOptions = new QueryOptions<MetricCalculationJob, Guid>()
+        var queryOptions = new QueryOptions<MetricCalculationJob, Guid>
         {
-            Data = requestId,
+            Data = requestId
         }.WithTracking();
 
         var job = await jobRepository.GetCalculationJob(queryOptions, ct)
-            ?? throw new CalculationJobNotFoundException(requestId);
+                  ?? throw new CalculationJobNotFoundException(requestId);
 
         if (job.Status == CalculationStatus.AwaitingWorker) return job;
-        
+
         logger.LogWarning(
             "Invalid job status. RequestId: {RequestId}, Status: {Status}",
             requestId,

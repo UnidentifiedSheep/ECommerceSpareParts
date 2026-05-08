@@ -6,7 +6,8 @@ using Main.Entities.Purchase;
 
 namespace Main.Application.Handlers.Purchases.CreatePurchase;
 
-[Transactional, AutoSave]
+[Transactional]
+[AutoSave]
 public record CreatePurchaseCommand(
     IEnumerable<(NewPurchaseContentDto content, int? storageContentId)> Content,
     int CurrencyId,
@@ -24,12 +25,12 @@ public class CreatePurchaseHandler(IUnitOfWork unitOfWork)
     public async Task<CreatePurchaseResult> Handle(CreatePurchaseCommand request, CancellationToken cancellationToken)
     {
         var purchase = Purchase.Create(
-            request.SupplierId, 
-            request.CurrencyId, 
-            request.TransactionId, 
-            request.StorageName, 
+            request.SupplierId,
+            request.CurrencyId,
+            request.TransactionId,
+            request.StorageName,
             request.PurchaseDateTime);
-        
+
         purchase.SetComment(request.Comment);
 
         foreach (var (content, storageContentId) in request.Content)

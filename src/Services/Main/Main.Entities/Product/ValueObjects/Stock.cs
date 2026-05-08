@@ -4,9 +4,9 @@ namespace Main.Entities.Product.ValueObjects;
 
 public record Stock
 {
-    public int Value { get; }
-    
-    private Stock() {}
+    private Stock()
+    {
+    }
 
     public Stock(int value)
     {
@@ -14,8 +14,16 @@ public record Stock
         ArgumentOutOfRangeException.ThrowIfNegative(value);
         Value = value;
     }
-    
-    public static implicit operator Stock(int value) => new(value);
 
-    public static implicit operator int(Stock stock) => stock.Value;
+    public int Value { get; }
+
+    public static implicit operator Stock(int value)
+    {
+        return new Stock(value);
+    }
+
+    public static implicit operator int(Stock stock)
+    {
+        return stock.Value;
+    }
 }

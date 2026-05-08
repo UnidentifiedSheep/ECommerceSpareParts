@@ -12,7 +12,7 @@ namespace Main.Application.Handlers.Cart.DeleteFromCart;
 public record DeleteFromCartCommand(Guid UserId, int ProductId) : ICommand;
 
 public class DeleteFromCartHandler(
-    IRepository<Entities.Cart.Cart, (Guid, int)> repository, 
+    IRepository<Entities.Cart.Cart, (Guid, int)> repository,
     IUnitOfWork unitOfWork)
     : ICommandHandler<DeleteFromCartCommand>
 {

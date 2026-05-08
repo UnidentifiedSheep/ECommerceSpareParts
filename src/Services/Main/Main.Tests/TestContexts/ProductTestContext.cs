@@ -9,25 +9,24 @@ using Tests.DataBuilders;
 namespace Tests.TestContexts;
 
 public class ProductTestContext(
-    DContext context, 
+    DContext context,
     IMediator mediator,
     ProducerTestContext producerTestContext
-    ) : TestContextBase<DContext>(context, mediator), IDependentTestContext
+) : TestContextBase<DContext>(context, mediator), IDependentTestContext
 {
-    public ProducerTestContext ProducerTestContext => producerTestContext;
-    
     private readonly List<Product> _products = [];
+    public ProducerTestContext ProducerTestContext => producerTestContext;
     public IReadOnlyList<Product> Products => _products;
-    
+
+    public static Type[] DependsOn { get; } =
+    [
+        typeof(ProducerTestContext)
+    ];
+
     public override async Task InitializeAsync(CancellationToken cancellationToken = default)
     {
         _products.AddRange(await new ProductBuilder(Faker)
             .WithProducers(producerTestContext.Producers)
             .BuildManyAndAddToDb(DbContext, 10));
     }
-
-    public static Type[] DependsOn { get; } =
-    [
-        typeof(ProducerTestContext)
-    ];
 }

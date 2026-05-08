@@ -9,7 +9,8 @@ using Microsoft.Extensions.Logging;
 
 namespace Main.Application.Handlers.Currencies.UpdateCurrenciesRates;
 
-[Transactional, AutoSave]
+[Transactional]
+[AutoSave]
 public record UpdateCurrenciesRatesCommand : ICommand;
 
 public class UpdateCurrenciesRatesHandler(

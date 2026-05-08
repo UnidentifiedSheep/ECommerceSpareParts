@@ -26,7 +26,7 @@ public class GetProducerOtherNamesHandler(IReadRepository<ProducerOtherName, Pro
             {
                 ProducerId = x.ProducerId,
                 OtherName = x.OtherName,
-                WhereUsed = x.WhereUsed,
+                WhereUsed = x.WhereUsed
             })
             .ApplyPagination(request.Pagination)
             .ToListAsync(cancellationToken);

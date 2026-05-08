@@ -17,9 +17,10 @@ namespace Tests.HandlersTests.StorageRoutes;
 public class AddStorageRouteTests : IntegrationTest
 {
     private User _carrier = null!;
+    private Currency _currency = null!;
     private Storage _fromStorage = null!;
     private Storage _toStorage = null!;
-    private Currency _currency = null!;
+
     public AddStorageRouteTests(CombinedContainerFixture fixture) : base(fixture)
     {
         RegisterBasicContext<CurrencyRatesTestContext>();
@@ -31,13 +32,13 @@ public class AddStorageRouteTests : IntegrationTest
         await base.InitializeAsync();
         _carrier = await new MemberUserBuilder(Faker)
             .BuildAndAddToDb(Context);
-        
+
         _fromStorage = GetContext<StorageTestContext>()
             .Storages.First(x => x.Type == StorageType.Warehouse);
-        
+
         _toStorage = GetContext<StorageTestContext>()
             .Storages.First(x => x.Type == StorageType.SupplierStorage);
-        
+
         _currency = GetContext<CurrencyTestContext>().Currencies[0];
     }
 

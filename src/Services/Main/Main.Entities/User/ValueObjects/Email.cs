@@ -5,9 +5,9 @@ namespace Main.Entities.User.ValueObjects;
 
 public record Email
 {
-    public string Value { get; } = null!;
-
-    private Email() {}
+    private Email()
+    {
+    }
 
     public Email(string value)
     {
@@ -15,11 +15,13 @@ public record Email
         Value = ToNormalized(value);
     }
 
+    public string Value { get; } = null!;
+
     public static string ToNormalized(string source)
     {
         return source.Trim().ToLowerInvariant();
     }
-    
+
     private static bool IsValid(string email)
     {
         try
@@ -32,8 +34,14 @@ public record Email
             return false;
         }
     }
-    
-    public static implicit operator Email(string value) => new(value);
 
-    public static implicit operator string(Email email) => email.Value;
+    public static implicit operator Email(string value)
+    {
+        return new Email(value);
+    }
+
+    public static implicit operator string(Email email)
+    {
+        return email.Value;
+    }
 }

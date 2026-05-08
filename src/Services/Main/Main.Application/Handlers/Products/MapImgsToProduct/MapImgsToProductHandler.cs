@@ -15,8 +15,8 @@ namespace Main.Application.Handlers.Products.MapImgsToProduct;
 public record MapImgsToProductCommand(int ProductId, IEnumerable<IFile> Images) : ICommand;
 
 public class MapImgsToProductHandler(
-    IS3StorageService s3Storage, 
-    IUnitOfWork unitOfWork, 
+    IS3StorageService s3Storage,
+    IUnitOfWork unitOfWork,
     ISettingsService settingsService,
     IIntegrationEventScope integrationEventScope)
     : ICommandHandler<MapImgsToProductCommand, Unit>
@@ -25,7 +25,8 @@ public class MapImgsToProductHandler(
     {
         var keys = new HashSet<string>();
         var toAdd = new List<ProductImage>();
-        var applicationSettings = (await settingsService.GetOrDefault<GlobalApplicationSetting>(cancellationToken)).Data;
+        var applicationSettings =
+            (await settingsService.GetOrDefault<GlobalApplicationSetting>(cancellationToken)).Data;
         try
         {
             foreach (var img in request.Images)
@@ -36,9 +37,9 @@ public class MapImgsToProductHandler(
                     stream, path, "image/webp");
                 keys.Add(key);
                 toAdd.Add(ProductImage.Create(
-                    productId: request.ProductId, 
-                    path: $"{applicationSettings.ServiceUrl}/{applicationSettings.ImageBucketName}/{path}", 
-                    description: key));
+                    request.ProductId,
+                    $"{applicationSettings.ServiceUrl}/{applicationSettings.ImageBucketName}/{path}",
+                    key));
             }
 
             await unitOfWork.AddRangeAsync(toAdd, cancellationToken);

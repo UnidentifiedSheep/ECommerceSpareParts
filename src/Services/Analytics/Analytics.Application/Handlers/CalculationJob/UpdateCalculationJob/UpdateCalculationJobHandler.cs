@@ -1,5 +1,4 @@
-﻿using Abstractions.Models.Repository;
-using Analytics.Abstractions.Exceptions.MetricCalculationJobs;
+﻿using Analytics.Abstractions.Exceptions.MetricCalculationJobs;
 using Analytics.Abstractions.Interfaces.DbRepositories;
 using Analytics.Entities;
 using Analytics.Enums;
@@ -12,10 +11,11 @@ namespace Analytics.Application.Handlers.CalculationJob.UpdateCalculationJob;
 [AutoSave]
 [Transactional]
 public record UpdateCalculationJobCommand(
-    Guid RequestId, 
+    Guid RequestId,
     CalculationStatus Status,
     Guid? MetricId,
     string? ErrorMessageKey) : ICommand<UpdateCalculationJobResult>;
+
 public record UpdateCalculationJobResult(MetricCalculationJob CalculationJob);
 
 public class UpdateCalculationJobHandler(
@@ -23,12 +23,14 @@ public class UpdateCalculationJobHandler(
     IScopedStringLocalizer localizer)
     : ICommandHandler<UpdateCalculationJobCommand, UpdateCalculationJobResult>
 {
-    public async Task<UpdateCalculationJobResult> Handle(UpdateCalculationJobCommand request, CancellationToken cancellationToken)
+    public async Task<UpdateCalculationJobResult> Handle(
+        UpdateCalculationJobCommand request,
+        CancellationToken cancellationToken)
     {
-        var queryOptions = new QueryOptions<MetricCalculationJob, Guid>()
-            {
-                Data = request.RequestId
-            }.WithTracking();
+        var queryOptions = new QueryOptions<MetricCalculationJob, Guid>
+        {
+            Data = request.RequestId
+        }.WithTracking();
 
         var job = await jobRepository.GetCalculationJob(queryOptions, cancellationToken)
                   ?? throw new CalculationJobNotFoundException(request.RequestId);

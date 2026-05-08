@@ -5,13 +5,9 @@ namespace Main.Entities.Auth;
 
 public class UserRole : AuditableEntity<UserRole, (Guid, string)>
 {
-    public Guid UserId { get; private set; }
-
-    public RoleName RoleName { get; private set; } = null!;
-
-    public Role Role { get; private set; } = null!;
-
-    private UserRole() {}
+    private UserRole()
+    {
+    }
 
     private UserRole(Guid userId, RoleName roleName)
     {
@@ -19,10 +15,19 @@ public class UserRole : AuditableEntity<UserRole, (Guid, string)>
         RoleName = roleName;
     }
 
+    public Guid UserId { get; }
+
+    public RoleName RoleName { get; } = null!;
+
+    public Role Role { get; private set; } = null!;
+
     public static UserRole Create(Guid userId, string roleName)
     {
         return new UserRole(userId, roleName);
     }
-    
-    public override (Guid, string) GetId() => (UserId, RoleName);
+
+    public override (Guid, string) GetId()
+    {
+        return (UserId, RoleName);
+    }
 }

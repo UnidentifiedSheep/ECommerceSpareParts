@@ -1,6 +1,5 @@
 ﻿using Application.Common.Interfaces.Settings;
 using Contracts.Settings;
-using Main.Abstractions.Constants;
 using MassTransit;
 
 namespace Main.Application.Consumers;

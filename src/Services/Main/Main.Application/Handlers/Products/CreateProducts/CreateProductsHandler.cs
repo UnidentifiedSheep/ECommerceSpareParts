@@ -29,7 +29,7 @@ public class CreateProductsHandler(
             product.SetCategory(@new.CategoryId);
             products.Add(product);
         }
-        
+
         await unitOfWork.AddRangeAsync(products, cancellationToken);
         await unitOfWork.SaveChangesAsync(cancellationToken);
 
@@ -43,9 +43,9 @@ public class CreateProductsHandler(
         foreach (var product in products)
             integrationEventScope.Add(new ProductCreatedEvent
             {
-                Id = product.Id,
+                Id = product.Id
             });
-        
+
         await unitOfWork.SaveChangesAsync(cancellationToken);
     }
 }

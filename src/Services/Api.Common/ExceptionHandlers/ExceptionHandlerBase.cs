@@ -60,9 +60,9 @@ public abstract class ExceptionHandlerBase<THandler>(
         if (exception is not ILocalizableException localizableException) return false;
 
         var key = localizableException.MessageKey;
-        if (!localizer.TryGet(key, out string? message) || message == null)
+        if (!localizer.TryGet(key, out var message) || message == null)
             logger.LogError("Unable to get localizable message for Key: {Key}", key);
-        
+
         var arguments = localizableException.Arguments;
 
         if (TryFormatLocalizableMessage(message!, arguments, out detail))

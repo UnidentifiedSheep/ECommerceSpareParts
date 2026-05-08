@@ -9,7 +9,7 @@ using Persistence.Extensions;
 
 namespace Main.Persistence.Repositories.Storage;
 
-public class StorageContentReservationRepository(DContext context) 
+public class StorageContentReservationRepository(DContext context)
     : RepositoryBase<DContext, StorageContentReservation, int>(context), IStorageContentReservationRepository
 {
     public Task<Dictionary<int, int>> GetReservationsCountForUserAsync(
@@ -18,9 +18,9 @@ public class StorageContentReservationRepository(DContext context)
         CancellationToken cancellationToken = default)
     {
         return GetReservationsCountInternalAsync(
-            r => 
-                r.UserId == userId && 
-                productIds.Contains(r.ProductId) && 
+            r =>
+                r.UserId == userId &&
+                productIds.Contains(r.ProductId) &&
                 !r.IsDone,
             cancellationToken);
     }
@@ -31,13 +31,24 @@ public class StorageContentReservationRepository(DContext context)
         CancellationToken cancellationToken = default)
     {
         return GetReservationsCountInternalAsync(
-            r => 
-                r.UserId != userId && 
-                productIds.Contains(r.ProductId) && 
+            r =>
+                r.UserId != userId &&
+                productIds.Contains(r.ProductId) &&
                 !r.IsDone,
             cancellationToken);
     }
-    
+
+    public override Task<Dictionary<int, StorageContentReservation>> FindByIdsAsync(
+        IEnumerable<int> ids,
+        Criteria<StorageContentReservation>? criteria = null,
+        CancellationToken ct = default)
+    {
+        return Context.StorageContentReservations
+            .Apply(criteria)
+            .Where(x => ids.Contains(x.Id))
+            .ToDictionaryAsync(x => x.Id, ct);
+    }
+
     private Task<Dictionary<int, int>> GetReservationsCountInternalAsync(
         Expression<Func<StorageContentReservation, bool>> predicate,
         CancellationToken cancellationToken)
@@ -55,16 +66,5 @@ public class StorageContentReservationRepository(DContext context)
                 x => x.ProductId,
                 x => x.TotalCount,
                 cancellationToken);
-    }
-
-    public override Task<Dictionary<int, StorageContentReservation>> FindByIdsAsync(
-        IEnumerable<int> ids, 
-        Criteria<StorageContentReservation>? criteria = null, 
-        CancellationToken ct = default)
-    {
-        return Context.StorageContentReservations
-            .Apply(criteria)
-            .Where(x => ids.Contains(x.Id))
-            .ToDictionaryAsync(x => x.Id, ct);
     }
 }

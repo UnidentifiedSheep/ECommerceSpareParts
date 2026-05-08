@@ -1,11 +1,9 @@
 using Abstractions.Interfaces;
-using Abstractions.Interfaces.Services;
 using BulkValidation.Pgsql.Extensions;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Persistence.DbValidator;
 using Persistence.Extensions;
-using Persistence.Services.UnitOfWork;
 using Pricing.Abstractions.Interfaces.DbRepositories;
 using Pricing.Persistence.Contexts;
 using Pricing.Persistence.Repositories;

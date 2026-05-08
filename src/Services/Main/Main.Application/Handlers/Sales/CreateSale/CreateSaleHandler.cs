@@ -3,11 +3,9 @@ using Abstractions.Interfaces.Services;
 using Application.Common.Interfaces;
 using Attributes;
 using Main.Abstractions.Interfaces.Services;
-using Main.Abstractions.Models;
 using Main.Application.Dtos.Amw.Sales;
 using Main.Application.Models.SaleService;
 using Main.Entities.Sale;
-using Main.Entities.Storage;
 
 namespace Main.Application.Handlers.Sales.CreateSale;
 
@@ -35,14 +33,14 @@ public class CreateSaleHandler(ISaleService saleService, IUnitOfWork unitOfWork)
         var currencyId = request.CurrencyId;
         var storageName = request.Storage;
 
-        Sale sale = Sale.Create(buyerId, transactionId, currencyId, storageName, request.SaleDateTime);
+        var sale = Sale.Create(buyerId, transactionId, currencyId, storageName, request.SaleDateTime);
         sale.SetComment(request.Comment);
 
         var saleContentList = request.SellContent.ToList();
 
         foreach (var saleContent in saleService.DistributeDetails(request.StorageContentValues, saleContentList))
             sale.AddContent(saleContent);
-        
+
         await unitOfWork.AddAsync(sale, cancellationToken);
         return new CreateSaleResult(sale);
     }

@@ -1,5 +1,4 @@
 ﻿using Abstractions.Interfaces.Services;
-using Abstractions.Models;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Persistence.Services.UnitOfWork;

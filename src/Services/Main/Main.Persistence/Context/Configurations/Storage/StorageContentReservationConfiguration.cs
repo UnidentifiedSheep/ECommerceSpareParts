@@ -1,5 +1,4 @@
-﻿using Main.Entities;
-using Main.Entities.Storage;
+﻿using Main.Entities.Storage;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
@@ -24,40 +23,40 @@ public class StorageContentReservationConfiguration : IEntityTypeConfiguration<S
 
         builder.HasIndex(e => e.IsDone, "storage_content_reservations_is_done_index");
 
-        builder.HasIndex(e => new { e.UserId, e.IsDone }, 
+        builder.HasIndex(e => new { e.UserId, e.IsDone },
             "storage_content_reservations_user_id_is_done_index");
 
         builder.HasIndex(e => new { e.ProductId, e.IsLocked },
             "storage_content_reservations_product_id_is_locked_index");
-        
+
         builder.Property(e => e.Id)
             .HasColumnName("id");
-        
+
         builder.Property(e => e.ProductId)
             .HasColumnName("product_id");
-        
+
         builder.Property(e => e.Comment)
             .HasColumnName("comment")
             .HasMaxLength(500);
-        
+
         builder.Property(e => e.CurrentCount)
             .HasColumnName("current_count");
-        
+
         builder.Property(e => e.ProposedCurrencyId)
             .HasColumnName("proposed_currency_id");
-        
+
         builder.Property(e => e.ProposedPrice)
             .HasColumnName("proposed_price");
-        
+
         builder.Property(e => e.ReservedCount)
             .HasColumnName("reserved_count");
-        
+
         builder.Property(e => e.IsDone)
             .HasColumnName("is_done");
-        
+
         builder.Property(e => e.IsLocked)
             .HasColumnName("is_locked");
-        
+
         builder.Property(e => e.UserId)
             .HasColumnName("user_id");
 
@@ -72,7 +71,7 @@ public class StorageContentReservationConfiguration : IEntityTypeConfiguration<S
             .HasForeignKey(d => d.ProposedCurrencyId)
             .OnDelete(DeleteBehavior.Cascade)
             .HasConstraintName("storage_content_reservations_currency_id_fk");
-        
+
         builder.HasOne<Entities.User.User>()
             .WithMany()
             .HasForeignKey(d => d.UserId)

@@ -8,13 +8,13 @@ using Tests.DataBuilders;
 namespace Tests.TestContexts;
 
 public class ProducerTestContext(
-    DContext context, 
+    DContext context,
     IMediator mediator
-    ) : TestContextBase<DContext>(context, mediator)
+) : TestContextBase<DContext>(context, mediator)
 {
     private readonly List<Producer> _producers = [];
     public IReadOnlyList<Producer> Producers => _producers;
-    
+
     public override async Task InitializeAsync(CancellationToken cancellationToken = default)
     {
         _producers.AddRange(await new ProducerBuilder(Faker)

@@ -1,8 +1,5 @@
-﻿using Abstractions.Interfaces.Currency;
-using Application.Common;
+﻿using Application.Common;
 using Application.Common.Abstractions.Settings;
-using Application.Common.Behaviors;
-using Application.Common.Extensions;
 using Application.Common.Interfaces.Currency;
 using Application.Common.Interfaces.Settings;
 using Application.Common.Services;
@@ -21,12 +18,14 @@ public static class ServiceProvider
     {
         collection.AddApplicationBase(typeof(Global).Assembly);
 
-        collection.AddSingleton<ICurrencyConverter, CurrencyConverterBase>(_ => new CurrencyConverterBase(Global.UsdId));
+        collection.AddSingleton<ICurrencyConverter, CurrencyConverterBase>(_ =>
+            new CurrencyConverterBase(Global.UsdId));
 
         collection.AddSingleton<IMarkupService, MarkupService>();
         collection.AddScoped<IMarkupSetup, MarkupSetup>();
 
-        collection.AddSingleton<ICurrencyConverter, CurrencyConverterBase>(_ => new CurrencyConverterBase(Global.UsdId));
+        collection.AddSingleton<ICurrencyConverter, CurrencyConverterBase>(_ =>
+            new CurrencyConverterBase(Global.UsdId));
         collection.AddScoped<ICurrencyConverterSetup, CurrencyConverterSetup>();
 
         collection.AddSingleton<ISettingsContainer, SettingsContainer>();

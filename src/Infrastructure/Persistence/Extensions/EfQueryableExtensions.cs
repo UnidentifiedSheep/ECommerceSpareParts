@@ -20,18 +20,18 @@ public static class EfQueryableExtensions
         if (criteria == null) return query;
         query.ConfigureTracking(criteria.Track);
         query.ForUpdate(criteria.ForUpdate);
-        
-        if (criteria.Where is not null) 
+
+        if (criteria.Where is not null)
             query = query.Where(criteria.Where);
-        
-        foreach (var i in criteria.Includes) 
+
+        foreach (var i in criteria.Includes)
             query = query.Include(i);
-        
-        if (criteria.OrderBy is not null) 
+
+        if (criteria.OrderBy is not null)
             query = criteria.OrderBy(query);
-        
+
         if (!criteria.Size.HasValue) return query;
-        
+
         if (criteria.Page.HasValue)
             query = query.Skip(criteria.Page.Value * criteria.Size.Value);
 

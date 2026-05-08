@@ -1,5 +1,4 @@
-﻿using Main.Entities;
-using Main.Entities.Product;
+﻿using Main.Entities.Product;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
@@ -10,7 +9,7 @@ public class ProductCoefficientConfiguration : IEntityTypeConfiguration<ProductC
     public void Configure(EntityTypeBuilder<ProductCoefficient> builder)
     {
         builder.ToTable("product_coefficients", "public");
-        
+
         builder.HasKey(e => new { e.ProductId, e.CoefficientName })
             .HasName("product_coefficients_pk");
 
@@ -23,7 +22,7 @@ public class ProductCoefficientConfiguration : IEntityTypeConfiguration<ProductC
 
         builder.Property(e => e.ValidTill)
             .HasColumnName("valid_till");
-        
+
         builder.HasOne(d => d.Coefficient)
             .WithMany(p => p.ProductCoefficients)
             .HasForeignKey(d => d.CoefficientName)

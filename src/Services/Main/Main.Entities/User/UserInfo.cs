@@ -5,13 +5,9 @@ namespace Main.Entities.User;
 
 public class UserInfo : Entity<UserInfo, Guid>
 {
-    public Guid UserId { get; private set; }
-    public string Name { get; private set; } = null!;
-    public string Surname { get; private set; } = null!;
-    public string? Description { get; private set; }
-    public string SearchColumn { get; private set; } = null!;
-
-    private UserInfo() { }
+    private UserInfo()
+    {
+    }
 
     private UserInfo(Guid userId, string name, string surname, string? description)
     {
@@ -21,6 +17,12 @@ public class UserInfo : Entity<UserInfo, Guid>
         SetDescription(description);
     }
 
+    public Guid UserId { get; }
+    public string Name { get; private set; } = null!;
+    public string Surname { get; private set; } = null!;
+    public string? Description { get; private set; }
+    public string SearchColumn { get; private set; } = null!;
+
     internal static UserInfo Create(Guid userId, string name, string surname, string? description)
     {
         return new UserInfo(userId, name, surname, description);
@@ -29,13 +31,13 @@ public class UserInfo : Entity<UserInfo, Guid>
     public void SetName(string name)
     {
         Name = name.Trim()
-                .AgainstNullOrWhiteSpace("user.name.required")
-                .AgainstTooShort(3, "user.name.min.length")
-                .Against(x => x.Any(char.IsSymbol), "user.name.no.special.chars")
-                .AgainstTooLong(30, "user.name.max.length");
+            .AgainstNullOrWhiteSpace("user.name.required")
+            .AgainstTooShort(3, "user.name.min.length")
+            .Against(x => x.Any(char.IsSymbol), "user.name.no.special.chars")
+            .AgainstTooLong(30, "user.name.max.length");
         UpdateSearchColumn();
     }
-    
+
     public void SetSurname(string surname)
     {
         Surname = surname.Trim()
@@ -66,5 +68,8 @@ public class UserInfo : Entity<UserInfo, Guid>
         SearchColumn = $"{Name} {Surname} {Description}".ToUpperInvariant();
     }
 
-    public override Guid GetId() => UserId;
+    public override Guid GetId()
+    {
+        return UserId;
+    }
 }

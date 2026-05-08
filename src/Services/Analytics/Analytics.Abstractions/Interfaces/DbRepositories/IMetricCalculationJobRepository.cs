@@ -1,5 +1,4 @@
-﻿using Abstractions.Models.Repository;
-using Analytics.Entities;
+﻿using Analytics.Entities;
 
 namespace Analytics.Abstractions.Interfaces.DbRepositories;
 

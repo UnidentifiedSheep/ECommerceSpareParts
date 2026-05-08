@@ -14,7 +14,7 @@ public class ProductSizesUpdatedConsumer(
     {
         var key = cachePolicy.GetCacheKey(new GetProductSizeQuery(context.Message.ProductId));
         await cache.RemoveAsync(
-            key: key,
+            key,
             token: context.CancellationToken);
     }
 }

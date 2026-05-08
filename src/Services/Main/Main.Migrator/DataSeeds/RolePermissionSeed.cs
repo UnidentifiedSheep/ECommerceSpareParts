@@ -216,7 +216,7 @@ public class RolePermissionSeed : ISeed<DContext>
                 PermissionCodes.USERS_VEHICLES_CREATE_ME,
                 PermissionCodes.ARTICLES_GET_MAIN
             ],
-            
+
             [Role.Supplier] = []
         };
     }

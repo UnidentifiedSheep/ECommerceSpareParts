@@ -36,11 +36,11 @@ public class PurchaseTests
         var purchase = Create();
 
         var content = PurchaseContent.Create(
-            productId: 1,
-            count: 2,
-            price: 10m,
-            storageContentId: null);
-        
+            1,
+            2,
+            10m,
+            null);
+
         typeof(PurchaseContent)
             .GetProperty("PurchaseId")!
             .SetValue(content, Guid.NewGuid());

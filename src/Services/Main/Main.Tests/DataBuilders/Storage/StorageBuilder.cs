@@ -34,7 +34,7 @@ public class StorageBuilder(Faker faker) : BuilderBase<Main.Entities.Storage.Sto
         Description = description;
         return this;
     }
-    
+
     public override Main.Entities.Storage.Storage Build()
     {
         var storage = Main.Entities.Storage.Storage.Create(
@@ -43,7 +43,7 @@ public class StorageBuilder(Faker faker) : BuilderBase<Main.Entities.Storage.Sto
 
         storage.SetDescription(Description);
         storage.SetLocation(Location);
-        
+
         return storage;
     }
 }

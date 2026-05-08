@@ -5,8 +5,8 @@ namespace Main.Application.Interfaces.Services;
 public interface IUserService
 {
     /// <summary>
-    /// Trys to get user from cache, if not found gets from db.
-    /// When user taken from db, than it's not gonna be tracked via ef core.
+    ///     Trys to get user from cache, if not found gets from db.
+    ///     When user taken from db, than it's not gonna be tracked via ef core.
     /// </summary>
     /// <param name="userId">Id of user to find</param>
     /// <param name="token">Cancellation token</param>

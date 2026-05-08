@@ -1,5 +1,4 @@
-﻿using Abstractions.Models;
-using Api.Common.Extensions;
+﻿using Api.Common.Extensions;
 using Api.Common.Models.Requests;
 using Carter;
 using Main.Application.Dtos.Auth;

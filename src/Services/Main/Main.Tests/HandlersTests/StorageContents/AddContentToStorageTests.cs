@@ -67,7 +67,7 @@ public class AddContentToStorageTests : IntegrationTest
     {
         var storage = GetContext<StorageTestContext>().Storages.First();
         var storageContent = GetNewStorageContents(3);
-        storageContent[^1] = storageContent[^1] with { CurrencyId = int.MaxValue};
+        storageContent[^1] = storageContent[^1] with { CurrencyId = int.MaxValue };
         var command = new AddContentCommand(storageContent, storage.Name,
             StorageMovementType.StorageContentAddition);
         await Assert.ThrowsAsync<DbValidationException>(async () => await Mediator.Send(command));
@@ -205,7 +205,7 @@ public class AddContentToStorageTests : IntegrationTest
         var products = GetContext<ProductTestContext>().Products;
         var currency = GetContext<CurrencyTestContext>().Currencies[0];
         var storage = GetContext<StorageTestContext>().Storages.First();
-        
+
         return new StorageContentBuilder(Faker)
             .WithProducts(products)
             .WithCurrencyId(currency.Id)

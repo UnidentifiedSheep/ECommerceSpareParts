@@ -13,7 +13,7 @@ namespace Main.Application.Handlers.Producers.DeleteOtherName;
 public record DeleteOtherNameCommand(int ProducerId, string OtherName, string Usage) : ICommand;
 
 public class DeleteOtherNameHandler(
-    IRepository<ProducerOtherName, ProducerOtherNameKey> repository, 
+    IRepository<ProducerOtherName, ProducerOtherNameKey> repository,
     IUnitOfWork unitOfWork)
     : ICommandHandler<DeleteOtherNameCommand>
 {

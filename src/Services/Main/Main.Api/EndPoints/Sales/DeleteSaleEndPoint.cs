@@ -1,7 +1,6 @@
 using Abstractions.Interfaces;
 using Api.Common.Extensions;
 using Carter;
-using Main.Application.Handlers.Sales.DeleteFullSale;
 using MediatR;
 
 namespace Main.Api.EndPoints.Sales;

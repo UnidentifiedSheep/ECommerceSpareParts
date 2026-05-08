@@ -11,7 +11,7 @@ public record PatchStorageDto
 
     [JsonPropertyName("location")]
     public PatchField<string?> Location { get; init; } = PatchField<string?>.NotSet();
-    
+
     [JsonPropertyName("type")]
     public PatchField<StorageType> Type { get; init; } = PatchField<StorageType>.NotSet();
 }

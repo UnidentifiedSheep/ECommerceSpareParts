@@ -8,7 +8,7 @@ using Main.Enums;
 namespace Main.Application.Services;
 
 public class UserTokenService(
-    IUnitOfWork unitOfWork, 
+    IUnitOfWork unitOfWork,
     ITokenHasher tokenHasher) : IUserTokenService
 {
     public async Task AddToken(

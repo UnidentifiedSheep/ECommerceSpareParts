@@ -1,7 +1,6 @@
 using Abstractions.Interfaces.Services;
 using Application.Common.Interfaces;
 using Attributes;
-using Main.Entities;
 using Main.Entities.Producer;
 using MediatR;
 

@@ -5,14 +5,9 @@ namespace Main.Entities.Product;
 
 public class ProductContent : Entity<ProductContent, (int, int)>
 {
-    public int ParentProductId { get; private set; }
-    public int ChildProductId { get; private set; }
-    public int Quantity { get; private set; }
-
-    public Product ParentProduct { get; private set; } = null!;
-    public Product ChildProduct { get; private set; } = null!;
-    
-    private ProductContent() {}
+    private ProductContent()
+    {
+    }
 
     private ProductContent(int parentProductId, int childProductId, int quantity)
     {
@@ -21,6 +16,13 @@ public class ProductContent : Entity<ProductContent, (int, int)>
         ChildProductId = childProductId;
         SetQuantity(quantity);
     }
+
+    public int ParentProductId { get; }
+    public int ChildProductId { get; }
+    public int Quantity { get; private set; }
+
+    public Product ParentProduct { get; private set; } = null!;
+    public Product ChildProduct { get; private set; } = null!;
 
     public static ProductContent Create(int parentProductId, int childProductId, int quantity)
     {
@@ -32,6 +34,9 @@ public class ProductContent : Entity<ProductContent, (int, int)>
         quantity.AgainstNegative("article.content.count.must.be.non.negative");
         Quantity = quantity;
     }
-    
-    public override (int, int) GetId() => (ParentProductId, ChildProductId);
+
+    public override (int, int) GetId()
+    {
+        return (ParentProductId, ChildProductId);
+    }
 }

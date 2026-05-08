@@ -6,6 +6,21 @@ namespace Main.Entities.Storage;
 
 public class StorageContentReservation : AuditableEntity<StorageContentReservation, int>
 {
+    private StorageContentReservation()
+    {
+    }
+
+    private StorageContentReservation(
+        Guid userId,
+        int productId,
+        int reservedCount)
+    {
+        UserId = userId;
+        ProductId = productId;
+        CurrentCount = 0;
+        SetReservedCount(reservedCount);
+    }
+
     public int Id { get; private set; }
 
     public Guid UserId { get; private set; }
@@ -21,23 +36,10 @@ public class StorageContentReservation : AuditableEntity<StorageContentReservati
     public int? ProposedCurrencyId { get; private set; }
 
     public bool IsDone { get; private set; }
-    
+
     public bool IsLocked { get; private set; }
 
     public string? Comment { get; private set; }
-    
-    private StorageContentReservation() {}
-
-    private StorageContentReservation(
-        Guid userId,
-        int productId,
-        int reservedCount)
-    {
-        UserId = userId;
-        ProductId = productId;
-        CurrentCount = 0;
-        SetReservedCount(reservedCount);
-    }
 
     public static StorageContentReservation Create(
         Guid userId,
@@ -56,13 +58,13 @@ public class StorageContentReservation : AuditableEntity<StorageContentReservati
     public void ProposePrice(decimal? givenPrice, int? givenCurrencyId)
     {
         PerformDomainChecks();
-        
+
         var hasPrice = givenPrice.HasValue;
         var hasCurrency = givenCurrencyId.HasValue;
 
         if (hasPrice != hasCurrency)
             throw new InvalidInputException("article.reservation.given.price.with.out.currency");
-        
+
         if (givenPrice == null)
         {
             ProposedPrice = null;
@@ -73,7 +75,7 @@ public class StorageContentReservation : AuditableEntity<StorageContentReservati
         givenPrice.Value
             .AgainstTooManyDecimalPlaces(2, "article.reservation.proposed.price.max.two.decimals")
             .AgainstTooSmall(0, "article.reservation.given.price.must.be.positive");
-        
+
         ProposedPrice = givenPrice;
         ProposedCurrencyId = givenCurrencyId;
     }
@@ -98,7 +100,7 @@ public class StorageContentReservation : AuditableEntity<StorageContentReservati
             throw new InvalidOperationException("Can't increase reservation count");
         if (summed < 0)
             throw new InvalidOperationException("Can't decrease reservation count");
-        
+
         CurrentCount = summed;
 
         UpdateDoneState();
@@ -132,6 +134,9 @@ public class StorageContentReservation : AuditableEntity<StorageContentReservati
         if (IsDone)
             throw new InvalidInputException("article.reservation.is.done");
     }
-    
-    public override int GetId() => Id;
+
+    public override int GetId()
+    {
+        return Id;
+    }
 }

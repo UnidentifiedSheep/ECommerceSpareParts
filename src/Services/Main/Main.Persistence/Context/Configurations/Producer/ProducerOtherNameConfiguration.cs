@@ -1,5 +1,4 @@
-﻿using Main.Entities;
-using Main.Entities.Producer;
+﻿using Main.Entities.Producer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
@@ -10,7 +9,7 @@ public class ProducerOtherNameConfiguration : IEntityTypeConfiguration<ProducerO
     public void Configure(EntityTypeBuilder<ProducerOtherName> builder)
     {
         builder.ToTable("producers_other_names", "public");
-        
+
         builder.HasKey(e => new { e.ProducerId, e.OtherName, e.WhereUsed })
             .HasName("producers_other_names_pk");
 
@@ -33,7 +32,7 @@ public class ProducerOtherNameConfiguration : IEntityTypeConfiguration<ProducerO
         builder.Property(e => e.OtherName)
             .HasMaxLength(64)
             .HasColumnName("other_name");
-        
+
         builder.Property(e => e.WhereUsed)
             .HasMaxLength(64)
             .HasColumnName("where_used");

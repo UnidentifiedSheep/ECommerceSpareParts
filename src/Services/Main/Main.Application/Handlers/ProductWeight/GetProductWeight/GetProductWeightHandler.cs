@@ -16,14 +16,14 @@ public class GetProductWeightHandler(IReadRepository<Entities.Product.ProductWei
     public async Task<GetProductWeightResult> Handle(GetProductWeightQuery request, CancellationToken cancellationToken)
     {
         var productWeight = await context.Query
-            .Select(x => new ProductWeightDto
-            {
-                ProductId = x.ProductId,
-                Weight = x.Weight,
-                Unit = x.Unit,
-            })
-            .FirstOrDefaultAsync(x => x.ProductId == request.ProductId, cancellationToken)
-                ?? throw new ProductWeightNotFoundException(request.ProductId);
+                                .Select(x => new ProductWeightDto
+                                {
+                                    ProductId = x.ProductId,
+                                    Weight = x.Weight,
+                                    Unit = x.Unit
+                                })
+                                .FirstOrDefaultAsync(x => x.ProductId == request.ProductId, cancellationToken)
+                            ?? throw new ProductWeightNotFoundException(request.ProductId);
 
         return new GetProductWeightResult(productWeight);
     }

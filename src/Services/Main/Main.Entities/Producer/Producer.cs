@@ -7,6 +7,17 @@ namespace Main.Entities.Producer;
 
 public class Producer : AuditableEntity<Producer, int>
 {
+    private Producer()
+    {
+    }
+
+    private Producer(Name name, string? description = null, string? imagePath = null)
+    {
+        Name = name;
+        SetImagePath(imagePath);
+        SetDescription(description);
+    }
+
     [Validate]
     public int Id { get; private set; }
 
@@ -16,15 +27,6 @@ public class Producer : AuditableEntity<Producer, int>
     public string? ImagePath { get; private set; }
 
     public string? Description { get; private set; }
-    
-    private Producer() { }
-
-    private Producer(Name name, string? description = null, string? imagePath = null)
-    {
-        Name = name;
-        SetImagePath(imagePath);
-        SetDescription(description);
-    }
 
     public static Producer Create(Name name, string? description = null, string? imagePath = null)
     {
@@ -35,7 +37,7 @@ public class Producer : AuditableEntity<Producer, int>
     {
         imagePath = imagePath?.Trim()
             .AgainstTooLong(255, "producer.image.too.long");
-        
+
         ImagePath = string.IsNullOrEmpty(imagePath) ? null : imagePath;
     }
 
@@ -51,6 +53,9 @@ public class Producer : AuditableEntity<Producer, int>
     {
         Name = name;
     }
-    
-    public override int GetId() => Id;
+
+    public override int GetId()
+    {
+        return Id;
+    }
 }

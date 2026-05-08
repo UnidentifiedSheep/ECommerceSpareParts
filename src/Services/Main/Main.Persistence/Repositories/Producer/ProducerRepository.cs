@@ -7,7 +7,7 @@ using Persistence.Extensions;
 
 namespace Main.Persistence.Repositories.Producer;
 
-public class ProducerRepository(DContext context) 
+public class ProducerRepository(DContext context)
     : RepositoryBase<DContext, Entities.Producer.Producer, int>(context), IProducerRepository
 {
     public async Task<bool> ProducerHasAnyArticle(int producerId, CancellationToken cancellationToken = default)
@@ -18,8 +18,8 @@ public class ProducerRepository(DContext context)
     }
 
     public override Task<Dictionary<int, Entities.Producer.Producer>> FindByIdsAsync(
-        IEnumerable<int> ids, 
-        Criteria<Entities.Producer.Producer>? criteria = null, 
+        IEnumerable<int> ids,
+        Criteria<Entities.Producer.Producer>? criteria = null,
         CancellationToken ct = default)
     {
         return Context.Producers

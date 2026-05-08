@@ -11,13 +11,13 @@ public record GetArticleRequest
 {
     [FromQuery(Name = "query")]
     public string Query { get; set; } = string.Empty;
-    
+
     [FromQuery(Name = "cursor")]
     public string? Cursor { get; set; }
-    
+
     [FromQuery(Name = "limit")]
     public int Limit { get; set; }
-    
+
     [FromQuery(Name = "searchVariant")]
     public ArticleSearchVariant SearchVariant { get; set; }
 }

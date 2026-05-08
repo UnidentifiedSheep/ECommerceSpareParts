@@ -13,8 +13,6 @@ public static class CartProjections
             CreatedAt = x.CreatedAt,
             UpdatedAt = x.UpdatedAt,
             ProductId = x.ProductId,
-            Product = ProductProjections.ToDto.Invoke(x.Product),
+            Product = ProductProjections.ToDto.Invoke(x.Product)
         };
-    
-    
 }

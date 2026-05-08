@@ -1,5 +1,4 @@
 ﻿using Abstractions.Interfaces.Integrations.ExchangeRate;
-using Enums;
 using ExchangeRate.Clients;
 using ExchangeRate.Factories;
 using Microsoft.Extensions.DependencyInjection;

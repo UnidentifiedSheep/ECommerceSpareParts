@@ -15,15 +15,15 @@ public class CreateMetricTestContext(
     IMediator mediator,
     IJsonSerializer serializer) : LocalizedTestContext(localizer)
 {
+    public Currency Currency = null!;
     public IMediator Mediator => mediator;
     public DContext Context => context;
     public IJsonSerializer Serializer => serializer;
-    public Currency Currency = null!;
 
     public override async Task InitializeAsync(CancellationToken cancellationToken = default)
     {
         await base.InitializeAsync(cancellationToken);
-        
+
         await Context.AddMockCurrencies();
         Currency = await Context.Currencies.FirstAsync(cancellationToken);
     }

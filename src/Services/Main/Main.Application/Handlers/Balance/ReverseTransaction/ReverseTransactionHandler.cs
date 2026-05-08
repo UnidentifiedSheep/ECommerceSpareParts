@@ -20,8 +20,6 @@ public class ReverseTransactionHandler(
     ITransactionRepository transactionRepository,
     IBalanceService balanceService) : ICommandHandler<ReverseTransactionCommand, ReverseTransactionResult>
 {
-    
-
     public async Task<ReverseTransactionResult> Handle(
         ReverseTransactionCommand request,
         CancellationToken cancellationToken)
@@ -32,7 +30,7 @@ public class ReverseTransactionHandler(
             .ForUpdate()
             .Track()
             .Build();
-        
+
         var transaction = await transactionRepository.FirstOrDefaultAsync(criteria, cancellationToken)
                           ?? throw new TransactionNotFoundException(transactionId);
 

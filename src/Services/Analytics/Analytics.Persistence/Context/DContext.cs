@@ -21,7 +21,7 @@ public partial class DContext : DbContext
     public virtual DbSet<Currency> Currencies { get; set; }
 
     public virtual DbSet<Metric> Metrics { get; set; }
-    
+
     public virtual DbSet<MetricCalculationJob> MetricCalculationJobs { get; set; }
 
     public virtual DbSet<PurchaseContent> PurchaseContents { get; set; }
@@ -64,10 +64,10 @@ public partial class DContext : DbContext
 
             entity.Property(e => e.RequestId)
                 .HasColumnName("request_id");
-            
+
             entity.Property(e => e.MetricId)
                 .HasColumnName("metric_id");
-            
+
             entity.Property(e => e.MetricSystemName)
                 .HasColumnName("metric_system_name")
                 .HasMaxLength(128);
@@ -92,7 +92,7 @@ public partial class DContext : DbContext
 
             entity.HasIndex(e => e.MetricId, "metrics_calc_jobs_metric_id_index")
                 .IsUnique();
-            
+
             entity.HasIndex(e => e.CreateAt, "metrics_calc_jobs_created_at_index");
 
             entity.HasIndex(e =>

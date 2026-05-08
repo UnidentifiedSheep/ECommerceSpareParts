@@ -25,7 +25,7 @@ public record AddContentCommand(
     IEnumerable<NewStorageContentDto> StorageContent,
     string StorageName,
     StorageMovementType MovementType
-    ) : ICommand<AddContentResult>;
+) : ICommand<AddContentResult>;
 
 public record AddContentResult(IReadOnlyList<StorageContentDto> StorageContents);
 
@@ -40,17 +40,17 @@ public class AddContentHandler(
     {
         var baseCurrencyId = (await settingsService.GetOrDefault<CurrencySetting>(cancellationToken))
             .Data.BaseCurrencyId;
-        
+
         var productIds = request.StorageContent
             .Select(x => x.ProductId)
             .Distinct()
             .ToList();
-        
+
         var products = await productRepository
             .EnsureExistsForUpdateAsync(
-                ids: productIds,
-                errorFactory: (notFound) => new ProductNotFoundException(notFound),
-                ct: cancellationToken);
+                productIds,
+                notFound => new ProductNotFoundException(notFound),
+                cancellationToken);
 
         var storageContents = new List<StorageContent>();
         var events = new List<Event>();
@@ -58,15 +58,15 @@ public class AddContentHandler(
         foreach (var item in request.StorageContent)
         {
             var content = StorageContent.Create(
-                storageName: request.StorageName,
-                productId: item.ProductId,
-                count: item.Count,
-                buyPrice: item.BuyPrice,
-                currencyId: item.CurrencyId,
-                buyPriceInBaseCurrency: await converter.ConvertToBaseAsync(item.BuyPrice, item.CurrencyId, cancellationToken),
-                buyPriceInBaseCurrencyId: baseCurrencyId,
-                purchaseDatetime: item.PurchaseDate);
-            
+                request.StorageName,
+                item.ProductId,
+                item.Count,
+                item.BuyPrice,
+                item.CurrencyId,
+                await converter.ConvertToBaseAsync(item.BuyPrice, item.CurrencyId, cancellationToken),
+                baseCurrencyId,
+                item.PurchaseDate);
+
             storageContents.Add(content);
 
             var storageMovementEvent = StorageMovementEvent.Create(content, request.MovementType);
@@ -83,12 +83,12 @@ public class AddContentHandler(
             {
                 ProductId = id
             });
-        
+
 
         var adapted = storageContents
             .Select(StorageContentProjections.ToStorageContentDto.AsFunc())
             .ToList();
-        
+
         return new AddContentResult(adapted);
     }
 }

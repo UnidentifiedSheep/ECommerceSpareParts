@@ -13,9 +13,9 @@ public class DeleteProducerTest : IntegrationTest
     {
         RegisterBasicContext<ProductTestContext>();
     }
-    
+
     private ProductTestContext TestContext => GetContext<ProductTestContext>();
-    
+
     [Fact]
     public async Task DeleteProducer_InvalidProducerId_ThrowsProducerNotFound()
     {
@@ -43,7 +43,7 @@ public class DeleteProducerTest : IntegrationTest
 
         var act = () => Mediator.Send(new DeleteProducerCommand(producer.Id));
         await act.Should().NotThrowAsync();
-        
+
         var dbProduct = await Context.Products.FirstOrDefaultAsync(x => x.ProducerId == producer.Id);
         dbProduct.Should().BeNull();
     }

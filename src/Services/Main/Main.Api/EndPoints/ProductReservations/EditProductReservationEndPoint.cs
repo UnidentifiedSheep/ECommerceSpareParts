@@ -1,4 +1,3 @@
-using Abstractions.Interfaces;
 using Api.Common.Extensions;
 using Carter;
 using Enums;

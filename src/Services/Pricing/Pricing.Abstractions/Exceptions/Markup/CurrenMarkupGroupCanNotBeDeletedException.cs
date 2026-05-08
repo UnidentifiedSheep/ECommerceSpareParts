@@ -3,7 +3,7 @@ using Exceptions.Base;
 
 namespace Pricing.Abstractions.Exceptions.Markup;
 
-public class CurrenMarkupGroupCanNotBeDeletedException() 
+public class CurrenMarkupGroupCanNotBeDeletedException()
     : BadRequestException(null), ILocalizableException
 {
     public string MessageKey => "current.markup.group.can.not.be.deleted";

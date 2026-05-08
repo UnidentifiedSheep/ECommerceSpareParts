@@ -23,17 +23,17 @@ public class ChangePasswordHandler(
     public async Task<Unit> Handle(ChangePasswordCommand request, CancellationToken cancellationToken)
     {
         var user = await userRepository.GetById(request.UserId, cancellationToken)
-            ?? throw new UserNotFoundException(request.UserId);
-        
+                   ?? throw new UserNotFoundException(request.UserId);
+
         if (!passwordManager.VerifyHashedPassword(user.PasswordHash, request.PreviousPassword))
             throw new WrongCredentialsException(null, request.PreviousPassword);
-        
+
         user.SetPasswordHash(passwordManager.GetHashOfPassword(request.NewPassword));
         integrationEventScope.Add(new UserUpdatedEvent
         {
             UserId = request.UserId
         });
-        
+
         return Unit.Value;
     }
 }

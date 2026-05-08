@@ -9,11 +9,11 @@ public class MetricConverterDispatcher(IServiceProvider provider) : IMetricConve
     public Metric Convert(MetricPayloadDto payload, Type metricType)
     {
         var converter = GetConverter(metricType)
-            ?? throw new InvalidOperationException($"Metric converter {metricType} is not registered");
-        
+                        ?? throw new InvalidOperationException($"Metric converter {metricType} is not registered");
+
         return converter.Convert(payload);
     }
-    
+
     private IMetricConverter? GetConverter(Type metricType)
     {
         var validatorType = typeof(IMetricConverter).MakeGenericType(metricType);

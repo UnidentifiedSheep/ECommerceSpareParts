@@ -15,7 +15,7 @@ public class SaleService : ISaleService
             storageContentValues,
             saleContents.Select(x => (x.ProductId, x.Price, x.PriceWithDiscount, x.Count)));
     }
-    
+
     public List<SaleContent> DistributeDetails(
         IEnumerable<StorageLot> storageContentValues,
         IEnumerable<EditSaleContentDto> saleContents)
@@ -24,7 +24,7 @@ public class SaleService : ISaleService
             storageContentValues,
             saleContents.Select(x => (x.ProductId, x.Price, x.PriceWithDiscount, x.Count)));
     }
-    
+
     private List<SaleContent> DistributeDetails(
         IEnumerable<StorageLot> storageContentValues,
         IEnumerable<(int productId, decimal price, decimal priceNoDiscount, int count)> saleContents)
@@ -67,7 +67,7 @@ public class SaleService : ISaleService
             var details = new List<SaleContentDetail>();
             var leftToDistribute = count;
 
-            int i = 0;
+            var i = 0;
 
             while (leftToDistribute > 0 && i < storage.Count)
             {
@@ -82,18 +82,18 @@ public class SaleService : ISaleService
                 else
                 {
                     details.Add(SaleContentDetail.Create(
-                        storageContentId: detail.Id,
-                        currencyId: detail.CurrencyId,
-                        buyPrice: detail.BuyPrice,
-                        count: leftToDistribute,
-                        purchaseDate: detail.PurchaseDatetime));
+                        detail.Id,
+                        detail.CurrencyId,
+                        detail.BuyPrice,
+                        leftToDistribute,
+                        detail.PurchaseDatetime));
 
                     storage[i] = SaleContentDetail.Create(
-                        storageContentId: detail.Id,
-                        currencyId: detail.CurrencyId,
-                        buyPrice: detail.BuyPrice,
-                        count: detail.Count - leftToDistribute,
-                        purchaseDate: detail.PurchaseDatetime);
+                        detail.Id,
+                        detail.CurrencyId,
+                        detail.BuyPrice,
+                        detail.Count - leftToDistribute,
+                        detail.PurchaseDatetime);
 
                     leftToDistribute = 0;
                 }

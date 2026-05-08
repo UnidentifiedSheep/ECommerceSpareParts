@@ -17,18 +17,18 @@ public class GetProductSizeHandler(IReadRepository<ProductSize, int> context)
     public async Task<GetProductSizesResult> Handle(GetProductSizeQuery request, CancellationToken cancellationToken)
     {
         var size = await context.Query
-                       .Select(x => new ProductSizeDto 
+                       .Select(x => new ProductSizeDto
                        {
                            ProductId = x.ProductId,
                            Length = x.Length,
                            Width = x.Width,
                            Height = x.Height,
                            Unit = x.Unit,
-                           VolumeM3 = x.VolumeM3,
+                           VolumeM3 = x.VolumeM3
                        })
                        .FirstOrDefaultAsync(x => x.ProductId == request.ProductId, cancellationToken)
                    ?? throw new ProductSizesNotFoundException(request.ProductId);
-        
+
         return new GetProductSizesResult(size);
     }
 }

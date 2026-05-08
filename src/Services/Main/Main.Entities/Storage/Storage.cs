@@ -8,6 +8,18 @@ namespace Main.Entities.Storage;
 
 public class Storage : AuditableEntity<Storage, string>
 {
+    private readonly List<StorageOwner> _owners = [];
+
+    private Storage()
+    {
+    }
+
+    private Storage(string name, StorageType type)
+    {
+        SetName(name);
+        SetType(type);
+    }
+
     [Validate]
     public string Name { get; private set; } = null!;
 
@@ -16,16 +28,7 @@ public class Storage : AuditableEntity<Storage, string>
     public string? Location { get; private set; }
 
     public StorageType Type { get; private set; }
-
-    private List<StorageOwner> _owners = [];
     public IReadOnlyCollection<StorageOwner> Owners => _owners;
-    private Storage(){}
-
-    private Storage(string name, StorageType type)
-    {
-        SetName(name);
-        SetType(type);
-    }
 
     public static Storage Create(string name, StorageType type)
     {
@@ -40,14 +43,14 @@ public class Storage : AuditableEntity<Storage, string>
             .AgainstTooShort(6, "storage.name.min.length")
             .AgainstTooLong(128, "storage.name.max.length");
     }
-    
+
     public void SetType(StorageType type)
     {
         if (Type == type) return;
 
         if (type == StorageType.SupplierStorage && _owners.Count != 0)
             throw new InvalidInputException("storage.type.change.restricted");
-        
+
         Type = type;
     }
 
@@ -57,7 +60,7 @@ public class Storage : AuditableEntity<Storage, string>
             .NullIfWhiteSpace()?
             .AgainstTooLong(256, "storage.description.max.length");
     }
-    
+
     public void SetLocation(string? location)
     {
         Location = location
@@ -78,5 +81,8 @@ public class Storage : AuditableEntity<Storage, string>
         _owners.Remove(found);
     }
 
-    public override string GetId() => Name;
+    public override string GetId()
+    {
+        return Name;
+    }
 }

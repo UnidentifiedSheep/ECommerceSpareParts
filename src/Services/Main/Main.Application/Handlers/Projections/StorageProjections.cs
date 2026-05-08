@@ -8,7 +8,7 @@ namespace Main.Application.Handlers.Projections;
 public static class StorageProjections
 {
     public static readonly Expression<Func<StorageRoute, StorageRouteDto>> StorageRouteProjection =
-        x => new StorageRouteDto 
+        x => new StorageRouteDto
         {
             Id = x.Id,
             CarrierId = x.CarrierId,
@@ -23,15 +23,15 @@ public static class StorageProjections
             PricePerOrder = x.PricePerOrder,
             PricingModel = x.PricingModel,
             RouteType = x.RouteType,
-            ToStorageName = x.ToStorageName,
+            ToStorageName = x.ToStorageName
         };
-    
+
     public static readonly Expression<Func<Storage, StorageDto>> StorageProjection =
-        x => new StorageDto 
+        x => new StorageDto
         {
             Name = x.Name,
             Location = x.Location,
             Description = x.Description,
-            Type = x.Type,
+            Type = x.Type
         };
 }

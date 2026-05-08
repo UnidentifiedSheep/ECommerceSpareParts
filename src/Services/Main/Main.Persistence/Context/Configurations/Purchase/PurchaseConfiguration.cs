@@ -8,7 +8,7 @@ public class PurchaseConfiguration : IEntityTypeConfiguration<Entities.Purchase.
     public void Configure(EntityTypeBuilder<Entities.Purchase.Purchase> builder)
     {
         builder.ToTable("purchase", "public");
-        
+
         builder.HasKey(e => e.Id)
             .HasName("purchase_pk");
 
@@ -33,28 +33,28 @@ public class PurchaseConfiguration : IEntityTypeConfiguration<Entities.Purchase.
             .HasDefaultValueSql("gen_random_uuid()")
             .HasColumnName("id")
             .ValueGeneratedOnAdd();
-            
+
         builder.Property(e => e.Comment)
             .HasMaxLength(256)
             .HasColumnName("comment");
-        
-            
+
+
         builder.Property(e => e.CurrencyId)
             .HasColumnName("currency_id");
-            
+
         builder.Property(e => e.PurchaseDatetime)
             .HasColumnName("purchase_datetime");
-            
+
         builder.Property(e => e.State)
             .HasColumnName("state");
-            
+
         builder.Property(e => e.Storage)
             .HasMaxLength(128)
             .HasColumnName("storage");
-        
+
         builder.Property(e => e.SupplierId)
             .HasColumnName("supplier_id");
-            
+
         builder.Property(e => e.TransactionId)
             .HasColumnName("transaction_id");
 
@@ -81,7 +81,7 @@ public class PurchaseConfiguration : IEntityTypeConfiguration<Entities.Purchase.
             .HasForeignKey(d => d.TransactionId)
             .OnDelete(DeleteBehavior.Restrict)
             .HasConstraintName("purchase_transactions_id_fk");
-        
+
         builder.Navigation(e => e.Contents)
             .HasField("_contents")
             .UsePropertyAccessMode(PropertyAccessMode.Field);

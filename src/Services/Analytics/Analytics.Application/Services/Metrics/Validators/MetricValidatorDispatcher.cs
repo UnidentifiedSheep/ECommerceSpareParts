@@ -9,14 +9,14 @@ public class MetricValidatorDispatcher(IServiceProvider provider) : IMetricValid
     {
         var validator = GetValidator(type);
         ArgumentNullException.ThrowIfNull(validator);
-        
+
         var context = new ValidationContext<object>(metric);
         var result = await validator.ValidateAsync(context, ct);
-        
+
         if (!result.IsValid)
             throw new ValidationException(result.Errors);
     }
-    
+
     private IValidator? GetValidator(Type metricType)
     {
         var validatorType = typeof(IValidator<>).MakeGenericType(metricType);

@@ -6,9 +6,13 @@ namespace Main.Entities.Event;
 
 public class StorageMovementEvent : Event<StorageMovementEventData>
 {
-    public StorageMovementEvent(StorageMovementEventData data) : base(data) { }
-    
-    private StorageMovementEvent() : base() {}
+    public StorageMovementEvent(StorageMovementEventData data) : base(data)
+    {
+    }
+
+    private StorageMovementEvent()
+    {
+    }
 
     public static StorageMovementEvent Create(StorageMovementEventData data)
     {
@@ -26,7 +30,7 @@ public class StorageMovementEvent : Event<StorageMovementEventData>
             BuyPrice = content.BuyPrice,
             MovementType = movementType
         };
-        
+
         return new StorageMovementEvent(data);
     }
 }
@@ -35,19 +39,19 @@ public record StorageMovementEventData
 {
     [JsonPropertyName("productId")]
     public required int ProductId { get; init; }
-    
+
     [JsonPropertyName("storageName")]
     public required string StorageName { get; init; }
-    
+
     [JsonPropertyName("currencyId")]
     public required int CurrencyId { get; init; }
-    
+
     [JsonPropertyName("count")]
     public required int Count { get; init; }
-    
+
     [JsonPropertyName("buyPrice")]
     public required decimal BuyPrice { get; init; }
-    
+
     [JsonPropertyName("movementType")]
     public required StorageMovementType MovementType { get; init; }
 }

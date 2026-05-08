@@ -16,10 +16,10 @@ public class IntegrationEventPublisherBehavior<TRequest, TResponse>(
         CancellationToken cancellationToken)
     {
         var response = await next(cancellationToken);
-        
+
         var events = eventScope.Flush();
         foreach (var @event in events) await publishEndpoint.Publish(@event, cancellationToken);
-        
+
         return response;
     }
 }

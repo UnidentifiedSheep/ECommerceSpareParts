@@ -15,7 +15,8 @@ public class BalanceService(
         CancellationToken cancellationToken = default)
     {
         var senderBalance = await GetUserBalanceAsync(transaction.SenderId, transaction.CurrencyId, cancellationToken);
-        var receiverBalance = await GetUserBalanceAsync(transaction.ReceiverId, transaction.CurrencyId, cancellationToken);
+        var receiverBalance =
+            await GetUserBalanceAsync(transaction.ReceiverId, transaction.CurrencyId, cancellationToken);
 
         transaction.Apply(senderBalance, receiverBalance);
     }
@@ -34,7 +35,7 @@ public class BalanceService(
         var dbValue = await userBalanceRepository.FirstOrDefaultAsync(criteria, cancellationToken);
 
         if (dbValue != null) return dbValue;
-        
+
         dbValue = UserBalance.Create(userId, currencyId);
         await unitOfWork.AddAsync(dbValue, cancellationToken);
 

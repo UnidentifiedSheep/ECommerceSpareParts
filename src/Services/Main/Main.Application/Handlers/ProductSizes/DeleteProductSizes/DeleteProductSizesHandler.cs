@@ -23,7 +23,7 @@ public class DeleteProductSizesHandler(
     {
         var sizes = await repository.GetById(request.ProductId, cancellationToken)
                     ?? throw new ProductSizesNotFoundException(request.ProductId);
-        
+
         unitOfWork.Remove(sizes);
 
         integrationEventScope.Add(new ProductSizesUpdatedEvent { ProductId = request.ProductId });

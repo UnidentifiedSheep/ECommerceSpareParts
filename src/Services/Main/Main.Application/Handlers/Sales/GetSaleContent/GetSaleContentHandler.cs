@@ -23,7 +23,7 @@ public class GetSaleContentHandler(
             .AsExpandable()
             .Select(SaleProjections.ToSaleContentDto)
             .ToListAsync(cancellationToken);
-        
+
         return new GetSaleContentResult(result);
     }
 }

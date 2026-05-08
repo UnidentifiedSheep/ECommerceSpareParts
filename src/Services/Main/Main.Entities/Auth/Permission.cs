@@ -7,20 +7,26 @@ namespace Main.Entities.Auth;
 
 public class Permission : AuditableEntity<Permission, string>
 {
-    [Validate]
-    public string Name { get; private set; } = null!;
+    private Permission()
+    {
+    }
 
-    public string? Description { get; private set; }
-    public override string GetId() => Name;
-    
-    private Permission() {}
-    
     public Permission(PermissionCodes name, string? description = null)
     {
         Name = ToNormalizedPermission(name);
         Description = description;
     }
-    
+
+    [Validate]
+    public string Name { get; } = null!;
+
+    public string? Description { get; private set; }
+
+    public override string GetId()
+    {
+        return Name;
+    }
+
     public static string ToNormalizedPermission(PermissionCodes permission)
     {
         return permission.ToString().ToNormalizedPermission();

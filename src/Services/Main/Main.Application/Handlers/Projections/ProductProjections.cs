@@ -19,16 +19,17 @@ public static class ProductProjections
             ProducerId = x.ProducerId,
             ProducerName = x.Producer.Name,
             Indicator = x.Indicator,
-            Images = x.Images.Select(z => z.Path).ToList(),
+            Images = x.Images.Select(z => z.Path).ToList()
         };
 
-    public static readonly Expression<Func<Entities.Product.ProductCoefficient, ProductCoefficientDto>> ToProductCoefficientDto =
-        x => new ProductCoefficientDto
-        {
-            ProductId = x.ProductId,
-            ValidTill = x.ValidTill,
-            CreatedAt = x.CreatedAt,
-            UpdatedAt = x.UpdatedAt,
-            Coefficient = CoefficientProjections.ToDto.Invoke(x.Coefficient),
-        };
+    public static readonly Expression<Func<Entities.Product.ProductCoefficient, ProductCoefficientDto>>
+        ToProductCoefficientDto =
+            x => new ProductCoefficientDto
+            {
+                ProductId = x.ProductId,
+                ValidTill = x.ValidTill,
+                CreatedAt = x.CreatedAt,
+                UpdatedAt = x.UpdatedAt,
+                Coefficient = CoefficientProjections.ToDto.Invoke(x.Coefficient)
+            };
 }

@@ -4,9 +4,9 @@ namespace Main.Entities.Producer.ValueObjects;
 
 public record Name
 {
-    public string Value { get; } = null!;
-    
-    private Name() {}
+    private Name()
+    {
+    }
 
     public Name(string value)
     {
@@ -18,8 +18,16 @@ public record Name
 
         Value = char.ToUpperInvariant(value[0]) + value[1..];
     }
-    
-    public static implicit operator Name(string value) => new(value);
 
-    public static implicit operator string(Name name) => name.Value;
+    public string Value { get; } = null!;
+
+    public static implicit operator Name(string value)
+    {
+        return new Name(value);
+    }
+
+    public static implicit operator string(Name name)
+    {
+        return name.Value;
+    }
 }

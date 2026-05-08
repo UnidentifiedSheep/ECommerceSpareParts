@@ -1,7 +1,5 @@
 ﻿using Application.Common.Abstractions;
 using BulkValidation.Core.Interfaces;
-using Extensions;
-using Main.Entities;
 
 namespace Main.Application.Handlers.Users.CreateUser;
 

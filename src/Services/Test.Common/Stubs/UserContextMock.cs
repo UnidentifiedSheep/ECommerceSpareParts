@@ -4,13 +4,12 @@ namespace Test.Common.Stubs;
 
 public class UserContextMock : IUserContext
 {
-    public bool IsAuthenticated { get; private set; }
-    public Guid UserId { get; private set; }
+    private readonly HashSet<string> _permissions = [];
 
     private readonly HashSet<string> _roles = [];
+    public bool IsAuthenticated { get; private set; }
+    public Guid UserId { get; private set; }
     public IReadOnlySet<string> Roles => _roles;
-    
-    private readonly HashSet<string> _permissions = [];
     public IReadOnlySet<string> Permissions => _permissions;
 
     public UserContextMock SetIsAuthenticated(bool isAuthenticated)

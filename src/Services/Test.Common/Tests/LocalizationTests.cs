@@ -76,7 +76,7 @@ public class LocalizationTests
             }
         }
     }
-    
+
     public async Task TestDbValidatorLocalization(IEnumerable<string> functionKeys, string path, Locale locale)
     {
         using var scoped = await CreateLocalizer(path, locale);
@@ -99,7 +99,7 @@ public class LocalizationTests
 
     private static List<ValidationConfig> GetConfigs(string key)
     {
-        var res = new List<ValidationConfig?>()
+        var res = new List<ValidationConfig?>
         {
             ConfigureDbValidation.GetConfig(key, KeyValueType.Single),
             ConfigureDbValidation.GetConfig(key, KeyValueType.MultipleKeys),

@@ -27,11 +27,11 @@ public class GetCharacteristicsHandler(
             {
                 ProductId = x.ProductId,
                 Name = x.Name,
-                Value = x.Value,
+                Value = x.Value
             })
             .ApplyPagination(request.Pagination)
             .ToListAsync(cancellationToken);
-        
+
         return new GetCharacteristicsResult(result);
     }
 }

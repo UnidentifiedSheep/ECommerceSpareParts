@@ -11,13 +11,13 @@ namespace Main.Application.Services;
 public class JwtGenerator(JwtOptions options) : IJwtGenerator
 {
     private readonly JwtSecurityTokenHandler _tokenHandler = new();
+
     public string CreateToken(
         UserDto user,
         string deviceId,
         IEnumerable<string> roles,
         IEnumerable<string> permissions)
     {
-
         var tokenDescriptor = new SecurityTokenDescriptor
         {
             SigningCredentials = options.SigningCredentials,

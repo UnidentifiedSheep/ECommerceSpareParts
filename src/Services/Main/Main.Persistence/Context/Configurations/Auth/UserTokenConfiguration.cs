@@ -1,5 +1,4 @@
-﻿using Main.Entities;
-using Main.Entities.Auth;
+﻿using Main.Entities.Auth;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
@@ -10,7 +9,7 @@ public class UserTokenConfiguration : IEntityTypeConfiguration<UserToken>
     public void Configure(EntityTypeBuilder<UserToken> builder)
     {
         builder.ToTable("user_tokens", "auth");
-        
+
         builder.HasKey(e => e.Id)
             .HasName("user_tokens_pk");
 
@@ -34,38 +33,38 @@ public class UserTokenConfiguration : IEntityTypeConfiguration<UserToken>
             .HasDefaultValueSql("gen_random_uuid()")
             .HasColumnName("id")
             .ValueGeneratedOnAdd();
-            
+
         builder.Property(e => e.DeviceId)
             .HasMaxLength(255)
             .HasColumnName("device_id");
-        
+
         builder.Property(e => e.ExpiresAt)
             .HasColumnName("expires_at");
-        
+
         builder.Property(e => e.IpAddress)
             .HasColumnName("ip_address");
-            
-            
+
+
         builder.Property(e => e.Permissions)
             .HasColumnName("permissions");
-        
+
         builder.Property(e => e.RevokeReason)
             .HasMaxLength(255)
             .HasColumnName("revoke_reason");
-        
+
         builder.Property(e => e.Revoked)
             .HasColumnName("revoked");
-        
+
         builder.Property(e => e.TokenHash)
             .HasColumnName("token_hash");
-        
+
         builder.Property(e => e.Type)
             .HasMaxLength(50)
             .HasColumnName("type");
-        
+
         builder.Property(e => e.UserAgent)
             .HasColumnName("user_agent");
-            
+
         builder.Property(e => e.UserId)
             .HasColumnName("user_id");
 

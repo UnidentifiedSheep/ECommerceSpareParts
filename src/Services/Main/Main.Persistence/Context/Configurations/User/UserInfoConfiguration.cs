@@ -1,5 +1,4 @@
-﻿using Main.Entities;
-using Main.Entities.User;
+﻿using Main.Entities.User;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
@@ -10,7 +9,7 @@ public class UserInfoConfiguration : IEntityTypeConfiguration<UserInfo>
     public void Configure(EntityTypeBuilder<UserInfo> builder)
     {
         builder.ToTable("user_info", "auth");
-        
+
         builder.HasKey(e => e.UserId)
             .HasName("user_info_pk");
 
@@ -37,16 +36,16 @@ public class UserInfoConfiguration : IEntityTypeConfiguration<UserInfo>
         builder.Property(e => e.UserId)
             .ValueGeneratedNever()
             .HasColumnName("user_id");
-        
+
         builder.Property(e => e.Description)
             .HasColumnName("description");
-        
+
         builder.Property(e => e.Name)
             .HasColumnName("name");
-        
+
         builder.Property(e => e.SearchColumn)
             .HasColumnName("search_column");
-        
+
         builder.Property(e => e.Surname)
             .HasColumnName("surname");
 

@@ -12,7 +12,7 @@ namespace Main.Application.Handlers.StorageRoutes.DeleteStorageRoute;
 public record DeleteStorageRouteCommand(Guid Id) : ICommand;
 
 public class DeleteStorageRouteHandler(
-    IStorageRouteRepository repository, 
+    IStorageRouteRepository repository,
     IUnitOfWork unitOfWork)
     : ICommandHandler<DeleteStorageRouteCommand>
 {

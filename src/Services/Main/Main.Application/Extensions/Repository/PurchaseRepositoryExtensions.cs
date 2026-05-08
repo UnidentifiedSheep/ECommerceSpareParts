@@ -7,8 +7,8 @@ namespace Main.Application.Extensions.Repository;
 public static class PurchaseRepositoryExtensions
 {
     public static async Task<Purchase> GetPurchaseForUpdate(
-        this IRepository<Purchase, Guid> repository, 
-        Guid id, 
+        this IRepository<Purchase, Guid> repository,
+        Guid id,
         CancellationToken cancellationToken = default)
     {
         var criteria = Criteria<Purchase>.New()
@@ -31,7 +31,7 @@ public static class PurchaseRepositoryExtensions
             .Include(x => x.PurchaseContentLogistic)
             .Where(x => x.PurchaseId == purchaseId)
             .Build();
-        
+
         return await repository.ListAsync(criteria, cancellationToken);
     }
 }

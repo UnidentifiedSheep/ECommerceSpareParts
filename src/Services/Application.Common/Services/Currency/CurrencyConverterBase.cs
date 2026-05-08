@@ -13,23 +13,30 @@ public abstract class CurrencyConverterBase : ICurrencyConverter
         return baseValue * toRate;
     }
 
-    public decimal ToBase(decimal value, decimal fromRate) => value / fromRate;
+    public decimal ToBase(decimal value, decimal fromRate)
+    {
+        return value / fromRate;
+    }
 
-    public decimal FromBase(decimal value, decimal toRate) => value * toRate;
+    public decimal FromBase(decimal value, decimal toRate)
+    {
+        return value * toRate;
+    }
+
     public abstract Task<decimal> ConvertAsync(
-        decimal value, 
-        int fromCurrencyId, 
-        int toCurrencyId, 
+        decimal value,
+        int fromCurrencyId,
+        int toCurrencyId,
         CancellationToken cancellationToken = default);
 
     public abstract Task<decimal> ConvertFromBaseAsync(
-        decimal value, 
-        int toCurrencyId, 
+        decimal value,
+        int toCurrencyId,
         CancellationToken cancellationToken = default);
 
     public abstract Task<decimal> ConvertToBaseAsync(
-        decimal value, 
-        int fromCurrencyId, 
+        decimal value,
+        int fromCurrencyId,
         CancellationToken cancellationToken = default);
 
     public ExchangeRates ChangeBaseCurrency(ExchangeRates data, string newBase)

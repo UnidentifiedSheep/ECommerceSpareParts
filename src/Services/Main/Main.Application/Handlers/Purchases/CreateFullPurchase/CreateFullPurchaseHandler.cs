@@ -2,24 +2,10 @@ using System.Data;
 using Abstractions.Interfaces.Services;
 using Application.Common.Interfaces;
 using Attributes;
-using Contracts.Articles;
-using Contracts.Purchase;
 using Main.Abstractions.Interfaces.Services;
 using Main.Application.Dtos.Amw.Purchase;
-using Main.Application.Dtos.Storage;
-using Main.Application.Extensions;
-using Main.Application.Handlers.Balance.CreateTransaction;
-using Main.Application.Handlers.Purchases.CreatePurchase;
-using Main.Application.Handlers.Purchases.UpsertLogisticsToPurchase;
-using Main.Application.Handlers.StorageContents.AddContent;
-using Main.Entities;
-using Main.Entities.Balance;
-using Main.Entities.Purchase;
-using Main.Enums;
-using Mapster;
 using MassTransit;
 using MediatR;
-using ContractPurchase = Contracts.Models.Purchase.Purchase;
 
 namespace Main.Application.Handlers.Purchases.CreateFullPurchase;
 

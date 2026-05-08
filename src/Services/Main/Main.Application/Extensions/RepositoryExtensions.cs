@@ -30,8 +30,8 @@ public static class RepositoryExtensions
             ct);
 
         keySet.EnsureAllExists(
-            otherIds: result.Keys,
-            errorFactory: errorFactory);
+            result.Keys,
+            errorFactory);
 
         return result;
     }
@@ -46,8 +46,8 @@ public static class RepositoryExtensions
             .Track()
             .ForUpdate()
             .Build();
-        
+
         return await productRepository.FirstOrDefaultAsync(criteria, cancellationToken)
-            ?? throw new ProductNotFoundException(productId);
+               ?? throw new ProductNotFoundException(productId);
     }
 }

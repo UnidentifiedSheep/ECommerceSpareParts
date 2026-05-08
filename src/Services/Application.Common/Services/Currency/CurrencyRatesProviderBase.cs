@@ -9,12 +9,12 @@ public abstract class CurrencyRatesProviderBase(
     public virtual async Task<decimal> GetRate(int currencyId, CancellationToken cancellationToken = default)
     {
         return await cache.GetOrSetAsync(
-            key: $"currency:{currencyId}:rate",
-            factory: ct => GetFromDb(currencyId, ct),
-            duration: TimeSpan.FromDays(1),
-            tags: [$"currency:{currencyId}"],
-            token: cancellationToken);
+            $"currency:{currencyId}:rate",
+            ct => GetFromDb(currencyId, ct),
+            TimeSpan.FromDays(1),
+            [$"currency:{currencyId}"],
+            cancellationToken);
     }
-    
+
     protected abstract Task<decimal> GetFromDb(int currencyId, CancellationToken cancellationToken = default);
 }

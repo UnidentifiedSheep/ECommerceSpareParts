@@ -23,22 +23,20 @@ public class GetRolesHandler(IReadRepository<Role, string> repository) : IQueryH
         var query = repository.Query;
 
         if (!string.IsNullOrWhiteSpace(trimmed))
-        {
             query = query.Where(x => EF.Functions.ILike(x.Name.Value, $"%{trimmed}%"))
                 .Select(x => new
                     { Role = x, Rank = EF.Functions.TrigramsSimilarity(x.Name.Value, $"%{trimmed}%") })
                 .OrderByDescending(x => x.Rank)
                 .Select(x => x.Role);
-        }
         else
             query = query.OrderBy(x => x.Name.Value);
-        
+
         var roles = await query
             .AsExpandable()
             .Select(AuthProjections.ToRoleDto)
             .ApplyPagination(request.Pagination)
             .ToListAsync(cancellationToken);
-        
+
         return new GetRolesResult(roles);
     }
 }

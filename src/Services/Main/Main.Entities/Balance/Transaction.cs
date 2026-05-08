@@ -9,32 +9,15 @@ namespace Main.Entities.Balance;
 
 public class Transaction : AuditableEntity<Transaction, Guid>
 {
-    [Validate]
-    public Guid Id { get; private set; }
-    public int CurrencyId { get; private set; }
-    public Guid SenderId { get; private set; }
-    public Guid ReceiverId { get; private set; }
-    public decimal Amount { get; private set; }
-    public TransactionType Type { get; private set; }
-    public TransactionStatus Status { get; private set; }
-    public DateTime TransactionDatetime { get; private set; }
-    public DateTime? ReversedAt { get; private set; }
-    public Guid? ReversedBy { get; private set; }
-    public uint RowVersion { get; private set; }
-    
-    public bool IsCompleted => Status.HasFlag(TransactionStatus.Completed);
-    public bool IsCompletionApplied => Status.HasFlag(TransactionStatus.CompletionApplied);
-
-    public bool IsReversed => Status.HasFlag(TransactionStatus.Reversed);
-    public bool IsReversalApplied => Status.HasFlag(TransactionStatus.ReversedApplied);
-    
-    private Transaction() {}
+    private Transaction()
+    {
+    }
 
     private Transaction(
-        Guid senderId, 
-        Guid receiverId, 
-        int currencyId, 
-        TransactionType type, 
+        Guid senderId,
+        Guid receiverId,
+        int currencyId,
+        TransactionType type,
         decimal transactionSum,
         DateTime transactionDatetime)
     {
@@ -49,6 +32,26 @@ public class Transaction : AuditableEntity<Transaction, Guid>
         SetAmount(transactionSum);
     }
 
+    [Validate]
+    public Guid Id { get; private set; }
+
+    public int CurrencyId { get; private set; }
+    public Guid SenderId { get; }
+    public Guid ReceiverId { get; }
+    public decimal Amount { get; private set; }
+    public TransactionType Type { get; private set; }
+    public TransactionStatus Status { get; private set; }
+    public DateTime TransactionDatetime { get; private set; }
+    public DateTime? ReversedAt { get; private set; }
+    public Guid? ReversedBy { get; private set; }
+    public uint RowVersion { get; private set; }
+
+    public bool IsCompleted => Status.HasFlag(TransactionStatus.Completed);
+    public bool IsCompletionApplied => Status.HasFlag(TransactionStatus.CompletionApplied);
+
+    public bool IsReversed => Status.HasFlag(TransactionStatus.Reversed);
+    public bool IsReversalApplied => Status.HasFlag(TransactionStatus.ReversedApplied);
+
     public static Transaction Create(
         Guid senderId,
         Guid receiverId,
@@ -59,7 +62,7 @@ public class Transaction : AuditableEntity<Transaction, Guid>
     {
         return new Transaction(senderId, receiverId, currencyId, type, transactionSum, transactionDatetime);
     }
-    
+
     private void SetAmount(decimal newAmount)
     {
         Amount = newAmount.AgainstTooManyDecimalPlaces(2, "transaction.amount.max.two.decimal.places")
@@ -69,8 +72,8 @@ public class Transaction : AuditableEntity<Transaction, Guid>
     private void SetCurrencyId(int currencyId)
     {
         currencyId.AgainstLessOrEqual(
-            min: 0,
-            exceptionFactory: () => new ArgumentException("CurrencyId must be greater than zero"));
+            0,
+            () => new ArgumentException("CurrencyId must be greater than zero"));
         CurrencyId = currencyId;
     }
 
@@ -107,10 +110,10 @@ public class Transaction : AuditableEntity<Transaction, Guid>
     public void Apply(UserBalance senderBalance, UserBalance receiverBalance)
     {
         ValidateBalances(senderBalance, receiverBalance);
-        
+
         if (!IsCompleted && !IsReversed)
             throw new InvalidOperationException("Nothing to apply");
-        
+
         if (IsReversed)
         {
             if (!IsCompletionApplied)
@@ -121,7 +124,7 @@ public class Transaction : AuditableEntity<Transaction, Guid>
             Status |= TransactionStatus.ReversedApplied;
             return;
         }
-        
+
         if (IsCompleted)
         {
             if (IsCompletionApplied)
@@ -154,7 +157,7 @@ public class Transaction : AuditableEntity<Transaction, Guid>
         sender.IncrementBalance(Amount);
         receiver.IncrementBalance(-Amount);
     }
-    
+
     private void EnsureCanMutate()
     {
         if (IsCompleted && IsReversed)
@@ -162,8 +165,10 @@ public class Transaction : AuditableEntity<Transaction, Guid>
 
         if (IsReversed)
             throw new InvalidOperationException("Transaction is in terminal state");
-        
     }
 
-    public override Guid GetId() => Id;
+    public override Guid GetId()
+    {
+        return Id;
+    }
 }

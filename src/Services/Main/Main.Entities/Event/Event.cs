@@ -6,26 +6,45 @@ namespace Main.Entities.Event;
 
 public abstract class Event : AuditableEntity<Event, int>
 {
-    public int Id { get; protected set; }
-
-    public string Discriminator { get; protected set; } = null!;
-    
-    public string Json { get; protected set; } = null!;
-    
-    protected Event() {}
+    protected Event()
+    {
+    }
 
     protected Event(string json)
     {
         Json = json;
     }
-    
-    public override int GetId() => Id;
+
+    public int Id { get; protected set; }
+
+    public string Discriminator { get; protected set; } = null!;
+
+    public string Json { get; protected set; } = null!;
+
+    public override int GetId()
+    {
+        return Id;
+    }
 }
 
 public abstract class Event<T> : Event
     where T : class
 {
     private T? _data;
+
+    protected Event(string json) : base(json)
+    {
+    }
+
+    protected Event()
+    {
+    }
+
+    protected Event(T data)
+        : base(Serialize(data))
+    {
+        _data = data;
+    }
 
     [NotMapped]
     public T Data
@@ -34,19 +53,13 @@ public abstract class Event<T> : Event
         init => _data = value;
     }
 
-    protected Event(string json) : base(json) { }
-
-    protected Event() {}
-    
-    protected Event(T data)
-        : base(Serialize(data))
+    private static string Serialize(T data)
     {
-        _data = data;
+        return JsonSerializer.Serialize(data);
     }
 
-    private static string Serialize(T data)
-        => JsonSerializer.Serialize(data);
-
     private static T Deserialize(string json)
-        => JsonSerializer.Deserialize<T>(json)!;
+    {
+        return JsonSerializer.Deserialize<T>(json)!;
+    }
 }

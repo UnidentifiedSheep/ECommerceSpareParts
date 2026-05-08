@@ -26,20 +26,20 @@ public class GetUserFullInfoHandler(
     public async Task<GetUserFullInfoResult> Handle(GetUserFullInfoQuery request, CancellationToken cancellationToken)
     {
         var user = await repository.Query
-                .Where(x => x.Id == request.UserId)
-                .AsExpandable()
-                .Select(x => new 
-                { 
-                    User = UserProjections.UserProjection.InvokeEFCore(x),
-                    Emails = x.Emails.Select(z => UserProjections.UserEmailProjection.InvokeEFCore(z))
-                })
-                .FirstOrDefaultAsync(cancellationToken) 
+                       .Where(x => x.Id == request.UserId)
+                       .AsExpandable()
+                       .Select(x => new
+                       {
+                           User = UserProjections.UserProjection.InvokeEFCore(x),
+                           Emails = x.Emails.Select(z => UserProjections.UserEmailProjection.InvokeEFCore(z))
+                       })
+                       .FirstOrDefaultAsync(cancellationToken)
                    ?? throw new UserNotFoundException(request.UserId);
 
         var (roles, permissions) = await userService
                                        .GetUserRolesAndPermissionsAsync(request.UserId, cancellationToken)
                                    ?? throw new UserNotFoundException(request.UserId);
-        
+
 
         return new GetUserFullInfoResult(
             user.User,

@@ -1,5 +1,4 @@
-﻿using Main.Entities;
-using Main.Entities.User;
+﻿using Main.Entities.User;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
@@ -10,7 +9,7 @@ public class UserBalanceConfiguration : IEntityTypeConfiguration<UserBalance>
     public void Configure(EntityTypeBuilder<UserBalance> builder)
     {
         builder.ToTable("user_balances", "public");
-        
+
         builder.HasKey(e => new { e.UserId, e.CurrencyId })
             .HasName("user_balances_pk");
 
@@ -26,13 +25,13 @@ public class UserBalanceConfiguration : IEntityTypeConfiguration<UserBalance>
 
         builder.HasIndex(e => e.UserId)
             .HasDatabaseName("user_balances_user_id_index");
-        
+
         builder.Property(e => e.Balance)
             .HasColumnName("balance");
-        
+
         builder.Property(e => e.CurrencyId)
             .HasColumnName("currency_id");
-        
+
         builder.Property(e => e.UserId)
             .HasColumnName("user_id");
 

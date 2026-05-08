@@ -10,13 +10,18 @@ public abstract class SettingFactoryBase : ISettingFactory
 
     public Setting Create(string key, string json)
     {
-        return !Map.TryGetValue(key, out var creator) 
-            ? throw new InvalidOperationException($"Unknown setting type: {key}") 
+        return !Map.TryGetValue(key, out var creator)
+            ? throw new InvalidOperationException($"Unknown setting type: {key}")
             : creator(json);
     }
 
-    public Setting Create<T>(string json) where T : Setting, ISetting<T> =>Create(T.SettingName, json);
+    public Setting Create<T>(string json) where T : Setting, ISetting<T>
+    {
+        return Create(T.SettingName, json);
+    }
 
     public void Register<T>(Func<string, T> factory) where T : Setting, ISetting<T>
-        => Map[T.SettingName] = factory;
+    {
+        Map[T.SettingName] = factory;
+    }
 }

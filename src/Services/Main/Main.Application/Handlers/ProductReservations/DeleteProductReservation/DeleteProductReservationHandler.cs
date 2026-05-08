@@ -19,7 +19,7 @@ public class DeleteProductReservationHandler(
     public async Task<Unit> Handle(DeleteProductReservationCommand request, CancellationToken cancellationToken)
     {
         var reservation = await repository.GetById(request.ReservationId, cancellationToken)
-            ?? throw new ReservationNotFoundException(request.ReservationId);
+                          ?? throw new ReservationNotFoundException(request.ReservationId);
         unitOfWork.Remove(reservation);
         return Unit.Value;
     }

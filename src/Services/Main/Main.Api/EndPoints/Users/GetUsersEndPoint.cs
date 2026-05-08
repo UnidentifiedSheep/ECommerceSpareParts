@@ -1,5 +1,4 @@
 using Abstractions.Interfaces;
-using Abstractions.Models;
 using Api.Common.Extensions;
 using Api.Common.Models.Requests;
 using Carter;
@@ -51,8 +50,8 @@ public class GetUsersEndPoint : ICarterModule
                     CancellationToken token) =>
                 {
                     var query = new GetUsersQuery(
-                        request, 
-                        request.SearchTerm, 
+                        request,
+                        request.SearchTerm,
                         request.SimilarityLevel,
                         userContext.UserId,
                         request.Name,

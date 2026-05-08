@@ -1,6 +1,4 @@
-﻿using Application.Common.Interfaces;
-using Contracts.Articles;
-using Main.Application.Handlers.Products.GetProductCrosses;
+﻿using Contracts.Articles;
 using MassTransit;
 using ZiggyCreatures.Caching.Fusion;
 
@@ -12,7 +10,7 @@ public class ProductUpdatedConsumer(
     public async Task Consume(ConsumeContext<ProductUpdatedEvent> context)
     {
         await cache.RemoveByTagAsync(
-            tags: ["product-crosses"],
+            ["product-crosses"],
             token: context.CancellationToken);
     }
 }

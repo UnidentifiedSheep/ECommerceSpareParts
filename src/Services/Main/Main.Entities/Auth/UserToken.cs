@@ -29,5 +29,9 @@ public class UserToken : AuditableEntity<UserToken, Guid>
     public string? UserAgent { get; set; }
 
     public virtual User.User User { get; set; } = null!;
-    public override Guid GetId() => Id;
+
+    public override Guid GetId()
+    {
+        return Id;
+    }
 }

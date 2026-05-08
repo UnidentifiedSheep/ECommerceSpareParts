@@ -1,5 +1,4 @@
-﻿using Extensions;
-using Lucene.Net.Documents;
+﻿using Lucene.Net.Documents;
 using Search.Entities;
 
 namespace Search.Persistence.Extensions;

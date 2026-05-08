@@ -11,8 +11,8 @@ namespace Main.Persistence.Repositories.Currency;
 
 public class CurrencyRateRepository(
     DContext context
-    ) 
-    : RepositoryBase<DContext, CurrencyRate, (int, int)>(context), 
+)
+    : RepositoryBase<DContext, CurrencyRate, (int, int)>(context),
         ICurrencyRateRepository
 {
     public Task<List<CurrencyRate>> GetByBaseCurrency(
@@ -34,9 +34,9 @@ public class CurrencyRateRepository(
         var keys = ids.Distinct().ToList();
 
         if (keys.Count == 0)
-            return Task.FromResult(new  Dictionary<(int, int), CurrencyRate>());
+            return Task.FromResult(new Dictionary<(int, int), CurrencyRate>());
 
-        IQueryable<CurrencyRate> query = Context.CurrencyRates
+        var query = Context.CurrencyRates
             .AsExpandable()
             .Apply(criteria);
 
@@ -46,7 +46,7 @@ public class CurrencyRateRepository(
             predicate = predicate.Or(x =>
                 x.FromCurrencyId == fromId &&
                 x.ToCurrencyId == toId);
-        
+
         return query
             .Where(predicate)
             .ToDictionaryAsync(

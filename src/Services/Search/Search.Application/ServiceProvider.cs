@@ -11,7 +11,7 @@ public static class ServiceProvider
     public static IServiceCollection AddApplicationLayer(this IServiceCollection services)
     {
         services.AddValidatorsFromAssembly(typeof(SearchArticlesHandler).Assembly);
-        
+
         services.AddMediatR(config =>
         {
             config.RegisterServicesFromAssembly(typeof(GetArticleQuery).Assembly);

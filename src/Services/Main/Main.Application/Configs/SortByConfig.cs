@@ -25,7 +25,7 @@ public static class SortByConfig
             .MapDefault<Producer, int>(x => x.Id)
             .Map<Producer, int>("id", x => x.Id)
             .Map<Producer, string>("name", x => x.Name.Value);
-        
+
         QueryableSortByOptions.Value
             .MapDefault<Purchase, DateTime>(x => x.PurchaseDatetime)
             .Map<Purchase, DateTime>("dateTime", x => x.PurchaseDatetime)

@@ -5,8 +5,8 @@ namespace Abstractions;
 
 public class QueryableSortByOptions
 {
-    public static readonly QueryableSortByOptions Value = new();
     private const string DefaultKey = "__default__";
+    public static readonly QueryableSortByOptions Value = new();
 
     private readonly ConcurrentDictionary<Type, ConcurrentDictionary<string, object>> _mapDictionary = new();
 
@@ -17,7 +17,10 @@ public class QueryableSortByOptions
         Delimiter = delimiter;
     }
 
-    public char GetDelimiter() => Delimiter;
+    public char GetDelimiter()
+    {
+        return Delimiter;
+    }
 
     public QueryableSortByOptions Map<TSource, TKey>(
         string source,

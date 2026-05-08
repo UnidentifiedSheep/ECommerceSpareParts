@@ -26,14 +26,14 @@ public class GetProducersHandler(IReadRepository<Producer, int> repository)
                 .OrderByDescending(x => EF.Functions.TrigramsSimilarity(x.Name, searchTerm));
         else
             query = query.OrderBy(x => x.Name);
-        
+
 
         var result = await query
             .Select(x => new ProducerDto
             {
                 Id = x.Id,
                 Name = x.Name,
-                Description = x.Description,
+                Description = x.Description
             })
             .ApplyPagination(request.Pagination)
             .ToListAsync(cancellationToken);

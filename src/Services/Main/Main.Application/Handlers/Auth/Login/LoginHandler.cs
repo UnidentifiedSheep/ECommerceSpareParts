@@ -7,11 +7,11 @@ using Application.Common.Interfaces.Repositories;
 using Attributes;
 using Exceptions.Base;
 using Main.Abstractions.Interfaces.Services;
-using Main.Application.Dtos.Users;
 using Main.Application.Handlers.Projections;
 using Main.Application.Interfaces.Persistence;
 using Main.Application.Interfaces.Services;
 using Main.Entities.Exceptions.Auth;
+using Main.Entities.User;
 using Main.Enums;
 
 namespace Main.Application.Handlers.Auth.Login;
@@ -32,13 +32,13 @@ public class LoginHandler(
 {
     public async Task<LoginResult> Handle(LoginCommand request, CancellationToken cancellationToken)
     {
-        var criteria = Criteria<Entities.User.User>.New()
+        var criteria = Criteria<User>.New()
             .Include(x => x.UserInfo)
             .Build();
-        
+
         var user = await userRepository.GetUserByPrimaryEmailAsync(request.Email, criteria, cancellationToken)
-            ?? throw new WrongCredentialsException(request.Email, null);
-        
+                   ?? throw new WrongCredentialsException(request.Email, null);
+
         if (user.UserInfo == null)
             throw new InternalServerException("User exists, but unable to get user info.");
         if (!passwordManager.VerifyHashedPassword(user.PasswordHash, request.Password))
@@ -52,7 +52,7 @@ public class LoginHandler(
         var ip = request.IpAddress;
         var userAgent = request.UserAgent;
 
-        UserDto userDto = UserProjections.UserProjection.AsFunc()(user);
+        var userDto = UserProjections.UserProjection.AsFunc()(user);
         var token = tokenGenerator.CreateToken(userDto, deviceId, roles, permissions);
         var refreshToken = tokenGenerator.CreateRefreshToken();
 

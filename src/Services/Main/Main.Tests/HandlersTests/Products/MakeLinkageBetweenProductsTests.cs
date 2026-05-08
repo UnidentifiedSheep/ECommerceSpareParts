@@ -13,14 +13,13 @@ namespace Tests.HandlersTests.Products;
 
 public class MakeLinkageBetweenProductsTests : IntegrationTest
 {
-    
     public MakeLinkageBetweenProductsTests(CombinedContainerFixture fixture) : base(fixture)
     {
         RegisterBasicContext<ProductTestContext>();
     }
-    
+
     private ProductTestContext TestContext => GetContext<ProductTestContext>();
-    
+
     [Fact]
     public async Task MakeLinkage_SameIds_FailsValidation()
     {
@@ -31,8 +30,7 @@ public class MakeLinkageBetweenProductsTests : IntegrationTest
             LinkageType = ProductLinkageType.FullCross
         };
         var command = new MakeLinkageBetweenProductsCommand([newLinkage]);
-        await Assert.ThrowsAsync<ValidationException>(
-            async () => await TestContext.Mediator.Send(command));
+        await Assert.ThrowsAsync<ValidationException>(async () => await TestContext.Mediator.Send(command));
     }
 
     [Fact]
@@ -58,7 +56,7 @@ public class MakeLinkageBetweenProductsTests : IntegrationTest
 
         crosses.Should().NotBeNull();
     }
-    
+
     [Fact]
     public async Task MakeLinkage_FullCross_CreatesAllCombinations()
     {
@@ -91,7 +89,7 @@ public class MakeLinkageBetweenProductsTests : IntegrationTest
         crosses.Should().Contain(x => x.LeftProductId == Math.Min(p3, p2)
                                       && x.RightProductId == Math.Max(p3, p2));
     }
-    
+
     [Fact]
     public async Task MakeLinkage_FullLeftToRightCross_CreatesCorrectLinks()
     {
@@ -118,7 +116,7 @@ public class MakeLinkageBetweenProductsTests : IntegrationTest
         crosses.Should().Contain(x => x.RightProductId == p2 && x.LeftProductId == Math.Min(p1, p2));
         crosses.Should().Contain(x => x.RightProductId == p2 && x.LeftProductId == Math.Min(p3, p2));
     }
-    
+
     [Fact]
     public async Task MakeLinkage_FullRightToLeftCross_CreatesCorrectLinks()
     {
@@ -148,7 +146,7 @@ public class MakeLinkageBetweenProductsTests : IntegrationTest
         crosses.Should().Contain(x => x.LeftProductId == Math.Min(p1, p3)
                                       && x.RightProductId == Math.Max(p1, p3));
     }
-    
+
     [Fact]
     public async Task MakeLinkage_ProductNotFound_Throws()
     {
@@ -165,7 +163,7 @@ public class MakeLinkageBetweenProductsTests : IntegrationTest
 
         await act.Should().ThrowAsync<DbValidationException>();
     }
-    
+
     [Fact]
     public async Task MakeLinkage_FullCross_DoesNotCreateDuplicates()
     {
@@ -193,7 +191,7 @@ public class MakeLinkageBetweenProductsTests : IntegrationTest
 
         crosses.Should().HaveCount(1);
     }
-    
+
     [Fact]
     public async Task MakeLinkage_MultipleLinkages_Succeeds()
     {

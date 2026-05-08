@@ -31,5 +31,9 @@ public class PurchaseLogistic : Entity<PurchaseLogistic, Guid>
     public virtual Currency.Currency Currency { get; set; } = null!;
 
     public virtual Transaction Transaction { get; set; } = null!;
-    public override Guid GetId() => PurchaseId;
+
+    public override Guid GetId()
+    {
+        return PurchaseId;
+    }
 }

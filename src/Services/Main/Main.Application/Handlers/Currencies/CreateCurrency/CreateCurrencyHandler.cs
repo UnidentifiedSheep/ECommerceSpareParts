@@ -15,7 +15,7 @@ public record CreateCurrencyCommand(string ShortName, string Name, string Curren
 public record CreateCurrencyResult(int Id);
 
 public class CreateCurrencyHandler(
-    IUnitOfWork unitOfWork, 
+    IUnitOfWork unitOfWork,
     IIntegrationEventScope integrationEventScope)
     : ICommandHandler<CreateCurrencyCommand, CreateCurrencyResult>
 {
@@ -28,7 +28,7 @@ public class CreateCurrencyHandler(
         {
             Currency = model.ToContract()
         });
-        
+
         return new CreateCurrencyResult(model.Id);
     }
 }

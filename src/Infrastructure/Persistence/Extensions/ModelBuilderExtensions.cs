@@ -48,7 +48,7 @@ public static class ModelBuilderExtensions
         foreach (var entityType in modelBuilder.Model.GetEntityTypes())
         {
             if (!typeof(IAuditable).IsAssignableFrom(entityType.ClrType)) continue;
-            
+
             var builder = modelBuilder.Entity(entityType.ClrType);
 
             builder.Property(nameof(IAuditable.CreatedAt))
@@ -56,19 +56,20 @@ public static class ModelBuilderExtensions
 
             builder.Property(nameof(IAuditable.UpdatedAt))
                 .HasColumnName("updated_at");
-            
+
             builder.Property(nameof(IAuditable.WhoCreated))
                 .HasColumnName("who_created");
-            
+
             builder.Property(nameof(IAuditable.WhoUpdated))
                 .HasColumnName("who_updated");
 
             builder.HasIndex(nameof(IAuditable.WhoUpdated))
                 .HasDatabaseName($"{entityType.Name.ToLowerInvariant()}_who_updated_idx");
-            
+
             builder.HasIndex(nameof(IAuditable.WhoCreated))
                 .HasDatabaseName($"{entityType.Name.ToLowerInvariant()}_who_created_idx");
         }
+
         return modelBuilder;
     }
 }

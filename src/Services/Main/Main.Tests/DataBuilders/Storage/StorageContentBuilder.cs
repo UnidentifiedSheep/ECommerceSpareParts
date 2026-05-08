@@ -7,13 +7,12 @@ namespace Tests.DataBuilders.Storage;
 
 public class StorageContentBuilder(Faker faker) : BuilderBase<StorageContent>(faker)
 {
+    private readonly HashSet<int> _productIds = [];
     public string? StorageName { get; private set; }
     public int? CurrencyId { get; private set; }
     public int? Count { get; private set; }
     public decimal? BuyPrice { get; private set; }
     public DateTime? PurchaseDate { get; private set; }
-    
-    private readonly HashSet<int> _productIds = [];
     public IReadOnlySet<int> ProductIds => _productIds;
 
     public StorageContentBuilder WithStorageName(string storageName)
@@ -51,13 +50,13 @@ public class StorageContentBuilder(Faker faker) : BuilderBase<StorageContent>(fa
         _productIds.UnionWith(ids);
         return this;
     }
-    
+
     public StorageContentBuilder WithProducts(IEnumerable<Product> products)
     {
         _productIds.UnionWith(products.Select(x => x.Id));
         return this;
     }
-    
+
     public override StorageContent Build()
     {
         return StorageContent.Create(

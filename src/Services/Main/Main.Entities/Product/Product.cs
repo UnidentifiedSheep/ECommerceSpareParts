@@ -6,8 +6,33 @@ namespace Main.Entities.Product;
 
 public class Product : AuditableEntity<Product, int>
 {
+    private readonly List<ProductCharacteristic> _characteristics = [];
+
+    private readonly List<ProductEan> _eans = [];
+
+    private readonly List<ProductImage> _images = [];
+
+
+    private Product(
+        Sku sku,
+        Name name,
+        int producerId,
+        string? description)
+    {
+        Sku = sku;
+        Name = name;
+        ProducerId = producerId;
+        Description = description;
+        Stock = 0;
+    }
+
+    private Product()
+    {
+    }
+
     [Validate]
     public int Id { get; private set; }
+
     public int? PairId { get; private set; }
     public Sku Sku { get; private set; } = null!;
     public Name Name { get; private set; } = null!;
@@ -18,14 +43,8 @@ public class Product : AuditableEntity<Product, int>
     public Indicator? Indicator { get; private set; }
     public int? CategoryId { get; private set; }
     public long Popularity { get; private set; }
-
-    private List<ProductCharacteristic> _characteristics = [];
     public IReadOnlyCollection<ProductCharacteristic> Characteristics => _characteristics;
-
-    private List<ProductEan> _eans = [];
     public IReadOnlyCollection<ProductEan> Eans => _eans;
-
-    private List<ProductImage> _images = [];
     public IReadOnlyCollection<ProductImage> Images => _images;
     public ProductSize? ProductSize { get; private set; }
 
@@ -37,26 +56,10 @@ public class Product : AuditableEntity<Product, int>
 
     public Producer.Producer Producer { get; private set; } = null!;
 
-
-    private Product(
-        Sku sku, 
-        Name name, 
-        int producerId, 
-        string? description)
-    {
-        Sku = sku;
-        Name = name;
-        ProducerId = producerId;
-        Description = description;
-        Stock = 0;
-    }
-    
-    private Product() {}
-
     public static Product Create(
-        Sku sku, 
-        Name name, 
-        int producerId, 
+        Sku sku,
+        Name name,
+        int producerId,
         string? description)
     {
         return new Product(sku, name, producerId, description);
@@ -121,6 +124,9 @@ public class Product : AuditableEntity<Product, int>
     {
         PairId = pairId;
     }
-    
-    public override int GetId() => Id;
+
+    public override int GetId()
+    {
+        return Id;
+    }
 }

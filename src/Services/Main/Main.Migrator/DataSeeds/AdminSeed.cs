@@ -12,6 +12,7 @@ namespace Main.Migrator.DataSeeds;
 public class AdminSeed(IPasswordManager passwordManager) : ISeed<DContext>
 {
     private const string AdministratorName = "Administrator";
+
     public async Task SeedAsync(DContext context)
     {
         if (await context.Users.AnyAsync(x => x.UserName == AdministratorName))
@@ -24,10 +25,13 @@ public class AdminSeed(IPasswordManager passwordManager) : ISeed<DContext>
         user.AddRole(RoleName.ToNormalized(nameof(Role.Admin)));
         user.SetUserInfo(AdministratorName, AdministratorName, null);
         user.AddUserEmail(email, EmailType.Personal, true, true);
-        
+
         await context.Users.AddAsync(user);
         await context.SaveChangesAsync();
     }
 
-    public int GetPriority() => 1;
+    public int GetPriority()
+    {
+        return 1;
+    }
 }

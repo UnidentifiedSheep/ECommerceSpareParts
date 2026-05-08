@@ -1,4 +1,4 @@
-﻿using Main.Enums;
+﻿using Main.Entities.Auth;
 using Main.Persistence.Context;
 using MediatR;
 using Test.Common.Abstractions;
@@ -10,12 +10,13 @@ namespace Tests.TestContexts;
 
 public class RolesTestContext(DContext ctx, IMediator mediator) : TestContextBase<DContext>(ctx, mediator)
 {
-    public IReadOnlyCollection<Main.Entities.Auth.Role> Roles { get; private set; } = null!;
+    public IReadOnlyCollection<Role> Roles { get; private set; } = null!;
+
     public override async Task InitializeAsync(CancellationToken cancellationToken = default)
     {
-        var builders = new List<IBuilder<Main.Entities.Auth.Role>>();
+        var builders = new List<IBuilder<Role>>();
 
-        foreach (var value in Enum.GetValues<Role>())
+        foreach (var value in Enum.GetValues<Main.Enums.Role>())
             builders.Add(new RoleBuilder(Faker).WithName(value.ToString()));
 
         Roles = await BuilderExtensions.BuildManyCombinedAndAddToDb(

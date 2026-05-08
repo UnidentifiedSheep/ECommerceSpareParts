@@ -14,6 +14,7 @@ public record JwtOptions
         ValidIssuer = validIssuer;
         ValidDuration = validDuration;
     }
+
     public TimeSpan ValidDuration { get; }
     public SigningCredentials SigningCredentials { get; init; }
     public string ValidIssuer { get; }

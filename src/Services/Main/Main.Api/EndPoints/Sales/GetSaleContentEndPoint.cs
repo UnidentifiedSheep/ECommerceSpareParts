@@ -1,8 +1,6 @@
 using Api.Common.Extensions;
 using Carter;
 using Main.Application.Dtos.Sale;
-using Main.Application.Handlers.Sales.GetSaleContent;
-using Mapster;
 using MediatR;
 
 namespace Main.Api.EndPoints.Sales;

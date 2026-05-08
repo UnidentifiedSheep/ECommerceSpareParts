@@ -1,5 +1,4 @@
-﻿using Main.Entities;
-using Main.Entities.Auth;
+﻿using Main.Entities.Auth;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
@@ -10,7 +9,7 @@ public class UserPermissionConfiguration : IEntityTypeConfiguration<UserPermissi
     public void Configure(EntityTypeBuilder<UserPermission> builder)
     {
         builder.ToTable("user_permissions", "auth");
-        
+
         builder.HasKey(e => new { e.UserId, e.Permission }).HasName("user_permissions_pk");
 
 
@@ -19,7 +18,7 @@ public class UserPermissionConfiguration : IEntityTypeConfiguration<UserPermissi
 
         builder.Property(e => e.UserId)
             .HasColumnName("user_id");
-        
+
         builder.Property(e => e.Permission)
             .HasColumnName("permission");
 

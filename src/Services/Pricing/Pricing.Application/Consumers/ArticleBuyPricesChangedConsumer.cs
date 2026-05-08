@@ -1,5 +1,4 @@
-﻿using Contracts.Articles;
-using MassTransit;
+﻿using MassTransit;
 using MediatR;
 using Pricing.Application.Handlers.Prices.RecalculateBasePrices;
 

@@ -34,7 +34,7 @@ public partial class DContext : DbContext
     }
 
     public virtual DbSet<Product> Products { get; set; }
-    
+
     public virtual DbSet<ProductCross> ProductCrosses { get; set; }
 
     public virtual DbSet<ProductCharacteristic> ProductCharacteristics { get; set; }
@@ -50,7 +50,7 @@ public partial class DContext : DbContext
     public virtual DbSet<ProductWeight> ProductWeights { get; set; }
 
     public virtual DbSet<ProductContent> ProductContents { get; set; }
-    
+
     public virtual DbSet<Event> Events { get; set; }
     public virtual DbSet<Cart> Carts { get; set; }
 
@@ -129,14 +129,14 @@ public partial class DContext : DbContext
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
     {
         base.OnConfiguring(optionsBuilder);
-        
+
         RegisterBaseInterceptors(optionsBuilder);
     }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         modelBuilder.HasDefaultSchema("public");
-        
+
         modelBuilder.AddOutboxMessageEntity();
         modelBuilder.AddOutboxStateEntity();
         modelBuilder.AddInboxStateEntity();

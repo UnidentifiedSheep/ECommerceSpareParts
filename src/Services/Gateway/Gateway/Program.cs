@@ -1,7 +1,6 @@
 using System.Security.Claims;
 using System.Text;
 using Api.Common.Extensions;
-using Gateway.Extensions;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.IdentityModel.Tokens;

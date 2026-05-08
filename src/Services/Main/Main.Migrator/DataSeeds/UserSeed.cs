@@ -1,5 +1,4 @@
-﻿using Main.Entities.Auth.ValueObjects;
-using Main.Entities.User;
+﻿using Main.Entities.User;
 using Main.Enums;
 using Main.Persistence.Context;
 using Microsoft.EntityFrameworkCore;
@@ -10,6 +9,7 @@ namespace Main.Migrator.DataSeeds;
 public class UserSeed : ISeed<DContext>
 {
     private const string System = "SYSTEM";
+
     public async Task SeedAsync(DContext context)
     {
         if (await context.Users.AnyAsync(x => x.UserName.NormalizedValue == System))

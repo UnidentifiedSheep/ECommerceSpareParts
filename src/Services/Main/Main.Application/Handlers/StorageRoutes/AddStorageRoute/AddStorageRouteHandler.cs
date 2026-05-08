@@ -1,15 +1,13 @@
 ﻿using Abstractions.Interfaces.Services;
 using Application.Common.Interfaces;
 using Attributes;
-using Main.Entities;
 using Main.Entities.Storage;
 using Main.Enums;
-using Mapster;
 
 namespace Main.Application.Handlers.StorageRoutes.AddStorageRoute;
 
 /// <summary>
-/// Creates a new logistics route between two storages.
+///     Creates a new logistics route between two storages.
 /// </summary>
 /// <param name="StorageFrom">Source storage name.</param>
 /// <param name="StorageTo">Destination storage name.</param>
@@ -43,7 +41,7 @@ public class AddStorageRouteHandler(IUnitOfWork unitOfWork)
     public async Task<AddStorageRouteResult> Handle(AddStorageRouteCommand request, CancellationToken cancellationToken)
     {
         var storageRoute = StorageRoute.Create(
-            request.StorageFrom, 
+            request.StorageFrom,
             request.StorageTo,
             request.Distance,
             request.RouteType,
@@ -55,7 +53,7 @@ public class AddStorageRouteHandler(IUnitOfWork unitOfWork)
             request.MinimumPrice,
             request.CurrencyId,
             request.CarrierId);
-        
+
         await unitOfWork.AddAsync(storageRoute, cancellationToken);
         await unitOfWork.SaveChangesAsync(cancellationToken);
 

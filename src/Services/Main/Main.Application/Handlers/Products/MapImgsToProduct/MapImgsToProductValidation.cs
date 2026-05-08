@@ -15,7 +15,7 @@ public class MapImgsToProductValidation : AbstractValidator<MapImgsToProductComm
         ".webp",
         ".tiff"
     ];
-    
+
     public MapImgsToProductValidation()
     {
         RuleForEach(x => x.Images)

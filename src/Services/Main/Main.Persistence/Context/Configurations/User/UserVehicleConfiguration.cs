@@ -1,5 +1,4 @@
-﻿using Main.Entities;
-using Main.Entities.User;
+﻿using Main.Entities.User;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
@@ -10,7 +9,7 @@ public class UserVehicleConfiguration : IEntityTypeConfiguration<UserVehicle>
     public void Configure(EntityTypeBuilder<UserVehicle> builder)
     {
         builder.ToTable("user_vehicles", "public");
-        
+
         builder.HasKey(e => e.Id)
             .HasName("user_vehicles_pk");
 
@@ -44,33 +43,33 @@ public class UserVehicleConfiguration : IEntityTypeConfiguration<UserVehicle>
             .HasDefaultValueSql("gen_random_uuid()")
             .HasColumnName("id")
             .ValueGeneratedOnAdd();
-        
+
         builder.Property(e => e.Comment)
             .HasColumnName("comment");
 
         builder.Property(e => e.EngineCode)
             .HasColumnName("engine_code");
-        
+
         builder.Property(e => e.Manufacture)
             .HasMaxLength(50)
             .HasColumnName("manufacture");
-        
+
         builder.Property(e => e.Model)
             .HasMaxLength(125)
             .HasColumnName("model");
-        
+
         builder.Property(e => e.Modification)
             .HasColumnName("modification");
-        
+
         builder.Property(e => e.PlateNumber)
             .HasColumnName("plate_number");
-        
+
         builder.Property(e => e.ProductionYear)
             .HasColumnName("production_year");
-        
+
         builder.Property(e => e.UserId)
             .HasColumnName("user_id");
-        
+
         builder.Property(e => e.Vin)
             .HasMaxLength(50)
             .HasColumnName("vin");
