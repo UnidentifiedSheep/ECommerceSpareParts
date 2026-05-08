@@ -12,6 +12,7 @@ using Main.Application.Extensions;
 using Main.Application.Handlers.Projections;
 using Main.Application.Interfaces.Persistence;
 using Main.Entities.Event;
+using Main.Entities.Exceptions.Products;
 using Main.Entities.Storage;
 using Main.Enums;
 using Event = Main.Entities.Event.Event;
@@ -44,8 +45,12 @@ public class AddContentHandler(
             .Select(x => x.ProductId)
             .Distinct()
             .ToList();
+        
         var products = await productRepository
-                .EnsureProductsExistsForUpdateAsync(productIds, cancellationToken);
+            .EnsureExistsForUpdateAsync(
+                ids: productIds,
+                errorFactory: (notFound) => new ProductNotFoundException(notFound),
+                ct: cancellationToken);
 
         var storageContents = new List<StorageContent>();
         var events = new List<Event>();

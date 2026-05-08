@@ -36,4 +36,15 @@ public class StorageRouteRepository(DContext context) : RepositoryBase<DContext,
                 x.ToStorageName == to && 
                 x.IsActive, ct); 
     }
+
+    public override Task<Dictionary<Guid, StorageRoute>> FindByIdsAsync(
+        IEnumerable<Guid> ids, 
+        Criteria<StorageRoute>? criteria = null, 
+        CancellationToken ct = default)
+    {
+        return Context.StorageRoutes
+            .Apply(criteria)
+            .Where(x => ids.Contains(x.Id))
+            .ToDictionaryAsync(x => x.Id, ct);
+    }
 }

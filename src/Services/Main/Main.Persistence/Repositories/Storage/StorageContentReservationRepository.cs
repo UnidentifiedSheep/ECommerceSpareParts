@@ -1,9 +1,11 @@
 ﻿using System.Linq.Expressions;
+using Application.Common.Interfaces.Repositories;
 using Main.Application.Interfaces.Persistence;
 using Main.Entities.Storage;
 using Main.Persistence.Context;
 using Microsoft.EntityFrameworkCore;
 using Persistence;
+using Persistence.Extensions;
 
 namespace Main.Persistence.Repositories.Storage;
 
@@ -53,5 +55,16 @@ public class StorageContentReservationRepository(DContext context)
                 x => x.ProductId,
                 x => x.TotalCount,
                 cancellationToken);
+    }
+
+    public override Task<Dictionary<int, StorageContentReservation>> FindByIdsAsync(
+        IEnumerable<int> ids, 
+        Criteria<StorageContentReservation>? criteria = null, 
+        CancellationToken ct = default)
+    {
+        return Context.StorageContentReservations
+            .Apply(criteria)
+            .Where(x => ids.Contains(x.Id))
+            .ToDictionaryAsync(x => x.Id, ct);
     }
 }

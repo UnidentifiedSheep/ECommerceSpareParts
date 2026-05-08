@@ -1,4 +1,7 @@
-﻿using Main.Entities.Currency;
+﻿using Application.Common.Interfaces.Settings;
+using Enums;
+using Main.Abstractions.Models.Settings;
+using Main.Entities.Currency;
 using Main.Persistence.Context;
 using MediatR;
 using Test.Common.Abstractions;
@@ -9,7 +12,8 @@ namespace Tests.TestContexts;
 
 public class CurrencyTestContext(
     DContext context, 
-    IMediator mediator
+    IMediator mediator,
+    ISettingsService settingsService
     ) : TestContextBase<DContext>(context, mediator)
 {
     private readonly List<Currency> _currencies = [];
@@ -18,6 +22,13 @@ public class CurrencyTestContext(
     {
         var created = await new CurrencyBuilder(Faker)
             .BuildManyAndAddToDb(DbContext, 3);
+
+        await settingsService.SetSetting(new CurrencySetting(new CurrencySettingData
+        {
+            AutoUpdateRates = false,
+            BaseCurrencyId = created.First().Id,
+            RateProvider = ExchangeRateProvider.Cbr
+        }), cancellationToken);
         
         _currencies.AddRange(created);
     }

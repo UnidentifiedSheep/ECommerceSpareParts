@@ -55,7 +55,7 @@ public class UserBuilder(Faker faker) : BuilderBase<Main.Entities.User.User>(fak
     public override Main.Entities.User.User Build()
     {
         var user =  Main.Entities.User.User.Create(
-            UserName ?? Faker.Internet.UserName(), 
+            UserName ?? Faker.Lorem.Letter(6), 
             PasswordHash ?? Faker.Lorem.Letter(24));
 
         if (UserInfoSet)

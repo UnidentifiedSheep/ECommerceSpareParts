@@ -22,7 +22,7 @@ public class AddStorageRouteTests : IntegrationTest
     private Currency _currency = null!;
     public AddStorageRouteTests(CombinedContainerFixture fixture) : base(fixture)
     {
-        RegisterBasicContext<CurrencyTestContext>();
+        RegisterBasicContext<CurrencyRatesTestContext>();
         RegisterBasicContext<StorageTestContext>();
     }
 
@@ -85,7 +85,7 @@ public class AddStorageRouteTests : IntegrationTest
             LogisticPricingType.PerOrder, 60, 10.5m, 20.5m, 9999, 5.0m,
             0, _carrier.Id);
 
-        await Assert.ThrowsAsync<ValidationException>(async () => await Mediator.Send(command));
+        await Assert.ThrowsAsync<DbValidationException>(async () => await Mediator.Send(command));
     }
 
     [Fact]

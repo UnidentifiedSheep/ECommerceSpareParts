@@ -57,6 +57,7 @@ public class AddStorageRouteHandler(IUnitOfWork unitOfWork)
             request.CarrierId);
         
         await unitOfWork.AddAsync(storageRoute, cancellationToken);
+        await unitOfWork.SaveChangesAsync(cancellationToken);
 
         return new AddStorageRouteResult(storageRoute.Id);
     }

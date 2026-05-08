@@ -14,7 +14,7 @@ public class StorageRouteTestContext(
     StorageTestContext storageTestContext,
     CurrencyTestContext currencyTestContext,
     UsersTestContext usersTestContext)
-    : TestContextBase<DContext>(ctx, mediator), ITestContextRegistrator
+    : TestContextBase<DContext>(ctx, mediator), IDependentTestContext
 {
     public StorageRoute ActiveRoute { get; private set; } = null!;
     public StorageRoute UnactiveRoute { get; private set; } = null!;
@@ -52,7 +52,7 @@ public class StorageRouteTestContext(
     public static Type[] DependsOn { get; } =
     [
         typeof(StorageTestContext),
-        typeof(CurrencyTestContext),
+        typeof(CurrencyRatesTestContext),
         typeof(UsersTestContext)
     ];
 }

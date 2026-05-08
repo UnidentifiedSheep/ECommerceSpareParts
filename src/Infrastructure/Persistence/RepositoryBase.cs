@@ -1,4 +1,5 @@
-﻿using Application.Common.Interfaces.Repositories;
+﻿using System.Runtime.CompilerServices;
+using Application.Common.Interfaces.Repositories;
 using Domain;
 using Domain.Interfaces;
 using Microsoft.EntityFrameworkCore;
@@ -7,7 +8,7 @@ using Persistence.Extensions;
 namespace Persistence;
 
 public abstract class RepositoryBase<TContext, TEntity, TKey>(TContext context) : IRepository<TEntity, TKey>
-    where TEntity : Entity<TEntity, TKey> where TContext : DbContext
+    where TEntity : Entity<TEntity, TKey> where TContext : DbContext where TKey : notnull
 {
     protected readonly TContext Context = context;
     protected readonly DbSet<TEntity> DbSet = context.Set<TEntity>();
@@ -41,26 +42,29 @@ public abstract class RepositoryBase<TContext, TEntity, TKey>(TContext context) 
         return await query.ToListAsync(ct);
     }
 
+    public abstract Task<Dictionary<TKey, TEntity>> FindByIdsAsync(
+        IEnumerable<TKey> ids,
+        Criteria<TEntity>? criteria = null,
+        CancellationToken ct = default);
+
     private static object[] ToKeyValues(TKey key)
     {
         return key switch
         {
             null => [],
-            ValueTuple v => GetTupleValues(v),
+            ITuple v => GetTupleValues(v),
             ICompositeKey k => k.ToArray(), 
             _ => [key]
         };
     }
     
-    private static object[] GetTupleValues(object tuple)
+    
+    private static object[] GetTupleValues(ITuple tuple)
     {
-        var type = tuple.GetType();
+        var values = new object[tuple.Length];
 
-        var fields = type.GetFields();
-
-        var values = new object[fields.Length];
-        for (int i = 0; i < fields.Length; i++)
-            values[i] = fields[i].GetValue(tuple)!;
+        for (int i = 0; i < tuple.Length; i++)
+            values[i] = tuple[i]!;
 
         return values;
     }

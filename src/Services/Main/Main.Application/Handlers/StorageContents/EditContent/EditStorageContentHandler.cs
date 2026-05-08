@@ -13,6 +13,8 @@ using Main.Application.Dtos.Storage;
 using Main.Application.Extensions;
 using Main.Application.Interfaces.Persistence;
 using Main.Entities.Event;
+using Main.Entities.Exceptions.Products;
+using Main.Entities.Exceptions.Storages;
 using Main.Entities.Product;
 using Main.Entities.Storage;
 using Main.Enums;
@@ -27,7 +29,7 @@ public record EditStorageContentCommand(
     Dictionary<int, ModelWithRowVersion<PatchStorageContentDto, uint>> EditedFields) : ICommand;
 
 public class EditStorageContentHandler(
-    IRepository<StorageContent, int> storageContentRepository,
+    IStorageContentRepository storageContentRepository,
     IProductRepository productRepository,
     IUnitOfWork unitOfWork,
     IIntegrationEventScope integrationEventScope,
@@ -37,14 +39,18 @@ public class EditStorageContentHandler(
     public async Task<Unit> Handle(EditStorageContentCommand request, CancellationToken cancellationToken)
     {
         var editedFields = request.EditedFields;
-        
+
         var storageContents = await storageContentRepository
-            .EnsureStorageContentsExistsForUpdateAsync(editedFields.Keys, cancellationToken);
+            .EnsureExistsForUpdateAsync(
+                ids: editedFields.Keys,
+                errorFactory: nf => new StorageContentNotFoundException(nf),
+                ct: cancellationToken);
 
         var products = await productRepository
-            .EnsureProductsExistsForUpdateAsync(
-                productIds: storageContents.Select(x => x.Value.ProductId), 
-                cancellationToken: cancellationToken);
+            .EnsureExistsForUpdateAsync(
+                ids: storageContents.Select(x => x.Value.ProductId),
+                errorFactory: (nf) => new ProductNotFoundException(nf),
+                ct: cancellationToken);
         
         var storageMovements = new List<Event>();
         

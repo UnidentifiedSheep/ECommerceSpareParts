@@ -8,6 +8,8 @@ using Main.Application.Extensions;
 using Main.Application.Interfaces.Persistence;
 using Main.Application.Models;
 using Main.Entities.Event;
+using Main.Entities.Exceptions.Products;
+using Main.Entities.Exceptions.Storages;
 using Main.Entities.Product;
 using Main.Entities.Storage;
 using Main.Enums;
@@ -39,10 +41,16 @@ public class RestoreContentHandler(
             storageContentIds.Add(detail.StorageContentId);
         }
         var products = await productRepository
-            .EnsureProductsExistsForUpdateAsync(productIds, cancellationToken);
+            .EnsureExistsForUpdateAsync(
+                ids: productIds,
+                errorFactory: (nf) => new ProductNotFoundException(nf),
+                ct: cancellationToken);
 
         var storageContents = await contentRepository
-            .EnsureStorageContentsExistsForUpdateAsync(storageContentIds, cancellationToken);
+            .EnsureExistsForUpdateAsync(
+                ids: storageContentIds,
+                errorFactory: (nf) => new StorageContentNotFoundException(nf),
+                ct: cancellationToken);
 
         var events = new List<Event>();
 

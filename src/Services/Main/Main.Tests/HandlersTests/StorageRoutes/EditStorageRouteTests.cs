@@ -41,7 +41,7 @@ public class EditStorageRouteTests : IntegrationTest
         var updatedRoute = await Context.StorageRoutes.AsNoTracking().FirstAsync(x => x.Id == route.Id);
         Assert.Equal(2000, updatedRoute.DistanceM);
         Assert.Equal(15.5m, updatedRoute.PriceKg);
-        Assert.Equal(!route.IsActive, updatedRoute.IsActive);
+        Assert.False(updatedRoute.IsActive);
 
         Assert.Equal(route.RouteType, updatedRoute.RouteType);
         Assert.Equal(route.PricingModel, updatedRoute.PricingModel);

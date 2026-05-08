@@ -2,7 +2,9 @@
 
 namespace Domain;
 
-public abstract class AuditableEntity<TModel, TKey> : Entity<TModel, TKey>, IAuditable
+public abstract class AuditableEntity<TModel, TKey> 
+    : Entity<TModel, TKey>, IAuditable 
+    where TModel : Entity<TModel, TKey> where TKey : notnull
 {
     public DateTime CreatedAt { get; private set; } = DateTime.UtcNow;
     public DateTime UpdatedAt { get; private set; } = DateTime.UtcNow;

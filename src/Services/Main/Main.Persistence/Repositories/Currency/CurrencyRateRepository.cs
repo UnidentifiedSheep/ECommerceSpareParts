@@ -1,4 +1,5 @@
 ﻿using Application.Common.Interfaces.Repositories;
+using LinqKit;
 using Main.Application.Interfaces.Persistence;
 using Main.Entities.Currency;
 using Main.Persistence.Context;
@@ -23,5 +24,33 @@ public class CurrencyRateRepository(
             .Where(x => x.ToCurrencyId == baseCurrencyId);
         query = criteria == null ? query : query.Apply(criteria);
         return query.ToListAsync(cancellationToken);
+    }
+
+    public override Task<Dictionary<(int, int), CurrencyRate>> FindByIdsAsync(
+        IEnumerable<(int, int)> ids,
+        Criteria<CurrencyRate>? criteria = null,
+        CancellationToken ct = default)
+    {
+        var keys = ids.Distinct().ToList();
+
+        if (keys.Count == 0)
+            return Task.FromResult(new  Dictionary<(int, int), CurrencyRate>());
+
+        IQueryable<CurrencyRate> query = Context.CurrencyRates
+            .AsExpandable()
+            .Apply(criteria);
+
+        var predicate = PredicateBuilder.New<CurrencyRate>();
+
+        foreach (var (fromId, toId) in keys)
+            predicate = predicate.Or(x =>
+                x.FromCurrencyId == fromId &&
+                x.ToCurrencyId == toId);
+        
+        return query
+            .Where(predicate)
+            .ToDictionaryAsync(
+                x => (x.FromCurrencyId, x.ToCurrencyId),
+                ct);
     }
 }

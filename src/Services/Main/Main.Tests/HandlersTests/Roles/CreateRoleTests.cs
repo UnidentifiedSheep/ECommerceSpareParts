@@ -39,7 +39,7 @@ public class CreateRoleTests(CombinedContainerFixture fixture) : IntegrationTest
         await Mediator.Send(command);
 
         var roleInDb = await Context.Roles.AsNoTracking()
-            .FirstOrDefaultAsync(x => x.Name.Value == r.Name.Value);
+            .FirstOrDefaultAsync(x => x.Name == r.Name);
 
         Assert.NotNull(roleInDb);
         

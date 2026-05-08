@@ -10,4 +10,14 @@ namespace Main.Persistence.Repositories.Balance;
 
 public class TransactionRepository(DContext context) : RepositoryBase<DContext, Transaction, Guid>(context), ITransactionRepository
 {
+    public override Task<Dictionary<Guid, Transaction>> FindByIdsAsync(
+        IEnumerable<Guid> ids, 
+        Criteria<Transaction>? criteria = null, 
+        CancellationToken ct = default)
+    {
+        return Context.Transactions
+            .Where(x => ids.Contains(x.Id))
+            .Apply(criteria)
+            .ToDictionaryAsync(x => x.Id, x => x, ct);
+    }
 }

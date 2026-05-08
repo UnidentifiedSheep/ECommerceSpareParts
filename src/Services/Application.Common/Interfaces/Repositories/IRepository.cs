@@ -2,7 +2,7 @@
 
 namespace Application.Common.Interfaces.Repositories;
 
-public interface IRepository<TEntity, in TKey> where TEntity : Entity<TEntity, TKey>
+public interface IRepository<TEntity, TKey> where TEntity : Entity<TEntity, TKey> where TKey : notnull
 {
     ValueTask<TEntity?> GetById(
         TKey id,
@@ -13,6 +13,11 @@ public interface IRepository<TEntity, in TKey> where TEntity : Entity<TEntity, T
         CancellationToken ct = default);
 
     Task<List<TEntity>> ListAsync(
+        Criteria<TEntity>? criteria = null,
+        CancellationToken ct = default);
+    
+    Task<Dictionary<TKey, TEntity>> FindByIdsAsync(
+        IEnumerable<TKey> ids,
         Criteria<TEntity>? criteria = null,
         CancellationToken ct = default);
 }

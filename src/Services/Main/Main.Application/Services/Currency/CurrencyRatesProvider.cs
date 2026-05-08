@@ -19,6 +19,8 @@ public class CurrencyRatesProvider(
             .Data
             .BaseCurrencyId;
 
+        if (currencyId == baseCurrencyId) return 1m;
+
         var rate = await rateRepository.GetById((currencyId, baseCurrencyId), cancellationToken)
                    ?? throw new CurrencyRateNotFoundException(currencyId);
 

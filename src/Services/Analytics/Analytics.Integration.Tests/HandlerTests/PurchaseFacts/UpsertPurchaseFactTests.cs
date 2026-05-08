@@ -12,7 +12,6 @@ using ValidationException = FluentValidation.ValidationException;
 
 namespace Analytics.Integration.Tests.HandlerTests.PurchaseFacts;
 
-[Collection("Combined collection")]
 public class UpsertPurchaseFactTests : IAsyncLifetime
 {
     private readonly PurchaseFactTestContext _context;

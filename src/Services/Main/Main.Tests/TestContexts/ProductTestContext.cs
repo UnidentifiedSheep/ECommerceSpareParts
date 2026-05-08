@@ -12,7 +12,7 @@ public class ProductTestContext(
     DContext context, 
     IMediator mediator,
     ProducerTestContext producerTestContext
-    ) : TestContextBase<DContext>(context, mediator), ITestContextRegistrator
+    ) : TestContextBase<DContext>(context, mediator), IDependentTestContext
 {
     public ProducerTestContext ProducerTestContext => producerTestContext;
     

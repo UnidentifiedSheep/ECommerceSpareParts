@@ -15,8 +15,9 @@ public static class EfQueryableExtensions
         return forUpdate ? query.TagWith("ForUpdate") : query;
     }
 
-    public static IQueryable<T> Apply<T>(this IQueryable<T> query, Criteria<T> criteria) where T : class
+    public static IQueryable<T> Apply<T>(this IQueryable<T> query, Criteria<T>? criteria) where T : class
     {
+        if (criteria == null) return query;
         query.ConfigureTracking(criteria.Track);
         query.ForUpdate(criteria.ForUpdate);
         

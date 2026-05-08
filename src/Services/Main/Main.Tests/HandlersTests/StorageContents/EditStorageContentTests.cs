@@ -10,7 +10,6 @@ using ValidationException = FluentValidation.ValidationException;
 
 namespace Tests.HandlersTests.StorageContents;
 
-[Collection("Combined collection")]
 public class EditStorageContentTests : IntegrationTest
 {
     public EditStorageContentTests(CombinedContainerFixture fixture) : base(fixture)

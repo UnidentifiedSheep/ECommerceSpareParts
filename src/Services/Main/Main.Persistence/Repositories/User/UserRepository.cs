@@ -56,4 +56,15 @@ public class UserRepository(DContext context) : RepositoryBase<DContext, Entitie
         
         return query.FirstOrDefaultAsync(cancellationToken);
     }
+
+    public override Task<Dictionary<Guid, Entities.User.User>> FindByIdsAsync(
+        IEnumerable<Guid> ids, 
+        Criteria<Entities.User.User>? criteria = null, 
+        CancellationToken ct = default)
+    {
+        return Context.Users
+            .Apply(criteria)
+            .Where(x => ids.Contains(x.Id))
+            .ToDictionaryAsync(x => x.Id, ct);
+    }
 }

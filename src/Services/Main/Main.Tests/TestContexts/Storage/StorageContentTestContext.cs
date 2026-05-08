@@ -15,7 +15,7 @@ public class StorageContentTestContext(
     StorageTestContext storage,
     ProductTestContext product,
     CurrencyTestContext currency) 
-    : TestContextBase<DContext>(ctx, mediator), ITestContextRegistrator
+    : TestContextBase<DContext>(ctx, mediator), IDependentTestContext
 {
     public IReadOnlyCollection<StorageContent> StorageContents { get; private set; } = null!;
     public override async Task InitializeAsync(CancellationToken cancellationToken = default)
@@ -29,7 +29,7 @@ public class StorageContentTestContext(
 
     public static Type[] DependsOn { get; } =
     [
-        typeof(CurrencyTestContext),
+        typeof(CurrencyRatesTestContext),
         typeof(ProductTestContext),
         typeof(StorageTestContext)
     ];

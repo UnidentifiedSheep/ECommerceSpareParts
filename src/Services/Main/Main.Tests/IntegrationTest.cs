@@ -43,7 +43,7 @@ public abstract class IntegrationTest(CombinedContainerFixture fixture) : TestBa
 
     protected override async Task InitializeBasicContexts()
     {
-        var unitOfWork = Sp.GetRequiredService<IUnitOfWork>();
+        var unitOfWork = Scope.ServiceProvider.GetRequiredService<IUnitOfWork>();
         await unitOfWork.ExecuteWithTransaction(new TransactionalAttribute(), () => base.InitializeBasicContexts());
     }
 

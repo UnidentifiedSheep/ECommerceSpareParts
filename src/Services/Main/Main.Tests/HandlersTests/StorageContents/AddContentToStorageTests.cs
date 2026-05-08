@@ -21,7 +21,7 @@ public class AddContentToStorageTests : IntegrationTest
     public AddContentToStorageTests(CombinedContainerFixture fixture) : base(fixture)
     {
         RegisterBasicContext<ProductTestContext>();
-        RegisterBasicContext<CurrencyTestContext>();
+        RegisterBasicContext<CurrencyRatesTestContext>();
         RegisterBasicContext<StorageTestContext>();
     }
 
@@ -70,7 +70,7 @@ public class AddContentToStorageTests : IntegrationTest
         storageContent[^1] = storageContent[^1] with { CurrencyId = int.MaxValue};
         var command = new AddContentCommand(storageContent, storage.Name,
             StorageMovementType.StorageContentAddition);
-        await Assert.ThrowsAsync<ValidationException>(async () => await Mediator.Send(command));
+        await Assert.ThrowsAsync<DbValidationException>(async () => await Mediator.Send(command));
     }
 
     [Fact]
@@ -209,6 +209,7 @@ public class AddContentToStorageTests : IntegrationTest
         return new StorageContentBuilder(Faker)
             .WithProducts(products)
             .WithCurrencyId(currency.Id)
+            .WithPurchaseDate(DateTime.UtcNow)
             .WithStorageName(storage.Name)
             .BuildMany(count)
             .Select(x => new NewStorageContentDto

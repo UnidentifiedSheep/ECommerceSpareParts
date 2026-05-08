@@ -37,10 +37,10 @@ public abstract class TestBase : IAsyncLifetime, ITest
 
         try
         {
-            if (typeof(ITestContextRegistrator).IsAssignableFrom(type))
+            if (typeof(IDependentTestContext).IsAssignableFrom(type))
             {
                 var dependsOnProperty = type.GetProperty(
-                    nameof(ITestContextRegistrator.DependsOn),
+                    nameof(IDependentTestContext.DependsOn),
                     BindingFlags.Public | BindingFlags.Static);
 
                 if (dependsOnProperty == null)
