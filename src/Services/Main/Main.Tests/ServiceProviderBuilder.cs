@@ -12,6 +12,7 @@ using Security;
 using Serilog;
 using Test.Common.Abstractions;
 using Test.Common.Extensions;
+using Test.Common.Interfaces;
 using Test.Common.Stubs;
 using Test.Common.TestContexts;
 using Tests.TestContexts;
@@ -19,11 +20,11 @@ using ApplicationServiceProvider = Main.Application.ServiceProvider;
 
 namespace Tests;
 
-public class ServiceProviderForTests
+public class ServiceProviderBuilder : IServiceProviderBuilder<ServiceProviderArguments>
 {
     private static bool _staticsConfigured;
 
-    public IServiceProvider Build(string postgresConnectionString, string redisConnectionString)
+    public IServiceProvider Build(ServiceProviderArguments args)
     {
         RegisterGlobalBasicContexts();
         var services = new ServiceCollection();
@@ -38,7 +39,7 @@ public class ServiceProviderForTests
             .CreateLogger();
 
         ApplicationServiceProvider.AddApplicationLayer(services)
-            .AddPersistenceLayer(postgresConnectionString);
+            .AddPersistenceLayer(args.PgsqlConnectionString);
         var passwordRules = new PasswordRules
         {
             RequireDigit = false,
@@ -46,7 +47,7 @@ public class ServiceProviderForTests
         };
 
         services.AddJsonSigner("some secret")
-            .AddCacheLayer(redisConnectionString)
+            .AddCacheLayer(args.CacheConnectionString)
             .AddFullSecurityLayer(passwordRules)
             .AddMailLayer()
             .AddCommonLayer();

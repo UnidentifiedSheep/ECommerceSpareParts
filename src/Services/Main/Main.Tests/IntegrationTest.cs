@@ -14,25 +14,18 @@ using Test.Common.TestContainers.Combined;
 namespace Tests;
 
 [Collection("Combined collection")]
-public abstract class IntegrationTest(CombinedContainerFixture fixture) : TestBase
+public abstract class IntegrationTest(CombinedContainerFixture fixture) 
+    : IntegrationTestBase<ServiceProviderBuilder, ServiceProviderArguments, DContext>
 {
-    private IServiceScope _scope = null!;
-    private IServiceProvider _sp = null!;
-    protected override IServiceProvider Sp => _sp;
-    protected override IServiceScope Scope => _scope;
-
-    protected DContext Context { get; private set; } = null!;
     protected IMediator Mediator { get; private set; } = null!;
 
     public override async Task InitializeAsync()
     {
-        _sp = new ServiceProviderForTests().Build(
-            fixture.PostgresConnectionString,
-            fixture.RedisConnectionString);
-
-        _scope = Sp.CreateScope();
-
-        Context = Scope.ServiceProvider.GetRequiredService<DContext>();
+        InitializeServiceProvider(new ServiceProviderArguments
+        {
+            PgsqlConnectionString = fixture.PostgresConnectionString,
+            CacheConnectionString = fixture.RedisConnectionString
+        });
         Mediator = Scope.ServiceProvider.GetRequiredService<IMediator>();
 
         await SeedDb();
