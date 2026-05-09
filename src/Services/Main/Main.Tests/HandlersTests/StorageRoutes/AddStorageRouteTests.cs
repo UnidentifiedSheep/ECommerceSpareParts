@@ -10,7 +10,6 @@ using Test.Common.Extensions;
 using Test.Common.TestContainers.Combined;
 using Tests.DataBuilders.User;
 using Tests.TestContexts;
-using DbValidationException = BulkValidation.Core.Exceptions.ValidationException;
 
 namespace Tests.HandlersTests.StorageRoutes;
 

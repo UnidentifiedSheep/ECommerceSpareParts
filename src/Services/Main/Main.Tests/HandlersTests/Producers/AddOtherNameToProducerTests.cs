@@ -1,13 +1,13 @@
 using FluentAssertions;
 using Main.Abstractions.Constants;
 using Main.Application.Handlers.Producers.AddOtherName;
+using Main.Entities.Producer;
 using Microsoft.EntityFrameworkCore;
 using Test.Common.Extensions;
 using Test.Common.TestContainers.Combined;
 using Tests.DataBuilders;
 using Tests.TestContexts;
 using ValidationException = FluentValidation.ValidationException;
-using DbValidationException = BulkValidation.Core.Exceptions.ValidationException;
 
 namespace Tests.HandlersTests.Producers;
 
@@ -73,8 +73,8 @@ public class AddOtherNameToProducerTests : IntegrationTest
         otherName.Should().NotBeNull();
 
         otherName.ProducerId.Should().Be(producer.Id);
-        otherName.OtherName.Should().Be(command.OtherName);
-        otherName.WhereUsed.Should().Be(command.WhereUsed);
+        otherName.OtherName.Should().Be(Producer.ToNormalizedName(command.OtherName));
+        otherName.WhereUsed.Should().Be(command.WhereUsed.ToUpperInvariant());
     }
 
     [Fact]

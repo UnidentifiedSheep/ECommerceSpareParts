@@ -6,6 +6,7 @@ using LinqKit;
 using Main.Application.Dtos.Auth;
 using Main.Application.Handlers.Projections;
 using Main.Entities.Auth;
+using Main.Entities.Auth.ValueObjects;
 using Microsoft.EntityFrameworkCore;
 
 namespace Main.Application.Handlers.Auth.GetRoles;
@@ -14,7 +15,7 @@ public record GetRolesQuery(string? SearchTerm, Pagination Pagination) : IQuery<
 
 public record GetRolesResult(IReadOnlyList<RoleDto> Roles);
 
-public class GetRolesHandler(IReadRepository<Role, string> repository) : IQueryHandler<GetRolesQuery, GetRolesResult>
+public class GetRolesHandler(IReadRepository<Role, RoleName> repository) : IQueryHandler<GetRolesQuery, GetRolesResult>
 {
     public async Task<GetRolesResult> Handle(GetRolesQuery request, CancellationToken cancellationToken)
     {

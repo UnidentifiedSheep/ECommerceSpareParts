@@ -24,7 +24,7 @@ public class RoleBuilder(Faker faker) : BuilderBase<Role>(faker)
 
     public override Role Build()
     {
-        var r = Role.Create(Name ?? Faker.Lorem.Word());
+        var r = Role.Create(Name ?? Faker.Lorem.Letter(5));
         r.SetDescription(Description);
         return r;
     }

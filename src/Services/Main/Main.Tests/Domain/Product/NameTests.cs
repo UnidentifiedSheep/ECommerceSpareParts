@@ -1,6 +1,6 @@
 ﻿using Exceptions;
 using FluentAssertions;
-using Main.Entities.Producer.ValueObjects;
+using Main.Entities.Product.ValueObjects;
 
 namespace Main.Tests.Domain.Product;
 

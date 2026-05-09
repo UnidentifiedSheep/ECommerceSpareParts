@@ -2,7 +2,6 @@
 using Domain;
 using Domain.Extensions;
 using Domain.Interfaces;
-using Main.Entities.Producer.ValueObjects;
 
 namespace Main.Entities.Producer;
 
@@ -12,10 +11,10 @@ public class ProducerOtherName : Entity<ProducerOtherName, ProducerOtherNameKey>
     {
     }
 
-    private ProducerOtherName(int producerId, Name otherName, string whereUsed)
+    private ProducerOtherName(int producerId, string otherName, string whereUsed)
     {
         ProducerId = producerId;
-        OtherName = otherName;
+        SetOtherName(otherName);
         SetWhereUsed(whereUsed);
     }
 
@@ -28,14 +27,14 @@ public class ProducerOtherName : Entity<ProducerOtherName, ProducerOtherNameKey>
     [ValidateTuple("PK")]
     public string WhereUsed { get; private set; } = null!;
 
-    public static ProducerOtherName Create(int producerId, Name otherName, string whereUsed)
+    public static ProducerOtherName Create(int producerId, string otherName, string whereUsed)
     {
         return new ProducerOtherName(producerId, otherName, whereUsed);
     }
 
-    public void SetOtherName(Name otherName)
+    public void SetOtherName(string otherName)
     {
-        OtherName = otherName;
+        OtherName = Producer.ToNormalizedName(otherName);
     }
 
     public void SetWhereUsed(string whereUsed)

@@ -37,6 +37,7 @@ public static class ServiceProvider
         collection.AddScoped<IUserRepository, UserRepository>();
         collection.AddScoped<ITransactionRepository, TransactionRepository>();
         collection.AddScoped<ICurrencyRateRepository, CurrencyRateRepository>();
+        collection.AddScoped<ICurrencyRepository, CurrencyRepository>();
 
         collection.AddScoped(typeof(IRepository<,>), typeof(BasicEfRepository<,>));
         collection.AddScoped(typeof(IReadRepository<,>), typeof(ReadRepository<,>));

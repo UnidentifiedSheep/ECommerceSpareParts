@@ -1,7 +1,6 @@
 ﻿using BulkValidation.Core.Attributes;
 using Domain;
 using Domain.Extensions;
-using Main.Entities.Producer.ValueObjects;
 
 namespace Main.Entities.Producer;
 
@@ -11,9 +10,9 @@ public class Producer : AuditableEntity<Producer, int>
     {
     }
 
-    private Producer(Name name, string? description = null, string? imagePath = null)
+    private Producer(string name, string? description = null, string? imagePath = null)
     {
-        Name = name;
+        SetName(name);
         SetImagePath(imagePath);
         SetDescription(description);
     }
@@ -22,13 +21,13 @@ public class Producer : AuditableEntity<Producer, int>
     public int Id { get; private set; }
 
     [Validate]
-    public Name Name { get; private set; } = null!;
+    public string Name { get; private set; } = null!;
 
     public string? ImagePath { get; private set; }
 
     public string? Description { get; private set; }
 
-    public static Producer Create(Name name, string? description = null, string? imagePath = null)
+    public static Producer Create(string name, string? description = null, string? imagePath = null)
     {
         return new Producer(name, description, imagePath);
     }
@@ -49,9 +48,21 @@ public class Producer : AuditableEntity<Producer, int>
         Description = string.IsNullOrEmpty(description) ? null : description;
     }
 
-    public void SetName(Name name)
+    public void SetName(string name)
     {
-        Name = name;
+        var value = name.Trim();
+
+        value.AgainstNullOrWhiteSpace("article.name.must.not.be.empty")
+            .AgainstTooShort(3, "article.name.min.length.3")
+            .AgainstTooLong(255, "article.name.max.length.255");
+
+        Name = ToNormalizedName(value);
+    }
+
+    public static string ToNormalizedName(string value)
+    {
+        value = value.Trim();
+        return char.ToUpperInvariant(value[0]) + value[1..];
     }
 
     public override int GetId()

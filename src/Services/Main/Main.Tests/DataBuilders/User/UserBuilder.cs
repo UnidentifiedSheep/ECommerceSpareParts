@@ -58,8 +58,8 @@ public class UserBuilder(Faker faker) : BuilderBase<Main.Entities.User.User>(fak
 
         if (UserInfoSet)
             user.SetUserInfo(
-                Name ?? Faker.Person.FirstName,
-                Surname ?? Faker.Person.LastName,
+                Name ?? Faker.Lorem.Letter(12),
+                Surname ?? Faker.Lorem.Letter(12),
                 Description ?? Faker.Lorem.Sentence());
 
         foreach (var role in Roles)

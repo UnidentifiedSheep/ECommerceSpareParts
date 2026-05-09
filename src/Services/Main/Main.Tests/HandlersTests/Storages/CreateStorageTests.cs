@@ -5,7 +5,6 @@ using Test.Common.Extensions;
 using Test.Common.TestContainers.Combined;
 using Tests.DataBuilders.Storage;
 using ValidationException = FluentValidation.ValidationException;
-using DbValidationException = BulkValidation.Core.Exceptions.ValidationException;
 
 namespace Tests.HandlersTests.Storages;
 

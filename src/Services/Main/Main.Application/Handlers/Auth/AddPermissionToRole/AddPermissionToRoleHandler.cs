@@ -14,7 +14,7 @@ namespace Main.Application.Handlers.Auth.AddPermissionToRole;
 public record AddPermissionToRoleCommand(string RoleName, string PermissionName) : ICommand;
 
 public class AddPermissionToRoleHandler(
-    IRepository<Role, string> repository,
+    IRepository<Role, RoleName> repository,
     IIntegrationEventScope integrationEventScope) : ICommandHandler<AddPermissionToRoleCommand>
 {
     public async Task<Unit> Handle(AddPermissionToRoleCommand request, CancellationToken cancellationToken)

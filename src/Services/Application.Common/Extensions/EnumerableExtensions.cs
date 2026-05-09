@@ -8,11 +8,7 @@ public static class EnumerableExtensions
         Func<IReadOnlyList<T>, Exception> errorFactory)
     {
         var set = ids as HashSet<T> ?? ids.ToHashSet();
-        var notFoundIds = new List<T>();
-
-        foreach (var id in otherIds)
-            if (!set.Contains(id))
-                notFoundIds.Add(id);
+        var notFoundIds = set.Except(otherIds).ToList();
 
         if (notFoundIds.Count > 0) throw errorFactory(notFoundIds);
     }

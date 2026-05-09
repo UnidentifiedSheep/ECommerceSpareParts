@@ -29,9 +29,16 @@ public class StorageContentTestContext(
     public override async Task InitializeAsync(CancellationToken cancellationToken = default)
     {
         StorageContents = await new StorageContentBuilder(Faker)
-            .WithCurrencyId(currency.Currencies.First().Id)
+            .WithCurrencyId(currency.Currencies[0].Id)
             .WithProducts(product.Products)
             .WithStorageName(storage.Storages.First(x => x.Type == StorageType.Warehouse).Name)
             .BuildManyAndAddToDb(DbContext, 10);
+
+        var products = product.Products.ToDictionary(k => k.Id);
+        
+        foreach (var content in StorageContents)
+            products[content.ProductId].IncreaseStock(content.Count);
+        
+        await DbContext.SaveChangesAsync(cancellationToken);
     }
 }

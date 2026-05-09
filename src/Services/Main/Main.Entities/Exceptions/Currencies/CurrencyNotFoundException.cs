@@ -8,6 +8,10 @@ public class CurrencyNotFoundException : NotFoundException, ILocalizableExceptio
     public CurrencyNotFoundException(int id) : base(null, new { Id = id })
     {
     }
+    
+    public CurrencyNotFoundException(IEnumerable<int> ids) : base(null, new { Ids = ids })
+    {
+    }
 
     public string MessageKey => "currency.not.found";
     public object[]? Arguments => null;

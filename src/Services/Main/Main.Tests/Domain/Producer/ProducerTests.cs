@@ -1,8 +1,7 @@
 ﻿using FluentAssertions;
-using Main.Entities.Producer.ValueObjects;
 using ProducerDomain = Main.Entities.Producer.Producer;
 
-namespace Main.Tests.Domain.Producer;
+namespace Tests.Domain.Producer;
 
 public class ProducerTests
 {
@@ -10,11 +9,11 @@ public class ProducerTests
     public void Create_ValidData_Succeeds()
     {
         var producer = ProducerDomain.Create(
-            new Name("sony"),
+            "sony",
             "desc",
             "/img.png");
 
-        producer.Name.Value.Should().Be("Sony");
+        producer.Name.Should().Be("Sony");
         producer.Description.Should().Be("desc");
         producer.ImagePath.Should().Be("/img.png");
     }
@@ -22,9 +21,9 @@ public class ProducerTests
     [Fact]
     public void Create_WithoutOptionalFields_Succeeds()
     {
-        var producer = ProducerDomain.Create(new Name("sony"));
+        var producer = ProducerDomain.Create("sony");
 
-        producer.Name.Value.Should().Be("Sony");
+        producer.Name.Should().Be("Sony");
         producer.Description.Should().BeNull();
         producer.ImagePath.Should().BeNull();
     }
@@ -32,17 +31,17 @@ public class ProducerTests
     [Fact]
     public void SetName_ChangesValue()
     {
-        var producer = ProducerDomain.Create(new Name("sony"));
+        var producer = ProducerDomain.Create("sony");
 
-        producer.SetName(new Name("samsung"));
+        producer.SetName("samsung");
 
-        producer.Name.Value.Should().Be("Samsung");
+        producer.Name.Should().Be("Samsung");
     }
 
     [Fact]
     public void SetDescription_TrimsAndNormalizes()
     {
-        var producer = ProducerDomain.Create(new Name("sony"));
+        var producer = ProducerDomain.Create("sony");
 
         producer.SetDescription("   test desc   ");
 
@@ -52,7 +51,7 @@ public class ProducerTests
     [Fact]
     public void SetDescription_EmptyBecomesNull()
     {
-        var producer = ProducerDomain.Create(new Name("sony"));
+        var producer = ProducerDomain.Create("sony");
 
         producer.SetDescription("   ");
 
@@ -62,7 +61,7 @@ public class ProducerTests
     [Fact]
     public void SetImagePath_Trims()
     {
-        var producer = ProducerDomain.Create(new Name("sony"));
+        var producer = ProducerDomain.Create("sony");
 
         producer.SetImagePath("   /img.png   ");
 
@@ -72,7 +71,7 @@ public class ProducerTests
     [Fact]
     public void SetImagePath_EmptyBecomesNull()
     {
-        var producer = ProducerDomain.Create(new Name("sony"));
+        var producer = ProducerDomain.Create("sony");
 
         producer.SetImagePath("   ");
 

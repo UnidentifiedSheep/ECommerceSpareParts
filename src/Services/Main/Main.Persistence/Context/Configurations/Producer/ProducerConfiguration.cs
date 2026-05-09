@@ -23,16 +23,12 @@ public class ProducerConfiguration : IEntityTypeConfiguration<Entities.Producer.
             .HasMaxLength(255)
             .HasColumnName("image_path");
 
-        builder.OwnsOne(b => b.Name,
-            b =>
-            {
-                b.Property(x => x.Value)
-                    .HasMaxLength(64)
-                    .HasColumnName("name");
+        builder.Property(x => x.Name)
+            .HasMaxLength(64)
+            .HasColumnName("name");
 
-                b.HasIndex(e => e.Value)
-                    .HasDatabaseName("producer_name_uindex")
-                    .IsUnique();
-            });
+        builder.HasIndex(e => e.Name)
+            .HasDatabaseName("producer_name_uindex")
+            .IsUnique();
     }
 }

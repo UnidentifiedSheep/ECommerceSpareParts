@@ -1,3 +1,4 @@
+using FluentAssertions;
 using Main.Abstractions.Constants;
 using Main.Application.Dtos.Storage;
 using Main.Application.Handlers.StorageContents.AddContent;
@@ -12,7 +13,6 @@ using Test.Common.TestContainers.Combined;
 using Tests.DataBuilders.Storage;
 using Tests.TestContexts;
 using ValidationException = FluentValidation.ValidationException;
-using DbValidationException = BulkValidation.Core.Exceptions.ValidationException;
 
 namespace Tests.HandlersTests.StorageContents;
 
@@ -148,7 +148,8 @@ public class AddContentToStorageTests : IntegrationTest
             if (!expectedTotals.TryAdd(kv.Key, kv.Value))
                 expectedTotals[kv.Key] += kv.Value;
 
-        var dbArticles = await Context.Products.AsNoTracking()
+        var dbArticles = await Context.Products
+            .AsNoTracking()
             .ToDictionaryAsync(x => x.Id);
 
         var dbStorageContents = await Context.StorageContents.AsNoTracking()

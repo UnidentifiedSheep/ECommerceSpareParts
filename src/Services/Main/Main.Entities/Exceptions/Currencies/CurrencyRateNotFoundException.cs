@@ -9,6 +9,6 @@ public class CurrencyRateNotFoundException : NotFoundException, ILocalizableExce
     {
     }
 
-    public string MessageKey { get; } //TODO: make this shit
-    public object[]? Arguments { get; }
+    public string MessageKey => "currency.rate.not.found";
+    public object[]? Arguments => null;
 }

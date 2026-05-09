@@ -11,9 +11,7 @@ namespace Main.Persistence.Repositories.Currency;
 
 public class CurrencyRateRepository(
     DContext context
-)
-    : RepositoryBase<DContext, CurrencyRate, (int, int)>(context),
-        ICurrencyRateRepository
+) : RepositoryBase<DContext, CurrencyRate, (int, int)>(context), ICurrencyRateRepository
 {
     public Task<List<CurrencyRate>> GetByBaseCurrency(
         int baseCurrencyId,

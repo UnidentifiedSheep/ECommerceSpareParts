@@ -109,6 +109,12 @@ public class StorageContent : AuditableEntity<StorageContent, int>, IVersionable
         CurrencyId = currencyId;
     }
 
+    public void AssignCurrency(Currency.Currency currency)
+    {
+        CurrencyId = currency.Id;
+        Currency = currency;
+    }
+
     public void SetBaseCurrencyId(int baseCurrencyId)
     {
         BaseCurrencyId = baseCurrencyId;

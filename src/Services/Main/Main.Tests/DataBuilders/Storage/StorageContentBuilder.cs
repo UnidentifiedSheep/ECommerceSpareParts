@@ -62,7 +62,7 @@ public class StorageContentBuilder(Faker faker) : BuilderBase<StorageContent>(fa
         return StorageContent.Create(
             StorageName ?? Faker.Lorem.Word(),
             _productIds.Count > 0 ? Faker.PickRandom<int>(_productIds) : Faker.Random.Int(1),
-            Count ?? Faker.Random.Int(1),
+            Count ?? Faker.Random.Int(1, 100),
             BuyPrice ?? Math.Round(Faker.Random.Decimal(1, 1000), 2),
             CurrencyId ?? Faker.Random.Int(1),
             BuyPrice ?? Math.Round(Faker.Random.Decimal(1, 1000), 2),

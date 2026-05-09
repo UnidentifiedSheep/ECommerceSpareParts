@@ -56,7 +56,7 @@ public class EditStorageContentHandler(
         {
             var patch = item.Value.Model;
             var content = storageContents[item.Key];
-            var product = products[item.Key];
+            var product = products[content.ProductId];
 
             content.ValidateVersion(item.Value.RowVersion);
             product.IncreaseStock(CalculateDiff(content, patch));

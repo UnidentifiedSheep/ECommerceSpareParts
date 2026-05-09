@@ -1,6 +1,7 @@
 using FluentAssertions;
 using Main.Application.Dtos.Producer;
 using Main.Application.Handlers.Producers.CreateProducer;
+using Main.Entities.Producer;
 using Microsoft.EntityFrameworkCore;
 using Test.Common.TestContainers.Combined;
 using ValidationException = FluentValidation.ValidationException;
@@ -48,7 +49,7 @@ public class CreateProducerTests(CombinedContainerFixture fixture) : Integration
 
         createdProducer.Should().NotBeNull();
 
-        createdProducer.Name.Should().Be(producer.Name);
+        createdProducer.Name.Should().Be(Producer.ToNormalizedName(producer.Name));
         createdProducer.Description.Should().Be(producer.Description);
     }
 

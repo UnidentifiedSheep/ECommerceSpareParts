@@ -1,10 +1,11 @@
-﻿using Domain;
+﻿using BulkValidation.Core.Attributes;
+using Domain;
 using Domain.Extensions;
 using Main.Entities.Auth.ValueObjects;
 
 namespace Main.Entities.Auth;
 
-public class Role : AuditableEntity<Role, string>
+public class Role : AuditableEntity<Role, RoleName>
 {
     private readonly List<RolePermission> _rolePermissions = [];
 
@@ -48,8 +49,8 @@ public class Role : AuditableEntity<Role, string>
         if (first != null) _rolePermissions.Remove(first);
     }
 
-    public override string GetId()
+    public override RoleName GetId()
     {
-        return Name.Value;
+        return Name;
     }
 }

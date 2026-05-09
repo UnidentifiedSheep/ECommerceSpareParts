@@ -12,6 +12,7 @@ using Main.Application.Extensions;
 using Main.Application.Handlers.Projections;
 using Main.Application.Interfaces.Persistence;
 using Main.Entities.Event;
+using Main.Entities.Exceptions.Currencies;
 using Main.Entities.Exceptions.Products;
 using Main.Entities.Storage;
 using Main.Enums;
@@ -33,6 +34,7 @@ public class AddContentHandler(
     IProductRepository productRepository,
     ICurrencyConverter converter,
     ISettingsService settingsService,
+    ICurrencyRepository currencyRepository,
     IUnitOfWork unitOfWork,
     IIntegrationEventScope integrationEventScope) : ICommandHandler<AddContentCommand, AddContentResult>
 {
@@ -41,16 +43,26 @@ public class AddContentHandler(
         var baseCurrencyId = (await settingsService.GetOrDefault<CurrencySetting>(cancellationToken))
             .Data.BaseCurrencyId;
 
-        var productIds = request.StorageContent
-            .Select(x => x.ProductId)
-            .Distinct()
-            .ToList();
+        var productIds = new HashSet<int>();
+        var currencyIds = new HashSet<int>();
+
+        foreach (var item in request.StorageContent)
+        {
+            productIds.Add(item.ProductId);
+            currencyIds.Add(item.CurrencyId);
+        }
 
         var products = await productRepository
             .EnsureExistsForUpdateAsync(
-                productIds,
-                notFound => new ProductNotFoundException(notFound),
-                cancellationToken);
+                ids: productIds,
+                errorFactory: notFound => new ProductNotFoundException(notFound),
+                ct: cancellationToken);
+
+        var currencies = await currencyRepository
+            .EnsureExistsAsync(
+                ids: currencyIds,
+                errorFactory: nf => new CurrencyNotFoundException(nf),
+                ct: cancellationToken);
 
         var storageContents = new List<StorageContent>();
         var events = new List<Event>();
@@ -66,6 +78,8 @@ public class AddContentHandler(
                 await converter.ConvertToBaseAsync(item.BuyPrice, item.CurrencyId, cancellationToken),
                 baseCurrencyId,
                 item.PurchaseDate);
+            
+            content.AssignCurrency(currencies[item.CurrencyId]);
 
             storageContents.Add(content);
 

@@ -1,9 +1,8 @@
 ﻿using Exceptions;
 using FluentAssertions;
 using Main.Entities.Producer;
-using Main.Entities.Producer.ValueObjects;
 
-namespace Main.Tests.Domain.Producer;
+namespace Tests.Domain.Producer;
 
 public class ProducerOtherNameTests
 {
@@ -53,7 +52,7 @@ public class ProducerOtherNameTests
     {
         var entity = ProducerOtherName.Create(1, "KSS", "EU");
 
-        entity.SetOtherName(new Name("Samsung"));
+        entity.SetOtherName("Samsung");
 
         entity.OtherName.Should().Be("Samsung");
     }

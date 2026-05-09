@@ -1,4 +1,5 @@
 ﻿using Application.Common.Interfaces.Repositories;
+using EFCore.BulkExtensions;
 using Main.Application.Interfaces.Persistence;
 using Main.Entities.Product;
 using Main.Persistence.Context;
@@ -15,17 +16,27 @@ public class ProductRepository(DContext context) : RepositoryBase<DContext, Prod
         Criteria<Product> criteria,
         CancellationToken cancellationToken = default)
     {
-        return await Context.Products
-            .FromSql($"""
-                      SELECT Distinct on (a.id) a.* 
-                      FROM products a 
-                      JOIN product_crosses c ON a.id = c.left_product OR a.id = c.right_product 
-                                             WHERE c.left_product = {productId} OR 
-                                                 c.right_product = {productId}
-                      ORDER BY a.id
-                      """)
+        var left = Context.ProductCrosses
+            .Where(c => c.RightProductId == productId)
+            .Select(c => c.LeftProduct);
+
+        var right = Context.ProductCrosses
+            .Where(c => c.LeftProductId == productId)
+            .Select(c => c.RightProduct);
+
+        return await left
+            .Union(right)
             .Apply(criteria)
             .ToListAsync(cancellationToken);
+    }
+
+    public Task UpsertProductCrosses(
+        IEnumerable<ProductCross> crosses, 
+        CancellationToken cancellationToken = default)
+    {
+        return Context.BulkInsertOrUpdateAsync(
+            entities: crosses, 
+            cancellationToken: cancellationToken);
     }
 
     public override Task<Dictionary<int, Product>> FindByIdsAsync(

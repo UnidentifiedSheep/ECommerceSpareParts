@@ -1,11 +1,11 @@
 using FluentValidation;
 using Localization.Domain.Extensions;
 
-namespace Main.Application.Handlers.Auth.CreateRole;
+namespace Main.Application.Handlers.Auth.UpsertRole;
 
-public class CreateRoleValidation : AbstractValidator<CreateRoleCommand>
+public class UpsertRoleValidation : AbstractValidator<UpsertRoleCommand>
 {
-    public CreateRoleValidation()
+    public UpsertRoleValidation()
     {
         RuleFor(x => x.Name)
             .NotEmpty()

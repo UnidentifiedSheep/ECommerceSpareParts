@@ -1,4 +1,3 @@
-using Abstractions.Interfaces.Services;
 using Application.Common.Interfaces;
 using Application.Common.Interfaces.Repositories;
 using Attributes;
@@ -18,7 +17,6 @@ public record MakeLinkageBetweenProductsCommand(List<NewProductLinkageDto> Linka
 
 public class MakeLinkageBetweenProductsHandler(
     IIntegrationEventScope integrationEventScope,
-    IUnitOfWork unitOfWork,
     IProductRepository repository) : ICommandHandler<MakeLinkageBetweenProductsCommand, Unit>
 {
     public async Task<Unit> Handle(MakeLinkageBetweenProductsCommand request, CancellationToken cancellationToken)
@@ -74,6 +72,7 @@ public class MakeLinkageBetweenProductsHandler(
                 foreach (var l in leftIds)
                 foreach (var r in rightIds)
                 {
+                    if (l == r) continue;
                     var cross = ProductCross.Create(l, r);
                     if (been.Add(cross.GetId())) toAdd.Add(cross);
                 }
@@ -98,7 +97,7 @@ public class MakeLinkageBetweenProductsHandler(
                 throw new ArgumentOutOfRangeException();
         }
 
-        await unitOfWork.AddRangeAsync(toAdd, cancellationToken);
+        await repository.UpsertProductCrosses(toAdd, cancellationToken);
         var ids = new HashSet<int>();
         foreach (var cross in toAdd)
         {

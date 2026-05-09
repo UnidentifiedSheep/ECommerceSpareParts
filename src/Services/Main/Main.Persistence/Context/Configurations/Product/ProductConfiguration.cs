@@ -85,6 +85,11 @@ public class ProductConfiguration : IEntityTypeConfiguration<Entities.Product.Pr
 
         builder.Property(e => e.ProducerId)
             .HasColumnName("producer_id");
+        
+        builder.Property(e => e.RowVersion)
+            .HasColumnName("xmin")
+            .IsRowVersion();
+
 
         builder.HasOne(d => d.Category)
             .WithMany(p => p.Articles)

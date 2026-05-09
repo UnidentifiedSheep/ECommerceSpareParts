@@ -9,7 +9,7 @@ namespace Main.Application.Extensions;
 
 public static class RepositoryExtensions
 {
-    public static async Task<Dictionary<TKey, TEntity>> EnsureExistsForUpdateAsync<TEntity, TKey>(
+    public static Task<Dictionary<TKey, TEntity>> EnsureExistsAsync<TEntity, TKey>(
         this IRepository<TEntity, TKey> repository,
         IEnumerable<TKey> ids,
         Func<IReadOnlyList<TKey>, Exception> errorFactory,
@@ -17,12 +17,47 @@ public static class RepositoryExtensions
         where TEntity : Entity<TEntity, TKey>
         where TKey : notnull
     {
-        var keySet = ids.ToHashSet();
+        var criteria = Criteria<TEntity>.New()
+            .Track()
+            .Build();
 
+        return repository.EnsureExistsCoreAsync(
+            ids,
+            errorFactory,
+            criteria, 
+            ct);
+    }
+
+    public static Task<Dictionary<TKey, TEntity>> EnsureExistsForUpdateAsync<TEntity, TKey>(
+        this IRepository<TEntity, TKey> repository,
+        IEnumerable<TKey> ids,
+        Func<IReadOnlyList<TKey>, Exception> errorFactory,
+        CancellationToken ct = default)
+        where TEntity : Entity<TEntity, TKey>
+        where TKey : notnull
+    {
         var criteria = Criteria<TEntity>.New()
             .Track()
             .ForUpdate()
             .Build();
+
+        return repository.EnsureExistsCoreAsync(
+            ids,
+            errorFactory,
+            criteria, 
+            ct);
+    }
+    
+    private static async Task<Dictionary<TKey, TEntity>> EnsureExistsCoreAsync<TEntity, TKey>(
+        this IRepository<TEntity, TKey> repository,
+        IEnumerable<TKey> ids,
+        Func<IReadOnlyList<TKey>, Exception> errorFactory,
+        Criteria<TEntity> criteria,
+        CancellationToken ct = default)
+        where TEntity : Entity<TEntity, TKey>
+        where TKey : notnull
+    {
+        var keySet = ids.ToHashSet();
 
         var result = await repository.FindByIdsAsync(
             keySet,

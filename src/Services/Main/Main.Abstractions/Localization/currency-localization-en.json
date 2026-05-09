@@ -19,6 +19,7 @@
     "currency.sign.min.length": "Currency sign must be at least 1 character long.",
     "currency.shortName.not.empty": "Currency short name must not be empty.",
     "currency.shortName.max.length": "Currency short name must be at most 5 characters long.",
-    "currency.shortName.min.length": "Currency short name must be at least 2 characters long."
+    "currency.shortName.min.length": "Currency short name must be at least 2 characters long.",
+    "currency.rate.not.found": "Currency rate can not be found."
   }
 }

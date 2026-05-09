@@ -1,17 +1,16 @@
 ﻿using Bogus;
 using Main.Entities.Producer;
-using Main.Entities.Producer.ValueObjects;
 using Test.Common.Abstractions;
 
 namespace Tests.DataBuilders;
 
 public class ProducerBuilder(Faker faker) : BuilderBase<Producer>(faker)
 {
-    public Name? Name { get; private set; }
+    public string? Name { get; private set; }
     public string? Description { get; private set; }
     public string? ImageUrl { get; private set; }
 
-    public ProducerBuilder WithName(Name name)
+    public ProducerBuilder WithName(string name)
     {
         Name = name;
         return this;

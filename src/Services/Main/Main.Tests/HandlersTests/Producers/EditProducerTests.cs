@@ -82,7 +82,7 @@ public class EditProducerTests : IntegrationTest
         var dbProducer = await Context.Producers.AsNoTracking().FirstOrDefaultAsync(x => x.Id == producer.Id);
         dbProducer.Should().NotBeNull();
 
-        dbProducer.Name.Value.Should().Be(producer.Name.Value);
+        dbProducer.Name.Should().Be(producer.Name);
         dbProducer.Description.Should().Be(producer.Description);
     }
 
@@ -111,7 +111,7 @@ public class EditProducerTests : IntegrationTest
         var dbProducer = await Context.Producers.AsNoTracking().FirstOrDefaultAsync(x => x.Id == producer.Id);
         dbProducer.Should().NotBeNull();
 
-        dbProducer.Name.Value.Should().Be(model.Name.Value);
+        dbProducer.Name.Should().Be(Producer.ToNormalizedName(model.Name.Value));
         dbProducer.Description.Should().Be(model.Description.Value);
     }
 

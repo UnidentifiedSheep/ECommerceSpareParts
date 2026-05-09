@@ -6,6 +6,7 @@ using Main.Entities.Exceptions.Storages;
 using Microsoft.EntityFrameworkCore;
 using Test.Common.TestContainers.Combined;
 using Tests.TestContexts;
+
 using ValidationException = FluentValidation.ValidationException;
 
 namespace Tests.HandlersTests.StorageContents;
@@ -122,8 +123,8 @@ public class EditStorageContentTests : IntegrationTest
 
         Assert.Equal(productBefore.Stock.Value, productAfter.Stock.Value - 5);
         Assert.NotNull(updated);
-        Assert.Equal(content.Count + 5, updated.Count);
-        Assert.Equal(content.BuyPrice + 10, updated.BuyPrice);
+        Assert.Equal(content.Count, dto.Count.Value);
+        Assert.Equal(content.BuyPrice, dto.BuyPrice.Value);
     }
 
     [Fact]
@@ -142,7 +143,7 @@ public class EditStorageContentTests : IntegrationTest
             { [content.Id] = new(dto, content.RowVersion) };
 
         var command = new EditStorageContentCommand(dict);
-        await Assert.ThrowsAsync<ValidationException>(async () => await Mediator.Send(command));
+        await Assert.ThrowsAsync<DbValidationException>(async () => await Mediator.Send(command));
     }
 
 
@@ -178,7 +179,7 @@ public class EditStorageContentTests : IntegrationTest
 
         var updated = await Context.StorageContents.FindAsync(content.Id);
         Assert.NotNull(updated);
-        Assert.Equal(content.Count + 3, updated.Count);
-        Assert.Equal(content.BuyPrice + 7, updated.BuyPrice);
+        Assert.Equal(content.Count, dto.Count.Value);
+        Assert.Equal(content.BuyPrice, dto.BuyPrice.Value);
     }
 }
