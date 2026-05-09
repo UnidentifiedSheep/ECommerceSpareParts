@@ -2,13 +2,15 @@
 using Application.Common.Interfaces.Repositories;
 using Dapper;
 using Domain;
-using Main.Persistence.Context;
 using Microsoft.EntityFrameworkCore;
 
-namespace Main.Persistence.Repositories;
+namespace Persistence.Repository;
 
-public class ReadRepository<TEntity, TKey>(DContext ctx)
-    : IReadRepository<TEntity, TKey> where TEntity : Entity<TEntity, TKey>
+public abstract class ReadRepositoryBase<TContext, TEntity, TKey>(TContext ctx)
+    : IReadRepository<TEntity, TKey> 
+    where TEntity : Entity<TEntity, TKey> 
+    where TKey : notnull
+    where TContext : DbContext
 {
     public IQueryable<TEntity> Query => ctx.Set<TEntity>().AsQueryable().AsNoTracking();
 

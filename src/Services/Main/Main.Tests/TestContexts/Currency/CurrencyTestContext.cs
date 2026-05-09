@@ -12,9 +12,8 @@ namespace Tests.TestContexts;
 
 public class CurrencyTestContext(
     DContext context,
-    IMediator mediator,
     ISettingsService settingsService
-) : TestContextBase<DContext>(context, mediator)
+) : TestContextBase<DContext>(context)
 {
     private readonly List<Currency> _currencies = [];
     public IReadOnlyList<Currency> Currencies => _currencies;

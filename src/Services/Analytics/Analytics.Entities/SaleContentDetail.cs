@@ -1,6 +1,8 @@
-﻿namespace Analytics.Entities;
+﻿using Domain;
 
-public class SaleContentDetail
+namespace Analytics.Entities;
+
+public class SaleContentDetail : Entity<SaleContentDetail, int>
 {
     public int Id { get; set; }
 
@@ -11,6 +13,5 @@ public class SaleContentDetail
     public int Count { get; set; }
 
     public DateTime PurchaseDate { get; set; }
-
-    public virtual Currency Currency { get; set; } = null!;
+    public override int GetId() => Id;
 }

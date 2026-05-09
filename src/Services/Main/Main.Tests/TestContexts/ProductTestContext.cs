@@ -10,9 +10,8 @@ namespace Tests.TestContexts;
 
 public class ProductTestContext(
     DContext context,
-    IMediator mediator,
     ProducerTestContext producerTestContext
-) : TestContextBase<DContext>(context, mediator), IDependentTestContext
+) : TestContextBase<DContext>(context), IDependentTestContext
 {
     private readonly List<Product> _products = [];
     public ProducerTestContext ProducerTestContext => producerTestContext;

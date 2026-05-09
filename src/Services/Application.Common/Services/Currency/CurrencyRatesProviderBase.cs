@@ -10,11 +10,11 @@ public abstract class CurrencyRatesProviderBase(
     {
         return await cache.GetOrSetAsync(
             $"currency:{currencyId}:rate",
-            ct => GetFromDb(currencyId, ct),
+            ct => GetExternalData(currencyId, ct),
             TimeSpan.FromDays(1),
             [$"currency:{currencyId}"],
             cancellationToken);
     }
 
-    protected abstract Task<decimal> GetFromDb(int currencyId, CancellationToken cancellationToken = default);
+    protected abstract Task<decimal> GetExternalData(int currencyId, CancellationToken cancellationToken = default);
 }

@@ -8,9 +8,8 @@ using Tests.DataBuilders;
 namespace Tests.TestContexts;
 
 public class ProducerTestContext(
-    DContext context,
-    IMediator mediator
-) : TestContextBase<DContext>(context, mediator)
+    DContext context
+) : TestContextBase<DContext>(context)
 {
     private readonly List<Producer> _producers = [];
     public IReadOnlyList<Producer> Producers => _producers;

@@ -42,6 +42,14 @@ public abstract class RepositoryBase<TContext, TEntity, TKey>(TContext context) 
         return await query.ToListAsync(ct);
     }
 
+    public IAsyncEnumerable<TEntity> AsyncEnumerable(
+        Criteria<TEntity>? criteria = null)
+    {
+        return DbSet.AsQueryable()
+            .Apply(criteria)
+            .AsAsyncEnumerable();
+    }
+
     public abstract Task<Dictionary<TKey, TEntity>> FindByIdsAsync(
         IEnumerable<TKey> ids,
         Criteria<TEntity>? criteria = null,

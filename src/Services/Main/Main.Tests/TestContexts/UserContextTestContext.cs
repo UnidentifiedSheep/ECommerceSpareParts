@@ -8,10 +8,9 @@ namespace Tests.TestContexts;
 
 public class UserContextTestContext(
     DContext context,
-    IMediator mediator,
     ISettingsService settingsService,
     IUserContext userContext
-) : GlobalApplicationSettingTestContext(context, mediator, settingsService)
+) : GlobalApplicationSettingTestContext(context, settingsService)
 {
     public override async Task InitializeAsync(CancellationToken cancellationToken = default)
     {

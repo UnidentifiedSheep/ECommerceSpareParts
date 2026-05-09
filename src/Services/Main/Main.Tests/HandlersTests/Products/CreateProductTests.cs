@@ -25,7 +25,7 @@ public class CreateProductTests : IntegrationTest
 
         var command = new CreateProductsCommand(dtos);
 
-        var act = () => TestContext.Mediator.Send(command);
+        var act = () => Mediator.Send(command);
         await act.Should().NotThrowAsync();
 
         var products = await GetProducts();
@@ -41,7 +41,7 @@ public class CreateProductTests : IntegrationTest
     {
         var command = new CreateProductsCommand([]);
 
-        await Assert.ThrowsAsync<ValidationException>(() => TestContext.Mediator.Send(command));
+        await Assert.ThrowsAsync<ValidationException>(() => Mediator.Send(command));
     }
 
     [Fact]
@@ -53,7 +53,7 @@ public class CreateProductTests : IntegrationTest
         };
 
         var command = new CreateProductsCommand([dtos]);
-        var act = () => TestContext.Mediator.Send(command);
+        var act = () => Mediator.Send(command);
 
         await act.Should().ThrowAsync<ValidationException>();
     }
@@ -61,7 +61,7 @@ public class CreateProductTests : IntegrationTest
     [Fact]
     public async Task CreateArticle_WithManyItems_FailsValidation()
     {
-        var act = () => TestContext.Mediator.Send(new CreateProductsCommand(CreateDtos(200)));
+        var act = () => Mediator.Send(new CreateProductsCommand(CreateDtos(200)));
         await act.Should().ThrowAsync<ValidationException>();
     }
 
@@ -73,7 +73,7 @@ public class CreateProductTests : IntegrationTest
             ProducerId = int.MaxValue
         };
 
-        var act = () => TestContext.Mediator.Send(new CreateProductsCommand([dto]));
+        var act = () => Mediator.Send(new CreateProductsCommand([dto]));
 
         await act.Should().ThrowAsync<DbValidationException>();
     }

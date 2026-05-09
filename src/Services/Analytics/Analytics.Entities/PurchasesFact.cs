@@ -1,23 +1,16 @@
 ﻿using BulkValidation.Core.Attributes;
+using Domain;
 
 namespace Analytics.Entities;
 
-public class PurchasesFact
+public class PurchasesFact : Entity<PurchasesFact, Guid>
 {
     [Validate]
-    public string Id { get; set; } = null!;
-
+    public Guid Id { get; set; }
     public int CurrencyId { get; set; }
-
     public Guid SupplierId { get; set; }
-
-    public DateTime CreatedAt { get; set; }
-
     public DateTime ProcessedAt { get; set; }
-
     public decimal TotalSum { get; set; }
-
-    public virtual Currency Currency { get; set; } = null!;
-
     public virtual ICollection<PurchaseContent> PurchaseContents { get; set; } = new List<PurchaseContent>();
+    public override Guid GetId() => Id;
 }

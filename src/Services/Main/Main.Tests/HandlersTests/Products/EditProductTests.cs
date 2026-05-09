@@ -31,7 +31,7 @@ public class EditProductTests : IntegrationTest
                 Name = new PatchField<string> { IsSet = true, Value = "Updated Article" }
             });
 
-        var act = () => TestContext.Mediator.Send(command);
+        var act = () => Mediator.Send(command);
 
         await act.Should().NotThrowAsync();
 
@@ -52,7 +52,7 @@ public class EditProductTests : IntegrationTest
                 Sku = new PatchField<string> { IsSet = true, Value = "67890" }
             });
 
-        var act = () => TestContext.Mediator.Send(command);
+        var act = () => Mediator.Send(command);
 
         await act.Should().ThrowAsync<ProductNotFoundException>();
     }
@@ -67,7 +67,7 @@ public class EditProductTests : IntegrationTest
                 Sku = new PatchField<string> { IsSet = true, Value = "" }
             });
 
-        var act = () => TestContext.Mediator.Send(command);
+        var act = () => Mediator.Send(command);
         await act.Should().ThrowAsync<ValidationException>();
     }
 
@@ -81,7 +81,7 @@ public class EditProductTests : IntegrationTest
                 Sku = new PatchField<string> { IsSet = false, Value = null }
             });
 
-        var act = () => TestContext.Mediator.Send(command);
+        var act = () => Mediator.Send(command);
         await act.Should().NotThrowAsync();
     }
 
@@ -94,7 +94,7 @@ public class EditProductTests : IntegrationTest
             {
                 Sku = new PatchField<string> { IsSet = true, Value = null }
             });
-        await Assert.ThrowsAsync<ValidationException>(async () => await TestContext.Mediator.Send(command));
+        await Assert.ThrowsAsync<ValidationException>(async () => await Mediator.Send(command));
     }
 
     private int GetFirstId()

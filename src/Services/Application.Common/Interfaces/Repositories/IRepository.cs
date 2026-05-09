@@ -16,6 +16,9 @@ public interface IRepository<TEntity, TKey> where TEntity : Entity<TEntity, TKey
         Criteria<TEntity>? criteria = null,
         CancellationToken ct = default);
 
+    IAsyncEnumerable<TEntity> AsyncEnumerable(
+        Criteria<TEntity>? criteria = null);
+
     Task<Dictionary<TKey, TEntity>> FindByIdsAsync(
         IEnumerable<TKey> ids,
         Criteria<TEntity>? criteria = null,

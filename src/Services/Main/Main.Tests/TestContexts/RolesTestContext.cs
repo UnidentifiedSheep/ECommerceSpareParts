@@ -8,7 +8,7 @@ using Tests.DataBuilders.Auth;
 
 namespace Tests.TestContexts;
 
-public class RolesTestContext(DContext ctx, IMediator mediator) : TestContextBase<DContext>(ctx, mediator)
+public class RolesTestContext(DContext ctx) : TestContextBase<DContext>(ctx)
 {
     public IReadOnlyCollection<Role> Roles { get; private set; } = null!;
 

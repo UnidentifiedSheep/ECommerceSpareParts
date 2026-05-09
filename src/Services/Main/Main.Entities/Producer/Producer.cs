@@ -52,9 +52,9 @@ public class Producer : AuditableEntity<Producer, int>
     {
         var value = name.Trim();
 
-        value.AgainstNullOrWhiteSpace("article.name.must.not.be.empty")
-            .AgainstTooShort(3, "article.name.min.length.3")
-            .AgainstTooLong(255, "article.name.max.length.255");
+        value.AgainstNullOrWhiteSpace("producer.name.not.empty")
+            .AgainstTooShort(2, "producer.name.min.length")
+            .AgainstTooLong(64, "producer.name.max.length");
 
         Name = ToNormalizedName(value);
     }

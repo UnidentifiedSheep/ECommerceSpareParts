@@ -1,10 +1,12 @@
-﻿namespace Analytics.Entities;
+﻿using Domain;
 
-public class SaleContent
+namespace Analytics.Entities;
+
+public class SaleContent : Entity<SaleContent, int>
 {
     public int Id { get; set; }
 
-    public string? SaleId { get; set; }
+    public Guid? SaleId { get; set; }
 
     public int ArticleId { get; set; }
 
@@ -15,4 +17,5 @@ public class SaleContent
     public decimal Discount { get; set; }
 
     public virtual SalesFact? Sale { get; set; }
+    public override int GetId() => Id;
 }

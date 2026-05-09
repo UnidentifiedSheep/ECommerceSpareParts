@@ -1,6 +1,8 @@
-﻿namespace Analytics.Entities;
+﻿using Domain;
 
-public class PurchaseContent
+namespace Analytics.Entities;
+
+public class PurchaseContent : Entity<PurchaseContent, int>
 {
     public int Id { get; set; }
 
@@ -13,4 +15,5 @@ public class PurchaseContent
     public int Count { get; set; }
 
     public virtual PurchasesFact Purchase { get; set; } = null!;
+    public override int GetId() => Id;
 }

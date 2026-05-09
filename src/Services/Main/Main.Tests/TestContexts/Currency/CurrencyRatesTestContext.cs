@@ -12,10 +12,9 @@ namespace Tests.TestContexts;
 
 public class CurrencyRatesTestContext(
     DContext context,
-    IMediator mediator,
     CurrencyTestContext currencyTestContext,
     ISettingsService settingsService
-) : TestContextBase<DContext>(context, mediator), IDependentTestContext
+) : TestContextBase<DContext>(context), IDependentTestContext
 {
     public CurrencyTestContext CurrencyTestContext => currencyTestContext;
 

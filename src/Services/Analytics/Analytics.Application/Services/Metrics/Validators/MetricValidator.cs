@@ -7,10 +7,6 @@ public class MetricValidator : AbstractValidator<Metric>
 {
     public MetricValidator()
     {
-        RuleFor(x => x.CreatedBy)
-            .NotEmpty()
-            .WithMessage("Created by is required");
-
         RuleFor(x => x.RangeStart)
             .NotEmpty()
             .WithMessage("Range start is required");

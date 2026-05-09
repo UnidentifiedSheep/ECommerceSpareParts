@@ -1,4 +1,4 @@
-﻿using Application.Common.Interfaces;
+﻿using Application.Common.Interfaces.NamedObject;
 using Localization.Abstractions.Interfaces;
 
 namespace Application.Common.Abstractions.NamedObjects;

@@ -3,18 +3,15 @@ using System.Security.Cryptography;
 using System.Text;
 using System.Text.Json;
 using Analytics.Enums;
+using Domain;
 
 namespace Analytics.Entities.Metrics;
 
-public abstract class Metric
+public abstract class Metric : AuditableEntity<Metric, Guid>
 {
     public Guid Id { get; set; }
 
     public int CurrencyId { get; set; }
-
-    public Guid CreatedBy { get; set; }
-
-    public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
 
     public DateTime RangeStart { get; set; }
 
@@ -41,13 +38,14 @@ public abstract class Metric
     public abstract DependsOn DependsOn { get; protected set; }
 
     public string? Json { get; protected set; }
-    public virtual Currency Currency { get; set; } = null!;
 
     private static byte[] ComputeHash(string key)
     {
         var full = SHA256.HashData(Encoding.UTF8.GetBytes(key));
         return full[..16];
     }
+
+    public override Guid GetId() => Id;
 }
 
 public abstract class Metric<T> : Metric where T : class

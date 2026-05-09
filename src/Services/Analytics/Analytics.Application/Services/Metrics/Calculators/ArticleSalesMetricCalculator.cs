@@ -1,15 +1,15 @@
-﻿using System.Linq.Expressions;
-using Analytics.Abstractions.Interfaces.DbRepositories;
+﻿using Analytics.Application.Interfaces.Repositories;
 using Analytics.Entities;
 using Analytics.Entities.Metrics;
 using Analytics.Entities.Metrics.JsonDataModels;
 using Analytics.Enums;
 using Application.Common.Interfaces.Currency;
+using Application.Common.Interfaces.Repositories;
 
 namespace Analytics.Application.Services.Metrics.Calculators;
 
 public class ArticleSalesMetricCalculator(
-    ISalesRepository salesRepository,
+    ISalesFactRepository salesRepository,
     ICurrencyConverter currencyConverter)
     : MetricCalculatorBase<ArticleSalesMetric>
 {
@@ -23,18 +23,22 @@ public class ArticleSalesMetricCalculator(
         double mean = 0;
         double m2 = 0;
         long count = 0;
+        
 
         var (start, end) = await WithTimer(async () =>
         {
             await foreach (var fact in salesRepository
-                               .GetFacts(GetWhere(metric))
+                               .AsyncEnumerable(GetCriteria(metric))
                                .WithCancellation(cancellationToken))
             foreach (var item in fact.SaleContents)
             {
                 if (item.ArticleId != metric.ArticleId)
                     continue;
 
-                var priceDecimal = currencyConverter.ConvertToUsd(item.Price, fact.CurrencyId);
+                var priceDecimal = await currencyConverter.ConvertToBaseAsync(
+                    item.Price, 
+                    fact.CurrencyId, 
+                    cancellationToken);
                 var quantity = item.Count;
 
                 if (quantity <= 0)
@@ -81,9 +85,11 @@ public class ArticleSalesMetricCalculator(
         metric.Tags = RecalculationTags.None;
     }
 
-    private static Expression<Func<SalesFact, bool>> GetWhere(ArticleSalesMetric metric)
+    private static Criteria<SalesFact> GetCriteria(ArticleSalesMetric metric)
     {
-        return x => x.SaleContents.Any(z => z.ArticleId == metric.ArticleId)
-                    && metric.RangeStart <= x.CreatedAt && x.CreatedAt <= metric.RangeEnd;
+        return Criteria<SalesFact>.New()
+            .Where(x => x.SaleContents.Any(z => z.ArticleId == metric.ArticleId)
+                        && metric.RangeStart <= x.CreatedAt && x.CreatedAt <= metric.RangeEnd)
+            .Build();
     }
 }

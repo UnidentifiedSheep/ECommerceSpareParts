@@ -1,8 +1,10 @@
 using System.Reflection;
+using Analytics.Application;
 using Analytics.Persistence;
 using Analytics.Persistence.Context;
 using Analytics.Worker.Consumers;
 using Api.Common.Extensions;
+using Cache;
 using Localization.Abstractions.Models;
 using Localization.Domain.Extensions;
 using MassTransit;
@@ -26,7 +28,7 @@ builder.Services.AddLocalization(defaultLocale, locales);
 
 builder.Services
     .AddPersistenceLayer(Environment.GetEnvironmentVariable("DB_CONNECTION_STRING")!)
-    .AddCacheLayer(Environment.GetEnvironmentVariable("REDIS_CONNECTION_STRING")!, "analytics")
+    .AddCacheLayer(Environment.GetEnvironmentVariable("REDIS_CONNECTION_STRING")!)
     .AddApplicationLayer();
 
 AddMassTransit(builder);

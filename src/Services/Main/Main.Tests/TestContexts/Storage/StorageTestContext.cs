@@ -8,7 +8,7 @@ using Tests.DataBuilders.Storage;
 
 namespace Tests.TestContexts;
 
-public class StorageTestContext(DContext ctx, IMediator mediator) : TestContextBase<DContext>(ctx, mediator)
+public class StorageTestContext(DContext ctx) : TestContextBase<DContext>(ctx)
 {
     public IReadOnlyCollection<Storage> Storages { get; private set; } = null!;
 

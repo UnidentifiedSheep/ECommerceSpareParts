@@ -8,8 +8,7 @@ using Tests.DataBuilders.User;
 namespace Tests.TestContexts;
 
 public class UsersTestContext(
-    DContext context,
-    IMediator mediator) : TestContextBase<DContext>(context, mediator)
+    DContext context) : TestContextBase<DContext>(context)
 {
     public IReadOnlyCollection<User> Users { get; private set; } = null!;
 

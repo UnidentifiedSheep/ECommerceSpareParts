@@ -12,7 +12,7 @@ public class CurrencyRatesProvider(
     ICurrencyRateRepository rateRepository,
     ISettingsService settingsService) : CurrencyRatesProviderBase(cache)
 {
-    protected override async Task<decimal> GetFromDb(int currencyId, CancellationToken cancellationToken = default)
+    protected override async Task<decimal> GetExternalData(int currencyId, CancellationToken cancellationToken = default)
     {
         var baseCurrencyId = (await settingsService.GetOrDefault<CurrencySetting>(cancellationToken))
             .Data

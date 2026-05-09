@@ -1,4 +1,5 @@
 using System.Reflection;
+using Analytics.Application;
 using Analytics.Application.Consumers;
 using Analytics.Persistence;
 using Analytics.Persistence.Context;
@@ -6,6 +7,7 @@ using Api.Common;
 using Api.Common.Extensions;
 using Api.Common.Middleware;
 using Api.Common.Models;
+using Cache;
 using Carter;
 using Localization.Abstractions.Models;
 using Localization.Domain.Extensions;
@@ -14,6 +16,7 @@ using MassTransit;
 using Persistence.Extensions;
 using RabbitMq.Extensions;
 using RabbitMq.Models;
+using Security;
 
 var localesPath = Assembly.GetExecutingAssembly().GetDefaultLocalizationPath();
 
@@ -32,7 +35,7 @@ builder.Host.AddLokiLogger(builder.Configuration, "analytics.api", env, lokiUrl)
 
 builder.Services
     .AddPersistenceLayer(Environment.GetEnvironmentVariable("DB_CONNECTION_STRING")!)
-    .AddCacheLayer(Environment.GetEnvironmentVariable("REDIS_CONNECTION_STRING")!, "analytics")
+    .AddCacheLayer(Environment.GetEnvironmentVariable("REDIS_CONNECTION_STRING")!)
     .AddApplicationLayer()
     .AddMinimalSecurityLayer();
 
@@ -134,18 +137,9 @@ app.UseMiddleware<HeaderSecretMiddleware>();
 
 app.UseMiddleware<ScopedLocalizationMiddleware>();
 
-await SetupCurrency(app.Services);
-
 if (app.Environment.IsDevelopment()) app.MapOpenApi();
 
 
 app.MapHealthChecks("/health");
 
 await app.RunAsync();
-
-async Task SetupCurrency(IServiceProvider serviceProvider)
-{
-    using var scope = serviceProvider.CreateScope();
-    var currencyConverterSetup = scope.ServiceProvider.GetRequiredService<ICurrencyConverterSetup>();
-    await currencyConverterSetup.InitializeAsync();
-}

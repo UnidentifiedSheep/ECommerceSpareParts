@@ -11,9 +11,8 @@ namespace Tests.TestContexts;
 
 public abstract class GlobalApplicationSettingTestContext(
     DContext context,
-    IMediator mediator,
     ISettingsService settingsService
-) : TestContextBase<DContext>(context, mediator)
+) : TestContextBase<DContext>(context)
 {
     public User SystemUser { get; private set; } = null!;
 

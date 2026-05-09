@@ -10,11 +10,10 @@ namespace Tests.TestContexts;
 
 public class StorageRouteTestContext(
     DContext ctx,
-    IMediator mediator,
     StorageTestContext storageTestContext,
     CurrencyTestContext currencyTestContext,
     UsersTestContext usersTestContext)
-    : TestContextBase<DContext>(ctx, mediator), IDependentTestContext
+    : TestContextBase<DContext>(ctx), IDependentTestContext
 {
     public StorageRoute ActiveRoute { get; private set; } = null!;
     public StorageRoute UnactiveRoute { get; private set; } = null!;

@@ -11,11 +11,10 @@ namespace Tests.TestContexts;
 
 public class StorageContentTestContext(
     DContext ctx,
-    IMediator mediator,
     StorageTestContext storage,
     ProductTestContext product,
     CurrencyTestContext currency)
-    : TestContextBase<DContext>(ctx, mediator), IDependentTestContext
+    : TestContextBase<DContext>(ctx), IDependentTestContext
 {
     public IReadOnlyCollection<StorageContent> StorageContents { get; private set; } = null!;
 

@@ -12,6 +12,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Persistence.DbValidator;
 using Persistence.Extensions;
 using Persistence.Interceptors;
+using Persistence.Repository;
 using ProducerRepository = Main.Persistence.Repositories.Producer.ProducerRepository;
 using StorageContentRepository = Main.Persistence.Repositories.Storage.StorageContentRepository;
 using UserRepository = Main.Persistence.Repositories.User.UserRepository;
