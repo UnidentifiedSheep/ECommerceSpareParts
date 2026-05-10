@@ -10,10 +10,13 @@ public class MetricCalculationJobConfiguration : IEntityTypeConfiguration<Metric
     {
         builder.ToTable("metric_calculation_jobs");
 
-        builder.HasKey(e => e.RequestId).HasName("request_id_pk");
+        builder.HasKey(e => e.RequestId)
+            .HasName("request_id_pk");
 
         builder.Property(e => e.RequestId)
-            .HasColumnName("request_id");
+            .HasDefaultValueSql("gen_random_uuid()")
+            .HasColumnName("request_id")
+            .ValueGeneratedOnAdd();
 
         builder.Property(e => e.MetricId)
             .HasColumnName("metric_id");

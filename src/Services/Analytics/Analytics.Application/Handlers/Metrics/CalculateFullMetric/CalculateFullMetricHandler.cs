@@ -1,7 +1,6 @@
 ﻿using Abstractions.Interfaces.Services;
 using Analytics.Abstractions.Dtos.CalculationJob;
 using Analytics.Abstractions.Exceptions.MetricCalculationJobs;
-using Analytics.Abstractions.Interfaces.DbRepositories;
 using Analytics.Application.Handlers.CalculationJob.UpdateCalculationJob;
 using Analytics.Application.Handlers.Metrics.CalculateMetric;
 using Analytics.Application.Handlers.Metrics.CreateMetric;
@@ -9,6 +8,7 @@ using Analytics.Entities;
 using Analytics.Entities.Metrics;
 using Analytics.Enums;
 using Application.Common.Interfaces;
+using Application.Common.Interfaces.Repositories;
 using MediatR;
 using Microsoft.Extensions.Logging;
 
@@ -17,13 +17,12 @@ namespace Analytics.Application.Handlers.Metrics.CalculateFullMetric;
 public record CalculateFullMetricCommand(
     Guid RequestId,
     string MetricSystemName,
-    MetricPayloadDto MetricPayload,
-    Guid CreatedBy) : ICommand;
+    MetricPayloadDto MetricPayload) : ICommand;
 
 public class CalculateFullMetricHandler(
     ISender sender,
     ILogger<CalculateFullMetricHandler> logger,
-    IMetricCalculationJobRepository jobRepository,
+    IRepository<MetricCalculationJob, Guid> jobRepository,
     IUnitOfWork unitOfWork)
     : ICommandHandler<CalculateFullMetricCommand>
 {
@@ -76,8 +75,7 @@ public class CalculateFullMetricHandler(
 
         var metric = (await sender.Send(new CreateMetricCommand(
             request.MetricSystemName,
-            request.MetricPayload,
-            request.CreatedBy), ct)).Metric;
+            request.MetricPayload), ct)).Metric;
 
         logger.LogInformation(
             "Metric created. MetricId: {MetricId}, RequestId: {RequestId}",
@@ -182,21 +180,23 @@ public class CalculateFullMetricHandler(
             "Fetching calculation job. RequestId: {RequestId}",
             requestId);
 
-        var queryOptions = new QueryOptions<MetricCalculationJob, Guid>
-        {
-            Data = requestId
-        }.WithTracking();
-
-        var job = await jobRepository.GetCalculationJob(queryOptions, ct)
+        var job = await jobRepository.GetById(requestId, ct)
                   ?? throw new CalculationJobNotFoundException(requestId);
 
-        if (job.Status == CalculationStatus.AwaitingWorker) return job;
+        try
+        {
+            job.EnsureAwaitingWorker();
+            return job;
+        }
+        catch (InvalidOperationException e)
+        {
+            logger.LogWarning(
+                e,
+                "Invalid job status. RequestId: {RequestId}, Status: {Status}",
+                requestId,
+                job.Status);
 
-        logger.LogWarning(
-            "Invalid job status. RequestId: {RequestId}, Status: {Status}",
-            requestId,
-            job.Status);
-
-        throw new InvalidOperationException("The calculation job is not awaiting worker.");
+            throw;
+        }
     }
 }

@@ -3,6 +3,8 @@
   "keyValues": {
     "metric.calculation.job.not.found": "Не удалось найти запись о задаче расчета метрики.",
     "metric.calculation.job.metric.id.set.once": "Идентификатор метрики может быть установлен только единожды в задаче расчета метрики.",
+    "metric.system.name.required": "Системное имя метрики обязательно.",
+    "metric.system.name.too.long": "Системное имя метрики не должно превышать 128 символов.",
     "failed.creating.metric": "Не удалось создать метрику, проверьте корректность данных."
   }
 }

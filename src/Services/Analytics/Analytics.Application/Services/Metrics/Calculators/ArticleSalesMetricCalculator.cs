@@ -80,9 +80,8 @@ public class ArticleSalesMetricCalculator(
             Timer = new MetricTimer(start, end)
         };
 
-        metric.Data = data;
-        metric.RecalculatedAt = DateTime.UtcNow;
-        metric.Tags = RecalculationTags.None;
+        metric.SetData(data);
+        metric.CompleteRecalculation();
     }
 
     private static Criteria<SalesFact> GetCriteria(ArticleSalesMetric metric)

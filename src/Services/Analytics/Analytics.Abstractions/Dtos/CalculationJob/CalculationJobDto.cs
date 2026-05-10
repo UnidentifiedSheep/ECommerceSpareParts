@@ -1,16 +1,29 @@
-﻿using Analytics.Enums;
+﻿using System.Text.Json.Serialization;
+using Analytics.Enums;
 
 namespace Analytics.Abstractions.Dtos.CalculationJob;
 
-public class CalculationJobDto
+public record CalculationJobDto
 {
-    public Guid RequestId { get; set; }
-    public Guid? MetricId { get; set; }
-    public string MetricSystemName { get; set; } = null!;
-    public CalculationStatus Status { get; set; }
+    [JsonPropertyName("requestId")]
+    public required Guid RequestId { get; init; }
+    
+    [JsonPropertyName("metricId")]
+    public Guid? MetricId { get; init; }
+    
+    [JsonPropertyName("metricSystemName")]
+    public required string MetricSystemName { get; init; }
+    
+    [JsonPropertyName("status")]
+    [JsonConverter(typeof(JsonStringEnumConverter<CalculationStatus>))]
+    public required CalculationStatus Status { get; init; }
 
-    public DateTime CreateAt { get; set; }
-    public DateTime UpdateAt { get; set; }
+    [JsonPropertyName("createdAt")]
+    public required DateTime CreateAt { get; init; }
+    
+    [JsonPropertyName("updatedAt")]
+    public required DateTime UpdateAt { get; init; }
 
-    public string? ErrorMessage { get; set; }
+    [JsonPropertyName("errorMessage")]
+    public string? ErrorMessage { get; init; }
 }

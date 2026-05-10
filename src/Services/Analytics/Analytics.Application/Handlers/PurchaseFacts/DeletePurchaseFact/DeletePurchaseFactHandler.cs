@@ -1,8 +1,8 @@
 ﻿using System.Data;
 using Abstractions.Interfaces.Services;
-using Analytics.Abstractions.Interfaces.DbRepositories;
 using Analytics.Entities;
 using Application.Common.Interfaces;
+using Application.Common.Interfaces.Repositories;
 using Attributes;
 using MediatR;
 using Microsoft.Extensions.Logging;
@@ -11,20 +11,18 @@ namespace Analytics.Application.Handlers.PurchaseFacts.DeletePurchaseFact;
 
 [AutoSave]
 [Transactional(IsolationLevel.ReadCommitted, 2, 20)]
-public record DeletePurchaseFactCommand(string PurchaseId) : ICommand;
+public record DeletePurchaseFactCommand(Guid PurchaseId) : ICommand;
 
 public class DeletePurchaseFactHandler(
-    IPurchaseFactRepository purchaseFactRepository,
+    IRepository<PurchasesFact, Guid> factRepository,
     IUnitOfWork unitOfWork,
     ILogger<DeletePurchaseFactCommand> logger)
     : ICommandHandler<DeletePurchaseFactCommand>
 {
     public async Task<Unit> Handle(DeletePurchaseFactCommand request, CancellationToken cancellationToken)
     {
-        var fact = await purchaseFactRepository.GetFact(
-            new QueryOptions<PurchasesFact, string> { Data = request.PurchaseId }
-                .WithForUpdate()
-                .WithTracking(),
+        var fact = await factRepository.GetById(
+            request.PurchaseId,
             cancellationToken);
 
         if (fact == null)

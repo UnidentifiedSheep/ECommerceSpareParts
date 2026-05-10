@@ -21,6 +21,7 @@
     </ItemGroup>
 
     <ItemGroup>
+      <Folder Include="Configs\Mapster\" />
       <Folder Include="NamedObjects\" />
     </ItemGroup>
 

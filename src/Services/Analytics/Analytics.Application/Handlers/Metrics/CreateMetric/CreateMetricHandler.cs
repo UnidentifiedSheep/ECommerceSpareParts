@@ -10,8 +10,7 @@ namespace Analytics.Application.Handlers.Metrics.CreateMetric;
 [AutoSave]
 public record CreateMetricCommand(
     string MetricSystemName,
-    MetricPayloadDto MetricPayload,
-    Guid CreatedBy) : ICommand<CreateMetricResult>;
+    MetricPayloadDto MetricPayload) : ICommand<CreateMetricResult>;
 
 public record CreateMetricResult(Metric Metric);
 
@@ -27,7 +26,6 @@ public class CreateMetricHandler(
         var metricType = calculatorRegistry.GetMetricType(request.MetricSystemName);
         var metric = metricConverterDispatcher.Convert(request.MetricPayload, metricType);
 
-        metric.CreatedBy = request.CreatedBy;
         await validatorDispatcher.ValidateAsync(metricType, metric, cancellationToken);
 
         await unitOfWork.AddAsync(metric, cancellationToken);
