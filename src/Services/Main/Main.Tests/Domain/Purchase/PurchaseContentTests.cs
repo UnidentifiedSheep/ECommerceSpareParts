@@ -1,7 +1,7 @@
 ﻿using FluentAssertions;
 using Main.Entities.Purchase;
 
-namespace Main.Tests.Domain.Purchase;
+namespace Tests.Domain.Purchase;
 
 public class PurchaseContentTests
 {

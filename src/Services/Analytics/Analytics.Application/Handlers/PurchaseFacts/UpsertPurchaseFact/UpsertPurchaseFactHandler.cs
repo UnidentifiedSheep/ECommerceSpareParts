@@ -1,8 +1,9 @@
 ﻿using System.Data;
 using Abstractions.Interfaces.Services;
-using Analytics.Abstractions.Dtos.PurchaseFact;
+using Analytics.Application.Dtos.PurchaseFact;
 using Analytics.Entities;
 using Application.Common.Interfaces;
+using Application.Common.Interfaces.Cqrs;
 using Application.Common.Interfaces.Repositories;
 using Attributes;
 using MediatR;
@@ -25,7 +26,7 @@ public class UpsertPurchaseFactHandler(
         var dbFact = await factRepository.GetById(
             request.PurchaseFact.Id,
             cancellationToken);
-        
+
         if (dto.LastUpdatedAt <= dbFact?.ProcessedAt)
         {
             logger.LogWarning(
@@ -37,8 +38,8 @@ public class UpsertPurchaseFactHandler(
 
             return Unit.Value;
         }
-        
-        
+
+
         var contents = dto.Content.Select(x =>
             PurchaseContent.Create(x.Id, dto.Id, x.ArticleId, x.Price, x.Count));
 
@@ -54,10 +55,10 @@ public class UpsertPurchaseFactHandler(
             await unitOfWork.AddAsync(dbFact, cancellationToken);
             return Unit.Value;
         }
-        
+
         unitOfWork.RemoveRange(dbFact.PurchaseContents);
         dbFact.Update(dto.CurrencyId, dto.SupplierId, dto.CreatedAt, dto.LastUpdatedAt, contents);
-        
+
         return Unit.Value;
     }
 }

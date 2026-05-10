@@ -2,7 +2,7 @@
 using Main.Entities.Product.ValueObjects;
 using ProductDomain = Main.Entities.Product.Product;
 
-namespace Main.Tests.Domain.Product;
+namespace Tests.Domain.Product;
 
 public class ProductTests
 {

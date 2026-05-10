@@ -1,7 +1,7 @@
 using System.Text.Json.Serialization;
 using Main.Enums;
 
-namespace Main.Application.Dtos.Amw.Balances;
+namespace Main.Application.Dtos.Balances;
 
 public record TransactionDto
 {

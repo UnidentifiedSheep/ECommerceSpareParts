@@ -15,7 +15,6 @@ using MassTransit;
 using Microsoft.AspNetCore.HttpOverrides;
 using OpenTelemetry.Metrics;
 using Persistence.Extensions;
-using Pricing.Abstractions.Constants;
 using Pricing.Api.EndPoints.Prices;
 using Pricing.Application;
 using Pricing.Application.Consumers;

@@ -2,7 +2,7 @@
 using Domain.Extensions;
 using Domain.Interfaces;
 
-namespace Main.Entities.User;
+namespace Main.Entities.Balance;
 
 public class UserBalance : AuditableEntity<UserBalance, UserBalanceKey>
 {

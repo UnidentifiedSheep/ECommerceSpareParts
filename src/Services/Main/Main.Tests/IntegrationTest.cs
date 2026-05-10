@@ -8,13 +8,14 @@ using MediatR;
 using Microsoft.Extensions.DependencyInjection;
 using Persistence.Extensions;
 using Test.Common.Abstractions;
+using Test.Common.Abstractions.Test;
 using Test.Common.Extensions;
 using Test.Common.TestContainers.Combined;
 
 namespace Tests;
 
 [Collection("Combined collection")]
-public abstract class IntegrationTest(CombinedContainerFixture fixture) 
+public abstract class IntegrationTest(CombinedContainerFixture fixture)
     : IntegrationTestBase<ServiceProviderBuilder, ServiceProviderArguments, DContext>
 {
     protected IMediator Mediator { get; private set; } = null!;

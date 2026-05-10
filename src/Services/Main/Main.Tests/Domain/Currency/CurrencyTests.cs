@@ -1,7 +1,7 @@
 ﻿using FluentAssertions;
 using CurrencyDomain = Main.Entities.Currency.Currency;
 
-namespace Main.Tests.Domain.Currency;
+namespace Tests.Domain.Currency;
 
 public class CurrencyTests
 {

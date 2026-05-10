@@ -7,8 +7,8 @@ using Microsoft.EntityFrameworkCore;
 namespace Persistence.Repository;
 
 public abstract class ReadRepositoryBase<TContext, TEntity, TKey>(TContext ctx)
-    : IReadRepository<TEntity, TKey> 
-    where TEntity : Entity<TEntity, TKey> 
+    : IReadRepository<TEntity, TKey>
+    where TEntity : Entity<TEntity, TKey>
     where TKey : notnull
     where TContext : DbContext
 {

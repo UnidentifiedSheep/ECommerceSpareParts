@@ -4,7 +4,7 @@ using Main.Application.Dtos.Product;
 using Main.Application.Handlers.ProductReservations.CreateProductReservation;
 using MediatR;
 
-namespace Main.Api.EndPoints.ArticlesReservation;
+namespace Main.Api.EndPoints.ProductReservations;
 
 public record CreateProductReservationQuery(List<NewProductReservationDto> Reservations);
 

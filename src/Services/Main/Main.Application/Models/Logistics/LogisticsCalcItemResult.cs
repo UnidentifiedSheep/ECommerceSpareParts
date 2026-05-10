@@ -1,6 +1,6 @@
 ﻿using Enums;
 
-namespace Main.Abstractions.Models.Logistics;
+namespace Main.Application.Models.Logistics;
 
 public record LogisticsCalcItemResult(
     int Id,

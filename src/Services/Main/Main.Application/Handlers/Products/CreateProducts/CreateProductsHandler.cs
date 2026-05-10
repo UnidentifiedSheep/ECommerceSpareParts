@@ -1,7 +1,8 @@
 ﻿using Abstractions.Interfaces.Services;
 using Application.Common.Interfaces;
+using Application.Common.Interfaces.Cqrs;
 using Attributes;
-using Contracts.Articles;
+using Contracts.Products;
 using Main.Application.Dtos.Product;
 using Main.Entities.Product;
 

@@ -4,6 +4,7 @@ using Main.Application.Handlers.Balance.CreateTransaction;
 using Microsoft.EntityFrameworkCore;
 using Test.Common.TestContainers.Combined;
 using Tests.TestContexts;
+using Tests.TestContexts.Currency;
 using ValidationException = FluentValidation.ValidationException;
 
 namespace Tests.HandlersTests.Balances;

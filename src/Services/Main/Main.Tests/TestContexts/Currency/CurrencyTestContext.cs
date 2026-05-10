@@ -1,22 +1,20 @@
 ﻿using Application.Common.Interfaces.Settings;
 using Enums;
-using Main.Abstractions.Models.Settings;
-using Main.Entities.Currency;
+using Main.Entities.Setting;
 using Main.Persistence.Context;
-using MediatR;
 using Test.Common.Abstractions;
 using Test.Common.Extensions;
-using Tests.DataBuilders;
+using Tests.DataBuilders.Currency;
 
-namespace Tests.TestContexts;
+namespace Tests.TestContexts.Currency;
 
 public class CurrencyTestContext(
     DContext context,
     ISettingsService settingsService
 ) : TestContextBase<DContext>(context)
 {
-    private readonly List<Currency> _currencies = [];
-    public IReadOnlyList<Currency> Currencies => _currencies;
+    private readonly List<Main.Entities.Currency.Currency> _currencies = [];
+    public IReadOnlyList<Main.Entities.Currency.Currency> Currencies => _currencies;
 
     public override async Task InitializeAsync(CancellationToken cancellationToken = default)
     {

@@ -1,5 +1,5 @@
-﻿using Abstractions.Interfaces.Tests;
-using Localization.Abstractions.Interfaces;
+﻿using Localization.Abstractions.Interfaces;
+using Test.Common.Interfaces;
 
 namespace Test.Common.TestContexts;
 

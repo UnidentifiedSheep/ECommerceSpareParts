@@ -1,8 +1,8 @@
-﻿using Main.Entities.User;
+﻿using Main.Entities.Balance;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
-namespace Main.Persistence.Context.Configurations.User;
+namespace Main.Persistence.Context.Configurations.Balance;
 
 public class UserBalanceConfiguration : IEntityTypeConfiguration<UserBalance>
 {

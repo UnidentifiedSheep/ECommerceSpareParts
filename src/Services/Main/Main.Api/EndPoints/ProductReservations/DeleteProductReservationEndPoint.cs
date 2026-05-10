@@ -3,7 +3,7 @@ using Carter;
 using Main.Application.Handlers.ProductReservations.DeleteProductReservation;
 using MediatR;
 
-namespace Main.Api.EndPoints.ArticlesReservation;
+namespace Main.Api.EndPoints.ProductReservations;
 
 public class DeleteProductReservationEndPoint : ICarterModule
 {

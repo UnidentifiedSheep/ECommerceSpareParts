@@ -4,7 +4,7 @@ using Enums;
 using Main.Application.Handlers.ProductSizes.DeleteProductSizes;
 using MediatR;
 
-namespace Main.Api.EndPoints.ArticleSize;
+namespace Main.Api.EndPoints.ProductSize;
 
 public class DeleteProductSizeEndPoint : ICarterModule
 {

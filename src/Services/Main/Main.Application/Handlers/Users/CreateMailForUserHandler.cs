@@ -1,4 +1,5 @@
 using Application.Common.Interfaces;
+using Application.Common.Interfaces.Cqrs;
 using FluentValidation;
 
 namespace Main.Application.Handlers.Users;

@@ -2,7 +2,7 @@
 using Main.Entities.Currency;
 using Test.Common.Abstractions;
 
-namespace Tests.DataBuilders;
+namespace Tests.DataBuilders.Currency;
 
 public class CurrencyRateBuilder(Faker faker) : BuilderBase<CurrencyRate>(faker)
 {

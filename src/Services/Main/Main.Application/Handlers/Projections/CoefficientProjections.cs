@@ -1,5 +1,5 @@
 ﻿using System.Linq.Expressions;
-using Main.Application.Dtos.Amw.Coefficients;
+using Main.Application.Dtos.Coefficient;
 using Main.Entities;
 
 namespace Main.Application.Handlers.Projections;

@@ -1,4 +1,3 @@
-using FluentAssertions;
 using Main.Abstractions.Constants;
 using Main.Application.Dtos.Storage;
 using Main.Application.Handlers.StorageContents.AddContent;
@@ -12,6 +11,8 @@ using Microsoft.Extensions.DependencyInjection;
 using Test.Common.TestContainers.Combined;
 using Tests.DataBuilders.Storage;
 using Tests.TestContexts;
+using Tests.TestContexts.Currency;
+using Tests.TestContexts.Storage;
 using ValidationException = FluentValidation.ValidationException;
 
 namespace Tests.HandlersTests.StorageContents;

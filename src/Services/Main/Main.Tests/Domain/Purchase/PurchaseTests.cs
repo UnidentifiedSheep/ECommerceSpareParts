@@ -3,7 +3,7 @@ using FluentAssertions;
 using Main.Entities.Purchase;
 using DomainPurchase = Main.Entities.Purchase.Purchase;
 
-namespace Main.Tests.Domain.Purchase;
+namespace Tests.Domain.Purchase;
 
 public class PurchaseTests
 {

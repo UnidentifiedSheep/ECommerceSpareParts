@@ -1,11 +1,12 @@
 ﻿using Abstractions.Interfaces.Services;
 using Application.Common.Interfaces;
+using Application.Common.Interfaces.Cqrs;
 using Attributes;
 using Contracts.User;
 using Main.Entities.Auth;
 using MediatR;
 
-namespace Main.Application.Handlers.Users.AddPermissionToUser;
+namespace Main.Application.Handlers.Auth.AddPermissionToUser;
 
 [Transactional]
 [AutoSave]

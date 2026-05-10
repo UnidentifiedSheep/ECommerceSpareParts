@@ -43,7 +43,7 @@ public partial class DContext : DbContext
         modelBuilder.Entity<OutboxMessage>().ToTable("OutboxMessage", "msg");
         modelBuilder.Entity<OutboxState>().ToTable("OutboxState", "msg");
         modelBuilder.Entity<InboxState>().ToTable("InboxState", "msg");
-        
+
 
         modelBuilder
             .HasPostgresExtension("dblink")

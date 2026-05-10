@@ -1,8 +1,9 @@
 ﻿using Abstractions.Models;
 using Application.Common.Extensions;
 using Application.Common.Interfaces;
+using Application.Common.Interfaces.Cqrs;
 using Application.Common.Interfaces.Repositories;
-using Main.Application.Dtos.Anonymous.Articles;
+using Main.Application.Dtos.Product;
 using Main.Entities.Product;
 using Microsoft.EntityFrameworkCore;
 

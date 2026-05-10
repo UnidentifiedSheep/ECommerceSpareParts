@@ -2,7 +2,9 @@
 
 Backend solution for an e-commerce spare parts platform.
 
-The system is built as a set of .NET services around product catalog, storage operations, purchases, sales, balances, pricing, search, and analytics. It is intended for a business domain where spare parts are bought, stored, priced, searched, sold, and analyzed.
+The system is built as a set of .NET services around product catalog, storage operations, purchases, sales, balances,
+pricing, search, and analytics. It is intended for a business domain where spare parts are bought, stored, priced,
+searched, sold, and analyzed.
 
 ## Tech Stack
 
@@ -53,16 +55,16 @@ src/
 
 ## Services
 
-| Service | Purpose |
-| --- | --- |
-| `Main` | Core business service: auth, users, products, storages, purchases, sales, balances, currencies. |
-| `Search` | Search API and local search indexes. |
-| `Pricing` | Pricing-related API and persistence. |
-| `Analytics` | Analytics API, metrics, and background worker. |
-| `Gateway` | Public entry point and reverse proxy. |
-| `Api.Common` | Shared API configuration and helpers. |
-| `Application.Common` | Shared application contracts, validators, repository abstractions, and services. |
-| `Test.Common` | Shared integration testing infrastructure, fixtures, stubs, and test contexts. |
+| Service              | Purpose                                                                                         |
+|----------------------|-------------------------------------------------------------------------------------------------|
+| `Main`               | Core business service: auth, users, products, storages, purchases, sales, balances, currencies. |
+| `Search`             | Search API and local search indexes.                                                            |
+| `Pricing`            | Pricing-related API and persistence.                                                            |
+| `Analytics`          | Analytics API, metrics, and background worker.                                                  |
+| `Gateway`            | Public entry point and reverse proxy.                                                           |
+| `Api.Common`         | Shared API configuration and helpers.                                                           |
+| `Application.Common` | Shared application contracts, validators, repository abstractions, and services.                |
+| `Test.Common`        | Shared integration testing infrastructure, fixtures, stubs, and test contexts.                  |
 
 ## Infrastructure
 
@@ -97,37 +99,40 @@ The values in `.env.example` are development defaults. Do not use them in produc
 
 ### Secrets
 
-The repository contains `.env.example` only as a local development template. Some values look like passwords or signing keys because Docker Compose needs complete defaults for a one-machine setup. Treat every value in `.env.example` as disposable development data.
+The repository contains `.env.example` only as a local development template. Some values look like passwords or signing
+keys because Docker Compose needs complete defaults for a one-machine setup. Treat every value in `.env.example` as
+disposable development data.
 
 For real environments:
 
 - keep secrets outside Git;
-- use CI/CD variables, Docker secrets, Kubernetes secrets, Vault, cloud secret managers, or another environment-specific secret provider;
+- use CI/CD variables, Docker secrets, Kubernetes secrets, Vault, cloud secret managers, or another environment-specific
+  secret provider;
 - rotate signing keys and service passwords per environment;
 - do not reuse local MinIO, PostgreSQL, Redis, RabbitMQ, Grafana, JWT, or signing secrets;
 - mount TLS certificates from infrastructure-managed storage, not from the repository.
 
 Main secret/config groups:
 
-| Group | Variables |
-| --- | --- |
-| PostgreSQL | `PGQL_USER`, `PGQL_PASSWORD`, `PGQL_MAIN_DB`, `PGQL_ANALYTICS_DB`, `PGQL_PRICING_DB` |
-| Redis | `REDIS_PASSWORD`, `REDIS_HOST`, `REDIS_PORT` |
-| RabbitMQ | `RABBITMQ_DEFAULT_USER`, `RABBITMQ_DEFAULT_PASS` |
-| Gateway/JWT | `GATEWAY_SUPER_KEY`, `VALID_ISSUER`, `ISSUER_SIGNING_KEY` |
-| Service signing | `MAIN_SIGN_SECRET`, `PRICING_SIGN_SECRET` |
-| MinIO/S3 | `MINIO_ROOT_USER`, `MINIO_ROOT_PASSWORD`, `MINIO_SERVICE_USER`, `MINIO_SERVICE_PASSWORD` |
-| Grafana | `GRAFANA_ADMIN_USER`, `GRAFANA_ADMIN_PASSWORD` |
-| TLS | `CERTS_PATH`, `CERT_PATH`, `CERT_KEYPATH` |
+| Group           | Variables                                                                                |
+|-----------------|------------------------------------------------------------------------------------------|
+| PostgreSQL      | `PGQL_USER`, `PGQL_PASSWORD`, `PGQL_MAIN_DB`, `PGQL_ANALYTICS_DB`, `PGQL_PRICING_DB`     |
+| Redis           | `REDIS_PASSWORD`, `REDIS_HOST`, `REDIS_PORT`                                             |
+| RabbitMQ        | `RABBITMQ_DEFAULT_USER`, `RABBITMQ_DEFAULT_PASS`                                         |
+| Gateway/JWT     | `GATEWAY_SUPER_KEY`, `VALID_ISSUER`, `ISSUER_SIGNING_KEY`                                |
+| Service signing | `MAIN_SIGN_SECRET`, `PRICING_SIGN_SECRET`                                                |
+| MinIO/S3        | `MINIO_ROOT_USER`, `MINIO_ROOT_PASSWORD`, `MINIO_SERVICE_USER`, `MINIO_SERVICE_PASSWORD` |
+| Grafana         | `GRAFANA_ADMIN_USER`, `GRAFANA_ADMIN_PASSWORD`                                           |
+| TLS             | `CERTS_PATH`, `CERT_PATH`, `CERT_KEYPATH`                                                |
 
 Important paths:
 
-| Variable | Description |
-| --- | --- |
+| Variable       | Description                                                    |
+|----------------|----------------------------------------------------------------|
 | `CONFIGS_PATH` | Mounted application config directory. Defaults to `./configs`. |
-| `CERTS_PATH` | Mounted certificate directory. Defaults to `./certs`. |
-| `CERT_PATH` | Certificate path inside the container. |
-| `CERT_KEYPATH` | Private key path inside the container. |
+| `CERTS_PATH`   | Mounted certificate directory. Defaults to `./certs`.          |
+| `CERT_PATH`    | Certificate path inside the container.                         |
+| `CERT_KEYPATH` | Private key path inside the container.                         |
 
 ## Running Locally
 
@@ -145,13 +150,13 @@ https://localhost:443
 
 Useful local endpoints:
 
-| Component | Port |
-| --- | --- |
-| PostgreSQL | `5432` |
-| RabbitMQ UI | `15672` |
-| MinIO Console | `9001` |
-| Loki | `3100` |
-| Grafana | `3000` |
+| Component     | Port    |
+|---------------|---------|
+| PostgreSQL    | `5432`  |
+| RabbitMQ UI   | `15672` |
+| MinIO Console | `9001`  |
+| Loki          | `3100`  |
+| Grafana       | `3000`  |
 
 Stop services:
 
@@ -183,7 +188,8 @@ docker compose -f migrator-compose.yaml up --build analytics.migrator
 docker compose -f migrator-compose.yaml up --build pricing.migrator
 ```
 
-The migrator compose file connects to PostgreSQL through `host.docker.internal:5432`, so PostgreSQL must be available locally before running migrators.
+The migrator compose file connects to PostgreSQL through `host.docker.internal:5432`, so PostgreSQL must be available
+locally before running migrators.
 
 ## Build
 
@@ -242,11 +248,13 @@ The compose stack includes:
 - Prometheus for metrics
 - Grafana for dashboards
 
-Services receive `LOKI_URL` through environment variables. Grafana is configured to run over HTTPS using mounted certificates.
+Services receive `LOKI_URL` through environment variables. Grafana is configured to run over HTTPS using mounted
+certificates.
 
 ## Storage
 
-MinIO is used as an S3-compatible storage service. The `minio-init` container creates the configured images bucket and service user during local startup.
+MinIO is used as an S3-compatible storage service. The `minio-init` container creates the configured images bucket and
+service user during local startup.
 
 Search service index data is mounted at:
 

@@ -4,7 +4,7 @@ using Main.Application.Dtos.Product;
 using Main.Application.Handlers.Products.PatchProduct;
 using MediatR;
 
-namespace Main.Api.EndPoints.Articles;
+namespace Main.Api.EndPoints.Products;
 
 public record EditProductRequest(PatchProductDto PatchProduct);
 

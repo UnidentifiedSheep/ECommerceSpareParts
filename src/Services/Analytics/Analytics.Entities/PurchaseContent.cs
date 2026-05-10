@@ -22,7 +22,10 @@ public class PurchaseContent : Entity<PurchaseContent, int>
 
     public virtual PurchasesFact Purchase { get; private set; } = null!;
 
-    public override int GetId() => Id;
+    public override int GetId()
+    {
+        return Id;
+    }
 
     public static PurchaseContent Create(int id, Guid purchaseId, int articleId, decimal price, int count)
     {

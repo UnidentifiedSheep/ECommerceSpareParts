@@ -1,4 +1,4 @@
-﻿namespace Analytics.Abstractions.Dtos.PurchaseFact;
+﻿namespace Analytics.Application.Dtos.PurchaseFact;
 
 public record PurchaseContentUpsertDto
 {

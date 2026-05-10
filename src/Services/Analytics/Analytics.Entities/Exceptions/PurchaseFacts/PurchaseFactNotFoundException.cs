@@ -1,7 +1,7 @@
 ﻿using Abstractions.Interfaces.Exceptions;
 using Exceptions.Base;
 
-namespace Analytics.Abstractions.Exceptions.PurchaseFacts;
+namespace Analytics.Entities.Exceptions.PurchaseFacts;
 
 public class PurchaseFactNotFoundException(string id)
     : NotFoundException(null, new { Id = id }), ILocalizableException

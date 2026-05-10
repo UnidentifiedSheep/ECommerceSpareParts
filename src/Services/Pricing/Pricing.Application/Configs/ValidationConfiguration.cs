@@ -3,7 +3,6 @@ using BulkValidation.Core.Configuration;
 using BulkValidation.Core.Enums;
 using BulkValidation.Core.Extensions;
 using Exceptions.Base;
-using Pricing.Abstractions.Constants;
 using Pricing.Entities;
 
 namespace Pricing.Application.Configs;

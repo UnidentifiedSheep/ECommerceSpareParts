@@ -3,7 +3,7 @@ using Carter;
 using Main.Application.Handlers.ProductContent.SetProductContentQuantity;
 using MediatR;
 
-namespace Main.Api.EndPoints.Articles;
+namespace Main.Api.EndPoints.Products;
 
 public record SetProductsContentCountRequest(int Count);
 

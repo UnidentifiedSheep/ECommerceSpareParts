@@ -3,7 +3,7 @@ using Carter;
 using Main.Application.Handlers.ProductContent.RemoveProductContent;
 using MediatR;
 
-namespace Main.Api.EndPoints.Articles;
+namespace Main.Api.EndPoints.Products;
 
 public class RemoveProductContentEndPoint : ICarterModule
 {

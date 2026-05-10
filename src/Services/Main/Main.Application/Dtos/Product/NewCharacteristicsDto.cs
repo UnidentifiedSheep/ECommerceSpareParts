@@ -1,6 +1,6 @@
 using System.Text.Json.Serialization;
 
-namespace Main.Application.Dtos.Amw.ArticleCharacteristics;
+namespace Main.Application.Dtos.Product;
 
 public record NewCharacteristicsDto
 {

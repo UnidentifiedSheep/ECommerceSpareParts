@@ -1,8 +1,9 @@
 ﻿using System.Reflection;
-using Analytics.Abstractions.Dtos.Metric;
+using Analytics.Application.Dtos.Metric;
 using Analytics.Attributes;
 using Analytics.Entities.Metrics;
 using Application.Common.Interfaces;
+using Application.Common.Interfaces.Cqrs;
 using Localization.Abstractions.Interfaces;
 
 namespace Analytics.Application.Handlers.Metrics.ListMetrics;

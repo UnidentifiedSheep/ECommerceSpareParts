@@ -1,7 +1,6 @@
-﻿using Abstractions.Interfaces.Tests;
-using Bogus;
-using MediatR;
+﻿using Bogus;
 using Microsoft.EntityFrameworkCore;
+using Test.Common.Interfaces;
 
 namespace Test.Common.Abstractions;
 

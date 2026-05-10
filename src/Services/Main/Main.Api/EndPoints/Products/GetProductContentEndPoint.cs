@@ -3,7 +3,7 @@ using Main.Application.Dtos.Product;
 using Main.Application.Handlers.ProductContent.GetProductContents;
 using MediatR;
 
-namespace Main.Api.EndPoints.Articles;
+namespace Main.Api.EndPoints.Products;
 
 public record GetProductContentResponse(IReadOnlyList<ProductContentDto> Content);
 

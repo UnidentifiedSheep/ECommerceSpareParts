@@ -3,12 +3,12 @@ using Abstractions.Interfaces.Services;
 using Abstractions.Models;
 using Application.Common.Interfaces.Currency;
 using Application.Common.Interfaces.Repositories;
-using Main.Abstractions.Models.Settings;
 using Main.Application.Interfaces.Persistence;
 using Main.Application.Interfaces.Services.Currency;
 using Main.Application.Models.Currency;
 using Main.Entities.Currency;
 using Main.Entities.Exceptions.Currencies;
+using Main.Entities.Setting;
 
 namespace Main.Application.Services.Currency;
 

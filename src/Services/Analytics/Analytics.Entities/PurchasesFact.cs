@@ -24,9 +24,12 @@ public class PurchasesFact : Entity<PurchasesFact, Guid>
 
     public decimal TotalSum { get; private set; }
 
-    public virtual ICollection<PurchaseContent> PurchaseContents { get; private set; } = new List<PurchaseContent>();
+    public virtual ICollection<PurchaseContent> PurchaseContents { get; } = new List<PurchaseContent>();
 
-    public override Guid GetId() => Id;
+    public override Guid GetId()
+    {
+        return Id;
+    }
 
     public static PurchasesFact Create(
         Guid id,

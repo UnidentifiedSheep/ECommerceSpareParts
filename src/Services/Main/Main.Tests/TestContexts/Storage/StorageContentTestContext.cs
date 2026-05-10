@@ -1,13 +1,13 @@
 ﻿using Main.Entities.Storage;
 using Main.Enums;
 using Main.Persistence.Context;
-using MediatR;
 using Test.Common.Abstractions;
 using Test.Common.Extensions;
 using Test.Common.Interfaces;
 using Tests.DataBuilders.Storage;
+using Tests.TestContexts.Currency;
 
-namespace Tests.TestContexts;
+namespace Tests.TestContexts.Storage;
 
 public class StorageContentTestContext(
     DContext ctx,
@@ -34,10 +34,10 @@ public class StorageContentTestContext(
             .BuildManyAndAddToDb(DbContext, 10);
 
         var products = product.Products.ToDictionary(k => k.Id);
-        
+
         foreach (var content in StorageContents)
             products[content.ProductId].IncreaseStock(content.Count);
-        
+
         await DbContext.SaveChangesAsync(cancellationToken);
     }
 }

@@ -1,4 +1,4 @@
-﻿using Analytics.Abstractions.Interfaces.Application;
+﻿using Analytics.Application.Interfaces.Services;
 using FluentValidation;
 
 namespace Analytics.Application.Services.Metrics.Validators;

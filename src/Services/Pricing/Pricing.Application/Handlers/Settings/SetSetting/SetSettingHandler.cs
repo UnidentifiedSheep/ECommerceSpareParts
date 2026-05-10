@@ -1,6 +1,7 @@
 ﻿using System.Text.Json;
 using Abstractions.Interfaces.Services;
 using Application.Common.Interfaces;
+using Application.Common.Interfaces.Cqrs;
 using Contracts.Settings;
 using MassTransit;
 using MediatR;

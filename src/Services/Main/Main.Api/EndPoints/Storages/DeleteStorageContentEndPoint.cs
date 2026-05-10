@@ -1,6 +1,6 @@
 using Api.Common.Extensions;
 using Carter;
-using Main.Application.Handlers.StorageContents.DeleteContent;
+using Main.Application.Handlers.StorageContents.SetToZeroContent;
 using MediatR;
 
 namespace Main.Api.EndPoints.Storages;

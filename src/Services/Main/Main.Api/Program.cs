@@ -17,7 +17,7 @@ using Hangfire.PostgreSql;
 using Localization.Domain.Extensions;
 using Localization.Domain.Middlewares;
 using Mail;
-using Main.Api.EndPoints.Articles;
+using Main.Api.EndPoints.Products;
 using Main.Application;
 using Main.Application.BackgroundServices;
 using Main.Application.Configs;

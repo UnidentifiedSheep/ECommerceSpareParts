@@ -1,5 +1,6 @@
 ﻿using Abstractions.Interfaces.Validators;
 using Application.Common.Interfaces;
+using Application.Common.Interfaces.Cqrs;
 using Attributes;
 using Contracts.User;
 using Main.Application.Interfaces.Persistence;

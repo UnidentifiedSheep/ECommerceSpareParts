@@ -1,6 +1,7 @@
 ﻿using Application.Common.Interfaces;
+using Application.Common.Interfaces.Cqrs;
 using Application.Common.Interfaces.Repositories;
-using Main.Abstractions.Models;
+using Main.Application.Dtos.Storage;
 using Main.Entities.Storage;
 
 namespace Main.Application.Handlers.StorageContents.GetStorageContentCosts;

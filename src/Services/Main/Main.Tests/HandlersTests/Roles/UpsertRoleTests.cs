@@ -1,6 +1,5 @@
 ﻿using FluentAssertions;
 using Main.Application.Handlers.Auth.UpsertRole;
-using Main.Entities.Exceptions.Auth;
 using Microsoft.EntityFrameworkCore;
 using Test.Common.Extensions;
 using Test.Common.TestContainers.Combined;
@@ -43,13 +42,13 @@ public class UpsertRoleTests(CombinedContainerFixture fixture) : IntegrationTest
     {
         var role = await new RoleBuilder(Faker).BuildAndAddToDb(Context);
         var command = new UpsertRoleCommand(role.Name, "New description");
-        
+
         var act = () => Mediator.Send(command);
         await act.Should().NotThrowAsync();
-        
+
         var roleInDb = await Context.Roles.AsNoTracking()
             .FirstOrDefaultAsync(x => x.Name == role.Name);
-        
+
         roleInDb.Should().NotBeNull();
         roleInDb.Description.Should().Be(command.Description);
         roleInDb.Name.Value.Should().Be(role.Name.Value);

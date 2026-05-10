@@ -2,7 +2,7 @@
 using FluentAssertions;
 using Main.Entities.Cart;
 
-namespace Main.Tests.Domain;
+namespace Tests.Domain;
 
 public class CartTests
 {

@@ -4,7 +4,7 @@ using Enums;
 using Main.Application.Handlers.ProductWeight.DeleteProductWeight;
 using MediatR;
 
-namespace Main.Api.EndPoints.ArticleWeight;
+namespace Main.Api.EndPoints.ProductWeight;
 
 public class DeleteProductWeightEndPoint : ICarterModule
 {

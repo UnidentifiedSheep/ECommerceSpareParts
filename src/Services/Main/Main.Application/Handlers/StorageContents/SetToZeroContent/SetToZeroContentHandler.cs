@@ -1,9 +1,10 @@
 using System.Data;
 using Abstractions.Interfaces.Services;
 using Application.Common.Interfaces;
+using Application.Common.Interfaces.Cqrs;
 using Application.Common.Interfaces.Repositories;
 using Attributes;
-using Contracts.Articles;
+using Contracts.Products;
 using Domain.Extensions;
 using Main.Application.Extensions;
 using Main.Application.Interfaces.Persistence;
@@ -13,7 +14,7 @@ using Main.Entities.Storage;
 using Main.Enums;
 using MediatR;
 
-namespace Main.Application.Handlers.StorageContents.DeleteContent;
+namespace Main.Application.Handlers.StorageContents.SetToZeroContent;
 
 [AutoSave]
 [Transactional(IsolationLevel.ReadCommitted, 20, 2)]

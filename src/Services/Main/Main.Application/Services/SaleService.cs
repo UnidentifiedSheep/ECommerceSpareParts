@@ -1,6 +1,6 @@
-using Main.Abstractions.Interfaces.Services;
-using Main.Application.Dtos.Amw.Sales;
-using Main.Application.Models.SaleService;
+using Main.Application.Dtos.Sale;
+using Main.Application.Interfaces.Services;
+using Main.Application.Models.Sale;
 using Main.Entities.Sale;
 
 namespace Main.Application.Services;

@@ -1,13 +1,14 @@
 ﻿using Abstractions.Interfaces.Services;
-using Analytics.Abstractions.Dtos.CalculationJob;
-using Analytics.Abstractions.Exceptions.MetricCalculationJobs;
+using Analytics.Application.Dtos.CalculationJob;
 using Analytics.Application.Handlers.CalculationJob.UpdateCalculationJob;
 using Analytics.Application.Handlers.Metrics.CalculateMetric;
 using Analytics.Application.Handlers.Metrics.CreateMetric;
 using Analytics.Entities;
+using Analytics.Entities.Exceptions.MetricCalculationJobs;
 using Analytics.Entities.Metrics;
 using Analytics.Enums;
 using Application.Common.Interfaces;
+using Application.Common.Interfaces.Cqrs;
 using Application.Common.Interfaces.Repositories;
 using MediatR;
 using Microsoft.Extensions.Logging;

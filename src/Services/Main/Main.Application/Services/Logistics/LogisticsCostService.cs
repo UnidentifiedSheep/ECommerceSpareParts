@@ -1,5 +1,5 @@
-﻿using Main.Abstractions.Interfaces.Logistics;
-using Main.Abstractions.Models.Logistics;
+﻿using Main.Application.Interfaces.Logistics;
+using Main.Application.Models.Logistics;
 using Main.Enums;
 
 namespace Main.Application.Services.Logistics;

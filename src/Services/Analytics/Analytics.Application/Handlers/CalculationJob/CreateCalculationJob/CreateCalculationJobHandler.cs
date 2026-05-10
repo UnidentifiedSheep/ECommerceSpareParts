@@ -1,9 +1,10 @@
 using Abstractions.Interfaces.Services;
-using Analytics.Abstractions.Dtos.CalculationJob;
+using Analytics.Application.Dtos.CalculationJob;
 using Analytics.Application.Handlers.Projections;
 using Analytics.Entities;
 using Application.Common.Extensions;
 using Application.Common.Interfaces;
+using Application.Common.Interfaces.Cqrs;
 using Attributes;
 using Contracts.Analytics;
 

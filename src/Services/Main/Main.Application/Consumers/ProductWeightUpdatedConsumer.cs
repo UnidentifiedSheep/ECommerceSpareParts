@@ -1,5 +1,6 @@
 ﻿using Application.Common.Interfaces;
-using Contracts.Articles;
+using Application.Common.Interfaces.Cqrs;
+using Contracts.Products;
 using Main.Application.Handlers.ProductWeight.GetProductWeight;
 using MassTransit;
 using ZiggyCreatures.Caching.Fusion;

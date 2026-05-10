@@ -1,8 +1,8 @@
-using Main.Application.Dtos.Amw.Sales;
-using Main.Application.Models.SaleService;
+using Main.Application.Dtos.Sale;
+using Main.Application.Models.Sale;
 using Main.Entities.Sale;
 
-namespace Main.Abstractions.Interfaces.Services;
+namespace Main.Application.Interfaces.Services;
 
 public interface ISaleService
 {

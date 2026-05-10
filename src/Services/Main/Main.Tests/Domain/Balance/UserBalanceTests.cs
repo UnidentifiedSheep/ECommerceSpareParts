@@ -1,7 +1,7 @@
 ﻿using FluentAssertions;
-using Main.Entities.User;
+using Main.Entities.Balance;
 
-namespace Main.Tests.Domain.Balance;
+namespace Tests.Domain.Balance;
 
 public class UserBalanceTests
 {

@@ -1,4 +1,5 @@
 ﻿using Application.Common.Interfaces;
+using Application.Common.Interfaces.Cqrs;
 using Contracts.Currency;
 using Main.Application.Handlers.Currencies.GetCurrencies;
 using MassTransit;

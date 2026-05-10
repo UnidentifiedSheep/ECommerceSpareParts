@@ -2,10 +2,10 @@ using Main.Entities.Balance;
 using Main.Entities.Currency;
 using Main.Entities.User;
 using Main.Persistence.Context;
-using MediatR;
 using Test.Common.Abstractions;
 using Test.Common.Interfaces;
 using Tests.DataBuilders.Balance;
+using Tests.TestContexts.Currency;
 
 namespace Tests.TestContexts.Balance;
 

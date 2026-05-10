@@ -1,11 +1,11 @@
 ﻿using Api.Common.Models.Requests;
 using Carter;
-using Main.Application.Dtos.Anonymous.Articles;
+using Main.Application.Dtos.Product;
 using Main.Application.Handlers.ProductCharacteristics.GetCharacteristics;
 using Mapster;
 using MediatR;
 
-namespace Main.Api.EndPoints.ArticleCharacteristics;
+namespace Main.Api.EndPoints.ProductCharacteristics;
 
 public record GetProductCharacteristicsResponse(IReadOnlyList<ProductCharacteristicDto> Characteristics);
 

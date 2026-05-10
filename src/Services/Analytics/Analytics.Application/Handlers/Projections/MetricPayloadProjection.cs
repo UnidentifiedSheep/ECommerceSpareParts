@@ -1,7 +1,6 @@
 ﻿using System.Linq.Expressions;
-
 using ContractMetricPayload = Contracts.Models.Metric.MetricPayloadDto;
-using MetricPayloadDto = Analytics.Abstractions.Dtos.CalculationJob.MetricPayloadDto;
+using MetricPayloadDto = Analytics.Application.Dtos.CalculationJob.MetricPayloadDto;
 
 namespace Analytics.Application.Handlers.Projections;
 
@@ -13,15 +12,15 @@ public static class MetricPayloadProjection
             CurrencyId = x.CurrencyId,
             RangeStart = x.RangeStart,
             RangeEnd = x.RangeEnd,
-            ArticleId = x.ArticleId,
+            ArticleId = x.ArticleId
         };
-    
+
     public static readonly Expression<Func<ContractMetricPayload, MetricPayloadDto>> FromContract =
         x => new MetricPayloadDto
         {
             CurrencyId = x.CurrencyId,
             RangeStart = x.RangeStart,
             RangeEnd = x.RangeEnd,
-            ArticleId = x.ArticleId,
+            ArticleId = x.ArticleId
         };
 }

@@ -1,7 +1,7 @@
 ﻿using System.Text.Json.Serialization;
 using Enums;
 
-namespace Main.Application.Dtos.Amw.Logistics;
+namespace Main.Application.Dtos.Logistics;
 
 public record DeliveryCostItemDto
 {

@@ -1,4 +1,4 @@
-﻿namespace Analytics.Abstractions.Interfaces.Application;
+﻿namespace Analytics.Application.Interfaces.Services;
 
 public interface IMetricCalculatorRegistry
 {

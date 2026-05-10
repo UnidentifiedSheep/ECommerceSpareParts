@@ -1,7 +1,7 @@
 ﻿using System.Text.Json.Serialization;
-using Main.Application.Dtos.Amw.Coefficients;
+using Main.Application.Dtos.Coefficient;
 
-namespace Main.Application.Dtos.Amw.ArticleCoefficients;
+namespace Main.Application.Dtos.Product;
 
 public record ProductCoefficientDto
 {

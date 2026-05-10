@@ -1,7 +1,7 @@
 ﻿using Domain.CommonEntities;
 using Domain.Interfaces;
 
-namespace Main.Abstractions.Models.Settings;
+namespace Main.Entities.Setting;
 
 public class StorageContentSetting : Setting<StorageContentSettingData>, ISetting<StorageContentSetting>
 {

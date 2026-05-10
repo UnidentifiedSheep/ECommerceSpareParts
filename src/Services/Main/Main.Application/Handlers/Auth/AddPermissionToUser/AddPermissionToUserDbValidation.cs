@@ -3,7 +3,7 @@ using BulkValidation.Core.Interfaces;
 using Extensions;
 using Main.Entities;
 
-namespace Main.Application.Handlers.Users.AddPermissionToUser;
+namespace Main.Application.Handlers.Auth.AddPermissionToUser;
 
 public class AddPermissionToUserDbValidation : AbstractDbValidation<AddPermissionToUserCommand>
 {

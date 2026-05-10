@@ -1,7 +1,7 @@
 using System.Text.Json.Serialization;
 using Abstractions.Models;
 
-namespace Main.Application.Dtos.Amw.ArticleCharacteristics;
+namespace Main.Application.Dtos.Product;
 
 public record PatchCharacteristicsDto
 {

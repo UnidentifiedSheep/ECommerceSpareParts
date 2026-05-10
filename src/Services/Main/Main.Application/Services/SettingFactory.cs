@@ -1,5 +1,5 @@
 ﻿using Application.Common.Services.Settings;
-using Main.Abstractions.Models.Settings;
+using Main.Entities.Setting;
 
 namespace Main.Application.Services;
 

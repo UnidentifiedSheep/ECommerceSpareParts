@@ -13,5 +13,9 @@ public class SaleContentDetail : Entity<SaleContentDetail, int>
     public int Count { get; set; }
 
     public DateTime PurchaseDate { get; set; }
-    public override int GetId() => Id;
+
+    public override int GetId()
+    {
+        return Id;
+    }
 }

@@ -1,7 +1,7 @@
 ﻿using Abstractions.Interfaces.Exceptions;
 using Exceptions.Base;
 
-namespace Analytics.Abstractions.Exceptions.Metrics;
+namespace Analytics.Entities.Exceptions.Metrics;
 
 public class MetricNotFoundException(Guid id)
     : NotFoundException(null, new { Id = id }), ILocalizableException

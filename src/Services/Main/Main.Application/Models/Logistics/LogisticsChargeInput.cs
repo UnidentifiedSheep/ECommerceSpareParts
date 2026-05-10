@@ -1,4 +1,4 @@
-﻿namespace Main.Abstractions.Models.Logistics;
+﻿namespace Main.Application.Models.Logistics;
 
 /// <param name="AreaM3">Area of ALL ITEMS (area for 1 item * quantity)</param>
 /// <param name="WeightKg">Weight of ALL ITEMS (weight for 1 item * quantity)</param>

@@ -21,7 +21,7 @@ public class GetTransactionsTests : IntegrationTest
     {
         var senderId = TestContext.Users[0].Id;
 
-        var result = await Mediator.Send(GetQuery(senderId: senderId));
+        var result = await Mediator.Send(GetQuery(senderId));
 
         result.Transactions.Should().ContainSingle();
         result.Transactions[0].SenderId.Should().Be(senderId);
@@ -44,7 +44,7 @@ public class GetTransactionsTests : IntegrationTest
         var currencyId = TestContext.Currencies[0].Id;
         var senderId = TestContext.Users[0].Id;
 
-        var result = await Mediator.Send(GetQuery(senderId: senderId, currencyId: currencyId));
+        var result = await Mediator.Send(GetQuery(senderId, currencyId: currencyId));
 
         result.Transactions.Should().OnlyContain(x => x.CurrencyId == currencyId);
     }
@@ -65,14 +65,14 @@ public class GetTransactionsTests : IntegrationTest
         var userId = TestContext.Users[0].Id;
 
         await Assert.ThrowsAsync<ValidationException>(() =>
-            Mediator.Send(GetQuery(senderId: userId, receiverId: userId)));
+            Mediator.Send(GetQuery(userId, userId)));
     }
 
     [Fact]
     public async Task GetTransactions_WithoutSenderAndReceiver_ThrowsValidationException()
     {
         await Assert.ThrowsAsync<ValidationException>(() =>
-            Mediator.Send(GetQuery(senderId: null, receiverId: null)));
+            Mediator.Send(GetQuery(null, null)));
     }
 
     [Fact]

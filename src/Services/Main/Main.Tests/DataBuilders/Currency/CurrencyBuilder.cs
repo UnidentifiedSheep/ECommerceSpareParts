@@ -1,10 +1,9 @@
 ﻿using Bogus;
-using Main.Entities.Currency;
 using Test.Common.Abstractions;
 
-namespace Tests.DataBuilders;
+namespace Tests.DataBuilders.Currency;
 
-public class CurrencyBuilder(Faker faker) : BuilderBase<Currency>(faker)
+public class CurrencyBuilder(Faker faker) : BuilderBase<Main.Entities.Currency.Currency>(faker)
 {
     public string? Name { get; private set; }
     public string? ShortName { get; private set; }
@@ -35,10 +34,10 @@ public class CurrencyBuilder(Faker faker) : BuilderBase<Currency>(faker)
         return this;
     }
 
-    public override Currency Build()
+    public override Main.Entities.Currency.Currency Build()
     {
         var rndCurrency = Faker.Finance.Currency(true);
-        return Currency.Create(
+        return Main.Entities.Currency.Currency.Create(
             Name ?? Faker.Lorem.Letter(24),
             ShortName ?? Faker.Lorem.Letter(5),
             Sign ?? Faker.Lorem.Letter(3),

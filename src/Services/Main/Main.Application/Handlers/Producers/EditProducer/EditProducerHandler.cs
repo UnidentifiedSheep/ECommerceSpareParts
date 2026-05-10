@@ -1,4 +1,5 @@
 using Application.Common.Interfaces;
+using Application.Common.Interfaces.Cqrs;
 using Attributes;
 using Main.Application.Dtos.Producer;
 using Main.Application.Interfaces.Persistence;

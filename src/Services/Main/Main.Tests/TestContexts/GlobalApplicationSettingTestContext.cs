@@ -1,8 +1,7 @@
 ﻿using Application.Common.Interfaces.Settings;
-using Main.Abstractions.Models.Settings;
+using Main.Entities.Setting;
 using Main.Entities.User;
 using Main.Persistence.Context;
-using MediatR;
 using Test.Common.Abstractions;
 using Test.Common.Extensions;
 using Tests.DataBuilders.User;

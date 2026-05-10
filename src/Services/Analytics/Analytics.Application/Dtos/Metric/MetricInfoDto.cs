@@ -1,4 +1,4 @@
-﻿namespace Analytics.Abstractions.Dtos.Metric;
+﻿namespace Analytics.Application.Dtos.Metric;
 
 public record MetricInfoDto
 {

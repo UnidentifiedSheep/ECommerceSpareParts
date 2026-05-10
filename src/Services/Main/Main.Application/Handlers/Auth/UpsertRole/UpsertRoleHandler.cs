@@ -1,5 +1,6 @@
 using Abstractions.Interfaces.Services;
 using Application.Common.Interfaces;
+using Application.Common.Interfaces.Cqrs;
 using Application.Common.Interfaces.Repositories;
 using Attributes;
 using Main.Entities.Auth;
@@ -25,7 +26,7 @@ public class UpsertRoleHandler(
             role = Role.Create(request.Name);
             await unitOfWork.AddAsync(role, cancellationToken);
         }
-        
+
         role.SetDescription(request.Description);
         return Unit.Value;
     }

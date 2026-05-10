@@ -1,7 +1,7 @@
 using FluentValidation;
 using Localization.Domain.Extensions;
 
-namespace Main.Application.Handlers.Balance.DeleteTransaction;
+namespace Main.Application.Handlers.Balance.ReverseTransaction;
 
 public class ReverseTransactionValidation : AbstractValidator<ReverseTransactionCommand>
 {

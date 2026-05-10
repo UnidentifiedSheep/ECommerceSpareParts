@@ -1,6 +1,6 @@
 ﻿using System.Text.Json.Serialization;
 
-namespace Main.Application.Dtos.Amw.Logistics;
+namespace Main.Application.Dtos.Logistics;
 
 public record LogisticsItemDto
 {

@@ -1,5 +1,5 @@
 using Abstractions.Interfaces;
-using Analytics.Abstractions.Interfaces.Application;
+using Analytics.Application.Interfaces.Services;
 using Analytics.Application.Services.Metrics.Calculators;
 using Analytics.Application.Services.Metrics.Converters;
 using Analytics.Application.Services.Metrics.Validators;

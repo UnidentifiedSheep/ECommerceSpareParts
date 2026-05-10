@@ -5,7 +5,7 @@ using Main.Application.Handlers.Products.MakeLinkageBetweenArticles;
 using Mapster;
 using MediatR;
 
-namespace Main.Api.EndPoints.Articles;
+namespace Main.Api.EndPoints.Products;
 
 public record MakeLinkageBetweenProductsRequest(List<NewProductLinkageDto> Linkages);
 

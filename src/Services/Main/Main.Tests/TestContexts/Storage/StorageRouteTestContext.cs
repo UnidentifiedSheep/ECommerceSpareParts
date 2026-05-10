@@ -1,12 +1,12 @@
 ﻿using Main.Entities.Storage;
 using Main.Persistence.Context;
-using MediatR;
 using Test.Common.Abstractions;
 using Test.Common.Extensions;
 using Test.Common.Interfaces;
 using Tests.DataBuilders.Storage;
+using Tests.TestContexts.Currency;
 
-namespace Tests.TestContexts;
+namespace Tests.TestContexts.Storage;
 
 public class StorageRouteTestContext(
     DContext ctx,

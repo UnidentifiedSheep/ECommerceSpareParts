@@ -1,7 +1,6 @@
 ﻿using Abstractions.Interfaces;
 using Application.Common.Interfaces.Settings;
 using Main.Persistence.Context;
-using MediatR;
 using Test.Common.Stubs;
 
 namespace Tests.TestContexts;

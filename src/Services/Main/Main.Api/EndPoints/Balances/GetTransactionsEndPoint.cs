@@ -1,6 +1,6 @@
 using Api.Common.Extensions;
 using Carter;
-using Main.Application.Dtos.Amw.Balances;
+using Main.Application.Dtos.Balances;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
 

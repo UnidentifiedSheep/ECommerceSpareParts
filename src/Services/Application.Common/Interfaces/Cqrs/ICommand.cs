@@ -1,6 +1,6 @@
 ﻿using MediatR;
 
-namespace Application.Common.Interfaces;
+namespace Application.Common.Interfaces.Cqrs;
 
 public interface ICommand : ICommand<Unit>;
 

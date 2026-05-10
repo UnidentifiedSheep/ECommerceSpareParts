@@ -1,4 +1,4 @@
-﻿namespace Abstractions.Interfaces.Tests;
+﻿namespace Test.Common.Interfaces;
 
 public interface ITestContext
 {

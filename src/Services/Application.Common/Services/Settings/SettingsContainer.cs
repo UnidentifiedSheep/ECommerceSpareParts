@@ -2,7 +2,7 @@
 using Application.Common.Interfaces.Settings;
 using Domain.CommonEntities;
 
-namespace Application.Common.Abstractions.Settings;
+namespace Application.Common.Services.Settings;
 
 public class SettingsContainer : ISettingsContainer
 {

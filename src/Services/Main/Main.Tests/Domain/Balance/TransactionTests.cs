@@ -1,10 +1,9 @@
 ﻿using Exceptions;
 using FluentAssertions;
 using Main.Entities.Balance;
-using Main.Entities.User;
 using Main.Enums;
 
-namespace Main.Tests.Domain.Balance;
+namespace Tests.Domain.Balance;
 
 public class TransactionTests
 {

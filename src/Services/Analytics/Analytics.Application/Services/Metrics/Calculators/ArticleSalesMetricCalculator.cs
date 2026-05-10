@@ -2,7 +2,6 @@
 using Analytics.Entities;
 using Analytics.Entities.Metrics;
 using Analytics.Entities.Metrics.JsonDataModels;
-using Analytics.Enums;
 using Application.Common.Interfaces.Currency;
 using Application.Common.Interfaces.Repositories;
 
@@ -23,7 +22,7 @@ public class ArticleSalesMetricCalculator(
         double mean = 0;
         double m2 = 0;
         long count = 0;
-        
+
 
         var (start, end) = await WithTimer(async () =>
         {
@@ -36,8 +35,8 @@ public class ArticleSalesMetricCalculator(
                     continue;
 
                 var priceDecimal = await currencyConverter.ConvertToBaseAsync(
-                    item.Price, 
-                    fact.CurrencyId, 
+                    item.Price,
+                    fact.CurrencyId,
                     cancellationToken);
                 var quantity = item.Count;
 

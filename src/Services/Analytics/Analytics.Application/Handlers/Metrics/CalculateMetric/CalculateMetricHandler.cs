@@ -1,7 +1,8 @@
-﻿using Analytics.Abstractions.Exceptions.Metrics;
-using Analytics.Abstractions.Interfaces.Application;
+﻿using Analytics.Application.Interfaces.Services;
+using Analytics.Entities.Exceptions.Metrics;
 using Analytics.Entities.Metrics;
 using Application.Common.Interfaces;
+using Application.Common.Interfaces.Cqrs;
 using Application.Common.Interfaces.Repositories;
 
 namespace Analytics.Application.Handlers.Metrics.CalculateMetric;

@@ -5,5 +5,4 @@ namespace Analytics.Application.Interfaces.Repositories;
 
 public interface ISalesFactRepository : IRepository<SalesFact, Guid>
 {
-    
 }

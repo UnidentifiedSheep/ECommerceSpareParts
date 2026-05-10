@@ -1,13 +1,14 @@
 using System.Data;
 using Abstractions.Interfaces.Services;
+using Abstractions.Models;
 using Application.Common.Extensions;
 using Application.Common.Interfaces;
+using Application.Common.Interfaces.Cqrs;
 using Application.Common.Interfaces.Currency;
 using Attributes;
-using Contracts.Articles;
+using Contracts.Products;
 using Contracts.StorageContent;
 using Domain.Extensions;
-using Main.Abstractions.Models;
 using Main.Application.Dtos.Storage;
 using Main.Application.Extensions;
 using Main.Application.Interfaces.Persistence;

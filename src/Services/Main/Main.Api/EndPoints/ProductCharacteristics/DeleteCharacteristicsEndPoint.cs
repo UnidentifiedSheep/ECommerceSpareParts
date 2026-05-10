@@ -4,7 +4,7 @@ using Enums;
 using Main.Application.Handlers.ProductCharacteristics.DeleteCharacteristics;
 using MediatR;
 
-namespace Main.Api.EndPoints.ArticleCharacteristics;
+namespace Main.Api.EndPoints.ProductCharacteristics;
 
 public class DeleteCharacteristicsEndPoint : ICarterModule
 {

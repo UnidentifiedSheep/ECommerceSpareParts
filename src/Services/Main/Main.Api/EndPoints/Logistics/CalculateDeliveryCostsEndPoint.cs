@@ -1,7 +1,7 @@
 ﻿using Api.Common.Extensions;
 using Carter;
 using Enums;
-using Main.Application.Dtos.Amw.Logistics;
+using Main.Application.Dtos.Logistics;
 using Main.Application.Dtos.Storage;
 using Main.Application.Handlers.Logistics.CalculateDeliveryCost;
 using Main.Enums;

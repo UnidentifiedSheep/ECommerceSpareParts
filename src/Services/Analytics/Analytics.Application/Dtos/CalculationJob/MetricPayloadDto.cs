@@ -1,4 +1,4 @@
-﻿namespace Analytics.Abstractions.Dtos.CalculationJob;
+﻿namespace Analytics.Application.Dtos.CalculationJob;
 
 public record MetricPayloadDto
 {

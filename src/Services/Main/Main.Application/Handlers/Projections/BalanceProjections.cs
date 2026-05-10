@@ -1,5 +1,5 @@
 ﻿using System.Linq.Expressions;
-using Main.Application.Dtos.Amw.Balances;
+using Main.Application.Dtos.Balances;
 using Main.Entities.Balance;
 
 namespace Main.Application.Handlers.Projections;

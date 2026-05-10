@@ -1,10 +1,10 @@
 ﻿using Abstractions.Interfaces;
 using Abstractions.Interfaces.Services;
 using Application.Common.Interfaces;
+using Application.Common.Interfaces.Cqrs;
 using Application.Common.Interfaces.Repositories;
 using Attributes;
 using Exceptions.Base;
-using Main.Abstractions.Interfaces.Services;
 using Main.Application.Interfaces.Services;
 using Main.Entities.Auth;
 using Main.Entities.Exceptions.Auth;

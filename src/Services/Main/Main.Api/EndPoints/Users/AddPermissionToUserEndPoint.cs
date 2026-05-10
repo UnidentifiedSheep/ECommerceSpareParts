@@ -1,6 +1,6 @@
 ﻿using Api.Common.Extensions;
 using Carter;
-using Main.Application.Handlers.Users.AddPermissionToUser;
+using Main.Application.Handlers.Auth.AddPermissionToUser;
 using MediatR;
 
 namespace Main.Api.EndPoints.Users;

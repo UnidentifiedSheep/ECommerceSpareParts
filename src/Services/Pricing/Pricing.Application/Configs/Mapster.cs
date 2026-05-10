@@ -11,7 +11,7 @@ public static class Mapster
 {
     public static void Configure()
     {
-        global::Mapster.TypeAdapterConfig<Currency, Abstractions.Models.Currency>.NewConfig()
+        TypeAdapterConfig<Currency, Abstractions.Models.Currency>.NewConfig()
             .Map(dest => dest.Id, src => src.Id).Map<decimal,>(dest => dest.ToUsdRate, src => src.ToUsdRate);
 
         //Markup

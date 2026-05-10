@@ -1,14 +1,16 @@
 ﻿using Application.Common;
-using Application.Common.Abstractions.Settings;
 using Application.Common.Interfaces.Currency;
 using Application.Common.Interfaces.Settings;
 using Application.Common.Services;
+using Application.Common.Services.Currency;
+using Application.Common.Services.Settings;
 using Microsoft.Extensions.DependencyInjection;
 using Pricing.Abstractions.Interfaces.Services;
 using Pricing.Abstractions.Interfaces.Services.Pricing;
 using Pricing.Application.Services;
 using Pricing.Application.Services.ArticlePricing;
 using Pricing.Application.Services.ArticlePricing.BasePriceStrategies;
+using SettingsService = Pricing.Application.Services.SettingsService;
 
 namespace Pricing.Application;
 

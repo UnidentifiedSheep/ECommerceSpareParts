@@ -3,7 +3,7 @@ using Carter;
 using Main.Application.Handlers.ProductContent.AddProductContent;
 using MediatR;
 
-namespace Main.Api.EndPoints.Articles;
+namespace Main.Api.EndPoints.Products;
 
 public record AddProductContentRequest(Dictionary<int, int> Content);
 

@@ -1,5 +1,4 @@
-﻿using BulkValidation.Core.Attributes;
-using Domain;
+﻿using Domain;
 using Domain.Extensions;
 using Main.Entities.Auth.ValueObjects;
 

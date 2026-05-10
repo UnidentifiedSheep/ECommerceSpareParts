@@ -1,11 +1,11 @@
-﻿using Application.Common.Interfaces;
+﻿using Application.Common.Interfaces.Cqrs;
 using Application.Common.Interfaces.Repositories;
 using LinqKit;
-using Main.Application.Dtos.Amw.ArticleCoefficients;
+using Main.Application.Dtos.Product;
 using Main.Application.Handlers.Projections;
 using Microsoft.EntityFrameworkCore;
 
-namespace Main.Application.Handlers.ProductCoefficient.GetArticleCoefficients;
+namespace Main.Application.Handlers.ProductCoefficient.GetProductCoefficients;
 
 public record GetProductCoefficientsQuery(IEnumerable<int> ProductIds) : IQuery<GetProductCoefficientsResult>;
 

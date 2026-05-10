@@ -1,6 +1,5 @@
 ﻿using Main.Entities.User;
 using Main.Persistence.Context;
-using MediatR;
 using Test.Common.Abstractions;
 using Test.Common.Extensions;
 using Tests.DataBuilders.User;

@@ -7,7 +7,7 @@ using Main.Application.Dtos.Product;
 using Main.Application.Handlers.Products.GetProductCrosses;
 using MediatR;
 
-namespace Main.Api.EndPoints.Articles;
+namespace Main.Api.EndPoints.Products;
 
 public record GetProductCrossesResponse(IReadOnlyList<ProductDto> Crosses, ProductDto RequestedArticle);
 

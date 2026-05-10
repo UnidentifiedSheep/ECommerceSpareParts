@@ -1,7 +1,7 @@
-﻿using Main.Abstractions.Models.Logistics;
+﻿using Main.Application.Models.Logistics;
 using Main.Enums;
 
-namespace Main.Abstractions.Interfaces.Logistics;
+namespace Main.Application.Interfaces.Logistics;
 
 public interface ILogisticsCostService
 {

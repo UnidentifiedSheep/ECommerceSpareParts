@@ -1,6 +1,6 @@
 ﻿using Analytics.Entities.Metrics;
 
-namespace Analytics.Abstractions.Interfaces.Application;
+namespace Analytics.Application.Interfaces.Services;
 
 public interface IMetricCalculatorFactory
 {

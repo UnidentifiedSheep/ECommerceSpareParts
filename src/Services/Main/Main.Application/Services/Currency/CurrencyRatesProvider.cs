@@ -1,8 +1,8 @@
 ﻿using Application.Common.Interfaces.Settings;
 using Application.Common.Services.Currency;
-using Main.Abstractions.Models.Settings;
 using Main.Application.Interfaces.Persistence;
 using Main.Entities.Exceptions.Currencies;
+using Main.Entities.Setting;
 using ZiggyCreatures.Caching.Fusion;
 
 namespace Main.Application.Services.Currency;
@@ -12,7 +12,9 @@ public class CurrencyRatesProvider(
     ICurrencyRateRepository rateRepository,
     ISettingsService settingsService) : CurrencyRatesProviderBase(cache)
 {
-    protected override async Task<decimal> GetExternalData(int currencyId, CancellationToken cancellationToken = default)
+    protected override async Task<decimal> GetExternalData(
+        int currencyId,
+        CancellationToken cancellationToken = default)
     {
         var baseCurrencyId = (await settingsService.GetOrDefault<CurrencySetting>(cancellationToken))
             .Data

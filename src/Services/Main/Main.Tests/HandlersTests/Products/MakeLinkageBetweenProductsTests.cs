@@ -172,7 +172,7 @@ public class MakeLinkageBetweenProductsTests : IntegrationTest
         var n = ProductCross.Create(p1, p2);
         await Context.ProductCrosses.AddAsync(n);
         await Context.SaveChangesAsync();
-        
+
         Context.Entry(n).State = EntityState.Detached;
 
         var command = new MakeLinkageBetweenProductsCommand([

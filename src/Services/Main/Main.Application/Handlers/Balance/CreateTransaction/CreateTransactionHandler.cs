@@ -1,6 +1,7 @@
 using System.Data;
 using Abstractions.Interfaces.Services;
 using Application.Common.Interfaces;
+using Application.Common.Interfaces.Cqrs;
 using Attributes;
 using Main.Application.Interfaces.Services;
 using Main.Entities.Balance;

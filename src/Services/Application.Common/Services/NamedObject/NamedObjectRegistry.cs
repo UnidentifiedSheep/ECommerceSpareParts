@@ -1,5 +1,4 @@
-﻿using Application.Common.Interfaces;
-using Application.Common.Interfaces.NamedObject;
+﻿using Application.Common.Interfaces.NamedObject;
 
 namespace Application.Common.Services.NamedObject;
 

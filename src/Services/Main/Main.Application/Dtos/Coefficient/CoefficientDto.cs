@@ -1,7 +1,7 @@
 ﻿using System.Text.Json.Serialization;
 using Enums;
 
-namespace Main.Application.Dtos.Amw.Coefficients;
+namespace Main.Application.Dtos.Coefficient;
 
 public record CoefficientDto
 {

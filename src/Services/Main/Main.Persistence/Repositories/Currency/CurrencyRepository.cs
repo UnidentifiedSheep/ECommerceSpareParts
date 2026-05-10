@@ -12,8 +12,8 @@ public class CurrencyRepository(
 ) : RepositoryBase<DContext, Entities.Currency.Currency, int>(context), ICurrencyRepository
 {
     public override Task<Dictionary<int, Entities.Currency.Currency>> FindByIdsAsync(
-        IEnumerable<int> ids, 
-        Criteria<Entities.Currency.Currency>? criteria = null, 
+        IEnumerable<int> ids,
+        Criteria<Entities.Currency.Currency>? criteria = null,
         CancellationToken ct = default)
     {
         return Context.Currencies

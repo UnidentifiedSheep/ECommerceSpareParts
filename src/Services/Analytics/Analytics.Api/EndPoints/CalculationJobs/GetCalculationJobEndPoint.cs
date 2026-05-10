@@ -1,4 +1,4 @@
-﻿using Analytics.Abstractions.Dtos.CalculationJob;
+﻿using Analytics.Application.Dtos.CalculationJob;
 using Analytics.Application.Handlers.CalculationJob.GetCalculationJob;
 using Carter;
 using MediatR;

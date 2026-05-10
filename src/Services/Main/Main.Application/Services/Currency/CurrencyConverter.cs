@@ -1,5 +1,6 @@
 ﻿using Application.Common.Interfaces.Currency;
 using Application.Common.Services;
+using Application.Common.Services.Currency;
 
 namespace Main.Application.Services.Currency;
 

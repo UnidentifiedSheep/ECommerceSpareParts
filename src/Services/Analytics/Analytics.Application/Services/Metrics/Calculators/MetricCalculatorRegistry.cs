@@ -1,5 +1,5 @@
 ﻿using System.Reflection;
-using Analytics.Abstractions.Interfaces.Application;
+using Analytics.Application.Interfaces.Services;
 using Analytics.Attributes;
 using Analytics.Entities.Metrics;
 

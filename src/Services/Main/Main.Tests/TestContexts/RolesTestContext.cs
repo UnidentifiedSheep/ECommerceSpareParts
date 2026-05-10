@@ -1,6 +1,5 @@
 ﻿using Main.Entities.Auth;
 using Main.Persistence.Context;
-using MediatR;
 using Test.Common.Abstractions;
 using Test.Common.Extensions;
 using Test.Common.Interfaces;

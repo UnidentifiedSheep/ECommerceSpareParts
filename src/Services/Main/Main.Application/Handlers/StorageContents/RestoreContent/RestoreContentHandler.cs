@@ -1,8 +1,9 @@
 using System.Data;
 using Abstractions.Interfaces.Services;
 using Application.Common.Interfaces;
+using Application.Common.Interfaces.Cqrs;
 using Attributes;
-using Contracts.Articles;
+using Contracts.Products;
 using Contracts.StorageContent;
 using Main.Application.Extensions;
 using Main.Application.Interfaces.Persistence;

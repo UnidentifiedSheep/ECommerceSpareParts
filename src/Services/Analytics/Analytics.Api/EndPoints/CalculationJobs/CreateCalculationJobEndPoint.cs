@@ -1,5 +1,5 @@
 ﻿using Abstractions.Interfaces;
-using Analytics.Abstractions.Dtos.CalculationJob;
+using Analytics.Application.Dtos.CalculationJob;
 using Analytics.Application.Handlers.CalculationJob.CreateCalculationJob;
 using Carter;
 using MediatR;

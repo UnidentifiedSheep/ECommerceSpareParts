@@ -1,6 +1,5 @@
 ﻿using System.Linq.Expressions;
 using LinqKit;
-using Main.Application.Dtos.Amw.ArticleCoefficients;
 using Main.Application.Dtos.Product;
 using Main.Entities.Product;
 

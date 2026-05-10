@@ -10,5 +10,9 @@ public class SalesFact : AuditableEntity<SalesFact, Guid>
     public decimal TotalSum { get; set; }
 
     public virtual ICollection<SaleContent> SaleContents { get; set; } = new List<SaleContent>();
-    public override Guid GetId() => Id;
+
+    public override Guid GetId()
+    {
+        return Id;
+    }
 }

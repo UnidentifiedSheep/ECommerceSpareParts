@@ -1,7 +1,7 @@
 ﻿using Enums;
 using Main.Enums;
 
-namespace Main.Abstractions.Models.Logistics;
+namespace Main.Application.Models.Logistics;
 
 public class LogisticsCalcResult
 {

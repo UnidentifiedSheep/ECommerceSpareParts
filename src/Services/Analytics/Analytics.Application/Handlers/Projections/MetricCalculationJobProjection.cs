@@ -1,5 +1,5 @@
 ﻿using System.Linq.Expressions;
-using Analytics.Abstractions.Dtos.CalculationJob;
+using Analytics.Application.Dtos.CalculationJob;
 using Analytics.Entities;
 
 namespace Analytics.Application.Handlers.Projections;

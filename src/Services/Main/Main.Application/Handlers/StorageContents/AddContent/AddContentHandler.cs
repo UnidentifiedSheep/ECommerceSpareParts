@@ -2,11 +2,11 @@ using System.Data;
 using Abstractions.Interfaces.Services;
 using Application.Common.Extensions;
 using Application.Common.Interfaces;
+using Application.Common.Interfaces.Cqrs;
 using Application.Common.Interfaces.Currency;
 using Application.Common.Interfaces.Settings;
 using Attributes;
 using Contracts.StorageContent;
-using Main.Abstractions.Models.Settings;
 using Main.Application.Dtos.Storage;
 using Main.Application.Extensions;
 using Main.Application.Handlers.Projections;
@@ -14,6 +14,7 @@ using Main.Application.Interfaces.Persistence;
 using Main.Entities.Event;
 using Main.Entities.Exceptions.Currencies;
 using Main.Entities.Exceptions.Products;
+using Main.Entities.Setting;
 using Main.Entities.Storage;
 using Main.Enums;
 using Event = Main.Entities.Event.Event;
@@ -54,15 +55,15 @@ public class AddContentHandler(
 
         var products = await productRepository
             .EnsureExistsForUpdateAsync(
-                ids: productIds,
-                errorFactory: notFound => new ProductNotFoundException(notFound),
-                ct: cancellationToken);
+                productIds,
+                notFound => new ProductNotFoundException(notFound),
+                cancellationToken);
 
         var currencies = await currencyRepository
             .EnsureExistsAsync(
-                ids: currencyIds,
-                errorFactory: nf => new CurrencyNotFoundException(nf),
-                ct: cancellationToken);
+                currencyIds,
+                nf => new CurrencyNotFoundException(nf),
+                cancellationToken);
 
         var storageContents = new List<StorageContent>();
         var events = new List<Event>();
@@ -78,7 +79,7 @@ public class AddContentHandler(
                 await converter.ConvertToBaseAsync(item.BuyPrice, item.CurrencyId, cancellationToken),
                 baseCurrencyId,
                 item.PurchaseDate);
-            
+
             content.AssignCurrency(currencies[item.CurrencyId]);
 
             storageContents.Add(content);

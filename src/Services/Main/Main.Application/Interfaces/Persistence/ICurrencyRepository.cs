@@ -5,5 +5,4 @@ namespace Main.Application.Interfaces.Persistence;
 
 public interface ICurrencyRepository : IRepository<Currency, int>
 {
-    
 }

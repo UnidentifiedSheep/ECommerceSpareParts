@@ -1,6 +1,6 @@
 ﻿using Contracts.Models.Currency;
 
-namespace Application.Common.Extensions.Entities;
+namespace Main.Application.Extensions.Entities;
 
 public static class CurrencyExtensions
 {

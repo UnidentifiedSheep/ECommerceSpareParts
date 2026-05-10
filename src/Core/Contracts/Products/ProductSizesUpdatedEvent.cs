@@ -1,7 +1,7 @@
 ﻿using System.Text.Json.Serialization;
 using Abstractions.Interfaces;
 
-namespace Contracts.Articles;
+namespace Contracts.Products;
 
 public class ProductSizesUpdatedEvent : IKeyedEvent
 {

@@ -1,8 +1,9 @@
 ﻿using Abstractions.Interfaces.Services;
 using Application.Common.Interfaces;
+using Application.Common.Interfaces.Cqrs;
 using Application.Common.Interfaces.Repositories;
 using Attributes;
-using Contracts.Articles;
+using Contracts.Products;
 using Enums;
 using Main.Entities.Product;
 using MediatR;

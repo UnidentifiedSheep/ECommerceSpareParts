@@ -29,7 +29,7 @@ public class MetricConfiguration : IEntityTypeConfiguration<Entities.Metrics.Met
         builder.Property(e => e.Tags)
             .HasColumnName("tags")
             .HasConversion<long>();
-        
+
         builder.Property(m => m.DependsOn)
             .HasConversion<long>()
             .HasColumnName("depends_on");

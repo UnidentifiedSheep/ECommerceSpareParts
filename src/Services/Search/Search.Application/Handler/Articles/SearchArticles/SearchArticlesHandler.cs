@@ -1,4 +1,5 @@
 ﻿using Application.Common.Interfaces;
+using Application.Common.Interfaces.Cqrs;
 using Search.Abstractions.Dtos;
 using Search.Abstractions.Interfaces.Persistence;
 using Search.Application.Configs;

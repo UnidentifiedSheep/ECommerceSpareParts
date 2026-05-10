@@ -1,4 +1,4 @@
-﻿using Contracts.Articles;
+﻿using Contracts.Products;
 using MassTransit;
 using Search.Abstractions.Interfaces.Persistence;
 

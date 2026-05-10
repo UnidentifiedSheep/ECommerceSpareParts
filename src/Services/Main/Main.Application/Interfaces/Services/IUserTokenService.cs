@@ -1,7 +1,7 @@
 using System.Net;
 using Main.Enums;
 
-namespace Main.Abstractions.Interfaces.Services;
+namespace Main.Application.Interfaces.Services;
 
 public interface IUserTokenService
 {

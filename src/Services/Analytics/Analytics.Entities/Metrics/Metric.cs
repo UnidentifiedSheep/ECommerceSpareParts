@@ -80,7 +80,10 @@ public abstract class Metric : AuditableEntity<Metric, Guid>
         return full[..16];
     }
 
-    public override Guid GetId() => Id;
+    public override Guid GetId()
+    {
+        return Id;
+    }
 }
 
 public abstract class Metric<T> : Metric where T : class

@@ -1,7 +1,7 @@
-﻿using Analytics.Abstractions.Dtos.CalculationJob;
+﻿using Analytics.Application.Dtos.CalculationJob;
 using Analytics.Entities.Metrics;
 
-namespace Analytics.Abstractions.Interfaces.Application;
+namespace Analytics.Application.Interfaces.Services;
 
 public interface IMetricConverterDispatcher
 {

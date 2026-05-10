@@ -2,7 +2,7 @@
 using Domain.Interfaces;
 using Enums;
 
-namespace Main.Abstractions.Models.Settings;
+namespace Main.Entities.Setting;
 
 public class CurrencySetting : Setting<CurrencySettingData>, ISetting<CurrencySetting>
 {

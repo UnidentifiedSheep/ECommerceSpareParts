@@ -1,6 +1,6 @@
 ﻿using Abstractions.Interfaces;
 
-namespace Contracts.Articles;
+namespace Contracts.Products;
 
 public record ProductDeletedEvent : IKeyedEvent
 {

@@ -1,6 +1,4 @@
-﻿using Abstractions.Interfaces.Tests;
-
-namespace Test.Common.Interfaces;
+﻿namespace Test.Common.Interfaces;
 
 public interface ITest
 {

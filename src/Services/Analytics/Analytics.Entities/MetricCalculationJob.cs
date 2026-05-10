@@ -73,7 +73,10 @@ public class MetricCalculationJob : AuditableEntity<MetricCalculationJob, Guid>
         EnsureStatus(CalculationStatus.AwaitingWorker);
     }
 
-    public override Guid GetId() => RequestId;
+    public override Guid GetId()
+    {
+        return RequestId;
+    }
 
     private void SetMetricId(Guid metricId)
     {

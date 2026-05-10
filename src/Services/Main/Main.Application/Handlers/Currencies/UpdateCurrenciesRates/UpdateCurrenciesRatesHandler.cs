@@ -1,9 +1,10 @@
 using Application.Common.Interfaces;
+using Application.Common.Interfaces.Cqrs;
 using Application.Common.Interfaces.Settings;
 using Attributes;
 using Contracts.Currency;
-using Main.Abstractions.Models.Settings;
 using Main.Application.Interfaces.Services.Currency;
+using Main.Entities.Setting;
 using MediatR;
 using Microsoft.Extensions.Logging;
 

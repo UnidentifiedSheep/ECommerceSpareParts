@@ -1,11 +1,12 @@
 ﻿using Abstractions.Interfaces;
 using Abstractions.Interfaces.Services;
 using Application.Common.Interfaces;
+using Application.Common.Interfaces.Cqrs;
 using Application.Common.Interfaces.Settings;
 using Attributes;
-using Contracts.Articles;
-using Main.Abstractions.Models.Settings;
+using Contracts.Products;
 using Main.Entities.Product;
+using Main.Entities.Setting;
 using MediatR;
 
 namespace Main.Application.Handlers.Products.MapImgsToProduct;

@@ -1,7 +1,7 @@
 using Abstractions.Interfaces;
 using Api.Common.Extensions;
 using Carter;
-using Main.Application.Dtos.Amw.Sales;
+using Main.Application.Dtos.Sale;
 using MediatR;
 
 namespace Main.Api.EndPoints.Sales;

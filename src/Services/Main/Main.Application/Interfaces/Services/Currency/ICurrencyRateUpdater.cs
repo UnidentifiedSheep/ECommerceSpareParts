@@ -1,5 +1,5 @@
-﻿using Main.Abstractions.Models.Settings;
-using Main.Application.Models.Currency;
+﻿using Main.Application.Models.Currency;
+using Main.Entities.Setting;
 
 namespace Main.Application.Interfaces.Services.Currency;
 

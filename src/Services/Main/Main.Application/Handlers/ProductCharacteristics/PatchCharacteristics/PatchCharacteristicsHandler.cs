@@ -1,8 +1,9 @@
 using Application.Common.Extensions;
 using Application.Common.Interfaces;
+using Application.Common.Interfaces.Cqrs;
 using Application.Common.Interfaces.Repositories;
 using Attributes;
-using Main.Application.Dtos.Amw.ArticleCharacteristics;
+using Main.Application.Dtos.Product;
 using Main.Entities.Exceptions.Products;
 using Main.Entities.Product;
 using MediatR;

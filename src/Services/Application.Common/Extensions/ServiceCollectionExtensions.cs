@@ -1,6 +1,7 @@
 ﻿using System.Reflection;
 using Application.Common.Abstractions;
 using Application.Common.Interfaces;
+using Application.Common.Interfaces.Cqrs;
 using Application.Common.Interfaces.NamedObject;
 using Application.Common.Services;
 using Application.Common.Services.NamedObject;

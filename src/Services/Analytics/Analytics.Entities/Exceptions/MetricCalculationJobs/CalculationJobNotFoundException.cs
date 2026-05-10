@@ -1,7 +1,7 @@
 ﻿using Abstractions.Interfaces.Exceptions;
 using Exceptions.Base;
 
-namespace Analytics.Abstractions.Exceptions.MetricCalculationJobs;
+namespace Analytics.Entities.Exceptions.MetricCalculationJobs;
 
 public class CalculationJobNotFoundException(Guid requestId)
     : NotFoundException(null, new { RequestId = requestId }), ILocalizableException

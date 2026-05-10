@@ -1,7 +1,7 @@
 using Abstractions.Models;
 using Application.Common.Interfaces.Currency;
 
-namespace Application.Common.Services;
+namespace Application.Common.Services.Currency;
 
 public abstract class CurrencyConverterBase : ICurrencyConverter
 {

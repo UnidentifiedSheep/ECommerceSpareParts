@@ -5,7 +5,7 @@ using Main.Application.Dtos.Product;
 using Main.Application.Handlers.ProductSizes.GetProductSizes;
 using MediatR;
 
-namespace Main.Api.EndPoints.ArticleSize;
+namespace Main.Api.EndPoints.ProductSize;
 
 public record GetProductSizeResponse(ProductSizeDto ProductSize);
 

@@ -24,7 +24,7 @@ public static class RepositoryExtensions
         return repository.EnsureExistsCoreAsync(
             ids,
             errorFactory,
-            criteria, 
+            criteria,
             ct);
     }
 
@@ -44,10 +44,10 @@ public static class RepositoryExtensions
         return repository.EnsureExistsCoreAsync(
             ids,
             errorFactory,
-            criteria, 
+            criteria,
             ct);
     }
-    
+
     private static async Task<Dictionary<TKey, TEntity>> EnsureExistsCoreAsync<TEntity, TKey>(
         this IRepository<TEntity, TKey> repository,
         IEnumerable<TKey> ids,

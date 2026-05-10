@@ -4,7 +4,7 @@ using Carter;
 using Main.Application.Handlers.Products.MapImgsToProduct;
 using MediatR;
 
-namespace Main.Api.EndPoints.Articles;
+namespace Main.Api.EndPoints.Products;
 
 public class MapImgsToProductsEndPoint : ICarterModule
 {

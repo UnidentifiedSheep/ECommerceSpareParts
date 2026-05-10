@@ -2,7 +2,7 @@
 using FluentAssertions;
 using Main.Entities.Product;
 
-namespace Main.Tests.Domain.Product;
+namespace Tests.Domain.Product;
 
 public class ProductContentTests
 {

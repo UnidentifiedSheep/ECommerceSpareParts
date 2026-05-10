@@ -1,14 +1,13 @@
 ﻿using Application.Common.Interfaces.Settings;
-using Main.Abstractions.Models.Settings;
 using Main.Entities.Currency;
+using Main.Entities.Setting;
 using Main.Persistence.Context;
-using MediatR;
 using Test.Common.Abstractions;
 using Test.Common.Extensions;
 using Test.Common.Interfaces;
-using Tests.DataBuilders;
+using Tests.DataBuilders.Currency;
 
-namespace Tests.TestContexts;
+namespace Tests.TestContexts.Currency;
 
 public class CurrencyRatesTestContext(
     DContext context,

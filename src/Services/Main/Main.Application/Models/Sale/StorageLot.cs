@@ -1,4 +1,4 @@
-﻿namespace Main.Application.Models.SaleService;
+﻿namespace Main.Application.Models.Sale;
 
 public record StorageLot(
     int Id,

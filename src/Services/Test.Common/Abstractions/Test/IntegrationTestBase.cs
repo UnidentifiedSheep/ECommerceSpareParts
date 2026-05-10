@@ -1,17 +1,17 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
-using Test.Common.Interfaces;
 using Test.Common.Interfaces.ServiceProvider;
 
-namespace Test.Common.Abstractions;
+namespace Test.Common.Abstractions.Test;
 
 public abstract class IntegrationTestBase<TSp, TArgs, TContext> : TestBase
-    where TSp : IServiceProviderBuilder<TArgs>, new() where TArgs : IServiceProviderArgument
+    where TSp : IServiceProviderBuilder<TArgs>, new()
+    where TArgs : IServiceProviderArgument
     where TContext : DbContext
 {
+    private IServiceScope _scope = null!;
     private IServiceProvider _sp = null!;
     protected override IServiceProvider Sp => _sp;
-    private IServiceScope _scope = null!;
     protected override IServiceScope Scope => _scope;
 
     public TContext Context { get; private set; } = null!;

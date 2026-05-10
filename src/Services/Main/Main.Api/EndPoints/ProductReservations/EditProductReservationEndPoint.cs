@@ -5,7 +5,7 @@ using Main.Application.Dtos.Product;
 using Main.Application.Handlers.ProductReservations.EditProductReservation;
 using MediatR;
 
-namespace Main.Api.EndPoints.ArticlesReservation;
+namespace Main.Api.EndPoints.ProductReservations;
 
 public record EditProductReservationRequest(EditProductReservationDto NewValue);
 

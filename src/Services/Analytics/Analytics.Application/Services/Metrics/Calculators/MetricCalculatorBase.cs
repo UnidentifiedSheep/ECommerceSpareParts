@@ -1,4 +1,4 @@
-﻿using Analytics.Abstractions.Interfaces.Application;
+﻿using Analytics.Application.Interfaces.Services;
 using Analytics.Entities.Metrics;
 
 namespace Analytics.Application.Services.Metrics.Calculators;

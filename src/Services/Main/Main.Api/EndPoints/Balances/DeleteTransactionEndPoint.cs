@@ -1,7 +1,7 @@
 using Abstractions.Interfaces;
 using Api.Common.Extensions;
 using Carter;
-using Main.Application.Handlers.Balance.DeleteTransaction;
+using Main.Application.Handlers.Balance.ReverseTransaction;
 using MediatR;
 
 namespace Main.Api.EndPoints.Balances;

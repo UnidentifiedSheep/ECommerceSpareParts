@@ -17,5 +17,9 @@ public class SaleContent : Entity<SaleContent, int>
     public decimal Discount { get; set; }
 
     public virtual SalesFact? Sale { get; set; }
-    public override int GetId() => Id;
+
+    public override int GetId()
+    {
+        return Id;
+    }
 }

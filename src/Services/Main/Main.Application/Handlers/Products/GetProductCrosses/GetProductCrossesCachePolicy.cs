@@ -1,4 +1,5 @@
 ﻿using Application.Common.Interfaces;
+using Application.Common.Interfaces.Cqrs;
 
 namespace Main.Application.Handlers.Products.GetProductCrosses;
 
