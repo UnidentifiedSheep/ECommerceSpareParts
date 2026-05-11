@@ -1,8 +1,12 @@
 ﻿using Application.Common.Interfaces;
-using Main.Abstractions.Dtos.Amw.StorageRoutes;
-using Main.Abstractions.Exceptions.Storages;
-using Main.Abstractions.Interfaces.DbRepositories;
-using Mapster;
+using Application.Common.Interfaces.Cqrs;
+using Application.Common.Interfaces.Repositories;
+using LinqKit;
+using Main.Application.Dtos.Storage;
+using Main.Application.Handlers.Projections;
+using Main.Entities.Exceptions.Storages;
+using Main.Entities.Storage;
+using Microsoft.EntityFrameworkCore;
 
 namespace Main.Application.Handlers.StorageRoutes.GetStorageRouteById;
 
@@ -10,16 +14,18 @@ public record GetStorageRouteByIdQuery(Guid Id) : IQuery<GetStorageRouteByIdResu
 
 public record GetStorageRouteByIdResult(StorageRouteDto StorageRoute);
 
-public class GetStorageRouteByIdHandler(IStorageRoutesRepository storageRoutesRepository)
+public class GetStorageRouteByIdHandler(
+    IReadRepository<StorageRoute, Guid> repository)
     : IQueryHandler<GetStorageRouteByIdQuery, GetStorageRouteByIdResult>
 {
     public async Task<GetStorageRouteByIdResult> Handle(
         GetStorageRouteByIdQuery request,
         CancellationToken cancellationToken)
     {
-        var route = await storageRoutesRepository.GetStorageRouteAsync(request.Id, false, cancellationToken,
-                        x => x.Currency)
-                    ?? throw new StorageRouteNotFound(request.Id);
-        return new GetStorageRouteByIdResult(route.Adapt<StorageRouteDto>());
+        var route = await repository.Query
+            .AsExpandable()
+            .Select(StorageProjections.StorageRouteProjection)
+            .FirstOrDefaultAsync(cancellationToken) ?? throw new StorageRouteNotFound(request.Id);
+        return new GetStorageRouteByIdResult(route);
     }
 }

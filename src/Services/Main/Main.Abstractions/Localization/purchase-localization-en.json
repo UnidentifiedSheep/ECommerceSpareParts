@@ -19,6 +19,8 @@
     "purchase.content.weight.min.zero": "Weight must be greater than or equal to 0.",
     "purchase.datetime.min.3months": "Purchase date cannot be older than 3 months.",
     "purchase.datetime.not.future": "Purchase date cannot be in the future.",
-    "purchase.content.duplicate.ids.not.allowed": "Duplicate item IDs are not allowed."
+    "purchase.content.duplicate.ids.not.allowed": "Duplicate item IDs are not allowed.",
+    "purchase.comment.too.long": "Purchase comment should have maximum 256 symbols",
+    "purchase.content.comment.too.long": "Purchase content comment should have maximum 256 symbols"
   }
 }

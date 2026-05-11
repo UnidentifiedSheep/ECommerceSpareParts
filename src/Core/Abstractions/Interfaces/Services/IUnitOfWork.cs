@@ -6,6 +6,7 @@ namespace Abstractions.Interfaces.Services;
 public interface IUnitOfWork
 {
     UnitOfWorkContext Context { get; }
+
     Task<T> ExecuteWithTransaction<T>(
         TransactionalAttribute settings,
         Func<Task<T>> action,

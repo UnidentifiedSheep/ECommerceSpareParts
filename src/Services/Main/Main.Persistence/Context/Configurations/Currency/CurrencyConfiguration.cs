@@ -1,0 +1,64 @@
+﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Metadata.Builders;
+
+namespace Main.Persistence.Context.Configurations.Currency;
+
+public class CurrencyConfiguration : IEntityTypeConfiguration<Entities.Currency.Currency>
+{
+    public void Configure(EntityTypeBuilder<Entities.Currency.Currency> builder)
+    {
+        builder.ToTable("currency", "public");
+
+        builder.HasKey(e => e.Id)
+            .HasName("currency_pk");
+
+        builder.HasIndex(e => e.Code, "currency_code_uindex")
+            .IsUnique();
+
+        builder.HasIndex(e => e.CurrencySign, "currency_currency_sign_uindex")
+            .IsUnique();
+
+        builder.HasIndex(e => e.Name, "currency_name_uindex")
+            .IsUnique();
+
+        builder.HasIndex(e => e.ShortName, "currency_short_name_uindex")
+            .IsUnique();
+
+        builder.Property(e => e.Id)
+            .HasColumnName("id");
+
+        builder.Property(e => e.Code)
+            .HasMaxLength(26)
+            .HasColumnName("code");
+
+        builder.Property(e => e.CurrencySign)
+            .HasMaxLength(3)
+            .HasColumnName("currency_sign");
+
+        builder.Property(e => e.Name)
+            .HasMaxLength(128)
+            .HasColumnName("name");
+
+        builder.Property(e => e.ShortName)
+            .HasMaxLength(5)
+            .HasColumnName("short_name");
+
+        builder.HasMany(e => e.RatesFrom)
+            .WithOne(e => e.FromCurrency)
+            .HasForeignKey(e => e.FromCurrencyId)
+            .OnDelete(DeleteBehavior.Restrict);
+
+        builder.HasMany(e => e.RatesTo)
+            .WithOne(e => e.ToCurrency)
+            .HasForeignKey(e => e.ToCurrencyId)
+            .OnDelete(DeleteBehavior.Restrict);
+
+        builder.Navigation(e => e.RatesTo)
+            .HasField("_ratesTo")
+            .UsePropertyAccessMode(PropertyAccessMode.Field);
+
+        builder.Navigation(e => e.RatesFrom)
+            .HasField("_ratesFrom")
+            .UsePropertyAccessMode(PropertyAccessMode.Field);
+    }
+}

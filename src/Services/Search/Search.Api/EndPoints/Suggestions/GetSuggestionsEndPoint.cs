@@ -12,15 +12,15 @@ public class GetSuggestionsEndPoint : ICarterModule
     public void AddRoutes(IEndpointRouteBuilder app)
     {
         app.MapGet("/suggestions", async (
-            string query,
-            int limit,
-            ISender mediator,
-            CancellationToken cancellationToken) =>
-        {
-            var result = await mediator.Send(new GetSuggestionsQuery(query, limit), cancellationToken);
-            return Results.Ok(new GetSuggestionsResponse(result.Suggestions));
-        }).WithName("GetArticleSuggestions")
-        .WithDescription("Gets suggestions by query")
-        .Produces<GetSuggestionsResponse>();
+                string query,
+                int limit,
+                ISender mediator,
+                CancellationToken cancellationToken) =>
+            {
+                var result = await mediator.Send(new GetSuggestionsQuery(query, limit), cancellationToken);
+                return Results.Ok(new GetSuggestionsResponse(result.Suggestions));
+            }).WithName("GetArticleSuggestions")
+            .WithDescription("Gets suggestions by query")
+            .Produces<GetSuggestionsResponse>();
     }
 }

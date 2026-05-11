@@ -1,5 +1,5 @@
 ﻿using Abstractions.Interfaces;
-using Analytics.Abstractions.Dtos.CalculationJob;
+using Analytics.Application.Dtos.CalculationJob;
 using Analytics.Application.Handlers.CalculationJob.CreateCalculationJob;
 using Carter;
 using MediatR;
@@ -7,6 +7,7 @@ using MediatR;
 namespace Analytics.Api.EndPoints.CalculationJobs;
 
 public record CreateCalculationJobRequest(string MetricSystemName, MetricPayloadDto MetricPayload);
+
 public record CreateCalculationJobResponse(Guid RequestId);
 
 public class CreateCalculationJobEndPoint : ICarterModule
@@ -14,10 +15,10 @@ public class CreateCalculationJobEndPoint : ICarterModule
     public void AddRoutes(IEndpointRouteBuilder app)
     {
         app.MapPost("jobs/", async (
-            ISender sender,
-            CreateCalculationJobRequest request,
-            IUserContext userContext,
-            CancellationToken ct) =>
+                ISender sender,
+                CreateCalculationJobRequest request,
+                IUserContext userContext,
+                CancellationToken ct) =>
             {
                 var result = await sender.Send(new CreateCalculationJobCommand(
                     request.MetricSystemName,

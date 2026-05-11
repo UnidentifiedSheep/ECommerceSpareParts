@@ -1,18 +1,12 @@
-﻿using Abstractions.Interfaces.Currency;
-using Application.Common.Extensions;
-using FluentValidation;
+﻿using FluentValidation;
 using Localization.Domain.Extensions;
 
 namespace Main.Application.Handlers.StorageRoutes.EditStorageRoute;
 
 public class EditStorageRouteValidation : AbstractValidator<EditStorageRouteCommand>
 {
-    public EditStorageRouteValidation(ICurrencyConverter currencyConverter)
+    public EditStorageRouteValidation()
     {
-        RuleFor(x => x.PatchStorageRoute.CurrencyId.Value)
-            .CurrencyMustExist(currencyConverter)
-            .When(x => x.PatchStorageRoute.CurrencyId.IsSet);
-
         RuleFor(x => x.PatchStorageRoute.PriceKg.Value)
             .GreaterThanOrEqualTo(0)
             .WithLocalizationKey("storage.route.price.kg.min")

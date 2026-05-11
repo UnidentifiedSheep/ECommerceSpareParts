@@ -1,7 +1,6 @@
 using System.Security.Claims;
 using System.Text;
 using Api.Common.Extensions;
-using Gateway.Extensions;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.IdentityModel.Tokens;
@@ -15,8 +14,8 @@ var env = Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT") ?? "";
 var lokiUrl = Environment.GetEnvironmentVariable("LOKI_URL");
 
 builder.Configuration
-    .AddConfigsFromJsons(env)
-    .AddConfigsFromJsons(env, "/app/configs");
+    .AddAppSettingsFromJsons(env)
+    .AddAppSettingsFromJsons(env, "/app/configs");
 
 builder.Host.AddLokiLogger(builder.Configuration, "gateway", env, lokiUrl);
 
@@ -30,30 +29,13 @@ builder.Services.AddOpenTelemetry()
             .AddPrometheusExporter();
     });
 
-builder.Services.AddAuthentication(options =>
+builder.Services.AddAuthorization(options =>
 {
-    options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
-    options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
-    options.DefaultScheme = JwtBearerDefaults.AuthenticationScheme;
-}).AddJwtBearer(options =>
-{
-    var iss = builder.Configuration["JwtBearer:ValidIssuer"];
-    options.TokenValidationParameters = new TokenValidationParameters
+    options.AddPolicy("DenyAll", policy =>
     {
-        ValidateIssuer = true,
-        ValidateAudience = false,
-        ValidateLifetime = true,
-        ValidateIssuerSigningKey = true,
-        ValidIssuer = iss,
-        IssuerSigningKey =
-            new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration["JwtBearer:IssuerSigningKey"]!))
-    };
+        policy.RequireAssertion(_ => false);
+    });
 });
-
-builder.Services.AddAuthorizationBuilder()
-    .SetDefaultPolicy(new AuthorizationPolicyBuilder(JwtBearerDefaults.AuthenticationScheme)
-        .RequireAuthenticatedUser()
-        .Build());
 
 var secret = builder.Configuration["HeaderSecret:Key"];
 
@@ -69,36 +51,8 @@ builder.Services.AddReverseProxy()
         builderContext.AddRequestTransform(transformContext =>
         {
             var headers = transformContext.ProxyRequest.Headers;
-            var user = transformContext.HttpContext.User;
-
-            headers.Remove("X-Gateway-Token");
-            headers.Remove("X-User-Id");
-            headers.Remove("X-Roles");
-            headers.Remove("X-Permissions");
-
-            headers.Add("X-Gateway-Token", secret);
-
-            if (user.Identity?.IsAuthenticated != true)
-                return ValueTask.CompletedTask;
-
-            var userId = user.FindFirst("sub")?.Value ??
-                         user.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-
-            if (!string.IsNullOrEmpty(userId))
-                headers.Add("X-User-Id", userId);
-
-            var roles = user.FindAll(ClaimTypes.Role)
-                .Select(r => r.Value)
-                .Distinct();
-
-            headers.Add("X-Roles", string.Join(",", roles));
-
-            var permissions = user.FindAll("permission")
-                .Select(p => p.Value)
-                .Distinct();
-
-            headers.Add("X-Permissions", string.Join(",", permissions));
-
+            headers.Remove("X-Internal-Token");
+            headers.Add("X-Internal-Token", secret);
             return ValueTask.CompletedTask;
         });
     });
@@ -118,7 +72,6 @@ var app = builder.Build();
 app.UseHttpsRedirection();
 app.UseCors();
 
-app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapReverseProxy();

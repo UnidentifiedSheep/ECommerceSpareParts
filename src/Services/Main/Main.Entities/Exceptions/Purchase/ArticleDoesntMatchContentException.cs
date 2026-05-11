@@ -1,0 +1,14 @@
+using Abstractions.Interfaces.Exceptions;
+using Exceptions.Base;
+
+namespace Main.Entities.Exceptions.Purchase;
+
+public class ArticleDoesntMatchContentException : BadRequestException, ILocalizableException
+{
+    public ArticleDoesntMatchContentException(int id) : base(null, new { Id = id })
+    {
+    }
+
+    public string MessageKey => "content.article.doesnt.match.purchase.position";
+    public object[]? Arguments => null;
+}

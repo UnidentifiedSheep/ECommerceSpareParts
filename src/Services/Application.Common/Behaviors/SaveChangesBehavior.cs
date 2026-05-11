@@ -9,15 +9,19 @@ public class SaveChangesBehavior<TRequest, TResponse>(IUnitOfWork unitOfWork) : 
     where TRequest : IRequest<TResponse>
     where TResponse : notnull
 {
-    private static readonly AutoSaveAttribute? AutoSave = 
+    private static readonly AutoSaveAttribute? AutoSave =
         typeof(TRequest).GetCustomAttribute<AutoSaveAttribute>(true);
-    public async Task<TResponse> Handle(TRequest request, RequestHandlerDelegate<TResponse> next, CancellationToken cancellationToken)
+
+    public async Task<TResponse> Handle(
+        TRequest request,
+        RequestHandlerDelegate<TResponse> next,
+        CancellationToken cancellationToken)
     {
         var response = await next(cancellationToken);
-        
+
         if (AutoSave != null && !unitOfWork.Context.SuppressAutoSave)
             await unitOfWork.SaveChangesAsync(cancellationToken);
-        
+
         return response;
     }
 }

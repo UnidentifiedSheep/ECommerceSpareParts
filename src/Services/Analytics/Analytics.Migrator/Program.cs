@@ -5,17 +5,13 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 
 var builder = Host.CreateDefaultBuilder(args)
-    .ConfigureAppConfiguration((_, config) =>
-    {
-        config.AddCommandLine(args);
-    });
+    .ConfigureAppConfiguration((_, config) => { config.AddCommandLine(args); });
 
 builder.ConfigureServices((context, services) =>
 {
     var connectionString = context.Configuration["ConnectionString"];
-    services.AddDbContext<DContext>(
-        options => options.UseNpgsql(connectionString, 
-            x => x.MigrationsAssembly("Analytics.Migrator")));
+    services.AddDbContext<DContext>(options => options.UseNpgsql(connectionString,
+        x => x.MigrationsAssembly("Analytics.Migrator")));
 });
 
 var host = builder.Build();

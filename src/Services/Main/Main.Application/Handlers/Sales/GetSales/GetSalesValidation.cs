@@ -1,5 +1,3 @@
-using Abstractions.Interfaces.Currency;
-using Application.Common.Extensions;
 using Application.Common.Validators;
 using FluentValidation;
 using Localization.Domain.Extensions;
@@ -8,7 +6,7 @@ namespace Main.Application.Handlers.Sales.GetSales;
 
 public class GetSalesValidation : AbstractValidator<GetSalesQuery>
 {
-    public GetSalesValidation(ICurrencyConverter currencyConverter)
+    public GetSalesValidation()
     {
         RuleFor(query => new { Start = query.RangeStartDate, End = query.RangeEndDate })
             .Must(x => x.Start.Date <= x.End.Date)
@@ -20,8 +18,5 @@ public class GetSalesValidation : AbstractValidator<GetSalesQuery>
 
         RuleFor(x => x.Pagination)
             .SetValidator(new PaginationValidator());
-
-        RuleFor(x => x.CurrencyId)
-            .CurrencyMustExist(currencyConverter);
     }
 }

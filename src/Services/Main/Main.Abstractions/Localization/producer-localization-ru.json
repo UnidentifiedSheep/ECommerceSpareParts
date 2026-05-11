@@ -14,6 +14,8 @@
     "producer.other.name.not.empty": "Дополнительное название не должно быть пустым.",
     "producer.other.name.min.length": "Дополнительное название должно быть не менее 2 символов.",
     "producer.other.name.max.length": "Дополнительное название должно быть не более 64 символов.",
-    "producer.other.name.where.used.max.length": "Поле 'where used' должно быть не более 64 символов."
+    "producer.other.name.where.used.max.length": "Поле 'where used' должно быть не более 64 символов.",
+    "producer.other.name.where.used.min.length": "Поле 'where used' должно быть минимум 2 символа в длину.",
+    "producer.image.too.long": "Путь к изображению производителя должен иметь не более 255 символов."
   }
 }

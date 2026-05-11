@@ -72,6 +72,11 @@ public class TransactionConfig(DbContext context) : ICustomTransaction
                     await transaction.CommitAsync(cancellationToken);
                 return result;
             }
+            catch (DbUpdateConcurrencyException)
+            {
+                if (attempt >= RetriesCount) throw;
+                await Task.Delay(RetryDelay, cancellationToken);
+            }
             catch (Exception ex)
             {
                 if (!isLocalTransaction) throw;

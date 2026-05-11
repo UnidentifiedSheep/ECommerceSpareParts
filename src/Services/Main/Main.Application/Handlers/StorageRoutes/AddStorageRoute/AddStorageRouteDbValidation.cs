@@ -9,7 +9,8 @@ public class AddStorageRouteDbValidation : AbstractDbValidation<AddStorageRouteC
     public override void Build(IValidationPlan plan, AddStorageRouteCommand request)
     {
         plan.ValidateStorageExistsName(request.StorageTo)
-            .ValidateStorageExistsName(request.StorageFrom);
+            .ValidateStorageExistsName(request.StorageFrom)
+            .ValidateCurrencyExistsId(request.CurrencyId);
 
         if (request.CarrierId != null)
             plan.ValidateUserExistsId(request.CarrierId.Value);

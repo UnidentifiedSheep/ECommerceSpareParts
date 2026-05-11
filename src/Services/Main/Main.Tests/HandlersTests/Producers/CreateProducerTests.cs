@@ -1,79 +1,64 @@
-using Bogus;
-using Extensions;
+using FluentAssertions;
+using Main.Application.Dtos.Producer;
 using Main.Application.Handlers.Producers.CreateProducer;
-using Main.Persistence.Context;
-using MediatR;
+using Main.Entities.Producer;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.DependencyInjection;
-using Test.Common.Extensions;
 using Test.Common.TestContainers.Combined;
 using ValidationException = FluentValidation.ValidationException;
 
 namespace Tests.HandlersTests.Producers;
 
-[Collection("Combined collection")]
-public class CreateProducerTests : IAsyncLifetime
+public class CreateProducerTests(CombinedContainerFixture fixture) : IntegrationTest(fixture)
 {
-    private readonly DContext _context;
-    private readonly Faker _faker = new(MockData.MockData.Locale);
-    private readonly IMediator _mediator;
-
-    public CreateProducerTests(CombinedContainerFixture fixture)
+    [Theory]
+    [InlineData("")]
+    [InlineData("           ")]
+    [InlineData("a")]
+    public async Task CreateProducer_TooShortName_FailsValidation(string name)
     {
-        var sp = ServiceProviderForTests.Build(fixture.PostgresConnectionString, fixture.RedisConnectionString);
-        _mediator = sp.GetService<IMediator>()!;
-        _context = sp.GetRequiredService<DContext>();
-    }
+        var producer = CreateDto() with { Name = name };
+        var command = new CreateProducerCommand(producer);
 
-    public Task InitializeAsync()
-    {
-        return Task.CompletedTask;
-    }
+        var act = () => Mediator.Send(command);
 
-    public async Task DisposeAsync()
-    {
-        await _context.ClearDatabase();
-    }
-
-    [Fact]
-    public async Task CreateProducer_TooShortName_FailsValidation()
-    {
-        var newProducerModel = MockData.MockData.CreateNewProducerDto(1)[0];
-        newProducerModel.ProducerName = "a";
-        var command = new CreateProducerCommand(newProducerModel);
-        await Assert.ThrowsAsync<ValidationException>(async () => await _mediator.Send(command));
-    }
-
-    [Fact]
-    public async Task CreateProducer_EmptyName_FailsValidation()
-    {
-        var newProducerModel = MockData.MockData.CreateNewProducerDto(1)[0];
-        newProducerModel.ProducerName = "   ";
-        var command = new CreateProducerCommand(newProducerModel);
-        await Assert.ThrowsAsync<ValidationException>(async () => await _mediator.Send(command));
+        await act.Should().ThrowAsync<ValidationException>();
     }
 
     [Fact]
     public async Task CreateProducer_TooLargeDescription_FailsValidation()
     {
-        var newProducerModel = MockData.MockData.CreateNewProducerDto(1)[0];
-        newProducerModel.Description = _faker.Lorem.Letter(600);
-        var command = new CreateProducerCommand(newProducerModel);
-        await Assert.ThrowsAsync<ValidationException>(async () => await _mediator.Send(command));
+        var producer = CreateDto() with { Description = Faker.Lorem.Letter(600) };
+        var command = new CreateProducerCommand(producer);
+
+        var act = () => Mediator.Send(command);
+
+        await act.Should().ThrowAsync<ValidationException>();
     }
 
     [Fact]
     public async Task CreateProducer_WithValidData_Succeeds()
     {
-        var newProducerModel = MockData.MockData.CreateNewProducerDto(1)[0];
-        var command = new CreateProducerCommand(newProducerModel);
-        var result = await _mediator.Send(command);
+        var producer = CreateDto();
+        var command = new CreateProducerCommand(producer);
 
-        var createdProducer = await _context.Producers
-            .AsNoTracking().FirstOrDefaultAsync(x => x.Id == result.ProducerId);
-        Assert.NotNull(createdProducer);
-        Assert.Equal(createdProducer.Description, newProducerModel.Description);
-        Assert.Equal(createdProducer.Name, newProducerModel.ProducerName.ToNormalized());
-        Assert.Equal(createdProducer.IsOe, newProducerModel.IsOe);
+        var act = () => Mediator.Send(command);
+
+        await act.Should().NotThrowAsync();
+
+        var createdProducer = await Context.Producers.AsNoTracking().FirstOrDefaultAsync();
+
+        createdProducer.Should().NotBeNull();
+
+        createdProducer.Name.Should().Be(Producer.ToNormalizedName(producer.Name));
+        createdProducer.Description.Should().Be(producer.Description);
+    }
+
+    private NewProducerDto CreateDto()
+    {
+        return new NewProducerDto
+        {
+            Name = Faker.Lorem.Word(),
+            Description = Faker.Lorem.Sentence()
+        };
     }
 }

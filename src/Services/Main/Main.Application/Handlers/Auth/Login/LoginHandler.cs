@@ -1,23 +1,22 @@
 ﻿using System.Net;
 using System.Security.Cryptography;
-using Abstractions.Interfaces;
-using Abstractions.Interfaces.Services;
 using Abstractions.Interfaces.Validators;
-using Abstractions.Models.Repository;
+using Application.Common.Extensions;
 using Application.Common.Interfaces;
+using Application.Common.Interfaces.Cqrs;
+using Application.Common.Interfaces.Repositories;
 using Attributes;
 using Exceptions.Base;
-using Main.Abstractions.Exceptions.Auth;
-using Main.Abstractions.Interfaces.DbRepositories;
-using Main.Abstractions.Interfaces.Services;
-using Main.Entities;
+using Main.Application.Handlers.Projections;
+using Main.Application.Interfaces.Persistence;
+using Main.Application.Interfaces.Services;
+using Main.Entities.Exceptions.Auth;
+using Main.Entities.User;
 using Main.Enums;
-using Mapster;
-using User = Abstractions.Models.User;
-using UserInfo = Abstractions.Models.UserInfo;
 
 namespace Main.Application.Handlers.Auth.Login;
 
+[AutoSave]
 [Transactional]
 public record LoginCommand(string Email, string Password, IPAddress? IpAddress, string? UserAgent)
     : ICommand<LoginResult>;
@@ -26,45 +25,41 @@ public record LoginResult(string Token, string RefreshToken, string DeviceId);
 
 public class LoginHandler(
     IPasswordManager passwordManager,
-    IUserEmailRepository userEmailRepository,
+    IUserRepository userRepository,
     IUserTokenService userTokenService,
     IJwtGenerator tokenGenerator,
-    IUserService userService,
-    IUnitOfWork unitOfWork) : ICommandHandler<LoginCommand, LoginResult>
+    IUserService userService) : ICommandHandler<LoginCommand, LoginResult>
 {
     public async Task<LoginResult> Handle(LoginCommand request, CancellationToken cancellationToken)
     {
-        var queryOptions = new QueryOptions<UserEmail, string>()
-        {
-            Data =  request.Email,
-        }.WithTracking()
-        .WithInclude(x => x.User)
-        .WithInclude(x => x.User.UserInfo);
-        var userEmail = await userEmailRepository.GetUserEmailByPrimary(queryOptions, cancellationToken)
+        var criteria = Criteria<User>.New()
+            .Include(x => x.UserInfo)
+            .Build();
+
+        var user = await userRepository.GetUserByPrimaryEmailAsync(request.Email, criteria, cancellationToken)
                    ?? throw new WrongCredentialsException(request.Email, null);
-        var user = userEmail.User;
+
         if (user.UserInfo == null)
             throw new InternalServerException("User exists, but unable to get user info.");
         if (!passwordManager.VerifyHashedPassword(user.PasswordHash, request.Password))
             throw new WrongCredentialsException(request.Email, request.Password);
 
-        var (roles, permissions) = 
-            await userService.GetUserRolesAndPermissionsAsync(user.Id, cancellationToken);
+        var (roles, permissions) =
+            await userService.GetUserRolesAndPermissionsAsync(user.Id, cancellationToken)
+            ?? throw new UserNotFoundException(user.Id);
 
         var deviceId = GenerateDeviceId();
         var ip = request.IpAddress;
         var userAgent = request.UserAgent;
 
-        var token = tokenGenerator.CreateToken(user.Adapt<User>(), user.UserInfo.Adapt<UserInfo>(), deviceId, roles,
-            permissions);
+        var userDto = UserProjections.UserProjection.AsFunc()(user);
+        var token = tokenGenerator.CreateToken(userDto, deviceId, roles, permissions);
         var refreshToken = tokenGenerator.CreateRefreshToken();
 
         await userTokenService.AddToken(refreshToken, user.Id, TokenType.RefreshToken, DateTime.UtcNow.AddMonths(1),
             ip, userAgent, deviceId, [], cancellationToken);
 
-        user.LastLoginAt = DateTime.UtcNow;
-        
-        await unitOfWork.SaveChangesAsync(cancellationToken);
+        user.Login();
 
         return new LoginResult(token, refreshToken, deviceId);
     }

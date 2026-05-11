@@ -7,7 +7,8 @@ public sealed class ScopedStringLocalizer(IStringLocalizer stringLocalizer) : IS
 {
     private bool _disposed;
     private Locale? _locale;
-    public Locale Locale 
+
+    public Locale Locale
         => _locale ?? throw new ArgumentNullException(nameof(Locale));
 
     public void SetLocale(Locale locale)

@@ -7,7 +7,7 @@ public class CreateProducerValidation : AbstractValidator<CreateProducerCommand>
 {
     public CreateProducerValidation()
     {
-        RuleFor(x => x.NewProducer.ProducerName)
+        RuleFor(x => x.NewProducer.Name)
             .SetValidator(new ProducerNameValidator());
 
         RuleFor(x => x.NewProducer.Description)

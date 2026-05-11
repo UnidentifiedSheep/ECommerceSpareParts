@@ -1,142 +1,122 @@
 using Abstractions.Models;
-using Bogus;
-using Main.Abstractions.Dtos.Amw.Storage;
-using Main.Abstractions.Exceptions.Storages;
-using Main.Application.Configs.Mapster;
+using Main.Application.Dtos.Storage;
 using Main.Application.Handlers.Storages.EditStorage;
-using Main.Entities;
+using Main.Entities.Exceptions.Storages;
+using Main.Entities.Storage;
 using Main.Enums;
-using Main.Persistence.Context;
-using MediatR;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.DependencyInjection;
-using Test.Common.Extensions;
 using Test.Common.TestContainers.Combined;
-using Tests.MockData;
-using static Tests.MockData.MockData;
+using Tests.TestContexts;
+using Tests.TestContexts.Storage;
 using ValidationException = FluentValidation.ValidationException;
 
 namespace Tests.HandlersTests.Storages;
 
-[Collection("Combined collection")]
-public class EditStorageTests : IAsyncLifetime
+public class EditStorageTests : IntegrationTest
 {
-    private readonly DContext _context;
-    private readonly Faker _faker = new(Locale);
-    private readonly IMediator _mediator;
-    private Storage _storage = null!;
-
-    public EditStorageTests(CombinedContainerFixture fixture)
+    public EditStorageTests(CombinedContainerFixture fixture) : base(fixture)
     {
-        MapsterConfig.Configure();
-        var sp = ServiceProviderForTests.Build(fixture.PostgresConnectionString, fixture.RedisConnectionString);
-        _mediator = sp.GetService<IMediator>()!;
-        _context = sp.GetRequiredService<DContext>();
-    }
-
-    public async Task InitializeAsync()
-    {
-        await _mediator.AddMockProducersAndArticles();
-        await _mediator.AddMockStorage();
-        _storage = await _context.Storages.FirstAsync();
-    }
-
-    public async Task DisposeAsync()
-    {
-        await _context.ClearDatabase();
+        RegisterBasicContext<StorageTestContext>();
     }
 
     [Fact]
     public async Task EditStorage_IsNotSetButHasDescriptionValue_Succeeds()
     {
+        var storage = GetStorage();
         var model = new PatchStorageDto
         {
             Description = new PatchField<string?>
             {
                 IsSet = false,
-                Value = _faker.Lorem.Sentence(30)
+                Value = Faker.Lorem.Sentence(30)
             }
         };
-        var command = new EditStorageCommand(_storage.Name, model);
-        await _mediator.Send(command);
-        var storage = await _context.Storages
-            .AsNoTracking()
-            .FirstOrDefaultAsync(x => x.Name == _storage.Name);
-        Assert.NotNull(storage);
+        var command = new EditStorageCommand(storage.Name, model);
+        await Mediator.Send(command);
 
-        Assert.Equal(_storage.Name, storage.Name);
-        Assert.Equal(_storage.Description, storage.Description);
-        Assert.Equal(_storage.Location, storage.Location);
+        var dbStorage = await Context.Storages
+            .AsNoTracking()
+            .FirstOrDefaultAsync(x => x.Name == storage.Name);
+        Assert.NotNull(dbStorage);
+
+        Assert.Equal(storage.Name, dbStorage.Name);
+        Assert.Equal(storage.Description, dbStorage.Description);
+        Assert.Equal(storage.Location, dbStorage.Location);
     }
 
     [Fact]
     public async Task EditStorage_IsNotSetButHasLocationValue_Succeeds()
     {
+        var storage = GetStorage();
         var model = new PatchStorageDto
         {
             Location = new PatchField<string?>
             {
                 IsSet = false,
-                Value = _faker.Lorem.Sentence(30)
+                Value = Faker.Lorem.Sentence(30)
             }
         };
-        var command = new EditStorageCommand(_storage.Name, model);
-        await _mediator.Send(command);
+        var command = new EditStorageCommand(storage.Name, model);
+        await Mediator.Send(command);
 
-        var storage = await _context.Storages
+        var dbStorage = await Context.Storages
             .AsNoTracking()
-            .FirstOrDefaultAsync(x => x.Name == _storage.Name);
-        Assert.NotNull(storage);
+            .FirstOrDefaultAsync(x => x.Name == storage.Name);
 
-        Assert.Equal(_storage.Name, storage.Name);
-        Assert.Equal(_storage.Description, storage.Description);
-        Assert.Equal(_storage.Location, storage.Location);
+        Assert.NotNull(dbStorage);
+
+        Assert.Equal(storage.Name, dbStorage.Name);
+        Assert.Equal(storage.Description, dbStorage.Description);
+        Assert.Equal(storage.Location, dbStorage.Location);
     }
 
     [Fact]
     public async Task EditStorage_TooLargeLocation_FailsValidation()
     {
+        var storage = GetStorage();
         var model = new PatchStorageDto
         {
             Location = new PatchField<string?>
             {
                 IsSet = true,
-                Value = _faker.Lorem.Letter(300)
+                Value = Faker.Lorem.Letter(300)
             }
         };
-        var command = new EditStorageCommand(_storage.Name, model);
-        await Assert.ThrowsAsync<ValidationException>(async () => await _mediator.Send(command));
+        var command = new EditStorageCommand(storage.Name, model);
+        await Assert.ThrowsAsync<ValidationException>(async () => await Mediator.Send(command));
     }
 
     [Fact]
     public async Task EditStorage_TooLargeDesctiption_FailsValidation()
     {
+        var storage = GetStorage();
         var model = new PatchStorageDto
         {
             Description = new PatchField<string?>
             {
                 IsSet = true,
-                Value = _faker.Lorem.Letter(300)
+                Value = Faker.Lorem.Letter(300)
             }
         };
-        var command = new EditStorageCommand(_storage.Name, model);
-        await Assert.ThrowsAsync<ValidationException>(async () => await _mediator.Send(command));
+        var command = new EditStorageCommand(storage.Name, model);
+        await Assert.ThrowsAsync<ValidationException>(async () => await Mediator.Send(command));
     }
 
     [Fact]
     public async Task EditStorage_Normal_Succeeds()
     {
+        var storage = GetStorage();
         var model = new PatchStorageDto
         {
             Description = new PatchField<string?>
             {
                 IsSet = true,
-                Value = _faker.Lorem.Letter(120)
+                Value = Faker.Lorem.Letter(120)
             },
             Location = new PatchField<string?>
             {
                 IsSet = true,
-                Value = _faker.Lorem.Letter(120)
+                Value = Faker.Lorem.Letter(120)
             },
             Type = new PatchField<StorageType>
             {
@@ -144,16 +124,17 @@ public class EditStorageTests : IAsyncLifetime
                 Value = StorageType.SupplierStorage
             }
         };
-        var command = new EditStorageCommand(_storage.Name, model);
-        await _mediator.Send(command);
+        var command = new EditStorageCommand(storage.Name, model);
+        await Mediator.Send(command);
 
-        var storage = await _context.Storages
+        var dbStorage = await Context.Storages
             .AsNoTracking()
-            .FirstOrDefaultAsync(x => x.Name == _storage.Name);
-        Assert.NotNull(storage);
-        Assert.Equal(storage.Description, model.Description);
-        Assert.Equal(storage.Location, model.Location);
-        Assert.Equal(StorageType.SupplierStorage, storage.Type);
+            .FirstOrDefaultAsync(x => x.Name == storage.Name);
+
+        Assert.NotNull(dbStorage);
+        Assert.Equal(dbStorage.Description, model.Description);
+        Assert.Equal(dbStorage.Location, model.Location);
+        Assert.Equal(StorageType.SupplierStorage, dbStorage.Type);
     }
 
     [Fact]
@@ -164,15 +145,17 @@ public class EditStorageTests : IAsyncLifetime
             Description = new PatchField<string?>
             {
                 IsSet = true,
-                Value = _faker.Lorem.Letter(120)
+                Value = Faker.Lorem.Letter(120)
             }
         };
-        var command = new EditStorageCommand(_faker.Lorem.Letter(100), model);
-        await Assert.ThrowsAsync<StorageNotFoundException>(async () => await _mediator.Send(command));
-        var storage = await _context.Storages
-            .AsNoTracking()
-            .FirstOrDefaultAsync(x => x.Name == _storage.Name);
-        Assert.NotNull(storage);
-        Assert.Equal(_storage.Description, storage.Description);
+        var command = new EditStorageCommand(Faker.Lorem.Letter(100), model);
+        await Assert.ThrowsAsync<StorageNotFoundException>(() => Mediator.Send(command));
+    }
+
+    private Storage GetStorage()
+    {
+        return GetContext<StorageTestContext>()
+            .Storages
+            .First(x => x.Type == StorageType.Warehouse);
     }
 }

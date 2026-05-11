@@ -1,5 +1,5 @@
-﻿using Abstractions.Interfaces.Tests;
-using Microsoft.Extensions.DependencyInjection;
+﻿using Microsoft.Extensions.DependencyInjection;
+using Test.Common.Interfaces;
 
 namespace Test.Common.Extensions;
 

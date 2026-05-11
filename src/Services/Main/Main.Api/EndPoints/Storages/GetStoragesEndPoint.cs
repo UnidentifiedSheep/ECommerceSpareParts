@@ -1,10 +1,10 @@
 using Abstractions.Models;
 using Api.Common.Extensions;
 using Carter;
-using Main.Abstractions.Dtos.Amw.Storage;
-using Main.Abstractions.Exceptions.Storages;
+using Main.Application.Dtos.Storage;
 using Main.Application.Handlers.Storages.GetStorage;
 using Main.Application.Handlers.Storages.GetStorageByName;
+using Main.Entities.Exceptions.Storages;
 using Main.Enums;
 using Mapster;
 using MediatR;
@@ -28,7 +28,7 @@ public class GetStoragesEndPoint : ICarterModule
                     StorageType? type,
                     CancellationToken token) =>
                 {
-                    var query = new GetStoragesQuery(new PaginationModel(page, limit), searchTerm, type);
+                    var query = new GetStoragesQuery(new Pagination(page, limit), searchTerm, type);
                     var result = await sender.Send(query, token);
                     var response = result.Adapt<GetStoragesResponse>();
                     return Results.Ok(response);

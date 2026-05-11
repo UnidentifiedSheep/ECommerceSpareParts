@@ -1,4 +1,5 @@
 ﻿using Application.Common.Interfaces;
+using Application.Common.Interfaces.Cqrs;
 using Search.Abstractions.Exceptions.Suggestions;
 using Search.Abstractions.Interfaces.Persistence;
 

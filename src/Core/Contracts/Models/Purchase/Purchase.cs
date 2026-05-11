@@ -4,7 +4,7 @@ namespace Contracts.Models.Purchase;
 
 public class Purchase
 {
-    public required string Id { get; init; }
+    public required Guid Id { get; init; }
 
     public required Guid CreatedUserId { get; init; }
 

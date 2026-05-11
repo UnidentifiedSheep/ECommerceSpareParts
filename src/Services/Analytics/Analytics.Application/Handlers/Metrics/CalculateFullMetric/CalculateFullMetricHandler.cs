@@ -1,15 +1,15 @@
 ﻿using Abstractions.Interfaces.Services;
-using Abstractions.Models.Repository;
-using Analytics.Abstractions.Dtos.CalculationJob;
-using Analytics.Abstractions.Exceptions.MetricCalculationJobs;
-using Analytics.Abstractions.Interfaces.DbRepositories;
+using Analytics.Application.Dtos.CalculationJob;
 using Analytics.Application.Handlers.CalculationJob.UpdateCalculationJob;
 using Analytics.Application.Handlers.Metrics.CalculateMetric;
 using Analytics.Application.Handlers.Metrics.CreateMetric;
 using Analytics.Entities;
+using Analytics.Entities.Exceptions.MetricCalculationJobs;
 using Analytics.Entities.Metrics;
 using Analytics.Enums;
 using Application.Common.Interfaces;
+using Application.Common.Interfaces.Cqrs;
+using Application.Common.Interfaces.Repositories;
 using MediatR;
 using Microsoft.Extensions.Logging;
 
@@ -17,14 +17,13 @@ namespace Analytics.Application.Handlers.Metrics.CalculateFullMetric;
 
 public record CalculateFullMetricCommand(
     Guid RequestId,
-    string MetricSystemName, 
-    MetricPayloadDto MetricPayload, 
-    Guid CreatedBy) : ICommand;
+    string MetricSystemName,
+    MetricPayloadDto MetricPayload) : ICommand;
 
 public class CalculateFullMetricHandler(
     ISender sender,
     ILogger<CalculateFullMetricHandler> logger,
-    IMetricCalculationJobRepository jobRepository,
+    IRepository<MetricCalculationJob, Guid> jobRepository,
     IUnitOfWork unitOfWork)
     : ICommandHandler<CalculateFullMetricCommand>
 {
@@ -36,7 +35,7 @@ public class CalculateFullMetricHandler(
             request.MetricSystemName);
 
         unitOfWork.Context.SuppressAutoSave = true;
-        
+
         var job = await GetAndValidateJob(request.RequestId, ct);
 
         Metric? metric = null;
@@ -44,9 +43,9 @@ public class CalculateFullMetricHandler(
         try
         {
             metric = await CreateMetricAndStartJob(request, job, ct);
-            
+
             metric = await CalculateMetric(metric.Id, ct);
-            
+
             await CompleteJobSuccessfully(job.RequestId, metric.Id, ct);
 
             logger.LogInformation(
@@ -65,7 +64,7 @@ public class CalculateFullMetricHandler(
 
         return Unit.Value;
     }
-    
+
     private async Task<Metric> CreateMetricAndStartJob(
         CalculateFullMetricCommand request,
         MetricCalculationJob job,
@@ -77,8 +76,7 @@ public class CalculateFullMetricHandler(
 
         var metric = (await sender.Send(new CreateMetricCommand(
             request.MetricSystemName,
-            request.MetricPayload,
-            request.CreatedBy), ct)).Metric;
+            request.MetricPayload), ct)).Metric;
 
         logger.LogInformation(
             "Metric created. MetricId: {MetricId}, RequestId: {RequestId}",
@@ -96,14 +94,14 @@ public class CalculateFullMetricHandler(
             job.RequestId);
 
         await unitOfWork.SaveChangesAsync(ct);
-            
+
         logger.LogDebug(
             "Initial changes saved. RequestId: {RequestId}",
             job.RequestId);
 
         return metric;
     }
-    
+
     private async Task<Metric> CalculateMetric(Guid metricId, CancellationToken ct)
     {
         logger.LogInformation(
@@ -119,7 +117,7 @@ public class CalculateFullMetricHandler(
 
         return result;
     }
-    
+
     private async Task CompleteJobSuccessfully(
         Guid requestId,
         Guid metricId,
@@ -183,21 +181,23 @@ public class CalculateFullMetricHandler(
             "Fetching calculation job. RequestId: {RequestId}",
             requestId);
 
-        var queryOptions = new QueryOptions<MetricCalculationJob, Guid>()
+        var job = await jobRepository.GetById(requestId, ct)
+                  ?? throw new CalculationJobNotFoundException(requestId);
+
+        try
         {
-            Data = requestId,
-        }.WithTracking();
+            job.EnsureAwaitingWorker();
+            return job;
+        }
+        catch (InvalidOperationException e)
+        {
+            logger.LogWarning(
+                e,
+                "Invalid job status. RequestId: {RequestId}, Status: {Status}",
+                requestId,
+                job.Status);
 
-        var job = await jobRepository.GetCalculationJob(queryOptions, ct)
-            ?? throw new CalculationJobNotFoundException(requestId);
-
-        if (job.Status == CalculationStatus.AwaitingWorker) return job;
-        
-        logger.LogWarning(
-            "Invalid job status. RequestId: {RequestId}, Status: {Status}",
-            requestId,
-            job.Status);
-
-        throw new InvalidOperationException("The calculation job is not awaiting worker.");
+            throw;
+        }
     }
 }

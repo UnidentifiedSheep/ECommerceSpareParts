@@ -1,14 +1,14 @@
 ﻿using Abstractions.Interfaces.Services;
 using Application.Common.Interfaces;
+using Application.Common.Interfaces.Cqrs;
 using Attributes;
-using Main.Abstractions.Dtos.Amw.Purchase;
-using Main.Entities;
-using Mapster;
+using Main.Application.Dtos.Amw.Purchase;
 using MediatR;
 
 namespace Main.Application.Handlers.Purchases.AddContentLogisticsToPurchase;
 
 [Transactional]
+[AutoSave]
 public record AddContentLogisticsToPurchaseCommand(IEnumerable<PurchaseContentLogisticDto> Contents) : ICommand;
 
 public class AddContentLogisticsToPurchaseHandler(IUnitOfWork unitOfWork)
@@ -16,9 +16,6 @@ public class AddContentLogisticsToPurchaseHandler(IUnitOfWork unitOfWork)
 {
     public async Task<Unit> Handle(AddContentLogisticsToPurchaseCommand request, CancellationToken cancellationToken)
     {
-        var models = request.Contents.Adapt<List<PurchaseContentLogistic>>();
-        await unitOfWork.AddRangeAsync(models, cancellationToken);
-        await unitOfWork.SaveChangesAsync(cancellationToken);
-        return Unit.Value;
+        throw new NotImplementedException();
     }
 }

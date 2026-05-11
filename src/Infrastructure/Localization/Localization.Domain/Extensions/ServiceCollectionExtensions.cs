@@ -8,7 +8,7 @@ namespace Localization.Domain.Extensions;
 public static class ServiceCollectionExtensions
 {
     public static IServiceCollection AddLocalization(
-        this IServiceCollection services, 
+        this IServiceCollection services,
         Locale defaultLocale,
         params Locale[] locales)
     {
@@ -16,11 +16,14 @@ public static class ServiceCollectionExtensions
             .AddStringLocalizer()
             .AddScopedStringLocalizer();
 
-        services.AddScoped<ScopedLocalizationMiddleware>(sp => 
-            new ScopedLocalizationMiddleware(sp.GetRequiredService<IScopedStringLocalizer>()));
+        var hs = locales.ToHashSet();
 
-        ScopedLocalizationMiddleware.Configure(defaultLocale, locales);
-        
+        services.AddScoped<ScopedLocalizationMiddleware>(sp =>
+            new ScopedLocalizationMiddleware(
+                defaultLocale,
+                hs,
+                sp.GetRequiredService<IScopedStringLocalizer>()));
+
         return services;
     }
 

@@ -1,5 +1,4 @@
 using System.Reflection;
-using Abstractions.Interfaces.Currency;
 using Analytics.Application;
 using Analytics.Application.Consumers;
 using Analytics.Persistence;
@@ -8,6 +7,7 @@ using Api.Common;
 using Api.Common.Extensions;
 using Api.Common.Middleware;
 using Api.Common.Models;
+using Cache;
 using Carter;
 using Localization.Abstractions.Models;
 using Localization.Domain.Extensions;
@@ -16,9 +16,7 @@ using MassTransit;
 using Persistence.Extensions;
 using RabbitMq.Extensions;
 using RabbitMq.Models;
-using Redis;
 using Security;
-using Security.Utils;
 
 var localesPath = Assembly.GetExecutingAssembly().GetDefaultLocalizationPath();
 
@@ -30,8 +28,8 @@ var lokiUrl = Environment.GetEnvironmentVariable("LOKI_URL");
 var env = Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT") ?? "";
 
 builder.Configuration
-    .AddConfigsFromJsons(env)
-    .AddConfigsFromJsons(env, "/app/configs");
+    .AddAppSettingsFromJsons(env)
+    .AddAppSettingsFromJsons(env, "/app/configs");
 
 builder.Host.AddLokiLogger(builder.Configuration, "analytics.api", env, lokiUrl);
 
@@ -61,7 +59,8 @@ builder.Services.AddOptions<MessageBrokerOptions>()
 var brokerOptions = builder.Configuration
                         .GetSection(MessageBrokerOptions.SectionName)
                         .Get<MessageBrokerOptions>()
-                    ?? throw new NullReferenceException($"Missing {MessageBrokerOptions.SectionName} configuration options");
+                    ?? throw new NullReferenceException(
+                        $"Missing {MessageBrokerOptions.SectionName} configuration options");
 
 var uniqQueueName = $"queue-of-analytics-{Environment.MachineName}";
 
@@ -138,18 +137,9 @@ app.UseMiddleware<HeaderSecretMiddleware>();
 
 app.UseMiddleware<ScopedLocalizationMiddleware>();
 
-await SetupCurrency(app.Services);
-
 if (app.Environment.IsDevelopment()) app.MapOpenApi();
 
 
 app.MapHealthChecks("/health");
 
 await app.RunAsync();
-
-async Task SetupCurrency(IServiceProvider serviceProvider)
-{
-    using var scope = serviceProvider.CreateScope();
-    var currencyConverterSetup = scope.ServiceProvider.GetRequiredService<ICurrencyConverterSetup>();
-    await currencyConverterSetup.InitializeAsync();
-}

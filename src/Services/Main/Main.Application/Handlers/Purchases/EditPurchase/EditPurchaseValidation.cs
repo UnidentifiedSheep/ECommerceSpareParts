@@ -1,5 +1,3 @@
-using Abstractions.Interfaces.Currency;
-using Application.Common.Extensions;
 using FluentValidation;
 using Localization.Domain.Extensions;
 using Main.Application.Handlers.Purchases.BaseValidators;
@@ -8,7 +6,7 @@ namespace Main.Application.Handlers.Purchases.EditPurchase;
 
 public class EditPurchaseValidation : AbstractValidator<EditPurchaseCommand>
 {
-    public EditPurchaseValidation(ICurrencyConverter currencyConverter)
+    public EditPurchaseValidation()
     {
         RuleFor(x => x.PurchaseId)
             .NotEmpty()
@@ -23,8 +21,5 @@ public class EditPurchaseValidation : AbstractValidator<EditPurchaseCommand>
 
         RuleFor(x => x.Content)
             .SetValidator(new EditPurchaseDtoValidation());
-
-        RuleFor(x => x.CurrencyId)
-            .CurrencyMustExist(currencyConverter);
     }
 }

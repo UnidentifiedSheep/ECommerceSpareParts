@@ -1,7 +1,6 @@
-using Abstractions.Interfaces;
 using Api.Common.Extensions;
 using Carter;
-using Main.Application.Handlers.StorageContents.DeleteContent;
+using Main.Application.Handlers.StorageContents.SetToZeroContent;
 using MediatR;
 
 namespace Main.Api.EndPoints.Storages;
@@ -13,11 +12,10 @@ public class DeleteStorageContentEndPoint : ICarterModule
         app.MapDelete("/storages/content/{contentId}", async (
                 ISender sender,
                 int contentId,
-                string concurrencyCode,
-                IUserContext user,
+                uint rowVersion,
                 CancellationToken cancellationToken) =>
             {
-                var command = new DeleteStorageContentCommand(contentId, concurrencyCode, user.UserId);
+                var command = new SetToZeroContentCommand(contentId, rowVersion);
                 await sender.Send(command, cancellationToken);
                 return Results.NoContent();
             }).WithTags("Storages")

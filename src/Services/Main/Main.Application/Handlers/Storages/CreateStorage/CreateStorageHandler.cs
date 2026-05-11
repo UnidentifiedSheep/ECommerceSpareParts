@@ -1,12 +1,13 @@
 using Abstractions.Interfaces.Services;
 using Application.Common.Interfaces;
+using Application.Common.Interfaces.Cqrs;
 using Attributes;
-using Main.Entities;
+using Main.Entities.Storage;
 using Main.Enums;
-using Mapster;
 
 namespace Main.Application.Handlers.Storages.CreateStorage;
 
+[AutoSave]
 [Transactional]
 public record CreateStorageCommand(string Name, string? Description, string? Location, StorageType Type)
     : ICommand<CreateStorageResult>;
@@ -17,9 +18,11 @@ public class CreateStorageHandler(IUnitOfWork unitOfWork) : ICommandHandler<Crea
 {
     public async Task<CreateStorageResult> Handle(CreateStorageCommand request, CancellationToken cancellationToken)
     {
-        var newStorage = request.Adapt<Storage>();
-        await unitOfWork.AddAsync(newStorage, cancellationToken);
-        await unitOfWork.SaveChangesAsync(cancellationToken);
-        return new CreateStorageResult(newStorage.Name);
+        var storage = Storage.Create(request.Name, request.Type);
+        storage.SetDescription(request.Description);
+        storage.SetLocation(request.Location);
+
+        await unitOfWork.AddAsync(storage, cancellationToken);
+        return new CreateStorageResult(storage.Name);
     }
 }

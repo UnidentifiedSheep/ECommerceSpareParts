@@ -7,9 +7,12 @@ namespace Analytics.Entities.Metrics;
 [MetricInfo("ArticleSalesMetric")]
 public sealed class ArticleSalesMetric : ArticleMetric<ArticleInfoModel>
 {
+    private ArticleSalesMetric()
+    {
+    }
+
     public ArticleSalesMetric(int articleId) : base(articleId)
     {
-        ArticleId = articleId;
     }
 
     public override DependsOn DependsOn { get; protected set; } = DependsOn.Sale | DependsOn.Period;

@@ -2,7 +2,7 @@
 using Api.Common.Extensions;
 using Carter;
 using Enums;
-using Main.Abstractions.Dtos.Amw.StorageRoutes;
+using Main.Application.Dtos.Storage;
 using Main.Application.Handlers.StorageRoutes.GetStorageRoutes;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
@@ -31,7 +31,7 @@ public class GetStorageRoutesEndPoint : ICarterModule
                 async (ISender sender, [AsParameters] GetStorageRoutesRequest request, CancellationToken token) =>
                 {
                     var query = new GetStorageRoutesQuery(request.StorageFrom, request.StorageTo, request.IsActive,
-                        new PaginationModel(request.Page, request.Limit));
+                        new Pagination(request.Page, request.Limit));
                     var result = await sender.Send(query, token);
                     return Results.Ok(new GetStorageRoutesResponse(result.StorageRoutes));
                 }).WithTags("Storage Routes")

@@ -18,7 +18,7 @@ public class HeaderSecretMiddleware(IOptionsMonitor<HeaderSecretOptions> options
             return;
         }
 
-        var receivedToken = context.Request.Headers["X-Gateway-Token"].FirstOrDefault();
+        var receivedToken = context.Request.Headers["X-Internal-Token"].FirstOrDefault();
 
         if (string.IsNullOrEmpty(receivedToken) || receivedToken != option.Key)
         {

@@ -1,5 +1,5 @@
-﻿using Analytics.Abstractions.Dtos.CalculationJob;
-using Analytics.Abstractions.Interfaces.Application;
+﻿using Analytics.Application.Dtos.CalculationJob;
+using Analytics.Application.Interfaces.Services;
 using Analytics.Entities.Metrics;
 
 namespace Analytics.Application.Services.Metrics.Converters;
@@ -15,8 +15,6 @@ public abstract class MetricConverterBase<TMetric> : IMetricConverter<TMetric> w
 
     protected static void FillBase(Metric metric, MetricPayloadDto payload)
     {
-        metric.RangeStart = payload.RangeStart;
-        metric.RangeEnd = payload.RangeEnd;
-        metric.CurrencyId = payload.CurrencyId;
+        metric.ConfigurePeriod(payload.CurrencyId, payload.RangeStart, payload.RangeEnd);
     }
 }

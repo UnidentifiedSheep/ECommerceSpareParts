@@ -1,5 +1,4 @@
 using System.Reflection;
-using Abstractions.Interfaces.Currency;
 using Abstractions.Models;
 using Amazon.S3;
 using Api.Common;
@@ -8,25 +7,22 @@ using Api.Common.Middleware;
 using Api.Common.Models;
 using Api.Common.OperationFilters;
 using Application.Common.Interfaces.Settings;
+using Cache;
 using Carter;
 using Contracts.Currency;
 using Contracts.Settings;
 using ExchangeRate;
 using Hangfire;
 using Hangfire.PostgreSql;
-using Localization.Abstractions.Models;
 using Localization.Domain.Extensions;
 using Localization.Domain.Middlewares;
 using Mail;
-using Main.Abstractions.Constants;
-using Main.Api.EndPoints.Articles;
+using Main.Api.EndPoints.Products;
 using Main.Application;
 using Main.Application.BackgroundServices;
 using Main.Application.Configs;
-using Main.Application.Configs.Mapster;
 using Main.Application.Consumers;
 using Main.Application.HangFireTasks;
-using Main.Cache;
 using Main.Persistence;
 using Main.Persistence.Context;
 using MassTransit;
@@ -34,7 +30,6 @@ using Microsoft.AspNetCore.HttpOverrides;
 using OpenTelemetry.Metrics;
 using RabbitMq.Extensions;
 using RabbitMq.Models;
-using Redis;
 using S3;
 using Security;
 using Global = Main.Application.Global;
@@ -45,8 +40,8 @@ var lokiUrl = Environment.GetEnvironmentVariable("LOKI_URL");
 var env = Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT") ?? "";
 
 builder.Configuration
-    .AddConfigsFromJsons(env)
-    .AddConfigsFromJsons(env, "/app/configs");
+    .AddAppSettingsFromJsons(env)
+    .AddAppSettingsFromJsons(env, "/app/configs");
 
 builder.Host.AddLokiLogger(builder.Configuration, "main.api", env, lokiUrl);
 
@@ -78,7 +73,8 @@ builder.Services.AddOptions<MessageBrokerOptions>()
 var brokerOptions = builder.Configuration
                         .GetSection(MessageBrokerOptions.SectionName)
                         .Get<MessageBrokerOptions>()
-                    ?? throw new NullReferenceException($"Missing {MessageBrokerOptions.SectionName} configuration options");
+                    ?? throw new NullReferenceException(
+                        $"Missing {MessageBrokerOptions.SectionName} configuration options");
 
 var uniqQueueName = $"queue-of-main-{Environment.MachineName}";
 
@@ -114,28 +110,24 @@ builder.Services.AddMassTransit(x =>
         {
             ep.Durable = true;
 
-            ep.ConfigureConsumer<GetArticleCoefficientsConsumer>(context);
-            ep.ConfigureConsumer<GetCurrenciesConsumer>(context);
-            ep.ConfigureConsumer<GetStorageContentCostsConsumer>(context);
+            ep.ConfigureConsumer<CurrencyCreatedConsumer>(context);
+            ep.ConfigureConsumer<ProductSizesUpdatedConsumer>(context);
+            ep.ConfigureConsumer<ProductWeightUpdatedConsumer>(context);
+            ep.ConfigureConsumer<ProductUpdatedConsumer>(context);
+            ep.ConfigureConsumer<RoleUpdatedConsumer>(context);
+            ep.ConfigureConsumer<UserUpdatedConsumer>(context);
         });
     });
 });
-
-var localesPath = Assembly.GetExecutingAssembly().GetDefaultLocalizationPath();
-Locale[] locales = ["ru-RU", "en-EN"];
-Locale defaultLocale = "ru-RU";
-
-builder.Services.AddLocalization(defaultLocale, locales);
 
 builder.Services.AddHttpContextAccessor();
 
 builder.Services
     .AddPersistenceLayer(Environment.GetEnvironmentVariable("DB_CONNECTION_STRING")!)
     .AddCacheLayer(Environment.GetEnvironmentVariable("REDIS_CONNECTION_STRING")!, "main")
-    .AddAppCacheLayer()
-    .AddJsonSigner( Environment.GetEnvironmentVariable("SIGN_SECRET")!, Global.JsonOptions)
+    .AddJsonSigner(Environment.GetEnvironmentVariable("SIGN_SECRET")!, Global.JsonOptions)
     .AddFullSecurityLayer()
-    .AddJwtOptions(builder.Configuration)
+    .AddEComAuth(builder.Configuration)
     .AddMailLayer()
     .AddCommonLayer()
     .AddS3(() =>
@@ -176,14 +168,13 @@ builder.Services.AddCors(options =>
     });
 });
 
-var endpointAssembly = typeof(AddArticleContentEndPoint).Assembly;
+var endpointAssembly = typeof(AddProductContentEndPoint).Assembly;
 builder.Services.AddCarter(new DependencyContextAssemblyCatalog(endpointAssembly));
 
 builder.Services.AddTransient<HeaderSecretMiddleware>();
 
 var app = builder.Build();
 
-MapsterConfig.Configure();
 SortByConfig.Configure();
 
 app.UseMiddleware<HeaderSecretMiddleware>();
@@ -195,14 +186,10 @@ app.UseForwardedHeaders(new ForwardedHeadersOptions
     ForwardedHeaders = ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto
 });
 
-Global.SetSystemId(Environment.GetEnvironmentVariable("SYSTEM_ID")!);
-Global.SetServiceUrl(Environment.GetEnvironmentVariable("S3_SERVICE_URL")!);
-Global.SetImageBucketName(Environment.GetEnvironmentVariable("S3_IMAGES_BUCKET")!);
-
 app.UseHangfireDashboard();
 
+var localesPath = Assembly.GetExecutingAssembly().GetDefaultLocalizationPath();
 await app.LoadLocalesFromJson(localesPath);
-await InitCurrencyConverter(app.Services);
 await InitSettings(app.Services);
 
 app.UseExceptionHandler(_ => { });
@@ -243,16 +230,9 @@ await app.RunAsync();
 
 return;
 
-async Task InitCurrencyConverter(IServiceProvider serviceProvider)
-{
-    using var scope = serviceProvider.CreateScope();
-    var currencyConverterSetup = scope.ServiceProvider.GetRequiredService<ICurrencyConverterSetup>();
-    await currencyConverterSetup.InitializeAsync();
-}
-
 async Task InitSettings(IServiceProvider serviceProvider)
 {
     using var scope = serviceProvider.CreateScope();
     var sr = scope.ServiceProvider.GetRequiredService<ISettingsService>();
-    await sr.LoadAsync(Settings.AllSettings);
+    await sr.LoadAsync();
 }

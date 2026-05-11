@@ -3,8 +3,9 @@
 [AttributeUsage(AttributeTargets.Class)]
 public class MetricInfoAttribute : Attribute
 {
-    public MetricInfoAttribute(string systemName, 
-        string nameLocalizationKey, 
+    public MetricInfoAttribute(
+        string systemName,
+        string nameLocalizationKey,
         string descriptionLocalizationKey)
     {
         SystemName = systemName;
@@ -13,8 +14,8 @@ public class MetricInfoAttribute : Attribute
     }
 
     /// <summary>
-    /// This constructor sets all fields as system name. Adds .description postfix for DescriptionKey
-    /// and .name for NameKey
+    ///     This constructor sets all fields as system name. Adds .description postfix for DescriptionKey
+    ///     and .name for NameKey
     /// </summary>
     /// <param name="systemName"></param>
     public MetricInfoAttribute(string systemName)

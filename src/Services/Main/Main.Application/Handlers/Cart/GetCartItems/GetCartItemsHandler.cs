@@ -1,24 +1,33 @@
 ﻿using Abstractions.Models;
+using Application.Common.Extensions;
 using Application.Common.Interfaces;
-using Main.Abstractions.Dtos.Cart;
-using Main.Abstractions.Interfaces.DbRepositories;
-using Mapster;
+using Application.Common.Interfaces.Cqrs;
+using Application.Common.Interfaces.Repositories;
+using LinqKit;
+using Main.Application.Dtos.Cart;
+using Main.Application.Handlers.Projections;
+using Microsoft.EntityFrameworkCore;
 
 namespace Main.Application.Handlers.Cart.GetCartItems;
 
-public record GetCartItemsQuery(Guid UserId, PaginationModel Pagination) : IQuery<GetCartItemsResult>;
+public record GetCartItemsQuery(Guid UserId, Pagination Pagination) : IQuery<GetCartItemsResult>;
 
 public record GetCartItemsResult(List<CartItemDto> CartItems);
 
-public class GetCartItemsHandler(ICartRepository cartRepository) : IQueryHandler<GetCartItemsQuery, GetCartItemsResult>
+public class GetCartItemsHandler(
+    IReadRepository<Entities.Cart.Cart, (Guid, int)> repository)
+    : IQueryHandler<GetCartItemsQuery, GetCartItemsResult>
 {
     public async Task<GetCartItemsResult> Handle(GetCartItemsQuery request, CancellationToken cancellationToken)
     {
-        var page = request.Pagination.Page;
-        var size = request.Pagination.Size;
+        var result = await repository
+            .Query
+            .Where(x => x.UserId == request.UserId)
+            .AsExpandable()
+            .Select(CartProjections.ToCartItemDto)
+            .ApplyPagination(request.Pagination)
+            .ToListAsync(cancellationToken);
 
-        var result = await cartRepository
-            .GetCartItemsAsync(request.UserId, false, page, size, cancellationToken);
-        return new GetCartItemsResult(result.Adapt<List<CartItemDto>>());
+        return new GetCartItemsResult(result);
     }
 }

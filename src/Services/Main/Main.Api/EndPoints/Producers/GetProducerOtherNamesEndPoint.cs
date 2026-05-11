@@ -1,6 +1,6 @@
 using Abstractions.Models;
 using Carter;
-using Main.Abstractions.Dtos.Amw.Producers;
+using Main.Application.Dtos.Producer;
 using Main.Application.Handlers.Producers.GetProducerOtherNames;
 using Mapster;
 using MediatR;
@@ -16,7 +16,7 @@ public class GetProducerOtherNamesEndPoint : ICarterModule
         app.MapGet("/producers/{producerId}/names",
                 async (ISender sender, int producerId, int page, int limit, CancellationToken token) =>
                 {
-                    var query = new GetProducerOtherNamesQuery(producerId, new PaginationModel(page, limit));
+                    var query = new GetProducerOtherNamesQuery(producerId, new Pagination(page, limit));
                     var result = await sender.Send(query, token);
                     return Results.Ok(result.Adapt<GetProducerOtherNamesResponse>());
                 }).WithTags("Producers")

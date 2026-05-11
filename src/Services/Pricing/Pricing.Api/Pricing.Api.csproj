@@ -19,13 +19,12 @@
     </ItemGroup>
 
     <ItemGroup>
+        <ProjectReference Include="..\..\..\Infrastructure\Cache\Cache.csproj" />
         <ProjectReference Include="..\..\..\Infrastructure\RabbitMq\RabbitMq.csproj"/>
-        <ProjectReference Include="..\..\..\Infrastructure\Redis\Redis.csproj"/>
         <ProjectReference Include="..\..\..\Infrastructure\Security\Security.csproj"/>
         <ProjectReference Include="..\..\Api.Common\Api.Common.csproj"/>
         <ProjectReference Include="..\Pricing.Abstractions\Pricing.Abstractions.csproj"/>
         <ProjectReference Include="..\Pricing.Application\Pricing.Application.csproj"/>
-        <ProjectReference Include="..\Pricing.Cache\Pricing.Cache.csproj"/>
         <ProjectReference Include="..\Pricing.Persistence\Pricing.Persistence.csproj"/>
     </ItemGroup>
 

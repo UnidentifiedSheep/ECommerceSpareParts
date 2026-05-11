@@ -1,24 +1,27 @@
 ﻿using Abstractions.Interfaces.Services;
 using Application.Common.Interfaces;
+using Application.Common.Interfaces.Cqrs;
 using Attributes;
-using Main.Abstractions.Exceptions.Storages;
-using Main.Abstractions.Interfaces.DbRepositories;
+using Main.Application.Interfaces.Persistence;
+using Main.Entities.Exceptions.Storages;
 using MediatR;
 
 namespace Main.Application.Handlers.StorageRoutes.DeleteStorageRoute;
 
+[AutoSave]
 [Transactional]
 public record DeleteStorageRouteCommand(Guid Id) : ICommand;
 
-public class DeleteStorageRouteHandler(IStorageRoutesRepository storageRoutesRepository, IUnitOfWork unitOfWork)
+public class DeleteStorageRouteHandler(
+    IStorageRouteRepository repository,
+    IUnitOfWork unitOfWork)
     : ICommandHandler<DeleteStorageRouteCommand>
 {
     public async Task<Unit> Handle(DeleteStorageRouteCommand request, CancellationToken cancellationToken)
     {
-        var route = await storageRoutesRepository.GetStorageRouteAsync(request.Id, true, cancellationToken)
+        var route = await repository.GetById(request.Id, cancellationToken)
                     ?? throw new StorageRouteNotFound(request.Id);
         unitOfWork.Remove(route);
-        await unitOfWork.SaveChangesAsync(cancellationToken);
         return Unit.Value;
     }
 }

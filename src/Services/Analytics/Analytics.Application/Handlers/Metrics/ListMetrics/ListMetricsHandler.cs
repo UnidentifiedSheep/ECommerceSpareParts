@@ -1,16 +1,16 @@
 ﻿using System.Reflection;
-using Analytics.Abstractions.Dtos.Metric;
+using Analytics.Application.Dtos.Metric;
 using Analytics.Attributes;
 using Analytics.Entities.Metrics;
 using Application.Common.Interfaces;
+using Application.Common.Interfaces.Cqrs;
 using Localization.Abstractions.Interfaces;
 
 namespace Analytics.Application.Handlers.Metrics.ListMetrics;
 
-public sealed record ListMetricsQuery() : IQuery<ListMetricsResult>;
+public sealed record ListMetricsQuery : IQuery<ListMetricsResult>;
 
 public sealed record ListMetricsResult(IReadOnlyList<MetricInfoDto> Metrics);
-
 
 public class ListMetricsHandler(IScopedStringLocalizer localizer) : IQueryHandler<ListMetricsQuery, ListMetricsResult>
 {
@@ -18,11 +18,11 @@ public class ListMetricsHandler(IScopedStringLocalizer localizer) : IQueryHandle
     {
         var metrics = GetAllMetricWithInfos();
 
-        var result = metrics.Select(attribute => 
+        var result = metrics.Select(attribute =>
             new MetricInfoDto
             {
-                SystemName = attribute.SystemName, 
-                Description = localizer[attribute.DescriptionLocalizationKey], 
+                SystemName = attribute.SystemName,
+                Description = localizer[attribute.DescriptionLocalizationKey],
                 Name = localizer[attribute.NameLocalizationKey]
             }).ToList();
 

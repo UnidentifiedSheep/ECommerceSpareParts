@@ -1,5 +1,5 @@
 ﻿using System.Reflection;
-using Analytics.Abstractions.Interfaces.Application;
+using Analytics.Application.Interfaces.Services;
 using Analytics.Attributes;
 using Analytics.Entities.Metrics;
 
@@ -12,6 +12,19 @@ public class MetricCalculatorRegistry : IMetricCalculatorRegistry
     public MetricCalculatorRegistry(Assembly? assembly = null)
     {
         RegisterFromAssembly(assembly ?? Assembly.GetExecutingAssembly());
+    }
+
+    public Type GetMetricType(string name)
+    {
+        if (_nameToType.TryGetValue(name, out var type))
+            return type;
+
+        throw new NotSupportedException($"Metric '{name}' is not supported");
+    }
+
+    public bool TryGetMetricType(string name, out Type? type)
+    {
+        return _nameToType.TryGetValue(name, out type);
     }
 
     private void RegisterFromAssembly(Assembly assembly)
@@ -30,24 +43,11 @@ public class MetricCalculatorRegistry : IMetricCalculatorRegistry
                 x.MetricType.GetCustomAttribute<MetricInfoAttribute>() != null)
             .Select(x => new
             {
-                Type = x.MetricType, 
+                Type = x.MetricType,
                 x.MetricType.GetCustomAttribute<MetricInfoAttribute>()!.SystemName
             });
 
         foreach (var type in result)
             _nameToType.Add(type.SystemName, type.Type);
-    }
-
-    public Type GetMetricType(string name)
-    {
-        if (_nameToType.TryGetValue(name, out var type))
-            return type;
-
-        throw new NotSupportedException($"Metric '{name}' is not supported");
-    }
-
-    public bool TryGetMetricType(string name, out Type? type)
-    {
-        return _nameToType.TryGetValue(name, out type);
     }
 }

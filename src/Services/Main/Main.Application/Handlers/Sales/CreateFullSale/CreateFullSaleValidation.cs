@@ -25,9 +25,5 @@ public class CreateFullSaleValidation : AbstractValidator<CreateFullSaleCommand>
         RuleFor(x => x.BuyerId)
             .NotEmpty()
             .WithLocalizationKey("sale.buyer.id.not.empty");
-
-        RuleFor(x => x.CreatedUserId)
-            .NotEmpty()
-            .WithLocalizationKey("sale.created.user.id.not.empty");
     }
 }

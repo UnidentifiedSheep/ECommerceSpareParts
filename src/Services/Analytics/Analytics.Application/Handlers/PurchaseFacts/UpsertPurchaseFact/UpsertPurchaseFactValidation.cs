@@ -24,9 +24,7 @@ public class UpsertPurchaseFactValidation : AbstractValidator<UpsertPurchaseFact
             {
                 z.RuleFor(x => x.Price)
                     .GreaterThan(0)
-                    .WithLocalizationKey("purchase.fact.content.price.required")
-                    .PrecisionScale(18, 2, true)
-                    .WithLocalizationKey("purchase.fact.content.price.precision.scale");
+                    .WithLocalizationKey("purchase.fact.content.price.required");
 
                 z.RuleFor(x => x.Count)
                     .GreaterThan(0)

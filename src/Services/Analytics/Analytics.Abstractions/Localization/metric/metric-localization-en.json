@@ -1,6 +1,8 @@
 ﻿{
   "locale": "en",
   "keyValues": {
-    "metric.not.found": "Unable to find metric."
+    "metric.not.found": "Unable to find metric.",
+    "metric.dimension.key.required": "Metric dimension key is required.",
+    "metric.dimension.key.too.long": "Metric dimension key must be 200 characters or fewer."
   }
 }

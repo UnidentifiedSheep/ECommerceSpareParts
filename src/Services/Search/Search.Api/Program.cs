@@ -16,7 +16,6 @@ using RabbitMq.Extensions;
 using RabbitMq.Models;
 using Search.Api.EndPoints.Articles;
 using Search.Application;
-using Search.Application.Consumers;
 using Search.Persistence;
 using Security;
 
@@ -28,8 +27,8 @@ var lokiUrl = Environment.GetEnvironmentVariable("LOKI_URL");
 var env = Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT") ?? "";
 
 builder.Configuration
-    .AddConfigsFromJsons(env)
-    .AddConfigsFromJsons(env, "/app/configs");
+    .AddAppSettingsFromJsons(env)
+    .AddAppSettingsFromJsons(env, "/app/configs");
 
 builder.Host.AddLokiLogger(builder.Configuration, "search.api", env, lokiUrl);
 
@@ -50,14 +49,11 @@ builder.Services.AddOptions<MessageBrokerOptions>()
 var brokerOptions = builder.Configuration
                         .GetSection(MessageBrokerOptions.SectionName)
                         .Get<MessageBrokerOptions>()
-                    ?? throw new NullReferenceException($"Missing {MessageBrokerOptions.SectionName} configuration options");
+                    ?? throw new NullReferenceException(
+                        $"Missing {MessageBrokerOptions.SectionName} configuration options");
 
 builder.Services.AddMassTransit(x =>
 {
-    x.AddConsumer<ArticledCreatedConsumer>();
-    x.AddConsumer<ArticleUpdatedConsumer>();
-    x.AddConsumer<ArticleDeletedConsumer>();
-    x.AddConsumer<SuggestionRebuildNeededConsumer>();
 
     x.UsingRabbitMq((context, cfg) =>
     {
@@ -67,10 +63,6 @@ builder.Services.AddMassTransit(x =>
         {
             ep.Durable = true;
 
-            ep.ConfigureConsumer<ArticledCreatedConsumer>(context);
-            ep.ConfigureConsumer<ArticleUpdatedConsumer>(context);
-            ep.ConfigureConsumer<ArticleDeletedConsumer>(context);
-            ep.ConfigureConsumer<SuggestionRebuildNeededConsumer>(context);
         });
     });
 });

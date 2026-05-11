@@ -1,14 +1,13 @@
-using Abstractions.Interfaces.Cache;
-using Abstractions.Interfaces.RelatedData;
 using Application.Common.Interfaces;
+using Application.Common.Interfaces.Cqrs;
 using MediatR;
+using ZiggyCreatures.Caching.Fusion;
 
 namespace Application.Common.Behaviors;
 
 public class CacheBehavior<TRequest, TResponse>(
-    ICache cache,
-    IRelatedDataFactory relatedDataFactory,
-    IRelatedDataCollector relatedDataCollector,
+    IFusionCache cache,
+    IIdsCollector idsCollector,
     ICachePolicy<TRequest>? cachePolicy = null) : IPipelineBehavior<TRequest, TResponse>
     where TRequest : IRequest<TResponse> where TResponse : notnull
 {
@@ -20,29 +19,23 @@ public class CacheBehavior<TRequest, TResponse>(
         if (cachePolicy == null)
             return await next(cancellationToken);
 
+        List<string>? tags = null;
         var cacheKey = cachePolicy.GetCacheKey(request);
 
-        var cached = await cache.StringGetAsync<TResponse>(cacheKey);
-        if (cached != null)
-            return cached;
-
-        var relatedType = cachePolicy.RelatedType;
-
-        using var _ = relatedDataCollector.BeginScope();
-
-        var response = await next(cancellationToken);
-
-        if (relatedType != null)
+        if (cachePolicy.Tags is { Count: > 0 })
         {
-            var relatedRepo = relatedDataFactory.GetRepository(relatedType);
-            var ids = relatedDataCollector.CurrentIds;
-
-            if (ids.Count > 0)
-                await relatedRepo.AddRelatedDataAsync(ids, cacheKey);
+            tags = [];
+            if (cachePolicy.BaseTag != null)
+                tags.Add(cachePolicy.BaseTag);
+            foreach (var id in idsCollector.CurrentIds)
+                tags.AddRange(cachePolicy.Tags.Select(tag => $"{tag}:{id}"));
         }
 
-        await cache.StringSetAsync(cacheKey, response, TimeSpan.FromSeconds(cachePolicy.DurationSeconds));
-
-        return response;
+        return await cache.GetOrSetAsync<TResponse>(
+            cacheKey,
+            ct => next(ct),
+            cachePolicy.TimeToLive,
+            tags,
+            cancellationToken);
     }
 }

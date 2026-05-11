@@ -1,5 +1,5 @@
-using Main.Abstractions.Dtos.Amw.Purchase;
-using Main.Abstractions.Dtos.Amw.Sales;
+using Main.Application.Dtos.Amw.Purchase;
+using Main.Application.Dtos.Sale;
 
 namespace Main.Application.Extensions;
 

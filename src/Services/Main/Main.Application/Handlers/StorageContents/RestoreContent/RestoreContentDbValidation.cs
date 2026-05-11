@@ -8,7 +8,7 @@ public class RestoreContentDbValidation : AbstractDbValidation<RestoreContentCom
 {
     public override void Build(IValidationPlan plan, RestoreContentCommand request)
     {
-        plan.ValidateUserExistsId(request.UserId)
-            .ValidateStorageExistsName(request.ContentDetails.Select(x => x.Detail.Storage).ToHashSet());
+        plan.ValidateStorageExistsName(request.ContentDetails.Select(x => x.Detail.Storage).Distinct())
+            .ValidateCurrencyExistsId(request.ContentDetails.Select(x => x.Detail.CurrencyId).Distinct());
     }
 }

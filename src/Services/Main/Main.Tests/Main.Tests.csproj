@@ -32,15 +32,14 @@
 
     <ItemGroup>
         <ProjectReference Include="..\..\..\Core\Exceptions\Exceptions.csproj"/>
+        <ProjectReference Include="..\..\..\Infrastructure\Cache\Cache.csproj"/>
         <ProjectReference Include="..\..\..\Infrastructure\Localization\Localization.Domain\Localization.Domain.csproj"/>
         <ProjectReference Include="..\..\..\Infrastructure\Mail\Mail.csproj"/>
         <ProjectReference Include="..\..\..\Infrastructure\RabbitMq\RabbitMq.csproj"/>
-        <ProjectReference Include="..\..\..\Infrastructure\Redis\Redis.csproj"/>
         <ProjectReference Include="..\..\..\Infrastructure\Security\Security.csproj"/>
         <ProjectReference Include="..\..\Api.Common\Api.Common.csproj"/>
         <ProjectReference Include="..\..\Test.Common\Test.Common.csproj"/>
         <ProjectReference Include="..\Main.Application\Main.Application.csproj"/>
-        <ProjectReference Include="..\Main.Cache\Main.Cache.csproj"/>
         <ProjectReference Include="..\Main.Persistence\Main.Persistence.csproj"/>
     </ItemGroup>
 

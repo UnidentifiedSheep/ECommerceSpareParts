@@ -1,9 +1,6 @@
-using Abstractions.Models;
 using Api.Common.Extensions;
 using Carter;
-using Main.Abstractions.Dtos.Amw.Sales;
-using Main.Application.Handlers.Sales.GetSales;
-using Mapster;
+using Main.Application.Dtos.Sale;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
 
@@ -44,12 +41,12 @@ public class GetSalesEndPoint : ICarterModule
     {
         app.MapGet("/sales/", async (ISender sender, [AsParameters] GetSalesRequest request, CancellationToken token) =>
             {
-                var pagination = new PaginationModel(request.Page, request.Limit);
+                /*var pagination = new Pagination(request.Page, request.Limit);
                 var query = new GetSalesQuery(request.RangeStartDate, request.RangeEndDate, pagination,
                     request.BuyerId, request.CurrencyId, request.SortBy, request.SearchTerm);
                 var result = await sender.Send(query, token);
-                var response = result.Adapt<GetSalesResponse>();
-                return Results.Ok(response);
+                var response = result.Adapt<GetSalesResponse>();*/
+                return Results.Ok();
             }).WithTags("Sales")
             .WithDescription("Получение списка продаж")
             .WithDisplayName("Получение продаж")

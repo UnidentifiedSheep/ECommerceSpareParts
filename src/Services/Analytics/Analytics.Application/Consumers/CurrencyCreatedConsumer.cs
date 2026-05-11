@@ -1,5 +1,4 @@
-using Analytics.Application.Handlers.Currencies.CreateCurrency;
-using Contracts.Currency;
+﻿using Contracts.Currency;
 using MassTransit;
 using MediatR;
 
@@ -9,8 +8,6 @@ public class CurrencyCreatedConsumer(IMediator mediator) : IConsumer<CurrencyCre
 {
     public async Task Consume(ConsumeContext<CurrencyCreatedEvent> context)
     {
-        var currency = context.Message.Currency;
-        var command = new CreateCurrencyCommand(currency.Id, currency.ToUsdRate);
-        await mediator.Send(command);
+        //TODO
     }
 }

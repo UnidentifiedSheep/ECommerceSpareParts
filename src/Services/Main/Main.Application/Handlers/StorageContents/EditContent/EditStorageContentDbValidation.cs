@@ -8,6 +8,13 @@ public class EditStorageContentDbValidation : AbstractDbValidation<EditStorageCo
 {
     public override void Build(IValidationPlan plan, EditStorageContentCommand request)
     {
-        plan.ValidateUserExistsId(request.UserId);
+        var currencyIds = request.EditedFields
+            .Where(x => x.Value.Model.CurrencyId.IsSet)
+            .Select(x => x.Value.Model.CurrencyId.Value)
+            .Distinct()
+            .ToArray();
+
+        if (currencyIds.Length != 0)
+            plan.ValidateCurrencyExistsId(currencyIds);
     }
 }

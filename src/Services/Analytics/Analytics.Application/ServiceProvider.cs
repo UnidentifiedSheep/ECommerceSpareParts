@@ -1,17 +1,11 @@
 using Abstractions.Interfaces;
-using Abstractions.Interfaces.Currency;
-using Analytics.Abstractions.Interfaces.Application;
-using Analytics.Application.Configs.Mapster;
-using Analytics.Application.Services;
-using Analytics.Application.Services.Metrics;
+using Analytics.Application.Interfaces.Services;
 using Analytics.Application.Services.Metrics.Calculators;
 using Analytics.Application.Services.Metrics.Converters;
 using Analytics.Application.Services.Metrics.Validators;
 using Analytics.Entities.Metrics;
-using Application.Common.Behaviors;
-using Application.Common.Extensions;
+using Application.Common;
 using Application.Common.Services;
-using FluentValidation;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace Analytics.Application;
@@ -20,29 +14,12 @@ public static class ServiceProvider
 {
     public static IServiceCollection AddApplicationLayer(this IServiceCollection collection)
     {
-        MapsterConfig.Configure();
-        
-        collection.RegisterRelatedData()
+        collection
+            .AddApplicationBase(typeof(Global).Assembly)
             .RegisterMetricCalculators()
-            .RegisterMetricConverters()
-            .RegisterCachePolicies(typeof(ServiceProvider).Assembly);
+            .RegisterMetricConverters();
 
         collection.AddSingleton<IJsonSerializer, JsonSerializer>();
-        collection.AddSingleton<ICurrencyConverter, CurrencyConverter>(_ => new CurrencyConverter(Global.UsdId));
-        collection.AddScoped<ICurrencyConverterSetup, CurrencyConverterSetup>();
-
-        collection.AddValidatorsFromAssembly(typeof(Global).Assembly);
-        
-        collection.AddMediatR(config =>
-        {
-            config.RegisterServicesFromAssembly(typeof(Global).Assembly);
-            config.AddOpenBehavior(typeof(ValidationBehavior<,>));
-            config.AddOpenBehavior(typeof(DbValidationBehavior<,>), ServiceLifetime.Scoped);
-            config.AddOpenBehavior(typeof(LoggingBehavior<,>));
-            config.AddOpenBehavior(typeof(CacheBehavior<,>));
-            config.AddOpenBehavior(typeof(TransactionBehavior<,>), ServiceLifetime.Scoped);
-            config.AddOpenBehavior(typeof(SaveChangesBehavior<,>), ServiceLifetime.Scoped);
-        });
 
         return collection;
     }
@@ -63,7 +40,7 @@ public static class ServiceProvider
         collection.AddSingleton<IMetricConverterDispatcher, MetricConverterDispatcher>();
         collection.AddSingleton<IMetricConverter<ArticlePurchasesMetric>, ArticlePurchaseMetricConverter>();
         collection.AddSingleton<IMetricConverter<ArticleSalesMetric>, ArticleSaleMetricConverter>();
-        
+
         return collection;
     }
 }

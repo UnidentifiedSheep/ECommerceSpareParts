@@ -1,7 +1,7 @@
 using Abstractions.Interfaces.Services;
 using Application.Common.Interfaces;
 using Application.Common.Models;
-using Main.Entities;
+using Main.Entities.User;
 using Mapster;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;

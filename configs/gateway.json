@@ -1,8 +1,42 @@
 {
   "ReverseProxy": {
     "Routes": {
+      "route-main-internal-deny": {
+        "ClusterId": "blackhole-cluster",
+        "Order": -100,
+        "Match": {
+          "Path": "/main/internal/{**catch-all}"
+        },
+        "AuthorizationPolicy": "DenyAll"
+      },
+      "route-analytics-internal-deny": {
+        "ClusterId": "blackhole-cluster",
+        "Order": -100,
+        "Match": {
+          "Path": "/analytics/internal/{**catch-all}"
+        },
+        "AuthorizationPolicy": "DenyAll"
+      },
+      "route-search-internal-deny": {
+        "ClusterId": "blackhole-cluster",
+        "Order": -100,
+        "Match": {
+          "Path": "/search/internal/{**catch-all}"
+        },
+        "AuthorizationPolicy": "DenyAll"
+      },
+      "route-pricing-internal-deny": {
+        "ClusterId": "blackhole-cluster",
+        "Order": -100,
+        "Match": {
+          "Path": "/pricing/internal/{**catch-all}"
+        },
+        "AuthorizationPolicy": "DenyAll"
+      },
+
       "route-api": {
         "ClusterId": "main-cluster",
+        "Order": 0,
         "Match": {
           "Path": "/main/{**catch-all}"
         },
@@ -12,8 +46,10 @@
           }
         ]
       },
+
       "route-analytics": {
         "ClusterId": "analytics-cluster",
+        "Order": 0,
         "Match": {
           "Path": "/analytics/{**catch-all}"
         },
@@ -23,10 +59,12 @@
           }
         ]
       },
+
       "route-search": {
         "ClusterId": "search-cluster",
+        "Order": 0,
         "Match": {
-          "Path": "/search/{**catch-all}",
+          "Path": "/search/{**catch-all}"
         },
         "Transforms": [
           {
@@ -34,8 +72,10 @@
           }
         ]
       },
+
       "route-pricing": {
         "ClusterId": "pricing-cluster",
+        "Order": 0,
         "Match": {
           "Path": "/pricing/{**catch-all}"
         },
@@ -46,8 +86,16 @@
         ]
       }
     },
-    
+
     "Clusters": {
+      "blackhole-cluster": {
+        "Destinations": {
+          "blackhole": {
+            "Address": "http://127.0.0.1:1/"
+          }
+        }
+      },
+
       "main-cluster": {
         "LoadBalancingPolicy": "RoundRobin",
         "HealthCheck": {
@@ -65,6 +113,7 @@
           }
         }
       },
+
       "analytics-cluster": {
         "LoadBalancingPolicy": "RoundRobin",
         "HealthCheck": {
@@ -82,6 +131,7 @@
           }
         }
       },
+
       "search-cluster": {
         "LoadBalancingPolicy": "RoundRobin",
         "HealthCheck": {
@@ -99,6 +149,7 @@
           }
         }
       },
+
       "pricing-cluster": {
         "LoadBalancingPolicy": "RoundRobin",
         "HealthCheck": {

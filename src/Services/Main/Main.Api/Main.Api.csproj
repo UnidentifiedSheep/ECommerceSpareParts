@@ -12,7 +12,7 @@
     <ItemGroup>
         <PackageReference Include="Carter" Version="10.0.0"/>
         <PackageReference Include="Hangfire.PostgreSql" Version="1.20.12"/>
-        <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="9.0.4"/>
+        <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="10.0.7" />
         <PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="10.0.0"/>
         <PackageReference Include="OpenTelemetry.Exporter.Prometheus.AspNetCore" Version="1.14.0-beta.1"/>
         <PackageReference Include="OpenTelemetry.Extensions.Hosting" Version="1.14.0"/>
@@ -28,16 +28,15 @@
     </ItemGroup>
 
     <ItemGroup>
+        <ProjectReference Include="..\..\..\Infrastructure\Cache\Cache.csproj"/>
         <ProjectReference Include="..\..\..\Infrastructure\Integrations\ExchangeRate\ExchangeRate.csproj"/>
         <ProjectReference Include="..\..\..\Infrastructure\Mail\Mail.csproj"/>
         <ProjectReference Include="..\..\..\Infrastructure\RabbitMq\RabbitMq.csproj"/>
-        <ProjectReference Include="..\..\..\Infrastructure\Redis\Redis.csproj"/>
         <ProjectReference Include="..\..\..\Infrastructure\S3\S3.csproj"/>
         <ProjectReference Include="..\..\..\Infrastructure\Security\Security.csproj"/>
         <ProjectReference Include="..\..\Api.Common\Api.Common.csproj"/>
         <ProjectReference Include="..\..\Application.Common\Application.Common.csproj"/>
         <ProjectReference Include="..\Main.Application\Main.Application.csproj"/>
-        <ProjectReference Include="..\Main.Cache\Main.Cache.csproj"/>
         <ProjectReference Include="..\Main.Persistence\Main.Persistence.csproj"/>
     </ItemGroup>
 

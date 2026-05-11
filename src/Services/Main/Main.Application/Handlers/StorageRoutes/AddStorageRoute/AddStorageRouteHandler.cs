@@ -1,9 +1,9 @@
 ﻿using Abstractions.Interfaces.Services;
 using Application.Common.Interfaces;
+using Application.Common.Interfaces.Cqrs;
 using Attributes;
-using Main.Entities;
+using Main.Entities.Storage;
 using Main.Enums;
-using Mapster;
 
 namespace Main.Application.Handlers.StorageRoutes.AddStorageRoute;
 
@@ -31,7 +31,7 @@ public record AddStorageRouteCommand(
     decimal PriceM3,
     int CurrencyId,
     decimal PricePerOrder,
-    decimal? MinimumPrice,
+    decimal MinimumPrice,
     Guid? CarrierId) : ICommand<AddStorageRouteResult>;
 
 public record AddStorageRouteResult(Guid RouteId);
@@ -41,7 +41,20 @@ public class AddStorageRouteHandler(IUnitOfWork unitOfWork)
 {
     public async Task<AddStorageRouteResult> Handle(AddStorageRouteCommand request, CancellationToken cancellationToken)
     {
-        var storageRoute = request.Adapt<StorageRoute>();
+        var storageRoute = StorageRoute.Create(
+            request.StorageFrom,
+            request.StorageTo,
+            request.Distance,
+            request.RouteType,
+            request.PricingType,
+            request.DeliveryTime,
+            request.PriceKg,
+            request.PriceM3,
+            request.PricePerOrder,
+            request.MinimumPrice,
+            request.CurrencyId,
+            request.CarrierId);
+
         await unitOfWork.AddAsync(storageRoute, cancellationToken);
         await unitOfWork.SaveChangesAsync(cancellationToken);
 

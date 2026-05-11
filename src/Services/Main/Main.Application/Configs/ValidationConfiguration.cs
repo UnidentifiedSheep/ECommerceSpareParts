@@ -15,11 +15,11 @@ public static class ValidationConfiguration
         ConfigureArticles();
         ConfigureProducer();
         ConfigureUser();
-        ConfigureUserEmail();
+        //ConfigureUserEmail();
         ConfigureTransaction();
         ConfigureStorage();
         ConfigurePermission();
-        ConfigureRole();
+        //ConfigureRole();
         ConfigureCurrency();
         ConfigureProducerOtherNames();
         ConfigureCart();
@@ -102,13 +102,13 @@ public static class ValidationConfiguration
 
     private static void ConfigureProducerOtherNames()
     {
-        ConfigureDbValidation.AddConfig(ValidationFunctions.ValidateProducersOtherNameExistsPK, KeyValueType.Tuple,
+        ConfigureDbValidation.AddConfig(ValidationFunctions.ValidateProducerOtherNameExistsPK, KeyValueType.Tuple,
             config => config.WithErrorName(ApplicationErrors.ProducerOtherNameNotFound)
                 .WithMessageTemplate("producer.other.name.not.found")
                 .WithErrorType(typeof(NotFoundException))
                 .WithErrorCode((int)HttpStatusCode.NotFound));
 
-        ConfigureDbValidation.AddConfig(ValidationFunctions.ValidateProducersOtherNameNotExistsPK, KeyValueType.Tuple,
+        ConfigureDbValidation.AddConfig(ValidationFunctions.ValidateProducerOtherNameNotExistsPK, KeyValueType.Tuple,
             config => config.WithErrorName(ApplicationErrors.ProducerOtherNameAlreadyTaken)
                 .WithMessageTemplate("producer.other.name.already.taken")
                 .WithErrorType(typeof(ConflictException))
@@ -192,20 +192,8 @@ public static class ValidationConfiguration
                 .WithErrorCode((int)HttpStatusCode.Conflict));
     }
 
-    private static void ConfigureRole()
+    /*private static void ConfigureRole()
     {
-        ConfigureDbValidation.AddConfig(ValidationFunctions.ValidateRoleExistsId, KeyValueType.Single,
-            config => config.WithErrorName(ApplicationErrors.RoleNotFound)
-                .WithMessageTemplate("role.not.found")
-                .WithErrorType(typeof(NotFoundException))
-                .WithErrorCode((int)HttpStatusCode.NotFound));
-
-        ConfigureDbValidation.AddConfig(ValidationFunctions.ValidateRoleExistsId, KeyValueType.MultipleKeys,
-            config => config.WithErrorName(ApplicationErrors.RoleNotFound)
-                .WithMessageTemplate("role.not.found")
-                .WithErrorType(typeof(NotFoundException))
-                .WithErrorCode((int)HttpStatusCode.NotFound));
-
         ConfigureDbValidation.AddConfig(ValidationFunctions.ValidateRoleExistsNormalizedName, KeyValueType.Single,
             config => config.WithErrorName(ApplicationErrors.RoleNotFound)
                 .WithMessageTemplate("role.not.found.with.role.name")
@@ -230,7 +218,7 @@ public static class ValidationConfiguration
                 .WithMessageTemplate("role.already.exists")
                 .WithErrorType(typeof(ConflictException))
                 .WithErrorCode((int)HttpStatusCode.Conflict));
-    }
+    }*/ //TODO: turn on after bulk pack updated
 
     private static void ConfigurePermission()
     {
@@ -288,13 +276,13 @@ public static class ValidationConfiguration
 
     private static void ConfigureArticles()
     {
-        ConfigureDbValidation.AddConfig(ValidationFunctions.ValidateArticleExistsId, KeyValueType.Single,
+        ConfigureDbValidation.AddConfig(ValidationFunctions.ValidateProductExistsId, KeyValueType.Single,
             config => config.WithErrorName(ApplicationErrors.ArticlesNotFound)
                 .WithMessageTemplate("article.not.found")
                 .WithErrorType(typeof(NotFoundException))
                 .WithErrorCode((int)HttpStatusCode.NotFound));
 
-        ConfigureDbValidation.AddConfig(ValidationFunctions.ValidateArticleExistsId, KeyValueType.MultipleKeys,
+        ConfigureDbValidation.AddConfig(ValidationFunctions.ValidateProductExistsId, KeyValueType.MultipleKeys,
             config => config.WithErrorName(ApplicationErrors.ArticlesNotFound)
                 .WithMessageTemplate("articles.not.found")
                 .WithErrorType(typeof(NotFoundException))
@@ -342,7 +330,7 @@ public static class ValidationConfiguration
                 .WithErrorCode((int)HttpStatusCode.NotFound)
                 .WithErrorType(typeof(NotFoundException)));
 
-        ConfigureDbValidation.AddConfig(ValidationFunctions.ValidateUserNotExistsNormalizedUserName,
+        /*ConfigureDbValidation.AddConfig(ValidationFunctions.ValidateUserNotExistsNormalizedUserName,
             KeyValueType.Single,
             config => config.WithErrorName(ApplicationErrors.UserNameAlreadyTaken)
                 .WithMessageTemplate("user.name.already.taken")
@@ -354,10 +342,10 @@ public static class ValidationConfiguration
             config => config.WithErrorName(ApplicationErrors.UserNameAlreadyTaken)
                 .WithMessageTemplate("user.name.already.taken")
                 .WithErrorCode((int)HttpStatusCode.Conflict)
-                .WithErrorType(typeof(ConflictException)));
+                .WithErrorType(typeof(ConflictException)));*/ //TODO: turn on after bulk pack updated
     }
 
-    private static void ConfigureUserEmail()
+    /*private static void ConfigureUserEmail()
     {
         ConfigureDbValidation.AddConfig(ValidationFunctions.ValidateUserEmailExistsNormalizedEmail, KeyValueType.Single,
             config => config.WithErrorName(ApplicationErrors.UserEmailNotFound)
@@ -385,7 +373,7 @@ public static class ValidationConfiguration
                 .WithMessageTemplate("user.email.already.in.use")
                 .WithErrorCode((int)HttpStatusCode.Conflict)
                 .WithErrorType(typeof(ConflictException)));
-    }
+    }*/ //TODO: turn on after bulk pack updated
 
     private static void ConfigureTransaction()
     {

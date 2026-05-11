@@ -1,4 +1,4 @@
-﻿using Analytics.Abstractions.Dtos.CalculationJob;
+﻿using Analytics.Application.Dtos.CalculationJob;
 using Analytics.Entities.Metrics;
 
 namespace Analytics.Application.Services.Metrics.Converters;

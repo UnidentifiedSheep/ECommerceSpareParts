@@ -1,18 +1,18 @@
-﻿namespace Analytics.Entities;
+﻿using Domain;
 
-public class SalesFact
+namespace Analytics.Entities;
+
+public class SalesFact : AuditableEntity<SalesFact, Guid>
 {
-    public string Id { get; set; } = null!;
-
+    public Guid Id { get; set; }
     public int CurrencyId { get; set; }
-
     public Guid BuyerId { get; set; }
-
-    public DateTime CreatedAt { get; set; }
-
     public decimal TotalSum { get; set; }
 
-    public virtual Currency Currency { get; set; } = null!;
-
     public virtual ICollection<SaleContent> SaleContents { get; set; } = new List<SaleContent>();
+
+    public override Guid GetId()
+    {
+        return Id;
+    }
 }

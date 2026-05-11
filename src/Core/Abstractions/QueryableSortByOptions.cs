@@ -1,60 +1,75 @@
-﻿using System.Linq.Expressions;
+﻿using System.Collections.Concurrent;
+using System.Linq.Expressions;
 
 namespace Abstractions;
 
-public static class QueryableSortByOptions
+public class QueryableSortByOptions
 {
-    private const string Defualt = "DEFUALT";
-    private static readonly Dictionary<Type, Dictionary<string, object>> MapDictionary = new();
-    public static char Delimiter { get; private set; } = '_';
+    private const string DefaultKey = "__default__";
+    public static readonly QueryableSortByOptions Value = new();
 
-    public static void SetDelimiter(char delimiter)
+    private readonly ConcurrentDictionary<Type, ConcurrentDictionary<string, object>> _mapDictionary = new();
+
+    public char Delimiter { get; private set; } = '_';
+
+    public void SetDelimiter(char delimiter)
     {
         Delimiter = delimiter;
     }
 
-    public static char GetDelimiter()
+    public char GetDelimiter()
     {
         return Delimiter;
     }
 
-    public static TSource Map<TSource, TKey>(
-        this TSource src,
+    public QueryableSortByOptions Map<TSource, TKey>(
         string source,
         Expression<Func<TSource, TKey>> keySelector)
     {
         var type = typeof(TSource);
         source = source.ToLowerInvariant();
-        MapDictionary.TryAdd(type, new Dictionary<string, object>());
-        var primary = MapDictionary[type];
-        var objectKeySelector = Expression.Lambda<Func<TSource, object>>(
-            Expression.Convert(keySelector.Body, typeof(object)), keySelector.Parameters);
-        var added = primary.TryAdd(source, objectKeySelector);
-        if (!added) throw new ArgumentException($"{source}|{type} Already Exists");
-        return src;
+
+        var primary = _mapDictionary.GetOrAdd(type, _ => new ConcurrentDictionary<string, object>());
+
+        var objectSelector = Expression.Lambda<Func<TSource, object>>(
+            Expression.Convert(keySelector.Body, typeof(object)),
+            keySelector.Parameters);
+
+        if (!primary.TryAdd(source, objectSelector))
+            throw new ArgumentException($"{source}|{type} already exists");
+        return this;
     }
 
-    public static TSource MapDefault<TSource, TKey>(this TSource src, Expression<Func<TSource, TKey>> keySelector)
+    public QueryableSortByOptions MapDefault<TSource, TKey>(
+        Expression<Func<TSource, TKey>> keySelector)
     {
         var type = typeof(TSource);
-        MapDictionary.TryAdd(type, new Dictionary<string, object>());
-        var primary = MapDictionary[type];
-        var objectKeySelector = Expression.Lambda<Func<TSource, object>>(
-            Expression.Convert(keySelector.Body, typeof(object)), keySelector.Parameters);
-        var added = primary.TryAdd(Defualt, objectKeySelector);
-        if (!added) throw new ArgumentException($"DEFAULT|{type} Already Exists");
-        return src;
+
+        var primary = _mapDictionary.GetOrAdd(type, _ => new ConcurrentDictionary<string, object>());
+
+        var objectSelector = Expression.Lambda<Func<TSource, object>>(
+            Expression.Convert(keySelector.Body, typeof(object)),
+            keySelector.Parameters);
+
+        if (!primary.TryAdd(DefaultKey, objectSelector))
+            throw new ArgumentException($"DEFAULT|{type} already exists");
+        return this;
     }
 
-    public static Expression<Func<TEntity, object?>> GetMapping<TEntity>(string source)
+    public Expression<Func<TEntity, object?>> GetMapping<TEntity>(string source)
     {
         source = source.ToLowerInvariant();
         var type = typeof(TEntity);
-        var primaryExists = MapDictionary.TryGetValue(type, out var primary);
-        if (!primaryExists) throw new ArgumentException($"{type} mapping not exists");
-        var valueExists = primary!.TryGetValue(source, out var value);
-        if (!valueExists) primary.TryGetValue(Defualt, out value);
-        if (value == null) throw new ArgumentException($"{type} mapping not exists");
-        return (Expression<Func<TEntity, object?>>)value;
+
+        if (!_mapDictionary.TryGetValue(type, out var primary))
+            throw new ArgumentException($"{type} mapping not exists");
+
+        if (primary.TryGetValue(source, out var value))
+            return (Expression<Func<TEntity, object?>>)value;
+
+        if (primary.TryGetValue(DefaultKey, out var defaultValue))
+            return (Expression<Func<TEntity, object?>>)defaultValue;
+
+        throw new ArgumentException($"Mapping '{source}' for {type} not exists and no default provided");
     }
 }

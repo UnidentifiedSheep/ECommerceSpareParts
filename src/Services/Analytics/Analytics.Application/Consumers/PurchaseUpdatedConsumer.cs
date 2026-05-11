@@ -1,4 +1,4 @@
-﻿using Analytics.Abstractions.Dtos.PurchaseFact;
+﻿using Analytics.Application.Dtos.PurchaseFact;
 using Analytics.Application.Handlers.PurchaseFacts.UpsertPurchaseFact;
 using Contracts.Purchase;
 using Mapster;

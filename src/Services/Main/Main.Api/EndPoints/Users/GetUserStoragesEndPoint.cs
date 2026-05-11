@@ -2,7 +2,7 @@
 using Api.Common.Extensions;
 using Carter;
 using Enums;
-using Main.Abstractions.Dtos.Amw.Storage;
+using Main.Application.Dtos.Storage;
 using Main.Application.Handlers.Users.GetUserStorages;
 using MediatR;
 
@@ -17,7 +17,7 @@ public class GetUserStoragesEndPoint : ICarterModule
         app.MapGet("/users/{userId:guid}/storages",
                 async (ISender sender, Guid userId, int page, int limit, CancellationToken token) =>
                 {
-                    var query = new GetUserStoragesQuery(userId, new PaginationModel(page, limit));
+                    var query = new GetUserStoragesQuery(userId, new Pagination(page, limit));
                     var result = await sender.Send(query, token);
                     return Results.Ok(new GetUserStoragesResponse(result.Storages));
                 }).WithTags("Users")

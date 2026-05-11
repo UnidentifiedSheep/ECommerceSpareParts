@@ -20,4 +20,9 @@
         <PackageReference Include="MassTransit" Version="8.5.8"/>
     </ItemGroup>
 
+    <ItemGroup>
+        <Folder Include="Configs\Mapster\"/>
+        <Folder Include="NamedObjects\"/>
+    </ItemGroup>
+
 </Project>

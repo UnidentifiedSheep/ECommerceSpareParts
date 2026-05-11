@@ -1,16 +1,15 @@
-using Abstractions.Interfaces.Currency;
 using Contracts.Currency;
-using Main.Abstractions.Interfaces.DbRepositories;
 using MassTransit;
+using ZiggyCreatures.Caching.Fusion;
 
 namespace Main.Application.Consumers;
 
-public class CurrencyRatesChangedConsumer(ICurrencyRepository currencyRepository, ICurrencyConverter currencyConverter)
+public class CurrencyRatesChangedConsumer(IFusionCache cache)
     : IConsumer<CurrencyRateChangedEvent>
 {
     public async Task Consume(ConsumeContext<CurrencyRateChangedEvent> context)
     {
-        var toUsdDict = await currencyRepository.GetCurrenciesToUsd();
-        currencyConverter.LoadRates(toUsdDict);
+        var keys = context.Message.Rates.Keys.Select(x => $"currency:{x}");
+        await cache.RemoveByTagAsync(keys);
     }
 }

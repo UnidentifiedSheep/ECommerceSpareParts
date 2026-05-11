@@ -2,7 +2,7 @@
 using Api.Common.Extensions;
 using Carter;
 using Enums;
-using Main.Abstractions.Dtos.Amw.Users;
+using Main.Application.Dtos.Users;
 using Main.Application.Handlers.StorageOwners.GetStorageOwners;
 using MediatR;
 
@@ -17,7 +17,7 @@ public class GetStorageOwnersEndPoint : ICarterModule
         app.MapGet("/storages/{storageName}/owners",
                 async (string storageName, int page, int size, ISender sender, CancellationToken cancellationToken) =>
                 {
-                    var query = new GetStorageOwnersQuery(storageName, new PaginationModel(page, size));
+                    var query = new GetStorageOwnersQuery(storageName, new Pagination(page, size));
                     var result = await sender.Send(query, cancellationToken);
                     return Results.Ok(new GetStorageOwnersResponse(result.Owners));
                 }).RequireAllPermissions(PermissionCodes.USERS_STORAGES_GET)

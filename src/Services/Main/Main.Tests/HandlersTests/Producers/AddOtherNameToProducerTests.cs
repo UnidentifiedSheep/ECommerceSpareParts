@@ -1,112 +1,92 @@
-using Bogus;
+using FluentAssertions;
 using Main.Abstractions.Constants;
-using Main.Application.Configs.Mapster;
 using Main.Application.Handlers.Producers.AddOtherName;
-using Main.Application.Handlers.Producers.CreateProducer;
-using Main.Persistence.Context;
-using MediatR;
+using Main.Entities.Producer;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.DependencyInjection;
 using Test.Common.Extensions;
 using Test.Common.TestContainers.Combined;
-using static Tests.MockData.MockData;
+using Tests.DataBuilders;
+using Tests.TestContexts;
 using ValidationException = FluentValidation.ValidationException;
-using DbValidationException = BulkValidation.Core.Exceptions.ValidationException;
 
 namespace Tests.HandlersTests.Producers;
 
-[Collection("Combined collection")]
-public class AddOtherNameToProducerTests : IAsyncLifetime
+public class AddOtherNameToProducerTests : IntegrationTest
 {
-    private readonly DContext _context;
-    private readonly Faker _faker = new(Locale);
-    private readonly IMediator _mediator;
-
-    public AddOtherNameToProducerTests(CombinedContainerFixture fixture)
+    public AddOtherNameToProducerTests(CombinedContainerFixture fixture) : base(fixture)
     {
-        MapsterConfig.Configure();
-        var sp = ServiceProviderForTests.Build(fixture.PostgresConnectionString, fixture.RedisConnectionString);
-        _mediator = sp.GetService<IMediator>()!;
-        _context = sp.GetRequiredService<DContext>();
+        RegisterBasicContext<ProducerTestContext>();
     }
 
-    public async Task InitializeAsync()
-    {
-        var newProducerModel = CreateNewProducerDto(1)[0];
-        var command = new CreateProducerCommand(newProducerModel);
-        await _mediator.Send(command);
-    }
+    private ProducerTestContext TestContext => GetContext<ProducerTestContext>();
 
-    public async Task DisposeAsync()
+    [Theory]
+    [InlineData(" ")]
+    [InlineData("tooBig")]
+    public async Task AddOtherProducerName_EmptyProducerName_FailsValidation(string otherName)
     {
-        await _context.ClearDatabase();
-    }
-
-    [Fact]
-    public async Task AddOtherProducerName_EmptyProducerName_FailsValidation()
-    {
-        var producer = await _context.Producers.AsNoTracking().FirstOrDefaultAsync();
-        Assert.NotNull(producer);
-        var command = new AddOtherNameCommand(producer.Id, " ", "null");
-        await Assert.ThrowsAsync<ValidationException>(async () => await _mediator.Send(command));
-    }
-
-    [Fact]
-    public async Task AddOtherProducerName_TooLargeName_FailsValidation()
-    {
-        var producer = await _context.Producers.AsNoTracking().FirstOrDefaultAsync();
-        Assert.NotNull(producer);
-        var command = new AddOtherNameCommand(producer.Id, _faker.Lorem.Letter(200), "sdfsdf");
-        await Assert.ThrowsAsync<ValidationException>(async () => await _mediator.Send(command));
+        if (otherName == "tooBig")
+            otherName = Faker.Lorem.Letter(200);
+        var producer = TestContext.Producers[0];
+        var command = new AddOtherNameCommand(producer.Id, otherName, "null");
+        await Assert.ThrowsAsync<ValidationException>(async () => await Mediator.Send(command));
     }
 
     [Fact]
     public async Task AddOtherProducerName_TooLargeUsage_FailsValidation()
     {
-        var producer = await _context.Producers.AsNoTracking().FirstOrDefaultAsync();
-        Assert.NotNull(producer);
-        var command = new AddOtherNameCommand(producer.Id, _faker.Lorem.Letter(40), _faker.Lorem.Letter(200));
-        await Assert.ThrowsAsync<ValidationException>(async () => await _mediator.Send(command));
+        var producer = TestContext.Producers[0];
+        var command = new AddOtherNameCommand(
+            producer.Id,
+            Faker.Lorem.Letter(40),
+            Faker.Lorem.Letter(200));
+        await Assert.ThrowsAsync<ValidationException>(async () => await Mediator.Send(command));
     }
 
     [Fact]
     public async Task AddOtherProducerName_InvalidProducerId_ThrowsProducerNotFound()
     {
-        var command = new AddOtherNameCommand(int.MaxValue, _faker.Lorem.Letter(40), _faker.Lorem.Letter(10));
-        var exception = await Assert.ThrowsAsync<DbValidationException>(async () => await _mediator.Send(command));
+        var command = new AddOtherNameCommand(
+            int.MaxValue,
+            Faker.Lorem.Letter(40),
+            Faker.Lorem.Letter(10));
+        var exception = await Assert.ThrowsAsync<DbValidationException>(async () => await Mediator.Send(command));
         Assert.Equal(ApplicationErrors.ProducersNotFound, exception.Failures[0].ErrorName);
     }
 
     [Fact]
     public async Task AddOtherProducerName_Normal_Succeeds()
     {
-        var producer = await _context.Producers.AsNoTracking().FirstOrDefaultAsync();
-        Assert.NotNull(producer);
+        var producer = TestContext.Producers[0];
 
-        var otherName = _faker.Lorem.Letter(40);
-        var usage = _faker.Lorem.Letter(10);
-        var command = new AddOtherNameCommand(producer.Id, otherName, usage);
-        await _mediator.Send(command);
+        var command = new AddOtherNameCommand(
+            producer.Id,
+            Faker.Lorem.Letter(40),
+            Faker.Lorem.Letter(10));
 
-        var producerOtherName = await _context.ProducersOtherNames
-            .AsNoTracking()
-            .Where(x => x.ProducerId == producer.Id &&
-                        x.ProducerOtherName == otherName && x.WhereUsed == usage)
-            .FirstOrDefaultAsync();
-        Assert.NotNull(producerOtherName);
+        var act = () => Mediator.Send(command);
+
+        await act.Should().NotThrowAsync();
+
+        var otherName = await Context.ProducersOtherNames.AsNoTracking().FirstOrDefaultAsync();
+
+        otherName.Should().NotBeNull();
+
+        otherName.ProducerId.Should().Be(producer.Id);
+        otherName.OtherName.Should().Be(Producer.ToNormalizedName(command.OtherName));
+        otherName.WhereUsed.Should().Be(command.WhereUsed.ToUpperInvariant());
     }
 
     [Fact]
     public async Task AddOtherProducerName_WithSameFields_ThrowsSameProducerOtherNameExists()
     {
-        var producer = await _context.Producers.AsNoTracking().FirstOrDefaultAsync();
-        Assert.NotNull(producer);
-        var otherName = _faker.Lorem.Letter(40);
-        var usage = _faker.Lorem.Letter(10);
-        await _mediator.Send(new AddOtherNameCommand(producer.Id, otherName, usage));
+        var producer = TestContext.Producers[0];
+        var existing = await new ProducerOtherNameBuilder(Faker)
+            .WithProducerId(producer.Id)
+            .BuildAndAddToDb(Context);
 
-        var command = new AddOtherNameCommand(producer.Id, otherName, usage);
-        var exception = await Assert.ThrowsAsync<DbValidationException>(async () => await _mediator.Send(command));
+        var command = new AddOtherNameCommand(producer.Id, existing.OtherName, existing.WhereUsed);
+        var exception = await Assert.ThrowsAsync<DbValidationException>(async () => await Mediator.Send(command));
         Assert.Equal(ApplicationErrors.ProducerOtherNameAlreadyTaken, exception.Failures[0].ErrorName);
     }
 }

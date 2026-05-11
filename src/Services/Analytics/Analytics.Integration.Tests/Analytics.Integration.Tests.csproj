@@ -21,7 +21,6 @@
 
     <ItemGroup>
         <ProjectReference Include="..\..\..\Infrastructure\Localization\Localization.Domain\Localization.Domain.csproj"/>
-        <ProjectReference Include="..\..\..\Infrastructure\Redis\Redis.csproj"/>
         <ProjectReference Include="..\..\Test.Common\Test.Common.csproj"/>
         <ProjectReference Include="..\Analytics.Application\Analytics.Application.csproj"/>
         <ProjectReference Include="..\Analytics.Persistence\Analytics.Persistence.csproj"/>
@@ -33,10 +32,6 @@
             <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
             <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
         </Content>
-    </ItemGroup>
-
-    <ItemGroup>
-      <Folder Include="HandlerTests\Metrics\" />
     </ItemGroup>
 
 </Project>

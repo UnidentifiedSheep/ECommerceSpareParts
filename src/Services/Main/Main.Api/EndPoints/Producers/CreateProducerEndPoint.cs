@@ -1,6 +1,6 @@
 using Api.Common.Extensions;
 using Carter;
-using Main.Abstractions.Dtos.Amw.Producers;
+using Main.Application.Dtos.Producer;
 using Main.Application.Handlers.Producers.CreateProducer;
 using Mapster;
 using MediatR;

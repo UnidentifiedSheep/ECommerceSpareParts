@@ -1,26 +1,88 @@
-﻿using Abstractions.Models.Repository;
-using Main.Abstractions.Exceptions.Articles;
-using Main.Abstractions.Interfaces.DbRepositories;
-using Main.Entities;
+﻿using Application.Common.Extensions;
+using Application.Common.Interfaces.Repositories;
+using Domain;
+using Main.Application.Interfaces.Persistence;
+using Main.Entities.Exceptions.Products;
+using Main.Entities.Product;
 
 namespace Main.Application.Extensions;
 
 public static class RepositoryExtensions
 {
-    public static async Task<IReadOnlyList<Article>> EnsureArticlesExistsForUpdateAsync(
-        this IArticlesRepository articlesRepository,
-        IEnumerable<int> articleIds,
+    public static Task<Dictionary<TKey, TEntity>> EnsureExistsAsync<TEntity, TKey>(
+        this IRepository<TEntity, TKey> repository,
+        IEnumerable<TKey> ids,
+        Func<IReadOnlyList<TKey>, Exception> errorFactory,
+        CancellationToken ct = default)
+        where TEntity : Entity<TEntity, TKey>
+        where TKey : notnull
+    {
+        var criteria = Criteria<TEntity>.New()
+            .Track()
+            .Build();
+
+        return repository.EnsureExistsCoreAsync(
+            ids,
+            errorFactory,
+            criteria,
+            ct);
+    }
+
+    public static Task<Dictionary<TKey, TEntity>> EnsureExistsForUpdateAsync<TEntity, TKey>(
+        this IRepository<TEntity, TKey> repository,
+        IEnumerable<TKey> ids,
+        Func<IReadOnlyList<TKey>, Exception> errorFactory,
+        CancellationToken ct = default)
+        where TEntity : Entity<TEntity, TKey>
+        where TKey : notnull
+    {
+        var criteria = Criteria<TEntity>.New()
+            .Track()
+            .ForUpdate()
+            .Build();
+
+        return repository.EnsureExistsCoreAsync(
+            ids,
+            errorFactory,
+            criteria,
+            ct);
+    }
+
+    private static async Task<Dictionary<TKey, TEntity>> EnsureExistsCoreAsync<TEntity, TKey>(
+        this IRepository<TEntity, TKey> repository,
+        IEnumerable<TKey> ids,
+        Func<IReadOnlyList<TKey>, Exception> errorFactory,
+        Criteria<TEntity> criteria,
+        CancellationToken ct = default)
+        where TEntity : Entity<TEntity, TKey>
+        where TKey : notnull
+    {
+        var keySet = ids.ToHashSet();
+
+        var result = await repository.FindByIdsAsync(
+            keySet,
+            criteria,
+            ct);
+
+        keySet.EnsureAllExists(
+            result.Keys,
+            errorFactory);
+
+        return result;
+    }
+
+    public static async Task<Product> EnsureProductExistsForUpdateAsync(
+        this IProductRepository productRepository,
+        int productId,
         CancellationToken cancellationToken = default)
     {
-        var requestedIds = articleIds.ToHashSet();
-        var options = new QueryOptions<Article, IReadOnlyList<int>>() { Data = requestedIds.ToList() }
-            .WithTracking(false)
-            .WithForUpdate();
-        var found = await articlesRepository.GetArticlesByIds(options, cancellationToken);
+        var criteria = Criteria<Product>.New()
+            .Where(x => x.Id == productId)
+            .Track()
+            .ForUpdate()
+            .Build();
 
-        foreach (var id in found.Select(x => x.Id)) requestedIds.Remove(id);
-        return requestedIds.Count != 0 
-            ? throw new ArticleNotFoundException(requestedIds) 
-            : found;
+        return await productRepository.FirstOrDefaultAsync(criteria, cancellationToken)
+               ?? throw new ProductNotFoundException(productId);
     }
 }

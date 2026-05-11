@@ -1,6 +1,6 @@
 using FluentValidation;
 using Localization.Domain.Extensions;
-using Main.Abstractions.Dtos.Amw.Sales;
+using Main.Application.Dtos.Sale;
 
 namespace Main.Application.Handlers.Sales.BaseValidators;
 

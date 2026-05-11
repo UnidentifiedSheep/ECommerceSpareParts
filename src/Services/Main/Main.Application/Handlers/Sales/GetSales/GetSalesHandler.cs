@@ -1,51 +1,70 @@
 using Abstractions.Models;
-using Abstractions.Models.Repository;
+using Application.Common.Extensions;
 using Application.Common.Interfaces;
-using Extensions;
-using Main.Abstractions.Dtos.Amw.Sales;
-using Main.Abstractions.Dtos.RepositoryOptionsData;
-using Main.Abstractions.Interfaces.DbRepositories;
-using Main.Entities;
-using Mapster;
+using Application.Common.Interfaces.Cqrs;
+using Application.Common.Interfaces.Repositories;
+using LinqKit.Core;
+using Main.Application.Dtos.Sale;
+using Main.Application.Handlers.Projections;
+using Main.Entities.Sale;
+using Microsoft.EntityFrameworkCore;
 
 namespace Main.Application.Handlers.Sales.GetSales;
 
 public record GetSalesQuery(
     DateTime RangeStartDate,
     DateTime RangeEndDate,
-    PaginationModel Pagination,
+    Pagination Pagination,
     Guid? BuyerId,
     int? CurrencyId,
-    string? SortBy,
-    string? SearchTerm) : IQuery<GetSalesResult>;
+    string? Sku,
+    string? ProductName,
+    string? Comment,
+    string? SortBy) : IQuery<GetSalesResult>;
 
 public record GetSalesResult(IEnumerable<SaleDto> Sales);
 
-public class GetSalesHandler(ISaleRepository saleRepository) : IQueryHandler<GetSalesQuery, GetSalesResult>
+public class GetSalesHandler(
+    IReadRepository<Sale, Guid> repository
+) : IQueryHandler<GetSalesQuery, GetSalesResult>
 {
     public async Task<GetSalesResult> Handle(GetSalesQuery request, CancellationToken cancellationToken)
     {
-        var options = new QueryOptions<Sale, GetSalesOptionsData>()
+        var fixedStart = request.RangeStartDate.Date;
+        var fixedEnd = request.RangeEndDate.Date.AddDays(1);
+
+        var query = repository.Query
+            .Where(x => x.SaleDatetime >= fixedStart && x.SaleDatetime <= fixedEnd);
+
+        if (request.CurrencyId.HasValue)
+            query = query.Where(x => x.CurrencyId == request.CurrencyId);
+
+        if (request.BuyerId.HasValue)
+            query = query.Where(x => x.BuyerId == request.BuyerId);
+
+        if (!string.IsNullOrWhiteSpace(request.Sku))
+            query = query.Where(x => x.Contents.Any(z => EF.Functions
+                .ILike(z.Product.Sku.NormalizedValue, $"%{request.Sku.Trim()}")));
+
+        if (!string.IsNullOrWhiteSpace(request.ProductName))
+            query = query.Where(x => x.Contents.Any(z => EF.Functions
+                .ILike(z.Product.Name.Value, $"%{request.ProductName.Trim()}%")));
+
+        if (!string.IsNullOrWhiteSpace(request.Comment))
         {
-            Data = new GetSalesOptionsData
-            {
-                BuyerId = request.BuyerId,
-                CurrencyId = request.CurrencyId,
-                RangeEnd = request.RangeEndDate,
-                RangeStart = request.RangeStartDate,
-                SearchTerm = request.SearchTerm
-            }
+            var pattern = $"%{request.Comment}%";
+            query = query.Where(x =>
+                EF.Functions.ILike(x.Comment!, pattern) ||
+                x.Contents.Any(z => EF.Functions.ILike(z.Comment!, pattern)));
         }
-        .WithInclude(x => x.Transaction)
-        .WithInclude(x => x.Buyer)
-        .WithInclude(x => x.Buyer.UserInfo)
-        .WithInclude(x => x.Currency)
-        .WithPage(request.Pagination.Page)
-        .WithSize(request.Pagination.Size)
-        .WithSorting(request.SortBy)
-        .WithTracking(false);
-        
-        var result = await saleRepository.GetSales(options, cancellationToken);
-        return new GetSalesResult(result.Adapt<List<SaleDto>>());
+
+        var result = await query
+            .AsExpandable()
+            .Select(SaleProjections.ToSaleDto)
+            .SortBy(request.SortBy)
+            .ApplyPagination(request.Pagination)
+            .ToListAsync(cancellationToken);
+
+        return new GetSalesResult(result);
     }
 }

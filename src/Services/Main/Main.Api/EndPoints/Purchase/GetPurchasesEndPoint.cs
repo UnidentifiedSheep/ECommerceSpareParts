@@ -1,7 +1,7 @@
 using Abstractions.Models;
 using Api.Common.Extensions;
 using Carter;
-using Main.Abstractions.Dtos.Amw.Purchase;
+using Main.Application.Dtos.Amw.Purchase;
 using Main.Application.Handlers.Purchases.GetPurchase;
 using Mapster;
 using MediatR;
@@ -48,7 +48,7 @@ public class GetPurchasesEndPoint : ICarterModule
                 CancellationToken token) =>
             {
                 var query = new GetPurchasesQuery(request.RangeStartDate, request.RangeEndDate,
-                    new PaginationModel(request.Page, request.Limit),
+                    new Pagination(request.Page, request.Limit),
                     request.SupplierId, request.CurrencyId, request.SortBy, request.SearchTerm);
                 var result = await sender.Send(query, token);
                 var response = result.Adapt<GetPurchasesResponse>();

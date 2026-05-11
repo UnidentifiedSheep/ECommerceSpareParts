@@ -1,0 +1,36 @@
+using Abstractions.Interfaces.Services;
+using Application.Common.Interfaces;
+using Application.Common.Interfaces.Cqrs;
+using Attributes;
+using Main.Application.Dtos.Product;
+using Main.Entities.Storage;
+using MediatR;
+
+namespace Main.Application.Handlers.ProductReservations.CreateProductReservation;
+
+[AutoSave]
+[Transactional]
+public record CreateProductReservationCommand(List<NewProductReservationDto> Reservations) : ICommand;
+
+public class CreateProductReservationHandler(IUnitOfWork unitOfWork) : ICommandHandler<CreateProductReservationCommand>
+{
+    public async Task<Unit> Handle(CreateProductReservationCommand request, CancellationToken cancellationToken)
+    {
+        var reservations = new List<StorageContentReservation>();
+
+        foreach (var dto in request.Reservations)
+        {
+            var newReservation = StorageContentReservation.Create(dto.UserId, dto.ProductId, dto.ReservedCount);
+
+            newReservation.AddCount(dto.CurrentCount);
+            newReservation.SetComment(dto.Comment);
+            newReservation.ProposePrice(dto.ProposedPrice, dto.GivenCurrencyId);
+
+            reservations.Add(newReservation);
+        }
+
+        await unitOfWork.AddRangeAsync(reservations, cancellationToken);
+
+        return Unit.Value;
+    }
+}

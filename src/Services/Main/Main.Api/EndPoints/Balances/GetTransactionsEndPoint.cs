@@ -1,9 +1,6 @@
-using Abstractions.Models;
 using Api.Common.Extensions;
 using Carter;
-using Main.Abstractions.Dtos.Amw.Balances;
-using Main.Application.Handlers.Balance.GetTransactions;
-using Mapster;
+using Main.Application.Dtos.Balances;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
 
@@ -36,16 +33,16 @@ public class GetTransactionsEndPoint : ICarterModule
                 [AsParameters] GetTransactionsRequest request,
                 CancellationToken token) =>
             {
-                var query = new GetTransactionsQuery(
+                /*var query = new GetTransactionsQuery(
                     request.RangeStart,
                     request.RangeEnd,
                     request.CurrencyId,
                     request.SenderId,
                     request.ReceiverId,
-                    new PaginationModel(request.Page, request.Limit));
+                    new Pagination(request.Page, request.Limit));
                 var result = await sender.Send(query, token);
                 var response = result.Adapt<GetTransactionsAmwResponse>();
-                return Results.Ok(response);
+                return Results.Ok(response);*/
             }).WithTags("Balances")
             .WithDescription("Получение списка транзакций")
             .WithDisplayName("Получение транзакций")

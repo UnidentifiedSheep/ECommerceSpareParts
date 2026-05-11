@@ -1,0 +1,15 @@
+﻿using Application.Common.Abstractions;
+using BulkValidation.Core.Interfaces;
+using Extensions;
+using Main.Entities;
+
+namespace Main.Application.Handlers.Auth.AddPermissionToUser;
+
+public class AddPermissionToUserDbValidation : AbstractDbValidation<AddPermissionToUserCommand>
+{
+    public override void Build(IValidationPlan plan, AddPermissionToUserCommand request)
+    {
+        plan.ValidateUserExistsId(request.UserId)
+            .ValidatePermissionExistsName(request.PermissionName.ToNormalized());
+    }
+}

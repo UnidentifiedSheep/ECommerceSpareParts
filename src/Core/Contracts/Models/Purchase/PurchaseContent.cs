@@ -4,7 +4,7 @@ public class PurchaseContent
 {
     public required int Id { get; init; }
 
-    public required string PurchaseId { get; init; }
+    public required Guid PurchaseId { get; init; }
 
     public required int ArticleId { get; init; }
 

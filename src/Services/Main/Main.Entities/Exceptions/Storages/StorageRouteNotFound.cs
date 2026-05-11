@@ -1,0 +1,24 @@
+﻿using Abstractions.Interfaces.Exceptions;
+using Exceptions.Base;
+
+namespace Main.Entities.Exceptions.Storages;
+
+public class StorageRouteNotFound : NotFoundException, ILocalizableException
+{
+    public StorageRouteNotFound(string storageFrom, string storageTo)
+        : base(null, new { StorageFrom = storageFrom, StorageTo = storageTo })
+    {
+        MessageKey = "storage.route.not.found.by.names";
+        Arguments = [storageFrom, storageTo];
+    }
+
+    public StorageRouteNotFound(Guid id)
+        : base("Маршрут складов с указанным идентификатором не найден.", new { Id = id })
+    {
+        MessageKey = "storage.route.not.found.by.id";
+        Arguments = null;
+    }
+
+    public string MessageKey { get; }
+    public object[]? Arguments { get; }
+}

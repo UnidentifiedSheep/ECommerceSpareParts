@@ -1,7 +1,6 @@
-using Abstractions.Interfaces;
 using Api.Common.Extensions;
 using Carter;
-using Main.Abstractions.Dtos.Amw.Storage;
+using Main.Application.Dtos.Storage;
 using Main.Application.Handlers.StorageContents.AddContent;
 using Main.Enums;
 using MediatR;
@@ -17,10 +16,9 @@ public class AddContentToStorageEndPoint : ICarterModule
         app.MapPost("/storages/content", async (
                 ISender sender,
                 AddContentToStorageRequest request,
-                IUserContext user,
                 CancellationToken cancellationToken) =>
             {
-                var command = new AddContentCommand(request.StorageContent, request.StorageName, user.UserId,
+                var command = new AddContentCommand(request.StorageContent, request.StorageName,
                     StorageMovementType.StorageContentAddition);
                 await sender.Send(command, cancellationToken);
                 return Results.NoContent();

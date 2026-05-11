@@ -19,6 +19,7 @@
     "currency.sign.min.length": "Символ валюты должен быть не менее 1 символа.",
     "currency.shortName.not.empty": "Краткое название валюты не должно быть пустым.",
     "currency.shortName.max.length": "Краткое название валюты должно быть не более 5 символов.",
-    "currency.shortName.min.length": "Краткое название валюты должно быть не менее 2 символов."
+    "currency.shortName.min.length": "Краткое название валюты должно быть не менее 2 символов.",
+    "currency.rate.not.found": "Не удалось найти курс валюты."
   }
 }

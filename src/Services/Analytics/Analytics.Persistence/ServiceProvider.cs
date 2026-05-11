@@ -1,17 +1,12 @@
 using Abstractions.Interfaces;
-using Abstractions.Interfaces.Services;
-using Abstractions.Models;
-using Analytics.Abstractions.Interfaces.DbRepositories;
 using Analytics.Persistence.Context;
-using Analytics.Persistence.DataSeeds;
 using Analytics.Persistence.Repositories;
+using Application.Common.Interfaces.Repositories;
 using BulkValidation.Pgsql.Extensions;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Persistence.DbValidator;
 using Persistence.Extensions;
-using Persistence.Interfaces;
-using Persistence.Services.UnitOfWork;
 
 namespace Analytics.Persistence;
 
@@ -23,16 +18,11 @@ public static class ServiceProvider
 
         collection.AddUnitOfWork<DContext>();
 
-        collection.AddScoped<IMetricRepository, MetricRepository>();
-        collection.AddScoped<ICurrencyRepository, CurrencyRepository>();
-        collection.AddScoped<IPurchaseFactRepository, PurchaseFactRepository>();
-        collection.AddScoped<ISalesRepository, SalesRepository>();
-        collection.AddScoped<IMetricCalculationJobRepository, MetricCalculationJobRepository>();
-        
+        collection.AddScoped(typeof(IRepository<,>), typeof(BasicEfRepository<,>));
+        collection.AddScoped(typeof(IReadRepository<,>), typeof(ReadRepository<,>));
+
         collection.AddScoped<IDbValidator, PgsqlDbValidator<DContext>>();
         collection.AddPgsqlDbValidators<DContext>();
-
-        collection.AddScoped<ISeed<DContext>, CurrencySeed>();
 
         return collection;
     }

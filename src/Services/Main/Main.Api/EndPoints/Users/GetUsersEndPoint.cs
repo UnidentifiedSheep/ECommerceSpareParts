@@ -1,9 +1,9 @@
 using Abstractions.Interfaces;
-using Abstractions.Models;
 using Api.Common.Extensions;
+using Api.Common.Models.Requests;
 using Carter;
 using Enums;
-using Main.Abstractions.Dtos.Amw.Users;
+using Main.Application.Dtos.Users;
 using Main.Application.Handlers.Users.GetUsers;
 using Main.Enums;
 using Mapster;
@@ -33,14 +33,10 @@ public record GetUsersRequest(
     string? Description,
     [FromQuery(Name = "similarityLevel")]
     double? SimilarityLevel,
-    [FromQuery(Name = "page")]
-    int Page,
-    [FromQuery(Name = "limit")]
-    int Limit,
     [FromQuery(Name = "searchMethod")]
-    string SearchMethod);
+    GeneralSearchStrategy SearchMethod) : PaginationQueryModel;
 
-public record GetUsersResponse(IEnumerable<UserDto> Users);
+public record GetUsersResponse(IReadOnlyList<UserDto> Users);
 
 public class GetUsersEndPoint : ICarterModule
 {
@@ -50,17 +46,23 @@ public class GetUsersEndPoint : ICarterModule
                 async (
                     ISender sender,
                     [AsParameters] GetUsersRequest request,
-                    IUserContext user,
+                    IUserContext userContext,
                     CancellationToken token) =>
                 {
-                    var userId = user.UserId;
-
-                    var pagination = new PaginationModel(request.Page, request.Limit);
-                    var query = new GetUsersQuery(request.SearchTerm, pagination, request.SimilarityLevel,
-                        userId, request.Name, request.Surname, request.Email, request.Phone, request.UserName,
+                    var query = new GetUsersQuery(
+                        request,
+                        request.SearchTerm,
+                        request.SimilarityLevel,
+                        userContext.UserId,
+                        request.Name,
+                        request.Surname,
+                        request.Email,
+                        request.Phone,
+                        request.UserName,
                         request.Id,
-                        request.Description, request.IsSupplier,
-                        Enum.Parse<GeneralSearchStrategy>(request.SearchMethod));
+                        request.Description,
+                        [],
+                        request.SearchMethod);
                     var result = await sender.Send(query, token);
                     var response = result.Adapt<GetUsersResponse>();
                     return Results.Ok(response);

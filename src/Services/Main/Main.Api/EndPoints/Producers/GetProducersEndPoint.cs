@@ -1,6 +1,6 @@
 using Abstractions.Models;
 using Carter;
-using Main.Abstractions.Dtos.Anonymous.Producers;
+using Main.Application.Dtos.Producer;
 using Main.Application.Handlers.Producers.GetProducerById;
 using Main.Application.Handlers.Producers.GetProducers;
 using Mapster;
@@ -18,7 +18,7 @@ public class GetProducersEndPoint : ICarterModule
     {
         app.MapGet("/producers", async (ISender sender, string? searchTerm, int page, int limit) =>
             {
-                var query = new GetProducersQuery(searchTerm, new PaginationModel(page, limit));
+                var query = new GetProducersQuery(searchTerm, new Pagination(page, limit));
                 var result = await sender.Send(query);
                 return Results.Ok(result.Adapt<GetProducersResponse>());
             }).WithTags("Producers")

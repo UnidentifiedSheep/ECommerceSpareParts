@@ -1,4 +1,4 @@
-﻿using Analytics.Abstractions.Dtos.Metric;
+﻿using Analytics.Application.Dtos.Metric;
 using Analytics.Application.Handlers.Metrics.ListMetrics;
 using Carter;
 using MediatR;

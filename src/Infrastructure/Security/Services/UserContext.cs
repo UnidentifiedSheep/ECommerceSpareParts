@@ -1,4 +1,5 @@
-﻿using Abstractions.Interfaces;
+﻿using System.Security.Claims;
+using Abstractions.Interfaces;
 using Microsoft.AspNetCore.Http;
 
 namespace Security.Services;
@@ -9,9 +10,12 @@ public sealed class UserContext : IUserContext
 
     public UserContext(IHttpContextAccessor accessor)
     {
-        var headers = accessor.HttpContext!.Request.Headers;
+        var httpContext = accessor.HttpContext
+            ?? throw new InvalidOperationException("Http context is not available.");
 
-        IsAuthenticated = headers.ContainsKey("X-User-Id");
+        var principal = httpContext.User;
+
+        IsAuthenticated = principal.Identity?.IsAuthenticated == true;
 
         if (!IsAuthenticated)
         {
@@ -21,17 +25,9 @@ public sealed class UserContext : IUserContext
             return;
         }
 
-        _userId = Guid.TryParse(headers["X-User-Id"], out var id) ? id : null;
-
-        Roles = headers["X-Roles"]
-            .ToString()
-            .Split(',', StringSplitOptions.RemoveEmptyEntries)
-            .ToHashSet();
-
-        Permissions = headers["X-Permissions"]
-            .ToString()
-            .Split(',', StringSplitOptions.RemoveEmptyEntries)
-            .ToHashSet();
+        _userId = GetUserId(principal);
+        Roles = GetRoles(principal);
+        Permissions = GetPermissions(principal);
     }
 
     public bool IsAuthenticated { get; }
@@ -41,5 +37,43 @@ public sealed class UserContext : IUserContext
         : throw new UnauthorizedAccessException("Пользователь не авторизован.");
 
     public IReadOnlySet<string> Roles { get; }
+
     public IReadOnlySet<string> Permissions { get; }
+
+    public bool HasRole(string role)
+    {
+        return Roles.Contains(role);
+    }
+
+    public bool HasPermission(string permission)
+    {
+        return Permissions.Contains(permission);
+    }
+
+    private static Guid? GetUserId(ClaimsPrincipal principal)
+    {
+        var value = principal.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+
+        return Guid.TryParse(value, out var id)
+            ? id
+            : null;
+    }
+
+    private static IReadOnlySet<string> GetRoles(ClaimsPrincipal principal)
+    {
+        return principal
+            .FindAll(ClaimTypes.Role)
+            .Select(x => x.Value)
+            .Where(x => !string.IsNullOrWhiteSpace(x))
+            .ToHashSet();
+    }
+
+    private static IReadOnlySet<string> GetPermissions(ClaimsPrincipal principal)
+    {
+        return principal
+            .FindAll("permission")
+            .Select(x => x.Value)
+            .Where(x => !string.IsNullOrWhiteSpace(x))
+            .ToHashSet();
+    }
 }

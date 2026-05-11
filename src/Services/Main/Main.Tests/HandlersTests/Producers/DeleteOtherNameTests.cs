@@ -1,83 +1,57 @@
-using Bogus;
-using Main.Abstractions.Exceptions.Producers;
-using Main.Application.Configs.Mapster;
+using FluentAssertions;
 using Main.Application.Handlers.Producers.DeleteOtherName;
-using Main.Entities;
-using Main.Persistence.Context;
-using MediatR;
+using Main.Entities.Exceptions.Producers;
+using Main.Entities.Producer;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.DependencyInjection;
 using Test.Common.Extensions;
 using Test.Common.TestContainers.Combined;
-using Tests.MockData;
+using Tests.DataBuilders;
+using Tests.TestContexts;
 
 namespace Tests.HandlersTests.Producers;
 
-[Collection("Combined collection")]
-public class DeleteOtherNameTests : IAsyncLifetime
+public class DeleteOtherNameTests : IntegrationTest
 {
-    private readonly DContext _context;
-    private readonly Faker _faker = new(Global.Locale);
-    private readonly IMediator _mediator;
-    private ProducersOtherName _otherName = null!;
+    private ProducerOtherName _otherName = null!;
 
-    public DeleteOtherNameTests(CombinedContainerFixture fixture)
+    public DeleteOtherNameTests(CombinedContainerFixture fixture) : base(fixture)
     {
-        MapsterConfig.Configure();
-        var sp = ServiceProviderForTests.Build(fixture.PostgresConnectionString, fixture.RedisConnectionString);
-        _mediator = sp.GetService<IMediator>()!;
-        _context = sp.GetRequiredService<DContext>();
+        RegisterBasicContext<ProducerTestContext>();
     }
 
-    public async Task InitializeAsync()
+    public override async Task InitializeAsync()
     {
-        await _mediator.AddMockProducersAndArticles();
-
-        var producer = await _context.Producers.AsNoTracking().FirstAsync();
-        var otherName = _faker.Lorem.Letter(40);
-        var usage = _faker.Lorem.Letter(10);
-        await _context.Database
-            .ExecuteSqlAsync($"""
-                              insert into producers_other_names (producer_id, producer_other_name, where_used) 
-                              values ({producer.Id}, {otherName}, {usage});
-                              """);
-        _otherName = await _context.ProducersOtherNames
-            .FirstAsync(x => x.ProducerId == 1 &&
-                             x.ProducerOtherName == otherName &&
-                             x.WhereUsed == usage);
-    }
-
-    public async Task DisposeAsync()
-    {
-        await _context.ClearDatabase();
+        await base.InitializeAsync();
+        _otherName = await new ProducerOtherNameBuilder(Faker)
+            .WithProducerId(GetContext<ProducerTestContext>().Producers[0].Id)
+            .BuildAndAddToDb(Context);
     }
 
     [Fact]
     public async Task DeleteOtherName_InvalidProducerId_ThrowsProducerNotFound()
     {
-        var command = new DeleteOtherNameCommand(int.MaxValue, _otherName.ProducerOtherName, _otherName.WhereUsed);
-        await Assert.ThrowsAsync<ProducersOtherNameNotFoundException>(async () => await _mediator.Send(command));
+        var command = new DeleteOtherNameCommand(int.MaxValue, _otherName.OtherName, _otherName.WhereUsed);
+        await Assert.ThrowsAsync<ProducersOtherNameNotFoundException>(async () => await Mediator.Send(command));
     }
 
     [Fact]
     public async Task DeleteOtherName_UnexistingProducerOtherName_ThrowsProducersOtherNameNotFoundException()
     {
         var command =
-            new DeleteOtherNameCommand(_otherName.ProducerId, _faker.Lorem.Letter(200), _faker.Lorem.Letter(200));
-        await Assert.ThrowsAsync<ProducersOtherNameNotFoundException>(async () => await _mediator.Send(command));
+            new DeleteOtherNameCommand(_otherName.ProducerId, Faker.Lorem.Letter(200), Faker.Lorem.Letter(200));
+        await Assert.ThrowsAsync<ProducersOtherNameNotFoundException>(async () => await Mediator.Send(command));
     }
 
     [Fact]
     public async Task DeleteOtherName_Normal_Succeeds()
     {
         var command =
-            new DeleteOtherNameCommand(_otherName.ProducerId, _otherName.ProducerOtherName, _otherName.WhereUsed);
-        await _mediator.Send(command);
-        var otherName = await _context.ProducersOtherNames
-            .AsNoTracking()
-            .FirstOrDefaultAsync(x => x.ProducerId == _otherName.ProducerId &&
-                                      x.WhereUsed == _otherName.WhereUsed &&
-                                      x.ProducerOtherName == _otherName.ProducerOtherName);
-        Assert.Null(otherName);
+            new DeleteOtherNameCommand(_otherName.ProducerId, _otherName.OtherName, _otherName.WhereUsed);
+
+        var act = () => Mediator.Send(command);
+        await act.Should().NotThrowAsync();
+
+        var dbOtherNames = await Context.ProducersOtherNames.AsNoTracking().ToListAsync();
+        dbOtherNames.Should().HaveCount(0);
     }
 }

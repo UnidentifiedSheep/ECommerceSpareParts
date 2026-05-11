@@ -1,7 +1,9 @@
 using Abstractions;
-using Extensions;
-using Main.Abstractions.Dtos.Amw.Articles;
-using Main.Entities;
+using Main.Entities.Producer;
+using Main.Entities.Product;
+using Main.Entities.Purchase;
+using Main.Entities.Sale;
+using Main.Entities.Storage;
 
 namespace Main.Application.Configs;
 
@@ -9,35 +11,38 @@ public static class SortByConfig
 {
     public static void Configure()
     {
-        new Article().MapDefault(x => x.Id)
-            .Map("id", x => x.Id)
-            .Map("articleNumber", x => x.ArticleNumber)
-            .Map("title", x => x.ArticleName)
-            .Map("count", x => x.TotalCount)
-            .Map("producerName", x => x.Producer.Name)
-            .Map("indicator", x => x.Indicator)
-            .Map("popularity", x => x.Popularity);
+        QueryableSortByOptions.Value
+            .MapDefault<Product, int>(x => x.Id)
+            .Map<Product, int>("id", x => x.Id)
+            .Map<Product, string>("sku", x => x.Sku.NormalizedValue)
+            .Map<Product, string>("name", x => x.Name.Value)
+            .Map<Product, int>("count", x => x.Stock.Value)
+            .Map<Product, string>("producerName", x => x.Producer.Name)
+            .Map<Product, string>("indicator", x => x.Indicator!.Value!)
+            .Map<Product, long>("popularity", x => x.Popularity);
 
-        new ArticleFullDto().Map("count", x => x.CurrentStock);
+        QueryableSortByOptions.Value
+            .MapDefault<Producer, int>(x => x.Id)
+            .Map<Producer, int>("id", x => x.Id)
+            .Map<Producer, string>("name", x => x.Name);
 
-        new Producer().MapDefault(x => x.Id)
-            .Map("id", x => x.Id)
-            .Map("name", x => x.Name);
-        new Purchase().MapDefault(x => x.PurchaseDatetime)
-            .Map("dateTime", x => x.PurchaseDatetime)
-            .Map("totalSum", x => x.Transaction.TransactionSum)
-            .Map("id", x => x.Id);
+        QueryableSortByOptions.Value
+            .MapDefault<Purchase, DateTime>(x => x.PurchaseDatetime)
+            .Map<Purchase, DateTime>("dateTime", x => x.PurchaseDatetime)
+            .Map<Purchase, decimal>("totalSum", x => x.Transaction.Amount)
+            .Map<Purchase, Guid>("id", x => x.Id);
 
-        new Sale().MapDefault(x => x.SaleDatetime)
-            .Map("dateTime", x => x.SaleDatetime)
-            .Map("totalSum", x => x.Transaction.TransactionSum)
-            .Map("id", x => x.Id);
+        QueryableSortByOptions.Value
+            .MapDefault<Sale, DateTime>(x => x.SaleDatetime)
+            .Map<Sale, DateTime>("dateTime", x => x.SaleDatetime)
+            .Map<Sale, decimal>("totalSum", x => x.Transaction.Amount)
+            .Map<Sale, Guid>("id", x => x.Id);
 
-        new StorageContentReservation()
-            .MapDefault(x => x.CreateAt)
-            .Map("id", x => x.Id)
-            .Map("createAt", x => x.CreateAt)
-            .Map("updatedAt", x => x.UpdatedAt)
-            .Map("isDone", x => x.IsDone);
+        QueryableSortByOptions.Value
+            .MapDefault<StorageContentReservation, DateTime>(x => x.CreatedAt)
+            .Map<StorageContentReservation, int>("id", x => x.Id)
+            .Map<StorageContentReservation, DateTime>("createAt", x => x.CreatedAt)
+            .Map<StorageContentReservation, DateTime>("updatedAt", x => x.UpdatedAt)
+            .Map<StorageContentReservation, bool>("isDone", x => x.IsDone);
     }
 }

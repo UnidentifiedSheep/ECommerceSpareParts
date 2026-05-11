@@ -1,6 +1,6 @@
 using Api.Common.Extensions;
 using Carter;
-using Main.Application.Handlers.Roles.CreateRole;
+using Main.Application.Handlers.Auth.UpsertRole;
 using MediatR;
 
 namespace Main.Api.EndPoints.Roles;
@@ -13,7 +13,7 @@ public class CreateRoleEndPoint : ICarterModule
     {
         app.MapPost("/roles", async (ISender sender, CreateRoleRequest request, CancellationToken cancellationToken) =>
             {
-                var command = new CreateRoleCommand(request.Name, request.Description);
+                var command = new UpsertRoleCommand(request.Name, request.Description);
                 await sender.Send(command, cancellationToken);
                 return Results.Created();
             }).WithTags("Roles")

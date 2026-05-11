@@ -8,7 +8,7 @@ namespace Search.Persistence.Enumerators;
 public sealed class ArticleEnumerator(IArticleReadRepository articleReadRepository) : IInputEnumerator, IDisposable
 {
     private bool _started;
-    public Article? CurrentArticle { get; private set; }
+    public Product? CurrentArticle { get; private set; }
 
     public void Dispose()
     {
@@ -17,7 +17,7 @@ public sealed class ArticleEnumerator(IArticleReadRepository articleReadReposito
 
     public BytesRef Current => CurrentArticle == null
         ? new BytesRef()
-        : new BytesRef($"{CurrentArticle.ArticleNumber} {CurrentArticle.Title}");
+        : new BytesRef($"{CurrentArticle.Sku} {CurrentArticle.Title}");
 
     public IComparer<BytesRef> Comparer => BytesRef.UTF8SortedAsUnicodeComparer;
 

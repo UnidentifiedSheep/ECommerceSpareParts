@@ -1,15 +1,12 @@
 using System.Reflection;
-using Abstractions.Interfaces.Currency;
 using Api.Common;
 using Api.Common.Extensions;
-using Api.Common.Logging;
 using Api.Common.Middleware;
 using Api.Common.Models;
 using Api.Common.OperationFilters;
-using Application.Common.Interfaces.Settings;
+using Cache;
 using Carter;
 using Contracts.Currency;
-using Contracts.Currency.GetCurrencies;
 using Contracts.Markup;
 using Contracts.Settings;
 using Localization.Abstractions.Models;
@@ -19,23 +16,12 @@ using MassTransit;
 using Microsoft.AspNetCore.HttpOverrides;
 using OpenTelemetry.Metrics;
 using Persistence.Extensions;
-using Pricing.Abstractions.Constants;
-using Pricing.Api.EndPoints.Prices;
 using Pricing.Application;
-using Pricing.Application.Consumers;
-using Pricing.Cache;
 using Pricing.Persistence;
 using Pricing.Persistence.Contexts;
 using RabbitMq.Extensions;
 using RabbitMq.Models;
-using Redis;
 using Security;
-using Security.Utils;
-using Serilog;
-using Serilog.Sinks.Loki;
-using Serilog.Sinks.Loki.Labels;
-
-var localesPath = Assembly.GetExecutingAssembly().GetDefaultLocalizationPath();
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -43,8 +29,8 @@ var lokiUrl = Environment.GetEnvironmentVariable("LOKI_URL");
 var env = Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT") ?? "";
 
 builder.Configuration
-    .AddConfigsFromJsons(env)
-    .AddConfigsFromJsons(env, "/app/configs");
+    .AddAppSettingsFromJsons(env)
+    .AddAppSettingsFromJsons(env, "/app/configs");
 
 builder.Host.AddLokiLogger(builder.Configuration, "pricing.api", env, lokiUrl);
 
@@ -68,7 +54,8 @@ builder.Services.AddOptions<MessageBrokerOptions>()
 var brokerOptions = builder.Configuration
                         .GetSection(MessageBrokerOptions.SectionName)
                         .Get<MessageBrokerOptions>()
-                    ?? throw new NullReferenceException($"Missing {MessageBrokerOptions.SectionName} configuration options");
+                    ?? throw new NullReferenceException(
+                        $"Missing {MessageBrokerOptions.SectionName} configuration options");
 
 var uniqQueueName = $"queue-of-pricing-{Environment.MachineName}";
 
@@ -82,8 +69,6 @@ builder.Services.AddMassTransit(x =>
         o.UseBusOutbox();
     });
 
-    x.AddRequestClient<GetCurrenciesRequest>();
-
     x.UsingRabbitMq((context, cfg) =>
     {
         cfg.ConfigureRabbitMq(brokerOptions);
@@ -95,12 +80,6 @@ builder.Services.AddMassTransit(x =>
 
             ep.ConfigureConsumeTopology = false;
 
-            ep.ConfigureConsumer<SettingChangedConsumer>(context);
-            ep.ConfigureConsumer<CurrencyRatesChangedConsumer>(context);
-            ep.ConfigureConsumer<MarkupGroupChangedConsumer>(context);
-            ep.ConfigureConsumer<MarkupGroupGeneratedConsumer>(context);
-            ep.ConfigureConsumer<MarkupRangesChangedConsumer>(context);
-
             ep.Bind<CurrencyRateChangedEvent>();
             ep.Bind<SettingChangedEvent>();
             ep.Bind<MarkupGroupChangedEvent>();
@@ -111,8 +90,6 @@ builder.Services.AddMassTransit(x =>
         cfg.ReceiveEndpoint("pricing-queue", ep =>
         {
             ep.Durable = true;
-            ep.ConfigureConsumer<ArticleBuyPricesChangedConsumer>(context);
-            ep.ConfigureConsumer<UserDiscountChangedConsumer>(context);
         });
     });
 });
@@ -123,7 +100,6 @@ Locale defaultLocale = "ru-RU";
 builder.Services
     .AddPersistenceLayer(Environment.GetEnvironmentVariable("DB_CONNECTION_STRING")!)
     .AddCacheLayer(Environment.GetEnvironmentVariable("REDIS_CONNECTION_STRING")!, "pricing")
-    .AddAppCacheLayer()
     .AddJsonSigner(Environment.GetEnvironmentVariable("SIGN_SECRET")!, Global.JsonOptions)
     .AddMinimalSecurityLayer()
     .AddCommonLayer()
@@ -154,16 +130,12 @@ builder.Services.AddCors(options =>
     });
 });
 
-var endpointAssembly = typeof(GetPricesEndPoint).Assembly;
+var endpointAssembly = typeof(Program).Assembly;
 builder.Services.AddCarter(new DependencyContextAssemblyCatalog(endpointAssembly));
 
 builder.Services.AddTransient<HeaderSecretMiddleware>();
 
 var app = builder.Build();
-
-//await app.LoadLocalesFromJson(localesPath); //NO locales for now. turn on in future.
-
-Pricing.Application.Configs.Mapster.Configure();
 
 app.UseMiddleware<HeaderSecretMiddleware>();
 
@@ -189,28 +161,6 @@ app.MapCarter();
 
 app.UseOpenTelemetryPrometheusScrapingEndpoint();
 
-await InitSettings(app.Services);
-await SetupCurrencies(app.Services);
-
 app.MapHealthChecks("/health");
 
 await app.RunAsync();
-
-
-return;
-
-async Task SetupCurrencies(IServiceProvider serviceProvider)
-{
-    var busControl = app.Services.GetRequiredService<IBusControl>();
-    await busControl.StartAsync();
-    using var scope = serviceProvider.CreateScope();
-    var currencyConverterSetup = scope.ServiceProvider.GetRequiredService<ICurrencyConverterSetup>();
-    await currencyConverterSetup.InitializeAsync();
-}
-
-async Task InitSettings(IServiceProvider serviceProvider)
-{
-    using var scope = serviceProvider.CreateScope();
-    var sr = scope.ServiceProvider.GetRequiredService<ISettingsService>();
-    await sr.LoadAsync(Settings.AllSettings);
-}

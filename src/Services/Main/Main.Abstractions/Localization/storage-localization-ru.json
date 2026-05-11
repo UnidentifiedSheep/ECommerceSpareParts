@@ -33,10 +33,18 @@
     "storage.route.price.m3.precision": "Цена за м³ может содержать не более 2 знаков после запятой.",
     "storage.route.price.order.min": "Минимальная цена за заказ — 0.",
     "storage.route.price.order.precision": "Цена за заказ может содержать не более 2 знаков после запятой.",
+    "storage.route.minimum.price.precision": "Минимальная цена за заказ может содержать не более 2 знаков после запятой.",
+    "storage.route.minimum.price.min": "Минимальная цена за заказ должна быть больше или равна нулю",
     "storage.name.min.length": "Название склада должно быть не менее 6 символов.",
     "storage.name.max.length": "Название склада должно быть не более 128 символов.",
     "storage.description.max.length": "Описание склада должно быть не более 256 символов.",
     "storage.location.max.length": "Местоположение склада должно быть не более 256 символов.",
-    "storage.name.taken": "Данное название склада занято."
+    "storage.name.taken": "Данное название склада занято.",
+    "fifo.storage.content.extract.policy.name": "Первое включение, первым вылетает",
+    "fifo.storage.content.extract.policy.description": "Сначала списываются старые поступления, затем новые",
+    "lifo.storage.content.extract.policy.name": "Последнее включение, первым вылетает",
+    "lifo.storage.content.extract.policy.description": "Сначала списываются последние поступления, затем более ранние",
+    "first.cheapest.storage.content.extract.policy.name": "Сначала самые дешёвые",
+    "first.cheapest.storage.content.extract.policy.description": "Сначала списываются поступления с наименьшей стоимостью, затем более дорогие"
   }
 }

@@ -1,0 +1,1 @@
+﻿global using DbValidationException = BulkValidation.Core.Exceptions.ValidationException;

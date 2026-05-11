@@ -1,14 +1,17 @@
 ﻿using Application.Common.Interfaces;
-using Main.Abstractions.Constants;
-using Main.Entities;
+using Application.Common.Interfaces.Cqrs;
 
 namespace Main.Application.Handlers.Currencies.GetCurrencies;
 
 public class GetCurrenciesCachePolicy : ICachePolicy<GetCurrenciesQuery>
 {
     public string GetCacheKey(GetCurrenciesQuery request)
-        => string.Format(CacheKeys.CurrenciesCacheKey, request.Pagination.Page, request.Pagination.Size);
+    {
+        return $"currencies:{request.Pagination.Page}-{request.Pagination.Size}";
+    }
 
-    public int DurationSeconds => 3600;
-    public Type? RelatedType => typeof(Currency);
+    public TimeSpan TimeToLive => TimeSpan.FromDays(3);
+
+    public IReadOnlyCollection<string> Tags => ["currency"];
+    public string BaseTag => "currency";
 }

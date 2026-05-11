@@ -12,7 +12,7 @@ public record PriceInfoModel
 
     [JsonPropertyName("average_price")]
     public required decimal AveragePrice { get; init; }
-    
+
     [JsonPropertyName("volatility")]
     public required decimal Volatility { get; init; }
 }

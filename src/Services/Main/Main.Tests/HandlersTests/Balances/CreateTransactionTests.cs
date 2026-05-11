@@ -1,177 +1,125 @@
-using FluentValidation;
-using Main.Application.Configs.Mapster;
+using FluentAssertions;
+using Main.Abstractions.Constants;
 using Main.Application.Handlers.Balance.CreateTransaction;
-using Main.Entities;
-using Main.Enums;
-using Main.Persistence.Context;
-using MediatR;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.DependencyInjection;
-using Test.Common.Extensions;
 using Test.Common.TestContainers.Combined;
-using Tests.MockData;
+using Tests.TestContexts;
+using Tests.TestContexts.Currency;
+using ValidationException = FluentValidation.ValidationException;
 
 namespace Tests.HandlersTests.Balances;
 
-[Collection("Combined collection")]
-public class CreateTransactionTests : IAsyncLifetime
+public class CreateTransactionTests : IntegrationTest
 {
-    private readonly DContext _context;
-    private readonly IMediator _mediator;
-    private User _adminUser = null!;
-    private Currency _currency = null!;
-    private User _mockUser = null!;
-    private User _systemUser = null!;
-
-    public CreateTransactionTests(CombinedContainerFixture fixture)
+    public CreateTransactionTests(CombinedContainerFixture fixture) : base(fixture)
     {
-        MapsterConfig.Configure();
-        var sp = ServiceProviderForTests.Build(fixture.PostgresConnectionString, fixture.RedisConnectionString);
-        _mediator = sp.GetService<IMediator>()!;
-        _context = sp.GetRequiredService<DContext>();
+        RegisterBasicContext<UsersTestContext>();
+        RegisterBasicContext<CurrencyTestContext>();
     }
 
-    public async Task InitializeAsync()
-    {
-        await _mediator.AddMockProducersAndArticles();
-        await _context.AddMockCurrencies();
-        var systemId = await _mediator.AddMockUser();
-        _systemUser = await _context.Users.AsNoTracking().FirstAsync(x => x.Id == systemId);
-        await _mediator.AddMockUser();
-        await _mediator.AddMockUser();
-        _mockUser = await _context.Users.AsNoTracking().FirstAsync(x => x.Id != systemId);
-        _adminUser = await _context.Users.AsNoTracking()
-            .FirstAsync(x => x.Id != systemId && x.Id != _mockUser.Id);
-        _currency = await _context.Currencies.AsNoTracking().FirstAsync();
-    }
-
-    public async Task DisposeAsync()
-    {
-        await _context.ClearDatabase();
-    }
+    private UsersTestContext UsersContext => GetContext<UsersTestContext>();
+    private CurrencyTestContext CurrencyContext => GetContext<CurrencyTestContext>();
 
     [Fact]
-    public async Task CreateOneTransaction_Succeeds()
+    public async Task CreateTransaction_ValidData_Succeeds()
     {
-        var command = new CreateTransactionCommand(
-            _systemUser.Id,
-            _mockUser.Id,
-            100,
-            _currency.Id,
-            _adminUser.Id,
-            DateTime.Now,
-            TransactionStatus.Normal
-        );
+        var sender = UsersContext.Users.ElementAt(0);
+        var receiver = UsersContext.Users.ElementAt(1);
+        var currency = CurrencyContext.Currencies[0];
+        var amount = 125.50m;
+        var transactionDateTime = DateTime.UtcNow;
 
-        var createdTransaction = (await _mediator.Send(command)).Transaction;
+        var result = await Mediator.Send(new CreateTransactionCommand(
+            sender.Id,
+            receiver.Id,
+            amount,
+            currency.Id,
+            transactionDateTime));
 
-        var transaction = await _context.Transactions
-            .FirstOrDefaultAsync(x => x.SenderId == _systemUser.Id &&
-                                      x.ReceiverId == _mockUser.Id &&
-                                      x.TransactionDatetime == command.TransactionDateTime);
-        Assert.NotNull(transaction);
-        Assert.Equal(createdTransaction.TransactionSum, transaction.TransactionSum);
-    }
+        var transaction = await Context.Transactions
+            .AsNoTracking()
+            .FirstOrDefaultAsync(x => x.Id == result.Transaction.Id);
 
-    [Fact]
-    public async Task CreateTransaction_WithEmptySender_FailsValidation()
-    {
-        var command = new CreateTransactionCommand(
-            Guid.Empty,
-            _mockUser.Id,
-            125,
-            _currency.Id,
-            _adminUser.Id,
-            DateTime.Now,
-            TransactionStatus.Normal
-        );
+        transaction.Should().NotBeNull();
+        transaction.SenderId.Should().Be(sender.Id);
+        transaction.ReceiverId.Should().Be(receiver.Id);
+        transaction.CurrencyId.Should().Be(currency.Id);
+        transaction.Amount.Should().Be(amount);
+        transaction.IsCompleted.Should().BeTrue();
+        transaction.IsCompletionApplied.Should().BeTrue();
 
-        await Assert.ThrowsAsync<ValidationException>(async () => await _mediator.Send(command));
-    }
+        var senderBalance = await Context.UserBalances
+            .AsNoTracking()
+            .FirstAsync(x => x.UserId == sender.Id && x.CurrencyId == currency.Id);
+        var receiverBalance = await Context.UserBalances
+            .AsNoTracking()
+            .FirstAsync(x => x.UserId == receiver.Id && x.CurrencyId == currency.Id);
 
-    [Fact]
-    public async Task CreateTransaction_WithNegativeAmount_FailsValidation()
-    {
-        var command = new CreateTransactionCommand(
-            _systemUser.Id,
-            _mockUser.Id,
-            -100,
-            _currency.Id,
-            _adminUser.Id,
-            DateTime.Now,
-            TransactionStatus.Normal
-        );
-
-        await Assert.ThrowsAsync<ValidationException>(async () => await _mediator.Send(command));
-    }
-
-    [Fact]
-    public async Task CreateTransaction_WithOldDate_ThrowsValidationError()
-    {
-        var command = new CreateTransactionCommand(
-            _systemUser.Id,
-            _mockUser.Id,
-            100,
-            _currency.Id,
-            _adminUser.Id,
-            DateTime.Now.AddMonths(-4),
-            TransactionStatus.Normal
-        );
-
-        await Assert.ThrowsAsync<ValidationException>(async () => await _mediator.Send(command));
-    }
-
-    [Fact]
-    public async Task CreateTransaction_WithFutureDateBeyondLimit_FailsValidation()
-    {
-        var command = new CreateTransactionCommand(
-            _systemUser.Id,
-            _mockUser.Id,
-            100,
-            _currency.Id,
-            _adminUser.Id,
-            DateTime.Now.AddMonths(1),
-            TransactionStatus.Normal
-        );
-
-        await Assert.ThrowsAsync<ValidationException>(async () => await _mediator.Send(command));
-    }
-
-    [Fact]
-    public async Task CreateTransaction_WithEmptyReceiver_FailsValidation()
-    {
-        var command = new CreateTransactionCommand(
-            _systemUser.Id,
-            Guid.Empty,
-            100,
-            _currency.Id,
-            _adminUser.Id,
-            DateTime.Now,
-            TransactionStatus.Normal
-        );
-
-        await Assert.ThrowsAsync<ValidationException>(async () => await _mediator.Send(command));
+        senderBalance.Balance.Should().Be(-amount);
+        receiverBalance.Balance.Should().Be(amount);
     }
 
     [Theory]
     [InlineData(0)]
     [InlineData(-1)]
-    [InlineData(-10000000)]
-    [InlineData(0.001)]
-    [InlineData(0.0001)]
-    [InlineData(0.009)]
     public async Task CreateTransaction_InvalidAmount_ThrowsValidationException(decimal amount)
     {
-        var command = new CreateTransactionCommand(
-            _systemUser.Id,
-            _mockUser.Id,
-            amount,
-            _currency.Id,
-            _adminUser.Id,
-            DateTime.Now,
-            TransactionStatus.Normal
-        );
+        var command = GetValidCommand();
 
-        await Assert.ThrowsAsync<ValidationException>(async () => await _mediator.Send(command));
+        await Assert.ThrowsAsync<ValidationException>(() => Mediator.Send(command with { Amount = amount }));
+    }
+
+    [Fact]
+    public async Task CreateTransaction_TooOldDate_ThrowsValidationException()
+    {
+        var command = GetValidCommand();
+
+        await Assert.ThrowsAsync<ValidationException>(() =>
+            Mediator.Send(command with { TransactionDateTime = DateTime.UtcNow.AddMonths(-3) }));
+    }
+
+    [Fact]
+    public async Task CreateTransaction_FutureDate_ThrowsValidationException()
+    {
+        var command = GetValidCommand();
+
+        await Assert.ThrowsAsync<ValidationException>(() =>
+            Mediator.Send(command with { TransactionDateTime = DateTime.UtcNow.AddHours(2) }));
+    }
+
+    [Fact]
+    public async Task CreateTransaction_MissingUser_ThrowsDbValidationException()
+    {
+        var command = GetValidCommand();
+
+        var exception = await Assert.ThrowsAsync<DbValidationException>(() =>
+            Mediator.Send(command with { SenderId = Guid.NewGuid() }));
+
+        exception.Failures[0].ErrorName.Should().Be(ApplicationErrors.UsersNotFound);
+    }
+
+    [Fact]
+    public async Task CreateTransaction_MissingCurrency_ThrowsDbValidationException()
+    {
+        var command = GetValidCommand();
+
+        var exception = await Assert.ThrowsAsync<DbValidationException>(() =>
+            Mediator.Send(command with { CurrencyId = int.MaxValue }));
+
+        exception.Failures[0].ErrorName.Should().Be(ApplicationErrors.CurrencyNotFound);
+    }
+
+    private CreateTransactionCommand GetValidCommand()
+    {
+        var sender = UsersContext.Users.ElementAt(0);
+        var receiver = UsersContext.Users.ElementAt(1);
+        var currency = CurrencyContext.Currencies[0];
+
+        return new CreateTransactionCommand(
+            sender.Id,
+            receiver.Id,
+            100m,
+            currency.Id,
+            DateTime.UtcNow);
     }
 }

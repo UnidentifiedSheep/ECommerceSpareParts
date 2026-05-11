@@ -2,7 +2,7 @@
 
 public record SettingChangedEvent
 {
-    public string Key { get; init; } = null!;
-    public string? Value { get; init; }
-    public DateTime ChangedAt { get; init; }
+    public required string Key { get; init; }
+    public required string Value { get; init; }
+    public required DateTime ChangedAt { get; init; }
 }

@@ -1,68 +1,50 @@
-using Main.Abstractions.Exceptions.Producers;
-using Main.Application.Configs.Mapster;
+using FluentAssertions;
 using Main.Application.Handlers.Producers.DeleteProducer;
-using Main.Persistence.Context;
-using MediatR;
+using Main.Entities.Exceptions.Producers;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.DependencyInjection;
-using Test.Common.Extensions;
 using Test.Common.TestContainers.Combined;
-using Tests.MockData;
+using Tests.TestContexts;
 
 namespace Tests.HandlersTests.Producers;
 
-[Collection("Combined collection")]
-public class DeleteProducerTest : IAsyncLifetime
+public class DeleteProducerTest : IntegrationTest
 {
-    private readonly DContext _context;
-    private readonly IMediator _mediator;
-
-    public DeleteProducerTest(CombinedContainerFixture fixture)
+    public DeleteProducerTest(CombinedContainerFixture fixture) : base(fixture)
     {
-        MapsterConfig.Configure();
-        var sp = ServiceProviderForTests.Build(fixture.PostgresConnectionString, fixture.RedisConnectionString);
-        _mediator = sp.GetService<IMediator>()!;
-        _context = sp.GetRequiredService<DContext>();
+        RegisterBasicContext<ProductTestContext>();
     }
 
-    public async Task InitializeAsync()
-    {
-        await _mediator.AddMockProducersAndArticles();
-    }
-
-    public async Task DisposeAsync()
-    {
-        await _context.ClearDatabase();
-    }
+    private ProductTestContext TestContext => GetContext<ProductTestContext>();
 
     [Fact]
     public async Task DeleteProducer_InvalidProducerId_ThrowsProducerNotFound()
     {
         var command = new DeleteProducerCommand(int.MaxValue);
-        await Assert.ThrowsAsync<ProducerNotFoundException>(async () => await _mediator.Send(command));
+        await Assert.ThrowsAsync<ProducerNotFoundException>(async () => await Mediator.Send(command));
     }
 
     [Fact]
     public async Task DeleteProducer_WhenProducerHasArticle_ThrowsCannotDeleteProducerWithArticles()
     {
-        var article = await _context.Articles.FirstOrDefaultAsync();
-        Assert.NotNull(article);
-        var command = new DeleteProducerCommand(article.ProducerId);
-        await Assert.ThrowsAsync<CannotDeleteProducerWithArticlesException>(async () => await _mediator.Send(command));
+        var command = new DeleteProducerCommand(TestContext.Products[0].ProducerId);
+        await Assert.ThrowsAsync<CannotDeleteProducerWithArticlesException>(async () => await Mediator.Send(command));
     }
 
     [Fact]
     public async Task DeleteProducer_Normal_Succeeds()
     {
-        var producer = await _context.Producers
-            .Include(x => x.Articles)
-            .FirstOrDefaultAsync();
-        Assert.NotNull(producer);
+        var producer = TestContext.ProducerTestContext.Producers[0];
+        var toRemove = await Context.Products.Where(x => x.ProducerId == producer.Id).ToListAsync();
+        if (toRemove.Count > 0)
+        {
+            Context.Products.RemoveRange(toRemove);
+            await Context.SaveChangesAsync();
+        }
 
-        _context.Articles.RemoveRange(producer.Articles);
-        await _context.SaveChangesAsync();
+        var act = () => Mediator.Send(new DeleteProducerCommand(producer.Id));
+        await act.Should().NotThrowAsync();
 
-        var command = new DeleteProducerCommand(producer.Id);
-        await _mediator.Send(command);
+        var dbProduct = await Context.Products.FirstOrDefaultAsync(x => x.ProducerId == producer.Id);
+        dbProduct.Should().BeNull();
     }
 }

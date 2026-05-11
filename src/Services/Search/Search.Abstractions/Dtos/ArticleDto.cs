@@ -1,6 +1,6 @@
 ﻿namespace Search.Abstractions.Dtos;
 
-public partial class ArticleDto
+public class ArticleDto
 {
     public int Id { get; set; }
 

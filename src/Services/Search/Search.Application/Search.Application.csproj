@@ -9,7 +9,7 @@
     <ItemGroup>
         <ProjectReference Include="..\..\..\Core\Contracts\Contracts.csproj"/>
         <ProjectReference Include="..\..\..\Core\Exceptions\Exceptions.csproj"/>
-        <ProjectReference Include="..\..\Application.Common\Application.Common.csproj" />
+        <ProjectReference Include="..\..\Application.Common\Application.Common.csproj"/>
         <ProjectReference Include="..\Search.Abstractions\Search.Abstractions.csproj"/>
     </ItemGroup>
 

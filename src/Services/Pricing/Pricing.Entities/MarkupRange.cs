@@ -2,15 +2,31 @@
 
 public class MarkupRange
 {
-    public int Id { get; set; }
+    private MarkupRange()
+    {
+    }
 
-    public decimal RangeStart { get; set; }
+    private MarkupRange(decimal rangeStart, decimal rangeEnd, decimal markup)
+    {
+        RangeStart = rangeStart;
+        RangeEnd = rangeEnd;
+        Markup = markup;
+    }
 
-    public decimal RangeEnd { get; set; }
+    public int Id { get; private set; }
 
-    public decimal Markup { get; set; }
+    public decimal RangeStart { get; private set; }
 
-    public int GroupId { get; set; }
+    public decimal RangeEnd { get; private set; }
 
-    public virtual MarkupGroup Group { get; set; } = null!;
+    public decimal Markup { get; private set; }
+
+    public int GroupId { get; private set; }
+
+    public MarkupGroup Group { get; private set; } = null!;
+
+    public static MarkupRange Create(decimal rangeStart, decimal rangeEnd, decimal markup)
+    {
+        return new MarkupRange(rangeStart, rangeEnd, markup);
+    }
 }

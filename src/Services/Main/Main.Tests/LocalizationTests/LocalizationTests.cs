@@ -1,8 +1,9 @@
 ﻿using System.Reflection;
 using Api.Common.Extensions;
-using Main.Abstractions.Constants;
+using Main.Application;
 using Main.Application.Configs;
 using Main.Entities;
+using Main.Entities.Product;
 
 namespace Tests.LocalizationTests;
 
@@ -21,7 +22,7 @@ public class LocalizationTests
     public async Task All_LocalizableExceptions_Should_Have_Valid_Localization(string locale)
     {
         var localesPath = Assembly.GetExecutingAssembly().GetDefaultLocalizationPath();
-        var assembly = Assembly.GetAssembly(typeof(CacheKeys))!;
+        var assembly = Assembly.GetAssembly(typeof(Product))!;
 
         await _localizationTests.TestLocalizableExceptions(assembly, localesPath, locale);
     }
@@ -32,11 +33,11 @@ public class LocalizationTests
     public async Task All_AbstractValidators_Should_Have_Valid_Localization(string locale)
     {
         var localesPath = Assembly.GetExecutingAssembly().GetDefaultLocalizationPath();
-        var assembly = Assembly.GetAssembly(typeof(Main.Application.Global))!;
+        var assembly = Assembly.GetAssembly(typeof(Global))!;
 
         await _localizationTests.TestAbstractValidatorLocalization(assembly, localesPath, locale);
     }
-    
+
     [Theory]
     [InlineData("ru")]
     [InlineData("en")]
@@ -50,7 +51,7 @@ public class LocalizationTests
             .Select(f => f.GetValue(null))
             .Cast<string>()
             .ToList();
-        
+
         await _localizationTests.TestDbValidatorLocalization(constants, localesPath, locale);
     }
 }

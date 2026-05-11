@@ -8,6 +8,6 @@ public class EditSaleDbValidation : AbstractDbValidation<EditSaleCommand>
 {
     public override void Build(IValidationPlan plan, EditSaleCommand request)
     {
-        plan.ValidateUserExistsId(request.UpdatedUserId);
+        plan.ValidateCurrencyExistsId(request.CurrencyId);
     }
 }

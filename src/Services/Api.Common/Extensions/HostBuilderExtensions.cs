@@ -15,13 +15,13 @@ public static class HostBuilderExtensions
         string? lokiUrl)
     {
         var loggerConfiguration = GetLoggerConfiguration(
-            configuration, 
-            serviceName, 
-            environment, 
+            configuration,
+            serviceName,
+            environment,
             lokiUrl);
 
         hostBuilder.UseSerilog(loggerConfiguration.CreateLogger());
-        return  hostBuilder;
+        return hostBuilder;
     }
 
     public static IHostApplicationBuilder AddLokiLogger(

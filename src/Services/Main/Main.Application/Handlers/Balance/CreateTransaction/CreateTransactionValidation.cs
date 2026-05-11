@@ -1,5 +1,4 @@
-using Abstractions.Interfaces.Currency;
-using Application.Common.Extensions;
+using Application.Common.Interfaces.Currency;
 using FluentValidation;
 using Localization.Domain.Extensions;
 using Main.Application.Handlers.BaseValidators;
@@ -25,8 +24,5 @@ public class CreateTransactionValidation : AbstractValidator<CreateTransactionCo
             .GreaterThanOrEqualTo(DateTime.UtcNow.AddMonths(-2))
             .LessThanOrEqualTo(DateTime.UtcNow.AddHours(1))
             .WithLocalizationKey("transaction.date.out.of.range");
-
-        RuleFor(command => command.CurrencyId)
-            .CurrencyMustExist(currencyConverter);
     }
 }

@@ -1,36 +1,35 @@
 using Abstractions.Interfaces.Services;
 using Application.Common.Interfaces;
+using Application.Common.Interfaces.Cqrs;
 using Attributes;
 using Contracts.Currency;
-using Main.Application.Notifications;
-using Main.Entities;
-using Mapster;
-using MassTransit;
-using MediatR;
+using Main.Application.Extensions.Entities;
+using Main.Entities.Currency;
 
 namespace Main.Application.Handlers.Currencies.CreateCurrency;
 
+[AutoSave]
 [Transactional]
 public record CreateCurrencyCommand(string ShortName, string Name, string CurrencySign, string Code)
     : ICommand<CreateCurrencyResult>;
 
 public record CreateCurrencyResult(int Id);
 
-public class CreateCurrencyHandler(IUnitOfWork unitOfWork, IPublishEndpoint publishEndpoint, IMediator mediator)
+public class CreateCurrencyHandler(
+    IUnitOfWork unitOfWork,
+    IIntegrationEventScope integrationEventScope)
     : ICommandHandler<CreateCurrencyCommand, CreateCurrencyResult>
 {
     public async Task<CreateCurrencyResult> Handle(CreateCurrencyCommand request, CancellationToken cancellationToken)
     {
-        var model = request.Adapt<Currency>();
+        var model = Currency.Create(request.Name, request.ShortName, request.CurrencySign, request.Code);
         await unitOfWork.AddAsync(model, cancellationToken);
 
-        await publishEndpoint.Publish(new CurrencyCreatedEvent
+        integrationEventScope.Add(new CurrencyCreatedEvent
         {
-            Currency = model.Adapt<Contracts.Models.Currency.Currency>()
-        }, cancellationToken);
-        await unitOfWork.SaveChangesAsync(cancellationToken);
+            Currency = model.ToContract()
+        });
 
-        await mediator.Publish(new CurrencyCreatedNotification(model.Id), cancellationToken);
         return new CreateCurrencyResult(model.Id);
     }
 }

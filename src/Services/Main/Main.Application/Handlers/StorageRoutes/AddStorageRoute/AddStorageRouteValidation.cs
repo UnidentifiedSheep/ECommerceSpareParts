@@ -1,13 +1,11 @@
-﻿using Abstractions.Interfaces.Currency;
-using Application.Common.Extensions;
-using FluentValidation;
+﻿using FluentValidation;
 using Localization.Domain.Extensions;
 
 namespace Main.Application.Handlers.StorageRoutes.AddStorageRoute;
 
 public class AddStorageRouteValidation : AbstractValidator<AddStorageRouteCommand>
 {
-    public AddStorageRouteValidation(ICurrencyConverter currencyConverter)
+    public AddStorageRouteValidation()
     {
         RuleFor(x => new { x.StorageTo, x.StorageFrom })
             .Must(x => x.StorageTo != x.StorageFrom)
@@ -20,9 +18,6 @@ public class AddStorageRouteValidation : AbstractValidator<AddStorageRouteComman
         RuleFor(x => x.DeliveryTime)
             .GreaterThanOrEqualTo(1)
             .WithLocalizationKey("storage.route.delivery.time.min");
-
-        RuleFor(x => x.CurrencyId)
-            .CurrencyMustExist(currencyConverter);
 
         RuleFor(x => x.PriceKg)
             .GreaterThanOrEqualTo(0)

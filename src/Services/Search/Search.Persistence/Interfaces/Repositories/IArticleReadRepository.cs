@@ -6,7 +6,7 @@ namespace Search.Persistence.Interfaces.Repositories;
 
 public interface IArticleReadRepository
 {
-    Article? GetArticle(int articleId);
+    Product? GetArticle(int articleId);
 
     /// <summary>
     ///     Retrieves the next article in the sequence after the specified article identifier.
@@ -17,11 +17,11 @@ public interface IArticleReadRepository
     /// <returns>
     ///     The next article in the sequence, or <c>null</c> if no more articles are available.
     /// </returns>
-    Article? GetNextArticle(int articleId = -1);
+    Product? GetNextArticle(int articleId = -1);
 
-    IReadOnlyList<Article> GetArticles(IEnumerable<int> articleIds);
+    IReadOnlyList<Product> GetArticles(IEnumerable<int> articleIds);
 
-    (IReadOnlyList<Article> result, SearchCursor? last) SearchByTitle(
+    (IReadOnlyList<Product> result, SearchCursor? last) SearchByTitle(
         string title,
         SearchCursor? cursor = null,
         int limit = 20);
@@ -39,7 +39,7 @@ public interface IArticleReadRepository
     /// <returns>
     ///     The read only list of articles.
     /// </returns>
-    (IReadOnlyList<Article> result, SearchCursor? last) SearchByArticleNumberPrefix(
+    (IReadOnlyList<Product> result, SearchCursor? last) SearchByArticleNumberPrefix(
         string prefix,
         SearchCursor? cursor = null,
         int limit = 20);

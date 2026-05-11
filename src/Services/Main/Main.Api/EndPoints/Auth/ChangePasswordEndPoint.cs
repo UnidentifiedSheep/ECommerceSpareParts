@@ -14,16 +14,16 @@ public class ChangePasswordEndPoint : ICarterModule
     public void AddRoutes(IEndpointRouteBuilder app)
     {
         app.MapPost("/auth/password/", async (
-            ISender sender,
-            ChangePasswordRequest request,
-            IUserContext user,
-            CancellationToken cancellationToken) =>
-        {
-            var command = new ChangePasswordCommand(user.UserId, request.PreviousPassword, request.NewPassword);
-            await sender.Send(command, cancellationToken);
-            
-            return Results.Ok();
-        }).WithName("ChangePassword")
-        .WithDisplayName("Change Password");
+                ISender sender,
+                ChangePasswordRequest request,
+                IUserContext user,
+                CancellationToken cancellationToken) =>
+            {
+                var command = new ChangePasswordCommand(user.UserId, request.PreviousPassword, request.NewPassword);
+                await sender.Send(command, cancellationToken);
+
+                return Results.Ok();
+            }).WithName("ChangePassword")
+            .WithDisplayName("Change Password");
     }
 }

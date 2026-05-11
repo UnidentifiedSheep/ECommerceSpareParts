@@ -1,4 +1,5 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using Domain.Interfaces;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 namespace Persistence.Extensions;
@@ -37,6 +38,36 @@ public static class ModelBuilderExtensions
                     .Entity(entityType.ClrType)
                     .Property(property.Name)
                     .HasConversion<string>();
+        }
+
+        return modelBuilder;
+    }
+
+    public static ModelBuilder AddFieldsForAuditableEntities(this ModelBuilder modelBuilder)
+    {
+        foreach (var entityType in modelBuilder.Model.GetEntityTypes())
+        {
+            if (!typeof(IAuditable).IsAssignableFrom(entityType.ClrType)) continue;
+
+            var builder = modelBuilder.Entity(entityType.ClrType);
+
+            builder.Property(nameof(IAuditable.CreatedAt))
+                .HasColumnName("created_at");
+
+            builder.Property(nameof(IAuditable.UpdatedAt))
+                .HasColumnName("updated_at");
+
+            builder.Property(nameof(IAuditable.WhoCreated))
+                .HasColumnName("who_created");
+
+            builder.Property(nameof(IAuditable.WhoUpdated))
+                .HasColumnName("who_updated");
+
+            builder.HasIndex(nameof(IAuditable.WhoUpdated))
+                .HasDatabaseName($"{entityType.Name.ToLowerInvariant()}_who_updated_idx");
+
+            builder.HasIndex(nameof(IAuditable.WhoCreated))
+                .HasDatabaseName($"{entityType.Name.ToLowerInvariant()}_who_created_idx");
         }
 
         return modelBuilder;

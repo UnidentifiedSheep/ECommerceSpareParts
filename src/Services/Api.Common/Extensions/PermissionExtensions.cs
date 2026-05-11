@@ -30,7 +30,7 @@ public static class PermissionExtensions
     public static TBuilder RequireAnyPermission<TBuilder>(this TBuilder builder, params Enum[] permissions)
         where TBuilder : IEndpointConventionBuilder
     {
-        var perm = permissions.Select(x => x.ToNormalizedPermission()).ToArray();
+        var perm = permissions.Select(x => x.ToString().ToNormalizedPermission()).ToArray();
         builder.Add(endpoint => { endpoint.Metadata.Add(new RequiredPermissionsMetadata(perm, false)); });
 
         builder.AddEndpointFilter(new PermissionFilter(PermissionCheck.Any, perm));
@@ -41,7 +41,7 @@ public static class PermissionExtensions
     public static TBuilder RequireAllPermissions<TBuilder>(this TBuilder builder, params Enum[] permissions)
         where TBuilder : IEndpointConventionBuilder
     {
-        var perm = permissions.Select(x => x.ToNormalizedPermission()).ToArray();
+        var perm = permissions.Select(x => x.ToString().ToNormalizedPermission()).ToArray();
         builder.Add(endpoint => { endpoint.Metadata.Add(new RequiredPermissionsMetadata(perm, true)); });
 
         builder.AddEndpointFilter(new PermissionFilter(PermissionCheck.All, perm));

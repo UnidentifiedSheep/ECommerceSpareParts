@@ -1,19 +1,23 @@
-using System.Data;
+/*using System.Data;
 using Abstractions.Interfaces.Services;
 using Application.Common.Interfaces;
 using Attributes;
 using Contracts.Sale;
-using Main.Abstractions.Dtos.Amw.Sales;
-using Main.Abstractions.Exceptions.Sales;
 using Main.Abstractions.Interfaces.DbRepositories;
 using Main.Abstractions.Models;
+using Main.Application.Dtos.Amw.Sales;
+using Main.Application.Dtos.Sale;
 using Main.Application.Extensions;
-using Main.Application.Handlers.ArticleReservations.SubtractCountFromReservations;
 using Main.Application.Handlers.Balance.EditTransaction;
+using Main.Application.Handlers.ProductReservations.UpdateReservationsCounts;
 using Main.Application.Handlers.Sales.EditSale;
 using Main.Application.Handlers.StorageContents.RemoveContent;
 using Main.Application.Handlers.StorageContents.RestoreContent;
+using Main.Application.Models;
 using Main.Entities;
+using Main.Entities.Exceptions.Sales;
+using Main.Entities.Sale;
+using Main.Entities.Storage;
 using Main.Enums;
 using Mapster;
 using MassTransit;
@@ -117,8 +121,8 @@ public class EditFullSaleHandler(
                 if (existingSaleContent.Count < content.Count)
                 {
                     var diff = content.Count - existingSaleContent.Count;
-                    contentGreaterCount[existingSaleContent.ArticleId] = contentGreaterCount
-                        .GetValueOrDefault(existingSaleContent.ArticleId) + diff;
+                    contentGreaterCount[existingSaleContent.ProductId] = contentGreaterCount
+                        .GetValueOrDefault(existingSaleContent.ProductId) + diff;
                 }
                 else if (existingSaleContent.Count > content.Count)
                 {
@@ -133,14 +137,14 @@ public class EditFullSaleHandler(
                         var newDetail = detail.Adapt<SaleContentDetail>();
                         newDetail.Count = tempCount;
                         diff -= tempCount;
-                        contentLessCount.Add((newDetail, content.ArticleId));
+                        contentLessCount.Add((newDetail, content.ProductId));
                     }
                 }
             }
             else
             {
-                contentGreaterCount[content.ArticleId] = contentGreaterCount
-                    .GetValueOrDefault(content.ArticleId) + content.Count;
+                contentGreaterCount[content.ProductId] = contentGreaterCount
+                    .GetValueOrDefault(content.ProductId) + content.Count;
             }
 
         return (contentGreaterCount, contentLessCount);
@@ -156,7 +160,7 @@ public class EditFullSaleHandler(
         {
             var details = saleContentDetails
                 .Where(x => x.SaleContentId == id);
-            removedDetails.AddRange(details.Select(detail => (detail, deletedContent.ArticleId)));
+            removedDetails.AddRange(details.Select(detail => (detail, ArticleId: deletedContent.ProductId)));
         }
 
         return removedDetails;
@@ -191,7 +195,7 @@ public class EditFullSaleHandler(
         CancellationToken cancellationToken = default)
     {
         var command =
-            new EditTransactionCommand(transactionId, currencyId, totalSum, TransactionStatus.Sale, saleDateTime);
+            new EditTransactionCommand(transactionId, currencyId, totalSum, TransactionType.Sale, saleDateTime);
         await mediator.Send(command, cancellationToken);
     }
 
@@ -220,7 +224,8 @@ public class EditFullSaleHandler(
         Guid userId,
         CancellationToken cancellationToken = default)
     {
-        var command = new SubtractCountFromReservationsCommand(userId, whoUpdated, graterCount);
+        var command = new UpdateReservationsCountsCommand(userId, whoUpdated, graterCount);
         await mediator.Send(command, cancellationToken);
     }
-}
+}*/ //TODO: fix this
+
