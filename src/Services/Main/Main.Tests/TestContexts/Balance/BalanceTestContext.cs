@@ -18,7 +18,7 @@ public class BalanceTestContext(
     private readonly List<Transaction> _transactions = [];
 
     public IReadOnlyList<User> Users => usersTestContext.Users.ToList();
-    public IReadOnlyList<Currency> Currencies => currencyTestContext.Currencies;
+    public IReadOnlyList<Main.Entities.Currency.Currency> Currencies => currencyTestContext.Currencies;
     public IReadOnlyList<Transaction> Transactions => _transactions;
 
     public static Type[] DependsOn { get; } =

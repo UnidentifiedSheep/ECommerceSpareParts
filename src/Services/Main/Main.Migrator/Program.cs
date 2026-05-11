@@ -1,5 +1,7 @@
 ﻿using Abstractions.Interfaces.Validators;
 using Abstractions.Models;
+using Api.Common.Extensions;
+using Main.Migrator;
 using Main.Migrator.DataSeeds;
 using Main.Persistence.Context;
 using Microsoft.EntityFrameworkCore;
@@ -11,7 +13,11 @@ using Persistence.Interfaces;
 using Security.Services;
 
 var builder = Host.CreateDefaultBuilder(args)
-    .ConfigureAppConfiguration((_, config) => { config.AddCommandLine(args); });
+    .ConfigureAppConfiguration((_, config) => { config.AddCommandLine(args); })
+    .ConfigureAppConfiguration((_, config) => 
+        config.AddMigratorSettingsFromJsons("main.settings")
+            .AddAppSettingsFromJsons("main.settings", "/app/configs"));
+
 
 var seedingRequested = false;
 
@@ -29,6 +35,10 @@ builder.ConfigureServices((context, services) =>
 
     //used for password hash etc
     services.AddSingleton<IPasswordManager, PasswordManager>(_ => new PasswordManager(new PasswordRules()));
+    
+    services.AddOptions<ServiceSecrets>(ServiceSecrets.SectionName)
+        .ValidateDataAnnotations()
+        .ValidateOnStart();
 });
 
 builder.ConfigureServices((_, services) =>

@@ -9,11 +9,6 @@
     volumes:
       - ${CONFIGS_PATH:-./certs}:/app/configs:ro
     environment:
-      - SEED_DB=${MAIN_SEED_DB}
-      - SEED_ADMIN=${MAIN_SEED_ADMIN}
-      - SEED_ADMIN_PASSWORD=${MAIN_SEED_ADMIN_PASSWORD}
-      - SEED_ADMIN_LOGIN=${MAIN_SEED_ADMIN_LOGIN}
-      - SEED_ADMIN_EMAIL=${MAIN_SEED_ADMIN_EMAIL}
       - REDIS_CONNECTION_STRING=${REDIS_HOST}:${REDIS_PORT},password=${REDIS_PASSWORD}
       - DB_CONNECTION_STRING=Host=${PGQL_HOST};Database=${PGQL_MAIN_DB};Username=${PGQL_USER};Password=${PGQL_PASSWORD}
       - MessageBroker__Host=amqp://${RABBITMQ_HOST}:${RABBITMQ_PORT}
@@ -26,9 +21,10 @@
       - S3_PASSWORD=${MINIO_SERVICE_PASSWORD}
       - S3_REGION=${MINIO_REGION}
       - S3_IMAGES_BUCKET=${MINIO_IMAGES_BUCKET}
-      - SYSTEM_ID=${MAIN_SYSTEM_ID}
       - SIGN_SECRET=${MAIN_SIGN_SECRET}
       - LOKI_URL=http://${LOKI_HOST}:${LOKI_PORT}
+      - JwtBearer__ValidIssuer=${VALID_ISSUER}
+      - JwtBearer__IssuerSigningKey=${ISSUER_SIGNING_KEY}
     networks:
       - backend-network
     depends_on:
@@ -54,6 +50,8 @@
       - MessageBroker__Password=${RABBITMQ_DEFAULT_PASS}
       - HeaderSecret__Key=${GATEWAY_SUPER_KEY}
       - LOKI_URL=http://${LOKI_HOST}:${LOKI_PORT}
+      - JwtBearer__ValidIssuer=${VALID_ISSUER}
+      - JwtBearer__IssuerSigningKey=${ISSUER_SIGNING_KEY}
     networks:
       - backend-network
 
@@ -76,6 +74,8 @@
       - SIGN_SECRET=${PRICING_SIGN_SECRET}
       - SEED_DB=${PRICING_SEED_DB}
       - LOKI_URL=http://${LOKI_HOST}:${LOKI_PORT}
+      - JwtBearer__ValidIssuer=${VALID_ISSUER}
+      - JwtBearer__IssuerSigningKey=${ISSUER_SIGNING_KEY}
     networks:
       - backend-network
     depends_on:
@@ -98,8 +98,6 @@
       - ASPNETCORE_Kestrel__Certificates__Default__Path=${CERT_PATH}
       - ASPNETCORE_Kestrel__Certificates__Default__KeyPath=${CERT_KEYPATH}
       - HeaderSecret__Key=${GATEWAY_SUPER_KEY}
-      - JwtBearer__ValidIssuer=${VALID_ISSUER}
-      - JwtBearer__IssuerSigningKey=${ISSUER_SIGNING_KEY}
       - LOKI_URL=http://${LOKI_HOST}:${LOKI_PORT}
     networks:
       - backend-network
@@ -123,6 +121,8 @@
       - HeaderSecret__Key=${GATEWAY_SUPER_KEY}
       - SEED_DB=${ANALYTICS_SEED_DB}
       - LOKI_URL=http://${LOKI_HOST}:${LOKI_PORT}
+      - JwtBearer__ValidIssuer=${VALID_ISSUER}
+      - JwtBearer__IssuerSigningKey=${ISSUER_SIGNING_KEY}
     networks:
       - backend-network
     depends_on:
@@ -146,6 +146,8 @@
       - MessageBroker__Password=${RABBITMQ_DEFAULT_PASS}
       - HeaderSecret__Key=${GATEWAY_SUPER_KEY}
       - LOKI_URL=http://${LOKI_HOST}:${LOKI_PORT}
+      - JwtBearer__ValidIssuer=${VALID_ISSUER}
+      - JwtBearer__IssuerSigningKey=${ISSUER_SIGNING_KEY}
     networks:
       - backend-network
     depends_on:

@@ -18,12 +18,18 @@
 
     <ItemGroup>
         <ProjectReference Include="..\..\..\Infrastructure\Security\Security.csproj"/>
+        <ProjectReference Include="..\..\Api.Common\Api.Common.csproj" />
         <ProjectReference Include="..\Main.Persistence\Main.Persistence.csproj"/>
     </ItemGroup>
 
     <ItemGroup>
         <Content Include="..\..\..\..\.dockerignore">
             <Link>.dockerignore</Link>
+        </Content>
+        <Content Include="..\..\..\..\configs\**\*">
+            <Link>configs\%(RecursiveDir)%(Filename)%(Extension)</Link>
+            <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+            <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
         </Content>
     </ItemGroup>
 

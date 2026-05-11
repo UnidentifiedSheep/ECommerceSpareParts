@@ -40,8 +40,8 @@ var lokiUrl = Environment.GetEnvironmentVariable("LOKI_URL");
 var env = Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT") ?? "";
 
 builder.Configuration
-    .AddConfigsFromJsons(env)
-    .AddConfigsFromJsons(env, "/app/configs");
+    .AddAppSettingsFromJsons(env)
+    .AddAppSettingsFromJsons(env, "/app/configs");
 
 builder.Host.AddLokiLogger(builder.Configuration, "main.api", env, lokiUrl);
 
@@ -127,6 +127,7 @@ builder.Services
     .AddCacheLayer(Environment.GetEnvironmentVariable("REDIS_CONNECTION_STRING")!)
     .AddJsonSigner(Environment.GetEnvironmentVariable("SIGN_SECRET")!, Global.JsonOptions)
     .AddFullSecurityLayer()
+    .AddEComAuth(builder.Configuration)
     .AddMailLayer()
     .AddCommonLayer()
     .AddS3(() =>

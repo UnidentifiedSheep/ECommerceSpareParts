@@ -62,12 +62,7 @@ public class CreateMarkupHandler(IUnitOfWork unitOfWork) : ICommandHandler<Creat
             markupRanges.Add(range.Adapt<MarkupRange>());
         }
 
-        var group = new MarkupGroup
-        {
-            Name = request.GroupName,
-            CurrencyId = request.CurrencyId,
-            MarkupRanges = markupRanges
-        };
+        var group = MarkupGroup.Create(request.GroupName, request.CurrencyId, markupRanges);
         await unitOfWork.AddAsync(group, cancellationToken);
         await unitOfWork.SaveChangesAsync(cancellationToken);
 

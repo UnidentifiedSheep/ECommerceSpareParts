@@ -1,25 +1,68 @@
-﻿using Main.Entities.User;
+﻿using Main.Entities.Auth.ValueObjects;
+using Main.Entities.User;
 using Main.Enums;
 using Main.Persistence.Context;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Options;
 using Persistence.Interfaces;
 
 namespace Main.Migrator.DataSeeds;
 
-public class UserSeed : ISeed<DContext>
+public class UserSeed(IOptions<ServiceSecrets> secrets) : ISeed<DContext>
 {
-    private const string System = "SYSTEM";
+    private readonly ServiceSecrets _secrets = secrets.Value;
+
+    private static readonly string[] Services =
+    [
+        nameof(ServiceSecrets.Main),
+        nameof(ServiceSecrets.Analytics),
+        nameof(ServiceSecrets.Pricing),
+        nameof(ServiceSecrets.Search)
+    ];
 
     public async Task SeedAsync(DContext context)
     {
-        if (await context.Users.AnyAsync(x => x.UserName.NormalizedValue == System))
+        var existingSystemUsers = await context.Users
+            .Where(x => x.Roles.Any(y => y.RoleName == RoleName.ToNormalized(nameof(Role.System))))
+            .AsNoTracking()
+            .ToDictionaryAsync(x => x.UserName);
+
+        var toAdd = new List<User>();
+
+        foreach (var service in Services)
+        {
+            if (existingSystemUsers.ContainsKey(service))
+                continue;
+
+            var secret = GetServiceSecret(service);
+            toAdd.Add(CreateSystemUser(service, secret));
+        }
+
+        if (toAdd.Count == 0)
             return;
 
-        var systemUser = User.Create(System, "");
+        await context.Users.AddRangeAsync(toAdd);
+        await context.SaveChangesAsync();
+    }
+
+    private string GetServiceSecret(string service)
+    {
+        return service switch
+        {
+            nameof(ServiceSecrets.Main) => _secrets.Main,
+            nameof(ServiceSecrets.Analytics) => _secrets.Analytics,
+            nameof(ServiceSecrets.Pricing) => _secrets.Pricing,
+            nameof(ServiceSecrets.Search) => _secrets.Search,
+            _ => throw new InvalidOperationException($"Unknown service: {service}")
+        };
+    }
+
+    private static User CreateSystemUser(string service, string secret)
+    {
+        var systemUser = User.Create(service, secret);
         systemUser.AddRole(nameof(Role.System));
 
-        await context.Users.AddAsync(systemUser);
-        await context.SaveChangesAsync();
+        return systemUser;
     }
 
     public int GetPriority()

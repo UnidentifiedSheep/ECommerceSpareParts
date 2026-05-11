@@ -6,8 +6,21 @@ public static class ConfigurationBuilderExtensions
 {
     private const string Appsettings = "appsettings";
 
+    public static IConfigurationBuilder AddAppSettingsFromJsons(
+        this IConfigurationBuilder configuration,
+        string? contour,
+        string? path = null)
+        => configuration.AddConfigsFromJsons(Appsettings, contour, path);
+    
+    public static IConfigurationBuilder AddMigratorSettingsFromJsons(
+        this IConfigurationBuilder configuration,
+        string? contour,
+        string? path = null)
+        => configuration.AddConfigsFromJsons("migrator", contour, path);
+    
     public static IConfigurationBuilder AddConfigsFromJsons(
         this IConfigurationBuilder configuration,
+        string nameStart,
         string? contour,
         string? path = null)
     {
@@ -25,7 +38,7 @@ public static class ConfigurationBuilderExtensions
         foreach (var file in files)
         {
             var fileName = Path.GetFileName(file);
-            if (fileName.StartsWith(Appsettings) && fileName != appsettingsFileName)
+            if (fileName.StartsWith(nameStart) && fileName != appsettingsFileName)
                 continue;
 
             configuration.AddJsonFile(file, true, true);

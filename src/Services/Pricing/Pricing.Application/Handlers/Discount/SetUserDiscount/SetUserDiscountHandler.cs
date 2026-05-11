@@ -1,7 +1,5 @@
-﻿using Application.Common.Interfaces;
-using Application.Common.Interfaces.Cqrs;
+﻿using Application.Common.Interfaces.Cqrs;
 using MediatR;
-using Pricing.Abstractions.Interfaces.CacheRepositories;
 
 namespace Pricing.Application.Handlers.Discount.SetUserDiscount;
 

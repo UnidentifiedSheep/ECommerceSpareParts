@@ -1,0 +1,23 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <TargetFramework>net10.0</TargetFramework>
+        <ImplicitUsings>enable</ImplicitUsings>
+        <Nullable>enable</Nullable>
+    </PropertyGroup>
+
+    <ItemGroup>
+      <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="10.0.7" />
+      <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="10.0.7" />
+      <PackageReference Include="Microsoft.Extensions.Http" Version="10.0.7" />
+      <PackageReference Include="Microsoft.Extensions.Options.ConfigurationExtensions" Version="10.0.7" />
+      <PackageReference Include="Microsoft.Extensions.Options.DataAnnotations" Version="10.0.7" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <ProjectReference Include="..\Internal.Integration.Auth\Internal.Integration.Auth.csproj" />
+      <ProjectReference Include="..\Internal.Integration.Core\Internal.Integration.Core.csproj" />
+      <ProjectReference Include="..\Internal.Integration.Main\Internal.Integration.Main.csproj" />
+    </ItemGroup>
+
+</Project>

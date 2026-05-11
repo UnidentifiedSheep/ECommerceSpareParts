@@ -4,12 +4,13 @@ using Api.Common.Extensions;
 using Api.Common.Middleware;
 using Api.Common.Models;
 using Api.Common.OperationFilters;
-using Application.Common.Interfaces.Settings;
+using Cache;
 using Carter;
 using Contracts.Currency;
 using Contracts.Markup;
 using Contracts.Settings;
 using Localization.Abstractions.Models;
+using Localization.Domain.Extensions;
 using Localization.Domain.Middlewares;
 using MassTransit;
 using Microsoft.AspNetCore.HttpOverrides;
@@ -22,8 +23,7 @@ using Pricing.Persistence;
 using Pricing.Persistence.Contexts;
 using RabbitMq.Extensions;
 using RabbitMq.Models;
-
-var localesPath = Assembly.GetExecutingAssembly().GetDefaultLocalizationPath();
+using Security;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -31,8 +31,8 @@ var lokiUrl = Environment.GetEnvironmentVariable("LOKI_URL");
 var env = Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT") ?? "";
 
 builder.Configuration
-    .AddConfigsFromJsons(env)
-    .AddConfigsFromJsons(env, "/app/configs");
+    .AddAppSettingsFromJsons(env)
+    .AddAppSettingsFromJsons(env, "/app/configs");
 
 builder.Host.AddLokiLogger(builder.Configuration, "pricing.api", env, lokiUrl);
 
@@ -70,8 +70,6 @@ builder.Services.AddMassTransit(x =>
         o.UsePostgres();
         o.UseBusOutbox();
     });
-
-    x.AddRequestClient<GetCurrenciesRequest>();
 
     x.UsingRabbitMq((context, cfg) =>
     {
@@ -111,8 +109,7 @@ Locale defaultLocale = "ru-RU";
 
 builder.Services
     .AddPersistenceLayer(Environment.GetEnvironmentVariable("DB_CONNECTION_STRING")!)
-    .AddCacheLayer(Environment.GetEnvironmentVariable("REDIS_CONNECTION_STRING")!, "pricing")
-    .AddAppCacheLayer()
+    .AddCacheLayer(Environment.GetEnvironmentVariable("REDIS_CONNECTION_STRING")!)
     .AddJsonSigner(Environment.GetEnvironmentVariable("SIGN_SECRET")!, Global.JsonOptions)
     .AddMinimalSecurityLayer()
     .AddCommonLayer()
@@ -150,10 +147,6 @@ builder.Services.AddTransient<HeaderSecretMiddleware>();
 
 var app = builder.Build();
 
-//await app.LoadLocalesFromJson(localesPath); //NO locales for now. turn on in future.
-
-Pricing.Application.Configs.Mapster.Configure();
-
 app.UseMiddleware<HeaderSecretMiddleware>();
 
 app.UseMiddleware<ScopedLocalizationMiddleware>();
@@ -178,28 +171,6 @@ app.MapCarter();
 
 app.UseOpenTelemetryPrometheusScrapingEndpoint();
 
-await InitSettings(app.Services);
-await SetupCurrencies(app.Services);
-
 app.MapHealthChecks("/health");
 
 await app.RunAsync();
-
-
-return;
-
-async Task SetupCurrencies(IServiceProvider serviceProvider)
-{
-    var busControl = app.Services.GetRequiredService<IBusControl>();
-    await busControl.StartAsync();
-    using var scope = serviceProvider.CreateScope();
-    var currencyConverterSetup = scope.ServiceProvider.GetRequiredService<ICurrencyConverterSetup>();
-    await currencyConverterSetup.InitializeAsync();
-}
-
-async Task InitSettings(IServiceProvider serviceProvider)
-{
-    using var scope = serviceProvider.CreateScope();
-    var sr = scope.ServiceProvider.GetRequiredService<ISettingsService>();
-    await sr.LoadAsync(Settings.AllSettings);
-}
