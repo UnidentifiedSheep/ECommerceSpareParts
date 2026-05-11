@@ -6,6 +6,7 @@ using Pricing.Abstractions.Interfaces.Services;
 using Pricing.Abstractions.Interfaces.Services.Pricing;
 using Pricing.Application.Services.ArticlePricing;
 using Pricing.Application.Services.ArticlePricing.BasePriceStrategies;
+using Pricing.Application.Services.ProductPricing;
 
 namespace Pricing.Application;
 
@@ -14,9 +15,6 @@ public static class ServiceProvider
     public static IServiceCollection AddApplicationLayer(this IServiceCollection collection)
     {
         collection.AddApplicationBase(typeof(Global).Assembly);
-
-        collection.AddSingleton<IMarkupService, MarkupService>();
-        collection.AddScoped<IMarkupSetup, MarkupSetup>();
 
         collection.AddSingleton<ISettingsContainer, SettingsContainer>();
         collection.AddTransient<ISettingsService, SettingsService>();

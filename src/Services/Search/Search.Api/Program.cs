@@ -16,7 +16,6 @@ using RabbitMq.Extensions;
 using RabbitMq.Models;
 using Search.Api.EndPoints.Articles;
 using Search.Application;
-using Search.Application.Consumers;
 using Search.Persistence;
 using Security;
 
@@ -55,10 +54,6 @@ var brokerOptions = builder.Configuration
 
 builder.Services.AddMassTransit(x =>
 {
-    x.AddConsumer<ArticledCreatedConsumer>();
-    x.AddConsumer<ArticleUpdatedConsumer>();
-    x.AddConsumer<ArticleDeletedConsumer>();
-    x.AddConsumer<SuggestionRebuildNeededConsumer>();
 
     x.UsingRabbitMq((context, cfg) =>
     {
@@ -68,10 +63,6 @@ builder.Services.AddMassTransit(x =>
         {
             ep.Durable = true;
 
-            ep.ConfigureConsumer<ArticledCreatedConsumer>(context);
-            ep.ConfigureConsumer<ArticleUpdatedConsumer>(context);
-            ep.ConfigureConsumer<ArticleDeletedConsumer>(context);
-            ep.ConfigureConsumer<SuggestionRebuildNeededConsumer>(context);
         });
     });
 });

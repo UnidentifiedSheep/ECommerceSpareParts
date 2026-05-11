@@ -12,16 +12,16 @@ namespace Search.Persistence.Repositories;
 internal class ArticleWriteRepository(IIndexManager indexManager)
     : RepositoryBase<ArticleIndexContext>(indexManager, IndexName.Articles), IArticleWriteRepository
 {
-    public void Add(Article article)
+    public void Add(Product product)
     {
-        var document = article.ToDocument();
-        IndexContext.IndexWriter.UpdateDocument(new Term("IdString", article.Id.ToString()), document);
+        var document = product.ToDocument();
+        IndexContext.IndexWriter.UpdateDocument(new Term("IdString", product.Id.ToString()), document);
         IndexContext.IndexWriter.Commit();
 
         IndexContext.ReloadIndex();
     }
 
-    public void AddRange(IEnumerable<Article> articles)
+    public void AddRange(IEnumerable<Product> articles)
     {
         var documents = articles.Select(a => a.ToDocument());
         IndexContext.IndexWriter.UpdateDocuments(new Term("IdString"), documents);

@@ -35,7 +35,7 @@ builder.Host.AddLokiLogger(builder.Configuration, "analytics.api", env, lokiUrl)
 
 builder.Services
     .AddPersistenceLayer(Environment.GetEnvironmentVariable("DB_CONNECTION_STRING")!)
-    .AddCacheLayer(Environment.GetEnvironmentVariable("REDIS_CONNECTION_STRING")!)
+    .AddCacheLayer(Environment.GetEnvironmentVariable("REDIS_CONNECTION_STRING")!, "analytics")
     .AddApplicationLayer()
     .AddMinimalSecurityLayer();
 

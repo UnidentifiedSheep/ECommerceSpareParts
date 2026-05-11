@@ -6,5 +6,5 @@ namespace Pricing.Abstractions.Interfaces.Services;
 public interface IBasePricesService
 {
     BasePricingResult CalculatePrices(BasePricingContext context);
-    BasePricingItemResult CalculatePrice(BasePricingItem item, ArticlePricingType pricingType);
+    BasePricingItemResult CalculatePrice(BasePricingItem item, ProductPricingType pricingType);
 }

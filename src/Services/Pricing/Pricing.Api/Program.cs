@@ -16,9 +16,7 @@ using MassTransit;
 using Microsoft.AspNetCore.HttpOverrides;
 using OpenTelemetry.Metrics;
 using Persistence.Extensions;
-using Pricing.Api.EndPoints.Prices;
 using Pricing.Application;
-using Pricing.Application.Consumers;
 using Pricing.Persistence;
 using Pricing.Persistence.Contexts;
 using RabbitMq.Extensions;
@@ -82,12 +80,6 @@ builder.Services.AddMassTransit(x =>
 
             ep.ConfigureConsumeTopology = false;
 
-            ep.ConfigureConsumer<SettingChangedConsumer>(context);
-            ep.ConfigureConsumer<CurrencyRatesChangedConsumer>(context);
-            ep.ConfigureConsumer<MarkupGroupChangedConsumer>(context);
-            ep.ConfigureConsumer<MarkupGroupGeneratedConsumer>(context);
-            ep.ConfigureConsumer<MarkupRangesChangedConsumer>(context);
-
             ep.Bind<CurrencyRateChangedEvent>();
             ep.Bind<SettingChangedEvent>();
             ep.Bind<MarkupGroupChangedEvent>();
@@ -98,8 +90,6 @@ builder.Services.AddMassTransit(x =>
         cfg.ReceiveEndpoint("pricing-queue", ep =>
         {
             ep.Durable = true;
-            ep.ConfigureConsumer<ArticleBuyPricesChangedConsumer>(context);
-            ep.ConfigureConsumer<UserDiscountChangedConsumer>(context);
         });
     });
 });
@@ -109,7 +99,7 @@ Locale defaultLocale = "ru-RU";
 
 builder.Services
     .AddPersistenceLayer(Environment.GetEnvironmentVariable("DB_CONNECTION_STRING")!)
-    .AddCacheLayer(Environment.GetEnvironmentVariable("REDIS_CONNECTION_STRING")!)
+    .AddCacheLayer(Environment.GetEnvironmentVariable("REDIS_CONNECTION_STRING")!, "pricing")
     .AddJsonSigner(Environment.GetEnvironmentVariable("SIGN_SECRET")!, Global.JsonOptions)
     .AddMinimalSecurityLayer()
     .AddCommonLayer()
@@ -140,7 +130,7 @@ builder.Services.AddCors(options =>
     });
 });
 
-var endpointAssembly = typeof(GetPricesEndPoint).Assembly;
+var endpointAssembly = typeof(Program).Assembly;
 builder.Services.AddCarter(new DependencyContextAssemblyCatalog(endpointAssembly));
 
 builder.Services.AddTransient<HeaderSecretMiddleware>();

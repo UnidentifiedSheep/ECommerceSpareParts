@@ -2,4 +2,4 @@
 
 namespace Pricing.Abstractions.Models.Pricing;
 
-public record PriceCoefficient(string Name, int Order, decimal Value, CoefficientType Type, DateTime ValidTill);
+public record PriceCoefficient(string Name, decimal Value, CoefficientType Type, DateTime ValidTill);

@@ -2,8 +2,8 @@
 
 namespace Pricing.Abstractions.Models.Pricing;
 
-public class BasePricingContext(IEnumerable<BasePricingItem> items, ArticlePricingType pricingType)
+public class BasePricingContext(IEnumerable<BasePricingItem> items, ProductPricingType pricingType)
 {
     public IReadOnlyList<BasePricingItem> Items { get; } = items.ToList();
-    public ArticlePricingType PricingType => pricingType;
+    public ProductPricingType PricingType => pricingType;
 }

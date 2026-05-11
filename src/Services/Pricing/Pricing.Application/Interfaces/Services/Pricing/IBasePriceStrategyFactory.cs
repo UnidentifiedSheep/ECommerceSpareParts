@@ -4,6 +4,6 @@ namespace Pricing.Abstractions.Interfaces.Services.Pricing;
 
 public interface IBasePriceStrategyFactory
 {
-    IBasePriceStrategy GetStrategy(ArticlePricingType type);
-    bool TryGetStrategy(ArticlePricingType type, out IBasePriceStrategy? strategy);
+    IBasePriceStrategy GetStrategy(ProductPricingType type);
+    bool TryGetStrategy(ProductPricingType type, out IBasePriceStrategy? strategy);
 }

@@ -5,6 +5,6 @@ namespace Pricing.Abstractions.Interfaces.Services.Pricing;
 
 public interface IBasePriceStrategy
 {
-    ArticlePricingType Type { get; }
-    decimal GetPrice(IEnumerable<ArticlePrice> prices);
+    ProductPricingType Type { get; }
+    decimal GetPrice(IEnumerable<ProductPrice> prices);
 }

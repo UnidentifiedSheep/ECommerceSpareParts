@@ -28,7 +28,7 @@ builder.Services.AddLocalization(defaultLocale, locales);
 
 builder.Services
     .AddPersistenceLayer(Environment.GetEnvironmentVariable("DB_CONNECTION_STRING")!)
-    .AddCacheLayer(Environment.GetEnvironmentVariable("REDIS_CONNECTION_STRING")!)
+    .AddCacheLayer(Environment.GetEnvironmentVariable("REDIS_CONNECTION_STRING")!, "analytics")
     .AddApplicationLayer();
 
 AddMassTransit(builder);

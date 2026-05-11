@@ -6,12 +6,12 @@ namespace Search.Persistence.Services;
 
 internal class ArticleWriteService(IArticleWriteRepository writeRepository) : IArticleWriteService
 {
-    public void Add(Article article)
+    public void Add(Product product)
     {
-        writeRepository.Add(article);
+        writeRepository.Add(product);
     }
 
-    public void AddRange(IEnumerable<Article> articles)
+    public void AddRange(IEnumerable<Product> articles)
     {
         writeRepository.AddRange(articles);
     }

@@ -49,7 +49,7 @@ public class ServiceProviderBuilder : IServiceProviderBuilder<ServiceProviderArg
         };
 
         services.AddJsonSigner("some secret")
-            .AddCacheLayer(args.CacheConnectionString)
+            .AddCacheLayer(args.CacheConnectionString, "test")
             .AddFullSecurityLayer(passwordRules)
             .AddMailLayer()
             .AddCommonLayer();

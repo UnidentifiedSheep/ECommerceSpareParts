@@ -19,7 +19,7 @@ internal class ArticleReadRepository(IIndexManager indexManager)
 {
     private IndexSearcher Searcher => IndexContext.Searcher;
 
-    public Article? GetArticle(int articleId)
+    public Product? GetArticle(int articleId)
     {
         var query = new TermQuery(new Term("IdString", articleId.ToString()));
         var topDocs = Searcher.Search(query, 1);
@@ -30,7 +30,7 @@ internal class ArticleReadRepository(IIndexManager indexManager)
         return doc.ToArticle();
     }
 
-    public Article? GetNextArticle(int articleId = -1)
+    public Product? GetNextArticle(int articleId = -1)
     {
         var query = new MatchAllDocsQuery();
         var filter = GetIdFilter(articleId);
@@ -43,7 +43,7 @@ internal class ArticleReadRepository(IIndexManager indexManager)
         return doc.ToArticle();
     }
 
-    public IReadOnlyList<Article> GetArticles(IEnumerable<int> articleIds)
+    public IReadOnlyList<Product> GetArticles(IEnumerable<int> articleIds)
     {
         var ids = articleIds.Select(id => id.ToString()).ToHashSet();
         if (ids.Count == 0) return [];
@@ -54,7 +54,7 @@ internal class ArticleReadRepository(IIndexManager indexManager)
         return ToArticles(topDocs);
     }
 
-    public (IReadOnlyList<Article> result, SearchCursor? last) SearchByTitle(
+    public (IReadOnlyList<Product> result, SearchCursor? last) SearchByTitle(
         string title,
         SearchCursor? cursor = null,
         int limit = 20)
@@ -68,12 +68,12 @@ internal class ArticleReadRepository(IIndexManager indexManager)
     }
 
 
-    public (IReadOnlyList<Article> result, SearchCursor? last) SearchByArticleNumberPrefix(
+    public (IReadOnlyList<Product> result, SearchCursor? last) SearchByArticleNumberPrefix(
         string prefix,
         SearchCursor? cursor = null,
         int limit = 20)
     {
-        prefix = prefix.ToNormalizedArticleNumber();
+        //TODO: add prefix normalization
         var query = new PrefixQuery(new Term("NormalizedArticleNumber", prefix));
 
         var topDocs = Searcher.SearchAfter(cursor?.ToScoreDoc(), query, limit);
@@ -89,16 +89,16 @@ internal class ArticleReadRepository(IIndexManager indexManager)
     /// <summary>
     ///     Converts the given TopDocs object into a list of Article objects.
     /// </summary>
-    private List<Article> ToArticles(TopDocs topDocs)
+    private List<Product> ToArticles(TopDocs topDocs)
     {
-        var docs = new List<Article>(topDocs.ScoreDocs.Length);
+        var docs = new List<Product>(topDocs.ScoreDocs.Length);
         foreach (var sd in topDocs.ScoreDocs) docs.Add(Searcher.Doc(sd.Doc).ToArticle());
         return docs;
     }
 
-    private (List<Article>, SearchCursor? last) ToArticlesWithCursor(TopDocs topDocs)
+    private (List<Product>, SearchCursor? last) ToArticlesWithCursor(TopDocs topDocs)
     {
-        var result = new List<Article>(topDocs.ScoreDocs.Length);
+        var result = new List<Product>(topDocs.ScoreDocs.Length);
         ScoreDoc? last = null;
 
         foreach (var sd in topDocs.ScoreDocs)

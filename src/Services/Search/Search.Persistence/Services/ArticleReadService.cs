@@ -7,17 +7,17 @@ namespace Search.Persistence.Services;
 
 internal class ArticleReadService(IArticleReadRepository readRepository) : IArticleReadService
 {
-    public Article? GetArticle(int articleId)
+    public Product? GetArticle(int articleId)
     {
         return readRepository.GetArticle(articleId);
     }
 
-    public IReadOnlyList<Article> GetArticles(IEnumerable<int> articleIds)
+    public IReadOnlyList<Product> GetArticles(IEnumerable<int> articleIds)
     {
         return readRepository.GetArticles(articleIds);
     }
 
-    public (IReadOnlyList<Article> result, string? cursor) SearchByTitle(
+    public (IReadOnlyList<Product> result, string? cursor) SearchByTitle(
         string title,
         string? cursor = null,
         int limit = 20)
@@ -29,7 +29,7 @@ internal class ArticleReadService(IArticleReadRepository readRepository) : IArti
         return (result, newCursor?.EncodeCursor());
     }
 
-    public (IReadOnlyList<Article> result, string? cursor) SearchByArticleNumberPrefix(
+    public (IReadOnlyList<Product> result, string? cursor) SearchByArticleNumberPrefix(
         string prefix,
         string? cursor = null,
         int limit = 20)

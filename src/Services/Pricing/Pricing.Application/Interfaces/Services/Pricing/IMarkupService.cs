@@ -4,7 +4,7 @@ namespace Pricing.Abstractions.Interfaces.Services.Pricing;
 
 public interface IMarkupService
 {
-    void SetUp(MarkupGroup markupGroup);
+    Task SetUp(MarkupGroup markupGroup);
     decimal GetMarkup(decimal value, int currencyId);
     decimal WithMarkup(decimal value, decimal markupFraction);
 }

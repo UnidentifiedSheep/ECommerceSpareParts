@@ -18,7 +18,7 @@ public class SearchArticlesHandler(IArticleReadService readService)
 {
     public Task<SearchArticlesResult> Handle(SearchArticlesQuery query, CancellationToken cancellationToken)
     {
-        IReadOnlyList<Article> articles;
+        IReadOnlyList<Product> articles;
         string? newCursor;
         switch (query.SearchVariant)
         {
