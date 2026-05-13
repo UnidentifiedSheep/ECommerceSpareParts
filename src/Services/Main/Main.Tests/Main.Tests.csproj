@@ -40,6 +40,7 @@
         <ProjectReference Include="..\..\Api.Common\Api.Common.csproj"/>
         <ProjectReference Include="..\..\Test.Common\Test.Common.csproj"/>
         <ProjectReference Include="..\Main.Application\Main.Application.csproj"/>
+        <ProjectReference Include="..\Main.Cache\Main.Cache.csproj" />
         <ProjectReference Include="..\Main.Persistence\Main.Persistence.csproj"/>
     </ItemGroup>
 

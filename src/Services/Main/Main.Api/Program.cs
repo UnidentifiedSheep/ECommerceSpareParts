@@ -23,6 +23,7 @@ using Main.Application.BackgroundServices;
 using Main.Application.Configs;
 using Main.Application.Consumers;
 using Main.Application.HangFireTasks;
+using Main.Cache;
 using Main.Persistence;
 using Main.Persistence.Context;
 using MassTransit;
@@ -125,6 +126,7 @@ builder.Services.AddHttpContextAccessor();
 builder.Services
     .AddPersistenceLayer(Environment.GetEnvironmentVariable("DB_CONNECTION_STRING")!)
     .AddCacheLayer(Environment.GetEnvironmentVariable("REDIS_CONNECTION_STRING")!, "main")
+    .AddApplicationCache()
     .AddJsonSigner(Environment.GetEnvironmentVariable("SIGN_SECRET")!, Global.JsonOptions)
     .AddFullSecurityLayer()
     .AddEComAuth(builder.Configuration)

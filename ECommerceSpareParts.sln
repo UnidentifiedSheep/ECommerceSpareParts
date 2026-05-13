@@ -151,6 +151,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Internal.Integration.Auth",
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Internal.Integration.Di", "src\Infrastructure\Integrations\Internal\Internal.Integration.Di\Internal.Integration.Di.csproj", "{1BF2B26D-DE03-4E23-84E2-6495E0453CE1}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Main.Cache", "src\Services\Main\Main.Cache\Main.Cache.csproj", "{1C58345D-B783-4AE3-9E0E-08ED5947873E}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -393,6 +395,10 @@ Global
 		{1BF2B26D-DE03-4E23-84E2-6495E0453CE1}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{1BF2B26D-DE03-4E23-84E2-6495E0453CE1}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{1BF2B26D-DE03-4E23-84E2-6495E0453CE1}.Release|Any CPU.Build.0 = Release|Any CPU
+		{1C58345D-B783-4AE3-9E0E-08ED5947873E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{1C58345D-B783-4AE3-9E0E-08ED5947873E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{1C58345D-B783-4AE3-9E0E-08ED5947873E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{1C58345D-B783-4AE3-9E0E-08ED5947873E}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
 		{C5111875-1112-406F-B3D1-EC119DBB23F6} = {3FC16924-68A6-4CDA-9961-0B0F589E671E}
@@ -463,5 +469,6 @@ Global
 		{CE21FFE3-4301-4428-87AD-D8A2CD6A5CF7} = {7EE101ED-89A2-46FA-AE5A-A31E37AD9BEA}
 		{E5CE182F-FCAC-4473-9D58-8AA3F3E53D0C} = {7EE101ED-89A2-46FA-AE5A-A31E37AD9BEA}
 		{1BF2B26D-DE03-4E23-84E2-6495E0453CE1} = {7EE101ED-89A2-46FA-AE5A-A31E37AD9BEA}
+		{1C58345D-B783-4AE3-9E0E-08ED5947873E} = {C5111875-1112-406F-B3D1-EC119DBB23F6}
 	EndGlobalSection
 EndGlobal

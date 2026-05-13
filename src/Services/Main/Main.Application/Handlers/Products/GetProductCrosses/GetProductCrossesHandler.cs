@@ -3,11 +3,14 @@ using Application.Common.Extensions;
 using Application.Common.Interfaces;
 using Application.Common.Interfaces.Cqrs;
 using Application.Common.Interfaces.Repositories;
+using LinqKit;
 using Main.Application.Dtos.Product;
-using Main.Application.Interfaces.Persistence;
+using Main.Application.Extensions.QueryExtensions;
+using Main.Application.Handlers.Projections;
+using Main.Application.Interfaces.Cache;
 using Main.Entities.Exceptions.Products;
 using Main.Entities.Product;
-using Mapster;
+using Microsoft.EntityFrameworkCore;
 
 namespace Main.Application.Handlers.Products.GetProductCrosses;
 
@@ -17,7 +20,9 @@ public record GetProductCrossesQuery(int ProductId, Pagination Pagination, strin
 public record GetProductCrossesResult(IReadOnlyList<ProductDto> Crosses, ProductDto RequestedProduct);
 
 public class GetProductCrossesHandler(
-    IProductRepository repository,
+    IProductCacheRepository productCache,
+    IReadRepository<Product, int> productRepository,
+    IReadRepository<ProductCross, (int, int)> crossesRepository,
     IIdsCollector idsCollector)
     : IQueryHandler<GetProductCrossesQuery, GetProductCrossesResult>
 {
@@ -26,47 +31,37 @@ public class GetProductCrossesHandler(
         CancellationToken cancellationToken)
     {
         var pagination = request.Pagination;
-        var requestedArticle = await GetRequestedArticle(request.ProductId, cancellationToken);
+        var requestedArticle = await productCache.GetProductOrSetAsync(request.ProductId, cancellationToken);
 
         var crosses = await GetCrosses(request.ProductId, pagination, request.SortBy, cancellationToken);
-
-        var requestedAdapted = requestedArticle.Adapt<ProductDto>();
-        var crossArticlesAdapted = crosses.Adapt<List<ProductDto>>();
 
         idsCollector.AddRange(crosses.Select(x => x.Id.ToString()));
         idsCollector.Add(requestedArticle.Id.ToString());
 
-        return new GetProductCrossesResult(crossArticlesAdapted, requestedAdapted);
+        return new GetProductCrossesResult(crosses, requestedArticle);
     }
 
-    private async Task<Product> GetRequestedArticle(int id, CancellationToken token)
+    private async Task<ProductDto> GetRequestedArticle(int id, CancellationToken token)
     {
-        var criteria = Criteria<Product>.New()
-            .Track(false)
-            .Include(x => x.Producer)
+        return await productRepository.Query
             .Where(x => x.Id == id)
-            .Build();
-
-        var requestedArticle = await repository.FirstOrDefaultAsync(criteria, token)
-                               ?? throw new ProductNotFoundException(id);
-
-        return requestedArticle;
+            .AsExpandable()
+            .Select(ProductProjections.ToDto)
+            .FirstOrDefaultAsync(token) ?? throw new ProductNotFoundException(id);
     }
 
-    private async Task<IReadOnlyList<Product>> GetCrosses(
-        int articleId,
+    private async Task<IReadOnlyList<ProductDto>> GetCrosses(
+        int productId,
         Pagination pagination,
         string? sortBy,
         CancellationToken token)
     {
-        var criteria = Criteria<Product>.New()
-            .Track(false)
-            .Include(x => x.Producer)
-            .Page(pagination.Page)
-            .Size(pagination.Size)
-            .WithSorting(sortBy)
-            .Build();
-
-        return await repository.GetProductCrosses(articleId, criteria, token);
+        return await crossesRepository.Query
+            .GetCrosses(productId)
+            .SortBy(sortBy)
+            .ApplyPagination(pagination)
+            .AsExpandable()
+            .Select(ProductProjections.ToDto)
+            .ToListAsync(token);
     }
 }
