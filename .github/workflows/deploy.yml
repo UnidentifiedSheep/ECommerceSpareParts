@@ -1,0 +1,95 @@
+name: Deploy
+
+on:
+  workflow_call:
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Build Migrator images
+        run: docker compose -f migrator-compose.yaml build
+
+      - name: Save Migrator images
+        run: |
+          echo "=== Migrator images ==="
+
+          MIGRATOR_IMAGES=$(docker compose -f migrator-compose.yaml config --images | awk -F: 'NF==1 {print $0}')
+
+          echo "$MIGRATOR_IMAGES"
+
+          if [ -z "$MIGRATOR_IMAGES" ]; then
+            echo "No migrator images found!"
+            exit 1
+          fi
+
+          docker save $MIGRATOR_IMAGES | gzip > migrator-images.tar.gz
+          ls -lh migrator-images.tar.gz
+
+      - name: Build App images
+        run: docker compose -f compose.yaml --env-file .env.example build
+
+      - name: Save App images
+        run: |
+          echo "=== App images ==="
+
+          APP_IMAGES=$(docker compose -f compose.yaml --env-file .env.example config --images | awk -F: 'NF==1 {print $0}')
+
+          echo "$APP_IMAGES"
+
+          if [ -z "$APP_IMAGES" ]; then
+            echo "No app images found!"
+            exit 1
+          fi
+
+          docker save $APP_IMAGES | gzip > app-images.tar.gz
+          ls -lh app-images.tar.gz
+
+      - name: Install rsync
+        run: sudo apt-get update && sudo apt-get install -y rsync
+
+      - name: Copy all files except /src
+        run: |
+          echo "${{ secrets.VPS_SSH_KEY }}" > key.pem
+          chmod 600 key.pem
+
+          rsync -avz \
+            --exclude 'src/' \
+            --exclude '.git/' \
+            -e "ssh -i key.pem -o StrictHostKeyChecking=no" \
+            ./ ${{ secrets.VPS_USER }}@${{ secrets.VPS_HOST }}:${{ secrets.VPS_PATH }}
+
+      - name: Deploy on server
+        uses: appleboy/ssh-action@v1.2.5
+        with:
+          host: ${{ secrets.VPS_HOST }}
+          username: ${{ secrets.VPS_USER }}
+          key: ${{ secrets.VPS_SSH_KEY }}
+          script: |
+            set -e
+
+            cd ${{ secrets.VPS_PATH }}
+
+            docker compose -f compose.yaml down
+            docker compose -f compose.yaml up pgql -d
+
+            echo "=== Load migrator images ==="
+            gunzip -c migrator-images.tar.gz | docker load
+
+            echo "=== Start pgql container ==="
+            docker compose up -d --no-build
+
+            echo "=== Run migrators ==="
+            docker compose -f migrator-compose.yaml up --no-build
+
+            echo "=== Load app images ==="
+            gunzip -c app-images.tar.gz | docker load
+
+            echo "=== Restart app ==="
+            docker compose -f compose.yaml up -d --no-build
+
+            echo "=== Done ==="
