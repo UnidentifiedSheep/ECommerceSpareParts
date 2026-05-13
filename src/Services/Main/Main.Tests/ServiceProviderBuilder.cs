@@ -4,6 +4,7 @@ using Api.Common;
 using Cache;
 using Mail;
 using Main.Application.Configs;
+using Main.Cache;
 using Main.Persistence;
 using MassTransit;
 using Microsoft.Extensions.DependencyInjection;
@@ -50,6 +51,7 @@ public class ServiceProviderBuilder : IServiceProviderBuilder<ServiceProviderArg
 
         services.AddJsonSigner("some secret")
             .AddCacheLayer(args.CacheConnectionString, "test")
+            .AddApplicationCache()
             .AddFullSecurityLayer(passwordRules)
             .AddMailLayer()
             .AddCommonLayer();
