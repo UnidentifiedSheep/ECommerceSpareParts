@@ -1,5 +1,4 @@
 using Abstractions.Interfaces.Services;
-using Application.Common.Interfaces;
 using Application.Common.Interfaces.Cqrs;
 using Attributes;
 using Main.Application.Dtos.Amw.Purchase;
@@ -7,10 +6,9 @@ using Main.Entities.Purchase;
 
 namespace Main.Application.Handlers.Purchases.CreatePurchase;
 
-[Transactional]
-[AutoSave]
+[Transactional, AutoSave]
 public record CreatePurchaseCommand(
-    IEnumerable<(NewPurchaseContentDto content, int? storageContentId)> Content,
+    IEnumerable<(NewPurchaseContentDto content, int storageContentId)> Content,
     int CurrencyId,
     Guid SupplierId,
     Guid TransactionId,

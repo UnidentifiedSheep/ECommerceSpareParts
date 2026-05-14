@@ -1,4 +1,5 @@
-﻿using Domain;
+﻿using System.Linq.Expressions;
+using Domain;
 
 namespace Main.Entities.User;
 
@@ -28,4 +29,7 @@ public class UserVehicle : AuditableEntity<UserVehicle, Guid>
     {
         return Id;
     }
+
+    public override Expression<Func<UserVehicle, bool>> GetEqualityExpression(Guid key)
+        => x => x.Id == key;
 }

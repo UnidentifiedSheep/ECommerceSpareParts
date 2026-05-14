@@ -1,4 +1,5 @@
-﻿using BulkValidation.Core.Attributes;
+﻿using System.Linq.Expressions;
+using BulkValidation.Core.Attributes;
 using Domain;
 using Domain.Extensions;
 using Domain.Interfaces;
@@ -129,4 +130,7 @@ public class StorageContent : AuditableEntity<StorageContent, int>, IVersionable
     {
         return Id;
     }
+
+    public override Expression<Func<StorageContent, bool>> GetEqualityExpression(int key)
+        => x => x.Id == key;
 }

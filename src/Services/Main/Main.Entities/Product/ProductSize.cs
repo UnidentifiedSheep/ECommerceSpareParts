@@ -1,4 +1,5 @@
-﻿using BulkValidation.Core.Attributes;
+﻿using System.Linq.Expressions;
+using BulkValidation.Core.Attributes;
 using Domain;
 using Domain.Extensions;
 using Enums;
@@ -81,4 +82,7 @@ public class ProductSize : Entity<ProductSize, int>
     {
         return ProductId;
     }
+
+    public override Expression<Func<ProductSize, bool>> GetEqualityExpression(int key)
+        => x => x.ProductId == key;
 }

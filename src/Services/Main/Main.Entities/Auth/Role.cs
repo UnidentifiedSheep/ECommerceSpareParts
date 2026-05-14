@@ -1,4 +1,5 @@
-﻿using Domain;
+﻿using System.Linq.Expressions;
+using Domain;
 using Domain.Extensions;
 using Main.Entities.Auth.ValueObjects;
 
@@ -52,4 +53,7 @@ public class Role : AuditableEntity<Role, RoleName>
     {
         return Name;
     }
+
+    public override Expression<Func<Role, bool>> GetEqualityExpression(RoleName key)
+        => x => x.Name == key;
 }

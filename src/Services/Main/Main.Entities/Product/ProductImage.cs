@@ -1,4 +1,5 @@
-﻿using Domain;
+﻿using System.Linq.Expressions;
+using Domain;
 using Exceptions;
 
 namespace Main.Entities.Product;
@@ -62,6 +63,9 @@ public class ProductImage : Entity<ProductImage, (int, string)>
     {
         return (ProductId, Path);
     }
+
+    public override Expression<Func<ProductImage, bool>> GetEqualityExpression((int, string) key)
+        => x => x.ProductId == key.Item1 && x.Path == key.Item2;
 
     private static bool IsSupportedExtension(string path)
     {

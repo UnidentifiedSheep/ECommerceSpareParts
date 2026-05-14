@@ -1,4 +1,5 @@
-﻿using BulkValidation.Core.Attributes;
+﻿using System.Linq.Expressions;
+using BulkValidation.Core.Attributes;
 using Domain;
 
 namespace Main.Entities.Storage;
@@ -35,4 +36,7 @@ public class StorageOwner : AuditableEntity<StorageOwner, (string, Guid)>
     {
         return (StorageName, UserId);
     }
+
+    public override Expression<Func<StorageOwner, bool>> GetEqualityExpression((string, Guid) key)
+        => x => x.StorageName == key.Item1 && x.UserId == key.Item2;
 }

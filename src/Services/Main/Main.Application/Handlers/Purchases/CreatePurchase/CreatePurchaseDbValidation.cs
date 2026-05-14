@@ -12,13 +12,12 @@ public class CreatePurchaseDbValidation : AbstractDbValidation<CreatePurchaseCom
             .ValidateCurrencyExistsId(request.CurrencyId)
             .ValidateTransactionExistsId(request.TransactionId)
             .ValidateStorageExistsName(request.StorageName)
-            .ValidateProductExistsId(request.Content.Select(x => x.content.ProductId).ToHashSet());
+            .ValidateProductExistsId(request.Content.Select(x => x.content.ProductId).Distinct());
 
         var storageContentIds = request.Content
-            .Where(x => x.storageContentId != null)
-            .Select(x => x.storageContentId!.Value).ToHashSet();
+            .Select(x => x.storageContentId)
+            .Distinct();
 
-        if (storageContentIds.Count > 0)
-            plan.ValidateStorageContentExistsId(storageContentIds);
+        plan.ValidateStorageContentExistsId(storageContentIds);
     }
 }

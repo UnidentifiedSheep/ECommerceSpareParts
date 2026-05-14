@@ -1,4 +1,5 @@
-﻿using Domain;
+﻿using System.Linq.Expressions;
+using Domain;
 
 namespace Main.Entities.Currency;
 
@@ -43,4 +44,7 @@ public class CurrencyRateHistory : AuditableEntity<CurrencyRateHistory, int>
     {
         return Id;
     }
+
+    public override Expression<Func<CurrencyRateHistory, bool>> GetEqualityExpression(int key)
+        => x => x.Id == key;
 }

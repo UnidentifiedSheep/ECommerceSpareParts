@@ -1,4 +1,5 @@
-﻿using BulkValidation.Core.Attributes;
+﻿using System.Linq.Expressions;
+using BulkValidation.Core.Attributes;
 using Domain;
 using Domain.Extensions;
 using Exceptions;
@@ -85,4 +86,7 @@ public class Storage : AuditableEntity<Storage, string>
     {
         return Name;
     }
+
+    public override Expression<Func<Storage, bool>> GetEqualityExpression(string key)
+        => x => x.Name == key;
 }

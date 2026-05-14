@@ -1,4 +1,5 @@
-﻿using BulkValidation.Core.Attributes;
+﻿using System.Linq.Expressions;
+using BulkValidation.Core.Attributes;
 using Domain;
 using Main.Entities.Product.ValueObjects;
 
@@ -130,4 +131,7 @@ public class Product : AuditableEntity<Product, int>
     {
         return Id;
     }
+
+    public override Expression<Func<Product, bool>> GetEqualityExpression(int key)
+        => x => x.Id == key;
 }

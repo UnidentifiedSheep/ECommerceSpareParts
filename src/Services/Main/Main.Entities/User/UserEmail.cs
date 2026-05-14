@@ -1,4 +1,5 @@
-﻿using Domain;
+﻿using System.Linq.Expressions;
+using Domain;
 using Main.Entities.User.ValueObjects;
 using Main.Enums;
 
@@ -55,4 +56,7 @@ public class UserEmail : AuditableEntity<UserEmail, string>
     {
         return Email.Value;
     }
+
+    public override Expression<Func<UserEmail, bool>> GetEqualityExpression(string key)
+        => x => x.Email == key;
 }

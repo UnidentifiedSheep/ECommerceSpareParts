@@ -1,4 +1,5 @@
-﻿using Domain;
+﻿using System.Linq.Expressions;
+using Domain;
 
 namespace Main.Entities.User;
 
@@ -22,4 +23,7 @@ public class UserPhone : AuditableEntity<UserPhone, string>
     {
         return NormalizedPhone;
     }
+
+    public override Expression<Func<UserPhone, bool>> GetEqualityExpression(string key)
+        => x => x.NormalizedPhone == NormalizedPhone;
 }

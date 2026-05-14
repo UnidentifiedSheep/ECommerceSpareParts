@@ -1,4 +1,5 @@
-﻿using Domain;
+﻿using System.Linq.Expressions;
+using Domain;
 using Domain.Extensions;
 using Exceptions;
 
@@ -139,4 +140,7 @@ public class StorageContentReservation : AuditableEntity<StorageContentReservati
     {
         return Id;
     }
+
+    public override Expression<Func<StorageContentReservation, bool>> GetEqualityExpression(int key)
+        => x => x.Id == key;
 }

@@ -1,4 +1,5 @@
-﻿using Domain;
+﻿using System.Linq.Expressions;
+using Domain;
 using Domain.Extensions;
 using Domain.Interfaces;
 
@@ -40,6 +41,9 @@ public class UserBalance : AuditableEntity<UserBalance, UserBalanceKey>
     {
         return new UserBalanceKey(UserId, CurrencyId);
     }
+
+    public override Expression<Func<UserBalance, bool>> GetEqualityExpression(UserBalanceKey key)
+        => x => x.UserId == key.UserId && x.CurrencyId == key.CurrencyId;
 }
 
 public readonly struct UserBalanceKey(Guid userId, int currencyId) : ICompositeKey

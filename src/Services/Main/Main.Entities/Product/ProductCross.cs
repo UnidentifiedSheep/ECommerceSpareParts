@@ -1,4 +1,5 @@
-﻿using Domain;
+﻿using System.Linq.Expressions;
+using Domain;
 using Exceptions;
 
 namespace Main.Entities.Product;
@@ -35,4 +36,7 @@ public class ProductCross : Entity<ProductCross, (int, int)>
     {
         return (LeftProductId, RightProductId);
     }
+
+    public override Expression<Func<ProductCross, bool>> GetEqualityExpression((int, int) key)
+        => x => x.LeftProductId == key.Item1 && x.RightProductId == key.Item2;
 }

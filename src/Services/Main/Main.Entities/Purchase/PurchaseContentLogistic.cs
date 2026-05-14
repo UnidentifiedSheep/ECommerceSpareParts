@@ -1,4 +1,5 @@
-﻿using Domain;
+﻿using System.Linq.Expressions;
+using Domain;
 using Domain.Extensions;
 
 namespace Main.Entities.Purchase;
@@ -55,4 +56,7 @@ public class PurchaseContentLogistic : Entity<PurchaseContentLogistic, int>
     {
         return PurchaseContentId;
     }
+
+    public override Expression<Func<PurchaseContentLogistic, bool>> GetEqualityExpression(int key)
+        => x => x.PurchaseContentId == key;
 }

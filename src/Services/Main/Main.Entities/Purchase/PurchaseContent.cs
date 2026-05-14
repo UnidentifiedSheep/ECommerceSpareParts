@@ -1,4 +1,5 @@
-﻿using BulkValidation.Core.Attributes;
+﻿using System.Linq.Expressions;
+using BulkValidation.Core.Attributes;
 using Domain;
 using Domain.Extensions;
 
@@ -91,4 +92,7 @@ public class PurchaseContent : Entity<PurchaseContent, int>
     {
         return Id;
     }
+
+    public override Expression<Func<PurchaseContent, bool>> GetEqualityExpression(int key)
+        => x => x.Id == key;
 }

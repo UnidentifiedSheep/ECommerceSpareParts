@@ -1,4 +1,5 @@
-﻿using BulkValidation.Core.Attributes;
+﻿using System.Linq.Expressions;
+using BulkValidation.Core.Attributes;
 using Domain;
 using Domain.Extensions;
 using Main.Enums;
@@ -182,4 +183,7 @@ public class StorageRoute : AuditableEntity<StorageRoute, Guid>
     {
         return Id;
     }
+
+    public override Expression<Func<StorageRoute, bool>> GetEqualityExpression(Guid key)
+        => x => x.Id == key;
 }

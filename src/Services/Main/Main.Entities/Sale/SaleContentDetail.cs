@@ -1,4 +1,5 @@
-﻿using Domain;
+﻿using System.Linq.Expressions;
+using Domain;
 using Domain.Extensions;
 
 namespace Main.Entities.Sale;
@@ -60,4 +61,7 @@ public class SaleContentDetail : Entity<SaleContentDetail, int>
     {
         return Id;
     }
+
+    public override Expression<Func<SaleContentDetail, bool>> GetEqualityExpression(int key)
+        => x => x.Id == key;
 }

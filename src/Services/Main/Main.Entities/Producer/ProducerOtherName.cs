@@ -1,4 +1,5 @@
-﻿using BulkValidation.Core.Attributes;
+﻿using System.Linq.Expressions;
+using BulkValidation.Core.Attributes;
 using Domain;
 using Domain.Extensions;
 using Domain.Interfaces;
@@ -50,6 +51,9 @@ public class ProducerOtherName : Entity<ProducerOtherName, ProducerOtherNameKey>
     {
         return new ProducerOtherNameKey(ProducerId, OtherName, WhereUsed);
     }
+
+    public override Expression<Func<ProducerOtherName, bool>> GetEqualityExpression(ProducerOtherNameKey key)
+        => x => x.ProducerId == key.ProducerId && x.OtherName == key.OtherName && x.WhereUsed == key.WhereUsed;
 }
 
 public readonly struct ProducerOtherNameKey(int producerId, string otherName, string whereUsed) : ICompositeKey

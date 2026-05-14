@@ -1,4 +1,5 @@
-﻿using Domain;
+﻿using System.Linq.Expressions;
+using Domain;
 
 namespace Main.Entities.Auth;
 
@@ -27,4 +28,7 @@ public class UserPermission : AuditableEntity<UserPermission, (Guid, string)>
     {
         return (UserId, Permission);
     }
+
+    public override Expression<Func<UserPermission, bool>> GetEqualityExpression((Guid, string) key)
+        => x => x.UserId == key.Item1 && x.Permission == key.Item2;
 }

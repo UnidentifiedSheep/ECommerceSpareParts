@@ -1,4 +1,5 @@
 ﻿using System.ComponentModel.DataAnnotations.Schema;
+using System.Linq.Expressions;
 using System.Text.Json;
 using Domain;
 
@@ -25,6 +26,9 @@ public abstract class Event : AuditableEntity<Event, int>
     {
         return Id;
     }
+
+    public override Expression<Func<Event, bool>> GetEqualityExpression(int key)
+        => x => x.Id == key;
 }
 
 public abstract class Event<T> : Event

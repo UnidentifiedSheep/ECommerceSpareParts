@@ -1,4 +1,5 @@
-﻿using Domain;
+﻿using System.Linq.Expressions;
+using Domain;
 using Main.Entities.Balance;
 using Main.Enums;
 
@@ -36,4 +37,7 @@ public class PurchaseLogistic : Entity<PurchaseLogistic, Guid>
     {
         return PurchaseId;
     }
+
+    public override Expression<Func<PurchaseLogistic, bool>> GetEqualityExpression(Guid key)
+        => x => x.PurchaseId == key;
 }

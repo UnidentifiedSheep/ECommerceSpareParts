@@ -1,4 +1,5 @@
-﻿using BulkValidation.Core.Attributes;
+﻿using System.Linq.Expressions;
+using BulkValidation.Core.Attributes;
 using Domain;
 using Domain.Extensions;
 
@@ -42,4 +43,7 @@ public class Cart : AuditableEntity<Cart, (Guid, int)>
     {
         return (UserId, ProductId);
     }
+
+    public override Expression<Func<Cart, bool>> GetEqualityExpression((Guid, int) key)
+        => x => x.UserId == key.Item1 && x.ProductId == key.Item2;
 }

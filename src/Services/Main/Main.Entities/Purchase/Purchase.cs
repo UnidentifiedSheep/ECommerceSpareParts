@@ -1,4 +1,5 @@
-﻿using BulkValidation.Core.Attributes;
+﻿using System.Linq.Expressions;
+using BulkValidation.Core.Attributes;
 using Domain;
 using Domain.Extensions;
 using Enums;
@@ -92,4 +93,7 @@ public class Purchase : AuditableEntity<Purchase, Guid>
     {
         return Id;
     }
+
+    public override Expression<Func<Purchase, bool>> GetEqualityExpression(Guid key)
+        => x => x.Id == key;
 }

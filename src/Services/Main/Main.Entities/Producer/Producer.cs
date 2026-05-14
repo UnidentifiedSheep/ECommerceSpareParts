@@ -1,4 +1,5 @@
-﻿using BulkValidation.Core.Attributes;
+﻿using System.Linq.Expressions;
+using BulkValidation.Core.Attributes;
 using Domain;
 using Domain.Extensions;
 
@@ -69,4 +70,7 @@ public class Producer : AuditableEntity<Producer, int>
     {
         return Id;
     }
+
+    public override Expression<Func<Producer, bool>> GetEqualityExpression(int key)
+        => x => x.Id == key;
 }

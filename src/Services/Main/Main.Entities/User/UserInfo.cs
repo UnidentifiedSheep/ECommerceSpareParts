@@ -1,4 +1,5 @@
-﻿using Domain;
+﻿using System.Linq.Expressions;
+using Domain;
 using Domain.Extensions;
 
 namespace Main.Entities.User;
@@ -72,4 +73,7 @@ public class UserInfo : Entity<UserInfo, Guid>
     {
         return UserId;
     }
+
+    public override Expression<Func<UserInfo, bool>> GetEqualityExpression(Guid key)
+        => x => x.UserId == key;
 }

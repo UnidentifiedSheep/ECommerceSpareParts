@@ -1,4 +1,5 @@
-﻿using System.Net;
+﻿using System.Linq.Expressions;
+using System.Net;
 using Domain;
 using Main.Enums;
 
@@ -34,4 +35,7 @@ public class UserToken : AuditableEntity<UserToken, Guid>
     {
         return Id;
     }
+
+    public override Expression<Func<UserToken, bool>> GetEqualityExpression(Guid key)
+        => x => x.Id == key;
 }

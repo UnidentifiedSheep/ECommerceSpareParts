@@ -1,4 +1,5 @@
-﻿using BulkValidation.Core.Attributes;
+﻿using System.Linq.Expressions;
+using BulkValidation.Core.Attributes;
 using Domain;
 using Enums;
 using Extensions;
@@ -26,6 +27,9 @@ public class Permission : AuditableEntity<Permission, string>
     {
         return Name;
     }
+
+    public override Expression<Func<Permission, bool>> GetEqualityExpression(string key)
+        => x => x.Name == key;
 
     public static string ToNormalizedPermission(PermissionCodes permission)
     {

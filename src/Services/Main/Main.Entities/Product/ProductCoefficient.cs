@@ -1,4 +1,5 @@
-﻿using Domain;
+﻿using System.Linq.Expressions;
+using Domain;
 
 namespace Main.Entities.Product;
 
@@ -16,4 +17,7 @@ public class ProductCoefficient : AuditableEntity<ProductCoefficient, (int, stri
     {
         return (ProductId, CoefficientName);
     }
+
+    public override Expression<Func<ProductCoefficient, bool>> GetEqualityExpression((int, string) key)
+        => x => x.ProductId == key.Item1 && x.CoefficientName == key.Item2;
 }

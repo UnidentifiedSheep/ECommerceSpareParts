@@ -1,4 +1,5 @@
-﻿using BulkValidation.Core.Attributes;
+﻿using System.Linq.Expressions;
+using BulkValidation.Core.Attributes;
 using Domain;
 using Domain.Extensions;
 using Enums;
@@ -43,6 +44,9 @@ public class ProductWeight : Entity<ProductWeight, int>
     {
         return ProductId;
     }
+
+    public override Expression<Func<ProductWeight, bool>> GetEqualityExpression(int key)
+        => x => x.ProductId == key;
 
     private static void ValidateWeight(decimal weight)
     {

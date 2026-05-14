@@ -1,4 +1,5 @@
-﻿using Domain;
+﻿using System.Linq.Expressions;
+using Domain;
 
 namespace Main.Entities.Order;
 
@@ -23,4 +24,7 @@ public class Order : AuditableEntity<Order, Guid>
     {
         return Id;
     }
+
+    public override Expression<Func<Order, bool>> GetEqualityExpression(Guid key)
+        =>  x => x.Id == key;
 }
