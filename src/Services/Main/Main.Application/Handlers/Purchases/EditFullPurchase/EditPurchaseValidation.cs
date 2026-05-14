@@ -4,9 +4,9 @@ using Main.Application.Handlers.Purchases.BaseValidators;
 
 namespace Main.Application.Handlers.Purchases.EditFullPurchase;
 
-public class EditFullPurchaseValidation : AbstractValidator<EditFullPurchaseCommand>
+public class EditPurchaseValidation : AbstractValidator<EditPurchaseCommand>
 {
-    public EditFullPurchaseValidation()
+    public EditPurchaseValidation()
     {
         RuleFor(x => x.PurchaseId)
             .NotEmpty()

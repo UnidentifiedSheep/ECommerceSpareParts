@@ -66,6 +66,15 @@ public class PurchaseContent : Entity<PurchaseContent, int>, ILinqEntity<Purchas
         CalculateTotalSum();
     }
 
+    public void SetPurchaseId(Guid purchaseId)
+    {
+        PurchaseId = purchaseId;
+    }
+
+    public void SetStorageContentId(int? storageContentId)
+    {
+        StorageContentId = storageContentId;
+    }
 
     public void SetComment(string? comment)
     {
@@ -82,6 +91,13 @@ public class PurchaseContent : Entity<PurchaseContent, int>, ILinqEntity<Purchas
             PurchaseContentLogistic = PurchaseContentLogistic.Create(weightKg, areaM3, price);
         else
             PurchaseContentLogistic.Update(weightKg, areaM3, price);
+    }
+
+    public PurchaseContentLogistic? ClearLogistic()
+    {
+        var logistic = PurchaseContentLogistic;
+        PurchaseContentLogistic = null;
+        return logistic;
     }
 
     private void CalculateTotalSum()

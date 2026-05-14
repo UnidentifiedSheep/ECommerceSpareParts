@@ -73,6 +73,11 @@ public class Purchase : AuditableEntity<Purchase, Guid>, ILinqEntity<Purchase, G
         CurrencyId = currencyId;
     }
 
+    public void SetTransactionId(Guid transactionId)
+    {
+        TransactionId = transactionId;
+    }
+
     public void SetPurchaseDate(DateTime purchaseDatetime)
     {
         PurchaseDatetime = purchaseDatetime;
@@ -80,10 +85,21 @@ public class Purchase : AuditableEntity<Purchase, Guid>, ILinqEntity<Purchase, G
 
     public void AddContent(PurchaseContent content)
     {
+        if (content.PurchaseId == Guid.Empty)
+            content.SetPurchaseId(GetId());
+
         if (content.PurchaseId != GetId())
             throw new InvalidOperationException("Invalid purchase id in purchase content");
         if (_contents.Contains(content)) return;
         _contents.Add(content);
+    }
+
+    public void RemoveContent(PurchaseContent content)
+    {
+        if (content.PurchaseId != GetId())
+            throw new InvalidOperationException("Invalid purchase id in purchase content");
+
+        _contents.Remove(content);
     }
 
     public void SetPurchaseLogistic(
@@ -123,6 +139,13 @@ public class Purchase : AuditableEntity<Purchase, Guid>, ILinqEntity<Purchase, G
                 pricePerOrder,
                 minimumPrice,
                 minimumPriceApplied);
+    }
+
+    public PurchaseLogistic? ClearPurchaseLogistic()
+    {
+        var logistic = PurchaseLogistic;
+        PurchaseLogistic = null;
+        return logistic;
     }
 
     public void Complete()
