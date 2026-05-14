@@ -32,7 +32,7 @@ public class MakeLinkageBetweenProductsHandler(
         }
 
         foreach (var id in updatedIds)
-            integrationEventScope.Add(new ProductUpdatedEvent { Id = id });
+            integrationEventScope.Add(new ProductLinkageUpdatedEvent { Id = id });
         return Unit.Value;
     }
 

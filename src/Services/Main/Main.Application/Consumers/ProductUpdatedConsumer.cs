@@ -10,6 +10,5 @@ public class ProductUpdatedConsumer(
     public async Task Consume(ConsumeContext<ProductUpdatedEvent> context)
     {
         await productCache.InvalidateProductAsync(context.Message.Id);
-        await productCache.InvalidateCrossesAsync(context.Message.Id);
     }
 }
