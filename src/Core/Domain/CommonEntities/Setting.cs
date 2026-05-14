@@ -1,10 +1,11 @@
 ﻿using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq.Expressions;
 using System.Text.Json;
+using Domain.Interfaces;
 
 namespace Domain.CommonEntities;
 
-public class Setting : AuditableEntity<Setting, string>
+public class Setting : AuditableEntity<Setting, string>, ILinqEntity<Setting, string>
 {
     private Setting()
     {
@@ -24,7 +25,7 @@ public class Setting : AuditableEntity<Setting, string>
         return Key;
     }
 
-    public override Expression<Func<Setting, bool>> GetEqualityExpression(string key)
+    public static Expression<Func<Setting, bool>> GetEqualityExpression(string key)
         => x => x.Key == key;
 }
 

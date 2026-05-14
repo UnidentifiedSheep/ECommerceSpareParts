@@ -1,11 +1,12 @@
-﻿using System.Linq.Expressions;
+using System.Linq.Expressions;
 using Domain;
+using Domain.Interfaces;
 using Domain.Extensions;
 using Main.Entities.Auth.ValueObjects;
 
 namespace Main.Entities.Auth;
 
-public class Role : AuditableEntity<Role, RoleName>
+public class Role : AuditableEntity<Role, RoleName>, ILinqEntity<Role, RoleName>
 {
     private readonly List<RolePermission> _rolePermissions = [];
 
@@ -54,6 +55,6 @@ public class Role : AuditableEntity<Role, RoleName>
         return Name;
     }
 
-    public override Expression<Func<Role, bool>> GetEqualityExpression(RoleName key)
+    public static Expression<Func<Role, bool>> GetEqualityExpression(RoleName key)
         => x => x.Name == key;
 }

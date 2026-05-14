@@ -1,11 +1,12 @@
-﻿using System.Linq.Expressions;
+using System.Linq.Expressions;
 using Domain;
+using Domain.Interfaces;
 using Domain.Extensions;
 using Exceptions;
 
 namespace Main.Entities.Storage;
 
-public class StorageContentReservation : AuditableEntity<StorageContentReservation, int>
+public class StorageContentReservation : AuditableEntity<StorageContentReservation, int>, ILinqEntity<StorageContentReservation, int>
 {
     private StorageContentReservation()
     {
@@ -141,6 +142,6 @@ public class StorageContentReservation : AuditableEntity<StorageContentReservati
         return Id;
     }
 
-    public override Expression<Func<StorageContentReservation, bool>> GetEqualityExpression(int key)
+    public static Expression<Func<StorageContentReservation, bool>> GetEqualityExpression(int key)
         => x => x.Id == key;
 }

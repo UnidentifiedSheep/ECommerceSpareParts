@@ -1,11 +1,12 @@
-﻿using System.ComponentModel.DataAnnotations.Schema;
+using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq.Expressions;
 using System.Text.Json;
 using Domain;
+using Domain.Interfaces;
 
 namespace Main.Entities.Event;
 
-public abstract class Event : AuditableEntity<Event, int>
+public abstract class Event : AuditableEntity<Event, int>, ILinqEntity<Event, int>
 {
     protected Event()
     {
@@ -27,7 +28,7 @@ public abstract class Event : AuditableEntity<Event, int>
         return Id;
     }
 
-    public override Expression<Func<Event, bool>> GetEqualityExpression(int key)
+    public static Expression<Func<Event, bool>> GetEqualityExpression(int key)
         => x => x.Id == key;
 }
 

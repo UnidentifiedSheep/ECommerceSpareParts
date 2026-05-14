@@ -1,11 +1,12 @@
-﻿using System.Linq.Expressions;
+using System.Linq.Expressions;
 using Domain;
+using Domain.Interfaces;
 using Main.Entities.User.ValueObjects;
 using Main.Enums;
 
 namespace Main.Entities.User;
 
-public class UserEmail : AuditableEntity<UserEmail, string>
+public class UserEmail : AuditableEntity<UserEmail, string>, ILinqEntity<UserEmail, string>
 {
     private UserEmail()
     {
@@ -57,6 +58,6 @@ public class UserEmail : AuditableEntity<UserEmail, string>
         return Email.Value;
     }
 
-    public override Expression<Func<UserEmail, bool>> GetEqualityExpression(string key)
+    public static Expression<Func<UserEmail, bool>> GetEqualityExpression(string key)
         => x => x.Email == key;
 }

@@ -1,9 +1,10 @@
-﻿using System.Linq.Expressions;
+using System.Linq.Expressions;
 using Domain;
+using Domain.Interfaces;
 
 namespace Main.Entities.Order;
 
-public class Order : AuditableEntity<Order, Guid>
+public class Order : AuditableEntity<Order, Guid>, ILinqEntity<Order, Guid>
 {
     public Guid Id { get; set; }
 
@@ -25,6 +26,6 @@ public class Order : AuditableEntity<Order, Guid>
         return Id;
     }
 
-    public override Expression<Func<Order, bool>> GetEqualityExpression(Guid key)
+    public static Expression<Func<Order, bool>> GetEqualityExpression(Guid key)
         =>  x => x.Id == key;
 }

@@ -1,10 +1,11 @@
-﻿using System.Linq.Expressions;
+using System.Linq.Expressions;
 using Domain;
+using Domain.Interfaces;
 using Domain.Extensions;
 
 namespace Main.Entities.Purchase;
 
-public class PurchaseContentLogistic : Entity<PurchaseContentLogistic, int>
+public class PurchaseContentLogistic : Entity<PurchaseContentLogistic, int>, ILinqEntity<PurchaseContentLogistic, int>
 {
     private PurchaseContentLogistic()
     {
@@ -57,6 +58,6 @@ public class PurchaseContentLogistic : Entity<PurchaseContentLogistic, int>
         return PurchaseContentId;
     }
 
-    public override Expression<Func<PurchaseContentLogistic, bool>> GetEqualityExpression(int key)
+    public static Expression<Func<PurchaseContentLogistic, bool>> GetEqualityExpression(int key)
         => x => x.PurchaseContentId == key;
 }

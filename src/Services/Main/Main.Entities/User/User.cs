@@ -1,6 +1,7 @@
-﻿using System.Linq.Expressions;
+using System.Linq.Expressions;
 using BulkValidation.Core.Attributes;
 using Domain;
+using Domain.Interfaces;
 using Domain.Extensions;
 using Exceptions;
 using Main.Entities.Auth;
@@ -10,7 +11,7 @@ using Main.Enums;
 
 namespace Main.Entities.User;
 
-public class User : AuditableEntity<User, Guid>
+public class User : AuditableEntity<User, Guid>, ILinqEntity<User, Guid>
 {
     private readonly List<Cart.Cart> _cartItems = [];
 
@@ -113,6 +114,6 @@ public class User : AuditableEntity<User, Guid>
         return Id;
     }
 
-    public override Expression<Func<User, bool>> GetEqualityExpression(Guid key)
+    public static Expression<Func<User, bool>> GetEqualityExpression(Guid key)
         => x => x.Id == key;
 }

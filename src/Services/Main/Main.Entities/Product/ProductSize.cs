@@ -1,13 +1,14 @@
-﻿using System.Linq.Expressions;
+using System.Linq.Expressions;
 using BulkValidation.Core.Attributes;
 using Domain;
+using Domain.Interfaces;
 using Domain.Extensions;
 using Enums;
 using Extensions;
 
 namespace Main.Entities.Product;
 
-public class ProductSize : Entity<ProductSize, int>
+public class ProductSize : Entity<ProductSize, int>, ILinqEntity<ProductSize, int>
 {
     private ProductSize()
     {
@@ -83,6 +84,6 @@ public class ProductSize : Entity<ProductSize, int>
         return ProductId;
     }
 
-    public override Expression<Func<ProductSize, bool>> GetEqualityExpression(int key)
+    public static Expression<Func<ProductSize, bool>> GetEqualityExpression(int key)
         => x => x.ProductId == key;
 }

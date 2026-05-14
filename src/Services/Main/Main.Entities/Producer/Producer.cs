@@ -1,11 +1,12 @@
-﻿using System.Linq.Expressions;
+using System.Linq.Expressions;
 using BulkValidation.Core.Attributes;
 using Domain;
+using Domain.Interfaces;
 using Domain.Extensions;
 
 namespace Main.Entities.Producer;
 
-public class Producer : AuditableEntity<Producer, int>
+public class Producer : AuditableEntity<Producer, int>, ILinqEntity<Producer, int>
 {
     private Producer()
     {
@@ -71,6 +72,6 @@ public class Producer : AuditableEntity<Producer, int>
         return Id;
     }
 
-    public override Expression<Func<Producer, bool>> GetEqualityExpression(int key)
+    public static Expression<Func<Producer, bool>> GetEqualityExpression(int key)
         => x => x.Id == key;
 }

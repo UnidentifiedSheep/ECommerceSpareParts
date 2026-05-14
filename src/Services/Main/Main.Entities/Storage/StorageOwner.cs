@@ -1,10 +1,11 @@
-﻿using System.Linq.Expressions;
+using System.Linq.Expressions;
 using BulkValidation.Core.Attributes;
 using Domain;
+using Domain.Interfaces;
 
 namespace Main.Entities.Storage;
 
-public class StorageOwner : AuditableEntity<StorageOwner, (string, Guid)>
+public class StorageOwner : AuditableEntity<StorageOwner, (string, Guid)>, ILinqEntity<StorageOwner, (string, Guid)>
 {
     private StorageOwner()
     {
@@ -37,6 +38,6 @@ public class StorageOwner : AuditableEntity<StorageOwner, (string, Guid)>
         return (StorageName, UserId);
     }
 
-    public override Expression<Func<StorageOwner, bool>> GetEqualityExpression((string, Guid) key)
+    public static Expression<Func<StorageOwner, bool>> GetEqualityExpression((string, Guid) key)
         => x => x.StorageName == key.Item1 && x.UserId == key.Item2;
 }

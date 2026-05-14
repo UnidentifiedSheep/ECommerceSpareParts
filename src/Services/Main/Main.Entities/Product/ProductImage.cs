@@ -1,10 +1,11 @@
-﻿using System.Linq.Expressions;
+using System.Linq.Expressions;
 using Domain;
+using Domain.Interfaces;
 using Exceptions;
 
 namespace Main.Entities.Product;
 
-public class ProductImage : Entity<ProductImage, (int, string)>
+public class ProductImage : Entity<ProductImage, (int, string)>, ILinqEntity<ProductImage, (int, string)>
 {
     private static readonly string[] SupportedExtensions =
     [
@@ -64,7 +65,7 @@ public class ProductImage : Entity<ProductImage, (int, string)>
         return (ProductId, Path);
     }
 
-    public override Expression<Func<ProductImage, bool>> GetEqualityExpression((int, string) key)
+    public static Expression<Func<ProductImage, bool>> GetEqualityExpression((int, string) key)
         => x => x.ProductId == key.Item1 && x.Path == key.Item2;
 
     private static bool IsSupportedExtension(string path)

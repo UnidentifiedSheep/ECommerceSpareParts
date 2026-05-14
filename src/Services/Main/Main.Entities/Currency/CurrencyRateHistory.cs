@@ -1,9 +1,10 @@
-﻿using System.Linq.Expressions;
+using System.Linq.Expressions;
 using Domain;
+using Domain.Interfaces;
 
 namespace Main.Entities.Currency;
 
-public class CurrencyRateHistory : AuditableEntity<CurrencyRateHistory, int>
+public class CurrencyRateHistory : AuditableEntity<CurrencyRateHistory, int>, ILinqEntity<CurrencyRateHistory, int>
 {
     private CurrencyRateHistory()
     {
@@ -45,6 +46,6 @@ public class CurrencyRateHistory : AuditableEntity<CurrencyRateHistory, int>
         return Id;
     }
 
-    public override Expression<Func<CurrencyRateHistory, bool>> GetEqualityExpression(int key)
+    public static Expression<Func<CurrencyRateHistory, bool>> GetEqualityExpression(int key)
         => x => x.Id == key;
 }

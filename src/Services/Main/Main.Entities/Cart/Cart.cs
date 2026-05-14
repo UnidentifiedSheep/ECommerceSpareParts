@@ -1,11 +1,12 @@
-﻿using System.Linq.Expressions;
+using System.Linq.Expressions;
 using BulkValidation.Core.Attributes;
 using Domain;
+using Domain.Interfaces;
 using Domain.Extensions;
 
 namespace Main.Entities.Cart;
 
-public class Cart : AuditableEntity<Cart, (Guid, int)>
+public class Cart : AuditableEntity<Cart, (Guid, int)>, ILinqEntity<Cart, (Guid, int)>
 {
     private Cart()
     {
@@ -44,6 +45,6 @@ public class Cart : AuditableEntity<Cart, (Guid, int)>
         return (UserId, ProductId);
     }
 
-    public override Expression<Func<Cart, bool>> GetEqualityExpression((Guid, int) key)
+    public static Expression<Func<Cart, bool>> GetEqualityExpression((Guid, int) key)
         => x => x.UserId == key.Item1 && x.ProductId == key.Item2;
 }

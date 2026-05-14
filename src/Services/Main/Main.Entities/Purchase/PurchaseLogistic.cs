@@ -1,11 +1,12 @@
-﻿using System.Linq.Expressions;
+using System.Linq.Expressions;
 using Domain;
+using Domain.Interfaces;
 using Main.Entities.Balance;
 using Main.Enums;
 
 namespace Main.Entities.Purchase;
 
-public class PurchaseLogistic : Entity<PurchaseLogistic, Guid>
+public class PurchaseLogistic : Entity<PurchaseLogistic, Guid>, ILinqEntity<PurchaseLogistic, Guid>
 {
     public Guid PurchaseId { get; set; }
 
@@ -38,6 +39,6 @@ public class PurchaseLogistic : Entity<PurchaseLogistic, Guid>
         return PurchaseId;
     }
 
-    public override Expression<Func<PurchaseLogistic, bool>> GetEqualityExpression(Guid key)
+    public static Expression<Func<PurchaseLogistic, bool>> GetEqualityExpression(Guid key)
         => x => x.PurchaseId == key;
 }

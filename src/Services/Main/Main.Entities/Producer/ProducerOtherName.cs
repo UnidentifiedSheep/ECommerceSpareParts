@@ -1,4 +1,4 @@
-﻿using System.Linq.Expressions;
+using System.Linq.Expressions;
 using BulkValidation.Core.Attributes;
 using Domain;
 using Domain.Extensions;
@@ -6,7 +6,7 @@ using Domain.Interfaces;
 
 namespace Main.Entities.Producer;
 
-public class ProducerOtherName : Entity<ProducerOtherName, ProducerOtherNameKey>
+public class ProducerOtherName : Entity<ProducerOtherName, ProducerOtherNameKey>, ILinqEntity<ProducerOtherName, ProducerOtherNameKey>
 {
     private ProducerOtherName()
     {
@@ -52,7 +52,7 @@ public class ProducerOtherName : Entity<ProducerOtherName, ProducerOtherNameKey>
         return new ProducerOtherNameKey(ProducerId, OtherName, WhereUsed);
     }
 
-    public override Expression<Func<ProducerOtherName, bool>> GetEqualityExpression(ProducerOtherNameKey key)
+    public static Expression<Func<ProducerOtherName, bool>> GetEqualityExpression(ProducerOtherNameKey key)
         => x => x.ProducerId == key.ProducerId && x.OtherName == key.OtherName && x.WhereUsed == key.WhereUsed;
 }
 

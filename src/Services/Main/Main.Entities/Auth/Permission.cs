@@ -1,12 +1,13 @@
-﻿using System.Linq.Expressions;
+using System.Linq.Expressions;
 using BulkValidation.Core.Attributes;
 using Domain;
+using Domain.Interfaces;
 using Enums;
 using Extensions;
 
 namespace Main.Entities.Auth;
 
-public class Permission : AuditableEntity<Permission, string>
+public class Permission : AuditableEntity<Permission, string>, ILinqEntity<Permission, string>
 {
     private Permission()
     {
@@ -28,7 +29,7 @@ public class Permission : AuditableEntity<Permission, string>
         return Name;
     }
 
-    public override Expression<Func<Permission, bool>> GetEqualityExpression(string key)
+    public static Expression<Func<Permission, bool>> GetEqualityExpression(string key)
         => x => x.Name == key;
 
     public static string ToNormalizedPermission(PermissionCodes permission)

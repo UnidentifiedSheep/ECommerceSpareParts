@@ -1,11 +1,12 @@
-﻿using System.Linq.Expressions;
+using System.Linq.Expressions;
 using System.Net;
 using Domain;
+using Domain.Interfaces;
 using Main.Enums;
 
 namespace Main.Entities.Auth;
 
-public class UserToken : AuditableEntity<UserToken, Guid>
+public class UserToken : AuditableEntity<UserToken, Guid>, ILinqEntity<UserToken, Guid>
 {
     public Guid Id { get; set; }
 
@@ -36,6 +37,6 @@ public class UserToken : AuditableEntity<UserToken, Guid>
         return Id;
     }
 
-    public override Expression<Func<UserToken, bool>> GetEqualityExpression(Guid key)
+    public static Expression<Func<UserToken, bool>> GetEqualityExpression(Guid key)
         => x => x.Id == key;
 }

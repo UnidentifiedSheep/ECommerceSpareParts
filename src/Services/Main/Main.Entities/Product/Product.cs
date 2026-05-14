@@ -1,11 +1,12 @@
-﻿using System.Linq.Expressions;
+using System.Linq.Expressions;
 using BulkValidation.Core.Attributes;
 using Domain;
+using Domain.Interfaces;
 using Main.Entities.Product.ValueObjects;
 
 namespace Main.Entities.Product;
 
-public class Product : AuditableEntity<Product, int>
+public class Product : AuditableEntity<Product, int>, ILinqEntity<Product, int>
 {
     private readonly List<ProductCharacteristic> _characteristics = [];
 
@@ -132,6 +133,6 @@ public class Product : AuditableEntity<Product, int>
         return Id;
     }
 
-    public override Expression<Func<Product, bool>> GetEqualityExpression(int key)
+    public static Expression<Func<Product, bool>> GetEqualityExpression(int key)
         => x => x.Id == key;
 }

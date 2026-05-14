@@ -9,6 +9,7 @@ using Domain.Extensions;
 using Main.Application.Extensions;
 using Main.Application.Interfaces.Persistence;
 using Main.Entities.Event;
+using Main.Entities.Exceptions.Products;
 using Main.Entities.Exceptions.Storages;
 using Main.Entities.Storage;
 using Main.Enums;
@@ -33,7 +34,10 @@ public class SetToZeroContentHandler(
 
         content.ValidateVersion(request.RowVersion);
 
-        var product = await productRepository.EnsureProductExistsForUpdateAsync(content.ProductId, cancellationToken);
+        var product = await productRepository.EnsureExistForUpdateAsync(
+            content.ProductId,
+            id => new ProductNotFoundException(id),
+            cancellationToken);
 
         await unitOfWork.AddAsync(
             StorageMovementEvent.Create(content, StorageMovementType.StorageContentDeletion),

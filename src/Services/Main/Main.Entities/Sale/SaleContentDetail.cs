@@ -1,10 +1,11 @@
-﻿using System.Linq.Expressions;
+using System.Linq.Expressions;
 using Domain;
+using Domain.Interfaces;
 using Domain.Extensions;
 
 namespace Main.Entities.Sale;
 
-public class SaleContentDetail : Entity<SaleContentDetail, int>
+public class SaleContentDetail : Entity<SaleContentDetail, int>, ILinqEntity<SaleContentDetail, int>
 {
     private SaleContentDetail()
     {
@@ -62,6 +63,6 @@ public class SaleContentDetail : Entity<SaleContentDetail, int>
         return Id;
     }
 
-    public override Expression<Func<SaleContentDetail, bool>> GetEqualityExpression(int key)
+    public static Expression<Func<SaleContentDetail, bool>> GetEqualityExpression(int key)
         => x => x.Id == key;
 }

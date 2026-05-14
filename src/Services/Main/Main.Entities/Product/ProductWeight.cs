@@ -1,12 +1,13 @@
-﻿using System.Linq.Expressions;
+using System.Linq.Expressions;
 using BulkValidation.Core.Attributes;
 using Domain;
+using Domain.Interfaces;
 using Domain.Extensions;
 using Enums;
 
 namespace Main.Entities.Product;
 
-public class ProductWeight : Entity<ProductWeight, int>
+public class ProductWeight : Entity<ProductWeight, int>, ILinqEntity<ProductWeight, int>
 {
     private ProductWeight()
     {
@@ -45,7 +46,7 @@ public class ProductWeight : Entity<ProductWeight, int>
         return ProductId;
     }
 
-    public override Expression<Func<ProductWeight, bool>> GetEqualityExpression(int key)
+    public static Expression<Func<ProductWeight, bool>> GetEqualityExpression(int key)
         => x => x.ProductId == key;
 
     private static void ValidateWeight(decimal weight)

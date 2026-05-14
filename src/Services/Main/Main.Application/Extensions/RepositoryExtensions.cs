@@ -1,6 +1,7 @@
 ﻿using Application.Common.Extensions;
 using Application.Common.Interfaces.Repositories;
 using Domain;
+using Domain.Interfaces;
 using Main.Application.Interfaces.Persistence;
 using Main.Entities.Exceptions.Products;
 using Main.Entities.Product;
@@ -71,18 +72,49 @@ public static class RepositoryExtensions
         return result;
     }
 
-    public static async Task<Product> EnsureProductExistsForUpdateAsync(
-        this IProductRepository productRepository,
-        int productId,
-        CancellationToken cancellationToken = default)
-    {
-        var criteria = Criteria<Product>.New()
-            .Where(x => x.Id == productId)
-            .Track()
-            .ForUpdate()
-            .Build();
+    public static async Task<TEntity> EnsureExistForUpdateAsync<TEntity, TKey>(
+        this IRepository<TEntity, TKey> repository,
+        TKey key,
+        Func<TKey, Exception> errorFactory,
+        CancellationToken ct = default)
+        where TEntity : Entity<TEntity, TKey>, ILinqEntity<TEntity, TKey>
+        where TKey : notnull
+        => await repository.EnsureExistCoreAsync(
+            key, 
+            errorFactory, 
+            Criteria<TEntity>.New().ForUpdate(), 
+            ct);
+    
+    public static async Task<TEntity> EnsureExistAsync<TEntity, TKey>(
+        this IRepository<TEntity, TKey> repository,
+        TKey key,
+        Func<TKey, Exception> errorFactory,
+        CancellationToken ct = default)
+        where TEntity : Entity<TEntity, TKey>, ILinqEntity<TEntity, TKey>
+        where TKey : notnull
+        => await repository.EnsureExistCoreAsync(
+            key, 
+            errorFactory, 
+            Criteria<TEntity>.New(), 
+            ct);
 
-        return await productRepository.FirstOrDefaultAsync(criteria, cancellationToken)
-               ?? throw new ProductNotFoundException(productId);
+    private static async Task<TEntity> EnsureExistCoreAsync<TEntity, TKey>(
+        this IRepository<TEntity, TKey> repository,
+        TKey key,
+        Func<TKey, Exception> errorFactory,
+        CriteriaBuilder<TEntity> criteriaBuilder,
+        CancellationToken ct = default) 
+        where TEntity : Entity<TEntity, TKey>, ILinqEntity<TEntity, TKey>
+        where TKey : notnull
+    {
+        var criteria = criteriaBuilder
+            .Where(TEntity.GetEqualityExpression(key))
+            .Build();
+        
+        var result = await repository.FirstOrDefaultAsync(
+            criteria,
+            ct);
+        
+        return result ?? throw errorFactory(key);
     }
 }

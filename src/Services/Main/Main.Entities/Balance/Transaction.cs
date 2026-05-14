@@ -1,6 +1,7 @@
-﻿using System.Linq.Expressions;
+using System.Linq.Expressions;
 using BulkValidation.Core.Attributes;
 using Domain;
+using Domain.Interfaces;
 using Domain.Extensions;
 using Exceptions;
 using Main.Entities.User;
@@ -8,7 +9,7 @@ using Main.Enums;
 
 namespace Main.Entities.Balance;
 
-public class Transaction : AuditableEntity<Transaction, Guid>
+public class Transaction : AuditableEntity<Transaction, Guid>, ILinqEntity<Transaction, Guid>
 {
     private Transaction()
     {
@@ -173,6 +174,6 @@ public class Transaction : AuditableEntity<Transaction, Guid>
         return Id;
     }
 
-    public override Expression<Func<Transaction, bool>> GetEqualityExpression(Guid key)
+    public static Expression<Func<Transaction, bool>> GetEqualityExpression(Guid key)
         => x => x.Id == key;
 }

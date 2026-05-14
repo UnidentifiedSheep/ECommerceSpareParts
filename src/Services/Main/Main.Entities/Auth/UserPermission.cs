@@ -1,9 +1,10 @@
-﻿using System.Linq.Expressions;
+using System.Linq.Expressions;
 using Domain;
+using Domain.Interfaces;
 
 namespace Main.Entities.Auth;
 
-public class UserPermission : AuditableEntity<UserPermission, (Guid, string)>
+public class UserPermission : AuditableEntity<UserPermission, (Guid, string)>, ILinqEntity<UserPermission, (Guid, string)>
 {
     private UserPermission()
     {
@@ -29,6 +30,6 @@ public class UserPermission : AuditableEntity<UserPermission, (Guid, string)>
         return (UserId, Permission);
     }
 
-    public override Expression<Func<UserPermission, bool>> GetEqualityExpression((Guid, string) key)
+    public static Expression<Func<UserPermission, bool>> GetEqualityExpression((Guid, string) key)
         => x => x.UserId == key.Item1 && x.Permission == key.Item2;
 }

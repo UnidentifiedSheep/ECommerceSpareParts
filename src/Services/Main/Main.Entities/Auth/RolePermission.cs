@@ -1,10 +1,11 @@
-﻿using System.Linq.Expressions;
+using System.Linq.Expressions;
 using Domain;
+using Domain.Interfaces;
 using Main.Entities.Auth.ValueObjects;
 
 namespace Main.Entities.Auth;
 
-public class RolePermission : Entity<RolePermission, (string, string)>
+public class RolePermission : Entity<RolePermission, (string, string)>, ILinqEntity<RolePermission, (string, string)>
 {
     private RolePermission()
     {
@@ -32,6 +33,6 @@ public class RolePermission : Entity<RolePermission, (string, string)>
         return (RoleName, PermissionName);
     }
 
-    public override Expression<Func<RolePermission, bool>> GetEqualityExpression((string, string) key)
+    public static Expression<Func<RolePermission, bool>> GetEqualityExpression((string, string) key)
         => x => x.RoleName == key.Item1 && x.PermissionName == key.Item2;
 }

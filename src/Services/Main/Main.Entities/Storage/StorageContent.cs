@@ -1,4 +1,4 @@
-﻿using System.Linq.Expressions;
+using System.Linq.Expressions;
 using BulkValidation.Core.Attributes;
 using Domain;
 using Domain.Extensions;
@@ -6,7 +6,7 @@ using Domain.Interfaces;
 
 namespace Main.Entities.Storage;
 
-public class StorageContent : AuditableEntity<StorageContent, int>, IVersionable<uint>
+public class StorageContent : AuditableEntity<StorageContent, int>, ILinqEntity<StorageContent, int>, IVersionable<uint>
 {
     private StorageContent()
     {
@@ -131,6 +131,6 @@ public class StorageContent : AuditableEntity<StorageContent, int>, IVersionable
         return Id;
     }
 
-    public override Expression<Func<StorageContent, bool>> GetEqualityExpression(int key)
+    public static Expression<Func<StorageContent, bool>> GetEqualityExpression(int key)
         => x => x.Id == key;
 }

@@ -1,11 +1,12 @@
-﻿using System.Linq.Expressions;
+using System.Linq.Expressions;
 using BulkValidation.Core.Attributes;
 using Domain;
+using Domain.Interfaces;
 using Domain.Extensions;
 
 namespace Main.Entities.Purchase;
 
-public class PurchaseContent : Entity<PurchaseContent, int>
+public class PurchaseContent : Entity<PurchaseContent, int>, ILinqEntity<PurchaseContent, int>
 {
     private PurchaseContent()
     {
@@ -93,6 +94,6 @@ public class PurchaseContent : Entity<PurchaseContent, int>
         return Id;
     }
 
-    public override Expression<Func<PurchaseContent, bool>> GetEqualityExpression(int key)
+    public static Expression<Func<PurchaseContent, bool>> GetEqualityExpression(int key)
         => x => x.Id == key;
 }

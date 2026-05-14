@@ -1,11 +1,12 @@
-﻿using System.Linq.Expressions;
+using System.Linq.Expressions;
 using BulkValidation.Core.Attributes;
 using Domain;
+using Domain.Interfaces;
 using Domain.Extensions;
 
 namespace Main.Entities.Currency;
 
-public class Currency : Entity<Currency, int>
+public class Currency : Entity<Currency, int>, ILinqEntity<Currency, int>
 {
     private readonly List<CurrencyRate> _ratesFrom = [];
 
@@ -87,6 +88,6 @@ public class Currency : Entity<Currency, int>
         return Id;
     }
 
-    public override Expression<Func<Currency, bool>> GetEqualityExpression(int key)
+    public static Expression<Func<Currency, bool>> GetEqualityExpression(int key)
         => x => x.Id == key;
 }

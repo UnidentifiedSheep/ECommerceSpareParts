@@ -1,12 +1,13 @@
-﻿using System.Linq.Expressions;
+using System.Linq.Expressions;
 using BulkValidation.Core.Attributes;
 using Domain;
+using Domain.Interfaces;
 using Domain.Extensions;
 using Main.Enums;
 
 namespace Main.Entities.Storage;
 
-public class StorageRoute : AuditableEntity<StorageRoute, Guid>
+public class StorageRoute : AuditableEntity<StorageRoute, Guid>, ILinqEntity<StorageRoute, Guid>
 {
     private StorageRoute()
     {
@@ -184,6 +185,6 @@ public class StorageRoute : AuditableEntity<StorageRoute, Guid>
         return Id;
     }
 
-    public override Expression<Func<StorageRoute, bool>> GetEqualityExpression(Guid key)
+    public static Expression<Func<StorageRoute, bool>> GetEqualityExpression(Guid key)
         => x => x.Id == key;
 }

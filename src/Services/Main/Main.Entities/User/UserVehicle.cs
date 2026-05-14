@@ -1,9 +1,10 @@
-﻿using System.Linq.Expressions;
+using System.Linq.Expressions;
 using Domain;
+using Domain.Interfaces;
 
 namespace Main.Entities.User;
 
-public class UserVehicle : AuditableEntity<UserVehicle, Guid>
+public class UserVehicle : AuditableEntity<UserVehicle, Guid>, ILinqEntity<UserVehicle, Guid>
 {
     public Guid Id { get; set; }
 
@@ -30,6 +31,6 @@ public class UserVehicle : AuditableEntity<UserVehicle, Guid>
         return Id;
     }
 
-    public override Expression<Func<UserVehicle, bool>> GetEqualityExpression(Guid key)
+    public static Expression<Func<UserVehicle, bool>> GetEqualityExpression(Guid key)
         => x => x.Id == key;
 }

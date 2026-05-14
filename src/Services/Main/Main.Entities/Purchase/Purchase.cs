@@ -1,6 +1,7 @@
-﻿using System.Linq.Expressions;
+using System.Linq.Expressions;
 using BulkValidation.Core.Attributes;
 using Domain;
+using Domain.Interfaces;
 using Domain.Extensions;
 using Enums;
 using Exceptions;
@@ -8,7 +9,7 @@ using Main.Entities.Balance;
 
 namespace Main.Entities.Purchase;
 
-public class Purchase : AuditableEntity<Purchase, Guid>
+public class Purchase : AuditableEntity<Purchase, Guid>, ILinqEntity<Purchase, Guid>
 {
     private readonly List<PurchaseContent> _contents = [];
 
@@ -94,6 +95,6 @@ public class Purchase : AuditableEntity<Purchase, Guid>
         return Id;
     }
 
-    public override Expression<Func<Purchase, bool>> GetEqualityExpression(Guid key)
+    public static Expression<Func<Purchase, bool>> GetEqualityExpression(Guid key)
         => x => x.Id == key;
 }

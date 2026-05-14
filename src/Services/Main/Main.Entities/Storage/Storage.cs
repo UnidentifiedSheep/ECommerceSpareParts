@@ -1,13 +1,14 @@
-﻿using System.Linq.Expressions;
+using System.Linq.Expressions;
 using BulkValidation.Core.Attributes;
 using Domain;
+using Domain.Interfaces;
 using Domain.Extensions;
 using Exceptions;
 using Main.Enums;
 
 namespace Main.Entities.Storage;
 
-public class Storage : AuditableEntity<Storage, string>
+public class Storage : AuditableEntity<Storage, string>, ILinqEntity<Storage, string>
 {
     private readonly List<StorageOwner> _owners = [];
 
@@ -87,6 +88,6 @@ public class Storage : AuditableEntity<Storage, string>
         return Name;
     }
 
-    public override Expression<Func<Storage, bool>> GetEqualityExpression(string key)
+    public static Expression<Func<Storage, bool>> GetEqualityExpression(string key)
         => x => x.Name == key;
 }

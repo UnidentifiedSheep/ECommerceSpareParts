@@ -1,11 +1,11 @@
-﻿using System.Linq.Expressions;
+using System.Linq.Expressions;
 using Domain;
 using Domain.Extensions;
 using Domain.Interfaces;
 
 namespace Main.Entities.Balance;
 
-public class UserBalance : AuditableEntity<UserBalance, UserBalanceKey>
+public class UserBalance : AuditableEntity<UserBalance, UserBalanceKey>, ILinqEntity<UserBalance, UserBalanceKey>
 {
     private UserBalance()
     {
@@ -42,7 +42,7 @@ public class UserBalance : AuditableEntity<UserBalance, UserBalanceKey>
         return new UserBalanceKey(UserId, CurrencyId);
     }
 
-    public override Expression<Func<UserBalance, bool>> GetEqualityExpression(UserBalanceKey key)
+    public static Expression<Func<UserBalance, bool>> GetEqualityExpression(UserBalanceKey key)
         => x => x.UserId == key.UserId && x.CurrencyId == key.CurrencyId;
 }
 
