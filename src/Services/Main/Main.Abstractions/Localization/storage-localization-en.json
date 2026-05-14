@@ -17,6 +17,8 @@
     "storage.name.not.empty": "Storage name must not be empty.",
     "storage.content.edit.list.not.empty": "Edited content list must not be empty.",
     "storage.content.edit.max.count": "Maximum number of items to edit at once is 100.",
+    "storage.content.id.greater.than.zero": "Storage content id must be greater than 0.",
+    "storage.content.count.greater.than.zero": "Storage content count must be greater than 0.",
     "storage.content.count.min.zero": "Item count must be greater than or equal to 0.",
     "storage.content.move.no.duplicates": "The list must not contain duplicate items.",
     "storage.content.move.not.empty": "Movements list must not be empty.",

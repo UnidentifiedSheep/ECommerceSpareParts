@@ -17,6 +17,8 @@
     "storage.name.not.empty": "Название склада не должно быть пустым.",
     "storage.content.edit.list.not.empty": "Список изменяемого содержимого не должен быть пустым.",
     "storage.content.edit.max.count": "Максимальное количество позиций для одновременного редактирования — 100.",
+    "storage.content.id.greater.than.zero": "Идентификатор содержимого склада должен быть больше 0.",
+    "storage.content.count.greater.than.zero": "Количество содержимого склада должно быть больше 0.",
     "storage.content.count.min.zero": "Количество позиции должно быть не меньше 0.",
     "storage.content.move.no.duplicates": "Список не должен содержать дубликатов.",
     "storage.content.move.not.empty": "Список перемещений не должен быть пустым.",
