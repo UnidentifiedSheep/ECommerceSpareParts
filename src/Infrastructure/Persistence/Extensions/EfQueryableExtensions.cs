@@ -21,8 +21,8 @@ public static class EfQueryableExtensions
         query.ConfigureTracking(criteria.Track);
         query.ForUpdate(criteria.ForUpdate);
 
-        if (criteria.Where is not null)
-            query = query.Where(criteria.Where);
+        foreach (var where in criteria.Wheres)
+            query = query.Where(where);
 
         foreach (var i in criteria.Includes)
             query = query.Include(i);

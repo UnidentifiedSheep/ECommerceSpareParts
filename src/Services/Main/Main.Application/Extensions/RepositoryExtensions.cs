@@ -2,9 +2,6 @@
 using Application.Common.Interfaces.Repositories;
 using Domain;
 using Domain.Interfaces;
-using Main.Application.Interfaces.Persistence;
-using Main.Entities.Exceptions.Products;
-using Main.Entities.Product;
 
 namespace Main.Application.Extensions;
 
@@ -76,26 +73,28 @@ public static class RepositoryExtensions
         this IRepository<TEntity, TKey> repository,
         TKey key,
         Func<TKey, Exception> errorFactory,
+        CriteriaBuilder<TEntity>? criteriaBuilder = null,
         CancellationToken ct = default)
         where TEntity : Entity<TEntity, TKey>, ILinqEntity<TEntity, TKey>
         where TKey : notnull
         => await repository.EnsureExistCoreAsync(
             key, 
             errorFactory, 
-            Criteria<TEntity>.New().ForUpdate(), 
+            criteriaBuilder?.ForUpdate() ?? Criteria<TEntity>.New().ForUpdate(), 
             ct);
     
     public static async Task<TEntity> EnsureExistAsync<TEntity, TKey>(
         this IRepository<TEntity, TKey> repository,
         TKey key,
         Func<TKey, Exception> errorFactory,
+        CriteriaBuilder<TEntity>? criteriaBuilder = null,
         CancellationToken ct = default)
         where TEntity : Entity<TEntity, TKey>, ILinqEntity<TEntity, TKey>
         where TKey : notnull
         => await repository.EnsureExistCoreAsync(
             key, 
             errorFactory, 
-            Criteria<TEntity>.New(), 
+            criteriaBuilder ?? Criteria<TEntity>.New(), 
             ct);
 
     private static async Task<TEntity> EnsureExistCoreAsync<TEntity, TKey>(

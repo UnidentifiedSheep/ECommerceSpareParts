@@ -4,9 +4,9 @@ using Main.Application.Handlers.Purchases.BaseValidators;
 
 namespace Main.Application.Handlers.Purchases.CreateFullPurchase;
 
-public class CreateFullPurchaseValidation : AbstractValidator<CreateFullPurchaseCommand>
+public class CreatePurchaseValidation : AbstractValidator<CreatePurchaseCommand>
 {
-    public CreateFullPurchaseValidation()
+    public CreatePurchaseValidation()
     {
         RuleFor(x => x.PurchaseContent)
             .NotEmpty()

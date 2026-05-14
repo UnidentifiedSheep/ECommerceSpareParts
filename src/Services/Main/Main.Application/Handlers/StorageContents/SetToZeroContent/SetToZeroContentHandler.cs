@@ -35,9 +35,9 @@ public class SetToZeroContentHandler(
         content.ValidateVersion(request.RowVersion);
 
         var product = await productRepository.EnsureExistForUpdateAsync(
-            content.ProductId,
-            id => new ProductNotFoundException(id),
-            cancellationToken);
+            key: content.ProductId,
+            errorFactory: id => new ProductNotFoundException(id),
+            ct: cancellationToken);
 
         await unitOfWork.AddAsync(
             StorageMovementEvent.Create(content, StorageMovementType.StorageContentDeletion),

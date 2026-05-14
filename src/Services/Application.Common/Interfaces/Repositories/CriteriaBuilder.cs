@@ -12,11 +12,11 @@ public sealed class CriteriaBuilder<T> where T : class
     private int? _size;
 
     private bool _track;
-    private Expression<Func<T, bool>>? _where;
+    private readonly List<Expression<Func<T, bool>>> _wheres = new();
 
     public CriteriaBuilder<T> Where(Expression<Func<T, bool>> predicate)
     {
-        _where = predicate;
+        _wheres.Add(predicate);
         return this;
     }
 
@@ -66,7 +66,7 @@ public sealed class CriteriaBuilder<T> where T : class
     {
         return new Criteria<T>
         {
-            Where = _where,
+            Wheres = _wheres.ToList(),
             OrderBy = _orderBy,
             Page = _page,
             Size = _size,

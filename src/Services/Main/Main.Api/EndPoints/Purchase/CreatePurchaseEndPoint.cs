@@ -30,7 +30,7 @@ public class CreatePurchaseEndPoint : ICarterModule
                     CreatePurchaseRequest request,
                     CancellationToken token) =>
                 {
-                    var command = new CreateFullPurchaseCommand(user.UserId, request.SupplierId, request.CurrencyId,
+                    var command = new CreatePurchaseCommand(user.UserId, request.SupplierId, request.CurrencyId,
                         request.StorageName, request.PurchaseDate, request.PurchaseContent, request.Comment,
                         request.PayedSum, request.WithLogistics, request.StorageFrom);
                     await sender.Send(command, token);

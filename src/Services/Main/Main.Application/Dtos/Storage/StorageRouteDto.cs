@@ -45,7 +45,7 @@ public record StorageRouteDto
     public required CurrencyDto Currency { get; init; }
 
     [JsonPropertyName("minimumPrice")]
-    public required decimal? MinimumPrice { get; init; }
+    public required decimal MinimumPrice { get; init; }
 
     [JsonPropertyName("carrierId")]
     public required Guid? CarrierId { get; init; }

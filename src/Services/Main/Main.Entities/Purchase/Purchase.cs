@@ -6,6 +6,7 @@ using Domain.Extensions;
 using Enums;
 using Exceptions;
 using Main.Entities.Balance;
+using Main.Enums;
 
 namespace Main.Entities.Purchase;
 
@@ -83,6 +84,45 @@ public class Purchase : AuditableEntity<Purchase, Guid>, ILinqEntity<Purchase, G
             throw new InvalidOperationException("Invalid purchase id in purchase content");
         if (_contents.Contains(content)) return;
         _contents.Add(content);
+    }
+
+    public void SetPurchaseLogistic(
+        Guid routeId,
+        int logisticsCurrencyId,
+        LogisticPricingType pricingModel,
+        RouteType routeType,
+        decimal priceKg,
+        decimal pricePerM3,
+        decimal pricePerOrder,
+        decimal? minimumPrice,
+        Guid? transactionId,
+        bool minimumPriceApplied)
+    {
+        if (PurchaseLogistic == null)
+            PurchaseLogistic = PurchaseLogistic.Create(
+                GetId(),
+                routeId,
+                logisticsCurrencyId,
+                transactionId,
+                pricingModel,
+                routeType,
+                priceKg,
+                pricePerM3,
+                pricePerOrder,
+                minimumPrice,
+                minimumPriceApplied);
+        else
+            PurchaseLogistic.Update(
+                routeId,
+                logisticsCurrencyId,
+                transactionId,
+                pricingModel,
+                routeType,
+                priceKg,
+                pricePerM3,
+                pricePerOrder,
+                minimumPrice,
+                minimumPriceApplied);
     }
 
     public void Complete()

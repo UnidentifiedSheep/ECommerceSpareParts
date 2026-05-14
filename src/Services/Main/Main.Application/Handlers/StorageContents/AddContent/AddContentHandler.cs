@@ -9,7 +9,6 @@ using Attributes;
 using Contracts.StorageContent;
 using Main.Application.Dtos.Storage;
 using Main.Application.Extensions;
-using Main.Application.Handlers.Projections;
 using Main.Application.Interfaces.Persistence;
 using Main.Entities.Event;
 using Main.Entities.Exceptions.Currencies;
@@ -29,7 +28,7 @@ public record AddContentCommand(
     StorageMovementType MovementType
 ) : ICommand<AddContentResult>;
 
-public record AddContentResult(IReadOnlyList<StorageContentDto> StorageContents);
+public record AddContentResult(IReadOnlyList<StorageContent> StorageContents);
 
 public class AddContentHandler(
     IProductRepository productRepository,
@@ -99,11 +98,6 @@ public class AddContentHandler(
                 ProductId = id
             });
 
-
-        var adapted = storageContents
-            .Select(StorageContentProjections.ToStorageContentDto.AsFunc())
-            .ToList();
-
-        return new AddContentResult(adapted);
+        return new AddContentResult(storageContents);
     }
 }

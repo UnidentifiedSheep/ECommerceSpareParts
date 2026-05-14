@@ -23,7 +23,7 @@ public record CalculateDeliveryCostQuery(
     string StorageFrom,
     string StorageTo,
     IEnumerable<LogisticsItemDto> Items,
-    LogisticsCalculationMode Mode = LogisticsCalculationMode.Strict
+    LogisticsCalculationMode Mode
 ) : IQuery<CalculateDeliveryCostResult>;
 
 public record CalculateDeliveryCostResult(StorageRouteDto Route, DeliveryCostDto DeliveryCost);
