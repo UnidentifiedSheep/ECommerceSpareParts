@@ -1,0 +1,9 @@
+services:
+  analytics.migrator:
+    image: ${ARTIFACT_REGISTRY_HOST}/analytics-migrator:${IMAGE_TAG}
+
+  main.migrator:
+    image: ${ARTIFACT_REGISTRY_HOST}/main-migrator:${IMAGE_TAG}
+
+  pricing.migrator:
+    image: ${ARTIFACT_REGISTRY_HOST}/pricing-migrator:${IMAGE_TAG}

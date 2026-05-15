@@ -1,0 +1,21 @@
+services:
+  main.api:
+    image: ${ARTIFACT_REGISTRY_HOST}/main-api:${IMAGE_TAG}
+
+  search.api:
+    image: ${ARTIFACT_REGISTRY_HOST}/search-api:${IMAGE_TAG}
+
+  pricing.api:
+    image: ${ARTIFACT_REGISTRY_HOST}/pricing-api:${IMAGE_TAG}
+
+  gateway:
+    image: ${ARTIFACT_REGISTRY_HOST}/gateway:${IMAGE_TAG}
+
+  analytics.api:
+    image: ${ARTIFACT_REGISTRY_HOST}/analytics-api:${IMAGE_TAG}
+
+  analytics.worker:
+    image: ${ARTIFACT_REGISTRY_HOST}/analytics-worker:${IMAGE_TAG}
+
+  pgql:
+    image: ${ARTIFACT_REGISTRY_HOST}/postgres-cron:${IMAGE_TAG}
