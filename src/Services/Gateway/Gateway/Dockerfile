@@ -20,6 +20,8 @@ COPY ["src/Services/Api.Common/Api.Common.csproj", "src/Services/Api.Common/"]
 COPY ["src/Core/Extensions/Extensions.csproj", "src/Core/Extensions/"]
 COPY ["src/Infrastructure/Localization/Localization.Abstractions/Localization.Abstractions.csproj", "src/Infrastructure/Localization/Localization.Abstractions/"]
 COPY ["src/Services/Application.Common/Application.Common.csproj", "src/Services/Application.Common/"]
+COPY ["src/Core/Contracts/Contracts.csproj", "src/Core/Contracts/"]
+COPY ["src/Core/Domain/Domain.csproj", "src/Core/Domain/"]
 COPY ["src/Infrastructure/Localization/Localization.Domain/Localization.Domain.csproj", "src/Infrastructure/Localization/Localization.Domain/"]
 RUN dotnet restore "src/Services/Gateway/Gateway/Gateway.csproj"
 COPY . .

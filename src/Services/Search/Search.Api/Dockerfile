@@ -4,6 +4,7 @@ WORKDIR /app
 EXPOSE 8080
 
 ENV ASPNETCORE_URLS=http://+:8080
+
 ENV TZ=Europe/Moscow
 
 FROM mcr.microsoft.com/dotnet/sdk:10.0 AS build
@@ -21,12 +22,13 @@ COPY ["src/Services/Api.Common/Api.Common.csproj", "src/Services/Api.Common/"]
 COPY ["src/Core/Extensions/Extensions.csproj", "src/Core/Extensions/"]
 COPY ["src/Infrastructure/Localization/Localization.Abstractions/Localization.Abstractions.csproj", "src/Infrastructure/Localization/Localization.Abstractions/"]
 COPY ["src/Services/Application.Common/Application.Common.csproj", "src/Services/Application.Common/"]
+COPY ["src/Core/Contracts/Contracts.csproj", "src/Core/Contracts/"]
+COPY ["src/Core/Domain/Domain.csproj", "src/Core/Domain/"]
 COPY ["src/Infrastructure/Localization/Localization.Domain/Localization.Domain.csproj", "src/Infrastructure/Localization/Localization.Domain/"]
 COPY ["src/Services/Search/Search.Abstractions/Search.Abstractions.csproj", "src/Services/Search/Search.Abstractions/"]
 COPY ["src/Services/Search/Search.Entities/Search.Entities.csproj", "src/Services/Search/Search.Entities/"]
 COPY ["src/Services/Search/Search.Enums/Search.Enums.csproj", "src/Services/Search/Search.Enums/"]
 COPY ["src/Services/Search/Search.Application/Search.Application.csproj", "src/Services/Search/Search.Application/"]
-COPY ["src/Core/Contracts/Contracts.csproj", "src/Core/Contracts/"]
 COPY ["src/Services/Search/Search.Persistence/Search.Persistence.csproj", "src/Services/Search/Search.Persistence/"]
 RUN dotnet restore "src/Services/Search/Search.Api/Search.Api.csproj"
 COPY . .

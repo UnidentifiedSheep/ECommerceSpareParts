@@ -29,18 +29,15 @@
     </ItemGroup>
 
     <ItemGroup>
-        <Content Include="..\..\..\..\.dockerignore">
-            <Link>.dockerignore</Link>
-        </Content>
-    </ItemGroup>
-
-    <ItemGroup>
         <_ContentIncludedByDefault Remove="ReverseProxy\Search\articles.json"/>
         <_ContentIncludedByDefault Remove="ReverseProxy\Search\suggestions.json"/>
         <_ContentIncludedByDefault Remove="ReverseProxy\gateway.json"/>
     </ItemGroup>
 
     <ItemGroup>
+        <Content Include="..\..\..\..\.dockerignore">
+          <Link>.dockerignore</Link>
+        </Content>
         <Content Include="..\..\..\..\configs\**\*">
             <Link>configs\%(RecursiveDir)%(Filename)%(Extension)</Link>
             <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>

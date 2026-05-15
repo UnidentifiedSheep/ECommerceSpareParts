@@ -14,12 +14,6 @@
     </ItemGroup>
 
     <ItemGroup>
-        <Content Include="..\.dockerignore">
-            <Link>.dockerignore</Link>
-        </Content>
-    </ItemGroup>
-
-    <ItemGroup>
         <ProjectReference Include="..\..\..\Infrastructure\RabbitMq\RabbitMq.csproj"/>
         <ProjectReference Include="..\..\..\Infrastructure\Security\Security.csproj"/>
         <ProjectReference Include="..\..\Api.Common\Api.Common.csproj"/>
@@ -30,6 +24,9 @@
     </ItemGroup>
 
     <ItemGroup>
+        <Content Include="..\..\..\..\.dockerignore">
+          <Link>.dockerignore</Link>
+        </Content>
         <Content Include="..\Search.Abstractions\Localization\**\*">
             <Link>Localization\%(RecursiveDir)%(Filename)%(Extension)</Link>
             <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
