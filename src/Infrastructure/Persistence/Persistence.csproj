@@ -12,6 +12,7 @@
         <PackageReference Include="Dapper" Version="2.1.72"/>
         <PackageReference Include="EFCore.BulkExtensions.PostgreSql" Version="10.0.1"/>
         <PackageReference Include="EFCore.ComplexIndexes.PostgreSQL" Version="2.0.0"/>
+        <PackageReference Include="Microsoft.EntityFrameworkCore.Relational" Version="10.0.8" />
         <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="10.0.8">
             <PrivateAssets>all</PrivateAssets>
             <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>

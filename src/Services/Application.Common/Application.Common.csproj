@@ -17,6 +17,7 @@
         <PackageReference Include="Mapster" Version="10.0.8-pre06" />
         <PackageReference Include="MassTransit.Abstractions" Version="8.5.8"/>
         <PackageReference Include="MediatR" Version="14.1.0" />
+        <PackageReference Include="Microsoft.EntityFrameworkCore" Version="10.0.8" />
         <PackageReference Include="Scrutor" Version="7.0.0"/>
         <PackageReference Include="ZiggyCreatures.FusionCache" Version="2.6.0"/>
         <PackageReference Include="ZiggyCreatures.FusionCache.Serialization.SystemTextJson" Version="2.6.0"/>
