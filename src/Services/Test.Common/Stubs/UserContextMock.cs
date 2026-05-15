@@ -9,6 +9,7 @@ public class UserContextMock : IUserContext
     private readonly HashSet<string> _roles = [];
     public bool IsAuthenticated { get; private set; }
     public Guid UserId { get; private set; }
+    public Guid? UserIdOrNull => UserId == Guid.Empty ? null : UserId;
     public IReadOnlySet<string> Roles => _roles;
     public IReadOnlySet<string> Permissions => _permissions;
 

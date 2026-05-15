@@ -1,3 +1,4 @@
+using Abstractions.Interfaces;
 using Abstractions.Interfaces.Validators;
 using Abstractions.Models;
 using Application.Common;
@@ -47,6 +48,7 @@ public static class ServiceProvider
         collection.AddSingleton(phoneOptions ?? new UserPhoneOptions());
 
         collection.AddScoped<ICurrencyConverter, CurrencyConverter>();
+        collection.AddScoped<ISystemIdExtractor, SystemIdExtractor>();
 
         collection.AddSingleton<ISettingsContainer, SettingsContainer>();
         collection.AddScoped<ISettingsService, SettingsService>();

@@ -5,28 +5,32 @@ using Microsoft.EntityFrameworkCore.Diagnostics;
 
 namespace Persistence.Interceptors;
 
-public class AuditableEntitySaveChangesInterceptor(IUserContext userContext) : SaveChangesInterceptor
+public class AuditableEntitySaveChangesInterceptor(
+    IUserContext userContext,
+    ISystemIdExtractor systemIdExtractor) : SaveChangesInterceptor
 {
     public override InterceptionResult<int> SavingChanges(
         DbContextEventData eventData,
         InterceptionResult<int> result)
     {
-        UpdateAuditFields(eventData.Context);
+        _ = UpdateAuditFields(eventData.Context);
         return base.SavingChanges(eventData, result);
     }
 
-    public override ValueTask<InterceptionResult<int>> SavingChangesAsync(
+    public override async ValueTask<InterceptionResult<int>> SavingChangesAsync(
         DbContextEventData eventData,
         InterceptionResult<int> result,
         CancellationToken cancellationToken = default)
     {
-        UpdateAuditFields(eventData.Context);
-        return base.SavingChangesAsync(eventData, result, cancellationToken);
+        await UpdateAuditFields(eventData.Context, cancellationToken);
+        return await base.SavingChangesAsync(eventData, result, cancellationToken);
     }
 
-    private void UpdateAuditFields(DbContext? context)
+    private async Task UpdateAuditFields(DbContext? context, CancellationToken cancellationToken = default)
     {
         if (context == null) return;
+        var userId = userContext.UserIdOrNull ?? 
+                     await systemIdExtractor.ExtractSystemId(cancellationToken);
 
         var modified = context.ChangeTracker
             .Entries<IAuditable>()
@@ -35,8 +39,8 @@ public class AuditableEntitySaveChangesInterceptor(IUserContext userContext) : S
         foreach (var entry in modified)
         {
             if (entry.State == EntityState.Added)
-                entry.Entity.SetCreatedUser(userContext.UserId);
-            entry.Entity.Touch(userContext.UserId);
+                entry.Entity.SetCreatedUser(userId);
+            entry.Entity.Touch(userId);
         }
     }
 }

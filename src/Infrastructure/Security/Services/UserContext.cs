@@ -10,12 +10,9 @@ public sealed class UserContext : IUserContext
 
     public UserContext(IHttpContextAccessor accessor)
     {
-        var httpContext = accessor.HttpContext
-            ?? throw new InvalidOperationException("Http context is not available.");
+        var principal = accessor.HttpContext?.User;
 
-        var principal = httpContext.User;
-
-        IsAuthenticated = principal.Identity?.IsAuthenticated == true;
+        IsAuthenticated = principal?.Identity?.IsAuthenticated == true;
 
         if (!IsAuthenticated)
         {
@@ -25,9 +22,9 @@ public sealed class UserContext : IUserContext
             return;
         }
 
-        _userId = GetUserId(principal);
-        Roles = GetRoles(principal);
-        Permissions = GetPermissions(principal);
+        _userId = GetUserId(principal!);
+        Roles = GetRoles(principal!);
+        Permissions = GetPermissions(principal!);
     }
 
     public bool IsAuthenticated { get; }
@@ -35,6 +32,8 @@ public sealed class UserContext : IUserContext
     public Guid UserId => IsAuthenticated && _userId.HasValue
         ? _userId.Value
         : throw new UnauthorizedAccessException("Пользователь не авторизован.");
+
+    public Guid? UserIdOrNull => _userId;
 
     public IReadOnlySet<string> Roles { get; }
 
