@@ -31,22 +31,26 @@ public static class BuilderExtensions
     public static async Task<IReadOnlyCollection<T>> BuildManyCombinedAndAddToDb<T>(
         DbContext context,
         int count,
+        bool saveChanges = true,
         params IBuilder<T>[] builders) where T : class
     {
         var entities = new List<T>();
         foreach (var builder in builders)
             entities.AddRange(builder.BuildMany(count));
-
+        
         await context.AddRangeAsync(entities);
-        await context.SaveChangesAsync();
+
+        if (saveChanges)
+            await context.SaveChangesAsync();
         return entities;
     }
 
     public static Task<IReadOnlyCollection<T>> BuildManyCombinedAndAddToDb<T>(
         this IEnumerable<IBuilder<T>> builders,
         DbContext context,
-        int count) where T : class
+        int count,
+        bool saveChanges = true) where T : class
     {
-        return BuildManyCombinedAndAddToDb(context, count, builders.ToArray());
+        return BuildManyCombinedAndAddToDb(context, count, saveChanges, builders.ToArray());
     }
 }

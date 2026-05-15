@@ -32,26 +32,26 @@ public class BalanceTestContext(
         var users = Users;
         var currency = Currencies.First();
 
+        var senderBalance = new UserBalanceBuilder(Faker)
+            .WithUserId(users[0].Id)
+            .WithCurrencyId(currency.Id)
+            .Build();
+
+        var receiverBalance = new UserBalanceBuilder(Faker)
+            .WithUserId(users[1].Id)
+            .WithCurrencyId(currency.Id)
+            .Build();
+
         var transaction = new TransactionBuilder(Faker)
             .WithSenderId(users[0].Id)
             .WithReceiverId(users[1].Id)
             .WithCurrencyId(currency.Id)
             .WithAmount(100m)
             .WithTransactionDateTime(DateTime.UtcNow.AddDays(-2))
+            .WithBalances(senderBalance, receiverBalance)
             .Completed()
+            .Applied()
             .Build();
-
-        var senderBalance = new UserBalanceBuilder(Faker)
-            .WithUserId(transaction.SenderId)
-            .WithCurrencyId(transaction.CurrencyId)
-            .Build();
-
-        var receiverBalance = new UserBalanceBuilder(Faker)
-            .WithUserId(transaction.ReceiverId)
-            .WithCurrencyId(transaction.CurrencyId)
-            .Build();
-
-        transaction.Apply(senderBalance, receiverBalance);
 
         await DbContext.AddRangeAsync([transaction, senderBalance, receiverBalance], cancellationToken);
         await DbContext.SaveChangesAsync(cancellationToken);

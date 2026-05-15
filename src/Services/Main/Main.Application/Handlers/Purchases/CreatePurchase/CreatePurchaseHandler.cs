@@ -5,13 +5,12 @@ using Application.Common.Interfaces.Repositories;
 using Application.Common.Interfaces.Settings;
 using Attributes;
 using Main.Application.Dtos.Amw.Purchase;
-using Main.Application.Dtos.Logistics;
 using Main.Application.Dtos.Storage;
 using Main.Application.Extensions;
 using Main.Application.Handlers.Balance.CreateTransaction;
-using Main.Application.Handlers.Logistics.CalculateDeliveryCost;
 using Main.Application.Handlers.StorageContents.AddContent;
 using Main.Application.Interfaces.Persistence;
+using Main.Application.Interfaces.Services;
 using Main.Entities.Balance;
 using Main.Entities.Exceptions.Auth;
 using Main.Entities.Purchase;
@@ -41,6 +40,7 @@ public class CreatePurchaseHandler(
     ISender sender,
     ISettingsService settingsService,
     IUserRepository userRepository,
+    IPurchaseLogisticsService purchaseLogisticsService,
     IUnitOfWork unitOfWork) : ICommandHandler<CreatePurchaseCommand>
 {
     public async Task<Unit> Handle(CreatePurchaseCommand request, CancellationToken cancellationToken)
@@ -125,7 +125,7 @@ public class CreatePurchaseHandler(
         IReadOnlyList<StorageContent> storageContents,
         CancellationToken cancellationToken)
     {
-        Dictionary<PurchaseContent, LogisticsItemDto> toCalculate = [];
+        List<PurchaseLogisticsItem> toCalculate = [];
         var purchase = Purchase.Create(
             request.SupplierId,
             request.CurrencyId,
@@ -154,76 +154,21 @@ public class CreatePurchaseHandler(
             purchase.AddContent(purchaseContent);
 
             if (request.WithLogistics && content.CalculateLogistics)
-                toCalculate[purchaseContent] = new LogisticsItemDto
-                {
-                    ProductId = content.ProductId,
-                    Quantity = content.Count
-                };
+                toCalculate.Add(new PurchaseLogisticsItem(
+                    purchaseContent,
+                    content.ProductId,
+                    content.Count));
         }
 
-        if (toCalculate.Count != 0)
-        {
-            var deliveryCost = await CalculateDelivery(toCalculate.Values, request, cancellationToken);
-            StorageRouteDto route = deliveryCost.Route;
-
-            int index = 0;
-            foreach (var (purchaseContent, _) in toCalculate)
-            {
-                var calcResult = deliveryCost.DeliveryCost.Items[index++];
-                purchaseContent.SetLogistic(calcResult.Weight, calcResult.AreaM3, calcResult.Cost);
-            }
-
-            Transaction? logisticsPayment = null;
-            if (route.CarrierId != null)
-            {
-                User carrier = await userRepository.EnsureExistAsync(
-                    key: route.CarrierId.Value,
-                    errorFactory: id => new UserNotFoundException(id),
-                    ct: cancellationToken);
-                
-                logisticsPayment = (await sender.Send(
-                        new CreateTransactionCommand(
-                            carrier.Id,
-                            systemId,
-                            deliveryCost.DeliveryCost.TotalCost,
-                            route.Currency.Id,
-                            request.PurchaseDate), cancellationToken))
-                    .Transaction;
-                
-                await unitOfWork.SaveChangesAsync(cancellationToken);
-            }
-            
-            purchase.SetPurchaseLogistic(
-                route.Id,
-                route.Currency.Id,
-                route.PricingModel,
-                route.RouteType,
-                route.PricePerKg,
-                route.PricePerM3,
-                route.PricePerOrder,
-                route.MinimumPrice,
-                logisticsPayment?.Id,
-                deliveryCost.DeliveryCost.MinimalPriceApplied);
-        }
+        await purchaseLogisticsService.ApplyAsync(
+            purchase,
+            toCalculate,
+            request.StorageFrom,
+            request.PurchaseDate,
+            systemId,
+            cancellationToken);
         
         purchase.Complete();
         await unitOfWork.AddAsync(purchase, cancellationToken);
-    }
-
-    private async Task<CalculateDeliveryCostResult> CalculateDelivery(
-        IEnumerable<LogisticsItemDto> toCalculate,
-        CreatePurchaseCommand request,
-        CancellationToken cancellationToken)
-    {
-        if (request.StorageFrom == null)
-            throw new InvalidOperationException("Storage from must be set, when calculation logistics.");
-        
-        var calculateCommand = new CalculateDeliveryCostQuery(
-            request.StorageFrom,
-            request.StorageName,
-            toCalculate,
-            LogisticsCalculationMode.Strict);
-        
-        return await sender.Send(calculateCommand, cancellationToken);
     }
 }

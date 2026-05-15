@@ -80,7 +80,7 @@ public static class RepositoryExtensions
         => await repository.EnsureExistCoreAsync(
             key, 
             errorFactory, 
-            criteriaBuilder?.ForUpdate() ?? Criteria<TEntity>.New().ForUpdate(), 
+            criteriaBuilder?.Track().ForUpdate() ?? Criteria<TEntity>.New().Track().ForUpdate(), 
             ct);
     
     public static async Task<TEntity> EnsureExistAsync<TEntity, TKey>(

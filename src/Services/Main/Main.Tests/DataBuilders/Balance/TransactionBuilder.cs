@@ -1,5 +1,6 @@
 using Bogus;
 using Main.Entities.Balance;
+using Main.Entities.User;
 using Main.Enums;
 using Test.Common.Abstractions;
 
@@ -14,6 +15,9 @@ public class TransactionBuilder(Faker faker) : BuilderBase<Transaction>(faker)
     public decimal? Amount { get; private set; }
     public DateTime? TransactionDateTime { get; private set; }
     public bool CompleteTransaction { get; private set; }
+    public bool ApplyTransaction { get; private set; }
+    public UserBalance? SenderBalance { get; private set; }
+    public UserBalance? ReceiverBalance { get; private set; }
 
     public TransactionBuilder WithSenderId(Guid senderId)
     {
@@ -57,6 +61,19 @@ public class TransactionBuilder(Faker faker) : BuilderBase<Transaction>(faker)
         return this;
     }
 
+    public TransactionBuilder WithBalances(UserBalance senderBalance, UserBalance receiverBalance)
+    {
+        SenderBalance = senderBalance;
+        ReceiverBalance = receiverBalance;
+        return this;
+    }
+
+    public TransactionBuilder Applied()
+    {
+        ApplyTransaction = true;
+        return this;
+    }
+
     public override Transaction Build()
     {
         var transaction = Transaction.Create(
@@ -69,6 +86,14 @@ public class TransactionBuilder(Faker faker) : BuilderBase<Transaction>(faker)
 
         if (CompleteTransaction)
             transaction.Complete();
+
+        if (ApplyTransaction)
+        {
+            if (SenderBalance is null || ReceiverBalance is null)
+                throw new InvalidOperationException("Balances must be set before applying transaction.");
+
+            transaction.Apply(SenderBalance, ReceiverBalance);
+        }
 
         return transaction;
     }

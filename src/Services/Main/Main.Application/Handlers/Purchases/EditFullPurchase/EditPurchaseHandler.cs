@@ -7,12 +7,14 @@ using Application.Common.Interfaces.Repositories;
 using Application.Common.Interfaces.Settings;
 using Attributes;
 using Main.Application.Dtos.Amw.Purchase;
-using Main.Application.Dtos.Logistics;
 using Main.Application.Extensions;
+using Main.Application.Extensions.Repository;
 using Main.Application.Handlers.Balance.CreateTransaction;
 using Main.Application.Handlers.Balance.ReverseTransaction;
 using Main.Application.Handlers.Logistics.CalculateDeliveryCost;
+using Main.Application.Handlers.StorageContents.SubtractContent;
 using Main.Application.Interfaces.Persistence;
+using Main.Application.Interfaces.Services;
 using Main.Entities.Balance;
 using Main.Entities.Event;
 using Main.Entities.Exceptions.Products;
@@ -32,7 +34,7 @@ namespace Main.Application.Handlers.Purchases.EditFullPurchase;
 [Transactional(IsolationLevel.ReadCommitted, 20, 2)]
 public record EditPurchaseCommand(
     IEnumerable<EditPurchaseDto> Content,
-    string PurchaseId,
+    Guid PurchaseId,
     int CurrencyId,
     string? Comment,
     DateTime PurchaseDateTime,
@@ -44,15 +46,18 @@ public class EditPurchaseHandler(
     ISender sender,
     ISettingsService settingsService,
     IRepository<Purchase, Guid> purchaseRepository,
+    IRepository<PurchaseContent, int> purchaseContentRepository,
+    IRepository<PurchaseLogistic, Guid> purchaseLogisticRepository,
     IRepository<StorageOwner, (string, Guid)> storageOwnerRepository,
     IStorageContentRepository storageContentRepository,
     IProductRepository productRepository,
     ICurrencyConverter currencyConverter,
+    IPurchaseLogisticsService purchaseLogisticsService,
     IUnitOfWork unitOfWork) : ICommandHandler<EditPurchaseCommand>
 {
     public async Task<Unit> Handle(EditPurchaseCommand request, CancellationToken cancellationToken)
     {
-        var purchaseId = ParsePurchaseId(request.PurchaseId);
+        var purchaseId = request.PurchaseId;
         var purchase = await GetPurchase(purchaseId, cancellationToken);
         var contentDtos = request.Content.ToList();
 
@@ -79,13 +84,6 @@ public class EditPurchaseHandler(
         return Unit.Value;
     }
 
-    private static Guid ParsePurchaseId(string purchaseId)
-    {
-        return Guid.TryParse(purchaseId, out var parsed)
-            ? parsed
-            : throw new PurchaseNotFoundException(Guid.Empty);
-    }
-
     private async Task<Guid> GetSystemUserId(CancellationToken cancellationToken)
     {
         return (await settingsService.GetOrDefault<GlobalApplicationSetting>(cancellationToken))
@@ -95,16 +93,17 @@ public class EditPurchaseHandler(
 
     private async Task<Purchase> GetPurchase(Guid purchaseId, CancellationToken cancellationToken)
     {
-        var criteria = Criteria<Purchase>.New()
-            .Where(x => x.Id == purchaseId)
-            .Include(x => x.Contents)
-            .Include(x => x.PurchaseLogistic)
-            .Track()
-            .ForUpdate()
-            .Build();
+        var purchase = await purchaseRepository.GetPurchaseForUpdate(purchaseId, cancellationToken);
 
-        return await purchaseRepository.FirstOrDefaultAsync(criteria, cancellationToken)
-               ?? throw new PurchaseNotFoundException(purchaseId);
+        await purchaseContentRepository.GetPurchaseContents(purchaseId, cancellationToken);
+        await purchaseLogisticRepository.FirstOrDefaultAsync(
+            Criteria<PurchaseLogistic>.New()
+                .Where(x => x.PurchaseId == purchaseId)
+                .Track()
+                .Build(),
+            cancellationToken);
+
+        return purchase;
     }
 
     private async Task EnsureStorageOwner(
@@ -182,7 +181,6 @@ public class EditPurchaseHandler(
 
         var storageContentIds = purchase.Contents
             .Select(x => x.StorageContentId)
-            .OfType<int>()
             .ToHashSet();
 
         var storageContents = storageContentIds.Count == 0
@@ -195,7 +193,7 @@ public class EditPurchaseHandler(
         var storageEvents = new List<Event>();
 
         foreach (var removed in purchase.Contents.Where(x => !requestedIds.Contains(x.Id)).ToList())
-            RemoveContent(purchase, removed, storageContents, products, storageEvents);
+            await RemoveContent(purchase, removed, cancellationToken);
 
         foreach (var dto in contentDtos)
         {
@@ -218,23 +216,20 @@ public class EditPurchaseHandler(
         await unitOfWork.AddRangeAsync(storageEvents, cancellationToken);
     }
 
-    private void RemoveContent(
+    private async Task RemoveContent(
         Purchase purchase,
         PurchaseContent content,
-        Dictionary<int, StorageContent> storageContents,
-        Dictionary<int, Product> products,
-        List<Event> storageEvents)
+        CancellationToken cancellationToken)
     {
         if (content.PurchaseContentLogistic is { } logistic)
             unitOfWork.Remove(logistic);
 
-        if (content.StorageContentId is { } storageContentId &&
-            storageContents.TryGetValue(storageContentId, out var storageContent))
-        {
-            storageEvents.Add(StorageMovementEvent.Create(storageContent, StorageMovementType.StorageContentDeletion));
-            products[storageContent.ProductId].IncreaseStock(-storageContent.Count);
-            storageContent.SetCount(0);
-        }
+        await sender.Send(
+            new SubtractStorageContentsCommand(
+                content.StorageContentId,
+                content.Count,
+                StorageMovementType.PurchaseDeletion),
+            cancellationToken);
 
         purchase.RemoveContent(content);
         unitOfWork.Remove(content);
@@ -293,19 +288,30 @@ public class EditPurchaseHandler(
         if (content.ProductId != dto.ProductId)
             throw new ArticleDoesntMatchContentException(content.Id);
 
-        if (content.StorageContentId is not { } storageContentId ||
-            !storageContents.TryGetValue(storageContentId, out var storageContent))
-            throw new StorageContentNotFoundException(content.StorageContentId ?? 0);
+        if (!storageContents.TryGetValue(content.StorageContentId, out var storageContent))
+            throw new StorageContentNotFoundException(content.StorageContentId);
 
-        storageEvents.Add(StorageMovementEvent.Create(storageContent, StorageMovementType.StorageContentEditing));
-
-        products[content.ProductId].IncreaseStock(dto.Count - content.Count);
+        var countDelta = dto.Count - content.Count;
+        if (countDelta < 0)
+        {
+            await sender.Send(
+                new SubtractStorageContentsCommand(
+                    content.StorageContentId,
+                    -countDelta,
+                    StorageMovementType.PurchaseEditing),
+                cancellationToken);
+        }
+        else if (countDelta > 0)
+        {
+            storageEvents.Add(StorageMovementEvent.Create(storageContent, StorageMovementType.PurchaseEditing));
+            products[content.ProductId].IncreaseStock(countDelta);
+            storageContent.IncreaseCount(countDelta);
+        }
 
         content.SetCount(dto.Count);
         content.SetPrice(dto.Price);
         content.SetComment(dto.Comment);
 
-        storageContent.SetCount(dto.Count);
         storageContent.SetCurrencyId(request.CurrencyId);
         storageContent.SetPurchaseDate(request.PurchaseDateTime);
         storageContent.SetBuyPrice(
@@ -324,78 +330,18 @@ public class EditPurchaseHandler(
                 contentDtos.Where(x => request.WithLogistics && x.CalculateLogistics),
                 purchaseContent => purchaseContent.ProductId,
                 dto => dto.ProductId,
-                (purchaseContent, dto) => new
-                {
-                    PurchaseContent = purchaseContent,
-                    Item = new LogisticsItemDto
-                    {
-                        ProductId = dto.ProductId,
-                        Quantity = dto.Count
-                    }
-                })
+                (purchaseContent, dto) => new PurchaseLogisticsItem(
+                    purchaseContent,
+                    dto.ProductId,
+                    dto.Count))
             .ToList();
 
-        if (toCalculate.Count == 0)
-        {
-            ClearLogistics(purchase);
-            return;
-        }
-
-        if (request.StorageFrom == null)
-            throw new InvalidOperationException("Storage from must be set, when calculation logistics.");
-
-        var deliveryCost = await sender.Send(
-            new CalculateDeliveryCostQuery(
-                request.StorageFrom,
-                purchase.Storage,
-                toCalculate.Select(x => x.Item),
-                LogisticsCalculationMode.Strict),
+        await purchaseLogisticsService.ApplyAsync(
+            purchase,
+            toCalculate,
+            request.StorageFrom,
+            request.PurchaseDateTime,
+            await GetSystemUserId(cancellationToken),
             cancellationToken);
-
-        var route = deliveryCost.Route;
-        for (var i = 0; i < toCalculate.Count; i++)
-        {
-            var calcResult = deliveryCost.DeliveryCost.Items[i];
-            toCalculate[i].PurchaseContent.SetLogistic(
-                calcResult.Weight,
-                calcResult.AreaM3,
-                calcResult.Cost);
-        }
-
-        foreach (var content in purchase.Contents.Except(toCalculate.Select(x => x.PurchaseContent)).ToList())
-            if (content.ClearLogistic() is { } logistic)
-                unitOfWork.Remove(logistic);
-
-        Transaction? logisticsPayment = null;
-        if (route.CarrierId is not null)
-            logisticsPayment = await CreateTransaction(
-                route.CarrierId.Value,
-                await GetSystemUserId(cancellationToken),
-                deliveryCost.DeliveryCost.TotalCost,
-                route.Currency.Id,
-                request.PurchaseDateTime,
-                cancellationToken);
-
-        purchase.SetPurchaseLogistic(
-            route.Id,
-            route.Currency.Id,
-            route.PricingModel,
-            route.RouteType,
-            route.PricePerKg,
-            route.PricePerM3,
-            route.PricePerOrder,
-            route.MinimumPrice,
-            logisticsPayment?.Id,
-            deliveryCost.DeliveryCost.MinimalPriceApplied);
-    }
-
-    private void ClearLogistics(Purchase purchase)
-    {
-        foreach (var content in purchase.Contents)
-            if (content.ClearLogistic() is { } logistic)
-                unitOfWork.Remove(logistic);
-
-        if (purchase.ClearPurchaseLogistic() is { } purchaseLogistic)
-            unitOfWork.Remove(purchaseLogistic);
     }
 }

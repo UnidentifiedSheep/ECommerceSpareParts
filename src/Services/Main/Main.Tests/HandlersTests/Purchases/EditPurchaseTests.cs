@@ -1,18 +1,17 @@
 using Enums;
 using FluentAssertions;
 using Main.Application.Dtos.Amw.Purchase;
-using Main.Application.Handlers.Purchases.CreateFullPurchase;
 using Main.Application.Handlers.Purchases.EditFullPurchase;
+using Main.Application.Handlers.StorageContents.SubtractContent;
 using Main.Entities.Product;
+using Main.Entities.Purchase;
 using Main.Entities.Storage;
-using Main.Entities.User;
 using Main.Enums;
 using Microsoft.EntityFrameworkCore;
-using Test.Common.Extensions;
 using Test.Common.TestContainers.Combined;
-using Tests.DataBuilders.User;
 using Tests.TestContexts;
 using Tests.TestContexts.Currency;
+using Tests.TestContexts.Purchase;
 using Tests.TestContexts.Storage;
 using ValidationException = FluentValidation.ValidationException;
 
@@ -20,38 +19,18 @@ namespace Tests.HandlersTests.Purchases;
 
 public class EditPurchaseTests : IntegrationTest
 {
-    private User _supplier = null!;
-
     public EditPurchaseTests(CombinedContainerFixture fixture) : base(fixture)
     {
-        RegisterBasicContext<ProductTestContext>();
-        RegisterBasicContext<CurrencyRatesTestContext>();
-        RegisterBasicContext<StorageTestContext>();
-        RegisterBasicContext<StorageRouteTestContext>();
-    }
-
-    public override async Task InitializeAsync()
-    {
-        await base.InitializeAsync();
-
-        _supplier = await new SupplierUserBuilder(Faker)
-            .BuildAndAddToDb(Context);
+        RegisterBasicContext<PurchaseTestContext>();
+        RegisterBasicContext<ProductMeasurementsTestContext>();
     }
 
     [Fact]
     public async Task EditPurchase_ValidContent_UpdatesPurchaseStorageAndTransaction()
     {
         var currency = GetContext<CurrencyTestContext>().Currencies[0];
-        var storage = GetContext<StorageTestContext>().Storages.First();
-        var product = GetContext<ProductTestContext>().Products.First();
-        await Mediator.Send(CreateCommand(
-            currency.Id,
-            storage.Name,
-            [NewContent(product, count: 2)]));
-
-        var purchase = await Context.Purchases
-            .Include(x => x.Contents)
-            .SingleAsync();
+        var purchase = PurchaseContext.Purchase;
+        var product = PurchaseContext.Product;
         var content = purchase.Contents.Single();
         var oldTransactionId = purchase.TransactionId;
 
@@ -66,7 +45,7 @@ public class EditPurchaseTests : IntegrationTest
                     Comment = "updated"
                 }
             ],
-            purchase.Id.ToString(),
+            purchase.Id,
             currency.Id,
             "edited purchase",
             DateTime.UtcNow,
@@ -112,16 +91,8 @@ public class EditPurchaseTests : IntegrationTest
     public async Task EditPurchase_AddAndRemoveContent_UpdatesPurchaseAndStorage()
     {
         var currency = GetContext<CurrencyTestContext>().Currencies[0];
-        var storage = GetContext<StorageTestContext>().Storages.First();
         var products = GetContext<ProductTestContext>().Products.Take(2).ToList();
-        await Mediator.Send(CreateCommand(
-            currency.Id,
-            storage.Name,
-            [NewContent(products[0], count: 2)]));
-
-        var purchase = await Context.Purchases
-            .Include(x => x.Contents)
-            .SingleAsync();
+        var purchase = PurchaseContext.Purchase;
         var removedStorageContentId = purchase.Contents.Single().StorageContentId;
 
         var editCommand = new EditPurchaseCommand(
@@ -133,7 +104,7 @@ public class EditPurchaseTests : IntegrationTest
                     Price = 15m
                 }
             ],
-            purchase.Id.ToString(),
+            purchase.Id,
             currency.Id,
             null,
             DateTime.UtcNow,
@@ -159,21 +130,65 @@ public class EditPurchaseTests : IntegrationTest
     }
 
     [Fact]
+    public async Task EditPurchase_WhenPartOfStorageContentAlreadyUsed_DecreaseSubtractsOnlyDeltaFromRemainingStock()
+    {
+        var currency = GetContext<CurrencyTestContext>().Currencies[0];
+        var purchase = PurchaseContext.Purchase;
+        var product = PurchaseContext.Product;
+        var content = purchase.Contents.Single();
+        var storageContentId = content.StorageContentId;
+        content.SetCount(10);
+        PurchaseContext.StorageContent.IncreaseCount(8);
+        product.IncreaseStock(8);
+        await Context.SaveChangesAsync();
+
+        await Mediator.Send(new SubtractStorageContentsCommand(
+            storageContentId,
+            5,
+            StorageMovementType.Sale));
+
+        await Mediator.Send(new EditPurchaseCommand(
+            [
+                new EditPurchaseDto
+                {
+                    Id = content.Id,
+                    ProductId = product.Id,
+                    Count = 8,
+                    Price = 10m
+                }
+            ],
+            purchase.Id,
+            currency.Id,
+            null,
+            DateTime.UtcNow,
+            GetContext<UserContextTestContext>().SystemUser.Id,
+            false,
+            null));
+
+        var updatedPurchaseContent = await Context.PurchaseContents
+            .AsNoTracking()
+            .SingleAsync();
+        var updatedStorageContent = await Context.StorageContents
+            .AsNoTracking()
+            .SingleAsync(x => x.Id == storageContentId);
+        var updatedProduct = await Context.Products
+            .AsNoTracking()
+            .SingleAsync(x => x.Id == product.Id);
+
+        updatedPurchaseContent.Count.Should().Be(8);
+        updatedStorageContent.Count.Should().Be(3);
+        updatedProduct.Stock.Value.Should().Be(3);
+    }
+
+    [Fact]
     public async Task EditPurchase_WithLogistics_CreatesPurchaseLogistics()
     {
         var currency = GetContext<CurrencyTestContext>().Currencies[0];
         var route = GetContext<StorageRouteTestContext>().ActiveRoute;
-        var product = GetContext<ProductTestContext>().Products.First();
-        await Mediator.Send(CreateCommand(
-            currency.Id,
-            route.ToStorageName,
-            [NewContent(product, count: 2)]));
-
-        var purchase = await Context.Purchases
-            .Include(x => x.Contents)
-            .SingleAsync();
+        var purchase = PurchaseContext.Purchase;
+        var product = PurchaseContext.Product;
         var content = purchase.Contents.Single();
-        await AddLogisticsDependencies(product, route, _supplier.Id);
+        await AddStorageOwner(route, PurchaseContext.Supplier.Id);
 
         var editCommand = new EditPurchaseCommand(
             [
@@ -186,7 +201,7 @@ public class EditPurchaseTests : IntegrationTest
                     CalculateLogistics = true
                 }
             ],
-            purchase.Id.ToString(),
+            purchase.Id,
             currency.Id,
             null,
             DateTime.UtcNow,
@@ -209,6 +224,58 @@ public class EditPurchaseTests : IntegrationTest
     }
 
     [Fact]
+    public async Task EditPurchase_WhenLogisticsDisabled_ClearsPurchaseLogistics()
+    {
+        var currency = GetContext<CurrencyTestContext>().Currencies[0];
+        var route = GetContext<StorageRouteTestContext>().ActiveRoute;
+        var purchase = PurchaseContext.Purchase;
+        var product = PurchaseContext.Product;
+        var content = purchase.Contents.Single();
+        content.SetLogistic(1m, 1m, 1m);
+        purchase.SetPurchaseLogistic(
+            route.Id,
+            route.CurrencyId,
+            route.PricingModel,
+            route.RouteType,
+            route.PriceKg,
+            route.PricePerM3,
+            route.PricePerOrder,
+            route.MinimumPrice,
+            null,
+            false);
+        await Context.SaveChangesAsync();
+
+        await Mediator.Send(new EditPurchaseCommand(
+            [
+                new EditPurchaseDto
+                {
+                    Id = content.Id,
+                    ProductId = product.Id,
+                    Count = content.Count,
+                    Price = content.Price,
+                    CalculateLogistics = false
+                }
+            ],
+            purchase.Id,
+            currency.Id,
+            null,
+            DateTime.UtcNow,
+            GetContext<UserContextTestContext>().SystemUser.Id,
+            false,
+            null));
+
+        var updatedPurchase = await Context.Purchases
+            .Include(x => x.PurchaseLogistic)
+            .Include(x => x.Contents)
+            .ThenInclude(x => x.PurchaseContentLogistic)
+            .AsNoTracking()
+            .SingleAsync();
+
+        updatedPurchase.PurchaseLogistic.Should().BeNull();
+        updatedPurchase.Contents.Single().PurchaseContentLogistic.Should().BeNull();
+    }
+
+    [Fact]
     public async Task EditPurchase_WithDuplicateContentIds_ThrowsValidationException()
     {
         var command = new EditPurchaseCommand(
@@ -216,7 +283,7 @@ public class EditPurchaseTests : IntegrationTest
                 new EditPurchaseDto { Id = 1, ProductId = 1, Count = 1, Price = 10m },
                 new EditPurchaseDto { Id = 1, ProductId = 1, Count = 1, Price = 10m }
             ],
-            Guid.NewGuid().ToString(),
+            Guid.NewGuid(),
             GetContext<CurrencyTestContext>().Currencies[0].Id,
             null,
             DateTime.UtcNow,
@@ -227,40 +294,11 @@ public class EditPurchaseTests : IntegrationTest
         await Assert.ThrowsAsync<ValidationException>(() => Mediator.Send(command));
     }
 
-    private CreatePurchaseCommand CreateCommand(
-        int currencyId,
-        string storageName,
-        IEnumerable<NewPurchaseContentDto> contents)
+    private async Task AddStorageOwner(StorageRoute route, Guid supplierId)
     {
-        return new CreatePurchaseCommand(
-            GetContext<UserContextTestContext>().SystemUser.Id,
-            _supplier.Id,
-            currencyId,
-            storageName,
-            DateTime.UtcNow,
-            contents.ToList(),
-            null,
-            null,
-            false,
-            null);
-    }
-
-    private static NewPurchaseContentDto NewContent(Product product, int count)
-    {
-        return new NewPurchaseContentDto
-        {
-            ProductId = product.Id,
-            Count = count,
-            Price = 10m,
-            CalculateLogistics = false
-        };
-    }
-
-    private async Task AddLogisticsDependencies(Product product, StorageRoute route, Guid supplierId)
-    {
-        Context.ProductSizes.Add(ProductSize.Create(product.Id, 1m, 1m, 1m, DimensionUnit.Meter));
-        Context.ProductWeights.Add(ProductWeight.Create(product.Id, 2m, WeightUnit.Kilogram));
         Context.StorageOwners.Add(StorageOwner.Create(route.FromStorageName, supplierId));
         await Context.SaveChangesAsync();
     }
+
+    private PurchaseTestContext PurchaseContext => GetContext<PurchaseTestContext>();
 }

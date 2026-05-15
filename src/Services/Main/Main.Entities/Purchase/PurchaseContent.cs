@@ -12,7 +12,7 @@ public class PurchaseContent : Entity<PurchaseContent, int>, ILinqEntity<Purchas
     {
     }
 
-    private PurchaseContent(int productId, int count, decimal price, int? storageContentId)
+    private PurchaseContent(int productId, int count, decimal price, int storageContentId)
     {
         ProductId = productId;
         StorageContentId = storageContentId;
@@ -25,7 +25,7 @@ public class PurchaseContent : Entity<PurchaseContent, int>, ILinqEntity<Purchas
 
     public Guid PurchaseId { get; private set; }
     public int ProductId { get; private set; }
-    public int? StorageContentId { get; private set; }
+    public int StorageContentId { get; private set; }
     public int Count { get; private set; }
     public decimal Price { get; private set; }
     public decimal TotalSum { get; private set; }
@@ -37,7 +37,7 @@ public class PurchaseContent : Entity<PurchaseContent, int>, ILinqEntity<Purchas
         int productId,
         int count,
         decimal price,
-        int? storageContentId,
+        int storageContentId,
         string? comment = null)
     {
         var item = new PurchaseContent(productId, count, price, storageContentId);
@@ -71,7 +71,7 @@ public class PurchaseContent : Entity<PurchaseContent, int>, ILinqEntity<Purchas
         PurchaseId = purchaseId;
     }
 
-    public void SetStorageContentId(int? storageContentId)
+    public void SetStorageContentId(int storageContentId)
     {
         StorageContentId = storageContentId;
     }

@@ -58,6 +58,7 @@ public static class ServiceProvider
         collection.AddSingleton<ILogisticsCostService, LogisticsCostService>();
 
         collection.AddScoped<IBalanceService, BalanceService>();
+        collection.AddScoped<IPurchaseLogisticsService, PurchaseLogisticsService>();
         collection.AddScoped<ISaleService, SaleService>();
         collection.AddScoped<IUserTokenService, UserTokenService>();
         collection.AddScoped<IUserService, UserService>();

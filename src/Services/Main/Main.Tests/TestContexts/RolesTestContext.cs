@@ -21,6 +21,7 @@ public class RolesTestContext(DContext ctx) : TestContextBase<DContext>(ctx)
         Roles = await BuilderExtensions.BuildManyCombinedAndAddToDb(
             DbContext,
             1,
+            true,
             builders.ToArray());
     }
 }

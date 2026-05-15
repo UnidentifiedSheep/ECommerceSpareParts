@@ -23,7 +23,7 @@ public class PurchaseContentTests
             1,
             count,
             price,
-            null);
+            1);
 
         act.Should().Throw<InvalidOperationException>();
     }
@@ -175,6 +175,6 @@ public class PurchaseContentTests
             1,
             2,
             10m,
-            null);
+            2);
     }
 }

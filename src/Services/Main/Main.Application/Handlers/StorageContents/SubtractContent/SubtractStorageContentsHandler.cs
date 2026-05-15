@@ -2,7 +2,6 @@ using System.Data;
 using Abstractions.Interfaces.Services;
 using Application.Common.Interfaces;
 using Application.Common.Interfaces.Cqrs;
-using Application.Common.Interfaces.Repositories;
 using Attributes;
 using Contracts.Products;
 using Contracts.StorageContent;
@@ -13,7 +12,6 @@ using Main.Entities.Exceptions.Products;
 using Main.Entities.Exceptions.Storages;
 using Main.Entities.Storage;
 using Main.Enums;
-using MediatR;
 using Event = Main.Entities.Event.Event;
 
 namespace Main.Application.Handlers.StorageContents.SubtractContent;

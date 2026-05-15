@@ -39,7 +39,7 @@ public class PurchaseTests
             1,
             2,
             10m,
-            null);
+            3);
 
         typeof(PurchaseContent)
             .GetProperty("PurchaseId")!

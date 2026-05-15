@@ -21,7 +21,7 @@ public class EditPurchaseEndPoint : ICarterModule
     {
         app.MapPut("/purchases/{purchaseId}", async (
                 ISender sender,
-                string purchaseId,
+                Guid purchaseId,
                 EditPurchaseRequest request,
                 CancellationToken cancellationToken,
                 IUserContext user) =>

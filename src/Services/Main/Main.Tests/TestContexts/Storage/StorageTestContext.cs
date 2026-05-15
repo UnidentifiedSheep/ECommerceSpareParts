@@ -15,6 +15,7 @@ public class StorageTestContext(DContext ctx) : TestContextBase<DContext>(ctx)
         Storages = await BuilderExtensions.BuildManyCombinedAndAddToDb(
             DbContext,
             2,
+            true,
             new StorageBuilder(Faker).WithType(StorageType.Warehouse),
             new StorageBuilder(Faker).WithType(StorageType.SupplierStorage));
     }
