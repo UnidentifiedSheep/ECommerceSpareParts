@@ -11,12 +11,12 @@
         <PackageReference Include="BulkValidation.Base" Version="1.0.3"/>
         <PackageReference Include="BulkValidation.Core" Version="1.0.9"/>
         <PackageReference Include="Dapper" Version="2.1.72"/>
-        <PackageReference Include="FluentValidation" Version="12.1.0"/>
-        <PackageReference Include="FluentValidation.DependencyInjectionExtensions" Version="12.1.0"/>
+        <PackageReference Include="FluentValidation" Version="12.1.1" />
+        <PackageReference Include="FluentValidation.DependencyInjectionExtensions" Version="12.1.1" />
         <PackageReference Include="LinqKit.Microsoft.EntityFrameworkCore" Version="10.0.11"/>
-        <PackageReference Include="Mapster" Version="10.0.0-pre01"/>
+        <PackageReference Include="Mapster" Version="10.0.8-pre06" />
         <PackageReference Include="MassTransit.Abstractions" Version="8.5.8"/>
-        <PackageReference Include="MediatR" Version="14.0.0-beta-1"/>
+        <PackageReference Include="MediatR" Version="14.1.0" />
         <PackageReference Include="Scrutor" Version="7.0.0"/>
         <PackageReference Include="ZiggyCreatures.FusionCache" Version="2.6.0"/>
         <PackageReference Include="ZiggyCreatures.FusionCache.Serialization.SystemTextJson" Version="2.6.0"/>

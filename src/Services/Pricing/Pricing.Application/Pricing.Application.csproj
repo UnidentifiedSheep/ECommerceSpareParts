@@ -15,7 +15,7 @@
 
     <ItemGroup>
         <PackageReference Include="IntervalMap" Version="1.0.3"/>
-        <PackageReference Include="Mapster" Version="10.0.0-pre01"/>
+        <PackageReference Include="Mapster" Version="10.0.8-pre06" />
         <PackageReference Include="MassTransit" Version="8.5.8"/>
     </ItemGroup>
 
