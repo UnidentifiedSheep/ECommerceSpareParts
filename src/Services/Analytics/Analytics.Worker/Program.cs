@@ -5,6 +5,7 @@ using Analytics.Persistence.Context;
 using Analytics.Worker.Consumers;
 using Api.Common.Extensions;
 using Cache;
+using Common;
 using Localization.Abstractions.Models;
 using Localization.Domain.Extensions;
 using MassTransit;

@@ -9,6 +9,7 @@ using Api.Common.Middleware;
 using Api.Common.Models;
 using Cache;
 using Carter;
+using Common;
 using Localization.Abstractions.Models;
 using Localization.Domain.Extensions;
 using Localization.Domain.Middlewares;
@@ -113,7 +114,7 @@ builder.Services.AddCors(options =>
     });
 });
 
-builder.Services.AddCarter();
+builder.Services.AddCarter(configurator: c => c.WithEmptyValidators());
 builder.Services.AddBaseExceptionHandlers();
 
 builder.Services.AddTransient<HeaderSecretMiddleware>();

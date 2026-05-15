@@ -1,6 +1,7 @@
 ﻿using System.Reflection;
+using Microsoft.Extensions.Configuration;
 
-namespace Api.Common.Extensions;
+namespace Common;
 
 public static class ConfigurationBuilderExtensions
 {

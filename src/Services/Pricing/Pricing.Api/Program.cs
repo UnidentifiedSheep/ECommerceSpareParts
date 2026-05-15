@@ -6,6 +6,7 @@ using Api.Common.Models;
 using Api.Common.OperationFilters;
 using Cache;
 using Carter;
+using Common;
 using Contracts.Currency;
 using Contracts.Markup;
 using Contracts.Settings;
@@ -106,7 +107,6 @@ builder.Services
     .AddApplicationLayer()
     .AddLocalization(defaultLocale, locales);
 
-
 builder.Services.AddBaseExceptionHandlers();
 
 builder.Services.AddOpenTelemetry()
@@ -131,7 +131,9 @@ builder.Services.AddCors(options =>
 });
 
 var endpointAssembly = typeof(Program).Assembly;
-builder.Services.AddCarter(new DependencyContextAssemblyCatalog(endpointAssembly));
+builder.Services.AddCarter(
+    new DependencyContextAssemblyCatalog(endpointAssembly),
+    configurator: c => c.WithEmptyValidators());
 
 builder.Services.AddTransient<HeaderSecretMiddleware>();
 

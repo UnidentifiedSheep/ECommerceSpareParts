@@ -1,6 +1,6 @@
 ﻿using Abstractions.Interfaces.Validators;
 using Abstractions.Models;
-using Api.Common.Extensions;
+using Common;
 using Main.Migrator;
 using Main.Migrator.DataSeeds;
 using Main.Persistence.Context;

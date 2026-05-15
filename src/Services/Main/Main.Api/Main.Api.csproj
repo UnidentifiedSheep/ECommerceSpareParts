@@ -29,6 +29,7 @@
 
     <ItemGroup>
         <ProjectReference Include="..\..\..\Infrastructure\Cache\Cache.csproj"/>
+        <ProjectReference Include="..\..\..\Infrastructure\Common\Common.csproj" />
         <ProjectReference Include="..\..\..\Infrastructure\Integrations\ExchangeRate\ExchangeRate.csproj"/>
         <ProjectReference Include="..\..\..\Infrastructure\Mail\Mail.csproj"/>
         <ProjectReference Include="..\..\..\Infrastructure\RabbitMq\RabbitMq.csproj"/>

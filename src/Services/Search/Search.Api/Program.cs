@@ -7,6 +7,7 @@ using Api.Common.Middleware;
 using Api.Common.Models;
 using Api.Common.OperationFilters;
 using Carter;
+using Common;
 using Localization.Abstractions.Models;
 using Localization.Domain.Extensions;
 using Localization.Domain.Middlewares;
@@ -95,7 +96,9 @@ builder.Services.AddCors(options =>
 });
 
 var endpointAssembly = typeof(GetArticleRequest).Assembly;
-builder.Services.AddCarter(new DependencyContextAssemblyCatalog(endpointAssembly));
+builder.Services.AddCarter(
+    new DependencyContextAssemblyCatalog(endpointAssembly),
+    configurator: c => c.WithEmptyValidators());
 
 builder.Services.AddTransient<HeaderSecretMiddleware>();
 

@@ -27,6 +27,7 @@
         <ProjectReference Include="..\..\Core\Contracts\Contracts.csproj"/>
         <ProjectReference Include="..\..\Core\Domain\Domain.csproj"/>
         <ProjectReference Include="..\..\Core\Exceptions\Exceptions.csproj"/>
+        <ProjectReference Include="..\..\Core\Extensions\Extensions.csproj" />
         <ProjectReference Include="..\..\Infrastructure\Localization\Localization.Domain\Localization.Domain.csproj"/>
     </ItemGroup>
 

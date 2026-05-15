@@ -1,6 +1,4 @@
 ﻿using Application.Common;
-using Application.Common.Interfaces.Settings;
-using Application.Common.Services.Settings;
 using Microsoft.Extensions.DependencyInjection;
 using Pricing.Abstractions.Interfaces.Services;
 using Pricing.Abstractions.Interfaces.Services.Pricing;
@@ -15,9 +13,6 @@ public static class ServiceProvider
     public static IServiceCollection AddApplicationLayer(this IServiceCollection collection)
     {
         collection.AddApplicationBase(typeof(Global).Assembly);
-
-        collection.AddSingleton<ISettingsContainer, SettingsContainer>();
-        collection.AddTransient<ISettingsService, SettingsService>();
 
         collection.AddSingleton<IBasePriceStrategyFactory, BasePriceStrategyFactory>();
         collection.AddSingleton<IBasePriceStrategy, AverageBasePriceStrategy>();

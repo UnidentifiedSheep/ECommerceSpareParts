@@ -5,6 +5,7 @@ using Application.Common.Interfaces;
 using Application.Common.Interfaces.Currency;
 using Application.Common.Interfaces.Settings;
 using Application.Common.Validators;
+using Application.Common.Services.Settings;
 using Localization.Abstractions.Models;
 using Localization.Domain.Extensions;
 using Main.Application.Configs;
@@ -45,8 +46,10 @@ public static class ServiceProvider
         collection.AddSingleton(emailOptions ?? new UserEmailOptions());
         collection.AddSingleton(phoneOptions ?? new UserPhoneOptions());
 
-        collection.AddSingleton<ICurrencyConverter, CurrencyConverter>();
+        collection.AddScoped<ICurrencyConverter, CurrencyConverter>();
 
+        collection.AddSingleton<ISettingsContainer, SettingsContainer>();
+        collection.AddScoped<ISettingsService, SettingsService>();
         collection.AddSingleton<ISettingFactory, SettingFactory>();
 
         collection.AddSingleton<ILogisticsPricingStrategy, NonePricing>();

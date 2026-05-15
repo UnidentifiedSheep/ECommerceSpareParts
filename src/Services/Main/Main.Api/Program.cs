@@ -9,6 +9,7 @@ using Api.Common.OperationFilters;
 using Application.Common.Interfaces.Settings;
 using Cache;
 using Carter;
+using Common;
 using Contracts.Currency;
 using Contracts.Settings;
 using ExchangeRate;
@@ -23,6 +24,7 @@ using Main.Application.BackgroundServices;
 using Main.Application.Configs;
 using Main.Application.Consumers;
 using Main.Application.HangFireTasks;
+using Main.Application.Models;
 using Main.Cache;
 using Main.Persistence;
 using Main.Persistence.Context;
@@ -76,6 +78,11 @@ var brokerOptions = builder.Configuration
                         .Get<MessageBrokerOptions>()
                     ?? throw new NullReferenceException(
                         $"Missing {MessageBrokerOptions.SectionName} configuration options");
+
+builder.Services.AddSingleton(new JwtOptions(
+    builder.Configuration["JwtBearer:IssuerSigningKey"]!,
+    builder.Configuration["JwtBearer:ValidIssuer"]!,
+    TimeSpan.FromMilliseconds(builder.Configuration.GetValue<int>("JwtBearer:ValidDurationMs"))));
 
 var uniqQueueName = $"queue-of-main-{Environment.MachineName}";
 
@@ -171,7 +178,9 @@ builder.Services.AddCors(options =>
 });
 
 var endpointAssembly = typeof(AddProductContentEndPoint).Assembly;
-builder.Services.AddCarter(new DependencyContextAssemblyCatalog(endpointAssembly));
+builder.Services.AddCarter(
+    new DependencyContextAssemblyCatalog(endpointAssembly),
+    configurator: c => c.WithEmptyValidators());
 
 builder.Services.AddTransient<HeaderSecretMiddleware>();
 

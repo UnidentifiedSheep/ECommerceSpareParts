@@ -2,8 +2,6 @@
 using Application.Common.Backplane;
 using Application.Common.Behaviors;
 using Application.Common.Extensions;
-using Application.Common.Interfaces.Settings;
-using Application.Common.Services.Settings;
 using Microsoft.Extensions.DependencyInjection;
 using ZiggyCreatures.Caching.Fusion.Backplane;
 
@@ -20,9 +18,6 @@ public static class ServiceProvider
             .RegisterCachePolicies(assembly)
             .RegisterDbValidations(assembly)
             .RegisterFluentValidations(assembly);
-
-        services.AddSingleton<ISettingsContainer, SettingsContainer>();
-        services.AddScoped<ISettingsService, SettingsService>();
 
         services.AddSingleton<IBackplaneDispatcher, BackplaneDispatcher>();
         services.AddScoped<IFusionCacheBackplane, MassTransitBackplane>();
