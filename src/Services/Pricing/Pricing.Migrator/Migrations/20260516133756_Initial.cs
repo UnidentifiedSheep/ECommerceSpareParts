@@ -47,7 +47,11 @@ namespace Pricing.Migrator.Migrations
                         .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
                     name = table.Column<string>(type: "text", nullable: true),
                     is_auto_generated = table.Column<bool>(type: "boolean", nullable: false),
-                    currency_id = table.Column<int>(type: "integer", nullable: false)
+                    currency_id = table.Column<int>(type: "integer", nullable: false),
+                    created_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
+                    updated_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
+                    who_created = table.Column<Guid>(type: "uuid", nullable: true),
+                    who_updated = table.Column<Guid>(type: "uuid", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -76,7 +80,11 @@ namespace Pricing.Migrator.Migrations
                 columns: table => new
                 {
                     key = table.Column<string>(type: "text", nullable: false),
-                    value = table.Column<string>(type: "text", nullable: false)
+                    json = table.Column<string>(type: "jsonb", nullable: false),
+                    created_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
+                    updated_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
+                    who_created = table.Column<Guid>(type: "uuid", nullable: true),
+                    who_updated = table.Column<Guid>(type: "uuid", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -162,6 +170,16 @@ namespace Pricing.Migrator.Migrations
                 column: "currency_id");
 
             migrationBuilder.CreateIndex(
+                name: "pricing.entities.markupgroup_who_created_idx",
+                table: "markup_group",
+                column: "who_created");
+
+            migrationBuilder.CreateIndex(
+                name: "pricing.entities.markupgroup_who_updated_idx",
+                table: "markup_group",
+                column: "who_updated");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_markup_ranges_group_id",
                 table: "markup_ranges",
                 column: "group_id");
@@ -197,6 +215,16 @@ namespace Pricing.Migrator.Migrations
                 schema: "msg",
                 table: "OutboxState",
                 column: "Created");
+
+            migrationBuilder.CreateIndex(
+                name: "domain.commonentities.setting_who_created_idx",
+                table: "settings",
+                column: "who_created");
+
+            migrationBuilder.CreateIndex(
+                name: "domain.commonentities.setting_who_updated_idx",
+                table: "settings",
+                column: "who_updated");
         }
 
         /// <inheritdoc />

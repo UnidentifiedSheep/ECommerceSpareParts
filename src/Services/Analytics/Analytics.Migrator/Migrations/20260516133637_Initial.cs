@@ -15,17 +15,10 @@ namespace Analytics.Migrator.Migrations
             migrationBuilder.EnsureSchema(
                 name: "msg");
 
-            migrationBuilder.CreateTable(
-                name: "currencies",
-                columns: table => new
-                {
-                    id = table.Column<int>(type: "integer", nullable: false),
-                    to_usd = table.Column<decimal>(type: "numeric", nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("currencies_pk", x => x.id);
-                });
+            migrationBuilder.AlterDatabase()
+                .Annotation("Npgsql:PostgresExtension:dblink", ",,")
+                .Annotation("Npgsql:PostgresExtension:pg_trgm", ",,")
+                .Annotation("Npgsql:PostgresExtension:pgcrypto", ",,");
 
             migrationBuilder.CreateTable(
                 name: "InboxState",
@@ -55,18 +48,46 @@ namespace Analytics.Migrator.Migrations
                 name: "metric_calculation_jobs",
                 columns: table => new
                 {
-                    request_id = table.Column<Guid>(type: "uuid", nullable: false),
+                    request_id = table.Column<Guid>(type: "uuid", nullable: false, defaultValueSql: "gen_random_uuid()"),
                     metric_id = table.Column<Guid>(type: "uuid", nullable: true),
                     metric_system_name = table.Column<string>(type: "character varying(128)", maxLength: 128, nullable: false),
-                    status = table.Column<int>(type: "integer", maxLength: 50, nullable: false),
-                    create_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
-                    update_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
+                    status = table.Column<string>(type: "character varying(50)", maxLength: 50, nullable: false),
                     error_message = table.Column<string>(type: "character varying(512)", maxLength: 512, nullable: true),
-                    xmin = table.Column<uint>(type: "xid", rowVersion: true, nullable: false)
+                    xmin = table.Column<uint>(type: "xid", rowVersion: true, nullable: false),
+                    created_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
+                    updated_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
+                    who_created = table.Column<Guid>(type: "uuid", nullable: true),
+                    who_updated = table.Column<Guid>(type: "uuid", nullable: true)
                 },
                 constraints: table =>
                 {
                     table.PrimaryKey("request_id_pk", x => x.request_id);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "metrics",
+                columns: table => new
+                {
+                    id = table.Column<Guid>(type: "uuid", nullable: false, defaultValueSql: "gen_random_uuid()"),
+                    currency_id = table.Column<int>(type: "integer", nullable: false),
+                    range_start = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
+                    range_end = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
+                    recalculated_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
+                    discriminator = table.Column<string>(type: "character varying(21)", maxLength: 21, nullable: false),
+                    tags = table.Column<string>(type: "text", nullable: false),
+                    dimension_key = table.Column<string>(type: "character varying(200)", maxLength: 200, nullable: false),
+                    dimension_hash = table.Column<byte[]>(type: "bytea", nullable: false),
+                    depends_on = table.Column<string>(type: "text", nullable: false),
+                    json = table.Column<string>(type: "text", nullable: true),
+                    article_id = table.Column<int>(type: "integer", nullable: true),
+                    created_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
+                    updated_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
+                    who_created = table.Column<Guid>(type: "uuid", nullable: true),
+                    who_updated = table.Column<Guid>(type: "uuid", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("metrics_pk", x => x.id);
                 });
 
             migrationBuilder.CreateTable(
@@ -87,40 +108,10 @@ namespace Analytics.Migrator.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "metrics",
-                columns: table => new
-                {
-                    id = table.Column<Guid>(type: "uuid", nullable: false, defaultValueSql: "gen_random_uuid()"),
-                    currency_id = table.Column<int>(type: "integer", nullable: false),
-                    created_by = table.Column<Guid>(type: "uuid", nullable: false),
-                    created_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
-                    range_start = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
-                    range_end = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
-                    recalculated_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
-                    discriminator = table.Column<string>(type: "character varying(21)", maxLength: 21, nullable: false),
-                    tags = table.Column<long>(type: "bigint", nullable: false),
-                    dimension_key = table.Column<string>(type: "character varying(200)", maxLength: 200, nullable: false),
-                    dimension_hash = table.Column<byte[]>(type: "bytea", nullable: false),
-                    depends_on = table.Column<long>(type: "bigint", nullable: false),
-                    json = table.Column<string>(type: "text", nullable: true),
-                    article_id = table.Column<int>(type: "integer", nullable: true)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("metrics_pk", x => x.id);
-                    table.ForeignKey(
-                        name: "metrics_currencies_id_fk",
-                        column: x => x.currency_id,
-                        principalTable: "currencies",
-                        principalColumn: "id",
-                        onDelete: ReferentialAction.Restrict);
-                });
-
-            migrationBuilder.CreateTable(
                 name: "purchases_fact",
                 columns: table => new
                 {
-                    id = table.Column<string>(type: "text", nullable: false),
+                    id = table.Column<Guid>(type: "uuid", nullable: false),
                     currency_id = table.Column<int>(type: "integer", nullable: false),
                     supplier_id = table.Column<Guid>(type: "uuid", nullable: false),
                     created_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
@@ -130,12 +121,6 @@ namespace Analytics.Migrator.Migrations
                 constraints: table =>
                 {
                     table.PrimaryKey("purchases_fact_pk", x => x.id);
-                    table.ForeignKey(
-                        name: "purchases_fact_currencies_id_fk",
-                        column: x => x.currency_id,
-                        principalTable: "currencies",
-                        principalColumn: "id",
-                        onDelete: ReferentialAction.Restrict);
                 });
 
             migrationBuilder.CreateTable(
@@ -151,33 +136,40 @@ namespace Analytics.Migrator.Migrations
                 constraints: table =>
                 {
                     table.PrimaryKey("sale_content_detail_pk", x => x.id);
-                    table.ForeignKey(
-                        name: "sale_content_detail_currencies_id_fk",
-                        column: x => x.currency_id,
-                        principalTable: "currencies",
-                        principalColumn: "id",
-                        onDelete: ReferentialAction.Restrict);
                 });
 
             migrationBuilder.CreateTable(
                 name: "sales_fact",
                 columns: table => new
                 {
-                    id = table.Column<string>(type: "character varying(128)", maxLength: 128, nullable: false),
+                    id = table.Column<Guid>(type: "uuid", maxLength: 128, nullable: false),
                     currency_id = table.Column<int>(type: "integer", nullable: false),
                     buyer_id = table.Column<Guid>(type: "uuid", nullable: false),
+                    total_sum = table.Column<decimal>(type: "numeric", nullable: false),
                     created_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
-                    total_sum = table.Column<decimal>(type: "numeric", nullable: false)
+                    updated_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
+                    who_created = table.Column<Guid>(type: "uuid", nullable: true),
+                    who_updated = table.Column<Guid>(type: "uuid", nullable: true)
                 },
                 constraints: table =>
                 {
                     table.PrimaryKey("sales_fact_pk", x => x.id);
-                    table.ForeignKey(
-                        name: "sales_fact_currencies_id_fk",
-                        column: x => x.currency_id,
-                        principalTable: "currencies",
-                        principalColumn: "id",
-                        onDelete: ReferentialAction.Restrict);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "settings",
+                columns: table => new
+                {
+                    key = table.Column<string>(type: "text", nullable: false),
+                    json = table.Column<string>(type: "jsonb", nullable: false),
+                    created_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
+                    updated_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
+                    who_created = table.Column<Guid>(type: "uuid", nullable: true),
+                    who_updated = table.Column<Guid>(type: "uuid", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("settings_pk", x => x.key);
                 });
 
             migrationBuilder.CreateTable(
@@ -230,7 +222,7 @@ namespace Analytics.Migrator.Migrations
                 columns: table => new
                 {
                     id = table.Column<int>(type: "integer", nullable: false),
-                    purchase_id = table.Column<string>(type: "text", nullable: false),
+                    purchase_id = table.Column<Guid>(type: "uuid", nullable: false),
                     article_id = table.Column<int>(type: "integer", nullable: false),
                     price = table.Column<decimal>(type: "numeric", nullable: false),
                     count = table.Column<int>(type: "integer", nullable: false)
@@ -251,7 +243,7 @@ namespace Analytics.Migrator.Migrations
                 columns: table => new
                 {
                     id = table.Column<int>(type: "integer", nullable: false),
-                    sale_id = table.Column<string>(type: "character varying(128)", maxLength: 128, nullable: true),
+                    sale_id = table.Column<Guid>(type: "uuid", maxLength: 128, nullable: true),
                     article_id = table.Column<int>(type: "integer", nullable: false),
                     count = table.Column<int>(type: "integer", nullable: false),
                     price = table.Column<decimal>(type: "numeric", nullable: false),
@@ -274,9 +266,14 @@ namespace Analytics.Migrator.Migrations
                 column: "Delivered");
 
             migrationBuilder.CreateIndex(
-                name: "metrics_calc_jobs_created_at_index",
+                name: "analytics.entities.metriccalculationjob_who_created_idx",
                 table: "metric_calculation_jobs",
-                column: "create_at");
+                column: "who_created");
+
+            migrationBuilder.CreateIndex(
+                name: "analytics.entities.metriccalculationjob_who_updated_idx",
+                table: "metric_calculation_jobs",
+                column: "who_updated");
 
             migrationBuilder.CreateIndex(
                 name: "metrics_calc_jobs_metric_id_index",
@@ -290,14 +287,14 @@ namespace Analytics.Migrator.Migrations
                 columns: new[] { "status", "metric_system_name" });
 
             migrationBuilder.CreateIndex(
-                name: "metrics_created_at_index",
+                name: "analytics.entities.metrics.metric_who_created_idx",
                 table: "metrics",
-                column: "created_at");
+                column: "who_created");
 
             migrationBuilder.CreateIndex(
-                name: "metrics_created_by_index",
+                name: "analytics.entities.metrics.metric_who_updated_idx",
                 table: "metrics",
-                column: "created_by");
+                column: "who_updated");
 
             migrationBuilder.CreateIndex(
                 name: "metrics_currency_id_index",
@@ -399,19 +396,34 @@ namespace Analytics.Migrator.Migrations
                 column: "sale_id");
 
             migrationBuilder.CreateIndex(
+                name: "analytics.entities.salesfact_who_created_idx",
+                table: "sales_fact",
+                column: "who_created");
+
+            migrationBuilder.CreateIndex(
+                name: "analytics.entities.salesfact_who_updated_idx",
+                table: "sales_fact",
+                column: "who_updated");
+
+            migrationBuilder.CreateIndex(
                 name: "sales_fact_buyer_id_index",
                 table: "sales_fact",
                 column: "buyer_id");
 
             migrationBuilder.CreateIndex(
-                name: "sales_fact_created_at_index",
-                table: "sales_fact",
-                column: "created_at");
-
-            migrationBuilder.CreateIndex(
                 name: "sales_fact_currency_id_index",
                 table: "sales_fact",
                 column: "currency_id");
+
+            migrationBuilder.CreateIndex(
+                name: "domain.commonentities.setting_who_created_idx",
+                table: "settings",
+                column: "who_created");
+
+            migrationBuilder.CreateIndex(
+                name: "domain.commonentities.setting_who_updated_idx",
+                table: "settings",
+                column: "who_updated");
         }
 
         /// <inheritdoc />
@@ -437,6 +449,9 @@ namespace Analytics.Migrator.Migrations
                 name: "sale_contents");
 
             migrationBuilder.DropTable(
+                name: "settings");
+
+            migrationBuilder.DropTable(
                 name: "InboxState",
                 schema: "msg");
 
@@ -449,9 +464,6 @@ namespace Analytics.Migrator.Migrations
 
             migrationBuilder.DropTable(
                 name: "sales_fact");
-
-            migrationBuilder.DropTable(
-                name: "currencies");
         }
     }
 }

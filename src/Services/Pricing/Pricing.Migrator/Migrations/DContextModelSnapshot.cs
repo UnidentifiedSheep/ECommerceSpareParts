@@ -17,10 +17,51 @@ namespace Pricing.Migrator.Migrations
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasAnnotation("ProductVersion", "10.0.3")
+                .HasAnnotation("ProductVersion", "10.0.8")
                 .HasAnnotation("Relational:MaxIdentifierLength", 63);
 
             NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
+
+            modelBuilder.Entity("Domain.CommonEntities.Setting", b =>
+                {
+                    b.Property<string>("Key")
+                        .HasColumnType("text")
+                        .HasColumnName("key");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("created_at");
+
+                    b.Property<string>("Json")
+                        .IsRequired()
+                        .HasColumnType("jsonb")
+                        .HasColumnName("json");
+
+                    b.Property<DateTime>("UpdatedAt")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("updated_at");
+
+                    b.Property<Guid?>("WhoCreated")
+                        .HasColumnType("uuid")
+                        .HasColumnName("who_created");
+
+                    b.Property<Guid?>("WhoUpdated")
+                        .HasColumnType("uuid")
+                        .HasColumnName("who_updated");
+
+                    b.HasKey("Key")
+                        .HasName("settings_pk");
+
+                    b.HasIndex("WhoCreated")
+                        .HasDatabaseName("domain.commonentities.setting_who_created_idx");
+
+                    b.HasIndex("WhoUpdated")
+                        .HasDatabaseName("domain.commonentities.setting_who_updated_idx");
+
+                    b.ToTable("settings", (string)null);
+
+                    b.HasDiscriminator<string>("Key").HasValue("Setting");
+                });
 
             modelBuilder.Entity("MassTransit.EntityFrameworkCoreIntegration.InboxState", b =>
                 {
@@ -199,6 +240,10 @@ namespace Pricing.Migrator.Migrations
 
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("created_at");
+
                     b.Property<int>("CurrencyId")
                         .HasColumnType("integer")
                         .HasColumnName("currency_id");
@@ -211,8 +256,26 @@ namespace Pricing.Migrator.Migrations
                         .HasColumnType("text")
                         .HasColumnName("name");
 
+                    b.Property<DateTime>("UpdatedAt")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("updated_at");
+
+                    b.Property<Guid?>("WhoCreated")
+                        .HasColumnType("uuid")
+                        .HasColumnName("who_created");
+
+                    b.Property<Guid?>("WhoUpdated")
+                        .HasColumnType("uuid")
+                        .HasColumnName("who_updated");
+
                     b.HasKey("Id")
                         .HasName("markup_group_pk");
+
+                    b.HasIndex("WhoCreated")
+                        .HasDatabaseName("pricing.entities.markupgroup_who_created_idx");
+
+                    b.HasIndex("WhoUpdated")
+                        .HasDatabaseName("pricing.entities.markupgroup_who_updated_idx");
 
                     b.HasIndex(new[] { "CurrencyId" }, "IX_markup_group_currency_id");
 
@@ -250,23 +313,6 @@ namespace Pricing.Migrator.Migrations
                     b.HasIndex(new[] { "GroupId" }, "IX_markup_ranges_group_id");
 
                     b.ToTable("markup_ranges", (string)null);
-                });
-
-            modelBuilder.Entity("Pricing.Entities.Setting", b =>
-                {
-                    b.Property<string>("Key")
-                        .HasColumnType("text")
-                        .HasColumnName("key");
-
-                    b.Property<string>("Value")
-                        .IsRequired()
-                        .HasColumnType("text")
-                        .HasColumnName("value");
-
-                    b.HasKey("Key")
-                        .HasName("settings_pk");
-
-                    b.ToTable("settings", (string)null);
                 });
 
             modelBuilder.Entity("MassTransit.EntityFrameworkCoreIntegration.OutboxMessage", b =>

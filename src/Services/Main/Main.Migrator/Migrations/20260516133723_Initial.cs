@@ -84,7 +84,7 @@ namespace Main.Migrator.Migrations
                     json = table.Column<string>(type: "jsonb", nullable: false),
                     created_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
                     updated_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
-                    who_created = table.Column<Guid>(type: "uuid", nullable: false),
+                    who_created = table.Column<Guid>(type: "uuid", nullable: true),
                     who_updated = table.Column<Guid>(type: "uuid", nullable: true)
                 },
                 constraints: table =>
@@ -142,7 +142,7 @@ namespace Main.Migrator.Migrations
                     description = table.Column<string>(type: "text", nullable: true),
                     created_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
                     updated_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
-                    who_created = table.Column<Guid>(type: "uuid", nullable: false),
+                    who_created = table.Column<Guid>(type: "uuid", nullable: true),
                     who_updated = table.Column<Guid>(type: "uuid", nullable: true)
                 },
                 constraints: table =>
@@ -162,7 +162,7 @@ namespace Main.Migrator.Migrations
                     description = table.Column<string>(type: "character varying(500)", maxLength: 500, nullable: true),
                     created_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
                     updated_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
-                    who_created = table.Column<Guid>(type: "uuid", nullable: false),
+                    who_created = table.Column<Guid>(type: "uuid", nullable: true),
                     who_updated = table.Column<Guid>(type: "uuid", nullable: true)
                 },
                 constraints: table =>
@@ -179,7 +179,7 @@ namespace Main.Migrator.Migrations
                     description = table.Column<string>(type: "character varying(255)", maxLength: 255, nullable: true),
                     created_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
                     updated_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
-                    who_created = table.Column<Guid>(type: "uuid", nullable: false),
+                    who_created = table.Column<Guid>(type: "uuid", nullable: true),
                     who_updated = table.Column<Guid>(type: "uuid", nullable: true)
                 },
                 constraints: table =>
@@ -196,7 +196,7 @@ namespace Main.Migrator.Migrations
                     json = table.Column<string>(type: "jsonb", nullable: false),
                     created_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
                     updated_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
-                    who_created = table.Column<Guid>(type: "uuid", nullable: false),
+                    who_created = table.Column<Guid>(type: "uuid", nullable: true),
                     who_updated = table.Column<Guid>(type: "uuid", nullable: true)
                 },
                 constraints: table =>
@@ -215,7 +215,7 @@ namespace Main.Migrator.Migrations
                     type = table.Column<string>(type: "character varying(24)", maxLength: 24, nullable: false),
                     created_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
                     updated_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
-                    who_created = table.Column<Guid>(type: "uuid", nullable: false),
+                    who_created = table.Column<Guid>(type: "uuid", nullable: true),
                     who_updated = table.Column<Guid>(type: "uuid", nullable: true)
                 },
                 constraints: table =>
@@ -238,7 +238,7 @@ namespace Main.Migrator.Migrations
                     user_name = table.Column<string>(type: "character varying(36)", maxLength: 36, nullable: false),
                     created_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
                     updated_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
-                    who_created = table.Column<Guid>(type: "uuid", nullable: false),
+                    who_created = table.Column<Guid>(type: "uuid", nullable: true),
                     who_updated = table.Column<Guid>(type: "uuid", nullable: true)
                 },
                 constraints: table =>
@@ -256,7 +256,7 @@ namespace Main.Migrator.Migrations
                     valid_till = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
                     created_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
                     updated_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
-                    who_created = table.Column<Guid>(type: "uuid", nullable: false),
+                    who_created = table.Column<Guid>(type: "uuid", nullable: true),
                     who_updated = table.Column<Guid>(type: "uuid", nullable: true)
                 },
                 constraints: table =>
@@ -281,7 +281,7 @@ namespace Main.Migrator.Migrations
                     rate = table.Column<decimal>(type: "numeric", nullable: false),
                     created_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
                     updated_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
-                    who_created = table.Column<Guid>(type: "uuid", nullable: false),
+                    who_created = table.Column<Guid>(type: "uuid", nullable: true),
                     who_updated = table.Column<Guid>(type: "uuid", nullable: true)
                 },
                 constraints: table =>
@@ -384,12 +384,13 @@ namespace Main.Migrator.Migrations
                     indicator = table.Column<string>(type: "character varying(24)", maxLength: 24, nullable: true),
                     category_id = table.Column<int>(type: "integer", nullable: true),
                     popularity = table.Column<long>(type: "bigint", nullable: false, defaultValue: 1L),
+                    xmin = table.Column<uint>(type: "xid", rowVersion: true, nullable: false),
                     normalized_sku = table.Column<string>(type: "text", nullable: false),
                     sku = table.Column<string>(type: "text", nullable: false),
                     stock = table.Column<int>(type: "integer", nullable: false),
                     created_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
                     updated_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
-                    who_created = table.Column<Guid>(type: "uuid", nullable: false),
+                    who_created = table.Column<Guid>(type: "uuid", nullable: true),
                     who_updated = table.Column<Guid>(type: "uuid", nullable: true)
                 },
                 constraints: table =>
@@ -460,7 +461,7 @@ namespace Main.Migrator.Migrations
                     is_canceled = table.Column<bool>(type: "boolean", nullable: false),
                     created_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
                     updated_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
-                    who_created = table.Column<Guid>(type: "uuid", nullable: false),
+                    who_created = table.Column<Guid>(type: "uuid", nullable: true),
                     who_updated = table.Column<Guid>(type: "uuid", nullable: true)
                 },
                 constraints: table =>
@@ -491,7 +492,7 @@ namespace Main.Migrator.Migrations
                     user_id = table.Column<Guid>(type: "uuid", nullable: false),
                     created_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
                     updated_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
-                    who_created = table.Column<Guid>(type: "uuid", nullable: false),
+                    who_created = table.Column<Guid>(type: "uuid", nullable: true),
                     who_updated = table.Column<Guid>(type: "uuid", nullable: true)
                 },
                 constraints: table =>
@@ -534,7 +535,7 @@ namespace Main.Migrator.Migrations
                     carrier_id = table.Column<Guid>(type: "uuid", nullable: true),
                     created_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
                     updated_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
-                    who_created = table.Column<Guid>(type: "uuid", nullable: false),
+                    who_created = table.Column<Guid>(type: "uuid", nullable: true),
                     who_updated = table.Column<Guid>(type: "uuid", nullable: true)
                 },
                 constraints: table =>
@@ -588,7 +589,7 @@ namespace Main.Migrator.Migrations
                     xmin = table.Column<uint>(type: "xid", rowVersion: true, nullable: false),
                     created_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
                     updated_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
-                    who_created = table.Column<Guid>(type: "uuid", nullable: false),
+                    who_created = table.Column<Guid>(type: "uuid", nullable: true),
                     who_updated = table.Column<Guid>(type: "uuid", nullable: true)
                 },
                 constraints: table =>
@@ -635,7 +636,7 @@ namespace Main.Migrator.Migrations
                     xmin = table.Column<uint>(type: "xid", rowVersion: true, nullable: false),
                     created_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
                     updated_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
-                    who_created = table.Column<Guid>(type: "uuid", nullable: false),
+                    who_created = table.Column<Guid>(type: "uuid", nullable: true),
                     who_updated = table.Column<Guid>(type: "uuid", nullable: true)
                 },
                 constraints: table =>
@@ -690,7 +691,7 @@ namespace Main.Migrator.Migrations
                     confirmed_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
                     created_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
                     updated_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
-                    who_created = table.Column<Guid>(type: "uuid", nullable: false),
+                    who_created = table.Column<Guid>(type: "uuid", nullable: true),
                     who_updated = table.Column<Guid>(type: "uuid", nullable: true)
                 },
                 constraints: table =>
@@ -737,7 +738,7 @@ namespace Main.Migrator.Migrations
                     permission = table.Column<string>(type: "text", nullable: false),
                     created_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
                     updated_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
-                    who_created = table.Column<Guid>(type: "uuid", nullable: false),
+                    who_created = table.Column<Guid>(type: "uuid", nullable: true),
                     who_updated = table.Column<Guid>(type: "uuid", nullable: true)
                 },
                 constraints: table =>
@@ -773,7 +774,7 @@ namespace Main.Migrator.Migrations
                     confirmed_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
                     created_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
                     updated_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
-                    who_created = table.Column<Guid>(type: "uuid", nullable: false),
+                    who_created = table.Column<Guid>(type: "uuid", nullable: true),
                     who_updated = table.Column<Guid>(type: "uuid", nullable: true)
                 },
                 constraints: table =>
@@ -797,7 +798,7 @@ namespace Main.Migrator.Migrations
                     role_name = table.Column<string>(type: "character varying(24)", nullable: false),
                     created_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
                     updated_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
-                    who_created = table.Column<Guid>(type: "uuid", nullable: false),
+                    who_created = table.Column<Guid>(type: "uuid", nullable: true),
                     who_updated = table.Column<Guid>(type: "uuid", nullable: true)
                 },
                 constraints: table =>
@@ -861,7 +862,7 @@ namespace Main.Migrator.Migrations
                     user_agent = table.Column<string>(type: "text", nullable: true),
                     created_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
                     updated_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
-                    who_created = table.Column<Guid>(type: "uuid", nullable: false),
+                    who_created = table.Column<Guid>(type: "uuid", nullable: true),
                     who_updated = table.Column<Guid>(type: "uuid", nullable: true)
                 },
                 constraints: table =>
@@ -893,7 +894,7 @@ namespace Main.Migrator.Migrations
                     comment = table.Column<string>(type: "text", nullable: true),
                     created_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
                     updated_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
-                    who_created = table.Column<Guid>(type: "uuid", nullable: false),
+                    who_created = table.Column<Guid>(type: "uuid", nullable: true),
                     who_updated = table.Column<Guid>(type: "uuid", nullable: true)
                 },
                 constraints: table =>
@@ -921,7 +922,7 @@ namespace Main.Migrator.Migrations
                     new_rate = table.Column<decimal>(type: "numeric", nullable: false),
                     created_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
                     updated_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
-                    who_created = table.Column<Guid>(type: "uuid", nullable: false),
+                    who_created = table.Column<Guid>(type: "uuid", nullable: true),
                     who_updated = table.Column<Guid>(type: "uuid", nullable: true)
                 },
                 constraints: table =>
@@ -946,7 +947,7 @@ namespace Main.Migrator.Migrations
                     count = table.Column<int>(type: "integer", nullable: false),
                     created_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
                     updated_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
-                    who_created = table.Column<Guid>(type: "uuid", nullable: false),
+                    who_created = table.Column<Guid>(type: "uuid", nullable: true),
                     who_updated = table.Column<Guid>(type: "uuid", nullable: true)
                 },
                 constraints: table =>
@@ -1144,11 +1145,11 @@ namespace Main.Migrator.Migrations
                     buy_price_in_base_currency = table.Column<decimal>(type: "numeric", nullable: false),
                     base_currency_id = table.Column<int>(type: "integer", nullable: false),
                     currency_id = table.Column<int>(type: "integer", nullable: false),
-                    xmin = table.Column<uint>(type: "xid", rowVersion: true, nullable: false),
                     purchase_datetime = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
+                    xmin = table.Column<uint>(type: "xid", rowVersion: true, nullable: false),
                     created_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
                     updated_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
-                    who_created = table.Column<Guid>(type: "uuid", nullable: false),
+                    who_created = table.Column<Guid>(type: "uuid", nullable: true),
                     who_updated = table.Column<Guid>(type: "uuid", nullable: true)
                 },
                 constraints: table =>
@@ -1202,7 +1203,7 @@ namespace Main.Migrator.Migrations
                     comment = table.Column<string>(type: "character varying(500)", maxLength: 500, nullable: true),
                     created_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
                     updated_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
-                    who_created = table.Column<Guid>(type: "uuid", nullable: false),
+                    who_created = table.Column<Guid>(type: "uuid", nullable: true),
                     who_updated = table.Column<Guid>(type: "uuid", nullable: true)
                 },
                 constraints: table =>
@@ -1241,8 +1242,7 @@ namespace Main.Migrator.Migrations
                         column: x => x.who_created,
                         principalSchema: "auth",
                         principalTable: "users",
-                        principalColumn: "id",
-                        onDelete: ReferentialAction.Cascade);
+                        principalColumn: "id");
                 });
 
             migrationBuilder.CreateTable(
@@ -1291,7 +1291,7 @@ namespace Main.Migrator.Migrations
                     state = table.Column<string>(type: "text", nullable: false),
                     created_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
                     updated_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
-                    who_created = table.Column<Guid>(type: "uuid", nullable: false),
+                    who_created = table.Column<Guid>(type: "uuid", nullable: true),
                     who_updated = table.Column<Guid>(type: "uuid", nullable: true)
                 },
                 constraints: table =>
@@ -1342,7 +1342,7 @@ namespace Main.Migrator.Migrations
                     state = table.Column<string>(type: "text", nullable: false),
                     created_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
                     updated_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
-                    who_created = table.Column<Guid>(type: "uuid", nullable: false),
+                    who_created = table.Column<Guid>(type: "uuid", nullable: true),
                     who_updated = table.Column<Guid>(type: "uuid", nullable: true)
                 },
                 constraints: table =>
@@ -1387,7 +1387,7 @@ namespace Main.Migrator.Migrations
                         .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
                     purchase_id = table.Column<Guid>(type: "uuid", nullable: false),
                     product_id = table.Column<int>(type: "integer", nullable: false),
-                    storage_content_id = table.Column<int>(type: "integer", nullable: true),
+                    storage_content_id = table.Column<int>(type: "integer", nullable: false),
                     count = table.Column<int>(type: "integer", nullable: false),
                     price = table.Column<decimal>(type: "numeric", nullable: false),
                     total_sum = table.Column<decimal>(type: "numeric", nullable: false),
@@ -2399,13 +2399,13 @@ namespace Main.Migrator.Migrations
                 column: "type");
 
             migrationBuilder.CreateIndex(
-                name: "main.entities.user.userbalance_who_created_idx",
+                name: "main.entities.balance.userbalance_who_created_idx",
                 schema: "public",
                 table: "user_balances",
                 column: "who_created");
 
             migrationBuilder.CreateIndex(
-                name: "main.entities.user.userbalance_who_updated_idx",
+                name: "main.entities.balance.userbalance_who_updated_idx",
                 schema: "public",
                 table: "user_balances",
                 column: "who_updated");

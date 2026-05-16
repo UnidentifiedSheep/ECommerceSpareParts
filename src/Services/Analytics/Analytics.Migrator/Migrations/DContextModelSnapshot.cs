@@ -17,37 +17,25 @@ namespace Analytics.Migrator.Migrations
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasAnnotation("ProductVersion", "10.0.3")
+                .HasAnnotation("ProductVersion", "10.0.8")
                 .HasAnnotation("Relational:MaxIdentifierLength", 63);
 
+            NpgsqlModelBuilderExtensions.HasPostgresExtension(modelBuilder, "dblink");
+            NpgsqlModelBuilderExtensions.HasPostgresExtension(modelBuilder, "pg_trgm");
+            NpgsqlModelBuilderExtensions.HasPostgresExtension(modelBuilder, "pgcrypto");
             NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
-
-            modelBuilder.Entity("Analytics.Entities.Currency", b =>
-                {
-                    b.Property<int>("Id")
-                        .HasColumnType("integer")
-                        .HasColumnName("id");
-
-                    b.Property<decimal>("ToUsd")
-                        .HasColumnType("numeric")
-                        .HasColumnName("to_usd");
-
-                    b.HasKey("Id")
-                        .HasName("currencies_pk");
-
-                    b.ToTable("currencies", (string)null);
-                });
 
             modelBuilder.Entity("Analytics.Entities.MetricCalculationJob", b =>
                 {
                     b.Property<Guid>("RequestId")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uuid")
-                        .HasColumnName("request_id");
+                        .HasColumnName("request_id")
+                        .HasDefaultValueSql("gen_random_uuid()");
 
-                    b.Property<DateTime>("CreateAt")
+                    b.Property<DateTime>("CreatedAt")
                         .HasColumnType("timestamp with time zone")
-                        .HasColumnName("create_at");
+                        .HasColumnName("created_at");
 
                     b.Property<string>("ErrorMessage")
                         .HasMaxLength(512)
@@ -70,19 +58,32 @@ namespace Analytics.Migrator.Migrations
                         .HasColumnType("xid")
                         .HasColumnName("xmin");
 
-                    b.Property<int>("Status")
+                    b.Property<string>("Status")
+                        .IsRequired()
                         .HasMaxLength(50)
-                        .HasColumnType("integer")
+                        .HasColumnType("character varying(50)")
                         .HasColumnName("status");
 
-                    b.Property<DateTime>("UpdateAt")
+                    b.Property<DateTime>("UpdatedAt")
                         .HasColumnType("timestamp with time zone")
-                        .HasColumnName("update_at");
+                        .HasColumnName("updated_at");
+
+                    b.Property<Guid?>("WhoCreated")
+                        .HasColumnType("uuid")
+                        .HasColumnName("who_created");
+
+                    b.Property<Guid?>("WhoUpdated")
+                        .HasColumnType("uuid")
+                        .HasColumnName("who_updated");
 
                     b.HasKey("RequestId")
                         .HasName("request_id_pk");
 
-                    b.HasIndex(new[] { "CreateAt" }, "metrics_calc_jobs_created_at_index");
+                    b.HasIndex("WhoCreated")
+                        .HasDatabaseName("analytics.entities.metriccalculationjob_who_created_idx");
+
+                    b.HasIndex("WhoUpdated")
+                        .HasDatabaseName("analytics.entities.metriccalculationjob_who_updated_idx");
 
                     b.HasIndex(new[] { "MetricId" }, "metrics_calc_jobs_metric_id_index")
                         .IsUnique();
@@ -104,16 +105,13 @@ namespace Analytics.Migrator.Migrations
                         .HasColumnType("timestamp with time zone")
                         .HasColumnName("created_at");
 
-                    b.Property<Guid>("CreatedBy")
-                        .HasColumnType("uuid")
-                        .HasColumnName("created_by");
-
                     b.Property<int>("CurrencyId")
                         .HasColumnType("integer")
                         .HasColumnName("currency_id");
 
-                    b.Property<long>("DependsOn")
-                        .HasColumnType("bigint")
+                    b.Property<string>("DependsOn")
+                        .IsRequired()
+                        .HasColumnType("text")
                         .HasColumnName("depends_on");
 
                     b.Property<byte[]>("DimensionHash")
@@ -149,16 +147,31 @@ namespace Analytics.Migrator.Migrations
                         .HasColumnType("timestamp with time zone")
                         .HasColumnName("recalculated_at");
 
-                    b.Property<long>("Tags")
-                        .HasColumnType("bigint")
+                    b.Property<string>("Tags")
+                        .IsRequired()
+                        .HasColumnType("text")
                         .HasColumnName("tags");
+
+                    b.Property<DateTime>("UpdatedAt")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("updated_at");
+
+                    b.Property<Guid?>("WhoCreated")
+                        .HasColumnType("uuid")
+                        .HasColumnName("who_created");
+
+                    b.Property<Guid?>("WhoUpdated")
+                        .HasColumnType("uuid")
+                        .HasColumnName("who_updated");
 
                     b.HasKey("Id")
                         .HasName("metrics_pk");
 
-                    b.HasIndex(new[] { "CreatedAt" }, "metrics_created_at_index");
+                    b.HasIndex("WhoCreated")
+                        .HasDatabaseName("analytics.entities.metrics.metric_who_created_idx");
 
-                    b.HasIndex(new[] { "CreatedBy" }, "metrics_created_by_index");
+                    b.HasIndex("WhoUpdated")
+                        .HasDatabaseName("analytics.entities.metrics.metric_who_updated_idx");
 
                     b.HasIndex(new[] { "CurrencyId" }, "metrics_currency_id_index");
 
@@ -195,9 +208,8 @@ namespace Analytics.Migrator.Migrations
                         .HasColumnType("numeric")
                         .HasColumnName("price");
 
-                    b.Property<string>("PurchaseId")
-                        .IsRequired()
-                        .HasColumnType("text")
+                    b.Property<Guid>("PurchaseId")
+                        .HasColumnType("uuid")
                         .HasColumnName("purchase_id");
 
                     b.HasKey("Id")
@@ -212,8 +224,9 @@ namespace Analytics.Migrator.Migrations
 
             modelBuilder.Entity("Analytics.Entities.PurchasesFact", b =>
                 {
-                    b.Property<string>("Id")
-                        .HasColumnType("text")
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid")
                         .HasColumnName("id");
 
                     b.Property<DateTime>("CreatedAt")
@@ -270,9 +283,9 @@ namespace Analytics.Migrator.Migrations
                         .HasColumnType("numeric")
                         .HasColumnName("price");
 
-                    b.Property<string>("SaleId")
+                    b.Property<Guid?>("SaleId")
                         .HasMaxLength(128)
-                        .HasColumnType("character varying(128)")
+                        .HasColumnType("uuid")
                         .HasColumnName("sale_id");
 
                     b.HasKey("Id")
@@ -317,9 +330,10 @@ namespace Analytics.Migrator.Migrations
 
             modelBuilder.Entity("Analytics.Entities.SalesFact", b =>
                 {
-                    b.Property<string>("Id")
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
                         .HasMaxLength(128)
-                        .HasColumnType("character varying(128)")
+                        .HasColumnType("uuid")
                         .HasColumnName("id");
 
                     b.Property<Guid>("BuyerId")
@@ -338,16 +352,73 @@ namespace Analytics.Migrator.Migrations
                         .HasColumnType("numeric")
                         .HasColumnName("total_sum");
 
+                    b.Property<DateTime>("UpdatedAt")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("updated_at");
+
+                    b.Property<Guid?>("WhoCreated")
+                        .HasColumnType("uuid")
+                        .HasColumnName("who_created");
+
+                    b.Property<Guid?>("WhoUpdated")
+                        .HasColumnType("uuid")
+                        .HasColumnName("who_updated");
+
                     b.HasKey("Id")
                         .HasName("sales_fact_pk");
 
-                    b.HasIndex(new[] { "BuyerId" }, "sales_fact_buyer_id_index");
+                    b.HasIndex("WhoCreated")
+                        .HasDatabaseName("analytics.entities.salesfact_who_created_idx");
 
-                    b.HasIndex(new[] { "CreatedAt" }, "sales_fact_created_at_index");
+                    b.HasIndex("WhoUpdated")
+                        .HasDatabaseName("analytics.entities.salesfact_who_updated_idx");
+
+                    b.HasIndex(new[] { "BuyerId" }, "sales_fact_buyer_id_index");
 
                     b.HasIndex(new[] { "CurrencyId" }, "sales_fact_currency_id_index");
 
                     b.ToTable("sales_fact", (string)null);
+                });
+
+            modelBuilder.Entity("Domain.CommonEntities.Setting", b =>
+                {
+                    b.Property<string>("Key")
+                        .HasColumnType("text")
+                        .HasColumnName("key");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("created_at");
+
+                    b.Property<string>("Json")
+                        .IsRequired()
+                        .HasColumnType("jsonb")
+                        .HasColumnName("json");
+
+                    b.Property<DateTime>("UpdatedAt")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("updated_at");
+
+                    b.Property<Guid?>("WhoCreated")
+                        .HasColumnType("uuid")
+                        .HasColumnName("who_created");
+
+                    b.Property<Guid?>("WhoUpdated")
+                        .HasColumnType("uuid")
+                        .HasColumnName("who_updated");
+
+                    b.HasKey("Key")
+                        .HasName("settings_pk");
+
+                    b.HasIndex("WhoCreated")
+                        .HasDatabaseName("domain.commonentities.setting_who_created_idx");
+
+                    b.HasIndex("WhoUpdated")
+                        .HasDatabaseName("domain.commonentities.setting_who_updated_idx");
+
+                    b.ToTable("settings", (string)null);
+
+                    b.HasDiscriminator<string>("Key").HasValue("Setting");
                 });
 
             modelBuilder.Entity("MassTransit.EntityFrameworkCoreIntegration.InboxState", b =>
@@ -531,18 +602,6 @@ namespace Analytics.Migrator.Migrations
                     b.HasDiscriminator().HasValue("ArticleSalesMetric");
                 });
 
-            modelBuilder.Entity("Analytics.Entities.Metrics.Metric", b =>
-                {
-                    b.HasOne("Analytics.Entities.Currency", "Currency")
-                        .WithMany("Metrics")
-                        .HasForeignKey("CurrencyId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired()
-                        .HasConstraintName("metrics_currencies_id_fk");
-
-                    b.Navigation("Currency");
-                });
-
             modelBuilder.Entity("Analytics.Entities.PurchaseContent", b =>
                 {
                     b.HasOne("Analytics.Entities.PurchasesFact", "Purchase")
@@ -555,18 +614,6 @@ namespace Analytics.Migrator.Migrations
                     b.Navigation("Purchase");
                 });
 
-            modelBuilder.Entity("Analytics.Entities.PurchasesFact", b =>
-                {
-                    b.HasOne("Analytics.Entities.Currency", "Currency")
-                        .WithMany("PurchasesFacts")
-                        .HasForeignKey("CurrencyId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired()
-                        .HasConstraintName("purchases_fact_currencies_id_fk");
-
-                    b.Navigation("Currency");
-                });
-
             modelBuilder.Entity("Analytics.Entities.SaleContent", b =>
                 {
                     b.HasOne("Analytics.Entities.SalesFact", "Sale")
@@ -575,30 +622,6 @@ namespace Analytics.Migrator.Migrations
                         .HasConstraintName("sale_contents_sales_fact_id_fk");
 
                     b.Navigation("Sale");
-                });
-
-            modelBuilder.Entity("Analytics.Entities.SaleContentDetail", b =>
-                {
-                    b.HasOne("Analytics.Entities.Currency", "Currency")
-                        .WithMany("SaleContentDetails")
-                        .HasForeignKey("CurrencyId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired()
-                        .HasConstraintName("sale_content_detail_currencies_id_fk");
-
-                    b.Navigation("Currency");
-                });
-
-            modelBuilder.Entity("Analytics.Entities.SalesFact", b =>
-                {
-                    b.HasOne("Analytics.Entities.Currency", "Currency")
-                        .WithMany("SalesFacts")
-                        .HasForeignKey("CurrencyId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired()
-                        .HasConstraintName("sales_fact_currencies_id_fk");
-
-                    b.Navigation("Currency");
                 });
 
             modelBuilder.Entity("MassTransit.EntityFrameworkCoreIntegration.OutboxMessage", b =>
@@ -611,17 +634,6 @@ namespace Analytics.Migrator.Migrations
                         .WithMany()
                         .HasForeignKey("InboxMessageId", "InboxConsumerId")
                         .HasPrincipalKey("MessageId", "ConsumerId");
-                });
-
-            modelBuilder.Entity("Analytics.Entities.Currency", b =>
-                {
-                    b.Navigation("Metrics");
-
-                    b.Navigation("PurchasesFacts");
-
-                    b.Navigation("SaleContentDetails");
-
-                    b.Navigation("SalesFacts");
                 });
 
             modelBuilder.Entity("Analytics.Entities.PurchasesFact", b =>

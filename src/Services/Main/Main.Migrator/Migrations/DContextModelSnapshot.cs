@@ -20,7 +20,7 @@ namespace Main.Migrator.Migrations
 #pragma warning disable 612, 618
             modelBuilder
                 .HasDefaultSchema("public")
-                .HasAnnotation("ProductVersion", "10.0.4")
+                .HasAnnotation("ProductVersion", "10.0.8")
                 .HasAnnotation("Relational:MaxIdentifierLength", 63);
 
             NpgsqlModelBuilderExtensions.HasPostgresExtension(modelBuilder, "dblink");
@@ -47,7 +47,7 @@ namespace Main.Migrator.Migrations
                         .HasColumnType("timestamp with time zone")
                         .HasColumnName("updated_at");
 
-                    b.Property<Guid>("WhoCreated")
+                    b.Property<Guid?>("WhoCreated")
                         .HasColumnType("uuid")
                         .HasColumnName("who_created");
 
@@ -87,7 +87,7 @@ namespace Main.Migrator.Migrations
                         .HasColumnType("timestamp with time zone")
                         .HasColumnName("updated_at");
 
-                    b.Property<Guid>("WhoCreated")
+                    b.Property<Guid?>("WhoCreated")
                         .HasColumnType("uuid")
                         .HasColumnName("who_created");
 
@@ -127,7 +127,7 @@ namespace Main.Migrator.Migrations
                         .HasColumnType("timestamp with time zone")
                         .HasColumnName("updated_at");
 
-                    b.Property<Guid>("WhoCreated")
+                    b.Property<Guid?>("WhoCreated")
                         .HasColumnType("uuid")
                         .HasColumnName("who_created");
 
@@ -183,7 +183,7 @@ namespace Main.Migrator.Migrations
                         .HasColumnType("timestamp with time zone")
                         .HasColumnName("updated_at");
 
-                    b.Property<Guid>("WhoCreated")
+                    b.Property<Guid?>("WhoCreated")
                         .HasColumnType("uuid")
                         .HasColumnName("who_created");
 
@@ -224,7 +224,7 @@ namespace Main.Migrator.Migrations
                         .HasColumnType("timestamp with time zone")
                         .HasColumnName("updated_at");
 
-                    b.Property<Guid>("WhoCreated")
+                    b.Property<Guid?>("WhoCreated")
                         .HasColumnType("uuid")
                         .HasColumnName("who_created");
 
@@ -309,7 +309,7 @@ namespace Main.Migrator.Migrations
                         .HasColumnType("uuid")
                         .HasColumnName("user_id");
 
-                    b.Property<Guid>("WhoCreated")
+                    b.Property<Guid?>("WhoCreated")
                         .HasColumnType("uuid")
                         .HasColumnName("who_created");
 
@@ -406,7 +406,7 @@ namespace Main.Migrator.Migrations
                         .HasColumnType("timestamp with time zone")
                         .HasColumnName("updated_at");
 
-                    b.Property<Guid>("WhoCreated")
+                    b.Property<Guid?>("WhoCreated")
                         .HasColumnType("uuid")
                         .HasColumnName("who_created");
 
@@ -441,6 +441,67 @@ namespace Main.Migrator.Migrations
                     b.ToTable("transactions", "public");
                 });
 
+            modelBuilder.Entity("Main.Entities.Balance.UserBalance", b =>
+                {
+                    b.Property<Guid>("UserId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("user_id");
+
+                    b.Property<int>("CurrencyId")
+                        .HasColumnType("integer")
+                        .HasColumnName("currency_id");
+
+                    b.Property<decimal>("Balance")
+                        .HasColumnType("numeric")
+                        .HasColumnName("balance");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("created_at");
+
+                    b.Property<uint>("RowVersion")
+                        .IsConcurrencyToken()
+                        .ValueGeneratedOnAddOrUpdate()
+                        .HasColumnType("xid")
+                        .HasColumnName("xmin");
+
+                    b.Property<DateTime>("UpdatedAt")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("updated_at");
+
+                    b.Property<Guid?>("WhoCreated")
+                        .HasColumnType("uuid")
+                        .HasColumnName("who_created");
+
+                    b.Property<Guid?>("WhoUpdated")
+                        .HasColumnType("uuid")
+                        .HasColumnName("who_updated");
+
+                    b.HasKey("UserId", "CurrencyId")
+                        .HasName("user_balances_pk");
+
+                    b.HasIndex("Balance")
+                        .HasDatabaseName("user_balances_balance_index");
+
+                    b.HasIndex("CurrencyId")
+                        .HasDatabaseName("user_balances_currency_id_index");
+
+                    b.HasIndex("UserId")
+                        .HasDatabaseName("user_balances_user_id_index");
+
+                    b.HasIndex("WhoCreated")
+                        .HasDatabaseName("main.entities.balance.userbalance_who_created_idx");
+
+                    b.HasIndex("WhoUpdated")
+                        .HasDatabaseName("main.entities.balance.userbalance_who_updated_idx");
+
+                    b.HasIndex("CurrencyId", "UserId")
+                        .IsUnique()
+                        .HasDatabaseName("user_balances_currency_id_user_id_uindex");
+
+                    b.ToTable("user_balances", "public");
+                });
+
             modelBuilder.Entity("Main.Entities.Cart.Cart", b =>
                 {
                     b.Property<Guid>("UserId")
@@ -463,7 +524,7 @@ namespace Main.Migrator.Migrations
                         .HasColumnType("timestamp with time zone")
                         .HasColumnName("updated_at");
 
-                    b.Property<Guid>("WhoCreated")
+                    b.Property<Guid?>("WhoCreated")
                         .HasColumnType("uuid")
                         .HasColumnName("who_created");
 
@@ -606,7 +667,7 @@ namespace Main.Migrator.Migrations
                         .HasColumnType("timestamp with time zone")
                         .HasColumnName("updated_at");
 
-                    b.Property<Guid>("WhoCreated")
+                    b.Property<Guid?>("WhoCreated")
                         .HasColumnType("uuid")
                         .HasColumnName("who_created");
 
@@ -662,7 +723,7 @@ namespace Main.Migrator.Migrations
                         .HasColumnType("timestamp with time zone")
                         .HasColumnName("updated_at");
 
-                    b.Property<Guid>("WhoCreated")
+                    b.Property<Guid?>("WhoCreated")
                         .HasColumnType("uuid")
                         .HasColumnName("who_created");
 
@@ -711,7 +772,7 @@ namespace Main.Migrator.Migrations
                         .HasColumnType("timestamp with time zone")
                         .HasColumnName("updated_at");
 
-                    b.Property<Guid>("WhoCreated")
+                    b.Property<Guid?>("WhoCreated")
                         .HasColumnType("uuid")
                         .HasColumnName("who_created");
 
@@ -784,7 +845,7 @@ namespace Main.Migrator.Migrations
                         .HasColumnType("uuid")
                         .HasColumnName("user_id");
 
-                    b.Property<Guid>("WhoCreated")
+                    b.Property<Guid?>("WhoCreated")
                         .HasColumnType("uuid")
                         .HasColumnName("who_created");
 
@@ -878,11 +939,17 @@ namespace Main.Migrator.Migrations
                         .HasColumnType("character varying(255)")
                         .HasColumnName("image_path");
 
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasMaxLength(64)
+                        .HasColumnType("character varying(64)")
+                        .HasColumnName("name");
+
                     b.Property<DateTime>("UpdatedAt")
                         .HasColumnType("timestamp with time zone")
                         .HasColumnName("updated_at");
 
-                    b.Property<Guid>("WhoCreated")
+                    b.Property<Guid?>("WhoCreated")
                         .HasColumnType("uuid")
                         .HasColumnName("who_created");
 
@@ -892,6 +959,10 @@ namespace Main.Migrator.Migrations
 
                     b.HasKey("Id")
                         .HasName("producer_id");
+
+                    b.HasIndex("Name")
+                        .IsUnique()
+                        .HasDatabaseName("producer_name_uindex");
 
                     b.HasIndex("WhoCreated")
                         .HasDatabaseName("main.entities.producer.producer_who_created_idx");
@@ -983,11 +1054,17 @@ namespace Main.Migrator.Migrations
                         .HasColumnType("integer")
                         .HasColumnName("producer_id");
 
+                    b.Property<uint>("RowVersion")
+                        .IsConcurrencyToken()
+                        .ValueGeneratedOnAddOrUpdate()
+                        .HasColumnType("xid")
+                        .HasColumnName("xmin");
+
                     b.Property<DateTime>("UpdatedAt")
                         .HasColumnType("timestamp with time zone")
                         .HasColumnName("updated_at");
 
-                    b.Property<Guid>("WhoCreated")
+                    b.Property<Guid?>("WhoCreated")
                         .HasColumnType("uuid")
                         .HasColumnName("who_created");
 
@@ -1101,7 +1178,7 @@ namespace Main.Migrator.Migrations
                         .HasColumnType("timestamp with time zone")
                         .HasColumnName("valid_till");
 
-                    b.Property<Guid>("WhoCreated")
+                    b.Property<Guid?>("WhoCreated")
                         .HasColumnType("uuid")
                         .HasColumnName("who_created");
 
@@ -1308,7 +1385,7 @@ namespace Main.Migrator.Migrations
                         .HasColumnType("timestamp with time zone")
                         .HasColumnName("updated_at");
 
-                    b.Property<Guid>("WhoCreated")
+                    b.Property<Guid?>("WhoCreated")
                         .HasColumnType("uuid")
                         .HasColumnName("who_created");
 
@@ -1375,7 +1452,7 @@ namespace Main.Migrator.Migrations
                         .HasColumnType("uuid")
                         .HasColumnName("purchase_id");
 
-                    b.Property<int?>("StorageContentId")
+                    b.Property<int>("StorageContentId")
                         .HasColumnType("integer")
                         .HasColumnName("storage_content_id");
 
@@ -1536,7 +1613,7 @@ namespace Main.Migrator.Migrations
                         .HasColumnType("timestamp with time zone")
                         .HasColumnName("updated_at");
 
-                    b.Property<Guid>("WhoCreated")
+                    b.Property<Guid?>("WhoCreated")
                         .HasColumnType("uuid")
                         .HasColumnName("who_created");
 
@@ -1710,7 +1787,7 @@ namespace Main.Migrator.Migrations
                         .HasColumnType("timestamp with time zone")
                         .HasColumnName("updated_at");
 
-                    b.Property<Guid>("WhoCreated")
+                    b.Property<Guid?>("WhoCreated")
                         .HasColumnType("uuid")
                         .HasColumnName("who_created");
 
@@ -1799,7 +1876,7 @@ namespace Main.Migrator.Migrations
                         .HasColumnType("timestamp with time zone")
                         .HasColumnName("updated_at");
 
-                    b.Property<Guid>("WhoCreated")
+                    b.Property<Guid?>("WhoCreated")
                         .HasColumnType("uuid")
                         .HasColumnName("who_created");
 
@@ -1892,7 +1969,7 @@ namespace Main.Migrator.Migrations
                         .HasColumnType("uuid")
                         .HasColumnName("user_id");
 
-                    b.Property<Guid>("WhoCreated")
+                    b.Property<Guid?>("WhoCreated")
                         .HasColumnType("uuid")
                         .HasColumnName("who_created");
 
@@ -1946,7 +2023,7 @@ namespace Main.Migrator.Migrations
                         .HasColumnType("timestamp with time zone")
                         .HasColumnName("updated_at");
 
-                    b.Property<Guid>("WhoCreated")
+                    b.Property<Guid?>("WhoCreated")
                         .HasColumnType("uuid")
                         .HasColumnName("who_created");
 
@@ -2046,7 +2123,7 @@ namespace Main.Migrator.Migrations
                         .HasColumnType("timestamp with time zone")
                         .HasColumnName("updated_at");
 
-                    b.Property<Guid>("WhoCreated")
+                    b.Property<Guid?>("WhoCreated")
                         .HasColumnType("uuid")
                         .HasColumnName("who_created");
 
@@ -2113,7 +2190,7 @@ namespace Main.Migrator.Migrations
                         .HasColumnType("timestamp with time zone")
                         .HasColumnName("updated_at");
 
-                    b.Property<Guid>("WhoCreated")
+                    b.Property<Guid?>("WhoCreated")
                         .HasColumnType("uuid")
                         .HasColumnName("who_created");
 
@@ -2153,67 +2230,6 @@ namespace Main.Migrator.Migrations
                         .HasDatabaseName("main.entities.user.user_who_updated_idx");
 
                     b.ToTable("users", "auth");
-                });
-
-            modelBuilder.Entity("Main.Entities.User.UserBalance", b =>
-                {
-                    b.Property<Guid>("UserId")
-                        .HasColumnType("uuid")
-                        .HasColumnName("user_id");
-
-                    b.Property<int>("CurrencyId")
-                        .HasColumnType("integer")
-                        .HasColumnName("currency_id");
-
-                    b.Property<decimal>("Balance")
-                        .HasColumnType("numeric")
-                        .HasColumnName("balance");
-
-                    b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("timestamp with time zone")
-                        .HasColumnName("created_at");
-
-                    b.Property<uint>("RowVersion")
-                        .IsConcurrencyToken()
-                        .ValueGeneratedOnAddOrUpdate()
-                        .HasColumnType("xid")
-                        .HasColumnName("xmin");
-
-                    b.Property<DateTime>("UpdatedAt")
-                        .HasColumnType("timestamp with time zone")
-                        .HasColumnName("updated_at");
-
-                    b.Property<Guid>("WhoCreated")
-                        .HasColumnType("uuid")
-                        .HasColumnName("who_created");
-
-                    b.Property<Guid?>("WhoUpdated")
-                        .HasColumnType("uuid")
-                        .HasColumnName("who_updated");
-
-                    b.HasKey("UserId", "CurrencyId")
-                        .HasName("user_balances_pk");
-
-                    b.HasIndex("Balance")
-                        .HasDatabaseName("user_balances_balance_index");
-
-                    b.HasIndex("CurrencyId")
-                        .HasDatabaseName("user_balances_currency_id_index");
-
-                    b.HasIndex("UserId")
-                        .HasDatabaseName("user_balances_user_id_index");
-
-                    b.HasIndex("WhoCreated")
-                        .HasDatabaseName("main.entities.user.userbalance_who_created_idx");
-
-                    b.HasIndex("WhoUpdated")
-                        .HasDatabaseName("main.entities.user.userbalance_who_updated_idx");
-
-                    b.HasIndex("CurrencyId", "UserId")
-                        .IsUnique()
-                        .HasDatabaseName("user_balances_currency_id_user_id_uindex");
-
-                    b.ToTable("user_balances", "public");
                 });
 
             modelBuilder.Entity("Main.Entities.User.UserDiscount", b =>
@@ -2269,7 +2285,7 @@ namespace Main.Migrator.Migrations
                         .HasColumnType("uuid")
                         .HasColumnName("user_id");
 
-                    b.Property<Guid>("WhoCreated")
+                    b.Property<Guid?>("WhoCreated")
                         .HasColumnType("uuid")
                         .HasColumnName("who_created");
 
@@ -2399,7 +2415,7 @@ namespace Main.Migrator.Migrations
                         .HasColumnType("uuid")
                         .HasColumnName("user_id");
 
-                    b.Property<Guid>("WhoCreated")
+                    b.Property<Guid?>("WhoCreated")
                         .HasColumnType("uuid")
                         .HasColumnName("who_created");
 
@@ -2528,7 +2544,7 @@ namespace Main.Migrator.Migrations
                         .HasColumnType("character varying(50)")
                         .HasColumnName("vin");
 
-                    b.Property<Guid>("WhoCreated")
+                    b.Property<Guid?>("WhoCreated")
                         .HasColumnType("uuid")
                         .HasColumnName("who_created");
 
@@ -2851,6 +2867,23 @@ namespace Main.Migrator.Migrations
                         .HasConstraintName("transactions_users_id_fk");
                 });
 
+            modelBuilder.Entity("Main.Entities.Balance.UserBalance", b =>
+                {
+                    b.HasOne("Main.Entities.Currency.Currency", null)
+                        .WithMany()
+                        .HasForeignKey("CurrencyId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired()
+                        .HasConstraintName("user_balances_currency_id_fk");
+
+                    b.HasOne("Main.Entities.User.User", null)
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired()
+                        .HasConstraintName("user_balances_users_id_fk");
+                });
+
             modelBuilder.Entity("Main.Entities.Cart.Cart", b =>
                 {
                     b.HasOne("Main.Entities.Product.Product", "Product")
@@ -2932,35 +2965,6 @@ namespace Main.Migrator.Migrations
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired()
                         .HasConstraintName("order_items_articles_id_fk");
-                });
-
-            modelBuilder.Entity("Main.Entities.Producer.Producer", b =>
-                {
-                    b.OwnsOne("Main.Entities.Producer.ValueObjects.Name", "Name", b1 =>
-                        {
-                            b1.Property<int>("ProducerId")
-                                .HasColumnType("integer");
-
-                            b1.Property<string>("Value")
-                                .IsRequired()
-                                .HasMaxLength(64)
-                                .HasColumnType("character varying(64)")
-                                .HasColumnName("name");
-
-                            b1.HasKey("ProducerId");
-
-                            b1.HasIndex("Value")
-                                .IsUnique()
-                                .HasDatabaseName("producer_name_uindex");
-
-                            b1.ToTable("producer", "public");
-
-                            b1.WithOwner()
-                                .HasForeignKey("ProducerId");
-                        });
-
-                    b.Navigation("Name")
-                        .IsRequired();
                 });
 
             modelBuilder.Entity("Main.Entities.Producer.ProducerOtherName", b =>
@@ -3181,6 +3185,7 @@ namespace Main.Migrator.Migrations
                         .WithOne()
                         .HasForeignKey("Main.Entities.Purchase.PurchaseContent", "StorageContentId")
                         .OnDelete(DeleteBehavior.SetNull)
+                        .IsRequired()
                         .HasConstraintName("purchase_content_storage_content_id_fk");
 
                     b.Navigation("Product");
@@ -3375,8 +3380,6 @@ namespace Main.Migrator.Migrations
                     b.HasOne("Main.Entities.User.User", null)
                         .WithMany()
                         .HasForeignKey("WhoCreated")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired()
                         .HasConstraintName("storage_content_reservations_users_id_fk_3");
 
                     b.HasOne("Main.Entities.User.User", null)
@@ -3437,23 +3440,6 @@ namespace Main.Migrator.Migrations
                         .HasConstraintName("storage_routes_storages_name_fk_2");
 
                     b.Navigation("Currency");
-                });
-
-            modelBuilder.Entity("Main.Entities.User.UserBalance", b =>
-                {
-                    b.HasOne("Main.Entities.Currency.Currency", null)
-                        .WithMany()
-                        .HasForeignKey("CurrencyId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired()
-                        .HasConstraintName("user_balances_currency_id_fk");
-
-                    b.HasOne("Main.Entities.User.User", null)
-                        .WithMany()
-                        .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired()
-                        .HasConstraintName("user_balances_users_id_fk");
                 });
 
             modelBuilder.Entity("Main.Entities.User.UserDiscount", b =>
