@@ -56,8 +56,8 @@ async Task LoadLocalization(IHost hostApp)
 void AddLoki(IHostApplicationBuilder hostBuilder)
 {
     hostBuilder.AddLokiLogger(
-        hostBuilder.Configuration, 
-        "analytics.worker", 
+        hostBuilder.Configuration,
+        "analytics.worker",
         env);
 }
 

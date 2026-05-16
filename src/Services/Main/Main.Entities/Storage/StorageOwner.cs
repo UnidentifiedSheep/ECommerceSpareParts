@@ -28,6 +28,11 @@ public class StorageOwner : AuditableEntity<StorageOwner, (string, Guid)>, ILinq
 
     public Storage Storage { get; private set; } = null!;
 
+    public static Expression<Func<StorageOwner, bool>> GetEqualityExpression((string, Guid) key)
+    {
+        return x => x.StorageName == key.Item1 && x.UserId == key.Item2;
+    }
+
     public static StorageOwner Create(string storageName, Guid ownerId)
     {
         return new StorageOwner(storageName, ownerId);
@@ -37,7 +42,4 @@ public class StorageOwner : AuditableEntity<StorageOwner, (string, Guid)>, ILinq
     {
         return (StorageName, UserId);
     }
-
-    public static Expression<Func<StorageOwner, bool>> GetEqualityExpression((string, Guid) key)
-        => x => x.StorageName == key.Item1 && x.UserId == key.Item2;
 }

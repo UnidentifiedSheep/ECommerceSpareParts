@@ -1,10 +1,9 @@
-﻿using Application.Common.Interfaces.Repositories;
-using Main.Application.Interfaces.Persistence;
+﻿using Main.Application.Interfaces.Persistence;
 using Main.Entities.Storage;
 using Main.Persistence.Context;
 using Microsoft.EntityFrameworkCore;
-using Persistence.Repository;
 using Persistence.Extensions;
+using Persistence.Repository;
 
 namespace Main.Persistence.Repositories.Storage;
 
@@ -61,5 +60,4 @@ public class StorageContentRepository(DContext context)
             .ToDictionaryAsync(x => x.ProductId,
                 x => x.TotalCount, cancellationToken);
     }
-
 }

@@ -1,4 +1,4 @@
-﻿namespace Pricing.Abstractions.Interfaces.Services.Pricing;
+﻿namespace Pricing.Application.Interfaces.Services.Pricing;
 
 public interface IDiscountService
 {

@@ -7,8 +7,8 @@
     </PropertyGroup>
 
     <ItemGroup>
-      <ProjectReference Include="..\..\..\Infrastructure\Cache\Cache.csproj" />
-      <ProjectReference Include="..\Main.Application\Main.Application.csproj" />
+        <ProjectReference Include="..\..\..\Infrastructure\Cache\Cache.csproj"/>
+        <ProjectReference Include="..\Main.Application\Main.Application.csproj"/>
     </ItemGroup>
 
 </Project>

@@ -1,6 +1,6 @@
 using Pricing.Entities;
 
-namespace Pricing.Abstractions.Interfaces.DbRepositories;
+namespace Pricing.Application.Interfaces.DbRepositories;
 
 public interface IMarkupRepository
 {

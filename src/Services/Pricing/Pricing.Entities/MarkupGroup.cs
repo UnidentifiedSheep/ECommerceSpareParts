@@ -48,9 +48,9 @@ public class MarkupGroup : AuditableEntity<MarkupGroup, int>
         IEnumerable<MarkupRange> markupRanges)
     {
         return new MarkupGroup(
-            "Auto Generated Markup", 
-            currencyId, 
-            markupRanges, 
+            "Auto Generated Markup",
+            currencyId,
+            markupRanges,
             true);
     }
 
@@ -69,5 +69,8 @@ public class MarkupGroup : AuditableEntity<MarkupGroup, int>
         _markupRanges.AddRange(ranges);
     }
 
-    public override int GetId() => Id;
+    public override int GetId()
+    {
+        return Id;
+    }
 }

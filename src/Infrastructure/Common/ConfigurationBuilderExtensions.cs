@@ -11,14 +11,18 @@ public static class ConfigurationBuilderExtensions
         this IConfigurationBuilder configuration,
         string? contour,
         string? path = null)
-        => configuration.AddConfigsFromJsons(Appsettings, contour, path);
-    
+    {
+        return configuration.AddConfigsFromJsons(Appsettings, contour, path);
+    }
+
     public static IConfigurationBuilder AddMigratorSettingsFromJsons(
         this IConfigurationBuilder configuration,
         string? contour,
         string? path = null)
-        => configuration.AddConfigsFromJsons("migrator", contour, path);
-    
+    {
+        return configuration.AddConfigsFromJsons("migrator", contour, path);
+    }
+
     public static IConfigurationBuilder AddConfigsFromJsons(
         this IConfigurationBuilder configuration,
         string nameStart,

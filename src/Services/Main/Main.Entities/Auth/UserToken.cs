@@ -32,11 +32,13 @@ public class UserToken : AuditableEntity<UserToken, Guid>, ILinqEntity<UserToken
 
     public virtual User.User User { get; set; } = null!;
 
+    public static Expression<Func<UserToken, bool>> GetEqualityExpression(Guid key)
+    {
+        return x => x.Id == key;
+    }
+
     public override Guid GetId()
     {
         return Id;
     }
-
-    public static Expression<Func<UserToken, bool>> GetEqualityExpression(Guid key)
-        => x => x.Id == key;
 }

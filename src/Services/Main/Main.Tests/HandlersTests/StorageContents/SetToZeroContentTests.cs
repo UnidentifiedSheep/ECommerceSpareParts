@@ -3,7 +3,6 @@ using Main.Application.Handlers.StorageContents.SetToZeroContent;
 using Main.Entities.Exceptions.Storages;
 using Microsoft.EntityFrameworkCore;
 using Test.Common.TestContainers.Combined;
-using Tests.TestContexts;
 using Tests.TestContexts.Storage;
 
 namespace Tests.HandlersTests.StorageContents;

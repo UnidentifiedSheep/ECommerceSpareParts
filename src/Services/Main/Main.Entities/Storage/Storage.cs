@@ -1,8 +1,8 @@
 using System.Linq.Expressions;
 using BulkValidation.Core.Attributes;
 using Domain;
-using Domain.Interfaces;
 using Domain.Extensions;
+using Domain.Interfaces;
 using Exceptions;
 using Main.Enums;
 
@@ -31,6 +31,11 @@ public class Storage : AuditableEntity<Storage, string>, ILinqEntity<Storage, st
 
     public StorageType Type { get; private set; }
     public IReadOnlyCollection<StorageOwner> Owners => _owners;
+
+    public static Expression<Func<Storage, bool>> GetEqualityExpression(string key)
+    {
+        return x => x.Name == key;
+    }
 
     public static Storage Create(string name, StorageType type)
     {
@@ -87,7 +92,4 @@ public class Storage : AuditableEntity<Storage, string>, ILinqEntity<Storage, st
     {
         return Name;
     }
-
-    public static Expression<Func<Storage, bool>> GetEqualityExpression(string key)
-        => x => x.Name == key;
 }

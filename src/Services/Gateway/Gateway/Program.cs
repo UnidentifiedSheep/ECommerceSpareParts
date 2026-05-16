@@ -15,9 +15,9 @@ builder.Configuration
     .AddConfigsFromJsons("gateway", env, "/app/configs");
 
 builder.Host.AddLokiLogger(
-    configuration: builder.Configuration, 
-    serviceName: "gateway", 
-    environment: env);
+    builder.Configuration,
+    "gateway",
+    env);
 
 builder.Services.AddOpenTelemetry()
     .WithMetrics(metrics =>
@@ -31,10 +31,7 @@ builder.Services.AddOpenTelemetry()
 
 builder.Services.AddAuthorization(options =>
 {
-    options.AddPolicy("DenyAll", policy =>
-    {
-        policy.RequireAssertion(_ => false);
-    });
+    options.AddPolicy("DenyAll", policy => { policy.RequireAssertion(_ => false); });
 });
 
 var secret = builder.Configuration["HeaderSecret:Key"];

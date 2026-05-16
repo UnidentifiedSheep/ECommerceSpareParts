@@ -39,7 +39,7 @@ public class PurchaseLogistic : Entity<PurchaseLogistic, Guid>, ILinqEntity<Purc
     }
 
     [Validate]
-    public Guid PurchaseId { get; private set; }
+    public Guid PurchaseId { get; }
 
     public Guid RouteId { get; private set; }
 
@@ -64,6 +64,11 @@ public class PurchaseLogistic : Entity<PurchaseLogistic, Guid>, ILinqEntity<Purc
     public virtual Currency.Currency Currency { get; private set; } = null!;
 
     public virtual Transaction? Transaction { get; private set; }
+
+    public static Expression<Func<PurchaseLogistic, bool>> GetEqualityExpression(Guid key)
+    {
+        return x => x.PurchaseId == key;
+    }
 
     internal static PurchaseLogistic Create(
         Guid purchaseId,
@@ -222,7 +227,4 @@ public class PurchaseLogistic : Entity<PurchaseLogistic, Guid>, ILinqEntity<Purc
     {
         return PurchaseId;
     }
-
-    public static Expression<Func<PurchaseLogistic, bool>> GetEqualityExpression(Guid key)
-        => x => x.PurchaseId == key;
 }

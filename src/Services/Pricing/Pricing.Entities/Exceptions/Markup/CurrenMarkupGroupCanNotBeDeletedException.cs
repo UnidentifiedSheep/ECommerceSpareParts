@@ -1,7 +1,7 @@
 ﻿using Abstractions.Interfaces.Exceptions;
 using Exceptions.Base;
 
-namespace Pricing.Abstractions.Exceptions.Markup;
+namespace Pricing.Entities.Exceptions.Markup;
 
 public class CurrenMarkupGroupCanNotBeDeletedException()
     : BadRequestException(null), ILocalizableException

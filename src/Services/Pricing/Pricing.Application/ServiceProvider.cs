@@ -1,10 +1,9 @@
 ﻿using Application.Common;
 using Microsoft.Extensions.DependencyInjection;
-using Pricing.Abstractions.Interfaces.Services;
-using Pricing.Abstractions.Interfaces.Services.Pricing;
-using Pricing.Application.Services.ArticlePricing;
-using Pricing.Application.Services.ArticlePricing.BasePriceStrategies;
+using Pricing.Application.Interfaces.Services;
+using Pricing.Application.Interfaces.Services.Pricing;
 using Pricing.Application.Services.ProductPricing;
+using Pricing.Application.Services.ProductPricing.BasePriceStrategies;
 
 namespace Pricing.Application;
 

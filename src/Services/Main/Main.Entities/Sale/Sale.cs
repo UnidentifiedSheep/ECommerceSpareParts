@@ -1,7 +1,7 @@
 using System.Linq.Expressions;
 using Domain;
-using Domain.Interfaces;
 using Domain.Extensions;
+using Domain.Interfaces;
 using Main.Entities.Balance;
 using Main.Enums;
 
@@ -38,6 +38,11 @@ public class Sale : AuditableEntity<Sale, Guid>, ILinqEntity<Sale, Guid>
     public Transaction Transaction { get; private set; } = null!;
     public IReadOnlyList<SaleContent> Contents => _contents;
 
+    public static Expression<Func<Sale, bool>> GetEqualityExpression(Guid key)
+    {
+        return x => x.Id == key;
+    }
+
     public static Sale Create(Guid buyerId, Guid transactionId, int currencyId, string storageName, DateTime saleDate)
     {
         return new Sale(buyerId, transactionId, currencyId, storageName, saleDate);
@@ -73,7 +78,4 @@ public class Sale : AuditableEntity<Sale, Guid>, ILinqEntity<Sale, Guid>
     {
         return Id;
     }
-
-    public static Expression<Func<Sale, bool>> GetEqualityExpression(Guid key)
-        => x => x.Id == key;
 }

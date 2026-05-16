@@ -1,20 +1,17 @@
-using Enums;
 using FluentAssertions;
 using Main.Application.Interfaces.Services;
-using Main.Entities.Product;
 using Main.Entities.Purchase;
-using Main.Entities.Storage;
 using Main.Enums;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Test.Common.Extensions;
 using Test.Common.TestContainers.Combined;
-using Tests.TestContexts;
-using Tests.TestContexts.Purchase;
-using Tests.TestContexts.Currency;
-using Tests.TestContexts.Storage;
-using Tests.DataBuilders.Storage;
 using Tests.DataBuilders.Purchase;
+using Tests.DataBuilders.Storage;
+using Tests.TestContexts;
+using Tests.TestContexts.Currency;
+using Tests.TestContexts.Purchase;
+using Tests.TestContexts.Storage;
 
 namespace Tests.ServicesTests.Purchases;
 
@@ -27,6 +24,8 @@ public class PurchaseLogisticsServiceTests : IntegrationTest
         RegisterBasicContext<PurchaseTestContext>();
         RegisterBasicContext<ProductMeasurementsTestContext>();
     }
+
+    private PurchaseTestContext PurchaseContext => GetContext<PurchaseTestContext>();
 
     public override async Task InitializeAsync()
     {
@@ -233,6 +232,4 @@ public class PurchaseLogisticsServiceTests : IntegrationTest
     {
         return new PurchaseLogisticsItem(content, content.ProductId, content.Count);
     }
-
-    private PurchaseTestContext PurchaseContext => GetContext<PurchaseTestContext>();
 }

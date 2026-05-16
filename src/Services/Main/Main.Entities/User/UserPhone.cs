@@ -20,11 +20,13 @@ public class UserPhone : AuditableEntity<UserPhone, string>, ILinqEntity<UserPho
 
     public DateTime? ConfirmedAt { get; set; }
 
+    public static Expression<Func<UserPhone, bool>> GetEqualityExpression(string key)
+    {
+        return x => x.NormalizedPhone == key;
+    }
+
     public override string GetId()
     {
         return NormalizedPhone;
     }
-
-    public static Expression<Func<UserPhone, bool>> GetEqualityExpression(string key)
-        => x => x.NormalizedPhone == key;
 }

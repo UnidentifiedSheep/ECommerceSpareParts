@@ -32,6 +32,11 @@ public class UserEmail : AuditableEntity<UserEmail, string>, ILinqEntity<UserEma
     public DateTime? ConfirmedAt { get; private set; }
     public User User { get; private set; } = null!;
 
+    public static Expression<Func<UserEmail, bool>> GetEqualityExpression(string key)
+    {
+        return x => x.Email == key;
+    }
+
     internal static UserEmail Create(Guid userId, Email email, EmailType emailType)
     {
         return new UserEmail(userId, email, emailType);
@@ -57,7 +62,4 @@ public class UserEmail : AuditableEntity<UserEmail, string>, ILinqEntity<UserEma
     {
         return Email.Value;
     }
-
-    public static Expression<Func<UserEmail, bool>> GetEqualityExpression(string key)
-        => x => x.Email == key;
 }

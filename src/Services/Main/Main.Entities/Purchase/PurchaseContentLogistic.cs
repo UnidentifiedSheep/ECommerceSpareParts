@@ -1,7 +1,7 @@
 using System.Linq.Expressions;
 using Domain;
-using Domain.Interfaces;
 using Domain.Extensions;
+using Domain.Interfaces;
 
 namespace Main.Entities.Purchase;
 
@@ -22,6 +22,11 @@ public class PurchaseContentLogistic : Entity<PurchaseContentLogistic, int>, ILi
     public decimal WeightKg { get; private set; }
     public decimal AreaM3 { get; private set; }
     public decimal Price { get; private set; }
+
+    public static Expression<Func<PurchaseContentLogistic, bool>> GetEqualityExpression(int key)
+    {
+        return x => x.PurchaseContentId == key;
+    }
 
     internal static PurchaseContentLogistic Create(decimal weightKg, decimal areaM3, decimal price)
     {
@@ -57,7 +62,4 @@ public class PurchaseContentLogistic : Entity<PurchaseContentLogistic, int>, ILi
     {
         return PurchaseContentId;
     }
-
-    public static Expression<Func<PurchaseContentLogistic, bool>> GetEqualityExpression(int key)
-        => x => x.PurchaseContentId == key;
 }

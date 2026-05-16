@@ -1,8 +1,8 @@
 using System.Linq.Expressions;
 using BulkValidation.Core.Attributes;
 using Domain;
-using Domain.Interfaces;
 using Domain.Extensions;
+using Domain.Interfaces;
 using Enums;
 
 namespace Main.Entities.Product;
@@ -29,6 +29,11 @@ public class ProductWeight : Entity<ProductWeight, int>, ILinqEntity<ProductWeig
 
     public WeightUnit Unit { get; private set; }
 
+    public static Expression<Func<ProductWeight, bool>> GetEqualityExpression(int key)
+    {
+        return x => x.ProductId == key;
+    }
+
     public static ProductWeight Create(int productId, decimal weight, WeightUnit unit)
     {
         return new ProductWeight(productId, weight, unit);
@@ -45,9 +50,6 @@ public class ProductWeight : Entity<ProductWeight, int>, ILinqEntity<ProductWeig
     {
         return ProductId;
     }
-
-    public static Expression<Func<ProductWeight, bool>> GetEqualityExpression(int key)
-        => x => x.ProductId == key;
 
     private static void ValidateWeight(decimal weight)
     {

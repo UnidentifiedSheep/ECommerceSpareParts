@@ -1,10 +1,7 @@
-using Enums;
 using FluentAssertions;
 using Main.Application.Dtos.Amw.Purchase;
 using Main.Application.Handlers.Purchases.EditFullPurchase;
 using Main.Application.Handlers.StorageContents.SubtractContent;
-using Main.Entities.Product;
-using Main.Entities.Purchase;
 using Main.Entities.Storage;
 using Main.Enums;
 using Microsoft.EntityFrameworkCore;
@@ -24,6 +21,8 @@ public class EditPurchaseTests : IntegrationTest
         RegisterBasicContext<PurchaseTestContext>();
         RegisterBasicContext<ProductMeasurementsTestContext>();
     }
+
+    private PurchaseTestContext PurchaseContext => GetContext<PurchaseTestContext>();
 
     [Fact]
     public async Task EditPurchase_ValidContent_UpdatesPurchaseStorageAndTransaction()
@@ -299,6 +298,4 @@ public class EditPurchaseTests : IntegrationTest
         Context.StorageOwners.Add(StorageOwner.Create(route.FromStorageName, supplierId));
         await Context.SaveChangesAsync();
     }
-
-    private PurchaseTestContext PurchaseContext => GetContext<PurchaseTestContext>();
 }

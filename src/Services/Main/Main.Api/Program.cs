@@ -3,21 +3,15 @@ using Abstractions.Models;
 using Amazon.S3;
 using Api.Common;
 using Api.Common.Extensions;
-using Api.Common.Middleware;
-using Api.Common.Models;
-using Api.Common.Models.Options;
-using Api.Common.OperationFilters;
 using Application.Common.Interfaces.Settings;
 using Cache;
 using Carter;
-using Common;
 using Contracts.Currency;
 using Contracts.Settings;
 using ExchangeRate;
 using Hangfire;
 using Hangfire.PostgreSql;
 using Localization.Domain.Extensions;
-using Localization.Domain.Middlewares;
 using Mail;
 using Main.Api.EndPoints.Products;
 using Main.Application;
@@ -30,11 +24,9 @@ using Main.Cache;
 using Main.Persistence;
 using Main.Persistence.Context;
 using MassTransit;
-using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.Extensions.Options;
 using OpenTelemetry.Metrics;
 using Persistence;
-using RabbitMq;
 using RabbitMq.Extensions;
 using S3;
 using Security;
@@ -45,9 +37,9 @@ var builder = WebApplication.CreateBuilder(args);
 var env = builder.AddServiceConfiguration("main");
 
 builder.Host.AddLokiLogger(
-    configuration: builder.Configuration, 
-    serviceName: "main.api", 
-    environment: env);
+    builder.Configuration,
+    "main.api",
+    env);
 
 builder.Services.AddMessageBrokerOptions()
     .AddHeaderSecretsOptions()
@@ -128,7 +120,7 @@ builder.Services
     .AddApplicationCache()
     .AddJsonSigner(
         builder.Configuration["SignSecret"] ??
-        throw new InvalidOperationException("SignSecret not found in configuration"), 
+        throw new InvalidOperationException("SignSecret not found in configuration"),
         Global.JsonOptions)
     .AddFullSecurityLayer()
     .AddEComAuth(builder.Configuration)
@@ -162,7 +154,7 @@ builder.Services.AddOpenTelemetry()
 
 builder.Services.AddCarter(
     new DependencyContextAssemblyCatalog(typeof(AddProductContentEndPoint).Assembly),
-    configurator: c => c.WithEmptyValidators());
+    c => c.WithEmptyValidators());
 
 var app = builder.Build();
 

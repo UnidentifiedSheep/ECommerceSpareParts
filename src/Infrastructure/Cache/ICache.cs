@@ -42,7 +42,7 @@ public interface ICache
         string key,
         IEnumerable<string> values,
         TimeSpan? ttl = null);
-    
+
     Task RemoveKeysAsync(IEnumerable<string> keys);
     Task RemoveKeyAsync(string key);
 

@@ -13,14 +13,18 @@ public class SalesFact : AuditableEntity<SalesFact, Guid>, ILinqEntity<SalesFact
 
     public virtual ICollection<SaleContent> SaleContents { get; set; } = new List<SaleContent>();
 
+    public static Expression<Func<SalesFact, Guid>> GetKeySelector()
+    {
+        return x => x.Id;
+    }
+
+    public static Expression<Func<SalesFact, bool>> GetEqualityExpression(Guid key)
+    {
+        return x => x.Id == key;
+    }
+
     public override Guid GetId()
     {
         return Id;
     }
-
-    public static Expression<Func<SalesFact, Guid>> GetKeySelector()
-        => x => x.Id;
-
-    public static Expression<Func<SalesFact, bool>> GetEqualityExpression(Guid key)
-        => x => x.Id == key;
 }

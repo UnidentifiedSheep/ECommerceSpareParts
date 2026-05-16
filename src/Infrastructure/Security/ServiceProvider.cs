@@ -70,7 +70,7 @@ public static class ServiceProvider
             .SetDefaultPolicy(new AuthorizationPolicyBuilder(JwtBearerDefaults.AuthenticationScheme)
                 .RequireAuthenticatedUser()
                 .Build());
-        
+
         return collection;
     }
 }

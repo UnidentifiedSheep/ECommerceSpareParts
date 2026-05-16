@@ -8,12 +8,12 @@ using Persistence.Extensions;
 
 namespace Analytics.Persistence.Repositories;
 
-public class SalesFactRepository(DContext context) 
+public class SalesFactRepository(DContext context)
     : RepositoryBase<DContext, SalesFact, Guid>(context), ISalesFactRepository
 {
     public override Task<Dictionary<Guid, SalesFact>> FindByIdsAsync(
-        IEnumerable<Guid> ids, 
-        Criteria<SalesFact>? criteria = null, 
+        IEnumerable<Guid> ids,
+        Criteria<SalesFact>? criteria = null,
         CancellationToken ct = default)
     {
         return Context.SalesFacts

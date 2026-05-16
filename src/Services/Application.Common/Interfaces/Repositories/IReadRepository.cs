@@ -2,7 +2,7 @@
 
 namespace Application.Common.Interfaces.Repositories;
 
-public interface IReadRepository<TEntity, TKey> where TEntity : Entity<TEntity, TKey> 
+public interface IReadRepository<TEntity, TKey> where TEntity : Entity<TEntity, TKey>
     where TKey : notnull
 {
     IQueryable<TEntity> Query { get; }

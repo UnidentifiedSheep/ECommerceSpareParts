@@ -1,8 +1,8 @@
 using System.Linq.Expressions;
 using BulkValidation.Core.Attributes;
 using Domain;
-using Domain.Interfaces;
 using Domain.Extensions;
+using Domain.Interfaces;
 
 namespace Main.Entities.Currency;
 
@@ -41,6 +41,16 @@ public class Currency : Entity<Currency, int>, ILinqEntity<Currency, int>
 
     public IReadOnlyCollection<CurrencyRate> RatesFrom => _ratesFrom;
     public IReadOnlyCollection<CurrencyRate> RatesTo => _ratesTo;
+
+    public static Expression<Func<Currency, int>> GetKeySelector()
+    {
+        return x => x.Id;
+    }
+
+    public static Expression<Func<Currency, bool>> GetEqualityExpression(int key)
+    {
+        return x => x.Id == key;
+    }
 
     public static Currency Create(string name, string shortName, string currencySign, string code)
     {
@@ -87,10 +97,4 @@ public class Currency : Entity<Currency, int>, ILinqEntity<Currency, int>
     {
         return Id;
     }
-
-    public static Expression<Func<Currency, int>> GetKeySelector()
-        => x => x.Id;
-
-    public static Expression<Func<Currency, bool>> GetEqualityExpression(int key)
-        => x => x.Id == key;
 }

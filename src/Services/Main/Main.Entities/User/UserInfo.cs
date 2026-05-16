@@ -1,7 +1,7 @@
 using System.Linq.Expressions;
 using Domain;
-using Domain.Interfaces;
 using Domain.Extensions;
+using Domain.Interfaces;
 
 namespace Main.Entities.User;
 
@@ -24,6 +24,11 @@ public class UserInfo : Entity<UserInfo, Guid>, ILinqEntity<UserInfo, Guid>
     public string Surname { get; private set; } = null!;
     public string? Description { get; private set; }
     public string SearchColumn { get; private set; } = null!;
+
+    public static Expression<Func<UserInfo, bool>> GetEqualityExpression(Guid key)
+    {
+        return x => x.UserId == key;
+    }
 
     internal static UserInfo Create(Guid userId, string name, string surname, string? description)
     {
@@ -74,7 +79,4 @@ public class UserInfo : Entity<UserInfo, Guid>, ILinqEntity<UserInfo, Guid>
     {
         return UserId;
     }
-
-    public static Expression<Func<UserInfo, bool>> GetEqualityExpression(Guid key)
-        => x => x.UserId == key;
 }

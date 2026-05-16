@@ -1,8 +1,8 @@
 using System.Linq.Expressions;
 using BulkValidation.Core.Attributes;
 using Domain;
-using Domain.Interfaces;
 using Domain.Extensions;
+using Domain.Interfaces;
 using Enums;
 using Extensions;
 
@@ -35,6 +35,11 @@ public class ProductSize : Entity<ProductSize, int>, ILinqEntity<ProductSize, in
     public DimensionUnit Unit { get; private set; }
 
     public decimal VolumeM3 { get; private set; }
+
+    public static Expression<Func<ProductSize, bool>> GetEqualityExpression(int key)
+    {
+        return x => x.ProductId == key;
+    }
 
     public static ProductSize Create(int productId, decimal length, decimal width, decimal height, DimensionUnit unit)
     {
@@ -83,7 +88,4 @@ public class ProductSize : Entity<ProductSize, int>, ILinqEntity<ProductSize, in
     {
         return ProductId;
     }
-
-    public static Expression<Func<ProductSize, bool>> GetEqualityExpression(int key)
-        => x => x.ProductId == key;
 }

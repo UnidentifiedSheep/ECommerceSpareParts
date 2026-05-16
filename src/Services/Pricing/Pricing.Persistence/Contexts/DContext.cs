@@ -1,7 +1,6 @@
-﻿using MassTransit;
+﻿using System.Reflection;
+using MassTransit;
 using MassTransit.EntityFrameworkCoreIntegration;
-using System.Reflection;
-using Domain.CommonEntities;
 using Microsoft.EntityFrameworkCore;
 using Persistence.BaseTableConfigurations;
 using Persistence.Extensions;
@@ -36,7 +35,7 @@ public partial class DContext : DbContext
 
         modelBuilder.ApplyConfigurationsFromAssembly(Assembly.GetAssembly(GetType())!)
             .ApplyConfiguration(new SettingConfiguration());
-        
+
         modelBuilder.AddFieldsForAuditableEntities();
 
         modelBuilder.AllDateTimesToUtc()

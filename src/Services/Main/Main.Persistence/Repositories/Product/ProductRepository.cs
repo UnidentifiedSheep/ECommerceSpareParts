@@ -4,12 +4,13 @@ using Main.Application.Interfaces.Persistence;
 using Main.Entities.Product;
 using Main.Persistence.Context;
 using Microsoft.EntityFrameworkCore;
-using Persistence.Repository;
 using Persistence.Extensions;
+using Persistence.Repository;
 
 namespace Main.Persistence.Repositories.Product;
 
-public class ProductRepository(DContext context) : LinqRepositoryBase<DContext, Entities.Product.Product, int>(context), IProductRepository
+public class ProductRepository(DContext context)
+    : LinqRepositoryBase<DContext, Entities.Product.Product, int>(context), IProductRepository
 {
     public async Task<IReadOnlyList<Entities.Product.Product>> GetProductCrosses(
         int productId,
@@ -38,5 +39,4 @@ public class ProductRepository(DContext context) : LinqRepositoryBase<DContext, 
             crosses,
             cancellationToken: cancellationToken);
     }
-
 }

@@ -3,7 +3,6 @@ using Main.Application.Handlers.Currencies.CreateCurrency;
 using Microsoft.EntityFrameworkCore;
 using Test.Common.Extensions;
 using Test.Common.TestContainers.Combined;
-using Tests.DataBuilders;
 using Tests.DataBuilders.Currency;
 using ValidationException = FluentValidation.ValidationException;
 

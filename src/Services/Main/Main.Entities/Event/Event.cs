@@ -23,13 +23,15 @@ public abstract class Event : AuditableEntity<Event, int>, ILinqEntity<Event, in
 
     public string Json { get; protected set; } = null!;
 
+    public static Expression<Func<Event, bool>> GetEqualityExpression(int key)
+    {
+        return x => x.Id == key;
+    }
+
     public override int GetId()
     {
         return Id;
     }
-
-    public static Expression<Func<Event, bool>> GetEqualityExpression(int key)
-        => x => x.Id == key;
 }
 
 public abstract class Event<T> : Event

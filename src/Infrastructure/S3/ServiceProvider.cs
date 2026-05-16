@@ -6,7 +6,9 @@ namespace S3;
 
 public static class ServiceProvider
 {
-    public static IServiceCollection AddS3(this IServiceCollection collection, Func<IServiceProvider, AmazonS3Client> getOptions)
+    public static IServiceCollection AddS3(
+        this IServiceCollection collection,
+        Func<IServiceProvider, AmazonS3Client> getOptions)
     {
         collection.AddSingleton<IAmazonS3>(getOptions);
         collection.AddScoped<IS3StorageService, S3StorageService>();

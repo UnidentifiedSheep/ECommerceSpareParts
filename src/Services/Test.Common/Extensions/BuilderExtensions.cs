@@ -37,7 +37,7 @@ public static class BuilderExtensions
         var entities = new List<T>();
         foreach (var builder in builders)
             entities.AddRange(builder.BuildMany(count));
-        
+
         await context.AddRangeAsync(entities);
 
         if (saveChanges)

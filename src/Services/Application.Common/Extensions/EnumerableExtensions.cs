@@ -14,7 +14,7 @@ public static class EnumerableExtensions
 
         if (notFoundIds.Count > 0) throw errorFactory(notFoundIds);
     }
-    
+
     public static IEnumerable<TModel> ApplyPagination<TModel>(
         this IEnumerable<TModel> queryable,
         Pagination pagination)

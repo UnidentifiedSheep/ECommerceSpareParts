@@ -1,4 +1,4 @@
-﻿namespace Pricing.Abstractions.Models.Pricing;
+﻿namespace Pricing.Application.Models.Pricing;
 
 /// <summary>
 ///     Context for final price calculation.

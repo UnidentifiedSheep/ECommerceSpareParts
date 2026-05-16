@@ -14,10 +14,8 @@ using Npgsql;
 using Persistence;
 using Security;
 using Serilog;
-using Test.Common.Abstractions;
 using Test.Common.Abstractions.Test;
 using Test.Common.Extensions;
-using Test.Common.Interfaces;
 using Test.Common.Interfaces.ServiceProvider;
 using Test.Common.Stubs;
 using Test.Common.TestContexts;
@@ -53,7 +51,7 @@ public class ServiceProviderBuilder : IServiceProviderBuilder<ServiceProviderArg
         };
 
         var redisParts = args.CacheConnectionString.Split(",password=");
-        
+
         services.AddSingleton(Options.Create(new RedisOptions
         {
             Url = redisParts[0],

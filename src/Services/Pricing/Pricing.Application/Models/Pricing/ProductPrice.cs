@@ -1,4 +1,4 @@
-﻿namespace Pricing.Abstractions.Models.Pricing;
+﻿namespace Pricing.Application.Models.Pricing;
 
 public record ProductPrice
 {

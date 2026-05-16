@@ -1,6 +1,6 @@
 ﻿using Pricing.Enums;
 
-namespace Pricing.Abstractions.Interfaces.Services.Pricing;
+namespace Pricing.Application.Interfaces.Services.Pricing;
 
 public interface IBasePriceStrategyFactory
 {

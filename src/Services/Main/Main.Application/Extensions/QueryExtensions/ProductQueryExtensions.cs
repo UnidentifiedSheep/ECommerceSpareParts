@@ -42,5 +42,7 @@ public static class ProductQueryExtensions
     private static IQueryable<Product> WithPredicate(
         this IQueryable<Product> query,
         Expression<Func<Product, bool>>? predicate)
-        => predicate == null ? query : query.Where(predicate);
+    {
+        return predicate == null ? query : query.Where(predicate);
+    }
 }

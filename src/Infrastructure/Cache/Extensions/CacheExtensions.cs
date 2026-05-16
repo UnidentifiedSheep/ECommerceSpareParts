@@ -74,8 +74,8 @@ public static class CacheExtensions
         TimeSpan? ttl = null)
     {
         return cache.SetEnumerableAsync(
-            key: key,
-            values: values,
+            key,
+            values,
             ttl: ttl);
     }
 

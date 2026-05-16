@@ -7,12 +7,13 @@ using Microsoft.Extensions.Options;
 namespace Internal.Integration.Main;
 
 public class MainClient(
-    HttpClient httpClient, 
+    HttpClient httpClient,
     IAuthClient authClient,
-    IOptionsMonitor<InternalServiceCredentials> optionsMonitor) : InternalClientBase(authClient, optionsMonitor), IMainClient
+    IOptionsMonitor<InternalServiceCredentials> optionsMonitor)
+    : InternalClientBase(authClient, optionsMonitor), IMainClient
 {
     public async Task<decimal> GetUserDiscount(
-        Guid userId, 
+        Guid userId,
         CancellationToken cancellationToken = default)
     {
         using var request = await GetRequest(
@@ -20,14 +21,14 @@ public class MainClient(
             $"/users/{userId}/discount",
             cancellationToken);
         using var response = await httpClient.SendAsync(
-            request: request,
-            cancellationToken: cancellationToken);
-        
+            request,
+            cancellationToken);
+
         response.EnsureSuccessStatusCode();
-        
+
         var json = await response.Content.ReadAsStringAsync(cancellationToken);
         return JsonSerializer.Deserialize<GetUserDiscountResponse>(json)?.Discount
-            ?? throw new InvalidOperationException($"{nameof(GetUserDiscount)} returned null.");
+               ?? throw new InvalidOperationException($"{nameof(GetUserDiscount)} returned null.");
     }
 
     private record GetUserDiscountResponse

@@ -18,11 +18,11 @@ public abstract class InternalClientBase(
         var request = new HttpRequestMessage();
         request.Method = method;
         request.RequestUri = new Uri(url);
-        
+
         var currOptions = optionsMonitor.CurrentValue;
         var token = await authClient.GetAuthToken(currOptions.Service, currOptions.Secret, ct);
         request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", token);
-        
+
         return request;
     }
 

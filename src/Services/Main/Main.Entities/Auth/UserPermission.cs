@@ -4,7 +4,8 @@ using Domain.Interfaces;
 
 namespace Main.Entities.Auth;
 
-public class UserPermission : AuditableEntity<UserPermission, (Guid, string)>, ILinqEntity<UserPermission, (Guid, string)>
+public class UserPermission : AuditableEntity<UserPermission, (Guid, string)>,
+    ILinqEntity<UserPermission, (Guid, string)>
 {
     private UserPermission()
     {
@@ -20,6 +21,11 @@ public class UserPermission : AuditableEntity<UserPermission, (Guid, string)>, I
 
     public string Permission { get; } = null!;
 
+    public static Expression<Func<UserPermission, bool>> GetEqualityExpression((Guid, string) key)
+    {
+        return x => x.UserId == key.Item1 && x.Permission == key.Item2;
+    }
+
     public static UserPermission Create(Guid userId, string permission)
     {
         return new UserPermission(userId, permission);
@@ -29,7 +35,4 @@ public class UserPermission : AuditableEntity<UserPermission, (Guid, string)>, I
     {
         return (UserId, Permission);
     }
-
-    public static Expression<Func<UserPermission, bool>> GetEqualityExpression((Guid, string) key)
-        => x => x.UserId == key.Item1 && x.Permission == key.Item2;
 }

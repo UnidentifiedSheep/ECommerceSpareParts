@@ -6,7 +6,8 @@ using Domain.Interfaces;
 
 namespace Main.Entities.Producer;
 
-public class ProducerOtherName : Entity<ProducerOtherName, ProducerOtherNameKey>, ILinqEntity<ProducerOtherName, ProducerOtherNameKey>
+public class ProducerOtherName : Entity<ProducerOtherName, ProducerOtherNameKey>,
+    ILinqEntity<ProducerOtherName, ProducerOtherNameKey>
 {
     private ProducerOtherName()
     {
@@ -27,6 +28,11 @@ public class ProducerOtherName : Entity<ProducerOtherName, ProducerOtherNameKey>
 
     [ValidateTuple("PK")]
     public string WhereUsed { get; private set; } = null!;
+
+    public static Expression<Func<ProducerOtherName, bool>> GetEqualityExpression(ProducerOtherNameKey key)
+    {
+        return x => x.ProducerId == key.ProducerId && x.OtherName == key.OtherName && x.WhereUsed == key.WhereUsed;
+    }
 
     public static ProducerOtherName Create(int producerId, string otherName, string whereUsed)
     {
@@ -51,9 +57,6 @@ public class ProducerOtherName : Entity<ProducerOtherName, ProducerOtherNameKey>
     {
         return new ProducerOtherNameKey(ProducerId, OtherName, WhereUsed);
     }
-
-    public static Expression<Func<ProducerOtherName, bool>> GetEqualityExpression(ProducerOtherNameKey key)
-        => x => x.ProducerId == key.ProducerId && x.OtherName == key.OtherName && x.WhereUsed == key.WhereUsed;
 }
 
 public readonly struct ProducerOtherNameKey(int producerId, string otherName, string whereUsed) : ICompositeKey

@@ -2,7 +2,7 @@
 using BulkValidation.Core.Interfaces;
 using Main.Entities;
 
-namespace Main.Application.Handlers.Purchases.CreateFullPurchase;
+namespace Main.Application.Handlers.Purchases.CreatePurchase;
 
 public class CreatePurchaseDbValidation : AbstractDbValidation<CreatePurchaseCommand>
 {

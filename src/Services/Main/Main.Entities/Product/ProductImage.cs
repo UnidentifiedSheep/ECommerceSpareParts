@@ -33,6 +33,11 @@ public class ProductImage : Entity<ProductImage, (int, string)>, ILinqEntity<Pro
 
     public string? Description { get; private set; }
 
+    public static Expression<Func<ProductImage, bool>> GetEqualityExpression((int, string) key)
+    {
+        return x => x.ProductId == key.Item1 && x.Path == key.Item2;
+    }
+
     public static ProductImage Create(int productId, string path, string? description)
     {
         return new ProductImage(productId, path, description);
@@ -64,9 +69,6 @@ public class ProductImage : Entity<ProductImage, (int, string)>, ILinqEntity<Pro
     {
         return (ProductId, Path);
     }
-
-    public static Expression<Func<ProductImage, bool>> GetEqualityExpression((int, string) key)
-        => x => x.ProductId == key.Item1 && x.Path == key.Item2;
 
     private static bool IsSupportedExtension(string path)
     {

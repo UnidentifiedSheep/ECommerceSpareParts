@@ -21,7 +21,7 @@ public class SubtractStorageContentsTests : IntegrationTest
     [Fact]
     public async Task SubtractStorageContents_StartsFromPassedStorageContentAndContinuesOnSameStorage()
     {
-        var contentsForSameProductAndStorage = GetContentsForSameProductAndStorage(minCount: 2)
+        var contentsForSameProductAndStorage = GetContentsForSameProductAndStorage(2)
             .OrderBy(x => x.PurchaseDatetime)
             .ToList();
         var firstByDate = contentsForSameProductAndStorage.First();
@@ -86,7 +86,7 @@ public class SubtractStorageContentsTests : IntegrationTest
     [Fact]
     public async Task SubtractStorageContents_WhenFirstStorageContentIsZero_ContinuesOnSameStorage()
     {
-        var contentsForSameProductAndStorage = GetContentsForSameProductAndStorage(minCount: 2)
+        var contentsForSameProductAndStorage = GetContentsForSameProductAndStorage(2)
             .OrderBy(x => x.PurchaseDatetime)
             .ToList();
         var first = contentsForSameProductAndStorage.First();
@@ -189,7 +189,8 @@ public class SubtractStorageContentsTests : IntegrationTest
     [Theory]
     [InlineData(0)]
     [InlineData(-1)]
-    public async Task SubtractStorageContents_WithInvalidStorageContentId_ThrowsValidationException(int storageContentId)
+    public async Task SubtractStorageContents_WithInvalidStorageContentId_ThrowsValidationException(
+        int storageContentId)
     {
         await Assert.ThrowsAsync<ValidationException>(() =>
             Mediator.Send(new SubtractStorageContentsCommand(

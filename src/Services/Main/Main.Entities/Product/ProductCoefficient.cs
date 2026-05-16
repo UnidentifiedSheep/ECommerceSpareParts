@@ -4,7 +4,8 @@ using Domain.Interfaces;
 
 namespace Main.Entities.Product;
 
-public class ProductCoefficient : AuditableEntity<ProductCoefficient, (int, string)>, ILinqEntity<ProductCoefficient, (int, string)>
+public class ProductCoefficient : AuditableEntity<ProductCoefficient, (int, string)>,
+    ILinqEntity<ProductCoefficient, (int, string)>
 {
     public int ProductId { get; set; }
 
@@ -14,11 +15,13 @@ public class ProductCoefficient : AuditableEntity<ProductCoefficient, (int, stri
 
     public virtual Coefficient Coefficient { get; set; } = null!;
 
+    public static Expression<Func<ProductCoefficient, bool>> GetEqualityExpression((int, string) key)
+    {
+        return x => x.ProductId == key.Item1 && x.CoefficientName == key.Item2;
+    }
+
     public override (int, string) GetId()
     {
         return (ProductId, CoefficientName);
     }
-
-    public static Expression<Func<ProductCoefficient, bool>> GetEqualityExpression((int, string) key)
-        => x => x.ProductId == key.Item1 && x.CoefficientName == key.Item2;
 }

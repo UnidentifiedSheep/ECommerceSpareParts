@@ -59,6 +59,16 @@ public class Product : AuditableEntity<Product, int>, ILinqEntity<Product, int>
 
     public Producer.Producer Producer { get; private set; } = null!;
 
+    public static Expression<Func<Product, int>> GetKeySelector()
+    {
+        return x => x.Id;
+    }
+
+    public static Expression<Func<Product, bool>> GetEqualityExpression(int key)
+    {
+        return x => x.Id == key;
+    }
+
     public static Product Create(
         Sku sku,
         Name name,
@@ -132,10 +142,4 @@ public class Product : AuditableEntity<Product, int>, ILinqEntity<Product, int>
     {
         return Id;
     }
-
-    public static Expression<Func<Product, int>> GetKeySelector()
-        => x => x.Id;
-
-    public static Expression<Func<Product, bool>> GetEqualityExpression(int key)
-        => x => x.Id == key;
 }

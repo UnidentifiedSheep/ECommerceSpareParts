@@ -20,16 +20,20 @@ public class Setting : AuditableEntity<Setting, string>, ILinqEntity<Setting, st
 
     public string Json { get; protected set; } = null!;
 
+    public static Expression<Func<Setting, string>> GetKeySelector()
+    {
+        return x => x.Key;
+    }
+
+    public static Expression<Func<Setting, bool>> GetEqualityExpression(string key)
+    {
+        return x => x.Key == key;
+    }
+
     public override string GetId()
     {
         return Key;
     }
-
-    public static Expression<Func<Setting, string>> GetKeySelector()
-        => x => x.Key;
-
-    public static Expression<Func<Setting, bool>> GetEqualityExpression(string key)
-        => x => x.Key == key;
 }
 
 public abstract class Setting<T> : Setting

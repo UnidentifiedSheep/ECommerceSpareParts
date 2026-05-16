@@ -1,4 +1,4 @@
-namespace Pricing.Abstractions.Dtos.Markups;
+namespace Pricing.Application.Dtos.Markups;
 
 public class MarkupGroupDto
 {

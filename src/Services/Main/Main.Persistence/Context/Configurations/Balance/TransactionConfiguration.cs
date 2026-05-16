@@ -1,11 +1,12 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using Main.Entities.Balance;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
 namespace Main.Persistence.Context.Configurations.Balance;
 
-public class TransactionConfiguration : IEntityTypeConfiguration<Entities.Balance.Transaction>
+public class TransactionConfiguration : IEntityTypeConfiguration<Transaction>
 {
-    public void Configure(EntityTypeBuilder<Entities.Balance.Transaction> builder)
+    public void Configure(EntityTypeBuilder<Transaction> builder)
     {
         builder.ToTable("transactions", "public");
 

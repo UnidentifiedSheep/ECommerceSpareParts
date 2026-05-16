@@ -26,11 +26,13 @@ public class UserVehicle : AuditableEntity<UserVehicle, Guid>, ILinqEntity<UserV
 
     public string? Comment { get; set; }
 
+    public static Expression<Func<UserVehicle, bool>> GetEqualityExpression(Guid key)
+    {
+        return x => x.Id == key;
+    }
+
     public override Guid GetId()
     {
         return Id;
     }
-
-    public static Expression<Func<UserVehicle, bool>> GetEqualityExpression(Guid key)
-        => x => x.Id == key;
 }

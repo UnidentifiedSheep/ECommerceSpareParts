@@ -3,14 +3,9 @@ using Abstractions.Interfaces.HostedServices;
 using Api.Common;
 using Api.Common.Extensions;
 using Api.Common.HostedServices;
-using Api.Common.Middleware;
-using Api.Common.OperationFilters;
 using Carter;
-using Common;
 using Localization.Domain.Extensions;
-using Localization.Domain.Middlewares;
 using MassTransit;
-using Microsoft.AspNetCore.HttpOverrides;
 using RabbitMq.Extensions;
 using Search.Api.EndPoints.Articles;
 using Search.Application;
@@ -21,8 +16,8 @@ var builder = WebApplication.CreateBuilder(args);
 var env = builder.AddServiceConfiguration("search");
 
 builder.Host.AddLokiLogger(
-    builder.Configuration, 
-    "search.api", 
+    builder.Configuration,
+    "search.api",
     env);
 
 builder.Services.AddMessageBrokerOptions()
@@ -37,11 +32,7 @@ builder.Services.AddMassTransit(x =>
     {
         cfg.ConfigureRabbitMq(context);
 
-        cfg.ReceiveEndpoint("search-queue", ep =>
-        {
-            ep.Durable = true;
-
-        });
+        cfg.ReceiveEndpoint("search-queue", ep => { ep.Durable = true; });
     });
 });
 
@@ -58,7 +49,7 @@ builder.Services.AddPersistenceLayer(builder.Configuration.GetValue<string>("Ind
 var endpointAssembly = typeof(GetArticleRequest).Assembly;
 builder.Services.AddCarter(
     new DependencyContextAssemblyCatalog(endpointAssembly),
-    configurator: c => c.WithEmptyValidators());
+    c => c.WithEmptyValidators());
 
 var app = builder.Build();
 

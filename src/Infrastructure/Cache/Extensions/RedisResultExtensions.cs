@@ -18,10 +18,10 @@ public static class RedisResultExtensions
         using var document = JsonDocument.Parse(json);
 
         var root = document.RootElement;
-        
+
         if (root.ValueKind != JsonValueKind.Array)
             return root.Deserialize<T>();
-        
+
         if (root.GetArrayLength() == 0)
             return default;
 

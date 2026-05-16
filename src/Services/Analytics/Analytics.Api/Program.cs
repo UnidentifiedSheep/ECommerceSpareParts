@@ -5,18 +5,11 @@ using Analytics.Persistence;
 using Analytics.Persistence.Context;
 using Api.Common;
 using Api.Common.Extensions;
-using Api.Common.Middleware;
-using Api.Common.Models;
-using Api.Common.Models.Options;
 using Cache;
 using Carter;
-using Common;
 using Internal.Integration.Di;
 using Localization.Domain.Extensions;
-using Localization.Domain.Middlewares;
 using MassTransit;
-using Persistence.Extensions;
-using RabbitMq;
 using RabbitMq.Extensions;
 using Security;
 
@@ -27,9 +20,9 @@ var builder = WebApplication.CreateBuilder(args);
 var env = builder.AddServiceConfiguration("analytics");
 
 builder.Host.AddLokiLogger(
-    configuration: builder.Configuration, 
-    serviceName: "analytics.api", 
-    environment:env);
+    builder.Configuration,
+    "analytics.api",
+    env);
 
 builder.Services.AddMessageBrokerOptions()
     .AddHeaderSecretsOptions()

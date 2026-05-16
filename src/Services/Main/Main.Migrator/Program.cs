@@ -14,7 +14,7 @@ using Security.Services;
 
 var builder = Host.CreateDefaultBuilder(args)
     .ConfigureAppConfiguration((_, config) => { config.AddCommandLine(args); })
-    .ConfigureAppConfiguration((_, config) => 
+    .ConfigureAppConfiguration((_, config) =>
         config.AddMigratorSettingsFromJsons("main.settings")
             .AddAppSettingsFromJsons("main.settings", "/app/configs"));
 
@@ -35,7 +35,7 @@ builder.ConfigureServices((context, services) =>
 
     //used for password hash etc
     services.AddSingleton<IPasswordManager, PasswordManager>(_ => new PasswordManager(new PasswordRules()));
-    
+
     services.AddOptions<ServiceSecrets>(ServiceSecrets.SectionName)
         .ValidateDataAnnotations()
         .ValidateOnStart();

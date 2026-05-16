@@ -18,10 +18,9 @@ public static class ServiceCollectionExtensions
         });
 
         serviceCollection.AddTransient<IDatabase>(sp => sp.GetRequiredService<IConnectionMultiplexer>().GetDatabase());
-        serviceCollection.AddTransient<ICache, RedisCache>(
-            sp => new RedisCache(
-                sp.GetRequiredService<IDatabase>(),
-                serviceName));
+        serviceCollection.AddTransient<ICache, RedisCache>(sp => new RedisCache(
+            sp.GetRequiredService<IDatabase>(),
+            serviceName));
 
         serviceCollection.AddOptions<RedisCacheOptions>()
             .Configure<IOptions<RedisOptions>>((cacheOptions, redisOptions) =>

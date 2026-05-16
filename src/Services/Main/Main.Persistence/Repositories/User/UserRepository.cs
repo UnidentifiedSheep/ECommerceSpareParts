@@ -4,8 +4,8 @@ using Main.Application.Interfaces.Persistence;
 using Main.Entities.User.ValueObjects;
 using Main.Persistence.Context;
 using Microsoft.EntityFrameworkCore;
-using Persistence.Repository;
 using Persistence.Extensions;
+using Persistence.Repository;
 
 namespace Main.Persistence.Repositories.User;
 
@@ -58,5 +58,4 @@ public class UserRepository(DContext context)
 
         return query.FirstOrDefaultAsync(cancellationToken);
     }
-
 }

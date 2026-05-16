@@ -1,28 +1,18 @@
 using System.Reflection;
 using Api.Common;
 using Api.Common.Extensions;
-using Api.Common.Middleware;
-using Api.Common.Models;
-using Api.Common.Models.Options;
-using Api.Common.OperationFilters;
 using Cache;
 using Carter;
-using Common;
 using Contracts.Currency;
 using Contracts.Markup;
 using Contracts.Settings;
 using Internal.Integration.Di;
-using Localization.Abstractions.Models;
 using Localization.Domain.Extensions;
-using Localization.Domain.Middlewares;
 using MassTransit;
-using Microsoft.AspNetCore.HttpOverrides;
 using OpenTelemetry.Metrics;
-using Persistence.Extensions;
 using Pricing.Application;
 using Pricing.Persistence;
 using Pricing.Persistence.Contexts;
-using RabbitMq;
 using RabbitMq.Extensions;
 using Security;
 
@@ -31,9 +21,9 @@ var builder = WebApplication.CreateBuilder(args);
 var env = builder.AddServiceConfiguration("pricing");
 
 builder.Host.AddLokiLogger(
-    configuration: builder.Configuration, 
-    serviceName: "pricing.api", 
-    environment: env);
+    builder.Configuration,
+    "pricing.api",
+    env);
 
 builder.Services.AddMessageBrokerOptions()
     .AddHeaderSecretsOptions()
@@ -72,10 +62,7 @@ builder.Services.AddMassTransit(x =>
             ep.Bind<MarkupRangesUpdatedEvent>();
         });
 
-        cfg.ReceiveEndpoint("pricing-queue", ep =>
-        {
-            ep.Durable = true;
-        });
+        cfg.ReceiveEndpoint("pricing-queue", ep => { ep.Durable = true; });
     });
 });
 
@@ -84,8 +71,8 @@ builder.Services
     .AddPersistenceLayer()
     .AddCacheLayer("pricing")
     .AddJsonSigner(
-        builder.Configuration["SignSecret"] 
-        ?? throw new InvalidOperationException("Unable to find SignSecret"), 
+        builder.Configuration["SignSecret"]
+        ?? throw new InvalidOperationException("Unable to find SignSecret"),
         Global.JsonOptions)
     .AddMinimalSecurityLayer()
     .AddIntegrationClients()
@@ -106,7 +93,7 @@ builder.Services.AddOpenTelemetry()
 var endpointAssembly = typeof(Program).Assembly;
 builder.Services.AddCarter(
     new DependencyContextAssemblyCatalog(endpointAssembly),
-    configurator: c => c.WithEmptyValidators());
+    c => c.WithEmptyValidators());
 
 var app = builder.Build();
 

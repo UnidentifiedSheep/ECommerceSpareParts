@@ -1,7 +1,6 @@
 using Analytics.Entities;
 using Analytics.Entities.Exceptions.MetricCalculationJobs;
 using Analytics.Enums;
-using Application.Common.Interfaces;
 using Application.Common.Interfaces.Cqrs;
 using Application.Common.Interfaces.Repositories;
 using Attributes;

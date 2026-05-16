@@ -8,8 +8,8 @@ namespace Internal.Integration.Auth;
 public abstract class AuthClientBase(HttpClient client) : IAuthClient
 {
     public virtual async Task<string> GetAuthToken(
-        string service, 
-        string serviceSecret, 
+        string service,
+        string serviceSecret,
         CancellationToken cancellationToken = default)
     {
         var request = new InternalLoginRequest
@@ -22,21 +22,21 @@ public abstract class AuthClientBase(HttpClient client) : IAuthClient
             JsonSerializer.Serialize(request),
             Encoding.UTF8,
             "application/json");
-        
+
         using var response = await client.PostAsync("/internal/auth/token", content, cancellationToken);
-        
+
         response.EnsureSuccessStatusCode();
-        
+
         var result = await response.Content.ReadAsStringAsync(cancellationToken);
-        return JsonSerializer.Deserialize<InternalLoginResponse>(result)?.Token 
-            ?? throw new InvalidOperationException("Unable to deserialize the response");
+        return JsonSerializer.Deserialize<InternalLoginResponse>(result)?.Token
+               ?? throw new InvalidOperationException("Unable to deserialize the response");
     }
 
     protected record InternalLoginRequest
     {
         [JsonPropertyName("service")]
         public required string Service { get; init; }
-        
+
         [JsonPropertyName("secret")]
         public required string ServiceSecret { get; init; }
     }

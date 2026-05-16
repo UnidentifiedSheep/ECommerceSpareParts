@@ -1,6 +1,5 @@
 using Bogus;
 using Main.Entities.Balance;
-using Main.Entities.User;
 using Main.Enums;
 using Test.Common.Abstractions;
 

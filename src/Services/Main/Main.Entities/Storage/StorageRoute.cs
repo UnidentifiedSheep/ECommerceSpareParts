@@ -1,8 +1,8 @@
 using System.Linq.Expressions;
 using BulkValidation.Core.Attributes;
 using Domain;
-using Domain.Interfaces;
 using Domain.Extensions;
+using Domain.Interfaces;
 using Main.Enums;
 
 namespace Main.Entities.Storage;
@@ -71,6 +71,16 @@ public class StorageRoute : AuditableEntity<StorageRoute, Guid>, ILinqEntity<Sto
     public Guid? CarrierId { get; private set; }
 
     public Currency.Currency Currency { get; private set; } = null!;
+
+    public static Expression<Func<StorageRoute, Guid>> GetKeySelector()
+    {
+        return x => x.Id;
+    }
+
+    public static Expression<Func<StorageRoute, bool>> GetEqualityExpression(Guid key)
+    {
+        return x => x.Id == key;
+    }
 
     public static StorageRoute Create(
         string from,
@@ -184,10 +194,4 @@ public class StorageRoute : AuditableEntity<StorageRoute, Guid>, ILinqEntity<Sto
     {
         return Id;
     }
-
-    public static Expression<Func<StorageRoute, Guid>> GetKeySelector()
-        => x => x.Id;
-
-    public static Expression<Func<StorageRoute, bool>> GetEqualityExpression(Guid key)
-        => x => x.Id == key;
 }

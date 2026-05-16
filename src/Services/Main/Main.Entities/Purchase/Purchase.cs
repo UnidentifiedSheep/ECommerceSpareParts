@@ -1,8 +1,8 @@
 using System.Linq.Expressions;
 using BulkValidation.Core.Attributes;
 using Domain;
-using Domain.Interfaces;
 using Domain.Extensions;
+using Domain.Interfaces;
 using Enums;
 using Exceptions;
 using Main.Entities.Balance;
@@ -48,6 +48,11 @@ public class Purchase : AuditableEntity<Purchase, Guid>, ILinqEntity<Purchase, G
     public virtual User.User Supplier { get; private set; } = null!;
     public virtual Transaction Transaction { get; private set; } = null!;
     public IReadOnlyCollection<PurchaseContent> Contents => _contents;
+
+    public static Expression<Func<Purchase, bool>> GetEqualityExpression(Guid key)
+    {
+        return x => x.Id == key;
+    }
 
     public static Purchase Create(
         Guid supplierId,
@@ -157,7 +162,4 @@ public class Purchase : AuditableEntity<Purchase, Guid>, ILinqEntity<Purchase, G
     {
         return Id;
     }
-
-    public static Expression<Func<Purchase, bool>> GetEqualityExpression(Guid key)
-        => x => x.Id == key;
 }

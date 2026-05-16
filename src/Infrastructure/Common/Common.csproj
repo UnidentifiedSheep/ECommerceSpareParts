@@ -8,11 +8,11 @@
     </PropertyGroup>
 
     <ItemGroup>
-        <PackageReference Include="FluentValidation" Version="12.1.1" />
-        <PackageReference Include="Mapster" Version="10.0.8-pre06" />
+        <PackageReference Include="FluentValidation" Version="12.1.1"/>
+        <PackageReference Include="Mapster" Version="10.0.8-pre06"/>
         <PackageReference Include="Mapster.DependencyInjection" Version="9.0.0-pre01"/>
         <PackageReference Include="Microsoft.Extensions.Configuration.Abstractions" Version="10.0.0"/>
-        <PackageReference Include="Microsoft.Extensions.Configuration.Json" Version="10.0.0" />
+        <PackageReference Include="Microsoft.Extensions.Configuration.Json" Version="10.0.0"/>
         <PackageReference Include="Microsoft.Extensions.Logging" Version="10.0.0"/>
         <PackageReference Include="Newtonsoft.Json" Version="13.0.4"/>
         <PackageReference Include="Polly" Version="8.6.5"/>

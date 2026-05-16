@@ -6,7 +6,6 @@ using Application.Common.Interfaces.Cqrs;
 using Attributes;
 using Contracts.Products;
 using Contracts.StorageContent;
-using Main.Application.Extensions;
 using Main.Application.Interfaces.Persistence;
 using Main.Entities.Event;
 using Main.Entities.Exceptions.Products;
@@ -56,7 +55,6 @@ public class SubtractStorageContentsHandler(
         Subtract(firstContent, ref remaining, affected, events, request.MovementType);
 
         if (remaining > 0)
-        {
             await foreach (var content in storageContentRepository
                                .GetStorageContentsForUpdateAsync(
                                    firstContent.ProductId,
@@ -68,7 +66,6 @@ public class SubtractStorageContentsHandler(
                 Subtract(content, ref remaining, affected, events, request.MovementType);
                 if (remaining == 0) break;
             }
-        }
 
         if (remaining > 0)
         {

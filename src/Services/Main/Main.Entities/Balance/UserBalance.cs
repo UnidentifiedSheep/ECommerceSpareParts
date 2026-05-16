@@ -23,6 +23,11 @@ public class UserBalance : AuditableEntity<UserBalance, UserBalanceKey>, ILinqEn
     public decimal Balance { get; private set; }
     public uint RowVersion { get; private set; }
 
+    public static Expression<Func<UserBalance, bool>> GetEqualityExpression(UserBalanceKey key)
+    {
+        return x => x.UserId == key.UserId && x.CurrencyId == key.CurrencyId;
+    }
+
     public static UserBalance Create(Guid userId, int currencyId)
     {
         return new UserBalance(userId, currencyId);
@@ -41,9 +46,6 @@ public class UserBalance : AuditableEntity<UserBalance, UserBalanceKey>, ILinqEn
     {
         return new UserBalanceKey(UserId, CurrencyId);
     }
-
-    public static Expression<Func<UserBalance, bool>> GetEqualityExpression(UserBalanceKey key)
-        => x => x.UserId == key.UserId && x.CurrencyId == key.CurrencyId;
 }
 
 public readonly struct UserBalanceKey(Guid userId, int currencyId) : ICompositeKey

@@ -15,17 +15,17 @@ public static class ServiceProviderExtensions
             .BindConfiguration(InternalServicesOptions.SectionName)
             .ValidateDataAnnotations()
             .ValidateOnStart();
-            
+
         services.AddOptions<InternalServiceCredentials>()
             .BindConfiguration(InternalServiceCredentials.SectionName)
             .ValidateDataAnnotations()
             .ValidateOnStart();
 
         services.AddSingleton<IAuthTokenCache, AuthTokenCache>();
-        
+
         services.AddHttpClient<IAuthClient, CacheableAuthClient>();
         services.AddHttpClient<IMainClient, MainClient>();
-        
+
         return services;
     }
 }

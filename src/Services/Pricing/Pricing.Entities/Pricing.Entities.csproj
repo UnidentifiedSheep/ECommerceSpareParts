@@ -12,10 +12,10 @@
     </ItemGroup>
 
     <ItemGroup>
-      <ProjectReference Include="..\..\..\Core\Abstractions\Abstractions.csproj" />
-      <ProjectReference Include="..\..\..\Core\Domain\Domain.csproj" />
-      <ProjectReference Include="..\..\..\Core\Exceptions\Exceptions.csproj" />
-      <ProjectReference Include="..\Pricing.Enums\Pricing.Enums.csproj" />
+        <ProjectReference Include="..\..\..\Core\Abstractions\Abstractions.csproj"/>
+        <ProjectReference Include="..\..\..\Core\Domain\Domain.csproj"/>
+        <ProjectReference Include="..\..\..\Core\Exceptions\Exceptions.csproj"/>
+        <ProjectReference Include="..\Pricing.Enums\Pricing.Enums.csproj"/>
     </ItemGroup>
 
 </Project>

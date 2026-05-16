@@ -1,11 +1,12 @@
 using System.Linq.Expressions;
 using Domain;
-using Domain.Interfaces;
 using Domain.Extensions;
+using Domain.Interfaces;
 
 namespace Main.Entities.Product;
 
-public class ProductCharacteristic : Entity<ProductCharacteristic, (int, string)>, ILinqEntity<ProductCharacteristic, (int, string)>
+public class ProductCharacteristic : Entity<ProductCharacteristic, (int, string)>,
+    ILinqEntity<ProductCharacteristic, (int, string)>
 {
     private ProductCharacteristic()
     {
@@ -22,6 +23,11 @@ public class ProductCharacteristic : Entity<ProductCharacteristic, (int, string)
 
     public string Name { get; private set; } = null!;
     public string Value { get; private set; } = null!;
+
+    public static Expression<Func<ProductCharacteristic, bool>> GetEqualityExpression((int, string) key)
+    {
+        return x => x.ProductId == key.Item1 && x.Name == key.Item2;
+    }
 
     public static ProductCharacteristic Create(int productId, string name, string value)
     {
@@ -47,7 +53,4 @@ public class ProductCharacteristic : Entity<ProductCharacteristic, (int, string)
     {
         return (ProductId, Name);
     }
-
-    public static Expression<Func<ProductCharacteristic, bool>> GetEqualityExpression((int, string) key)
-        => x => x.ProductId == key.Item1 && x.Name == key.Item2;
 }

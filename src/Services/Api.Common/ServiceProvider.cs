@@ -3,7 +3,6 @@ using Api.Common.Models.Options;
 using Api.Common.Services;
 using Application.Common.Interfaces;
 using Cache;
-using Localization.Domain;
 using Persistence;
 using RabbitMq;
 using S3;
@@ -41,37 +40,37 @@ public static class ServiceProvider
             .BindConfiguration(HeaderSecretOptions.SectionName)
             .ValidateDataAnnotations()
             .ValidateOnStart();
-        
+
         return collection;
     }
-    
+
     public static IServiceCollection AddRedisOptions(this IServiceCollection collection)
     {
         collection.AddOptions<RedisOptions>()
             .BindConfiguration(RedisOptions.SectionName)
             .ValidateDataAnnotations()
             .ValidateOnStart();
-        
+
         return collection;
     }
-    
+
     public static IServiceCollection AddDatabaseOptions(this IServiceCollection collection)
     {
         collection.AddOptions<DatabaseOptions>()
             .BindConfiguration(DatabaseOptions.SectionName)
             .ValidateDataAnnotations()
             .ValidateOnStart();
-        
+
         return collection;
     }
-    
+
     public static IServiceCollection AddS3Options(this IServiceCollection collection)
     {
         collection.AddOptions<S3Options>()
             .BindConfiguration(S3Options.SectionName)
             .ValidateDataAnnotations()
             .ValidateOnStart();
-        
+
         return collection;
     }
 }

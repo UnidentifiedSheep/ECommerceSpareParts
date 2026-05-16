@@ -1,7 +1,7 @@
 using System.Linq.Expressions;
 using Domain;
-using Domain.Interfaces;
 using Domain.Extensions;
+using Domain.Interfaces;
 using Main.Entities.Auth.ValueObjects;
 
 namespace Main.Entities.Auth;
@@ -23,6 +23,11 @@ public class Role : AuditableEntity<Role, RoleName>, ILinqEntity<Role, RoleName>
 
     public string? Description { get; private set; }
     public IReadOnlyCollection<RolePermission> RolePermissions => _rolePermissions;
+
+    public static Expression<Func<Role, bool>> GetEqualityExpression(RoleName key)
+    {
+        return x => x.Name == key;
+    }
 
     public static Role Create(RoleName name)
     {
@@ -54,7 +59,4 @@ public class Role : AuditableEntity<Role, RoleName>, ILinqEntity<Role, RoleName>
     {
         return Name;
     }
-
-    public static Expression<Func<Role, bool>> GetEqualityExpression(RoleName key)
-        => x => x.Name == key;
 }

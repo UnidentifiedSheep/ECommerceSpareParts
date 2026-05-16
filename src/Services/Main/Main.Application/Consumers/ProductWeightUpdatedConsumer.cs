@@ -1,5 +1,4 @@
-﻿using Application.Common.Interfaces;
-using Application.Common.Interfaces.Cqrs;
+﻿using Application.Common.Interfaces.Cqrs;
 using Contracts.Products;
 using Main.Application.Handlers.ProductWeight.GetProductWeight;
 using MassTransit;
