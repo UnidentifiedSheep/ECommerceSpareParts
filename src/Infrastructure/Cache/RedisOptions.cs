@@ -9,8 +9,9 @@ public class RedisOptions
     [Required]
     public required string Url { get; init; }
 
-    [Required]
-    public required string Password { get; init; }
+    public string? Password { get; init; }
 
-    public string ConnectionString => $"{Url},password={Password}";
+    public string ConnectionString => string.IsNullOrWhiteSpace(Password)
+        ? Url
+        : $"{Url},password={Password}";
 }

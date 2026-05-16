@@ -2,6 +2,7 @@ using Abstractions.Interfaces;
 using Abstractions.Models;
 using Api.Common;
 using Cache;
+using Localization.Domain.Extensions;
 using Mail;
 using Main.Application.Configs;
 using Main.Cache;
@@ -43,6 +44,7 @@ public class ServiceProviderBuilder : IServiceProviderBuilder<ServiceProviderArg
             .CreateLogger();
 
         ApplicationServiceProvider.AddApplicationLayer(services)
+            .AddLocalization("ru-RU", "ru-RU", "en-EN")
             .AddPersistenceLayer();
         var passwordRules = new PasswordRules
         {
@@ -50,12 +52,10 @@ public class ServiceProviderBuilder : IServiceProviderBuilder<ServiceProviderArg
             RequireUppercase = false
         };
 
-        var redisParts = args.CacheConnectionString.Split(",password=");
-
         services.AddSingleton(Options.Create(new RedisOptions
         {
-            Url = redisParts[0],
-            Password = redisParts[1]
+            Url = args.CacheConnectionString,
+            Password = null
         }));
 
         var pgsqlBuilder = new NpgsqlConnectionStringBuilder(args.PgsqlConnectionString);
@@ -65,7 +65,8 @@ public class ServiceProviderBuilder : IServiceProviderBuilder<ServiceProviderArg
             Host = pgsqlBuilder.Host!,
             Database = pgsqlBuilder.Database!,
             Username = pgsqlBuilder.Username!,
-            Password = pgsqlBuilder.Password!
+            Password = pgsqlBuilder.Password!,
+            Port = pgsqlBuilder.Port
         }));
 
         services.AddJsonSigner("some secret")
