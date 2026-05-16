@@ -21,7 +21,10 @@ public class GetRoles : ICarterModule
     public void AddRoutes(IEndpointRouteBuilder app)
     {
         app.MapGet("/roles",
-                async (ISender sender, GetRolesRequest queryParams, CancellationToken cancellationToken) =>
+                async (
+                    ISender sender,
+                    [AsParameters] GetRolesRequest queryParams,
+                    CancellationToken cancellationToken) =>
                 {
                     var command = new GetRolesQuery(queryParams.SearchTerm, queryParams);
                     var result = await sender.Send(command, cancellationToken);

@@ -18,7 +18,7 @@ public class GetCurrenciesEndPoint : ICarterModule
     {
         app.MapGet("/currencies", async (
                 ISender sender,
-                PaginationQueryModel queryParams,
+                [AsParameters] PaginationQueryModel queryParams,
                 CancellationToken cancellation) =>
             {
                 var query = new GetCurrenciesQuery(queryParams);

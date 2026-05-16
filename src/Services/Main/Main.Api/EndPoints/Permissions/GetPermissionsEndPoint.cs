@@ -13,7 +13,10 @@ public class GetPermissionsEndPoint : ICarterModule
 {
     public void AddRoutes(IEndpointRouteBuilder app)
     {
-        app.MapGet("/permissions/", async (ISender sender, PaginationQueryModel queryParams, CancellationToken ct) =>
+        app.MapGet("/permissions/", async (
+                ISender sender,
+                [AsParameters] PaginationQueryModel queryParams,
+                CancellationToken ct) =>
             {
                 var query = new GetPermissionsQuery(queryParams);
                 var result = await sender.Send(query, ct);
