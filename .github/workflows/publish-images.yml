@@ -32,8 +32,20 @@ jobs:
           username: ${{ secrets.ARTIFACT_REGISTRY_USERNAME }}
           password: ${{ secrets.ARTIFACT_REGISTRY_PASSWORD }}
 
-      - name: Build and push app images
-        run: docker compose -f compose.yaml -f compose.registry.yaml --env-file .env.example build --push
+      - name: Build app images
+        run: docker compose -f compose.yaml -f compose.registry.yaml --env-file .env.example build
 
-      - name: Build and push migrator images
-        run: docker compose -f migrator-compose.yaml -f migrator-compose.registry.yaml --env-file .env.example build --push
+      - name: Push app images
+        run: |
+          SERVICES=$(docker compose -f compose.yaml -f compose.registry.yaml --env-file .env.example config --format json \
+            | jq -r '.services | to_entries[] | select(.value.build != null) | .key')
+          docker compose -f compose.yaml -f compose.registry.yaml --env-file .env.example push $SERVICES
+
+      - name: Build migrator images
+        run: docker compose -f migrator-compose.yaml -f migrator-compose.registry.yaml --env-file .env.example build
+
+      - name: Push migrator images
+        run: |
+          SERVICES=$(docker compose -f migrator-compose.yaml -f migrator-compose.registry.yaml --env-file .env.example config --format json \
+            | jq -r '.services | to_entries[] | select(.value.build != null) | .key')
+          docker compose -f migrator-compose.yaml -f migrator-compose.registry.yaml --env-file .env.example push $SERVICES
