@@ -3,17 +3,14 @@ using Analytics.Application;
 using Analytics.Persistence;
 using Analytics.Persistence.Context;
 using Analytics.Worker.Consumers;
+using Api.Common;
 using Api.Common.Extensions;
 using Cache;
 using Common;
-using Localization.Abstractions.Models;
+using Internal.Integration.Di;
 using Localization.Domain.Extensions;
 using MassTransit;
 using RabbitMq.Extensions;
-using RabbitMq.Models;
-
-Locale[] locales = ["ru-RU", "en-EN"];
-Locale defaultLocale = "ru-RU";
 
 var env = Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT") ?? "";
 
@@ -21,15 +18,23 @@ var builder = Host.CreateApplicationBuilder(args);
 
 builder.Configuration
     .AddAppSettingsFromJsons(env)
-    .AddAppSettingsFromJsons(env, "/app/configs");
+    .AddAppSettingsFromJsons(env, "/app/configs")
+    .AddConfigsFromJsons("analytics", env, "/app/configs");
+
+builder.Services
+    .AddMessageBrokerOptions()
+    .AddHeaderSecretsOptions()
+    .AddRedisOptions()
+    .AddDatabaseOptions();
 
 AddLoki(builder);
 
-builder.Services.AddLocalization(defaultLocale, locales);
+builder.Services.AddLocalization(builder.Configuration);
 
 builder.Services
-    .AddPersistenceLayer(Environment.GetEnvironmentVariable("DB_CONNECTION_STRING")!)
-    .AddCacheLayer(Environment.GetEnvironmentVariable("REDIS_CONNECTION_STRING")!, "analytics")
+    .AddPersistenceLayer()
+    .AddCacheLayer("analytics")
+    .AddIntegrationClients()
     .AddApplicationLayer();
 
 AddMassTransit(builder);
@@ -50,24 +55,14 @@ async Task LoadLocalization(IHost hostApp)
 
 void AddLoki(IHostApplicationBuilder hostBuilder)
 {
-    var lokiUrl = Environment.GetEnvironmentVariable("LOKI_URL");
-
-    hostBuilder.AddLokiLogger(hostBuilder.Configuration, "analytics.worker", env, lokiUrl);
+    hostBuilder.AddLokiLogger(
+        hostBuilder.Configuration, 
+        "analytics.worker", 
+        env);
 }
 
 void AddMassTransit(IHostApplicationBuilder hostBuilder)
 {
-    hostBuilder.Services.AddOptions<MessageBrokerOptions>()
-        .BindConfiguration(MessageBrokerOptions.SectionName)
-        .ValidateDataAnnotations()
-        .ValidateOnStart();
-
-    var brokerOptions = hostBuilder.Configuration
-                            .GetSection(MessageBrokerOptions.SectionName)
-                            .Get<MessageBrokerOptions>()
-                        ?? throw new NullReferenceException(
-                            $"Missing {MessageBrokerOptions.SectionName} configuration options");
-
     hostBuilder.Services.AddMassTransit(x =>
     {
         x.AddConsumers(Assembly.GetAssembly(typeof(MetricCalculationRequestedConsumer)));
@@ -80,7 +75,7 @@ void AddMassTransit(IHostApplicationBuilder hostBuilder)
 
         x.UsingRabbitMq((context, cfg) =>
         {
-            cfg.ConfigureRabbitMq(brokerOptions);
+            cfg.ConfigureRabbitMq(context);
 
             cfg.ReceiveEndpoint("analytics-work-queue", ep =>
             {

@@ -72,6 +72,9 @@ public class Producer : AuditableEntity<Producer, int>, ILinqEntity<Producer, in
         return Id;
     }
 
+    public static Expression<Func<Producer, int>> GetKeySelector()
+        => x => x.Id;
+
     public static Expression<Func<Producer, bool>> GetEqualityExpression(int key)
         => x => x.Id == key;
 }

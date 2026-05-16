@@ -7,16 +7,17 @@ using Api.Common;
 using Api.Common.Extensions;
 using Api.Common.Middleware;
 using Api.Common.Models;
+using Api.Common.Models.Options;
 using Cache;
 using Carter;
 using Common;
-using Localization.Abstractions.Models;
+using Internal.Integration.Di;
 using Localization.Domain.Extensions;
 using Localization.Domain.Middlewares;
 using MassTransit;
 using Persistence.Extensions;
+using RabbitMq;
 using RabbitMq.Extensions;
-using RabbitMq.Models;
 using Security;
 
 var localesPath = Assembly.GetExecutingAssembly().GetDefaultLocalizationPath();
@@ -25,43 +26,34 @@ var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddOpenApi();
 
-var lokiUrl = Environment.GetEnvironmentVariable("LOKI_URL");
 var env = Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT") ?? "";
 
 builder.Configuration
     .AddAppSettingsFromJsons(env)
-    .AddAppSettingsFromJsons(env, "/app/configs");
+    .AddAppSettingsFromJsons(env, "/app/configs")
+    .AddConfigsFromJsons("analytics", env, "/app/configs");
 
-builder.Host.AddLokiLogger(builder.Configuration, "analytics.api", env, lokiUrl);
+builder.Host.AddLokiLogger(
+    configuration: builder.Configuration, 
+    serviceName: "analytics.api", 
+    environment:env);
+
+builder.Services.AddMessageBrokerOptions()
+    .AddHeaderSecretsOptions()
+    .AddRedisOptions()
+    .AddDatabaseOptions();
 
 builder.Services
-    .AddPersistenceLayer(Environment.GetEnvironmentVariable("DB_CONNECTION_STRING")!)
-    .AddCacheLayer(Environment.GetEnvironmentVariable("REDIS_CONNECTION_STRING")!, "analytics")
+    .AddPersistenceLayer()
+    .AddCacheLayer("analytics")
     .AddApplicationLayer()
+    .AddIntegrationClients()
+    .AddEComAuth(builder.Configuration)
     .AddMinimalSecurityLayer();
 
-builder.Services.AddOptions<HeaderSecretOptions>()
-    .BindConfiguration(HeaderSecretOptions.SectionName)
-    .ValidateDataAnnotations()
-    .ValidateOnStart();
-
-Locale[] locales = ["ru-RU", "en-EN"];
-Locale defaultLocale = "ru-RU";
-
-builder.Services.AddLocalization(defaultLocale, locales);
+builder.Services.AddLocalization(builder.Configuration);
 
 builder.Services.AddHttpContextAccessor();
-
-builder.Services.AddOptions<MessageBrokerOptions>()
-    .BindConfiguration(MessageBrokerOptions.SectionName)
-    .ValidateDataAnnotations()
-    .ValidateOnStart();
-
-var brokerOptions = builder.Configuration
-                        .GetSection(MessageBrokerOptions.SectionName)
-                        .Get<MessageBrokerOptions>()
-                    ?? throw new NullReferenceException(
-                        $"Missing {MessageBrokerOptions.SectionName} configuration options");
 
 var uniqQueueName = $"queue-of-analytics-{Environment.MachineName}";
 
@@ -77,7 +69,7 @@ builder.Services.AddMassTransit(x =>
 
     x.UsingRabbitMq((context, cfg) =>
     {
-        cfg.ConfigureRabbitMq(brokerOptions);
+        cfg.ConfigureRabbitMq(context);
 
         cfg.ReceiveEndpoint(uniqQueueName, ep =>
         {
@@ -130,9 +122,6 @@ app.UseCors();
 app.MapCarter();
 
 await app.LoadLocalesFromJson(localesPath);
-
-if (Environment.GetEnvironmentVariable("SEED_DB") == "true")
-    await app.SeedAsync<DContext>();
 
 app.UseMiddleware<HeaderSecretMiddleware>();
 

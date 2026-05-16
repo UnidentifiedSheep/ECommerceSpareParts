@@ -9,7 +9,7 @@ namespace Internal.Integration.Di;
 public static class ServiceProviderExtensions
 {
     public static IServiceCollection AddIntegrationClients(
-        IServiceCollection services)
+        this IServiceCollection services)
     {
         services.AddOptions<InternalServicesOptions>()
             .BindConfiguration(InternalServicesOptions.SectionName)

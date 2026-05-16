@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace Api.Common.Models;
+namespace Api.Common.Models.Options;
 
 public class HeaderSecretOptions
 {

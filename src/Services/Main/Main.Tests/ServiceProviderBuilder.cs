@@ -9,6 +9,9 @@ using Main.Persistence;
 using MassTransit;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
+using Microsoft.Extensions.Options;
+using Npgsql;
+using Persistence;
 using Security;
 using Serilog;
 using Test.Common.Abstractions;
@@ -42,15 +45,33 @@ public class ServiceProviderBuilder : IServiceProviderBuilder<ServiceProviderArg
             .CreateLogger();
 
         ApplicationServiceProvider.AddApplicationLayer(services)
-            .AddPersistenceLayer(args.PgsqlConnectionString);
+            .AddPersistenceLayer();
         var passwordRules = new PasswordRules
         {
             RequireDigit = false,
             RequireUppercase = false
         };
 
+        var redisParts = args.CacheConnectionString.Split(",password=");
+        
+        services.AddSingleton(Options.Create(new RedisOptions
+        {
+            Url = redisParts[0],
+            Password = redisParts[1]
+        }));
+
+        var pgsqlBuilder = new NpgsqlConnectionStringBuilder(args.PgsqlConnectionString);
+
+        services.AddSingleton(Options.Create(new DatabaseOptions
+        {
+            Host = pgsqlBuilder.Host!,
+            Database = pgsqlBuilder.Database!,
+            Username = pgsqlBuilder.Username!,
+            Password = pgsqlBuilder.Password!
+        }));
+
         services.AddJsonSigner("some secret")
-            .AddCacheLayer(args.CacheConnectionString, "test")
+            .AddCacheLayer("test")
             .AddApplicationCache()
             .AddFullSecurityLayer(passwordRules)
             .AddMailLayer()

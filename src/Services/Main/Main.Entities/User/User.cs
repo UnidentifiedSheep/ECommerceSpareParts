@@ -114,6 +114,9 @@ public class User : AuditableEntity<User, Guid>, ILinqEntity<User, Guid>
         return Id;
     }
 
+    public static Expression<Func<User, Guid>> GetKeySelector()
+        => x => x.Id;
+
     public static Expression<Func<User, bool>> GetEqualityExpression(Guid key)
         => x => x.Id == key;
 }

@@ -1,12 +1,42 @@
-﻿using Localization.Abstractions.Interfaces;
+using Localization.Abstractions.Interfaces;
 using Localization.Abstractions.Models;
 using Localization.Domain.Middlewares;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace Localization.Domain.Extensions;
 
 public static class ServiceCollectionExtensions
 {
+    public static IServiceCollection AddLocalization(
+        this IServiceCollection services,
+        IConfiguration configuration)
+    {
+        services.AddOptions<LocalesOptions>()
+            .Bind(configuration.GetRequiredSection(LocalesOptions.SectionName))
+            .ValidateDataAnnotations()
+            .Validate(
+                x => x.Supported.Length > 0,
+                $"{nameof(LocalesOptions.Supported)} must contain at least one locale")
+            .Validate(
+                x => x.Supported.Distinct(StringComparer.OrdinalIgnoreCase).Count() == x.Supported.Length,
+                $"{nameof(LocalesOptions.Supported)} must not contain duplicates")
+            .Validate(
+                x => x.Supported.Contains(x.Default, StringComparer.OrdinalIgnoreCase),
+                $"{nameof(LocalesOptions.Default)} must be included in {nameof(LocalesOptions.Supported)}")
+            .ValidateOnStart();
+
+        var options = configuration
+                          .GetRequiredSection(LocalesOptions.SectionName)
+                          .Get<LocalesOptions>()
+                      ?? throw new InvalidOperationException(
+                          $"Missing {LocalesOptions.SectionName} configuration section");
+
+        return services.AddLocalization(
+            options.Default,
+            options.Supported.Select(x => (Locale)x).ToArray());
+    }
+
     public static IServiceCollection AddLocalization(
         this IServiceCollection services,
         Locale defaultLocale,

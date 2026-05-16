@@ -131,6 +131,9 @@ public class StorageContent : AuditableEntity<StorageContent, int>, ILinqEntity<
         return Id;
     }
 
+    public static Expression<Func<StorageContent, int>> GetKeySelector()
+        => x => x.Id;
+
     public static Expression<Func<StorageContent, bool>> GetEqualityExpression(int key)
         => x => x.Id == key;
 }

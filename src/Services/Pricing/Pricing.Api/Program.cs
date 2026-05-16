@@ -3,6 +3,7 @@ using Api.Common;
 using Api.Common.Extensions;
 using Api.Common.Middleware;
 using Api.Common.Models;
+using Api.Common.Models.Options;
 using Api.Common.OperationFilters;
 using Cache;
 using Carter;
@@ -10,6 +11,7 @@ using Common;
 using Contracts.Currency;
 using Contracts.Markup;
 using Contracts.Settings;
+using Internal.Integration.Di;
 using Localization.Abstractions.Models;
 using Localization.Domain.Extensions;
 using Localization.Domain.Middlewares;
@@ -20,43 +22,34 @@ using Persistence.Extensions;
 using Pricing.Application;
 using Pricing.Persistence;
 using Pricing.Persistence.Contexts;
+using RabbitMq;
 using RabbitMq.Extensions;
-using RabbitMq.Models;
 using Security;
 
 var builder = WebApplication.CreateBuilder(args);
 
-var lokiUrl = Environment.GetEnvironmentVariable("LOKI_URL");
 var env = Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT") ?? "";
 
 builder.Configuration
     .AddAppSettingsFromJsons(env)
-    .AddAppSettingsFromJsons(env, "/app/configs");
+    .AddAppSettingsFromJsons(env, "/app/configs")
+    .AddConfigsFromJsons("pricing", env, "/app/configs");
 
-builder.Host.AddLokiLogger(builder.Configuration, "pricing.api", env, lokiUrl);
+builder.Host.AddLokiLogger(
+    configuration: builder.Configuration, 
+    serviceName: "pricing.api", 
+    environment: env);
+
+builder.Services.AddMessageBrokerOptions()
+    .AddHeaderSecretsOptions()
+    .AddRedisOptions()
+    .AddDatabaseOptions();
 
 builder.Services.AddHttpContextAccessor();
-
 
 builder.Services.AddOpenApi();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen(c => { c.OperationFilter<PermissionsOperationFilter>(); });
-
-builder.Services.AddOptions<HeaderSecretOptions>()
-    .BindConfiguration(HeaderSecretOptions.SectionName)
-    .ValidateDataAnnotations()
-    .ValidateOnStart();
-
-builder.Services.AddOptions<MessageBrokerOptions>()
-    .BindConfiguration(MessageBrokerOptions.SectionName)
-    .ValidateDataAnnotations()
-    .ValidateOnStart();
-
-var brokerOptions = builder.Configuration
-                        .GetSection(MessageBrokerOptions.SectionName)
-                        .Get<MessageBrokerOptions>()
-                    ?? throw new NullReferenceException(
-                        $"Missing {MessageBrokerOptions.SectionName} configuration options");
 
 var uniqQueueName = $"queue-of-pricing-{Environment.MachineName}";
 
@@ -72,7 +65,7 @@ builder.Services.AddMassTransit(x =>
 
     x.UsingRabbitMq((context, cfg) =>
     {
-        cfg.ConfigureRabbitMq(brokerOptions);
+        cfg.ConfigureRabbitMq(context);
 
         cfg.ReceiveEndpoint(uniqQueueName, ep =>
         {
@@ -95,17 +88,19 @@ builder.Services.AddMassTransit(x =>
     });
 });
 
-Locale[] locales = ["ru-RU", "en-EN"];
-Locale defaultLocale = "ru-RU";
-
 builder.Services
-    .AddPersistenceLayer(Environment.GetEnvironmentVariable("DB_CONNECTION_STRING")!)
-    .AddCacheLayer(Environment.GetEnvironmentVariable("REDIS_CONNECTION_STRING")!, "pricing")
-    .AddJsonSigner(Environment.GetEnvironmentVariable("SIGN_SECRET")!, Global.JsonOptions)
+    .AddEComAuth(builder.Configuration)
+    .AddPersistenceLayer()
+    .AddCacheLayer("pricing")
+    .AddJsonSigner(
+        builder.Configuration["SignSecret"] 
+        ?? throw new InvalidOperationException("Unable to find SignSecret"), 
+        Global.JsonOptions)
     .AddMinimalSecurityLayer()
+    .AddIntegrationClients()
     .AddCommonLayer()
     .AddApplicationLayer()
-    .AddLocalization(defaultLocale, locales);
+    .AddLocalization(builder.Configuration);
 
 builder.Services.AddBaseExceptionHandlers();
 
@@ -147,10 +142,6 @@ app.UseForwardedHeaders(new ForwardedHeadersOptions
 {
     ForwardedHeaders = ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto
 });
-
-
-if (Environment.GetEnvironmentVariable("SEED_DB") == "true")
-    await app.SeedAsync<DContext>();
 
 app.UseExceptionHandler(_ => { });
 

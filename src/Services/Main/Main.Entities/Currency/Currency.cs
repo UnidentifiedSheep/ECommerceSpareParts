@@ -88,6 +88,9 @@ public class Currency : Entity<Currency, int>, ILinqEntity<Currency, int>
         return Id;
     }
 
+    public static Expression<Func<Currency, int>> GetKeySelector()
+        => x => x.Id;
+
     public static Expression<Func<Currency, bool>> GetEqualityExpression(int key)
         => x => x.Id == key;
 }

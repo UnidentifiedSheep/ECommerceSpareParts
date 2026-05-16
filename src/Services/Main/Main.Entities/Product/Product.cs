@@ -133,6 +133,9 @@ public class Product : AuditableEntity<Product, int>, ILinqEntity<Product, int>
         return Id;
     }
 
+    public static Expression<Func<Product, int>> GetKeySelector()
+        => x => x.Id;
+
     public static Expression<Func<Product, bool>> GetEqualityExpression(int key)
         => x => x.Id == key;
 }

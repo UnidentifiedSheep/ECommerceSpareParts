@@ -142,6 +142,9 @@ public class StorageContentReservation : AuditableEntity<StorageContentReservati
         return Id;
     }
 
+    public static Expression<Func<StorageContentReservation, int>> GetKeySelector()
+        => x => x.Id;
+
     public static Expression<Func<StorageContentReservation, bool>> GetEqualityExpression(int key)
         => x => x.Id == key;
 }

@@ -11,14 +11,13 @@ public static class HostBuilderExtensions
         this IHostBuilder hostBuilder,
         IConfiguration configuration,
         string serviceName,
-        string environment,
-        string? lokiUrl)
+        string environment)
     {
         var loggerConfiguration = GetLoggerConfiguration(
             configuration,
             serviceName,
             environment,
-            lokiUrl);
+            configuration["LokiUrl"]);
 
         hostBuilder.UseSerilog(loggerConfiguration.CreateLogger());
         return hostBuilder;
@@ -28,14 +27,13 @@ public static class HostBuilderExtensions
         this IHostApplicationBuilder builder,
         IConfiguration configuration,
         string serviceName,
-        string environment,
-        string? lokiUrl)
+        string environment)
     {
         var logger = GetLoggerConfiguration(
             configuration,
             serviceName,
             environment,
-            lokiUrl).CreateLogger();
+            configuration["LokiUrl"]).CreateLogger();
         builder.Logging.AddSerilog(logger);
 
         return builder;

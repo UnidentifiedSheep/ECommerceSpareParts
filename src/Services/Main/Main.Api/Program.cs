@@ -5,6 +5,7 @@ using Api.Common;
 using Api.Common.Extensions;
 using Api.Common.Middleware;
 using Api.Common.Models;
+using Api.Common.Models.Options;
 using Api.Common.OperationFilters;
 using Application.Common.Interfaces.Settings;
 using Cache;
@@ -30,37 +31,47 @@ using Main.Persistence;
 using Main.Persistence.Context;
 using MassTransit;
 using Microsoft.AspNetCore.HttpOverrides;
+using Microsoft.Extensions.Options;
 using OpenTelemetry.Metrics;
+using Persistence;
+using RabbitMq;
 using RabbitMq.Extensions;
-using RabbitMq.Models;
 using S3;
 using Security;
 using Global = Main.Application.Global;
 
 var builder = WebApplication.CreateBuilder(args);
 
-var lokiUrl = Environment.GetEnvironmentVariable("LOKI_URL");
 var env = Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT") ?? "";
 
 builder.Configuration
     .AddAppSettingsFromJsons(env)
-    .AddAppSettingsFromJsons(env, "/app/configs");
+    .AddAppSettingsFromJsons(env, "/app/configs")
+    .AddConfigsFromJsons("main", env, "/app/configs");
 
-builder.Host.AddLokiLogger(builder.Configuration, "main.api", env, lokiUrl);
+builder.Host.AddLokiLogger(
+    configuration: builder.Configuration, 
+    serviceName: "main.api", 
+    environment: env);
+
+builder.Services.AddMessageBrokerOptions()
+    .AddHeaderSecretsOptions()
+    .AddRedisOptions()
+    .AddS3Options()
+    .AddDatabaseOptions();
 
 builder.Services.AddOpenApi();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen(c => { c.OperationFilter<PermissionsOperationFilter>(); });
 
-builder.Services.AddHangfire(x =>
+builder.Services.AddHangfire((sp, x) =>
+{
+    var options = sp.GetRequiredService<IOptions<DatabaseOptions>>().Value;
     x.UsePostgreSqlStorage(z =>
-        z.UseNpgsqlConnection(Environment.GetEnvironmentVariable("DB_CONNECTION_STRING"))));
-builder.Services.AddHangfireServer();
+        z.UseNpgsqlConnection(options.ConnectionString));
+});
 
-builder.Services.AddOptions<HeaderSecretOptions>()
-    .BindConfiguration(HeaderSecretOptions.SectionName)
-    .ValidateDataAnnotations()
-    .ValidateOnStart();
+builder.Services.AddHangfireServer();
 
 var emailOptions = new UserEmailOptions
 {
@@ -68,21 +79,11 @@ var emailOptions = new UserEmailOptions
     MaxEmailCount = 5
 };
 
-builder.Services.AddOptions<MessageBrokerOptions>()
-    .BindConfiguration(MessageBrokerOptions.SectionName)
-    .ValidateDataAnnotations()
-    .ValidateOnStart();
-
-var brokerOptions = builder.Configuration
-                        .GetSection(MessageBrokerOptions.SectionName)
-                        .Get<MessageBrokerOptions>()
-                    ?? throw new NullReferenceException(
-                        $"Missing {MessageBrokerOptions.SectionName} configuration options");
-
+//looks bas asf
 builder.Services.AddSingleton(new JwtOptions(
     builder.Configuration["JwtBearer:IssuerSigningKey"]!,
     builder.Configuration["JwtBearer:ValidIssuer"]!,
-    TimeSpan.FromMilliseconds(builder.Configuration.GetValue<int>("JwtBearer:ValidDurationMs"))));
+    TimeSpan.FromMilliseconds(builder.Configuration.GetValue<long>("JwtBearer:ValidDurationMs"))));
 
 var uniqQueueName = $"queue-of-main-{Environment.MachineName}";
 
@@ -98,7 +99,7 @@ builder.Services.AddMassTransit(x =>
 
     x.UsingRabbitMq((context, cfg) =>
     {
-        cfg.ConfigureRabbitMq(brokerOptions);
+        cfg.ConfigureRabbitMq(context);
 
         cfg.ReceiveEndpoint(uniqQueueName, ep =>
         {
@@ -131,25 +132,29 @@ builder.Services.AddMassTransit(x =>
 builder.Services.AddHttpContextAccessor();
 
 builder.Services
-    .AddPersistenceLayer(Environment.GetEnvironmentVariable("DB_CONNECTION_STRING")!)
-    .AddCacheLayer(Environment.GetEnvironmentVariable("REDIS_CONNECTION_STRING")!, "main")
+    .AddPersistenceLayer()
+    .AddCacheLayer("main")
     .AddApplicationCache()
-    .AddJsonSigner(Environment.GetEnvironmentVariable("SIGN_SECRET")!, Global.JsonOptions)
+    .AddJsonSigner(
+        builder.Configuration["SignSecret"] ??
+        throw new InvalidOperationException("SignSecret not found in configuration"), 
+        Global.JsonOptions)
     .AddFullSecurityLayer()
     .AddEComAuth(builder.Configuration)
     .AddMailLayer()
     .AddCommonLayer()
-    .AddS3(() =>
+    .AddS3(sp =>
     {
+        var options = sp.GetRequiredService<IOptions<S3Options>>().Value;
         var config = new AmazonS3Config
         {
-            ServiceURL = Environment.GetEnvironmentVariable("S3_URL"),
-            ForcePathStyle = Environment.GetEnvironmentVariable("S3_FORCE_PATH_STYLE") == "true"
+            ServiceURL = options.Url,
+            ForcePathStyle = options.ForcePathStyle
         };
-        return new AmazonS3Client(Environment.GetEnvironmentVariable("S3_LOGIN"),
-            Environment.GetEnvironmentVariable("S3_PASSWORD"), config);
+        return new AmazonS3Client(options.Login, options.Password, config);
     })
     .AddApplicationLayer(emailOptions)
+    .AddLocalization(builder.Configuration)
     .AddExchangeRates();
 
 builder.Services.AddBaseExceptionHandlers();
@@ -177,9 +182,8 @@ builder.Services.AddCors(options =>
     });
 });
 
-var endpointAssembly = typeof(AddProductContentEndPoint).Assembly;
 builder.Services.AddCarter(
-    new DependencyContextAssemblyCatalog(endpointAssembly),
+    new DependencyContextAssemblyCatalog(typeof(AddProductContentEndPoint).Assembly),
     configurator: c => c.WithEmptyValidators());
 
 builder.Services.AddTransient<HeaderSecretMiddleware>();

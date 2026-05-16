@@ -9,22 +9,8 @@
     volumes:
       - ${CONFIGS_PATH:-./certs}:/app/configs:ro
     environment:
-      - REDIS_CONNECTION_STRING=${REDIS_HOST}:${REDIS_PORT},password=${REDIS_PASSWORD}
-      - DB_CONNECTION_STRING=Host=${PGQL_HOST};Database=${PGQL_MAIN_DB};Username=${PGQL_USER};Password=${PGQL_PASSWORD}
-      - MessageBroker__Host=amqp://${RABBITMQ_HOST}:${RABBITMQ_PORT}
-      - MessageBroker__Username=${RABBITMQ_DEFAULT_USER}
-      - MessageBroker__Password=${RABBITMQ_DEFAULT_PASS}
-      - HeaderSecret__Key=${GATEWAY_SUPER_KEY}
-      - S3_URL=http://${S3_HOST}:${S3_PORT}
-      - S3_FORCE_PATH_STYLE=${MAIN_S3_FORCE_PATH_STYLE}
-      - S3_LOGIN=${MINIO_SERVICE_USER}
-      - S3_PASSWORD=${MINIO_SERVICE_PASSWORD}
-      - S3_REGION=${MINIO_REGION}
-      - S3_IMAGES_BUCKET=${MINIO_IMAGES_BUCKET}
-      - SIGN_SECRET=${MAIN_SIGN_SECRET}
-      - LOKI_URL=http://${LOKI_HOST}:${LOKI_PORT}
-      - JwtBearer__ValidIssuer=${VALID_ISSUER}
-      - JwtBearer__IssuerSigningKey=${ISSUER_SIGNING_KEY}
+      - DOTNET_ENVIRONMENT=${DOTNET_ENVIRONMENT:-Development}
+      - ASPNETCORE_ENVIRONMENT=${ASPNETCORE_ENVIRONMENT:-Development}
     networks:
       - backend-network
     depends_on:
@@ -44,14 +30,8 @@
       - ./search_api_data:/app/data
       - ${CONFIGS_PATH:-./certs}:/app/configs:ro
     environment:
-      - INDEX_FOLDER=/app/data
-      - MessageBroker__Host=amqp://${RABBITMQ_HOST}:${RABBITMQ_PORT}
-      - MessageBroker__Username=${RABBITMQ_DEFAULT_USER}
-      - MessageBroker__Password=${RABBITMQ_DEFAULT_PASS}
-      - HeaderSecret__Key=${GATEWAY_SUPER_KEY}
-      - LOKI_URL=http://${LOKI_HOST}:${LOKI_PORT}
-      - JwtBearer__ValidIssuer=${VALID_ISSUER}
-      - JwtBearer__IssuerSigningKey=${ISSUER_SIGNING_KEY}
+      - DOTNET_ENVIRONMENT=${DOTNET_ENVIRONMENT:-Development}
+      - ASPNETCORE_ENVIRONMENT=${ASPNETCORE_ENVIRONMENT:-Development}
     networks:
       - backend-network
 
@@ -65,17 +45,8 @@
     volumes:
       - ${CONFIGS_PATH:-./certs}:/app/configs:ro
     environment:
-      - REDIS_CONNECTION_STRING=${REDIS_HOST}:${REDIS_PORT},password=${REDIS_PASSWORD}
-      - DB_CONNECTION_STRING=Host=${PGQL_HOST};Database=${PGQL_PRICING_DB};Username=${PGQL_USER};Password=${PGQL_PASSWORD}
-      - MessageBroker__Host=amqp://${RABBITMQ_HOST}:${RABBITMQ_PORT}
-      - MessageBroker__Username=${RABBITMQ_DEFAULT_USER}
-      - MessageBroker__Password=${RABBITMQ_DEFAULT_PASS}
-      - HeaderSecret__Key=${GATEWAY_SUPER_KEY}
-      - SIGN_SECRET=${PRICING_SIGN_SECRET}
-      - SEED_DB=${PRICING_SEED_DB}
-      - LOKI_URL=http://${LOKI_HOST}:${LOKI_PORT}
-      - JwtBearer__ValidIssuer=${VALID_ISSUER}
-      - JwtBearer__IssuerSigningKey=${ISSUER_SIGNING_KEY}
+      - DOTNET_ENVIRONMENT=${DOTNET_ENVIRONMENT:-Development}
+      - ASPNETCORE_ENVIRONMENT=${ASPNETCORE_ENVIRONMENT:-Development}
     networks:
       - backend-network
     depends_on:
@@ -95,10 +66,10 @@
       - ${CERTS_PATH:-./certs}:/app/certs:ro
       - ${CONFIGS_PATH:-./certs}:/app/configs:ro
     environment:
+      - DOTNET_ENVIRONMENT=${DOTNET_ENVIRONMENT:-Development}
+      - ASPNETCORE_ENVIRONMENT=${ASPNETCORE_ENVIRONMENT:-Development}
       - ASPNETCORE_Kestrel__Certificates__Default__Path=${CERT_PATH}
       - ASPNETCORE_Kestrel__Certificates__Default__KeyPath=${CERT_KEYPATH}
-      - HeaderSecret__Key=${GATEWAY_SUPER_KEY}
-      - LOKI_URL=http://${LOKI_HOST}:${LOKI_PORT}
     networks:
       - backend-network
     restart: unless-stopped
@@ -113,16 +84,8 @@
     volumes:
       - ${CONFIGS_PATH:-./certs}:/app/configs:ro
     environment:
-      - REDIS_CONNECTION_STRING=${REDIS_HOST}:${REDIS_PORT},password=${REDIS_PASSWORD}
-      - DB_CONNECTION_STRING=Host=${PGQL_HOST};Database=${PGQL_ANALYTICS_DB};Username=${PGQL_USER};Password=${PGQL_PASSWORD}
-      - MessageBroker__Host=amqp://${RABBITMQ_HOST}:${RABBITMQ_PORT}
-      - MessageBroker__Username=${RABBITMQ_DEFAULT_USER}
-      - MessageBroker__Password=${RABBITMQ_DEFAULT_PASS}
-      - HeaderSecret__Key=${GATEWAY_SUPER_KEY}
-      - SEED_DB=${ANALYTICS_SEED_DB}
-      - LOKI_URL=http://${LOKI_HOST}:${LOKI_PORT}
-      - JwtBearer__ValidIssuer=${VALID_ISSUER}
-      - JwtBearer__IssuerSigningKey=${ISSUER_SIGNING_KEY}
+      - DOTNET_ENVIRONMENT=${DOTNET_ENVIRONMENT:-Development}
+      - ASPNETCORE_ENVIRONMENT=${ASPNETCORE_ENVIRONMENT:-Development}
     networks:
       - backend-network
     depends_on:
@@ -139,15 +102,8 @@
     volumes:
       - ${CONFIGS_PATH:-./certs}:/app/configs:ro
     environment:
-      - REDIS_CONNECTION_STRING=${REDIS_HOST}:${REDIS_PORT},password=${REDIS_PASSWORD}
-      - DB_CONNECTION_STRING=Host=${PGQL_HOST};Database=${PGQL_ANALYTICS_DB};Username=${PGQL_USER};Password=${PGQL_PASSWORD}
-      - MessageBroker__Host=amqp://${RABBITMQ_HOST}:${RABBITMQ_PORT}
-      - MessageBroker__Username=${RABBITMQ_DEFAULT_USER}
-      - MessageBroker__Password=${RABBITMQ_DEFAULT_PASS}
-      - HeaderSecret__Key=${GATEWAY_SUPER_KEY}
-      - LOKI_URL=http://${LOKI_HOST}:${LOKI_PORT}
-      - JwtBearer__ValidIssuer=${VALID_ISSUER}
-      - JwtBearer__IssuerSigningKey=${ISSUER_SIGNING_KEY}
+      - DOTNET_ENVIRONMENT=${DOTNET_ENVIRONMENT:-Development}
+      - ASPNETCORE_ENVIRONMENT=${ASPNETCORE_ENVIRONMENT:-Development}
     networks:
       - backend-network
     depends_on:

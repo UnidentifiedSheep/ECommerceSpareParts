@@ -2,6 +2,8 @@ using Abstractions.Interfaces;
 using BulkValidation.Pgsql.Extensions;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Options;
+using Persistence;
 using Persistence.DbValidator;
 using Persistence.Extensions;
 using Pricing.Persistence.Contexts;
@@ -10,9 +12,13 @@ namespace Pricing.Persistence;
 
 public static class ServiceProvider
 {
-    public static IServiceCollection AddPersistenceLayer(this IServiceCollection collection, string connectionString)
+    public static IServiceCollection AddPersistenceLayer(this IServiceCollection collection)
     {
-        collection.AddDbContext<DContext>(options => options.UseNpgsql(connectionString));
+        collection.AddDbContext<DContext>((sp, options) =>
+        {
+            var dbOptions = sp.GetRequiredService<IOptions<DatabaseOptions>>().Value;
+            options.UseNpgsql(dbOptions.ConnectionString);
+        });
 
         collection.AddUnitOfWork<DContext>();
 

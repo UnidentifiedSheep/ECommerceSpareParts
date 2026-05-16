@@ -25,6 +25,9 @@ public class Setting : AuditableEntity<Setting, string>, ILinqEntity<Setting, st
         return Key;
     }
 
+    public static Expression<Func<Setting, string>> GetKeySelector()
+        => x => x.Key;
+
     public static Expression<Func<Setting, bool>> GetEqualityExpression(string key)
         => x => x.Key == key;
 }

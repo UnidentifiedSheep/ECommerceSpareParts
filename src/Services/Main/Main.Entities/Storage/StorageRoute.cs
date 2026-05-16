@@ -185,6 +185,9 @@ public class StorageRoute : AuditableEntity<StorageRoute, Guid>, ILinqEntity<Sto
         return Id;
     }
 
+    public static Expression<Func<StorageRoute, Guid>> GetKeySelector()
+        => x => x.Id;
+
     public static Expression<Func<StorageRoute, bool>> GetEqualityExpression(Guid key)
         => x => x.Id == key;
 }

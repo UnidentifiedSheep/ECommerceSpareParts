@@ -174,6 +174,9 @@ public class Transaction : AuditableEntity<Transaction, Guid>, ILinqEntity<Trans
         return Id;
     }
 
+    public static Expression<Func<Transaction, Guid>> GetKeySelector()
+        => x => x.Id;
+
     public static Expression<Func<Transaction, bool>> GetEqualityExpression(Guid key)
         => x => x.Id == key;
 }
