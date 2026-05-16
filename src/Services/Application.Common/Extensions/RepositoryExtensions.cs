@@ -1,9 +1,8 @@
-﻿using Application.Common.Extensions;
-using Application.Common.Interfaces.Repositories;
+﻿using Application.Common.Interfaces.Repositories;
 using Domain;
 using Domain.Interfaces;
 
-namespace Main.Application.Extensions;
+namespace Application.Common.Extensions;
 
 public static class RepositoryExtensions
 {

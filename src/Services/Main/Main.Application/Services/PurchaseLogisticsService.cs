@@ -1,4 +1,5 @@
 using Abstractions.Interfaces.Services;
+using Application.Common.Extensions;
 using Main.Application.Extensions;
 using Main.Application.Dtos.Logistics;
 using Main.Application.Handlers.Balance.CreateTransaction;

@@ -238,7 +238,6 @@ Development rules are kept outside the root README:
 
 - [Development Guidelines](docs/DEVELOPMENT.md)
 - [Testing Guidelines](docs/TESTING.md)
-- [Main Tests README](src/Services/Main/Main.Tests/README.md)
 
 ## Observability
 

@@ -1,5 +1,6 @@
 using System.Data;
 using Abstractions.Interfaces.Services;
+using Application.Common.Extensions;
 using Application.Common.Interfaces.Cqrs;
 using Application.Common.Interfaces.Repositories;
 using Application.Common.Interfaces.Settings;
