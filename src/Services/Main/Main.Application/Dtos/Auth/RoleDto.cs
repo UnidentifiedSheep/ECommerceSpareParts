@@ -17,7 +17,7 @@ public record RoleDto
     public required DateTime UpdatedAt { get; init; }
 
     [JsonPropertyName("whoCreated")]
-    public required Guid WhoCreated { get; init; }
+    public required Guid? WhoCreated { get; init; }
 
     [JsonPropertyName("whoUpdated")]
     public required Guid? WhoUpdated { get; init; }
