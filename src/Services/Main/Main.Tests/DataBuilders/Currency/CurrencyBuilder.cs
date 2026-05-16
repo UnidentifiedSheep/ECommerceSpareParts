@@ -36,11 +36,21 @@ public class CurrencyBuilder(Faker faker) : BuilderBase<Main.Entities.Currency.C
 
     public override Main.Entities.Currency.Currency Build()
     {
-        var rndCurrency = Faker.Finance.Currency(true);
         return Main.Entities.Currency.Currency.Create(
             Name ?? Faker.Lorem.Letter(24),
             ShortName ?? Faker.Lorem.Letter(5),
             Sign ?? Faker.Lorem.Letter(3),
             Code ?? Faker.Lorem.Letter(6));
+    }
+
+    public override IReadOnlyCollection<Main.Entities.Currency.Currency> BuildMany(int count)
+    {
+        return Enumerable.Range(0, count)
+            .Select(index => Main.Entities.Currency.Currency.Create(
+                Name ?? $"{Faker.Lorem.Letter(20)}-{index}",
+                ShortName ?? $"{Faker.Lorem.Letter(3)}-{index}",
+                Sign ?? $"{Faker.Lorem.Letter()}-{index}",
+                Code ?? $"{Faker.Lorem.Letter(4)}-{index}"))
+            .ToList();
     }
 }
