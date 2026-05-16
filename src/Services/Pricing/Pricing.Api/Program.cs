@@ -28,12 +28,7 @@ using Security;
 
 var builder = WebApplication.CreateBuilder(args);
 
-var env = Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT") ?? "";
-
-builder.Configuration
-    .AddAppSettingsFromJsons(env)
-    .AddAppSettingsFromJsons(env, "/app/configs")
-    .AddConfigsFromJsons("pricing", env, "/app/configs");
+var env = builder.AddServiceConfiguration("pricing");
 
 builder.Host.AddLokiLogger(
     configuration: builder.Configuration, 
@@ -45,11 +40,7 @@ builder.Services.AddMessageBrokerOptions()
     .AddRedisOptions()
     .AddDatabaseOptions();
 
-builder.Services.AddHttpContextAccessor();
-
-builder.Services.AddOpenApi();
-builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen(c => { c.OperationFilter<PermissionsOperationFilter>(); });
+builder.Services.AddCommonApiInfrastructure();
 
 var uniqQueueName = $"queue-of-pricing-{Environment.MachineName}";
 
@@ -102,8 +93,6 @@ builder.Services
     .AddApplicationLayer()
     .AddLocalization(builder.Configuration);
 
-builder.Services.AddBaseExceptionHandlers();
-
 builder.Services.AddOpenTelemetry()
     .WithMetrics(metrics =>
     {
@@ -114,46 +103,15 @@ builder.Services.AddOpenTelemetry()
             .AddPrometheusExporter();
     });
 
-builder.Services.AddCors(options =>
-{
-    options.AddDefaultPolicy(policy =>
-    {
-        policy
-            .AllowAnyOrigin()
-            .AllowAnyHeader()
-            .AllowAnyMethod();
-    });
-});
-
 var endpointAssembly = typeof(Program).Assembly;
 builder.Services.AddCarter(
     new DependencyContextAssemblyCatalog(endpointAssembly),
     configurator: c => c.WithEmptyValidators());
 
-builder.Services.AddTransient<HeaderSecretMiddleware>();
-
 var app = builder.Build();
 
-app.UseMiddleware<HeaderSecretMiddleware>();
-
-app.UseMiddleware<ScopedLocalizationMiddleware>();
-
-app.UseForwardedHeaders(new ForwardedHeadersOptions
-{
-    ForwardedHeaders = ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto
-});
-
-app.UseExceptionHandler(_ => { });
-
-app.UseRouting();
-
-app.UseCors();
-
-
-app.MapCarter();
+app.UseCommonApiPipeline();
 
 app.UseOpenTelemetryPrometheusScrapingEndpoint();
-
-app.MapHealthChecks("/health");
 
 await app.RunAsync();

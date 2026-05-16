@@ -18,12 +18,7 @@ using Search.Persistence;
 using Security;
 
 var builder = WebApplication.CreateBuilder(args);
-var env = Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT") ?? "";
-
-builder.Configuration
-    .AddAppSettingsFromJsons(env)
-    .AddAppSettingsFromJsons(env, "/app/configs")
-    .AddConfigsFromJsons("search", env, "/app/configs");
+var env = builder.AddServiceConfiguration("search");
 
 builder.Host.AddLokiLogger(
     builder.Configuration, 
@@ -34,9 +29,7 @@ builder.Services.AddMessageBrokerOptions()
     .AddHeaderSecretsOptions()
     .AddRedisOptions();
 
-builder.Services.AddOpenApi();
-builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen(c => { c.OperationFilter<PermissionsOperationFilter>(); });
+builder.Services.AddCommonApiInfrastructure();
 
 builder.Services.AddMassTransit(x =>
 {
@@ -52,8 +45,6 @@ builder.Services.AddMassTransit(x =>
     });
 });
 
-builder.Services.AddHttpContextAccessor();
-
 builder.Services.AddSingleton<BackgroundTaskQueue>();
 builder.Services.AddSingleton<IBackgroundTaskQueue>(sp => sp.GetRequiredService<BackgroundTaskQueue>());
 builder.Services.AddHostedService<BackgroundTaskQueue>(sp => sp.GetRequiredService<BackgroundTaskQueue>());
@@ -62,49 +53,18 @@ builder.Services.AddPersistenceLayer(builder.Configuration.GetValue<string>("Ind
     .AddEComAuth(builder.Configuration)
     .AddMinimalSecurityLayer()
     .AddApplicationLayer()
-    .AddLocalization(builder.Configuration)
-    .AddBaseExceptionHandlers();
-
-builder.Services.AddCors(options =>
-{
-    options.AddDefaultPolicy(policy =>
-    {
-        policy
-            .AllowAnyOrigin()
-            .AllowAnyHeader()
-            .AllowAnyMethod();
-    });
-});
+    .AddLocalization(builder.Configuration);
 
 var endpointAssembly = typeof(GetArticleRequest).Assembly;
 builder.Services.AddCarter(
     new DependencyContextAssemblyCatalog(endpointAssembly),
     configurator: c => c.WithEmptyValidators());
 
-builder.Services.AddTransient<HeaderSecretMiddleware>();
-
 var app = builder.Build();
 
 await app.LoadLocalesFromJson(
     Assembly.GetExecutingAssembly().GetDefaultLocalizationPath());
 
-app.UseMiddleware<HeaderSecretMiddleware>();
-
-app.UseMiddleware<ScopedLocalizationMiddleware>();
-
-app.UseForwardedHeaders(new ForwardedHeadersOptions
-{
-    ForwardedHeaders = ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto
-});
-
-app.UseExceptionHandler(_ => { });
-
-app.UseRouting();
-
-app.UseCors();
-
-app.MapCarter();
-
-app.MapHealthChecks("/health");
+app.UseCommonApiPipeline();
 
 await app.RunAsync();

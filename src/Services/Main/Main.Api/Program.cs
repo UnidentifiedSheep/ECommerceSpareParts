@@ -42,12 +42,7 @@ using Global = Main.Application.Global;
 
 var builder = WebApplication.CreateBuilder(args);
 
-var env = Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT") ?? "";
-
-builder.Configuration
-    .AddAppSettingsFromJsons(env)
-    .AddAppSettingsFromJsons(env, "/app/configs")
-    .AddConfigsFromJsons("main", env, "/app/configs");
+var env = builder.AddServiceConfiguration("main");
 
 builder.Host.AddLokiLogger(
     configuration: builder.Configuration, 
@@ -60,9 +55,7 @@ builder.Services.AddMessageBrokerOptions()
     .AddS3Options()
     .AddDatabaseOptions();
 
-builder.Services.AddOpenApi();
-builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen(c => { c.OperationFilter<PermissionsOperationFilter>(); });
+builder.Services.AddCommonApiInfrastructure();
 
 builder.Services.AddHangfire((sp, x) =>
 {
@@ -129,8 +122,6 @@ builder.Services.AddMassTransit(x =>
     });
 });
 
-builder.Services.AddHttpContextAccessor();
-
 builder.Services
     .AddPersistenceLayer()
     .AddCacheLayer("main")
@@ -157,8 +148,6 @@ builder.Services
     .AddLocalization(builder.Configuration)
     .AddExchangeRates();
 
-builder.Services.AddBaseExceptionHandlers();
-
 builder.Services.AddHostedService<SearchLogBackgroundWorker>();
 
 builder.Services.AddOpenTelemetry()
@@ -171,50 +160,21 @@ builder.Services.AddOpenTelemetry()
             .AddPrometheusExporter();
     });
 
-builder.Services.AddCors(options =>
-{
-    options.AddDefaultPolicy(policy =>
-    {
-        policy
-            .AllowAnyOrigin()
-            .AllowAnyHeader()
-            .AllowAnyMethod();
-    });
-});
-
 builder.Services.AddCarter(
     new DependencyContextAssemblyCatalog(typeof(AddProductContentEndPoint).Assembly),
     configurator: c => c.WithEmptyValidators());
-
-builder.Services.AddTransient<HeaderSecretMiddleware>();
 
 var app = builder.Build();
 
 SortByConfig.Configure();
 
-app.UseMiddleware<HeaderSecretMiddleware>();
-
-app.UseMiddleware<ScopedLocalizationMiddleware>();
-
-app.UseForwardedHeaders(new ForwardedHeadersOptions
-{
-    ForwardedHeaders = ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto
-});
+app.UseCommonApiPipeline();
 
 app.UseHangfireDashboard();
 
 var localesPath = Assembly.GetExecutingAssembly().GetDefaultLocalizationPath();
 await app.LoadLocalesFromJson(localesPath);
 await InitSettings(app.Services);
-
-app.UseExceptionHandler(_ => { });
-
-app.UseRouting();
-
-app.UseCors();
-
-
-app.MapCarter();
 
 if (app.Environment.IsDevelopment())
 {
@@ -237,8 +197,6 @@ RecurringJob.AddOrUpdate<NotifySuggestionsRebuildNeeded>("RebuildSuggestionsTask
     x => x.Run(), Cron.Daily);
 
 app.UseOpenTelemetryPrometheusScrapingEndpoint();
-
-app.MapHealthChecks("/health");
 
 await app.RunAsync();
 

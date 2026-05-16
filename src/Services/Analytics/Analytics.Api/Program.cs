@@ -24,14 +24,7 @@ var localesPath = Assembly.GetExecutingAssembly().GetDefaultLocalizationPath();
 
 var builder = WebApplication.CreateBuilder(args);
 
-builder.Services.AddOpenApi();
-
-var env = Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT") ?? "";
-
-builder.Configuration
-    .AddAppSettingsFromJsons(env)
-    .AddAppSettingsFromJsons(env, "/app/configs")
-    .AddConfigsFromJsons("analytics", env, "/app/configs");
+var env = builder.AddServiceConfiguration("analytics");
 
 builder.Host.AddLokiLogger(
     configuration: builder.Configuration, 
@@ -43,6 +36,8 @@ builder.Services.AddMessageBrokerOptions()
     .AddRedisOptions()
     .AddDatabaseOptions();
 
+builder.Services.AddCommonApiInfrastructure();
+
 builder.Services
     .AddPersistenceLayer()
     .AddCacheLayer("analytics")
@@ -52,8 +47,6 @@ builder.Services
     .AddMinimalSecurityLayer();
 
 builder.Services.AddLocalization(builder.Configuration);
-
-builder.Services.AddHttpContextAccessor();
 
 var uniqQueueName = $"queue-of-analytics-{Environment.MachineName}";
 
@@ -95,41 +88,15 @@ builder.Services.AddMassTransit(x =>
     });
 });
 
-builder.Services.AddCors(options =>
-{
-    options.AddDefaultPolicy(policy =>
-    {
-        policy
-            .AllowAnyOrigin()
-            .AllowAnyHeader()
-            .AllowAnyMethod();
-    });
-});
-
 builder.Services.AddCarter(configurator: c => c.WithEmptyValidators());
-builder.Services.AddBaseExceptionHandlers();
-
-builder.Services.AddTransient<HeaderSecretMiddleware>();
 
 var app = builder.Build();
 
-app.UseExceptionHandler(_ => { });
-
-app.UseRouting();
-
-app.UseCors();
-
-app.MapCarter();
+app.UseCommonApiPipeline();
 
 await app.LoadLocalesFromJson(localesPath);
 
-app.UseMiddleware<HeaderSecretMiddleware>();
-
-app.UseMiddleware<ScopedLocalizationMiddleware>();
-
 if (app.Environment.IsDevelopment()) app.MapOpenApi();
 
-
-app.MapHealthChecks("/health");
 
 await app.RunAsync();
