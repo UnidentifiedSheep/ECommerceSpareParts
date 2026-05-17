@@ -5,12 +5,14 @@ using Analytics.Persistence.Context;
 using Analytics.Worker.Consumers;
 using Api.Common;
 using Api.Common.Extensions;
+using Application.Common.Backplane;
 using Cache;
 using Common;
 using Internal.Integration.Di;
 using Localization.Domain.Extensions;
 using MassTransit;
 using RabbitMq.Extensions;
+using ZiggyCreatures.Caching.Fusion.Backplane;
 
 var env = Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT") ?? "";
 
@@ -63,9 +65,11 @@ void AddLoki(IHostApplicationBuilder hostBuilder)
 
 void AddMassTransit(IHostApplicationBuilder hostBuilder)
 {
+    var uniqQueueName = $"queue-of-analytics-worker-{Environment.MachineName}";
     hostBuilder.Services.AddMassTransit(x =>
     {
         x.AddConsumers(Assembly.GetAssembly(typeof(MetricCalculationRequestedConsumer)));
+        x.AddConsumer<BackplaneConsumer>();
 
         x.AddEntityFrameworkOutbox<DContext>(o =>
         {
@@ -76,6 +80,15 @@ void AddMassTransit(IHostApplicationBuilder hostBuilder)
         x.UsingRabbitMq((context, cfg) =>
         {
             cfg.ConfigureRabbitMq(context);
+            
+            cfg.ReceiveEndpoint(uniqQueueName, ep =>
+            {
+                ep.AutoDelete = true;
+                ep.Durable = false;
+            
+                ep.ConfigureConsumer<BackplaneConsumer>(context);
+                ep.Bind<BackplaneMessage>();
+            });
 
             cfg.ReceiveEndpoint("analytics-work-queue", ep =>
             {

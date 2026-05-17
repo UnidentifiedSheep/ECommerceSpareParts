@@ -3,6 +3,7 @@ using Abstractions.Models;
 using Amazon.S3;
 using Api.Common;
 using Api.Common.Extensions;
+using Application.Common.Backplane;
 using Application.Common.Interfaces.Settings;
 using Cache;
 using Carter;
@@ -30,6 +31,7 @@ using Persistence;
 using RabbitMq.Extensions;
 using S3;
 using Security;
+using ZiggyCreatures.Caching.Fusion.Backplane;
 using Global = Main.Application.Global;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -75,6 +77,7 @@ var uniqQueueName = $"queue-of-main-{Environment.MachineName}";
 builder.Services.AddMassTransit(x =>
 {
     x.AddConsumers(Assembly.GetAssembly(typeof(Global)));
+    x.AddConsumer<BackplaneConsumer>();
 
     x.AddEntityFrameworkOutbox<DContext>(o =>
     {
@@ -98,6 +101,9 @@ builder.Services.AddMassTransit(x =>
 
             ep.Bind<CurrencyRateChangedEvent>();
             ep.Bind<SettingChangedEvent>();
+            
+            ep.ConfigureConsumer<BackplaneConsumer>(context);
+            ep.Bind<BackplaneMessage>();
         });
 
         cfg.ReceiveEndpoint("main-queue", ep =>

@@ -5,6 +5,7 @@ using Analytics.Persistence;
 using Analytics.Persistence.Context;
 using Api.Common;
 using Api.Common.Extensions;
+using Application.Common.Backplane;
 using Cache;
 using Carter;
 using Internal.Integration.Di;
@@ -12,6 +13,7 @@ using Localization.Domain.Extensions;
 using MassTransit;
 using RabbitMq.Extensions;
 using Security;
+using ZiggyCreatures.Caching.Fusion.Backplane;
 
 var localesPath = Assembly.GetExecutingAssembly().GetDefaultLocalizationPath();
 
@@ -46,6 +48,7 @@ var uniqQueueName = $"queue-of-analytics-{Environment.MachineName}";
 builder.Services.AddMassTransit(x =>
 {
     x.AddConsumers(Assembly.GetAssembly(typeof(CurrencyCreatedConsumer)));
+    x.AddConsumer<BackplaneConsumer>();
 
     x.AddEntityFrameworkOutbox<DContext>(o =>
     {
@@ -61,6 +64,9 @@ builder.Services.AddMassTransit(x =>
         {
             ep.AutoDelete = true;
             ep.Durable = false;
+            
+            ep.ConfigureConsumer<BackplaneConsumer>(context);
+            ep.Bind<BackplaneMessage>();
         });
 
         cfg.ReceiveEndpoint("analytics-queue", ep =>
