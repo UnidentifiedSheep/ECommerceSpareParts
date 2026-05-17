@@ -51,13 +51,8 @@ public static class ConfigurationBuilderExtensions
 
     private static bool ShouldLoad(string fileName, string nameStart, string? contour)
     {
-        if (!fileName.StartsWith(nameStart, StringComparison.OrdinalIgnoreCase))
-            return false;
-
-        if (nameStart != Appsettings)
-            return true;
-
         var additionalName = string.IsNullOrWhiteSpace(contour) ? null : $".{contour}";
-        return fileName is $"{Appsettings}.json" || fileName == $"{Appsettings}{additionalName}.json";
+        return string.Equals(fileName, $"{nameStart}.json", StringComparison.OrdinalIgnoreCase) ||
+               string.Equals(fileName, $"{nameStart}{additionalName}.json", StringComparison.OrdinalIgnoreCase);
     }
 }

@@ -7,7 +7,7 @@ services:
       cache_from:
         - type=registry,ref=${ARTIFACT_REGISTRY_HOST}/main-api:buildcache
       cache_to:
-        - type=registry,ref=${ARTIFACT_REGISTRY_HOST}/main-api:buildcache,mode=min
+        - type=registry,ref=${ARTIFACT_REGISTRY_HOST}/main-api:buildcache,mode=max
 
   search.api:
     image: ${ARTIFACT_REGISTRY_HOST}/search-api:${IMAGE_TAG}
@@ -17,7 +17,7 @@ services:
       cache_from:
         - type=registry,ref=${ARTIFACT_REGISTRY_HOST}/search-api:buildcache
       cache_to:
-        - type=registry,ref=${ARTIFACT_REGISTRY_HOST}/search-api:buildcache,mode=min
+        - type=registry,ref=${ARTIFACT_REGISTRY_HOST}/search-api:buildcache,mode=max
 
   pricing.api:
     image: ${ARTIFACT_REGISTRY_HOST}/pricing-api:${IMAGE_TAG}
@@ -27,7 +27,7 @@ services:
       cache_from:
         - type=registry,ref=${ARTIFACT_REGISTRY_HOST}/pricing-api:buildcache
       cache_to:
-        - type=registry,ref=${ARTIFACT_REGISTRY_HOST}/pricing-api:buildcache,mode=min
+        - type=registry,ref=${ARTIFACT_REGISTRY_HOST}/pricing-api:buildcache,mode=max
 
   gateway:
     image: ${ARTIFACT_REGISTRY_HOST}/gateway:${IMAGE_TAG}
@@ -37,7 +37,7 @@ services:
       cache_from:
         - type=registry,ref=${ARTIFACT_REGISTRY_HOST}/gateway:buildcache
       cache_to:
-        - type=registry,ref=${ARTIFACT_REGISTRY_HOST}/gateway:buildcache,mode=min
+        - type=registry,ref=${ARTIFACT_REGISTRY_HOST}/gateway:buildcache,mode=max
 
   analytics.api:
     image: ${ARTIFACT_REGISTRY_HOST}/analytics-api:${IMAGE_TAG}
@@ -47,7 +47,7 @@ services:
       cache_from:
         - type=registry,ref=${ARTIFACT_REGISTRY_HOST}/analytics-api:buildcache
       cache_to:
-        - type=registry,ref=${ARTIFACT_REGISTRY_HOST}/analytics-api:buildcache,mode=min
+        - type=registry,ref=${ARTIFACT_REGISTRY_HOST}/analytics-api:buildcache,mode=max
 
   analytics.worker:
     image: ${ARTIFACT_REGISTRY_HOST}/analytics-worker:${IMAGE_TAG}
@@ -57,7 +57,7 @@ services:
       cache_from:
         - type=registry,ref=${ARTIFACT_REGISTRY_HOST}/analytics-worker:buildcache
       cache_to:
-        - type=registry,ref=${ARTIFACT_REGISTRY_HOST}/analytics-worker:buildcache,mode=min
+        - type=registry,ref=${ARTIFACT_REGISTRY_HOST}/analytics-worker:buildcache,mode=max
 
   pgql:
     image: ${ARTIFACT_REGISTRY_HOST}/postgres-cron:${IMAGE_TAG}
@@ -67,4 +67,4 @@ services:
       cache_from:
         - type=registry,ref=${ARTIFACT_REGISTRY_HOST}/postgres-cron:buildcache
       cache_to:
-        - type=registry,ref=${ARTIFACT_REGISTRY_HOST}/postgres-cron:buildcache,mode=min
+        - type=registry,ref=${ARTIFACT_REGISTRY_HOST}/postgres-cron:buildcache,mode=max
