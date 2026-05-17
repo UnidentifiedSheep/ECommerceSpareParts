@@ -1,7 +1,7 @@
-﻿using Pricing.Abstractions.Interfaces.Services.Pricing;
-using Pricing.Abstractions.Models.Pricing;
+﻿using Pricing.Application.Interfaces.Services.Pricing;
+using Pricing.Application.Models.Pricing;
 
-namespace Pricing.Application.Services.ArticlePricing;
+namespace Pricing.Application.Services.ProductPricing;
 
 public class PriceService(IMarkupService markupService, IDiscountService discountService) : IPriceService
 {

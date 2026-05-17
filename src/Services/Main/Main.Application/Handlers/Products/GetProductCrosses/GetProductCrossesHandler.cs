@@ -21,13 +21,13 @@ public class GetProductCrossesHandler(
     {
         var pagination = request.Pagination;
         var requestedArticle = await productCache.GetProductOrSetAsync(
-            request.ProductId, 
+            request.ProductId,
             cancellationToken);
 
         var crosses = await GetCrosses(
-            request.ProductId, 
-            pagination, 
-            request.SortBy, 
+            request.ProductId,
+            pagination,
+            request.SortBy,
             cancellationToken);
 
         return new GetProductCrossesResult(crosses, requestedArticle);
@@ -40,11 +40,11 @@ public class GetProductCrossesHandler(
         CancellationToken token)
     {
         var crosseIds = (await productCache.GetProductCrossesAsync(
-            productId,
-            sortBy,
-            token))
+                productId,
+                sortBy,
+                token))
             .ApplyPagination(pagination);
-        
+
         return (await productCache.GetProductsOrSetAsync(crosseIds, token)).Values.ToList();
     }
 }

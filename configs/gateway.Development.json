@@ -1,0 +1,10 @@
+{
+  "Kestrel": {
+    "Certificates": {
+      "Default": {
+        "Path": "/app/certs/gateway.local.cert.pem",
+        "KeyPath": "/app/certs/gateway.local.key.pem"
+      }
+    }
+  }
+}

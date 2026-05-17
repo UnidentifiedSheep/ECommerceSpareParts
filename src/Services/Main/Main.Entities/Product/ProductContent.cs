@@ -1,7 +1,7 @@
 using System.Linq.Expressions;
 using Domain;
-using Domain.Interfaces;
 using Domain.Extensions;
+using Domain.Interfaces;
 
 namespace Main.Entities.Product;
 
@@ -26,6 +26,11 @@ public class ProductContent : Entity<ProductContent, (int, int)>, ILinqEntity<Pr
     public Product ParentProduct { get; private set; } = null!;
     public Product ChildProduct { get; private set; } = null!;
 
+    public static Expression<Func<ProductContent, bool>> GetEqualityExpression((int, int) key)
+    {
+        return x => x.ParentProductId == key.Item1 && x.ChildProductId == key.Item2;
+    }
+
     public static ProductContent Create(int parentProductId, int childProductId, int quantity)
     {
         return new ProductContent(parentProductId, childProductId, quantity);
@@ -41,7 +46,4 @@ public class ProductContent : Entity<ProductContent, (int, int)>, ILinqEntity<Pr
     {
         return (ParentProductId, ChildProductId);
     }
-
-    public static Expression<Func<ProductContent, bool>> GetEqualityExpression((int, int) key)
-        => x => x.ParentProductId == key.Item1 && x.ChildProductId == key.Item2;
 }

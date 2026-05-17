@@ -1,7 +1,6 @@
 ﻿using System.Data;
 using Abstractions.Interfaces.Services;
 using Analytics.Entities;
-using Application.Common.Interfaces;
 using Application.Common.Interfaces.Cqrs;
 using Application.Common.Interfaces.Repositories;
 using Attributes;

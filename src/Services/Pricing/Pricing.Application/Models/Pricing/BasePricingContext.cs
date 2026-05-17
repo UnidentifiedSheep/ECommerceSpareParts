@@ -1,6 +1,6 @@
 ﻿using Pricing.Enums;
 
-namespace Pricing.Abstractions.Models.Pricing;
+namespace Pricing.Application.Models.Pricing;
 
 public class BasePricingContext(IEnumerable<BasePricingItem> items, ProductPricingType pricingType)
 {

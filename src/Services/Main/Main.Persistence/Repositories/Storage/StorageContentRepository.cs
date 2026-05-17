@@ -1,15 +1,14 @@
-﻿using Application.Common.Interfaces.Repositories;
-using Main.Application.Interfaces.Persistence;
+﻿using Main.Application.Interfaces.Persistence;
 using Main.Entities.Storage;
 using Main.Persistence.Context;
 using Microsoft.EntityFrameworkCore;
-using Persistence;
 using Persistence.Extensions;
+using Persistence.Repository;
 
 namespace Main.Persistence.Repositories.Storage;
 
 public class StorageContentRepository(DContext context)
-    : RepositoryBase<DContext, StorageContent, int>(context), IStorageContentRepository
+    : LinqRepositoryBase<DContext, StorageContent, int>(context), IStorageContentRepository
 {
     public IAsyncEnumerable<StorageContent> GetStorageContentsForUpdateAsync(
         int? productId,
@@ -60,16 +59,5 @@ public class StorageContentRepository(DContext context)
             })
             .ToDictionaryAsync(x => x.ProductId,
                 x => x.TotalCount, cancellationToken);
-    }
-
-    public override Task<Dictionary<int, StorageContent>> FindByIdsAsync(
-        IEnumerable<int> ids,
-        Criteria<StorageContent>? criteria = null,
-        CancellationToken ct = default)
-    {
-        return Context.StorageContents
-            .Apply(criteria)
-            .Where(x => ids.Contains(x.Id))
-            .ToDictionaryAsync(x => x.Id, ct);
     }
 }

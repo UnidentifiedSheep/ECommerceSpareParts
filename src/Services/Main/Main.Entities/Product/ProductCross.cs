@@ -28,6 +28,11 @@ public class ProductCross : Entity<ProductCross, (int, int)>, ILinqEntity<Produc
     public Product LeftProduct { get; private set; } = null!;
     public Product RightProduct { get; private set; } = null!;
 
+    public static Expression<Func<ProductCross, bool>> GetEqualityExpression((int, int) key)
+    {
+        return x => x.LeftProductId == key.Item1 && x.RightProductId == key.Item2;
+    }
+
     public static ProductCross Create(int id, int crossId)
     {
         return new ProductCross(id, crossId);
@@ -37,7 +42,4 @@ public class ProductCross : Entity<ProductCross, (int, int)>, ILinqEntity<Produc
     {
         return (LeftProductId, RightProductId);
     }
-
-    public static Expression<Func<ProductCross, bool>> GetEqualityExpression((int, int) key)
-        => x => x.LeftProductId == key.Item1 && x.RightProductId == key.Item2;
 }

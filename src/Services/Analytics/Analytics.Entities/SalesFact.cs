@@ -1,8 +1,10 @@
-﻿using Domain;
+using System.Linq.Expressions;
+using Domain;
+using Domain.Interfaces;
 
 namespace Analytics.Entities;
 
-public class SalesFact : AuditableEntity<SalesFact, Guid>
+public class SalesFact : AuditableEntity<SalesFact, Guid>, ILinqEntity<SalesFact, Guid>
 {
     public Guid Id { get; set; }
     public int CurrencyId { get; set; }
@@ -10,6 +12,16 @@ public class SalesFact : AuditableEntity<SalesFact, Guid>
     public decimal TotalSum { get; set; }
 
     public virtual ICollection<SaleContent> SaleContents { get; set; } = new List<SaleContent>();
+
+    public static Expression<Func<SalesFact, Guid>> GetKeySelector()
+    {
+        return x => x.Id;
+    }
+
+    public static Expression<Func<SalesFact, bool>> GetEqualityExpression(Guid key)
+    {
+        return x => x.Id == key;
+    }
 
     public override Guid GetId()
     {

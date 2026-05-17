@@ -6,7 +6,6 @@ using Application.Common.Interfaces.Cqrs;
 using Attributes;
 using Contracts.Products;
 using Contracts.StorageContent;
-using Main.Application.Extensions;
 using Main.Application.Interfaces.Persistence;
 using Main.Application.Models;
 using Main.Entities.Event;

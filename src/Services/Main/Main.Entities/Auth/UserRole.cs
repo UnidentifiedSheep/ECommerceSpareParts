@@ -23,6 +23,11 @@ public class UserRole : AuditableEntity<UserRole, (Guid, string)>, ILinqEntity<U
 
     public Role Role { get; private set; } = null!;
 
+    public static Expression<Func<UserRole, bool>> GetEqualityExpression((Guid, string) key)
+    {
+        return x => x.UserId == key.Item1 && x.RoleName == key.Item2;
+    }
+
     public static UserRole Create(Guid userId, string roleName)
     {
         return new UserRole(userId, roleName);
@@ -32,7 +37,4 @@ public class UserRole : AuditableEntity<UserRole, (Guid, string)>, ILinqEntity<U
     {
         return (UserId, RoleName);
     }
-
-    public static Expression<Func<UserRole, bool>> GetEqualityExpression((Guid, string) key)
-        => x => x.UserId == key.Item1 && x.RoleName == key.Item2;
 }

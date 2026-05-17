@@ -2,14 +2,12 @@ using Enums;
 using FluentAssertions;
 using Main.Abstractions.Constants;
 using Main.Application.Dtos.Amw.Purchase;
-using Main.Application.Handlers.Purchases.CreateFullPurchase;
+using Main.Application.Handlers.Purchases.CreatePurchase;
 using Main.Entities.Exceptions.Auth;
 using Main.Entities.Exceptions.Products;
 using Main.Entities.Product;
-using Main.Entities.Purchase;
 using Main.Entities.Storage;
 using Main.Entities.User;
-using Main.Enums;
 using Microsoft.EntityFrameworkCore;
 using Test.Common.Extensions;
 using Test.Common.TestContainers.Combined;
@@ -48,12 +46,12 @@ public class CreatePurchaseTests : IntegrationTest
         var storage = GetContext<StorageTestContext>().Storages.First();
         var products = GetContext<ProductTestContext>().Products.Take(2).ToList();
         var command = CreateCommand(
-            supplierId: _supplier.Id,
-            currencyId: currency.Id,
-            storageName: storage.Name,
-            withLogistics: false,
-            storageFrom: null,
-            contents: products.Select((product, index) => NewContent(product, index + 1, calculateLogistics: false)));
+            _supplier.Id,
+            currency.Id,
+            storage.Name,
+            false,
+            null,
+            products.Select((product, index) => NewContent(product, index + 1, false)));
 
         await Mediator.Send(command);
 
@@ -97,12 +95,12 @@ public class CreatePurchaseTests : IntegrationTest
         var storage = GetContext<StorageTestContext>().Storages.First();
         var product = GetContext<ProductTestContext>().Products.First();
         var command = CreateCommand(
-            supplierId: member.Id,
-            currencyId: currency.Id,
-            storageName: storage.Name,
-            withLogistics: false,
-            storageFrom: null,
-            contents: [NewContent(product, count: 1, calculateLogistics: false)]);
+            member.Id,
+            currency.Id,
+            storage.Name,
+            false,
+            null,
+            [NewContent(product, 1, false)]);
 
         await Assert.ThrowsAsync<UserIsNotInNeededRole>(() => Mediator.Send(command));
     }
@@ -116,12 +114,12 @@ public class CreatePurchaseTests : IntegrationTest
         await AddLogisticsDependencies(product, route, _supplier.Id);
 
         var command = CreateCommand(
-            supplierId: _supplier.Id,
-            currencyId: currency.Id,
-            storageName: route.ToStorageName,
-            withLogistics: true,
-            storageFrom: route.FromStorageName,
-            contents: [NewContent(product, count: 2, calculateLogistics: true)]);
+            _supplier.Id,
+            currency.Id,
+            route.ToStorageName,
+            true,
+            route.FromStorageName,
+            [NewContent(product, 2, true)]);
 
         await Mediator.Send(command);
 
@@ -167,13 +165,13 @@ public class CreatePurchaseTests : IntegrationTest
         var product = GetContext<ProductTestContext>().Products.First();
         var payedSum = 5m;
         var command = CreateCommand(
-            supplierId: _supplier.Id,
-            currencyId: currency.Id,
-            storageName: storage.Name,
-            withLogistics: false,
-            storageFrom: null,
-            contents: [NewContent(product, count: 1, calculateLogistics: false)],
-            payedSum: payedSum);
+            _supplier.Id,
+            currency.Id,
+            storage.Name,
+            false,
+            null,
+            [NewContent(product, 1, false)],
+            payedSum);
 
         await Mediator.Send(command);
 
@@ -193,13 +191,13 @@ public class CreatePurchaseTests : IntegrationTest
         var storage = GetContext<StorageTestContext>().Storages.First();
         var product = GetContext<ProductTestContext>().Products.First();
         var command = CreateCommand(
-            supplierId: _supplier.Id,
-            currencyId: currency.Id,
-            storageName: storage.Name,
-            withLogistics: false,
-            storageFrom: null,
-            contents: [NewContent(product, count: 1, calculateLogistics: false)],
-            payedSum: 0m);
+            _supplier.Id,
+            currency.Id,
+            storage.Name,
+            false,
+            null,
+            [NewContent(product, 1, false)],
+            0m);
 
         await Mediator.Send(command);
 
@@ -217,12 +215,12 @@ public class CreatePurchaseTests : IntegrationTest
         await Context.SaveChangesAsync();
 
         var command = CreateCommand(
-            supplierId: _supplier.Id,
-            currencyId: currency.Id,
-            storageName: route.ToStorageName,
-            withLogistics: true,
-            storageFrom: route.FromStorageName,
-            contents: [NewContent(product, count: 1, calculateLogistics: false)]);
+            _supplier.Id,
+            currency.Id,
+            route.ToStorageName,
+            true,
+            route.FromStorageName,
+            [NewContent(product, 1, false)]);
 
         await Mediator.Send(command);
 
@@ -357,12 +355,12 @@ public class CreatePurchaseTests : IntegrationTest
         await Context.SaveChangesAsync();
 
         var command = CreateCommand(
-            supplierId: _supplier.Id,
-            currencyId: GetContext<CurrencyTestContext>().Currencies[0].Id,
-            storageName: route.ToStorageName,
-            withLogistics: true,
-            storageFrom: route.FromStorageName,
-            contents: [NewContent(product, count: 1, calculateLogistics: true)]);
+            _supplier.Id,
+            GetContext<CurrencyTestContext>().Currencies[0].Id,
+            route.ToStorageName,
+            true,
+            route.FromStorageName,
+            [NewContent(product, 1, true)]);
 
         await Assert.ThrowsAsync<ProductSizesNotFoundException>(() => Mediator.Send(command));
     }
@@ -377,12 +375,12 @@ public class CreatePurchaseTests : IntegrationTest
         await Context.SaveChangesAsync();
 
         var command = CreateCommand(
-            supplierId: _supplier.Id,
-            currencyId: GetContext<CurrencyTestContext>().Currencies[0].Id,
-            storageName: route.ToStorageName,
-            withLogistics: true,
-            storageFrom: route.FromStorageName,
-            contents: [NewContent(product, count: 1, calculateLogistics: true)]);
+            _supplier.Id,
+            GetContext<CurrencyTestContext>().Currencies[0].Id,
+            route.ToStorageName,
+            true,
+            route.FromStorageName,
+            [NewContent(product, 1, true)]);
 
         await Assert.ThrowsAsync<ProductWeightNotFoundException>(() => Mediator.Send(command));
     }
@@ -416,12 +414,12 @@ public class CreatePurchaseTests : IntegrationTest
         var product = GetContext<ProductTestContext>().Products.First();
 
         return CreateCommand(
-            supplierId: _supplier.Id,
-            currencyId: currency.Id,
-            storageName: storage.Name,
-            withLogistics: false,
-            storageFrom: null,
-            contents: [NewContent(product, count: 1, calculateLogistics: false)]);
+            _supplier.Id,
+            currency.Id,
+            storage.Name,
+            false,
+            null,
+            [NewContent(product, 1, false)]);
     }
 
     private static NewPurchaseContentDto NewContent(Product product, int count, bool calculateLogistics)

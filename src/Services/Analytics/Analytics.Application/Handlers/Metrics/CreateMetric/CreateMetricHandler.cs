@@ -2,7 +2,6 @@
 using Analytics.Application.Dtos.CalculationJob;
 using Analytics.Application.Interfaces.Services;
 using Analytics.Entities.Metrics;
-using Application.Common.Interfaces;
 using Application.Common.Interfaces.Cqrs;
 using Attributes;
 

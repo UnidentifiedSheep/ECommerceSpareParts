@@ -11,14 +11,18 @@ public static class ConfigurationBuilderExtensions
         this IConfigurationBuilder configuration,
         string? contour,
         string? path = null)
-        => configuration.AddConfigsFromJsons(Appsettings, contour, path);
-    
+    {
+        return configuration.AddConfigsFromJsons(Appsettings, contour, path);
+    }
+
     public static IConfigurationBuilder AddMigratorSettingsFromJsons(
         this IConfigurationBuilder configuration,
         string? contour,
         string? path = null)
-        => configuration.AddConfigsFromJsons("migrator", contour, path);
-    
+    {
+        return configuration.AddConfigsFromJsons("migrator", contour, path);
+    }
+
     public static IConfigurationBuilder AddConfigsFromJsons(
         this IConfigurationBuilder configuration,
         string nameStart,
@@ -29,9 +33,6 @@ public static class ConfigurationBuilderExtensions
 
         if (!Directory.Exists(path)) return configuration;
 
-        var additionalName = string.IsNullOrWhiteSpace(contour) ? null : $".{contour}";
-        var appsettingsFileName = $"{Appsettings}{additionalName}.json";
-
         var files = Directory
             .GetFiles(path, "*.json", SearchOption.AllDirectories)
             .OrderBy(f => f);
@@ -39,12 +40,24 @@ public static class ConfigurationBuilderExtensions
         foreach (var file in files)
         {
             var fileName = Path.GetFileName(file);
-            if (fileName.StartsWith(nameStart) && fileName != appsettingsFileName)
+            if (!ShouldLoad(fileName, nameStart, contour))
                 continue;
 
             configuration.AddJsonFile(file, true, true);
         }
 
         return configuration;
+    }
+
+    private static bool ShouldLoad(string fileName, string nameStart, string? contour)
+    {
+        if (!fileName.StartsWith(nameStart, StringComparison.OrdinalIgnoreCase))
+            return false;
+
+        if (nameStart != Appsettings)
+            return true;
+
+        var additionalName = string.IsNullOrWhiteSpace(contour) ? null : $".{contour}";
+        return fileName is $"{Appsettings}.json" || fileName == $"{Appsettings}{additionalName}.json";
     }
 }

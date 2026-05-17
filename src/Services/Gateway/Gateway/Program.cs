@@ -1,10 +1,5 @@
-using System.Security.Claims;
-using System.Text;
 using Api.Common.Extensions;
 using Common;
-using Microsoft.AspNetCore.Authentication.JwtBearer;
-using Microsoft.AspNetCore.Authorization;
-using Microsoft.IdentityModel.Tokens;
 using OpenTelemetry.Metrics;
 using Yarp.ReverseProxy.Transforms;
 
@@ -12,13 +7,17 @@ var builder = WebApplication.CreateBuilder(args);
 
 
 var env = Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT") ?? "";
-var lokiUrl = Environment.GetEnvironmentVariable("LOKI_URL");
 
 builder.Configuration
     .AddAppSettingsFromJsons(env)
-    .AddAppSettingsFromJsons(env, "/app/configs");
+    .AddAppSettingsFromJsons(env, "/app/configs")
+    .AddConfigsFromJsons("gateway", null, "/app/configs")
+    .AddConfigsFromJsons("gateway", env, "/app/configs");
 
-builder.Host.AddLokiLogger(builder.Configuration, "gateway", env, lokiUrl);
+builder.Host.AddLokiLogger(
+    builder.Configuration,
+    "gateway",
+    env);
 
 builder.Services.AddOpenTelemetry()
     .WithMetrics(metrics =>
@@ -32,10 +31,7 @@ builder.Services.AddOpenTelemetry()
 
 builder.Services.AddAuthorization(options =>
 {
-    options.AddPolicy("DenyAll", policy =>
-    {
-        policy.RequireAssertion(_ => false);
-    });
+    options.AddPolicy("DenyAll", policy => { policy.RequireAssertion(_ => false); });
 });
 
 var secret = builder.Configuration["HeaderSecret:Key"];

@@ -38,6 +38,8 @@ jobs:
 
             export ARTIFACT_REGISTRY_HOST='${{ secrets.ARTIFACT_REGISTRY_HOST }}'
             export IMAGE_TAG='${{ github.sha }}'
+            export DOTNET_ENVIRONMENT='staging'
+            export ASPNETCORE_ENVIRONMENT='staging'
 
             echo '${{ secrets.ARTIFACT_REGISTRY_PASSWORD }}' | docker login \
               '${{ secrets.ARTIFACT_REGISTRY_HOST }}' \

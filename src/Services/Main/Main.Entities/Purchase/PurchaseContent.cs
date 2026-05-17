@@ -1,8 +1,8 @@
 using System.Linq.Expressions;
 using BulkValidation.Core.Attributes;
 using Domain;
-using Domain.Interfaces;
 using Domain.Extensions;
+using Domain.Interfaces;
 
 namespace Main.Entities.Purchase;
 
@@ -32,6 +32,11 @@ public class PurchaseContent : Entity<PurchaseContent, int>, ILinqEntity<Purchas
     public string? Comment { get; private set; }
     public Product.Product Product { get; private set; } = null!;
     public PurchaseContentLogistic? PurchaseContentLogistic { get; private set; }
+
+    public static Expression<Func<PurchaseContent, bool>> GetEqualityExpression(int key)
+    {
+        return x => x.Id == key;
+    }
 
     public static PurchaseContent Create(
         int productId,
@@ -109,7 +114,4 @@ public class PurchaseContent : Entity<PurchaseContent, int>, ILinqEntity<Purchas
     {
         return Id;
     }
-
-    public static Expression<Func<PurchaseContent, bool>> GetEqualityExpression(int key)
-        => x => x.Id == key;
 }

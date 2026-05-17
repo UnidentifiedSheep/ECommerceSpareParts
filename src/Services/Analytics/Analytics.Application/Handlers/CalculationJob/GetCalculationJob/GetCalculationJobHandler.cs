@@ -2,7 +2,6 @@
 using Analytics.Application.Handlers.Projections;
 using Analytics.Entities;
 using Analytics.Entities.Exceptions.MetricCalculationJobs;
-using Application.Common.Interfaces;
 using Application.Common.Interfaces.Cqrs;
 using Application.Common.Interfaces.Repositories;
 using LinqKit;

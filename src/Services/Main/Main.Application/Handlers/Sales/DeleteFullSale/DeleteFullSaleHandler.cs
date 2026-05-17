@@ -1,7 +1,6 @@
 using System.Data;
 using Abstractions.Interfaces;
 using Abstractions.Interfaces.Services;
-using Application.Common.Interfaces;
 using Application.Common.Interfaces.Cqrs;
 using Attributes;
 using Contracts.Sale;

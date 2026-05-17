@@ -1,8 +1,8 @@
 using System.Linq.Expressions;
 using BulkValidation.Core.Attributes;
 using Domain;
-using Domain.Interfaces;
 using Domain.Extensions;
+using Domain.Interfaces;
 
 namespace Main.Entities.Producer;
 
@@ -28,6 +28,16 @@ public class Producer : AuditableEntity<Producer, int>, ILinqEntity<Producer, in
     public string? ImagePath { get; private set; }
 
     public string? Description { get; private set; }
+
+    public static Expression<Func<Producer, int>> GetKeySelector()
+    {
+        return x => x.Id;
+    }
+
+    public static Expression<Func<Producer, bool>> GetEqualityExpression(int key)
+    {
+        return x => x.Id == key;
+    }
 
     public static Producer Create(string name, string? description = null, string? imagePath = null)
     {
@@ -71,7 +81,4 @@ public class Producer : AuditableEntity<Producer, int>, ILinqEntity<Producer, in
     {
         return Id;
     }
-
-    public static Expression<Func<Producer, bool>> GetEqualityExpression(int key)
-        => x => x.Id == key;
 }

@@ -1,4 +1,4 @@
-namespace Pricing.Abstractions.Models;
+namespace Pricing.Application.Models;
 
 public class DetailedPriceModel
 {

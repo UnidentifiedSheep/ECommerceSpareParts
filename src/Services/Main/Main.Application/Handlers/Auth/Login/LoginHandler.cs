@@ -2,7 +2,6 @@
 using System.Security.Cryptography;
 using Abstractions.Interfaces.Validators;
 using Application.Common.Extensions;
-using Application.Common.Interfaces;
 using Application.Common.Interfaces.Cqrs;
 using Application.Common.Interfaces.Repositories;
 using Attributes;

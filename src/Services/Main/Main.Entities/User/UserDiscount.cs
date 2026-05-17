@@ -1,7 +1,7 @@
 using System.Linq.Expressions;
 using Domain;
-using Domain.Interfaces;
 using Domain.Extensions;
+using Domain.Interfaces;
 
 namespace Main.Entities.User;
 
@@ -21,6 +21,11 @@ public class UserDiscount : Entity<UserDiscount, Guid>, ILinqEntity<UserDiscount
 
     public decimal Discount { get; set; }
 
+    public static Expression<Func<UserDiscount, bool>> GetEqualityExpression(Guid key)
+    {
+        return x => x.UserId == key;
+    }
+
     public static UserDiscount Create(Guid userId, decimal discount)
     {
         return new UserDiscount(userId, discount);
@@ -35,7 +40,4 @@ public class UserDiscount : Entity<UserDiscount, Guid>, ILinqEntity<UserDiscount
     {
         return UserId;
     }
-
-    public static Expression<Func<UserDiscount, bool>> GetEqualityExpression(Guid key)
-        => x => x.UserId == key;
 }

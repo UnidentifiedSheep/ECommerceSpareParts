@@ -4,12 +4,13 @@ using Main.Application.Interfaces.Persistence;
 using Main.Entities.Product;
 using Main.Persistence.Context;
 using Microsoft.EntityFrameworkCore;
-using Persistence;
 using Persistence.Extensions;
+using Persistence.Repository;
 
 namespace Main.Persistence.Repositories.Product;
 
-public class ProductRepository(DContext context) : RepositoryBase<DContext, Entities.Product.Product, int>(context), IProductRepository
+public class ProductRepository(DContext context)
+    : LinqRepositoryBase<DContext, Entities.Product.Product, int>(context), IProductRepository
 {
     public async Task<IReadOnlyList<Entities.Product.Product>> GetProductCrosses(
         int productId,
@@ -37,16 +38,5 @@ public class ProductRepository(DContext context) : RepositoryBase<DContext, Enti
         return Context.BulkInsertOrUpdateAsync(
             crosses,
             cancellationToken: cancellationToken);
-    }
-
-    public override Task<Dictionary<int, Entities.Product.Product>> FindByIdsAsync(
-        IEnumerable<int> ids,
-        Criteria<Entities.Product.Product>? criteria = null,
-        CancellationToken ct = default)
-    {
-        return Context.Products
-            .Apply(criteria)
-            .Where(x => ids.Contains(x.Id))
-            .ToDictionaryAsync(x => x.Id, ct);
     }
 }

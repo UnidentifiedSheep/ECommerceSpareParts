@@ -4,10 +4,9 @@ using Application.Common;
 using Application.Common.Interfaces;
 using Application.Common.Interfaces.Currency;
 using Application.Common.Interfaces.Settings;
-using Application.Common.Validators;
+using Application.Common.Services.Currency;
 using Application.Common.Services.Settings;
-using Localization.Abstractions.Models;
-using Localization.Domain.Extensions;
+using Application.Common.Validators;
 using Main.Application.Configs;
 using Main.Application.Handlers.Users.GetUserDiscount;
 using Main.Application.HangFireTasks;
@@ -30,12 +29,8 @@ public static class ServiceProvider
         UserEmailOptions? emailOptions = null,
         UserPhoneOptions? phoneOptions = null)
     {
-        Locale[] locales = ["ru-RU", "en-EN"];
-        Locale defaultLocale = "ru-RU";
-
         collection
             .AddNamedObjects()
-            .AddLocalization(defaultLocale, locales)
             .AddFusionCache()
             .WithRegisteredDistributedCache()
             .WithRegisteredBackplane()

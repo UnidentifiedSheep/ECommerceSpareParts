@@ -1,3 +1,3 @@
-﻿namespace Pricing.Abstractions.Models.Pricing;
+﻿namespace Pricing.Application.Models.Pricing;
 
 public record BasePricingItem(int Id, IEnumerable<ProductPrice> Prices, IEnumerable<PriceCoefficient> Coefficients);

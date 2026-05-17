@@ -3,13 +3,13 @@ using Main.Application.Interfaces.Persistence;
 using Main.Entities.Storage;
 using Main.Persistence.Context;
 using Microsoft.EntityFrameworkCore;
-using Persistence;
 using Persistence.Extensions;
+using Persistence.Repository;
 
 namespace Main.Persistence.Repositories.Storage;
 
 public class StorageRouteRepository(DContext context)
-    : RepositoryBase<DContext, StorageRoute, Guid>(context), IStorageRouteRepository
+    : LinqRepositoryBase<DContext, StorageRoute, Guid>(context), IStorageRouteRepository
 {
     public async Task<StorageRoute?> GetActiveRouteAsync(
         string from,
@@ -36,16 +36,5 @@ public class StorageRouteRepository(DContext context)
                 x.FromStorageName == from &&
                 x.ToStorageName == to &&
                 x.IsActive, ct);
-    }
-
-    public override Task<Dictionary<Guid, StorageRoute>> FindByIdsAsync(
-        IEnumerable<Guid> ids,
-        Criteria<StorageRoute>? criteria = null,
-        CancellationToken ct = default)
-    {
-        return Context.StorageRoutes
-            .Apply(criteria)
-            .Where(x => ids.Contains(x.Id))
-            .ToDictionaryAsync(x => x.Id, ct);
     }
 }

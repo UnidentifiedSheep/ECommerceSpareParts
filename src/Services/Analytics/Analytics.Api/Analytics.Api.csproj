@@ -10,12 +10,13 @@
 
     <ItemGroup>
         <PackageReference Include="Carter" Version="10.0.0"/>
-        <PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="10.0.8" />
+        <PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="10.0.8"/>
     </ItemGroup>
 
     <ItemGroup>
         <ProjectReference Include="..\..\..\Infrastructure\Cache\Cache.csproj"/>
-        <ProjectReference Include="..\..\..\Infrastructure\Common\Common.csproj" />
+        <ProjectReference Include="..\..\..\Infrastructure\Common\Common.csproj"/>
+        <ProjectReference Include="..\..\..\Infrastructure\Integrations\Internal\Internal.Integration.Di\Internal.Integration.Di.csproj"/>
         <ProjectReference Include="..\..\..\Infrastructure\Localization\Localization.Domain\Localization.Domain.csproj"/>
         <ProjectReference Include="..\..\..\Infrastructure\RabbitMq\RabbitMq.csproj"/>
         <ProjectReference Include="..\..\..\Infrastructure\Security\Security.csproj"/>

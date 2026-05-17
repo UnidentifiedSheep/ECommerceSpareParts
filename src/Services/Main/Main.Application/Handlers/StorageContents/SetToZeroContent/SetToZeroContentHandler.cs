@@ -7,7 +7,6 @@ using Application.Common.Interfaces.Repositories;
 using Attributes;
 using Contracts.Products;
 using Domain.Extensions;
-using Main.Application.Extensions;
 using Main.Application.Interfaces.Persistence;
 using Main.Entities.Event;
 using Main.Entities.Exceptions.Products;
@@ -36,8 +35,8 @@ public class SetToZeroContentHandler(
         content.ValidateVersion(request.RowVersion);
 
         var product = await productRepository.EnsureExistForUpdateAsync(
-            key: content.ProductId,
-            errorFactory: id => new ProductNotFoundException(id),
+            content.ProductId,
+            id => new ProductNotFoundException(id),
             ct: cancellationToken);
 
         await unitOfWork.AddAsync(

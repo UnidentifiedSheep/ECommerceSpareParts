@@ -1,7 +1,7 @@
 using System.Linq.Expressions;
 using Domain;
-using Domain.Interfaces;
 using Domain.Extensions;
+using Domain.Interfaces;
 
 namespace Main.Entities.Sale;
 
@@ -43,6 +43,11 @@ public class SaleContent : Entity<SaleContent, int>, ILinqEntity<SaleContent, in
 
     public Product.Product Product { get; private set; } = null!;
     public IReadOnlyList<SaleContentDetail> Details => _details;
+
+    public static Expression<Func<SaleContent, bool>> GetEqualityExpression(int key)
+    {
+        return x => x.Id == key;
+    }
 
     public static SaleContent Create(
         int productId,
@@ -111,7 +116,4 @@ public class SaleContent : Entity<SaleContent, int>, ILinqEntity<SaleContent, in
     {
         return Id;
     }
-
-    public static Expression<Func<SaleContent, bool>> GetEqualityExpression(int key)
-        => x => x.Id == key;
 }

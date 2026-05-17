@@ -1,10 +1,9 @@
 using System.Linq.Expressions;
 using BulkValidation.Core.Attributes;
 using Domain;
-using Domain.Interfaces;
 using Domain.Extensions;
+using Domain.Interfaces;
 using Exceptions;
-using Main.Entities.User;
 using Main.Enums;
 
 namespace Main.Entities.Balance;
@@ -53,6 +52,16 @@ public class Transaction : AuditableEntity<Transaction, Guid>, ILinqEntity<Trans
 
     public bool IsReversed => Status.HasFlag(TransactionStatus.Reversed);
     public bool IsReversalApplied => Status.HasFlag(TransactionStatus.ReversedApplied);
+
+    public static Expression<Func<Transaction, Guid>> GetKeySelector()
+    {
+        return x => x.Id;
+    }
+
+    public static Expression<Func<Transaction, bool>> GetEqualityExpression(Guid key)
+    {
+        return x => x.Id == key;
+    }
 
     public static Transaction Create(
         Guid senderId,
@@ -173,7 +182,4 @@ public class Transaction : AuditableEntity<Transaction, Guid>, ILinqEntity<Trans
     {
         return Id;
     }
-
-    public static Expression<Func<Transaction, bool>> GetEqualityExpression(Guid key)
-        => x => x.Id == key;
 }

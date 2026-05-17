@@ -1,7 +1,7 @@
 using System.Linq.Expressions;
 using Domain;
-using Domain.Interfaces;
 using Domain.Extensions;
+using Domain.Interfaces;
 
 namespace Main.Entities.Currency;
 
@@ -33,6 +33,11 @@ public class CurrencyRate : AuditableEntity<CurrencyRate, (int, int)>, ILinqEnti
     public Currency ToCurrency { get; private set; } = null!;
     public IReadOnlyCollection<CurrencyRateHistory> History => _history;
 
+    public static Expression<Func<CurrencyRate, bool>> GetEqualityExpression((int, int) key)
+    {
+        return x => x.FromCurrencyId == key.Item1 && x.ToCurrencyId == key.Item2;
+    }
+
     public static CurrencyRate Create(int fromCurrencyId, int toCurrencyId, decimal rate)
     {
         return new CurrencyRate(fromCurrencyId, toCurrencyId, rate);
@@ -54,7 +59,4 @@ public class CurrencyRate : AuditableEntity<CurrencyRate, (int, int)>, ILinqEnti
     {
         return (FromCurrencyId, ToCurrencyId);
     }
-
-    public static Expression<Func<CurrencyRate, bool>> GetEqualityExpression((int, int) key)
-        => x => x.FromCurrencyId == key.Item1 && x.ToCurrencyId == key.Item2;
 }

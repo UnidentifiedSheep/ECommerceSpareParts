@@ -1,7 +1,7 @@
 ﻿using Enums;
-using Pricing.Abstractions.Interfaces.Services;
-using Pricing.Abstractions.Interfaces.Services.Pricing;
-using Pricing.Abstractions.Models.Pricing;
+using Pricing.Application.Interfaces.Services;
+using Pricing.Application.Interfaces.Services.Pricing;
+using Pricing.Application.Models.Pricing;
 using Pricing.Enums;
 
 namespace Pricing.Application.Services.ProductPricing;

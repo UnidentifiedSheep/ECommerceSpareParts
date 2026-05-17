@@ -33,7 +33,6 @@
         },
         "AuthorizationPolicy": "DenyAll"
       },
-
       "route-api": {
         "ClusterId": "main-cluster",
         "Order": 0,
@@ -46,7 +45,6 @@
           }
         ]
       },
-
       "route-analytics": {
         "ClusterId": "analytics-cluster",
         "Order": 0,
@@ -59,7 +57,6 @@
           }
         ]
       },
-
       "route-search": {
         "ClusterId": "search-cluster",
         "Order": 0,
@@ -72,7 +69,6 @@
           }
         ]
       },
-
       "route-pricing": {
         "ClusterId": "pricing-cluster",
         "Order": 0,
@@ -86,7 +82,6 @@
         ]
       }
     },
-
     "Clusters": {
       "blackhole-cluster": {
         "Destinations": {
@@ -95,7 +90,6 @@
           }
         }
       },
-
       "main-cluster": {
         "LoadBalancingPolicy": "RoundRobin",
         "HealthCheck": {
@@ -113,7 +107,6 @@
           }
         }
       },
-
       "analytics-cluster": {
         "LoadBalancingPolicy": "RoundRobin",
         "HealthCheck": {
@@ -131,7 +124,6 @@
           }
         }
       },
-
       "search-cluster": {
         "LoadBalancingPolicy": "RoundRobin",
         "HealthCheck": {
@@ -149,7 +141,6 @@
           }
         }
       },
-
       "pricing-cluster": {
         "LoadBalancingPolicy": "RoundRobin",
         "HealthCheck": {

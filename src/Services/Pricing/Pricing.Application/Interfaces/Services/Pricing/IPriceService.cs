@@ -1,6 +1,6 @@
-﻿using Pricing.Abstractions.Models.Pricing;
+﻿using Pricing.Application.Models.Pricing;
 
-namespace Pricing.Abstractions.Interfaces.Services.Pricing;
+namespace Pricing.Application.Interfaces.Services.Pricing;
 
 public interface IPriceService
 {

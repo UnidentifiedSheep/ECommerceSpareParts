@@ -51,6 +51,16 @@ public class StorageContent : AuditableEntity<StorageContent, int>, ILinqEntity<
 
     public Currency.Currency Currency { get; private set; } = null!;
 
+    public static Expression<Func<StorageContent, int>> GetKeySelector()
+    {
+        return x => x.Id;
+    }
+
+    public static Expression<Func<StorageContent, bool>> GetEqualityExpression(int key)
+    {
+        return x => x.Id == key;
+    }
+
     public uint RowVersion { get; private set; }
 
     public static StorageContent Create(
@@ -130,7 +140,4 @@ public class StorageContent : AuditableEntity<StorageContent, int>, ILinqEntity<
     {
         return Id;
     }
-
-    public static Expression<Func<StorageContent, bool>> GetEqualityExpression(int key)
-        => x => x.Id == key;
 }

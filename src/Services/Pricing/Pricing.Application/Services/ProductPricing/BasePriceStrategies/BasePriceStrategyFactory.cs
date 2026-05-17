@@ -1,7 +1,7 @@
-﻿using Pricing.Abstractions.Interfaces.Services.Pricing;
+﻿using Pricing.Application.Interfaces.Services.Pricing;
 using Pricing.Enums;
 
-namespace Pricing.Application.Services.ArticlePricing.BasePriceStrategies;
+namespace Pricing.Application.Services.ProductPricing.BasePriceStrategies;
 
 public class BasePriceStrategyFactory : IBasePriceStrategyFactory
 {

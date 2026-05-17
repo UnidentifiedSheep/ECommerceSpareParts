@@ -1,5 +1,4 @@
-﻿using Application.Common.Interfaces;
-using Application.Common.Interfaces.Cqrs;
+﻿using Application.Common.Interfaces.Cqrs;
 using Localization.Abstractions.Interfaces;
 
 namespace Analytics.Application.Handlers.Metrics.ListMetrics;

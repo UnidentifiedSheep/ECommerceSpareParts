@@ -72,7 +72,7 @@ public class GetTransactionsTests : IntegrationTest
     public async Task GetTransactions_WithoutSenderAndReceiver_ThrowsValidationException()
     {
         await Assert.ThrowsAsync<ValidationException>(() =>
-            Mediator.Send(GetQuery(null, null)));
+            Mediator.Send(GetQuery()));
     }
 
     [Fact]

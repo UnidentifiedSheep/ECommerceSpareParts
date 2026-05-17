@@ -1,8 +1,8 @@
 using System.Linq.Expressions;
 using BulkValidation.Core.Attributes;
 using Domain;
-using Domain.Interfaces;
 using Domain.Extensions;
+using Domain.Interfaces;
 using Exceptions;
 using Main.Entities.Auth;
 using Main.Entities.Auth.ValueObjects;
@@ -52,6 +52,16 @@ public class User : AuditableEntity<User, Guid>, ILinqEntity<User, Guid>
     public IReadOnlyList<UserRole> Roles => _roles;
     public IReadOnlyList<UserVehicle> Vehicles => _vehicles;
     public IReadOnlyList<Cart.Cart> CartItems => _cartItems;
+
+    public static Expression<Func<User, Guid>> GetKeySelector()
+    {
+        return x => x.Id;
+    }
+
+    public static Expression<Func<User, bool>> GetEqualityExpression(Guid key)
+    {
+        return x => x.Id == key;
+    }
 
     public static User Create(UserName userName, string passwordHash)
     {
@@ -113,7 +123,4 @@ public class User : AuditableEntity<User, Guid>, ILinqEntity<User, Guid>
     {
         return Id;
     }
-
-    public static Expression<Func<User, bool>> GetEqualityExpression(Guid key)
-        => x => x.Id == key;
 }

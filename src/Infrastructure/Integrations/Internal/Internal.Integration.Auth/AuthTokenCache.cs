@@ -49,8 +49,8 @@ public sealed class AuthTokenCache : IAuthTokenCache
             var expiresAtUtc = GetExpiresAtUtc(newToken);
 
             var tokenToCache = new CachedToken(
-                Token: newToken,
-                ExpiresAtUtc: expiresAtUtc);
+                newToken,
+                expiresAtUtc);
 
             _cache[key] = tokenToCache;
 
@@ -84,8 +84,8 @@ public sealed class AuthTokenCache : IAuthTokenCache
         public static AuthTokenCacheKey Create(string service, string secret)
         {
             return new AuthTokenCacheKey(
-                Service: service,
-                SecretHash: Sha256(secret));
+                service,
+                Sha256(secret));
         }
 
         private static string Sha256(string value)

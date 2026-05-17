@@ -2,6 +2,7 @@ using Abstractions.Interfaces;
 using Abstractions.Models;
 using Api.Common;
 using Cache;
+using Localization.Domain.Extensions;
 using Mail;
 using Main.Application.Configs;
 using Main.Cache;
@@ -9,12 +10,13 @@ using Main.Persistence;
 using MassTransit;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
+using Microsoft.Extensions.Options;
+using Npgsql;
+using Persistence;
 using Security;
 using Serilog;
-using Test.Common.Abstractions;
 using Test.Common.Abstractions.Test;
 using Test.Common.Extensions;
-using Test.Common.Interfaces;
 using Test.Common.Interfaces.ServiceProvider;
 using Test.Common.Stubs;
 using Test.Common.TestContexts;
@@ -42,15 +44,33 @@ public class ServiceProviderBuilder : IServiceProviderBuilder<ServiceProviderArg
             .CreateLogger();
 
         ApplicationServiceProvider.AddApplicationLayer(services)
-            .AddPersistenceLayer(args.PgsqlConnectionString);
+            .AddLocalization("ru-RU", "ru-RU", "en-EN")
+            .AddPersistenceLayer();
         var passwordRules = new PasswordRules
         {
             RequireDigit = false,
             RequireUppercase = false
         };
 
+        services.AddSingleton(Options.Create(new RedisOptions
+        {
+            Url = args.CacheConnectionString,
+            Password = null
+        }));
+
+        var pgsqlBuilder = new NpgsqlConnectionStringBuilder(args.PgsqlConnectionString);
+
+        services.AddSingleton(Options.Create(new DatabaseOptions
+        {
+            Host = pgsqlBuilder.Host!,
+            Database = pgsqlBuilder.Database!,
+            Username = pgsqlBuilder.Username!,
+            Password = pgsqlBuilder.Password!,
+            Port = pgsqlBuilder.Port
+        }));
+
         services.AddJsonSigner("some secret")
-            .AddCacheLayer(args.CacheConnectionString, "test")
+            .AddCacheLayer("test")
             .AddApplicationCache()
             .AddFullSecurityLayer(passwordRules)
             .AddMailLayer()

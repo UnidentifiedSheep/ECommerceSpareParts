@@ -2,7 +2,6 @@ using Abstractions.Interfaces.Services;
 using Application.Common.Interfaces.Repositories;
 using Main.Application.Interfaces.Services;
 using Main.Entities.Balance;
-using Main.Entities.User;
 
 namespace Main.Application.Services;
 

@@ -1,4 +1,4 @@
-﻿namespace Pricing.Abstractions.Interfaces.Services;
+﻿namespace Pricing.Application.Interfaces.Services;
 
 public interface IUserServices
 {

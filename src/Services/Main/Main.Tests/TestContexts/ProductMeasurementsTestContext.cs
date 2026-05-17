@@ -28,20 +28,20 @@ public class ProductMeasurementsTestContext(
         {
             sizeBuilders.Add(new ProductSizeBuilder(Faker)
                 .WithProductId(product.Id));
-            
+
             weightsBuilder.Add(new ProductWeightBuilder(Faker)
                 .WithProductId(product.Id));
         }
 
         Sizes = await sizeBuilders.BuildManyCombinedAndAddToDb(
-            DbContext, 
-            1, 
+            DbContext,
+            1,
             false);
         Weights = await weightsBuilder.BuildManyCombinedAndAddToDb(
-            DbContext, 
-            1, 
+            DbContext,
+            1,
             false);
-        
+
         await DbContext.SaveChangesAsync(cancellationToken);
     }
 }

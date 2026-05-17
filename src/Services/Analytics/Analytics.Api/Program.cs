@@ -5,69 +5,50 @@ using Analytics.Persistence;
 using Analytics.Persistence.Context;
 using Api.Common;
 using Api.Common.Extensions;
-using Api.Common.Middleware;
-using Api.Common.Models;
+using Application.Common.Backplane;
 using Cache;
 using Carter;
-using Common;
-using Localization.Abstractions.Models;
+using Internal.Integration.Di;
 using Localization.Domain.Extensions;
-using Localization.Domain.Middlewares;
 using MassTransit;
-using Persistence.Extensions;
 using RabbitMq.Extensions;
-using RabbitMq.Models;
 using Security;
+using ZiggyCreatures.Caching.Fusion.Backplane;
 
 var localesPath = Assembly.GetExecutingAssembly().GetDefaultLocalizationPath();
 
 var builder = WebApplication.CreateBuilder(args);
 
-builder.Services.AddOpenApi();
+var env = builder.AddServiceConfiguration("analytics");
 
-var lokiUrl = Environment.GetEnvironmentVariable("LOKI_URL");
-var env = Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT") ?? "";
+builder.Host.AddLokiLogger(
+    builder.Configuration,
+    "analytics.api",
+    env);
 
-builder.Configuration
-    .AddAppSettingsFromJsons(env)
-    .AddAppSettingsFromJsons(env, "/app/configs");
+builder.Services.AddMessageBrokerOptions()
+    .AddHeaderSecretsOptions()
+    .AddRedisOptions()
+    .AddDatabaseOptions();
 
-builder.Host.AddLokiLogger(builder.Configuration, "analytics.api", env, lokiUrl);
+builder.Services.AddCommonApiInfrastructure();
 
 builder.Services
-    .AddPersistenceLayer(Environment.GetEnvironmentVariable("DB_CONNECTION_STRING")!)
-    .AddCacheLayer(Environment.GetEnvironmentVariable("REDIS_CONNECTION_STRING")!, "analytics")
+    .AddPersistenceLayer()
+    .AddCacheLayer("analytics")
     .AddApplicationLayer()
+    .AddIntegrationClients()
+    .AddEComAuth(builder.Configuration)
     .AddMinimalSecurityLayer();
 
-builder.Services.AddOptions<HeaderSecretOptions>()
-    .BindConfiguration(HeaderSecretOptions.SectionName)
-    .ValidateDataAnnotations()
-    .ValidateOnStart();
-
-Locale[] locales = ["ru-RU", "en-EN"];
-Locale defaultLocale = "ru-RU";
-
-builder.Services.AddLocalization(defaultLocale, locales);
-
-builder.Services.AddHttpContextAccessor();
-
-builder.Services.AddOptions<MessageBrokerOptions>()
-    .BindConfiguration(MessageBrokerOptions.SectionName)
-    .ValidateDataAnnotations()
-    .ValidateOnStart();
-
-var brokerOptions = builder.Configuration
-                        .GetSection(MessageBrokerOptions.SectionName)
-                        .Get<MessageBrokerOptions>()
-                    ?? throw new NullReferenceException(
-                        $"Missing {MessageBrokerOptions.SectionName} configuration options");
+builder.Services.AddLocalization(builder.Configuration);
 
 var uniqQueueName = $"queue-of-analytics-{Environment.MachineName}";
 
 builder.Services.AddMassTransit(x =>
 {
     x.AddConsumers(Assembly.GetAssembly(typeof(CurrencyCreatedConsumer)));
+    x.AddConsumer<BackplaneConsumer>();
 
     x.AddEntityFrameworkOutbox<DContext>(o =>
     {
@@ -77,12 +58,15 @@ builder.Services.AddMassTransit(x =>
 
     x.UsingRabbitMq((context, cfg) =>
     {
-        cfg.ConfigureRabbitMq(brokerOptions);
+        cfg.ConfigureRabbitMq(context);
 
         cfg.ReceiveEndpoint(uniqQueueName, ep =>
         {
             ep.AutoDelete = true;
             ep.Durable = false;
+            
+            ep.ConfigureConsumer<BackplaneConsumer>(context);
+            ep.Bind<BackplaneMessage>();
         });
 
         cfg.ReceiveEndpoint("analytics-queue", ep =>
@@ -103,44 +87,15 @@ builder.Services.AddMassTransit(x =>
     });
 });
 
-builder.Services.AddCors(options =>
-{
-    options.AddDefaultPolicy(policy =>
-    {
-        policy
-            .AllowAnyOrigin()
-            .AllowAnyHeader()
-            .AllowAnyMethod();
-    });
-});
-
 builder.Services.AddCarter(configurator: c => c.WithEmptyValidators());
-builder.Services.AddBaseExceptionHandlers();
-
-builder.Services.AddTransient<HeaderSecretMiddleware>();
 
 var app = builder.Build();
 
-app.UseExceptionHandler(_ => { });
-
-app.UseRouting();
-
-app.UseCors();
-
-app.MapCarter();
+app.UseCommonApiPipeline();
 
 await app.LoadLocalesFromJson(localesPath);
 
-if (Environment.GetEnvironmentVariable("SEED_DB") == "true")
-    await app.SeedAsync<DContext>();
-
-app.UseMiddleware<HeaderSecretMiddleware>();
-
-app.UseMiddleware<ScopedLocalizationMiddleware>();
-
 if (app.Environment.IsDevelopment()) app.MapOpenApi();
 
-
-app.MapHealthChecks("/health");
 
 await app.RunAsync();

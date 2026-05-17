@@ -37,7 +37,7 @@ public class ProductCacheRepository(
     }
 
     public async Task<ProductDto?> GetProductAsync(
-        int productId, 
+        int productId,
         CancellationToken cancellationToken = default)
     {
         return await rawCache.GetAsync<ProductDto>(CacheKeys.ProductCache.Product(productId));
@@ -105,7 +105,7 @@ public class ProductCacheRepository(
     }
 
     private Task<List<int>> GetCrossesFromDb(
-        int productId, 
+        int productId,
         string? sortBy,
         CancellationToken cancellationToken = default)
     {
@@ -115,12 +115,12 @@ public class ProductCacheRepository(
             .Select(x => x.Id)
             .ToListAsync(cancellationToken);
     }
-    
+
     private async Task<ProductDto> GetProductFromDb(int id, CancellationToken cancellationToken)
     {
         return await productReadRepository
-            .Query
-            .FirstProductDtoAsync(x => x.Id == id, cancellationToken)
+                   .Query
+                   .FirstProductDtoAsync(x => x.Id == id, cancellationToken)
                ?? throw new ProductNotFoundException(id);
     }
 }

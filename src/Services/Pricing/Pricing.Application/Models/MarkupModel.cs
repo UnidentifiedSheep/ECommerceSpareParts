@@ -1,3 +1,3 @@
-﻿namespace Pricing.Abstractions.Models;
+﻿namespace Pricing.Application.Models;
 
 public record MarkupModel(decimal Markup);

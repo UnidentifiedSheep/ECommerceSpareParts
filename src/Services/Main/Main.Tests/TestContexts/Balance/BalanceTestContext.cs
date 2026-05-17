@@ -1,5 +1,4 @@
 using Main.Entities.Balance;
-using Main.Entities.Currency;
 using Main.Entities.User;
 using Main.Persistence.Context;
 using Test.Common.Abstractions;

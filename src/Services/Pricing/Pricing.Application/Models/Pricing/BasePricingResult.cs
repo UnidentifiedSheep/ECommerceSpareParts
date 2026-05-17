@@ -1,5 +1,5 @@
 ﻿using Pricing.Enums;
 
-namespace Pricing.Abstractions.Models.Pricing;
+namespace Pricing.Application.Models.Pricing;
 
 public record BasePricingResult(IEnumerable<BasePricingItemResult> Items, ProductPricingType PricingType);

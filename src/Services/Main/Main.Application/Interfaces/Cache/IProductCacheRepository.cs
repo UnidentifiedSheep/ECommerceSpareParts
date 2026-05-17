@@ -7,7 +7,7 @@ public interface IProductCacheRepository
     Task<ProductDto> GetProductOrSetAsync(
         int productId,
         CancellationToken cancellationToken = default);
-    
+
     Task<ProductDto?> GetProductAsync(
         int productId,
         CancellationToken cancellationToken = default);

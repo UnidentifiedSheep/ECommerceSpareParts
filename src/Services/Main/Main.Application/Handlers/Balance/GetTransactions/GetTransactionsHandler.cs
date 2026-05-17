@@ -1,5 +1,4 @@
 using Abstractions.Models;
-using Application.Common.Interfaces;
 using Application.Common.Interfaces.Cqrs;
 using Application.Common.Interfaces.Repositories;
 using LinqKit;

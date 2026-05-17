@@ -22,16 +22,16 @@ public class RedisCache(
     {
         return redis.JSON()
             .MGetAsync(
-                keys: GetWithPrefixes(keys), 
-                path: path);
+                GetWithPrefixes(keys),
+                path);
     }
 
     public async Task SetAsync<T>(
-        IEnumerable<(string key, T value)> keyValues, 
+        IEnumerable<(string key, T value)> keyValues,
         TimeSpan? ttl = null)
     {
         var rawKeys = new HashSet<string>();
-        KeyPathValue[] values = keyValues
+        var values = keyValues
             .Select(x =>
             {
                 ArgumentNullException.ThrowIfNull(x.value);
@@ -39,20 +39,22 @@ public class RedisCache(
                 return new KeyPathValue(GetWithPrefixString(x.key), "$", x.value);
             })
             .ToArray();
-        
+
         await redis.JSON().MSetAsync(values);
         await SetExpireAsync(rawKeys, ttl);
     }
 
     public Task<bool> SetExpireAsync(
-        string key, 
+        string key,
         TimeSpan? ttl = null,
         ExpireWhen when = ExpireWhen.Always)
-        => SetExpireCore(redis, key, ttl, when);
+    {
+        return SetExpireCore(redis, key, ttl, when);
+    }
 
     public async Task<Dictionary<string, bool>> SetExpireAsync(
-        IEnumerable<string> keys, 
-        TimeSpan? ttl = null, 
+        IEnumerable<string> keys,
+        TimeSpan? ttl = null,
         ExpireWhen when = ExpireWhen.Always)
     {
         var batch = redis.CreateBatch();
@@ -60,12 +62,12 @@ public class RedisCache(
             .Distinct()
             .Select(x => (x, SetExpireCore(batch, x, ttl, when)))
             .ToDictionary(x => x.x, x => x.Item2);
-        
+
         batch.Execute();
         await Task.WhenAll(keyedTasks.Values);
 
         return keyedTasks.ToDictionary(
-            x => x.Key, 
+            x => x.Key,
             x => x.Value.Result);
     }
 
@@ -91,10 +93,10 @@ public class RedisCache(
         TimeSpan? ttl = null)
     {
         await redis.JSON().SetAsync(
-            key: GetWithPrefix(key),
-            path: path,
+            GetWithPrefix(key),
+            path,
             values);
-        
+
         await SetExpireAsync(key, ttl);
     }
 
@@ -115,7 +117,7 @@ public class RedisCache(
     {
         return redis.KeyDeleteAsync(GetWithPrefixes(keys));
     }
-    
+
     public Task RemoveKeyAsync(string key)
     {
         return redis.KeyDeleteAsync(GetWithPrefix(key));
@@ -140,38 +142,48 @@ public class RedisCache(
         var tasks = new List<Task>();
         foreach (var (key, values) in keyValues)
             tasks.Add(AddToSetCore(batch, key, values));
-        
+
         batch.Execute();
         await Task.WhenAll(tasks);
 
         if (ttl.HasValue)
             await SetExpireAsync(keyValues.Keys, ttl);
     }
-    
+
     private Task AddToSetCore(
         IDatabaseAsync db,
         string key,
         IEnumerable<string> values)
-        => db.SetAddAsync(
-            key: GetWithPrefix(key),
-            values: values.Select(x => new RedisValue(x)).ToArray());
+    {
+        return db.SetAddAsync(
+            GetWithPrefix(key),
+            values.Select(x => new RedisValue(x)).ToArray());
+    }
 
     private Task<bool> SetExpireCore(
         IDatabaseAsync db,
-        string key, 
+        string key,
         TimeSpan? ttl,
         ExpireWhen when)
-        => db.KeyExpireAsync(
-            GetWithPrefix(key), 
+    {
+        return db.KeyExpireAsync(
+            GetWithPrefix(key),
             ttl,
             when);
-    
+    }
+
     private string GetWithPrefixString(string key)
-        => string.IsNullOrWhiteSpace(prefix) ? key : $"{prefix}:{key}";
-    
+    {
+        return string.IsNullOrWhiteSpace(prefix) ? key : $"{prefix}:{key}";
+    }
+
     private RedisKey GetWithPrefix(string key)
-        => GetWithPrefixString(key);
-    
+    {
+        return GetWithPrefixString(key);
+    }
+
     private RedisKey[] GetWithPrefixes(IEnumerable<string> keys)
-        => keys.Select(GetWithPrefix).ToArray();
+    {
+        return keys.Select(GetWithPrefix).ToArray();
+    }
 }

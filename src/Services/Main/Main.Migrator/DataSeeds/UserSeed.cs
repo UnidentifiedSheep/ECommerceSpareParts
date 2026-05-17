@@ -10,8 +10,6 @@ namespace Main.Migrator.DataSeeds;
 
 public class UserSeed(IOptions<ServiceSecrets> secrets) : ISeed<DContext>
 {
-    private readonly ServiceSecrets _secrets = secrets.Value;
-
     private static readonly string[] Services =
     [
         nameof(ServiceSecrets.Main),
@@ -19,6 +17,8 @@ public class UserSeed(IOptions<ServiceSecrets> secrets) : ISeed<DContext>
         nameof(ServiceSecrets.Pricing),
         nameof(ServiceSecrets.Search)
     ];
+
+    private readonly ServiceSecrets _secrets = secrets.Value;
 
     public async Task SeedAsync(DContext context)
     {
@@ -45,6 +45,11 @@ public class UserSeed(IOptions<ServiceSecrets> secrets) : ISeed<DContext>
         await context.SaveChangesAsync();
     }
 
+    public int GetPriority()
+    {
+        return 1;
+    }
+
     private string GetServiceSecret(string service)
     {
         return service switch
@@ -63,10 +68,5 @@ public class UserSeed(IOptions<ServiceSecrets> secrets) : ISeed<DContext>
         systemUser.AddRole(nameof(Role.System));
 
         return systemUser;
-    }
-
-    public int GetPriority()
-    {
-        return 1;
     }
 }

@@ -1,5 +1,6 @@
 ﻿using MassTransit;
-using RabbitMq.Models;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Options;
 
 namespace RabbitMq.Extensions;
 
@@ -7,12 +8,13 @@ public static class MassTransitConfigurationExtensions
 {
     public static void ConfigureRabbitMq(
         this IRabbitMqBusFactoryConfigurator cfg,
-        MessageBrokerOptions brokerOptions)
+        IBusRegistrationContext ctx)
     {
-        cfg.Host(brokerOptions.Host, h =>
+        var options = ctx.GetRequiredService<IOptions<MessageBrokerOptions>>().Value;
+        cfg.Host(options.Url, h =>
         {
-            h.Username(brokerOptions.Username);
-            h.Password(brokerOptions.Password);
+            h.Username(options.Username);
+            h.Password(options.Password);
         });
 
         cfg.UseMessageRetry(r => r.Interval(3, TimeSpan.FromSeconds(5)));

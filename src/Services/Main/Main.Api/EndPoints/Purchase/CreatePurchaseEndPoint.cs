@@ -3,7 +3,7 @@ using Api.Common.Extensions;
 using Carter;
 using Enums;
 using Main.Application.Dtos.Amw.Purchase;
-using Main.Application.Handlers.Purchases.CreateFullPurchase;
+using Main.Application.Handlers.Purchases.CreatePurchase;
 using MediatR;
 
 namespace Main.Api.EndPoints.Purchase;

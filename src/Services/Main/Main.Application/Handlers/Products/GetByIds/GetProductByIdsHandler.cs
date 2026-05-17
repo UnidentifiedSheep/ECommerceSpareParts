@@ -5,6 +5,7 @@ using Main.Application.Interfaces.Cache;
 namespace Main.Application.Handlers.Products.GetByIds;
 
 public record GetProductByIdsQuery(IEnumerable<int> Ids) : IQuery<GetProductByIdsResult>;
+
 public record GetProductByIdsResult(IReadOnlyList<ProductDto> Products);
 
 public class GetProductByIdsHandler(

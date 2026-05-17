@@ -1,3 +1,8 @@
 ﻿{
-  
+  "ServiceSecrets": {
+    "Main": "SuperMainKey222",
+    "Analytics": "SuperAnalyticsKey222",
+    "Pricing": "SuperPricingKey222",
+    "Search": "SuperSearchKey222"
+  }
 }

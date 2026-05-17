@@ -10,7 +10,6 @@ using Contracts.Products;
 using Contracts.StorageContent;
 using Domain.Extensions;
 using Main.Application.Dtos.Storage;
-using Main.Application.Extensions;
 using Main.Application.Interfaces.Persistence;
 using Main.Entities.Event;
 using Main.Entities.Exceptions.Products;

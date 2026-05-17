@@ -1,4 +1,4 @@
-using Api.Common.Models;
+using Api.Common.Models.Options;
 using Microsoft.Extensions.Options;
 
 namespace Api.Common.Middleware;

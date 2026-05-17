@@ -1,3 +1,4 @@
+using Main.Entities.Product;
 using Main.Entities.Storage;
 using Main.Entities.User;
 using Main.Persistence.Context;
@@ -23,7 +24,7 @@ public class PurchaseTestContext(
     : TestContextBase<DContext>(context), IDependentTestContext
 {
     public User Supplier { get; private set; } = null!;
-    public Main.Entities.Product.Product Product { get; private set; } = null!;
+    public Product Product { get; private set; } = null!;
     public StorageContent StorageContent { get; private set; } = null!;
     public DomainPurchase Purchase { get; private set; } = null!;
 

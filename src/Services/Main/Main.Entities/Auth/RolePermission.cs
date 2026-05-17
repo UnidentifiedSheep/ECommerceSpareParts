@@ -23,6 +23,11 @@ public class RolePermission : Entity<RolePermission, (string, string)>, ILinqEnt
     public Role Role { get; set; } = null!;
     public Permission Permission { get; set; } = null!;
 
+    public static Expression<Func<RolePermission, bool>> GetEqualityExpression((string, string) key)
+    {
+        return x => x.RoleName == key.Item1 && x.PermissionName == key.Item2;
+    }
+
     public static RolePermission Create(RoleName roleName, string permissionName)
     {
         return new RolePermission(roleName, permissionName);
@@ -32,7 +37,4 @@ public class RolePermission : Entity<RolePermission, (string, string)>, ILinqEnt
     {
         return (RoleName, PermissionName);
     }
-
-    public static Expression<Func<RolePermission, bool>> GetEqualityExpression((string, string) key)
-        => x => x.RoleName == key.Item1 && x.PermissionName == key.Item2;
 }

@@ -1,6 +1,6 @@
-﻿using Pricing.Abstractions.Interfaces.Services.Pricing;
+﻿using Pricing.Application.Interfaces.Services.Pricing;
 
-namespace Pricing.Application.Services.ArticlePricing;
+namespace Pricing.Application.Services.ProductPricing;
 
 public class DiscountService : IDiscountService
 {

@@ -2,7 +2,6 @@
 using Abstractions.Interfaces.Services;
 using Analytics.Application.Dtos.PurchaseFact;
 using Analytics.Entities;
-using Application.Common.Interfaces;
 using Application.Common.Interfaces.Cqrs;
 using Application.Common.Interfaces.Repositories;
 using Attributes;

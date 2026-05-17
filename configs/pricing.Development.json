@@ -1,0 +1,13 @@
+{
+  "Database": {
+    "Host": "pgql",
+    "Database": "pricing",
+    "Username": "postgres",
+    "Password": "PleasKillMe21"
+  },
+  "SignSecret": "SomeSecretPriceSignKey21",
+  "InternalServiceCredentials": {
+    "Service": "Pricing",
+    "Secret": "SuperPricingKey222"
+  }
+}

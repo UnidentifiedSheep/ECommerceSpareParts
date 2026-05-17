@@ -1,6 +1,5 @@
 using Abstractions.Interfaces.Services;
 using Abstractions.Interfaces.Validators;
-using Application.Common.Interfaces;
 using Application.Common.Interfaces.Cqrs;
 using Attributes;
 using Main.Application.Dtos.Emails;

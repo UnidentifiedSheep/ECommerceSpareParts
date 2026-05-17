@@ -5,6 +5,7 @@ namespace Application.Common.Interfaces.Repositories;
 public sealed class CriteriaBuilder<T> where T : class
 {
     private readonly List<Expression<Func<T, object?>>> _includes = new();
+    private readonly List<Expression<Func<T, bool>>> _wheres = new();
     private bool _forUpdate;
     private Func<IQueryable<T>, IOrderedQueryable<T>>? _orderBy;
 
@@ -12,7 +13,6 @@ public sealed class CriteriaBuilder<T> where T : class
     private int? _size;
 
     private bool _track;
-    private readonly List<Expression<Func<T, bool>>> _wheres = new();
 
     public CriteriaBuilder<T> Where(Expression<Func<T, bool>> predicate)
     {

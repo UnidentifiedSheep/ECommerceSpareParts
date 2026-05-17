@@ -7,12 +7,10 @@ using Application.Common.Interfaces.Settings;
 using Attributes;
 using Main.Application.Dtos.Amw.Purchase;
 using Main.Application.Dtos.Storage;
-using Main.Application.Extensions;
 using Main.Application.Handlers.Balance.CreateTransaction;
 using Main.Application.Handlers.StorageContents.AddContent;
 using Main.Application.Interfaces.Persistence;
 using Main.Application.Interfaces.Services;
-using Main.Entities.Balance;
 using Main.Entities.Exceptions.Auth;
 using Main.Entities.Purchase;
 using Main.Entities.Setting;
@@ -21,7 +19,7 @@ using Main.Entities.User;
 using Main.Enums;
 using MediatR;
 
-namespace Main.Application.Handlers.Purchases.CreateFullPurchase;
+namespace Main.Application.Handlers.Purchases.CreatePurchase;
 
 [AutoSave]
 [Transactional(IsolationLevel.ReadCommitted, 20, 2)]
@@ -46,35 +44,35 @@ public class CreatePurchaseHandler(
 {
     public async Task<Unit> Handle(CreatePurchaseCommand request, CancellationToken cancellationToken)
     {
-        Guid systemId = (await settingsService.GetOrDefault<GlobalApplicationSetting>(cancellationToken))
+        var systemId = (await settingsService.GetOrDefault<GlobalApplicationSetting>(cancellationToken))
             .Data
             .SystemId;
-        
-        User supplier = await userRepository.EnsureExistAsync(
+
+        var supplier = await userRepository.EnsureExistAsync(
             request.SupplierId,
             _ => new UserIsNotInNeededRole(Role.Supplier),
             Criteria<User>
                 .New()
-                .Where(x => x.Roles.Any(z => z.RoleName== nameof(Role.Supplier))),
+                .Where(x => x.Roles.Any(z => z.RoleName == nameof(Role.Supplier))),
             cancellationToken);
 
         var purchaseContents = request.PurchaseContent.ToList();
-        
-        decimal totalSum = purchaseContents.Sum(x => x.Price * x.Count);
+
+        var totalSum = purchaseContents.Sum(x => x.Price * x.Count);
 
         var purchaseTransaction = (await sender.Send(
-            new CreateTransactionCommand(
-                supplier.Id,
-                systemId,
-                totalSum,
-                request.CurrencyId,
-                request.PurchaseDate), cancellationToken))
+                new CreateTransactionCommand(
+                    supplier.Id,
+                    systemId,
+                    totalSum,
+                    request.CurrencyId,
+                    request.PurchaseDate), cancellationToken))
             .Transaction;
-        
+
         var storageContents = await AddContentsToStorage(
-            request, 
+            request,
             cancellationToken);
-        
+
         await unitOfWork.SaveChangesAsync(cancellationToken);
 
         await CreatePurchase(
@@ -136,7 +134,7 @@ public class CreatePurchaseHandler(
 
         purchase.SetComment(request.Comment);
 
-        for (int i = 0; i < storageContents.Count; i++)
+        for (var i = 0; i < storageContents.Count; i++)
         {
             var content = purchaseContents[i];
             var storageContent = storageContents[i];
@@ -151,7 +149,7 @@ public class CreatePurchaseHandler(
                 content.Price,
                 storageContent.Id,
                 content.Comment);
-            
+
             purchase.AddContent(purchaseContent);
 
             if (request.WithLogistics && content.CalculateLogistics)
@@ -168,7 +166,7 @@ public class CreatePurchaseHandler(
             request.PurchaseDate,
             systemId,
             cancellationToken);
-        
+
         purchase.Complete();
         await unitOfWork.AddAsync(purchase, cancellationToken);
     }

@@ -76,12 +76,14 @@ public static class RepositoryExtensions
         CancellationToken ct = default)
         where TEntity : Entity<TEntity, TKey>, ILinqEntity<TEntity, TKey>
         where TKey : notnull
-        => await repository.EnsureExistCoreAsync(
-            key, 
-            errorFactory, 
-            criteriaBuilder?.Track().ForUpdate() ?? Criteria<TEntity>.New().Track().ForUpdate(), 
+    {
+        return await repository.EnsureExistCoreAsync(
+            key,
+            errorFactory,
+            criteriaBuilder?.Track().ForUpdate() ?? Criteria<TEntity>.New().Track().ForUpdate(),
             ct);
-    
+    }
+
     public static async Task<TEntity> EnsureExistAsync<TEntity, TKey>(
         this IRepository<TEntity, TKey> repository,
         TKey key,
@@ -90,29 +92,31 @@ public static class RepositoryExtensions
         CancellationToken ct = default)
         where TEntity : Entity<TEntity, TKey>, ILinqEntity<TEntity, TKey>
         where TKey : notnull
-        => await repository.EnsureExistCoreAsync(
-            key, 
-            errorFactory, 
-            criteriaBuilder ?? Criteria<TEntity>.New(), 
+    {
+        return await repository.EnsureExistCoreAsync(
+            key,
+            errorFactory,
+            criteriaBuilder ?? Criteria<TEntity>.New(),
             ct);
+    }
 
     private static async Task<TEntity> EnsureExistCoreAsync<TEntity, TKey>(
         this IRepository<TEntity, TKey> repository,
         TKey key,
         Func<TKey, Exception> errorFactory,
         CriteriaBuilder<TEntity> criteriaBuilder,
-        CancellationToken ct = default) 
+        CancellationToken ct = default)
         where TEntity : Entity<TEntity, TKey>, ILinqEntity<TEntity, TKey>
         where TKey : notnull
     {
         var criteria = criteriaBuilder
             .Where(TEntity.GetEqualityExpression(key))
             .Build();
-        
+
         var result = await repository.FirstOrDefaultAsync(
             criteria,
             ct);
-        
+
         return result ?? throw errorFactory(key);
     }
 }
