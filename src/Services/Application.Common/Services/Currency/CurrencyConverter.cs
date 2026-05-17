@@ -1,7 +1,6 @@
 ﻿using Application.Common.Interfaces.Currency;
-using Application.Common.Services.Currency;
 
-namespace Main.Application.Services.Currency;
+namespace Application.Common.Services.Currency;
 
 public class CurrencyConverter(
     ICurrencyRatesProvider ratesProvider) : CurrencyConverterBase

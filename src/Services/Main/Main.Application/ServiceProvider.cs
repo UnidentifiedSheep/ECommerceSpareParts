@@ -4,6 +4,7 @@ using Application.Common;
 using Application.Common.Interfaces;
 using Application.Common.Interfaces.Currency;
 using Application.Common.Interfaces.Settings;
+using Application.Common.Services.Currency;
 using Application.Common.Services.Settings;
 using Application.Common.Validators;
 using Main.Application.Configs;

@@ -22,6 +22,7 @@ public static class ServiceProvider
 
         collection.AddSingleton<IDiscountService, DiscountService>();
         collection.AddSingleton<IPriceService, PriceService>();
+        collection.AddSingleton<IMarkupService, MarkupService>();
 
         return collection;
     }
