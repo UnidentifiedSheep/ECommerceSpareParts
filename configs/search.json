@@ -1,7 +1,0 @@
-{
-  "Serilog": {
-    "MinimumLevel": "Information"
-  },
-  "AllowedHosts": "*",
-  "IndexPath": "/app/data"
-}

@@ -68,8 +68,6 @@
     environment:
       - DOTNET_ENVIRONMENT=${DOTNET_ENVIRONMENT:-Development}
       - ASPNETCORE_ENVIRONMENT=${ASPNETCORE_ENVIRONMENT:-Development}
-      - ASPNETCORE_Kestrel__Certificates__Default__Path=${CERT_PATH}
-      - ASPNETCORE_Kestrel__Certificates__Default__KeyPath=${CERT_KEYPATH}
     networks:
       - backend-network
     restart: unless-stopped
