@@ -5,5 +5,9 @@
     "Username": "postgres",
     "Password": "PleasKillMe21"
   },
-  "SignSecret": "SomeSecretPriceSignKey21"
+  "SignSecret": "SomeSecretPriceSignKey21",
+  "InternalServiceCredentials": {
+    "Service": "Pricing",
+    "Secret": "SuperPricingKey222"
+  }
 }
