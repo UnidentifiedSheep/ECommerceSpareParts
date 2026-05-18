@@ -19,9 +19,15 @@ public class CacheBehavior<TRequest, TResponse>(
         if (cachePolicy == null)
             return await next(cancellationToken);
 
-        List<string>? tags = null;
         var cacheKey = cachePolicy.GetCacheKey(request);
+        var cached = await cache.TryGetAsync<TResponse>(cacheKey, token: cancellationToken);
+        if (cached.HasValue)
+            return cached.Value;
 
+        using var _ = idsCollector.BeginScope();
+        var response = await next(cancellationToken);
+
+        List<string>? tags = null;
         if (cachePolicy.Tags is { Count: > 0 })
         {
             tags = [];
@@ -31,11 +37,13 @@ public class CacheBehavior<TRequest, TResponse>(
                 tags.AddRange(cachePolicy.Tags.Select(tag => $"{tag}:{id}"));
         }
 
-        return await cache.GetOrSetAsync<TResponse>(
+        await cache.SetAsync(
             cacheKey,
-            ct => next(ct),
+            response,
             cachePolicy.TimeToLive,
             tags,
             cancellationToken);
+
+        return response;
     }
 }
