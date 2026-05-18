@@ -4,8 +4,6 @@ using Main.Application.Dtos.Users;
 using Main.Application.Handlers.Projections;
 using Main.Application.Interfaces.Persistence;
 using Main.Application.Interfaces.Services;
-using Main.Application.Models.Cache;
-using Microsoft.Extensions.Options;
 using ZiggyCreatures.Caching.Fusion;
 using DbUser = Main.Entities.User.User;
 
@@ -13,29 +11,26 @@ namespace Main.Application.Services;
 
 public class UserService(
     IFusionCache cache,
-    IUserRepository userRepository,
-    IOptions<CacheSettings> cacheSettings) : IUserService
+    IUserRepository userRepository) : IUserService
 {
-    private UserCacheSettings UserSettings => cacheSettings.Value.User;
-
     public async Task<UserDto?> TryGetUserAsync(Guid userId, CancellationToken token = default)
     {
-        var key = UserSettings.GetUserCacheKey(userId);
+        var key = CacheKeys.UserCache.GetUserCacheKey(userId);
         return await cache.GetOrSetAsync(
             key,
             ct => TryGetUserFromDb(userId, ct),
             tags: [key],
-            duration: UserSettings.Duration,
+            duration: CacheKeys.UserCache.Ttl,
             token: token);
     }
 
     public async Task<decimal?> GetUserDiscountAsync(Guid userId, CancellationToken token = default)
     {
         return await cache.GetOrSetAsync(
-            UserSettings.GetUserDiscountCacheKey(userId),
+            CacheKeys.UserCache.GetUserDiscountCacheKey(userId),
             ct => userRepository.GetUsersDiscountAsync(userId, ct),
-            tags: [UserSettings.GetUserCacheKey(userId)],
-            duration: UserSettings.Duration,
+            tags: [CacheKeys.UserCache.GetUserCacheKey(userId)],
+            duration: CacheKeys.UserCache.Ttl,
             token: token);
     }
 
@@ -44,10 +39,10 @@ public class UserService(
         CancellationToken token = default)
     {
         return await cache.GetOrSetAsync(
-            UserSettings.GetUserRolesAndPermissionsCacheKey(userId),
+            CacheKeys.UserCache.GetUserRolesAndPermissionsCacheKey(userId),
             ct => userRepository.GetUserRolesAndPermissionsAsync(userId, ct),
-            tags: [UserSettings.GetUserCacheKey(userId), "roles"],
-            duration: UserSettings.Duration,
+            tags: [CacheKeys.UserCache.GetUserCacheKey(userId), "roles"],
+            duration: CacheKeys.UserCache.Ttl,
             token: token);
     }
 

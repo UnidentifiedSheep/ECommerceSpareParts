@@ -12,28 +12,44 @@ namespace Main.Persistence.Repositories.User;
 public class UserRepository(DContext context)
     : LinqRepositoryBase<DContext, Entities.User.User, Guid>(context), IUserRepository
 {
-    public Task<UserRolesAndPermissions?> GetUserRolesAndPermissionsAsync(
+    public async Task<UserRolesAndPermissions?> GetUserRolesAndPermissionsAsync(
         Guid userId,
         CancellationToken cancellationToken)
     {
-        return Context.Users
+        var userExists = await Context.Users
             .AsNoTracking()
-            .Where(u => u.Id == userId)
-            .Select(u => new UserRolesAndPermissions
-            {
-                Roles = u.Roles
-                    .Select(r => r.RoleName.Value)
-                    .ToList(),
+            .AnyAsync(u => u.Id == userId, cancellationToken);
 
-                Permissions =
-                    u.Permissions.Select(p => p.Permission)
-                        .Union(
-                            u.Roles.SelectMany(r => r.Role.RolePermissions
-                                .Select(p => p.PermissionName))
-                        )
-                        .ToList()
-            })
-            .FirstOrDefaultAsync(cancellationToken);
+        if (!userExists)
+            return null;
+
+        var roles = await Context.UserRoles
+            .AsNoTracking()
+            .Where(r => r.UserId == userId)
+            .Select(r => r.RoleName.Value)
+            .ToListAsync(cancellationToken);
+
+        var directPermissions = Context.UserPermissions
+            .AsNoTracking()
+            .Where(p => p.UserId == userId)
+            .Select(p => p.Permission);
+
+        var rolePermissions =
+            from userRole in Context.UserRoles.AsNoTracking()
+            join rolePermission in Context.Set<Entities.Auth.RolePermission>().AsNoTracking()
+                on userRole.RoleName equals rolePermission.RoleName
+            where userRole.UserId == userId
+            select rolePermission.PermissionName;
+
+        var permissions = await directPermissions
+            .Union(rolePermissions)
+            .ToListAsync(cancellationToken);
+
+        return new UserRolesAndPermissions
+        {
+            Roles = roles,
+            Permissions = permissions
+        };
     }
 
     public async Task<decimal?> GetUsersDiscountAsync(Guid userId, CancellationToken cancellationToken = default)
