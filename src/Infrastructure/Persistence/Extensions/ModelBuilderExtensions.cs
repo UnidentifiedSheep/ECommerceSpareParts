@@ -29,9 +29,9 @@ public static class ModelBuilderExtensions
     {
         foreach (var entityType in modelBuilder.Model.GetEntityTypes())
         {
-            var enumProperties = entityType.ClrType
+            var enumProperties = entityType
                 .GetProperties()
-                .Where(p => p.PropertyType.IsEnum);
+                .Where(p => p.ClrType.IsEnum && p.GetValueConverter() == null);
 
             foreach (var property in enumProperties)
                 modelBuilder

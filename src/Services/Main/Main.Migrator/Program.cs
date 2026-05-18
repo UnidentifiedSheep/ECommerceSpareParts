@@ -25,9 +25,8 @@ builder.ConfigureServices((context, services) =>
 {
     var connectionString = context.Configuration["ConnectionString"];
 
-    var seedValue = context.Configuration.GetValue<string?>("Seed");
-    if (seedValue == "true")
-        seedingRequested = true;
+    var seedValue = context.Configuration.GetValue<bool?>("Seed");
+    seedingRequested = seedValue.HasValue && seedValue.Value;
 
     //add db context
     services.AddDbContext<DContext>(options => options.UseNpgsql(connectionString,
@@ -36,7 +35,8 @@ builder.ConfigureServices((context, services) =>
     //used for password hash etc
     services.AddSingleton<IPasswordManager, PasswordManager>(_ => new PasswordManager(new PasswordRules()));
 
-    services.AddOptions<ServiceSecrets>(ServiceSecrets.SectionName)
+    services.AddOptions<ServiceSecrets>()
+        .BindConfiguration(ServiceSecrets.SectionName)
         .ValidateDataAnnotations()
         .ValidateOnStart();
 });

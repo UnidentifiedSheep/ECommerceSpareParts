@@ -1,4 +1,5 @@
-﻿using Localization.Abstractions.Interfaces;
+﻿using Exceptions.Base;
+using Localization.Abstractions.Interfaces;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Api.Common.ExceptionHandlers;
@@ -12,9 +13,13 @@ public class AnyExceptionHandler(
         Exception exception,
         CancellationToken cancellationToken)
     {
+        LogError(httpContext, exception);
         var statusCode = GetStatusCode(exception);
 
         var problemDetails = GetBaseDetails(exception, httpContext, statusCode);
+        if (statusCode == StatusCodes.Status500InternalServerError)
+            problemDetails.Detail = nameof(InternalServerException);
+        
         SetLocalizedDetail(problemDetails, httpContext, exception);
         AddExceptionRelatedData(problemDetails, exception);
 

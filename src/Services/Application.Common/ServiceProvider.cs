@@ -20,7 +20,7 @@ public static class ServiceProvider
             .RegisterFluentValidations(assembly);
 
         services.AddSingleton<IBackplaneDispatcher, BackplaneDispatcher>();
-        services.AddScoped<IFusionCacheBackplane, MassTransitBackplane>();
+        services.AddSingleton<IFusionCacheBackplane, MassTransitBackplane>();
 
         services.AddMediatR(config =>
         {

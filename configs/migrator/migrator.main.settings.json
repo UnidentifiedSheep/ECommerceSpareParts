@@ -1,8 +1,9 @@
 ﻿{
   "ServiceSecrets": {
-    "Main": "SuperMainKey222",
+    "MainApp": "SuperMainKey222",
     "Analytics": "SuperAnalyticsKey222",
     "Pricing": "SuperPricingKey222",
     "Search": "SuperSearchKey222"
-  }
+  },
+  "Seed": true
 }

@@ -4,7 +4,7 @@ using ZiggyCreatures.Caching.Fusion.Backplane;
 
 namespace Application.Common.Backplane;
 
-public class MassTransitBackplane(IPublishEndpoint publish, IBackplaneDispatcher dispatcher) : IFusionCacheBackplane
+public class MassTransitBackplane(IBus bus, IBackplaneDispatcher dispatcher) : IFusionCacheBackplane
 {
     public void Subscribe(BackplaneSubscriptionOptions options)
     {
@@ -33,7 +33,7 @@ public class MassTransitBackplane(IPublishEndpoint publish, IBackplaneDispatcher
         FusionCacheEntryOptions options,
         CancellationToken token = new())
     {
-        return new ValueTask(publish.Publish(message, token));
+        return new ValueTask(bus.Publish(message, token));
     }
 
     public void Publish(

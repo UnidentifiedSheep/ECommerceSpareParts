@@ -20,8 +20,11 @@ public record StorageContentDto
     [JsonPropertyName("buyPrice")]
     public required decimal BuyPrice { get; init; }
 
-    [JsonPropertyName("purchaseDateTime")]
+    [JsonPropertyName("purchaseDatetime")]
     public required DateTime PurchaseDatetime { get; init; }
+    
+    [JsonPropertyName("rowVersion")]
+    public required uint RowVersion { get; init; }
 
     [JsonPropertyName("currency")]
     public required CurrencyDto Currency { get; init; }

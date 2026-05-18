@@ -49,9 +49,12 @@ public class UserRepository(DContext context)
         Criteria<Entities.User.User>? criteria = null,
         CancellationToken cancellationToken = default)
     {
-        var query = Context.UserEmails
-            .Where(x => x.Email.Value == Email.ToNormalized(email) && x.IsPrimary)
-            .Select(x => x.User);
+        Email norm = email;
+        var query =
+            from user in Context.Users
+            join userEmail in Context.UserEmails on user.Id equals userEmail.UserId
+            where userEmail.Email == norm && userEmail.IsPrimary
+            select user;
 
         if (criteria != null)
             query = query.Apply(criteria);

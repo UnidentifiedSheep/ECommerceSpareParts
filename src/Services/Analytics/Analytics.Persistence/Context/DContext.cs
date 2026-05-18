@@ -55,8 +55,7 @@ public partial class DContext : DbContext
 
         modelBuilder.AddFieldsForAuditableEntities();
 
-        modelBuilder.AllDateTimesToUtc()
-            .AllEnumsToString();
+        modelBuilder.AllDateTimesToUtc();
 
         OnModelCreatingPartial(modelBuilder);
     }

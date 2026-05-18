@@ -1,4 +1,5 @@
 ﻿using Abstractions.Models.Validation;
+using Exceptions;
 using FluentValidation;
 using Localization.Abstractions.Interfaces;
 using Microsoft.AspNetCore.Mvc;

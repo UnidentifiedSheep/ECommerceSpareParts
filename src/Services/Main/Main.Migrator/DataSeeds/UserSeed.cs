@@ -1,4 +1,5 @@
-﻿using Main.Entities.Auth.ValueObjects;
+﻿using Abstractions.Interfaces.Validators;
+using Main.Entities.Auth.ValueObjects;
 using Main.Entities.User;
 using Main.Enums;
 using Main.Persistence.Context;
@@ -8,11 +9,13 @@ using Persistence.Interfaces;
 
 namespace Main.Migrator.DataSeeds;
 
-public class UserSeed(IOptions<ServiceSecrets> secrets) : ISeed<DContext>
+public class UserSeed(
+    IOptions<ServiceSecrets> secrets,
+    IPasswordManager pwdManager) : ISeed<DContext>
 {
     private static readonly string[] Services =
     [
-        nameof(ServiceSecrets.Main),
+        nameof(ServiceSecrets.MainApp),
         nameof(ServiceSecrets.Analytics),
         nameof(ServiceSecrets.Pricing),
         nameof(ServiceSecrets.Search)
@@ -54,7 +57,7 @@ public class UserSeed(IOptions<ServiceSecrets> secrets) : ISeed<DContext>
     {
         return service switch
         {
-            nameof(ServiceSecrets.Main) => _secrets.Main,
+            nameof(ServiceSecrets.MainApp) => _secrets.MainApp,
             nameof(ServiceSecrets.Analytics) => _secrets.Analytics,
             nameof(ServiceSecrets.Pricing) => _secrets.Pricing,
             nameof(ServiceSecrets.Search) => _secrets.Search,
@@ -62,9 +65,9 @@ public class UserSeed(IOptions<ServiceSecrets> secrets) : ISeed<DContext>
         };
     }
 
-    private static User CreateSystemUser(string service, string secret)
+    private User CreateSystemUser(string service, string secret)
     {
-        var systemUser = User.Create(service, secret);
+        var systemUser = User.Create(service, pwdManager.GetHashOfPassword(secret));
         systemUser.AddRole(nameof(Role.System));
 
         return systemUser;
