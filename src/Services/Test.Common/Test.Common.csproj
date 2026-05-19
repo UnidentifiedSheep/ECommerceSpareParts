@@ -18,6 +18,7 @@
         <PackageReference Include="Testcontainers.PostgreSql" Version="4.11.0"/>
         <PackageReference Include="Testcontainers.Redis" Version="4.11.0"/>
         <PackageReference Include="xunit.extensibility.core" Version="2.9.3"/>
+        <PackageReference Include="ZiggyCreatures.FusionCache" Version="2.6.0"/>
     </ItemGroup>
 
     <ItemGroup>

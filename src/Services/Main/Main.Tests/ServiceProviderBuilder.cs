@@ -21,6 +21,7 @@ using Test.Common.Interfaces.ServiceProvider;
 using Test.Common.Stubs;
 using Test.Common.TestContexts;
 using Tests.TestContexts;
+using ZiggyCreatures.Caching.Fusion.Backplane;
 using ApplicationServiceProvider = Main.Application.ServiceProvider;
 
 namespace Tests;
@@ -80,6 +81,8 @@ public class ServiceProviderBuilder : IServiceProviderBuilder<ServiceProviderArg
         services.AddScoped<IUserContext, UserContextMock>();
 
         services.AddTransient<IPublishEndpoint, MessageBrokerStub>();
+        services.RemoveAll<IFusionCacheBackplane>();
+        services.AddSingleton<IFusionCacheBackplane, FusionCacheBackplaneStub>();
 
         if (!_staticsConfigured)
         {

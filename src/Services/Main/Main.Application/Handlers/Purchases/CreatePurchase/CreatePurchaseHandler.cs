@@ -7,10 +7,12 @@ using Application.Common.Interfaces.Settings;
 using Attributes;
 using Main.Application.Dtos.Amw.Purchase;
 using Main.Application.Dtos.Storage;
+using Main.Application.Extensions;
 using Main.Application.Handlers.Balance.CreateTransaction;
 using Main.Application.Handlers.StorageContents.AddContent;
 using Main.Application.Interfaces.Persistence;
 using Main.Application.Interfaces.Services;
+using Main.Entities.Auth;
 using Main.Entities.Exceptions.Auth;
 using Main.Entities.Purchase;
 using Main.Entities.Setting;
@@ -18,6 +20,7 @@ using Main.Entities.Storage;
 using Main.Entities.User;
 using Main.Enums;
 using MediatR;
+using Role = Main.Enums.Role;
 
 namespace Main.Application.Handlers.Purchases.CreatePurchase;
 
@@ -53,7 +56,7 @@ public class CreatePurchaseHandler(
             _ => new UserIsNotInNeededRole(Role.Supplier),
             Criteria<User>
                 .New()
-                .Where(x => x.Roles.Any(z => z.RoleName == nameof(Role.Supplier))),
+                .WhereHasRole(Role.Supplier),
             cancellationToken);
 
         var purchaseContents = request.PurchaseContent.ToList();
