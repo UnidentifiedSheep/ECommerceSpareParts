@@ -167,12 +167,15 @@ public class GetUsersHandler(IReadRepository<User, Guid> readRepository) : IQuer
         GetUsersQuery request,
         CancellationToken cancellationToken)
     {
+        IQueryable<User> query = readRepository.Query
+            .Where(x => x.UserInfo != null)
+            .ExcludeUsersWithRole(Role.System);
+        if (request.Roles != null && request.Roles.Any())
+            query = query.IncludeUsersWithRoles(request.Roles);
+        
         if (string.IsNullOrWhiteSpace(request.SearchColumn))
         {
-            return await readRepository.Query
-                .Where(x => x.UserInfo != null)
-                .ExcludeUsersWithRole(Role.System)
-                .IncludeUsersWithRoles(request.Roles ?? [])
+            return await query
                 .OrderBy(x => x.Id)
                 .AsExpandable()
                 .Select(UserProjections.UserProjection)
@@ -181,10 +184,7 @@ public class GetUsersHandler(IReadRepository<User, Guid> readRepository) : IQuer
         }
 
         var trimmed = request.SearchColumn.Trim();
-        return await readRepository.Query
-            .Where(x => x.UserInfo != null)
-            .ExcludeUsersWithRole(Role.System)
-            .IncludeUsersWithRoles(request.Roles ?? [])
+        return await query
             .Select(x => new
             {
                 Rank = EF.Functions.TrigramsSimilarity(x.UserInfo!.SearchColumn, trimmed) +
