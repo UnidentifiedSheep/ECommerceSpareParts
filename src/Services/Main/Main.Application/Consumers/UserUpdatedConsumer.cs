@@ -1,14 +1,13 @@
-﻿using Contracts.User;
+using Contracts.User;
+using Main.Application.Interfaces.Cache;
 using MassTransit;
-using ZiggyCreatures.Caching.Fusion;
 
 namespace Main.Application.Consumers;
 
-public class UserUpdatedConsumer(IFusionCache cache) : IConsumer<UserUpdatedEvent>
+public class UserUpdatedConsumer(IUserCacheRepository userCache) : IConsumer<UserUpdatedEvent>
 {
     public async Task Consume(ConsumeContext<UserUpdatedEvent> context)
     {
-        var key = CacheKeys.UserCache.GetUserCacheKey(context.Message.UserId);
-        await cache.RemoveByTagAsync([key]);
+        await userCache.InvalidateUserAsync(context.Message.UserId);
     }
 }

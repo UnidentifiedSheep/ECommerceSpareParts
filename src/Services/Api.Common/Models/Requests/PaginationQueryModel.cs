@@ -6,7 +6,7 @@ namespace Api.Common.Models.Requests;
 public record PaginationQueryModel
 {
     [FromQuery(Name = "page")]
-    public int Page { get; init; } = 1;
+    public int Page { get; init; } = 0;
 
     [FromQuery(Name = "size")]
     public int Size { get; init; } = 20;

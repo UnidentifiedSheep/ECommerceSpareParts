@@ -7,8 +7,11 @@ using Application.Common.Backplane;
 using Application.Common.Interfaces.Settings;
 using Cache;
 using Carter;
+using Contracts.Auth;
 using Contracts.Currency;
+using Contracts.Products;
 using Contracts.Settings;
+using Contracts.User;
 using ExchangeRate;
 using Hangfire;
 using Hangfire.PostgreSql;
@@ -116,6 +119,15 @@ builder.Services.AddMassTransit(x =>
             ep.ConfigureConsumer<ProductUpdatedConsumer>(context);
             ep.ConfigureConsumer<RoleUpdatedConsumer>(context);
             ep.ConfigureConsumer<UserUpdatedConsumer>(context);
+            ep.ConfigureConsumer<UserDiscountUpdatedConsumer>(context);
+
+            ep.Bind<CurrencyCreatedEvent>();
+            ep.Bind<ProductSizesUpdatedEvent>();
+            ep.Bind<ProductWeightUpdatedEvent>();
+            ep.Bind<ProductUpdatedEvent>();
+            ep.Bind<RoleUpdatedEvent>();
+            ep.Bind<UserUpdatedEvent>();
+            ep.Bind<UserDiscountUpdatedEvent>();
         });
     });
 });

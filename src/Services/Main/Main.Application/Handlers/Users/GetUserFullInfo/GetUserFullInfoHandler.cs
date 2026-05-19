@@ -1,9 +1,9 @@
-﻿using Application.Common.Interfaces.Cqrs;
+using Application.Common.Interfaces.Cqrs;
 using Application.Common.Interfaces.Repositories;
 using LinqKit;
 using Main.Application.Dtos.Users;
 using Main.Application.Handlers.Projections;
-using Main.Application.Interfaces.Services;
+using Main.Application.Interfaces.Cache;
 using Main.Entities.Exceptions.Auth;
 using Main.Entities.User;
 using Microsoft.EntityFrameworkCore;
@@ -20,7 +20,7 @@ public record GetUserFullInfoResult(
 
 public class GetUserFullInfoHandler(
     IReadRepository<User, Guid> repository,
-    IUserService userService)
+    IUserCacheRepository userCache)
     : IQueryHandler<GetUserFullInfoQuery, GetUserFullInfoResult>
 {
     public async Task<GetUserFullInfoResult> Handle(GetUserFullInfoQuery request, CancellationToken cancellationToken)
@@ -30,13 +30,13 @@ public class GetUserFullInfoHandler(
                        .AsExpandable()
                        .Select(x => new
                        {
-                           User = UserProjections.UserProjection.InvokeEFCore(x),
-                           Emails = x.Emails.Select(z => UserProjections.UserEmailProjection.InvokeEFCore(z))
+                           User = UserProjections.UserProjection.Invoke(x),
+                           Emails = x.Emails.Select(z => UserProjections.UserEmailProjection.Invoke(z))
                        })
                        .FirstOrDefaultAsync(cancellationToken)
                    ?? throw new UserNotFoundException(request.UserId);
 
-        var (roles, permissions) = await userService
+        var (roles, permissions) = await userCache
                                        .GetUserRolesAndPermissionsAsync(request.UserId, cancellationToken)
                                    ?? throw new UserNotFoundException(request.UserId);
 

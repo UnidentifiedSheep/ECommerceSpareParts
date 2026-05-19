@@ -35,19 +35,40 @@ public static class CacheKeys
     public static class UserCache
     {
         public static TimeSpan Ttl { get; } = TimeSpan.FromDays(1);
-        public static string GetUserCacheKey(Guid userId)
+
+        public static string User(Guid userId)
         {
             return $"user:{userId}";
         }
 
-        public static string GetUserDiscountCacheKey(Guid userId)
+        public static string UserDiscount(Guid userId)
         {
             return $"user:{userId}:discount";
         }
 
-        public static string GetUserRolesAndPermissionsCacheKey(Guid userId)
+        public static string UserRolesAndPermissions(Guid userId)
         {
             return $"user:{userId}:roles:permissions";
+        }
+
+        public static string RolesAndPermissionsRelations()
+        {
+            return "users:roles:permissions:relations";
+        }
+
+        public static string GetUserCacheKey(Guid userId)
+        {
+            return User(userId);
+        }
+
+        public static string GetUserDiscountCacheKey(Guid userId)
+        {
+            return UserDiscount(userId);
+        }
+
+        public static string GetUserRolesAndPermissionsCacheKey(Guid userId)
+        {
+            return UserRolesAndPermissions(userId);
         }
     }
 }

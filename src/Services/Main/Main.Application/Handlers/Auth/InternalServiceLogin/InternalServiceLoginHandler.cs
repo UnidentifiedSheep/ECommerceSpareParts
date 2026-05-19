@@ -1,8 +1,9 @@
-﻿using Abstractions.Interfaces.Validators;
+using Abstractions.Interfaces.Validators;
 using Application.Common.Extensions;
 using Application.Common.Interfaces.Cqrs;
 using Application.Common.Interfaces.Repositories;
 using Main.Application.Handlers.Projections;
+using Main.Application.Interfaces.Cache;
 using Main.Application.Interfaces.Persistence;
 using Main.Application.Interfaces.Services;
 using Main.Entities.Exceptions.Auth;
@@ -19,7 +20,7 @@ public class InternalServiceLoginHandler(
     IPasswordManager passwordManager,
     IUserRepository userRepository,
     IJwtGenerator tokenGenerator,
-    IUserService userService) : ICommandHandler<InternalServiceLoginCommand, InternalServiceLoginResult>
+    IUserCacheRepository userCache) : ICommandHandler<InternalServiceLoginCommand, InternalServiceLoginResult>
 {
     public async Task<InternalServiceLoginResult> Handle(
         InternalServiceLoginCommand request,
@@ -36,7 +37,7 @@ public class InternalServiceLoginHandler(
             throw new WrongCredentialsException(request.Service, request.ServiceSecret);
 
         var (roles, permissions) =
-            await userService.GetUserRolesAndPermissionsAsync(user.Id, cancellationToken)
+            await userCache.GetUserRolesAndPermissionsAsync(user.Id, cancellationToken)
             ?? throw new UserNotFoundException(user.Id);
 
         var userDto = UserProjections.UserProjection.AsFunc()(user);

@@ -1,9 +1,10 @@
-﻿using Abstractions.Interfaces;
+using Abstractions.Interfaces;
 using Abstractions.Interfaces.Services;
 using Application.Common.Interfaces.Cqrs;
 using Application.Common.Interfaces.Repositories;
 using Attributes;
 using Exceptions.Base;
+using Main.Application.Interfaces.Cache;
 using Main.Application.Interfaces.Services;
 using Main.Entities.Auth;
 using Main.Entities.Exceptions.Auth;
@@ -22,7 +23,7 @@ public class RefreshTokenHandler(
     IJwtGenerator tokenGenerator,
     IUserTokenService userTokenService,
     ITokenHasher tokenHasher,
-    IUserService userService) : ICommandHandler<RefreshTokenCommand, RefreshTokenResult>
+    IUserCacheRepository userCache) : ICommandHandler<RefreshTokenCommand, RefreshTokenResult>
 {
     public async Task<RefreshTokenResult> Handle(RefreshTokenCommand request, CancellationToken cancellationToken)
     {
@@ -36,13 +37,13 @@ public class RefreshTokenHandler(
         if (userToken.ExpiresAt < DateTime.UtcNow || userToken.DeviceId != request.DeviceId)
             throw new InvalidTokenException(request.RefreshToken);
 
-        var user = await userService.TryGetUserAsync(userToken.UserId, cancellationToken)
+        var user = await userCache.TryGetUserAsync(userToken.UserId, cancellationToken)
                    ?? throw new UserNotFoundException(userToken.UserId);
 
         if (user.UserInfo == null)
             throw new InternalServerException("User exists, but unable to get user info.");
 
-        var (roles, permissions) = await userService
+        var (roles, permissions) = await userCache
                                        .GetUserRolesAndPermissionsAsync(userToken.UserId, cancellationToken)
                                    ?? throw new UserNotFoundException(userToken.UserId);
 

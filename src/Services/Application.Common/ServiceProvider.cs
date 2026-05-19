@@ -30,8 +30,8 @@ public static class ServiceProvider
             config.AddOpenBehavior(typeof(LoggingBehavior<,>));
             config.AddOpenBehavior(typeof(CacheBehavior<,>));
             config.AddOpenBehavior(typeof(TransactionBehavior<,>), ServiceLifetime.Scoped);
-            config.AddOpenBehavior(typeof(IntegrationEventPublisherBehavior<,>), ServiceLifetime.Scoped);
             config.AddOpenBehavior(typeof(SaveChangesBehavior<,>), ServiceLifetime.Scoped);
+            config.AddOpenBehavior(typeof(IntegrationEventPublisherBehavior<,>), ServiceLifetime.Scoped);
         });
 
         return services;

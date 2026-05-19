@@ -8,6 +8,7 @@ public static class ServiceCollectionExtensions
     public static IServiceCollection AddApplicationCache(this IServiceCollection services)
     {
         services.AddScoped<IProductCacheRepository, ProductCacheRepository>();
+        services.AddScoped<IUserCacheRepository, UserCacheRepository>();
         return services;
     }
 }
