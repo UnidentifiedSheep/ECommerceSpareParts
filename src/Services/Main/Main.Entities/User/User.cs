@@ -5,7 +5,6 @@ using Domain.Extensions;
 using Domain.Interfaces;
 using Exceptions;
 using Main.Entities.Auth;
-using Main.Entities.Auth.ValueObjects;
 using Main.Entities.User.ValueObjects;
 using Main.Enums;
 
@@ -83,7 +82,7 @@ public class User : AuditableEntity<User, Guid>, ILinqEntity<User, Guid>
 
     public void AddRole(string roleName)
     {
-        if (_roles.Any(r => r.RoleName == RoleName.ToNormalized(roleName))) return;
+        if (_roles.Any(r => r.RoleName == RoleNames.Normalize(roleName))) return;
         _roles.Add(UserRole.Create(Id, roleName));
     }
 

@@ -3,7 +3,6 @@ using Application.Common.Interfaces.Cqrs;
 using Application.Common.Interfaces.Repositories;
 using Attributes;
 using Main.Entities.Auth;
-using Main.Entities.Auth.ValueObjects;
 using MediatR;
 
 namespace Main.Application.Handlers.Auth.UpsertRole;
@@ -14,7 +13,7 @@ public record UpsertRoleCommand(string Name, string? Description) : ICommand;
 
 public class UpsertRoleHandler(
     IUnitOfWork unitOfWork,
-    IRepository<Role, RoleName> repository)
+    IRepository<Role, string> repository)
     : ICommandHandler<UpsertRoleCommand>
 {
     public async Task<Unit> Handle(UpsertRoleCommand request, CancellationToken cancellationToken)

@@ -11,7 +11,7 @@ public class RoleSeed : ISeed<DContext>
     public async Task SeedAsync(DContext context)
     {
         var existingRoles = await context.Roles
-            .Select(x => x.Name.Value)
+            .Select(x => x.Name)
             .ToHashSetAsync();
 
         var roles = new[]
@@ -24,7 +24,7 @@ public class RoleSeed : ISeed<DContext>
         };
 
         var notExistingRoles = roles
-            .Where(x => !existingRoles.Contains(x.Name.Value))
+            .Where(x => !existingRoles.Contains(x.Name))
             .ToList();
         if (notExistingRoles.Count == 0) return;
 

@@ -1,5 +1,4 @@
-﻿using Bogus;
-using Main.Entities.Auth.ValueObjects;
+using Bogus;
 using Main.Entities.User.ValueObjects;
 using Test.Common.Abstractions;
 
@@ -7,7 +6,7 @@ namespace Tests.DataBuilders.User;
 
 public class UserBuilder(Faker faker) : BuilderBase<Main.Entities.User.User>(faker)
 {
-    private readonly List<RoleName> _roles = [];
+    private readonly List<string> _roles = [];
     public UserName? UserName { get; private set; }
     public string? PasswordHash { get; private set; }
 
@@ -15,7 +14,7 @@ public class UserBuilder(Faker faker) : BuilderBase<Main.Entities.User.User>(fak
     public string? Name { get; private set; }
     public string? Surname { get; private set; }
     public string? Description { get; private set; }
-    public IReadOnlyList<RoleName> Roles => _roles;
+    public IReadOnlyList<string> Roles => _roles;
 
     public UserBuilder WithUserName(UserName userName)
     {
@@ -29,7 +28,7 @@ public class UserBuilder(Faker faker) : BuilderBase<Main.Entities.User.User>(fak
         return this;
     }
 
-    public UserBuilder WithRole(RoleName role)
+    public UserBuilder WithRole(string role)
     {
         _roles.Add(role);
         return this;

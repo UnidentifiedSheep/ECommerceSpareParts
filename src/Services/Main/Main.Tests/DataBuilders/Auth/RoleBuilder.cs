@@ -1,16 +1,15 @@
-﻿using Bogus;
+using Bogus;
 using Main.Entities.Auth;
-using Main.Entities.Auth.ValueObjects;
 using Test.Common.Abstractions;
 
 namespace Tests.DataBuilders.Auth;
 
 public class RoleBuilder(Faker faker) : BuilderBase<Role>(faker)
 {
-    public RoleName? Name { get; private set; }
+    public string? Name { get; private set; }
     public string? Description { get; private set; }
 
-    public RoleBuilder WithName(RoleName name)
+    public RoleBuilder WithName(string name)
     {
         Name = name;
         return this;

@@ -51,6 +51,6 @@ public class UpsertRoleTests(CombinedContainerFixture fixture) : IntegrationTest
 
         roleInDb.Should().NotBeNull();
         roleInDb.Description.Should().Be(command.Description);
-        roleInDb.Name.Value.Should().Be(role.Name.Value);
+        roleInDb.Name.Should().Be(role.Name);
     }
 }

@@ -1,11 +1,12 @@
-﻿using Abstractions.Interfaces.Validators;
-using Main.Entities.Auth.ValueObjects;
+using Abstractions.Interfaces.Validators;
+using Main.Entities.Auth;
 using Main.Entities.User;
 using Main.Enums;
 using Main.Persistence.Context;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 using Persistence.Interfaces;
+using Role = Main.Enums.Role;
 
 namespace Main.Migrator.DataSeeds;
 
@@ -26,7 +27,7 @@ public class UserSeed(
     public async Task SeedAsync(DContext context)
     {
         var existingSystemUsers = await context.Users
-            .Where(x => x.Roles.Any(y => y.RoleName == RoleName.ToNormalized(nameof(Role.System))))
+            .Where(x => x.Roles.Any(y => y.RoleName == RoleNames.Normalize(nameof(Role.System))))
             .AsNoTracking()
             .ToDictionaryAsync(x => x.UserName);
 

@@ -1,5 +1,5 @@
-﻿using Abstractions.Interfaces.Validators;
-using Main.Entities.Auth.ValueObjects;
+using Abstractions.Interfaces.Validators;
+using Main.Entities.Auth;
 using Main.Entities.User;
 using Main.Enums;
 using Main.Persistence.Context;
@@ -22,7 +22,7 @@ public class AdminSeed(IPasswordManager passwordManager) : ISeed<DContext>
         var email = $"{upperName}@example.com";
 
         var user = User.Create(AdministratorName, passwordManager.GetHashOfPassword("SuperSecretPassword.21"));
-        user.AddRole(RoleName.ToNormalized(nameof(Role.Admin)));
+        user.AddRole(RoleNames.Normalize(nameof(Role.Admin)));
         user.SetUserInfo(AdministratorName, AdministratorName, null);
         user.AddUserEmail(email, EmailType.Personal, true, true);
 

@@ -1,4 +1,4 @@
-﻿using Application.Common.Interfaces.Repositories;
+using Application.Common.Interfaces.Repositories;
 using Main.Application.Dtos.Users;
 using Main.Application.Interfaces.Persistence;
 using Main.Entities.User.ValueObjects;
@@ -26,7 +26,7 @@ public class UserRepository(DContext context)
         var roles = await Context.UserRoles
             .AsNoTracking()
             .Where(r => r.UserId == userId)
-            .Select(r => r.RoleName.Value)
+            .Select(r => r.RoleName)
             .ToListAsync(cancellationToken);
 
         var directPermissions = Context.UserPermissions

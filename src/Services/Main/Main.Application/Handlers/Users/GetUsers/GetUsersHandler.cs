@@ -168,7 +168,17 @@ public class GetUsersHandler(IReadRepository<User, Guid> readRepository) : IQuer
         CancellationToken cancellationToken)
     {
         if (string.IsNullOrWhiteSpace(request.SearchColumn))
-            throw new InvalidInputException("user.search.strategy.not.valid.input");
+        {
+            return await readRepository.Query
+                .Where(x => x.UserInfo != null)
+                .ExcludeUsersWithRole(Role.System)
+                .IncludeUsersWithRoles(request.Roles ?? [])
+                .OrderBy(x => x.Id)
+                .AsExpandable()
+                .Select(UserProjections.UserProjection)
+                .ApplyPagination(request.Pagination)
+                .ToListAsync(cancellationToken);
+        }
 
         var trimmed = request.SearchColumn.Trim();
         return await readRepository.Query

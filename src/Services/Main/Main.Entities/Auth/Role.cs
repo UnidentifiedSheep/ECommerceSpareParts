@@ -2,11 +2,10 @@ using System.Linq.Expressions;
 using Domain;
 using Domain.Extensions;
 using Domain.Interfaces;
-using Main.Entities.Auth.ValueObjects;
 
 namespace Main.Entities.Auth;
 
-public class Role : AuditableEntity<Role, RoleName>, ILinqEntity<Role, RoleName>
+public class Role : AuditableEntity<Role, string>, ILinqEntity<Role, string>
 {
     private readonly List<RolePermission> _rolePermissions = [];
 
@@ -14,22 +13,23 @@ public class Role : AuditableEntity<Role, RoleName>, ILinqEntity<Role, RoleName>
     {
     }
 
-    private Role(RoleName name)
+    private Role(string name)
     {
-        Name = name;
+        Name = RoleNames.Normalize(name);
     }
 
-    public RoleName Name { get; } = null!;
+    public string Name { get; } = null!;
 
     public string? Description { get; private set; }
     public IReadOnlyCollection<RolePermission> RolePermissions => _rolePermissions;
 
-    public static Expression<Func<Role, bool>> GetEqualityExpression(RoleName key)
+    public static Expression<Func<Role, bool>> GetEqualityExpression(string key)
     {
-        return x => x.Name == key;
+        var normalized = RoleNames.Normalize(key);
+        return x => x.Name == normalized;
     }
 
-    public static Role Create(RoleName name)
+    public static Role Create(string name)
     {
         return new Role(name);
     }
@@ -43,10 +43,10 @@ public class Role : AuditableEntity<Role, RoleName>, ILinqEntity<Role, RoleName>
     public void AddPermission(string name)
     {
         name = name.Trim();
-        if (_rolePermissions.Any(x => x.PermissionName == name.Trim()))
+        if (_rolePermissions.Any(x => x.PermissionName == name))
             return;
 
-        _rolePermissions.Add(RolePermission.Create(Name.Value, name));
+        _rolePermissions.Add(RolePermission.Create(Name, name));
     }
 
     public void RemovePermission(string name)
@@ -55,7 +55,7 @@ public class Role : AuditableEntity<Role, RoleName>, ILinqEntity<Role, RoleName>
         if (first != null) _rolePermissions.Remove(first);
     }
 
-    public override RoleName GetId()
+    public override string GetId()
     {
         return Name;
     }
