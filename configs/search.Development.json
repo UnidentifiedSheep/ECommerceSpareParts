@@ -1,3 +1,6 @@
 {
-  "IndexPath": "/app/data"
+  "OpenSearch": {
+    "Uri": "http://opensearch:9200",
+    "IndexName": "search-documents-v1"
+  }
 }

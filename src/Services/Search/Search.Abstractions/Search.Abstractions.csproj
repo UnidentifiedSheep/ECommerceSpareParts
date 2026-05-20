@@ -13,8 +13,4 @@
         <ProjectReference Include="..\Search.Enums\Search.Enums.csproj"/>
     </ItemGroup>
 
-    <ItemGroup>
-        <PackageReference Include="Lucene.Net.Suggest" Version="4.8.0-beta00017"/>
-    </ItemGroup>
-
 </Project>

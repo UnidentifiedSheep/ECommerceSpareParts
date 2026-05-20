@@ -34,6 +34,8 @@
       - ASPNETCORE_ENVIRONMENT=${ASPNETCORE_ENVIRONMENT:-Development}
     networks:
       - backend-network
+    depends_on:
+      - opensearch
 
   pricing.api:
     image: pricing.api
@@ -165,6 +167,34 @@
       - backend-network
     restart: unless-stopped
 
+  opensearch:
+    image: opensearchproject/opensearch:latest
+    environment:
+      - discovery.type=single-node
+      - DISABLE_SECURITY_PLUGIN=true
+      - OPENSEARCH_JAVA_OPTS=-Xms512m -Xmx512m
+    ports:
+      - "9200:9200"
+      - "9600:9600"
+    volumes:
+      - opensearch_data:/usr/share/opensearch/data
+    networks:
+      - backend-network
+    restart: unless-stopped
+
+  opensearch-dashboards:
+    image: opensearchproject/opensearch-dashboards:latest
+    environment:
+      - OPENSEARCH_HOSTS=["http://opensearch:9200"]
+      - DISABLE_SECURITY_DASHBOARDS_PLUGIN=true
+    ports:
+      - "5601:5601"
+    depends_on:
+      - opensearch
+    networks:
+      - backend-network
+    restart: unless-stopped
+
   minio:
     image: quay.io/minio/minio:latest
     container_name: minio
@@ -256,3 +286,4 @@ volumes:
   rabbitmq_data:
   minio_data:
   grafana_data:
+  opensearch_data:
