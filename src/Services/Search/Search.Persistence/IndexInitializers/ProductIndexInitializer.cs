@@ -16,38 +16,37 @@ public class ProductIndexInitializer(
     {
         var idx = options.Value.IndexOptions.Products;
 
-        if (await CheckIfIndexExists(idx, cancellationToken))
-            return;
-        
-        await Client.Indices.CreateAsync(idx, c => c
-            .Settings(s => s
-                .Analysis(a => a
-                    .Normalizers(n => n
-                        .Custom("lowercase_normalizer", cn => cn
-                            .Filters("lowercase")
-                        )
-                    )
-                )
-            )
-            .Map<Product>(m => m
-                .Properties(p => p
-                    .Keyword(k => k
-                        .Name(x => x.Id)
-                    )
-                    .Text(t => t
-                        .Name(x => x.Name)
-                        .Fields(f => f
-                            .Keyword(k => k
-                                .Name("keyword")
-                                .IgnoreAbove(256)
+        await InitializeIfMissing(
+            idx,
+            ct => Client.Indices.CreateAsync(idx, c => c
+                .Settings(s => s
+                    .Analysis(a => a
+                        .Normalizers(n => n
+                            .Custom("lowercase_normalizer", cn => cn
+                                .Filters("lowercase")
                             )
                         )
+                    ))
+                .Map<Product>(m => m
+                    .Properties(p => p
+                        .Keyword(k => k
+                            .Name(x => x.Id)
+                        )
+                        .Text(t => t
+                            .Name(x => x.Name)
+                            .Fields(f => f
+                                .Keyword(k => k
+                                    .Name("keyword")
+                                    .IgnoreAbove(256)
+                                )
+                            )
+                        )
+                        .Keyword(k => k
+                            .Name(x => x.Sku)
+                            .Normalizer("lowercase_normalizer")
+                        )
                     )
-                    .Keyword(k => k
-                        .Name(x => x.Sku)
-                        .Normalizer("lowercase_normalizer")
-                    )
-                )
-            ), cancellationToken);
+                ), ct),
+            cancellationToken);
     }
 }

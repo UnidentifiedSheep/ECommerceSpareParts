@@ -4,7 +4,7 @@
     "Username": "admin",
     "Password": "OpenSearchAdminPass21",
     "AllowInvalidCertificate": true,
-    "Indexes": {
+    "IndexOptions": {
       "Products": "products-v1"
     }
   }
