@@ -18,6 +18,7 @@
     <ItemGroup>
         <ProjectReference Include="..\..\..\Core\Exceptions\Exceptions.csproj"/>
         <ProjectReference Include="..\..\..\Core\Extensions\Extensions.csproj"/>
+        <ProjectReference Include="..\..\..\Infrastructure\Integrations\Internal\Internal.Integration.Core\Internal.Integration.Core.csproj"/>
         <ProjectReference Include="..\Search.Abstractions\Search.Abstractions.csproj"/>
         <ProjectReference Include="..\Search.Application\Search.Application.csproj" />
         <ProjectReference Include="..\Search.Entities\Search.Entities.csproj"/>

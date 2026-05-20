@@ -1,6 +1,7 @@
 ﻿using Application.Common.Interfaces.Cqrs;
 using Application.Common.Interfaces.Repositories;
 using Main.Application.Dtos.Product;
+using Main.Application.Handlers.Projections;
 using Main.Entities.Exceptions.Products;
 using Main.Entities.Product;
 using Microsoft.EntityFrameworkCore;
@@ -17,16 +18,9 @@ public class GetProductSizeHandler(IReadRepository<ProductSize, int> context)
     public async Task<GetProductSizesResult> Handle(GetProductSizeQuery request, CancellationToken cancellationToken)
     {
         var size = await context.Query
-                       .Select(x => new ProductSizeDto
-                       {
-                           ProductId = x.ProductId,
-                           Length = x.Length,
-                           Width = x.Width,
-                           Height = x.Height,
-                           Unit = x.Unit,
-                           VolumeM3 = x.VolumeM3
-                       })
-                       .FirstOrDefaultAsync(x => x.ProductId == request.ProductId, cancellationToken)
+                       .Where(x => x.ProductId == request.ProductId)
+                       .Select(ProductProjections.ToProductSizeDto)
+                       .FirstOrDefaultAsync(cancellationToken)
                    ?? throw new ProductSizesNotFoundException(request.ProductId);
 
         return new GetProductSizesResult(size);

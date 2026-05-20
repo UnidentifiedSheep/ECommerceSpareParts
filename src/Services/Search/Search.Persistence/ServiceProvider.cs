@@ -37,6 +37,7 @@ public static class ServiceProvider
         });
         
         services.AddSingleton<IProductRepository, ProductRepository>();
+        services.AddScoped<IProductSearchDocumentProvider, MainProductSearchDocumentProvider>();
 
 
         services.AddSingleton<IIndexInitializer<Product>, ProductIndexInitializer>();

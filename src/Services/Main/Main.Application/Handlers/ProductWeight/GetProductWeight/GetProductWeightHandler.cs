@@ -1,6 +1,7 @@
 ﻿using Application.Common.Interfaces.Cqrs;
 using Application.Common.Interfaces.Repositories;
 using Main.Application.Dtos.Product;
+using Main.Application.Handlers.Projections;
 using Main.Entities.Exceptions.Products;
 using Microsoft.EntityFrameworkCore;
 
@@ -16,13 +17,9 @@ public class GetProductWeightHandler(IReadRepository<Entities.Product.ProductWei
     public async Task<GetProductWeightResult> Handle(GetProductWeightQuery request, CancellationToken cancellationToken)
     {
         var productWeight = await context.Query
-                                .Select(x => new ProductWeightDto
-                                {
-                                    ProductId = x.ProductId,
-                                    Weight = x.Weight,
-                                    Unit = x.Unit
-                                })
-                                .FirstOrDefaultAsync(x => x.ProductId == request.ProductId, cancellationToken)
+                                .Where(x => x.ProductId == request.ProductId)
+                                .Select(ProductProjections.ToProductWeightDto)
+                                .FirstOrDefaultAsync(cancellationToken)
                             ?? throw new ProductWeightNotFoundException(request.ProductId);
 
         return new GetProductWeightResult(productWeight);

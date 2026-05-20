@@ -4,11 +4,13 @@ using Api.Common;
 using Api.Common.Extensions;
 using Api.Common.HostedServices;
 using Carter;
+using Internal.Integration.Di;
 using Localization.Domain.Extensions;
 using MassTransit;
 using RabbitMq.Extensions;
 using Search.Abstractions.Options;
 using Search.Application;
+using Search.Application.Consumers;
 using Search.Persistence;
 using Security;
 
@@ -29,11 +31,27 @@ builder.Services.AddCommonApiInfrastructure();
 
 builder.Services.AddMassTransit(x =>
 {
+    x.AddConsumer<ProductCreatedConsumer>();
+    x.AddConsumer<ProductUpdatedConsumer>();
+    x.AddConsumer<ProductDeletedConsumer>();
+    x.AddConsumer<ProductSizesUpdatedConsumer>();
+    x.AddConsumer<ProductWeightUpdatedConsumer>();
+    x.AddConsumer<ProductLinkageUpdatedConsumer>();
+
     x.UsingRabbitMq((context, cfg) =>
     {
         cfg.ConfigureRabbitMq(context);
 
-        cfg.ReceiveEndpoint("search-queue", ep => { ep.Durable = true; });
+        cfg.ReceiveEndpoint("search-queue", ep =>
+        {
+            ep.Durable = true;
+            ep.ConfigureConsumer<ProductCreatedConsumer>(context);
+            ep.ConfigureConsumer<ProductUpdatedConsumer>(context);
+            ep.ConfigureConsumer<ProductDeletedConsumer>(context);
+            ep.ConfigureConsumer<ProductSizesUpdatedConsumer>(context);
+            ep.ConfigureConsumer<ProductWeightUpdatedConsumer>(context);
+            ep.ConfigureConsumer<ProductLinkageUpdatedConsumer>(context);
+        });
     });
 });
 
@@ -44,6 +62,7 @@ builder.Services.AddHostedService<BackgroundTaskQueue>(sp => sp.GetRequiredServi
 builder.Services.AddPersistenceLayer()
     .AddEComAuth(builder.Configuration)
     .AddMinimalSecurityLayer()
+    .AddIntegrationClients()
     .AddApplicationLayer()
     .AddLocalization(builder.Configuration);
 

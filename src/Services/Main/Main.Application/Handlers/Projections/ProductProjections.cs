@@ -31,4 +31,28 @@ public static class ProductProjections
                 UpdatedAt = x.UpdatedAt,
                 Coefficient = CoefficientProjections.ToDto.Invoke(x.Coefficient)
             };
+
+    public static readonly Expression<Func<Entities.Product.ProductWeight?, ProductWeightDto?>>
+        ToProductWeightDto =
+            x => x == null ? null 
+                : new ProductWeightDto
+                {
+                    ProductId = x.ProductId,
+                    Weight = x.Weight,
+                    Unit = x.Unit
+                };
+
+    public static readonly Expression<Func<Entities.Product.ProductSize?, ProductSizeDto?>>
+        ToProductSizeDto =
+            x => x == null
+                ? null
+                : new ProductSizeDto
+                {
+                    ProductId = x.ProductId,
+                    Unit = x.Unit,
+                    Length = x.Length,
+                    Height = x.Height,
+                    Width = x.Width,
+                    VolumeM3 = x.VolumeM3
+                };
 }

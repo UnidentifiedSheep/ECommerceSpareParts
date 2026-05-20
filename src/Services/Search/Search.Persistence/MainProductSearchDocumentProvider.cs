@@ -1,0 +1,58 @@
+using Extensions;
+using Internal.Integration.Core.Interfaces;
+using Internal.Integration.Core.Models.Main;
+using Search.Application.Interfaces;
+using Search.Entities;
+
+namespace Search.Persistence;
+
+public class MainProductSearchDocumentProvider(
+    IMainClient mainClient) : IProductSearchDocumentProvider
+{
+    public async Task<Product?> GetById(
+        int productId,
+        CancellationToken cancellationToken = default)
+    {
+        var fullProduct = await mainClient.GetFullProduct(productId, cancellationToken);
+        if (fullProduct == null)
+        {
+            return null;
+        }
+
+        return new Product
+        {
+            Id = fullProduct.Product.Id,
+            Sku = fullProduct.Product.Sku,
+            Name = fullProduct.Product.Name,
+            ProducerId = fullProduct.Product.ProducerId,
+            Dimensions = MapDimensions(fullProduct.ProductSize),
+            Weight = MapWeight(fullProduct.ProductWeight)
+        };
+    }
+
+    private static ProductDimensions? MapDimensions(InternalProductSize? size)
+    {
+        return size == null
+            ? null
+            : new ProductDimensions
+            {
+                Length = size.Length,
+                Width = size.Width,
+                Height = size.Height,
+                Unit = size.Unit,
+                VolumeM3 = size.VolumeM3
+            };
+    }
+
+    private static ProductWeight? MapWeight(InternalProductWeight? weight)
+    {
+        return weight == null
+            ? null
+            : new ProductWeight
+            {
+                Value = weight.Weight,
+                Unit = weight.Unit,
+                WeightKg = weight.Weight.ToKg(weight.Unit)
+            };
+    }
+}
