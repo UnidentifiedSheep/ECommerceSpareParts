@@ -7,6 +7,7 @@ using Carter;
 using Localization.Domain.Extensions;
 using MassTransit;
 using RabbitMq.Extensions;
+using Search.Abstractions.Options;
 using Search.Application;
 using Search.Persistence;
 using Security;
@@ -19,7 +20,8 @@ builder.Host.AddLokiLogger(
     "search.api",
     env);
 
-builder.Services.AddMessageBrokerOptions()
+AddOpenSearchOptions(builder.Services)
+    .AddMessageBrokerOptions()
     .AddHeaderSecretsOptions()
     .AddRedisOptions();
 
@@ -58,3 +60,13 @@ await app.LoadLocalesFromJson(
 app.UseCommonApiPipeline();
 
 await app.RunAsync();
+return;
+
+static IServiceCollection AddOpenSearchOptions(IServiceCollection services)
+{
+    services.AddOptions<OpenSearchOptions>()
+        .BindConfiguration(OpenSearchOptions.SectionName)
+        .ValidateDataAnnotations()
+        .ValidateOnStart();
+    return services;
+}

@@ -45,6 +45,52 @@ public class ProductIndexInitializer(
                             .Name(x => x.Sku)
                             .Normalizer("lowercase_normalizer")
                         )
+                        .Number(n => n
+                            .Name(x => x.ProducerId)
+                            .Type(NumberType.Integer)
+                        )
+                        .Object<ProductDimensions>(o => o
+                            .Name(x => x.Dimensions)
+                            .Properties(dp => dp
+                                .Number(n => n
+                                    .Name(d => d.Length)
+                                    .Type(NumberType.Double)
+                                )
+                                .Number(n => n
+                                    .Name(d => d.Width)
+                                    .Type(NumberType.Double)
+                                )
+                                .Number(n => n
+                                    .Name(d => d.Height)
+                                    .Type(NumberType.Double)
+                                )
+                                .Number(n => n
+                                    .Name(d => d.Unit)
+                                    .Type(NumberType.Integer)
+                                )
+                                .Number(n => n
+                                    .Name(d => d.VolumeM3)
+                                    .Type(NumberType.Double)
+                                )
+                            )
+                        )
+                        .Object<ProductWeight>(o => o
+                            .Name(x => x.Weight)
+                            .Properties(wp => wp
+                                .Number(n => n
+                                    .Name(w => w.Value)
+                                    .Type(NumberType.Double)
+                                )
+                                .Number(n => n
+                                    .Name(w => w.Unit)
+                                    .Type(NumberType.Integer)
+                                )
+                                .Number(n => n
+                                    .Name(w => w.WeightKg)
+                                    .Type(NumberType.Double)
+                                )
+                            )
+                        )
                     )
                 ), ct),
             cancellationToken);
