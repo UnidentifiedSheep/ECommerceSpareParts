@@ -60,16 +60,31 @@ public class ProductRepository(
         string query,
         int? producerId = null,
         Pagination? pagination = null,
+        RangeModel<decimal>? lengthM = null,
+        RangeModel<decimal>? widthM = null,
+        RangeModel<decimal>? heightM = null,
         CancellationToken token = default)
     {
-        if (string.IsNullOrWhiteSpace(query))
+        var hasTextQuery = !string.IsNullOrWhiteSpace(query);
+        var filters = new List<Func<QueryContainerDescriptor<Product>, QueryContainer>>();
+
+        if (producerId.HasValue)
         {
-            return Array.Empty<Product>();
+            filters.Add(f => f.Term(t => t
+                .Field(p => p.ProducerId)
+                .Value(producerId.Value)));
         }
+
+        AddRangeFilter(filters, p => p.Dimensions!.LengthM, lengthM);
+        AddRangeFilter(filters, p => p.Dimensions!.WidthM, widthM);
+        AddRangeFilter(filters, p => p.Dimensions!.HeightM, heightM);
+
+        if (!hasTextQuery && filters.Count == 0)
+            return [];
 
         var page = pagination ?? DefaultPagination;
         var idx = await CheckInitAndGetIdx(token);
-        var normalizedQuery = NormalizeSku(query);
+        var normalizedQuery = ProductSkuNormalizer.Normalize(query);
         var response = await client.SearchAsync<Product>(
             s => s
                 .Index(idx)
@@ -77,28 +92,24 @@ public class ProductRepository(
                 .Size(page.Size)
                 .Query(q => q.Bool(b =>
                 {
-                    b = b.Should(
-                            sh => sh.Term(t => t
-                                .Field(p => p.Sku)
-                                .Value(normalizedQuery)
-                                .Boost(8)),
-                            sh => sh.Prefix(p => p
-                                .Field(k => k.Sku)
-                                .Value(normalizedQuery)
-                                .Boost(4)),
-                            sh => sh.Match(m => m
-                                .Field(p => p.Name)
-                                .Query(query)
-                                .Boost(2)),
-                            sh => sh.MatchPhrasePrefix(m => m
-                                .Field(p => p.Name)
-                                .Query(query)))
-                        .MinimumShouldMatch(1);
+                    if (hasTextQuery)
+                    {
+                        var should = new List<Func<QueryContainerDescriptor<Product>, QueryContainer>>();
+                        AddSkuQueries(should, normalizedQuery);
+                        should.Add(sh => sh.Match(m => m
+                            .Field(p => p.Name)
+                            .Query(query)
+                            .Boost(2)));
+                        should.Add(sh => sh.MatchPhrasePrefix(m => m
+                            .Field(p => p.Name)
+                            .Query(query)));
 
-                    return producerId.HasValue
-                        ? b.Filter(f => f.Term(t => t
-                            .Field(p => p.ProducerId)
-                            .Value(producerId.Value)))
+                        b = b.Should(should.ToArray())
+                            .MinimumShouldMatch(1);
+                    }
+
+                    return filters.Count > 0
+                        ? b.Filter(filters)
                         : b;
                 })),
             token);
@@ -112,27 +123,26 @@ public class ProductRepository(
         CancellationToken token = default)
     {
         if (string.IsNullOrWhiteSpace(sku))
-        {
-            return Array.Empty<Product>();
-        }
+            return [];
+        
 
         var page = pagination ?? DefaultPagination;
         var idx = await CheckInitAndGetIdx(token);
-        var normalizedSku = NormalizeSku(sku);
+        var normalizedSku = ProductSkuNormalizer.Normalize(sku);
+        if (string.IsNullOrEmpty(normalizedSku))
+            return [];
+        
+
+        var should = new List<Func<QueryContainerDescriptor<Product>, QueryContainer>>();
+        AddSkuQueries(should, normalizedSku);
+
         var response = await client.SearchAsync<Product>(
             s => s
                 .Index(idx)
                 .From(GetFrom(page))
                 .Size(page.Size)
-                .Query(q => q.Bool(b => b.Should(
-                        sh => sh.Term(t => t
-                            .Field(p => p.Sku)
-                            .Value(normalizedSku)
-                            .Boost(8)),
-                        sh => sh.Prefix(p => p
-                            .Field(k => k.Sku)
-                            .Value(normalizedSku)
-                            .Boost(4)))
+                .Query(q => q.Bool(b => b
+                    .Should(should.ToArray())
                     .MinimumShouldMatch(1))),
             token);
 
@@ -164,7 +174,7 @@ public class ProductRepository(
         Pagination? pagination = null,
         CancellationToken token = default)
     {
-        return SearchByRange(p => p.Dimensions!.Length, length, pagination, token);
+        return SearchByRange(p => p.Dimensions!.LengthM, length, pagination, token);
     }
 
     public Task<IReadOnlyCollection<Product>> GetByWidthRange(
@@ -172,7 +182,7 @@ public class ProductRepository(
         Pagination? pagination = null,
         CancellationToken token = default)
     {
-        return SearchByRange(p => p.Dimensions!.Width, width, pagination, token);
+        return SearchByRange(p => p.Dimensions!.WidthM, width, pagination, token);
     }
 
     public Task<IReadOnlyCollection<Product>> GetByHeightRange(
@@ -180,7 +190,7 @@ public class ProductRepository(
         Pagination? pagination = null,
         CancellationToken token = default)
     {
-        return SearchByRange(p => p.Dimensions!.Height, height, pagination, token);
+        return SearchByRange(p => p.Dimensions!.HeightM, height, pagination, token);
     }
 
     public Task<IReadOnlyCollection<Product>> GetByWeightKgRange(
@@ -207,9 +217,9 @@ public class ProductRepository(
         CancellationToken token = default)
     {
         var filters = new List<Func<QueryContainerDescriptor<Product>, QueryContainer>>();
-        AddRangeFilter(filters, p => p.Dimensions!.Length, length);
-        AddRangeFilter(filters, p => p.Dimensions!.Width, width);
-        AddRangeFilter(filters, p => p.Dimensions!.Height, height);
+        AddRangeFilter(filters, p => p.Dimensions!.LengthM, length);
+        AddRangeFilter(filters, p => p.Dimensions!.WidthM, width);
+        AddRangeFilter(filters, p => p.Dimensions!.HeightM, height);
 
         if (filters.Count == 0)
             return [];
@@ -337,8 +347,34 @@ public class ProductRepository(
         return pagination.Page * pagination.Size;
     }
 
-    private static string NormalizeSku(string sku)
+    private static void AddSkuQueries(
+        ICollection<Func<QueryContainerDescriptor<Product>, QueryContainer>> queries,
+        string normalizedSku)
     {
-        return sku.Trim().ToLowerInvariant();
+        if (string.IsNullOrEmpty(normalizedSku))
+        {
+            return;
+        }
+
+        queries.Add(q => q.Term(t => t
+            .Field(p => p.NormalizedSku)
+            .Value(normalizedSku)
+            .Boost(10)));
+
+        queries.Add(q => q.Prefix(p => p
+            .Field(k => k.NormalizedSku)
+            .Value(normalizedSku)
+            .Boost(6)));
+
+        queries.Add(q => q.Wildcard(w => w
+            .Field(p => p.NormalizedSku)
+            .Value($"*{normalizedSku}*")
+            .Boost(3)));
+
+        queries.Add(q => q.Fuzzy(f => f
+            .Field(p => p.NormalizedSku)
+            .Value(normalizedSku)
+            .Fuzziness(Fuzziness.Auto)
+            .Boost(1)));
     }
 }

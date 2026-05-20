@@ -31,12 +31,7 @@ builder.Services.AddCommonApiInfrastructure();
 
 builder.Services.AddMassTransit(x =>
 {
-    x.AddConsumer<ProductCreatedConsumer>();
-    x.AddConsumer<ProductUpdatedConsumer>();
-    x.AddConsumer<ProductDeletedConsumer>();
-    x.AddConsumer<ProductSizesUpdatedConsumer>();
-    x.AddConsumer<ProductWeightUpdatedConsumer>();
-    x.AddConsumer<ProductLinkageUpdatedConsumer>();
+    x.AddConsumers(Assembly.GetAssembly(typeof(ProductCreatedConsumer)));
 
     x.UsingRabbitMq((context, cfg) =>
     {
@@ -59,11 +54,12 @@ builder.Services.AddSingleton<BackgroundTaskQueue>();
 builder.Services.AddSingleton<IBackgroundTaskQueue>(sp => sp.GetRequiredService<BackgroundTaskQueue>());
 builder.Services.AddHostedService<BackgroundTaskQueue>(sp => sp.GetRequiredService<BackgroundTaskQueue>());
 
-builder.Services.AddPersistenceLayer()
+builder.Services
     .AddEComAuth(builder.Configuration)
     .AddMinimalSecurityLayer()
     .AddIntegrationClients()
     .AddApplicationLayer()
+    .AddPersistenceLayer()
     .AddLocalization(builder.Configuration);
 
 var endpointAssembly = typeof(Program).Assembly;

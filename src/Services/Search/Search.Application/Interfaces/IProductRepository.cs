@@ -11,7 +11,10 @@ public interface IProductRepository
     Task<IReadOnlyCollection<Product>> Search(
         string query, 
         int? producerId = null, 
-        Pagination? pagination = null, 
+        Pagination? pagination = null,
+        RangeModel<decimal>? lengthM = null,
+        RangeModel<decimal>? widthM = null,
+        RangeModel<decimal>? heightM = null,
         CancellationToken token = default);
     
     Task<IReadOnlyCollection<Product>> SearchBySku(

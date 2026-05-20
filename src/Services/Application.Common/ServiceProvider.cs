@@ -9,7 +9,10 @@ namespace Application.Common;
 
 public static class ServiceProvider
 {
-    public static IServiceCollection AddApplicationBase(this IServiceCollection services, Assembly? assembly = null)
+    public static IServiceCollection AddApplicationBase(
+        this IServiceCollection services, 
+        Assembly? assembly = null,
+        params Type[] behaviorsToExclude)
     {
         assembly ??= Assembly.GetExecutingAssembly();
         services
@@ -21,19 +24,50 @@ public static class ServiceProvider
 
         services.AddSingleton<IBackplaneDispatcher, BackplaneDispatcher>();
         services.AddSingleton<IFusionCacheBackplane, MassTransitBackplane>();
-
+        
+        var hs = behaviorsToExclude.ToHashSet();
         services.AddMediatR(config =>
         {
             config.RegisterServicesFromAssembly(assembly);
-            config.AddOpenBehavior(typeof(ValidationBehavior<,>));
-            config.AddOpenBehavior(typeof(DbValidationBehavior<,>), ServiceLifetime.Scoped);
-            config.AddOpenBehavior(typeof(LoggingBehavior<,>));
-            config.AddOpenBehavior(typeof(CacheBehavior<,>));
-            config.AddOpenBehavior(typeof(TransactionBehavior<,>), ServiceLifetime.Scoped);
-            config.AddOpenBehavior(typeof(SaveChangesBehavior<,>), ServiceLifetime.Scoped);
-            config.AddOpenBehavior(typeof(IntegrationEventPublisherBehavior<,>), ServiceLifetime.Scoped);
+            config
+                .RegisterIfNotExcluded(
+                    hs,
+                    typeof(ValidationBehavior<,>))
+                .RegisterIfNotExcluded(
+                    hs,
+                    typeof(DbValidationBehavior<,>),
+                    ServiceLifetime.Scoped)
+                .RegisterIfNotExcluded(
+                    hs,
+                    typeof(LoggingBehavior<,>))
+                .RegisterIfNotExcluded(
+                    hs,
+                    typeof(CacheBehavior<,>))
+                .RegisterIfNotExcluded(
+                    hs,
+                    typeof(TransactionBehavior<,>),
+                    ServiceLifetime.Scoped)
+                .RegisterIfNotExcluded(
+                    hs,
+                    typeof(SaveChangesBehavior<,>),
+                    ServiceLifetime.Scoped)
+                .RegisterIfNotExcluded(
+                    hs,
+                    typeof(IntegrationEventPublisherBehavior<,>),
+                    ServiceLifetime.Scoped);
         });
 
         return services;
+    }
+
+    private static MediatRServiceConfiguration RegisterIfNotExcluded(
+        this MediatRServiceConfiguration serviceConfiguration,
+        HashSet<Type> excludedTypes,
+        Type openBehaviorType, 
+        ServiceLifetime serviceLifetime = ServiceLifetime.Transient)
+    {
+        if (excludedTypes.Contains(openBehaviorType)) return serviceConfiguration;
+        serviceConfiguration.AddOpenBehavior(openBehaviorType, serviceLifetime);
+        return serviceConfiguration;
     }
 }

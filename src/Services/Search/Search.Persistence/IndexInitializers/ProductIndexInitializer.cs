@@ -45,6 +45,10 @@ public class ProductIndexInitializer(
                             .Name(x => x.Sku)
                             .Normalizer("lowercase_normalizer")
                         )
+                        .Keyword(k => k
+                            .Name(x => x.NormalizedSku)
+                            .Normalizer("lowercase_normalizer")
+                        )
                         .Number(n => n
                             .Name(x => x.ProducerId)
                             .Type(NumberType.Integer)
@@ -57,11 +61,23 @@ public class ProductIndexInitializer(
                                     .Type(NumberType.Double)
                                 )
                                 .Number(n => n
+                                    .Name(d => d.LengthM)
+                                    .Type(NumberType.Double)
+                                )
+                                .Number(n => n
                                     .Name(d => d.Width)
                                     .Type(NumberType.Double)
                                 )
                                 .Number(n => n
+                                    .Name(d => d.WidthM)
+                                    .Type(NumberType.Double)
+                                )
+                                .Number(n => n
                                     .Name(d => d.Height)
+                                    .Type(NumberType.Double)
+                                )
+                                .Number(n => n
+                                    .Name(d => d.HeightM)
                                     .Type(NumberType.Double)
                                 )
                                 .Number(n => n

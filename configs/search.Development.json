@@ -2,7 +2,7 @@
   "OpenSearch": {
     "Uri": "https://opensearch:9200",
     "Username": "admin",
-    "Password": "OpenSearchAdminPass21",
+    "Password": "N9v#Qp7!Lm2@Rz5$",
     "AllowInvalidCertificate": true,
     "IndexOptions": {
       "Products": "products-v1"

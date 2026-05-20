@@ -23,6 +23,7 @@ public class MainProductSearchDocumentProvider(
         {
             Id = fullProduct.Product.Id,
             Sku = fullProduct.Product.Sku,
+            NormalizedSku = ProductSkuNormalizer.Normalize(fullProduct.Product.Sku),
             Name = fullProduct.Product.Name,
             ProducerId = fullProduct.Product.ProducerId,
             Dimensions = MapDimensions(fullProduct.ProductSize),
@@ -37,8 +38,11 @@ public class MainProductSearchDocumentProvider(
             : new ProductDimensions
             {
                 Length = size.Length,
+                LengthM = size.Length.ToMeters(size.Unit),
                 Width = size.Width,
+                WidthM = size.Width.ToMeters(size.Unit),
                 Height = size.Height,
+                HeightM = size.Height.ToMeters(size.Unit),
                 Unit = size.Unit,
                 VolumeM3 = size.VolumeM3
             };
