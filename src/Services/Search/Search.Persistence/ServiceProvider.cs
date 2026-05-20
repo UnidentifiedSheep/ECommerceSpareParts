@@ -3,6 +3,10 @@ using Microsoft.Extensions.Options;
 using OpenSearch.Client;
 using OpenSearch.Net;
 using Search.Abstractions.Options;
+using Search.Application.Interfaces;
+using Search.Entities;
+using Search.Persistence.IndexInitializers;
+using Search.Persistence.Interfaces;
 
 namespace Search.Persistence;
 
@@ -31,6 +35,11 @@ public static class ServiceProvider
 
             return new OpenSearchClient(connectionSettings);
         });
+        
+        services.AddSingleton<IProductRepository, ProductRepository>();
+
+
+        services.AddSingleton<IIndexInitializer<Product>, ProductIndexInitializer>();
 
         return services;
     }
