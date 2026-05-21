@@ -53,7 +53,7 @@ public class SearchProductsEndPoint : ICarterModule
 
     public void AddRoutes(IEndpointRouteBuilder app)
     {
-        app.MapGet("/products/search", async (
+        app.MapGet("/products", async (
                 ISender sender,
                 [AsParameters] SearchProductsRequest request,
                 CancellationToken cancellationToken) =>
