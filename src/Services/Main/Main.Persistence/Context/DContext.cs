@@ -10,6 +10,7 @@ using Main.Entities.Producer;
 using Main.Entities.Product;
 using Main.Entities.Purchase;
 using Main.Entities.Sale;
+using Main.Entities.Setting;
 using Main.Entities.Storage;
 using Main.Entities.User;
 using MassTransit;
@@ -152,6 +153,13 @@ public partial class DContext : DbContext
 
         modelBuilder.ApplyConfigurationsFromAssembly(Assembly.GetAssembly(GetType())!)
             .ApplyConfiguration(new SettingConfiguration());
+
+        modelBuilder.Entity<Setting>()
+            .HasDiscriminator(e => e.Key)
+            .HasValue<Setting>(nameof(Setting))
+            .HasValue<CurrencySetting>(CurrencySetting.SettingName)
+            .HasValue<GlobalApplicationSetting>(GlobalApplicationSetting.SettingName)
+            .HasValue<StorageContentSetting>(StorageContentSetting.SettingName);
 
         modelBuilder.AddFieldsForAuditableEntities();
 
