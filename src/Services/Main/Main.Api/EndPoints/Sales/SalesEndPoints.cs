@@ -55,7 +55,10 @@ public class SalesEndPoints : ICarterModule
                 CreateSaleRequest request,
                 CancellationToken token) => Results.Ok())
             .WithDescription("Создание новой продажи")
+            .WithName("CreateSale")
+            .WithSummary("Создать продажу")
             .WithDisplayName("Создание новой продажи")
+            .Accepts<CreateSaleRequest>(false, "application/json")
             .Produces(200)
             .Produces(401)
             .RequireAnyPermission(PermissionCodes.SALES_CREATE);
@@ -66,7 +69,11 @@ public class SalesEndPoints : ICarterModule
                 string saleId,
                 CancellationToken token) => Results.NoContent())
             .WithDescription("Удаление продажи")
+            .WithName("DeleteSale")
+            .WithSummary("Удалить продажу")
             .WithDisplayName("Удаление продажи")
+            .Produces(StatusCodes.Status204NoContent)
+            .ProducesProblem(StatusCodes.Status404NotFound)
             .RequireAnyPermission(PermissionCodes.SALES_DELETE);
 
         sales.MapPut("/{saleId}", (
@@ -76,7 +83,13 @@ public class SalesEndPoints : ICarterModule
                 IUserContext user,
                 CancellationToken cancellationToken) => Results.Ok())
             .WithDescription("Редактирование продажи")
+            .WithName("EditSale")
+            .WithSummary("Редактировать продажу")
             .WithDisplayName("Редактирование продажи")
+            .Accepts<EditSaleRequest>(false, "application/json")
+            .Produces(StatusCodes.Status200OK)
+            .ProducesProblem(StatusCodes.Status400BadRequest)
+            .ProducesProblem(StatusCodes.Status404NotFound)
             .RequireAnyPermission(PermissionCodes.SALES_EDIT);
 
         sales.MapGet("/{id}/content", (
@@ -84,7 +97,11 @@ public class SalesEndPoints : ICarterModule
                 string id,
                 CancellationToken cancellationToken) => Results.Ok())
             .WithDescription("Получение содержания продажи")
+            .WithName("GetSaleContent")
+            .WithSummary("Получить содержимое продажи")
             .WithDisplayName("Получение содержания продажи")
+            .Produces(StatusCodes.Status200OK)
+            .ProducesProblem(StatusCodes.Status404NotFound)
             .RequireAnyPermission(PermissionCodes.SALES_GET);
 
         sales.MapGet("/", (
@@ -92,7 +109,11 @@ public class SalesEndPoints : ICarterModule
                 [AsParameters] GetSalesRequest request,
                 CancellationToken token) => Results.Ok())
             .WithDescription("Получение списка продаж")
+            .WithName("GetSales")
+            .WithSummary("Получить продажи")
             .WithDisplayName("Получение продаж")
+            .Produces(StatusCodes.Status200OK)
+            .ProducesProblem(StatusCodes.Status400BadRequest)
             .RequireAnyPermission(PermissionCodes.SALES_GET);
     }
 }

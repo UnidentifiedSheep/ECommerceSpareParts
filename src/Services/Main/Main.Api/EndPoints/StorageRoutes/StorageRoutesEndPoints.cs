@@ -56,8 +56,13 @@ public class StorageRoutesEndPoints : ICarterModule
                 var result = await sender.Send(request.Adapt<AddStorageRouteCommand>(), token);
                 return Results.Created($"/storages/routes/{result.RouteId}", new AddStorageRouteResponse(result.RouteId));
             })
+            .WithName("CreateStorageRoute")
+            .WithSummary("Создать маршрут склада")
             .WithDescription("Создание маршрута")
             .WithDisplayName("Создание маршрута")
+            .Accepts<AddStorageRouteRequest>(false, "application/json")
+            .Produces<AddStorageRouteResponse>(StatusCodes.Status201Created)
+            .ProducesProblem(StatusCodes.Status400BadRequest)
             .RequireAnyPermission(PermissionCodes.STORAGE_ROUTES_CREATE);
 
         routes.MapDelete("/{id:guid}", async (ISender sender, Guid id, CancellationToken token) =>
@@ -65,8 +70,12 @@ public class StorageRoutesEndPoints : ICarterModule
                 await sender.Send(new DeleteStorageRouteCommand(id), token);
                 return Results.NoContent();
             })
+            .WithName("DeleteStorageRoute")
+            .WithSummary("Удалить маршрут склада")
             .WithDescription("Удаление маршрута")
             .WithDisplayName("Удаление маршрута")
+            .Produces(StatusCodes.Status204NoContent)
+            .ProducesProblem(StatusCodes.Status404NotFound)
             .RequireAnyPermission(PermissionCodes.STORAGE_ROUTES_DELETE);
 
         routes.MapPatch("/{id:guid}", async (
@@ -78,8 +87,14 @@ public class StorageRoutesEndPoints : ICarterModule
                 await sender.Send(new EditStorageRouteCommand(id, request.PatchStorageRoute), cancellationToken);
                 return Results.Ok();
             })
+            .WithName("EditStorageRoute")
+            .WithSummary("Редактировать маршрут склада")
             .WithDescription("Обновление маршрута")
             .WithDisplayName("Обновление маршрута")
+            .Accepts<EditStorageRouteRequest>(false, "application/json")
+            .Produces(StatusCodes.Status200OK)
+            .ProducesProblem(StatusCodes.Status400BadRequest)
+            .ProducesProblem(StatusCodes.Status404NotFound)
             .RequireAnyPermission(PermissionCodes.STORAGE_ROUTES_EDIT);
 
         routes.MapGet("/{id:guid}", async (ISender sender, Guid id, CancellationToken token) =>
@@ -87,8 +102,12 @@ public class StorageRoutesEndPoints : ICarterModule
                 var result = await sender.Send(new GetStorageRouteByIdQuery(id), token);
                 return Results.Ok(new GetStorageRouteResponse(result.StorageRoute));
             })
+            .WithName("GetStorageRoute")
+            .WithSummary("Получить маршрут склада")
             .WithDescription("Получение маршрута")
             .WithDisplayName("Получение маршрута")
+            .Produces<GetStorageRouteResponse>()
+            .ProducesProblem(StatusCodes.Status404NotFound)
             .RequireAnyPermission(PermissionCodes.STORAGE_ROUTES_GET);
 
         routes.MapGet("", async (
@@ -104,8 +123,12 @@ public class StorageRoutesEndPoints : ICarterModule
                 var result = await sender.Send(query, token);
                 return Results.Ok(new GetStorageRoutesResponse(result.StorageRoutes));
             })
+            .WithName("GetStorageRoutes")
+            .WithSummary("Получить маршруты складов")
             .WithDescription("Получение маршрутов")
             .WithDisplayName("Получение маршрутов")
+            .Produces<GetStorageRoutesResponse>()
+            .ProducesProblem(StatusCodes.Status400BadRequest)
             .RequireAnyPermission(PermissionCodes.STORAGE_ROUTES_GET);
     }
 }

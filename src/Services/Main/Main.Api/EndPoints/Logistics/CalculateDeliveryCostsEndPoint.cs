@@ -29,8 +29,14 @@ public class CalculateDeliveryCostsEndPoint : ICarterModule
                     var result = await sender.Send(query, token);
                     return Results.Ok(new CalculateDeliveryCostResponse(result.DeliveryCost, result.Route));
                 }).WithTags("Logistics")
+            .WithName("CalculateDeliveryCost")
+            .WithSummary("Рассчитать стоимость доставки")
             .WithDescription("Расчет стоимости доставки между складами")
             .WithDisplayName("Расчет стоимости доставки между складами")
+            .Accepts<CalculateDeliveryCostRequest>(false, "application/json")
+            .Produces<CalculateDeliveryCostResponse>()
+            .ProducesProblem(StatusCodes.Status400BadRequest)
+            .ProducesProblem(StatusCodes.Status404NotFound)
             .RequireAnyPermission(PermissionCodes.LOGISTICS_CALCULATE);
     }
 }

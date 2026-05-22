@@ -28,11 +28,16 @@ public class ProductReservationsEndPoints : ICarterModule
                 await sender.Send(new CreateProductReservationCommand(query.Reservations), cancellationToken);
                 return Results.NoContent();
             })
+            .WithName("CreateProductReservations")
+            .WithSummary("Создать резервации продуктов")
             .WithDisplayName("Создать резервацию")
             .WithDescription("Создать резервацию для пользователя")
+            .Accepts<CreateProductReservationQuery>(false, "application/json")
+            .Produces(StatusCodes.Status204NoContent)
+            .ProducesProblem(StatusCodes.Status400BadRequest)
             .RequireAnyPermission(PermissionCodes.ARTICLE_RESERVATIONS_CREATE);
 
-        reservations.MapDelete("/{reservationId}", async (
+        reservations.MapDelete("/{reservationId:int}", async (
                 ISender sender,
                 int reservationId,
                 CancellationToken cancellationToken) =>
@@ -40,11 +45,15 @@ public class ProductReservationsEndPoints : ICarterModule
                 await sender.Send(new DeleteProductReservationCommand(reservationId), cancellationToken);
                 return Results.NoContent();
             })
+            .WithName("DeleteProductReservation")
+            .WithSummary("Удалить резервацию продукта")
             .WithDisplayName("Удалить резервацию")
             .WithDescription("Удалить резервацию")
+            .Produces(StatusCodes.Status204NoContent)
+            .ProducesProblem(StatusCodes.Status404NotFound)
             .RequireAnyPermission(PermissionCodes.ARTICLE_RESERVATIONS_DELETE);
 
-        reservations.MapPut("/{reservationId}", async (
+        reservations.MapPut("/{reservationId:int}", async (
                 ISender sender,
                 int reservationId,
                 EditProductReservationRequest request,
@@ -53,8 +62,14 @@ public class ProductReservationsEndPoints : ICarterModule
                 await sender.Send(new EditProductReservationCommand(reservationId, request.NewValue), token);
                 return Results.NoContent();
             })
+            .WithName("EditProductReservation")
+            .WithSummary("Редактировать резервацию продукта")
             .WithDisplayName("Редактирование резервации")
             .WithDescription("Редактирование резервации")
+            .Accepts<EditProductReservationRequest>(false, "application/json")
+            .Produces(StatusCodes.Status204NoContent)
+            .ProducesProblem(StatusCodes.Status400BadRequest)
+            .ProducesProblem(StatusCodes.Status404NotFound)
             .RequireAnyPermission(PermissionCodes.ARTICLE_RESERVATIONS_EDIT);
     }
 }

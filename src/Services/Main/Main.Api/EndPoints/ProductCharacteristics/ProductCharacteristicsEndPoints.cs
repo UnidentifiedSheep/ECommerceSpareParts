@@ -33,14 +33,16 @@ public class ProductCharacteristicsEndPoints : ICarterModule
                 await sender.Send(new AddCharacteristicsCommand(request.Characteristics), token);
                 return Results.Created();
             })
-            .WithName("Создание характеристик артикула")
+            .WithName("CreateProductCharacteristics")
             .WithDescription("Создание характеристик артикула")
+            .Accepts<AddCharacteristicsRequest>(false, "application/json")
+            .Produces(StatusCodes.Status201Created)
             .ProducesProblem(StatusCodes.Status400BadRequest)
             .ProducesProblem(StatusCodes.Status404NotFound)
-            .WithSummary("Создание характеристик артикула")
+            .WithSummary("Создать характеристики продуктов")
             .RequireAnyPermission(PermissionCodes.ARTICLE_CHARACTERISTICS_CREATE);
 
-        characteristics.MapDelete("/{productId}/characteristics/{name}", async (
+        characteristics.MapDelete("/{productId:int}/characteristics/{name}", async (
                 ISender sender,
                 int productId,
                 string name,
@@ -49,14 +51,15 @@ public class ProductCharacteristicsEndPoints : ICarterModule
                 await sender.Send(new DeleteCharacteristicsCommand(productId, name), token);
                 return Results.Ok();
             })
-            .WithName("Удаление характеристики артикула по id")
+            .WithName("DeleteProductCharacteristic")
             .WithDescription("Удаление характеристики")
+            .Produces(StatusCodes.Status200OK)
             .ProducesProblem(StatusCodes.Status400BadRequest)
             .ProducesProblem(StatusCodes.Status404NotFound)
-            .WithSummary("Удаление характеристики")
+            .WithSummary("Удалить характеристику продукта")
             .RequireAnyPermission(PermissionCodes.ARTICLE_CHARACTERISTICS_DELETE);
 
-        characteristics.MapPatch("/{productId}/characteristics/{name}", async (
+        characteristics.MapPatch("/{productId:int}/characteristics/{name}", async (
                 ISender sender,
                 int productId,
                 string name,
@@ -66,11 +69,13 @@ public class ProductCharacteristicsEndPoints : ICarterModule
                 await sender.Send(new PatchCharacteristicsCommand(productId, name, request.Value), token);
                 return Results.Ok();
             })
-            .WithName("Редактирование характеристики артикула по id")
+            .WithName("EditProductCharacteristic")
             .WithDescription("Редактирование характеристики")
+            .Accepts<EditCharacteristicsRequest>(false, "application/json")
+            .Produces(StatusCodes.Status200OK)
             .ProducesProblem(StatusCodes.Status400BadRequest)
             .ProducesProblem(StatusCodes.Status404NotFound)
-            .WithSummary("Редактирование характеристики")
+            .WithSummary("Редактировать характеристику продукта")
             .RequireAnyPermission(PermissionCodes.ARTICLE_CHARACTERISTICS_UPDATE);
 
         characteristics.MapGet("/{productId:int}/characteristics", async (
@@ -82,10 +87,11 @@ public class ProductCharacteristicsEndPoints : ICarterModule
                 var result = await sender.Send(new GetCharacteristicsQuery(productId, queryParams), token);
                 return Results.Ok(result.Adapt<GetProductCharacteristicsResponse>());
             })
-            .WithName("Получение характеристик артикула по id")
+            .WithName("GetProductCharacteristics")
             .WithDescription("Получить характеристики артикула")
             .Produces<GetProductCharacteristicsResponse>()
             .ProducesProblem(StatusCodes.Status400BadRequest)
-            .WithSummary("Получение характеристик артикула по id");
+            .ProducesProblem(StatusCodes.Status404NotFound)
+            .WithSummary("Получить характеристики продукта");
     }
 }

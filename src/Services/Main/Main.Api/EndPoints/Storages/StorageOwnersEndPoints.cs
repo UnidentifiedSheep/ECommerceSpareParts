@@ -26,6 +26,7 @@ public static class StorageOwnersEndPoints
             })
             .RequireAllPermissions(PermissionCodes.USERS_STORAGES_GET)
             .WithName("GetStorageOwners")
+            .WithSummary("Получить владельцев склада")
             .WithDescription("Получение владельцев склада.")
             .ProducesProblem(404)
             .Produces<GetStorageOwnersResponse>();

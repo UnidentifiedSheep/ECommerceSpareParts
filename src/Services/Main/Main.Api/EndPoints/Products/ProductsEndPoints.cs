@@ -35,6 +35,8 @@ public class ProductsEndPoints : ICarterModule
                 var response = new CreateProductResponse(result.CreatedIds);
                 return Results.Created("/products", response);
             })
+            .WithName("CreateProducts")
+            .WithSummary("Создать продукты")
             .WithDescription("Добавление новых артикулов")
             .WithDisplayName("Добавление артикулов")
             .Accepts<CreateProductRequest>(false, "application/json")
@@ -42,7 +44,7 @@ public class ProductsEndPoints : ICarterModule
             .ProducesProblem(400)
             .RequireAnyPermission(PermissionCodes.ARTICLES_CREATE);
 
-        products.MapPatch("/{productId}", async (
+        products.MapPatch("/{productId:int}", async (
                 ISender sender,
                 int productId,
                 EditProductRequest request,
@@ -52,9 +54,14 @@ public class ProductsEndPoints : ICarterModule
                 await sender.Send(command, token);
                 return Results.NoContent();
             })
+            .WithName("EditProduct")
+            .WithSummary("Редактировать продукт")
             .WithDescription("Редактирование артикула")
             .WithDisplayName("Редактирование артикула")
             .Accepts<EditProductRequest>(false, "application/json")
+            .Produces(StatusCodes.Status204NoContent)
+            .ProducesProblem(StatusCodes.Status400BadRequest)
+            .ProducesProblem(StatusCodes.Status404NotFound)
             .RequireAnyPermission(PermissionCodes.ARTICLES_EDIT);
     }
 }

@@ -28,6 +28,10 @@ public class InternalGetCurrencyRateEndPoint : ICarterModule
                 });
             }).WithGroupName("Internal Currency")
         .WithDisplayName("Internal service currency rates")
-        .WithName("InternalCurrencyRates");
+        .WithName("InternalCurrencyRates")
+        .WithSummary("Получить курс валюты для внутреннего сервиса")
+        .WithDescription("Получение курса валюты по id для внутренних интеграций")
+        .Produces<GetCurrencyRateResult>()
+        .ProducesProblem(StatusCodes.Status404NotFound);
     }
 }

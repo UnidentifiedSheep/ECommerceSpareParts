@@ -39,6 +39,10 @@ public class InternalGetFullProductEndPoint : ICarterModule
                 });
             }).WithGroupName("Internal Products")
             .WithDisplayName("Internal service full product")
-            .WithName("InternalFullProduct");
+            .WithName("InternalFullProduct")
+            .WithSummary("Получить полный продукт для внутреннего сервиса")
+            .WithDescription("Получение продукта, веса и размеров для внутренних интеграций")
+            .Produces<InternalGetFullProductResponse>()
+            .ProducesProblem(StatusCodes.Status404NotFound);
     }
 }

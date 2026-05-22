@@ -40,13 +40,23 @@ public class AuthEndPoints : ICarterModule
                 return Results.Ok();
             })
             .WithName("ChangePassword")
-            .WithDisplayName("Change Password");
+            .WithSummary("Сменить пароль")
+            .WithDisplayName("Change Password")
+            .Accepts<ChangePasswordRequest>(false, "application/json")
+            .Produces(StatusCodes.Status200OK)
+            .ProducesProblem(StatusCodes.Status400BadRequest);
 
         auth.MapGet("/verify/mail", async (ISender sender, string userId, string confirmationToken) =>
             {
                 await sender.Send(new ConfirmMailCommand(userId, confirmationToken));
                 return Results.Ok();
-            });
+            })
+            .WithName("ConfirmMail")
+            .WithSummary("Подтвердить почту")
+            .WithDescription("Подтверждение почты пользователя")
+            .WithDisplayName("Подтверждение почты")
+            .Produces(StatusCodes.Status200OK)
+            .ProducesProblem(StatusCodes.Status400BadRequest);
 
         auth.MapPost("/login", async (
                 LoginRequest request,
@@ -62,6 +72,8 @@ public class AuthEndPoints : ICarterModule
                 return Results.Ok(result.Adapt<LoginResponse>());
             })
             .WithName("Login")
+            .WithDisplayName("Вход пользователя")
+            .Accepts<LoginRequest>(false, "application/json")
             .Produces<LoginResponse>()
             .ProducesProblem(StatusCodes.Status400BadRequest)
             .ProducesProblem(StatusCodes.Status401Unauthorized)
@@ -74,6 +86,8 @@ public class AuthEndPoints : ICarterModule
                 return Results.Ok(result.Adapt<RefreshTokenResponse>());
             })
             .WithName("RefreshToken")
+            .WithDisplayName("Обновление токена")
+            .Accepts<RefreshTokenRequest>(false, "application/json")
             .Produces<RefreshTokenResponse>()
             .ProducesProblem(StatusCodes.Status400BadRequest)
             .WithSummary("Refresh Token")
@@ -85,6 +99,8 @@ public class AuthEndPoints : ICarterModule
                 return Results.Ok();
             })
             .WithName("RegisterUser")
+            .WithDisplayName("Регистрация пользователя")
+            .Accepts<RegisterRequest>(false, "application/json")
             .Produces<Unit>()
             .ProducesProblem(StatusCodes.Status400BadRequest)
             .WithSummary("Register User")

@@ -28,7 +28,7 @@ public static class UserInfoEndPoints
 {
     public static RouteGroupBuilder MapUserInfoEndPoints(this RouteGroupBuilder users)
     {
-        users.MapPatch("/{userId}/discount/", async (
+        users.MapPatch("/{userId:guid}/discount/", async (
                 ISender sender,
                 Guid userId,
                 ChangeDiscountForUserRequest request,
@@ -37,8 +37,14 @@ public static class UserInfoEndPoints
                 await sender.Send(new ChangeUserDiscountCommand(userId, request.NewDiscountRate), cancellationToken);
                 return Results.Ok();
             })
+            .WithName("ChangeUserDiscount")
+            .WithSummary("Изменить скидку пользователя")
             .WithDescription("Изменение скидки пользователя")
             .WithDisplayName("Поменять скидку")
+            .Accepts<ChangeDiscountForUserRequest>(false, "application/json")
+            .Produces(StatusCodes.Status200OK)
+            .ProducesProblem(StatusCodes.Status400BadRequest)
+            .ProducesProblem(StatusCodes.Status404NotFound)
             .RequireAnyPermission(PermissionCodes.USERS_DISCOUNT_CREATE);
 
         users.MapGet("/{id:guid}/discount", async (ISender sender, Guid id, CancellationToken token) =>
@@ -46,8 +52,12 @@ public static class UserInfoEndPoints
                 var result = await sender.Send(new GetUserDiscountQuery(id), token);
                 return Results.Ok(new GetUserDiscountResponse(result.Discount ?? 0));
             })
+            .WithName("GetUserDiscount")
+            .WithSummary("Получить скидку пользователя")
             .WithDescription("Получение скидки пользователя")
             .WithDisplayName("Получение скидки пользователя")
+            .Produces<GetUserDiscountResponse>()
+            .ProducesProblem(StatusCodes.Status404NotFound)
             .RequireAnyPermission(PermissionCodes.USERS_DISCOUNT_GET);
 
         users.MapPost("/{userId}/mail/corporate", async (
@@ -61,8 +71,14 @@ public static class UserInfoEndPoints
                 string? uri = null;
                 return Results.Created(uri, result.Adapt<CreateMailForUserResponse>());
             })
+            .WithName("CreateUserCorporateMail")
+            .WithSummary("Создать корпоративную почту пользователя")
             .WithDescription("Создание корпоративной почты для пользователя")
             .WithDisplayName("Создание почты для пользователя")
+            .Accepts<CreateMailForUserRequest>(false, "application/json")
+            .Produces<CreateMailForUserResponse>(StatusCodes.Status201Created)
+            .ProducesProblem(StatusCodes.Status400BadRequest)
+            .ProducesProblem(StatusCodes.Status404NotFound)
             .RequireAnyPermission(PermissionCodes.USERS_MAILS_CREATE);
 
         users.MapGet("/{id:guid}/info", async (ISender sender, Guid id, CancellationToken token) =>
@@ -74,8 +90,12 @@ public static class UserInfoEndPoints
                     result.Roles,
                     result.Permissions));
             })
+            .WithName("GetUserFullInfo")
+            .WithSummary("Получить полную информацию пользователя")
             .WithDescription("Получение информации пользователя")
             .WithDisplayName("Получение информации пользователя")
+            .Produces<GetUserFullInfoResponse>()
+            .ProducesProblem(StatusCodes.Status404NotFound)
             .RequireAnyPermission(PermissionCodes.USERS_INFO_GET);
 
         return users;

@@ -61,6 +61,8 @@ public class UsersEndPoints : ICarterModule
                 await sender.Send(new AddPermissionToUserCommand(userId, request.Permission), ct);
                 return Results.NoContent();
             })
+            .WithName("AddPermissionToUser")
+            .WithSummary("Добавить разрешение пользователю")
             .WithDescription("Добавление пользователю разрешение")
             .WithDisplayName("Добавление пользователю разрешение'")
             .Produces(204)
@@ -73,8 +75,13 @@ public class UsersEndPoints : ICarterModule
                 var userId = (await sender.Send(request.Adapt<CreateUserCommand>(), cancellationToken)).UserId;
                 return Results.Created($"users/{userId}", new CreateUserResponse(userId));
             })
+            .WithName("CreateUser")
+            .WithSummary("Создать пользователя")
             .WithDescription("Создание пользователя")
             .WithDisplayName("Создание пользователя")
+            .Accepts<CreateUserRequest>(false, "application/json")
+            .Produces<CreateUserResponse>(StatusCodes.Status201Created)
+            .ProducesProblem(StatusCodes.Status400BadRequest)
             .RequireAnyPermission(PermissionCodes.USERS_CREATE);
 
         users.MapGet("/", async (
@@ -100,8 +107,12 @@ public class UsersEndPoints : ICarterModule
                 var result = await sender.Send(query, token);
                 return Results.Ok(result.Adapt<GetUsersResponse>());
             })
+            .WithName("GetUsers")
+            .WithSummary("Получить пользователей")
             .WithDescription("Получение пользователей")
             .WithDisplayName("Получение пользователей")
+            .Produces<GetUsersResponse>()
+            .ProducesProblem(StatusCodes.Status400BadRequest)
             .RequireAnyPermission(PermissionCodes.USERS_GET);
     }
 }

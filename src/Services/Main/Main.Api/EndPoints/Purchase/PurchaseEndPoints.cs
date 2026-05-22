@@ -80,8 +80,13 @@ public class PurchaseEndPoints : ICarterModule
                 await sender.Send(command, token);
                 return Results.Ok();
             })
+            .WithName("CreatePurchase")
+            .WithSummary("Создать закупку")
             .WithDescription("Создание новой закупки")
             .WithDisplayName("Создание новой закупки")
+            .Accepts<CreatePurchaseRequest>(false, "application/json")
+            .Produces(StatusCodes.Status200OK)
+            .ProducesProblem(StatusCodes.Status400BadRequest)
             .RequireAnyPermission(PermissionCodes.PURCHASE_CREATE);
 
         purchases.MapDelete("/{purchaseId}", async (
@@ -93,11 +98,15 @@ public class PurchaseEndPoints : ICarterModule
                 await sender.Send(new DeleteFullPurchaseCommand(purchaseId, user.UserId), cancellationToken);
                 return Results.NoContent();
             })
+            .WithName("DeletePurchase")
+            .WithSummary("Удалить закупку")
             .WithDescription("Удаление закупки")
             .WithDisplayName("Удаление закупки")
+            .Produces(StatusCodes.Status204NoContent)
+            .ProducesProblem(StatusCodes.Status404NotFound)
             .RequireAnyPermission(PermissionCodes.PURCHASE_DELETE);
 
-        purchases.MapPut("/{purchaseId}", async (
+        purchases.MapPut("/{purchaseId:guid}", async (
                 ISender sender,
                 Guid purchaseId,
                 EditPurchaseRequest request,
@@ -116,8 +125,14 @@ public class PurchaseEndPoints : ICarterModule
                 await sender.Send(command, cancellationToken);
                 return Results.NoContent();
             })
+            .WithName("EditPurchase")
+            .WithSummary("Редактировать закупку")
             .WithDescription("Редактирование существующей закупки")
             .WithDisplayName("Редактирование закупки")
+            .Accepts<EditPurchaseRequest>(false, "application/json")
+            .Produces(StatusCodes.Status204NoContent)
+            .ProducesProblem(StatusCodes.Status400BadRequest)
+            .ProducesProblem(StatusCodes.Status404NotFound)
             .RequireAnyPermission(PermissionCodes.PURCHASE_EDIT);
 
         purchases.MapGet("/{id}/contents", async (ISender sender, string id, CancellationToken ct) =>
@@ -125,8 +140,12 @@ public class PurchaseEndPoints : ICarterModule
                 var result = await sender.Send(new GetPurchaseContentQuery(id), ct);
                 return Results.Ok(result.Adapt<GetPurchaseContentResponse>());
             })
+            .WithName("GetPurchaseContent")
+            .WithSummary("Получить содержимое закупки")
             .WithDescription("Получение содержания закупки")
             .WithDisplayName("Получение содержания закупки")
+            .Produces<GetPurchaseContentResponse>()
+            .ProducesProblem(StatusCodes.Status404NotFound)
             .RequireAnyPermission(PermissionCodes.PURCHASE_GET);
 
         purchases.MapGet("/{id}/logistics", async (ISender sender, string id, CancellationToken token) =>
@@ -134,8 +153,12 @@ public class PurchaseEndPoints : ICarterModule
                 var result = await sender.Send(new GetPurchaseLogisticQuery(id), token);
                 return Results.Ok(new GetPurchaseLogisticResponse(result.PurchaseLogistic));
             })
+            .WithName("GetPurchaseLogistics")
+            .WithSummary("Получить логистику закупки")
             .WithDescription("Получение логистики закупки")
             .WithDisplayName("Получение логистики закупки")
+            .Produces<GetPurchaseLogisticResponse>()
+            .ProducesProblem(StatusCodes.Status404NotFound)
             .RequireAnyPermission(PermissionCodes.PURCHASE_GET);
 
         purchases.MapGet("/", async (
@@ -154,8 +177,12 @@ public class PurchaseEndPoints : ICarterModule
                 var result = await sender.Send(query, token);
                 return Results.Ok(result.Adapt<GetPurchasesResponse>());
             })
+            .WithName("GetPurchases")
+            .WithSummary("Получить закупки")
             .WithDescription("Получение списка покупок")
             .WithDisplayName("Получение покупок")
+            .Produces<GetPurchasesResponse>()
+            .ProducesProblem(StatusCodes.Status400BadRequest)
             .RequireAnyPermission(PermissionCodes.PURCHASE_GET);
     }
 }

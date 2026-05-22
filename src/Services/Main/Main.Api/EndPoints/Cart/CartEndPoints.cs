@@ -34,8 +34,11 @@ public class CartEndPoints : ICarterModule
                 await sender.Send(new AddToCartCommand(user.UserId, request.ArticleId, request.Count), cancellationToken);
                 return Results.NoContent();
             })
+            .WithName("AddCartItem")
+            .WithSummary("Добавить позицию в корзину")
             .WithDescription("Добавление позиции в корзину")
             .WithDisplayName("Добавление позиции в корзину")
+            .Accepts<AddToCartRequest>(false, "application/json")
             .Produces(204)
             .Produces(401)
             .Produces(403)
@@ -43,7 +46,7 @@ public class CartEndPoints : ICarterModule
             .Produces(400)
             .RequireAnyPermission(PermissionCodes.CART_ADD);
 
-        cart.MapPatch("/{articleId}", async (
+        cart.MapPatch("/{articleId:int}", async (
                 ISender sender,
                 IUserContext user,
                 int articleId,
@@ -55,8 +58,11 @@ public class CartEndPoints : ICarterModule
                     cancellationToken);
                 return Results.NoContent();
             })
+            .WithName("ChangeCartItemCount")
+            .WithSummary("Изменить количество позиции корзины")
             .WithDescription("Редактирование позиции в корзине")
             .WithDisplayName("Редактирование позиции в корзине")
+            .Accepts<ChangeCartItemCountRequest>(false, "application/json")
             .Produces(204)
             .Produces(401)
             .Produces(403)
@@ -64,7 +70,7 @@ public class CartEndPoints : ICarterModule
             .Produces(400)
             .RequireAnyPermission(PermissionCodes.CART_UPDATE);
 
-        cart.MapDelete("/{articleId}", async (
+        cart.MapDelete("/{articleId:int}", async (
                 ISender sender,
                 IUserContext user,
                 int articleId,
@@ -73,6 +79,8 @@ public class CartEndPoints : ICarterModule
                 await sender.Send(new DeleteFromCartCommand(user.UserId, articleId), cancellationToken);
                 return Results.NoContent();
             })
+            .WithName("DeleteCartItem")
+            .WithSummary("Удалить позицию корзины")
             .WithDescription("Удалить позицию из корзины")
             .WithDisplayName("Удалить позицию из корзины")
             .Produces(204)
@@ -94,9 +102,12 @@ public class CartEndPoints : ICarterModule
                     cancellationToken);
                 return Results.Ok(new GetCartItemsResponse(result.CartItems));
             })
+            .WithName("GetCartItems")
+            .WithSummary("Получить позиции корзины")
             .WithDescription("Получение позиций корзины")
             .WithDisplayName("Получение позиций корзины")
-            .Produces(200)
+            .Produces<GetCartItemsResponse>()
+            .ProducesProblem(StatusCodes.Status400BadRequest)
             .RequireAnyPermission(PermissionCodes.CART_GET);
     }
 }

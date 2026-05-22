@@ -25,8 +25,12 @@ public class ProductSizeEndPoints : ICarterModule
                 await sender.Send(new DeleteArticleSizesCommand(id), token);
                 return Results.NoContent();
             })
+            .WithName("DeleteProductSize")
+            .WithSummary("Удалить размеры продукта")
             .WithDescription("Удаление размеров артикула.")
             .WithDisplayName("Удаление размеров артикула.")
+            .Produces(StatusCodes.Status204NoContent)
+            .ProducesProblem(StatusCodes.Status404NotFound)
             .RequireAnyPermission(PermissionCodes.ARTICLE_SIZES_DELETE);
 
         sizes.MapGet("", async (ISender sender, int id, CancellationToken token) =>
@@ -34,8 +38,12 @@ public class ProductSizeEndPoints : ICarterModule
                 var result = await sender.Send(new GetProductSizeQuery(id), token);
                 return Results.Ok(new GetProductSizeResponse(result.ProductSize));
             })
+            .WithName("GetProductSize")
+            .WithSummary("Получить размеры продукта")
             .WithDescription("Получение размеров артикула.")
             .WithDisplayName("Получение размеров артикула.")
+            .Produces<GetProductSizeResponse>()
+            .ProducesProblem(StatusCodes.Status404NotFound)
             .RequireAnyPermission(PermissionCodes.ARTICLE_SIZES_GET);
 
         sizes.MapPut("", async (
@@ -48,8 +56,13 @@ public class ProductSizeEndPoints : ICarterModule
                 await sender.Send(command, token);
                 return Results.Created();
             })
+            .WithName("SetProductSize")
+            .WithSummary("Установить размеры продукта")
             .WithDescription("Установка размеров артикула.")
             .WithDisplayName("Установка размеров артикула.")
+            .Accepts<PutProductSizeRequest>(false, "application/json")
+            .Produces(StatusCodes.Status201Created)
+            .ProducesProblem(StatusCodes.Status400BadRequest)
             .RequireAnyPermission(PermissionCodes.ARTICLE_SIZES_CREATE);
     }
 }

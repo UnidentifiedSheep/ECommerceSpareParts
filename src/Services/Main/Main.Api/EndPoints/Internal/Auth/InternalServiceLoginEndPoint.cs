@@ -39,6 +39,11 @@ public class InternalServiceLoginEndPoint : ICarterModule
                 });
             }).WithGroupName("Internal Authentication")
             .WithDisplayName("Internal service login")
-            .WithName("InternalServiceLogin");
+            .WithName("InternalServiceLogin")
+            .WithSummary("Выпустить токен внутреннего сервиса")
+            .WithDescription("Авторизация внутреннего сервиса по секрету")
+            .Accepts<InternalServiceLoginRequest>(false, "application/json")
+            .Produces<InternalServiceLoginResponse>()
+            .ProducesProblem(StatusCodes.Status400BadRequest);
     }
 }

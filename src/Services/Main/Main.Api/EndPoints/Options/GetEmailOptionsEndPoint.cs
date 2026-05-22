@@ -18,8 +18,11 @@ public class GetEmailOptionsEndPoint : ICarterModule
                 var result = await sender.Send(new GetEmailOptionsQuery(), token);
                 return Results.Ok(new GetEmailOptionsResponse(result.EmailOptions));
             }).WithTags("Options")
+            .WithName("GetEmailOptions")
+            .WithSummary("Получить параметры почт")
             .WithDescription("Получение параметров почт")
             .WithDisplayName("Получение параметров почт")
+            .Produces<GetEmailOptionsResponse>()
             .RequireAnyPermission(PermissionCodes.OPTIONS_GET);
     }
 }

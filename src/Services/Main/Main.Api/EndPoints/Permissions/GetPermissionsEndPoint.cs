@@ -24,6 +24,8 @@ public class GetPermissionsEndPoint : ICarterModule
                 var response = new GetPermissionsResponse(result.Permissions);
                 return Results.Ok(response);
             }).WithTags("Permissions")
+            .WithName("GetPermissions")
+            .WithSummary("Получить разрешения")
             .WithDescription("Получение разрешений")
             .WithDisplayName("Получение разрешений")
             .Produces<GetPermissionsResponse>()

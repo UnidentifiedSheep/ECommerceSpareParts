@@ -37,7 +37,7 @@ public class ProducersEndPoints : ICarterModule
         var producers = app.MapGroup("/producers")
             .WithTags("Producers");
 
-        producers.MapPost("/{producerId}/names", async (
+        producers.MapPost("/{producerId:int}/names", async (
                 ISender sender,
                 int producerId,
                 AddOtherNameToProducerRequest request,
@@ -46,11 +46,17 @@ public class ProducersEndPoints : ICarterModule
                 await sender.Send(new AddOtherNameCommand(producerId, request.OtherName, request.WhereUsed), token);
                 return Results.Ok();
             })
+            .WithName("AddProducerOtherName")
+            .WithSummary("Добавить дополнительное имя производителя")
             .WithDisplayName("Добавление дополнительного имени")
             .WithDescription("Добавление дополнительного имени к производителю")
+            .Accepts<AddOtherNameToProducerRequest>(false, "application/json")
+            .Produces(StatusCodes.Status200OK)
+            .ProducesProblem(StatusCodes.Status400BadRequest)
+            .ProducesProblem(StatusCodes.Status404NotFound)
             .RequireAnyPermission(PermissionCodes.PRODUCERS_EDIT);
 
-        producers.MapDelete("/{producerId}/names/{otherName}", async (
+        producers.MapDelete("/{producerId:int}/names/{otherName}", async (
                 ISender sender,
                 int producerId,
                 string otherName,
@@ -60,11 +66,15 @@ public class ProducersEndPoints : ICarterModule
                 await sender.Send(new DeleteOtherNameCommand(producerId, otherName, usage!), cancellationToken);
                 return Results.NoContent();
             })
+            .WithName("DeleteProducerOtherName")
+            .WithSummary("Удалить дополнительное имя производителя")
             .WithDisplayName("Удаление дополнительного имени")
             .WithDescription("Удаление дополнительного имени у производителя")
+            .Produces(StatusCodes.Status204NoContent)
+            .ProducesProblem(StatusCodes.Status404NotFound)
             .RequireAnyPermission(PermissionCodes.PRODUCERS_EDIT);
 
-        producers.MapGet("/{producerId}/names", async (
+        producers.MapGet("/{producerId:int}/names", async (
                 ISender sender,
                 int producerId,
                 int page,
@@ -75,19 +85,29 @@ public class ProducersEndPoints : ICarterModule
                 var result = await sender.Send(query, token);
                 return Results.Ok(result.Adapt<GetProducerOtherNamesResponse>());
             })
+            .WithName("GetProducerOtherNames")
+            .WithSummary("Получить дополнительные имена производителя")
             .WithDisplayName("Получение дополнительных имен производителя")
-            .WithDescription("Дополнительные имена производителя");
+            .WithDescription("Дополнительные имена производителя")
+            .Produces<GetProducerOtherNamesResponse>()
+            .ProducesProblem(StatusCodes.Status400BadRequest)
+            .ProducesProblem(StatusCodes.Status404NotFound);
 
         producers.MapPost("", async (ISender sender, CreateProducerRequest request, CancellationToken token) =>
             {
                 var result = await sender.Send(request.Adapt<CreateProducerCommand>(), token);
                 return Results.Created("/producers", new CreateProducerResponse(result.ProducerId));
             })
+            .WithName("CreateProducer")
+            .WithSummary("Создать производителя")
             .WithDescription("Добавление новых производителей в бд")
             .WithDisplayName("Добавление производителей")
+            .Accepts<CreateProducerRequest>(false, "application/json")
+            .Produces<CreateProducerResponse>(StatusCodes.Status201Created)
+            .ProducesProblem(StatusCodes.Status400BadRequest)
             .RequireAnyPermission(PermissionCodes.PRODUCERS_CREATE);
 
-        producers.MapPatch("/{producerId}", async (
+        producers.MapPatch("/{producerId:int}", async (
                 ISender sender,
                 int producerId,
                 EditProducerRequest request,
@@ -96,17 +116,27 @@ public class ProducersEndPoints : ICarterModule
                 await sender.Send(new EditProducerCommand(producerId, request.EditProducer), cancellationToken);
                 return Results.NoContent();
             })
+            .WithName("EditProducer")
+            .WithSummary("Редактировать производителя")
             .WithDescription("Редактирование производителя")
             .WithDisplayName("Редактирование производителя")
+            .Accepts<EditProducerRequest>(false, "application/json")
+            .Produces(StatusCodes.Status204NoContent)
+            .ProducesProblem(StatusCodes.Status400BadRequest)
+            .ProducesProblem(StatusCodes.Status404NotFound)
             .RequireAnyPermission(PermissionCodes.PRODUCERS_EDIT);
 
-        producers.MapDelete("/{id}", async (ISender sender, int id, CancellationToken cancellationToken) =>
+        producers.MapDelete("/{id:int}", async (ISender sender, int id, CancellationToken cancellationToken) =>
             {
                 await sender.Send(new DeleteProducerCommand(id), cancellationToken);
                 return Results.Ok();
             })
+            .WithName("DeleteProducer")
+            .WithSummary("Удалить производителя")
             .WithDescription("Удаление производителя из бд")
             .WithDisplayName("Удаление производителя")
+            .Produces(StatusCodes.Status200OK)
+            .ProducesProblem(StatusCodes.Status404NotFound)
             .RequireAnyPermission(PermissionCodes.PRODUCERS_DELETE);
 
         producers.MapGet("", async (ISender sender, string? searchTerm, int page, int limit) =>
@@ -114,17 +144,22 @@ public class ProducersEndPoints : ICarterModule
                 var result = await sender.Send(new GetProducersQuery(searchTerm, new Pagination(page, limit)));
                 return Results.Ok(result.Adapt<GetProducersResponse>());
             })
+            .WithName("GetProducers")
+            .WithSummary("Получить производителей")
             .WithDescription("Получение производителей по ключевому слову либо списком")
-            .Produces<GetProducersResponse>();
+            .Produces<GetProducersResponse>()
+            .ProducesProblem(StatusCodes.Status400BadRequest);
 
-        producers.MapGet("/{id}", async (ISender sender, int id) =>
+        producers.MapGet("/{id:int}", async (ISender sender, int id) =>
             {
                 var result = await sender.Send(new GetProducerByIdQuery(id));
                 return Results.Ok(result.Adapt<GetProducerByIdResponse>());
             })
+            .WithName("GetProducerById")
+            .WithSummary("Получить производителя по id")
             .WithDisplayName("Получение производителя по Id")
             .WithDescription("Получение производителя по Id")
             .Produces<GetProducerByIdResponse>()
-            .ProducesProblem(404);
+            .ProducesProblem(StatusCodes.Status404NotFound);
     }
 }

@@ -21,7 +21,7 @@ public static class ProductRelationsEndPoints
 {
     public static RouteGroupBuilder MapProductRelationsEndPoints(this RouteGroupBuilder products)
     {
-        products.MapGet("/{productId}/crosses/", async (
+        products.MapGet("/{productId:int}/crosses/", async (
                 ISender sender,
                 IUserContext user,
                 int productId,
@@ -33,11 +33,16 @@ public static class ProductRelationsEndPoints
                 var response = new GetProductCrossesResponse(result.Crosses, result.RequestedProduct);
                 return Results.Ok(response);
             })
+            .WithName("GetProductCrosses")
+            .WithSummary("Получить кроссы продукта")
             .RequireAllPermissions(PermissionCodes.ARTICLE_CROSSES_GET)
             .WithDescription("Получение кросс номеров по id артикула")
-            .WithDisplayName("Поиск по кросс номерам");
+            .WithDisplayName("Поиск по кросс номерам")
+            .Produces<GetProductCrossesResponse>()
+            .ProducesProblem(StatusCodes.Status400BadRequest)
+            .ProducesProblem(StatusCodes.Status404NotFound);
 
-        products.MapGet("/{productId}/pairs", async (
+        products.MapGet("/{productId:int}/pairs", async (
                 ISender sender,
                 int productId,
                 CancellationToken token) =>
@@ -46,8 +51,11 @@ public static class ProductRelationsEndPoints
                 var result = await sender.Send(query, token);
                 return Results.Ok(new GetProductPairResponse(result.Pair));
             })
+            .WithName("GetProductPairs")
             .WithDescription("Поиск пар артикула")
-            .WithSummary("Поиск пар артикула");
+            .WithSummary("Поиск пар артикула")
+            .Produces<GetProductPairResponse>()
+            .ProducesProblem(StatusCodes.Status404NotFound);
 
         products.MapPost("/crosses", async (
                 ISender sender,
@@ -58,8 +66,11 @@ public static class ProductRelationsEndPoints
                 await sender.Send(command, token);
                 return Results.Created();
             })
+            .WithName("CreateProductCrosses")
+            .WithSummary("Создать кроссы продуктов")
             .WithDescription("Создание кроссировки между артикулами")
             .WithDisplayName("Создание кроссировки")
+            .Accepts<MakeLinkageBetweenProductsRequest>(false, "application/json")
             .Produces(201)
             .ProducesProblem(404)
             .ProducesProblem(400)

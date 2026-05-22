@@ -34,8 +34,13 @@ public class CurrenciesEndPoints : ICarterModule
                 var result = await sender.Send(request.Adapt<CreateCurrencyCommand>(), cancellationToken);
                 return Results.Created($"currencies/{result.Id}", new CreateCurrencyResponse(result.Id));
             })
+            .WithName("CreateCurrency")
+            .WithSummary("Создать валюту")
             .WithDescription("Создание валюты")
             .WithDisplayName("Создание валюты")
+            .Accepts<CreateCurrencyRequest>(false, "application/json")
+            .Produces<CreateCurrencyResponse>(StatusCodes.Status201Created)
+            .ProducesProblem(StatusCodes.Status400BadRequest)
             .RequireAnyPermission(PermissionCodes.CURRENCIES_CREATE);
 
         currencies.MapGet("", async (
@@ -46,17 +51,25 @@ public class CurrenciesEndPoints : ICarterModule
                 var result = await sender.Send(new GetCurrenciesQuery(queryParams), cancellation);
                 return Results.Ok(new GetCurrenciesResponse(result.Currencies));
             })
+            .WithName("GetCurrencies")
+            .WithSummary("Получить валюты")
             .WithDescription("Получение списка валют")
             .WithDisplayName("Получение списка валют")
+            .Produces<GetCurrenciesResponse>()
+            .ProducesProblem(StatusCodes.Status400BadRequest)
             .RequireAnyPermission(PermissionCodes.CURRENCIES_GET);
 
-        currencies.MapGet("/{id}", async (ISender sender, int id, CancellationToken cancellation) =>
+        currencies.MapGet("/{id:int}", async (ISender sender, int id, CancellationToken cancellation) =>
             {
                 var result = await sender.Send(new GetCurrencyByIdQuery(id), cancellation);
                 return Results.Ok(new GetCurrencyByIdResponse(result.Currency));
             })
+            .WithName("GetCurrencyById")
+            .WithSummary("Получить валюту по id")
             .WithDescription("Получение валюты по идентификатору")
             .WithDisplayName("Получение валюты по id")
+            .Produces<GetCurrencyByIdResponse>()
+            .ProducesProblem(StatusCodes.Status404NotFound)
             .RequireAnyPermission(PermissionCodes.CURRENCIES_GET);
     }
 }

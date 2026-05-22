@@ -49,11 +49,16 @@ public class BalancesEndPoints : ICarterModule
                 await sender.Send(command, token);
                 return Results.Ok();
             })
+            .WithName("CreateBalanceTransaction")
+            .WithSummary("Создать транзакцию баланса")
             .WithDescription("Создание транзакции")
             .WithDisplayName("Создание транзакции")
+            .Accepts<CreateTransactionRequest>(false, "application/json")
+            .Produces(StatusCodes.Status200OK)
+            .ProducesProblem(StatusCodes.Status400BadRequest)
             .RequireAnyPermission(PermissionCodes.BALANCES_TRANSACTION_CREATE);
 
-        balances.MapDelete("/transaction/{id}", async (
+        balances.MapDelete("/transaction/{id:guid}", async (
                 ISender sender,
                 IUserContext user,
                 Guid id,
@@ -62,8 +67,12 @@ public class BalancesEndPoints : ICarterModule
                 await sender.Send(new ReverseTransactionCommand(id, user.UserId), token);
                 return Results.Ok();
             })
+            .WithName("DeleteBalanceTransaction")
+            .WithSummary("Отменить транзакцию баланса")
             .WithDescription("Удалить транзакцию")
             .WithDisplayName("Удалить транзакцию")
+            .Produces(StatusCodes.Status200OK)
+            .ProducesProblem(StatusCodes.Status404NotFound)
             .RequireAnyPermission(PermissionCodes.BALANCES_TRANSACTION_DELETE);
 
         balances.MapGet("/transactions", async (
@@ -73,8 +82,12 @@ public class BalancesEndPoints : ICarterModule
             {
                 await Task.CompletedTask;
             })
+            .WithName("GetBalanceTransactions")
+            .WithSummary("Получить транзакции баланса")
             .WithDescription("Получение списка транзакций")
             .WithDisplayName("Получение транзакций")
+            .Produces(StatusCodes.Status200OK)
+            .ProducesProblem(StatusCodes.Status400BadRequest)
             .RequireAnyPermission(PermissionCodes.BALANCES_TRANSACTION_GET_ALL);
     }
 }

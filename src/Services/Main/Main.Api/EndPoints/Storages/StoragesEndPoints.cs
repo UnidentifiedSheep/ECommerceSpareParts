@@ -43,8 +43,11 @@ public class StoragesEndPoints : ICarterModule
                 var result = await sender.Send(request.Adapt<CreateStorageCommand>(), cancellationToken);
                 return Results.Created("/storages/", new CreateStorageResponse(result.Name));
             })
+            .WithName("CreateStorage")
+            .WithSummary("Создать склад")
             .WithDescription("Создание нового склада")
             .WithDisplayName("Создать склад")
+            .Accepts<CreateStorageRequest>(false, "application/json")
             .Produces<CreateStorageResponse>(201)
             .ProducesProblem(400)
             .RequireAnyPermission(PermissionCodes.STORAGES_CREATE);
@@ -57,8 +60,12 @@ public class StoragesEndPoints : ICarterModule
                 await sender.Send(new DeleteStorageCommand(storageName), cancellationToken);
                 return Results.NoContent();
             })
+            .WithName("DeleteStorage")
+            .WithSummary("Удалить склад")
             .WithDescription("Полное удаление склада по его имени")
             .WithDisplayName("Удаление склада")
+            .Produces(StatusCodes.Status204NoContent)
+            .ProducesProblem(StatusCodes.Status404NotFound)
             .RequireAnyPermission(PermissionCodes.STORAGES_DELETE);
 
         storages.MapPatch("/{storageName}", async (
@@ -70,8 +77,14 @@ public class StoragesEndPoints : ICarterModule
                 await sender.Send(new EditStorageCommand(storageName, request.EditStorage), token);
                 return Results.NoContent();
             })
+            .WithName("EditStorage")
+            .WithSummary("Редактировать склад")
             .WithDescription("Редактирование полей склада")
             .WithDisplayName("Редактирование склада")
+            .Accepts<EditStorageRequest>(false, "application/json")
+            .Produces(StatusCodes.Status204NoContent)
+            .ProducesProblem(StatusCodes.Status400BadRequest)
+            .ProducesProblem(StatusCodes.Status404NotFound)
             .RequireAnyPermission(PermissionCodes.STORAGES_EDIT);
 
         storages.MapGet("/", async (
@@ -86,8 +99,11 @@ public class StoragesEndPoints : ICarterModule
                 var result = await sender.Send(query, token);
                 return Results.Ok(result.Adapt<GetStoragesResponse>());
             })
+            .WithName("GetStorages")
+            .WithSummary("Получить склады")
             .WithDescription("Поиск и получение существующих складов")
             .Produces<GetStoragesResponse>()
+            .ProducesProblem(StatusCodes.Status400BadRequest)
             .WithDisplayName("Получение складов")
             .RequireAnyPermission(PermissionCodes.STORAGES_GET);
 
@@ -96,10 +112,12 @@ public class StoragesEndPoints : ICarterModule
                 var result = await sender.Send(new GetStorageByNameQuery(name), token);
                 return Results.Ok(result.Adapt<GetStorageByNameResponse>());
             })
+            .WithName("GetStorageByName")
+            .WithSummary("Получить склад по имени")
             .WithDescription("Получение склада по имени")
             .WithDisplayName("Получение склада по имени")
             .Produces<GetStorageByNameResponse>()
-            .Produces<StorageNotFoundException>(404)
+            .Produces<StorageNotFoundException>(StatusCodes.Status404NotFound)
             .RequireAnyPermission(PermissionCodes.STORAGES_GET);
     }
 }
