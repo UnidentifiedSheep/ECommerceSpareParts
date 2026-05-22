@@ -171,7 +171,7 @@ builder.Services.AddOpenTelemetry()
     });
 
 builder.Services.AddCarter(
-    new DependencyContextAssemblyCatalog(typeof(AddProductContentEndPoint).Assembly),
+    new DependencyContextAssemblyCatalog(typeof(ProductsEndPoints).Assembly),
     c => c.WithEmptyValidators());
 
 var app = builder.Build();

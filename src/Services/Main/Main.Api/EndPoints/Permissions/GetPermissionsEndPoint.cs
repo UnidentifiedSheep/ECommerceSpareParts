@@ -1,6 +1,7 @@
 ﻿using Api.Common.Extensions;
 using Api.Common.Models.Requests;
 using Carter;
+using Enums;
 using Main.Application.Dtos.Auth;
 using Main.Application.Handlers.Auth.GetPermission;
 using MediatR;
@@ -27,6 +28,6 @@ public class GetPermissionsEndPoint : ICarterModule
             .WithDisplayName("Получение разрешений")
             .Produces<GetPermissionsResponse>()
             .ProducesProblem(400)
-            .RequireAnyPermission("PERMISSIONS.GET");
+            .RequireAnyPermission(PermissionCodes.PERMISSIONS_GET);
     }
 }
