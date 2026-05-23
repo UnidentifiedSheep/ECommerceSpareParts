@@ -19,6 +19,7 @@ public class ProducerIndexInitializer(IOpenSearchClient client,
             idx,
             ct => Client.Indices.CreateAsync(idx, c => c
                 .Settings(s => s
+                    .Setting("index.max_ngram_diff", 18)
                     .Analysis(a => a
                         .Tokenizers(t => t
                             .NGram("producer_ngram_tokenizer", nt => nt

@@ -11,6 +11,7 @@ using RabbitMq.Extensions;
 using Search.Abstractions.Options;
 using Search.Application;
 using Search.Application.Consumers;
+using Search.Application.Consumers.Producer;
 using Search.Application.Consumers.Product;
 using Search.Persistence;
 using Security;
@@ -47,6 +48,7 @@ builder.Services.AddMassTransit(x =>
             ep.ConfigureConsumer<ProductSizesUpdatedConsumer>(context);
             ep.ConfigureConsumer<ProductWeightUpdatedConsumer>(context);
             ep.ConfigureConsumer<ProductLinkageUpdatedConsumer>(context);
+            ep.ConfigureConsumer<ProducerUpdatedConsumer>(context);
         });
     });
 });

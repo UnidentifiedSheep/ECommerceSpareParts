@@ -1,16 +1,22 @@
 using Abstractions.Interfaces.Services;
+using Application.Common.Interfaces;
 using Application.Common.Interfaces.Cqrs;
 using Attributes;
+using Contracts.Producer;
 using Main.Application.Interfaces.Persistence;
 using Main.Entities.Exceptions;
 using MediatR;
 
 namespace Main.Application.Handlers.Producers.DeleteProducer;
 
+[AutoSave]
 [Transactional]
 public record DeleteProducerCommand(int Id) : ICommand;
 
-public class DeleteProducerHandler(IProducerRepository repository, IUnitOfWork unitOfWork)
+public class DeleteProducerHandler(
+    IProducerRepository repository, 
+    IUnitOfWork unitOfWork,
+    IIntegrationEventScope integrationEventScope)
     : ICommandHandler<DeleteProducerCommand>
 {
     public async Task<Unit> Handle(DeleteProducerCommand request, CancellationToken cancellationToken)
@@ -22,7 +28,10 @@ public class DeleteProducerHandler(IProducerRepository repository, IUnitOfWork u
         await ValidateData(producerId, cancellationToken);
 
         unitOfWork.Remove(producer);
-        await unitOfWork.SaveChangesAsync(cancellationToken);
+        integrationEventScope.Add(new ProducerUpdatedEvent
+        {
+            Id = request.Id
+        });
         return Unit.Value;
     }
 

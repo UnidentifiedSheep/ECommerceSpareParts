@@ -57,16 +57,13 @@ public class ProducerRepository(
     }
 
     public async Task<IReadOnlyCollection<Producer>> Search(
-        string query,
+        string? query,
         Pagination? pagination = null,
         CancellationToken token = default)
     {
-        if (string.IsNullOrWhiteSpace(query))
-            return [];
-
         var page = pagination ?? DefaultPagination;
         var idx = await CheckInitAndGetIdx(token);
-        var searchQuery = query.Trim();
+        var searchQuery = query?.Trim() ?? "";
 
         var response = await client.SearchAsync<Producer>(
             s => s

@@ -8,7 +8,7 @@ public interface IProducerRepository
     Task UpsertMany(IEnumerable<Entities.Producer> producers, CancellationToken token = default);
     Task<Entities.Producer?> GetById(int id, CancellationToken token = default);
     Task<IReadOnlyCollection<Entities.Producer>> Search(
-        string query,
+        string? query,
         Pagination? pagination = null,
         CancellationToken token = default);
     Task Delete(int id, CancellationToken token = default);
