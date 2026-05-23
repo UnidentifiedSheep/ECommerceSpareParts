@@ -1,6 +1,6 @@
 using Exceptions.Base.Localized;
 
-namespace Main.Entities.Exceptions.Vehicles;
+namespace Main.Entities.Exceptions;
 
 public class PlateNumberAlreadyTakenException(string plateNumber)
     : LocalizedBadRequestException(

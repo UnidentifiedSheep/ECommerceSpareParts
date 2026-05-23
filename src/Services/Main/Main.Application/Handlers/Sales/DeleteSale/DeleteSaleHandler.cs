@@ -2,7 +2,7 @@ using Abstractions.Interfaces.Services;
 using Application.Common.Interfaces.Cqrs;
 using Application.Common.Interfaces.Repositories;
 using Attributes;
-using Main.Entities.Exceptions.Sales;
+using Main.Entities.Exceptions;
 using Main.Entities.Sale;
 
 namespace Main.Application.Handlers.Sales.DeleteSale;

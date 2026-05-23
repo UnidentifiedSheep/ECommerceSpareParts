@@ -2,7 +2,7 @@
 using Application.Common.Interfaces.Cqrs;
 using Application.Common.Interfaces.Repositories;
 using Attributes;
-using Main.Entities.Exceptions.Cart;
+using Main.Entities.Exceptions;
 using MediatR;
 
 namespace Main.Application.Handlers.Cart.DeleteFromCart;

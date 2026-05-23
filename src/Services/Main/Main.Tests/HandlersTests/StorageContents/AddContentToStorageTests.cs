@@ -2,7 +2,7 @@ using Main.Abstractions.Constants;
 using Main.Application.Dtos.Storage;
 using Main.Application.Handlers.StorageContents.AddContent;
 using Main.Entities.Event;
-using Main.Entities.Exceptions.Products;
+using Main.Entities.Exceptions;
 using Main.Entities.Storage;
 using Main.Enums;
 using MediatR;

@@ -7,7 +7,7 @@ using Exceptions.Base;
 using Main.Application.Interfaces.Cache;
 using Main.Application.Interfaces.Services;
 using Main.Entities.Auth;
-using Main.Entities.Exceptions.Auth;
+using Main.Entities.Exceptions;
 using Main.Enums;
 
 namespace Main.Application.Handlers.Auth.RefreshToken;

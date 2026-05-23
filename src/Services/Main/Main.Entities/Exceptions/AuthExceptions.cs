@@ -1,7 +1,7 @@
 using Exceptions.Base.Localized;
 using Main.Enums;
 
-namespace Main.Entities.Exceptions.Auth;
+namespace Main.Entities.Exceptions;
 
 public class InvalidTokenException(string token)
     : LocalizedBadRequestException("invalid.token", new { Token = token });

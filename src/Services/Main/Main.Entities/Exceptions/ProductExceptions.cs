@@ -1,6 +1,6 @@
 using Exceptions.Base.Localized;
 
-namespace Main.Entities.Exceptions.Products;
+namespace Main.Entities.Exceptions;
 
 public class ArticlePairNotFoundException(int articleId)
     : LocalizedNotFoundException("article.pair.not.found", new { ArticleId = articleId });

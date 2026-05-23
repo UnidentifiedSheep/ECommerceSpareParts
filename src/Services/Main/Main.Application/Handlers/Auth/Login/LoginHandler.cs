@@ -10,7 +10,7 @@ using Main.Application.Handlers.Projections;
 using Main.Application.Interfaces.Cache;
 using Main.Application.Interfaces.Persistence;
 using Main.Application.Interfaces.Services;
-using Main.Entities.Exceptions.Auth;
+using Main.Entities.Exceptions;
 using Main.Entities.User;
 using Main.Enums;
 

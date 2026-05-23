@@ -1,6 +1,6 @@
 using FluentAssertions;
 using Main.Application.Handlers.Producers.DeleteOtherName;
-using Main.Entities.Exceptions.Producers;
+using Main.Entities.Exceptions;
 using Main.Entities.Producer;
 using Microsoft.EntityFrameworkCore;
 using Test.Common.Extensions;

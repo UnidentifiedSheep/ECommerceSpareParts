@@ -13,7 +13,7 @@ using Main.Application.Handlers.StorageContents.AddContent;
 using Main.Application.Interfaces.Persistence;
 using Main.Application.Interfaces.Services;
 using Main.Entities.Auth;
-using Main.Entities.Exceptions.Auth;
+using Main.Entities.Exceptions;
 using Main.Entities.Purchase;
 using Main.Entities.Setting;
 using Main.Entities.Storage;

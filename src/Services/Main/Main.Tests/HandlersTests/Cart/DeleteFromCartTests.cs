@@ -1,5 +1,5 @@
 ﻿using Main.Application.Handlers.Cart.DeleteFromCart;
-using Main.Entities.Exceptions.Cart;
+using Main.Entities.Exceptions;
 using Microsoft.EntityFrameworkCore;
 using Test.Common.Extensions;
 using Test.Common.TestContainers.Combined;

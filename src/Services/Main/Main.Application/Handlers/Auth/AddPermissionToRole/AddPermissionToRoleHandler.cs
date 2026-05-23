@@ -4,7 +4,7 @@ using Application.Common.Interfaces.Repositories;
 using Attributes;
 using Contracts.Auth;
 using Main.Entities.Auth;
-using Main.Entities.Exceptions.Auth;
+using Main.Entities.Exceptions;
 using MediatR;
 
 namespace Main.Application.Handlers.Auth.AddPermissionToRole;

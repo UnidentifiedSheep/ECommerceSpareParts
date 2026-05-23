@@ -2,7 +2,7 @@
 using Application.Common.Interfaces.Repositories;
 using Main.Application.Dtos.Product;
 using Main.Application.Handlers.Projections;
-using Main.Entities.Exceptions.Products;
+using Main.Entities.Exceptions;
 using Main.Entities.Product;
 using Microsoft.EntityFrameworkCore;
 

@@ -1,6 +1,6 @@
 using Exceptions.Base.Localized;
 
-namespace Main.Entities.Exceptions.Storages;
+namespace Main.Entities.Exceptions;
 
 public class ChangeOfStorageTypeRestrictedException()
     : LocalizedBadRequestException("storage.type.change.restricted");

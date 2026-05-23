@@ -6,7 +6,7 @@ using Main.Application.Handlers.Logistics.CalculateDeliveryCost;
 using Main.Application.Interfaces.Persistence;
 using Main.Application.Interfaces.Services;
 using Main.Entities.Balance;
-using Main.Entities.Exceptions.Auth;
+using Main.Entities.Exceptions;
 using Main.Entities.Purchase;
 using Main.Enums;
 using MediatR;

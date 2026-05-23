@@ -1,6 +1,6 @@
 using Exceptions.Base.Localized;
 
-namespace Main.Entities.Exceptions.Balances;
+namespace Main.Entities.Exceptions;
 
 public class BadTransactionStatusException(string status)
     : LocalizedBadRequestException(

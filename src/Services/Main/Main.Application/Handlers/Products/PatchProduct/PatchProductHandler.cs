@@ -4,7 +4,7 @@ using Attributes;
 using Contracts.Products;
 using Main.Application.Dtos.Product;
 using Main.Application.Interfaces.Persistence;
-using Main.Entities.Exceptions.Products;
+using Main.Entities.Exceptions;
 using MediatR;
 
 namespace Main.Application.Handlers.Products.PatchProduct;

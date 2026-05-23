@@ -5,7 +5,7 @@ using Attributes;
 using Main.Application.Interfaces.Persistence;
 using Main.Application.Interfaces.Services;
 using Main.Entities.Balance;
-using Main.Entities.Exceptions.Balances;
+using Main.Entities.Exceptions;
 
 namespace Main.Application.Handlers.Balance.ReverseTransaction;
 

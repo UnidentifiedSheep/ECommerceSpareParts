@@ -1,5 +1,5 @@
 ﻿using Application.Common.Interfaces.Repositories;
-using Main.Entities.Exceptions.Purchase;
+using Main.Entities.Exceptions;
 using Main.Entities.Purchase;
 
 namespace Main.Application.Extensions.Repository;

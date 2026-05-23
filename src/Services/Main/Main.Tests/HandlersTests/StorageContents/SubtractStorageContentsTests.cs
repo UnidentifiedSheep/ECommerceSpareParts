@@ -1,7 +1,7 @@
 using FluentAssertions;
 using Main.Application.Handlers.StorageContents.SubtractContent;
 using Main.Entities.Event;
-using Main.Entities.Exceptions.Storages;
+using Main.Entities.Exceptions;
 using Main.Entities.Storage;
 using Main.Enums;
 using Microsoft.EntityFrameworkCore;

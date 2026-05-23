@@ -1,7 +1,7 @@
 ﻿using Application.Common.Interfaces.Settings;
 using Application.Common.Services.Currency;
 using Main.Application.Interfaces.Persistence;
-using Main.Entities.Exceptions.Currencies;
+using Main.Entities.Exceptions;
 using Main.Entities.Setting;
 using ZiggyCreatures.Caching.Fusion;
 

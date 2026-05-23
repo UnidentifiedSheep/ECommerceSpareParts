@@ -1,6 +1,6 @@
 using Exceptions.Base.Localized;
 
-namespace Main.Entities.Exceptions.Purchase;
+namespace Main.Entities.Exceptions;
 
 public class ArticleDoesntMatchContentException(int id)
     : LocalizedBadRequestException(

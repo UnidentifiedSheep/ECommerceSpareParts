@@ -4,7 +4,7 @@ using Application.Common.Interfaces.Cqrs;
 using Attributes;
 using Contracts.User;
 using Main.Application.Interfaces.Persistence;
-using Main.Entities.Exceptions.Auth;
+using Main.Entities.Exceptions;
 using MediatR;
 
 namespace Main.Application.Handlers.Auth.ChangePassword;

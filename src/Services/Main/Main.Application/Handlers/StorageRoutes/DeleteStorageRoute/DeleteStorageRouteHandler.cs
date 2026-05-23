@@ -2,7 +2,7 @@
 using Application.Common.Interfaces.Cqrs;
 using Attributes;
 using Main.Application.Interfaces.Persistence;
-using Main.Entities.Exceptions.Storages;
+using Main.Entities.Exceptions;
 using MediatR;
 
 namespace Main.Application.Handlers.StorageRoutes.DeleteStorageRoute;

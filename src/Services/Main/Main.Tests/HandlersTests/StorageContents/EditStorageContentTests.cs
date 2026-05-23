@@ -1,7 +1,7 @@
 using Abstractions.Models;
 using Main.Application.Dtos.Storage;
 using Main.Application.Handlers.StorageContents.EditContent;
-using Main.Entities.Exceptions.Storages;
+using Main.Entities.Exceptions;
 using Microsoft.EntityFrameworkCore;
 using Test.Common.TestContainers.Combined;
 using Tests.TestContexts.Storage;

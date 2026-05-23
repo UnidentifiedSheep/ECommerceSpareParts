@@ -4,7 +4,7 @@ using LinqKit;
 using Main.Application.Dtos.Users;
 using Main.Application.Handlers.Projections;
 using Main.Application.Interfaces.Cache;
-using Main.Entities.Exceptions.Auth;
+using Main.Entities.Exceptions;
 using Main.Entities.User;
 using Microsoft.EntityFrameworkCore;
 

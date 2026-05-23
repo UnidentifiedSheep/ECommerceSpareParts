@@ -2,7 +2,7 @@ using Cache;
 using FluentAssertions;
 using Main.Application;
 using Main.Application.Interfaces.Cache;
-using Main.Entities.Exceptions.Products;
+using Main.Entities.Exceptions;
 using Microsoft.Extensions.DependencyInjection;
 using Test.Common.TestContainers.Combined;
 using Tests.TestContexts;

@@ -3,7 +3,7 @@ using Application.Common.Interfaces.Cqrs;
 using Application.Common.Interfaces.Repositories;
 using Attributes;
 using Contracts.User;
-using Main.Entities.Exceptions.Auth;
+using Main.Entities.Exceptions;
 using Main.Entities.User;
 using MediatR;
 

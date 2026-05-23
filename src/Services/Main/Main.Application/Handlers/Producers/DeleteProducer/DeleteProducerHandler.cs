@@ -2,7 +2,7 @@ using Abstractions.Interfaces.Services;
 using Application.Common.Interfaces.Cqrs;
 using Attributes;
 using Main.Application.Interfaces.Persistence;
-using Main.Entities.Exceptions.Producers;
+using Main.Entities.Exceptions;
 using MediatR;
 
 namespace Main.Application.Handlers.Producers.DeleteProducer;

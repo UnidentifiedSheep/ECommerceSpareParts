@@ -3,7 +3,7 @@ using Application.Common.Interfaces.Cqrs;
 using Application.Common.Interfaces.Repositories;
 using Attributes;
 using Main.Application.Dtos.Storage;
-using Main.Entities.Exceptions.Storages;
+using Main.Entities.Exceptions;
 using Main.Entities.Storage;
 using MediatR;
 

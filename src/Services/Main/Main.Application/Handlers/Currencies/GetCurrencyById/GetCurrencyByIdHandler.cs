@@ -4,7 +4,7 @@ using LinqKit;
 using Main.Application.Dtos.Currencies;
 using Main.Application.Handlers.Projections;
 using Main.Entities.Currency;
-using Main.Entities.Exceptions.Currencies;
+using Main.Entities.Exceptions;
 using Microsoft.EntityFrameworkCore;
 
 namespace Main.Application.Handlers.Currencies.GetCurrencyById;

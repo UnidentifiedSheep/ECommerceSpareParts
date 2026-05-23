@@ -1,7 +1,7 @@
 ﻿using Application.Common.Interfaces.Cqrs;
 using Application.Common.Interfaces.Repositories;
 using Main.Application.Dtos.Producer;
-using Main.Entities.Exceptions.Producers;
+using Main.Entities.Exceptions;
 using Main.Entities.Producer;
 using Microsoft.EntityFrameworkCore;
 

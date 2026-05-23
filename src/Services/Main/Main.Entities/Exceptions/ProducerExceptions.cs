@@ -1,6 +1,6 @@
 using Exceptions.Base.Localized;
 
-namespace Main.Entities.Exceptions.Producers;
+namespace Main.Entities.Exceptions;
 
 public class CannotDeleteProducerWithArticlesException()
     : LocalizedBadRequestException("producer.with.articles.cannot.be.deleted");

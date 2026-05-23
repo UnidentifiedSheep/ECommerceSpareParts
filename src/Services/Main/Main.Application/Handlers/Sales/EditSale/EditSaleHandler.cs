@@ -5,7 +5,7 @@ using Attributes;
 using Main.Application.Dtos.Sale;
 using Main.Application.Interfaces.Services;
 using Main.Application.Models.Sale;
-using Main.Entities.Exceptions.Sales;
+using Main.Entities.Exceptions;
 using Main.Entities.Sale;
 using MediatR;
 

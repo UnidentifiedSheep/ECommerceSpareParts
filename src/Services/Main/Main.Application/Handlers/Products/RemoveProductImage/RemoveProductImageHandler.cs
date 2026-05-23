@@ -6,7 +6,7 @@ using Application.Common.Interfaces.Repositories;
 using Application.Common.Interfaces.Settings;
 using Attributes;
 using Contracts.Products;
-using Main.Entities.Exceptions.Products;
+using Main.Entities.Exceptions;
 using Main.Entities.Product;
 using Main.Entities.Setting;
 using MediatR;

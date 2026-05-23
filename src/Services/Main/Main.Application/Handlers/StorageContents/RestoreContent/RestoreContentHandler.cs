@@ -9,8 +9,7 @@ using Contracts.StorageContent;
 using Main.Application.Interfaces.Persistence;
 using Main.Application.Models;
 using Main.Entities.Event;
-using Main.Entities.Exceptions.Products;
-using Main.Entities.Exceptions.Storages;
+using Main.Entities.Exceptions;
 using Main.Enums;
 using MediatR;
 

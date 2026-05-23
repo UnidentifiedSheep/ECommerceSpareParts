@@ -8,7 +8,7 @@ using Main.Application.Handlers.Storages.DeleteStorage;
 using Main.Application.Handlers.Storages.EditStorage;
 using Main.Application.Handlers.Storages.GetStorage;
 using Main.Application.Handlers.Storages.GetStorageByName;
-using Main.Entities.Exceptions.Storages;
+using Main.Entities.Exceptions;
 using Main.Enums;
 using Mapster;
 using MediatR;

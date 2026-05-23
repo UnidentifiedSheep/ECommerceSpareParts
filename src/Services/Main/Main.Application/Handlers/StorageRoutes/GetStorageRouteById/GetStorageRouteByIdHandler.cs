@@ -3,7 +3,7 @@ using Application.Common.Interfaces.Repositories;
 using LinqKit;
 using Main.Application.Dtos.Storage;
 using Main.Application.Handlers.Projections;
-using Main.Entities.Exceptions.Storages;
+using Main.Entities.Exceptions;
 using Main.Entities.Storage;
 using Microsoft.EntityFrameworkCore;
 

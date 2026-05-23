@@ -1,7 +1,7 @@
 using Abstractions.Models;
 using Main.Application.Dtos.Storage;
 using Main.Application.Handlers.Storages.EditStorage;
-using Main.Entities.Exceptions.Storages;
+using Main.Entities.Exceptions;
 using Main.Entities.Storage;
 using Main.Enums;
 using Microsoft.EntityFrameworkCore;

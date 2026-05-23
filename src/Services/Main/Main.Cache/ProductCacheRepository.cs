@@ -6,7 +6,7 @@ using Main.Application;
 using Main.Application.Dtos.Product;
 using Main.Application.Extensions.QueryExtensions;
 using Main.Application.Interfaces.Cache;
-using Main.Entities.Exceptions.Products;
+using Main.Entities.Exceptions;
 using Main.Entities.Product;
 using Microsoft.EntityFrameworkCore;
 
