@@ -25,7 +25,7 @@ jobs:
           CLOUD_RU_SECRET_PROJECT_ID: ${{ secrets.CLOUD_RU_SECRET_PROJECT_ID }}
           CLOUD_RU_SECRET_NAMES: ${{ secrets.CLOUD_RU_SECRET_NAMES }}
           CLOUD_RU_SECRET_VERSION: ${{ secrets.CLOUD_RU_SECRET_VERSION }}
-        run: bash scripts/deploy/load-cloud-configs.sh
+        run: python scripts/deploy/load-secrets.py
 
       - name: Prepare deploy payload
         run: |
