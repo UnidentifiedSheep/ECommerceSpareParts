@@ -1,4 +1,4 @@
-namespace Search.Application.Interfaces;
+namespace Search.Application.Interfaces.Product;
 
 public interface IProductIndexSynchronizer
 {

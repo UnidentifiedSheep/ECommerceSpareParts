@@ -3,6 +3,7 @@ using Microsoft.Extensions.Options;
 using OpenSearch.Client;
 using Search.Abstractions.Options;
 using Search.Application.Interfaces;
+using Search.Application.Interfaces.Producer;
 using Search.Entities;
 using Search.Persistence.Interfaces;
 

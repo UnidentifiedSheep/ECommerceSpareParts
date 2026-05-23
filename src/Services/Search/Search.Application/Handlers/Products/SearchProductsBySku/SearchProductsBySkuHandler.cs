@@ -2,6 +2,7 @@
 using Application.Common.Interfaces.Cqrs;
 using Search.Application.Dtos.Products;
 using Search.Application.Interfaces;
+using Search.Application.Interfaces.Product;
 using Search.Application.Mapping;
 
 namespace Search.Application.Handlers.Products.SearchProductsBySku;

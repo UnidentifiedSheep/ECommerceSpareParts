@@ -1,4 +1,5 @@
 using Search.Application.Interfaces;
+using Search.Application.Interfaces.Product;
 
 namespace Search.Application.Services;
 

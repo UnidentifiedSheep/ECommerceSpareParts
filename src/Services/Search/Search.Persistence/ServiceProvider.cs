@@ -4,7 +4,10 @@ using OpenSearch.Client;
 using OpenSearch.Net;
 using Search.Abstractions.Options;
 using Search.Application.Interfaces;
+using Search.Application.Interfaces.Producer;
+using Search.Application.Interfaces.Product;
 using Search.Entities;
+using Search.Persistence.DocumentProviders;
 using Search.Persistence.IndexInitializers;
 using Search.Persistence.Interfaces;
 
@@ -39,6 +42,7 @@ public static class ServiceProvider
         services.AddSingleton<IProductRepository, ProductRepository>();
         services.AddSingleton<IProducerRepository, ProducerRepository>();
         services.AddSingleton<IProductSearchDocumentProvider, MainProductSearchDocumentProvider>();
+        services.AddSingleton<IProducerSearchDocumentProvider, MainProducerSearchDocumentProvider>();
 
 
         services.AddSingleton<IIndexInitializer<Product>, ProductIndexInitializer>();

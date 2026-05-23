@@ -6,6 +6,7 @@ using Search.Application.Interfaces;
 using Search.Entities;
 using Search.Persistence.Interfaces;
 using System.Linq.Expressions;
+using Search.Application.Interfaces.Product;
 
 namespace Search.Persistence;
 

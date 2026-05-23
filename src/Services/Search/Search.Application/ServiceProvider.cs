@@ -2,6 +2,8 @@ using Application.Common;
 using Application.Common.Behaviors;
 using Microsoft.Extensions.DependencyInjection;
 using Search.Application.Interfaces;
+using Search.Application.Interfaces.Producer;
+using Search.Application.Interfaces.Product;
 using Search.Application.Services;
 
 namespace Search.Application;
@@ -22,6 +24,7 @@ public static class ServiceProvider
             ]);
 
         services.AddSingleton<IProductIndexSynchronizer, ProductIndexSynchronizer>();
+        services.AddSingleton<IProducerIndexSynchronizer, ProducerIndexSynchronizer>();
 
         return services;
     }

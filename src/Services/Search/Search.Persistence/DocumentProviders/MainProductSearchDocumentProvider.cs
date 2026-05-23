@@ -1,10 +1,10 @@
 using Extensions;
 using Internal.Integration.Core.Interfaces;
 using Internal.Integration.Core.Models.Main;
-using Search.Application.Interfaces;
+using Search.Application.Interfaces.Product;
 using Search.Entities;
 
-namespace Search.Persistence;
+namespace Search.Persistence.DocumentProviders;
 
 public class MainProductSearchDocumentProvider(
     IMainClient mainClient) : IProductSearchDocumentProvider

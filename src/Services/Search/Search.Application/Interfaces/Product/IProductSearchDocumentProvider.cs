@@ -1,8 +1,6 @@
-using Search.Entities;
-
-namespace Search.Application.Interfaces;
+namespace Search.Application.Interfaces.Product;
 
 public interface IProductSearchDocumentProvider
 {
-    Task<Product?> GetById(int productId, CancellationToken cancellationToken = default);
+    Task<Entities.Product?> GetById(int productId, CancellationToken cancellationToken = default);
 }

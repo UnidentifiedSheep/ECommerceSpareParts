@@ -2,11 +2,11 @@
 
 public class Producer
 {
-    public int Id { get; set; }
+    public int Id { get; init; }
 
-    public required string Name { get; set; }
+    public required string Name { get; init; }
 
-    public string? Description { get; set; }
+    public string? Description { get; init; }
 
-    public List<ProducerOtherName> OtherNames { get; set; } = [];
+    public List<ProducerOtherName> OtherNames { get; init; } = [];
 }
