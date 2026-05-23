@@ -38,7 +38,7 @@ public class ProducerOtherNameConfiguration : IEntityTypeConfiguration<ProducerO
             .HasColumnName("where_used");
 
         builder.HasOne<Entities.Producer.Producer>()
-            .WithMany()
+            .WithMany(x => x.OtherNames)
             .HasForeignKey(d => d.ProducerId)
             .HasConstraintName("producers_other_names_producer_id_fk");
     }

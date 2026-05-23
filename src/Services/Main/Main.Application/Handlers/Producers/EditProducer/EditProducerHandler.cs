@@ -1,5 +1,7 @@
+using Application.Common.Interfaces;
 using Application.Common.Interfaces.Cqrs;
 using Attributes;
+using Contracts.Producer;
 using Main.Application.Dtos.Producer;
 using Main.Application.Interfaces.Persistence;
 using Main.Entities.Exceptions;
@@ -11,7 +13,9 @@ namespace Main.Application.Handlers.Producers.EditProducer;
 [Transactional]
 public record EditProducerCommand(int ProducerId, PatchProducerDto Producer) : ICommand;
 
-public class EditProducerHandler(IProducerRepository repository) : ICommandHandler<EditProducerCommand>
+public class EditProducerHandler(
+    IProducerRepository repository,
+    IIntegrationEventScope integrationEventScope) : ICommandHandler<EditProducerCommand>
 {
     public async Task<Unit> Handle(EditProducerCommand request, CancellationToken cancellationToken)
     {
@@ -20,11 +24,16 @@ public class EditProducerHandler(IProducerRepository repository) : ICommandHandl
 
         var patch = request.Producer;
 
-        if (patch.Name.IsSet && patch.Name.Value != null)
+        if (patch.Name is { IsSet: true, Value: not null })
             producer.SetName(patch.Name.Value);
 
         if (patch.Description.IsSet)
             producer.SetDescription(patch.Description.Value);
+        
+        integrationEventScope.Add(new ProducerUpdatedEvent
+        {
+            Id = producer.Id
+        });
 
         return Unit.Value;
     }

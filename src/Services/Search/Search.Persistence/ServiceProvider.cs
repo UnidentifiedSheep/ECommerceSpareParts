@@ -37,10 +37,12 @@ public static class ServiceProvider
         });
         
         services.AddSingleton<IProductRepository, ProductRepository>();
+        services.AddSingleton<IProducerRepository, ProducerRepository>();
         services.AddSingleton<IProductSearchDocumentProvider, MainProductSearchDocumentProvider>();
 
 
         services.AddSingleton<IIndexInitializer<Product>, ProductIndexInitializer>();
+        services.AddSingleton<IIndexInitializer<Producer>, ProducerIndexInitializer>();
 
         return services;
     }

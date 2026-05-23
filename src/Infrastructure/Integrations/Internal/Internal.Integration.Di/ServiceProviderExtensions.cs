@@ -33,7 +33,7 @@ public static class ServiceProviderExtensions
             client.DefaultRequestHeaders.Add(InternalTokenHeader, options.InternalToken);
         });
 
-        services.AddHttpClient<IMainClient, MainClient>((sp, client) =>
+        services.AddHttpClient<IMainClient, RootClient>((sp, client) =>
         {
             var options = sp.GetRequiredService<IOptions<InternalServicesOptions>>().Value;
             client.BaseAddress = new Uri(options.Main.Url);

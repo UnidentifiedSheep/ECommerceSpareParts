@@ -9,4 +9,6 @@ public interface IMainClient
     Task<decimal> GetCurrencyRate(int currencyId, CancellationToken cancellationToken = default);
 
     Task<InternalFullProduct?> GetFullProduct(int productId, CancellationToken cancellationToken = default);
+
+    Task<InternalFullProducer?> GetFullProducer(int producerId, CancellationToken cancellationToken = default);
 }

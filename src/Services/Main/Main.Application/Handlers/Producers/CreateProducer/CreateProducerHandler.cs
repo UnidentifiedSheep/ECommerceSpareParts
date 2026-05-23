@@ -1,6 +1,8 @@
 using Abstractions.Interfaces.Services;
+using Application.Common.Interfaces;
 using Application.Common.Interfaces.Cqrs;
 using Attributes;
+using Contracts.Producer;
 using Main.Application.Dtos.Producer;
 using Main.Entities.Producer;
 
@@ -11,7 +13,9 @@ public record CreateProducerCommand(NewProducerDto NewProducer) : ICommand<Creat
 
 public record CreateProducerResult(int ProducerId);
 
-public class CreateProducerHandler(IUnitOfWork unitOfWork)
+public class CreateProducerHandler(
+    IUnitOfWork unitOfWork,
+    IIntegrationEventScope integrationEventScope)
     : ICommandHandler<CreateProducerCommand, CreateProducerResult>
 {
     public async Task<CreateProducerResult> Handle(CreateProducerCommand request, CancellationToken cancellationToken)
@@ -20,6 +24,11 @@ public class CreateProducerHandler(IUnitOfWork unitOfWork)
         var producer = Producer.Create(newProducer.Name, newProducer.Description);
         await unitOfWork.AddAsync(producer, cancellationToken);
         await unitOfWork.SaveChangesAsync(cancellationToken);
+        
+        integrationEventScope.Add(new ProducerUpdatedEvent
+        {
+            Id = producer.Id
+        });
 
         return new CreateProducerResult(producer.Id);
     }

@@ -2,7 +2,9 @@ using Abstractions.Models;
 using Application.Common.Extensions;
 using Application.Common.Interfaces.Cqrs;
 using Application.Common.Interfaces.Repositories;
+using LinqKit;
 using Main.Application.Dtos.Producer;
+using Main.Application.Handlers.Projections;
 using Main.Entities.Producer;
 using Microsoft.EntityFrameworkCore;
 
@@ -22,12 +24,8 @@ public class GetProducerOtherNamesHandler(IReadRepository<ProducerOtherName, Pro
     {
         var result = await repository.Query
             .Where(x => x.ProducerId == request.ProducerId)
-            .Select(x => new ProducerOtherNameDto
-            {
-                ProducerId = x.ProducerId,
-                OtherName = x.OtherName,
-                WhereUsed = x.WhereUsed
-            })
+            .AsExpandable()
+            .Select(ProducerProjections.ToOtherNameDto)
             .ApplyPagination(request.Pagination)
             .ToListAsync(cancellationToken);
         return new GetProducerOtherNamesResult(result);

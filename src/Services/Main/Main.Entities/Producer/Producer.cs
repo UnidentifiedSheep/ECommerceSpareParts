@@ -29,6 +29,9 @@ public class Producer : AuditableEntity<Producer, int>, ILinqEntity<Producer, in
 
     public string? Description { get; private set; }
 
+    private readonly List<ProducerOtherName> _otherNames = [];
+    public IReadOnlyCollection<ProducerOtherName> OtherNames => _otherNames;
+
     public static Expression<Func<Producer, int>> GetKeySelector()
     {
         return x => x.Id;

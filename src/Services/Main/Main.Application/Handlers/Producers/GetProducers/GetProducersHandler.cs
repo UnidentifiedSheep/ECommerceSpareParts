@@ -2,7 +2,9 @@ using Abstractions.Models;
 using Application.Common.Extensions;
 using Application.Common.Interfaces.Cqrs;
 using Application.Common.Interfaces.Repositories;
+using LinqKit;
 using Main.Application.Dtos.Producer;
+using Main.Application.Handlers.Projections;
 using Main.Entities.Producer;
 using Microsoft.EntityFrameworkCore;
 
@@ -29,12 +31,8 @@ public class GetProducersHandler(IReadRepository<Producer, int> repository)
 
 
         var result = await query
-            .Select(x => new ProducerDto
-            {
-                Id = x.Id,
-                Name = x.Name,
-                Description = x.Description
-            })
+            .AsExpandable()
+            .Select(ProducerProjections.ToDto)
             .ApplyPagination(request.Pagination)
             .ToListAsync(cancellationToken);
 

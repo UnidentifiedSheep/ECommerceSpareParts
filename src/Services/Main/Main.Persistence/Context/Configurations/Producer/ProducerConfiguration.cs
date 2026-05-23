@@ -30,5 +30,9 @@ public class ProducerConfiguration : IEntityTypeConfiguration<Entities.Producer.
         builder.HasIndex(e => e.Name)
             .HasDatabaseName("producer_name_uindex")
             .IsUnique();
+        
+        builder.Navigation(e => e.OtherNames)
+            .HasField("_otherNames")
+            .UsePropertyAccessMode(PropertyAccessMode.Field);
     }
 }
