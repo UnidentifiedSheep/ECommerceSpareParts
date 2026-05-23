@@ -133,22 +133,24 @@ jobs:
             export PRICING_API_REPLICAS="${PRICING_API_REPLICAS:-1}"
             export ANALYTICS_API_REPLICAS="${ANALYTICS_API_REPLICAS:-1}"
             export ANALYTICS_WORKER_REPLICAS="${ANALYTICS_WORKER_REPLICAS:-1}"
+            export DOCKER_CONFIG="${{ env.SWARM_PATH }}/.docker"
+            mkdir -p "$DOCKER_CONFIG"
 
-            echo '${{ secrets.ARTIFACT_REGISTRY_PASSWORD }}' | docker login \
+            echo '${{ secrets.ARTIFACT_REGISTRY_PASSWORD }}' | sudo --preserve-env=DOCKER_CONFIG docker login \
               '${{ secrets.ARTIFACT_REGISTRY_HOST }}' \
               --username '${{ secrets.ARTIFACT_REGISTRY_USERNAME }}' \
               --password-stdin
 
-            docker compose -f compose.stack.yaml config |
+            sudo docker compose -f compose.stack.yaml config |
               sed '/^name:/d' |
               sed -E 's/^([[:space:]]+published: )"([0-9]+)"$/\1\2/' \
               > compose.stack.rendered.yaml
 
             echo "=== Deploy stack ==="
-            docker stack deploy \
+            sudo docker stack deploy \
               -c compose.stack.rendered.yaml \
               "$STACK_NAME" \
               --with-registry-auth
 
             echo "=== Stack services ==="
-            docker stack services "$STACK_NAME"
+            sudo docker stack services "$STACK_NAME"
