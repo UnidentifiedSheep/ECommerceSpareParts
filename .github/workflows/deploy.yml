@@ -141,13 +141,13 @@ jobs:
               --username '${{ secrets.ARTIFACT_REGISTRY_USERNAME }}' \
               --password-stdin
 
-            sudo docker compose -f compose.stack.yaml config |
+            docker compose -f compose.stack.yaml config |
               sed '/^name:/d' |
               sed -E 's/^([[:space:]]+published: )"([0-9]+)"$/\1\2/' \
               > compose.stack.rendered.yaml
 
             echo "=== Deploy stack ==="
-            sudo docker stack deploy \
+            sudo --preserve-env=DOCKER_CONFIG docker stack deploy \
               -c compose.stack.rendered.yaml \
               "$STACK_NAME" \
               --with-registry-auth
