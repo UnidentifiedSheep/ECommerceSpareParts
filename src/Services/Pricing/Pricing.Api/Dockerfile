@@ -36,10 +36,11 @@ COPY ["src/Infrastructure/Persistence/Persistence.csproj", "src/Infrastructure/P
 RUN dotnet restore "src/Services/Pricing/Pricing.Api/Pricing.Api.csproj"
 COPY . .
 WORKDIR "/src/src/Services/Pricing/Pricing.Api"
+RUN dotnet build "./Pricing.Api.csproj" -c $BUILD_CONFIGURATION -o /app/build
 
 FROM build AS publish
 ARG BUILD_CONFIGURATION=Release
-RUN dotnet publish "./Pricing.Api.csproj" -c $BUILD_CONFIGURATION --no-restore -o /app/publish /p:UseAppHost=false
+RUN dotnet publish "./Pricing.Api.csproj" -c $BUILD_CONFIGURATION -o /app/publish /p:UseAppHost=false
 
 FROM base AS final
 WORKDIR /app

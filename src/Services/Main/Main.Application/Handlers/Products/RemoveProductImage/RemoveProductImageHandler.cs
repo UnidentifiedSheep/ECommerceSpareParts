@@ -33,11 +33,30 @@ public class RemoveProductImageHandler(
         
         unitOfWork.Remove(imageEntity);
 
-        await s3Storage.DeleteFileAsync(applicationSettings.ImageBucketName, request.ImagePath);
+        var objectKey = GetObjectKey(imageEntity, applicationSettings);
+        await s3Storage.DeleteFileAsync(applicationSettings.ImageBucketName, objectKey);
+
         integrationEventScope.Add(new ProductUpdatedEvent
         {
             Id = request.ProductId
         });
         return Unit.Value;
+    }
+
+    private static string GetObjectKey(ProductImage image, GlobalApplicationSettingData settings)
+    {
+        if (!string.IsNullOrWhiteSpace(image.Description))
+            return image.Description;
+
+        if (!Uri.TryCreate(image.Path, UriKind.Absolute, out var uri))
+            return image.Path.TrimStart('/');
+
+        var bucketPrefix = $"/{settings.ImageBucketName}/";
+        var path = uri.AbsolutePath;
+        var bucketIndex = path.IndexOf(bucketPrefix, StringComparison.OrdinalIgnoreCase);
+
+        return bucketIndex >= 0
+            ? path[(bucketIndex + bucketPrefix.Length)..]
+            : path.TrimStart('/');
     }
 }

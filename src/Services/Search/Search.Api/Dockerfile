@@ -33,10 +33,11 @@ COPY ["src/Services/Search/Search.Persistence/Search.Persistence.csproj", "src/S
 RUN dotnet restore "src/Services/Search/Search.Api/Search.Api.csproj"
 COPY . .
 WORKDIR "/src/src/Services/Search/Search.Api"
+RUN dotnet build "./Search.Api.csproj" -c $BUILD_CONFIGURATION -o /app/build
 
 FROM build AS publish
 ARG BUILD_CONFIGURATION=Release
-RUN dotnet publish "./Search.Api.csproj" -c $BUILD_CONFIGURATION --no-restore -o /app/publish /p:UseAppHost=false
+RUN dotnet publish "./Search.Api.csproj" -c $BUILD_CONFIGURATION -o /app/publish /p:UseAppHost=false
 
 FROM base AS final
 WORKDIR /app

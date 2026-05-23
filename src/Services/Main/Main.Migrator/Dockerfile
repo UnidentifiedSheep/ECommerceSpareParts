@@ -27,10 +27,11 @@ COPY ["src/Services/Main/Main.Application/Main.Application.csproj", "src/Service
 RUN dotnet restore "src/Services/Main/Main.Migrator/Main.Migrator.csproj"
 COPY . .
 WORKDIR "/src/src/Services/Main/Main.Migrator"
+RUN dotnet build "./Main.Migrator.csproj" -c $BUILD_CONFIGURATION -o /app/build
 
 FROM build AS publish
 ARG BUILD_CONFIGURATION=Release
-RUN dotnet publish "./Main.Migrator.csproj" -c $BUILD_CONFIGURATION --no-restore -o /app/publish /p:UseAppHost=false
+RUN dotnet publish "./Main.Migrator.csproj" -c $BUILD_CONFIGURATION -o /app/publish /p:UseAppHost=false
 
 FROM base AS final
 WORKDIR /app
