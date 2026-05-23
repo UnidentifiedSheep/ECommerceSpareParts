@@ -210,34 +210,38 @@ render_template() {
   local template="$1"
   local secret_name="${2:-}"
   local secret_encoded="${3:-}"
-  local folder_encoded
-  local project_encoded
-  local depth_encoded
-  local version_encoded
+  python3 - \
+    "$template" \
+    "$SECRET_API_URL" \
+    "${CLOUD_RU_SECRET_PROJECT_ID:-}" \
+    "${SECRET_PREFIX#/}" \
+    "$SECRET_DEPTH" \
+    "$secret_encoded" \
+    "$SECRET_VERSION" <<'PY'
+import sys
+from urllib.parse import quote
 
-  folder_encoded="$(url_encode "${SECRET_PREFIX#/}")"
-  project_encoded="$(url_encode "${CLOUD_RU_SECRET_PROJECT_ID:-}")"
-  depth_encoded="$(url_encode "$SECRET_DEPTH")"
-  version_encoded="$(url_encode "$SECRET_VERSION")"
+template, api, project_id, folder_path, depth, secret_path, version = sys.argv[1:]
 
-  local url="$template"
-  url="${url//\{api\}/$SECRET_API_URL}"
-  url="${url//\{project_id\}/$project_encoded}"
-  url="${url//\{folder_path\}/$folder_encoded}"
-  url="${url//\{depth\}/$depth_encoded}"
-  url="${url//\{secret\}/$secret_encoded}"
-  url="${url//\{secret_path\}/$secret_encoded}"
-  url="${url//\{version\}/$version_encoded}"
+values = {
+    "api": api.rstrip("/"),
+    "project_id": quote(project_id, safe=""),
+    "folder_path": quote(folder_path, safe=""),
+    "depth": quote(depth, safe=""),
+    "secret": secret_path,
+    "secret_path": secret_path,
+    "version": quote(version, safe=""),
+}
 
-  if [ -n "$SECRET_VERSION" ] && [[ "$url" != *"version="* ]]; then
-    if [[ "$url" == *"?"* ]]; then
-      url="${url}&version=${version_encoded}"
-    else
-      url="${url}?version=${version_encoded}"
-    fi
-  fi
+url = template
+for key, value in values.items():
+    url = url.replace("{" + key + "}", value)
 
-  printf '%s' "$url"
+if version and "version=" not in url:
+    url += ("&" if "?" in url else "?") + "version=" + values["version"]
+
+print(url, end="")
+PY
 }
 
 get_token() {
