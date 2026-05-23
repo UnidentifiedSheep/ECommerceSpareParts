@@ -118,6 +118,7 @@ jobs:
             . ./.env
             set +a
 
+            export STACK_NAME='${{ env.STACK_NAME }}'
             export ARTIFACT_REGISTRY_HOST='${{ secrets.ARTIFACT_REGISTRY_HOST }}'
             export IMAGE_TAG='${{ github.sha }}'
             export DOTNET_ENVIRONMENT='Staging'
@@ -126,6 +127,7 @@ jobs:
             export CERTS_PATH='${{ env.SWARM_PATH }}/certs'
             export INIT_PATH='${{ env.SWARM_PATH }}/init'
             export PROMETHEUS_CONFIG_PATH='${{ env.SWARM_PATH }}/prometheus.yml'
+            export TRAEFIK_NETWORK="${TRAEFIK_NETWORK:-${STACK_NAME}_backend-network}"
             export MAIN_API_REPLICAS="${MAIN_API_REPLICAS:-1}"
             export SEARCH_API_REPLICAS="${SEARCH_API_REPLICAS:-1}"
             export PRICING_API_REPLICAS="${PRICING_API_REPLICAS:-1}"
@@ -142,8 +144,8 @@ jobs:
             echo "=== Deploy stack ==="
             docker stack deploy \
               -c compose.stack.rendered.yaml \
-              '${{ env.STACK_NAME }}' \
+              "$STACK_NAME" \
               --with-registry-auth
 
             echo "=== Stack services ==="
-            docker stack services '${{ env.STACK_NAME }}'
+            docker stack services "$STACK_NAME"

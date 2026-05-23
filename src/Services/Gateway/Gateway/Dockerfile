@@ -1,9 +1,9 @@
 ﻿FROM mcr.microsoft.com/dotnet/aspnet:10.0 AS base
 USER $APP_UID
 WORKDIR /app
-EXPOSE 7292
+EXPOSE 8080
 
-ENV ASPNETCORE_URLS=https://+:7292
+ENV ASPNETCORE_URLS=http://+:8080
 ENV TZ=Europe/Moscow
 
 FROM mcr.microsoft.com/dotnet/sdk:10.0 AS build

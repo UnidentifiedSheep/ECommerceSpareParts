@@ -1,11 +1,42 @@
 services:
-  gateway:
-    image: ${ARTIFACT_REGISTRY_HOST}/gateway:${IMAGE_TAG}
+  traefik:
+    image: traefik:v3.6
+    command:
+      - --providers.swarm=true
+      - --providers.swarm.exposedbydefault=false
+      - --providers.swarm.network=${TRAEFIK_NETWORK:-ecommerce_backend-network}
+      - --entrypoints.web.address=:80
+      - --entrypoints.websecure.address=:443
+      - --entrypoints.web.http.redirections.entrypoint.to=websecure
+      - --entrypoints.web.http.redirections.entrypoint.scheme=https
+      - --certificatesresolvers.letsencrypt.acme.email=${TRAEFIK_ACME_EMAIL:?TRAEFIK_ACME_EMAIL is required}
+      - --certificatesresolvers.letsencrypt.acme.storage=/letsencrypt/acme.json
+      - --certificatesresolvers.letsencrypt.acme.httpchallenge=true
+      - --certificatesresolvers.letsencrypt.acme.httpchallenge.entrypoint=web
     ports:
-      - target: 7292
+      - target: 80
+        published: 80
+        protocol: tcp
+        mode: host
+      - target: 443
         published: 443
         protocol: tcp
         mode: host
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+      - traefik_letsencrypt:/letsencrypt
+    networks:
+      - backend-network
+    deploy:
+      replicas: 1
+      placement:
+        constraints:
+          - node.labels.gateway == true
+      restart_policy:
+        condition: any
+
+  gateway:
+    image: ${ARTIFACT_REGISTRY_HOST}/gateway:${IMAGE_TAG}
     volumes:
       - ${CERTS_PATH:-/opt/ecommerce/certs}:/app/certs:ro
       - ${CONFIGS_PATH:-/opt/ecommerce/configs}:/app/configs:ro
@@ -19,6 +50,12 @@ services:
       placement:
         constraints:
           - node.labels.gateway == true
+      labels:
+        - traefik.enable=true
+        - traefik.http.routers.gateway.rule=Host(`${GATEWAY_HOST:?GATEWAY_HOST is required}`)
+        - traefik.http.routers.gateway.entrypoints=websecure
+        - traefik.http.routers.gateway.tls.certresolver=letsencrypt
+        - traefik.http.services.gateway.loadbalancer.server.port=7292
       update_config:
         parallelism: 1
         order: start-first
@@ -220,6 +257,12 @@ services:
       placement:
         constraints:
           - node.labels.monitoring == true
+      labels:
+        - traefik.enable=true
+        - traefik.http.routers.opensearch-dashboards.rule=Host(`${OPENSEARCH_DASHBOARDS_HOST:?OPENSEARCH_DASHBOARDS_HOST is required}`)
+        - traefik.http.routers.opensearch-dashboards.entrypoints=websecure
+        - traefik.http.routers.opensearch-dashboards.tls.certresolver=letsencrypt
+        - traefik.http.services.opensearch-dashboards.loadbalancer.server.port=5601
       restart_policy:
         condition: any
 
@@ -311,15 +354,23 @@ services:
       placement:
         constraints:
           - node.labels.monitoring == true
+      labels:
+        - traefik.enable=true
+        - traefik.http.routers.grafana.rule=Host(`${GRAFANA_HOST:?GRAFANA_HOST is required}`)
+        - traefik.http.routers.grafana.entrypoints=websecure
+        - traefik.http.routers.grafana.tls.certresolver=letsencrypt
+        - traefik.http.services.grafana.loadbalancer.server.port=3000
       restart_policy:
         condition: any
 
 networks:
   backend-network:
+    name: ${TRAEFIK_NETWORK:-ecommerce_backend-network}
     driver: overlay
     attachable: true
 
 volumes:
+  traefik_letsencrypt:
   pg_data:
   redis_data:
   rabbitmq_data:
