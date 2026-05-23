@@ -140,6 +140,7 @@ jobs:
               --password-stdin
 
             docker compose -f compose.stack.yaml config |
+              sed '/^name:/d' |
               sed -E 's/^([[:space:]]+published: )"([0-9]+)"$/\1\2/' \
               > compose.stack.rendered.yaml
 
