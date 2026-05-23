@@ -46,29 +46,21 @@ jobs:
               --username '${{ secrets.ARTIFACT_REGISTRY_USERNAME }}' \
               --password-stdin
 
-            COMPOSE_FILES="-f compose.yaml -f compose.registry.yaml"
-            INFRA_SERVICES="pgql redis rabbitmq minio"
-            APP_SERVICES="main.api search.api pricing.api gateway analytics.api analytics.worker"
-
             docker compose -f compose.yaml -f compose.registry.yaml down
-
-            echo "=== Pull pgql image ==="
-            docker compose $COMPOSE_FILES pull pgql
 
             echo "=== Pull migrator images ==="
             docker compose -f migrator-compose.yaml -f migrator-compose.registry.yaml pull
 
             echo "=== Start app infra ==="
-            docker compose $COMPOSE_FILES up -d --no-build --no-deps $INFRA_SERVICES
-            docker compose $COMPOSE_FILES up -d --no-build minio-init
+            docker compose -f compose.yaml -f compose.registry.yaml up pgql -d --no-build
 
             echo "=== Run migrators ==="
             docker compose -f migrator-compose.yaml -f migrator-compose.registry.yaml up --no-build
 
             echo "=== Pull app images ==="
-            docker compose $COMPOSE_FILES pull $APP_SERVICES
+            docker compose -f compose.yaml -f compose.registry.yaml pull
 
             echo "=== Restart app ==="
-            docker compose $COMPOSE_FILES up -d --no-build --no-deps $APP_SERVICES
+            docker compose -f compose.yaml -f compose.registry.yaml up -d --no-build
 
             echo "=== Done ==="
