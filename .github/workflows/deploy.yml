@@ -139,7 +139,9 @@ jobs:
               --username '${{ secrets.ARTIFACT_REGISTRY_USERNAME }}' \
               --password-stdin
 
-            docker compose -f compose.stack.yaml config > compose.stack.rendered.yaml
+            docker compose -f compose.stack.yaml config |
+              sed -E 's/^([[:space:]]+published: )"([0-9]+)"$/\1\2/' \
+              > compose.stack.rendered.yaml
 
             echo "=== Deploy stack ==="
             docker stack deploy \
