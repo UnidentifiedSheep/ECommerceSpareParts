@@ -79,7 +79,7 @@ jobs:
           chmod 600 swarm_key.pem
           ssh-keygen -y -f swarm_key.pem > /dev/null
 
-          SSH_OPTS="-i swarm_key.pem -o BatchMode=yes -o IdentitiesOnly=yes -o StrictHostKeyChecking=no -o ConnectTimeout=20"
+          SSH_OPTS="-i swarm_key.pem -o BatchMode=yes -o IdentitiesOnly=yes -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -o LogLevel=ERROR -o ConnectTimeout=20"
 
           for host in $SWARM_WORKER_HOSTS; do
             user="$SWARM_SSH_USER"
@@ -90,7 +90,7 @@ jobs:
               target_host="${host#*@}"
             fi
 
-            echo "Uploading shared configs to $user@$target_host"
+            echo "Uploading shared configs to worker node"
 
             ssh $SSH_OPTS "$user@$target_host" \
               "mkdir -p '${SWARM_PATH}' && rm -rf '${SWARM_PATH}/configs' '${SWARM_PATH}/init' && mkdir -p '${SWARM_PATH}/configs' '${SWARM_PATH}/init' '${SWARM_PATH}/certs'"
@@ -126,15 +126,22 @@ jobs:
             export CERTS_PATH='${{ env.SWARM_PATH }}/certs'
             export INIT_PATH='${{ env.SWARM_PATH }}/init'
             export PROMETHEUS_CONFIG_PATH='${{ env.SWARM_PATH }}/prometheus.yml'
+            export MAIN_API_REPLICAS="${MAIN_API_REPLICAS:-1}"
+            export SEARCH_API_REPLICAS="${SEARCH_API_REPLICAS:-1}"
+            export PRICING_API_REPLICAS="${PRICING_API_REPLICAS:-1}"
+            export ANALYTICS_API_REPLICAS="${ANALYTICS_API_REPLICAS:-1}"
+            export ANALYTICS_WORKER_REPLICAS="${ANALYTICS_WORKER_REPLICAS:-1}"
 
             echo '${{ secrets.ARTIFACT_REGISTRY_PASSWORD }}' | docker login \
               '${{ secrets.ARTIFACT_REGISTRY_HOST }}' \
               --username '${{ secrets.ARTIFACT_REGISTRY_USERNAME }}' \
               --password-stdin
 
+            docker compose -f compose.stack.yaml config > compose.stack.rendered.yaml
+
             echo "=== Deploy stack ==="
             docker stack deploy \
-              -c compose.stack.yaml \
+              -c compose.stack.rendered.yaml \
               '${{ env.STACK_NAME }}' \
               --with-registry-auth
 
