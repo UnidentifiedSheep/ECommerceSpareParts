@@ -225,8 +225,8 @@
       mc alias set local http://minio:9000 ${MINIO_ROOT_USER} ${MINIO_ROOT_PASSWORD};
       mc mb -p local/${MINIO_IMAGES_BUCKET};
       mc anonymous set public local/${MINIO_IMAGES_BUCKET};
-      mc ${MINIO_ROOT_USER} user add local ${MINIO_SERVICE_USER} ${MINIO_SERVICE_PASSWORD};
-      mc ${MINIO_ROOT_USER} policy attach local readwrite --user ${MINIO_SERVICE_USER};
+      mc admin user add local ${MINIO_SERVICE_USER} ${MINIO_SERVICE_PASSWORD};
+      mc admin policy attach local readwrite --user ${MINIO_SERVICE_USER};
       exit 0;
       "
     networks:

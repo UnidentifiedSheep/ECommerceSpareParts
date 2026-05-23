@@ -2,6 +2,7 @@ using Api.Common.Extensions;
 using Api.Common.Models;
 using Enums;
 using Main.Application.Handlers.Products.MapImgsToProduct;
+using Main.Application.Handlers.Products.RemoveProductImage;
 using MediatR;
 
 namespace Main.Api.EndPoints.Products;
@@ -30,6 +31,26 @@ public static class ProductImagesEndPoints
             .ProducesProblem(400)
             .ProducesProblem(404)
             .RequireAnyPermission(PermissionCodes.ARTICLE_IMAGES_CREATE);
+        
+        products.MapDelete("/{productId:int}/imgs/{imagePath}", async (
+                ISender sender,
+                int productId,
+                string imagePath,
+                CancellationToken token) =>
+            {
+                var command = new RemoveProductImageCommand(productId, imagePath);
+                await sender.Send(command, token);
+                return Results.NoContent();
+            })
+            .DisableAntiforgery()
+            .WithMetadata()
+            .WithName("DeleteProductImage")
+            .WithSummary("Удаление изображения продукта")
+            .WithDescription("Удаление изображений продукта")
+            .Produces(204)
+            .ProducesProblem(400)
+            .ProducesProblem(404)
+            .RequireAnyPermission(PermissionCodes.ARTICLE_IMAGES_DELETE);
 
         return products;
     }

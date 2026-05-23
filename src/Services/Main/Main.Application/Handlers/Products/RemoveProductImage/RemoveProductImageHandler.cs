@@ -1,0 +1,43 @@
+﻿using Abstractions.Interfaces;
+using Abstractions.Interfaces.Services;
+using Application.Common.Interfaces;
+using Application.Common.Interfaces.Cqrs;
+using Application.Common.Interfaces.Repositories;
+using Application.Common.Interfaces.Settings;
+using Attributes;
+using Contracts.Products;
+using Main.Entities.Exceptions.Products;
+using Main.Entities.Product;
+using Main.Entities.Setting;
+using MediatR;
+
+namespace Main.Application.Handlers.Products.RemoveProductImage;
+
+[Transactional, AutoSave]
+public record RemoveProductImageCommand(int ProductId, string ImagePath) : ICommand;
+
+public class RemoveProductImageHandler(
+    IS3StorageService s3Storage,
+    IUnitOfWork unitOfWork,
+    ISettingsService settingsService,
+    IRepository<ProductImage, (int, string)> repository,
+    IIntegrationEventScope integrationEventScope) : ICommandHandler<RemoveProductImageCommand>
+{
+    public async Task<Unit> Handle(RemoveProductImageCommand request, CancellationToken cancellationToken)
+    {
+        var applicationSettings =
+            (await settingsService.GetOrDefault<GlobalApplicationSetting>(cancellationToken)).Data;
+
+        var imageEntity = await repository.GetById((request.ProductId, request.ImagePath), cancellationToken)
+                          ?? throw new ProductImageNotFoundException(request.ProductId, request.ImagePath);
+        
+        unitOfWork.Remove(imageEntity);
+
+        await s3Storage.DeleteFileAsync(applicationSettings.ImageBucketName, request.ImagePath);
+        integrationEventScope.Add(new ProductUpdatedEvent
+        {
+            Id = request.ProductId
+        });
+        return Unit.Value;
+    }
+}

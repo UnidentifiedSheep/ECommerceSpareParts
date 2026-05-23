@@ -51,6 +51,7 @@
     "article.weight.must.be.greater.than.zero": "Вес должен быть больше 0.",
     "article.weight.max.two.decimals": "Вес может содержать не более двух знаков после запятой.",
     "article.reservation.search.term.min.length": "Поисковая строка должна содержать минимум 3 символа.",
-    "article.reservation.similarity.range": "Уровень схожести должен быть от 0 до 1."
+    "article.reservation.similarity.range": "Уровень схожести должен быть от 0 до 1.",
+    "article.image.not.found": "Не удалось найти указанное изображение продукта."
   }
 }
