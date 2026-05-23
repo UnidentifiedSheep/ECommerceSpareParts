@@ -2,7 +2,7 @@ using Contracts.Products;
 using MassTransit;
 using Search.Application.Interfaces;
 
-namespace Search.Application.Consumers;
+namespace Search.Application.Consumers.Product;
 
 public class ProductSizesUpdatedConsumer(
     IProductIndexSynchronizer productIndexSynchronizer) : IConsumer<ProductSizesUpdatedEvent>

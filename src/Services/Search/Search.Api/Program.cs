@@ -11,6 +11,7 @@ using RabbitMq.Extensions;
 using Search.Abstractions.Options;
 using Search.Application;
 using Search.Application.Consumers;
+using Search.Application.Consumers.Product;
 using Search.Persistence;
 using Security;
 
@@ -31,7 +32,7 @@ builder.Services.AddCommonApiInfrastructure();
 
 builder.Services.AddMassTransit(x =>
 {
-    x.AddConsumers(Assembly.GetAssembly(typeof(ProductCreatedConsumer)));
+    x.AddConsumers(Assembly.GetAssembly(typeof(ProductUpdatedConsumer)));
 
     x.UsingRabbitMq((context, cfg) =>
     {
@@ -40,7 +41,7 @@ builder.Services.AddMassTransit(x =>
         cfg.ReceiveEndpoint("search-queue", ep =>
         {
             ep.Durable = true;
-            ep.ConfigureConsumer<ProductCreatedConsumer>(context);
+            
             ep.ConfigureConsumer<ProductUpdatedConsumer>(context);
             ep.ConfigureConsumer<ProductDeletedConsumer>(context);
             ep.ConfigureConsumer<ProductSizesUpdatedConsumer>(context);

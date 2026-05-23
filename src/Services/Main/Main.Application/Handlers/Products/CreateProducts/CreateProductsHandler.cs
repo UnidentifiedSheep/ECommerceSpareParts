@@ -42,7 +42,7 @@ public class CreateProductsHandler(
     private async Task PublishEvent(List<Product> products, CancellationToken cancellationToken)
     {
         foreach (var product in products)
-            integrationEventScope.Add(new ProductCreatedEvent
+            integrationEventScope.Add(new ProductUpdatedEvent()
             {
                 Id = product.Id
             });
