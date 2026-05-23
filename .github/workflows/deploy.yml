@@ -7,60 +7,123 @@ jobs:
   deploy:
     runs-on: ubuntu-latest
 
+    env:
+      CLOUD_RU_SECRET_PREFIX: ${{ secrets.CLOUD_RU_SECRET_PREFIX || '/appsettings' }}
+      CLOUD_RU_CONFIGS_OUT: ./configs
+      CLOUD_RU_SECRET_DEPTH: ${{ secrets.CLOUD_RU_SECRET_DEPTH || '-1' }}
+      SWARM_PATH: ${{ secrets.SWARM_PATH || '/opt/ecommerce' }}
+      STACK_NAME: ${{ secrets.SWARM_STACK_NAME || 'ecommerce' }}
+
     steps:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Install rsync
-        run: sudo apt-get update && sudo apt-get install -y rsync
+      - name: Load Cloud.ru configs
+        env:
+          CLOUD_RU_KEY_ID: ${{ secrets.ARTIFACT_REGISTRY_USERNAME }}
+          CLOUD_RU_KEY_SECRET: ${{ secrets.ARTIFACT_REGISTRY_PASSWORD }}
+          CLOUD_RU_SECRET_PROJECT_ID: ${{ secrets.CLOUD_RU_SECRET_PROJECT_ID }}
+          CLOUD_RU_SECRET_NAMES: ${{ secrets.CLOUD_RU_SECRET_NAMES }}
+          CLOUD_RU_SECRET_VERSION: ${{ secrets.CLOUD_RU_SECRET_VERSION }}
+        run: bash scripts/deploy/load-cloud-configs.sh
 
-      - name: Copy all files except /src
+      - name: Prepare deploy payload
         run: |
-          echo "${{ secrets.VPS_SSH_KEY }}" > key.pem
-          chmod 600 key.pem
+          mkdir -p deploy-payload/configs deploy-payload/init
 
-          rsync -avz \
-            --exclude 'src/' \
-            --exclude '.git/' \
-            -e "ssh -i key.pem -o StrictHostKeyChecking=no" \
-            ./ ${{ secrets.VPS_USER }}@${{ secrets.VPS_HOST }}:${{ secrets.VPS_PATH }}
+          cp compose.stack.yaml deploy-payload/compose.stack.yaml
+          cp prometheus.yml deploy-payload/prometheus.yml
+          cp -R configs/. deploy-payload/configs/
+          cp -R init/. deploy-payload/init/
 
-      - name: Deploy on server
+      - name: Prepare leader directory
         uses: appleboy/ssh-action@v1.2.5
         with:
-          host: ${{ secrets.VPS_HOST }}
-          username: ${{ secrets.VPS_USER }}
-          key: ${{ secrets.VPS_SSH_KEY }}
+          host: ${{ secrets.SWARM_LEADER_HOST }}
+          username: ${{ secrets.SWARM_SSH_USER }}
+          key: ${{ secrets.SWARM_SSH_KEY }}
           script: |
             set -e
 
-            cd ${{ secrets.VPS_PATH }}
+            mkdir -p '${{ env.SWARM_PATH }}'
+            cd '${{ env.SWARM_PATH }}'
+
+            rm -rf configs init
+            mkdir -p configs init certs
+
+      - name: Upload stack files to leader
+        uses: appleboy/scp-action@v0.1.7
+        with:
+          host: ${{ secrets.SWARM_LEADER_HOST }}
+          username: ${{ secrets.SWARM_SSH_USER }}
+          key: ${{ secrets.SWARM_SSH_KEY }}
+          source: "deploy-payload/*"
+          target: ${{ env.SWARM_PATH }}
+          strip_components: 1
+          overwrite: true
+
+      - name: Upload shared configs to worker nodes
+        env:
+          SWARM_WORKER_HOSTS: ${{ secrets.SWARM_WORKER_HOSTS }}
+          SWARM_SSH_USER: ${{ secrets.SWARM_SSH_USER }}
+          SWARM_SSH_KEY: ${{ secrets.SWARM_SSH_KEY }}
+        run: |
+          set -e
+
+          if [ -z "$SWARM_WORKER_HOSTS" ]; then
+            echo "SWARM_WORKER_HOSTS is empty, skipping worker upload."
+            exit 0
+          fi
+
+          echo "$SWARM_SSH_KEY" > swarm_key.pem
+          chmod 600 swarm_key.pem
+
+          for host in $SWARM_WORKER_HOSTS; do
+            ssh -i swarm_key.pem -o StrictHostKeyChecking=no "$SWARM_SSH_USER@$host" \
+              "mkdir -p '${SWARM_PATH}' && rm -rf '${SWARM_PATH}/configs' '${SWARM_PATH}/init' && mkdir -p '${SWARM_PATH}/configs' '${SWARM_PATH}/init' '${SWARM_PATH}/certs'"
+
+            scp -i swarm_key.pem -o StrictHostKeyChecking=no -r \
+              deploy-payload/configs deploy-payload/init deploy-payload/prometheus.yml \
+              "$SWARM_SSH_USER@$host:${SWARM_PATH}/"
+          done
+
+      - name: Deploy stack
+        uses: appleboy/ssh-action@v1.2.5
+        with:
+          host: ${{ secrets.SWARM_LEADER_HOST }}
+          username: ${{ secrets.SWARM_SSH_USER }}
+          key: ${{ secrets.SWARM_SSH_KEY }}
+          script: |
+            set -e
+
+            cd '${{ env.SWARM_PATH }}'
+
+            printf '%s\n' '${{ secrets.SWARM_ENV }}' > .env
+            chmod 600 .env
+
+            set -a
+            . ./.env
+            set +a
 
             export ARTIFACT_REGISTRY_HOST='${{ secrets.ARTIFACT_REGISTRY_HOST }}'
             export IMAGE_TAG='${{ github.sha }}'
             export DOTNET_ENVIRONMENT='Staging'
             export ASPNETCORE_ENVIRONMENT='Staging'
+            export CONFIGS_PATH='${{ env.SWARM_PATH }}/configs'
+            export CERTS_PATH='${{ env.SWARM_PATH }}/certs'
+            export INIT_PATH='${{ env.SWARM_PATH }}/init'
+            export PROMETHEUS_CONFIG_PATH='${{ env.SWARM_PATH }}/prometheus.yml'
 
             echo '${{ secrets.ARTIFACT_REGISTRY_PASSWORD }}' | docker login \
               '${{ secrets.ARTIFACT_REGISTRY_HOST }}' \
               --username '${{ secrets.ARTIFACT_REGISTRY_USERNAME }}' \
               --password-stdin
 
-            docker compose -f compose.yaml -f compose.registry.yaml down
+            echo "=== Deploy stack ==="
+            docker stack deploy \
+              -c compose.stack.yaml \
+              '${{ env.STACK_NAME }}' \
+              --with-registry-auth
 
-            echo "=== Pull migrator images ==="
-            docker compose -f migrator-compose.yaml -f migrator-compose.registry.yaml pull
-
-            echo "=== Start app infra ==="
-            docker compose -f compose.yaml -f compose.registry.yaml up pgql -d --no-build
-
-            echo "=== Run migrators ==="
-            docker compose -f migrator-compose.yaml -f migrator-compose.registry.yaml up --no-build
-
-            echo "=== Pull app images ==="
-            docker compose -f compose.yaml -f compose.registry.yaml pull
-
-            echo "=== Restart app ==="
-            docker compose -f compose.yaml -f compose.registry.yaml up -d --no-build
-
-            echo "=== Done ==="
+            echo "=== Stack services ==="
+            docker stack services '${{ env.STACK_NAME }}'

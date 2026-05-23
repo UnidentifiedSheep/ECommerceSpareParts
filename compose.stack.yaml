@@ -1,0 +1,329 @@
+services:
+  gateway:
+    image: ${ARTIFACT_REGISTRY_HOST}/gateway:${IMAGE_TAG}
+    ports:
+      - target: 7292
+        published: 443
+        protocol: tcp
+        mode: host
+    volumes:
+      - ${CERTS_PATH:-/opt/ecommerce/certs}:/app/certs:ro
+      - ${CONFIGS_PATH:-/opt/ecommerce/configs}:/app/configs:ro
+    environment:
+      - DOTNET_ENVIRONMENT=${DOTNET_ENVIRONMENT:-Staging}
+      - ASPNETCORE_ENVIRONMENT=${ASPNETCORE_ENVIRONMENT:-Staging}
+    networks:
+      - backend-network
+    deploy:
+      replicas: 1
+      placement:
+        constraints:
+          - node.labels.gateway == true
+      update_config:
+        parallelism: 1
+        order: start-first
+      restart_policy:
+        condition: any
+
+  main.api:
+    image: ${ARTIFACT_REGISTRY_HOST}/main-api:${IMAGE_TAG}
+    volumes:
+      - ${CONFIGS_PATH:-/opt/ecommerce/configs}:/app/configs:ro
+    environment:
+      - DOTNET_ENVIRONMENT=${DOTNET_ENVIRONMENT:-Staging}
+      - ASPNETCORE_ENVIRONMENT=${ASPNETCORE_ENVIRONMENT:-Staging}
+    networks:
+      - backend-network
+    deploy:
+      replicas: ${MAIN_API_REPLICAS:-1}
+      placement:
+        constraints:
+          - node.labels.role == app
+      update_config:
+        parallelism: 1
+        order: start-first
+      restart_policy:
+        condition: any
+
+  search.api:
+    image: ${ARTIFACT_REGISTRY_HOST}/search-api:${IMAGE_TAG}
+    volumes:
+      - search_api_data:/app/data
+      - ${CONFIGS_PATH:-/opt/ecommerce/configs}:/app/configs:ro
+    environment:
+      - DOTNET_ENVIRONMENT=${DOTNET_ENVIRONMENT:-Staging}
+      - ASPNETCORE_ENVIRONMENT=${ASPNETCORE_ENVIRONMENT:-Staging}
+    networks:
+      - backend-network
+    deploy:
+      replicas: ${SEARCH_API_REPLICAS:-1}
+      placement:
+        constraints:
+          - node.labels.role == app
+      update_config:
+        parallelism: 1
+        order: start-first
+      restart_policy:
+        condition: any
+
+  pricing.api:
+    image: ${ARTIFACT_REGISTRY_HOST}/pricing-api:${IMAGE_TAG}
+    volumes:
+      - ${CONFIGS_PATH:-/opt/ecommerce/configs}:/app/configs:ro
+    environment:
+      - DOTNET_ENVIRONMENT=${DOTNET_ENVIRONMENT:-Staging}
+      - ASPNETCORE_ENVIRONMENT=${ASPNETCORE_ENVIRONMENT:-Staging}
+    networks:
+      - backend-network
+    deploy:
+      replicas: ${PRICING_API_REPLICAS:-1}
+      placement:
+        constraints:
+          - node.labels.role == app
+      update_config:
+        parallelism: 1
+        order: start-first
+      restart_policy:
+        condition: any
+
+  analytics.api:
+    image: ${ARTIFACT_REGISTRY_HOST}/analytics-api:${IMAGE_TAG}
+    volumes:
+      - ${CONFIGS_PATH:-/opt/ecommerce/configs}:/app/configs:ro
+    environment:
+      - DOTNET_ENVIRONMENT=${DOTNET_ENVIRONMENT:-Staging}
+      - ASPNETCORE_ENVIRONMENT=${ASPNETCORE_ENVIRONMENT:-Staging}
+    networks:
+      - backend-network
+    deploy:
+      replicas: ${ANALYTICS_API_REPLICAS:-1}
+      placement:
+        constraints:
+          - node.labels.role == app
+      update_config:
+        parallelism: 1
+        order: start-first
+      restart_policy:
+        condition: any
+
+  analytics.worker:
+    image: ${ARTIFACT_REGISTRY_HOST}/analytics-worker:${IMAGE_TAG}
+    volumes:
+      - ${CONFIGS_PATH:-/opt/ecommerce/configs}:/app/configs:ro
+    environment:
+      - DOTNET_ENVIRONMENT=${DOTNET_ENVIRONMENT:-Staging}
+      - ASPNETCORE_ENVIRONMENT=${ASPNETCORE_ENVIRONMENT:-Staging}
+    networks:
+      - backend-network
+    deploy:
+      replicas: ${ANALYTICS_WORKER_REPLICAS:-1}
+      placement:
+        constraints:
+          - node.labels.role == app
+      update_config:
+        parallelism: 1
+        order: stop-first
+      restart_policy:
+        condition: any
+
+  pgql:
+    image: ${ARTIFACT_REGISTRY_HOST}/postgres-cron:${IMAGE_TAG}
+    environment:
+      POSTGRES_USER: ${PGQL_USER}
+      POSTGRES_PASSWORD: ${PGQL_PASSWORD}
+      POSTGRES_MULTIPLE_DATABASES: main,analytics,pricing
+    volumes:
+      - pg_data:/var/lib/postgresql
+      - ${INIT_PATH:-/opt/ecommerce/init}:/docker-entrypoint-initdb.d:ro
+    command: >
+      postgres
+      -c shared_preload_libraries=pg_cron
+      -c cron.database_name=postgres
+    networks:
+      - backend-network
+    deploy:
+      replicas: 1
+      placement:
+        constraints:
+          - node.labels.role == infra
+      restart_policy:
+        condition: any
+
+  redis:
+    image: redis/redis-stack:latest
+    command:
+      - redis-stack-server
+      - --maxmemory-policy
+      - allkeys-lru
+      - --active-expire-effort
+      - "10"
+      - --requirepass
+      - ${REDIS_PASSWORD}
+    volumes:
+      - redis_data:/data
+    networks:
+      - backend-network
+    deploy:
+      replicas: 1
+      placement:
+        constraints:
+          - node.labels.role == infra
+      restart_policy:
+        condition: any
+
+  rabbitmq:
+    image: rabbitmq:3-management
+    environment:
+      RABBITMQ_DEFAULT_USER: ${RABBITMQ_DEFAULT_USER}
+      RABBITMQ_DEFAULT_PASS: ${RABBITMQ_DEFAULT_PASS}
+    volumes:
+      - rabbitmq_data:/var/lib/rabbitmq
+    networks:
+      - backend-network
+    deploy:
+      replicas: 1
+      placement:
+        constraints:
+          - node.labels.role == infra
+      restart_policy:
+        condition: any
+
+  opensearch:
+    image: opensearchproject/opensearch:latest
+    environment:
+      - discovery.type=single-node
+      - OPENSEARCH_INITIAL_ADMIN_PASSWORD=${OPENSEARCH_PASSWORD}
+      - OPENSEARCH_JAVA_OPTS=-Xms512m -Xmx512m
+    volumes:
+      - opensearch_data:/usr/share/opensearch/data
+    networks:
+      - backend-network
+    deploy:
+      replicas: 1
+      placement:
+        constraints:
+          - node.labels.role == infra
+      restart_policy:
+        condition: any
+
+  opensearch-dashboards:
+    image: opensearchproject/opensearch-dashboards:latest
+    environment:
+      - OPENSEARCH_HOSTS=["https://opensearch:9200"]
+      - OPENSEARCH_USERNAME=admin
+      - OPENSEARCH_PASSWORD=${OPENSEARCH_PASSWORD}
+      - OPENSEARCH_SSL_VERIFICATIONMODE=none
+    networks:
+      - backend-network
+    deploy:
+      replicas: 1
+      placement:
+        constraints:
+          - node.labels.monitoring == true
+      restart_policy:
+        condition: any
+
+  minio:
+    image: quay.io/minio/minio:latest
+    volumes:
+      - minio_data:/data
+    environment:
+      MINIO_ROOT_USER: ${MINIO_ROOT_USER}
+      MINIO_ROOT_PASSWORD: ${MINIO_ROOT_PASSWORD}
+    command: >
+      server /data --console-address ":9001"
+    networks:
+      - backend-network
+    deploy:
+      replicas: 1
+      placement:
+        constraints:
+          - node.labels.role == infra
+      restart_policy:
+        condition: any
+
+  minio-init:
+    image: minio/mc:latest
+    entrypoint: >
+      /bin/sh -c "
+      sleep 10;
+      mc alias set local http://minio:9000 ${MINIO_ROOT_USER} ${MINIO_ROOT_PASSWORD};
+      mc mb -p local/${MINIO_IMAGES_BUCKET};
+      mc anonymous set public local/${MINIO_IMAGES_BUCKET};
+      mc admin user add local ${MINIO_SERVICE_USER} ${MINIO_SERVICE_PASSWORD};
+      mc admin policy attach local readwrite --user ${MINIO_SERVICE_USER};
+      exit 0;
+      "
+    networks:
+      - backend-network
+    deploy:
+      replicas: 1
+      placement:
+        constraints:
+          - node.labels.role == infra
+      restart_policy:
+        condition: none
+
+  loki:
+    image: grafana/loki:latest
+    command: -config.file=/etc/loki/local-config.yaml
+    networks:
+      - backend-network
+    deploy:
+      replicas: 1
+      placement:
+        constraints:
+          - node.labels.monitoring == true
+      restart_policy:
+        condition: any
+
+  prometheus:
+    image: prom/prometheus:latest
+    volumes:
+      - ${PROMETHEUS_CONFIG_PATH:-/opt/ecommerce/prometheus.yml}:/etc/prometheus/prometheus.yml:ro
+    command:
+      - "--config.file=/etc/prometheus/prometheus.yml"
+    networks:
+      - backend-network
+    deploy:
+      replicas: 1
+      placement:
+        constraints:
+          - node.labels.monitoring == true
+      restart_policy:
+        condition: any
+
+  grafana:
+    image: grafana/grafana:latest
+    volumes:
+      - grafana_data:/var/lib/grafana
+      - ${CERTS_PATH:-/opt/ecommerce/certs}:/app/certs:ro
+    environment:
+      - GF_SERVER_PROTOCOL=${GRAFANA_SERVER_PROTOCOL:-http}
+      - GF_SERVER_CERT_FILE=${CERT_PATH:-}
+      - GF_SERVER_CERT_KEY=${CERT_KEYPATH:-}
+      - GF_SECURITY_ADMIN_USER=${GRAFANA_ADMIN_USER}
+      - GF_SECURITY_ADMIN_PASSWORD=${GRAFANA_ADMIN_PASSWORD}
+    networks:
+      - backend-network
+    deploy:
+      replicas: 1
+      placement:
+        constraints:
+          - node.labels.monitoring == true
+      restart_policy:
+        condition: any
+
+networks:
+  backend-network:
+    driver: overlay
+    attachable: true
+
+volumes:
+  pg_data:
+  redis_data:
+  rabbitmq_data:
+  minio_data:
+  grafana_data:
+  opensearch_data:
+  search_api_data:
