@@ -39,11 +39,10 @@ COPY ["src/Services/Main/Main.Cache/Main.Cache.csproj", "src/Services/Main/Main.
 RUN dotnet restore "src/Services/Main/Main.Api/Main.Api.csproj"
 COPY . .
 WORKDIR "/src/src/Services/Main/Main.Api"
-RUN dotnet build "./Main.Api.csproj" -c $BUILD_CONFIGURATION -o /app/build
 
 FROM build AS publish
 ARG BUILD_CONFIGURATION=Release
-RUN dotnet publish "./Main.Api.csproj" -c $BUILD_CONFIGURATION -o /app/publish /p:UseAppHost=false
+RUN dotnet publish "./Main.Api.csproj" -c $BUILD_CONFIGURATION --no-restore -o /app/publish /p:UseAppHost=false
 
 FROM base AS final
 WORKDIR /app

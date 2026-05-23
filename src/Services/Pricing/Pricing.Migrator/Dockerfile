@@ -23,11 +23,10 @@ COPY ["src/Services/Pricing/Pricing.Enums/Pricing.Enums.csproj", "src/Services/P
 RUN dotnet restore "src/Services/Pricing/Pricing.Migrator/Pricing.Migrator.csproj"
 COPY . .
 WORKDIR "/src/src/Services/Pricing/Pricing.Migrator"
-RUN dotnet build "./Pricing.Migrator.csproj" -c $BUILD_CONFIGURATION -o /app/build
 
 FROM build AS publish
 ARG BUILD_CONFIGURATION=Release
-RUN dotnet publish "./Pricing.Migrator.csproj" -c $BUILD_CONFIGURATION -o /app/publish /p:UseAppHost=false
+RUN dotnet publish "./Pricing.Migrator.csproj" -c $BUILD_CONFIGURATION --no-restore -o /app/publish /p:UseAppHost=false
 
 FROM base AS final
 WORKDIR /app

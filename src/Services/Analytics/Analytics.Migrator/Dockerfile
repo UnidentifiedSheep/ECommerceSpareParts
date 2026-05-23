@@ -24,11 +24,10 @@ COPY ["src/Services/Analytics/Analytics.Enums/Analytics.Enums.csproj", "src/Serv
 RUN dotnet restore "src/Services/Analytics/Analytics.Migrator/Analytics.Migrator.csproj"
 COPY . .
 WORKDIR "/src/src/Services/Analytics/Analytics.Migrator"
-RUN dotnet build "./Analytics.Migrator.csproj" -c $BUILD_CONFIGURATION -o /app/build
 
 FROM build AS publish
 ARG BUILD_CONFIGURATION=Release
-RUN dotnet publish "./Analytics.Migrator.csproj" -c $BUILD_CONFIGURATION -o /app/publish /p:UseAppHost=false
+RUN dotnet publish "./Analytics.Migrator.csproj" -c $BUILD_CONFIGURATION --no-restore -o /app/publish /p:UseAppHost=false
 
 FROM base AS final
 WORKDIR /app

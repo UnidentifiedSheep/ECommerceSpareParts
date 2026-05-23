@@ -34,11 +34,10 @@ COPY ["src/Infrastructure/Persistence/Persistence.csproj", "src/Infrastructure/P
 RUN dotnet restore "src/Services/Analytics/Analytics.Worker/Analytics.Worker.csproj"
 COPY . .
 WORKDIR "/src/src/Services/Analytics/Analytics.Worker"
-RUN dotnet build "./Analytics.Worker.csproj" -c $BUILD_CONFIGURATION -o /app/build
 
 FROM build AS publish
 ARG BUILD_CONFIGURATION=Release
-RUN dotnet publish "./Analytics.Worker.csproj" -c $BUILD_CONFIGURATION -o /app/publish /p:UseAppHost=false
+RUN dotnet publish "./Analytics.Worker.csproj" -c $BUILD_CONFIGURATION --no-restore -o /app/publish /p:UseAppHost=false
 
 FROM base AS final
 WORKDIR /app
