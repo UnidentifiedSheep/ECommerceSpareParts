@@ -11,8 +11,50 @@ on:
         required: true
 
 jobs:
+  discover-images:
+    runs-on: ubuntu-latest
+
+    env:
+      ARTIFACT_REGISTRY_HOST: ${{ secrets.ARTIFACT_REGISTRY_HOST }}
+      IMAGE_TAG: ${{ github.sha }}
+
+    outputs:
+      matrix: ${{ steps.discover.outputs.matrix }}
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Discover Docker services
+        id: discover
+        run: |
+          APP_SERVICES=$(docker compose -f compose.yaml -f compose.registry.yaml --env-file .env.example config --format json \
+            | python3 -c 'import json, sys; data = json.load(sys.stdin); print(json.dumps([
+                {"service": name, "compose_files": "compose.yaml compose.registry.yaml"}
+                for name, service in data["services"].items()
+                if service.get("build") is not None
+              ]))')
+
+          MIGRATOR_SERVICES=$(docker compose -f migrator-compose.yaml -f migrator-compose.registry.yaml --env-file .env.example config --format json \
+            | python3 -c 'import json, sys; data = json.load(sys.stdin); print(json.dumps([
+                {"service": name, "compose_files": "migrator-compose.yaml migrator-compose.registry.yaml"}
+                for name, service in data["services"].items()
+                if service.get("build") is not None
+              ]))')
+
+          MATRIX=$(APP_SERVICES="$APP_SERVICES" MIGRATOR_SERVICES="$MIGRATOR_SERVICES" python3 -c 'import json, os; print(json.dumps({
+              "include": json.loads(os.environ["APP_SERVICES"]) + json.loads(os.environ["MIGRATOR_SERVICES"])
+            }))')
+
+          echo "matrix=$MATRIX" >> "$GITHUB_OUTPUT"
+          echo "$MATRIX"
+
   publish-images:
     runs-on: ubuntu-latest
+    needs: discover-images
+    strategy:
+      fail-fast: false
+      matrix: ${{ fromJson(needs.discover-images.outputs.matrix) }}
 
     env:
       ARTIFACT_REGISTRY_HOST: ${{ secrets.ARTIFACT_REGISTRY_HOST }}
@@ -32,8 +74,11 @@ jobs:
           username: ${{ secrets.ARTIFACT_REGISTRY_USERNAME }}
           password: ${{ secrets.ARTIFACT_REGISTRY_PASSWORD }}
 
-      - name: Build app images
-        run: docker compose -f compose.yaml -f compose.registry.yaml --env-file .env.example build --push
+      - name: Build and push ${{ matrix.service }}
+        run: |
+          COMPOSE_ARGS=()
+          for file in ${{ matrix.compose_files }}; do
+            COMPOSE_ARGS+=("-f" "$file")
+          done
 
-      - name: Build migrator images
-        run: docker compose -f migrator-compose.yaml -f migrator-compose.registry.yaml --env-file .env.example build --push
+          docker compose "${COMPOSE_ARGS[@]}" --env-file .env.example build --push ${{ matrix.service }}
