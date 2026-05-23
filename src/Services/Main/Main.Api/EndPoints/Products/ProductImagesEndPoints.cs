@@ -4,6 +4,7 @@ using Enums;
 using Main.Application.Handlers.Products.MapImgsToProduct;
 using Main.Application.Handlers.Products.RemoveProductImage;
 using MediatR;
+using Microsoft.AspNetCore.Mvc;
 
 namespace Main.Api.EndPoints.Products;
 
@@ -32,9 +33,10 @@ public static class ProductImagesEndPoints
             .ProducesProblem(404)
             .RequireAnyPermission(PermissionCodes.ARTICLE_IMAGES_CREATE);
         
-        products.MapDelete("/{productId:int}/imgs/{imagePath}", async (
+        products.MapDelete("/{productId:int}/imgs", async (
                 ISender sender,
                 int productId,
+                [FromQuery]
                 string imagePath,
                 CancellationToken token) =>
             {

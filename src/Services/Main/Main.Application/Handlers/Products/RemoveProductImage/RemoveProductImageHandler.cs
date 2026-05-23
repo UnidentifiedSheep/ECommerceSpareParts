@@ -25,11 +25,12 @@ public class RemoveProductImageHandler(
 {
     public async Task<Unit> Handle(RemoveProductImageCommand request, CancellationToken cancellationToken)
     {
+        var imagePath = NormalizeImagePath(request.ImagePath);
         var applicationSettings =
             (await settingsService.GetOrDefault<GlobalApplicationSetting>(cancellationToken)).Data;
 
-        var imageEntity = await repository.GetById((request.ProductId, request.ImagePath), cancellationToken)
-                          ?? throw new ProductImageNotFoundException(request.ProductId, request.ImagePath);
+        var imageEntity = await repository.GetById((request.ProductId, imagePath), cancellationToken)
+                          ?? throw new ProductImageNotFoundException(request.ProductId, imagePath);
         
         unitOfWork.Remove(imageEntity);
 
@@ -41,6 +42,13 @@ public class RemoveProductImageHandler(
             Id = request.ProductId
         });
         return Unit.Value;
+    }
+
+    private static string NormalizeImagePath(string imagePath)
+    {
+        var normalized = Uri.UnescapeDataString(imagePath).Trim();
+        return normalized.Replace("http//", "http://", StringComparison.OrdinalIgnoreCase)
+            .Replace("https//", "https://", StringComparison.OrdinalIgnoreCase);
     }
 
     private static string GetObjectKey(ProductImage image, GlobalApplicationSettingData settings)

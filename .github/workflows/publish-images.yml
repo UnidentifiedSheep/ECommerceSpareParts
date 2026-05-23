@@ -81,4 +81,5 @@ jobs:
             COMPOSE_ARGS+=("-f" "$file")
           done
 
-          docker compose "${COMPOSE_ARGS[@]}" --env-file .env.example build --push ${{ matrix.service }}
+          docker compose "${COMPOSE_ARGS[@]}" --env-file .env.example build ${{ matrix.service }}
+          docker compose "${COMPOSE_ARGS[@]}" --env-file .env.example push ${{ matrix.service }}
