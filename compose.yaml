@@ -1,6 +1,6 @@
 ﻿services:
-  main.api:
-    image: main.api
+  main-api:
+    image: main-api
     build:
       context: .
       dockerfile: src/Services/Main/Main.Api/Dockerfile
@@ -19,8 +19,8 @@
       - rabbitmq
     restart: unless-stopped
 
-  search.api:
-    image: search.api
+  search-api:
+    image: search-api
     build:
       context: .
       dockerfile: src/Services/Search/Search.Api/Dockerfile
@@ -37,8 +37,8 @@
     depends_on:
       - opensearch
 
-  pricing.api:
-    image: pricing.api
+  pricing-api:
+    image: pricing-api
     build:
       context: .
       dockerfile: src/Services/Pricing/Pricing.Api/Dockerfile
@@ -74,8 +74,8 @@
       - backend-network
     restart: unless-stopped
 
-  analytics.api:
-    image: analytics.api
+  analytics-api:
+    image: analytics-api
     build:
       context: .
       dockerfile: src/Services/Analytics/Analytics.Api/Dockerfile
@@ -94,8 +94,8 @@
       - rabbitmq
     restart: unless-stopped
   
-  analytics.worker:
-    image: analytics.worker
+  analytics-worker:
+    image: analytics-worker
     build:
       context: .
       dockerfile: src/Services/Analytics/Analytics.Worker/Dockerfile

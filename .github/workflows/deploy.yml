@@ -135,8 +135,9 @@ jobs:
             export ANALYTICS_WORKER_REPLICAS="${ANALYTICS_WORKER_REPLICAS:-1}"
             export DOCKER_CONFIG="${{ env.SWARM_PATH }}/.docker"
             mkdir -p "$DOCKER_CONFIG"
+            sudo chown -R "$(id -u):$(id -g)" "$DOCKER_CONFIG"
 
-            echo '${{ secrets.ARTIFACT_REGISTRY_PASSWORD }}' | sudo --preserve-env=DOCKER_CONFIG docker login \
+            echo '${{ secrets.ARTIFACT_REGISTRY_PASSWORD }}' | docker login \
               '${{ secrets.ARTIFACT_REGISTRY_HOST }}' \
               --username '${{ secrets.ARTIFACT_REGISTRY_USERNAME }}' \
               --password-stdin

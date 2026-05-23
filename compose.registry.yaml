@@ -1,5 +1,5 @@
 services:
-  main.api:
+  main-api:
     image: ${ARTIFACT_REGISTRY_HOST}/main-api:${IMAGE_TAG}
     build:
       tags:
@@ -9,7 +9,7 @@ services:
       cache_to:
         - type=registry,ref=${ARTIFACT_REGISTRY_HOST}/main-api:buildcache,mode=min
 
-  search.api:
+  search-api:
     image: ${ARTIFACT_REGISTRY_HOST}/search-api:${IMAGE_TAG}
     build:
       tags:
@@ -19,7 +19,7 @@ services:
       cache_to:
         - type=registry,ref=${ARTIFACT_REGISTRY_HOST}/search-api:buildcache,mode=min
 
-  pricing.api:
+  pricing-api:
     image: ${ARTIFACT_REGISTRY_HOST}/pricing-api:${IMAGE_TAG}
     build:
       tags:
@@ -39,7 +39,7 @@ services:
       cache_to:
         - type=registry,ref=${ARTIFACT_REGISTRY_HOST}/gateway:buildcache,mode=min
 
-  analytics.api:
+  analytics-api:
     image: ${ARTIFACT_REGISTRY_HOST}/analytics-api:${IMAGE_TAG}
     build:
       tags:
@@ -49,7 +49,7 @@ services:
       cache_to:
         - type=registry,ref=${ARTIFACT_REGISTRY_HOST}/analytics-api:buildcache,mode=min
 
-  analytics.worker:
+  analytics-worker:
     image: ${ARTIFACT_REGISTRY_HOST}/analytics-worker:${IMAGE_TAG}
     build:
       tags:

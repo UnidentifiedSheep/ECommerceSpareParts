@@ -11,7 +11,7 @@
   },
   "InternalServices": {
     "Main": {
-      "Url": "http://main.api:8080"
+      "Url": "http://main-api:8080"
     },
     "InternalToken": "SuperSecretKey21"
   },

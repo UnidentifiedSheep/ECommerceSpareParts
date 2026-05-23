@@ -94,7 +94,7 @@
         "LoadBalancingPolicy": "RoundRobin",
         "Destinations": {
           "main-api": {
-            "Address": "http://main.api:8080/"
+            "Address": "http://main-api:8080/"
           }
         }
       },
@@ -102,7 +102,7 @@
         "LoadBalancingPolicy": "RoundRobin",
         "Destinations": {
           "analytics-api": {
-            "Address": "http://analytics.api:8080/"
+            "Address": "http://analytics-api:8080/"
           }
         }
       },
@@ -110,7 +110,7 @@
         "LoadBalancingPolicy": "RoundRobin",
         "Destinations": {
           "search-api": {
-            "Address": "http://search.api:8080/"
+            "Address": "http://search-api:8080/"
           }
         }
       },
@@ -118,7 +118,7 @@
         "LoadBalancingPolicy": "RoundRobin",
         "Destinations": {
           "pricing-api": {
-            "Address": "http://pricing.api:8080/"
+            "Address": "http://pricing-api:8080/"
           }
         }
       }
