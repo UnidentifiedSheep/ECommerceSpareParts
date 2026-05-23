@@ -68,12 +68,7 @@ public class ProductRepository(
         var hasTextQuery = !string.IsNullOrWhiteSpace(query);
         var filters = new List<Func<QueryContainerDescriptor<Product>, QueryContainer>>();
 
-        if (producerId.HasValue)
-        {
-            filters.Add(f => f.Term(t => t
-                .Field(p => p.ProducerId)
-                .Value(producerId.Value)));
-        }
+        AddProducerFilter(filters, producerId);
 
         AddRangeFilter(filters, p => p.Dimensions!.LengthM, lengthM);
         AddRangeFilter(filters, p => p.Dimensions!.WidthM, widthM);
@@ -119,6 +114,7 @@ public class ProductRepository(
 
     public async Task<IReadOnlyCollection<Product>> SearchBySku(
         string sku,
+        int? producerId,
         Pagination? pagination = null,
         CancellationToken token = default)
     {
@@ -135,6 +131,7 @@ public class ProductRepository(
 
         var should = new List<Func<QueryContainerDescriptor<Product>, QueryContainer>>();
         AddSkuQueries(should, normalizedSku);
+        AddProducerFilter(should, producerId);
 
         var response = await client.SearchAsync<Product>(
             s => s
@@ -148,51 +145,7 @@ public class ProductRepository(
 
         return response.Documents;
     }
-
-    public async Task<IReadOnlyCollection<Product>> GetByProducerId(
-        int producerId,
-        Pagination? pagination = null,
-        CancellationToken token = default)
-    {
-        var page = pagination ?? DefaultPagination;
-        var idx = await CheckInitAndGetIdx(token);
-        var response = await client.SearchAsync<Product>(
-            s => s
-                .Index(idx)
-                .From(GetFrom(page))
-                .Size(page.Size)
-                .Query(q => q.Term(t => t
-                    .Field(p => p.ProducerId)
-                    .Value(producerId))),
-            token);
-
-        return response.Documents;
-    }
-
-    public Task<IReadOnlyCollection<Product>> GetByLengthRange(
-        RangeModel<decimal>? length = null,
-        Pagination? pagination = null,
-        CancellationToken token = default)
-    {
-        return SearchByRange(p => p.Dimensions!.LengthM, length, pagination, token);
-    }
-
-    public Task<IReadOnlyCollection<Product>> GetByWidthRange(
-        RangeModel<decimal>? width = null,
-        Pagination? pagination = null,
-        CancellationToken token = default)
-    {
-        return SearchByRange(p => p.Dimensions!.WidthM, width, pagination, token);
-    }
-
-    public Task<IReadOnlyCollection<Product>> GetByHeightRange(
-        RangeModel<decimal>? height = null,
-        Pagination? pagination = null,
-        CancellationToken token = default)
-    {
-        return SearchByRange(p => p.Dimensions!.HeightM, height, pagination, token);
-    }
-
+    
     public Task<IReadOnlyCollection<Product>> GetByWeightKgRange(
         RangeModel<decimal>? weightKg = null,
         Pagination? pagination = null,
@@ -235,19 +188,6 @@ public class ProductRepository(
             token);
 
         return response.Documents;
-    }
-
-    public async Task<bool> Exists(
-        int id,
-        CancellationToken token = default)
-    {
-        var idx = await CheckInitAndGetIdx(token);
-        var response = await client.DocumentExistsAsync<Product>(
-            id,
-            e => e.Index(idx),
-            token);
-
-        return response.Exists;
     }
 
     public async Task Delete(
@@ -314,8 +254,19 @@ public class ProductRepository(
         return response.Documents;
     }
 
+    private static void AddProducerFilter(
+        List<Func<QueryContainerDescriptor<Product>, QueryContainer>> filters,
+        int? producerId)
+    {
+        if (!producerId.HasValue) return;
+        
+        filters.Add(f => f.Term(t => t
+            .Field(p => p.ProducerId)
+            .Value(producerId.Value)));
+    }
+
     private static void AddRangeFilter(
-        ICollection<Func<QueryContainerDescriptor<Product>, QueryContainer>> filters,
+        List<Func<QueryContainerDescriptor<Product>, QueryContainer>> filters,
         Expression<Func<Product, object>> field,
         RangeModel<decimal>? range)
     {
@@ -348,7 +299,7 @@ public class ProductRepository(
     }
 
     private static void AddSkuQueries(
-        ICollection<Func<QueryContainerDescriptor<Product>, QueryContainer>> queries,
+        List<Func<QueryContainerDescriptor<Product>, QueryContainer>> queries,
         string normalizedSku)
     {
         if (string.IsNullOrEmpty(normalizedSku))

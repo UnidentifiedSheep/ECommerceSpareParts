@@ -6,24 +6,24 @@ using Search.Application.Dtos.Products;
 using Search.Application.Interfaces;
 using Search.Application.Mapping;
 
-namespace Search.Application.Handlers.Products.SearchProducts;
+namespace Search.Application.Handlers.Products.SearchProductsByAll;
 
-public record SearchProductsQuery(
+public record SearchProductsByAllQuery(
     string? Query,
     int? ProducerId,
     Pagination Pagination,
     RangeModel<decimal>? Length = null,
     RangeModel<decimal>? Width = null,
     RangeModel<decimal>? Height = null,
-    DimensionUnit DimensionUnit = DimensionUnit.Meter) : IQuery<SearchProductsResult>;
+    DimensionUnit DimensionUnit = DimensionUnit.Meter) : IQuery<SearchProductsByAllResult>;
 
-public record SearchProductsResult(IEnumerable<ProductDto> Products);
+public record SearchProductsByAllResult(IEnumerable<ProductDto> Products);
 
-public class SearchProductsHandler(IProductRepository productRepository)
-    : IQueryHandler<SearchProductsQuery, SearchProductsResult>
+public class SearchProductsByAllHandler(IProductRepository productRepository)
+    : IQueryHandler<SearchProductsByAllQuery, SearchProductsByAllResult>
 {
-    public async Task<SearchProductsResult> Handle(
-        SearchProductsQuery request,
+    public async Task<SearchProductsByAllResult> Handle(
+        SearchProductsByAllQuery request,
         CancellationToken cancellationToken)
     {
         var products = await productRepository.Search(
@@ -35,7 +35,7 @@ public class SearchProductsHandler(IProductRepository productRepository)
             ConvertDimensionRangeToMeters(request.Height, request.DimensionUnit),
             cancellationToken);
 
-        return new SearchProductsResult(
+        return new SearchProductsByAllResult(
             products.Select(x => x.ToProductDto()));
     }
 

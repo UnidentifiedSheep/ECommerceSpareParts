@@ -1,3 +1,4 @@
+using System.Text.Json.Serialization;
 using Abstractions.Models;
 using Api.Common.Extensions;
 using Carter;
@@ -15,15 +16,45 @@ using MediatR;
 
 namespace Main.Api.EndPoints.Storages;
 
-public record CreateStorageRequest(string Name, string? Description, string? Location, StorageType Type);
+public record CreateStorageRequest
+{
+    [JsonPropertyName("name")]
+    public required string Name { get; init; }
+    
+    [JsonPropertyName("description")]
+    public string? Description { get; init; }
+    
+    [JsonPropertyName("location")]
+    public string? Location { get; init; }
+    
+    [JsonPropertyName("type")]
+    [JsonConverter(typeof(JsonStringEnumConverter<StorageType>))]
+    public StorageType Type { get; init; }
+}
 
-public record CreateStorageResponse(string Name);
+public record CreateStorageResponse
+{
+    [JsonPropertyName("name")]
+    public required string Name { get; init; }
+}
 
-public record EditStorageRequest(PatchStorageDto EditStorage);
+public record EditStorageRequest
+{
+    [JsonPropertyName("editStorage")]
+    public required PatchStorageDto EditStorage { get; init; }
+}
 
-public record GetStoragesResponse(IEnumerable<StorageDto> Storages);
+public record GetStoragesResponse
+{
+    [JsonPropertyName("storages")]
+    public required IEnumerable<StorageDto> Storages { get; init; }
+}
 
-public record GetStorageByNameResponse(StorageDto Storage);
+public record GetStorageByNameResponse
+{
+    [JsonPropertyName("storage")]
+    public required StorageDto Storage { get; init; }
+}
 
 public class StoragesEndPoints : ICarterModule
 {
@@ -41,7 +72,10 @@ public class StoragesEndPoints : ICarterModule
                 CancellationToken cancellationToken) =>
             {
                 var result = await sender.Send(request.Adapt<CreateStorageCommand>(), cancellationToken);
-                return Results.Created("/storages/", new CreateStorageResponse(result.Name));
+                return Results.Created("/storages/", new CreateStorageResponse
+                {
+                    Name = result.Name
+                });
             })
             .WithName("CreateStorage")
             .WithSummary("Создать склад")
@@ -97,7 +131,10 @@ public class StoragesEndPoints : ICarterModule
             {
                 var query = new GetStoragesQuery(new Pagination(page, limit), searchTerm, type);
                 var result = await sender.Send(query, token);
-                return Results.Ok(result.Adapt<GetStoragesResponse>());
+                return Results.Ok(new GetStoragesResponse
+                {
+                    Storages = result.Storages
+                });
             })
             .WithName("GetStorages")
             .WithSummary("Получить склады")
@@ -110,7 +147,10 @@ public class StoragesEndPoints : ICarterModule
         storages.MapGet("/{name}", async (ISender sender, string name, CancellationToken token) =>
             {
                 var result = await sender.Send(new GetStorageByNameQuery(name), token);
-                return Results.Ok(result.Adapt<GetStorageByNameResponse>());
+                return Results.Ok(new GetStorageByNameResponse
+                {
+                    Storage = result.Storage
+                });
             })
             .WithName("GetStorageByName")
             .WithSummary("Получить склад по имени")

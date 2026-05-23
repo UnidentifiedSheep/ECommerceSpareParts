@@ -18,27 +18,8 @@ public interface IProductRepository
         CancellationToken token = default);
     
     Task<IReadOnlyCollection<Product>> SearchBySku(
-        string sku, 
-        Pagination? pagination = null, 
-        CancellationToken token = default);
-    
-    Task<IReadOnlyCollection<Product>> GetByProducerId(
-        int producerId, 
-        Pagination? pagination = null, 
-        CancellationToken token = default);
-    
-    Task<IReadOnlyCollection<Product>> GetByLengthRange(
-        RangeModel<decimal>? length = null, 
-        Pagination? pagination = null, 
-        CancellationToken token = default);
-    
-    Task<IReadOnlyCollection<Product>> GetByWidthRange(
-        RangeModel<decimal>? width = null, 
-        Pagination? pagination = null, 
-        CancellationToken token = default);
-    
-    Task<IReadOnlyCollection<Product>> GetByHeightRange(
-        RangeModel<decimal>? height = null, 
+        string sku,
+        int? producerId,
         Pagination? pagination = null, 
         CancellationToken token = default);
     
@@ -52,13 +33,6 @@ public interface IProductRepository
         Pagination? pagination = null, 
         CancellationToken token = default);
     
-    Task<IReadOnlyCollection<Product>> GetByDimensionsRange(
-        RangeModel<decimal>? length = null, 
-        RangeModel<decimal>? width = null, 
-        RangeModel<decimal>? height = null, 
-        Pagination? pagination = null, 
-        CancellationToken token = default);
-    Task<bool> Exists(int id, CancellationToken token = default);
     Task Delete(int id, CancellationToken token = default);
     Task DeleteMany(IEnumerable<int> ids, CancellationToken token = default);
 }

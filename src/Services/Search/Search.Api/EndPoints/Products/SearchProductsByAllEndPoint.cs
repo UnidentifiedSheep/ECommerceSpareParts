@@ -1,16 +1,17 @@
 using System.Text.Json.Serialization;
 using Abstractions.Models;
+using Api.Common.Extensions;
 using Api.Common.Models.Requests;
 using Carter;
 using Enums;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
 using Search.Application.Dtos.Products;
-using Search.Application.Handlers.Products.SearchProducts;
+using Search.Application.Handlers.Products.SearchProductsByAll;
 
 namespace Search.Api.EndPoints.Products;
 
-public record SearchProductsRequest : PaginationQueryModel
+public record SearchProductsByAllRequest : PaginationQueryModel
 {
     [FromQuery(Name = "query")]
     public string? Query { get; init; }
@@ -40,26 +41,24 @@ public record SearchProductsRequest : PaginationQueryModel
     public DimensionUnit? DimensionUnit { get; init; }
 }
 
-public record SearchProductsResult
+public record SearchProductsByAllResult
 {
     [JsonPropertyName("products")]
     public required IEnumerable<ProductDto> Products { get; init; }
 }
 
 
-public class SearchProductsEndPoint : ICarterModule
+public static class SearchProductsByAllEndPoint
 {
-    private const int MaxLimit = 100;
-
-    public void AddRoutes(IEndpointRouteBuilder app)
+    public static RouteGroupBuilder AddSearchProductsByAll(this RouteGroupBuilder products)
     {
-        app.MapGet("/products", async (
+        products.MapGet("/all", async (
                 ISender sender,
-                [AsParameters] SearchProductsRequest request,
+                [AsParameters] SearchProductsByAllRequest request,
                 CancellationToken cancellationToken) =>
             {
                 var result = await sender.Send(
-                    new SearchProductsQuery(
+                    new SearchProductsByAllQuery(
                         request.Query,
                         request.ProducerId,
                         request,
@@ -69,14 +68,17 @@ public class SearchProductsEndPoint : ICarterModule
                         request.DimensionUnit ?? DimensionUnit.Meter),
                     cancellationToken);
 
-                return Results.Ok(new SearchProductsResult
+                return Results.Ok(new SearchProductsByAllResult
                 {
                     Products = result.Products
                 });
             })
             .WithTags("Products")
+            .RequireAllPermissions(PermissionCodes.ARTICLES_GET_MAIN)
             .WithDisplayName("Search products")
-            .Produces<SearchProductsResult>();
+            .Produces<SearchProductsByAllResult>();
+        
+        return products;
     }
 
     private static RangeModel<decimal>? ToRange(decimal? min, decimal? max)

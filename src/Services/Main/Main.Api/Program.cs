@@ -11,6 +11,7 @@ using Contracts.Auth;
 using Contracts.Currency;
 using Contracts.Products;
 using Contracts.Settings;
+using Contracts.StorageContent;
 using Contracts.User;
 using ExchangeRate;
 using Hangfire;
@@ -117,11 +118,13 @@ builder.Services.AddMassTransit(x =>
             ep.ConfigureConsumer<ProductSizesUpdatedConsumer>(context);
             ep.ConfigureConsumer<ProductWeightUpdatedConsumer>(context);
             ep.ConfigureConsumer<ProductUpdatedConsumer>(context);
+            ep.ConfigureConsumer<StorageContentUpdatedConsumer>(context);
             ep.ConfigureConsumer<RoleUpdatedConsumer>(context);
             ep.ConfigureConsumer<UserUpdatedConsumer>(context);
             ep.ConfigureConsumer<UserDiscountUpdatedConsumer>(context);
 
             ep.Bind<CurrencyCreatedEvent>();
+            ep.Bind<StorageContentUpdatedEvent>();
             ep.Bind<ProductSizesUpdatedEvent>();
             ep.Bind<ProductWeightUpdatedEvent>();
             ep.Bind<ProductUpdatedEvent>();
