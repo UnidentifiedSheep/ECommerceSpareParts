@@ -92,15 +92,6 @@
       },
       "main-cluster": {
         "LoadBalancingPolicy": "RoundRobin",
-        "HealthCheck": {
-          "Active": {
-            "Enabled": true,
-            "Interval": "00:00:30",
-            "Timeout": "00:00:02",
-            "Policy": "ConsecutiveFailures",
-            "Path": "/health"
-          }
-        },
         "Destinations": {
           "main-api": {
             "Address": "http://main.api:8080/"
@@ -109,15 +100,6 @@
       },
       "analytics-cluster": {
         "LoadBalancingPolicy": "RoundRobin",
-        "HealthCheck": {
-          "Active": {
-            "Enabled": true,
-            "Interval": "00:00:30",
-            "Timeout": "00:00:02",
-            "Policy": "ConsecutiveFailures",
-            "Path": "/health"
-          }
-        },
         "Destinations": {
           "analytics-api": {
             "Address": "http://analytics.api:8080/"
@@ -126,15 +108,6 @@
       },
       "search-cluster": {
         "LoadBalancingPolicy": "RoundRobin",
-        "HealthCheck": {
-          "Active": {
-            "Enabled": true,
-            "Interval": "00:00:30",
-            "Timeout": "00:00:02",
-            "Policy": "ConsecutiveFailures",
-            "Path": "/health"
-          }
-        },
         "Destinations": {
           "search-api": {
             "Address": "http://search.api:8080/"
@@ -143,15 +116,6 @@
       },
       "pricing-cluster": {
         "LoadBalancingPolicy": "RoundRobin",
-        "HealthCheck": {
-          "Active": {
-            "Enabled": true,
-            "Interval": "00:00:30",
-            "Timeout": "00:00:02",
-            "Policy": "ConsecutiveFailures",
-            "Path": "/health"
-          }
-        },
         "Destinations": {
           "pricing-api": {
             "Address": "http://pricing.api:8080/"

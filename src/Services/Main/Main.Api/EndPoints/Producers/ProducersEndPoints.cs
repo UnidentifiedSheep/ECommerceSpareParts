@@ -30,6 +30,8 @@ public record GetProducersResponse(IEnumerable<ProducerDto> Producers);
 
 public record GetProducerByIdResponse(ProducerDto Producer);
 
+public record PatchProducerResponse(ProducerDto Producer);
+
 public class ProducersEndPoints : ICarterModule
 {
     public void AddRoutes(IEndpointRouteBuilder app)
@@ -113,15 +115,16 @@ public class ProducersEndPoints : ICarterModule
                 EditProducerRequest request,
                 CancellationToken cancellationToken) =>
             {
-                await sender.Send(new EditProducerCommand(producerId, request.EditProducer), cancellationToken);
-                return Results.NoContent();
+                var result = await sender
+                    .Send(new EditProducerCommand(producerId, request.EditProducer), cancellationToken);
+                return Results.Ok(new PatchProducerResponse(result.Producer));
             })
             .WithName("EditProducer")
             .WithSummary("Редактировать производителя")
             .WithDescription("Редактирование производителя")
             .WithDisplayName("Редактирование производителя")
             .Accepts<EditProducerRequest>(false, "application/json")
-            .Produces(StatusCodes.Status204NoContent)
+            .Produces<PatchProducerResponse>()
             .ProducesProblem(StatusCodes.Status400BadRequest)
             .ProducesProblem(StatusCodes.Status404NotFound)
             .RequireAnyPermission(PermissionCodes.PRODUCERS_EDIT);
