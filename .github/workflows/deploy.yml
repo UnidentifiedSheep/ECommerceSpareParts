@@ -29,10 +29,12 @@ jobs:
 
       - name: Prepare deploy payload
         run: |
-          mkdir -p deploy-payload/configs deploy-payload/init
+          mkdir -p deploy-payload/configs deploy-payload/init deploy-payload/scripts/deploy
 
           cp compose.stack.yaml deploy-payload/compose.stack.yaml
+          cp compose.stack.database.yaml deploy-payload/compose.stack.database.yaml
           cp prometheus.yml deploy-payload/prometheus.yml
+          cp scripts/deploy/deploy-swarm.sh deploy-payload/scripts/deploy/deploy-swarm.sh
           cp -R configs/. deploy-payload/configs/
           cp -R init/. deploy-payload/init/
 
@@ -67,38 +69,8 @@ jobs:
           SWARM_WORKER_HOSTS: ${{ secrets.SWARM_WORKER_HOSTS }}
           SWARM_SSH_USER: ${{ secrets.SWARM_SSH_USER }}
           SWARM_SSH_KEY: ${{ secrets.SWARM_SSH_KEY }}
-        run: |
-          set -e
-
-          if [ -z "$SWARM_WORKER_HOSTS" ]; then
-            echo "SWARM_WORKER_HOSTS is empty, skipping worker upload."
-            exit 0
-          fi
-
-          printf '%s\n' "$SWARM_SSH_KEY" > swarm_key.pem
-          chmod 600 swarm_key.pem
-          ssh-keygen -y -f swarm_key.pem > /dev/null
-
-          SSH_OPTS="-i swarm_key.pem -o BatchMode=yes -o IdentitiesOnly=yes -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -o LogLevel=ERROR -o ConnectTimeout=20"
-
-          for host in $SWARM_WORKER_HOSTS; do
-            user="$SWARM_SSH_USER"
-            target_host="$host"
-
-            if echo "$host" | grep -q '@'; then
-              user="${host%@*}"
-              target_host="${host#*@}"
-            fi
-
-            echo "Uploading shared configs to worker node"
-
-            ssh $SSH_OPTS "$user@$target_host" \
-              "mkdir -p '${SWARM_PATH}' && rm -rf '${SWARM_PATH}/configs' '${SWARM_PATH}/init' && mkdir -p '${SWARM_PATH}/configs' '${SWARM_PATH}/init' '${SWARM_PATH}/certs'"
-
-            scp $SSH_OPTS -r \
-              deploy-payload/configs deploy-payload/init deploy-payload/prometheus.yml \
-              "$user@$target_host:${SWARM_PATH}/"
-          done
+          SWARM_PATH: ${{ env.SWARM_PATH }}
+        run: bash scripts/deploy/upload-swarm-shared-files.sh
 
       - name: Deploy stack
         uses: appleboy/ssh-action@v1.2.5
@@ -120,7 +92,10 @@ jobs:
 
             export STACK_NAME='${{ env.STACK_NAME }}'
             export ARTIFACT_REGISTRY_HOST='${{ secrets.ARTIFACT_REGISTRY_HOST }}'
+            export ARTIFACT_REGISTRY_USERNAME='${{ secrets.ARTIFACT_REGISTRY_USERNAME }}'
+            export ARTIFACT_REGISTRY_PASSWORD='${{ secrets.ARTIFACT_REGISTRY_PASSWORD }}'
             export IMAGE_TAG='${{ github.sha }}'
+            export DEPLOY_RUN_ID='${{ github.run_id }}'
             export DOTNET_ENVIRONMENT='Staging'
             export ASPNETCORE_ENVIRONMENT='Staging'
             export CONFIGS_PATH='${{ env.SWARM_PATH }}/configs'
@@ -134,24 +109,5 @@ jobs:
             export ANALYTICS_API_REPLICAS="${ANALYTICS_API_REPLICAS:-1}"
             export ANALYTICS_WORKER_REPLICAS="${ANALYTICS_WORKER_REPLICAS:-1}"
             export DOCKER_CONFIG="${{ env.SWARM_PATH }}/.docker"
-            mkdir -p "$DOCKER_CONFIG"
-            sudo chown -R "$(id -u):$(id -g)" "$DOCKER_CONFIG"
 
-            echo '${{ secrets.ARTIFACT_REGISTRY_PASSWORD }}' | docker login \
-              '${{ secrets.ARTIFACT_REGISTRY_HOST }}' \
-              --username '${{ secrets.ARTIFACT_REGISTRY_USERNAME }}' \
-              --password-stdin
-
-            docker compose -f compose.stack.yaml config |
-              sed '/^name:/d' |
-              sed -E 's/^([[:space:]]+published: )"([0-9]+)"$/\1\2/' \
-              > compose.stack.rendered.yaml
-
-            echo "=== Deploy stack ==="
-            sudo --preserve-env=DOCKER_CONFIG docker stack deploy \
-              -c compose.stack.rendered.yaml \
-              "$STACK_NAME" \
-              --with-registry-auth
-
-            echo "=== Stack services ==="
-            sudo docker stack services "$STACK_NAME"
+            bash scripts/deploy/deploy-swarm.sh

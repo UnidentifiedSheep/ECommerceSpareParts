@@ -1,0 +1,32 @@
+services:
+  pgql:
+    image: ${ARTIFACT_REGISTRY_HOST}/postgres-cron:${IMAGE_TAG}
+    environment:
+      POSTGRES_USER: ${PGQL_USER}
+      POSTGRES_PASSWORD: ${PGQL_PASSWORD}
+      POSTGRES_MULTIPLE_DATABASES: main,analytics,pricing
+    volumes:
+      - pg_data:/var/lib/postgresql
+      - ${INIT_PATH:-/opt/ecommerce/init}:/docker-entrypoint-initdb.d:ro
+    command: >
+      postgres
+      -c shared_preload_libraries=pg_cron
+      -c cron.database_name=postgres
+    networks:
+      - backend-network
+    deploy:
+      replicas: 1
+      placement:
+        constraints:
+          - node.labels.role == infra
+      restart_policy:
+        condition: any
+
+networks:
+  backend-network:
+    name: ${TRAEFIK_NETWORK:-ecommerce_backend-network}
+    driver: overlay
+    attachable: true
+
+volumes:
+  pg_data:
