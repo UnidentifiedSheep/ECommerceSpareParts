@@ -9,12 +9,6 @@
       "Producers": "producers-v1"
     }
   },
-  "InternalServices": {
-    "Main": {
-      "Url": "http://main-api:8080"
-    },
-    "InternalToken": "SuperSecretKey21"
-  },
   "InternalServiceCredentials": {
     "Service": "Search",
     "Secret": "SuperSearchKey222"
