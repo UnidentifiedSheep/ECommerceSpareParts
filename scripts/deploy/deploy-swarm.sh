@@ -85,6 +85,17 @@ run_migrator() {
   return 1
 }
 
+force_update_app_services() {
+  echo "=== Restart app services ==="
+
+  sudo --preserve-env=DOCKER_CONFIG docker service update --force "${STACK_NAME}_gateway"
+  sudo --preserve-env=DOCKER_CONFIG docker service update --force "${STACK_NAME}_main-api"
+  sudo --preserve-env=DOCKER_CONFIG docker service update --force "${STACK_NAME}_pricing-api"
+  sudo --preserve-env=DOCKER_CONFIG docker service update --force "${STACK_NAME}_search-api"
+  sudo --preserve-env=DOCKER_CONFIG docker service update --force "${STACK_NAME}_analytics-api"
+  sudo --preserve-env=DOCKER_CONFIG docker service update --force "${STACK_NAME}_analytics-worker"
+}
+
 require_env() {
   local name="$1"
 
@@ -138,6 +149,8 @@ sudo --preserve-env=DOCKER_CONFIG docker stack deploy \
   -c compose.stack.rendered.yaml \
   "$STACK_NAME" \
   --with-registry-auth
+
+force_update_app_services
 
 echo "=== Stack services ==="
 sudo docker stack services "$STACK_NAME"
