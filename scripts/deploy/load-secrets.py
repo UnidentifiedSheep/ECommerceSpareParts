@@ -3,6 +3,7 @@ import argparse
 import base64
 import json
 import os
+import shutil
 import sys
 import time
 import urllib.parse
@@ -275,7 +276,14 @@ def load_secrets_to_configs(
     secret_names: list[str] | None = None,
     depth: int = -1,
     version: int | None = None,
+    clean_output: bool = True,
 ) -> list[Path]:
+    if clean_output:
+        output_path = Path(output_dir)
+        if output_path.exists():
+            shutil.rmtree(output_path)
+        output_path.mkdir(parents=True, exist_ok=True)
+
     paths = secret_names or list_secret_paths(
         token=token,
         project_id=project_id,
@@ -324,6 +332,11 @@ def main() -> int:
         "--out",
         default=os.environ.get("CLOUD_RU_CONFIGS_OUT", "./configs"),
         help="Output directory for generated JSON configs. Default: CLOUD_RU_CONFIGS_OUT or ./configs.",
+    )
+    parser.add_argument(
+        "--no-clean",
+        action="store_true",
+        help="Do not clean output directory before writing configs.",
     )
 
     args = parser.parse_args()
@@ -374,6 +387,7 @@ def main() -> int:
             secret_names=parse_secret_names(explicit_secret_names) if explicit_secret_names else None,
             depth=depth,
             version=version,
+            clean_output=not args.no_clean,
         )
 
         for path in written_files:

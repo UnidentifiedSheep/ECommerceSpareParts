@@ -1,11 +1,13 @@
 ﻿using Analytics.Persistence.Context;
+using Common;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 
 var builder = Host.CreateDefaultBuilder(args)
-    .ConfigureAppConfiguration((_, config) => { config.AddCommandLine(args); });
+    .ConfigureAppConfiguration((_, config) =>
+        config.AddMigratorSettingsFromJsons("analytics.settings")
+            .AddMigratorSettingsFromJsons("analytics.settings", "/app/configs"));
 
 builder.ConfigureServices((context, services) =>
 {

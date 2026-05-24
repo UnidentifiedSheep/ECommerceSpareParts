@@ -9,7 +9,7 @@ jobs:
 
     env:
       CLOUD_RU_SECRET_PREFIX: ${{ secrets.CLOUD_RU_SECRET_PREFIX || '/appsettings' }}
-      CLOUD_RU_CONFIGS_OUT: ./configs
+      CLOUD_RU_CONFIGS_OUT: ./cloud-configs
       CLOUD_RU_SECRET_DEPTH: ${{ secrets.CLOUD_RU_SECRET_DEPTH || '-1' }}
       SWARM_PATH: ${{ secrets.SWARM_PATH || '/opt/ecommerce' }}
       STACK_NAME: ${{ secrets.SWARM_STACK_NAME || 'ecommerce' }}
@@ -35,7 +35,7 @@ jobs:
           cp compose.stack.database.yaml deploy-payload/compose.stack.database.yaml
           cp prometheus.yml deploy-payload/prometheus.yml
           cp scripts/deploy/deploy-swarm.sh deploy-payload/scripts/deploy/deploy-swarm.sh
-          cp -R configs/. deploy-payload/configs/
+          cp -R "$CLOUD_RU_CONFIGS_OUT"/. deploy-payload/configs/
           cp -R init/. deploy-payload/init/
 
       - name: Prepare leader directory
@@ -50,7 +50,8 @@ jobs:
             mkdir -p '${{ env.SWARM_PATH }}'
             cd '${{ env.SWARM_PATH }}'
 
-            mkdir -p configs init certs
+            rm -rf release configs.next
+            mkdir -p release init certs
 
       - name: Upload stack files to leader
         uses: appleboy/scp-action@v0.1.7
@@ -59,9 +60,37 @@ jobs:
           username: ${{ secrets.SWARM_SSH_USER }}
           key: ${{ secrets.SWARM_SSH_KEY }}
           source: "deploy-payload/*"
-          target: ${{ env.SWARM_PATH }}
+          target: ${{ env.SWARM_PATH }}/release
           strip_components: 1
           overwrite: true
+
+      - name: Activate leader payload
+        uses: appleboy/ssh-action@v1.2.5
+        with:
+          host: ${{ secrets.SWARM_LEADER_HOST }}
+          username: ${{ secrets.SWARM_SSH_USER }}
+          key: ${{ secrets.SWARM_SSH_KEY }}
+          script: |
+            set -e
+
+            cd '${{ env.SWARM_PATH }}'
+
+            rm -rf configs.next configs.old
+            mv release/configs configs.next
+            if [ -d configs ]; then
+              mv configs configs.old
+            fi
+            mv configs.next configs
+
+            rm -rf init
+            mv release/init init
+
+            cp release/compose.stack.yaml compose.stack.yaml
+            cp release/compose.stack.database.yaml compose.stack.database.yaml
+            cp release/prometheus.yml prometheus.yml
+            rm -rf scripts
+            mv release/scripts scripts
+            rm -rf release
 
       - name: Upload shared configs to worker nodes
         env:

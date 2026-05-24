@@ -24,9 +24,24 @@ for host in $SWARM_WORKER_HOSTS; do
   echo "Uploading shared configs to worker node"
 
   ssh $SSH_OPTS "$user@$target_host" \
-    "mkdir -p '${SWARM_PATH}/configs' '${SWARM_PATH}/init' '${SWARM_PATH}/certs'"
+    "mkdir -p '${SWARM_PATH}' '${SWARM_PATH}/certs' && rm -rf '${SWARM_PATH}/configs.next' '${SWARM_PATH}/init.next'"
 
   scp $SSH_OPTS -r \
-    deploy-payload/configs deploy-payload/init deploy-payload/prometheus.yml \
-    "$user@$target_host:${SWARM_PATH}/"
+    deploy-payload/configs \
+    "$user@$target_host:${SWARM_PATH}/configs.next"
+
+  scp $SSH_OPTS -r \
+    deploy-payload/init \
+    "$user@$target_host:${SWARM_PATH}/init.next"
+
+  scp $SSH_OPTS \
+    deploy-payload/prometheus.yml \
+    "$user@$target_host:${SWARM_PATH}/prometheus.yml"
+
+  ssh $SSH_OPTS "$user@$target_host" \
+    "rm -rf '${SWARM_PATH}/configs.old' '${SWARM_PATH}/init.old' && \
+     if [ -d '${SWARM_PATH}/configs' ]; then mv '${SWARM_PATH}/configs' '${SWARM_PATH}/configs.old'; fi && \
+     if [ -d '${SWARM_PATH}/init' ]; then mv '${SWARM_PATH}/init' '${SWARM_PATH}/init.old'; fi && \
+     mv '${SWARM_PATH}/configs.next' '${SWARM_PATH}/configs' && \
+     mv '${SWARM_PATH}/init.next' '${SWARM_PATH}/init'"
 done

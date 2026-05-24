@@ -1,11 +1,13 @@
-﻿using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Configuration;
+﻿using Common;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Pricing.Persistence.Contexts;
 
 var builder = Host.CreateDefaultBuilder(args)
-    .ConfigureAppConfiguration((_, config) => { config.AddCommandLine(args); });
+    .ConfigureAppConfiguration((_, config) =>
+        config.AddMigratorSettingsFromJsons("pricing.settings")
+            .AddMigratorSettingsFromJsons("pricing.settings", "/app/configs"));
 
 builder.ConfigureServices((context, services) =>
 {
