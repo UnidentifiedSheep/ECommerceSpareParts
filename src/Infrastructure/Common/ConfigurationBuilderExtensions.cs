@@ -43,7 +43,7 @@ public static class ConfigurationBuilderExtensions
             if (!ShouldLoad(fileName, nameStart, contour))
                 continue;
 
-            configuration.AddJsonFile(file, true, true);
+            configuration.AddJsonFile(file, optional: true, reloadOnChange: true);
         }
 
         return configuration;

@@ -15,7 +15,7 @@ using Security.Services;
 var builder = Host.CreateDefaultBuilder(args)
     .ConfigureAppConfiguration((_, config) =>
         config.AddMigratorSettingsFromJsons("main.settings")
-            .AddAppSettingsFromJsons("main.settings", "/app/configs"));
+            .AddMigratorSettingsFromJsons("main.settings", "/app/configs"));
 
 
 var seedingRequested = false;
