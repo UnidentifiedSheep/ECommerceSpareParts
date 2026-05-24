@@ -40,6 +40,13 @@ if (secret == null)
     throw new ArgumentNullException(nameof(secret), "HeaderSecret:Key cannot be null.");
 
 var reverseProxySection = builder.Configuration.GetSection("ReverseProxy");
+var routeCount = reverseProxySection.GetSection("Routes").GetChildren().Count();
+var clusterCount = reverseProxySection.GetSection("Clusters").GetChildren().Count();
+
+Console.WriteLine($"Gateway reverse proxy config loaded. Routes: {routeCount}, clusters: {clusterCount}");
+
+if (routeCount == 0 || clusterCount == 0)
+    throw new InvalidOperationException("Gateway reverse proxy config is empty.");
 
 builder.Services.AddReverseProxy()
     .LoadFromConfig(reverseProxySection)
