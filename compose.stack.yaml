@@ -7,6 +7,7 @@ services:
       - --providers.swarm.network=${TRAEFIK_NETWORK:-ecommerce_backend-network}
       - --entrypoints.web.address=:80
       - --entrypoints.websecure.address=:443
+      - --entrypoints.postgres.address=:5432
       - --entrypoints.web.http.redirections.entrypoint.to=websecure
       - --entrypoints.web.http.redirections.entrypoint.scheme=https
       - --certificatesresolvers.letsencrypt.acme.email=${TRAEFIK_ACME_EMAIL:?TRAEFIK_ACME_EMAIL is required}
@@ -20,6 +21,10 @@ services:
         mode: host
       - target: 443
         published: 443
+        protocol: tcp
+        mode: host
+      - target: 5432
+        published: 5432
         protocol: tcp
         mode: host
     volumes:
@@ -183,6 +188,11 @@ services:
       placement:
         constraints:
           - node.labels.role == infra
+      labels:
+        - traefik.enable=true
+        - traefik.tcp.routers.pgql.rule=HostSNI(`*`)
+        - traefik.tcp.routers.pgql.entrypoints=postgres
+        - traefik.tcp.services.pgql.loadbalancer.server.port=5432
       restart_policy:
         condition: any
 

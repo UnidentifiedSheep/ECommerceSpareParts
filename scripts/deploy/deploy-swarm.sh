@@ -50,7 +50,7 @@ run_migrator() {
     --name "$service_name" \
     --detach=true \
     --restart-condition none \
-    --constraint 'node.labels.role == app' \
+    --constraint "$MIGRATOR_NODE_CONSTRAINT" \
     --network "$TRAEFIK_NETWORK" \
     --env DOTNET_ENVIRONMENT="$DOTNET_ENVIRONMENT" \
     --env ASPNETCORE_ENVIRONMENT="$ASPNETCORE_ENVIRONMENT" \
@@ -107,6 +107,8 @@ require_env PGQL_PASSWORD
 require_env TRAEFIK_NETWORK
 require_env CONFIGS_PATH
 require_env DOCKER_CONFIG
+
+MIGRATOR_NODE_CONSTRAINT="${MIGRATOR_NODE_CONSTRAINT:-node.labels.role == infra}"
 
 mkdir -p "$DOCKER_CONFIG"
 sudo chown -R "$(id -u):$(id -g)" "$DOCKER_CONFIG"
