@@ -4,14 +4,40 @@ import base64
 import json
 import os
 import sys
+import time
 import urllib.parse
 import urllib.request
-from urllib.error import HTTPError
+from urllib.error import HTTPError, URLError
 from pathlib import Path
 
 
 DEFAULT_AUTH_URL = "https://iam.api.cloud.ru/api/v1/auth/token"
 DEFAULT_SECRET_API_URL = "https://secretmanager.api.cloud.ru"
+DEFAULT_HTTP_RETRIES = 5
+DEFAULT_HTTP_TIMEOUT_SECONDS = 30
+DEFAULT_HTTP_RETRY_DELAY_SECONDS = 2
+
+
+def get_retry_count() -> int:
+    return int(os.environ.get("CLOUD_RU_HTTP_RETRIES", str(DEFAULT_HTTP_RETRIES)))
+
+
+def get_timeout_seconds() -> int:
+    return int(os.environ.get("CLOUD_RU_HTTP_TIMEOUT_SECONDS", str(DEFAULT_HTTP_TIMEOUT_SECONDS)))
+
+
+def get_retry_delay_seconds() -> float:
+    return float(os.environ.get("CLOUD_RU_HTTP_RETRY_DELAY_SECONDS", str(DEFAULT_HTTP_RETRY_DELAY_SECONDS)))
+
+
+def should_retry_http_error(exc: HTTPError) -> bool:
+    return exc.code == 429 or 500 <= exc.code < 600
+
+
+def sleep_before_retry(attempt: int) -> None:
+    delay = get_retry_delay_seconds() * attempt
+    print(f"Cloud.ru request failed, retrying in {delay:.1f}s...", file=sys.stderr)
+    time.sleep(delay)
 
 
 def get_cloud_ru_token(
@@ -37,8 +63,7 @@ def get_cloud_ru_token(
         },
     )
 
-    with urllib.request.urlopen(request, timeout=30) as response:
-        payload = json.loads(response.read().decode("utf-8"))
+    payload = open_json_with_retries(request)
 
     token = payload.get("access_token")
     if not token:
@@ -66,14 +91,38 @@ def request_json(
         headers=headers,
     )
 
-    try:
-        with urllib.request.urlopen(request, timeout=30) as response:
-            return json.loads(response.read().decode("utf-8"))
-    except HTTPError as exc:
-        body = exc.read().decode("utf-8", errors="replace")
-        raise RuntimeError(
-            f"Cloud.ru request failed: {method} {url} -> HTTP {exc.code} {exc.reason}\n{body}"
-        ) from exc
+    return open_json_with_retries(request)
+
+
+def open_json_with_retries(request: urllib.request.Request) -> dict:
+    retries = get_retry_count()
+    timeout = get_timeout_seconds()
+    method = request.get_method()
+    url = request.full_url
+
+    for attempt in range(1, retries + 1):
+        try:
+            with urllib.request.urlopen(request, timeout=timeout) as response:
+                return json.loads(response.read().decode("utf-8"))
+        except HTTPError as exc:
+            body = exc.read().decode("utf-8", errors="replace")
+            if attempt < retries and should_retry_http_error(exc):
+                sleep_before_retry(attempt)
+                continue
+
+            raise RuntimeError(
+                f"Cloud.ru request failed: {method} {url} -> HTTP {exc.code} {exc.reason}\n{body}"
+            ) from exc
+        except (TimeoutError, URLError) as exc:
+            if attempt < retries:
+                sleep_before_retry(attempt)
+                continue
+
+            raise RuntimeError(
+                f"Cloud.ru request failed after {retries} attempts: {method} {url}\n{exc}"
+            ) from exc
+
+    raise RuntimeError(f"Cloud.ru request failed after {retries} attempts: {method} {url}")
 
 
 def list_secret_paths(
