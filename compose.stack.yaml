@@ -232,6 +232,12 @@ services:
       placement:
         constraints:
           - node.labels.role == infra
+      labels:
+        - traefik.enable=true
+        - traefik.http.routers.rabbitmq.rule=Host(`${RABBITMQ_HOST:?RABBITMQ_HOST is required}`)
+        - traefik.http.routers.rabbitmq.entrypoints=websecure
+        - traefik.http.routers.rabbitmq.tls.certresolver=letsencrypt
+        - traefik.http.services.rabbitmq.loadbalancer.server.port=15672
       restart_policy:
         condition: any
 
