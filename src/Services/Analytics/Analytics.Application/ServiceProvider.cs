@@ -9,6 +9,7 @@ using Application.Common;
 using Application.Common.Interfaces.Currency;
 using Application.Common.Services;
 using Application.Common.Services.Currency;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using ZiggyCreatures.Caching.Fusion;
 
@@ -16,10 +17,12 @@ namespace Analytics.Application;
 
 public static class ServiceProvider
 {
-    public static IServiceCollection AddApplicationLayer(this IServiceCollection collection)
+    public static IServiceCollection AddApplicationLayer(
+        this IServiceCollection collection,
+        IConfiguration configuration)
     {
         collection
-            .AddApplicationBase(typeof(Global).Assembly)
+            .AddApplicationBase(configuration, typeof(Global).Assembly)
             .RegisterMetricCalculators()
             .RegisterMetricConverters()
             .AddFusionCache()

@@ -37,7 +37,7 @@ builder.Services
     .AddPersistenceLayer()
     .AddCacheLayer("analytics")
     .AddIntegrationClients()
-    .AddApplicationLayer();
+    .AddApplicationLayer(builder.Configuration);
 
 AddMassTransit(builder);
 

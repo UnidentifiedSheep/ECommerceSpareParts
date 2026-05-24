@@ -44,7 +44,8 @@ public class ServiceProviderBuilder : IServiceProviderBuilder<ServiceProviderArg
             .WriteTo.Console()
             .CreateLogger();
 
-        ApplicationServiceProvider.AddApplicationLayer(services)
+        ApplicationServiceProvider
+            .AddApplicationLayer(services, null)
             .AddLocalization("ru-RU", "ru-RU", "en-EN")
             .AddPersistenceLayer();
         var passwordRules = new PasswordRules

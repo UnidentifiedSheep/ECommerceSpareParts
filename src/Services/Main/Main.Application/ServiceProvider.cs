@@ -17,6 +17,7 @@ using Main.Application.Services;
 using Main.Application.Services.Currency;
 using Main.Application.Services.Logistics;
 using Main.Application.Services.Logistics.PricingStrategies;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using ZiggyCreatures.Caching.Fusion;
 
@@ -26,6 +27,7 @@ public static class ServiceProvider
 {
     public static IServiceCollection AddApplicationLayer(
         this IServiceCollection collection,
+        IConfiguration? configuration,
         UserEmailOptions? emailOptions = null,
         UserPhoneOptions? phoneOptions = null)
     {
@@ -62,7 +64,7 @@ public static class ServiceProvider
         collection.AddScoped<ICurrencyRateUpdater, CurrencyRateUpdater>();
         collection.AddScoped<ICurrencyRatesProvider, CurrencyRatesProvider>();
 
-        collection.AddApplicationBase(typeof(Global).Assembly);
+        collection.AddApplicationBase(configuration, typeof(Global).Assembly);
 
         collection.AddSingleton<IEmailValidator, EmailValidator>();
 

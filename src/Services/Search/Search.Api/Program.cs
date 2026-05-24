@@ -61,7 +61,7 @@ builder.Services
     .AddEComAuth(builder.Configuration)
     .AddMinimalSecurityLayer()
     .AddIntegrationClients()
-    .AddApplicationLayer()
+    .AddApplicationLayer(builder.Configuration)
     .AddPersistenceLayer()
     .AddLocalization(builder.Configuration);
 

@@ -2,6 +2,7 @@
 using Application.Common.Backplane;
 using Application.Common.Behaviors;
 using Application.Common.Extensions;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using ZiggyCreatures.Caching.Fusion.Backplane;
 
@@ -11,6 +12,7 @@ public static class ServiceProvider
 {
     public static IServiceCollection AddApplicationBase(
         this IServiceCollection services, 
+        IConfiguration? configuration,
         Assembly? assembly = null,
         params Type[] behaviorsToExclude)
     {
@@ -28,6 +30,10 @@ public static class ServiceProvider
         var hs = behaviorsToExclude.ToHashSet();
         services.AddMediatR(config =>
         {
+            var licenseKey = configuration?.GetValue<string>("MediatR:LicenseKey");
+            if (!string.IsNullOrWhiteSpace(licenseKey))
+                config.LicenseKey = licenseKey;
+            
             config.RegisterServicesFromAssembly(assembly);
             config
                 .RegisterIfNotExcluded(

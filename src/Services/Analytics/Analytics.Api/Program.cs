@@ -36,7 +36,7 @@ builder.Services.AddCommonApiInfrastructure();
 builder.Services
     .AddPersistenceLayer()
     .AddCacheLayer("analytics")
-    .AddApplicationLayer()
+    .AddApplicationLayer(builder.Configuration)
     .AddIntegrationClients()
     .AddEComAuth(builder.Configuration)
     .AddMinimalSecurityLayer();

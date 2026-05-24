@@ -77,7 +77,7 @@ builder.Services
     .AddMinimalSecurityLayer()
     .AddIntegrationClients()
     .AddCommonLayer()
-    .AddApplicationLayer()
+    .AddApplicationLayer(builder.Configuration)
     .AddLocalization(builder.Configuration);
 
 builder.Services.AddOpenTelemetry()

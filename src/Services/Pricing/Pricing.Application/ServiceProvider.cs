@@ -1,4 +1,5 @@
 ﻿using Application.Common;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Pricing.Application.Interfaces.Services;
 using Pricing.Application.Interfaces.Services.Pricing;
@@ -9,9 +10,11 @@ namespace Pricing.Application;
 
 public static class ServiceProvider
 {
-    public static IServiceCollection AddApplicationLayer(this IServiceCollection collection)
+    public static IServiceCollection AddApplicationLayer(
+        this IServiceCollection collection,
+        IConfiguration configuration)
     {
-        collection.AddApplicationBase(typeof(Global).Assembly);
+        collection.AddApplicationBase(configuration, typeof(Global).Assembly);
 
         collection.AddSingleton<IBasePriceStrategyFactory, BasePriceStrategyFactory>();
         collection.AddSingleton<IBasePriceStrategy, AverageBasePriceStrategy>();

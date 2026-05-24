@@ -157,7 +157,7 @@ builder.Services
         };
         return new AmazonS3Client(options.Login, options.Password, config);
     })
-    .AddApplicationLayer(emailOptions)
+    .AddApplicationLayer(builder.Configuration, emailOptions)
     .AddLocalization(builder.Configuration)
     .AddExchangeRates();
 
