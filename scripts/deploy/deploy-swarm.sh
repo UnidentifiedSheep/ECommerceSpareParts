@@ -11,6 +11,13 @@ render_stack_file() {
     > "$target_file"
 }
 
+print_service_diagnostics() {
+  local service_name="$1"
+
+  sudo docker service ps "$service_name" --no-trunc || true
+  sudo docker service logs "$service_name" --raw --tail 200 || true
+}
+
 wait_for_postgres() {
   echo "=== Wait for PostgreSQL ==="
 
@@ -20,12 +27,11 @@ wait_for_postgres() {
       return 0
     fi
 
-    if [ "$attempt" -eq 60 ]; then
-      echo "PostgreSQL did not become ready in time."
-      sudo docker service ps "${STACK_NAME}_pgql" --no-trunc || true
-      sudo docker service logs "${STACK_NAME}_pgql" --tail 200 || true
-      return 1
-    fi
+              if [ "$attempt" -eq 60 ]; then
+                echo "PostgreSQL did not become ready in time."
+                print_service_diagnostics "${STACK_NAME}_pgql"
+                return 1
+              fi
 
     sleep 5
   done
@@ -42,6 +48,7 @@ run_migrator() {
 
   sudo --preserve-env=DOCKER_CONFIG docker service create \
     --name "$service_name" \
+    --detach=true \
     --restart-condition none \
     --constraint 'node.labels.role == app' \
     --network "$TRAEFIK_NETWORK" \
@@ -61,9 +68,9 @@ run_migrator() {
         sudo docker service rm "$service_name" >/dev/null
         return 0
         ;;
-      Failed*|Rejected*)
+      Failed*|Rejected*|Shutdown*non-zero\ exit*|*non-zero\ exit*|*exit\ \(*)
         echo "$state"
-        sudo docker service logs "$service_name" --raw --tail 200 || true
+        print_service_diagnostics "$service_name"
         sudo docker service rm "$service_name" >/dev/null
         return 1
         ;;
@@ -73,8 +80,7 @@ run_migrator() {
   done
 
   echo "${migrator_name} did not complete in time."
-  sudo docker service ps "$service_name" --no-trunc || true
-  sudo docker service logs "$service_name" --raw --tail 200 || true
+  print_service_diagnostics "$service_name"
   sudo docker service rm "$service_name" >/dev/null
   return 1
 }
