@@ -9,7 +9,7 @@ public class CurrencySeed : ISeed<DContext>
 {
     public async Task SeedAsync(DContext context)
     {
-        if (await context.Currencies.AnyAsync(x => x.Id == 1))
+        if (await context.Currencies.AnyAsync(x => x.Code == "USD"))
             return;
 
         var usd = Currency.Create("Доллар США", "Дол.", "$", "USD");

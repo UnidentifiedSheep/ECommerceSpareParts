@@ -20,6 +20,13 @@ public class RolePermissionSeed : ISeed<DContext>
             .ToDictionaryAsync(p => p.Name);
 
         var rolePermissions = BuildRolePermissions();
+        var existingRolePermissions = (await context.Set<RolePermission>()
+                .Select(x => new { x.RoleName, x.PermissionName })
+                .ToListAsync())
+            .Select(x => (x.RoleName, x.PermissionName))
+            .ToHashSet();
+
+        var newRolePermissions = new List<RolePermission>();
 
         foreach (var role in roles)
         {
@@ -28,9 +35,16 @@ public class RolePermissionSeed : ISeed<DContext>
             if (!rolePermissions.TryGetValue(parsedRole, out var needed))
                 continue;
 
-            await context.AddRangeAsync(ResolvePermissions(role.Name, needed, permissions));
+            var permissionsToAdd = ResolvePermissions(role.Name, needed, permissions)
+                .Where(x => existingRolePermissions.Add(x.GetId()))
+                .ToList();
+
+            newRolePermissions.AddRange(permissionsToAdd);
         }
 
+        if (newRolePermissions.Count == 0) return;
+
+        await context.AddRangeAsync(newRolePermissions);
         await context.SaveChangesAsync();
     }
 

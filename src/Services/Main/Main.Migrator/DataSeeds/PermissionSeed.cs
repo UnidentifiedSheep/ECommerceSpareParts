@@ -9,20 +9,18 @@ public class PermissionSeed : ISeed<DContext>
 {
     public async Task SeedAsync(DContext context)
     {
-        if (!context.Permissions.Any())
-        {
-            var permissions = GetPermissions();
-            var existingPermissions = context.Permissions
-                .Select(p => p.Name)
-                .ToHashSet();
-            var newPermissions = permissions
-                .Where(p => !existingPermissions.Contains(p.Name))
-                .ToList();
-            if (newPermissions.Count == 0) return;
+        var permissions = GetPermissions();
+        var existingPermissions = context.Permissions
+            .Select(p => p.Name)
+            .ToHashSet();
 
-            await context.Permissions.AddRangeAsync(newPermissions);
-            await context.SaveChangesAsync();
-        }
+        var newPermissions = permissions
+            .Where(p => !existingPermissions.Contains(p.Name))
+            .ToList();
+        if (newPermissions.Count == 0) return;
+
+        await context.Permissions.AddRangeAsync(newPermissions);
+        await context.SaveChangesAsync();
     }
 
     public int GetPriority()

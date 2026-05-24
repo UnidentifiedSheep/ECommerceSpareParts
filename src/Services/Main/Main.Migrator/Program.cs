@@ -13,7 +13,6 @@ using Persistence.Interfaces;
 using Security.Services;
 
 var builder = Host.CreateDefaultBuilder(args)
-    .ConfigureAppConfiguration((_, config) => { config.AddCommandLine(args); })
     .ConfigureAppConfiguration((_, config) =>
         config.AddMigratorSettingsFromJsons("main.settings")
             .AddAppSettingsFromJsons("main.settings", "/app/configs"));
@@ -26,7 +25,7 @@ builder.ConfigureServices((context, services) =>
     var connectionString = context.Configuration["ConnectionString"];
 
     var seedValue = context.Configuration.GetValue<bool?>("Seed");
-    seedingRequested = seedValue.HasValue && seedValue.Value;
+    seedingRequested = seedValue == true;
 
     //add db context
     services.AddDbContext<DContext>(options => options.UseNpgsql(connectionString,
