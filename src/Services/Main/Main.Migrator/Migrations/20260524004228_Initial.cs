@@ -2130,13 +2130,13 @@ namespace Main.Migrator.Migrations
                 column: "storage");
 
             migrationBuilder.CreateIndex(
-                name: "domain.commonentities.setting_who_created_idx",
+                name: "main.entities.setting.storagecontentsetting_who_created_idx",
                 schema: "public",
                 table: "settings",
                 column: "who_created");
 
             migrationBuilder.CreateIndex(
-                name: "domain.commonentities.setting_who_updated_idx",
+                name: "main.entities.setting.storagecontentsetting_who_updated_idx",
                 schema: "public",
                 table: "settings",
                 column: "who_updated");

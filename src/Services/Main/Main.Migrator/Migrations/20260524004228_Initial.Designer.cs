@@ -14,7 +14,7 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace Main.Migrator.Migrations
 {
     [DbContext(typeof(DContext))]
-    [Migration("20260516133723_Initial")]
+    [Migration("20260524004228_Initial")]
     partial class Initial
     {
         /// <inheritdoc />
@@ -62,14 +62,16 @@ namespace Main.Migrator.Migrations
                         .HasName("settings_pk");
 
                     b.HasIndex("WhoCreated")
-                        .HasDatabaseName("domain.commonentities.setting_who_created_idx");
+                        .HasDatabaseName("main.entities.setting.storagecontentsetting_who_created_idx");
 
                     b.HasIndex("WhoUpdated")
-                        .HasDatabaseName("domain.commonentities.setting_who_updated_idx");
+                        .HasDatabaseName("main.entities.setting.storagecontentsetting_who_updated_idx");
 
                     b.ToTable("settings", "public");
 
                     b.HasDiscriminator<string>("Key").HasValue("Setting");
+
+                    b.UseTphMappingStrategy();
                 });
 
             modelBuilder.Entity("Main.Entities.Auth.Permission", b =>
@@ -2764,6 +2766,27 @@ namespace Main.Migrator.Migrations
                     b.ToTable("OutboxState", "msg");
                 });
 
+            modelBuilder.Entity("Main.Entities.Setting.CurrencySetting", b =>
+                {
+                    b.HasBaseType("Domain.CommonEntities.Setting");
+
+                    b.HasDiscriminator().HasValue("CurrencySetting");
+                });
+
+            modelBuilder.Entity("Main.Entities.Setting.GlobalApplicationSetting", b =>
+                {
+                    b.HasBaseType("Domain.CommonEntities.Setting");
+
+                    b.HasDiscriminator().HasValue("GlobalApplicationSetting");
+                });
+
+            modelBuilder.Entity("Main.Entities.Setting.StorageContentSetting", b =>
+                {
+                    b.HasBaseType("Domain.CommonEntities.Setting");
+
+                    b.HasDiscriminator().HasValue("StorageContentSetting");
+                });
+
             modelBuilder.Entity("Main.Entities.Event.StorageMovementEvent", b =>
                 {
                     b.HasBaseType("Main.Entities.Event.Event");
@@ -2973,7 +2996,7 @@ namespace Main.Migrator.Migrations
             modelBuilder.Entity("Main.Entities.Producer.ProducerOtherName", b =>
                 {
                     b.HasOne("Main.Entities.Producer.Producer", null)
-                        .WithMany()
+                        .WithMany("OtherNames")
                         .HasForeignKey("ProducerId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired()
@@ -3544,6 +3567,11 @@ namespace Main.Migrator.Migrations
             modelBuilder.Entity("Main.Entities.Currency.CurrencyRate", b =>
                 {
                     b.Navigation("History");
+                });
+
+            modelBuilder.Entity("Main.Entities.Producer.Producer", b =>
+                {
+                    b.Navigation("OtherNames");
                 });
 
             modelBuilder.Entity("Main.Entities.Product.Product", b =>
