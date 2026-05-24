@@ -60,7 +60,7 @@ services:
         - traefik.http.routers.gateway.rule=Host(`${GATEWAY_HOST:?GATEWAY_HOST is required}`)
         - traefik.http.routers.gateway.entrypoints=websecure
         - traefik.http.routers.gateway.tls.certresolver=letsencrypt
-        - traefik.http.services.gateway.loadbalancer.server.port=7292
+        - traefik.http.services.gateway.loadbalancer.server.port=8080
       update_config:
         parallelism: 1
         order: start-first
