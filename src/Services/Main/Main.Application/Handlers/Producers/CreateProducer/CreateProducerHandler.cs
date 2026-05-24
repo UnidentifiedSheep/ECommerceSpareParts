@@ -8,6 +8,7 @@ using Main.Entities.Producer;
 
 namespace Main.Application.Handlers.Producers.CreateProducer;
 
+[AutoSave]
 [Transactional]
 public record CreateProducerCommand(NewProducerDto NewProducer) : ICommand<CreateProducerResult>;
 

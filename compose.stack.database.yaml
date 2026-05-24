@@ -19,6 +19,11 @@ services:
       placement:
         constraints:
           - node.labels.role == infra
+      labels:
+        - traefik.enable=true
+        - traefik.tcp.routers.pgql.rule=HostSNI(`*`)
+        - traefik.tcp.routers.pgql.entrypoints=postgres
+        - traefik.tcp.services.pgql.loadbalancer.server.port=5432
       restart_policy:
         condition: any
 
