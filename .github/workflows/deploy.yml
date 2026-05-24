@@ -50,7 +50,6 @@ jobs:
             mkdir -p '${{ env.SWARM_PATH }}'
             cd '${{ env.SWARM_PATH }}'
 
-            rm -rf configs init
             mkdir -p configs init certs
 
       - name: Upload stack files to leader

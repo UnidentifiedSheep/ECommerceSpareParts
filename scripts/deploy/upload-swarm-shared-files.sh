@@ -24,7 +24,7 @@ for host in $SWARM_WORKER_HOSTS; do
   echo "Uploading shared configs to worker node"
 
   ssh $SSH_OPTS "$user@$target_host" \
-    "mkdir -p '${SWARM_PATH}' && rm -rf '${SWARM_PATH}/configs' '${SWARM_PATH}/init' && mkdir -p '${SWARM_PATH}/configs' '${SWARM_PATH}/init' '${SWARM_PATH}/certs'"
+    "mkdir -p '${SWARM_PATH}/configs' '${SWARM_PATH}/init' '${SWARM_PATH}/certs'"
 
   scp $SSH_OPTS -r \
     deploy-payload/configs deploy-payload/init deploy-payload/prometheus.yml \
