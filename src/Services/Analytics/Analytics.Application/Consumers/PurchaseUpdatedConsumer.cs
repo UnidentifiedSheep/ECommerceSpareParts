@@ -1,18 +1,13 @@
-﻿using Analytics.Application.Dtos.PurchaseFact;
-using Analytics.Application.Handlers.PurchaseFacts.UpsertPurchaseFact;
+﻿using Analytics.Application.Interfaces.Services;
 using Contracts.Purchase;
-using Mapster;
 using MassTransit;
-using MediatR;
 
 namespace Analytics.Application.Consumers;
 
-public class PurchaseUpdatedConsumer(IMediator mediator) : IConsumer<PurchaseUpdateEvent>
+public class PurchaseUpdatedConsumer(IPurchaseFactSynchronizer synchronizer) : IConsumer<PurchaseUpdateEvent>
 {
     public async Task Consume(ConsumeContext<PurchaseUpdateEvent> context)
     {
-        var data = context.Message.Purchase.Adapt<PurchaseFactUpsertDto>();
-        var upsertCommand = new UpsertPurchaseFactCommand(data);
-        await mediator.Send(upsertCommand);
+        await synchronizer.SynchronizeAsync(context.Message.PurchaseId);
     }
 }

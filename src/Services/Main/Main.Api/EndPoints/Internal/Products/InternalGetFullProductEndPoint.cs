@@ -1,5 +1,7 @@
 using System.Text.Json.Serialization;
+using Api.Common.Extensions;
 using Carter;
+using Enums;
 using Main.Application.Dtos.Product;
 using Main.Application.Handlers.Products.GetFullProduct;
 using MediatR;
@@ -37,7 +39,9 @@ public class InternalGetFullProductEndPoint : ICarterModule
                     ProductWeight = result.ProductWeight,
                     ProductSize = result.ProductSize
                 });
-            }).WithGroupName("Internal Products")
+            })
+            .RequireAllPermissions(PermissionCodes.ARTICLES_GET_MAIN)
+            .WithGroupName("Internal Products")
             .WithDisplayName("Internal service full product")
             .WithName("InternalFullProduct")
             .WithSummary("Получить полный продукт для внутреннего сервиса")

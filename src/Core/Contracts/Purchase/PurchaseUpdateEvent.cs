@@ -1,6 +1,9 @@
-﻿namespace Contracts.Purchase;
+﻿using Abstractions.Interfaces;
 
-public record PurchaseUpdateEvent
+namespace Contracts.Purchase;
+
+public record PurchaseUpdateEvent : IKeyedEvent
 {
-    public required Models.Purchase.Purchase Purchase { get; init; }
+    public required Guid PurchaseId { get; init; }
+    public string GetKey() => $"purchase-updated:{PurchaseId}";
 }

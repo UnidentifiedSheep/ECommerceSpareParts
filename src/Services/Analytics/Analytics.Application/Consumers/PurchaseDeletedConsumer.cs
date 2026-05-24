@@ -1,15 +1,13 @@
-﻿using Analytics.Application.Handlers.PurchaseFacts.DeletePurchaseFact;
+﻿using Analytics.Application.Interfaces.Services;
 using Contracts.Purchase;
 using MassTransit;
-using MediatR;
 
 namespace Analytics.Application.Consumers;
 
-public class PurchaseDeletedConsumer(IMediator mediator) : IConsumer<PurchaseDeleteEvent>
+public class PurchaseDeletedConsumer(IPurchaseFactSynchronizer synchronizer) : IConsumer<PurchaseDeleteEvent>
 {
     public async Task Consume(ConsumeContext<PurchaseDeleteEvent> context)
     {
-        var purchase = context.Message.Purchase;
-        await mediator.Send(new DeletePurchaseFactCommand(purchase.Id));
+        await synchronizer.SynchronizeAsync(context.Message.PurchaseId);
     }
 }

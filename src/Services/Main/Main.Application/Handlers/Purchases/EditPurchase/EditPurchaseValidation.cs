@@ -2,7 +2,7 @@ using FluentValidation;
 using Localization.Domain.Extensions;
 using Main.Application.Handlers.Purchases.BaseValidators;
 
-namespace Main.Application.Handlers.Purchases.EditFullPurchase;
+namespace Main.Application.Handlers.Purchases.EditPurchase;
 
 public class EditPurchaseValidation : AbstractValidator<EditPurchaseCommand>
 {

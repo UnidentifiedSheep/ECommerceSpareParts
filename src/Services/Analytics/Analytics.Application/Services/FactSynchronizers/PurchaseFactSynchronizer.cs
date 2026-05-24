@@ -1,0 +1,99 @@
+﻿using System.Data;
+using Abstractions.Interfaces.Services;
+using Analytics.Application.Interfaces.Services;
+using Analytics.Entities;
+using Application.Common.Interfaces.Repositories;
+using Attributes;
+using Internal.Integration.Core.Interfaces;
+using Microsoft.Extensions.Logging;
+
+namespace Analytics.Application.Services.FactSynchronizers;
+
+public class PurchaseFactSynchronizer(
+    IMainClient mainClient,
+    IRepository<PurchasesFact, Guid> repository,
+    IUnitOfWork unitOfWork,
+    ILogger<IPurchaseFactSynchronizer> logger) : IPurchaseFactSynchronizer
+{
+    public async Task<PurchasesFact?> SynchronizeAsync(
+        Guid id, 
+        CancellationToken cancellationToken = default)
+    {
+        return await unitOfWork.ExecuteWithTransaction(
+            TransactionalAttribute.ReadCommited(20, 2),
+            async () => await ExecuteAsync(id, cancellationToken),
+            cancellationToken);
+    }
+
+    private async Task<PurchasesFact?> ExecuteAsync(
+        Guid id, 
+        CancellationToken cancellationToken)
+    {
+        var synchronizationStartedAt = DateTime.UtcNow;
+        
+        var fromMain = await mainClient.GetFullPurchase(id, cancellationToken);
+        var dbFact = await repository.FirstOrDefaultAsync(
+            Criteria<PurchasesFact>
+                .New()
+                .Where(x => x.Id == id)
+                .Include(x => x.PurchaseContents)
+                .Track()
+                .Build(),
+            cancellationToken);
+         
+        if (synchronizationStartedAt <= dbFact?.ProcessedAt)
+        {
+            logger.LogWarning(
+                "Purchase fact Id: {id} upsert skipped, because current record is newer than incoming." +
+                "Last processed at: {lastProcessedAt}. Incoming creation date time: {creationDate}",
+                id,
+                dbFact.ProcessedAt,
+                synchronizationStartedAt);
+
+            return dbFact;
+        }
+
+        if (fromMain is null)
+        {
+            if (dbFact is not null)
+                unitOfWork.Remove(dbFact);
+
+            await unitOfWork.SaveChangesAsync(cancellationToken);
+            return null;
+        }
+
+        var purchase = fromMain.Purchase;
+        var contents = fromMain.Contents.Select(x =>
+            PurchaseContent.Create(
+                x.Id,
+                purchase.Id,
+                x.Product.Id,
+                x.Price,
+                x.Count));
+
+        if (dbFact is null)
+        {
+            dbFact = PurchasesFact.Create(
+                purchase.Id,
+                purchase.Currency.Id,
+                purchase.Supplier.Id,
+                purchase.PurchaseDatetime,
+                synchronizationStartedAt,
+                contents);
+
+            await unitOfWork.AddAsync(dbFact, cancellationToken);
+            await unitOfWork.SaveChangesAsync(cancellationToken);
+            return dbFact;
+        }
+
+        dbFact.Update(
+            purchase.Currency.Id,
+            purchase.Supplier.Id,
+            purchase.PurchaseDatetime,
+            synchronizationStartedAt,
+            contents);
+
+        await unitOfWork.SaveChangesAsync(cancellationToken);
+        return dbFact;
+    }
+}

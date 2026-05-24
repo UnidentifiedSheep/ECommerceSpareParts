@@ -1,12 +1,14 @@
 using System.Data;
 using Abstractions.Interfaces.Services;
 using Application.Common.Extensions;
+using Application.Common.Interfaces;
 using Application.Common.Interfaces.Cqrs;
 using Application.Common.Interfaces.Currency;
 using Application.Common.Interfaces.Repositories;
 using Application.Common.Interfaces.Settings;
 using Attributes;
-using Main.Application.Dtos.Amw.Purchase;
+using Contracts.Purchase;
+using Main.Application.Dtos.Purchase;
 using Main.Application.Extensions.Repository;
 using Main.Application.Handlers.Balance.CreateTransaction;
 using Main.Application.Handlers.Balance.ReverseTransaction;
@@ -24,7 +26,7 @@ using Main.Enums;
 using MediatR;
 using Event = Main.Entities.Event.Event;
 
-namespace Main.Application.Handlers.Purchases.EditFullPurchase;
+namespace Main.Application.Handlers.Purchases.EditPurchase;
 
 [AutoSave]
 [Transactional(IsolationLevel.ReadCommitted, 20, 2)]
@@ -49,6 +51,7 @@ public class EditPurchaseHandler(
     IProductRepository productRepository,
     ICurrencyConverter currencyConverter,
     IPurchaseLogisticsService purchaseLogisticsService,
+    IIntegrationEventScope integrationEventScope,
     IUnitOfWork unitOfWork) : ICommandHandler<EditPurchaseCommand>
 {
     public async Task<Unit> Handle(EditPurchaseCommand request, CancellationToken cancellationToken)
@@ -77,6 +80,11 @@ public class EditPurchaseHandler(
         await UpdateContents(purchase, contentDtos, request, cancellationToken);
         await UpdateLogistics(purchase, contentDtos, request, cancellationToken);
 
+        integrationEventScope.Add(new PurchaseUpdateEvent
+        {
+            PurchaseId = purchase.Id 
+        });
+        
         return Unit.Value;
     }
 

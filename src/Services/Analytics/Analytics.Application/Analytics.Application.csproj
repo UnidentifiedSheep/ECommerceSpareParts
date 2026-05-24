@@ -23,7 +23,7 @@
 
     <ItemGroup>
         <Folder Include="Configs\Mapster\"/>
-        <Folder Include="NamedObjects\"/>
+        <Folder Include="NamedObjects\" />
     </ItemGroup>
 
 </Project>

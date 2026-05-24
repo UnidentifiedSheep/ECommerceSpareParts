@@ -1,6 +1,7 @@
 using Abstractions.Interfaces;
 using Analytics.Application.Interfaces.Services;
 using Analytics.Application.Services;
+using Analytics.Application.Services.FactSynchronizers;
 using Analytics.Application.Services.Metrics.Calculators;
 using Analytics.Application.Services.Metrics.Converters;
 using Analytics.Application.Services.Metrics.Validators;
@@ -33,6 +34,7 @@ public static class ServiceProvider
         collection.AddSingleton<IJsonSerializer, JsonSerializer>();
         collection.AddScoped<ICurrencyConverter, CurrencyConverter>();
         collection.AddScoped<ICurrencyRatesProvider, CurrencyRatesProvider>();
+        collection.AddScoped<IPurchaseFactSynchronizer, PurchaseFactSynchronizer>();
 
         return collection;
     }

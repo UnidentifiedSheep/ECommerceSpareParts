@@ -1,11 +1,13 @@
 using System.Data;
 using Abstractions.Interfaces.Services;
 using Application.Common.Extensions;
+using Application.Common.Interfaces;
 using Application.Common.Interfaces.Cqrs;
 using Application.Common.Interfaces.Repositories;
 using Application.Common.Interfaces.Settings;
 using Attributes;
-using Main.Application.Dtos.Amw.Purchase;
+using Contracts.Purchase;
+using Main.Application.Dtos.Purchase;
 using Main.Application.Dtos.Storage;
 using Main.Application.Extensions;
 using Main.Application.Handlers.Balance.CreateTransaction;
@@ -43,6 +45,7 @@ public class CreatePurchaseHandler(
     ISettingsService settingsService,
     IUserRepository userRepository,
     IPurchaseLogisticsService purchaseLogisticsService,
+    IIntegrationEventScope integrationEventScope,
     IUnitOfWork unitOfWork) : ICommandHandler<CreatePurchaseCommand>
 {
     public async Task<Unit> Handle(CreatePurchaseCommand request, CancellationToken cancellationToken)
@@ -78,7 +81,7 @@ public class CreatePurchaseHandler(
 
         await unitOfWork.SaveChangesAsync(cancellationToken);
 
-        await CreatePurchase(
+        var purchase = await CreatePurchase(
             systemId,
             request,
             purchaseTransaction.Id,
@@ -95,6 +98,13 @@ public class CreatePurchaseHandler(
                     request.CurrencyId,
                     request.PurchaseDate),
                 cancellationToken);
+        
+        await unitOfWork.SaveChangesAsync(cancellationToken);
+        
+        integrationEventScope.Add(new PurchaseUpdateEvent
+        {
+            PurchaseId = purchase.Id 
+        });
 
         return Unit.Value;
     }
@@ -119,7 +129,7 @@ public class CreatePurchaseHandler(
             .StorageContents;
     }
 
-    private async Task CreatePurchase(
+    private async Task<Purchase> CreatePurchase(
         Guid systemId,
         CreatePurchaseCommand request,
         Guid transactionId,
@@ -172,5 +182,6 @@ public class CreatePurchaseHandler(
 
         purchase.Complete();
         await unitOfWork.AddAsync(purchase, cancellationToken);
+        return purchase;
     }
 }

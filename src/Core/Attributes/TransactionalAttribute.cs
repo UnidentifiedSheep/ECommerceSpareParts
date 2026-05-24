@@ -25,4 +25,10 @@ public class TransactionalAttribute : Attribute
     public int RetryDelayMs { get; }
     public int RetryCount { get; }
     public IEnumerable<string> RetryErrors { get; }
+    
+    public static TransactionalAttribute ReadCommited(int delay, int retryCount) =>
+        new(IsolationLevel.ReadCommitted, delay, retryCount);
+    
+    public static TransactionalAttribute Serializable(int delay, int retryCount) =>
+        new(IsolationLevel.Serializable, delay, retryCount);
 }

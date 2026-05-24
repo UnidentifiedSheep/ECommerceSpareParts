@@ -1,7 +1,7 @@
 using Enums;
 using FluentAssertions;
 using Main.Abstractions.Constants;
-using Main.Application.Dtos.Amw.Purchase;
+using Main.Application.Dtos.Purchase;
 using Main.Application.Handlers.Purchases.CreatePurchase;
 using Main.Entities.Exceptions;
 using Main.Entities.Product;
