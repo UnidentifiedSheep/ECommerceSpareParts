@@ -48,6 +48,7 @@ services:
     environment:
       - DOTNET_ENVIRONMENT=${DOTNET_ENVIRONMENT:-Staging}
       - ASPNETCORE_ENVIRONMENT=${ASPNETCORE_ENVIRONMENT:-Staging}
+      - DEPLOY_RUN_ID=${DEPLOY_RUN_ID:-local}
     networks:
       - backend-network
     deploy:
@@ -74,6 +75,7 @@ services:
     environment:
       - DOTNET_ENVIRONMENT=${DOTNET_ENVIRONMENT:-Staging}
       - ASPNETCORE_ENVIRONMENT=${ASPNETCORE_ENVIRONMENT:-Staging}
+      - DEPLOY_RUN_ID=${DEPLOY_RUN_ID:-local}
     networks:
       - backend-network
     deploy:
@@ -95,6 +97,7 @@ services:
     environment:
       - DOTNET_ENVIRONMENT=${DOTNET_ENVIRONMENT:-Staging}
       - ASPNETCORE_ENVIRONMENT=${ASPNETCORE_ENVIRONMENT:-Staging}
+      - DEPLOY_RUN_ID=${DEPLOY_RUN_ID:-local}
     networks:
       - backend-network
     deploy:
@@ -115,6 +118,7 @@ services:
     environment:
       - DOTNET_ENVIRONMENT=${DOTNET_ENVIRONMENT:-Staging}
       - ASPNETCORE_ENVIRONMENT=${ASPNETCORE_ENVIRONMENT:-Staging}
+      - DEPLOY_RUN_ID=${DEPLOY_RUN_ID:-local}
     networks:
       - backend-network
     deploy:
@@ -135,6 +139,7 @@ services:
     environment:
       - DOTNET_ENVIRONMENT=${DOTNET_ENVIRONMENT:-Staging}
       - ASPNETCORE_ENVIRONMENT=${ASPNETCORE_ENVIRONMENT:-Staging}
+      - DEPLOY_RUN_ID=${DEPLOY_RUN_ID:-local}
     networks:
       - backend-network
     deploy:
@@ -155,6 +160,7 @@ services:
     environment:
       - DOTNET_ENVIRONMENT=${DOTNET_ENVIRONMENT:-Staging}
       - ASPNETCORE_ENVIRONMENT=${ASPNETCORE_ENVIRONMENT:-Staging}
+      - DEPLOY_RUN_ID=${DEPLOY_RUN_ID:-local}
     networks:
       - backend-network
     deploy:
@@ -215,12 +221,6 @@ services:
       placement:
         constraints:
           - node.labels.role == infra
-      labels:
-        - traefik.enable=true
-        - traefik.http.routers.minio.rule=Host(`${MINIO_HOST:?MINIO_HOST is required}`)
-        - traefik.http.routers.minio.entrypoints=websecure
-        - traefik.http.routers.minio.tls.certresolver=letsencrypt
-        - traefik.http.services.minio.loadbalancer.server.port=9000
       restart_policy:
         condition: any
 
@@ -262,6 +262,12 @@ services:
       placement:
         constraints:
           - node.labels.role == infra
+      labels:
+        - traefik.enable=true
+        - traefik.http.routers.minio.rule=Host(`${MINIO_HOST:?MINIO_HOST is required}`)
+        - traefik.http.routers.minio.entrypoints=websecure
+        - traefik.http.routers.minio.tls.certresolver=letsencrypt
+        - traefik.http.services.minio.loadbalancer.server.port=9000
       restart_policy:
         condition: any
 
