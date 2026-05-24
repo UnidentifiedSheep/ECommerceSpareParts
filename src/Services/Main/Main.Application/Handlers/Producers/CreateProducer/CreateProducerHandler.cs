@@ -1,9 +1,11 @@
 using Abstractions.Interfaces.Services;
+using Application.Common.Extensions;
 using Application.Common.Interfaces;
 using Application.Common.Interfaces.Cqrs;
 using Attributes;
 using Contracts.Producer;
 using Main.Application.Dtos.Producer;
+using Main.Application.Handlers.Projections;
 using Main.Entities.Producer;
 
 namespace Main.Application.Handlers.Producers.CreateProducer;
@@ -12,7 +14,7 @@ namespace Main.Application.Handlers.Producers.CreateProducer;
 [Transactional]
 public record CreateProducerCommand(NewProducerDto NewProducer) : ICommand<CreateProducerResult>;
 
-public record CreateProducerResult(int ProducerId);
+public record CreateProducerResult(ProducerDto Producer);
 
 public class CreateProducerHandler(
     IUnitOfWork unitOfWork,
@@ -31,6 +33,6 @@ public class CreateProducerHandler(
             Id = producer.Id
         });
 
-        return new CreateProducerResult(producer.Id);
+        return new CreateProducerResult(ProducerProjections.ToDto.AsFunc()(producer));
     }
 }

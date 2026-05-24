@@ -20,7 +20,7 @@ public record AddOtherNameToProducerRequest(string OtherName, string WhereUsed);
 
 public record CreateProducerRequest(NewProducerDto NewProducer);
 
-public record CreateProducerResponse(int Id);
+public record CreateProducerResponse(ProducerDto Producer);
 
 public record EditProducerRequest(PatchProducerDto EditProducer);
 
@@ -98,7 +98,7 @@ public class ProducersEndPoints : ICarterModule
         producers.MapPost("", async (ISender sender, CreateProducerRequest request, CancellationToken token) =>
             {
                 var result = await sender.Send(request.Adapt<CreateProducerCommand>(), token);
-                return Results.Created("/producers", new CreateProducerResponse(result.ProducerId));
+                return Results.Created("/producers", new CreateProducerResponse(result.Producer));
             })
             .WithName("CreateProducer")
             .WithSummary("Создать производителя")

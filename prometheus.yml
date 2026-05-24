@@ -18,4 +18,4 @@ scrape_configs:
     tls_config:
       insecure_skip_verify: true
     static_configs:
-      - targets: [ "gateway:7292" ]
+      - targets: [ "gateway:8080" ]
