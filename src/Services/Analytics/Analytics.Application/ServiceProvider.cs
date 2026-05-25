@@ -45,16 +45,16 @@ public static class ServiceProvider
         collection.AddScoped<IMetricCalculatorFactory, MetricCalculatorFactory>();
         collection.AddScoped<IMetricValidatorDispatcher, MetricValidatorDispatcher>();
 
-        collection.AddScoped<IMetricCalculator<ArticleSalesMetric>, ArticleSalesMetricCalculator>();
-        collection.AddScoped<IMetricCalculator<ArticlePurchasesMetric>, ArticlePurchasesMetricCalculator>();
+        collection.AddScoped<IMetricCalculator<ProductSalesMetric>, ArticleSalesMetricCalculator>();
+        collection.AddScoped<IMetricCalculator<ProductPurchasesMetric>, ArticlePurchasesMetricCalculator>();
         return collection;
     }
 
     private static IServiceCollection RegisterMetricConverters(this IServiceCollection collection)
     {
         collection.AddSingleton<IMetricConverterDispatcher, MetricConverterDispatcher>();
-        collection.AddSingleton<IMetricConverter<ArticlePurchasesMetric>, ArticlePurchaseMetricConverter>();
-        collection.AddSingleton<IMetricConverter<ArticleSalesMetric>, ArticleSaleMetricConverter>();
+        collection.AddSingleton<IMetricConverter<ProductPurchasesMetric>, ArticlePurchaseMetricConverter>();
+        collection.AddSingleton<IMetricConverter<ProductSalesMetric>, ArticleSaleMetricConverter>();
 
         return collection;
     }

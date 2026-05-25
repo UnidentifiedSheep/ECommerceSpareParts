@@ -5,13 +5,13 @@ using Analytics.Enums;
 namespace Analytics.Entities.Metrics;
 
 [MetricInfo("ArticleSalesMetric")]
-public sealed class ArticleSalesMetric : ArticleMetric<ArticleInfoModel>
+public sealed class ProductSalesMetric : ProductMetric<ProductInfoModel>
 {
-    private ArticleSalesMetric()
+    private ProductSalesMetric()
     {
     }
 
-    public ArticleSalesMetric(int articleId) : base(articleId)
+    public ProductSalesMetric(int productId) : base(productId)
     {
     }
 

@@ -10,9 +10,9 @@ namespace Analytics.Application.Services.Metrics.Calculators;
 public class ArticleSalesMetricCalculator(
     ISalesFactRepository salesRepository,
     ICurrencyConverter currencyConverter)
-    : MetricCalculatorBase<ArticleSalesMetric>
+    : MetricCalculatorBase<ProductSalesMetric>
 {
-    public override async Task CalculateMetric(ArticleSalesMetric metric, CancellationToken cancellationToken = default)
+    public override async Task CalculateMetric(ProductSalesMetric metric, CancellationToken cancellationToken = default)
     {
         var minPrice = decimal.MaxValue;
         var maxPrice = decimal.MinValue;
@@ -31,7 +31,7 @@ public class ArticleSalesMetricCalculator(
                                .WithCancellation(cancellationToken))
             foreach (var item in fact.SaleContents)
             {
-                if (item.ArticleId != metric.ArticleId)
+                if (item.ArticleId != metric.ProductId)
                     continue;
 
                 var priceDecimal = await currencyConverter.ConvertToBaseAsync(
@@ -65,7 +65,7 @@ public class ArticleSalesMetricCalculator(
 
         var avgPrice = totalQuantity == 0 ? 0 : totalAmount / totalQuantity;
 
-        var data = new ArticleInfoModel
+        var data = new ProductInfoModel
         {
             Quantity = totalQuantity,
             TotalAmount = totalAmount,
@@ -83,10 +83,10 @@ public class ArticleSalesMetricCalculator(
         metric.CompleteRecalculation();
     }
 
-    private static Criteria<SalesFact> GetCriteria(ArticleSalesMetric metric)
+    private static Criteria<SalesFact> GetCriteria(ProductSalesMetric metric)
     {
         return Criteria<SalesFact>.New()
-            .Where(x => x.SaleContents.Any(z => z.ArticleId == metric.ArticleId)
+            .Where(x => x.SaleContents.Any(z => z.ArticleId == metric.ProductId)
                         && metric.RangeStart <= x.CreatedAt && x.CreatedAt <= metric.RangeEnd)
             .Build();
     }

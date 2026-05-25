@@ -3,13 +3,13 @@ using Analytics.Entities.Metrics;
 
 namespace Analytics.Application.Services.Metrics.Converters;
 
-public class ArticlePurchaseMetricConverter : MetricConverterBase<ArticlePurchasesMetric>
+public class ArticlePurchaseMetricConverter : MetricConverterBase<ProductPurchasesMetric>
 {
-    public override ArticlePurchasesMetric Convert(MetricPayloadDto payload)
+    public override ProductPurchasesMetric Convert(MetricPayloadDto payload)
     {
         ArgumentNullException.ThrowIfNull(payload.ArticleId);
 
-        var metric = new ArticlePurchasesMetric(payload.ArticleId.Value);
+        var metric = new ProductPurchasesMetric(payload.ArticleId.Value);
         FillBase(metric, payload);
         return metric;
     }

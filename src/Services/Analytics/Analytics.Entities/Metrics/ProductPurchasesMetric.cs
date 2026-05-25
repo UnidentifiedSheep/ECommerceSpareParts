@@ -4,14 +4,14 @@ using Analytics.Enums;
 
 namespace Analytics.Entities.Metrics;
 
-[MetricInfo("ArticlePurchasesMetric")]
-public class ArticlePurchasesMetric : ArticleMetric<ArticleInfoModel>
+[MetricInfo("ProductPurchasesMetric")]
+public class ProductPurchasesMetric : ProductMetric<ProductInfoModel>
 {
-    private ArticlePurchasesMetric()
+    private ProductPurchasesMetric()
     {
     }
 
-    public ArticlePurchasesMetric(int articleId) : base(articleId)
+    public ProductPurchasesMetric(int productId) : base(productId)
     {
     }
 

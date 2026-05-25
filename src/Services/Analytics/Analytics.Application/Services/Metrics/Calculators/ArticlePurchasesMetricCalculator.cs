@@ -2,10 +2,10 @@
 
 namespace Analytics.Application.Services.Metrics.Calculators;
 
-public class ArticlePurchasesMetricCalculator : MetricCalculatorBase<ArticlePurchasesMetric>
+public class ArticlePurchasesMetricCalculator : MetricCalculatorBase<ProductPurchasesMetric>
 {
     public override async Task CalculateMetric(
-        ArticlePurchasesMetric metric,
+        ProductPurchasesMetric metric,
         CancellationToken cancellationToken = default)
     {
     }

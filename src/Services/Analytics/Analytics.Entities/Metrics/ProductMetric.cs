@@ -1,24 +1,24 @@
 ﻿namespace Analytics.Entities.Metrics;
 
-public abstract class ArticleMetric<TData> : Metric<TData> where TData : class
+public abstract class ProductMetric<TData> : Metric<TData> where TData : class
 {
-    protected ArticleMetric()
+    protected ProductMetric()
     {
     }
 
-    protected ArticleMetric(int articleId)
+    protected ProductMetric(int productId)
     {
-        SetArticleId(articleId);
+        SetArticleId(productId);
     }
 
-    public int ArticleId { get; private set; }
+    public int ProductId { get; private set; }
 
     private void SetArticleId(int articleId)
     {
         if (articleId <= 0)
             throw new ArgumentException("Article id must be greater than zero.", nameof(articleId));
 
-        ArticleId = articleId;
+        ProductId = articleId;
         SetDimensionKey(articleId.ToString());
     }
 }
