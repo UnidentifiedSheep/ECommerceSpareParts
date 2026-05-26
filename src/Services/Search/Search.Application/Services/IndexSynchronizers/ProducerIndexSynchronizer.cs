@@ -1,21 +1,22 @@
 using Search.Application.Interfaces;
 using Search.Application.Interfaces.Producer;
+using Search.Entities;
 
 namespace Search.Application.Services;
 
 public class ProducerIndexSynchronizer(
     IProducerSearchDocumentProvider producerSearchDocumentProvider,
-    IProducerRepository producerRepository) : IProducerIndexSynchronizer
+    IProducerRepository producerRepository) : IIndexSynchronizer<Producer, int>
 {
     public async Task Reindex(
-        int producerId,
+        int id,
         CancellationToken cancellationToken = default)
     {
-        var producer = await producerSearchDocumentProvider.GetById(producerId, cancellationToken);
+        var producer = await producerSearchDocumentProvider.GetById(id, cancellationToken);
 
         if (producer == null)
         {
-            await producerRepository.Delete(producerId, cancellationToken);
+            await producerRepository.Delete(id, cancellationToken);
             return;
         }
 
@@ -23,9 +24,9 @@ public class ProducerIndexSynchronizer(
     }
 
     public Task Delete(
-        int producerId,
+        int id,
         CancellationToken cancellationToken = default)
     {
-        return producerRepository.Delete(producerId, cancellationToken);
+        return producerRepository.Delete(id, cancellationToken);
     }
 }

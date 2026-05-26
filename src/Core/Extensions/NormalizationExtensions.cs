@@ -30,4 +30,14 @@ public static partial class NormalizationExtensions
     {
         return source.Trim().ToUpperInvariant();
     }
+    
+    public static string OnlyCharacterToUpper(this string source)
+    {
+        return OnlyCharacter().Replace(source, "").ToUpperInvariant();
+    }
+    
+    public static string OnlyCharacterToLower(this string source)
+    {
+        return OnlyCharacter().Replace(source, "").ToLowerInvariant();
+    }
 }

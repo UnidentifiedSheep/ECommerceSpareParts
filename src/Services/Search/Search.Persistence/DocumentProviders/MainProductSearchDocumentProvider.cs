@@ -23,7 +23,7 @@ public class MainProductSearchDocumentProvider(
         {
             Id = fullProduct.Product.Id,
             Sku = fullProduct.Product.Sku,
-            NormalizedSku = ProductSkuNormalizer.Normalize(fullProduct.Product.Sku),
+            NormalizedSku = fullProduct.Product.Sku.OnlyCharacterToLower(),
             Name = fullProduct.Product.Name,
             ProducerId = fullProduct.Product.ProducerId,
             Dimensions = MapDimensions(fullProduct.ProductSize),
