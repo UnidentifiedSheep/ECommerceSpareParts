@@ -1,6 +1,7 @@
 using Abstractions.Interfaces;
 using Abstractions.Models;
 using Api.Common.Extensions;
+using Api.Common.Models.Requests;
 using Carter;
 using Enums;
 using Main.Application.Dtos.Purchase;
@@ -41,16 +42,13 @@ public record GetPurchaseLogisticResponse(PurchaseLogisticDto PurchaseLogistic);
 
 public record GetPurchasesResponse(IEnumerable<PurchaseDto> Purchases);
 
-public class GetPurchasesRequest
+public record GetPurchasesRequest : SortablePaginationQueryModel
 {
-    [FromQuery(Name = "rangeStartDate")] public DateTime RangeStartDate { get; set; }
-    [FromQuery(Name = "rangeEndDate")] public DateTime RangeEndDate { get; set; }
-    [FromQuery(Name = "page")] public int Page { get; set; }
-    [FromQuery(Name = "limit")] public int Limit { get; set; }
-    [FromQuery(Name = "supplierId")] public Guid? SupplierId { get; set; }
-    [FromQuery(Name = "currencyId")] public int? CurrencyId { get; set; }
-    [FromQuery(Name = "sortBy")] public string? SortBy { get; set; }
-    [FromQuery(Name = "searchTerm")] public string? SearchTerm { get; set; }
+    [FromQuery(Name = "rangeStartDate")] public DateTime RangeStartDate { get; init; }
+    [FromQuery(Name = "rangeEndDate")] public DateTime RangeEndDate { get; init; }
+    [FromQuery(Name = "supplierId")] public Guid? SupplierId { get; init; }
+    [FromQuery(Name = "currencyId")] public int? CurrencyId { get; init; }
+    [FromQuery(Name = "searchTerm")] public string? SearchTerm { get; init; }
 }
 
 public class PurchaseEndPoints : ICarterModule
@@ -169,7 +167,7 @@ public class PurchaseEndPoints : ICarterModule
                 var query = new GetPurchasesQuery(
                     request.RangeStartDate,
                     request.RangeEndDate,
-                    new Pagination(request.Page, request.Limit),
+                    request,
                     request.SupplierId,
                     request.CurrencyId,
                     request.SortBy,
