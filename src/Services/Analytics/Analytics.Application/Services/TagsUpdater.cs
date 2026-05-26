@@ -1,5 +1,6 @@
 using Analytics.Application.Interfaces.Repositories;
 using Analytics.Application.Interfaces.Services;
+using Analytics.Application.Interfaces.Services.Metrics;
 using Analytics.Application.Models;
 using Analytics.Entities.Interfaces;
 

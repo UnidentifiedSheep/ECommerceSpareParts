@@ -13,11 +13,18 @@ public sealed record ListMetricsResult(IReadOnlyList<MetricInfoDto> Metrics);
 
 public class ListMetricsHandler(IScopedStringLocalizer localizer) : IQueryHandler<ListMetricsQuery, ListMetricsResult>
 {
+    private static readonly MetricInfoAttribute[] MetricsInfo = typeof(Metric).Assembly.GetTypes()
+        .Where(t => !t.IsAbstract && typeof(Metric).IsAssignableFrom(t))
+        .Select(t => new
+        {
+            Info = t.GetCustomAttribute<MetricInfoAttribute>()
+        })
+        .Where(x => x.Info != null)
+        .Select(x => x.Info!)
+        .ToArray();
     public Task<ListMetricsResult> Handle(ListMetricsQuery request, CancellationToken cancellationToken)
     {
-        var metrics = GetAllMetricWithInfos();
-
-        var result = metrics.Select(attribute =>
+        var result = MetricsInfo.Select(attribute =>
             new MetricInfoDto
             {
                 SystemName = attribute.SystemName,
@@ -26,18 +33,5 @@ public class ListMetricsHandler(IScopedStringLocalizer localizer) : IQueryHandle
             }).ToList();
 
         return Task.FromResult(new ListMetricsResult(result));
-    }
-
-    private MetricInfoAttribute[] GetAllMetricWithInfos()
-    {
-        return typeof(Metric).Assembly.GetTypes()
-            .Where(t => !t.IsAbstract && typeof(Metric).IsAssignableFrom(t))
-            .Select(t => new
-            {
-                Info = t.GetCustomAttribute<MetricInfoAttribute>()
-            })
-            .Where(x => x.Info != null)
-            .Select(x => x.Info!)
-            .ToArray();
     }
 }

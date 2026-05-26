@@ -1,7 +1,7 @@
 ﻿using Analytics.Application.Models;
 using Analytics.Entities.Interfaces;
 
-namespace Analytics.Application.Interfaces.Services;
+namespace Analytics.Application.Interfaces.Services.Metrics;
 
 public interface ITagsUpdater
 {

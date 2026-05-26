@@ -1,6 +1,7 @@
 ﻿using Abstractions.Interfaces.Services;
 using Analytics.Application.Interfaces.Services;
 using Analytics.Application.Interfaces.Services.FactSynchronizers;
+using Analytics.Application.Interfaces.Services.Metrics;
 using Analytics.Application.Models;
 using Analytics.Entities;
 using Application.Common.Interfaces.Repositories;

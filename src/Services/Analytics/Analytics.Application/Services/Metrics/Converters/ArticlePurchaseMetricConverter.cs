@@ -7,9 +7,9 @@ public class ArticlePurchaseMetricConverter : MetricConverterBase<ProductPurchas
 {
     public override ProductPurchasesMetric Convert(MetricPayloadDto payload)
     {
-        ArgumentNullException.ThrowIfNull(payload.ArticleId);
+        ArgumentNullException.ThrowIfNull(payload.ProductId);
 
-        var metric = new ProductPurchasesMetric(payload.ArticleId.Value);
+        var metric = new ProductPurchasesMetric(payload.ProductId.Value);
         FillBase(metric, payload);
         return metric;
     }

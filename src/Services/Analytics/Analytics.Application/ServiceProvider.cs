@@ -1,6 +1,7 @@
 using Abstractions.Interfaces;
 using Analytics.Application.Interfaces.Services;
 using Analytics.Application.Interfaces.Services.FactSynchronizers;
+using Analytics.Application.Interfaces.Services.Metrics;
 using Analytics.Application.Services;
 using Analytics.Application.Services.FactSynchronizers;
 using Analytics.Application.Services.Metrics.Calculators;
