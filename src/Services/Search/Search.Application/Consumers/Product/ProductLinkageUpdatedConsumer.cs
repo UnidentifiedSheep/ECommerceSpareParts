@@ -6,7 +6,7 @@ using Search.Application.Interfaces.Product;
 namespace Search.Application.Consumers.Product;
 
 public class ProductLinkageUpdatedConsumer(
-    IProductIndexSynchronizer productIndexSynchronizer) : IConsumer<ProductLinkageUpdatedEvent>
+    IIndexSynchronizer<Entities.Product, int> productIndexSynchronizer) : IConsumer<ProductLinkageUpdatedEvent>
 {
     public Task Consume(ConsumeContext<ProductLinkageUpdatedEvent> context)
     {

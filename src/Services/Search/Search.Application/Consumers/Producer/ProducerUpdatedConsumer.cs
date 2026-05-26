@@ -6,7 +6,7 @@ using Search.Application.Interfaces.Producer;
 namespace Search.Application.Consumers.Producer;
 
 public class ProducerUpdatedConsumer(
-    IProducerIndexSynchronizer producerIndexSynchronizer) : IConsumer<ProducerUpdatedEvent>
+    IIndexSynchronizer<Entities.Producer, int> producerIndexSynchronizer) : IConsumer<ProducerUpdatedEvent>
 {
     public Task Consume(ConsumeContext<ProducerUpdatedEvent> context)
     {

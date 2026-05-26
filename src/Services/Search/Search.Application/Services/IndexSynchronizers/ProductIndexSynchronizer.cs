@@ -1,21 +1,22 @@
 using Search.Application.Interfaces;
 using Search.Application.Interfaces.Product;
+using Search.Entities;
 
 namespace Search.Application.Services;
 
 public class ProductIndexSynchronizer(
     IProductSearchDocumentProvider productSearchDocumentProvider,
-    IProductRepository productRepository) : IProductIndexSynchronizer
+    IProductRepository productRepository) : IIndexSynchronizer<Product, int>
 {
     public async Task Reindex(
-        int productId,
+        int id,
         CancellationToken cancellationToken = default)
     {
-        var product = await productSearchDocumentProvider.GetById(productId, cancellationToken);
+        var product = await productSearchDocumentProvider.GetById(id, cancellationToken);
 
         if (product == null)
         {
-            await productRepository.Delete(productId, cancellationToken);
+            await productRepository.Delete(id, cancellationToken);
             return;
         }
 
@@ -23,9 +24,9 @@ public class ProductIndexSynchronizer(
     }
 
     public Task Delete(
-        int productId,
+        int id,
         CancellationToken cancellationToken = default)
     {
-        return productRepository.Delete(productId, cancellationToken);
+        return productRepository.Delete(id, cancellationToken);
     }
 }

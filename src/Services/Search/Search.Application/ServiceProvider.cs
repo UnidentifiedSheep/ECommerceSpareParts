@@ -6,6 +6,7 @@ using Search.Application.Interfaces;
 using Search.Application.Interfaces.Producer;
 using Search.Application.Interfaces.Product;
 using Search.Application.Services;
+using Search.Entities;
 
 namespace Search.Application;
 
@@ -27,8 +28,8 @@ public static class ServiceProvider
                 typeof(CacheBehavior<,>)
             ]);
 
-        services.AddSingleton<IProductIndexSynchronizer, ProductIndexSynchronizer>();
-        services.AddSingleton<IProducerIndexSynchronizer, ProducerIndexSynchronizer>();
+        services.AddSingleton<IIndexSynchronizer<Product, int>, ProductIndexSynchronizer>();
+        services.AddSingleton<IIndexSynchronizer<Producer, int>, ProducerIndexSynchronizer>();
 
         return services;
     }

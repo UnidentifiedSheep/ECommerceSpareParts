@@ -11,7 +11,6 @@ using Main.Application.Handlers.Purchases.DeleteFullPurchase;
 using Main.Application.Handlers.Purchases.EditPurchase;
 using Main.Application.Handlers.Purchases.GetPurchase;
 using Main.Application.Handlers.Purchases.GetPurchaseContent;
-using Main.Application.Handlers.Purchases.GetPurchaseLogistic;
 using Mapster;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
@@ -48,6 +47,12 @@ public record CreatePurchaseRequest
     public string? StorageFrom { get; init; }
 }
 
+public record CreatePurchaseResponse
+{
+    [JsonPropertyName("purchase")]
+    public required PurchaseDto Purchase { get; init; }
+}
+
 public record EditPurchaseRequest(
     IEnumerable<EditPurchaseDto> Content,
     int CurrencyId,
@@ -56,7 +61,10 @@ public record EditPurchaseRequest(
     bool WithLogistics,
     string? StorageFrom);
 
-public record GetPurchaseContentResponse(IEnumerable<PurchaseContentDto> Content);
+public record GetPurchaseContentResponse
+{
+    public required IReadOnlyList<PurchaseContentDto> Content { get; init; }
+}
 
 public record GetPurchaseLogisticResponse(PurchaseLogisticDto PurchaseLogistic);
 
@@ -66,8 +74,9 @@ public record GetPurchasesRequest : SortablePaginationQueryModel
 {
     [FromQuery(Name = "rangeStartDate")] public DateTime RangeStartDate { get; init; }
     [FromQuery(Name = "rangeEndDate")] public DateTime RangeEndDate { get; init; }
-    [FromQuery(Name = "supplierId")] public Guid? SupplierId { get; init; }
-    [FromQuery(Name = "currencyId")] public int? CurrencyId { get; init; }
+    [FromQuery(Name = "supplierIds")] public Guid[] SupplierIds { get; init; } = [];
+    [FromQuery(Name = "currencyIds")] public int[] CurrencyIds { get; init; } = [];
+    [FromQuery(Name = "productIds")] public int[] ProductIds { get; init; } = [];
     [FromQuery(Name = "searchTerm")] public string? SearchTerm { get; init; }
 }
 
@@ -79,7 +88,6 @@ public class PurchaseEndPoints : ICarterModule
             .WithTags("Purchases");
 
         purchases.MapPost("/", async (
-                IUserContext user,
                 ISender sender,
                 CreatePurchaseRequest request,
                 CancellationToken token) =>
@@ -94,15 +102,20 @@ public class PurchaseEndPoints : ICarterModule
                     request.PayedSum,
                     request.WithLogistics,
                     request.StorageFrom);
-                await sender.Send(command, token);
-                return Results.Ok();
+                var result = await sender.Send(command, token);
+                return Results.Created(
+                    new Uri($"/purchases/{result.Purchase.Id}"),
+                    new CreatePurchaseResponse
+                    {
+                        Purchase = result.Purchase 
+                    });
             })
             .WithName("CreatePurchase")
             .WithSummary("Создать закупку")
             .WithDescription("Создание новой закупки")
             .WithDisplayName("Создание новой закупки")
             .Accepts<CreatePurchaseRequest>(false, "application/json")
-            .Produces(StatusCodes.Status200OK)
+            .Produces<CreatePurchaseResponse>()
             .ProducesProblem(StatusCodes.Status400BadRequest)
             .RequireAnyPermission(PermissionCodes.PURCHASE_CREATE);
 
@@ -152,10 +165,13 @@ public class PurchaseEndPoints : ICarterModule
             .ProducesProblem(StatusCodes.Status404NotFound)
             .RequireAnyPermission(PermissionCodes.PURCHASE_EDIT);
 
-        purchases.MapGet("/{id}/contents", async (ISender sender, string id, CancellationToken ct) =>
+        purchases.MapGet("/{id:guid}/contents", async (ISender sender, Guid id, CancellationToken ct) =>
             {
                 var result = await sender.Send(new GetPurchaseContentQuery(id), ct);
-                return Results.Ok(result.Adapt<GetPurchaseContentResponse>());
+                return Results.Ok(new GetPurchaseContentResponse
+                {
+                    Content = result.Content
+                });
             })
             .WithName("GetPurchaseContent")
             .WithSummary("Получить содержимое закупки")
@@ -165,30 +181,17 @@ public class PurchaseEndPoints : ICarterModule
             .ProducesProblem(StatusCodes.Status404NotFound)
             .RequireAnyPermission(PermissionCodes.PURCHASE_GET);
 
-        purchases.MapGet("/{id}/logistics", async (ISender sender, string id, CancellationToken token) =>
-            {
-                var result = await sender.Send(new GetPurchaseLogisticQuery(id), token);
-                return Results.Ok(new GetPurchaseLogisticResponse(result.PurchaseLogistic));
-            })
-            .WithName("GetPurchaseLogistics")
-            .WithSummary("Получить логистику закупки")
-            .WithDescription("Получение логистики закупки")
-            .WithDisplayName("Получение логистики закупки")
-            .Produces<GetPurchaseLogisticResponse>()
-            .ProducesProblem(StatusCodes.Status404NotFound)
-            .RequireAnyPermission(PermissionCodes.PURCHASE_GET);
-
         purchases.MapGet("/", async (
                 ISender sender,
                 [AsParameters] GetPurchasesRequest request,
                 CancellationToken token) =>
             {
                 var query = new GetPurchasesQuery(
-                    request.RangeStartDate,
-                    request.RangeEndDate,
+                    new RangeModel<DateTime>(request.RangeStartDate, request.RangeEndDate),
                     request,
-                    request.SupplierId,
-                    request.CurrencyId,
+                    request.SupplierIds,
+                    request.CurrencyIds,
+                    request.ProductIds,
                     request.SortBy,
                     request.SearchTerm);
                 var result = await sender.Send(query, token);

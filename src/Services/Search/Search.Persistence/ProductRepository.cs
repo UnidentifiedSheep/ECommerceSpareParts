@@ -6,6 +6,7 @@ using Search.Application.Interfaces;
 using Search.Entities;
 using Search.Persistence.Interfaces;
 using System.Linq.Expressions;
+using Extensions;
 using Search.Application.Interfaces.Product;
 
 namespace Search.Persistence;
@@ -80,7 +81,7 @@ public class ProductRepository(
 
         var page = pagination ?? DefaultPagination;
         var idx = await CheckInitAndGetIdx(token);
-        var normalizedQuery = ProductSkuNormalizer.Normalize(query);
+        var normalizedQuery = query.OnlyCharacterToLower();
         var response = await client.SearchAsync<Product>(
             s => s
                 .Index(idx)
@@ -125,7 +126,7 @@ public class ProductRepository(
 
         var page = pagination ?? DefaultPagination;
         var idx = await CheckInitAndGetIdx(token);
-        var normalizedSku = ProductSkuNormalizer.Normalize(sku);
+        var normalizedSku = sku.OnlyCharacterToLower();
         if (string.IsNullOrEmpty(normalizedSku))
             return [];
         

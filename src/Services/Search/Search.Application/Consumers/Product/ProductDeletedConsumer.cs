@@ -6,7 +6,7 @@ using Search.Application.Interfaces.Product;
 namespace Search.Application.Consumers.Product;
 
 public class ProductDeletedConsumer(
-    IProductIndexSynchronizer productIndexSynchronizer) : IConsumer<ProductDeletedEvent>
+    IIndexSynchronizer<Entities.Product, int> productIndexSynchronizer) : IConsumer<ProductDeletedEvent>
 {
     public Task Consume(ConsumeContext<ProductDeletedEvent> context)
     {

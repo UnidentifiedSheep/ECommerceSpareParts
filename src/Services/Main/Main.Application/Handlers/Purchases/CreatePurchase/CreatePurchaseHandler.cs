@@ -11,6 +11,7 @@ using Main.Application.Dtos.Purchase;
 using Main.Application.Dtos.Storage;
 using Main.Application.Extensions;
 using Main.Application.Handlers.Balance.CreateTransaction;
+using Main.Application.Handlers.Projections;
 using Main.Application.Handlers.StorageContents.AddContent;
 using Main.Application.Interfaces.Persistence;
 using Main.Application.Interfaces.Services;
@@ -37,7 +38,9 @@ public record CreatePurchaseCommand(
     string? Comment,
     decimal? PayedSum,
     bool WithLogistics,
-    string? StorageFrom) : ICommand;
+    string? StorageFrom) : ICommand<CreatePurchaseResult>;
+
+public record CreatePurchaseResult(PurchaseDto Purchase);
 
 public class CreatePurchaseHandler(
     ISender sender,
@@ -45,9 +48,9 @@ public class CreatePurchaseHandler(
     IUserRepository userRepository,
     IPurchaseLogisticsService purchaseLogisticsService,
     IIntegrationEventScope integrationEventScope,
-    IUnitOfWork unitOfWork) : ICommandHandler<CreatePurchaseCommand>
+    IUnitOfWork unitOfWork) : ICommandHandler<CreatePurchaseCommand, CreatePurchaseResult>
 {
-    public async Task<Unit> Handle(CreatePurchaseCommand request, CancellationToken cancellationToken)
+    public async Task<CreatePurchaseResult> Handle(CreatePurchaseCommand request, CancellationToken cancellationToken)
     {
         var systemId = (await settingsService.GetOrDefault<GlobalApplicationSetting>(cancellationToken))
             .Data
@@ -105,7 +108,7 @@ public class CreatePurchaseHandler(
             PurchaseId = purchase.Id 
         });
 
-        return Unit.Value;
+        return new CreatePurchaseResult(PurchaseProjections.ToPurchaseDto.AsFunc()(purchase));
     }
 
     private async Task<IReadOnlyList<StorageContent>> AddContentsToStorage(
