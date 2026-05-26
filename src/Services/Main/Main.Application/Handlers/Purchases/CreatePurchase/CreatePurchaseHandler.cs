@@ -29,7 +29,6 @@ namespace Main.Application.Handlers.Purchases.CreatePurchase;
 [AutoSave]
 [Transactional(IsolationLevel.ReadCommitted, 20, 2)]
 public record CreatePurchaseCommand(
-    Guid CreatedUserId,
     Guid SupplierId,
     int CurrencyId,
     string StorageName,

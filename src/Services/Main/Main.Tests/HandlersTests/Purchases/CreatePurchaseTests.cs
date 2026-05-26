@@ -275,14 +275,6 @@ public class CreatePurchaseTests : IntegrationTest
     }
 
     [Fact]
-    public async Task CreatePurchase_WithEmptyCreatedUserId_ThrowsValidationException()
-    {
-        var command = CreateValidCommand() with { CreatedUserId = Guid.Empty };
-
-        await Assert.ThrowsAsync<ValidationException>(() => Mediator.Send(command));
-    }
-
-    [Fact]
     public async Task CreatePurchase_WithEmptySupplierId_ThrowsValidationException()
     {
         var command = CreateValidCommand() with { SupplierId = Guid.Empty };
@@ -394,7 +386,6 @@ public class CreatePurchaseTests : IntegrationTest
         decimal? payedSum = null)
     {
         return new CreatePurchaseCommand(
-            GetContext<UserContextTestContext>().SystemUser.Id,
             supplierId,
             currencyId,
             storageName,

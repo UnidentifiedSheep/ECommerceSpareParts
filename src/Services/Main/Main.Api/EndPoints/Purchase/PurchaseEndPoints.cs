@@ -85,7 +85,6 @@ public class PurchaseEndPoints : ICarterModule
                 CancellationToken token) =>
             {
                 var command = new CreatePurchaseCommand(
-                    user.UserId,
                     request.SupplierId,
                     request.CurrencyId,
                     request.StorageName,
