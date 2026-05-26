@@ -39,3 +39,6 @@ public class UserNotFoundException(Guid id)
 
 public class WrongCredentialsException(string? email, string? password)
     : LocalizedBadRequestException("wrong.credentials", new { Email = email, Password = password });
+
+public class CantCreateSystemUserException()
+    : LocalizedBadRequestException("cant.create.system.user");

@@ -1,6 +1,9 @@
-﻿namespace Contracts.Purchase;
+﻿using Abstractions.Interfaces;
 
-public record PurchaseDeleteEvent
+namespace Contracts.Purchase;
+
+public record PurchaseDeleteEvent : IKeyedEvent
 {
-    public required Models.Purchase.Purchase Purchase { get; init; }
+    public required Guid PurchaseId { get; init; }
+    public string GetKey() => $"purchase-deleted:{PurchaseId}";
 }

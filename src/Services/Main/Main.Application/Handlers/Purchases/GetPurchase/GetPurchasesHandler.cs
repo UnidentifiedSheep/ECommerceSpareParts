@@ -1,6 +1,6 @@
 using Abstractions.Models;
 using Application.Common.Interfaces.Cqrs;
-using Main.Application.Dtos.Amw.Purchase;
+using Main.Application.Dtos.Purchase;
 
 namespace Main.Application.Handlers.Purchases.GetPurchase;
 

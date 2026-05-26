@@ -1,10 +1,15 @@
 using Abstractions.Interfaces.Services;
 using Abstractions.Interfaces.Validators;
+using Application.Common.Extensions;
 using Application.Common.Interfaces.Cqrs;
 using Attributes;
 using Main.Application.Dtos.Emails;
 using Main.Application.Dtos.Users;
+using Main.Application.Handlers.Projections;
+using Main.Entities.Auth;
+using Main.Entities.Exceptions;
 using Main.Entities.User;
+using Role = Main.Enums.Role;
 
 namespace Main.Application.Handlers.Users.CreateUser;
 
@@ -16,7 +21,7 @@ public record CreateUserCommand(
     IEnumerable<EmailDto> Emails,
     IEnumerable<string> Roles) : ICommand<CreateUserResult>;
 
-public record CreateUserResult(Guid UserId);
+public record CreateUserResult(UserDto User);
 
 public class CreateUserHandler(IUnitOfWork unitOfWork, IPasswordManager passwordManager)
     : ICommandHandler<CreateUserCommand, CreateUserResult>
@@ -28,13 +33,17 @@ public class CreateUserHandler(IUnitOfWork unitOfWork, IPasswordManager password
         user.SetUserInfo(request.UserInfo.Name, request.UserInfo.Surname, request.UserInfo.Description);
 
         foreach (var role in request.Roles)
+        {
+            if (role == RoleNames.Normalize(nameof(Role.System)))
+                throw new CantCreateSystemUserException();
             user.AddRole(role);
+        }
 
         foreach (var email in request.Emails)
             user.AddUserEmail(email.Email, email.Type, email.IsPrimary, email.IsConfirmed);
 
         await unitOfWork.AddAsync(user, cancellationToken);
         await unitOfWork.SaveChangesAsync(cancellationToken);
-        return new CreateUserResult(user.Id);
+        return new CreateUserResult(UserProjections.UserProjection.AsFunc()(user));
     }
 }

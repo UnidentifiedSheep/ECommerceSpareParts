@@ -16,7 +16,6 @@ public record DeliveryCostDto
     public required decimal TotalWeight { get; init; }
 
     [JsonPropertyName("weightUnit")]
-    [JsonConverter(typeof(JsonStringEnumConverter<WeightUnit>))]
     public required WeightUnit WeightUnit { get; init; }
 
     [JsonPropertyName("totalCost")]
@@ -32,6 +31,5 @@ public record DeliveryCostDto
     public required int CurrencyId { get; init; }
 
     [JsonPropertyName("pricingModel")]
-    [JsonConverter(typeof(JsonStringEnumConverter<LogisticPricingType>))]
     public required LogisticPricingType PricingModel { get; init; }
 }

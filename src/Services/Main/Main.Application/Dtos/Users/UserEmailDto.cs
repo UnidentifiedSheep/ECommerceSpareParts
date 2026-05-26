@@ -12,7 +12,6 @@ public record UserEmailDto
     public required bool Confirmed { get; init; }
 
     [JsonPropertyName("emailType")]
-    [JsonConverter(typeof(JsonStringEnumConverter<EmailType>))]
     public required EmailType EmailType { get; init; }
 
     [JsonPropertyName("isPrimary")]

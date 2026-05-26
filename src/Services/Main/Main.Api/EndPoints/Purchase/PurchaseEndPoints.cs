@@ -1,12 +1,14 @@
+using System.Text.Json.Serialization;
 using Abstractions.Interfaces;
 using Abstractions.Models;
 using Api.Common.Extensions;
+using Api.Common.Models.Requests;
 using Carter;
 using Enums;
-using Main.Application.Dtos.Amw.Purchase;
+using Main.Application.Dtos.Purchase;
 using Main.Application.Handlers.Purchases.CreatePurchase;
 using Main.Application.Handlers.Purchases.DeleteFullPurchase;
-using Main.Application.Handlers.Purchases.EditFullPurchase;
+using Main.Application.Handlers.Purchases.EditPurchase;
 using Main.Application.Handlers.Purchases.GetPurchase;
 using Main.Application.Handlers.Purchases.GetPurchaseContent;
 using Main.Application.Handlers.Purchases.GetPurchaseLogistic;
@@ -16,16 +18,35 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace Main.Api.EndPoints.Purchase;
 
-public record CreatePurchaseRequest(
-    Guid SupplierId,
-    int CurrencyId,
-    string StorageName,
-    DateTime PurchaseDate,
-    IEnumerable<NewPurchaseContentDto> PurchaseContent,
-    string? Comment,
-    decimal? PayedSum,
-    bool WithLogistics,
-    string? StorageFrom);
+public record CreatePurchaseRequest
+{
+    [JsonPropertyName("supplierId")]
+    public required Guid SupplierId { get; init; }
+    
+    [JsonPropertyName("currencyId")]
+    public required int CurrencyId { get; init; }
+    
+    [JsonPropertyName("storageName")]
+    public required string StorageName { get; init; }
+    
+    [JsonPropertyName("purchaseDate")]
+    public required DateTime PurchaseDate { get; init; }
+    
+    [JsonPropertyName("purchaseContent")]
+    public required IEnumerable<NewPurchaseContentDto> PurchaseContent { get; init; }
+    
+    [JsonPropertyName("withLogistics")]
+    public required bool WithLogistics { get; init; }
+    
+    [JsonPropertyName("comment")]
+    public string? Comment { get; init; }
+    
+    [JsonPropertyName("payedSum")]
+    public decimal? PayedSum { get; init; }
+    
+    [JsonPropertyName("storageFrom")]
+    public string? StorageFrom { get; init; }
+}
 
 public record EditPurchaseRequest(
     IEnumerable<EditPurchaseDto> Content,
@@ -41,16 +62,13 @@ public record GetPurchaseLogisticResponse(PurchaseLogisticDto PurchaseLogistic);
 
 public record GetPurchasesResponse(IEnumerable<PurchaseDto> Purchases);
 
-public class GetPurchasesRequest
+public record GetPurchasesRequest : SortablePaginationQueryModel
 {
-    [FromQuery(Name = "rangeStartDate")] public DateTime RangeStartDate { get; set; }
-    [FromQuery(Name = "rangeEndDate")] public DateTime RangeEndDate { get; set; }
-    [FromQuery(Name = "page")] public int Page { get; set; }
-    [FromQuery(Name = "limit")] public int Limit { get; set; }
-    [FromQuery(Name = "supplierId")] public Guid? SupplierId { get; set; }
-    [FromQuery(Name = "currencyId")] public int? CurrencyId { get; set; }
-    [FromQuery(Name = "sortBy")] public string? SortBy { get; set; }
-    [FromQuery(Name = "searchTerm")] public string? SearchTerm { get; set; }
+    [FromQuery(Name = "rangeStartDate")] public DateTime RangeStartDate { get; init; }
+    [FromQuery(Name = "rangeEndDate")] public DateTime RangeEndDate { get; init; }
+    [FromQuery(Name = "supplierId")] public Guid? SupplierId { get; init; }
+    [FromQuery(Name = "currencyId")] public int? CurrencyId { get; init; }
+    [FromQuery(Name = "searchTerm")] public string? SearchTerm { get; init; }
 }
 
 public class PurchaseEndPoints : ICarterModule
@@ -67,7 +85,6 @@ public class PurchaseEndPoints : ICarterModule
                 CancellationToken token) =>
             {
                 var command = new CreatePurchaseCommand(
-                    user.UserId,
                     request.SupplierId,
                     request.CurrencyId,
                     request.StorageName,
@@ -169,7 +186,7 @@ public class PurchaseEndPoints : ICarterModule
                 var query = new GetPurchasesQuery(
                     request.RangeStartDate,
                     request.RangeEndDate,
-                    new Pagination(request.Page, request.Limit),
+                    request,
                     request.SupplierId,
                     request.CurrencyId,
                     request.SortBy,

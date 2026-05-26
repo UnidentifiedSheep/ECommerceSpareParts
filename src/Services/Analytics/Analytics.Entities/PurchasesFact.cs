@@ -1,3 +1,5 @@
+using Analytics.Entities.Interfaces;
+using Analytics.Enums;
 using BulkValidation.Core.Attributes;
 using Domain;
 using Domain.Extensions;
@@ -5,7 +7,7 @@ using Exceptions;
 
 namespace Analytics.Entities;
 
-public class PurchasesFact : Entity<PurchasesFact, Guid>
+public class PurchasesFact : Entity<PurchasesFact, Guid>, IDependency
 {
     private PurchasesFact()
     {
@@ -97,4 +99,6 @@ public class PurchasesFact : Entity<PurchasesFact, Guid>
 
         TotalSum = totalSum;
     }
+
+    public static DependsOn DependsOn => DependsOn.Purchase;
 }

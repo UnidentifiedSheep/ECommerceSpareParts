@@ -27,7 +27,6 @@ public record DeliveryCostItemDto
     public required decimal WeightPerItem { get; init; }
 
     [JsonPropertyName("weightUnit")]
-    [JsonConverter(typeof(JsonStringEnumConverter<WeightUnit>))]
     public required WeightUnit WeightUnit { get; init; }
 
     [JsonPropertyName("skipped")]

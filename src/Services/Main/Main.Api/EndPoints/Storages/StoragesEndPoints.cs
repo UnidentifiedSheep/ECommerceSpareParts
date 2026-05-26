@@ -28,7 +28,6 @@ public record CreateStorageRequest
     public string? Location { get; init; }
     
     [JsonPropertyName("type")]
-    [JsonConverter(typeof(JsonStringEnumConverter<StorageType>))]
     public StorageType Type { get; init; }
 }
 

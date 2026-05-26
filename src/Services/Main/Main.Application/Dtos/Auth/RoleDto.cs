@@ -4,8 +4,11 @@ namespace Main.Application.Dtos.Auth;
 
 public record RoleDto
 {
-    [JsonPropertyName("name")]
-    public required string Name { get; init; }
+    [JsonPropertyName("systemName")]
+    public required string SystemName { get; init; }
+    
+    [JsonPropertyName("localizedName")]
+    public required string? LocalizedName { get; init; }
 
     [JsonPropertyName("description")]
     public required string? Description { get; init; }

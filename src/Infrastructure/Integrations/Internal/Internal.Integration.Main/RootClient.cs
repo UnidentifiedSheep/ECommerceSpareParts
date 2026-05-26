@@ -15,7 +15,7 @@ public class RootClient(
     private readonly ProducerNode _producerNode = new(httpClient, authClient, optionsMonitor);
     private readonly UserNode _userNode = new(httpClient, authClient, optionsMonitor);
     private readonly CurrencyNode _currencyNode = new(httpClient, authClient, optionsMonitor);
-    
+    private readonly PurchaseNode _purchaseNode = new(httpClient, authClient, optionsMonitor);
     
     public async Task<decimal> GetUserDiscount(
         Guid userId,
@@ -36,4 +36,9 @@ public class RootClient(
         int producerId,
         CancellationToken cancellationToken = default)
         => await _producerNode.GetFullProducer(producerId, cancellationToken);
+
+    public async Task<InternalFullPurchase?> GetFullPurchase(
+        Guid purchaseId,
+        CancellationToken cancellationToken = default)
+        => await _purchaseNode.GetFullPurchase(purchaseId, cancellationToken);
 }

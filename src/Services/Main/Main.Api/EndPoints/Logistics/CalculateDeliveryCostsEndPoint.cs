@@ -1,4 +1,5 @@
-﻿using Api.Common.Extensions;
+﻿using System.Text.Json.Serialization;
+using Api.Common.Extensions;
 using Carter;
 using Enums;
 using Main.Application.Dtos.Logistics;
@@ -9,11 +10,20 @@ using MediatR;
 
 namespace Main.Api.EndPoints.Logistics;
 
-public record CalculateDeliveryCostRequest(
-    string StorageFrom,
-    string StorageTo,
-    LogisticsCalculationMode Mode,
-    IEnumerable<LogisticsItemDto> Items);
+public record CalculateDeliveryCostRequest
+{
+    [JsonPropertyName("storageFrom")]
+    public required string StorageFrom { get; init; }
+    
+    [JsonPropertyName("storageTo")]
+    public required string StorageTo { get; init; }
+    
+    [JsonPropertyName("mode")]
+    public required LogisticsCalculationMode Mode { get; init; }
+    
+    [JsonPropertyName("items")]
+    public required IEnumerable<LogisticsItemDto> Items { get; init; }
+}
 
 public record CalculateDeliveryCostResponse(DeliveryCostDto DeliveryCost, StorageRouteDto UsedRoute);
 

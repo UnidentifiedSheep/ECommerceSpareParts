@@ -11,4 +11,6 @@ public interface IMainClient
     Task<InternalFullProduct?> GetFullProduct(int productId, CancellationToken cancellationToken = default);
 
     Task<InternalFullProducer?> GetFullProducer(int producerId, CancellationToken cancellationToken = default);
+
+    Task<InternalFullPurchase?> GetFullPurchase(Guid purchaseId, CancellationToken cancellationToken = default);
 }

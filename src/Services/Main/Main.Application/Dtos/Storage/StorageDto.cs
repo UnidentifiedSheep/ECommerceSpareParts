@@ -15,6 +15,5 @@ public record StorageDto
     public required string? Location { get; init; }
 
     [JsonPropertyName("type")]
-    [JsonConverter(typeof(JsonStringEnumConverter<StorageType>))]
     public required StorageType Type { get; init; }
 }

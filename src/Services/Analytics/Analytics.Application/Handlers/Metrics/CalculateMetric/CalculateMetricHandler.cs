@@ -1,18 +1,21 @@
-﻿using Analytics.Application.Interfaces.Services;
+﻿using Analytics.Application.Interfaces.Repositories;
+using Analytics.Application.Interfaces.Services;
+using Analytics.Application.Interfaces.Services.Metrics;
 using Analytics.Entities.Exceptions.Metrics;
 using Analytics.Entities.Metrics;
 using Application.Common.Interfaces.Cqrs;
-using Application.Common.Interfaces.Repositories;
+using Attributes;
 
 namespace Analytics.Application.Handlers.Metrics.CalculateMetric;
 
+[Transactional, AutoSave]
 public record CalculateMetricCommand(Guid MetricId) : ICommand<CalculateMetricResult>;
 
 public record CalculateMetricResult(Metric CalculatedMetric);
 
 public class CalculateMetricHandler(
     IMetricCalculatorFactory calculatorFactory,
-    IRepository<Metric, Guid> metricRepository)
+    IMetricRepository metricRepository)
     : ICommandHandler<CalculateMetricCommand, CalculateMetricResult>
 {
     public async Task<CalculateMetricResult> Handle(CalculateMetricCommand request, CancellationToken cancellationToken)

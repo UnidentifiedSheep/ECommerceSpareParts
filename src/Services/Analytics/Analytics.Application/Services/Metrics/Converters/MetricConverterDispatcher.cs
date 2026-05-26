@@ -1,5 +1,6 @@
 ﻿using Analytics.Application.Dtos.CalculationJob;
 using Analytics.Application.Interfaces.Services;
+using Analytics.Application.Interfaces.Services.Metrics;
 using Analytics.Entities.Metrics;
 
 namespace Analytics.Application.Services.Metrics.Converters;

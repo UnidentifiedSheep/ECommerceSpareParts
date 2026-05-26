@@ -12,6 +12,5 @@ public record CoefficientDto
     public required decimal Value { get; init; }
 
     [JsonPropertyName("type")]
-    [JsonConverter(typeof(JsonStringEnumConverter<CoefficientType>))]
     public required CoefficientType Type { get; init; }
 }
