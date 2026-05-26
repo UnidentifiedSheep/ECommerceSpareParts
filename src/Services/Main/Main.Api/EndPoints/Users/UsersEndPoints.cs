@@ -3,6 +3,7 @@ using Api.Common.Extensions;
 using Api.Common.Models.Requests;
 using Carter;
 using Enums;
+using Main.Application.Dtos.Auth;
 using Main.Application.Dtos.Emails;
 using Main.Application.Dtos.Users;
 using Main.Application.Handlers.Auth.AddPermissionToUser;
@@ -17,15 +18,17 @@ namespace Main.Api.EndPoints.Users;
 
 public record AddPermissionToUserRequest(string Permission);
 
-public record CreateUserRequest(
-    string UserName,
-    string Password,
-    UserInfoDto UserInfo,
-    IEnumerable<EmailDto> Emails,
-    IEnumerable<string> Phones,
-    IEnumerable<string> Roles);
+public record CreateUserRequest
+{
+    public required string UserName { get; init; }
+    public required string Password { get; init; }
+    public required UserInfoDto UserInfo { get; init; }
+    public required IEnumerable<EmailDto> Emails { get; init; }
+    public required IEnumerable<string> Phones { get; init; }
+    public required IEnumerable<string> Roles { get; init; }
+}
 
-public record CreateUserResponse(Guid UserId);
+public record CreateUserResponse(UserDto User);
 
 public record GetUsersRequest(
     [FromQuery(Name = "searchTerm")] string? SearchTerm,
@@ -38,6 +41,7 @@ public record GetUsersRequest(
     [FromQuery(Name = "isSupplier")] bool? IsSupplier,
     [FromQuery(Name = "description")] string? Description,
     [FromQuery(Name = "similarityLevel")] double? SimilarityLevel,
+    [FromQuery(Name = "roles")] string[]? Roles,
     [FromQuery(Name = "searchMethod")] GeneralSearchStrategy SearchMethod) : PaginationQueryModel;
 
 public record GetUsersResponse(IReadOnlyList<UserDto> Users);
@@ -72,8 +76,13 @@ public class UsersEndPoints : ICarterModule
 
         users.MapPost("/", async (ISender sender, CreateUserRequest request, CancellationToken cancellationToken) =>
             {
-                var userId = (await sender.Send(request.Adapt<CreateUserCommand>(), cancellationToken)).UserId;
-                return Results.Created($"users/{userId}", new CreateUserResponse(userId));
+                var result = await sender.Send(new CreateUserCommand(
+                    request.UserName, 
+                    request.Password,
+                    request.UserInfo,
+                    request.Emails,
+                    request.Roles), cancellationToken);
+                return Results.Created($"users/{result.User.Id}", new CreateUserResponse(result.User));
             })
             .WithName("CreateUser")
             .WithSummary("Создать пользователя")
@@ -102,7 +111,7 @@ public class UsersEndPoints : ICarterModule
                     request.UserName,
                     request.Id,
                     request.Description,
-                    [],
+                    request.Roles,
                     request.SearchMethod);
                 var result = await sender.Send(query, token);
                 return Results.Ok(result.Adapt<GetUsersResponse>());

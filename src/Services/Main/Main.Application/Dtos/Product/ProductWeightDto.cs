@@ -12,6 +12,5 @@ public record ProductWeightDto
     public required decimal Weight { get; init; }
 
     [JsonPropertyName("unit")]
-    [JsonConverter(typeof(JsonStringEnumConverter<WeightUnit>))]
     public required WeightUnit Unit { get; init; }
 }

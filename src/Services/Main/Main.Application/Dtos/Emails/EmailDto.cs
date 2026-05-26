@@ -15,6 +15,5 @@ public record EmailDto
     public bool IsPrimary { get; init; }
 
     [JsonPropertyName("type")]
-    [JsonConverter(typeof(JsonStringEnumConverter<EmailType>))]
     public EmailType Type { get; init; }
 }

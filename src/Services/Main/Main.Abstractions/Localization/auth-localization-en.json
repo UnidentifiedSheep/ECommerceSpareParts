@@ -35,6 +35,12 @@
     "user.email.already.in.use": "Email is already in use by some user.",
     "user.min.email.count": "User must have at least {0} emails.",
     "user.max.email.count": "User must have no more than {0} emails.",
-    "user.search.strategy.not.valid.input": "Provided input is invalid, for general search you must provide SearchColumn. For similarity search any other columns"
+    "user.search.strategy.not.valid.input": "Provided input is invalid, for general search you must provide SearchColumn. For similarity search any other columns",
+    "role.SUPPLIER.name": "Supplier",
+    "role.ADMIN.name": "Administrator",
+    "role.MEMBER.name": "Member",
+    "role.WORKER.name": "Worker",
+    "role.SYSTEM.name": "System",
+    "cant.create.system.user": "System user can not be created."
   }
 }

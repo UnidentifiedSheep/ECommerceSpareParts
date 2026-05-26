@@ -3,6 +3,7 @@ using Application.Common.Extensions;
 using Application.Common.Interfaces.Cqrs;
 using Application.Common.Interfaces.Repositories;
 using LinqKit;
+using Localization.Abstractions.Interfaces;
 using Main.Application.Dtos.Auth;
 using Main.Application.Handlers.Projections;
 using Main.Entities.Auth;
@@ -14,7 +15,9 @@ public record GetRolesQuery(string? SearchTerm, Pagination Pagination) : IQuery<
 
 public record GetRolesResult(IReadOnlyList<RoleDto> Roles);
 
-public class GetRolesHandler(IReadRepository<Role, string> repository) : IQueryHandler<GetRolesQuery, GetRolesResult>
+public class GetRolesHandler(
+    IReadRepository<Role, string> repository,
+    IScopedStringLocalizer localizer) : IQueryHandler<GetRolesQuery, GetRolesResult>
 {
     public async Task<GetRolesResult> Handle(GetRolesQuery request, CancellationToken cancellationToken)
     {
@@ -33,7 +36,7 @@ public class GetRolesHandler(IReadRepository<Role, string> repository) : IQueryH
 
         var roles = await query
             .AsExpandable()
-            .Select(AuthProjections.ToRoleDto)
+            .Select(AuthProjections.ToRoleDto(localizer))
             .ApplyPagination(request.Pagination)
             .ToListAsync(cancellationToken);
 

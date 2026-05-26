@@ -15,7 +15,6 @@ public record CalculationJobDto
     public required string MetricSystemName { get; init; }
 
     [JsonPropertyName("status")]
-    [JsonConverter(typeof(JsonStringEnumConverter<CalculationStatus>))]
     public required CalculationStatus Status { get; init; }
 
     [JsonPropertyName("createdAt")]

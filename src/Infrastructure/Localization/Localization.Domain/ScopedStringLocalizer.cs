@@ -33,6 +33,9 @@ public sealed class ScopedStringLocalizer(IStringLocalizer stringLocalizer) : IS
         return stringLocalizer.TryGet(key, _locale.Value, out value);
     }
 
+    public string? GetOrDefault(string key)
+        => TryGet(key, out string? value) ? value : null;
+
     public string this[string key] => Get(key);
 
     public void Dispose()

@@ -35,6 +35,12 @@
     "user.email.already.in.use": "Почта уже занята другим пользователем.",
     "user.min.email.count": "У пользователя должно быть не менее {0} email.",
     "user.max.email.count": "У пользователя должно быть не более {0} email.",
-    "user.search.strategy.not.valid.input": "Предоставлены неверные данные, для общего поиска требуется указать SearchColumn для поиска по схожести надо предоставить любые другие колонки."
+    "user.search.strategy.not.valid.input": "Предоставлены неверные данные, для общего поиска требуется указать SearchColumn для поиска по схожести надо предоставить любые другие колонки.",
+    "role.SUPPLIER.name": "Поставщик",
+    "role.ADMIN.name": "Администратор",
+    "role.MEMBER.name": "Пользователь",
+    "role.WORKER.name": "Работник",
+    "role.SYSTEM.name": "Система",
+    "cant.create.system.user": "Нельзя создать системного пользователя."
   }
 }

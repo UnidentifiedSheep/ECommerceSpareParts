@@ -19,11 +19,9 @@ public record StorageRouteDto
     public required int DistanceM { get; init; }
 
     [JsonPropertyName("routeType")]
-    [JsonConverter(typeof(JsonStringEnumConverter<RouteType>))]
     public required RouteType RouteType { get; init; }
 
     [JsonPropertyName("pricingModel")]
-    [JsonConverter(typeof(JsonStringEnumConverter<LogisticPricingType>))]
     public required LogisticPricingType PricingModel { get; init; }
 
     [JsonPropertyName("deliveryTimeMinutes")]

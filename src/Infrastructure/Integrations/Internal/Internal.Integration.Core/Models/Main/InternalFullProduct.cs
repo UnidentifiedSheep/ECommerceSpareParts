@@ -39,7 +39,6 @@ public record InternalProductWeight
     public required decimal Weight { get; init; }
 
     [JsonPropertyName("unit")]
-    [JsonConverter(typeof(JsonStringEnumConverter<WeightUnit>))]
     public required WeightUnit Unit { get; init; }
 }
 
@@ -58,7 +57,6 @@ public record InternalProductSize
     public required decimal Height { get; init; }
 
     [JsonPropertyName("unit")]
-    [JsonConverter(typeof(JsonStringEnumConverter<DimensionUnit>))]
     public required DimensionUnit Unit { get; init; }
 
     [JsonPropertyName("volumeM3")]

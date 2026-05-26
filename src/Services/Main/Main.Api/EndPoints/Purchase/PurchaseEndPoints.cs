@@ -1,3 +1,4 @@
+using System.Text.Json.Serialization;
 using Abstractions.Interfaces;
 using Abstractions.Models;
 using Api.Common.Extensions;
@@ -17,16 +18,35 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace Main.Api.EndPoints.Purchase;
 
-public record CreatePurchaseRequest(
-    Guid SupplierId,
-    int CurrencyId,
-    string StorageName,
-    DateTime PurchaseDate,
-    IEnumerable<NewPurchaseContentDto> PurchaseContent,
-    string? Comment,
-    decimal? PayedSum,
-    bool WithLogistics,
-    string? StorageFrom);
+public record CreatePurchaseRequest
+{
+    [JsonPropertyName("supplierId")]
+    public required Guid SupplierId { get; init; }
+    
+    [JsonPropertyName("currencyId")]
+    public required int CurrencyId { get; init; }
+    
+    [JsonPropertyName("storageName")]
+    public required string StorageName { get; init; }
+    
+    [JsonPropertyName("purchaseDate")]
+    public required DateTime PurchaseDate { get; init; }
+    
+    [JsonPropertyName("purchaseContent")]
+    public required IEnumerable<NewPurchaseContentDto> PurchaseContent { get; init; }
+    
+    [JsonPropertyName("withLogistics")]
+    public required bool WithLogistics { get; init; }
+    
+    [JsonPropertyName("comment")]
+    public string? Comment { get; init; }
+    
+    [JsonPropertyName("payedSum")]
+    public decimal? PayedSum { get; init; }
+    
+    [JsonPropertyName("storageFrom")]
+    public string? StorageFrom { get; init; }
+}
 
 public record EditPurchaseRequest(
     IEnumerable<EditPurchaseDto> Content,

@@ -13,11 +13,9 @@ public record PurchaseLogisticDto
     public required Guid? TransactionId { get; init; }
     
     [JsonPropertyName("pricingModel")]
-    [JsonConverter(typeof(JsonStringEnumConverter<LogisticPricingType>))]
     public required LogisticPricingType PricingModel { get; init; }
     
     [JsonPropertyName("routeType")]
-    [JsonConverter(typeof(JsonStringEnumConverter<RouteType>))]
     public required RouteType RouteType { get; init; }
     
     [JsonPropertyName("priceKg")]
