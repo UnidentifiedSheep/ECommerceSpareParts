@@ -15,5 +15,5 @@ public class ProductPurchasesMetric : ProductMetric<ProductInfoModel>
     {
     }
 
-    public override DependsOn DependsOn { get; protected set; } = DependsOn.Purchase | DependsOn.Period;
+    public override DependsOn DependsOn { get; protected set; } = DependsOn.Purchase;
 }

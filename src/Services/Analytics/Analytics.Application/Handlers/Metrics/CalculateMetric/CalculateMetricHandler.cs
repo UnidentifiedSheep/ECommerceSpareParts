@@ -1,8 +1,8 @@
-﻿using Analytics.Application.Interfaces.Services;
+using Analytics.Application.Interfaces.Repositories;
+using Analytics.Application.Interfaces.Services;
 using Analytics.Entities.Exceptions.Metrics;
 using Analytics.Entities.Metrics;
 using Application.Common.Interfaces.Cqrs;
-using Application.Common.Interfaces.Repositories;
 
 namespace Analytics.Application.Handlers.Metrics.CalculateMetric;
 
@@ -12,7 +12,7 @@ public record CalculateMetricResult(Metric CalculatedMetric);
 
 public class CalculateMetricHandler(
     IMetricCalculatorFactory calculatorFactory,
-    IRepository<Metric, Guid> metricRepository)
+    IMetricRepository metricRepository)
     : ICommandHandler<CalculateMetricCommand, CalculateMetricResult>
 {
     public async Task<CalculateMetricResult> Handle(CalculateMetricCommand request, CancellationToken cancellationToken)

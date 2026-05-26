@@ -2,6 +2,6 @@
   "locale": "en",
   "keyValues": {
     "ProductPurchasesMetric.description": "",
-    "ArticleSalesMetric.description": "Calculates sales metrics for a selected product over a given period, including quantity sold, total revenue, average, minimum and maximum price, and price volatility."
+    "ProductSalesMetric.description": "Calculates sales metrics for a selected product over a given period, including quantity sold, total revenue, average, minimum and maximum price, and price volatility."
   }
 }

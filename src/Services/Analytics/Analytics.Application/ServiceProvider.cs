@@ -1,10 +1,12 @@
 using Abstractions.Interfaces;
 using Analytics.Application.Interfaces.Services;
+using Analytics.Application.Interfaces.Services.FactSynchronizers;
 using Analytics.Application.Services;
 using Analytics.Application.Services.FactSynchronizers;
 using Analytics.Application.Services.Metrics.Calculators;
 using Analytics.Application.Services.Metrics.Converters;
 using Analytics.Application.Services.Metrics.Validators;
+using Analytics.Entities;
 using Analytics.Entities.Metrics;
 using Application.Common;
 using Application.Common.Interfaces.Currency;
@@ -34,8 +36,9 @@ public static class ServiceProvider
         collection.AddSingleton<IJsonSerializer, JsonSerializer>();
         collection.AddScoped<ICurrencyConverter, CurrencyConverter>();
         collection.AddScoped<ICurrencyRatesProvider, CurrencyRatesProvider>();
-        collection.AddScoped<IPurchaseFactSynchronizer, PurchaseFactSynchronizer>();
+        collection.AddScoped<IFactSynchronizer<PurchasesFact, Guid>, PurchaseFactSynchronizer>();
 
+        collection.AddScoped<ITagsUpdater, TagsUpdater>();
         return collection;
     }
 
@@ -45,8 +48,8 @@ public static class ServiceProvider
         collection.AddScoped<IMetricCalculatorFactory, MetricCalculatorFactory>();
         collection.AddScoped<IMetricValidatorDispatcher, MetricValidatorDispatcher>();
 
-        collection.AddScoped<IMetricCalculator<ProductSalesMetric>, ArticleSalesMetricCalculator>();
-        collection.AddScoped<IMetricCalculator<ProductPurchasesMetric>, ArticlePurchasesMetricCalculator>();
+        collection.AddScoped<IMetricCalculator<ProductSalesMetric>, ProductSalesMetricCalculator>();
+        collection.AddScoped<IMetricCalculator<ProductPurchasesMetric>, ProductPurchasesMetricCalculator>();
         return collection;
     }
 

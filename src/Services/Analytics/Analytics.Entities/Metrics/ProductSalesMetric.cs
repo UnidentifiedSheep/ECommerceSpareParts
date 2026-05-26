@@ -4,7 +4,7 @@ using Analytics.Enums;
 
 namespace Analytics.Entities.Metrics;
 
-[MetricInfo("ArticleSalesMetric")]
+[MetricInfo("ProductSalesMetric")]
 public sealed class ProductSalesMetric : ProductMetric<ProductInfoModel>
 {
     private ProductSalesMetric()
@@ -15,5 +15,5 @@ public sealed class ProductSalesMetric : ProductMetric<ProductInfoModel>
     {
     }
 
-    public override DependsOn DependsOn { get; protected set; } = DependsOn.Sale | DependsOn.Period;
+    public override DependsOn DependsOn { get; protected set; } = DependsOn.Sale;
 }

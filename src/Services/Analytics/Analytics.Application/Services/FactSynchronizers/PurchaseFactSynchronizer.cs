@@ -1,6 +1,7 @@
-﻿using System.Data;
-using Abstractions.Interfaces.Services;
+﻿using Abstractions.Interfaces.Services;
 using Analytics.Application.Interfaces.Services;
+using Analytics.Application.Interfaces.Services.FactSynchronizers;
+using Analytics.Application.Models;
 using Analytics.Entities;
 using Application.Common.Interfaces.Repositories;
 using Attributes;
@@ -13,7 +14,8 @@ public class PurchaseFactSynchronizer(
     IMainClient mainClient,
     IRepository<PurchasesFact, Guid> repository,
     IUnitOfWork unitOfWork,
-    ILogger<IPurchaseFactSynchronizer> logger) : IPurchaseFactSynchronizer
+    ITagsUpdater tagsUpdater,
+    ILogger<IFactSynchronizer<PurchasesFact, Guid>> logger) : IFactSynchronizer<PurchasesFact, Guid>
 {
     public async Task<PurchasesFact?> SynchronizeAsync(
         Guid id, 
@@ -56,7 +58,16 @@ public class PurchaseFactSynchronizer(
         if (fromMain is null)
         {
             if (dbFact is not null)
+            {
+                await tagsUpdater.UpdateTags(
+                    new PurchaseTagUpdateContext
+                    {
+                        NewFactDatetime = dbFact.CreatedAt
+                    },
+                    cancellationToken);
+
                 unitOfWork.Remove(dbFact);
+            }
 
             await unitOfWork.SaveChangesAsync(cancellationToken);
             return null;
@@ -82,9 +93,18 @@ public class PurchaseFactSynchronizer(
                 contents);
 
             await unitOfWork.AddAsync(dbFact, cancellationToken);
+            await tagsUpdater.UpdateTags(
+                new PurchaseTagUpdateContext
+                {
+                    NewFactDatetime = dbFact.CreatedAt
+                },
+                cancellationToken);
+
             await unitOfWork.SaveChangesAsync(cancellationToken);
             return dbFact;
         }
+
+        var previousFactDatetime = dbFact.CreatedAt;
 
         dbFact.Update(
             purchase.Currency.Id,
@@ -93,7 +113,17 @@ public class PurchaseFactSynchronizer(
             synchronizationStartedAt,
             contents);
 
+        await tagsUpdater.UpdateTags(
+            new PurchaseTagUpdateContext
+            {
+                NewFactDatetime = dbFact.CreatedAt,
+                PreviousFactDatetime = previousFactDatetime
+            },
+            cancellationToken);
+
         await unitOfWork.SaveChangesAsync(cancellationToken);
         return dbFact;
     }
+
+    private sealed record PurchaseTagUpdateContext : TagUpdateContext<PurchasesFact>;
 }

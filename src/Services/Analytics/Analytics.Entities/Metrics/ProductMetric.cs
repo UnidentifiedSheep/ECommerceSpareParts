@@ -8,17 +8,17 @@ public abstract class ProductMetric<TData> : Metric<TData> where TData : class
 
     protected ProductMetric(int productId)
     {
-        SetArticleId(productId);
+        SetProductId(productId);
     }
 
     public int ProductId { get; private set; }
 
-    private void SetArticleId(int articleId)
+    private void SetProductId(int productId)
     {
-        if (articleId <= 0)
-            throw new ArgumentException("Article id must be greater than zero.", nameof(articleId));
+        if (productId <= 0)
+            throw new ArgumentException("Product id must be greater than zero.", nameof(productId));
 
-        ProductId = articleId;
-        SetDimensionKey(articleId.ToString());
+        ProductId = productId;
+        SetDimensionKey(productId.ToString());
     }
 }

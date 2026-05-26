@@ -2,7 +2,7 @@
 
 namespace Analytics.Application.Services.Metrics.Calculators;
 
-public class ArticlePurchasesMetricCalculator : MetricCalculatorBase<ProductPurchasesMetric>
+public class ProductPurchasesMetricCalculator : MetricCalculatorBase<ProductPurchasesMetric>
 {
     public override async Task CalculateMetric(
         ProductPurchasesMetric metric,

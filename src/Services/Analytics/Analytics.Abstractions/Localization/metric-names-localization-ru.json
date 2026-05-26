@@ -1,7 +1,7 @@
 ﻿{
   "locale": "ru",
   "keyValues": {
-    "ProductPurchasesMetric.name": "Метрика продаж товара.",
+    "ProductSalesMetric.name": "Метрика продаж товара.",
     "ProductPurchasesMetric.name": "Метрика закупок товара."
   }
 }
