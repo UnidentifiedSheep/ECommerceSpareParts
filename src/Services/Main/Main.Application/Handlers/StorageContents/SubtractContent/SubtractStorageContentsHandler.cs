@@ -9,6 +9,7 @@ using Contracts.StorageContent;
 using Main.Application.Interfaces.Persistence;
 using Main.Entities.Event;
 using Main.Entities.Exceptions;
+using Main.Entities.Product;
 using Main.Entities.Storage;
 using Main.Enums;
 using Event = Main.Entities.Event.Event;
@@ -18,11 +19,21 @@ namespace Main.Application.Handlers.StorageContents.SubtractContent;
 [AutoSave]
 [Transactional(IsolationLevel.ReadCommitted, 20, 2)]
 public record SubtractStorageContentsCommand(
-    int StorageContentId,
-    int Count,
-    StorageMovementType MovementType) : ICommand<SubtractStorageContentsResult>;
+    IReadOnlyList<SubtractStorageContentItem> Items,
+    StorageMovementType MovementType) : ICommand<SubtractStorageContentsResult>
+{
+    public SubtractStorageContentsCommand(
+        int storageContentId,
+        int count,
+        StorageMovementType movementType)
+        : this([new SubtractStorageContentItem(storageContentId, count)], movementType)
+    {
+    }
+}
 
 public record SubtractStorageContentsResult(IReadOnlyList<SubtractedStorageContent> Contents);
+
+public record SubtractStorageContentItem(int StorageContentId, int Count);
 
 public record SubtractedStorageContent(int StorageContentId, int Count);
 
@@ -37,21 +48,74 @@ public class SubtractStorageContentsHandler(
         SubtractStorageContentsCommand request,
         CancellationToken cancellationToken)
     {
-        var firstContent = await storageContentRepository.EnsureExistForUpdateAsync(
-            request.StorageContentId,
-            id => new StorageContentNotFoundException(id),
-            ct: cancellationToken);
+        var items = request.Items.ToList();
+        var firstContentIds = items
+            .Select(x => x.StorageContentId)
+            .Distinct()
+            .ToArray();
 
-        var product = await productRepository.EnsureExistForUpdateAsync(
-            firstContent.ProductId,
-            id => new ProductNotFoundException(id),
-            ct: cancellationToken);
+        var firstContents = await storageContentRepository
+            .EnsureExistsForUpdateAsync(
+                firstContentIds, 
+                ids => new StorageContentNotFoundException(ids[0]), 
+                cancellationToken);
 
-        var remaining = request.Count;
+        var productIds = firstContents.Values
+            .Select(x => x.ProductId)
+            .Distinct()
+            .ToArray();
+
+        var products = await productRepository.EnsureExistsForUpdateAsync(
+            productIds,
+            ids => new ProductNotFoundException(ids),
+            cancellationToken);
+
         var affected = new List<SubtractedStorageContent>();
         var events = new List<Event>();
+        var affectedProductIds = new HashSet<int>();
 
-        Subtract(firstContent, ref remaining, affected, events, request.MovementType);
+        foreach (var item in items)
+            await SubtractItem(
+                item,
+                firstContents[item.StorageContentId],
+                products,
+                affected,
+                events,
+                affectedProductIds,
+                request.MovementType,
+                cancellationToken);
+
+        await unitOfWork.AddRangeAsync(events, cancellationToken);
+
+        foreach (var productId in affectedProductIds)
+        {
+            integrationEventScope.Add(new ProductUpdatedEvent
+            {
+                Id = productId
+            });
+
+            integrationEventScope.Add(new StorageContentUpdatedEvent
+            {
+                ProductId = productId
+            });
+        }
+
+        return new SubtractStorageContentsResult(affected);
+    }
+
+    private async Task SubtractItem(
+        SubtractStorageContentItem item,
+        StorageContent firstContent,
+        IReadOnlyDictionary<int, Product> products,
+        ICollection<SubtractedStorageContent> affected,
+        ICollection<Event> events,
+        ISet<int> affectedProductIds,
+        StorageMovementType movementType,
+        CancellationToken cancellationToken)
+    {
+        var remaining = item.Count;
+
+        Subtract(firstContent, ref remaining, affected, events, movementType);
 
         if (remaining > 0)
             await foreach (var content in storageContentRepository
@@ -62,33 +126,21 @@ public class SubtractStorageContentsHandler(
             {
                 if (content.Id == firstContent.Id) continue;
 
-                Subtract(content, ref remaining, affected, events, request.MovementType);
+                Subtract(content, ref remaining, affected, events, movementType);
                 if (remaining == 0) break;
             }
 
         if (remaining > 0)
         {
-            var availableCount = request.Count - remaining;
+            var availableCount = item.Count - remaining;
             throw new NotEnoughCountOnStorageException(
                 firstContent.ProductId,
                 availableCount,
-                request.Count);
+                item.Count);
         }
 
-        product.IncreaseStock(-request.Count);
-        await unitOfWork.AddRangeAsync(events, cancellationToken);
-
-        integrationEventScope.Add(new ProductUpdatedEvent
-        {
-            Id = firstContent.ProductId
-        });
-
-        integrationEventScope.Add(new StorageContentUpdatedEvent
-        {
-            ProductId = firstContent.ProductId
-        });
-
-        return new SubtractStorageContentsResult(affected);
+        products[firstContent.ProductId].IncreaseStock(-item.Count);
+        affectedProductIds.Add(firstContent.ProductId);
     }
 
     private static void Subtract(

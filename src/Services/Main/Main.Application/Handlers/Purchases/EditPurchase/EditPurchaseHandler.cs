@@ -195,9 +195,11 @@ public class EditPurchaseHandler(
                 cancellationToken);
 
         var storageEvents = new List<Event>();
+        var deletionSubtractions = new List<SubtractStorageContentItem>();
+        var editingSubtractions = new List<SubtractStorageContentItem>();
 
         foreach (var removed in purchase.Contents.Where(x => !requestedIds.Contains(x.Id)).ToList())
-            await RemoveContent(purchase, removed, cancellationToken);
+            RemoveContent(purchase, removed, deletionSubtractions);
 
         foreach (var dto in contentDtos)
         {
@@ -214,26 +216,38 @@ public class EditPurchaseHandler(
                 storageContents,
                 products,
                 storageEvents,
+                editingSubtractions,
                 cancellationToken);
         }
+
+        if (deletionSubtractions.Count > 0)
+            await sender.Send(
+                new SubtractStorageContentsCommand(
+                    deletionSubtractions,
+                    StorageMovementType.PurchaseDeletion),
+                cancellationToken);
+
+        if (editingSubtractions.Count > 0)
+            await sender.Send(
+                new SubtractStorageContentsCommand(
+                    editingSubtractions,
+                    StorageMovementType.PurchaseEditing),
+                cancellationToken);
 
         await unitOfWork.AddRangeAsync(storageEvents, cancellationToken);
     }
 
-    private async Task RemoveContent(
+    private void RemoveContent(
         Purchase purchase,
         PurchaseContent content,
-        CancellationToken cancellationToken)
+        ICollection<SubtractStorageContentItem> subtractions)
     {
         if (content.PurchaseContentLogistic is { } logistic)
             unitOfWork.Remove(logistic);
 
-        await sender.Send(
-            new SubtractStorageContentsCommand(
-                content.StorageContentId,
-                content.Count,
-                StorageMovementType.PurchaseDeletion),
-            cancellationToken);
+        subtractions.Add(new SubtractStorageContentItem(
+            content.StorageContentId,
+            content.Count));
 
         purchase.RemoveContent(content);
         unitOfWork.Remove(content);
@@ -287,6 +301,7 @@ public class EditPurchaseHandler(
         Dictionary<int, StorageContent> storageContents,
         Dictionary<int, Product> products,
         List<Event> storageEvents,
+        ICollection<SubtractStorageContentItem> subtractions,
         CancellationToken cancellationToken)
     {
         if (content.ProductId != dto.ProductId)
@@ -298,12 +313,9 @@ public class EditPurchaseHandler(
         var countDelta = dto.Count - content.Count;
         if (countDelta < 0)
         {
-            await sender.Send(
-                new SubtractStorageContentsCommand(
-                    content.StorageContentId,
-                    -countDelta,
-                    StorageMovementType.PurchaseEditing),
-                cancellationToken);
+            subtractions.Add(new SubtractStorageContentItem(
+                content.StorageContentId,
+                -countDelta));
         }
         else if (countDelta > 0)
         {

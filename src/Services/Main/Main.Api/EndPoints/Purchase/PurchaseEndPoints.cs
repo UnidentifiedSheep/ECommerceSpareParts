@@ -7,7 +7,7 @@ using Carter;
 using Enums;
 using Main.Application.Dtos.Purchase;
 using Main.Application.Handlers.Purchases.CreatePurchase;
-using Main.Application.Handlers.Purchases.DeleteFullPurchase;
+using Main.Application.Handlers.Purchases.DeletePurchase;
 using Main.Application.Handlers.Purchases.EditPurchase;
 using Main.Application.Handlers.Purchases.GetPurchase;
 using Main.Application.Handlers.Purchases.GetPurchaseContent;
@@ -121,11 +121,10 @@ public class PurchaseEndPoints : ICarterModule
 
         purchases.MapDelete("/{purchaseId}", async (
                 ISender sender,
-                string purchaseId,
-                IUserContext user,
+                Guid purchaseId,
                 CancellationToken cancellationToken) =>
             {
-                await sender.Send(new DeleteFullPurchaseCommand(purchaseId, user.UserId), cancellationToken);
+                await sender.Send(new DeletePurchaseCommand(purchaseId), cancellationToken);
                 return Results.NoContent();
             })
             .WithName("DeletePurchase")

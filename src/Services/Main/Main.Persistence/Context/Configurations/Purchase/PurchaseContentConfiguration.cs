@@ -60,7 +60,7 @@ public class PurchaseContentConfiguration : IEntityTypeConfiguration<PurchaseCon
             .HasForeignKey(d => d.PurchaseId)
             .HasConstraintName("purchase_content_purchase_id_fk");
 
-        builder.HasOne<StorageContent>()
+        builder.HasOne<StorageContent>(e => e.StorageContent)
             .WithOne()
             .HasForeignKey<PurchaseContent>(d => d.StorageContentId)
             .OnDelete(DeleteBehavior.SetNull)
