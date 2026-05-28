@@ -1,9 +1,10 @@
-﻿using System.Data.Common;
+using System.Data.Common;
+using System.Text.RegularExpressions;
 using Microsoft.EntityFrameworkCore.Diagnostics;
 
 namespace Persistence.Interceptors;
 
-public class SelectForUpdateCommandInterceptor : DbCommandInterceptor
+public partial class SelectForUpdateCommandInterceptor : DbCommandInterceptor
 {
     public override InterceptionResult<object> ScalarExecuting(
         DbCommand command,
@@ -46,6 +47,26 @@ public class SelectForUpdateCommandInterceptor : DbCommandInterceptor
     private static void ManipulateCommand(DbCommand command)
     {
         if (command.CommandText.Contains("-- ForUpdate", StringComparison.Ordinal))
-            command.CommandText += " FOR UPDATE";
+            command.CommandText = AppendForUpdate(command.CommandText);
     }
+
+    private static string AppendForUpdate(string commandText)
+    {
+        if (commandText.Contains("FOR UPDATE", StringComparison.OrdinalIgnoreCase))
+            return commandText;
+
+        var rootAlias = RootAliasRegex().Match(commandText).Groups["alias"].Value;
+        var forUpdate = string.IsNullOrWhiteSpace(rootAlias)
+            ? " FOR UPDATE"
+            : $" FOR UPDATE OF {rootAlias}";
+
+        return commandText.EndsWith(';')
+            ? string.Concat(commandText.AsSpan(0, commandText.Length - 1), forUpdate, ";")
+            : commandText + forUpdate;
+    }
+
+    [GeneratedRegex(
+        "\\bFROM\\s+.+?\\s+AS\\s+(?<alias>\"[^\"]+\"|[A-Za-z_][A-Za-z0-9_]*)",
+        RegexOptions.IgnoreCase | RegexOptions.Singleline)]
+    private static partial Regex RootAliasRegex();
 }
