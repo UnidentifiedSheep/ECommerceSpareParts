@@ -3,12 +3,13 @@ using Main.Application.Interfaces.Persistence;
 using Main.Entities.Storage;
 using Main.Persistence.Context;
 using Microsoft.EntityFrameworkCore;
+using Persistence.Interfaces;
 using Persistence.Repository;
 
 namespace Main.Persistence.Repositories.Storage;
 
-public class StorageContentReservationRepository(DContext context)
-    : LinqRepositoryBase<DContext, StorageContentReservation, int>(context), IStorageContentReservationRepository
+public class StorageContentReservationRepository(DContext context, IQueryableExtensions extensions)
+    : LinqRepositoryBase<DContext, StorageContentReservation, int>(context, extensions), IStorageContentReservationRepository
 {
     public Task<Dictionary<int, int>> GetReservationsCountForUserAsync(
         Guid userId,

@@ -1,5 +1,6 @@
 using System.Data;
 using Abstractions.Interfaces;
+using Abstractions.Interfaces.Persistence;
 using Abstractions.Interfaces.Services;
 using Application.Common.Interfaces.Cqrs;
 using Attributes;
@@ -56,7 +57,7 @@ public class DeleteFullSaleHandler(
         Guid userId,
         CancellationToken cancellationToken = default)
     {
-        var command = new ReverseTransactionCommand(transactionId, userId);
+        var command = new ReverseTransactionCommand(transactionId);
         await mediator.Send(command, cancellationToken);
     }
 

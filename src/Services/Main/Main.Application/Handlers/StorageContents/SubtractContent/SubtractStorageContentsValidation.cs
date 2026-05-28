@@ -7,12 +7,20 @@ public class SubtractStorageContentsValidation : AbstractValidator<SubtractStora
 {
     public SubtractStorageContentsValidation()
     {
-        RuleFor(x => x.StorageContentId)
-            .GreaterThan(0)
-            .WithLocalizationKey("storage.content.id.greater.than.zero");
+        RuleFor(x => x.Items)
+            .NotEmpty()
+            .WithLocalizationKey("storage.content.items.required");
 
-        RuleFor(x => x.Count)
-            .GreaterThan(0)
-            .WithLocalizationKey("storage.content.count.greater.than.zero");
+        RuleForEach(x => x.Items)
+            .ChildRules(item =>
+            {
+                item.RuleFor(x => x.StorageContentId)
+                    .GreaterThan(0)
+                    .WithLocalizationKey("storage.content.id.greater.than.zero");
+
+                item.RuleFor(x => x.Count)
+                    .GreaterThan(0)
+                    .WithLocalizationKey("storage.content.count.greater.than.zero");
+            });
     }
 }

@@ -1,4 +1,5 @@
 using System.Data;
+using Abstractions.Interfaces.Persistence;
 using Abstractions.Interfaces.Services;
 using Abstractions.Models;
 using Application.Common.Extensions;

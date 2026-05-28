@@ -60,11 +60,10 @@ public class BalancesEndPoints : ICarterModule
 
         balances.MapDelete("/transaction/{id:guid}", async (
                 ISender sender,
-                IUserContext user,
                 Guid id,
                 CancellationToken token) =>
             {
-                await sender.Send(new ReverseTransactionCommand(id, user.UserId), token);
+                await sender.Send(new ReverseTransactionCommand(id), token);
                 return Results.Ok();
             })
             .WithName("DeleteBalanceTransaction")

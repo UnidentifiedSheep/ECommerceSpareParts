@@ -1,4 +1,5 @@
 using System.Data;
+using Abstractions.Interfaces;
 using Application.Common.Interfaces.Cqrs;
 using Application.Common.Interfaces.Repositories;
 using Attributes;
@@ -11,13 +12,14 @@ namespace Main.Application.Handlers.Balance.ReverseTransaction;
 
 [AutoSave]
 [Transactional(IsolationLevel.Serializable, 20, 3)]
-public record ReverseTransactionCommand(Guid TransactionId, Guid WhoReversed)
+public record ReverseTransactionCommand(Guid TransactionId)
     : ICommand<ReverseTransactionResult>;
 
 public record ReverseTransactionResult(Transaction Transaction);
 
 public class ReverseTransactionHandler(
     ITransactionRepository transactionRepository,
+    IUserContext userContext,
     IBalanceService balanceService) : ICommandHandler<ReverseTransactionCommand, ReverseTransactionResult>
 {
     public async Task<ReverseTransactionResult> Handle(
@@ -34,7 +36,7 @@ public class ReverseTransactionHandler(
         var transaction = await transactionRepository.FirstOrDefaultAsync(criteria, cancellationToken)
                           ?? throw new TransactionNotFoundException(transactionId);
 
-        transaction.Reverse(request.WhoReversed);
+        transaction.Reverse(userContext.UserId);
         await balanceService.ChangeSenderReceiverBalancesAsync(transaction, cancellationToken);
         return new ReverseTransactionResult(transaction);
     }

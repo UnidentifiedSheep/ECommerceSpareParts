@@ -2,7 +2,7 @@ using Search.Application.Interfaces;
 using Search.Application.Interfaces.Product;
 using Search.Entities;
 
-namespace Search.Application.Services;
+namespace Search.Application.Services.IndexSynchronizers;
 
 public class ProductIndexSynchronizer(
     IProductSearchDocumentProvider productSearchDocumentProvider,

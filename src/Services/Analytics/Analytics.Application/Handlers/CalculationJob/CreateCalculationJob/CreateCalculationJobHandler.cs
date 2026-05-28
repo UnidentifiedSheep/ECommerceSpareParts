@@ -1,3 +1,4 @@
+using Abstractions.Interfaces.Persistence;
 using Abstractions.Interfaces.Services;
 using Analytics.Application.Dtos.CalculationJob;
 using Analytics.Application.Handlers.Projections;

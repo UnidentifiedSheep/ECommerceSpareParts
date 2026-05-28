@@ -1,3 +1,4 @@
+using Abstractions.Interfaces.Persistence;
 using Abstractions.Interfaces.Services;
 using Application.Common.Interfaces.Repositories;
 using Main.Application.Interfaces.Services;

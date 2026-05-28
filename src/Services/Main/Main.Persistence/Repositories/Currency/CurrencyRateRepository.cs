@@ -1,17 +1,20 @@
-﻿using Application.Common.Interfaces.Repositories;
+﻿using Abstractions.Interfaces.Services;
+using Application.Common.Interfaces.Repositories;
 using LinqKit;
 using Main.Application.Interfaces.Persistence;
 using Main.Entities.Currency;
 using Main.Persistence.Context;
 using Microsoft.EntityFrameworkCore;
 using Persistence;
-using Persistence.Extensions;
+using Persistence.Interfaces;
+using Persistence.Repository;
 
 namespace Main.Persistence.Repositories.Currency;
 
 public class CurrencyRateRepository(
-    DContext context
-) : RepositoryBase<DContext, CurrencyRate, (int, int)>(context), ICurrencyRateRepository
+    DContext context, 
+    IQueryableExtensions extensions
+) : RepositoryBase<DContext, CurrencyRate, (int, int)>(context, extensions), ICurrencyRateRepository
 {
     public Task<List<CurrencyRate>> GetByBaseCurrency(
         int baseCurrencyId,
@@ -20,7 +23,7 @@ public class CurrencyRateRepository(
     {
         var query = Context.CurrencyRates
             .Where(x => x.ToCurrencyId == baseCurrencyId);
-        query = criteria == null ? query : query.Apply(criteria);
+        query = criteria == null ? query : QueryableExtensions.Apply(query, criteria);
         return query.ToListAsync(cancellationToken);
     }
 
@@ -35,8 +38,9 @@ public class CurrencyRateRepository(
             return Task.FromResult(new Dictionary<(int, int), CurrencyRate>());
 
         var query = Context.CurrencyRates
-            .AsExpandable()
-            .Apply(criteria);
+            .AsExpandable();
+
+        query = QueryableExtensions.Apply(query, criteria);
 
         var predicate = PredicateBuilder.New<CurrencyRate>();
 

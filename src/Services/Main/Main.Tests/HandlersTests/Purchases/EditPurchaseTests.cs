@@ -48,7 +48,6 @@ public class EditPurchaseTests : IntegrationTest
             currency.Id,
             "edited purchase",
             DateTime.UtcNow,
-            GetContext<UserContextTestContext>().SystemUser.Id,
             false,
             null);
 
@@ -107,7 +106,6 @@ public class EditPurchaseTests : IntegrationTest
             currency.Id,
             null,
             DateTime.UtcNow,
-            GetContext<UserContextTestContext>().SystemUser.Id,
             false,
             null);
 
@@ -160,7 +158,6 @@ public class EditPurchaseTests : IntegrationTest
             currency.Id,
             null,
             DateTime.UtcNow,
-            GetContext<UserContextTestContext>().SystemUser.Id,
             false,
             null));
 
@@ -204,7 +201,6 @@ public class EditPurchaseTests : IntegrationTest
             currency.Id,
             null,
             DateTime.UtcNow,
-            GetContext<UserContextTestContext>().SystemUser.Id,
             true,
             route.FromStorageName);
 
@@ -259,7 +255,6 @@ public class EditPurchaseTests : IntegrationTest
             currency.Id,
             null,
             DateTime.UtcNow,
-            GetContext<UserContextTestContext>().SystemUser.Id,
             false,
             null));
 
@@ -286,7 +281,6 @@ public class EditPurchaseTests : IntegrationTest
             GetContext<CurrencyTestContext>().Currencies[0].Id,
             null,
             DateTime.UtcNow,
-            GetContext<UserContextTestContext>().SystemUser.Id,
             false,
             null);
 

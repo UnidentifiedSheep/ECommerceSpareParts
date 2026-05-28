@@ -4,12 +4,13 @@ using Main.Entities.Storage;
 using Main.Persistence.Context;
 using Microsoft.EntityFrameworkCore;
 using Persistence.Extensions;
+using Persistence.Interfaces;
 using Persistence.Repository;
 
 namespace Main.Persistence.Repositories.Storage;
 
-public class StorageRouteRepository(DContext context)
-    : LinqRepositoryBase<DContext, StorageRoute, Guid>(context), IStorageRouteRepository
+public class StorageRouteRepository(DContext context, IQueryableExtensions extensions)
+    : LinqRepositoryBase<DContext, StorageRoute, Guid>(context, extensions), IStorageRouteRepository
 {
     public async Task<StorageRoute?> GetActiveRouteAsync(
         string from,
@@ -20,7 +21,7 @@ public class StorageRouteRepository(DContext context)
         var query = Context.StorageRoutes.AsQueryable();
 
         if (criteria != null)
-            query = query.Apply(criteria);
+            query = QueryableExtensions.Apply(query, criteria);
 
         return await query
             .FirstOrDefaultAsync(

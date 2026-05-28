@@ -1,7 +1,7 @@
 using Abstractions.Models;
 using Attributes;
 
-namespace Abstractions.Interfaces.Services;
+namespace Abstractions.Interfaces.Persistence;
 
 public interface IUnitOfWork
 {

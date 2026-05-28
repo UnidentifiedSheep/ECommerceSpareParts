@@ -1,4 +1,5 @@
-﻿using Abstractions.Interfaces.Services;
+﻿using Abstractions.Interfaces.Persistence;
+using Abstractions.Interfaces.Services;
 using Application.Common.Interfaces.Cqrs;
 using Application.Common.Interfaces.Repositories;
 using Attributes;

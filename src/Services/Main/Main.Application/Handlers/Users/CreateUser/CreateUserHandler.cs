@@ -1,3 +1,4 @@
+using Abstractions.Interfaces.Persistence;
 using Abstractions.Interfaces.Services;
 using Abstractions.Interfaces.Validators;
 using Application.Common.Extensions;

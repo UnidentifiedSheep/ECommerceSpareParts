@@ -3,5 +3,6 @@
 public enum PurchaseState
 {
     Draft,
-    Completed
+    Completed,
+    Deleted
 }

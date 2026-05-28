@@ -1,3 +1,4 @@
+using Abstractions.Interfaces.Services;
 using Analytics.Application.Interfaces.Repositories;
 using Analytics.Entities.Metrics;
 using Analytics.Enums;
@@ -6,11 +7,13 @@ using Application.Common.Interfaces.Repositories;
 using Microsoft.EntityFrameworkCore;
 using Persistence;
 using Persistence.Extensions;
+using Persistence.Interfaces;
+using Persistence.Repository;
 
 namespace Analytics.Persistence.Repositories;
 
-public class MetricRepository(DContext context)
-    : RepositoryBase<DContext, Metric, Guid>(context), IMetricRepository
+public class MetricRepository(DContext context, IQueryableExtensions extensions)
+    : RepositoryBase<DContext, Metric, Guid>(context, extensions), IMetricRepository
 {
     public async Task<int> MarkDirtyAsync(
         DependsOn dependsOn,
@@ -40,8 +43,7 @@ public class MetricRepository(DContext context)
         Criteria<Metric>? criteria = null,
         CancellationToken ct = default)
     {
-        return Context.Metrics
-            .Apply(criteria)
+        return QueryableExtensions.Apply(Context.Metrics, criteria)
             .Where(x => ids.Contains(x.Id))
             .ToDictionaryAsync(x => x.Id, ct);
     }

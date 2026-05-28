@@ -3,6 +3,7 @@ using BulkValidation.Core.Attributes;
 using Domain;
 using Domain.Extensions;
 using Domain.Interfaces;
+using Main.Entities.Storage;
 
 namespace Main.Entities.Purchase;
 
@@ -32,6 +33,7 @@ public class PurchaseContent : Entity<PurchaseContent, int>, ILinqEntity<Purchas
     public string? Comment { get; private set; }
     public Product.Product Product { get; private set; } = null!;
     public PurchaseContentLogistic? PurchaseContentLogistic { get; private set; }
+    public StorageContent StorageContent { get; private set; } = null!;
 
     public static Expression<Func<PurchaseContent, bool>> GetEqualityExpression(int key)
     {
