@@ -8,6 +8,7 @@ using Application.Common.Interfaces.Repositories;
 using Application.Common.Interfaces.Settings;
 using Attributes;
 using Contracts.Purchase;
+using LinqKit;
 using Main.Application.Dtos.Purchase;
 using Main.Application.Dtos.Storage;
 using Main.Application.Extensions;
@@ -24,6 +25,7 @@ using Main.Entities.Storage;
 using Main.Entities.User;
 using Main.Enums;
 using MediatR;
+using Microsoft.EntityFrameworkCore;
 using Role = Main.Enums.Role;
 
 namespace Main.Application.Handlers.Purchases.CreatePurchase;
@@ -49,6 +51,7 @@ public class CreatePurchaseHandler(
     IUserRepository userRepository,
     IPurchaseLogisticsService purchaseLogisticsService,
     IIntegrationEventScope integrationEventScope,
+    IReadRepository<Purchase, Guid> readRepository,
     IUnitOfWork unitOfWork) : ICommandHandler<CreatePurchaseCommand, CreatePurchaseResult>
 {
     public async Task<CreatePurchaseResult> Handle(CreatePurchaseCommand request, CancellationToken cancellationToken)
@@ -109,7 +112,11 @@ public class CreatePurchaseHandler(
             PurchaseId = purchase.Id 
         });
 
-        return new CreatePurchaseResult(PurchaseProjections.ToPurchaseDto.AsFunc()(purchase));
+        var fromDb = await readRepository.Query
+            .AsExpandable()
+            .Select(PurchaseProjections.ToPurchaseDto)
+            .FirstAsync(x => x.Id == purchase.Id, cancellationToken);
+        return new CreatePurchaseResult(fromDb);
     }
 
     private async Task<IReadOnlyList<StorageContent>> AddContentsToStorage(
