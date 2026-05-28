@@ -1,14 +1,16 @@
 using System.Linq.Expressions;
+using Abstractions.Interfaces.Services;
 using Application.Common.Interfaces.Repositories;
 using Domain;
 using Domain.Interfaces;
 using Microsoft.EntityFrameworkCore;
 using Persistence.Extensions;
+using Persistence.Interfaces;
 
 namespace Persistence.Repository;
 
-public abstract class LinqRepositoryBase<TContext, TEntity, TKey>(TContext context)
-    : RepositoryBase<TContext, TEntity, TKey>(context)
+public abstract class LinqRepositoryBase<TContext, TEntity, TKey>(TContext context, IQueryableExtensions extensions)
+    : RepositoryBase<TContext, TEntity, TKey>(context, extensions)
     where TEntity : Entity<TEntity, TKey>, ILinqEntity<TEntity, TKey>
     where TKey : notnull
     where TContext : DbContext
@@ -22,9 +24,8 @@ public abstract class LinqRepositoryBase<TContext, TEntity, TKey>(TContext conte
         var keySelector = TEntity.GetKeySelector();
         var containsExpression = BuildContainsExpression(keys, keySelector);
 
-        return DbSet
-            .AsQueryable()
-            .Apply(criteria)
+        return QueryableExtensions
+            .Apply(DbSet.AsQueryable(), criteria)
             .Where(containsExpression)
             .ToDictionaryAsync(keySelector.Compile(), ct);
     }

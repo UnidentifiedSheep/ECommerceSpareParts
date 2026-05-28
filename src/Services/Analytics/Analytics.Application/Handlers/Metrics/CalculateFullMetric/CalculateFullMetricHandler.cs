@@ -1,4 +1,5 @@
-﻿using Abstractions.Interfaces.Services;
+﻿using Abstractions.Interfaces.Persistence;
+using Abstractions.Interfaces.Services;
 using Analytics.Application.Dtos.CalculationJob;
 using Analytics.Application.Handlers.CalculationJob.UpdateCalculationJob;
 using Analytics.Application.Handlers.Metrics.CalculateMetric;

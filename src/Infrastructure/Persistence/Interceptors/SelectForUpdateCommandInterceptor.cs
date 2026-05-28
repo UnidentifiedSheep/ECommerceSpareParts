@@ -1,30 +1,13 @@
+using System.Collections.Concurrent;
 using System.Data.Common;
 using System.Text.RegularExpressions;
 using Microsoft.EntityFrameworkCore.Diagnostics;
 
 namespace Persistence.Interceptors;
 
-public partial class SelectForUpdateCommandInterceptor : DbCommandInterceptor
+public sealed partial class SelectForUpdateCommandInterceptor : DbCommandInterceptor
 {
-    public override InterceptionResult<object> ScalarExecuting(
-        DbCommand command,
-        CommandEventData eventData,
-        InterceptionResult<object> result)
-    {
-        ManipulateCommand(command);
-        return result;
-    }
-
-    public override ValueTask<InterceptionResult<object>> ScalarExecutingAsync(
-        DbCommand command,
-        CommandEventData eventData,
-        InterceptionResult<object> result,
-        CancellationToken cancellationToken = default)
-    {
-        ManipulateCommand(command);
-        return new ValueTask<InterceptionResult<object>>(result);
-    }
-
+    private static readonly ConcurrentDictionary<string, Regex> RegexCache = new();
     public override InterceptionResult<DbDataReader> ReaderExecuting(
         DbCommand command,
         CommandEventData eventData,
@@ -41,32 +24,111 @@ public partial class SelectForUpdateCommandInterceptor : DbCommandInterceptor
         CancellationToken cancellationToken = default)
     {
         ManipulateCommand(command);
-        return new ValueTask<InterceptionResult<DbDataReader>>(result);
+        return ValueTask.FromResult(result);
+    }
+
+    public override InterceptionResult<object> ScalarExecuting(
+        DbCommand command,
+        CommandEventData eventData,
+        InterceptionResult<object> result)
+    {
+        ManipulateCommand(command);
+        return result;
+    }
+
+    public override ValueTask<InterceptionResult<object>> ScalarExecutingAsync(
+        DbCommand command,
+        CommandEventData eventData,
+        InterceptionResult<object> result,
+        CancellationToken cancellationToken = default)
+    {
+        ManipulateCommand(command);
+        return ValueTask.FromResult(result);
     }
 
     private static void ManipulateCommand(DbCommand command)
     {
-        if (command.CommandText.Contains("-- ForUpdate", StringComparison.Ordinal))
-            command.CommandText = AppendForUpdate(command.CommandText);
+        var sql = command.CommandText;
+
+        if (sql.Contains("FOR UPDATE", StringComparison.OrdinalIgnoreCase))
+            return;
+
+        var table = GetForUpdateTable(sql);
+
+        if (string.IsNullOrWhiteSpace(table))
+            return;
+
+        var aliasMatch = FindTableAlias(sql, table);
+
+        if (!aliasMatch.Success)
+            return;
+
+        var alias = aliasMatch.Groups["alias"].Value;
+        var forUpdate = $"FOR UPDATE OF {alias}";
+
+        command.CommandText = InsertForUpdate(sql, aliasMatch.Index, forUpdate);
     }
 
-    private static string AppendForUpdate(string commandText)
+    private static string? GetForUpdateTable(string sql)
     {
-        if (commandText.Contains("FOR UPDATE", StringComparison.OrdinalIgnoreCase))
-            return commandText;
+        var match = ForUpdateOfTagRegex().Match(sql);
 
-        var rootAlias = RootAliasRegex().Match(commandText).Groups["alias"].Value;
-        var forUpdate = string.IsNullOrWhiteSpace(rootAlias)
-            ? " FOR UPDATE"
-            : $" FOR UPDATE OF {rootAlias}";
-
-        return commandText.EndsWith(';')
-            ? string.Concat(commandText.AsSpan(0, commandText.Length - 1), forUpdate, ";")
-            : commandText + forUpdate;
+        return match.Success
+            ? match.Groups["table"].Value.Trim()
+            : null;
     }
 
-    [GeneratedRegex(
-        "\\bFROM\\s+.+?\\s+AS\\s+(?<alias>\"[^\"]+\"|[A-Za-z_][A-Za-z0-9_]*)",
-        RegexOptions.IgnoreCase | RegexOptions.Singleline)]
-    private static partial Regex RootAliasRegex();
+    private static Match FindTableAlias(string sql, string table)
+    {
+        var regex = RegexCache.GetOrAdd(table, static table =>
+        {
+            var parts = table.Split(
+                '.',
+                StringSplitOptions.RemoveEmptyEntries |
+                StringSplitOptions.TrimEntries);
+
+            var tablePattern = parts.Length switch
+            {
+                1 => QuoteOrRaw(parts[0]),
+                2 => $@"{QuoteOrRaw(parts[0])}\s*\.\s*{QuoteOrRaw(parts[1])}",
+                _ => throw new InvalidOperationException(
+                    $"Invalid table name: {table}")
+            };
+
+            return new Regex(
+                $@"\bFROM\s+{tablePattern}\s+(?:AS\s+)?(?<alias>""[^""]+""|[A-Za-z_][A-Za-z0-9_]*)",
+                RegexOptions.IgnoreCase |
+                RegexOptions.Compiled);
+        });
+
+        return regex.Match(sql);
+    }
+
+    private static string InsertForUpdate(string sql, int tableFromIndex, string forUpdate)
+    {
+        var limitMatch = LimitRegex().Match(sql, tableFromIndex);
+
+        if (limitMatch.Success)
+            return sql.Insert(limitMatch.Index, $"{forUpdate} ");
+
+        var semicolon = sql.LastIndexOf(';');
+
+        if (semicolon >= 0)
+            return sql.Insert(semicolon, $"{Environment.NewLine}{forUpdate}");
+
+        return sql.TrimEnd() + $"{Environment.NewLine}{forUpdate}";
+    }
+
+    private static string QuoteOrRaw(string name)
+    {
+        var escaped = Regex.Escape(name);
+
+        return $@"(?:""{escaped}""|{escaped})";
+    }
+
+    [GeneratedRegex(@"--\s*ForUpdateOf:(?<table>[^\r\n]+)", RegexOptions.IgnoreCase)]
+    private static partial Regex ForUpdateOfTagRegex();
+
+    [GeneratedRegex(@"\bLIMIT\b", RegexOptions.IgnoreCase)]
+    private static partial Regex LimitRegex();
 }

@@ -6,6 +6,7 @@ using Search.Application.Interfaces;
 using Search.Application.Interfaces.Producer;
 using Search.Application.Interfaces.Product;
 using Search.Application.Services;
+using Search.Application.Services.IndexSynchronizers;
 using Search.Entities;
 
 namespace Search.Application;

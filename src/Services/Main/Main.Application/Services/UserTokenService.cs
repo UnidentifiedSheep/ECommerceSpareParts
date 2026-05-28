@@ -1,5 +1,6 @@
 using System.Net;
 using Abstractions.Interfaces;
+using Abstractions.Interfaces.Persistence;
 using Abstractions.Interfaces.Services;
 using Main.Application.Interfaces.Services;
 using Main.Entities.Auth;

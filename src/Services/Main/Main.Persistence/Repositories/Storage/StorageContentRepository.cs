@@ -3,12 +3,13 @@ using Main.Entities.Storage;
 using Main.Persistence.Context;
 using Microsoft.EntityFrameworkCore;
 using Persistence.Extensions;
+using Persistence.Interfaces;
 using Persistence.Repository;
 
 namespace Main.Persistence.Repositories.Storage;
 
-public class StorageContentRepository(DContext context)
-    : LinqRepositoryBase<DContext, StorageContent, int>(context), IStorageContentRepository
+public class StorageContentRepository(DContext context, IQueryableExtensions extensions)
+    : LinqRepositoryBase<DContext, StorageContent, int>(context, extensions), IStorageContentRepository
 {
     public IAsyncEnumerable<StorageContent> GetStorageContentsForUpdateAsync(
         int? productId,
@@ -34,9 +35,8 @@ public class StorageContentRepository(DContext context)
         if (exceptStorageNames != null && exceptStorageNames.Count != 0)
             query = query.Where(x => !exceptStorageNames.Contains(x.StorageName));
 
-        return query
-            .OrderBy(x => x.PurchaseDatetime)
-            .ForUpdate()
+        return QueryableExtensions.ForUpdate(query
+                .OrderBy(x => x.PurchaseDatetime))
             .AsAsyncEnumerable();
     }
 

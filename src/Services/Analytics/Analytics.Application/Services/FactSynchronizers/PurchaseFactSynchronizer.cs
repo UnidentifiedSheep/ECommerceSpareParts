@@ -1,4 +1,5 @@
-﻿using Abstractions.Interfaces.Services;
+﻿using Abstractions.Interfaces.Persistence;
+using Abstractions.Interfaces.Services;
 using Analytics.Application.Interfaces.Services;
 using Analytics.Application.Interfaces.Services.FactSynchronizers;
 using Analytics.Application.Interfaces.Services.Metrics;

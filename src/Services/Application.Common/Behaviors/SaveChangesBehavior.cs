@@ -1,4 +1,5 @@
 ﻿using System.Reflection;
+using Abstractions.Interfaces.Persistence;
 using Abstractions.Interfaces.Services;
 using Attributes;
 using MediatR;

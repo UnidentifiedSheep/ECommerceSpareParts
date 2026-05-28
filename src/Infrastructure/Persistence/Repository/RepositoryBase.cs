@@ -3,14 +3,15 @@ using Application.Common.Interfaces.Repositories;
 using Domain;
 using Domain.Interfaces;
 using Microsoft.EntityFrameworkCore;
-using Persistence.Extensions;
+using Persistence.Interfaces;
 
-namespace Persistence;
+namespace Persistence.Repository;
 
-public abstract class RepositoryBase<TContext, TEntity, TKey>(TContext context) : IRepository<TEntity, TKey>
+public abstract class RepositoryBase<TContext, TEntity, TKey>(TContext context, IQueryableExtensions queryableExtensions) : IRepository<TEntity, TKey>
     where TEntity : Entity<TEntity, TKey> where TContext : DbContext where TKey : notnull
 {
     protected readonly TContext Context = context;
+    protected readonly IQueryableExtensions QueryableExtensions = queryableExtensions;
     protected readonly DbSet<TEntity> DbSet = context.Set<TEntity>();
 
     public async ValueTask<TEntity?> GetById(TKey id, CancellationToken ct = default)
@@ -25,7 +26,7 @@ public abstract class RepositoryBase<TContext, TEntity, TKey>(TContext context) 
         var query = DbSet.AsQueryable();
 
         if (criteria != null)
-            query = query.Apply(criteria);
+            query = QueryableExtensions.Apply(query, criteria);
 
         return await query.FirstOrDefaultAsync(ct);
     }
@@ -37,7 +38,7 @@ public abstract class RepositoryBase<TContext, TEntity, TKey>(TContext context) 
         var query = DbSet.AsQueryable();
 
         if (criteria != null)
-            query = query.Apply(criteria);
+            query = QueryableExtensions.Apply(query, criteria);
 
         return await query.ToListAsync(ct);
     }
@@ -45,9 +46,9 @@ public abstract class RepositoryBase<TContext, TEntity, TKey>(TContext context) 
     public IAsyncEnumerable<TEntity> AsyncEnumerable(
         Criteria<TEntity>? criteria = null)
     {
-        return DbSet.AsQueryable()
-            .Apply(criteria)
-            .AsAsyncEnumerable();
+        var query = DbSet.AsQueryable();
+        query = QueryableExtensions.Apply(query, criteria);
+        return query.AsAsyncEnumerable();
     }
 
     public abstract Task<Dictionary<TKey, TEntity>> FindByIdsAsync(

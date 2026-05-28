@@ -1,4 +1,5 @@
 using System.Data;
+using Abstractions.Interfaces.Persistence;
 using Abstractions.Interfaces.Services;
 using Application.Common.Extensions;
 using Application.Common.Interfaces;
@@ -22,8 +23,6 @@ public record DeletePurchaseCommand(Guid PurchaseId) : ICommand<Unit>;
 public class DeletePurchaseHandler(
     IUnitOfWork unitOfWork,
     IRepository<Purchase, Guid> repository,
-    IRepository<PurchaseContent, int> purchaseContentRepository,
-    IRepository<PurchaseLogistic, Guid> purchaseLogisticsRepository,
     IIntegrationEventScope interfaceScope,
     ISender sender)
     : ICommandHandler<DeletePurchaseCommand, Unit>
@@ -46,21 +45,13 @@ public class DeletePurchaseHandler(
 
     private async Task<Purchase> GetPurchase(Guid id, CancellationToken cancellationToken)
     {
-        var purchase = await repository.EnsureExistForUpdateAsync(
+        return await repository.EnsureExistForUpdateAsync(
             id,
             key => new PurchaseNotFoundException(key),
-            null,
+            Criteria<Purchase>.New()
+                .Include(x => x.PurchaseLogistic)
+                .Include(x => x.Contents),
             cancellationToken);
-        
-        await purchaseLogisticsRepository.GetById(purchase.Id, cancellationToken);
-
-        var criteria = Criteria<PurchaseContent>
-            .New()
-            .Where(x => x.PurchaseId == purchase.Id)
-            .Track()
-            .Build();
-        await purchaseContentRepository.ListAsync(criteria, cancellationToken);
-        return purchase;
     }
 
     private async Task SubtractStock(

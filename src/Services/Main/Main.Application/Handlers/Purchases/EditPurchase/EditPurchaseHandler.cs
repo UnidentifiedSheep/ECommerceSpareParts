@@ -1,5 +1,5 @@
 using System.Data;
-using Abstractions.Interfaces;
+using Abstractions.Interfaces.Persistence;
 using Abstractions.Interfaces.Services;
 using Application.Common.Extensions;
 using Application.Common.Interfaces;
@@ -10,7 +10,6 @@ using Application.Common.Interfaces.Settings;
 using Attributes;
 using Contracts.Purchase;
 using Main.Application.Dtos.Purchase;
-using Main.Application.Extensions.Repository;
 using Main.Application.Handlers.Balance.CreateTransaction;
 using Main.Application.Handlers.Balance.ReverseTransaction;
 using Main.Application.Handlers.StorageContents.SubtractContent;
@@ -44,8 +43,6 @@ public class EditPurchaseHandler(
     ISender sender,
     ISettingsService settingsService,
     IRepository<Purchase, Guid> purchaseRepository,
-    IRepository<PurchaseContent, int> purchaseContentRepository,
-    IRepository<PurchaseLogistic, Guid> purchaseLogisticRepository,
     IRepository<StorageOwner, (string, Guid)> storageOwnerRepository,
     IStorageContentRepository storageContentRepository,
     IProductRepository productRepository,
@@ -95,19 +92,15 @@ public class EditPurchaseHandler(
             .SystemId;
     }
 
-    private async Task<Purchase> GetPurchase(Guid purchaseId, CancellationToken cancellationToken)
+    private Task<Purchase> GetPurchase(Guid purchaseId, CancellationToken cancellationToken)
     {
-        var purchase = await purchaseRepository.GetPurchaseForUpdate(purchaseId, cancellationToken);
-
-        await purchaseContentRepository.GetPurchaseContents(purchaseId, cancellationToken);
-        await purchaseLogisticRepository.FirstOrDefaultAsync(
-            Criteria<PurchaseLogistic>.New()
-                .Where(x => x.PurchaseId == purchaseId)
-                .Track()
-                .Build(),
+        return purchaseRepository.EnsureExistForUpdateAsync(
+            purchaseId,
+            id => new PurchaseNotFoundException(id),
+            Criteria<Purchase>.New()
+                .Include(x => x.Contents)
+                .Include(x => x.PurchaseLogistic),
             cancellationToken);
-
-        return purchase;
     }
 
     private async Task EnsureStorageOwner(

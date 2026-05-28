@@ -4,13 +4,14 @@ using Main.Application.Interfaces.Persistence;
 using Main.Entities.Product;
 using Main.Persistence.Context;
 using Microsoft.EntityFrameworkCore;
-using Persistence.Extensions;
 using Persistence.Repository;
+
+using QueryExtensions = Persistence.Interfaces.IQueryableExtensions;
 
 namespace Main.Persistence.Repositories.Product;
 
-public class ProductRepository(DContext context)
-    : LinqRepositoryBase<DContext, Entities.Product.Product, int>(context), IProductRepository
+public class ProductRepository(DContext context, QueryExtensions extensions)
+    : LinqRepositoryBase<DContext, Entities.Product.Product, int>(context, extensions), IProductRepository
 {
     public async Task<IReadOnlyList<Entities.Product.Product>> GetProductCrosses(
         int productId,
@@ -25,9 +26,7 @@ public class ProductRepository(DContext context)
             .Where(c => c.LeftProductId == productId)
             .Select(c => c.RightProduct);
 
-        return await left
-            .Union(right)
-            .Apply(criteria)
+        return await QueryableExtensions.Apply(left.Union(right), criteria)
             .ToListAsync(cancellationToken);
     }
 

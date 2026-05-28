@@ -9,10 +9,10 @@ public class SelectForUpdateCommandInterceptorTests
     private readonly SelectForUpdateCommandInterceptor _interceptor = new();
 
     [Fact]
-    public void ReaderExecuting_WhenCommandHasForUpdateTag_AddsForUpdateOfRootAlias()
+    public void ReaderExecuting_WhenCommandHasForUpdateOfTag_AddsForUpdateOfAlias()
     {
         var command = CreateCommand("""
-            -- ForUpdate
+            -- ForUpdateOf:public.purchase
             SELECT p.id, p.comment
             FROM public.purchase AS p
             WHERE p.id = @id
@@ -24,44 +24,66 @@ public class SelectForUpdateCommandInterceptorTests
     }
 
     [Fact]
-    public void ReaderExecuting_WhenRootAliasIsQuoted_AddsForUpdateOfQuotedRootAlias()
+    public void ReaderExecuting_WhenCommandHasJoin_LocksOnlyTaggedTableAlias()
     {
         var command = CreateCommand("""
-            -- ForUpdate
-            SELECT "p"."id", "p"."comment"
-            FROM "purchase" AS "p"
-            WHERE "p"."id" = @id
-            """);
-
-        _interceptor.ReaderExecuting(command, null!, default);
-
-        Assert.EndsWith("FOR UPDATE OF \"p\"", command.CommandText);
-    }
-
-    [Fact]
-    public void ReaderExecuting_WhenCommandHasJoins_LocksOnlyRootAlias()
-    {
-        var command = CreateCommand("""
-            -- ForUpdate
-            SELECT p.id, p.comment, p0.id
+            -- ForUpdateOf:public.purchase
+            SELECT p.id, p0.id
             FROM public.purchase AS p
             LEFT JOIN public.purchase_content AS p0 ON p.id = p0.purchase_id
-            LEFT JOIN public.products AS p1 ON p0.product_id = p1.id
             WHERE p.id = @id
             """);
 
         _interceptor.ReaderExecuting(command, null!, default);
 
         Assert.EndsWith("FOR UPDATE OF p", command.CommandText);
-        Assert.DoesNotContain("FOR UPDATE OF p, p0", command.CommandText);
         Assert.DoesNotContain("FOR UPDATE OF p0", command.CommandText);
+    }
+
+    [Fact]
+    public void ReaderExecuting_WhenCommandHasSubquery_InsertsForUpdateBeforeInnerLimit()
+    {
+        var command = CreateCommand("""
+                                    -- ForUpdateOf:public.purchase
+                                    SELECT s.id, p1.id
+                                    FROM (
+                                        SELECT p.id, p.comment
+                                        FROM public.purchase AS p
+                                        LEFT JOIN public.purchase_logistics AS p0 ON p.id = p0.purchase_id
+                                        WHERE p.id = @key
+                                        LIMIT 1
+                                    ) AS s
+                                    LEFT JOIN public.purchase_content AS p1 ON s.id = p1.purchase_id
+                                    ORDER BY s.id
+                                    """);
+
+        _interceptor.ReaderExecuting(command, null!, default);
+
+        var normalized = Normalize(command.CommandText);
+
+        Assert.Contains(
+            "WHERE p.id = @key FOR UPDATE OF p LIMIT 1",
+            normalized);
+    }
+
+    [Fact]
+    public void ReaderExecuting_WhenCommandIsSingleLineSubquery_InsertsForUpdateBeforeLimit()
+    {
+        var command = CreateCommand("""
+            -- ForUpdateOf:public.purchase
+            SELECT s.id FROM ( SELECT p.id FROM public.purchase AS p WHERE p.id = @key LIMIT 1 ) AS s ORDER BY s.id
+            """);
+
+        _interceptor.ReaderExecuting(command, null!, default);
+
+        Assert.Contains("WHERE p.id = @key FOR UPDATE OF p LIMIT 1", Normalize(command.CommandText));
     }
 
     [Fact]
     public void ReaderExecuting_WhenCommandEndsWithSemicolon_AddsForUpdateBeforeSemicolon()
     {
         var command = CreateCommand("""
-            -- ForUpdate
+            -- ForUpdateOf:public.purchase
             SELECT p.id
             FROM public.purchase AS p;
             """);
@@ -72,46 +94,149 @@ public class SelectForUpdateCommandInterceptorTests
     }
 
     [Fact]
-    public void ReaderExecuting_WhenCommandHasNoForUpdateTag_DoesNotChangeCommandText()
-    {
-        const string sql = """
-            SELECT p.id
-            FROM public.purchase AS p
-            """;
-        var command = CreateCommand(sql);
-
-        _interceptor.ReaderExecuting(command, null!, default);
-
-        Assert.Equal(sql, command.CommandText);
-    }
-
-    [Fact]
-    public void ReaderExecuting_WhenCommandAlreadyHasForUpdate_DoesNotAppendAgain()
-    {
-        const string sql = """
-            -- ForUpdate
-            SELECT p.id
-            FROM public.purchase AS p
-            FOR UPDATE OF p
-            """;
-        var command = CreateCommand(sql);
-
-        _interceptor.ReaderExecuting(command, null!, default);
-
-        Assert.Equal(sql, command.CommandText);
-    }
-
-    [Fact]
-    public void ReaderExecuting_WhenRootAliasCannotBeFound_FallsBackToForUpdate()
+    public void ReaderExecuting_WhenTableHasNoSchema_AddsForUpdateOfAlias()
     {
         var command = CreateCommand("""
-            -- ForUpdate
-            SELECT 1
+            -- ForUpdateOf:purchase
+            SELECT p.id
+            FROM purchase AS p
+            WHERE p.id = @id
             """);
 
         _interceptor.ReaderExecuting(command, null!, default);
 
-        Assert.EndsWith("FOR UPDATE", command.CommandText);
+        Assert.EndsWith("FOR UPDATE OF p", command.CommandText);
+    }
+
+    [Fact]
+    public void ReaderExecuting_WhenTableAndSchemaAreQuoted_AddsForUpdateOfAlias()
+    {
+        var command = CreateCommand("""
+            -- ForUpdateOf:public.purchase
+            SELECT p.id
+            FROM "public"."purchase" AS p
+            WHERE p.id = @id
+            """);
+
+        _interceptor.ReaderExecuting(command, null!, default);
+
+        Assert.EndsWith("FOR UPDATE OF p", command.CommandText);
+    }
+
+    [Fact]
+    public void ReaderExecuting_WhenAliasIsQuoted_AddsForUpdateOfQuotedAlias()
+    {
+        var command = CreateCommand("""
+            -- ForUpdateOf:public.purchase
+            SELECT "p"."id"
+            FROM "public"."purchase" AS "p"
+            WHERE "p"."id" = @id
+            """);
+
+        _interceptor.ReaderExecuting(command, null!, default);
+
+        Assert.EndsWith("FOR UPDATE OF \"p\"", command.CommandText);
+    }
+
+    [Fact]
+    public void ReaderExecuting_WhenAliasWithoutAs_AddsForUpdateOfAlias()
+    {
+        var command = CreateCommand("""
+            -- ForUpdateOf:public.purchase
+            SELECT p.id
+            FROM public.purchase p
+            WHERE p.id = @id
+            """);
+
+        _interceptor.ReaderExecuting(command, null!, default);
+
+        Assert.EndsWith("FOR UPDATE OF p", command.CommandText);
+    }
+
+    [Fact]
+    public void ReaderExecuting_WhenTaggedTableIsNotRoot_DoesNotChangeCommandText()
+    {
+        const string sql = """
+                           -- ForUpdateOf:public.purchase
+                           SELECT p.id, s.id
+                           FROM public.storage AS s
+                           JOIN public.purchase AS p ON p.storage = s.id
+                           WHERE p.id = @id
+                           """;
+
+        var command = CreateCommand(sql);
+
+        _interceptor.ReaderExecuting(command, null!, default);
+
+        Assert.Equal(sql, command.CommandText);
+    }
+
+    [Fact]
+    public void ReaderExecuting_WhenNoForUpdateOfTag_DoesNotChangeCommandText()
+    {
+        const string sql = """
+            SELECT p.id
+            FROM public.purchase AS p
+            """;
+
+        var command = CreateCommand(sql);
+
+        _interceptor.ReaderExecuting(command, null!, default);
+
+        Assert.Equal(sql, command.CommandText);
+    }
+
+    [Fact]
+    public void ReaderExecuting_WhenForUpdateAlreadyExists_DoesNotAppendAgain()
+    {
+        const string sql = """
+            -- ForUpdateOf:public.purchase
+            SELECT p.id
+            FROM public.purchase AS p
+            FOR UPDATE OF p
+            """;
+
+        var command = CreateCommand(sql);
+
+        _interceptor.ReaderExecuting(command, null!, default);
+
+        Assert.Equal(sql, command.CommandText);
+    }
+
+    [Fact]
+    public void ReaderExecuting_WhenTaggedTableAliasCannotBeFound_DoesNotChangeCommandText()
+    {
+        const string sql = """
+            -- ForUpdateOf:public.purchase
+            SELECT 1
+            """;
+
+        var command = CreateCommand(sql);
+
+        _interceptor.ReaderExecuting(command, null!, default);
+
+        Assert.Equal(sql, command.CommandText);
+    }
+
+    [Fact]
+    public async Task ReaderExecutingAsync_WhenCommandHasForUpdateOfTag_AddsForUpdateOfAlias()
+    {
+        var command = CreateCommand("""
+            -- ForUpdateOf:public.purchase
+            SELECT p.id
+            FROM public.purchase AS p
+            """);
+
+        await _interceptor.ReaderExecutingAsync(command, null!, default);
+
+        Assert.EndsWith("FOR UPDATE OF p", command.CommandText);
+    }
+
+    private static string Normalize(string value)
+    {
+        return string.Join(' ', value.Split(
+            [' ', '\r', '\n', '\t'],
+            StringSplitOptions.RemoveEmptyEntries));
     }
 
     private static TestDbCommand CreateCommand(string commandText)
@@ -127,9 +252,9 @@ public class SelectForUpdateCommandInterceptorTests
         public override required string CommandText
         {
             get;
-#pragma warning disable CS8765 // Nullability of type of parameter doesn't match overridden member (possibly because of nullability attributes).
+#pragma warning disable CS8765
             set => field = value;
-#pragma warning restore CS8765 // Nullability of type of parameter doesn't match overridden member (possibly because of nullability attributes).
+#pragma warning restore CS8765
         }
 
         public override int CommandTimeout { get; set; }

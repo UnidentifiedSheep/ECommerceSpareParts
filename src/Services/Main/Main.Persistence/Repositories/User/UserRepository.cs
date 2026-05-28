@@ -5,12 +5,13 @@ using Main.Entities.User.ValueObjects;
 using Main.Persistence.Context;
 using Microsoft.EntityFrameworkCore;
 using Persistence.Extensions;
+using Persistence.Interfaces;
 using Persistence.Repository;
 
 namespace Main.Persistence.Repositories.User;
 
-public class UserRepository(DContext context)
-    : LinqRepositoryBase<DContext, Entities.User.User, Guid>(context), IUserRepository
+public class UserRepository(DContext context, IQueryableExtensions extensions)
+    : LinqRepositoryBase<DContext, Entities.User.User, Guid>(context, extensions), IUserRepository
 {
     public async Task<UserRolesAndPermissions?> GetUserRolesAndPermissionsAsync(
         Guid userId,
@@ -73,7 +74,7 @@ public class UserRepository(DContext context)
             select user;
 
         if (criteria != null)
-            query = query.Apply(criteria);
+            query = QueryableExtensions.Apply(query, criteria);
 
         return query.FirstOrDefaultAsync(cancellationToken);
     }
