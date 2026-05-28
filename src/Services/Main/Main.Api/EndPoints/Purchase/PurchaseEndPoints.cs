@@ -139,8 +139,7 @@ public class PurchaseEndPoints : ICarterModule
                 ISender sender,
                 Guid purchaseId,
                 EditPurchaseRequest request,
-                CancellationToken cancellationToken,
-                IUserContext user) =>
+                CancellationToken cancellationToken) =>
             {
                 var command = new EditPurchaseCommand(
                     request.Content,
@@ -148,7 +147,6 @@ public class PurchaseEndPoints : ICarterModule
                     request.CurrencyId,
                     request.Comment,
                     request.PurchaseDateTime,
-                    user.UserId,
                     request.WithLogistics,
                     request.StorageFrom);
                 await sender.Send(command, cancellationToken);

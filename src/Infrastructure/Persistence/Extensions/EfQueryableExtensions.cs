@@ -18,8 +18,8 @@ public static class EfQueryableExtensions
     public static IQueryable<T> Apply<T>(this IQueryable<T> query, Criteria<T>? criteria) where T : class
     {
         if (criteria == null) return query;
-        query.ConfigureTracking(criteria.Track);
-        query.ForUpdate(criteria.ForUpdate);
+        query = query.ConfigureTracking(criteria.Track);
+        query = query.ForUpdate(criteria.ForUpdate);
 
         foreach (var where in criteria.Wheres)
             query = query.Where(where);

@@ -47,6 +47,7 @@
     "lifo.storage.content.extract.policy.name": "Последнее включение, первым вылетает",
     "lifo.storage.content.extract.policy.description": "Сначала списываются последние поступления, затем более ранние",
     "first.cheapest.storage.content.extract.policy.name": "Сначала самые дешёвые",
-    "first.cheapest.storage.content.extract.policy.description": "Сначала списываются поступления с наименьшей стоимостью, затем более дорогие"
+    "first.cheapest.storage.content.extract.policy.description": "Сначала списываются поступления с наименьшей стоимостью, затем более дорогие",
+    "storage.content.items.required": "Для вычитания со склада требуется чтобы список вычитаемых не был пуст."
   }
 }

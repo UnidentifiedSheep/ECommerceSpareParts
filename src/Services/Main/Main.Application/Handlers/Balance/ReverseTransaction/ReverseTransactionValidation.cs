@@ -10,9 +10,5 @@ public class ReverseTransactionValidation : AbstractValidator<ReverseTransaction
         RuleFor(x => x.TransactionId)
             .NotEmpty()
             .WithLocalizationKey("transaction.id.required");
-
-        RuleFor(x => x.WhoReversed)
-            .NotEmpty()
-            .WithLocalizationKey("transaction.who.delete.user.id.required");
     }
 }

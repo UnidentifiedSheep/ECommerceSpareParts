@@ -19,7 +19,7 @@ namespace Main.Application.Handlers.StorageContents.SubtractContent;
 [AutoSave]
 [Transactional(IsolationLevel.ReadCommitted, 20, 2)]
 public record SubtractStorageContentsCommand(
-    IReadOnlyList<SubtractStorageContentItem> Items,
+    IEnumerable<SubtractStorageContentItem> Items,
     StorageMovementType MovementType) : ICommand<SubtractStorageContentsResult>
 {
     public SubtractStorageContentsCommand(

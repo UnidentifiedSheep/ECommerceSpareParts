@@ -3,6 +3,7 @@ using Main.Application.Handlers.Balance.ReverseTransaction;
 using Main.Entities.Exceptions;
 using Microsoft.EntityFrameworkCore;
 using Test.Common.TestContainers.Combined;
+using Tests.TestContexts;
 using Tests.TestContexts.Balance;
 using ValidationException = FluentValidation.ValidationException;
 
@@ -21,9 +22,9 @@ public class ReverseTransactionTests : IntegrationTest
     public async Task ReverseTransaction_ValidData_Succeeds()
     {
         var transaction = TestContext.Transactions[0];
-        var reversedBy = TestContext.Users[2].Id;
+        var reversedBy = GetContext<UserContextTestContext>().UserContext.UserId;
 
-        await Mediator.Send(new ReverseTransactionCommand(transaction.Id, reversedBy));
+        await Mediator.Send(new ReverseTransactionCommand(transaction.Id));
 
         var reversed = await Context.Transactions
             .AsNoTracking()
@@ -51,16 +52,7 @@ public class ReverseTransactionTests : IntegrationTest
         var reversedBy = TestContext.Users[0].Id;
 
         await Assert.ThrowsAsync<TransactionNotFoundException>(() =>
-            Mediator.Send(new ReverseTransactionCommand(Guid.NewGuid(), reversedBy)));
-    }
-
-    [Fact]
-    public async Task ReverseTransaction_UnknownUser_ThrowsDbValidationException()
-    {
-        var transaction = TestContext.Transactions[0];
-
-        await Assert.ThrowsAsync<DbValidationException>(() =>
-            Mediator.Send(new ReverseTransactionCommand(transaction.Id, Guid.NewGuid())));
+            Mediator.Send(new ReverseTransactionCommand(Guid.NewGuid())));
     }
 
     [Fact]
@@ -69,15 +61,6 @@ public class ReverseTransactionTests : IntegrationTest
         var reversedBy = TestContext.Users[0].Id;
 
         await Assert.ThrowsAsync<ValidationException>(() =>
-            Mediator.Send(new ReverseTransactionCommand(Guid.Empty, reversedBy)));
-    }
-
-    [Fact]
-    public async Task ReverseTransaction_EmptyUserId_ThrowsValidationException()
-    {
-        var transaction = TestContext.Transactions[0];
-
-        await Assert.ThrowsAsync<ValidationException>(() =>
-            Mediator.Send(new ReverseTransactionCommand(transaction.Id, Guid.Empty)));
+            Mediator.Send(new ReverseTransactionCommand(Guid.Empty)));
     }
 }

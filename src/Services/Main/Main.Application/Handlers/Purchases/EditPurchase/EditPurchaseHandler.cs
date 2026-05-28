@@ -1,4 +1,5 @@
 using System.Data;
+using Abstractions.Interfaces;
 using Abstractions.Interfaces.Services;
 using Application.Common.Extensions;
 using Application.Common.Interfaces;
@@ -36,7 +37,6 @@ public record EditPurchaseCommand(
     int CurrencyId,
     string? Comment,
     DateTime PurchaseDateTime,
-    Guid UpdatedUserId,
     bool WithLogistics,
     string? StorageFrom) : ICommand;
 
@@ -61,7 +61,7 @@ public class EditPurchaseHandler(
         var contentDtos = request.Content.ToList();
 
         await EnsureStorageOwner(purchase, request, cancellationToken);
-        await ReversePurchaseTransactions(purchase, request.UpdatedUserId, cancellationToken);
+        await ReversePurchaseTransactions(purchase, cancellationToken);
 
         var totalSum = contentDtos.Sum(x => x.Price * x.Count);
         var purchaseTransaction = await CreateTransaction(
@@ -125,16 +125,15 @@ public class EditPurchaseHandler(
 
     private async Task ReversePurchaseTransactions(
         Purchase purchase,
-        Guid updatedUserId,
         CancellationToken cancellationToken)
     {
         await sender.Send(
-            new ReverseTransactionCommand(purchase.TransactionId, updatedUserId),
+            new ReverseTransactionCommand(purchase.TransactionId),
             cancellationToken);
 
         if (purchase.PurchaseLogistic?.TransactionId is { } logisticsTransactionId)
             await sender.Send(
-                new ReverseTransactionCommand(logisticsTransactionId, updatedUserId),
+                new ReverseTransactionCommand(logisticsTransactionId),
                 cancellationToken);
     }
 
