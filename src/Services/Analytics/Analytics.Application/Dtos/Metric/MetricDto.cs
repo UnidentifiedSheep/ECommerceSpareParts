@@ -2,7 +2,7 @@
 
 namespace Analytics.Application.Dtos.Metric;
 
-public record MetricInfoDto
+public record MetricDto
 {
     [JsonPropertyName("systemName")]
     public required string SystemName { get; init; }

@@ -7,11 +7,11 @@ using Localization.Abstractions.Interfaces;
 
 namespace Analytics.Application.Handlers.Metrics.ListMetrics;
 
-public sealed record ListMetricsQuery : IQuery<ListMetricsResult>;
+public sealed record ListAvailableMetricsQuery : IQuery<ListAvailableMetricsResult>;
 
-public sealed record ListMetricsResult(IReadOnlyList<MetricInfoDto> Metrics);
+public sealed record ListAvailableMetricsResult(IReadOnlyList<MetricInfoDto> Metrics);
 
-public class ListMetricsHandler(IScopedStringLocalizer localizer) : IQueryHandler<ListMetricsQuery, ListMetricsResult>
+public class ListAvailableMetricsHandler(IScopedStringLocalizer localizer) : IQueryHandler<ListAvailableMetricsQuery, ListAvailableMetricsResult>
 {
     private static readonly MetricInfoAttribute[] MetricsInfo = typeof(Metric).Assembly.GetTypes()
         .Where(t => !t.IsAbstract && typeof(Metric).IsAssignableFrom(t))
@@ -22,7 +22,7 @@ public class ListMetricsHandler(IScopedStringLocalizer localizer) : IQueryHandle
         .Where(x => x.Info != null)
         .Select(x => x.Info!)
         .ToArray();
-    public Task<ListMetricsResult> Handle(ListMetricsQuery request, CancellationToken cancellationToken)
+    public Task<ListAvailableMetricsResult> Handle(ListAvailableMetricsQuery request, CancellationToken cancellationToken)
     {
         var result = MetricsInfo.Select(attribute =>
             new MetricInfoDto
@@ -32,6 +32,6 @@ public class ListMetricsHandler(IScopedStringLocalizer localizer) : IQueryHandle
                 Name = localizer[attribute.NameLocalizationKey]
             }).ToList();
 
-        return Task.FromResult(new ListMetricsResult(result));
+        return Task.FromResult(new ListAvailableMetricsResult(result));
     }
 }

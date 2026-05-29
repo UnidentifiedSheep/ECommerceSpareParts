@@ -13,7 +13,7 @@ public class ListMetricsEndPoint : ICarterModule
     {
         app.MapGet("/metrics", async (ISender sender, CancellationToken ct) =>
             {
-                var result = await sender.Send(new ListMetricsQuery(), ct);
+                var result = await sender.Send(new ListAvailableMetricsQuery(), ct);
 
                 return Results.Ok(new ListMetricsResponse(result.Metrics));
             }).WithName("ListMetrics")

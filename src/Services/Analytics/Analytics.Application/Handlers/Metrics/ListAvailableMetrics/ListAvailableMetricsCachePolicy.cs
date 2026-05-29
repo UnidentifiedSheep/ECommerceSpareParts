@@ -3,9 +3,9 @@ using Localization.Abstractions.Interfaces;
 
 namespace Analytics.Application.Handlers.Metrics.ListMetrics;
 
-public class ListMetricsCachePolicy(IScopedStringLocalizer localizer) : ICachePolicy<ListMetricsQuery>
+public class ListAvailableMetricsCachePolicy(IScopedStringLocalizer localizer) : ICachePolicy<ListAvailableMetricsQuery>
 {
-    public string GetCacheKey(ListMetricsQuery request)
+    public string GetCacheKey(ListAvailableMetricsQuery request)
     {
         return $"list-metrics:{localizer.Locale}";
     }

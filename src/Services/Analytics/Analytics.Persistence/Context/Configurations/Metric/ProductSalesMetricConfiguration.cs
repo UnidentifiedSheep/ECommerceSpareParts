@@ -4,7 +4,7 @@ using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
 namespace Analytics.Persistence.Context.Configurations.Metric;
 
-public class ArticleSalesMetricConfiguration : IEntityTypeConfiguration<ProductSalesMetric>
+public class ProductSalesMetricConfiguration : IEntityTypeConfiguration<ProductSalesMetric>
 {
     public void Configure(EntityTypeBuilder<ProductSalesMetric> builder)
     {
