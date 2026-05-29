@@ -1,4 +1,5 @@
 using System.Reflection;
+using Abstractions.Interfaces;
 using Analytics.Application;
 using Analytics.Persistence;
 using Analytics.Persistence.Context;
@@ -38,7 +39,6 @@ builder.Services
     .AddPersistenceLayer()
     .AddCacheLayer("analytics")
     .AddIntegrationClients()
-    .AddMinimalSecurityLayer()
     .AddApplicationLayer(builder.Configuration);
 
 AddMassTransit(builder);

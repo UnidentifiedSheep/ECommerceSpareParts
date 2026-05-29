@@ -16,15 +16,15 @@ namespace Analytics.Application.Handlers.CalculationJob.CreateCalculationJob;
 [Transactional]
 public record CreateCalculationJobCommand(
     string MetricSystemName,
-    MetricPayloadDto MetricPayload
+    MetricPayloadDto MetricPayload,
+    Guid UserId
     ) : ICommand<CreateCalculationJobResult>;
 
 public record CreateCalculationJobResult(MetricCalculationJob CalculationJob);
 
 public class CreateCalculationJobHandler(
     IUnitOfWork unitOfWork,
-    IIntegrationEventScope integrationEventScope,
-    IUserContext userContext
+    IIntegrationEventScope integrationEventScope
 ) : ICommandHandler<CreateCalculationJobCommand, CreateCalculationJobResult>
 {
     public async Task<CreateCalculationJobResult> Handle(
@@ -38,7 +38,7 @@ public class CreateCalculationJobHandler(
         integrationEventScope.Add(new MetricCalculationRequestedEvent
         {
             RequestId = model.RequestId,
-            CreatedBy = userContext.UserId,
+            CreatedBy = request.UserId,
             MetricSystemName = model.MetricSystemName,
             MetricPayload = MetricPayloadProjection.ToContract.AsFunc()(request.MetricPayload)
         });

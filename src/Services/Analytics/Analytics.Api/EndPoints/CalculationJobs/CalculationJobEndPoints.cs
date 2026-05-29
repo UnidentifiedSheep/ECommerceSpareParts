@@ -1,4 +1,5 @@
-﻿using Analytics.Application.Dtos.CalculationJob;
+﻿using Abstractions.Interfaces;
+using Analytics.Application.Dtos.CalculationJob;
 using Analytics.Application.Handlers.CalculationJob.CreateCalculationJob;
 using Analytics.Application.Handlers.CalculationJob.GetCalculationJob;
 using Carter;
@@ -23,11 +24,13 @@ public class CalculationJobEndPoints : ICarterModule
         jobs.MapPost("", async (
                 ISender sender,
                 CreateCalculationJobRequest request,
+                IUserContext userContext,
                 CancellationToken ct) =>
             {
                 var result = await sender.Send(new CreateCalculationJobCommand(
                     request.MetricSystemName,
-                    request.MetricPayload), ct);
+                    request.MetricPayload,
+                    userContext.UserId), ct);
 
                 return Results.Created(
                     $"/jobs/{result.CalculationJob.RequestId}",
