@@ -90,8 +90,7 @@ public static class ServiceCollectionExtensions
             var registration = scan
                 .FromAssemblies(assembly)
                 .AddClasses(classes => classes.AssignableTo<TBaseObject>())
-                .AsSelf()
-                .AsImplementedInterfaces();
+                .As<TBaseObject>();
 
             switch (objectsLifetime)
             {

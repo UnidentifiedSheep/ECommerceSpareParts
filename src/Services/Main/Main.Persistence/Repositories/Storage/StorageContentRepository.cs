@@ -1,4 +1,5 @@
 ﻿using Main.Application.Interfaces.Persistence;
+using Main.Application.NamedObjects.StorageContentExtractPolicies;
 using Main.Entities.Storage;
 using Main.Persistence.Context;
 using Microsoft.EntityFrameworkCore;
@@ -16,9 +17,10 @@ public class StorageContentRepository(DContext context, IQueryableExtensions ext
         string? storageName,
         IEnumerable<int>? exceptProductIds = null,
         IEnumerable<string>? exceptStorages = null,
-        int countGreaterThen = 0)
+        int countGreaterThen = 0,
+        StorageContentExtractPolicyBase? policy = null)
     {
-        var exceptArticles = exceptProductIds?.ToList();
+        var exceptProducts = exceptProductIds?.ToList();
         var exceptStorageNames = exceptStorages?.ToList();
         var query = Context.StorageContents
             .Where(x => x.Count > countGreaterThen);
@@ -26,8 +28,8 @@ public class StorageContentRepository(DContext context, IQueryableExtensions ext
         if (productId != null)
             query = query.Where(x => x.ProductId == productId);
 
-        if (exceptArticles != null && exceptArticles.Count != 0)
-            query = query.Where(x => !exceptArticles.Contains(x.ProductId));
+        if (exceptProducts != null && exceptProducts.Count != 0)
+            query = query.Where(x => !exceptProducts.Contains(x.ProductId));
 
         if (storageName != null)
             query = query.Where(x => x.StorageName == storageName);
@@ -35,9 +37,13 @@ public class StorageContentRepository(DContext context, IQueryableExtensions ext
         if (exceptStorageNames != null && exceptStorageNames.Count != 0)
             query = query.Where(x => !exceptStorageNames.Contains(x.StorageName));
 
-        return QueryableExtensions.ForUpdate(query
-                .OrderBy(x => x.PurchaseDatetime))
-            .AsAsyncEnumerable();
+        query = QueryableExtensions.ForUpdate(query);
+
+        query = policy != null 
+            ? policy.Apply(query) 
+            : query.OrderBy(x => x.PurchaseDatetime);
+        
+        return query.AsAsyncEnumerable();
     }
 
     public async Task<Dictionary<int, int>> GetStorageContentCounts(

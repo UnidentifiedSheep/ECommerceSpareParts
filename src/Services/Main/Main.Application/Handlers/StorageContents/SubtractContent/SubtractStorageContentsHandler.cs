@@ -4,13 +4,17 @@ using Abstractions.Interfaces.Services;
 using Application.Common.Extensions;
 using Application.Common.Interfaces;
 using Application.Common.Interfaces.Cqrs;
+using Application.Common.Interfaces.NamedObject;
+using Application.Common.Interfaces.Settings;
 using Attributes;
 using Contracts.Products;
 using Contracts.StorageContent;
 using Main.Application.Interfaces.Persistence;
+using Main.Application.NamedObjects.StorageContentExtractPolicies;
 using Main.Entities.Event;
 using Main.Entities.Exceptions;
 using Main.Entities.Product;
+using Main.Entities.Setting;
 using Main.Entities.Storage;
 using Main.Enums;
 using Event = Main.Entities.Event.Event;
@@ -42,7 +46,9 @@ public class SubtractStorageContentsHandler(
     IStorageContentRepository storageContentRepository,
     IProductRepository productRepository,
     IUnitOfWork unitOfWork,
-    IIntegrationEventScope integrationEventScope)
+    IIntegrationEventScope integrationEventScope,
+    ISettingsService settingsService,
+    INamedObjectRegistry<StorageContentExtractPolicyBase> policyRegistry)
     : ICommandHandler<SubtractStorageContentsCommand, SubtractStorageContentsResult>
 {
     public async Task<SubtractStorageContentsResult> Handle(
@@ -84,6 +90,7 @@ public class SubtractStorageContentsHandler(
                 events,
                 affectedProductIds,
                 request.MovementType,
+                await GetExtractionPolicy(cancellationToken),
                 cancellationToken);
 
         await unitOfWork.AddRangeAsync(events, cancellationToken);
@@ -104,14 +111,21 @@ public class SubtractStorageContentsHandler(
         return new SubtractStorageContentsResult(affected);
     }
 
+    private async Task<StorageContentExtractPolicyBase> GetExtractionPolicy(CancellationToken cancellationToken)
+    {
+        var setting = (await settingsService.GetOrDefault<StorageContentSetting>(cancellationToken)).Data;
+        return policyRegistry.GetBySystemName(setting.StorageContentExtractionPolicy);
+    }
+
     private async Task SubtractItem(
         SubtractStorageContentItem item,
         StorageContent firstContent,
         IReadOnlyDictionary<int, Product> products,
         ICollection<SubtractedStorageContent> affected,
         ICollection<Event> events,
-        ISet<int> affectedProductIds,
+        HashSet<int> affectedProductIds,
         StorageMovementType movementType,
+        StorageContentExtractPolicyBase policy,
         CancellationToken cancellationToken)
     {
         var remaining = item.Count;
@@ -122,7 +136,8 @@ public class SubtractStorageContentsHandler(
             await foreach (var content in storageContentRepository
                                .GetStorageContentsForUpdateAsync(
                                    firstContent.ProductId,
-                                   firstContent.StorageName)
+                                   firstContent.StorageName,
+                                   policy: policy)
                                .WithCancellation(cancellationToken))
             {
                 if (content.Id == firstContent.Id) continue;
