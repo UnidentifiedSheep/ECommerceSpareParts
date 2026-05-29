@@ -1,6 +1,6 @@
-﻿using Abstractions.Interfaces;
-using Analytics.Application.Dtos.CalculationJob;
+﻿using Analytics.Application.Dtos.CalculationJob;
 using Analytics.Application.Handlers.CalculationJob.CreateCalculationJob;
+using Analytics.Application.Handlers.CalculationJob.GetCalculationJob;
 using Carter;
 using MediatR;
 
@@ -10,11 +10,17 @@ public record CreateCalculationJobRequest(string MetricSystemName, MetricPayload
 
 public record CreateCalculationJobResponse(Guid RequestId);
 
-public class CreateCalculationJobEndPoint : ICarterModule
+public record GetCalculationJobResponse(CalculationJobDto CalculationJob);
+
+public class CalculationJobEndPoints : ICarterModule
 {
     public void AddRoutes(IEndpointRouteBuilder app)
     {
-        app.MapPost("jobs/", async (
+        var jobs = app
+            .MapGroup("/jobs")
+            .WithTags("CalculationJobs");
+            
+        jobs.MapPost("", async (
                 ISender sender,
                 CreateCalculationJobRequest request,
                 CancellationToken ct) =>
@@ -30,5 +36,18 @@ public class CreateCalculationJobEndPoint : ICarterModule
             .WithDisplayName("Create calculation job")
             .Produces<CreateCalculationJobResponse>(StatusCodes.Status201Created)
             .Produces(400);
+        
+        
+        jobs.MapGet("{id}", async (
+                Guid id,
+                ISender sender,
+                CancellationToken cancellationToken) =>
+            {
+                var result = await sender.Send(new GetCalculationJobQuery(id), cancellationToken);
+                return Results.Ok(new GetCalculationJobResponse(result.CalculationJob));
+            }).WithName("GetCalculationJob")
+            .WithDescription("Gets a calculation job by id.")
+            .Produces<GetCalculationJobResponse>()
+            .Produces(404);
     }
 }
