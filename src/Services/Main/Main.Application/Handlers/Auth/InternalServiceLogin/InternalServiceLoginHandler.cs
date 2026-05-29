@@ -22,6 +22,7 @@ public class InternalServiceLoginHandler(
     IJwtGenerator tokenGenerator,
     IUserCacheRepository userCache) : ICommandHandler<InternalServiceLoginCommand, InternalServiceLoginResult>
 {
+    private static readonly TimeSpan AdditionalValidDuration = TimeSpan.FromHours(1);
     public async Task<InternalServiceLoginResult> Handle(
         InternalServiceLoginCommand request,
         CancellationToken cancellationToken)
@@ -41,7 +42,12 @@ public class InternalServiceLoginHandler(
             ?? throw new UserNotFoundException(user.Id);
 
         var userDto = UserProjections.UserProjection.AsFunc()(user);
-        var token = tokenGenerator.CreateToken(userDto, request.Service, roles, permissions);
+        var token = tokenGenerator.CreateToken(
+            userDto, 
+            request.Service, 
+            roles, 
+            permissions,
+            AdditionalValidDuration);
         return new InternalServiceLoginResult(token);
     }
 }

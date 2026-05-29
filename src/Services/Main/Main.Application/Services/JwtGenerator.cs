@@ -16,13 +16,14 @@ public class JwtGenerator(JwtOptions options) : IJwtGenerator
         UserDto user,
         string deviceId,
         IEnumerable<string> roles,
-        IEnumerable<string> permissions)
+        IEnumerable<string> permissions,
+        TimeSpan? additionalValidDuration = null)
     {
         var tokenDescriptor = new SecurityTokenDescriptor
         {
             SigningCredentials = options.SigningCredentials,
             Issuer = options.ValidIssuer,
-            Expires = DateTime.UtcNow.Add(options.ValidDuration),
+            Expires = DateTime.UtcNow.Add(options.ValidDuration + additionalValidDuration ?? TimeSpan.Zero),
             Subject = GetClaims(user, deviceId, roles, permissions)
         };
         return _tokenHandler.WriteToken(_tokenHandler.CreateToken(tokenDescriptor));

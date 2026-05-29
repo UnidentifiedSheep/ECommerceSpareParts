@@ -9,7 +9,8 @@ public interface IJwtGenerator
         UserDto user,
         string deviceId,
         IEnumerable<string> roles,
-        IEnumerable<string> permissions);
+        IEnumerable<string> permissions,
+        TimeSpan? additionalValidDuration = null);
 
     string CreateRefreshToken();
     ClaimsPrincipal GetClaimsPrincipal(string token);
