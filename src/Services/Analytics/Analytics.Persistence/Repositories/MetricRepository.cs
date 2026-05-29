@@ -15,6 +15,26 @@ namespace Analytics.Persistence.Repositories;
 public class MetricRepository(DContext context, IQueryableExtensions extensions)
     : RepositoryBase<DContext, Metric, Guid>(context, extensions), IMetricRepository
 {
+    public Task<Metric?> GetByNaturalKeyAsync(
+        Type metricType,
+        DateTime rangeStart,
+        DateTime rangeEnd,
+        byte[] dimensionHash,
+        CancellationToken cancellationToken = default)
+    {
+        var discriminator = Context.Model.FindEntityType(metricType)?.GetDiscriminatorValue()?.ToString()
+                            ?? throw new InvalidOperationException(
+                                $"Metric type '{metricType.Name}' is not registered in DbContext model.");
+
+        return Context.Metrics
+            .FirstOrDefaultAsync(x =>
+                    x.Discriminator == discriminator &&
+                    x.RangeStart == rangeStart &&
+                    x.RangeEnd == rangeEnd &&
+                    x.DimensionHash == dimensionHash,
+                cancellationToken);
+    }
+
     public async Task<int> MarkDirtyAsync(
         DependsOn dependsOn,
         DateTime factDatetime,

@@ -6,6 +6,13 @@ namespace Analytics.Application.Interfaces.Repositories;
 
 public interface IMetricRepository : IRepository<Metric, Guid>
 {
+    Task<Metric?> GetByNaturalKeyAsync(
+        Type metricType,
+        DateTime rangeStart,
+        DateTime rangeEnd,
+        byte[] dimensionHash,
+        CancellationToken cancellationToken = default);
+
     Task<int> MarkDirtyAsync(
         DependsOn dependsOn,
         DateTime factDatetime,

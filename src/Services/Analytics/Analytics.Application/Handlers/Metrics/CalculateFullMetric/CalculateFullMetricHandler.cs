@@ -1,9 +1,8 @@
 ﻿using Abstractions.Interfaces.Persistence;
-using Abstractions.Interfaces.Services;
 using Analytics.Application.Dtos.CalculationJob;
 using Analytics.Application.Handlers.CalculationJob.UpdateCalculationJob;
 using Analytics.Application.Handlers.Metrics.CalculateMetric;
-using Analytics.Application.Handlers.Metrics.CreateMetric;
+using Analytics.Application.Handlers.Metrics.UpsertMetric;
 using Analytics.Entities;
 using Analytics.Entities.Exceptions.MetricCalculationJobs;
 using Analytics.Entities.Metrics;
@@ -42,7 +41,8 @@ public class CalculateFullMetricHandler(
 
         try
         {
-            metric = await CreateMetricAndStartJob(request, job, ct);
+            var upsertResult = await UpsertMetricAndStartJob(request, job, ct);
+            metric = upsertResult.Metric;
 
             metric = await CalculateMetric(metric.Id, ct);
 
@@ -65,21 +65,22 @@ public class CalculateFullMetricHandler(
         return Unit.Value;
     }
 
-    private async Task<Metric> CreateMetricAndStartJob(
+    private async Task<UpsertMetricResult> UpsertMetricAndStartJob(
         CalculateFullMetricCommand request,
         MetricCalculationJob job,
         CancellationToken ct)
     {
         logger.LogInformation(
-            "Creating metric and starting job. RequestId: {RequestId}",
+            "Upserting metric and starting job. RequestId: {RequestId}",
             job.RequestId);
 
-        var metric = (await sender.Send(new CreateMetricCommand(
+        var result = await sender.Send(new UpsertMetricCommand(
             request.MetricSystemName,
-            request.MetricPayload), ct)).Metric;
+            request.MetricPayload), ct);
+        var metric = result.Metric;
 
         logger.LogInformation(
-            "Metric created. MetricId: {MetricId}, RequestId: {RequestId}",
+            "Metric upserted. MetricId: {MetricId}, RequestId: {RequestId}",
             metric.Id,
             job.RequestId);
 
@@ -99,7 +100,7 @@ public class CalculateFullMetricHandler(
             "Initial changes saved. RequestId: {RequestId}",
             job.RequestId);
 
-        return metric;
+        return result;
     }
 
     private async Task<Metric> CalculateMetric(Guid metricId, CancellationToken ct)
@@ -159,13 +160,10 @@ public class CalculateFullMetricHandler(
             metric?.Id,
             messageErrorKey), ct);
 
-        if (metric != null)
-            unitOfWork.Remove(metric);
-
         await unitOfWork.SaveChangesAsync(ct);
 
         logger.LogInformation(
-            "Failure state persisted and metric removed. RequestId: {RequestId}, MetricId: {MetricId}",
+            "Failure state persisted. RequestId: {RequestId}, MetricId: {MetricId}",
             requestId,
             metric?.Id);
 
