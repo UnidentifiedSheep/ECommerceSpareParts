@@ -12,6 +12,7 @@ using Internal.Integration.Di;
 using Localization.Domain.Extensions;
 using MassTransit;
 using RabbitMq.Extensions;
+using Security;
 using ZiggyCreatures.Caching.Fusion.Backplane;
 
 var env = Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT") ?? "";
@@ -37,6 +38,7 @@ builder.Services
     .AddPersistenceLayer()
     .AddCacheLayer("analytics")
     .AddIntegrationClients()
+    .AddMinimalSecurityLayer()
     .AddApplicationLayer(builder.Configuration);
 
 AddMassTransit(builder);
