@@ -1,4 +1,5 @@
 using Abstractions.Interfaces;
+using Analytics.Application.Configs;
 using Analytics.Application.Interfaces.Services;
 using Analytics.Application.Interfaces.Services.FactSynchronizers;
 using Analytics.Application.Interfaces.Services.Metrics;
@@ -25,6 +26,7 @@ public static class ServiceProvider
         this IServiceCollection collection,
         IConfiguration configuration)
     {
+        SortByConfig.Configure();
         collection
             .AddApplicationBase(configuration, typeof(Global).Assembly)
             .RegisterMetricCalculators()

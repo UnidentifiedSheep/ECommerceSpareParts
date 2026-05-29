@@ -1,3 +1,4 @@
+using Abstractions.Interfaces;
 using Abstractions.Interfaces.Persistence;
 using Abstractions.Interfaces.Services;
 using Analytics.Application.Dtos.CalculationJob;
@@ -15,14 +16,15 @@ namespace Analytics.Application.Handlers.CalculationJob.CreateCalculationJob;
 [Transactional]
 public record CreateCalculationJobCommand(
     string MetricSystemName,
-    MetricPayloadDto MetricPayload,
-    Guid CreatedBy) : ICommand<CreateCalculationJobResult>;
+    MetricPayloadDto MetricPayload
+    ) : ICommand<CreateCalculationJobResult>;
 
 public record CreateCalculationJobResult(MetricCalculationJob CalculationJob);
 
 public class CreateCalculationJobHandler(
     IUnitOfWork unitOfWork,
-    IIntegrationEventScope integrationEventScope
+    IIntegrationEventScope integrationEventScope,
+    IUserContext userContext
 ) : ICommandHandler<CreateCalculationJobCommand, CreateCalculationJobResult>
 {
     public async Task<CreateCalculationJobResult> Handle(
@@ -36,12 +38,11 @@ public class CreateCalculationJobHandler(
         integrationEventScope.Add(new MetricCalculationRequestedEvent
         {
             RequestId = model.RequestId,
-            CreatedBy = request.CreatedBy,
+            CreatedBy = userContext.UserId,
             MetricSystemName = model.MetricSystemName,
             MetricPayload = MetricPayloadProjection.ToContract.AsFunc()(request.MetricPayload)
         });
-
-
+        
         return new CreateCalculationJobResult(model);
     }
 }

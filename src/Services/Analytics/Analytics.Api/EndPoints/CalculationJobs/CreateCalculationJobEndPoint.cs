@@ -17,13 +17,11 @@ public class CreateCalculationJobEndPoint : ICarterModule
         app.MapPost("jobs/", async (
                 ISender sender,
                 CreateCalculationJobRequest request,
-                IUserContext userContext,
                 CancellationToken ct) =>
             {
                 var result = await sender.Send(new CreateCalculationJobCommand(
                     request.MetricSystemName,
-                    request.MetricPayload,
-                    userContext.UserId), ct);
+                    request.MetricPayload), ct);
 
                 return Results.Created(
                     $"/jobs/{result.CalculationJob.RequestId}",

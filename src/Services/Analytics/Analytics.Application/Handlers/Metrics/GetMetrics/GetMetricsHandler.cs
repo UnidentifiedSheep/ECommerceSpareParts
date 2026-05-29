@@ -12,7 +12,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Analytics.Application.Handlers.Metrics.GetMetrics;
 
-public record GetMetricsQuery(Pagination Pagination) : IQuery<GetMetricsResult>;
+public record GetMetricsQuery(string? SortBy, Pagination Pagination) : IQuery<GetMetricsResult>;
 public record GetMetricsResult(IReadOnlyList<MetricDto> Metrics);
 
 public class GetMetricsHandler(
@@ -25,6 +25,7 @@ public class GetMetricsHandler(
             .Query
             .AsExpandable()
             .Select(MetricProjection.ToDto(await GetMetricInfos(cancellationToken)))
+            .SortBy(request.SortBy)
             .ApplyPagination(request.Pagination)
             .ToListAsync(cancellationToken);
         
