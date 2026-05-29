@@ -23,9 +23,9 @@ public class GetMetricsHandler(
     {
         var metrics = await metricRepository
             .Query
+            .SortBy(request.SortBy)
             .AsExpandable()
             .Select(MetricProjection.ToDto(await GetMetricInfos(cancellationToken)))
-            .SortBy(request.SortBy)
             .ApplyPagination(request.Pagination)
             .ToListAsync(cancellationToken);
         
