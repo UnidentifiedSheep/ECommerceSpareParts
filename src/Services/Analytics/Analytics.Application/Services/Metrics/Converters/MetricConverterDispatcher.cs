@@ -15,7 +15,7 @@ public class MetricConverterDispatcher(IServiceProvider provider) : IMetricConve
         return converter.Convert(payload);
     }
 
-    private IMetricConverter? GetConverter(Type metricType)
+    public IMetricConverter? GetConverter(Type metricType)
     {
         var validatorType = typeof(IMetricConverter<>).MakeGenericType(metricType);
         var validator = provider.GetService(validatorType) as IMetricConverter;

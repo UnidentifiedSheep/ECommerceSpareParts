@@ -59,8 +59,8 @@ public static class ServiceProvider
     private static IServiceCollection RegisterMetricConverters(this IServiceCollection collection)
     {
         collection.AddSingleton<IMetricConverterDispatcher, MetricConverterDispatcher>();
-        collection.AddSingleton<IMetricConverter<ProductPurchasesMetric>, ArticlePurchaseMetricConverter>();
-        collection.AddSingleton<IMetricConverter<ProductSalesMetric>, ArticleSaleMetricConverter>();
+        collection.AddSingleton<IMetricConverter<ProductPurchasesMetric>, ProductPurchaseMetricConverter>();
+        collection.AddSingleton<IMetricConverter<ProductSalesMetric>, ProductSaleMetricConverter>();
 
         return collection;
     }

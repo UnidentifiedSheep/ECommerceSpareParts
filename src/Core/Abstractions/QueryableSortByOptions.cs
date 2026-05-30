@@ -50,8 +50,7 @@ public class QueryableSortByOptions
             Expression.Convert(keySelector.Body, typeof(object)),
             keySelector.Parameters);
 
-        if (!primary.TryAdd(DefaultKey, objectSelector))
-            throw new ArgumentException($"DEFAULT|{type} already exists");
+        primary[DefaultKey] = objectSelector;
         return this;
     }
 

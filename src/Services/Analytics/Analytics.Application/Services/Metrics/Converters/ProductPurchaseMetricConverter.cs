@@ -3,7 +3,7 @@ using Analytics.Entities.Metrics;
 
 namespace Analytics.Application.Services.Metrics.Converters;
 
-public class ArticlePurchaseMetricConverter : MetricConverterBase<ProductPurchasesMetric>
+public class ProductPurchaseMetricConverter : MetricConverterBase<ProductPurchasesMetric>
 {
     public override ProductPurchasesMetric Convert(MetricPayloadDto payload)
     {
