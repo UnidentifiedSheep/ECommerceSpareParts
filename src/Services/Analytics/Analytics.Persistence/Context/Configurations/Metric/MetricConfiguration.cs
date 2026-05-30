@@ -19,8 +19,7 @@ public class MetricConfiguration : IEntityTypeConfiguration<Entities.Metrics.Met
         builder.HasIndex(m => new { m.DependsOn, m.RangeStart, m.RangeEnd },
             "metrics_range_depends_index");
 
-        builder.HasIndex(m => new { m.Discriminator, m.RangeStart, m.RangeEnd, m.DimensionHash },
-                "metrics_range_start_end_discriminator_u_index")
+        builder.HasIndex(m => m.NaturalKey, "metrics_natural_key_index")
             .IsUnique();
 
         builder.Property(e => e.Id)
@@ -30,6 +29,10 @@ public class MetricConfiguration : IEntityTypeConfiguration<Entities.Metrics.Met
             .HasColumnName("tags")
             .HasConversion<long>();
 
+        builder.Property(e => e.NaturalKey)
+            .HasColumnName("natural_key")
+            .HasColumnType("bytea");
+        
         builder.Property(m => m.DependsOn)
             .HasConversion<long>()
             .HasColumnName("depends_on");
@@ -41,8 +44,6 @@ public class MetricConfiguration : IEntityTypeConfiguration<Entities.Metrics.Met
         builder.Property(e => e.DimensionKey)
             .HasColumnName("dimension_key")
             .HasMaxLength(200);
-        builder.Property(e => e.DimensionHash).HasColumnName("dimension_hash")
-            .HasColumnType("bytea");
 
         builder.Property(e => e.Json).HasColumnName("json");
 

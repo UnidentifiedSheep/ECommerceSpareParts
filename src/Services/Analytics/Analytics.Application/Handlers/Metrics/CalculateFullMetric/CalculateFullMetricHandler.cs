@@ -41,8 +41,7 @@ public class CalculateFullMetricHandler(
 
         try
         {
-            var upsertResult = await UpsertMetricAndStartJob(request, job, ct);
-            metric = upsertResult.Metric;
+            metric = await UpsertMetricAndStartJob(request, job, ct);
 
             metric = await CalculateMetric(metric.Id, ct);
 
@@ -65,7 +64,7 @@ public class CalculateFullMetricHandler(
         return Unit.Value;
     }
 
-    private async Task<UpsertMetricResult> UpsertMetricAndStartJob(
+    private async Task<Metric> UpsertMetricAndStartJob(
         CalculateFullMetricCommand request,
         MetricCalculationJob job,
         CancellationToken ct)
@@ -74,11 +73,12 @@ public class CalculateFullMetricHandler(
             "Upserting metric and starting job. RequestId: {RequestId}",
             job.RequestId);
 
-        var result = await sender.Send(new UpsertMetricCommand(
+        var metric = (await sender.Send(new UpsertMetricCommand(
             request.MetricSystemName,
-            request.MetricPayload), ct);
-        var metric = result.Metric;
+            request.MetricPayload), ct)).Metric;
 
+        await unitOfWork.SaveChangesAsync(ct);
+        
         logger.LogInformation(
             "Metric upserted. MetricId: {MetricId}, RequestId: {RequestId}",
             metric.Id,
@@ -100,7 +100,7 @@ public class CalculateFullMetricHandler(
             "Initial changes saved. RequestId: {RequestId}",
             job.RequestId);
 
-        return result;
+        return metric;
     }
 
     private async Task<Metric> CalculateMetric(Guid metricId, CancellationToken ct)

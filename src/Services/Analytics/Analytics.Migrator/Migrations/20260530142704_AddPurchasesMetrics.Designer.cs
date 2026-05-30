@@ -3,6 +3,7 @@ using System;
 using Analytics.Persistence.Context;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
@@ -11,9 +12,11 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace Analytics.Migrator.Migrations
 {
     [DbContext(typeof(DContext))]
-    partial class DContextModelSnapshot : ModelSnapshot
+    [Migration("20260530142704_AddPurchasesMetrics")]
+    partial class AddPurchasesMetrics
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -112,6 +115,11 @@ namespace Analytics.Migrator.Migrations
                         .HasColumnType("bigint")
                         .HasColumnName("depends_on");
 
+                    b.Property<byte[]>("DimensionHash")
+                        .IsRequired()
+                        .HasColumnType("bytea")
+                        .HasColumnName("dimension_hash");
+
                     b.Property<string>("DimensionKey")
                         .IsRequired()
                         .HasMaxLength(200)
@@ -127,11 +135,6 @@ namespace Analytics.Migrator.Migrations
                     b.Property<string>("Json")
                         .HasColumnType("text")
                         .HasColumnName("json");
-
-                    b.Property<byte[]>("NaturalKey")
-                        .IsRequired()
-                        .HasColumnType("bytea")
-                        .HasColumnName("natural_key");
 
                     b.Property<DateTime>("RangeEnd")
                         .HasColumnType("timestamp with time zone")
@@ -175,10 +178,10 @@ namespace Analytics.Migrator.Migrations
                     b.HasIndex(new[] { "Discriminator" }, "metrics_dirty_index")
                         .HasFilter("(tags & 1) = 1");
 
-                    b.HasIndex(new[] { "NaturalKey" }, "metrics_natural_key_index")
-                        .IsUnique();
-
                     b.HasIndex(new[] { "DependsOn", "RangeStart", "RangeEnd" }, "metrics_range_depends_index");
+
+                    b.HasIndex(new[] { "Discriminator", "RangeStart", "RangeEnd", "DimensionHash" }, "metrics_range_start_end_discriminator_u_index")
+                        .IsUnique();
 
                     b.ToTable("metrics", (string)null);
 

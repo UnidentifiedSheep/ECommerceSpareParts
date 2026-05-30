@@ -6,6 +6,7 @@ using Analytics.Application.Interfaces.Services;
 using Analytics.Application.Interfaces.Services.Metrics;
 using Analytics.Entities.Metrics;
 using Application.Common.Interfaces.Cqrs;
+using Application.Common.Interfaces.Repositories;
 using Attributes;
 
 namespace Analytics.Application.Handlers.Metrics.UpsertMetric;
@@ -32,12 +33,13 @@ public class UpsertMetricHandler(
 
         await validatorDispatcher.ValidateAsync(metricType, metric, cancellationToken);
 
-        var existingMetric = await metricRepository.GetByNaturalKeyAsync(
-            metricType,
-            metric.RangeStart,
-            metric.RangeEnd,
-            metric.DimensionHash,
-            cancellationToken);
+        var criteria = Criteria<Metric>.New()
+            .Where(x => x.NaturalKey == Metric.GetNaturalKey(metric))
+            .Track()
+            .Build();
+        
+        var existingMetric = await metricRepository
+            .FirstOrDefaultAsync(criteria, cancellationToken);
         if (existingMetric is not null)
             return new UpsertMetricResult(existingMetric);
 

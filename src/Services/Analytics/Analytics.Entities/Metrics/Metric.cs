@@ -24,17 +24,8 @@ public abstract class Metric : AuditableEntity<Metric, Guid>
 
     public RecalculationTags Tags { get; private set; }
 
-    public string DimensionKey
-    {
-        get;
-        private set
-        {
-            field = value;
-            DimensionHash = ComputeHash(value);
-        }
-    } = string.Empty;
-
-    public byte[] DimensionHash { get; private set; } = [];
+    public string DimensionKey { get; private set; } = string.Empty;
+    public byte[] NaturalKey { get; private set; } = [];
 
     public abstract DependsOn DependsOn { get; protected set; }
 
@@ -52,6 +43,7 @@ public abstract class Metric : AuditableEntity<Metric, Guid>
         CurrencyId = currencyId;
         RangeStart = rangeStart;
         RangeEnd = rangeEnd;
+        NaturalKey = ComputeNaturalKey();
         MarkDirty();
     }
 
@@ -72,12 +64,48 @@ public abstract class Metric : AuditableEntity<Metric, Guid>
             .TrimSafe()
             .AgainstNullOrWhiteSpace("metric.dimension.key.required")
             .AgainstTooLong(200, "metric.dimension.key.too.long");
+
+        NaturalKey = ComputeNaturalKey();
     }
 
-    private static byte[] ComputeHash(string key)
+    private byte[] ComputeNaturalKey()
     {
-        var full = SHA256.HashData(Encoding.UTF8.GetBytes(key));
-        return full[..16];
+        return GetNaturalKey(this);
+    }
+
+    public static byte[] GetNaturalKey(Metric metric)
+    {
+        return GetNaturalKey(
+            metric.RangeStart, 
+            metric.RangeEnd, 
+            metric.GetType().Name,
+            metric.DimensionKey, 
+            metric.CurrencyId);
+    }
+
+    public static byte[] GetNaturalKey(
+        DateTime start,
+        DateTime end,
+        string discriminator,
+        string dimensionKey,
+        int currencyId)
+    {
+        start = ToUtc(start);
+        end = ToUtc(end);
+
+        return SHA256.HashData(
+            Encoding.UTF8
+                .GetBytes($"{start:O}|{end:O}|{discriminator}|{dimensionKey}|{currencyId}"));
+    }
+
+    private static DateTime ToUtc(DateTime value)
+    {
+        return value.Kind switch
+        {
+            DateTimeKind.Utc => value,
+            DateTimeKind.Local => value.ToUniversalTime(),
+            _ => DateTime.SpecifyKind(value, DateTimeKind.Utc)
+        };
     }
 
     public override Guid GetId()
