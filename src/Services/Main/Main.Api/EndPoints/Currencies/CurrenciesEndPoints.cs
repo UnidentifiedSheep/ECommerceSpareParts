@@ -6,6 +6,7 @@ using Main.Application.Dtos.Currencies;
 using Main.Application.Handlers.Currencies.CreateCurrency;
 using Main.Application.Handlers.Currencies.GetCurrencies;
 using Main.Application.Handlers.Currencies.GetCurrencyById;
+using Main.Application.Handlers.Currencies.UpdateCurrenciesRates;
 using Mapster;
 using MediatR;
 
@@ -71,5 +72,15 @@ public class CurrenciesEndPoints : ICarterModule
             .Produces<GetCurrencyByIdResponse>()
             .ProducesProblem(StatusCodes.Status404NotFound)
             .RequireAnyPermission(PermissionCodes.CURRENCIES_GET);
+
+        currencies.MapPost("/update", async (ISender sender, CancellationToken token) =>
+            {
+                await sender.Send(new UpdateCurrenciesRatesCommand(), token);
+                return Results.Ok();
+            }).WithName("UpdateCurrencyRates")
+            .WithSummary("Обновление курсов валют")
+            .WithDescription("Обновление курсов валют")
+            .WithDisplayName("Обновление курсов валют")
+            .RequireAnyPermission(PermissionCodes.CURRENCIES_CREATE);
     }
 }

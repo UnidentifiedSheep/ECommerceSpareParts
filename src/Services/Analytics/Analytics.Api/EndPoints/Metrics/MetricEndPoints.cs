@@ -1,6 +1,6 @@
 ﻿using Analytics.Application.Dtos.Metric;
 using Analytics.Application.Handlers.Metrics.GetMetrics;
-using Analytics.Application.Handlers.Metrics.ListMetrics;
+using Analytics.Application.Handlers.Metrics.ListAvailableMetrics;
 using Api.Common.Models.Requests;
 using Carter;
 using MediatR;

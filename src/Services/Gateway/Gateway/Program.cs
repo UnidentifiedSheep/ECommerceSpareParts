@@ -1,6 +1,7 @@
 using Api.Common.Extensions;
 using Common;
 using OpenTelemetry.Metrics;
+using Scalar.AspNetCore;
 using Yarp.ReverseProxy.Transforms;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -79,6 +80,7 @@ var app = builder.Build();
 if (!app.Environment.IsDevelopment())
     app.UseHttpsRedirection();
 
+MapDocs(app);
 
 app.UseCors();
 
@@ -88,3 +90,16 @@ app.MapReverseProxy();
 
 app.UseOpenTelemetryPrometheusScrapingEndpoint();
 app.Run();
+
+
+void MapDocs(WebApplication application)
+{
+    application.MapScalarApiReference("/docs", options =>
+    {
+        options
+            .AddDocument("main", "Main API", "/main/swagger/v1/swagger.json")
+            .AddDocument("analytics", "Analytics API", "/analytics/swagger/v1/swagger.json")
+            .AddDocument("search", "Search API", "/search/swagger/v1/swagger.json")
+            .AddDocument("pricing", "Pricing API", "/pricing/swagger/v1/swagger.json");
+    });
+}

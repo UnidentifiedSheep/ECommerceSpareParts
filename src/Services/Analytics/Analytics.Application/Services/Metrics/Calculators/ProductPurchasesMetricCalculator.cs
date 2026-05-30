@@ -31,7 +31,7 @@ public class ProductPurchasesMetricCalculator(
                                .WithCancellation(cancellationToken))
             foreach (var item in fact.PurchaseContents)
             {
-                if (item.ArticleId != metric.ProductId)
+                if (item.ProductId != metric.ProductId)
                     continue;
 
                 var priceDecimal = await currencyConverter.ConvertToBaseAsync(
@@ -86,8 +86,9 @@ public class ProductPurchasesMetricCalculator(
     private static Criteria<PurchasesFact> GetCriteria(ProductPurchasesMetric metric)
     {
         return Criteria<PurchasesFact>.New()
-            .Where(x => x.PurchaseContents.Any(z => z.ArticleId == metric.ProductId)
+            .Where(x => x.PurchaseContents.Any(z => z.ProductId == metric.ProductId)
                         && metric.RangeStart <= x.CreatedAt && x.CreatedAt <= metric.RangeEnd)
+            .Include(x => x.PurchaseContents)
             .Build();
     }
 }

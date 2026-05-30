@@ -89,7 +89,7 @@ public class PurchasesFact : Entity<PurchasesFact, Guid>, IDependency
             totalSum += incomingContent.Count * incomingContent.Price;
 
             if (existingContents.TryGetValue(incomingContent.Id, out var existingContent))
-                existingContent.Update(incomingContent.ArticleId, incomingContent.Price, incomingContent.Count);
+                existingContent.Update(incomingContent.ProductId, incomingContent.Price, incomingContent.Count);
             else
                 PurchaseContents.Add(incomingContent);
         }

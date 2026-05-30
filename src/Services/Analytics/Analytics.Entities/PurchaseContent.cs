@@ -14,7 +14,7 @@ public class PurchaseContent : Entity<PurchaseContent, int>
 
     public Guid PurchaseId { get; private set; }
 
-    public int ArticleId { get; private set; }
+    public int ProductId { get; private set; }
 
     public decimal Price { get; private set; }
 
@@ -33,7 +33,7 @@ public class PurchaseContent : Entity<PurchaseContent, int>
         {
             Id = id,
             PurchaseId = purchaseId,
-            ArticleId = articleId,
+            ProductId = articleId,
             Price = ValidatePrice(price),
             Count = ValidateCount(count)
         };
@@ -41,7 +41,7 @@ public class PurchaseContent : Entity<PurchaseContent, int>
 
     public void Update(int articleId, decimal price, int count)
     {
-        ArticleId = articleId;
+        ProductId = articleId;
         Price = ValidatePrice(price);
         Count = ValidateCount(count);
     }

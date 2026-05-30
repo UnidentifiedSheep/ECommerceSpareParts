@@ -5,7 +5,7 @@ using Analytics.Entities.Metrics;
 using Application.Common.Interfaces.Cqrs;
 using Localization.Abstractions.Interfaces;
 
-namespace Analytics.Application.Handlers.Metrics.ListMetrics;
+namespace Analytics.Application.Handlers.Metrics.ListAvailableMetrics;
 
 public sealed record ListAvailableMetricsQuery : IQuery<ListAvailableMetricsResult>;
 

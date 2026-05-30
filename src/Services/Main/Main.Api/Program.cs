@@ -189,20 +189,6 @@ var localesPath = Assembly.GetExecutingAssembly().GetDefaultLocalizationPath();
 await app.LoadLocalesFromJson(localesPath);
 await InitSettings(app.Services);
 
-if (app.Environment.IsDevelopment())
-{
-    app.UseReDoc(options =>
-    {
-        options.DocumentTitle = "Main API Docs";
-        options.SpecUrl = "/swagger/v1/swagger.json";
-        options.RoutePrefix = "docs";
-    });
-    app.UseSwagger();
-    app.UseSwaggerUI();
-    app.MapOpenApi();
-}
-
-
 RecurringJob.AddOrUpdate<UpdateCurrencyRate>("UpdateCurrencyTask",
     x => x.Run(), Cron.Daily);
 

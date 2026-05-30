@@ -1,6 +1,6 @@
 ﻿using Abstractions.Models;
 using Analytics.Application.Dtos.Metric;
-using Analytics.Application.Handlers.Metrics.ListMetrics;
+using Analytics.Application.Handlers.Metrics.ListAvailableMetrics;
 using Analytics.Application.Handlers.Projections;
 using Analytics.Entities.Metrics;
 using Application.Common.Extensions;

@@ -8,7 +8,7 @@ public class SaleContent : Entity<SaleContent, int>
 
     public Guid? SaleId { get; set; }
 
-    public int ArticleId { get; set; }
+    public int ProductId { get; set; }
 
     public int Count { get; set; }
 
