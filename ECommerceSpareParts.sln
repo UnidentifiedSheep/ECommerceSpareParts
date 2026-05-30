@@ -123,7 +123,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Localization.Unit.Tests", "
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Localization.Abstractions", "src\Infrastructure\Localization\Localization.Abstractions\Localization.Abstractions.csproj", "{E75D74EB-E173-42B1-9B67-8A61B5696EA3}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Analytics.Integration.Tests", "src\Services\Analytics\Analytics.Integration.Tests\Analytics.Integration.Tests.csproj", "{A391ED1F-7F99-4D17-8B81-3FA69BE7C5C7}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Analytics.Tests", "src\Services\Analytics\Analytics.Tests\Analytics.Tests.csproj", "{A391ED1F-7F99-4D17-8B81-3FA69BE7C5C7}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Search.Api", "src\Services\Search\Search.Api\Search.Api.csproj", "{4B77189C-5B5F-46C1-9DC4-B4A1618395ED}"
 EndProject
