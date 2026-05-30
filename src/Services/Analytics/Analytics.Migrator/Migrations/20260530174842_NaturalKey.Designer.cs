@@ -12,8 +12,8 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace Analytics.Migrator.Migrations
 {
     [DbContext(typeof(DContext))]
-    [Migration("20260530142704_AddPurchasesMetrics")]
-    partial class AddPurchasesMetrics
+    [Migration("20260530174842_NaturalKey")]
+    partial class NaturalKey
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -87,8 +87,7 @@ namespace Analytics.Migrator.Migrations
                     b.HasIndex("WhoUpdated")
                         .HasDatabaseName("analytics.entities.metriccalculationjob_who_updated_idx");
 
-                    b.HasIndex(new[] { "MetricId" }, "metrics_calc_jobs_metric_id_index")
-                        .IsUnique();
+                    b.HasIndex(new[] { "MetricId" }, "metrics_calc_jobs_metric_id_index");
 
                     b.HasIndex(new[] { "Status", "MetricSystemName" }, "metrics_calc_jobs_status_name_index");
 
@@ -115,11 +114,6 @@ namespace Analytics.Migrator.Migrations
                         .HasColumnType("bigint")
                         .HasColumnName("depends_on");
 
-                    b.Property<byte[]>("DimensionHash")
-                        .IsRequired()
-                        .HasColumnType("bytea")
-                        .HasColumnName("dimension_hash");
-
                     b.Property<string>("DimensionKey")
                         .IsRequired()
                         .HasMaxLength(200)
@@ -135,6 +129,11 @@ namespace Analytics.Migrator.Migrations
                     b.Property<string>("Json")
                         .HasColumnType("text")
                         .HasColumnName("json");
+
+                    b.Property<byte[]>("NaturalKey")
+                        .IsRequired()
+                        .HasColumnType("bytea")
+                        .HasColumnName("natural_key");
 
                     b.Property<DateTime>("RangeEnd")
                         .HasColumnType("timestamp with time zone")
@@ -178,10 +177,10 @@ namespace Analytics.Migrator.Migrations
                     b.HasIndex(new[] { "Discriminator" }, "metrics_dirty_index")
                         .HasFilter("(tags & 1) = 1");
 
-                    b.HasIndex(new[] { "DependsOn", "RangeStart", "RangeEnd" }, "metrics_range_depends_index");
-
-                    b.HasIndex(new[] { "Discriminator", "RangeStart", "RangeEnd", "DimensionHash" }, "metrics_range_start_end_discriminator_u_index")
+                    b.HasIndex(new[] { "NaturalKey" }, "metrics_natural_key_index")
                         .IsUnique();
+
+                    b.HasIndex(new[] { "DependsOn", "RangeStart", "RangeEnd" }, "metrics_range_depends_index");
 
                     b.ToTable("metrics", (string)null);
 
