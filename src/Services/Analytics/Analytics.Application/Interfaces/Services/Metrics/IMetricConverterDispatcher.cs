@@ -5,6 +5,7 @@ namespace Analytics.Application.Interfaces.Services.Metrics;
 
 public interface IMetricConverterDispatcher
 {
-    Metric Convert(MetricPayloadDto payload, Type metricType);
+    Metric FromPayload(MetricPayloadDto payload, Type metricType);
+    MetricPayloadDto ToPayload(Metric metric);
     IMetricConverter? GetConverter(Type metricType);
 }

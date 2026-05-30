@@ -29,7 +29,7 @@ public class UpsertMetricHandler(
     public async Task<UpsertMetricResult> Handle(UpsertMetricCommand request, CancellationToken cancellationToken)
     {
         var metricType = calculatorRegistry.GetMetricType(request.MetricSystemName);
-        var metric = metricConverterDispatcher.Convert(request.MetricPayload, metricType);
+        var metric = metricConverterDispatcher.FromPayload(request.MetricPayload, metricType);
 
         await validatorDispatcher.ValidateAsync(metricType, metric, cancellationToken);
 

@@ -4,9 +4,10 @@ using Analytics.Enums;
 
 namespace Analytics.Entities.Metrics;
 
-[MetricInfo("ProductSalesMetric")]
+[MetricInfo(nameof(ProductSalesMetric))]
 public sealed class ProductSalesMetric : ProductMetric<ProductInfoModel>
 {
+    public static string SystemName = nameof(ProductSalesMetric);
     private ProductSalesMetric()
     {
     }

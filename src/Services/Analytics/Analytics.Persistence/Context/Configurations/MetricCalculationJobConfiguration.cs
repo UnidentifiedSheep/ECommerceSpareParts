@@ -37,8 +37,7 @@ public class MetricCalculationJobConfiguration : IEntityTypeConfiguration<Metric
             .HasColumnName("xmin")
             .IsRowVersion();
 
-        builder.HasIndex(e => e.MetricId, "metrics_calc_jobs_metric_id_index")
-            .IsUnique();
+        builder.HasIndex(e => e.MetricId, "metrics_calc_jobs_metric_id_index");
 
         builder.HasIndex(e =>
                 new { e.Status, e.MetricSystemName },

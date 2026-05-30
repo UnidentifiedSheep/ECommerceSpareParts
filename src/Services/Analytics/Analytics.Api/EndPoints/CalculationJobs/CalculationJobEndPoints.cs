@@ -7,7 +7,12 @@ using MediatR;
 
 namespace Analytics.Api.EndPoints.CalculationJobs;
 
-public record CreateCalculationJobRequest(string MetricSystemName, MetricPayloadDto MetricPayload);
+public record CreateCalculationJobRequest
+{
+    public string? MetricSystemName { get; init; }
+    public MetricPayloadDto? MetricPayload { get; init; }
+    public Guid? MetricId { get; init; }
+}
 
 public record CreateCalculationJobResponse(Guid RequestId);
 
@@ -27,10 +32,15 @@ public class CalculationJobEndPoints : ICarterModule
                 IUserContext userContext,
                 CancellationToken ct) =>
             {
-                var result = await sender.Send(new CreateCalculationJobCommand(
-                    request.MetricSystemName,
-                    request.MetricPayload,
-                    userContext.UserId), ct);
+                CreateCalculationJobCommand command;
+                if (request.MetricId != null)
+                    command = new CreateCalculationJobCommand(request.MetricId.Value, userContext.UserId);
+                else if (request.MetricPayload != null && request.MetricSystemName != null)
+                    command = new CreateCalculationJobCommand(request.MetricSystemName, userContext.UserId, request.MetricPayload);
+                else
+                    throw new InvalidOperationException("Invalid request");
+                
+                var result = await sender.Send(command, ct);
 
                 return Results.Created(
                     $"/jobs/{result.CalculationJob.RequestId}",

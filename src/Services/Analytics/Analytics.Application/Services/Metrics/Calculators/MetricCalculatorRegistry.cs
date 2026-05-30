@@ -9,6 +9,7 @@ namespace Analytics.Application.Services.Metrics.Calculators;
 public class MetricCalculatorRegistry : IMetricCalculatorRegistry
 {
     private readonly Dictionary<string, Type> _nameToType = new();
+    private readonly Dictionary<Type, string> _typeToName = new();
 
     public MetricCalculatorRegistry(Assembly? assembly = null)
     {
@@ -21,6 +22,16 @@ public class MetricCalculatorRegistry : IMetricCalculatorRegistry
             return type;
 
         throw new NotSupportedException($"Metric '{name}' is not supported");
+    }
+
+    public string GetSystemName<TMetric>() where TMetric : Metric
+        => GetSystemName(typeof(TMetric));
+
+    public string GetSystemName(Type type)
+    {
+        return _typeToName.TryGetValue(type, out var systemName) 
+            ? systemName 
+            : throw new NotSupportedException($"Metric '{type.Name}' is not supported");
     }
 
     public bool TryGetMetricType(string name, out Type? type)
@@ -49,6 +60,9 @@ public class MetricCalculatorRegistry : IMetricCalculatorRegistry
             });
 
         foreach (var type in result)
+        {
             _nameToType.Add(type.SystemName, type.Type);
+            _typeToName.Add(type.Type, type.SystemName);
+        }
     }
 }
