@@ -40,8 +40,4 @@
             <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
         </Content>
     </ItemGroup>
-
-    <ItemGroup>
-      <Folder Include="TaskRuners\" />
-    </ItemGroup>
 </Project>

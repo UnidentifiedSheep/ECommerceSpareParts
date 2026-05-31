@@ -11,20 +11,20 @@ using Test.Common.TestContainers.Combined;
 
 namespace Analytics.Integration.Tests.ServiceTests;
 
-public class TagsUpdaterTests(CombinedContainerFixture fixture) : IntegrationTest(fixture)
+public class TagsServiceTests(CombinedContainerFixture fixture) : IntegrationTest(fixture)
 {
-    private ITagsUpdater _tagsUpdater = null!;
+    private ITagsService _tagsService = null!;
 
     public override async Task InitializeAsync()
     {
         await base.InitializeAsync();
-        _tagsUpdater = Scope.ServiceProvider.GetRequiredService<ITagsUpdater>();
+        _tagsService = Scope.ServiceProvider.GetRequiredService<ITagsService>();
     }
     
     [Fact]
     public async Task WhenNoMetrics_UpdatesNothing()
     {
-        var act = () => _tagsUpdater.UpdateTags(
+        var act = () => _tagsService.UpdateTags(
             new TagUpdateContext<PurchasesFact>
             {
                 NewFactDatetime = DateTime.UtcNow,
@@ -46,7 +46,7 @@ public class TagsUpdaterTests(CombinedContainerFixture fixture) : IntegrationTes
             .WithEndDate(end)
             .BuildAndAddToDb(Context);
 
-        await _tagsUpdater.UpdateTags(
+        await _tagsService.UpdateTags(
             new TagUpdateContext<PurchasesFact>
             {
                 NewFactDatetime = DateTime.UtcNow,
@@ -68,7 +68,7 @@ public class TagsUpdaterTests(CombinedContainerFixture fixture) : IntegrationTes
             .WithEndDate(factDatetime.AddDays(1))
             .BuildAndAddToDb(Context);
 
-        await _tagsUpdater.UpdateTags(
+        await _tagsService.UpdateTags(
             new TagUpdateContext<PurchasesFact>
             {
                 NewFactDatetime = factDatetime
@@ -87,7 +87,7 @@ public class TagsUpdaterTests(CombinedContainerFixture fixture) : IntegrationTes
             .WithEndDate(DateTime.UtcNow.AddDays(-5))
             .BuildAndAddToDb(Context);
 
-        await _tagsUpdater.UpdateTags(
+        await _tagsService.UpdateTags(
             new TagUpdateContext<PurchasesFact>
             {
                 NewFactDatetime = DateTime.UtcNow,
@@ -109,7 +109,7 @@ public class TagsUpdaterTests(CombinedContainerFixture fixture) : IntegrationTes
             .WithEndDate(previousFactDatetime.AddDays(1))
             .BuildAndAddToDb(Context);
 
-        await _tagsUpdater.UpdateTags(
+        await _tagsService.UpdateTags(
             new TagUpdateContext<PurchasesFact>
             {
                 NewFactDatetime = DateTime.UtcNow,
@@ -131,7 +131,7 @@ public class TagsUpdaterTests(CombinedContainerFixture fixture) : IntegrationTes
             .WithEndDate(factDatetime.AddDays(1))
             .BuildAndAddToDb(Context);
 
-        await _tagsUpdater.UpdateTags(
+        await _tagsService.UpdateTags(
             new TagUpdateContext<PurchasesFact>
             {
                 NewFactDatetime = factDatetime
@@ -152,7 +152,7 @@ public class TagsUpdaterTests(CombinedContainerFixture fixture) : IntegrationTes
             .WithEndDate(factDatetime)
             .BuildAndAddToDb(Context);
 
-        await _tagsUpdater.UpdateTags(
+        await _tagsService.UpdateTags(
             new TagUpdateContext<PurchasesFact>
             {
                 NewFactDatetime = factDatetime
@@ -174,7 +174,7 @@ public class TagsUpdaterTests(CombinedContainerFixture fixture) : IntegrationTes
             .WithEndDate(factDatetime.AddDays(1))
             .BuildAndAddToDb(Context);
 
-        await _tagsUpdater.UpdateTags(
+        await _tagsService.UpdateTags(
             new TagUpdateContext<PurchasesFact>
             {
                 NewFactDatetime = factDatetime
@@ -194,7 +194,7 @@ public class TagsUpdaterTests(CombinedContainerFixture fixture) : IntegrationTes
             .WithEndDate(DateTime.UtcNow.AddDays(5))
             .BuildAndAddToDb(Context);
 
-        await _tagsUpdater.UpdateTags(
+        await _tagsService.UpdateTags(
             new TagUpdateContext<PurchasesFact>
             {
                 NewFactDatetime = DateTime.UtcNow

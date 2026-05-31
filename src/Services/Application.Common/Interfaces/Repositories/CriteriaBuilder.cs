@@ -7,6 +7,7 @@ public sealed class CriteriaBuilder<T> where T : class
     private readonly List<Expression<Func<T, object?>>> _includes = new();
     private readonly List<Expression<Func<T, bool>>> _wheres = new();
     private bool _forUpdate;
+    private bool _skipLocked;
     private Func<IQueryable<T>, IOrderedQueryable<T>>? _orderBy;
 
     private int? _page;
@@ -56,9 +57,10 @@ public sealed class CriteriaBuilder<T> where T : class
         return this;
     }
 
-    public CriteriaBuilder<T> ForUpdate(bool forUpdate = true)
+    public CriteriaBuilder<T> ForUpdate(bool forUpdate = true, bool skipLocked = false)
     {
         _forUpdate = forUpdate;
+        _skipLocked = skipLocked;
         return this;
     }
 
@@ -72,7 +74,8 @@ public sealed class CriteriaBuilder<T> where T : class
             Size = _size,
             Includes = _includes.ToList(),
             Track = _track,
-            ForUpdate = _forUpdate
+            ForUpdate = _forUpdate,
+            SkipLocked = _skipLocked
         };
     }
 }

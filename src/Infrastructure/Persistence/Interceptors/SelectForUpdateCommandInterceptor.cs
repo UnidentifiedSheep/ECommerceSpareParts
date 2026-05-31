@@ -64,7 +64,9 @@ public sealed partial class SelectForUpdateCommandInterceptor : DbCommandInterce
             return;
 
         var alias = aliasMatch.Groups["alias"].Value;
-        var forUpdate = $"FOR UPDATE OF {alias}";
+        var forUpdate = ShouldSkipLocked(sql)
+            ? $"FOR UPDATE OF {alias} SKIP LOCKED"
+            : $"FOR UPDATE OF {alias}";
 
         command.CommandText = InsertForUpdate(sql, aliasMatch.Index, forUpdate);
     }
@@ -128,6 +130,14 @@ public sealed partial class SelectForUpdateCommandInterceptor : DbCommandInterce
 
     [GeneratedRegex(@"--\s*ForUpdateOf:(?<table>[^\r\n]+)", RegexOptions.IgnoreCase)]
     private static partial Regex ForUpdateOfTagRegex();
+
+    private static bool ShouldSkipLocked(string sql)
+    {
+        return SkipLockedTagRegex().IsMatch(sql);
+    }
+
+    [GeneratedRegex(@"--\s*SkipLocked\b", RegexOptions.IgnoreCase)]
+    private static partial Regex SkipLockedTagRegex();
 
     [GeneratedRegex(@"\bLIMIT\b", RegexOptions.IgnoreCase)]
     private static partial Regex LimitRegex();

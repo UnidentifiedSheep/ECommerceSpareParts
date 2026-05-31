@@ -67,6 +67,10 @@ public class CreateCalculationJobHandler(
         }
         
         var model = MetricCalculationJob.Create(request.MetricSystemName ?? systemName);
+
+        if (request.MetricId != null)
+            model.SetMetricId(request.MetricId.Value);
+        
         await unitOfWork.AddAsync(model, cancellationToken);
         await unitOfWork.SaveChangesAsync(cancellationToken);
 

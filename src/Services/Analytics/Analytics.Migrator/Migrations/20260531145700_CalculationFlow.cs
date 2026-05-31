@@ -5,7 +5,7 @@
 namespace Analytics.Migrator.Migrations
 {
     /// <inheritdoc />
-    public partial class NaturalKey : Migration
+    public partial class CalculationFlow : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -17,6 +17,26 @@ namespace Analytics.Migrator.Migrations
             migrationBuilder.DropIndex(
                 name: "metrics_calc_jobs_metric_id_index",
                 table: "metric_calculation_jobs");
+
+            migrationBuilder.RenameColumn(
+                name: "article_id",
+                table: "sale_contents",
+                newName: "product_id");
+
+            migrationBuilder.RenameIndex(
+                name: "sale_contents_article_id_index",
+                table: "sale_contents",
+                newName: "sale_contents_product_id_index");
+
+            migrationBuilder.RenameColumn(
+                name: "article_id",
+                table: "purchase_contents",
+                newName: "product_id");
+
+            migrationBuilder.RenameIndex(
+                name: "purchase_contents_article_id_index",
+                table: "purchase_contents",
+                newName: "purchase_contents_product_id_index");
 
             migrationBuilder.RenameColumn(
                 name: "dimension_hash",
@@ -43,11 +63,23 @@ namespace Analytics.Migrator.Migrations
                 name: "metrics_calc_jobs_metric_id_index",
                 table: "metric_calculation_jobs",
                 column: "metric_id");
+
+            migrationBuilder.AddForeignKey(
+                name: "metric_calculation_jobs_metric_id_fk",
+                table: "metric_calculation_jobs",
+                column: "metric_id",
+                principalTable: "metrics",
+                principalColumn: "id",
+                onDelete: ReferentialAction.Cascade);
         }
 
         /// <inheritdoc />
         protected override void Down(MigrationBuilder migrationBuilder)
         {
+            migrationBuilder.DropForeignKey(
+                name: "metric_calculation_jobs_metric_id_fk",
+                table: "metric_calculation_jobs");
+
             migrationBuilder.DropIndex(
                 name: "metrics_natural_key_index",
                 table: "metrics");
@@ -55,6 +87,26 @@ namespace Analytics.Migrator.Migrations
             migrationBuilder.DropIndex(
                 name: "metrics_calc_jobs_metric_id_index",
                 table: "metric_calculation_jobs");
+
+            migrationBuilder.RenameColumn(
+                name: "product_id",
+                table: "sale_contents",
+                newName: "article_id");
+
+            migrationBuilder.RenameIndex(
+                name: "sale_contents_product_id_index",
+                table: "sale_contents",
+                newName: "sale_contents_article_id_index");
+
+            migrationBuilder.RenameColumn(
+                name: "product_id",
+                table: "purchase_contents",
+                newName: "article_id");
+
+            migrationBuilder.RenameIndex(
+                name: "purchase_contents_product_id_index",
+                table: "purchase_contents",
+                newName: "purchase_contents_article_id_index");
 
             migrationBuilder.RenameColumn(
                 name: "natural_key",

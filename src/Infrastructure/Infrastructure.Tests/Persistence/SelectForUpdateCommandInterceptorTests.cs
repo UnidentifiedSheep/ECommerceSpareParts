@@ -24,6 +24,22 @@ public class SelectForUpdateCommandInterceptorTests
     }
 
     [Fact]
+    public void ReaderExecuting_WhenCommandHasSkipLockedTag_AddsForUpdateOfAliasSkipLocked()
+    {
+        var command = CreateCommand("""
+            -- ForUpdateOf:public.purchase
+            -- SkipLocked
+            SELECT p.id, p.comment
+            FROM public.purchase AS p
+            WHERE p.id = @id
+            """);
+
+        _interceptor.ReaderExecuting(command, null!, default);
+
+        Assert.EndsWith("FOR UPDATE OF p SKIP LOCKED", command.CommandText);
+    }
+
+    [Fact]
     public void ReaderExecuting_WhenCommandHasJoin_LocksOnlyTaggedTableAlias()
     {
         var command = CreateCommand("""
@@ -77,6 +93,22 @@ public class SelectForUpdateCommandInterceptorTests
         _interceptor.ReaderExecuting(command, null!, default);
 
         Assert.Contains("WHERE p.id = @key FOR UPDATE OF p LIMIT 1", Normalize(command.CommandText));
+    }
+
+    [Fact]
+    public void ReaderExecuting_WhenCommandHasSkipLockedAndLimit_InsertsForUpdateSkipLockedBeforeLimit()
+    {
+        var command = CreateCommand("""
+            -- ForUpdateOf:public.purchase
+            -- SkipLocked
+            SELECT s.id FROM ( SELECT p.id FROM public.purchase AS p WHERE p.id = @key LIMIT 1 ) AS s ORDER BY s.id
+            """);
+
+        _interceptor.ReaderExecuting(command, null!, default);
+
+        Assert.Contains(
+            "WHERE p.id = @key FOR UPDATE OF p SKIP LOCKED LIMIT 1",
+            Normalize(command.CommandText));
     }
 
     [Fact]

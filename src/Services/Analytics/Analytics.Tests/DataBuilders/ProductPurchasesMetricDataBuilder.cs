@@ -1,4 +1,5 @@
 ﻿using Analytics.Entities.Metrics;
+using Analytics.Integration.Tests.DataBuilders.Base;
 using Bogus;
 
 namespace Analytics.Integration.Tests.DataBuilders;

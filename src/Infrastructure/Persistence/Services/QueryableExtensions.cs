@@ -12,7 +12,11 @@ public class QueryableExtensions(IContextMetadata contextMetadata) : IQueryableE
         return track ? query : query.AsNoTracking();
     }
 
-    public IQueryable<T> ForUpdate<T>(IQueryable<T> query, bool forUpdate = true) where T : class
+    public IQueryable<T> ForUpdate<T>(
+        IQueryable<T> query,
+        bool forUpdate = true,
+        bool skipLocked = false)
+        where T : class
     {
         var schema = contextMetadata.GetSchemaName<T>();
         var tableName = contextMetadata.GetTableName<T>();
@@ -20,9 +24,15 @@ public class QueryableExtensions(IContextMetadata contextMetadata) : IQueryableE
         string fullQualifiedTableName = string.IsNullOrWhiteSpace(schema)
             ? $"{tableName}"
             : $"{schema}.{tableName}";
-        
-        return forUpdate 
-            ? query.TagWith("ForUpdate").TagWith($"ForUpdateOf:{fullQualifiedTableName}") 
+
+        if (!forUpdate)
+            return query;
+
+        query = query.TagWith("ForUpdate")
+            .TagWith($"ForUpdateOf:{fullQualifiedTableName}");
+
+        return skipLocked
+            ? query.TagWith("SkipLocked")
             : query;
     }
 
@@ -30,7 +40,7 @@ public class QueryableExtensions(IContextMetadata contextMetadata) : IQueryableE
     {
         if (criteria == null) return query;
         query = ConfigureTracking(query, criteria.Track);
-        query = ForUpdate(query, criteria.ForUpdate);
+        query = ForUpdate(query, criteria.ForUpdate, criteria.SkipLocked);
 
         foreach (var where in criteria.Wheres)
             query = query.Where(where);

@@ -32,6 +32,9 @@ public abstract class Metric : AuditableEntity<Metric, Guid>
 
     public string? Json { get; protected set; }
 
+    private readonly List<MetricCalculationJob> _calculationJobs = [];
+    public IReadOnlyCollection<MetricCalculationJob> CalculationJobs => _calculationJobs;
+
     public void ConfigurePeriod(int currencyId, DateTime rangeStart, DateTime rangeEnd)
     {
         currencyId.AgainstLessOrEqual(

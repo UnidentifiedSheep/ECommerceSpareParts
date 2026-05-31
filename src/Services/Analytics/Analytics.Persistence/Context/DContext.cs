@@ -1,6 +1,8 @@
 ﻿using System.Reflection;
 using Analytics.Entities;
 using Analytics.Entities.Metrics;
+using Analytics.Entities.Settings;
+using Domain.CommonEntities;
 using MassTransit;
 using MassTransit.EntityFrameworkCoreIntegration;
 using Microsoft.EntityFrameworkCore;
@@ -44,7 +46,6 @@ public partial class DContext : DbContext
         modelBuilder.Entity<OutboxState>().ToTable("OutboxState", "msg");
         modelBuilder.Entity<InboxState>().ToTable("InboxState", "msg");
 
-
         modelBuilder
             .HasPostgresExtension("dblink")
             .HasPostgresExtension("pg_trgm")
@@ -53,6 +54,12 @@ public partial class DContext : DbContext
         modelBuilder.ApplyConfigurationsFromAssembly(Assembly.GetAssembly(GetType())!)
             .ApplyConfiguration(new SettingConfiguration());
 
+
+        modelBuilder.Entity<Setting>()
+            .HasDiscriminator(e => e.Key)
+            .HasValue<Setting>(nameof(Setting))
+            .HasValue<GlobalApplicationSetting>(GlobalApplicationSetting.SettingName);
+        
         modelBuilder.AddFieldsForAuditableEntities();
 
         modelBuilder.AllDateTimesToUtc();

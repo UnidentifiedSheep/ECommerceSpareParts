@@ -9,5 +9,11 @@
   "InternalServiceCredentials": {
     "Service": "Analytics",
     "Secret": "SuperAnalyticsKey222"
+  },
+  "HostedServiceOptions": {
+    "RecalculationCheck": {
+      "Delay": "00:00:30",
+      "ScheduleAtOnce": 100
+    }
   }
 }

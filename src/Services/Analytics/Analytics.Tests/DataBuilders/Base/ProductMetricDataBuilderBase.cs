@@ -1,7 +1,7 @@
 ﻿using Analytics.Entities.Metrics;
 using Bogus;
 
-namespace Analytics.Integration.Tests.DataBuilders;
+namespace Analytics.Integration.Tests.DataBuilders.Base;
 
 public abstract class ProductMetricDataBuilderBase<T, TMetric>(Faker faker) 
     : MetricDataBuilderBase<T, TMetric>(faker)

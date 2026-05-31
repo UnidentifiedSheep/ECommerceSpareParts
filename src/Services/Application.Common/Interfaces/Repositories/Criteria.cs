@@ -13,6 +13,7 @@ public sealed class Criteria<T> where T : class
 
     public bool Track { get; init; }
     public bool ForUpdate { get; init; }
+    public bool SkipLocked { get; init; }
 
     public static CriteriaBuilder<T> New()
     {

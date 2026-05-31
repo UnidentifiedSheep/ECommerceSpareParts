@@ -17,7 +17,7 @@ public class PurchaseFactSynchronizer(
     IMainClient mainClient,
     IRepository<PurchasesFact, Guid> repository,
     IUnitOfWork unitOfWork,
-    ITagsUpdater tagsUpdater,
+    ITagsService tagsService,
     ILogger<IFactSynchronizer<PurchasesFact, Guid>> logger) : IFactSynchronizer<PurchasesFact, Guid>
 {
     public async Task<PurchasesFact?> SynchronizeAsync(
@@ -62,7 +62,7 @@ public class PurchaseFactSynchronizer(
         {
             if (dbFact is not null)
             {
-                await tagsUpdater.UpdateTags(
+                await tagsService.UpdateTags(
                     new TagUpdateContext<PurchasesFact>
                     {
                         NewFactDatetime = dbFact.CreatedAt
@@ -96,7 +96,7 @@ public class PurchaseFactSynchronizer(
                 contents);
 
             await unitOfWork.AddAsync(dbFact, cancellationToken);
-            await tagsUpdater.UpdateTags(
+            await tagsService.UpdateTags(
                 new TagUpdateContext<PurchasesFact>
                 {
                     NewFactDatetime = dbFact.CreatedAt
@@ -116,7 +116,7 @@ public class PurchaseFactSynchronizer(
             synchronizationStartedAt,
             contents);
 
-        await tagsUpdater.UpdateTags(
+        await tagsService.UpdateTags(
             new TagUpdateContext<PurchasesFact>
             {
                 NewFactDatetime = dbFact.CreatedAt,

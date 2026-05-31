@@ -12,8 +12,8 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace Analytics.Migrator.Migrations
 {
     [DbContext(typeof(DContext))]
-    [Migration("20260530193345_ProductId")]
-    partial class ProductId
+    [Migration("20260531145700_CalculationFlow")]
+    partial class CalculationFlow
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -418,6 +418,8 @@ namespace Analytics.Migrator.Migrations
                     b.ToTable("settings", (string)null);
 
                     b.HasDiscriminator<string>("Key").HasValue("Setting");
+
+                    b.UseTphMappingStrategy();
                 });
 
             modelBuilder.Entity("MassTransit.EntityFrameworkCoreIntegration.InboxState", b =>
@@ -616,6 +618,22 @@ namespace Analytics.Migrator.Migrations
                     b.HasDiscriminator().HasValue("ProductSalesMetric");
                 });
 
+            modelBuilder.Entity("Analytics.Entities.Settings.GlobalApplicationSetting", b =>
+                {
+                    b.HasBaseType("Domain.CommonEntities.Setting");
+
+                    b.HasDiscriminator().HasValue("GlobalApplicationSetting");
+                });
+
+            modelBuilder.Entity("Analytics.Entities.MetricCalculationJob", b =>
+                {
+                    b.HasOne("Analytics.Entities.Metrics.Metric", null)
+                        .WithMany("CalculationJobs")
+                        .HasForeignKey("MetricId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .HasConstraintName("metric_calculation_jobs_metric_id_fk");
+                });
+
             modelBuilder.Entity("Analytics.Entities.PurchaseContent", b =>
                 {
                     b.HasOne("Analytics.Entities.PurchasesFact", "Purchase")
@@ -648,6 +666,11 @@ namespace Analytics.Migrator.Migrations
                         .WithMany()
                         .HasForeignKey("InboxMessageId", "InboxConsumerId")
                         .HasPrincipalKey("MessageId", "ConsumerId");
+                });
+
+            modelBuilder.Entity("Analytics.Entities.Metrics.Metric", b =>
+                {
+                    b.Navigation("CalculationJobs");
                 });
 
             modelBuilder.Entity("Analytics.Entities.PurchasesFact", b =>

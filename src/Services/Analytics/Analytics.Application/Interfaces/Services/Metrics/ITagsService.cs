@@ -3,7 +3,7 @@ using Analytics.Entities.Interfaces;
 
 namespace Analytics.Application.Interfaces.Services.Metrics;
 
-public interface ITagsUpdater
+public interface ITagsService
 {
     Task UpdateTags<TEntity>(
         TagUpdateContext<TEntity> context,

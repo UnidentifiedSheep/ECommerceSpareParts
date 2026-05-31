@@ -3,7 +3,7 @@ using Analytics.Enums;
 using Bogus;
 using Test.Common.Abstractions;
 
-namespace Analytics.Integration.Tests.DataBuilders;
+namespace Analytics.Integration.Tests.DataBuilders.Base;
 
 public abstract class MetricDataBuilderBase<T, TMetric>(Faker faker) 
     : BuilderBase<TMetric>(faker) 

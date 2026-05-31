@@ -1,13 +1,12 @@
 using Analytics.Application.Interfaces.Repositories;
-using Analytics.Application.Interfaces.Services;
 using Analytics.Application.Interfaces.Services.Metrics;
 using Analytics.Application.Models;
 using Analytics.Entities.Interfaces;
 
 namespace Analytics.Application.Services;
 
-public class TagsUpdater(
-    IMetricRepository metricRepository) : ITagsUpdater
+public class TagsService(
+    IMetricRepository metricRepository) : ITagsService
 {
     public async Task UpdateTags<TEntity>(
         TagUpdateContext<TEntity> context,
