@@ -5,6 +5,7 @@ using Analytics.Application.Interfaces.Services.FactSynchronizers;
 using Analytics.Application.Interfaces.Services.Metrics;
 using Analytics.Application.Models;
 using Analytics.Entities;
+using Analytics.Enums;
 using Application.Common.Interfaces.Repositories;
 using Attributes;
 using Internal.Integration.Core.Interfaces;
@@ -62,7 +63,7 @@ public class PurchaseFactSynchronizer(
             if (dbFact is not null)
             {
                 await tagsUpdater.UpdateTags(
-                    new PurchaseTagUpdateContext
+                    new TagUpdateContext<PurchasesFact>
                     {
                         NewFactDatetime = dbFact.CreatedAt
                     },
@@ -96,7 +97,7 @@ public class PurchaseFactSynchronizer(
 
             await unitOfWork.AddAsync(dbFact, cancellationToken);
             await tagsUpdater.UpdateTags(
-                new PurchaseTagUpdateContext
+                new TagUpdateContext<PurchasesFact>
                 {
                     NewFactDatetime = dbFact.CreatedAt
                 },
@@ -116,7 +117,7 @@ public class PurchaseFactSynchronizer(
             contents);
 
         await tagsUpdater.UpdateTags(
-            new PurchaseTagUpdateContext
+            new TagUpdateContext<PurchasesFact>
             {
                 NewFactDatetime = dbFact.CreatedAt,
                 PreviousFactDatetime = previousFactDatetime
@@ -126,6 +127,4 @@ public class PurchaseFactSynchronizer(
         await unitOfWork.SaveChangesAsync(cancellationToken);
         return dbFact;
     }
-
-    private sealed record PurchaseTagUpdateContext : TagUpdateContext<PurchasesFact>;
 }

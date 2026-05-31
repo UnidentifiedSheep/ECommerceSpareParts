@@ -2,7 +2,7 @@
 
 namespace Analytics.Application.Models;
 
-public abstract record TagUpdateContext<TEntity>
+public record TagUpdateContext<TEntity>
     where TEntity : IDependency
 {
     public DateTime? PreviousFactDatetime { get; init; }

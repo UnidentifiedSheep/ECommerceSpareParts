@@ -52,6 +52,11 @@ public abstract class Metric : AuditableEntity<Metric, Guid>
         Tags |= RecalculationTags.RecalculationNeeded;
     }
 
+    public void Disable()
+    {
+        Tags |= RecalculationTags.Disabled;
+    }
+
     public void CompleteRecalculation()
     {
         RecalculatedAt = DateTime.UtcNow;
