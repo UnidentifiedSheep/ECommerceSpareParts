@@ -3,13 +3,13 @@ using FluentValidation;
 
 namespace Analytics.Application.Services.Metrics.Validators;
 
-public class ArticleSalesMetricValidator : AbstractValidator<ProductSalesMetric>
+public class ProductPurchasesMetricValidator : AbstractValidator<ProductPurchasesMetric>
 {
-    public ArticleSalesMetricValidator()
+    public ProductPurchasesMetricValidator()
     {
         RuleFor(x => x.ProductId)
             .NotEmpty()
-            .WithMessage("Article Id is required");
+            .WithMessage("Product Id is required");
 
         RuleFor(x => x)
             .SetValidator(new MetricValidator());

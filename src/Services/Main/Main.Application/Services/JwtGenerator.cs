@@ -19,11 +19,12 @@ public class JwtGenerator(JwtOptions options) : IJwtGenerator
         IEnumerable<string> permissions,
         TimeSpan? additionalValidDuration = null)
     {
+        TimeSpan validDuration = options.ValidDuration + (additionalValidDuration ?? TimeSpan.Zero);
         var tokenDescriptor = new SecurityTokenDescriptor
         {
             SigningCredentials = options.SigningCredentials,
             Issuer = options.ValidIssuer,
-            Expires = DateTime.UtcNow.Add(options.ValidDuration + additionalValidDuration ?? TimeSpan.Zero),
+            Expires = DateTime.UtcNow.Add(validDuration),
             Subject = GetClaims(user, deviceId, roles, permissions)
         };
         return _tokenHandler.WriteToken(_tokenHandler.CreateToken(tokenDescriptor));

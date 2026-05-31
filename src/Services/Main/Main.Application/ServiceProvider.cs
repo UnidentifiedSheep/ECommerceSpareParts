@@ -1,6 +1,7 @@
 using Abstractions.Interfaces.Validators;
 using Abstractions.Models;
 using Application.Common;
+using Application.Common.Extensions;
 using Application.Common.Interfaces;
 using Application.Common.Interfaces.Currency;
 using Application.Common.Interfaces.Settings;
@@ -45,9 +46,7 @@ public static class ServiceProvider
 
         collection.AddScoped<ICurrencyConverter, CurrencyConverter>();
 
-        collection.AddSingleton<ISettingsContainer, SettingsContainer>();
-        collection.AddScoped<ISettingsService, SettingsService>();
-        collection.AddSingleton<ISettingFactory, SettingFactory>();
+        collection.RegisterSettingsService<SettingFactory>();
 
         collection.AddSingleton<ILogisticsPricingStrategy, NonePricing>();
         collection.AddSingleton<ILogisticsPricingStrategy, PerAreaAndWeight>();

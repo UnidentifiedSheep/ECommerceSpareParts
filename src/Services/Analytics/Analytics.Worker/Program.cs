@@ -1,8 +1,11 @@
 using System.Reflection;
+using Abstractions.Interfaces;
 using Analytics.Application;
 using Analytics.Persistence;
 using Analytics.Persistence.Context;
+using Analytics.Worker;
 using Analytics.Worker.Consumers;
+using Analytics.Worker.HostedServices;
 using Api.Common;
 using Api.Common.Extensions;
 using Application.Common.Backplane;
@@ -12,6 +15,7 @@ using Internal.Integration.Di;
 using Localization.Domain.Extensions;
 using MassTransit;
 using RabbitMq.Extensions;
+using Security;
 using ZiggyCreatures.Caching.Fusion.Backplane;
 
 var env = Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT") ?? "";
@@ -39,6 +43,9 @@ builder.Services
     .AddIntegrationClients()
     .AddApplicationLayer(builder.Configuration);
 
+AddHostedServiceOptions(builder.Services);
+builder.Services.AddHostedService<RecalculationCheckHostedService>();
+
 AddMassTransit(builder);
 
 var host = builder.Build();
@@ -61,6 +68,14 @@ void AddLoki(IHostApplicationBuilder hostBuilder)
         hostBuilder.Configuration,
         "analytics.worker",
         env);
+}
+
+void AddHostedServiceOptions(IServiceCollection collection)
+{
+    collection.AddOptions<HostedServiceOptions>()
+        .BindConfiguration(HostedServiceOptions.SectionName)
+        .ValidateDataAnnotations()
+        .ValidateOnStart();
 }
 
 void AddMassTransit(IHostApplicationBuilder hostBuilder)

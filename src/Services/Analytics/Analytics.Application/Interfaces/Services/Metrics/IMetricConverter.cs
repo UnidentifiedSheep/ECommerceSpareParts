@@ -3,12 +3,14 @@ using Analytics.Entities.Metrics;
 
 namespace Analytics.Application.Interfaces.Services.Metrics;
 
-public interface IMetricConverter<out TMetric> : IMetricConverter where TMetric : Metric
+public interface IMetricConverter<TMetric> : IMetricConverter where TMetric : Metric
 {
-    new TMetric Convert(MetricPayloadDto payload);
+    new TMetric FromPayload(MetricPayloadDto payload);
+    MetricPayloadDto ToPayload(TMetric metric);
 }
 
 public interface IMetricConverter
 {
-    Metric Convert(MetricPayloadDto payload);
+    Metric FromPayload(MetricPayloadDto payload);
+    MetricPayloadDto ToPayload(Metric metric);
 }

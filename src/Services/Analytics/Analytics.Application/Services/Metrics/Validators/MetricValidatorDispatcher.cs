@@ -1,5 +1,4 @@
-﻿using Analytics.Application.Interfaces.Services;
-using Analytics.Application.Interfaces.Services.Metrics;
+﻿using Analytics.Application.Interfaces.Services.Metrics;
 using FluentValidation;
 
 namespace Analytics.Application.Services.Metrics.Validators;
@@ -18,7 +17,7 @@ public class MetricValidatorDispatcher(IServiceProvider provider) : IMetricValid
             throw new ValidationException(result.Errors);
     }
 
-    private IValidator? GetValidator(Type metricType)
+    public IValidator? GetValidator(Type metricType)
     {
         var validatorType = typeof(IValidator<>).MakeGenericType(metricType);
         var validator = provider.GetService(validatorType) as IValidator;

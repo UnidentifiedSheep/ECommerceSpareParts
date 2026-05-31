@@ -12,14 +12,14 @@ public class PurchaseContentConfiguration : IEntityTypeConfiguration<PurchaseCon
 
         builder.ToTable("purchase_contents");
 
-        builder.HasIndex(e => e.ArticleId, "purchase_contents_article_id_index");
+        builder.HasIndex(e => e.ProductId, "purchase_contents_product_id_index");
 
         builder.HasIndex(e => e.PurchaseId, "purchase_contents_purchase_id_index");
 
         builder.Property(e => e.Id)
             .ValueGeneratedNever()
             .HasColumnName("id");
-        builder.Property(e => e.ArticleId).HasColumnName("article_id");
+        builder.Property(e => e.ProductId).HasColumnName("product_id");
         builder.Property(e => e.Count).HasColumnName("count");
         builder.Property(e => e.Price).HasColumnName("price");
         builder.Property(e => e.PurchaseId).HasColumnName("purchase_id");

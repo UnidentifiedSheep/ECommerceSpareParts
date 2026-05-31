@@ -3,8 +3,10 @@ using Application.Common.Abstractions;
 using Application.Common.Interfaces;
 using Application.Common.Interfaces.Cqrs;
 using Application.Common.Interfaces.NamedObject;
+using Application.Common.Interfaces.Settings;
 using Application.Common.Services;
 using Application.Common.Services.NamedObject;
+using Application.Common.Services.Settings;
 using FluentValidation;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
@@ -16,6 +18,16 @@ public static class ServiceCollectionExtensions
     public static IServiceCollection RegisterIdCollector(this IServiceCollection collection)
     {
         collection.AddScoped<IIdsCollector, IdsCollector>();
+        return collection;
+    }
+
+    public static IServiceCollection RegisterSettingsService<TSettingFactory>(
+        this IServiceCollection collection) 
+        where TSettingFactory : class, ISettingFactory
+    {
+        collection.AddSingleton<ISettingsContainer, SettingsContainer>();
+        collection.AddScoped<ISettingsService, SettingsService>();
+        collection.AddSingleton<ISettingFactory, TSettingFactory>();
         return collection;
     }
 

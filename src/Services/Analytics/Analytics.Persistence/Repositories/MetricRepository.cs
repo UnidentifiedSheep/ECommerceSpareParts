@@ -5,6 +5,8 @@ using Analytics.Enums;
 using Analytics.Persistence.Context;
 using Application.Common.Interfaces.Repositories;
 using Microsoft.EntityFrameworkCore;
+using Npgsql;
+using NpgsqlTypes;
 using Persistence;
 using Persistence.Extensions;
 using Persistence.Interfaces;

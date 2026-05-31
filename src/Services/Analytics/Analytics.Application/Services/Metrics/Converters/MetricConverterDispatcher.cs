@@ -7,17 +7,25 @@ namespace Analytics.Application.Services.Metrics.Converters;
 
 public class MetricConverterDispatcher(IServiceProvider provider) : IMetricConverterDispatcher
 {
-    public Metric Convert(MetricPayloadDto payload, Type metricType)
+    public Metric FromPayload(MetricPayloadDto payload, Type metricType)
     {
         var converter = GetConverter(metricType)
                         ?? throw new InvalidOperationException($"Metric converter {metricType} is not registered");
 
-        return converter.Convert(payload);
+        return converter.FromPayload(payload);
     }
 
-    private IMetricConverter? GetConverter(Type metricType)
+    public MetricPayloadDto ToPayload(Metric metric)
     {
-        var validatorType = typeof(IMetricConverter).MakeGenericType(metricType);
+        var converter = GetConverter(metric.GetType())
+            ?? throw new InvalidOperationException($"Metric converter {metric.GetType()} is not registered");
+        
+        return converter.ToPayload(metric);
+    }
+
+    public IMetricConverter? GetConverter(Type metricType)
+    {
+        var validatorType = typeof(IMetricConverter<>).MakeGenericType(metricType);
         var validator = provider.GetService(validatorType) as IMetricConverter;
         return validator;
     }

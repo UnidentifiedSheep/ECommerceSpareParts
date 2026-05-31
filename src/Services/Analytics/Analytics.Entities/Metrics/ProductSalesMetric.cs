@@ -1,10 +1,8 @@
-﻿using Analytics.Attributes;
-using Analytics.Entities.Metrics.JsonDataModels;
+﻿using Analytics.Entities.Metrics.JsonDataModels;
 using Analytics.Enums;
 
 namespace Analytics.Entities.Metrics;
 
-[MetricInfo("ProductSalesMetric")]
 public sealed class ProductSalesMetric : ProductMetric<ProductInfoModel>
 {
     private ProductSalesMetric()

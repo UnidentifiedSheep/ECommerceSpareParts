@@ -5,6 +5,7 @@ using Analytics.Application.Interfaces.Services.FactSynchronizers;
 using Analytics.Application.Interfaces.Services.Metrics;
 using Analytics.Application.Models;
 using Analytics.Entities;
+using Analytics.Enums;
 using Application.Common.Interfaces.Repositories;
 using Attributes;
 using Internal.Integration.Core.Interfaces;
@@ -16,7 +17,7 @@ public class PurchaseFactSynchronizer(
     IMainClient mainClient,
     IRepository<PurchasesFact, Guid> repository,
     IUnitOfWork unitOfWork,
-    ITagsUpdater tagsUpdater,
+    ITagsService tagsService,
     ILogger<IFactSynchronizer<PurchasesFact, Guid>> logger) : IFactSynchronizer<PurchasesFact, Guid>
 {
     public async Task<PurchasesFact?> SynchronizeAsync(
@@ -61,8 +62,8 @@ public class PurchaseFactSynchronizer(
         {
             if (dbFact is not null)
             {
-                await tagsUpdater.UpdateTags(
-                    new PurchaseTagUpdateContext
+                await tagsService.UpdateTags(
+                    new TagUpdateContext<PurchasesFact>
                     {
                         NewFactDatetime = dbFact.CreatedAt
                     },
@@ -95,8 +96,8 @@ public class PurchaseFactSynchronizer(
                 contents);
 
             await unitOfWork.AddAsync(dbFact, cancellationToken);
-            await tagsUpdater.UpdateTags(
-                new PurchaseTagUpdateContext
+            await tagsService.UpdateTags(
+                new TagUpdateContext<PurchasesFact>
                 {
                     NewFactDatetime = dbFact.CreatedAt
                 },
@@ -115,8 +116,8 @@ public class PurchaseFactSynchronizer(
             synchronizationStartedAt,
             contents);
 
-        await tagsUpdater.UpdateTags(
-            new PurchaseTagUpdateContext
+        await tagsService.UpdateTags(
+            new TagUpdateContext<PurchasesFact>
             {
                 NewFactDatetime = dbFact.CreatedAt,
                 PreviousFactDatetime = previousFactDatetime
@@ -126,6 +127,4 @@ public class PurchaseFactSynchronizer(
         await unitOfWork.SaveChangesAsync(cancellationToken);
         return dbFact;
     }
-
-    private sealed record PurchaseTagUpdateContext : TagUpdateContext<PurchasesFact>;
 }

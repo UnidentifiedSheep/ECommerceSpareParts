@@ -1,4 +1,5 @@
 ﻿using System.ComponentModel.DataAnnotations.Schema;
+using System.Globalization;
 using System.Security.Cryptography;
 using System.Text;
 using System.Text.Json;
@@ -24,21 +25,15 @@ public abstract class Metric : AuditableEntity<Metric, Guid>
 
     public RecalculationTags Tags { get; private set; }
 
-    public string DimensionKey
-    {
-        get;
-        private set
-        {
-            field = value;
-            DimensionHash = ComputeHash(value);
-        }
-    } = string.Empty;
-
-    public byte[] DimensionHash { get; private set; } = [];
+    public string DimensionKey { get; private set; } = string.Empty;
+    public byte[] NaturalKey { get; private set; } = [];
 
     public abstract DependsOn DependsOn { get; protected set; }
 
     public string? Json { get; protected set; }
+
+    private readonly List<MetricCalculationJob> _calculationJobs = [];
+    public IReadOnlyCollection<MetricCalculationJob> CalculationJobs => _calculationJobs;
 
     public void ConfigurePeriod(int currencyId, DateTime rangeStart, DateTime rangeEnd)
     {
@@ -52,12 +47,18 @@ public abstract class Metric : AuditableEntity<Metric, Guid>
         CurrencyId = currencyId;
         RangeStart = rangeStart;
         RangeEnd = rangeEnd;
+        NaturalKey = ComputeNaturalKey();
         MarkDirty();
     }
 
     public void MarkDirty()
     {
         Tags |= RecalculationTags.RecalculationNeeded;
+    }
+
+    public void Disable()
+    {
+        Tags |= RecalculationTags.Disabled;
     }
 
     public void CompleteRecalculation()
@@ -72,26 +73,65 @@ public abstract class Metric : AuditableEntity<Metric, Guid>
             .TrimSafe()
             .AgainstNullOrWhiteSpace("metric.dimension.key.required")
             .AgainstTooLong(200, "metric.dimension.key.too.long");
+
+        NaturalKey = ComputeNaturalKey();
     }
 
-    private static byte[] ComputeHash(string key)
+    private byte[] ComputeNaturalKey()
     {
-        var full = SHA256.HashData(Encoding.UTF8.GetBytes(key));
-        return full[..16];
+        return GetNaturalKey(this);
+    }
+
+    public static byte[] GetNaturalKey(Metric metric)
+    {
+        return GetNaturalKey(
+            metric.RangeStart, 
+            metric.RangeEnd, 
+            metric.GetType().Name,
+            metric.DimensionKey, 
+            metric.CurrencyId);
+    }
+
+    public static byte[] GetNaturalKey(
+        DateTime start,
+        DateTime end,
+        string discriminator,
+        string dimensionKey,
+        int currencyId)
+    {
+        start = start.ToUniversalTime();
+        end = end.ToUniversalTime();
+        
+        var key = string.Create(
+            CultureInfo.InvariantCulture,
+            $"{start:yyyy-MM-ddTHH:mm:ssZ}|{end:yyyy-MM-ddTHH:mm:ssZ}|{discriminator}|{dimensionKey}|{currencyId}");
+
+        return SHA256.HashData(
+            Encoding.UTF8
+                .GetBytes(key));
     }
 
     public override Guid GetId()
     {
         return Id;
     }
+    
+    public abstract object? GetData();
+    public abstract Type DataType { get; }
 }
 
 public abstract class Metric<T> : Metric where T : class
 {
+    public override Type DataType => typeof(T);
+
     [NotMapped]
     public T? Data
     {
-        get;
+        get
+        {
+            field ??= Json == null ? null : JsonSerializer.Deserialize<T>(Json);
+            return field;
+        }
         private set
         {
             field = value;
@@ -103,4 +143,6 @@ public abstract class Metric<T> : Metric where T : class
     {
         Data = data;
     }
+
+    public override object? GetData() => Data;
 }

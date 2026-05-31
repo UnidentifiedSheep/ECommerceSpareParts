@@ -11,6 +11,7 @@ using Analytics.Application.Services.Metrics.Validators;
 using Analytics.Entities;
 using Analytics.Entities.Metrics;
 using Application.Common;
+using Application.Common.Extensions;
 using Application.Common.Interfaces.Currency;
 using Application.Common.Services;
 using Application.Common.Services.Currency;
@@ -35,13 +36,15 @@ public static class ServiceProvider
             .WithRegisteredDistributedCache()
             .WithRegisteredBackplane()
             .WithSystemTextJsonSerializer();
+        
+        collection.RegisterSettingsService<SettingFactory>();
 
         collection.AddSingleton<IJsonSerializer, JsonSerializer>();
         collection.AddScoped<ICurrencyConverter, CurrencyConverter>();
         collection.AddScoped<ICurrencyRatesProvider, CurrencyRatesProvider>();
         collection.AddScoped<IFactSynchronizer<PurchasesFact, Guid>, PurchaseFactSynchronizer>();
 
-        collection.AddScoped<ITagsUpdater, TagsUpdater>();
+        collection.AddScoped<ITagsService, TagsService>();
         return collection;
     }
 
@@ -59,8 +62,8 @@ public static class ServiceProvider
     private static IServiceCollection RegisterMetricConverters(this IServiceCollection collection)
     {
         collection.AddSingleton<IMetricConverterDispatcher, MetricConverterDispatcher>();
-        collection.AddSingleton<IMetricConverter<ProductPurchasesMetric>, ArticlePurchaseMetricConverter>();
-        collection.AddSingleton<IMetricConverter<ProductSalesMetric>, ArticleSaleMetricConverter>();
+        collection.AddSingleton<IMetricConverter<ProductPurchasesMetric>, ProductPurchaseMetricConverter>();
+        collection.AddSingleton<IMetricConverter<ProductSalesMetric>, ProductSaleMetricConverter>();
 
         return collection;
     }

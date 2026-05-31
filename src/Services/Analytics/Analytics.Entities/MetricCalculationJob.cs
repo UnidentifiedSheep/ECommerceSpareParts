@@ -78,7 +78,7 @@ public class MetricCalculationJob : AuditableEntity<MetricCalculationJob, Guid>
         return RequestId;
     }
 
-    private void SetMetricId(Guid metricId)
+    public void SetMetricId(Guid metricId)
     {
         if (metricId == Guid.Empty)
             throw new ArgumentException("Metric id must be specified.", nameof(metricId));

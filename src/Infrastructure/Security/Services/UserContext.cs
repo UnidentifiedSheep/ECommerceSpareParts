@@ -1,5 +1,6 @@
 ﻿using System.Security.Claims;
 using Abstractions.Interfaces;
+using Exceptions.Base;
 using Microsoft.AspNetCore.Http;
 
 namespace Security.Services;
@@ -31,7 +32,7 @@ public sealed class UserContext : IUserContext
 
     public Guid UserId => IsAuthenticated && _userId.HasValue
         ? _userId.Value
-        : throw new UnauthorizedAccessException("Пользователь не авторизован.");
+        : throw new UnauthorizedException("Пользователь не авторизован.");
 
     public Guid? UserIdOrNull => _userId;
 

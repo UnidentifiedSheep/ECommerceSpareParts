@@ -1,4 +1,5 @@
-﻿using Analytics.Entities;
+using Analytics.Entities;
+using Analytics.Entities.Metrics;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
@@ -37,11 +38,16 @@ public class MetricCalculationJobConfiguration : IEntityTypeConfiguration<Metric
             .HasColumnName("xmin")
             .IsRowVersion();
 
-        builder.HasIndex(e => e.MetricId, "metrics_calc_jobs_metric_id_index")
-            .IsUnique();
+        builder.HasIndex(e => e.MetricId, "metrics_calc_jobs_metric_id_index");
 
         builder.HasIndex(e =>
                 new { e.Status, e.MetricSystemName },
             "metrics_calc_jobs_status_name_index");
+
+        builder.HasOne<Entities.Metrics.Metric>()
+            .WithMany(metric => metric.CalculationJobs)
+            .HasForeignKey(job => job.MetricId)
+            .OnDelete(DeleteBehavior.Cascade)
+            .HasConstraintName("metric_calculation_jobs_metric_id_fk");
     }
 }

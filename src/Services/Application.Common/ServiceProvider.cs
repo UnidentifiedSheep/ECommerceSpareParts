@@ -38,14 +38,14 @@ public static class ServiceProvider
             config
                 .RegisterIfNotExcluded(
                     hs,
+                    typeof(DiagnosticsBehavior<,>))
+                .RegisterIfNotExcluded(
+                    hs,
                     typeof(ValidationBehavior<,>))
                 .RegisterIfNotExcluded(
                     hs,
                     typeof(DbValidationBehavior<,>),
                     ServiceLifetime.Scoped)
-                .RegisterIfNotExcluded(
-                    hs,
-                    typeof(LoggingBehavior<,>))
                 .RegisterIfNotExcluded(
                     hs,
                     typeof(CacheBehavior<,>))
