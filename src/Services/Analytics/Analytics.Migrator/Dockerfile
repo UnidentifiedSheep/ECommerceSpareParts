@@ -19,7 +19,6 @@ COPY ["src/Infrastructure/Localization/Localization.Domain/Localization.Domain.c
 COPY ["src/Infrastructure/Localization/Localization.Abstractions/Localization.Abstractions.csproj", "src/Infrastructure/Localization/Localization.Abstractions/"]
 COPY ["src/Services/Analytics/Analytics.Abstractions/Analytics.Abstractions.csproj", "src/Services/Analytics/Analytics.Abstractions/"]
 COPY ["src/Services/Analytics/Analytics.Entities/Analytics.Entities.csproj", "src/Services/Analytics/Analytics.Entities/"]
-COPY ["src/Services/Analytics/Analytics.Attributes/Analytics.Attributes.csproj", "src/Services/Analytics/Analytics.Attributes/"]
 COPY ["src/Services/Analytics/Analytics.Enums/Analytics.Enums.csproj", "src/Services/Analytics/Analytics.Enums/"]
 RUN dotnet restore "src/Services/Analytics/Analytics.Migrator/Analytics.Migrator.csproj"
 COPY . .

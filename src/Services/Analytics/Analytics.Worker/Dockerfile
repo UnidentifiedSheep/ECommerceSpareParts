@@ -26,7 +26,6 @@ COPY ["src/Infrastructure/Localization/Localization.Domain/Localization.Domain.c
 COPY ["src/Services/Analytics/Analytics.Application/Analytics.Application.csproj", "src/Services/Analytics/Analytics.Application/"]
 COPY ["src/Services/Analytics/Analytics.Abstractions/Analytics.Abstractions.csproj", "src/Services/Analytics/Analytics.Abstractions/"]
 COPY ["src/Services/Analytics/Analytics.Entities/Analytics.Entities.csproj", "src/Services/Analytics/Analytics.Entities/"]
-COPY ["src/Services/Analytics/Analytics.Attributes/Analytics.Attributes.csproj", "src/Services/Analytics/Analytics.Attributes/"]
 COPY ["src/Services/Analytics/Analytics.Enums/Analytics.Enums.csproj", "src/Services/Analytics/Analytics.Enums/"]
 COPY ["src/Services/Analytics/Analytics.Utils/Analytics.Utils.csproj", "src/Services/Analytics/Analytics.Utils/"]
 COPY ["src/Services/Analytics/Analytics.Persistence/Analytics.Persistence.csproj", "src/Services/Analytics/Analytics.Persistence/"]
