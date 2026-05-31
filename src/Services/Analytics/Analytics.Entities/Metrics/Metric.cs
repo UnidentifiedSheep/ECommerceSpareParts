@@ -112,14 +112,23 @@ public abstract class Metric : AuditableEntity<Metric, Guid>
     {
         return Id;
     }
+    
+    public abstract object? GetData();
+    public abstract Type DataType { get; }
 }
 
 public abstract class Metric<T> : Metric where T : class
 {
+    public override Type DataType => typeof(T);
+
     [NotMapped]
     public T? Data
     {
-        get;
+        get
+        {
+            field ??= Json == null ? null : JsonSerializer.Deserialize<T>(Json);
+            return field;
+        }
         private set
         {
             field = value;
@@ -131,4 +140,6 @@ public abstract class Metric<T> : Metric where T : class
     {
         Data = data;
     }
+
+    public override object? GetData() => Data;
 }

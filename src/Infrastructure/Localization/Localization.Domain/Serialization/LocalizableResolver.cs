@@ -1,6 +1,6 @@
 ﻿using System.Text.Json;
 using System.Text.Json.Serialization.Metadata;
-using Localization.Abstractions.Attributes;
+using Attributes;
 using Localization.Abstractions.Interfaces;
 
 namespace Localization.Domain.Serialization;

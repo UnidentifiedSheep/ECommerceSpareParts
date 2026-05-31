@@ -7,6 +7,7 @@ using Application.Common.Extensions;
 using Application.Common.Interfaces.Cqrs;
 using Application.Common.Interfaces.Repositories;
 using LinqKit;
+using Localization.Abstractions.Interfaces;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 
@@ -17,6 +18,7 @@ public record GetMetricsResult(IReadOnlyList<MetricDto> Metrics);
 
 public class GetMetricsHandler(
     IReadRepository<Metric, Guid> metricRepository,
+    IScopedLocalizedJsonSerializer serializer,
     ISender sender) : IQueryHandler<GetMetricsQuery, GetMetricsResult>
 {
     public async Task<GetMetricsResult> Handle(GetMetricsQuery request, CancellationToken cancellationToken)
@@ -25,7 +27,7 @@ public class GetMetricsHandler(
             .Query
             .SortBy(request.SortBy)
             .AsExpandable()
-            .Select(MetricProjection.ToDto(await GetMetricInfos(cancellationToken)))
+            .Select(MetricProjection.ToDto(await GetMetricInfos(cancellationToken), serializer))
             .ApplyPagination(request.Pagination)
             .ToListAsync(cancellationToken);
         
