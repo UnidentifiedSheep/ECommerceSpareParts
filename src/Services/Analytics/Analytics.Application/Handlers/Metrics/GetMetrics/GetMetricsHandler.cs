@@ -13,7 +13,10 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Analytics.Application.Handlers.Metrics.GetMetrics;
 
-public record GetMetricsQuery(string? SortBy, Pagination Pagination) : IQuery<GetMetricsResult>;
+public record GetMetricsQuery(
+    string? MetricSystemName,
+    string? SortBy, 
+    Pagination Pagination) : IQuery<GetMetricsResult>;
 public record GetMetricsResult(IReadOnlyList<MetricDto> Metrics);
 
 public class GetMetricsHandler(
@@ -23,8 +26,12 @@ public class GetMetricsHandler(
 {
     public async Task<GetMetricsResult> Handle(GetMetricsQuery request, CancellationToken cancellationToken)
     {
-        var metrics = await metricRepository
-            .Query
+        var query = metricRepository.Query;
+
+        if (!string.IsNullOrWhiteSpace(request.MetricSystemName))
+            query = query.Where(x => x.Discriminator == request.MetricSystemName);
+        
+        var metrics = await query
             .SortBy(request.SortBy)
             .AsExpandable()
             .Select(MetricProjection.ToDto(await GetMetricInfos(cancellationToken), serializer))

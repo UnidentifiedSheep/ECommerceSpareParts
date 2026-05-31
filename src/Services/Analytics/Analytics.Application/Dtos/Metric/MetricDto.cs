@@ -1,4 +1,5 @@
 ﻿using System.Text.Json.Serialization;
+using Analytics.Application.Dtos.CalculationJob;
 using Analytics.Enums;
 
 namespace Analytics.Application.Dtos.Metric;
@@ -35,4 +36,7 @@ public record MetricDto
     
     [JsonPropertyName("productId")]
     public required int? ProductId { get; init; }
+    
+    [JsonPropertyName("lastCalculationJob")]
+    public required CalculationJobDto? LastCalculationJob { get; init; }
 }

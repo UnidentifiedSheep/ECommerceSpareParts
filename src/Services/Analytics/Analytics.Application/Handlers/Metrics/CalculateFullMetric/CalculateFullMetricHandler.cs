@@ -9,6 +9,7 @@ using Analytics.Entities.Metrics;
 using Analytics.Enums;
 using Application.Common.Interfaces.Cqrs;
 using Application.Common.Interfaces.Repositories;
+using Attributes;
 using MediatR;
 using Microsoft.Extensions.Logging;
 
@@ -69,38 +70,43 @@ public class CalculateFullMetricHandler(
         MetricCalculationJob job,
         CancellationToken ct)
     {
-        logger.LogInformation(
-            "Upserting metric and starting job. RequestId: {RequestId}",
-            job.RequestId);
+        return await unitOfWork.ExecuteWithTransaction(
+            TransactionalAttribute.ReadCommited(20, 2),
+            async () =>
+            {
+                logger.LogInformation(
+                    "Upserting metric and starting job. RequestId: {RequestId}",
+                    job.RequestId);
 
-        var metric = (await sender.Send(new UpsertMetricCommand(
-            request.MetricSystemName,
-            request.MetricPayload), ct)).Metric;
+                var metric = (await sender.Send(new UpsertMetricCommand(
+                    request.MetricSystemName,
+                    request.MetricPayload), ct)).Metric;
 
-        await unitOfWork.SaveChangesAsync(ct);
-        
-        logger.LogInformation(
-            "Metric upserted. MetricId: {MetricId}, RequestId: {RequestId}",
-            metric.Id,
-            job.RequestId);
+                await unitOfWork.SaveChangesAsync(ct);
 
-        await sender.Send(new UpdateCalculationJobCommand(
-            job.RequestId,
-            CalculationStatus.Calculating,
-            metric.Id,
-            null), ct);
+                logger.LogInformation(
+                    "Metric upserted. MetricId: {MetricId}, RequestId: {RequestId}",
+                    metric.Id,
+                    job.RequestId);
 
-        logger.LogInformation(
-            "Job status updated to Calculating. RequestId: {RequestId}",
-            job.RequestId);
+                await sender.Send(new UpdateCalculationJobCommand(
+                    job.RequestId,
+                    CalculationStatus.Calculating,
+                    metric.Id,
+                    null), ct);
 
-        await unitOfWork.SaveChangesAsync(ct);
+                logger.LogInformation(
+                    "Job status updated to Calculating. RequestId: {RequestId}",
+                    job.RequestId);
 
-        logger.LogDebug(
-            "Initial changes saved. RequestId: {RequestId}",
-            job.RequestId);
+                await unitOfWork.SaveChangesAsync(ct);
 
-        return metric;
+                logger.LogDebug(
+                    "Initial changes saved. RequestId: {RequestId}",
+                    job.RequestId);
+
+                return metric;
+            }, ct);
     }
 
     private async Task<Metric> CalculateMetric(Guid metricId, CancellationToken ct)

@@ -1,6 +1,4 @@
-﻿using System.Reflection;
-using Analytics.Application.Dtos.Metric;
-using Analytics.Attributes;
+﻿using Analytics.Application.Dtos.Metric;
 using Analytics.Entities.Metrics;
 using Application.Common.Interfaces.Cqrs;
 using Localization.Abstractions.Interfaces;
@@ -13,23 +11,19 @@ public sealed record ListAvailableMetricsResult(IReadOnlyList<MetricInfoDto> Met
 
 public class ListAvailableMetricsHandler(IScopedStringLocalizer localizer) : IQueryHandler<ListAvailableMetricsQuery, ListAvailableMetricsResult>
 {
-    private static readonly MetricInfoAttribute[] MetricsInfo = typeof(Metric).Assembly.GetTypes()
-        .Where(t => !t.IsAbstract && typeof(Metric).IsAssignableFrom(t))
-        .Select(t => new
-        {
-            Info = t.GetCustomAttribute<MetricInfoAttribute>()
-        })
-        .Where(x => x.Info != null)
-        .Select(x => x.Info!)
-        .ToArray();
+    private static readonly (string systemName, string nameKey, string descriptionKey)[] MetricsInfo = 
+        typeof(Metric).Assembly.GetTypes()
+            .Where(t => !t.IsAbstract && typeof(Metric).IsAssignableFrom(t))
+            .Select(t => (t.Name, $"{t.Name}.name", $"{t.Name}.description"))
+            .ToArray();
     public Task<ListAvailableMetricsResult> Handle(ListAvailableMetricsQuery request, CancellationToken cancellationToken)
     {
-        var result = MetricsInfo.Select(attribute =>
+        var result = MetricsInfo.Select(a =>
             new MetricInfoDto
             {
-                SystemName = attribute.SystemName,
-                Description = localizer[attribute.DescriptionLocalizationKey],
-                Name = localizer[attribute.NameLocalizationKey]
+                SystemName = a.systemName,
+                Description = localizer[a.descriptionKey],
+                Name = localizer[a.nameKey]
             }).ToList();
 
         return Task.FromResult(new ListAvailableMetricsResult(result));

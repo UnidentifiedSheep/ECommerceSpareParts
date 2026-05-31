@@ -1,9 +1,5 @@
-﻿using System.Reflection;
-using Analytics.Application.Extensions;
+﻿using Analytics.Application.Extensions;
 using Analytics.Application.Interfaces.Services.Metrics;
-using Analytics.Application.Services.Metrics.Validators;
-using Analytics.Attributes;
-using Analytics.Entities.Metrics;
 using FluentAssertions;
 using Microsoft.Extensions.DependencyInjection;
 using Test.Common.TestContainers.Combined;

@@ -1,16 +1,27 @@
-﻿using Analytics.Application.Dtos.Metric;
+﻿using Analytics.Application.Dtos.CalculationJob;
+using Analytics.Application.Dtos.Metric;
+using Analytics.Application.Handlers.CalculationJob.GetCalculationJob;
+using Analytics.Application.Handlers.CalculationJob.GetCalculationJobs;
 using Analytics.Application.Handlers.Metrics.GetMetrics;
 using Analytics.Application.Handlers.Metrics.ListAvailableMetrics;
 using Api.Common.Models.Requests;
 using Carter;
 using MediatR;
+using Microsoft.AspNetCore.Mvc;
 
 namespace Analytics.Api.EndPoints.Metrics;
 
-public sealed record GetMetricsRequest() : SortablePaginationQueryModel;
+public sealed record GetMetricCalculationJobsRequest() : SortablePaginationQueryModel;
+
+public sealed record GetMetricsRequest : SortablePaginationQueryModel
+{
+    [FromQuery(Name = "metricSystemName")]
+    public string? MetricSystemName { get; init; }
+}
 public sealed record GetMetricsResponse(IReadOnlyList<MetricDto> Metrics);
 
 public sealed record GetMetricInfosResponse(IReadOnlyList<MetricInfoDto> Metrics);
+public sealed record GetMetricCalculationJobsResponse(IReadOnlyList<CalculationJobDto> Jobs);
 
 public class MetricEndPoints : ICarterModule
 {
@@ -33,6 +44,7 @@ public class MetricEndPoints : ICarterModule
             CancellationToken token) =>
         {
             var result = await sender.Send(new GetMetricsQuery(
+                request.MetricSystemName,
                 request.SortBy,
                 request), token);
             
@@ -40,5 +52,22 @@ public class MetricEndPoints : ICarterModule
         }).WithName("GetMetrics")
         .WithDescription("Выводит метрики")
         .Produces<GetMetricsResponse>();
+
+        metrics.MapGet("{metricId:guid}/jobs", async (
+            ISender sender,
+            Guid metricId,
+            [AsParameters] GetMetricCalculationJobsRequest request,
+            CancellationToken ct) =>
+        {
+            var query = new GetCalculationJobsQuery(
+                metricId,
+                request,
+                request.SortBy);
+            
+            var result = await sender.Send(query, ct);
+            return Results.Ok(new GetMetricCalculationJobsResponse(result.Jobs));
+        }).WithName("GetMetricCalculationJobs")
+        .WithDescription("Выводит историю расчетов метрики.")
+        .Produces<GetMetricCalculationJobsResponse>();
     }
 }
