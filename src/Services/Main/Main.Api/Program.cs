@@ -122,6 +122,7 @@ builder.Services.AddMassTransit(x =>
             ep.ConfigureConsumer<RoleUpdatedConsumer>(context);
             ep.ConfigureConsumer<UserUpdatedConsumer>(context);
             ep.ConfigureConsumer<UserDiscountUpdatedConsumer>(context);
+            ep.ConfigureConsumer<ProductLinkageUpdatedConsumer>(context);
 
             ep.Bind<CurrencyCreatedEvent>();
             ep.Bind<StorageContentUpdatedEvent>();
@@ -131,6 +132,7 @@ builder.Services.AddMassTransit(x =>
             ep.Bind<RoleUpdatedEvent>();
             ep.Bind<UserUpdatedEvent>();
             ep.Bind<UserDiscountUpdatedEvent>();
+            ep.Bind<ProductLinkageUpdatedEvent>();
         });
     });
 });
