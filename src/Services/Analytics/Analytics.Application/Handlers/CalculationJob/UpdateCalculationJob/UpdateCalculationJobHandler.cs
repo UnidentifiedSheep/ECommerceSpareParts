@@ -1,9 +1,11 @@
 using Analytics.Entities;
 using Analytics.Entities.Exceptions.MetricCalculationJobs;
 using Analytics.Enums;
+using Application.Common.Interfaces;
 using Application.Common.Interfaces.Cqrs;
 using Application.Common.Interfaces.Repositories;
 using Attributes;
+using Contracts.Metrics;
 using Localization.Abstractions.Interfaces;
 
 namespace Analytics.Application.Handlers.CalculationJob.UpdateCalculationJob;
@@ -20,7 +22,8 @@ public record UpdateCalculationJobResult(MetricCalculationJob CalculationJob);
 
 public class UpdateCalculationJobHandler(
     IRepository<MetricCalculationJob, Guid> jobRepository,
-    IScopedStringLocalizer localizer)
+    IScopedStringLocalizer localizer,
+    IIntegrationEventScope integrationEventScope)
     : ICommandHandler<UpdateCalculationJobCommand, UpdateCalculationJobResult>
 {
     public async Task<UpdateCalculationJobResult> Handle(
@@ -45,6 +48,14 @@ public class UpdateCalculationJobHandler(
         {
             throw new CalculationJobMetricIdUpdateException();
         }
+        
+        integrationEventScope.Add(new MetricCalculationJobUpdatedEvent
+        {
+            MetricId = request.MetricId,
+            RequestId = request.RequestId,
+            CalculationStatus = job.Status.ToString(),
+            ErrorMessage = errorMessage
+        });
 
         return new UpdateCalculationJobResult(job);
     }

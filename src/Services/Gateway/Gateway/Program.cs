@@ -68,10 +68,19 @@ builder.Services.AddCors(options =>
 {
     options.AddDefaultPolicy(policy =>
     {
+        var allowedOrigins = builder.Configuration
+            .GetSection("Cors:AllowedOrigins")
+            .Get<string[]>() ?? [];
+
         policy
-            .AllowAnyOrigin()
             .AllowAnyHeader()
-            .AllowAnyMethod();
+            .AllowAnyMethod()
+            .AllowCredentials();
+
+        if (allowedOrigins.Length > 0)
+            policy.WithOrigins(allowedOrigins);
+        else
+            policy.SetIsOriginAllowed(_ => true);
     });
 });
 
@@ -86,6 +95,7 @@ app.UseCors();
 
 app.UseAuthorization();
 
+app.UseWebSockets();
 app.MapReverseProxy();
 
 app.UseOpenTelemetryPrometheusScrapingEndpoint();

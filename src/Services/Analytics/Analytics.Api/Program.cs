@@ -1,4 +1,6 @@
 using System.Reflection;
+using Analytics.Api.Consumers;
+using Analytics.Api.Hubs;
 using Analytics.Application;
 using Analytics.Application.Consumers;
 using Analytics.Persistence;
@@ -8,6 +10,7 @@ using Api.Common.Extensions;
 using Application.Common.Backplane;
 using Cache;
 using Carter;
+using Contracts.Metrics;
 using Internal.Integration.Di;
 using Localization.Domain.Extensions;
 using MassTransit;
@@ -48,6 +51,7 @@ var uniqQueueName = $"queue-of-analytics-{Environment.MachineName}";
 builder.Services.AddMassTransit(x =>
 {
     x.AddConsumers(Assembly.GetAssembly(typeof(CurrencyCreatedConsumer)));
+    x.AddConsumers(Assembly.GetAssembly(typeof(MetricCalculationJobUpdatedConsumer)));
     x.AddConsumer<BackplaneConsumer>();
 
     x.AddEntityFrameworkOutbox<DContext>(o =>
@@ -64,6 +68,8 @@ builder.Services.AddMassTransit(x =>
         {
             ep.AutoDelete = true;
             ep.Durable = false;
+            
+            ep.ConfigureConsumer<MetricCalculationJobUpdatedConsumer>(context);
             
             ep.ConfigureConsumer<BackplaneConsumer>(context);
             ep.Bind<BackplaneMessage>();
@@ -86,11 +92,15 @@ builder.Services.AddMassTransit(x =>
     });
 });
 
+builder.Services.AddSignalR();
+
 builder.Services.AddCarter(configurator: c => c.WithEmptyValidators());
 
 var app = builder.Build();
 
 app.UseCommonApiPipeline();
+
+app.MapHub<MetricCalculationHub>("/hubs/calculation-jobs");
 
 await app.LoadLocalesFromJson(localesPath);
 
