@@ -1,4 +1,5 @@
 ﻿using System.Text.Json.Serialization;
+using Analytics.Enums;
 
 namespace Analytics.Application.Dtos.Metric;
 
@@ -18,4 +19,20 @@ public record MetricDto
     
     [JsonPropertyName("data")]
     public required string? Data { get; init; }
+    
+    [JsonPropertyName("tags")]
+    [JsonConverter(typeof(JsonStringEnumConverter))]
+    public required RecalculationTags Tags { get; init; }
+    
+    [JsonPropertyName("rangeStart")]
+    public required DateTime RangeStart { get; init; }
+    
+    [JsonPropertyName("rangeEnd")]
+    public required DateTime RangeEnd { get; init; }
+    
+    [JsonPropertyName("currencyId")]
+    public required int CurrencyId { get; init; }
+    
+    [JsonPropertyName("productId")]
+    public required int? ProductId { get; init; }
 }

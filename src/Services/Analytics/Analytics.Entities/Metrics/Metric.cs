@@ -1,4 +1,5 @@
 ﻿using System.ComponentModel.DataAnnotations.Schema;
+using System.Globalization;
 using System.Security.Cryptography;
 using System.Text;
 using System.Text.Json;
@@ -95,22 +96,16 @@ public abstract class Metric : AuditableEntity<Metric, Guid>
         string dimensionKey,
         int currencyId)
     {
-        start = ToUtc(start);
-        end = ToUtc(end);
+        start = start.ToUniversalTime();
+        end = end.ToUniversalTime();
+        
+        var key = string.Create(
+            CultureInfo.InvariantCulture,
+            $"{start:yyyy-MM-ddTHH:mm:ssZ}|{end:yyyy-MM-ddTHH:mm:ssZ}|{discriminator}|{dimensionKey}|{currencyId}");
 
         return SHA256.HashData(
             Encoding.UTF8
-                .GetBytes($"{start:O}|{end:O}|{discriminator}|{dimensionKey}|{currencyId}"));
-    }
-
-    private static DateTime ToUtc(DateTime value)
-    {
-        return value.Kind switch
-        {
-            DateTimeKind.Utc => value,
-            DateTimeKind.Local => value.ToUniversalTime(),
-            _ => DateTime.SpecifyKind(value, DateTimeKind.Utc)
-        };
+                .GetBytes(key));
     }
 
     public override Guid GetId()

@@ -16,6 +16,12 @@ public static class MetricProjection
             SystemName = x.Discriminator,
             Description = infos[x.Discriminator].Description,
             Name = infos[x.Discriminator].Name,
-            Data = serializer.Serialize(x.GetData())
+            Data = serializer.Serialize(x.GetData()),
+            Tags = x.Tags,
+            RangeEnd = x.RangeEnd,
+            RangeStart = x.RangeStart,
+            CurrencyId = x.CurrencyId,
+            ProductId = x is ProductPurchasesMetric ? ((ProductPurchasesMetric)x).ProductId
+                : x is ProductSalesMetric ? ((ProductSalesMetric)x).ProductId : null
         };
 }

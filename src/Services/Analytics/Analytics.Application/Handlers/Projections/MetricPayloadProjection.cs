@@ -12,7 +12,7 @@ public static class MetricPayloadProjection
             CurrencyId = x.CurrencyId,
             RangeStart = x.RangeStart,
             RangeEnd = x.RangeEnd,
-            ArticleId = x.ProductId
+            ProductId = x.ProductId
         };
 
     public static readonly Expression<Func<ContractMetricPayload, MetricPayloadDto>> FromContract =
@@ -21,6 +21,6 @@ public static class MetricPayloadProjection
             CurrencyId = x.CurrencyId,
             RangeStart = x.RangeStart,
             RangeEnd = x.RangeEnd,
-            ProductId = x.ArticleId
+            ProductId = x.ProductId
         };
 }

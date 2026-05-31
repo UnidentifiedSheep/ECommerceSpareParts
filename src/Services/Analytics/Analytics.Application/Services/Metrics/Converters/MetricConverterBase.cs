@@ -23,6 +23,9 @@ public abstract class MetricConverterBase<TMetric> :
 
     protected static void FillBase(Metric metric, MetricPayloadDto payload)
     {
-        metric.ConfigurePeriod(payload.CurrencyId, payload.RangeStart, payload.RangeEnd);
+        metric.ConfigurePeriod(
+            payload.CurrencyId, 
+            payload.RangeStart, 
+            payload.RangeEnd);
     }
 }

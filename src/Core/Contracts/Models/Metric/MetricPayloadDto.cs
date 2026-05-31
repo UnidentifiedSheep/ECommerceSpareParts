@@ -8,5 +8,5 @@ public record MetricPayloadDto
     public required DateTime RangeEnd { get; init; }
 
     //Fields based on article
-    public int? ArticleId { get; init; }
+    public int? ProductId { get; init; }
 }
