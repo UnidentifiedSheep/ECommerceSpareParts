@@ -22,6 +22,8 @@ using Main.Application.HangFireTasks;
 using Main.Cache;
 using Main.Persistence;
 using Main.Persistence.Context;
+using Main.Worker;
+using Main.Worker.HostedServices;
 using MassTransit;
 using Microsoft.Extensions.Options;
 using Persistence;
@@ -76,6 +78,9 @@ builder.Services
     .AddFullSecurityLayer()
     .AddExchangeRates();
 
+AddHostedServiceOptions(builder.Services);
+builder.Services.AddHostedService<EmailWorkHostedService>();
+
 builder.Services.AddHangfire((sp, x) =>
 {
     var options = sp.GetRequiredService<IOptions<DatabaseOptions>>().Value;
@@ -101,6 +106,14 @@ using (var scope = host.Services.CreateScope())
 }
 
 await host.RunAsync();
+
+void AddHostedServiceOptions(IServiceCollection collection)
+{
+    collection.AddOptions<HostedServiceOptions>()
+        .BindConfiguration(HostedServiceOptions.SectionName)
+        .ValidateDataAnnotations()
+        .ValidateOnStart();
+}
 
 void AddMassTransit(IHostApplicationBuilder hostBuilder)
 {
