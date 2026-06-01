@@ -6,6 +6,7 @@ using Main.Application.Dtos.Currencies;
 using Main.Application.Handlers.Currencies.CreateCurrency;
 using Main.Application.Handlers.Currencies.GetCurrencies;
 using Main.Application.Handlers.Currencies.GetCurrencyById;
+using Main.Application.Handlers.Currencies.GetCurrencyHistory;
 using Main.Application.Handlers.Currencies.UpdateCurrenciesRates;
 using Mapster;
 using MediatR;
@@ -19,6 +20,8 @@ public record CreateCurrencyResponse(int Id);
 public record GetCurrenciesResponse(IReadOnlyList<CurrencyDto> Currencies);
 
 public record GetCurrencyByIdResponse(CurrencyDto Currency);
+
+public record GetCurrencyHistoryResponse(IReadOnlyList<CurrencyRateHistoryDto> History);
 
 public class CurrenciesEndPoints : ICarterModule
 {
@@ -71,6 +74,23 @@ public class CurrenciesEndPoints : ICarterModule
             .WithDisplayName("Получение валюты по id")
             .Produces<GetCurrencyByIdResponse>()
             .ProducesProblem(StatusCodes.Status404NotFound)
+            .RequireAnyPermission(PermissionCodes.CURRENCIES_GET);
+
+        currencies.MapGet("/{id:int}/history", async (
+                ISender sender,
+                int id,
+                [AsParameters] PaginationQueryModel queryParams,
+                CancellationToken cancellation) =>
+            {
+                var result = await sender.Send(new GetCurrencyHistoryQuery(id, queryParams), cancellation);
+                return Results.Ok(new GetCurrencyHistoryResponse(result.History));
+            })
+            .WithName("GetCurrencyHistory")
+            .WithSummary("Получить историю курса валюты")
+            .WithDescription("Получение истории изменений курса валюты по id")
+            .WithDisplayName("История курса валюты")
+            .Produces<GetCurrencyHistoryResponse>()
+            .ProducesProblem(StatusCodes.Status400BadRequest)
             .RequireAnyPermission(PermissionCodes.CURRENCIES_GET);
 
         currencies.MapPost("/update", async (ISender sender, CancellationToken token) =>
