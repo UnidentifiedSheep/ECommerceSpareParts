@@ -1,4 +1,4 @@
-﻿namespace Attributes;
+﻿namespace Attributes.JsonAttributes;
 
 [AttributeUsage(AttributeTargets.Property)]
 public sealed class LocalizableJsonPropertyNameAttribute(string key)
