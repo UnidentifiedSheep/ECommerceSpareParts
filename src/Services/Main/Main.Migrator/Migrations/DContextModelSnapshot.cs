@@ -801,6 +801,68 @@ namespace Main.Migrator.Migrations
                     b.UseTphMappingStrategy();
                 });
 
+            modelBuilder.Entity("Main.Entities.Mailing.EmailOutBox", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid")
+                        .HasColumnName("id");
+
+                    b.Property<string>("Body")
+                        .IsRequired()
+                        .HasColumnType("text")
+                        .HasColumnName("body");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("created_at");
+
+                    b.Property<DateTime?>("SentAt")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("sent_at");
+
+                    b.Property<string>("Status")
+                        .IsRequired()
+                        .HasColumnType("text")
+                        .HasColumnName("status");
+
+                    b.Property<string>("Subject")
+                        .IsRequired()
+                        .HasColumnType("text")
+                        .HasColumnName("subject");
+
+                    b.Property<string>("To")
+                        .IsRequired()
+                        .HasColumnType("text")
+                        .HasColumnName("to");
+
+                    b.Property<DateTime>("UpdatedAt")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("updated_at");
+
+                    b.Property<Guid?>("WhoCreated")
+                        .HasColumnType("uuid")
+                        .HasColumnName("who_created");
+
+                    b.Property<Guid?>("WhoUpdated")
+                        .HasColumnType("uuid")
+                        .HasColumnName("who_updated");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("WhoCreated")
+                        .HasDatabaseName("main.entities.mailing.emailoutbox_who_created_idx");
+
+                    b.HasIndex("WhoUpdated")
+                        .HasDatabaseName("main.entities.mailing.emailoutbox_who_updated_idx");
+
+                    b.HasIndex(new[] { "Status" }, "status_email_outbox_idx");
+
+                    b.HasIndex(new[] { "To", "Status" }, "to_status_email_outbox_idx");
+
+                    b.ToTable("email_outbox", "public");
+                });
+
             modelBuilder.Entity("Main.Entities.Order.Order", b =>
                 {
                     b.Property<Guid>("Id")
@@ -3204,7 +3266,7 @@ namespace Main.Migrator.Migrations
                         .IsRequired()
                         .HasConstraintName("purchase_content_purchase_id_fk");
 
-                    b.HasOne("Main.Entities.Storage.StorageContent", null)
+                    b.HasOne("Main.Entities.Storage.StorageContent", "StorageContent")
                         .WithOne()
                         .HasForeignKey("Main.Entities.Purchase.PurchaseContent", "StorageContentId")
                         .OnDelete(DeleteBehavior.SetNull)
@@ -3212,6 +3274,8 @@ namespace Main.Migrator.Migrations
                         .HasConstraintName("purchase_content_storage_content_id_fk");
 
                     b.Navigation("Product");
+
+                    b.Navigation("StorageContent");
                 });
 
             modelBuilder.Entity("Main.Entities.Purchase.PurchaseContentLogistic", b =>

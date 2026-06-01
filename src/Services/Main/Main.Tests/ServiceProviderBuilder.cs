@@ -75,7 +75,6 @@ public class ServiceProviderBuilder : IServiceProviderBuilder<ServiceProviderArg
             .AddCacheLayer("test")
             .AddApplicationCache()
             .AddFullSecurityLayer(passwordRules)
-            .AddMailLayer()
             .AddCommonLayer();
 
         services.RemoveAll<IUserContext>();

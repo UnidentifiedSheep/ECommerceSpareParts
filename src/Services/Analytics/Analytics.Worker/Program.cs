@@ -18,14 +18,9 @@ using RabbitMq.Extensions;
 using Security;
 using ZiggyCreatures.Caching.Fusion.Backplane;
 
-var env = Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT") ?? "";
-
 var builder = Host.CreateApplicationBuilder(args);
 
-builder.Configuration
-    .AddAppSettingsFromJsons(env)
-    .AddAppSettingsFromJsons(env, "/app/configs")
-    .AddConfigsFromJsons("analytics", env, "/app/configs");
+var env = builder.AddServiceConfiguration("analytics");
 
 builder.Services
     .AddMessageBrokerOptions()
@@ -33,7 +28,10 @@ builder.Services
     .AddRedisOptions()
     .AddDatabaseOptions();
 
-AddLoki(builder);
+builder.AddLokiLogger(
+    builder.Configuration,
+    "analytics.worker",
+    env);
 
 builder.Services.AddLocalization(builder.Configuration);
 
@@ -41,7 +39,8 @@ builder.Services
     .AddPersistenceLayer()
     .AddCacheLayer("analytics")
     .AddIntegrationClients()
-    .AddApplicationLayer(builder.Configuration);
+    .AddApplicationLayer(builder.Configuration)
+    .AddWorkerSecurityLayer();
 
 AddHostedServiceOptions(builder.Services);
 builder.Services.AddHostedService<RecalculationCheckHostedService>();
@@ -60,14 +59,6 @@ async Task LoadLocalization(IHost hostApp)
 {
     var localesPath = Assembly.GetExecutingAssembly().GetDefaultLocalizationPath();
     await hostApp.LoadLocalesFromJson(localesPath);
-}
-
-void AddLoki(IHostApplicationBuilder hostBuilder)
-{
-    hostBuilder.AddLokiLogger(
-        hostBuilder.Configuration,
-        "analytics.worker",
-        env);
 }
 
 void AddHostedServiceOptions(IServiceCollection collection)

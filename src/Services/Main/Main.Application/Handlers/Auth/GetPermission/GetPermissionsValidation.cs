@@ -8,6 +8,6 @@ public class GetPermissionsValidation : AbstractValidator<GetPermissionsQuery>
     public GetPermissionsValidation()
     {
         RuleFor(x => x.Pagination)
-            .SetValidator(new PaginationValidator());
+            .SetValidator(new PaginationValidator(1, 10000));
     }
 }

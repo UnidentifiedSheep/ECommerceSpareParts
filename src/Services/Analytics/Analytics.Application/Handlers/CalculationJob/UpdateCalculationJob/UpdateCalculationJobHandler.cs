@@ -10,8 +10,8 @@ using Localization.Abstractions.Interfaces;
 
 namespace Analytics.Application.Handlers.CalculationJob.UpdateCalculationJob;
 
-[AutoSave]
-[Transactional]
+[Diagnostics(maxExecutionTimeMs: 200)]
+[Transactional, AutoSave]
 public record UpdateCalculationJobCommand(
     Guid RequestId,
     CalculationStatus Status,

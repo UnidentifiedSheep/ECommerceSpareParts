@@ -83,6 +83,7 @@ services:
       placement:
         constraints:
           - node.labels.role == app
+          - node.labels.workload == api
       update_config:
         parallelism: 1
         order: start-first
@@ -105,6 +106,7 @@ services:
       placement:
         constraints:
           - node.labels.role == app
+          - node.labels.workload == api
       update_config:
         parallelism: 1
         order: start-first
@@ -126,6 +128,7 @@ services:
       placement:
         constraints:
           - node.labels.role == app
+          - node.labels.workload == api
       update_config:
         parallelism: 1
         order: start-first
@@ -147,6 +150,7 @@ services:
       placement:
         constraints:
           - node.labels.role == app
+          - node.labels.workload == api
       update_config:
         parallelism: 1
         order: start-first
@@ -168,6 +172,29 @@ services:
       placement:
         constraints:
           - node.labels.role == app
+          - node.labels.workload == worker
+      update_config:
+        parallelism: 1
+        order: stop-first
+      restart_policy:
+        condition: any
+
+  main-worker:
+    image: ${ARTIFACT_REGISTRY_HOST}/main-worker:${IMAGE_TAG}
+    volumes:
+      - ${CONFIGS_PATH:-/opt/ecommerce/configs}:/app/configs:ro
+    environment:
+      - DOTNET_ENVIRONMENT=${DOTNET_ENVIRONMENT:-Staging}
+      - ASPNETCORE_ENVIRONMENT=${ASPNETCORE_ENVIRONMENT:-Staging}
+      - DEPLOY_RUN_ID=${DEPLOY_RUN_ID:-local}
+    networks:
+      - backend-network
+    deploy:
+      replicas: ${MAIN_WORKER_REPLICAS:-1}
+      placement:
+        constraints:
+          - node.labels.role == app
+          - node.labels.workload == worker
       update_config:
         parallelism: 1
         order: stop-first

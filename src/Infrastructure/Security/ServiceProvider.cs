@@ -8,6 +8,7 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.IdentityModel.Tokens;
 using Security.Services;
 
@@ -38,7 +39,18 @@ public static class ServiceProvider
 
     public static IServiceCollection AddMinimalSecurityLayer(this IServiceCollection collection)
     {
-        collection.AddScoped<IUserContext, UserContext>();
+        collection.TryAddScoped<IUserContext, UserContext>();
+        return collection;
+    }
+
+    public static IServiceCollection AddWorkerSecurityLayer(this IServiceCollection collection)
+    {
+        collection.AddOptions<WorkerServiceOptions>()
+            .BindConfiguration(WorkerServiceOptions.SectionName)
+            .ValidateDataAnnotations()
+            .ValidateOnStart();
+        
+        collection.AddSingleton<IUserContext, WorkerUserContext>();
         return collection;
     }
 

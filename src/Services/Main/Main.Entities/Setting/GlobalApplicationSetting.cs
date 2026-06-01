@@ -23,5 +23,7 @@ public record GlobalApplicationSettingData
 {
     public required Guid SystemId { get; init; }
     public required string ImageBucketName { get; init; }
-    public required string ServiceUrl { get; init; }
+    public required string S3ServiceUrl { get; init; }
+    public required string ApiServiceUrl { get; init; }
+    public required string AppServiceUrl { get; init; }
 }

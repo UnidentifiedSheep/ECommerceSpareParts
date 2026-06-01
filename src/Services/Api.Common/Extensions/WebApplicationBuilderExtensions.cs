@@ -8,7 +8,7 @@ namespace Api.Common.Extensions;
 public static class WebApplicationBuilderExtensions
 {
     public static string AddServiceConfiguration(
-        this WebApplicationBuilder builder,
+        this IHostApplicationBuilder builder,
         string serviceName,
         string configsPath = "/app/configs")
     {

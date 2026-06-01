@@ -104,7 +104,4 @@ app.MapHub<MetricCalculationHub>("/hubs/calculation-jobs");
 
 await app.LoadLocalesFromJson(localesPath);
 
-if (app.Environment.IsDevelopment()) app.MapOpenApi();
-
-
 await app.RunAsync();

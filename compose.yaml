@@ -18,6 +18,24 @@
       - redis
       - rabbitmq
     restart: unless-stopped
+    
+  main-worker:
+    image: main-worker
+    build:
+      context: .
+      dockerfile: src/Services/Main/Main.Worker/Dockerfile
+    volumes:
+      - ${CONFIGS_PATH:-./certs}:/app/configs:ro
+    environment:
+      - DOTNET_ENVIRONMENT=${DOTNET_ENVIRONMENT:-Development}
+      - ASPNETCORE_ENVIRONMENT=${ASPNETCORE_ENVIRONMENT:-Development}
+    networks:
+      - backend-network
+    depends_on:
+      - pgql
+      - redis
+      - rabbitmq
+    restart: unless-stopped
 
   search-api:
     image: search-api

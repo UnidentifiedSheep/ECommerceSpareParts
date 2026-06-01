@@ -1,10 +1,12 @@
 ﻿using Analytics.Application.Dtos.Metric;
 using Analytics.Entities.Metrics;
 using Application.Common.Interfaces.Cqrs;
+using Attributes;
 using Localization.Abstractions.Interfaces;
 
 namespace Analytics.Application.Handlers.Metrics.ListAvailableMetrics;
 
+[Diagnostics(maxExecutionTimeMs: 40)]
 public sealed record ListAvailableMetricsQuery : IQuery<ListAvailableMetricsResult>;
 
 public sealed record ListAvailableMetricsResult(IReadOnlyList<MetricInfoDto> Metrics);

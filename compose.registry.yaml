@@ -59,6 +59,16 @@ services:
       cache_to:
         - type=registry,ref=${ARTIFACT_REGISTRY_HOST}/analytics-worker:buildcache,mode=min
 
+  main-worker:
+    image: ${ARTIFACT_REGISTRY_HOST}/main-worker:${IMAGE_TAG}
+    build:
+      tags:
+        - ${ARTIFACT_REGISTRY_HOST}/main-worker:${IMAGE_TAG}
+      cache_from:
+        - type=registry,ref=${ARTIFACT_REGISTRY_HOST}/main-worker:buildcache
+      cache_to:
+        - type=registry,ref=${ARTIFACT_REGISTRY_HOST}/main-worker:buildcache,mode=min
+
   pgql:
     image: ${ARTIFACT_REGISTRY_HOST}/postgres-cron:${IMAGE_TAG}
     build:

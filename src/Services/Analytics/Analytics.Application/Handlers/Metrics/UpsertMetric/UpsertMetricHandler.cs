@@ -11,7 +11,8 @@ using Attributes;
 
 namespace Analytics.Application.Handlers.Metrics.UpsertMetric;
 
-[AutoSave]
+[Diagnostics(maxExecutionTimeMs: 120)]
+[Transactional, AutoSave]
 public record UpsertMetricCommand(
     string MetricSystemName,
     MetricPayloadDto MetricPayload) : ICommand<UpsertMetricResult>;

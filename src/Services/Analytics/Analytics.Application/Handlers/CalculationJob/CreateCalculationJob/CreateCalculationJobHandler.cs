@@ -16,8 +16,8 @@ using Contracts.Analytics;
 
 namespace Analytics.Application.Handlers.CalculationJob.CreateCalculationJob;
 
-[AutoSave]
-[Transactional]
+[Diagnostics(maxExecutionTimeMs: 200)]
+[Transactional, AutoSave]
 public record CreateCalculationJobCommand : ICommand<CreateCalculationJobResult>
 {
     public string? MetricSystemName { get; }

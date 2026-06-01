@@ -1,10 +1,8 @@
 using System.Reflection;
-using Abstractions.Models;
 using Amazon.S3;
 using Api.Common;
 using Api.Common.Extensions;
 using Application.Common.Backplane;
-using Application.Common.Interfaces.Settings;
 using Cache;
 using Carter;
 using Contracts.Auth;
@@ -14,16 +12,14 @@ using Contracts.Settings;
 using Contracts.StorageContent;
 using Contracts.User;
 using ExchangeRate;
-using Hangfire;
-using Hangfire.PostgreSql;
 using Localization.Domain.Extensions;
 using Mail;
+using Main.Api;
 using Main.Api.EndPoints.Products;
 using Main.Application;
 using Main.Application.BackgroundServices;
 using Main.Application.Configs;
 using Main.Application.Consumers;
-using Main.Application.HangFireTasks;
 using Main.Application.Models;
 using Main.Cache;
 using Main.Persistence;
@@ -31,7 +27,6 @@ using Main.Persistence.Context;
 using MassTransit;
 using Microsoft.Extensions.Options;
 using OpenTelemetry.Metrics;
-using Persistence;
 using RabbitMq.Extensions;
 using S3;
 using Security;
@@ -51,30 +46,12 @@ builder.Services.AddMessageBrokerOptions()
     .AddHeaderSecretsOptions()
     .AddRedisOptions()
     .AddS3Options()
-    .AddDatabaseOptions();
+    .AddDatabaseOptions()
+    .AddEmailOptions()
+    .AddPhoneOptions()
+    .AddJwtOptions();
 
 builder.Services.AddCommonApiInfrastructure();
-
-builder.Services.AddHangfire((sp, x) =>
-{
-    var options = sp.GetRequiredService<IOptions<DatabaseOptions>>().Value;
-    x.UsePostgreSqlStorage(z =>
-        z.UseNpgsqlConnection(options.ConnectionString));
-});
-
-builder.Services.AddHangfireServer();
-
-var emailOptions = new UserEmailOptions
-{
-    MinEmailCount = 1,
-    MaxEmailCount = 5
-};
-
-//looks bas asf
-builder.Services.AddSingleton(new JwtOptions(
-    builder.Configuration["JwtBearer:IssuerSigningKey"]!,
-    builder.Configuration["JwtBearer:ValidIssuer"]!,
-    TimeSpan.FromMilliseconds(builder.Configuration.GetValue<long>("JwtBearer:ValidDurationMs"))));
 
 var uniqQueueName = $"queue-of-main-{Environment.MachineName}";
 
@@ -101,9 +78,7 @@ builder.Services.AddMassTransit(x =>
             ep.ConfigureConsumeTopology = false;
 
             ep.ConfigureConsumer<SettingChangedConsumer>(context);
-            ep.ConfigureConsumer<CurrencyRatesChangedConsumer>(context);
-
-            ep.Bind<CurrencyRateChangedEvent>();
+            
             ep.Bind<SettingChangedEvent>();
             
             ep.ConfigureConsumer<BackplaneConsumer>(context);
@@ -114,6 +89,7 @@ builder.Services.AddMassTransit(x =>
         {
             ep.Durable = true;
 
+            ep.ConfigureConsumer<CurrencyRatesChangedConsumer>(context);
             ep.ConfigureConsumer<CurrencyCreatedConsumer>(context);
             ep.ConfigureConsumer<ProductSizesUpdatedConsumer>(context);
             ep.ConfigureConsumer<ProductWeightUpdatedConsumer>(context);
@@ -133,6 +109,7 @@ builder.Services.AddMassTransit(x =>
             ep.Bind<UserUpdatedEvent>();
             ep.Bind<UserDiscountUpdatedEvent>();
             ep.Bind<ProductLinkageUpdatedEvent>();
+            ep.Bind<CurrencyRateChangedEvent>();
         });
     });
 });
@@ -159,7 +136,7 @@ builder.Services
         };
         return new AmazonS3Client(options.Login, options.Password, config);
     })
-    .AddApplicationLayer(builder.Configuration, emailOptions)
+    .AddApplicationLayer(builder.Configuration)
     .AddLocalization(builder.Configuration)
     .AddExchangeRates();
 
@@ -185,28 +162,9 @@ SortByConfig.Configure();
 
 app.UseCommonApiPipeline();
 
-app.UseHangfireDashboard();
-
 var localesPath = Assembly.GetExecutingAssembly().GetDefaultLocalizationPath();
 await app.LoadLocalesFromJson(localesPath);
-await InitSettings(app.Services);
-
-RecurringJob.AddOrUpdate<UpdateCurrencyRate>("UpdateCurrencyTask",
-    x => x.Run(), Cron.Daily);
-
-RecurringJob.AddOrUpdate<NotifySuggestionsRebuildNeeded>("RebuildSuggestionsTask",
-    x => x.Run(), Cron.Daily);
 
 app.UseOpenTelemetryPrometheusScrapingEndpoint();
 
 await app.RunAsync();
-
-
-return;
-
-async Task InitSettings(IServiceProvider serviceProvider)
-{
-    using var scope = serviceProvider.CreateScope();
-    var sr = scope.ServiceProvider.GetRequiredService<ISettingsService>();
-    await sr.LoadAsync();
-}

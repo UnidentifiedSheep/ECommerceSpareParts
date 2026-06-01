@@ -6,6 +6,7 @@ using Analytics.Entities.Metrics;
 using Application.Common.Extensions;
 using Application.Common.Interfaces.Cqrs;
 using Application.Common.Interfaces.Repositories;
+using Attributes;
 using LinqKit;
 using Localization.Abstractions.Interfaces;
 using MediatR;
@@ -13,6 +14,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Analytics.Application.Handlers.Metrics.GetMetrics;
 
+[Diagnostics(maxExecutionTimeMs: 200)]
 public record GetMetricsQuery(
     string? MetricSystemName,
     string? SortBy, 
