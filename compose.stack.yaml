@@ -83,6 +83,7 @@ services:
       placement:
         constraints:
           - node.labels.role == app
+          - node.labels.workload == api
       update_config:
         parallelism: 1
         order: start-first
@@ -105,6 +106,7 @@ services:
       placement:
         constraints:
           - node.labels.role == app
+          - node.labels.workload == api
       update_config:
         parallelism: 1
         order: start-first
@@ -126,6 +128,7 @@ services:
       placement:
         constraints:
           - node.labels.role == app
+          - node.labels.workload == api
       update_config:
         parallelism: 1
         order: start-first
@@ -147,6 +150,7 @@ services:
       placement:
         constraints:
           - node.labels.role == app
+          - node.labels.workload == api
       update_config:
         parallelism: 1
         order: start-first
@@ -168,6 +172,7 @@ services:
       placement:
         constraints:
           - node.labels.role == app
+          - node.labels.workload == worker
       update_config:
         parallelism: 1
         order: stop-first
