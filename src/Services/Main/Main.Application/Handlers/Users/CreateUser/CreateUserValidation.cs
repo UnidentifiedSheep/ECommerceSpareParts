@@ -5,6 +5,7 @@ using Extensions;
 using FluentValidation;
 using FluentValidation.Results;
 using Main.Application.Handlers.BaseValidators;
+using Microsoft.Extensions.Options;
 
 namespace Main.Application.Handlers.Users.CreateUser;
 
@@ -13,8 +14,8 @@ public class CreateUserValidation : AbstractValidator<CreateUserCommand>
     public CreateUserValidation(
         IPasswordManager passwordManager,
         IEmailValidator emailValidator,
-        UserEmailOptions emailOptions,
-        UserPhoneOptions phoneOptions)
+        IOptions<UserEmailOptions> emailOptions,
+        IOptions<UserPhoneOptions> phoneOptions)
     {
         RuleFor(x => x.UserName)
             .SetValidator(new LoginValidator());
@@ -54,7 +55,7 @@ public class CreateUserValidation : AbstractValidator<CreateUserCommand>
                     {
                         ErrorCode = "user.have.duplicate.email"
                     });
-                if (list.Count < emailOptions.MinEmailCount)
+                if (list.Count < emailOptions.Value.MinEmailCount)
                     context.AddFailure(new ValidationFailure(
                         context.PropertyPath,
                         "Validation failed")
@@ -62,10 +63,10 @@ public class CreateUserValidation : AbstractValidator<CreateUserCommand>
                         ErrorCode = "user.min.email.count",
                         CustomState = new ValidationStateData
                         {
-                            ErrorMessageArguments = [emailOptions.MinEmailCount]
+                            ErrorMessageArguments = [emailOptions.Value.MinEmailCount]
                         }
                     });
-                if (list.Count > emailOptions.MaxEmailCount)
+                if (list.Count > emailOptions.Value.MaxEmailCount)
                     context.AddFailure(new ValidationFailure(
                         context.PropertyPath,
                         "Validation failed")
@@ -73,7 +74,7 @@ public class CreateUserValidation : AbstractValidator<CreateUserCommand>
                         ErrorCode = "user.max.email.count",
                         CustomState = new ValidationStateData
                         {
-                            ErrorMessageArguments = [emailOptions.MaxEmailCount]
+                            ErrorMessageArguments = [emailOptions.Value.MaxEmailCount]
                         }
                     });
             });

@@ -28,9 +28,7 @@ public static class ServiceProvider
 {
     public static IServiceCollection AddApplicationLayer(
         this IServiceCollection collection,
-        IConfiguration? configuration,
-        UserEmailOptions? emailOptions = null,
-        UserPhoneOptions? phoneOptions = null)
+        IConfiguration? configuration)
     {
         collection
             .AddNamedObjects()
@@ -41,8 +39,6 @@ public static class ServiceProvider
 
         collection.AddSingleton<IJwtGenerator, JwtGenerator>();
         collection.AddSingleton<UpdateCurrencyRate>();
-        collection.AddSingleton(emailOptions ?? new UserEmailOptions());
-        collection.AddSingleton(phoneOptions ?? new UserPhoneOptions());
 
         collection.AddScoped<ICurrencyConverter, CurrencyConverter>();
 
@@ -56,6 +52,7 @@ public static class ServiceProvider
         collection.AddSingleton<ILogisticsPricingStrategy, PerWeightPricing>();
         collection.AddSingleton<ILogisticsCostService, LogisticsCostService>();
 
+        collection.AddScoped<IMailingService, MailingService>();
         collection.AddScoped<IBalanceService, BalanceService>();
         collection.AddScoped<IPurchaseLogisticsService, PurchaseLogisticsService>();
         collection.AddScoped<ISaleService, SaleService>();

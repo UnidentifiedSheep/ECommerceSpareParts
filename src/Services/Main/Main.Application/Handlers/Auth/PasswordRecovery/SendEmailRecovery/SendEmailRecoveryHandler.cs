@@ -1,10 +1,11 @@
-﻿using Abstractions.Interfaces.Services;
+﻿using Abstractions.Interfaces.Mail;
+using Abstractions.Interfaces.Services;
 using Application.Common.Interfaces.Cqrs;
 using Application.Common.Interfaces.Repositories;
 using Application.Common.Interfaces.Settings;
-using Mail.Interface;
 using Main.Application.EmailMessages;
 using Main.Application.Interfaces.Persistence;
+using Main.Application.Interfaces.Services;
 using Main.Application.Models.Auth;
 using Main.Entities.Setting;
 using Main.Entities.User;
@@ -15,9 +16,9 @@ namespace Main.Application.Handlers.Auth.PasswordRecovery.SendEmailRecovery;
 public record SendEmailRecoveryCommand(string Email) : ICommand;
 
 public class SendEmailRecoveryHandler(
-    IEmailSender emailSender,
     IJsonSigner jsonSigner,
     IUserRepository userRepository,
+    IMailingService mailingService,
     ISettingsService settingsService) : ICommandHandler<SendEmailRecoveryCommand>
 {
     public async Task<Unit> Handle(
@@ -44,9 +45,9 @@ public class SendEmailRecoveryHandler(
         });
 
         var baseUri = new Uri(setting.AppServiceUrl.TrimEnd('/') + "/");
-        var resetUrl = new Uri(baseUri, $"reset?token={Uri.EscapeDataString(signed)}"); 
+        var resetUrl = new Uri(baseUri, $"reset?token={Uri.EscapeDataString(signed)}");
 
-        await emailSender.SendAsync(
+        await mailingService.QueueToOutbox(
             new PasswordResetEmailMessage(request.Email, resetUrl),
             cancellationToken);
 

@@ -8,7 +8,7 @@ using Main.Application.Handlers.Logistics.CalculateDeliveryCost;
 using Main.Enums;
 using MediatR;
 
-namespace Main.Api.EndPoints.Logistics;
+namespace Main.Api.EndPoints;
 
 public record CalculateDeliveryCostRequest
 {

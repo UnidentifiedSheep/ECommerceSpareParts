@@ -6,7 +6,7 @@ using Main.Application.Dtos.Sale;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
 
-namespace Main.Api.EndPoints.Sales;
+namespace Main.Api.EndPoints;
 
 public record CreateSaleRequest(
     Guid BuyerId,

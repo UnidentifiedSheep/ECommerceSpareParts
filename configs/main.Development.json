@@ -5,5 +5,16 @@
     "Username": "postgres",
     "Password": "PleasKillMe21"
   },
-  "SignSecret": "SomeSecretPriceSignKey21"
+  "SignSecret": "SomeSecretPriceSignKey21",
+  "UserEmail": {
+    "MaxEmailCount": 5,
+    "MinEmailCount": 1
+  },
+  "UserPhone": {
+    "MaxPhoneCount": 5,
+    "MinPhoneCount": 0
+  },
+  "WorkerService": {
+    "SystemId": "b3b94368-bcce-4fb0-af14-1b64da84c092"
+  }
 }

@@ -10,7 +10,7 @@ using Main.Application.Handlers.ProductCharacteristics.PatchCharacteristics;
 using Mapster;
 using MediatR;
 
-namespace Main.Api.EndPoints.ProductCharacteristics;
+namespace Main.Api.EndPoints;
 
 public record AddCharacteristicsRequest(IEnumerable<NewCharacteristicsDto> Characteristics);
 

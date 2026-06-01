@@ -1,4 +1,4 @@
-using Mail.Interface;
+using Abstractions.Interfaces.Mail;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace Mail;

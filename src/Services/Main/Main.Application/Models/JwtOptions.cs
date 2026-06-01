@@ -1,21 +1,31 @@
-﻿using System.Text;
+﻿using System.ComponentModel.DataAnnotations;
+using System.Text;
 using Microsoft.IdentityModel.Tokens;
 
 namespace Main.Application.Models;
 
 public record JwtOptions
 {
-    public JwtOptions(string issuerSignKey, string validIssuer, TimeSpan validDuration)
-    {
-        var key = Encoding.UTF8.GetBytes(issuerSignKey);
-        SigningCredentials = new SigningCredentials(
-            new SymmetricSecurityKey(key),
-            SecurityAlgorithms.HmacSha256);
-        ValidIssuer = validIssuer;
-        ValidDuration = validDuration;
-    }
+    public const string SectionName = "JwtBearer";
+    [Required]
+    public required TimeSpan ValidDuration { get; set; }
+    
+    [Required]
+    public required string ValidIssuer { get; set; }
+    
+    [Required]
+    public required string IssuerSigningKey { get; set; }
 
-    public TimeSpan ValidDuration { get; }
-    public SigningCredentials SigningCredentials { get; init; }
-    public string ValidIssuer { get; }
+    public SigningCredentials SigningCredentials
+    {
+        get
+        {
+            if (field != null) return field;
+            var key = Encoding.UTF8.GetBytes(IssuerSigningKey);
+            field = new SigningCredentials(
+                new SymmetricSecurityKey(key),
+                SecurityAlgorithms.HmacSha256);
+            return field;
+        }
+    } = null;
 }

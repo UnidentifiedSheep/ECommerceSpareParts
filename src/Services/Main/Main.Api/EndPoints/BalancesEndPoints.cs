@@ -1,4 +1,3 @@
-using Abstractions.Interfaces;
 using Api.Common.Extensions;
 using Carter;
 using Enums;
@@ -8,7 +7,7 @@ using Main.Application.Handlers.Balance.ReverseTransaction;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
 
-namespace Main.Api.EndPoints.Balances;
+namespace Main.Api.EndPoints;
 
 public record CreateTransactionRequest(
     Guid SenderId,

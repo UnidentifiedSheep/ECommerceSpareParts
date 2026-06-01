@@ -1,5 +1,4 @@
 using System.Text.Json.Serialization;
-using Abstractions.Interfaces;
 using Abstractions.Models;
 using Api.Common.Extensions;
 using Api.Common.Models.Requests;
@@ -15,7 +14,7 @@ using Mapster;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
 
-namespace Main.Api.EndPoints.Purchase;
+namespace Main.Api.EndPoints;
 
 public record CreatePurchaseRequest
 {

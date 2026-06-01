@@ -5,7 +5,7 @@ using Enums;
 using Main.Application.Handlers.Options.GetEmailOptions;
 using MediatR;
 
-namespace Main.Api.EndPoints.Options;
+namespace Main.Api.EndPoints;
 
 public record GetEmailOptionsResponse(UserEmailOptions EmailOptions);
 

@@ -7,7 +7,7 @@ using Main.Application.Handlers.ProductReservations.DeleteProductReservation;
 using Main.Application.Handlers.ProductReservations.EditProductReservation;
 using MediatR;
 
-namespace Main.Api.EndPoints.ProductReservations;
+namespace Main.Api.EndPoints;
 
 public record CreateProductReservationQuery(List<NewProductReservationDto> Reservations);
 

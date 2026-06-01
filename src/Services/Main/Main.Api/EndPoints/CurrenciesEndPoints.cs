@@ -11,7 +11,7 @@ using Main.Application.Handlers.Currencies.UpdateCurrenciesRates;
 using Mapster;
 using MediatR;
 
-namespace Main.Api.EndPoints.Currencies;
+namespace Main.Api.EndPoints;
 
 public record CreateCurrencyRequest(string ShortName, string Name, string CurrencySign, string Code);
 

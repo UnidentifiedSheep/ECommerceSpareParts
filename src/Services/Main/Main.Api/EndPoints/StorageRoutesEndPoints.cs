@@ -13,7 +13,7 @@ using Mapster;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
 
-namespace Main.Api.EndPoints.StorageRoutes;
+namespace Main.Api.EndPoints;
 
 public record AddStorageRouteRequest(
     string StorageFrom,

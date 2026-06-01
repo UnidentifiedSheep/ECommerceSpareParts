@@ -14,7 +14,7 @@ using Main.Application.Handlers.Producers.GetProducers;
 using Mapster;
 using MediatR;
 
-namespace Main.Api.EndPoints.Producers;
+namespace Main.Api.EndPoints;
 
 public record AddOtherNameToProducerRequest(string OtherName, string WhereUsed);
 

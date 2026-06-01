@@ -6,7 +6,7 @@ using Main.Application.Dtos.Purchase;
 using Main.Application.Handlers.Purchases.GetFullPurchase;
 using MediatR;
 
-namespace Main.Api.EndPoints.Internal.Purchase;
+namespace Main.Api.EndPoints.Internal;
 
 public record InternalGetFullPurchaseResponse
 {

@@ -3,7 +3,7 @@ using Carter;
 using Main.Application.Handlers.Currencies.GetCurrencyRate;
 using MediatR;
 
-namespace Main.Api.EndPoints.Internal.Currency;
+namespace Main.Api.EndPoints.Internal;
 
 public record GetCurrencyRateResult
 {

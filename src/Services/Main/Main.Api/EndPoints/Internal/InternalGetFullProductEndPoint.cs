@@ -6,7 +6,7 @@ using Main.Application.Dtos.Product;
 using Main.Application.Handlers.Products.GetFullProduct;
 using MediatR;
 
-namespace Main.Api.EndPoints.Internal.Products;
+namespace Main.Api.EndPoints.Internal;
 
 public record InternalGetFullProductResponse
 {

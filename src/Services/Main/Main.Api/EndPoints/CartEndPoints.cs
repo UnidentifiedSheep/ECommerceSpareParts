@@ -10,7 +10,7 @@ using Main.Application.Handlers.Cart.DeleteFromCart;
 using Main.Application.Handlers.Cart.GetCartItems;
 using MediatR;
 
-namespace Main.Api.EndPoints.Cart;
+namespace Main.Api.EndPoints;
 
 public record AddToCartRequest(int ArticleId, int Count);
 

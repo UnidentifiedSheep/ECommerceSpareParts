@@ -4,11 +4,12 @@ using System.Security.Cryptography;
 using Main.Application.Dtos.Users;
 using Main.Application.Interfaces.Services;
 using Main.Application.Models;
+using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 
 namespace Main.Application.Services;
 
-public class JwtGenerator(JwtOptions options) : IJwtGenerator
+public class JwtGenerator(IOptions<JwtOptions> options) : IJwtGenerator
 {
     private readonly JwtSecurityTokenHandler _tokenHandler = new();
 
@@ -19,11 +20,11 @@ public class JwtGenerator(JwtOptions options) : IJwtGenerator
         IEnumerable<string> permissions,
         TimeSpan? additionalValidDuration = null)
     {
-        TimeSpan validDuration = options.ValidDuration + (additionalValidDuration ?? TimeSpan.Zero);
+        TimeSpan validDuration = options.Value.ValidDuration + (additionalValidDuration ?? TimeSpan.Zero);
         var tokenDescriptor = new SecurityTokenDescriptor
         {
-            SigningCredentials = options.SigningCredentials,
-            Issuer = options.ValidIssuer,
+            SigningCredentials = options.Value.SigningCredentials,
+            Issuer = options.Value.ValidIssuer,
             Expires = DateTime.UtcNow.Add(validDuration),
             Subject = GetClaims(user, deviceId, roles, permissions)
         };
@@ -47,8 +48,8 @@ public class JwtGenerator(JwtOptions options) : IJwtGenerator
             ValidateAudience = false,
             ValidateLifetime = true,
             ValidateIssuerSigningKey = true,
-            ValidIssuer = options.ValidIssuer,
-            IssuerSigningKey = options.SigningCredentials.Key
+            ValidIssuer = options.Value.ValidIssuer,
+            IssuerSigningKey = options.Value.SigningCredentials.Key
         };
         return new JwtSecurityTokenHandler().ValidateToken(token, validation, out _);
     }

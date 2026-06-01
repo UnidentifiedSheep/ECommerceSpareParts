@@ -25,6 +25,11 @@ public class MailOptions
     [Required]
     public required string FromEmail { get; set; }
 
+    public required int MaxBatchSize { get; set; } = 10;
+    public required TimeSpan BatchDelay { get; set; } = TimeSpan.FromMilliseconds(300);
+    public required int MaxRetryAttempts { get; set; } = 3;
+    public required TimeSpan RetryDelay { get; set; } = TimeSpan.FromSeconds(1);
+
     public required SecureSocketOptions SecureSocket { get; set; } 
         = SecureSocketOptions.Auto;
 }

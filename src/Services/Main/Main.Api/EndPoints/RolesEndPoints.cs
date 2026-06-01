@@ -9,7 +9,7 @@ using Main.Application.Handlers.Auth.UpsertRole;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
 
-namespace Main.Api.EndPoints.Roles;
+namespace Main.Api.EndPoints;
 
 public record AddPermissionToRoleRequest(string PermissionName);
 

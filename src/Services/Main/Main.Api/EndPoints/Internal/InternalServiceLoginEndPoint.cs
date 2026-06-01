@@ -3,7 +3,7 @@ using Carter;
 using Main.Application.Handlers.Auth.InternalServiceLogin;
 using MediatR;
 
-namespace Main.Api.EndPoints.Internal.Auth;
+namespace Main.Api.EndPoints.Internal;
 
 public record InternalServiceLoginRequest
 {

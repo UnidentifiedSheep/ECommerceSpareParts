@@ -10,7 +10,7 @@ using Main.Application.Handlers.Auth.Register;
 using Mapster;
 using MediatR;
 
-namespace Main.Api.EndPoints.Auth;
+namespace Main.Api.EndPoints;
 
 public record ChangePasswordRequest(string PreviousPassword, string NewPassword);
 

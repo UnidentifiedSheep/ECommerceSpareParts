@@ -7,7 +7,7 @@ using Main.Application.Handlers.ProductWeight.GetProductWeight;
 using Main.Application.Handlers.ProductWeight.SetProductWeight;
 using MediatR;
 
-namespace Main.Api.EndPoints.ProductWeight;
+namespace Main.Api.EndPoints;
 
 public record GetProductWeightResponse(ProductWeightDto ProductWeight);
 

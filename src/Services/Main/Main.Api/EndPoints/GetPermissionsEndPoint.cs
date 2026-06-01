@@ -6,7 +6,7 @@ using Main.Application.Dtos.Auth;
 using Main.Application.Handlers.Auth.GetPermission;
 using MediatR;
 
-namespace Main.Api.EndPoints.Permissions;
+namespace Main.Api.EndPoints;
 
 public record GetPermissionsResponse(IReadOnlyList<PermissionDto> Permissions);
 
