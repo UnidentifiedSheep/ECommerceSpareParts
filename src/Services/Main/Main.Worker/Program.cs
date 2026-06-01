@@ -148,7 +148,7 @@ void AddMassTransit(IHostApplicationBuilder hostBuilder)
                 ep.Bind<BackplaneMessage>();
             });
 
-            cfg.ReceiveEndpoint("main-queue", ep =>
+            cfg.ReceiveEndpoint("main-worker-queue", ep =>
             {
                 ep.Durable = true;
 
