@@ -8,7 +8,7 @@ public class EmailOutBoxConfiguration : IEntityTypeConfiguration<EmailOutBox>
 {
     public void Configure(EntityTypeBuilder<EmailOutBox> builder)
     {
-        builder.ToTable("email_outbox");
+        builder.ToTable("email_outbox", "public");
         
         builder.HasKey(e => e.Id);
         
