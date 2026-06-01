@@ -42,3 +42,6 @@ public class WrongCredentialsException(string? email, string? password)
 
 public class CantCreateSystemUserException()
     : LocalizedBadRequestException("cant.create.system.user");
+    
+public class ResetTokenExpiredException() 
+    : LocalizedBadRequestException("reset.token.expired");

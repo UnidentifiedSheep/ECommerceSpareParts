@@ -25,7 +25,9 @@ public abstract class GlobalApplicationSettingTestContext(
         {
             SystemId = SystemUser.Id,
             ImageBucketName = "images",
-            ServiceUrl = "https://www.somewebsite.com"
+            S3ServiceUrl = "https://www.somewebsite.com",
+            ApiServiceUrl = "https://www.somewebsite.com",
+            AppServiceUrl = "https://www.somewebsite.com",
         });
 
         await settingsService.SetSetting(setting, cancellationToken);

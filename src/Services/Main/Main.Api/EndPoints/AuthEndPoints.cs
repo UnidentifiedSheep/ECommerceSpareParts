@@ -3,6 +3,8 @@ using Carter;
 using Main.Application.Handlers.Auth.ChangePassword;
 using Main.Application.Handlers.Auth.ConfirmMail;
 using Main.Application.Handlers.Auth.Login;
+using Main.Application.Handlers.Auth.PasswordRecovery.ResetPassword;
+using Main.Application.Handlers.Auth.PasswordRecovery.SendEmailRecovery;
 using Main.Application.Handlers.Auth.RefreshToken;
 using Main.Application.Handlers.Auth.Register;
 using Mapster;
@@ -11,6 +13,10 @@ using MediatR;
 namespace Main.Api.EndPoints.Auth;
 
 public record ChangePasswordRequest(string PreviousPassword, string NewPassword);
+
+public record SendEmailRecoveryRequest(string Email);
+
+public record ResetPasswordRequest(string Token, string NewPassword);
 
 public record LoginRequest(string Email, string Password);
 
@@ -43,6 +49,42 @@ public class AuthEndPoints : ICarterModule
             .WithSummary("Сменить пароль")
             .WithDisplayName("Change Password")
             .Accepts<ChangePasswordRequest>(false, "application/json")
+            .Produces(StatusCodes.Status200OK)
+            .ProducesProblem(StatusCodes.Status400BadRequest);
+
+        auth.MapPost("/password/recovery", async (
+                ISender sender,
+                SendEmailRecoveryRequest request,
+                CancellationToken cancellationToken) =>
+            {
+                await sender.Send(
+                    new SendEmailRecoveryCommand(request.Email),
+                    cancellationToken);
+
+                return Results.Ok();
+            })
+            .WithName("SendPasswordRecoveryEmail")
+            .WithSummary("Send password recovery email")
+            .WithDisplayName("Send Password Recovery Email")
+            .Accepts<SendEmailRecoveryRequest>(false, "application/json")
+            .Produces(StatusCodes.Status200OK)
+            .ProducesProblem(StatusCodes.Status400BadRequest);
+
+        auth.MapPost("/password/reset", async (
+                ISender sender,
+                ResetPasswordRequest request,
+                CancellationToken cancellationToken) =>
+            {
+                await sender.Send(
+                    new ResetPasswordCommand(request.Token, request.NewPassword),
+                    cancellationToken);
+
+                return Results.Ok();
+            })
+            .WithName("ResetPassword")
+            .WithSummary("Reset password")
+            .WithDisplayName("Reset Password")
+            .Accepts<ResetPasswordRequest>(false, "application/json")
             .Produces(StatusCodes.Status200OK)
             .ProducesProblem(StatusCodes.Status400BadRequest);
 

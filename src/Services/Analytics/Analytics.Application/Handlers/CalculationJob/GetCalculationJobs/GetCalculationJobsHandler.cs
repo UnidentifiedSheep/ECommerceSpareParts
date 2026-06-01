@@ -5,11 +5,13 @@ using Analytics.Entities;
 using Application.Common.Extensions;
 using Application.Common.Interfaces.Cqrs;
 using Application.Common.Interfaces.Repositories;
+using Attributes;
 using LinqKit;
 using Microsoft.EntityFrameworkCore;
 
 namespace Analytics.Application.Handlers.CalculationJob.GetCalculationJobs;
 
+[Diagnostics(maxExecutionTimeMs: 100)]
 public record GetCalculationJobsQuery(Guid MetricId, Pagination Pagination, string? SortBy) : IQuery<GetCalculationJobsResult>;
 public record GetCalculationJobsResult(IReadOnlyList<CalculationJobDto> Jobs);
 

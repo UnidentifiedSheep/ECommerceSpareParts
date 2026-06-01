@@ -11,6 +11,8 @@
         <PackageReference Include="MailKit" Version="4.16.0"/>
         <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="10.0.0"/>
         <PackageReference Include="Microsoft.Extensions.Options" Version="10.0.0"/>
+        <PackageReference Include="Microsoft.Extensions.Options.ConfigurationExtensions" Version="10.0.0" />
+        <PackageReference Include="Microsoft.Extensions.Options.DataAnnotations" Version="10.0.0" />
         <PackageReference Include="System.Security.Cryptography.Pkcs" Version="10.0.8"/>
     </ItemGroup>
 
@@ -21,6 +23,10 @@
         <Reference Include="Microsoft.Extensions.Options">
             <HintPath>..\..\..\..\..\..\.nuget\packages\microsoft.extensions.options\9.0.8\lib\net9.0\Microsoft.Extensions.Options.dll</HintPath>
         </Reference>
+    </ItemGroup>
+
+    <ItemGroup>
+      <ProjectReference Include="..\..\Core\Abstractions\Abstractions.csproj" />
     </ItemGroup>
 
 </Project>

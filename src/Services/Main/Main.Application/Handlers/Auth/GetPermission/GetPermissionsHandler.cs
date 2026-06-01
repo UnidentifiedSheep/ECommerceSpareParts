@@ -2,6 +2,7 @@
 using Application.Common.Extensions;
 using Application.Common.Interfaces.Cqrs;
 using Application.Common.Interfaces.Repositories;
+using Attributes;
 using Main.Application.Dtos.Auth;
 using Main.Application.Handlers.Projections;
 using Main.Entities.Auth;
@@ -9,6 +10,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Main.Application.Handlers.Auth.GetPermission;
 
+[Diagnostics(maxExecutionTimeMs: 80)]
 public record GetPermissionsQuery(Pagination Pagination) : IQuery<GetPermissionsResult>;
 
 public record GetPermissionsResult(IReadOnlyList<PermissionDto> Permissions);

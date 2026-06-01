@@ -16,8 +16,8 @@ using Main.Enums;
 
 namespace Main.Application.Handlers.Auth.Login;
 
-[AutoSave]
-[Transactional]
+[Diagnostics(maxExecutionTimeMs: 500)]
+[Transactional, AutoSave]
 public record LoginCommand(string Email, string Password, IPAddress? IpAddress, string? UserAgent)
     : ICommand<LoginResult>;
 
@@ -32,8 +32,10 @@ public class LoginHandler(
 {
     public async Task<LoginResult> Handle(LoginCommand request, CancellationToken cancellationToken)
     {
-        var criteria = Criteria<User>.New()
+        var criteria = Criteria<User>
+            .New()
             .Include(x => x.UserInfo)
+            .Track()
             .Build();
 
         var user = await userRepository.GetUserByPrimaryEmailAsync(request.Email, criteria, cancellationToken)

@@ -40,7 +40,7 @@ public class MapImgsToProductHandler(
                 keys.Add(key);
                 toAdd.Add(ProductImage.Create(
                     request.ProductId,
-                    $"{applicationSettings.ServiceUrl}/{applicationSettings.ImageBucketName}/{path}",
+                    $"{applicationSettings.S3ServiceUrl}/{applicationSettings.ImageBucketName}/{path}",
                     key));
             }
 

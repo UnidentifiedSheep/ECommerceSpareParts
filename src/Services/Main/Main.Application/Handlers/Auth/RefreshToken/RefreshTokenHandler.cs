@@ -13,7 +13,8 @@ using Main.Enums;
 
 namespace Main.Application.Handlers.Auth.RefreshToken;
 
-[Transactional]
+[Diagnostics(maxExecutionTimeMs: 300)]
+[Transactional, AutoSave]
 public record RefreshTokenCommand(string RefreshToken, string DeviceId) : ICommand<RefreshTokenResult>;
 
 public record RefreshTokenResult(string Token, string RefreshToken);
@@ -55,7 +56,6 @@ public class RefreshTokenHandler(
             userToken.IpAddress, userToken.UserAgent, request.DeviceId, [], cancellationToken);
 
         unitOfWork.Remove(userToken);
-        await unitOfWork.SaveChangesAsync(cancellationToken);
         return new RefreshTokenResult(token, refreshToken);
     }
 }

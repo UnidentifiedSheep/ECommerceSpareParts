@@ -12,6 +12,7 @@ using MediatR;
 
 namespace Analytics.Application.Handlers.Metrics.ScheduleDirtyMetricsRecalculation;
 
+[Diagnostics(maxExecutionTimeMs: 500)]
 [Transactional(IsolationLevel.ReadCommitted, 20, 2)]
 public record ScheduleDirtyMetricsRecalculationCommand(int Limit) : ICommand;
 

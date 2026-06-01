@@ -4,11 +4,13 @@ using Analytics.Entities;
 using Analytics.Entities.Exceptions.MetricCalculationJobs;
 using Application.Common.Interfaces.Cqrs;
 using Application.Common.Interfaces.Repositories;
+using Attributes;
 using LinqKit;
 using Microsoft.EntityFrameworkCore;
 
 namespace Analytics.Application.Handlers.CalculationJob.GetCalculationJob;
 
+[Diagnostics(maxExecutionTimeMs: 120)]
 public record GetCalculationJobQuery(Guid RequestId) : IQuery<GetCalculationJobResult>;
 
 public record GetCalculationJobResult(CalculationJobDto CalculationJob);
