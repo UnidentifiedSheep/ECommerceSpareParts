@@ -3,6 +3,7 @@ using Abstractions.Interfaces.Services;
 using Application.Common.Interfaces.Cqrs;
 using Application.Common.Interfaces.Repositories;
 using Application.Common.Interfaces.Settings;
+using Attributes;
 using Main.Application.EmailMessages;
 using Main.Application.Interfaces.Persistence;
 using Main.Application.Interfaces.Services;
@@ -13,6 +14,7 @@ using MediatR;
 
 namespace Main.Application.Handlers.Auth.PasswordRecovery.SendEmailRecovery;
 
+[Transactional, AutoSave]
 public record SendEmailRecoveryCommand(string Email) : ICommand;
 
 public class SendEmailRecoveryHandler(
