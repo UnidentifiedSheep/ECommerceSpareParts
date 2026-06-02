@@ -4,6 +4,7 @@ using Application.Common.Interfaces.Cqrs;
 using Application.Common.Interfaces.Repositories;
 using Attributes;
 using Main.Entities.Mailing;
+using Main.Enums;
 using MediatR;
 
 namespace Main.Application.Handlers.Mailing.SendMailBatch;
@@ -23,6 +24,8 @@ public class SendMailBatchHandler(
         var batch = await repository.ListAsync(
             Criteria<EmailOutBox>
                 .New()
+                .OrderByDesc(x => x.Id)
+                .Where(x => x.Status == EmailStatus.Pending)
                 .ForUpdate(true, true)
                 .Track()
                 .Size(request.Batch)
