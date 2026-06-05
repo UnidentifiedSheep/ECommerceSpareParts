@@ -28,6 +28,7 @@
     <ItemGroup>
       <ProjectReference Include="..\..\..\Core\Abstractions\Abstractions.csproj" />
       <ProjectReference Include="..\..\Common\Common.csproj" />
+      <ProjectReference Include="..\EmailTemplates\EmailTemplates.csproj" />
     </ItemGroup>
 
     <ItemGroup>
