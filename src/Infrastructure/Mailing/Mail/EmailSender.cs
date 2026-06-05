@@ -2,9 +2,9 @@ using Abstractions.Interfaces.Mail;
 using MailKit.Net.Smtp;
 using Microsoft.Extensions.Options;
 using MimeKit;
+using System.Net.Sockets;
 using Polly;
 using Polly.Retry;
-using System.Net.Sockets;
 
 namespace Mail;
 
