@@ -11,6 +11,7 @@ using Main.Application.Interfaces.Services;
 using Main.Application.Models.Auth;
 using Main.Entities.Setting;
 using Main.Entities.User;
+using Main.Enums.Auth;
 using MediatR;
 
 namespace Main.Application.Handlers.Auth.PasswordRecovery.SendEmailRecovery;
@@ -45,7 +46,7 @@ public class SendEmailRecoveryHandler(
         var signed = jsonSigner.Sign(new ResetPayload
         {
             UserId = user.Id,
-            Email = request.Email.Trim().ToLowerInvariant(),
+            Type = ResetType.PasswordReset,
             Expires = DateTime.UtcNow + TimeSpan.FromMinutes(30)
         });
 

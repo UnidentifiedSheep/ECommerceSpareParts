@@ -5,6 +5,7 @@ using Attributes;
 using Main.Application.Interfaces.Persistence;
 using Main.Application.Models.Auth;
 using Main.Entities.Exceptions;
+using Main.Enums.Auth;
 using MediatR;
 
 namespace Main.Application.Handlers.Auth.PasswordRecovery.ResetPassword;
@@ -26,7 +27,8 @@ public class ResetPasswordHandler(
         var token = Uri.UnescapeDataString(request.Token);
         if (!jsonSigner.VerifyJson<ResetPayload>(token, out var payload) || 
             payload == null || 
-            payload.Expires <= DateTime.UtcNow)
+            payload.Expires <= DateTime.UtcNow ||
+            payload.Type != ResetType.PasswordReset)
             throw new ResetTokenExpiredException();
 
         var user = await userRepository.GetById(payload.UserId, cancellationToken)
