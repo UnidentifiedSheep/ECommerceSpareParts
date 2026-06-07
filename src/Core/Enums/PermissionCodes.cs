@@ -143,5 +143,8 @@ public enum PermissionCodes
     OPTIONS_GET,
 
     // ===== LOGISTICS =====
-    LOGISTICS_CALCULATE
+    LOGISTICS_CALCULATE,
+    
+    // ===== UPLOADS =====
+    UPLOADS_CREATE
 }

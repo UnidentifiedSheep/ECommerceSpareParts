@@ -146,7 +146,8 @@ public class RolePermissionSeed : ISeed<DContext>
                 PermissionCodes.STORAGE_ROUTES_EDIT,
                 PermissionCodes.STORAGE_ROUTES_CREATE,
                 PermissionCodes.STORAGE_ROUTES_DELETE,
-                PermissionCodes.LOGISTICS_CALCULATE
+                PermissionCodes.LOGISTICS_CALCULATE,
+                PermissionCodes.UPLOADS_CREATE
             ],
 
             [Role.Worker] =
@@ -216,7 +217,8 @@ public class RolePermissionSeed : ISeed<DContext>
                 PermissionCodes.PRODUCERS_DELETE,
                 PermissionCodes.OPTIONS_GET,
                 PermissionCodes.STORAGE_ROUTES_EDIT,
-                PermissionCodes.LOGISTICS_CALCULATE
+                PermissionCodes.LOGISTICS_CALCULATE,
+                PermissionCodes.UPLOADS_CREATE
             ],
 
             [Role.Member] =
@@ -322,7 +324,8 @@ public class RolePermissionSeed : ISeed<DContext>
                 PermissionCodes.STORAGE_ROUTES_EDIT,
                 PermissionCodes.STORAGE_ROUTES_CREATE,
                 PermissionCodes.STORAGE_ROUTES_DELETE,
-                PermissionCodes.LOGISTICS_CALCULATE
+                PermissionCodes.LOGISTICS_CALCULATE,
+                PermissionCodes.UPLOADS_CREATE
             ]
         };
     }

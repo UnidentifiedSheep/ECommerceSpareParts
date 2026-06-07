@@ -64,14 +64,37 @@ public class S3StorageService(IAmazonS3 s3Client) : IS3StorageService
         return response.HttpStatusCode == HttpStatusCode.NoContent;
     }
 
-    public async Task<List<string>> ListFilesAsync(string bucketName)
+    public async Task<List<string>> ListFilesAsync(
+        string bucketName,
+        string? lastKey,
+        int size)
     {
         var request = new ListObjectsV2Request
         {
-            BucketName = bucketName
+            BucketName = bucketName,
+            StartAfter = lastKey,
+            MaxKeys = size
         };
 
         var response = await s3Client.ListObjectsV2Async(request);
         return response.S3Objects.Select(o => o.Key).ToList();
+    }
+    
+    public Task<string> CreatePresignedUploadUrl(
+        string bucketName,
+        string objectKey,
+        string contentType,
+        TimeSpan lifetime)
+    {
+        var request = new GetPreSignedUrlRequest
+        {
+            BucketName = bucketName,
+            Key = objectKey,
+            Verb = HttpVerb.PUT,
+            Expires = DateTime.UtcNow.Add(lifetime),
+            ContentType = contentType
+        };
+
+        return s3Client.GetPreSignedURLAsync(request);
     }
 }

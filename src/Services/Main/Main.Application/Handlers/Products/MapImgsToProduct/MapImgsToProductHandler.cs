@@ -35,12 +35,12 @@ public class MapImgsToProductHandler(
             {
                 await using var stream = img.OpenReadStream();
                 var path = $"imgs/articles/{request.ProductId}_{Guid.NewGuid()}{img.Extension}";
-                var key = await s3Storage.UploadFileAsync(applicationSettings.ImageBucketName,
+                var key = await s3Storage.UploadFileAsync(BucketNames.Images,
                     stream, path, "image/webp");
                 keys.Add(key);
                 toAdd.Add(ProductImage.Create(
                     request.ProductId,
-                    $"{applicationSettings.S3ServiceUrl}/{applicationSettings.ImageBucketName}/{path}",
+                    $"{applicationSettings.S3ServiceUrl}/{BucketNames.Images}/{path}",
                     key));
             }
 
@@ -50,7 +50,7 @@ public class MapImgsToProductHandler(
         catch (Exception)
         {
             foreach (var key in keys)
-                await s3Storage.DeleteFileAsync(applicationSettings.ImageBucketName, key);
+                await s3Storage.DeleteFileAsync(BucketNames.Images, key);
             throw;
         }
 
