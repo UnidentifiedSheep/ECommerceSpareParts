@@ -16,6 +16,7 @@
     "producer.other.name.max.length": "Additional name must be at most 64 characters long.",
     "producer.other.name.where.used.max.length": "Where-used designation must be at most 64 characters long.",
     "producer.other.name.where.used.min.length": "Where-used must be at least 2 characters long.",
-    "producer.image.too.long": "Image path must be shorter than 255 symbols."
+    "producer.image.too.long": "Image path must be shorter than 255 symbols.",
+    "producer.too.many.errors.while.processing.batch": "Too many errors happened while batch was processing."
   }
 }

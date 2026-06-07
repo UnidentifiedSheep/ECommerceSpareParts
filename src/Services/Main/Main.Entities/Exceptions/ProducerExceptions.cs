@@ -10,3 +10,6 @@ public class ProducerNotFoundException(int id)
 
 public class ProducersOtherNameNotFoundException(string name)
     : LocalizedNotFoundException("producer.additional.name.not.found", new { Name = name }, [name]);
+
+public class TooManyErrorsWhenProcessingBatch()
+    : LocalizedNotFoundException("producer.too.many.errors.while.processing.batch");

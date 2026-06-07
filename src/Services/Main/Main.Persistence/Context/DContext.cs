@@ -126,6 +126,8 @@ public partial class DContext : DbContext
     public virtual DbSet<UserToken> UserTokens { get; set; }
 
     public virtual DbSet<UserVehicle> UserVehicles { get; set; }
+    
+    public virtual DbSet<Job> Jobs { get; set; }
 
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
     {
@@ -152,7 +154,8 @@ public partial class DContext : DbContext
             .HasPostgresExtension("pgcrypto");
 
         modelBuilder.ApplyConfigurationsFromAssembly(Assembly.GetAssembly(GetType())!)
-            .ApplyConfiguration(new SettingConfiguration());
+            .ApplyConfiguration(new SettingConfiguration())
+            .ApplyConfiguration(new JobConfiguration());
 
         modelBuilder.Entity<Setting>()
             .HasDiscriminator(e => e.Key)

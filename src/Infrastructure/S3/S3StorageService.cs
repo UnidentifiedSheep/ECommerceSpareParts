@@ -40,7 +40,10 @@ public class S3StorageService(IAmazonS3 s3Client) : IS3StorageService
         return keyName;
     }
 
-    public async Task<Stream> DownloadFileAsync(string bucketName, string keyName)
+    public async Task<Stream> DownloadFileAsync(
+        string bucketName, 
+        string keyName,
+        CancellationToken ct = default)
     {
         var request = new GetObjectRequest
         {
@@ -48,7 +51,7 @@ public class S3StorageService(IAmazonS3 s3Client) : IS3StorageService
             Key = keyName
         };
 
-        using var response = await s3Client.GetObjectAsync(request);
+        using var response = await s3Client.GetObjectAsync(request, ct);
         return response.ResponseStream;
     }
 

@@ -16,6 +16,7 @@
     "producer.other.name.max.length": "Дополнительное название должно быть не более 64 символов.",
     "producer.other.name.where.used.max.length": "Поле 'where used' должно быть не более 64 символов.",
     "producer.other.name.where.used.min.length": "Поле 'where used' должно быть минимум 2 символа в длину.",
-    "producer.image.too.long": "Путь к изображению производителя должен иметь не более 255 символов."
+    "producer.image.too.long": "Путь к изображению производителя должен иметь не более 255 символов.",
+    "producer.too.many.errors.while.processing.batch": "Произошло слишком много ошибок при обработке производителей."
   }
 }
