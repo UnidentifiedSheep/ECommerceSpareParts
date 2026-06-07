@@ -15,4 +15,9 @@ public interface IS3StorageService
         string objectKey,
         string contentType,
         TimeSpan lifetime);
+
+    Task CompletePresignedUploadUrl(
+        string bucketName,
+        string objectKey,
+        CancellationToken ct = default);
 }

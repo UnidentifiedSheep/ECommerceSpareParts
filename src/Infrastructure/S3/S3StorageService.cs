@@ -97,4 +97,17 @@ public class S3StorageService(IAmazonS3 s3Client) : IS3StorageService
 
         return s3Client.GetPreSignedURLAsync(request);
     }
+
+    public Task CompletePresignedUploadUrl(
+        string bucketName,
+        string objectKey,
+        CancellationToken ct = default)
+    {
+        var request = new CompleteMultipartUploadRequest
+        {
+            BucketName = bucketName,
+            Key = objectKey
+        };
+        return s3Client.CompleteMultipartUploadAsync(request, ct);
+    }
 }

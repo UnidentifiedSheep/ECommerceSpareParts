@@ -18,6 +18,12 @@ public record CreateUploadRequest
 
 public record CreateUploadResponse(string UploadUrl);
 
+public record CompleteUploadRequest
+{
+    [JsonPropertyName("fileName")]
+    public required string FileName { get; init; }
+}
+
 public class UploadsEndPoints : ICarterModule
 {
     public void AddRoutes(IEndpointRouteBuilder app)
@@ -42,6 +48,22 @@ public class UploadsEndPoints : ICarterModule
             .WithDisplayName("Create Upload Request")
             .Accepts<CreateUploadRequest>(false, "application/json")
             .Produces<CreateUploadResponse>()
+            .ProducesProblem(StatusCodes.Status400BadRequest)
+            .RequireAnyPermission(PermissionCodes.UPLOADS_CREATE);
+
+        uploads.MapPost("/complete", async (
+                ISender sender,
+                CompleteUploadRequest request,
+                CancellationToken token) =>
+            {
+                await sender.Send(new CompleteUploadCommand(request.FileName), token);
+                return Results.Ok();
+            })
+            .WithName("CompleteUpload")
+            .WithSummary("Complete upload")
+            .WithDisplayName("Complete Upload")
+            .Accepts<CompleteUploadRequest>(false, "application/json")
+            .Produces(StatusCodes.Status200OK)
             .ProducesProblem(StatusCodes.Status400BadRequest)
             .RequireAnyPermission(PermissionCodes.UPLOADS_CREATE);
     }
