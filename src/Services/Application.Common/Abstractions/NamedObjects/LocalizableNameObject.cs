@@ -3,10 +3,10 @@ using Localization.Abstractions.Interfaces;
 
 namespace Application.Common.Abstractions.NamedObjects;
 
-public abstract class LocalizableNameObject : INamedObject
+public abstract class LocalizableNameObject : ILocalizableNamedObject
 {
-    protected abstract string NameLocalizationKey { get; }
-    protected abstract string DescriptionLocalizationKey { get; }
+    public abstract string NameLocalizationKey { get; }
+    public abstract string DescriptionLocalizationKey { get; }
     public abstract string SystemName { get; }
 
     public string GetLocalizedName(IScopedStringLocalizer stringLocalizer)

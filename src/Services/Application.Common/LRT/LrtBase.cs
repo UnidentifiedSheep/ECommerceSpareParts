@@ -1,5 +1,7 @@
-﻿using Abstractions.Interfaces.Persistence;
-using Application.Common.Interfaces;
+﻿using System.Text.Json;
+using Abstractions.Interfaces.Persistence;
+using Application.Common.Exceptions;
+using Application.Common.Interfaces.Lrt;
 using Application.Common.Interfaces.Repositories;
 using Attributes;
 using Domain.CommonEntities;
@@ -21,6 +23,8 @@ public abstract class LrtBase(
     {
         CancellationToken = cancellationToken;
         JobId = jobId;
+        Job = null!;
+        Initialized = false;
 
         while (true)
         {
@@ -43,6 +47,11 @@ public abstract class LrtBase(
                 await CancelJobAsync();
                 break;
             }
+            catch (LrtInterruptedException e)
+            {
+                await AttemptOrFailJobAsync(e, true);
+                break;
+            }
             catch (Exception e)
             {
                 if (await AttemptOrFailJobAsync(e))
@@ -55,6 +64,33 @@ public abstract class LrtBase(
     protected virtual Task InitJobAsync()
     {
         return GetJobAsync();
+    }
+
+    protected void Interrupt(string reason)
+    {
+        throw new LrtInterruptedException(reason);
+    }
+
+    protected async Task<T?> GetStateAsync<T>()
+    {
+        await GetJobAsync();
+        return string.IsNullOrWhiteSpace(Job.State) 
+            ? default 
+            : JsonSerializer.Deserialize<T>(Job.State);
+    }
+
+    protected async Task UpdateState<T>(T? state)
+    {
+        var json = JsonSerializer.Serialize(state);
+        await unitOfWork.ExecuteWithTransaction(
+            TransactionalAttribute.ReadCommited(30, 3),
+            async () =>
+            {
+                await GetJobAsync();
+                Job.SetState(json);
+                await unitOfWork.SaveChangesAsync(CancellationToken);
+            },
+            CancellationToken);
     }
 
     protected async Task GetJobAsync()
@@ -76,7 +112,9 @@ public abstract class LrtBase(
             CancellationToken);
     }
 
-    protected virtual async Task<bool> AttemptOrFailJobAsync(Exception exception)
+    protected virtual async Task<bool> AttemptOrFailJobAsync(
+        Exception exception,
+        bool forceFail = false)
     {
         return await unitOfWork.ExecuteWithTransaction(
             TransactionalAttribute.ReadCommited(30, 3),
@@ -84,7 +122,7 @@ public abstract class LrtBase(
             {
                 await GetJobAsync();
 
-                if (Job.CanRetry())
+                if (Job.CanRetry() && !forceFail)
                 {
                     Job.RegisterAttempt();
                     await unitOfWork.SaveChangesAsync(CancellationToken);

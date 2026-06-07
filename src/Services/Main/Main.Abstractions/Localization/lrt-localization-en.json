@@ -1,0 +1,7 @@
+﻿{
+  "locale": "en",
+  "keyValues": {
+    "lrt.producer.import.name": "Producer import",
+    "lrt.producer.import.description": "Imports producers from an uploaded file, validates the data, and adds new records while skipping existing ones."
+  }
+}
