@@ -14,4 +14,11 @@
         <ProjectReference Include="..\Pricing.Enums\Pricing.Enums.csproj"/>
     </ItemGroup>
 
+    <ItemGroup>
+        <Content Include="..\..\Application.Common\Localization\**\*">
+            <Link>Localization\%(RecursiveDir)%(Filename)%(Extension)</Link>
+            <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+            <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+        </Content>
+    </ItemGroup>
 </Project>

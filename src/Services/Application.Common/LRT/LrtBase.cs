@@ -16,6 +16,7 @@ public abstract class LrtBase(
     protected Job Job { get; private set; } = null!;
     protected Guid JobId { get; private set; }
     protected bool Initialized { get; private set; }
+    public abstract Type InitialStateType { get; }
     
     public async Task ExecuteAsync(
         Guid jobId,

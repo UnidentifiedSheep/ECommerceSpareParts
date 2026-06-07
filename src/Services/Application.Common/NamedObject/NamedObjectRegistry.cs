@@ -1,6 +1,6 @@
 ﻿using Application.Common.Interfaces.NamedObject;
 
-namespace Application.Common.Services.NamedObject;
+namespace Application.Common.NamedObject;
 
 public class NamedObjectRegistry<TBaseObject>
     : INamedObjectRegistry<TBaseObject>
