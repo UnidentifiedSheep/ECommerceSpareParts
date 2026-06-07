@@ -1,3 +1,4 @@
+using System.Text.Json.Nodes;
 using Api.Common.Extensions;
 using Common;
 using OpenTelemetry.Metrics;
@@ -63,6 +64,7 @@ builder.Services.AddReverseProxy()
             return ValueTask.CompletedTask;
         });
     });
+builder.Services.AddHttpClient();
 
 builder.Services.AddCors(options =>
 {
@@ -104,12 +106,56 @@ app.Run();
 
 void MapDocs(WebApplication application)
 {
+    application.MapGet("/docs/openapi/{service}.json", async (
+        string service,
+        HttpContext context,
+        IHttpClientFactory httpClientFactory) =>
+    {
+        var services = new Dictionary<string, string>
+        {
+            ["main"] = "/main/swagger/v1/swagger.json",
+            ["analytics"] = "/analytics/swagger/v1/swagger.json",
+            ["search"] = "/search/swagger/v1/swagger.json",
+            ["pricing"] = "/pricing/swagger/v1/swagger.json"
+        };
+
+        if (!services.TryGetValue(service, out var swaggerPath))
+            return Results.NotFound();
+
+        var request = context.Request;
+
+        var baseUrl = $"{request.Scheme}://{request.Host}";
+
+        var client = httpClientFactory.CreateClient();
+
+        var swaggerUrl = $"{baseUrl}{swaggerPath}";
+
+        var json = await client.GetStringAsync(swaggerUrl);
+
+        var node = JsonNode.Parse(json);
+
+        if (node is null)
+            return Results.Problem("Invalid OpenAPI document.");
+
+        node["servers"] = new JsonArray
+        {
+            new JsonObject
+            {
+                ["url"] = $"/{service}"
+            }
+        };
+
+        return Results.Content(
+            node.ToJsonString(),
+            "application/json");
+    });
+
     application.MapScalarApiReference("/docs", options =>
     {
         options
-            .AddDocument("main", "Main API", "/main/swagger/v1/swagger.json")
-            .AddDocument("analytics", "Analytics API", "/analytics/swagger/v1/swagger.json")
-            .AddDocument("search", "Search API", "/search/swagger/v1/swagger.json")
-            .AddDocument("pricing", "Pricing API", "/pricing/swagger/v1/swagger.json");
+            .AddDocument("main", "Main API", "/docs/openapi/main.json")
+            .AddDocument("analytics", "Analytics API", "/docs/openapi/analytics.json")
+            .AddDocument("search", "Search API", "/docs/openapi/search.json")
+            .AddDocument("pricing", "Pricing API", "/docs/openapi/pricing.json");
     });
 }
