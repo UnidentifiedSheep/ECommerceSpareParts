@@ -3,9 +3,11 @@ using Amazon.S3;
 using Api.Common;
 using Api.Common.Extensions;
 using Application.Common.Backplane;
+using Application.Common.Concumers;
 using Cache;
 using Contracts.Auth;
 using Contracts.Currency;
+using Contracts.Lrt;
 using Contracts.Products;
 using Contracts.Settings;
 using Contracts.StorageContent;
@@ -122,6 +124,7 @@ void AddMassTransit(IHostApplicationBuilder hostBuilder)
     {
         x.AddConsumers(Assembly.GetAssembly(typeof(Global)));
         x.AddConsumer<BackplaneConsumer>();
+        x.AddConsumer<JobQueuedConsumer>();
 
         x.AddEntityFrameworkOutbox<DContext>(o =>
         {
@@ -151,7 +154,11 @@ void AddMassTransit(IHostApplicationBuilder hostBuilder)
             cfg.ReceiveEndpoint("main-worker-queue", ep =>
             {
                 ep.Durable = true;
+                
+                ep.ConcurrentMessageLimit = 4;
+                ep.PrefetchCount = 1;
 
+                ep.ConfigureConsumer<JobQueuedConsumer>(context);
                 ep.ConfigureConsumer<CurrencyCreatedConsumer>(context);
                 ep.ConfigureConsumer<ProductSizesUpdatedConsumer>(context);
                 ep.ConfigureConsumer<ProductWeightUpdatedConsumer>(context);
@@ -163,6 +170,7 @@ void AddMassTransit(IHostApplicationBuilder hostBuilder)
                 ep.ConfigureConsumer<ProductLinkageUpdatedConsumer>(context);
                 ep.ConfigureConsumer<CurrencyRatesChangedConsumer>(context);
 
+                ep.Bind<JobQueuedEvent>();
                 ep.Bind<CurrencyCreatedEvent>();
                 ep.Bind<StorageContentUpdatedEvent>();
                 ep.Bind<ProductSizesUpdatedEvent>();

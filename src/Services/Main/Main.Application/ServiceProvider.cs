@@ -32,6 +32,7 @@ public static class ServiceProvider
     {
         collection
             .AddNamedObjects()
+            .AddLrtLayer()
             .AddFusionCache()
             .WithRegisteredDistributedCache()
             .WithRegisteredBackplane()

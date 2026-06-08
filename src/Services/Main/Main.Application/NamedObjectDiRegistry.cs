@@ -12,7 +12,6 @@ public static class NamedObjectDiRegistry
     public static IServiceCollection AddNamedObjects(this IServiceCollection services)
     {
         return services
-            .RegisterNamedObject<StorageContentExtractPolicyBase>(objectsLifetime: ServiceLifetime.Singleton)
-            .RegisterNamedObject<LrtNamedObjectBase>(typeof(ProducerImportLrt).Assembly);
+            .RegisterNamedObject<StorageContentExtractPolicyBase>(objectsLifetime: ServiceLifetime.Singleton);
     }
 }

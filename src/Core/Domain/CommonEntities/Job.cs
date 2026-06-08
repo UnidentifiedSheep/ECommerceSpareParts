@@ -8,7 +8,7 @@ namespace Domain.CommonEntities;
 public class Job : AuditableEntity<Job, Guid>, ILinqEntity<Job, Guid>
 {
     public Guid Id { get; private set; }
-    public string SystemName { get; private set; } = null!;
+    public string SystemName { get; private set; }
     public string State { get; protected set; } = string.Empty;
     public JobStatus Status { get; protected set; }
     public int Attempts { get; private set; }
@@ -22,13 +22,16 @@ public class Job : AuditableEntity<Job, Guid>, ILinqEntity<Job, Guid>
     public static Expression<Func<Job, bool>> GetEqualityExpression(Guid key)
         => x => x.Id == key;
 
-    protected Job(int maxAttempts)
+    protected Job(
+        string systemName,
+        int maxAttempts)
     {
         Status = JobStatus.Pending;
+        SystemName = systemName;
         MaxAttempts = maxAttempts;
     }
     
-    public static Job Create(int maxAttempts = 3) => new(maxAttempts);
+    public static Job Create(string systemName, int maxAttempts = 3) => new(systemName, maxAttempts);
 
     public bool CanRetry()
     {
