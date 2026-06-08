@@ -10,13 +10,12 @@ namespace Application.Common.LRT;
 
 public abstract class LrtBase(
     IRepository<Job, Guid> jobRepository,
-    IUnitOfWork unitOfWork) : ILrt
+    IUnitOfWork unitOfWork) : ILrt, ILrtDescriptor
 {
     protected CancellationToken CancellationToken { get; private set; }
     protected Job Job { get; private set; } = null!;
     protected Guid JobId { get; private set; }
     protected bool Initialized { get; private set; }
-    public abstract Type InitialStateType { get; }
     
     public async Task ExecuteAsync(
         Guid jobId,
@@ -163,4 +162,6 @@ public abstract class LrtBase(
     }
     
     protected abstract Task DoWork();
+    public abstract Type InputType { get; }
+    public abstract Type StateType { get; }
 }

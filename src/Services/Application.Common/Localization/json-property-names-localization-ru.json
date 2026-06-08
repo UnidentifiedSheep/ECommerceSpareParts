@@ -12,6 +12,8 @@
     "volatility": "Волатильность",
     "price_info": "Информация о цене",
     "timer": "Время выполнения",
-    "total_amount": "Общая стоимость"
+    "total_amount": "Общая стоимость",
+    "file_name": "Название файла",
+    "file_name_description": "Название файла"
   }
 }

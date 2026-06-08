@@ -1,6 +1,7 @@
 using System.Reflection;
 using Amazon.S3;
 using Api.Common;
+using Api.Common.EndPoints;
 using Api.Common.Extensions;
 using Application.Common.Backplane;
 using Cache;
@@ -153,7 +154,9 @@ builder.Services.AddOpenTelemetry()
     });
 
 builder.Services.AddCarter(
-    new DependencyContextAssemblyCatalog(typeof(ProductsEndPoints).Assembly),
+    new DependencyContextAssemblyCatalog(
+        typeof(ProductsEndPoints).Assembly,
+        typeof(JobEndPoints).Assembly),
     c => c.WithEmptyValidators());
 
 var app = builder.Build();

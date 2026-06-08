@@ -21,6 +21,8 @@ public class JobConfiguration : IEntityTypeConfiguration<Job>
             .HasColumnName("status")
             .HasConversion<string>();
 
+        builder.HasDiscriminator(e => e.SystemName);
+        
         builder.Property(e => e.Attempts)
             .HasColumnName("attempts");
         
@@ -33,7 +35,14 @@ public class JobConfiguration : IEntityTypeConfiguration<Job>
         builder.Property(e => e.ErrorMessage)
             .HasColumnName("error_message");
 
+        builder.Property(e => e.LockedAt)
+            .HasColumnName("locked_at");
+        
         builder.Property(e => e.State)
             .HasColumnName("state");
+
+        builder.HasIndex(e => e.SystemName, "jobs_system_name_idx");
+        builder.HasIndex(e => e.Status, "jobs_status_idx");
+        builder.HasIndex(e => e.LockedAt, "jobs_locked_at_idx");
     }
 }

@@ -3,6 +3,7 @@
 public enum JobStatus
 {
     Pending,
+    Locked,
     Processing,
     Failed,
     Succeeded,

@@ -2,9 +2,9 @@
 using Application.Common.Backplane;
 using Application.Common.Behaviors;
 using Application.Common.Extensions;
-using Application.Common.Interfaces.Lrt;
+using Application.Common.Handlers.Jobs;
 using Application.Common.NamedObject;
-using Application.Common.Services;
+using MediatR;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using ZiggyCreatures.Caching.Fusion.Backplane;
@@ -74,8 +74,20 @@ public static class ServiceProvider
         Assembly? assembly = null)
     {
         assembly ??= Assembly.GetExecutingAssembly();
-        services.AddScoped<ILrtService, LrtService>()
-            .RegisterNamedObject<LrtNamedObjectBase>(assembly);
+        services.RegisterNamedObject<LrtNamedObjectBase>(assembly);
+        
+        services.AddScoped<
+            IRequestHandler<GetAllAvailableJobsQuery, GetAllAvailableJobsResult>,
+            GetAllAvailableJobsHandler>();
+
+        services.AddScoped<
+            IRequestHandler<QueueJobCommand, QueueJobResult>,
+            QueueJobHandler>();
+
+        services.AddScoped<
+            IRequestHandler<RunJobBatchCommand, Unit>,
+            RunJobBatchHandler>();
+        
         return services;
     }
 

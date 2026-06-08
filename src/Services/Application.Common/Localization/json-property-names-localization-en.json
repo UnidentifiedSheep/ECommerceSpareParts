@@ -12,6 +12,8 @@
     "volatility": "Volatility",
     "price_info": "Price information",
     "timer": "Calculation time",
-    "total_amount": "Total amount"
+    "total_amount": "Total amount",
+    "file_name": "File name",
+    "file_name_description": "The name of file"
   }
 }

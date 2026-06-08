@@ -8,9 +8,7 @@ using Analytics.Worker.HostedServices;
 using Api.Common;
 using Api.Common.Extensions;
 using Application.Common.Backplane;
-using Application.Common.Concumers;
 using Cache;
-using Contracts.Lrt;
 using Internal.Integration.Di;
 using Localization.Domain.Extensions;
 using MassTransit;
@@ -76,7 +74,6 @@ void AddMassTransit(IHostApplicationBuilder hostBuilder)
     {
         x.AddConsumers(Assembly.GetAssembly(typeof(MetricCalculationRequestedConsumer)));
         x.AddConsumer<BackplaneConsumer>();
-        x.AddConsumer<JobQueuedConsumer>();
 
         x.AddEntityFrameworkOutbox<DContext>(o =>
         {
@@ -103,11 +100,8 @@ void AddMassTransit(IHostApplicationBuilder hostBuilder)
 
                 ep.ConcurrentMessageLimit = 4;
                 ep.PrefetchCount = 1;
-
-                ep.ConfigureConsumer<JobQueuedConsumer>(context);
-                ep.ConfigureConsumer<MetricCalculationRequestedConsumer>(context);
                 
-                ep.Bind<JobQueuedEvent>();
+                ep.ConfigureConsumer<MetricCalculationRequestedConsumer>(context);
             });
         });
     });

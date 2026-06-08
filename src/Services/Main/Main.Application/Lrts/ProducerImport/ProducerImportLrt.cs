@@ -27,8 +27,8 @@ public class ProducerImportLrt(
     public override string SystemName => nameof(ProducerImportLrt);
     public override string NameLocalizationKey => "lrt.producer.import.name";
     public override string DescriptionLocalizationKey => "lrt.producer.import.description";
-
-    public override Type InitialStateType => typeof(ProducerImportState);
+    public override Type InputType => typeof(ProducerImportInputState);
+    public override Type StateType => typeof(ProducerImportState);
 
     protected override async Task DoWork()
     {
@@ -92,6 +92,7 @@ public class ProducerImportLrt(
             Errors = errors
         });
     }
+
 
     private async Task InsertAndClear(
         List<Producer> producers,

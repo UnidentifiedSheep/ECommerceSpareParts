@@ -14,6 +14,7 @@ public class Job : AuditableEntity<Job, Guid>, ILinqEntity<Job, Guid>
     public int Attempts { get; private set; }
     public int MaxAttempts { get; private set; }
     public string? ErrorMessage { get; private set; }
+    public DateTime? LockedAt { get; private set; }
     
     public bool IsTerminal =>
         Status is JobStatus.Succeeded or JobStatus.Failed or JobStatus.Cancelled;
@@ -65,7 +66,7 @@ public class Job : AuditableEntity<Job, Guid>, ILinqEntity<Job, Guid>
     
     public void Start()
     {
-        EnsureStatus(JobStatus.Pending);
+        EnsureStatus(JobStatus.Locked);
         ErrorMessage = null;
         Status = JobStatus.Processing;
     }
@@ -93,5 +94,14 @@ public class Job : AuditableEntity<Job, Guid>, ILinqEntity<Job, Guid>
 
         ErrorMessage = errorMessage?.TrimOrNull();
         Status = JobStatus.Cancelled;
+    }
+
+    public void Lock()
+    {
+        if (LockedAt != null)
+            throw new InvalidOperationException("Job is already locked.");
+        
+        LockedAt = DateTime.UtcNow;
+        Status = JobStatus.Locked;
     }
 }
