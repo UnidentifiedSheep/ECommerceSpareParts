@@ -7,7 +7,7 @@ using Localization.Abstractions.Interfaces;
 namespace Application.Common.Handlers.Jobs;
 
 public sealed record GetAllAvailableJobsQuery() : IQuery<GetAllAvailableJobsResult>;
-public sealed record GetAllAvailableJobsResult(IReadOnlyList<JobDto> Jobs);
+public sealed record GetAllAvailableJobsResult(IReadOnlyList<JobInfoDto> Jobs);
 
 public sealed class GetAllAvailableJobsHandler(
     IScopedStringLocalizer localizer,
@@ -18,7 +18,7 @@ public sealed class GetAllAvailableJobsHandler(
     public Task<GetAllAvailableJobsResult> Handle(GetAllAvailableJobsQuery request, CancellationToken cancellationToken)
     {
         var result = registry.All
-            .Select(x => new JobDto
+            .Select(x => new JobInfoDto
             {
                 SystemName = x.SystemName,
                 Name = localizer.Get(x.NameLocalizationKey),
