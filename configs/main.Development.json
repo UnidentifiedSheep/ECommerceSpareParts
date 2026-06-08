@@ -22,5 +22,8 @@
       "Delay": "00:00:30",
       "ScheduleAtOnce": 100
     }
+  },
+  "LrtExecutor": {
+    "MaxParallelPerWorker": 1
   }
 }

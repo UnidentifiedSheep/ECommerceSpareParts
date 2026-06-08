@@ -42,7 +42,7 @@ public class JobConfiguration : IEntityTypeConfiguration<Job>
             .HasColumnName("state");
 
         builder.HasIndex(e => e.SystemName, "jobs_system_name_idx");
-        builder.HasIndex(e => e.Status, "jobs_status_idx");
+        builder.HasIndex(e => new { e.Status, e.Id }, "jobs_status_id_idx");
         builder.HasIndex(e => e.LockedAt, "jobs_locked_at_idx");
     }
 }

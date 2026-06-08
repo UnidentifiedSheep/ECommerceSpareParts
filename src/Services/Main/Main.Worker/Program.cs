@@ -2,6 +2,7 @@ using System.Reflection;
 using Amazon.S3;
 using Api.Common;
 using Api.Common.Extensions;
+using Api.Common.HostedServices;
 using Application.Common.Backplane;
 using Cache;
 using Contracts.Auth;
@@ -43,7 +44,8 @@ builder.Services
     .AddDatabaseOptions()
     .AddEmailOptions()
     .AddPhoneOptions()
-    .AddJwtOptions();
+    .AddJwtOptions()
+    .AddLrtOptions();
 
 builder.AddLokiLogger(
     builder.Configuration,
@@ -79,7 +81,9 @@ builder.Services
     .AddExchangeRates();
 
 AddHostedServiceOptions(builder.Services);
-builder.Services.AddHostedService<EmailWorkHostedService>();
+builder.Services
+    .AddHostedService<EmailWorkHostedService>()
+    .AddHostedService<LrtExecutorHostedService>();
 
 builder.Services.AddHangfire((sp, x) =>
 {

@@ -146,5 +146,9 @@ public enum PermissionCodes
     LOGISTICS_CALCULATE,
     
     // ===== UPLOADS =====
-    UPLOADS_CREATE
+    UPLOADS_CREATE,
+    
+    // ===== JOBS =====
+    JOBS_GET,
+    JOBS_CREATE
 }
