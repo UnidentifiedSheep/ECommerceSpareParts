@@ -2,6 +2,6 @@
 
 public static class BucketNames
 {
-    public const string Uploads = "Uploads";
-    public const string Images = "Images";
+    public const string Uploads = "uploads";
+    public const string Images = "images";
 }

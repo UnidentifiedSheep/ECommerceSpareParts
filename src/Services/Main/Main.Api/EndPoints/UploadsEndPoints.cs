@@ -1,8 +1,11 @@
 using System.Text.Json.Serialization;
+using Abstractions.Models;
 using Api.Common.Extensions;
 using Carter;
 using Enums;
+using Main.Application.Dtos.Uploads;
 using Main.Application.Handlers.Uploads;
+using Main.Application.Handlers.Uploads.GetUploads;
 using MediatR;
 
 namespace Main.Api.EndPoints;
@@ -18,6 +21,18 @@ public record CreateUploadRequest
 
 public record CreateUploadResponse(string UploadUrl);
 
+public record GetUploadsResponse
+{
+    [JsonPropertyName("files")]
+    public required IReadOnlyList<FileDto> Files { get; init; }
+
+    [JsonPropertyName("nextCursor")]
+    public string? NextContinuationToken { get; init; }
+
+    [JsonPropertyName("hasMore")]
+    public required bool HasMore { get; init; }
+}
+
 public record CompleteUploadRequest
 {
     [JsonPropertyName("fileName")]
@@ -31,6 +46,30 @@ public class UploadsEndPoints : ICarterModule
         var uploads = app
             .MapGroup("/uploads")
             .WithTags("Uploads");
+
+        uploads.MapGet("", async (
+                ISender sender,
+                string? cursor,
+                int size,
+                CancellationToken token) =>
+            {
+                var result = await sender.Send(
+                    new GetUploadsQuery(new Cursor<string?>(cursor, size)), 
+                    token);
+
+                return Results.Ok(new GetUploadsResponse
+                {
+                    Files = result.Files,
+                    NextContinuationToken = result.NextContinuationToken,
+                    HasMore = result.HasMore
+                });
+            })
+            .WithName("GetUploads")
+            .WithSummary("Get uploads")
+            .WithDisplayName("Get Uploads")
+            .Produces<GetUploadsResponse>()
+            .ProducesProblem(StatusCodes.Status400BadRequest)
+            .RequireAnyPermission(PermissionCodes.UPLOADS_CREATE);
 
         uploads.MapPost("/create", async (
                 ISender sender,

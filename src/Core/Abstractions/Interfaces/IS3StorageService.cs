@@ -1,4 +1,6 @@
-﻿namespace Abstractions.Interfaces;
+﻿using Abstractions.Models.S3;
+
+namespace Abstractions.Interfaces;
 
 public interface IS3StorageService
 {
@@ -9,10 +11,11 @@ public interface IS3StorageService
         string keyName,
         CancellationToken ct = default);
     Task<bool> DeleteFileAsync(string bucketName, string keyName);
-    Task<List<string>> ListFilesAsync(
+    Task<S3ObjectListDto> ListFilesAsync(
         string bucketName,
-        string? lastKey,
-        int size);
+        string? continuationToken,
+        int size,
+        CancellationToken ct = default);
     Task<string> CreatePresignedUploadUrl(
         string bucketName,
         string objectKey,

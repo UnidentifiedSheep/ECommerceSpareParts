@@ -5,6 +5,7 @@ namespace Attributes;
 [AttributeUsage(AttributeTargets.Class)]
 public class TransactionalAttribute : Attribute
 {
+    private static readonly string[] DefaultPgqlErrors = ["40001", "40P01", "55P03"];
     /// <param name="isolationLevel">Уровень изоляции транзакции</param>
     /// <param name="retryDelayMs">Задержка перед повторением не удавшейся транзакции</param>
     /// <param name="retryCount">Количество повторных попыток</param>
@@ -18,7 +19,7 @@ public class TransactionalAttribute : Attribute
         IsolationLevel = isolationLevel;
         RetryDelayMs = retryDelayMs;
         RetryCount = retryCount;
-        RetryErrors = retryErrors ?? ["40001", "40P01", "55P03"];
+        RetryErrors = retryErrors?.Union(DefaultPgqlErrors) ?? DefaultPgqlErrors;
     }
 
     public IsolationLevel IsolationLevel { get; }

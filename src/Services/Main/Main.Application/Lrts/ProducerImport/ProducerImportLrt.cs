@@ -1,15 +1,17 @@
 using System.Globalization;
 using Abstractions.Interfaces;
-using Abstractions.Interfaces.Exceptions;
 using Abstractions.Interfaces.Persistence;
 using Application.Common.Interfaces.Repositories;
 using Application.Common.NamedObject;
 using CsvHelper;
 using CsvHelper.Configuration.Attributes;
+using CsvHelper.TypeConversion;
 using Domain.CommonEntities;
 using Localization.Abstractions.Interfaces;
-using Main.Application.Interfaces.Persistence;
-using Main.Entities.Producer;
+using Main.Application.Dtos.Producer;
+using Main.Application.Handlers.Producers;
+using MediatR;
+using Microsoft.Extensions.Logging;
 
 namespace Main.Application.Lrts.ProducerImport;
 
@@ -17,9 +19,10 @@ public class ProducerImportLrt(
     IRepository<Job, Guid> jobRepository,
     IUnitOfWork unitOfWork,
     IS3StorageService s3Service,
-    IProducerRepository producerRepository,
+    ISender sender,
+    ILogger<ProducerImportLrt> logger,
     IScopedStringLocalizer stringLocalizer)
-    : LrtNamedObjectBase(jobRepository, unitOfWork)
+    : LrtNamedObjectBase(jobRepository, unitOfWork, logger)
 {
     private const int BatchSize = 1000;
     private const int MaxErrors = 10_000;
@@ -45,16 +48,18 @@ public class ProducerImportLrt(
 
         var rowIdx = 1;
         var errors = state.Errors;
-        var producersToAdd = new List<Producer>();
+        var rowsToAdd = new List<(int idx, NewProducerCsvDto row)>();
 
-        await foreach (var row in csv.GetRecordsAsync<NewProducerCsvDto>(CancellationToken))
+        await csv.ReadAsync();
+        csv.ReadHeader();
+
+        while (await csv.ReadAsync())
         {
             if (rowIdx <= state.CurrentLine)
             {
                 rowIdx++;
                 continue;
             }
-            var producer = ProcessRow(rowIdx, row, errors);
 
             if (errors.Count >= MaxErrors)
             {
@@ -67,12 +72,28 @@ public class ProducerImportLrt(
                 Interrupt(stringLocalizer.Get("producer.too.many.errors.while.processing.batch"));
             }
 
-            if (producer != null)
-                producersToAdd.Add(producer);
-
-            if (producersToAdd.Count >= BatchSize)
+            NewProducerCsvDto row;
+            try
             {
-                await InsertAndClear(producersToAdd, CancellationToken);
+                row = csv.GetRecord<NewProducerCsvDto>();
+            }
+            catch (Exception ex) when (ex is CsvHelperException or TypeConverterException)
+            {
+                errors.Add(new ProducerImportError
+                {
+                    RowIdx = rowIdx,
+                    Message = ex.Message
+                });
+
+                rowIdx++;
+                continue;
+            }
+            
+            rowsToAdd.Add((rowIdx, row));
+
+            if (rowsToAdd.Count >= BatchSize)
+            {
+                await InsertAndClear(rowsToAdd, errors);
                 await UpdateState(state with
                 {
                     CurrentLine = rowIdx,
@@ -83,8 +104,8 @@ public class ProducerImportLrt(
             rowIdx++;
         }
 
-        if (producersToAdd.Count > 0)
-            await InsertAndClear(producersToAdd, CancellationToken);
+        if (rowsToAdd.Count > 0)
+            await InsertAndClear(rowsToAdd, errors);
 
         await UpdateState(state with
         {
@@ -95,36 +116,43 @@ public class ProducerImportLrt(
 
 
     private async Task InsertAndClear(
-        List<Producer> producers,
-        CancellationToken cancellationToken)
-    {
-        await producerRepository.BulkInsertOnConflictDoNothing(producers, cancellationToken);
-        producers.Clear();
-    }
-
-    private Producer? ProcessRow(
-        int rowIdx,
-        NewProducerCsvDto row,
+        List<(int idx, NewProducerCsvDto row)> producers,
         List<ProducerImportError> errors)
     {
-        try
-        {
-            return Producer.Create(row.Name, row.Description);
-        }
-        catch (Exception ex)
-        {
-            var message = ex is ILocalizableException localizableException
-                ? stringLocalizer.GetOrDefault(localizableException.MessageKey) ?? ex.Message
-                : ex.Message;
+        if (producers.Count == 0) return;
 
+        var firstIdx = producers[0].idx;
+        
+        var result = (await sender.Send(
+            new CreateProducerBatchCommand(
+                producers.Select(x => new NewProducerDto
+                {
+                    Name = x.row.Name,
+                    Description = x.row.Description
+                })),
+            CancellationToken));
+
+        foreach (var (idx, message) in result.Errors)
+        {
             errors.Add(new ProducerImportError
             {
-                RowIdx = rowIdx,
-                Message = message
+                Message = message,
+                RowIdx = firstIdx + idx
             });
-
-            return null;
         }
+        
+        Logger.LogInformation(
+            "Producer import batch processed. JobId: {JobId}, " +
+            "BatchStartRow: {BatchStartRow}, BatchSize: {BatchSize}, " +
+            "Created: {Created}, Skipped: {Skipped}, Errors: {Errors}",
+            JobId,
+            firstIdx,
+            producers.Count,
+            result.Created,
+            result.Skipped,
+            result.Errors.Count);
+        
+        producers.Clear();
     }
     
     private record NewProducerCsvDto

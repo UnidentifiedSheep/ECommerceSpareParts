@@ -1,8 +1,12 @@
 using System.Text.Json.Nodes;
 using Api.Common.Extensions;
 using Common;
+using Gateway.EndPoints;
+using Gateway.Options;
+using Gateway.Services.Jobs;
 using OpenTelemetry.Metrics;
 using Scalar.AspNetCore;
+using Security;
 using Yarp.ReverseProxy.Transforms;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -50,7 +54,8 @@ Console.WriteLine($"Gateway reverse proxy config loaded. Routes: {routeCount}, c
 if (routeCount == 0 || clusterCount == 0)
     throw new InvalidOperationException("Gateway reverse proxy config is empty.");
 
-builder.Services.AddReverseProxy()
+builder.Services
+    .AddReverseProxy()
     .LoadFromConfig(reverseProxySection)
     .AddTransforms(builderContext =>
     {
@@ -65,6 +70,14 @@ builder.Services.AddReverseProxy()
         });
     });
 builder.Services.AddHttpClient();
+builder.Services
+    .AddOptions<JobAggregationOptions>()
+    .BindConfiguration(JobAggregationOptions.SectionName)
+    .ValidateDataAnnotations()
+    .ValidateOnStart();
+
+builder.Services.AddScoped<IJobAggregationService, JobAggregationService>();
+builder.Services.AddHttpClient("jobs-aggregation");
 
 builder.Services.AddCors(options =>
 {
@@ -98,6 +111,7 @@ app.UseCors();
 app.UseAuthorization();
 
 app.UseWebSockets();
+app.MapJobEndPoints();
 app.MapReverseProxy();
 
 app.UseOpenTelemetryPrometheusScrapingEndpoint();

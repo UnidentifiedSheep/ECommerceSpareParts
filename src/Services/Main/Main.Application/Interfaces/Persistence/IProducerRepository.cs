@@ -8,6 +8,6 @@ public interface IProducerRepository : IRepository<Producer, int>
     Task<bool> ProducerHasAnyArticle(int producerId, CancellationToken cancellationToken = default);
 
     Task BulkInsertOnConflictDoNothing(
-        IEnumerable<Entities.Producer.Producer> producers,
+        IEnumerable<Producer> producers,
         CancellationToken cancellationToken = default);
 }

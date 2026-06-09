@@ -20,8 +20,6 @@ public class JobConfiguration : IEntityTypeConfiguration<Job>
         builder.Property(e => e.Status)
             .HasColumnName("status")
             .HasConversion<string>();
-
-        builder.HasDiscriminator(e => e.SystemName);
         
         builder.Property(e => e.Attempts)
             .HasColumnName("attempts");
@@ -30,7 +28,8 @@ public class JobConfiguration : IEntityTypeConfiguration<Job>
             .HasColumnName("max_attempts");
 
         builder.Property(e => e.SystemName)
-            .HasColumnName("system_name");
+            .HasColumnName("system_name")
+            .HasMaxLength(128);
 
         builder.Property(e => e.ErrorMessage)
             .HasColumnName("error_message");

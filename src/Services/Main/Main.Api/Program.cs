@@ -127,16 +127,7 @@ builder.Services
     .AddEComAuth(builder.Configuration)
     .AddMailLayer()
     .AddCommonLayer()
-    .AddS3(sp =>
-    {
-        var options = sp.GetRequiredService<IOptions<S3Options>>().Value;
-        var config = new AmazonS3Config
-        {
-            ServiceURL = options.Url,
-            ForcePathStyle = options.ForcePathStyle
-        };
-        return new AmazonS3Client(options.Login, options.Password, config);
-    })
+    .AddS3()
     .AddApplicationLayer(builder.Configuration)
     .AddLocalization(builder.Configuration)
     .AddExchangeRates();

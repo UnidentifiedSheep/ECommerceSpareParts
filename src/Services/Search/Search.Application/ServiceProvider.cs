@@ -17,17 +17,18 @@ public static class ServiceProvider
         this IServiceCollection services,
         IConfiguration configuration)
     {
-        services.AddApplicationBase(
-            configuration: configuration,
-            assembly: typeof(ServiceProvider).Assembly,
-            behaviorsToExclude:
-            [
-                typeof(TransactionBehavior<,>),
-                typeof(SaveChangesBehavior<,>),
-                typeof(IntegrationEventPublisherBehavior<,>),
-                typeof(DbValidationBehavior<,>),
-                typeof(CacheBehavior<,>)
-            ]);
+        services
+            .AddApplicationBase(
+                configuration: configuration,
+                assembly: typeof(ServiceProvider).Assembly,
+                behaviorsToExclude:
+                [
+                    typeof(TransactionBehavior<,>),
+                    typeof(SaveChangesBehavior<,>),
+                    typeof(IntegrationEventPublisherBehavior<,>),
+                    typeof(DbValidationBehavior<,>),
+                    typeof(CacheBehavior<,>)
+                ]);
 
         services.AddSingleton<IIndexSynchronizer<Product, int>, ProductIndexSynchronizer>();
         services.AddSingleton<IIndexSynchronizer<Producer, int>, ProducerIndexSynchronizer>();

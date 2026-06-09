@@ -5,13 +5,18 @@ using Application.Common.Interfaces.Lrt;
 using Application.Common.Interfaces.Repositories;
 using Attributes;
 using Domain.CommonEntities;
+using Microsoft.Extensions.Logging;
 
 namespace Application.Common.LRT;
 
 public abstract class LrtBase(
     IRepository<Job, Guid> jobRepository,
-    IUnitOfWork unitOfWork) : ILrt, ILrtDescriptor
+    IUnitOfWork unitOfWork,
+    ILogger logger) : ILrt, ILrtDescriptor
 {
+    protected IUnitOfWork UnitOfWork => unitOfWork;
+    protected IRepository<Job, Guid> JobRepository => jobRepository;
+    protected ILogger Logger => logger;
     protected CancellationToken CancellationToken { get; private set; }
     protected Job Job { get; private set; } = null!;
     protected Guid JobId { get; private set; }
@@ -26,6 +31,10 @@ public abstract class LrtBase(
         Job = null!;
         Initialized = false;
 
+        logger.LogInformation(
+            "LRT execution started. JobId: {JobId}",
+            JobId);
+
         while (true)
         {
             try
@@ -39,23 +48,48 @@ public abstract class LrtBase(
                 
                 await DoWork();
                 await SucceedJobAsync();
+                logger.LogInformation(
+                    "LRT execution completed. JobId: {JobId}",
+                    JobId);
                 break;
                 
             }
             catch (OperationCanceledException) when (cancellationToken.IsCancellationRequested)
             {
                 await CancelJobAsync();
+                logger.LogInformation(
+                    "LRT execution cancelled. JobId: {JobId}",
+                    JobId);
                 break;
             }
             catch (LrtInterruptedException e)
             {
                 await AttemptOrFailJobAsync(e, true);
+                logger.LogWarning(
+                    e,
+                    "LRT execution interrupted. JobId: {JobId}",
+                    JobId);
                 break;
             }
             catch (Exception e)
             {
                 if (await AttemptOrFailJobAsync(e))
+                {
+                    logger.LogWarning(
+                        e,
+                        "LRT execution attempt failed. JobId: {JobId}, Attempts: {Attempts}/{MaxAttempts}",
+                        JobId,
+                        Job.Attempts,
+                        Job.MaxAttempts);
                     continue;
+                }
+
+                logger.LogError(
+                    e,
+                    "LRT execution failed. JobId: {JobId}, Attempts: {Attempts}/{MaxAttempts}",
+                    JobId,
+                    Job.Attempts,
+                    Job.MaxAttempts);
                 break;
             }
         }
@@ -108,6 +142,9 @@ public abstract class LrtBase(
                 await GetJobAsync();
                 Job.Start();
                 await unitOfWork.SaveChangesAsync(CancellationToken);
+                logger.LogInformation(
+                    "LRT job processing started. JobId: {JobId}",
+                    JobId);
             },
             CancellationToken);
     }
