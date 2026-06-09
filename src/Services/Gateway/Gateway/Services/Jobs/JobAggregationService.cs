@@ -11,7 +11,7 @@ public interface IJobAggregationService
     Task<GetGatewayJobsResponse> GetJobsAsync(
         HttpContext context,
         CancellationToken cancellationToken);
-}
+}//TODO: part of logic in this service must go to client
 
 public sealed class JobAggregationService(
     IHttpClientFactory httpClientFactory,

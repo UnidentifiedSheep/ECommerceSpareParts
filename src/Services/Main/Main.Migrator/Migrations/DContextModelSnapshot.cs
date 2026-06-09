@@ -99,8 +99,6 @@ namespace Main.Migrator.Migrations
                     b.HasIndex(new[] { "SystemName" }, "jobs_system_name_idx");
 
                     b.ToTable("jobs", "public");
-
-                    b.HasDiscriminator<string>("SystemName").HasValue("Job");
                 });
 
             modelBuilder.Entity("Domain.CommonEntities.Setting", b =>

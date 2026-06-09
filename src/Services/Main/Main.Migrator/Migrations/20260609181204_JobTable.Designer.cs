@@ -14,7 +14,7 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace Main.Migrator.Migrations
 {
     [DbContext(typeof(DContext))]
-    [Migration("20260608211512_JobTable")]
+    [Migration("20260609181204_JobTable")]
     partial class JobTable
     {
         /// <inheritdoc />
@@ -70,8 +70,8 @@ namespace Main.Migrator.Migrations
 
                     b.Property<string>("SystemName")
                         .IsRequired()
-                        .HasMaxLength(3)
-                        .HasColumnType("character varying(3)")
+                        .HasMaxLength(128)
+                        .HasColumnType("character varying(128)")
                         .HasColumnName("system_name");
 
                     b.Property<DateTime>("UpdatedAt")
@@ -102,8 +102,6 @@ namespace Main.Migrator.Migrations
                     b.HasIndex(new[] { "SystemName" }, "jobs_system_name_idx");
 
                     b.ToTable("jobs", "public");
-
-                    b.HasDiscriminator<string>("SystemName").HasValue("Job");
                 });
 
             modelBuilder.Entity("Domain.CommonEntities.Setting", b =>
