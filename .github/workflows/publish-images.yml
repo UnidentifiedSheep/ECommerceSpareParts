@@ -46,31 +46,19 @@ jobs:
                   return os.path.relpath(value, workspace)
               return value
 
-          def normalize_build_args(value):
-              if not value:
-                  return ""
-              if isinstance(value, dict):
-                  return "\n".join(f"{key}={val}" for key, val in value.items())
-              return "\n".join(value)
-
           for name, service in data["services"].items():
               build = service.get("build")
               if build is None:
                   continue
 
-              tags = build.get("tags") or [service.get("image")]
-              tags = [tag for tag in tags if tag]
+              image = service.get("image") or (build.get("tags") or [""])[0]
+              image_name = image.split("/")[-1].split(":")[0]
 
               result.append({
                   "service": name,
+                  "image": image_name,
                   "context": normalize_path(build.get("context") or "."),
-                  "dockerfile": normalize_path(build.get("dockerfile") or "Dockerfile"),
-                  "target": build.get("target") or "",
-                  "platforms": "\n".join(build.get("platforms") or []),
-                  "build_args": normalize_build_args(build.get("args")),
-                  "tags": "\n".join(tags),
-                  "cache_from": "\n".join(build.get("cache_from") or []),
-                  "cache_to": "\n".join(build.get("cache_to") or [])
+                  "dockerfile": normalize_path(build.get("dockerfile") or "Dockerfile")
               })
 
           print(json.dumps(result))
@@ -120,9 +108,6 @@ jobs:
           push: true
           provenance: false
           sbom: false
-          target: ${{ matrix.target }}
-          platforms: ${{ matrix.platforms }}
-          build-args: ${{ matrix.build_args }}
-          tags: ${{ matrix.tags }}
-          cache-from: ${{ matrix.cache_from }}
-          cache-to: ${{ matrix.cache_to }}
+          tags: ${{ secrets.ARTIFACT_REGISTRY_HOST }}/${{ matrix.image }}:${{ github.sha }}
+          cache-from: type=registry,ref=${{ secrets.ARTIFACT_REGISTRY_HOST }}/${{ matrix.image }}:buildcache
+          cache-to: type=registry,ref=${{ secrets.ARTIFACT_REGISTRY_HOST }}/${{ matrix.image }}:buildcache,mode=min
