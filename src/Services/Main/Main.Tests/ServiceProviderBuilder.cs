@@ -3,7 +3,6 @@ using Abstractions.Models;
 using Api.Common;
 using Cache;
 using Localization.Domain.Extensions;
-using Mail;
 using Main.Application.Configs;
 using Main.Cache;
 using Main.Persistence;

@@ -1,0 +1,19 @@
+﻿{
+  "locale": "en",
+  "keyValues": {
+    "price": "Price",
+    "date": "Date",
+    "quantity": "Quantity",
+    "start_time": "Start time",
+    "end_time": "End time",
+    "min_price": "Minimum price",
+    "max_price": "Maximum price",
+    "average_price": "Average price",
+    "volatility": "Volatility",
+    "price_info": "Price information",
+    "timer": "Calculation time",
+    "total_amount": "Total amount",
+    "file_name": "File name",
+    "file_name_description": "The name of file"
+  }
+}

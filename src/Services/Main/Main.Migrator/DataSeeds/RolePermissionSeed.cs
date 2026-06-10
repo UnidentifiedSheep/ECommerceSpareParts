@@ -146,7 +146,10 @@ public class RolePermissionSeed : ISeed<DContext>
                 PermissionCodes.STORAGE_ROUTES_EDIT,
                 PermissionCodes.STORAGE_ROUTES_CREATE,
                 PermissionCodes.STORAGE_ROUTES_DELETE,
-                PermissionCodes.LOGISTICS_CALCULATE
+                PermissionCodes.LOGISTICS_CALCULATE,
+                PermissionCodes.UPLOADS_CREATE,
+                PermissionCodes.JOBS_CREATE,
+                PermissionCodes.JOBS_GET
             ],
 
             [Role.Worker] =
@@ -216,7 +219,10 @@ public class RolePermissionSeed : ISeed<DContext>
                 PermissionCodes.PRODUCERS_DELETE,
                 PermissionCodes.OPTIONS_GET,
                 PermissionCodes.STORAGE_ROUTES_EDIT,
-                PermissionCodes.LOGISTICS_CALCULATE
+                PermissionCodes.LOGISTICS_CALCULATE,
+                PermissionCodes.UPLOADS_CREATE,
+                PermissionCodes.JOBS_CREATE,
+                PermissionCodes.JOBS_GET
             ],
 
             [Role.Member] =
@@ -228,7 +234,9 @@ public class RolePermissionSeed : ISeed<DContext>
                 PermissionCodes.BALANCES_TRANSACTION_GET_ME,
                 PermissionCodes.STORAGES_CONTENT_GET_STANDARD,
                 PermissionCodes.USERS_VEHICLES_CREATE_ME,
-                PermissionCodes.ARTICLES_GET_MAIN
+                PermissionCodes.ARTICLES_GET_MAIN,
+                PermissionCodes.JOBS_CREATE,
+                PermissionCodes.JOBS_GET
             ],
 
             [Role.Supplier] = [],
@@ -322,7 +330,10 @@ public class RolePermissionSeed : ISeed<DContext>
                 PermissionCodes.STORAGE_ROUTES_EDIT,
                 PermissionCodes.STORAGE_ROUTES_CREATE,
                 PermissionCodes.STORAGE_ROUTES_DELETE,
-                PermissionCodes.LOGISTICS_CALCULATE
+                PermissionCodes.LOGISTICS_CALCULATE,
+                PermissionCodes.UPLOADS_CREATE,
+                PermissionCodes.JOBS_CREATE,
+                PermissionCodes.JOBS_GET
             ]
         };
     }

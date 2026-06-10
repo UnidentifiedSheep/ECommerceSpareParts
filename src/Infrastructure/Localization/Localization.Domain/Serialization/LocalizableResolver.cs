@@ -1,6 +1,5 @@
-﻿using System.Text.Json;
+using System.Text.Json;
 using System.Text.Json.Serialization.Metadata;
-using Attributes;
 using Attributes.JsonAttributes;
 using Localization.Abstractions.Interfaces;
 
@@ -19,10 +18,7 @@ public sealed class LocalizableResolver(
 
         foreach (var prop in info.Properties)
         {
-            var attr = prop.AttributeProvider?
-                .GetCustomAttributes(typeof(LocalizableJsonPropertyNameAttribute), true)
-                .OfType<LocalizableJsonPropertyNameAttribute>()
-                .FirstOrDefault();
+            var attr = GetAttribute<LocalizedJsonFieldNameAttribute>(prop);
 
             if (attr is null)
                 continue;
@@ -34,5 +30,14 @@ public sealed class LocalizableResolver(
         }
 
         return info;
+    }
+
+    private static T? GetAttribute<T>(JsonPropertyInfo prop)
+        where T : Attribute
+    {
+        return prop.AttributeProvider?
+            .GetCustomAttributes(typeof(T), true)
+            .OfType<T>()
+            .FirstOrDefault();
     }
 }

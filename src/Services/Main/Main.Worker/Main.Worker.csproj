@@ -26,10 +26,14 @@
             <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
             <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
         </Content>
+        <Content Include="..\..\Application.Common\Localization\**\*">
+            <Link>Localization\%(RecursiveDir)%(Filename)%(Extension)</Link>
+            <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+            <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+        </Content>
     </ItemGroup>
 
     <ItemGroup>
-      <ProjectReference Include="..\..\..\Infrastructure\Mail\Mail.csproj" />
       <ProjectReference Include="..\..\..\Infrastructure\Security\Security.csproj" />
       <ProjectReference Include="..\..\Api.Common\Api.Common.csproj" />
       <ProjectReference Include="..\Main.Api\Main.Api.csproj" />

@@ -73,4 +73,14 @@ public static class ServiceProvider
 
         return collection;
     }
+
+    public static IServiceCollection AddLrtOptions(this IServiceCollection collection)
+    {
+        collection.AddOptions<LrtExecutorOptions>()
+            .BindConfiguration(LrtExecutorOptions.SectionName)
+            .ValidateDataAnnotations()
+            .ValidateOnStart();
+        
+        return collection;
+    }
 }

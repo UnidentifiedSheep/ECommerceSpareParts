@@ -14,6 +14,7 @@ using Main.Application.HangFireTasks;
 using Main.Application.Interfaces.Logistics;
 using Main.Application.Interfaces.Services;
 using Main.Application.Interfaces.Services.Currency;
+using Main.Application.Lrts.ProducerImport;
 using Main.Application.Services;
 using Main.Application.Services.Currency;
 using Main.Application.Services.Logistics;
@@ -32,6 +33,7 @@ public static class ServiceProvider
     {
         collection
             .AddNamedObjects()
+            .AddLrtLayer(typeof(ProducerImportLrt).Assembly)
             .AddFusionCache()
             .WithRegisteredDistributedCache()
             .WithRegisteredBackplane()

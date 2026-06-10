@@ -4,4 +4,5 @@ public interface INamedObjectRegistry<TBaseObject> where TBaseObject : INamedObj
 {
     TBaseObject GetBySystemName(string systemName);
     TBaseObject? TryGetBySystemName(string systemName);
+    IReadOnlyCollection<TBaseObject> All { get; }
 }

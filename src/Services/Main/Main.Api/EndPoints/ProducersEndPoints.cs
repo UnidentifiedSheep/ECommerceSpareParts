@@ -97,7 +97,7 @@ public class ProducersEndPoints : ICarterModule
 
         producers.MapPost("", async (ISender sender, CreateProducerRequest request, CancellationToken token) =>
             {
-                var result = await sender.Send(request.Adapt<CreateProducerCommand>(), token);
+                var result = await sender.Send(new CreateProducerCommand(request.NewProducer), token);
                 return Results.Created("/producers", new CreateProducerResponse(result.Producer));
             })
             .WithName("CreateProducer")

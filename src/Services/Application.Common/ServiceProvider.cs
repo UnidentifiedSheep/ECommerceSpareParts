@@ -2,6 +2,9 @@
 using Application.Common.Backplane;
 using Application.Common.Behaviors;
 using Application.Common.Extensions;
+using Application.Common.Handlers.Jobs;
+using Application.Common.NamedObject;
+using MediatR;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using ZiggyCreatures.Caching.Fusion.Backplane;
@@ -66,6 +69,28 @@ public static class ServiceProvider
         return services;
     }
 
+    public static IServiceCollection AddLrtLayer(
+        this IServiceCollection services,
+        Assembly? assembly = null)
+    {
+        assembly ??= Assembly.GetExecutingAssembly();
+        services.RegisterNamedObject<LrtNamedObjectBase>(assembly);
+        
+        services.AddScoped<
+            IRequestHandler<GetAllAvailableJobsQuery, GetAllAvailableJobsResult>,
+            GetAllAvailableJobsHandler>();
+
+        services.AddScoped<
+            IRequestHandler<QueueJobCommand, QueueJobResult>,
+            QueueJobHandler>();
+
+        services.AddScoped<
+            IRequestHandler<RunJobBatchCommand, Unit>,
+            RunJobBatchHandler>();
+        
+        return services;
+    }
+
     private static MediatRServiceConfiguration RegisterIfNotExcluded(
         this MediatRServiceConfiguration serviceConfiguration,
         HashSet<Type> excludedTypes,
@@ -76,4 +101,5 @@ public static class ServiceProvider
         serviceConfiguration.AddOpenBehavior(openBehaviorType, serviceLifetime);
         return serviceConfiguration;
     }
+    
 }

@@ -1,6 +1,7 @@
 using System.Reflection;
 using Amazon.S3;
 using Api.Common;
+using Api.Common.EndPoints;
 using Api.Common.Extensions;
 using Application.Common.Backplane;
 using Cache;
@@ -126,16 +127,7 @@ builder.Services
     .AddEComAuth(builder.Configuration)
     .AddMailLayer()
     .AddCommonLayer()
-    .AddS3(sp =>
-    {
-        var options = sp.GetRequiredService<IOptions<S3Options>>().Value;
-        var config = new AmazonS3Config
-        {
-            ServiceURL = options.Url,
-            ForcePathStyle = options.ForcePathStyle
-        };
-        return new AmazonS3Client(options.Login, options.Password, config);
-    })
+    .AddS3()
     .AddApplicationLayer(builder.Configuration)
     .AddLocalization(builder.Configuration)
     .AddExchangeRates();
@@ -153,7 +145,9 @@ builder.Services.AddOpenTelemetry()
     });
 
 builder.Services.AddCarter(
-    new DependencyContextAssemblyCatalog(typeof(ProductsEndPoints).Assembly),
+    new DependencyContextAssemblyCatalog(
+        typeof(ProductsEndPoints).Assembly,
+        typeof(JobEndPoints).Assembly),
     c => c.WithEmptyValidators());
 
 var app = builder.Build();

@@ -7,8 +7,11 @@ public class S3Options
     public const string SectionName = "S3";
 
     [Required]
-    public required string Url { get; init; }
+    public required string InternalUrl { get; init; }
 
+    [Required]
+    public required string ExternalUrl { get; init; }
+    
     [Required]
     public required string Login { get; init; }
 

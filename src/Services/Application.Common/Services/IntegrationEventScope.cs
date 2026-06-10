@@ -16,6 +16,11 @@ public class IntegrationEventScope : IIntegrationEventScope
         _events[key] = @event;
     }
 
+    public void AddRange<T>(IEnumerable<T> events)
+    {
+        foreach (var @event in events) Add(@event);
+    }
+
     public IReadOnlyCollection<object> Flush()
     {
         var result = _events.Values.ToList();

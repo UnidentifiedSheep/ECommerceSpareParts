@@ -2,6 +2,7 @@ using System.Reflection;
 using Amazon.S3;
 using Api.Common;
 using Api.Common.Extensions;
+using Api.Common.HostedServices;
 using Application.Common.Backplane;
 using Cache;
 using Contracts.Auth;
@@ -43,7 +44,9 @@ builder.Services
     .AddDatabaseOptions()
     .AddEmailOptions()
     .AddPhoneOptions()
-    .AddJwtOptions();
+    .AddJwtOptions()
+    .AddS3Options()
+    .AddLrtOptions();
 
 builder.AddLokiLogger(
     builder.Configuration,
@@ -62,16 +65,7 @@ builder.Services
         Global.JsonOptions)
     .AddMailLayer()
     .AddCommonLayer()
-    .AddS3(sp =>
-    {
-        var options = sp.GetRequiredService<IOptions<S3Options>>().Value;
-        var config = new AmazonS3Config
-        {
-            ServiceURL = options.Url,
-            ForcePathStyle = options.ForcePathStyle
-        };
-        return new AmazonS3Client(options.Login, options.Password, config);
-    })
+    .AddS3()
     .AddApplicationLayer(builder.Configuration)
     .AddLocalization(builder.Configuration)
     .AddWorkerSecurityLayer()
@@ -79,7 +73,9 @@ builder.Services
     .AddExchangeRates();
 
 AddHostedServiceOptions(builder.Services);
-builder.Services.AddHostedService<EmailWorkHostedService>();
+builder.Services
+    .AddHostedService<EmailWorkHostedService>()
+    .AddHostedService<LrtExecutorHostedService>();
 
 builder.Services.AddHangfire((sp, x) =>
 {
@@ -151,7 +147,10 @@ void AddMassTransit(IHostApplicationBuilder hostBuilder)
             cfg.ReceiveEndpoint("main-worker-queue", ep =>
             {
                 ep.Durable = true;
-
+                
+                ep.ConcurrentMessageLimit = 4;
+                ep.PrefetchCount = 1;
+                
                 ep.ConfigureConsumer<CurrencyCreatedConsumer>(context);
                 ep.ConfigureConsumer<ProductSizesUpdatedConsumer>(context);
                 ep.ConfigureConsumer<ProductWeightUpdatedConsumer>(context);
@@ -163,6 +162,7 @@ void AddMassTransit(IHostApplicationBuilder hostBuilder)
                 ep.ConfigureConsumer<ProductLinkageUpdatedConsumer>(context);
                 ep.ConfigureConsumer<CurrencyRatesChangedConsumer>(context);
 
+                
                 ep.Bind<CurrencyCreatedEvent>();
                 ep.Bind<StorageContentUpdatedEvent>();
                 ep.Bind<ProductSizesUpdatedEvent>();
