@@ -1,4 +1,5 @@
 using Application.Common.Validators;
+using Enums;
 using FluentValidation;
 using Localization.Domain.Extensions;
 
@@ -8,8 +9,9 @@ public class GetTransactionsValidation : AbstractValidator<GetTransactionsQuery>
 {
     public GetTransactionsValidation()
     {
-        RuleFor(x => new { x.ReceiverId, x.SenderId })
+        RuleFor(x => new { x.ReceiverId, x.SenderId, x.LogicalOperation })
             .Must(x => x.ReceiverId != x.SenderId || x.ReceiverId == null)
+            .When(x => x.LogicalOperation == LogicalOperation.And)
             .WithLocalizationKey("transaction.sender.receiver.must.not.be.same");
 
         RuleFor(x => new { x.ReceiverId, x.SenderId })

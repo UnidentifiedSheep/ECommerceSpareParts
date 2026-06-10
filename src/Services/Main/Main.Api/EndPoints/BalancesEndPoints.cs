@@ -88,6 +88,7 @@ public class BalancesEndPoints : ICarterModule
                     request.CurrencyId,
                     request.SenderId,
                     request.ReceiverId,
+                    request.LogicalOperation,
                     new Cursor<(Guid id, DateTime dt)>((
                             request.CursorId ?? Guid.Empty,
                             request.CursorDate ?? DateTime.MinValue),
