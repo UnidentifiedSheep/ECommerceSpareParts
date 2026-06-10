@@ -80,9 +80,9 @@ jobs:
     needs: discover-images
     strategy:
       fail-fast: false
-      max-parallel: 3
+      max-parallel: 6
       matrix: ${{ fromJson(needs.discover-images.outputs.matrix) }}
-    timeout-minutes: 30
+    timeout-minutes: 10
 
     env:
       ARTIFACT_REGISTRY_HOST: ${{ secrets.ARTIFACT_REGISTRY_HOST }}
@@ -103,6 +103,23 @@ jobs:
           password: ${{ secrets.ARTIFACT_REGISTRY_PASSWORD }}
 
       - name: Build and push ${{ matrix.service }}
+        id: build_push
+        timeout-minutes: 25
+        continue-on-error: true
+        uses: docker/build-push-action@v6
+        with:
+          context: ${{ matrix.context }}
+          file: ${{ matrix.dockerfile }}
+          push: true
+          provenance: false
+          sbom: false
+          tags: ${{ secrets.ARTIFACT_REGISTRY_HOST }}/${{ matrix.image }}:${{ github.sha }}
+          cache-from: type=registry,ref=${{ secrets.ARTIFACT_REGISTRY_HOST }}/${{ matrix.image }}:buildcache
+          cache-to: type=registry,ref=${{ secrets.ARTIFACT_REGISTRY_HOST }}/${{ matrix.image }}:buildcache,mode=min,ignore-error=true
+
+      - name: Retry build and push ${{ matrix.service }}
+        if: steps.build_push.outcome == 'failure'
+        timeout-minutes: 25
         uses: docker/build-push-action@v6
         with:
           context: ${{ matrix.context }}
