@@ -2,7 +2,7 @@ using Application.Common.Validators;
 using FluentValidation;
 using Localization.Domain.Extensions;
 
-namespace Main.Application.Handlers.Purchases.GetPurchase;
+namespace Main.Application.Handlers.Purchases.GetPurchases;
 
 public class GetPurchasesValidation : AbstractValidator<GetPurchasesQuery>
 {

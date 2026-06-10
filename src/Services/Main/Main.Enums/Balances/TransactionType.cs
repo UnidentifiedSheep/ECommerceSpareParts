@@ -1,4 +1,4 @@
-namespace Main.Enums;
+namespace Main.Enums.Balances;
 
 public enum TransactionType
 {

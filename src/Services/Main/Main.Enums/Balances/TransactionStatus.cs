@@ -1,4 +1,4 @@
-﻿namespace Main.Enums;
+﻿namespace Main.Enums.Balances;
 
 [Flags]
 public enum TransactionStatus
