@@ -36,7 +36,7 @@
 
     <ItemGroup>
         <Content Include="..\..\..\..\.dockerignore">
-            <Link>.dockerignore</Link>
+          <Link>.dockerignore</Link>
         </Content>
         <Content Include="..\Pricing.Abstractions\Localization\**\*">
             <Link>Localization\%(RecursiveDir)%(Filename)%(Extension)</Link>

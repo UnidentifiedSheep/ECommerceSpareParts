@@ -26,13 +26,18 @@ COPY ["src/Services/Application.Common/Application.Common.csproj", "src/Services
 COPY ["src/Core/Contracts/Contracts.csproj", "src/Core/Contracts/"]
 COPY ["src/Core/Domain/Domain.csproj", "src/Core/Domain/"]
 COPY ["src/Infrastructure/Localization/Localization.Domain/Localization.Domain.csproj", "src/Infrastructure/Localization/Localization.Domain/"]
+COPY ["src/Infrastructure/S3/S3.csproj", "src/Infrastructure/S3/"]
+COPY ["src/Infrastructure/Persistence/Persistence.csproj", "src/Infrastructure/Persistence/"]
+COPY ["src/Infrastructure/Common/Common.csproj", "src/Infrastructure/Common/"]
 COPY ["src/Services/Pricing/Pricing.Abstractions/Pricing.Abstractions.csproj", "src/Services/Pricing/Pricing.Abstractions/"]
 COPY ["src/Services/Pricing/Pricing.Entities/Pricing.Entities.csproj", "src/Services/Pricing/Pricing.Entities/"]
 COPY ["src/Services/Pricing/Pricing.Enums/Pricing.Enums.csproj", "src/Services/Pricing/Pricing.Enums/"]
 COPY ["src/Services/Pricing/Pricing.Application/Pricing.Application.csproj", "src/Services/Pricing/Pricing.Application/"]
 COPY ["src/Infrastructure/Integrations/Internal/Internal.Integration.Core/Internal.Integration.Core.csproj", "src/Infrastructure/Integrations/Internal/Internal.Integration.Core/"]
 COPY ["src/Services/Pricing/Pricing.Persistence/Pricing.Persistence.csproj", "src/Services/Pricing/Pricing.Persistence/"]
-COPY ["src/Infrastructure/Persistence/Persistence.csproj", "src/Infrastructure/Persistence/"]
+COPY ["src/Infrastructure/Integrations/Internal/Internal.Integration.Main/Internal.Integration.Main.csproj", "src/Infrastructure/Integrations/Internal/Internal.Integration.Main/"]
+COPY ["src/Infrastructure/Integrations/Internal/Internal.Integration.Auth/Internal.Integration.Auth.csproj", "src/Infrastructure/Integrations/Internal/Internal.Integration.Auth/"]
+COPY ["src/Infrastructure/Integrations/Internal/Internal.Integration.Di/Internal.Integration.Di.csproj", "src/Infrastructure/Integrations/Internal/Internal.Integration.Di/"]
 RUN dotnet restore "src/Services/Pricing/Pricing.Api/Pricing.Api.csproj"
 COPY . .
 WORKDIR "/src/src/Services/Pricing/Pricing.Api"

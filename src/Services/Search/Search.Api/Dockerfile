@@ -25,11 +25,19 @@ COPY ["src/Services/Application.Common/Application.Common.csproj", "src/Services
 COPY ["src/Core/Contracts/Contracts.csproj", "src/Core/Contracts/"]
 COPY ["src/Core/Domain/Domain.csproj", "src/Core/Domain/"]
 COPY ["src/Infrastructure/Localization/Localization.Domain/Localization.Domain.csproj", "src/Infrastructure/Localization/Localization.Domain/"]
+COPY ["src/Infrastructure/S3/S3.csproj", "src/Infrastructure/S3/"]
+COPY ["src/Infrastructure/Persistence/Persistence.csproj", "src/Infrastructure/Persistence/"]
+COPY ["src/Infrastructure/Common/Common.csproj", "src/Infrastructure/Common/"]
+COPY ["src/Infrastructure/Cache/Cache.csproj", "src/Infrastructure/Cache/"]
 COPY ["src/Services/Search/Search.Abstractions/Search.Abstractions.csproj", "src/Services/Search/Search.Abstractions/"]
 COPY ["src/Services/Search/Search.Entities/Search.Entities.csproj", "src/Services/Search/Search.Entities/"]
 COPY ["src/Services/Search/Search.Enums/Search.Enums.csproj", "src/Services/Search/Search.Enums/"]
 COPY ["src/Services/Search/Search.Application/Search.Application.csproj", "src/Services/Search/Search.Application/"]
 COPY ["src/Services/Search/Search.Persistence/Search.Persistence.csproj", "src/Services/Search/Search.Persistence/"]
+COPY ["src/Infrastructure/Integrations/Internal/Internal.Integration.Core/Internal.Integration.Core.csproj", "src/Infrastructure/Integrations/Internal/Internal.Integration.Core/"]
+COPY ["src/Infrastructure/Integrations/Internal/Internal.Integration.Di/Internal.Integration.Di.csproj", "src/Infrastructure/Integrations/Internal/Internal.Integration.Di/"]
+COPY ["src/Infrastructure/Integrations/Internal/Internal.Integration.Auth/Internal.Integration.Auth.csproj", "src/Infrastructure/Integrations/Internal/Internal.Integration.Auth/"]
+COPY ["src/Infrastructure/Integrations/Internal/Internal.Integration.Main/Internal.Integration.Main.csproj", "src/Infrastructure/Integrations/Internal/Internal.Integration.Main/"]
 RUN dotnet restore "src/Services/Search/Search.Api/Search.Api.csproj"
 COPY . .
 WORKDIR "/src/src/Services/Search/Search.Api"

@@ -23,6 +23,11 @@ COPY ["src/Services/Application.Common/Application.Common.csproj", "src/Services
 COPY ["src/Core/Contracts/Contracts.csproj", "src/Core/Contracts/"]
 COPY ["src/Core/Domain/Domain.csproj", "src/Core/Domain/"]
 COPY ["src/Infrastructure/Localization/Localization.Domain/Localization.Domain.csproj", "src/Infrastructure/Localization/Localization.Domain/"]
+COPY ["src/Infrastructure/S3/S3.csproj", "src/Infrastructure/S3/"]
+COPY ["src/Infrastructure/RabbitMq/RabbitMq.csproj", "src/Infrastructure/RabbitMq/"]
+COPY ["src/Infrastructure/Persistence/Persistence.csproj", "src/Infrastructure/Persistence/"]
+COPY ["src/Infrastructure/Common/Common.csproj", "src/Infrastructure/Common/"]
+COPY ["src/Infrastructure/Cache/Cache.csproj", "src/Infrastructure/Cache/"]
 RUN dotnet restore "src/Services/Gateway/Gateway/Gateway.csproj"
 COPY . .
 WORKDIR "/src/src/Services/Gateway/Gateway"
