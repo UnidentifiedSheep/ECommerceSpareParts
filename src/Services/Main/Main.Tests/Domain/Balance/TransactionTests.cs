@@ -2,6 +2,7 @@
 using FluentAssertions;
 using Main.Entities.Balance;
 using Main.Enums;
+using Main.Enums.Balances;
 
 namespace Tests.Domain.Balance;
 
@@ -27,7 +28,8 @@ public class TransactionTests
             1,
             TransactionType.Transfer,
             100m,
-            DateTime.UtcNow);
+            DateTime.UtcNow,
+            TransactionSourceType.Manual);
 
         act.Should().Throw<InvalidInputException>();
     }
@@ -248,6 +250,7 @@ public class TransactionTests
             1,
             TransactionType.Transfer,
             100m,
-            DateTime.UtcNow);
+            DateTime.UtcNow,
+            TransactionSourceType.Manual);
     }
 }

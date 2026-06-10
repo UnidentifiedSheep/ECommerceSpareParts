@@ -5,6 +5,7 @@ using Domain.Extensions;
 using Domain.Interfaces;
 using Exceptions;
 using Main.Enums;
+using Main.Enums.Balances;
 
 namespace Main.Entities.Balance;
 
@@ -20,7 +21,8 @@ public class Transaction : AuditableEntity<Transaction, Guid>, ILinqEntity<Trans
         int currencyId,
         TransactionType type,
         decimal transactionSum,
-        DateTime transactionDatetime)
+        DateTime transactionDatetime,
+        TransactionSourceType sourceType)
     {
         if (senderId == receiverId)
             throw new InvalidInputException(""); //TODO: create error message.
@@ -28,6 +30,7 @@ public class Transaction : AuditableEntity<Transaction, Guid>, ILinqEntity<Trans
         ReceiverId = receiverId;
         Type = type;
         Status = TransactionStatus.Pending;
+        SourceType = sourceType;
         SetTransactionDatetime(transactionDatetime);
         SetCurrencyId(currencyId);
         SetAmount(transactionSum);
@@ -45,6 +48,7 @@ public class Transaction : AuditableEntity<Transaction, Guid>, ILinqEntity<Trans
     public DateTime TransactionDatetime { get; private set; }
     public DateTime? ReversedAt { get; private set; }
     public Guid? ReversedBy { get; private set; }
+    public TransactionSourceType SourceType { get; private set; }
     public uint RowVersion { get; private set; }
 
     public bool IsCompleted => Status.HasFlag(TransactionStatus.Completed);
@@ -71,9 +75,17 @@ public class Transaction : AuditableEntity<Transaction, Guid>, ILinqEntity<Trans
         int currencyId,
         TransactionType type,
         decimal transactionSum,
-        DateTime transactionDatetime)
+        DateTime transactionDatetime,
+        TransactionSourceType sourceType)
     {
-        return new Transaction(senderId, receiverId, currencyId, type, transactionSum, transactionDatetime);
+        return new Transaction(
+            senderId, 
+            receiverId, 
+            currencyId, 
+            type, 
+            transactionSum, 
+            transactionDatetime,
+            sourceType);
     }
 
     private void SetAmount(decimal newAmount)

@@ -10,6 +10,7 @@ using Main.Entities.Balance;
 using Main.Entities.Exceptions;
 using Main.Entities.Purchase;
 using Main.Enums;
+using Main.Enums.Balances;
 using MediatR;
 
 namespace Main.Application.Services;
@@ -77,7 +78,8 @@ public class PurchaseLogisticsService(
                         systemUserId,
                         deliveryCost.DeliveryCost.TotalCost,
                         route.Currency.Id,
-                        purchaseDateTime),
+                        purchaseDateTime,
+                        TransactionSourceType.Logistic),
                     cancellationToken))
                 .Transaction;
 

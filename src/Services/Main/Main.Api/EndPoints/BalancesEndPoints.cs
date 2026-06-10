@@ -6,6 +6,7 @@ using Main.Application.Dtos.Balances;
 using Main.Application.Handlers.Balance.CreateTransaction;
 using Main.Application.Handlers.Balance.GetTransactions;
 using Main.Application.Handlers.Balance.ReverseTransaction;
+using Main.Enums.Balances;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
 
@@ -48,7 +49,8 @@ public class BalancesEndPoints : ICarterModule
                     request.ReceiverId,
                     request.Amount,
                     request.CurrencyId,
-                    request.TransactionDateTime);
+                    request.TransactionDateTime,
+                    TransactionSourceType.Manual);
                 await sender.Send(command, token);
                 return Results.Ok();
             })

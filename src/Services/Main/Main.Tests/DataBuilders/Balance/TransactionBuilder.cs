@@ -1,6 +1,7 @@
 using Bogus;
 using Main.Entities.Balance;
 using Main.Enums;
+using Main.Enums.Balances;
 using Test.Common.Abstractions;
 
 namespace Tests.DataBuilders.Balance;
@@ -17,6 +18,7 @@ public class TransactionBuilder(Faker faker) : BuilderBase<Transaction>(faker)
     public bool ApplyTransaction { get; private set; }
     public UserBalance? SenderBalance { get; private set; }
     public UserBalance? ReceiverBalance { get; private set; }
+    public TransactionSourceType? SourceType { get; private set; }
 
     public TransactionBuilder WithSenderId(Guid senderId)
     {
@@ -73,6 +75,12 @@ public class TransactionBuilder(Faker faker) : BuilderBase<Transaction>(faker)
         return this;
     }
 
+    public TransactionBuilder WithSourceType(TransactionSourceType sourceType)
+    {
+        SourceType = sourceType;
+        return this;
+    }
+
     public override Transaction Build()
     {
         var transaction = Transaction.Create(
@@ -81,7 +89,8 @@ public class TransactionBuilder(Faker faker) : BuilderBase<Transaction>(faker)
             CurrencyId ?? Faker.Random.Int(1, 100),
             Type ?? TransactionType.Transfer,
             Amount ?? Faker.Random.Decimal(1m, 10_000m),
-            TransactionDateTime ?? DateTime.UtcNow);
+            TransactionDateTime ?? DateTime.UtcNow,
+            SourceType ?? TransactionSourceType.Manual);
 
         if (CompleteTransaction)
             transaction.Complete();

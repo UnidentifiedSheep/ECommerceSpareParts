@@ -39,6 +39,9 @@ public class TransactionConfiguration : IEntityTypeConfiguration<Transaction>
 
         builder.Property(e => e.ReversedAt)
             .HasColumnName("reversed_at");
+        
+        builder.Property(e => e.SourceType)
+            .HasColumnName("source_type");
 
         builder.Property(e => e.ReversedBy)
             .HasColumnName("reversed_by");

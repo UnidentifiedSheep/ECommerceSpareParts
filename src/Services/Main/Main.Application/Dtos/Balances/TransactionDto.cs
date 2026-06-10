@@ -1,6 +1,7 @@
 using System.Text.Json.Serialization;
 using Main.Application.Dtos.Users;
 using Main.Enums;
+using Main.Enums.Balances;
 
 namespace Main.Application.Dtos.Balances;
 
@@ -29,4 +30,7 @@ public record TransactionDto
 
     [JsonPropertyName("status")]
     public required TransactionStatus Status { get; init; }
+    
+    [JsonPropertyName("sourceType")]
+    public required TransactionSourceType SourceType { get; init; }
 }

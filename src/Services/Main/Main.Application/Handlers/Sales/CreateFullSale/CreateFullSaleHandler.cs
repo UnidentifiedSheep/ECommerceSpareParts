@@ -15,6 +15,7 @@ using Main.Entities.Balance;
 using Main.Entities.Exceptions;
 using Main.Entities.Product;
 using Main.Entities.Sale;
+using Main.Enums.Balances;
 using MediatR;
 using Utils;
 using IsolationLevel = System.Data.IsolationLevel;
@@ -168,7 +169,13 @@ public class CreateFullSaleHandler(
         DateTime transactionDateTime,
         CancellationToken cancellationToken = default)
     {
-        var command = new CreateTransactionCommand(senderId, receiverId, amount, currencyId, transactionDateTime);
+        var command = new CreateTransactionCommand(
+            senderId, 
+            receiverId, 
+            amount, 
+            currencyId, 
+            transactionDateTime,
+            TransactionSourceType.Sale);
         var result = await sender.Send(command, cancellationToken);
         return result.Transaction;
     }

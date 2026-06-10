@@ -23,6 +23,7 @@ using Main.Entities.Purchase;
 using Main.Entities.Setting;
 using Main.Entities.Storage;
 using Main.Enums;
+using Main.Enums.Balances;
 using MediatR;
 using Event = Main.Entities.Event.Event;
 
@@ -144,7 +145,8 @@ public class EditPurchaseHandler(
                     receiverId,
                     amount,
                     currencyId,
-                    transactionDateTime),
+                    transactionDateTime,
+                    TransactionSourceType.Purchase),
                 cancellationToken))
             .Transaction;
     }
