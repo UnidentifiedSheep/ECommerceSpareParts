@@ -14,8 +14,8 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace Main.Migrator.Migrations
 {
     [DbContext(typeof(DContext))]
-    [Migration("20260610210302_TransactionIndex")]
-    partial class TransactionIndex
+    [Migration("20260610210656_TransactionIdxSource")]
+    partial class TransactionIdxSource
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)

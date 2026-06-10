@@ -5,7 +5,7 @@
 namespace Main.Migrator.Migrations
 {
     /// <inheritdoc />
-    public partial class TransactionSource : Migration
+    public partial class TransactionIdxSource : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -17,6 +17,20 @@ namespace Main.Migrator.Migrations
                 type: "text",
                 nullable: false,
                 defaultValue: "");
+
+            migrationBuilder.CreateIndex(
+                name: "transactions_receiver_id_transaction_datetime_id_idx",
+                schema: "public",
+                table: "transactions",
+                columns: new[] { "receiver_id", "transaction_datetime", "id" },
+                descending: new[] { false, true, true });
+
+            migrationBuilder.CreateIndex(
+                name: "transactions_sender_id_transaction_datetime_id_idx",
+                schema: "public",
+                table: "transactions",
+                columns: new[] { "sender_id", "transaction_datetime", "id" },
+                descending: new[] { false, true, true });
 
             migrationBuilder.DropIndex(
                 name: "products_sku_index",
@@ -63,6 +77,16 @@ namespace Main.Migrator.Migrations
         /// <inheritdoc />
         protected override void Down(MigrationBuilder migrationBuilder)
         {
+            migrationBuilder.DropIndex(
+                name: "transactions_receiver_id_transaction_datetime_id_idx",
+                schema: "public",
+                table: "transactions");
+
+            migrationBuilder.DropIndex(
+                name: "transactions_sender_id_transaction_datetime_id_idx",
+                schema: "public",
+                table: "transactions");
+
             migrationBuilder.DropColumn(
                 name: "source_type",
                 schema: "public",
