@@ -28,19 +28,57 @@ jobs:
       - name: Discover Docker services
         id: discover
         run: |
-          APP_SERVICES=$(docker compose -f compose.yaml -f compose.registry.yaml --env-file .env.example config --format json \
-            | python3 -c 'import json, sys; data = json.load(sys.stdin); print(json.dumps([
-                {"service": name, "compose_files": "compose.yaml compose.registry.yaml"}
-                for name, service in data["services"].items()
-                if service.get("build") is not None
-              ]))')
+          discover_services() {
+            docker compose "$@" --env-file .env.example config --format json \
+              | python3 -c '
+          import json
+          import os
+          import sys
 
-          MIGRATOR_SERVICES=$(docker compose -f migrator-compose.yaml -f migrator-compose.registry.yaml --env-file .env.example config --format json \
-            | python3 -c 'import json, sys; data = json.load(sys.stdin); print(json.dumps([
-                {"service": name, "compose_files": "migrator-compose.yaml migrator-compose.registry.yaml"}
-                for name, service in data["services"].items()
-                if service.get("build") is not None
-              ]))')
+          data = json.load(sys.stdin)
+          workspace = os.getcwd()
+          result = []
+
+          def normalize_path(value):
+              if not value:
+                  return value
+              if os.path.isabs(value):
+                  return os.path.relpath(value, workspace)
+              return value
+
+          def normalize_build_args(value):
+              if not value:
+                  return ""
+              if isinstance(value, dict):
+                  return "\n".join(f"{key}={val}" for key, val in value.items())
+              return "\n".join(value)
+
+          for name, service in data["services"].items():
+              build = service.get("build")
+              if build is None:
+                  continue
+
+              tags = build.get("tags") or [service.get("image")]
+              tags = [tag for tag in tags if tag]
+
+              result.append({
+                  "service": name,
+                  "context": normalize_path(build.get("context") or "."),
+                  "dockerfile": normalize_path(build.get("dockerfile") or "Dockerfile"),
+                  "target": build.get("target") or "",
+                  "platforms": "\n".join(build.get("platforms") or []),
+                  "build_args": normalize_build_args(build.get("args")),
+                  "tags": "\n".join(tags),
+                  "cache_from": "\n".join(build.get("cache_from") or []),
+                  "cache_to": "\n".join(build.get("cache_to") or [])
+              })
+
+          print(json.dumps(result))
+          '
+          }
+
+          APP_SERVICES=$(discover_services -f compose.yaml -f compose.registry.yaml)
+          MIGRATOR_SERVICES=$(discover_services -f migrator-compose.yaml -f migrator-compose.registry.yaml)
 
           MATRIX=$(APP_SERVICES="$APP_SERVICES" MIGRATOR_SERVICES="$MIGRATOR_SERVICES" python3 -c 'import json, os; print(json.dumps({
               "include": json.loads(os.environ["APP_SERVICES"]) + json.loads(os.environ["MIGRATOR_SERVICES"])
@@ -75,11 +113,16 @@ jobs:
           password: ${{ secrets.ARTIFACT_REGISTRY_PASSWORD }}
 
       - name: Build and push ${{ matrix.service }}
-        run: |
-          COMPOSE_ARGS=()
-          for file in ${{ matrix.compose_files }}; do
-            COMPOSE_ARGS+=("-f" "$file")
-          done
-
-          docker compose "${COMPOSE_ARGS[@]}" --env-file .env.example build ${{ matrix.service }}
-          docker compose "${COMPOSE_ARGS[@]}" --env-file .env.example push ${{ matrix.service }}
+        uses: docker/build-push-action@v6
+        with:
+          context: ${{ matrix.context }}
+          file: ${{ matrix.dockerfile }}
+          push: true
+          provenance: false
+          sbom: false
+          target: ${{ matrix.target }}
+          platforms: ${{ matrix.platforms }}
+          build-args: ${{ matrix.build_args }}
+          tags: ${{ matrix.tags }}
+          cache-from: ${{ matrix.cache_from }}
+          cache-to: ${{ matrix.cache_to }}
