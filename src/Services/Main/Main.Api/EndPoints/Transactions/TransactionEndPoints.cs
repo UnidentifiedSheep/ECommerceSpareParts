@@ -1,6 +1,5 @@
 using Abstractions.Models;
 using Api.Common.Extensions;
-using Carter;
 using Enums;
 using Main.Application.Dtos.Balances;
 using Main.Application.Handlers.Balance.CreateTransaction;
@@ -10,7 +9,7 @@ using Main.Enums.Balances;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
 
-namespace Main.Api.EndPoints;
+namespace Main.Api.EndPoints.Transactions;
 
 public record CreateTransactionRequest(
     Guid SenderId,
@@ -32,14 +31,11 @@ public record GetTransactionsRequest(
     [FromQuery(Name = "cursorDate")] DateTime? CursorDate,
     [FromQuery(Name = "size")] int Size);
 
-public class BalancesEndPoints : ICarterModule
+public static class TransactionEndPoints
 {
-    public void AddRoutes(IEndpointRouteBuilder app)
+    public static RouteGroupBuilder MapTransactionEndPoints(this RouteGroupBuilder balances)
     {
-        var balances = app.MapGroup("/balances")
-            .WithTags("Balances");
-
-        balances.MapPost("/transactions", async (
+        balances.MapPost("", async (
                 ISender sender,
                 CreateTransactionRequest request,
                 CancellationToken token) =>
@@ -63,7 +59,7 @@ public class BalancesEndPoints : ICarterModule
             .ProducesProblem(StatusCodes.Status400BadRequest)
             .RequireAnyPermission(PermissionCodes.BALANCES_TRANSACTION_CREATE);
 
-        balances.MapDelete("/transactions/{id:guid}", async (
+        balances.MapDelete("{id:guid}", async (
                 ISender sender,
                 Guid id,
                 CancellationToken token) =>
@@ -79,7 +75,7 @@ public class BalancesEndPoints : ICarterModule
             .ProducesProblem(StatusCodes.Status404NotFound)
             .RequireAnyPermission(PermissionCodes.BALANCES_TRANSACTION_DELETE);
 
-        balances.MapGet("/transactions", async (
+        balances.MapGet("", async (
                 ISender sender,
                 [AsParameters] GetTransactionsRequest request,
                 CancellationToken token) =>
@@ -106,5 +102,7 @@ public class BalancesEndPoints : ICarterModule
             .Produces<GetTransactionsResponse>()
             .ProducesProblem(StatusCodes.Status400BadRequest)
             .RequireAnyPermission(PermissionCodes.BALANCES_TRANSACTION_GET_ALL);
+
+        return balances;
     }
 }

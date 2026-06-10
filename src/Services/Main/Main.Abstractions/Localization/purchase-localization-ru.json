@@ -21,6 +21,7 @@
     "purchase.datetime.not.future": "Дата закупки не может быть в будущем.",
     "purchase.content.duplicate.ids.not.allowed": "Дубликаты ID позиций не допускаются.",
     "purchase.comment.too.long": "Длина комментария закупки должна быть максимум 256 символов.",
-    "purchase.content.comment.too.long": "Длина комментария позиции должна быть максимум 256 символов."
+    "purchase.content.comment.too.long": "Длина комментария позиции должна быть максимум 256 символов.",
+    "purchase.id.or.transaction.id.required": "Необходимо заполнить ID закупки или ID транзакции."
   }
 }
