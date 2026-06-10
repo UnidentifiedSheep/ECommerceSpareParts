@@ -52,6 +52,8 @@ public class Transaction : AuditableEntity<Transaction, Guid>, ILinqEntity<Trans
 
     public bool IsReversed => Status.HasFlag(TransactionStatus.Reversed);
     public bool IsReversalApplied => Status.HasFlag(TransactionStatus.ReversedApplied);
+    public User.User Receiver { get; private set; } = null!;
+    public User.User Sender { get; private set; } = null!;
 
     public static Expression<Func<Transaction, Guid>> GetKeySelector()
     {

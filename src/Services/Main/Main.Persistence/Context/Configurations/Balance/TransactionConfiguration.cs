@@ -80,13 +80,13 @@ public class TransactionConfiguration : IEntityTypeConfiguration<Transaction>
             .OnDelete(DeleteBehavior.Restrict)
             .HasConstraintName("transactions_users_id_fk_4");
 
-        builder.HasOne<Entities.User.User>()
+        builder.HasOne<Entities.User.User>(x => x.Receiver)
             .WithMany()
             .HasForeignKey(d => d.ReceiverId)
             .OnDelete(DeleteBehavior.Restrict)
             .HasConstraintName("transactions_users_id_fk_2");
 
-        builder.HasOne<Entities.User.User>()
+        builder.HasOne<Entities.User.User>(x => x.Sender)
             .WithMany()
             .HasForeignKey(d => d.SenderId)
             .OnDelete(DeleteBehavior.Restrict)

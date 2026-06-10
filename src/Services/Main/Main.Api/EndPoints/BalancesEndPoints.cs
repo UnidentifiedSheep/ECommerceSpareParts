@@ -1,8 +1,10 @@
+using Abstractions.Models;
 using Api.Common.Extensions;
 using Carter;
 using Enums;
 using Main.Application.Dtos.Balances;
 using Main.Application.Handlers.Balance.CreateTransaction;
+using Main.Application.Handlers.Balance.GetTransactions;
 using Main.Application.Handlers.Balance.ReverseTransaction;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
@@ -16,7 +18,7 @@ public record CreateTransactionRequest(
     int CurrencyId,
     DateTime TransactionDateTime);
 
-public record GetTransactionsAmwResponse(IEnumerable<TransactionDto> Transactions);
+public record GetTransactionsResponse(IReadOnlyList<TransactionDto> Transactions);
 
 public record GetTransactionsRequest(
     [FromQuery(Name = "rangeStart")] DateTime RangeStart,
@@ -24,8 +26,10 @@ public record GetTransactionsRequest(
     [FromQuery(Name = "currencyId")] int? CurrencyId,
     [FromQuery(Name = "senderId")] Guid? SenderId,
     [FromQuery(Name = "receiverId")] Guid? ReceiverId,
-    [FromQuery(Name = "page")] int Page,
-    [FromQuery(Name = "limit")] int Limit);
+    [FromQuery(Name = "logicalOperator")] LogicalOperation LogicalOperation,
+    [FromQuery(Name = "cursorId")] Guid? CursorId,
+    [FromQuery(Name = "cursorDate")] DateTime? CursorDate,
+    [FromQuery(Name = "size")] int Size);
 
 public class BalancesEndPoints : ICarterModule
 {
@@ -34,7 +38,7 @@ public class BalancesEndPoints : ICarterModule
         var balances = app.MapGroup("/balances")
             .WithTags("Balances");
 
-        balances.MapPost("/transaction", async (
+        balances.MapPost("/transactions", async (
                 ISender sender,
                 CreateTransactionRequest request,
                 CancellationToken token) =>
@@ -57,7 +61,7 @@ public class BalancesEndPoints : ICarterModule
             .ProducesProblem(StatusCodes.Status400BadRequest)
             .RequireAnyPermission(PermissionCodes.BALANCES_TRANSACTION_CREATE);
 
-        balances.MapDelete("/transaction/{id:guid}", async (
+        balances.MapDelete("/transactions/{id:guid}", async (
                 ISender sender,
                 Guid id,
                 CancellationToken token) =>
@@ -78,13 +82,25 @@ public class BalancesEndPoints : ICarterModule
                 [AsParameters] GetTransactionsRequest request,
                 CancellationToken token) =>
             {
-                await Task.CompletedTask;
+                var query = new GetTransactionsQuery(
+                    request.RangeStart,
+                    request.RangeEnd,
+                    request.CurrencyId,
+                    request.SenderId,
+                    request.ReceiverId,
+                    new Cursor<(Guid id, DateTime dt)>((
+                            request.CursorId ?? Guid.Empty,
+                            request.CursorDate ?? DateTime.MinValue),
+                        request.Size));
+
+                var result = await sender.Send(query, token);
+                return Results.Ok(new GetTransactionsResponse(result.Transactions));
             })
             .WithName("GetBalanceTransactions")
             .WithSummary("Получить транзакции баланса")
             .WithDescription("Получение списка транзакций")
             .WithDisplayName("Получение транзакций")
-            .Produces(StatusCodes.Status200OK)
+            .Produces<GetTransactionsResponse>()
             .ProducesProblem(StatusCodes.Status400BadRequest)
             .RequireAnyPermission(PermissionCodes.BALANCES_TRANSACTION_GET_ALL);
     }
