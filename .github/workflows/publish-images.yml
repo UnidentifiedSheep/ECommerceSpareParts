@@ -82,7 +82,7 @@ jobs:
       fail-fast: false
       max-parallel: 6
       matrix: ${{ fromJson(needs.discover-images.outputs.matrix) }}
-    timeout-minutes: 10
+    timeout-minutes: 15
 
     env:
       ARTIFACT_REGISTRY_HOST: ${{ secrets.ARTIFACT_REGISTRY_HOST }}
@@ -104,7 +104,7 @@ jobs:
 
       - name: Build and push ${{ matrix.service }}
         id: build_push
-        timeout-minutes: 25
+        timeout-minutes: 5
         continue-on-error: true
         uses: docker/build-push-action@v6
         with:
@@ -119,7 +119,7 @@ jobs:
 
       - name: Retry build and push ${{ matrix.service }}
         if: steps.build_push.outcome == 'failure'
-        timeout-minutes: 25
+        timeout-minutes: 5
         uses: docker/build-push-action@v6
         with:
           context: ${{ matrix.context }}
