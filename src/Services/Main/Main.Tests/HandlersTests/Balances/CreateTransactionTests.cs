@@ -1,6 +1,7 @@
 using FluentAssertions;
 using Main.Abstractions.Constants;
 using Main.Application.Handlers.Balance.CreateTransaction;
+using Main.Enums.Balances;
 using Microsoft.EntityFrameworkCore;
 using Test.Common.TestContainers.Combined;
 using Tests.TestContexts;
@@ -34,7 +35,8 @@ public class CreateTransactionTests : IntegrationTest
             receiver.Id,
             amount,
             currency.Id,
-            transactionDateTime));
+            transactionDateTime,
+            TransactionSourceType.Manual));
 
         var transaction = await Context.Transactions
             .AsNoTracking()
@@ -120,6 +122,7 @@ public class CreateTransactionTests : IntegrationTest
             receiver.Id,
             100m,
             currency.Id,
-            DateTime.UtcNow);
+            DateTime.UtcNow,
+            TransactionSourceType.Manual);
     }
 }

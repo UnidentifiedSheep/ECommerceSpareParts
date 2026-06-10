@@ -10,6 +10,7 @@ using Main.Application.Handlers.Purchases.DeletePurchase;
 using Main.Application.Handlers.Purchases.EditPurchase;
 using Main.Application.Handlers.Purchases.GetPurchase;
 using Main.Application.Handlers.Purchases.GetPurchaseContent;
+using Main.Application.Handlers.Purchases.GetPurchases;
 using Mapster;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
@@ -66,6 +67,8 @@ public record GetPurchaseContentResponse
 }
 
 public record GetPurchaseLogisticResponse(PurchaseLogisticDto PurchaseLogistic);
+
+public record GetPurchaseResponse(PurchaseDto Purchase);
 
 public record GetPurchasesResponse(IEnumerable<PurchaseDto> Purchases);
 
@@ -160,6 +163,26 @@ public class PurchaseEndPoints : ICarterModule
             .ProducesProblem(StatusCodes.Status400BadRequest)
             .ProducesProblem(StatusCodes.Status404NotFound)
             .RequireAnyPermission(PermissionCodes.PURCHASE_EDIT);
+
+        purchases.MapGet("/{purchaseId:guid}", async (
+                ISender sender,
+                Guid purchaseId,
+                CancellationToken cancellationToken) =>
+            {
+                var result = await sender.Send(
+                    new GetPurchaseQuery(purchaseId, null),
+                    cancellationToken);
+
+                return Results.Ok(new GetPurchaseResponse(result.Purchase));
+            })
+            .WithName("GetPurchase")
+            .WithSummary("Получить закупку")
+            .WithDescription("Получение закупки по идентификатору")
+            .WithDisplayName("Получение закупки")
+            .Produces<GetPurchaseResponse>()
+            .ProducesProblem(StatusCodes.Status400BadRequest)
+            .ProducesProblem(StatusCodes.Status404NotFound)
+            .RequireAnyPermission(PermissionCodes.PURCHASE_GET);
 
         purchases.MapGet("/{id:guid}/contents", async (ISender sender, Guid id, CancellationToken ct) =>
             {

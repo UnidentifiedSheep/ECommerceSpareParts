@@ -1,6 +1,5 @@
 using System.Linq.Expressions;
 using Application.Common.Interfaces.Repositories;
-using Main.Entities.Auth;
 using Main.Entities.User;
 using RoleEnum = Main.Enums.Role;
 
@@ -69,23 +68,13 @@ internal static class UserRoleFilter
             : user => !user.Roles.Any(role => normalizedRoles.Contains(role.RoleName));
     }
 
-    private static string Normalize(string role)
-    {
-        return RoleNames.Normalize(role);
-    }
-
-    private static string Normalize(RoleEnum role)
-    {
-        return Normalize(role.ToString());
-    }
-
     private static IReadOnlyCollection<string> NormalizeMany(IEnumerable<string> roles)
     {
-        return roles.Select(Normalize).Distinct().ToArray();
+        return roles.Select(RoleExtensions.ToNormalizedRole).Distinct().ToArray();
     }
 
     private static IReadOnlyCollection<string> NormalizeMany(IEnumerable<RoleEnum> roles)
     {
-        return roles.Select(Normalize).Distinct().ToArray();
+        return roles.Select(RoleExtensions.ToNormalizedRole).Distinct().ToArray();
     }
 }

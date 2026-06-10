@@ -1,4 +1,5 @@
 using Abstractions.Models;
+using Enums;
 using FluentAssertions;
 using Main.Application.Handlers.Balance.GetTransactions;
 using Test.Common.TestContainers.Combined;
@@ -24,7 +25,7 @@ public class GetTransactionsTests : IntegrationTest
         var result = await Mediator.Send(GetQuery(senderId));
 
         result.Transactions.Should().ContainSingle();
-        result.Transactions[0].SenderId.Should().Be(senderId);
+        result.Transactions[0].Sender.User?.Id.Should().Be(senderId);
     }
 
     [Fact]
@@ -35,7 +36,7 @@ public class GetTransactionsTests : IntegrationTest
         var result = await Mediator.Send(GetQuery(receiverId: receiverId));
 
         result.Transactions.Should().ContainSingle();
-        result.Transactions[0].ReceiverId.Should().Be(receiverId);
+        result.Transactions[0].Receiver.User?.Id.Should().Be(receiverId);
     }
 
     [Fact]
@@ -57,6 +58,22 @@ public class GetTransactionsTests : IntegrationTest
         var result = await Mediator.Send(GetQuery(receiverId: receiverId, size: 1));
 
         result.Transactions.Should().HaveCount(1);
+    }
+
+    [Fact]
+    public async Task GetTransactions_WithOr_ReturnsTransactionsWhereUserIsSenderOrReceiver()
+    {
+        var userId = TestContext.Users[0].Id;
+
+        var result = await Mediator.Send(GetQuery(
+            senderId: userId,
+            receiverId: userId,
+            logicalOperation: LogicalOperation.Or));
+
+        result.Transactions.Should().NotBeEmpty();
+        result.Transactions.Should().OnlyContain(x =>
+            x.Sender.User != null && x.Sender.User.Id == userId ||
+            x.Receiver.User != null && x.Receiver.User.Id == userId);
     }
 
     [Fact]
@@ -90,7 +107,8 @@ public class GetTransactionsTests : IntegrationTest
         int? currencyId = null,
         int size = 20,
         DateTime? rangeStart = null,
-        DateTime? rangeEnd = null)
+        DateTime? rangeEnd = null,
+        LogicalOperation logicalOperation = LogicalOperation.And)
     {
         return new GetTransactionsQuery(
             rangeStart ?? DateTime.UtcNow.AddDays(-10),
@@ -98,6 +116,7 @@ public class GetTransactionsTests : IntegrationTest
             currencyId,
             senderId,
             receiverId,
+            logicalOperation,
             new Cursor<(Guid id, DateTime dt)>((Guid.Empty, DateTime.MinValue), size));
     }
 }

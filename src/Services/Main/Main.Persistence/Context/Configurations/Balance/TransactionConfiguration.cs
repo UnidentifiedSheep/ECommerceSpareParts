@@ -22,6 +22,14 @@ public class TransactionConfiguration : IEntityTypeConfiguration<Transaction>
 
         builder.HasIndex(e => new { e.SenderId, e.ReceiverId }, "transactions_sender_id_receiver_id_index");
 
+        builder.HasIndex(e => new { e.SenderId, e.TransactionDatetime, e.Id },
+                "transactions_sender_id_transaction_datetime_id_idx")
+            .IsDescending(false, true, true);
+
+        builder.HasIndex(e => new { e.ReceiverId, e.TransactionDatetime, e.Id },
+                "transactions_receiver_id_transaction_datetime_id_idx")
+            .IsDescending(false, true, true);
+
         builder.HasIndex(e => e.Type, "transactions_type_index");
 
         builder.HasIndex(e => new { e.TransactionDatetime, e.Id }, "transactions_transaction_datetime_id_index");
@@ -39,6 +47,9 @@ public class TransactionConfiguration : IEntityTypeConfiguration<Transaction>
 
         builder.Property(e => e.ReversedAt)
             .HasColumnName("reversed_at");
+        
+        builder.Property(e => e.SourceType)
+            .HasColumnName("source_type");
 
         builder.Property(e => e.ReversedBy)
             .HasColumnName("reversed_by");
@@ -80,13 +91,13 @@ public class TransactionConfiguration : IEntityTypeConfiguration<Transaction>
             .OnDelete(DeleteBehavior.Restrict)
             .HasConstraintName("transactions_users_id_fk_4");
 
-        builder.HasOne<Entities.User.User>()
+        builder.HasOne<Entities.User.User>(x => x.Receiver)
             .WithMany()
             .HasForeignKey(d => d.ReceiverId)
             .OnDelete(DeleteBehavior.Restrict)
             .HasConstraintName("transactions_users_id_fk_2");
 
-        builder.HasOne<Entities.User.User>()
+        builder.HasOne<Entities.User.User>(x => x.Sender)
             .WithMany()
             .HasForeignKey(d => d.SenderId)
             .OnDelete(DeleteBehavior.Restrict)

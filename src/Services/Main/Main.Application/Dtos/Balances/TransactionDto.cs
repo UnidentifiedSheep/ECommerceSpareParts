@@ -1,5 +1,7 @@
 using System.Text.Json.Serialization;
+using Main.Application.Dtos.Users;
 using Main.Enums;
+using Main.Enums.Balances;
 
 namespace Main.Application.Dtos.Balances;
 
@@ -8,11 +10,11 @@ public record TransactionDto
     [JsonPropertyName("id")]
     public required Guid Id { get; init; }
 
-    [JsonPropertyName("senderId")]
-    public required Guid SenderId { get; init; }
+    [JsonPropertyName("sender")]
+    public required TransactionPartyDto Sender { get; init; }
 
-    [JsonPropertyName("receiverId")]
-    public required Guid ReceiverId { get; init; }
+    [JsonPropertyName("receiver")]
+    public required TransactionPartyDto Receiver { get; init; }
 
     [JsonPropertyName("currencyId")]
     public required int CurrencyId { get; init; }
@@ -28,4 +30,7 @@ public record TransactionDto
 
     [JsonPropertyName("status")]
     public required TransactionStatus Status { get; init; }
+    
+    [JsonPropertyName("sourceType")]
+    public required TransactionSourceType SourceType { get; init; }
 }

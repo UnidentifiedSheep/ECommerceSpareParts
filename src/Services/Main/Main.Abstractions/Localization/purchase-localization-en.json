@@ -21,6 +21,7 @@
     "purchase.datetime.not.future": "Purchase date cannot be in the future.",
     "purchase.content.duplicate.ids.not.allowed": "Duplicate item IDs are not allowed.",
     "purchase.comment.too.long": "Purchase comment should have maximum 256 symbols",
-    "purchase.content.comment.too.long": "Purchase content comment should have maximum 256 symbols"
+    "purchase.content.comment.too.long": "Purchase content comment should have maximum 256 symbols",
+    "purchase.id.or.transaction.id.required": "Purchase ID or transaction ID must be provided."
   }
 }

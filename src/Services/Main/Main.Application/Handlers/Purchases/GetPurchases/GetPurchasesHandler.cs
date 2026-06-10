@@ -2,13 +2,13 @@ using Abstractions.Models;
 using Application.Common.Extensions;
 using Application.Common.Interfaces.Cqrs;
 using Application.Common.Interfaces.Repositories;
+using LinqKit;
 using Main.Application.Dtos.Purchase;
 using Main.Application.Handlers.Projections;
 using Main.Entities.Purchase;
 using Microsoft.EntityFrameworkCore;
-using LinqKit;
 
-namespace Main.Application.Handlers.Purchases.GetPurchase;
+namespace Main.Application.Handlers.Purchases.GetPurchases;
 
 public record GetPurchasesQuery(
     RangeModel<DateTime> DateRange,

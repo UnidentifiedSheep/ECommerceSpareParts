@@ -6,6 +6,7 @@ using Attributes;
 using Main.Application.Interfaces.Services;
 using Main.Entities.Balance;
 using Main.Enums;
+using Main.Enums.Balances;
 
 namespace Main.Application.Handlers.Balance.CreateTransaction;
 
@@ -16,7 +17,8 @@ public record CreateTransactionCommand(
     Guid ReceiverId,
     decimal Amount,
     int CurrencyId,
-    DateTime TransactionDateTime) : ICommand<CreateTransactionResult>;
+    DateTime TransactionDateTime,
+    TransactionSourceType SourceType) : ICommand<CreateTransactionResult>;
 
 public record CreateTransactionResult(Transaction Transaction);
 
@@ -34,7 +36,8 @@ public class CreateTransactionHandler(
             request.CurrencyId,
             TransactionType.Transfer,
             request.Amount,
-            request.TransactionDateTime);
+            request.TransactionDateTime,
+            request.SourceType);
 
         transaction.Complete();
         await balanceService.ChangeSenderReceiverBalancesAsync(transaction, cancellationToken);

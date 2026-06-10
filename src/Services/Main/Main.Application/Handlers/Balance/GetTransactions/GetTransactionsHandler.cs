@@ -5,6 +5,7 @@ using LinqKit;
 using Main.Application.Dtos.Balances;
 using Main.Application.Handlers.Projections;
 using Main.Entities.Balance;
+using Enums;
 using Microsoft.EntityFrameworkCore;
 
 namespace Main.Application.Handlers.Balance.GetTransactions;
@@ -15,6 +16,7 @@ public record GetTransactionsQuery(
     int? CurrencyId,
     Guid? SenderId,
     Guid? ReceiverId,
+    LogicalOperation LogicalOperation,
     Cursor<(Guid id, DateTime dt)> Cursor) : IQuery<GetTransactionsResult>;
 
 public record GetTransactionsResult(IReadOnlyList<TransactionDto> Transactions);
@@ -31,11 +33,11 @@ public class GetTransactionsHandler(
         if (request.CurrencyId.HasValue)
             query = query.Where(e => e.CurrencyId == request.CurrencyId.Value);
 
-        if (request.SenderId.HasValue)
-            query = query.Where(e => e.SenderId == request.SenderId.Value);
-
-        if (request.ReceiverId.HasValue)
-            query = query.Where(e => e.ReceiverId == request.ReceiverId.Value);
+        query = request.LogicalOperation switch
+        {
+            LogicalOperation.Or => ApplyOrUserFilter(query, request.SenderId, request.ReceiverId),
+            _ => ApplyAndUserFilter(query, request.SenderId, request.ReceiverId)
+        };
 
         var fixedStart = request.RangeStart.Date;
         var fixedEnd = request.RangeEnd.Date.AddDays(1);
@@ -54,5 +56,38 @@ public class GetTransactionsHandler(
             .ToListAsync(cancellationToken);
 
         return new GetTransactionsResult(res);
+    }
+
+    private static IQueryable<Transaction> ApplyAndUserFilter(
+        IQueryable<Transaction> query,
+        Guid? senderId,
+        Guid? receiverId)
+    {
+        if (senderId.HasValue)
+            query = query.Where(e => e.SenderId == senderId.Value);
+
+        if (receiverId.HasValue)
+            query = query.Where(e => e.ReceiverId == receiverId.Value);
+
+        return query;
+    }
+
+    private static IQueryable<Transaction> ApplyOrUserFilter(
+        IQueryable<Transaction> query,
+        Guid? senderId,
+        Guid? receiverId)
+    {
+        if (!senderId.HasValue && !receiverId.HasValue)
+            return query;
+
+        if (senderId == receiverId)
+        {
+            var userId = senderId ?? receiverId!.Value;
+            return query.Where(e => e.SenderId == userId || e.ReceiverId == userId);
+        }
+
+        return query.Where(e =>
+            senderId.HasValue && (e.SenderId == senderId.Value || e.ReceiverId == senderId.Value) ||
+            receiverId.HasValue && (e.SenderId == receiverId.Value || e.ReceiverId == receiverId.Value));
     }
 }

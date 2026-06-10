@@ -24,6 +24,7 @@ using Main.Entities.Setting;
 using Main.Entities.Storage;
 using Main.Entities.User;
 using Main.Enums;
+using Main.Enums.Balances;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 using Role = Main.Enums.Role;
@@ -78,7 +79,8 @@ public class CreatePurchaseHandler(
                     systemId,
                     totalSum,
                     request.CurrencyId,
-                    request.PurchaseDate), cancellationToken))
+                    request.PurchaseDate,
+                    TransactionSourceType.Purchase), cancellationToken))
             .Transaction;
 
         var storageContents = await AddContentsToStorage(
@@ -102,7 +104,8 @@ public class CreatePurchaseHandler(
                     supplier.Id,
                     request.PayedSum.Value,
                     request.CurrencyId,
-                    request.PurchaseDate),
+                    request.PurchaseDate,
+                    TransactionSourceType.Manual),
                 cancellationToken);
         
         await unitOfWork.SaveChangesAsync(cancellationToken);

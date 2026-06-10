@@ -1,12 +1,17 @@
 ﻿using System.Linq.Expressions;
 using LinqKit;
 using Main.Application.Dtos.Users;
+using Main.Application.Extensions;
 using Main.Entities.User;
+using Main.Enums;
+using Main.Enums.Balances;
 
 namespace Main.Application.Handlers.Projections;
 
 public static class UserProjections
 {
+    private static readonly string SystemRole = Role.System.ToNormalizedRole();
+    
     public static readonly Expression<Func<User, UserDto>> UserProjection =
         x => new UserDto
         {
@@ -44,4 +49,9 @@ public static class UserProjections
             EmailType = x.EmailType,
             IsPrimary = x.IsPrimary
         };
+
+    public static readonly Expression<Func<User, TransactionPartyType>> TransactionPartyTypeProjection =
+        x => x.Roles.Any(role => role.RoleName == SystemRole)
+            ? TransactionPartyType.System
+            : TransactionPartyType.User;
 }
