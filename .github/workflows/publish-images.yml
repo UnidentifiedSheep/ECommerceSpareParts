@@ -80,7 +80,9 @@ jobs:
     needs: discover-images
     strategy:
       fail-fast: false
+      max-parallel: 3
       matrix: ${{ fromJson(needs.discover-images.outputs.matrix) }}
+    timeout-minutes: 30
 
     env:
       ARTIFACT_REGISTRY_HOST: ${{ secrets.ARTIFACT_REGISTRY_HOST }}
@@ -110,4 +112,4 @@ jobs:
           sbom: false
           tags: ${{ secrets.ARTIFACT_REGISTRY_HOST }}/${{ matrix.image }}:${{ github.sha }}
           cache-from: type=registry,ref=${{ secrets.ARTIFACT_REGISTRY_HOST }}/${{ matrix.image }}:buildcache
-          cache-to: type=registry,ref=${{ secrets.ARTIFACT_REGISTRY_HOST }}/${{ matrix.image }}:buildcache,mode=min
+          cache-to: type=registry,ref=${{ secrets.ARTIFACT_REGISTRY_HOST }}/${{ matrix.image }}:buildcache,mode=min,ignore-error=true
