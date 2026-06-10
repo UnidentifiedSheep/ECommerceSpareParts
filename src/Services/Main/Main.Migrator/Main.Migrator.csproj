@@ -24,7 +24,7 @@
 
     <ItemGroup>
         <Content Include="..\..\..\..\.dockerignore">
-            <Link>.dockerignore</Link>
+          <Link>.dockerignore</Link>
         </Content>
         <Content Include="..\..\..\..\configs\**\*">
             <Link>configs\%(RecursiveDir)%(Filename)%(Extension)</Link>

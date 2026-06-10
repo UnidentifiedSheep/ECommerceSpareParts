@@ -17,9 +17,11 @@ COPY ["src/Services/Application.Common/Application.Common.csproj", "src/Services
 COPY ["src/Core/Contracts/Contracts.csproj", "src/Core/Contracts/"]
 COPY ["src/Infrastructure/Localization/Localization.Domain/Localization.Domain.csproj", "src/Infrastructure/Localization/Localization.Domain/"]
 COPY ["src/Infrastructure/Localization/Localization.Abstractions/Localization.Abstractions.csproj", "src/Infrastructure/Localization/Localization.Abstractions/"]
+COPY ["src/Core/Extensions/Extensions.csproj", "src/Core/Extensions/"]
 COPY ["src/Services/Pricing/Pricing.Abstractions/Pricing.Abstractions.csproj", "src/Services/Pricing/Pricing.Abstractions/"]
 COPY ["src/Services/Pricing/Pricing.Entities/Pricing.Entities.csproj", "src/Services/Pricing/Pricing.Entities/"]
 COPY ["src/Services/Pricing/Pricing.Enums/Pricing.Enums.csproj", "src/Services/Pricing/Pricing.Enums/"]
+COPY ["src/Infrastructure/Common/Common.csproj", "src/Infrastructure/Common/"]
 RUN dotnet restore "src/Services/Pricing/Pricing.Migrator/Pricing.Migrator.csproj"
 COPY . .
 WORKDIR "/src/src/Services/Pricing/Pricing.Migrator"

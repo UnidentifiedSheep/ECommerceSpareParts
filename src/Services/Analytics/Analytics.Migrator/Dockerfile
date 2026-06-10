@@ -17,9 +17,14 @@ COPY ["src/Services/Application.Common/Application.Common.csproj", "src/Services
 COPY ["src/Core/Contracts/Contracts.csproj", "src/Core/Contracts/"]
 COPY ["src/Infrastructure/Localization/Localization.Domain/Localization.Domain.csproj", "src/Infrastructure/Localization/Localization.Domain/"]
 COPY ["src/Infrastructure/Localization/Localization.Abstractions/Localization.Abstractions.csproj", "src/Infrastructure/Localization/Localization.Abstractions/"]
+COPY ["src/Core/Extensions/Extensions.csproj", "src/Core/Extensions/"]
 COPY ["src/Services/Analytics/Analytics.Abstractions/Analytics.Abstractions.csproj", "src/Services/Analytics/Analytics.Abstractions/"]
 COPY ["src/Services/Analytics/Analytics.Entities/Analytics.Entities.csproj", "src/Services/Analytics/Analytics.Entities/"]
 COPY ["src/Services/Analytics/Analytics.Enums/Analytics.Enums.csproj", "src/Services/Analytics/Analytics.Enums/"]
+COPY ["src/Services/Analytics/Analytics.Utils/Analytics.Utils.csproj", "src/Services/Analytics/Analytics.Utils/"]
+COPY ["src/Infrastructure/Integrations/Internal/Internal.Integration.Core/Internal.Integration.Core.csproj", "src/Infrastructure/Integrations/Internal/Internal.Integration.Core/"]
+COPY ["src/Services/Analytics/Analytics.Application/Analytics.Application.csproj", "src/Services/Analytics/Analytics.Application/"]
+COPY ["src/Infrastructure/Common/Common.csproj", "src/Infrastructure/Common/"]
 RUN dotnet restore "src/Services/Analytics/Analytics.Migrator/Analytics.Migrator.csproj"
 COPY . .
 WORKDIR "/src/src/Services/Analytics/Analytics.Migrator"
