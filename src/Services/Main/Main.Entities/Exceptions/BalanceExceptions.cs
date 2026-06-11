@@ -29,3 +29,7 @@ public class TransactionSourceCannotBeReversedByUserException(TransactionSourceT
         "transaction.source.cannot.be.reversed.by.user",
         new { SourceType = sourceType },
         [sourceType.ToString()]);
+
+public class TransactionWithSystemUserCannotBeCreatedByUserException()
+    : LocalizedBadRequestException(
+        "transaction.with.system.user.cannot.be.created.by.user");

@@ -150,7 +150,8 @@ public class EditPurchaseHandler(
                     amount,
                     currencyId,
                     transactionDateTime,
-                    TransactionSourceType.Purchase),
+                    TransactionSourceType.Purchase,
+                    TransactionCreationMode.System),
                 cancellationToken))
             .Transaction;
     }

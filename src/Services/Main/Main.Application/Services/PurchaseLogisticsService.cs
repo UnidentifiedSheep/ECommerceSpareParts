@@ -79,7 +79,8 @@ public class PurchaseLogisticsService(
                         deliveryCost.DeliveryCost.TotalCost,
                         route.Currency.Id,
                         purchaseDateTime,
-                        TransactionSourceType.Logistic),
+                        TransactionSourceType.Logistic,
+                        TransactionCreationMode.System),
                     cancellationToken))
                 .Transaction;
 

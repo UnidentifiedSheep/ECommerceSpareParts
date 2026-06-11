@@ -1,3 +1,4 @@
+using System.Text.Json.Serialization;
 using Abstractions.Models;
 using Api.Common.Extensions;
 using Enums;
@@ -11,12 +12,19 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace Main.Api.EndPoints.Transactions;
 
-public record CreateTransactionRequest(
-    Guid SenderId,
-    Guid ReceiverId,
-    decimal Amount,
-    int CurrencyId,
-    DateTime TransactionDateTime);
+public record CreateTransactionRequest
+{
+    [JsonPropertyName("senderId")]
+    public Guid SenderId { get; init; }
+    [JsonPropertyName("receiverId")]
+    public Guid ReceiverId { get; init; }
+    [JsonPropertyName("amount")]
+    public decimal Amount { get; init; }
+    [JsonPropertyName("currencyId")]
+    public int CurrencyId { get; init; }
+    [JsonPropertyName("transactionDateTime")]
+    public DateTime TransactionDateTime { get; init; }
+}
 
 public record GetTransactionsResponse(IReadOnlyList<TransactionDto> Transactions);
 

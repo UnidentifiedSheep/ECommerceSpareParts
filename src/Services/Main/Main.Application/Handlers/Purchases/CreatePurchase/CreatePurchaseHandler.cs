@@ -80,7 +80,8 @@ public class CreatePurchaseHandler(
                     totalSum,
                     request.CurrencyId,
                     request.PurchaseDate,
-                    TransactionSourceType.Purchase), cancellationToken))
+                    TransactionSourceType.Purchase,
+                    TransactionCreationMode.System), cancellationToken))
             .Transaction;
 
         var storageContents = await AddContentsToStorage(
@@ -105,7 +106,8 @@ public class CreatePurchaseHandler(
                     request.PayedSum.Value,
                     request.CurrencyId,
                     request.PurchaseDate,
-                    TransactionSourceType.Manual),
+                    TransactionSourceType.Manual,
+                    TransactionCreationMode.System),
                 cancellationToken);
         
         await unitOfWork.SaveChangesAsync(cancellationToken);

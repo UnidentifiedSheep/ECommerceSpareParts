@@ -2,9 +2,13 @@ using System.Data;
 using Abstractions.Interfaces.Persistence;
 using Abstractions.Interfaces.Services;
 using Application.Common.Interfaces.Cqrs;
+using Application.Common.Interfaces.Repositories;
 using Attributes;
+using Main.Application.Extensions;
 using Main.Application.Interfaces.Services;
 using Main.Entities.Balance;
+using Main.Entities.Exceptions;
+using Main.Entities.User;
 using Main.Enums;
 using Main.Enums.Balances;
 
@@ -18,18 +22,23 @@ public record CreateTransactionCommand(
     decimal Amount,
     int CurrencyId,
     DateTime TransactionDateTime,
-    TransactionSourceType SourceType) : ICommand<CreateTransactionResult>;
+    TransactionSourceType SourceType,
+    TransactionCreationMode Mode = TransactionCreationMode.User) : ICommand<CreateTransactionResult>;
 
 public record CreateTransactionResult(Transaction Transaction);
 
 public class CreateTransactionHandler(
     IBalanceService balanceService,
+    IRepository<User, Guid> userRepository,
     IUnitOfWork unitOfWork) : ICommandHandler<CreateTransactionCommand, CreateTransactionResult>
 {
     public async Task<CreateTransactionResult> Handle(
         CreateTransactionCommand request,
         CancellationToken cancellationToken)
     {
+        if (request.Mode == TransactionCreationMode.User)
+            await WhenUserCreates(request, cancellationToken);
+        
         var transaction = Transaction.Create(
             request.SenderId,
             request.ReceiverId,
@@ -44,5 +53,22 @@ public class CreateTransactionHandler(
 
         await unitOfWork.AddAsync(transaction, cancellationToken);
         return new CreateTransactionResult(transaction);
+    }
+
+    private async Task WhenUserCreates(
+        CreateTransactionCommand command,
+        CancellationToken cancellationToken)
+    {
+        var criteria = UserRoleFilter
+            .Apply(
+                Criteria<User>.New()
+                    .Where(x => x.Id == command.SenderId || x.Id == command.ReceiverId)
+                    .Track(false),
+                [Role.System],
+                true)
+            .Build();
+
+        if (await userRepository.FirstOrDefaultAsync(criteria, cancellationToken) is not null)
+            throw new TransactionWithSystemUserCannotBeCreatedByUserException();
     }
 }
