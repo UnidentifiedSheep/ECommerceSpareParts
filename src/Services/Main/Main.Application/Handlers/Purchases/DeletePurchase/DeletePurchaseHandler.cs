@@ -12,6 +12,7 @@ using Main.Application.Handlers.StorageContents.SubtractContent;
 using Main.Entities.Exceptions;
 using Main.Entities.Purchase;
 using Main.Enums;
+using Main.Enums.Balances;
 using MediatR;
 
 namespace Main.Application.Handlers.Purchases.DeletePurchase;
@@ -68,10 +69,15 @@ public class DeletePurchaseHandler(
         Purchase purchase, 
         CancellationToken token)
     {
-        await sender.Send(new ReverseTransactionCommand(purchase.TransactionId), token);
+        await sender.Send(
+            new ReverseTransactionCommand(purchase.TransactionId, TransactionReversalMode.System),
+            token);
+
         if (purchase.PurchaseLogistic?.TransactionId != null)
             await sender.Send(
-                new ReverseTransactionCommand(purchase.PurchaseLogistic.TransactionId.Value), 
+                new ReverseTransactionCommand(
+                    purchase.PurchaseLogistic.TransactionId.Value,
+                    TransactionReversalMode.System), 
                 token);
     }
 }

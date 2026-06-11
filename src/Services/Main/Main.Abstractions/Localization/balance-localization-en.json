@@ -5,6 +5,7 @@
     "deleted.transaction.cannot.be.edited": "You cannot edit a transaction that has already been deleted.",
     "transaction.already.deleted": "This transaction has already been deleted.",
     "transaction.not.found": "The transaction could not be found.",
+    "transaction.source.cannot.be.reversed.by.user": "A transaction with source '{0}' cannot be reversed by a user.",
     "transaction.sender.id.required": "Sender ID must be provided.",
     "transaction.receiver.id.required": "Receiver ID must be provided.",
     "transaction.date.out.of.range": "Transaction date must be within the last 2 months and no more than 1 hour in the future.",
