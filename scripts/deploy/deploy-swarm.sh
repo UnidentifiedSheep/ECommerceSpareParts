@@ -82,6 +82,9 @@ wait_for_service_running() {
     local desired_running
     local current_running
     local failed_count
+    local update_status
+    local update_state
+    local update_message
 
     desired_running="$(sudo docker service ps "$service_name" \
       --filter desired-state=running \
@@ -90,10 +93,21 @@ wait_for_service_running() {
       --filter desired-state=running \
       --format '{{.CurrentState}}' | grep -c '^Running' || true)"
     failed_count="$(sudo docker service ps "$service_name" \
+      --filter desired-state=running \
       --format '{{.CurrentState}}|{{.Error}}' | grep -Eci 'Failed|Rejected|non-zero exit|No such image' || true)"
+    update_status="$(sudo docker service inspect "$service_name" \
+      --format '{{if .UpdateStatus}}{{.UpdateStatus.State}}|{{.UpdateStatus.Message}}{{end}}' 2>/dev/null || true)"
+    update_state="${update_status%%|*}"
+    update_message="${update_status#*|}"
 
     if [ "$desired_running" -gt 0 ] && [ "$desired_running" -eq "$current_running" ]; then
       return 0
+    fi
+
+    if [ "$update_state" = "paused" ] || [ "$update_state" = "rollback_paused" ]; then
+      echo "${service_name} update failed: ${update_message}"
+      print_service_diagnostics "$service_name"
+      return 1
     fi
 
     if [ "$failed_count" -gt 0 ]; then
