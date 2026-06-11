@@ -2,6 +2,7 @@ using Abstractions.Models;
 using Enums;
 using FluentAssertions;
 using Main.Application.Handlers.Balance.GetTransactions;
+using Microsoft.EntityFrameworkCore;
 using Test.Common.TestContainers.Combined;
 using Tests.TestContexts.Balance;
 using ValidationException = FluentValidation.ValidationException;
@@ -77,6 +78,30 @@ public class GetTransactionsTests : IntegrationTest
     }
 
     [Fact]
+    public async Task GetTransactions_SkipReversedFalse_ReturnsReversedTransactions()
+    {
+        var transaction = await ReverseSeedTransaction();
+
+        var result = await Mediator.Send(GetQuery(
+            senderId: transaction.SenderId,
+            skipReversed: false));
+
+        result.Transactions.Should().Contain(x => x.Id == transaction.Id);
+    }
+
+    [Fact]
+    public async Task GetTransactions_SkipReversedTrue_DoesNotReturnReversedTransactions()
+    {
+        var transaction = await ReverseSeedTransaction();
+
+        var result = await Mediator.Send(GetQuery(
+            senderId: transaction.SenderId,
+            skipReversed: true));
+
+        result.Transactions.Should().NotContain(x => x.Id == transaction.Id);
+    }
+
+    [Fact]
     public async Task GetTransactions_SameSenderAndReceiver_ThrowsValidationException()
     {
         var userId = TestContext.Users[0].Id;
@@ -108,7 +133,8 @@ public class GetTransactionsTests : IntegrationTest
         int size = 20,
         DateTime? rangeStart = null,
         DateTime? rangeEnd = null,
-        LogicalOperation logicalOperation = LogicalOperation.And)
+        LogicalOperation logicalOperation = LogicalOperation.And,
+        bool skipReversed = false)
     {
         return new GetTransactionsQuery(
             rangeStart ?? DateTime.UtcNow.AddDays(-10),
@@ -117,6 +143,24 @@ public class GetTransactionsTests : IntegrationTest
             senderId,
             receiverId,
             logicalOperation,
-            new Cursor<(Guid id, DateTime dt)>((Guid.Empty, DateTime.MinValue), size));
+            new Cursor<(Guid id, DateTime dt)>((Guid.Empty, DateTime.MinValue), size),
+            skipReversed);
+    }
+
+    private async Task<Main.Entities.Balance.Transaction> ReverseSeedTransaction()
+    {
+        var transaction = await Context.Transactions
+            .FirstAsync(x => x.Id == TestContext.Transactions[0].Id);
+
+        var senderBalance = await Context.UserBalances
+            .FirstAsync(x => x.UserId == transaction.SenderId && x.CurrencyId == transaction.CurrencyId);
+        var receiverBalance = await Context.UserBalances
+            .FirstAsync(x => x.UserId == transaction.ReceiverId && x.CurrencyId == transaction.CurrencyId);
+
+        transaction.Reverse(TestContext.Users[0].Id);
+        transaction.Apply(senderBalance, receiverBalance);
+        await Context.SaveChangesAsync();
+
+        return transaction;
     }
 }

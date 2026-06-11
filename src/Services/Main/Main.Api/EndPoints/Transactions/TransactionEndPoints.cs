@@ -29,7 +29,8 @@ public record GetTransactionsRequest(
     [FromQuery(Name = "logicalOperator")] LogicalOperation LogicalOperation,
     [FromQuery(Name = "cursorId")] Guid? CursorId,
     [FromQuery(Name = "cursorDate")] DateTime? CursorDate,
-    [FromQuery(Name = "size")] int Size);
+    [FromQuery(Name = "size")] int Size,
+    [FromQuery(Name = "skipReversed")] bool SkipReversed);
 
 public static class TransactionEndPoints
 {
@@ -90,7 +91,8 @@ public static class TransactionEndPoints
                     new Cursor<(Guid id, DateTime dt)>((
                             request.CursorId ?? Guid.Empty,
                             request.CursorDate ?? DateTime.MinValue),
-                        request.Size));
+                        request.Size),
+                    request.SkipReversed);
 
                 var result = await sender.Send(query, token);
                 return Results.Ok(new GetTransactionsResponse(result.Transactions));

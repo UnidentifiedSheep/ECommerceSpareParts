@@ -6,6 +6,7 @@ using Main.Application.Dtos.Balances;
 using Main.Application.Handlers.Projections;
 using Main.Entities.Balance;
 using Enums;
+using Main.Enums.Balances;
 using Microsoft.EntityFrameworkCore;
 
 namespace Main.Application.Handlers.Balance.GetTransactions;
@@ -17,7 +18,8 @@ public record GetTransactionsQuery(
     Guid? SenderId,
     Guid? ReceiverId,
     LogicalOperation LogicalOperation,
-    Cursor<(Guid id, DateTime dt)> Cursor) : IQuery<GetTransactionsResult>;
+    Cursor<(Guid id, DateTime dt)> Cursor,
+    bool SkipReversed) : IQuery<GetTransactionsResult>;
 
 public record GetTransactionsResult(IReadOnlyList<TransactionDto> Transactions);
 
@@ -25,6 +27,14 @@ public class GetTransactionsHandler(
     IReadRepository<Transaction, Guid> repository)
     : IQueryHandler<GetTransactionsQuery, GetTransactionsResult>
 {
+    private static readonly TransactionStatus[] NotReversedStatuses =
+    [
+        TransactionStatus.Pending,
+        TransactionStatus.Completed,
+        TransactionStatus.CompletionApplied,
+        TransactionStatus.Completed | TransactionStatus.CompletionApplied
+    ];
+
     public async Task<GetTransactionsResult> Handle(GetTransactionsQuery request, CancellationToken cancellationToken)
     {
         var cursor = request.Cursor;
@@ -43,6 +53,9 @@ public class GetTransactionsHandler(
         var fixedEnd = request.RangeEnd.Date.AddDays(1);
         query = query.Where(x => x.TransactionDatetime >= fixedStart &&
                                  x.TransactionDatetime <= fixedEnd);
+
+        if (request.SkipReversed)
+            query = query.Where(x => NotReversedStatuses.Contains(x.Status));
 
         var res = await query
             .Where(x =>
