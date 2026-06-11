@@ -4,6 +4,7 @@ using Main.Application.Handlers.Purchases.EditPurchase;
 using Main.Application.Handlers.StorageContents.SubtractContent;
 using Main.Entities.Storage;
 using Main.Enums;
+using Main.Enums.Balances;
 using Microsoft.EntityFrameworkCore;
 using Test.Common.TestContainers.Combined;
 using Tests.TestContexts;
@@ -216,6 +217,15 @@ public class EditPurchaseTests : IntegrationTest
         updatedPurchase.PurchaseLogistic.Should().NotBeNull();
         updatedPurchase.PurchaseLogistic!.RouteId.Should().Be(route.Id);
         updatedPurchase.Contents.Single().PurchaseContentLogistic.Should().NotBeNull();
+
+        if (updatedPurchase.PurchaseLogistic.TransactionId is not null)
+        {
+            var logisticsTransaction = await Context.Transactions
+                .AsNoTracking()
+                .SingleAsync(x => x.Id == updatedPurchase.PurchaseLogistic.TransactionId);
+
+            logisticsTransaction.SourceType.Should().Be(TransactionSourceType.Logistic);
+        }
     }
 
     [Fact]

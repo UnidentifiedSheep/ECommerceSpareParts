@@ -3,6 +3,7 @@ using Main.Application.Handlers.Purchases.DeletePurchase;
 using Main.Application.Handlers.StorageContents.SubtractContent;
 using Main.Entities.Exceptions;
 using Main.Enums;
+using Main.Enums.Balances;
 using Microsoft.EntityFrameworkCore;
 using Test.Common.Extensions;
 using Test.Common.TestContainers.Combined;
@@ -86,6 +87,7 @@ public class DeletePurchaseTests : IntegrationTest
             .WithReceiverId(systemUserId)
             .WithCurrencyId(currencyId)
             .WithAmount(20m)
+            .WithSourceType(TransactionSourceType.Purchase)
             .WithBalances(supplierBalance, systemBalance)
             .Completed()
             .Applied()
@@ -95,6 +97,7 @@ public class DeletePurchaseTests : IntegrationTest
             .WithReceiverId(systemUserId)
             .WithCurrencyId(currencyId)
             .WithAmount(5m)
+            .WithSourceType(TransactionSourceType.Logistic)
             .WithBalances(carrierBalance, systemBalance)
             .Completed()
             .Applied()
@@ -147,8 +150,10 @@ public class DeletePurchaseTests : IntegrationTest
         purchaseExists.Should().BeFalse();
         purchaseTransactionAfterDelete.IsReversed.Should().BeTrue();
         purchaseTransactionAfterDelete.IsReversalApplied.Should().BeTrue();
+        purchaseTransactionAfterDelete.SourceType.Should().Be(TransactionSourceType.Purchase);
         logisticsTransactionAfterDelete.IsReversed.Should().BeTrue();
         logisticsTransactionAfterDelete.IsReversalApplied.Should().BeTrue();
+        logisticsTransactionAfterDelete.SourceType.Should().Be(TransactionSourceType.Logistic);
         productAfterDelete.Stock.Value.Should().Be(originalStock);
     }
 

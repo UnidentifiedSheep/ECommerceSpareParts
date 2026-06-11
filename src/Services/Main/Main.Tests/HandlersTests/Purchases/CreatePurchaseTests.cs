@@ -7,6 +7,7 @@ using Main.Entities.Exceptions;
 using Main.Entities.Product;
 using Main.Entities.Storage;
 using Main.Entities.User;
+using Main.Enums.Balances;
 using Microsoft.EntityFrameworkCore;
 using Test.Common.Extensions;
 using Test.Common.TestContainers.Combined;
@@ -84,6 +85,7 @@ public class CreatePurchaseTests : IntegrationTest
         purchaseTransaction.SenderId.Should().Be(_supplier.Id);
         purchaseTransaction.ReceiverId.Should().Be(GetContext<UserContextTestContext>().SystemUser.Id);
         purchaseTransaction.Amount.Should().Be(command.PurchaseContent.Sum(x => x.Price * x.Count));
+        purchaseTransaction.SourceType.Should().Be(TransactionSourceType.Purchase);
     }
 
     [Fact]
@@ -153,6 +155,7 @@ public class CreatePurchaseTests : IntegrationTest
                 .SingleAsync(x => x.Id == purchase.PurchaseLogistic.TransactionId);
             logisticsTransaction.SenderId.Should().Be(route.CarrierId.Value);
             logisticsTransaction.ReceiverId.Should().Be(GetContext<UserContextTestContext>().SystemUser.Id);
+            logisticsTransaction.SourceType.Should().Be(TransactionSourceType.Logistic);
         }
     }
 
@@ -181,6 +184,7 @@ public class CreatePurchaseTests : IntegrationTest
         paymentTransaction.SenderId.Should().Be(GetContext<UserContextTestContext>().SystemUser.Id);
         paymentTransaction.ReceiverId.Should().Be(_supplier.Id);
         paymentTransaction.CurrencyId.Should().Be(currency.Id);
+        paymentTransaction.SourceType.Should().Be(TransactionSourceType.Manual);
     }
 
     [Fact]
