@@ -5,6 +5,8 @@
     "deleted.transaction.cannot.be.edited": "Невозможно редактировать уже удалённую транзакцию.",
     "transaction.already.deleted": "Эта транзакция уже была удалена.",
     "transaction.not.found": "Транзакция не найдена.",
+    "transaction.source.cannot.be.reversed.by.user": "Пользователь не может отменить транзакцию с источником '{0}'.",
+    "transaction.with.system.user.cannot.be.created.by.user": "Пользователь не может создать транзакцию, где отправитель или получатель является системным пользователем.",
     "transaction.sender.id.required": "Необходимо указать ID отправителя.",
     "transaction.receiver.id.required": "Необходимо указать ID получателя.",
     "transaction.date.out.of.range": "Дата транзакции должна быть в пределах последних 2 месяцев и не более чем на 1 час в будущем.",

@@ -1,6 +1,7 @@
 using FluentAssertions;
 using Main.Abstractions.Constants;
 using Main.Application.Handlers.Balance.CreateTransaction;
+using Main.Entities.Exceptions;
 using Main.Enums.Balances;
 using Microsoft.EntityFrameworkCore;
 using Test.Common.TestContainers.Combined;
@@ -15,6 +16,7 @@ public class CreateTransactionTests : IntegrationTest
     public CreateTransactionTests(CombinedContainerFixture fixture) : base(fixture)
     {
         RegisterBasicContext<UsersTestContext>();
+        RegisterBasicContext<UserContextTestContext>();
         RegisterBasicContext<CurrencyTestContext>();
     }
 
@@ -109,6 +111,49 @@ public class CreateTransactionTests : IntegrationTest
             Mediator.Send(command with { CurrencyId = int.MaxValue }));
 
         exception.Failures[0].ErrorName.Should().Be(ApplicationErrors.CurrencyNotFound);
+    }
+
+    [Fact]
+    public async Task CreateTransaction_UserModeAndSystemSender_ThrowsTransactionWithSystemUserCannotBeCreatedByUserException()
+    {
+        var command = GetValidCommand() with
+        {
+            SenderId = GetContext<UserContextTestContext>().SystemUser.Id
+        };
+
+        await Assert.ThrowsAsync<TransactionWithSystemUserCannotBeCreatedByUserException>(() =>
+            Mediator.Send(command));
+    }
+
+    [Fact]
+    public async Task CreateTransaction_UserModeAndSystemReceiver_ThrowsTransactionWithSystemUserCannotBeCreatedByUserException()
+    {
+        var command = GetValidCommand() with
+        {
+            ReceiverId = GetContext<UserContextTestContext>().SystemUser.Id
+        };
+
+        await Assert.ThrowsAsync<TransactionWithSystemUserCannotBeCreatedByUserException>(() =>
+            Mediator.Send(command));
+    }
+
+    [Fact]
+    public async Task CreateTransaction_SystemModeAndSystemReceiver_Succeeds()
+    {
+        var command = GetValidCommand() with
+        {
+            ReceiverId = GetContext<UserContextTestContext>().SystemUser.Id,
+            Mode = TransactionCreationMode.System
+        };
+
+        var result = await Mediator.Send(command);
+
+        var transaction = await Context.Transactions
+            .AsNoTracking()
+            .FirstOrDefaultAsync(x => x.Id == result.Transaction.Id);
+
+        transaction.Should().NotBeNull();
+        transaction!.ReceiverId.Should().Be(command.ReceiverId);
     }
 
     private CreateTransactionCommand GetValidCommand()

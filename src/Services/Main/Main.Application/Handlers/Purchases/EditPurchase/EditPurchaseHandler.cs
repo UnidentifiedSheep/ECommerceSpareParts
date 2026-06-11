@@ -122,12 +122,16 @@ public class EditPurchaseHandler(
         CancellationToken cancellationToken)
     {
         await sender.Send(
-            new ReverseTransactionCommand(purchase.TransactionId),
+            new ReverseTransactionCommand(
+                purchase.TransactionId,
+                TransactionReversalMode.System),
             cancellationToken);
 
         if (purchase.PurchaseLogistic?.TransactionId is { } logisticsTransactionId)
             await sender.Send(
-                new ReverseTransactionCommand(logisticsTransactionId),
+                new ReverseTransactionCommand(
+                    logisticsTransactionId,
+                    TransactionReversalMode.System),
                 cancellationToken);
     }
 
@@ -146,7 +150,8 @@ public class EditPurchaseHandler(
                     amount,
                     currencyId,
                     transactionDateTime,
-                    TransactionSourceType.Purchase),
+                    TransactionSourceType.Purchase,
+                    TransactionCreationMode.System),
                 cancellationToken))
             .Transaction;
     }

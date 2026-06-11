@@ -2,6 +2,7 @@ using FluentAssertions;
 using Main.Application.Interfaces.Services;
 using Main.Entities.Purchase;
 using Main.Enums;
+using Main.Enums.Balances;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Test.Common.Extensions;
@@ -76,6 +77,7 @@ public class PurchaseLogisticsServiceTests : IntegrationTest
             .SingleAsync(x => x.Id == updatedPurchase.PurchaseLogistic.TransactionId);
         transaction.SenderId.Should().Be(route.CarrierId!.Value);
         transaction.ReceiverId.Should().Be(GetContext<UserContextTestContext>().SystemUser.Id);
+        transaction.SourceType.Should().Be(TransactionSourceType.Logistic);
     }
 
     [Fact]

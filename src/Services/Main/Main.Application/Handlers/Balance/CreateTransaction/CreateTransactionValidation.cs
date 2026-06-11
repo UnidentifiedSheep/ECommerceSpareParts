@@ -7,7 +7,7 @@ namespace Main.Application.Handlers.Balance.CreateTransaction;
 
 public class CreateTransactionValidation : AbstractValidator<CreateTransactionCommand>
 {
-    public CreateTransactionValidation(ICurrencyConverter currencyConverter)
+    public CreateTransactionValidation()
     {
         RuleFor(command => command.SenderId)
             .NotEmpty()

@@ -11,6 +11,7 @@ using Main.Application.Handlers.StorageContents.RestoreContent;
 using Main.Application.Models;
 using Main.Entities.Sale;
 using Main.Enums;
+using Main.Enums.Balances;
 using Mapster;
 using MassTransit;
 using MediatR;
@@ -57,7 +58,9 @@ public class DeleteFullSaleHandler(
         Guid userId,
         CancellationToken cancellationToken = default)
     {
-        var command = new ReverseTransactionCommand(transactionId);
+        var command = new ReverseTransactionCommand(
+            transactionId,
+            TransactionReversalMode.System);
         await mediator.Send(command, cancellationToken);
     }
 

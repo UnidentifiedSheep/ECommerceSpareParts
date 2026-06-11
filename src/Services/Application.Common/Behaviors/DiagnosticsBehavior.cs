@@ -29,20 +29,20 @@ public class DiagnosticsBehavior<TRequest, TResponse>(
         var response = await next(cancellationToken);
         
         timer.Stop();
-        var timeTaken = timer.Elapsed;
+        var elapsedMs = timer.Elapsed.TotalMilliseconds;
+
+        if (elapsedMs > Settings.MaxExecutionTimeMs)
+            logger.LogWarning(
+                "[PERFORMANCE] {Request} took {ElapsedMs:F0} ms. Expected <= {ExpectedMs} ms",
+                typeof(TRequest).Name,
+                elapsedMs,
+                Settings.MaxExecutionTimeMs);
         
-        if (timeTaken.Milliseconds > Settings.MaxExecutionTimeMs)
-            logger.LogWarning("[PERFORMANCE] The request {Request} took {TimeTaken} seconds." +
-                              "Maximum expected execution time is {Expected}",
-                typeof(TRequest).Name, 
-                timeTaken.Seconds,
-                TimeSpan.FromMilliseconds(Settings.MaxExecutionTimeMs));
-        
-        
+
         logger.LogInformation(
-            "[END] Handled {Request}. Time taken is {TimeTaken}", 
-            typeof(TRequest).Name, 
-            timeTaken);
+            "[END] {Request} handled in {ElapsedMs:F0} ms",
+            typeof(TRequest).Name,
+            elapsedMs);
         
         return response;
     }

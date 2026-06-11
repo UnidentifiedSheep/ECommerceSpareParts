@@ -7,12 +7,15 @@ using Main.Application.Interfaces.Persistence;
 using Main.Application.Interfaces.Services;
 using Main.Entities.Balance;
 using Main.Entities.Exceptions;
+using Main.Enums.Balances;
 
 namespace Main.Application.Handlers.Balance.ReverseTransaction;
 
 [AutoSave]
 [Transactional(IsolationLevel.Serializable, 20, 3)]
-public record ReverseTransactionCommand(Guid TransactionId)
+public record ReverseTransactionCommand(
+    Guid TransactionId,
+    TransactionReversalMode Mode = TransactionReversalMode.User)
     : ICommand<ReverseTransactionResult>;
 
 public record ReverseTransactionResult(Transaction Transaction);
@@ -35,6 +38,10 @@ public class ReverseTransactionHandler(
 
         var transaction = await transactionRepository.FirstOrDefaultAsync(criteria, cancellationToken)
                           ?? throw new TransactionNotFoundException(transactionId);
+
+        if (request.Mode == TransactionReversalMode.User &&
+            transaction.SourceType != TransactionSourceType.Manual)
+            throw new TransactionSourceCannotBeReversedByUserException(transaction.SourceType);
 
         transaction.Reverse(userContext.UserId);
         await balanceService.ChangeSenderReceiverBalancesAsync(transaction, cancellationToken);

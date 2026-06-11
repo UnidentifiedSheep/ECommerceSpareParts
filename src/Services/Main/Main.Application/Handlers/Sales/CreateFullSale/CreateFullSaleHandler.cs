@@ -175,7 +175,8 @@ public class CreateFullSaleHandler(
             amount, 
             currencyId, 
             transactionDateTime,
-            TransactionSourceType.Sale);
+            TransactionSourceType.Sale,
+            TransactionCreationMode.System);
         var result = await sender.Send(command, cancellationToken);
         return result.Transaction;
     }

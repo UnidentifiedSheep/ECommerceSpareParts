@@ -1,7 +1,9 @@
+using System.Text.Json.Serialization;
 using Abstractions.Models;
 using Api.Common.Extensions;
 using Enums;
 using Main.Application.Dtos.Balances;
+using Main.Application.Handlers.Balance;
 using Main.Application.Handlers.Balance.CreateTransaction;
 using Main.Application.Handlers.Balance.GetTransactions;
 using Main.Application.Handlers.Balance.ReverseTransaction;
@@ -11,12 +13,33 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace Main.Api.EndPoints.Transactions;
 
-public record CreateTransactionRequest(
-    Guid SenderId,
-    Guid ReceiverId,
-    decimal Amount,
-    int CurrencyId,
-    DateTime TransactionDateTime);
+public record CreateTransactionRequest
+{
+    [JsonPropertyName("senderId")]
+    public Guid SenderId { get; init; }
+    [JsonPropertyName("receiverId")]
+    public Guid ReceiverId { get; init; }
+    [JsonPropertyName("amount")]
+    public decimal Amount { get; init; }
+    [JsonPropertyName("currencyId")]
+    public int CurrencyId { get; init; }
+    [JsonPropertyName("transactionDateTime")]
+    public DateTime TransactionDateTime { get; init; }
+}
+
+public record CreateSystemTransactionRequest
+{
+    [JsonPropertyName("userId")]
+    public Guid UserId { get; init; }
+    [JsonPropertyName("direction")]
+    public SystemTransactionDirection Direction { get; init; }
+    [JsonPropertyName("amount")]
+    public decimal Amount { get; init; }
+    [JsonPropertyName("currencyId")]
+    public int CurrencyId { get; init; }
+    [JsonPropertyName("transactionDateTime")]
+    public DateTime TransactionDateTime { get; init; }
+}
 
 public record GetTransactionsResponse(IReadOnlyList<TransactionDto> Transactions);
 
@@ -29,7 +52,8 @@ public record GetTransactionsRequest(
     [FromQuery(Name = "logicalOperator")] LogicalOperation LogicalOperation,
     [FromQuery(Name = "cursorId")] Guid? CursorId,
     [FromQuery(Name = "cursorDate")] DateTime? CursorDate,
-    [FromQuery(Name = "size")] int Size);
+    [FromQuery(Name = "size")] int Size,
+    [FromQuery(Name = "skipReversed")] bool SkipReversed);
 
 public static class TransactionEndPoints
 {
@@ -55,6 +79,31 @@ public static class TransactionEndPoints
             .WithDescription("Создание транзакции")
             .WithDisplayName("Создание транзакции")
             .Accepts<CreateTransactionRequest>(false, "application/json")
+            .Produces(StatusCodes.Status200OK)
+            .ProducesProblem(StatusCodes.Status400BadRequest)
+            .RequireAnyPermission(PermissionCodes.BALANCES_TRANSACTION_CREATE);
+
+        balances.MapPost("system", async (
+                ISender sender,
+                CreateSystemTransactionRequest request,
+                CancellationToken token) =>
+            {
+                await sender.Send(
+                    new CreateSystemTransactionCommand(
+                        request.UserId,
+                        request.Amount,
+                        request.CurrencyId,
+                        request.TransactionDateTime,
+                        request.Direction),
+                    token);
+
+                return Results.Ok();
+            })
+            .WithName("CreateSystemTransaction")
+            .WithSummary("Создать системную транзакцию баланса")
+            .WithDescription("Создание ручной транзакции между пользователем и системой")
+            .WithDisplayName("Создание системной транзакции")
+            .Accepts<CreateSystemTransactionRequest>(false, "application/json")
             .Produces(StatusCodes.Status200OK)
             .ProducesProblem(StatusCodes.Status400BadRequest)
             .RequireAnyPermission(PermissionCodes.BALANCES_TRANSACTION_CREATE);
@@ -90,7 +139,8 @@ public static class TransactionEndPoints
                     new Cursor<(Guid id, DateTime dt)>((
                             request.CursorId ?? Guid.Empty,
                             request.CursorDate ?? DateTime.MinValue),
-                        request.Size));
+                        request.Size),
+                    request.SkipReversed);
 
                 var result = await sender.Send(query, token);
                 return Results.Ok(new GetTransactionsResponse(result.Transactions));

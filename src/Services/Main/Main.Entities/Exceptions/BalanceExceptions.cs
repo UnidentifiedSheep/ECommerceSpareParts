@@ -1,4 +1,5 @@
 using Exceptions.Base.Localized;
+using Main.Enums.Balances;
 
 namespace Main.Entities.Exceptions;
 
@@ -22,3 +23,13 @@ public class TransactionNotFoundException(Guid transactionId)
     : LocalizedNotFoundException(
         "transaction.not.found",
         new { TransactionId = transactionId });
+
+public class TransactionSourceCannotBeReversedByUserException(TransactionSourceType sourceType)
+    : LocalizedBadRequestException(
+        "transaction.source.cannot.be.reversed.by.user",
+        new { SourceType = sourceType },
+        [sourceType.ToString()]);
+
+public class TransactionWithSystemUserCannotBeCreatedByUserException()
+    : LocalizedBadRequestException(
+        "transaction.with.system.user.cannot.be.created.by.user");
