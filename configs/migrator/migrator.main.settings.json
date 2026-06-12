@@ -5,6 +5,11 @@
     "Pricing": "SuperPricingKey222",
     "Search": "SuperSearchKey222"
   },
-  "ConnectionString": "Host=localhost;Port=5432;Database=main;Username=postgres;Password=PleasKillMe21",
+  "Database": {
+    "Host": "host.docker.internal",
+    "Database": "main",
+    "Username": "postgres",
+    "Password": "PleasKillMe21"
+  },
   "Seed": true
 }

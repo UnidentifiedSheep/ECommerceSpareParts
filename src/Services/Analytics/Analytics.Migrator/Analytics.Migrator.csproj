@@ -19,6 +19,7 @@
 
     <ItemGroup>
         <ProjectReference Include="..\..\..\Infrastructure\Common\Common.csproj"/>
+        <ProjectReference Include="..\..\Api.Common\Api.Common.csproj" />
         <ProjectReference Include="..\Analytics.Persistence\Analytics.Persistence.csproj"/>
     </ItemGroup>
 

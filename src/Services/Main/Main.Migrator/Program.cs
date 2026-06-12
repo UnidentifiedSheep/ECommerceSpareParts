@@ -1,5 +1,6 @@
 ﻿using Abstractions.Interfaces.Validators;
 using Abstractions.Models;
+using Api.Common;
 using Common;
 using Main.Migrator;
 using Main.Migrator.DataSeeds;
@@ -8,6 +9,8 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Options;
+using Persistence;
 using Persistence.Extensions;
 using Persistence.Interfaces;
 using Security.Services;
@@ -22,14 +25,17 @@ var seedingRequested = false;
 
 builder.ConfigureServices((context, services) =>
 {
-    var connectionString = context.Configuration["ConnectionString"];
-
+    services.AddDatabaseOptions();
+    
     var seedValue = context.Configuration.GetValue<bool?>("Seed");
     seedingRequested = seedValue == true;
 
     //add db context
-    services.AddDbContext<DContext>(options => options.UseNpgsql(connectionString,
-        x => x.MigrationsAssembly("Main.Migrator")));
+    services.AddDbContext<DContext>((sp, options) =>
+    {
+        var connectionString = sp.GetRequiredService<IOptions<DatabaseOptions>>().Value.ConnectionString;
+        options.UseNpgsql(connectionString, x => x.MigrationsAssembly("Main.Migrator"));
+    });
 
     //used for password hash etc
     services.AddSingleton<IPasswordManager, PasswordManager>(_ => new PasswordManager(new PasswordRules()));

@@ -1,3 +1,8 @@
 ﻿{
-  "ConnectionString": "Host=localhost;Port=5432;Database=analytics;Username=postgres;Password=PleasKillMe21"
+  "Database": {
+    "Host": "host.docker.internal",
+    "Database": "analytics",
+    "Username": "postgres",
+    "Password": "PleasKillMe21"
+  }
 }

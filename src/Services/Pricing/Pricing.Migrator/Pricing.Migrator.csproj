@@ -18,6 +18,7 @@
 
     <ItemGroup>
         <ProjectReference Include="..\..\..\Infrastructure\Common\Common.csproj"/>
+        <ProjectReference Include="..\..\Api.Common\Api.Common.csproj" />
         <ProjectReference Include="..\Pricing.Persistence\Pricing.Persistence.csproj"/>
     </ItemGroup>
 
@@ -29,6 +30,11 @@
       <Content Include="..\..\..\..\.dockerignore">
         <Link>.dockerignore</Link>
       </Content>
+        <Content Include="..\..\..\..\configs\**\*">
+            <Link>configs\%(RecursiveDir)%(Filename)%(Extension)</Link>
+            <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+            <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+        </Content>
     </ItemGroup>
 
 </Project>
