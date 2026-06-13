@@ -8,11 +8,11 @@ public class SaleDateTimeValidator : AbstractValidator<DateTime>
     public SaleDateTimeValidator()
     {
         RuleFor(x => x.ToUniversalTime())
-            .GreaterThanOrEqualTo(DateTime.Now.Date.AddMonths(-3).ToUniversalTime())
+            .GreaterThanOrEqualTo(DateTime.UtcNow.Date.AddMonths(-3))
             .WithLocalizationKey("sale.date.min");
 
         RuleFor(x => x.ToUniversalTime())
-            .LessThanOrEqualTo(DateTime.Now.AddMinutes(10).ToUniversalTime())
+            .LessThanOrEqualTo(DateTime.UtcNow.AddMinutes(10))
             .WithLocalizationKey("sale.date.max");
     }
 }

@@ -64,7 +64,7 @@ public class SaleContent : Entity<SaleContent, int>, ILinqEntity<SaleContent, in
         return new SaleContent(productId, priceWithOutDiscount, priceWithDiscount, count, details);
     }
 
-    public void SetCount(int count)
+    private void SetCount(int count)
     {
         Count = count.AgainstLessOrEqual(0, "sale.content.count.min");
     }
@@ -103,9 +103,8 @@ public class SaleContent : Entity<SaleContent, int>, ILinqEntity<SaleContent, in
         if (seenStorages.Count != 1)
             throw new InvalidOperationException("Sale content details must have only one storage");
 
-        if (detailsCount != Count)
-            throw new InvalidOperationException("Total details count is not equal to sale conent count");
-
+        SetCount(detailsCount);
+        
         _details.Clear();
         _details.AddRange(list);
     }
