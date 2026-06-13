@@ -18,7 +18,7 @@ using MediatR;
 namespace Main.Application.Handlers.Purchases.DeletePurchase;
 
 [AutoSave]
-[Transactional(IsolationLevel.ReadCommitted, 20, 2)]
+[Transactional(IsolationLevel.Serializable, 20, 2)]
 public record DeletePurchaseCommand(Guid PurchaseId) : ICommand<Unit>;
 
 public class DeletePurchaseHandler(

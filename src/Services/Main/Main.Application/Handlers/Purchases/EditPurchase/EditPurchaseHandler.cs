@@ -30,7 +30,7 @@ using Event = Main.Entities.Event.Event;
 namespace Main.Application.Handlers.Purchases.EditPurchase;
 
 [AutoSave]
-[Transactional(IsolationLevel.ReadCommitted, 20, 2)]
+[Transactional(IsolationLevel.Serializable, 20, 2)]
 public record EditPurchaseCommand(
     IEnumerable<EditPurchaseDto> Content,
     Guid PurchaseId,
@@ -300,7 +300,7 @@ public class EditPurchaseHandler(
         Dictionary<int, StorageContent> storageContents,
         Dictionary<int, Product> products,
         List<Event> storageEvents,
-        ICollection<SubtractStorageContentItem> subtractions,
+        List<SubtractStorageContentItem> subtractions,
         CancellationToken cancellationToken)
     {
         if (content.ProductId != dto.ProductId)
