@@ -13,7 +13,8 @@ public static class ProductMappingExtensions
             Name = product.Name,
             ProducerId = product.ProducerId,
             Dimensions = product.Dimensions?.ToProductDimensionsDto(),
-            Weight = product.Weight?.ToProductWeightDto()
+            Weight = product.Weight?.ToProductWeightDto(),
+            Stock = product.Stock
         };
 
     private static ProductDimensionsDto ToProductDimensionsDto(this ProductDimensions dimensions)

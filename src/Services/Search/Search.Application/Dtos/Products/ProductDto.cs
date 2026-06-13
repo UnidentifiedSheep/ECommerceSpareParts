@@ -16,6 +16,9 @@ public record ProductDto
     [JsonPropertyName("producerId")]
     public required int ProducerId { get; init; }
     
+    [JsonPropertyName("stock")]
+    public required int Stock { get; init; }
+    
     [JsonPropertyName("dimensions")]
     public ProductDimensionsDto? Dimensions { get; init; }
     

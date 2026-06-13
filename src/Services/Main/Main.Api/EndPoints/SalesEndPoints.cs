@@ -1,23 +1,48 @@
+using System.Text.Json.Serialization;
 using Abstractions.Interfaces;
 using Api.Common.Extensions;
+using Api.Common.Models.Requests;
 using Carter;
 using Enums;
 using Main.Application.Dtos.Sale;
+using Main.Application.Handlers.Sales.CreateSale;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Main.Api.EndPoints;
 
-public record CreateSaleRequest(
-    Guid BuyerId,
-    int CurrencyId,
-    string StorageName,
-    bool SellFromOtherStorages,
-    DateTime SaleDateTime,
-    IEnumerable<NewSaleContentDto> SaleContent,
-    string? Comment,
-    decimal? PayedSum,
-    string? ConfirmationCode);
+public record CreateSaleRequest
+{
+    [JsonPropertyName("buyerId")]
+    public required Guid  BuyerId { get; init; }
+    
+    [JsonPropertyName("currencyId")]
+    public required int CurrencyId { get; init; }
+    
+    [JsonPropertyName("storageName")]
+    public required string StorageName { get; init; }
+    
+    [JsonPropertyName("saleDateTime")]
+    public required DateTime SaleDateTime { get; init; }
+    
+    [JsonPropertyName("contents")]
+    public required IEnumerable<NewSaleContentDto> Contents { get; init; }
+    
+    [JsonPropertyName("comment")]
+    public string? Comment { get; init; }
+
+    [JsonPropertyName("payedSum")]
+    public decimal? PayedSum { get; init; }
+    
+    [JsonPropertyName("confirmationCode")]
+    public string? ConfirmationCode { get; init; }
+}
+
+public record CreateSaleResponse
+{
+    [JsonPropertyName("sale")]
+    public required SaleDto Sale { get; init; }
+}
 
 public record EditSaleRequest(
     IEnumerable<EditSaleContentDto> EditedContent,
@@ -30,16 +55,25 @@ public record GetSaleContentResponse(IEnumerable<SaleContentDto> Content);
 
 public record GetSalesResponse(IEnumerable<SaleDto> Sales);
 
-public class GetSalesRequest
+public record GetSalesRequest : PaginationQueryModel
 {
-    [FromQuery(Name = "rangeStartDate")] public DateTime RangeStartDate { get; set; }
-    [FromQuery(Name = "rangeEndDate")] public DateTime RangeEndDate { get; set; }
-    [FromQuery(Name = "page")] public int Page { get; set; }
-    [FromQuery(Name = "limit")] public int Limit { get; set; }
-    [FromQuery(Name = "buyerId")] public Guid? BuyerId { get; set; }
-    [FromQuery(Name = "currencyId")] public int? CurrencyId { get; set; }
-    [FromQuery(Name = "sortBy")] public string? SortBy { get; set; }
-    [FromQuery(Name = "searchTerm")] public string? SearchTerm { get; set; }
+    [FromQuery(Name = "rangeStartDate")] 
+    public DateTime RangeStartDate { get; init; }
+    
+    [FromQuery(Name = "rangeEndDate")] 
+    public DateTime RangeEndDate { get; init; }
+    
+    [FromQuery(Name = "buyerId")] 
+    public Guid? BuyerId { get; init; }
+    
+    [FromQuery(Name = "currencyId")] 
+    public int? CurrencyId { get; init; }
+    
+    [FromQuery(Name = "sortBy")] 
+    public string? SortBy { get; init; }
+    
+    [FromQuery(Name = "searchTerm")] 
+    public string? SearchTerm { get; init; }
 }
 
 public class SalesEndPoints : ICarterModule
@@ -49,17 +83,32 @@ public class SalesEndPoints : ICarterModule
         var sales = app.MapGroup("/sales")
             .WithTags("Sales");
 
-        sales.MapPost("/", (
-                IUserContext user,
+        sales.MapPost("/", async (
                 ISender sender,
                 CreateSaleRequest request,
-                CancellationToken token) => Results.Ok())
+                CancellationToken token) =>
+            {
+                var result = await sender.Send(new CreateSaleCommand(
+                    request.BuyerId,
+                    request.CurrencyId,
+                    request.StorageName,
+                    request.SaleDateTime,
+                    request.Contents,
+                    request.Comment,
+                    request.PayedSum,
+                    request.ConfirmationCode), token);
+                
+                return Results.Ok(new CreateSaleResponse
+                {
+                    Sale = result.Sale
+                });
+            })
             .WithDescription("Создание новой продажи")
             .WithName("CreateSale")
             .WithSummary("Создать продажу")
             .WithDisplayName("Создание новой продажи")
             .Accepts<CreateSaleRequest>(false, "application/json")
-            .Produces(200)
+            .Produces<CreateSaleResponse>()
             .Produces(401)
             .RequireAnyPermission(PermissionCodes.SALES_CREATE);
 

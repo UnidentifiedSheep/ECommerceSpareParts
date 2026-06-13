@@ -53,6 +53,9 @@ public class ProductIndexInitializer(
                             .Name(x => x.ProducerId)
                             .Type(NumberType.Integer)
                         )
+                        .Number(n => n
+                            .Name(x => x.Stock)
+                            .Type(NumberType.Integer))
                         .Object<ProductDimensions>(o => o
                             .Name(x => x.Dimensions)
                             .Properties(dp => dp

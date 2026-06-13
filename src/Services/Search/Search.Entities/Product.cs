@@ -11,6 +11,7 @@ public class Product
     public required string Name { get; init; }
 
     public required int ProducerId { get; init; }
+    public required int Stock { get; init; }
 
     public ProductDimensions? Dimensions { get; init; }
 
