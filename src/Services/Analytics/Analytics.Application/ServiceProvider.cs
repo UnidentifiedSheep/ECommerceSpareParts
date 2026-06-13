@@ -25,7 +25,7 @@ public static class ServiceProvider
 {
     public static IServiceCollection AddApplicationLayer(
         this IServiceCollection collection,
-        IConfiguration configuration)
+        IConfiguration? configuration)
     {
         SortByConfig.Configure();
         collection
