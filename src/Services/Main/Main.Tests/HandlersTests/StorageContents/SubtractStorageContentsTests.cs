@@ -294,9 +294,112 @@ public class SubtractStorageContentsTests : IntegrationTest
                 StorageMovementType.Sale)));
     }
 
+    [Fact]
+    public async Task SubtractStorageContents_ByProductAndStorage_StartsFromPolicyContent()
+    {
+        var contentsForSameProductAndStorage = GetContentsForSameProductAndStorage(2)
+            .OrderBy(x => x.PurchaseDatetime)
+            .ToList();
+        var firstByDate = contentsForSameProductAndStorage.First();
+        var secondByDate = contentsForSameProductAndStorage.Skip(1).First();
+        var product = await Context.Products.AsNoTracking().SingleAsync(x => x.Id == firstByDate.ProductId);
+        var firstByDateOriginalCount = firstByDate.Count;
+        var secondByDateOriginalCount = secondByDate.Count;
+        var countToSubtract = firstByDate.Count + 1;
+
+        var result = await Mediator.Send(new SubtractStorageContentsCommand(
+            [
+                new SubtractProductFromStorageItem(
+                    firstByDate.ProductId,
+                    firstByDate.StorageName,
+                    countToSubtract)
+            ],
+            StorageMovementType.Sale));
+
+        result.Contents.Should().Equal(
+            new SubtractedStorageContent(firstByDate.Id, firstByDateOriginalCount),
+            new SubtractedStorageContent(secondByDate.Id, 1));
+
+        var contents = await Context.StorageContents.AsNoTracking().ToDictionaryAsync(x => x.Id);
+        contents[firstByDate.Id].Count.Should().Be(0);
+        contents[secondByDate.Id].Count.Should().Be(secondByDateOriginalCount - 1);
+
+        var updatedProduct = await Context.Products.AsNoTracking().SingleAsync(x => x.Id == product.Id);
+        updatedProduct.Stock.Value.Should().Be(product.Stock.Value - countToSubtract);
+    }
+
+    [Fact]
+    public async Task SubtractStorageContents_WithMixedItems_SubtractsEveryItem()
+    {
+        var groups = GetContext<StorageContentTestContext>().StorageContents
+            .Where(x => x.Count > 0)
+            .GroupBy(x => new { x.ProductId, x.StorageName })
+            .Where(x => x.Count() >= 1)
+            .Take(2)
+            .Select(x => x.First())
+            .ToList();
+
+        groups.Should().HaveCount(2);
+
+        var result = await Mediator.Send(new SubtractStorageContentsCommand(
+            [
+                new SubtractStorageContentItem(groups[0].Id, 1),
+                new SubtractProductFromStorageItem(groups[1].ProductId, groups[1].StorageName, 1)
+            ],
+            StorageMovementType.Sale));
+
+        result.Contents.Should().HaveCount(2);
+        result.Contents.Should().OnlyContain(x => x.Count == 1);
+    }
+
+    [Fact]
+    public async Task SubtractStorageContents_ByProductAndStorage_WhenNoContentOnStorage_ThrowsNotEnoughCount()
+    {
+        var product = await Context.Products.AsNoTracking().FirstAsync();
+
+        await Assert.ThrowsAsync<NotEnoughCountOnStorageException>(() =>
+            Mediator.Send(new SubtractStorageContentsCommand(
+                [
+                    new SubtractProductFromStorageItem(
+                        product.Id,
+                        "missing-storage",
+                        1)
+                ],
+                StorageMovementType.Sale)));
+    }
+
+    [Fact]
+    public async Task SubtractStorageContents_ByProductAndStorage_WithInvalidProductId_ThrowsValidationException()
+    {
+        await Assert.ThrowsAsync<ValidationException>(() =>
+            Mediator.Send(new SubtractStorageContentsCommand(
+                [
+                    new SubtractProductFromStorageItem(
+                        0,
+                        "storage",
+                        1)
+                ],
+                StorageMovementType.Sale)));
+    }
+
+    [Fact]
+    public async Task SubtractStorageContents_ByProductAndStorage_WithInvalidStorageName_ThrowsValidationException()
+    {
+        await Assert.ThrowsAsync<ValidationException>(() =>
+            Mediator.Send(new SubtractStorageContentsCommand(
+                [
+                    new SubtractProductFromStorageItem(
+                        1,
+                        "",
+                        1)
+                ],
+                StorageMovementType.Sale)));
+    }
+
     private IReadOnlyList<StorageContent> GetContentsForSameProductAndStorage(int minCount)
     {
         return GetContext<StorageContentTestContext>().StorageContents
+            .Where(x => x.Count > 0)
             .GroupBy(x => new { x.ProductId, x.StorageName })
             .Where(x => x.Count() >= minCount)
             .OrderByDescending(x => x.Sum(z => z.Count))
