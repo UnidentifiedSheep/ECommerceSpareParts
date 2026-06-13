@@ -23,6 +23,11 @@ public class PurchaseContentLogistic : Entity<PurchaseContentLogistic, int>, ILi
     public decimal AreaM3 { get; private set; }
     public decimal Price { get; private set; }
 
+    public static Expression<Func<PurchaseContentLogistic, int>> GetKeySelector()
+    {
+        return x => x.PurchaseContentId;
+    }
+
     public static Expression<Func<PurchaseContentLogistic, bool>> GetEqualityExpression(int key)
     {
         return x => x.PurchaseContentId == key;

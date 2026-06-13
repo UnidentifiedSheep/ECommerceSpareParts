@@ -29,6 +29,11 @@ public class ProductWeight : Entity<ProductWeight, int>, ILinqEntity<ProductWeig
 
     public WeightUnit Unit { get; private set; }
 
+    public static Expression<Func<ProductWeight, int>> GetKeySelector()
+    {
+        return x => x.ProductId;
+    }
+
     public static Expression<Func<ProductWeight, bool>> GetEqualityExpression(int key)
     {
         return x => x.ProductId == key;

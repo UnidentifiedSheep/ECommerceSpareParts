@@ -65,6 +65,11 @@ public class PurchaseLogistic : Entity<PurchaseLogistic, Guid>, ILinqEntity<Purc
 
     public virtual Transaction? Transaction { get; private set; }
 
+    public static Expression<Func<PurchaseLogistic, Guid>> GetKeySelector()
+    {
+        return x => x.PurchaseId;
+    }
+
     public static Expression<Func<PurchaseLogistic, bool>> GetEqualityExpression(Guid key)
     {
         return x => x.PurchaseId == key;

@@ -23,6 +23,11 @@ public class Role : AuditableEntity<Role, string>, ILinqEntity<Role, string>
     public string? Description { get; private set; }
     public IReadOnlyCollection<RolePermission> RolePermissions => _rolePermissions;
 
+    public static Expression<Func<Role, string>> GetKeySelector()
+    {
+        return x => x.Name;
+    }
+
     public static Expression<Func<Role, bool>> GetEqualityExpression(string key)
     {
         var normalized = RoleNames.Normalize(key);

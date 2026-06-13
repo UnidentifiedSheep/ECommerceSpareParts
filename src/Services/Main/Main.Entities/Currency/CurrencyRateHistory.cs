@@ -32,6 +32,11 @@ public class CurrencyRateHistory : AuditableEntity<CurrencyRateHistory, int>, IL
 
     public CurrencyRate CurrencyRate { get; private set; } = null!;
 
+    public static Expression<Func<CurrencyRateHistory, int>> GetKeySelector()
+    {
+        return x => x.Id;
+    }
+
     public static Expression<Func<CurrencyRateHistory, bool>> GetEqualityExpression(int key)
     {
         return x => x.Id == key;

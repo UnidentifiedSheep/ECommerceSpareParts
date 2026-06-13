@@ -35,6 +35,11 @@ public class PurchaseContent : Entity<PurchaseContent, int>, ILinqEntity<Purchas
     public PurchaseContentLogistic? PurchaseContentLogistic { get; private set; }
     public StorageContent StorageContent { get; private set; } = null!;
 
+    public static Expression<Func<PurchaseContent, int>> GetKeySelector()
+    {
+        return x => x.Id;
+    }
+
     public static Expression<Func<PurchaseContent, bool>> GetEqualityExpression(int key)
     {
         return x => x.Id == key;

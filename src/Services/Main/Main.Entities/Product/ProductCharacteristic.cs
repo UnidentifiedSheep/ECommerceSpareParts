@@ -24,6 +24,11 @@ public class ProductCharacteristic : Entity<ProductCharacteristic, (int, string)
     public string Name { get; private set; } = null!;
     public string Value { get; private set; } = null!;
 
+    public static Expression<Func<ProductCharacteristic, (int, string)>> GetKeySelector()
+    {
+        return x => ValueTuple.Create(x.ProductId, x.Name);
+    }
+
     public static Expression<Func<ProductCharacteristic, bool>> GetEqualityExpression((int, string) key)
     {
         return x => x.ProductId == key.Item1 && x.Name == key.Item2;

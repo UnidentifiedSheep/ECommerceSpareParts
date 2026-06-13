@@ -36,6 +36,11 @@ public class ProductSize : Entity<ProductSize, int>, ILinqEntity<ProductSize, in
 
     public decimal VolumeM3 { get; private set; }
 
+    public static Expression<Func<ProductSize, int>> GetKeySelector()
+    {
+        return x => x.ProductId;
+    }
+
     public static Expression<Func<ProductSize, bool>> GetEqualityExpression(int key)
     {
         return x => x.ProductId == key;

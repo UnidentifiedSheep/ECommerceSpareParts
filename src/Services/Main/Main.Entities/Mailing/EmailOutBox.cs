@@ -52,6 +52,9 @@ public class EmailOutBox : AuditableEntity<EmailOutBox, Guid>, ILinqEntity<Email
         Status = EmailStatus.Cancelled;
     }
     
+    public static Expression<Func<EmailOutBox, Guid>> GetKeySelector()
+        => x => x.Id;
+    
     public static Expression<Func<EmailOutBox, bool>> GetEqualityExpression(Guid key)
         => x => x.Id == key;
 }

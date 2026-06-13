@@ -32,6 +32,11 @@ public class Storage : AuditableEntity<Storage, string>, ILinqEntity<Storage, st
     public StorageType Type { get; private set; }
     public IReadOnlyCollection<StorageOwner> Owners => _owners;
 
+    public static Expression<Func<Storage, string>> GetKeySelector()
+    {
+        return x => x.Name;
+    }
+
     public static Expression<Func<Storage, bool>> GetEqualityExpression(string key)
     {
         return x => x.Name == key;

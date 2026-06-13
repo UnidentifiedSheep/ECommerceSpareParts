@@ -49,6 +49,11 @@ public class Purchase : AuditableEntity<Purchase, Guid>, ILinqEntity<Purchase, G
     public virtual Transaction Transaction { get; private set; } = null!;
     public IReadOnlyCollection<PurchaseContent> Contents => _contents;
 
+    public static Expression<Func<Purchase, Guid>> GetKeySelector()
+    {
+        return x => x.Id;
+    }
+
     public static Expression<Func<Purchase, bool>> GetEqualityExpression(Guid key)
     {
         return x => x.Id == key;

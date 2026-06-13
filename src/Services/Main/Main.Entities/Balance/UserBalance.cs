@@ -23,6 +23,11 @@ public class UserBalance : AuditableEntity<UserBalance, UserBalanceKey>, ILinqEn
     public decimal Balance { get; private set; }
     public uint RowVersion { get; private set; }
 
+    public static Expression<Func<UserBalance, UserBalanceKey>> GetKeySelector()
+    {
+        return x => new UserBalanceKey(x.UserId, x.CurrencyId);
+    }
+
     public static Expression<Func<UserBalance, bool>> GetEqualityExpression(UserBalanceKey key)
     {
         return x => x.UserId == key.UserId && x.CurrencyId == key.CurrencyId;

@@ -29,6 +29,11 @@ public class ProducerOtherName : Entity<ProducerOtherName, ProducerOtherNameKey>
     [ValidateTuple("PK")]
     public string WhereUsed { get; private set; } = null!;
 
+    public static Expression<Func<ProducerOtherName, ProducerOtherNameKey>> GetKeySelector()
+    {
+        return x => new ProducerOtherNameKey(x.ProducerId, x.OtherName, x.WhereUsed);
+    }
+
     public static Expression<Func<ProducerOtherName, bool>> GetEqualityExpression(ProducerOtherNameKey key)
     {
         return x => x.ProducerId == key.ProducerId && x.OtherName == key.OtherName && x.WhereUsed == key.WhereUsed;

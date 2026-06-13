@@ -34,6 +34,11 @@ public class SaleContentDetail : Entity<SaleContentDetail, int>, ILinqEntity<Sal
     public int Count { get; private set; }
     public DateTime PurchaseDatetime { get; private set; }
 
+    public static Expression<Func<SaleContentDetail, int>> GetKeySelector()
+    {
+        return x => x.Id;
+    }
+
     public static Expression<Func<SaleContentDetail, bool>> GetEqualityExpression(int key)
     {
         return x => x.Id == key;

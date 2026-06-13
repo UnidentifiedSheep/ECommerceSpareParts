@@ -25,6 +25,11 @@ public class UserInfo : Entity<UserInfo, Guid>, ILinqEntity<UserInfo, Guid>
     public string? Description { get; private set; }
     public string SearchColumn { get; private set; } = null!;
 
+    public static Expression<Func<UserInfo, Guid>> GetKeySelector()
+    {
+        return x => x.UserId;
+    }
+
     public static Expression<Func<UserInfo, bool>> GetEqualityExpression(Guid key)
     {
         return x => x.UserId == key;

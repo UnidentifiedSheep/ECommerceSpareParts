@@ -26,6 +26,11 @@ public class ProductContent : Entity<ProductContent, (int, int)>, ILinqEntity<Pr
     public Product ParentProduct { get; private set; } = null!;
     public Product ChildProduct { get; private set; } = null!;
 
+    public static Expression<Func<ProductContent, (int, int)>> GetKeySelector()
+    {
+        return x => ValueTuple.Create(x.ParentProductId, x.ChildProductId);
+    }
+
     public static Expression<Func<ProductContent, bool>> GetEqualityExpression((int, int) key)
     {
         return x => x.ParentProductId == key.Item1 && x.ChildProductId == key.Item2;

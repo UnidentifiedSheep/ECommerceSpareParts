@@ -21,6 +21,11 @@ public class RolePermission : Entity<RolePermission, (string, string)>, ILinqEnt
     public Role Role { get; set; } = null!;
     public Permission Permission { get; set; } = null!;
 
+    public static Expression<Func<RolePermission, (string, string)>> GetKeySelector()
+    {
+        return x => ValueTuple.Create(x.RoleName, x.PermissionName);
+    }
+
     public static Expression<Func<RolePermission, bool>> GetEqualityExpression((string, string) key)
     {
         var normalized = RoleNames.Normalize(key.Item1);

@@ -44,6 +44,11 @@ public class SaleContent : Entity<SaleContent, int>, ILinqEntity<SaleContent, in
     public Product.Product Product { get; private set; } = null!;
     public IReadOnlyList<SaleContentDetail> Details => _details;
 
+    public static Expression<Func<SaleContent, int>> GetKeySelector()
+    {
+        return x => x.Id;
+    }
+
     public static Expression<Func<SaleContent, bool>> GetEqualityExpression(int key)
     {
         return x => x.Id == key;

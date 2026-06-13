@@ -20,6 +20,10 @@ public class Job : AuditableEntity<Job, Guid>, ILinqEntity<Job, Guid>
         Status is JobStatus.Succeeded or JobStatus.Failed or JobStatus.Cancelled;
     
     public override Guid GetId() => Id;
+    
+    public static Expression<Func<Job, Guid>> GetKeySelector()
+        => x => x.Id;
+    
     public static Expression<Func<Job, bool>> GetEqualityExpression(Guid key)
         => x => x.Id == key;
 

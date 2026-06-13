@@ -28,6 +28,11 @@ public class StorageOwner : AuditableEntity<StorageOwner, (string, Guid)>, ILinq
 
     public Storage Storage { get; private set; } = null!;
 
+    public static Expression<Func<StorageOwner, (string, Guid)>> GetKeySelector()
+    {
+        return x => ValueTuple.Create(x.StorageName, x.UserId);
+    }
+
     public static Expression<Func<StorageOwner, bool>> GetEqualityExpression((string, Guid) key)
     {
         return x => x.StorageName == key.Item1 && x.UserId == key.Item2;
