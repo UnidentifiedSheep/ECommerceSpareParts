@@ -8,7 +8,7 @@ public class FifoStorageContentExtractPolicy : StorageContentExtractPolicyBase
     public override string NameLocalizationKey => "fifo.storage.content.extract.policy.name";
     public override string DescriptionLocalizationKey => "fifo.storage.content.extract.policy.description";
 
-    public override IQueryable<StorageContent> Apply(IQueryable<StorageContent> query)
+    public override IOrderedQueryable<StorageContent> Apply(IQueryable<StorageContent> query)
     {
         return query.OrderBy(x => x.PurchaseDatetime);
     }
