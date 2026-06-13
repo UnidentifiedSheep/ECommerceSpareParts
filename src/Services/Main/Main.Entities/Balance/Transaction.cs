@@ -25,7 +25,7 @@ public class Transaction : AuditableEntity<Transaction, Guid>, ILinqEntity<Trans
         TransactionSourceType sourceType)
     {
         if (senderId == receiverId)
-            throw new InvalidInputException(""); //TODO: create error message.
+            throw new InvalidInputException("transaction.sender.receiver.must.not.be.same");
         SenderId = senderId;
         ReceiverId = receiverId;
         Type = type;

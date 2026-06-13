@@ -5,7 +5,6 @@ using Main.Entities.Product;
 using Microsoft.EntityFrameworkCore;
 using Test.Common.TestContainers.Combined;
 using Tests.TestContexts;
-using ValidationException = FluentValidation.ValidationException;
 
 namespace Tests.HandlersTests.Products;
 

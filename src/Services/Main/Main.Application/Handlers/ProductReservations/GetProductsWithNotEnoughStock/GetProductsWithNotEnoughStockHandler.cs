@@ -1,32 +1,32 @@
 using Application.Common.Interfaces.Cqrs;
 using Main.Application.Interfaces.Persistence;
 
-namespace Main.Application.Handlers.ProductReservations.GetArticlesWithNotEnoughStock;
+namespace Main.Application.Handlers.ProductReservations.GetProductsWithNotEnoughStock;
 
 /// <summary>
 ///     Получение артикулов у которых не хватает количества на складе,
 ///     или есть резервации артикулов другими пользователями при этом количество на складе
 ///     не покрывает продажу и резервацию.
 /// </summary>
-public record GetArticlesWithNotEnoughStockQuery(
+public record GetProductsWithNotEnoughStockQuery(
     Guid BuyerId,
     string StorageName,
     bool TakeFromOtherStorages,
-    Dictionary<int, int> NeededCounts) : IQuery<GetArticlesWithNotEnoughStockResult>;
+    Dictionary<int, int> NeededCounts) : IQuery<GetProductsWithNotEnoughStockResult>;
 
 /// <param name="NotEnoughByReservation">Список артикулов которых не хватает из-за резерваций</param>
 /// <param name="NotEnoughByStock">Список артикулов которых не хватает на складе для продажи без учета резерваций.</param>
-public record GetArticlesWithNotEnoughStockResult(
+public record GetProductsWithNotEnoughStockResult(
     Dictionary<int, int> NotEnoughByReservation,
     Dictionary<int, int> NotEnoughByStock);
 
-public class GetArticlesWithNotEnoughStockHandler(
+public class GetProductsWithNotEnoughStockHandler(
     IStorageContentRepository storageContentRepository,
     IStorageContentReservationRepository reservationRepository)
-    : IQueryHandler<GetArticlesWithNotEnoughStockQuery, GetArticlesWithNotEnoughStockResult>
+    : IQueryHandler<GetProductsWithNotEnoughStockQuery, GetProductsWithNotEnoughStockResult>
 {
-    public async Task<GetArticlesWithNotEnoughStockResult> Handle(
-        GetArticlesWithNotEnoughStockQuery request,
+    public async Task<GetProductsWithNotEnoughStockResult> Handle(
+        GetProductsWithNotEnoughStockQuery request,
         CancellationToken cancellationToken)
     {
         var articleIds = request.NeededCounts.Keys;
@@ -61,6 +61,6 @@ public class GetArticlesWithNotEnoughStockHandler(
             if (reservationsDiff < 0) notEnoughByReservation.Add(id, Math.Abs(reservationsDiff));
         }
 
-        return new GetArticlesWithNotEnoughStockResult(notEnoughByReservation, notEnoughStock);
+        return new GetProductsWithNotEnoughStockResult(notEnoughByReservation, notEnoughStock);
     }
 }

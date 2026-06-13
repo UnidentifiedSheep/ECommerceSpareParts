@@ -13,7 +13,6 @@ using Tests.DataBuilders.Storage;
 using Tests.TestContexts;
 using Tests.TestContexts.Currency;
 using Tests.TestContexts.Storage;
-using ValidationException = FluentValidation.ValidationException;
 
 namespace Tests.HandlersTests.StorageContents;
 

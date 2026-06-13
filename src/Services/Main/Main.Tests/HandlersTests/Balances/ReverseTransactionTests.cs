@@ -7,7 +7,6 @@ using Test.Common.TestContainers.Combined;
 using Tests.DataBuilders.Balance;
 using Tests.TestContexts;
 using Tests.TestContexts.Balance;
-using ValidationException = FluentValidation.ValidationException;
 
 namespace Tests.HandlersTests.Balances;
 

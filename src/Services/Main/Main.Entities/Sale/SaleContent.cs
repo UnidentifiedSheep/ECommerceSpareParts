@@ -91,17 +91,7 @@ public class SaleContent : Entity<SaleContent, int>, ILinqEntity<SaleContent, in
     private void ClearAndSetDetails(IEnumerable<SaleContentDetail> details)
     {
         var list = details.ToList();
-        var detailsCount = 0;
-        HashSet<string> seenStorages = [];
-
-        foreach (var detail in list)
-        {
-            seenStorages.Add(detail.Storage);
-            detailsCount += detail.Count;
-        }
-
-        if (seenStorages.Count != 1)
-            throw new InvalidOperationException("Sale content details must have only one storage");
+        var detailsCount = list.Sum(detail => detail.Count);
 
         SetCount(detailsCount);
         

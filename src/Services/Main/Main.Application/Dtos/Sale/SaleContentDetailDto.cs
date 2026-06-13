@@ -11,10 +11,7 @@ public record SaleContentDetailDto
     public required int SaleContentId { get; init; }
 
     [JsonPropertyName("storageContentId")]
-    public required int? StorageContentId { get; init; }
-
-    [JsonPropertyName("storage")]
-    public required string Storage { get; init; }
+    public required int StorageContentId { get; init; }
 
     [JsonPropertyName("currencyId")]
     public required int CurrencyId { get; init; }

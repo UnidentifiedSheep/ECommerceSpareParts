@@ -9,6 +9,7 @@ using Attributes;
 using Contracts.Products;
 using Contracts.StorageContent;
 using Main.Application.Interfaces.Persistence;
+using Main.Application.Models.Storage;
 using Main.Application.NamedObjects.StorageContentExtractPolicies;
 using Main.Entities.Event;
 using Main.Entities.Exceptions;
@@ -35,9 +36,7 @@ public record SubtractStorageContentsCommand(
     }
 }
 
-public record SubtractStorageContentsResult(IReadOnlyList<SubtractedStorageContent> Contents);
-
-public record SubtractedStorageContent(int StorageContentId, int Count);
+public record SubtractStorageContentsResult(IReadOnlyList<StorageLot> Contents);
 
 public class SubtractStorageContentsHandler(
     IStorageContentRepository storageContentRepository,
@@ -98,7 +97,7 @@ public class SubtractStorageContentsHandler(
             cancellationToken);
 
         var events = new List<Event>();
-        var affected = new List<SubtractedStorageContent>();
+        var affected = new List<StorageLot>();
         var policy = await GetExtractionPolicy(cancellationToken);
 
         await SubtractByStorageContentsAsync(
@@ -142,7 +141,7 @@ public class SubtractStorageContentsHandler(
         Dictionary<int, int> byStorageContents,
         Dictionary<int, StorageContent> storageContents,
         Dictionary<int, Product> products,
-        List<SubtractedStorageContent> affected,
+        List<StorageLot> affected,
         List<Event> events,
         StorageMovementType movementType,
         StorageContentExtractPolicyBase policy,
@@ -173,7 +172,7 @@ public class SubtractStorageContentsHandler(
     private async Task SubtractByProductAndStorageAsync(
         Dictionary<(string storageName, int productId), int> byProductAndStorage,
         Dictionary<int, Product> products,
-        List<SubtractedStorageContent> affected,
+        List<StorageLot> affected,
         List<Event> events,
         StorageMovementType movementType,
         StorageContentExtractPolicyBase policy,
@@ -204,7 +203,7 @@ public class SubtractStorageContentsHandler(
         string storageName,
         StorageContentExtractPolicyBase policy,
         List<Event> events,
-        List<SubtractedStorageContent> affected,
+        List<StorageLot> affected,
         StorageMovementType movementType,
         int? skipStorageContentId = null,
         CancellationToken cancellationToken = default)
@@ -245,7 +244,7 @@ public class SubtractStorageContentsHandler(
     private static void Subtract(
         StorageContent content,
         ref int remaining,
-        ICollection<SubtractedStorageContent> affected,
+        ICollection<StorageLot> affected,
         ICollection<Event> events,
         StorageMovementType movementType)
     {
@@ -254,7 +253,13 @@ public class SubtractStorageContentsHandler(
         var countToSubtract = Math.Min(content.Count, remaining);
         events.Add(CreateStorageMovementEvent(content, countToSubtract, movementType));
         content.IncreaseCount(-countToSubtract);
-        affected.Add(new SubtractedStorageContent(content.Id, countToSubtract));
+        affected.Add(new StorageLot(
+            content.Id,
+            content.ProductId,
+            content.CurrencyId,
+            content.BuyPrice,
+            countToSubtract,
+            content.PurchaseDatetime));
         remaining -= countToSubtract;
     }
 

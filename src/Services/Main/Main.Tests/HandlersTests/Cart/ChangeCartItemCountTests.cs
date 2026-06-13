@@ -5,7 +5,6 @@ using Test.Common.Extensions;
 using Test.Common.TestContainers.Combined;
 using Tests.DataBuilders;
 using Tests.TestContexts;
-using ValidationException = FluentValidation.ValidationException;
 
 namespace Tests.HandlersTests.Cart;
 

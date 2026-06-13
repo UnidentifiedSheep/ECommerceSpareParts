@@ -14,7 +14,7 @@ using Tests.TestContexts.Currency;
 using Tests.TestContexts.Purchase;
 using Tests.TestContexts.Storage;
 
-namespace Tests.ServicesTests.Purchases;
+namespace Tests.ServicesTests;
 
 public class PurchaseLogisticsServiceTests : IntegrationTest
 {

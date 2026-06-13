@@ -4,7 +4,6 @@ using Main.Application.Handlers.Producers.CreateProducer;
 using Main.Entities.Producer;
 using Microsoft.EntityFrameworkCore;
 using Test.Common.TestContainers.Combined;
-using ValidationException = FluentValidation.ValidationException;
 
 namespace Tests.HandlersTests.Producers;
 

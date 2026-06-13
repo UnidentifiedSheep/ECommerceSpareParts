@@ -42,7 +42,6 @@ public static class SaleProjections
             CurrencyId = x.CurrencyId,
             PurchaseDatetime = x.PurchaseDatetime,
             SaleContentId = x.SaleContentId,
-            Storage = x.Storage,
             StorageContentId = x.StorageContentId
         };
 }

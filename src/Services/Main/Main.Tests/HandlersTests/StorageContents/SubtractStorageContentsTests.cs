@@ -1,5 +1,6 @@
 using FluentAssertions;
 using Main.Application.Handlers.StorageContents.SubtractContent;
+using Main.Application.Models.Storage;
 using Main.Entities.Event;
 using Main.Entities.Exceptions;
 using Main.Entities.Storage;
@@ -7,7 +8,6 @@ using Main.Enums;
 using Microsoft.EntityFrameworkCore;
 using Test.Common.TestContainers.Combined;
 using Tests.TestContexts.Storage;
-using ValidationException = FluentValidation.ValidationException;
 
 namespace Tests.HandlersTests.StorageContents;
 
@@ -38,8 +38,8 @@ public class SubtractStorageContentsTests : IntegrationTest
             StorageMovementType.Sale));
 
         result.Contents.Should().Equal(
-            new SubtractedStorageContent(passedContent.Id, passedContentOriginalCount),
-            new SubtractedStorageContent(firstByDate.Id, 1));
+            ToStorageLot(passedContent, passedContentOriginalCount),
+            ToStorageLot(firstByDate, 1));
 
         var contents = await Context.StorageContents.AsNoTracking().ToDictionaryAsync(x => x.Id);
         contents[passedContent.Id].Count.Should().Be(0);
@@ -75,7 +75,7 @@ public class SubtractStorageContentsTests : IntegrationTest
             2,
             StorageMovementType.Sale));
 
-        result.Contents.Should().Equal(new SubtractedStorageContent(content.Id, 2));
+        result.Contents.Should().Equal(ToStorageLot(content, 2));
 
         var updatedContent = await Context.StorageContents.AsNoTracking().SingleAsync(x => x.Id == content.Id);
         var updatedProduct = await Context.Products.AsNoTracking().SingleAsync(x => x.Id == content.ProductId);
@@ -103,7 +103,7 @@ public class SubtractStorageContentsTests : IntegrationTest
             1,
             StorageMovementType.Sale));
 
-        result.Contents.Should().Equal(new SubtractedStorageContent(second.Id, 1));
+        result.Contents.Should().Equal(ToStorageLot(second, 1));
 
         var updatedFirst = await Context.StorageContents.AsNoTracking().SingleAsync(x => x.Id == first.Id);
         var updatedSecond = await Context.StorageContents.AsNoTracking().SingleAsync(x => x.Id == second.Id);
@@ -154,8 +154,8 @@ public class SubtractStorageContentsTests : IntegrationTest
             StorageMovementType.PurchaseEditing));
 
         result.Contents.Should().Equal(
-            new SubtractedStorageContent(first.Id, 1),
-            new SubtractedStorageContent(second.Id, 1));
+            ToStorageLot(first, 1),
+            ToStorageLot(second, 1));
 
         var contents = await Context.StorageContents.AsNoTracking().ToDictionaryAsync(x => x.Id);
         contents[first.Id].Count.Should().Be(originalFirstCount - 1);
@@ -317,8 +317,8 @@ public class SubtractStorageContentsTests : IntegrationTest
             StorageMovementType.Sale));
 
         result.Contents.Should().Equal(
-            new SubtractedStorageContent(firstByDate.Id, firstByDateOriginalCount),
-            new SubtractedStorageContent(secondByDate.Id, 1));
+            ToStorageLot(firstByDate, firstByDateOriginalCount),
+            ToStorageLot(secondByDate, 1));
 
         var contents = await Context.StorageContents.AsNoTracking().ToDictionaryAsync(x => x.Id);
         contents[firstByDate.Id].Count.Should().Be(0);
@@ -405,5 +405,16 @@ public class SubtractStorageContentsTests : IntegrationTest
             .OrderByDescending(x => x.Sum(z => z.Count))
             .First()
             .ToList();
+    }
+
+    private static StorageLot ToStorageLot(StorageContent content, int count)
+    {
+        return new StorageLot(
+            content.Id,
+            content.ProductId,
+            content.CurrencyId,
+            content.BuyPrice,
+            count,
+            content.PurchaseDatetime);
     }
 }

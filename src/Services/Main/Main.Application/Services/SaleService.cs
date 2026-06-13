@@ -1,6 +1,6 @@
 using Main.Application.Dtos.Sale;
 using Main.Application.Interfaces.Services;
-using Main.Application.Models.Sale;
+using Main.Application.Models.Storage;
 using Main.Entities.Sale;
 
 namespace Main.Application.Services;
@@ -27,7 +27,7 @@ public class SaleService : ISaleService
 
     private List<SaleContent> DistributeDetails(
         IEnumerable<StorageLot> storageContentValues,
-        IEnumerable<(int productId, decimal price, decimal priceNoDiscount, int count)> saleContents)
+        IEnumerable<(int productId, decimal price, decimal priceWithDiscount, int count)> saleContents)
     {
         var result = new List<SaleContent>();
 
@@ -58,7 +58,7 @@ public class SaleService : ISaleService
                     .ToList()
             );
 
-        foreach (var (productId, price, priceNoDiscount, count) in
+        foreach (var (productId, price, priceWithDiscount, count) in
                  saleContents.OrderByDescending(x => x.count))
         {
             if (!storageByProduct.TryGetValue(productId, out var storage))
@@ -77,19 +77,19 @@ public class SaleService : ISaleService
                 {
                     details.Add(detail);
                     leftToDistribute -= detail.Count;
-                    i++;
+                    storage.RemoveAt(i);
                 }
                 else
                 {
                     details.Add(SaleContentDetail.Create(
-                        detail.Id,
+                        detail.StorageContentId,
                         detail.CurrencyId,
                         detail.BuyPrice,
                         leftToDistribute,
                         detail.PurchaseDatetime));
 
                     storage[i] = SaleContentDetail.Create(
-                        detail.Id,
+                        detail.StorageContentId,
                         detail.CurrencyId,
                         detail.BuyPrice,
                         detail.Count - leftToDistribute,
@@ -104,8 +104,8 @@ public class SaleService : ISaleService
 
             result.Add(SaleContent.Create(
                 productId,
-                priceNoDiscount,
                 price,
+                priceWithDiscount,
                 count,
                 details));
         }
