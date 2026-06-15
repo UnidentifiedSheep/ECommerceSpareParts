@@ -1,11 +1,13 @@
 using System.Text.Json.Serialization;
 using Abstractions.Interfaces;
+using Abstractions.Models;
 using Api.Common.Extensions;
 using Api.Common.Models.Requests;
 using Carter;
 using Enums;
 using Main.Application.Dtos.Sale;
 using Main.Application.Handlers.Sales.CreateSale;
+using Main.Application.Handlers.Sales.GetSales;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
 
@@ -44,6 +46,32 @@ public record CreateSaleResponse
     public required SaleDto Sale { get; init; }
 }
 
+public record GetSalesRequest : SortablePaginationQueryModel
+{
+    [FromQuery(Name = "rangeStartDate")] 
+    public DateTime RangeStartDate { get; init; }
+    
+    [FromQuery(Name = "rangeEndDate")] 
+    public DateTime RangeEndDate { get; init; }
+    
+    [FromQuery(Name = "buyerIds")] 
+    public Guid[] BuyerIds { get; init; } = [];
+    
+    [FromQuery(Name = "currencyIds")] 
+    public int[] CurrencyIds { get; init; } = [];
+
+    [FromQuery(Name = "productIds")] 
+    public int[] ProductIds { get; init; } = [];
+    
+    [FromQuery(Name = "searchTerm")] 
+    public string? SearchTerm { get; init; }
+}
+public record GetSalesResponse
+{
+    [JsonPropertyName("sales")]
+    public required IReadOnlyList<SaleDto> Sales { get; init; }
+}
+
 public record EditSaleRequest(
     IEnumerable<EditSaleContentDto> EditedContent,
     int CurrencyId,
@@ -53,28 +81,7 @@ public record EditSaleRequest(
 
 public record GetSaleContentResponse(IEnumerable<SaleContentDto> Content);
 
-public record GetSalesResponse(IEnumerable<SaleDto> Sales);
 
-public record GetSalesRequest : PaginationQueryModel
-{
-    [FromQuery(Name = "rangeStartDate")] 
-    public DateTime RangeStartDate { get; init; }
-    
-    [FromQuery(Name = "rangeEndDate")] 
-    public DateTime RangeEndDate { get; init; }
-    
-    [FromQuery(Name = "buyerId")] 
-    public Guid? BuyerId { get; init; }
-    
-    [FromQuery(Name = "currencyId")] 
-    public int? CurrencyId { get; init; }
-    
-    [FromQuery(Name = "sortBy")] 
-    public string? SortBy { get; init; }
-    
-    [FromQuery(Name = "searchTerm")] 
-    public string? SearchTerm { get; init; }
-}
 
 public class SalesEndPoints : ICarterModule
 {
@@ -153,15 +160,30 @@ public class SalesEndPoints : ICarterModule
             .ProducesProblem(StatusCodes.Status404NotFound)
             .RequireAnyPermission(PermissionCodes.SALES_GET);
 
-        sales.MapGet("/", (
+        sales.MapGet("/", async (
                 ISender sender,
                 [AsParameters] GetSalesRequest request,
-                CancellationToken token) => Results.Ok())
+                CancellationToken token) =>
+            {
+                var result = await sender.Send(new GetSalesQuery(
+                    new RangeModel<DateTime>(request.RangeStartDate, request.RangeEndDate),
+                    request,
+                    request.BuyerIds,
+                    request.CurrencyIds,
+                    request.ProductIds,
+                    request.SortBy,
+                    request.SearchTerm), token);
+
+                return Results.Ok(new GetSalesResponse
+                {
+                    Sales = result.Sales
+                });
+            })
             .WithDescription("Получение списка продаж")
             .WithName("GetSales")
             .WithSummary("Получить продажи")
             .WithDisplayName("Получение продаж")
-            .Produces(StatusCodes.Status200OK)
+            .Produces<GetSalesResponse>()
             .ProducesProblem(StatusCodes.Status400BadRequest)
             .RequireAnyPermission(PermissionCodes.SALES_GET);
     }
