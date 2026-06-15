@@ -14,10 +14,16 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace Main.Api.EndPoints.Products;
 
-public record CreateProductReservationQuery
+public record CreateProductReservationRequest
 {
-    [JsonPropertyName("reservations")]
-    public required List<NewProductReservationDto> Reservations { get; init; }
+    [JsonPropertyName("reservation")]
+    public required NewProductReservationDto Reservation { get; init; }
+}
+
+public record CreateProductReservationResponse
+{
+    [JsonPropertyName("reservation")]
+    public required ProductReservationDto Reservation { get; init; }
 }
 
 public record EditProductReservationRequest
@@ -57,18 +63,23 @@ public static class ProductReservationsEndPoints
     {
         products.MapPost("/reservations", async (
                 ISender sender,
-                CreateProductReservationQuery query,
+                CreateProductReservationRequest request,
                 CancellationToken cancellationToken) =>
             {
-                await sender.Send(new CreateProductReservationCommand(query.Reservations), cancellationToken);
-                return Results.NoContent();
+                var result = await sender.Send(new CreateProductReservationCommand(request.Reservation), cancellationToken);
+                return Results.Created(
+                    $"/products/reservations/{result.Reservation.Id}", 
+                    new CreateProductReservationResponse
+                    {
+                       Reservation = result.Reservation
+                    });
             })
             .WithName("CreateProductReservations")
             .WithSummary("Создать резервации продуктов")
             .WithDisplayName("Создать резервацию")
             .WithDescription("Создать резервацию для пользователя")
-            .Accepts<CreateProductReservationQuery>(false, "application/json")
-            .Produces(StatusCodes.Status204NoContent)
+            .Accepts<CreateProductReservationRequest>(false, "application/json")
+            .Produces<CreateProductReservationResponse>(StatusCodes.Status201Created)
             .ProducesProblem(StatusCodes.Status400BadRequest)
             .RequireAnyPermission(PermissionCodes.ARTICLE_RESERVATIONS_CREATE);
 
