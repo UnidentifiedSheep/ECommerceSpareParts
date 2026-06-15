@@ -2,6 +2,7 @@ using Application.Common.Interfaces.Cqrs;
 using Application.Common.Interfaces.Repositories;
 using Attributes;
 using Main.Entities.Storage;
+using Main.Enums;
 
 namespace Main.Application.Handlers.ProductReservations.UpdateReservationsCounts;
 
@@ -31,7 +32,8 @@ public class UpdateReservationsCountsHandler(
         var criteria = Criteria<StorageContentReservation>.New()
             .Where(x => x.UserId == userId &&
                         productIds.Contains(x.ProductId) &&
-                        !x.IsDone)
+                        (x.Status == StorageContentReservationStatus.Active ||
+                         x.Status == StorageContentReservationStatus.Locked))
             .Track()
             .ForUpdate()
             .Build();

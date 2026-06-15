@@ -25,6 +25,7 @@
     "article.reservation.proposed.price.max.two.decimals": "Proposed price can have at most 2 decimal places.",
     "article.reservation.is.locked": "The reservation is fixed and cannot be modified.",
     "article.reservation.is.done": "The reservation is already marked as completed and cannot be modified.",
+    "article.reservation.is.canceled": "The reservation is canceled and cannot be modified.",
     "article.reservation.comment.max.length": "The reservation comment can not be longer than 500 symbols.",
     "article.reservation.initial.count.must.be.positive": "Initial quantity must be greater than 0.",
     "article.reservation.current.count.must.be.positive": "Current quantity must be greater than 0.",

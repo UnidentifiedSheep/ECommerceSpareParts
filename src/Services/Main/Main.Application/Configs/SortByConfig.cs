@@ -4,6 +4,7 @@ using Main.Entities.Product;
 using Main.Entities.Purchase;
 using Main.Entities.Sale;
 using Main.Entities.Storage;
+using Main.Enums;
 
 namespace Main.Application.Configs;
 
@@ -43,6 +44,6 @@ public static class SortByConfig
             .Map<StorageContentReservation, int>("id", x => x.Id)
             .Map<StorageContentReservation, DateTime>("createAt", x => x.CreatedAt)
             .Map<StorageContentReservation, DateTime>("updatedAt", x => x.UpdatedAt)
-            .Map<StorageContentReservation, bool>("isDone", x => x.IsDone);
+            .Map<StorageContentReservation, StorageContentReservationStatus>("status", x => x.Status);
     }
 }

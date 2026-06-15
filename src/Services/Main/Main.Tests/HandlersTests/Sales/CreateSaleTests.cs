@@ -167,7 +167,7 @@ public class CreateSaleTests : IntegrationTest
             .AsNoTracking()
             .SingleAsync(x => x.Id == reservation.Id);
         updatedReservation.CurrentCount.Should().Be(2);
-        updatedReservation.IsDone.Should().BeTrue();
+        updatedReservation.Status.Should().Be(StorageContentReservationStatus.Done);
     }
 
     [Fact]

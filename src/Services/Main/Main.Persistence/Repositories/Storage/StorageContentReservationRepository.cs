@@ -1,6 +1,7 @@
 ﻿using System.Linq.Expressions;
 using Main.Application.Interfaces.Persistence;
 using Main.Entities.Storage;
+using Main.Enums;
 using Main.Persistence.Context;
 using Microsoft.EntityFrameworkCore;
 using Persistence.Interfaces;
@@ -20,7 +21,8 @@ public class StorageContentReservationRepository(DContext context, IQueryableExt
             r =>
                 r.UserId == userId &&
                 productIds.Contains(r.ProductId) &&
-                !r.IsDone,
+                (r.Status == StorageContentReservationStatus.Active ||
+                 r.Status == StorageContentReservationStatus.Locked),
             cancellationToken);
     }
 
@@ -33,7 +35,8 @@ public class StorageContentReservationRepository(DContext context, IQueryableExt
             r =>
                 r.UserId != userId &&
                 productIds.Contains(r.ProductId) &&
-                !r.IsDone,
+                (r.Status == StorageContentReservationStatus.Active ||
+                 r.Status == StorageContentReservationStatus.Locked),
             cancellationToken);
     }
 
