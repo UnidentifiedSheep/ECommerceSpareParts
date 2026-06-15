@@ -3,7 +3,6 @@ using Main.Application.NamedObjects.StorageContentExtractPolicies;
 using Main.Entities.Storage;
 using Main.Persistence.Context;
 using Microsoft.EntityFrameworkCore;
-using Persistence.Extensions;
 using Persistence.Interfaces;
 using Persistence.Repository;
 
@@ -20,30 +19,14 @@ public class StorageContentRepository(DContext context, IQueryableExtensions ext
         int countGreaterThen = 0,
         StorageContentExtractPolicyBase? policy = null)
     {
-        var exceptProducts = exceptProductIds?.ToList();
-        var exceptStorageNames = exceptStorages?.ToList();
-        var query = Context.StorageContents
-            .Where(x => x.Count > countGreaterThen);
-
-        if (productId != null)
-            query = query.Where(x => x.ProductId == productId);
-
-        if (exceptProducts != null && exceptProducts.Count != 0)
-            query = query.Where(x => !exceptProducts.Contains(x.ProductId));
-
-        if (storageName != null)
-            query = query.Where(x => x.StorageName == storageName);
-
-        if (exceptStorageNames != null && exceptStorageNames.Count != 0)
-            query = query.Where(x => !exceptStorageNames.Contains(x.StorageName));
-
-        query = QueryableExtensions.ForUpdate(query);
-
-        query = policy != null 
-            ? policy.Apply(query) 
-            : query.OrderBy(x => x.PurchaseDatetime);
-        
-        return query.AsAsyncEnumerable();
+        return BuildStorageContentsForUpdateQuery(
+                productId,
+                storageName,
+                exceptProductIds,
+                exceptStorages,
+                countGreaterThen,
+                policy)
+            .AsAsyncEnumerable();
     }
 
     public async Task<Dictionary<int, int>> GetStorageContentCounts(
@@ -65,5 +48,37 @@ public class StorageContentRepository(DContext context, IQueryableExtensions ext
             })
             .ToDictionaryAsync(x => x.ProductId,
                 x => x.TotalCount, cancellationToken);
+    }
+
+    private IQueryable<StorageContent> BuildStorageContentsForUpdateQuery(
+        int? productId,
+        string? storageName,
+        IEnumerable<int>? exceptProductIds = null,
+        IEnumerable<string>? exceptStorages = null,
+        int countGreaterThen = 0,
+        StorageContentExtractPolicyBase? policy = null)
+    {
+        var exceptProducts = exceptProductIds?.ToList();
+        var exceptStorageNames = exceptStorages?.ToList();
+        var query = Context.StorageContents
+            .Where(x => x.Count > countGreaterThen);
+
+        if (productId != null)
+            query = query.Where(x => x.ProductId == productId);
+
+        if (exceptProducts is { Count: > 0 })
+            query = query.Where(x => !exceptProducts.Contains(x.ProductId));
+
+        if (storageName != null)
+            query = query.Where(x => x.StorageName == storageName);
+
+        if (exceptStorageNames is { Count: > 0 })
+            query = query.Where(x => !exceptStorageNames.Contains(x.StorageName));
+
+        query = QueryableExtensions.ForUpdate(query);
+
+        return policy != null
+            ? policy.Apply(query)
+            : query.OrderBy(x => x.PurchaseDatetime);
     }
 }

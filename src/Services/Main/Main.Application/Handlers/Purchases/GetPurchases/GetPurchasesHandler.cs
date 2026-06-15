@@ -42,7 +42,8 @@ public class GetPurchasesHandler(
 
         if (request.ProductIds.Any())
             query = query.Where(x => x.Contents.Any(z => request.ProductIds.Contains(z.ProductId)));
-        else if (!string.IsNullOrWhiteSpace(request.SearchTerm))
+
+        if (!string.IsNullOrWhiteSpace(request.SearchTerm))
             query = ApplySearchTerm(query, request.SearchTerm);
 
         var purchases = await query

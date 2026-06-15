@@ -32,6 +32,11 @@ public class UserEmail : AuditableEntity<UserEmail, string>, ILinqEntity<UserEma
     public DateTime? ConfirmedAt { get; private set; }
     public User User { get; private set; } = null!;
 
+    public static Expression<Func<UserEmail, string>> GetKeySelector()
+    {
+        return x => x.Email.Value;
+    }
+
     public static Expression<Func<UserEmail, bool>> GetEqualityExpression(string key)
     {
         return x => x.Email == key;

@@ -1880,12 +1880,6 @@ namespace Main.Migrator.Migrations
                         .HasColumnType("integer")
                         .HasColumnName("sale_content_id");
 
-                    b.Property<string>("Storage")
-                        .IsRequired()
-                        .HasMaxLength(128)
-                        .HasColumnType("character varying(128)")
-                        .HasColumnName("storage");
-
                     b.Property<int>("StorageContentId")
                         .HasColumnType("integer")
                         .HasColumnName("storage_content_id");
@@ -1898,8 +1892,6 @@ namespace Main.Migrator.Migrations
                     b.HasIndex(new[] { "SaleContentId" }, "sale_content_details_sale_content_id_index");
 
                     b.HasIndex(new[] { "StorageContentId" }, "sale_content_details_storage_content_id_index");
-
-                    b.HasIndex(new[] { "Storage" }, "sale_content_details_storage_index");
 
                     b.ToTable("sale_content_details", "public");
                 });
@@ -3482,17 +3474,10 @@ namespace Main.Migrator.Migrations
                         .IsRequired()
                         .HasConstraintName("sale_content_details_sale_content_id_fk");
 
-                    b.HasOne("Main.Entities.Storage.Storage", null)
-                        .WithMany()
-                        .HasForeignKey("Storage")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired()
-                        .HasConstraintName("sale_content_details_storages_name_fk");
-
                     b.HasOne("Main.Entities.Storage.StorageContent", null)
                         .WithMany()
                         .HasForeignKey("StorageContentId")
-                        .OnDelete(DeleteBehavior.SetNull)
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired()
                         .HasConstraintName("sale_content_details_storage_content_id_fk");
                 });

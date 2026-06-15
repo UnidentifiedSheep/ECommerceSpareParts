@@ -1,10 +1,21 @@
+using System.Text.Json.Serialization;
+
 namespace Main.Application.Dtos.Sale;
 
-public class NewSaleContentDto
+public record NewSaleContentDto
 {
-    public int ProductId { get; set; }
-    public int Count { get; set; }
-    public decimal Price { get; set; }
-    public decimal PriceWithDiscount { get; set; }
-    public string? Comment { get; set; }
+    [JsonPropertyName("productId")]
+    public required int ProductId { get; init; }
+    
+    [JsonPropertyName("count")]
+    public required int Count { get; init; }
+    
+    [JsonPropertyName("price")]
+    public required decimal Price { get; init; }
+    
+    [JsonPropertyName("priceWithDiscount")]
+    public required decimal PriceWithDiscount { get; init; }
+    
+    [JsonPropertyName("comment")]
+    public string? Comment { get; init; }
 }

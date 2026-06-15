@@ -33,6 +33,11 @@ public class ProductImage : Entity<ProductImage, (int, string)>, ILinqEntity<Pro
 
     public string? Description { get; private set; }
 
+    public static Expression<Func<ProductImage, (int, string)>> GetKeySelector()
+    {
+        return x => ValueTuple.Create(x.ProductId, x.Path);
+    }
+
     public static Expression<Func<ProductImage, bool>> GetEqualityExpression((int, string) key)
     {
         return x => x.ProductId == key.Item1 && x.Path == key.Item2;

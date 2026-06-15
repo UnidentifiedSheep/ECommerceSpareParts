@@ -28,11 +28,17 @@ public class SaleContentDetail : Entity<SaleContentDetail, int>, ILinqEntity<Sal
     public int Id { get; private set; }
     public int SaleContentId { get; private set; }
     public int StorageContentId { get; private set; }
-    public string Storage { get; private set; } = null!;
     public int CurrencyId { get; private set; }
     public decimal BuyPrice { get; private set; }
     public int Count { get; private set; }
     public DateTime PurchaseDatetime { get; private set; }
+
+    public Currency.Currency Currency { get; private set; } = null!;
+
+    public static Expression<Func<SaleContentDetail, int>> GetKeySelector()
+    {
+        return x => x.Id;
+    }
 
     public static Expression<Func<SaleContentDetail, bool>> GetEqualityExpression(int key)
     {

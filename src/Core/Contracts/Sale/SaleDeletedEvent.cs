@@ -1,6 +1,9 @@
-﻿namespace Contracts.Sale;
+using Abstractions.Interfaces;
 
-public record SaleDeletedEvent
+namespace Contracts.Sale;
+
+public record SaleDeletedEvent : IKeyedEvent
 {
-    public Models.Sale.Sale Sale { get; init; } = null!;
+    public Guid Id { get; init; }
+    public string GetKey() => $"sale-deleted:{Id}";
 }

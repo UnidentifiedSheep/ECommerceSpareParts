@@ -4,7 +4,6 @@ using Microsoft.EntityFrameworkCore;
 using Test.Common.Extensions;
 using Test.Common.TestContainers.Combined;
 using Tests.DataBuilders.Currency;
-using ValidationException = FluentValidation.ValidationException;
 
 namespace Tests.HandlersTests.Currencies;
 

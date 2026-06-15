@@ -3,10 +3,11 @@ using Application.Common.Interfaces.Repositories;
 using LinqKit;
 using Main.Application.Dtos.Sale;
 using Main.Application.Handlers.Projections;
+using Main.Entities.Exceptions;
 using Main.Entities.Sale;
 using Microsoft.EntityFrameworkCore;
 
-namespace Main.Application.Handlers.Sales.GetSaleContent;
+namespace Main.Application.Handlers.Sales;
 
 public record GetSaleContentQuery(Guid Id) : IQuery<GetSaleContentResult>;
 
@@ -24,6 +25,8 @@ public class GetSaleContentHandler(
             .Select(SaleProjections.ToSaleContentDto)
             .ToListAsync(cancellationToken);
 
-        return new GetSaleContentResult(result);
+        return result.Count == 0 
+            ? throw new SaleNotFoundException(request.Id) 
+            : new GetSaleContentResult(result);
     }
 }

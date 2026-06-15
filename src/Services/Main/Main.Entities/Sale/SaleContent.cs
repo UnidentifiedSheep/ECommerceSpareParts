@@ -44,6 +44,11 @@ public class SaleContent : Entity<SaleContent, int>, ILinqEntity<SaleContent, in
     public Product.Product Product { get; private set; } = null!;
     public IReadOnlyList<SaleContentDetail> Details => _details;
 
+    public static Expression<Func<SaleContent, int>> GetKeySelector()
+    {
+        return x => x.Id;
+    }
+
     public static Expression<Func<SaleContent, bool>> GetEqualityExpression(int key)
     {
         return x => x.Id == key;
@@ -59,7 +64,7 @@ public class SaleContent : Entity<SaleContent, int>, ILinqEntity<SaleContent, in
         return new SaleContent(productId, priceWithOutDiscount, priceWithDiscount, count, details);
     }
 
-    public void SetCount(int count)
+    private void SetCount(int count)
     {
         Count = count.AgainstLessOrEqual(0, "sale.content.count.min");
     }
@@ -86,21 +91,10 @@ public class SaleContent : Entity<SaleContent, int>, ILinqEntity<SaleContent, in
     private void ClearAndSetDetails(IEnumerable<SaleContentDetail> details)
     {
         var list = details.ToList();
-        var detailsCount = 0;
-        HashSet<string> seenStorages = [];
+        var detailsCount = list.Sum(detail => detail.Count);
 
-        foreach (var detail in list)
-        {
-            seenStorages.Add(detail.Storage);
-            detailsCount += detail.Count;
-        }
-
-        if (seenStorages.Count != 1)
-            throw new InvalidOperationException("Sale content details must have only one storage");
-
-        if (detailsCount != Count)
-            throw new InvalidOperationException("Total details count is not equal to sale conent count");
-
+        SetCount(detailsCount);
+        
         _details.Clear();
         _details.AddRange(list);
     }

@@ -1,5 +1,5 @@
 using Main.Application.Dtos.Sale;
-using Main.Application.Models.Sale;
+using Main.Application.Models.Storage;
 using Main.Entities.Sale;
 
 namespace Main.Application.Interfaces.Services;

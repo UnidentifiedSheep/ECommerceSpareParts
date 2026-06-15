@@ -1,11 +1,11 @@
 using FluentValidation;
 using Localization.Domain.Extensions;
 
-namespace Main.Application.Handlers.ProductReservations.GetArticlesWithNotEnoughStock;
+namespace Main.Application.Handlers.ProductReservations.GetProductsWithNotEnoughStock;
 
-public class GetArticlesWithNotEnoughStockValidation : AbstractValidator<GetArticlesWithNotEnoughStockQuery>
+public class GetProductsWithNotEnoughStockValidation : AbstractValidator<GetProductsWithNotEnoughStockQuery>
 {
-    public GetArticlesWithNotEnoughStockValidation()
+    public GetProductsWithNotEnoughStockValidation()
     {
         RuleFor(x => x.BuyerId)
             .NotEmpty()

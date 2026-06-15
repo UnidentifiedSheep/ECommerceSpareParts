@@ -21,6 +21,11 @@ public class UserPermission : AuditableEntity<UserPermission, (Guid, string)>,
 
     public string Permission { get; } = null!;
 
+    public static Expression<Func<UserPermission, (Guid, string)>> GetKeySelector()
+    {
+        return x => ValueTuple.Create(x.UserId, x.Permission);
+    }
+
     public static Expression<Func<UserPermission, bool>> GetEqualityExpression((Guid, string) key)
     {
         return x => x.UserId == key.Item1 && x.Permission == key.Item2;

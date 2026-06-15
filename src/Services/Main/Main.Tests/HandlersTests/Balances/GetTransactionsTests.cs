@@ -5,7 +5,6 @@ using Main.Application.Handlers.Balance.GetTransactions;
 using Microsoft.EntityFrameworkCore;
 using Test.Common.TestContainers.Combined;
 using Tests.TestContexts.Balance;
-using ValidationException = FluentValidation.ValidationException;
 
 namespace Tests.HandlersTests.Balances;
 

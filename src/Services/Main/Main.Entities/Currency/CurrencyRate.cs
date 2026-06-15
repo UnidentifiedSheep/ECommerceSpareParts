@@ -33,6 +33,11 @@ public class CurrencyRate : AuditableEntity<CurrencyRate, (int, int)>, ILinqEnti
     public Currency ToCurrency { get; private set; } = null!;
     public IReadOnlyCollection<CurrencyRateHistory> History => _history;
 
+    public static Expression<Func<CurrencyRate, (int, int)>> GetKeySelector()
+    {
+        return x => ValueTuple.Create(x.FromCurrencyId, x.ToCurrencyId);
+    }
+
     public static Expression<Func<CurrencyRate, bool>> GetEqualityExpression((int, int) key)
     {
         return x => x.FromCurrencyId == key.Item1 && x.ToCurrencyId == key.Item2;

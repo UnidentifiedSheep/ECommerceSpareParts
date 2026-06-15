@@ -24,6 +24,11 @@ public class Permission : AuditableEntity<Permission, string>, ILinqEntity<Permi
 
     public string? Description { get; private set; }
 
+    public static Expression<Func<Permission, string>> GetKeySelector()
+    {
+        return x => x.Name;
+    }
+
     public static Expression<Func<Permission, bool>> GetEqualityExpression(string key)
     {
         return x => x.Name == key;

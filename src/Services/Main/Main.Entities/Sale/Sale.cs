@@ -38,6 +38,11 @@ public class Sale : AuditableEntity<Sale, Guid>, ILinqEntity<Sale, Guid>
     public Transaction Transaction { get; private set; } = null!;
     public IReadOnlyList<SaleContent> Contents => _contents;
 
+    public static Expression<Func<Sale, Guid>> GetKeySelector()
+    {
+        return x => x.Id;
+    }
+
     public static Expression<Func<Sale, bool>> GetEqualityExpression(Guid key)
     {
         return x => x.Id == key;
@@ -56,11 +61,15 @@ public class Sale : AuditableEntity<Sale, Guid>, ILinqEntity<Sale, Guid>
 
     public void AddContent(SaleContent content)
     {
+        if (content.SaleId != Guid.Empty && content.SaleId != Id)
+            throw new InvalidOperationException("Content already added to another sale");
         _contents.Add(content);
     }
 
     public void RemoveContent(SaleContent content)
     {
+        if (content.SaleId != GetId())
+            throw new InvalidOperationException("Invalid sale id in sale content");
         _contents.Remove(content);
     }
 
@@ -74,8 +83,5 @@ public class Sale : AuditableEntity<Sale, Guid>, ILinqEntity<Sale, Guid>
         CurrencyId = currencyId;
     }
 
-    public override Guid GetId()
-    {
-        return Id;
-    }
+    public override Guid GetId() => Id;
 }

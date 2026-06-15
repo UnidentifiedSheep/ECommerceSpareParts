@@ -27,7 +27,8 @@ public class MainProductSearchDocumentProvider(
             Name = fullProduct.Product.Name,
             ProducerId = fullProduct.Product.ProducerId,
             Dimensions = MapDimensions(fullProduct.ProductSize),
-            Weight = MapWeight(fullProduct.ProductWeight)
+            Weight = MapWeight(fullProduct.ProductWeight),
+            Stock = fullProduct.Product.Stock
         };
     }
 

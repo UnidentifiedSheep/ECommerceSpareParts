@@ -1,4 +1,4 @@
-﻿using Application.Common.Abstractions;
+using Application.Common.Abstractions;
 using BulkValidation.Core.Interfaces;
 using Main.Entities;
 
@@ -8,10 +8,8 @@ public class CreateSaleDbValidation : AbstractDbValidation<CreateSaleCommand>
 {
     public override void Build(IValidationPlan plan, CreateSaleCommand request)
     {
-        plan.ValidateTransactionExistsId(request.TransactionId)
-            .ValidateProductExistsId(request.SellContent.Select(x => x.ProductId).ToHashSet())
+        plan.ValidateCurrencyExistsId(request.CurrencyId)
             .ValidateUserExistsId(request.BuyerId)
-            .ValidateCurrencyExistsId(request.CurrencyId)
-            .ValidateStorageExistsName(request.Storage);
+            .ValidateStorageExistsName(request.StorageName);
     }
 }

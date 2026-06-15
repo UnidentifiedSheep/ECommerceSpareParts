@@ -20,6 +20,11 @@ public class UserRole : AuditableEntity<UserRole, (Guid, string)>, ILinqEntity<U
     public string RoleName { get; } = null!;
     public Role Role { get; private set; } = null!;
 
+    public static Expression<Func<UserRole, (Guid, string)>> GetKeySelector()
+    {
+        return x => ValueTuple.Create(x.UserId, x.RoleName);
+    }
+
     public static Expression<Func<UserRole, bool>> GetEqualityExpression((Guid, string) key)
     {
         var normalized = RoleNames.Normalize(key.Item2);

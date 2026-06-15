@@ -5,5 +5,5 @@ namespace Main.Application.NamedObjects.StorageContentExtractPolicies;
 
 public abstract class StorageContentExtractPolicyBase : LocalizableNameObject
 {
-    public abstract IQueryable<StorageContent> Apply(IQueryable<StorageContent> query);
+    public abstract IOrderedQueryable<StorageContent> Apply(IQueryable<StorageContent> query);
 }

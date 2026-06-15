@@ -21,6 +21,11 @@ public class UserDiscount : Entity<UserDiscount, Guid>, ILinqEntity<UserDiscount
 
     public decimal Discount { get; set; }
 
+    public static Expression<Func<UserDiscount, Guid>> GetKeySelector()
+    {
+        return x => x.UserId;
+    }
+
     public static Expression<Func<UserDiscount, bool>> GetEqualityExpression(Guid key)
     {
         return x => x.UserId == key;

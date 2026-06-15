@@ -6,6 +6,7 @@
     "article.reservation.not.found": "Article reservation not found.",
     "article.content.not.found": "Article content not found.",
     "article.not.found": "Article not found.",
+    "article.id.greater.than.zero": "Article id must be greater than 0.",
     "articles.not.found": "Articles not found.",
     "article.weight.not.found": "Article weight not found.",
     "article.sizes.not.found": "Article sizes not found.",

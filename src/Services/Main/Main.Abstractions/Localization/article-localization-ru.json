@@ -6,6 +6,7 @@
     "article.reservation.not.found": "Резервация артикула не найдена.",
     "article.content.not.found": "Содержимое артикула не найдено.",
     "article.not.found": "Артикул не найден.",
+    "article.id.greater.than.zero": "Идентификатор артикула должен быть больше 0.",
     "articles.not.found": "Артикулы не найдены.",
     "article.weight.not.found": "Вес артикула не найден.",
     "article.sizes.not.found": "Размеры артикула не найдены.",

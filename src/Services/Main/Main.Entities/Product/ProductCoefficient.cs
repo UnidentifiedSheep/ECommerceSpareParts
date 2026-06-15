@@ -15,6 +15,11 @@ public class ProductCoefficient : AuditableEntity<ProductCoefficient, (int, stri
 
     public virtual Coefficient Coefficient { get; set; } = null!;
 
+    public static Expression<Func<ProductCoefficient, (int, string)>> GetKeySelector()
+    {
+        return x => ValueTuple.Create(x.ProductId, x.CoefficientName);
+    }
+
     public static Expression<Func<ProductCoefficient, bool>> GetEqualityExpression((int, string) key)
     {
         return x => x.ProductId == key.Item1 && x.CoefficientName == key.Item2;

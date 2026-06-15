@@ -32,7 +32,7 @@ using Role = Main.Enums.Role;
 namespace Main.Application.Handlers.Purchases.CreatePurchase;
 
 [AutoSave]
-[Transactional(IsolationLevel.ReadCommitted, 20, 2)]
+[Transactional(IsolationLevel.Serializable, 20, 2)]
 public record CreatePurchaseCommand(
     Guid SupplierId,
     int CurrencyId,

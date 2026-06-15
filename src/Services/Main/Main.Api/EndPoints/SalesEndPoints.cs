@@ -1,23 +1,77 @@
+using System.Text.Json.Serialization;
 using Abstractions.Interfaces;
+using Abstractions.Models;
 using Api.Common.Extensions;
+using Api.Common.Models.Requests;
 using Carter;
 using Enums;
 using Main.Application.Dtos.Sale;
+using Main.Application.Handlers.Sales;
+using Main.Application.Handlers.Sales.CreateSale;
+using Main.Application.Handlers.Sales.GetSales;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Main.Api.EndPoints;
 
-public record CreateSaleRequest(
-    Guid BuyerId,
-    int CurrencyId,
-    string StorageName,
-    bool SellFromOtherStorages,
-    DateTime SaleDateTime,
-    IEnumerable<NewSaleContentDto> SaleContent,
-    string? Comment,
-    decimal? PayedSum,
-    string? ConfirmationCode);
+public record CreateSaleRequest
+{
+    [JsonPropertyName("buyerId")]
+    public required Guid  BuyerId { get; init; }
+    
+    [JsonPropertyName("currencyId")]
+    public required int CurrencyId { get; init; }
+    
+    [JsonPropertyName("storageName")]
+    public required string StorageName { get; init; }
+    
+    [JsonPropertyName("saleDateTime")]
+    public required DateTime SaleDateTime { get; init; }
+    
+    [JsonPropertyName("contents")]
+    public required IEnumerable<NewSaleContentDto> Contents { get; init; }
+    
+    [JsonPropertyName("comment")]
+    public string? Comment { get; init; }
+
+    [JsonPropertyName("payedSum")]
+    public decimal? PayedSum { get; init; }
+    
+    [JsonPropertyName("confirmationCode")]
+    public string? ConfirmationCode { get; init; }
+}
+
+public record CreateSaleResponse
+{
+    [JsonPropertyName("sale")]
+    public required SaleDto Sale { get; init; }
+}
+
+public record GetSalesRequest : SortablePaginationQueryModel
+{
+    [FromQuery(Name = "rangeStartDate")] 
+    public DateTime RangeStartDate { get; init; }
+    
+    [FromQuery(Name = "rangeEndDate")] 
+    public DateTime RangeEndDate { get; init; }
+    
+    [FromQuery(Name = "buyerIds")] 
+    public Guid[] BuyerIds { get; init; } = [];
+    
+    [FromQuery(Name = "currencyIds")] 
+    public int[] CurrencyIds { get; init; } = [];
+
+    [FromQuery(Name = "productIds")] 
+    public int[] ProductIds { get; init; } = [];
+    
+    [FromQuery(Name = "searchTerm")] 
+    public string? SearchTerm { get; init; }
+}
+public record GetSalesResponse
+{
+    [JsonPropertyName("sales")]
+    public required IReadOnlyList<SaleDto> Sales { get; init; }
+}
 
 public record EditSaleRequest(
     IEnumerable<EditSaleContentDto> EditedContent,
@@ -26,21 +80,7 @@ public record EditSaleRequest(
     string? Comment,
     bool SellFromOtherStorages);
 
-public record GetSaleContentResponse(IEnumerable<SaleContentDto> Content);
-
-public record GetSalesResponse(IEnumerable<SaleDto> Sales);
-
-public class GetSalesRequest
-{
-    [FromQuery(Name = "rangeStartDate")] public DateTime RangeStartDate { get; set; }
-    [FromQuery(Name = "rangeEndDate")] public DateTime RangeEndDate { get; set; }
-    [FromQuery(Name = "page")] public int Page { get; set; }
-    [FromQuery(Name = "limit")] public int Limit { get; set; }
-    [FromQuery(Name = "buyerId")] public Guid? BuyerId { get; set; }
-    [FromQuery(Name = "currencyId")] public int? CurrencyId { get; set; }
-    [FromQuery(Name = "sortBy")] public string? SortBy { get; set; }
-    [FromQuery(Name = "searchTerm")] public string? SearchTerm { get; set; }
-}
+public record GetSaleContentResponse(IReadOnlyList<SaleContentDto> Content);
 
 public class SalesEndPoints : ICarterModule
 {
@@ -49,17 +89,32 @@ public class SalesEndPoints : ICarterModule
         var sales = app.MapGroup("/sales")
             .WithTags("Sales");
 
-        sales.MapPost("/", (
-                IUserContext user,
+        sales.MapPost("/", async (
                 ISender sender,
                 CreateSaleRequest request,
-                CancellationToken token) => Results.Ok())
+                CancellationToken token) =>
+            {
+                var result = await sender.Send(new CreateSaleCommand(
+                    request.BuyerId,
+                    request.CurrencyId,
+                    request.StorageName,
+                    request.SaleDateTime,
+                    request.Contents,
+                    request.Comment,
+                    request.PayedSum,
+                    request.ConfirmationCode), token);
+                
+                return Results.Ok(new CreateSaleResponse
+                {
+                    Sale = result.Sale
+                });
+            })
             .WithDescription("Создание новой продажи")
             .WithName("CreateSale")
             .WithSummary("Создать продажу")
             .WithDisplayName("Создание новой продажи")
             .Accepts<CreateSaleRequest>(false, "application/json")
-            .Produces(200)
+            .Produces<CreateSaleResponse>()
             .Produces(401)
             .RequireAnyPermission(PermissionCodes.SALES_CREATE);
 
@@ -92,27 +147,46 @@ public class SalesEndPoints : ICarterModule
             .ProducesProblem(StatusCodes.Status404NotFound)
             .RequireAnyPermission(PermissionCodes.SALES_EDIT);
 
-        sales.MapGet("/{id}/content", (
+        sales.MapGet("/{id:guid}/contents", async (
                 ISender sender,
-                string id,
-                CancellationToken cancellationToken) => Results.Ok())
+                Guid id,
+                CancellationToken cancellationToken) =>
+            {
+                var result = await sender.Send(new GetSaleContentQuery(id), cancellationToken);
+                return Results.Ok(new GetSaleContentResponse(result.Content));
+            })
             .WithDescription("Получение содержания продажи")
             .WithName("GetSaleContent")
             .WithSummary("Получить содержимое продажи")
             .WithDisplayName("Получение содержания продажи")
-            .Produces(StatusCodes.Status200OK)
+            .Produces<GetSaleContentResponse>()
             .ProducesProblem(StatusCodes.Status404NotFound)
             .RequireAnyPermission(PermissionCodes.SALES_GET);
 
-        sales.MapGet("/", (
+        sales.MapGet("/", async (
                 ISender sender,
                 [AsParameters] GetSalesRequest request,
-                CancellationToken token) => Results.Ok())
+                CancellationToken token) =>
+            {
+                var result = await sender.Send(new GetSalesQuery(
+                    new RangeModel<DateTime>(request.RangeStartDate, request.RangeEndDate),
+                    request,
+                    request.BuyerIds,
+                    request.CurrencyIds,
+                    request.ProductIds,
+                    request.SortBy,
+                    request.SearchTerm), token);
+
+                return Results.Ok(new GetSalesResponse
+                {
+                    Sales = result.Sales
+                });
+            })
             .WithDescription("Получение списка продаж")
             .WithName("GetSales")
             .WithSummary("Получить продажи")
             .WithDisplayName("Получение продаж")
-            .Produces(StatusCodes.Status200OK)
+            .Produces<GetSalesResponse>()
             .ProducesProblem(StatusCodes.Status400BadRequest)
             .RequireAnyPermission(PermissionCodes.SALES_GET);
     }
