@@ -3,7 +3,7 @@ using LinqKit;
 using Main.Application.Dtos.Purchase;
 using Main.Entities.Purchase;
 
-namespace Main.Application.Handlers.Projections;
+namespace Main.Application.Projections;
 
 public static class PurchaseProjections
 {

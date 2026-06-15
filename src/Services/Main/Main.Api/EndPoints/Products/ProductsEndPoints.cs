@@ -24,6 +24,7 @@ public class ProductsEndPoints : ICarterModule
         products.MapProductContentEndPoints();
         products.MapProductRelationsEndPoints();
         products.MapProductImagesEndPoints();
+        products.MapProductReservationsEndPoints();
 
         products.MapPost("", async (
                 ISender sender,

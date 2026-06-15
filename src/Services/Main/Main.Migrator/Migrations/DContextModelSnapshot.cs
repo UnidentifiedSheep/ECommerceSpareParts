@@ -845,8 +845,8 @@ namespace Main.Migrator.Migrations
 
                     b.Property<string>("Discriminator")
                         .IsRequired()
-                        .HasMaxLength(21)
-                        .HasColumnType("character varying(21)")
+                        .HasMaxLength(34)
+                        .HasColumnType("character varying(34)")
                         .HasColumnName("discriminator");
 
                     b.Property<string>("Json")
@@ -2077,14 +2077,6 @@ namespace Main.Migrator.Migrations
                         .HasColumnType("integer")
                         .HasColumnName("current_count");
 
-                    b.Property<bool>("IsDone")
-                        .HasColumnType("boolean")
-                        .HasColumnName("is_done");
-
-                    b.Property<bool>("IsLocked")
-                        .HasColumnType("boolean")
-                        .HasColumnName("is_locked");
-
                     b.Property<int>("ProductId")
                         .HasColumnType("integer")
                         .HasColumnName("product_id");
@@ -2100,6 +2092,11 @@ namespace Main.Migrator.Migrations
                     b.Property<int>("ReservedCount")
                         .HasColumnType("integer")
                         .HasColumnName("reserved_count");
+
+                    b.Property<string>("Status")
+                        .IsRequired()
+                        .HasColumnType("text")
+                        .HasColumnName("status");
 
                     b.Property<DateTime>("UpdatedAt")
                         .HasColumnType("timestamp with time zone")
@@ -2133,13 +2130,11 @@ namespace Main.Migrator.Migrations
                     NpgsqlIndexBuilderExtensions.HasMethod(b.HasIndex(new[] { "Comment" }, "storage_content_reservations_comment_index"), "gin");
                     NpgsqlIndexBuilderExtensions.HasOperators(b.HasIndex(new[] { "Comment" }, "storage_content_reservations_comment_index"), new[] { "gin_trgm_ops" });
 
-                    b.HasIndex(new[] { "IsDone" }, "storage_content_reservations_is_done_index");
+                    b.HasIndex(new[] { "ProductId", "Status" }, "storage_content_reservations_product_id_status_index");
 
-                    b.HasIndex(new[] { "ProductId", "IsDone" }, "storage_content_reservations_product_id_is_done_index");
+                    b.HasIndex(new[] { "Status" }, "storage_content_reservations_status_index");
 
-                    b.HasIndex(new[] { "ProductId", "IsLocked" }, "storage_content_reservations_product_id_is_locked_index");
-
-                    b.HasIndex(new[] { "UserId", "IsDone" }, "storage_content_reservations_user_id_is_done_index");
+                    b.HasIndex(new[] { "UserId", "Status" }, "storage_content_reservations_user_id_status_index");
 
                     b.ToTable("storage_content_reservations", "public");
                 });
@@ -2922,6 +2917,20 @@ namespace Main.Migrator.Migrations
                     b.HasDiscriminator().HasValue("StorageContentSetting");
                 });
 
+            modelBuilder.Entity("Main.Entities.Event.ReservationManualChangeEvent", b =>
+                {
+                    b.HasBaseType("Main.Entities.Event.Event");
+
+                    b.Property<int>("ReservationId")
+                        .HasColumnType("integer")
+                        .HasColumnName("reservation_id");
+
+                    b.HasIndex("ReservationId")
+                        .HasDatabaseName("reservation_manual_change_event_reservation_id_idx");
+
+                    b.HasDiscriminator().HasValue("ReservationManualChangeEvent");
+                });
+
             modelBuilder.Entity("Main.Entities.Event.StorageMovementEvent", b =>
                 {
                     b.HasBaseType("Main.Entities.Event.Event");
@@ -3460,7 +3469,7 @@ namespace Main.Migrator.Migrations
 
             modelBuilder.Entity("Main.Entities.Sale.SaleContentDetail", b =>
                 {
-                    b.HasOne("Main.Entities.Currency.Currency", null)
+                    b.HasOne("Main.Entities.Currency.Currency", "Currency")
                         .WithMany()
                         .HasForeignKey("CurrencyId")
                         .OnDelete(DeleteBehavior.Restrict)
@@ -3480,6 +3489,8 @@ namespace Main.Migrator.Migrations
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired()
                         .HasConstraintName("sale_content_details_storage_content_id_fk");
+
+                    b.Navigation("Currency");
                 });
 
             modelBuilder.Entity("Main.Entities.Storage.StorageContent", b =>
@@ -3530,7 +3541,7 @@ namespace Main.Migrator.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .HasConstraintName("storage_content_reservations_currency_id_fk");
 
-                    b.HasOne("Main.Entities.User.User", null)
+                    b.HasOne("Main.Entities.User.User", "User")
                         .WithMany()
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -3547,6 +3558,8 @@ namespace Main.Migrator.Migrations
                         .HasForeignKey("WhoUpdated")
                         .OnDelete(DeleteBehavior.Cascade)
                         .HasConstraintName("storage_content_reservations_users_id_fk_2");
+
+                    b.Navigation("User");
                 });
 
             modelBuilder.Entity("Main.Entities.Storage.StorageOwner", b =>
@@ -3674,6 +3687,16 @@ namespace Main.Migrator.Migrations
                         .WithMany()
                         .HasForeignKey("InboxMessageId", "InboxConsumerId")
                         .HasPrincipalKey("MessageId", "ConsumerId");
+                });
+
+            modelBuilder.Entity("Main.Entities.Event.ReservationManualChangeEvent", b =>
+                {
+                    b.HasOne("Main.Entities.Storage.StorageContentReservation", null)
+                        .WithMany()
+                        .HasForeignKey("ReservationId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired()
+                        .HasConstraintName("reservation_manual_change_event_reservation_id_fk");
                 });
 
             modelBuilder.Entity("Main.Entities.Auth.Role", b =>

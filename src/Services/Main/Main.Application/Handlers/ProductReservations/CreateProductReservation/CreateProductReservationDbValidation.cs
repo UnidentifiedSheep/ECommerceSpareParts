@@ -8,20 +8,12 @@ public class CreateProductReservationDbValidation : AbstractDbValidation<CreateP
 {
     public override void Build(IValidationPlan plan, CreateProductReservationCommand request)
     {
-        var articleIds = new HashSet<int>();
-        var userIds = new HashSet<Guid>();
-        var currencyIds = new HashSet<int>();
+        var reservation = request.Reservation;
 
-        foreach (var item in request.Reservations)
-        {
-            articleIds.Add(item.ProductId);
-            userIds.Add(item.UserId);
-            if (item.GivenCurrencyId.HasValue)
-                currencyIds.Add(item.GivenCurrencyId.Value);
-        }
+        plan.ValidateProductExistsId(reservation.ProductId)
+            .ValidateUserExistsId(reservation.UserId);
 
-        plan.ValidateProductExistsId(articleIds)
-            .ValidateUserExistsId(userIds)
-            .ValidateCurrencyExistsId(currencyIds);
+        if (reservation.GivenCurrencyId.HasValue)
+            plan.ValidateCurrencyExistsId(reservation.GivenCurrencyId.Value);
     }
 }

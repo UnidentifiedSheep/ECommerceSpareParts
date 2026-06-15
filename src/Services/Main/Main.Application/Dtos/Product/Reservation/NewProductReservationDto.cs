@@ -1,6 +1,6 @@
 using System.Text.Json.Serialization;
 
-namespace Main.Application.Dtos.Product;
+namespace Main.Application.Dtos.Product.Reservation;
 
 public record NewProductReservationDto
 {

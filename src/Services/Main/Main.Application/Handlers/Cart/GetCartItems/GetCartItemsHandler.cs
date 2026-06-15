@@ -4,7 +4,7 @@ using Application.Common.Interfaces.Cqrs;
 using Application.Common.Interfaces.Repositories;
 using LinqKit;
 using Main.Application.Dtos.Cart;
-using Main.Application.Handlers.Projections;
+using Main.Application.Projections;
 using Microsoft.EntityFrameworkCore;
 
 namespace Main.Application.Handlers.Cart.GetCartItems;

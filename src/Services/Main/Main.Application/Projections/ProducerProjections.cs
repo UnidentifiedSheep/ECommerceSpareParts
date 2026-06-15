@@ -2,7 +2,7 @@
 using Main.Application.Dtos.Producer;
 using Main.Entities.Producer;
 
-namespace Main.Application.Handlers.Projections;
+namespace Main.Application.Projections;
 
 public static class ProducerProjections
 {

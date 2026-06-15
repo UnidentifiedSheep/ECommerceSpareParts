@@ -2,7 +2,7 @@
 using Application.Common.Interfaces.Repositories;
 using LinqKit;
 using Main.Application.Dtos.Purchase;
-using Main.Application.Handlers.Projections;
+using Main.Application.Projections;
 using Main.Entities.Exceptions;
 using Main.Entities.Purchase;
 using Microsoft.EntityFrameworkCore;

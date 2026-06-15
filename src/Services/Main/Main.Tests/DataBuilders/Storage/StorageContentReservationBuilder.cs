@@ -1,4 +1,5 @@
 using Bogus;
+using Main.Entities.Product;
 using Main.Entities.Storage;
 using Test.Common.Abstractions;
 
@@ -6,6 +7,9 @@ namespace Tests.DataBuilders.Storage;
 
 public class StorageContentReservationBuilder(Faker faker) : BuilderBase<StorageContentReservation>(faker)
 {
+    private readonly HashSet<Guid> _userIds = [];
+    private readonly HashSet<int> _productIds = [];
+
     public Guid? UserId { get; private set; }
     public int? ProductId { get; private set; }
     public int? ReservedCount { get; private set; }
@@ -20,9 +24,33 @@ public class StorageContentReservationBuilder(Faker faker) : BuilderBase<Storage
         return this;
     }
 
+    public StorageContentReservationBuilder WithUserIds(params Guid[] userIds)
+    {
+        _userIds.UnionWith(userIds);
+        return this;
+    }
+
+    public StorageContentReservationBuilder WithUsers(IEnumerable<Main.Entities.User.User> users)
+    {
+        _userIds.UnionWith(users.Select(x => x.Id));
+        return this;
+    }
+
     public StorageContentReservationBuilder WithProductId(int productId)
     {
         ProductId = productId;
+        return this;
+    }
+
+    public StorageContentReservationBuilder WithProductIds(params int[] productIds)
+    {
+        _productIds.UnionWith(productIds);
+        return this;
+    }
+
+    public StorageContentReservationBuilder WithProducts(IEnumerable<Product> products)
+    {
+        _productIds.UnionWith(products.Select(x => x.Id));
         return this;
     }
 
@@ -54,8 +82,8 @@ public class StorageContentReservationBuilder(Faker faker) : BuilderBase<Storage
     public override StorageContentReservation Build()
     {
         var reservation = StorageContentReservation.Create(
-            UserId ?? Guid.NewGuid(),
-            ProductId ?? Faker.Random.Int(1),
+            UserId ?? (_userIds.Count > 0 ? Faker.PickRandom<Guid>(_userIds) : Guid.NewGuid()),
+            ProductId ?? (_productIds.Count > 0 ? Faker.PickRandom<int>(_productIds) : Faker.Random.Int(1)),
             ReservedCount ?? Faker.Random.Int(1, 100));
 
         reservation.ProposePrice(ProposedPrice, ProposedCurrencyId);

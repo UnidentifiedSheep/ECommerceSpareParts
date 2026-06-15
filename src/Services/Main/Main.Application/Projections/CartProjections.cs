@@ -2,7 +2,7 @@
 using LinqKit;
 using Main.Application.Dtos.Cart;
 
-namespace Main.Application.Handlers.Projections;
+namespace Main.Application.Projections;
 
 public static class CartProjections
 {

@@ -14,20 +14,17 @@ public class StorageContentReservationConfiguration : IEntityTypeConfiguration<S
 
         builder.HasIndex(e => e.ProposedCurrencyId, "IX_storage_content_reservations_proposed_currency_id");
 
-        builder.HasIndex(e => new { e.ProductId, e.IsDone },
-            "storage_content_reservations_product_id_is_done_index");
+        builder.HasIndex(e => new { e.ProductId, e.Status },
+            "storage_content_reservations_product_id_status_index");
 
         builder.HasIndex(e => e.Comment, "storage_content_reservations_comment_index")
             .HasMethod("gin")
             .HasOperators("gin_trgm_ops");
 
-        builder.HasIndex(e => e.IsDone, "storage_content_reservations_is_done_index");
+        builder.HasIndex(e => e.Status, "storage_content_reservations_status_index");
 
-        builder.HasIndex(e => new { e.UserId, e.IsDone },
-            "storage_content_reservations_user_id_is_done_index");
-
-        builder.HasIndex(e => new { e.ProductId, e.IsLocked },
-            "storage_content_reservations_product_id_is_locked_index");
+        builder.HasIndex(e => new { e.UserId, e.Status },
+            "storage_content_reservations_user_id_status_index");
 
         builder.Property(e => e.Id)
             .HasColumnName("id");
@@ -51,11 +48,8 @@ public class StorageContentReservationConfiguration : IEntityTypeConfiguration<S
         builder.Property(e => e.ReservedCount)
             .HasColumnName("reserved_count");
 
-        builder.Property(e => e.IsDone)
-            .HasColumnName("is_done");
-
-        builder.Property(e => e.IsLocked)
-            .HasColumnName("is_locked");
+        builder.Property(e => e.Status)
+            .HasColumnName("status");
 
         builder.Property(e => e.UserId)
             .HasColumnName("user_id");
@@ -72,7 +66,7 @@ public class StorageContentReservationConfiguration : IEntityTypeConfiguration<S
             .OnDelete(DeleteBehavior.Cascade)
             .HasConstraintName("storage_content_reservations_currency_id_fk");
 
-        builder.HasOne<Entities.User.User>()
+        builder.HasOne<Entities.User.User>(e => e.User)
             .WithMany()
             .HasForeignKey(d => d.UserId)
             .HasConstraintName("storage_content_reservations_users_id_fk");

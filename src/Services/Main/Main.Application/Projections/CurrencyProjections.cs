@@ -2,7 +2,7 @@
 using Main.Application.Dtos.Currencies;
 using Main.Entities.Currency;
 
-namespace Main.Application.Handlers.Projections;
+namespace Main.Application.Projections;
 
 public static class CurrencyProjections
 {

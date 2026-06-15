@@ -3,9 +3,9 @@ using Application.Common.Interfaces.Cqrs;
 using Application.Common.Interfaces.Repositories;
 using LinqKit;
 using Main.Application.Dtos.Balances;
-using Main.Application.Handlers.Projections;
 using Main.Entities.Balance;
 using Enums;
+using Main.Application.Projections;
 using Main.Enums.Balances;
 using Microsoft.EntityFrameworkCore;
 

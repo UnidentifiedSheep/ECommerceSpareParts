@@ -1,4 +1,5 @@
 using System.Text.Json.Serialization;
+using Main.Application.Dtos.Auth;
 using Main.Application.Dtos.Users;
 using Main.Enums;
 using Main.Enums.Balances;
@@ -11,10 +12,10 @@ public record TransactionDto
     public required Guid Id { get; init; }
 
     [JsonPropertyName("sender")]
-    public required TransactionPartyDto Sender { get; init; }
+    public required UserPartyDto Sender { get; init; }
 
     [JsonPropertyName("receiver")]
-    public required TransactionPartyDto Receiver { get; init; }
+    public required UserPartyDto Receiver { get; init; }
 
     [JsonPropertyName("currencyId")]
     public required int CurrencyId { get; init; }

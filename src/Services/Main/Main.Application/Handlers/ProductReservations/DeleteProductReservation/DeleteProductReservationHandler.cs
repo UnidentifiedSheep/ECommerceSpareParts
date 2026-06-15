@@ -1,5 +1,3 @@
-using Abstractions.Interfaces.Persistence;
-using Abstractions.Interfaces.Services;
 using Application.Common.Interfaces.Cqrs;
 using Application.Common.Interfaces.Repositories;
 using Attributes;
@@ -14,14 +12,13 @@ namespace Main.Application.Handlers.ProductReservations.DeleteProductReservation
 public record DeleteProductReservationCommand(int ReservationId) : ICommand;
 
 public class DeleteProductReservationHandler(
-    IRepository<StorageContentReservation, int> repository,
-    IUnitOfWork unitOfWork) : ICommandHandler<DeleteProductReservationCommand>
+    IRepository<StorageContentReservation, int> repository) : ICommandHandler<DeleteProductReservationCommand>
 {
     public async Task<Unit> Handle(DeleteProductReservationCommand request, CancellationToken cancellationToken)
     {
         var reservation = await repository.GetById(request.ReservationId, cancellationToken)
                           ?? throw new ReservationNotFoundException(request.ReservationId);
-        unitOfWork.Remove(reservation);
+        reservation.Cancel();
         return Unit.Value;
     }
 }

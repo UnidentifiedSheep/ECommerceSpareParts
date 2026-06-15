@@ -4,9 +4,9 @@ using Cache;
 using Cache.Extensions;
 using Main.Application;
 using Main.Application.Dtos.Users;
-using Main.Application.Handlers.Projections;
 using Main.Application.Interfaces.Cache;
 using Main.Application.Interfaces.Persistence;
+using Main.Application.Projections;
 using Main.Entities.User;
 
 namespace Main.Cache;

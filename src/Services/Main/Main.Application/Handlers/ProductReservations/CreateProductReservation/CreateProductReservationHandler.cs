@@ -1,36 +1,47 @@
 using Abstractions.Interfaces.Persistence;
-using Abstractions.Interfaces.Services;
 using Application.Common.Interfaces.Cqrs;
+using Application.Common.Interfaces.Repositories;
 using Attributes;
-using Main.Application.Dtos.Product;
+using LinqKit;
+using Main.Application.Dtos.Product.Reservation;
+using Main.Application.Projections;
 using Main.Entities.Storage;
 using MediatR;
+using Microsoft.EntityFrameworkCore;
 
 namespace Main.Application.Handlers.ProductReservations.CreateProductReservation;
 
-[AutoSave]
 [Transactional]
-public record CreateProductReservationCommand(List<NewProductReservationDto> Reservations) : ICommand;
+public record CreateProductReservationCommand(
+    NewProductReservationDto Reservation) : ICommand<CreateProductReservationResult>;
 
-public class CreateProductReservationHandler(IUnitOfWork unitOfWork) : ICommandHandler<CreateProductReservationCommand>
+public record CreateProductReservationResult(ProductReservationDto Reservation);
+
+public class CreateProductReservationHandler(
+    IUnitOfWork unitOfWork,
+    IReadRepository<StorageContentReservation, int> repository
+    ) : ICommandHandler<CreateProductReservationCommand, CreateProductReservationResult>
 {
-    public async Task<Unit> Handle(CreateProductReservationCommand request, CancellationToken cancellationToken)
+    public async Task<CreateProductReservationResult> Handle(
+        CreateProductReservationCommand request, 
+        CancellationToken cancellationToken)
     {
-        var reservations = new List<StorageContentReservation>();
+        var dto = request.Reservation;
+        var reservation = StorageContentReservation.Create(dto.UserId, dto.ProductId, dto.ReservedCount);
 
-        foreach (var dto in request.Reservations)
-        {
-            var newReservation = StorageContentReservation.Create(dto.UserId, dto.ProductId, dto.ReservedCount);
+        reservation.SetComment(dto.Comment);
+        reservation.ProposePrice(dto.ProposedPrice, dto.GivenCurrencyId);
+        reservation.AddCount(dto.CurrentCount);
 
-            newReservation.AddCount(dto.CurrentCount);
-            newReservation.SetComment(dto.Comment);
-            newReservation.ProposePrice(dto.ProposedPrice, dto.GivenCurrencyId);
+        await unitOfWork.AddAsync(reservation, cancellationToken);
+        await unitOfWork.SaveChangesAsync(cancellationToken);
 
-            reservations.Add(newReservation);
-        }
-
-        await unitOfWork.AddRangeAsync(reservations, cancellationToken);
-
-        return Unit.Value;
+        var result = await repository.Query
+            .Where(x => x.Id == reservation.Id)
+            .AsExpandable()
+            .Select(ProductProjections.ToReservationDto)
+            .SingleAsync(cancellationToken);
+        
+        return new CreateProductReservationResult(result);
     }
 }

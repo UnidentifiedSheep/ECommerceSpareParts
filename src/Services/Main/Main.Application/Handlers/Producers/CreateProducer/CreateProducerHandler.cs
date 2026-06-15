@@ -6,7 +6,7 @@ using Application.Common.Interfaces.Cqrs;
 using Attributes;
 using Contracts.Producer;
 using Main.Application.Dtos.Producer;
-using Main.Application.Handlers.Projections;
+using Main.Application.Projections;
 using Main.Entities.Producer;
 
 namespace Main.Application.Handlers.Producers.CreateProducer;

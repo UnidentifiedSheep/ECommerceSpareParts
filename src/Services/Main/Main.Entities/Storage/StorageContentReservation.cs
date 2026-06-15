@@ -3,9 +3,10 @@ using Domain;
 using Domain.Extensions;
 using Domain.Interfaces;
 using Exceptions;
+using Main.Enums;
 
 namespace Main.Entities.Storage;
-
+//Product reservation. It should be renamed.
 public class StorageContentReservation : AuditableEntity<StorageContentReservation, int>,
     ILinqEntity<StorageContentReservation, int>
 {
@@ -21,6 +22,7 @@ public class StorageContentReservation : AuditableEntity<StorageContentReservati
         UserId = userId;
         ProductId = productId;
         CurrentCount = 0;
+        Status = StorageContentReservationStatus.Active;
         SetReservedCount(reservedCount);
     }
 
@@ -38,11 +40,11 @@ public class StorageContentReservation : AuditableEntity<StorageContentReservati
 
     public int? ProposedCurrencyId { get; private set; }
 
-    public bool IsDone { get; private set; }
-
-    public bool IsLocked { get; private set; }
+    public StorageContentReservationStatus Status { get; private set; }
 
     public string? Comment { get; private set; }
+
+    public User.User User { get; private set; } = null!;
 
     public static Expression<Func<StorageContentReservation, int>> GetKeySelector()
     {
@@ -108,6 +110,8 @@ public class StorageContentReservation : AuditableEntity<StorageContentReservati
 
     public void AddCount(int amount)
     {
+        ThrowIfCanceled();
+
         var summed = CurrentCount + amount;
         if (summed > ReservedCount)
             throw new InvalidOperationException("Can't increase reservation count");
@@ -116,36 +120,43 @@ public class StorageContentReservation : AuditableEntity<StorageContentReservati
 
         CurrentCount = summed;
 
-        UpdateDoneState();
-        UpdateLockState();
+        UpdateStatus();
     }
 
-    private void UpdateLockState()
+    public void Cancel()
     {
-        IsLocked = CurrentCount > 0;
+        Status = StorageContentReservationStatus.Canceled;
     }
 
-    private void UpdateDoneState()
+    private void UpdateStatus()
     {
-        IsDone = CurrentCount == ReservedCount;
+        if (Status == StorageContentReservationStatus.Canceled)
+            return;
+
+        Status = CurrentCount switch
+        {
+            _ when CurrentCount == ReservedCount => StorageContentReservationStatus.Done,
+            > 0 => StorageContentReservationStatus.Locked,
+            _ => StorageContentReservationStatus.Active
+        };
     }
 
     private void PerformDomainChecks()
     {
-        ThrowIfLocked();
         ThrowIfDone();
-    }
-
-    private void ThrowIfLocked()
-    {
-        if (IsLocked)
-            throw new InvalidInputException("article.reservation.is.locked");
+        ThrowIfCanceled();
     }
 
     private void ThrowIfDone()
     {
-        if (IsDone)
+        if (Status == StorageContentReservationStatus.Done)
             throw new InvalidInputException("article.reservation.is.done");
+    }
+
+    private void ThrowIfCanceled()
+    {
+        if (Status == StorageContentReservationStatus.Canceled)
+            throw new InvalidInputException("article.reservation.is.canceled");
     }
 
     public override int GetId()

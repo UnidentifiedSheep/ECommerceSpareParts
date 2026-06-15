@@ -2,7 +2,7 @@ using Application.Common.Interfaces.Cqrs;
 using Application.Common.Interfaces.Repositories;
 using LinqKit;
 using Main.Application.Dtos.Sale;
-using Main.Application.Handlers.Projections;
+using Main.Application.Projections;
 using Main.Entities.Exceptions;
 using Main.Entities.Sale;
 using Microsoft.EntityFrameworkCore;

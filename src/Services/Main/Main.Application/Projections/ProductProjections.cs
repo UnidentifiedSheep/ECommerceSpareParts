@@ -1,9 +1,13 @@
 ﻿using System.Linq.Expressions;
 using LinqKit;
+using Main.Application.Dtos.Auth;
 using Main.Application.Dtos.Product;
+using Main.Application.Dtos.Product.Reservation;
 using Main.Entities.Product;
+using Main.Entities.Storage;
+using Main.Entities.User;
 
-namespace Main.Application.Handlers.Projections;
+namespace Main.Application.Projections;
 
 public static class ProductProjections
 {
@@ -55,4 +59,20 @@ public static class ProductProjections
                     Width = x.Width,
                     VolumeM3 = x.VolumeM3
                 };
+
+    public static readonly Expression<Func<StorageContentReservation, ProductReservationDto>>
+        ToReservationDto =
+            x => new ProductReservationDto
+            {
+                Id = x.Id,
+                WhoUpdated = x.WhoUpdated,
+                Comment = x.Comment,
+                CurrentCount = x.CurrentCount,
+                ProposedCurrencyId = x.ProposedCurrencyId,
+                ProposedPrice = x.ProposedPrice,
+                ReservedCount = x.ReservedCount,
+                Status = x.Status,
+                UpdatedAt = x.UpdatedAt,
+                User = UserProjections.UserPartyProjection.Invoke(x.User)
+            };
 }

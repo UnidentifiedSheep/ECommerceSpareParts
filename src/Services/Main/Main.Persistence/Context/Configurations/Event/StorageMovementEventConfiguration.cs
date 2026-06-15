@@ -8,5 +8,6 @@ public class StorageMovementEventConfiguration : IEntityTypeConfiguration<Storag
 {
     public void Configure(EntityTypeBuilder<StorageMovementEvent> builder)
     {
+        builder.Metadata.SetDiscriminatorValue("StorageMovementEvent");
     }
 }

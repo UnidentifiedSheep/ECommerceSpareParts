@@ -1,4 +1,5 @@
 using Main.Entities.User;
+using Main.Enums.Auth;
 using Main.Enums.Balances;
 using Role = Main.Enums.Role;
 using RoleExtensions = Main.Application.Extensions.RoleExtensions;
@@ -7,11 +8,11 @@ namespace Main.Application.Extensions.Entities;
 
 public static class UserExtensions
 {
-    public static TransactionPartyType GetPartyType(this User user)
+    public static UserPartyType GetPartyType(this User user)
     {
         return user.HasSystem()
-            ? TransactionPartyType.System
-            : TransactionPartyType.User;
+            ? UserPartyType.System
+            : UserPartyType.User;
     }
 
     public static bool HasSystem(this User user)
