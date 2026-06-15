@@ -6,7 +6,7 @@ using Exceptions;
 using Main.Enums;
 
 namespace Main.Entities.Storage;
-
+//Product reservation. It should be renamed.
 public class StorageContentReservation : AuditableEntity<StorageContentReservation, int>,
     ILinqEntity<StorageContentReservation, int>
 {
