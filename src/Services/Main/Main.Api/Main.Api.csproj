@@ -62,11 +62,16 @@
             <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
             <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
         </Content>
-        <Content Include="..\..\..\Infrastructure\Mailing\EmailTemplates\**\*.cshtml">
-            <Link>Templates\Emails\%(RecursiveDir)%(Filename)%(Extension)</Link>
-            <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-            <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
-        </Content>
     </ItemGroup>
+
+    <Target Name="AddEmailTemplatesToPublish" BeforeTargets="ComputeFilesToPublish">
+        <ItemGroup>
+            <EmailTemplate Include="..\..\..\Infrastructure\Mailing\EmailTemplates\**\*.cshtml" />
+            <ResolvedFileToPublish Include="@(EmailTemplate)">
+                <RelativePath>Templates\Emails\%(EmailTemplate.RecursiveDir)%(EmailTemplate.Filename)%(EmailTemplate.Extension)</RelativePath>
+                <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+            </ResolvedFileToPublish>
+        </ItemGroup>
+    </Target>
 
 </Project>
