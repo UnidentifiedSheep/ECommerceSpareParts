@@ -65,6 +65,7 @@
         <Content Include="..\..\..\Infrastructure\Mailing\EmailTemplates\**\*.cshtml">
             <Link>Templates\Emails\%(RecursiveDir)%(Filename)%(Extension)</Link>
             <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+            <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
         </Content>
     </ItemGroup>
 
