@@ -7,6 +7,8 @@ using Main.Application.Handlers.ProductReservations.CreateProductReservation;
 using Main.Application.Handlers.ProductReservations.DeleteProductReservation;
 using Main.Application.Handlers.ProductReservations.EditProductReservation;
 using Main.Application.Handlers.ProductReservations.GetProductReservations;
+using Main.Application.Handlers.ProductReservations.GetReservationHistory;
+using Main.Entities.Event;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
 
@@ -36,10 +38,17 @@ public record GetProductReservationsRequest : SortablePaginationQueryModel
     public bool ShowDeleted { get; init; }
 }
 
+
 public record GetProductReservationsResponse
 {
     [JsonPropertyName("reservations")]
     public required IReadOnlyList<ProductReservationDto> Reservations { get; init; }
+}
+
+public record GetProductReservationHistoryResponse
+{
+    [JsonPropertyName("history")]
+    public required IReadOnlyList<ReservationManualChangeEventData> History { get; init; }
 }
 
 public static class ProductReservationsEndPoints
@@ -151,6 +160,29 @@ public static class ProductReservationsEndPoints
             .Produces<GetProductReservationsResponse>()
             .ProducesProblem(StatusCodes.Status400BadRequest)
             .ProducesProblem(StatusCodes.Status404NotFound)
+            .RequireAnyPermission(PermissionCodes.ARTICLE_RESERVATIONS_GET_ALL);
+        
+        products.MapGet("/reservations/{id:int}/history", async (
+                ISender sender,
+                int id,
+                [AsParameters] PaginationQueryModel queryParams,
+                CancellationToken cancellationToken) =>
+            {
+                var query = new GetReservationHistoryQuery(
+                    id,
+                    queryParams);
+                var result = await sender.Send(query, cancellationToken);
+                var response = new GetProductReservationHistoryResponse
+                {
+                    History = result.History
+                };
+                return Results.Ok(response);
+            })
+            .WithName("GetProductReservationsHistory")
+            .WithSummary("Получить историю резервации")
+            .WithDescription("Получить список истории резервации.")
+            .WithDisplayName("Получение истории резерваций")
+            .Produces<GetProductReservationHistoryResponse>()
             .RequireAnyPermission(PermissionCodes.ARTICLE_RESERVATIONS_GET_ALL);
 
         return products;
