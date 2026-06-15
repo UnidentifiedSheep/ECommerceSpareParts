@@ -6,17 +6,22 @@ namespace Main.Entities.Event;
 public class ReservationManualChangeEvent : Event<ReservationManualChangeEventData>
 {
     public int ReservationId { get; private set; }
-    public ReservationManualChangeEvent(ReservationManualChangeEventData data) : base(data)
+    public ReservationManualChangeEvent(
+        int reservationId,
+        ReservationManualChangeEventData data) : base(data)
     {
+        ReservationId = reservationId;
     }
 
     private ReservationManualChangeEvent()
     {
     }
 
-    public static ReservationManualChangeEvent Create(ReservationManualChangeEventData data)
+    public static ReservationManualChangeEvent Create(
+        int reservationId,
+        ReservationManualChangeEventData data)
     {
-        return new ReservationManualChangeEvent(data);
+        return new ReservationManualChangeEvent(reservationId, data);
     }
 
     public static ReservationManualChangeEvent Create(StorageContentReservation reservation)
@@ -30,7 +35,7 @@ public class ReservationManualChangeEvent : Event<ReservationManualChangeEventDa
             UpdatedBy = reservation.WhoUpdated
         };
 
-        return new ReservationManualChangeEvent(data);
+        return new ReservationManualChangeEvent(reservation.Id, data);
     }
 }
 
