@@ -6,6 +6,7 @@ using Api.Common.Models.Requests;
 using Carter;
 using Enums;
 using Main.Application.Dtos.Sale;
+using Main.Application.Handlers.Sales;
 using Main.Application.Handlers.Sales.CreateSale;
 using Main.Application.Handlers.Sales.GetSales;
 using MediatR;
@@ -79,9 +80,7 @@ public record EditSaleRequest(
     string? Comment,
     bool SellFromOtherStorages);
 
-public record GetSaleContentResponse(IEnumerable<SaleContentDto> Content);
-
-
+public record GetSaleContentResponse(IReadOnlyList<SaleContentDto> Content);
 
 public class SalesEndPoints : ICarterModule
 {
@@ -148,15 +147,19 @@ public class SalesEndPoints : ICarterModule
             .ProducesProblem(StatusCodes.Status404NotFound)
             .RequireAnyPermission(PermissionCodes.SALES_EDIT);
 
-        sales.MapGet("/{id}/content", (
+        sales.MapGet("/{id:guid}/contents", async (
                 ISender sender,
-                string id,
-                CancellationToken cancellationToken) => Results.Ok())
+                Guid id,
+                CancellationToken cancellationToken) =>
+            {
+                var result = await sender.Send(new GetSaleContentQuery(id), cancellationToken);
+                return Results.Ok(new GetSaleContentResponse(result.Content));
+            })
             .WithDescription("Получение содержания продажи")
             .WithName("GetSaleContent")
             .WithSummary("Получить содержимое продажи")
             .WithDisplayName("Получение содержания продажи")
-            .Produces(StatusCodes.Status200OK)
+            .Produces<GetSaleContentResponse>()
             .ProducesProblem(StatusCodes.Status404NotFound)
             .RequireAnyPermission(PermissionCodes.SALES_GET);
 
