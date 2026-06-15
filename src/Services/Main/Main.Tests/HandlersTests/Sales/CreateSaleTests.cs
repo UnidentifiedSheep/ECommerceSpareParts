@@ -148,7 +148,7 @@ public class CreateSaleTests : IntegrationTest
     public async Task CreateSale_WithBuyerReservation_SubtractsReservationCount()
     {
         var buyer = Buyer();
-        var storageContent = StorageContent();
+        var storageContent = StorageContentWithCountAtLeast(2);
         var reservation = await new StorageContentReservationBuilder(Faker)
             .WithUserId(buyer.Id)
             .WithProductId(storageContent.ProductId)
@@ -464,7 +464,9 @@ public class CreateSaleTests : IntegrationTest
         return GetContext<StorageContentTestContext>().StorageContents
             .Where(x => x.Count > 0)
             .GroupBy(x => new { x.ProductId, x.StorageName })
+            .OrderByDescending(x => x.Sum(z => z.Count))
             .First(x => x.Sum(z => z.Count) >= count)
+            .OrderByDescending(x => x.Count)
             .First();
     }
 
