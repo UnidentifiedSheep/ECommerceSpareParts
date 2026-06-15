@@ -3,7 +3,7 @@ using Localization.Abstractions.Interfaces;
 using Main.Application.Dtos.Auth;
 using Main.Entities.Auth;
 
-namespace Main.Application.Handlers.Projections;
+namespace Main.Application.Projections;
 
 public static class AuthProjections
 {

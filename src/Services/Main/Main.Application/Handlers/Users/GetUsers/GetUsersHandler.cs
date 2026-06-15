@@ -6,7 +6,7 @@ using Exceptions;
 using LinqKit;
 using Main.Application.Dtos.Users;
 using Main.Application.Extensions;
-using Main.Application.Handlers.Projections;
+using Main.Application.Projections;
 using Main.Entities.User.ValueObjects;
 using Main.Enums;
 using Microsoft.EntityFrameworkCore;

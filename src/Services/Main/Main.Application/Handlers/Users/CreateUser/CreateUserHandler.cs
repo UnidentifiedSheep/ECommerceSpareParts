@@ -6,7 +6,7 @@ using Application.Common.Interfaces.Cqrs;
 using Attributes;
 using Main.Application.Dtos.Emails;
 using Main.Application.Dtos.Users;
-using Main.Application.Handlers.Projections;
+using Main.Application.Projections;
 using Main.Entities.Auth;
 using Main.Entities.Exceptions;
 using Main.Entities.User;

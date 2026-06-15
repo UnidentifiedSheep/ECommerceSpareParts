@@ -3,7 +3,7 @@ using LinqKit;
 using Main.Application.Dtos.Storage;
 using Main.Entities.Storage;
 
-namespace Main.Application.Handlers.Projections;
+namespace Main.Application.Projections;
 
 public static class StorageContentProjections
 {

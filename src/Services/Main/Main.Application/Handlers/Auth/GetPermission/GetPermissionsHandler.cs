@@ -4,7 +4,7 @@ using Application.Common.Interfaces.Cqrs;
 using Application.Common.Interfaces.Repositories;
 using Attributes;
 using Main.Application.Dtos.Auth;
-using Main.Application.Handlers.Projections;
+using Main.Application.Projections;
 using Main.Entities.Auth;
 using Microsoft.EntityFrameworkCore;
 

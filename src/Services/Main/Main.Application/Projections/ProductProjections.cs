@@ -3,7 +3,7 @@ using LinqKit;
 using Main.Application.Dtos.Product;
 using Main.Entities.Product;
 
-namespace Main.Application.Handlers.Projections;
+namespace Main.Application.Projections;
 
 public static class ProductProjections
 {

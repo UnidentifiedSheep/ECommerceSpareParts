@@ -2,7 +2,7 @@
 using Main.Application.Dtos.Coefficient;
 using Main.Entities;
 
-namespace Main.Application.Handlers.Projections;
+namespace Main.Application.Projections;
 
 public static class CoefficientProjections
 {

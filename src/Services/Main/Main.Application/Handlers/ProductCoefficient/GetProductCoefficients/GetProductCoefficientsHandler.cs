@@ -2,7 +2,7 @@
 using Application.Common.Interfaces.Repositories;
 using LinqKit;
 using Main.Application.Dtos.Product;
-using Main.Application.Handlers.Projections;
+using Main.Application.Projections;
 using Microsoft.EntityFrameworkCore;
 
 namespace Main.Application.Handlers.ProductCoefficient.GetProductCoefficients;

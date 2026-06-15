@@ -5,7 +5,7 @@ using Application.Common.Interfaces.Repositories;
 using LinqKit;
 using Localization.Abstractions.Interfaces;
 using Main.Application.Dtos.Auth;
-using Main.Application.Handlers.Projections;
+using Main.Application.Projections;
 using Main.Entities.Auth;
 using Microsoft.EntityFrameworkCore;
 

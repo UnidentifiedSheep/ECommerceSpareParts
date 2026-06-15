@@ -4,8 +4,8 @@ using Application.Common.Interfaces.Cqrs;
 using Attributes;
 using Contracts.Producer;
 using Main.Application.Dtos.Producer;
-using Main.Application.Handlers.Projections;
 using Main.Application.Interfaces.Persistence;
+using Main.Application.Projections;
 using Main.Entities.Exceptions;
 using MediatR;
 

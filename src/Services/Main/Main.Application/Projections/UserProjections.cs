@@ -1,12 +1,13 @@
 ﻿using System.Linq.Expressions;
 using LinqKit;
+using Main.Application.Dtos.Auth;
 using Main.Application.Dtos.Users;
 using Main.Application.Extensions;
 using Main.Entities.User;
 using Main.Enums;
-using Main.Enums.Balances;
+using Main.Enums.Auth;
 
-namespace Main.Application.Handlers.Projections;
+namespace Main.Application.Projections;
 
 public static class UserProjections
 {
@@ -29,6 +30,14 @@ public static class UserProjections
                 : UserInfoProjection.Invoke(x.UserInfo)
         };
 
+    public static readonly Expression<Func<User, UserPartyDto>> UserPartyProjection =
+        x => new UserPartyDto
+        {
+            PartyType = TransactionPartyTypeProjection.Invoke(x),
+            User = x.Roles.Any(role => role.RoleName == SystemRole)
+                ? null
+                : UserProjection.Invoke(x)
+        };
 
     public static readonly Expression<Func<UserInfo, UserInfoDto>> UserInfoProjection =
         x => new UserInfoDto
@@ -50,8 +59,8 @@ public static class UserProjections
             IsPrimary = x.IsPrimary
         };
 
-    public static readonly Expression<Func<User, TransactionPartyType>> TransactionPartyTypeProjection =
+    public static readonly Expression<Func<User, UserPartyType>> TransactionPartyTypeProjection =
         x => x.Roles.Any(role => role.RoleName == SystemRole)
-            ? TransactionPartyType.System
-            : TransactionPartyType.User;
+            ? UserPartyType.System
+            : UserPartyType.User;
 }
