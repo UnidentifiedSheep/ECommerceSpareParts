@@ -33,6 +33,8 @@ public class SaleContentDetail : Entity<SaleContentDetail, int>, ILinqEntity<Sal
     public int Count { get; private set; }
     public DateTime PurchaseDatetime { get; private set; }
 
+    public Currency.Currency Currency { get; private set; } = null!;
+
     public static Expression<Func<SaleContentDetail, int>> GetKeySelector()
     {
         return x => x.Id;

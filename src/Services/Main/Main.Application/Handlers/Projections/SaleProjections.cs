@@ -1,6 +1,8 @@
 ﻿using System.Linq.Expressions;
 using LinqKit;
+using Main.Application.Dtos.Currencies;
 using Main.Application.Dtos.Sale;
+using Main.Entities.Currency;
 using Main.Entities.Sale;
 
 namespace Main.Application.Handlers.Projections;
@@ -39,7 +41,7 @@ public static class SaleProjections
             Id = x.Id,
             BuyPrice = x.BuyPrice,
             Count = x.Count,
-            CurrencyId = x.CurrencyId,
+            Currency = CurrencyProjections.ToDto.Invoke(x.Currency),
             PurchaseDatetime = x.PurchaseDatetime,
             SaleContentId = x.SaleContentId,
             StorageContentId = x.StorageContentId
