@@ -1,0 +1,158 @@
+using System.Text.Json.Serialization;
+using Api.Common.Extensions;
+using Api.Common.Models.Requests;
+using Enums;
+using Main.Application.Dtos.Product.Reservation;
+using Main.Application.Handlers.ProductReservations.CreateProductReservation;
+using Main.Application.Handlers.ProductReservations.DeleteProductReservation;
+using Main.Application.Handlers.ProductReservations.EditProductReservation;
+using Main.Application.Handlers.ProductReservations.GetProductReservations;
+using MediatR;
+using Microsoft.AspNetCore.Mvc;
+
+namespace Main.Api.EndPoints.Products;
+
+public record CreateProductReservationQuery
+{
+    [JsonPropertyName("reservations")]
+    public required List<NewProductReservationDto> Reservations { get; init; }
+}
+
+public record EditProductReservationRequest
+{
+    [JsonPropertyName("newValue")]
+    public required EditProductReservationDto NewValue { get; init; }
+}
+
+public record GetProductReservationsRequest : SortablePaginationQueryModel
+{
+    [FromQuery(Name = "productId")]
+    public int? ProductId { get; init; }
+
+    [FromQuery(Name = "userId")]
+    public Guid? UserId { get; init; }
+
+    [FromQuery(Name = "showDeleted")]
+    public bool ShowDeleted { get; init; }
+}
+
+public record GetProductReservationsResponse
+{
+    [JsonPropertyName("reservations")]
+    public required IReadOnlyList<ProductReservationDto> Reservations { get; init; }
+}
+
+public static class ProductReservationsEndPoints
+{
+    public static RouteGroupBuilder MapProductReservationsEndPoints(this RouteGroupBuilder products)
+    {
+        products.MapPost("/reservations", async (
+                ISender sender,
+                CreateProductReservationQuery query,
+                CancellationToken cancellationToken) =>
+            {
+                await sender.Send(new CreateProductReservationCommand(query.Reservations), cancellationToken);
+                return Results.NoContent();
+            })
+            .WithName("CreateProductReservations")
+            .WithSummary("Создать резервации продуктов")
+            .WithDisplayName("Создать резервацию")
+            .WithDescription("Создать резервацию для пользователя")
+            .Accepts<CreateProductReservationQuery>(false, "application/json")
+            .Produces(StatusCodes.Status204NoContent)
+            .ProducesProblem(StatusCodes.Status400BadRequest)
+            .RequireAnyPermission(PermissionCodes.ARTICLE_RESERVATIONS_CREATE);
+
+        products.MapPut("/reservations/{reservationId:int}", async (
+                ISender sender,
+                int reservationId,
+                EditProductReservationRequest request,
+                CancellationToken cancellationToken) =>
+            {
+                await sender.Send(new EditProductReservationCommand(reservationId, request.NewValue), cancellationToken);
+                return Results.NoContent();
+            })
+            .WithName("EditProductReservation")
+            .WithSummary("Редактировать резервацию продукта")
+            .WithDisplayName("Редактирование резервации")
+            .WithDescription("Редактирование резервации")
+            .Accepts<EditProductReservationRequest>(false, "application/json")
+            .Produces(StatusCodes.Status204NoContent)
+            .ProducesProblem(StatusCodes.Status400BadRequest)
+            .ProducesProblem(StatusCodes.Status404NotFound)
+            .RequireAnyPermission(PermissionCodes.ARTICLE_RESERVATIONS_EDIT);
+
+        products.MapDelete("/reservations/{reservationId:int}", async (
+                ISender sender,
+                int reservationId,
+                CancellationToken cancellationToken) =>
+            {
+                await sender.Send(new DeleteProductReservationCommand(reservationId), cancellationToken);
+                return Results.NoContent();
+            })
+            .WithName("DeleteProductReservation")
+            .WithSummary("Удалить резервацию продукта")
+            .WithDisplayName("Удалить резервацию")
+            .WithDescription("Удалить резервацию")
+            .Produces(StatusCodes.Status204NoContent)
+            .ProducesProblem(StatusCodes.Status404NotFound)
+            .RequireAnyPermission(PermissionCodes.ARTICLE_RESERVATIONS_DELETE);
+
+        products.MapGet("/reservations", async (
+                ISender sender,
+                [AsParameters] GetProductReservationsRequest queryParams,
+                CancellationToken cancellationToken) =>
+            {
+                var query = new GetProductReservationsQuery(
+                    queryParams.ProductId,
+                    queryParams.UserId,
+                    queryParams.SortBy,
+                    queryParams.ShowDeleted,
+                    queryParams);
+                var result = await sender.Send(query, cancellationToken);
+                var response = new GetProductReservationsResponse
+                {
+                    Reservations = result.Reservations
+                };
+                return Results.Ok(response);
+            })
+            .WithName("GetProductReservations")
+            .WithSummary("Получить резервации продукта")
+            .WithDescription("Получить список резерваций артикула по id артикула.")
+            .WithDisplayName("Получение резерваций артикула")
+            .Produces<GetProductReservationsResponse>()
+            .ProducesProblem(StatusCodes.Status400BadRequest)
+            .ProducesProblem(StatusCodes.Status404NotFound)
+            .RequireAnyPermission(PermissionCodes.ARTICLE_RESERVATIONS_GET_ALL);
+
+        products.MapGet("/{productId:int}/reservations", async (
+                ISender sender,
+                int productId,
+                [AsParameters] GetProductReservationsRequest queryParams,
+                CancellationToken cancellationToken) =>
+            {
+                var query = new GetProductReservationsQuery(
+                    productId,
+                    queryParams.UserId,
+                    queryParams.SortBy,
+                    queryParams.ShowDeleted,
+                    queryParams);
+                var result = await sender.Send(query, cancellationToken);
+                var response = new GetProductReservationsResponse
+                {
+                    Reservations = result.Reservations
+                };
+                return Results.Ok(response);
+            })
+            .WithName("GetProductReservationsByProduct")
+            .WithSummary("Получить резервации продукта")
+            .WithDescription("Получить список резерваций артикула по id артикула.")
+            .WithDisplayName("Получение резерваций артикула")
+            .Produces<GetProductReservationsResponse>()
+            .ProducesProblem(StatusCodes.Status400BadRequest)
+            .ProducesProblem(StatusCodes.Status404NotFound)
+            .RequireAnyPermission(PermissionCodes.ARTICLE_RESERVATIONS_GET_ALL);
+
+        return products;
+    }
+}

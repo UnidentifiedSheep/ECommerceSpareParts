@@ -9,8 +9,8 @@ public record ProductReservationDto
     [JsonPropertyName("id")]
     public required int Id { get; init; }
     
-    [JsonPropertyName("userId")]
-    public required Guid UserId { get; init; }
+    [JsonPropertyName("user")]
+    public required UserPartyDto User { get; init; }
     
     [JsonPropertyName("reservedCount")]
     public required int ReservedCount { get; init; }
@@ -35,5 +35,5 @@ public record ProductReservationDto
     public required DateTime UpdatedAt { get; init; }
     
     [JsonPropertyName("whoUpdated")]
-    public required UserPartyDto WhoUpdated { get; init; }
+    public required Guid? WhoUpdated { get; init; }
 }

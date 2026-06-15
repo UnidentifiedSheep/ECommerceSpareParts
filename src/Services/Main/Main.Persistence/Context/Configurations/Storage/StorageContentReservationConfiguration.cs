@@ -66,7 +66,7 @@ public class StorageContentReservationConfiguration : IEntityTypeConfiguration<S
             .OnDelete(DeleteBehavior.Cascade)
             .HasConstraintName("storage_content_reservations_currency_id_fk");
 
-        builder.HasOne<Entities.User.User>()
+        builder.HasOne<Entities.User.User>(e => e.User)
             .WithMany()
             .HasForeignKey(d => d.UserId)
             .HasConstraintName("storage_content_reservations_users_id_fk");

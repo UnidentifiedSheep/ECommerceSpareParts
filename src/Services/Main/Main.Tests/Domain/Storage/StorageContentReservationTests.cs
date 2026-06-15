@@ -160,20 +160,29 @@ public class StorageContentReservationTests
         act.Should().Throw<InvalidOperationException>();
     }
 
-    [Theory]
-    [InlineData(1, StorageContentReservationStatus.Locked)]
-    [InlineData(3, StorageContentReservationStatus.Done)]
-    public void ProposePrice_NotActiveStatus_Throws(
-        int countToAdd,
-        StorageContentReservationStatus expectedStatus)
+    [Fact]
+    public void ProposePrice_LockedReservation_Succeeds()
     {
         var reservation = Create(reservedCount: 3);
-        reservation.AddCount(countToAdd);
+        reservation.AddCount(1);
+
+        reservation.ProposePrice(100m, 1);
+
+        reservation.ProposedPrice.Should().Be(100m);
+        reservation.ProposedCurrencyId.Should().Be(1);
+        reservation.Status.Should().Be(StorageContentReservationStatus.Locked);
+    }
+
+    [Fact]
+    public void ProposePrice_DoneReservation_Throws()
+    {
+        var reservation = Create(reservedCount: 3);
+        reservation.AddCount(3);
 
         var act = () => reservation.ProposePrice(100m, 1);
 
         act.Should().Throw<InvalidInputException>();
-        reservation.Status.Should().Be(expectedStatus);
+        reservation.Status.Should().Be(StorageContentReservationStatus.Done);
     }
 
     [Fact]

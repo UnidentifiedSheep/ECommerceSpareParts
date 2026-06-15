@@ -3,6 +3,7 @@ using Abstractions.Interfaces.Services;
 using Application.Common.Interfaces.Cqrs;
 using Attributes;
 using Main.Application.Dtos.Product;
+using Main.Application.Dtos.Product.Reservation;
 using Main.Entities.Storage;
 using MediatR;
 

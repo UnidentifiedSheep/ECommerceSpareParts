@@ -44,6 +44,8 @@ public class StorageContentReservation : AuditableEntity<StorageContentReservati
 
     public string? Comment { get; private set; }
 
+    public User.User User { get; private set; } = null!;
+
     public static Expression<Func<StorageContentReservation, int>> GetKeySelector()
     {
         return x => x.Id;
@@ -141,15 +143,8 @@ public class StorageContentReservation : AuditableEntity<StorageContentReservati
 
     private void PerformDomainChecks()
     {
-        ThrowIfLocked();
         ThrowIfDone();
         ThrowIfCanceled();
-    }
-
-    private void ThrowIfLocked()
-    {
-        if (Status == StorageContentReservationStatus.Locked)
-            throw new InvalidInputException("article.reservation.is.locked");
     }
 
     private void ThrowIfDone()
