@@ -2,7 +2,6 @@ using Abstractions.Interfaces.Persistence;
 using Application.Common.Interfaces.Cqrs;
 using Application.Common.Interfaces.Repositories;
 using Attributes;
-using Main.Application.Dtos.Product;
 using Main.Application.Dtos.Product.Reservation;
 using Main.Entities.Event;
 using Main.Entities.Exceptions;

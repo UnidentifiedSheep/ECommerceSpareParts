@@ -2,7 +2,7 @@ using System.Text.Json.Serialization;
 
 namespace Main.Application.Dtos.Product.Reservation;
 
-public class EditProductReservationDto
+public record EditProductReservationDto
 {
     [JsonPropertyName("proposedPrice")]
     public required decimal? GivenPrice { get; init; }
