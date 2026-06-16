@@ -1,17 +1,19 @@
 ﻿using Abstractions.Interfaces.Persistence;
-using Abstractions.Interfaces.Services;
 using Application.Common.Interfaces;
 using Application.Common.Interfaces.Cqrs;
 using Attributes;
 using Contracts.Products;
 using Main.Application.Dtos.Product;
 using Main.Entities.Product;
+using Main.Enums.Products;
 
 namespace Main.Application.Handlers.Products.CreateProducts;
 
 [AutoSave]
 [Transactional]
-public record CreateProductsCommand(List<CreateProductDto> NewProducts) : ICommand<CreateProductsResult>;
+public record CreateProductsCommand(
+    List<CreateProductDto> NewProducts,
+    CreateProductsConflictPolicy Policy = CreateProductsConflictPolicy.Fail) : ICommand<CreateProductsResult>;
 
 public record CreateProductsResult(List<int> CreatedIds);
 
