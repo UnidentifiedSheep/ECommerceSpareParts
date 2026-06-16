@@ -17,7 +17,7 @@ public class CreateProductReservationValidation : AbstractValidator<CreateProduc
             .WithLocalizationKey("article.reservation.initial.count.must.be.positive");
 
         RuleFor(x => x.Reservation.CurrentCount)
-            .GreaterThan(0)
+            .GreaterThanOrEqualTo(0)
             .WithLocalizationKey("article.reservation.current.count.must.be.positive");
 
         RuleFor(x => x.Reservation.ReservedCount)

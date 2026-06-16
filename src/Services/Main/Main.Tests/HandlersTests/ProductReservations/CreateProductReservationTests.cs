@@ -121,7 +121,6 @@ public class CreateProductReservationTests : IntegrationTest
     }
 
     [Theory]
-    [InlineData(0)]
     [InlineData(-1)]
     public async Task WithInvalidCurrentCount_ThrowsValidationException(int currentCount)
     {
