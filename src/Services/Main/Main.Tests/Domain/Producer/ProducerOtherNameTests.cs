@@ -1,6 +1,6 @@
-﻿using Exceptions;
-using FluentAssertions;
+﻿using FluentAssertions;
 using Main.Entities.Producer;
+using ProducerDomain = Main.Entities.Producer.Producer;
 
 namespace Tests.Domain.Producer;
 
@@ -15,7 +15,7 @@ public class ProducerOtherNameTests
         var entity = ProducerOtherName.Create(producerId, otherName, whereUsed);
 
         entity.ProducerId.Should().Be(producerId);
-        entity.OtherName.Should().Be(otherName.Trim());
+        entity.OtherName.Should().Be(ProducerDomain.ToNormalizedName(otherName));
         entity.WhereUsed.Should().Be(whereUsed.Trim().ToUpperInvariant());
     }
 
@@ -48,13 +48,13 @@ public class ProducerOtherNameTests
     }
 
     [Fact]
-    public void SetOtherName_AllowsAnyValue()
+    public void SetOtherName_NormalizesValue()
     {
         var entity = ProducerOtherName.Create(1, "KSS", "EU");
 
         entity.SetOtherName("Samsung");
 
-        entity.OtherName.Should().Be("Samsung");
+        entity.OtherName.Should().Be("SAMSUNG");
     }
 
     [Fact]

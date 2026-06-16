@@ -9,6 +9,7 @@ using CsvHelper.Configuration.Attributes;
 using CsvHelper.TypeConversion;
 using Domain.CommonEntities;
 using Localization.Abstractions.Interfaces;
+using Localization.Domain;
 using Main.Application.Dtos.Product;
 using Main.Application.Handlers.Products.CreateProducts;
 using Main.Application.Interfaces.Persistence;
@@ -19,6 +20,7 @@ using Main.Enums.Products;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 
 namespace Main.Application.Lrts.ProductImport;
 
@@ -30,7 +32,8 @@ public class ProductImportLrt(
     IS3StorageService s3Service,
     ISender sender,
     ILogger<ProductImportLrt> logger,
-    IScopedStringLocalizer stringLocalizer) : LrtNamedObjectBase(jobRepository, unitOfWork, logger)
+    IScopedStringLocalizer stringLocalizer,
+    IOptions<LocalesOptions> localesOptions) : LrtNamedObjectBase(jobRepository, unitOfWork, logger)
 {
     private const int BatchSize = 100;
     private const int MaxErrors = 10_000;
@@ -46,6 +49,7 @@ public class ProductImportLrt(
     
     protected override async Task DoWork()
     {
+        stringLocalizer.SetLocale(localesOptions.Value.Default);
         var state = await GetStateAsync<ProductImportState>()
                     ?? throw new InvalidOperationException("Product import state is empty.");
 
