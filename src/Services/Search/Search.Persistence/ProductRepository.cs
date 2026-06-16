@@ -2,7 +2,6 @@ using Abstractions.Models;
 using Microsoft.Extensions.Options;
 using OpenSearch.Client;
 using Search.Abstractions.Options;
-using Search.Application.Interfaces;
 using Search.Entities;
 using Search.Persistence.Interfaces;
 using System.Linq.Expressions;
@@ -76,9 +75,6 @@ public class ProductRepository(
         AddRangeFilter(filters, p => p.Dimensions!.WidthM, widthM);
         AddRangeFilter(filters, p => p.Dimensions!.HeightM, heightM);
 
-        if (!hasTextQuery && filters.Count == 0)
-            return [];
-
         var page = pagination ?? DefaultPagination;
         var idx = await CheckInitAndGetIdx(token);
         var normalizedQuery = query.OnlyCharacterToLower();
@@ -120,29 +116,38 @@ public class ProductRepository(
         Pagination? pagination = null,
         CancellationToken token = default)
     {
-        if (string.IsNullOrWhiteSpace(sku))
-            return [];
-        
-
         var page = pagination ?? DefaultPagination;
         var idx = await CheckInitAndGetIdx(token);
         var normalizedSku = sku.OnlyCharacterToLower();
-        if (string.IsNullOrEmpty(normalizedSku))
-            return [];
-        
 
         var should = new List<Func<QueryContainerDescriptor<Product>, QueryContainer>>();
+        var filters = new List<Func<QueryContainerDescriptor<Product>, QueryContainer>>();
         AddSkuQueries(should, normalizedSku);
-        AddProducerFilter(should, producerId);
+        AddProducerFilter(filters, producerId);
 
         var response = await client.SearchAsync<Product>(
             s => s
                 .Index(idx)
                 .From(GetFrom(page))
                 .Size(page.Size)
-                .Query(q => q.Bool(b => b
-                    .Should(should.ToArray())
-                    .MinimumShouldMatch(1))),
+                .Query(q =>
+                {
+                    if (should.Count == 0 && filters.Count == 0)
+                        return q.MatchAll();
+
+                    return q.Bool(b =>
+                    {
+                        if (should.Count > 0)
+                        {
+                            b = b.Should(should.ToArray())
+                                .MinimumShouldMatch(1);
+                        }
+
+                        return filters.Count > 0
+                            ? b.Filter(filters)
+                            : b;
+                    });
+                }),
             token);
 
         return response.Documents;
@@ -176,9 +181,6 @@ public class ProductRepository(
         AddRangeFilter(filters, p => p.Dimensions!.WidthM, width);
         AddRangeFilter(filters, p => p.Dimensions!.HeightM, height);
 
-        if (filters.Count == 0)
-            return [];
-
         var page = pagination ?? DefaultPagination;
         var idx = await CheckInitAndGetIdx(token);
         var response = await client.SearchAsync<Product>(
@@ -186,7 +188,9 @@ public class ProductRepository(
                 .Index(idx)
                 .From(GetFrom(page))
                 .Size(page.Size)
-                .Query(q => q.Bool(b => b.Filter(filters))),
+                .Query(q => filters.Count > 0
+                    ? q.Bool(b => b.Filter(filters))
+                    : q.MatchAll()),
             token);
 
         return response.Documents;
@@ -240,9 +244,6 @@ public class ProductRepository(
         Pagination? pagination,
         CancellationToken token)
     {
-        if (range is not { HasBounds: true })
-            return [];
-
         var page = pagination ?? DefaultPagination;
         var idx = await CheckInitAndGetIdx(token);
         var response = await client.SearchAsync<Product>(
@@ -250,7 +251,9 @@ public class ProductRepository(
                 .Index(idx)
                 .From(GetFrom(page))
                 .Size(page.Size)
-                .Query(q => q.Range(r => ApplyRange(r.Field(field), range))),
+                .Query(q => range is { HasBounds: true }
+                    ? q.Range(r => ApplyRange(r.Field(field), range))
+                    : q.MatchAll()),
             token);
 
         return response.Documents;
