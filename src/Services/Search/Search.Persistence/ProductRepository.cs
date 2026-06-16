@@ -3,6 +3,7 @@ using Microsoft.Extensions.Options;
 using OpenSearch.Client;
 using Search.Abstractions.Options;
 using Search.Entities;
+using Search.Persistence.Extensions;
 using Search.Persistence.Interfaces;
 using System.Linq.Expressions;
 using Extensions;
@@ -61,6 +62,7 @@ public class ProductRepository(
         string query,
         int? producerId = null,
         Pagination? pagination = null,
+        string? sortBy = null,
         RangeModel<decimal>? lengthM = null,
         RangeModel<decimal>? widthM = null,
         RangeModel<decimal>? heightM = null,
@@ -83,6 +85,7 @@ public class ProductRepository(
                 .Index(idx)
                 .From(GetFrom(page))
                 .Size(page.Size)
+                .SortBy(sortBy)
                 .Query(q => q.Bool(b =>
                 {
                     if (hasTextQuery)
@@ -114,6 +117,7 @@ public class ProductRepository(
         string sku,
         int? producerId,
         Pagination? pagination = null,
+        string? sortBy = null,
         CancellationToken token = default)
     {
         var page = pagination ?? DefaultPagination;
@@ -130,6 +134,7 @@ public class ProductRepository(
                 .Index(idx)
                 .From(GetFrom(page))
                 .Size(page.Size)
+                .SortBy(sortBy)
                 .Query(q =>
                 {
                     if (should.Count == 0 && filters.Count == 0)
@@ -156,17 +161,19 @@ public class ProductRepository(
     public Task<IReadOnlyCollection<Product>> GetByWeightKgRange(
         RangeModel<decimal>? weightKg = null,
         Pagination? pagination = null,
+        string? sortBy = null,
         CancellationToken token = default)
     {
-        return SearchByRange(p => p.Weight!.WeightKg, weightKg, pagination, token);
+        return SearchByRange(p => p.Weight!.WeightKg, weightKg, pagination, sortBy, token);
     }
 
     public Task<IReadOnlyCollection<Product>> GetByVolumeM3Range(
         RangeModel<decimal>? volumeM3 = null,
         Pagination? pagination = null,
+        string? sortBy = null,
         CancellationToken token = default)
     {
-        return SearchByRange(p => p.Dimensions!.VolumeM3, volumeM3, pagination, token);
+        return SearchByRange(p => p.Dimensions!.VolumeM3, volumeM3, pagination, sortBy, token);
     }
 
     public async Task<IReadOnlyCollection<Product>> GetByDimensionsRange(
@@ -174,6 +181,7 @@ public class ProductRepository(
         RangeModel<decimal>? width = null,
         RangeModel<decimal>? height = null,
         Pagination? pagination = null,
+        string? sortBy = null,
         CancellationToken token = default)
     {
         var filters = new List<Func<QueryContainerDescriptor<Product>, QueryContainer>>();
@@ -188,6 +196,7 @@ public class ProductRepository(
                 .Index(idx)
                 .From(GetFrom(page))
                 .Size(page.Size)
+                .SortBy(sortBy)
                 .Query(q => filters.Count > 0
                     ? q.Bool(b => b.Filter(filters))
                     : q.MatchAll()),
@@ -242,6 +251,7 @@ public class ProductRepository(
         Expression<Func<Product, object>> field,
         RangeModel<decimal>? range,
         Pagination? pagination,
+        string? sortBy,
         CancellationToken token)
     {
         var page = pagination ?? DefaultPagination;
@@ -251,6 +261,7 @@ public class ProductRepository(
                 .Index(idx)
                 .From(GetFrom(page))
                 .Size(page.Size)
+                .SortBy(sortBy)
                 .Query(q => range is { HasBounds: true }
                     ? q.Range(r => ApplyRange(r.Field(field), range))
                     : q.MatchAll()),

@@ -1,12 +1,13 @@
 ﻿using System.Collections.Concurrent;
 using System.Linq.Expressions;
+using Abstractions.Models.SortyBy;
 
 namespace Abstractions;
 
-public class QueryableSortByOptions
+public class QueryableSortBy
 {
     private const string DefaultKey = "__default__";
-    public static readonly QueryableSortByOptions Value = new();
+    public static readonly QueryableSortBy Value = new();
 
     private readonly ConcurrentDictionary<Type, ConcurrentDictionary<string, object>> _mapDictionary = new();
 
@@ -22,7 +23,7 @@ public class QueryableSortByOptions
         return Delimiter;
     }
 
-    public QueryableSortByOptions Map<TSource, TKey>(
+    public QueryableSortBy Map<TSource, TKey>(
         string source,
         Expression<Func<TSource, TKey>> keySelector)
     {
@@ -39,7 +40,7 @@ public class QueryableSortByOptions
         return this;
     }
 
-    public QueryableSortByOptions MapDefault<TSource, TKey>(
+    public QueryableSortBy MapDefault<TSource, TKey>(
         Expression<Func<TSource, TKey>> keySelector)
     {
         var type = typeof(TSource);
@@ -69,5 +70,36 @@ public class QueryableSortByOptions
             return (Expression<Func<TEntity, object?>>)defaultValue;
 
         throw new ArgumentException($"Mapping '{source}' for {type} not exists and no default provided");
+    }
+    
+    public static KeySelectorSortDefinition<TEntity> ParseToKeySelector<TEntity>(string? sortParam)
+    {
+        var sort = ParseToText(sortParam);
+        var map = QueryableSortBy.Value.GetMapping<TEntity>(sort.Field);
+        return new KeySelectorSortDefinition<TEntity>(map, sort.Desc);
+    }
+
+    public static TextSortDefinition ParseToText(string? sortParam)
+    {
+        if (string.IsNullOrWhiteSpace(sortParam))
+            return new TextSortDefinition(string.Empty, false);
+
+        var span = sortParam.Trim().ToLowerInvariant();
+        var delimiter = QueryableSortBy.Value.GetDelimiter();
+
+        var idx = span.IndexOf(delimiter);
+
+        if (idx < 0)
+            return new TextSortDefinition(span, false);
+
+        var field = span[..idx];
+        var dir = span[(idx + 1)..];
+
+        return new TextSortDefinition(field, IsDesc(dir));
+    }
+
+    public static bool IsDesc(string? way)
+    {
+        return string.Equals(way, "desc", StringComparison.OrdinalIgnoreCase);
     }
 }

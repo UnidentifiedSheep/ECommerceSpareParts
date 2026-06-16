@@ -2,6 +2,7 @@ using Application.Common;
 using Application.Common.Behaviors;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Search.Application.Configs;
 using Search.Application.Interfaces;
 using Search.Application.Interfaces.Producer;
 using Search.Application.Interfaces.Product;
@@ -17,6 +18,8 @@ public static class ServiceProvider
         this IServiceCollection services,
         IConfiguration configuration)
     {
+        SortByConfig.Configure();
+        
         services
             .AddApplicationBase(
                 configuration: configuration,

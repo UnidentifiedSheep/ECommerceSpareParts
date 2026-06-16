@@ -10,7 +10,8 @@ namespace Search.Application.Handlers.Products.SearchProductsBySku;
 public record SearchProductsBySkuQuery(
     string Sku,
     int? ProducerId,
-    Pagination Pagination) : IQuery<SearchProductsBySkuResult>;
+    Pagination Pagination,
+    string? SortBy) : IQuery<SearchProductsBySkuResult>;
 public record SearchProductsBySkuResult(IEnumerable<ProductDto> Products);
 
 public class SearchProductsBySkuHandler(
@@ -23,6 +24,7 @@ public class SearchProductsBySkuHandler(
             request.Sku,
             request.ProducerId,
             request.Pagination,
+            request.SortBy,
             cancellationToken);
         
         return new SearchProductsBySkuResult(
