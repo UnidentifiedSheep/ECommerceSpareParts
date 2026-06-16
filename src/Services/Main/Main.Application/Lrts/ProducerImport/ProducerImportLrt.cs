@@ -8,10 +8,12 @@ using CsvHelper.Configuration.Attributes;
 using CsvHelper.TypeConversion;
 using Domain.CommonEntities;
 using Localization.Abstractions.Interfaces;
+using Localization.Domain;
 using Main.Application.Dtos.Producer;
 using Main.Application.Handlers.Producers;
 using MediatR;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 
 namespace Main.Application.Lrts.ProducerImport;
 
@@ -21,7 +23,8 @@ public class ProducerImportLrt(
     IS3StorageService s3Service,
     ISender sender,
     ILogger<ProducerImportLrt> logger,
-    IScopedStringLocalizer stringLocalizer)
+    IScopedStringLocalizer stringLocalizer,
+    IOptions<LocalesOptions> localesOptions)
     : LrtNamedObjectBase(jobRepository, unitOfWork, logger)
 {
     private const int BatchSize = 1000;
@@ -35,6 +38,7 @@ public class ProducerImportLrt(
 
     protected override async Task DoWork()
     {
+        stringLocalizer.SetLocale(localesOptions.Value.Default);
         var state = await GetStateAsync<ProducerImportState>()
                     ?? throw new InvalidOperationException("Producer import state is empty.");
 

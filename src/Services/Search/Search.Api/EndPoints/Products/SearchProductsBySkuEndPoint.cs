@@ -9,7 +9,7 @@ using Search.Application.Handlers.Products.SearchProductsBySku;
 
 namespace Search.Api.EndPoints.Products;
 
-public record SearchProductsBySkuRequest : PaginationQueryModel
+public record SearchProductsBySkuRequest : SortablePaginationQueryModel
 {
     [FromQuery(Name = "sku")]
     public required string Sku { get; init; }
@@ -37,7 +37,8 @@ public static class SearchProductsBySkuEndPoint
                     new SearchProductsBySkuQuery(
                         request.Sku,
                         request.ProducerId,
-                        request),
+                        request,
+                        request.SortBy),
                     cancellationToken);
 
                 return Results.Ok(new SearchProductsBySkuResult

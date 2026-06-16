@@ -88,4 +88,21 @@ public class AddOtherNameToProducerTests : IntegrationTest
         var exception = await Assert.ThrowsAsync<DbValidationException>(async () => await Mediator.Send(command));
         Assert.Equal(ApplicationErrors.ProducerOtherNameAlreadyTaken, exception.Failures[0].ErrorName);
     }
+
+    [Fact]
+    public async Task AddOtherProducerName_WithSameOtherNameForAnotherProducer_ThrowsProducerOtherNameExists()
+    {
+        var existing = await new ProducerOtherNameBuilder(Faker)
+            .WithProducerId(TestContext.Producers[0].Id)
+            .BuildAndAddToDb(Context);
+
+        var command = new AddOtherNameCommand(
+            TestContext.Producers[1].Id,
+            existing.OtherName,
+            Faker.Lorem.Letter(10));
+
+        var exception = await Assert.ThrowsAsync<DbValidationException>(async () => await Mediator.Send(command));
+
+        Assert.Equal(ApplicationErrors.ProducerOtherNameAlreadyTaken, exception.Failures[0].ErrorName);
+    }
 }

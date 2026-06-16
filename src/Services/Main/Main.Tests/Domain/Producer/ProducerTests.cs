@@ -13,7 +13,7 @@ public class ProducerTests
             "desc",
             "/img.png");
 
-        producer.Name.Should().Be("Sony");
+        producer.Name.Should().Be(ProducerDomain.ToNormalizedName("sony"));
         producer.Description.Should().Be("desc");
         producer.ImagePath.Should().Be("/img.png");
     }
@@ -23,7 +23,7 @@ public class ProducerTests
     {
         var producer = ProducerDomain.Create("sony");
 
-        producer.Name.Should().Be("Sony");
+        producer.Name.Should().Be(ProducerDomain.ToNormalizedName("sony"));
         producer.Description.Should().BeNull();
         producer.ImagePath.Should().BeNull();
     }
@@ -35,7 +35,7 @@ public class ProducerTests
 
         producer.SetName("samsung");
 
-        producer.Name.Should().Be("Samsung");
+        producer.Name.Should().Be(ProducerDomain.ToNormalizedName("samsung"));
     }
 
     [Fact]

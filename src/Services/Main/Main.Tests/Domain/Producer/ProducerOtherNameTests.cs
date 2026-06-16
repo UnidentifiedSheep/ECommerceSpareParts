@@ -1,6 +1,6 @@
-﻿using Exceptions;
-using FluentAssertions;
+﻿using FluentAssertions;
 using Main.Entities.Producer;
+using ProducerDomain = Main.Entities.Producer.Producer;
 
 namespace Tests.Domain.Producer;
 
@@ -15,7 +15,7 @@ public class ProducerOtherNameTests
         var entity = ProducerOtherName.Create(producerId, otherName, whereUsed);
 
         entity.ProducerId.Should().Be(producerId);
-        entity.OtherName.Should().Be(otherName.Trim());
+        entity.OtherName.Should().Be(ProducerDomain.ToNormalizedName(otherName));
         entity.WhereUsed.Should().Be(whereUsed.Trim().ToUpperInvariant());
     }
 
@@ -24,7 +24,7 @@ public class ProducerOtherNameTests
     {
         var act = () => ProducerOtherName.Create(1, "KSS", "   ");
 
-        act.Should().Throw<InvalidInputException>();
+        act.Should().NotThrow();
     }
 
     [Fact]
@@ -44,28 +44,26 @@ public class ProducerOtherNameTests
 
         var act = () => entity.SetWhereUsed("a");
 
-        act.Should().Throw<InvalidInputException>();
+        act.Should().NotThrow();
     }
 
     [Fact]
-    public void SetOtherName_AllowsAnyValue()
+    public void SetOtherName_NormalizesValue()
     {
         var entity = ProducerOtherName.Create(1, "KSS", "EU");
 
         entity.SetOtherName("Samsung");
 
-        entity.OtherName.Should().Be("Samsung");
+        entity.OtherName.Should().Be("SAMSUNG");
     }
 
     [Fact]
-    public void Key_IsStableAfterNormalization()
+    public void Key_IsNormalizedOtherName()
     {
         var entity = ProducerOtherName.Create(1, "  KSS  ", "eu");
 
         var key = entity.GetId();
 
-        key.ProducerId.Should().Be(1);
-        key.OtherName.Should().Be("KSS");
-        key.WhereUsed.Should().Be("EU");
+        key.Should().Be("KSS");
     }
 }

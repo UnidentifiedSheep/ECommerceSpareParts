@@ -11,6 +11,7 @@ public interface IProductRepository
         string query, 
         int? producerId = null, 
         Pagination? pagination = null,
+        string? sortBy = null,
         RangeModel<decimal>? lengthM = null,
         RangeModel<decimal>? widthM = null,
         RangeModel<decimal>? heightM = null,
@@ -19,17 +20,20 @@ public interface IProductRepository
     Task<IReadOnlyCollection<Entities.Product>> SearchBySku(
         string sku,
         int? producerId,
-        Pagination? pagination = null, 
+        Pagination? pagination = null,
+        string? sortBy = null,
         CancellationToken token = default);
     
     Task<IReadOnlyCollection<Entities.Product>> GetByWeightKgRange(
         RangeModel<decimal>? weightKg = null, 
-        Pagination? pagination = null, 
+        Pagination? pagination = null,
+        string? sortBy = null,
         CancellationToken token = default);
     
     Task<IReadOnlyCollection<Entities.Product>> GetByVolumeM3Range(
         RangeModel<decimal>? volumeM3 = null, 
-        Pagination? pagination = null, 
+        Pagination? pagination = null,
+        string? sortBy = null,
         CancellationToken token = default);
     
     Task Delete(int id, CancellationToken token = default);

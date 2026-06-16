@@ -7,6 +7,9 @@ public class CreateProductsValidation : AbstractValidator<CreateProductsCommand>
 {
     public CreateProductsValidation()
     {
+        RuleFor(x => x.Policy)
+            .IsInEnum();
+
         RuleFor(x => x.NewProducts)
             .NotEmpty()
             .WithLocalizationKey("article.create.articles.must.have.at.least.one");

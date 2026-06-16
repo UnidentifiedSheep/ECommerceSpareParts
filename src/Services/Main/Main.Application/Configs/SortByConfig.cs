@@ -12,7 +12,7 @@ public static class SortByConfig
 {
     public static void Configure()
     {
-        QueryableSortByOptions.Value
+        QueryableSortBy.Value
             .MapDefault<Product, int>(x => x.Id)
             .Map<Product, int>("id", x => x.Id)
             .Map<Product, string>("sku", x => x.Sku.NormalizedValue)
@@ -22,24 +22,24 @@ public static class SortByConfig
             .Map<Product, string>("indicator", x => x.Indicator!.Value!)
             .Map<Product, long>("popularity", x => x.Popularity);
 
-        QueryableSortByOptions.Value
+        QueryableSortBy.Value
             .MapDefault<Producer, int>(x => x.Id)
             .Map<Producer, int>("id", x => x.Id)
             .Map<Producer, string>("name", x => x.Name);
 
-        QueryableSortByOptions.Value
+        QueryableSortBy.Value
             .MapDefault<Purchase, DateTime>(x => x.PurchaseDatetime)
             .Map<Purchase, DateTime>("dateTime", x => x.PurchaseDatetime)
             .Map<Purchase, decimal>("totalSum", x => x.Transaction.Amount)
             .Map<Purchase, Guid>("id", x => x.Id);
 
-        QueryableSortByOptions.Value
+        QueryableSortBy.Value
             .MapDefault<Sale, DateTime>(x => x.SaleDatetime)
             .Map<Sale, DateTime>("dateTime", x => x.SaleDatetime)
             .Map<Sale, decimal>("totalSum", x => x.Transaction.Amount)
             .Map<Sale, Guid>("id", x => x.Id);
 
-        QueryableSortByOptions.Value
+        QueryableSortBy.Value
             .MapDefault<StorageContentReservation, DateTime>(x => x.CreatedAt)
             .Map<StorageContentReservation, int>("id", x => x.Id)
             .Map<StorageContentReservation, DateTime>("createAt", x => x.CreatedAt)

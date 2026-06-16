@@ -13,8 +13,6 @@ public class AddOtherNameValidation : AbstractValidator<AddOtherNameCommand>
 
         RuleFor(x => x.WhereUsed)
             .Must(name => name.Trim().Length <= 64)
-            .WithLocalizationKey("producer.other.name.where.used.max.length")
-            .Must(name => name.Trim().Length >= 2)
-            .WithLocalizationKey("producer.other.name.where.used.min.length");
+            .WithLocalizationKey("producer.other.name.where.used.max.length");
     }
 }

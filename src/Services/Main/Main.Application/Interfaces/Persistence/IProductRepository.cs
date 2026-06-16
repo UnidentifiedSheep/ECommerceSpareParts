@@ -10,5 +10,9 @@ public interface IProductRepository : IRepository<Product, int>
         Criteria<Product> criteria,
         CancellationToken cancellationToken = default);
 
+    Task<HashSet<(string NormalizedSku, int ProducerId)>> GetExistingProductKeys(
+        IEnumerable<(string NormalizedSku, int ProducerId)> keys,
+        CancellationToken cancellationToken = default);
+
     Task UpsertProductCrosses(IEnumerable<ProductCross> crosses, CancellationToken cancellationToken = default);
 }

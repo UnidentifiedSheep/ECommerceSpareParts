@@ -11,7 +11,7 @@ using Search.Application.Handlers.Products.SearchProductsByAll;
 
 namespace Search.Api.EndPoints.Products;
 
-public record SearchProductsByAllRequest : PaginationQueryModel
+public record SearchProductsByAllRequest : SortablePaginationQueryModel
 {
     [FromQuery(Name = "query")]
     public string? Query { get; init; }
@@ -62,6 +62,7 @@ public static class SearchProductsByAllEndPoint
                         request.Query,
                         request.ProducerId,
                         request,
+                        request.SortBy,
                         ToRange(request.LengthMin, request.LengthMax),
                         ToRange(request.WidthMin, request.WidthMax),
                         ToRange(request.HeightMin, request.HeightMax),

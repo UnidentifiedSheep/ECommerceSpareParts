@@ -76,8 +76,7 @@ public class Producer : AuditableEntity<Producer, int>, ILinqEntity<Producer, in
 
     public static string ToNormalizedName(string value)
     {
-        value = value.Trim();
-        return char.ToUpperInvariant(value[0]) + value[1..];
+        return value.Trim().ToUpperInvariant();
     }
 
     public override int GetId()

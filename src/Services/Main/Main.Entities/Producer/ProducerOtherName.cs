@@ -6,8 +6,8 @@ using Domain.Interfaces;
 
 namespace Main.Entities.Producer;
 
-public class ProducerOtherName : Entity<ProducerOtherName, ProducerOtherNameKey>,
-    ILinqEntity<ProducerOtherName, ProducerOtherNameKey>
+public class ProducerOtherName : Entity<ProducerOtherName, string>,
+    ILinqEntity<ProducerOtherName, string>
 {
     private ProducerOtherName()
     {
@@ -20,23 +20,21 @@ public class ProducerOtherName : Entity<ProducerOtherName, ProducerOtherNameKey>
         SetWhereUsed(whereUsed);
     }
 
-    [ValidateTuple("PK")]
     public int ProducerId { get; }
 
-    [ValidateTuple("PK")]
+    [Validate]
     public string OtherName { get; private set; } = null!;
 
-    [ValidateTuple("PK")]
     public string WhereUsed { get; private set; } = null!;
 
-    public static Expression<Func<ProducerOtherName, ProducerOtherNameKey>> GetKeySelector()
+    public static Expression<Func<ProducerOtherName, string>> GetKeySelector()
     {
-        return x => new ProducerOtherNameKey(x.ProducerId, x.OtherName, x.WhereUsed);
+        return x => x.OtherName;
     }
 
-    public static Expression<Func<ProducerOtherName, bool>> GetEqualityExpression(ProducerOtherNameKey key)
+    public static Expression<Func<ProducerOtherName, bool>> GetEqualityExpression(string key)
     {
-        return x => x.ProducerId == key.ProducerId && x.OtherName == key.OtherName && x.WhereUsed == key.WhereUsed;
+        return x => x.OtherName == key;
     }
 
     public static ProducerOtherName Create(int producerId, string otherName, string whereUsed)
@@ -52,26 +50,13 @@ public class ProducerOtherName : Entity<ProducerOtherName, ProducerOtherNameKey>
     public void SetWhereUsed(string whereUsed)
     {
         whereUsed = whereUsed.Trim()
-            .AgainstTooLong(64, "producer.other.name.where.used.max.length")
-            .AgainstTooShort(2, "producer.other.name.where.used.min.length");
+            .AgainstTooLong(64, "producer.other.name.where.used.max.length");
 
         WhereUsed = whereUsed.ToUpperInvariant();
     }
 
-    public override ProducerOtherNameKey GetId()
+    public override string GetId()
     {
-        return new ProducerOtherNameKey(ProducerId, OtherName, WhereUsed);
-    }
-}
-
-public readonly struct ProducerOtherNameKey(int producerId, string otherName, string whereUsed) : ICompositeKey
-{
-    public int ProducerId => producerId;
-    public string OtherName => otherName;
-    public string WhereUsed => whereUsed;
-
-    public object[] ToArray()
-    {
-        return [producerId, otherName, whereUsed];
+        return OtherName;
     }
 }
