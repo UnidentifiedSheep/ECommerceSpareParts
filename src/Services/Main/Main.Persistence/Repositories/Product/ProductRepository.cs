@@ -30,6 +30,44 @@ public class ProductRepository(DContext context, QueryExtensions extensions)
             .ToListAsync(cancellationToken);
     }
 
+    public async Task<HashSet<(string NormalizedSku, int ProducerId)>> GetExistingProductKeys(
+        IEnumerable<(string NormalizedSku, int ProducerId)> keys,
+        CancellationToken cancellationToken = default)
+    {
+        var requestedKeys = keys
+            .Distinct()
+            .ToHashSet();
+
+        if (requestedKeys.Count == 0)
+            return [];
+
+        var normalizedSkus = requestedKeys
+            .Select(x => x.NormalizedSku)
+            .Distinct()
+            .ToList();
+
+        var producerIds = requestedKeys
+            .Select(x => x.ProducerId)
+            .Distinct()
+            .ToList();
+
+        var existing = await Context.Products
+            .AsNoTracking()
+            .Where(x => normalizedSkus.Contains(x.Sku.NormalizedValue))
+            .Where(x => producerIds.Contains(x.ProducerId))
+            .Select(x => new
+            {
+                x.Sku.NormalizedValue,
+                x.ProducerId
+            })
+            .ToListAsync(cancellationToken);
+
+        return existing
+            .Select(x => (x.NormalizedValue, x.ProducerId))
+            .Where(requestedKeys.Contains)
+            .ToHashSet();
+    }
+
     public Task UpsertProductCrosses(
         IEnumerable<ProductCross> crosses,
         CancellationToken cancellationToken = default)
