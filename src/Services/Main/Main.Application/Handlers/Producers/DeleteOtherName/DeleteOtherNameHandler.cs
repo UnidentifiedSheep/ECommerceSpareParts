@@ -13,19 +13,21 @@ namespace Main.Application.Handlers.Producers.DeleteOtherName;
 
 [AutoSave]
 [Transactional]
-public record DeleteOtherNameCommand(int ProducerId, string OtherName, string Usage) : ICommand;
+public record DeleteOtherNameCommand(int ProducerId, string OtherName) : ICommand;
 
 public class DeleteOtherNameHandler(
-    IRepository<ProducerOtherName, ProducerOtherNameKey> repository,
+    IRepository<ProducerOtherName, string> repository,
     IUnitOfWork unitOfWork,
     IIntegrationEventScope integrationEventScope)
     : ICommandHandler<DeleteOtherNameCommand>
 {
     public async Task<Unit> Handle(DeleteOtherNameCommand request, CancellationToken cancellationToken)
     {
-        var key = new ProducerOtherNameKey(request.ProducerId, request.OtherName, request.Usage);
-        var producerOtherName = await repository.GetById(key, cancellationToken)
+        var producerOtherName = await repository.GetById(Producer.ToNormalizedName(request.OtherName), cancellationToken)
                                 ?? throw new ProducersOtherNameNotFoundException(request.OtherName);
+
+        if (producerOtherName.ProducerId != request.ProducerId)
+            throw new ProducersOtherNameNotFoundException(request.OtherName);
 
         unitOfWork.Remove(producerOtherName);
         integrationEventScope.Add(new ProducerUpdatedEvent

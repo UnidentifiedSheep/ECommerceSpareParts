@@ -58,14 +58,12 @@ public class ProducerOtherNameTests
     }
 
     [Fact]
-    public void Key_IsStableAfterNormalization()
+    public void Key_IsNormalizedOtherName()
     {
         var entity = ProducerOtherName.Create(1, "  KSS  ", "eu");
 
         var key = entity.GetId();
 
-        key.ProducerId.Should().Be(1);
-        key.OtherName.Should().Be("KSS");
-        key.WhereUsed.Should().Be("EU");
+        key.Should().Be("KSS");
     }
 }

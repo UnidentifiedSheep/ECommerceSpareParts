@@ -62,10 +62,9 @@ public class ProducersEndPoints : ICarterModule
                 ISender sender,
                 int producerId,
                 string otherName,
-                string? usage,
                 CancellationToken cancellationToken) =>
             {
-                await sender.Send(new DeleteOtherNameCommand(producerId, otherName, usage!), cancellationToken);
+                await sender.Send(new DeleteOtherNameCommand(producerId, otherName), cancellationToken);
                 return Results.NoContent();
             })
             .WithName("DeleteProducerOtherName")

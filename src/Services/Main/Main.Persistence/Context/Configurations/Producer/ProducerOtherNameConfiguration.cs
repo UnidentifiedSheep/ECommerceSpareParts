@@ -10,7 +10,7 @@ public class ProducerOtherNameConfiguration : IEntityTypeConfiguration<ProducerO
     {
         builder.ToTable("producers_other_names", "public");
 
-        builder.HasKey(e => new { e.ProducerId, e.OtherName, e.WhereUsed })
+        builder.HasKey(e => e.OtherName)
             .HasName("producers_other_names_pk");
 
         builder.HasIndex(e => e.ProducerId)
