@@ -24,7 +24,7 @@ public class ProducerOtherNameTests
     {
         var act = () => ProducerOtherName.Create(1, "KSS", "   ");
 
-        act.Should().Throw<InvalidInputException>();
+        act.Should().NotThrow();
     }
 
     [Fact]
@@ -44,7 +44,7 @@ public class ProducerOtherNameTests
 
         var act = () => entity.SetWhereUsed("a");
 
-        act.Should().Throw<InvalidInputException>();
+        act.Should().NotThrow();
     }
 
     [Fact]

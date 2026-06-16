@@ -54,6 +54,8 @@
     "article.weight.max.two.decimals": "Weight can have at most 2 decimal places.",
     "article.reservation.search.term.min.length": "Search term must be at least 3 characters long.",
     "article.reservation.similarity.range": "Similarity level must be between 0 and 1.",
-    "article.image.not.found": "Unable to find specified image of product."
+    "article.image.not.found": "Unable to find specified image of product.",
+    "article.import.too.many.errors.while.processing.batch": "Too many errors happened while product import batch was processing.",
+    "article.import.producer.not.found": "Producer or producer alias '{0}' was not found."
   }
 }

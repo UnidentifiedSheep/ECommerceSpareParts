@@ -16,6 +16,9 @@ public record ProductImportState
 
     [JsonPropertyName("skippedLines")]
     public List<int> SkippedLines { get; init; } = [];
+
+    [JsonPropertyName("errors")]
+    public List<ProductImportError> Errors { get; init; } = [];
 }
 
 public record ProductImportInputState : IInputState
@@ -37,4 +40,13 @@ public record ProductImportInputState : IInputState
                                                 "File name should end with .csv");
         return jsonState;
     }
+}
+
+public record ProductImportError
+{
+    [JsonPropertyName("rowIdx")]
+    public int RowIdx { get; init; }
+
+    [JsonPropertyName("message")]
+    public required string Message { get; init; }
 }

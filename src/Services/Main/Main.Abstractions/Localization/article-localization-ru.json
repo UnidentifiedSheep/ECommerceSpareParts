@@ -54,6 +54,8 @@
     "article.weight.max.two.decimals": "Вес может содержать не более двух знаков после запятой.",
     "article.reservation.search.term.min.length": "Поисковая строка должна содержать минимум 3 символа.",
     "article.reservation.similarity.range": "Уровень схожести должен быть от 0 до 1.",
-    "article.image.not.found": "Не удалось найти указанное изображение продукта."
+    "article.image.not.found": "Не удалось найти указанное изображение продукта.",
+    "article.import.too.many.errors.while.processing.batch": "Произошло слишком много ошибок при обработке товаров.",
+    "article.import.producer.not.found": "Производитель или алиас производителя '{0}' не найден."
   }
 }

@@ -50,8 +50,7 @@ public class ProducerOtherName : Entity<ProducerOtherName, string>,
     public void SetWhereUsed(string whereUsed)
     {
         whereUsed = whereUsed.Trim()
-            .AgainstTooLong(64, "producer.other.name.where.used.max.length")
-            .AgainstTooShort(2, "producer.other.name.where.used.min.length");
+            .AgainstTooLong(64, "producer.other.name.where.used.max.length");
 
         WhereUsed = whereUsed.ToUpperInvariant();
     }
