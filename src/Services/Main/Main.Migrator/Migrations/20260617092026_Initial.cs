@@ -74,14 +74,16 @@ namespace Main.Migrator.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "events",
+                name: "email_outbox",
                 schema: "public",
                 columns: table => new
                 {
-                    id = table.Column<int>(type: "integer", nullable: false)
-                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
-                    discriminator = table.Column<string>(type: "character varying(21)", maxLength: 21, nullable: false),
-                    json = table.Column<string>(type: "jsonb", nullable: false),
+                    id = table.Column<Guid>(type: "uuid", nullable: false),
+                    subject = table.Column<string>(type: "text", nullable: false),
+                    to = table.Column<string>(type: "text", nullable: false),
+                    body = table.Column<string>(type: "text", nullable: false),
+                    status = table.Column<string>(type: "text", nullable: false),
+                    sent_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
                     created_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
                     updated_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
                     who_created = table.Column<Guid>(type: "uuid", nullable: true),
@@ -89,7 +91,7 @@ namespace Main.Migrator.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("events_id_pk", x => x.id);
+                    table.PrimaryKey("PK_email_outbox", x => x.id);
                 });
 
             migrationBuilder.CreateTable(
@@ -114,6 +116,29 @@ namespace Main.Migrator.Migrations
                 {
                     table.PrimaryKey("PK_InboxState", x => x.Id);
                     table.UniqueConstraint("AK_InboxState_MessageId_ConsumerId", x => new { x.MessageId, x.ConsumerId });
+                });
+
+            migrationBuilder.CreateTable(
+                name: "jobs",
+                schema: "public",
+                columns: table => new
+                {
+                    id = table.Column<Guid>(type: "uuid", nullable: false),
+                    system_name = table.Column<string>(type: "character varying(128)", maxLength: 128, nullable: false),
+                    state = table.Column<string>(type: "text", nullable: false),
+                    status = table.Column<string>(type: "text", nullable: false),
+                    attempts = table.Column<int>(type: "integer", nullable: false),
+                    max_attempts = table.Column<int>(type: "integer", nullable: false),
+                    error_message = table.Column<string>(type: "text", nullable: true),
+                    locked_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
+                    created_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
+                    updated_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
+                    who_created = table.Column<Guid>(type: "uuid", nullable: true),
+                    who_updated = table.Column<Guid>(type: "uuid", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("jobs_pk", x => x.id);
                 });
 
             migrationBuilder.CreateTable(
@@ -353,13 +378,13 @@ namespace Main.Migrator.Migrations
                 schema: "public",
                 columns: table => new
                 {
-                    producer_id = table.Column<int>(type: "integer", nullable: false),
                     other_name = table.Column<string>(type: "character varying(64)", maxLength: 64, nullable: false),
+                    producer_id = table.Column<int>(type: "integer", nullable: false),
                     where_used = table.Column<string>(type: "character varying(64)", maxLength: 64, nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("producers_other_names_pk", x => new { x.producer_id, x.other_name, x.where_used });
+                    table.PrimaryKey("producers_other_names_pk", x => x.other_name);
                     table.ForeignKey(
                         name: "producers_other_names_producer_id_fk",
                         column: x => x.producer_id,
@@ -586,6 +611,7 @@ namespace Main.Migrator.Migrations
                     transaction_datetime = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
                     reversed_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
                     reversed_by = table.Column<Guid>(type: "uuid", nullable: true),
+                    source_type = table.Column<string>(type: "text", nullable: false),
                     xmin = table.Column<uint>(type: "xid", rowVersion: true, nullable: false),
                     created_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
                     updated_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
@@ -1198,8 +1224,7 @@ namespace Main.Migrator.Migrations
                     current_count = table.Column<int>(type: "integer", nullable: false),
                     proposed_price = table.Column<decimal>(type: "numeric", nullable: true),
                     proposed_currency_id = table.Column<int>(type: "integer", nullable: true),
-                    is_done = table.Column<bool>(type: "boolean", nullable: false),
-                    is_locked = table.Column<bool>(type: "boolean", nullable: false),
+                    status = table.Column<string>(type: "text", nullable: false),
                     comment = table.Column<string>(type: "character varying(500)", maxLength: 500, nullable: true),
                     created_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
                     updated_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
@@ -1379,6 +1404,33 @@ namespace Main.Migrator.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "events",
+                schema: "public",
+                columns: table => new
+                {
+                    id = table.Column<int>(type: "integer", nullable: false)
+                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
+                    discriminator = table.Column<string>(type: "character varying(34)", maxLength: 34, nullable: false),
+                    json = table.Column<string>(type: "jsonb", nullable: false),
+                    reservation_id = table.Column<int>(type: "integer", nullable: true),
+                    created_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
+                    updated_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
+                    who_created = table.Column<Guid>(type: "uuid", nullable: true),
+                    who_updated = table.Column<Guid>(type: "uuid", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("events_id_pk", x => x.id);
+                    table.ForeignKey(
+                        name: "reservation_manual_change_event_reservation_id_fk",
+                        column: x => x.reservation_id,
+                        principalSchema: "public",
+                        principalTable: "storage_content_reservations",
+                        principalColumn: "id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "purchase_content",
                 schema: "public",
                 columns: table => new
@@ -1534,7 +1586,6 @@ namespace Main.Migrator.Migrations
                         .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
                     sale_content_id = table.Column<int>(type: "integer", nullable: false),
                     storage_content_id = table.Column<int>(type: "integer", nullable: false),
-                    storage = table.Column<string>(type: "character varying(128)", maxLength: 128, nullable: false),
                     currency_id = table.Column<int>(type: "integer", nullable: false),
                     buy_price = table.Column<decimal>(type: "numeric", nullable: false),
                     count = table.Column<int>(type: "integer", nullable: false),
@@ -1563,13 +1614,6 @@ namespace Main.Migrator.Migrations
                         principalSchema: "public",
                         principalTable: "storage_content",
                         principalColumn: "id",
-                        onDelete: ReferentialAction.SetNull);
-                    table.ForeignKey(
-                        name: "sale_content_details_storages_name_fk",
-                        column: x => x.storage,
-                        principalSchema: "public",
-                        principalTable: "storages",
-                        principalColumn: "name",
                         onDelete: ReferentialAction.Restrict);
                 });
 
@@ -1662,6 +1706,30 @@ namespace Main.Migrator.Migrations
                 column: "who_updated");
 
             migrationBuilder.CreateIndex(
+                name: "main.entities.mailing.emailoutbox_who_created_idx",
+                schema: "public",
+                table: "email_outbox",
+                column: "who_created");
+
+            migrationBuilder.CreateIndex(
+                name: "main.entities.mailing.emailoutbox_who_updated_idx",
+                schema: "public",
+                table: "email_outbox",
+                column: "who_updated");
+
+            migrationBuilder.CreateIndex(
+                name: "status_email_outbox_idx",
+                schema: "public",
+                table: "email_outbox",
+                column: "status");
+
+            migrationBuilder.CreateIndex(
+                name: "to_status_email_outbox_idx",
+                schema: "public",
+                table: "email_outbox",
+                columns: new[] { "to", "status" });
+
+            migrationBuilder.CreateIndex(
                 name: "event_discriminator_idx",
                 schema: "public",
                 table: "events",
@@ -1680,10 +1748,46 @@ namespace Main.Migrator.Migrations
                 column: "who_updated");
 
             migrationBuilder.CreateIndex(
+                name: "reservation_manual_change_event_reservation_id_idx",
+                schema: "public",
+                table: "events",
+                column: "reservation_id");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_InboxState_Delivered",
                 schema: "msg",
                 table: "InboxState",
                 column: "Delivered");
+
+            migrationBuilder.CreateIndex(
+                name: "domain.commonentities.job_who_created_idx",
+                schema: "public",
+                table: "jobs",
+                column: "who_created");
+
+            migrationBuilder.CreateIndex(
+                name: "domain.commonentities.job_who_updated_idx",
+                schema: "public",
+                table: "jobs",
+                column: "who_updated");
+
+            migrationBuilder.CreateIndex(
+                name: "jobs_locked_at_idx",
+                schema: "public",
+                table: "jobs",
+                column: "locked_at");
+
+            migrationBuilder.CreateIndex(
+                name: "jobs_status_id_idx",
+                schema: "public",
+                table: "jobs",
+                columns: new[] { "status", "id" });
+
+            migrationBuilder.CreateIndex(
+                name: "jobs_system_name_idx",
+                schema: "public",
+                table: "jobs",
+                column: "system_name");
 
             migrationBuilder.CreateIndex(
                 name: "order_items_order_id_index",
@@ -2124,12 +2228,6 @@ namespace Main.Migrator.Migrations
                 column: "storage_content_id");
 
             migrationBuilder.CreateIndex(
-                name: "sale_content_details_storage_index",
-                schema: "public",
-                table: "sale_content_details",
-                column: "storage");
-
-            migrationBuilder.CreateIndex(
                 name: "main.entities.setting.storagecontentsetting_who_created_idx",
                 schema: "public",
                 table: "settings",
@@ -2230,28 +2328,22 @@ namespace Main.Migrator.Migrations
                 .Annotation("Npgsql:IndexOperators", new[] { "gin_trgm_ops" });
 
             migrationBuilder.CreateIndex(
-                name: "storage_content_reservations_is_done_index",
+                name: "storage_content_reservations_product_id_status_index",
                 schema: "public",
                 table: "storage_content_reservations",
-                column: "is_done");
+                columns: new[] { "product_id", "status" });
 
             migrationBuilder.CreateIndex(
-                name: "storage_content_reservations_product_id_is_done_index",
+                name: "storage_content_reservations_status_index",
                 schema: "public",
                 table: "storage_content_reservations",
-                columns: new[] { "product_id", "is_done" });
+                column: "status");
 
             migrationBuilder.CreateIndex(
-                name: "storage_content_reservations_product_id_is_locked_index",
+                name: "storage_content_reservations_user_id_status_index",
                 schema: "public",
                 table: "storage_content_reservations",
-                columns: new[] { "product_id", "is_locked" });
-
-            migrationBuilder.CreateIndex(
-                name: "storage_content_reservations_user_id_is_done_index",
-                schema: "public",
-                table: "storage_content_reservations",
-                columns: new[] { "user_id", "is_done" });
+                columns: new[] { "user_id", "status" });
 
             migrationBuilder.CreateIndex(
                 name: "main.entities.storage.storageowner_who_created_idx",
@@ -2374,10 +2466,24 @@ namespace Main.Migrator.Migrations
                 column: "receiver_id");
 
             migrationBuilder.CreateIndex(
+                name: "transactions_receiver_id_transaction_datetime_id_idx",
+                schema: "public",
+                table: "transactions",
+                columns: new[] { "receiver_id", "transaction_datetime", "id" },
+                descending: new[] { false, true, true });
+
+            migrationBuilder.CreateIndex(
                 name: "transactions_sender_id_receiver_id_index",
                 schema: "public",
                 table: "transactions",
                 columns: new[] { "sender_id", "receiver_id" });
+
+            migrationBuilder.CreateIndex(
+                name: "transactions_sender_id_transaction_datetime_id_idx",
+                schema: "public",
+                table: "transactions",
+                columns: new[] { "sender_id", "transaction_datetime", "id" },
+                descending: new[] { false, true, true });
 
             migrationBuilder.CreateIndex(
                 name: "transactions_transaction_datetime_id_index",
@@ -2736,7 +2842,15 @@ namespace Main.Migrator.Migrations
                 schema: "public");
 
             migrationBuilder.DropTable(
+                name: "email_outbox",
+                schema: "public");
+
+            migrationBuilder.DropTable(
                 name: "events",
+                schema: "public");
+
+            migrationBuilder.DropTable(
+                name: "jobs",
                 schema: "public");
 
             migrationBuilder.DropTable(
@@ -2804,10 +2918,6 @@ namespace Main.Migrator.Migrations
                 schema: "public");
 
             migrationBuilder.DropTable(
-                name: "storage_content_reservations",
-                schema: "public");
-
-            migrationBuilder.DropTable(
                 name: "storage_owners",
                 schema: "public");
 
@@ -2853,6 +2963,10 @@ namespace Main.Migrator.Migrations
 
             migrationBuilder.DropTable(
                 name: "currency_rates",
+                schema: "public");
+
+            migrationBuilder.DropTable(
+                name: "storage_content_reservations",
                 schema: "public");
 
             migrationBuilder.DropTable(
