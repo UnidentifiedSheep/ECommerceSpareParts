@@ -1,12 +1,16 @@
 using System.Text.Json.Nodes;
+using Abstractions;
+using Api.Common;
 using Api.Common.Extensions;
+using Cache;
 using Common;
+using Gateway.Application;
 using Gateway.EndPoints;
-using Gateway.Options;
-using Gateway.Services.Jobs;
+using Internal.Integration.Di;
+using Localization.Domain.Extensions;
+using Localization.Domain.Middlewares;
 using OpenTelemetry.Metrics;
 using Scalar.AspNetCore;
-using Security;
 using Yarp.ReverseProxy.Transforms;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -55,6 +59,11 @@ if (routeCount == 0 || clusterCount == 0)
     throw new InvalidOperationException("Gateway reverse proxy config is empty.");
 
 builder.Services
+    .AddBaseExceptionHandlers()
+    .AddCacheLayer("gateway")
+    .AddLocalization(builder.Configuration)
+    .AddApplicationLayer(builder.Configuration)
+    .AddIntegrationClients()
     .AddReverseProxy()
     .LoadFromConfig(reverseProxySection)
     .AddTransforms(builderContext =>
@@ -69,15 +78,8 @@ builder.Services
             return ValueTask.CompletedTask;
         });
     });
-builder.Services.AddHttpClient();
-builder.Services
-    .AddOptions<JobAggregationOptions>()
-    .BindConfiguration(JobAggregationOptions.SectionName)
-    .ValidateDataAnnotations()
-    .ValidateOnStart();
 
-builder.Services.AddScoped<IJobAggregationService, JobAggregationService>();
-builder.Services.AddHttpClient("jobs-aggregation");
+builder.Services.AddHttpClient();
 
 builder.Services.AddCors(options =>
 {
@@ -114,8 +116,12 @@ app.UseWebSockets();
 app.MapJobEndPoints();
 app.MapReverseProxy();
 
+app.UseMiddleware<ScopedLocalizationMiddleware>();
+
+app.UseExceptionHandler(_ => { });
+
 app.UseOpenTelemetryPrometheusScrapingEndpoint();
-app.Run();
+await app.RunAsync();
 
 
 void MapDocs(WebApplication application)
@@ -127,10 +133,10 @@ void MapDocs(WebApplication application)
     {
         var services = new Dictionary<string, string>
         {
-            ["main"] = "/main/swagger/v1/swagger.json",
-            ["analytics"] = "/analytics/swagger/v1/swagger.json",
-            ["search"] = "/search/swagger/v1/swagger.json",
-            ["pricing"] = "/pricing/swagger/v1/swagger.json"
+            [ServicesDefinitions.Main.ServiceName] = "/main/swagger/v1/swagger.json",
+            [ServicesDefinitions.Analytics.ServiceName] = "/analytics/swagger/v1/swagger.json",
+            [ServicesDefinitions.Search.ServiceName] = "/search/swagger/v1/swagger.json",
+            [ServicesDefinitions.Pricing.ServiceName] = "/pricing/swagger/v1/swagger.json"
         };
 
         if (!services.TryGetValue(service, out var swaggerPath))
@@ -167,9 +173,21 @@ void MapDocs(WebApplication application)
     application.MapScalarApiReference("/docs", options =>
     {
         options
-            .AddDocument("main", "Main API", "/docs/openapi/main.json")
-            .AddDocument("analytics", "Analytics API", "/docs/openapi/analytics.json")
-            .AddDocument("search", "Search API", "/docs/openapi/search.json")
-            .AddDocument("pricing", "Pricing API", "/docs/openapi/pricing.json");
+            .AddDocument(
+                ServicesDefinitions.Main.ServiceName, 
+                "Main API", 
+                "/docs/openapi/main.json")
+            .AddDocument(
+                ServicesDefinitions.Analytics.ServiceName, 
+                "Analytics API", 
+                "/docs/openapi/analytics.json")
+            .AddDocument(
+                ServicesDefinitions.Search.ServiceName, 
+                "Search API", 
+                "/docs/openapi/search.json")
+            .AddDocument(
+                ServicesDefinitions.Pricing.ServiceName, 
+                "Pricing API", 
+                "/docs/openapi/pricing.json");
     });
 }

@@ -14,13 +14,18 @@ internal sealed class JobNode(
 {
     public async Task<IReadOnlyList<InternalJobInfo>> GetAvailableJobs(
         ServiceOptions options,
+        string? locale,
         CancellationToken cancellationToken = default)
     {
         var url = new Uri(new Uri(options.Url), "/jobs/available");
+        
         using var request = await GetRequest(
             HttpMethod.Get,
             url.ToString(),
             cancellationToken);
+        
+        AddLocalizationHeader(request, locale);
+        
         using var response = await httpClient.SendAsync(
             request,
             cancellationToken);

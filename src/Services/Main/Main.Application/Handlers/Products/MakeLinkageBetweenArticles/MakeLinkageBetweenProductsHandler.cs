@@ -8,6 +8,7 @@ using Main.Application.Interfaces.Persistence;
 using Main.Entities.Exceptions;
 using Main.Entities.Product;
 using Main.Enums;
+using Main.Enums.Products;
 using MediatR;
 
 namespace Main.Application.Handlers.Products.MakeLinkageBetweenArticles;

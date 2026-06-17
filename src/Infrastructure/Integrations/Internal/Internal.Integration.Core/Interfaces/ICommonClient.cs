@@ -7,5 +7,6 @@ public interface ICommonClient
 {
     Task<IReadOnlyList<InternalJobInfo>> GetAvailableJobs(
         IServiceDefinition serviceDefinition,
+        string? locale,
         CancellationToken cancellationToken = default);
 }

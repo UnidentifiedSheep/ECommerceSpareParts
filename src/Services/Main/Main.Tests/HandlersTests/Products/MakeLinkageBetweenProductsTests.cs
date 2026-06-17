@@ -4,6 +4,7 @@ using Main.Application.Dtos.Product;
 using Main.Application.Handlers.Products.MakeLinkageBetweenArticles;
 using Main.Entities.Product;
 using Main.Enums;
+using Main.Enums.Products;
 using Microsoft.EntityFrameworkCore;
 using Test.Common.TestContainers.Combined;
 using Tests.TestContexts;

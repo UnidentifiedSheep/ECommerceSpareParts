@@ -17,9 +17,10 @@ public class RootClient(
     
     public async Task<IReadOnlyList<InternalJobInfo>> GetAvailableJobs(
         IServiceDefinition serviceDefinition, 
+        string? locale,
         CancellationToken cancellationToken = default)
     {
         var options = serviceOptions.CurrentValue.GetOptionsForService(serviceDefinition);
-        return await _jobNode.GetAvailableJobs(options, cancellationToken);
+        return await _jobNode.GetAvailableJobs(options, locale, cancellationToken);
     }
 }

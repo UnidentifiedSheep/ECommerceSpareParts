@@ -27,8 +27,10 @@
 
     <ItemGroup>
         <ProjectReference Include="..\..\..\Infrastructure\Common\Common.csproj"/>
+        <ProjectReference Include="..\..\..\Infrastructure\Integrations\Internal\Internal.Integration.Di\Internal.Integration.Di.csproj" />
         <ProjectReference Include="..\..\..\Infrastructure\Security\Security.csproj"/>
         <ProjectReference Include="..\..\Api.Common\Api.Common.csproj"/>
+        <ProjectReference Include="..\Gateway.Application\Gateway.Application.csproj" />
     </ItemGroup>
 
     <ItemGroup>
