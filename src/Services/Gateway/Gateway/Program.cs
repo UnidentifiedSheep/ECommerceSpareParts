@@ -2,6 +2,7 @@ using System.Text.Json.Nodes;
 using Abstractions;
 using Api.Common;
 using Api.Common.Extensions;
+using Application.Common.Backplane;
 using Cache;
 using Common;
 using Gateway.Application;
@@ -9,9 +10,12 @@ using Gateway.EndPoints;
 using Internal.Integration.Di;
 using Localization.Domain.Extensions;
 using Localization.Domain.Middlewares;
+using MassTransit;
 using OpenTelemetry.Metrics;
+using RabbitMq.Extensions;
 using Scalar.AspNetCore;
 using Yarp.ReverseProxy.Transforms;
+using ZiggyCreatures.Caching.Fusion.Backplane;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -98,6 +102,34 @@ builder.Services.AddCors(options =>
             policy.WithOrigins(allowedOrigins);
         else
             policy.SetIsOriginAllowed(_ => true);
+    });
+});
+
+var uniqQueueName = $"queue-of-gateway-{Environment.MachineName}";
+
+builder.Services.AddMassTransit(x =>
+{
+    x.AddConsumer<BackplaneConsumer>();
+
+    x.UsingRabbitMq((context, cfg) =>
+    {
+        cfg.ConfigureRabbitMq(context);
+
+        cfg.ReceiveEndpoint(uniqQueueName, ep =>
+        {
+            ep.AutoDelete = true;
+            ep.Durable = false;
+
+            ep.ConfigureConsumeTopology = false;
+            
+            ep.ConfigureConsumer<BackplaneConsumer>(context);
+            ep.Bind<BackplaneMessage>();
+        });
+
+        cfg.ReceiveEndpoint("gateway-queue", ep =>
+        {
+            ep.Durable = true;
+        });
     });
 });
 
