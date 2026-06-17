@@ -1,13 +1,17 @@
 using System.Reflection;
 using Amazon.S3;
+using Abstractions;
 using Api.Common;
+using Api.Common.Consumers;
 using Api.Common.EndPoints;
 using Api.Common.Extensions;
+using Api.Common.Hubs;
 using Application.Common.Backplane;
 using Cache;
 using Carter;
 using Contracts.Auth;
 using Contracts.Currency;
+using Contracts.Job;
 using Contracts.Products;
 using Contracts.Settings;
 using Contracts.StorageContent;
@@ -29,6 +33,7 @@ using MassTransit;
 using Microsoft.Extensions.Options;
 using OpenTelemetry.Metrics;
 using RabbitMq.Extensions;
+using RabbitMQ.Client;
 using S3;
 using Security;
 using ZiggyCreatures.Caching.Fusion.Backplane;
@@ -53,6 +58,7 @@ builder.Services.AddMessageBrokerOptions()
     .AddJwtOptions();
 
 builder.Services.AddCommonApiInfrastructure();
+builder.Services.AddSignalR();
 
 var uniqQueueName = $"queue-of-main-{Environment.MachineName}";
 
@@ -60,6 +66,7 @@ builder.Services.AddMassTransit(x =>
 {
     x.AddConsumers(Assembly.GetAssembly(typeof(Global)));
     x.AddConsumer<BackplaneConsumer>();
+    x.AddConsumer<JobStatusUpdatedConsumer>();
 
     x.AddEntityFrameworkOutbox<DContext>(o =>
     {
@@ -70,6 +77,7 @@ builder.Services.AddMassTransit(x =>
     x.UsingRabbitMq((context, cfg) =>
     {
         cfg.ConfigureRabbitMq(context);
+        cfg.Publish<JobStatusUpdatedEvent>(p => p.ExchangeType = ExchangeType.Direct);
 
         cfg.ReceiveEndpoint(uniqQueueName, ep =>
         {
@@ -84,6 +92,13 @@ builder.Services.AddMassTransit(x =>
             
             ep.ConfigureConsumer<BackplaneConsumer>(context);
             ep.Bind<BackplaneMessage>();
+
+            ep.ConfigureConsumer<JobStatusUpdatedConsumer>(context);
+            ep.Bind<JobStatusUpdatedEvent>(bind =>
+            {
+                bind.ExchangeType = ExchangeType.Direct;
+                bind.RoutingKey = ServicesDefinitions.Main.ServiceName;
+            });
         });
 
         cfg.ReceiveEndpoint("main-queue", ep =>
@@ -160,5 +175,6 @@ var localesPath = Assembly.GetExecutingAssembly().GetDefaultLocalizationPath();
 await app.LoadLocalesFromJson(localesPath);
 
 app.UseOpenTelemetryPrometheusScrapingEndpoint();
+app.MapHub<JobHub>("/hubs/jobs");
 
 await app.RunAsync();

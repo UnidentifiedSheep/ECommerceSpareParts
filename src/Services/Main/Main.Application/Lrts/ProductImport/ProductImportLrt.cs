@@ -1,4 +1,5 @@
 using System.Globalization;
+using Abstractions;
 using Abstractions.Interfaces.Exceptions;
 using Abstractions.Interfaces;
 using Abstractions.Interfaces.Persistence;
@@ -17,6 +18,7 @@ using Main.Entities.Producer;
 using Main.Entities.Product;
 using Main.Entities.Product.ValueObjects;
 using Main.Enums.Products;
+using MassTransit;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
@@ -31,9 +33,10 @@ public class ProductImportLrt(
     IUnitOfWork unitOfWork,
     IS3StorageService s3Service,
     ISender sender,
+    IPublishEndpoint publisher,
     ILogger<ProductImportLrt> logger,
     IScopedStringLocalizer stringLocalizer,
-    IOptions<LocalesOptions> localesOptions) : LrtNamedObjectBase(jobRepository, unitOfWork, logger)
+    IOptions<LocalesOptions> localesOptions) : LrtNamedObjectBase(jobRepository, unitOfWork, publisher, logger)
 {
     private const int BatchSize = 100;
     private const int MaxErrors = 10_000;
@@ -43,10 +46,12 @@ public class ProductImportLrt(
     public override string SystemName => nameof(ProductImportLrt);
     public override string NameLocalizationKey => "lrt.product.import.name";
     public override string DescriptionLocalizationKey => "lrt.product.import.description";
+
+    protected override IServiceDefinition ServiceDefinition => ServicesDefinitions.Main;
     
     private readonly Dictionary<string, int> _producerNamesToIds = new();
     private readonly Dictionary<string, int> _otherNamesToIds = new();
-    
+
     protected override async Task DoWork()
     {
         stringLocalizer.SetLocale(localesOptions.Value.Default);
