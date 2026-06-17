@@ -31,10 +31,6 @@
     </ItemGroup>
 
     <ItemGroup>
-        <Folder Include="EndPoints\"/>
-    </ItemGroup>
-
-    <ItemGroup>
         <Content Include="..\..\..\..\.dockerignore">
           <Link>.dockerignore</Link>
         </Content>
