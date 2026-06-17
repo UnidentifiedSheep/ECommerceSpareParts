@@ -1,0 +1,25 @@
+{
+  "locale": "tr",
+  "keyValues": {
+    "currency.not.found": "Aradığınız para birimini bulamadık.",
+    "currency.not.found.by.code": "Para birimi kodu '{0}' olan para birimini bulamadık.",
+    "currency.code.already.take": "Kodu '{0}' olan para birimi zaten mevcut.",
+    "currency.name.already.take": "Adı '{0}' olan para birimi zaten mevcut.",
+    "currency.short.name.already.take": "Kısa adı '{0}' olan para birimi zaten mevcut.",
+    "currency.sign.already.take": "Simgesi '{0}' olan para birimi zaten mevcut.",
+    "currency.must.exist": "Belirtilen para birimi mevcut olmalıdır.",
+    "currency.code.not.empty": "Para birimi kodu boş olmamalıdır.",
+    "currency.code.max.length": "Para birimi kodu en fazla 26 karakter uzunluğunda olmalıdır.",
+    "currency.code.min.length": "Para birimi kodu en az 2 karakter uzunluğunda olmalıdır.",
+    "currency.name.not.empty": "Para birimi adı boş olmamalıdır.",
+    "currency.name.max.length": "Para birimi adı en fazla 128 karakter uzunluğunda olmalıdır.",
+    "currency.name.min.length": "Para birimi adı en az 3 karakter uzunluğunda olmalıdır.",
+    "currency.sign.not.empty": "Para birimi simgesi boş olmamalıdır.",
+    "currency.sign.max.length": "Para birimi simgesi en fazla 3 karakter uzunluğunda olmalıdır.",
+    "currency.sign.min.length": "Para birimi simgesi en az 1 karakter uzunluğunda olmalıdır.",
+    "currency.shortName.not.empty": "Para birimi kısa adı boş olmamalıdır.",
+    "currency.shortName.max.length": "Para birimi kısa adı en fazla 5 karakter uzunluğunda olmalıdır.",
+    "currency.shortName.min.length": "Para birimi kısa adı en az 2 karakter uzunluğunda olmalıdır.",
+    "currency.rate.not.found": "Para birimi kuru bulunamadı."
+  }
+}

@@ -1,0 +1,7 @@
+{
+  "locale": "tr",
+  "keyValues": {
+    "cart.item.not.found": "Sepet öğesi bulunamadı.",
+    "item.already.in.cart": "Öğe zaten sepette."
+  }
+}

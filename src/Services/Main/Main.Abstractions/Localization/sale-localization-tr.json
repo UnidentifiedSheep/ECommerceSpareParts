@@ -1,0 +1,27 @@
+{
+  "locale": "tr",
+  "keyValues": {
+    "sale.content.not.found": "Bu satış için herhangi bir içerik bulamadık.",
+    "sale.not.found": "Aradığınız satışı bulamadık.",
+    "soft.confirmation.needed.for.sale.reservation.reason": "Bu satış, mevcut rezervasyonlarla çakıştığı için onay gerektiriyor. Onay kodu '{0}'.",
+    "sale.date.min": "Satış tarihi 3 aydan eski olamaz.",
+    "sale.date.max": "Satış tarihi gelecekte olamaz.",
+    "sale.content.count.min": "Miktar 0'dan büyük olmalıdır.",
+    "sale.content.comment.max": "Öğe yorumu en fazla 256 karakter uzunluğunda olmalıdır.",
+    "sale.content.price.min": "Öğe fiyatı 0'dan büyük olmalıdır.",
+    "sale.content.price.precision": "Fiyat en fazla 2 ondalık basamak içermelidir.",
+    "sale.content.price.with.discount.min": "İndirimli fiyat 0'dan büyük olmalıdır.",
+    "sale.content.price.with.discount.precision": "İndirimli fiyat en fazla 2 ondalık basamak içermelidir.",
+    "sale.content.price.with.discount.max": "İndirimli fiyat orijinal fiyatı aşamaz.",
+    "sale.content.list.not.empty": "Satış içeriği listesi boş olmamalıdır.",
+    "sale.content.list.duplicate": "Yinelenen öğe kimliklerine izin verilmez.",
+    "sale.payed.sum.min": "Belirtilmişse ödenen tutar 0 veya daha büyük olmalıdır.",
+    "sale.payed.sum.precision": "Ödenen tutar en fazla 2 ondalık basamak içermelidir.",
+    "sale.buyer.id.not.empty": "Alıcı kimliği boş olmamalıdır.",
+    "sale.created.user.id.not.empty": "Oluşturan kullanıcı kimliği boş olmamalıdır.",
+    "sale.articles.missing": "Satış detaylarını oluşturmak için gereken ürünleri bulamadık.",
+    "sale.comment.max": "Genel yorum en fazla 256 karakter uzunluğunda olmalıdır.",
+    "sale.range.start.before.end": "Başlangıç tarihi bitiş tarihinden sonra olamaz.",
+    "sale.range.max5months": "Maksimum sorgu aralığı 5 aydır."
+  }
+}

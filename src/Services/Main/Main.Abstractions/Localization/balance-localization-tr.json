@@ -1,0 +1,22 @@
+{
+  "locale": "tr",
+  "keyValues": {
+    "transaction.invalid.status.for.deletion": "Durumu '{0}' olan bir işlem silinemez.",
+    "deleted.transaction.cannot.be.edited": "Zaten silinmiş bir işlem düzenlenemez.",
+    "transaction.already.deleted": "Bu işlem zaten silinmiş.",
+    "transaction.not.found": "İşlem bulunamadı.",
+    "transaction.source.cannot.be.reversed.by.user": "Kaynağı '{0}' olan bir işlem kullanıcı tarafından geri alınamaz.",
+    "transaction.with.system.user.cannot.be.created.by.user": "Göndereni veya alıcısı sistem kullanıcısı olan bir işlem kullanıcı tarafından oluşturulamaz.",
+    "transaction.sender.id.required": "Gönderen kimliği belirtilmelidir.",
+    "transaction.receiver.id.required": "Alıcı kimliği belirtilmelidir.",
+    "transaction.date.out.of.range": "İşlem tarihi son 2 ay içinde olmalı ve gelecekte en fazla 1 saat olmalıdır.",
+    "transaction.id.required": "İşlem kimliği belirtilmelidir.",
+    "transaction.who.delete.user.id.required": "İşlemi silen kullanıcının kimliği belirtilmelidir.",
+    "transaction.amount.must.be.positive": "İşlem tutarı 0'dan büyük olmalıdır.",
+    "transaction.amount.max.two.decimal.places": "İşlem tutarı en fazla 2 ondalık basamak içerebilir.",
+    "transaction.sender.receiver.must.not.be.same": "Gönderen ve alıcı aynı olamaz.",
+    "transaction.sender.or.receiver.required": "Gönderen veya alıcıdan en az biri belirtilmelidir.",
+    "transaction.range.start.before.end": "Başlangıç tarihi bitiş tarihinden sonra olamaz.",
+    "transaction.range.max.months": "Maksimum aralık 5 aydır."
+  }
+}
