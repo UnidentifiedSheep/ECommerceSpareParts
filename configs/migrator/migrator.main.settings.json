@@ -3,7 +3,8 @@
     "MainApp": "SuperMainKey222",
     "Analytics": "SuperAnalyticsKey222",
     "Pricing": "SuperPricingKey222",
-    "Search": "SuperSearchKey222"
+    "Search": "SuperSearchKey222",
+    "Gateway": "SuperGatewayKey222"
   },
   "Database": {
     "Host": "host.docker.internal",

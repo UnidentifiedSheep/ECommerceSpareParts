@@ -19,7 +19,8 @@ public class UserSeed(
         nameof(ServiceSecrets.MainApp),
         nameof(ServiceSecrets.Analytics),
         nameof(ServiceSecrets.Pricing),
-        nameof(ServiceSecrets.Search)
+        nameof(ServiceSecrets.Search),
+        nameof(ServiceSecrets.Gateway)
     ];
 
     private readonly ServiceSecrets _secrets = secrets.Value;
@@ -62,6 +63,7 @@ public class UserSeed(
             nameof(ServiceSecrets.Analytics) => _secrets.Analytics,
             nameof(ServiceSecrets.Pricing) => _secrets.Pricing,
             nameof(ServiceSecrets.Search) => _secrets.Search,
+            nameof(ServiceSecrets.Gateway) => _secrets.Gateway,
             _ => throw new InvalidOperationException($"Unknown service: {service}")
         };
     }

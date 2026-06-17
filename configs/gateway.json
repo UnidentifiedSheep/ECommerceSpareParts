@@ -1,4 +1,8 @@
 {
+  "InternalServiceCredentials": {
+    "Service": "Gateway",
+    "Secret": "SuperGatewayKey222"
+  },
   "ReverseProxy": {
     "Routes": {
       "route-main-internal-deny": {

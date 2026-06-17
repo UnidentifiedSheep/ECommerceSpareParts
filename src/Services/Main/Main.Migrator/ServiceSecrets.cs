@@ -17,4 +17,7 @@ public record ServiceSecrets
 
     [Required]
     public required string Search { get; init; }
+    
+    [Required]
+    public required string Gateway { get; init; }
 }

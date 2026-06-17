@@ -14,6 +14,7 @@ using MassTransit;
 using OpenTelemetry.Metrics;
 using RabbitMq.Extensions;
 using Scalar.AspNetCore;
+using Security;
 using Yarp.ReverseProxy.Transforms;
 using ZiggyCreatures.Caching.Fusion.Backplane;
 
@@ -27,6 +28,10 @@ builder.Configuration
     .AddAppSettingsFromJsons(env, "/app/configs")
     .AddConfigsFromJsons("gateway", null, "/app/configs")
     .AddConfigsFromJsons("gateway", env, "/app/configs");
+
+builder.Services
+    .AddRedisOptions()
+    .AddMessageBrokerOptions();
 
 builder.Host.AddLokiLogger(
     builder.Configuration,
@@ -67,9 +72,12 @@ builder.Services
     .AddCacheLayer("gateway")
     .AddLocalization(builder.Configuration)
     .AddApplicationLayer(builder.Configuration)
+    .AddEComAuth(builder.Configuration)
+    .AddMinimalSecurityLayer()
     .AddIntegrationClients()
+    .AddHttpContextAccessor()
     .AddReverseProxy()
-    .LoadFromConfig(reverseProxySection)
+    .LoadFromConfig(reverseProxySection) 
     .AddTransforms(builderContext =>
     {
         builderContext.CopyRequestHeaders = true;
