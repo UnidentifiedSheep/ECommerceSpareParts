@@ -1,0 +1,7 @@
+{
+  "locale": "tr",
+  "keyValues": {
+    "markup.group.not.found": "Kâr marjı grubu bulunamadı.",
+    "current.markup.group.can.not.be.deleted": "Şu anda kullanılan kâr marjı grubu silinemez. Önce başka bir grup seçin."
+  }
+}

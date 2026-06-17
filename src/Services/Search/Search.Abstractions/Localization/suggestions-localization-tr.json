@@ -1,0 +1,8 @@
+{
+  "locale": "tr",
+  "keyValues": {
+    "suggestion.already.rebuilding": "Öneriler yeniden oluşturma süreci zaten başlatılmış.",
+    "suggestion.search.query.empty": "Öneri arama sorgusu boş olamaz.",
+    "suggestion.search.limit.min": "İstenen öneriler için minimum sayı 1'dir."
+  }
+}

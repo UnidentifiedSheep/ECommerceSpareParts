@@ -1,0 +1,10 @@
+{
+  "locale": "tr",
+  "keyValues": {
+    "metric.calculation.job.not.found": "Metrik hesaplama görevi bulunamadı.",
+    "metric.calculation.job.metric.id.set.once": "Hesaplama görevi metrik kimliği yalnızca bir kez ayarlanabilir.",
+    "metric.system.name.required": "Metrik sistem adı zorunludur.",
+    "metric.system.name.too.long": "Metrik sistem adı 128 karakter veya daha kısa olmalıdır.",
+    "failed.creating.metric": "Metrik oluşturulamadı; verinin geçerli olup olmadığını kontrol edin."
+  }
+}
