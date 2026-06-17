@@ -10,22 +10,22 @@ public static class ServicesDefinitions
     public static readonly Search Search = new();
 }
 
-public class Analytics : IServiceDefinition
+public sealed class Analytics : IServiceDefinition
 {
     public string ServiceName => "analytics";
 }
 
-public class Main : IServiceDefinition
+public sealed class Main : IServiceDefinition
 {
     public string ServiceName => "main";
 }
 
-public class Pricing : IServiceDefinition
+public sealed class Pricing : IServiceDefinition
 {
     public string ServiceName => "pricing";
 }
 
-public class Search : IServiceDefinition
+public sealed class Search : IServiceDefinition
 {
     public string ServiceName => "search";
 }

@@ -40,6 +40,12 @@ public static class ServiceProviderExtensions
             client.DefaultRequestHeaders.Add(InternalTokenHeader, options.InternalToken);
         });
 
+        services.AddHttpClient<ICommonClient, Common.RootClient>((sp, client) =>
+        {
+            var options = sp.GetRequiredService<IOptions<InternalServicesOptions>>().Value;
+            client.DefaultRequestHeaders.Add(InternalTokenHeader, options.InternalToken);
+        });
+
         return services;
     }
 }

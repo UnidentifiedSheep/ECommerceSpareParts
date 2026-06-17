@@ -1,14 +1,7 @@
 {
-  "Gateway": {
-    "Jobs": {
-      "RequestTimeout": "00:00:05",
-      "Services": [
-        {
-          "Name": "main",
-          "Url": "http://main-api:8080/jobs/available"
-        }
-      ]
-    }
+  "InternalServiceCredentials": {
+    "Service": "Gateway",
+    "Secret": "SuperGatewayKey222"
   },
   "ReverseProxy": {
     "Routes": {

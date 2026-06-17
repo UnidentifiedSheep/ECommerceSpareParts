@@ -26,6 +26,12 @@ public abstract class InternalClientBase(
         return request;
     }
 
+    protected static void AddLocalizationHeader(HttpRequestMessage request, string? locale)
+    {
+        if (locale == null) return;
+        request.Headers.Add("Accept-Language", locale);
+    }
+
     protected void SetJsonContent<TValue>(
         HttpRequestMessage request,
         TValue value)
