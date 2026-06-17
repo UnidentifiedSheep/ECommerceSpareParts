@@ -19,6 +19,7 @@ public class LocalizationTests
     [Theory]
     [InlineData("ru")]
     [InlineData("en")]
+    [InlineData("tr")]
     public async Task All_LocalizableExceptions_Should_Have_Valid_Localization(string locale)
     {
         var localesPath = Assembly.GetExecutingAssembly().GetDefaultLocalizationPath();
@@ -30,6 +31,7 @@ public class LocalizationTests
     [Theory]
     [InlineData("ru")]
     [InlineData("en")]
+    [InlineData("tr")]
     public async Task All_AbstractValidators_Should_Have_Valid_Localization(string locale)
     {
         var localesPath = Assembly.GetExecutingAssembly().GetDefaultLocalizationPath();
@@ -41,6 +43,7 @@ public class LocalizationTests
     [Theory]
     [InlineData("ru")]
     [InlineData("en")]
+    [InlineData("tr")]
     public async Task All_DbValidators_Should_Have_Valid_Localization(string locale)
     {
         ValidationConfiguration.Configure();

@@ -1,0 +1,8 @@
+{
+  "locale": "tr",
+  "keyValues": {
+    "article.not.found": "İstenen ürün bulunamadı.",
+    "article.search.query.empty": "Ürün arama sorgusu boş olmamalıdır.",
+    "article.search.limit.min": "Minimum ürün dönüş sayısı 1'dir."
+  }
+}

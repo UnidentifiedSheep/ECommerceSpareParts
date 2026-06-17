@@ -1,0 +1,9 @@
+{
+  "locale": "tr",
+  "keyValues": {
+    "lrt.producer.import.name": "Üretici içe aktarma",
+    "lrt.producer.import.description": "Üreticileri yüklenen bir dosyadan içe aktarır, verileri doğrular ve mevcut kayıtları atlayarak yeni kayıtları ekler.",
+    "lrt.product.import.name": "Ürün içe aktarma",
+    "lrt.product.import.description": "Ürünleri yüklenen bir dosyadan içe aktarır, verileri doğrular ve mevcut kayıtları atlayarak yeni kayıtları ekler."
+  }
+}

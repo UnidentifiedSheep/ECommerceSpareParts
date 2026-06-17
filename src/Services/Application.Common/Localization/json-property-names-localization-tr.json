@@ -1,0 +1,19 @@
+{
+  "locale": "tr",
+  "keyValues": {
+    "price": "Fiyat",
+    "date": "Tarih",
+    "quantity": "Miktar",
+    "start_time": "Başlangıç zamanı",
+    "end_time": "Bitiş zamanı",
+    "min_price": "Minimum fiyat",
+    "max_price": "Maksimum fiyat",
+    "average_price": "Ortalama fiyat",
+    "volatility": "Oynaklık",
+    "price_info": "Fiyat bilgisi",
+    "timer": "Hesaplama zamanı",
+    "total_amount": "Toplam tutar",
+    "file_name": "Dosya adı",
+    "file_name_description": "Dosyanın adı"
+  }
+}

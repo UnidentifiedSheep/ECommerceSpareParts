@@ -1,0 +1,30 @@
+{
+  "locale": "tr",
+  "keyValues": {
+    "position.count.must.be.greater.than.zero": "Pozisyon adedi 0'dan büyük olmalıdır.",
+    "email.must.be.valid": "E-posta adresi geçerli olmalıdır.",
+    "login.must.not.be.empty": "Giriş adı boş olmamalıdır.",
+    "login.min.length.5": "Giriş adı en az 5 karakter uzunluğunda olmalıdır.",
+    "login.max.length.36": "Giriş adı en fazla 36 karakter uzunluğunda olmalıdır.",
+    "login.cannot.contain.spaces": "Giriş adı boşluk içeremez.",
+    "password.must.not.be.empty": "Şifre boş olmamalıdır.",
+    "password.min.length": "Şifre en az {0} karakter uzunluğunda olmalıdır.",
+    "password.max.length": "Şifre en fazla {0} karakter uzunluğunda olmalıdır.",
+    "password.cannot.start.or.end.with.space": "Şifre boşlukla başlayamaz veya bitemez.",
+    "password.cannot.contain.spaces": "Şifre boşluk içeremez.",
+    "password.must.contain.uppercase": "Şifre en az bir büyük harf içermelidir.",
+    "password.must.contain.digit": "Şifre en az bir rakam içermelidir.",
+    "password.must.contain.special": "Şifre en az bir özel karakter içermelidir ({0}).",
+    "price.must.be.positive": "Fiyat 0'dan büyük olmalıdır.",
+    "price.max.two.decimal.places": "Fiyat en fazla 2 ondalık basamak içerebilir.",
+    "user.name.required": "Kullanıcının adı olmalıdır.",
+    "user.name.min.length": "Kullanıcı adı en az 3 karakter uzunluğunda olmalıdır.",
+    "user.name.max.length": "Kullanıcı adı en fazla 30 karakter uzunluğunda olmalıdır.",
+    "user.name.no.special.chars": "Kullanıcı adı özel karakter içeremez.",
+    "user.surname.required": "Kullanıcının soyadı olmalıdır.",
+    "user.surname.min.length": "Kullanıcı soyadı en az 3 karakter uzunluğunda olmalıdır.",
+    "user.surname.max.length": "Kullanıcı soyadı en fazla 30 karakter uzunluğunda olmalıdır.",
+    "user.surname.no.special.chars": "Kullanıcı soyadı özel karakter içeremez.",
+    "user.description.max.length": "Kullanıcı açıklaması en fazla 300 karakter uzunluğunda olmalıdır."
+  }
+}

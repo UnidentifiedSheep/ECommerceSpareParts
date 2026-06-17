@@ -1,0 +1,9 @@
+{
+  "locale": "tr",
+  "keyValues": {
+    "pagination.page.min": "Sayfa 0 veya daha büyük olmalıdır.",
+    "pagination.size.range": "Öğe sayısı 1 ile 100 arasında olmalıdır.",
+    "row.is.out.dated": "Güncellemeye çalıştığınız veri güncel değil. Lütfen veriyi yeniden yükleyin.",
+    "job.not.found": "İstenen görev bulunamadı."
+  }
+}

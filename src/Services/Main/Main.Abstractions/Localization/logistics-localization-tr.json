@@ -1,0 +1,8 @@
+{
+  "locale": "tr",
+  "keyValues": {
+    "logistics.no.items.for.calculation": "Lojistik hesaplaması için kullanılabilir öğe yok.",
+    "delivery.items.not.empty": "Öğe listesi boş olmamalıdır.",
+    "delivery.item.quantity.greater.than.zero": "Öğe miktarı 0'dan büyük olmalıdır."
+  }
+}

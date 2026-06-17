@@ -1,0 +1,8 @@
+{
+  "locale": "tr",
+  "keyValues": {
+    "metric.not.found": "Metrik bulunamadı.",
+    "metric.dimension.key.required": "Metrik boyut anahtarı zorunludur.",
+    "metric.dimension.key.too.long": "Metrik boyut anahtarı 200 karakter veya daha kısa olmalıdır."
+  }
+}

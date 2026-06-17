@@ -1,0 +1,27 @@
+{
+  "locale": "tr",
+  "keyValues": {
+    "content.article.doesnt.match.purchase.position": "Ürün, satın alma pozisyonuyla eşleşmiyor.",
+    "purchase.content.not.found": "Aradığınız satın alma içeriğini bulamadık.",
+    "purchase.logistics.data.not.found": "Bu satın alma için lojistik bilgisi bulamadık.",
+    "purchase.not.found": "Aradığınız satın almayı bulamadık.",
+    "purchase.content.not.empty": "Satın alma içeriği boş olmamalıdır.",
+    "purchase.supplier.id.not.empty": "Tedarikçi kimliği boş olmamalıdır.",
+    "purchase.created.user.id.not.empty": "Oluşturan kullanıcı kimliği boş olmamalıdır.",
+    "purchase.storage.from.required.when.logistics": "Lojistik içeren satın almalar için gönderen depo belirtilmelidir.",
+    "purchase.payed.sum.min.value": "Ödenen tutar 0 veya daha büyük olmalıdır.",
+    "purchase.payed.sum.precision": "Ödenen tutar en fazla 2 ondalık basamak içermelidir.",
+    "purchase.date.range.start.before.end": "Başlangıç tarihi bitiş tarihinden sonra olamaz.",
+    "purchase.date.range.max.5months": "Maksimum tarih aralığı 5 aydır.",
+    "purchase.id.not.empty": "Satın alma kimliği boş olmamalıdır.",
+    "purchase.content.area.min.zero": "Alan 0 veya daha büyük olmalıdır.",
+    "purchase.content.price.min.zero": "Fiyat 0 veya daha büyük olmalıdır.",
+    "purchase.content.weight.min.zero": "Ağırlık 0 veya daha büyük olmalıdır.",
+    "purchase.datetime.min.3months": "Satın alma tarihi 3 aydan eski olamaz.",
+    "purchase.datetime.not.future": "Satın alma tarihi gelecekte olamaz.",
+    "purchase.content.duplicate.ids.not.allowed": "Yinelenen öğe kimliklerine izin verilmez.",
+    "purchase.comment.too.long": "Satın alma yorumu en fazla 256 karakter olmalıdır.",
+    "purchase.content.comment.too.long": "Satın alma içeriği yorumu en fazla 256 karakter olmalıdır.",
+    "purchase.id.or.transaction.id.required": "Satın alma kimliği veya işlem kimliği belirtilmelidir."
+  }
+}

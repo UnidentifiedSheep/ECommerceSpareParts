@@ -1,0 +1,12 @@
+{
+  "locale": "tr",
+  "keyValues": {
+    "purchase.fact.required": "Satın alma olgusu zorunludur.",
+    "purchase.fact.id.required": "Satın alma olgusu kimliği zorunludur.",
+    "purchase.fact.content.required": "Satın alma olgusu içeriği boş olmamalıdır.",
+    "purchase.fact.content.price.required": "Satın alma içeriği 0'dan büyük olmalıdır.",
+    "purchase.fact.content.price.precision.scale": "Satın alma içeriği en fazla 2 ondalık basamak içerebilir.",
+    "purchase.fact.content.count.required": "Satın alma içeriği adedi 0'dan büyük olmalıdır.",
+    "purchase.fact.not.found": "Satın alma olgusu bulunamadı."
+  }
+}

@@ -1,0 +1,23 @@
+{
+  "locale": "tr",
+  "keyValues": {
+    "producer.with.articles.cannot.be.deleted": "İlişkili ürünleri olan bir üretici silinemez.",
+    "producer.not.found": "Aradığınız üreticiyi bulamadık.",
+    "producers.not.found": "Aradığınız üreticileri bulamadık.",
+    "producer.additional.name.not.found": "Ek adı '{0}' olan bir üretici bulamadık.",
+    "producer.name.not.empty": "Üretici adı boş olmamalıdır.",
+    "producer.name.min.length": "Üretici adı en az 2 karakter uzunluğunda olmalıdır.",
+    "producer.name.max.length": "Üretici adı en fazla 64 karakter uzunluğunda olmalıdır.",
+    "producer.description.max.length": "Üretici açıklaması en fazla 500 karakter uzunluğunda olmalıdır.",
+    "producer.other.name.not.found": "Üreticinin ek adı bulunamadı.",
+    "producer.other.name.already.taken": "Bu ek üretici adı zaten alınmış.",
+    "producer.other.name.not.empty": "Ek ad boş olmamalıdır.",
+    "producer.other.name.min.length": "Ek ad en az 2 karakter uzunluğunda olmalıdır.",
+    "producer.other.name.max.length": "Ek ad en fazla 64 karakter uzunluğunda olmalıdır.",
+    "producer.other.name.where.used.max.length": "Kullanıldığı yer tanımı en fazla 64 karakter uzunluğunda olmalıdır.",
+    "producer.other.name.where.used.min.length": "Kullanıldığı yer en az 2 karakter uzunluğunda olmalıdır.",
+    "producer.image.too.long": "Resim yolu 255 karakterden kısa olmalıdır.",
+    "producer.too.many.errors.while.processing.batch": "Paket işlenirken çok fazla hata oluştu.",
+    "producer.duplicate.name.in.batch": "Pakette yinelenen ad var."
+  }
+}
