@@ -7,6 +7,7 @@ using Application.Common.Backplane;
 using Cache;
 using Contracts.Auth;
 using Contracts.Currency;
+using Contracts.Job;
 using Contracts.Products;
 using Contracts.Settings;
 using Contracts.StorageContent;
@@ -29,6 +30,7 @@ using MassTransit;
 using Microsoft.Extensions.Options;
 using Persistence;
 using RabbitMq.Extensions;
+using RabbitMQ.Client;
 using S3;
 using Security;
 using ZiggyCreatures.Caching.Fusion.Backplane;
@@ -128,6 +130,10 @@ void AddMassTransit(IHostApplicationBuilder hostBuilder)
         x.UsingRabbitMq((context, cfg) =>
         {
             cfg.ConfigureRabbitMq(context);
+            cfg.Publish<JobStatusUpdatedEvent>(p =>
+            {
+                p.ExchangeType = ExchangeType.Direct;
+            });
 
             cfg.ReceiveEndpoint(uniqQueueName, ep =>
             {

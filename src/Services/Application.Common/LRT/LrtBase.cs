@@ -1,10 +1,14 @@
 ﻿using System.Text.Json;
+using Abstractions.Interfaces;
 using Abstractions.Interfaces.Persistence;
 using Application.Common.Exceptions;
 using Application.Common.Interfaces.Lrt;
 using Application.Common.Interfaces.Repositories;
 using Attributes;
+using Contracts.Job;
 using Domain.CommonEntities;
+using Domain.CommonEnums;
+using MassTransit;
 using Microsoft.Extensions.Logging;
 
 namespace Application.Common.LRT;
@@ -12,6 +16,7 @@ namespace Application.Common.LRT;
 public abstract class LrtBase(
     IRepository<Job, Guid> jobRepository,
     IUnitOfWork unitOfWork,
+    IPublishEndpoint publisher,
     ILogger logger) : ILrt, ILrtDescriptor
 {
     protected IUnitOfWork UnitOfWork => unitOfWork;
@@ -21,6 +26,7 @@ public abstract class LrtBase(
     protected Job Job { get; private set; } = null!;
     protected Guid JobId { get; private set; }
     protected bool Initialized { get; private set; }
+    protected abstract IServiceDefinition ServiceDefinition { get; }
     
     public async Task ExecuteAsync(
         Guid jobId,
@@ -141,6 +147,7 @@ public abstract class LrtBase(
             {
                 await GetJobAsync();
                 Job.Start();
+                await PublishStatusUpdatedEvent(Job);
                 await unitOfWork.SaveChangesAsync(CancellationToken);
                 logger.LogInformation(
                     "LRT job processing started. JobId: {JobId}",
@@ -162,11 +169,13 @@ public abstract class LrtBase(
                 if (Job.CanRetry() && !forceFail)
                 {
                     Job.RegisterAttempt();
+                    await PublishStatusUpdatedEvent(Job);
                     await unitOfWork.SaveChangesAsync(CancellationToken);
                     return true;
                 }
 
                 Job.Fail(exception.Message);
+                await PublishStatusUpdatedEvent(Job);
                 await unitOfWork.SaveChangesAsync(CancellationToken);
                 return false;
             },
@@ -181,6 +190,7 @@ public abstract class LrtBase(
             {
                 await GetJobAsync();
                 Job.Succeed();
+                await PublishStatusUpdatedEvent(Job);
                 await unitOfWork.SaveChangesAsync(CancellationToken);
             },
             CancellationToken);
@@ -194,8 +204,22 @@ public abstract class LrtBase(
             {
                 await GetJobAsync();
                 Job.Cancel();
+                await PublishStatusUpdatedEvent(Job);
                 await unitOfWork.SaveChangesAsync(CancellationToken);
             }, CancellationToken);
+    }
+
+    protected async Task PublishStatusUpdatedEvent(Job job)
+    {
+        await publisher.Publish(
+            new JobStatusUpdatedEvent
+            {
+                JobId = job.Id,
+                Status = job.Status.ToString(),
+                CurrentAttempt = job.Attempts
+            },
+            conf => conf.SetRoutingKey(ServiceDefinition.ServiceName),
+            CancellationToken);
     }
     
     protected abstract Task DoWork();

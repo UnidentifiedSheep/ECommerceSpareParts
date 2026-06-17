@@ -11,7 +11,7 @@ public static class JobEndPoints
         var jobs = app.MapGroup("/jobs")
             .WithTags("Jobs");
 
-        jobs.MapGet("", async (
+        jobs.MapGet("/available", async (
                 IJobAggregationService aggregationService,
                 HttpContext context,
                 CancellationToken ct) =>
@@ -19,8 +19,8 @@ public static class JobEndPoints
                 var result = await aggregationService.GetJobsAsync(context, ct);
                 return Results.Ok(result);
             })
-            .WithName("GetGatewayJobs")
-            .WithDisplayName("Get jobs from all services")
+            .WithName("GetAvailableGatewayJobs")
+            .WithDisplayName("Get available jobs from all services")
             .Produces<GetGatewayJobsResponse>();
 
         return app;

@@ -4,6 +4,7 @@ using Application.Common.Extensions;
 using Application.Common.Interfaces.Cqrs;
 using Application.Common.Interfaces.NamedObject;
 using Application.Common.NamedObject;
+using Application.Common.Projections;
 using Attributes;
 using Domain.CommonEntities;
 
@@ -34,19 +35,6 @@ public sealed class QueueJobHandler(
 
         await unitOfWork.AddAsync(job, cancellationToken);
         await unitOfWork.SaveChangesAsync(cancellationToken);
-        return new QueueJobResult(new JobDto
-        {
-            Attempts = job.Attempts,
-            CreatedAt = job.CreatedAt,
-            SystemName = job.SystemName,
-            CreatedBy = job.WhoCreated,
-            ErrorMessage = job.ErrorMessage,
-            MaxAttempts = job.MaxAttempts,
-            Id = job.Id,
-            LockedAt = job.LockedAt,
-            State = job.State,
-            Status = job.Status,
-            UpdatedAt = job.UpdatedAt
-        });
+        return new QueueJobResult(JobProjections.JobProjection.AsFunc()(job));
     }
 }

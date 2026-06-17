@@ -11,9 +11,6 @@ public record JobDto
     [JsonPropertyName("systemName")]
     public required string SystemName { get; init; }
     
-    [JsonPropertyName("state")]
-    public required string State { get; init; }
-    
     [JsonPropertyName("status")]
     [JsonConverter(typeof(JsonStringEnumConverter))]
     public required JobStatus Status { get; init; }

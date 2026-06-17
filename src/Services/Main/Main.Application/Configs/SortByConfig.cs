@@ -1,4 +1,5 @@
 using Abstractions;
+using Application.Common.Extensions;
 using Main.Entities.Producer;
 using Main.Entities.Product;
 using Main.Entities.Purchase;
@@ -45,5 +46,7 @@ public static class SortByConfig
             .Map<StorageContentReservation, DateTime>("createAt", x => x.CreatedAt)
             .Map<StorageContentReservation, DateTime>("updatedAt", x => x.UpdatedAt)
             .Map<StorageContentReservation, StorageContentReservationStatus>("status", x => x.Status);
+
+        QueryableSortBy.Value.ConfigureForJob();
     }
 }

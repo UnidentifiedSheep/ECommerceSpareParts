@@ -3,6 +3,7 @@ using Application.Common.Backplane;
 using Application.Common.Behaviors;
 using Application.Common.Extensions;
 using Application.Common.Handlers.Jobs;
+using Application.Common.Handlers.Jobs.GetJobs;
 using Application.Common.NamedObject;
 using MediatR;
 using Microsoft.Extensions.Configuration;
@@ -74,7 +75,8 @@ public static class ServiceProvider
         Assembly? assembly = null)
     {
         assembly ??= Assembly.GetExecutingAssembly();
-        services.RegisterNamedObject<LrtNamedObjectBase>(assembly);
+        services.RegisterNamedObject<LrtNamedObjectBase>(assembly)
+            .RegisterFluentValidations(typeof(GetAllAvailableJobsHandler).Assembly);
         
         services.AddScoped<
             IRequestHandler<GetAllAvailableJobsQuery, GetAllAvailableJobsResult>,
@@ -87,6 +89,14 @@ public static class ServiceProvider
         services.AddScoped<
             IRequestHandler<RunJobBatchCommand, Unit>,
             RunJobBatchHandler>();
+
+        services.AddScoped<
+            IRequestHandler<GetJobsQuery, GetJobsResult>,
+            GetJobsHandler>();
+
+        services.AddScoped<
+            IRequestHandler<GetJobStateQuery, GetJobStateResult>,
+            GetJobStateHandler>();
         
         return services;
     }

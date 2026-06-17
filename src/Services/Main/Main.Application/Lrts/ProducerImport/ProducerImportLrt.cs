@@ -1,4 +1,5 @@
 using System.Globalization;
+using Abstractions;
 using Abstractions.Interfaces;
 using Abstractions.Interfaces.Persistence;
 using Application.Common.Interfaces.Repositories;
@@ -11,6 +12,7 @@ using Localization.Abstractions.Interfaces;
 using Localization.Domain;
 using Main.Application.Dtos.Producer;
 using Main.Application.Handlers.Producers;
+using MassTransit;
 using MediatR;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
@@ -23,9 +25,10 @@ public class ProducerImportLrt(
     IS3StorageService s3Service,
     ISender sender,
     ILogger<ProducerImportLrt> logger,
+    IPublishEndpoint publisher,
     IScopedStringLocalizer stringLocalizer,
     IOptions<LocalesOptions> localesOptions)
-    : LrtNamedObjectBase(jobRepository, unitOfWork, logger)
+    : LrtNamedObjectBase(jobRepository, unitOfWork, publisher, logger)
 {
     private const int BatchSize = 1000;
     private const int MaxErrors = 10_000;
@@ -35,6 +38,8 @@ public class ProducerImportLrt(
     public override string DescriptionLocalizationKey => "lrt.producer.import.description";
     public override Type InputType => typeof(ProducerImportInputState);
     public override Type StateType => typeof(ProducerImportState);
+
+    protected override IServiceDefinition ServiceDefinition => ServicesDefinitions.Main;
 
     protected override async Task DoWork()
     {
@@ -165,6 +170,7 @@ public class ProducerImportLrt(
         public required string Name { get; init; }
 
         [Name("Description")]
+        [Optional]
         public string? Description { get; init; }
     }
 }
