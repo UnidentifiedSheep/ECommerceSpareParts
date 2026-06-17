@@ -39,6 +39,17 @@ public sealed class ResetPasswordData : IEmailData
             Fallback = "Если кнопка не работает, скопируйте и вставьте эту ссылку в браузер:";
             Ignore = "Если вы не запрашивали восстановление пароля, просто проигнорируйте это письмо.";
         }
+        else if (locale == "tr")
+        {
+            HtmlLang = "tr";
+            Subject = "Şifre sıfırlama";
+            Title = "Şifrenizi sıfırlayın";
+            Intro = "Hesabınızın şifresini sıfırlamak için bir istek aldık.";
+            Description = "Yeni bir şifre belirlemek için aşağıdaki düğmeyi kullanın. Bu bağlantı sınırlı bir süre için geçerlidir.";
+            Button = "Şifreyi sıfırla";
+            Fallback = "Düğme çalışmazsa bu bağlantıyı kopyalayıp tarayıcınıza yapıştırın:";
+            Ignore = "Şifre sıfırlama isteğinde bulunmadıysanız bu e-postayı güvenle yok sayabilirsiniz.";
+        }
         else
         {
             HtmlLang = "en";
