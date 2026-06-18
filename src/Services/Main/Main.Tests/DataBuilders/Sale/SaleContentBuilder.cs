@@ -6,27 +6,22 @@ namespace Tests.DataBuilders.Sale;
 
 public class SaleContentBuilder(Faker faker) : BuilderBase<SaleContent>(faker)
 {
-    private readonly List<int> _productIds = [];
-    public IReadOnlyList<int> ProductIds => _productIds;
+    public int? ProductId { get; private set; }
     
     public decimal? PriceWithDiscount { get; private set; }
     public decimal? PriceWithOutDiscount { get; private set; }
     
-    private List<int> _storageContentIds = [];
+    private readonly List<int> _storageContentIds = [];
     public IReadOnlyList<int> StorageContentIds => _storageContentIds;
     
     public int? CurrencyId { get; private set; }
     
     public int? DetailsCount { get; private set; }
     public int? Count { get; private set; }
-    
-    public SaleContentBuilder WithProductId(int productId)
-        => WithProductIds([productId]);
 
-    public SaleContentBuilder WithProductIds(IEnumerable<int> productIds)
+    public SaleContentBuilder WithProductId(int productId)
     {
-        _productIds.Clear();
-        _productIds.AddRange(productIds);
+        ProductId = productId;
         return this;
     }
 
@@ -61,7 +56,7 @@ public class SaleContentBuilder(Faker faker) : BuilderBase<SaleContent>(faker)
     {
         var price = PriceWithOutDiscount ?? Math.Round(Faker.Random.Decimal(1), 2);
         return SaleContent.Create(
-            ProductIds.Count > 0 ? Faker.PickRandom<int>(ProductIds) : Faker.Random.Int(1),
+            ProductId ?? Faker.Random.Int(1),
             price,
             PriceWithDiscount ?? price,
             GetDetails());
@@ -71,11 +66,10 @@ public class SaleContentBuilder(Faker faker) : BuilderBase<SaleContent>(faker)
     {
         var details = new List<SaleContentDetail>();
         Count ??= Faker.Random.Int(1, 100);
-        DetailsCount ??= Faker.Random.Int(1, 5);
+        DetailsCount ??= Faker.Random.Int(1, Math.Min(5, Count.Value));
 
         int remaining = Count.Value;
-        int currDetailsCount = 0;
-        int chunk = remaining / DetailsCount.Value;
+        var detailsCount = Math.Min(DetailsCount.Value, Count.Value);
         
         var builder = new SaleContentDetailBuilder(Faker)
             .WithPurchaseDate(Faker.Date.Recent())
@@ -83,9 +77,13 @@ public class SaleContentBuilder(Faker faker) : BuilderBase<SaleContent>(faker)
             .WithStorageContentIds(_storageContentIds)
             .WithCurrencyId(CurrencyId ?? Faker.Random.Int(1));
         
-        while (remaining > 0 && currDetailsCount++ < DetailsCount)
+        for (var i = 0; i < detailsCount; i++)
         {
-            int toTake = Math.Min(remaining, chunk);
+            var remainingDetails = detailsCount - i;
+            var toTake = i == detailsCount - 1
+                ? remaining
+                : Faker.Random.Int(1, remaining - remainingDetails + 1);
+
             remaining -= toTake;
             
             details.Add(builder.WithCount(toTake).Build());

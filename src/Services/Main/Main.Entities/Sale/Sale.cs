@@ -89,6 +89,10 @@ public class Sale : AuditableEntity<Sale, Guid>, ILinqEntity<Sale, Guid>, IVersi
     {
         if (State == SaleState.Deleted)
             throw new InvalidOperationException("Cannot complete deleted sale");
+
+        if (Contents.Count == 0)
+            throw new InvalidOperationException("Cannot complete empty sale");
+        
         State = SaleState.Completed;
     }
 

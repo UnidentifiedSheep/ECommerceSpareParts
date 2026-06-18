@@ -81,8 +81,8 @@ public class SaleContent : Entity<SaleContent, int>, ILinqEntity<SaleContent, in
             .AgainstTooBig(withOutDiscount, "sale.content.price.with.discount.max");
 
         Discount = (withOutDiscount - withDiscount) / withOutDiscount;
-        TotalSum = Price * Count;
         ClearAndSetDetails(details);
+        TotalSum = Price * Count;
     }
 
     private void ClearAndSetDetails(IEnumerable<SaleContentDetail> details)

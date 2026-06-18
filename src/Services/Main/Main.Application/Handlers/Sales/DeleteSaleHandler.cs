@@ -1,5 +1,4 @@
 using System.Data;
-using Abstractions.Interfaces.Persistence;
 using Application.Common.Interfaces;
 using Application.Common.Interfaces.Cqrs;
 using Application.Common.Interfaces.Repositories;
@@ -25,7 +24,6 @@ public record DeleteSaleCommand(Guid Id, uint RowVersion) : ICommand;
 
 public class DeleteSaleHandler(
     ISaleRepository repository,
-    IUnitOfWork unitOfWork,
     ISender sender,
     IIntegrationEventScope integrationEventScope
     ) : ICommandHandler<DeleteSaleCommand>

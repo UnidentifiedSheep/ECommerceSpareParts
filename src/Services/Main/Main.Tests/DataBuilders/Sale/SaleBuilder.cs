@@ -11,6 +11,7 @@ public class SaleBuilder(Faker faker) : BuilderBase<Main.Entities.Sale.Sale>(fak
     public int? CurrencyId { get; private set; }
     public string? StorageName { get; private set; }
     public DateTime? SaleDate { get; private set; }
+    public bool CompleteSale { get; private set; }
 
     private readonly List<SaleContent> _contents = [];
     public IReadOnlyList<SaleContent> Contents => _contents;
@@ -51,6 +52,12 @@ public class SaleBuilder(Faker faker) : BuilderBase<Main.Entities.Sale.Sale>(fak
         _contents.AddRange(contents);
         return this;
     }
+
+    public SaleBuilder Completed()
+    {
+        CompleteSale = true;
+        return this;
+    }
     
     public override Main.Entities.Sale.Sale Build()
     {
@@ -63,6 +70,9 @@ public class SaleBuilder(Faker faker) : BuilderBase<Main.Entities.Sale.Sale>(fak
 
         foreach (var content in _contents)
             sale.AddContent(content);
+
+        if (CompleteSale)
+            sale.Complete();
         
         return sale;
     }
