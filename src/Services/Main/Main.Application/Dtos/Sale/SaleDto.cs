@@ -1,6 +1,7 @@
 using System.Text.Json.Serialization;
 using Main.Application.Dtos.Currencies;
 using Main.Application.Dtos.Users;
+using Main.Enums;
 
 namespace Main.Application.Dtos.Sale;
 
@@ -29,6 +30,10 @@ public record SaleDto
     
     [JsonPropertyName("rowVersion")]
     public required uint RowVersion { get; init; }
+    
+    [JsonPropertyName("state")]
+    [JsonConverter(typeof(JsonStringEnumConverter))]
+    public required SaleState State { get; init; }
 
     [JsonPropertyName("currency")]
     public required CurrencyDto Currency { get; init; }
