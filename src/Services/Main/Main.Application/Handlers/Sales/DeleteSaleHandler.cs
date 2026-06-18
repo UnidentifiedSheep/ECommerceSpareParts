@@ -32,30 +32,25 @@ public class DeleteSaleHandler(
 {
     public async Task<Unit> Handle(DeleteSaleCommand request, CancellationToken cancellationToken)
     {
-        unitOfWork.Context.SuppressAutoSave = true; //we suppress auto save to make ont SaveChanges at the end.
-                                                    //For details take a look at AutoSave attr.
-        
         var sale = await repository.GetFullSaleForUpdate(request.Id, cancellationToken)
                    ?? throw new SaleNotFoundException(request.Id);
 
         if (sale.State == SaleState.Deleted)
             return Unit.Value;
-        
+
         sale.ValidateVersion(request.RowVersion);
         sale.Delete();
-        
+
         await sender.Send(
-            new ReverseTransactionCommand(sale.TransactionId, TransactionReversalMode.System), 
+            new ReverseTransactionCommand(sale.TransactionId, TransactionReversalMode.System),
             cancellationToken);
-        
+
         await RestoreContents(sale, cancellationToken);
-        
+
         integrationEventScope.Add(new SaleDeletedEvent
         {
             SaleId = sale.Id,
         });
-        
-        unitOfWork.Context.SuppressAutoSave = false; //return auth save, to save all changes.
         
         return Unit.Value;
     }
