@@ -1739,6 +1739,12 @@ namespace Main.Migrator.Migrations
                         .HasColumnType("integer")
                         .HasColumnName("currency_id");
 
+                    b.Property<uint>("RowVersion")
+                        .IsConcurrencyToken()
+                        .ValueGeneratedOnAddOrUpdate()
+                        .HasColumnType("xid")
+                        .HasColumnName("xmin");
+
                     b.Property<DateTime>("SaleDatetime")
                         .HasColumnType("timestamp with time zone")
                         .HasColumnName("sale_datetime");

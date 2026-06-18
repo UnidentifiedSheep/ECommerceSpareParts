@@ -122,11 +122,15 @@ public class SalesEndPoints : ICarterModule
             .Produces(401)
             .RequireAnyPermission(PermissionCodes.SALES_CREATE);
 
-        sales.MapDelete("/{saleId}", (
+        sales.MapDelete("/{saleId:guid}", async (
                 ISender sender,
-                IUserContext user,
-                string saleId,
-                CancellationToken token) => Results.NoContent())
+                [FromHeader(Name = "If-Match")] uint rowVersion,
+                Guid saleId,
+                CancellationToken token) =>
+            {
+                await sender.Send(new DeleteSaleCommand(saleId, rowVersion), token);
+                return Results.NoContent();
+            })
             .WithDescription("Удаление продажи")
             .WithName("DeleteSale")
             .WithSummary("Удалить продажу")
