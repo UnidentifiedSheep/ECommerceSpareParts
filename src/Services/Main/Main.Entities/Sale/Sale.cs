@@ -2,12 +2,13 @@ using System.Linq.Expressions;
 using Domain;
 using Domain.Extensions;
 using Domain.Interfaces;
+using Exceptions;
 using Main.Entities.Balance;
 using Main.Enums;
 
 namespace Main.Entities.Sale;
 
-public class Sale : AuditableEntity<Sale, Guid>, ILinqEntity<Sale, Guid>
+public class Sale : AuditableEntity<Sale, Guid>, ILinqEntity<Sale, Guid>, IVersionable<uint>
 {
     private readonly List<SaleContent> _contents = [];
 
@@ -37,6 +38,7 @@ public class Sale : AuditableEntity<Sale, Guid>, ILinqEntity<Sale, Guid>
     public Currency.Currency Currency { get; private set; } = null!;
     public Transaction Transaction { get; private set; } = null!;
     public IReadOnlyList<SaleContent> Contents => _contents;
+    public uint RowVersion { get; private set; }
 
     public static Expression<Func<Sale, Guid>> GetKeySelector()
     {
@@ -81,6 +83,21 @@ public class Sale : AuditableEntity<Sale, Guid>, ILinqEntity<Sale, Guid>
     public void SetCurrency(int currencyId)
     {
         CurrencyId = currencyId;
+    }
+    
+    public void Complete()
+    {
+        if (State == SaleState.Deleted)
+            throw new InvalidOperationException("Cannot complete deleted sale");
+        State = SaleState.Completed;
+    }
+
+    public void Delete()
+    {
+        if (State == SaleState.Deleted)
+            return;
+
+        State = SaleState.Deleted;
     }
 
     public override Guid GetId() => Id;

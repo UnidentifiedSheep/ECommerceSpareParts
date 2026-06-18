@@ -53,6 +53,10 @@ public class SaleConfiguration : IEntityTypeConfiguration<Entities.Sale.Sale>
         builder.Property(e => e.TransactionId)
             .HasColumnName("transaction_id");
 
+        builder.Property(x => x.RowVersion)
+            .HasColumnName("xmin")
+            .IsRowVersion();
+
         builder.HasOne(d => d.Buyer)
             .WithMany()
             .HasForeignKey(d => d.BuyerId)

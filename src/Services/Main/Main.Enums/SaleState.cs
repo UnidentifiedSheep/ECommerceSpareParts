@@ -3,5 +3,6 @@
 public enum SaleState
 {
     Draft,
-    Completed
+    Completed,
+    Deleted
 }

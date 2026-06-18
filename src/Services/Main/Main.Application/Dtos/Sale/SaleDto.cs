@@ -26,6 +26,9 @@ public record SaleDto
 
     [JsonPropertyName("storage")]
     public required string Storage { get; init; }
+    
+    [JsonPropertyName("rowVersion")]
+    public required uint RowVersion { get; init; }
 
     [JsonPropertyName("currency")]
     public required CurrencyDto Currency { get; init; }

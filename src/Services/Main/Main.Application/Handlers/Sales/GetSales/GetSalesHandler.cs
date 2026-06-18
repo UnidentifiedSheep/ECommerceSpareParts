@@ -6,6 +6,7 @@ using LinqKit;
 using Main.Application.Dtos.Sale;
 using Main.Application.Projections;
 using Main.Entities.Sale;
+using Main.Enums;
 using Microsoft.EntityFrameworkCore;
 
 namespace Main.Application.Handlers.Sales.GetSales;
@@ -16,6 +17,7 @@ public record GetSalesQuery(
     IEnumerable<Guid> BuyerIds,
     IEnumerable<int> CurrencyIds,
     IEnumerable<int> ProductIds,
+    IEnumerable<SaleState> States,
     string? SortBy,
     string? SearchTerm) : IQuery<GetSalesResult>;
 
@@ -28,6 +30,9 @@ public class GetSalesHandler(
     public async Task<GetSalesResult> Handle(GetSalesQuery request, CancellationToken cancellationToken)
     {
         var query = repository.Query;
+
+        if (request.States.Any())
+            query = query.Where(x => request.States.Contains(x.State));
 
         if (request.DateRange.Min.HasValue)
             query = query.Where(x => x.SaleDatetime >= request.DateRange.Min.Value);

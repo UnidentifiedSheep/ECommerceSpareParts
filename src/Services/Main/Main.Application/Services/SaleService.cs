@@ -13,7 +13,7 @@ public class SaleService : ISaleService
     {
         return DistributeDetails(
             storageContentValues,
-            saleContents.Select(x => (x.ProductId, x.Price, x.PriceWithDiscount, x.Count)));
+            saleContents.Select(x => (x.ProductId, x.Price, x.PriceWithDiscount, x.Count, x.Comment)));
     }
 
     public List<SaleContent> DistributeDetails(
@@ -22,12 +22,12 @@ public class SaleService : ISaleService
     {
         return DistributeDetails(
             storageContentValues,
-            saleContents.Select(x => (x.ProductId, x.Price, x.PriceWithDiscount, x.Count)));
+            saleContents.Select(x => (x.ProductId, x.Price, x.PriceWithDiscount, x.Count, x.Comment)));
     }
 
     private List<SaleContent> DistributeDetails(
         IEnumerable<StorageLot> storageContentValues,
-        IEnumerable<(int productId, decimal price, decimal priceWithDiscount, int count)> saleContents)
+        IEnumerable<(int productId, decimal price, decimal priceWithDiscount, int count, string? comment)> saleContents)
     {
         var result = new List<SaleContent>();
 
@@ -58,7 +58,7 @@ public class SaleService : ISaleService
                     .ToList()
             );
 
-        foreach (var (productId, price, priceWithDiscount, count) in
+        foreach (var (productId, price, priceWithDiscount, count, comment) in
                  saleContents.OrderByDescending(x => x.count))
         {
             if (!storageByProduct.TryGetValue(productId, out var storage))
@@ -102,12 +102,15 @@ public class SaleService : ISaleService
             if (leftToDistribute != 0)
                 throw new InvalidOperationException("Unable to distribute details");
 
-            result.Add(SaleContent.Create(
+            var content = SaleContent.Create(
                 productId,
                 price,
                 priceWithDiscount,
-                count,
-                details));
+                details);
+            
+            content.SetComment(comment);
+            
+            result.Add(content);
         }
 
         return result;

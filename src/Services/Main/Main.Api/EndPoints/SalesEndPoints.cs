@@ -9,6 +9,7 @@ using Main.Application.Dtos.Sale;
 using Main.Application.Handlers.Sales;
 using Main.Application.Handlers.Sales.CreateSale;
 using Main.Application.Handlers.Sales.GetSales;
+using Main.Enums;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
 
@@ -66,6 +67,9 @@ public record GetSalesRequest : SortablePaginationQueryModel
     
     [FromQuery(Name = "searchTerm")] 
     public string? SearchTerm { get; init; }
+    
+    [FromQuery(Name = "state")]
+    public SaleState[] States { get; init; } = [];
 }
 public record GetSalesResponse
 {
@@ -174,6 +178,7 @@ public class SalesEndPoints : ICarterModule
                     request.BuyerIds,
                     request.CurrencyIds,
                     request.ProductIds,
+                    request.States,
                     request.SortBy,
                     request.SearchTerm), token);
 

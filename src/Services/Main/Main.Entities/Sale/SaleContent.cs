@@ -17,11 +17,9 @@ public class SaleContent : Entity<SaleContent, int>, ILinqEntity<SaleContent, in
         int productId,
         decimal priceWithOutDiscount,
         decimal priceWithDiscount,
-        int count,
         IEnumerable<SaleContentDetail> details)
     {
         ProductId = productId;
-        SetCount(count);
         SetPriceAndDetails(priceWithOutDiscount, priceWithDiscount, details);
     }
 
@@ -58,10 +56,9 @@ public class SaleContent : Entity<SaleContent, int>, ILinqEntity<SaleContent, in
         int productId,
         decimal priceWithOutDiscount,
         decimal priceWithDiscount,
-        int count,
         IEnumerable<SaleContentDetail> details)
     {
-        return new SaleContent(productId, priceWithOutDiscount, priceWithDiscount, count, details);
+        return new SaleContent(productId, priceWithOutDiscount, priceWithDiscount, details);
     }
 
     private void SetCount(int count)
