@@ -10,6 +10,7 @@ public class QueryableSortBy
     public static readonly QueryableSortBy Value = new();
 
     private readonly ConcurrentDictionary<Type, ConcurrentDictionary<string, object>> _mapDictionary = new();
+    private readonly ConcurrentDictionary<Type, bool> _defaultDirectionMap = new();
 
     public char Delimiter { get; private set; } = '_';
 
@@ -41,7 +42,8 @@ public class QueryableSortBy
     }
 
     public QueryableSortBy MapDefault<TSource, TKey>(
-        Expression<Func<TSource, TKey>> keySelector)
+        Expression<Func<TSource, TKey>> keySelector,
+        bool desc = false)
     {
         var type = typeof(TSource);
 
@@ -52,6 +54,7 @@ public class QueryableSortBy
             keySelector.Parameters);
 
         primary[DefaultKey] = objectSelector;
+        _defaultDirectionMap[type] = desc;
         return this;
     }
 
@@ -71,12 +74,21 @@ public class QueryableSortBy
 
         throw new ArgumentException($"Mapping '{source}' for {type} not exists and no default provided");
     }
+
+    public bool GetDefaultDesc<TEntity>()
+    {
+        return _defaultDirectionMap.TryGetValue(typeof(TEntity), out var desc) && desc;
+    }
     
     public static KeySelectorSortDefinition<TEntity> ParseToKeySelector<TEntity>(string? sortParam)
     {
         var sort = ParseToText(sortParam);
-        var map = QueryableSortBy.Value.GetMapping<TEntity>(sort.Field);
-        return new KeySelectorSortDefinition<TEntity>(map, sort.Desc);
+        var map = Value.GetMapping<TEntity>(sort.Field);
+        var desc = string.IsNullOrEmpty(sort.Field)
+            ? Value.GetDefaultDesc<TEntity>()
+            : sort.Desc;
+
+        return new KeySelectorSortDefinition<TEntity>(map, desc);
     }
 
     public static TextSortDefinition ParseToText(string? sortParam)
@@ -85,7 +97,7 @@ public class QueryableSortBy
             return new TextSortDefinition(string.Empty, false);
 
         var span = sortParam.Trim().ToLowerInvariant();
-        var delimiter = QueryableSortBy.Value.GetDelimiter();
+        var delimiter = Value.GetDelimiter();
 
         var idx = span.IndexOf(delimiter);
 

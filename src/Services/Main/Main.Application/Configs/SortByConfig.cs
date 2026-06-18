@@ -29,13 +29,13 @@ public static class SortByConfig
             .Map<Producer, string>("name", x => x.Name);
 
         QueryableSortBy.Value
-            .MapDefault<Purchase, DateTime>(x => x.PurchaseDatetime)
+            .MapDefault<Purchase, DateTime>(x => x.PurchaseDatetime, desc: true)
             .Map<Purchase, DateTime>("dateTime", x => x.PurchaseDatetime)
             .Map<Purchase, decimal>("totalSum", x => x.Transaction.Amount)
             .Map<Purchase, Guid>("id", x => x.Id);
 
         QueryableSortBy.Value
-            .MapDefault<Sale, DateTime>(x => x.SaleDatetime)
+            .MapDefault<Sale, DateTime>(x => x.SaleDatetime, desc: true)
             .Map<Sale, DateTime>("dateTime", x => x.SaleDatetime)
             .Map<Sale, decimal>("totalSum", x => x.Transaction.Amount)
             .Map<Sale, Guid>("id", x => x.Id);
