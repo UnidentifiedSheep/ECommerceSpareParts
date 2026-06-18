@@ -8,6 +8,7 @@ using Enums;
 using Main.Application.Dtos.Sale;
 using Main.Application.Handlers.Sales;
 using Main.Application.Handlers.Sales.CreateSale;
+using Main.Application.Handlers.Sales.GetSale;
 using Main.Application.Handlers.Sales.GetSales;
 using Main.Enums;
 using MediatR;
@@ -77,6 +78,12 @@ public record GetSalesResponse
     public required IReadOnlyList<SaleDto> Sales { get; init; }
 }
 
+public record GetSaleResponse
+{
+    [JsonPropertyName("sale")]
+    public required SaleDto Sale { get; init; }
+}
+
 public record EditSaleRequest(
     IEnumerable<EditSaleContentDto> EditedContent,
     int CurrencyId,
@@ -137,7 +144,31 @@ public class SalesEndPoints : ICarterModule
             .WithDisplayName("Удаление продажи")
             .Produces(StatusCodes.Status204NoContent)
             .ProducesProblem(StatusCodes.Status404NotFound)
+            .ProducesProblem(StatusCodes.Status409Conflict)
             .RequireAnyPermission(PermissionCodes.SALES_DELETE);
+
+        sales.MapGet("/{saleId:guid}", async (
+                ISender sender,
+                Guid saleId,
+                CancellationToken cancellationToken) =>
+            {
+                var result = await sender.Send(
+                    new GetSaleQuery(saleId, null),
+                    cancellationToken);
+
+                return Results.Ok(new GetSaleResponse
+                {
+                    Sale = result.Sale
+                });
+            })
+            .WithDescription("Получение продажи по идентификатору")
+            .WithName("GetSale")
+            .WithSummary("Получить продажу")
+            .WithDisplayName("Получение продажи")
+            .Produces<GetSaleResponse>()
+            .ProducesProblem(StatusCodes.Status400BadRequest)
+            .ProducesProblem(StatusCodes.Status404NotFound)
+            .RequireAnyPermission(PermissionCodes.SALES_GET);
 
         sales.MapPut("/{saleId}", (
                 ISender sender,
