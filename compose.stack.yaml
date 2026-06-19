@@ -344,7 +344,7 @@ services:
     image: minio/mc:latest
     entrypoint: >
       /bin/sh -c "
-      sleep 10;
+      sleep 20;
       mc alias set local http://minio:9000 ${MINIO_ROOT_USER} ${MINIO_ROOT_PASSWORD};
       mc mb -p local/images;
       mc anonymous set public local/images;

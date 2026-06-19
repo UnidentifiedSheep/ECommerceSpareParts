@@ -48,7 +48,8 @@ builder.Services
     .AddPhoneOptions()
     .AddJwtOptions()
     .AddS3Options()
-    .AddLrtOptions();
+    .AddLrtOptions()
+    .AddSystemOptions();
 
 builder.AddLokiLogger(
     builder.Configuration,
@@ -70,7 +71,7 @@ builder.Services
     .AddS3()
     .AddApplicationLayer(builder.Configuration)
     .AddLocalization(builder.Configuration)
-    .AddSystemOptions()
+    .AddWorkerSecurityLayer()
     .AddFullSecurityLayer()
     .AddExchangeRates();
 
