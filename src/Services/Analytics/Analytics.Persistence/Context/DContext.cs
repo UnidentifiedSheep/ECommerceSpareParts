@@ -1,7 +1,6 @@
 ﻿using System.Reflection;
 using Analytics.Entities;
 using Analytics.Entities.Metrics;
-using Analytics.Entities.Settings;
 using Domain.CommonEntities;
 using MassTransit;
 using MassTransit.EntityFrameworkCoreIntegration;
@@ -57,8 +56,7 @@ public partial class DContext : DbContext
 
         modelBuilder.Entity<Setting>()
             .HasDiscriminator(e => e.Key)
-            .HasValue<Setting>(nameof(Setting))
-            .HasValue<GlobalApplicationSetting>(GlobalApplicationSetting.SettingName);
+            .HasValue<Setting>(nameof(Setting));
         
         modelBuilder.AddFieldsForAuditableEntities();
 
