@@ -1,4 +1,5 @@
 ﻿using Abstractions.Models;
+using Abstractions.Models.Options;
 using Application.Common.Interfaces.Cqrs;
 using Microsoft.Extensions.Options;
 

@@ -1,31 +1,32 @@
 using System.Data;
 using Abstractions.Interfaces.Persistence;
 using Abstractions.Interfaces.Services;
+using Abstractions.Models.Options;
 using Application.Common.Extensions;
 using Application.Common.Interfaces;
 using Application.Common.Interfaces.Cqrs;
 using Application.Common.Interfaces.Currency;
 using Application.Common.Interfaces.Repositories;
-using Application.Common.Interfaces.Settings;
 using Attributes;
 using Contracts.Purchase;
 using Main.Application.Dtos.Purchase;
+using Main.Application.Dtos.Storage;
 using Main.Application.Handlers.Balance.CreateTransaction;
 using Main.Application.Handlers.Balance.ReverseTransaction;
+using Main.Application.Handlers.StorageContents.AddContent;
+using Main.Application.Handlers.StorageContents.RestoreContent;
 using Main.Application.Handlers.StorageContents.SubtractContent;
 using Main.Application.Interfaces.Persistence;
 using Main.Application.Interfaces.Services;
+using Main.Application.Models;
 using Main.Entities.Balance;
-using Main.Entities.Event;
 using Main.Entities.Exceptions;
-using Main.Entities.Product;
 using Main.Entities.Purchase;
-using Main.Entities.Setting;
 using Main.Entities.Storage;
 using Main.Enums;
 using Main.Enums.Balances;
 using MediatR;
-using Event = Main.Entities.Event.Event;
+using Microsoft.Extensions.Options;
 
 namespace Main.Application.Handlers.Purchases.EditPurchase;
 
@@ -42,11 +43,10 @@ public record EditPurchaseCommand(
 
 public class EditPurchaseHandler(
     ISender sender,
-    ISettingsService settingsService,
     IRepository<Purchase, Guid> purchaseRepository,
     IRepository<StorageOwner, (string, Guid)> storageOwnerRepository,
+    IOptions<SystemOptions> systemOptions,
     IStorageContentRepository storageContentRepository,
-    IProductRepository productRepository,
     ICurrencyConverter currencyConverter,
     IPurchaseLogisticsService purchaseLogisticsService,
     IIntegrationEventScope integrationEventScope,
@@ -64,7 +64,7 @@ public class EditPurchaseHandler(
         var totalSum = contentDtos.Sum(x => x.Price * x.Count);
         var purchaseTransaction = await CreateTransaction(
             purchase.SupplierId,
-            await GetSystemUserId(cancellationToken),
+            GetSystemUserId(),
             totalSum,
             request.CurrencyId,
             request.PurchaseDateTime,
@@ -86,11 +86,9 @@ public class EditPurchaseHandler(
         return Unit.Value;
     }
 
-    private async Task<Guid> GetSystemUserId(CancellationToken cancellationToken)
+    private Guid GetSystemUserId()
     {
-        return (await settingsService.GetOrDefault<GlobalApplicationSetting>(cancellationToken))
-            .Data
-            .SystemId;
+        return systemOptions.Value.SystemId;
     }
 
     private Task<Purchase> GetPurchase(Guid purchaseId, CancellationToken cancellationToken)
@@ -172,16 +170,6 @@ public class EditPurchaseHandler(
             existingById.Keys,
             ids => new PurchaseContentNotFoundException(ids[0]));
 
-        var affectedProductIds = contentDtos
-            .Select(x => x.ProductId)
-            .Concat(purchase.Contents.Select(x => x.ProductId))
-            .ToHashSet();
-
-        var products = await productRepository.EnsureExistsForUpdateAsync(
-            affectedProductIds,
-            ids => new ProductNotFoundException(ids),
-            cancellationToken);
-
         var storageContentIds = purchase.Contents
             .Select(x => x.StorageContentId)
             .ToHashSet();
@@ -193,9 +181,10 @@ public class EditPurchaseHandler(
                 ids => new StorageContentNotFoundException(ids[0]),
                 cancellationToken);
 
-        var storageEvents = new List<Event>();
         var deletionSubtractions = new List<SubtractStorageContentItem>();
         var editingSubtractions = new List<SubtractStorageContentItem>();
+        var editingRestorations = new List<RestoreContentItem>();
+        var contentToAdd = new List<EditPurchaseDto>();
 
         foreach (var removed in purchase.Contents.Where(x => !requestedIds.Contains(x.Id)).ToList())
             RemoveContent(purchase, removed, deletionSubtractions);
@@ -204,7 +193,7 @@ public class EditPurchaseHandler(
         {
             if (dto.Id is null)
             {
-                await AddContent(purchase, dto, request, products, storageEvents, cancellationToken);
+                contentToAdd.Add(dto);
                 continue;
             }
 
@@ -213,17 +202,23 @@ public class EditPurchaseHandler(
                 dto,
                 request,
                 storageContents,
-                products,
-                storageEvents,
+                editingRestorations,
                 editingSubtractions,
                 cancellationToken);
         }
+
+        if (contentToAdd.Count > 0)
+            await AddContent(
+                purchase,
+                contentToAdd,
+                cancellationToken);
+        
 
         if (deletionSubtractions.Count > 0)
             await sender.Send(
                 new SubtractStorageContentsCommand(
                     deletionSubtractions,
-                    StorageMovementType.PurchaseDeletion),
+                    StorageMovementType.PurchaseEditing),
                 cancellationToken);
 
         if (editingSubtractions.Count > 0)
@@ -233,7 +228,12 @@ public class EditPurchaseHandler(
                     StorageMovementType.PurchaseEditing),
                 cancellationToken);
 
-        await unitOfWork.AddRangeAsync(storageEvents, cancellationToken);
+        if (editingRestorations.Count > 0)
+            await sender.Send(
+                new RestoreContentCommand(
+                    editingRestorations,
+                    StorageMovementType.PurchaseEditing),
+                cancellationToken);
     }
 
     private void RemoveContent(
@@ -254,43 +254,43 @@ public class EditPurchaseHandler(
 
     private async Task AddContent(
         Purchase purchase,
-        EditPurchaseDto dto,
-        EditPurchaseCommand request,
-        IReadOnlyDictionary<int, Product> products,
-        ICollection<Event> storageEvents,
+        List<EditPurchaseDto> newContents,
         CancellationToken cancellationToken)
     {
-        var baseCurrencyId = (await settingsService.GetOrDefault<CurrencySetting>(cancellationToken))
-            .Data
-            .BaseCurrencyId;
-        var buyPriceInBaseCurrency = await currencyConverter.ConvertToBaseAsync(
-            dto.Price,
-            request.CurrencyId,
+        var result = await sender.Send(
+            new AddContentCommand(
+                newContents.Select(x => new NewStorageContentDto
+                {
+                    BuyPrice = x.Price,
+                    Count = x.Count,
+                    CurrencyId = purchase.CurrencyId,
+                    ProductId = x.ProductId,
+                    PurchaseDate = purchase.PurchaseDatetime
+                }).ToList(),
+                purchase.Storage,
+                StorageMovementType.PurchaseEditing),
             cancellationToken);
-        var storageContent = StorageContent.Create(
-            purchase.Storage,
-            dto.ProductId,
-            dto.Count,
-            dto.Price,
-            request.CurrencyId,
-            buyPriceInBaseCurrency,
-            baseCurrencyId,
-            request.PurchaseDateTime);
 
-        await unitOfWork.AddAsync(storageContent, cancellationToken);
-        await unitOfWork.SaveChangesAsync(cancellationToken);
+        if (result.StorageContents.Count != newContents.Count)
+            throw new InvalidOperationException("AddContentCommand returned unexpected number of storage contents.");
+        
+        for (int i = 0; i < result.StorageContents.Count; i++)
+        {
+            var storageContent = result.StorageContents[i];
+            var newContent = newContents[i];
 
-        products[dto.ProductId].IncreaseStock(dto.Count);
-        storageEvents.Add(StorageMovementEvent.Create(storageContent, StorageMovementType.Purchase));
-
-        var purchaseContent = PurchaseContent.Create(
-            dto.ProductId,
-            dto.Count,
-            dto.Price,
-            storageContent.Id,
-            dto.Comment);
-
-        purchase.AddContent(purchaseContent);
+            if (storageContent.ProductId != newContent.ProductId ||
+                storageContent.Count != newContent.Count)
+                throw new InvalidOperationException("Unexpected storage content when updating purchase.");
+                
+            
+            purchase.AddContent(PurchaseContent.Create(
+                storageContent.ProductId,
+                storageContent.Count,
+                storageContent.BuyPrice,
+                storageContent.Id,
+                newContent.Comment));
+        }
     }
 
     private async Task UpdateContent(
@@ -298,8 +298,7 @@ public class EditPurchaseHandler(
         EditPurchaseDto dto,
         EditPurchaseCommand request,
         Dictionary<int, StorageContent> storageContents,
-        Dictionary<int, Product> products,
-        List<Event> storageEvents,
+        List<RestoreContentItem> restorations,
         List<SubtractStorageContentItem> subtractions,
         CancellationToken cancellationToken)
     {
@@ -309,6 +308,7 @@ public class EditPurchaseHandler(
         if (!storageContents.TryGetValue(content.StorageContentId, out var storageContent))
             throw new StorageContentNotFoundException(content.StorageContentId);
 
+        var lotIsUntouched = storageContent.Count == content.Count;
         var countDelta = dto.Count - content.Count;
         if (countDelta < 0)
         {
@@ -317,16 +317,32 @@ public class EditPurchaseHandler(
                 -countDelta));
         }
         else if (countDelta > 0)
-        {
-            storageEvents.Add(StorageMovementEvent.Create(storageContent, StorageMovementType.PurchaseEditing));
-            products[content.ProductId].IncreaseStock(countDelta);
-            storageContent.IncreaseCount(countDelta);
-        }
+            restorations.Add(new RestoreContentItem(
+                content.StorageContentId,
+                content.ProductId,
+                request.CurrencyId,
+                dto.Price,
+                countDelta));
 
         content.SetCount(dto.Count);
         content.SetPrice(dto.Price);
         content.SetComment(dto.Comment);
 
+        if (!lotIsUntouched) return;
+        
+        await UpdateStorageContentMetadata(
+            storageContent,
+            dto,
+            request,
+            cancellationToken);
+    }
+
+    private async Task UpdateStorageContentMetadata(
+        StorageContent storageContent,
+        EditPurchaseDto dto,
+        EditPurchaseCommand request,
+        CancellationToken cancellationToken)
+    {
         storageContent.SetCurrencyId(request.CurrencyId);
         storageContent.SetPurchaseDate(request.PurchaseDateTime);
         storageContent.SetBuyPrice(
@@ -356,7 +372,7 @@ public class EditPurchaseHandler(
             toCalculate,
             request.StorageFrom,
             request.PurchaseDateTime,
-            await GetSystemUserId(cancellationToken),
+            GetSystemUserId(),
             cancellationToken);
     }
 }

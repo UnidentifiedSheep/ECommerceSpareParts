@@ -1,4 +1,5 @@
 ﻿using Abstractions.Models;
+using Abstractions.Models.Options;
 using Api.Common.Extensions;
 using Carter;
 using Enums;

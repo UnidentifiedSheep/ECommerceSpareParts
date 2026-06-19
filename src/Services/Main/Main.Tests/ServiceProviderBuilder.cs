@@ -78,6 +78,7 @@ public class ServiceProviderBuilder : IServiceProviderBuilder<ServiceProviderArg
 
         services.RemoveAll<IUserContext>();
         services.AddScoped<IUserContext, UserContextMock>();
+        services.AddSystemOptionsForTests();
 
         services.AddTransient<IPublishEndpoint, MessageBrokerStub>();
         services.RemoveAll<IFusionCacheBackplane>();

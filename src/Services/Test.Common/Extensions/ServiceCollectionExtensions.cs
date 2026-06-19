@@ -1,5 +1,9 @@
-﻿using Microsoft.Extensions.DependencyInjection;
+﻿using Abstractions.Models.Options;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.DependencyInjection.Extensions;
+using Microsoft.Extensions.Options;
 using Test.Common.Interfaces;
+using Test.Common.Stubs;
 
 namespace Test.Common.Extensions;
 
@@ -17,6 +21,14 @@ public static class ServiceCollectionExtensions
         foreach (var impl in implementations)
             services.AddScoped(impl);
 
+        return services;
+    }
+
+    public static IServiceCollection AddSystemOptionsForTests(this IServiceCollection services)
+    {
+        services.RemoveAll<IOptions<SystemOptions>>();
+        services.AddSingleton<TestSystemOptionsAccessor>();
+        services.AddSingleton<IOptions<SystemOptions>, TestSystemOptions>();
         return services;
     }
 }

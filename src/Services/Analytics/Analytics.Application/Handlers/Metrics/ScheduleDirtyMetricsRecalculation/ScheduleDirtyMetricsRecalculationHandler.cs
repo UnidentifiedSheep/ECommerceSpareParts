@@ -1,12 +1,11 @@
 ﻿using System.Data;
+using Abstractions.Interfaces;
 using Analytics.Application.Handlers.CalculationJob.CreateCalculationJob;
 using Analytics.Application.Interfaces.Repositories;
 using Analytics.Entities.Metrics;
-using Analytics.Entities.Settings;
 using Analytics.Enums;
 using Application.Common.Interfaces.Cqrs;
 using Application.Common.Interfaces.Repositories;
-using Application.Common.Interfaces.Settings;
 using Attributes;
 using MediatR;
 
@@ -18,7 +17,7 @@ public record ScheduleDirtyMetricsRecalculationCommand(int Limit) : ICommand;
 
 public class ScheduleDirtyMetricsRecalculationHandler(
     IMetricRepository metricRepository,
-    ISettingsService settingsService,
+    IUserContext userContext,
     ISender sender
     ) : ICommandHandler<ScheduleDirtyMetricsRecalculationCommand>
 {
@@ -26,11 +25,6 @@ public class ScheduleDirtyMetricsRecalculationHandler(
         ScheduleDirtyMetricsRecalculationCommand request, 
         CancellationToken cancellationToken)
     {
-        var systemId = (await settingsService
-                .GetOrDefault<GlobalApplicationSetting>(cancellationToken))
-            .Data
-            .SystemId;
-        
         var criteria = Criteria<Metric>.New()
             .Where(x => 
                 (x.Tags & (RecalculationTags.RecalculationNeeded | RecalculationTags.Disabled))
@@ -46,7 +40,7 @@ public class ScheduleDirtyMetricsRecalculationHandler(
         var metrics = await metricRepository.ListAsync(criteria, cancellationToken);
         foreach (var metric in metrics)
             await sender.Send(
-                new CreateCalculationJobCommand(metric.Id, systemId),
+                new CreateCalculationJobCommand(metric.Id, userContext.UserId),
                 cancellationToken);
         
         return Unit.Value;

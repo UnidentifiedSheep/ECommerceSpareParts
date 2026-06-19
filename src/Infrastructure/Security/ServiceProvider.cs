@@ -43,17 +43,6 @@ public static class ServiceProvider
         return collection;
     }
 
-    public static IServiceCollection AddWorkerSecurityLayer(this IServiceCollection collection)
-    {
-        collection.AddOptions<WorkerServiceOptions>()
-            .BindConfiguration(WorkerServiceOptions.SectionName)
-            .ValidateDataAnnotations()
-            .ValidateOnStart();
-        
-        collection.AddSingleton<IUserContext, WorkerUserContext>();
-        return collection;
-    }
-
     public static IServiceCollection AddEComAuth(
         this IServiceCollection collection,
         IConfiguration configuration)

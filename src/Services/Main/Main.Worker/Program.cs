@@ -70,7 +70,7 @@ builder.Services
     .AddS3()
     .AddApplicationLayer(builder.Configuration)
     .AddLocalization(builder.Configuration)
-    .AddWorkerSecurityLayer()
+    .AddSystemOptions()
     .AddFullSecurityLayer()
     .AddExchangeRates();
 

@@ -1,6 +1,7 @@
 using System.Data;
 using Abstractions.Interfaces.Persistence;
 using Abstractions.Interfaces.Services;
+using Abstractions.Models.Options;
 using Application.Common.Extensions;
 using Application.Common.Interfaces;
 using Application.Common.Interfaces.Cqrs;
@@ -27,6 +28,7 @@ using Main.Enums;
 using Main.Enums.Balances;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Options;
 using Role = Main.Enums.Role;
 
 namespace Main.Application.Handlers.Purchases.CreatePurchase;
@@ -48,7 +50,7 @@ public record CreatePurchaseResult(PurchaseDto Purchase);
 
 public class CreatePurchaseHandler(
     ISender sender,
-    ISettingsService settingsService,
+    IOptions<SystemOptions> systemOptions,
     IUserRepository userRepository,
     IPurchaseLogisticsService purchaseLogisticsService,
     IIntegrationEventScope integrationEventScope,
@@ -57,9 +59,7 @@ public class CreatePurchaseHandler(
 {
     public async Task<CreatePurchaseResult> Handle(CreatePurchaseCommand request, CancellationToken cancellationToken)
     {
-        var systemId = (await settingsService.GetOrDefault<GlobalApplicationSetting>(cancellationToken))
-            .Data
-            .SystemId;
+        var systemId = systemOptions.Value.SystemId;
 
         var supplier = await userRepository.EnsureExistAsync(
             request.SupplierId,

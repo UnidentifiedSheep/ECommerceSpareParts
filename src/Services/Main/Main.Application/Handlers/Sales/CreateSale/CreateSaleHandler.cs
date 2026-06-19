@@ -1,6 +1,7 @@
 using System.Data;
 using System.Text;
 using Abstractions.Interfaces.Persistence;
+using Abstractions.Models.Options;
 using Application.Common.Interfaces;
 using Application.Common.Interfaces.Cqrs;
 using Application.Common.Interfaces.Repositories;
@@ -26,6 +27,7 @@ using Main.Enums;
 using Main.Enums.Balances;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Options;
 using Utils;
 
 namespace Main.Application.Handlers.Sales.CreateSale;
@@ -46,7 +48,7 @@ public record CreateSaleResult(SaleDto Sale);
 
 public class CreateSaleHandler(
     ISender sender,
-    ISettingsService settingsService,
+    IOptions<SystemOptions> systemOptions,
     IProductRepository productRepository,
     IIntegrationEventScope integrationEventScope,
     IReadRepository<Sale, Guid> readRepository,
@@ -64,8 +66,7 @@ public class CreateSaleHandler(
             request.ConfirmationCode, 
             cancellationToken);
         
-        var systemId = (await settingsService.GetOrDefault<GlobalApplicationSetting>(cancellationToken))
-            .Data.SystemId;
+        var systemId = systemOptions.Value.SystemId;
 
         var totalSum = contents.Sum(x => x.PriceWithDiscount * x.Count);
 

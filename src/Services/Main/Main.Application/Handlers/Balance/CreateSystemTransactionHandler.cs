@@ -1,9 +1,9 @@
+using Abstractions.Models.Options;
 using Application.Common.Interfaces.Cqrs;
-using Application.Common.Interfaces.Settings;
 using Main.Application.Handlers.Balance.CreateTransaction;
-using Main.Entities.Setting;
 using Main.Enums.Balances;
 using MediatR;
+using Microsoft.Extensions.Options;
 
 namespace Main.Application.Handlers.Balance;
 
@@ -16,15 +16,13 @@ public record CreateSystemTransactionCommand(
 
 public class CreateSystemTransactionHandler(
     ISender sender,
-    ISettingsService settingsService) : ICommandHandler<CreateSystemTransactionCommand, CreateTransactionResult>
+    IOptions<SystemOptions> systemOptions) : ICommandHandler<CreateSystemTransactionCommand, CreateTransactionResult>
 {
     public async Task<CreateTransactionResult> Handle(
         CreateSystemTransactionCommand request,
         CancellationToken cancellationToken)
     {
-        var systemUserId = (await settingsService.GetOrDefault<GlobalApplicationSetting>(cancellationToken))
-            .Data
-            .SystemId;
+        var systemUserId = systemOptions.Value.SystemId;
 
         var senderId = request.Direction == SystemTransactionDirection.UserToSystem
             ? request.UserId

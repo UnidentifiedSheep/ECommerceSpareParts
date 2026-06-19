@@ -9,5 +9,8 @@
   "InternalServiceCredentials": {
     "Service": "Pricing",
     "Secret": "SuperPricingKey222"
+  },
+  "System": {
+    "SystemId": "c410f364-476f-4dcc-b91e-8940ad539b99"
   }
 }

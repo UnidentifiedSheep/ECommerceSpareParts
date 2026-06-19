@@ -1,3 +1,4 @@
+using Abstractions.Models.Options;
 using Api.Common.ExceptionHandlers;
 using Api.Common.Models.Options;
 using Api.Common.Services;
@@ -82,5 +83,16 @@ public static class ServiceProvider
             .ValidateOnStart();
         
         return collection;
+    }
+
+    public static IServiceCollection AddSystemOptions(this IServiceCollection collection)
+    {
+        collection.AddOptions<SystemOptions>()
+            .BindConfiguration(SystemOptions.SectionName)
+            .ValidateDataAnnotations()
+            .ValidateOnStart();
+        
+        return collection;
+            
     }
 }

@@ -11,10 +11,10 @@ public class RestoreContentValidation : AbstractValidator<RestoreContentCommand>
         RuleForEach(z => z.ContentDetails)
             .ChildRules(z =>
             {
-                z.RuleFor(x => x.Detail.Count)
+                z.RuleFor(x => x.Count)
                     .SetValidator(new CountValidator());
 
-                z.RuleFor(x => x.Detail.BuyPrice)
+                z.RuleFor(x => x.BuyPrice)
                     .SetValidator(new PriceValidator());
             });
 
