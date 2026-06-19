@@ -7,6 +7,7 @@ using Main.Persistence.Repositories;
 using Main.Persistence.Repositories.Balance;
 using Main.Persistence.Repositories.Currency;
 using Main.Persistence.Repositories.Product;
+using Main.Persistence.Repositories.Sale;
 using Main.Persistence.Repositories.Storage;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
@@ -42,6 +43,7 @@ public static class ServiceProvider
         collection.AddScoped<ITransactionRepository, TransactionRepository>();
         collection.AddScoped<ICurrencyRateRepository, CurrencyRateRepository>();
         collection.AddScoped<ICurrencyRepository, CurrencyRepository>();
+        collection.AddScoped<ISaleRepository, SaleRepository>();
 
         collection.AddScoped(typeof(IRepository<,>), typeof(BasicEfRepository<,>));
         collection.AddScoped(typeof(IReadRepository<,>), typeof(ReadRepository<,>));

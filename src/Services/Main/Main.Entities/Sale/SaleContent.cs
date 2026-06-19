@@ -17,11 +17,9 @@ public class SaleContent : Entity<SaleContent, int>, ILinqEntity<SaleContent, in
         int productId,
         decimal priceWithOutDiscount,
         decimal priceWithDiscount,
-        int count,
         IEnumerable<SaleContentDetail> details)
     {
         ProductId = productId;
-        SetCount(count);
         SetPriceAndDetails(priceWithOutDiscount, priceWithDiscount, details);
     }
 
@@ -58,10 +56,9 @@ public class SaleContent : Entity<SaleContent, int>, ILinqEntity<SaleContent, in
         int productId,
         decimal priceWithOutDiscount,
         decimal priceWithDiscount,
-        int count,
         IEnumerable<SaleContentDetail> details)
     {
-        return new SaleContent(productId, priceWithOutDiscount, priceWithDiscount, count, details);
+        return new SaleContent(productId, priceWithOutDiscount, priceWithDiscount, details);
     }
 
     private void SetCount(int count)
@@ -84,8 +81,8 @@ public class SaleContent : Entity<SaleContent, int>, ILinqEntity<SaleContent, in
             .AgainstTooBig(withOutDiscount, "sale.content.price.with.discount.max");
 
         Discount = (withOutDiscount - withDiscount) / withOutDiscount;
-        TotalSum = Price * Count;
         ClearAndSetDetails(details);
+        TotalSum = Price * Count;
     }
 
     private void ClearAndSetDetails(IEnumerable<SaleContentDetail> details)

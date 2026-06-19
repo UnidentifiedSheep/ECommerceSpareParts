@@ -128,6 +128,8 @@ public class CreateSaleHandler(
                 ProductId = content.ProductId,
             });
         }
+        
+        sale.Complete();
 
         await SubtractCountFromReservations(sale, request.BuyerId, cancellationToken);
 

@@ -10,6 +10,7 @@ public class TransactionsEndPoints : ICarterModule
             .WithTags("Transactions");
 
         balances.MapTransactionEndPoints()
-            .MapTransactionPurchaseEndPoints();
+            .MapTransactionPurchaseEndPoints()
+            .MapTransactionSaleEndPoints();
     }
 }

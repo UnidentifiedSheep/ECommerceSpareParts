@@ -17,7 +17,9 @@ public static class SaleProjections
             SaleDatetime = x.SaleDatetime,
             Storage = x.StorageName,
             TotalSum = x.Transaction.Amount,
-            TransactionId = x.TransactionId
+            TransactionId = x.TransactionId,
+            RowVersion = x.RowVersion,
+            State = x.State,
         };
 
     public static readonly Expression<Func<SaleContent, SaleContentDto>> ToSaleContentDto =

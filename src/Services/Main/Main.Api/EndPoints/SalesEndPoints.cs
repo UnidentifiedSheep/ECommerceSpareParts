@@ -8,7 +8,9 @@ using Enums;
 using Main.Application.Dtos.Sale;
 using Main.Application.Handlers.Sales;
 using Main.Application.Handlers.Sales.CreateSale;
+using Main.Application.Handlers.Sales.GetSale;
 using Main.Application.Handlers.Sales.GetSales;
+using Main.Enums;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
 
@@ -66,11 +68,20 @@ public record GetSalesRequest : SortablePaginationQueryModel
     
     [FromQuery(Name = "searchTerm")] 
     public string? SearchTerm { get; init; }
+    
+    [FromQuery(Name = "state")]
+    public SaleState[] States { get; init; } = [];
 }
 public record GetSalesResponse
 {
     [JsonPropertyName("sales")]
     public required IReadOnlyList<SaleDto> Sales { get; init; }
+}
+
+public record GetSaleResponse
+{
+    [JsonPropertyName("sale")]
+    public required SaleDto Sale { get; init; }
 }
 
 public record EditSaleRequest(
@@ -118,18 +129,46 @@ public class SalesEndPoints : ICarterModule
             .Produces(401)
             .RequireAnyPermission(PermissionCodes.SALES_CREATE);
 
-        sales.MapDelete("/{saleId}", (
+        sales.MapDelete("/{saleId:guid}", async (
                 ISender sender,
-                IUserContext user,
-                string saleId,
-                CancellationToken token) => Results.NoContent())
+                [FromHeader(Name = "If-Match")] uint rowVersion,
+                Guid saleId,
+                CancellationToken token) =>
+            {
+                await sender.Send(new DeleteSaleCommand(saleId, rowVersion), token);
+                return Results.NoContent();
+            })
             .WithDescription("Удаление продажи")
             .WithName("DeleteSale")
             .WithSummary("Удалить продажу")
             .WithDisplayName("Удаление продажи")
             .Produces(StatusCodes.Status204NoContent)
             .ProducesProblem(StatusCodes.Status404NotFound)
+            .ProducesProblem(StatusCodes.Status409Conflict)
             .RequireAnyPermission(PermissionCodes.SALES_DELETE);
+
+        sales.MapGet("/{saleId:guid}", async (
+                ISender sender,
+                Guid saleId,
+                CancellationToken cancellationToken) =>
+            {
+                var result = await sender.Send(
+                    new GetSaleQuery(saleId, null),
+                    cancellationToken);
+
+                return Results.Ok(new GetSaleResponse
+                {
+                    Sale = result.Sale
+                });
+            })
+            .WithDescription("Получение продажи по идентификатору")
+            .WithName("GetSale")
+            .WithSummary("Получить продажу")
+            .WithDisplayName("Получение продажи")
+            .Produces<GetSaleResponse>()
+            .ProducesProblem(StatusCodes.Status400BadRequest)
+            .ProducesProblem(StatusCodes.Status404NotFound)
+            .RequireAnyPermission(PermissionCodes.SALES_GET);
 
         sales.MapPut("/{saleId}", (
                 ISender sender,
@@ -174,6 +213,7 @@ public class SalesEndPoints : ICarterModule
                     request.BuyerIds,
                     request.CurrencyIds,
                     request.ProductIds,
+                    request.States,
                     request.SortBy,
                     request.SearchTerm), token);
 

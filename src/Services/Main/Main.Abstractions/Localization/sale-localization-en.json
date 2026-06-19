@@ -3,6 +3,7 @@
   "keyValues": {
     "sale.content.not.found": "We couldn't find any content for this sale.",
     "sale.not.found": "We couldn't find the sale you were looking for.",
+    "sale.id.or.transaction.id.required": "Sale ID or transaction ID must be provided.",
     "soft.confirmation.needed.for.sale.reservation.reason": "This sale requires confirmation because it conflicts with existing reservations. Confirmation code is '{0}'.",
     "sale.date.min": "Sale date cannot be older than 3 months.",
     "sale.date.max": "Sale date cannot be in the future.",
