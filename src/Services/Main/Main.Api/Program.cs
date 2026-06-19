@@ -55,7 +55,8 @@ builder.Services.AddMessageBrokerOptions()
     .AddDatabaseOptions()
     .AddEmailOptions()
     .AddPhoneOptions()
-    .AddJwtOptions();
+    .AddJwtOptions()
+    .AddSystemOptions();
 
 builder.Services.AddCommonApiInfrastructure();
 builder.Services.AddSignalR();

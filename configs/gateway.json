@@ -3,6 +3,9 @@
     "Service": "Gateway",
     "Secret": "SuperGatewayKey222"
   },
+  "System": {
+    "SystemId": "7e3e0544-37d2-4f1d-b111-a48f4e9d426f"
+  },
   "ReverseProxy": {
     "Routes": {
       "route-main-internal-deny": {

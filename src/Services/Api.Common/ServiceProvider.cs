@@ -1,8 +1,8 @@
+using Abstractions.Models.Options;
 using Api.Common.ExceptionHandlers;
 using Api.Common.Models.Options;
 using Api.Common.Services;
 using Application.Common.Interfaces;
-using Application.Common.Models.Options;
 using Cache;
 using Persistence;
 using RabbitMq;

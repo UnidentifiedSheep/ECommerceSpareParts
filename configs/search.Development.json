@@ -12,5 +12,8 @@
   "InternalServiceCredentials": {
     "Service": "Search",
     "Secret": "SuperSearchKey222"
+  },
+  "System": {
+    "SystemId": "c5c8154b-0174-401e-b275-0fb1669e44c9"
   }
 }

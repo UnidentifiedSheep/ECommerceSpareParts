@@ -1,7 +1,6 @@
 using Abstractions.Interfaces;
 using Abstractions.Models;
 using Api.Common;
-using Application.Common.Models.Options;
 using Cache;
 using Localization.Domain.Extensions;
 using Main.Application.Configs;

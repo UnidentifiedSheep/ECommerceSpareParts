@@ -1,4 +1,4 @@
-using Application.Common.Models.Options;
+using Abstractions.Models.Options;
 using Microsoft.Extensions.Options;
 
 namespace Test.Common.Stubs;

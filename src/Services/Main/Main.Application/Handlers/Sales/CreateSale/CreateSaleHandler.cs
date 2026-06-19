@@ -1,11 +1,11 @@
 using System.Data;
 using System.Text;
 using Abstractions.Interfaces.Persistence;
+using Abstractions.Models.Options;
 using Application.Common.Interfaces;
 using Application.Common.Interfaces.Cqrs;
 using Application.Common.Interfaces.Repositories;
 using Application.Common.Interfaces.Settings;
-using Application.Common.Models.Options;
 using Attributes;
 using Contracts.Products;
 using Contracts.Sale;

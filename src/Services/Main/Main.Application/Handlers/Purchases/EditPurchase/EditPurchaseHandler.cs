@@ -1,13 +1,13 @@
 using System.Data;
 using Abstractions.Interfaces.Persistence;
 using Abstractions.Interfaces.Services;
+using Abstractions.Models.Options;
 using Application.Common.Extensions;
 using Application.Common.Interfaces;
 using Application.Common.Interfaces.Cqrs;
 using Application.Common.Interfaces.Currency;
 using Application.Common.Interfaces.Repositories;
 using Application.Common.Interfaces.Settings;
-using Application.Common.Models.Options;
 using Attributes;
 using Contracts.Purchase;
 using Main.Application.Dtos.Purchase;
