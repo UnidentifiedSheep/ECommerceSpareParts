@@ -38,6 +38,7 @@ builder.Services
     .AddCacheLayer("analytics")
     .AddIntegrationClients()
     .AddApplicationLayer(builder.Configuration)
+    .AddWorkerSecurityLayer()
     .AddSystemOptions();
 
 AddHostedServiceOptions(builder.Services);

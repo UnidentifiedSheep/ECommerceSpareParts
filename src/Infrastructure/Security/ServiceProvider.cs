@@ -1,3 +1,4 @@
+using System.Runtime.CompilerServices;
 using System.Text;
 using System.Text.Json;
 using Abstractions.Interfaces;
@@ -40,6 +41,12 @@ public static class ServiceProvider
     public static IServiceCollection AddMinimalSecurityLayer(this IServiceCollection collection)
     {
         collection.TryAddScoped<IUserContext, UserContext>();
+        return collection;
+    }
+
+    public static IServiceCollection AddWorkerSecurityLayer(this IServiceCollection collection)
+    {
+        collection.TryAddSingleton<IUserContext, WorkerUserContext>();
         return collection;
     }
 
