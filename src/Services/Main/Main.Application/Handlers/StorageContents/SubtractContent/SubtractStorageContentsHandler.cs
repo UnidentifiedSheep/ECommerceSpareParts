@@ -9,6 +9,7 @@ using Attributes;
 using Contracts.Products;
 using Contracts.StorageContent;
 using Main.Application.Interfaces.Persistence;
+using Main.Application.Interfaces.Services.Storage;
 using Main.Application.Models.Storage;
 using Main.Application.NamedObjects.StorageContentExtractPolicies;
 using Main.Entities.Event;
@@ -42,7 +43,7 @@ public class SubtractStorageContentsHandler(
     IStorageContentRepository storageContentRepository,
     IProductRepository productRepository,
     IUnitOfWork unitOfWork,
-    IIntegrationEventScope integrationEventScope,
+    IStorageContentChangeNotifier changeNotifier,
     ISettingsService settingsService,
     INamedObjectRegistry<StorageContentExtractPolicyBase> policyRegistry)
     : ICommandHandler<SubtractStorageContentsCommand, SubtractStorageContentsResult>
@@ -121,18 +122,7 @@ public class SubtractStorageContentsHandler(
 
         await unitOfWork.AddRangeAsync(events, cancellationToken);
 
-        foreach (var (productId, _) in products)
-        {
-            integrationEventScope.Add(new ProductUpdatedEvent
-            {
-                Id = productId
-            });
-
-            integrationEventScope.Add(new StorageContentUpdatedEvent
-            {
-                ProductId = productId
-            });
-        }
+        changeNotifier.NotifyChanged(products.Keys);
 
         return new SubtractStorageContentsResult(affected);
     }

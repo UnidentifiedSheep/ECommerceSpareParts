@@ -12,6 +12,7 @@ using Contracts.StorageContent;
 using Domain.Extensions;
 using Main.Application.Dtos.Storage;
 using Main.Application.Interfaces.Persistence;
+using Main.Application.Interfaces.Services.Storage;
 using Main.Entities.Event;
 using Main.Entities.Exceptions;
 using Main.Entities.Storage;
@@ -30,7 +31,7 @@ public class EditStorageContentHandler(
     IStorageContentRepository storageContentRepository,
     IProductRepository productRepository,
     IUnitOfWork unitOfWork,
-    IIntegrationEventScope integrationEventScope,
+    IStorageContentChangeNotifier changeNotifier,
     ICurrencyConverter currencyConverter
 ) : ICommandHandler<EditStorageContentCommand>
 {
@@ -81,18 +82,7 @@ public class EditStorageContentHandler(
 
         await unitOfWork.AddRangeAsync(storageMovements, cancellationToken);
 
-        foreach (var productId in products.Keys)
-        {
-            integrationEventScope.Add(new ProductUpdatedEvent
-            {
-                Id = productId
-            });
-
-            integrationEventScope.Add(new StorageContentUpdatedEvent
-            {
-                ProductId = productId
-            });
-        }
+        changeNotifier.NotifyChanged(products.Keys);
 
         return Unit.Value;
     }
