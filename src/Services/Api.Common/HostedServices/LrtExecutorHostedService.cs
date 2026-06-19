@@ -31,8 +31,6 @@ public class LrtExecutorHostedService(
             await sender.Send(
                 new RunJobBatchCommand(opt.MaxParallelPerWorker),
                 ct);
-
-            await Task.Delay(opt.Delay, ct);
         }
         catch (OperationCanceledException) when (ct.IsCancellationRequested)
         {
@@ -42,5 +40,10 @@ public class LrtExecutorHostedService(
         {
             logger.LogError(ex, "Job batch execution failed.");
         }
+        finally
+        {
+            await Task.Delay(opt.Delay, ct);
+        }
+        
     }
 }
