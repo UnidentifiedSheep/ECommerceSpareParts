@@ -2,6 +2,7 @@ using Api.Common.ExceptionHandlers;
 using Api.Common.Models.Options;
 using Api.Common.Services;
 using Application.Common.Interfaces;
+using Application.Common.Models.Options;
 using Cache;
 using Persistence;
 using RabbitMq;
@@ -82,5 +83,16 @@ public static class ServiceProvider
             .ValidateOnStart();
         
         return collection;
+    }
+
+    public static IServiceCollection AddSystemOptions(this IServiceCollection collection)
+    {
+        collection.AddOptions<SystemOptions>()
+            .BindConfiguration(SystemOptions.SectionName)
+            .ValidateDataAnnotations()
+            .ValidateOnStart();
+        
+        return collection;
+            
     }
 }

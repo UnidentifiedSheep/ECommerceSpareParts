@@ -1,6 +1,7 @@
 using Abstractions.Interfaces;
 using Abstractions.Models;
 using Api.Common;
+using Application.Common.Models.Options;
 using Cache;
 using Localization.Domain.Extensions;
 using Main.Application.Configs;
@@ -78,6 +79,7 @@ public class ServiceProviderBuilder : IServiceProviderBuilder<ServiceProviderArg
 
         services.RemoveAll<IUserContext>();
         services.AddScoped<IUserContext, UserContextMock>();
+        services.AddSystemOptionsForTests();
 
         services.AddTransient<IPublishEndpoint, MessageBrokerStub>();
         services.RemoveAll<IFusionCacheBackplane>();

@@ -7,6 +7,7 @@ using Application.Common.Interfaces.Cqrs;
 using Application.Common.Interfaces.Currency;
 using Application.Common.Interfaces.Repositories;
 using Application.Common.Interfaces.Settings;
+using Application.Common.Models.Options;
 using Attributes;
 using Contracts.Purchase;
 using Main.Application.Dtos.Purchase;
@@ -25,6 +26,7 @@ using Main.Entities.Storage;
 using Main.Enums;
 using Main.Enums.Balances;
 using MediatR;
+using Microsoft.Extensions.Options;
 using Event = Main.Entities.Event.Event;
 
 namespace Main.Application.Handlers.Purchases.EditPurchase;
@@ -45,6 +47,7 @@ public class EditPurchaseHandler(
     ISettingsService settingsService,
     IRepository<Purchase, Guid> purchaseRepository,
     IRepository<StorageOwner, (string, Guid)> storageOwnerRepository,
+    IOptions<SystemOptions> systemOptions,
     IStorageContentRepository storageContentRepository,
     IProductRepository productRepository,
     ICurrencyConverter currencyConverter,
@@ -64,7 +67,7 @@ public class EditPurchaseHandler(
         var totalSum = contentDtos.Sum(x => x.Price * x.Count);
         var purchaseTransaction = await CreateTransaction(
             purchase.SupplierId,
-            await GetSystemUserId(cancellationToken),
+            GetSystemUserId(cancellationToken),
             totalSum,
             request.CurrencyId,
             request.PurchaseDateTime,
@@ -86,11 +89,9 @@ public class EditPurchaseHandler(
         return Unit.Value;
     }
 
-    private async Task<Guid> GetSystemUserId(CancellationToken cancellationToken)
+    private Guid GetSystemUserId(CancellationToken cancellationToken)
     {
-        return (await settingsService.GetOrDefault<GlobalApplicationSetting>(cancellationToken))
-            .Data
-            .SystemId;
+        return systemOptions.Value.SystemId;
     }
 
     private Task<Purchase> GetPurchase(Guid purchaseId, CancellationToken cancellationToken)
@@ -356,7 +357,7 @@ public class EditPurchaseHandler(
             toCalculate,
             request.StorageFrom,
             request.PurchaseDateTime,
-            await GetSystemUserId(cancellationToken),
+            GetSystemUserId(cancellationToken),
             cancellationToken);
     }
 }

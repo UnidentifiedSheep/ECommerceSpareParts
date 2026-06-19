@@ -8,8 +8,9 @@ namespace Tests.TestContexts;
 public class UserContextTestContext(
     DContext context,
     ISettingsService settingsService,
+    TestSystemOptionsAccessor systemOptionsAccessor,
     IUserContext userContext
-) : GlobalApplicationSettingTestContext(context, settingsService)
+) : GlobalApplicationSettingTestContext(context, settingsService, systemOptionsAccessor)
 {
     public IUserContext UserContext { get; private set; } = null!;
     public override async Task InitializeAsync(CancellationToken cancellationToken = default)
