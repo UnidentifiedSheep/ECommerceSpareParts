@@ -34,9 +34,9 @@ public class RestoreContentHandler(
         var productIds = new HashSet<int>();
         var storageContentIds = new HashSet<int>();
 
-        foreach (var (detail, productId) in contentDetailsList)
+        foreach (var detail in contentDetailsList)
         {
-            productIds.Add(productId);
+            productIds.Add(detail.ProductId);
             storageContentIds.Add(detail.StorageContentId);
         }
 
@@ -54,12 +54,20 @@ public class RestoreContentHandler(
 
         var events = new List<Event>();
 
-        foreach (var (detail, productId) in contentDetailsList)
+        foreach (var detail in contentDetailsList)
         {
-            var product = products[productId];
+            var product = products[detail.ProductId];
             var content = storageContents[detail.StorageContentId];
 
-            events.Add(StorageMovementEvent.Create(content, request.MovementType));
+            events.Add(StorageMovementEvent.Create(new StorageMovementEventData
+            {
+                ProductId = content.ProductId,
+                StorageName = content.StorageName,
+                CurrencyId = content.CurrencyId,
+                Count = detail.Count,
+                BuyPrice = content.BuyPrice,
+                MovementType = request.MovementType
+            }));
 
             content.IncreaseCount(detail.Count);
             product.IncreaseStock(detail.Count);

@@ -8,6 +8,6 @@ public class RestoreContentDbValidation : AbstractDbValidation<RestoreContentCom
 {
     public override void Build(IValidationPlan plan, RestoreContentCommand request)
     {
-        plan.ValidateCurrencyExistsId(request.ContentDetails.Select(x => x.Detail.CurrencyId).Distinct());
+        plan.ValidateCurrencyExistsId(request.ContentDetails.Select(x => x.CurrencyId).Distinct());
     }
 }
