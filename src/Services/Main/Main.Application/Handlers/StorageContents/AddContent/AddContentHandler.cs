@@ -7,6 +7,7 @@ using Application.Common.Interfaces.Cqrs;
 using Application.Common.Interfaces.Currency;
 using Application.Common.Interfaces.Settings;
 using Attributes;
+using Contracts.Products;
 using Contracts.StorageContent;
 using Main.Application.Dtos.Storage;
 using Main.Application.Interfaces.Persistence;
@@ -92,10 +93,16 @@ public class AddContentHandler(
         await unitOfWork.AddRangeAsync(events, cancellationToken);
 
         foreach (var id in productIds)
+        {
             integrationEventScope.Add(new StorageContentUpdatedEvent
             {
                 ProductId = id
             });
+            integrationEventScope.Add(new ProductUpdatedEvent
+            {
+                Id = id
+            });
+        }
 
         return new AddContentResult(storageContents);
     }
