@@ -33,7 +33,9 @@ public class ScheduleDirtyMetricsRecalculationHandler(
                 == RecalculationTags.RecalculationNeeded)
             .Where(x => 
                 x.Jobs
-                    .All(z => z.Job.Status != JobStatus.Pending && z.Job.Status != JobStatus.Locked))
+                    .All(z => z.Job.Status != JobStatus.Pending 
+                              && z.Job.Status != JobStatus.Locked
+                              && z.Job.Status != JobStatus.Processing))
             .ForUpdate(true, true)
             .Track()
             .Size(request.Limit)
