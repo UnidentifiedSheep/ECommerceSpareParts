@@ -1,7 +1,5 @@
-﻿using Analytics.Application.Dtos.CalculationJob;
-using Analytics.Application.Dtos.Metric;
-using Analytics.Application.Handlers.CalculationJob.GetCalculationJob;
-using Analytics.Application.Handlers.CalculationJob.GetCalculationJobs;
+﻿using Analytics.Application.Dtos.Metric;
+using Analytics.Application.Handlers.Metrics;
 using Analytics.Application.Handlers.Metrics.GetMetrics;
 using Analytics.Application.Handlers.Metrics.ListAvailableMetrics;
 using Api.Common.Models.Requests;
@@ -11,7 +9,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace Analytics.Api.EndPoints.Metrics;
 
-public sealed record GetMetricCalculationJobsRequest() : SortablePaginationQueryModel;
+public sealed record GetMetricJobsRequest() : SortablePaginationQueryModel;
 
 public sealed record GetMetricsRequest : SortablePaginationQueryModel
 {
@@ -21,7 +19,7 @@ public sealed record GetMetricsRequest : SortablePaginationQueryModel
 public sealed record GetMetricsResponse(IReadOnlyList<MetricDto> Metrics);
 
 public sealed record GetMetricInfosResponse(IReadOnlyList<MetricInfoDto> Metrics);
-public sealed record GetMetricCalculationJobsResponse(IReadOnlyList<CalculationJobDto> Jobs);
+public sealed record GetMetricJobsResponse(IReadOnlyList<MetricJobDto> Jobs);
 
 public class MetricEndPoints : ICarterModule
 {
@@ -56,18 +54,18 @@ public class MetricEndPoints : ICarterModule
         metrics.MapGet("{metricId:guid}/jobs", async (
             ISender sender,
             Guid metricId,
-            [AsParameters] GetMetricCalculationJobsRequest request,
+            [AsParameters] GetMetricJobsRequest request,
             CancellationToken ct) =>
         {
-            var query = new GetCalculationJobsQuery(
+            var query = new GetMetricJobsQuery(
                 metricId,
                 request,
                 request.SortBy);
             
             var result = await sender.Send(query, ct);
-            return Results.Ok(new GetMetricCalculationJobsResponse(result.Jobs));
-        }).WithName("GetMetricCalculationJobs")
+            return Results.Ok(new GetMetricJobsResponse(result.Jobs));
+        }).WithName("GetMetricJobs")
         .WithDescription("Выводит историю расчетов метрики.")
-        .Produces<GetMetricCalculationJobsResponse>();
+        .Produces<GetMetricJobsResponse>();
     }
 }

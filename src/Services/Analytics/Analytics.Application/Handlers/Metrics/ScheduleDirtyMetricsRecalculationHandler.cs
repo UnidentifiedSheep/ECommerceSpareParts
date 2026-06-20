@@ -1,23 +1,25 @@
 ﻿using System.Data;
-using Abstractions.Interfaces;
-using Analytics.Application.Handlers.CalculationJob.CreateCalculationJob;
+using System.Text.Json;
 using Analytics.Application.Interfaces.Repositories;
+using Analytics.Application.Lrts.MetricCalculation;
 using Analytics.Entities.Metrics;
 using Analytics.Enums;
+using Application.Common.Handlers.Jobs;
 using Application.Common.Interfaces.Cqrs;
 using Application.Common.Interfaces.Repositories;
 using Attributes;
+using Domain.CommonEnums;
 using MediatR;
 
-namespace Analytics.Application.Handlers.Metrics.ScheduleDirtyMetricsRecalculation;
+namespace Analytics.Application.Handlers.Metrics;
 
+[AutoSave]
 [Diagnostics(maxExecutionTimeMs: 500)]
 [Transactional(IsolationLevel.ReadCommitted, 20, 2)]
 public record ScheduleDirtyMetricsRecalculationCommand(int Limit) : ICommand;
 
 public class ScheduleDirtyMetricsRecalculationHandler(
     IMetricRepository metricRepository,
-    IUserContext userContext,
     ISender sender
     ) : ICommandHandler<ScheduleDirtyMetricsRecalculationCommand>
 {
@@ -30,19 +32,29 @@ public class ScheduleDirtyMetricsRecalculationHandler(
                 (x.Tags & (RecalculationTags.RecalculationNeeded | RecalculationTags.Disabled))
                 == RecalculationTags.RecalculationNeeded)
             .Where(x => 
-                x.CalculationJobs
-                    .All(z => z.Status != CalculationStatus.AwaitingWorker))
+                x.Jobs
+                    .All(z => z.Job.Status != JobStatus.Pending && z.Job.Status != JobStatus.Locked))
             .ForUpdate(true, true)
-            .Track(false)
+            .Track()
             .Size(request.Limit)
             .Build();
         
         var metrics = await metricRepository.ListAsync(criteria, cancellationToken);
-        foreach (var metric in metrics)
-            await sender.Send(
-                new CreateCalculationJobCommand(metric.Id, userContext.UserId),
-                cancellationToken);
+        var jobItems = metrics
+            .Select(x => new QueueJobItem(
+                SystemName: MetricCalculationLrt.LrtSystemName, 
+                InputState: GetInputState(x.Id), 
+                MaxAttempts: 3))
+            .ToList();
+        
+        var jobResult = await sender.Send(new QueueJobCommand(jobItems), cancellationToken);
+        
+        for (int i = 0; i < metrics.Count; i++)
+            metrics[i].AddJob(jobResult.Jobs[i].Id);
         
         return Unit.Value;
     }
+
+    private static string GetInputState(Guid metricId)
+        => JsonSerializer.Serialize(new MetricCalculationInputState { MetricId = metricId });
 }

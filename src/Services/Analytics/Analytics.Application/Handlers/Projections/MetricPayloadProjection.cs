@@ -1,6 +1,6 @@
 ﻿using System.Linq.Expressions;
 using ContractMetricPayload = Contracts.Models.Metric.MetricPayloadDto;
-using MetricPayloadDto = Analytics.Application.Dtos.CalculationJob.MetricPayloadDto;
+using MetricPayloadDto = Analytics.Application.Dtos.Metric.MetricPayloadDto;
 
 namespace Analytics.Application.Handlers.Projections;
 

@@ -1,0 +1,7 @@
+﻿{
+  "locale": "ru",
+  "keyValues": {
+    "metric_calculation_lrt_name": "Пересчет метрики",
+    "metric_calculation_lrt_description": "Запускает пересчет выбранной аналитической метрики по ее идентификатору."
+  }
+}

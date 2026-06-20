@@ -3,6 +3,8 @@
   "keyValues": {
     "metric.not.found": "Не удалось найти метрику.",
     "metric.dimension.key.required": "Ключ измерения метрики обязателен.",
-    "metric.dimension.key.too.long": "Ключ измерения метрики не должен превышать 200 символов."
+    "metric.dimension.key.too.long": "Ключ измерения метрики не должен превышать 200 символов.",
+    "metric_id_name": "Идентификатор метрики",
+    "metric_id_description": "Идентификатор метрики для пересчета."
   }
 }

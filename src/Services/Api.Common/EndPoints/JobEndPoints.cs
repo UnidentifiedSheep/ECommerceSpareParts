@@ -126,10 +126,10 @@ public class JobEndPoints : ICarterModule
                     request.MaxAttempts), ct);
                 
                 return Results.Created(
-                    $"/jobs/{result.Job.Id}", 
+                    $"/jobs/{result.Jobs[0].Id}", 
                     new CreateJobResponse
                     {
-                        Job = result.Job
+                        Job = result.Jobs[0]
                     });
             }).WithName("CreateJob")
             .WithDisplayName("Creates a new job")

@@ -1,6 +1,6 @@
 ﻿using System.Text.Json.Serialization;
 
-namespace Analytics.Application.Dtos.CalculationJob;
+namespace Analytics.Application.Dtos.Metric;
 
 public record MetricPayloadDto
 {

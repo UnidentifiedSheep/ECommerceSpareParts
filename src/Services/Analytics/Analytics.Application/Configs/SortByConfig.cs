@@ -1,7 +1,6 @@
 ﻿using Abstractions;
-using Analytics.Entities;
 using Analytics.Entities.Metrics;
-using Analytics.Enums;
+using Domain.CommonEnums;
 
 namespace Analytics.Application.Configs;
 
@@ -17,10 +16,11 @@ public static class SortByConfig
             .Map<Metric, DateTime?>("recalculatedAt", x => x.RecalculatedAt);
 
         QueryableSortBy.Value
-            .MapDefault<MetricCalculationJob, Guid>(x => x.RequestId)
-            .Map<MetricCalculationJob, Guid>("requestId", x => x.RequestId)
-            .Map<MetricCalculationJob, DateTime>("createdAt", x => x.CreatedAt)
-            .Map<MetricCalculationJob, DateTime>("updatedAt", x => x.UpdatedAt)
-            .Map<MetricCalculationJob, CalculationStatus>("status", x => x.Status);
+            .MapDefault<MetricJob, DateTime>(x => x.Job.CreatedAt, desc: true)
+            .Map<MetricJob, Guid>("jobId", x => x.JobId)
+            .Map<MetricJob, Guid>("metricId", x => x.MetricId)
+            .Map<MetricJob, DateTime>("createdAt", x => x.Job.CreatedAt)
+            .Map<MetricJob, DateTime>("updatedAt", x => x.Job.UpdatedAt)
+            .Map<MetricJob, JobStatus>("status", x => x.Job.Status);
     }
 }

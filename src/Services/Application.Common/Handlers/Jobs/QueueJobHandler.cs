@@ -11,12 +11,26 @@ using Domain.CommonEntities;
 namespace Application.Common.Handlers.Jobs;
 
 [Transactional]
-public sealed record QueueJobCommand(
-    string SystemName,
-    string InputState,
-    int MaxAttempts) : ICommand<QueueJobResult>;
+public sealed record QueueJobCommand : ICommand<QueueJobResult>
+{
+    public readonly IReadOnlyList<QueueJobItem> Jobs;
+    public QueueJobCommand(string systemName,
+        string inputState,
+        int maxAttempts)
+    {
+        Jobs = new List<QueueJobItem> { new(systemName, inputState, maxAttempts) };
+    }
+    
+    public QueueJobCommand(IEnumerable<QueueJobItem> jobs)
+    {
+        Jobs = jobs.ToList();
+    }
+    
+}
 
-public sealed record QueueJobResult(JobDto Job);
+public sealed record QueueJobItem(string SystemName, string InputState, int MaxAttempts);
+
+public sealed record QueueJobResult(IReadOnlyList<JobDto> Jobs);
 
 public sealed class QueueJobHandler(
     INamedObjectRegistry<LrtNamedObjectBase> registry,
@@ -27,14 +41,19 @@ public sealed class QueueJobHandler(
         QueueJobCommand request, 
         CancellationToken cancellationToken)
     {
-        var lrt = registry.GetBySystemName(request.SystemName);
-        var validatedState = InputStateValidator.GetAndValidate(lrt.InputType, request.InputState);
+        var toAdd = new List<Job>();
+        foreach (var item in request.Jobs)
+        {
+            var lrt = registry.GetBySystemName(item.SystemName);
+            var validatedState = InputStateValidator.GetAndValidate(lrt.InputType, item.InputState);
 
-        var job = Job.Create(lrt.SystemName, request.MaxAttempts);
-        job.SetState(validatedState);
-
-        await unitOfWork.AddAsync(job, cancellationToken);
+            var job = Job.Create(lrt.SystemName, item.MaxAttempts);
+            job.SetState(validatedState);
+            toAdd.Add(job);
+        }
+        
+        await unitOfWork.AddRangeAsync(toAdd, cancellationToken);
         await unitOfWork.SaveChangesAsync(cancellationToken);
-        return new QueueJobResult(JobProjections.JobProjection.AsFunc()(job));
+        return new QueueJobResult(toAdd.Select(job => JobProjections.JobProjection.AsFunc()(job)).ToList());
     }
 }

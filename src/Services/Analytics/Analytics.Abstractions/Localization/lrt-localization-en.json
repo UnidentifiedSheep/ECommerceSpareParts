@@ -1,0 +1,7 @@
+﻿{
+  "locale": "en",
+  "keyValues": {
+    "metric_calculation_lrt_name": "Metric recalculation",
+    "metric_calculation_lrt_description": "Starts recalculation of the selected analytics metric by its identifier."
+  }
+}
