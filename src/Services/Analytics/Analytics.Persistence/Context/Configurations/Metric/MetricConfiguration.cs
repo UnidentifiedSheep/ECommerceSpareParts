@@ -47,6 +47,9 @@ public class MetricConfiguration : IEntityTypeConfiguration<Entities.Metrics.Met
 
         builder.Property(e => e.Json).HasColumnName("json");
 
+        builder.Navigation(e => e.Jobs)
+            .UsePropertyAccessMode(PropertyAccessMode.Field);
+
         builder.HasDiscriminator(e => e.Discriminator);
     }
 }

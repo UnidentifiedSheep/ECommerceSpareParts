@@ -24,10 +24,10 @@ public static class MetricProjection
             CurrencyId = x.CurrencyId,
             ProductId = x is ProductPurchasesMetric ? ((ProductPurchasesMetric)x).ProductId
                 : x is ProductSalesMetric ? ((ProductSalesMetric)x).ProductId : null,
-            LastCalculationJob = MetricCalculationJobProjection
+            LastMetricJob = MetricJobProjection
                 .ToDtoOrDefault
-                .Invoke(x.CalculationJobs
-                    .OrderByDescending(z => z.CreatedAt)
+                .Invoke(x.Jobs
+                    .OrderByDescending(z => z.Job.CreatedAt)
                     .FirstOrDefault())
         };
 }

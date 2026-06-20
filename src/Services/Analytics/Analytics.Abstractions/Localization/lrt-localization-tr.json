@@ -1,0 +1,7 @@
+{
+  "locale": "tr",
+  "keyValues": {
+    "metric_calculation_lrt_name": "Metrik yeniden hesaplama",
+    "metric_calculation_lrt_description": "Seçilen analitik metriği kimlik koduna göre yeniden hesaplatır."
+  }
+}

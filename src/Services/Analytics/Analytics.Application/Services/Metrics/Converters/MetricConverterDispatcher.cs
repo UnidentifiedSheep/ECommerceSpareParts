@@ -1,4 +1,4 @@
-﻿using Analytics.Application.Dtos.CalculationJob;
+﻿using Analytics.Application.Dtos.Metric;
 using Analytics.Application.Interfaces.Services;
 using Analytics.Application.Interfaces.Services.Metrics;
 using Analytics.Entities.Metrics;

@@ -7,9 +7,11 @@ using Application.Common.Interfaces.Cqrs;
 using Application.Common.Interfaces.Currency;
 using Application.Common.Interfaces.Settings;
 using Attributes;
+using Contracts.Products;
 using Contracts.StorageContent;
 using Main.Application.Dtos.Storage;
 using Main.Application.Interfaces.Persistence;
+using Main.Application.Interfaces.Services.Storage;
 using Main.Entities.Event;
 using Main.Entities.Exceptions;
 using Main.Entities.Setting;
@@ -35,7 +37,7 @@ public class AddContentHandler(
     ISettingsService settingsService,
     ICurrencyRepository currencyRepository,
     IUnitOfWork unitOfWork,
-    IIntegrationEventScope integrationEventScope) : ICommandHandler<AddContentCommand, AddContentResult>
+    IStorageContentChangeNotifier changeNotifier) : ICommandHandler<AddContentCommand, AddContentResult>
 {
     public async Task<AddContentResult> Handle(AddContentCommand request, CancellationToken cancellationToken)
     {
@@ -91,11 +93,7 @@ public class AddContentHandler(
         await unitOfWork.AddRangeAsync(storageContents, cancellationToken);
         await unitOfWork.AddRangeAsync(events, cancellationToken);
 
-        foreach (var id in productIds)
-            integrationEventScope.Add(new StorageContentUpdatedEvent
-            {
-                ProductId = id
-            });
+        changeNotifier.NotifyChanged(productIds);
 
         return new AddContentResult(storageContents);
     }

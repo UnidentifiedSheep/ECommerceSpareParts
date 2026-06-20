@@ -5,6 +5,7 @@ using System.Text;
 using System.Text.Json;
 using Analytics.Enums;
 using Domain;
+using Domain.CommonEntities;
 using Domain.Extensions;
 
 namespace Analytics.Entities.Metrics;
@@ -32,8 +33,8 @@ public abstract class Metric : AuditableEntity<Metric, Guid>
 
     public string? Json { get; protected set; }
 
-    private readonly List<MetricCalculationJob> _calculationJobs = [];
-    public IReadOnlyCollection<MetricCalculationJob> CalculationJobs => _calculationJobs;
+    private readonly List<MetricJob> _jobs = [];
+    public IReadOnlyCollection<MetricJob> Jobs => _jobs;
 
     public void ConfigurePeriod(int currencyId, DateTime rangeStart, DateTime rangeEnd)
     {
@@ -49,6 +50,11 @@ public abstract class Metric : AuditableEntity<Metric, Guid>
         RangeEnd = rangeEnd;
         NaturalKey = ComputeNaturalKey();
         MarkDirty();
+    }
+
+    public void AddJob(Guid jobId)
+    {
+        _jobs.Add(MetricJob.Create(Id, jobId));
     }
 
     public void MarkDirty()

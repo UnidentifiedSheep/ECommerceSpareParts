@@ -23,7 +23,9 @@ public partial class DContext : DbContext
 
     public virtual DbSet<Metric> Metrics { get; set; }
 
-    public virtual DbSet<MetricCalculationJob> MetricCalculationJobs { get; set; }
+    public virtual DbSet<MetricJob> MetricJobs { get; set; }
+    
+    public virtual DbSet<Job> Jobs { get; set; }
 
     public virtual DbSet<PurchaseContent> PurchaseContents { get; set; }
 
@@ -51,7 +53,8 @@ public partial class DContext : DbContext
             .HasPostgresExtension("pgcrypto");
 
         modelBuilder.ApplyConfigurationsFromAssembly(Assembly.GetAssembly(GetType())!)
-            .ApplyConfiguration(new SettingConfiguration());
+            .ApplyConfiguration(new SettingConfiguration())
+            .ApplyConfiguration(new JobConfiguration());
 
 
         modelBuilder.Entity<Setting>()

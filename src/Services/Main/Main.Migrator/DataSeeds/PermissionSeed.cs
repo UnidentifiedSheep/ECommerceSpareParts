@@ -150,7 +150,10 @@ public class PermissionSeed : ISeed<DContext>
             new Permission(PermissionCodes.LOGISTICS_CALCULATE, "Права на получение расчетов логистики."),
             new Permission(PermissionCodes.UPLOADS_CREATE, "Права на создание загрузки документа."),
             new Permission(PermissionCodes.JOBS_CREATE, "Права на создание задачи."),
-            new Permission(PermissionCodes.JOBS_GET, "Права на получение задач.")
+            new Permission(PermissionCodes.JOBS_GET, "Права на получение задач."),
+            
+            new Permission(PermissionCodes.METRICS_CREATE, "Права на создание метрики."),
+            new Permission(PermissionCodes.METRICS_GET, "Права на создание метрики."),
         ];
     }
 }

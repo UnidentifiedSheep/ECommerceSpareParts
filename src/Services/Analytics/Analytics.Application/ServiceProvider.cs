@@ -3,6 +3,7 @@ using Analytics.Application.Configs;
 using Analytics.Application.Interfaces.Services;
 using Analytics.Application.Interfaces.Services.FactSynchronizers;
 using Analytics.Application.Interfaces.Services.Metrics;
+using Analytics.Application.Lrts.MetricCalculation;
 using Analytics.Application.Services;
 using Analytics.Application.Services.FactSynchronizers;
 using Analytics.Application.Services.Metrics.Calculators;
@@ -30,6 +31,7 @@ public static class ServiceProvider
         SortByConfig.Configure();
         collection
             .AddApplicationBase(configuration, typeof(Global).Assembly)
+            .AddLrtLayer(typeof(MetricCalculationLrt).Assembly)
             .RegisterMetricCalculators()
             .RegisterMetricConverters()
             .AddFusionCache()

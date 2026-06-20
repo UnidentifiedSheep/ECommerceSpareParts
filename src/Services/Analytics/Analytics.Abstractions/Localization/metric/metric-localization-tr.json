@@ -3,6 +3,8 @@
   "keyValues": {
     "metric.not.found": "Metrik bulunamadı.",
     "metric.dimension.key.required": "Metrik boyut anahtarı zorunludur.",
-    "metric.dimension.key.too.long": "Metrik boyut anahtarı 200 karakter veya daha kısa olmalıdır."
+    "metric.dimension.key.too.long": "Metrik boyut anahtarı 200 karakter veya daha kısa olmalıdır.",
+    "metric_id_name": "Metrik kimlik kodu",
+    "metric_id_description": "Yeniden hesaplanacak metriğin kimlik kodu."
   }
 }

@@ -8,6 +8,7 @@ using Attributes;
 using Contracts.Products;
 using Contracts.StorageContent;
 using Main.Application.Interfaces.Persistence;
+using Main.Application.Interfaces.Services.Storage;
 using Main.Application.Models;
 using Main.Entities.Event;
 using Main.Entities.Exceptions;
@@ -26,7 +27,7 @@ public class RestoreContentHandler(
     IStorageContentRepository contentRepository,
     IProductRepository productRepository,
     IUnitOfWork unitOfWork,
-    IIntegrationEventScope integrationEventScope) : ICommandHandler<RestoreContentCommand>
+    IStorageContentChangeNotifier changeNotifier) : ICommandHandler<RestoreContentCommand>
 {
     public async Task<Unit> Handle(RestoreContentCommand request, CancellationToken cancellationToken)
     {
@@ -75,18 +76,7 @@ public class RestoreContentHandler(
 
         await unitOfWork.AddRangeAsync(events, cancellationToken);
 
-        foreach (var id in productIds)
-        {
-            integrationEventScope.Add(new StorageContentUpdatedEvent
-            {
-                ProductId = id
-            });
-
-            integrationEventScope.Add(new ProductUpdatedEvent
-            {
-                Id = id
-            });
-        }
+        changeNotifier.NotifyChanged(productIds);
 
         return Unit.Value;
     }

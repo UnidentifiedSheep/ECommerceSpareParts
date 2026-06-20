@@ -1,4 +1,4 @@
-﻿using Analytics.Application.Handlers.Metrics.ScheduleDirtyMetricsRecalculation;
+﻿using Analytics.Application.Handlers.Metrics;
 using MediatR;
 using Microsoft.Extensions.Options;
 

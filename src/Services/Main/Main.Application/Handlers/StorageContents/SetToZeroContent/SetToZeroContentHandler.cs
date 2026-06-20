@@ -9,6 +9,7 @@ using Attributes;
 using Contracts.Products;
 using Domain.Extensions;
 using Main.Application.Interfaces.Persistence;
+using Main.Application.Interfaces.Services.Storage;
 using Main.Entities.Event;
 using Main.Entities.Exceptions;
 using Main.Entities.Storage;
@@ -25,7 +26,7 @@ public class SetToZeroContentHandler(
     IRepository<StorageContent, int> repository,
     IUnitOfWork unitOfWork,
     IProductRepository productRepository,
-    IIntegrationEventScope integrationEventScope) : ICommandHandler<SetToZeroContentCommand>
+    IStorageContentChangeNotifier changeNotifier) : ICommandHandler<SetToZeroContentCommand>
 {
     public async Task<Unit> Handle(SetToZeroContentCommand request, CancellationToken cancellationToken)
     {
@@ -46,10 +47,7 @@ public class SetToZeroContentHandler(
         product.IncreaseStock(-content.Count);
         content.IncreaseCount(-content.Count);
 
-        integrationEventScope.Add(new ProductUpdatedEvent
-        {
-            Id = content.ProductId
-        });
+        changeNotifier.NotifyChanged([content.ProductId]);
 
         return Unit.Value;
     }

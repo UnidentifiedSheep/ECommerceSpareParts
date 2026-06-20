@@ -150,5 +150,9 @@ public enum PermissionCodes
     
     // ===== JOBS =====
     JOBS_GET,
-    JOBS_CREATE
+    JOBS_CREATE,
+    
+    // ===== METRICS =====
+    METRICS_CREATE,
+    METRICS_GET,
 }
