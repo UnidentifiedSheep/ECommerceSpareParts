@@ -22,6 +22,7 @@ public abstract class LrtBase(
     protected IUnitOfWork UnitOfWork => unitOfWork;
     protected IRepository<Job, Guid> JobRepository => jobRepository;
     protected ILogger Logger => logger;
+    protected IPublishEndpoint Publisher => publisher;
     protected CancellationToken CancellationToken { get; private set; }
     protected Job Job { get; private set; } = null!;
     protected Guid JobId { get; private set; }

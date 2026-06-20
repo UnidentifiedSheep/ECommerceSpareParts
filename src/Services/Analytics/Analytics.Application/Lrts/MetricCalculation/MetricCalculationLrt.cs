@@ -30,7 +30,7 @@ public class MetricCalculationLrt(
         var state = await GetStateAsync<MetricCalculationInputState>()
             ?? throw new InvalidOperationException($"'{InputType.Name}' state is null");
         
-        await sender.Send(new CalculateMetricCommand(state.MetricId), CancellationToken);
+        var result = await sender.Send(new CalculateMetricCommand(state.MetricId), CancellationToken);
     }
 
 }
