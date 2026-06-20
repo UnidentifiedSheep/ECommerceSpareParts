@@ -78,7 +78,10 @@ builder.Services.AddMassTransit(x =>
     x.UsingRabbitMq((context, cfg) =>
     {
         cfg.ConfigureRabbitMq(context);
-        cfg.Publish<JobStatusUpdatedEvent>(p => p.ExchangeType = ExchangeType.Direct);
+        cfg.Publish<JobStatusUpdatedEvent>(p =>
+        {
+            p.ExchangeType = ExchangeType.Direct;
+        });
 
         cfg.ReceiveEndpoint(uniqQueueName, ep =>
         {

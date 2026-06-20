@@ -15,4 +15,8 @@
         <PackageReference Include="Microsoft.Extensions.Options.DataAnnotations" Version="10.0.5"/>
     </ItemGroup>
 
+    <ItemGroup>
+        <ProjectReference Include="..\..\Core\Contracts\Contracts.csproj"/>
+    </ItemGroup>
+
 </Project>

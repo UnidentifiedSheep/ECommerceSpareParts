@@ -9,9 +9,11 @@ using Api.Common.Extensions;
 using Api.Common.HostedServices;
 using Application.Common.Backplane;
 using Cache;
+using Contracts.Job;
 using Internal.Integration.Di;
 using Localization.Domain.Extensions;
 using MassTransit;
+using RabbitMQ.Client;
 using RabbitMq.Extensions;
 using Security;
 using ZiggyCreatures.Caching.Fusion.Backplane;
@@ -87,6 +89,10 @@ void AddMassTransit(IHostApplicationBuilder hostBuilder)
         x.UsingRabbitMq((context, cfg) =>
         {
             cfg.ConfigureRabbitMq(context);
+            cfg.Publish<JobStatusUpdatedEvent>(p =>
+            {
+                p.ExchangeType = ExchangeType.Direct;
+            });
             
             cfg.ReceiveEndpoint(uniqQueueName, ep =>
             {

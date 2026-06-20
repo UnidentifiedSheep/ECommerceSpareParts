@@ -1,6 +1,8 @@
-﻿using MassTransit;
+﻿using Contracts.Job;
+using MassTransit;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
+using RabbitMQ.Client;
 
 namespace RabbitMq.Extensions;
 
@@ -18,5 +20,6 @@ public static class MassTransitConfigurationExtensions
         });
 
         cfg.UseMessageRetry(r => r.Interval(3, TimeSpan.FromSeconds(5)));
+        cfg.Publish<JobStatusUpdatedEvent>(p => p.ExchangeType = ExchangeType.Direct);
     }
 }
