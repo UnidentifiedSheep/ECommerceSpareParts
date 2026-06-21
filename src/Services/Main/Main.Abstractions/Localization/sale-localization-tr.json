@@ -4,6 +4,7 @@
     "sale.content.not.found": "Bu satış için herhangi bir içerik bulamadık.",
     "sale.not.found": "Aradığınız satışı bulamadık.",
     "sale.id.or.transaction.id.required": "Satış kimliği veya işlem kimliği belirtilmelidir.",
+    "sale.id.not.empty": "Satış kimliği boş olmamalıdır.",
     "soft.confirmation.needed.for.sale.reservation.reason": "Bu satış, mevcut rezervasyonlarla çakıştığı için onay gerektiriyor. Onay kodu '{0}'.",
     "sale.date.min": "Satış tarihi 3 aydan eski olamaz.",
     "sale.date.max": "Satış tarihi gelecekte olamaz.",

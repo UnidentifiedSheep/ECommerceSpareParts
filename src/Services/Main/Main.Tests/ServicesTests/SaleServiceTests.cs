@@ -1,13 +1,18 @@
 using FluentAssertions;
+using Main.Application.Interfaces.Persistence;
 using Main.Application.Dtos.Sale;
 using Main.Application.Models.Storage;
 using Main.Application.Services;
+using MediatR;
+using Moq;
 
 namespace Tests.ServicesTests;
 
 public class SaleServiceTests
 {
-    private readonly SaleService _service = new();
+    private readonly SaleService _service = new(
+        Mock.Of<ISender>(),
+        Mock.Of<IProductRepository>());
 
     [Fact]
     public void DistributeDetails_WithNewSaleContent_DistributesFromLargestLotsFirst()

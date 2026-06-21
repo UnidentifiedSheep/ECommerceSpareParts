@@ -8,6 +8,7 @@ using Enums;
 using Main.Application.Dtos.Sale;
 using Main.Application.Handlers.Sales;
 using Main.Application.Handlers.Sales.CreateSale;
+using Main.Application.Handlers.Sales.EditSale;
 using Main.Application.Handlers.Sales.GetSale;
 using Main.Application.Handlers.Sales.GetSales;
 using Main.Enums;
@@ -84,12 +85,23 @@ public record GetSaleResponse
     public required SaleDto Sale { get; init; }
 }
 
-public record EditSaleRequest(
-    IEnumerable<EditSaleContentDto> EditedContent,
-    int CurrencyId,
-    DateTime SaleDateTime,
-    string? Comment,
-    bool SellFromOtherStorages);
+public record EditSaleRequest
+{
+    [JsonPropertyName("content")]
+    public required IEnumerable<EditSaleContentDto> Content { get; init; }
+
+    [JsonPropertyName("currencyId")]
+    public required int CurrencyId { get; init; }
+
+    [JsonPropertyName("saleDateTime")]
+    public required DateTime SaleDateTime { get; init; }
+
+    [JsonPropertyName("comment")]
+    public string? Comment { get; init; }
+
+    [JsonPropertyName("confirmationCode")]
+    public string? ConfirmationCode { get; init; }
+}
 
 public record GetSaleContentResponse(IReadOnlyList<SaleContentDto> Content);
 
@@ -170,20 +182,35 @@ public class SalesEndPoints : ICarterModule
             .ProducesProblem(StatusCodes.Status404NotFound)
             .RequireAnyPermission(PermissionCodes.SALES_GET);
 
-        sales.MapPut("/{saleId}", (
+        sales.MapPut("/{saleId:guid}", async (
                 ISender sender,
-                string saleId,
+                [FromHeader(Name = "If-Match")] uint rowVersion,
+                Guid saleId,
                 EditSaleRequest request,
-                IUserContext user,
-                CancellationToken cancellationToken) => Results.Ok())
+                CancellationToken cancellationToken) =>
+            {
+                await sender.Send(
+                    new EditSaleCommand(
+                        saleId,
+                        rowVersion,
+                        request.Content,
+                        request.CurrencyId,
+                        request.SaleDateTime,
+                        request.Comment,
+                        request.ConfirmationCode),
+                    cancellationToken);
+
+                return Results.NoContent();
+            })
             .WithDescription("Редактирование продажи")
             .WithName("EditSale")
             .WithSummary("Редактировать продажу")
             .WithDisplayName("Редактирование продажи")
             .Accepts<EditSaleRequest>(false, "application/json")
-            .Produces(StatusCodes.Status200OK)
+            .Produces(StatusCodes.Status204NoContent)
             .ProducesProblem(StatusCodes.Status400BadRequest)
             .ProducesProblem(StatusCodes.Status404NotFound)
+            .ProducesProblem(StatusCodes.Status409Conflict)
             .RequireAnyPermission(PermissionCodes.SALES_EDIT);
 
         sales.MapGet("/{id:guid}/contents", async (
