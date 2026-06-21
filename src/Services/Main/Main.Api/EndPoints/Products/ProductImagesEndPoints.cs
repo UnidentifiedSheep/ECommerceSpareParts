@@ -1,8 +1,8 @@
 using Api.Common.Extensions;
 using Api.Common.Models;
 using Enums;
+using Main.Application.Handlers.Products;
 using Main.Application.Handlers.Products.MapImgsToProduct;
-using Main.Application.Handlers.Products.RemoveProductImage;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
 

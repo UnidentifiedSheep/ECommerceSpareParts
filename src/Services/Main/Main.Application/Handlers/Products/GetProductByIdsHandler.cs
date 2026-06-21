@@ -2,7 +2,7 @@
 using Main.Application.Dtos.Product;
 using Main.Application.Interfaces.Cache;
 
-namespace Main.Application.Handlers.Products.GetByIds;
+namespace Main.Application.Handlers.Products;
 
 public record GetProductByIdsQuery(IEnumerable<int> Ids) : IQuery<GetProductByIdsResult>;
 

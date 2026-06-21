@@ -9,7 +9,7 @@ using Main.Entities.Exceptions;
 using Main.Entities.Product;
 using MediatR;
 
-namespace Main.Application.Handlers.Products.RemoveProductImage;
+namespace Main.Application.Handlers.Products;
 
 [Transactional, AutoSave]
 public record RemoveProductImageCommand(int ProductId, string ImagePath) : ICommand;

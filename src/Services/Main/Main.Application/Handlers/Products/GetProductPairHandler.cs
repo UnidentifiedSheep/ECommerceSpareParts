@@ -5,7 +5,7 @@ using Main.Application.Extensions.QueryExtensions;
 using Main.Entities.Product;
 using Microsoft.EntityFrameworkCore;
 
-namespace Main.Application.Handlers.Products.GetProductPair;
+namespace Main.Application.Handlers.Products;
 
 public record GetProductPairQuery(int ProductId) : IQuery<GetProductPairResult>;
 

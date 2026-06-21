@@ -2,7 +2,7 @@
 using Main.Application.Dtos.Product;
 using Main.Application.Interfaces.Cache;
 
-namespace Main.Application.Handlers.Products.GetById;
+namespace Main.Application.Handlers.Products;
 
 public record GetByIdQuery(int ProductId) : IQuery<GetByIdResult>;
 
