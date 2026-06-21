@@ -1,3 +1,4 @@
+using System.Text.Json.Serialization;
 using Api.Common.Extensions;
 using Carter;
 using Enums;
@@ -5,6 +6,8 @@ using Main.Application.Dtos.Product;
 using Main.Application.Handlers.Products.CreateProducts;
 using Main.Application.Handlers.Products.PatchProduct;
 using MediatR;
+using Microsoft.AspNetCore.Mvc;
+using ApplicationGetProductByIdsQuery = Main.Application.Handlers.Products.GetByIds.GetProductByIdsQuery;
 
 namespace Main.Api.EndPoints.Products;
 
@@ -13,6 +16,18 @@ public record CreateProductRequest(List<CreateProductDto> NewProducts);
 public record CreateProductResponse(IReadOnlyList<int> CreatedIds);
 
 public record EditProductRequest(PatchProductDto PatchProduct);
+
+public record GetProductByIdsQuery
+{
+    [FromQuery(Name = "id")]
+    public int[] Ids { get; init; } = [];
+}
+
+public record GetProductByIdsResult
+{
+    [JsonPropertyName("products")]
+    public required IReadOnlyList<ProductDto> Products { get; init; }
+}
 
 public class ProductsEndPoints : ICarterModule
 {
@@ -44,6 +59,25 @@ public class ProductsEndPoints : ICarterModule
             .Produces<CreateProductResponse>(201, "application/json")
             .ProducesProblem(400)
             .RequireAnyPermission(PermissionCodes.ARTICLES_CREATE);
+
+        products.MapGet("", async (
+                ISender sender,
+                [AsParameters] GetProductByIdsQuery request,
+                CancellationToken token) =>
+            {
+                var result = await sender.Send(new ApplicationGetProductByIdsQuery(request.Ids), token);
+                return Results.Ok(new GetProductByIdsResult
+                {
+                    Products = result.Products
+                });
+            })
+            .WithName("GetProductsByIds")
+            .WithSummary("Получить продукты по идентификаторам")
+            .WithDescription("Получение списка артикулов по идентификаторам")
+            .WithDisplayName("Получение артикулов по идентификаторам")
+            .Produces<GetProductByIdsResult>()
+            .ProducesProblem(StatusCodes.Status400BadRequest)
+            .RequireAnyPermission(PermissionCodes.ARTICLES_GET_MAIN);
 
         products.MapPatch("/{productId:int}", async (
                 ISender sender,
