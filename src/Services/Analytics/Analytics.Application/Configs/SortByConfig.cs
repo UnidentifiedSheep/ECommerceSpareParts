@@ -1,5 +1,6 @@
 ﻿using Abstractions;
 using Analytics.Entities.Metrics;
+using Application.Common.Extensions;
 using Domain.CommonEnums;
 
 namespace Analytics.Application.Configs;
@@ -22,5 +23,7 @@ public static class SortByConfig
             .Map<MetricJob, DateTime>("createdAt", x => x.Job.CreatedAt)
             .Map<MetricJob, DateTime>("updatedAt", x => x.Job.UpdatedAt)
             .Map<MetricJob, JobStatus>("status", x => x.Job.Status);
+        
+        QueryableSortBy.Value.ConfigureForJob();
     }
 }
