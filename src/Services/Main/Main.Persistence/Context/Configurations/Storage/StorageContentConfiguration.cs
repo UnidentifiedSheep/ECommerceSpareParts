@@ -16,6 +16,10 @@ public class StorageContentConfiguration : IEntityTypeConfiguration<StorageConte
 
         builder.HasIndex(e => new { e.ProductId, e.StorageName }, "storage_content_product_id_storage_name_index");
 
+        builder.HasIndex(e => new { e.ProductId, e.StorageName }, "storage_content_product_storage_positive_count_idx")
+            .HasFilter("(count > 0)")
+            .IncludeProperties(e => e.Count);
+
         builder.HasIndex(e => e.BuyPrice, "storage_content_buy_price_index");
 
         builder.HasIndex(e => e.CurrencyId, "storage_content_currency_id_index");
