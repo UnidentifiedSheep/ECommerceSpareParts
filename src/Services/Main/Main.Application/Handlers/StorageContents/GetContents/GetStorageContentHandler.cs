@@ -35,7 +35,7 @@ public class GetStorageContentHandler(
             query = query.Where(x => x.StorageName == request.StorageName);
 
         if (!request.ShowZeroCount)
-            query = query.Where(x => x.Count != 0);
+            query = query.Where(x => x.Count > 0);
 
         var result = await query
             .AsExpandable()
