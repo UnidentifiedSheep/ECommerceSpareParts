@@ -10,6 +10,6 @@ public class LifoStorageContentExtractPolicy : StorageContentExtractPolicyBase
 
     public override IOrderedQueryable<StorageContent> Apply(IQueryable<StorageContent> query)
     {
-        return query.OrderBy(x => x.PurchaseDatetime);
+        return query.OrderByDescending(x => x.PurchaseDatetime);
     }
 }

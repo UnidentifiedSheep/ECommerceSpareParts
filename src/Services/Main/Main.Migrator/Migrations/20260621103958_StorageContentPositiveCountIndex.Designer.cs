@@ -5,6 +5,7 @@ using System.Net;
 using Main.Persistence.Context;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
@@ -13,9 +14,11 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace Main.Migrator.Migrations
 {
     [DbContext(typeof(DContext))]
-    partial class DContextModelSnapshot : ModelSnapshot
+    [Migration("20260621103958_StorageContentPositiveCountIndex")]
+    partial class StorageContentPositiveCountIndex
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -2042,7 +2045,11 @@ namespace Main.Migrator.Migrations
                     b.HasIndex("WhoUpdated")
                         .HasDatabaseName("main.entities.storage.storagecontent_who_updated_idx");
 
+                    b.HasIndex(new[] { "BuyPrice" }, "storage_content_buy_price_index");
+
                     b.HasIndex(new[] { "CurrencyId" }, "storage_content_currency_id_index");
+
+                    b.HasIndex(new[] { "ProductId", "Count" }, "storage_content_product_id_count_index");
 
                     b.HasIndex(new[] { "ProductId", "StorageName" }, "storage_content_product_id_storage_name_index");
 
@@ -2050,6 +2057,13 @@ namespace Main.Migrator.Migrations
                         .HasFilter("(count > 0)");
 
                     NpgsqlIndexBuilderExtensions.IncludeProperties(b.HasIndex(new[] { "ProductId", "StorageName" }, "storage_content_product_storage_positive_count_idx"), new[] { "Count" });
+
+                    b.HasIndex(new[] { "PurchaseDatetime" }, "storage_content_purchase_datetime_index");
+
+                    b.HasIndex(new[] { "StorageName" }, "storage_content_storage_name_index");
+
+                    NpgsqlIndexBuilderExtensions.HasMethod(b.HasIndex(new[] { "StorageName" }, "storage_content_storage_name_index"), "gin");
+                    NpgsqlIndexBuilderExtensions.HasOperators(b.HasIndex(new[] { "StorageName" }, "storage_content_storage_name_index"), new[] { "gin_trgm_ops" });
 
                     b.HasIndex(new[] { "StorageName", "ProductId" }, "storage_content_storage_name_product_id_index");
 

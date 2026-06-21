@@ -57,15 +57,15 @@ public class SubtractStorageContentsHandler(
         //StorageContentId | Count
         var byStorageContents = new Dictionary<int, int>();
 
-        //Key = StorageName + productId, Value = Count
-        var byProductAndStorage = new Dictionary<(string storageName, int productId), int>();
+        //Key = StorageName + productId + takeFromOtherStorages, Value = Count
+        var byProductAndStorage = new Dictionary<(string storageName, int productId, bool takeFromOtherStorages), int>();
 
         foreach (var item in items)
         {
             switch (item)
             {
                 case SubtractProductFromStorageItem byProduct:
-                    var key = (byProduct.StorageName, byProduct.ProductId);
+                    var key = (byProduct.StorageName, byProduct.ProductId, byProduct.TakeFromOtherStorages);
                     byProductAndStorage[key] = byProductAndStorage.GetValueOrDefault(key) + byProduct.Count;
                     break;
                 case SubtractStorageContentItem byContent:
@@ -160,7 +160,7 @@ public class SubtractStorageContentsHandler(
     }
 
     private async Task SubtractByProductAndStorageAsync(
-        Dictionary<(string storageName, int productId), int> byProductAndStorage,
+        Dictionary<(string storageName, int productId, bool takeFromOtherStorages), int> byProductAndStorage,
         Dictionary<int, Product> products,
         List<StorageLot> affected,
         List<Event> events,
@@ -168,13 +168,13 @@ public class SubtractStorageContentsHandler(
         StorageContentExtractPolicyBase policy,
         CancellationToken cancellationToken)
     {
-        foreach (var ((storage, productId), count) in byProductAndStorage)
+        foreach (var ((storage, productId, takeFromOtherStorages), count) in byProductAndStorage)
         {
             await SubtractFromStorageContentsAsync(
                 count,
                 count,
                 productId,
-                storage,
+                takeFromOtherStorages ? null : storage,
                 policy,
                 events,
                 affected,
@@ -190,7 +190,7 @@ public class SubtractStorageContentsHandler(
         int count,
         int requestedCount,
         int productId,
-        string storageName,
+        string? storageName,
         StorageContentExtractPolicyBase policy,
         List<Event> events,
         List<StorageLot> affected,

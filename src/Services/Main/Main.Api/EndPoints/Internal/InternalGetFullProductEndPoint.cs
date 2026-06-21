@@ -3,7 +3,7 @@ using Api.Common.Extensions;
 using Carter;
 using Enums;
 using Main.Application.Dtos.Product;
-using Main.Application.Handlers.Products.GetFullProduct;
+using Main.Application.Handlers.Products;
 using MediatR;
 
 namespace Main.Api.EndPoints.Internal;

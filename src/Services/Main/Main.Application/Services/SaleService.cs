@@ -1,19 +1,48 @@
+using System.Text;
+using Application.Common.Interfaces.Repositories;
 using Main.Application.Dtos.Sale;
+using Main.Application.Handlers.ProductReservations.GetProductsWithNotEnoughStock;
+using Main.Application.Handlers.ProductReservations.UpdateReservationsCounts;
+using Main.Application.Handlers.StorageContents.RestoreContent;
+using Main.Application.Handlers.StorageContents.SubtractContent;
 using Main.Application.Interfaces.Services;
+using Main.Application.Interfaces.Persistence;
+using Main.Application.Models;
 using Main.Application.Models.Storage;
+using Main.Entities.Exceptions;
+using Main.Entities.Product;
 using Main.Entities.Sale;
+using Main.Enums;
+using MediatR;
+using Utils;
 
 namespace Main.Application.Services;
 
-public class SaleService : ISaleService
+public class SaleService(
+    ISender sender,
+    IProductRepository productRepository) : ISaleService
 {
+    private sealed record SaleContentInput(
+        int OriginalIndex,
+        int ProductId,
+        decimal Price,
+        decimal PriceWithDiscount,
+        int Count,
+        string? Comment);
+
     public List<SaleContent> DistributeDetails(
         IEnumerable<StorageLot> storageContentValues,
         IEnumerable<NewSaleContentDto> saleContents)
     {
         return DistributeDetails(
             storageContentValues,
-            saleContents.Select(x => (x.ProductId, x.Price, x.PriceWithDiscount, x.Count, x.Comment)));
+            saleContents.Select((x, index) => new SaleContentInput(
+                index,
+                x.ProductId,
+                x.Price,
+                x.PriceWithDiscount,
+                x.Count,
+                x.Comment)));
     }
 
     public List<SaleContent> DistributeDetails(
@@ -22,14 +51,143 @@ public class SaleService : ISaleService
     {
         return DistributeDetails(
             storageContentValues,
-            saleContents.Select(x => (x.ProductId, x.Price, x.PriceWithDiscount, x.Count, x.Comment)));
+            saleContents.Select((x, index) => new SaleContentInput(
+                index,
+                x.ProductId,
+                x.Price,
+                x.PriceWithDiscount,
+                x.Count,
+                x.Comment)));
+    }
+
+    public Task CheckReservations(
+        IEnumerable<NewSaleContentDto> saleContents,
+        Guid buyerId,
+        string storageName,
+        bool takeFromOtherStorages,
+        string? confirmationCode,
+        CancellationToken cancellationToken = default)
+    {
+        return CheckReservations(
+            saleContents.Select(x => new SaleContentInput(
+                0,
+                x.ProductId,
+                x.Price,
+                x.PriceWithDiscount,
+                x.Count,
+                x.Comment)),
+            buyerId,
+            storageName,
+            takeFromOtherStorages,
+            confirmationCode,
+            cancellationToken);
+    }
+
+    public Task CheckReservations(
+        IEnumerable<EditSaleContentDto> saleContents,
+        Guid buyerId,
+        string storageName,
+        bool takeFromOtherStorages,
+        string? confirmationCode,
+        CancellationToken cancellationToken = default)
+    {
+        return CheckReservations(
+            saleContents.Select(x => new SaleContentInput(
+                0,
+                x.ProductId,
+                x.Price,
+                x.PriceWithDiscount,
+                x.Count,
+                x.Comment)),
+            buyerId,
+            storageName,
+            takeFromOtherStorages,
+            confirmationCode,
+            cancellationToken);
+    }
+
+    public async Task<IReadOnlyList<SaleContent>> TakeFromStorageAndDistributeDetails(
+        string storageName,
+        IEnumerable<NewSaleContentDto> saleContents,
+        StorageMovementType movementType,
+        bool takeFromOtherStorages,
+        CancellationToken cancellationToken = default)
+    {
+        var contents = saleContents.ToList();
+        var takenFromStorage = await TakeFromStorage(
+            storageName,
+            contents.Select(x => (x.ProductId, x.Count)),
+            movementType,
+            takeFromOtherStorages,
+            cancellationToken);
+
+        return DistributeDetails(takenFromStorage.Contents, contents);
+    }
+
+    public async Task<IReadOnlyList<SaleContent>> TakeFromStorageAndDistributeDetails(
+        string storageName,
+        IEnumerable<EditSaleContentDto> saleContents,
+        StorageMovementType movementType,
+        bool takeFromOtherStorages,
+        CancellationToken cancellationToken = default)
+    {
+        var contents = saleContents.ToList();
+        var takenFromStorage = await TakeFromStorage(
+            storageName,
+            contents.Select(x => (x.ProductId, x.Count)),
+            movementType,
+            takeFromOtherStorages,
+            cancellationToken);
+
+        return DistributeDetails(takenFromStorage.Contents, contents);
+    }
+
+    public async Task UpdateReservationsCounts(
+        Guid buyerId,
+        Dictionary<int, int> counts,
+        CancellationToken cancellationToken = default)
+    {
+        var toSubtract = counts
+            .Where(x => x.Value > 0)
+            .ToDictionary(x => x.Key, x => x.Value);
+
+        if (toSubtract.Count == 0) return;
+
+        await sender.Send(new UpdateReservationsCountsCommand(buyerId, toSubtract), cancellationToken);
+    }
+
+    public Task SubtractCountFromReservations(
+        Sale sale,
+        Guid buyerId,
+        CancellationToken cancellationToken = default)
+    {
+        var toSubtract = sale.Contents
+            .GroupBy(x => x.ProductId)
+            .ToDictionary(x => x.Key, x => x.Sum(z => z.Count));
+
+        return UpdateReservationsCounts(buyerId, toSubtract, cancellationToken);
+    }
+
+    public async Task RestoreContents(
+        Sale sale,
+        StorageMovementType movementType,
+        CancellationToken cancellationToken = default)
+    {
+        var toRestore = sale.Contents
+            .SelectMany(content => content.Details
+                .Select(detail => new RestoreContentItem(detail, content.ProductId)))
+            .ToList();
+
+        if (toRestore.Count == 0) return;
+
+        await sender.Send(new RestoreContentCommand(toRestore, movementType), cancellationToken);
     }
 
     private List<SaleContent> DistributeDetails(
         IEnumerable<StorageLot> storageContentValues,
-        IEnumerable<(int productId, decimal price, decimal priceWithDiscount, int count, string? comment)> saleContents)
+        IEnumerable<SaleContentInput> saleContents)
     {
-        var result = new List<SaleContent>();
+        var result = new List<(int OriginalIndex, SaleContent Content)>();
 
         var storageByProduct = storageContentValues
             .Select(x =>
@@ -58,9 +216,9 @@ public class SaleService : ISaleService
                     .ToList()
             );
 
-        foreach (var (productId, price, priceWithDiscount, count, comment) in
-                 saleContents.OrderByDescending(x => x.count))
+        foreach (var contentInput in saleContents.OrderByDescending(x => x.Count))
         {
+            var (originalIndex, productId, price, priceWithDiscount, count, comment) = contentInput;
             if (!storageByProduct.TryGetValue(productId, out var storage))
                 throw new InvalidOperationException($"No storage for product {productId}");
 
@@ -110,9 +268,100 @@ public class SaleService : ISaleService
             
             content.SetComment(comment);
             
-            result.Add(content);
+            result.Add((originalIndex, content));
         }
 
-        return result;
+        return result
+            .OrderBy(x => x.OriginalIndex)
+            .Select(x => x.Content)
+            .ToList();
     }
+
+    private async Task<SubtractStorageContentsResult> TakeFromStorage(
+        string storageName,
+        IEnumerable<(int ProductId, int Count)> contents,
+        StorageMovementType movementType,
+        bool takeFromOtherStorages,
+        CancellationToken cancellationToken)
+    {
+        return await sender.Send(
+            new SubtractStorageContentsCommand(
+                contents.Select(x =>
+                    new SubtractProductFromStorageItem(
+                        x.ProductId,
+                        storageName,
+                        x.Count,
+                        takeFromOtherStorages)),
+                movementType),
+            cancellationToken);
+    }
+
+    private async Task CheckReservations(
+        IEnumerable<SaleContentInput> saleContents,
+        Guid buyerId,
+        string storageName,
+        bool takeFromOtherStorages,
+        string? confirmationCode,
+        CancellationToken cancellationToken)
+    {
+        var contentList = saleContents.ToList();
+        var (byReservation, byStock) = await GetStockReservations(
+            contentList,
+            buyerId,
+            storageName,
+            takeFromOtherStorages,
+            cancellationToken);
+
+        if (byStock.Count != 0)
+            throw new NotEnoughCountOnStorageException(byStock.Keys);
+
+        if (byReservation.Count == 0) return;
+
+        var criteria = Criteria<Product>.New()
+            .Track(false)
+            .Include(x => x.Producer)
+            .Where(x => byReservation.Keys.Contains(x.Id))
+            .Build();
+
+        var products = (await productRepository.ListAsync(criteria, cancellationToken))
+            .ToDictionary(x => x.Id);
+
+        var res = new Dictionary<string, int>();
+        var codeBuilder = new StringBuilder();
+        foreach (var (id, count) in byReservation.OrderBy(x => x.Key))
+        {
+            var art = products[id];
+            var key = $"{art.Producer.Name}_{art.Sku.NormalizedValue}";
+            res[key] = count;
+            codeBuilder.Append(HashUtils.ComputeHash(key, count));
+        }
+
+        var currentCode = codeBuilder.ToString();
+        if (currentCode != confirmationCode)
+            throw new SaleSoftConfirmationNeededException(currentCode, res);
+    }
+
+    private async Task<(Dictionary<int, int> byReservation, Dictionary<int, int> byStock)> GetStockReservations(
+        IEnumerable<SaleContentInput> saleContents,
+        Guid buyerId,
+        string storageName,
+        bool takeFromOtherStorages,
+        CancellationToken cancellationToken = default)
+    {
+        var neededProductCounts = saleContents
+            .GroupBy(x => x.ProductId)
+            .ToDictionary(x => x.Key,
+                x => x.Sum(z => z.Count));
+
+        var result = await sender.Send(
+            new GetProductsWithNotEnoughStockQuery(
+                buyerId,
+                storageName,
+                takeFromOtherStorages,
+                neededProductCounts),
+            cancellationToken);
+
+        return (result.NotEnoughByReservation, result.NotEnoughByStock);
+    }
+
 }

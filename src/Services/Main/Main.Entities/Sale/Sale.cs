@@ -84,6 +84,11 @@ public class Sale : AuditableEntity<Sale, Guid>, ILinqEntity<Sale, Guid>, IVersi
     {
         CurrencyId = currencyId;
     }
+
+    public void SetTransactionId(Guid transactionId)
+    {
+        TransactionId = transactionId;
+    }
     
     public void Complete()
     {

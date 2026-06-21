@@ -7,7 +7,7 @@ using Main.Entities.Exceptions;
 using Main.Entities.Product;
 using Microsoft.EntityFrameworkCore;
 
-namespace Main.Application.Handlers.Products.GetFullProduct;
+namespace Main.Application.Handlers.Products;
 
 public record GetFullProductQuery(int ProductId) : IQuery<GetFullProductResult>;
 

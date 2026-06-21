@@ -7,9 +7,8 @@ using Contracts.Sale;
 using Domain.Extensions;
 using Exceptions;
 using Main.Application.Handlers.Balance.ReverseTransaction;
-using Main.Application.Handlers.StorageContents.RestoreContent;
 using Main.Application.Interfaces.Persistence;
-using Main.Application.Models;
+using Main.Application.Interfaces.Services;
 using Main.Entities.Exceptions;
 using Main.Entities.Sale;
 using Main.Enums;
@@ -25,7 +24,8 @@ public record DeleteSaleCommand(Guid Id, uint RowVersion) : ICommand;
 public class DeleteSaleHandler(
     ISaleRepository repository,
     ISender sender,
-    IIntegrationEventScope integrationEventScope
+    IIntegrationEventScope integrationEventScope,
+    ISaleService saleService
     ) : ICommandHandler<DeleteSaleCommand>
 {
     public async Task<Unit> Handle(DeleteSaleCommand request, CancellationToken cancellationToken)
@@ -43,7 +43,7 @@ public class DeleteSaleHandler(
             new ReverseTransactionCommand(sale.TransactionId, TransactionReversalMode.System),
             cancellationToken);
 
-        await RestoreContents(sale, cancellationToken);
+        await saleService.RestoreContents(sale, StorageMovementType.SaleDeletion, cancellationToken);
 
         integrationEventScope.Add(new SaleDeletedEvent
         {
@@ -53,17 +53,4 @@ public class DeleteSaleHandler(
         return Unit.Value;
     }
 
-    private async Task RestoreContents(
-        Sale sale,
-        CancellationToken cancellationToken)
-    {
-        List<RestoreContentItem> toRestore = sale.Contents
-            .SelectMany(content => content.Details
-                .Select(detail => new RestoreContentItem(detail, content.ProductId)))
-            .ToList();
-
-        await sender.Send(
-            new RestoreContentCommand(toRestore, StorageMovementType.SaleDeletion), 
-            cancellationToken);
-    }
 }
