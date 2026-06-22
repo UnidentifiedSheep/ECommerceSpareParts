@@ -5,6 +5,7 @@ using Domain.Extensions;
 using Domain.Interfaces;
 using Exceptions;
 using Main.Entities.Auth;
+using Main.Entities.Balance;
 using Main.Entities.User.ValueObjects;
 using Main.Enums;
 
@@ -45,6 +46,7 @@ public class User : AuditableEntity<User, Guid>, ILinqEntity<User, Guid>
     public DateTime? LastLoginAt { get; private set; }
     public UserInfo? UserInfo { get; private set; }
     public UserDiscount? Discount { get; private set; }
+    public UserFinancialProfile? FinancialProfile { get; private set; }
     public IReadOnlyList<UserEmail> Emails => _emails;
     public IReadOnlyList<UserPermission> Permissions => _permissions;
     public IReadOnlyList<UserPhone> Phones => _phones;
