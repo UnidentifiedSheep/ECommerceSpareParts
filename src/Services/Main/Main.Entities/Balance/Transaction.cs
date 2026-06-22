@@ -4,7 +4,6 @@ using Domain;
 using Domain.Extensions;
 using Domain.Interfaces;
 using Exceptions;
-using Main.Enums;
 using Main.Enums.Balances;
 
 namespace Main.Entities.Balance;
@@ -56,6 +55,8 @@ public class Transaction : AuditableEntity<Transaction, Guid>, ILinqEntity<Trans
 
     public bool IsReversed => Status.HasFlag(TransactionStatus.Reversed);
     public bool IsReversalApplied => Status.HasFlag(TransactionStatus.ReversedApplied);
+    public bool IsReversalProfileApplied => Status.HasFlag(TransactionStatus.ReversalProfileApplied);
+    public bool IsCompletionProfileApplied => Status.HasFlag(TransactionStatus.CompletionProfileApplied);
     public User.User Receiver { get; private set; } = null!;
     public User.User Sender { get; private set; } = null!;
 
@@ -79,11 +80,11 @@ public class Transaction : AuditableEntity<Transaction, Guid>, ILinqEntity<Trans
         TransactionSourceType sourceType)
     {
         return new Transaction(
-            senderId, 
-            receiverId, 
-            currencyId, 
-            type, 
-            transactionSum, 
+            senderId,
+            receiverId,
+            currencyId,
+            type,
+            transactionSum,
             transactionDatetime,
             sourceType);
     }
@@ -132,64 +133,100 @@ public class Transaction : AuditableEntity<Transaction, Guid>, ILinqEntity<Trans
         ReversedBy = reversedBy;
     }
 
-    public void Apply(UserBalance senderBalance, UserBalance receiverBalance)
+    public void EnsureCanMutate()
+    {
+        if (IsCompleted && IsReversed)
+            throw new InvalidOperationException("Invalid state: both Completed and Reversed");
+
+        if (IsReversed)
+            throw new InvalidOperationException("Transaction is in terminal state");
+    }
+
+    internal void EnsureCanApplyProfile(
+        UserFinancialProfile senderProfile,
+        UserFinancialProfile receiverProfile)
+    {
+        ValidateProfiles(senderProfile, receiverProfile);
+
+        if (IsReversalApplied)
+        {
+            if (IsReversalProfileApplied)
+                throw new InvalidOperationException("Reversal profile already applied");
+
+            return;
+        }
+
+        if (IsCompletionApplied)
+        {
+            if (IsCompletionProfileApplied)
+                throw new InvalidOperationException("Completion profile already applied");
+
+            return;
+        }
+
+        throw new InvalidOperationException("Transaction is not completed");
+    }
+
+    internal void MarkCompletionProfileApplied()
+    {
+        if (!IsCompletionApplied)
+            throw new InvalidOperationException("Completion is not applied");
+        if (IsCompletionProfileApplied)
+            throw new InvalidOperationException("Completion profile already applied");
+
+        Status |= TransactionStatus.CompletionProfileApplied;
+    }
+
+    internal void MarkReversalProfileApplied()
+    {
+        if (!IsReversalApplied)
+            throw new InvalidOperationException("Reversal is not applied");
+        if (IsReversalProfileApplied)
+            throw new InvalidOperationException("Reversal profile already applied");
+
+        Status |= TransactionStatus.ReversalProfileApplied;
+    }
+
+    private void ValidateProfiles(
+        UserFinancialProfile senderProfile,
+        UserFinancialProfile receiverProfile)
+    {
+        if (SenderId != senderProfile.UserId)
+            throw new InvalidOperationException("Sender profile user mismatch");
+        if (ReceiverId != receiverProfile.UserId)
+            throw new InvalidOperationException("Receiver profile user mismatch");
+    }
+
+    public void Apply(
+        UserBalance senderBalance,
+        UserBalance receiverBalance)
     {
         ValidateBalances(senderBalance, receiverBalance);
-        EnsureCanApply();
+
+        if (!IsCompleted && !IsReversed)
+            throw new InvalidOperationException("Nothing to apply");
 
         if (IsReversed)
         {
+            if (!IsCompletionApplied)
+                throw new InvalidOperationException("Cannot reverse before completion is applied");
+            if (IsReversalApplied)
+                throw new InvalidOperationException("Reversed already applied.");
             ApplyReversed(senderBalance, receiverBalance);
-            Status |= TransactionStatus.ReversedApplied;
             return;
         }
 
         if (IsCompleted)
         {
+            if (IsCompletionApplied)
+                throw new InvalidOperationException("Completion already applied.");
             ApplyCompleted(senderBalance, receiverBalance);
-            Status |= TransactionStatus.CompletionApplied;
         }
     }
 
-    public void Apply(
+    private void ValidateBalances(
         UserBalance senderBalance,
-        UserBalance receiverBalance,
-        UserFinancialProfile senderProfile,
-        UserFinancialProfile receiverProfile,
-        decimal amountInBaseCurrency,
-        Guid systemId,
-        bool forceFinancialProfileDebit = false)
-    {
-        ValidateBalances(senderBalance, receiverBalance);
-        ValidateFinancialProfiles(senderProfile, receiverProfile);
-        EnsureCanApply();
-
-        ApplyFinancialProfiles(
-            senderProfile,
-            receiverProfile,
-            amountInBaseCurrency,
-            systemId,
-            forceFinancialProfileDebit);
-        Apply(senderBalance, receiverBalance);
-    }
-
-    private void ApplyFinancialProfiles(
-        UserFinancialProfile senderProfile,
-        UserFinancialProfile receiverProfile,
-        decimal amountInBaseCurrency,
-        Guid systemId,
-        bool forceDebit)
-    {
-        if (SourceType == TransactionSourceType.Manual)
-        {
-            ApplyManualFinancialProfiles(senderProfile, receiverProfile, amountInBaseCurrency, forceDebit);
-            return;
-        }
-
-        ApplySystemSettlementFinancialProfiles(senderProfile, receiverProfile, amountInBaseCurrency, systemId, forceDebit);
-    }
-
-    private void ValidateBalances(UserBalance senderBalance, UserBalance receiverBalance)
+        UserBalance receiverBalance)
     {
         if (senderBalance.CurrencyId != CurrencyId)
             throw new InvalidOperationException("Sender balance currency mismatch");
@@ -201,95 +238,22 @@ public class Transaction : AuditableEntity<Transaction, Guid>, ILinqEntity<Trans
             throw new InvalidOperationException("Receiver balance user mismatch");
     }
 
-    private void ValidateFinancialProfiles(
-        UserFinancialProfile senderProfile,
-        UserFinancialProfile receiverProfile)
-    {
-        if (senderProfile.UserId != SenderId)
-            throw new InvalidOperationException("Sender financial profile user mismatch");
-        if (receiverProfile.UserId != ReceiverId)
-            throw new InvalidOperationException("Receiver financial profile user mismatch");
-    }
-
-    private void EnsureCanApply()
-    {
-        if (!IsCompleted && !IsReversed)
-            throw new InvalidOperationException("Nothing to apply");
-
-        if (IsReversed)
-        {
-            if (!IsCompletionApplied)
-                throw new InvalidOperationException("Cannot reverse before completion is applied");
-            if (IsReversalApplied)
-                throw new InvalidOperationException("Reversed already applied.");
-            return;
-        }
-
-        if (IsCompleted && IsCompletionApplied)
-            throw new InvalidOperationException("Completion already applied.");
-    }
-
-    private void ApplyManualFinancialProfiles(
-        UserFinancialProfile senderProfile,
-        UserFinancialProfile receiverProfile,
-        decimal amountInBaseCurrency,
-        bool forceDebit)
-    {
-        if (IsReversed)
-        {
-            senderProfile.Credit(amountInBaseCurrency);
-            receiverProfile.Debit(amountInBaseCurrency, forceDebit);
-            return;
-        }
-
-        senderProfile.Debit(amountInBaseCurrency, forceDebit);
-        receiverProfile.Credit(amountInBaseCurrency);
-    }
-
-    private void ApplySystemSettlementFinancialProfiles(
-        UserFinancialProfile senderProfile,
-        UserFinancialProfile receiverProfile,
-        decimal amountInBaseCurrency,
-        Guid systemId,
-        bool forceDebit)
-    {
-        var senderIsSystem = SenderId == systemId;
-        var receiverIsSystem = ReceiverId == systemId;
-
-        if (IsReversed)
-        {
-            if (receiverIsSystem)
-                senderProfile.Debit(amountInBaseCurrency, forceDebit);
-            else if (senderIsSystem)
-                receiverProfile.Credit(amountInBaseCurrency);
-            return;
-        }
-
-        if (receiverIsSystem)
-            senderProfile.Credit(amountInBaseCurrency);
-        else if (senderIsSystem)
-            receiverProfile.Debit(amountInBaseCurrency, forceDebit);
-    }
-
-    private void ApplyCompleted(UserBalance sender, UserBalance receiver)
+    private void ApplyCompleted(
+        UserBalance sender,
+        UserBalance receiver)
     {
         sender.IncrementBalance(-Amount);
         receiver.IncrementBalance(Amount);
+        Status |= TransactionStatus.CompletionApplied;
     }
 
-    private void ApplyReversed(UserBalance sender, UserBalance receiver)
+    private void ApplyReversed(
+        UserBalance sender,
+        UserBalance receiver)
     {
         sender.IncrementBalance(Amount);
         receiver.IncrementBalance(-Amount);
-    }
-
-    private void EnsureCanMutate()
-    {
-        if (IsCompleted && IsReversed)
-            throw new InvalidOperationException("Invalid state: both Completed and Reversed");
-
-        if (IsReversed)
-            throw new InvalidOperationException("Transaction is in terminal state");
+        Status |= TransactionStatus.ReversedApplied;
     }
 
     public override Guid GetId()

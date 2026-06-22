@@ -62,18 +62,6 @@ public class CreateSaleHandler(
 
         var totalSum = contents.Sum(x => x.PriceWithDiscount * x.Count);
 
-        var saleTransaction = (await sender.Send(
-            new CreateTransactionCommand(
-                systemId,
-                request.BuyerId,
-                totalSum,
-                request.CurrencyId,
-                request.SaleDateTime,
-                TransactionSourceType.Sale,
-                TransactionCreationMode.System,
-                request.ForcePayment),
-            cancellationToken)).Transaction;
-
         if (request.PayedSum > 0)
             await sender.Send(
                 new CreateTransactionCommand(
@@ -86,6 +74,18 @@ public class CreateSaleHandler(
                     TransactionCreationMode.System,
                     request.ForcePayment),
                 cancellationToken);
+
+        var saleTransaction = (await sender.Send(
+            new CreateTransactionCommand(
+                systemId,
+                request.BuyerId,
+                totalSum,
+                request.CurrencyId,
+                request.SaleDateTime,
+                TransactionSourceType.Sale,
+                TransactionCreationMode.System,
+                request.ForcePayment),
+            cancellationToken)).Transaction;
         
         var sale = Sale.Create(
             request.BuyerId,

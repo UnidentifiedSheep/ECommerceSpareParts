@@ -5,7 +5,6 @@ using Application.Common.Interfaces.Currency;
 using Application.Common.Interfaces.Repositories;
 using Main.Application.Interfaces.Services;
 using Main.Entities.Balance;
-using Main.Enums.Balances;
 using Microsoft.Extensions.Options;
 
 namespace Main.Application.Services;
@@ -15,6 +14,7 @@ public class BalanceService(
     IRepository<UserFinancialProfile, Guid> userFinancialProfileRepository,
     ICurrencyConverter currencyConverter,
     IOptions<SystemOptions> systemOptions,
+    ITransactionFinancialProfileService transactionFinancialProfileService,
     IUnitOfWork unitOfWork) : IBalanceService
 {
     public async Task ChangeSenderReceiverBalancesAsync(
@@ -24,30 +24,30 @@ public class BalanceService(
     {
         var senderProfile = await GetFinancialProfile(transaction.SenderId, cancellationToken);
         var receiverProfile = await GetFinancialProfile(transaction.ReceiverId, cancellationToken);
-        
+
         var senderBalance = await GetUserBalanceAsync(
-            transaction.SenderId, 
-            transaction.CurrencyId, 
+            transaction.SenderId,
+            transaction.CurrencyId,
             cancellationToken);
         var receiverBalance = await GetUserBalanceAsync(
-            transaction.ReceiverId, 
-            transaction.CurrencyId, 
+            transaction.ReceiverId,
+            transaction.CurrencyId,
             cancellationToken);
-        
+
         var amountInBaseCurrency = await currencyConverter
             .ConvertToBaseAsync(
-                transaction.Amount, 
-                transaction.CurrencyId, 
+                transaction.Amount,
+                transaction.CurrencyId,
                 cancellationToken);
 
-        transaction.Apply(
-            senderBalance,
-            receiverBalance,
+        transaction.Apply(senderBalance, receiverBalance);
+        transactionFinancialProfileService.Apply(
+            transaction,
             senderProfile,
             receiverProfile,
             amountInBaseCurrency,
             systemOptions.Value.SystemId,
-            forceFinancialProfileDebit || transaction.IsReversed && transaction.SourceType != TransactionSourceType.Manual);
+            forceFinancialProfileDebit);
     }
 
     private async Task<UserBalance> GetUserBalanceAsync(
@@ -91,7 +91,7 @@ public class BalanceService(
         dbValue = systemOptions.Value.SystemId == userId
             ? UserFinancialProfile.Create(userId, decimal.MinValue)
             : UserFinancialProfile.Create(userId);
-        
+
         await unitOfWork.AddAsync(dbValue, cancellationToken);
         return dbValue;
     }

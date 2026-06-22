@@ -46,6 +46,7 @@ public class ReverseTransactionHandler(
         transaction.Reverse(userContext.UserId);
         await balanceService.ChangeSenderReceiverBalancesAsync(
             transaction,
+            request.Mode == TransactionReversalMode.System,
             cancellationToken: cancellationToken);
         return new ReverseTransactionResult(transaction);
     }

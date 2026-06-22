@@ -3,6 +3,7 @@ using Exceptions;
 using Main.Abstractions.Constants;
 using Main.Application.Dtos.Sale;
 using Main.Application.Handlers.Sales.CreateSale;
+using Main.Entities.Balance;
 using Main.Entities.Event;
 using Main.Entities.Exceptions;
 using Main.Entities.Storage;
@@ -127,6 +128,62 @@ public class CreateSaleTests : IntegrationTest
     }
 
     [Fact]
+    public async Task CreateSale_WithFullPayedSumAndZeroBalanceWithoutForcePayment_CreatesSale()
+    {
+        var buyer = Buyer();
+        var storageContent = StorageContent();
+        var command = CreateCommand(
+            buyer.Id,
+            storageContent.CurrencyId,
+            storageContent.StorageName,
+            [NewContent(storageContent.ProductId, count: 1, price: 1200m, priceWithDiscount: 1200m)],
+            payedSum: 1200m,
+            forcePayment: false);
+
+        await Mediator.Send(command);
+
+        var profile = await Context.Set<UserFinancialProfile>()
+            .AsNoTracking()
+            .SingleAsync(x => x.UserId == buyer.Id);
+        profile.Balance.Should().Be(0m);
+    }
+
+    [Fact]
+    public async Task CreateSale_WithoutPayedSumAndZeroBalanceWithoutForcePayment_Throws()
+    {
+        var buyer = Buyer();
+        var storageContent = StorageContent();
+        var command = CreateCommand(
+            buyer.Id,
+            storageContent.CurrencyId,
+            storageContent.StorageName,
+            [NewContent(storageContent.ProductId, count: 1, price: 1200m, priceWithDiscount: 1200m)],
+            forcePayment: false);
+
+        await Assert.ThrowsAsync<InvalidInputException>(() => Mediator.Send(command));
+    }
+
+    [Fact]
+    public async Task CreateSale_WithFullPayedSumAndZeroBalanceWithForcePayment_CreatesSale()
+    {
+        var buyer = Buyer();
+        var storageContent = StorageContent();
+        var command = CreateCommand(
+            buyer.Id,
+            storageContent.CurrencyId,
+            storageContent.StorageName,
+            [NewContent(storageContent.ProductId, count: 1, price: 1200m, priceWithDiscount: 1200m)],
+            payedSum: 1200m);
+
+        await Mediator.Send(command);
+
+        var profile = await Context.Set<UserFinancialProfile>()
+            .AsNoTracking()
+            .SingleAsync(x => x.UserId == buyer.Id);
+        profile.Balance.Should().Be(0m);
+    }
+
+    [Fact]
     public async Task CreateSale_WithZeroPayedSum_DoesNotCreatePaymentTransaction()
     {
         var buyer = Buyer();
@@ -169,21 +226,6 @@ public class CreateSaleTests : IntegrationTest
             .SingleAsync(x => x.Id == reservation.Id);
         updatedReservation.CurrentCount.Should().Be(2);
         updatedReservation.Status.Should().Be(StorageContentReservationStatus.Done);
-    }
-
-    [Fact]
-    public async Task CreateSale_WithoutEnoughBuyerBalanceAndWithoutForcePayment_Throws()
-    {
-        var buyer = Buyer();
-        var storageContent = StorageContent();
-        var command = CreateCommand(
-            buyer.Id,
-            storageContent.CurrencyId,
-            storageContent.StorageName,
-            [NewContent(storageContent.ProductId, count: 1)],
-            forcePayment: false);
-
-        await Assert.ThrowsAsync<InvalidInputException>(() => Mediator.Send(command));
     }
 
     [Fact]

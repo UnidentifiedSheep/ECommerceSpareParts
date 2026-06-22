@@ -67,6 +67,7 @@ public class CreateSystemTransactionTests : IntegrationTest
         var systemUser = UserContext.SystemUser;
         var currency = CurrencyContext.Currencies[0];
         var amount = 75m;
+        await CreditProfile(user.Id, amount);
 
         var result = await Mediator.Send(new CreateSystemTransactionCommand(
             user.Id,
