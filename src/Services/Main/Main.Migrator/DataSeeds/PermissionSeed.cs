@@ -85,6 +85,9 @@ public class PermissionSeed : ISeed<DContext>
             new Permission(PermissionCodes.BALANCES_TRANSACTION_DELETE, "Права на удаление транзакции"),
             new Permission(PermissionCodes.BALANCES_TRANSACTION_GET_ALL, "Права на получение всех транзакций"),
             new Permission(PermissionCodes.BALANCES_TRANSACTION_GET_ME, "Права на получение своих транзакций"),
+            new Permission(PermissionCodes.BALANCES_FINANCES_UPDATE, "Права на обновление финансов пользователя"),
+            new Permission(PermissionCodes.BALANCES_FINANCES_GET, "Права на получение финансов пользователя"),
+            new Permission(PermissionCodes.BALANCES_FINANCES_GET_ME, "Права на получение своих финансовых данных"),
 
             new Permission(PermissionCodes.CURRENCIES_CREATE, "Права на создание валюты"),
             new Permission(PermissionCodes.CURRENCIES_GET, "Права на получение валют"),

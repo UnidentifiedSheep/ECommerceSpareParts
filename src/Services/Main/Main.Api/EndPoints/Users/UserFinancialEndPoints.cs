@@ -1,9 +1,11 @@
 using System.Text.Json.Serialization;
 using Api.Common.Extensions;
 using Enums;
+using Main.Application.Dtos.Balances;
 using Main.Application.Dtos.Currencies;
 using Main.Application.Dtos.Users;
 using Main.Application.Handlers.Balance;
+using Main.Application.Handlers.Balance.UpdateUserFinancialProfile;
 using Main.Application.Handlers.Users.GetUserDiscount;
 using MediatR;
 
@@ -19,6 +21,18 @@ public record GetUserFinancialInfoResponse
     
     [JsonPropertyName("balances")]
     public required IEnumerable<UserBalanceDto> Balances { get; init; }
+}
+
+public record UpdateUserFinancialInfoRequest
+{
+    [JsonPropertyName("financialProfile")]
+    public required PatchUserFinancialProfileDto FinancialProfile { get; init; }
+}
+
+public record UpdateUserFinancialInfoResponse
+{
+    [JsonPropertyName("financialProfile")]
+    public required UserFinancialProfileDto FinancialProfile { get; init; }
 }
 
 public static class UserFinancialEndPoints
@@ -41,7 +55,31 @@ public static class UserFinancialEndPoints
             .WithDisplayName("Получение финансовой информации пользователя")
             .Produces<GetUserFinancialInfoResponse>()
             .ProducesProblem(StatusCodes.Status404NotFound)
-            .RequireAnyPermission(PermissionCodes.USERS_INFO_GET);
+            .RequireAnyPermission(PermissionCodes.BALANCES_FINANCES_GET);
+        
+        users.MapPatch("/{id:guid}/finances", async (
+                ISender sender, 
+                UpdateUserFinancialInfoRequest request,
+                Guid id, 
+                CancellationToken token) =>
+            {
+                var result = await sender.Send(
+                    new UpdateUserFinancialProfileCommand(
+                        id, 
+                        request.FinancialProfile), 
+                    token);
+                return Results.Ok(new UpdateUserFinancialInfoResponse
+                {
+                    FinancialProfile = result.Profile
+                });
+            })
+            .WithName("UpdateUserFinancialInfo")
+            .WithSummary("Получить информацию по финанцам пользователя")
+            .WithDescription("Получение финансовой информации пользователя")
+            .WithDisplayName("Получение финансовой информации пользователя")
+            .Produces<UpdateUserFinancialInfoResponse>()
+            .ProducesProblem(StatusCodes.Status404NotFound)
+            .RequireAnyPermission(PermissionCodes.BALANCES_FINANCES_UPDATE);
         
         return users;
     }
