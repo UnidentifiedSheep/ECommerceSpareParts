@@ -17,6 +17,8 @@
     "transaction.sender.receiver.must.not.be.same": "Sender and receiver cannot be the same.",
     "transaction.sender.or.receiver.required": "At least one of sender or receiver must be specified.",
     "transaction.range.start.before.end": "Start date cannot be later than end date.",
-    "transaction.range.max.months": "Maximum range is 5 months."
+    "transaction.range.max.months": "Maximum range is 5 months.",
+    "financial.profile.amount.must.not.be.negative": "Amount cannot be negative.",
+    "financial.profile.balance.must.not.be.less.than.minimum": "Balance cannot be less than the minimum allowed balance."
   }
 }

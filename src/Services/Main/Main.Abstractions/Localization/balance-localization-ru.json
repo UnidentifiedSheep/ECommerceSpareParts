@@ -17,6 +17,8 @@
     "transaction.sender.receiver.must.not.be.same": "Отправитель и получатель не могут совпадать.",
     "transaction.sender.or.receiver.required": "Должен быть указан хотя бы отправитель или получатель.",
     "transaction.range.start.before.end": "Дата начала диапазона не может быть позже даты конца.",
-    "transaction.range.max.months": "Максимальный диапазон — 5 месяцев."
+    "transaction.range.max.months": "Максимальный диапазон — 5 месяцев.",
+    "financial.profile.amount.must.not.be.negative": "Сумма не может быть отрицательной.",
+    "financial.profile.balance.must.not.be.less.than.minimum": "Баланс не может быть меньше минимально допустимого."
   }
 }
