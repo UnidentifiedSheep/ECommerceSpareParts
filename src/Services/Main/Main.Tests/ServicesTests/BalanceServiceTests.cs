@@ -61,8 +61,8 @@ public class BalanceServiceTests : IntegrationTest
         senderProfile.Balance.Should().Be(0m);
         receiverProfile.Balance.Should().Be(700m);
 
-        (await GetUserBalance(sender.Id, currency.Id)).Balance.Should().Be(-700m);
-        (await GetUserBalance(receiver.Id, currency.Id)).Balance.Should().Be(700m);
+        (await GetUserBalance(sender.Id, currency.Id)).Balance.Should().Be(700m);
+        (await GetUserBalance(receiver.Id, currency.Id)).Balance.Should().Be(-700m);
     }
 
     [Fact]
@@ -92,8 +92,8 @@ public class BalanceServiceTests : IntegrationTest
         var userProfile = await GetProfile(user.Id);
         userProfile.Balance.Should().Be(550m);
 
-        (await GetUserBalance(user.Id, currency.Id)).Balance.Should().Be(-250m);
-        (await GetUserBalance(systemUser.Id, currency.Id)).Balance.Should().Be(250m);
+        (await GetUserBalance(user.Id, currency.Id)).Balance.Should().Be(250m);
+        (await GetUserBalance(systemUser.Id, currency.Id)).Balance.Should().Be(-250m);
     }
 
     [Fact]
@@ -123,8 +123,8 @@ public class BalanceServiceTests : IntegrationTest
         var userProfile = await GetProfile(user.Id);
         userProfile.Balance.Should().Be(0m);
 
-        (await GetUserBalance(systemUser.Id, currency.Id)).Balance.Should().Be(-250m);
-        (await GetUserBalance(user.Id, currency.Id)).Balance.Should().Be(250m);
+        (await GetUserBalance(systemUser.Id, currency.Id)).Balance.Should().Be(250m);
+        (await GetUserBalance(user.Id, currency.Id)).Balance.Should().Be(-250m);
     }
 
     [Theory]

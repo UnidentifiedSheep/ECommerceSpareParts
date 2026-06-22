@@ -24,6 +24,8 @@ public class User : AuditableEntity<User, Guid>, ILinqEntity<User, Guid>
     private readonly List<UserRole> _roles = [];
 
     private readonly List<UserVehicle> _vehicles = [];
+    
+    private readonly List<UserBalance> _balances = [];
 
     private User()
     {
@@ -53,6 +55,7 @@ public class User : AuditableEntity<User, Guid>, ILinqEntity<User, Guid>
     public IReadOnlyList<UserRole> Roles => _roles;
     public IReadOnlyList<UserVehicle> Vehicles => _vehicles;
     public IReadOnlyList<Cart.Cart> CartItems => _cartItems;
+    public IReadOnlyList<UserBalance> Balances => _balances;
 
     public static Expression<Func<User, Guid>> GetKeySelector()
     {

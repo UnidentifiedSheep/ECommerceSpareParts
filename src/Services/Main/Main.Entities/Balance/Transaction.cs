@@ -242,8 +242,8 @@ public class Transaction : AuditableEntity<Transaction, Guid>, ILinqEntity<Trans
         UserBalance sender,
         UserBalance receiver)
     {
-        sender.IncrementBalance(-Amount);
-        receiver.IncrementBalance(Amount);
+        sender.IncrementBalance(Amount);
+        receiver.IncrementBalance(-Amount);
         Status |= TransactionStatus.CompletionApplied;
     }
 
@@ -251,8 +251,8 @@ public class Transaction : AuditableEntity<Transaction, Guid>, ILinqEntity<Trans
         UserBalance sender,
         UserBalance receiver)
     {
-        sender.IncrementBalance(Amount);
-        receiver.IncrementBalance(-Amount);
+        sender.IncrementBalance(-Amount);
+        receiver.IncrementBalance(Amount);
         Status |= TransactionStatus.ReversedApplied;
     }
 

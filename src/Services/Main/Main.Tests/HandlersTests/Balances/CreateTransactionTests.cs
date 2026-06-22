@@ -61,8 +61,8 @@ public class CreateTransactionTests : IntegrationTest
             .AsNoTracking()
             .FirstAsync(x => x.UserId == receiver.Id && x.CurrencyId == currency.Id);
 
-        senderBalance.Balance.Should().Be(-amount);
-        receiverBalance.Balance.Should().Be(amount);
+        senderBalance.Balance.Should().Be(amount);
+        receiverBalance.Balance.Should().Be(-amount);
     }
 
     [Theory]

@@ -15,22 +15,6 @@ namespace Main.Api.EndPoints.Transactions;
 
 public record CreateTransactionRequest
 {
-    [JsonPropertyName("senderId")]
-    public Guid SenderId { get; init; }
-    [JsonPropertyName("receiverId")]
-    public Guid ReceiverId { get; init; }
-    [JsonPropertyName("amount")]
-    public decimal Amount { get; init; }
-    [JsonPropertyName("currencyId")]
-    public int CurrencyId { get; init; }
-    [JsonPropertyName("transactionDateTime")]
-    public DateTime TransactionDateTime { get; init; }
-    [JsonPropertyName("forcePayment")]
-    public bool ForcePayment { get; init; } = false;
-}
-
-public record CreateSystemTransactionRequest
-{
     [JsonPropertyName("userId")]
     public Guid UserId { get; init; }
     [JsonPropertyName("direction")]
@@ -69,32 +53,6 @@ public static class TransactionEndPoints
                 CreateTransactionRequest request,
                 CancellationToken token) =>
             {
-                var command = new CreateTransactionCommand(
-                    request.SenderId,
-                    request.ReceiverId,
-                    request.Amount,
-                    request.CurrencyId,
-                    request.TransactionDateTime,
-                    TransactionSourceType.Manual,
-                    TransactionCreationMode.User,
-                    request.ForcePayment);
-                await sender.Send(command, token);
-                return Results.Ok();
-            })
-            .WithName("CreateBalanceTransaction")
-            .WithSummary("Создать транзакцию баланса")
-            .WithDescription("Создание транзакции")
-            .WithDisplayName("Создание транзакции")
-            .Accepts<CreateTransactionRequest>(false, "application/json")
-            .Produces(StatusCodes.Status200OK)
-            .ProducesProblem(StatusCodes.Status400BadRequest)
-            .RequireAnyPermission(PermissionCodes.BALANCES_TRANSACTION_CREATE);
-
-        balances.MapPost("system", async (
-                ISender sender,
-                CreateSystemTransactionRequest request,
-                CancellationToken token) =>
-            {
                 await sender.Send(
                     new CreateSystemTransactionCommand(
                         request.UserId,
@@ -111,7 +69,7 @@ public static class TransactionEndPoints
             .WithSummary("Создать системную транзакцию баланса")
             .WithDescription("Создание ручной транзакции между пользователем и системой")
             .WithDisplayName("Создание системной транзакции")
-            .Accepts<CreateSystemTransactionRequest>(false, "application/json")
+            .Accepts<CreateTransactionRequest>(false, "application/json")
             .Produces(StatusCodes.Status200OK)
             .ProducesProblem(StatusCodes.Status400BadRequest)
             .RequireAnyPermission(PermissionCodes.BALANCES_TRANSACTION_CREATE);

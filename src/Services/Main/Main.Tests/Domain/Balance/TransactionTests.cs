@@ -73,8 +73,8 @@ public class TransactionTests
         tx.Complete();
         tx.Apply(sender, receiver);
 
-        sender.Balance.Should().Be(100m);
-        receiver.Balance.Should().Be(100m);
+        sender.Balance.Should().Be(300m);
+        receiver.Balance.Should().Be(-100m);
         tx.IsCompletionApplied.Should().BeTrue();
     }
 
@@ -113,8 +113,8 @@ public class TransactionTests
         tx.Apply(senderBalance, receiverBalance);
         ApplyProfile(tx, senderProfile, receiverProfile, 120m, SystemId);
 
-        senderBalance.Balance.Should().Be(100m);
-        receiverBalance.Balance.Should().Be(100m);
+        senderBalance.Balance.Should().Be(300m);
+        receiverBalance.Balance.Should().Be(-100m);
         senderProfile.Balance.Should().Be(80m);
         receiverProfile.Balance.Should().Be(120m);
         tx.IsCompletionApplied.Should().BeTrue();

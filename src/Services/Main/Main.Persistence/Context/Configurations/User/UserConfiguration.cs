@@ -76,5 +76,9 @@ public class UserConfiguration : IEntityTypeConfiguration<Entities.User.User>
         builder.Navigation(e => e.CartItems)
             .HasField("_cartItems")
             .UsePropertyAccessMode(PropertyAccessMode.Field);
+        
+        builder.Navigation(e => e.Balances)
+            .HasField("_balances")
+            .UsePropertyAccessMode(PropertyAccessMode.Field);
     }
 }

@@ -56,8 +56,8 @@ public class CreateSystemTransactionTests : IntegrationTest
             .AsNoTracking()
             .FirstAsync(x => x.UserId == systemUser.Id && x.CurrencyId == currency.Id);
 
-        userBalance.Balance.Should().Be(-amount);
-        systemBalance.Balance.Should().Be(amount);
+        userBalance.Balance.Should().Be(amount);
+        systemBalance.Balance.Should().Be(-amount);
     }
 
     [Fact]
@@ -93,8 +93,8 @@ public class CreateSystemTransactionTests : IntegrationTest
             .AsNoTracking()
             .FirstAsync(x => x.UserId == systemUser.Id && x.CurrencyId == currency.Id);
 
-        userBalance.Balance.Should().Be(amount);
-        systemBalance.Balance.Should().Be(-amount);
+        userBalance.Balance.Should().Be(-amount);
+        systemBalance.Balance.Should().Be(amount);
     }
 
     private async Task CreditProfile(Guid userId, decimal amount)
