@@ -70,14 +70,15 @@ public class DeletePurchaseHandler(
         CancellationToken token)
     {
         await sender.Send(
-            new ReverseTransactionCommand(purchase.TransactionId, TransactionReversalMode.System),
+            new ReverseTransactionCommand(purchase.TransactionId, TransactionReversalMode.System, true),
             token);
 
         if (purchase.PurchaseLogistic?.TransactionId != null)
             await sender.Send(
                 new ReverseTransactionCommand(
                     purchase.PurchaseLogistic.TransactionId.Value,
-                    TransactionReversalMode.System), 
+                    TransactionReversalMode.System, 
+                    true), 
                 token);
     }
 }

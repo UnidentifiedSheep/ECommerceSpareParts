@@ -15,7 +15,8 @@ namespace Main.Application.Handlers.Balance.ReverseTransaction;
 [Transactional(IsolationLevel.ReadCommitted, 20, 3)]
 public record ReverseTransactionCommand(
     Guid TransactionId,
-    TransactionReversalMode Mode = TransactionReversalMode.User)
+    TransactionReversalMode Mode = TransactionReversalMode.User,
+    bool ForcePayment = false)
     : ICommand<ReverseTransactionResult>;
 
 public record ReverseTransactionResult(Transaction Transaction);
@@ -46,7 +47,7 @@ public class ReverseTransactionHandler(
         transaction.Reverse(userContext.UserId);
         await balanceService.ChangeSenderReceiverBalancesAsync(
             transaction,
-            request.Mode == TransactionReversalMode.System,
+            request.ForcePayment,
             cancellationToken: cancellationToken);
         return new ReverseTransactionResult(transaction);
     }

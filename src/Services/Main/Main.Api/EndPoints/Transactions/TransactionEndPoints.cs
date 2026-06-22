@@ -25,6 +25,8 @@ public record CreateTransactionRequest
     public int CurrencyId { get; init; }
     [JsonPropertyName("transactionDateTime")]
     public DateTime TransactionDateTime { get; init; }
+    [JsonPropertyName("forcePayment")]
+    public bool ForcePayment { get; init; } = false;
 }
 
 public record CreateSystemTransactionRequest
@@ -39,6 +41,9 @@ public record CreateSystemTransactionRequest
     public int CurrencyId { get; init; }
     [JsonPropertyName("transactionDateTime")]
     public DateTime TransactionDateTime { get; init; }
+
+    [JsonPropertyName("forcePayment")] 
+    public bool ForcePayment { get; init; } = false;
 }
 
 public record GetTransactionsResponse(IReadOnlyList<TransactionDto> Transactions);
@@ -70,7 +75,9 @@ public static class TransactionEndPoints
                     request.Amount,
                     request.CurrencyId,
                     request.TransactionDateTime,
-                    TransactionSourceType.Manual);
+                    TransactionSourceType.Manual,
+                    TransactionCreationMode.User,
+                    request.ForcePayment);
                 await sender.Send(command, token);
                 return Results.Ok();
             })
@@ -94,7 +101,8 @@ public static class TransactionEndPoints
                         request.Amount,
                         request.CurrencyId,
                         request.TransactionDateTime,
-                        request.Direction),
+                        request.Direction,
+                        request.ForcePayment),
                     token);
 
                 return Results.Ok();
@@ -111,9 +119,13 @@ public static class TransactionEndPoints
         balances.MapDelete("{id:guid}", async (
                 ISender sender,
                 Guid id,
+                [FromQuery] bool forcePayment,
                 CancellationToken token) =>
             {
-                await sender.Send(new ReverseTransactionCommand(id), token);
+                await sender.Send(new ReverseTransactionCommand(
+                    id, 
+                    TransactionReversalMode.User, 
+                    forcePayment), token);
                 return Results.Ok();
             })
             .WithName("DeleteBalanceTransaction")

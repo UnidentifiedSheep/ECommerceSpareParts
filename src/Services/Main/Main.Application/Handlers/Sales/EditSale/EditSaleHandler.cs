@@ -100,7 +100,8 @@ public class EditSaleHandler(
         await sender.Send(
             new ReverseTransactionCommand(
                 sale.TransactionId,
-                TransactionReversalMode.System),
+                TransactionReversalMode.System, 
+                true),
             cancellationToken);
     }
 
