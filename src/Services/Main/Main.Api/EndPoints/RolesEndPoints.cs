@@ -3,7 +3,7 @@ using Api.Common.Models.Requests;
 using Carter;
 using Enums;
 using Main.Application.Dtos.Auth;
-using Main.Application.Handlers.Auth.AddPermissionToRole;
+using Main.Application.Handlers.Auth;
 using Main.Application.Handlers.Auth.GetRoles;
 using Main.Application.Handlers.Auth.UpsertRole;
 using MediatR;

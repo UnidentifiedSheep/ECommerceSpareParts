@@ -2,7 +2,7 @@ using Application.Common.Interfaces.Cqrs;
 using Attributes;
 using MediatR;
 
-namespace Main.Application.Handlers.Auth.ConfirmMail;
+namespace Main.Application.Handlers.Auth;
 
 [Transactional]
 public record ConfirmMailCommand(string UserId, string ConfirmationToken) : ICommand;

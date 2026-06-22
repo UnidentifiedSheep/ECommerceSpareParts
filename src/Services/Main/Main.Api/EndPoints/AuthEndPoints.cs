@@ -1,11 +1,9 @@
 using Abstractions.Interfaces;
 using Carter;
+using Main.Application.Handlers.Auth;
 using Main.Application.Handlers.Auth.ChangePassword;
-using Main.Application.Handlers.Auth.ConfirmMail;
-using Main.Application.Handlers.Auth.Login;
 using Main.Application.Handlers.Auth.PasswordRecovery.ResetPassword;
 using Main.Application.Handlers.Auth.PasswordRecovery.SendEmailRecovery;
-using Main.Application.Handlers.Auth.RefreshToken;
 using Main.Application.Handlers.Auth.Register;
 using Mapster;
 using MediatR;

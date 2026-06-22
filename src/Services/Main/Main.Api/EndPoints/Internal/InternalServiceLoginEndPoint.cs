@@ -1,6 +1,6 @@
 ﻿using System.Text.Json.Serialization;
 using Carter;
-using Main.Application.Handlers.Auth.InternalServiceLogin;
+using Main.Application.Handlers.Auth;
 using MediatR;
 
 namespace Main.Api.EndPoints.Internal;

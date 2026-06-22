@@ -120,7 +120,7 @@ public class LocalizationTests
         return (IValidator)Activator.CreateInstance(type, args)!;
     }
 
-    private async Task<IScopedStringLocalizer> CreateLocalizer(string path, Locale locale)
+    public async Task<IScopedStringLocalizer> CreateLocalizer(string path, Locale locale)
     {
         var jsonLoader = new JsonLocalizerContainerLoader(path);
         var container = new LocalizerContainer(locale);

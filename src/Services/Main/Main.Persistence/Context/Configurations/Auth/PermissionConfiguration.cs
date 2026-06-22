@@ -15,8 +15,5 @@ public class PermissionConfiguration : IEntityTypeConfiguration<Permission>
 
         builder.Property(e => e.Name)
             .HasColumnName("name");
-
-        builder.Property(e => e.Description)
-            .HasColumnName("description");
     }
 }

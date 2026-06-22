@@ -3,7 +3,7 @@ using Api.Common.Models.Requests;
 using Carter;
 using Enums;
 using Main.Application.Dtos.Auth;
-using Main.Application.Handlers.Auth.GetPermission;
+using Main.Application.Handlers.Auth.GetPermissions;
 using MediatR;
 
 namespace Main.Api.EndPoints;
@@ -16,10 +16,9 @@ public class GetPermissionsEndPoint : ICarterModule
     {
         app.MapGet("/permissions/", async (
                 ISender sender,
-                [AsParameters] PaginationQueryModel queryParams,
                 CancellationToken ct) =>
             {
-                var query = new GetPermissionsQuery(queryParams);
+                var query = new GetPermissionsQuery();
                 var result = await sender.Send(query, ct);
                 var response = new GetPermissionsResponse(result.Permissions);
                 return Results.Ok(response);

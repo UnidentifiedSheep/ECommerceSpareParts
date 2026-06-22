@@ -11,7 +11,7 @@ using Main.Entities.Exceptions;
 using Main.Entities.User;
 using Main.Entities.User.ValueObjects;
 
-namespace Main.Application.Handlers.Auth.InternalServiceLogin;
+namespace Main.Application.Handlers.Auth;
 
 [Diagnostics(maxExecutionTimeMs: 80)]
 public record InternalServiceLoginCommand(string Service, string ServiceSecret) : ICommand<InternalServiceLoginResult>;

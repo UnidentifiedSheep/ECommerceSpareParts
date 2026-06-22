@@ -14,7 +14,7 @@ using Main.Entities.Exceptions;
 using Main.Entities.User;
 using Main.Enums;
 
-namespace Main.Application.Handlers.Auth.Login;
+namespace Main.Application.Handlers.Auth;
 
 [Diagnostics(maxExecutionTimeMs: 500)]
 [Transactional, AutoSave]

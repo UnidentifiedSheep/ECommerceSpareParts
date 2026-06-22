@@ -9,20 +9,20 @@ namespace Main.Entities.Auth;
 
 public class Permission : AuditableEntity<Permission, string>, ILinqEntity<Permission, string>
 {
+    private const string Prefix = "permissions.";
+    private const string NamePostfix = ".name";
+    private const string DescriptionPostfix = ".description";
     private Permission()
     {
     }
 
-    public Permission(PermissionCodes name, string? description = null)
+    public Permission(PermissionCodes name)
     {
         Name = ToNormalizedPermission(name);
-        Description = description;
     }
 
     [Validate]
     public string Name { get; } = null!;
-
-    public string? Description { get; private set; }
 
     public static Expression<Func<Permission, string>> GetKeySelector()
     {
@@ -43,4 +43,10 @@ public class Permission : AuditableEntity<Permission, string>, ILinqEntity<Permi
     {
         return permission.ToString().ToNormalizedPermission();
     }
+    
+    public static string GetLocalizationNameKey(PermissionCodes permission)
+        => Prefix + ToNormalizedPermission(permission).ToLowerInvariant() + NamePostfix;
+    
+    public static string GetLocalizationDescriptionKey(PermissionCodes permission)
+        => Prefix + ToNormalizedPermission(permission).ToLowerInvariant() + DescriptionPostfix;
 }

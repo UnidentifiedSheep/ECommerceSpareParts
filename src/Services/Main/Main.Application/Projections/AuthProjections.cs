@@ -7,13 +7,6 @@ namespace Main.Application.Projections;
 
 public static class AuthProjections
 {
-    public static readonly Expression<Func<Permission, PermissionDto>> ToPermissionDto =
-        x => new PermissionDto
-        {
-            Name = x.Name,
-            Description = x.Description
-        };
-
     public static Expression<Func<Role, RoleDto>> ToRoleDto(IScopedStringLocalizer localizer) =>
         x => new RoleDto
         {

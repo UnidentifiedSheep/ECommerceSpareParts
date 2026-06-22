@@ -7,7 +7,7 @@ using Main.Entities.Auth;
 using Main.Entities.Exceptions;
 using MediatR;
 
-namespace Main.Application.Handlers.Auth.AddPermissionToRole;
+namespace Main.Application.Handlers.Auth;
 
 [Transactional]
 [AutoSave]
