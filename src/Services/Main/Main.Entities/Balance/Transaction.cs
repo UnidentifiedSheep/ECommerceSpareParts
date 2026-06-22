@@ -4,7 +4,6 @@ using Domain;
 using Domain.Extensions;
 using Domain.Interfaces;
 using Exceptions;
-using Main.Enums;
 using Main.Enums.Balances;
 
 namespace Main.Entities.Balance;
@@ -56,6 +55,8 @@ public class Transaction : AuditableEntity<Transaction, Guid>, ILinqEntity<Trans
 
     public bool IsReversed => Status.HasFlag(TransactionStatus.Reversed);
     public bool IsReversalApplied => Status.HasFlag(TransactionStatus.ReversedApplied);
+    public bool IsReversalProfileApplied => Status.HasFlag(TransactionStatus.ReversalProfileApplied);
+    public bool IsCompletionProfileApplied => Status.HasFlag(TransactionStatus.CompletionProfileApplied);
     public User.User Receiver { get; private set; } = null!;
     public User.User Sender { get; private set; } = null!;
 
@@ -79,11 +80,11 @@ public class Transaction : AuditableEntity<Transaction, Guid>, ILinqEntity<Trans
         TransactionSourceType sourceType)
     {
         return new Transaction(
-            senderId, 
-            receiverId, 
-            currencyId, 
-            type, 
-            transactionSum, 
+            senderId,
+            receiverId,
+            currencyId,
+            type,
+            transactionSum,
             transactionDatetime,
             sourceType);
     }
@@ -132,7 +133,73 @@ public class Transaction : AuditableEntity<Transaction, Guid>, ILinqEntity<Trans
         ReversedBy = reversedBy;
     }
 
-    public void Apply(UserBalance senderBalance, UserBalance receiverBalance)
+    public void EnsureCanMutate()
+    {
+        if (IsCompleted && IsReversed)
+            throw new InvalidOperationException("Invalid state: both Completed and Reversed");
+
+        if (IsReversed)
+            throw new InvalidOperationException("Transaction is in terminal state");
+    }
+
+    internal void EnsureCanApplyProfile(
+        UserFinancialProfile senderProfile,
+        UserFinancialProfile receiverProfile)
+    {
+        ValidateProfiles(senderProfile, receiverProfile);
+
+        if (IsReversalApplied)
+        {
+            if (IsReversalProfileApplied)
+                throw new InvalidOperationException("Reversal profile already applied");
+
+            return;
+        }
+
+        if (IsCompletionApplied)
+        {
+            if (IsCompletionProfileApplied)
+                throw new InvalidOperationException("Completion profile already applied");
+
+            return;
+        }
+
+        throw new InvalidOperationException("Transaction is not completed");
+    }
+
+    internal void MarkCompletionProfileApplied()
+    {
+        if (!IsCompletionApplied)
+            throw new InvalidOperationException("Completion is not applied");
+        if (IsCompletionProfileApplied)
+            throw new InvalidOperationException("Completion profile already applied");
+
+        Status |= TransactionStatus.CompletionProfileApplied;
+    }
+
+    internal void MarkReversalProfileApplied()
+    {
+        if (!IsReversalApplied)
+            throw new InvalidOperationException("Reversal is not applied");
+        if (IsReversalProfileApplied)
+            throw new InvalidOperationException("Reversal profile already applied");
+
+        Status |= TransactionStatus.ReversalProfileApplied;
+    }
+
+    private void ValidateProfiles(
+        UserFinancialProfile senderProfile,
+        UserFinancialProfile receiverProfile)
+    {
+        if (SenderId != senderProfile.UserId)
+            throw new InvalidOperationException("Sender profile user mismatch");
+        if (ReceiverId != receiverProfile.UserId)
+            throw new InvalidOperationException("Receiver profile user mismatch");
+    }
+
+    public void Apply(
+        UserBalance senderBalance,
+        UserBalance receiverBalance)
     {
         ValidateBalances(senderBalance, receiverBalance);
 
@@ -146,7 +213,6 @@ public class Transaction : AuditableEntity<Transaction, Guid>, ILinqEntity<Trans
             if (IsReversalApplied)
                 throw new InvalidOperationException("Reversed already applied.");
             ApplyReversed(senderBalance, receiverBalance);
-            Status |= TransactionStatus.ReversedApplied;
             return;
         }
 
@@ -155,11 +221,12 @@ public class Transaction : AuditableEntity<Transaction, Guid>, ILinqEntity<Trans
             if (IsCompletionApplied)
                 throw new InvalidOperationException("Completion already applied.");
             ApplyCompleted(senderBalance, receiverBalance);
-            Status |= TransactionStatus.CompletionApplied;
         }
     }
 
-    private void ValidateBalances(UserBalance senderBalance, UserBalance receiverBalance)
+    private void ValidateBalances(
+        UserBalance senderBalance,
+        UserBalance receiverBalance)
     {
         if (senderBalance.CurrencyId != CurrencyId)
             throw new InvalidOperationException("Sender balance currency mismatch");
@@ -171,25 +238,22 @@ public class Transaction : AuditableEntity<Transaction, Guid>, ILinqEntity<Trans
             throw new InvalidOperationException("Receiver balance user mismatch");
     }
 
-    private void ApplyCompleted(UserBalance sender, UserBalance receiver)
-    {
-        sender.IncrementBalance(-Amount);
-        receiver.IncrementBalance(Amount);
-    }
-
-    private void ApplyReversed(UserBalance sender, UserBalance receiver)
+    private void ApplyCompleted(
+        UserBalance sender,
+        UserBalance receiver)
     {
         sender.IncrementBalance(Amount);
         receiver.IncrementBalance(-Amount);
+        Status |= TransactionStatus.CompletionApplied;
     }
 
-    private void EnsureCanMutate()
+    private void ApplyReversed(
+        UserBalance sender,
+        UserBalance receiver)
     {
-        if (IsCompleted && IsReversed)
-            throw new InvalidOperationException("Invalid state: both Completed and Reversed");
-
-        if (IsReversed)
-            throw new InvalidOperationException("Transaction is in terminal state");
+        sender.IncrementBalance(-Amount);
+        receiver.IncrementBalance(Amount);
+        Status |= TransactionStatus.ReversedApplied;
     }
 
     public override Guid GetId()

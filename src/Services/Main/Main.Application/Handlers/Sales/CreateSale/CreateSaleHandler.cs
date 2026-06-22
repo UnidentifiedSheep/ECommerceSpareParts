@@ -23,7 +23,7 @@ using Microsoft.Extensions.Options;
 
 namespace Main.Application.Handlers.Sales.CreateSale;
 
-[Transactional(IsolationLevel.Serializable, 30, 2)]
+[Transactional(IsolationLevel.ReadCommitted, 30, 2)]
 [AutoSave]
 public record CreateSaleCommand(
     Guid BuyerId,
@@ -33,7 +33,8 @@ public record CreateSaleCommand(
     IEnumerable<NewSaleContentDto> Contents,
     string? Comment,
     decimal? PayedSum,
-    string? ConfirmationCode) : ICommand<CreateSaleResult>;
+    string? ConfirmationCode,
+    bool ForcePayment = false) : ICommand<CreateSaleResult>;
 
 public record CreateSaleResult(SaleDto Sale);
 
@@ -61,17 +62,6 @@ public class CreateSaleHandler(
 
         var totalSum = contents.Sum(x => x.PriceWithDiscount * x.Count);
 
-        var saleTransaction = (await sender.Send(
-            new CreateTransactionCommand(
-                systemId,
-                request.BuyerId,
-                totalSum,
-                request.CurrencyId,
-                request.SaleDateTime,
-                TransactionSourceType.Sale,
-                TransactionCreationMode.System),
-            cancellationToken)).Transaction;
-
         if (request.PayedSum > 0)
             await sender.Send(
                 new CreateTransactionCommand(
@@ -81,8 +71,21 @@ public class CreateSaleHandler(
                     request.CurrencyId,
                     request.SaleDateTime,
                     TransactionSourceType.Manual,
-                    TransactionCreationMode.System),
+                    TransactionCreationMode.System,
+                    request.ForcePayment),
                 cancellationToken);
+
+        var saleTransaction = (await sender.Send(
+            new CreateTransactionCommand(
+                systemId,
+                request.BuyerId,
+                totalSum,
+                request.CurrencyId,
+                request.SaleDateTime,
+                TransactionSourceType.Sale,
+                TransactionCreationMode.System,
+                request.ForcePayment),
+            cancellationToken)).Transaction;
         
         var sale = Sale.Create(
             request.BuyerId,

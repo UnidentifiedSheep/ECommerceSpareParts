@@ -21,6 +21,7 @@ using Main.Application.Services.Currency;
 using Main.Application.Services.Logistics;
 using Main.Application.Services.Logistics.PricingStrategies;
 using Main.Application.Services.Storage;
+using Main.Entities.Balance;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using ZiggyCreatures.Caching.Fusion;
@@ -59,6 +60,7 @@ public static class ServiceProvider
         collection.AddScoped<IStorageContentChangeNotifier, StorageContentChangeNotifier>();
 
         collection.AddScoped<IMailingService, MailingService>();
+        collection.AddScoped<ITransactionFinancialProfileService, TransactionFinancialProfileService>();
         collection.AddScoped<IBalanceService, BalanceService>();
         collection.AddScoped<IPurchaseLogisticsService, PurchaseLogisticsService>();
         collection.AddScoped<ISaleService, SaleService>();

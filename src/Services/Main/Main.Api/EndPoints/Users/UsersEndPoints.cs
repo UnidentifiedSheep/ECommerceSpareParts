@@ -55,6 +55,7 @@ public class UsersEndPoints : ICarterModule
 
         users.MapUserInfoEndPoints();
         users.MapUserStorageEndPoints();
+        users.MapUserFinancialEndPoints();
 
         users.MapPost("/{userId:guid}/permissions/", async (
                 ISender sender,

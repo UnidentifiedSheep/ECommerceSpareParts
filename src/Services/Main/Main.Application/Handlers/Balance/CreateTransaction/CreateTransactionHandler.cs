@@ -15,7 +15,7 @@ using Main.Enums.Balances;
 namespace Main.Application.Handlers.Balance.CreateTransaction;
 
 [AutoSave]
-[Transactional(IsolationLevel.Serializable, 20, 3)]
+[Transactional(IsolationLevel.ReadCommitted, 20, 3)]
 public record CreateTransactionCommand(
     Guid SenderId,
     Guid ReceiverId,
@@ -23,7 +23,8 @@ public record CreateTransactionCommand(
     int CurrencyId,
     DateTime TransactionDateTime,
     TransactionSourceType SourceType,
-    TransactionCreationMode Mode = TransactionCreationMode.User) : ICommand<CreateTransactionResult>;
+    TransactionCreationMode Mode = TransactionCreationMode.User,
+    bool ForcePayment = false) : ICommand<CreateTransactionResult>;
 
 public record CreateTransactionResult(Transaction Transaction);
 
@@ -49,7 +50,10 @@ public class CreateTransactionHandler(
             request.SourceType);
 
         transaction.Complete();
-        await balanceService.ChangeSenderReceiverBalancesAsync(transaction, cancellationToken);
+        await balanceService.ChangeSenderReceiverBalancesAsync(
+            transaction,
+            request.ForcePayment,
+            cancellationToken);
 
         await unitOfWork.AddAsync(transaction, cancellationToken);
         return new CreateTransactionResult(transaction);

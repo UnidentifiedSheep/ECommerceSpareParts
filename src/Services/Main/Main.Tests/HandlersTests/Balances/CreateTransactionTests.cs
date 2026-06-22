@@ -1,6 +1,7 @@
 using FluentAssertions;
 using Main.Abstractions.Constants;
 using Main.Application.Handlers.Balance.CreateTransaction;
+using Main.Entities.Balance;
 using Main.Entities.Exceptions;
 using Main.Enums.Balances;
 using Microsoft.EntityFrameworkCore;
@@ -31,6 +32,8 @@ public class CreateTransactionTests : IntegrationTest
         var amount = 125.50m;
         var transactionDateTime = DateTime.UtcNow;
 
+        await CreditProfile(sender.Id, amount);
+
         var result = await Mediator.Send(new CreateTransactionCommand(
             sender.Id,
             receiver.Id,
@@ -58,8 +61,8 @@ public class CreateTransactionTests : IntegrationTest
             .AsNoTracking()
             .FirstAsync(x => x.UserId == receiver.Id && x.CurrencyId == currency.Id);
 
-        senderBalance.Balance.Should().Be(-amount);
-        receiverBalance.Balance.Should().Be(amount);
+        senderBalance.Balance.Should().Be(amount);
+        receiverBalance.Balance.Should().Be(-amount);
     }
 
     [Theory]
@@ -145,6 +148,8 @@ public class CreateTransactionTests : IntegrationTest
             Mode = TransactionCreationMode.System
         };
 
+        await CreditProfile(command.SenderId, command.Amount);
+
         var result = await Mediator.Send(command);
 
         var transaction = await Context.Transactions
@@ -168,5 +173,14 @@ public class CreateTransactionTests : IntegrationTest
             currency.Id,
             DateTime.UtcNow,
             TransactionSourceType.Manual);
+    }
+
+    private async Task CreditProfile(Guid userId, decimal amount)
+    {
+        var profile = UserFinancialProfile.Create(userId);
+        profile.Credit(amount);
+
+        await Context.AddAsync(profile);
+        await Context.SaveChangesAsync();
     }
 }

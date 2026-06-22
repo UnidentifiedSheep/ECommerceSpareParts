@@ -40,7 +40,7 @@ public class DeleteSaleHandler(
         sale.Delete();
 
         await sender.Send(
-            new ReverseTransactionCommand(sale.TransactionId, TransactionReversalMode.System),
+            new ReverseTransactionCommand(sale.TransactionId, TransactionReversalMode.System, true),
             cancellationToken);
 
         await saleService.RestoreContents(sale, StorageMovementType.SaleDeletion, cancellationToken);

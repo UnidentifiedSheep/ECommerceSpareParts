@@ -8,6 +8,10 @@ namespace Tests.Domain.Balance;
 
 public class TransactionTests
 {
+    private static readonly Guid SystemId = Guid.NewGuid();
+    private static readonly ITransactionFinancialProfileService FinancialProfileService =
+        new TransactionFinancialProfileService();
+
     [Fact]
     public void Create_ValidData_Succeeds()
     {
@@ -69,8 +73,8 @@ public class TransactionTests
         tx.Complete();
         tx.Apply(sender, receiver);
 
-        sender.Balance.Should().Be(100m);
-        receiver.Balance.Should().Be(100m);
+        sender.Balance.Should().Be(300m);
+        receiver.Balance.Should().Be(-100m);
         tx.IsCompletionApplied.Should().BeTrue();
     }
 
@@ -92,6 +96,166 @@ public class TransactionTests
 
         sender.Balance.Should().Be(200m);
         receiver.Balance.Should().Be(0m);
+    }
+
+    [Fact]
+    public void ApplyProfile_CompletionApplied_UsesBaseAmountForProfiles()
+    {
+        var tx = Create();
+        var senderBalance = UserBalance.Create(tx.SenderId, tx.CurrencyId);
+        var receiverBalance = UserBalance.Create(tx.ReceiverId, tx.CurrencyId);
+        var senderProfile = UserFinancialProfile.Create(tx.SenderId);
+        var receiverProfile = UserFinancialProfile.Create(tx.ReceiverId);
+        senderBalance.IncrementBalance(200m);
+        senderProfile.Credit(200m);
+
+        tx.Complete();
+        tx.Apply(senderBalance, receiverBalance);
+        ApplyProfile(tx, senderProfile, receiverProfile, 120m, SystemId);
+
+        senderBalance.Balance.Should().Be(300m);
+        receiverBalance.Balance.Should().Be(-100m);
+        senderProfile.Balance.Should().Be(80m);
+        receiverProfile.Balance.Should().Be(120m);
+        tx.IsCompletionApplied.Should().BeTrue();
+        tx.IsCompletionProfileApplied.Should().BeTrue();
+    }
+
+    [Fact]
+    public void ApplyProfile_ReversalAfterCompletionProfileApplied_RollsBackProfile()
+    {
+        var tx = Create();
+        var senderBalance = UserBalance.Create(tx.SenderId, tx.CurrencyId);
+        var receiverBalance = UserBalance.Create(tx.ReceiverId, tx.CurrencyId);
+        var senderProfile = UserFinancialProfile.Create(tx.SenderId);
+        var receiverProfile = UserFinancialProfile.Create(tx.ReceiverId);
+        senderBalance.IncrementBalance(200m);
+        senderProfile.Credit(200m);
+
+        tx.Complete();
+        tx.Apply(senderBalance, receiverBalance);
+        ApplyProfile(tx, senderProfile, receiverProfile, 120m, SystemId);
+        tx.Reverse(Guid.NewGuid());
+        tx.Apply(senderBalance, receiverBalance);
+        ApplyProfile(tx, senderProfile, receiverProfile, 120m, SystemId);
+
+        senderProfile.Balance.Should().Be(200m);
+        receiverProfile.Balance.Should().Be(0m);
+        tx.IsReversalProfileApplied.Should().BeTrue();
+    }
+
+    [Fact]
+    public void ApplyProfile_SenderProfileMismatch_Throws()
+    {
+        var tx = Create();
+        var senderBalance = UserBalance.Create(tx.SenderId, tx.CurrencyId);
+        var receiverBalance = UserBalance.Create(tx.ReceiverId, tx.CurrencyId);
+        var senderProfile = UserFinancialProfile.Create(Guid.NewGuid());
+        var receiverProfile = UserFinancialProfile.Create(tx.ReceiverId);
+
+        tx.Complete();
+        tx.Apply(senderBalance, receiverBalance);
+
+        var act = () => ApplyProfile(tx, senderProfile, receiverProfile, 100m, SystemId);
+
+        act.Should().Throw<InvalidOperationException>()
+            .WithMessage("Sender profile user mismatch");
+    }
+
+    [Fact]
+    public void ApplyProfile_CompletionProfileAppliedTwice_Throws()
+    {
+        var tx = Create();
+        var senderBalance = UserBalance.Create(tx.SenderId, tx.CurrencyId);
+        var receiverBalance = UserBalance.Create(tx.ReceiverId, tx.CurrencyId);
+        var senderProfile = UserFinancialProfile.Create(tx.SenderId);
+        var receiverProfile = UserFinancialProfile.Create(tx.ReceiverId);
+        senderProfile.Credit(200m);
+
+        tx.Complete();
+        tx.Apply(senderBalance, receiverBalance);
+        ApplyProfile(tx, senderProfile, receiverProfile, 100m, SystemId);
+
+        var act = () => ApplyProfile(tx, senderProfile, receiverProfile, 100m, SystemId);
+
+        act.Should().Throw<InvalidOperationException>()
+            .WithMessage("Completion profile already applied");
+    }
+
+    [Theory]
+    [InlineData(TransactionSourceType.Purchase)]
+    [InlineData(TransactionSourceType.Logistic)]
+    public void ApplyProfile_SystemOwesUser_CreditsSenderProfile(TransactionSourceType sourceType)
+    {
+        var senderId = Guid.NewGuid();
+        var tx = Create(senderId, SystemId, sourceType);
+        var senderBalance = UserBalance.Create(tx.SenderId, tx.CurrencyId);
+        var receiverBalance = UserBalance.Create(tx.ReceiverId, tx.CurrencyId);
+        var senderProfile = UserFinancialProfile.Create(tx.SenderId);
+        var receiverProfile = UserFinancialProfile.Create(tx.ReceiverId, decimal.MinValue);
+
+        tx.Complete();
+        tx.Apply(senderBalance, receiverBalance);
+        ApplyProfile(tx, senderProfile, receiverProfile, 100m, SystemId);
+
+        senderProfile.Balance.Should().Be(100m);
+        receiverProfile.Balance.Should().Be(0m);
+    }
+
+    [Fact]
+    public void ApplyProfile_Sale_DebitsBuyerProfile()
+    {
+        var buyerId = Guid.NewGuid();
+        var tx = Create(SystemId, buyerId, TransactionSourceType.Sale);
+        var senderBalance = UserBalance.Create(tx.SenderId, tx.CurrencyId);
+        var receiverBalance = UserBalance.Create(tx.ReceiverId, tx.CurrencyId);
+        var senderProfile = UserFinancialProfile.Create(tx.SenderId, decimal.MinValue);
+        var receiverProfile = UserFinancialProfile.Create(tx.ReceiverId);
+        receiverProfile.Credit(100m);
+
+        tx.Complete();
+        tx.Apply(senderBalance, receiverBalance);
+        ApplyProfile(tx, senderProfile, receiverProfile, 100m, SystemId);
+
+        senderProfile.Balance.Should().Be(0m);
+        receiverProfile.Balance.Should().Be(0m);
+    }
+
+    [Fact]
+    public void ApplyProfile_ManualUserToSystem_CreditsUserProfile()
+    {
+        var senderId = Guid.NewGuid();
+        var tx = Create(senderId, SystemId, TransactionSourceType.Manual);
+        var senderBalance = UserBalance.Create(tx.SenderId, tx.CurrencyId);
+        var receiverBalance = UserBalance.Create(tx.ReceiverId, tx.CurrencyId);
+        var senderProfile = UserFinancialProfile.Create(tx.SenderId);
+        var receiverProfile = UserFinancialProfile.Create(tx.ReceiverId, decimal.MinValue);
+
+        tx.Complete();
+        tx.Apply(senderBalance, receiverBalance);
+        ApplyProfile(tx, senderProfile, receiverProfile, 100m, SystemId);
+
+        senderProfile.Balance.Should().Be(100m);
+        receiverProfile.Balance.Should().Be(0m);
+    }
+
+    [Fact]
+    public void ApplyProfile_ManualSystemToUser_DebitsUserProfile()
+    {
+        var receiverId = Guid.NewGuid();
+        var tx = Create(SystemId, receiverId, TransactionSourceType.Manual);
+        var senderBalance = UserBalance.Create(tx.SenderId, tx.CurrencyId);
+        var receiverBalance = UserBalance.Create(tx.ReceiverId, tx.CurrencyId);
+        var senderProfile = UserFinancialProfile.Create(tx.SenderId, decimal.MinValue);
+        var receiverProfile = UserFinancialProfile.Create(tx.ReceiverId);
+        receiverProfile.Credit(100m);
+
+        tx.Complete();
+        tx.Apply(senderBalance, receiverBalance);
+        ApplyProfile(tx, senderProfile, receiverProfile, 100m, SystemId);
+
+        senderProfile.Balance.Should().Be(0m);
+        receiverProfile.Balance.Should().Be(0m);
     }
 
     [Fact]
@@ -242,15 +406,35 @@ public class TransactionTests
         act.Should().Throw<InvalidOperationException>();
     }
 
-    private static Transaction Create()
+    private static Transaction Create(
+        Guid? senderId = null,
+        Guid? receiverId = null,
+        TransactionSourceType sourceType = TransactionSourceType.Manual)
     {
         return Transaction.Create(
-            Guid.NewGuid(),
-            Guid.NewGuid(),
+            senderId ?? Guid.NewGuid(),
+            receiverId ?? Guid.NewGuid(),
             1,
             TransactionType.Transfer,
             100m,
             DateTime.UtcNow,
-            TransactionSourceType.Manual);
+            sourceType);
+    }
+
+    private static void ApplyProfile(
+        Transaction transaction,
+        UserFinancialProfile senderProfile,
+        UserFinancialProfile receiverProfile,
+        decimal amountInBaseCurrency,
+        Guid systemId,
+        bool forceDebit = false)
+    {
+        FinancialProfileService.Apply(
+            transaction,
+            senderProfile,
+            receiverProfile,
+            amountInBaseCurrency,
+            systemId,
+            forceDebit);
     }
 }

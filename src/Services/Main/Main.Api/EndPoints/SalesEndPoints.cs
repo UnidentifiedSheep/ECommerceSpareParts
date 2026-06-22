@@ -42,6 +42,9 @@ public record CreateSaleRequest
     
     [JsonPropertyName("confirmationCode")]
     public string? ConfirmationCode { get; init; }
+
+    [JsonPropertyName("forcePayment")]
+    public bool ForcePayment { get; init; }
 }
 
 public record CreateSaleResponse
@@ -101,6 +104,9 @@ public record EditSaleRequest
 
     [JsonPropertyName("confirmationCode")]
     public string? ConfirmationCode { get; init; }
+
+    [JsonPropertyName("forcePayment")]
+    public bool ForcePayment { get; init; }
 }
 
 public record GetSaleContentResponse(IReadOnlyList<SaleContentDto> Content);
@@ -125,7 +131,8 @@ public class SalesEndPoints : ICarterModule
                     request.Contents,
                     request.Comment,
                     request.PayedSum,
-                    request.ConfirmationCode), token);
+                    request.ConfirmationCode,
+                    request.ForcePayment), token);
                 
                 return Results.Ok(new CreateSaleResponse
                 {
@@ -197,7 +204,8 @@ public class SalesEndPoints : ICarterModule
                         request.CurrencyId,
                         request.SaleDateTime,
                         request.Comment,
-                        request.ConfirmationCode),
+                        request.ConfirmationCode,
+                        request.ForcePayment),
                     cancellationToken);
 
                 return Results.NoContent();

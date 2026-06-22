@@ -12,7 +12,8 @@ public record CreateSystemTransactionCommand(
     decimal Amount,
     int CurrencyId,
     DateTime TransactionDateTime,
-    SystemTransactionDirection Direction) : ICommand<CreateTransactionResult>;
+    SystemTransactionDirection Direction,
+    bool ForcePayment = false) : ICommand<CreateTransactionResult>;
 
 public class CreateSystemTransactionHandler(
     ISender sender,
@@ -40,7 +41,8 @@ public class CreateSystemTransactionHandler(
                 request.CurrencyId,
                 request.TransactionDateTime,
                 TransactionSourceType.Manual,
-                TransactionCreationMode.System),
+                TransactionCreationMode.System,
+                request.ForcePayment),
             cancellationToken);
     }
 }

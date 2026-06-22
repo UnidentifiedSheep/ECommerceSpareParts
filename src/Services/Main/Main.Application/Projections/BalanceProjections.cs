@@ -1,16 +1,16 @@
 using System.Linq.Expressions;
 using LinqKit;
 using Main.Application.Dtos.Balances;
+using Main.Application.Dtos.Users;
 using Main.Application.Extensions;
 using Main.Entities.Balance;
+using Main.Entities.User;
 using Main.Enums;
 
 namespace Main.Application.Projections;
 
 public static class BalanceProjections
 {
-    private static readonly string SystemRole = Role.System.ToNormalizedRole();
-    
     public static readonly Expression<Func<Transaction, TransactionDto>> ToTransactionDto =
         x => new TransactionDto
         {
@@ -23,5 +23,19 @@ public static class BalanceProjections
             Type = x.Type,
             TransactionDate = x.TransactionDatetime,
             SourceType = x.SourceType
+        };
+
+    public static readonly Expression<Func<UserBalance, UserBalanceDto>> ToUserBalanceDto =
+        x => new UserBalanceDto
+        {
+            Balance = x.Balance,
+            Currency = CurrencyProjections.ToDto.Invoke(x.Currency),
+        };
+
+    public static readonly Expression<Func<UserFinancialProfile, UserFinancialProfileDto>>
+        ToUserFinancialProfileDto = x => new UserFinancialProfileDto
+        {
+            Balance = x.Balance,
+            MinimalAllowedBalance = x.MinAllowedBalance
         };
 }

@@ -41,6 +41,10 @@ public class BalanceTestContext(
             .WithCurrencyId(currency.Id)
             .Build();
 
+        var senderProfile = UserFinancialProfile.Create(users[0].Id);
+        var receiverProfile = UserFinancialProfile.Create(users[1].Id);
+        receiverProfile.Credit(100m);
+
         var transaction = new TransactionBuilder(Faker)
             .WithSenderId(users[0].Id)
             .WithReceiverId(users[1].Id)
@@ -52,7 +56,9 @@ public class BalanceTestContext(
             .Applied()
             .Build();
 
-        await DbContext.AddRangeAsync([transaction, senderBalance, receiverBalance], cancellationToken);
+        await DbContext.AddRangeAsync(
+            [transaction, senderBalance, receiverBalance, senderProfile, receiverProfile],
+            cancellationToken);
         await DbContext.SaveChangesAsync(cancellationToken);
 
         _transactions.Add(transaction);

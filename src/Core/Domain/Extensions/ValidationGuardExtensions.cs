@@ -86,6 +86,12 @@ public static class ValidationGuardExtensions
         return value.CompareTo(default) < 0 ? throw new InvalidInputException(errorKey) : value;
     }
 
+    public static T AgainstPositive<T>(this T value, string errorKey)
+        where T : struct, IComparable<T>
+    {
+        return value.CompareTo(default) > 0 ? throw new InvalidInputException(errorKey) : value;
+    }
+
     public static decimal AgainstTooManyDecimalPlaces(this decimal value, int maxDecimals, string errorKey)
     {
         var decimalPlaces = BitConverter.GetBytes(decimal.GetBits(value)[3])[2];
@@ -182,6 +188,12 @@ public static class ValidationGuardExtensions
         where T : struct, IComparable<T>
     {
         return value.CompareTo(default) < 0 ? throw exceptionFactory() : value;
+    }
+
+    public static T AgainstPositive<T>(this T value, Func<Exception> exceptionFactory)
+        where T : struct, IComparable<T>
+    {
+        return value.CompareTo(default) > 0 ? throw exceptionFactory() : value;
     }
 
     public static decimal AgainstTooManyDecimalPlaces(

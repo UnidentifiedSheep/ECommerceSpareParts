@@ -22,6 +22,7 @@ public class UserBalance : AuditableEntity<UserBalance, UserBalanceKey>, ILinqEn
     public int CurrencyId { get; }
     public decimal Balance { get; private set; }
     public uint RowVersion { get; private set; }
+    public Currency.Currency Currency { get; private set; } = null!;
 
     public static Expression<Func<UserBalance, UserBalanceKey>> GetKeySelector()
     {

@@ -23,7 +23,7 @@ using Microsoft.Extensions.Options;
 namespace Main.Application.Handlers.Sales.EditSale;
 
 [AutoSave]
-[Transactional(IsolationLevel.Serializable, 20, 2)]
+[Transactional(IsolationLevel.ReadCommitted, 20, 2)]
 public record EditSaleCommand(
     Guid SaleId,
     uint RowVersion,
@@ -31,7 +31,8 @@ public record EditSaleCommand(
     int CurrencyId,
     DateTime SaleDateTime,
     string? Comment,
-    string? ConfirmationCode) : ICommand;
+    string? ConfirmationCode,
+    bool ForcePayment = false) : ICommand;
 
 public class EditSaleHandler(
     ISender sender,
@@ -73,6 +74,7 @@ public class EditSaleHandler(
             contentDtos.Sum(x => x.PriceWithDiscount * x.Count),
             request.CurrencyId,
             request.SaleDateTime,
+            request.ForcePayment,
             cancellationToken);
 
         sale.SetTransactionId(transaction.Id);
@@ -98,7 +100,8 @@ public class EditSaleHandler(
         await sender.Send(
             new ReverseTransactionCommand(
                 sale.TransactionId,
-                TransactionReversalMode.System),
+                TransactionReversalMode.System, 
+                true),
             cancellationToken);
     }
 
@@ -107,6 +110,7 @@ public class EditSaleHandler(
         decimal amount,
         int currencyId,
         DateTime transactionDateTime,
+        bool forcePayment,
         CancellationToken cancellationToken)
     {
         return (await sender.Send(
@@ -117,7 +121,8 @@ public class EditSaleHandler(
                     currencyId,
                     transactionDateTime,
                     TransactionSourceType.Sale,
-                    TransactionCreationMode.System),
+                    TransactionCreationMode.System,
+                    forcePayment),
                 cancellationToken))
             .Transaction;
     }

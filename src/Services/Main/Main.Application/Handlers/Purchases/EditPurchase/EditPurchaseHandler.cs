@@ -31,7 +31,7 @@ using Microsoft.Extensions.Options;
 namespace Main.Application.Handlers.Purchases.EditPurchase;
 
 [AutoSave]
-[Transactional(IsolationLevel.Serializable, 20, 2)]
+[Transactional(IsolationLevel.ReadCommitted, 20, 2)]
 public record EditPurchaseCommand(
     IEnumerable<EditPurchaseDto> Content,
     Guid PurchaseId,
@@ -122,14 +122,16 @@ public class EditPurchaseHandler(
         await sender.Send(
             new ReverseTransactionCommand(
                 purchase.TransactionId,
-                TransactionReversalMode.System),
+                TransactionReversalMode.System, 
+                true),
             cancellationToken);
 
         if (purchase.PurchaseLogistic?.TransactionId is { } logisticsTransactionId)
             await sender.Send(
                 new ReverseTransactionCommand(
                     logisticsTransactionId,
-                    TransactionReversalMode.System),
+                    TransactionReversalMode.System, 
+                    true),
                 cancellationToken);
     }
 

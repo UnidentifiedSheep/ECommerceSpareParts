@@ -39,14 +39,14 @@ public class UserBalanceConfiguration : IEntityTypeConfiguration<UserBalance>
             .HasColumnName("xmin")
             .IsRowVersion();
 
-        builder.HasOne<Entities.Currency.Currency>()
+        builder.HasOne<Entities.Currency.Currency>(e => e.Currency)
             .WithMany()
             .HasForeignKey(d => d.CurrencyId)
             .OnDelete(DeleteBehavior.Restrict)
             .HasConstraintName("user_balances_currency_id_fk");
 
         builder.HasOne<Entities.User.User>()
-            .WithMany()
+            .WithMany(e => e.Balances)
             .HasForeignKey(d => d.UserId)
             .OnDelete(DeleteBehavior.Restrict)
             .HasConstraintName("user_balances_users_id_fk");

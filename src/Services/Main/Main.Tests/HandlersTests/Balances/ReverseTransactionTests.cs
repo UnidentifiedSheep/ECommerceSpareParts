@@ -63,7 +63,8 @@ public class ReverseTransactionTests : IntegrationTest
 
         await Mediator.Send(new ReverseTransactionCommand(
             transaction.Id,
-            TransactionReversalMode.System));
+            TransactionReversalMode.System, 
+true));
 
         var reversed = await Context.Transactions
             .AsNoTracking()

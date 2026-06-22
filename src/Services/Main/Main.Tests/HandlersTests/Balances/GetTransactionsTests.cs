@@ -2,6 +2,7 @@ using Abstractions.Models;
 using Enums;
 using FluentAssertions;
 using Main.Application.Handlers.Balance.GetTransactions;
+using Main.Entities.Balance;
 using Microsoft.EntityFrameworkCore;
 using Test.Common.TestContainers.Combined;
 using Tests.TestContexts.Balance;
@@ -101,6 +102,18 @@ public class GetTransactionsTests : IntegrationTest
     }
 
     [Fact]
+    public async Task GetTransactions_SkipReversedTrue_ReturnsCompletionProfileAppliedTransactions()
+    {
+        var transaction = await CreateCompletionProfileAppliedTransaction();
+
+        var result = await Mediator.Send(GetQuery(
+            senderId: transaction.SenderId,
+            skipReversed: true));
+
+        result.Transactions.Should().Contain(x => x.Id == transaction.Id);
+    }
+
+    [Fact]
     public async Task GetTransactions_SameSenderAndReceiver_ThrowsValidationException()
     {
         var userId = TestContext.Users[0].Id;
@@ -158,6 +171,45 @@ public class GetTransactionsTests : IntegrationTest
 
         transaction.Reverse(TestContext.Users[0].Id);
         transaction.Apply(senderBalance, receiverBalance);
+        await Context.SaveChangesAsync();
+
+        return transaction;
+    }
+
+    private async Task<Main.Entities.Balance.Transaction> CreateCompletionProfileAppliedTransaction()
+    {
+        var sender = TestContext.Users[0];
+        var receiver = TestContext.Users[1];
+        var currency = TestContext.Currencies[0];
+        var senderBalance = await Context.UserBalances
+            .FirstAsync(x => x.UserId == sender.Id && x.CurrencyId == currency.Id);
+        var receiverBalance = await Context.UserBalances
+            .FirstAsync(x => x.UserId == receiver.Id && x.CurrencyId == currency.Id);
+        var senderProfile = await Context.Set<UserFinancialProfile>()
+            .FirstAsync(x => x.UserId == sender.Id);
+        var receiverProfile = await Context.Set<UserFinancialProfile>()
+            .FirstAsync(x => x.UserId == receiver.Id);
+        senderProfile.Credit(100m);
+
+        var transaction = Main.Entities.Balance.Transaction.Create(
+            sender.Id,
+            receiver.Id,
+            currency.Id,
+            Main.Enums.Balances.TransactionType.Transfer,
+            100m,
+            DateTime.UtcNow.AddDays(-1),
+            Main.Enums.Balances.TransactionSourceType.Manual);
+
+        transaction.Complete();
+        transaction.Apply(senderBalance, receiverBalance);
+        new TransactionFinancialProfileService().Apply(
+            transaction,
+            senderProfile,
+            receiverProfile,
+            100m,
+            Guid.NewGuid());
+
+        await Context.AddAsync(transaction);
         await Context.SaveChangesAsync();
 
         return transaction;

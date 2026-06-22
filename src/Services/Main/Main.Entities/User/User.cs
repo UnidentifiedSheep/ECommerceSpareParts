@@ -5,6 +5,7 @@ using Domain.Extensions;
 using Domain.Interfaces;
 using Exceptions;
 using Main.Entities.Auth;
+using Main.Entities.Balance;
 using Main.Entities.User.ValueObjects;
 using Main.Enums;
 
@@ -23,6 +24,8 @@ public class User : AuditableEntity<User, Guid>, ILinqEntity<User, Guid>
     private readonly List<UserRole> _roles = [];
 
     private readonly List<UserVehicle> _vehicles = [];
+    
+    private readonly List<UserBalance> _balances = [];
 
     private User()
     {
@@ -45,12 +48,14 @@ public class User : AuditableEntity<User, Guid>, ILinqEntity<User, Guid>
     public DateTime? LastLoginAt { get; private set; }
     public UserInfo? UserInfo { get; private set; }
     public UserDiscount? Discount { get; private set; }
+    public UserFinancialProfile? FinancialProfile { get; private set; }
     public IReadOnlyList<UserEmail> Emails => _emails;
     public IReadOnlyList<UserPermission> Permissions => _permissions;
     public IReadOnlyList<UserPhone> Phones => _phones;
     public IReadOnlyList<UserRole> Roles => _roles;
     public IReadOnlyList<UserVehicle> Vehicles => _vehicles;
     public IReadOnlyList<Cart.Cart> CartItems => _cartItems;
+    public IReadOnlyList<UserBalance> Balances => _balances;
 
     public static Expression<Func<User, Guid>> GetKeySelector()
     {

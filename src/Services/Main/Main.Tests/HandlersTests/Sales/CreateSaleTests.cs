@@ -1,7 +1,9 @@
 using FluentAssertions;
+using Exceptions;
 using Main.Abstractions.Constants;
 using Main.Application.Dtos.Sale;
 using Main.Application.Handlers.Sales.CreateSale;
+using Main.Entities.Balance;
 using Main.Entities.Event;
 using Main.Entities.Exceptions;
 using Main.Entities.Storage;
@@ -123,6 +125,62 @@ public class CreateSaleTests : IntegrationTest
         payment.ReceiverId.Should().Be(GetContext<UserContextTestContext>().SystemUser.Id);
         payment.Amount.Should().Be(payedSum);
         payment.CurrencyId.Should().Be(storageContent.CurrencyId);
+    }
+
+    [Fact]
+    public async Task CreateSale_WithFullPayedSumAndZeroBalanceWithoutForcePayment_CreatesSale()
+    {
+        var buyer = Buyer();
+        var storageContent = StorageContent();
+        var command = CreateCommand(
+            buyer.Id,
+            storageContent.CurrencyId,
+            storageContent.StorageName,
+            [NewContent(storageContent.ProductId, count: 1, price: 1200m, priceWithDiscount: 1200m)],
+            payedSum: 1200m,
+            forcePayment: false);
+
+        await Mediator.Send(command);
+
+        var profile = await Context.Set<UserFinancialProfile>()
+            .AsNoTracking()
+            .SingleAsync(x => x.UserId == buyer.Id);
+        profile.Balance.Should().Be(0m);
+    }
+
+    [Fact]
+    public async Task CreateSale_WithoutPayedSumAndZeroBalanceWithoutForcePayment_Throws()
+    {
+        var buyer = Buyer();
+        var storageContent = StorageContent();
+        var command = CreateCommand(
+            buyer.Id,
+            storageContent.CurrencyId,
+            storageContent.StorageName,
+            [NewContent(storageContent.ProductId, count: 1, price: 1200m, priceWithDiscount: 1200m)],
+            forcePayment: false);
+
+        await Assert.ThrowsAsync<InvalidInputException>(() => Mediator.Send(command));
+    }
+
+    [Fact]
+    public async Task CreateSale_WithFullPayedSumAndZeroBalanceWithForcePayment_CreatesSale()
+    {
+        var buyer = Buyer();
+        var storageContent = StorageContent();
+        var command = CreateCommand(
+            buyer.Id,
+            storageContent.CurrencyId,
+            storageContent.StorageName,
+            [NewContent(storageContent.ProductId, count: 1, price: 1200m, priceWithDiscount: 1200m)],
+            payedSum: 1200m);
+
+        await Mediator.Send(command);
+
+        var profile = await Context.Set<UserFinancialProfile>()
+            .AsNoTracking()
+            .SingleAsync(x => x.UserId == buyer.Id);
+        profile.Balance.Should().Be(0m);
     }
 
     [Fact]
@@ -421,7 +479,8 @@ public class CreateSaleTests : IntegrationTest
         string storageName,
         IEnumerable<NewSaleContentDto> contents,
         decimal? payedSum = null,
-        string? confirmationCode = null)
+        string? confirmationCode = null,
+        bool forcePayment = true)
     {
         return new CreateSaleCommand(
             buyerId,
@@ -431,7 +490,8 @@ public class CreateSaleTests : IntegrationTest
             contents.ToList(),
             Faker.Lorem.Sentence(),
             payedSum,
-            confirmationCode);
+            confirmationCode,
+            forcePayment);
     }
 
     private static NewSaleContentDto NewContent(
