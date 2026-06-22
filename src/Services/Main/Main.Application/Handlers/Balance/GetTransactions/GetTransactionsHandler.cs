@@ -27,13 +27,8 @@ public class GetTransactionsHandler(
     IReadRepository<Transaction, Guid> repository)
     : IQueryHandler<GetTransactionsQuery, GetTransactionsResult>
 {
-    private static readonly TransactionStatus[] NotReversedStatuses =
-    [
-        TransactionStatus.Pending,
-        TransactionStatus.Completed,
-        TransactionStatus.CompletionApplied,
-        TransactionStatus.Completed | TransactionStatus.CompletionApplied
-    ];
+    private static readonly List<TransactionStatus> ReversedStatuses = GetStatusesWithFlag(TransactionStatus.Reversed)
+        .ToList();
 
     public async Task<GetTransactionsResult> Handle(GetTransactionsQuery request, CancellationToken cancellationToken)
     {
@@ -55,7 +50,7 @@ public class GetTransactionsHandler(
                                  x.TransactionDatetime <= fixedEnd);
 
         if (request.SkipReversed)
-            query = query.Where(x => NotReversedStatuses.Contains(x.Status));
+            query = query.Where(x => !ReversedStatuses.Contains(x.Status));
 
         var res = await query
             .Where(x =>
@@ -102,5 +97,16 @@ public class GetTransactionsHandler(
         return query.Where(e =>
             senderId.HasValue && (e.SenderId == senderId.Value || e.ReceiverId == senderId.Value) ||
             receiverId.HasValue && (e.SenderId == receiverId.Value || e.ReceiverId == receiverId.Value));
+    }
+
+    private static TransactionStatus[] GetStatusesWithFlag(TransactionStatus flag)
+    {
+        var allFlagsMask = Enum.GetValues<TransactionStatus>()
+            .Aggregate(0, (current, value) => current | (int)value);
+
+        return Enumerable.Range(0, allFlagsMask + 1)
+            .Select(x => (TransactionStatus)x)
+            .Where(x => x.HasFlag(flag))
+            .ToArray();
     }
 }
