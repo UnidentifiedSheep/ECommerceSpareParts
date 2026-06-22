@@ -1,6 +1,7 @@
 using FluentAssertions;
 using Main.Abstractions.Constants;
 using Main.Application.Handlers.Balance.CreateTransaction;
+using Main.Entities.Balance;
 using Main.Entities.Exceptions;
 using Main.Enums.Balances;
 using Microsoft.EntityFrameworkCore;
@@ -30,6 +31,8 @@ public class CreateTransactionTests : IntegrationTest
         var currency = CurrencyContext.Currencies[0];
         var amount = 125.50m;
         var transactionDateTime = DateTime.UtcNow;
+
+        await DepositWallet(sender.Id, amount);
 
         var result = await Mediator.Send(new CreateTransactionCommand(
             sender.Id,
@@ -145,6 +148,8 @@ public class CreateTransactionTests : IntegrationTest
             Mode = TransactionCreationMode.System
         };
 
+        await DepositWallet(command.SenderId, command.Amount);
+
         var result = await Mediator.Send(command);
 
         var transaction = await Context.Transactions
@@ -168,5 +173,14 @@ public class CreateTransactionTests : IntegrationTest
             currency.Id,
             DateTime.UtcNow,
             TransactionSourceType.Manual);
+    }
+
+    private async Task DepositWallet(Guid userId, decimal amount)
+    {
+        var profile = UserFinancialProfile.Create(userId);
+        profile.DepositWallet(amount);
+
+        await Context.AddAsync(profile);
+        await Context.SaveChangesAsync();
     }
 }

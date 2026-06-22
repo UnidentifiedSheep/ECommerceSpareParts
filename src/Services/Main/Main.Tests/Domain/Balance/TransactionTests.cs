@@ -95,6 +95,85 @@ public class TransactionTests
     }
 
     [Fact]
+    public void Apply_WithFinancialProfiles_ManualUserToUser_UsesBaseAmountForProfiles()
+    {
+        var tx = Create();
+        var senderBalance = UserBalance.Create(tx.SenderId, tx.CurrencyId);
+        var receiverBalance = UserBalance.Create(tx.ReceiverId, tx.CurrencyId);
+        var senderProfile = UserFinancialProfile.Create(tx.SenderId);
+        var receiverProfile = UserFinancialProfile.Create(tx.ReceiverId);
+        senderBalance.IncrementBalance(200m);
+        senderProfile.DepositWallet(200m);
+
+        tx.Complete();
+        tx.Apply(
+            senderBalance,
+            receiverBalance,
+            senderProfile,
+            receiverProfile,
+            120m,
+            Guid.NewGuid());
+
+        senderBalance.Balance.Should().Be(100m);
+        receiverBalance.Balance.Should().Be(100m);
+        senderProfile.WalletBalance.Should().Be(80m);
+        receiverProfile.WalletBalance.Should().Be(120m);
+        tx.IsCompletionApplied.Should().BeTrue();
+    }
+
+    [Fact]
+    public void Apply_WithFinancialProfiles_SystemSettlementReversed_RollsBackFinancialProfile()
+    {
+        var systemId = Guid.NewGuid();
+        var receiverId = Guid.NewGuid();
+        var tx = Transaction.Create(
+            systemId,
+            receiverId,
+            1,
+            TransactionType.Transfer,
+            100m,
+            DateTime.UtcNow,
+            TransactionSourceType.Sale);
+        var senderBalance = UserBalance.Create(tx.SenderId, tx.CurrencyId);
+        var receiverBalance = UserBalance.Create(tx.ReceiverId, tx.CurrencyId);
+        var senderProfile = UserFinancialProfile.Create(tx.SenderId, decimal.MinValue);
+        var receiverProfile = UserFinancialProfile.Create(tx.ReceiverId);
+
+        tx.Complete();
+        tx.Apply(senderBalance, receiverBalance, senderProfile, receiverProfile, 120m, systemId);
+        tx.Reverse(systemId);
+        tx.Apply(senderBalance, receiverBalance, senderProfile, receiverProfile, 120m, systemId);
+
+        senderBalance.Balance.Should().Be(0m);
+        receiverBalance.Balance.Should().Be(0m);
+        receiverProfile.SystemBalance.Should().Be(0m);
+        tx.IsReversalApplied.Should().BeTrue();
+    }
+
+    [Fact]
+    public void Apply_WithFinancialProfiles_SenderProfileMismatch_Throws()
+    {
+        var tx = Create();
+        var senderBalance = UserBalance.Create(tx.SenderId, tx.CurrencyId);
+        var receiverBalance = UserBalance.Create(tx.ReceiverId, tx.CurrencyId);
+        var senderProfile = UserFinancialProfile.Create(Guid.NewGuid());
+        var receiverProfile = UserFinancialProfile.Create(tx.ReceiverId);
+
+        tx.Complete();
+
+        var act = () => tx.Apply(
+            senderBalance,
+            receiverBalance,
+            senderProfile,
+            receiverProfile,
+            100m,
+            Guid.NewGuid());
+
+        act.Should().Throw<InvalidOperationException>()
+            .WithMessage("Sender financial profile user mismatch");
+    }
+
+    [Fact]
     public void Reverse_WithoutCompletionApplied_Throws()
     {
         var tx = Create();

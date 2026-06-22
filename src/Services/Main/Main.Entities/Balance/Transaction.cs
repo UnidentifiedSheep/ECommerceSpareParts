@@ -135,16 +135,10 @@ public class Transaction : AuditableEntity<Transaction, Guid>, ILinqEntity<Trans
     public void Apply(UserBalance senderBalance, UserBalance receiverBalance)
     {
         ValidateBalances(senderBalance, receiverBalance);
-
-        if (!IsCompleted && !IsReversed)
-            throw new InvalidOperationException("Nothing to apply");
+        EnsureCanApply();
 
         if (IsReversed)
         {
-            if (!IsCompletionApplied)
-                throw new InvalidOperationException("Cannot reverse before completion is applied");
-            if (IsReversalApplied)
-                throw new InvalidOperationException("Reversed already applied.");
             ApplyReversed(senderBalance, receiverBalance);
             Status |= TransactionStatus.ReversedApplied;
             return;
@@ -152,11 +146,44 @@ public class Transaction : AuditableEntity<Transaction, Guid>, ILinqEntity<Trans
 
         if (IsCompleted)
         {
-            if (IsCompletionApplied)
-                throw new InvalidOperationException("Completion already applied.");
             ApplyCompleted(senderBalance, receiverBalance);
             Status |= TransactionStatus.CompletionApplied;
         }
+    }
+
+    public void Apply(
+        UserBalance senderBalance,
+        UserBalance receiverBalance,
+        UserFinancialProfile senderProfile,
+        UserFinancialProfile receiverProfile,
+        decimal amountInBaseCurrency,
+        Guid systemId)
+    {
+        ValidateBalances(senderBalance, receiverBalance);
+        ValidateFinancialProfiles(senderProfile, receiverProfile);
+        EnsureCanApply();
+
+        ApplyFinancialProfiles(
+            senderProfile,
+            receiverProfile,
+            amountInBaseCurrency,
+            systemId);
+        Apply(senderBalance, receiverBalance);
+    }
+
+    private void ApplyFinancialProfiles(
+        UserFinancialProfile senderProfile,
+        UserFinancialProfile receiverProfile,
+        decimal amountInBaseCurrency,
+        Guid systemId)
+    {
+        if (SourceType == TransactionSourceType.Manual)
+        {
+            ApplyManualFinancialProfiles(senderProfile, receiverProfile, amountInBaseCurrency, systemId);
+            return;
+        }
+
+        ApplySystemSettlementFinancialProfiles(senderProfile, receiverProfile, amountInBaseCurrency, systemId);
     }
 
     private void ValidateBalances(UserBalance senderBalance, UserBalance receiverBalance)
@@ -169,6 +196,170 @@ public class Transaction : AuditableEntity<Transaction, Guid>, ILinqEntity<Trans
             throw new InvalidOperationException("Sender balance user mismatch");
         if (receiverBalance.UserId != ReceiverId)
             throw new InvalidOperationException("Receiver balance user mismatch");
+    }
+
+    private void ValidateFinancialProfiles(
+        UserFinancialProfile senderProfile,
+        UserFinancialProfile receiverProfile)
+    {
+        if (senderProfile.UserId != SenderId)
+            throw new InvalidOperationException("Sender financial profile user mismatch");
+        if (receiverProfile.UserId != ReceiverId)
+            throw new InvalidOperationException("Receiver financial profile user mismatch");
+    }
+
+    private void EnsureCanApply()
+    {
+        if (!IsCompleted && !IsReversed)
+            throw new InvalidOperationException("Nothing to apply");
+
+        if (IsReversed)
+        {
+            if (!IsCompletionApplied)
+                throw new InvalidOperationException("Cannot reverse before completion is applied");
+            if (IsReversalApplied)
+                throw new InvalidOperationException("Reversed already applied.");
+            return;
+        }
+
+        if (IsCompleted && IsCompletionApplied)
+            throw new InvalidOperationException("Completion already applied.");
+    }
+
+    private void ApplyManualFinancialProfiles(
+        UserFinancialProfile senderProfile,
+        UserFinancialProfile receiverProfile,
+        decimal amountInBaseCurrency,
+        Guid systemId)
+    {
+        var senderIsSystem = SenderId == systemId;
+        var receiverIsSystem = ReceiverId == systemId;
+
+        if (IsReversed)
+        {
+            ApplyManualReversedFinancialProfiles(
+                senderProfile,
+                receiverProfile,
+                amountInBaseCurrency,
+                senderIsSystem,
+                receiverIsSystem);
+            return;
+        }
+
+        ApplyManualCompletedFinancialProfiles(
+            senderProfile,
+            receiverProfile,
+            amountInBaseCurrency,
+            senderIsSystem,
+            receiverIsSystem);
+    }
+
+    private static void ApplyManualCompletedFinancialProfiles(
+        UserFinancialProfile senderProfile,
+        UserFinancialProfile receiverProfile,
+        decimal amountInBaseCurrency,
+        bool senderIsSystem,
+        bool receiverIsSystem)
+    {
+        switch (senderIsSystem)
+        {
+            case true when !receiverIsSystem:
+                receiverProfile.ReceiveFromSystem(amountInBaseCurrency);
+                return;
+            case false when receiverIsSystem:
+                senderProfile.PayToSystem(amountInBaseCurrency);
+                return;
+            default:
+                senderProfile.SpendAvailable(amountInBaseCurrency);
+                receiverProfile.DepositWallet(amountInBaseCurrency);
+                return;
+        }
+    }
+
+    private static void ApplyManualReversedFinancialProfiles(
+        UserFinancialProfile senderProfile,
+        UserFinancialProfile receiverProfile,
+        decimal amountInBaseCurrency,
+        bool senderIsSystem,
+        bool receiverIsSystem)
+    {
+        switch (senderIsSystem)
+        {
+            case true when !receiverIsSystem:
+                receiverProfile.PayToSystem(amountInBaseCurrency);
+                return;
+            case false when receiverIsSystem:
+                senderProfile.ReceiveFromSystem(amountInBaseCurrency);
+                return;
+            default:
+                senderProfile.DepositWallet(amountInBaseCurrency);
+                receiverProfile.SpendAvailable(amountInBaseCurrency);
+                return;
+        }
+    }
+
+    private void ApplySystemSettlementFinancialProfiles(
+        UserFinancialProfile senderProfile,
+        UserFinancialProfile receiverProfile,
+        decimal amountInBaseCurrency,
+        Guid systemId)
+    {
+        var senderIsSystem = SenderId == systemId;
+        var receiverIsSystem = ReceiverId == systemId;
+
+        if (IsReversed)
+        {
+            ApplySystemSettlementReversedFinancialProfiles(
+                senderProfile,
+                receiverProfile,
+                amountInBaseCurrency,
+                senderIsSystem,
+                receiverIsSystem);
+            return;
+        }
+
+        ApplySystemSettlementCompletedFinancialProfiles(
+            senderProfile,
+            receiverProfile,
+            amountInBaseCurrency,
+            senderIsSystem,
+            receiverIsSystem);
+    }
+
+    private static void ApplySystemSettlementCompletedFinancialProfiles(
+        UserFinancialProfile senderProfile,
+        UserFinancialProfile receiverProfile,
+        decimal amountInBaseCurrency,
+        bool senderIsSystem,
+        bool receiverIsSystem)
+    {
+        switch (senderIsSystem)
+        {
+            case false when receiverIsSystem:
+                senderProfile.IncreaseSystemBalance(amountInBaseCurrency);
+                return;
+            case true when !receiverIsSystem:
+                receiverProfile.DecreaseSystemBalance(amountInBaseCurrency);
+                return;
+        }
+    }
+
+    private static void ApplySystemSettlementReversedFinancialProfiles(
+        UserFinancialProfile senderProfile,
+        UserFinancialProfile receiverProfile,
+        decimal amountInBaseCurrency,
+        bool senderIsSystem,
+        bool receiverIsSystem)
+    {
+        switch (senderIsSystem)
+        {
+            case false when receiverIsSystem:
+                senderProfile.DecreaseSystemBalance(amountInBaseCurrency);
+                return;
+            case true when !receiverIsSystem:
+                receiverProfile.IncreaseSystemBalance(amountInBaseCurrency);
+                return;
+        }
     }
 
     private void ApplyCompleted(UserBalance sender, UserBalance receiver)

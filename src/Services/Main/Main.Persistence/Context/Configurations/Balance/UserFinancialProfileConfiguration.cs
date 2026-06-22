@@ -23,8 +23,11 @@ public class UserFinancialProfileConfiguration : IEntityTypeConfiguration<UserFi
         builder.Property(e => e.MinAllowedBalance)
             .HasColumnName("min_allowed_balance");
         
-        builder.Property(e => e.TotalBalance)
-            .HasColumnName("total_balance");
+        builder.Property(e => e.WalletBalance)
+            .HasColumnName("wallet_balance");
+
+        builder.Property(e => e.SystemBalance)
+            .HasColumnName("system_balance");
         
         builder.HasOne<Entities.User.User>()
             .WithOne(e => e.FinancialProfile)

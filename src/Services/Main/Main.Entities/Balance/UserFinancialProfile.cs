@@ -7,7 +7,9 @@ namespace Main.Entities.Balance;
 public class UserFinancialProfile : AuditableEntity<UserFinancialProfile, Guid>, IVersionable<uint>
 {
     public Guid UserId { get; private set; }
-    public decimal TotalBalance { get; private set; }
+    public decimal WalletBalance { get; private set; }
+    public decimal SystemBalance { get; private set; }
+    public decimal AvailableBalance => WalletBalance + SystemBalance;
     public decimal MinAllowedBalance { get; private set; }
     public uint RowVersion { get; private set; }
 
@@ -16,7 +18,8 @@ public class UserFinancialProfile : AuditableEntity<UserFinancialProfile, Guid>,
     private UserFinancialProfile(Guid userId, decimal minAllowedBalance)
     {
         UserId = userId;
-        TotalBalance = 0;
+        WalletBalance = 0;
+        SystemBalance = 0;
         SetMinAllowedBalance(minAllowedBalance);
     }
 
@@ -30,18 +33,72 @@ public class UserFinancialProfile : AuditableEntity<UserFinancialProfile, Guid>,
         MinAllowedBalance = minAllowedBalance;
     }
 
-    public void Withdraw(decimal amount)
+    public void DepositWallet(decimal amount)
     {
         amount.AgainstNegative("financial.profile.amount.must.not.be.negative");
-        var newBalance = TotalBalance - amount;
-        newBalance.AgainstTooSmall(MinAllowedBalance, "financial.profile.balance.must.not.be.less.than.minimum");
-        TotalBalance = newBalance;
+        WalletBalance += amount;
     }
 
-    public void Deposit(decimal amount)
+    public void SpendAvailable(decimal amount)
     {
         amount.AgainstNegative("financial.profile.amount.must.not.be.negative");
-        var newBalance = TotalBalance + amount;
-        TotalBalance = newBalance;
+        var newAvailableBalance = AvailableBalance - amount;
+        newAvailableBalance.AgainstTooSmall(
+            MinAllowedBalance,
+            "financial.profile.balance.must.not.be.less.than.minimum");
+
+        var fromWallet = Math.Min(WalletBalance, amount);
+        WalletBalance -= fromWallet;
+
+        var rest = amount - fromWallet;
+        SystemBalance -= rest;
+    }
+
+    public void IncreaseSystemBalance(decimal amount)
+    {
+        amount.AgainstNegative("financial.profile.amount.must.not.be.negative");
+        SystemBalance += amount;
+    }
+
+    public void DecreaseSystemBalance(decimal amount)
+    {
+        amount.AgainstNegative("financial.profile.amount.must.not.be.negative");
+        SystemBalance -= amount;
+    }
+
+    public void PayToSystem(decimal amount)
+    {
+        amount.AgainstNegative("financial.profile.amount.must.not.be.negative");
+
+        if (SystemBalance >= 0)
+        {
+            SpendAvailable(amount);
+            return;
+        }
+
+        var debtPayment = Math.Min(amount, -SystemBalance);
+        SystemBalance += debtPayment;
+
+        var rest = amount - debtPayment;
+        if (rest > 0)
+            SpendAvailable(rest);
+    }
+
+    public void ReceiveFromSystem(decimal amount)
+    {
+        amount.AgainstNegative("financial.profile.amount.must.not.be.negative");
+
+        if (SystemBalance <= 0)
+        {
+            DepositWallet(amount);
+            return;
+        }
+
+        var debtPayment = Math.Min(amount, SystemBalance);
+        SystemBalance -= debtPayment;
+
+        var rest = amount - debtPayment;
+        if (rest > 0)
+            DepositWallet(rest);
     }
 }

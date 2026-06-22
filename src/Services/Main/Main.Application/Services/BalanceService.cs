@@ -38,9 +38,13 @@ public class BalanceService(
                 transaction.CurrencyId, 
                 cancellationToken);
 
-        senderProfile.Withdraw(amountInBaseCurrency);
-        receiverProfile.Deposit(amountInBaseCurrency);
-        transaction.Apply(senderBalance, receiverBalance);
+        transaction.Apply(
+            senderBalance,
+            receiverBalance,
+            senderProfile,
+            receiverProfile,
+            amountInBaseCurrency,
+            systemOptions.Value.SystemId);
     }
 
     private async Task<UserBalance> GetUserBalanceAsync(
@@ -81,10 +85,9 @@ public class BalanceService(
 
         if (dbValue != null) return dbValue;
 
-        if (systemOptions.Value.SystemId == userId)
-            dbValue = UserFinancialProfile.Create(userId, decimal.MinValue);
-        else
-            dbValue = UserFinancialProfile.Create(userId);
+        dbValue = systemOptions.Value.SystemId == userId
+            ? UserFinancialProfile.Create(userId, decimal.MinValue)
+            : UserFinancialProfile.Create(userId);
         
         await unitOfWork.AddAsync(dbValue, cancellationToken);
         return dbValue;
