@@ -16,8 +16,6 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace Main.Api.EndPoints.Users;
 
-public record AddPermissionToUserRequest(string Permission);
-
 public record CreateUserRequest
 {
     public required string UserName { get; init; }
@@ -56,24 +54,7 @@ public class UsersEndPoints : ICarterModule
         users.MapUserInfoEndPoints();
         users.MapUserStorageEndPoints();
         users.MapUserFinancialEndPoints();
-
-        users.MapPost("/{userId:guid}/permissions/", async (
-                ISender sender,
-                Guid userId,
-                AddPermissionToUserRequest request,
-                CancellationToken ct) =>
-            {
-                await sender.Send(new AddPermissionToUserCommand(userId, request.Permission), ct);
-                return Results.NoContent();
-            })
-            .WithName("AddPermissionToUser")
-            .WithSummary("Добавить разрешение пользователю")
-            .WithDescription("Добавление пользователю разрешение")
-            .WithDisplayName("Добавление пользователю разрешение'")
-            .Produces(204)
-            .ProducesProblem(400)
-            .ProducesProblem(404)
-            .RequireAnyPermission(PermissionCodes.USERS_PERMISSIONS_CREATE);
+        users.MapUserPermissionEndPoints();
 
         users.MapPost("/", async (ISender sender, CreateUserRequest request, CancellationToken cancellationToken) =>
             {
