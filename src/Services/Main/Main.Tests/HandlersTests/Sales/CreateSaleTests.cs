@@ -1,4 +1,5 @@
 using FluentAssertions;
+using Exceptions;
 using Main.Abstractions.Constants;
 using Main.Application.Dtos.Sale;
 using Main.Application.Handlers.Sales.CreateSale;
@@ -168,6 +169,21 @@ public class CreateSaleTests : IntegrationTest
             .SingleAsync(x => x.Id == reservation.Id);
         updatedReservation.CurrentCount.Should().Be(2);
         updatedReservation.Status.Should().Be(StorageContentReservationStatus.Done);
+    }
+
+    [Fact]
+    public async Task CreateSale_WithoutEnoughBuyerBalanceAndWithoutForcePayment_Throws()
+    {
+        var buyer = Buyer();
+        var storageContent = StorageContent();
+        var command = CreateCommand(
+            buyer.Id,
+            storageContent.CurrencyId,
+            storageContent.StorageName,
+            [NewContent(storageContent.ProductId, count: 1)],
+            forcePayment: false);
+
+        await Assert.ThrowsAsync<InvalidInputException>(() => Mediator.Send(command));
     }
 
     [Fact]
@@ -421,7 +437,8 @@ public class CreateSaleTests : IntegrationTest
         string storageName,
         IEnumerable<NewSaleContentDto> contents,
         decimal? payedSum = null,
-        string? confirmationCode = null)
+        string? confirmationCode = null,
+        bool forcePayment = true)
     {
         return new CreateSaleCommand(
             buyerId,
@@ -431,7 +448,8 @@ public class CreateSaleTests : IntegrationTest
             contents.ToList(),
             Faker.Lorem.Sentence(),
             payedSum,
-            confirmationCode);
+            confirmationCode,
+            forcePayment);
     }
 
     private static NewSaleContentDto NewContent(

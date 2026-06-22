@@ -32,7 +32,7 @@ public class CreateTransactionTests : IntegrationTest
         var amount = 125.50m;
         var transactionDateTime = DateTime.UtcNow;
 
-        await DepositWallet(sender.Id, amount);
+        await CreditProfile(sender.Id, amount);
 
         var result = await Mediator.Send(new CreateTransactionCommand(
             sender.Id,
@@ -148,7 +148,7 @@ public class CreateTransactionTests : IntegrationTest
             Mode = TransactionCreationMode.System
         };
 
-        await DepositWallet(command.SenderId, command.Amount);
+        await CreditProfile(command.SenderId, command.Amount);
 
         var result = await Mediator.Send(command);
 
@@ -175,10 +175,10 @@ public class CreateTransactionTests : IntegrationTest
             TransactionSourceType.Manual);
     }
 
-    private async Task DepositWallet(Guid userId, decimal amount)
+    private async Task CreditProfile(Guid userId, decimal amount)
     {
         var profile = UserFinancialProfile.Create(userId);
-        profile.DepositWallet(amount);
+        profile.Credit(amount);
 
         await Context.AddAsync(profile);
         await Context.SaveChangesAsync();

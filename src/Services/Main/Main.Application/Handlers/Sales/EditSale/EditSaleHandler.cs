@@ -31,7 +31,8 @@ public record EditSaleCommand(
     int CurrencyId,
     DateTime SaleDateTime,
     string? Comment,
-    string? ConfirmationCode) : ICommand;
+    string? ConfirmationCode,
+    bool ForcePayment = false) : ICommand;
 
 public class EditSaleHandler(
     ISender sender,
@@ -73,6 +74,7 @@ public class EditSaleHandler(
             contentDtos.Sum(x => x.PriceWithDiscount * x.Count),
             request.CurrencyId,
             request.SaleDateTime,
+            request.ForcePayment,
             cancellationToken);
 
         sale.SetTransactionId(transaction.Id);
@@ -107,6 +109,7 @@ public class EditSaleHandler(
         decimal amount,
         int currencyId,
         DateTime transactionDateTime,
+        bool forcePayment,
         CancellationToken cancellationToken)
     {
         return (await sender.Send(
@@ -117,7 +120,8 @@ public class EditSaleHandler(
                     currencyId,
                     transactionDateTime,
                     TransactionSourceType.Sale,
-                    TransactionCreationMode.System),
+                    TransactionCreationMode.System,
+                    forcePayment),
                 cancellationToken))
             .Transaction;
     }

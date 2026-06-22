@@ -5,6 +5,7 @@ using Application.Common.Interfaces.Currency;
 using Application.Common.Interfaces.Repositories;
 using Main.Application.Interfaces.Services;
 using Main.Entities.Balance;
+using Main.Enums.Balances;
 using Microsoft.Extensions.Options;
 
 namespace Main.Application.Services;
@@ -18,6 +19,7 @@ public class BalanceService(
 {
     public async Task ChangeSenderReceiverBalancesAsync(
         Transaction transaction,
+        bool forceFinancialProfileDebit = false,
         CancellationToken cancellationToken = default)
     {
         var senderProfile = await GetFinancialProfile(transaction.SenderId, cancellationToken);
@@ -44,7 +46,8 @@ public class BalanceService(
             senderProfile,
             receiverProfile,
             amountInBaseCurrency,
-            systemOptions.Value.SystemId);
+            systemOptions.Value.SystemId,
+            forceFinancialProfileDebit || transaction.IsReversed && transaction.SourceType != TransactionSourceType.Manual);
     }
 
     private async Task<UserBalance> GetUserBalanceAsync(

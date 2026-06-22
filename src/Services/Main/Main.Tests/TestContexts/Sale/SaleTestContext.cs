@@ -36,6 +36,8 @@ public class SaleTestContext(
     {
         var currencyId = currencyContext.Currencies[0].Id;
         Buyer = await new MemberUserBuilder(Faker).BuildAndAddToDb(DbContext);
+        var buyerProfile = UserFinancialProfile.Create(Buyer.Id);
+        buyerProfile.Credit(10_000m);
         StorageContent = storageContentContext.StorageContents.First(x => x.Count > 0);
         Product = productContext.Products.Single(x => x.Id == StorageContent.ProductId);
         SoldCount = 1;
@@ -62,7 +64,7 @@ public class SaleTestContext(
             .Applied()
             .Build();
         
-        await DbContext.AddRangeAsync(Transaction, SenderBalance, ReceiverBalance);
+        await DbContext.AddRangeAsync(Transaction, SenderBalance, ReceiverBalance, buyerProfile);
         await DbContext.SaveChangesAsync(cancellationToken);
 
         var saleContent = new SaleContentBuilder(Faker)

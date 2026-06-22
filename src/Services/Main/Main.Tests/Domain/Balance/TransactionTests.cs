@@ -103,7 +103,7 @@ public class TransactionTests
         var senderProfile = UserFinancialProfile.Create(tx.SenderId);
         var receiverProfile = UserFinancialProfile.Create(tx.ReceiverId);
         senderBalance.IncrementBalance(200m);
-        senderProfile.DepositWallet(200m);
+        senderProfile.Credit(200m);
 
         tx.Complete();
         tx.Apply(
@@ -116,8 +116,8 @@ public class TransactionTests
 
         senderBalance.Balance.Should().Be(100m);
         receiverBalance.Balance.Should().Be(100m);
-        senderProfile.WalletBalance.Should().Be(80m);
-        receiverProfile.WalletBalance.Should().Be(120m);
+        senderProfile.Balance.Should().Be(80m);
+        receiverProfile.Balance.Should().Be(120m);
         tx.IsCompletionApplied.Should().BeTrue();
     }
 
@@ -138,6 +138,7 @@ public class TransactionTests
         var receiverBalance = UserBalance.Create(tx.ReceiverId, tx.CurrencyId);
         var senderProfile = UserFinancialProfile.Create(tx.SenderId, decimal.MinValue);
         var receiverProfile = UserFinancialProfile.Create(tx.ReceiverId);
+        receiverProfile.Credit(120m);
 
         tx.Complete();
         tx.Apply(senderBalance, receiverBalance, senderProfile, receiverProfile, 120m, systemId);
@@ -146,7 +147,7 @@ public class TransactionTests
 
         senderBalance.Balance.Should().Be(0m);
         receiverBalance.Balance.Should().Be(0m);
-        receiverProfile.SystemBalance.Should().Be(0m);
+        receiverProfile.Balance.Should().Be(120m);
         tx.IsReversalApplied.Should().BeTrue();
     }
 

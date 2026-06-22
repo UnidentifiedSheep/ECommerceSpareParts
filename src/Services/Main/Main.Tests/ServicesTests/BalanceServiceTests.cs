@@ -40,8 +40,7 @@ public class BalanceServiceTests : IntegrationTest
         var currency = CurrencyContext.Currencies[0];
         await Context.AddAsync(new UserFinancialProfileBuilder(Faker)
             .WithUserId(sender.Id)
-            .WithWalletBalance(300m)
-            .WithSystemBalance(400m)
+            .WithBalance(700m)
             .Build());
         await Context.SaveChangesAsync();
 
@@ -59,26 +58,22 @@ public class BalanceServiceTests : IntegrationTest
 
         var senderProfile = await GetProfile(sender.Id);
         var receiverProfile = await GetProfile(receiver.Id);
-        senderProfile.WalletBalance.Should().Be(0m);
-        senderProfile.SystemBalance.Should().Be(0m);
-        senderProfile.AvailableBalance.Should().Be(0m);
-        receiverProfile.WalletBalance.Should().Be(700m);
-        receiverProfile.SystemBalance.Should().Be(0m);
+        senderProfile.Balance.Should().Be(0m);
+        receiverProfile.Balance.Should().Be(700m);
 
         (await GetUserBalance(sender.Id, currency.Id)).Balance.Should().Be(-700m);
         (await GetUserBalance(receiver.Id, currency.Id)).Balance.Should().Be(700m);
     }
 
     [Fact]
-    public async Task ChangeSenderReceiverBalancesAsync_ManualUserToSystem_PaysSystemDebtFirst()
+    public async Task ChangeSenderReceiverBalancesAsync_ManualUserToSystem_DebitsUserBalance()
     {
         var user = UsersContext.Users.ElementAt(0);
         var systemUser = UserContext.SystemUser;
         var currency = CurrencyContext.Currencies[0];
         await Context.AddAsync(new UserFinancialProfileBuilder(Faker)
             .WithUserId(user.Id)
-            .WithWalletBalance(300m)
-            .WithSystemBalance(-200m)
+            .WithBalance(300m)
             .Build());
         await Context.SaveChangesAsync();
 
@@ -95,26 +90,18 @@ public class BalanceServiceTests : IntegrationTest
         await Context.SaveChangesAsync();
 
         var userProfile = await GetProfile(user.Id);
-        userProfile.WalletBalance.Should().Be(250m);
-        userProfile.SystemBalance.Should().Be(0m);
-        userProfile.AvailableBalance.Should().Be(250m);
+        userProfile.Balance.Should().Be(50m);
 
         (await GetUserBalance(user.Id, currency.Id)).Balance.Should().Be(-250m);
         (await GetUserBalance(systemUser.Id, currency.Id)).Balance.Should().Be(250m);
     }
 
     [Fact]
-    public async Task ChangeSenderReceiverBalancesAsync_ManualSystemToUser_RepaysSystemDebtFirst()
+    public async Task ChangeSenderReceiverBalancesAsync_ManualSystemToUser_CreditsUserBalance()
     {
         var user = UsersContext.Users.ElementAt(0);
         var systemUser = UserContext.SystemUser;
         var currency = CurrencyContext.Currencies[0];
-        await Context.AddAsync(new UserFinancialProfileBuilder(Faker)
-            .WithUserId(user.Id)
-            .WithSystemBalance(200m)
-            .Build());
-        await Context.SaveChangesAsync();
-
         var transaction = new TransactionBuilder(Faker)
             .WithSenderId(systemUser.Id)
             .WithReceiverId(user.Id)
@@ -128,9 +115,7 @@ public class BalanceServiceTests : IntegrationTest
         await Context.SaveChangesAsync();
 
         var userProfile = await GetProfile(user.Id);
-        userProfile.WalletBalance.Should().Be(50m);
-        userProfile.SystemBalance.Should().Be(0m);
-        userProfile.AvailableBalance.Should().Be(50m);
+        userProfile.Balance.Should().Be(250m);
 
         (await GetUserBalance(systemUser.Id, currency.Id)).Balance.Should().Be(-250m);
         (await GetUserBalance(user.Id, currency.Id)).Balance.Should().Be(250m);
@@ -139,7 +124,7 @@ public class BalanceServiceTests : IntegrationTest
     [Theory]
     [InlineData(TransactionSourceType.Purchase)]
     [InlineData(TransactionSourceType.Logistic)]
-    public async Task ChangeSenderReceiverBalancesAsync_SystemSettlementUserToSystem_IncreasesUserSystemBalance(
+    public async Task ChangeSenderReceiverBalancesAsync_SystemSettlementUserToSystem_CreditsUserBalance(
         TransactionSourceType sourceType)
     {
         var user = UsersContext.Users.ElementAt(0);
@@ -159,17 +144,20 @@ public class BalanceServiceTests : IntegrationTest
         await Context.SaveChangesAsync();
 
         var userProfile = await GetProfile(user.Id);
-        userProfile.WalletBalance.Should().Be(0m);
-        userProfile.SystemBalance.Should().Be(100m);
-        userProfile.AvailableBalance.Should().Be(100m);
+        userProfile.Balance.Should().Be(100m);
     }
 
     [Fact]
-    public async Task ChangeSenderReceiverBalancesAsync_SystemSettlementSystemToUser_DecreasesUserSystemBalance()
+    public async Task ChangeSenderReceiverBalancesAsync_SystemSettlementSystemToUser_DebitsUserBalance()
     {
         var buyer = UsersContext.Users.ElementAt(0);
         var systemUser = UserContext.SystemUser;
         var currency = CurrencyContext.Currencies[0];
+        await Context.AddAsync(new UserFinancialProfileBuilder(Faker)
+            .WithUserId(buyer.Id)
+            .WithBalance(100m)
+            .Build());
+        await Context.SaveChangesAsync();
 
         var transaction = new TransactionBuilder(Faker)
             .WithSenderId(systemUser.Id)
@@ -184,13 +172,11 @@ public class BalanceServiceTests : IntegrationTest
         await Context.SaveChangesAsync();
 
         var buyerProfile = await GetProfile(buyer.Id);
-        buyerProfile.WalletBalance.Should().Be(0m);
-        buyerProfile.SystemBalance.Should().Be(-100m);
-        buyerProfile.AvailableBalance.Should().Be(-100m);
+        buyerProfile.Balance.Should().Be(0m);
     }
 
     [Fact]
-    public async Task ChangeSenderReceiverBalancesAsync_ReverseSystemSettlementUserToSystem_RollsBackUserSystemBalance()
+    public async Task ChangeSenderReceiverBalancesAsync_ReverseSystemSettlementUserToSystem_RollsBackUserBalance()
     {
         var supplier = UsersContext.Users.ElementAt(0);
         var systemUser = UserContext.SystemUser;
@@ -213,16 +199,14 @@ public class BalanceServiceTests : IntegrationTest
         await Context.SaveChangesAsync();
 
         var supplierProfile = await GetProfile(supplier.Id);
-        supplierProfile.WalletBalance.Should().Be(0m);
-        supplierProfile.SystemBalance.Should().Be(0m);
-        supplierProfile.AvailableBalance.Should().Be(0m);
+        supplierProfile.Balance.Should().Be(0m);
 
         (await GetUserBalance(supplier.Id, currency.Id)).Balance.Should().Be(0m);
         (await GetUserBalance(systemUser.Id, currency.Id)).Balance.Should().Be(0m);
     }
 
     [Fact]
-    public async Task ChangeSenderReceiverBalancesAsync_ReverseManualUserToUser_RollsBackWalletBalances()
+    public async Task ChangeSenderReceiverBalancesAsync_ReverseManualUserToUser_RollsBackBalances()
     {
         var sender = UsersContext.Users.ElementAt(0);
         var receiver = UsersContext.Users.ElementAt(1);
@@ -230,7 +214,7 @@ public class BalanceServiceTests : IntegrationTest
         var currency = CurrencyContext.Currencies[0];
         await Context.AddAsync(new UserFinancialProfileBuilder(Faker)
             .WithUserId(sender.Id)
-            .WithWalletBalance(100m)
+            .WithBalance(100m)
             .Build());
         await Context.SaveChangesAsync();
 
@@ -253,10 +237,8 @@ public class BalanceServiceTests : IntegrationTest
 
         var senderProfile = await GetProfile(sender.Id);
         var receiverProfile = await GetProfile(receiver.Id);
-        senderProfile.WalletBalance.Should().Be(100m);
-        senderProfile.SystemBalance.Should().Be(0m);
-        receiverProfile.WalletBalance.Should().Be(0m);
-        receiverProfile.SystemBalance.Should().Be(0m);
+        senderProfile.Balance.Should().Be(100m);
+        receiverProfile.Balance.Should().Be(0m);
 
         (await GetUserBalance(sender.Id, currency.Id)).Balance.Should().Be(0m);
         (await GetUserBalance(receiver.Id, currency.Id)).Balance.Should().Be(0m);

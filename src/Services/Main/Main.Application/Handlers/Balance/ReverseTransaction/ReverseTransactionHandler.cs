@@ -44,7 +44,9 @@ public class ReverseTransactionHandler(
             throw new TransactionSourceCannotBeReversedByUserException(transaction.SourceType);
 
         transaction.Reverse(userContext.UserId);
-        await balanceService.ChangeSenderReceiverBalancesAsync(transaction, cancellationToken);
+        await balanceService.ChangeSenderReceiverBalancesAsync(
+            transaction,
+            cancellationToken: cancellationToken);
         return new ReverseTransactionResult(transaction);
     }
 }

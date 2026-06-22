@@ -157,7 +157,8 @@ public class Transaction : AuditableEntity<Transaction, Guid>, ILinqEntity<Trans
         UserFinancialProfile senderProfile,
         UserFinancialProfile receiverProfile,
         decimal amountInBaseCurrency,
-        Guid systemId)
+        Guid systemId,
+        bool forceFinancialProfileDebit = false)
     {
         ValidateBalances(senderBalance, receiverBalance);
         ValidateFinancialProfiles(senderProfile, receiverProfile);
@@ -167,7 +168,8 @@ public class Transaction : AuditableEntity<Transaction, Guid>, ILinqEntity<Trans
             senderProfile,
             receiverProfile,
             amountInBaseCurrency,
-            systemId);
+            systemId,
+            forceFinancialProfileDebit);
         Apply(senderBalance, receiverBalance);
     }
 
@@ -175,15 +177,16 @@ public class Transaction : AuditableEntity<Transaction, Guid>, ILinqEntity<Trans
         UserFinancialProfile senderProfile,
         UserFinancialProfile receiverProfile,
         decimal amountInBaseCurrency,
-        Guid systemId)
+        Guid systemId,
+        bool forceDebit)
     {
         if (SourceType == TransactionSourceType.Manual)
         {
-            ApplyManualFinancialProfiles(senderProfile, receiverProfile, amountInBaseCurrency, systemId);
+            ApplyManualFinancialProfiles(senderProfile, receiverProfile, amountInBaseCurrency, forceDebit);
             return;
         }
 
-        ApplySystemSettlementFinancialProfiles(senderProfile, receiverProfile, amountInBaseCurrency, systemId);
+        ApplySystemSettlementFinancialProfiles(senderProfile, receiverProfile, amountInBaseCurrency, systemId, forceDebit);
     }
 
     private void ValidateBalances(UserBalance senderBalance, UserBalance receiverBalance)
@@ -230,136 +233,42 @@ public class Transaction : AuditableEntity<Transaction, Guid>, ILinqEntity<Trans
         UserFinancialProfile senderProfile,
         UserFinancialProfile receiverProfile,
         decimal amountInBaseCurrency,
-        Guid systemId)
+        bool forceDebit)
     {
-        var senderIsSystem = SenderId == systemId;
-        var receiverIsSystem = ReceiverId == systemId;
-
         if (IsReversed)
         {
-            ApplyManualReversedFinancialProfiles(
-                senderProfile,
-                receiverProfile,
-                amountInBaseCurrency,
-                senderIsSystem,
-                receiverIsSystem);
+            senderProfile.Credit(amountInBaseCurrency);
+            receiverProfile.Debit(amountInBaseCurrency, forceDebit);
             return;
         }
 
-        ApplyManualCompletedFinancialProfiles(
-            senderProfile,
-            receiverProfile,
-            amountInBaseCurrency,
-            senderIsSystem,
-            receiverIsSystem);
-    }
-
-    private static void ApplyManualCompletedFinancialProfiles(
-        UserFinancialProfile senderProfile,
-        UserFinancialProfile receiverProfile,
-        decimal amountInBaseCurrency,
-        bool senderIsSystem,
-        bool receiverIsSystem)
-    {
-        switch (senderIsSystem)
-        {
-            case true when !receiverIsSystem:
-                receiverProfile.ReceiveFromSystem(amountInBaseCurrency);
-                return;
-            case false when receiverIsSystem:
-                senderProfile.PayToSystem(amountInBaseCurrency);
-                return;
-            default:
-                senderProfile.SpendAvailable(amountInBaseCurrency);
-                receiverProfile.DepositWallet(amountInBaseCurrency);
-                return;
-        }
-    }
-
-    private static void ApplyManualReversedFinancialProfiles(
-        UserFinancialProfile senderProfile,
-        UserFinancialProfile receiverProfile,
-        decimal amountInBaseCurrency,
-        bool senderIsSystem,
-        bool receiverIsSystem)
-    {
-        switch (senderIsSystem)
-        {
-            case true when !receiverIsSystem:
-                receiverProfile.PayToSystem(amountInBaseCurrency);
-                return;
-            case false when receiverIsSystem:
-                senderProfile.ReceiveFromSystem(amountInBaseCurrency);
-                return;
-            default:
-                senderProfile.DepositWallet(amountInBaseCurrency);
-                receiverProfile.SpendAvailable(amountInBaseCurrency);
-                return;
-        }
+        senderProfile.Debit(amountInBaseCurrency, forceDebit);
+        receiverProfile.Credit(amountInBaseCurrency);
     }
 
     private void ApplySystemSettlementFinancialProfiles(
         UserFinancialProfile senderProfile,
         UserFinancialProfile receiverProfile,
         decimal amountInBaseCurrency,
-        Guid systemId)
+        Guid systemId,
+        bool forceDebit)
     {
         var senderIsSystem = SenderId == systemId;
         var receiverIsSystem = ReceiverId == systemId;
 
         if (IsReversed)
         {
-            ApplySystemSettlementReversedFinancialProfiles(
-                senderProfile,
-                receiverProfile,
-                amountInBaseCurrency,
-                senderIsSystem,
-                receiverIsSystem);
+            if (receiverIsSystem)
+                senderProfile.Debit(amountInBaseCurrency, forceDebit);
+            else if (senderIsSystem)
+                receiverProfile.Credit(amountInBaseCurrency);
             return;
         }
 
-        ApplySystemSettlementCompletedFinancialProfiles(
-            senderProfile,
-            receiverProfile,
-            amountInBaseCurrency,
-            senderIsSystem,
-            receiverIsSystem);
-    }
-
-    private static void ApplySystemSettlementCompletedFinancialProfiles(
-        UserFinancialProfile senderProfile,
-        UserFinancialProfile receiverProfile,
-        decimal amountInBaseCurrency,
-        bool senderIsSystem,
-        bool receiverIsSystem)
-    {
-        switch (senderIsSystem)
-        {
-            case false when receiverIsSystem:
-                senderProfile.IncreaseSystemBalance(amountInBaseCurrency);
-                return;
-            case true when !receiverIsSystem:
-                receiverProfile.DecreaseSystemBalance(amountInBaseCurrency);
-                return;
-        }
-    }
-
-    private static void ApplySystemSettlementReversedFinancialProfiles(
-        UserFinancialProfile senderProfile,
-        UserFinancialProfile receiverProfile,
-        decimal amountInBaseCurrency,
-        bool senderIsSystem,
-        bool receiverIsSystem)
-    {
-        switch (senderIsSystem)
-        {
-            case false when receiverIsSystem:
-                senderProfile.DecreaseSystemBalance(amountInBaseCurrency);
-                return;
-            case true when !receiverIsSystem:
-                receiverProfile.IncreaseSystemBalance(amountInBaseCurrency);
-                return;
-        }
+        if (receiverIsSystem)
+            senderProfile.Credit(amountInBaseCurrency);
+        else if (senderIsSystem)
+            receiverProfile.Debit(amountInBaseCurrency, forceDebit);
     }
 
     private void ApplyCompleted(UserBalance sender, UserBalance receiver)

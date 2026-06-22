@@ -4,5 +4,8 @@ namespace Main.Application.Interfaces.Services;
 
 public interface IBalanceService
 {
-    Task ChangeSenderReceiverBalancesAsync(Transaction transaction, CancellationToken cancellationToken = default);
+    Task ChangeSenderReceiverBalancesAsync(
+        Transaction transaction,
+        bool forceFinancialProfileDebit = false,
+        CancellationToken cancellationToken = default);
 }

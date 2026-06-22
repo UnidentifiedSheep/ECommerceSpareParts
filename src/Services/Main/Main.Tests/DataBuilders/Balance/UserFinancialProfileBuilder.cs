@@ -8,8 +8,7 @@ public class UserFinancialProfileBuilder(Faker faker) : BuilderBase<UserFinancia
 {
     public Guid? UserId { get; private set; }
     public decimal? MinAllowedBalance { get; private set; }
-    public decimal? WalletBalance { get; private set; }
-    public decimal? SystemBalance { get; private set; }
+    public decimal? Balance { get; private set; }
 
     public UserFinancialProfileBuilder WithUserId(Guid userId)
     {
@@ -23,15 +22,9 @@ public class UserFinancialProfileBuilder(Faker faker) : BuilderBase<UserFinancia
         return this;
     }
 
-    public UserFinancialProfileBuilder WithWalletBalance(decimal walletBalance)
+    public UserFinancialProfileBuilder WithBalance(decimal balance)
     {
-        WalletBalance = walletBalance;
-        return this;
-    }
-
-    public UserFinancialProfileBuilder WithSystemBalance(decimal systemBalance)
-    {
-        SystemBalance = systemBalance;
+        Balance = balance;
         return this;
     }
 
@@ -41,16 +34,13 @@ public class UserFinancialProfileBuilder(Faker faker) : BuilderBase<UserFinancia
             UserId ?? Guid.NewGuid(),
             MinAllowedBalance ?? 0m);
 
-        if (WalletBalance.HasValue)
-            profile.DepositWallet(WalletBalance.Value);
-
-        if (!SystemBalance.HasValue)
+        if (!Balance.HasValue)
             return profile;
 
-        if (SystemBalance.Value >= 0)
-            profile.IncreaseSystemBalance(SystemBalance.Value);
+        if (Balance.Value >= 0)
+            profile.Credit(Balance.Value);
         else
-            profile.DecreaseSystemBalance(Math.Abs(SystemBalance.Value));
+            profile.Debit(Math.Abs(Balance.Value), true);
 
         return profile;
     }

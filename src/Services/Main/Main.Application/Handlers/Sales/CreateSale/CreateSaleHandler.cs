@@ -33,7 +33,8 @@ public record CreateSaleCommand(
     IEnumerable<NewSaleContentDto> Contents,
     string? Comment,
     decimal? PayedSum,
-    string? ConfirmationCode) : ICommand<CreateSaleResult>;
+    string? ConfirmationCode,
+    bool ForcePayment = false) : ICommand<CreateSaleResult>;
 
 public record CreateSaleResult(SaleDto Sale);
 
@@ -69,7 +70,8 @@ public class CreateSaleHandler(
                 request.CurrencyId,
                 request.SaleDateTime,
                 TransactionSourceType.Sale,
-                TransactionCreationMode.System),
+                TransactionCreationMode.System,
+                request.ForcePayment),
             cancellationToken)).Transaction;
 
         if (request.PayedSum > 0)
@@ -81,7 +83,8 @@ public class CreateSaleHandler(
                     request.CurrencyId,
                     request.SaleDateTime,
                     TransactionSourceType.Manual,
-                    TransactionCreationMode.System),
+                    TransactionCreationMode.System,
+                    request.ForcePayment),
                 cancellationToken);
         
         var sale = Sale.Create(
