@@ -1,9 +1,11 @@
 using Abstractions.Interfaces.Persistence;
 using Abstractions.Interfaces.Services;
+using Abstractions.Models.Options;
 using Application.Common.Interfaces.Currency;
 using Application.Common.Interfaces.Repositories;
 using Main.Application.Interfaces.Services;
 using Main.Entities.Balance;
+using Microsoft.Extensions.Options;
 
 namespace Main.Application.Services;
 
@@ -11,6 +13,7 @@ public class BalanceService(
     IRepository<UserBalance, UserBalanceKey> userBalanceRepository,
     IRepository<UserFinancialProfile, Guid> userFinancialProfileRepository,
     ICurrencyConverter currencyConverter,
+    IOptions<SystemOptions> systemOptions,
     IUnitOfWork unitOfWork) : IBalanceService
 {
     public async Task ChangeSenderReceiverBalancesAsync(
@@ -77,8 +80,12 @@ public class BalanceService(
                 cancellationToken);
 
         if (dbValue != null) return dbValue;
+
+        if (systemOptions.Value.SystemId == userId)
+            dbValue = UserFinancialProfile.Create(userId, decimal.MinValue);
+        else
+            dbValue = UserFinancialProfile.Create(userId);
         
-        dbValue = UserFinancialProfile.Create(userId);
         await unitOfWork.AddAsync(dbValue, cancellationToken);
         return dbValue;
     }

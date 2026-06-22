@@ -19,6 +19,8 @@
     "transaction.range.start.before.end": "Дата начала диапазона не может быть позже даты конца.",
     "transaction.range.max.months": "Максимальный диапазон — 5 месяцев.",
     "financial.profile.amount.must.not.be.negative": "Сумма не может быть отрицательной.",
-    "financial.profile.balance.must.not.be.less.than.minimum": "Баланс не может быть меньше минимально допустимого."
+    "financial.profile.balance.must.not.be.less.than.minimum": "Баланс не может быть меньше минимально допустимого.",
+    "financial.profile.min.allowed.balance.max.two.decimal.places": "Минимально допустимый баланс может содержать не более 2 знаков после запятой.",
+    "financial.profile.min.allowed.balance.must.not.be.positive": "Минимально допустимый баланс не может быть положительным."
   }
 }
