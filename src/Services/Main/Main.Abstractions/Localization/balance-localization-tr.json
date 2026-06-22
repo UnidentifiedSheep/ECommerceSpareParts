@@ -19,7 +19,7 @@
     "transaction.range.start.before.end": "Başlangıç tarihi bitiş tarihinden sonra olamaz.",
     "transaction.range.max.months": "Maksimum aralık 5 aydır.",
     "financial.profile.amount.must.not.be.negative": "Tutar negatif olamaz.",
-    "financial.profile.balance.must.not.be.less.than.minimum": "Bakiye izin verilen minimum bakiyeden az olamaz.",
+    "financial.profile.balance.must.not.be.less.than.minimum": "İşlemi tamamlamak için yeterli bakiye yok.",
     "financial.profile.min.allowed.balance.max.two.decimal.places": "İzin verilen minimum bakiye en fazla 2 ondalık basamak içerebilir.",
     "financial.profile.min.allowed.balance.must.not.be.positive": "İzin verilen minimum bakiye pozitif olamaz."
   }
