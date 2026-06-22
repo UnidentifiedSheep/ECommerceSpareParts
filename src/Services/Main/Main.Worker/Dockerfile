@@ -31,7 +31,6 @@ COPY ["src/Infrastructure/Mailing/Mailing.Core/Mailing.Core.csproj", "src/Infras
 COPY ["src/Infrastructure/Mailing/EmailTemplates/EmailTemplates.csproj", "src/Infrastructure/Mailing/EmailTemplates/"]
 COPY ["src/Infrastructure/Integrations/ExchangeRate/ExchangeRate.csproj", "src/Infrastructure/Integrations/ExchangeRate/"]
 COPY ["src/Services/Main/Main.Application/Main.Application.csproj", "src/Services/Main/Main.Application/"]
-COPY ["src/Services/Main/Main.Abstractions/Main.Abstractions.csproj", "src/Services/Main/Main.Abstractions/"]
 COPY ["src/Services/Main/Main.Entities/Main.Entities.csproj", "src/Services/Main/Main.Entities/"]
 COPY ["src/Services/Main/Main.Enums/Main.Enums.csproj", "src/Services/Main/Main.Enums/"]
 COPY ["src/Services/Main/Main.Persistence/Main.Persistence.csproj", "src/Services/Main/Main.Persistence/"]

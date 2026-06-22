@@ -29,7 +29,6 @@
         <ProjectReference Include="..\..\..\Infrastructure\Localization\Localization.Domain\Localization.Domain.csproj"/>
         <ProjectReference Include="..\..\..\Infrastructure\Mailing\Mailing.Core\Mailing.Core.csproj" />
         <ProjectReference Include="..\..\Application.Common\Application.Common.csproj"/>
-        <ProjectReference Include="..\Main.Abstractions\Main.Abstractions.csproj"/>
         <ProjectReference Include="..\Main.Entities\Main.Entities.csproj"/>
     </ItemGroup>
 
@@ -41,5 +40,4 @@
             <HintPath>..\..\..\..\..\..\..\.nuget\packages\serilog\4.3.1-dev-02387\lib\net9.0\Serilog.dll</HintPath>
         </Reference>
     </ItemGroup>
-
 </Project>
