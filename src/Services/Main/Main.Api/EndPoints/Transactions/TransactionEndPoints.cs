@@ -119,8 +119,8 @@ public static class TransactionEndPoints
         balances.MapDelete("{id:guid}", async (
                 ISender sender,
                 Guid id,
-                [FromQuery] bool forcePayment,
-                CancellationToken token) =>
+                [FromQuery] bool forcePayment = false,
+                CancellationToken token = default) =>
             {
                 await sender.Send(new ReverseTransactionCommand(
                     id, 
