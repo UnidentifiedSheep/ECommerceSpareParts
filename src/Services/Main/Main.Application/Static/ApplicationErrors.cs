@@ -1,4 +1,4 @@
-﻿namespace Main.Abstractions.Constants;
+﻿namespace Main.Application.Static;
 
 public static class ApplicationErrors
 {

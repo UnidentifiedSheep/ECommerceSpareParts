@@ -5,6 +5,7 @@ using Application.Common.Interfaces.Cqrs;
 using Application.Common.Interfaces.Repositories;
 using Attributes;
 using Contracts.Products;
+using Main.Application.Static;
 using Main.Entities.Exceptions;
 using Main.Entities.Product;
 using MediatR;

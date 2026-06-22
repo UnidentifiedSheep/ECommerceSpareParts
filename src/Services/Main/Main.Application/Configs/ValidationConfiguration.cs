@@ -3,7 +3,7 @@ using BulkValidation.Core.Configuration;
 using BulkValidation.Core.Enums;
 using BulkValidation.Core.Extensions;
 using Exceptions.Base;
-using Main.Abstractions.Constants;
+using Main.Application.Static;
 using Main.Entities;
 
 namespace Main.Application.Configs;

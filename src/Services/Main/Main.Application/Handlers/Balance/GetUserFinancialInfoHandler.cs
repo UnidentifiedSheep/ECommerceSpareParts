@@ -2,6 +2,7 @@ using Application.Common.Interfaces.Cqrs;
 using Application.Common.Interfaces.Repositories;
 using Application.Common.Interfaces.Settings;
 using LinqKit;
+using Main.Application.Dtos.Balances;
 using Main.Application.Dtos.Currencies;
 using Main.Application.Dtos.Users;
 using Main.Application.Projections;

@@ -6,6 +6,7 @@ using Application.Common.Interfaces.Cqrs;
 using Application.Common.Interfaces.Settings;
 using Attributes;
 using Contracts.Products;
+using Main.Application.Static;
 using Main.Entities.Product;
 using Main.Entities.Setting;
 using MediatR;

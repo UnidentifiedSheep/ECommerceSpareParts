@@ -1,5 +1,6 @@
 ﻿using Abstractions.Interfaces;
 using Application.Common.Interfaces.Cqrs;
+using Main.Application.Static;
 using MediatR;
 
 namespace Main.Application.Handlers.Uploads;

@@ -1,5 +1,6 @@
 ﻿using Abstractions.Interfaces;
 using Application.Common.Interfaces.Cqrs;
+using Main.Application.Static;
 
 namespace Main.Application.Handlers.Uploads;
 

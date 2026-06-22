@@ -1,8 +1,8 @@
 using FluentAssertions;
 using Exceptions;
-using Main.Abstractions.Constants;
 using Main.Application.Dtos.Sale;
 using Main.Application.Handlers.Sales.CreateSale;
+using Main.Application.Static;
 using Main.Entities.Balance;
 using Main.Entities.Event;
 using Main.Entities.Exceptions;
