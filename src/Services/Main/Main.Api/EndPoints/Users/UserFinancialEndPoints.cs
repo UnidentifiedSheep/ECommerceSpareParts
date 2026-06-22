@@ -74,9 +74,9 @@ public static class UserFinancialEndPoints
                 });
             })
             .WithName("UpdateUserFinancialInfo")
-            .WithSummary("Получить информацию по финанцам пользователя")
-            .WithDescription("Получение финансовой информации пользователя")
-            .WithDisplayName("Получение финансовой информации пользователя")
+            .WithSummary("Обновление финансового профиля пользователя")
+            .WithDescription("Обновление финансового профиля пользователя")
+            .WithDisplayName("Обновление финансового профиля пользователя")
             .Produces<UpdateUserFinancialInfoResponse>()
             .ProducesProblem(StatusCodes.Status404NotFound)
             .RequireAnyPermission(PermissionCodes.BALANCES_FINANCES_UPDATE);
