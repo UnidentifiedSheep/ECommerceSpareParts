@@ -23,7 +23,7 @@ using Microsoft.Extensions.Options;
 namespace Main.Application.Handlers.Sales.EditSale;
 
 [AutoSave]
-[Transactional(IsolationLevel.Serializable, 20, 2)]
+[Transactional(IsolationLevel.ReadCommitted, 20, 2)]
 public record EditSaleCommand(
     Guid SaleId,
     uint RowVersion,

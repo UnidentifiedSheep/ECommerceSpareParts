@@ -31,7 +31,7 @@ using Microsoft.Extensions.Options;
 namespace Main.Application.Handlers.Purchases.EditPurchase;
 
 [AutoSave]
-[Transactional(IsolationLevel.Serializable, 20, 2)]
+[Transactional(IsolationLevel.ReadCommitted, 20, 2)]
 public record EditPurchaseCommand(
     IEnumerable<EditPurchaseDto> Content,
     Guid PurchaseId,

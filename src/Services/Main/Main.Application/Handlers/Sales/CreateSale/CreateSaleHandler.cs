@@ -23,7 +23,7 @@ using Microsoft.Extensions.Options;
 
 namespace Main.Application.Handlers.Sales.CreateSale;
 
-[Transactional(IsolationLevel.Serializable, 30, 2)]
+[Transactional(IsolationLevel.ReadCommitted, 30, 2)]
 [AutoSave]
 public record CreateSaleCommand(
     Guid BuyerId,

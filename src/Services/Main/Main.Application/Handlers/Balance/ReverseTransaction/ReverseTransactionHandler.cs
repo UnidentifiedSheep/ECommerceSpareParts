@@ -12,7 +12,7 @@ using Main.Enums.Balances;
 namespace Main.Application.Handlers.Balance.ReverseTransaction;
 
 [AutoSave]
-[Transactional(IsolationLevel.Serializable, 20, 3)]
+[Transactional(IsolationLevel.ReadCommitted, 20, 3)]
 public record ReverseTransactionCommand(
     Guid TransactionId,
     TransactionReversalMode Mode = TransactionReversalMode.User)

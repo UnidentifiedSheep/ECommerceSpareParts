@@ -20,9 +20,14 @@ public class BalanceService(
         var senderProfile = await GetFinancialProfile(transaction.SenderId, cancellationToken);
         var receiverProfile = await GetFinancialProfile(transaction.ReceiverId, cancellationToken);
         
-        var senderBalance = await GetUserBalanceAsync(transaction.SenderId, transaction.CurrencyId, cancellationToken);
-        var receiverBalance =
-            await GetUserBalanceAsync(transaction.ReceiverId, transaction.CurrencyId, cancellationToken);
+        var senderBalance = await GetUserBalanceAsync(
+            transaction.SenderId, 
+            transaction.CurrencyId, 
+            cancellationToken);
+        var receiverBalance = await GetUserBalanceAsync(
+            transaction.ReceiverId, 
+            transaction.CurrencyId, 
+            cancellationToken);
         
         var amountInBaseCurrency = await currencyConverter
             .ConvertToBaseAsync(
