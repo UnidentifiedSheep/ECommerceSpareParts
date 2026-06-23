@@ -1,4 +1,5 @@
-﻿using Domain.CommonEntities;
+﻿using System.Text.Json.Serialization;
+using Domain.CommonEntities;
 using Domain.Interfaces;
 using Pricing.Enums;
 
@@ -20,7 +21,13 @@ public class PricingSetting : Setting<PricingSettingData>, ISetting<PricingSetti
 
 public record PricingSettingData
 {
+    [JsonPropertyName("pricingStrategy")]
+    [JsonConverter(typeof(JsonStringEnumConverter))]
     public ProductPricingType PricingStrategy { get; init; } = ProductPricingType.Average;
+    
+    [JsonPropertyName("selectedMarkupId")]
     public int? SelectedMarkupId { get; init; }
+    
+    [JsonPropertyName("defaultMarkup")]
     public decimal DefaultMarkup { get; init; } = 20;
 }
