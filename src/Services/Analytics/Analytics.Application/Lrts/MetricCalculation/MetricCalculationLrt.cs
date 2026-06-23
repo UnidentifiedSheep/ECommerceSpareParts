@@ -4,6 +4,8 @@ using Abstractions.Interfaces.Persistence;
 using Analytics.Application.Handlers.Metrics;
 using Application.Common.Interfaces.Repositories;
 using Application.Common.NamedObject;
+using Attributes;
+using Contracts.Analytics;
 using Domain.CommonEntities;
 using MassTransit;
 using MediatR;
@@ -29,8 +31,30 @@ public class MetricCalculationLrt(
     {
         var state = await GetStateAsync<MetricCalculationInputState>()
             ?? throw new InvalidOperationException($"'{InputType.Name}' state is null");
+
+        await Publisher.Publish(new MetricCalculationStatusUpdatedEvent
+        {
+            MetricId = state.MetricId,
+            JobStatus = Job.Status.ToString()
+        });
+        
+        await UnitOfWork.SaveChangesAsync(CancellationToken);
         
         var result = await sender.Send(new CalculateMetricCommand(state.MetricId), CancellationToken);
     }
 
+    protected override async Task SucceedJobAsync()
+    {
+        await base.SucceedJobAsync();
+        var state = await GetStateAsync<MetricCalculationState>() 
+                    ?? throw new InvalidOperationException("State is null");
+        
+        await Publisher.Publish(new MetricCalculationStatusUpdatedEvent
+        {
+            MetricId = state.MetricId,
+            JobStatus = Job.Status.ToString()
+        });
+        
+        await UnitOfWork.SaveChangesAsync(CancellationToken);
+    }
 }

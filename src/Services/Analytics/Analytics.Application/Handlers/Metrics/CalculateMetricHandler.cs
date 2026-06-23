@@ -1,19 +1,19 @@
-﻿using Analytics.Application.Interfaces.Repositories;
+﻿using Abstractions.Interfaces.Persistence;
+using Analytics.Application.Interfaces.Repositories;
 using Analytics.Application.Interfaces.Services.Metrics;
 using Analytics.Entities.Exceptions.Metrics;
 using Analytics.Entities.Metrics;
 using Application.Common.Interfaces.Cqrs;
-using Attributes;
 
 namespace Analytics.Application.Handlers.Metrics;
 
-[Transactional, AutoSave]
 public record CalculateMetricCommand(Guid MetricId) : ICommand<CalculateMetricResult>;
 
 public record CalculateMetricResult(Metric CalculatedMetric);
 
 public class CalculateMetricHandler(
     IMetricCalculatorFactory calculatorFactory,
+    IUnitOfWork unitOfWork,
     IMetricRepository metricRepository)
     : ICommandHandler<CalculateMetricCommand, CalculateMetricResult>
 {
@@ -27,6 +27,8 @@ public class CalculateMetricHandler(
 
         await calculator.CalculateMetric(metric, cancellationToken);
 
+        await unitOfWork.SaveChangesAsync(cancellationToken);
+        
         return new CalculateMetricResult(metric);
     }
 }

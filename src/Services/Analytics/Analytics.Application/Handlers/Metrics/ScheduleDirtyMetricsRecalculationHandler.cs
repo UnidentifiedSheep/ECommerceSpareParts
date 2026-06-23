@@ -5,9 +5,11 @@ using Analytics.Application.Lrts.MetricCalculation;
 using Analytics.Entities.Metrics;
 using Analytics.Enums;
 using Application.Common.Handlers.Jobs;
+using Application.Common.Interfaces;
 using Application.Common.Interfaces.Cqrs;
 using Application.Common.Interfaces.Repositories;
 using Attributes;
+using Contracts.Analytics;
 using Domain.CommonEnums;
 using MediatR;
 
@@ -20,6 +22,7 @@ public record ScheduleDirtyMetricsRecalculationCommand(int Limit) : ICommand;
 
 public class ScheduleDirtyMetricsRecalculationHandler(
     IMetricRepository metricRepository,
+    IIntegrationEventScope integrationEventScope,
     ISender sender
     ) : ICommandHandler<ScheduleDirtyMetricsRecalculationCommand>
 {
@@ -52,7 +55,16 @@ public class ScheduleDirtyMetricsRecalculationHandler(
         var jobResult = await sender.Send(new QueueJobCommand(jobItems), cancellationToken);
         
         for (int i = 0; i < metrics.Count; i++)
-            metrics[i].AddJob(jobResult.Jobs[i].Id);
+        {
+            var metric = metrics[i];
+            var job = jobResult.Jobs[i];
+            metric.AddJob(job.Id);
+            integrationEventScope.Add(new MetricCalculationStatusUpdatedEvent
+            {
+                MetricId = metric.Id,
+                JobStatus = job.Status.ToString()
+            });
+        }
         
         return Unit.Value;
     }
