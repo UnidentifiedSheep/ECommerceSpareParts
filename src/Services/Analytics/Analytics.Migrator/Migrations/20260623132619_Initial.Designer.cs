@@ -12,7 +12,7 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace Analytics.Migrator.Migrations
 {
     [DbContext(typeof(DContext))]
-    [Migration("20260518191736_Initial")]
+    [Migration("20260623132619_Initial")]
     partial class Initial
     {
         /// <inheritdoc />
@@ -27,73 +27,6 @@ namespace Analytics.Migrator.Migrations
             NpgsqlModelBuilderExtensions.HasPostgresExtension(modelBuilder, "pg_trgm");
             NpgsqlModelBuilderExtensions.HasPostgresExtension(modelBuilder, "pgcrypto");
             NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
-
-            modelBuilder.Entity("Analytics.Entities.MetricCalculationJob", b =>
-                {
-                    b.Property<Guid>("RequestId")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uuid")
-                        .HasColumnName("request_id")
-                        .HasDefaultValueSql("gen_random_uuid()");
-
-                    b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("timestamp with time zone")
-                        .HasColumnName("created_at");
-
-                    b.Property<string>("ErrorMessage")
-                        .HasMaxLength(512)
-                        .HasColumnType("character varying(512)")
-                        .HasColumnName("error_message");
-
-                    b.Property<Guid?>("MetricId")
-                        .HasColumnType("uuid")
-                        .HasColumnName("metric_id");
-
-                    b.Property<string>("MetricSystemName")
-                        .IsRequired()
-                        .HasMaxLength(128)
-                        .HasColumnType("character varying(128)")
-                        .HasColumnName("metric_system_name");
-
-                    b.Property<uint>("RowVersion")
-                        .IsConcurrencyToken()
-                        .ValueGeneratedOnAddOrUpdate()
-                        .HasColumnType("xid")
-                        .HasColumnName("xmin");
-
-                    b.Property<int>("Status")
-                        .HasMaxLength(50)
-                        .HasColumnType("integer")
-                        .HasColumnName("status");
-
-                    b.Property<DateTime>("UpdatedAt")
-                        .HasColumnType("timestamp with time zone")
-                        .HasColumnName("updated_at");
-
-                    b.Property<Guid?>("WhoCreated")
-                        .HasColumnType("uuid")
-                        .HasColumnName("who_created");
-
-                    b.Property<Guid?>("WhoUpdated")
-                        .HasColumnType("uuid")
-                        .HasColumnName("who_updated");
-
-                    b.HasKey("RequestId")
-                        .HasName("request_id_pk");
-
-                    b.HasIndex("WhoCreated")
-                        .HasDatabaseName("analytics.entities.metriccalculationjob_who_created_idx");
-
-                    b.HasIndex("WhoUpdated")
-                        .HasDatabaseName("analytics.entities.metriccalculationjob_who_updated_idx");
-
-                    b.HasIndex(new[] { "MetricId" }, "metrics_calc_jobs_metric_id_index")
-                        .IsUnique();
-
-                    b.HasIndex(new[] { "Status", "MetricSystemName" }, "metrics_calc_jobs_status_name_index");
-
-                    b.ToTable("metric_calculation_jobs", (string)null);
-                });
 
             modelBuilder.Entity("Analytics.Entities.Metrics.Metric", b =>
                 {
@@ -115,11 +48,6 @@ namespace Analytics.Migrator.Migrations
                         .HasColumnType("bigint")
                         .HasColumnName("depends_on");
 
-                    b.Property<byte[]>("DimensionHash")
-                        .IsRequired()
-                        .HasColumnType("bytea")
-                        .HasColumnName("dimension_hash");
-
                     b.Property<string>("DimensionKey")
                         .IsRequired()
                         .HasMaxLength(200)
@@ -128,13 +56,18 @@ namespace Analytics.Migrator.Migrations
 
                     b.Property<string>("Discriminator")
                         .IsRequired()
-                        .HasMaxLength(21)
-                        .HasColumnType("character varying(21)")
+                        .HasMaxLength(34)
+                        .HasColumnType("character varying(34)")
                         .HasColumnName("discriminator");
 
                     b.Property<string>("Json")
                         .HasColumnType("text")
                         .HasColumnName("json");
+
+                    b.Property<byte[]>("NaturalKey")
+                        .IsRequired()
+                        .HasColumnType("bytea")
+                        .HasColumnName("natural_key");
 
                     b.Property<DateTime>("RangeEnd")
                         .HasColumnType("timestamp with time zone")
@@ -168,20 +101,20 @@ namespace Analytics.Migrator.Migrations
                         .HasName("metrics_pk");
 
                     b.HasIndex("WhoCreated")
-                        .HasDatabaseName("analytics.entities.metrics.metric_who_created_idx");
+                        .HasDatabaseName("analytics.entities.metrics.productsalesmetric_who_created_idx");
 
                     b.HasIndex("WhoUpdated")
-                        .HasDatabaseName("analytics.entities.metrics.metric_who_updated_idx");
+                        .HasDatabaseName("analytics.entities.metrics.productsalesmetric_who_updated_idx");
 
                     b.HasIndex(new[] { "CurrencyId" }, "metrics_currency_id_index");
 
                     b.HasIndex(new[] { "Discriminator" }, "metrics_dirty_index")
                         .HasFilter("(tags & 1) = 1");
 
-                    b.HasIndex(new[] { "DependsOn", "RangeStart", "RangeEnd" }, "metrics_range_depends_index");
-
-                    b.HasIndex(new[] { "Discriminator", "RangeStart", "RangeEnd", "DimensionHash" }, "metrics_range_start_end_discriminator_u_index")
+                    b.HasIndex(new[] { "NaturalKey" }, "metrics_natural_key_index")
                         .IsUnique();
+
+                    b.HasIndex(new[] { "DependsOn", "RangeStart", "RangeEnd" }, "metrics_range_depends_index");
 
                     b.ToTable("metrics", (string)null);
 
@@ -190,15 +123,31 @@ namespace Analytics.Migrator.Migrations
                     b.UseTphMappingStrategy();
                 });
 
+            modelBuilder.Entity("Analytics.Entities.Metrics.MetricJob", b =>
+                {
+                    b.Property<Guid>("MetricId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("metric_id");
+
+                    b.Property<Guid>("JobId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("job_id");
+
+                    b.HasKey("MetricId", "JobId")
+                        .HasName("metric_jobs_pk");
+
+                    b.HasIndex(new[] { "JobId" }, "metric_jobs_job_id_idx");
+
+                    b.HasIndex(new[] { "MetricId" }, "metric_jobs_metric_id_idx");
+
+                    b.ToTable("metric_jobs", (string)null);
+                });
+
             modelBuilder.Entity("Analytics.Entities.PurchaseContent", b =>
                 {
                     b.Property<int>("Id")
                         .HasColumnType("integer")
                         .HasColumnName("id");
-
-                    b.Property<int>("ArticleId")
-                        .HasColumnType("integer")
-                        .HasColumnName("article_id");
 
                     b.Property<int>("Count")
                         .HasColumnType("integer")
@@ -208,6 +157,10 @@ namespace Analytics.Migrator.Migrations
                         .HasColumnType("numeric")
                         .HasColumnName("price");
 
+                    b.Property<int>("ProductId")
+                        .HasColumnType("integer")
+                        .HasColumnName("product_id");
+
                     b.Property<Guid>("PurchaseId")
                         .HasColumnType("uuid")
                         .HasColumnName("purchase_id");
@@ -215,7 +168,7 @@ namespace Analytics.Migrator.Migrations
                     b.HasKey("Id")
                         .HasName("purchase_contents_pk");
 
-                    b.HasIndex(new[] { "ArticleId" }, "purchase_contents_article_id_index");
+                    b.HasIndex(new[] { "ProductId" }, "purchase_contents_product_id_index");
 
                     b.HasIndex(new[] { "PurchaseId" }, "purchase_contents_purchase_id_index");
 
@@ -267,10 +220,6 @@ namespace Analytics.Migrator.Migrations
                         .HasColumnType("integer")
                         .HasColumnName("id");
 
-                    b.Property<int>("ArticleId")
-                        .HasColumnType("integer")
-                        .HasColumnName("article_id");
-
                     b.Property<int>("Count")
                         .HasColumnType("integer")
                         .HasColumnName("count");
@@ -283,7 +232,11 @@ namespace Analytics.Migrator.Migrations
                         .HasColumnType("numeric")
                         .HasColumnName("price");
 
-                    b.Property<Guid?>("SaleId")
+                    b.Property<int>("ProductId")
+                        .HasColumnType("integer")
+                        .HasColumnName("product_id");
+
+                    b.Property<Guid>("SaleId")
                         .HasMaxLength(128)
                         .HasColumnType("uuid")
                         .HasColumnName("sale_id");
@@ -291,7 +244,7 @@ namespace Analytics.Migrator.Migrations
                     b.HasKey("Id")
                         .HasName("sale_contents_pk");
 
-                    b.HasIndex(new[] { "ArticleId" }, "sale_contents_article_id_index");
+                    b.HasIndex(new[] { "ProductId" }, "sale_contents_product_id_index");
 
                     b.HasIndex(new[] { "SaleId" }, "sale_contents_sale_id_index");
 
@@ -348,9 +301,68 @@ namespace Analytics.Migrator.Migrations
                         .HasColumnType("integer")
                         .HasColumnName("currency_id");
 
+                    b.Property<DateTime>("ProcessedAt")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("processed_at");
+
                     b.Property<decimal>("TotalSum")
                         .HasColumnType("numeric")
                         .HasColumnName("total_sum");
+
+                    b.HasKey("Id")
+                        .HasName("sales_fact_pk");
+
+                    b.HasIndex(new[] { "BuyerId" }, "sales_fact_buyer_id_index");
+
+                    b.HasIndex(new[] { "CreatedAt" }, "sales_fact_created_at_index");
+
+                    b.HasIndex(new[] { "CurrencyId" }, "sales_fact_currency_id_index");
+
+                    b.ToTable("sales_fact", (string)null);
+                });
+
+            modelBuilder.Entity("Domain.CommonEntities.Job", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid")
+                        .HasColumnName("id");
+
+                    b.Property<int>("Attempts")
+                        .HasColumnType("integer")
+                        .HasColumnName("attempts");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("created_at");
+
+                    b.Property<string>("ErrorMessage")
+                        .HasColumnType("text")
+                        .HasColumnName("error_message");
+
+                    b.Property<DateTime?>("LockedAt")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("locked_at");
+
+                    b.Property<int>("MaxAttempts")
+                        .HasColumnType("integer")
+                        .HasColumnName("max_attempts");
+
+                    b.Property<string>("State")
+                        .IsRequired()
+                        .HasColumnType("text")
+                        .HasColumnName("state");
+
+                    b.Property<string>("Status")
+                        .IsRequired()
+                        .HasColumnType("text")
+                        .HasColumnName("status");
+
+                    b.Property<string>("SystemName")
+                        .IsRequired()
+                        .HasMaxLength(128)
+                        .HasColumnType("character varying(128)")
+                        .HasColumnName("system_name");
 
                     b.Property<DateTime>("UpdatedAt")
                         .HasColumnType("timestamp with time zone")
@@ -365,19 +377,21 @@ namespace Analytics.Migrator.Migrations
                         .HasColumnName("who_updated");
 
                     b.HasKey("Id")
-                        .HasName("sales_fact_pk");
+                        .HasName("jobs_pk");
 
                     b.HasIndex("WhoCreated")
-                        .HasDatabaseName("analytics.entities.salesfact_who_created_idx");
+                        .HasDatabaseName("domain.commonentities.job_who_created_idx");
 
                     b.HasIndex("WhoUpdated")
-                        .HasDatabaseName("analytics.entities.salesfact_who_updated_idx");
+                        .HasDatabaseName("domain.commonentities.job_who_updated_idx");
 
-                    b.HasIndex(new[] { "BuyerId" }, "sales_fact_buyer_id_index");
+                    b.HasIndex(new[] { "LockedAt" }, "jobs_locked_at_idx");
 
-                    b.HasIndex(new[] { "CurrencyId" }, "sales_fact_currency_id_index");
+                    b.HasIndex(new[] { "Status", "Id" }, "jobs_status_id_idx");
 
-                    b.ToTable("sales_fact", (string)null);
+                    b.HasIndex(new[] { "SystemName" }, "jobs_system_name_idx");
+
+                    b.ToTable("jobs", (string)null);
                 });
 
             modelBuilder.Entity("Domain.CommonEntities.Setting", b =>
@@ -589,17 +603,53 @@ namespace Analytics.Migrator.Migrations
                     b.ToTable("OutboxState", "msg");
                 });
 
-            modelBuilder.Entity("Analytics.Entities.Metrics.ArticleSalesMetric", b =>
+            modelBuilder.Entity("Analytics.Entities.Metrics.ProductPurchasesMetric", b =>
                 {
                     b.HasBaseType("Analytics.Entities.Metrics.Metric");
 
-                    b.Property<int>("ArticleId")
+                    b.Property<int>("ProductId")
+                        .ValueGeneratedOnUpdateSometimes()
                         .HasColumnType("integer")
-                        .HasColumnName("article_id");
+                        .HasColumnName("product_id");
 
-                    b.HasIndex(new[] { "Discriminator", "ArticleId" }, "metrics_discriminator_article_index");
+                    b.HasIndex(new[] { "Discriminator", "ProductId" }, "metrics_discriminator_article_index");
 
-                    b.HasDiscriminator().HasValue("ArticleSalesMetric");
+                    b.HasDiscriminator().HasValue("ProductPurchasesMetric");
+                });
+
+            modelBuilder.Entity("Analytics.Entities.Metrics.ProductSalesMetric", b =>
+                {
+                    b.HasBaseType("Analytics.Entities.Metrics.Metric");
+
+                    b.Property<int>("ProductId")
+                        .ValueGeneratedOnUpdateSometimes()
+                        .HasColumnType("integer")
+                        .HasColumnName("product_id");
+
+                    b.HasIndex(new[] { "Discriminator", "ProductId" }, "metrics_discriminator_article_index");
+
+                    b.HasDiscriminator().HasValue("ProductSalesMetric");
+                });
+
+            modelBuilder.Entity("Analytics.Entities.Metrics.MetricJob", b =>
+                {
+                    b.HasOne("Domain.CommonEntities.Job", "Job")
+                        .WithMany()
+                        .HasForeignKey("JobId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired()
+                        .HasConstraintName("metric_jobs_job_id_fk");
+
+                    b.HasOne("Analytics.Entities.Metrics.Metric", "Metric")
+                        .WithMany("Jobs")
+                        .HasForeignKey("MetricId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired()
+                        .HasConstraintName("metric_jobs_metric_id_fk");
+
+                    b.Navigation("Job");
+
+                    b.Navigation("Metric");
                 });
 
             modelBuilder.Entity("Analytics.Entities.PurchaseContent", b =>
@@ -619,6 +669,8 @@ namespace Analytics.Migrator.Migrations
                     b.HasOne("Analytics.Entities.SalesFact", "Sale")
                         .WithMany("SaleContents")
                         .HasForeignKey("SaleId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired()
                         .HasConstraintName("sale_contents_sales_fact_id_fk");
 
                     b.Navigation("Sale");
@@ -634,6 +686,11 @@ namespace Analytics.Migrator.Migrations
                         .WithMany()
                         .HasForeignKey("InboxMessageId", "InboxConsumerId")
                         .HasPrincipalKey("MessageId", "ConsumerId");
+                });
+
+            modelBuilder.Entity("Analytics.Entities.Metrics.Metric", b =>
+                {
+                    b.Navigation("Jobs");
                 });
 
             modelBuilder.Entity("Analytics.Entities.PurchasesFact", b =>
