@@ -6,6 +6,8 @@ using Analytics.Entities;
 using Application.Common.Interfaces.Repositories;
 using Attributes;
 using Internal.Integration.Core.Interfaces.Main;
+using Internal.Integration.Core.Models.Main;
+using Internal.Integration.Core.Models.Main.Sale;
 using Microsoft.Extensions.Logging;
 
 namespace Analytics.Application.Services.FactSynchronizers;
@@ -55,23 +57,8 @@ public class SaleFactSynchronizer(
             return dbFact;
         }
 
-        if (fromMain is null)
-        {
-            if (dbFact is not null)
-            {
-                await tagsService.UpdateTags(
-                    new TagUpdateContext<SalesFact>
-                    {
-                        NewFactDatetime = dbFact.CreatedAt
-                    },
-                    cancellationToken);
-
-                unitOfWork.Remove(dbFact);
-            }
-
-            await unitOfWork.SaveChangesAsync(cancellationToken);
-            return null;
-        }
+        if (fromMain is null || fromMain.Sale.State != InternalSaleState.Completed)
+            return await RemoveFactIfExists(dbFact, cancellationToken);
 
         var sale = fromMain.Sale;
         var contents = fromMain.Contents.Select(x =>
@@ -124,5 +111,25 @@ public class SaleFactSynchronizer(
 
         await unitOfWork.SaveChangesAsync(cancellationToken);
         return dbFact;
+    }
+
+    private async Task<SalesFact?> RemoveFactIfExists(
+        SalesFact? dbFact,
+        CancellationToken cancellationToken)
+    {
+        if (dbFact is not null)
+        {
+            await tagsService.UpdateTags(
+                new TagUpdateContext<SalesFact>
+                {
+                    NewFactDatetime = dbFact.CreatedAt
+                },
+                cancellationToken);
+
+            unitOfWork.Remove(dbFact);
+        }
+
+        await unitOfWork.SaveChangesAsync(cancellationToken);
+        return null;
     }
 }
