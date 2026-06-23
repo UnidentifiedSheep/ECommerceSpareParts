@@ -1,4 +1,4 @@
-﻿using System.Text.Json.Serialization;
+using System.Text.Json.Serialization;
 using Carter;
 using Main.Application.Handlers.Auth;
 using MediatR;
@@ -20,11 +20,15 @@ public record InternalServiceLoginResponse
     public required string Token { get; init; }
 }
 
-public class InternalServiceLoginEndPoint : ICarterModule
+public static class InternalAuthEndPoints
 {
-    public void AddRoutes(IEndpointRouteBuilder app)
+    public static RouteGroupBuilder AddInternalAuthEndPoints(this RouteGroupBuilder group)
     {
-        app.MapPost("/internal/auth/token", async (
+        var auth = group
+            .MapGroup("/auth")
+            .WithGroupName("Internal Authentication");
+        
+        auth.MapPost("/token", async (
                 ISender sender,
                 InternalServiceLoginRequest request,
                 CancellationToken cancellationToken) =>
@@ -37,7 +41,7 @@ public class InternalServiceLoginEndPoint : ICarterModule
                 {
                     Token = result.Token
                 });
-            }).WithGroupName("Internal Authentication")
+            })
             .WithDisplayName("Internal service login")
             .WithName("InternalServiceLogin")
             .WithSummary("Выпустить токен внутреннего сервиса")
@@ -45,5 +49,7 @@ public class InternalServiceLoginEndPoint : ICarterModule
             .Accepts<InternalServiceLoginRequest>(false, "application/json")
             .Produces<InternalServiceLoginResponse>()
             .ProducesProblem(StatusCodes.Status400BadRequest);
+
+        return group;
     }
 }

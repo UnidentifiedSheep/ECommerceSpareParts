@@ -17,15 +17,15 @@ public record InternalGetFullPurchaseResponse
     public required IEnumerable<PurchaseContentDto> Contents { get; init; }
 }
 
-public class InternalPurchaseEndPoints : ICarterModule
+public static class InternalPurchaseEndPoints
 {
-    public void AddRoutes(IEndpointRouteBuilder app)
+    public static RouteGroupBuilder AddInternalPurchaseEndPoints(this RouteGroupBuilder group)
     {
-        var group = app.MapGroup("/internal/purchases")
+        var purchase = group.MapGroup("/purchases")
             .WithGroupName("Internal Purchase")
             .WithTags("InternalPurchase");
 
-        group.MapGet("{id:guid}", async (
+        purchase.MapGet("{id:guid}", async (
                 Guid id,
                 ISender sender,
                 CancellationToken cancellationToken) =>
@@ -44,5 +44,7 @@ public class InternalPurchaseEndPoints : ICarterModule
             .WithDescription("Получение закупки с ее содержимым для внутренних интеграций")
             .Produces<InternalGetFullPurchaseResponse>()
             .ProducesProblem(StatusCodes.Status404NotFound);
+
+        return group;
     }
 }

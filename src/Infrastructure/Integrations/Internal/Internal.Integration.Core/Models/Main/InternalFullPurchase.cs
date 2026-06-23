@@ -109,33 +109,3 @@ public record InternalPurchaseContentLogistic
     [JsonPropertyName("price")]
     public required decimal Price { get; init; }
 }
-
-public record InternalCurrency
-{
-    [JsonPropertyName("id")]
-    public required int Id { get; init; }
-
-    [JsonPropertyName("shortName")]
-    public required string ShortName { get; init; }
-
-    [JsonPropertyName("name")]
-    public required string Name { get; init; }
-
-    [JsonPropertyName("currencySign")]
-    public required string CurrencySign { get; init; }
-
-    [JsonPropertyName("code")]
-    public required string Code { get; init; }
-}
-
-public record InternalUser
-{
-    [JsonPropertyName("id")]
-    public required Guid Id { get; init; }
-
-    [JsonPropertyName("userName")]
-    public required string UserName { get; init; }
-
-    [JsonPropertyName("normalizedUserName")]
-    public required string NormalizedUserName { get; init; }
-}
