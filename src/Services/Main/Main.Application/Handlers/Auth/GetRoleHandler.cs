@@ -30,6 +30,7 @@ public class GetRoleHandler(
 
         var roleWithPermissions = await readRepository.Query
             .Where(x => x.Name == request.Name)
+            .AsExpandable()
             .Select(x => new
             {
                 Role = AuthProjections.ToRoleDto(localizer).Invoke(x),
@@ -40,6 +41,6 @@ public class GetRoleHandler(
         
         return new GetRoleResult(
             roleWithPermissions.Role, 
-            permissions.Where(x => roleWithPermissions.Permissions.Contains(x.Name)).ToList());
+            permissions.Where(x => roleWithPermissions.Permissions.Contains(x.SystemName)).ToList());
     }
 }
