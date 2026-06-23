@@ -1,0 +1,9 @@
+{
+  "locale": "ru",
+  "keyValues": {
+    "sale.fact.content.required": "Содержимое факта продажи не может быть пустым.",
+    "sale.fact.content.price.required": "Цена содержимого факта продажи должна быть больше 0.",
+    "sale.fact.content.count.required": "Количество содержимого факта продажи должно быть больше 0.",
+    "sale.fact.content.discount.must.not.be.negative": "Скидка содержимого факта продажи не может быть отрицательной."
+  }
+}
