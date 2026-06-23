@@ -30,7 +30,7 @@ public static class ServiceProvider
     {
         SortByConfig.Configure();
         collection
-            .AddApplicationBase(configuration, typeof(Global).Assembly)
+            .AddApplicationBase(configuration, typeof(TagsService).Assembly)
             .AddLrtLayer(typeof(MetricCalculationLrt).Assembly)
             .RegisterMetricCalculators()
             .RegisterMetricConverters()
