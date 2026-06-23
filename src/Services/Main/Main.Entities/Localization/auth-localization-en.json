@@ -42,6 +42,7 @@
     "role.WORKER.name": "Worker",
     "role.SYSTEM.name": "System",
     "cant.create.system.user": "System user can not be created.",
+    "user.permission.not.found": "User permission was not found.",
     "reset.token.expired": "Reset token is expired, you need to verify your identity one more time."
   }
 }

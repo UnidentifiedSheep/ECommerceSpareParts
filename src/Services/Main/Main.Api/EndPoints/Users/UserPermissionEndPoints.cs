@@ -2,6 +2,7 @@ using System.Text.Json.Serialization;
 using Api.Common.Extensions;
 using Enums;
 using Main.Application.Handlers.Auth.AddPermissionToUser;
+using Main.Application.Handlers.Auth.RemovePermissionFromUser;
 using MediatR;
 
 namespace Main.Api.EndPoints.Users;
@@ -31,6 +32,23 @@ public static class UserPermissionEndPoints
             .WithDisplayName("Добавление пользователю разрешение'")
             .Produces(204)
             .ProducesProblem(400)
+            .ProducesProblem(404)
+            .RequireAnyPermission(PermissionCodes.USERS_PERMISSIONS_CREATE);
+        
+        users.MapDelete("/{userId:guid}/permissions/{permission}", async (
+                ISender sender,
+                Guid userId,
+                string permission,
+                CancellationToken ct) =>
+            {
+                await sender.Send(new RemovePermissionFromUserCommand(userId, permission), ct);
+                return Results.Ok();
+            })
+            .WithName("RemovePermissionFromUser")
+            .WithSummary("Удаление разрешения у пользователя")
+            .WithDescription("Удаление разрешения у пользователя")
+            .WithDisplayName("Удаление разрешения у пользователя")
+            .Produces(200)
             .ProducesProblem(404)
             .RequireAnyPermission(PermissionCodes.USERS_PERMISSIONS_CREATE);
         
