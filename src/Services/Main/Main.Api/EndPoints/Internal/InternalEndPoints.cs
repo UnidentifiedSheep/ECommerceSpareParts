@@ -12,6 +12,7 @@ public class InternalEndPoints : ICarterModule
             .AddInternalProducerEndPoints()
             .AddInternalProductsEndPoints()
             .AddInternalPurchaseEndPoints()
+            .AddInternalSaleEndPoints()
             .AddInternalCurrencyEndPoints();
     }
 }
