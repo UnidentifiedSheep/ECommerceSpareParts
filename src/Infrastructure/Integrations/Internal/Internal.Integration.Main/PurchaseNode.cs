@@ -2,6 +2,7 @@ using System.Net;
 using System.Text.Json;
 using Internal.Integration.Core;
 using Internal.Integration.Core.Interfaces;
+using Internal.Integration.Core.Interfaces.Main;
 using Internal.Integration.Core.Models.Main;
 using Microsoft.Extensions.Options;
 
@@ -10,7 +11,8 @@ namespace Internal.Integration.Main;
 internal sealed class PurchaseNode(
     HttpClient httpClient,
     IAuthClient authClient,
-    IOptionsMonitor<InternalServiceCredentials> optionsMonitor) : InternalClientBase(authClient, optionsMonitor)
+    IOptionsMonitor<InternalServiceCredentials> optionsMonitor) 
+    : InternalClientBase(authClient, optionsMonitor), IPurchaseNode
 {
     public async Task<InternalFullPurchase?> GetFullPurchase(
         Guid purchaseId,

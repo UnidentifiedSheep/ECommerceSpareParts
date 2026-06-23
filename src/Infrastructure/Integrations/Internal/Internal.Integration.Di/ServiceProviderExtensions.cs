@@ -1,6 +1,7 @@
 ﻿using Internal.Integration.Auth;
 using Internal.Integration.Core;
 using Internal.Integration.Core.Interfaces;
+using Internal.Integration.Core.Interfaces.Main;
 using Internal.Integration.Main;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;

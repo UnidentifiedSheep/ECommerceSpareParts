@@ -1,5 +1,6 @@
 using Extensions;
 using Internal.Integration.Core.Interfaces;
+using Internal.Integration.Core.Interfaces.Main;
 using Internal.Integration.Core.Models.Main;
 using Search.Application.Interfaces.Product;
 using Search.Entities;
@@ -13,7 +14,7 @@ public class MainProductSearchDocumentProvider(
         int productId,
         CancellationToken cancellationToken = default)
     {
-        var fullProduct = await mainClient.GetFullProduct(productId, cancellationToken);
+        var fullProduct = await mainClient.ProductNode.GetFullProduct(productId, cancellationToken);
         if (fullProduct == null)
         {
             return null;

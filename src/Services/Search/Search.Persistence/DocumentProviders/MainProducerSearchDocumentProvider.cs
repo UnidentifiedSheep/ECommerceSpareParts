@@ -1,4 +1,5 @@
 using Internal.Integration.Core.Interfaces;
+using Internal.Integration.Core.Interfaces.Main;
 using Internal.Integration.Core.Models.Main;
 using Search.Application.Interfaces.Producer;
 using Search.Entities;
@@ -12,7 +13,7 @@ public class MainProducerSearchDocumentProvider(
         int producerId,
         CancellationToken cancellationToken = default)
     {
-        var fullProducer = await mainClient.GetFullProducer(producerId, cancellationToken);
+        var fullProducer = await mainClient.ProducerNode.GetFullProducer(producerId, cancellationToken);
         if (fullProducer == null)
         {
             return null;
