@@ -1,4 +1,5 @@
 ﻿using Application.Common.Interfaces.Cqrs;
+using Main.Application.Static;
 
 namespace Main.Application.Handlers.ProductWeight.GetProductWeight;
 

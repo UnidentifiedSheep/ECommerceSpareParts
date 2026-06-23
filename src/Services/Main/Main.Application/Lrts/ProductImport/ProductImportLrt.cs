@@ -14,6 +14,7 @@ using Localization.Domain;
 using Main.Application.Dtos.Product;
 using Main.Application.Handlers.Products.CreateProducts;
 using Main.Application.Interfaces.Persistence;
+using Main.Application.Static;
 using Main.Entities.Producer;
 using Main.Entities.Product;
 using Main.Entities.Product.ValueObjects;

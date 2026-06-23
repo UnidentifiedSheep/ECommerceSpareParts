@@ -1,5 +1,5 @@
-using Main.Abstractions.Constants;
 using Main.Application.Handlers.Storages.CreateStorage;
+using Main.Application.Static;
 using Microsoft.EntityFrameworkCore;
 using Test.Common.Extensions;
 using Test.Common.TestContainers.Combined;

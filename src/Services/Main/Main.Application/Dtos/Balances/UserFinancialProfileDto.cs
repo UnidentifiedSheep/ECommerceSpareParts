@@ -1,7 +1,6 @@
 using System.Text.Json.Serialization;
-using Main.Application.Dtos.Currencies;
 
-namespace Main.Application.Dtos.Users;
+namespace Main.Application.Dtos.Balances;
 
 public record UserFinancialProfileDto
 {

@@ -7,6 +7,7 @@ using Main.Application.Dtos.Users;
 using Main.Application.Interfaces.Cache;
 using Main.Application.Interfaces.Persistence;
 using Main.Application.Projections;
+using Main.Application.Static;
 using Main.Entities.User;
 
 namespace Main.Cache;

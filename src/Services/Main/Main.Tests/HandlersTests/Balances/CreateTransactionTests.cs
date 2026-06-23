@@ -1,6 +1,6 @@
 using FluentAssertions;
-using Main.Abstractions.Constants;
 using Main.Application.Handlers.Balance.CreateTransaction;
+using Main.Application.Static;
 using Main.Entities.Balance;
 using Main.Entities.Exceptions;
 using Main.Enums.Balances;

@@ -1,5 +1,4 @@
 ﻿using Abstractions.Interfaces.Persistence;
-using Abstractions.Interfaces.Services;
 using Application.Common.Interfaces;
 using Application.Common.Interfaces.Cqrs;
 using Attributes;
@@ -7,7 +6,7 @@ using Contracts.User;
 using Main.Entities.Auth;
 using MediatR;
 
-namespace Main.Application.Handlers.Auth.AddRoleToUser;
+namespace Main.Application.Handlers.Auth;
 
 [AutoSave]
 [Transactional]

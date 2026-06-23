@@ -1,6 +1,6 @@
 ﻿using FluentAssertions;
-using Main.Abstractions.Constants;
 using Main.Application.Handlers.Cart.AddToCart;
+using Main.Application.Static;
 using Main.Entities.Product;
 using Main.Entities.User;
 using Microsoft.EntityFrameworkCore;

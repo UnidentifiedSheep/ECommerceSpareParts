@@ -3,6 +3,7 @@ using Abstractions.Models;
 using Application.Common.Interfaces.Cqrs;
 using Application.Common.Interfaces.Settings;
 using Main.Application.Dtos.Uploads;
+using Main.Application.Static;
 using Main.Entities.Setting;
 
 namespace Main.Application.Handlers.Uploads.GetUploads;

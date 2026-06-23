@@ -1,6 +1,6 @@
 using FluentAssertions;
-using Main.Abstractions.Constants;
 using Main.Application.Handlers.Producers.AddOtherName;
+using Main.Application.Static;
 using Main.Entities.Producer;
 using Microsoft.EntityFrameworkCore;
 using Test.Common.Extensions;

@@ -1,6 +1,5 @@
 using Abstractions.Interfaces;
 using Abstractions.Interfaces.Persistence;
-using Abstractions.Interfaces.Services;
 using Application.Common.Interfaces.Cqrs;
 using Application.Common.Interfaces.Repositories;
 using Attributes;
@@ -11,7 +10,7 @@ using Main.Entities.Auth;
 using Main.Entities.Exceptions;
 using Main.Enums;
 
-namespace Main.Application.Handlers.Auth.RefreshToken;
+namespace Main.Application.Handlers.Auth;
 
 [Diagnostics(maxExecutionTimeMs: 300)]
 [Transactional, AutoSave]

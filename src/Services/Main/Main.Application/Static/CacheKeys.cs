@@ -1,4 +1,4 @@
-﻿namespace Main.Application;
+﻿namespace Main.Application.Static;
 
 public static class CacheKeys
 {

@@ -1,6 +1,6 @@
 ﻿using FluentValidation;
-using Main.Abstractions.Constants;
 using Main.Application.Handlers.StorageRoutes.AddStorageRoute;
+using Main.Application.Static;
 using Main.Entities.Currency;
 using Main.Entities.Storage;
 using Main.Entities.User;
