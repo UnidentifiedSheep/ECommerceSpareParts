@@ -2,6 +2,7 @@ using Extensions;
 using Internal.Integration.Core.Interfaces;
 using Internal.Integration.Core.Interfaces.Main;
 using Internal.Integration.Core.Models.Main;
+using Internal.Integration.Core.Models.Main.Product;
 using Search.Application.Interfaces.Product;
 using Search.Entities;
 

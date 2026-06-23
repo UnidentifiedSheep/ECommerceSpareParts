@@ -8,7 +8,7 @@ using Main.Entities.Auth;
 using Main.Entities.Exceptions;
 using MediatR;
 
-namespace Main.Application.Handlers.Auth.RemovePermissionFromUser;
+namespace Main.Application.Handlers.Auth;
 
 [Diagnostics(maxExecutionTimeMs: 150)]
 [Transactional, AutoSave]

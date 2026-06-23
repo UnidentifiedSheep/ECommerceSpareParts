@@ -1,6 +1,7 @@
 using Internal.Integration.Core.Interfaces;
 using Internal.Integration.Core.Interfaces.Main;
 using Internal.Integration.Core.Models.Main;
+using Internal.Integration.Core.Models.Main.Producer;
 using Search.Application.Interfaces.Producer;
 using Search.Entities;
 

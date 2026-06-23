@@ -1,27 +1,27 @@
-﻿using System.Net;
+using System.Net;
 using System.Text.Json;
 using Internal.Integration.Core;
 using Internal.Integration.Core.Interfaces;
 using Internal.Integration.Core.Interfaces.Main;
 using Internal.Integration.Core.Models.Main;
-using Internal.Integration.Core.Models.Main.Product;
+using Internal.Integration.Core.Models.Main.Sale;
 using Microsoft.Extensions.Options;
 
 namespace Internal.Integration.Main;
 
-internal sealed class ProductNode(
+internal sealed class SaleNode(
     HttpClient httpClient,
     IAuthClient authClient,
-    IOptionsMonitor<InternalServiceCredentials> optionsMonitor) 
-    : InternalClientBase(authClient, optionsMonitor), IProductNode
+    IOptionsMonitor<InternalServiceCredentials> optionsMonitor)
+    : InternalClientBase(authClient, optionsMonitor), ISaleNode
 {
-    public async Task<InternalFullProduct?> GetFullProduct(
-        int productId,
+    public async Task<InternalFullSale?> GetFullSale(
+        Guid saleId,
         CancellationToken cancellationToken = default)
     {
         using var request = await GetRequest(
             HttpMethod.Get,
-            $"/internal/products/{productId}/full",
+            $"/internal/sales/{saleId}",
             cancellationToken);
         using var response = await httpClient.SendAsync(
             request,
@@ -35,6 +35,6 @@ internal sealed class ProductNode(
         response.EnsureSuccessStatusCode();
 
         var json = await response.Content.ReadAsStringAsync(cancellationToken);
-        return JsonSerializer.Deserialize<InternalFullProduct>(json);
+        return JsonSerializer.Deserialize<InternalFullSale>(json);
     }
 }

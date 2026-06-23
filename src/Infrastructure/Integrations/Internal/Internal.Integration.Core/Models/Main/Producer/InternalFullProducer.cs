@@ -1,6 +1,6 @@
 using System.Text.Json.Serialization;
 
-namespace Internal.Integration.Core.Models.Main;
+namespace Internal.Integration.Core.Models.Main.Producer;
 
 public record InternalFullProducer
 {

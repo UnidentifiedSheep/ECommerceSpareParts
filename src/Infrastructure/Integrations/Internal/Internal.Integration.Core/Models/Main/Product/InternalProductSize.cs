@@ -1,7 +1,7 @@
 using System.Text.Json.Serialization;
 using Enums;
 
-namespace Internal.Integration.Core.Models.Main;
+namespace Internal.Integration.Core.Models.Main.Product;
 
 public record InternalProductSize
 {

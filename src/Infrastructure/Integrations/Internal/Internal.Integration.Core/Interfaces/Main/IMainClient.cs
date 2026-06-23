@@ -9,4 +9,5 @@ public interface IMainClient
     IProductNode ProductNode { get; }
     IProducerNode ProducerNode { get; }
     IPurchaseNode PurchaseNode { get; }
+    ISaleNode SaleNode { get; }
 }

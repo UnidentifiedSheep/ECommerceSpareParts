@@ -17,9 +17,11 @@ public class RootClient(
     private readonly ProducerNode _producerNode = new(httpClient, authClient, optionsMonitor);
     private readonly CurrencyNode _currencyNode = new(httpClient, authClient, optionsMonitor);
     private readonly PurchaseNode _purchaseNode = new(httpClient, authClient, optionsMonitor);
+    private readonly SaleNode _saleNode = new(httpClient, authClient, optionsMonitor);
     public IUserNode UserNode => _userNode;
     public IProductNode ProductNode => _productNode;
     public IProducerNode ProducerNode => _producerNode;
     public IPurchaseNode PurchaseNode => _purchaseNode;
+    public ISaleNode SaleNode => _saleNode;
     public ICurrencyNode CurrencyNode => _currencyNode;
 }

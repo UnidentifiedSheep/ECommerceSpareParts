@@ -1,6 +1,7 @@
 using System.Text.Json.Serialization;
+using Internal.Integration.Core.Models.Main.User;
 
-namespace Internal.Integration.Core.Models.Main;
+namespace Internal.Integration.Core.Models.Main.Purchase;
 
 public record InternalPurchase
 {

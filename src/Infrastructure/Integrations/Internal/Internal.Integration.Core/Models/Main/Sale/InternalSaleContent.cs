@@ -1,8 +1,9 @@
 using System.Text.Json.Serialization;
+using Internal.Integration.Core.Models.Main.Product;
 
-namespace Internal.Integration.Core.Models.Main;
+namespace Internal.Integration.Core.Models.Main.Sale;
 
-public record InternalPurchaseContent
+public record InternalSaleContent
 {
     [JsonPropertyName("id")]
     public required int Id { get; init; }
@@ -19,9 +20,12 @@ public record InternalPurchaseContent
     [JsonPropertyName("comment")]
     public string? Comment { get; init; }
 
+    [JsonPropertyName("discount")]
+    public required decimal Discount { get; init; }
+
     [JsonPropertyName("product")]
     public required InternalProduct Product { get; init; }
 
-    [JsonPropertyName("logistics")]
-    public required InternalPurchaseContentLogistic? ContentLogistics { get; init; }
+    [JsonPropertyName("details")]
+    public required IReadOnlyList<InternalSaleContentDetail> Details { get; init; }
 }

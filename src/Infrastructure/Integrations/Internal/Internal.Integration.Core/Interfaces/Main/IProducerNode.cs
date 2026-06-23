@@ -1,4 +1,5 @@
 using Internal.Integration.Core.Models.Main;
+using Internal.Integration.Core.Models.Main.Producer;
 
 namespace Internal.Integration.Core.Interfaces.Main;
 
