@@ -1,3 +1,4 @@
+using System.Text.Json.Serialization;
 using Api.Common.Extensions;
 using Api.Common.Models.Requests;
 using Carter;
@@ -16,6 +17,15 @@ public record AddPermissionToRoleRequest(string PermissionName);
 public record CreateRoleRequest(string Name, string? Description);
 
 public record GetRolesResponse(IReadOnlyList<RoleDto> Roles);
+
+public record GetRoleResponse
+{
+    [JsonPropertyName("role")]
+    public required RoleDto Role { get; init; }
+    
+    [JsonPropertyName("permissions")]
+    public required IReadOnlyList<PermissionDto> Permissions { get; init; }
+}
 
 public record GetRolesRequest : SortablePaginationQueryModel
 {
@@ -76,6 +86,28 @@ public class RolesEndPoints : ICarterModule
             .WithDisplayName("Получение ролей")
             .Produces<GetRolesResponse>()
             .ProducesProblem(StatusCodes.Status400BadRequest)
+            .RequireAnyPermission(PermissionCodes.ROLES_GET);
+        
+        roles.MapGet("{roleName}", async (
+                ISender sender,
+                string roleName,
+                CancellationToken cancellationToken) =>
+            {
+                var result = await sender.Send(
+                    new GetRoleQuery(roleName), 
+                    cancellationToken);
+                return Results.Ok(new GetRoleResponse
+                {
+                    Role = result.Role,
+                    Permissions = result.Permissions
+                });
+            })
+            .WithName("GetRole")
+            .WithSummary("Получить роль")
+            .WithDescription("Получение роли")
+            .WithDisplayName("Получение роли")
+            .Produces<GetRoleResponse>()
+            .ProducesProblem(StatusCodes.Status404NotFound)
             .RequireAnyPermission(PermissionCodes.ROLES_GET);
     }
 }
