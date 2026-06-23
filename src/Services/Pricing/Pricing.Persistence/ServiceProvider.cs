@@ -1,4 +1,5 @@
 using Abstractions.Interfaces;
+using Application.Common.Interfaces.Repositories;
 using BulkValidation.Pgsql.Extensions;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
@@ -7,6 +8,7 @@ using Persistence;
 using Persistence.DbValidator;
 using Persistence.Extensions;
 using Pricing.Persistence.Contexts;
+using Pricing.Persistence.Repositories;
 
 namespace Pricing.Persistence;
 
@@ -19,6 +21,9 @@ public static class ServiceProvider
             var dbOptions = sp.GetRequiredService<IOptions<DatabaseOptions>>().Value;
             options.UseNpgsql(dbOptions.ConnectionString);
         });
+        
+        collection.AddScoped(typeof(IRepository<,>), typeof(BasicEfRepository<,>));
+        collection.AddScoped(typeof(IReadRepository<,>), typeof(ReadRepository<,>));
 
         collection.AddUnitOfWork<DContext>();
 

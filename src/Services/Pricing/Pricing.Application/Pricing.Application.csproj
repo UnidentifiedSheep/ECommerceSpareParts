@@ -19,4 +19,11 @@
         <PackageReference Include="MassTransit" Version="8.5.8"/>
     </ItemGroup>
 
+    <ItemGroup>
+      <Folder Include="Dtos\" />
+      <Folder Include="Handlers\" />
+      <Folder Include="Interfaces\" />
+      <Folder Include="Models\" />
+    </ItemGroup>
+
 </Project>
