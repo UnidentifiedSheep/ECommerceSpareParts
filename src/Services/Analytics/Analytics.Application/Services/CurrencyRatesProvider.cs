@@ -1,5 +1,6 @@
 ﻿using Application.Common.Services.Currency;
 using Internal.Integration.Core.Interfaces;
+using Internal.Integration.Core.Interfaces.Main;
 using ZiggyCreatures.Caching.Fusion;
 
 namespace Analytics.Application.Services;
@@ -11,5 +12,5 @@ public class CurrencyRatesProvider(
     protected override Task<decimal> GetExternalData(
         int currencyId,
         CancellationToken cancellationToken = default)
-        => mainClient.GetCurrencyRate(currencyId, cancellationToken);
+        => mainClient.CurrencyNode.GetCurrencyRate(currencyId, cancellationToken);
 }

@@ -1,0 +1,9 @@
+{
+  "locale": "tr",
+  "keyValues": {
+    "sale.fact.content.required": "Satış olgusu içeriği boş olmamalıdır.",
+    "sale.fact.content.price.required": "Satış içeriği fiyatı 0'dan büyük olmalıdır.",
+    "sale.fact.content.count.required": "Satış içeriği adedi 0'dan büyük olmalıdır.",
+    "sale.fact.content.discount.must.not.be.negative": "Satış içeriği indirimi negatif olmamalıdır."
+  }
+}

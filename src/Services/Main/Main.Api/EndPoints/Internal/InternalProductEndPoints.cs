@@ -1,6 +1,5 @@
 using System.Text.Json.Serialization;
 using Api.Common.Extensions;
-using Carter;
 using Enums;
 using Main.Application.Dtos.Product;
 using Main.Application.Handlers.Products;
@@ -20,11 +19,16 @@ public record InternalGetFullProductResponse
     public ProductSizeDto? ProductSize { get; init; }
 }
 
-public class InternalGetFullProductEndPoint : ICarterModule
+public static class InternalProductEndPoints
 {
-    public void AddRoutes(IEndpointRouteBuilder app)
+    public static RouteGroupBuilder AddInternalProductsEndPoints(this RouteGroupBuilder group)
     {
-        app.MapGet("/internal/products/{id:int}/full", async (
+        var products = group
+            .MapGroup("/products")
+            .WithGroupName("Internal Products")
+            .WithTags("InternalProducts");
+        
+        products.MapGet("{id:int}/full", async (
                 ISender sender,
                 int id,
                 CancellationToken cancellationToken) =>
@@ -48,5 +52,7 @@ public class InternalGetFullProductEndPoint : ICarterModule
             .WithDescription("Получение продукта, веса и размеров для внутренних интеграций")
             .Produces<InternalGetFullProductResponse>()
             .ProducesProblem(StatusCodes.Status404NotFound);
+
+        return group;
     }
 }

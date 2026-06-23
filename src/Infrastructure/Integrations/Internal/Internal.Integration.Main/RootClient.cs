@@ -1,5 +1,6 @@
 using Internal.Integration.Core;
 using Internal.Integration.Core.Interfaces;
+using Internal.Integration.Core.Interfaces.Main;
 using Internal.Integration.Core.Models.Main;
 using Microsoft.Extensions.Options;
 
@@ -11,34 +12,16 @@ public class RootClient(
     IOptionsMonitor<InternalServiceCredentials> optionsMonitor)
     : InternalClientBase(authClient, optionsMonitor), IMainClient
 {
+    private readonly UserNode _userNode = new(httpClient, authClient, optionsMonitor);
     private readonly ProductNode _productNode = new(httpClient, authClient, optionsMonitor);
     private readonly ProducerNode _producerNode = new(httpClient, authClient, optionsMonitor);
-    private readonly UserNode _userNode = new(httpClient, authClient, optionsMonitor);
     private readonly CurrencyNode _currencyNode = new(httpClient, authClient, optionsMonitor);
     private readonly PurchaseNode _purchaseNode = new(httpClient, authClient, optionsMonitor);
-    
-    public async Task<decimal> GetUserDiscount(
-        Guid userId,
-        CancellationToken cancellationToken = default)
-        => await _userNode.GetUserDiscount(userId, cancellationToken);
-
-    public async Task<decimal> GetCurrencyRate(
-        int currencyId,
-        CancellationToken cancellationToken = default)
-        => await _currencyNode.GetCurrencyRate(currencyId, cancellationToken);
-
-    public async Task<InternalFullProduct?> GetFullProduct(
-        int productId,
-        CancellationToken cancellationToken = default)
-        => await _productNode.GetFullProduct(productId, cancellationToken);
-
-    public async Task<InternalFullProducer?> GetFullProducer(
-        int producerId,
-        CancellationToken cancellationToken = default)
-        => await _producerNode.GetFullProducer(producerId, cancellationToken);
-
-    public async Task<InternalFullPurchase?> GetFullPurchase(
-        Guid purchaseId,
-        CancellationToken cancellationToken = default)
-        => await _purchaseNode.GetFullPurchase(purchaseId, cancellationToken);
+    private readonly SaleNode _saleNode = new(httpClient, authClient, optionsMonitor);
+    public IUserNode UserNode => _userNode;
+    public IProductNode ProductNode => _productNode;
+    public IProducerNode ProducerNode => _producerNode;
+    public IPurchaseNode PurchaseNode => _purchaseNode;
+    public ISaleNode SaleNode => _saleNode;
+    public ICurrencyNode CurrencyNode => _currencyNode;
 }

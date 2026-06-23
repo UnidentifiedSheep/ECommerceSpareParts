@@ -1,14 +1,12 @@
 ﻿using Abstractions.Interfaces.Persistence;
-using Abstractions.Interfaces.Services;
-using Analytics.Application.Interfaces.Services;
 using Analytics.Application.Interfaces.Services.FactSynchronizers;
 using Analytics.Application.Interfaces.Services.Metrics;
 using Analytics.Application.Models;
 using Analytics.Entities;
-using Analytics.Enums;
 using Application.Common.Interfaces.Repositories;
 using Attributes;
 using Internal.Integration.Core.Interfaces;
+using Internal.Integration.Core.Interfaces.Main;
 using Microsoft.Extensions.Logging;
 
 namespace Analytics.Application.Services.FactSynchronizers;
@@ -36,7 +34,7 @@ public class PurchaseFactSynchronizer(
     {
         var synchronizationStartedAt = DateTime.UtcNow;
         
-        var fromMain = await mainClient.GetFullPurchase(id, cancellationToken);
+        var fromMain = await mainClient.PurchaseNode.GetFullPurchase(id, cancellationToken);
         var dbFact = await repository.FirstOrDefaultAsync(
             Criteria<PurchasesFact>
                 .New()

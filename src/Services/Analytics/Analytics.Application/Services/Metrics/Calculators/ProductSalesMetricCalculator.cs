@@ -8,7 +8,7 @@ using Application.Common.Interfaces.Repositories;
 namespace Analytics.Application.Services.Metrics.Calculators;
 
 public class ProductSalesMetricCalculator(
-    ISalesFactRepository salesRepository,
+    IRepository<SalesFact, Guid> salesRepository,
     ICurrencyConverter currencyConverter)
     : MetricCalculatorBase<ProductSalesMetric>
 {

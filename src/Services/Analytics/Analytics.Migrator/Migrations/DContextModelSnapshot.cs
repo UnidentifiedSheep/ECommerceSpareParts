@@ -233,7 +233,7 @@ namespace Analytics.Migrator.Migrations
                         .HasColumnType("integer")
                         .HasColumnName("product_id");
 
-                    b.Property<Guid?>("SaleId")
+                    b.Property<Guid>("SaleId")
                         .HasMaxLength(128)
                         .HasColumnType("uuid")
                         .HasColumnName("sale_id");
@@ -298,32 +298,20 @@ namespace Analytics.Migrator.Migrations
                         .HasColumnType("integer")
                         .HasColumnName("currency_id");
 
+                    b.Property<DateTime>("ProcessedAt")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("processed_at");
+
                     b.Property<decimal>("TotalSum")
                         .HasColumnType("numeric")
                         .HasColumnName("total_sum");
 
-                    b.Property<DateTime>("UpdatedAt")
-                        .HasColumnType("timestamp with time zone")
-                        .HasColumnName("updated_at");
-
-                    b.Property<Guid?>("WhoCreated")
-                        .HasColumnType("uuid")
-                        .HasColumnName("who_created");
-
-                    b.Property<Guid?>("WhoUpdated")
-                        .HasColumnType("uuid")
-                        .HasColumnName("who_updated");
-
                     b.HasKey("Id")
                         .HasName("sales_fact_pk");
 
-                    b.HasIndex("WhoCreated")
-                        .HasDatabaseName("analytics.entities.salesfact_who_created_idx");
-
-                    b.HasIndex("WhoUpdated")
-                        .HasDatabaseName("analytics.entities.salesfact_who_updated_idx");
-
                     b.HasIndex(new[] { "BuyerId" }, "sales_fact_buyer_id_index");
+
+                    b.HasIndex(new[] { "CreatedAt" }, "sales_fact_created_at_index");
 
                     b.HasIndex(new[] { "CurrencyId" }, "sales_fact_currency_id_index");
 
@@ -678,6 +666,8 @@ namespace Analytics.Migrator.Migrations
                     b.HasOne("Analytics.Entities.SalesFact", "Sale")
                         .WithMany("SaleContents")
                         .HasForeignKey("SaleId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired()
                         .HasConstraintName("sale_contents_sales_fact_id_fk");
 
                     b.Navigation("Sale");

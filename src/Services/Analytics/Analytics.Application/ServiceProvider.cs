@@ -30,7 +30,7 @@ public static class ServiceProvider
     {
         SortByConfig.Configure();
         collection
-            .AddApplicationBase(configuration, typeof(Global).Assembly)
+            .AddApplicationBase(configuration, typeof(TagsService).Assembly)
             .AddLrtLayer(typeof(MetricCalculationLrt).Assembly)
             .RegisterMetricCalculators()
             .RegisterMetricConverters()
@@ -45,6 +45,7 @@ public static class ServiceProvider
         collection.AddScoped<ICurrencyConverter, CurrencyConverter>();
         collection.AddScoped<ICurrencyRatesProvider, CurrencyRatesProvider>();
         collection.AddScoped<IFactSynchronizer<PurchasesFact, Guid>, PurchaseFactSynchronizer>();
+        collection.AddScoped<IFactSynchronizer<SalesFact, Guid>, SaleFactSynchronizer>();
 
         collection.AddScoped<ITagsService, TagsService>();
         return collection;

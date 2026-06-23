@@ -1,5 +1,6 @@
 using System.Reflection;
 using Abstractions;
+using Analytics.Api.Consumers;
 using Analytics.Api.Hubs;
 using Analytics.Application;
 using Analytics.Application.Consumers;
@@ -56,6 +57,7 @@ builder.Services.AddMassTransit(x =>
     x.AddConsumers(Assembly.GetAssembly(typeof(CurrencyCreatedConsumer)));
     x.AddConsumer<BackplaneConsumer>();
     x.AddConsumer<JobStatusUpdatedConsumer>();
+    x.AddConsumer<MetricCalculationStatusUpdatedConsumer>();
 
     x.AddEntityFrameworkOutbox<DContext>(o =>
     {
@@ -80,6 +82,9 @@ builder.Services.AddMassTransit(x =>
             ep.ConfigureConsumer<BackplaneConsumer>(context);
             ep.Bind<BackplaneMessage>();
 
+            ep.ConfigureConsumer<MetricCalculationStatusUpdatedConsumer>(context);
+            ep.Bind<MetricCalculationStatusUpdatedConsumer>();
+            
             ep.ConfigureConsumer<JobStatusUpdatedConsumer>(context);
             
             ep.Bind<JobStatusUpdatedEvent>(bind =>
@@ -117,5 +122,6 @@ app.MapHub<MetricCalculationHub>("/hubs/calculation-jobs");
 
 await app.LoadLocalesFromJson(localesPath);
 app.MapHub<JobHub>("/hubs/jobs");
+app.MapHub<JobHub>("/hubs/metrics");
 
 await app.RunAsync();

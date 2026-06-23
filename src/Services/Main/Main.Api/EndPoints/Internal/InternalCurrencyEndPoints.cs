@@ -11,11 +11,16 @@ public record GetCurrencyRateResult
     public required decimal Rate { get; init; }
 }
 
-public class InternalGetCurrencyRateEndPoint : ICarterModule
+public static class InternalCurrencyEndPoints
 {
-    public void AddRoutes(IEndpointRouteBuilder app)
+    public static RouteGroupBuilder AddInternalCurrencyEndPoints(this RouteGroupBuilder group)
     {
-        app.MapGet("/internal/currencies/{id:int}/rates/", async (
+        var currency = group
+            .MapGroup("/currencies")
+            .WithGroupName("Internal Currency")
+            .WithTags("InternalCurrencies");
+        
+        currency.MapGet("{id:int}/rates/", async (
                 ISender sender, 
                 int id, 
                 CancellationToken cancellationToken) =>
@@ -26,12 +31,14 @@ public class InternalGetCurrencyRateEndPoint : ICarterModule
                 {
                     Rate = result.Rate
                 });
-            }).WithGroupName("Internal Currency")
+            })
         .WithDisplayName("Internal service currency rates")
         .WithName("InternalCurrencyRates")
         .WithSummary("Получить курс валюты для внутреннего сервиса")
         .WithDescription("Получение курса валюты по id для внутренних интеграций")
         .Produces<GetCurrencyRateResult>()
         .ProducesProblem(StatusCodes.Status404NotFound);
+
+        return group;
     }
 }

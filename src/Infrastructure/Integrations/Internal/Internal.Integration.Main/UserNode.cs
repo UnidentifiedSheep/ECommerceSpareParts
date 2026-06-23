@@ -2,6 +2,7 @@
 using System.Text.Json.Serialization;
 using Internal.Integration.Core;
 using Internal.Integration.Core.Interfaces;
+using Internal.Integration.Core.Interfaces.Main;
 using Microsoft.Extensions.Options;
 
 namespace Internal.Integration.Main;
@@ -9,7 +10,8 @@ namespace Internal.Integration.Main;
 internal sealed class UserNode(
     HttpClient httpClient,
     IAuthClient authClient,
-    IOptionsMonitor<InternalServiceCredentials> optionsMonitor) : InternalClientBase(authClient, optionsMonitor)
+    IOptionsMonitor<InternalServiceCredentials> optionsMonitor) 
+    : InternalClientBase(authClient, optionsMonitor), IUserNode
 {
     public async Task<decimal> GetUserDiscount(
         Guid userId,

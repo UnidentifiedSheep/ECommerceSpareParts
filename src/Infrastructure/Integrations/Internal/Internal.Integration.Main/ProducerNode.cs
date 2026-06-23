@@ -2,7 +2,9 @@ using System.Net;
 using System.Text.Json;
 using Internal.Integration.Core;
 using Internal.Integration.Core.Interfaces;
+using Internal.Integration.Core.Interfaces.Main;
 using Internal.Integration.Core.Models.Main;
+using Internal.Integration.Core.Models.Main.Producer;
 using Microsoft.Extensions.Options;
 
 namespace Internal.Integration.Main;
@@ -11,7 +13,7 @@ internal sealed class ProducerNode(
     HttpClient httpClient,
     IAuthClient authClient,
     IOptionsMonitor<InternalServiceCredentials> optionsMonitor)
-    : InternalClientBase(authClient, optionsMonitor)
+    : InternalClientBase(authClient, optionsMonitor), IProducerNode
 {
     public async Task<InternalFullProducer?> GetFullProducer(
         int producerId,
