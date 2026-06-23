@@ -14,8 +14,8 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace Main.Migrator.Migrations
 {
     [DbContext(typeof(DContext))]
-    [Migration("20260621103958_StorageContentPositiveCountIndex")]
-    partial class StorageContentPositiveCountIndex
+    [Migration("20260623112421_Initial")]
+    partial class Initial
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -156,10 +156,6 @@ namespace Main.Migrator.Migrations
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("timestamp with time zone")
                         .HasColumnName("created_at");
-
-                    b.Property<string>("Description")
-                        .HasColumnType("text")
-                        .HasColumnName("description");
 
                     b.Property<DateTime>("UpdatedAt")
                         .HasColumnType("timestamp with time zone")
@@ -589,6 +585,54 @@ namespace Main.Migrator.Migrations
                         .HasDatabaseName("user_balances_currency_id_user_id_uindex");
 
                     b.ToTable("user_balances", "public");
+                });
+
+            modelBuilder.Entity("Main.Entities.Balance.UserFinancialProfile", b =>
+                {
+                    b.Property<Guid>("UserId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("user_id");
+
+                    b.Property<decimal>("Balance")
+                        .HasColumnType("numeric")
+                        .HasColumnName("balance");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("created_at");
+
+                    b.Property<decimal>("MinAllowedBalance")
+                        .HasColumnType("numeric")
+                        .HasColumnName("min_allowed_balance");
+
+                    b.Property<uint>("RowVersion")
+                        .IsConcurrencyToken()
+                        .ValueGeneratedOnAddOrUpdate()
+                        .HasColumnType("xid")
+                        .HasColumnName("xmin");
+
+                    b.Property<DateTime>("UpdatedAt")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("updated_at");
+
+                    b.Property<Guid?>("WhoCreated")
+                        .HasColumnType("uuid")
+                        .HasColumnName("who_created");
+
+                    b.Property<Guid?>("WhoUpdated")
+                        .HasColumnType("uuid")
+                        .HasColumnName("who_updated");
+
+                    b.HasKey("UserId")
+                        .HasName("user_financial_profile_pk");
+
+                    b.HasIndex("WhoCreated")
+                        .HasDatabaseName("main.entities.balance.userfinancialprofile_who_created_idx");
+
+                    b.HasIndex("WhoUpdated")
+                        .HasDatabaseName("main.entities.balance.userfinancialprofile_who_updated_idx");
+
+                    b.ToTable("user_financial_profile", "public");
                 });
 
             modelBuilder.Entity("Main.Entities.Cart.Cart", b =>
@@ -2045,11 +2089,7 @@ namespace Main.Migrator.Migrations
                     b.HasIndex("WhoUpdated")
                         .HasDatabaseName("main.entities.storage.storagecontent_who_updated_idx");
 
-                    b.HasIndex(new[] { "BuyPrice" }, "storage_content_buy_price_index");
-
                     b.HasIndex(new[] { "CurrencyId" }, "storage_content_currency_id_index");
-
-                    b.HasIndex(new[] { "ProductId", "Count" }, "storage_content_product_id_count_index");
 
                     b.HasIndex(new[] { "ProductId", "StorageName" }, "storage_content_product_id_storage_name_index");
 
@@ -2057,13 +2097,6 @@ namespace Main.Migrator.Migrations
                         .HasFilter("(count > 0)");
 
                     NpgsqlIndexBuilderExtensions.IncludeProperties(b.HasIndex(new[] { "ProductId", "StorageName" }, "storage_content_product_storage_positive_count_idx"), new[] { "Count" });
-
-                    b.HasIndex(new[] { "PurchaseDatetime" }, "storage_content_purchase_datetime_index");
-
-                    b.HasIndex(new[] { "StorageName" }, "storage_content_storage_name_index");
-
-                    NpgsqlIndexBuilderExtensions.HasMethod(b.HasIndex(new[] { "StorageName" }, "storage_content_storage_name_index"), "gin");
-                    NpgsqlIndexBuilderExtensions.HasOperators(b.HasIndex(new[] { "StorageName" }, "storage_content_storage_name_index"), new[] { "gin_trgm_ops" });
 
                     b.HasIndex(new[] { "StorageName", "ProductId" }, "storage_content_storage_name_product_id_index");
 
@@ -3058,7 +3091,7 @@ namespace Main.Migrator.Migrations
 
             modelBuilder.Entity("Main.Entities.Balance.UserBalance", b =>
                 {
-                    b.HasOne("Main.Entities.Currency.Currency", null)
+                    b.HasOne("Main.Entities.Currency.Currency", "Currency")
                         .WithMany()
                         .HasForeignKey("CurrencyId")
                         .OnDelete(DeleteBehavior.Restrict)
@@ -3066,11 +3099,23 @@ namespace Main.Migrator.Migrations
                         .HasConstraintName("user_balances_currency_id_fk");
 
                     b.HasOne("Main.Entities.User.User", null)
-                        .WithMany()
+                        .WithMany("Balances")
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired()
                         .HasConstraintName("user_balances_users_id_fk");
+
+                    b.Navigation("Currency");
+                });
+
+            modelBuilder.Entity("Main.Entities.Balance.UserFinancialProfile", b =>
+                {
+                    b.HasOne("Main.Entities.User.User", null)
+                        .WithOne("FinancialProfile")
+                        .HasForeignKey("Main.Entities.Balance.UserFinancialProfile", "UserId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired()
+                        .HasConstraintName("user_financial_profile_users_id_fk");
                 });
 
             modelBuilder.Entity("Main.Entities.Cart.Cart", b =>
@@ -3788,11 +3833,15 @@ namespace Main.Migrator.Migrations
 
             modelBuilder.Entity("Main.Entities.User.User", b =>
                 {
+                    b.Navigation("Balances");
+
                     b.Navigation("CartItems");
 
                     b.Navigation("Discount");
 
                     b.Navigation("Emails");
+
+                    b.Navigation("FinancialProfile");
 
                     b.Navigation("Permissions");
 

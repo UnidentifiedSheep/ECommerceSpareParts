@@ -164,7 +164,6 @@ namespace Main.Migrator.Migrations
                 columns: table => new
                 {
                     name = table.Column<string>(type: "text", nullable: false),
-                    description = table.Column<string>(type: "text", nullable: true),
                     created_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
                     updated_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
                     who_created = table.Column<Guid>(type: "uuid", nullable: true),
@@ -730,6 +729,32 @@ namespace Main.Migrator.Migrations
                         principalTable: "users",
                         principalColumn: "id",
                         onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "user_financial_profile",
+                schema: "public",
+                columns: table => new
+                {
+                    user_id = table.Column<Guid>(type: "uuid", nullable: false),
+                    balance = table.Column<decimal>(type: "numeric", nullable: false),
+                    min_allowed_balance = table.Column<decimal>(type: "numeric", nullable: false),
+                    xmin = table.Column<uint>(type: "xid", rowVersion: true, nullable: false),
+                    created_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
+                    updated_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
+                    who_created = table.Column<Guid>(type: "uuid", nullable: true),
+                    who_updated = table.Column<Guid>(type: "uuid", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("user_financial_profile_pk", x => x.user_id);
+                    table.ForeignKey(
+                        name: "user_financial_profile_users_id_fk",
+                        column: x => x.user_id,
+                        principalSchema: "auth",
+                        principalTable: "users",
+                        principalColumn: "id",
+                        onDelete: ReferentialAction.Restrict);
                 });
 
             migrationBuilder.CreateTable(
@@ -1365,6 +1390,7 @@ namespace Main.Migrator.Migrations
                     comment = table.Column<string>(type: "character varying(256)", maxLength: 256, nullable: true),
                     sale_datetime = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
                     state = table.Column<string>(type: "text", nullable: false),
+                    xmin = table.Column<uint>(type: "xid", rowVersion: true, nullable: false),
                     created_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
                     updated_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
                     who_created = table.Column<Guid>(type: "uuid", nullable: true),
@@ -2258,22 +2284,10 @@ namespace Main.Migrator.Migrations
                 column: "who_updated");
 
             migrationBuilder.CreateIndex(
-                name: "storage_content_buy_price_index",
-                schema: "public",
-                table: "storage_content",
-                column: "buy_price");
-
-            migrationBuilder.CreateIndex(
                 name: "storage_content_currency_id_index",
                 schema: "public",
                 table: "storage_content",
                 column: "currency_id");
-
-            migrationBuilder.CreateIndex(
-                name: "storage_content_product_id_count_index",
-                schema: "public",
-                table: "storage_content",
-                columns: new[] { "product_id", "count" });
 
             migrationBuilder.CreateIndex(
                 name: "storage_content_product_id_storage_name_index",
@@ -2282,18 +2296,12 @@ namespace Main.Migrator.Migrations
                 columns: new[] { "product_id", "storage_name" });
 
             migrationBuilder.CreateIndex(
-                name: "storage_content_purchase_datetime_index",
+                name: "storage_content_product_storage_positive_count_idx",
                 schema: "public",
                 table: "storage_content",
-                column: "purchase_datetime");
-
-            migrationBuilder.CreateIndex(
-                name: "storage_content_storage_name_index",
-                schema: "public",
-                table: "storage_content",
-                column: "storage_name")
-                .Annotation("Npgsql:IndexMethod", "gin")
-                .Annotation("Npgsql:IndexOperators", new[] { "gin_trgm_ops" });
+                columns: new[] { "product_id", "storage_name" },
+                filter: "(count > 0)")
+                .Annotation("Npgsql:IndexInclude", new[] { "count" });
 
             migrationBuilder.CreateIndex(
                 name: "storage_content_storage_name_product_id_index",
@@ -2574,6 +2582,18 @@ namespace Main.Migrator.Migrations
                 columns: new[] { "user_id", "is_primary" },
                 unique: true,
                 filter: "(is_primary = true)");
+
+            migrationBuilder.CreateIndex(
+                name: "main.entities.balance.userfinancialprofile_who_created_idx",
+                schema: "public",
+                table: "user_financial_profile",
+                column: "who_created");
+
+            migrationBuilder.CreateIndex(
+                name: "main.entities.balance.userfinancialprofile_who_updated_idx",
+                schema: "public",
+                table: "user_financial_profile",
+                column: "who_updated");
 
             migrationBuilder.CreateIndex(
                 name: "user_info_description_index",
@@ -2932,6 +2952,10 @@ namespace Main.Migrator.Migrations
             migrationBuilder.DropTable(
                 name: "user_emails",
                 schema: "auth");
+
+            migrationBuilder.DropTable(
+                name: "user_financial_profile",
+                schema: "public");
 
             migrationBuilder.DropTable(
                 name: "user_info",
