@@ -10,7 +10,6 @@
         <ProjectReference Include="..\..\..\Core\Contracts\Contracts.csproj"/>
         <ProjectReference Include="..\..\..\Infrastructure\Integrations\Internal\Internal.Integration.Core\Internal.Integration.Core.csproj"/>
         <ProjectReference Include="..\..\Application.Common\Application.Common.csproj"/>
-        <ProjectReference Include="..\Pricing.Abstractions\Pricing.Abstractions.csproj"/>
     </ItemGroup>
 
     <ItemGroup>
@@ -24,6 +23,7 @@
       <Folder Include="Handlers\" />
       <Folder Include="Interfaces\" />
       <Folder Include="Models\" />
+      <Folder Include="Services\" />
     </ItemGroup>
 
 </Project>

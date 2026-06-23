@@ -25,7 +25,6 @@
         <ProjectReference Include="..\..\..\Infrastructure\RabbitMq\RabbitMq.csproj"/>
         <ProjectReference Include="..\..\..\Infrastructure\Security\Security.csproj"/>
         <ProjectReference Include="..\..\Api.Common\Api.Common.csproj"/>
-        <ProjectReference Include="..\Pricing.Abstractions\Pricing.Abstractions.csproj"/>
         <ProjectReference Include="..\Pricing.Application\Pricing.Application.csproj"/>
         <ProjectReference Include="..\Pricing.Persistence\Pricing.Persistence.csproj"/>
     </ItemGroup>
@@ -34,7 +33,7 @@
         <Content Include="..\..\..\..\.dockerignore">
           <Link>.dockerignore</Link>
         </Content>
-        <Content Include="..\Pricing.Abstractions\Localization\**\*">
+        <Content Include="..\Pricing.Entities\Localization\**\*">
             <Link>Localization\%(RecursiveDir)%(Filename)%(Extension)</Link>
             <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
             <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>

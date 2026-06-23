@@ -22,7 +22,6 @@
 
     <ItemGroup>
         <ProjectReference Include="..\..\..\Infrastructure\Persistence\Persistence.csproj"/>
-        <ProjectReference Include="..\Pricing.Abstractions\Pricing.Abstractions.csproj"/>
         <ProjectReference Include="..\Pricing.Entities\Pricing.Entities.csproj"/>
     </ItemGroup>
 
