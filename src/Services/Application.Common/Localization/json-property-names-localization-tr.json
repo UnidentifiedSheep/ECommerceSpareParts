@@ -14,6 +14,10 @@
     "timer": "Hesaplama zamanı",
     "total_amount": "Toplam tutar",
     "file_name": "Dosya adı",
-    "file_name_description": "Dosyanın adı"
+    "file_name_description": "Dosyanın adı",
+    "datetime.range.start.name": "Zaman aralığı başlangıcı",
+    "datetime.range.start.description": "Zaman aralığı başlangıcı",
+    "datetime.range.end.name": "Zaman aralığı sonu",
+    "datetime.range.end.description": "Zaman aralığı sonu"
   }
 }

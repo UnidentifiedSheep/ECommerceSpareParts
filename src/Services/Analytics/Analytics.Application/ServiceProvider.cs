@@ -1,14 +1,11 @@
 using Abstractions.Interfaces;
 using Analytics.Application.Configs;
-using Analytics.Application.Interfaces.Services;
 using Analytics.Application.Interfaces.Services.FactSynchronizers;
 using Analytics.Application.Interfaces.Services.Metrics;
 using Analytics.Application.Lrts.MetricCalculation;
 using Analytics.Application.Services;
 using Analytics.Application.Services.FactSynchronizers;
 using Analytics.Application.Services.Metrics.Calculators;
-using Analytics.Application.Services.Metrics.Converters;
-using Analytics.Application.Services.Metrics.Validators;
 using Analytics.Entities;
 using Analytics.Entities.Metrics;
 using Application.Common;
@@ -31,9 +28,9 @@ public static class ServiceProvider
         SortByConfig.Configure();
         collection
             .AddApplicationBase(configuration, typeof(TagsService).Assembly)
+            .AddNamedObjects()
             .AddLrtLayer(typeof(MetricCalculationLrt).Assembly)
             .RegisterMetricCalculators()
-            .RegisterMetricConverters()
             .AddFusionCache()
             .WithRegisteredDistributedCache()
             .WithRegisteredBackplane()
@@ -53,21 +50,10 @@ public static class ServiceProvider
 
     private static IServiceCollection RegisterMetricCalculators(this IServiceCollection collection)
     {
-        collection.AddSingleton<IMetricCalculatorRegistry, MetricCalculatorRegistry>();
         collection.AddScoped<IMetricCalculatorFactory, MetricCalculatorFactory>();
-        collection.AddScoped<IMetricValidatorDispatcher, MetricValidatorDispatcher>();
 
         collection.AddScoped<IMetricCalculator<ProductSalesMetric>, ProductSalesMetricCalculator>();
         collection.AddScoped<IMetricCalculator<ProductPurchasesMetric>, ProductPurchasesMetricCalculator>();
-        return collection;
-    }
-
-    private static IServiceCollection RegisterMetricConverters(this IServiceCollection collection)
-    {
-        collection.AddSingleton<IMetricConverterDispatcher, MetricConverterDispatcher>();
-        collection.AddSingleton<IMetricConverter<ProductPurchasesMetric>, ProductPurchaseMetricConverter>();
-        collection.AddSingleton<IMetricConverter<ProductSalesMetric>, ProductSaleMetricConverter>();
-
         return collection;
     }
 }

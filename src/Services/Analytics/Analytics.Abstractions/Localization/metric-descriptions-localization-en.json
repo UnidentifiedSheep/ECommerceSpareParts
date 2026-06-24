@@ -1,7 +1,0 @@
-﻿{
-  "locale": "en",
-  "keyValues": {
-    "ProductPurchasesMetric.description": "Purchase analysis for the selected product over the specified period: quantity, total amount, average, minimum and maximum purchase price, and price volatility.",
-    "ProductSalesMetric.description": "Calculates sales metrics for a selected product over a given period, including quantity sold, total revenue, average, minimum and maximum price, and price volatility."
-  }
-}

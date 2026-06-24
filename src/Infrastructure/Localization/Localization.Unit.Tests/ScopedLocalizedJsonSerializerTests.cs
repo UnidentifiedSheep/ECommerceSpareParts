@@ -52,6 +52,25 @@ public class ScopedLocalizedJsonSerializerTests
             .Select(x => x.GetString())
             .Should()
             .BeEquivalentTo([".csv"]);
+        field.GetProperty("dependsOnEntity").GetString().Should().Be(nameof(TestEntity));
+        field.TryGetProperty("dependsOnField", out _).Should().BeFalse();
+    }
+
+    [Fact]
+    public void SerializeMetadata_ShouldIncludeDependsOnField_WhenAttributeHasFieldName()
+    {
+        var serializer = CreateSerializer();
+
+        var json = serializer.SerializeMetadata<TestInputWithEntityField>();
+
+        using var document = JsonDocument.Parse(json);
+        var field = document.RootElement
+            .GetProperty("fields")
+            .EnumerateArray()
+            .Single();
+
+        field.GetProperty("dependsOnEntity").GetString().Should().Be("Product");
+        field.GetProperty("dependsOnField").GetString().Should().Be("id");
     }
 
     [Fact]
@@ -95,6 +114,7 @@ public class ScopedLocalizedJsonSerializerTests
         [RequiredJsonField]
         [LocalizedJsonFieldDescription("file_name_description")]
         [LocalizedJsonFieldName("file_name")]
+        [DependsOnEntity(typeof(TestEntity))]
         public required string FileName { get; init; }
     }
 
@@ -104,4 +124,12 @@ public class ScopedLocalizedJsonSerializerTests
         [LocalizedJsonFieldDescription("missing_description_key")]
         public string? Value { get; init; }
     }
+
+    private record TestInputWithEntityField
+    {
+        [DependsOnEntity("Product", "id")]
+        public int ProductId { get; init; }
+    }
+
+    private sealed class TestEntity;
 }

@@ -1,7 +1,7 @@
 ﻿using Abstractions.Interfaces.Persistence;
 using Analytics.Application.Interfaces.Repositories;
 using Analytics.Application.Interfaces.Services.Metrics;
-using Analytics.Entities.Exceptions.Metrics;
+using Analytics.Entities.Exceptions;
 using Analytics.Entities.Metrics;
 using Application.Common.Interfaces.Cqrs;
 

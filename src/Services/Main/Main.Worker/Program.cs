@@ -98,9 +98,8 @@ using (var scope = host.Services.CreateScope())
 
     recurringJobManager.AddOrUpdate<UpdateCurrencyRate>("UpdateCurrencyTask",
         x => x.Run(), Cron.Daily);
-
-    recurringJobManager.AddOrUpdate<NotifySuggestionsRebuildNeeded>("RebuildSuggestionsTask",
-        x => x.Run(), Cron.Daily);
+    
+    
 }
 
 await host.RunAsync();

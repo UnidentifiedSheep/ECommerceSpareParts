@@ -2,9 +2,19 @@
   "locale": "tr",
   "keyValues": {
     "metric.not.found": "Metrik bulunamadı.",
+    "metric.input.invalid": "Metrik için geçersiz veri girildi.",
+    "metric.input.range.start.must.be.before.or.equal.end": "Zaman aralığı başlangıcı, zaman aralığı sonundan küçük veya ona eşit olmalıdır.",
     "metric.dimension.key.required": "Metrik boyut anahtarı zorunludur.",
     "metric.dimension.key.too.long": "Metrik boyut anahtarı 200 karakter veya daha kısa olmalıdır.",
-    "metric_id_name": "Metrik kimlik kodu",
-    "metric_id_description": "Yeniden hesaplanacak metriğin kimlik kodu."
+    "metric.id.name": "Metrik kimlik kodu",
+    "metric.id.description": "Yeniden hesaplanacak metriğin kimlik kodu.",
+    "metric.input.field.currency.id.name": "Para birimi",
+    "metric.input.field.currency.id.description": "Metrik hesaplaması için kullanılan para birimi.",
+    "metric.input.field.product.id.name": "Ürün",
+    "metric.input.field.product.id.description": "Metrik hesaplaması için kullanılan ürün.",
+    "product.sales.metric.name": "Ürün satış metriği.",
+    "product.sales.metric.description": "Seçilen ürün için belirtilen dönemde satış metriklerini hesaplar: satılan miktar, toplam gelir, ortalama, minimum ve maksimum fiyat ve fiyat oynaklığı.",
+    "product.purchases.metric.name": "Ürün satın alma metriği.",
+    "product.purchases.metric.description": "Seçilen ürün için belirtilen dönemde satın alma analizi: miktar, toplam tutar, ortalama, minimum ve maksimum satın alma fiyatı ve fiyat oynaklığı."
   }
 }

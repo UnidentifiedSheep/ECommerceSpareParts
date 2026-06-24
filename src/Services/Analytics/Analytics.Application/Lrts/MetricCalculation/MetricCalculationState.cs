@@ -16,8 +16,8 @@ public record MetricCalculationInputState : IInputState
 {
     [InputControl(InputControlType.TextField)]
     [RequiredJsonField]
-    [LocalizedJsonFieldDescription("metric_id_description")]
-    [LocalizedJsonFieldName("metric_id_name")]
+    [LocalizedJsonFieldDescription("metric.id.description")]
+    [LocalizedJsonFieldName("metric.id.name")]
     [JsonPropertyName("metricId")]
     public required Guid MetricId { get; init; }
 
