@@ -6,6 +6,26 @@ public readonly record struct CacheArrayResult<T>(
 
 public static class CacheExtensions
 {
+    public static async Task<T?> GetOrSetAsync<T>(
+        this ICache cache,
+        string key, 
+        Func<Task<T?>> factory,
+        TimeSpan? ttl = null)
+    {
+        var cached = await cache.GetAsync<T>(key);
+        if (cached != null)
+            return cached;
+
+        var value = await factory();
+        if (value == null) return default;
+        
+        await cache.SetAsync<T>(
+            [(key, value)],
+            ttl);
+        
+        return value;
+    }
+    
     public static async Task<Dictionary<TKey, TValue>> GetOrSetManyAsync<TKey, TValue>(
         this ICache cache,
         IEnumerable<TKey> ids,

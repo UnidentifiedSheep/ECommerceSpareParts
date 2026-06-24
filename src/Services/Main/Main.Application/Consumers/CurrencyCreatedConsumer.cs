@@ -1,18 +1,14 @@
-﻿using Application.Common.Interfaces.Cqrs;
-using Contracts.Currency;
-using Main.Application.Handlers.Currencies.GetCurrencies;
+﻿using Contracts.Currency;
+using Main.Application.Interfaces.Cache;
 using MassTransit;
-using ZiggyCreatures.Caching.Fusion;
 
 namespace Main.Application.Consumers;
 
 public class CurrencyCreatedConsumer(
-    IFusionCache cache,
-    ICachePolicy<GetCurrenciesQuery> cachePolicy) : IConsumer<CurrencyCreatedEvent>
+    ICurrencyCacheRepository cacheRepository) : IConsumer<CurrencyCreatedEvent>
 {
     public async Task Consume(ConsumeContext<CurrencyCreatedEvent> context)
     {
-        if (cachePolicy.BaseTag != null)
-            await cache.RemoveByTagAsync(cachePolicy.BaseTag);
+        await cacheRepository.InvalidateAllCurrencies();
     }
 }

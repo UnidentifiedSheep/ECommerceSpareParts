@@ -9,6 +9,7 @@ public static class ServiceCollectionExtensions
     {
         services.AddScoped<IProductCacheRepository, ProductCacheRepository>();
         services.AddScoped<IUserCacheRepository, UserCacheRepository>();
+        services.AddScoped<ICurrencyCacheRepository, CurrencyCacheRepository>();
         return services;
     }
 }

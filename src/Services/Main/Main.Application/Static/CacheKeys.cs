@@ -55,20 +55,20 @@ public static class CacheKeys
         {
             return "users:roles:permissions:relations";
         }
+    }
 
-        public static string GetUserCacheKey(Guid userId)
+    public static class CurrencyCache
+    {
+        public static TimeSpan Ttl { get; } = TimeSpan.FromDays(1);
+
+        public static string Currency(int currencyId)
         {
-            return User(userId);
+            return $"currency:{currencyId}";
         }
-
-        public static string GetUserDiscountCacheKey(Guid userId)
+        
+        public static string AllCurrencies()
         {
-            return UserDiscount(userId);
-        }
-
-        public static string GetUserRolesAndPermissionsCacheKey(Guid userId)
-        {
-            return UserRolesAndPermissions(userId);
+            return "currencies";
         }
     }
 }

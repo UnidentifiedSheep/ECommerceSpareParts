@@ -4,7 +4,7 @@ using Carter;
 using Enums;
 using Main.Application.Dtos.Currencies;
 using Main.Application.Handlers.Currencies.CreateCurrency;
-using Main.Application.Handlers.Currencies.GetCurrencies;
+using Main.Application.Handlers.Currencies.GetAllCurrencies;
 using Main.Application.Handlers.Currencies.GetCurrencyById;
 using Main.Application.Handlers.Currencies.GetCurrencyHistory;
 using Main.Application.Handlers.Currencies.UpdateCurrenciesRates;
@@ -49,10 +49,9 @@ public class CurrenciesEndPoints : ICarterModule
 
         currencies.MapGet("", async (
                 ISender sender,
-                [AsParameters] PaginationQueryModel queryParams,
                 CancellationToken cancellation) =>
             {
-                var result = await sender.Send(new GetCurrenciesQuery(queryParams), cancellation);
+                var result = await sender.Send(new GetAllCurrenciesQuery(), cancellation);
                 return Results.Ok(new GetCurrenciesResponse(result.Currencies));
             })
             .WithName("GetCurrencies")

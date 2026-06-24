@@ -1,27 +1,19 @@
 ﻿using Application.Common.Interfaces.Cqrs;
-using Application.Common.Interfaces.Repositories;
-using LinqKit;
 using Main.Application.Dtos.Currencies;
-using Main.Application.Projections;
-using Main.Entities.Currency;
-using Microsoft.EntityFrameworkCore;
+using Main.Application.Interfaces.Cache;
 
 namespace Main.Application.Handlers.Currencies.GetAllCurrencies;
 
 public record GetAllCurrenciesQuery : IQuery<GetAllCurrenciesResult>;
 
-public record GetAllCurrenciesResult(List<CurrencyDto> Currencies);
+public record GetAllCurrenciesResult(IReadOnlyList<CurrencyDto> Currencies);
 
-public class GetAllCurrenciesHandler(IReadRepository<Currency, int> repository)
+public class GetAllCurrenciesHandler(
+    ICurrencyCacheRepository cacheRepository)
     : IQueryHandler<GetAllCurrenciesQuery, GetAllCurrenciesResult>
 {
     public async Task<GetAllCurrenciesResult> Handle(GetAllCurrenciesQuery request, CancellationToken cancellationToken)
     {
-        var result = await repository.Query
-            .AsExpandable()
-            .Select(CurrencyProjections.ToDto)
-            .ToListAsync(cancellationToken);
-
-        return new GetAllCurrenciesResult(result);
+        return new GetAllCurrenciesResult(await cacheRepository.GetAllCurrencies(cancellationToken));
     }
 }
