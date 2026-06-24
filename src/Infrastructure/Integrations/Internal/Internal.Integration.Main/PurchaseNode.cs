@@ -1,8 +1,7 @@
-using System.Net;
-using System.Text.Json;
 using Internal.Integration.Core;
 using Internal.Integration.Core.Interfaces;
 using Internal.Integration.Core.Interfaces.Main;
+using Internal.Integration.Core.Models;
 using Internal.Integration.Core.Models.Main;
 using Internal.Integration.Core.Models.Main.Purchase;
 using Microsoft.Extensions.Options;
@@ -15,7 +14,7 @@ internal sealed class PurchaseNode(
     IOptionsMonitor<InternalServiceCredentials> optionsMonitor) 
     : InternalClientBase(authClient, optionsMonitor), IPurchaseNode
 {
-    public async Task<InternalFullPurchase?> GetFullPurchase(
+    public async Task<InternalResponse<InternalFullPurchase>> GetFullPurchase(
         Guid purchaseId,
         CancellationToken cancellationToken = default)
     {
@@ -27,14 +26,6 @@ internal sealed class PurchaseNode(
             request,
             cancellationToken);
 
-        if (response.StatusCode == HttpStatusCode.NotFound)
-        {
-            return null;
-        }
-
-        response.EnsureSuccessStatusCode();
-
-        var json = await response.Content.ReadAsStringAsync(cancellationToken);
-        return JsonSerializer.Deserialize<InternalFullPurchase>(json);
+        return await ReadInternalResponse<InternalFullPurchase>(response, cancellationToken);
     }
 }

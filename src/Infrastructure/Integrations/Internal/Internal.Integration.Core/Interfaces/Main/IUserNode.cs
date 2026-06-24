@@ -1,6 +1,8 @@
+using Internal.Integration.Core.Models;
+
 namespace Internal.Integration.Core.Interfaces.Main;
 
 public interface IUserNode
 {
-    Task<decimal> GetUserDiscount(Guid userId, CancellationToken cancellationToken = default);
+    Task<InternalResponse<decimal>> GetUserDiscount(Guid userId, CancellationToken cancellationToken = default);
 }
