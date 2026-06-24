@@ -1,4 +1,5 @@
 using Application.Common.Interfaces.Repositories;
+using Application.Common.Interfaces.Settings;
 using Cache;
 using Cache.Extensions;
 using LinqKit;
@@ -7,12 +8,16 @@ using Main.Application.Interfaces.Cache;
 using Main.Application.Projections;
 using Main.Application.Static;
 using Main.Entities.Currency;
+using Main.Entities.Exceptions;
+using Main.Entities.Setting;
 using Microsoft.EntityFrameworkCore;
 
 namespace Main.Cache;
 
 public class CurrencyCacheRepository(
     ICache rawCache,
+    ISettingsService settingsService,
+    IRepository<CurrencyRate, (int, int)> rateRepository,
     IReadRepository<Currency, int> repository) : ICurrencyCacheRepository
 {
     public async Task<CurrencyDto?> GetCurrency(
@@ -20,7 +25,10 @@ public class CurrencyCacheRepository(
         CancellationToken cancellationToken = default)
     {
         var key = CacheKeys.CurrencyCache.Currency(id);
-        return await rawCache.GetOrSetAsync(key, () => GetCurrencyFromDb(id), CacheKeys.CurrencyCache.Ttl);
+        return await rawCache.GetOrSetAsync(
+            key: key, 
+            factory: () => GetCurrencyFromDb(id), 
+            ttl: CacheKeys.CurrencyCache.Ttl);
     }
 
     public async Task<IReadOnlyList<CurrencyDto>> GetAllCurrencies(CancellationToken cancellationToken = default)
@@ -47,14 +55,33 @@ public class CurrencyCacheRepository(
         return currencies;
     }
 
+    public Task<decimal?> GetCurrencyRate(int currencyId, CancellationToken cancellationToken = default)
+        => rawCache.GetOrSetAsync(
+            key: CacheKeys.CurrencyCache.CurrencyRate(currencyId),
+            factory: () => GetRateFromDb(currencyId),
+            ttl: CacheKeys.CurrencyCache.Ttl);
+
     public Task InvalidateCurrency(int id, CancellationToken cancellationToken = default)
     {
         return rawCache.RemoveKeyAsync(CacheKeys.CurrencyCache.Currency(id));
     }
 
-    public Task InvalidateAllCurrencies(CancellationToken cancellationToken = default)
+    public async Task InvalidateAllCurrencies(CancellationToken cancellationToken = default)
     {
-        return InvalidateAllCurrenciesCore();
+        var currenciesKey = CacheKeys.CurrencyCache.AllCurrencies();
+        var currencyIds = await rawCache.GetFromSetAsync(currenciesKey);
+        
+        var keys = currencyIds
+            .Select(int.Parse)
+            .Select(CacheKeys.CurrencyCache.Currency)
+            .Append(currenciesKey);
+
+        await rawCache.RemoveKeysAsync(keys);
+    }
+
+    public Task InvalidateCurrencyRate(int currencyId, CancellationToken cancellationToken = default)
+    {
+        return rawCache.RemoveKeyAsync(CacheKeys.CurrencyCache.CurrencyRate(currencyId));
     }
 
     private Task<CurrencyDto?> GetCurrencyFromDb(int id)
@@ -68,15 +95,14 @@ public class CurrencyCacheRepository(
             .Select(CurrencyProjections.ToDto)
             .ToDictionaryAsync(x => x.Id);
 
-    private async Task InvalidateAllCurrenciesCore()
+    private async Task<decimal?> GetRateFromDb(int currencyId)
     {
-        var currenciesKey = CacheKeys.CurrencyCache.AllCurrencies();
-        var currencyIds = await rawCache.GetFromSetAsync(currenciesKey);
-        var keys = currencyIds
-            .Select(int.Parse)
-            .Select(CacheKeys.CurrencyCache.Currency)
-            .Append(currenciesKey);
+        var baseCurrencyId = (await settingsService.GetOrDefault<CurrencySetting>())
+            .Data
+            .BaseCurrencyId;
 
-        await rawCache.RemoveKeysAsync(keys);
+        if (currencyId == baseCurrencyId) return 1m;
+
+        return (await rateRepository.GetById((currencyId, baseCurrencyId)))?.Rate;
     }
 }

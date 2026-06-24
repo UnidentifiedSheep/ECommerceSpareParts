@@ -70,5 +70,10 @@ public static class CacheKeys
         {
             return "currencies";
         }
+
+        public static string CurrencyRate(int currencyId)
+        {
+            return $"currency:{currencyId}:rate";
+        }
     }
 }

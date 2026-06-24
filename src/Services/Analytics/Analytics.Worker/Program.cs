@@ -1,5 +1,6 @@
 using System.Reflection;
 using Analytics.Application;
+using Analytics.Cache;
 using Analytics.Persistence;
 using Analytics.Persistence.Context;
 using Analytics.Worker;
@@ -37,6 +38,7 @@ builder.Services.AddLocalization(builder.Configuration);
 
 builder.Services
     .AddPersistenceLayer()
+    .AddApplicationCache()
     .AddCacheLayer("analytics")
     .AddIntegrationClients()
     .AddApplicationLayer(builder.Configuration)

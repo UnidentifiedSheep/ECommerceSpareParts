@@ -4,6 +4,7 @@ using Analytics.Api.Consumers;
 using Analytics.Api.Hubs;
 using Analytics.Application;
 using Analytics.Application.Consumers;
+using Analytics.Cache;
 using Analytics.Persistence;
 using Analytics.Persistence.Context;
 using Api.Common;
@@ -43,6 +44,7 @@ builder.Services.AddCommonApiInfrastructure();
 builder.Services
     .AddPersistenceLayer()
     .AddCacheLayer("analytics")
+    .AddApplicationCache()
     .AddApplicationLayer(builder.Configuration)
     .AddIntegrationClients()
     .AddEComAuth(builder.Configuration)
@@ -54,7 +56,7 @@ var uniqQueueName = $"queue-of-analytics-{Environment.MachineName}";
 
 builder.Services.AddMassTransit(x =>
 {
-    x.AddConsumers(Assembly.GetAssembly(typeof(CurrencyCreatedConsumer)));
+    x.AddConsumers(Assembly.GetAssembly(typeof(CurrencyRatesChangedConsumer)));
     x.AddConsumer<BackplaneConsumer>();
     x.AddConsumer<JobStatusUpdatedConsumer>();
     x.AddConsumer<MetricCalculationStatusUpdatedConsumer>();
@@ -98,7 +100,6 @@ builder.Services.AddMassTransit(x =>
         {
             ep.Durable = true;
 
-            ep.ConfigureConsumer<CurrencyCreatedConsumer>(context);
             ep.ConfigureConsumer<CurrencyRatesChangedConsumer>(context);
             ep.ConfigureConsumer<SaleDeletedConsumer>(context);
             ep.ConfigureConsumer<SaleUpdatedConsumer>(context);

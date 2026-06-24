@@ -1,5 +1,6 @@
 using Abstractions.Interfaces;
 using Abstractions.Models;
+using Analytics.Cache;
 using Analytics.Application.Configs;
 using Analytics.Persistence;
 using Api.Common;
@@ -70,6 +71,7 @@ public class ServiceProviderBuilder : IServiceProviderBuilder<ServiceProviderArg
 
         services
             .AddCacheLayer("test")
+            .AddApplicationCache()
             .AddCommonLayer();
 
         services.RemoveAll<IUserContext>();
