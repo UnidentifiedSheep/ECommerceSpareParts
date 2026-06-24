@@ -1,8 +1,7 @@
-using System.Net;
-using System.Text.Json;
 using Internal.Integration.Core;
 using Internal.Integration.Core.Interfaces;
 using Internal.Integration.Core.Interfaces.Main;
+using Internal.Integration.Core.Models;
 using Internal.Integration.Core.Models.Main;
 using Internal.Integration.Core.Models.Main.Sale;
 using Microsoft.Extensions.Options;
@@ -15,7 +14,7 @@ internal sealed class SaleNode(
     IOptionsMonitor<InternalServiceCredentials> optionsMonitor)
     : InternalClientBase(authClient, optionsMonitor), ISaleNode
 {
-    public async Task<InternalFullSale?> GetFullSale(
+    public async Task<InternalResponse<InternalFullSale>> GetFullSale(
         Guid saleId,
         CancellationToken cancellationToken = default)
     {
@@ -27,14 +26,6 @@ internal sealed class SaleNode(
             request,
             cancellationToken);
 
-        if (response.StatusCode == HttpStatusCode.NotFound)
-        {
-            return null;
-        }
-
-        response.EnsureSuccessStatusCode();
-
-        var json = await response.Content.ReadAsStringAsync(cancellationToken);
-        return JsonSerializer.Deserialize<InternalFullSale>(json);
+        return await ReadInternalResponse<InternalFullSale>(response, cancellationToken);
     }
 }

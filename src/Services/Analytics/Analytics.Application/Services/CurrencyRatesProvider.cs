@@ -1,16 +1,19 @@
-﻿using Application.Common.Services.Currency;
-using Internal.Integration.Core.Interfaces;
-using Internal.Integration.Core.Interfaces.Main;
-using ZiggyCreatures.Caching.Fusion;
+using Analytics.Application.Interfaces.Cache;
+using Application.Common.Interfaces.Currency;
 
 namespace Analytics.Application.Services;
 
 public class CurrencyRatesProvider(
-    IFusionCache cache,
-    IMainClient mainClient) : CurrencyRatesProviderBase(cache)
+    ICurrencyCacheRepository currencyCacheRepository) : ICurrencyRatesProvider
 {
-    protected override Task<decimal> GetExternalData(
-        int currencyId,
-        CancellationToken cancellationToken = default)
-        => mainClient.CurrencyNode.GetCurrencyRate(currencyId, cancellationToken);
+    public async Task<decimal> GetRate(int currencyId, CancellationToken cancellationToken = default)
+    {
+        return await currencyCacheRepository.GetCurrencyRate(currencyId, cancellationToken) ??
+               throw new InvalidOperationException("Currency rate not found");
+    }
+
+    public Task<decimal?> GetRateOrDefault(int currencyId, CancellationToken cancellationToken = default)
+    {
+        return currencyCacheRepository.GetCurrencyRate(currencyId, cancellationToken);
+    }
 }

@@ -1,3 +1,4 @@
+using System.Net;
 using Internal.Integration.Core.Interfaces;
 using Internal.Integration.Core.Interfaces.Main;
 using Internal.Integration.Core.Models.Main;
@@ -14,11 +15,17 @@ public class MainProducerSearchDocumentProvider(
         int producerId,
         CancellationToken cancellationToken = default)
     {
-        var fullProducer = await mainClient.ProducerNode.GetFullProducer(producerId, cancellationToken);
-        if (fullProducer == null)
-        {
+        var response = await mainClient.ProducerNode.GetFullProducer(producerId, cancellationToken);
+        if (response is { StatusCode: HttpStatusCode.NotFound })
             return null;
-        }
+
+        if (!response.Success)
+            throw new InvalidOperationException(
+                $"Unable to get producer {producerId} from Main service. " +
+                $"Status: {response.StatusCode}. " +
+                $"Error: {response.Error}");
+
+        var fullProducer = response.ValueOrThrow;
 
         return new Producer
         {

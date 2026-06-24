@@ -1,30 +1,20 @@
-﻿using Application.Common.Interfaces.Settings;
-using Application.Common.Services.Currency;
-using Main.Application.Interfaces.Persistence;
+﻿using Application.Common.Interfaces.Currency;
+using Main.Application.Interfaces.Cache;
 using Main.Entities.Exceptions;
-using Main.Entities.Setting;
-using ZiggyCreatures.Caching.Fusion;
 
 namespace Main.Application.Services.Currency;
 
 public class CurrencyRatesProvider(
-    IFusionCache cache,
-    ICurrencyRateRepository rateRepository,
-    ISettingsService settingsService) : CurrencyRatesProviderBase(cache)
+    ICurrencyCacheRepository cacheRepository) : ICurrencyRatesProvider
 {
-    protected override async Task<decimal> GetExternalData(
-        int currencyId,
-        CancellationToken cancellationToken = default)
+    public async Task<decimal> GetRate(int currencyId, CancellationToken cancellationToken = default)
     {
-        var baseCurrencyId = (await settingsService.GetOrDefault<CurrencySetting>(cancellationToken))
-            .Data
-            .BaseCurrencyId;
+        return await cacheRepository.GetCurrencyRate(currencyId, cancellationToken) ?? 
+               throw new CurrencyRateNotFoundException(currencyId);
+    }
 
-        if (currencyId == baseCurrencyId) return 1m;
-
-        var rate = await rateRepository.GetById((currencyId, baseCurrencyId), cancellationToken)
-                   ?? throw new CurrencyRateNotFoundException(currencyId);
-
-        return rate.Rate;
+    public Task<decimal?> GetRateOrDefault(int currencyId, CancellationToken cancellationToken = default)
+    {
+        return cacheRepository.GetCurrencyRate(currencyId, cancellationToken);
     }
 }

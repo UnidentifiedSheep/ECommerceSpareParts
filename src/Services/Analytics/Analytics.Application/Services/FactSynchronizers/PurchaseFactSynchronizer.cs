@@ -1,4 +1,5 @@
-﻿using Abstractions.Interfaces.Persistence;
+﻿using System.Net;
+using Abstractions.Interfaces.Persistence;
 using Analytics.Application.Interfaces.Services.FactSynchronizers;
 using Analytics.Application.Interfaces.Services.Metrics;
 using Analytics.Application.Models;
@@ -34,7 +35,7 @@ public class PurchaseFactSynchronizer(
     {
         var synchronizationStartedAt = DateTime.UtcNow;
         
-        var fromMain = await mainClient.PurchaseNode.GetFullPurchase(id, cancellationToken);
+        var response = await mainClient.PurchaseNode.GetFullPurchase(id, cancellationToken);
         var dbFact = await repository.FirstOrDefaultAsync(
             Criteria<PurchasesFact>
                 .New()
@@ -56,23 +57,17 @@ public class PurchaseFactSynchronizer(
             return dbFact;
         }
 
-        if (fromMain is null)
+        if (!response.Success)
         {
-            if (dbFact is not null)
-            {
-                await tagsService.UpdateTags(
-                    new TagUpdateContext<PurchasesFact>
-                    {
-                        NewFactDatetime = dbFact.CreatedAt
-                    },
-                    cancellationToken);
+            if (response.StatusCode == HttpStatusCode.NotFound)
+                return await RemoveFactIfExists(dbFact, cancellationToken);
 
-                unitOfWork.Remove(dbFact);
-            }
-
-            await unitOfWork.SaveChangesAsync(cancellationToken);
-            return null;
+            throw new InvalidOperationException(
+                $"Unable to synchronize purchase fact {id}. " +
+                $"Main service returned {response.StatusCode}: {response.Error}");
         }
+
+        var fromMain = response.ValueOrThrow;
 
         var purchase = fromMain.Purchase;
         var contents = fromMain.Contents.Select(x =>
@@ -124,5 +119,25 @@ public class PurchaseFactSynchronizer(
 
         await unitOfWork.SaveChangesAsync(cancellationToken);
         return dbFact;
+    }
+
+    private async Task<PurchasesFact?> RemoveFactIfExists(
+        PurchasesFact? dbFact,
+        CancellationToken cancellationToken)
+    {
+        if (dbFact is not null)
+        {
+            await tagsService.UpdateTags(
+                new TagUpdateContext<PurchasesFact>
+                {
+                    NewFactDatetime = dbFact.CreatedAt
+                },
+                cancellationToken);
+
+            unitOfWork.Remove(dbFact);
+        }
+
+        await unitOfWork.SaveChangesAsync(cancellationToken);
+        return null;
     }
 }

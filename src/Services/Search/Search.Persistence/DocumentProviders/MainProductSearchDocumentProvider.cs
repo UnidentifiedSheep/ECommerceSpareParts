@@ -1,3 +1,4 @@
+using System.Net;
 using Extensions;
 using Internal.Integration.Core.Interfaces;
 using Internal.Integration.Core.Interfaces.Main;
@@ -15,11 +16,17 @@ public class MainProductSearchDocumentProvider(
         int productId,
         CancellationToken cancellationToken = default)
     {
-        var fullProduct = await mainClient.ProductNode.GetFullProduct(productId, cancellationToken);
-        if (fullProduct == null)
-        {
+        var response = await mainClient.ProductNode.GetFullProduct(productId, cancellationToken);
+        if (response is { StatusCode: HttpStatusCode.NotFound })
             return null;
-        }
+
+        if (!response.Success)
+            throw new InvalidOperationException(
+                $"Unable to get product {productId} from Main service. " +
+                $"Status: {response.StatusCode}. " +
+                $"Error: {response.Error}");
+
+        var fullProduct = response.ValueOrThrow;
 
         return new Product
         {

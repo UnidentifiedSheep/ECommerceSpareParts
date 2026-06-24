@@ -1,6 +1,7 @@
 using System.Reflection;
 using Api.Common;
 using Api.Common.Extensions;
+using Application.Common.Backplane;
 using Cache;
 using Carter;
 using Contracts.Currency;
@@ -11,10 +12,13 @@ using Localization.Domain.Extensions;
 using MassTransit;
 using OpenTelemetry.Metrics;
 using Pricing.Application;
+using Pricing.Application.Consumers;
+using Pricing.Cache;
 using Pricing.Persistence;
 using Pricing.Persistence.Contexts;
 using RabbitMq.Extensions;
 using Security;
+using ZiggyCreatures.Caching.Fusion.Backplane;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -37,6 +41,7 @@ var uniqQueueName = $"queue-of-pricing-{Environment.MachineName}";
 builder.Services.AddMassTransit(x =>
 {
     x.AddConsumers(Assembly.GetAssembly(typeof(Global)));
+    x.AddConsumer<BackplaneConsumer>();
 
     x.AddEntityFrameworkOutbox<DContext>(o =>
     {
@@ -52,23 +57,34 @@ builder.Services.AddMassTransit(x =>
         {
             ep.AutoDelete = true;
             ep.Durable = false;
-
             ep.ConfigureConsumeTopology = false;
+            
+            ep.ConfigureConsumer<BackplaneConsumer>(context);
+            ep.Bind<BackplaneMessage>();
+            
 
+            ep.ConfigureConsumer<MarkupCurrencyRatesChangedConsumer>(context);
             ep.Bind<CurrencyRateChangedEvent>();
+
             ep.Bind<SettingChangedEvent>();
             ep.Bind<MarkupGroupChangedEvent>();
             ep.Bind<MarkupGroupGeneratedEvent>();
             ep.Bind<MarkupRangesUpdatedEvent>();
         });
 
-        cfg.ReceiveEndpoint("pricing-queue", ep => { ep.Durable = true; });
+        cfg.ReceiveEndpoint("pricing-queue", ep =>
+        {
+            ep.Durable = true;
+            
+            ep.ConfigureConsumer<CurrencyRatesChangedConsumer>(context);
+        });
     });
 });
 
 builder.Services
     .AddEComAuth(builder.Configuration)
     .AddPersistenceLayer()
+    .AddApplicationCache()
     .AddCacheLayer("pricing")
     .AddJsonSigner(
         builder.Configuration["SignSecret"]

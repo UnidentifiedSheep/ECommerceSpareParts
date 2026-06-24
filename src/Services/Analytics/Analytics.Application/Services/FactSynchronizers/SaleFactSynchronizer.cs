@@ -1,3 +1,4 @@
+using System.Net;
 using Abstractions.Interfaces.Persistence;
 using Analytics.Application.Interfaces.Services.FactSynchronizers;
 using Analytics.Application.Interfaces.Services.Metrics;
@@ -6,7 +7,6 @@ using Analytics.Entities;
 using Application.Common.Interfaces.Repositories;
 using Attributes;
 using Internal.Integration.Core.Interfaces.Main;
-using Internal.Integration.Core.Models.Main;
 using Internal.Integration.Core.Models.Main.Sale;
 using Microsoft.Extensions.Logging;
 
@@ -35,7 +35,7 @@ public class SaleFactSynchronizer(
     {
         var synchronizationStartedAt = DateTime.UtcNow;
 
-        var fromMain = await mainClient.SaleNode.GetFullSale(id, cancellationToken);
+        var response = await mainClient.SaleNode.GetFullSale(id, cancellationToken);
         var dbFact = await repository.FirstOrDefaultAsync(
             Criteria<SalesFact>
                 .New()
@@ -57,7 +57,19 @@ public class SaleFactSynchronizer(
             return dbFact;
         }
 
-        if (fromMain is null || fromMain.Sale.State != InternalSaleState.Completed)
+        if (!response.Success)
+        {
+            if (response.StatusCode == HttpStatusCode.NotFound)
+                return await RemoveFactIfExists(dbFact, cancellationToken);
+
+            throw new InvalidOperationException(
+                $"Unable to synchronize sale fact {id}. " +
+                $"Main service returned {response.StatusCode}: {response.Error}");
+        }
+
+        var fromMain = response.ValueOrThrow;
+
+        if (fromMain.Sale.State != InternalSaleState.Completed)
             return await RemoveFactIfExists(dbFact, cancellationToken);
 
         var sale = fromMain.Sale;
