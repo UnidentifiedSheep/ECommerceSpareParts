@@ -8,18 +8,19 @@ using Internal.Integration.Core.Models;
 using Microsoft.Extensions.DependencyInjection;
 using Moq;
 using Test.Common.TestContainers.Combined;
+using ZiggyCreatures.Caching.Fusion;
 
 namespace Analytics.Integration.Tests.CacheRepositoriesTests;
 
 public class CurrencyCacheRepositoryTests(CombinedContainerFixture fixture) : IntegrationTest(fixture)
 {
-    private ICache _cache = null!;
+    private IFusionCache _cache = null!;
     private Mock<IMainClient> _mock = null!;
     private Mock<ICurrencyNode> _currencyMock = null!;
     public override async Task InitializeAsync()
     {
         await base.InitializeAsync();
-        _cache = Sp.GetRequiredService<ICache>();
+        _cache = Sp.GetRequiredService<IFusionCache>();
         _mock = new Mock<IMainClient>();
         _currencyMock = new Mock<ICurrencyNode>();
         

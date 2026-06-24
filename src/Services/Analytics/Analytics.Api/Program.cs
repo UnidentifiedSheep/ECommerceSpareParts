@@ -103,8 +103,7 @@ builder.Services.AddMassTransit(x =>
             ep.ConfigureConsumer<CurrencyRatesChangedConsumer>(context);
             ep.ConfigureConsumer<SaleDeletedConsumer>(context);
             ep.ConfigureConsumer<SaleUpdatedConsumer>(context);
-            ep.ConfigureConsumer<CurrencyRatesChangedConsumer>(context);
-
+            
             ep.ConfigureConsumer<PurchaseDeletedConsumer>(context);
             ep.ConfigureConsumer<PurchaseUpdatedConsumer>(context);
         });

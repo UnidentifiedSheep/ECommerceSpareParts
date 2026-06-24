@@ -1,6 +1,13 @@
 ﻿using Application.Common;
+using Application.Common.Extensions;
+using Application.Common.Interfaces.Currency;
+using Application.Common.Services.Currency;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Pricing.Application.Interfaces;
+using Pricing.Application.Services;
+using Pricing.Application.Services.Markup;
+using ZiggyCreatures.Caching.Fusion;
 
 namespace Pricing.Application;
 
@@ -10,9 +17,20 @@ public static class ServiceProvider
         this IServiceCollection collection,
         IConfiguration configuration)
     {
-        collection.AddApplicationBase(configuration, typeof(Global).Assembly);
+        collection.AddApplicationBase(configuration, typeof(Global).Assembly)
+            .AddFusionCache()
+            .WithRegisteredDistributedCache()
+            .WithRegisteredBackplane()
+            .WithSystemTextJsonSerializer();
 
+        collection.RegisterSettingsService<SettingFactory>();
         
+        collection.AddScoped<ICurrencyConverter, CurrencyConverter>();
+        collection.AddScoped<ICurrencyRatesProvider, CurrencyRatesProvider>();
+        
+        collection.AddSingleton<IMarkupContainer, MarkupContainer>();
+        collection.AddScoped<IMarkupCalculator, MarkupCalculator>();
+        collection.AddScoped<IMarkupInitializer, MarkupInitializer>();
 
         return collection;
     }

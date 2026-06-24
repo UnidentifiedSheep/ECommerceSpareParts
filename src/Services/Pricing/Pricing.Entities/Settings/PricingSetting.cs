@@ -29,5 +29,5 @@ public record PricingSettingData
     public int? SelectedMarkupId { get; init; }
     
     [JsonPropertyName("defaultMarkup")]
-    public decimal DefaultMarkup { get; init; } = 20;
+    public decimal DefaultMarkup { get; init; } = 0.2m;
 }

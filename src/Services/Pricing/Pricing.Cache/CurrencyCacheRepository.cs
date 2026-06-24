@@ -1,11 +1,9 @@
-using Analytics.Application.Interfaces.Cache;
-using Analytics.Application.Static;
-using Cache;
-using Cache.Extensions;
 using Internal.Integration.Core.Interfaces.Main;
+using Pricing.Application.Interfaces.Cache;
+using Pricing.Application.Static;
 using ZiggyCreatures.Caching.Fusion;
 
-namespace Analytics.Cache;
+namespace Pricing.Cache;
 
 public class CurrencyCacheRepository(
     IFusionCache fusionCache,
