@@ -8,7 +8,6 @@ using Application.Common.Interfaces.Cqrs;
 using Application.Common.Interfaces.Currency;
 using Attributes;
 using Contracts.Products;
-using Contracts.StorageContent;
 using Domain.Extensions;
 using Main.Application.Dtos.Storage;
 using Main.Application.Interfaces.Persistence;

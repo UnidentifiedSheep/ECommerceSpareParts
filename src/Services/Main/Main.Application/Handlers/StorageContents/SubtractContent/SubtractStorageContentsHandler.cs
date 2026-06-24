@@ -7,7 +7,6 @@ using Application.Common.Interfaces.NamedObject;
 using Application.Common.Interfaces.Settings;
 using Attributes;
 using Contracts.Products;
-using Contracts.StorageContent;
 using Main.Application.Interfaces.Persistence;
 using Main.Application.Interfaces.Services.Storage;
 using Main.Application.Models.Storage;
