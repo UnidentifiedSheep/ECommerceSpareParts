@@ -36,5 +36,4 @@ public record JobScheduleDto
     
     [JsonPropertyName("enabled")]
     public required bool Enabled { get; init; }
-    
 }
