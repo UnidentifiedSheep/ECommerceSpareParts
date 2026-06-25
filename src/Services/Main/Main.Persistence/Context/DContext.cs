@@ -129,6 +129,8 @@ public partial class DContext : DbContext
     
     public virtual DbSet<Job> Jobs { get; set; }
 
+    public virtual DbSet<JobSchedule> JobSchedules { get; set; }
+
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
     {
         base.OnConfiguring(optionsBuilder);
@@ -155,7 +157,8 @@ public partial class DContext : DbContext
 
         modelBuilder.ApplyConfigurationsFromAssembly(Assembly.GetAssembly(GetType())!)
             .ApplyConfiguration(new SettingConfiguration())
-            .ApplyConfiguration(new JobConfiguration());
+            .ApplyConfiguration(new JobConfiguration())
+            .ApplyConfiguration(new JobScheduleConfiguration());
 
         modelBuilder.Entity<Setting>()
             .HasDiscriminator(e => e.Key)
