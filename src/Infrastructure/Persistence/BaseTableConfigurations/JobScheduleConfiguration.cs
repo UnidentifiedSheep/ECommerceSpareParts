@@ -57,5 +57,9 @@ public class JobScheduleConfiguration : IEntityTypeConfiguration<JobSchedule>
         builder.HasIndex(
             e => new { e.Enabled, e.NextRunAt, e.Id }, 
             "job_schedules_enabled_next_run_at_id_idx");
+        
+        builder.Navigation(e => e.Runs)
+            .HasField("_runs")
+            .UsePropertyAccessMode(PropertyAccessMode.Field);
     }
 }

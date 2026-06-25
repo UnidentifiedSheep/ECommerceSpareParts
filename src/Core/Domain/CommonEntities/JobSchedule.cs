@@ -20,6 +20,9 @@ public class JobSchedule : AuditableEntity<JobSchedule, Guid>, ILinqEntity<JobSc
     public DateTime? LastQueuedAt { get; private set; }
     public DateTime? NextRunAt { get; private set; }
 
+    private readonly List<JobScheduleRun> _runs = [];
+    public IReadOnlyList<JobScheduleRun> Runs => _runs;
+
     private JobSchedule() {}
     
     private JobSchedule(
@@ -44,8 +47,11 @@ public class JobSchedule : AuditableEntity<JobSchedule, Guid>, ILinqEntity<JobSc
         string jobSystemName, 
         string inputState, 
         int maxAttempts, 
-        string cron) 
+        string cron)  
         => new(name, description, jobSystemName, inputState, maxAttempts, cron);
+
+    public void AddScheduleRun(Guid jobId, DateTime scheduledAt, DateTime queuedAt)
+        => _runs.Add(JobScheduleRun.Create(Id, jobId, scheduledAt, queuedAt));
 
     public void SetName(string name)
     {
@@ -86,6 +92,12 @@ public class JobSchedule : AuditableEntity<JobSchedule, Guid>, ILinqEntity<JobSc
 
     public void SetNextRunAt(DateTime? nextRunAt)
     {
+        NextRunAt = nextRunAt;
+    }
+
+    public void MarkQueued(DateTime queuedAt, DateTime? nextRunAt)
+    {
+        LastQueuedAt = queuedAt;
         NextRunAt = nextRunAt;
     }
 

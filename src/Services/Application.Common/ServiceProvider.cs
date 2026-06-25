@@ -4,6 +4,7 @@ using Application.Common.Behaviors;
 using Application.Common.Extensions;
 using Application.Common.Handlers.Jobs;
 using Application.Common.Handlers.Jobs.GetJobs;
+using Application.Common.Handlers.JobSchedules;
 using Application.Common.Handlers.JobSchedules.CreateSchedule;
 using Application.Common.Handlers.JobSchedules.GetSchedule;
 using Application.Common.Handlers.JobSchedules.UpdateSchedule;
@@ -112,6 +113,10 @@ public static class ServiceProvider
         services.AddScoped<
             IRequestHandler<UpdateScheduleCommand, UpdateScheduleResult>,
             UpdateScheduleHandler>();
+
+        services.AddScoped<
+            IRequestHandler<QueueScheduledJobsCommand, Unit>,
+            QueueScheduledJobsHandler>();
         
         return services;
     }

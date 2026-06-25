@@ -40,7 +40,7 @@ public class JobScheduleRunConfiguration : IEntityTypeConfiguration<JobScheduleR
             .IsUnique();
 
         builder.HasOne<JobSchedule>()
-            .WithMany()
+            .WithMany(e => e.Runs)
             .HasForeignKey(e => e.JobScheduleId)
             .OnDelete(DeleteBehavior.Cascade)
             .HasConstraintName("job_schedule_runs_job_schedule_id_fk");
