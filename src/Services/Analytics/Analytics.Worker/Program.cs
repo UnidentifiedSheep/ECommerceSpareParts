@@ -44,12 +44,14 @@ builder.Services
     .AddApplicationLayer(builder.Configuration)
     .AddWorkerSecurityLayer()
     .AddLrtOptions()
+    .AddScheduledJobEnqueuerOptions()
     .AddSystemOptions();
 
 AddHostedServiceOptions(builder.Services);
 builder.Services
     .AddHostedService<RecalculationCheckHostedService>()
-    .AddHostedService<LrtExecutorHostedService>();
+    .AddHostedService<LrtExecutorHostedService>()
+    .AddHostedService<ScheduledJobEnqueuerHostedService>();
 
 AddMassTransit(builder);
 

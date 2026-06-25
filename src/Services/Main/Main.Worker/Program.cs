@@ -48,6 +48,7 @@ builder.Services
     .AddJwtOptions()
     .AddS3Options()
     .AddLrtOptions()
+    .AddScheduledJobEnqueuerOptions()
     .AddSystemOptions();
 
 builder.AddLokiLogger(
@@ -77,7 +78,8 @@ builder.Services
 AddHostedServiceOptions(builder.Services);
 builder.Services
     .AddHostedService<EmailWorkHostedService>()
-    .AddHostedService<LrtExecutorHostedService>();
+    .AddHostedService<LrtExecutorHostedService>()
+    .AddHostedService<ScheduledJobEnqueuerHostedService>();
 
 builder.Services.AddHangfire((sp, x) =>
 {

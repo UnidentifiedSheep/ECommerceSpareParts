@@ -48,6 +48,8 @@ public class QueueScheduledJobsHandler(
         {
             var schedule = schedules[i];
             var job = jobs[i];
+
+            var scheduledAt = schedule.NextRunAt!.Value;
             
             var nextRunAt = CronExpression.Parse(schedule.Cron)
                 .GetNextOccurrence(
@@ -55,7 +57,7 @@ public class QueueScheduledJobsHandler(
                     JobSchedule.TimeZone);
 
             schedule.MarkQueued(uncorrectedTime, nextRunAt);
-            schedule.AddScheduleRun(job.Id, schedule.NextRunAt!.Value, uncorrectedTime);
+            schedule.AddScheduleRun(job.Id, scheduledAt, uncorrectedTime);
         }
 
         return Unit.Value;

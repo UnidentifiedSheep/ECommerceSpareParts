@@ -85,6 +85,16 @@ public static class ServiceProvider
         return collection;
     }
 
+    public static IServiceCollection AddScheduledJobEnqueuerOptions(this IServiceCollection collection)
+    {
+        collection.AddOptions<ScheduledJobEnqueuerOptions>()
+            .BindConfiguration(ScheduledJobEnqueuerOptions.SectionName)
+            .ValidateDataAnnotations()
+            .ValidateOnStart();
+        
+        return collection;
+    }
+
     public static IServiceCollection AddSystemOptions(this IServiceCollection collection)
     {
         collection.AddOptions<SystemOptions>()
