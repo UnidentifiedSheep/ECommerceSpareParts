@@ -25,6 +25,9 @@ public record JobScheduleDto
     [JsonPropertyName("cron")]
     public required string Cron { get; init; }
     
+    [JsonPropertyName("localizedCron")]
+    public required string LocalizedCron { get; init; }
+    
     [JsonPropertyName("lastQueuedAt")]
     public required DateTime? LastQueuedAt { get; init; }
     
@@ -33,4 +36,5 @@ public record JobScheduleDto
     
     [JsonPropertyName("enabled")]
     public required bool Enabled { get; init; }
+    
 }

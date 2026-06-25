@@ -5,6 +5,7 @@ using Application.Common.Interfaces.Cqrs;
 using Application.Common.Interfaces.Repositories;
 using Application.Common.Projections;
 using LinqKit;
+using Localization.Abstractions.Interfaces;
 using Microsoft.EntityFrameworkCore;
 
 namespace Application.Common.Handlers.JobSchedules.GetSchedule;
@@ -17,6 +18,7 @@ public record GetScheduleQuery(
 public record GetScheduleResult(IReadOnlyList<JobScheduleDto> Schedules);
 
 public class GetScheduleHandler(
+    IScopedStringLocalizer localizer,
     IReadRepository<Domain.CommonEntities.JobSchedule, Guid> repository) : IQueryHandler<GetScheduleQuery, GetScheduleResult>
 {
     public async Task<GetScheduleResult> Handle(
@@ -37,7 +39,7 @@ public class GetScheduleHandler(
         var result = await query
             .SortBy(request.SortBy)
             .AsExpandable()
-            .Select(JobProjections.JobScheduleProjection)
+            .Select(JobProjections.JobScheduleProjection(localizer))
             .ApplyPagination(request.Pagination)
             .ToListAsync(cancellationToken);
         

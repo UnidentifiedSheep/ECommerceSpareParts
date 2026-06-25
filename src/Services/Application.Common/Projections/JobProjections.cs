@@ -1,6 +1,8 @@
 using System.Linq.Expressions;
 using Application.Common.Dtos;
+using CronExpressionDescriptor;
 using Domain.CommonEntities;
+using Localization.Abstractions.Interfaces;
 
 namespace Application.Common.Projections;
 
@@ -21,13 +23,18 @@ public static class JobProjections
             UpdatedAt = job.UpdatedAt
         };
 
-    public static readonly Expression<Func<JobSchedule, JobScheduleDto>> JobScheduleProjection =
-        schedule => new JobScheduleDto
+    public static Expression<Func<JobSchedule, JobScheduleDto>> JobScheduleProjection(
+        IScopedStringLocalizer localizer) => schedule => new JobScheduleDto
         {
             Id = schedule.Id,
             Name = schedule.Name,
             Description = schedule.Description,
             Cron = schedule.Cron,
+            LocalizedCron = ExpressionDescriptor.GetDescription(schedule.Cron, new Options(){
+                DayOfWeekStartIndexZero = false,
+                Use24HourTimeFormat = true,
+                Locale = localizer.Locale
+            }),
             InputState = schedule.InputState,
             LastQueuedAt = schedule.LastQueuedAt,
             MaxAttempts = schedule.MaxAttempts,
