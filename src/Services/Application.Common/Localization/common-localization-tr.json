@@ -5,6 +5,14 @@
     "pagination.size.range": "Öğe sayısı 1 ile 100 arasında olmalıdır.",
     "row.is.out.dated": "Güncellemeye çalıştığınız veri güncel değil. Lütfen veriyi yeniden yükleyin.",
     "job.not.found": "İstenen görev bulunamadı.",
-    "job.max.attempts.must.be.greater.than.zero": "Maksimum deneme sayısı 0'dan büyük olmalıdır."
+    "job.schedule.not.found": "İstenen görev zamanlaması bulunamadı.",
+    "job.max.attempts.must.be.greater.than.zero": "Maksimum deneme sayısı 0'dan büyük olmalıdır.",
+    "job.schedule.name.required": "Görev zamanlaması adı zorunludur.",
+    "job.schedule.name.max.length": "Görev zamanlaması adı 64 karakter veya daha kısa olmalıdır.",
+    "job.schedule.description.max.length": "Görev zamanlaması açıklaması 255 karakter veya daha kısa olmalıdır.",
+    "job.schedule.job.system.name.required": "Görev sistem adı zorunludur.",
+    "job.schedule.input.state.required": "Görev giriş durumu zorunludur.",
+    "job.schedule.cron.required": "Görev zamanlaması cron ifadesi zorunludur.",
+    "job.schedule.cron.invalid": "Görev zamanlaması cron ifadesi geçerli olmalıdır."
   }
 }

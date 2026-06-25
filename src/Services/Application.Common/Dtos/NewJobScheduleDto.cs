@@ -2,16 +2,13 @@ using System.Text.Json.Serialization;
 
 namespace Application.Common.Dtos;
 
-public record JobScheduleDto
+public record NewJobScheduleDto
 {
-    [JsonPropertyName("id")]
-    public required Guid Id { get; init; }
-    
     [JsonPropertyName("name")]
     public required string Name { get; init; }
     
     [JsonPropertyName("description")]
-    public required string? Description { get; init; }
+    public string? Description { get; init; }
     
     [JsonPropertyName("jobSystemName")]
     public required string JobSystemName { get; init; }
@@ -20,16 +17,10 @@ public record JobScheduleDto
     public required string InputState { get; init; }
     
     [JsonPropertyName("maxAttempts")]
-    public required int MaxAttempts { get; init; }
+    public int MaxAttempts { get; init; } = 3;
     
     [JsonPropertyName("cron")]
     public required string Cron { get; init; }
-    
-    [JsonPropertyName("lastQueuedAt")]
-    public required DateTime? LastQueuedAt { get; init; }
-    
-    [JsonPropertyName("nextRunAt")]
-    public required DateTime? NextRunAt { get; init; }
     
     [JsonPropertyName("enabled")]
     public required bool Enabled { get; init; }

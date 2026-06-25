@@ -5,6 +5,14 @@
     "pagination.size.range": "Количество элементов должно быть от 1 до 100.",
     "row.is.out.dated": "Данные которые вы пытаетесь обновить, уже не актуальны. Пожалуйста перезагрузите их.",
     "job.not.found": "Запрошенная задача не была найдена.",
-    "job.max.attempts.must.be.greater.than.zero": "Максимальное количество попыток должно быть больше 0."
+    "job.schedule.not.found": "Запрошенное расписание задачи не было найдено.",
+    "job.max.attempts.must.be.greater.than.zero": "Максимальное количество попыток должно быть больше 0.",
+    "job.schedule.name.required": "Название расписания задачи обязательно.",
+    "job.schedule.name.max.length": "Название расписания задачи не должно превышать 64 символа.",
+    "job.schedule.description.max.length": "Описание расписания задачи не должно превышать 255 символов.",
+    "job.schedule.job.system.name.required": "Системное название задачи обязательно.",
+    "job.schedule.input.state.required": "Входное состояние задачи обязательно.",
+    "job.schedule.cron.required": "Cron-выражение расписания задачи обязательно.",
+    "job.schedule.cron.invalid": "Cron-выражение расписания задачи должно быть валидным."
   }
 }

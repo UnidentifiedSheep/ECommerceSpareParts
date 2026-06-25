@@ -17,8 +17,16 @@ public class JobScheduleConfiguration : IEntityTypeConfiguration<JobSchedule>
             .HasColumnName("id")
             .ValueGeneratedOnAdd();
 
-        builder.Property(e => e.SystemName)
-            .HasColumnName("system_name")
+        builder.Property(e => e.Name)
+            .HasColumnName("name")
+            .HasMaxLength(JobSchedule.NameMaxLength);
+
+        builder.Property(e => e.Description)
+            .HasColumnName("description")
+            .HasMaxLength(JobSchedule.DescriptionMaxLength);
+
+        builder.Property(e => e.JobSystemName)
+            .HasColumnName("job_system_name")
             .HasMaxLength(128);
 
         builder.Property(e => e.InputState)
@@ -41,8 +49,11 @@ public class JobScheduleConfiguration : IEntityTypeConfiguration<JobSchedule>
             .HasColumnName("next_run_at");
 
         builder.HasIndex(
-            e => e.SystemName, 
-            "job_schedules_system_name_idx");
+            e => e.Name, 
+            "job_schedules_name_idx");
+        builder.HasIndex(
+            e => e.JobSystemName, 
+            "job_schedules_job_system_name_idx");
         builder.HasIndex(
             e => new { e.Enabled, e.NextRunAt, e.Id }, 
             "job_schedules_enabled_next_run_at_id_idx");

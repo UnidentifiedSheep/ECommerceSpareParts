@@ -25,11 +25,14 @@ public static class JobProjections
         schedule => new JobScheduleDto
         {
             Id = schedule.Id,
+            Name = schedule.Name,
+            Description = schedule.Description,
             Cron = schedule.Cron,
             InputState = schedule.InputState,
             LastQueuedAt = schedule.LastQueuedAt,
             MaxAttempts = schedule.MaxAttempts,
             NextRunAt = schedule.NextRunAt,
-            SystemName = schedule.SystemName
+            JobSystemName = schedule.JobSystemName,
+            Enabled = schedule.Enabled
         };
 }

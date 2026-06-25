@@ -1,0 +1,55 @@
+using Abstractions.Interfaces.Persistence;
+using Application.Common.Dtos;
+using Application.Common.Extensions;
+using Application.Common.Interfaces.Cqrs;
+using Application.Common.Interfaces.NamedObject;
+using Application.Common.NamedObject;
+using Application.Common.Projections;
+using Attributes;
+using Cronos;
+using Domain.CommonEntities;
+
+namespace Application.Common.Handlers.JobSchedules.CreateSchedule;
+
+[Transactional]
+public record CreateScheduleCommand(NewJobScheduleDto NewSchedule) : IQuery<CreateScheduleResult>;
+
+public record CreateScheduleResult(JobScheduleDto Schedule);
+
+public class CreateScheduleHandler(
+    INamedObjectRegistry<LrtNamedObjectBase> registry,
+    IUnitOfWork unitOfWork) : IQueryHandler<CreateScheduleCommand, CreateScheduleResult>
+{
+    public async Task<CreateScheduleResult> Handle(
+        CreateScheduleCommand request, 
+        CancellationToken cancellationToken)
+    {
+        var lrt = registry.GetBySystemName(request.NewSchedule.JobSystemName);
+        var validatedState = InputStateValidator.GetAndValidate(
+            lrt.InputType, 
+            request.NewSchedule.InputState);
+        
+        var schedule = JobSchedule.Create(
+            request.NewSchedule.Name,
+            request.NewSchedule.Description,
+            lrt.SystemName,
+            validatedState,
+            maxAttempts: request.NewSchedule.MaxAttempts,
+            cron: request.NewSchedule.Cron);
+
+        if (request.NewSchedule.Enabled)
+            schedule.Enable();
+        
+        var nextRunAt = CronExpression.Parse(schedule.Cron)
+            .GetNextOccurrence(
+                DateTime.UtcNow, 
+                JobSchedule.TimeZone);
+        
+        schedule.SetNextRunAt(nextRunAt);
+
+        await unitOfWork.AddAsync(schedule, cancellationToken);
+        await unitOfWork.SaveChangesAsync(cancellationToken);
+
+        return new CreateScheduleResult(JobProjections.JobScheduleProjection.AsFunc()(schedule));
+    }
+}

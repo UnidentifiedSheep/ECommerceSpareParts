@@ -6,9 +6,13 @@ namespace Domain.CommonEntities;
 
 public class JobSchedule : AuditableEntity<JobSchedule, Guid>, ILinqEntity<JobSchedule, Guid>
 {
-    public const string TimeZone = "UTC";
+    public const int NameMaxLength = 64;
+    public const int DescriptionMaxLength = 255;
+    public static readonly TimeZoneInfo TimeZone = TimeZoneInfo.Utc;
     public Guid Id { get; private set; }
-    public string SystemName { get; private set; } = null!;
+    public string Name { get; private set; } = null!;
+    public string? Description { get; private set; }
+    public string JobSystemName { get; private set; } = null!;
     public string InputState { get; private set; } = null!;
     public int MaxAttempts { get; private set; }
     public string Cron { get; private set; } = null!;
@@ -19,23 +23,44 @@ public class JobSchedule : AuditableEntity<JobSchedule, Guid>, ILinqEntity<JobSc
     private JobSchedule() {}
     
     private JobSchedule(
-        string systemName,
+        string name,
+        string? description,
+        string jobSystemName,
         string inputState,
         int maxAttempts,
         string cron)
     {
-        SystemName = systemName;
+        SetName(name);
+        SetDescription(description);
+        JobSystemName = jobSystemName;
         InputState = inputState;
         SetMaxAttempts(maxAttempts);
         SetCron(cron);
     }
     
     public static JobSchedule Create(
-        string systemName, 
+        string name,
+        string? description,
+        string jobSystemName, 
         string inputState, 
         int maxAttempts, 
         string cron) 
-        => new(systemName, inputState, maxAttempts, cron);
+        => new(name, description, jobSystemName, inputState, maxAttempts, cron);
+
+    public void SetName(string name)
+    {
+        Name = name
+            .TrimSafe()
+            .AgainstNullOrWhiteSpace("job.schedule.name.required")
+            .AgainstTooLong(NameMaxLength, "job.schedule.name.max.length");
+    }
+
+    public void SetDescription(string? description)
+    {
+        Description = description
+            .NullIfWhiteSpace()?
+            .AgainstTooLong(DescriptionMaxLength, "job.schedule.description.max.length");
+    }
 
     public void SetCron(string cron)
     {
@@ -45,11 +70,18 @@ public class JobSchedule : AuditableEntity<JobSchedule, Guid>, ILinqEntity<JobSc
             .AgainstNullOrWhiteSpace(() => throw new InvalidOperationException("Cron cannot be null or empty."));
     }
 
+    public void SetInputState(string inputState)
+    {
+        InputState = inputState
+            .TrimSafe()
+            .AgainstNullOrWhiteSpace("job.schedule.input.state.required");
+    }
+
     public void SetMaxAttempts(int maxAttempts)
     {
         MaxAttempts = maxAttempts.AgainstLessOrEqual(
             0,
-            () => throw new InvalidOperationException("job.max.attempts.must.be.greater.than.zero"));
+            "job.max.attempts.must.be.greater.than.zero");
     }
 
     public void SetNextRunAt(DateTime? nextRunAt)

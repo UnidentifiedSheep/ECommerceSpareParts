@@ -5,6 +5,14 @@
     "pagination.size.range": "Number of items must be between 1 and 100.",
     "row.is.out.dated": "The data you are trying to update, is out dated. Pleas reload the data.",
     "job.not.found": "Requested job not found.",
-    "job.max.attempts.must.be.greater.than.zero": "Max attempts must be greater than 0."
+    "job.schedule.not.found": "Requested job schedule not found.",
+    "job.max.attempts.must.be.greater.than.zero": "Max attempts must be greater than 0.",
+    "job.schedule.name.required": "Job schedule name is required.",
+    "job.schedule.name.max.length": "Job schedule name must be 64 characters or fewer.",
+    "job.schedule.description.max.length": "Job schedule description must be 255 characters or fewer.",
+    "job.schedule.job.system.name.required": "Job system name is required.",
+    "job.schedule.input.state.required": "Job input state is required.",
+    "job.schedule.cron.required": "Job schedule cron expression is required.",
+    "job.schedule.cron.invalid": "Job schedule cron expression must be valid."
   }
 }

@@ -4,6 +4,9 @@ using Application.Common.Behaviors;
 using Application.Common.Extensions;
 using Application.Common.Handlers.Jobs;
 using Application.Common.Handlers.Jobs.GetJobs;
+using Application.Common.Handlers.JobSchedules.CreateSchedule;
+using Application.Common.Handlers.JobSchedules.GetSchedule;
+using Application.Common.Handlers.JobSchedules.UpdateSchedule;
 using Application.Common.NamedObject;
 using MediatR;
 using Microsoft.Extensions.Configuration;
@@ -97,6 +100,18 @@ public static class ServiceProvider
         services.AddScoped<
             IRequestHandler<GetJobStateQuery, GetJobStateResult>,
             GetJobStateHandler>();
+
+        services.AddScoped<
+            IRequestHandler<CreateScheduleCommand, CreateScheduleResult>,
+            CreateScheduleHandler>();
+        
+        services.AddScoped<
+            IRequestHandler<GetScheduleQuery, GetScheduleResult>,
+            GetScheduleHandler>();
+
+        services.AddScoped<
+            IRequestHandler<UpdateScheduleCommand, UpdateScheduleResult>,
+            UpdateScheduleHandler>();
         
         return services;
     }
