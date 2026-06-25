@@ -8,7 +8,7 @@ public class JobConfiguration : IEntityTypeConfiguration<Job>
 {
     public void Configure(EntityTypeBuilder<Job> builder)
     {
-        builder.ToTable("jobs");
+        builder.ToTable("jobs", "job");
 
         builder.HasKey(e => e.Id)
             .HasName("jobs_pk");

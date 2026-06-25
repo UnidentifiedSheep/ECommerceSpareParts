@@ -1,11 +1,20 @@
 ﻿using Domain.Interfaces;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
+using Persistence.BaseTableConfigurations;
 
 namespace Persistence.Extensions;
 
 public static class ModelBuilderExtensions
 {
+    public static ModelBuilder ApplyJobConfigurations(this ModelBuilder modelBuilder)
+    {
+        return modelBuilder
+            .ApplyConfiguration(new JobConfiguration())
+            .ApplyConfiguration(new JobScheduleConfiguration())
+            .ApplyConfiguration(new JobScheduleRunConfiguration());
+    }
+
     public static ModelBuilder AllDateTimesToUtc(this ModelBuilder modelBuilder)
     {
         foreach (var entityType in modelBuilder.Model.GetEntityTypes())
