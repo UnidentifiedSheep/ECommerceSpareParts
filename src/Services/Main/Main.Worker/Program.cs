@@ -12,8 +12,6 @@ using Contracts.Products;
 using Contracts.Settings;
 using Contracts.User;
 using ExchangeRate;
-using Hangfire;
-using Hangfire.PostgreSql;
 using Localization.Domain.Extensions;
 using Mail;
 using Main.Api;
@@ -81,28 +79,9 @@ builder.Services
     .AddHostedService<LrtExecutorHostedService>()
     .AddHostedService<ScheduledJobEnqueuerHostedService>();
 
-builder.Services.AddHangfire((sp, x) =>
-{
-    var options = sp.GetRequiredService<IOptions<DatabaseOptions>>().Value;
-    x.UsePostgreSqlStorage(z =>
-        z.UseNpgsqlConnection(options.ConnectionString));
-});
-
-builder.Services.AddHangfireServer();
-
 var host = builder.Build();
 
 await host.LoadLocalesFromJson(Assembly.GetExecutingAssembly().GetDefaultLocalizationPath());
-
-using (var scope = host.Services.CreateScope())
-{
-    var recurringJobManager = scope.ServiceProvider.GetRequiredService<IRecurringJobManager>();
-
-    recurringJobManager.AddOrUpdate<UpdateCurrencyRate>("UpdateCurrencyTask",
-        x => x.Run(), Cron.Daily);
-    
-    
-}
 
 await host.RunAsync();
 

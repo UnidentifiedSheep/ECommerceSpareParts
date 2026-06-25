@@ -4,6 +4,9 @@
     "lrt.producer.import.name": "Üretici içe aktarma",
     "lrt.producer.import.description": "Üreticileri yüklenen bir dosyadan içe aktarır, verileri doğrular ve mevcut kayıtları atlayarak yeni kayıtları ekler.",
     "lrt.product.import.name": "Ürün içe aktarma",
-    "lrt.product.import.description": "Ürünleri yüklenen bir dosyadan içe aktarır, verileri doğrular ve mevcut kayıtları atlayarak yeni kayıtları ekler."
+    "lrt.product.import.description": "Ürünleri yüklenen bir dosyadan içe aktarır, verileri doğrular ve mevcut kayıtları atlayarak yeni kayıtları ekler.",
+    "lrt.currency.rates.update.name": "Döviz kuru güncelleme",
+    "lrt.currency.rates.update.description": "Döviz kurlarını güncel verilerle yeniler ve sistemdeki mevcut kur bilgilerini günceller."
+
   }
 }
