@@ -20,4 +20,16 @@ public static class JobProjections
             Status = job.Status,
             UpdatedAt = job.UpdatedAt
         };
+
+    public static readonly Expression<Func<JobSchedule, JobScheduleDto>> JobScheduleProjection =
+        schedule => new JobScheduleDto
+        {
+            Id = schedule.Id,
+            Cron = schedule.Cron,
+            InputState = schedule.InputState,
+            LastQueuedAt = schedule.LastQueuedAt,
+            MaxAttempts = schedule.MaxAttempts,
+            NextRunAt = schedule.NextRunAt,
+            SystemName = schedule.SystemName
+        };
 }

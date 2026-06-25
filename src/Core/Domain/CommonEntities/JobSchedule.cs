@@ -26,7 +26,7 @@ public class JobSchedule : AuditableEntity<JobSchedule, Guid>, ILinqEntity<JobSc
     {
         SystemName = systemName;
         InputState = inputState;
-        MaxAttempts = maxAttempts;
+        SetMaxAttempts(maxAttempts);
         SetCron(cron);
     }
     
@@ -43,6 +43,13 @@ public class JobSchedule : AuditableEntity<JobSchedule, Guid>, ILinqEntity<JobSc
         Cron = cron
             .TrimSafe()
             .AgainstNullOrWhiteSpace(() => throw new InvalidOperationException("Cron cannot be null or empty."));
+    }
+
+    public void SetMaxAttempts(int maxAttempts)
+    {
+        MaxAttempts = maxAttempts.AgainstLessOrEqual(
+            0,
+            () => throw new InvalidOperationException("job.max.attempts.must.be.greater.than.zero"));
     }
 
     public void SetNextRunAt(DateTime? nextRunAt)
