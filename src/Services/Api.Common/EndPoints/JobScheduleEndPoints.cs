@@ -111,7 +111,7 @@ public static class JobScheduleEndPoints
             .ProducesProblem(StatusCodes.Status404NotFound)
             .RequireAllPermissions(PermissionCodes.JOBS_CREATE);
         
-        schedules.MapPatch("{scheduleId:guid}", async (
+        schedules.MapDelete("{scheduleId:guid}", async (
                 ISender sender,
                 Guid scheduleId,
                 CancellationToken ct) =>
