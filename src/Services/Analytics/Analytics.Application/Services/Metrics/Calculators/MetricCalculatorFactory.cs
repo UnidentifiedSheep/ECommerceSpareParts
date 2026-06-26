@@ -1,17 +1,9 @@
-﻿using Analytics.Application.Interfaces.Services;
-using Analytics.Application.Interfaces.Services.Metrics;
-using Analytics.Entities.Metrics;
-using Microsoft.Extensions.DependencyInjection;
+﻿using Analytics.Application.Interfaces.Services.Metrics;
 
 namespace Analytics.Application.Services.Metrics.Calculators;
 
 public class MetricCalculatorFactory(IServiceProvider provider) : IMetricCalculatorFactory
 {
-    public IMetricCalculator<TMetric>? TryGetCalculator<TMetric>() where TMetric : Metric
-    {
-        return provider.GetService<IMetricCalculator<TMetric>>();
-    }
-
     public IMetricCalculator? TryGetCalculator(Type metricType)
     {
         var serviceType = typeof(IMetricCalculator<>).MakeGenericType(metricType);
@@ -22,11 +14,5 @@ public class MetricCalculatorFactory(IServiceProvider provider) : IMetricCalcula
     {
         return TryGetCalculator(metricType)
                ?? throw new NotSupportedException($"Metric type {metricType} is not supported");
-    }
-
-    public IMetricCalculator<TMetric> GetCalculator<TMetric>() where TMetric : Metric
-    {
-        return TryGetCalculator<TMetric>()
-               ?? throw new NotSupportedException($"Metric type {typeof(TMetric).Name} is not supported");
     }
 }

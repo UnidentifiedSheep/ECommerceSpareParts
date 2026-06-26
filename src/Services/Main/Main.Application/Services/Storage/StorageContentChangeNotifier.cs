@@ -1,6 +1,5 @@
 using Application.Common.Interfaces;
 using Contracts.Products;
-using Contracts.StorageContent;
 using Main.Application.Interfaces.Services.Storage;
 
 namespace Main.Application.Services.Storage;
@@ -11,9 +10,6 @@ public sealed class StorageContentChangeNotifier(
     public void NotifyChanged(IEnumerable<int> productIds)
     {
         foreach (var productId in productIds.Distinct())
-        {
             integrationEventScope.Add(new ProductUpdatedEvent { Id = productId });
-            integrationEventScope.Add(new StorageContentUpdatedEvent { ProductId = productId });
-        }
     }
 }

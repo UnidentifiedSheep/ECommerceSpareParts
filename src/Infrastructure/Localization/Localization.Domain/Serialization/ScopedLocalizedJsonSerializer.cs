@@ -1,5 +1,6 @@
 using System.Collections.Concurrent;
 using System.Text.Json;
+using System.Text.Json.Serialization;
 using System.Text.Json.Serialization.Metadata;
 using Attributes.JsonAttributes;
 using Localization.Abstractions.Interfaces;
@@ -56,6 +57,7 @@ public sealed class ScopedLocalizedJsonSerializer(
                 var descriptionAttr = GetAttribute<LocalizedJsonFieldDescriptionAttribute>(prop);
                 var inputControlAttr = GetAttribute<InputControlAttribute>(prop);
                 var acceptsAttr = GetAttribute<AcceptsAttribute>(prop);
+                var dependsOnEntityAttr = GetAttribute<DependsOnEntityAttribute>(prop);
 
                 return new JsonFieldPlan(
                     prop.Name,
@@ -64,7 +66,9 @@ public sealed class ScopedLocalizedJsonSerializer(
                     descriptionAttr?.Key,
                     GetAttribute<RequiredJsonFieldAttribute>(prop) is not null,
                     inputControlAttr?.InputControl.ToString(),
-                    acceptsAttr?.Accepts ?? []);
+                    acceptsAttr?.Accepts ?? [],
+                    dependsOnEntityAttr?.EntityName,
+                    dependsOnEntityAttr?.FieldName);
             })
             .ToArray();
     }
@@ -78,7 +82,9 @@ public sealed class ScopedLocalizedJsonSerializer(
             GetLocalizedOrDefault(plan.DescriptionKey),
             plan.Required,
             plan.Control,
-            plan.Accepts);
+            plan.Accepts,
+            plan.DependsOnEntity,
+            plan.DependsOnField);
     }
 
     private string? GetLocalizedOrDefault(string? key)
@@ -130,7 +136,9 @@ public sealed class ScopedLocalizedJsonSerializer(
         string? DescriptionKey,
         bool Required,
         string? Control,
-        string[] Accepts);
+        string[] Accepts,
+        string? DependsOnEntity,
+        string? DependsOnField);
 
     private sealed record JsonFieldMetadata(
         string Name,
@@ -139,5 +147,9 @@ public sealed class ScopedLocalizedJsonSerializer(
         string? Description,
         bool Required,
         string? Control,
-        string[] Accepts);
+        string[] Accepts,
+        [property: JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+        string? DependsOnEntity,
+        [property: JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+        string? DependsOnField);
 }

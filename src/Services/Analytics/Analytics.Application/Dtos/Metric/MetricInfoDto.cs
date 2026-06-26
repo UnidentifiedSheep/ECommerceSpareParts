@@ -12,4 +12,7 @@ public record MetricInfoDto
     
     [JsonPropertyName("description")]
     public required string Description { get; init; }
+    
+    [JsonPropertyName("inputSchema")]
+    public required string InputSchema { get; init; }
 }

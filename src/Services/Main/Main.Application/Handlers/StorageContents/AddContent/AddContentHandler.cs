@@ -8,7 +8,6 @@ using Application.Common.Interfaces.Currency;
 using Application.Common.Interfaces.Settings;
 using Attributes;
 using Contracts.Products;
-using Contracts.StorageContent;
 using Main.Application.Dtos.Storage;
 using Main.Application.Interfaces.Persistence;
 using Main.Application.Interfaces.Services.Storage;

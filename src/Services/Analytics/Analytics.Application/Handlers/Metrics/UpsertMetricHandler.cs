@@ -3,10 +3,12 @@ using Analytics.Application.Dtos.Metric;
 using Analytics.Application.Handlers.Metrics.ListAvailableMetrics;
 using Analytics.Application.Handlers.Projections;
 using Analytics.Application.Interfaces.Repositories;
-using Analytics.Application.Interfaces.Services.Metrics;
+using Analytics.Application.NamedObjects.Metrics;
+using Analytics.Entities.Exceptions;
 using Analytics.Entities.Metrics;
 using Application.Common.Extensions;
 using Application.Common.Interfaces.Cqrs;
+using Application.Common.Interfaces.NamedObject;
 using Application.Common.Interfaces.Repositories;
 using Attributes;
 using Localization.Abstractions.Interfaces;
@@ -18,26 +20,23 @@ namespace Analytics.Application.Handlers.Metrics;
 [Transactional, AutoSave]
 public record UpsertMetricCommand(
     string MetricSystemName,
-    MetricPayloadDto MetricPayload) : ICommand<UpsertMetricResult>;
+    string InputPayload) : ICommand<UpsertMetricResult>;
 
 public record UpsertMetricResult(MetricDto Metric);
 
 public class UpsertMetricHandler(
-    IMetricCalculatorRegistry calculatorRegistry,
     IMetricRepository metricRepository,
     ISender sender,
     IUnitOfWork unitOfWork,
-    IScopedLocalizedJsonSerializer serializer,
-    IMetricValidatorDispatcher validatorDispatcher,
-    IMetricConverterDispatcher metricConverterDispatcher)
+    INamedObjectRegistry<MetricDefinitionNamedObjectBase> registry,
+    IScopedLocalizedJsonSerializer serializer)
     : ICommandHandler<UpsertMetricCommand, UpsertMetricResult>
 {
     public async Task<UpsertMetricResult> Handle(UpsertMetricCommand request, CancellationToken cancellationToken)
     {
-        var metricType = calculatorRegistry.GetMetricType(request.MetricSystemName);
-        var metric = metricConverterDispatcher.FromPayload(request.MetricPayload, metricType);
-
-        await validatorDispatcher.ValidateAsync(metricType, metric, cancellationToken);
+        var metricDefinition = registry.TryGetBySystemName(request.MetricSystemName)
+            ?? throw new MetricNotFoundException();
+        var metric = metricDefinition.CreateMetricUntyped(request.InputPayload);
 
         var criteria = Criteria<Metric>.New()
             .Where(x => x.NaturalKey == Metric.GetNaturalKey(metric))

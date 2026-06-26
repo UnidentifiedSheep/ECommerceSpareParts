@@ -5,16 +5,13 @@ using Application.Common.Interfaces;
 using Application.Common.Interfaces.Cqrs;
 using Application.Common.Interfaces.Repositories;
 using Attributes;
-using Contracts.Products;
 using Contracts.Sale;
-using Contracts.StorageContent;
 using LinqKit;
 using Main.Application.Dtos.Sale;
 using Main.Application.Handlers.Balance.CreateTransaction;
 using Main.Application.Interfaces.Services;
 using Main.Application.Projections;
 using Main.Entities.Sale;
-using Main.Entities.Setting;
 using Main.Enums;
 using Main.Enums.Balances;
 using MediatR;
@@ -104,18 +101,8 @@ public class CreateSaleHandler(
             cancellationToken);
 
         foreach (var content in distributed)
-        {
             sale.AddContent(content);
-            integrationEventScope.Add(new ProductUpdatedEvent
-            {
-                Id = content.ProductId,
-            });
-            
-            integrationEventScope.Add(new StorageContentUpdatedEvent
-            {
-                ProductId = content.ProductId,
-            });
-        }
+        
         
         sale.Complete();
 

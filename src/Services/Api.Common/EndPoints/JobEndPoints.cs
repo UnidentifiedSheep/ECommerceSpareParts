@@ -62,7 +62,8 @@ public class JobEndPoints : ICarterModule
     public void AddRoutes(IEndpointRouteBuilder app)
     {
         var jobs = app.MapGroup("/jobs")
-            .WithTags("Jobs");
+            .WithTags("Jobs")
+            .AddScheduleEndPoints();
 
         jobs.MapGet("/available", async (
             ISender sender, 

@@ -4,6 +4,8 @@
     "lrt.producer.import.name": "Producer import",
     "lrt.producer.import.description": "Imports producers from an uploaded file, validates the data, and adds new records while skipping existing ones.",
     "lrt.product.import.name": "Product import",
-    "lrt.product.import.description": "Imports products from an uploaded file, validates the data, and adds new records while skipping existing ones."
+    "lrt.product.import.description": "Imports products from an uploaded file, validates the data, and adds new records while skipping existing ones.",
+    "lrt.currency.rates.update.name": "Currency rate update",
+    "lrt.currency.rates.update.description": "Updates currency exchange rates using current data and saves the new values in the system."
   }
 }

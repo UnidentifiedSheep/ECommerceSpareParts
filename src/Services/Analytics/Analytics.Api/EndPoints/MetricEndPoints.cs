@@ -37,8 +37,8 @@ public sealed record UpsertMetricRequest
     [JsonPropertyName("metricSystemName")]
     public required string MetricSystemName { get; init; }
 
-    [JsonPropertyName("metricPayload")]
-    public required MetricPayloadDto MetricPayload { get; init; }
+    [JsonPropertyName("inputPayload")]
+    public required string InputPayload { get; init; }
 }
 
 public sealed record UpsertMetricResponse
@@ -99,7 +99,7 @@ public class MetricEndPoints : ICarterModule
             var result = await sender.Send(
                 new UpsertMetricCommand(
                     request.MetricSystemName,
-                    request.MetricPayload),
+                    request.InputPayload),
                 token);
 
             return Results.Ok(new UpsertMetricResponse

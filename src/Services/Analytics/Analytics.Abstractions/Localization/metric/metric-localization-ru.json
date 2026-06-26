@@ -2,9 +2,19 @@
   "locale": "ru",
   "keyValues": {
     "metric.not.found": "Не удалось найти метрику.",
+    "metric.input.invalid": "Были введены некорректные данные для метрики.",
+    "metric.input.range.start.must.be.before.or.equal.end": "Начало временного диапазона должно быть меньше или равно его концу.",
     "metric.dimension.key.required": "Ключ измерения метрики обязателен.",
     "metric.dimension.key.too.long": "Ключ измерения метрики не должен превышать 200 символов.",
-    "metric_id_name": "Идентификатор метрики",
-    "metric_id_description": "Идентификатор метрики для пересчета."
+    "metric.id.name": "Идентификатор метрики",
+    "metric.id.description": "Идентификатор метрики для пересчета.",
+    "metric.input.field.currency.id.name": "Валюта",
+    "metric.input.field.currency.id.description": "Валюта для расчета метрики.",
+    "metric.input.field.product.id.name": "Товар",
+    "metric.input.field.product.id.description": "Товар для расчета метрики.",
+    "product.sales.metric.name": "Метрика продаж товара.",
+    "product.sales.metric.description": "Рассчитывает метрики продаж для выбранного товара за указанный период, включая количество проданных единиц, общий доход, среднюю, минимальную и максимальную цену, а также волатильность цен.",
+    "product.purchases.metric.name": "Метрика закупок товара.",
+    "product.purchases.metric.description": "Анализ закупок выбранного товара за указанный период: количество, общая сумма, средняя, минимальная и максимальная цена закупки, а также волатильность цены."
   }
 }

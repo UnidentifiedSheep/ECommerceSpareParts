@@ -11,15 +11,8 @@ using Main.Entities.Product;
 
 namespace Tests.LocalizationTests;
 
-public class LocalizationTests
+public class LocalizationTests : Test.Common.Tests.LocalizationTests
 {
-    private readonly Test.Common.Tests.LocalizationTests _localizationTests;
-
-    public LocalizationTests()
-    {
-        _localizationTests = new Test.Common.Tests.LocalizationTests();
-    }
-
     [Theory]
     [InlineData("ru")]
     [InlineData("en")]
@@ -29,7 +22,7 @@ public class LocalizationTests
         var localesPath = Assembly.GetExecutingAssembly().GetDefaultLocalizationPath();
         var assembly = Assembly.GetAssembly(typeof(Product))!;
 
-        await _localizationTests.TestLocalizableExceptions(assembly, localesPath, locale);
+        await TestLocalizableExceptions(assembly, localesPath, locale);
     }
 
     [Theory]
@@ -41,7 +34,7 @@ public class LocalizationTests
         var localesPath = Assembly.GetExecutingAssembly().GetDefaultLocalizationPath();
         var assembly = Assembly.GetAssembly(typeof(Global))!;
 
-        await _localizationTests.TestAbstractValidatorLocalization(assembly, localesPath, locale);
+        await TestAbstractValidatorLocalization(assembly, localesPath, locale);
     }
 
     [Theory]
@@ -59,7 +52,7 @@ public class LocalizationTests
             .Cast<string>()
             .ToList();
 
-        await _localizationTests.TestDbValidatorLocalization(constants, localesPath, locale);
+        await TestDbValidatorLocalization(constants, localesPath, locale);
     }
 
     [Theory]
@@ -69,7 +62,7 @@ public class LocalizationTests
     public async Task All_Permissions_Have_Valid_Localization(string locale)
     {
         var localesPath = Assembly.GetExecutingAssembly().GetDefaultLocalizationPath();
-        using var scoped = await _localizationTests.CreateLocalizer(localesPath, locale);
+        using var scoped = await CreateLocalizer(localesPath, locale);
         scoped.SetLocale(locale);
 
         foreach (var permission in Enum.GetValues<PermissionCodes>())

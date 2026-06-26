@@ -3,5 +3,7 @@
 public enum InputControlType
 {
     UploadFile,
-    TextField
+    TextField,
+    DatePicker,
+    EntitySelector
 }

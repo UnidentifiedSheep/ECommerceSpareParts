@@ -2,9 +2,19 @@
   "locale": "en",
   "keyValues": {
     "metric.not.found": "Unable to find metric.",
+    "metric.input.invalid": "Invalid metric input data was provided.",
+    "metric.input.range.start.must.be.before.or.equal.end": "The time range start must be less than or equal to the time range end.",
     "metric.dimension.key.required": "Metric dimension key is required.",
     "metric.dimension.key.too.long": "Metric dimension key must be 200 characters or fewer.",
-    "metric_id_name": "Metric identifier",
-    "metric_id_description": "The identifier of metric to calculate."
+    "metric.id.name": "Metric identifier",
+    "metric.id.description": "The identifier of metric to calculate.",
+    "metric.input.field.currency.id.name": "Currency",
+    "metric.input.field.currency.id.description": "Currency used for metric calculation.",
+    "metric.input.field.product.id.name": "Product",
+    "metric.input.field.product.id.description": "Product used for metric calculation.",
+    "product.sales.metric.name": "Product sales metric.",
+    "product.sales.metric.description": "Calculates sales metrics for a selected product over a given period, including quantity sold, total revenue, average, minimum and maximum price, and price volatility.",
+    "product.purchases.metric.name": "Product purchase metric.",
+    "product.purchases.metric.description": "Purchase analysis for the selected product over the specified period: quantity, total amount, average, minimum and maximum purchase price, and price volatility."
   }
 }

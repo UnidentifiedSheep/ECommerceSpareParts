@@ -33,7 +33,7 @@ public class Job : AuditableEntity<Job, Guid>, ILinqEntity<Job, Guid>
     {
         Status = JobStatus.Pending;
         SystemName = systemName;
-        MaxAttempts = maxAttempts;
+        SetMaxAttempts(maxAttempts);
     }
     
     public static Job Create(string systemName, int maxAttempts = 3) => new(systemName, maxAttempts);
@@ -66,6 +66,13 @@ public class Job : AuditableEntity<Job, Guid>, ILinqEntity<Job, Guid>
         if (Status != expected)
             throw new InvalidOperationException(
                 $"Job must be in {expected} status, but current status is {Status}.");
+    }
+    
+    public void SetMaxAttempts(int maxAttempts)
+    {
+        MaxAttempts = maxAttempts.AgainstLessOrEqual(
+            0,
+            () => throw new InvalidOperationException("job.max.attempts.must.be.greater.than.zero"));
     }
     
     public void Start()

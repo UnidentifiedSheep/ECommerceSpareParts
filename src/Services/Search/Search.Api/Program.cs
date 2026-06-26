@@ -1,5 +1,4 @@
 using System.Reflection;
-using Abstractions.Interfaces.HostedServices;
 using Api.Common;
 using Api.Common.Extensions;
 using Api.Common.HostedServices;
@@ -52,10 +51,6 @@ builder.Services.AddMassTransit(x =>
         });
     });
 });
-
-builder.Services.AddSingleton<BackgroundTaskQueue>();
-builder.Services.AddSingleton<IBackgroundTaskQueue>(sp => sp.GetRequiredService<BackgroundTaskQueue>());
-builder.Services.AddHostedService<BackgroundTaskQueue>(sp => sp.GetRequiredService<BackgroundTaskQueue>());
 
 builder.Services
     .AddEComAuth(builder.Configuration)

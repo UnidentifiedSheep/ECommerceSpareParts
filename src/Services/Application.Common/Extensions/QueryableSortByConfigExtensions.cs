@@ -12,6 +12,13 @@ public static class QueryableSortByConfigExtensions
             .Map<Job, Guid>("id", x => x.Id)
             .Map<Job, DateTime>("createdAt", x => x.CreatedAt)
             .Map<Job, DateTime>("updatedAt", x => x.UpdatedAt)
-            .Map<Job, JobStatus>("status", x => x.Status);
+            .Map<Job, JobStatus>("status", x => x.Status)
+            .MapDefault<JobSchedule, Guid>(x => x.Id)
+            .Map<JobSchedule, Guid>("id", x => x.Id)
+            .Map<JobSchedule, string>("name", x => x.Name)
+            .Map<JobSchedule, string>("jobSystemName", x => x.JobSystemName)
+            .Map<JobSchedule, DateTime?>("nextRunAt", x => x.NextRunAt)
+            .Map<JobSchedule, DateTime?>("lastQueuedAt", x => x.LastQueuedAt)
+            .Map<JobSchedule, bool>("enabled", x => x.Enabled);
     }
 }

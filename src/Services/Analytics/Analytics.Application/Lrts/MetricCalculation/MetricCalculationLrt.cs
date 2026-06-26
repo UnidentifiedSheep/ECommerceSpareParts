@@ -40,7 +40,7 @@ public class MetricCalculationLrt(
         
         await UnitOfWork.SaveChangesAsync(CancellationToken);
         
-        var result = await sender.Send(new CalculateMetricCommand(state.MetricId), CancellationToken);
+        await sender.Send(new CalculateMetricCommand(state.MetricId), CancellationToken);
     }
 
     protected override async Task SucceedJobAsync()

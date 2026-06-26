@@ -10,11 +10,8 @@ using Contracts.Currency;
 using Contracts.Job;
 using Contracts.Products;
 using Contracts.Settings;
-using Contracts.StorageContent;
 using Contracts.User;
 using ExchangeRate;
-using Hangfire;
-using Hangfire.PostgreSql;
 using Localization.Domain.Extensions;
 using Mail;
 using Main.Api;
@@ -49,6 +46,7 @@ builder.Services
     .AddJwtOptions()
     .AddS3Options()
     .AddLrtOptions()
+    .AddScheduledJobEnqueuerOptions()
     .AddSystemOptions();
 
 builder.AddLokiLogger(
@@ -78,31 +76,12 @@ builder.Services
 AddHostedServiceOptions(builder.Services);
 builder.Services
     .AddHostedService<EmailWorkHostedService>()
-    .AddHostedService<LrtExecutorHostedService>();
-
-builder.Services.AddHangfire((sp, x) =>
-{
-    var options = sp.GetRequiredService<IOptions<DatabaseOptions>>().Value;
-    x.UsePostgreSqlStorage(z =>
-        z.UseNpgsqlConnection(options.ConnectionString));
-});
-
-builder.Services.AddHangfireServer();
+    .AddHostedService<LrtExecutorHostedService>()
+    .AddHostedService<ScheduledJobEnqueuerHostedService>();
 
 var host = builder.Build();
 
 await host.LoadLocalesFromJson(Assembly.GetExecutingAssembly().GetDefaultLocalizationPath());
-
-using (var scope = host.Services.CreateScope())
-{
-    var recurringJobManager = scope.ServiceProvider.GetRequiredService<IRecurringJobManager>();
-
-    recurringJobManager.AddOrUpdate<UpdateCurrencyRate>("UpdateCurrencyTask",
-        x => x.Run(), Cron.Daily);
-
-    recurringJobManager.AddOrUpdate<NotifySuggestionsRebuildNeeded>("RebuildSuggestionsTask",
-        x => x.Run(), Cron.Daily);
-}
 
 await host.RunAsync();
 
@@ -162,7 +141,6 @@ void AddMassTransit(IHostApplicationBuilder hostBuilder)
                 ep.ConfigureConsumer<ProductSizesUpdatedConsumer>(context);
                 ep.ConfigureConsumer<ProductWeightUpdatedConsumer>(context);
                 ep.ConfigureConsumer<ProductUpdatedConsumer>(context);
-                ep.ConfigureConsumer<StorageContentUpdatedConsumer>(context);
                 ep.ConfigureConsumer<RoleUpdatedConsumer>(context);
                 ep.ConfigureConsumer<UserUpdatedConsumer>(context);
                 ep.ConfigureConsumer<UserDiscountUpdatedConsumer>(context);
@@ -171,7 +149,6 @@ void AddMassTransit(IHostApplicationBuilder hostBuilder)
 
                 
                 ep.Bind<CurrencyCreatedEvent>();
-                ep.Bind<StorageContentUpdatedEvent>();
                 ep.Bind<ProductSizesUpdatedEvent>();
                 ep.Bind<ProductWeightUpdatedEvent>();
                 ep.Bind<ProductUpdatedEvent>();

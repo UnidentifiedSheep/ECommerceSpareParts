@@ -1,7 +1,0 @@
-{
-  "locale": "tr",
-  "keyValues": {
-    "ProductPurchasesMetric.description": "Seçilen ürün için belirtilen dönemde satın alma analizi: miktar, toplam tutar, ortalama, minimum ve maksimum satın alma fiyatı ve fiyat oynaklığı.",
-    "ProductSalesMetric.description": "Seçilen ürün için belirtilen dönemde satış metriklerini hesaplar: satılan miktar, toplam gelir, ortalama, minimum ve maksimum fiyat ve fiyat oynaklığı."
-  }
-}
