@@ -3,6 +3,7 @@ using Abstractions.Models;
 using Api.Common.Extensions;
 using Api.Common.Models.Requests;
 using Application.Common.Dtos;
+using Application.Common.Handlers.JobSchedules;
 using Application.Common.Handlers.JobSchedules.CreateSchedule;
 using Application.Common.Handlers.JobSchedules.GetSchedule;
 using Application.Common.Handlers.JobSchedules.UpdateSchedule;
@@ -107,6 +108,20 @@ public static class JobScheduleEndPoints
             .WithDisplayName("Update job schedule")
             .Produces<UpdateJobScheduleResponse>()
             .ProducesProblem(StatusCodes.Status400BadRequest)
+            .ProducesProblem(StatusCodes.Status404NotFound)
+            .RequireAllPermissions(PermissionCodes.JOBS_CREATE);
+        
+        schedules.MapPatch("{scheduleId:guid}", async (
+                ISender sender,
+                Guid scheduleId,
+                CancellationToken ct) =>
+            {
+                await sender.Send(new RemoveJobScheduleCommand(scheduleId), ct);
+                return Results.NoContent();
+            })
+            .WithName("RemoveJobSchedule")
+            .WithDisplayName("Remove job schedule")
+            .Produces(204)
             .ProducesProblem(StatusCodes.Status404NotFound)
             .RequireAllPermissions(PermissionCodes.JOBS_CREATE);
 
