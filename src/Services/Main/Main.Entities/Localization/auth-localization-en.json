@@ -12,6 +12,7 @@
     "role.not.found.with.role.name": "Role '{0}' not found.",
     "role.already.exists": "Role '{0}' already exists.",
     "user.already.have.this.role": "User already has role '{0}'.",
+    "user.role.not.found": "User role '{0}' was not found.",
     "user.is.not.in.needed.role": "User does not have the required role for this action. Required role: '{0}'.",
     "user.not.found": "User not found.",
     "user.name.already.taken": "User name already taken by other user.",
@@ -43,6 +44,7 @@
     "role.SYSTEM.name": "System",
     "cant.create.system.user": "System user can not be created.",
     "cant.add.system.role.to.user": "System role can not be assigned to a user.",
+    "cant.remove.system.role.from.user": "System role can not be removed from a user.",
     "user.permission.not.found": "User permission was not found.",
     "reset.token.expired": "Reset token is expired, you need to verify your identity one more time."
   }
