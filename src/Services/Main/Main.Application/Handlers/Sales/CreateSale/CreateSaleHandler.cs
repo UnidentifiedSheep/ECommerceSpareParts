@@ -10,6 +10,7 @@ using LinqKit;
 using Main.Application.Dtos.Sale;
 using Main.Application.Handlers.Balance.CreateTransaction;
 using Main.Application.Interfaces.Services;
+using Main.Application.Interfaces.Services.Event;
 using Main.Application.Projections;
 using Main.Entities.Sale;
 using Main.Enums;
@@ -38,8 +39,8 @@ public record CreateSaleResult(SaleDto Sale);
 public class CreateSaleHandler(
     ISender sender,
     IOptions<SystemOptions> systemOptions,
-    IIntegrationEventScope integrationEventScope,
     IReadRepository<Sale, Guid> readRepository,
+    ISaleEventService saleEventService,
     IUnitOfWork unitOfWork,
     ISaleService saleService) : ICommandHandler<CreateSaleCommand, CreateSaleResult>
 {
@@ -111,10 +112,7 @@ public class CreateSaleHandler(
         await unitOfWork.AddAsync(sale, cancellationToken);
         await unitOfWork.SaveChangesAsync(cancellationToken);
         
-        integrationEventScope.Add(new SaleUpdatedEvent
-        {
-            SaleId = sale.GetId()
-        });
+        await saleEventService.NotifyUpdated(sale.Id, cancellationToken);
 
         return await ReturnAsync(sale.GetId(), cancellationToken);
     }

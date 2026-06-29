@@ -2,14 +2,12 @@
 using Analytics.Entities;
 using Analytics.Entities.Metrics;
 using Analytics.Entities.Metrics.JsonDataModels;
-using Application.Common.Interfaces.Currency;
 using Application.Common.Interfaces.Repositories;
 
 namespace Analytics.Application.Services.Metrics.Calculators;
 
 public class ProductSalesMetricCalculator(
-    IRepository<SalesFact, Guid> salesRepository,
-    ICurrencyConverter currencyConverter)
+    IRepository<SalesFact, Guid> salesRepository)
     : MetricCalculatorBase<ProductSalesMetric>
 {
     public override async Task CalculateMetric(ProductSalesMetric metric, CancellationToken cancellationToken = default)
@@ -34,10 +32,7 @@ public class ProductSalesMetricCalculator(
                 if (item.ProductId != metric.ProductId)
                     continue;
 
-                var priceDecimal = await currencyConverter.ConvertToBaseAsync(
-                    item.Price,
-                    fact.CurrencyId,
-                    cancellationToken);
+                var priceDecimal = item.PriceInBaseCurrency;
                 var quantity = item.Count;
 
                 if (quantity <= 0)

@@ -23,6 +23,7 @@ public class SaleContentConfiguration : IEntityTypeConfiguration<SaleContent>
         builder.Property(e => e.Count).HasColumnName("count");
         builder.Property(e => e.Discount).HasColumnName("discount");
         builder.Property(e => e.Price).HasColumnName("price");
+        builder.Property(e => e.PriceInBaseCurrency).HasColumnName("price_in_base_currency");
         builder.Property(e => e.SaleId)
             .HasMaxLength(128)
             .HasColumnName("sale_id");

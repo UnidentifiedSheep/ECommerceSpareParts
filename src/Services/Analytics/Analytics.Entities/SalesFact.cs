@@ -20,6 +20,8 @@ public class SalesFact : Entity<SalesFact, Guid>, IDependency, ILinqEntity<Sales
 
     public int CurrencyId { get; private set; }
 
+    public int BaseCurrencyId { get; private set; }
+
     public Guid BuyerId { get; private set; }
 
     public DateTime CreatedAt { get; private set; }
@@ -38,6 +40,7 @@ public class SalesFact : Entity<SalesFact, Guid>, IDependency, ILinqEntity<Sales
     public static SalesFact Create(
         Guid id,
         int currencyId,
+        int baseCurrencyId,
         Guid buyerId,
         DateTime createdAt,
         DateTime processedAt,
@@ -47,6 +50,7 @@ public class SalesFact : Entity<SalesFact, Guid>, IDependency, ILinqEntity<Sales
         {
             Id = id,
             CurrencyId = currencyId,
+            BaseCurrencyId = baseCurrencyId,
             BuyerId = buyerId,
             CreatedAt = createdAt,
             ProcessedAt = processedAt
@@ -59,12 +63,14 @@ public class SalesFact : Entity<SalesFact, Guid>, IDependency, ILinqEntity<Sales
 
     public void Update(
         int currencyId,
+        int baseCurrencyId,
         Guid buyerId,
         DateTime createdAt,
         DateTime processedAt,
         IEnumerable<SaleContent> contents)
     {
         CurrencyId = currencyId;
+        BaseCurrencyId = baseCurrencyId;
         BuyerId = buyerId;
         CreatedAt = createdAt;
         ProcessedAt = processedAt;
@@ -93,6 +99,7 @@ public class SalesFact : Entity<SalesFact, Guid>, IDependency, ILinqEntity<Sales
                 existingContent.Update(
                     incomingContent.ProductId,
                     incomingContent.Price,
+                    incomingContent.PriceInBaseCurrency,
                     incomingContent.Count,
                     incomingContent.Discount,
                     incomingContent.Details);

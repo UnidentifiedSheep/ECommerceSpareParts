@@ -22,6 +22,8 @@ public class SaleContent : Entity<SaleContent, int>
 
     public decimal Price { get; private set; }
 
+    public decimal PriceInBaseCurrency { get; private set; }
+
     public decimal Discount { get; private set; }
 
     public decimal TotalSum => Count * Price - Discount;
@@ -40,6 +42,7 @@ public class SaleContent : Entity<SaleContent, int>
         Guid saleId,
         int productId,
         decimal price,
+        decimal priceInBaseCurrency,
         int count,
         decimal discount,
         IEnumerable<SaleContentDetail>? details = null)
@@ -50,6 +53,7 @@ public class SaleContent : Entity<SaleContent, int>
             SaleId = saleId,
             ProductId = productId,
             Price = ValidatePrice(price),
+            PriceInBaseCurrency = ValidatePrice(priceInBaseCurrency),
             Count = ValidateCount(count),
             Discount = ValidateDiscount(discount)
         };
@@ -61,12 +65,14 @@ public class SaleContent : Entity<SaleContent, int>
     public void Update(
         int productId,
         decimal price,
+        decimal priceInBaseCurrency,
         int count,
         decimal discount,
         IEnumerable<SaleContentDetail>? details = null)
     {
         ProductId = productId;
         Price = ValidatePrice(price);
+        PriceInBaseCurrency = ValidatePrice(priceInBaseCurrency);
         Count = ValidateCount(count);
         Discount = ValidateDiscount(discount);
         ApplyDetails(details ?? []);
@@ -90,6 +96,7 @@ public class SaleContent : Entity<SaleContent, int>
                 existingDetail.Update(
                     incomingDetail.CurrencyId,
                     incomingDetail.BuyPrice,
+                    incomingDetail.BuyPriceInBaseCurrency,
                     incomingDetail.Count,
                     incomingDetail.PurchaseDate);
             }

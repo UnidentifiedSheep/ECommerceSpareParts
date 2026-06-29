@@ -20,6 +20,7 @@ public class SaleContentDetailConfiguration : IEntityTypeConfiguration<SaleConte
             .HasColumnName("id");
         builder.Property(e => e.SaleContentId).HasColumnName("sale_content_id");
         builder.Property(e => e.BuyPrice).HasColumnName("buy_price");
+        builder.Property(e => e.BuyPriceInBaseCurrency).HasColumnName("buy_price_in_base_currency");
         builder.Property(e => e.Count).HasColumnName("count");
         builder.Property(e => e.CurrencyId).HasColumnName("currency_id");
         builder.Property(e => e.PurchaseDate).HasColumnName("purchase_date");

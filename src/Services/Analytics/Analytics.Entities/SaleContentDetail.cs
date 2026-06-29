@@ -18,6 +18,8 @@ public class SaleContentDetail : Entity<SaleContentDetail, int>
 
     public decimal BuyPrice { get; private set; }
 
+    public decimal BuyPriceInBaseCurrency { get; private set; }
+
     public int Count { get; private set; }
 
     public DateTime PurchaseDate { get; private set; }
@@ -29,6 +31,7 @@ public class SaleContentDetail : Entity<SaleContentDetail, int>
         int saleContentId,
         int currencyId,
         decimal buyPrice,
+        decimal buyPriceInBaseCurrency,
         int count,
         DateTime purchaseDate)
     {
@@ -39,18 +42,20 @@ public class SaleContentDetail : Entity<SaleContentDetail, int>
             CurrencyId = currencyId
         };
 
-        detail.Update(currencyId, buyPrice, count, purchaseDate);
+        detail.Update(currencyId, buyPrice, buyPriceInBaseCurrency, count, purchaseDate);
         return detail;
     }
 
     public void Update(
         int currencyId,
         decimal buyPrice,
+        decimal buyPriceInBaseCurrency,
         int count,
         DateTime purchaseDate)
     {
         CurrencyId = currencyId;
         BuyPrice = buyPrice;
+        BuyPriceInBaseCurrency = buyPriceInBaseCurrency;
         Count = count.AgainstLessOrEqual(
             0,
             () => new InvalidInputException("sale.fact.content.detail.count.required"));
