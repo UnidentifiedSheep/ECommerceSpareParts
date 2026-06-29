@@ -28,6 +28,9 @@ public class RoleNotFoundException : LocalizedNotFoundException
 public class UserAlreadyContainsRoleException(Guid userId, string role)
     : LocalizedConflictException("user.already.have.this.role", new { UserId = userId, Role = role }, [role]);
 
+public class UserRoleNotFoundException(Guid userId, string role)
+    : LocalizedNotFoundException("user.role.not.found", new { UserId = userId, Role = role }, [role]);
+
 public class UserIsNotInNeededRole(Role role)
     : LocalizedBadRequestException(
         "user.is.not.in.needed.role",

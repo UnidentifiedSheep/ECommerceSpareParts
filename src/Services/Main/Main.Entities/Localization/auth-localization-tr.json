@@ -12,6 +12,7 @@
     "role.not.found.with.role.name": "Rol '{0}' bulunamadı.",
     "role.already.exists": "Rol '{0}' zaten mevcut.",
     "user.already.have.this.role": "Kullanıcı zaten '{0}' rolüne sahip.",
+    "user.role.not.found": "Kullanıcı rolü '{0}' bulunamadı.",
     "user.is.not.in.needed.role": "Kullanıcı bu işlem için gerekli role sahip değil. Gerekli rol: '{0}'.",
     "user.not.found": "Kullanıcı bulunamadı.",
     "user.name.already.taken": "Kullanıcı adı başka bir kullanıcı tarafından alınmış.",
@@ -42,6 +43,8 @@
     "role.WORKER.name": "Çalışan",
     "role.SYSTEM.name": "Sistem",
     "cant.create.system.user": "Sistem kullanıcısı oluşturulamaz.",
+    "cant.add.system.role.to.user": "Sistem rolü bir kullanıcıya atanamaz.",
+    "cant.remove.system.role.from.user": "Sistem rolü bir kullanıcıdan kaldırılamaz.",
     "user.permission.not.found": "Kullanıcı izni bulunamadı.",
     "reset.token.expired": "Sıfırlama token'ının süresi doldu; kimliğinizi bir kez daha doğrulamanız gerekiyor."
   }

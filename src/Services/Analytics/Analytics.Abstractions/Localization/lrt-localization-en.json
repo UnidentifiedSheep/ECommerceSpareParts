@@ -2,6 +2,10 @@
   "locale": "en",
   "keyValues": {
     "metric_calculation_lrt_name": "Metric recalculation",
-    "metric_calculation_lrt_description": "Starts recalculation of the selected analytics metric by its identifier."
+    "metric_calculation_lrt_description": "Starts recalculation of the selected analytics metric by its identifier.",
+    "markup_calculation_lrt_name": "Markup calculation",
+    "markup_calculation_lrt_description": "Analyzes markup data and generates recommended markup ranges for pricing.",
+    "markup.calculation.input.invalid": "Invalid markup calculation input data was provided.",
+    "markup.calculation.range.start.must.be.before.or.equal.end": "The markup calculation time range start must be less than or equal to the time range end."
   }
 }

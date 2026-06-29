@@ -1,13 +1,17 @@
+using System.Linq.Expressions;
 using Analytics.Entities.Interfaces;
 using Analytics.Enums;
 using Domain.Extensions;
 using Exceptions;
 using Domain;
+using Domain.Interfaces;
 
 namespace Analytics.Entities;
 
-public class SalesFact : Entity<SalesFact, Guid>, IDependency
+public class SalesFact : Entity<SalesFact, Guid>, IDependency, ILinqEntity<SalesFact, Guid>
 {
+    private readonly List<SaleContent> _saleContents = [];
+
     private SalesFact()
     {
     }
@@ -15,6 +19,8 @@ public class SalesFact : Entity<SalesFact, Guid>, IDependency
     public Guid Id { get; private set; }
 
     public int CurrencyId { get; private set; }
+
+    public int BaseCurrencyId { get; private set; }
 
     public Guid BuyerId { get; private set; }
 
@@ -24,7 +30,7 @@ public class SalesFact : Entity<SalesFact, Guid>, IDependency
 
     public decimal TotalSum { get; private set; }
 
-    public virtual ICollection<SaleContent> SaleContents { get; } = new List<SaleContent>();
+    public IReadOnlyCollection<SaleContent> SaleContents => _saleContents;
 
     public override Guid GetId()
     {
@@ -34,6 +40,7 @@ public class SalesFact : Entity<SalesFact, Guid>, IDependency
     public static SalesFact Create(
         Guid id,
         int currencyId,
+        int baseCurrencyId,
         Guid buyerId,
         DateTime createdAt,
         DateTime processedAt,
@@ -43,6 +50,7 @@ public class SalesFact : Entity<SalesFact, Guid>, IDependency
         {
             Id = id,
             CurrencyId = currencyId,
+            BaseCurrencyId = baseCurrencyId,
             BuyerId = buyerId,
             CreatedAt = createdAt,
             ProcessedAt = processedAt
@@ -55,12 +63,14 @@ public class SalesFact : Entity<SalesFact, Guid>, IDependency
 
     public void Update(
         int currencyId,
+        int baseCurrencyId,
         Guid buyerId,
         DateTime createdAt,
         DateTime processedAt,
         IEnumerable<SaleContent> contents)
     {
         CurrencyId = currencyId;
+        BaseCurrencyId = baseCurrencyId;
         BuyerId = buyerId;
         CreatedAt = createdAt;
         ProcessedAt = processedAt;
@@ -75,7 +85,7 @@ public class SalesFact : Entity<SalesFact, Guid>, IDependency
             .ToList()
             .AgainstEmpty(() => new InvalidInputException("sale.fact.content.required"));
 
-        var existingContents = SaleContents.ToDictionary(x => x.Id);
+        var existingContents = _saleContents.ToDictionary(x => x.Id);
         var toRemove = new Dictionary<int, SaleContent>(existingContents);
         var totalSum = 0m;
 
@@ -89,20 +99,25 @@ public class SalesFact : Entity<SalesFact, Guid>, IDependency
                 existingContent.Update(
                     incomingContent.ProductId,
                     incomingContent.Price,
+                    incomingContent.PriceInBaseCurrency,
                     incomingContent.Count,
-                    incomingContent.Discount);
+                    incomingContent.Discount,
+                    incomingContent.Details);
             }
             else
             {
-                SaleContents.Add(incomingContent);
+                _saleContents.Add(incomingContent);
             }
         }
 
         foreach (var item in toRemove.Values)
-            SaleContents.Remove(item);
+            _saleContents.Remove(item);
 
         TotalSum = totalSum;
     }
 
     public static DependsOn DependsOn => DependsOn.Sale;
+    public static Expression<Func<SalesFact, Guid>> GetKeySelector() => x => x.Id;
+
+    public static Expression<Func<SalesFact, bool>> GetEqualityExpression(Guid key) => x => x.Id == key;
 }

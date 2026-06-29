@@ -2,16 +2,16 @@
 using Analytics.Entities;
 using Analytics.Entities.Metrics;
 using Analytics.Entities.Metrics.JsonDataModels;
-using Application.Common.Interfaces.Currency;
 using Application.Common.Interfaces.Repositories;
 
 namespace Analytics.Application.Services.Metrics.Calculators;
 
 public class ProductSalesMetricCalculator(
-    IRepository<SalesFact, Guid> salesRepository,
-    ICurrencyConverter currencyConverter)
+    IRepository<SalesFact, Guid> salesRepository)
     : MetricCalculatorBase<ProductSalesMetric>
 {
+    private const int BatchSize = 1000;
+
     public override async Task CalculateMetric(ProductSalesMetric metric, CancellationToken cancellationToken = default)
     {
         var minPrice = decimal.MaxValue;
@@ -26,37 +26,46 @@ public class ProductSalesMetricCalculator(
 
         var (start, end) = await WithTimer(async () =>
         {
-            await foreach (var fact in salesRepository
-                               .AsyncEnumerable(GetCriteria(metric))
-                               .WithCancellation(cancellationToken))
-            foreach (var item in fact.SaleContents)
+            var lastId = Guid.Empty;
+            while (true)
             {
-                if (item.ProductId != metric.ProductId)
-                    continue;
-
-                var priceDecimal = await currencyConverter.ConvertToBaseAsync(
-                    item.Price,
-                    fact.CurrencyId,
+                var facts = await salesRepository.ListAsync(
+                    GetCriteria(metric, lastId), 
                     cancellationToken);
-                var quantity = item.Count;
+                if (facts.Count == 0)
+                    break;
 
-                if (quantity <= 0)
-                    continue;
+                foreach (var item in facts.SelectMany(x => x.SaleContents))
+                {
+                    if (item.ProductId != metric.ProductId)
+                        continue;
 
-                var price = (double)priceDecimal;
+                    var priceDecimal = item.PriceInBaseCurrency;
+                    var quantity = item.Count;
 
-                if (priceDecimal < minPrice) minPrice = priceDecimal;
-                if (priceDecimal > maxPrice) maxPrice = priceDecimal;
+                    if (quantity <= 0)
+                        continue;
 
-                totalAmount += priceDecimal * quantity;
-                totalQuantity += quantity;
+                    var price = (double)priceDecimal;
 
-                count += quantity;
+                    if (priceDecimal < minPrice) minPrice = priceDecimal;
+                    if (priceDecimal > maxPrice) maxPrice = priceDecimal;
 
-                var delta = price - mean;
-                mean += delta * quantity / count;
-                var delta2 = price - mean;
-                m2 += quantity * delta * delta2;
+                    totalAmount += priceDecimal * quantity;
+                    totalQuantity += quantity;
+
+                    count += quantity;
+
+                    var delta = price - mean;
+                    mean += delta * quantity / count;
+                    var delta2 = price - mean;
+                    m2 += quantity * delta * delta2;
+                }
+
+                if (facts.Count < BatchSize)
+                    break;
+
+                lastId = facts[^1].Id;
             }
         });
 
@@ -83,12 +92,15 @@ public class ProductSalesMetricCalculator(
         metric.CompleteRecalculation();
     }
 
-    private static Criteria<SalesFact> GetCriteria(ProductSalesMetric metric)
+    private static Criteria<SalesFact> GetCriteria(ProductSalesMetric metric, Guid lastId)
     {
         return Criteria<SalesFact>.New()
             .Where(x => x.SaleContents.Any(z => z.ProductId == metric.ProductId)
-                        && metric.RangeStart <= x.CreatedAt && x.CreatedAt <= metric.RangeEnd)
+                        && metric.RangeStart <= x.CreatedAt && x.CreatedAt <= metric.RangeEnd
+                        && x.Id > lastId)
             .Include(x => x.SaleContents)
+            .OrderByAsc(x => x.Id)
+            .Size(BatchSize)
             .Build();
     }
 }

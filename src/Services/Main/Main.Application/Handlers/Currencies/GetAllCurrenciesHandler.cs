@@ -2,7 +2,7 @@
 using Main.Application.Dtos.Currencies;
 using Main.Application.Interfaces.Cache;
 
-namespace Main.Application.Handlers.Currencies.GetAllCurrencies;
+namespace Main.Application.Handlers.Currencies;
 
 public record GetAllCurrenciesQuery : IQuery<GetAllCurrenciesResult>;
 

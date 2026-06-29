@@ -6,10 +6,10 @@ using Contracts.User;
 using Main.Entities.Auth;
 using MediatR;
 
-namespace Main.Application.Handlers.Auth;
+namespace Main.Application.Handlers.Auth.AddRoleToUser;
 
-[AutoSave]
-[Transactional]
+[Diagnostics(maxExecutionTimeMs: 400)]
+[Transactional, AutoSave]
 public record AddRoleToUserCommand(Guid UserId, string RoleName) : ICommand;
 
 public class AddRoleToUserHandler(

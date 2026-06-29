@@ -2,6 +2,15 @@
   "locale": "en",
   "keyValues": {
     "markup.group.not.found": "Markup group not found.",
-    "current.markup.group.can.not.be.deleted": "Currently used markup group can not be deleted. Firstly select other group."
+    "current.markup.group.can.not.be.deleted": "Currently used markup group can not be deleted. Firstly select other group.",
+    "markup.group.required": "Markup group data is required.",
+    "markup.group.id.must.be.positive": "Markup group id must be greater than 0.",
+    "markup.group.name.max.length": "Markup group name must not exceed 128 characters.",
+    "markup.group.currency.id.must.be.positive": "Markup group currency id must be greater than 0.",
+    "markup.group.ranges.required": "Markup group must contain at least one range.",
+    "markup.range.start.must.not.be.negative": "Markup range start must not be negative.",
+    "markup.range.end.must.not.be.negative": "Markup range end must not be negative.",
+    "markup.range.end.must.be.greater.than.start": "Markup range end must be greater than range start.",
+    "markup.range.markup.must.not.be.negative": "Markup value must not be negative."
   }
 }

@@ -21,6 +21,5 @@ public class CurrencySetting : Setting<CurrencySettingData>, ISetting<CurrencySe
 public record CurrencySettingData
 {
     public int BaseCurrencyId { get; init; } = 1;
-    public bool AutoUpdateRates { get; init; } = true;
     public ExchangeRateProvider RateProvider { get; init; } = ExchangeRateProvider.Cbr;
 }

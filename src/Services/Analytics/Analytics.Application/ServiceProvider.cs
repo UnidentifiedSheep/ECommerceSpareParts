@@ -43,6 +43,7 @@ public static class ServiceProvider
         collection.AddScoped<ICurrencyRatesProvider, CurrencyRatesProvider>();
         collection.AddScoped<IFactSynchronizer<PurchasesFact, Guid>, PurchaseFactSynchronizer>();
         collection.AddScoped<IFactSynchronizer<SalesFact, Guid>, SaleFactSynchronizer>();
+        collection.AddScoped<ISaleFactSynchronizer, SaleFactSynchronizer>();
 
         collection.AddScoped<ITagsService, TagsService>();
         return collection;

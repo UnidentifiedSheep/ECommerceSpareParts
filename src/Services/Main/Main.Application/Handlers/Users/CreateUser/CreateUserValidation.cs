@@ -27,7 +27,7 @@ public class CreateUserValidation : AbstractValidator<CreateUserCommand>
         RuleFor(x => x.Emails)
             .ChildRules(z =>
                 z.RuleForEach(x => x)
-                    .SetValidator(new EmailValidator(emailValidator)))
+                    .SetValidator(new EmailDtoValidator(emailValidator)))
             .Custom((z, context) =>
             {
                 var list = z.ToList();

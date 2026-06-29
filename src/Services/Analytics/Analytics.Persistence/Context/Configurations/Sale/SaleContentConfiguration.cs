@@ -23,6 +23,7 @@ public class SaleContentConfiguration : IEntityTypeConfiguration<SaleContent>
         builder.Property(e => e.Count).HasColumnName("count");
         builder.Property(e => e.Discount).HasColumnName("discount");
         builder.Property(e => e.Price).HasColumnName("price");
+        builder.Property(e => e.PriceInBaseCurrency).HasColumnName("price_in_base_currency");
         builder.Property(e => e.SaleId)
             .HasMaxLength(128)
             .HasColumnName("sale_id");
@@ -30,5 +31,15 @@ public class SaleContentConfiguration : IEntityTypeConfiguration<SaleContent>
         builder.HasOne(d => d.Sale).WithMany(p => p.SaleContents)
             .HasForeignKey(d => d.SaleId)
             .HasConstraintName("sale_contents_sales_fact_id_fk");
+
+        builder.HasMany(e => e.Details)
+            .WithOne(e => e.SaleContent)
+            .HasForeignKey(e => e.SaleContentId)
+            .OnDelete(DeleteBehavior.Cascade)
+            .HasConstraintName("sale_content_detail_sale_content_id_fk");
+
+        builder.Navigation(e => e.Details)
+            .HasField("_details")
+            .UsePropertyAccessMode(PropertyAccessMode.Field);
     }
 }

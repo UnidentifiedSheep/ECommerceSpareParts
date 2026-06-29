@@ -1,7 +1,16 @@
 ﻿{
-  "locale": "en",
+  "locale": "ru",
   "keyValues": {
     "markup.group.not.found": "Не удалось найти группу наценок.",
-    "current.markup.group.can.not.be.deleted": "Используемая группа неценок не может быть удалена. Для начала выберите другую группу.."
+    "current.markup.group.can.not.be.deleted": "Используемая группа наценок не может быть удалена. Для начала выберите другую группу.",
+    "markup.group.required": "Данные группы наценок обязательны.",
+    "markup.group.id.must.be.positive": "Идентификатор группы наценок должен быть больше 0.",
+    "markup.group.name.max.length": "Название группы наценок не должно превышать 128 символов.",
+    "markup.group.currency.id.must.be.positive": "Идентификатор валюты группы наценок должен быть больше 0.",
+    "markup.group.ranges.required": "Группа наценок должна содержать хотя бы один диапазон.",
+    "markup.range.start.must.not.be.negative": "Начало диапазона наценки не должно быть отрицательным.",
+    "markup.range.end.must.not.be.negative": "Конец диапазона наценки не должен быть отрицательным.",
+    "markup.range.end.must.be.greater.than.start": "Конец диапазона наценки должен быть больше его начала.",
+    "markup.range.markup.must.not.be.negative": "Значение наценки не должно быть отрицательным."
   }
 }

@@ -12,6 +12,7 @@ using Main.Application.Handlers.Balance.CreateTransaction;
 using Main.Application.Handlers.Balance.ReverseTransaction;
 using Main.Application.Interfaces.Persistence;
 using Main.Application.Interfaces.Services;
+using Main.Application.Interfaces.Services.Event;
 using Main.Entities.Balance;
 using Main.Entities.Exceptions;
 using Main.Entities.Sale;
@@ -39,7 +40,7 @@ public class EditSaleHandler(
     ISaleRepository saleRepository,
     IOptions<SystemOptions> systemOptions,
     ISaleService saleService,
-    IIntegrationEventScope integrationEventScope,
+    ISaleEventService saleEventService,
     IUnitOfWork unitOfWork) : ICommandHandler<EditSaleCommand>
 {
     public async Task<Unit> Handle(EditSaleCommand request, CancellationToken cancellationToken)
@@ -84,11 +85,10 @@ public class EditSaleHandler(
 
         await UpdateContents(sale, contentDtos, false, cancellationToken);
         await UpdateReservationsCounts(sale, oldCounts, cancellationToken);
+        
+        await unitOfWork.SaveChangesAsync(cancellationToken);
 
-        integrationEventScope.Add(new SaleUpdatedEvent
-        {
-            SaleId = sale.Id
-        });
+        await saleEventService.NotifyUpdated(sale.Id, cancellationToken);
 
         return Unit.Value;
     }

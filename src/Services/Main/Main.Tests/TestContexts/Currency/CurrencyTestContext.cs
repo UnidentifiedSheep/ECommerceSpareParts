@@ -23,7 +23,6 @@ public class CurrencyTestContext(
 
         await settingsService.SetSetting(new CurrencySetting(new CurrencySettingData
         {
-            AutoUpdateRates = false,
             BaseCurrencyId = created.First().Id,
             RateProvider = ExchangeRateProvider.Cbr
         }), cancellationToken);

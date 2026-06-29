@@ -39,7 +39,7 @@ public class SaleContentDetailConfiguration : IEntityTypeConfiguration<SaleConte
             .HasForeignKey(d => d.SaleContentId)
             .HasConstraintName("sale_content_details_sale_content_id_fk");
 
-        builder.HasOne<StorageContent>()
+        builder.HasOne<StorageContent>(e => e.StorageContent)
             .WithMany()
             .HasForeignKey(d => d.StorageContentId)
             .OnDelete(DeleteBehavior.Restrict)

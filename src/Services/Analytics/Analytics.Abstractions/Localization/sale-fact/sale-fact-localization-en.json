@@ -4,6 +4,8 @@
     "sale.fact.content.required": "Content of sale fact must not be empty.",
     "sale.fact.content.price.required": "Sale content price must be greater than 0.",
     "sale.fact.content.count.required": "Sale content count must be greater than 0.",
-    "sale.fact.content.discount.must.not.be.negative": "Sale content discount must not be negative."
+    "sale.fact.content.discount.must.not.be.negative": "Sale content discount must not be negative.",
+    "sale.fact.content.detail.required": "Sale content details must not be null.",
+    "sale.fact.content.detail.count.required": "Sale content detail count must be greater than 0."
   }
 }

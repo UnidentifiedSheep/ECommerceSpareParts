@@ -229,6 +229,10 @@ namespace Analytics.Migrator.Migrations
                         .HasColumnType("numeric")
                         .HasColumnName("price");
 
+                    b.Property<decimal>("PriceInBaseCurrency")
+                        .HasColumnType("numeric")
+                        .HasColumnName("price_in_base_currency");
+
                     b.Property<int>("ProductId")
                         .HasColumnType("integer")
                         .HasColumnName("product_id");
@@ -254,9 +258,13 @@ namespace Analytics.Migrator.Migrations
                         .HasColumnType("integer")
                         .HasColumnName("id");
 
-                    b.Property<decimal?>("BuyPrice")
+                    b.Property<decimal>("BuyPrice")
                         .HasColumnType("numeric")
                         .HasColumnName("buy_price");
+
+                    b.Property<decimal>("BuyPriceInBaseCurrency")
+                        .HasColumnType("numeric")
+                        .HasColumnName("buy_price_in_base_currency");
 
                     b.Property<int>("Count")
                         .HasColumnType("integer")
@@ -270,10 +278,16 @@ namespace Analytics.Migrator.Migrations
                         .HasColumnType("timestamp with time zone")
                         .HasColumnName("purchase_date");
 
+                    b.Property<int>("SaleContentId")
+                        .HasColumnType("integer")
+                        .HasColumnName("sale_content_id");
+
                     b.HasKey("Id")
                         .HasName("sale_content_detail_pk");
 
                     b.HasIndex(new[] { "CurrencyId" }, "sale_content_detail_currency_id_index");
+
+                    b.HasIndex(new[] { "SaleContentId" }, "sale_content_detail_sale_content_id_index");
 
                     b.ToTable("sale_content_detail", (string)null);
                 });
@@ -285,6 +299,10 @@ namespace Analytics.Migrator.Migrations
                         .HasMaxLength(128)
                         .HasColumnType("uuid")
                         .HasColumnName("id");
+
+                    b.Property<int>("BaseCurrencyId")
+                        .HasColumnType("integer")
+                        .HasColumnName("base_currency_id");
 
                     b.Property<Guid>("BuyerId")
                         .HasColumnType("uuid")
@@ -793,6 +811,18 @@ namespace Analytics.Migrator.Migrations
                     b.Navigation("Sale");
                 });
 
+            modelBuilder.Entity("Analytics.Entities.SaleContentDetail", b =>
+                {
+                    b.HasOne("Analytics.Entities.SaleContent", "SaleContent")
+                        .WithMany("Details")
+                        .HasForeignKey("SaleContentId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired()
+                        .HasConstraintName("sale_content_detail_sale_content_id_fk");
+
+                    b.Navigation("SaleContent");
+                });
+
             modelBuilder.Entity("Domain.CommonEntities.JobScheduleRun", b =>
                 {
                     b.HasOne("Domain.CommonEntities.Job", null)
@@ -830,6 +860,11 @@ namespace Analytics.Migrator.Migrations
             modelBuilder.Entity("Analytics.Entities.PurchasesFact", b =>
                 {
                     b.Navigation("PurchaseContents");
+                });
+
+            modelBuilder.Entity("Analytics.Entities.SaleContent", b =>
+                {
+                    b.Navigation("Details");
                 });
 
             modelBuilder.Entity("Analytics.Entities.SalesFact", b =>

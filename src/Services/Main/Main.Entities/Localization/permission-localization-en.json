@@ -151,6 +151,8 @@
     "permissions.users.info.get.description": "Permission to view user information.",
     "permissions.users.permissions.create.name": "Add permission to user",
     "permissions.users.permissions.create.description": "Permission to add permissions to users.",
+    "permissions.users.roles.create.name": "Add role to user",
+    "permissions.users.roles.create.description": "Permission to add roles to users.",
     "permissions.users.discount.create.name": "Edit user discount",
     "permissions.users.discount.create.description": "Permission to edit user discounts.",
     "permissions.users.discount.get.name": "View user discount",
