@@ -2,19 +2,11 @@ using System.Text.Json.Serialization;
 using Api.Common.Extensions;
 using Enums;
 using Main.Application.Dtos.Users;
-using Main.Application.Handlers.Users;
-using Main.Application.Handlers.Users.ChangeUserDiscount;
 using Main.Application.Handlers.Users.EditUserInfo;
-using Main.Application.Handlers.Users.GetUserDiscount;
 using Main.Application.Handlers.Users.GetUserFullInfo;
-using Mapster;
 using MediatR;
 
 namespace Main.Api.EndPoints.Users;
-
-public record CreateMailForUserRequest(string MailBox, string? Password, string? Comment);
-
-public record CreateMailForUserResponse(string MailBoxAddress, string Password);
 
 public record GetUserDiscountResponse(decimal Discount);
 
@@ -40,27 +32,6 @@ public static class UserInfoEndPoints
 {
     public static RouteGroupBuilder MapUserInfoEndPoints(this RouteGroupBuilder users)
     {
-        users.MapPost("/{userId}/mail/corporate", async (
-                ISender sender,
-                string userId,
-                CreateMailForUserRequest request,
-                CancellationToken token) =>
-            {
-                var command = new CreateMailForUserCommand(userId, request.MailBox, request.Password, request.Comment);
-                var result = await sender.Send(command, token);
-                string? uri = null;
-                return Results.Created(uri, result.Adapt<CreateMailForUserResponse>());
-            })
-            .WithName("CreateUserCorporateMail")
-            .WithSummary("Создать корпоративную почту пользователя")
-            .WithDescription("Создание корпоративной почты для пользователя")
-            .WithDisplayName("Создание почты для пользователя")
-            .Accepts<CreateMailForUserRequest>(false, "application/json")
-            .Produces<CreateMailForUserResponse>(StatusCodes.Status201Created)
-            .ProducesProblem(StatusCodes.Status400BadRequest)
-            .ProducesProblem(StatusCodes.Status404NotFound)
-            .RequireAnyPermission(PermissionCodes.USERS_MAILS_CREATE);
-
         users.MapGet("/{id:guid}/info", async (ISender sender, Guid id, CancellationToken token) =>
             {
                 var result = await sender.Send(new GetUserFullInfoQuery(id), token);

@@ -104,6 +104,11 @@ public class User : AuditableEntity<User, Guid>, ILinqEntity<User, Guid>
         _emails.Add(userEmail);
     }
 
+    public void RemoveUserEmail(Email email)
+    {
+        _emails.RemoveAll(x => x.Email.Value == email.Value);
+    }
+
     public void SetDiscount(decimal discount)
     {
         if (Discount == null)
