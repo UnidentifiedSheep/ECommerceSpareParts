@@ -47,7 +47,18 @@ public class SettingsService(
             TransactionSettings,
             async () =>
             {
-                await unitOfWork.AddAsync(value, cancellationToken);
+                var criteria = Criteria<Setting>.New()
+                    .Where(x => x.Key == value.Key)
+                    .ForUpdate()
+                    .Track()
+                    .Build();
+                
+                var existing = await repository.FirstOrDefaultAsync(criteria, cancellationToken);
+                existing?.SetData(value.Json);
+
+                if (existing == null)
+                    await unitOfWork.AddAsync(value, cancellationToken);
+
                 await publishEndpoint.Publish(
                     new SettingUpdatedEvent
                     {
@@ -67,12 +78,17 @@ public class SettingsService(
     public async Task<T> GetOrDefault<T>(CancellationToken cancellationToken = default) where T : Setting, ISetting<T>
     {
         if (settingsContainer.TryGet<T>(out var setting)) return setting!;
+        
         var dbSetting = await repository.GetById(T.SettingName, cancellationToken);
-        if (dbSetting == null) return T.Default;
 
-        var typed = (T)settingFactory.Create(dbSetting.Key, dbSetting.Json);
-        await SetSetting(typed, cancellationToken);
+        if (dbSetting != null)
+        {
+            var typed = (T)settingFactory.Create(dbSetting.Key, dbSetting.Json);
+            settingsContainer.Set(typed);
+            return typed;
+        }
 
-        return typed;
+        await SetSetting(T.Default, cancellationToken);
+        return T.Default;
     }
 }

@@ -22,6 +22,7 @@ public static class ServiceProvider
                 serviceDefinition: ServicesDefinitions.Pricing,
                 configuration: configuration, 
                 assembly: typeof(Global).Assembly)
+            .AddNamedObjects()
             .AddFusionCache()
             .WithRegisteredDistributedCache()
             .WithRegisteredBackplane()

@@ -1,5 +1,7 @@
 ﻿using System.Reflection;
 using Application.Common.Abstractions;
+using Application.Common.Handlers.NamedObjects;
+using Application.Common.Handlers.Settings;
 using Application.Common.Interfaces;
 using Application.Common.Interfaces.Cqrs;
 using Application.Common.Interfaces.NamedObject;
@@ -8,6 +10,7 @@ using Application.Common.NamedObject;
 using Application.Common.Services;
 using Application.Common.Services.Settings;
 using FluentValidation;
+using MediatR;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 
@@ -28,6 +31,15 @@ public static class ServiceCollectionExtensions
         collection.AddSingleton<ISettingsContainer, SettingsContainer>();
         collection.AddScoped<ISettingsService, SettingsService>();
         collection.AddSingleton<ISettingFactory, TSettingFactory>();
+        
+        collection.TryAddScoped<
+            IRequestHandler<UpdateSettingCommand, UpdateSettingResult>,
+            UpdateSettingHandler>();
+        
+        collection.TryAddScoped<
+            IRequestHandler<GetSettingsQuery, GetSettingsResult>,
+            GetSettingsHandler>();
+        
         return collection;
     }
 
@@ -124,7 +136,8 @@ public static class ServiceCollectionExtensions
         });
 
         services.TryAddScoped(typeof(INamedObjectRegistry<>), typeof(NamedObjectRegistry<>));
-
+        services.TryAddScoped<INamedObjectGroupResolver, NamedObjectGroupResolver>();
+        
         return services;
     }
 }

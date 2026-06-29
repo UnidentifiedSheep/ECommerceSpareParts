@@ -48,6 +48,11 @@
     "lifo.storage.content.extract.policy.description": "Önce en yeni stok, sonra daha eski stok kullanılır.",
     "first.cheapest.storage.content.extract.policy.name": "Önce en ucuz",
     "first.cheapest.storage.content.extract.policy.description": "Önce en ucuz stok, sonra daha pahalı stok kullanılır.",
-    "storage.content.items.required": "Çıkarma işlemi için depo içerikleri gereklidir."
+    "storage.content.items.required": "Çıkarma işlemi için depo içerikleri gereklidir.",
+    "storage.content.setting.name": "Depo içeriği ayarları",
+    "storage.content.setting.description": "Stokların depo içeriğinden nasıl seçileceğini ve düşüleceğini yönetir.",
+    "storage.content.setting.input.invalid": "Geçersiz depo içeriği ayarları verisi sağlandı.",
+    "storage.content.setting.extraction.policy.name": "Stok düşme politikası",
+    "storage.content.setting.extraction.policy.description": "Hangi depo içeriği öğelerinin önce tüketileceğini belirleyen politika."
   }
 }

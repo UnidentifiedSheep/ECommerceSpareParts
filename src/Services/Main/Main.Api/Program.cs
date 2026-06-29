@@ -68,6 +68,7 @@ builder.Services.AddMassTransit(x =>
     x.AddConsumers(Assembly.GetAssembly(typeof(Global)));
     x.AddConsumer<BackplaneConsumer>();
     x.AddConsumer<JobStatusUpdatedConsumer>();
+    x.AddConsumer<SettingUpdatedConsumer>();
 
     x.AddEntityFrameworkOutbox<DContext>(o =>
     {

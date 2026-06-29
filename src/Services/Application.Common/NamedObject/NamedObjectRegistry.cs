@@ -14,8 +14,9 @@ public class NamedObjectRegistry<TBaseObject>
             x => x.SystemName,
             StringComparer.OrdinalIgnoreCase);
     }
-
+    
     public IReadOnlyCollection<TBaseObject> All => _objects.Values.ToList();
+
 
     public TBaseObject GetBySystemName(string systemName)
     {
@@ -29,4 +30,10 @@ public class NamedObjectRegistry<TBaseObject>
         _objects.TryGetValue(systemName, out var obj);
         return obj;
     }
+    
+    INamedObject? INamedObjectRegistry.TryGetBySystemName(string systemName)
+        => TryGetBySystemName(systemName);
+    IReadOnlyCollection<INamedObject> INamedObjectRegistry.All => All;
+    INamedObject INamedObjectRegistry.GetBySystemName(string systemName)
+        => GetBySystemName(systemName);
 }

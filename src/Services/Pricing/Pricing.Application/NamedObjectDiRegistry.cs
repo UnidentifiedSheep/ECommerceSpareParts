@@ -1,15 +1,13 @@
 ﻿using Application.Common.Extensions;
-using Application.Common.Handlers.NamedObjects;
 using Application.Common.Handlers.NamedObjects.GetNamedObjects;
 using Application.Common.Interfaces.NamedObject;
 using Application.Common.NamedObject;
-using Main.Application.NamedObjects;
-using Main.Application.NamedObjects.StorageContentExtractPolicies;
 using MediatR;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
+using Pricing.Application.NamedObjects;
 
-namespace Main.Application;
+namespace Pricing.Application;
 
 public static class NamedObjectDiRegistry
 {
@@ -22,9 +20,6 @@ public static class NamedObjectDiRegistry
             GetNamedObjectsHandler>();
         
         return services
-            .RegisterNamedObject<StorageContentExtractPolicyBase>(objectsLifetime: ServiceLifetime.Singleton)
-            .RegisterNamedObject<SettingDefinitionNamedObjectBase>(
-                assembly: typeof(StorageContentExtractPolicyBase).Assembly, 
-                objectsLifetime: ServiceLifetime.Scoped);
+            .RegisterNamedObject<SettingDefinitionNamedObjectBase>(objectsLifetime: ServiceLifetime.Scoped);
     }
 }

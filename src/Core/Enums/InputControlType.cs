@@ -6,5 +6,6 @@ public enum InputControlType
     TextField,
     DatePicker,
     EntitySelector,
-    EnumSelector
+    EnumSelector,
+    NamedObjectSelector,
 }

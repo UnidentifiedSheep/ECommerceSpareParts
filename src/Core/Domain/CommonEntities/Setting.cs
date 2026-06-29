@@ -25,6 +25,11 @@ public class Setting : AuditableEntity<Setting, string>, ILinqEntity<Setting, st
         return x => x.Key;
     }
 
+    public void SetData(string json)
+    {
+        Json = json;
+    }
+
     public static Expression<Func<Setting, bool>> GetEqualityExpression(string key)
     {
         return x => x.Key == key;

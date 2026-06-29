@@ -1,4 +1,5 @@
-﻿using Domain.CommonEntities;
+﻿using System.Text.Json.Serialization;
+using Domain.CommonEntities;
 using Domain.Interfaces;
 
 namespace Main.Entities.Setting;
@@ -19,5 +20,6 @@ public class StorageContentSetting : Setting<StorageContentSettingData>, ISettin
 
 public record StorageContentSettingData
 {
+    [JsonPropertyName("storageContentExtractionPolicy")]
     public string StorageContentExtractionPolicy { get; init; } = "FifoStorageContentExtractPolicy";
 }

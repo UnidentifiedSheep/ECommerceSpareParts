@@ -3,6 +3,7 @@ using System.Text.Json.Serialization;
 using Application.Common.Interfaces.Settings;
 using Application.Common.NamedObject;
 using Attributes.JsonAttributes;
+using Domain.CommonEntities;
 using Enums;
 using Exceptions;
 using Main.Entities.Setting;
@@ -32,6 +33,9 @@ public class CurrencySettingDefinition(
             }), 
             cancellationToken);
     }
+
+    public override async Task<Setting> GetSettingAsync(CancellationToken cancellationToken)
+        => await settingsService.GetOrDefault<CurrencySetting>(cancellationToken);
 }
 
 public record CurrencySettingInputData

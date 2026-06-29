@@ -100,6 +100,7 @@ void AddMassTransit(IHostApplicationBuilder hostBuilder)
     {
         x.AddConsumers(Assembly.GetAssembly(typeof(Global)));
         x.AddConsumer<BackplaneConsumer>();
+        x.AddConsumer<SettingUpdatedConsumer>();
 
         x.AddEntityFrameworkOutbox<DContext>(o =>
         {
