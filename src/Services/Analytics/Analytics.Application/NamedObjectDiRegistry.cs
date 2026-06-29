@@ -1,4 +1,5 @@
-﻿using Analytics.Application.NamedObjects.Metrics;
+﻿using Analytics.Application.NamedObjects.Analyzers.Markup;
+using Analytics.Application.NamedObjects.Metrics;
 using Application.Common.Extensions;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -9,6 +10,7 @@ public static class NamedObjectDiRegistry
     public static IServiceCollection AddNamedObjects(this IServiceCollection services)
     {
         return services
-            .RegisterNamedObject<MetricDefinitionNamedObjectBase>(objectsLifetime: ServiceLifetime.Singleton);
+            .RegisterNamedObject<MetricDefinitionNamedObjectBase>(objectsLifetime: ServiceLifetime.Singleton)
+            .RegisterNamedObject<MarkupAnalyzerNamedObjectBase>(objectsLifetime: ServiceLifetime.Scoped);
     }
 }

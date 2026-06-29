@@ -26,7 +26,7 @@ public class SaleContent : Entity<SaleContent, int>
 
     public decimal Discount { get; private set; }
 
-    public decimal TotalSum => Count * Price - Discount;
+    public decimal TotalSum => Count * Price;
 
     public virtual SalesFact Sale { get; private set; } = null!;
 
