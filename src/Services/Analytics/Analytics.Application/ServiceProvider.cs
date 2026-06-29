@@ -1,3 +1,4 @@
+using Abstractions;
 using Abstractions.Interfaces;
 using Analytics.Application.Configs;
 using Analytics.Application.Interfaces.Services.FactSynchronizers;
@@ -27,7 +28,10 @@ public static class ServiceProvider
     {
         SortByConfig.Configure();
         collection
-            .AddApplicationBase(configuration, typeof(TagsService).Assembly)
+            .AddApplicationBase(
+                ServicesDefinitions.Analytics,
+                configuration, 
+                typeof(TagsService).Assembly)
             .AddNamedObjects()
             .AddLrtLayer(typeof(MetricCalculationLrt).Assembly)
             .RegisterMetricCalculators()

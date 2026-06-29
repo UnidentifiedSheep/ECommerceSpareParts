@@ -1,4 +1,5 @@
 ﻿using System.Data;
+using Abstractions.Interfaces;
 using Abstractions.Interfaces.Persistence;
 using Abstractions.Interfaces.Services;
 using Application.Common.Interfaces.Repositories;
@@ -16,6 +17,7 @@ public class SettingsService(
     IUnitOfWork unitOfWork,
     ISettingsContainer settingsContainer,
     IPublishEndpoint publishEndpoint,
+    IServiceDefinition serviceDefinition,
     ISettingFactory settingFactory)
     : ISettingsService
 {
@@ -46,12 +48,15 @@ public class SettingsService(
             async () =>
             {
                 await unitOfWork.AddAsync(value, cancellationToken);
-                await publishEndpoint.Publish(new SettingChangedEvent
-                {
-                    Key = value.Key,
-                    Value = value.Json,
-                    ChangedAt = DateTime.UtcNow
-                }, cancellationToken);
+                await publishEndpoint.Publish(
+                    new SettingUpdatedEvent
+                    {
+                        Key = value.Key,
+                        Value = value.Json,
+                        ChangedAt = DateTime.UtcNow
+                    }, 
+                    conf => conf.SetRoutingKey(serviceDefinition.ServiceName),
+                    cancellationToken);
                 await unitOfWork.SaveChangesAsync(cancellationToken);
             },
             cancellationToken);
@@ -66,7 +71,7 @@ public class SettingsService(
         if (dbSetting == null) return T.Default;
 
         var typed = (T)settingFactory.Create(dbSetting.Key, dbSetting.Json);
-        settingsContainer.Set(typed);
+        await SetSetting(typed, cancellationToken);
 
         return typed;
     }

@@ -4,6 +4,7 @@ using Api.Common;
 using Api.Common.Extensions;
 using Api.Common.HostedServices;
 using Application.Common.Backplane;
+using Application.Common.Consumer;
 using Cache;
 using Contracts.Auth;
 using Contracts.Currency;
@@ -121,9 +122,9 @@ void AddMassTransit(IHostApplicationBuilder hostBuilder)
 
                 ep.ConfigureConsumeTopology = false;
 
-                ep.ConfigureConsumer<SettingChangedConsumer>(context);
+                ep.ConfigureConsumer<SettingUpdatedConsumer>(context);
                 
-                ep.Bind<SettingChangedEvent>();
+                ep.Bind<SettingUpdatedEvent>();
                 
                 ep.ConfigureConsumer<BackplaneConsumer>(context);
                 ep.Bind<BackplaneMessage>();

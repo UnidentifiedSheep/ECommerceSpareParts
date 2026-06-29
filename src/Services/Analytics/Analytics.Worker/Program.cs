@@ -1,4 +1,5 @@
 using System.Reflection;
+using Abstractions;
 using Analytics.Application;
 using Analytics.Cache;
 using Analytics.Persistence;
@@ -9,8 +10,10 @@ using Api.Common;
 using Api.Common.Extensions;
 using Api.Common.HostedServices;
 using Application.Common.Backplane;
+using Application.Common.Consumer;
 using Cache;
 using Contracts.Job;
+using Contracts.Settings;
 using Internal.Integration.Di;
 using Localization.Domain.Extensions;
 using MassTransit;
@@ -83,6 +86,7 @@ void AddMassTransit(IHostApplicationBuilder hostBuilder)
     hostBuilder.Services.AddMassTransit(x =>
     {
         x.AddConsumer<BackplaneConsumer>();
+        x.AddConsumer<SettingUpdatedConsumer>();
 
         x.AddEntityFrameworkOutbox<DContext>(o =>
         {
@@ -93,10 +97,6 @@ void AddMassTransit(IHostApplicationBuilder hostBuilder)
         x.UsingRabbitMq((context, cfg) =>
         {
             cfg.ConfigureRabbitMq(context);
-            cfg.Publish<JobStatusUpdatedEvent>(p =>
-            {
-                p.ExchangeType = ExchangeType.Direct;
-            });
             
             cfg.ReceiveEndpoint(uniqQueueName, ep =>
             {
@@ -104,7 +104,12 @@ void AddMassTransit(IHostApplicationBuilder hostBuilder)
                 ep.Durable = false;
             
                 ep.ConfigureConsumer<BackplaneConsumer>(context);
+                ep.ConfigureConsumer<SettingUpdatedConsumer>(context);
+                
                 ep.Bind<BackplaneMessage>();
+                
+                ep.BindForService<JobStatusUpdatedEvent>(ServicesDefinitions.Analytics)
+                    .BindForService<SettingUpdatedEvent>(ServicesDefinitions.Analytics);
             });
 
             cfg.ReceiveEndpoint("analytics-work-queue", ep =>

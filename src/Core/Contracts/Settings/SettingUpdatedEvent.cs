@@ -1,6 +1,6 @@
 ﻿namespace Contracts.Settings;
 
-public record SettingChangedEvent
+public record SettingUpdatedEvent
 {
     public required string Key { get; init; }
     public required string Value { get; init; }

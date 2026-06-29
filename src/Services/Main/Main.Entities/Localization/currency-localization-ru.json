@@ -20,6 +20,11 @@
     "currency.shortName.not.empty": "Краткое название валюты не должно быть пустым.",
     "currency.shortName.max.length": "Краткое название валюты должно быть не более 5 символов.",
     "currency.shortName.min.length": "Краткое название валюты должно быть не менее 2 символов.",
-    "currency.rate.not.found": "Не удалось найти курс валюты."
+    "currency.rate.not.found": "Не удалось найти курс валюты.",
+    "currency.setting.name": "Настройки валют",
+    "currency.setting.description": "Управляет настройками валют, включая провайдера курсов обмена.",
+    "currency.setting.input.invalid": "Переданы некорректные данные настроек валют.",
+    "currency.setting.rate.provider.name": "Провайдер курсов обмена",
+    "currency.setting.rate.provider.description": "Провайдер, используемый для обновления курсов валют."
   }
 }

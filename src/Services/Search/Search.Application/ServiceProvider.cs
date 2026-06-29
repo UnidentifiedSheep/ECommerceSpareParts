@@ -1,3 +1,4 @@
+using Abstractions;
 using Application.Common;
 using Application.Common.Behaviors;
 using Microsoft.Extensions.Configuration;
@@ -22,6 +23,7 @@ public static class ServiceProvider
         
         services
             .AddApplicationBase(
+                serviceDefinition: ServicesDefinitions.Search,
                 configuration: configuration,
                 assembly: typeof(ServiceProvider).Assembly,
                 behaviorsToExclude:

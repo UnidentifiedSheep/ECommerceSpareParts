@@ -1,11 +1,14 @@
 using System.Reflection;
+using Abstractions;
 using Api.Common;
 using Api.Common.Extensions;
 using Application.Common.Backplane;
+using Application.Common.Consumer;
 using Cache;
 using Carter;
 using Contracts.Analytics;
 using Contracts.Currency;
+using Contracts.Job;
 using Contracts.Settings;
 using Internal.Integration.Di;
 using Localization.Domain.Extensions;
@@ -42,6 +45,7 @@ builder.Services.AddMassTransit(x =>
 {
     x.AddConsumers(Assembly.GetAssembly(typeof(Global)));
     x.AddConsumer<BackplaneConsumer>();
+    x.AddConsumer<SettingUpdatedConsumer>();
 
     x.AddEntityFrameworkOutbox<DContext>(o =>
     {
@@ -60,13 +64,15 @@ builder.Services.AddMassTransit(x =>
             ep.ConfigureConsumeTopology = false;
             
             ep.ConfigureConsumer<BackplaneConsumer>(context);
-            ep.Bind<BackplaneMessage>();
-            
+            ep.ConfigureConsumer<SettingUpdatedConsumer>(context);
 
             ep.ConfigureConsumer<MarkupRangesRefreshRequestedConsumer>(context);
             
+            ep.Bind<BackplaneMessage>();
             ep.Bind<MarkupRangesRefreshRequestedEvent>();
-            ep.Bind<SettingChangedEvent>();
+            
+            ep.BindForService<JobStatusUpdatedEvent>(ServicesDefinitions.Pricing)
+                .BindForService<SettingUpdatedEvent>(ServicesDefinitions.Pricing);
         });
 
         cfg.ReceiveEndpoint("pricing-queue", ep =>

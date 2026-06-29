@@ -1,4 +1,6 @@
-﻿using Contracts.Job;
+﻿using Abstractions.Interfaces;
+using Contracts.Job;
+using Contracts.Settings;
 using MassTransit;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
@@ -20,6 +22,27 @@ public static class MassTransitConfigurationExtensions
         });
 
         cfg.UseMessageRetry(r => r.Interval(3, TimeSpan.FromSeconds(5)));
-        cfg.Publish<JobStatusUpdatedEvent>(p => p.ExchangeType = ExchangeType.Direct);
+        cfg.Publish<JobStatusUpdatedEvent>(p =>
+        {
+            p.ExchangeType = ExchangeType.Direct;
+        });
+        cfg.Publish<SettingUpdatedEvent>(p =>
+        {
+            p.ExchangeType = ExchangeType.Direct;
+        });
+    }
+
+    public static IRabbitMqReceiveEndpointConfigurator BindForService<TEvent>(
+        this IRabbitMqReceiveEndpointConfigurator ep,
+        IServiceDefinition serviceDefinition,
+        string exchangeType = ExchangeType.Direct) where TEvent : class
+    {
+        ep.Bind<TEvent>(bind =>
+        {
+            bind.ExchangeType = exchangeType;
+            bind.RoutingKey = serviceDefinition.ServiceName;
+        });
+        
+        return ep;
     }
 }

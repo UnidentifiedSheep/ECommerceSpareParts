@@ -20,6 +20,11 @@
     "currency.shortName.not.empty": "Currency short name must not be empty.",
     "currency.shortName.max.length": "Currency short name must be at most 5 characters long.",
     "currency.shortName.min.length": "Currency short name must be at least 2 characters long.",
-    "currency.rate.not.found": "Currency rate can not be found."
+    "currency.rate.not.found": "Currency rate can not be found.",
+    "currency.setting.name": "Currency settings",
+    "currency.setting.description": "Controls currency-related application settings, including the exchange rate provider.",
+    "currency.setting.input.invalid": "Invalid currency settings data was provided.",
+    "currency.setting.rate.provider.name": "Exchange rate provider",
+    "currency.setting.rate.provider.description": "Provider used to update currency exchange rates."
   }
 }
