@@ -1,16 +1,16 @@
+using System.Text.Json.Serialization;
 using Api.Common.Extensions;
 using Enums;
 using Main.Application.Dtos.Users;
 using Main.Application.Handlers.Users;
 using Main.Application.Handlers.Users.ChangeUserDiscount;
+using Main.Application.Handlers.Users.EditUserInfo;
 using Main.Application.Handlers.Users.GetUserDiscount;
 using Main.Application.Handlers.Users.GetUserFullInfo;
 using Mapster;
 using MediatR;
 
 namespace Main.Api.EndPoints.Users;
-
-public record ChangeDiscountForUserRequest(decimal NewDiscountRate);
 
 public record CreateMailForUserRequest(string MailBox, string? Password, string? Comment);
 
@@ -24,42 +24,22 @@ public record GetUserFullInfoResponse(
     IReadOnlyList<string> Roles,
     IReadOnlyList<string> Permissions);
 
+public record EditUserInfoRequest
+{
+    [JsonPropertyName("userInfo")]
+    public required UserInfoDto UserInfo { get; init; }
+}
+
+public record EditUserInfoResponse
+{
+    [JsonPropertyName("userInfo")]
+    public required UserInfoDto UserInfo { get; init; }
+}
+
 public static class UserInfoEndPoints
 {
     public static RouteGroupBuilder MapUserInfoEndPoints(this RouteGroupBuilder users)
     {
-        users.MapPatch("/{userId:guid}/discount/", async (
-                ISender sender,
-                Guid userId,
-                ChangeDiscountForUserRequest request,
-                CancellationToken cancellationToken) =>
-            {
-                await sender.Send(new ChangeUserDiscountCommand(userId, request.NewDiscountRate), cancellationToken);
-                return Results.Ok();
-            })
-            .WithName("ChangeUserDiscount")
-            .WithSummary("Изменить скидку пользователя")
-            .WithDescription("Изменение скидки пользователя")
-            .WithDisplayName("Поменять скидку")
-            .Accepts<ChangeDiscountForUserRequest>(false, "application/json")
-            .Produces(StatusCodes.Status200OK)
-            .ProducesProblem(StatusCodes.Status400BadRequest)
-            .ProducesProblem(StatusCodes.Status404NotFound)
-            .RequireAnyPermission(PermissionCodes.USERS_DISCOUNT_CREATE);
-
-        users.MapGet("/{id:guid}/discount", async (ISender sender, Guid id, CancellationToken token) =>
-            {
-                var result = await sender.Send(new GetUserDiscountQuery(id), token);
-                return Results.Ok(new GetUserDiscountResponse(result.Discount ?? 0));
-            })
-            .WithName("GetUserDiscount")
-            .WithSummary("Получить скидку пользователя")
-            .WithDescription("Получение скидки пользователя")
-            .WithDisplayName("Получение скидки пользователя")
-            .Produces<GetUserDiscountResponse>()
-            .ProducesProblem(StatusCodes.Status404NotFound)
-            .RequireAnyPermission(PermissionCodes.USERS_DISCOUNT_GET);
-
         users.MapPost("/{userId}/mail/corporate", async (
                 ISender sender,
                 string userId,
@@ -97,6 +77,27 @@ public static class UserInfoEndPoints
             .Produces<GetUserFullInfoResponse>()
             .ProducesProblem(StatusCodes.Status404NotFound)
             .RequireAnyPermission(PermissionCodes.USERS_INFO_GET);
+        
+        users.MapPut("/{id:guid}/info", async (
+                ISender sender, 
+                Guid id, 
+                EditUserInfoRequest request,
+                CancellationToken token) =>
+            {
+                var result = await sender.Send(new EditUserInfoCommand(id, request.UserInfo), token);
+                return Results.Ok(new EditUserInfoResponse
+                {
+                    UserInfo = result.UserInfo
+                });
+            })
+            .WithName("EditUserInfo")
+            .WithSummary("Редактирование информации пользователя")
+            .WithDescription("Редактирование информации пользователя")
+            .WithDisplayName("Редактирование информации пользователя")
+            .Produces<EditUserInfoResponse>()
+            .ProducesProblem(StatusCodes.Status404NotFound)
+            .ProducesProblem(StatusCodes.Status400BadRequest)
+            .RequireAnyPermission(PermissionCodes.USERS_CREATE);
 
         return users;
     }
