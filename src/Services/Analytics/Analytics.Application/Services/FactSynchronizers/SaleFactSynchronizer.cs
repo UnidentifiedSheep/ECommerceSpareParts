@@ -1,10 +1,10 @@
 using System.Net;
 using Abstractions.Interfaces.Persistence;
+using Analytics.Application.Interfaces.Repositories;
 using Analytics.Application.Interfaces.Services.FactSynchronizers;
 using Analytics.Application.Interfaces.Services.Metrics;
 using Analytics.Application.Models;
 using Analytics.Entities;
-using Application.Common.Interfaces.Repositories;
 using Attributes;
 using Internal.Integration.Core.Interfaces.Main;
 using Internal.Integration.Core.Models.Main.Sale;
@@ -14,7 +14,7 @@ namespace Analytics.Application.Services.FactSynchronizers;
 
 public class SaleFactSynchronizer(
     IMainClient mainClient,
-    IRepository<SalesFact, Guid> repository,
+    ISaleFactRepository repository,
     IUnitOfWork unitOfWork,
     ITagsService tagsService,
     ILogger<IFactSynchronizer<SalesFact, Guid>> logger) : IFactSynchronizer<SalesFact, Guid>
@@ -36,14 +36,7 @@ public class SaleFactSynchronizer(
         var synchronizationStartedAt = DateTime.UtcNow;
 
         var response = await mainClient.SaleNode.GetFullSale(id, cancellationToken);
-        var dbFact = await repository.FirstOrDefaultAsync(
-            Criteria<SalesFact>
-                .New()
-                .Where(x => x.Id == id)
-                .Include(x => x.SaleContents)
-                .Track()
-                .Build(),
-            cancellationToken);
+        var dbFact = await repository.GetFullSalesFact(id, cancellationToken);
 
         if (synchronizationStartedAt <= dbFact?.ProcessedAt)
         {
@@ -74,13 +67,25 @@ public class SaleFactSynchronizer(
 
         var sale = fromMain.Sale;
         var contents = fromMain.Contents.Select(x =>
-            SaleContent.Create(
+        {
+            var details = x.Details.Select(detail =>
+                SaleContentDetail.Create(
+                    detail.Id,
+                    x.Id,
+                    detail.Currency.Id,
+                    detail.BuyPrice,
+                    detail.Count,
+                    detail.PurchaseDatetime));
+
+            return SaleContent.Create(
                 x.Id,
                 sale.Id,
                 x.Product.Id,
                 x.Price,
                 x.Count,
-                x.Discount));
+                x.Discount,
+                details);
+        });
 
         if (dbFact is null)
         {

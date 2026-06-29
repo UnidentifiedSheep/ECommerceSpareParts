@@ -30,5 +30,15 @@ public class SaleContentConfiguration : IEntityTypeConfiguration<SaleContent>
         builder.HasOne(d => d.Sale).WithMany(p => p.SaleContents)
             .HasForeignKey(d => d.SaleId)
             .HasConstraintName("sale_contents_sales_fact_id_fk");
+
+        builder.HasMany(e => e.Details)
+            .WithOne(e => e.SaleContent)
+            .HasForeignKey(e => e.SaleContentId)
+            .OnDelete(DeleteBehavior.Cascade)
+            .HasConstraintName("sale_content_detail_sale_content_id_fk");
+
+        builder.Navigation(e => e.Details)
+            .HasField("_details")
+            .UsePropertyAccessMode(PropertyAccessMode.Field);
     }
 }

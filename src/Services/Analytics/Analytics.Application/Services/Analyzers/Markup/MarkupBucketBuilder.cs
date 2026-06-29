@@ -1,6 +1,6 @@
 namespace Analytics.Application.Services.Analyzers.Markup;
 
-public sealed class MarkupBucketBuilder //TODO: gonna be used in future.
+public sealed class MarkupBucketBuilder
 {
     public decimal FromCost { get; private set; }
     public decimal ToCost { get; private set; }
