@@ -1,6 +1,7 @@
 using Analytics.Application.Interfaces.Repositories;
 using Analytics.Entities;
 using Analytics.Persistence.Context;
+using Application.Common.Interfaces.Repositories;
 using Microsoft.EntityFrameworkCore;
 using Persistence.Interfaces;
 using Persistence.Repository;

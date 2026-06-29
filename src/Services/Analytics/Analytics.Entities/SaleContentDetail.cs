@@ -16,7 +16,7 @@ public class SaleContentDetail : Entity<SaleContentDetail, int>
 
     public int CurrencyId { get; private set; }
 
-    public decimal? BuyPrice { get; private set; }
+    public decimal BuyPrice { get; private set; }
 
     public int Count { get; private set; }
 
@@ -28,7 +28,7 @@ public class SaleContentDetail : Entity<SaleContentDetail, int>
         int id,
         int saleContentId,
         int currencyId,
-        decimal? buyPrice,
+        decimal buyPrice,
         int count,
         DateTime purchaseDate)
     {
@@ -45,7 +45,7 @@ public class SaleContentDetail : Entity<SaleContentDetail, int>
 
     public void Update(
         int currencyId,
-        decimal? buyPrice,
+        decimal buyPrice,
         int count,
         DateTime purchaseDate)
     {
