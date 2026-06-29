@@ -10,7 +10,7 @@ public class MarkupRangeAnalyzer(
     private const int BatchSize = 1000;
     private const double MaxStdDev = 0.08;
     private const decimal MaxCostRatio = 1.5m;
-    private const decimal MinAllowedMarkup = -0.5m;
+    private const decimal MinAllowedMarkup = 0.01m;
     private const decimal MaxAllowedMarkup = 3m;
     
     public const string AnalyzerSystemName = nameof(MarkupRangeAnalyzer);

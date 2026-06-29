@@ -14,6 +14,8 @@ public class MarkupAnalyzedConsumer(
 {
     public async Task Consume(ConsumeContext<MarkupAnalyzedEvent> context)
     {
+        if (context.Message.Ranges.Count == 0) return;
+        
         var baseCurrencyId = (await settingsService.GetOrDefault<CurrencySetting>())
             .Data.BaseCurrencyId;
         
