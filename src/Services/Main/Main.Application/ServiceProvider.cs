@@ -10,7 +10,6 @@ using Application.Common.Services.Settings;
 using Application.Common.Validators;
 using Main.Application.Configs;
 using Main.Application.Handlers.Users.GetUserDiscount;
-using Main.Application.HangFireTasks;
 using Main.Application.Interfaces.Logistics;
 using Main.Application.Interfaces.Services;
 using Main.Application.Interfaces.Services.Currency;
@@ -43,7 +42,6 @@ public static class ServiceProvider
             .WithSystemTextJsonSerializer();
 
         collection.AddSingleton<IJwtGenerator, JwtGenerator>();
-        collection.AddSingleton<UpdateCurrencyRate>();
 
         collection.AddScoped<ICurrencyConverter, CurrencyConverter>();
 

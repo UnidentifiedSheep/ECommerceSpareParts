@@ -17,7 +17,6 @@ using Mail;
 using Main.Api;
 using Main.Application;
 using Main.Application.Consumers;
-using Main.Application.HangFireTasks;
 using Main.Cache;
 using Main.Persistence;
 using Main.Persistence.Context;
