@@ -10,6 +10,8 @@ public class ProductPurchasesMetricCalculator(
     IRepository<PurchasesFact, Guid> repository,
     ICurrencyConverter currencyConverter) : MetricCalculatorBase<ProductPurchasesMetric>
 {
+    private const int BatchSize = 1000;
+
     public override async Task CalculateMetric(
         ProductPurchasesMetric metric,
         CancellationToken cancellationToken = default)
@@ -26,37 +28,50 @@ public class ProductPurchasesMetricCalculator(
 
         var (start, end) = await WithTimer(async () =>
         {
-            await foreach (var fact in repository
-                               .AsyncEnumerable(GetCriteria(metric))
-                               .WithCancellation(cancellationToken))
-            foreach (var item in fact.PurchaseContents)
+            var lastId = Guid.Empty;
+            while (true)
             {
-                if (item.ProductId != metric.ProductId)
-                    continue;
-
-                var priceDecimal = await currencyConverter.ConvertToBaseAsync(
-                    item.Price,
-                    fact.CurrencyId,
+                var facts = await repository.ListAsync(
+                    GetCriteria(metric, lastId), 
                     cancellationToken);
-                var quantity = item.Count;
+                if (facts.Count == 0)
+                    break;
 
-                if (quantity <= 0)
-                    continue;
+                foreach (var fact in facts)
+                foreach (var item in fact.PurchaseContents)
+                {
+                    if (item.ProductId != metric.ProductId)
+                        continue;
 
-                var price = (double)priceDecimal;
+                    var priceDecimal = await currencyConverter.ConvertToBaseAsync(
+                        item.Price,
+                        fact.CurrencyId,
+                        cancellationToken);
+                    var quantity = item.Count;
 
-                if (priceDecimal < minPrice) minPrice = priceDecimal;
-                if (priceDecimal > maxPrice) maxPrice = priceDecimal;
+                    if (quantity <= 0)
+                        continue;
 
-                totalAmount += priceDecimal * quantity;
-                totalQuantity += quantity;
+                    var price = (double)priceDecimal;
 
-                count += quantity;
+                    if (priceDecimal < minPrice) minPrice = priceDecimal;
+                    if (priceDecimal > maxPrice) maxPrice = priceDecimal;
 
-                var delta = price - mean;
-                mean += delta * quantity / count;
-                var delta2 = price - mean;
-                m2 += quantity * delta * delta2;
+                    totalAmount += priceDecimal * quantity;
+                    totalQuantity += quantity;
+
+                    count += quantity;
+
+                    var delta = price - mean;
+                    mean += delta * quantity / count;
+                    var delta2 = price - mean;
+                    m2 += quantity * delta * delta2;
+                }
+
+                if (facts.Count < BatchSize)
+                    break;
+
+                lastId = facts[^1].Id;
             }
         });
 
@@ -83,12 +98,15 @@ public class ProductPurchasesMetricCalculator(
         metric.CompleteRecalculation();
     }
     
-    private static Criteria<PurchasesFact> GetCriteria(ProductPurchasesMetric metric)
+    private static Criteria<PurchasesFact> GetCriteria(ProductPurchasesMetric metric, Guid lastId)
     {
         return Criteria<PurchasesFact>.New()
             .Where(x => x.PurchaseContents.Any(z => z.ProductId == metric.ProductId)
-                        && metric.RangeStart <= x.CreatedAt && x.CreatedAt <= metric.RangeEnd)
+                        && metric.RangeStart <= x.CreatedAt && x.CreatedAt <= metric.RangeEnd
+                        && x.Id > lastId)
             .Include(x => x.PurchaseContents)
+            .OrderByAsc(x => x.Id)
+            .Size(BatchSize)
             .Build();
     }
 }
