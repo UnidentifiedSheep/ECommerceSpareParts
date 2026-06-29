@@ -1,8 +1,7 @@
-﻿using Domain.CommonEntities;
+using Domain.CommonEntities;
 using Domain.Interfaces;
-using Enums;
 
-namespace Main.Entities.Setting;
+namespace Pricing.Entities.Settings;
 
 public class CurrencySetting : Setting<CurrencySettingData>, ISetting<CurrencySetting>
 {
@@ -21,5 +20,4 @@ public class CurrencySetting : Setting<CurrencySettingData>, ISetting<CurrencySe
 public record CurrencySettingData
 {
     public int BaseCurrencyId { get; init; } = 1;
-    public ExchangeRateProvider RateProvider { get; init; } = ExchangeRateProvider.Cbr;
 }

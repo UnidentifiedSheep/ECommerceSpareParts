@@ -2,6 +2,15 @@
   "locale": "tr",
   "keyValues": {
     "markup.group.not.found": "Kâr marjı grubu bulunamadı.",
-    "current.markup.group.can.not.be.deleted": "Şu anda kullanılan kâr marjı grubu silinemez. Önce başka bir grup seçin."
+    "current.markup.group.can.not.be.deleted": "Şu anda kullanılan kâr marjı grubu silinemez. Önce başka bir grup seçin.",
+    "markup.group.required": "Kâr marjı grubu verisi zorunludur.",
+    "markup.group.id.must.be.positive": "Kâr marjı grubu kimliği 0'dan büyük olmalıdır.",
+    "markup.group.name.max.length": "Kâr marjı grubu adı 128 karakteri aşmamalıdır.",
+    "markup.group.currency.id.must.be.positive": "Kâr marjı grubu para birimi kimliği 0'dan büyük olmalıdır.",
+    "markup.group.ranges.required": "Kâr marjı grubu en az bir aralık içermelidir.",
+    "markup.range.start.must.not.be.negative": "Kâr marjı aralığı başlangıcı negatif olmamalıdır.",
+    "markup.range.end.must.not.be.negative": "Kâr marjı aralığı sonu negatif olmamalıdır.",
+    "markup.range.end.must.be.greater.than.start": "Kâr marjı aralığı sonu başlangıcından büyük olmalıdır.",
+    "markup.range.markup.must.not.be.negative": "Kâr marjı değeri negatif olmamalıdır."
   }
 }

@@ -4,8 +4,8 @@ using Api.Common.Extensions;
 using Application.Common.Backplane;
 using Cache;
 using Carter;
+using Contracts.Analytics;
 using Contracts.Currency;
-using Contracts.Markup;
 using Contracts.Settings;
 using Internal.Integration.Di;
 using Localization.Domain.Extensions;
@@ -63,13 +63,10 @@ builder.Services.AddMassTransit(x =>
             ep.Bind<BackplaneMessage>();
             
 
-            ep.ConfigureConsumer<MarkupCurrencyRatesChangedConsumer>(context);
-            ep.Bind<CurrencyRateChangedEvent>();
-
+            ep.ConfigureConsumer<MarkupRangesRefreshRequestedConsumer>(context);
+            
+            ep.Bind<MarkupRangesRefreshRequestedEvent>();
             ep.Bind<SettingChangedEvent>();
-            ep.Bind<MarkupGroupChangedEvent>();
-            ep.Bind<MarkupGroupGeneratedEvent>();
-            ep.Bind<MarkupRangesUpdatedEvent>();
         });
 
         cfg.ReceiveEndpoint("pricing-queue", ep =>
@@ -77,6 +74,7 @@ builder.Services.AddMassTransit(x =>
             ep.Durable = true;
             
             ep.ConfigureConsumer<CurrencyRatesChangedConsumer>(context);
+            ep.ConfigureConsumer<MarkupAnalyzedConsumer>(context);
         });
     });
 });

@@ -1,3 +1,4 @@
+using Contracts.Analytics;
 using Contracts.Currency;
 using MassTransit;
 using Pricing.Application.Interfaces;
@@ -11,6 +12,8 @@ public class CurrencyRatesChangedConsumer(
     public async Task Consume(ConsumeContext<CurrencyRateChangedEvent> context)
     {
         foreach (var (id, _) in context.Message.Rates)
-            await cacheRepository.InvalidateCurrencyRate(id);
+            await cacheRepository.InvalidateCurrencyRate(id, context.CancellationToken);
+
+        await context.Publish(new MarkupRangesRefreshRequestedEvent(), context.CancellationToken);
     }
 }
