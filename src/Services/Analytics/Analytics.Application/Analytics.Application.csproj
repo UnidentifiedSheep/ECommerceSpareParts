@@ -21,4 +21,8 @@
         <PackageReference Include="MassTransit" Version="8.5.8"/>
     </ItemGroup>
 
+    <ItemGroup>
+      <Folder Include="Services\Analyzers\Trend\" />
+    </ItemGroup>
+
 </Project>
