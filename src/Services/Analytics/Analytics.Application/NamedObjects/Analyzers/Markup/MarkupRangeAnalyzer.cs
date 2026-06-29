@@ -80,7 +80,7 @@ public class MarkupRangeAnalyzer(
         return query.Select(x => new SaleContentMarkupRow
         {
             Id = x.Id,
-            SaleUnitPriceBase = x.PriceInBaseCurrency,
+            SaleUnitPriceBase = x.PriceInBaseCurrency / (1 - x.Discount),
             AvgBuyPriceBase =
                 x.Details.Sum(d => d.BuyPriceInBaseCurrency * d.Count) /
                 x.Details.Sum(d => d.Count)
