@@ -28,14 +28,11 @@ public record ProducerImportInputState : IInputState
     [JsonPropertyName("fileName")]
     public required string FileName { get; init; }
 
-    public static string GetAndValidateState(string jsonState)
+    public void ValidateState()
     {
-        var desir = JsonSerializer.Deserialize<ProducerImportInputState>(jsonState)
-            ?? throw new InvalidOperationException("Invalid state");
-        if (!desir.FileName.EndsWith(".csv"))
+        if (!FileName.EndsWith(".csv"))
             throw new InvalidOperationException("Producer import state error. " +
                                                 "File name should end with .csv");
-        return jsonState;
     }
 }
 

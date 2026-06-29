@@ -21,11 +21,5 @@ public record MetricCalculationInputState : IInputState
     [JsonPropertyName("metricId")]
     public required Guid MetricId { get; init; }
 
-    public static string GetAndValidateState(string jsonState)
-    {
-        _ = JsonSerializer.Deserialize<MetricCalculationState>(jsonState)
-                    ?? throw new InvalidOperationException("Invalid state");
-        
-        return jsonState;
-    }
+    public void ValidateState() { }
 }

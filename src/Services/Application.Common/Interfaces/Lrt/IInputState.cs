@@ -2,5 +2,5 @@
 
 public interface IInputState
 {
-    public static abstract string GetAndValidateState(string jsonState);
+    void ValidateState();
 }

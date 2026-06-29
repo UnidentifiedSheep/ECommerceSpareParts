@@ -30,14 +30,9 @@ public record MarkupCalculationInputState : IInputState
     [JsonPropertyName("rangeEnd")]
     public DateTime? RangeEnd { get; init; }
 
-    public static string GetAndValidateState(string jsonState)
+    public void ValidateState()
     {
-        var obj = JsonSerializer.Deserialize<MarkupCalculationState>(jsonState)
-            ?? throw new InvalidInputException("markup.calculation.input.invalid");
-
-        if (obj.RangeStart is not null && obj.RangeEnd is not null && obj.RangeStart > obj.RangeEnd)
+        if (RangeStart is not null && RangeEnd is not null && RangeStart > RangeEnd)
             throw new InvalidInputException("markup.calculation.range.start.must.be.before.or.equal.end");
-        
-        return jsonState;
     }
 }
