@@ -56,6 +56,7 @@ public class UsersEndPoints : ICarterModule
         users.MapUserFinancialEndPoints();
         users.MapUserPermissionEndPoints();
         users.MapUserEmailEndPoints();
+        users.MapUserRoleEndPoints();
 
         users.MapPost("/", async (ISender sender, CreateUserRequest request, CancellationToken cancellationToken) =>
             {

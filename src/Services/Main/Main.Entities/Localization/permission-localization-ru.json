@@ -151,6 +151,8 @@
     "permissions.users.info.get.description": "Право на получение информации о пользователе.",
     "permissions.users.permissions.create.name": "Добавление прав пользователю",
     "permissions.users.permissions.create.description": "Право на добавление прав доступа пользователю.",
+    "permissions.users.roles.create.name": "Добавление роли пользователю",
+    "permissions.users.roles.create.description": "Право на добавление ролей пользователю.",
     "permissions.users.discount.create.name": "Редактирование скидки пользователя",
     "permissions.users.discount.create.description": "Право на редактирование скидки пользователя.",
     "permissions.users.discount.get.name": "Просмотр скидки пользователя",
