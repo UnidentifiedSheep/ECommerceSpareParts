@@ -1,3 +1,4 @@
+using System.Text.Json.Serialization;
 using Abstractions.Interfaces;
 using Api.Common.Extensions;
 using Api.Common.Models.Requests;
@@ -18,11 +19,22 @@ namespace Main.Api.EndPoints.Users;
 
 public record CreateUserRequest
 {
+    [JsonPropertyName("userName")]
     public required string UserName { get; init; }
+    
+    [JsonPropertyName("password")]
     public required string Password { get; init; }
+    
+    [JsonPropertyName("userInfo")]
     public required UserInfoDto UserInfo { get; init; }
+    
+    [JsonPropertyName("emails")]
     public required IEnumerable<EmailDto> Emails { get; init; }
-    public required IEnumerable<string> Phones { get; init; }
+    
+    [JsonPropertyName("phones")]
+    public required IEnumerable<UserPhoneDto> Phones { get; init; }
+    
+    [JsonPropertyName("roles")]
     public required IEnumerable<string> Roles { get; init; }
 }
 
@@ -65,6 +77,7 @@ public class UsersEndPoints : ICarterModule
                     request.Password,
                     request.UserInfo,
                     request.Emails,
+                    request.Phones,
                     request.Roles), cancellationToken);
                 return Results.Created($"users/{result.User.Id}", new CreateUserResponse(result.User));
             })

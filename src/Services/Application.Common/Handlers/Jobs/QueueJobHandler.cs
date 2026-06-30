@@ -45,10 +45,10 @@ public sealed class QueueJobHandler(
         foreach (var item in request.Jobs)
         {
             var lrt = registry.GetBySystemName(item.SystemName);
-            var validatedState = InputStateValidator.GetAndValidate(lrt.InputType, item.InputState);
+            lrt.ValidateState(item.InputState);
 
             var job = Job.Create(lrt.SystemName, item.MaxAttempts);
-            job.SetState(validatedState);
+            job.SetState(item.InputState);
             toAdd.Add(job);
         }
         

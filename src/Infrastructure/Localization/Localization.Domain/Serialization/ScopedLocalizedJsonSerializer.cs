@@ -1,4 +1,5 @@
 using System.Collections.Concurrent;
+using System.Reflection;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using System.Text.Json.Serialization.Metadata;
@@ -12,6 +13,7 @@ public sealed class ScopedLocalizedJsonSerializer(
     ) : IScopedLocalizedJsonSerializer
 {
     private static readonly ConcurrentDictionary<Type, JsonFieldPlan[]> MetadataCache = new();
+    private static readonly ConcurrentDictionary<Type, CsvColumnPlan[]?> CsvSchemaCache = new();
 
     private static readonly JsonSerializerOptions MetadataOptions = new(JsonSerializerDefaults.Web)
     {
@@ -39,8 +41,12 @@ public sealed class ScopedLocalizedJsonSerializer(
             .GetOrAdd(type, BuildFieldPlans)
             .Select(ToFieldMetadata)
             .ToArray();
+        var csvSchema = CsvSchemaCache
+            .GetOrAdd(type, BuildCsvSchemaPlan)?
+            .Select(ToCsvColumnMetadata)
+            .ToArray();
 
-        return JsonSerializer.Serialize(new JsonObjectMetadata(fields), MetadataOptions);
+        return JsonSerializer.Serialize(new JsonObjectMetadata(fields, csvSchema), MetadataOptions);
     }
 
     private static JsonFieldPlan[] BuildFieldPlans(Type type)
@@ -73,6 +79,31 @@ public sealed class ScopedLocalizedJsonSerializer(
             .ToArray();
     }
 
+    private static CsvColumnPlan[]? BuildCsvSchemaPlan(Type type)
+    {
+        var schemaAttr = type.GetCustomAttribute<CsvSchemaAttribute>();
+        if (schemaAttr is null)
+            return null;
+
+        return schemaAttr.RowType
+            .GetProperties(BindingFlags.Public | BindingFlags.Instance)
+            .Select(prop =>
+            {
+                var nameAttr = prop.GetCustomAttributes(true)
+                    .FirstOrDefault(x => x.GetType().FullName == "CsvHelper.Configuration.Attributes.NameAttribute");
+                var aliases = GetCsvNameAliases(nameAttr);
+
+                return new CsvColumnPlan(
+                    prop.Name,
+                    aliases.Length == 0 ? [prop.Name] : aliases,
+                    GetJsonType(prop.PropertyType),
+                    IsCsvColumnRequired(prop),
+                    prop.GetCustomAttribute<LocalizedJsonFieldNameAttribute>()?.Key,
+                    prop.GetCustomAttribute<LocalizedJsonFieldDescriptionAttribute>()?.Key);
+            })
+            .ToArray();
+    }
+
     private JsonFieldMetadata ToFieldMetadata(JsonFieldPlan plan)
     {
         return new JsonFieldMetadata(
@@ -85,6 +116,17 @@ public sealed class ScopedLocalizedJsonSerializer(
             plan.Accepts,
             plan.DependsOnEntity,
             plan.DependsOnField);
+    }
+
+    private CsvColumnMetadata ToCsvColumnMetadata(CsvColumnPlan plan)
+    {
+        return new CsvColumnMetadata(
+            plan.PropertyName,
+            plan.Names,
+            plan.Type,
+            plan.Required,
+            GetLocalizedOrDefault(plan.LabelKey),
+            GetLocalizedOrDefault(plan.DescriptionKey));
     }
 
     private string? GetLocalizedOrDefault(string? key)
@@ -103,6 +145,24 @@ public sealed class ScopedLocalizedJsonSerializer(
             .GetCustomAttributes(typeof(T), true)
             .OfType<T>()
             .FirstOrDefault();
+    }
+
+    private static string[] GetCsvNameAliases(object? nameAttribute)
+    {
+        if (nameAttribute is null)
+            return [];
+
+        var names = nameAttribute.GetType()
+            .GetProperty("Names", BindingFlags.Public | BindingFlags.Instance)?
+            .GetValue(nameAttribute) as string[];
+
+        return names ?? [];
+    }
+
+    private static bool IsCsvColumnRequired(PropertyInfo prop)
+    {
+        return prop.GetCustomAttributes(true)
+            .All(x => x.GetType().FullName != "CsvHelper.Configuration.Attributes.OptionalAttribute");
     }
 
     private static string GetJsonType(Type type)
@@ -127,7 +187,10 @@ public sealed class ScopedLocalizedJsonSerializer(
         return "object";
     }
 
-    private sealed record JsonObjectMetadata(JsonFieldMetadata[] Fields);
+    private sealed record JsonObjectMetadata(
+        JsonFieldMetadata[] Fields,
+        [property: JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+        CsvColumnMetadata[]? CsvSchema);
 
     private sealed record JsonFieldPlan(
         string Name,
@@ -152,4 +215,20 @@ public sealed class ScopedLocalizedJsonSerializer(
         string? DependsOnEntity,
         [property: JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
         string? DependsOnField);
+
+    private sealed record CsvColumnPlan(
+        string PropertyName,
+        string[] Names,
+        string Type,
+        bool Required,
+        string? LabelKey,
+        string? DescriptionKey);
+
+    private sealed record CsvColumnMetadata(
+        string PropertyName,
+        string[] Names,
+        string Type,
+        bool Required,
+        string? Label,
+        string? Description);
 }

@@ -25,6 +25,14 @@ public sealed class ScopedStringLocalizer(IStringLocalizer stringLocalizer) : IS
         return stringLocalizer.Get(key, _locale.Value);
     }
 
+    public string Get(string key, params object[] arguments)
+    {
+        ObjectDisposedException.ThrowIf(_disposed, this);
+        ArgumentNullException.ThrowIfNull(_locale);
+
+        return stringLocalizer.Get(key, _locale.Value, arguments);
+    }
+
     public bool TryGet(string key, out string? value)
     {
         ObjectDisposedException.ThrowIf(_disposed, this);
@@ -33,8 +41,19 @@ public sealed class ScopedStringLocalizer(IStringLocalizer stringLocalizer) : IS
         return stringLocalizer.TryGet(key, _locale.Value, out value);
     }
 
+    public bool TryGet(string key, out string? value, params object[] arguments)
+    {
+        ObjectDisposedException.ThrowIf(_disposed, this);
+        ArgumentNullException.ThrowIfNull(_locale);
+
+        return stringLocalizer.TryGet(key, _locale.Value, out value, arguments);
+    }
+
     public string? GetOrDefault(string key)
         => TryGet(key, out string? value) ? value : null;
+
+    public string? GetOrDefault(string key, params object[] arguments)
+        => TryGet(key, out string? value, arguments) ? value : null;
 
     public string this[string key] => Get(key);
 

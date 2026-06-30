@@ -48,6 +48,11 @@
     "lifo.storage.content.extract.policy.description": "Сначала списываются последние поступления, затем более ранние",
     "first.cheapest.storage.content.extract.policy.name": "Сначала самые дешёвые",
     "first.cheapest.storage.content.extract.policy.description": "Сначала списываются поступления с наименьшей стоимостью, затем более дорогие",
-    "storage.content.items.required": "Для вычитания со склада требуется чтобы список вычитаемых не был пуст."
+    "storage.content.items.required": "Для вычитания со склада требуется чтобы список вычитаемых не был пуст.",
+    "storage.content.setting.name": "Настройки содержимого склада",
+    "storage.content.setting.description": "Управляет тем, как позиции выбираются и списываются из содержимого склада.",
+    "storage.content.setting.input.invalid": "Переданы некорректные данные настроек содержимого склада.",
+    "storage.content.setting.extraction.policy.name": "Политика списания со склада",
+    "storage.content.setting.extraction.policy.description": "Политика, определяющая какие позиции содержимого склада будут списываться первыми."
   }
 }

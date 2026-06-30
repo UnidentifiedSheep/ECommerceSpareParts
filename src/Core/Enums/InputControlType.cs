@@ -5,5 +5,7 @@ public enum InputControlType
     UploadFile,
     TextField,
     DatePicker,
-    EntitySelector
+    EntitySelector,
+    EnumSelector,
+    NamedObjectSelector,
 }

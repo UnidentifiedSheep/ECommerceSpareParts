@@ -7,6 +7,7 @@ using Api.Common.EndPoints;
 using Api.Common.Extensions;
 using Api.Common.Hubs;
 using Application.Common.Backplane;
+using Application.Common.Consumer;
 using Cache;
 using Carter;
 using Contracts.Auth;
@@ -67,6 +68,7 @@ builder.Services.AddMassTransit(x =>
     x.AddConsumers(Assembly.GetAssembly(typeof(Global)));
     x.AddConsumer<BackplaneConsumer>();
     x.AddConsumer<JobStatusUpdatedConsumer>();
+    x.AddConsumer<SettingUpdatedConsumer>();
 
     x.AddEntityFrameworkOutbox<DContext>(o =>
     {
@@ -77,10 +79,6 @@ builder.Services.AddMassTransit(x =>
     x.UsingRabbitMq((context, cfg) =>
     {
         cfg.ConfigureRabbitMq(context);
-        cfg.Publish<JobStatusUpdatedEvent>(p =>
-        {
-            p.ExchangeType = ExchangeType.Direct;
-        });
 
         cfg.ReceiveEndpoint(uniqQueueName, ep =>
         {
@@ -89,19 +87,13 @@ builder.Services.AddMassTransit(x =>
 
             ep.ConfigureConsumeTopology = false;
 
-            ep.ConfigureConsumer<SettingChangedConsumer>(context);
-            
-            ep.Bind<SettingChangedEvent>();
-            
+            ep.ConfigureConsumer<SettingUpdatedConsumer>(context);
             ep.ConfigureConsumer<BackplaneConsumer>(context);
-            ep.Bind<BackplaneMessage>();
-
             ep.ConfigureConsumer<JobStatusUpdatedConsumer>(context);
-            ep.Bind<JobStatusUpdatedEvent>(bind =>
-            {
-                bind.ExchangeType = ExchangeType.Direct;
-                bind.RoutingKey = ServicesDefinitions.Main.ServiceName;
-            });
+
+            ep.Bind<BackplaneMessage>();
+            ep.BindForService<JobStatusUpdatedEvent>(ServicesDefinitions.Main)
+                .BindForService<SettingUpdatedEvent>(ServicesDefinitions.Main);
         });
 
         cfg.ReceiveEndpoint("main-queue", ep =>

@@ -20,6 +20,11 @@
     "currency.shortName.not.empty": "Para birimi kısa adı boş olmamalıdır.",
     "currency.shortName.max.length": "Para birimi kısa adı en fazla 5 karakter uzunluğunda olmalıdır.",
     "currency.shortName.min.length": "Para birimi kısa adı en az 2 karakter uzunluğunda olmalıdır.",
-    "currency.rate.not.found": "Para birimi kuru bulunamadı."
+    "currency.rate.not.found": "Para birimi kuru bulunamadı.",
+    "currency.setting.name": "Para birimi ayarları",
+    "currency.setting.description": "Döviz kuru sağlayıcısı dahil para birimiyle ilgili uygulama ayarlarını yönetir.",
+    "currency.setting.input.invalid": "Geçersiz para birimi ayarları verisi sağlandı.",
+    "currency.setting.rate.provider.name": "Döviz kuru sağlayıcısı",
+    "currency.setting.rate.provider.description": "Para birimi kurlarını güncellemek için kullanılan sağlayıcı."
   }
 }

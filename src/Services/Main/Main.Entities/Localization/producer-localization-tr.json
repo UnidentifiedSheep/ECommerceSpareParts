@@ -18,6 +18,8 @@
     "producer.other.name.where.used.min.length": "Kullanıldığı yer en az 2 karakter uzunluğunda olmalıdır.",
     "producer.image.too.long": "Resim yolu 255 karakterden kısa olmalıdır.",
     "producer.too.many.errors.while.processing.batch": "Paket işlenirken çok fazla hata oluştu.",
-    "producer.duplicate.name.in.batch": "Pakette yinelenen ad var."
+    "producer.duplicate.name.in.batch": "Pakette yinelenen ad var.",
+    "producer.other.name.duplicate.in.batch": "Pakette yinelenen ek üretici adı var.",
+    "producer.other.name.producer.not.found.in.batch": "Ek ad için üretici bulunamadı."
   }
 }

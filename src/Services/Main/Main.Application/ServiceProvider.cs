@@ -1,3 +1,4 @@
+using Abstractions;
 using Abstractions.Interfaces.Validators;
 using Abstractions.Models;
 using Application.Common;
@@ -69,7 +70,10 @@ public static class ServiceProvider
         collection.AddScoped<ICurrencyRateUpdater, CurrencyRateUpdater>();
         collection.AddScoped<ICurrencyRatesProvider, CurrencyRatesProvider>();
 
-        collection.AddApplicationBase(configuration, typeof(Global).Assembly);
+        collection.AddApplicationBase(
+            serviceDefinition: ServicesDefinitions.Main,
+            configuration: configuration, 
+            assembly: typeof(Global).Assembly);
 
         collection.AddSingleton<IEmailValidator, EmailValidator>();
 

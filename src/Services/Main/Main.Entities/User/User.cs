@@ -104,6 +104,26 @@ public class User : AuditableEntity<User, Guid>, ILinqEntity<User, Guid>
         _emails.Add(userEmail);
     }
 
+    public void AddUserPhone(string phoneNumber, PhoneType phoneType, bool isPrimary, bool isConfirmed)
+    {
+        var normalizedPhone = UserPhone.ToNormalizedPhone(phoneNumber);
+        if (_phones.Any(x => x.NormalizedPhone == normalizedPhone))
+            throw new InvalidInputException("user.have.duplicate.phone");
+        if (isPrimary && _phones.Any(x => x.IsPrimary))
+            throw new InvalidInputException("user.phone.primary.count");
+
+        var userPhone = UserPhone.Create(Id, phoneNumber, phoneType);
+        userPhone.MakePrimary(isPrimary);
+        userPhone.Confirm(isConfirmed);
+        _phones.Add(userPhone);
+    }
+
+    public void RemoveUserPhone(string phoneNumber)
+    {
+        var normalizedPhone = UserPhone.ToNormalizedPhone(phoneNumber);
+        _phones.RemoveAll(x => x.NormalizedPhone == normalizedPhone);
+    }
+
     public void RemoveUserEmail(Email email)
     {
         _emails.RemoveAll(x => x.Email.Value == email.Value);

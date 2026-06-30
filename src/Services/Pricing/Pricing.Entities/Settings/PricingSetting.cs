@@ -16,7 +16,7 @@ public class PricingSetting : Setting<PricingSettingData>, ISetting<PricingSetti
     }
 
     public static string SettingName => "PricingSettings";
-    public static PricingSetting Default { get; } = new(new PricingSettingData());
+    public static PricingSetting Default => new(new PricingSettingData());
 }
 
 public record PricingSettingData

@@ -1,8 +1,15 @@
 ﻿namespace Application.Common.Interfaces.NamedObject;
 
-public interface INamedObjectRegistry<TBaseObject> where TBaseObject : INamedObject
+public interface INamedObjectRegistry<TBaseObject> : INamedObjectRegistry where TBaseObject : INamedObject
 {
-    TBaseObject GetBySystemName(string systemName);
-    TBaseObject? TryGetBySystemName(string systemName);
-    IReadOnlyCollection<TBaseObject> All { get; }
+    new TBaseObject GetBySystemName(string systemName);
+    new TBaseObject? TryGetBySystemName(string systemName);
+    new IReadOnlyCollection<TBaseObject> All { get; }
+}
+
+public interface INamedObjectRegistry
+{
+    INamedObject GetBySystemName(string systemName);
+    INamedObject? TryGetBySystemName(string systemName);
+    IReadOnlyCollection<INamedObject> All { get; }
 }

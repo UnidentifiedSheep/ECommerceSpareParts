@@ -13,6 +13,7 @@ public record GetUserDiscountResponse(decimal Discount);
 public record GetUserFullInfoResponse(
     UserDto User,
     IReadOnlyList<UserEmailDto> Emails,
+    IReadOnlyList<UserPhoneDto> Phones,
     IReadOnlyList<string> Roles,
     IReadOnlyList<string> Permissions);
 
@@ -38,6 +39,7 @@ public static class UserInfoEndPoints
                 return Results.Ok(new GetUserFullInfoResponse(
                     result.User,
                     result.Emails,
+                    result.Phones,
                     result.Roles,
                     result.Permissions));
             })

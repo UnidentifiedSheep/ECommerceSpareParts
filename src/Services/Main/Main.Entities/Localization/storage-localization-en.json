@@ -48,6 +48,11 @@
     "lifo.storage.content.extract.policy.description": "Newest stock is used first, then older stock",
     "first.cheapest.storage.content.extract.policy.name": "First cheapest",
     "first.cheapest.storage.content.extract.policy.description": "Cheapest stock is used first, then more expensive stock",
-    "storage.content.items.required": "Storage contents are required for subtraction."
+    "storage.content.items.required": "Storage contents are required for subtraction.",
+    "storage.content.setting.name": "Storage content settings",
+    "storage.content.setting.description": "Controls how stock is selected and removed from storage content.",
+    "storage.content.setting.input.invalid": "Invalid storage content settings data was provided.",
+    "storage.content.setting.extraction.policy.name": "Stock extraction policy",
+    "storage.content.setting.extraction.policy.description": "Policy used to choose which storage content items are consumed first."
   }
 }

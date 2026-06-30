@@ -3,6 +3,8 @@
   "keyValues": {
     "lrt.producer.import.name": "Üretici içe aktarma",
     "lrt.producer.import.description": "Üreticileri yüklenen bir dosyadan içe aktarır, verileri doğrular ve mevcut kayıtları atlayarak yeni kayıtları ekler.",
+    "lrt.producer.other.names.import.name": "Üretici ek adları içe aktarma",
+    "lrt.producer.other.names.import.description": "Üretici ek adlarını yüklenen bir dosyadan içe aktarır, verileri doğrular, mevcut üreticilerle ilişkilendirir ve mevcut alias kayıtlarını atlar.",
     "lrt.product.import.name": "Ürün içe aktarma",
     "lrt.product.import.description": "Ürünleri yüklenen bir dosyadan içe aktarır, verileri doğrular ve mevcut kayıtları atlayarak yeni kayıtları ekler.",
     "lrt.currency.rates.update.name": "Döviz kuru güncelleme",

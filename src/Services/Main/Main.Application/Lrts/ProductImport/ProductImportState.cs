@@ -21,6 +21,7 @@ public record ProductImportState
     public List<ProductImportError> Errors { get; init; } = [];
 }
 
+[CsvSchema(typeof(ProductImportLrt.NewProductCsvDto))]
 public record ProductImportInputState : IInputState
 {
     [Accepts(".csv")]
@@ -31,14 +32,11 @@ public record ProductImportInputState : IInputState
     [JsonPropertyName("fileName")]
     public required string FileName { get; init; }
 
-    public static string GetAndValidateState(string jsonState)
+    public void ValidateState()
     {
-        var desir = JsonSerializer.Deserialize<ProductImportInputState>(jsonState)
-                    ?? throw new InvalidOperationException("Invalid state");
-        if (!desir.FileName.EndsWith(".csv"))
+        if (!FileName.EndsWith(".csv"))
             throw new InvalidOperationException("Product import state error. " +
                                                 "File name should end with .csv");
-        return jsonState;
     }
 }
 

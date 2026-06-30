@@ -1,18 +1,13 @@
-using System.Globalization;
-using Abstractions;
 using Abstractions.Interfaces;
 using Abstractions.Interfaces.Persistence;
 using Application.Common.Interfaces.Repositories;
-using Application.Common.NamedObject;
-using CsvHelper;
 using CsvHelper.Configuration.Attributes;
-using CsvHelper.TypeConversion;
 using Domain.CommonEntities;
 using Localization.Abstractions.Interfaces;
 using Localization.Domain;
 using Main.Application.Dtos.Producer;
 using Main.Application.Handlers.Producers;
-using Main.Application.Static;
+using Main.Application.Lrts;
 using MassTransit;
 using MediatR;
 using Microsoft.Extensions.Logging;
@@ -29,104 +24,66 @@ public class ProducerImportLrt(
     IPublishEndpoint publisher,
     IScopedStringLocalizer stringLocalizer,
     IOptions<LocalesOptions> localesOptions)
-    : LrtNamedObjectBase(jobRepository, unitOfWork, publisher, logger)
+    : CsvImportLrtBase<ProducerImportState, ProducerImportError, ProducerImportLrt.NewProducerCsvDto, NewProducerDto>(
+        jobRepository,
+        unitOfWork,
+        publisher,
+        logger,
+        s3Service,
+        stringLocalizer,
+        localesOptions)
 {
-    private const int BatchSize = 1000;
-    private const int MaxErrors = 10_000;
-
     public override string SystemName => nameof(ProducerImportLrt);
     public override string NameLocalizationKey => "lrt.producer.import.name";
     public override string DescriptionLocalizationKey => "lrt.producer.import.description";
     public override Type InputType => typeof(ProducerImportInputState);
     public override Type StateType => typeof(ProducerImportState);
 
-    protected override IServiceDefinition ServiceDefinition => ServicesDefinitions.Main;
+    protected override string GetFileName(ProducerImportState state) => state.FileName;
+    protected override int GetCurrentLine(ProducerImportState state) => state.CurrentLine;
+    protected override List<ProducerImportError> GetErrors(ProducerImportState state) => state.Errors;
+    protected override string GetTooManyErrorsLocalizationKey() => "producer.too.many.errors.while.processing.batch";
 
-    protected override async Task DoWork()
+    protected override ProducerImportError CreateError(int rowIdx, string message)
     {
-        stringLocalizer.SetLocale(localesOptions.Value.Default);
-        var state = await GetStateAsync<ProducerImportState>()
-                    ?? throw new InvalidOperationException("Producer import state is empty.");
-
-        await using var stream = await s3Service.DownloadFileAsync(
-            BucketNames.Uploads,
-            state.FileName,
-            CancellationToken);
-
-        using var reader = new StreamReader(stream);
-        using var csv = new CsvReader(reader, CultureInfo.InvariantCulture);
-
-        var rowIdx = 1;
-        var errors = state.Errors;
-        var rowsToAdd = new List<(int idx, NewProducerCsvDto row)>();
-
-        await csv.ReadAsync();
-        csv.ReadHeader();
-
-        while (await csv.ReadAsync())
+        return new ProducerImportError
         {
-            if (rowIdx <= state.CurrentLine)
-            {
-                rowIdx++;
-                continue;
-            }
-
-            if (errors.Count >= MaxErrors)
-            {
-                await UpdateState(state with
-                {
-                    CurrentLine = rowIdx,
-                    Errors = errors
-                });
-
-                Interrupt(stringLocalizer.Get("producer.too.many.errors.while.processing.batch"));
-            }
-
-            NewProducerCsvDto row;
-            try
-            {
-                row = csv.GetRecord<NewProducerCsvDto>();
-            }
-            catch (Exception ex) when (ex is CsvHelperException or TypeConverterException)
-            {
-                errors.Add(new ProducerImportError
-                {
-                    RowIdx = rowIdx,
-                    Message = ex.Message
-                });
-
-                rowIdx++;
-                continue;
-            }
-            
-            rowsToAdd.Add((rowIdx, row));
-
-            if (rowsToAdd.Count >= BatchSize)
-            {
-                await InsertAndClear(rowsToAdd, errors);
-                await UpdateState(state with
-                {
-                    CurrentLine = rowIdx,
-                    Errors = errors
-                });
-            }
-
-            rowIdx++;
-        }
-
-        if (rowsToAdd.Count > 0)
-            await InsertAndClear(rowsToAdd, errors);
-
-        await UpdateState(state with
-        {
-            CurrentLine = rowIdx - 1,
-            Errors = errors
-        });
+            RowIdx = rowIdx,
+            Message = message
+        };
     }
 
+    protected override ProducerImportState WithUpdatedState(
+        ProducerImportState state,
+        int currentLine,
+        List<ProducerImportError> errors)
+    {
+        return state with
+        {
+            CurrentLine = currentLine,
+            Errors = errors
+        };
+    }
 
-    private async Task InsertAndClear(
-        List<(int idx, NewProducerCsvDto row)> producers,
+    protected override bool TryProcessRow(
+        int rowIdx,
+        NewProducerCsvDto row,
+        ProducerImportState state,
+        List<ProducerImportError> errors,
+        out NewProducerDto item)
+    {
+        item = new NewProducerDto
+        {
+            Name = row.Name,
+            Description = row.Description
+        };
+
+        return true;
+    }
+
+    protected override async Task ProcessBatch(
+        List<(int idx, NewProducerDto item)> producers,
+        ProducerImportState state,
         List<ProducerImportError> errors)
     {
         if (producers.Count == 0) return;
@@ -135,11 +92,7 @@ public class ProducerImportLrt(
         
         var result = (await sender.Send(
             new CreateProducerBatchCommand(
-                producers.Select(x => new NewProducerDto
-                {
-                    Name = x.row.Name,
-                    Description = x.row.Description
-                })),
+                producers.Select(x => x.item)),
             CancellationToken));
 
         foreach (var (idx, message) in result.Errors)
@@ -147,7 +100,9 @@ public class ProducerImportLrt(
             errors.Add(new ProducerImportError
             {
                 Message = message,
-                RowIdx = firstIdx + idx
+                RowIdx = idx >= 0 && idx < producers.Count
+                    ? producers[idx].idx
+                    : firstIdx + idx
             });
         }
         
@@ -165,7 +120,7 @@ public class ProducerImportLrt(
         producers.Clear();
     }
     
-    private record NewProducerCsvDto
+    public record NewProducerCsvDto
     {
         [Name("Name")]
         public required string Name { get; init; }

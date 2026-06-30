@@ -1,4 +1,5 @@
-﻿using Application.Common;
+﻿using Abstractions;
+using Application.Common;
 using Application.Common.Extensions;
 using Application.Common.Interfaces.Currency;
 using Application.Common.Services.Currency;
@@ -17,7 +18,11 @@ public static class ServiceProvider
         this IServiceCollection collection,
         IConfiguration configuration)
     {
-        collection.AddApplicationBase(configuration, typeof(Global).Assembly)
+        collection.AddApplicationBase(
+                serviceDefinition: ServicesDefinitions.Pricing,
+                configuration: configuration, 
+                assembly: typeof(Global).Assembly)
+            .AddNamedObjects()
             .AddFusionCache()
             .WithRegisteredDistributedCache()
             .WithRegisteredBackplane()

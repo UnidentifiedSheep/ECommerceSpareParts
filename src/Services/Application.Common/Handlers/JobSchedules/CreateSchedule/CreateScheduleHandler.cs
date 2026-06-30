@@ -1,7 +1,9 @@
+using System.Text.Json;
 using Abstractions.Interfaces.Persistence;
 using Application.Common.Dtos;
 using Application.Common.Extensions;
 using Application.Common.Interfaces.Cqrs;
+using Application.Common.Interfaces.Lrt;
 using Application.Common.Interfaces.NamedObject;
 using Application.Common.NamedObject;
 using Application.Common.Projections;
@@ -27,15 +29,13 @@ public class CreateScheduleHandler(
         CancellationToken cancellationToken)
     {
         var lrt = registry.GetBySystemName(request.NewSchedule.JobSystemName);
-        var validatedState = InputStateValidator.GetAndValidate(
-            lrt.InputType, 
-            request.NewSchedule.InputState);
+        lrt.ValidateState(request.NewSchedule.InputState);
         
         var schedule = JobSchedule.Create(
             request.NewSchedule.Name,
             request.NewSchedule.Description,
             lrt.SystemName,
-            validatedState,
+            request.NewSchedule.InputState,
             maxAttempts: request.NewSchedule.MaxAttempts,
             cron: request.NewSchedule.Cron);
 

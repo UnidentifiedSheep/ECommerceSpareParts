@@ -12,9 +12,11 @@ using Api.Common.Consumers;
 using Api.Common.Extensions;
 using Api.Common.Hubs;
 using Application.Common.Backplane;
+using Application.Common.Consumer;
 using Cache;
 using Carter;
 using Contracts.Job;
+using Contracts.Settings;
 using Internal.Integration.Di;
 using Localization.Domain.Extensions;
 using MassTransit;
@@ -59,6 +61,7 @@ builder.Services.AddMassTransit(x =>
     x.AddConsumers(Assembly.GetAssembly(typeof(CurrencyRatesChangedConsumer)));
     x.AddConsumer<BackplaneConsumer>();
     x.AddConsumer<JobStatusUpdatedConsumer>();
+    x.AddConsumer<SettingUpdatedConsumer>();
     x.AddConsumer<MetricCalculationStatusUpdatedConsumer>();
 
     x.AddEntityFrameworkOutbox<DContext>(o =>
@@ -70,10 +73,6 @@ builder.Services.AddMassTransit(x =>
     x.UsingRabbitMq((context, cfg) =>
     {
         cfg.ConfigureRabbitMq(context);
-        cfg.Publish<JobStatusUpdatedEvent>(p =>
-        {
-            p.ExchangeType = ExchangeType.Direct;
-        });
 
         cfg.ReceiveEndpoint(uniqQueueName, ep =>
         {
@@ -88,12 +87,10 @@ builder.Services.AddMassTransit(x =>
             ep.Bind<MetricCalculationStatusUpdatedConsumer>();
             
             ep.ConfigureConsumer<JobStatusUpdatedConsumer>(context);
+            ep.ConfigureConsumer<SettingUpdatedConsumer>(context);
             
-            ep.Bind<JobStatusUpdatedEvent>(bind =>
-            {
-                bind.ExchangeType = ExchangeType.Direct;
-                bind.RoutingKey = ServicesDefinitions.Analytics.ServiceName;
-            });
+            ep.BindForService<JobStatusUpdatedEvent>(ServicesDefinitions.Analytics)
+                .BindForService<SettingUpdatedEvent>(ServicesDefinitions.Analytics);
         });
 
         cfg.ReceiveEndpoint("analytics-queue", ep =>

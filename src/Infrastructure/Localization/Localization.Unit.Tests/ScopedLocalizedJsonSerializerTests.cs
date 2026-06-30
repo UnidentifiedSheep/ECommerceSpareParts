@@ -74,6 +74,35 @@ public class ScopedLocalizedJsonSerializerTests
     }
 
     [Fact]
+    public void SerializeMetadata_ShouldIncludeCsvSchema_WhenTypeHasCsvSchemaAttribute()
+    {
+        var serializer = CreateSerializer();
+
+        var json = serializer.SerializeMetadata<TestInputWithCsvSchema>();
+
+        using var document = JsonDocument.Parse(json);
+        var csvSchema = document.RootElement
+            .GetProperty("csvSchema")
+            .EnumerateArray()
+            .ToList();
+
+        csvSchema.Should().HaveCount(2);
+
+        var sku = csvSchema.Single(x => x.GetProperty("propertyName").GetString() == nameof(TestCsvRow.Sku));
+        sku.GetProperty("type").GetString().Should().Be("string");
+        sku.GetProperty("required").GetBoolean().Should().BeTrue();
+        sku.GetProperty("names").EnumerateArray()
+            .Select(x => x.GetString())
+            .Should()
+            .BeEquivalentTo(["Sku", "Article"]);
+
+        var description = csvSchema.Single(x => x.GetProperty("propertyName").GetString() == nameof(TestCsvRow.Description));
+        description.GetProperty("required").GetBoolean().Should().BeFalse();
+        description.GetProperty("label").GetString().Should().Be("Description");
+        description.GetProperty("description").GetString().Should().Be("CSV row description");
+    }
+
+    [Fact]
     public void SerializeMetadata_ShouldFallbackToLocalizationKey_WhenLocalizedValueNotFound()
     {
         var serializer = CreateSerializer();
@@ -96,7 +125,9 @@ public class ScopedLocalizedJsonSerializerTests
         container.Initialize(new Dictionary<string, string>
         {
             ["file_name"] = "File",
-            ["file_name_description"] = "CSV file with producers"
+            ["file_name_description"] = "CSV file with producers",
+            ["csv_description_name"] = "Description",
+            ["csv_description_description"] = "CSV row description"
         });
 
         var baseLocalizer = new StringLocalizer([container]);
@@ -129,6 +160,24 @@ public class ScopedLocalizedJsonSerializerTests
     {
         [DependsOnEntity("Product", "id")]
         public int ProductId { get; init; }
+    }
+
+    [CsvSchema(typeof(TestCsvRow))]
+    private record TestInputWithCsvSchema
+    {
+        public string? FileName { get; init; }
+    }
+
+    private record TestCsvRow
+    {
+        [CsvHelper.Configuration.Attributes.Name("Sku", "Article")]
+        public required string Sku { get; init; }
+
+        [CsvHelper.Configuration.Attributes.Name("Description")]
+        [CsvHelper.Configuration.Attributes.Optional]
+        [LocalizedJsonFieldName("csv_description_name")]
+        [LocalizedJsonFieldDescription("csv_description_description")]
+        public string? Description { get; init; }
     }
 
     private sealed class TestEntity;

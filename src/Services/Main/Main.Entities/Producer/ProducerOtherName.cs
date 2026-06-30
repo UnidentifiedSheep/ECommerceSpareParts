@@ -13,7 +13,7 @@ public class ProducerOtherName : Entity<ProducerOtherName, string>,
     {
     }
 
-    private ProducerOtherName(int producerId, string otherName, string whereUsed)
+    private ProducerOtherName(int producerId, string otherName, string? whereUsed)
     {
         ProducerId = producerId;
         SetOtherName(otherName);
@@ -37,7 +37,7 @@ public class ProducerOtherName : Entity<ProducerOtherName, string>,
         return x => x.OtherName == key;
     }
 
-    public static ProducerOtherName Create(int producerId, string otherName, string whereUsed)
+    public static ProducerOtherName Create(int producerId, string otherName, string? whereUsed)
     {
         return new ProducerOtherName(producerId, otherName, whereUsed);
     }
@@ -47,9 +47,9 @@ public class ProducerOtherName : Entity<ProducerOtherName, string>,
         OtherName = Producer.ToNormalizedName(otherName);
     }
 
-    public void SetWhereUsed(string whereUsed)
+    public void SetWhereUsed(string? whereUsed)
     {
-        whereUsed = whereUsed.Trim()
+        whereUsed = whereUsed.TrimSafe()
             .AgainstTooLong(64, "producer.other.name.where.used.max.length");
 
         WhereUsed = whereUsed.ToUpperInvariant();

@@ -59,6 +59,15 @@ public static class UserProjections
             IsPrimary = x.IsPrimary
         };
 
+    public static readonly Expression<Func<UserPhone, UserPhoneDto>> UserPhoneProjection =
+        x => new UserPhoneDto
+        {
+            IsConfirmed = x.Confirmed,
+            IsPrimary = x.IsPrimary,
+            Number = x.PhoneNumber,
+            Type = x.PhoneType
+        };
+
     public static readonly Expression<Func<User, UserPartyType>> TransactionPartyTypeProjection =
         x => x.Roles.Any(role => role.RoleName == SystemRole)
             ? UserPartyType.System

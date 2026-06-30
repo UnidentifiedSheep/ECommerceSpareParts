@@ -29,6 +29,19 @@ public class ScopedStringLocalizerTests
     }
 
     [Fact]
+    public void Get_ShouldReturnFormattedValue_WhenArgumentsProvided()
+    {
+        var baseLocalizer = CreateBaseLocalizer();
+        var scoped = new ScopedStringLocalizer(baseLocalizer);
+
+        scoped.SetLocale("en");
+
+        var result = scoped.Get("Formatted.Key", "World");
+
+        result.Should().Be("Hello, World.");
+    }
+
+    [Fact]
     public void Indexer_ShouldWork()
     {
         var baseLocalizer = CreateBaseLocalizer();
@@ -78,6 +91,33 @@ public class ScopedStringLocalizerTests
     }
 
     [Fact]
+    public void TryGet_ShouldReturnTrueAndFormattedValue_WhenArgumentsProvided()
+    {
+        var baseLocalizer = CreateBaseLocalizer();
+        var scoped = new ScopedStringLocalizer(baseLocalizer);
+
+        scoped.SetLocale("en");
+
+        var success = scoped.TryGet("Formatted.Key", out var value, "World");
+
+        success.Should().BeTrue();
+        value.Should().Be("Hello, World.");
+    }
+
+    [Fact]
+    public void GetOrDefault_ShouldReturnFormattedValue_WhenArgumentsProvided()
+    {
+        var baseLocalizer = CreateBaseLocalizer();
+        var scoped = new ScopedStringLocalizer(baseLocalizer);
+
+        scoped.SetLocale("en");
+
+        var value = scoped.GetOrDefault("Formatted.Key", "World");
+
+        value.Should().Be("Hello, World.");
+    }
+
+    [Fact]
     public void TryGet_ShouldReturnFalseAndNull_WhenKeyDoesNotExist()
     {
         var baseLocalizer = CreateBaseLocalizer();
@@ -108,7 +148,8 @@ public class ScopedStringLocalizerTests
         var container = new LocalizerContainer("en");
         container.Initialize(new Dictionary<string, string>
         {
-            ["Test.Key"] = "value"
+            ["Test.Key"] = "value",
+            ["Formatted.Key"] = "Hello, {0}."
         });
 
         return new StringLocalizer([container]);

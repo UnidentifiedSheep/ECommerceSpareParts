@@ -7,6 +7,7 @@ using LinqKit;
 using Main.Application.Dtos.Users;
 using Main.Application.Extensions;
 using Main.Application.Projections;
+using Main.Entities.User;
 using Main.Entities.User.ValueObjects;
 using Main.Enums;
 using Microsoft.EntityFrameworkCore;
@@ -99,13 +100,13 @@ public class GetUsersHandler(IReadRepository<User, Guid> readRepository) : IQuer
             isEmailIncluded = true;
         }
 
-        /*if (!string.IsNullOrWhiteSpace(request.Phone))
+        if (!string.IsNullOrWhiteSpace(request.Phone))
         {
-            normalizedPhone = request.Phone.Trim().ToNormalizedPhoneNumber();
-            query = query.Where(u => u.UserPhones.Any(p =>
-                EF.Functions.TrigramsSimilarity(p.NormalizedPhone, normalizedPhone) > similarityLevel));
+            normalizedPhone = UserPhone.ToNormalizedPhone(request.Phone);
+            query = query.Where(u => u.Phones.Any(p =>
+                EF.Functions.TrigramsSimilarity(p.NormalizedPhone, normalizedPhone) > simLevel));
             isPhoneNumberIncluded = true;
-        }*/ //TODO phone search currently not supported.
+        }
 
         if (!string.IsNullOrWhiteSpace(request.UserName))
         {

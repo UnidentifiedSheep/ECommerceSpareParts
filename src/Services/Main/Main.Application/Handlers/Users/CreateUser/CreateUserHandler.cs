@@ -20,6 +20,7 @@ public record CreateUserCommand(
     string Password,
     UserInfoDto UserInfo,
     IEnumerable<EmailDto> Emails,
+    IEnumerable<UserPhoneDto> Phones,
     IEnumerable<string> Roles) : ICommand<CreateUserResult>;
 
 public record CreateUserResult(UserDto User);
@@ -42,6 +43,9 @@ public class CreateUserHandler(IUnitOfWork unitOfWork, IPasswordManager password
 
         foreach (var email in request.Emails)
             user.AddUserEmail(email.Email, email.Type, email.IsPrimary, email.IsConfirmed);
+
+        foreach (var phone in request.Phones)
+            user.AddUserPhone(phone.Number, phone.Type, phone.IsPrimary, phone.IsConfirmed);
 
         await unitOfWork.AddAsync(user, cancellationToken);
         await unitOfWork.SaveChangesAsync(cancellationToken);

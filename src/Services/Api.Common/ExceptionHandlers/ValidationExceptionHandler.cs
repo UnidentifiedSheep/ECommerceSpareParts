@@ -52,10 +52,11 @@ public class ValidationExceptionHandler(
                 continue;
             }
 
-            var template = localizer[errorCode];
-            TryFormatLocalizableMessage(template, state?.ErrorMessageArguments, out template);
+            var message = state?.ErrorMessageArguments is { Length: > 0 } arguments
+                ? localizer.Get(errorCode, arguments)
+                : localizer[errorCode];
 
-            errors.Add(new ValidationErrorModel(propertyName, template, attemptedValue));
+            errors.Add(new ValidationErrorModel(propertyName, message, attemptedValue));
         }
 
         problemDetails.Extensions["validationErrors"] = errors;

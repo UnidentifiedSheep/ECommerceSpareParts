@@ -1,4 +1,5 @@
 ﻿using System.Reflection;
+using Abstractions.Interfaces;
 using Application.Common.Backplane;
 using Application.Common.Behaviors;
 using Application.Common.Extensions;
@@ -20,6 +21,7 @@ public static class ServiceProvider
 {
     public static IServiceCollection AddApplicationBase(
         this IServiceCollection services, 
+        IServiceDefinition serviceDefinition,
         IConfiguration? configuration,
         Assembly? assembly = null,
         params Type[] behaviorsToExclude)
@@ -34,6 +36,7 @@ public static class ServiceProvider
 
         services.AddSingleton<IBackplaneDispatcher, BackplaneDispatcher>();
         services.AddSingleton<IFusionCacheBackplane, MassTransitBackplane>();
+        services.AddSingleton(serviceDefinition);
         
         var hs = behaviorsToExclude.ToHashSet();
         services.AddMediatR(config =>
