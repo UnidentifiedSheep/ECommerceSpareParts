@@ -16,7 +16,7 @@ public class CurrencySetting : Setting<CurrencySettingData>, ISetting<CurrencySe
     }
 
     public static string SettingName => "CurrencySetting";
-    public static CurrencySetting Default { get; } = new(new CurrencySettingData());
+    public static CurrencySetting Default => new(new CurrencySettingData());
 }
 
 public record CurrencySettingData

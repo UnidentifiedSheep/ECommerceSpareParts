@@ -15,7 +15,7 @@ public class StorageContentSetting : Setting<StorageContentSettingData>, ISettin
     }
 
     public static string SettingName => "StorageContentSetting";
-    public static StorageContentSetting Default { get; } = new(new StorageContentSettingData());
+    public static StorageContentSetting Default => new(new StorageContentSettingData());
 }
 
 public record StorageContentSettingData

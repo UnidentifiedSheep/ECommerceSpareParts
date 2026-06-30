@@ -29,7 +29,7 @@ internal class RegisterHandler(IMediator mediator) : ICommandHandler<RegisterCom
             Type = EmailType.Unknown
         };
         var command = new CreateUserCommand(request.UserName, request.Password, userInfo,
-            [email], [nameof(Role.Member)]);
+            [email], [], [nameof(Role.Member)]);
         await mediator.Send(command, cancellationToken);
         return Unit.Value;
     }

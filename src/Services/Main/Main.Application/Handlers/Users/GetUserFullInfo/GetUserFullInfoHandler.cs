@@ -15,6 +15,7 @@ public record GetUserFullInfoQuery(Guid UserId) : IQuery<GetUserFullInfoResult>;
 public record GetUserFullInfoResult(
     UserDto User,
     IReadOnlyList<UserEmailDto> Emails,
+    IReadOnlyList<UserPhoneDto> Phones,
     IReadOnlyList<string> Roles,
     IReadOnlyList<string> Permissions);
 
@@ -31,7 +32,8 @@ public class GetUserFullInfoHandler(
                        .Select(x => new
                        {
                            User = UserProjections.UserProjection.Invoke(x),
-                           Emails = x.Emails.Select(z => UserProjections.UserEmailProjection.Invoke(z))
+                           Emails = x.Emails.Select(z => UserProjections.UserEmailProjection.Invoke(z)),
+                           Phones = x.Phones.Select(z => UserProjections.UserPhoneProjection.Invoke(z))
                        })
                        .FirstOrDefaultAsync(cancellationToken)
                    ?? throw new UserNotFoundException(request.UserId);
@@ -44,6 +46,7 @@ public class GetUserFullInfoHandler(
         return new GetUserFullInfoResult(
             user.User,
             user.Emails.ToList(),
+            user.Phones.ToList(),
             roles,
             permissions);
     }

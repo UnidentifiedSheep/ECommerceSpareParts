@@ -6,6 +6,7 @@ using Extensions;
 using FluentValidation;
 using FluentValidation.Results;
 using Main.Application.Handlers.BaseValidators;
+using Main.Entities.User;
 using Microsoft.Extensions.Options;
 
 namespace Main.Application.Handlers.Users.CreateUser;
@@ -76,6 +77,61 @@ public class CreateUserValidation : AbstractValidator<CreateUserCommand>
                         CustomState = new ValidationStateData
                         {
                             ErrorMessageArguments = [emailOptions.Value.MaxEmailCount]
+                        }
+                    });
+            });
+        
+        RuleFor(x => x.Phones)
+            .ChildRules(z =>
+                z.RuleForEach(x => x))
+            .Custom((z, context) =>
+            {
+                var list = z.ToList();
+                var primaryCount = 0;
+                var setOfPhones = new HashSet<string>();
+                foreach (var phone in list)
+                {
+                    setOfPhones.Add(UserPhone.ToNormalizedPhone(phone.Number));
+                    if (phone.IsPrimary) primaryCount++;
+                }
+
+
+                if (primaryCount > 1)
+                    context.AddFailure(new ValidationFailure(
+                        context.PropertyPath,
+                        "Validation failed")
+                    {
+                        ErrorCode = "user.phone.primary.count",
+                        CustomState = null
+                    });
+
+                if (list.Count > setOfPhones.Count)
+                    context.AddFailure(new ValidationFailure(
+                        context.PropertyPath,
+                        "Validation failed")
+                    {
+                        ErrorCode = "user.have.duplicate.phone"
+                    });
+                if (list.Count < phoneOptions.Value.MinPhoneCount)
+                    context.AddFailure(new ValidationFailure(
+                        context.PropertyPath,
+                        "Validation failed")
+                    {
+                        ErrorCode = "user.min.phone.count",
+                        CustomState = new ValidationStateData
+                        {
+                            ErrorMessageArguments = [phoneOptions.Value.MinPhoneCount]
+                        }
+                    });
+                if (list.Count > phoneOptions.Value.MaxPhoneCount)
+                    context.AddFailure(new ValidationFailure(
+                        context.PropertyPath,
+                        "Validation failed")
+                    {
+                        ErrorCode = "user.max.phone.count",
+                        CustomState = new ValidationStateData
+                        {
+                            ErrorMessageArguments = [phoneOptions.Value.MaxPhoneCount]
                         }
                     });
             });

@@ -58,11 +58,9 @@ public partial class UserPhone : AuditableEntity<UserPhone, string>, ILinqEntity
 
     public void SetPhoneNumber(string phoneNumber)
     {
-        if (!IsValidPhone(phoneNumber))
-            throw new InvalidInputException("user.phone.invalid");
-        
         PhoneNumber = phoneNumber
             .TrimSafe()
+            .Against(z => !IsValidPhone(z), "user.phone.invalid")
             .AgainstNullOrWhiteSpace("phone.number.required")
             .AgainstTooLong(MaxPhoneNumberLength, "phone.number.max.length");
 
