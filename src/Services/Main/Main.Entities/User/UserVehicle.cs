@@ -1,30 +1,47 @@
 using System.Linq.Expressions;
 using Domain;
+using Domain.Extensions;
 using Domain.Interfaces;
 
 namespace Main.Entities.User;
 
 public class UserVehicle : AuditableEntity<UserVehicle, Guid>, ILinqEntity<UserVehicle, Guid>
 {
-    public Guid Id { get; set; }
+    public const int MaxPlateNumberLength = 32;
+    public const int MaxVinLength = 50;
+    public const int MaxCommentLength = 500;
 
-    public Guid UserId { get; set; }
+    private UserVehicle()
+    {
+    }
 
-    public string? Vin { get; set; }
+    private UserVehicle(
+        Guid userId, 
+        Guid vehicleId, 
+        string plateNumber, 
+        string? vin, 
+        string? comment)
+    {
+        UserId = userId;
+        SetVehicle(vehicleId);
+        SetPlateNumber(plateNumber);
+        SetVin(vin);
+        SetComment(comment);
+    }
 
-    public string PlateNumber { get; set; } = null!;
+    public Guid Id { get; private set; }
 
-    public string Manufacture { get; set; } = null!;
+    public Guid UserId { get; private set; }
 
-    public string Model { get; set; } = null!;
+    public Guid VehicleId { get; private set; }
 
-    public string? Modification { get; set; }
+    public string? Vin { get; private set; }
 
-    public string? EngineCode { get; set; }
+    public string PlateNumber { get; private set; } = null!;
 
-    public int? ProductionYear { get; set; }
+    public string? Comment { get; private set; }
 
-    public string? Comment { get; set; }
+    public User User { get; private set; } = null!;
 
     public static Expression<Func<UserVehicle, Guid>> GetKeySelector()
     {
@@ -34,6 +51,55 @@ public class UserVehicle : AuditableEntity<UserVehicle, Guid>, ILinqEntity<UserV
     public static Expression<Func<UserVehicle, bool>> GetEqualityExpression(Guid key)
     {
         return x => x.Id == key;
+    }
+
+    internal static UserVehicle Create(
+        Guid userId,
+        Guid vehicleId,
+        string plateNumber,
+        string? vin = null,
+        string? comment = null)
+    {
+        return new UserVehicle(userId, vehicleId, plateNumber, vin, comment);
+    }
+
+    public void SetVehicle(Guid vehicleId)
+    {
+        VehicleId = vehicleId.AgainstEqual(Guid.Empty, "user.vehicle.id.not.empty");
+    }
+
+    public void SetPlateNumber(string plateNumber)
+    {
+        PlateNumber = NormalizePlateNumber(plateNumber);
+    }
+
+    public void SetVin(string? vin)
+    {
+        Vin = NormalizeVin(vin);
+    }
+
+    public void SetComment(string? comment)
+    {
+        Comment = comment
+            .NullIfWhiteSpace()?
+            .AgainstTooLong(MaxCommentLength, "user.vehicle.comment.max.length");
+    }
+
+    public static string NormalizePlateNumber(string plateNumber)
+    {
+        return plateNumber
+            .TrimSafe()
+            .AgainstNullOrWhiteSpace("user.vehicle.plate.number.not.empty")
+            .AgainstTooLong(MaxPlateNumberLength, "user.vehicle.plate.number.max.length")
+            .ToUpperInvariant();
+    }
+
+    public static string? NormalizeVin(string? vin)
+    {
+        return vin
+            .NullIfWhiteSpace()?
+            .AgainstTooLong(MaxVinLength, "user.vehicle.vin.code.max.length")
+            .ToUpperInvariant();
     }
 
     public override Guid GetId()

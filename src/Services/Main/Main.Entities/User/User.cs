@@ -124,6 +124,24 @@ public class User : AuditableEntity<User, Guid>, ILinqEntity<User, Guid>
         _phones.RemoveAll(x => x.NormalizedPhone == normalizedPhone);
     }
 
+    public void AddUserVehicle(Guid vehicleId, string plateNumber, string? vin = null, string? comment = null)
+    {
+        var normalizedPlateNumber = UserVehicle.NormalizePlateNumber(plateNumber);
+        if (_vehicles.Any(x => x.PlateNumber == normalizedPlateNumber))
+            throw new InvalidInputException("user.have.duplicate.vehicle.plate.number");
+
+        var normalizedVin = UserVehicle.NormalizeVin(vin);
+        if (normalizedVin != null && _vehicles.Any(x => x.Vin == normalizedVin))
+            throw new InvalidInputException("user.have.duplicate.vehicle.vin.code");
+
+        _vehicles.Add(UserVehicle.Create(Id, vehicleId, plateNumber, vin, comment));
+    }
+
+    public void RemoveUserVehicle(Guid vehicleId)
+    {
+        _vehicles.RemoveAll(x => x.VehicleId == vehicleId);
+    }
+
     public void RemoveUserEmail(Email email)
     {
         _emails.RemoveAll(x => x.Email.Value == email.Value);
