@@ -1,3 +1,4 @@
+using Integrations.Common;
 using Internal.Integration.Core;
 using Internal.Integration.Core.Interfaces;
 using Internal.Integration.Core.Interfaces.Main;
@@ -14,7 +15,7 @@ internal sealed class PurchaseNode(
     IOptionsMonitor<InternalServiceCredentials> optionsMonitor) 
     : InternalClientBase(authClient, optionsMonitor), IPurchaseNode
 {
-    public async Task<InternalResponse<InternalFullPurchase>> GetFullPurchase(
+    public async Task<Response<InternalFullPurchase>> GetFullPurchase(
         Guid purchaseId,
         CancellationToken cancellationToken = default)
     {

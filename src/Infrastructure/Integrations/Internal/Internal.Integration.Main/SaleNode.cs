@@ -1,3 +1,4 @@
+using Integrations.Common;
 using Internal.Integration.Core;
 using Internal.Integration.Core.Interfaces;
 using Internal.Integration.Core.Interfaces.Main;
@@ -14,7 +15,7 @@ internal sealed class SaleNode(
     IOptionsMonitor<InternalServiceCredentials> optionsMonitor)
     : InternalClientBase(authClient, optionsMonitor), ISaleNode
 {
-    public async Task<InternalResponse<InternalFullSale>> GetFullSale(
+    public async Task<Response<InternalFullSale>> GetFullSale(
         Guid saleId,
         CancellationToken cancellationToken = default)
     {

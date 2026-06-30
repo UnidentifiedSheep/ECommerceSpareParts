@@ -3,6 +3,7 @@ using Analytics.Application.Interfaces.Cache;
 using Analytics.Cache;
 using Cache;
 using FluentAssertions;
+using Integrations.Common;
 using Internal.Integration.Core.Interfaces.Main;
 using Internal.Integration.Core.Models;
 using Microsoft.Extensions.DependencyInjection;
@@ -85,7 +86,7 @@ public class CurrencyCacheRepositoryTests(CombinedContainerFixture fixture) : In
     {
         _currencyMock
             .Setup(x => x.GetCurrencyRate(currencyId, It.IsAny<CancellationToken>()))
-            .ReturnsAsync(InternalResponse<decimal>.Ok(rate));
+            .ReturnsAsync(Response<decimal>.Ok(rate));
     }
 
     private void SetupCurrencyRateNotFound(int currencyId)
@@ -100,7 +101,7 @@ public class CurrencyCacheRepositoryTests(CombinedContainerFixture fixture) : In
     {
         _currencyMock
             .Setup(x => x.GetCurrencyRate(currencyId, It.IsAny<CancellationToken>()))
-            .ReturnsAsync(InternalResponse<decimal>.Fail(statusCode, error));
+            .ReturnsAsync(Response<decimal>.Fail(statusCode, error));
     }
 
     private void VerifyCurrencyRateRequested(int currencyId, Times times)

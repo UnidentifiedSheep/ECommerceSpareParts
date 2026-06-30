@@ -1,6 +1,7 @@
 ﻿using System.Net.Http.Headers;
 using System.Text;
 using System.Text.Json;
+using Integrations.Common;
 using Internal.Integration.Core.Interfaces;
 using Internal.Integration.Core.Models;
 using Microsoft.Extensions.Options;
@@ -43,29 +44,29 @@ public abstract class InternalClientBase(
             "application/json");
     }
 
-    protected static async Task<InternalResponse<T>> ReadInternalResponse<T>(
+    protected static async Task<Response<T>> ReadInternalResponse<T>(
         HttpResponseMessage response,
         CancellationToken cancellationToken = default)
     {
         var json = await response.Content.ReadAsStringAsync(cancellationToken);
 
         if (!response.IsSuccessStatusCode)
-            return InternalResponse<T>.Fail(response.StatusCode, GetError(response, json));
+            return Response<T>.Fail(response.StatusCode, GetError(response, json));
 
         try
         {
             var value = JsonSerializer.Deserialize<T>(json);
             return value is null
-                ? InternalResponse<T>.Fail(response.StatusCode, "Empty response body")
-                : InternalResponse<T>.Ok(value);
+                ? Response<T>.Fail(response.StatusCode, "Empty response body")
+                : Response<T>.Ok(value);
         }
         catch (JsonException ex)
         {
-            return InternalResponse<T>.Fail(response.StatusCode, ex.Message);
+            return Response<T>.Fail(response.StatusCode, ex.Message);
         }
     }
 
-    protected static async Task<InternalResponse<TValue>> ReadInternalResponse<TResponse, TValue>(
+    protected static async Task<Response<TValue>> ReadInternalResponse<TResponse, TValue>(
         HttpResponseMessage response,
         Func<TResponse, TValue> selector,
         CancellationToken cancellationToken = default)
@@ -73,13 +74,13 @@ public abstract class InternalClientBase(
         var result = await ReadInternalResponse<TResponse>(response, cancellationToken);
 
         if (!result.Success)
-            return InternalResponse<TValue>.Fail(
+            return Response<TValue>.Fail(
                 result.StatusCode ?? response.StatusCode,
                 result.Error);
 
         return result.Value is null
-            ? InternalResponse<TValue>.Fail(response.StatusCode, "Empty response body")
-            : InternalResponse<TValue>.Ok(selector(result.Value));
+            ? Response<TValue>.Fail(response.StatusCode, "Empty response body")
+            : Response<TValue>.Ok(selector(result.Value));
     }
 
     private static string? GetError(HttpResponseMessage response, string body)

@@ -1,3 +1,4 @@
+using Integrations.Common;
 using Internal.Integration.Core;
 using Internal.Integration.Core.Interfaces;
 using Internal.Integration.Core.Interfaces.Main;
@@ -14,7 +15,7 @@ internal sealed class ProducerNode(
     IOptionsMonitor<InternalServiceCredentials> optionsMonitor)
     : InternalClientBase(authClient, optionsMonitor), IProducerNode
 {
-    public async Task<InternalResponse<InternalFullProducer>> GetFullProducer(
+    public async Task<Response<InternalFullProducer>> GetFullProducer(
         int producerId,
         CancellationToken cancellationToken = default)
     {

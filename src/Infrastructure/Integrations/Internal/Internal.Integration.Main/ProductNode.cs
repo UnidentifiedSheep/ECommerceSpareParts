@@ -1,4 +1,5 @@
-﻿using Internal.Integration.Core;
+﻿using Integrations.Common;
+using Internal.Integration.Core;
 using Internal.Integration.Core.Interfaces;
 using Internal.Integration.Core.Interfaces.Main;
 using Internal.Integration.Core.Models;
@@ -14,7 +15,7 @@ internal sealed class ProductNode(
     IOptionsMonitor<InternalServiceCredentials> optionsMonitor) 
     : InternalClientBase(authClient, optionsMonitor), IProductNode
 {
-    public async Task<InternalResponse<InternalFullProduct>> GetFullProduct(
+    public async Task<Response<InternalFullProduct>> GetFullProduct(
         int productId,
         CancellationToken cancellationToken = default)
     {

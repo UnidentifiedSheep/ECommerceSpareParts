@@ -1,4 +1,5 @@
 ﻿using System.Text.Json.Serialization;
+using Integrations.Common;
 using Internal.Integration.Core;
 using Internal.Integration.Core.Interfaces;
 using Internal.Integration.Core.Interfaces.Main;
@@ -14,7 +15,7 @@ internal sealed class CurrencyNode(
     IOptionsMonitor<InternalServiceCredentials> optionsMonitor) 
     : InternalClientBase(authClient, optionsMonitor), ICurrencyNode
 {
-    public async Task<InternalResponse<decimal>> GetCurrencyRate(
+    public async Task<Response<decimal>> GetCurrencyRate(
         int currencyId,
         CancellationToken cancellationToken = default)
     {
@@ -32,7 +33,7 @@ internal sealed class CurrencyNode(
             cancellationToken);
     }
 
-    public async Task<InternalResponse<IReadOnlyList<InternalCurrency>>> GetCurrencies(
+    public async Task<Response<IReadOnlyList<InternalCurrency>>> GetCurrencies(
         CancellationToken cancellationToken = default)
     {
         using var request = await GetRequest(

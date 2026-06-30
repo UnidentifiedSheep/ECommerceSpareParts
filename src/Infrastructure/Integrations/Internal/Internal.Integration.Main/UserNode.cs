@@ -1,4 +1,5 @@
 ﻿using System.Text.Json.Serialization;
+using Integrations.Common;
 using Internal.Integration.Core;
 using Internal.Integration.Core.Interfaces;
 using Internal.Integration.Core.Interfaces.Main;
@@ -13,7 +14,7 @@ internal sealed class UserNode(
     IOptionsMonitor<InternalServiceCredentials> optionsMonitor) 
     : InternalClientBase(authClient, optionsMonitor), IUserNode
 {
-    public async Task<InternalResponse<decimal>> GetUserDiscount(
+    public async Task<Response<decimal>> GetUserDiscount(
         Guid userId,
         CancellationToken cancellationToken = default)
     {
