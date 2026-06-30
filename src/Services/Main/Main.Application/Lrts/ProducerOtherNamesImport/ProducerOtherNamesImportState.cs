@@ -1,12 +1,11 @@
-﻿using System.Text.Json;
-using System.Text.Json.Serialization;
+﻿using System.Text.Json.Serialization;
 using Application.Common.Interfaces.Lrt;
 using Attributes.JsonAttributes;
 using Enums;
 
-namespace Main.Application.Lrts.ProducerImport;
+namespace Main.Application.Lrts.ProducerOtherNamesImport;
 
-public record ProducerImportState
+public record ProducerOtherNamesImportState
 {
     [JsonPropertyName("fileName")]
     public required string FileName { get; init; }
@@ -15,11 +14,11 @@ public record ProducerImportState
     public int CurrentLine { get; init; }
 
     [JsonPropertyName("errors")]
-    public List<ProducerImportError> Errors { get; init; } = [];
+    public List<ProducerOtherNamesImportError> Errors { get; init; } = [];
 }
 
-[CsvSchema(typeof(ProducerImportLrt.NewProducerCsvDto))]
-public record ProducerImportInputState : IInputState
+[CsvSchema(typeof(ProducerOtherNamesImportLrt.ProducerOtherNameCsvDto))]
+public record ProducerOtherNamesImportInputState : IInputState
 {
     [Accepts(".csv")]
     [InputControl(InputControlType.UploadFile)]
@@ -32,12 +31,12 @@ public record ProducerImportInputState : IInputState
     public void ValidateState()
     {
         if (!FileName.EndsWith(".csv"))
-            throw new InvalidOperationException("Producer import state error. " +
+            throw new InvalidOperationException("Producer other name import state error. " +
                                                 "File name should end with .csv");
     }
 }
 
-public record ProducerImportError
+public record ProducerOtherNamesImportError
 {
     [JsonPropertyName("rowIdx")]
     public int RowIdx { get; init; }

@@ -1,4 +1,5 @@
 ﻿using Abstractions.Interfaces.Exceptions;
+using Localization.Abstractions;
 using Localization.Abstractions.Interfaces;
 using Microsoft.AspNetCore.Diagnostics;
 using Microsoft.AspNetCore.Mvc;
@@ -63,35 +64,13 @@ public abstract class ExceptionHandlerBase<THandler>(
         if (!localizer.TryGet(key, out var message) || message == null)
             logger.LogError("Unable to get localizable message for Key: {Key}", key);
 
-        var arguments = localizableException.Arguments;
-
-        if (TryFormatLocalizableMessage(message!, arguments, out detail))
+        if (LocalizedMessageFormatter.TryFormat(message!, localizableException.Arguments, out detail))
             return true;
 
         logger.LogError(
             "Unable to format localizable message for Key: {Key}, Arguments: {@Args}",
             key,
-            arguments);
+            localizableException.Arguments);
         return false;
-    }
-
-    protected static bool TryFormatLocalizableMessage(
-        string template,
-        object[]? arguments,
-        out string result)
-    {
-        result = template;
-        if (arguments == null || arguments.Length == 0) return true;
-
-        try
-        {
-            result = string.Format(template, arguments);
-            return true;
-        }
-        catch (FormatException)
-        {
-            result = $"{result} [Error formatting message]";
-            return false;
-        }
     }
 }

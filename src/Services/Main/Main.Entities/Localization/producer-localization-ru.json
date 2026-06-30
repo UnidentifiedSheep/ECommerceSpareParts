@@ -18,6 +18,8 @@
     "producer.other.name.where.used.min.length": "Поле 'where used' должно быть минимум 2 символа в длину.",
     "producer.image.too.long": "Путь к изображению производителя должен иметь не более 255 символов.",
     "producer.too.many.errors.while.processing.batch": "Произошло слишком много ошибок при обработке производителей.",
-    "producer.duplicate.name.in.batch": "Дубликат производителя в батче"
+    "producer.duplicate.name.in.batch": "Дубликат производителя в батче",
+    "producer.other.name.duplicate.in.batch": "Дубликат дополнительного названия производителя в батче.",
+    "producer.other.name.producer.not.found.in.batch": "Не удалось найти производителя для дополнительного названия."
   }
 }

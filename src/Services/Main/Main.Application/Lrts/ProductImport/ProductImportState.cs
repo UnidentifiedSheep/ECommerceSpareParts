@@ -21,6 +21,7 @@ public record ProductImportState
     public List<ProductImportError> Errors { get; init; } = [];
 }
 
+[CsvSchema(typeof(ProductImportLrt.NewProductCsvDto))]
 public record ProductImportInputState : IInputState
 {
     [Accepts(".csv")]

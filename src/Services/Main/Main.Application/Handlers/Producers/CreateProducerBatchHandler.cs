@@ -14,7 +14,7 @@ using Main.Entities.Producer;
 namespace Main.Application.Handlers.Producers;
 
 [AutoSave]
-[Transactional(retryErrors: ["23505"])]
+[Transactional(retryErrors: ["23505"], retryCount: 2, retryDelayMs: 20)]
 public record CreateProducerBatchCommand(
     IEnumerable<NewProducerDto> NewProducers) : ICommand<CreateProducerBatchResult>;
 

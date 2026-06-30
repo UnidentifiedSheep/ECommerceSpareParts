@@ -8,6 +8,9 @@ public interface IScopedStringLocalizer : IDisposable
     string this[string key] { get; }
     void SetLocale(Locale locale);
     string Get(string key);
+    string Get(string key, params object[] arguments);
     bool TryGet(string key, out string? value);
+    bool TryGet(string key, out string? value, params object[] arguments);
     string? GetOrDefault(string key);
+    string? GetOrDefault(string key, params object[] arguments);
 }

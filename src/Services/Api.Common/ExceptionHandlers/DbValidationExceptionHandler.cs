@@ -50,8 +50,6 @@ public class DbValidationExceptionHandler(
                 continue;
             }
 
-            var key = fail.Message;
-            var template = localizer[key];
             object[]? arguments = null;
 
             if (fail.AttemptedValue is IEnumerable<object?> args)
@@ -62,12 +60,15 @@ public class DbValidationExceptionHandler(
             else if (fail.AttemptedValue != null)
                 arguments = [fail.AttemptedValue];
 
-            TryFormatLocalizableMessage(template, arguments, out template);
+            var key = fail.Message;
+            var message = arguments is { Length: > 0 }
+                ? localizer.GetOrDefault(key, arguments) ?? fail.Message
+                : localizer.GetOrDefault(key) ?? fail.Message;
 
             errors.Add(new ProblemDetails
             {
                 Title = errorName,
-                Detail = template,
+                Detail = message,
                 Status = errorCode
             });
         }

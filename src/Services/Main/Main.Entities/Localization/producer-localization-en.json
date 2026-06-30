@@ -18,6 +18,8 @@
     "producer.other.name.where.used.min.length": "Where-used must be at least 2 characters long.",
     "producer.image.too.long": "Image path must be shorter than 255 symbols.",
     "producer.too.many.errors.while.processing.batch": "Too many errors happened while batch was processing.",
-    "producer.duplicate.name.in.batch": "Duplicate name in batch."
+    "producer.duplicate.name.in.batch": "Duplicate name in batch.",
+    "producer.other.name.duplicate.in.batch": "Duplicate additional producer name in batch.",
+    "producer.other.name.producer.not.found.in.batch": "Producer for additional name was not found."
   }
 }

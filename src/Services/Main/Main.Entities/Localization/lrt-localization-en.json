@@ -3,6 +3,8 @@
   "keyValues": {
     "lrt.producer.import.name": "Producer import",
     "lrt.producer.import.description": "Imports producers from an uploaded file, validates the data, and adds new records while skipping existing ones.",
+    "lrt.producer.other.names.import.name": "Producer additional names import",
+    "lrt.producer.other.names.import.description": "Imports additional producer names from an uploaded file, validates the data, links them to existing producers, and skips existing aliases.",
     "lrt.product.import.name": "Product import",
     "lrt.product.import.description": "Imports products from an uploaded file, validates the data, and adds new records while skipping existing ones.",
     "lrt.currency.rates.update.name": "Currency rate update",
