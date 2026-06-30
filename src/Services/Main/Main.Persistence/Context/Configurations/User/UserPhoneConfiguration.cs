@@ -45,7 +45,7 @@ public class UserPhoneConfiguration : IEntityTypeConfiguration<UserPhone>
         builder.Property(e => e.UserId)
             .HasColumnName("user_id");
 
-        builder.HasOne<Entities.User.User>()
+        builder.HasOne(e => e.User)
             .WithMany(p => p.Phones)
             .HasForeignKey(d => d.UserId)
             .HasConstraintName("user_phones_user_id_fkey");

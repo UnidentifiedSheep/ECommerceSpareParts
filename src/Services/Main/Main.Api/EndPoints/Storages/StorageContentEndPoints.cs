@@ -1,5 +1,6 @@
 using Abstractions.Models;
 using Api.Common.Extensions;
+using Api.Common.Models.Requests;
 using Enums;
 using Main.Application.Dtos.Storage;
 using Main.Application.Handlers.StorageContents.AddContent;
@@ -19,10 +20,9 @@ public record EditStorageContentRequest(Dictionary<int, ModelWithRowVersion<Patc
 
 public record GetStorageContentRequest(
     [FromQuery(Name = "storageName")] string? StorageName,
-    [FromQuery(Name = "articleId")] int? ArticleId,
-    [FromQuery(Name = "page")] int Page,
-    [FromQuery(Name = "limit")] int Limit,
-    [FromQuery(Name = "showZeroContent")] bool ShowZeroCount = true);
+    [FromQuery(Name = "productId")] int? ArticleId,
+    [FromQuery(Name = "showZeroContent")] bool ShowZeroCount = true)
+    : PaginationQueryModel;
 
 public record GetStorageContentResponse(IEnumerable<StorageContentDto> Content);
 
@@ -30,7 +30,7 @@ public static class StorageContentEndPoints
 {
     public static RouteGroupBuilder MapStorageContentEndPoints(this RouteGroupBuilder storages)
     {
-        storages.MapPost("/content", async (
+        storages.MapPost("/contents", async (
                 ISender sender,
                 AddContentToStorageRequest request,
                 CancellationToken cancellationToken) =>
@@ -52,7 +52,7 @@ public static class StorageContentEndPoints
             .ProducesProblem(StatusCodes.Status404NotFound)
             .RequireAnyPermission(PermissionCodes.STORAGES_CONTENT_CREATE);
 
-        storages.MapDelete("/content/{contentId:int}", async (
+        storages.MapDelete("/contents/{contentId:int}", async (
                 ISender sender,
                 int contentId,
                 uint rowVersion,
@@ -70,7 +70,7 @@ public static class StorageContentEndPoints
             .ProducesProblem(StatusCodes.Status404NotFound)
             .RequireAnyPermission(PermissionCodes.STORAGES_CONTENT_DELETE);
 
-        storages.MapPatch("/content", async (
+        storages.MapPatch("/contents", async (
                 ISender sender,
                 EditStorageContentRequest request,
                 CancellationToken cancellationToken) =>
@@ -88,7 +88,7 @@ public static class StorageContentEndPoints
             .ProducesProblem(StatusCodes.Status404NotFound)
             .RequireAnyPermission(PermissionCodes.STORAGES_CONTENT_EDIT);
 
-        storages.MapGet("/content", async (
+        storages.MapGet("/contents", async (
                 ISender sender,
                 CancellationToken token,
                 [AsParameters] GetStorageContentRequest request) =>
@@ -96,7 +96,7 @@ public static class StorageContentEndPoints
                 var query = new GetStorageContentQuery(
                     request.StorageName,
                     request.ArticleId,
-                    new Pagination(request.Page, request.Limit),
+                    request,
                     request.ShowZeroCount);
                 var result = await sender.Send(query, token);
                 return Results.Ok(result.Adapt<GetStorageContentResponse>());

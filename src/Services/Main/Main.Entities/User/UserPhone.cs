@@ -1,24 +1,45 @@
 using System.Linq.Expressions;
+using System.Text.RegularExpressions;
 using Domain;
+using Domain.Extensions;
 using Domain.Interfaces;
+using Exceptions;
+using Extensions;
+using Main.Enums;
 
 namespace Main.Entities.User;
 
-public class UserPhone : AuditableEntity<UserPhone, string>, ILinqEntity<UserPhone, string>
+public partial class UserPhone : AuditableEntity<UserPhone, string>, ILinqEntity<UserPhone, string>
 {
-    public Guid UserId { get; set; }
+    public const int MinNormalizedPhoneLength = 7;
+    public const int MaxNormalizedPhoneLength = 15;
+    public const int MaxPhoneNumberLength = 32;
 
-    public string PhoneNumber { get; set; } = null!;
+    private UserPhone()
+    {
+    }
 
-    public string NormalizedPhone { get; set; } = null!;
+    private UserPhone(Guid userId, string phoneNumber, PhoneType phoneType)
+    {
+        UserId = userId;
+        SetPhoneNumber(phoneNumber);
+        PhoneType = phoneType;
+    }
 
-    public bool Confirmed { get; set; }
+    public Guid UserId { get; private set; }
 
-    public bool IsPrimary { get; set; }
+    public string PhoneNumber { get; private set; } = null!;
 
-    public string? PhoneType { get; set; }
+    public string NormalizedPhone { get; private set; } = null!;
 
-    public DateTime? ConfirmedAt { get; set; }
+    public bool Confirmed { get; private set; }
+
+    public bool IsPrimary { get; private set; }
+
+    public PhoneType PhoneType { get; private set; }
+
+    public DateTime? ConfirmedAt { get; private set; }
+    public User User { get; private set; } = null!;
 
     public static Expression<Func<UserPhone, string>> GetKeySelector()
     {
@@ -29,6 +50,73 @@ public class UserPhone : AuditableEntity<UserPhone, string>, ILinqEntity<UserPho
     {
         return x => x.NormalizedPhone == key;
     }
+
+    internal static UserPhone Create(Guid userId, string phoneNumber, PhoneType phoneType)
+    {
+        return new UserPhone(userId, phoneNumber, phoneType);
+    }
+
+    public void SetPhoneNumber(string phoneNumber)
+    {
+        if (!IsValidPhone(phoneNumber))
+            throw new InvalidInputException("user.phone.invalid");
+        
+        PhoneNumber = phoneNumber
+            .TrimSafe()
+            .AgainstNullOrWhiteSpace("phone.number.required")
+            .AgainstTooLong(MaxPhoneNumberLength, "phone.number.max.length");
+
+        NormalizedPhone = ToNormalizedPhone(phoneNumber)
+            .AgainstNullOrWhiteSpace("phone.number.must.contain.digits")
+            .AgainstTooShort(MinNormalizedPhoneLength, "phone.number.min.normalized.length")
+            .AgainstTooLong(MaxNormalizedPhoneLength, "phone.number.max.normalized.length");
+    }
+
+    public void Confirm(bool confirmed = true)
+    {
+        Confirmed = confirmed;
+        ConfirmedAt = confirmed ? DateTime.UtcNow : null;
+    }
+
+    public void ChangeType(PhoneType phoneType)
+    {
+        PhoneType = phoneType;
+    }
+
+    public void MakePrimary(bool isPrimary = true)
+    {
+        IsPrimary = isPrimary;
+    }
+
+    public static string ToNormalizedPhone(string phoneNumber)
+    {
+        return phoneNumber.ToNormalizedPhoneNumber();
+    }
+    
+    public bool IsValidPhone(string phone)
+    {
+        if (string.IsNullOrWhiteSpace(phone))
+            return false;
+
+        phone = phone.Trim();
+
+        if (phone.Length is < 7 or > 20)
+            return false;
+
+        if (!PhoneRegex().IsMatch(phone))
+            return false;
+
+        var digitsOnly = new string(phone.Where(char.IsDigit).ToArray());
+        return digitsOnly.Length >= 7;
+    }
+    //Допустимые форматы
+    // +1 (555) 123-4567
+    // +44 20 7946 0958
+    // (495) 123-45-67
+    // 89001234567
+
+    [GeneratedRegex(@"^\+?[0-9\s\-\(\)]{7,20}$")]
+    private static partial Regex PhoneRegex();
 
     public override string GetId()
     {
