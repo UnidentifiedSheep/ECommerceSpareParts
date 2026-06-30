@@ -25,7 +25,7 @@ public class ProducerOtherName : Entity<ProducerOtherName, string>,
     [Validate]
     public string OtherName { get; private set; } = null!;
 
-    public string WhereUsed { get; private set; } = null!;
+    public string WhereUsed { get; private set; } = null!;//TODO: should be removed.
 
     public static Expression<Func<ProducerOtherName, string>> GetKeySelector()
     {
