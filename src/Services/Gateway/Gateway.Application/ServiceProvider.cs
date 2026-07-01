@@ -23,12 +23,10 @@ public static class ServiceProvider
                 ServicesDefinitions.Gateway,
                 configuration,
                 typeof(ServiceProvider).Assembly,
-                [
-                    typeof(TransactionBehavior<,>),
-                    typeof(SaveChangesBehavior<,>),
-                    typeof(IntegrationEventPublisherBehavior<,>),
-                    typeof(DbValidationBehavior<,>)
-                ]);
+                typeof(TransactionBehavior<,>),
+                typeof(SaveChangesBehavior<,>),
+                typeof(IntegrationEventPublisherBehavior<,>),
+                typeof(DbValidationBehavior<,>));
 
         return services;
     }

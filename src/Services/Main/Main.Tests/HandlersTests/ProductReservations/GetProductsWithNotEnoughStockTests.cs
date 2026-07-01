@@ -158,8 +158,7 @@ public class GetProductsWithNotEnoughStockTests : IntegrationTest
             buyer.Id,
             storage.Name,
             product.Id,
-            5,
-            false);
+            5);
 
         var result = await Mediator.Send(query);
 

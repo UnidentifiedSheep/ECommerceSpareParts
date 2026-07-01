@@ -123,7 +123,7 @@ public class StorageContentReservationTests
     [Fact]
     public void AddCount_PartialCount_SetsLockedStatus()
     {
-        var reservation = Create(3);
+        var reservation = Create();
 
         reservation.AddCount(2);
 
@@ -134,7 +134,7 @@ public class StorageContentReservationTests
     [Fact]
     public void AddCount_FullCount_SetsDoneStatus()
     {
-        var reservation = Create(3);
+        var reservation = Create();
 
         reservation.AddCount(3);
 
@@ -145,7 +145,7 @@ public class StorageContentReservationTests
     [Fact]
     public void AddCount_DecreasedToZero_ReturnsToActiveStatus()
     {
-        var reservation = Create(3);
+        var reservation = Create();
         reservation.AddCount(2);
 
         reservation.AddCount(-2);
@@ -159,7 +159,7 @@ public class StorageContentReservationTests
     [InlineData(-1)]
     public void AddCount_InvalidResult_Throws(int amount)
     {
-        var reservation = Create(3);
+        var reservation = Create();
 
         var act = () => reservation.AddCount(amount);
 
@@ -169,7 +169,7 @@ public class StorageContentReservationTests
     [Fact]
     public void ProposePrice_LockedReservation_Succeeds()
     {
-        var reservation = Create(3);
+        var reservation = Create();
         reservation.AddCount(1);
 
         reservation.ProposePrice(100m, 1);
@@ -182,7 +182,7 @@ public class StorageContentReservationTests
     [Fact]
     public void ProposePrice_DoneReservation_Throws()
     {
-        var reservation = Create(3);
+        var reservation = Create();
         reservation.AddCount(3);
 
         var act = () => reservation.ProposePrice(100m, 1);

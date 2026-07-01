@@ -77,7 +77,7 @@ public class SaleContentTests
         var content = Create();
         var details = new[]
         {
-            CreateDetail(2, 1),
+            CreateDetail(2),
             CreateDetail(3, 4)
         };
 

@@ -46,9 +46,7 @@ public class SaleServiceTests
         {
             NewSaleContent(
                 10,
-                7,
-                200m,
-                180m)
+                7)
         };
 
         var result = _service.DistributeDetails(storageLots, saleContents);

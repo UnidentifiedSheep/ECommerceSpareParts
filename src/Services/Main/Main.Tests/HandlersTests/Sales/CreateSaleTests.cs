@@ -269,9 +269,7 @@ public class CreateSaleTests : IntegrationTest
             [
                 NewContent(
                     storageContent.ProductId,
-                    1,
-                    100m,
-                    90m),
+                    1),
                 NewContent(
                     storageContent.ProductId,
                     1,

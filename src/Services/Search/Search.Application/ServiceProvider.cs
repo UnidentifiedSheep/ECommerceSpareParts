@@ -23,13 +23,11 @@ public static class ServiceProvider
                 ServicesDefinitions.Search,
                 configuration,
                 typeof(ServiceProvider).Assembly,
-                [
-                    typeof(TransactionBehavior<,>),
-                    typeof(SaveChangesBehavior<,>),
-                    typeof(IntegrationEventPublisherBehavior<,>),
-                    typeof(DbValidationBehavior<,>),
-                    typeof(CacheBehavior<,>)
-                ]);
+                typeof(TransactionBehavior<,>),
+                typeof(SaveChangesBehavior<,>),
+                typeof(IntegrationEventPublisherBehavior<,>),
+                typeof(DbValidationBehavior<,>),
+                typeof(CacheBehavior<,>));
 
         services.AddSingleton<IIndexSynchronizer<Product, int>, ProductIndexSynchronizer>();
         services.AddSingleton<IIndexSynchronizer<Producer, int>, ProducerIndexSynchronizer>();
