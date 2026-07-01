@@ -14,7 +14,7 @@ using Main.Application.NamedObjects.StorageContentExtractPolicies;
 using Main.Entities.Event;
 using Main.Entities.Exceptions;
 using Main.Entities.Product;
-using Main.Entities.Setting;
+using Main.Entities.Settings;
 using Main.Entities.Storage;
 using Main.Enums;
 using Event = Main.Entities.Event.Event;

@@ -1,4 +1,4 @@
-using System.Text.Json.Serialization;
+using Abstractions.Models.Options;
 using Api.Common.Middleware;
 using Api.Common.OperationFilters;
 using Common;
@@ -25,12 +25,13 @@ public static class WebApplicationBuilderExtensions
     public static IServiceCollection AddCommonApiInfrastructure(
         this IServiceCollection services)
     {
+        services.AddProjectJsonSerialization();
         services.AddOpenApi();
         services.AddEndpointsApiExplorer();
         services.AddSwaggerGen(c => c.OperationFilter<PermissionsOperationFilter>());
         services.ConfigureHttpJsonOptions(options =>
         {
-            options.SerializerOptions.Converters.Add(new JsonStringEnumConverter());
+            ProjectJsonOptions.Configure(options.SerializerOptions);
         });
         services.AddHttpContextAccessor();
         services.AddBaseExceptionHandlers();

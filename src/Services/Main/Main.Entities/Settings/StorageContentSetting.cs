@@ -2,7 +2,7 @@
 using Domain.CommonEntities;
 using Domain.Interfaces;
 
-namespace Main.Entities.Setting;
+namespace Main.Entities.Settings;
 
 public class StorageContentSetting : Setting<StorageContentSettingData>, ISetting<StorageContentSetting>
 {

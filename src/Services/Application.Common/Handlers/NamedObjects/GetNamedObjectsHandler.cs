@@ -4,7 +4,7 @@ using Application.Common.Interfaces.Cqrs;
 using Application.Common.Interfaces.NamedObject;
 using Localization.Abstractions.Interfaces;
 
-namespace Application.Common.Handlers.NamedObjects.GetNamedObjects;
+namespace Application.Common.Handlers.NamedObjects;
 
 public record GetNamedObjectsQuery(
     string GroupName) : IQuery<GetNamedObjectsResult>;

@@ -1,6 +1,6 @@
 using System.Text;
 
-namespace Armtek.Integrations.Core.Models;
+namespace Integrations.Common;
 
 public record BasicAuthModel
 {

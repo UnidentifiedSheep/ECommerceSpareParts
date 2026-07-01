@@ -21,7 +21,6 @@ using Main.Application.Projections;
 using Main.Entities.Auth;
 using Main.Entities.Exceptions;
 using Main.Entities.Purchase;
-using Main.Entities.Setting;
 using Main.Entities.Storage;
 using Main.Entities.User;
 using Main.Enums;

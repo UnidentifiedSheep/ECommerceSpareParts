@@ -4,7 +4,7 @@ using Application.Common.Interfaces.Settings;
 using Attributes;
 using Contracts.Currency;
 using Main.Application.Interfaces.Services.Currency;
-using Main.Entities.Setting;
+using Main.Entities.Settings;
 using MediatR;
 using Microsoft.Extensions.Logging;
 

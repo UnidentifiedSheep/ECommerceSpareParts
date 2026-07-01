@@ -9,7 +9,7 @@ using Mailing.Core.Models;
 using Main.Application.Interfaces.Persistence;
 using Main.Application.Interfaces.Services;
 using Main.Application.Models.Auth;
-using Main.Entities.Setting;
+using Main.Entities.Settings;
 using Main.Entities.User;
 using Main.Enums.Auth;
 using MediatR;

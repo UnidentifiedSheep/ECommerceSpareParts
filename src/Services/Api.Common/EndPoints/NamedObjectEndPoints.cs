@@ -1,7 +1,7 @@
 using System.Text.Json.Serialization;
 using Api.Common.Extensions;
 using Application.Common.Dtos;
-using Application.Common.Handlers.NamedObjects.GetNamedObjects;
+using Application.Common.Handlers.NamedObjects;
 using Carter;
 using Enums;
 using MediatR;

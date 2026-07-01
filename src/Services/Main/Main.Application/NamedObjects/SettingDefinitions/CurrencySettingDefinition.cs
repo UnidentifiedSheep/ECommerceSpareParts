@@ -6,7 +6,7 @@ using Attributes.JsonAttributes;
 using Domain.CommonEntities;
 using Enums;
 using Exceptions;
-using Main.Entities.Setting;
+using Main.Entities.Settings;
 
 namespace Main.Application.NamedObjects.SettingDefinitions;
 

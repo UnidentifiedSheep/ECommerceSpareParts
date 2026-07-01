@@ -35,7 +35,8 @@ builder.Host.AddLokiLogger(
 builder.Services.AddMessageBrokerOptions()
     .AddHeaderSecretsOptions()
     .AddRedisOptions()
-    .AddDatabaseOptions();
+    .AddDatabaseOptions()
+    .AddSecretEncryptionOptions();
 
 builder.Services.AddCommonApiInfrastructure();
 
@@ -90,10 +91,7 @@ builder.Services
     .AddPersistenceLayer()
     .AddApplicationCache()
     .AddCacheLayer("pricing")
-    .AddJsonSigner(
-        builder.Configuration["SignSecret"]
-        ?? throw new InvalidOperationException("Unable to find SignSecret"),
-        Global.JsonOptions)
+    .AddJsonSigner()
     .AddMinimalSecurityLayer()
     .AddIntegrationClients()
     .AddCommonLayer()

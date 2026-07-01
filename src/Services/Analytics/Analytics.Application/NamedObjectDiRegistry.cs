@@ -1,9 +1,9 @@
 ﻿using Analytics.Application.NamedObjects;
+using Analytics.Application.NamedObjects.Analyzers;
 using Analytics.Application.NamedObjects.Analyzers.Markup;
 using Analytics.Application.NamedObjects.Metrics;
 using Application.Common.Extensions;
 using Application.Common.Handlers.NamedObjects;
-using Application.Common.Handlers.NamedObjects.GetNamedObjects;
 using Application.Common.Interfaces.NamedObject;
 using MediatR;
 using Microsoft.Extensions.DependencyInjection;

@@ -47,12 +47,15 @@ builder.Services
     .AddS3Options()
     .AddLrtOptions()
     .AddScheduledJobEnqueuerOptions()
-    .AddSystemOptions();
+    .AddSystemOptions()
+    .AddSecretEncryptionOptions();
 
 builder.AddLokiLogger(
     builder.Configuration,
     "main.worker",
     env);
+
+builder.Services.AddProjectJsonSerialization();
 
 AddMassTransit(builder);
 
@@ -60,10 +63,7 @@ builder.Services
     .AddPersistenceLayer()
     .AddCacheLayer("main")
     .AddApplicationCache()
-    .AddJsonSigner(
-        builder.Configuration["SignSecret"] ??
-        throw new InvalidOperationException("SignSecret not found in configuration"),
-        Global.JsonOptions)
+    .AddJsonSigner()
     .AddMailLayer()
     .AddCommonLayer()
     .AddS3()

@@ -9,7 +9,7 @@ using LinqKit;
 using Main.Application.Interfaces.Services.Event;
 using Main.Entities.Exceptions;
 using Main.Entities.Sale;
-using Main.Entities.Setting;
+using Main.Entities.Settings;
 using Main.Enums;
 using Microsoft.EntityFrameworkCore;
 

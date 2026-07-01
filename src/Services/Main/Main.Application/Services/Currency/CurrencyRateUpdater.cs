@@ -9,7 +9,7 @@ using Main.Application.Interfaces.Services.Currency;
 using Main.Application.Models.Currency;
 using Main.Entities.Currency;
 using Main.Entities.Exceptions;
-using Main.Entities.Setting;
+using Main.Entities.Settings;
 
 namespace Main.Application.Services.Currency;
 

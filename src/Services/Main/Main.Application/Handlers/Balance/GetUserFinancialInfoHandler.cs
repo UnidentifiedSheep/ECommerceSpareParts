@@ -9,7 +9,7 @@ using Main.Application.Projections;
 using Main.Entities.Balance;
 using Main.Entities.Currency;
 using Main.Entities.Exceptions;
-using Main.Entities.Setting;
+using Main.Entities.Settings;
 using Main.Entities.User;
 using Microsoft.EntityFrameworkCore;
 

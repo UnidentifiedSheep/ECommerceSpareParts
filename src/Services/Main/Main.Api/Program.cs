@@ -30,6 +30,7 @@ using Main.Cache;
 using Main.Persistence;
 using Main.Persistence.Context;
 using MassTransit;
+using Microsoft.AspNetCore.DataProtection;
 using Microsoft.Extensions.Options;
 using OpenTelemetry.Metrics;
 using RabbitMq.Extensions;
@@ -56,7 +57,8 @@ builder.Services.AddMessageBrokerOptions()
     .AddEmailOptions()
     .AddPhoneOptions()
     .AddJwtOptions()
-    .AddSystemOptions();
+    .AddSystemOptions()
+    .AddSecretEncryptionOptions();
 
 builder.Services.AddCommonApiInfrastructure();
 builder.Services.AddSignalR();
@@ -127,10 +129,7 @@ builder.Services
     .AddPersistenceLayer()
     .AddCacheLayer("main")
     .AddApplicationCache()
-    .AddJsonSigner(
-        builder.Configuration["SignSecret"] ??
-        throw new InvalidOperationException("SignSecret not found in configuration"),
-        Global.JsonOptions)
+    .AddJsonSigner()
     .AddFullSecurityLayer()
     .AddEComAuth(builder.Configuration)
     .AddMailLayer()

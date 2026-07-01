@@ -1,5 +1,5 @@
 ﻿using Application.Common.Interfaces.Settings;
-using Main.Entities.Setting;
+using Main.Entities.Settings;
 using Main.Entities.User;
 using Main.Persistence.Context;
 using Test.Common.Abstractions;

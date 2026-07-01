@@ -1,5 +1,5 @@
 ﻿using Application.Common.Services.Settings;
-using Main.Entities.Setting;
+using Main.Entities.Settings;
 
 namespace Main.Application.Services;
 

@@ -10,7 +10,7 @@ using Main.Entities.Producer;
 using Main.Entities.Product;
 using Main.Entities.Purchase;
 using Main.Entities.Sale;
-using Main.Entities.Setting;
+using Main.Entities.Settings;
 using Main.Entities.Storage;
 using Main.Entities.User;
 using MassTransit;

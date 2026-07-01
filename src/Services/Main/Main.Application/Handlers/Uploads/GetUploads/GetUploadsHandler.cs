@@ -4,7 +4,7 @@ using Application.Common.Interfaces.Cqrs;
 using Application.Common.Interfaces.Settings;
 using Main.Application.Dtos.Uploads;
 using Main.Application.Static;
-using Main.Entities.Setting;
+using Main.Entities.Settings;
 
 namespace Main.Application.Handlers.Uploads.GetUploads;
 

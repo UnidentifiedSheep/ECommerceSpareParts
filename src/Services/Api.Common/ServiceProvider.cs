@@ -7,6 +7,8 @@ using Cache;
 using Persistence;
 using RabbitMq;
 using S3;
+using Security;
+using Utils;
 
 namespace Api.Common;
 
@@ -15,6 +17,15 @@ public static class ServiceProvider
     public static IServiceCollection AddCommonLayer(this IServiceCollection collection)
     {
         collection.AddSingleton<ISearchLogger, SearchLogger>();
+        return collection;
+    }
+
+    public static IServiceCollection AddProjectJsonSerialization(this IServiceCollection collection)
+    {
+        collection
+            .AddOptions<ProjectJsonOptions>()
+            .Configure(options => ProjectJsonOptions.Configure(options.SerializerOptions));
+
         return collection;
     }
 
@@ -104,5 +115,20 @@ public static class ServiceProvider
         
         return collection;
             
+    }
+
+    public static IServiceCollection AddSecretEncryptionOptions(this IServiceCollection collection)
+    {
+        collection.AddOptions<SecretEncryptionOptions>()
+            .BindConfiguration(SecretEncryptionOptions.SectionName)
+            .Configure<IConfiguration>((options, configuration) =>
+            {
+                if (string.IsNullOrWhiteSpace(options.Secret))
+                    options.Secret = configuration["SignSecret"] ?? string.Empty;
+            })
+            .ValidateDataAnnotations()
+            .ValidateOnStart();
+        
+        return collection;
     }
 }

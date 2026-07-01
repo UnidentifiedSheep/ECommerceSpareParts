@@ -5,13 +5,16 @@ using Abstractions.Interfaces;
 using Abstractions.Interfaces.Services;
 using Abstractions.Interfaces.Validators;
 using Abstractions.Models;
+using Abstractions.Models.Options;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.DataProtection;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.IdentityModel.Tokens;
 using Security.Services;
+using Utils;
 
 namespace Security;
 
@@ -30,11 +33,17 @@ public static class ServiceProvider
     }
 
     public static IServiceCollection AddJsonSigner(
-        this IServiceCollection collection,
-        string secret,
-        JsonSerializerOptions? options = null)
+        this IServiceCollection collection)
     {
-        collection.AddSingleton<IJsonSigner, JsonSigner>(_ => new JsonSigner(secret, options));
+        collection.AddOptions<ProjectJsonOptions>();
+        collection.AddSingleton<IJsonSigner, JsonSigner>();
+        return collection;
+    }
+
+    public static IServiceCollection AddSecretEncryptor(
+        this IServiceCollection collection)
+    {
+        collection.AddSingleton<ISecretEncryptor, SecretEncryptor>();
         return collection;
     }
 

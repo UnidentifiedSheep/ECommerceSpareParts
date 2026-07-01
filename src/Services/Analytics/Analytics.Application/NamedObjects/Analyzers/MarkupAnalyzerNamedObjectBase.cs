@@ -1,6 +1,7 @@
+using Analytics.Application.NamedObjects.Analyzers.Markup;
 using Application.Common.Abstractions.NamedObjects;
 
-namespace Analytics.Application.NamedObjects.Analyzers.Markup;
+namespace Analytics.Application.NamedObjects.Analyzers;
 
 public abstract class MarkupAnalyzerNamedObjectBase : LocalizableNameObject
 {

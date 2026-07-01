@@ -48,6 +48,7 @@
         <ProjectReference Include="..\..\Infrastructure\Persistence\Persistence.csproj"/>
         <ProjectReference Include="..\..\Infrastructure\RabbitMq\RabbitMq.csproj"/>
         <ProjectReference Include="..\..\Infrastructure\S3\S3.csproj"/>
+        <ProjectReference Include="..\..\Infrastructure\Security\Security.csproj" />
         <ProjectReference Include="..\Application.Common\Application.Common.csproj"/>
     </ItemGroup>
 

@@ -1,6 +1,6 @@
 ﻿using Application.Common.Interfaces.Settings;
 using Enums;
-using Main.Entities.Setting;
+using Main.Entities.Settings;
 using Main.Persistence.Context;
 using Test.Common.Abstractions;
 using Test.Common.Extensions;

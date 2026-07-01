@@ -13,7 +13,7 @@ using Main.Application.Interfaces.Persistence;
 using Main.Application.Interfaces.Services.Storage;
 using Main.Entities.Event;
 using Main.Entities.Exceptions;
-using Main.Entities.Setting;
+using Main.Entities.Settings;
 using Main.Entities.Storage;
 using Main.Enums;
 using Event = Main.Entities.Event.Event;

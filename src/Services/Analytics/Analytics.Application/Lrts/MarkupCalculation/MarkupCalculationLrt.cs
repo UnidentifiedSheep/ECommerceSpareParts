@@ -2,6 +2,7 @@ using Abstractions;
 using Abstractions.Interfaces;
 using Abstractions.Interfaces.Persistence;
 using Analytics.Application.Lrts.MetricCalculation;
+using Analytics.Application.NamedObjects.Analyzers;
 using Analytics.Application.NamedObjects.Analyzers.Markup;
 using Application.Common.Interfaces.NamedObject;
 using Application.Common.Interfaces.Repositories;

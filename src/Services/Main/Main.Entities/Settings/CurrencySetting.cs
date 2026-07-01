@@ -3,7 +3,7 @@ using Domain.CommonEntities;
 using Domain.Interfaces;
 using Enums;
 
-namespace Main.Entities.Setting;
+namespace Main.Entities.Settings;
 
 public class CurrencySetting : Setting<CurrencySettingData>, ISetting<CurrencySetting>
 {

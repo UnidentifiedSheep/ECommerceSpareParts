@@ -32,6 +32,8 @@ builder.Services
     .AddRedisOptions()
     .AddDatabaseOptions();
 
+builder.Services.AddProjectJsonSerialization();
+
 builder.AddLokiLogger(
     builder.Configuration,
     "analytics.worker",

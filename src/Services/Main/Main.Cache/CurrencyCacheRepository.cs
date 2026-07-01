@@ -9,7 +9,7 @@ using Main.Application.Projections;
 using Main.Application.Static;
 using Main.Entities.Currency;
 using Main.Entities.Exceptions;
-using Main.Entities.Setting;
+using Main.Entities.Settings;
 using Microsoft.EntityFrameworkCore;
 
 namespace Main.Cache;

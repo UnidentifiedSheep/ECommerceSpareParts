@@ -1,5 +1,5 @@
 ﻿using Application.Common.Extensions;
-using Application.Common.Handlers.NamedObjects.GetNamedObjects;
+using Application.Common.Handlers.NamedObjects;
 using Application.Common.Interfaces.NamedObject;
 using Application.Common.NamedObject;
 using MediatR;

@@ -14,6 +14,7 @@ using Npgsql;
 using Persistence;
 using Security;
 using Serilog;
+using Utils;
 using Test.Common.Abstractions.Test;
 using Test.Common.Extensions;
 using Test.Common.Interfaces.ServiceProvider;
@@ -70,7 +71,13 @@ public class ServiceProviderBuilder : IServiceProviderBuilder<ServiceProviderArg
             Port = pgsqlBuilder.Port
         }));
 
-        services.AddJsonSigner("some secret")
+        services.AddSingleton(Options.Create(new SecretEncryptionOptions
+        {
+            Secret = "some secret"
+        }));
+        services.AddProjectJsonSerialization();
+
+        services.AddJsonSigner()
             .AddCacheLayer("test")
             .AddApplicationCache()
             .AddFullSecurityLayer(passwordRules)

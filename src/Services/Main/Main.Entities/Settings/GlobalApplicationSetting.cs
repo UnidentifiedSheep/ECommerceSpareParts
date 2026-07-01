@@ -1,7 +1,7 @@
 ﻿using Domain.CommonEntities;
 using Domain.Interfaces;
 
-namespace Main.Entities.Setting;
+namespace Main.Entities.Settings;
 
 public class GlobalApplicationSetting : Setting<GlobalApplicationSettingData>, ISetting<GlobalApplicationSetting>
 {

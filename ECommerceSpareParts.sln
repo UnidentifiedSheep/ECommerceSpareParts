@@ -173,6 +173,14 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Integrations.Common", "src\
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Armtek.Integrations.Client", "src\Infrastructure\Integrations\Armtek\Armtek.Integrations.Client\Armtek.Integrations.Client.csproj", "{802CD1FE-059E-4753-BD82-27F6D829D46C}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Favorit", "Favorit", "{52C099E6-0451-4D42-A38B-3ABF548D707B}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Favorit.Integrations.Core", "src\Infrastructure\Integrations\Favorit\Favorit.Integrations.Core\Favorit.Integrations.Core.csproj", "{770694F4-35AE-48F3-A4F3-597F2C3F92BF}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Favorit.Integrations.Client", "src\Infrastructure\Integrations\Favorit\Favorit.Integrations.Client\Favorit.Integrations.Client.csproj", "{CE725F14-A36C-48F1-9E3D-12F2A2FADE8B}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Integrations.Supplier", "src\Infrastructure\Integrations\Integrations.Supplier\Integrations.Supplier.csproj", "{0A5684A4-2069-4BBD-BCB3-821A4315AD55}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -451,6 +459,18 @@ Global
 		{802CD1FE-059E-4753-BD82-27F6D829D46C}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{802CD1FE-059E-4753-BD82-27F6D829D46C}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{802CD1FE-059E-4753-BD82-27F6D829D46C}.Release|Any CPU.Build.0 = Release|Any CPU
+		{770694F4-35AE-48F3-A4F3-597F2C3F92BF}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{770694F4-35AE-48F3-A4F3-597F2C3F92BF}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{770694F4-35AE-48F3-A4F3-597F2C3F92BF}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{770694F4-35AE-48F3-A4F3-597F2C3F92BF}.Release|Any CPU.Build.0 = Release|Any CPU
+		{CE725F14-A36C-48F1-9E3D-12F2A2FADE8B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{CE725F14-A36C-48F1-9E3D-12F2A2FADE8B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{CE725F14-A36C-48F1-9E3D-12F2A2FADE8B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{CE725F14-A36C-48F1-9E3D-12F2A2FADE8B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{0A5684A4-2069-4BBD-BCB3-821A4315AD55}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{0A5684A4-2069-4BBD-BCB3-821A4315AD55}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{0A5684A4-2069-4BBD-BCB3-821A4315AD55}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{0A5684A4-2069-4BBD-BCB3-821A4315AD55}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
 		{C5111875-1112-406F-B3D1-EC119DBB23F6} = {3FC16924-68A6-4CDA-9961-0B0F589E671E}
@@ -532,5 +552,9 @@ Global
 		{77ADB20C-BBE5-400E-9ECE-B5EB0BB35ECD} = {083AE736-E053-4089-98B4-4572908F7EBA}
 		{3142198F-1F14-4FDB-8275-CACCB6D6FF87} = {3B382C5C-A126-4CE1-BC27-C79F368E771A}
 		{802CD1FE-059E-4753-BD82-27F6D829D46C} = {083AE736-E053-4089-98B4-4572908F7EBA}
+		{52C099E6-0451-4D42-A38B-3ABF548D707B} = {3B382C5C-A126-4CE1-BC27-C79F368E771A}
+		{770694F4-35AE-48F3-A4F3-597F2C3F92BF} = {52C099E6-0451-4D42-A38B-3ABF548D707B}
+		{CE725F14-A36C-48F1-9E3D-12F2A2FADE8B} = {52C099E6-0451-4D42-A38B-3ABF548D707B}
+		{0A5684A4-2069-4BBD-BCB3-821A4315AD55} = {3B382C5C-A126-4CE1-BC27-C79F368E771A}
 	EndGlobalSection
 EndGlobal

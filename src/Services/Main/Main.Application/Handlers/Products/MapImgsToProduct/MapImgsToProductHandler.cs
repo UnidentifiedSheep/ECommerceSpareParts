@@ -8,7 +8,7 @@ using Attributes;
 using Contracts.Products;
 using Main.Application.Static;
 using Main.Entities.Product;
-using Main.Entities.Setting;
+using Main.Entities.Settings;
 using MediatR;
 
 namespace Main.Application.Handlers.Products.MapImgsToProduct;
