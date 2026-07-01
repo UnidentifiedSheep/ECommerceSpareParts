@@ -5,7 +5,6 @@
     "Username": "postgres",
     "Password": "PleasKillMe21"
   },
-  "SignSecret": "SomeSecretPriceSignKey21",
   "UserEmail": {
     "MaxEmailCount": 5,
     "MinEmailCount": 1
