@@ -28,6 +28,23 @@ public abstract class ClientBase
         }
     }
     
+    protected static async Task<Response<TValue>> ReadResponse<TResponse, TValue>(
+        HttpResponseMessage response,
+        Func<TResponse, TValue> selector,
+        CancellationToken cancellationToken = default)
+    {
+        var result = await ReadResponse<TResponse>(response, cancellationToken);
+
+        if (!result.Success)
+            return Response<TValue>.Fail(
+                result.StatusCode ?? response.StatusCode,
+                result.Error);
+
+        return result.Value is null
+            ? Response<TValue>.Fail(response.StatusCode, "Response body is null")
+            : Response<TValue>.Ok(selector(result.Value));
+    }
+    
     private static string? GetError(HttpResponseMessage response, string body)
     {
         return string.IsNullOrWhiteSpace(body)

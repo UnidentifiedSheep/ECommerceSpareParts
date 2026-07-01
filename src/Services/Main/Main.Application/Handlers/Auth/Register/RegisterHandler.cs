@@ -1,5 +1,6 @@
 ﻿using Application.Common.Interfaces.Cqrs;
 using Attributes;
+using Enums;
 using Main.Application.Dtos.Emails;
 using Main.Application.Dtos.Users;
 using Main.Application.Handlers.Users.CreateUser;

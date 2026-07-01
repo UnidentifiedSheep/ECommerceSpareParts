@@ -1,7 +1,7 @@
 using System.Linq.Expressions;
 using Application.Common.Interfaces.Repositories;
 using Main.Entities.User;
-using RoleEnum = Main.Enums.Role;
+using RoleEnum = Enums.Role;
 
 namespace Main.Application.Extensions;
 

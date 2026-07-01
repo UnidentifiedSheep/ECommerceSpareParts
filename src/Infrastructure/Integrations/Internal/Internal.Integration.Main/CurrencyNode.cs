@@ -27,7 +27,7 @@ internal sealed class CurrencyNode(
             request,
             cancellationToken);
 
-        return await ReadInternalResponse<GetCurrencyRateResponse, decimal>(
+        return await ReadResponse<GetCurrencyRateResponse, decimal>(
             response,
             x => x.Rate,
             cancellationToken);
@@ -44,7 +44,7 @@ internal sealed class CurrencyNode(
             request,
             cancellationToken);
 
-        return await ReadInternalResponse<GetCurrenciesResponse, IReadOnlyList<InternalCurrency>>(
+        return await ReadResponse<GetCurrenciesResponse, IReadOnlyList<InternalCurrency>>(
             response,
             x => x.Currencies,
             cancellationToken);

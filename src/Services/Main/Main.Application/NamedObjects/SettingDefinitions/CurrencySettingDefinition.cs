@@ -12,7 +12,7 @@ namespace Main.Application.NamedObjects.SettingDefinitions;
 
 public class CurrencySettingDefinition(
     ISettingsService settingsService
-    ) : SettingDefinitionNamedObjectBase
+    ) : SettingDefinitionNamedObjectBase<CurrencySetting>(settingsService)
 {
     public override string SystemName => CurrencySetting.SettingName;
     public override string NameLocalizationKey => "currency.setting.name";
@@ -24,8 +24,8 @@ public class CurrencySettingDefinition(
     {
         var deser = JsonSerializer.Deserialize<CurrencySettingInputData>(json)
             ?? throw new InvalidInputException("currency.setting.input.invalid");
-        var currentSetting = await settingsService.GetOrDefault<CurrencySetting>(cancellationToken);
-        await settingsService.SetSetting(
+        var currentSetting = await SettingsService.GetOrDefault<CurrencySetting>(cancellationToken);
+        await SettingsService.SetSetting(
             new CurrencySetting(new CurrencySettingData
             {
                 BaseCurrencyId = currentSetting.Data.BaseCurrencyId,
@@ -35,7 +35,7 @@ public class CurrencySettingDefinition(
     }
 
     public override async Task<string> GetOutputJsonAsync(CancellationToken cancellationToken)
-        => (await settingsService.GetOrDefault<CurrencySetting>(cancellationToken)).Json;
+        => (await SettingsService.GetOrDefault<CurrencySetting>(cancellationToken)).Json;
 }
 
 public record CurrencySettingInputData

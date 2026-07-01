@@ -13,7 +13,7 @@ namespace Main.Application.NamedObjects.SettingDefinitions.Supplier;
 
 public class FavoritSupplierSettingDefinition(
     ISettingsService settingsService,
-    ISecretEncryptor secretEncryptor) : SettingDefinitionNamedObjectBase
+    ISecretEncryptor secretEncryptor) : SettingDefinitionNamedObjectBase<FavoritSupplierSetting>(settingsService)
 {
     private const string InvalidInputKey = "supplier.favorit.setting.input.invalid";
 
@@ -27,11 +27,11 @@ public class FavoritSupplierSettingDefinition(
         var deser = JsonSerializer.Deserialize<FavoritSupplierSettingInputData>(json)
                     ?? throw new InvalidInputException(InvalidInputKey);
 
-        var currentSetting = await settingsService.GetOrDefault<FavoritSupplierSetting>(cancellationToken);
+        var currentSetting = await SettingsService.GetOrDefault<FavoritSupplierSetting>(cancellationToken);
         
         if (!deser.IsEnabled)
         {
-            await settingsService.SetSetting(
+            await SettingsService.SetSetting(
                 new FavoritSupplierSetting(currentSetting.Data with { IsEnabled = false }), 
                 cancellationToken);
             return;
@@ -50,12 +50,12 @@ public class FavoritSupplierSettingDefinition(
             BaseUrl = baseUrl
         };
         
-        await settingsService.SetSetting(new FavoritSupplierSetting(data), cancellationToken);
+        await SettingsService.SetSetting(new FavoritSupplierSetting(data), cancellationToken);
     }
 
     public override async Task<string> GetOutputJsonAsync(CancellationToken cancellationToken)
     {
-        var setting = await settingsService.GetOrDefault<FavoritSupplierSetting>(cancellationToken);
+        var setting = await SettingsService.GetOrDefault<FavoritSupplierSetting>(cancellationToken);
 
         return JsonSerializer.Serialize(new FavoritSupplierSettingOutputData
         {

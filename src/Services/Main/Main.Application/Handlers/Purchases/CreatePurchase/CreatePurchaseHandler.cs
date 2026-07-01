@@ -28,7 +28,7 @@ using Main.Enums.Balances;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
-using Role = Main.Enums.Role;
+using Role = Enums.Role;
 
 namespace Main.Application.Handlers.Purchases.CreatePurchase;
 

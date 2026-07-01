@@ -1,7 +1,7 @@
 using FluentValidation;
 using Localization.Domain.Extensions;
 using Main.Entities.Auth;
-using Role = Main.Enums.Role;
+using Role = Enums.Role;
 
 namespace Main.Application.Handlers.Auth.AddRoleToUser;
 

@@ -34,21 +34,4 @@ public abstract class InternalClientBase(
         if (locale == null) return;
         request.Headers.Add("Accept-Language", locale);
     }
-
-    protected static async Task<Response<TValue>> ReadInternalResponse<TResponse, TValue>(
-        HttpResponseMessage response,
-        Func<TResponse, TValue> selector,
-        CancellationToken cancellationToken = default)
-    {
-        var result = await ReadResponse<TResponse>(response, cancellationToken);
-
-        if (!result.Success)
-            return Response<TValue>.Fail(
-                result.StatusCode ?? response.StatusCode,
-                result.Error);
-
-        return result.Value is null
-            ? Response<TValue>.Fail(response.StatusCode, "Response body is null")
-            : Response<TValue>.Ok(selector(result.Value));
-    }
 }

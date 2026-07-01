@@ -15,7 +15,7 @@ public class RolesTestContext(DContext ctx) : TestContextBase<DContext>(ctx)
     {
         var builders = new List<IBuilder<Role>>();
 
-        foreach (var value in Enum.GetValues<Main.Enums.Role>())
+        foreach (var value in Enum.GetValues<Enums.Role>())
             builders.Add(new RoleBuilder(Faker).WithName(value.ToString()));
 
         Roles = await BuilderExtensions.BuildManyCombinedAndAddToDb(

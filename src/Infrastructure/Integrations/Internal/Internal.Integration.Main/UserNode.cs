@@ -26,7 +26,7 @@ internal sealed class UserNode(
             request,
             cancellationToken);
 
-        return await ReadInternalResponse<GetUserDiscountResponse, decimal>(
+        return await ReadResponse<GetUserDiscountResponse, decimal>(
             response,
             x => x.Discount,
             cancellationToken);

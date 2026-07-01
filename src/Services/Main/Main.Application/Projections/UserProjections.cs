@@ -1,4 +1,5 @@
 ﻿using System.Linq.Expressions;
+using Enums;
 using LinqKit;
 using Main.Application.Dtos.Auth;
 using Main.Application.Dtos.Users;

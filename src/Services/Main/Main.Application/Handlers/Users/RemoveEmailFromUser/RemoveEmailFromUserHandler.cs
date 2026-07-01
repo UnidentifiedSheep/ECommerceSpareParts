@@ -4,6 +4,7 @@ using Application.Common.Interfaces.Cqrs;
 using Application.Common.Interfaces.Repositories;
 using Attributes;
 using Contracts.User;
+using Enums;
 using Exceptions;
 using Main.Application.Extensions;
 using Main.Application.Interfaces.Persistence;

@@ -1,5 +1,5 @@
 ﻿using Main.Entities.Auth;
-using Role = Main.Enums.Role;
+using Role = Enums.Role;
 
 namespace Main.Application.Extensions;
 

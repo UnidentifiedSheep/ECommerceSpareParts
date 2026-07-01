@@ -4,6 +4,7 @@ using Abstractions.Interfaces.Services;
 using Application.Common.Interfaces.Cqrs;
 using Application.Common.Interfaces.Repositories;
 using Attributes;
+using Enums;
 using Main.Application.Extensions;
 using Main.Application.Interfaces.Services;
 using Main.Entities.Balance;

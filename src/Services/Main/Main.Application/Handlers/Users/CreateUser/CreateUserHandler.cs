@@ -10,7 +10,7 @@ using Main.Application.Projections;
 using Main.Entities.Auth;
 using Main.Entities.Exceptions;
 using Main.Entities.User;
-using Role = Main.Enums.Role;
+using Role = Enums.Role;
 
 namespace Main.Application.Handlers.Users.CreateUser;
 

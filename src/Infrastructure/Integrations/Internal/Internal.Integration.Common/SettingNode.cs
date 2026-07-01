@@ -1,48 +1,44 @@
-using System.Text.Json;
 using System.Text.Json.Serialization;
 using Abstractions.Interfaces;
 using Integrations.Common;
 using Internal.Integration.Core;
 using Internal.Integration.Core.Interfaces;
 using Internal.Integration.Core.Interfaces.Common;
-using Internal.Integration.Core.Models.Common;
 using Microsoft.Extensions.Options;
 
 namespace Internal.Integration.Common;
 
-internal sealed class JobNode(
+public class SettingNode(
     HttpClient httpClient,
     IAuthClient authClient,
     IOptionsMonitor<InternalServicesOptions> serviceOptions,
-    IOptionsMonitor<InternalServiceCredentials> credentialsMonitor) 
-    : InternalCommonClientBase(authClient, credentialsMonitor, serviceOptions), IJobNode
+    IOptionsMonitor<InternalServiceCredentials> credentialsMonitor
+    ) : InternalCommonClientBase(authClient, credentialsMonitor, serviceOptions), ISettingNode
 {
-    public async Task<Response<IReadOnlyList<InternalJobInfo>>> GetAvailableJobs(
+    public async Task<Response<string>> GetSetting(
         IServiceDefinition serviceDefinition, 
-        string? locale,
+        string systemName, 
         CancellationToken cancellationToken = default)
     {
         using var request = await GetRequest(
             serviceDefinition,
             HttpMethod.Get,
-            "/jobs/available",
+            "/internal/settings/" + systemName,
             cancellationToken);
-        
-        AddLocalizationHeader(request, locale);
         
         using var response = await httpClient.SendAsync(
             request,
             cancellationToken);
 
-        return await ReadResponse<GetAvailableJobsResponse, IReadOnlyList<InternalJobInfo>>(
+        return await ReadResponse<GetSettingResponse, string>(
             response, 
-            x => x.Jobs,
+            x => x.Json,
             cancellationToken);
     }
-
-    private record GetAvailableJobsResponse
+    
+    private record GetSettingResponse
     {
-        [JsonPropertyName("jobs")]
-        public required IReadOnlyList<InternalJobInfo> Jobs { get; init; }
+        [JsonPropertyName("json")]
+        public required string Json { get; init; }
     }
 }

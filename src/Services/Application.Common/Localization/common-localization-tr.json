@@ -13,6 +13,7 @@
     "job.schedule.job.system.name.required": "Görev sistem adı zorunludur.",
     "job.schedule.input.state.required": "Görev giriş durumu zorunludur.",
     "job.schedule.cron.required": "Görev zamanlaması cron ifadesi zorunludur.",
-    "job.schedule.cron.invalid": "Görev zamanlaması cron ifadesi geçerli olmalıdır."
+    "job.schedule.cron.invalid": "Görev zamanlaması cron ifadesi geçerli olmalıdır.",
+    "setting.not.found": "Ayar {0} bulunamadı."
   }
 }

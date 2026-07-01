@@ -15,7 +15,7 @@ namespace Main.Application.NamedObjects.SettingDefinitions;
 public class StorageContentSettingDefinition(
     ISettingsService settingsService,
     INamedObjectRegistry<StorageContentExtractPolicyBase> registry
-    ) : SettingDefinitionNamedObjectBase
+    ) : SettingDefinitionNamedObjectBase<StorageContentSetting>(settingsService)
 {
     private const string InvalidInputKey = "storage.content.setting.input.invalid";
     public override string SystemName => StorageContentSetting.SettingName;
@@ -32,7 +32,7 @@ public class StorageContentSettingDefinition(
         if (registry.TryGetBySystemName(deser.StorageContentExtractionPolicy) == null)
             throw new InvalidInputException(InvalidInputKey);
         
-        await settingsService.SetSetting(
+        await SettingsService.SetSetting(
             new StorageContentSetting(new StorageContentSettingData
             {
                 StorageContentExtractionPolicy = deser.StorageContentExtractionPolicy
@@ -41,7 +41,7 @@ public class StorageContentSettingDefinition(
     }
     
     public override async Task<string> GetOutputJsonAsync(CancellationToken cancellationToken)
-        => (await settingsService.GetOrDefault<StorageContentSetting>(cancellationToken)).Json;
+        => (await SettingsService.GetOrDefault<StorageContentSetting>(cancellationToken)).Json;
 }
 
 public record StorageContentSettingInputData

@@ -52,4 +52,9 @@
         <ProjectReference Include="..\Application.Common\Application.Common.csproj"/>
     </ItemGroup>
 
+
+    <ItemGroup>
+      <Folder Include="EndPoints\Internal\" />
+    </ItemGroup>
+
 </Project>

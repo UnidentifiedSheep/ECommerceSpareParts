@@ -13,6 +13,7 @@
     "job.schedule.job.system.name.required": "Job system name is required.",
     "job.schedule.input.state.required": "Job input state is required.",
     "job.schedule.cron.required": "Job schedule cron expression is required.",
-    "job.schedule.cron.invalid": "Job schedule cron expression must be valid."
+    "job.schedule.cron.invalid": "Job schedule cron expression must be valid.",
+    "setting.not.found": "Failed to find setting {0}."
   }
 }

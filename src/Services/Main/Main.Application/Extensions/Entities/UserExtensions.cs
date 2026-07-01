@@ -1,7 +1,7 @@
 using Main.Entities.User;
 using Main.Enums.Auth;
 using Main.Enums.Balances;
-using Role = Main.Enums.Role;
+using Role = Enums.Role;
 using RoleExtensions = Main.Application.Extensions.RoleExtensions;
 
 namespace Main.Application.Extensions.Entities;

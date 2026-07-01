@@ -3,7 +3,7 @@ using Main.Entities.Auth;
 using Main.Persistence.Context;
 using Microsoft.EntityFrameworkCore;
 using Persistence.Interfaces;
-using Role = Main.Enums.Role;
+using Role = Enums.Role;
 
 namespace Main.Migrator.DataSeeds;
 
