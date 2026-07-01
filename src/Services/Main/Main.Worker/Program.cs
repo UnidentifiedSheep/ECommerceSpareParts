@@ -64,6 +64,7 @@ builder.Services
     .AddCacheLayer("main")
     .AddApplicationCache()
     .AddJsonSigner()
+    .AddSecretEncryptor()
     .AddMailLayer()
     .AddCommonLayer()
     .AddS3()

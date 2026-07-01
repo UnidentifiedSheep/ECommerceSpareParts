@@ -1,0 +1,16 @@
+{
+  "locale": "ru",
+  "keyValues": {
+    "supplier.favorit.setting.name": "Настройки поставщика Favorit",
+    "supplier.favorit.setting.description": "Управляет настройками подключения к интеграции поставщика Favorit.",
+    "supplier.favorit.setting.input.invalid": "Переданы некорректные данные настроек поставщика Favorit.",
+    "supplier.favorit.setting.is.enabled.name": "Интеграция включена",
+    "supplier.favorit.setting.is.enabled.description": "Включает или отключает интеграцию с поставщиком Favorit.",
+    "supplier.favorit.setting.base.url.name": "Базовый URL",
+    "supplier.favorit.setting.base.url.description": "Базовый URL, используемый для отправки запросов в API поставщика Favorit.",
+    "supplier.favorit.setting.api.key.name": "API-ключ",
+    "supplier.favorit.setting.api.key.description": "API-ключ, используемый для авторизации запросов в API поставщика Favorit.",
+    "supplier.favorit.setting.has.api.key.name": "API-ключ задан",
+    "supplier.favorit.setting.has.api.key.description": "Показывает, сохранен ли API-ключ для интеграции с поставщиком Favorit."
+  }
+}

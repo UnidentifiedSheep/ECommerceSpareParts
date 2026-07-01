@@ -29,7 +29,8 @@ public class GetSettingsHandler(
                 Name = definition.GetLocalizedName(localizer),
                 Description = definition.GetLocalizedDescription(localizer),
                 InputData = jsonSerializer.SerializeMetadata(definition.InputSettingType),
-                OutputData = (await definition.GetSettingAsync(cancellationToken)).Json
+                OutputMetadata = jsonSerializer.SerializeMetadata(definition.OutputSettingType),
+                OutputData = await definition.GetOutputJsonAsync(cancellationToken)
             });
         }
         

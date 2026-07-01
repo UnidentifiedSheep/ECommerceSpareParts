@@ -24,6 +24,8 @@
     "currency.setting.name": "Para birimi ayarları",
     "currency.setting.description": "Döviz kuru sağlayıcısı dahil para birimiyle ilgili uygulama ayarlarını yönetir.",
     "currency.setting.input.invalid": "Geçersiz para birimi ayarları verisi sağlandı.",
+    "currency.setting.base.currency.name": "Temel para birimi",
+    "currency.setting.base.currency.description": "Uygulama döviz kurları için temel alınan para birimi.",
     "currency.setting.rate.provider.name": "Döviz kuru sağlayıcısı",
     "currency.setting.rate.provider.description": "Para birimi kurlarını güncellemek için kullanılan sağlayıcı."
   }

@@ -40,8 +40,8 @@ public class StorageContentSettingDefinition(
             cancellationToken);
     }
     
-    public override async Task<Setting> GetSettingAsync(CancellationToken cancellationToken)
-        => await settingsService.GetOrDefault<StorageContentSetting>(cancellationToken);
+    public override async Task<string> GetOutputJsonAsync(CancellationToken cancellationToken)
+        => (await settingsService.GetOrDefault<StorageContentSetting>(cancellationToken)).Json;
 }
 
 public record StorageContentSettingInputData

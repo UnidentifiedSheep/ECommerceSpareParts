@@ -1,0 +1,16 @@
+{
+  "locale": "tr",
+  "keyValues": {
+    "supplier.favorit.setting.name": "Favorit tedarikçi ayarları",
+    "supplier.favorit.setting.description": "Favorit tedarikçi entegrasyonu için bağlantı ayarlarını yönetir.",
+    "supplier.favorit.setting.input.invalid": "Geçersiz Favorit tedarikçi ayarları verisi sağlandı.",
+    "supplier.favorit.setting.is.enabled.name": "Entegrasyon etkin",
+    "supplier.favorit.setting.is.enabled.description": "Favorit tedarikçi entegrasyonunu etkinleştirir veya devre dışı bırakır.",
+    "supplier.favorit.setting.base.url.name": "Temel URL",
+    "supplier.favorit.setting.base.url.description": "Favorit tedarikçi API'sine istek göndermek için kullanılan temel URL.",
+    "supplier.favorit.setting.api.key.name": "API anahtarı",
+    "supplier.favorit.setting.api.key.description": "Favorit tedarikçi API'sine yapılan istekleri yetkilendirmek için kullanılan API anahtarı.",
+    "supplier.favorit.setting.has.api.key.name": "API anahtarı tanımlı",
+    "supplier.favorit.setting.has.api.key.description": "Favorit tedarikçi entegrasyonu için API anahtarının kaydedilip kaydedilmediğini gösterir."
+  }
+}

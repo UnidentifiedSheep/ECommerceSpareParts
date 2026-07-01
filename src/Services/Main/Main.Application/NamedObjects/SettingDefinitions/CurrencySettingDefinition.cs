@@ -34,8 +34,8 @@ public class CurrencySettingDefinition(
             cancellationToken);
     }
 
-    public override async Task<Setting> GetSettingAsync(CancellationToken cancellationToken)
-        => await settingsService.GetOrDefault<CurrencySetting>(cancellationToken);
+    public override async Task<string> GetOutputJsonAsync(CancellationToken cancellationToken)
+        => (await settingsService.GetOrDefault<CurrencySetting>(cancellationToken)).Json;
 }
 
 public record CurrencySettingInputData

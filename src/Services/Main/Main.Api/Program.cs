@@ -130,6 +130,7 @@ builder.Services
     .AddCacheLayer("main")
     .AddApplicationCache()
     .AddJsonSigner()
+    .AddSecretEncryptor()
     .AddFullSecurityLayer()
     .AddEComAuth(builder.Configuration)
     .AddMailLayer()

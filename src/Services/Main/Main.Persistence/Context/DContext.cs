@@ -11,6 +11,7 @@ using Main.Entities.Product;
 using Main.Entities.Purchase;
 using Main.Entities.Sale;
 using Main.Entities.Settings;
+using Main.Entities.Settings.Supplier;
 using Main.Entities.Storage;
 using Main.Entities.User;
 using MassTransit;
@@ -166,7 +167,8 @@ public partial class DContext : DbContext
             .HasValue<Setting>(nameof(Setting))
             .HasValue<CurrencySetting>(CurrencySetting.SettingName)
             .HasValue<GlobalApplicationSetting>(GlobalApplicationSetting.SettingName)
-            .HasValue<StorageContentSetting>(StorageContentSetting.SettingName);
+            .HasValue<StorageContentSetting>(StorageContentSetting.SettingName)
+            .HasValue<FavoritSupplierSetting>(FavoritSupplierSetting.SettingName);
 
         modelBuilder.AddFieldsForAuditableEntities();
 

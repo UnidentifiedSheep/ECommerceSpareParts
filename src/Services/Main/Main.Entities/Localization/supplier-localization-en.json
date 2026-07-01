@@ -1,0 +1,16 @@
+{
+  "locale": "en",
+  "keyValues": {
+    "supplier.favorit.setting.name": "Favorit supplier settings",
+    "supplier.favorit.setting.description": "Controls connection settings for the Favorit supplier integration.",
+    "supplier.favorit.setting.input.invalid": "Invalid Favorit supplier settings data was provided.",
+    "supplier.favorit.setting.is.enabled.name": "Integration enabled",
+    "supplier.favorit.setting.is.enabled.description": "Enables or disables the Favorit supplier integration.",
+    "supplier.favorit.setting.base.url.name": "Base URL",
+    "supplier.favorit.setting.base.url.description": "Base URL used to send requests to the Favorit supplier API.",
+    "supplier.favorit.setting.api.key.name": "API key",
+    "supplier.favorit.setting.api.key.description": "API key used to authorize requests to the Favorit supplier API.",
+    "supplier.favorit.setting.has.api.key.name": "API key configured",
+    "supplier.favorit.setting.has.api.key.description": "Shows whether an API key is stored for the Favorit supplier integration."
+  }
+}

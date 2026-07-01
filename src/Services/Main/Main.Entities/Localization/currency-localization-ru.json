@@ -24,6 +24,8 @@
     "currency.setting.name": "Настройки валют",
     "currency.setting.description": "Управляет настройками валют, включая провайдера курсов обмена.",
     "currency.setting.input.invalid": "Переданы некорректные данные настроек валют.",
+    "currency.setting.base.currency.name": "Базовая валюта",
+    "currency.setting.base.currency.description": "Валюта, используемая как базовая для курсов обмена в приложении.",
     "currency.setting.rate.provider.name": "Провайдер курсов обмена",
     "currency.setting.rate.provider.description": "Провайдер, используемый для обновления курсов валют."
   }

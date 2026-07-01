@@ -1,5 +1,4 @@
 using Application.Common.Abstractions.NamedObjects;
-using Domain.CommonEntities;
 
 namespace Application.Common.NamedObject;
 
@@ -12,5 +11,5 @@ public abstract class SettingDefinitionNamedObjectBase : LocalizableNameObject
         string json,
         CancellationToken cancellationToken);
     
-    public abstract Task<Setting> GetSettingAsync(CancellationToken cancellationToken);
+    public abstract Task<string> GetOutputJsonAsync(CancellationToken cancellationToken);
 }

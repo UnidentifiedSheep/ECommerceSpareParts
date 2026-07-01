@@ -16,6 +16,9 @@ public record SettingDto
     [JsonPropertyName("inputData")]
     public required string InputData { get; init; }
     
+    [JsonPropertyName("outputMetadata")]
+    public required string OutputMetadata { get; init; }
+    
     [JsonPropertyName("outputData")]
     public required string OutputData { get; init; }
 }
