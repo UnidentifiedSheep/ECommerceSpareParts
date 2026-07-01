@@ -11,10 +11,10 @@ using Integrations.Supplier.Settings;
 
 namespace Favorit.Integrations.Client;
 
-public class SupplierAdapter(
+public class FavoritPartsSupplier(
     IFavoritPartsClient client,
     ISupplierSettingsProvider<FavoriteSettings> settingsProvider
-    ) : ISupplierAdapter
+    ) : ISupplier
 {
     public Supplier Supplier => Supplier.FavoritParts;
     

@@ -1,6 +1,12 @@
 namespace Integrations.Supplier.Interfaces;
 
-public interface IConnectionProvider<TModel>
+public interface IConnectionProvider<TModel> : IConnectionProvider
 {
-    Task<TModel> GetConnectionAsync(CancellationToken cancellationToken = default);
+    new Task<TModel> GetConnectionAsync(CancellationToken cancellationToken = default);
+}
+
+public interface IConnectionProvider
+{
+    Supplier Supplier { get; }
+    Task<object> GetConnectionAsync(CancellationToken cancellationToken = default);
 }

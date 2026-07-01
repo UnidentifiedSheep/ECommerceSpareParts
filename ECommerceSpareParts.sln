@@ -185,6 +185,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Favorit.Integrations.Client
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Favorit.Integrations.Core", "src\Infrastructure\Integrations\Suppliers\Favorit\Favorit.Integrations.Core\Favorit.Integrations.Core.csproj", "{A12DFB39-B482-4C6C-9C65-B6DA430C92D4}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Integrations.Supplier.DI", "src\Infrastructure\Integrations\Suppliers\Integrations.Supplier.DI\Integrations.Supplier.DI.csproj", "{36355B95-C378-4C60-A3FC-66E52EB8B9C1}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -479,6 +481,10 @@ Global
 		{A12DFB39-B482-4C6C-9C65-B6DA430C92D4}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{A12DFB39-B482-4C6C-9C65-B6DA430C92D4}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{A12DFB39-B482-4C6C-9C65-B6DA430C92D4}.Release|Any CPU.Build.0 = Release|Any CPU
+		{36355B95-C378-4C60-A3FC-66E52EB8B9C1}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{36355B95-C378-4C60-A3FC-66E52EB8B9C1}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{36355B95-C378-4C60-A3FC-66E52EB8B9C1}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{36355B95-C378-4C60-A3FC-66E52EB8B9C1}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
 		{C5111875-1112-406F-B3D1-EC119DBB23F6} = {3FC16924-68A6-4CDA-9961-0B0F589E671E}
@@ -566,5 +572,6 @@ Global
 		{85440F19-74FD-4D9C-9F8F-B964B92FD256} = {61091FB1-9548-4664-96D9-1A9CD8CE7CAE}
 		{947D5238-AD2D-479A-822E-BF67BA642D12} = {CEF53BF4-0130-4935-96F5-575F4A340942}
 		{A12DFB39-B482-4C6C-9C65-B6DA430C92D4} = {CEF53BF4-0130-4935-96F5-575F4A340942}
+		{36355B95-C378-4C60-A3FC-66E52EB8B9C1} = {4469AF48-D4DF-4280-8DCE-C9B3D3ACC959}
 	EndGlobalSection
 EndGlobal

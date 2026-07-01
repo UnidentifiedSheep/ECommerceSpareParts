@@ -4,7 +4,7 @@ using Integrations.Supplier.Models.Requests;
 
 namespace Integrations.Supplier.Interfaces;
 
-public interface ISupplierAdapter
+public interface ISupplier
 {
     Supplier Supplier { get; }
     

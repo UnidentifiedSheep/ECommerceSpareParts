@@ -9,7 +9,7 @@ using Microsoft.AspNetCore.WebUtilities;
 
 namespace Favorit.Integrations.Client;
 
-public class FavoritClient(
+public class FavoritPartsClient(
     HttpClient client,
     IConnectionProvider<FavoritConnection> connectionProvider
     ) : ClientBase, IFavoritPartsClient
