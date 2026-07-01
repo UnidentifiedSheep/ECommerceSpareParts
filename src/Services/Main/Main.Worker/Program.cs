@@ -55,7 +55,7 @@ builder.AddLokiLogger(
     "main.worker",
     env);
 
-builder.Services.AddProjectJsonSerialization();
+builder.Services.AddCommonWorkerInfrastructure();
 
 AddMassTransit(builder);
 

@@ -32,7 +32,7 @@ builder.Services
     .AddRedisOptions()
     .AddDatabaseOptions();
 
-builder.Services.AddProjectJsonSerialization();
+builder.Services.AddCommonWorkerInfrastructure();
 
 builder.AddLokiLogger(
     builder.Configuration,

@@ -49,4 +49,12 @@ public static class WebApplicationBuilderExtensions
 
         return services;
     }
+
+    public static IServiceCollection AddCommonWorkerInfrastructure(
+        this IServiceCollection services)
+    {
+        services.AddProjectJsonSerialization();
+
+        return services;
+    }
 }
