@@ -8,7 +8,6 @@ using Application.Common.Services.Supplier;
 using Cache;
 using Carter;
 using Contracts.Analytics;
-using Contracts.Currency;
 using Contracts.Job;
 using Contracts.Settings;
 using Integrations.Supplier.DI;
@@ -60,31 +59,35 @@ builder.Services.AddMassTransit(x =>
     {
         cfg.ConfigureRabbitMq(context);
 
-        cfg.ReceiveEndpoint(uniqQueueName, ep =>
-        {
-            ep.AutoDelete = true;
-            ep.Durable = false;
-            ep.ConfigureConsumeTopology = false;
-            
-            ep.ConfigureConsumer<BackplaneConsumer>(context);
-            ep.ConfigureConsumer<SettingUpdatedConsumer>(context);
+        cfg.ReceiveEndpoint(
+            uniqQueueName,
+            ep =>
+            {
+                ep.AutoDelete = true;
+                ep.Durable = false;
+                ep.ConfigureConsumeTopology = false;
 
-            ep.ConfigureConsumer<MarkupRangesRefreshRequestedConsumer>(context);
-            
-            ep.Bind<BackplaneMessage>();
-            ep.Bind<MarkupRangesRefreshRequestedEvent>();
-            
-            ep.BindForService<JobStatusUpdatedEvent>(ServicesDefinitions.Pricing)
-                .BindForService<SettingUpdatedEvent>(ServicesDefinitions.Pricing);
-        });
+                ep.ConfigureConsumer<BackplaneConsumer>(context);
+                ep.ConfigureConsumer<SettingUpdatedConsumer>(context);
 
-        cfg.ReceiveEndpoint("pricing-queue", ep =>
-        {
-            ep.Durable = true;
-            
-            ep.ConfigureConsumer<CurrencyRatesChangedConsumer>(context);
-            ep.ConfigureConsumer<MarkupAnalyzedConsumer>(context);
-        });
+                ep.ConfigureConsumer<MarkupRangesRefreshRequestedConsumer>(context);
+
+                ep.Bind<BackplaneMessage>();
+                ep.Bind<MarkupRangesRefreshRequestedEvent>();
+
+                ep.BindForService<JobStatusUpdatedEvent>(ServicesDefinitions.Pricing)
+                    .BindForService<SettingUpdatedEvent>(ServicesDefinitions.Pricing);
+            });
+
+        cfg.ReceiveEndpoint(
+            "pricing-queue",
+            ep =>
+            {
+                ep.Durable = true;
+
+                ep.ConfigureConsumer<CurrencyRatesChangedConsumer>(context);
+                ep.ConfigureConsumer<MarkupAnalyzedConsumer>(context);
+            });
     });
 });
 

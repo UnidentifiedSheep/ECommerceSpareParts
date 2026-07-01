@@ -9,9 +9,7 @@ namespace Main.Entities.Storage;
 
 public class StorageRoute : AuditableEntity<StorageRoute, Guid>, ILinqEntity<StorageRoute, Guid>
 {
-    private StorageRoute()
-    {
-    }
+    private StorageRoute() { }
 
     private StorageRoute(
         string from,
@@ -29,7 +27,10 @@ public class StorageRoute : AuditableEntity<StorageRoute, Guid>, ILinqEntity<Sto
     {
         SetRoute(from, to);
         SetDistanceM(distanceM);
-        SetPrices(priceKg, pricePerM3, pricePerOrder);
+        SetPrices(
+            priceKg,
+            pricePerM3,
+            pricePerOrder);
         SetDeliveryTime(deliveryTimeMinutes);
         SetMinimumPrice(minimumPrice);
         SetCurrencyId(currencyId);
@@ -72,10 +73,7 @@ public class StorageRoute : AuditableEntity<StorageRoute, Guid>, ILinqEntity<Sto
 
     public Currency.Currency Currency { get; private set; } = null!;
 
-    public static Expression<Func<StorageRoute, Guid>> GetKeySelector()
-    {
-        return x => x.Id;
-    }
+    public static Expression<Func<StorageRoute, Guid>> GetKeySelector() { return x => x.Id; }
 
     public static Expression<Func<StorageRoute, bool>> GetEqualityExpression(Guid key)
     {
@@ -128,7 +126,10 @@ public class StorageRoute : AuditableEntity<StorageRoute, Guid>, ILinqEntity<Sto
         DeliveryTimeMinutes = minutes.AgainstTooSmall(1, "storage.route.delivery.time.min");
     }
 
-    public void SetPrices(decimal priceKg, decimal pricePerM3, decimal pricePerOrder)
+    public void SetPrices(
+        decimal priceKg,
+        decimal pricePerM3,
+        decimal pricePerOrder)
     {
         SetPriceKg(priceKg);
         SetPricePerM3(pricePerM3);
@@ -160,38 +161,17 @@ public class StorageRoute : AuditableEntity<StorageRoute, Guid>, ILinqEntity<Sto
             .AgainstTooSmall(0, "storage.route.minimum.price.min");
     }
 
-    public void SetCurrencyId(int currencyId)
-    {
-        CurrencyId = currencyId;
-    }
+    public void SetCurrencyId(int currencyId) { CurrencyId = currencyId; }
 
-    public void SetCarrierId(Guid? carrierId)
-    {
-        CarrierId = carrierId;
-    }
+    public void SetCarrierId(Guid? carrierId) { CarrierId = carrierId; }
 
-    public void SetRouteType(RouteType routeType)
-    {
-        RouteType = routeType;
-    }
+    public void SetRouteType(RouteType routeType) { RouteType = routeType; }
 
-    public void SetPricingModel(LogisticPricingType pricingModel)
-    {
-        PricingModel = pricingModel;
-    }
+    public void SetPricingModel(LogisticPricingType pricingModel) { PricingModel = pricingModel; }
 
-    public void Activate()
-    {
-        IsActive = true;
-    }
+    public void Activate() { IsActive = true; }
 
-    public void Deactivate()
-    {
-        IsActive = false;
-    }
+    public void Deactivate() { IsActive = false; }
 
-    public override Guid GetId()
-    {
-        return Id;
-    }
+    public override Guid GetId() { return Id; }
 }

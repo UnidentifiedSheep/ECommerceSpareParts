@@ -1,5 +1,4 @@
 ﻿using Abstractions.Interfaces.Persistence;
-using Abstractions.Interfaces.Services;
 using Application.Common.Interfaces.Cqrs;
 using Application.Common.Interfaces.Repositories;
 using Attributes;
@@ -14,7 +13,8 @@ public record DeleteFromCartCommand(Guid UserId, int ProductId) : ICommand;
 
 public class DeleteFromCartHandler(
     IRepository<Entities.Cart.Cart, (Guid, int)> repository,
-    IUnitOfWork unitOfWork)
+    IUnitOfWork unitOfWork
+)
     : ICommandHandler<DeleteFromCartCommand>
 {
     public async Task<Unit> Handle(DeleteFromCartCommand request, CancellationToken cancellationToken)

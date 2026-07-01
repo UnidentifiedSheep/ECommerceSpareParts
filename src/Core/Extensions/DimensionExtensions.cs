@@ -4,12 +4,19 @@ namespace Extensions;
 
 public static class DimensionExtensions
 {
-    public static decimal ToCubicMeters(decimal length, decimal width, decimal height, DimensionUnit unit)
+    public static decimal ToCubicMeters(
+        decimal length,
+        decimal width,
+        decimal height,
+        DimensionUnit unit)
     {
         return length.ToMeters(unit) * width.ToMeters(unit) * height.ToMeters(unit);
     }
 
-    public static decimal ToCubicMeters(decimal length, decimal width, decimal height)
+    public static decimal ToCubicMeters(
+        decimal length,
+        decimal width,
+        decimal height)
     {
         return length * width * height;
     }
@@ -21,7 +28,10 @@ public static class DimensionExtensions
             DimensionUnit.Millimeter => value / 1000,
             DimensionUnit.Centimeter => value / 100,
             DimensionUnit.Meter => value,
-            _ => throw new ArgumentOutOfRangeException(nameof(unit), unit, null)
+            _ => throw new ArgumentOutOfRangeException(
+                nameof(unit),
+                unit,
+                null)
         };
     }
 }

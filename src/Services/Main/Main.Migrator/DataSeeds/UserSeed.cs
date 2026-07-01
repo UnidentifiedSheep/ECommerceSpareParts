@@ -1,7 +1,6 @@
 using Abstractions.Interfaces.Validators;
 using Main.Entities.Auth;
 using Main.Entities.User;
-using Main.Enums;
 using Main.Persistence.Context;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
@@ -12,7 +11,8 @@ namespace Main.Migrator.DataSeeds;
 
 public class UserSeed(
     IOptions<ServiceSecrets> secrets,
-    IPasswordManager pwdManager) : ISeed<DContext>
+    IPasswordManager pwdManager
+) : ISeed<DContext>
 {
     private static readonly string[] Services =
     [
@@ -36,24 +36,19 @@ public class UserSeed(
 
         foreach (var service in Services)
         {
-            if (existingSystemUsers.ContainsKey(service))
-                continue;
+            if (existingSystemUsers.ContainsKey(service)) continue;
 
             var secret = GetServiceSecret(service);
             toAdd.Add(CreateSystemUser(service, secret));
         }
 
-        if (toAdd.Count == 0)
-            return;
+        if (toAdd.Count == 0) return;
 
         await context.Users.AddRangeAsync(toAdd);
         await context.SaveChangesAsync();
     }
 
-    public int GetPriority()
-    {
-        return 1;
-    }
+    public int GetPriority() { return 1; }
 
     private string GetServiceSecret(string service)
     {

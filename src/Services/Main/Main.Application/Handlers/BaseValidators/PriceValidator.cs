@@ -12,7 +12,10 @@ public class PriceValidator : AbstractValidator<decimal>
             .WithLocalizationKey("price.must.be.positive");
 
         RuleFor(x => x)
-            .PrecisionScale(18, 2, true)
+            .PrecisionScale(
+                18,
+                2,
+                true)
             .WithLocalizationKey("price.max.two.decimal.places");
     }
 }

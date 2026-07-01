@@ -5,7 +5,7 @@ namespace Analytics.Application.NamedObjects.Metrics;
 
 public record ProductPurchasesMetricInput : ProductMetricInputBase;
 
-public class ProductPurchasesMetricDefinition 
+public class ProductPurchasesMetricDefinition
     : MetricDefinitionNamedObjectBase<ProductPurchasesMetric, ProductPurchasesMetricInput>
 {
     public override string NameLocalizationKey => "product.purchases.metric.name";
@@ -14,5 +14,7 @@ public class ProductPurchasesMetricDefinition
     public override Type InputType => typeof(ProductPurchasesMetricInput);
 
     protected override ProductPurchasesMetric CreateMetric(ProductPurchasesMetricInput input)
-        => FillMetricBase(new ProductPurchasesMetric(input.ProductId), input);
+    {
+        return FillMetricBase(new ProductPurchasesMetric(input.ProductId), input);
+    }
 }

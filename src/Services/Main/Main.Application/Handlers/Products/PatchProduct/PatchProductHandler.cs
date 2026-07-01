@@ -15,7 +15,8 @@ public record PatchProductCommand(int ProductId, PatchProductDto PatchProduct) :
 
 public class PatchProductHandler(
     IIntegrationEventScope integrationEventScope,
-    IProductRepository productRepository)
+    IProductRepository productRepository
+)
     : ICommandHandler<PatchProductCommand>
 {
     public async Task<Unit> Handle(PatchProductCommand request, CancellationToken cancellationToken)
@@ -27,11 +28,9 @@ public class PatchProductHandler(
         if (patch.Description.IsSet) product.SetDescription(patch.Description);
         if (patch.CategoryId.IsSet) product.SetCategory(patch.CategoryId);
 
-        if (patch.Sku is { IsSet: true, Value: not null })
-            product.SetSku(patch.Sku.Value);
+        if (patch.Sku is { IsSet: true, Value: not null }) product.SetSku(patch.Sku.Value);
 
-        if (patch.Name is { IsSet: true, Value: not null })
-            product.SetName(patch.Name.Value);
+        if (patch.Name is { IsSet: true, Value: not null }) product.SetName(patch.Name.Value);
 
         if (patch.ProducerId.IsSet) product.SetProducerId(patch.ProducerId);
 
@@ -41,10 +40,11 @@ public class PatchProductHandler(
 
         if (patch.PairId.IsSet) product.SetPair(patch.PairId.Value);
 
-        integrationEventScope.Add(new ProductUpdatedEvent
-        {
-            Id = product.Id
-        });
+        integrationEventScope.Add(
+            new ProductUpdatedEvent
+            {
+                Id = product.Id
+            });
 
         return Unit.Value;
     }

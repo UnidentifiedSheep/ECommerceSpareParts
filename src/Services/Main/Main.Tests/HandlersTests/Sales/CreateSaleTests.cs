@@ -1,5 +1,5 @@
-using FluentAssertions;
 using Exceptions;
+using FluentAssertions;
 using Main.Application.Dtos.Sale;
 using Main.Application.Handlers.Sales.CreateSale;
 using Main.Application.Static;
@@ -17,7 +17,6 @@ using Tests.DataBuilders.Storage;
 using Tests.TestContexts;
 using Tests.TestContexts.Storage;
 
-
 namespace Tests.HandlersTests.Sales;
 
 public class CreateSaleTests : IntegrationTest
@@ -33,17 +32,25 @@ public class CreateSaleTests : IntegrationTest
     {
         var buyer = Buyer();
         var storageContent = StorageContent();
-        var product = await Context.Products.AsNoTracking().SingleAsync(x => x.Id == storageContent.ProductId);
+        var product = await Context.Products.AsNoTracking()
+            .SingleAsync(x => x.Id == storageContent.ProductId);
         var originalContents = await Context.StorageContents
             .AsNoTracking()
-            .Where(x => x.ProductId == storageContent.ProductId && x.StorageName == storageContent.StorageName)
+            .Where(x =>
+                x.ProductId == storageContent.ProductId && x.StorageName == storageContent.StorageName)
             .ToDictionaryAsync(x => x.Id);
         var originalStock = product.Stock.Value;
         var command = CreateCommand(
             buyer.Id,
             storageContent.CurrencyId,
             storageContent.StorageName,
-            [NewContent(storageContent.ProductId, count: 1, price: 100m, priceWithDiscount: 80m)]);
+            [
+                NewContent(
+                    storageContent.ProductId,
+                    1,
+                    100m,
+                    80m)
+            ]);
 
         var result = await Mediator.Send(command);
 
@@ -76,19 +83,22 @@ public class CreateSaleTests : IntegrationTest
         detail.CurrencyId.Should().Be(affectedStorageContent.CurrencyId);
         detail.BuyPrice.Should().Be(affectedStorageContent.BuyPrice);
         detail.Count.Should().Be(1);
-        detail.PurchaseDatetime.Should().BeCloseTo(
-            affectedStorageContent.PurchaseDatetime.ToUniversalTime(),
-            TimeSpan.FromMilliseconds(1));
+        detail.PurchaseDatetime.Should()
+            .BeCloseTo(
+                affectedStorageContent.PurchaseDatetime.ToUniversalTime(),
+                TimeSpan.FromMilliseconds(1));
 
         var updatedContent = await Context.StorageContents
             .AsNoTracking()
             .SingleAsync(x => x.Id == detail.StorageContentId);
         updatedContent.Count.Should().Be(affectedStorageContent.Count - 1);
 
-        var updatedProduct = await Context.Products.AsNoTracking().SingleAsync(x => x.Id == storageContent.ProductId);
+        var updatedProduct =
+            await Context.Products.AsNoTracking().SingleAsync(x => x.Id == storageContent.ProductId);
         updatedProduct.Stock.Value.Should().Be(originalStock - 1);
 
-        var saleTransaction = await Context.Transactions.AsNoTracking().SingleAsync(x => x.Id == sale.TransactionId);
+        var saleTransaction =
+            await Context.Transactions.AsNoTracking().SingleAsync(x => x.Id == sale.TransactionId);
         saleTransaction.SenderId.Should().Be(GetContext<UserContextTestContext>().SystemUser.Id);
         saleTransaction.ReceiverId.Should().Be(buyer.Id);
         saleTransaction.Amount.Should().Be(80m);
@@ -112,7 +122,7 @@ public class CreateSaleTests : IntegrationTest
             buyer.Id,
             storageContent.CurrencyId,
             storageContent.StorageName,
-            [NewContent(storageContent.ProductId, count: 1)],
+            [NewContent(storageContent.ProductId, 1)],
             payedSum);
 
         await Mediator.Send(command);
@@ -136,8 +146,14 @@ public class CreateSaleTests : IntegrationTest
             buyer.Id,
             storageContent.CurrencyId,
             storageContent.StorageName,
-            [NewContent(storageContent.ProductId, count: 1, price: 1200m, priceWithDiscount: 1200m)],
-            payedSum: 1200m,
+            [
+                NewContent(
+                    storageContent.ProductId,
+                    1,
+                    1200m,
+                    1200m)
+            ],
+            1200m,
             forcePayment: false);
 
         await Mediator.Send(command);
@@ -157,7 +173,13 @@ public class CreateSaleTests : IntegrationTest
             buyer.Id,
             storageContent.CurrencyId,
             storageContent.StorageName,
-            [NewContent(storageContent.ProductId, count: 1, price: 1200m, priceWithDiscount: 1200m)],
+            [
+                NewContent(
+                    storageContent.ProductId,
+                    1,
+                    1200m,
+                    1200m)
+            ],
             forcePayment: false);
 
         await Assert.ThrowsAsync<InvalidInputException>(() => Mediator.Send(command));
@@ -172,8 +194,14 @@ public class CreateSaleTests : IntegrationTest
             buyer.Id,
             storageContent.CurrencyId,
             storageContent.StorageName,
-            [NewContent(storageContent.ProductId, count: 1, price: 1200m, priceWithDiscount: 1200m)],
-            payedSum: 1200m);
+            [
+                NewContent(
+                    storageContent.ProductId,
+                    1,
+                    1200m,
+                    1200m)
+            ],
+            1200m);
 
         await Mediator.Send(command);
 
@@ -192,7 +220,7 @@ public class CreateSaleTests : IntegrationTest
             buyer.Id,
             storageContent.CurrencyId,
             storageContent.StorageName,
-            [NewContent(storageContent.ProductId, count: 1)],
+            [NewContent(storageContent.ProductId, 1)],
             0m);
 
         await Mediator.Send(command);
@@ -217,7 +245,7 @@ public class CreateSaleTests : IntegrationTest
             buyer.Id,
             storageContent.CurrencyId,
             storageContent.StorageName,
-            [NewContent(storageContent.ProductId, count: 2)]);
+            [NewContent(storageContent.ProductId, 2)]);
 
         await Mediator.Send(command);
 
@@ -239,8 +267,16 @@ public class CreateSaleTests : IntegrationTest
             storageContent.CurrencyId,
             storageContent.StorageName,
             [
-                NewContent(storageContent.ProductId, count: 1, price: 100m, priceWithDiscount: 90m),
-                NewContent(storageContent.ProductId, count: 1, price: 200m, priceWithDiscount: 180m)
+                NewContent(
+                    storageContent.ProductId,
+                    1,
+                    100m,
+                    90m),
+                NewContent(
+                    storageContent.ProductId,
+                    1,
+                    200m,
+                    180m)
             ]);
 
         var result = await Mediator.Send(command);
@@ -267,7 +303,8 @@ public class CreateSaleTests : IntegrationTest
         var storageContent = StorageContent();
         var countOnStorage = await Context.StorageContents
             .AsNoTracking()
-            .Where(x => x.ProductId == storageContent.ProductId && x.StorageName == storageContent.StorageName)
+            .Where(x =>
+                x.ProductId == storageContent.ProductId && x.StorageName == storageContent.StorageName)
             .SumAsync(x => x.Count);
         var command = CreateCommand(
             buyer.Id,
@@ -282,7 +319,8 @@ public class CreateSaleTests : IntegrationTest
     }
 
     [Fact]
-    public async Task CreateSale_WithOtherBuyerReservationAndNoConfirmation_ThrowsSaleSoftConfirmationNeededException()
+    public async Task
+        CreateSale_WithOtherBuyerReservationAndNoConfirmation_ThrowsSaleSoftConfirmationNeededException()
     {
         var buyer = Buyer();
         var otherBuyer = GetContext<UsersTestContext>().Users.First(x => x.Id != buyer.Id);
@@ -299,7 +337,7 @@ public class CreateSaleTests : IntegrationTest
             buyer.Id,
             storageContent.CurrencyId,
             storageContent.StorageName,
-            [NewContent(storageContent.ProductId, count: 1)]);
+            [NewContent(storageContent.ProductId, 1)]);
 
         await Assert.ThrowsAsync<SaleSoftConfirmationNeededException>(() => Mediator.Send(command));
     }
@@ -321,11 +359,15 @@ public class CreateSaleTests : IntegrationTest
             buyer.Id,
             storageContent.CurrencyId,
             storageContent.StorageName,
-            [NewContent(storageContent.ProductId, count: 1)]);
+            [NewContent(storageContent.ProductId, 1)]);
 
         var exception = await Assert.ThrowsAsync<SaleSoftConfirmationNeededException>(() =>
             Mediator.Send(commandWithoutConfirmation));
-        var confirmationCode = exception.Arguments.Should().ContainSingle().Subject.Should().BeOfType<string>().Subject;
+        var confirmationCode = exception.Arguments.Should()
+            .ContainSingle()
+            .Subject.Should()
+            .BeOfType<string>()
+            .Subject;
         var command = commandWithoutConfirmation with { ConfirmationCode = confirmationCode };
 
         var result = await Mediator.Send(command);
@@ -378,7 +420,8 @@ public class CreateSaleTests : IntegrationTest
     [InlineData(0)]
     [InlineData(-1)]
     [InlineData(0.001)]
-    public async Task CreateSale_WithInvalidPriceWithDiscount_ThrowsValidationException(decimal priceWithDiscount)
+    public async Task CreateSale_WithInvalidPriceWithDiscount_ThrowsValidationException(
+        decimal priceWithDiscount)
     {
         var command = CreateValidCommand();
         var content = command.Contents.Single() with { PriceWithDiscount = priceWithDiscount };
@@ -470,7 +513,7 @@ public class CreateSaleTests : IntegrationTest
             buyer.Id,
             storageContent.CurrencyId,
             storageContent.StorageName,
-            [NewContent(storageContent.ProductId, count: 1)]);
+            [NewContent(storageContent.ProductId, 1)]);
     }
 
     private CreateSaleCommand CreateCommand(
@@ -509,10 +552,7 @@ public class CreateSaleTests : IntegrationTest
         };
     }
 
-    private User Buyer()
-    {
-        return GetContext<UsersTestContext>().Users.First();
-    }
+    private User Buyer() { return GetContext<UsersTestContext>().Users.First(); }
 
     private StorageContent StorageContent()
     {
@@ -521,7 +561,8 @@ public class CreateSaleTests : IntegrationTest
 
     private StorageContent StorageContentWithCountAtLeast(int count)
     {
-        return GetContext<StorageContentTestContext>().StorageContents
+        return GetContext<StorageContentTestContext>()
+            .StorageContents
             .Where(x => x.Count > 0)
             .GroupBy(x => new { x.ProductId, x.StorageName })
             .OrderByDescending(x => x.Sum(z => z.Count))
@@ -534,8 +575,8 @@ public class CreateSaleTests : IntegrationTest
     {
         return Context.StorageContents
             .AsNoTracking()
-            .Where(x => x.ProductId == storageContent.ProductId && x.StorageName == storageContent.StorageName)
+            .Where(x =>
+                x.ProductId == storageContent.ProductId && x.StorageName == storageContent.StorageName)
             .SumAsync(x => x.Count);
     }
-
 }

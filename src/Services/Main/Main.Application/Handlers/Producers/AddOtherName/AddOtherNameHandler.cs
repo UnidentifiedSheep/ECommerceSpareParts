@@ -1,5 +1,4 @@
 using Abstractions.Interfaces.Persistence;
-using Abstractions.Interfaces.Services;
 using Application.Common.Interfaces;
 using Application.Common.Interfaces.Cqrs;
 using Attributes;
@@ -11,20 +10,29 @@ namespace Main.Application.Handlers.Producers.AddOtherName;
 
 [AutoSave]
 [Transactional]
-public record AddOtherNameCommand(int ProducerId, string OtherName, string WhereUsed) : ICommand<Unit>;
+public record AddOtherNameCommand(
+    int ProducerId,
+    string OtherName,
+    string WhereUsed
+) : ICommand<Unit>;
 
 public class AddOtherNameHandler(
     IUnitOfWork unitOfWork,
-    IIntegrationEventScope integrationEventScope) : ICommandHandler<AddOtherNameCommand>
+    IIntegrationEventScope integrationEventScope
+) : ICommandHandler<AddOtherNameCommand>
 {
     public async Task<Unit> Handle(AddOtherNameCommand request, CancellationToken cancellationToken)
     {
-        var model = ProducerOtherName.Create(request.ProducerId, request.OtherName, request.WhereUsed);
+        var model = ProducerOtherName.Create(
+            request.ProducerId,
+            request.OtherName,
+            request.WhereUsed);
         await unitOfWork.AddAsync(model, cancellationToken);
-        integrationEventScope.Add(new ProducerUpdatedEvent
-        {
-            Id = request.ProducerId
-        });
+        integrationEventScope.Add(
+            new ProducerUpdatedEvent
+            {
+                Id = request.ProducerId
+            });
         return Unit.Value;
     }
 }

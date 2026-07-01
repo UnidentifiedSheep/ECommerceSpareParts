@@ -15,7 +15,8 @@ public class ProducerTestContext(
 
     public override async Task InitializeAsync(CancellationToken cancellationToken = default)
     {
-        _producers.AddRange(await new ProducerBuilder(Faker)
-            .BuildManyAndAddToDb(DbContext, 5));
+        _producers.AddRange(
+            await new ProducerBuilder(Faker)
+                .BuildManyAndAddToDb(DbContext, 5));
     }
 }

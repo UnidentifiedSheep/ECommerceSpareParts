@@ -10,7 +10,10 @@ public class SetProductWeightValidation : AbstractValidator<SetProductWeightComm
         RuleFor(x => x.Weight)
             .GreaterThan(0)
             .WithLocalizationKey("article.weight.must.be.greater.than.zero")
-            .PrecisionScale(18, 2, true)
+            .PrecisionScale(
+                18,
+                2,
+                true)
             .WithLocalizationKey("article.weight.max.two.decimals");
     }
 }

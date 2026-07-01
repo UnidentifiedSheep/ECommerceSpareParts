@@ -1,5 +1,4 @@
 using Abstractions.Interfaces.Persistence;
-using Abstractions.Interfaces.Services;
 using Application.Common.Interfaces.Cqrs;
 using Application.Common.Interfaces.Repositories;
 using Attributes;
@@ -14,7 +13,8 @@ public record RemoveProductContentCommand(int ParentProductId, int ChildProductI
 
 public class RemoveProductContentHandler(
     IRepository<Entities.Product.ProductContent, (int, int)> repository,
-    IUnitOfWork unitOfWork) : ICommandHandler<RemoveProductContentCommand>
+    IUnitOfWork unitOfWork
+) : ICommandHandler<RemoveProductContentCommand>
 {
     public async Task<Unit> Handle(RemoveProductContentCommand request, CancellationToken cancellationToken)
     {

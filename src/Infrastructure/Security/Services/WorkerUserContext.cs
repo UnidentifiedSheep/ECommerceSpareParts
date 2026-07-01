@@ -5,7 +5,8 @@ using Microsoft.Extensions.Options;
 namespace Security.Services;
 
 public class WorkerUserContext(
-    IOptions<SystemOptions> options) : IUserContext
+    IOptions<SystemOptions> options
+) : IUserContext
 {
     public bool IsAuthenticated => true;
     public Guid UserId => options.Value.SystemId;

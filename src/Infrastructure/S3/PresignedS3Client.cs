@@ -11,7 +11,8 @@ public interface IPresignedS3Client
 
 public sealed class PresignedS3Client(
     IAmazonS3 client,
-    Protocol protocol) : IPresignedS3Client
+    Protocol protocol
+) : IPresignedS3Client
 {
     public IAmazonS3 Client { get; } = client;
 

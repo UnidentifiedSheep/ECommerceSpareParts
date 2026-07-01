@@ -14,7 +14,8 @@ public record GetStorageRouteByIdQuery(Guid Id) : IQuery<GetStorageRouteByIdResu
 public record GetStorageRouteByIdResult(StorageRouteDto StorageRoute);
 
 public class GetStorageRouteByIdHandler(
-    IReadRepository<StorageRoute, Guid> repository)
+    IReadRepository<StorageRoute, Guid> repository
+)
     : IQueryHandler<GetStorageRouteByIdQuery, GetStorageRouteByIdResult>
 {
     public async Task<GetStorageRouteByIdResult> Handle(

@@ -1,12 +1,13 @@
 ﻿using System.Linq.Expressions;
 using LinqKit;
 using Main.Application.Dtos.Cart;
+using Main.Entities.Cart;
 
 namespace Main.Application.Projections;
 
 public static class CartProjections
 {
-    public static readonly Expression<Func<Entities.Cart.Cart, CartItemDto>> ToCartItemDto =
+    public static readonly Expression<Func<Cart, CartItemDto>> ToCartItemDto =
         x => new CartItemDto
         {
             Count = x.Count,

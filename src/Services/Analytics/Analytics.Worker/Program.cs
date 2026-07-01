@@ -17,7 +17,6 @@ using Contracts.Settings;
 using Internal.Integration.Di;
 using Localization.Domain.Extensions;
 using MassTransit;
-using RabbitMQ.Client;
 using RabbitMq.Extensions;
 using Security;
 using ZiggyCreatures.Caching.Fusion.Backplane;
@@ -99,25 +98,24 @@ void AddMassTransit(IHostApplicationBuilder hostBuilder)
         x.UsingRabbitMq((context, cfg) =>
         {
             cfg.ConfigureRabbitMq(context);
-            
-            cfg.ReceiveEndpoint(uniqQueueName, ep =>
-            {
-                ep.AutoDelete = true;
-                ep.Durable = false;
-            
-                ep.ConfigureConsumer<BackplaneConsumer>(context);
-                ep.ConfigureConsumer<SettingUpdatedConsumer>(context);
-                
-                ep.Bind<BackplaneMessage>();
-                
-                ep.BindForService<JobStatusUpdatedEvent>(ServicesDefinitions.Analytics)
-                    .BindForService<SettingUpdatedEvent>(ServicesDefinitions.Analytics);
-            });
 
-            cfg.ReceiveEndpoint("analytics-work-queue", ep =>
-            {
-                ep.Durable = true;
-            });
+            cfg.ReceiveEndpoint(
+                uniqQueueName,
+                ep =>
+                {
+                    ep.AutoDelete = true;
+                    ep.Durable = false;
+
+                    ep.ConfigureConsumer<BackplaneConsumer>(context);
+                    ep.ConfigureConsumer<SettingUpdatedConsumer>(context);
+
+                    ep.Bind<BackplaneMessage>();
+
+                    ep.BindForService<JobStatusUpdatedEvent>(ServicesDefinitions.Analytics)
+                        .BindForService<SettingUpdatedEvent>(ServicesDefinitions.Analytics);
+                });
+
+            cfg.ReceiveEndpoint("analytics-work-queue", ep => { ep.Durable = true; });
         });
     });
 }

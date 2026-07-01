@@ -4,6 +4,7 @@ using Application.Common.Extensions;
 using Application.Common.Interfaces.Cqrs;
 using Application.Common.Interfaces.Repositories;
 using Application.Common.Projections;
+using Domain.CommonEntities;
 using LinqKit;
 using Localization.Abstractions.Interfaces;
 using Microsoft.EntityFrameworkCore;
@@ -14,15 +15,18 @@ public record GetScheduleQuery(
     IEnumerable<string> JobSystemNames,
     RangeModel<DateTime>? NextRunRange,
     string? SortBy,
-    Pagination Pagination) : IQuery<GetScheduleResult>;
+    Pagination Pagination
+) : IQuery<GetScheduleResult>;
+
 public record GetScheduleResult(IReadOnlyList<JobScheduleDto> Schedules);
 
 public class GetScheduleHandler(
     IScopedStringLocalizer localizer,
-    IReadRepository<Domain.CommonEntities.JobSchedule, Guid> repository) : IQueryHandler<GetScheduleQuery, GetScheduleResult>
+    IReadRepository<JobSchedule, Guid> repository
+) : IQueryHandler<GetScheduleQuery, GetScheduleResult>
 {
     public async Task<GetScheduleResult> Handle(
-        GetScheduleQuery request, 
+        GetScheduleQuery request,
         CancellationToken cancellationToken)
     {
         var query = repository.Query;
@@ -42,7 +46,7 @@ public class GetScheduleHandler(
             .Select(JobProjections.JobScheduleProjection(localizer))
             .ApplyPagination(request.Pagination)
             .ToListAsync(cancellationToken);
-        
+
         return new GetScheduleResult(result);
     }
 }

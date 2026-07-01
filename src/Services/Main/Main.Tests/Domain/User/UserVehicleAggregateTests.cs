@@ -11,7 +11,11 @@ public class UserVehicleAggregateTests
         var user = Main.Entities.User.User.Create("test-user", "hash");
         var vehicleId = Guid.NewGuid();
 
-        user.AddUserVehicle(vehicleId, "a123bc", "vin", "comment");
+        user.AddUserVehicle(
+            vehicleId,
+            "a123bc",
+            "vin",
+            "comment");
 
         user.Vehicles.Should().ContainSingle();
         var vehicle = user.Vehicles.Single();
@@ -37,9 +41,15 @@ public class UserVehicleAggregateTests
     public void AddUserVehicle_DuplicateVin_Throws()
     {
         var user = Main.Entities.User.User.Create("test-user", "hash");
-        user.AddUserVehicle(Guid.NewGuid(), "a123bc", "vin");
+        user.AddUserVehicle(
+            Guid.NewGuid(),
+            "a123bc",
+            "vin");
 
-        var act = () => user.AddUserVehicle(Guid.NewGuid(), "b321ca", " VIN ");
+        var act = () => user.AddUserVehicle(
+            Guid.NewGuid(),
+            "b321ca",
+            " VIN ");
 
         act.Should().Throw<InvalidInputException>();
         user.Vehicles.Should().ContainSingle();

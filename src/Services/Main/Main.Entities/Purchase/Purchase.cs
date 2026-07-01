@@ -14,9 +14,7 @@ public class Purchase : AuditableEntity<Purchase, Guid>, ILinqEntity<Purchase, G
 {
     private readonly List<PurchaseContent> _contents = [];
 
-    private Purchase()
-    {
-    }
+    private Purchase() { }
 
     private Purchase(
         Guid supplierId,
@@ -49,10 +47,7 @@ public class Purchase : AuditableEntity<Purchase, Guid>, ILinqEntity<Purchase, G
     public virtual Transaction Transaction { get; private set; } = null!;
     public IReadOnlyCollection<PurchaseContent> Contents => _contents;
 
-    public static Expression<Func<Purchase, Guid>> GetKeySelector()
-    {
-        return x => x.Id;
-    }
+    public static Expression<Func<Purchase, Guid>> GetKeySelector() { return x => x.Id; }
 
     public static Expression<Func<Purchase, bool>> GetEqualityExpression(Guid key)
     {
@@ -66,37 +61,33 @@ public class Purchase : AuditableEntity<Purchase, Guid>, ILinqEntity<Purchase, G
         string storage,
         DateTime purchaseDatetime)
     {
-        return new Purchase(supplierId, currencyId, transactionId, storage, purchaseDatetime);
+        return new Purchase(
+            supplierId,
+            currencyId,
+            transactionId,
+            storage,
+            purchaseDatetime);
     }
 
     public void SetComment(string? comment)
     {
         Comment = comment
-            .NullIfWhiteSpace()?
+            .NullIfWhiteSpace()
+            ?
             .AgainstTooLong(
                 256,
                 () => throw new InvalidInputException("purchase.comment.too.long"));
     }
 
-    public void SetCurrencyId(int currencyId)
-    {
-        CurrencyId = currencyId;
-    }
+    public void SetCurrencyId(int currencyId) { CurrencyId = currencyId; }
 
-    public void SetTransactionId(Guid transactionId)
-    {
-        TransactionId = transactionId;
-    }
+    public void SetTransactionId(Guid transactionId) { TransactionId = transactionId; }
 
-    public void SetPurchaseDate(DateTime purchaseDatetime)
-    {
-        PurchaseDatetime = purchaseDatetime;
-    }
+    public void SetPurchaseDate(DateTime purchaseDatetime) { PurchaseDatetime = purchaseDatetime; }
 
     public void AddContent(PurchaseContent content)
     {
-        if (content.PurchaseId == Guid.Empty)
-            content.SetPurchaseId(GetId());
+        if (content.PurchaseId == Guid.Empty) content.SetPurchaseId(GetId());
 
         if (content.PurchaseId != GetId())
             throw new InvalidOperationException("Invalid purchase id in purchase content");
@@ -158,13 +149,7 @@ public class Purchase : AuditableEntity<Purchase, Guid>, ILinqEntity<Purchase, G
         return logistic;
     }
 
-    public void Complete()
-    {
-        State = PurchaseState.Completed;
-    }
+    public void Complete() { State = PurchaseState.Completed; }
 
-    public override Guid GetId()
-    {
-        return Id;
-    }
+    public override Guid GetId() { return Id; }
 }

@@ -8,13 +8,9 @@ namespace Main.Entities.Settings;
 
 public class StorageContentSetting : Setting<StorageContentSettingData>, ISetting<StorageContentSetting>
 {
-    public StorageContentSetting(string json) : base(SettingName, json)
-    {
-    }
+    public StorageContentSetting(string json) : base(SettingName, json) { }
 
-    public StorageContentSetting(StorageContentSettingData data) : base(SettingName, data)
-    {
-    }
+    public StorageContentSetting(StorageContentSettingData data) : base(SettingName, data) { }
 
     public static string SettingName => "StorageContentSetting";
     public static StorageContentSetting Default => new(new StorageContentSettingData());

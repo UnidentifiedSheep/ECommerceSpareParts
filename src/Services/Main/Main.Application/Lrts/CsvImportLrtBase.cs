@@ -23,8 +23,13 @@ public abstract class CsvImportLrtBase<TState, TError, TCsvRow, TBatchItem>(
     ILogger logger,
     IS3StorageService s3Service,
     IScopedStringLocalizer stringLocalizer,
-    IOptions<LocalesOptions> localesOptions)
-    : LrtNamedObjectBase(jobRepository, unitOfWork, publisher, logger)
+    IOptions<LocalesOptions> localesOptions
+)
+    : LrtNamedObjectBase(
+        jobRepository,
+        unitOfWork,
+        publisher,
+        logger)
 {
     protected virtual int BatchSize => 1000;
     protected virtual int MaxErrors => 10_000;
@@ -65,15 +70,16 @@ public abstract class CsvImportLrtBase<TState, TError, TCsvRow, TBatchItem>(
 
             if (errors.Count >= MaxErrors)
             {
-                await UpdateState(WithUpdatedState(state, rowIdx, errors));
+                await UpdateState(
+                    WithUpdatedState(
+                        state,
+                        rowIdx,
+                        errors));
                 Interrupt(stringLocalizer.Get(GetTooManyErrorsLocalizationKey()));
             }
 
             TCsvRow row;
-            try
-            {
-                row = csv.GetRecord<TCsvRow>();
-            }
+            try { row = csv.GetRecord<TCsvRow>(); }
             catch (Exception ex) when (ex is CsvHelperException or TypeConverterException)
             {
                 errors.Add(CreateError(rowIdx, ex.Message));
@@ -81,32 +87,55 @@ public abstract class CsvImportLrtBase<TState, TError, TCsvRow, TBatchItem>(
                 continue;
             }
 
-            if (TryProcessRow(rowIdx, row, state, errors, out var item))
+            if (TryProcessRow(
+                    rowIdx,
+                    row,
+                    state,
+                    errors,
+                    out var item))
                 rowsToAdd.Add((rowIdx, item));
 
             if (rowsToAdd.Count >= BatchSize)
             {
-                await ProcessBatch(rowsToAdd, state, errors);
-                await UpdateState(WithUpdatedState(state, rowIdx, errors));
+                await ProcessBatch(
+                    rowsToAdd,
+                    state,
+                    errors);
+                await UpdateState(
+                    WithUpdatedState(
+                        state,
+                        rowIdx,
+                        errors));
             }
 
             rowIdx++;
         }
 
         if (rowsToAdd.Count > 0)
-            await ProcessBatch(rowsToAdd, state, errors);
+            await ProcessBatch(
+                rowsToAdd,
+                state,
+                errors);
 
-        await UpdateState(WithUpdatedState(state, rowIdx - 1, errors));
+        await UpdateState(
+            WithUpdatedState(
+                state,
+                rowIdx - 1,
+                errors));
     }
 
-    protected virtual Task BeforeRead(TState state) => Task.CompletedTask;
+    protected virtual Task BeforeRead(TState state) { return Task.CompletedTask; }
 
     protected abstract string GetFileName(TState state);
     protected abstract int GetCurrentLine(TState state);
     protected abstract List<TError> GetErrors(TState state);
     protected abstract TError CreateError(int rowIdx, string message);
     protected abstract string GetTooManyErrorsLocalizationKey();
-    protected abstract TState WithUpdatedState(TState state, int currentLine, List<TError> errors);
+
+    protected abstract TState WithUpdatedState(
+        TState state,
+        int currentLine,
+        List<TError> errors);
 
     protected abstract bool TryProcessRow(
         int rowIdx,

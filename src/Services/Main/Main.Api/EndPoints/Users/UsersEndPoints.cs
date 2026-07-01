@@ -4,10 +4,8 @@ using Api.Common.Extensions;
 using Api.Common.Models.Requests;
 using Carter;
 using Enums;
-using Main.Application.Dtos.Auth;
 using Main.Application.Dtos.Emails;
 using Main.Application.Dtos.Users;
-using Main.Application.Handlers.Auth.AddPermissionToUser;
 using Main.Application.Handlers.Users.CreateUser;
 using Main.Application.Handlers.Users.GetUsers;
 using Main.Enums;
@@ -20,19 +18,19 @@ public record CreateUserRequest
 {
     [JsonPropertyName("userName")]
     public required string UserName { get; init; }
-    
+
     [JsonPropertyName("password")]
     public required string Password { get; init; }
-    
+
     [JsonPropertyName("userInfo")]
     public required UserInfoDto UserInfo { get; init; }
-    
+
     [JsonPropertyName("emails")]
     public required IEnumerable<EmailDto> Emails { get; init; }
-    
+
     [JsonPropertyName("phones")]
     public required IEnumerable<UserPhoneDto> Phones { get; init; }
-    
+
     [JsonPropertyName("roles")]
     public required IEnumerable<string> Roles { get; init; }
 }
@@ -40,18 +38,31 @@ public record CreateUserRequest
 public record CreateUserResponse(UserDto User);
 
 public record GetUsersRequest(
-    [FromQuery(Name = "searchTerm")] string? SearchTerm,
-    [FromQuery(Name = "id")] Guid? Id,
-    [FromQuery(Name = "name")] string? Name,
-    [FromQuery(Name = "surname")] string? Surname,
-    [FromQuery(Name = "email")] string? Email,
-    [FromQuery(Name = "phone")] string? Phone,
-    [FromQuery(Name = "userName")] string? UserName,
-    [FromQuery(Name = "isSupplier")] bool? IsSupplier,
-    [FromQuery(Name = "description")] string? Description,
-    [FromQuery(Name = "similarityLevel")] double? SimilarityLevel,
-    [FromQuery(Name = "roles")] string[]? Roles,
-    [FromQuery(Name = "searchMethod")] GeneralSearchStrategy SearchMethod) : PaginationQueryModel;
+    [FromQuery(Name = "searchTerm")]
+    string? SearchTerm,
+    [FromQuery(Name = "id")]
+    Guid? Id,
+    [FromQuery(Name = "name")]
+    string? Name,
+    [FromQuery(Name = "surname")]
+    string? Surname,
+    [FromQuery(Name = "email")]
+    string? Email,
+    [FromQuery(Name = "phone")]
+    string? Phone,
+    [FromQuery(Name = "userName")]
+    string? UserName,
+    [FromQuery(Name = "isSupplier")]
+    bool? IsSupplier,
+    [FromQuery(Name = "description")]
+    string? Description,
+    [FromQuery(Name = "similarityLevel")]
+    double? SimilarityLevel,
+    [FromQuery(Name = "roles")]
+    string[]? Roles,
+    [FromQuery(Name = "searchMethod")]
+    GeneralSearchStrategy SearchMethod
+) : PaginationQueryModel;
 
 public record GetUsersResponse(IReadOnlyList<UserDto> Users);
 
@@ -69,17 +80,24 @@ public class UsersEndPoints : ICarterModule
         users.MapUserEmailEndPoints();
         users.MapUserRoleEndPoints();
 
-        users.MapPost("/", async (ISender sender, CreateUserRequest request, CancellationToken cancellationToken) =>
-            {
-                var result = await sender.Send(new CreateUserCommand(
-                    request.UserName, 
-                    request.Password,
-                    request.UserInfo,
-                    request.Emails,
-                    request.Phones,
-                    request.Roles), cancellationToken);
-                return Results.Created($"users/{result.User.Id}", new CreateUserResponse(result.User));
-            })
+        users.MapPost(
+                "/",
+                async (
+                    ISender sender,
+                    CreateUserRequest request,
+                    CancellationToken cancellationToken) =>
+                {
+                    var result = await sender.Send(
+                        new CreateUserCommand(
+                            request.UserName,
+                            request.Password,
+                            request.UserInfo,
+                            request.Emails,
+                            request.Phones,
+                            request.Roles),
+                        cancellationToken);
+                    return Results.Created($"users/{result.User.Id}", new CreateUserResponse(result.User));
+                })
             .WithName("CreateUser")
             .WithSummary("Создать пользователя")
             .WithDescription("Создание пользователя")
@@ -89,29 +107,31 @@ public class UsersEndPoints : ICarterModule
             .ProducesProblem(StatusCodes.Status400BadRequest)
             .RequireAnyPermission(PermissionCodes.USERS_CREATE);
 
-        users.MapGet("/", async (
-                ISender sender,
-                [AsParameters] GetUsersRequest request,
-                IUserContext userContext,
-                CancellationToken token) =>
-            {
-                var query = new GetUsersQuery(
-                    request,
-                    request.SearchTerm,
-                    request.SimilarityLevel,
-                    userContext.UserId,
-                    request.Name,
-                    request.Surname,
-                    request.Email,
-                    request.Phone,
-                    request.UserName,
-                    request.Id,
-                    request.Description,
-                    request.Roles,
-                    request.SearchMethod);
-                var result = await sender.Send(query, token);
-                return Results.Ok(new GetUsersResponse(result.Users));
-            })
+        users.MapGet(
+                "/",
+                async (
+                    ISender sender,
+                    [AsParameters] GetUsersRequest request,
+                    IUserContext userContext,
+                    CancellationToken token) =>
+                {
+                    var query = new GetUsersQuery(
+                        request,
+                        request.SearchTerm,
+                        request.SimilarityLevel,
+                        userContext.UserId,
+                        request.Name,
+                        request.Surname,
+                        request.Email,
+                        request.Phone,
+                        request.UserName,
+                        request.Id,
+                        request.Description,
+                        request.Roles,
+                        request.SearchMethod);
+                    var result = await sender.Send(query, token);
+                    return Results.Ok(new GetUsersResponse(result.Users));
+                })
             .WithName("GetUsers")
             .WithSummary("Получить пользователей")
             .WithDescription("Получение пользователей")

@@ -14,12 +14,14 @@ public record GetStorageContentQuery(
     string? StorageName,
     int? ProductId,
     Pagination Pagination,
-    bool ShowZeroCount) : IQuery<GetStorageContentResult>;
+    bool ShowZeroCount
+) : IQuery<GetStorageContentResult>;
 
 public record GetStorageContentResult(IEnumerable<StorageContentDto> Content);
 
 public class GetStorageContentHandler(
-    IReadRepository<StorageContent, int> repository)
+    IReadRepository<StorageContent, int> repository
+)
     : IQueryHandler<GetStorageContentQuery, GetStorageContentResult>
 {
     public async Task<GetStorageContentResult> Handle(
@@ -28,14 +30,12 @@ public class GetStorageContentHandler(
     {
         var query = repository.Query;
 
-        if (request.ProductId.HasValue)
-            query = query.Where(x => x.ProductId == request.ProductId);
+        if (request.ProductId.HasValue) query = query.Where(x => x.ProductId == request.ProductId);
 
         if (!string.IsNullOrWhiteSpace(request.StorageName))
             query = query.Where(x => x.StorageName == request.StorageName);
 
-        if (!request.ShowZeroCount)
-            query = query.Where(x => x.Count > 0);
+        if (!request.ShowZeroCount) query = query.Where(x => x.Count > 0);
 
         var result = await query
             .AsExpandable()

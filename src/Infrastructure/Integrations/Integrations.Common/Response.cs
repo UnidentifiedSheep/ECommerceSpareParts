@@ -10,16 +10,22 @@ public record Response<T>
     public HttpStatusCode? StatusCode { get; init; }
     public string? Error { get; init; }
 
-    public static Response<T> Ok(T? value) => new()
+    public static Response<T> Ok(T? value)
     {
-        Success = true,
-        Value = value
-    };
+        return new Response<T>
+        {
+            Success = true,
+            Value = value
+        };
+    }
 
-    public static Response<T> Fail(HttpStatusCode statusCode, string? error = null) => new()
+    public static Response<T> Fail(HttpStatusCode statusCode, string? error = null)
     {
-        Success = false,
-        StatusCode = statusCode,
-        Error = error
-    };
+        return new Response<T>
+        {
+            Success = false,
+            StatusCode = statusCode,
+            Error = error
+        };
+    }
 }

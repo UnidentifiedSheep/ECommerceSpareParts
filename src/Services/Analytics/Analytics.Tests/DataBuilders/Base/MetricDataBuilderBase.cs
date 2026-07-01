@@ -5,8 +5,8 @@ using Test.Common.Abstractions;
 
 namespace Analytics.Integration.Tests.DataBuilders.Base;
 
-public abstract class MetricDataBuilderBase<T, TMetric>(Faker faker) 
-    : BuilderBase<TMetric>(faker) 
+public abstract class MetricDataBuilderBase<T, TMetric>(Faker faker)
+    : BuilderBase<TMetric>(faker)
     where T : MetricDataBuilderBase<T, TMetric>
     where TMetric : Metric
 {
@@ -15,7 +15,7 @@ public abstract class MetricDataBuilderBase<T, TMetric>(Faker faker)
     public DateTime? End { get; private set; }
     public RecalculationTags? Tags { get; private set; }
     public bool Recalculated { get; private set; }
-    
+
     public T WithCurrencyId(int currencyId)
     {
         CurrencyId = currencyId;
@@ -55,13 +55,10 @@ public abstract class MetricDataBuilderBase<T, TMetric>(Faker faker)
 
         if (Tags.HasValue)
         {
-            if(Tags.Value.HasFlag(RecalculationTags.Disabled))
-                metric.Disable();
-            if (Tags.Value.HasFlag(RecalculationTags.RecalculationNeeded))
-                metric.MarkDirty();
+            if (Tags.Value.HasFlag(RecalculationTags.Disabled)) metric.Disable();
+            if (Tags.Value.HasFlag(RecalculationTags.RecalculationNeeded)) metric.MarkDirty();
         }
 
-        if (Recalculated)
-            metric.CompleteRecalculation();
+        if (Recalculated) metric.CompleteRecalculation();
     }
 }

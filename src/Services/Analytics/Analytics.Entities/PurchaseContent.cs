@@ -6,9 +6,7 @@ namespace Analytics.Entities;
 
 public class PurchaseContent : Entity<PurchaseContent, int>
 {
-    private PurchaseContent()
-    {
-    }
+    private PurchaseContent() { }
 
     public int Id { get; private set; }
 
@@ -22,12 +20,14 @@ public class PurchaseContent : Entity<PurchaseContent, int>
 
     public virtual PurchasesFact Purchase { get; private set; } = null!;
 
-    public override int GetId()
-    {
-        return Id;
-    }
+    public override int GetId() { return Id; }
 
-    public static PurchaseContent Create(int id, Guid purchaseId, int articleId, decimal price, int count)
+    public static PurchaseContent Create(
+        int id,
+        Guid purchaseId,
+        int articleId,
+        decimal price,
+        int count)
     {
         return new PurchaseContent
         {
@@ -39,7 +39,10 @@ public class PurchaseContent : Entity<PurchaseContent, int>
         };
     }
 
-    public void Update(int articleId, decimal price, int count)
+    public void Update(
+        int articleId,
+        decimal price,
+        int count)
     {
         ProductId = articleId;
         Price = ValidatePrice(price);

@@ -1,5 +1,3 @@
-using Integrations.Common;
-
 namespace Armtek.Integrations.Core.Models;
 
 public record ArmtekConnectionModel

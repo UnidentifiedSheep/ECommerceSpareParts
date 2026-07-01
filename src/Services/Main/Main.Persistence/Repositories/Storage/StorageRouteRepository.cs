@@ -3,7 +3,6 @@ using Main.Application.Interfaces.Persistence;
 using Main.Entities.Storage;
 using Main.Persistence.Context;
 using Microsoft.EntityFrameworkCore;
-using Persistence.Extensions;
 using Persistence.Interfaces;
 using Persistence.Repository;
 
@@ -20,22 +19,27 @@ public class StorageRouteRepository(DContext context, IQueryableExtensions exten
     {
         var query = Context.StorageRoutes.AsQueryable();
 
-        if (criteria != null)
-            query = QueryableExtensions.Apply(query, criteria);
+        if (criteria != null) query = QueryableExtensions.Apply(query, criteria);
 
         return await query
             .FirstOrDefaultAsync(
                 x => x.FromStorageName == from
                      && x.ToStorageName == to
-                     && x.IsActive, ct);
+                     && x.IsActive,
+                ct);
     }
 
-    public async Task<bool> IsAnyRouteActiveAsync(string from, string to, CancellationToken ct = default)
+    public async Task<bool> IsAnyRouteActiveAsync(
+        string from,
+        string to,
+        CancellationToken ct = default)
     {
         return await Context.StorageRoutes
-            .AnyAsync(x =>
-                x.FromStorageName == from &&
-                x.ToStorageName == to &&
-                x.IsActive, ct);
+            .AnyAsync(
+                x =>
+                    x.FromStorageName == from &&
+                    x.ToStorageName == to &&
+                    x.IsActive,
+                ct);
     }
 }

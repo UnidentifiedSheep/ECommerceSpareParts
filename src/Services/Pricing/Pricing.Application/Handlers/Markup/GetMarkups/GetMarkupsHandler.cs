@@ -10,13 +10,14 @@ using Pricing.Entities;
 namespace Pricing.Application.Handlers.Markup.GetMarkups;
 
 public record GetMarkupsQuery(
-    Pagination Pagination) : IQuery<GetMarkupsResult>;
+    Pagination Pagination
+) : IQuery<GetMarkupsResult>;
 
 public record GetMarkupsResult(IReadOnlyList<MarkupGroupDto> Groups);
 
 public class GetMarkupsHandler(
     IReadRepository<MarkupGroup, int> repository
-    ) : IQueryHandler<GetMarkupsQuery, GetMarkupsResult>
+) : IQueryHandler<GetMarkupsQuery, GetMarkupsResult>
 {
     public async Task<GetMarkupsResult> Handle(GetMarkupsQuery request, CancellationToken cancellationToken)
     {
@@ -38,7 +39,7 @@ public class GetMarkupsHandler(
             })
             .ApplyPagination(request.Pagination)
             .ToListAsync(cancellationToken);
-        
+
         return new GetMarkupsResult(result);
     }
 }

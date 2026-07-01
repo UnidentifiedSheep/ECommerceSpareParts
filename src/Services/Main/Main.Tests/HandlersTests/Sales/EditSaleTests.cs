@@ -4,6 +4,8 @@ using Main.Application.Dtos.Sale;
 using Main.Application.Handlers.Sales.EditSale;
 using Main.Entities.Event;
 using Main.Entities.Exceptions;
+using Main.Entities.Sale;
+using Main.Entities.Storage;
 using Main.Enums;
 using Main.Enums.Balances;
 using Microsoft.EntityFrameworkCore;
@@ -119,22 +121,23 @@ public class EditSaleTests : IntegrationTest
     public async Task EditSale_WhenSaleDoesNotExist_ThrowsSaleNotFoundException()
     {
         await Assert.ThrowsAsync<SaleNotFoundException>(() =>
-            Mediator.Send(new EditSaleCommand(
-                Guid.NewGuid(),
-                1,
-                [
-                    new EditSaleContentDto
-                    {
-                        ProductId = SaleContext.Product.Id,
-                        Count = 1,
-                        Price = 100m,
-                        PriceWithDiscount = 90m
-                    }
-                ],
-                SaleContext.StorageContent.CurrencyId,
-                DateTime.UtcNow,
-                null,
-                null)));
+            Mediator.Send(
+                new EditSaleCommand(
+                    Guid.NewGuid(),
+                    1,
+                    [
+                        new EditSaleContentDto
+                        {
+                            ProductId = SaleContext.Product.Id,
+                            Count = 1,
+                            Price = 100m,
+                            PriceWithDiscount = 90m
+                        }
+                    ],
+                    SaleContext.StorageContent.CurrencyId,
+                    DateTime.UtcNow,
+                    null,
+                    null)));
     }
 
     [Fact]
@@ -271,7 +274,10 @@ public class EditSaleTests : IntegrationTest
         var sale = await ReloadSale();
         var content = sale.Contents.Single();
         var detail = content.Details.Single();
-        await AddAvailableCount(content.ProductId, detail.StorageContentId, 1);
+        await AddAvailableCount(
+            content.ProductId,
+            detail.StorageContentId,
+            1);
         var storageCountBeforeEdit = await StorageProductCount(content.ProductId, sale.StorageName);
         var productStockBeforeEdit = await ProductStock(content.ProductId);
         var command = new EditSaleCommand(
@@ -300,10 +306,11 @@ public class EditSaleTests : IntegrationTest
         editedContent.Count.Should().Be(content.Count + 1);
         editedContent.Details.Sum(x => x.Count).Should().Be(soldCount);
         (await ProductStock(content.ProductId)).Should().Be(productStockBeforeEdit - 1);
-        (await StorageProductCount(content.ProductId, sale.StorageName)).Should().Be(storageCountBeforeEdit - 1);
+        (await StorageProductCount(content.ProductId, sale.StorageName)).Should()
+            .Be(storageCountBeforeEdit - 1);
     }
 
-    private Task<Main.Entities.Sale.Sale> ReloadSale()
+    private Task<Sale> ReloadSale()
     {
         return Context.Sales
             .Include(x => x.Contents)
@@ -312,7 +319,7 @@ public class EditSaleTests : IntegrationTest
             .SingleAsync(x => x.Id == SaleContext.Sale.Id);
     }
 
-    private static EditSaleContentDto ToDto(Main.Entities.Sale.SaleContent content)
+    private static EditSaleContentDto ToDto(SaleContent content)
     {
         return new EditSaleContentDto
         {
@@ -336,7 +343,7 @@ public class EditSaleTests : IntegrationTest
         };
     }
 
-    private Task<Main.Entities.Storage.StorageContent> OtherStorageContent()
+    private Task<StorageContent> OtherStorageContent()
     {
         return Context.StorageContents
             .AsNoTracking()
@@ -363,7 +370,10 @@ public class EditSaleTests : IntegrationTest
         return product.Stock.Value;
     }
 
-    private async Task AddAvailableCount(int productId, int storageContentId, int count)
+    private async Task AddAvailableCount(
+        int productId,
+        int storageContentId,
+        int count)
     {
         var storageContent = await Context.StorageContents.SingleAsync(x => x.Id == storageContentId);
         var product = await Context.Products.SingleAsync(x => x.Id == productId);

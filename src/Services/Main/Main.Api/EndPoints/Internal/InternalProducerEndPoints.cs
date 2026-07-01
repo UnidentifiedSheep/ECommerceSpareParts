@@ -9,7 +9,7 @@ public record InternalGetFullProducerResponse
 {
     [JsonPropertyName("producer")]
     public required ProducerDto Producer { get; init; }
-    
+
     [JsonPropertyName("otherNames")]
     public required IReadOnlyList<ProducerOtherNameDto> OtherNames { get; init; }
 }
@@ -22,19 +22,22 @@ public static class InternalProducerEndPoints
             .MapGroup("/producers")
             .WithGroupName("Internal Producers")
             .WithTags("InternalProducers");
-        
-        producers.MapGet("{id:int}", async (
-                int id, 
-                ISender sender, 
-                CancellationToken cancellationToken) =>
-            {
-                var result = await sender.Send(new GetFullProducerQuery(id), cancellationToken);
-                return Results.Ok(new InternalGetFullProducerResponse
+
+        producers.MapGet(
+                "{id:int}",
+                async (
+                    int id,
+                    ISender sender,
+                    CancellationToken cancellationToken) =>
                 {
-                    Producer = result.Producer,
-                    OtherNames = result.OtherNames
-                });
-            })
+                    var result = await sender.Send(new GetFullProducerQuery(id), cancellationToken);
+                    return Results.Ok(
+                        new InternalGetFullProducerResponse
+                        {
+                            Producer = result.Producer,
+                            OtherNames = result.OtherNames
+                        });
+                })
             .WithDisplayName("Internal service full producer")
             .WithName("InternalFullProducer")
             .WithSummary("Получить полного производителя для внутреннего сервиса")

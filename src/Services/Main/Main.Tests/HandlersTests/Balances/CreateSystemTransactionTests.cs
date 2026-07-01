@@ -32,12 +32,13 @@ public class CreateSystemTransactionTests : IntegrationTest
 
         await CreditProfile(user.Id, amount);
 
-        var result = await Mediator.Send(new CreateSystemTransactionCommand(
-            user.Id,
-            amount,
-            currency.Id,
-            DateTime.UtcNow,
-            SystemTransactionDirection.UserToSystem));
+        var result = await Mediator.Send(
+            new CreateSystemTransactionCommand(
+                user.Id,
+                amount,
+                currency.Id,
+                DateTime.UtcNow,
+                SystemTransactionDirection.UserToSystem));
 
         var transaction = await Context.Transactions
             .AsNoTracking()
@@ -69,12 +70,13 @@ public class CreateSystemTransactionTests : IntegrationTest
         var amount = 75m;
         await CreditProfile(user.Id, amount);
 
-        var result = await Mediator.Send(new CreateSystemTransactionCommand(
-            user.Id,
-            amount,
-            currency.Id,
-            DateTime.UtcNow,
-            SystemTransactionDirection.SystemToUser));
+        var result = await Mediator.Send(
+            new CreateSystemTransactionCommand(
+                user.Id,
+                amount,
+                currency.Id,
+                DateTime.UtcNow,
+                SystemTransactionDirection.SystemToUser));
 
         var transaction = await Context.Transactions
             .AsNoTracking()

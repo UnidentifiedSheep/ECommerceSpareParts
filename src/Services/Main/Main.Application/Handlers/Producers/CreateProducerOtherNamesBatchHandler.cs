@@ -13,22 +13,34 @@ namespace Main.Application.Handlers.Producers;
 
 [AutoSave]
 [Diagnostics]
-[Transactional(retryErrors: ["23505"], retryCount: 2, retryDelayMs: 20)]
+[Transactional(
+    retryErrors: ["23505"],
+    retryCount: 2,
+    retryDelayMs: 20)]
 public record CreateProducerOtherNamesBatchCommand(
     IEnumerable<CreateProducerOtherNamesBatchItem> Items
-    ) : ICommand<CreateProducerOtherNamesBatchResult>;
+) : ICommand<CreateProducerOtherNamesBatchResult>;
+
 public record CreateProducerOtherNamesBatchResult(
     int Created,
     int Skipped,
-    IReadOnlyList<CreateProducerOtherNamesBatchError> Errors);
+    IReadOnlyList<CreateProducerOtherNamesBatchError> Errors
+);
 
-public record CreateProducerOtherNamesBatchItem(string OriginalName, string OtherName, string? WhereUsed);
+public record CreateProducerOtherNamesBatchItem(
+    string OriginalName,
+    string OtherName,
+    string? WhereUsed
+);
+
 public record CreateProducerOtherNamesBatchError(int Index, string Message);
+
 internal record ProcessedProducerOtherNameBatchItem(
     int Index,
     string OriginalName,
     string OtherName,
-    string? WhereUsed);
+    string? WhereUsed
+);
 
 public class CreateProducerOtherNamesBatchHandler(
     IRepository<ProducerOtherName, string> aliasRepository,
@@ -36,30 +48,40 @@ public class CreateProducerOtherNamesBatchHandler(
     IProducerRepository producerRepository,
     IIntegrationEventScope integrationEventScope,
     IUnitOfWork unitOfWork
-    ) : ICommandHandler<CreateProducerOtherNamesBatchCommand, CreateProducerOtherNamesBatchResult>
+) : ICommandHandler<CreateProducerOtherNamesBatchCommand, CreateProducerOtherNamesBatchResult>
 {
-    public async Task<CreateProducerOtherNamesBatchResult> Handle(CreateProducerOtherNamesBatchCommand request, CancellationToken cancellationToken)
+    public async Task<CreateProducerOtherNamesBatchResult> Handle(
+        CreateProducerOtherNamesBatchCommand request,
+        CancellationToken cancellationToken)
     {
         var items = request.Items.ToList();
-        if (items.Count == 0) return new CreateProducerOtherNamesBatchResult(0, 0, []);
-        
+        if (items.Count == 0)
+            return new CreateProducerOtherNamesBatchResult(
+                0,
+                0,
+                []);
+
         var processedItems = new List<ProcessedProducerOtherNameBatchItem>();
         var toAdd = new List<ProducerOtherName>();
         var errors = new List<CreateProducerOtherNamesBatchError>();
         var uniqOtherNames = new HashSet<string>();
 
-        int idx = 0;
+        var idx = 0;
         foreach (var item in items)
         {
             var currentIdx = idx++;
-            var processed = ProcessDto(currentIdx, item, errors);
+            var processed = ProcessDto(
+                currentIdx,
+                item,
+                errors);
             if (processed is null) continue;
 
             if (!uniqOtherNames.Add(processed.OtherName))
             {
-                errors.Add(new CreateProducerOtherNamesBatchError(
-                    currentIdx,
-                    localizer.Get("producer.other.name.duplicate.in.batch")));
+                errors.Add(
+                    new CreateProducerOtherNamesBatchError(
+                        currentIdx,
+                        localizer.Get("producer.other.name.duplicate.in.batch")));
                 continue;
             }
 
@@ -73,30 +95,37 @@ public class CreateProducerOtherNamesBatchHandler(
         {
             if (existingAliases.ContainsKey(item.OtherName))
             {
-                errors.Add(new CreateProducerOtherNamesBatchError(
-                    item.Index,
-                    localizer.Get("producer.other.name.already.taken")));
+                errors.Add(
+                    new CreateProducerOtherNamesBatchError(
+                        item.Index,
+                        localizer.Get("producer.other.name.already.taken")));
                 continue;
             }
 
             if (!existingProducers.TryGetValue(item.OriginalName, out var producer))
             {
-                errors.Add(new CreateProducerOtherNamesBatchError(
-                    item.Index,
-                    localizer.Get("producer.other.name.producer.not.found.in.batch")));
+                errors.Add(
+                    new CreateProducerOtherNamesBatchError(
+                        item.Index,
+                        localizer.Get("producer.other.name.producer.not.found.in.batch")));
                 continue;
             }
-            
-            toAdd.Add(ProducerOtherName.Create(producer.Id, item.OtherName, item.WhereUsed));
+
+            toAdd.Add(
+                ProducerOtherName.Create(
+                    producer.Id,
+                    item.OtherName,
+                    item.WhereUsed));
         }
 
         await unitOfWork.AddRangeAsync(toAdd, cancellationToken);
         foreach (var producerId in toAdd.Select(x => x.ProducerId).Distinct())
-            integrationEventScope.Add(new ProducerUpdatedEvent
-            {
-                Id = producerId
-            });
-        
+            integrationEventScope.Add(
+                new ProducerUpdatedEvent
+                {
+                    Id = producerId
+                });
+
         return new CreateProducerOtherNamesBatchResult(
             toAdd.Count,
             processedItems.Count - toAdd.Count,
@@ -111,7 +140,7 @@ public class CreateProducerOtherNamesBatchHandler(
         try
         {
             var producerOtherName = ProducerOtherName.Create(
-                producerId: 0,
+                0,
                 dto.OtherName,
                 dto.WhereUsed);
 
@@ -124,7 +153,9 @@ public class CreateProducerOtherNamesBatchHandler(
         catch (Exception ex)
         {
             var message = ex is ILocalizableException localizableException
-                ? localizer.GetOrDefault(localizableException.MessageKey, localizableException.Arguments ?? []) ?? ex.Message
+                ? localizer.GetOrDefault(
+                    localizableException.MessageKey,
+                    localizableException.Arguments ?? []) ?? ex.Message
                 : ex.Message;
 
             errors.Add(new CreateProducerOtherNamesBatchError(idx, message));

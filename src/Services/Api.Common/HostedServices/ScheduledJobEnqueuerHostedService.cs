@@ -8,7 +8,8 @@ namespace Api.Common.HostedServices;
 public class ScheduledJobEnqueuerHostedService(
     IServiceScopeFactory scopeFactory,
     ILogger<ScheduledJobEnqueuerHostedService> logger,
-    IOptionsMonitor<ScheduledJobEnqueuerOptions> options) : BackgroundService
+    IOptionsMonitor<ScheduledJobEnqueuerOptions> options
+) : BackgroundService
 {
     protected override async Task ExecuteAsync(CancellationToken stoppingToken)
     {
@@ -18,7 +19,7 @@ public class ScheduledJobEnqueuerHostedService(
             await Iteration(currentValue, stoppingToken);
         }
     }
-    
+
     private async Task Iteration(
         ScheduledJobEnqueuerOptions opt,
         CancellationToken ct)
@@ -32,18 +33,8 @@ public class ScheduledJobEnqueuerHostedService(
                 new QueueScheduledJobsCommand(opt.BatchSize),
                 ct);
         }
-        catch (OperationCanceledException) when (ct.IsCancellationRequested)
-        {
-            throw;
-        }
-        catch (Exception ex)
-        {
-            logger.LogError(ex, "Scheduled job enqueuer failed.");
-        }
-        finally
-        {
-            await Task.Delay(opt.Delay, ct);
-        }
-        
+        catch (OperationCanceledException) when (ct.IsCancellationRequested) { throw; }
+        catch (Exception ex) { logger.LogError(ex, "Scheduled job enqueuer failed."); }
+        finally { await Task.Delay(opt.Delay, ct); }
     }
 }

@@ -13,7 +13,8 @@ public class GetPurchasesValidation : AbstractValidator<GetPurchasesQuery>
             .WithLocalizationKey("purchase.date.range.start.before.end");
 
         RuleFor(query => query.DateRange)
-            .Must(x => !x.Min.HasValue || !x.Max.HasValue || x.Max.Value.Date <= x.Min.Value.Date.AddMonths(5))
+            .Must(x => !x.Min.HasValue || !x.Max.HasValue ||
+                       x.Max.Value.Date <= x.Min.Value.Date.AddMonths(5))
             .WithLocalizationKey("purchase.date.range.max.5months");
 
         RuleFor(x => x.Pagination)

@@ -12,7 +12,10 @@ public static class ConfigurationBuilderExtensions
         string? contour,
         string? path = null)
     {
-        return configuration.AddConfigsFromJsons(Appsettings, contour, path);
+        return configuration.AddConfigsFromJsons(
+            Appsettings,
+            contour,
+            path);
     }
 
     public static IConfigurationBuilder AddMigratorSettingsFromJsons(
@@ -20,7 +23,10 @@ public static class ConfigurationBuilderExtensions
         string? contour,
         string? path = null)
     {
-        return configuration.AddConfigsFromJsons("migrator", contour, path);
+        return configuration.AddConfigsFromJsons(
+            "migrator",
+            contour,
+            path);
     }
 
     public static IConfigurationBuilder AddConfigsFromJsons(
@@ -34,25 +40,43 @@ public static class ConfigurationBuilderExtensions
         if (!Directory.Exists(path)) return configuration;
 
         var files = Directory
-            .GetFiles(path, "*.json", SearchOption.AllDirectories)
+            .GetFiles(
+                path,
+                "*.json",
+                SearchOption.AllDirectories)
             .OrderBy(f => f);
 
         foreach (var file in files)
         {
             var fileName = Path.GetFileName(file);
-            if (!ShouldLoad(fileName, nameStart, contour))
+            if (!ShouldLoad(
+                    fileName,
+                    nameStart,
+                    contour))
                 continue;
 
-            configuration.AddJsonFile(file, optional: true, reloadOnChange: false);
+            configuration.AddJsonFile(
+                file,
+                true,
+                false);
         }
 
         return configuration;
     }
 
-    private static bool ShouldLoad(string fileName, string nameStart, string? contour)
+    private static bool ShouldLoad(
+        string fileName,
+        string nameStart,
+        string? contour)
     {
         var additionalName = string.IsNullOrWhiteSpace(contour) ? null : $".{contour}";
-        return string.Equals(fileName, $"{nameStart}.json", StringComparison.OrdinalIgnoreCase) ||
-               string.Equals(fileName, $"{nameStart}{additionalName}.json", StringComparison.OrdinalIgnoreCase);
+        return string.Equals(
+                   fileName,
+                   $"{nameStart}.json",
+                   StringComparison.OrdinalIgnoreCase) ||
+               string.Equals(
+                   fileName,
+                   $"{nameStart}{additionalName}.json",
+                   StringComparison.OrdinalIgnoreCase);
     }
 }

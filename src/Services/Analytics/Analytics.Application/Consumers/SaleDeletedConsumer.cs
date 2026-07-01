@@ -5,7 +5,8 @@ using MassTransit;
 
 namespace Analytics.Application.Consumers;
 
-public class SaleDeletedConsumer(IFactSynchronizer<SalesFact, Guid> synchronizer) : IConsumer<SaleDeletedEvent>
+public class SaleDeletedConsumer(IFactSynchronizer<SalesFact, Guid> synchronizer)
+    : IConsumer<SaleDeletedEvent>
 {
     public async Task Consume(ConsumeContext<SaleDeletedEvent> context)
     {

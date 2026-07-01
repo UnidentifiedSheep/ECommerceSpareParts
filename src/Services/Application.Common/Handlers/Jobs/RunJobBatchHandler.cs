@@ -16,7 +16,8 @@ public record RunJobBatchCommand(int MaxBatchSize) : ICommand;
 public class RunJobBatchHandler(
     IServiceScopeFactory scopeFactory,
     IUnitOfWork unitOfWork,
-    IRepository<Job, Guid> repository) : ICommandHandler<RunJobBatchCommand>
+    IRepository<Job, Guid> repository
+) : ICommandHandler<RunJobBatchCommand>
 {
     public async Task<Unit> Handle(RunJobBatchCommand request, CancellationToken cancellationToken)
     {
@@ -42,11 +43,14 @@ public class RunJobBatchHandler(
             cancellationToken);
 
         var tasks = jobs
-            .Select(x => TakeScopeAndRun(x.Id, x.SystemName, cancellationToken))
+            .Select(x => TakeScopeAndRun(
+                x.Id,
+                x.SystemName,
+                cancellationToken))
             .ToList();
 
         await Task.WhenAll(tasks);
-        
+
         return Unit.Value;
     }
 

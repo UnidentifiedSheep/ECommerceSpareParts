@@ -12,7 +12,7 @@ namespace Integrations.Supplier.DI;
 public static class ServiceCollectionExtensions
 {
     public static IServiceCollection AddFavoriteIntegration<TConnectionProvider, TSettingsProvider>(
-            this IServiceCollection services)
+        this IServiceCollection services)
         where TConnectionProvider : class, IConnectionProvider<FavoritConnection>
         where TSettingsProvider : class, ISupplierSettingsProvider<FavoriteSettings>
     {

@@ -17,20 +17,20 @@ public static class ServiceProvider
             AppContext.BaseDirectory,
             "Templates",
             "Emails");
-        
+
         collection.AddOptions<MailOptions>()
             .BindConfiguration(MailOptions.SectionName)
             .ValidateDataAnnotations()
             .ValidateOnStart();
-        
+
         collection.AddSingleton<IEmailSender, EmailSender>();
-        
+
         collection.AddRazorLight(() => new RazorLightEngineBuilder()
             .UseFileSystemProject(templatesRoot)
             .UseMemoryCachingProvider()
             .Build());
         collection.AddSingleton<IEmailMessageRenderer, EmailMessageRenderer>();
-        
+
         return collection;
     }
 }

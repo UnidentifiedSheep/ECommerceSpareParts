@@ -6,11 +6,13 @@ public interface ISubtractStorageContentItem
 }
 
 public record SubtractStorageContentItem(
-    int StorageContentId, 
-    int Count) : ISubtractStorageContentItem;
+    int StorageContentId,
+    int Count
+) : ISubtractStorageContentItem;
 
 public record SubtractProductFromStorageItem(
-    int ProductId, 
-    string StorageName, 
+    int ProductId,
+    string StorageName,
     int Count,
-    bool TakeFromOtherStorages = false) : ISubtractStorageContentItem;
+    bool TakeFromOtherStorages = false
+) : ISubtractStorageContentItem;

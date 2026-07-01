@@ -1,8 +1,6 @@
 using System.Net;
 using Extensions;
-using Internal.Integration.Core.Interfaces;
 using Internal.Integration.Core.Interfaces.Main;
-using Internal.Integration.Core.Models.Main;
 using Internal.Integration.Core.Models.Main.Product;
 using Search.Application.Interfaces.Product;
 using Search.Entities;
@@ -10,15 +8,15 @@ using Search.Entities;
 namespace Search.Persistence.DocumentProviders;
 
 public class MainProductSearchDocumentProvider(
-    IMainClient mainClient) : IProductSearchDocumentProvider
+    IMainClient mainClient
+) : IProductSearchDocumentProvider
 {
     public async Task<Product?> GetById(
         int productId,
         CancellationToken cancellationToken = default)
     {
         var response = await mainClient.ProductNode.GetFullProduct(productId, cancellationToken);
-        if (response is { StatusCode: HttpStatusCode.NotFound })
-            return null;
+        if (response is { StatusCode: HttpStatusCode.NotFound }) return null;
 
         if (!response.Success)
             throw new InvalidOperationException(

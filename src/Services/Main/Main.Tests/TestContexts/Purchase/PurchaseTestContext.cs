@@ -20,7 +20,8 @@ public class PurchaseTestContext(
     UserContextTestContext userContext,
     ProductTestContext productContext,
     CurrencyTestContext currencyContext,
-    StorageRouteTestContext storageRouteContext)
+    StorageRouteTestContext storageRouteContext
+)
     : TestContextBase<DContext>(context), IDependentTestContext
 {
     public User Supplier { get; private set; } = null!;
@@ -62,7 +63,10 @@ public class PurchaseTestContext(
             .Applied()
             .Build();
 
-        await DbContext.AddRangeAsync(transaction, senderBalance, receiverBalance);
+        await DbContext.AddRangeAsync(
+            transaction,
+            senderBalance,
+            receiverBalance);
         await DbContext.SaveChangesAsync(cancellationToken);
 
         StorageContent = await new StorageContentBuilder(Faker)

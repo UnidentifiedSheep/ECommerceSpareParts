@@ -3,6 +3,7 @@ using Enums;
 using FluentAssertions;
 using Main.Application.Handlers.Balance.GetTransactions;
 using Main.Entities.Balance;
+using Main.Enums.Balances;
 using Microsoft.EntityFrameworkCore;
 using Test.Common.TestContainers.Combined;
 using Tests.TestContexts.Balance;
@@ -66,15 +67,17 @@ public class GetTransactionsTests : IntegrationTest
     {
         var userId = TestContext.Users[0].Id;
 
-        var result = await Mediator.Send(GetQuery(
-            senderId: userId,
-            receiverId: userId,
-            logicalOperation: LogicalOperation.Or));
+        var result = await Mediator.Send(
+            GetQuery(
+                userId,
+                userId,
+                logicalOperation: LogicalOperation.Or));
 
         result.Transactions.Should().NotBeEmpty();
-        result.Transactions.Should().OnlyContain(x =>
-            x.Sender.User != null && x.Sender.User.Id == userId ||
-            x.Receiver.User != null && x.Receiver.User.Id == userId);
+        result.Transactions.Should()
+            .OnlyContain(x =>
+                (x.Sender.User != null && x.Sender.User.Id == userId) ||
+                (x.Receiver.User != null && x.Receiver.User.Id == userId));
     }
 
     [Fact]
@@ -82,9 +85,10 @@ public class GetTransactionsTests : IntegrationTest
     {
         var transaction = await ReverseSeedTransaction();
 
-        var result = await Mediator.Send(GetQuery(
-            senderId: transaction.SenderId,
-            skipReversed: false));
+        var result = await Mediator.Send(
+            GetQuery(
+                transaction.SenderId,
+                skipReversed: false));
 
         result.Transactions.Should().Contain(x => x.Id == transaction.Id);
     }
@@ -94,9 +98,10 @@ public class GetTransactionsTests : IntegrationTest
     {
         var transaction = await ReverseSeedTransaction();
 
-        var result = await Mediator.Send(GetQuery(
-            senderId: transaction.SenderId,
-            skipReversed: true));
+        var result = await Mediator.Send(
+            GetQuery(
+                transaction.SenderId,
+                skipReversed: true));
 
         result.Transactions.Should().NotContain(x => x.Id == transaction.Id);
     }
@@ -106,9 +111,10 @@ public class GetTransactionsTests : IntegrationTest
     {
         var transaction = await CreateCompletionProfileAppliedTransaction();
 
-        var result = await Mediator.Send(GetQuery(
-            senderId: transaction.SenderId,
-            skipReversed: true));
+        var result = await Mediator.Send(
+            GetQuery(
+                transaction.SenderId,
+                skipReversed: true));
 
         result.Transactions.Should().Contain(x => x.Id == transaction.Id);
     }
@@ -133,9 +139,10 @@ public class GetTransactionsTests : IntegrationTest
     public async Task GetTransactions_InvalidRange_ThrowsValidationException()
     {
         await Assert.ThrowsAsync<ValidationException>(() =>
-            Mediator.Send(GetQuery(
-                rangeStart: DateTime.UtcNow,
-                rangeEnd: DateTime.UtcNow.AddDays(-1))));
+            Mediator.Send(
+                GetQuery(
+                    rangeStart: DateTime.UtcNow,
+                    rangeEnd: DateTime.UtcNow.AddDays(-1))));
     }
 
     private GetTransactionsQuery GetQuery(
@@ -159,7 +166,7 @@ public class GetTransactionsTests : IntegrationTest
             skipReversed);
     }
 
-    private async Task<Main.Entities.Balance.Transaction> ReverseSeedTransaction()
+    private async Task<Transaction> ReverseSeedTransaction()
     {
         var transaction = await Context.Transactions
             .FirstAsync(x => x.Id == TestContext.Transactions[0].Id);
@@ -176,7 +183,7 @@ public class GetTransactionsTests : IntegrationTest
         return transaction;
     }
 
-    private async Task<Main.Entities.Balance.Transaction> CreateCompletionProfileAppliedTransaction()
+    private async Task<Transaction> CreateCompletionProfileAppliedTransaction()
     {
         var sender = TestContext.Users[0];
         var receiver = TestContext.Users[1];
@@ -191,14 +198,14 @@ public class GetTransactionsTests : IntegrationTest
             .FirstAsync(x => x.UserId == receiver.Id);
         senderProfile.Credit(100m);
 
-        var transaction = Main.Entities.Balance.Transaction.Create(
+        var transaction = Transaction.Create(
             sender.Id,
             receiver.Id,
             currency.Id,
-            Main.Enums.Balances.TransactionType.Transfer,
+            TransactionType.Transfer,
             100m,
             DateTime.UtcNow.AddDays(-1),
-            Main.Enums.Balances.TransactionSourceType.Manual);
+            TransactionSourceType.Manual);
 
         transaction.Complete();
         transaction.Apply(senderBalance, receiverBalance);

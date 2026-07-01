@@ -4,13 +4,19 @@ namespace Test.Common.Stubs;
 
 public class MessageBrokerStub : IPublishEndpoint
 {
-    public Task Publish<T>(T message, IPipe<PublishContext<T>> publishPipe, CancellationToken cancellationToken = new())
+    public Task Publish<T>(
+        T message,
+        IPipe<PublishContext<T>> publishPipe,
+        CancellationToken cancellationToken = new())
         where T : class
     {
         return Task.CompletedTask;
     }
 
-    public Task Publish<T>(T message, IPipe<PublishContext> publishPipe, CancellationToken cancellationToken = new())
+    public Task Publish<T>(
+        T message,
+        IPipe<PublishContext> publishPipe,
+        CancellationToken cancellationToken = new())
         where T : class
     {
         return Task.CompletedTask;
@@ -21,12 +27,18 @@ public class MessageBrokerStub : IPublishEndpoint
         return Task.CompletedTask;
     }
 
-    public Task Publish(object message, IPipe<PublishContext> publishPipe, CancellationToken cancellationToken = new())
+    public Task Publish(
+        object message,
+        IPipe<PublishContext> publishPipe,
+        CancellationToken cancellationToken = new())
     {
         return Task.CompletedTask;
     }
 
-    public Task Publish(object message, Type messageType, CancellationToken cancellationToken = new())
+    public Task Publish(
+        object message,
+        Type messageType,
+        CancellationToken cancellationToken = new())
     {
         return Task.CompletedTask;
     }
@@ -61,10 +73,7 @@ public class MessageBrokerStub : IPublishEndpoint
         return Task.CompletedTask;
     }
 
-    public ConnectHandle ConnectPublishObserver(IPublishObserver observer)
-    {
-        return null!;
-    }
+    public ConnectHandle ConnectPublishObserver(IPublishObserver observer) { return null!; }
 
     Task IPublishEndpoint.Publish<T>(T message, CancellationToken cancellationToken)
     {

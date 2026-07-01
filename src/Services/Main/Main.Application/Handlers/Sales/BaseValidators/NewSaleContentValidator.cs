@@ -18,13 +18,19 @@ public class NewSaleContentValidator : AbstractValidator<IEnumerable<NewSaleCont
                 z.RuleFor(x => x.Price)
                     .GreaterThan(0)
                     .WithLocalizationKey("sale.content.price.min")
-                    .PrecisionScale(18, 2, true)
+                    .PrecisionScale(
+                        18,
+                        2,
+                        true)
                     .WithLocalizationKey("sale.content.price.precision");
 
                 z.RuleFor(x => x.PriceWithDiscount)
                     .GreaterThan(0)
                     .WithLocalizationKey("sale.content.price.with.discount.min")
-                    .PrecisionScale(18, 2, true)
+                    .PrecisionScale(
+                        18,
+                        2,
+                        true)
                     .WithLocalizationKey("sale.content.price.with.discount.precision");
 
                 z.RuleFor(x => x.PriceWithDiscount)

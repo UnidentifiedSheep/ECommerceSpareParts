@@ -114,8 +114,5 @@ public class EditProducerTests : IntegrationTest
         dbProducer.Description.Should().Be(model.Description.Value);
     }
 
-    private Producer GetFirstProducer()
-    {
-        return TestContext.Producers[0];
-    }
+    private Producer GetFirstProducer() { return TestContext.Producers[0]; }
 }

@@ -39,10 +39,11 @@ public class SecretEncryptorTests
 
     private static SecretEncryptor CreateEncryptor()
     {
-        var options = Options.Create(new SecretEncryptionOptions
-        {
-            Secret = Convert.ToBase64String(new byte[32])
-        });
+        var options = Options.Create(
+            new SecretEncryptionOptions
+            {
+                Secret = Convert.ToBase64String(new byte[32])
+            });
 
         return new SecretEncryptor(options);
     }

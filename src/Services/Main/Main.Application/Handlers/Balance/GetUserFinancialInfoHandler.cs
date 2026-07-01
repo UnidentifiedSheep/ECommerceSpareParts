@@ -4,9 +4,7 @@ using Application.Common.Interfaces.Settings;
 using LinqKit;
 using Main.Application.Dtos.Balances;
 using Main.Application.Dtos.Currencies;
-using Main.Application.Dtos.Users;
 using Main.Application.Projections;
-using Main.Entities.Balance;
 using Main.Entities.Currency;
 using Main.Entities.Exceptions;
 using Main.Entities.Settings;
@@ -27,15 +25,16 @@ public record GetUserFinancialInfoResult
 public class GetUserFinancialInfoHandler(
     ISettingsService settingsService,
     IReadRepository<User, Guid> readRepository,
-    IReadRepository<Currency, int> currencyReadRepository) : IQueryHandler<GetUserFinancialInfoQuery, GetUserFinancialInfoResult>
+    IReadRepository<Currency, int> currencyReadRepository
+) : IQueryHandler<GetUserFinancialInfoQuery, GetUserFinancialInfoResult>
 {
     public async Task<GetUserFinancialInfoResult> Handle(
-        GetUserFinancialInfoQuery request, 
+        GetUserFinancialInfoQuery request,
         CancellationToken cancellationToken)
     {
         var baseCurrencyId = (await settingsService.GetOrDefault<CurrencySetting>(cancellationToken))
             .Data.BaseCurrencyId;
-        
+
         var baseCurrency = await currencyReadRepository.Query
             .AsExpandable()
             .Select(CurrencyProjections.ToDto)
@@ -43,17 +42,17 @@ public class GetUserFinancialInfoHandler(
         //we need to cache it.
 
         return await readRepository.Query
-            .Where(x => x.Id == request.UserId)
-            .AsExpandable()
-            .Select(x => new GetUserFinancialInfoResult
-            {
-                FinancialProfile = x.FinancialProfile == null 
-                    ? null 
-                    : BalanceProjections.ToUserFinancialProfileDto.Invoke(x.FinancialProfile),
-                Balances = x.Balances.Select(z => BalanceProjections.ToUserBalanceDto.Invoke(z)),
-                BaseCurrency = baseCurrency
-            })
-            .FirstOrDefaultAsync(cancellationToken)
-            ?? throw new UserNotFoundException(request.UserId);
+                   .Where(x => x.Id == request.UserId)
+                   .AsExpandable()
+                   .Select(x => new GetUserFinancialInfoResult
+                   {
+                       FinancialProfile = x.FinancialProfile == null
+                           ? null
+                           : BalanceProjections.ToUserFinancialProfileDto.Invoke(x.FinancialProfile),
+                       Balances = x.Balances.Select(z => BalanceProjections.ToUserBalanceDto.Invoke(z)),
+                       BaseCurrency = baseCurrency
+                   })
+                   .FirstOrDefaultAsync(cancellationToken)
+               ?? throw new UserNotFoundException(request.UserId);
     }
 }

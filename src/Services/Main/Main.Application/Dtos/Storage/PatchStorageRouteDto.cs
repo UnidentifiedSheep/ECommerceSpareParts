@@ -13,7 +13,8 @@ public record PatchStorageRouteDto
     public PatchField<RouteType> RouteType { get; init; } = PatchField<RouteType>.NotSet();
 
     [JsonPropertyName("pricingModel")]
-    public PatchField<LogisticPricingType> PricingModel { get; init; } = PatchField<LogisticPricingType>.NotSet();
+    public PatchField<LogisticPricingType> PricingModel { get; init; } =
+        PatchField<LogisticPricingType>.NotSet();
 
     [JsonPropertyName("deliveryTimeMinutes")]
     public PatchField<int> DeliveryTimeMinutes { get; init; } = PatchField<int>.NotSet();

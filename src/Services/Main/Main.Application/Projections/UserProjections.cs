@@ -5,7 +5,6 @@ using Main.Application.Dtos.Auth;
 using Main.Application.Dtos.Users;
 using Main.Application.Extensions;
 using Main.Entities.User;
-using Main.Enums;
 using Main.Enums.Auth;
 
 namespace Main.Application.Projections;
@@ -13,7 +12,7 @@ namespace Main.Application.Projections;
 public static class UserProjections
 {
     private static readonly string SystemRole = Role.System.ToNormalizedRole();
-    
+
     public static readonly Expression<Func<User, UserDto>> UserProjection =
         x => new UserDto
         {

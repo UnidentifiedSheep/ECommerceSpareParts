@@ -7,7 +7,8 @@ using Microsoft.AspNetCore.Mvc;
 namespace Api.Common.ExceptionHandlers;
 
 public abstract class ExceptionHandlerBase<THandler>(
-    ILogger<THandler> logger) : IExceptionHandler
+    ILogger<THandler> logger
+) : IExceptionHandler
 {
     public abstract ValueTask<bool> TryHandleAsync(
         HttpContext httpContext,
@@ -19,11 +20,17 @@ public abstract class ExceptionHandlerBase<THandler>(
         if (!logger.IsEnabled(LogLevel.Error)) return;
         using (logger.BeginScope(new Dictionary<string, object> { ["TraceId"] = context.TraceIdentifier }))
         {
-            logger.LogError(exception, "Error occurred at {Time}", DateTime.UtcNow);
+            logger.LogError(
+                exception,
+                "Error occurred at {Time}",
+                DateTime.UtcNow);
         }
     }
 
-    protected ProblemDetails GetBaseDetails(Exception exception, HttpContext httpContext, int? statusCode = 500)
+    protected ProblemDetails GetBaseDetails(
+        Exception exception,
+        HttpContext httpContext,
+        int? statusCode = 500)
     {
         return new ProblemDetails
         {
@@ -64,7 +71,10 @@ public abstract class ExceptionHandlerBase<THandler>(
         if (!localizer.TryGet(key, out var message) || message == null)
             logger.LogError("Unable to get localizable message for Key: {Key}", key);
 
-        if (LocalizedMessageFormatter.TryFormat(message!, localizableException.Arguments, out detail))
+        if (LocalizedMessageFormatter.TryFormat(
+                message!,
+                localizableException.Arguments,
+                out detail))
             return true;
 
         logger.LogError(

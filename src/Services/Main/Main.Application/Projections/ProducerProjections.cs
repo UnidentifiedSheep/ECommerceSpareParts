@@ -13,7 +13,7 @@ public static class ProducerProjections
             Name = x.Name,
             Description = x.Description
         };
-    
+
     public static readonly Expression<Func<ProducerOtherName, ProducerOtherNameDto>> ToOtherNameDto =
         x => new ProducerOtherNameDto
         {

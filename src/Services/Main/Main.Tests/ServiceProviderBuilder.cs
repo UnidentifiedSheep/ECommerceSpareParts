@@ -14,7 +14,6 @@ using Npgsql;
 using Persistence;
 using Security;
 using Serilog;
-using Utils;
 using Test.Common.Abstractions.Test;
 using Test.Common.Extensions;
 using Test.Common.Interfaces.ServiceProvider;
@@ -46,7 +45,10 @@ public class ServiceProviderBuilder : IServiceProviderBuilder<ServiceProviderArg
 
         ApplicationServiceProvider
             .AddApplicationLayer(services, null)
-            .AddLocalization("ru-RU", "ru-RU", "en-EN")
+            .AddLocalization(
+                "ru-RU",
+                "ru-RU",
+                "en-EN")
             .AddPersistenceLayer();
         var passwordRules = new PasswordRules
         {
@@ -54,27 +56,33 @@ public class ServiceProviderBuilder : IServiceProviderBuilder<ServiceProviderArg
             RequireUppercase = false
         };
 
-        services.AddSingleton(Options.Create(new RedisOptions
-        {
-            Url = args.CacheConnectionString,
-            Password = null
-        }));
+        services.AddSingleton(
+            Options.Create(
+                new RedisOptions
+                {
+                    Url = args.CacheConnectionString,
+                    Password = null
+                }));
 
         var pgsqlBuilder = new NpgsqlConnectionStringBuilder(args.PgsqlConnectionString);
 
-        services.AddSingleton(Options.Create(new DatabaseOptions
-        {
-            Host = pgsqlBuilder.Host!,
-            Database = pgsqlBuilder.Database!,
-            Username = pgsqlBuilder.Username!,
-            Password = pgsqlBuilder.Password!,
-            Port = pgsqlBuilder.Port
-        }));
+        services.AddSingleton(
+            Options.Create(
+                new DatabaseOptions
+                {
+                    Host = pgsqlBuilder.Host!,
+                    Database = pgsqlBuilder.Database!,
+                    Username = pgsqlBuilder.Username!,
+                    Password = pgsqlBuilder.Password!,
+                    Port = pgsqlBuilder.Port
+                }));
 
-        services.AddSingleton(Options.Create(new SecretEncryptionOptions
-        {
-            Secret = "some secret"
-        }));
+        services.AddSingleton(
+            Options.Create(
+                new SecretEncryptionOptions
+                {
+                    Secret = "some secret"
+                }));
         services.AddProjectJsonSerialization();
 
         services.AddJsonSigner()

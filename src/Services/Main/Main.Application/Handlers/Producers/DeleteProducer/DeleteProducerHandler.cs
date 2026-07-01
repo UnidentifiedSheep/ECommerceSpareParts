@@ -1,5 +1,4 @@
 using Abstractions.Interfaces.Persistence;
-using Abstractions.Interfaces.Services;
 using Application.Common.Interfaces;
 using Application.Common.Interfaces.Cqrs;
 using Attributes;
@@ -15,9 +14,10 @@ namespace Main.Application.Handlers.Producers.DeleteProducer;
 public record DeleteProducerCommand(int Id) : ICommand;
 
 public class DeleteProducerHandler(
-    IProducerRepository repository, 
+    IProducerRepository repository,
     IUnitOfWork unitOfWork,
-    IIntegrationEventScope integrationEventScope)
+    IIntegrationEventScope integrationEventScope
+)
     : ICommandHandler<DeleteProducerCommand>
 {
     public async Task<Unit> Handle(DeleteProducerCommand request, CancellationToken cancellationToken)
@@ -29,10 +29,11 @@ public class DeleteProducerHandler(
         await ValidateData(producerId, cancellationToken);
 
         unitOfWork.Remove(producer);
-        integrationEventScope.Add(new ProducerUpdatedEvent
-        {
-            Id = request.Id
-        });
+        integrationEventScope.Add(
+            new ProducerUpdatedEvent
+            {
+                Id = request.Id
+            });
         return Unit.Value;
     }
 

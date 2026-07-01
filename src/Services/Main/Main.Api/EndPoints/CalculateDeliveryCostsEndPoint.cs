@@ -14,13 +14,13 @@ public record CalculateDeliveryCostRequest
 {
     [JsonPropertyName("storageFrom")]
     public required string StorageFrom { get; init; }
-    
+
     [JsonPropertyName("storageTo")]
     public required string StorageTo { get; init; }
-    
+
     [JsonPropertyName("mode")]
     public required LogisticsCalculationMode Mode { get; init; }
-    
+
     [JsonPropertyName("items")]
     public required IEnumerable<LogisticsItemDto> Items { get; init; }
 }
@@ -31,14 +31,22 @@ public class CalculateDeliveryCostsEndPoint : ICarterModule
 {
     public void AddRoutes(IEndpointRouteBuilder app)
     {
-        app.MapPost("/logistics/calculate",
-                async (ISender sender, CalculateDeliveryCostRequest request, CancellationToken token) =>
+        app.MapPost(
+                "/logistics/calculate",
+                async (
+                    ISender sender,
+                    CalculateDeliveryCostRequest request,
+                    CancellationToken token) =>
                 {
-                    var query = new CalculateDeliveryCostQuery(request.StorageFrom, request.StorageTo, request.Items,
+                    var query = new CalculateDeliveryCostQuery(
+                        request.StorageFrom,
+                        request.StorageTo,
+                        request.Items,
                         request.Mode);
                     var result = await sender.Send(query, token);
                     return Results.Ok(new CalculateDeliveryCostResponse(result.DeliveryCost, result.Route));
-                }).WithTags("Logistics")
+                })
+            .WithTags("Logistics")
             .WithName("CalculateDeliveryCost")
             .WithSummary("Рассчитать стоимость доставки")
             .WithDescription("Расчет стоимости доставки между складами")

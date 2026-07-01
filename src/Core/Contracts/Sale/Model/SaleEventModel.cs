@@ -34,7 +34,7 @@ public record SaleEventModel
 
     [JsonPropertyName("currencyId")]
     public required int CurrencyId { get; init; }
-    
+
     [JsonPropertyName("contents")]
     public required IReadOnlyList<SaleContentEventModel> Contents { get; init; }
 }

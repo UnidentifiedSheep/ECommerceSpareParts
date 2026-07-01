@@ -4,9 +4,7 @@ namespace Main.Entities.Product.ValueObjects;
 
 public record Name
 {
-    private Name()
-    {
-    }
+    private Name() { }
 
     public Name(string value)
     {
@@ -21,13 +19,7 @@ public record Name
 
     public string Value { get; } = null!;
 
-    public static implicit operator Name(string value)
-    {
-        return new Name(value);
-    }
+    public static implicit operator Name(string value) { return new Name(value); }
 
-    public static implicit operator string(Name name)
-    {
-        return name.Value;
-    }
+    public static implicit operator string(Name name) { return name.Value; }
 }

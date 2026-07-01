@@ -1,12 +1,12 @@
 ﻿using System.Reflection;
 using Abstractions.Interfaces.Persistence;
-using Abstractions.Interfaces.Services;
 using Attributes;
 using MediatR;
 
 namespace Application.Common.Behaviors;
 
-public class SaveChangesBehavior<TRequest, TResponse>(IUnitOfWork unitOfWork) : IPipelineBehavior<TRequest, TResponse>
+public class SaveChangesBehavior<TRequest, TResponse>(IUnitOfWork unitOfWork)
+    : IPipelineBehavior<TRequest, TResponse>
     where TRequest : IRequest<TResponse>
     where TResponse : notnull
 {

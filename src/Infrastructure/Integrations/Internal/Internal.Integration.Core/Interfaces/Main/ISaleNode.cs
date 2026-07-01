@@ -1,6 +1,4 @@
 using Integrations.Common;
-using Internal.Integration.Core.Models;
-using Internal.Integration.Core.Models.Main;
 using Internal.Integration.Core.Models.Main.Sale;
 
 namespace Internal.Integration.Core.Interfaces.Main;

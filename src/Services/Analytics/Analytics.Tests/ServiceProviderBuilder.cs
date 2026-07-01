@@ -1,7 +1,7 @@
 using Abstractions.Interfaces;
 using Abstractions.Models;
-using Analytics.Cache;
 using Analytics.Application.Configs;
+using Analytics.Cache;
 using Analytics.Persistence;
 using Api.Common;
 using Cache;
@@ -43,31 +43,38 @@ public class ServiceProviderBuilder : IServiceProviderBuilder<ServiceProviderArg
 
         ApplicationServiceProvider
             .AddApplicationLayer(services, null)
-            .AddLocalization("ru-RU", "ru-RU", "en-EN")
+            .AddLocalization(
+                "ru-RU",
+                "ru-RU",
+                "en-EN")
             .AddPersistenceLayer();
-        
+
         var passwordRules = new PasswordRules
         {
             RequireDigit = false,
             RequireUppercase = false
         };
 
-        services.AddSingleton(Options.Create(new RedisOptions
-        {
-            Url = args.CacheConnectionString,
-            Password = null
-        }));
+        services.AddSingleton(
+            Options.Create(
+                new RedisOptions
+                {
+                    Url = args.CacheConnectionString,
+                    Password = null
+                }));
 
         var pgsqlBuilder = new NpgsqlConnectionStringBuilder(args.PgsqlConnectionString);
 
-        services.AddSingleton(Options.Create(new DatabaseOptions
-        {
-            Host = pgsqlBuilder.Host!,
-            Database = pgsqlBuilder.Database!,
-            Username = pgsqlBuilder.Username!,
-            Password = pgsqlBuilder.Password!,
-            Port = pgsqlBuilder.Port
-        }));
+        services.AddSingleton(
+            Options.Create(
+                new DatabaseOptions
+                {
+                    Host = pgsqlBuilder.Host!,
+                    Database = pgsqlBuilder.Database!,
+                    Username = pgsqlBuilder.Username!,
+                    Password = pgsqlBuilder.Password!,
+                    Port = pgsqlBuilder.Port
+                }));
 
         services
             .AddCacheLayer("test")

@@ -15,14 +15,10 @@ public class SearchLogger : ISearchLogger
     {
         _logs.Enqueue(log);
 
-        if (_logs.Count >= 1000 && _trigger.CurrentCount == 0)
-            _trigger.Release();
+        if (_logs.Count >= 1000 && _trigger.CurrentCount == 0) _trigger.Release();
     }
 
-    public bool TryDequeue(out SearchLogModel? log)
-    {
-        return _logs.TryDequeue(out log);
-    }
+    public bool TryDequeue(out SearchLogModel? log) { return _logs.TryDequeue(out log); }
 
     public async Task WaitForTriggerOrTimeoutAsync(TimeSpan timeout, CancellationToken token)
     {

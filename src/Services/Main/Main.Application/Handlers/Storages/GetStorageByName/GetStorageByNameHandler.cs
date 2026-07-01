@@ -14,10 +14,13 @@ public record GetStorageByNameQuery(string StorageName) : IQuery<GetStorageByNam
 public record GetStorageByNameResult(StorageDto Storage);
 
 public class GetStorageByNameHandler(
-    IReadRepository<Storage, string> repository)
+    IReadRepository<Storage, string> repository
+)
     : IQueryHandler<GetStorageByNameQuery, GetStorageByNameResult>
 {
-    public async Task<GetStorageByNameResult> Handle(GetStorageByNameQuery request, CancellationToken cancellationToken)
+    public async Task<GetStorageByNameResult> Handle(
+        GetStorageByNameQuery request,
+        CancellationToken cancellationToken)
     {
         var storage = await repository.Query
                           .AsExpandable()

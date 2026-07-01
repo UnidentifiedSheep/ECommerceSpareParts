@@ -2,7 +2,6 @@
 using Application.Common.Interfaces.Repositories;
 using Cache;
 using Cache.Extensions;
-using Main.Application;
 using Main.Application.Dtos.Product;
 using Main.Application.Extensions.QueryExtensions;
 using Main.Application.Interfaces.Cache;
@@ -16,7 +15,8 @@ namespace Main.Cache;
 public class ProductCacheRepository(
     ICache rawCache,
     IReadRepository<ProductCross, (int, int)> crossesReadRepository,
-    IReadRepository<Product, int> productReadRepository) : IProductCacheRepository
+    IReadRepository<Product, int> productReadRepository
+) : IProductCacheRepository
 {
     public async Task<ProductDto> GetProductOrSetAsync(
         int productId,
@@ -25,8 +25,7 @@ public class ProductCacheRepository(
         var key = CacheKeys.ProductCache.Product(productId);
         var cached = await rawCache.GetAsync<ProductDto>(key);
 
-        if (cached != null)
-            return cached;
+        if (cached != null) return cached;
 
         var product = await GetProductFromDb(productId, cancellationToken);
 
@@ -67,12 +66,17 @@ public class ProductCacheRepository(
 
         var cached = await rawCache.GetJsonArrayOrEmptyAsync<int>(key);
 
-        if (cached.IsHit)
-            return cached.Values;
+        if (cached.IsHit) return cached.Values;
 
-        var crosses = await GetCrossesFromDb(productId, sortBy, cancellationToken);
+        var crosses = await GetCrossesFromDb(
+            productId,
+            sortBy,
+            cancellationToken);
 
-        await rawCache.SetJsonArrayAsync(key, crosses, CacheKeys.ProductCache.Ttl);
+        await rawCache.SetJsonArrayAsync(
+            key,
+            crosses,
+            CacheKeys.ProductCache.Ttl);
 
         await rawCache.AddRelationsAsync(
             crosses.Prepend(productId),

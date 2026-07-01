@@ -12,41 +12,35 @@ public class Permission : AuditableEntity<Permission, string>, ILinqEntity<Permi
     private const string Prefix = "permissions.";
     private const string NamePostfix = ".name";
     private const string DescriptionPostfix = ".description";
-    private Permission()
-    {
-    }
 
-    public Permission(PermissionCodes name)
-    {
-        Name = ToNormalizedPermission(name);
-    }
+    private Permission() { }
+
+    public Permission(PermissionCodes name) { Name = ToNormalizedPermission(name); }
 
     [Validate]
     public string Name { get; } = null!;
 
-    public static Expression<Func<Permission, string>> GetKeySelector()
-    {
-        return x => x.Name;
-    }
+    public static Expression<Func<Permission, string>> GetKeySelector() { return x => x.Name; }
 
     public static Expression<Func<Permission, bool>> GetEqualityExpression(string key)
     {
         return x => x.Name == key;
     }
 
-    public override string GetId()
-    {
-        return Name;
-    }
+    public override string GetId() { return Name; }
 
     public static string ToNormalizedPermission(PermissionCodes permission)
     {
         return permission.ToString().ToNormalizedPermission();
     }
-    
+
     public static string GetLocalizationNameKey(PermissionCodes permission)
-        => Prefix + ToNormalizedPermission(permission).ToLowerInvariant() + NamePostfix;
-    
+    {
+        return Prefix + ToNormalizedPermission(permission).ToLowerInvariant() + NamePostfix;
+    }
+
     public static string GetLocalizationDescriptionKey(PermissionCodes permission)
-        => Prefix + ToNormalizedPermission(permission).ToLowerInvariant() + DescriptionPostfix;
+    {
+        return Prefix + ToNormalizedPermission(permission).ToLowerInvariant() + DescriptionPostfix;
+    }
 }

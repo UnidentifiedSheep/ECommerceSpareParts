@@ -27,7 +27,8 @@ public class DeleteProducerTest : IntegrationTest
     public async Task DeleteProducer_WhenProducerHasArticle_ThrowsCannotDeleteProducerWithArticles()
     {
         var command = new DeleteProducerCommand(TestContext.Products[0].ProducerId);
-        await Assert.ThrowsAsync<CannotDeleteProducerWithArticlesException>(async () => await Mediator.Send(command));
+        await Assert.ThrowsAsync<CannotDeleteProducerWithArticlesException>(async () =>
+            await Mediator.Send(command));
     }
 
     [Fact]

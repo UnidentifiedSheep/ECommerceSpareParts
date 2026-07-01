@@ -31,8 +31,9 @@ public record ProducerOtherNamesImportInputState : IInputState
     public void ValidateState()
     {
         if (!FileName.EndsWith(".csv"))
-            throw new InvalidOperationException("Producer other name import state error. " +
-                                                "File name should end with .csv");
+            throw new InvalidOperationException(
+                "Producer other name import state error. " +
+                "File name should end with .csv");
     }
 }
 

@@ -26,9 +26,7 @@ namespace Main.Persistence.Context;
 
 public partial class DContext : DbContext
 {
-    public DContext()
-    {
-    }
+    public DContext() { }
 
     public DContext(DbContextOptions<DContext> options)
         : base(options)
@@ -127,7 +125,7 @@ public partial class DContext : DbContext
     public virtual DbSet<UserToken> UserTokens { get; set; }
 
     public virtual DbSet<UserVehicle> UserVehicles { get; set; }
-    
+
     public virtual DbSet<Job> Jobs { get; set; }
 
     public virtual DbSet<JobSchedule> JobSchedules { get; set; }

@@ -27,10 +27,10 @@ public record SaleDto
 
     [JsonPropertyName("storage")]
     public required string Storage { get; init; }
-    
+
     [JsonPropertyName("rowVersion")]
     public required uint RowVersion { get; init; }
-    
+
     [JsonPropertyName("state")]
     [JsonConverter(typeof(JsonStringEnumConverter))]
     public required SaleState State { get; init; }

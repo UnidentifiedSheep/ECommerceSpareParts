@@ -8,11 +8,12 @@ namespace Main.Entities.Product;
 public class ProductCharacteristic : Entity<ProductCharacteristic, (int, string)>,
     ILinqEntity<ProductCharacteristic, (int, string)>
 {
-    private ProductCharacteristic()
-    {
-    }
+    private ProductCharacteristic() { }
 
-    private ProductCharacteristic(int productId, string name, string value)
+    private ProductCharacteristic(
+        int productId,
+        string name,
+        string value)
     {
         ProductId = productId;
         SetName(name);
@@ -34,9 +35,15 @@ public class ProductCharacteristic : Entity<ProductCharacteristic, (int, string)
         return x => x.ProductId == key.Item1 && x.Name == key.Item2;
     }
 
-    public static ProductCharacteristic Create(int productId, string name, string value)
+    public static ProductCharacteristic Create(
+        int productId,
+        string name,
+        string value)
     {
-        return new ProductCharacteristic(productId, name, value);
+        return new ProductCharacteristic(
+            productId,
+            name,
+            value);
     }
 
     public void SetValue(string value)
@@ -54,8 +61,5 @@ public class ProductCharacteristic : Entity<ProductCharacteristic, (int, string)
             .AgainstTooLong(128, "article.characteristic.name.max.length");
     }
 
-    public override (int, string) GetId()
-    {
-        return (ProductId, Name);
-    }
+    public override (int, string) GetId() { return (ProductId, Name); }
 }

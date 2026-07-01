@@ -12,9 +12,7 @@ public class Storage : AuditableEntity<Storage, string>, ILinqEntity<Storage, st
 {
     private readonly List<StorageOwner> _owners = [];
 
-    private Storage()
-    {
-    }
+    private Storage() { }
 
     private Storage(string name, StorageType type)
     {
@@ -32,20 +30,14 @@ public class Storage : AuditableEntity<Storage, string>, ILinqEntity<Storage, st
     public StorageType Type { get; private set; }
     public IReadOnlyCollection<StorageOwner> Owners => _owners;
 
-    public static Expression<Func<Storage, string>> GetKeySelector()
-    {
-        return x => x.Name;
-    }
+    public static Expression<Func<Storage, string>> GetKeySelector() { return x => x.Name; }
 
     public static Expression<Func<Storage, bool>> GetEqualityExpression(string key)
     {
         return x => x.Name == key;
     }
 
-    public static Storage Create(string name, StorageType type)
-    {
-        return new Storage(name, type);
-    }
+    public static Storage Create(string name, StorageType type) { return new Storage(name, type); }
 
     private void SetName(string name)
     {
@@ -69,14 +61,16 @@ public class Storage : AuditableEntity<Storage, string>, ILinqEntity<Storage, st
     public void SetDescription(string? description)
     {
         Description = description
-            .NullIfWhiteSpace()?
+            .NullIfWhiteSpace()
+            ?
             .AgainstTooLong(256, "storage.description.max.length");
     }
 
     public void SetLocation(string? location)
     {
         Location = location
-            .NullIfWhiteSpace()?
+            .NullIfWhiteSpace()
+            ?
             .AgainstTooLong(256, "storage.location.max.length");
     }
 
@@ -93,8 +87,5 @@ public class Storage : AuditableEntity<Storage, string>, ILinqEntity<Storage, st
         _owners.Remove(found);
     }
 
-    public override string GetId()
-    {
-        return Name;
-    }
+    public override string GetId() { return Name; }
 }

@@ -8,7 +8,6 @@ using Persistence;
 using RabbitMq;
 using S3;
 using Security;
-using Utils;
 
 namespace Api.Common;
 
@@ -92,7 +91,7 @@ public static class ServiceProvider
             .BindConfiguration(LrtExecutorOptions.SectionName)
             .ValidateDataAnnotations()
             .ValidateOnStart();
-        
+
         return collection;
     }
 
@@ -102,7 +101,7 @@ public static class ServiceProvider
             .BindConfiguration(ScheduledJobEnqueuerOptions.SectionName)
             .ValidateDataAnnotations()
             .ValidateOnStart();
-        
+
         return collection;
     }
 
@@ -112,9 +111,8 @@ public static class ServiceProvider
             .BindConfiguration(SystemOptions.SectionName)
             .ValidateDataAnnotations()
             .ValidateOnStart();
-        
+
         return collection;
-            
     }
 
     public static IServiceCollection AddSecretEncryptionOptions(this IServiceCollection collection)
@@ -128,7 +126,7 @@ public static class ServiceProvider
             })
             .ValidateDataAnnotations()
             .ValidateOnStart();
-        
+
         return collection;
     }
 }

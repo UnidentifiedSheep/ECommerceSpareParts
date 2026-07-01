@@ -1,5 +1,4 @@
 using Abstractions.Interfaces.Persistence;
-using Abstractions.Interfaces.Services;
 using Abstractions.Interfaces.Validators;
 using Application.Common.Extensions;
 using Application.Common.Interfaces.Cqrs;
@@ -21,7 +20,8 @@ public record CreateUserCommand(
     UserInfoDto UserInfo,
     IEnumerable<EmailDto> Emails,
     IEnumerable<UserPhoneDto> Phones,
-    IEnumerable<string> Roles) : ICommand<CreateUserResult>;
+    IEnumerable<string> Roles
+) : ICommand<CreateUserResult>;
 
 public record CreateUserResult(UserDto User);
 
@@ -32,20 +32,30 @@ public class CreateUserHandler(IUnitOfWork unitOfWork, IPasswordManager password
     {
         var passwordHash = passwordManager.GetHashOfPassword(request.Password);
         var user = User.Create(request.UserName, passwordHash);
-        user.SetUserInfo(request.UserInfo.Name, request.UserInfo.Surname, request.UserInfo.Description);
+        user.SetUserInfo(
+            request.UserInfo.Name,
+            request.UserInfo.Surname,
+            request.UserInfo.Description);
 
         foreach (var role in request.Roles)
         {
-            if (role == RoleNames.Normalize(nameof(Role.System)))
-                throw new CantCreateSystemUserException();
+            if (role == RoleNames.Normalize(nameof(Role.System))) throw new CantCreateSystemUserException();
             user.AddRole(role);
         }
 
         foreach (var email in request.Emails)
-            user.AddUserEmail(email.Email, email.Type, email.IsPrimary, email.IsConfirmed);
+            user.AddUserEmail(
+                email.Email,
+                email.Type,
+                email.IsPrimary,
+                email.IsConfirmed);
 
         foreach (var phone in request.Phones)
-            user.AddUserPhone(phone.Number, phone.Type, phone.IsPrimary, phone.IsConfirmed);
+            user.AddUserPhone(
+                phone.Number,
+                phone.Type,
+                phone.IsPrimary,
+                phone.IsConfirmed);
 
         await unitOfWork.AddAsync(user, cancellationToken);
         await unitOfWork.SaveChangesAsync(cancellationToken);

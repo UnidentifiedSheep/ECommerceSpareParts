@@ -7,5 +7,5 @@ public enum InputControlType
     DatePicker,
     EntitySelector,
     EnumSelector,
-    NamedObjectSelector,
+    NamedObjectSelector
 }

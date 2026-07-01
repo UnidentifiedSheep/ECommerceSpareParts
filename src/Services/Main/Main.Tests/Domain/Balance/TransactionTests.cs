@@ -1,7 +1,6 @@
 ﻿using Exceptions;
 using FluentAssertions;
 using Main.Entities.Balance;
-using Main.Enums;
 using Main.Enums.Balances;
 
 namespace Tests.Domain.Balance;
@@ -9,6 +8,7 @@ namespace Tests.Domain.Balance;
 public class TransactionTests
 {
     private static readonly Guid SystemId = Guid.NewGuid();
+
     private static readonly ITransactionFinancialProfileService FinancialProfileService =
         new TransactionFinancialProfileService();
 
@@ -111,7 +111,12 @@ public class TransactionTests
 
         tx.Complete();
         tx.Apply(senderBalance, receiverBalance);
-        ApplyProfile(tx, senderProfile, receiverProfile, 120m, SystemId);
+        ApplyProfile(
+            tx,
+            senderProfile,
+            receiverProfile,
+            120m,
+            SystemId);
 
         senderBalance.Balance.Should().Be(300m);
         receiverBalance.Balance.Should().Be(-100m);
@@ -134,10 +139,20 @@ public class TransactionTests
 
         tx.Complete();
         tx.Apply(senderBalance, receiverBalance);
-        ApplyProfile(tx, senderProfile, receiverProfile, 120m, SystemId);
+        ApplyProfile(
+            tx,
+            senderProfile,
+            receiverProfile,
+            120m,
+            SystemId);
         tx.Reverse(Guid.NewGuid());
         tx.Apply(senderBalance, receiverBalance);
-        ApplyProfile(tx, senderProfile, receiverProfile, 120m, SystemId);
+        ApplyProfile(
+            tx,
+            senderProfile,
+            receiverProfile,
+            120m,
+            SystemId);
 
         senderProfile.Balance.Should().Be(200m);
         receiverProfile.Balance.Should().Be(0m);
@@ -156,9 +171,15 @@ public class TransactionTests
         tx.Complete();
         tx.Apply(senderBalance, receiverBalance);
 
-        var act = () => ApplyProfile(tx, senderProfile, receiverProfile, 100m, SystemId);
+        var act = () => ApplyProfile(
+            tx,
+            senderProfile,
+            receiverProfile,
+            100m,
+            SystemId);
 
-        act.Should().Throw<InvalidOperationException>()
+        act.Should()
+            .Throw<InvalidOperationException>()
             .WithMessage("Sender profile user mismatch");
     }
 
@@ -174,11 +195,22 @@ public class TransactionTests
 
         tx.Complete();
         tx.Apply(senderBalance, receiverBalance);
-        ApplyProfile(tx, senderProfile, receiverProfile, 100m, SystemId);
+        ApplyProfile(
+            tx,
+            senderProfile,
+            receiverProfile,
+            100m,
+            SystemId);
 
-        var act = () => ApplyProfile(tx, senderProfile, receiverProfile, 100m, SystemId);
+        var act = () => ApplyProfile(
+            tx,
+            senderProfile,
+            receiverProfile,
+            100m,
+            SystemId);
 
-        act.Should().Throw<InvalidOperationException>()
+        act.Should()
+            .Throw<InvalidOperationException>()
             .WithMessage("Completion profile already applied");
     }
 
@@ -188,7 +220,10 @@ public class TransactionTests
     public void ApplyProfile_SystemOwesUser_CreditsSenderProfile(TransactionSourceType sourceType)
     {
         var senderId = Guid.NewGuid();
-        var tx = Create(senderId, SystemId, sourceType);
+        var tx = Create(
+            senderId,
+            SystemId,
+            sourceType);
         var senderBalance = UserBalance.Create(tx.SenderId, tx.CurrencyId);
         var receiverBalance = UserBalance.Create(tx.ReceiverId, tx.CurrencyId);
         var senderProfile = UserFinancialProfile.Create(tx.SenderId);
@@ -196,7 +231,12 @@ public class TransactionTests
 
         tx.Complete();
         tx.Apply(senderBalance, receiverBalance);
-        ApplyProfile(tx, senderProfile, receiverProfile, 100m, SystemId);
+        ApplyProfile(
+            tx,
+            senderProfile,
+            receiverProfile,
+            100m,
+            SystemId);
 
         senderProfile.Balance.Should().Be(100m);
         receiverProfile.Balance.Should().Be(0m);
@@ -206,7 +246,10 @@ public class TransactionTests
     public void ApplyProfile_Sale_DebitsBuyerProfile()
     {
         var buyerId = Guid.NewGuid();
-        var tx = Create(SystemId, buyerId, TransactionSourceType.Sale);
+        var tx = Create(
+            SystemId,
+            buyerId,
+            TransactionSourceType.Sale);
         var senderBalance = UserBalance.Create(tx.SenderId, tx.CurrencyId);
         var receiverBalance = UserBalance.Create(tx.ReceiverId, tx.CurrencyId);
         var senderProfile = UserFinancialProfile.Create(tx.SenderId, decimal.MinValue);
@@ -215,7 +258,12 @@ public class TransactionTests
 
         tx.Complete();
         tx.Apply(senderBalance, receiverBalance);
-        ApplyProfile(tx, senderProfile, receiverProfile, 100m, SystemId);
+        ApplyProfile(
+            tx,
+            senderProfile,
+            receiverProfile,
+            100m,
+            SystemId);
 
         senderProfile.Balance.Should().Be(0m);
         receiverProfile.Balance.Should().Be(0m);
@@ -225,7 +273,7 @@ public class TransactionTests
     public void ApplyProfile_ManualUserToSystem_CreditsUserProfile()
     {
         var senderId = Guid.NewGuid();
-        var tx = Create(senderId, SystemId, TransactionSourceType.Manual);
+        var tx = Create(senderId, SystemId);
         var senderBalance = UserBalance.Create(tx.SenderId, tx.CurrencyId);
         var receiverBalance = UserBalance.Create(tx.ReceiverId, tx.CurrencyId);
         var senderProfile = UserFinancialProfile.Create(tx.SenderId);
@@ -233,7 +281,12 @@ public class TransactionTests
 
         tx.Complete();
         tx.Apply(senderBalance, receiverBalance);
-        ApplyProfile(tx, senderProfile, receiverProfile, 100m, SystemId);
+        ApplyProfile(
+            tx,
+            senderProfile,
+            receiverProfile,
+            100m,
+            SystemId);
 
         senderProfile.Balance.Should().Be(100m);
         receiverProfile.Balance.Should().Be(0m);
@@ -243,7 +296,7 @@ public class TransactionTests
     public void ApplyProfile_ManualSystemToUser_DebitsUserProfile()
     {
         var receiverId = Guid.NewGuid();
-        var tx = Create(SystemId, receiverId, TransactionSourceType.Manual);
+        var tx = Create(SystemId, receiverId);
         var senderBalance = UserBalance.Create(tx.SenderId, tx.CurrencyId);
         var receiverBalance = UserBalance.Create(tx.ReceiverId, tx.CurrencyId);
         var senderProfile = UserFinancialProfile.Create(tx.SenderId, decimal.MinValue);
@@ -252,7 +305,12 @@ public class TransactionTests
 
         tx.Complete();
         tx.Apply(senderBalance, receiverBalance);
-        ApplyProfile(tx, senderProfile, receiverProfile, 100m, SystemId);
+        ApplyProfile(
+            tx,
+            senderProfile,
+            receiverProfile,
+            100m,
+            SystemId);
 
         senderProfile.Balance.Should().Be(0m);
         receiverProfile.Balance.Should().Be(0m);
@@ -311,7 +369,8 @@ public class TransactionTests
 
         var act = () => tx.Apply(sender, receiver);
 
-        act.Should().Throw<InvalidOperationException>()
+        act.Should()
+            .Throw<InvalidOperationException>()
             .WithMessage("Nothing to apply");
     }
 
@@ -333,7 +392,8 @@ public class TransactionTests
 
         var act = () => tx.Apply(sender, receiver);
 
-        act.Should().Throw<InvalidOperationException>()
+        act.Should()
+            .Throw<InvalidOperationException>()
             .WithMessage("Reversed already applied.");
     }
 
@@ -352,7 +412,8 @@ public class TransactionTests
 
         var act = () => tx.Apply(sender, receiver);
 
-        act.Should().Throw<InvalidOperationException>()
+        act.Should()
+            .Throw<InvalidOperationException>()
             .WithMessage("Completion already applied.");
     }
 

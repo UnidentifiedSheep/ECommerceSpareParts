@@ -23,8 +23,9 @@ public class ProductTestContext(
 
     public override async Task InitializeAsync(CancellationToken cancellationToken = default)
     {
-        _products.AddRange(await new ProductBuilder(Faker)
-            .WithProducers(producerTestContext.Producers)
-            .BuildManyAndAddToDb(DbContext, 10));
+        _products.AddRange(
+            await new ProductBuilder(Faker)
+                .WithProducers(producerTestContext.Producers)
+                .BuildManyAndAddToDb(DbContext, 10));
     }
 }

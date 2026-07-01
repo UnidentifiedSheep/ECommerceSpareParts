@@ -17,7 +17,8 @@ public static class ServiceCollectionExtensions
             return ConnectionMultiplexer.Connect(options.ConnectionString);
         });
 
-        serviceCollection.AddTransient<IDatabase>(sp => sp.GetRequiredService<IConnectionMultiplexer>().GetDatabase());
+        serviceCollection.AddTransient<IDatabase>(sp =>
+            sp.GetRequiredService<IConnectionMultiplexer>().GetDatabase());
         serviceCollection.AddTransient<ICache, RedisCache>(sp => new RedisCache(
             sp.GetRequiredService<IDatabase>(),
             serviceName));

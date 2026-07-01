@@ -3,7 +3,6 @@ using Application.Common.Extensions;
 using Application.Common.Interfaces.Cqrs;
 using Application.Common.Interfaces.Repositories;
 using Enums;
-using Exceptions;
 using LinqKit;
 using Main.Application.Dtos.Users;
 using Main.Application.Extensions;
@@ -29,11 +28,13 @@ public record GetUsersQuery(
     Guid? Id,
     string? Description,
     IEnumerable<string>? Roles,
-    GeneralSearchStrategy SearchStrategy) : IQuery<GetUsersResult>;
+    GeneralSearchStrategy SearchStrategy
+) : IQuery<GetUsersResult>;
 
 public record GetUsersResult(IReadOnlyList<UserDto> Users);
 
-public class GetUsersHandler(IReadRepository<User, Guid> readRepository) : IQueryHandler<GetUsersQuery, GetUsersResult>
+public class GetUsersHandler(IReadRepository<User, Guid> readRepository)
+    : IQueryHandler<GetUsersQuery, GetUsersResult>
 {
     public async Task<GetUsersResult> Handle(GetUsersQuery request, CancellationToken cancellationToken)
     {
@@ -78,7 +79,8 @@ public class GetUsersHandler(IReadRepository<User, Guid> readRepository) : IQuer
         if (!string.IsNullOrWhiteSpace(request.Name))
         {
             currName = request.Name.Trim().ToUpperInvariant();
-            query = query.Where(u => EF.Functions.TrigramsSimilarity(u.UserInfo!.Name.ToUpper(),
+            query = query.Where(u => EF.Functions.TrigramsSimilarity(
+                u.UserInfo!.Name.ToUpper(),
                 currName) > simLevel);
             isNameIncluded = true;
         }
@@ -86,7 +88,8 @@ public class GetUsersHandler(IReadRepository<User, Guid> readRepository) : IQuer
         if (!string.IsNullOrWhiteSpace(request.Surname))
         {
             currSurname = request.Surname.Trim().ToUpperInvariant();
-            query = query.Where(u => EF.Functions.TrigramsSimilarity(u.UserInfo!.Surname.ToUpper(),
+            query = query.Where(u => EF.Functions.TrigramsSimilarity(
+                u.UserInfo!.Surname.ToUpper(),
                 currSurname) > simLevel);
             isSurnameIncluded = true;
         }
@@ -96,7 +99,8 @@ public class GetUsersHandler(IReadRepository<User, Guid> readRepository) : IQuer
         {
             normalizedEmail = Email.ToNormalized(request.Email);
             query = query.Where(u => u.Emails.Any(e =>
-                EF.Functions.TrigramsSimilarity(e.Email.Value,
+                EF.Functions.TrigramsSimilarity(
+                    e.Email.Value,
                     normalizedEmail) > simLevel));
             isEmailIncluded = true;
         }
@@ -121,26 +125,29 @@ public class GetUsersHandler(IReadRepository<User, Guid> readRepository) : IQuer
         {
             normalizedDescription = request.Description.Trim().ToUpperInvariant();
             query = query.Where(u => u.UserInfo!.Description != null &&
-                                     EF.Functions.TrigramsSimilarity(u.UserInfo.Description.ToUpper(),
+                                     EF.Functions.TrigramsSimilarity(
+                                         u.UserInfo.Description.ToUpper(),
                                          normalizedDescription) > simLevel);
             isDescriptionIncluded = true;
         }
 
-        if (request.Id != null)
-            query = query.Where(u => u.Id == request.Id);
+        if (request.Id != null) query = query.Where(u => u.Id == request.Id);
 
         var queryWithScore = query.Select(u => new
             {
                 User = u,
                 Score =
                     (isNameIncluded ? EF.Functions.TrigramsSimilarity(u.UserInfo!.Name, currName) : 0) +
-                    (isSurnameIncluded ? EF.Functions.TrigramsSimilarity(u.UserInfo!.Surname, currSurname) : 0) +
+                    (isSurnameIncluded
+                        ? EF.Functions.TrigramsSimilarity(u.UserInfo!.Surname, currSurname)
+                        : 0) +
                     (isUserNameIncluded
                         ? EF.Functions.TrigramsSimilarity(u.UserName.NormalizedValue, normalizedUserName)
                         : 0) +
                     (isEmailIncluded
                         ? u.Emails
-                            .OrderByDescending(x => EF.Functions.TrigramsSimilarity(x.Email.Value, normalizedEmail))
+                            .OrderByDescending(x =>
+                                EF.Functions.TrigramsSimilarity(x.Email.Value, normalizedEmail))
                             .Select(x => EF.Functions.Greatest(
                                 EF.Functions.TrigramsSimilarity(x.Email.Value, normalizedEmail)))
                             .FirstOrDefault()
@@ -150,7 +157,8 @@ public class GetUsersHandler(IReadRepository<User, Guid> readRepository) : IQuer
                         : 0) +
                     (isPhoneNumberIncluded
                         ? u.Phones
-                            .OrderByDescending(x => EF.Functions.TrigramsSimilarity(x.NormalizedPhone, normalizedPhone))
+                            .OrderByDescending(x =>
+                                EF.Functions.TrigramsSimilarity(x.NormalizedPhone, normalizedPhone))
                             .Select(x => EF.Functions.Greatest(
                                 EF.Functions.TrigramsSimilarity(x.NormalizedPhone, normalizedPhone)))
                             .FirstOrDefault()
@@ -169,21 +177,18 @@ public class GetUsersHandler(IReadRepository<User, Guid> readRepository) : IQuer
         GetUsersQuery request,
         CancellationToken cancellationToken)
     {
-        IQueryable<User> query = readRepository.Query
+        var query = readRepository.Query
             .Where(x => x.UserInfo != null)
             .ExcludeUsersWithRole(Role.System);
-        if (request.Roles != null && request.Roles.Any())
-            query = query.IncludeUsersWithRoles(request.Roles);
-        
+        if (request.Roles != null && request.Roles.Any()) query = query.IncludeUsersWithRoles(request.Roles);
+
         if (string.IsNullOrWhiteSpace(request.SearchColumn))
-        {
             return await query
                 .OrderBy(x => x.Id)
                 .AsExpandable()
                 .Select(UserProjections.UserProjection)
                 .ApplyPagination(request.Pagination)
                 .ToListAsync(cancellationToken);
-        }
 
         var trimmed = request.SearchColumn.Trim();
         return await query

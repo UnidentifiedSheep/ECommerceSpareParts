@@ -12,8 +12,22 @@ public class MetricInputBaseValidatorTests
     public void Validate_WhenRangeStartIsBeforeRangeEnd_ShouldBeValid()
     {
         var input = CreateInput(
-            rangeStart: new DateTime(2026, 1, 1, 0, 0, 0, DateTimeKind.Utc),
-            rangeEnd: new DateTime(2026, 1, 2, 0, 0, 0, DateTimeKind.Utc));
+            new DateTime(
+                2026,
+                1,
+                1,
+                0,
+                0,
+                0,
+                DateTimeKind.Utc),
+            new DateTime(
+                2026,
+                1,
+                2,
+                0,
+                0,
+                0,
+                DateTimeKind.Utc));
 
         var result = _validator.Validate(input);
 
@@ -23,10 +37,17 @@ public class MetricInputBaseValidatorTests
     [Fact]
     public void Validate_WhenRangeStartEqualsRangeEnd_ShouldBeValid()
     {
-        var date = new DateTime(2026, 1, 1, 0, 0, 0, DateTimeKind.Utc);
+        var date = new DateTime(
+            2026,
+            1,
+            1,
+            0,
+            0,
+            0,
+            DateTimeKind.Utc);
         var input = CreateInput(
-            rangeStart: date,
-            rangeEnd: date);
+            date,
+            date);
 
         var result = _validator.Validate(input);
 
@@ -37,8 +58,22 @@ public class MetricInputBaseValidatorTests
     public void Validate_WhenRangeStartIsAfterRangeEnd_ShouldBeInvalid()
     {
         var input = CreateInput(
-            rangeStart: new DateTime(2026, 1, 2, 0, 0, 0, DateTimeKind.Utc),
-            rangeEnd: new DateTime(2026, 1, 1, 0, 0, 0, DateTimeKind.Utc));
+            new DateTime(
+                2026,
+                1,
+                2,
+                0,
+                0,
+                0,
+                DateTimeKind.Utc),
+            new DateTime(
+                2026,
+                1,
+                1,
+                0,
+                0,
+                0,
+                DateTimeKind.Utc));
 
         var result = _validator.Validate(input);
 

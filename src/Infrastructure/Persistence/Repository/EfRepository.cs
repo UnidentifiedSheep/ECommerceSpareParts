@@ -1,5 +1,4 @@
-﻿using Abstractions.Interfaces.Services;
-using Domain;
+﻿using Domain;
 using Microsoft.EntityFrameworkCore;
 using Persistence.Interfaces;
 

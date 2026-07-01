@@ -4,11 +4,10 @@ using Domain.Interfaces;
 
 namespace Main.Entities.Auth;
 
-public class RolePermission : Entity<RolePermission, (string, string)>, ILinqEntity<RolePermission, (string, string)>
+public class RolePermission : Entity<RolePermission, (string, string)>,
+    ILinqEntity<RolePermission, (string, string)>
 {
-    private RolePermission()
-    {
-    }
+    private RolePermission() { }
 
     private RolePermission(string roleName, string permissionName)
     {
@@ -37,8 +36,5 @@ public class RolePermission : Entity<RolePermission, (string, string)>, ILinqEnt
         return new RolePermission(roleName, permissionName);
     }
 
-    public override (string, string) GetId()
-    {
-        return (RoleName, PermissionName);
-    }
+    public override (string, string) GetId() { return (RoleName, PermissionName); }
 }

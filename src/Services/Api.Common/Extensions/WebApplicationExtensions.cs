@@ -11,10 +11,11 @@ public static class WebApplicationExtensions
     {
         app.UseMiddleware<HeaderSecretMiddleware>();
         app.UseMiddleware<ScopedLocalizationMiddleware>();
-        app.UseForwardedHeaders(new ForwardedHeadersOptions
-        {
-            ForwardedHeaders = ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto
-        });
+        app.UseForwardedHeaders(
+            new ForwardedHeadersOptions
+            {
+                ForwardedHeaders = ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto
+            });
 
         app.UseExceptionHandler(_ => { });
         app.UseRouting();

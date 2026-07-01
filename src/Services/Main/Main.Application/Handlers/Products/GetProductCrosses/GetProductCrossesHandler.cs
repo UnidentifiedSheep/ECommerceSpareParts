@@ -6,13 +6,19 @@ using Main.Application.Interfaces.Cache;
 
 namespace Main.Application.Handlers.Products.GetProductCrosses;
 
-public record GetProductCrossesQuery(int ProductId, Pagination Pagination, string? SortBy, Guid? UserId)
+public record GetProductCrossesQuery(
+    int ProductId,
+    Pagination Pagination,
+    string? SortBy,
+    Guid? UserId
+)
     : IQuery<GetProductCrossesResult>;
 
 public record GetProductCrossesResult(IReadOnlyList<ProductDto> Crosses, ProductDto RequestedProduct);
 
 public class GetProductCrossesHandler(
-    IProductCacheRepository productCache)
+    IProductCacheRepository productCache
+)
     : IQueryHandler<GetProductCrossesQuery, GetProductCrossesResult>
 {
     public async Task<GetProductCrossesResult> Handle(

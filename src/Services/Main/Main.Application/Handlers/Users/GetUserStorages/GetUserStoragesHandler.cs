@@ -17,7 +17,9 @@ public record GetUserStoragesResult(List<StorageDto> Storages);
 public class GetUserStoragesHandler(IReadRepository<StorageOwner, (string, Guid)> storageOwnersRepository)
     : IQueryHandler<GetUserStoragesQuery, GetUserStoragesResult>
 {
-    public async Task<GetUserStoragesResult> Handle(GetUserStoragesQuery request, CancellationToken cancellationToken)
+    public async Task<GetUserStoragesResult> Handle(
+        GetUserStoragesQuery request,
+        CancellationToken cancellationToken)
     {
         var storages = await storageOwnersRepository.Query
             .Where(x => x.UserId == request.UserId)

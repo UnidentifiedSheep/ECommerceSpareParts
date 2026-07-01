@@ -26,8 +26,14 @@ var env = Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT") ?? "";
 builder.Configuration
     .AddAppSettingsFromJsons(env)
     .AddAppSettingsFromJsons(env, "/app/configs")
-    .AddConfigsFromJsons("gateway", null, "/app/configs")
-    .AddConfigsFromJsons("gateway", env, "/app/configs");
+    .AddConfigsFromJsons(
+        "gateway",
+        null,
+        "/app/configs")
+    .AddConfigsFromJsons(
+        "gateway",
+        env,
+        "/app/configs");
 
 builder.Services
     .AddRedisOptions()
@@ -55,8 +61,7 @@ builder.Services.AddAuthorization(options =>
 
 var secret = builder.Configuration["HeaderSecret:Key"];
 
-if (secret == null)
-    throw new ArgumentNullException(nameof(secret), "HeaderSecret:Key cannot be null.");
+if (secret == null) throw new ArgumentNullException(nameof(secret), "HeaderSecret:Key cannot be null.");
 
 var reverseProxySection = builder.Configuration.GetSection("ReverseProxy");
 var routeCount = reverseProxySection.GetSection("Routes").GetChildren().Count();
@@ -77,7 +82,7 @@ builder.Services
     .AddIntegrationClients()
     .AddHttpContextAccessor()
     .AddReverseProxy()
-    .LoadFromConfig(reverseProxySection) 
+    .LoadFromConfig(reverseProxySection)
     .AddTransforms(builderContext =>
     {
         builderContext.CopyRequestHeaders = true;
@@ -123,28 +128,26 @@ builder.Services.AddMassTransit(x =>
     {
         cfg.ConfigureRabbitMq(context);
 
-        cfg.ReceiveEndpoint(uniqQueueName, ep =>
-        {
-            ep.AutoDelete = true;
-            ep.Durable = false;
+        cfg.ReceiveEndpoint(
+            uniqQueueName,
+            ep =>
+            {
+                ep.AutoDelete = true;
+                ep.Durable = false;
 
-            ep.ConfigureConsumeTopology = false;
-            
-            ep.ConfigureConsumer<BackplaneConsumer>(context);
-            ep.Bind<BackplaneMessage>();
-        });
+                ep.ConfigureConsumeTopology = false;
 
-        cfg.ReceiveEndpoint("gateway-queue", ep =>
-        {
-            ep.Durable = true;
-        });
+                ep.ConfigureConsumer<BackplaneConsumer>(context);
+                ep.Bind<BackplaneMessage>();
+            });
+
+        cfg.ReceiveEndpoint("gateway-queue", ep => { ep.Durable = true; });
     });
 });
 
 var app = builder.Build();
 
-if (!app.Environment.IsDevelopment())
-    app.UseHttpsRedirection();
+if (!app.Environment.IsDevelopment()) app.UseHttpsRedirection();
 
 MapDocs(app);
 
@@ -166,68 +169,70 @@ await app.RunAsync();
 
 void MapDocs(WebApplication application)
 {
-    application.MapGet("/docs/openapi/{service}.json", async (
-        string service,
-        HttpContext context,
-        IHttpClientFactory httpClientFactory) =>
-    {
-        var services = new Dictionary<string, string>
+    application.MapGet(
+        "/docs/openapi/{service}.json",
+        async (
+            string service,
+            HttpContext context,
+            IHttpClientFactory httpClientFactory) =>
         {
-            [ServicesDefinitions.Main.ServiceName] = "/main/swagger/v1/swagger.json",
-            [ServicesDefinitions.Analytics.ServiceName] = "/analytics/swagger/v1/swagger.json",
-            [ServicesDefinitions.Search.ServiceName] = "/search/swagger/v1/swagger.json",
-            [ServicesDefinitions.Pricing.ServiceName] = "/pricing/swagger/v1/swagger.json"
-        };
-
-        if (!services.TryGetValue(service, out var swaggerPath))
-            return Results.NotFound();
-
-        var request = context.Request;
-
-        var baseUrl = $"{request.Scheme}://{request.Host}";
-
-        var client = httpClientFactory.CreateClient();
-
-        var swaggerUrl = $"{baseUrl}{swaggerPath}";
-
-        var json = await client.GetStringAsync(swaggerUrl);
-
-        var node = JsonNode.Parse(json);
-
-        if (node is null)
-            return Results.Problem("Invalid OpenAPI document.");
-
-        node["servers"] = new JsonArray
-        {
-            new JsonObject
+            var services = new Dictionary<string, string>
             {
-                ["url"] = $"/{service}"
-            }
-        };
+                [ServicesDefinitions.Main.ServiceName] = "/main/swagger/v1/swagger.json",
+                [ServicesDefinitions.Analytics.ServiceName] = "/analytics/swagger/v1/swagger.json",
+                [ServicesDefinitions.Search.ServiceName] = "/search/swagger/v1/swagger.json",
+                [ServicesDefinitions.Pricing.ServiceName] = "/pricing/swagger/v1/swagger.json"
+            };
 
-        return Results.Content(
-            node.ToJsonString(),
-            "application/json");
-    });
+            if (!services.TryGetValue(service, out var swaggerPath)) return Results.NotFound();
 
-    application.MapScalarApiReference("/docs", options =>
-    {
-        options
-            .AddDocument(
-                ServicesDefinitions.Main.ServiceName, 
-                "Main API", 
-                "/docs/openapi/main.json")
-            .AddDocument(
-                ServicesDefinitions.Analytics.ServiceName, 
-                "Analytics API", 
-                "/docs/openapi/analytics.json")
-            .AddDocument(
-                ServicesDefinitions.Search.ServiceName, 
-                "Search API", 
-                "/docs/openapi/search.json")
-            .AddDocument(
-                ServicesDefinitions.Pricing.ServiceName, 
-                "Pricing API", 
-                "/docs/openapi/pricing.json");
-    });
+            var request = context.Request;
+
+            var baseUrl = $"{request.Scheme}://{request.Host}";
+
+            var client = httpClientFactory.CreateClient();
+
+            var swaggerUrl = $"{baseUrl}{swaggerPath}";
+
+            var json = await client.GetStringAsync(swaggerUrl);
+
+            var node = JsonNode.Parse(json);
+
+            if (node is null) return Results.Problem("Invalid OpenAPI document.");
+
+            node["servers"] = new JsonArray
+            {
+                new JsonObject
+                {
+                    ["url"] = $"/{service}"
+                }
+            };
+
+            return Results.Content(
+                node.ToJsonString(),
+                "application/json");
+        });
+
+    application.MapScalarApiReference(
+        "/docs",
+        options =>
+        {
+            options
+                .AddDocument(
+                    ServicesDefinitions.Main.ServiceName,
+                    "Main API",
+                    "/docs/openapi/main.json")
+                .AddDocument(
+                    ServicesDefinitions.Analytics.ServiceName,
+                    "Analytics API",
+                    "/docs/openapi/analytics.json")
+                .AddDocument(
+                    ServicesDefinitions.Search.ServiceName,
+                    "Search API",
+                    "/docs/openapi/search.json")
+                .AddDocument(
+                    ServicesDefinitions.Pricing.ServiceName,
+                    "Pricing API",
+                    "/docs/openapi/pricing.json");
+        });
 }

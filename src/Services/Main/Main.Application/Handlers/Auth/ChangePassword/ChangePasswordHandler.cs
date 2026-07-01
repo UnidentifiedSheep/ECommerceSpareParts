@@ -14,12 +14,14 @@ namespace Main.Application.Handlers.Auth.ChangePassword;
 public record ChangePasswordCommand(
     Guid UserId,
     string PreviousPassword,
-    string NewPassword) : ICommand;
+    string NewPassword
+) : ICommand;
 
 public class ChangePasswordHandler(
     IUserRepository userRepository,
     IPasswordManager passwordManager,
-    IIntegrationEventScope integrationEventScope) : ICommandHandler<ChangePasswordCommand>
+    IIntegrationEventScope integrationEventScope
+) : ICommandHandler<ChangePasswordCommand>
 {
     public async Task<Unit> Handle(ChangePasswordCommand request, CancellationToken cancellationToken)
     {
@@ -30,10 +32,11 @@ public class ChangePasswordHandler(
             throw new WrongCredentialsException(null, request.PreviousPassword);
 
         user.SetPasswordHash(passwordManager.GetHashOfPassword(request.NewPassword));
-        integrationEventScope.Add(new UserUpdatedEvent
-        {
-            UserId = request.UserId
-        });
+        integrationEventScope.Add(
+            new UserUpdatedEvent
+            {
+                UserId = request.UserId
+            });
 
         return Unit.Value;
     }

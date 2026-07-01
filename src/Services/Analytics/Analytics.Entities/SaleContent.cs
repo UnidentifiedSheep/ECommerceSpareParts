@@ -8,9 +8,7 @@ public class SaleContent : Entity<SaleContent, int>
 {
     private readonly List<SaleContentDetail> _details = [];
 
-    private SaleContent()
-    {
-    }
+    private SaleContent() { }
 
     public int Id { get; private set; }
 
@@ -32,10 +30,7 @@ public class SaleContent : Entity<SaleContent, int>
 
     public IReadOnlyCollection<SaleContentDetail> Details => _details;
 
-    public override int GetId()
-    {
-        return Id;
-    }
+    public override int GetId() { return Id; }
 
     public static SaleContent Create(
         int id,
@@ -92,22 +87,17 @@ public class SaleContent : Entity<SaleContent, int>
             toRemove.Remove(incomingDetail.Id);
 
             if (existingDetails.TryGetValue(incomingDetail.Id, out var existingDetail))
-            {
                 existingDetail.Update(
                     incomingDetail.CurrencyId,
                     incomingDetail.BuyPrice,
                     incomingDetail.BuyPriceInBaseCurrency,
                     incomingDetail.Count,
                     incomingDetail.PurchaseDate);
-            }
             else
-            {
                 _details.Add(incomingDetail);
-            }
         }
 
-        foreach (var item in toRemove.Values)
-            _details.Remove(item);
+        foreach (var item in toRemove.Values) _details.Remove(item);
     }
 
     private static decimal ValidatePrice(decimal price)
@@ -126,7 +116,7 @@ public class SaleContent : Entity<SaleContent, int>
 
     private static decimal ValidateDiscount(decimal discount)
     {
-        return discount.AgainstNegative(
-            () => new InvalidInputException("sale.fact.content.discount.must.not.be.negative"));
+        return discount.AgainstNegative(() =>
+            new InvalidInputException("sale.fact.content.discount.must.not.be.negative"));
     }
 }

@@ -7,11 +7,11 @@ public sealed class CriteriaBuilder<T> where T : class
     private readonly List<Expression<Func<T, object?>>> _includes = new();
     private readonly List<Expression<Func<T, bool>>> _wheres = new();
     private bool _forUpdate;
-    private bool _skipLocked;
     private Func<IQueryable<T>, IOrderedQueryable<T>>? _orderBy;
 
     private int? _page;
     private int? _size;
+    private bool _skipLocked;
 
     private bool _track;
 

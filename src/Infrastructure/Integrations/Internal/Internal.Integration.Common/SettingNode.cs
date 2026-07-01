@@ -13,11 +13,14 @@ public class SettingNode(
     IAuthClient authClient,
     IOptionsMonitor<InternalServicesOptions> serviceOptions,
     IOptionsMonitor<InternalServiceCredentials> credentialsMonitor
-    ) : InternalCommonClientBase(authClient, credentialsMonitor, serviceOptions), ISettingNode
+) : InternalCommonClientBase(
+    authClient,
+    credentialsMonitor,
+    serviceOptions), ISettingNode
 {
     public async Task<Response<string>> GetSetting(
-        IServiceDefinition serviceDefinition, 
-        string systemName, 
+        IServiceDefinition serviceDefinition,
+        string systemName,
         CancellationToken cancellationToken = default)
     {
         using var request = await GetRequest(
@@ -25,17 +28,17 @@ public class SettingNode(
             HttpMethod.Get,
             "/internal/settings/" + systemName,
             cancellationToken);
-        
+
         using var response = await httpClient.SendAsync(
             request,
             cancellationToken);
 
         return await ReadResponse<GetSettingResponse, string>(
-            response, 
+            response,
             x => x.Json,
             cancellationToken);
     }
-    
+
     private record GetSettingResponse
     {
         [JsonPropertyName("json")]

@@ -102,7 +102,10 @@ public class DeletePurchaseTests : IntegrationTest
             .Applied()
             .Build();
 
-        await Context.AddRangeAsync(carrierBalance, purchaseTransaction, logisticsTransaction);
+        await Context.AddRangeAsync(
+            carrierBalance,
+            purchaseTransaction,
+            logisticsTransaction);
         await Context.SaveChangesAsync();
 
         var storageContent = await new StorageContentBuilder(Faker)
@@ -120,7 +123,10 @@ public class DeletePurchaseTests : IntegrationTest
             .WithPrice(10m)
             .WithStorageContentId(storageContent.Id)
             .Build();
-        purchaseContent.SetLogistic(1m, 1m, 5m);
+        purchaseContent.SetLogistic(
+            1m,
+            1m,
+            5m);
 
         var purchase = await new PurchaseBuilder(Faker)
             .WithSupplierId(supplier.Id)
@@ -180,10 +186,11 @@ public class DeletePurchaseTests : IntegrationTest
         var storageContentId = content.StorageContentId;
         var transactionId = purchase.TransactionId;
 
-        await Mediator.Send(new SubtractStorageContentsCommand(
-            storageContentId,
-            1,
-            StorageMovementType.Sale));
+        await Mediator.Send(
+            new SubtractStorageContentsCommand(
+                storageContentId,
+                1,
+                StorageMovementType.Sale));
 
         await Assert.ThrowsAsync<NotEnoughCountOnStorageException>(() =>
             Mediator.Send(new DeletePurchaseCommand(purchase.Id)));

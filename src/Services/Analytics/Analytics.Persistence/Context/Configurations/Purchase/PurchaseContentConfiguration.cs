@@ -24,7 +24,8 @@ public class PurchaseContentConfiguration : IEntityTypeConfiguration<PurchaseCon
         builder.Property(e => e.Price).HasColumnName("price");
         builder.Property(e => e.PurchaseId).HasColumnName("purchase_id");
 
-        builder.HasOne(d => d.Purchase).WithMany(p => p.PurchaseContents)
+        builder.HasOne(d => d.Purchase)
+            .WithMany(p => p.PurchaseContents)
             .HasForeignKey(d => d.PurchaseId)
             .OnDelete(DeleteBehavior.Cascade)
             .HasConstraintName("purchase_contents_purchases_fact_id_fk");

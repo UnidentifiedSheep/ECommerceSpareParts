@@ -8,11 +8,12 @@ namespace Main.Entities.Cart;
 
 public class Cart : AuditableEntity<Cart, (Guid, int)>, ILinqEntity<Cart, (Guid, int)>
 {
-    private Cart()
-    {
-    }
+    private Cart() { }
 
-    private Cart(Guid userId, int productId, int count)
+    private Cart(
+        Guid userId,
+        int productId,
+        int count)
     {
         UserId = userId;
         ProductId = productId;
@@ -39,9 +40,15 @@ public class Cart : AuditableEntity<Cart, (Guid, int)>, ILinqEntity<Cart, (Guid,
         return x => x.UserId == key.Item1 && x.ProductId == key.Item2;
     }
 
-    public static Cart Create(Guid userId, int productId, int count)
+    public static Cart Create(
+        Guid userId,
+        int productId,
+        int count)
     {
-        return new Cart(userId, productId, count);
+        return new Cart(
+            userId,
+            productId,
+            count);
     }
 
     public void SetCount(int count)
@@ -50,8 +57,5 @@ public class Cart : AuditableEntity<Cart, (Guid, int)>, ILinqEntity<Cart, (Guid,
         Count = count;
     }
 
-    public override (Guid, int) GetId()
-    {
-        return (UserId, ProductId);
-    }
+    public override (Guid, int) GetId() { return (UserId, ProductId); }
 }

@@ -11,7 +11,11 @@ namespace Main.Application.Handlers.ProductCharacteristics.PatchCharacteristics;
 
 [AutoSave]
 [Transactional]
-public record PatchCharacteristicsCommand(int ProductId, string Name, PatchCharacteristicsDto Patch) : ICommand;
+public record PatchCharacteristicsCommand(
+    int ProductId,
+    string Name,
+    PatchCharacteristicsDto Patch
+) : ICommand;
 
 public class PatchCharacteristicsHandler(
     IRepository<ProductCharacteristic, (int, string)> repository

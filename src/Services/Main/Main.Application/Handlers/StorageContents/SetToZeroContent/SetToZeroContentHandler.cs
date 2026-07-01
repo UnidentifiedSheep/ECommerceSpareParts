@@ -1,12 +1,9 @@
 using System.Data;
 using Abstractions.Interfaces.Persistence;
-using Abstractions.Interfaces.Services;
 using Application.Common.Extensions;
-using Application.Common.Interfaces;
 using Application.Common.Interfaces.Cqrs;
 using Application.Common.Interfaces.Repositories;
 using Attributes;
-using Contracts.Products;
 using Domain.Extensions;
 using Main.Application.Interfaces.Persistence;
 using Main.Application.Interfaces.Services.Storage;
@@ -19,14 +16,18 @@ using MediatR;
 namespace Main.Application.Handlers.StorageContents.SetToZeroContent;
 
 [AutoSave]
-[Transactional(IsolationLevel.ReadCommitted, 20, 2)]
+[Transactional(
+    IsolationLevel.ReadCommitted,
+    20,
+    2)]
 public record SetToZeroContentCommand(int ContentId, uint RowVersion) : ICommand;
 
 public class SetToZeroContentHandler(
     IRepository<StorageContent, int> repository,
     IUnitOfWork unitOfWork,
     IProductRepository productRepository,
-    IStorageContentChangeNotifier changeNotifier) : ICommandHandler<SetToZeroContentCommand>
+    IStorageContentChangeNotifier changeNotifier
+) : ICommandHandler<SetToZeroContentCommand>
 {
     public async Task<Unit> Handle(SetToZeroContentCommand request, CancellationToken cancellationToken)
     {

@@ -1,6 +1,5 @@
 using System.Text.Json.Serialization;
 using Favorit.Integrations.Core.Models;
-using Integrations.Common;
 
 namespace Favorit.Integrations.Core.Responses;
 

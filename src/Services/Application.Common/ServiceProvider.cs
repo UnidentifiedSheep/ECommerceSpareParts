@@ -20,7 +20,7 @@ namespace Application.Common;
 public static class ServiceProvider
 {
     public static IServiceCollection AddApplicationBase(
-        this IServiceCollection services, 
+        this IServiceCollection services,
         IServiceDefinition serviceDefinition,
         IConfiguration? configuration,
         Assembly? assembly = null,
@@ -37,14 +37,13 @@ public static class ServiceProvider
         services.AddSingleton<IBackplaneDispatcher, BackplaneDispatcher>();
         services.AddSingleton<IFusionCacheBackplane, MassTransitBackplane>();
         services.AddSingleton(serviceDefinition);
-        
+
         var hs = behaviorsToExclude.ToHashSet();
         services.AddMediatR(config =>
         {
             var licenseKey = configuration?.GetValue<string>("MediatR:LicenseKey");
-            if (!string.IsNullOrWhiteSpace(licenseKey))
-                config.LicenseKey = licenseKey;
-            
+            if (!string.IsNullOrWhiteSpace(licenseKey)) config.LicenseKey = licenseKey;
+
             config.RegisterServicesFromAssembly(assembly);
             config
                 .RegisterIfNotExcluded(
@@ -84,7 +83,7 @@ public static class ServiceProvider
         assembly ??= Assembly.GetExecutingAssembly();
         services.RegisterNamedObject<LrtNamedObjectBase>(assembly)
             .RegisterFluentValidations(typeof(GetAllAvailableJobsHandler).Assembly);
-        
+
         services.AddScoped<
             IRequestHandler<GetAllAvailableJobsQuery, GetAllAvailableJobsResult>,
             GetAllAvailableJobsHandler>();
@@ -108,7 +107,7 @@ public static class ServiceProvider
         services.AddScoped<
             IRequestHandler<CreateScheduleCommand, CreateScheduleResult>,
             CreateScheduleHandler>();
-        
+
         services.AddScoped<
             IRequestHandler<GetScheduleQuery, GetScheduleResult>,
             GetScheduleHandler>();
@@ -120,23 +119,22 @@ public static class ServiceProvider
         services.AddScoped<
             IRequestHandler<QueueScheduledJobsCommand, Unit>,
             QueueScheduledJobsHandler>();
-        
+
         services.AddScoped<
             IRequestHandler<RemoveJobScheduleCommand, Unit>,
             RemoveJobScheduleHandler>();
-        
+
         return services;
     }
 
     private static MediatRServiceConfiguration RegisterIfNotExcluded(
         this MediatRServiceConfiguration serviceConfiguration,
         HashSet<Type> excludedTypes,
-        Type openBehaviorType, 
+        Type openBehaviorType,
         ServiceLifetime serviceLifetime = ServiceLifetime.Transient)
     {
         if (excludedTypes.Contains(openBehaviorType)) return serviceConfiguration;
         serviceConfiguration.AddOpenBehavior(openBehaviorType, serviceLifetime);
         return serviceConfiguration;
     }
-    
 }

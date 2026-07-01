@@ -1,4 +1,3 @@
-using System.Text.Json;
 using System.Text.Json.Serialization;
 using Abstractions.Interfaces;
 using Integrations.Common;
@@ -14,11 +13,15 @@ internal sealed class JobNode(
     HttpClient httpClient,
     IAuthClient authClient,
     IOptionsMonitor<InternalServicesOptions> serviceOptions,
-    IOptionsMonitor<InternalServiceCredentials> credentialsMonitor) 
-    : InternalCommonClientBase(authClient, credentialsMonitor, serviceOptions), IJobNode
+    IOptionsMonitor<InternalServiceCredentials> credentialsMonitor
+)
+    : InternalCommonClientBase(
+        authClient,
+        credentialsMonitor,
+        serviceOptions), IJobNode
 {
     public async Task<Response<IReadOnlyList<InternalJobInfo>>> GetAvailableJobs(
-        IServiceDefinition serviceDefinition, 
+        IServiceDefinition serviceDefinition,
         string? locale,
         CancellationToken cancellationToken = default)
     {
@@ -27,15 +30,15 @@ internal sealed class JobNode(
             HttpMethod.Get,
             "/jobs/available",
             cancellationToken);
-        
+
         AddLocalizationHeader(request, locale);
-        
+
         using var response = await httpClient.SendAsync(
             request,
             cancellationToken);
 
         return await ReadResponse<GetAvailableJobsResponse, IReadOnlyList<InternalJobInfo>>(
-            response, 
+            response,
             x => x.Jobs,
             cancellationToken);
     }

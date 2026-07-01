@@ -9,11 +9,12 @@ namespace Main.Entities.Product;
 
 public class ProductWeight : Entity<ProductWeight, int>, ILinqEntity<ProductWeight, int>
 {
-    private ProductWeight()
-    {
-    }
+    private ProductWeight() { }
 
-    private ProductWeight(int productId, decimal weight, WeightUnit unit)
+    private ProductWeight(
+        int productId,
+        decimal weight,
+        WeightUnit unit)
     {
         ValidateWeight(weight);
 
@@ -29,19 +30,22 @@ public class ProductWeight : Entity<ProductWeight, int>, ILinqEntity<ProductWeig
 
     public WeightUnit Unit { get; private set; }
 
-    public static Expression<Func<ProductWeight, int>> GetKeySelector()
-    {
-        return x => x.ProductId;
-    }
+    public static Expression<Func<ProductWeight, int>> GetKeySelector() { return x => x.ProductId; }
 
     public static Expression<Func<ProductWeight, bool>> GetEqualityExpression(int key)
     {
         return x => x.ProductId == key;
     }
 
-    public static ProductWeight Create(int productId, decimal weight, WeightUnit unit)
+    public static ProductWeight Create(
+        int productId,
+        decimal weight,
+        WeightUnit unit)
     {
-        return new ProductWeight(productId, weight, unit);
+        return new ProductWeight(
+            productId,
+            weight,
+            unit);
     }
 
     public void Update(decimal weight, WeightUnit unit)
@@ -51,10 +55,7 @@ public class ProductWeight : Entity<ProductWeight, int>, ILinqEntity<ProductWeig
         Unit = unit;
     }
 
-    public override int GetId()
-    {
-        return ProductId;
-    }
+    public override int GetId() { return ProductId; }
 
     private static void ValidateWeight(decimal weight)
     {

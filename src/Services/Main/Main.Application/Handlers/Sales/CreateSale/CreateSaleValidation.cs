@@ -10,15 +10,18 @@ public class CreateSaleValidation : AbstractValidator<CreateSaleCommand>
     {
         RuleFor(x => x.SaleDateTime)
             .SetValidator(new SaleDateTimeValidator());
-        
+
         RuleFor(x => x.Contents)
             .SetValidator(new NewSaleContentValidator());
-        
+
         RuleFor(x => x.PayedSum)
             .GreaterThanOrEqualTo(0)
             .When(x => x.PayedSum != null)
             .WithLocalizationKey("sale.payed.sum.min")
-            .PrecisionScale(18, 2, true)
+            .PrecisionScale(
+                18,
+                2,
+                true)
             .When(x => x.PayedSum != null)
             .WithLocalizationKey("sale.payed.sum.precision");
 

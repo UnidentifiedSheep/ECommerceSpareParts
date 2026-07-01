@@ -22,8 +22,7 @@ public class UpdateReservationsCountsHandler(
         UpdateReservationsCountsCommand request,
         CancellationToken cancellationToken)
     {
-        if (request.Contents.Count == 0)
-            return new UpdateReservationsCountsResult([]);
+        if (request.Contents.Count == 0) return new UpdateReservationsCountsResult([]);
 
         var userId = request.UserId;
         var remaining = new Dictionary<int, int>(request.Contents);
@@ -44,14 +43,12 @@ public class UpdateReservationsCountsHandler(
 
         foreach (var productId in productIds)
         {
-            if (!reservationsByIds.TryGetValue(productId, out var reservations))
-                continue;
+            if (!reservationsByIds.TryGetValue(productId, out var reservations)) continue;
 
             foreach (var reservation in reservations)
             {
                 var remainingCount = remaining[productId];
-                if (remainingCount <= 0)
-                    break;
+                if (remainingCount <= 0) break;
 
                 var canBeTaken = reservation.ReservedCount - reservation.CurrentCount;
                 var min = Math.Min(remainingCount, canBeTaken);

@@ -1,12 +1,12 @@
 using System.Reflection;
 using Abstractions.Interfaces.Persistence;
-using Abstractions.Interfaces.Services;
 using Attributes;
 using MediatR;
 
 namespace Application.Common.Behaviors;
 
-public class TransactionBehavior<TRequest, TResponse>(IUnitOfWork unitOfWork) : IPipelineBehavior<TRequest, TResponse>
+public class TransactionBehavior<TRequest, TResponse>(IUnitOfWork unitOfWork)
+    : IPipelineBehavior<TRequest, TResponse>
     where TRequest : IRequest<TResponse>
     where TResponse : notnull
 {
@@ -18,13 +18,15 @@ public class TransactionBehavior<TRequest, TResponse>(IUnitOfWork unitOfWork) : 
         RequestHandlerDelegate<TResponse> next,
         CancellationToken cancellationToken)
     {
-        if (Settings is null)
-            return await next(cancellationToken);
+        if (Settings is null) return await next(cancellationToken);
 
-        return await unitOfWork.ExecuteWithTransaction(Settings, async () =>
-        {
-            var response = await next(cancellationToken);
-            return response;
-        }, cancellationToken);
+        return await unitOfWork.ExecuteWithTransaction(
+            Settings,
+            async () =>
+            {
+                var response = await next(cancellationToken);
+                return response;
+            },
+            cancellationToken);
     }
 }

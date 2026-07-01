@@ -1,5 +1,4 @@
 ﻿using Abstractions.Interfaces.Persistence;
-using Abstractions.Interfaces.Services;
 using Application.Common.Interfaces.Cqrs;
 using Attributes;
 using Main.Application.Interfaces.Persistence;
@@ -14,7 +13,8 @@ public record DeleteStorageRouteCommand(Guid Id) : ICommand;
 
 public class DeleteStorageRouteHandler(
     IStorageRouteRepository repository,
-    IUnitOfWork unitOfWork)
+    IUnitOfWork unitOfWork
+)
     : ICommandHandler<DeleteStorageRouteCommand>
 {
     public async Task<Unit> Handle(DeleteStorageRouteCommand request, CancellationToken cancellationToken)

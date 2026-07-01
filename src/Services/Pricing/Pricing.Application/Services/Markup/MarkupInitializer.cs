@@ -15,7 +15,8 @@ public class MarkupInitializer(
     ISettingsService settingsService,
     IMainClient mainClient,
     ICurrencyConverter currencyConverter,
-    ICurrencyRatesProvider ratesProvider) : IMarkupInitializer
+    ICurrencyRatesProvider ratesProvider
+) : IMarkupInitializer
 {
     public async Task Initialize(CancellationToken cancellationToken = default)
     {
@@ -51,8 +52,7 @@ public class MarkupInitializer(
         foreach (var currency in allCurrencies.ValueOrThrow
                      .Where(x => x.Id != defaultGroup.CurrencyId))
         {
-            if (await ratesProvider.GetRateOrDefault(currency.Id, cancellationToken) == null)
-                continue;
+            if (await ratesProvider.GetRateOrDefault(currency.Id, cancellationToken) == null) continue;
 
             var list = new List<MarkupRange>();
             foreach (var range in defaultGroup.MarkupRanges)
@@ -69,7 +69,11 @@ public class MarkupInitializer(
                     currency.Id,
                     cancellationToken);
 
-                list.Add(MarkupRange.Create(start, end, range.Markup));
+                list.Add(
+                    MarkupRange.Create(
+                        start,
+                        end,
+                        range.Markup));
             }
 
             otherCurrencies[currency.Id] = list;

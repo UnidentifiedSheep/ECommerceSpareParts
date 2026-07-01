@@ -20,11 +20,16 @@ public class ProductWeightEndPoints : ICarterModule
         var weights = app.MapGroup("/products/{id:int}/weights")
             .WithTags("Product Weight");
 
-        weights.MapDelete("", async (ISender sender, int id, CancellationToken token) =>
-            {
-                await sender.Send(new DeleteProductWeightCommand(id), token);
-                return Results.NoContent();
-            })
+        weights.MapDelete(
+                "",
+                async (
+                    ISender sender,
+                    int id,
+                    CancellationToken token) =>
+                {
+                    await sender.Send(new DeleteProductWeightCommand(id), token);
+                    return Results.NoContent();
+                })
             .WithName("DeleteProductWeight")
             .WithSummary("Удалить вес продукта")
             .WithDescription("Удаление веса артикула.")
@@ -33,11 +38,16 @@ public class ProductWeightEndPoints : ICarterModule
             .ProducesProblem(StatusCodes.Status404NotFound)
             .RequireAnyPermission(PermissionCodes.ARTICLE_WEIGHT_DELETE);
 
-        weights.MapGet("", async (ISender sender, int id, CancellationToken token) =>
-            {
-                var result = await sender.Send(new GetProductWeightQuery(id), token);
-                return Results.Ok(new GetProductWeightResponse(result.ProductWeight));
-            })
+        weights.MapGet(
+                "",
+                async (
+                    ISender sender,
+                    int id,
+                    CancellationToken token) =>
+                {
+                    var result = await sender.Send(new GetProductWeightQuery(id), token);
+                    return Results.Ok(new GetProductWeightResponse(result.ProductWeight));
+                })
             .WithName("GetProductWeight")
             .WithSummary("Получить вес продукта")
             .WithDescription("Установка веса артикула.")
@@ -46,15 +56,22 @@ public class ProductWeightEndPoints : ICarterModule
             .ProducesProblem(StatusCodes.Status404NotFound)
             .RequireAnyPermission(PermissionCodes.ARTICLE_WEIGHT_GET);
 
-        weights.MapPut("", async (
-                ISender sender,
-                int id,
-                PutProductWeightRequest request,
-                CancellationToken token) =>
-            {
-                await sender.Send(new SetProductWeightCommand(id, request.Weight, request.Unit), token);
-                return Results.Created();
-            })
+        weights.MapPut(
+                "",
+                async (
+                    ISender sender,
+                    int id,
+                    PutProductWeightRequest request,
+                    CancellationToken token) =>
+                {
+                    await sender.Send(
+                        new SetProductWeightCommand(
+                            id,
+                            request.Weight,
+                            request.Unit),
+                        token);
+                    return Results.Created();
+                })
             .WithName("SetProductWeight")
             .WithSummary("Установить вес продукта")
             .WithDescription("Установка веса артикула.")

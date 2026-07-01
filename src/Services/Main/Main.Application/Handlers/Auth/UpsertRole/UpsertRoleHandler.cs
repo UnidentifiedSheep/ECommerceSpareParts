@@ -1,5 +1,4 @@
 using Abstractions.Interfaces.Persistence;
-using Abstractions.Interfaces.Services;
 using Application.Common.Interfaces.Cqrs;
 using Application.Common.Interfaces.Repositories;
 using Attributes;
@@ -14,7 +13,8 @@ public record UpsertRoleCommand(string Name, string? Description) : ICommand;
 
 public class UpsertRoleHandler(
     IUnitOfWork unitOfWork,
-    IRepository<Role, string> repository)
+    IRepository<Role, string> repository
+)
     : ICommandHandler<UpsertRoleCommand>
 {
     public async Task<Unit> Handle(UpsertRoleCommand request, CancellationToken cancellationToken)

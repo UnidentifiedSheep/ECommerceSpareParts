@@ -7,7 +7,6 @@ using Localization.Abstractions.Interfaces;
 using Localization.Domain;
 using Main.Application.Dtos.Producer;
 using Main.Application.Handlers.Producers;
-using Main.Application.Lrts;
 using MassTransit;
 using MediatR;
 using Microsoft.Extensions.Logging;
@@ -23,8 +22,10 @@ public class ProducerImportLrt(
     ILogger<ProducerImportLrt> logger,
     IPublishEndpoint publisher,
     IScopedStringLocalizer stringLocalizer,
-    IOptions<LocalesOptions> localesOptions)
-    : CsvImportLrtBase<ProducerImportState, ProducerImportError, ProducerImportLrt.NewProducerCsvDto, NewProducerDto>(
+    IOptions<LocalesOptions> localesOptions
+)
+    : CsvImportLrtBase<ProducerImportState, ProducerImportError, ProducerImportLrt.NewProducerCsvDto,
+        NewProducerDto>(
         jobRepository,
         unitOfWork,
         publisher,
@@ -39,10 +40,16 @@ public class ProducerImportLrt(
     public override Type InputType => typeof(ProducerImportInputState);
     public override Type StateType => typeof(ProducerImportState);
 
-    protected override string GetFileName(ProducerImportState state) => state.FileName;
-    protected override int GetCurrentLine(ProducerImportState state) => state.CurrentLine;
-    protected override List<ProducerImportError> GetErrors(ProducerImportState state) => state.Errors;
-    protected override string GetTooManyErrorsLocalizationKey() => "producer.too.many.errors.while.processing.batch";
+    protected override string GetFileName(ProducerImportState state) { return state.FileName; }
+
+    protected override int GetCurrentLine(ProducerImportState state) { return state.CurrentLine; }
+
+    protected override List<ProducerImportError> GetErrors(ProducerImportState state) { return state.Errors; }
+
+    protected override string GetTooManyErrorsLocalizationKey()
+    {
+        return "producer.too.many.errors.while.processing.batch";
+    }
 
     protected override ProducerImportError CreateError(int rowIdx, string message)
     {
@@ -89,23 +96,22 @@ public class ProducerImportLrt(
         if (producers.Count == 0) return;
 
         var firstIdx = producers[0].idx;
-        
-        var result = (await sender.Send(
+
+        var result = await sender.Send(
             new CreateProducerBatchCommand(
                 producers.Select(x => x.item)),
-            CancellationToken));
+            CancellationToken);
 
         foreach (var (idx, message) in result.Errors)
-        {
-            errors.Add(new ProducerImportError
-            {
-                Message = message,
-                RowIdx = idx >= 0 && idx < producers.Count
-                    ? producers[idx].idx
-                    : firstIdx + idx
-            });
-        }
-        
+            errors.Add(
+                new ProducerImportError
+                {
+                    Message = message,
+                    RowIdx = idx >= 0 && idx < producers.Count
+                        ? producers[idx].idx
+                        : firstIdx + idx
+                });
+
         Logger.LogInformation(
             "Producer import batch processed. JobId: {JobId}, " +
             "BatchStartRow: {BatchStartRow}, BatchSize: {BatchSize}, " +
@@ -116,10 +122,10 @@ public class ProducerImportLrt(
             result.Created,
             result.Skipped,
             result.Errors.Count);
-        
+
         producers.Clear();
     }
-    
+
     public record NewProducerCsvDto
     {
         [Name("Name")]

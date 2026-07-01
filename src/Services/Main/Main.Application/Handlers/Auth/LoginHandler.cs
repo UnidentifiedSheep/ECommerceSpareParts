@@ -17,18 +17,29 @@ using Main.Enums;
 namespace Main.Application.Handlers.Auth;
 
 [Diagnostics(maxExecutionTimeMs: 500)]
-[Transactional, AutoSave]
-public record LoginCommand(string Email, string Password, IPAddress? IpAddress, string? UserAgent)
+[Transactional]
+[AutoSave]
+public record LoginCommand(
+    string Email,
+    string Password,
+    IPAddress? IpAddress,
+    string? UserAgent
+)
     : ICommand<LoginResult>;
 
-public record LoginResult(string Token, string RefreshToken, string DeviceId);
+public record LoginResult(
+    string Token,
+    string RefreshToken,
+    string DeviceId
+);
 
 public class LoginHandler(
     IPasswordManager passwordManager,
     IUserRepository userRepository,
     IUserTokenService userTokenService,
     IJwtGenerator tokenGenerator,
-    IUserCacheRepository userCache) : ICommandHandler<LoginCommand, LoginResult>
+    IUserCacheRepository userCache
+) : ICommandHandler<LoginCommand, LoginResult>
 {
     public async Task<LoginResult> Handle(LoginCommand request, CancellationToken cancellationToken)
     {
@@ -38,7 +49,10 @@ public class LoginHandler(
             .Track()
             .Build();
 
-        var user = await userRepository.GetUserByPrimaryEmailAsync(request.Email, criteria, cancellationToken)
+        var user = await userRepository.GetUserByPrimaryEmailAsync(
+                       request.Email,
+                       criteria,
+                       cancellationToken)
                    ?? throw new WrongCredentialsException(request.Email, null);
 
         if (user.UserInfo == null)
@@ -55,15 +69,30 @@ public class LoginHandler(
         var userAgent = request.UserAgent;
 
         var userDto = UserProjections.UserProjection.AsFunc()(user);
-        var token = tokenGenerator.CreateToken(userDto, deviceId, roles, permissions);
+        var token = tokenGenerator.CreateToken(
+            userDto,
+            deviceId,
+            roles,
+            permissions);
         var refreshToken = tokenGenerator.CreateRefreshToken();
 
-        await userTokenService.AddToken(refreshToken, user.Id, TokenType.RefreshToken, DateTime.UtcNow.AddMonths(1),
-            ip, userAgent, deviceId, [], cancellationToken);
+        await userTokenService.AddToken(
+            refreshToken,
+            user.Id,
+            TokenType.RefreshToken,
+            DateTime.UtcNow.AddMonths(1),
+            ip,
+            userAgent,
+            deviceId,
+            [],
+            cancellationToken);
 
         user.Login();
 
-        return new LoginResult(token, refreshToken, deviceId);
+        return new LoginResult(
+            token,
+            refreshToken,
+            deviceId);
     }
 
     private string GenerateDeviceId()

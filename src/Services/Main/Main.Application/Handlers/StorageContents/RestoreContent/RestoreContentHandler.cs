@@ -1,11 +1,8 @@
 using System.Data;
 using Abstractions.Interfaces.Persistence;
-using Abstractions.Interfaces.Services;
 using Application.Common.Extensions;
-using Application.Common.Interfaces;
 using Application.Common.Interfaces.Cqrs;
 using Attributes;
-using Contracts.Products;
 using Main.Application.Interfaces.Persistence;
 using Main.Application.Interfaces.Services.Storage;
 using Main.Application.Models;
@@ -17,16 +14,21 @@ using MediatR;
 namespace Main.Application.Handlers.StorageContents.RestoreContent;
 
 [AutoSave]
-[Transactional(IsolationLevel.ReadCommitted, 20, 2)]
+[Transactional(
+    IsolationLevel.ReadCommitted,
+    20,
+    2)]
 public record RestoreContentCommand(
     IEnumerable<RestoreContentItem> ContentDetails,
-    StorageMovementType MovementType) : ICommand;
+    StorageMovementType MovementType
+) : ICommand;
 
 public class RestoreContentHandler(
     IStorageContentRepository contentRepository,
     IProductRepository productRepository,
     IUnitOfWork unitOfWork,
-    IStorageContentChangeNotifier changeNotifier) : ICommandHandler<RestoreContentCommand>
+    IStorageContentChangeNotifier changeNotifier
+) : ICommandHandler<RestoreContentCommand>
 {
     public async Task<Unit> Handle(RestoreContentCommand request, CancellationToken cancellationToken)
     {
@@ -59,15 +61,17 @@ public class RestoreContentHandler(
             var product = products[detail.ProductId];
             var content = storageContents[detail.StorageContentId];
 
-            events.Add(StorageMovementEvent.Create(new StorageMovementEventData
-            {
-                ProductId = content.ProductId,
-                StorageName = content.StorageName,
-                CurrencyId = content.CurrencyId,
-                Count = detail.Count,
-                BuyPrice = content.BuyPrice,
-                MovementType = request.MovementType
-            }));
+            events.Add(
+                StorageMovementEvent.Create(
+                    new StorageMovementEventData
+                    {
+                        ProductId = content.ProductId,
+                        StorageName = content.StorageName,
+                        CurrencyId = content.CurrencyId,
+                        Count = detail.Count,
+                        BuyPrice = content.BuyPrice,
+                        MovementType = request.MovementType
+                    }));
 
             content.IncreaseCount(detail.Count);
             product.IncreaseStock(detail.Count);

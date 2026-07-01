@@ -12,7 +12,8 @@ public class StorageRouteTestContext(
     DContext ctx,
     StorageTestContext storageTestContext,
     CurrencyTestContext currencyTestContext,
-    UsersTestContext usersTestContext)
+    UsersTestContext usersTestContext
+)
     : TestContextBase<DContext>(ctx), IDependentTestContext
 {
     public StorageRoute ActiveRoute { get; private set; } = null!;

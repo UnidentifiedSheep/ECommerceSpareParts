@@ -13,6 +13,7 @@ namespace Main.Entities.User;
 
 public class User : AuditableEntity<User, Guid>, ILinqEntity<User, Guid>
 {
+    private readonly List<UserBalance> _balances = [];
     private readonly List<Cart.Cart> _cartItems = [];
 
     private readonly List<UserEmail> _emails = [];
@@ -24,12 +25,8 @@ public class User : AuditableEntity<User, Guid>, ILinqEntity<User, Guid>
     private readonly List<UserRole> _roles = [];
 
     private readonly List<UserVehicle> _vehicles = [];
-    
-    private readonly List<UserBalance> _balances = [];
 
-    private User()
-    {
-    }
+    private User() { }
 
     private User(UserName userName, string passwordHash)
     {
@@ -57,32 +54,33 @@ public class User : AuditableEntity<User, Guid>, ILinqEntity<User, Guid>
     public IReadOnlyList<Cart.Cart> CartItems => _cartItems;
     public IReadOnlyList<UserBalance> Balances => _balances;
 
-    public static Expression<Func<User, Guid>> GetKeySelector()
-    {
-        return x => x.Id;
-    }
+    public static Expression<Func<User, Guid>> GetKeySelector() { return x => x.Id; }
 
-    public static Expression<Func<User, bool>> GetEqualityExpression(Guid key)
-    {
-        return x => x.Id == key;
-    }
+    public static Expression<Func<User, bool>> GetEqualityExpression(Guid key) { return x => x.Id == key; }
 
     public static User Create(UserName userName, string passwordHash)
     {
         return new User(userName, passwordHash);
     }
 
-    public void EnableTwoFactor(bool enabled)
-    {
-        TwoFactorEnabled = enabled;
-    }
+    public void EnableTwoFactor(bool enabled) { TwoFactorEnabled = enabled; }
 
-    public void SetUserInfo(string name, string surname, string? description)
+    public void SetUserInfo(
+        string name,
+        string surname,
+        string? description)
     {
         if (UserInfo != null)
-            UserInfo.Update(name, surname, description);
+            UserInfo.Update(
+                name,
+                surname,
+                description);
         else
-            UserInfo = UserInfo.Create(Id, name, surname, description);
+            UserInfo = UserInfo.Create(
+                Id,
+                name,
+                surname,
+                description);
     }
 
     public void AddRole(string roleName)
@@ -91,20 +89,31 @@ public class User : AuditableEntity<User, Guid>, ILinqEntity<User, Guid>
         _roles.Add(UserRole.Create(Id, roleName));
     }
 
-    public void AddUserEmail(Email email, EmailType emailType, bool isPrimary, bool isConfirmed)
+    public void AddUserEmail(
+        Email email,
+        EmailType emailType,
+        bool isPrimary,
+        bool isConfirmed)
     {
         if (_emails.Any(x => x.Email.Value == email.Value))
             throw new InvalidInputException("user.have.duplicate.email");
         if (isPrimary && _emails.Any(x => x.IsPrimary))
             throw new InvalidInputException("user.email.primary.count");
 
-        var userEmail = UserEmail.Create(Id, email, emailType);
+        var userEmail = UserEmail.Create(
+            Id,
+            email,
+            emailType);
         userEmail.MakePrimary(isPrimary);
         userEmail.Confirm(isConfirmed);
         _emails.Add(userEmail);
     }
 
-    public void AddUserPhone(string phoneNumber, PhoneType phoneType, bool isPrimary, bool isConfirmed)
+    public void AddUserPhone(
+        string phoneNumber,
+        PhoneType phoneType,
+        bool isPrimary,
+        bool isConfirmed)
     {
         var normalizedPhone = UserPhone.ToNormalizedPhone(phoneNumber);
         if (_phones.Any(x => x.NormalizedPhone == normalizedPhone))
@@ -112,7 +121,10 @@ public class User : AuditableEntity<User, Guid>, ILinqEntity<User, Guid>
         if (isPrimary && _phones.Any(x => x.IsPrimary))
             throw new InvalidInputException("user.phone.primary.count");
 
-        var userPhone = UserPhone.Create(Id, phoneNumber, phoneType);
+        var userPhone = UserPhone.Create(
+            Id,
+            phoneNumber,
+            phoneType);
         userPhone.MakePrimary(isPrimary);
         userPhone.Confirm(isConfirmed);
         _phones.Add(userPhone);
@@ -124,7 +136,11 @@ public class User : AuditableEntity<User, Guid>, ILinqEntity<User, Guid>
         _phones.RemoveAll(x => x.NormalizedPhone == normalizedPhone);
     }
 
-    public void AddUserVehicle(Guid vehicleId, string plateNumber, string? vin = null, string? comment = null)
+    public void AddUserVehicle(
+        Guid vehicleId,
+        string plateNumber,
+        string? vin = null,
+        string? comment = null)
     {
         var normalizedPlateNumber = UserVehicle.NormalizePlateNumber(plateNumber);
         if (_vehicles.Any(x => x.PlateNumber == normalizedPlateNumber))
@@ -134,18 +150,18 @@ public class User : AuditableEntity<User, Guid>, ILinqEntity<User, Guid>
         if (normalizedVin != null && _vehicles.Any(x => x.Vin == normalizedVin))
             throw new InvalidInputException("user.have.duplicate.vehicle.vin.code");
 
-        _vehicles.Add(UserVehicle.Create(Id, vehicleId, plateNumber, vin, comment));
+        _vehicles.Add(
+            UserVehicle.Create(
+                Id,
+                vehicleId,
+                plateNumber,
+                vin,
+                comment));
     }
 
-    public void RemoveUserVehicle(Guid vehicleId)
-    {
-        _vehicles.RemoveAll(x => x.VehicleId == vehicleId);
-    }
+    public void RemoveUserVehicle(Guid vehicleId) { _vehicles.RemoveAll(x => x.VehicleId == vehicleId); }
 
-    public void RemoveUserEmail(Email email)
-    {
-        _emails.RemoveAll(x => x.Email.Value == email.Value);
-    }
+    public void RemoveUserEmail(Email email) { _emails.RemoveAll(x => x.Email.Value == email.Value); }
 
     public void SetDiscount(decimal discount)
     {
@@ -158,16 +174,11 @@ public class User : AuditableEntity<User, Guid>, ILinqEntity<User, Guid>
     public void SetPasswordHash(string passwordHash)
     {
         PasswordHash = passwordHash
-            .AgainstNullOrWhiteSpace(() => new InvalidOperationException("Password hash must not be null or empty."));
+            .AgainstNullOrWhiteSpace(() =>
+                new InvalidOperationException("Password hash must not be null or empty."));
     }
 
-    public void Login()
-    {
-        LastLoginAt = DateTime.UtcNow;
-    }
+    public void Login() { LastLoginAt = DateTime.UtcNow; }
 
-    public override Guid GetId()
-    {
-        return Id;
-    }
+    public override Guid GetId() { return Id; }
 }

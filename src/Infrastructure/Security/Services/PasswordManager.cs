@@ -6,17 +6,15 @@ namespace Security.Services;
 
 public class PasswordManager(PasswordRules rules) : IPasswordManager
 {
-    public string GetHashOfPassword(string password)
-    {
-        return HashPassword(password);
-    }
+    public string GetHashOfPassword(string password) { return HashPassword(password); }
 
     public bool VerifyHashedPassword(string hashedPassword, string providedPassword)
     {
         return Verify(providedPassword, hashedPassword);
     }
 
-    public (bool isValid, IEnumerable<(string key, object[]? args)> errors) IsPasswordMatchRules(string password)
+    public (bool isValid, IEnumerable<(string key, object[]? args)> errors) IsPasswordMatchRules(
+        string password)
     {
         var errors = new List<(string, object[]?)>();
 
@@ -27,8 +25,7 @@ public class PasswordManager(PasswordRules rules) : IPasswordManager
         }
 
         // Проверки длины сразу
-        if (password.Length < rules.MinLength)
-            errors.Add(("password.min.length", [rules.MinLength]));
+        if (password.Length < rules.MinLength) errors.Add(("password.min.length", [rules.MinLength]));
 
         if (rules.MaxLength.HasValue && password.Length > rules.MaxLength.Value)
             errors.Add(("password.max.length", [rules.MaxLength.Value]));
@@ -45,19 +42,19 @@ public class PasswordManager(PasswordRules rules) : IPasswordManager
         var specials = rules.SpecialCharacters;
 
         foreach (var c in password)
-            if (char.IsUpper(c)) hasUpper = true;
-            else if (char.IsDigit(c)) hasDigit = true;
-            else if (specials.Contains(c)) hasSpecial = true;
+            if (char.IsUpper(c))
+                hasUpper = true;
+            else if (char.IsDigit(c))
+                hasDigit = true;
+            else if (specials.Contains(c))
+                hasSpecial = true;
             else if (c == ' ') hasSpace = true;
 
-        if (!rules.CanContainSpaces && hasSpace)
-            errors.Add(("password.cannot.contain.spaces", null));
+        if (!rules.CanContainSpaces && hasSpace) errors.Add(("password.cannot.contain.spaces", null));
 
-        if (rules.RequireUppercase && !hasUpper)
-            errors.Add(("password.must.contain.uppercase", null));
+        if (rules.RequireUppercase && !hasUpper) errors.Add(("password.must.contain.uppercase", null));
 
-        if (rules.RequireDigit && !hasDigit)
-            errors.Add(("password.must.contain.digit", null));
+        if (rules.RequireDigit && !hasDigit) errors.Add(("password.must.contain.digit", null));
 
         if (rules.RequireSpecial && !hasSpecial)
             errors.Add(("password.must.contain.special", [string.Join(',', specials)]));

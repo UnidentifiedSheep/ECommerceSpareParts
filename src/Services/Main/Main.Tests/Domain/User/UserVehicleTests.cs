@@ -53,7 +53,11 @@ public class UserVehicleTests
     [Fact]
     public void SetVin_WhiteSpace_SetsNull()
     {
-        var vehicle = UserVehicle.Create(Guid.NewGuid(), Guid.NewGuid(), "A123BC", "VIN");
+        var vehicle = UserVehicle.Create(
+            Guid.NewGuid(),
+            Guid.NewGuid(),
+            "A123BC",
+            "VIN");
 
         vehicle.SetVin("   ");
 
@@ -63,7 +67,12 @@ public class UserVehicleTests
     [Fact]
     public void SetComment_WhiteSpace_SetsNull()
     {
-        var vehicle = UserVehicle.Create(Guid.NewGuid(), Guid.NewGuid(), "A123BC", null, "comment");
+        var vehicle = UserVehicle.Create(
+            Guid.NewGuid(),
+            Guid.NewGuid(),
+            "A123BC",
+            null,
+            "comment");
 
         vehicle.SetComment("   ");
 
@@ -73,7 +82,10 @@ public class UserVehicleTests
     [Fact]
     public void SetPlateNumber_TooLong_Throws()
     {
-        var vehicle = UserVehicle.Create(Guid.NewGuid(), Guid.NewGuid(), "A123BC");
+        var vehicle = UserVehicle.Create(
+            Guid.NewGuid(),
+            Guid.NewGuid(),
+            "A123BC");
         var plate = new string('A', UserVehicle.MaxPlateNumberLength + 1);
 
         var act = () => vehicle.SetPlateNumber(plate);
@@ -84,7 +96,10 @@ public class UserVehicleTests
     [Fact]
     public void SetVin_TooLong_Throws()
     {
-        var vehicle = UserVehicle.Create(Guid.NewGuid(), Guid.NewGuid(), "A123BC");
+        var vehicle = UserVehicle.Create(
+            Guid.NewGuid(),
+            Guid.NewGuid(),
+            "A123BC");
         var vin = new string('A', UserVehicle.MaxVinLength + 1);
 
         var act = () => vehicle.SetVin(vin);
@@ -95,7 +110,10 @@ public class UserVehicleTests
     [Fact]
     public void SetComment_TooLong_Throws()
     {
-        var vehicle = UserVehicle.Create(Guid.NewGuid(), Guid.NewGuid(), "A123BC");
+        var vehicle = UserVehicle.Create(
+            Guid.NewGuid(),
+            Guid.NewGuid(),
+            "A123BC");
         var comment = new string('A', UserVehicle.MaxCommentLength + 1);
 
         var act = () => vehicle.SetComment(comment);

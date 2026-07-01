@@ -1,10 +1,10 @@
 using System.Linq.Expressions;
 using Analytics.Entities.Interfaces;
 using Analytics.Enums;
-using Domain.Extensions;
-using Exceptions;
 using Domain;
+using Domain.Extensions;
 using Domain.Interfaces;
+using Exceptions;
 
 namespace Analytics.Entities;
 
@@ -12,9 +12,7 @@ public class SalesFact : Entity<SalesFact, Guid>, IDependency, ILinqEntity<Sales
 {
     private readonly List<SaleContent> _saleContents = [];
 
-    private SalesFact()
-    {
-    }
+    private SalesFact() { }
 
     public Guid Id { get; private set; }
 
@@ -32,10 +30,15 @@ public class SalesFact : Entity<SalesFact, Guid>, IDependency, ILinqEntity<Sales
 
     public IReadOnlyCollection<SaleContent> SaleContents => _saleContents;
 
-    public override Guid GetId()
+    public static DependsOn DependsOn => DependsOn.Sale;
+    public static Expression<Func<SalesFact, Guid>> GetKeySelector() { return x => x.Id; }
+
+    public static Expression<Func<SalesFact, bool>> GetEqualityExpression(Guid key)
     {
-        return Id;
+        return x => x.Id == key;
     }
+
+    public override Guid GetId() { return Id; }
 
     public static SalesFact Create(
         Guid id,
@@ -95,7 +98,6 @@ public class SalesFact : Entity<SalesFact, Guid>, IDependency, ILinqEntity<Sales
             totalSum += incomingContent.TotalSum;
 
             if (existingContents.TryGetValue(incomingContent.Id, out var existingContent))
-            {
                 existingContent.Update(
                     incomingContent.ProductId,
                     incomingContent.Price,
@@ -103,21 +105,12 @@ public class SalesFact : Entity<SalesFact, Guid>, IDependency, ILinqEntity<Sales
                     incomingContent.Count,
                     incomingContent.Discount,
                     incomingContent.Details);
-            }
             else
-            {
                 _saleContents.Add(incomingContent);
-            }
         }
 
-        foreach (var item in toRemove.Values)
-            _saleContents.Remove(item);
+        foreach (var item in toRemove.Values) _saleContents.Remove(item);
 
         TotalSum = totalSum;
     }
-
-    public static DependsOn DependsOn => DependsOn.Sale;
-    public static Expression<Func<SalesFact, Guid>> GetKeySelector() => x => x.Id;
-
-    public static Expression<Func<SalesFact, bool>> GetEqualityExpression(Guid key) => x => x.Id == key;
 }

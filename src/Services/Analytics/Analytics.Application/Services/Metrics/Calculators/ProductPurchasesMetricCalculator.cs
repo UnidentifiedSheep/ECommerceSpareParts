@@ -8,7 +8,8 @@ namespace Analytics.Application.Services.Metrics.Calculators;
 
 public class ProductPurchasesMetricCalculator(
     IRepository<PurchasesFact, Guid> repository,
-    ICurrencyConverter currencyConverter) : MetricCalculatorBase<ProductPurchasesMetric>
+    ICurrencyConverter currencyConverter
+) : MetricCalculatorBase<ProductPurchasesMetric>
 {
     private const int BatchSize = 1000;
 
@@ -32,16 +33,14 @@ public class ProductPurchasesMetricCalculator(
             while (true)
             {
                 var facts = await repository.ListAsync(
-                    GetCriteria(metric, lastId), 
+                    GetCriteria(metric, lastId),
                     cancellationToken);
-                if (facts.Count == 0)
-                    break;
+                if (facts.Count == 0) break;
 
                 foreach (var fact in facts)
                 foreach (var item in fact.PurchaseContents)
                 {
-                    if (item.ProductId != metric.ProductId)
-                        continue;
+                    if (item.ProductId != metric.ProductId) continue;
 
                     var priceDecimal = await currencyConverter.ConvertToBaseAsync(
                         item.Price,
@@ -49,8 +48,7 @@ public class ProductPurchasesMetricCalculator(
                         cancellationToken);
                     var quantity = item.Count;
 
-                    if (quantity <= 0)
-                        continue;
+                    if (quantity <= 0) continue;
 
                     var price = (double)priceDecimal;
 
@@ -68,8 +66,7 @@ public class ProductPurchasesMetricCalculator(
                     m2 += quantity * delta * delta2;
                 }
 
-                if (facts.Count < BatchSize)
-                    break;
+                if (facts.Count < BatchSize) break;
 
                 lastId = facts[^1].Id;
             }
@@ -97,7 +94,7 @@ public class ProductPurchasesMetricCalculator(
         metric.SetData(data);
         metric.CompleteRecalculation();
     }
-    
+
     private static Criteria<PurchasesFact> GetCriteria(ProductPurchasesMetric metric, Guid lastId)
     {
         return Criteria<PurchasesFact>.New()

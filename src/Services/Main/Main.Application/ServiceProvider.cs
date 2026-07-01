@@ -1,16 +1,11 @@
 using Abstractions;
 using Abstractions.Interfaces.Validators;
-using Abstractions.Models;
 using Application.Common;
 using Application.Common.Extensions;
-using Application.Common.Interfaces;
 using Application.Common.Interfaces.Currency;
-using Application.Common.Interfaces.Settings;
 using Application.Common.Services.Currency;
-using Application.Common.Services.Settings;
 using Application.Common.Validators;
 using Main.Application.Configs;
-using Main.Application.Handlers.Users.GetUserDiscount;
 using Main.Application.Interfaces.Logistics;
 using Main.Application.Interfaces.Services;
 using Main.Application.Interfaces.Services.Currency;
@@ -71,9 +66,9 @@ public static class ServiceProvider
         collection.AddScoped<ICurrencyRatesProvider, CurrencyRatesProvider>();
 
         collection.AddApplicationBase(
-            serviceDefinition: ServicesDefinitions.Main,
-            configuration: configuration, 
-            assembly: typeof(Global).Assembly);
+            ServicesDefinitions.Main,
+            configuration,
+            typeof(Global).Assembly);
 
         collection.AddSingleton<IEmailValidator, EmailValidator>();
 

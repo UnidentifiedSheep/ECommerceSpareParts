@@ -6,7 +6,8 @@ using Microsoft.AspNetCore.SignalR;
 namespace Analytics.Api.Consumers;
 
 public class MetricCalculationStatusUpdatedConsumer(
-    IHubContext<MetricCalculationHub> hubContext) : IConsumer<MetricCalculationStatusUpdatedEvent>
+    IHubContext<MetricCalculationHub> hubContext
+) : IConsumer<MetricCalculationStatusUpdatedEvent>
 {
     public async Task Consume(ConsumeContext<MetricCalculationStatusUpdatedEvent> context)
     {

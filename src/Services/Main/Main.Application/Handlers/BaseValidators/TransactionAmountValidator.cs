@@ -12,7 +12,10 @@ public class TransactionAmountValidator : AbstractValidator<decimal>
             .WithLocalizationKey("transaction.amount.must.be.positive");
 
         RuleFor(x => x)
-            .PrecisionScale(18, 2, true)
+            .PrecisionScale(
+                18,
+                2,
+                true)
             .WithLocalizationKey("transaction.amount.max.two.decimal.places");
     }
 }

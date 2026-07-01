@@ -5,7 +5,8 @@ using Main.Entities;
 
 namespace Main.Application.Handlers.Balance.ReverseTransaction;
 
-public class ReverseTransactionDbValidation(IUserContext userContext) : AbstractDbValidation<ReverseTransactionCommand>
+public class ReverseTransactionDbValidation(IUserContext userContext)
+    : AbstractDbValidation<ReverseTransactionCommand>
 {
     public override void Build(IValidationPlan plan, ReverseTransactionCommand request)
     {

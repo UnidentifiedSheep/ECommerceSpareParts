@@ -1,6 +1,5 @@
 ﻿using System.Reflection;
 using Application.Common.Abstractions;
-using Application.Common.Handlers.NamedObjects;
 using Application.Common.Handlers.Settings;
 using Application.Common.Interfaces;
 using Application.Common.Interfaces.Cqrs;
@@ -25,21 +24,21 @@ public static class ServiceCollectionExtensions
     }
 
     public static IServiceCollection RegisterSettingsService<TSettingFactory>(
-        this IServiceCollection collection) 
+        this IServiceCollection collection)
         where TSettingFactory : class, ISettingFactory
     {
         collection.AddSingleton<ISettingsContainer, SettingsContainer>();
         collection.AddScoped<ISettingsService, SettingsService>();
         collection.AddSingleton<ISettingFactory, TSettingFactory>();
-        
+
         collection.TryAddScoped<
             IRequestHandler<UpdateSettingCommand, UpdateSettingResult>,
             UpdateSettingHandler>();
-        
+
         collection.TryAddScoped<
             IRequestHandler<GetSettingsQuery, GetSettingsResult>,
             GetSettingsHandler>();
-        
+
         return collection;
     }
 
@@ -67,7 +66,9 @@ public static class ServiceCollectionExtensions
         return services;
     }
 
-    public static IServiceCollection RegisterDbValidations(this IServiceCollection services, Assembly? assembly = null)
+    public static IServiceCollection RegisterDbValidations(
+        this IServiceCollection services,
+        Assembly? assembly = null)
     {
         assembly ??= Assembly.GetExecutingAssembly();
         var validationTypes = assembly.GetTypes()
@@ -131,13 +132,16 @@ public static class ServiceCollectionExtensions
                     break;
 
                 default:
-                    throw new ArgumentOutOfRangeException(nameof(objectsLifetime), objectsLifetime, null);
+                    throw new ArgumentOutOfRangeException(
+                        nameof(objectsLifetime),
+                        objectsLifetime,
+                        null);
             }
         });
 
         services.TryAddScoped(typeof(INamedObjectRegistry<>), typeof(NamedObjectRegistry<>));
         services.TryAddScoped<INamedObjectGroupResolver, NamedObjectGroupResolver>();
-        
+
         return services;
     }
 }

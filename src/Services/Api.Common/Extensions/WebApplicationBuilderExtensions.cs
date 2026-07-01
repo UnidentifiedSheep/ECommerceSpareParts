@@ -17,7 +17,10 @@ public static class WebApplicationBuilderExtensions
         builder.Configuration
             .AddAppSettingsFromJsons(environment)
             .AddAppSettingsFromJsons(environment, configsPath)
-            .AddConfigsFromJsons(serviceName, environment, configsPath);
+            .AddConfigsFromJsons(
+                serviceName,
+                environment,
+                configsPath);
 
         return environment;
     }

@@ -9,7 +9,7 @@ namespace Pricing.Application.Services.Markup;
 public class MarkupContainer : IMarkupContainer
 {
     private readonly Lock _lock = new();
-    private IntervalMapBase<Interval<Models.Markup>> _defaultMarkupMap = null!; 
+    private IntervalMapBase<Interval<Models.Markup>> _defaultMarkupMap = null!;
     private Dictionary<int, IntervalMapBase<Interval<Models.Markup>>> _markupMaps = new();
     public bool Initialized { get; private set; }
     public Models.Markup DefaultMarkup { get; private set; } = null!;
@@ -24,15 +24,15 @@ public class MarkupContainer : IMarkupContainer
     public Models.Markup? GetForCurrencyOrNull(int currencyId, double value)
     {
         EnsureInitialized();
-        return _markupMaps.TryGetValue(currencyId, out var map) 
-            ? map.GetInterval(value)?.Value 
+        return _markupMaps.TryGetValue(currencyId, out var map)
+            ? map.GetInterval(value)?.Value
             : null;
     }
 
     public void Initialize(
         int defaultCurrencyId,
         Models.Markup defaultMarkup,
-        IEnumerable<MarkupRange> @default, 
+        IEnumerable<MarkupRange> @default,
         Dictionary<int, IEnumerable<MarkupRange>> other)
     {
         lock (_lock)
@@ -50,17 +50,17 @@ public class MarkupContainer : IMarkupContainer
         var map = new AdaptiveIntervalMap<Models.Markup>(intersectionAllowed: true);
 
         foreach (var range in markupRanges)
-            map.AddInterval(new Interval<Models.Markup>(
-                (double)range.RangeStart,
-                (double)range.RangeEnd,
-                new Models.Markup(range.Markup)));
-        
+            map.AddInterval(
+                new Interval<Models.Markup>(
+                    (double)range.RangeStart,
+                    (double)range.RangeEnd,
+                    new Models.Markup(range.Markup)));
+
         return map;
     }
 
     private void EnsureInitialized()
     {
-        if (!Initialized)
-            throw new InvalidOperationException("Markup map container is not initialized");
+        if (!Initialized) throw new InvalidOperationException("Markup map container is not initialized");
     }
 }

@@ -2,7 +2,6 @@ using Application.Common.Extensions;
 using Application.Common.Interfaces.Repositories;
 using Cache;
 using Cache.Extensions;
-using Main.Application;
 using Main.Application.Dtos.Users;
 using Main.Application.Interfaces.Cache;
 using Main.Application.Interfaces.Persistence;
@@ -14,7 +13,8 @@ namespace Main.Cache;
 
 public class UserCacheRepository(
     ICache rawCache,
-    IUserRepository userRepository) : IUserCacheRepository
+    IUserRepository userRepository
+) : IUserCacheRepository
 {
     public async Task<UserDto?> TryGetUserAsync(
         Guid userId,
@@ -23,12 +23,10 @@ public class UserCacheRepository(
         var key = CacheKeys.UserCache.User(userId);
         var cached = await rawCache.GetAsync<UserDto>(key);
 
-        if (cached != null)
-            return cached;
+        if (cached != null) return cached;
 
         var user = await TryGetUserFromDb(userId, token);
-        if (user == null)
-            return null;
+        if (user == null) return null;
 
         await rawCache.SetAsync(
             [(key, user)],
@@ -44,8 +42,7 @@ public class UserCacheRepository(
         var key = CacheKeys.UserCache.UserDiscount(userId);
         var cached = await rawCache.GetAsync<decimal?>(key);
 
-        if (cached.HasValue)
-            return cached.Value;
+        if (cached.HasValue) return cached.Value;
 
         var discount = await userRepository.GetUsersDiscountAsync(userId, token);
 
@@ -64,12 +61,10 @@ public class UserCacheRepository(
         var key = CacheKeys.UserCache.UserRolesAndPermissions(userId);
         var cached = await rawCache.GetAsync<UserRolesAndPermissions>(key);
 
-        if (cached != null)
-            return cached;
+        if (cached != null) return cached;
 
         var rolesAndPermissions = await userRepository.GetUserRolesAndPermissionsAsync(userId, token);
-        if (rolesAndPermissions == null)
-            return null;
+        if (rolesAndPermissions == null) return null;
 
         await rawCache.SetAsync(
             [(key, rolesAndPermissions)],
@@ -95,12 +90,13 @@ public class UserCacheRepository(
 
     public Task InvalidateUsersAsync(IEnumerable<Guid> userIds)
     {
-        return rawCache.RemoveKeysAsync(userIds.SelectMany(userId => new[]
-        {
-            CacheKeys.UserCache.User(userId),
-            CacheKeys.UserCache.UserDiscount(userId),
-            CacheKeys.UserCache.UserRolesAndPermissions(userId)
-        }));
+        return rawCache.RemoveKeysAsync(
+            userIds.SelectMany(userId => new[]
+            {
+                CacheKeys.UserCache.User(userId),
+                CacheKeys.UserCache.UserDiscount(userId),
+                CacheKeys.UserCache.UserRolesAndPermissions(userId)
+            }));
     }
 
     public Task InvalidateUserDiscountAsync(Guid userId)

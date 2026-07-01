@@ -13,14 +13,23 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace Main.Api.EndPoints.Storages;
 
-public record AddContentToStorageRequest(IEnumerable<NewStorageContentDto> StorageContent, string StorageName);
+public record AddContentToStorageRequest(
+    IEnumerable<NewStorageContentDto> StorageContent,
+    string StorageName
+);
 
-public record EditStorageContentRequest(Dictionary<int, ModelWithRowVersion<PatchStorageContentDto, uint>> EditedFields);
+public record EditStorageContentRequest(
+    Dictionary<int, ModelWithRowVersion<PatchStorageContentDto, uint>> EditedFields
+);
 
 public record GetStorageContentRequest(
-    [FromQuery(Name = "storageName")] string? StorageName,
-    [FromQuery(Name = "productId")] int? ArticleId,
-    [FromQuery(Name = "showZeroContent")] bool ShowZeroCount = true)
+    [FromQuery(Name = "storageName")]
+    string? StorageName,
+    [FromQuery(Name = "productId")]
+    int? ArticleId,
+    [FromQuery(Name = "showZeroContent")]
+    bool ShowZeroCount = true
+)
     : PaginationQueryModel;
 
 public record GetStorageContentResponse(IEnumerable<StorageContentDto> Content);
@@ -29,18 +38,20 @@ public static class StorageContentEndPoints
 {
     public static RouteGroupBuilder MapStorageContentEndPoints(this RouteGroupBuilder storages)
     {
-        storages.MapPost("/contents", async (
-                ISender sender,
-                AddContentToStorageRequest request,
-                CancellationToken cancellationToken) =>
-            {
-                var command = new AddContentCommand(
-                    request.StorageContent,
-                    request.StorageName,
-                    StorageMovementType.StorageContentAddition);
-                await sender.Send(command, cancellationToken);
-                return Results.NoContent();
-            })
+        storages.MapPost(
+                "/contents",
+                async (
+                    ISender sender,
+                    AddContentToStorageRequest request,
+                    CancellationToken cancellationToken) =>
+                {
+                    var command = new AddContentCommand(
+                        request.StorageContent,
+                        request.StorageName,
+                        StorageMovementType.StorageContentAddition);
+                    await sender.Send(command, cancellationToken);
+                    return Results.NoContent();
+                })
             .WithName("AddStorageContent")
             .WithSummary("Добавить содержимое склада")
             .WithDescription("Добавление позиций на склад")
@@ -51,15 +62,17 @@ public static class StorageContentEndPoints
             .ProducesProblem(StatusCodes.Status404NotFound)
             .RequireAnyPermission(PermissionCodes.STORAGES_CONTENT_CREATE);
 
-        storages.MapDelete("/contents/{contentId:int}", async (
-                ISender sender,
-                int contentId,
-                uint rowVersion,
-                CancellationToken cancellationToken) =>
-            {
-                await sender.Send(new SetToZeroContentCommand(contentId, rowVersion), cancellationToken);
-                return Results.NoContent();
-            })
+        storages.MapDelete(
+                "/contents/{contentId:int}",
+                async (
+                    ISender sender,
+                    int contentId,
+                    uint rowVersion,
+                    CancellationToken cancellationToken) =>
+                {
+                    await sender.Send(new SetToZeroContentCommand(contentId, rowVersion), cancellationToken);
+                    return Results.NoContent();
+                })
             .WithName("DeleteStorageContent")
             .WithSummary("Удалить содержимое склада")
             .WithDescription("Полное удаление позиции со склада по его Id")
@@ -69,14 +82,16 @@ public static class StorageContentEndPoints
             .ProducesProblem(StatusCodes.Status404NotFound)
             .RequireAnyPermission(PermissionCodes.STORAGES_CONTENT_DELETE);
 
-        storages.MapPatch("/contents", async (
-                ISender sender,
-                EditStorageContentRequest request,
-                CancellationToken cancellationToken) =>
-            {
-                await sender.Send(new EditStorageContentCommand(request.EditedFields), cancellationToken);
-                return Results.NoContent();
-            })
+        storages.MapPatch(
+                "/contents",
+                async (
+                    ISender sender,
+                    EditStorageContentRequest request,
+                    CancellationToken cancellationToken) =>
+                {
+                    await sender.Send(new EditStorageContentCommand(request.EditedFields), cancellationToken);
+                    return Results.NoContent();
+                })
             .WithName("EditStorageContent")
             .WithSummary("Редактировать содержимое склада")
             .WithDescription("Редактирование позиций на складе")
@@ -87,19 +102,21 @@ public static class StorageContentEndPoints
             .ProducesProblem(StatusCodes.Status404NotFound)
             .RequireAnyPermission(PermissionCodes.STORAGES_CONTENT_EDIT);
 
-        storages.MapGet("/contents", async (
-                ISender sender,
-                CancellationToken token,
-                [AsParameters] GetStorageContentRequest request) =>
-            {
-                var query = new GetStorageContentQuery(
-                    request.StorageName,
-                    request.ArticleId,
-                    request,
-                    request.ShowZeroCount);
-                var result = await sender.Send(query, token);
-                return Results.Ok(new GetStorageContentResponse(result.Content));
-            })
+        storages.MapGet(
+                "/contents",
+                async (
+                    ISender sender,
+                    CancellationToken token,
+                    [AsParameters] GetStorageContentRequest request) =>
+                {
+                    var query = new GetStorageContentQuery(
+                        request.StorageName,
+                        request.ArticleId,
+                        request,
+                        request.ShowZeroCount);
+                    var result = await sender.Send(query, token);
+                    return Results.Ok(new GetStorageContentResponse(result.Content));
+                })
             .WithName("GetStorageContent")
             .WithSummary("Получить содержимое склада")
             .WithDescription("Получение позиций на складе")

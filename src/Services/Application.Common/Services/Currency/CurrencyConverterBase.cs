@@ -5,7 +5,10 @@ namespace Application.Common.Services.Currency;
 
 public abstract class CurrencyConverterBase : ICurrencyConverter
 {
-    public decimal Convert(decimal value, decimal fromRate, decimal toRate)
+    public decimal Convert(
+        decimal value,
+        decimal fromRate,
+        decimal toRate)
     {
         if (fromRate == toRate) return value;
 
@@ -13,15 +16,9 @@ public abstract class CurrencyConverterBase : ICurrencyConverter
         return baseValue * toRate;
     }
 
-    public decimal ToBase(decimal value, decimal fromRate)
-    {
-        return value / fromRate;
-    }
+    public decimal ToBase(decimal value, decimal fromRate) { return value / fromRate; }
 
-    public decimal FromBase(decimal value, decimal toRate)
-    {
-        return value * toRate;
-    }
+    public decimal FromBase(decimal value, decimal toRate) { return value * toRate; }
 
     public abstract Task<decimal> ConvertAsync(
         decimal value,
@@ -41,8 +38,7 @@ public abstract class CurrencyConverterBase : ICurrencyConverter
 
     public ExchangeRates ChangeBaseCurrency(ExchangeRates data, string newBase)
     {
-        if (data.Base == newBase)
-            return data;
+        if (data.Base == newBase) return data;
 
         if (!data.Rates.TryGetValue(newBase, out var newBaseRate))
             throw new ArgumentException($"Валюта с кодом '{newBase}' не найдена.");

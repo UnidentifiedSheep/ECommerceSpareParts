@@ -32,7 +32,8 @@ public class DeleteStorageTests : IntegrationTest
     {
         var storage = GetContext<StorageTestContext>()
             .Storages
-            .First(x => x.Name != GetContext<StorageContentTestContext>().StorageContents.First().StorageName);
+            .First(x =>
+                x.Name != GetContext<StorageContentTestContext>().StorageContents.First().StorageName);
         var command = new DeleteStorageCommand(storage.Name);
         await Mediator.Send(command);
 

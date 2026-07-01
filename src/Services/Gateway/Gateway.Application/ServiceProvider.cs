@@ -17,13 +17,12 @@ public static class ServiceProvider
             .WithRegisteredDistributedCache()
             .WithRegisteredBackplane()
             .WithSystemTextJsonSerializer();
-        
+
         services
             .AddApplicationBase(
-                serviceDefinition: ServicesDefinitions.Gateway,
-                configuration: configuration,
-                assembly: typeof(ServiceProvider).Assembly,
-                behaviorsToExclude:
+                ServicesDefinitions.Gateway,
+                configuration,
+                typeof(ServiceProvider).Assembly,
                 [
                     typeof(TransactionBehavior<,>),
                     typeof(SaveChangesBehavior<,>),

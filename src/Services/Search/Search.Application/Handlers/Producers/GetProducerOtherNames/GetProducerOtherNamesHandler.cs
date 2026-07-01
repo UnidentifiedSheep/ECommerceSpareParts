@@ -10,7 +10,8 @@ public record GetProducerOtherNamesQuery(int ProducerId) : IQuery<GetProducerOth
 public record GetProducerOtherNamesResult(IEnumerable<ProducerOtherNameDto> OtherNames);
 
 public class GetProducerOtherNamesHandler(
-    IProducerRepository producerRepository) : IQueryHandler<GetProducerOtherNamesQuery, GetProducerOtherNamesResult>
+    IProducerRepository producerRepository
+) : IQueryHandler<GetProducerOtherNamesQuery, GetProducerOtherNamesResult>
 {
     public async Task<GetProducerOtherNamesResult> Handle(
         GetProducerOtherNamesQuery request,

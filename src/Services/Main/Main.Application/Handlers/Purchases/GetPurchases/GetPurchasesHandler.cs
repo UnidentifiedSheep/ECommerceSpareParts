@@ -17,14 +17,18 @@ public record GetPurchasesQuery(
     IEnumerable<int> CurrencyIds,
     IEnumerable<int> ProductIds,
     string? SortBy,
-    string? SearchTerm) : IQuery<GetPurchasesResult>;
+    string? SearchTerm
+) : IQuery<GetPurchasesResult>;
 
 public record GetPurchasesResult(IEnumerable<PurchaseDto> Purchases);
 
 public class GetPurchasesHandler(
-    IReadRepository<Purchase, Guid> repository) : IQueryHandler<GetPurchasesQuery, GetPurchasesResult>
+    IReadRepository<Purchase, Guid> repository
+) : IQueryHandler<GetPurchasesQuery, GetPurchasesResult>
 {
-    public async Task<GetPurchasesResult> Handle(GetPurchasesQuery request, CancellationToken cancellationToken)
+    public async Task<GetPurchasesResult> Handle(
+        GetPurchasesQuery request,
+        CancellationToken cancellationToken)
     {
         var query = repository.Query;
 
@@ -34,11 +38,9 @@ public class GetPurchasesHandler(
         if (request.DateRange.Max.HasValue)
             query = query.Where(x => x.PurchaseDatetime <= request.DateRange.Max.Value);
 
-        if (request.SupplierIds.Any())
-            query = query.Where(x => request.SupplierIds.Contains(x.SupplierId));
+        if (request.SupplierIds.Any()) query = query.Where(x => request.SupplierIds.Contains(x.SupplierId));
 
-        if (request.CurrencyIds.Any())
-            query = query.Where(x => request.CurrencyIds.Contains(x.CurrencyId));
+        if (request.CurrencyIds.Any()) query = query.Where(x => request.CurrencyIds.Contains(x.CurrencyId));
 
         if (request.ProductIds.Any())
             query = query.Where(x => x.Contents.Any(z => request.ProductIds.Contains(z.ProductId)));

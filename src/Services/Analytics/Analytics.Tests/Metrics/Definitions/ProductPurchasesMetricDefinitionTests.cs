@@ -43,8 +43,22 @@ public class ProductPurchasesMetricDefinitionTests
     public void CreateMetric_WhenRangeStartIsAfterRangeEnd_ShouldThrowMetricInvalidInputException()
     {
         var input = CreateInput(
-            rangeStart: new DateTime(2026, 1, 2, 0, 0, 0, DateTimeKind.Utc),
-            rangeEnd: new DateTime(2026, 1, 1, 0, 0, 0, DateTimeKind.Utc));
+            new DateTime(
+                2026,
+                1,
+                2,
+                0,
+                0,
+                0,
+                DateTimeKind.Utc),
+            new DateTime(
+                2026,
+                1,
+                1,
+                0,
+                0,
+                0,
+                DateTimeKind.Utc));
         var json = JsonSerializer.Serialize(input);
 
         var act = () => _definition.CreateMetric(json);
@@ -60,8 +74,22 @@ public class ProductPurchasesMetricDefinitionTests
         {
             ProductId = 10,
             CurrencyId = 1,
-            RangeStart = rangeStart ?? new DateTime(2026, 1, 1, 0, 0, 0, DateTimeKind.Utc),
-            RangeEnd = rangeEnd ?? new DateTime(2026, 1, 2, 0, 0, 0, DateTimeKind.Utc)
+            RangeStart = rangeStart ?? new DateTime(
+                2026,
+                1,
+                1,
+                0,
+                0,
+                0,
+                DateTimeKind.Utc),
+            RangeEnd = rangeEnd ?? new DateTime(
+                2026,
+                1,
+                2,
+                0,
+                0,
+                0,
+                DateTimeKind.Utc)
         };
     }
 }

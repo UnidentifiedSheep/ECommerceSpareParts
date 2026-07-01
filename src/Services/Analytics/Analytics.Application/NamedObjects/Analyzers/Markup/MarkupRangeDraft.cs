@@ -5,4 +5,5 @@ public sealed record MarkupRangeDraft(
     decimal ToCost,
     decimal MeanMarkup,
     decimal StdDevMarkup,
-    int Count);
+    int Count
+);

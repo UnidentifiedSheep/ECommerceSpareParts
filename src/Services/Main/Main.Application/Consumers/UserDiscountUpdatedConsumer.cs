@@ -5,7 +5,8 @@ using MassTransit;
 namespace Main.Application.Consumers;
 
 public class UserDiscountUpdatedConsumer(
-    IUserCacheRepository userCache) : IConsumer<UserDiscountUpdatedEvent>
+    IUserCacheRepository userCache
+) : IConsumer<UserDiscountUpdatedEvent>
 {
     public async Task Consume(ConsumeContext<UserDiscountUpdatedEvent> context)
     {

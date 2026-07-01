@@ -1,7 +1,6 @@
 ﻿using System.Data;
 using Abstractions.Interfaces;
 using Abstractions.Interfaces.Persistence;
-using Abstractions.Interfaces.Services;
 using Application.Common.Interfaces.Repositories;
 using Application.Common.Interfaces.Settings;
 using Attributes;
@@ -18,11 +17,15 @@ public class SettingsService(
     ISettingsContainer settingsContainer,
     IPublishEndpoint publishEndpoint,
     IServiceDefinition serviceDefinition,
-    ISettingFactory settingFactory)
+    ISettingFactory settingFactory
+)
     : ISettingsService
 {
     private static readonly TransactionalAttribute TransactionSettings
-        = new(IsolationLevel.ReadCommitted, 20, 3);
+        = new(
+            IsolationLevel.ReadCommitted,
+            20,
+            3);
 
     public async Task LoadAsync(CancellationToken cancellationToken = default)
     {
@@ -52,12 +55,11 @@ public class SettingsService(
                     .ForUpdate()
                     .Track()
                     .Build();
-                
+
                 var existing = await repository.FirstOrDefaultAsync(criteria, cancellationToken);
                 existing?.SetData(value.Json);
 
-                if (existing == null)
-                    await unitOfWork.AddAsync(value, cancellationToken);
+                if (existing == null) await unitOfWork.AddAsync(value, cancellationToken);
 
                 await publishEndpoint.Publish(
                     new SettingUpdatedEvent
@@ -65,7 +67,7 @@ public class SettingsService(
                         Key = value.Key,
                         Value = value.Json,
                         ChangedAt = DateTime.UtcNow
-                    }, 
+                    },
                     conf => conf.SetRoutingKey(serviceDefinition.ServiceName),
                     cancellationToken);
                 await unitOfWork.SaveChangesAsync(cancellationToken);
@@ -75,10 +77,11 @@ public class SettingsService(
         settingsContainer.Set(value);
     }
 
-    public async Task<T> GetOrDefault<T>(CancellationToken cancellationToken = default) where T : Setting, ISetting<T>
+    public async Task<T> GetOrDefault<T>(CancellationToken cancellationToken = default)
+        where T : Setting, ISetting<T>
     {
         if (settingsContainer.TryGet<T>(out var setting)) return setting!;
-        
+
         var dbSetting = await repository.GetById(T.SettingName, cancellationToken);
 
         if (dbSetting != null)

@@ -14,11 +14,11 @@ public static class NamedObjectDiRegistry
     public static IServiceCollection AddNamedObjects(this IServiceCollection services)
     {
         services.AddSingleton<INamedObjectGroupRegistry, NamedObjectGroupRegistry>();
-        
+
         services.TryAddScoped<
             IRequestHandler<GetNamedObjectsQuery, GetNamedObjectsResult>,
             GetNamedObjectsHandler>();
-        
+
         return services
             .RegisterNamedObject<SettingDefinitionNamedObjectBase>(objectsLifetime: ServiceLifetime.Scoped);
     }

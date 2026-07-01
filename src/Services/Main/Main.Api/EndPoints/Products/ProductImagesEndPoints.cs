@@ -12,16 +12,18 @@ public static class ProductImagesEndPoints
 {
     public static RouteGroupBuilder MapProductImagesEndPoints(this RouteGroupBuilder products)
     {
-        products.MapPost("/{productId:int}/imgs/", async (
-                ISender sender,
-                int productId,
-                IFormFileCollection files,
-                CancellationToken token) =>
-            {
-                var command = new MapImgsToProductCommand(productId, FileModel.GetFileModels(files));
-                await sender.Send(command, token);
-                return Results.Ok();
-            })
+        products.MapPost(
+                "/{productId:int}/imgs/",
+                async (
+                    ISender sender,
+                    int productId,
+                    IFormFileCollection files,
+                    CancellationToken token) =>
+                {
+                    var command = new MapImgsToProductCommand(productId, FileModel.GetFileModels(files));
+                    await sender.Send(command, token);
+                    return Results.Ok();
+                })
             .DisableAntiforgery()
             .WithMetadata()
             .WithName("AddProductImages")
@@ -32,18 +34,19 @@ public static class ProductImagesEndPoints
             .ProducesProblem(400)
             .ProducesProblem(404)
             .RequireAnyPermission(PermissionCodes.ARTICLE_IMAGES_CREATE);
-        
-        products.MapDelete("/{productId:int}/imgs", async (
-                ISender sender,
-                int productId,
-                [FromQuery]
-                string imagePath,
-                CancellationToken token) =>
-            {
-                var command = new RemoveProductImageCommand(productId, imagePath);
-                await sender.Send(command, token);
-                return Results.NoContent();
-            })
+
+        products.MapDelete(
+                "/{productId:int}/imgs",
+                async (
+                    ISender sender,
+                    int productId,
+                    [FromQuery] string imagePath,
+                    CancellationToken token) =>
+                {
+                    var command = new RemoveProductImageCommand(productId, imagePath);
+                    await sender.Send(command, token);
+                    return Results.NoContent();
+                })
             .DisableAntiforgery()
             .WithMetadata()
             .WithName("DeleteProductImage")

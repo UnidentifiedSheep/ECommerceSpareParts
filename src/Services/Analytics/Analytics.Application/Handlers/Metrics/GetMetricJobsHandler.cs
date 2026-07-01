@@ -14,12 +14,14 @@ namespace Analytics.Application.Handlers.Metrics;
 public record GetMetricJobsQuery(
     Guid MetricId,
     Pagination Pagination,
-    string? SortBy) : IQuery<GetMetricJobsResult>;
+    string? SortBy
+) : IQuery<GetMetricJobsResult>;
 
 public record GetMetricJobsResult(IReadOnlyList<MetricJobDto> Jobs);
 
 public class GetMetricJobsHandler(
-    IReadRepository<MetricJob, (Guid, Guid)> repository)
+    IReadRepository<MetricJob, (Guid, Guid)> repository
+)
     : IQueryHandler<GetMetricJobsQuery, GetMetricJobsResult>
 {
     public async Task<GetMetricJobsResult> Handle(

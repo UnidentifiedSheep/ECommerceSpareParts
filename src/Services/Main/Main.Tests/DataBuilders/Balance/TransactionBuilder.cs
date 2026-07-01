@@ -1,6 +1,5 @@
 using Bogus;
 using Main.Entities.Balance;
-using Main.Enums;
 using Main.Enums.Balances;
 using Test.Common.Abstractions;
 
@@ -92,8 +91,7 @@ public class TransactionBuilder(Faker faker) : BuilderBase<Transaction>(faker)
             TransactionDateTime ?? DateTime.UtcNow,
             SourceType ?? TransactionSourceType.Manual);
 
-        if (CompleteTransaction)
-            transaction.Complete();
+        if (CompleteTransaction) transaction.Complete();
 
         if (ApplyTransaction)
         {

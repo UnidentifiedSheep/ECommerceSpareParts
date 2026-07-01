@@ -15,10 +15,13 @@ public record GetStorageOwnersQuery(string Name, Pagination Pagination) : IQuery
 public record GetStorageOwnersResult(IReadOnlyList<UserDto> Owners);
 
 public class GetStorageOwnersHandler(
-    IReadRepository<StorageOwner, (string, Guid)> repository)
+    IReadRepository<StorageOwner, (string, Guid)> repository
+)
     : IQueryHandler<GetStorageOwnersQuery, GetStorageOwnersResult>
 {
-    public async Task<GetStorageOwnersResult> Handle(GetStorageOwnersQuery request, CancellationToken cancellationToken)
+    public async Task<GetStorageOwnersResult> Handle(
+        GetStorageOwnersQuery request,
+        CancellationToken cancellationToken)
     {
         var result = await repository.Query
             .Where(x => x.StorageName == request.Name)

@@ -3,7 +3,8 @@ using Localization.Abstractions.Interfaces;
 
 namespace Analytics.Application.Handlers.Metrics.ListAvailableMetrics;
 
-public class ListAvailableMetricsCachePolicy(IScopedStringLocalizer localizer) : ICachePolicy<ListAvailableMetricsQuery>
+public class ListAvailableMetricsCachePolicy(IScopedStringLocalizer localizer)
+    : ICachePolicy<ListAvailableMetricsQuery>
 {
     public string GetCacheKey(ListAvailableMetricsQuery request)
     {

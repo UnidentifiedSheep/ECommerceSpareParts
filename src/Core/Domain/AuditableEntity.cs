@@ -17,8 +17,7 @@ public abstract class AuditableEntity<TModel, TKey>
         if (WhoUpdated != null)
             throw new InvalidOperationException("Can't set created user, it's already set");
 
-        if (WhoCreated == Guid.Empty)
-            throw new InvalidOperationException("Can't set empty created user id.");
+        if (WhoCreated == Guid.Empty) throw new InvalidOperationException("Can't set empty created user id.");
 
         WhoCreated = userId;
     }

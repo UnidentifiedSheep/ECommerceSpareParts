@@ -4,7 +4,6 @@ using Analytics.Entities;
 using Analytics.Enums;
 using Analytics.Integration.Tests.DataBuilders;
 using FluentAssertions;
-using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Test.Common.Extensions;
 using Test.Common.TestContainers.Combined;
@@ -20,7 +19,7 @@ public class TagsServiceTests(CombinedContainerFixture fixture) : IntegrationTes
         await base.InitializeAsync();
         _tagsService = Scope.ServiceProvider.GetRequiredService<ITagsService>();
     }
-    
+
     [Fact]
     public async Task WhenNoMetrics_UpdatesNothing()
     {
@@ -33,7 +32,7 @@ public class TagsServiceTests(CombinedContainerFixture fixture) : IntegrationTes
 
         await act.Should().NotThrowAsync();
     }
-    
+
     [Fact]
     public async Task WhenPurchaseMetricContainsNewFactDatetime_MarksMetricDirty()
     {

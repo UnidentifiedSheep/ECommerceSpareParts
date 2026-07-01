@@ -5,13 +5,9 @@ namespace Analytics.Entities.Metrics;
 
 public class ProductPurchasesMetric : ProductMetric<ProductInfoModel>
 {
-    private ProductPurchasesMetric()
-    {
-    }
+    private ProductPurchasesMetric() { }
 
-    public ProductPurchasesMetric(int productId) : base(productId)
-    {
-    }
+    public ProductPurchasesMetric(int productId) : base(productId) { }
 
     public override DependsOn DependsOn { get; protected set; } = DependsOn.Purchase;
 }

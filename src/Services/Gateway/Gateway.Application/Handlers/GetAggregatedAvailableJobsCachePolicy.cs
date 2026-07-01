@@ -7,6 +7,7 @@ public class GetAggregatedAvailableJobsCachePolicy : ICachePolicy<GetAggregatedA
     public TimeSpan TimeToLive => TimeSpan.FromHours(1);
     public IReadOnlyCollection<string>? Tags => null;
     public string? BaseTag => null;
+
     public string GetCacheKey(GetAggregatedAvailableJobsQuery request)
     {
         return $"available-jobs:{request.Locale}";

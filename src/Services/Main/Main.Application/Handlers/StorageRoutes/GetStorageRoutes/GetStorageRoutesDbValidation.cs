@@ -10,7 +10,6 @@ public class GetStorageRoutesDbValidation : AbstractDbValidation<GetStorageRoute
     {
         if (!string.IsNullOrWhiteSpace(request.StorageFrom))
             plan.ValidateStorageExistsName(request.StorageFrom);
-        if (!string.IsNullOrWhiteSpace(request.StorageTo))
-            plan.ValidateStorageExistsName(request.StorageTo);
+        if (!string.IsNullOrWhiteSpace(request.StorageTo)) plan.ValidateStorageExistsName(request.StorageTo);
     }
 }

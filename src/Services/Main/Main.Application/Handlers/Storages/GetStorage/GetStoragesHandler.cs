@@ -11,7 +11,11 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Main.Application.Handlers.Storages.GetStorage;
 
-public record GetStoragesQuery(Pagination Pagination, string? SearchTerm, StorageType? Type)
+public record GetStoragesQuery(
+    Pagination Pagination,
+    string? SearchTerm,
+    StorageType? Type
+)
     : IQuery<GetStoragesResult>;
 
 public record GetStoragesResult(IReadOnlyList<StorageDto> Storages);
@@ -31,7 +35,9 @@ public class GetStoragesHandler(
                     Entity = x,
                     Rank =
                         (EF.Functions.ILike(x.Name, $"%{searchTerm}%") ? 3 : 0) +
-                        (x.Description != null && EF.Functions.ILike(x.Description, $"%{searchTerm}%") ? 2 : 0) +
+                        (x.Description != null && EF.Functions.ILike(x.Description, $"%{searchTerm}%")
+                            ? 2
+                            : 0) +
                         (x.Location != null && EF.Functions.ILike(x.Location, $"%{searchTerm}%") ? 1 : 0)
                 })
                 .Where(x => x.Rank > 0)

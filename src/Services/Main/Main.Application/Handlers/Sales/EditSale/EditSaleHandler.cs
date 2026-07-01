@@ -2,10 +2,8 @@ using System.Data;
 using Abstractions.Interfaces.Persistence;
 using Abstractions.Models.Options;
 using Application.Common.Extensions;
-using Application.Common.Interfaces;
 using Application.Common.Interfaces.Cqrs;
 using Attributes;
-using Contracts.Sale;
 using Domain.Extensions;
 using Main.Application.Dtos.Sale;
 using Main.Application.Handlers.Balance.CreateTransaction;
@@ -24,7 +22,10 @@ using Microsoft.Extensions.Options;
 namespace Main.Application.Handlers.Sales.EditSale;
 
 [AutoSave]
-[Transactional(IsolationLevel.ReadCommitted, 20, 2)]
+[Transactional(
+    IsolationLevel.ReadCommitted,
+    20,
+    2)]
 public record EditSaleCommand(
     Guid SaleId,
     uint RowVersion,
@@ -33,7 +34,8 @@ public record EditSaleCommand(
     DateTime SaleDateTime,
     string? Comment,
     string? ConfirmationCode,
-    bool ForcePayment = false) : ICommand;
+    bool ForcePayment = false
+) : ICommand;
 
 public class EditSaleHandler(
     ISender sender,
@@ -41,15 +43,15 @@ public class EditSaleHandler(
     IOptions<SystemOptions> systemOptions,
     ISaleService saleService,
     ISaleEventService saleEventService,
-    IUnitOfWork unitOfWork) : ICommandHandler<EditSaleCommand>
+    IUnitOfWork unitOfWork
+) : ICommandHandler<EditSaleCommand>
 {
     public async Task<Unit> Handle(EditSaleCommand request, CancellationToken cancellationToken)
     {
         var sale = await saleRepository.GetFullSaleForUpdate(request.SaleId, cancellationToken)
                    ?? throw new SaleNotFoundException(request.SaleId);
 
-        if (sale.State == SaleState.Deleted)
-            throw new SaleNotFoundException(request.SaleId);
+        if (sale.State == SaleState.Deleted) throw new SaleNotFoundException(request.SaleId);
 
         sale.ValidateVersion(request.RowVersion);
 
@@ -58,7 +60,10 @@ public class EditSaleHandler(
             .GroupBy(x => x.ProductId)
             .ToDictionary(x => x.Key, x => x.Sum(z => z.Count));
 
-        await saleService.RestoreContents(sale, StorageMovementType.SaleEditing, cancellationToken);
+        await saleService.RestoreContents(
+            sale,
+            StorageMovementType.SaleEditing,
+            cancellationToken);
 
         await saleService.CheckReservations(
             contentDtos,
@@ -83,9 +88,16 @@ public class EditSaleHandler(
         sale.SetDateTime(request.SaleDateTime);
         sale.SetComment(request.Comment);
 
-        await UpdateContents(sale, contentDtos, false, cancellationToken);
-        await UpdateReservationsCounts(sale, oldCounts, cancellationToken);
-        
+        await UpdateContents(
+            sale,
+            contentDtos,
+            false,
+            cancellationToken);
+        await UpdateReservationsCounts(
+            sale,
+            oldCounts,
+            cancellationToken);
+
         await unitOfWork.SaveChangesAsync(cancellationToken);
 
         await saleEventService.NotifyUpdated(sale.Id, cancellationToken);
@@ -100,7 +112,7 @@ public class EditSaleHandler(
         await sender.Send(
             new ReverseTransactionCommand(
                 sale.TransactionId,
-                TransactionReversalMode.System, 
+                TransactionReversalMode.System,
                 true),
             cancellationToken);
     }
@@ -164,7 +176,10 @@ public class EditSaleHandler(
                 continue;
             }
 
-            UpdateContent(existingById[dto.Id.Value], dto, newContent);
+            UpdateContent(
+                existingById[dto.Id.Value],
+                dto,
+                newContent);
         }
     }
 
@@ -173,8 +188,7 @@ public class EditSaleHandler(
         EditSaleContentDto dto,
         SaleContent newContent)
     {
-        if (content.ProductId != dto.ProductId)
-            throw new ArticleDoesntMatchContentException(content.Id);
+        if (content.ProductId != dto.ProductId) throw new ArticleDoesntMatchContentException(content.Id);
 
         unitOfWork.RemoveRange(content.Details.ToList());
         content.SetPriceAndDetails(
@@ -203,6 +217,9 @@ public class EditSaleHandler(
                 x => x.Key,
                 x => x.Sum(z => z.Count) - oldCounts.GetValueOrDefault(x.Key));
 
-        await saleService.UpdateReservationsCounts(sale.BuyerId, deltas, cancellationToken);
+        await saleService.UpdateReservationsCounts(
+            sale.BuyerId,
+            deltas,
+            cancellationToken);
     }
 }

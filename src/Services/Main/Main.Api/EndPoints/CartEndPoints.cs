@@ -25,15 +25,22 @@ public class CartEndPoints : ICarterModule
         var cart = app.MapGroup("/cart")
             .WithTags("Cart");
 
-        cart.MapPost("", async (
-                ISender sender,
-                IUserContext user,
-                AddToCartRequest request,
-                CancellationToken cancellationToken) =>
-            {
-                await sender.Send(new AddToCartCommand(user.UserId, request.ArticleId, request.Count), cancellationToken);
-                return Results.NoContent();
-            })
+        cart.MapPost(
+                "",
+                async (
+                    ISender sender,
+                    IUserContext user,
+                    AddToCartRequest request,
+                    CancellationToken cancellationToken) =>
+                {
+                    await sender.Send(
+                        new AddToCartCommand(
+                            user.UserId,
+                            request.ArticleId,
+                            request.Count),
+                        cancellationToken);
+                    return Results.NoContent();
+                })
             .WithName("AddCartItem")
             .WithSummary("Добавить позицию в корзину")
             .WithDescription("Добавление позиции в корзину")
@@ -46,18 +53,23 @@ public class CartEndPoints : ICarterModule
             .Produces(400)
             .RequireAnyPermission(PermissionCodes.CART_ADD);
 
-        cart.MapPatch("/{articleId:int}", async (
-                ISender sender,
-                IUserContext user,
-                int articleId,
-                ChangeCartItemCountRequest request,
-                CancellationToken cancellationToken) =>
-            {
-                await sender.Send(
-                    new ChangeCartItemCountCommand(user.UserId, articleId, request.NewCount),
-                    cancellationToken);
-                return Results.NoContent();
-            })
+        cart.MapPatch(
+                "/{articleId:int}",
+                async (
+                    ISender sender,
+                    IUserContext user,
+                    int articleId,
+                    ChangeCartItemCountRequest request,
+                    CancellationToken cancellationToken) =>
+                {
+                    await sender.Send(
+                        new ChangeCartItemCountCommand(
+                            user.UserId,
+                            articleId,
+                            request.NewCount),
+                        cancellationToken);
+                    return Results.NoContent();
+                })
             .WithName("ChangeCartItemCount")
             .WithSummary("Изменить количество позиции корзины")
             .WithDescription("Редактирование позиции в корзине")
@@ -70,15 +82,17 @@ public class CartEndPoints : ICarterModule
             .Produces(400)
             .RequireAnyPermission(PermissionCodes.CART_UPDATE);
 
-        cart.MapDelete("/{articleId:int}", async (
-                ISender sender,
-                IUserContext user,
-                int articleId,
-                CancellationToken cancellationToken) =>
-            {
-                await sender.Send(new DeleteFromCartCommand(user.UserId, articleId), cancellationToken);
-                return Results.NoContent();
-            })
+        cart.MapDelete(
+                "/{articleId:int}",
+                async (
+                    ISender sender,
+                    IUserContext user,
+                    int articleId,
+                    CancellationToken cancellationToken) =>
+                {
+                    await sender.Send(new DeleteFromCartCommand(user.UserId, articleId), cancellationToken);
+                    return Results.NoContent();
+                })
             .WithName("DeleteCartItem")
             .WithSummary("Удалить позицию корзины")
             .WithDescription("Удалить позицию из корзины")
@@ -90,18 +104,20 @@ public class CartEndPoints : ICarterModule
             .Produces(400)
             .RequireAnyPermission(PermissionCodes.CART_DELETE);
 
-        cart.MapGet("", async (
-                ISender sender,
-                IUserContext user,
-                int page,
-                int limit,
-                CancellationToken cancellationToken) =>
-            {
-                var result = await sender.Send(
-                    new GetCartItemsQuery(user.UserId, new Pagination(page, limit)),
-                    cancellationToken);
-                return Results.Ok(new GetCartItemsResponse(result.CartItems));
-            })
+        cart.MapGet(
+                "",
+                async (
+                    ISender sender,
+                    IUserContext user,
+                    int page,
+                    int limit,
+                    CancellationToken cancellationToken) =>
+                {
+                    var result = await sender.Send(
+                        new GetCartItemsQuery(user.UserId, new Pagination(page, limit)),
+                        cancellationToken);
+                    return Results.Ok(new GetCartItemsResponse(result.CartItems));
+                })
             .WithName("GetCartItems")
             .WithSummary("Получить позиции корзины")
             .WithDescription("Получение позиций корзины")

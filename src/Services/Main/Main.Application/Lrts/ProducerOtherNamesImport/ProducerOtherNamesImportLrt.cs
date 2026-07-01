@@ -6,7 +6,6 @@ using Domain.CommonEntities;
 using Localization.Abstractions.Interfaces;
 using Localization.Domain;
 using Main.Application.Handlers.Producers;
-using Main.Application.Lrts;
 using MassTransit;
 using MediatR;
 using Microsoft.Extensions.Logging;
@@ -22,7 +21,8 @@ public class ProducerOtherNamesImportLrt(
     ILogger<ProducerOtherNamesImportLrt> logger,
     IPublishEndpoint publisher,
     IScopedStringLocalizer stringLocalizer,
-    IOptions<LocalesOptions> localesOptions)
+    IOptions<LocalesOptions> localesOptions
+)
     : CsvImportLrtBase<
         ProducerOtherNamesImportState,
         ProducerOtherNamesImportError,
@@ -42,10 +42,19 @@ public class ProducerOtherNamesImportLrt(
     public override Type InputType => typeof(ProducerOtherNamesImportInputState);
     public override Type StateType => typeof(ProducerOtherNamesImportState);
 
-    protected override string GetFileName(ProducerOtherNamesImportState state) => state.FileName;
-    protected override int GetCurrentLine(ProducerOtherNamesImportState state) => state.CurrentLine;
-    protected override List<ProducerOtherNamesImportError> GetErrors(ProducerOtherNamesImportState state) => state.Errors;
-    protected override string GetTooManyErrorsLocalizationKey() => "producer.too.many.errors.while.processing.batch";
+    protected override string GetFileName(ProducerOtherNamesImportState state) { return state.FileName; }
+
+    protected override int GetCurrentLine(ProducerOtherNamesImportState state) { return state.CurrentLine; }
+
+    protected override List<ProducerOtherNamesImportError> GetErrors(ProducerOtherNamesImportState state)
+    {
+        return state.Errors;
+    }
+
+    protected override string GetTooManyErrorsLocalizationKey()
+    {
+        return "producer.too.many.errors.while.processing.batch";
+    }
 
     protected override ProducerOtherNamesImportError CreateError(int rowIdx, string message)
     {
@@ -76,9 +85,9 @@ public class ProducerOtherNamesImportLrt(
         out CreateProducerOtherNamesBatchItem item)
     {
         item = new CreateProducerOtherNamesBatchItem(
-            OriginalName: row.Name,
-            OtherName: row.OtherName,
-            WhereUsed: row.WhereUsed);
+            row.Name,
+            row.OtherName,
+            row.WhereUsed);
         return true;
     }
 
@@ -95,16 +104,15 @@ public class ProducerOtherNamesImportLrt(
             CancellationToken);
 
         foreach (var (idx, message) in result.Errors)
-        {
-            errors.Add(new ProducerOtherNamesImportError
-            {
-                Message = message,
-                RowIdx = idx >= 0 && idx < otherNames.Count
-                    ? otherNames[idx].idx
-                    : firstIdx + idx
-            });
-        }
-        
+            errors.Add(
+                new ProducerOtherNamesImportError
+                {
+                    Message = message,
+                    RowIdx = idx >= 0 && idx < otherNames.Count
+                        ? otherNames[idx].idx
+                        : firstIdx + idx
+                });
+
         Logger.LogInformation(
             "Producer other names import batch processed. JobId: {JobId}, " +
             "BatchStartRow: {BatchStartRow}, BatchSize: {BatchSize}, " +
@@ -115,10 +123,10 @@ public class ProducerOtherNamesImportLrt(
             result.Created,
             result.Skipped,
             result.Errors.Count);
-        
+
         otherNames.Clear();
     }
-    
+
     public record ProducerOtherNameCsvDto
     {
         [Name("OriginalName", "Name")]
@@ -126,7 +134,7 @@ public class ProducerOtherNamesImportLrt(
 
         [Name("OtherName", "Alias")]
         public required string OtherName { get; init; }
-        
+
         [Name("WhereUsed", "WhereUsed")]
         [Optional]
         public string? WhereUsed { get; init; }

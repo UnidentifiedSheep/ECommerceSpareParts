@@ -8,11 +8,14 @@ namespace Main.Entities.Producer;
 
 public class Producer : AuditableEntity<Producer, int>, ILinqEntity<Producer, int>
 {
-    private Producer()
-    {
-    }
+    private readonly List<ProducerOtherName> _otherNames = [];
 
-    private Producer(string name, string? description = null, string? imagePath = null)
+    private Producer() { }
+
+    private Producer(
+        string name,
+        string? description = null,
+        string? imagePath = null)
     {
         SetName(name);
         SetImagePath(imagePath);
@@ -28,23 +31,21 @@ public class Producer : AuditableEntity<Producer, int>, ILinqEntity<Producer, in
     public string? ImagePath { get; private set; }
 
     public string? Description { get; private set; }
-
-    private readonly List<ProducerOtherName> _otherNames = [];
     public IReadOnlyCollection<ProducerOtherName> OtherNames => _otherNames;
 
-    public static Expression<Func<Producer, int>> GetKeySelector()
-    {
-        return x => x.Id;
-    }
+    public static Expression<Func<Producer, int>> GetKeySelector() { return x => x.Id; }
 
-    public static Expression<Func<Producer, bool>> GetEqualityExpression(int key)
-    {
-        return x => x.Id == key;
-    }
+    public static Expression<Func<Producer, bool>> GetEqualityExpression(int key) { return x => x.Id == key; }
 
-    public static Producer Create(string name, string? description = null, string? imagePath = null)
+    public static Producer Create(
+        string name,
+        string? description = null,
+        string? imagePath = null)
     {
-        return new Producer(name, description, imagePath);
+        return new Producer(
+            name,
+            description,
+            imagePath);
     }
 
     public void SetImagePath(string? imagePath)
@@ -74,13 +75,7 @@ public class Producer : AuditableEntity<Producer, int>, ILinqEntity<Producer, in
         Name = ToNormalizedName(value);
     }
 
-    public static string ToNormalizedName(string value)
-    {
-        return value.Trim().ToUpperInvariant();
-    }
+    public static string ToNormalizedName(string value) { return value.Trim().ToUpperInvariant(); }
 
-    public override int GetId()
-    {
-        return Id;
-    }
+    public override int GetId() { return Id; }
 }

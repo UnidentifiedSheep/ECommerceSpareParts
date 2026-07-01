@@ -19,15 +19,17 @@ public static class ProductContentEndPoints
 {
     public static RouteGroupBuilder MapProductContentEndPoints(this RouteGroupBuilder products)
     {
-        products.MapGet("/{productId:int}/contents", async (
-                ISender sender,
-                int productId,
-                CancellationToken token) =>
-            {
-                var result = await sender.Send(new GetProductContentsQuery(productId), token);
-                var response = new GetProductContentResponse(result.Contents);
-                return Results.Ok(response);
-            })
+        products.MapGet(
+                "/{productId:int}/contents",
+                async (
+                    ISender sender,
+                    int productId,
+                    CancellationToken token) =>
+                {
+                    var result = await sender.Send(new GetProductContentsQuery(productId), token);
+                    var response = new GetProductContentResponse(result.Contents);
+                    return Results.Ok(response);
+                })
             .WithName("GetProductContent")
             .WithDescription("Получить содержимое артикула по id.")
             .Produces<GetProductContentResponse>()
@@ -35,16 +37,18 @@ public static class ProductContentEndPoints
             .ProducesProblem(StatusCodes.Status404NotFound)
             .WithSummary("Получить содержимое продукта");
 
-        products.MapPost("/{productId:int}/contents", async (
-                ISender sender,
-                int productId,
-                AddProductContentRequest request,
-                CancellationToken cancellationToken) =>
-            {
-                var command = new AddProductContentCommand(productId, request.Content);
-                await sender.Send(command, cancellationToken);
-                return Results.NoContent();
-            })
+        products.MapPost(
+                "/{productId:int}/contents",
+                async (
+                    ISender sender,
+                    int productId,
+                    AddProductContentRequest request,
+                    CancellationToken cancellationToken) =>
+                {
+                    var command = new AddProductContentCommand(productId, request.Content);
+                    await sender.Send(command, cancellationToken);
+                    return Results.NoContent();
+                })
             .WithName("AddProductContent")
             .WithSummary("Добавить содержимое продукта")
             .WithDescription("Добавление содержимого артикула")
@@ -55,16 +59,18 @@ public static class ProductContentEndPoints
             .ProducesProblem(StatusCodes.Status404NotFound)
             .RequireAnyPermission(PermissionCodes.ARTICLE_CONTENT_CREATE);
 
-        products.MapDelete("/{productId:int}/contents/{childProductId:int}", async (
-                ISender sender,
-                int productId,
-                int childProductId,
-                CancellationToken token) =>
-            {
-                var command = new RemoveProductContentCommand(productId, childProductId);
-                await sender.Send(command, token);
-                return Results.NoContent();
-            })
+        products.MapDelete(
+                "/{productId:int}/contents/{childProductId:int}",
+                async (
+                    ISender sender,
+                    int productId,
+                    int childProductId,
+                    CancellationToken token) =>
+                {
+                    var command = new RemoveProductContentCommand(productId, childProductId);
+                    await sender.Send(command, token);
+                    return Results.NoContent();
+                })
             .WithName("RemoveProductContent")
             .WithSummary("Удалить содержимое продукта")
             .WithDescription("Удаление содержимого артикула в бд")
@@ -73,17 +79,22 @@ public static class ProductContentEndPoints
             .ProducesProblem(StatusCodes.Status404NotFound)
             .RequireAnyPermission(PermissionCodes.ARTICLE_CONTENT_DELETE);
 
-        products.MapPatch("/{productId:int}/contents/{childProductId:int}", async (
-                ISender sender,
-                int productId,
-                int childProductId,
-                SetProductsContentCountRequest request,
-                CancellationToken token) =>
-            {
-                var command = new SetProductsContentCountCommand(productId, childProductId, request.Count);
-                await sender.Send(command, token);
-                return Results.NoContent();
-            })
+        products.MapPatch(
+                "/{productId:int}/contents/{childProductId:int}",
+                async (
+                    ISender sender,
+                    int productId,
+                    int childProductId,
+                    SetProductsContentCountRequest request,
+                    CancellationToken token) =>
+                {
+                    var command = new SetProductsContentCountCommand(
+                        productId,
+                        childProductId,
+                        request.Count);
+                    await sender.Send(command, token);
+                    return Results.NoContent();
+                })
             .WithName("SetProductContentCount")
             .WithSummary("Изменить количество содержимого продукта")
             .Accepts<SetProductsContentCountRequest>(false, "application/json")

@@ -8,7 +8,7 @@ public class DatabaseOptions
 
     [Required]
     public required string Host { get; init; }
-    
+
     public int? Port { get; init; }
 
     [Required]
@@ -20,6 +20,6 @@ public class DatabaseOptions
     [Required]
     public required string Password { get; init; }
 
-    public string ConnectionString => 
+    public string ConnectionString =>
         $"Host={Host};{(Port is null ? "" : $"Port={Port};")}Database={Database};Username={Username};Password={Password}";
 }

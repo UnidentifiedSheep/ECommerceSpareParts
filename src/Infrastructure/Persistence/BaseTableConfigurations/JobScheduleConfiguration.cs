@@ -49,15 +49,15 @@ public class JobScheduleConfiguration : IEntityTypeConfiguration<JobSchedule>
             .HasColumnName("next_run_at");
 
         builder.HasIndex(
-            e => e.Name, 
+            e => e.Name,
             "job_schedules_name_idx");
         builder.HasIndex(
-            e => e.JobSystemName, 
+            e => e.JobSystemName,
             "job_schedules_job_system_name_idx");
         builder.HasIndex(
-            e => new { e.Enabled, e.NextRunAt, e.Id }, 
+            e => new { e.Enabled, e.NextRunAt, e.Id },
             "job_schedules_enabled_next_run_at_id_idx");
-        
+
         builder.Navigation(e => e.Runs)
             .HasField("_runs")
             .UsePropertyAccessMode(PropertyAccessMode.Field);

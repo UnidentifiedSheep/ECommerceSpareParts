@@ -1,5 +1,4 @@
-﻿using Abstractions.Interfaces.Services;
-using Analytics.Persistence.Context;
+﻿using Analytics.Persistence.Context;
 using Domain;
 using Persistence.Interfaces;
 using Persistence.Repository;

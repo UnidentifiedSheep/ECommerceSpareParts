@@ -6,10 +6,7 @@ namespace Application.Common.Backplane;
 
 public class MassTransitBackplane(IBus bus, IBackplaneDispatcher dispatcher) : IFusionCacheBackplane
 {
-    public void Subscribe(BackplaneSubscriptionOptions options)
-    {
-        dispatcher.Subscribe(options);
-    }
+    public void Subscribe(BackplaneSubscriptionOptions options) { dispatcher.Subscribe(options); }
 
     public ValueTask SubscribeAsync(BackplaneSubscriptionOptions options)
     {
@@ -17,10 +14,7 @@ public class MassTransitBackplane(IBus bus, IBackplaneDispatcher dispatcher) : I
         return ValueTask.CompletedTask;
     }
 
-    public void Unsubscribe()
-    {
-        dispatcher.Unsubscribe();
-    }
+    public void Unsubscribe() { dispatcher.Unsubscribe(); }
 
     public ValueTask UnsubscribeAsync()
     {
@@ -41,6 +35,11 @@ public class MassTransitBackplane(IBus bus, IBackplaneDispatcher dispatcher) : I
         FusionCacheEntryOptions options,
         CancellationToken token = new())
     {
-        _ = Task.Run(async () => await PublishAsync(message, options, token), token);
+        _ = Task.Run(
+            async () => await PublishAsync(
+                message,
+                options,
+                token),
+            token);
     }
 }

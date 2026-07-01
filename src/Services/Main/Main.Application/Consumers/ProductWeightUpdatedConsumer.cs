@@ -8,7 +8,8 @@ namespace Main.Application.Consumers;
 
 public class ProductWeightUpdatedConsumer(
     IFusionCache fusionCache,
-    ICachePolicy<GetProductWeightQuery> cachePolicy) : IConsumer<ProductWeightUpdatedEvent>
+    ICachePolicy<GetProductWeightQuery> cachePolicy
+) : IConsumer<ProductWeightUpdatedEvent>
 {
     public async Task Consume(ConsumeContext<ProductWeightUpdatedEvent> context)
     {

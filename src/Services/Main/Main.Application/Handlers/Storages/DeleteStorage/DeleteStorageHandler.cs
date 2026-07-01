@@ -1,5 +1,4 @@
 using Abstractions.Interfaces.Persistence;
-using Abstractions.Interfaces.Services;
 using Application.Common.Interfaces.Cqrs;
 using Application.Common.Interfaces.Repositories;
 using Attributes;
@@ -15,7 +14,8 @@ public record DeleteStorageCommand(string StorageName) : ICommand;
 
 public class DeleteStorageHandler(
     IRepository<Storage, string> repository,
-    IUnitOfWork unitOfWork)
+    IUnitOfWork unitOfWork
+)
     : ICommandHandler<DeleteStorageCommand>
 {
     public async Task<Unit> Handle(DeleteStorageCommand request, CancellationToken cancellationToken)

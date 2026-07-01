@@ -19,24 +19,24 @@
     </ItemGroup>
 
     <ItemGroup>
-      <Content Include="..\..\Application.Common\Localization\common-localization-en.json">
-        <Link>Localization\common-localization-en.json</Link>
-      </Content>
-      <Content Include="..\..\Application.Common\Localization\common-localization-ru.json">
-        <Link>Localization\common-localization-ru.json</Link>
-      </Content>
-      <Content Include="..\..\Application.Common\Localization\common-localization-tr.json">
-        <Link>Localization\common-localization-tr.json</Link>
-      </Content>
-      <Content Include="..\..\Application.Common\Localization\json-property-names-localization-en.json">
-        <Link>Localization\json-property-names-localization-en.json</Link>
-      </Content>
-      <Content Include="..\..\Application.Common\Localization\json-property-names-localization-ru.json">
-        <Link>Localization\json-property-names-localization-ru.json</Link>
-      </Content>
-      <Content Include="..\..\Application.Common\Localization\json-property-names-localization-tr.json">
-        <Link>Localization\json-property-names-localization-tr.json</Link>
-      </Content>
+        <Content Include="..\..\Application.Common\Localization\common-localization-en.json">
+            <Link>Localization\common-localization-en.json</Link>
+        </Content>
+        <Content Include="..\..\Application.Common\Localization\common-localization-ru.json">
+            <Link>Localization\common-localization-ru.json</Link>
+        </Content>
+        <Content Include="..\..\Application.Common\Localization\common-localization-tr.json">
+            <Link>Localization\common-localization-tr.json</Link>
+        </Content>
+        <Content Include="..\..\Application.Common\Localization\json-property-names-localization-en.json">
+            <Link>Localization\json-property-names-localization-en.json</Link>
+        </Content>
+        <Content Include="..\..\Application.Common\Localization\json-property-names-localization-ru.json">
+            <Link>Localization\json-property-names-localization-ru.json</Link>
+        </Content>
+        <Content Include="..\..\Application.Common\Localization\json-property-names-localization-tr.json">
+            <Link>Localization\json-property-names-localization-tr.json</Link>
+        </Content>
     </ItemGroup>
 
 </Project>

@@ -34,8 +34,7 @@ public abstract class TestBase : IAsyncLifetime, ITest
 
     private void RegisterBasicContext(Type type)
     {
-        if (_basicContexts.Contains(type))
-            return;
+        if (_basicContexts.Contains(type)) return;
 
         if (!_registeringContexts.Add(type))
             throw new InvalidOperationException(
@@ -61,10 +60,7 @@ public abstract class TestBase : IAsyncLifetime, ITest
 
             _basicContexts.Add(type);
         }
-        finally
-        {
-            _registeringContexts.Remove(type);
-        }
+        finally { _registeringContexts.Remove(type); }
     }
 
     public static void RegisterGlobalBasicContext<TContext>() where TContext : class, ITestContext
@@ -79,8 +75,7 @@ public abstract class TestBase : IAsyncLifetime, ITest
 
     protected T GetContext<T>() where T : class, ITestContext
     {
-        if (_initedBasicContexts.TryGetValue(typeof(T), out var ctx))
-            return (T)ctx;
+        if (_initedBasicContexts.TryGetValue(typeof(T), out var ctx)) return (T)ctx;
         throw new InvalidOperationException($"No context found for {typeof(T).Name}. Try register it first");
     }
 

@@ -7,10 +7,15 @@ using MediatR;
 namespace Main.Application.Handlers.Cart.ChangeCartItemCount;
 
 [Transactional]
-public record ChangeCartItemCountCommand(Guid UserId, int ProductId, int NewCount) : ICommand;
+public record ChangeCartItemCountCommand(
+    Guid UserId,
+    int ProductId,
+    int NewCount
+) : ICommand;
 
 public class ChangeCartItemCountHandler(
-    IRepository<Entities.Cart.Cart, (Guid, int)> repository)
+    IRepository<Entities.Cart.Cart, (Guid, int)> repository
+)
     : ICommandHandler<ChangeCartItemCountCommand>
 {
     public async Task<Unit> Handle(ChangeCartItemCountCommand request, CancellationToken cancellationToken)

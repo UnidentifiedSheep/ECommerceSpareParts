@@ -22,19 +22,28 @@ public class AddStorageRouteValidation : AbstractValidator<AddStorageRouteComman
         RuleFor(x => x.PriceKg)
             .GreaterThanOrEqualTo(0)
             .WithLocalizationKey("storage.route.price.kg.min")
-            .PrecisionScale(18, 2, true)
+            .PrecisionScale(
+                18,
+                2,
+                true)
             .WithLocalizationKey("storage.route.price.kg.precision");
 
         RuleFor(x => x.PriceM3)
             .GreaterThanOrEqualTo(0)
             .WithLocalizationKey("storage.route.price.m3.min")
-            .PrecisionScale(18, 2, true)
+            .PrecisionScale(
+                18,
+                2,
+                true)
             .WithLocalizationKey("storage.route.price.m3.precision");
 
         RuleFor(x => x.PricePerOrder)
             .GreaterThanOrEqualTo(0)
             .WithLocalizationKey("storage.route.price.order.min")
-            .PrecisionScale(18, 2, true)
+            .PrecisionScale(
+                18,
+                2,
+                true)
             .WithLocalizationKey("storage.route.price.order.precision");
     }
 }

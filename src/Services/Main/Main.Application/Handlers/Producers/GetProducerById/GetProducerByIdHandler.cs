@@ -14,7 +14,9 @@ public record GetProducerByIdResult(ProducerDto Producer);
 public class GetProducerByIdHandler(IReadRepository<Producer, int> repository)
     : IQueryHandler<GetProducerByIdQuery, GetProducerByIdResult>
 {
-    public async Task<GetProducerByIdResult> Handle(GetProducerByIdQuery request, CancellationToken cancellationToken)
+    public async Task<GetProducerByIdResult> Handle(
+        GetProducerByIdQuery request,
+        CancellationToken cancellationToken)
     {
         var producer = await repository.Query
                            .Select(x => new ProducerDto
@@ -22,7 +24,8 @@ public class GetProducerByIdHandler(IReadRepository<Producer, int> repository)
                                Id = x.Id,
                                Description = x.Description,
                                Name = x.Name
-                           }).FirstOrDefaultAsync(x => x.Id == request.Id, cancellationToken)
+                           })
+                           .FirstOrDefaultAsync(x => x.Id == request.Id, cancellationToken)
                        ?? throw new ProducerNotFoundException(request.Id);
         return new GetProducerByIdResult(producer);
     }

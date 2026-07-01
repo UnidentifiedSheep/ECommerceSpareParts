@@ -6,12 +6,16 @@ using Application.Common.NamedObject;
 namespace Application.Common.Handlers.Settings;
 
 public record GetRawSettingQuery(string SystemName) : IQuery<GetRawSettingResult>;
+
 public record GetRawSettingResult(string Value);
 
 public class GetRawSettingHandler(
-    INamedObjectRegistry<SettingDefinitionNamedObjectBase> registry) : IQueryHandler<GetRawSettingQuery, GetRawSettingResult>
+    INamedObjectRegistry<SettingDefinitionNamedObjectBase> registry
+) : IQueryHandler<GetRawSettingQuery, GetRawSettingResult>
 {
-    public async Task<GetRawSettingResult> Handle(GetRawSettingQuery request, CancellationToken cancellationToken)
+    public async Task<GetRawSettingResult> Handle(
+        GetRawSettingQuery request,
+        CancellationToken cancellationToken)
     {
         var settingDefinition = registry.TryGetBySystemName(request.SystemName)
                                 ?? throw new SettingNotFound(request.SystemName);

@@ -15,7 +15,8 @@ public record GetUserFullInfoResponse(
     IReadOnlyList<UserEmailDto> Emails,
     IReadOnlyList<UserPhoneDto> Phones,
     IReadOnlyList<string> Roles,
-    IReadOnlyList<string> Permissions);
+    IReadOnlyList<string> Permissions
+);
 
 public record EditUserInfoRequest
 {
@@ -33,16 +34,22 @@ public static class UserInfoEndPoints
 {
     public static RouteGroupBuilder MapUserInfoEndPoints(this RouteGroupBuilder users)
     {
-        users.MapGet("/{id:guid}/info", async (ISender sender, Guid id, CancellationToken token) =>
-            {
-                var result = await sender.Send(new GetUserFullInfoQuery(id), token);
-                return Results.Ok(new GetUserFullInfoResponse(
-                    result.User,
-                    result.Emails,
-                    result.Phones,
-                    result.Roles,
-                    result.Permissions));
-            })
+        users.MapGet(
+                "/{id:guid}/info",
+                async (
+                    ISender sender,
+                    Guid id,
+                    CancellationToken token) =>
+                {
+                    var result = await sender.Send(new GetUserFullInfoQuery(id), token);
+                    return Results.Ok(
+                        new GetUserFullInfoResponse(
+                            result.User,
+                            result.Emails,
+                            result.Phones,
+                            result.Roles,
+                            result.Permissions));
+                })
             .WithName("GetUserFullInfo")
             .WithSummary("Получить полную информацию пользователя")
             .WithDescription("Получение информации пользователя")
@@ -50,19 +57,22 @@ public static class UserInfoEndPoints
             .Produces<GetUserFullInfoResponse>()
             .ProducesProblem(StatusCodes.Status404NotFound)
             .RequireAnyPermission(PermissionCodes.USERS_INFO_GET);
-        
-        users.MapPut("/{id:guid}/info", async (
-                ISender sender, 
-                Guid id, 
-                EditUserInfoRequest request,
-                CancellationToken token) =>
-            {
-                var result = await sender.Send(new EditUserInfoCommand(id, request.UserInfo), token);
-                return Results.Ok(new EditUserInfoResponse
+
+        users.MapPut(
+                "/{id:guid}/info",
+                async (
+                    ISender sender,
+                    Guid id,
+                    EditUserInfoRequest request,
+                    CancellationToken token) =>
                 {
-                    UserInfo = result.UserInfo
-                });
-            })
+                    var result = await sender.Send(new EditUserInfoCommand(id, request.UserInfo), token);
+                    return Results.Ok(
+                        new EditUserInfoResponse
+                        {
+                            UserInfo = result.UserInfo
+                        });
+                })
             .WithName("EditUserInfo")
             .WithSummary("Редактирование информации пользователя")
             .WithDescription("Редактирование информации пользователя")

@@ -9,11 +9,20 @@ public class RootClient(
     IOptionsMonitor<InternalServicesOptions> serviceOptions,
     IOptionsMonitor<InternalServiceCredentials> credentialsMonitor,
     IAuthClient authClient,
-    HttpClient httpClient) : ICommonClient
+    HttpClient httpClient
+) : ICommonClient
 {
-    public IJobNode JobNode { get; } 
-        = new JobNode(httpClient, authClient, serviceOptions, credentialsMonitor);
+    public IJobNode JobNode { get; }
+        = new JobNode(
+            httpClient,
+            authClient,
+            serviceOptions,
+            credentialsMonitor);
 
-    public ISettingNode SettingNode { get; } 
-        = new SettingNode(httpClient, authClient, serviceOptions, credentialsMonitor);
+    public ISettingNode SettingNode { get; }
+        = new SettingNode(
+            httpClient,
+            authClient,
+            serviceOptions,
+            credentialsMonitor);
 }

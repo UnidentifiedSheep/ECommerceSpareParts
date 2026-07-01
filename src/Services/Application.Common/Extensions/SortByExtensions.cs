@@ -1,5 +1,4 @@
 ﻿using Abstractions;
-using Abstractions.Models.SortyBy;
 using Application.Common.Interfaces.Repositories;
 
 namespace Application.Common.Extensions;
@@ -11,7 +10,7 @@ public static class SortByExtensions
         string? sortParam)
     {
         var sort = QueryableSortBy.ParseToKeySelector<TEntity>(sortParam);
-        
+
         return sort.Desc
             ? query.OrderByDescending(sort.KeySelector)
             : query.OrderBy(sort.KeySelector);

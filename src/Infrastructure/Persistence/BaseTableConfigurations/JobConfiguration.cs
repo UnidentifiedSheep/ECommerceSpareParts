@@ -16,14 +16,14 @@ public class JobConfiguration : IEntityTypeConfiguration<Job>
         builder.Property(e => e.Id)
             .HasColumnName("id")
             .ValueGeneratedOnAdd();
-        
+
         builder.Property(e => e.Status)
             .HasColumnName("status")
             .HasConversion<string>();
-        
+
         builder.Property(e => e.Attempts)
             .HasColumnName("attempts");
-        
+
         builder.Property(e => e.MaxAttempts)
             .HasColumnName("max_attempts");
 
@@ -36,7 +36,7 @@ public class JobConfiguration : IEntityTypeConfiguration<Job>
 
         builder.Property(e => e.LockedAt)
             .HasColumnName("locked_at");
-        
+
         builder.Property(e => e.State)
             .HasColumnName("state");
 

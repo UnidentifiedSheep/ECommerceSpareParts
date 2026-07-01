@@ -11,6 +11,5 @@ public class RemoveEmailFronUserValidation : AbstractValidator<RemoveEmailFromUs
     {
         RuleFor(x => x.Email)
             .SetValidator(new EmailValidator(emailValidator));
-
     }
 }

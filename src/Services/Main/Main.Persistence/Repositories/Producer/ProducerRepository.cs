@@ -1,11 +1,8 @@
-using Abstractions.Interfaces.Services;
 using EFCore.BulkExtensions;
 using Main.Application.Interfaces.Persistence;
 using Main.Persistence.Context;
 using Microsoft.EntityFrameworkCore;
-using Persistence.Interfaces;
 using Persistence.Repository;
-
 using QueryExtensions = Persistence.Interfaces.IQueryableExtensions;
 
 namespace Main.Persistence.Repositories.Producer;
@@ -26,8 +23,7 @@ public class ProducerRepository(DContext context, QueryExtensions extensions)
     {
         var producerList = producers.ToList();
 
-        if (producerList.Count == 0)
-            return;
+        if (producerList.Count == 0) return;
 
         await Context.BulkInsertAsync(
             producerList,

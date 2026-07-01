@@ -5,7 +5,8 @@ using MassTransit;
 namespace Main.Application.Consumers;
 
 public class ProductLinkageUpdatedConsumer(
-    IProductCacheRepository productCache) : IConsumer<ProductLinkageUpdatedEvent>
+    IProductCacheRepository productCache
+) : IConsumer<ProductLinkageUpdatedEvent>
 {
     public async Task Consume(ConsumeContext<ProductLinkageUpdatedEvent> context)
     {

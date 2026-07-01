@@ -7,12 +7,13 @@ namespace Main.Application.Models;
 public record JwtOptions
 {
     public const string SectionName = "JwtBearer";
+
     [Required]
     public required TimeSpan ValidDuration { get; set; }
-    
+
     [Required]
     public required string ValidIssuer { get; set; }
-    
+
     [Required]
     public required string IssuerSigningKey { get; set; }
 

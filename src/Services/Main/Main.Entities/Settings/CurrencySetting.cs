@@ -8,13 +8,9 @@ namespace Main.Entities.Settings;
 
 public class CurrencySetting : Setting<CurrencySettingData>, ISetting<CurrencySetting>
 {
-    public CurrencySetting(string json) : base(SettingName, json)
-    {
-    }
+    public CurrencySetting(string json) : base(SettingName, json) { }
 
-    public CurrencySetting(CurrencySettingData data) : base(SettingName, data)
-    {
-    }
+    public CurrencySetting(CurrencySettingData data) : base(SettingName, data) { }
 
     public static string SettingName => "CurrencySetting";
     public static CurrencySetting Default => new(new CurrencySettingData());
@@ -29,7 +25,7 @@ public record CurrencySettingData
     [LocalizedJsonFieldName("currency.setting.base.currency.name")]
     [LocalizedJsonFieldDescription("currency.setting.base.currency.description")]
     public int BaseCurrencyId { get; init; } = 1;
-    
+
     [JsonPropertyName("rateProvider")]
     [RequiredJsonField]
     [InputControl(InputControlType.EnumSelector)]

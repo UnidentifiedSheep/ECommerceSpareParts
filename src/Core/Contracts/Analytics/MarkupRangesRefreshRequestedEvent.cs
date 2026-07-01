@@ -1,3 +1,3 @@
 namespace Contracts.Analytics;
 
-public record MarkupRangesRefreshRequestedEvent();
+public record MarkupRangesRefreshRequestedEvent;

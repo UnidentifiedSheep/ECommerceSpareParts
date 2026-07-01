@@ -30,12 +30,17 @@ public class RolePermissionSeed : ISeed<DContext>
 
         foreach (var role in roles)
         {
-            if (!Enum.TryParse(role.Name, ignoreCase: true, out Role parsedRole))
+            if (!Enum.TryParse(
+                    role.Name,
+                    true,
+                    out Role parsedRole))
                 continue;
-            if (!rolePermissions.TryGetValue(parsedRole, out var needed))
-                continue;
+            if (!rolePermissions.TryGetValue(parsedRole, out var needed)) continue;
 
-            var permissionsToAdd = ResolvePermissions(role.Name, needed, permissions)
+            var permissionsToAdd = ResolvePermissions(
+                    role.Name,
+                    needed,
+                    permissions)
                 .Where(x => existingRolePermissions.Add(x.GetId()))
                 .ToList();
 
@@ -48,10 +53,7 @@ public class RolePermissionSeed : ISeed<DContext>
         await context.SaveChangesAsync();
     }
 
-    public int GetPriority()
-    {
-        return 1;
-    }
+    public int GetPriority() { return 1; }
 
     private static IReadOnlyDictionary<Role, PermissionCodes[]> BuildRolePermissions()
     {
@@ -251,7 +253,7 @@ public class RolePermissionSeed : ISeed<DContext>
             ],
 
             [Role.Supplier] = [],
-            
+
             [Role.System] =
             [
                 PermissionCodes.STORAGES_CONTENT_GET_ALL,

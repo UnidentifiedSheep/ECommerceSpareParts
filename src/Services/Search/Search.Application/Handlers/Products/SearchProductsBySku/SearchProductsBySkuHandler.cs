@@ -1,7 +1,6 @@
 ﻿using Abstractions.Models;
 using Application.Common.Interfaces.Cqrs;
 using Search.Application.Dtos.Products;
-using Search.Application.Interfaces;
 using Search.Application.Interfaces.Product;
 using Search.Application.Mapping;
 
@@ -11,14 +10,18 @@ public record SearchProductsBySkuQuery(
     string Sku,
     int? ProducerId,
     Pagination Pagination,
-    string? SortBy) : IQuery<SearchProductsBySkuResult>;
+    string? SortBy
+) : IQuery<SearchProductsBySkuResult>;
+
 public record SearchProductsBySkuResult(IEnumerable<ProductDto> Products);
 
 public class SearchProductsBySkuHandler(
     IProductRepository productRepository
-    ) : IQueryHandler<SearchProductsBySkuQuery, SearchProductsBySkuResult>
+) : IQueryHandler<SearchProductsBySkuQuery, SearchProductsBySkuResult>
 {
-    public async Task<SearchProductsBySkuResult> Handle(SearchProductsBySkuQuery request, CancellationToken cancellationToken)
+    public async Task<SearchProductsBySkuResult> Handle(
+        SearchProductsBySkuQuery request,
+        CancellationToken cancellationToken)
     {
         var result = await productRepository.SearchBySku(
             request.Sku,
@@ -26,7 +29,7 @@ public class SearchProductsBySkuHandler(
             request.Pagination,
             request.SortBy,
             cancellationToken);
-        
+
         return new SearchProductsBySkuResult(
             result.Select(x => x.ToProductDto()));
     }

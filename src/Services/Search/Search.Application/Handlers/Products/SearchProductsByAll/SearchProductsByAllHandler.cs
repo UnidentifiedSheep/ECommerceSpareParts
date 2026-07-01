@@ -3,7 +3,6 @@ using Application.Common.Interfaces.Cqrs;
 using Enums;
 using Extensions;
 using Search.Application.Dtos.Products;
-using Search.Application.Interfaces;
 using Search.Application.Interfaces.Product;
 using Search.Application.Mapping;
 
@@ -17,7 +16,8 @@ public record SearchProductsByAllQuery(
     RangeModel<decimal>? Length = null,
     RangeModel<decimal>? Width = null,
     RangeModel<decimal>? Height = null,
-    DimensionUnit DimensionUnit = DimensionUnit.Meter) : IQuery<SearchProductsByAllResult>;
+    DimensionUnit DimensionUnit = DimensionUnit.Meter
+) : IQuery<SearchProductsByAllResult>;
 
 public record SearchProductsByAllResult(IEnumerable<ProductDto> Products);
 

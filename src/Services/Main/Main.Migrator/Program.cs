@@ -26,7 +26,7 @@ var seedingRequested = false;
 builder.ConfigureServices((context, services) =>
 {
     services.AddDatabaseOptions();
-    
+
     var seedValue = context.Configuration.GetValue<bool?>("Seed");
     seedingRequested = seedValue == true;
 

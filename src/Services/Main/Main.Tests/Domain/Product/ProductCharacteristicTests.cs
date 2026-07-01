@@ -7,22 +7,44 @@ namespace Tests.Domain.Product;
 public class ProductCharacteristicTests
 {
     [Theory]
-    [InlineData(1, "Color", "Red")]
-    [InlineData(2, "Size", "Large")]
-    [InlineData(3, "Weight", "100g")]
-    public void Create_ValidData_Succeeds(int productId, string name, string value)
+    [InlineData(
+        1,
+        "Color",
+        "Red")]
+    [InlineData(
+        2,
+        "Size",
+        "Large")]
+    [InlineData(
+        3,
+        "Weight",
+        "100g")]
+    public void Create_ValidData_Succeeds(
+        int productId,
+        string name,
+        string value)
     {
-        var act = () => ProductCharacteristic.Create(productId, name, value);
+        var act = () => ProductCharacteristic.Create(
+            productId,
+            name,
+            value);
 
         var model = act.Should().NotThrow().Subject;
 
-        Validate(model, productId, name.Trim(), value.Trim());
+        Validate(
+            model,
+            productId,
+            name.Trim(),
+            value.Trim());
     }
 
     [Fact]
     public void Create_EmptyName_Throws_InvalidOperationException()
     {
-        var act = () => ProductCharacteristic.Create(1, "   ", "value");
+        var act = () => ProductCharacteristic.Create(
+            1,
+            "   ",
+            "value");
 
         act.Should().Throw<InvalidOperationException>();
     }
@@ -32,7 +54,10 @@ public class ProductCharacteristicTests
     [InlineData("ab")]
     public void Create_ValueTooShort_Throws(string value)
     {
-        var act = () => ProductCharacteristic.Create(1, "Name", value);
+        var act = () => ProductCharacteristic.Create(
+            1,
+            "Name",
+            value);
 
         act.Should().Throw<InvalidInputException>();
     }
@@ -42,7 +67,10 @@ public class ProductCharacteristicTests
     {
         var longValue = new string('x', 200);
 
-        var act = () => ProductCharacteristic.Create(1, "Name", longValue);
+        var act = () => ProductCharacteristic.Create(
+            1,
+            "Name",
+            longValue);
 
         act.Should().Throw<InvalidInputException>();
     }
@@ -50,7 +78,10 @@ public class ProductCharacteristicTests
     [Fact]
     public void SetName_Valid_Succeeds()
     {
-        var model = ProductCharacteristic.Create(1, "Name", "Value");
+        var model = ProductCharacteristic.Create(
+            1,
+            "Name",
+            "Value");
 
         var act = () => model.SetName("NewName");
 
@@ -62,7 +93,10 @@ public class ProductCharacteristicTests
     [Fact]
     public void SetName_Empty_Throws()
     {
-        var model = ProductCharacteristic.Create(1, "Name", "Value");
+        var model = ProductCharacteristic.Create(
+            1,
+            "Name",
+            "Value");
 
         var act = () => model.SetName("   ");
 
@@ -72,7 +106,10 @@ public class ProductCharacteristicTests
     [Fact]
     public void SetValue_Valid_Succeeds()
     {
-        var model = ProductCharacteristic.Create(1, "Name", "Value");
+        var model = ProductCharacteristic.Create(
+            1,
+            "Name",
+            "Value");
 
         var act = () => model.SetValue("NewValue");
 
@@ -85,7 +122,10 @@ public class ProductCharacteristicTests
     [InlineData("ab")]
     public void SetValue_TooShort_Throws(string value)
     {
-        var model = ProductCharacteristic.Create(1, "Name", "Value");
+        var model = ProductCharacteristic.Create(
+            1,
+            "Name",
+            "Value");
 
         var act = () => model.SetValue(value);
 

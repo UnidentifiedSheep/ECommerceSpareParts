@@ -14,41 +14,44 @@ namespace Favorit.Integrations.Client;
 public class FavoritPartsSupplier(
     IFavoritPartsClient client,
     ISupplierSettingsProvider<FavoriteSettings> settingsProvider
-    ) : ISupplier
+) : ISupplier
 {
     public Supplier Supplier => Supplier.FavoritParts;
-    
+
     public async Task<Response<IReadOnlyList<SupplierProduct>>> GetProductsAsync(
-        GetProductsRequest request, 
+        GetProductsRequest request,
         CancellationToken cancellationToken = default)
     {
         var result = await client.GetPricesAsync(
-            AdaptRequest(request), 
+            AdaptRequest(request),
             cancellationToken);
 
-        if (!result.Success) 
+        if (!result.Success)
             Response<IReadOnlyList<SupplierProduct>>.Fail(
-                result.StatusCode ?? HttpStatusCode.InternalServerError, 
+                result.StatusCode ?? HttpStatusCode.InternalServerError,
                 result.Error);
-        
+
         var settings = await settingsProvider.GetSettingsAsync(cancellationToken);
         return Response<IReadOnlyList<SupplierProduct>>.Ok(
             AdaptResponse(result.ValueOrThrow, settings));
     }
 
     private static GetPricesRequest AdaptRequest(GetProductsRequest request)
-        => new()
+    {
+        return new GetPricesRequest
         {
             Brand = request.Brand,
             Number = request.Number,
             ShowAnalogues = request.ShowAnalogues,
             ShowIsRefundable = true
         };
+    }
 
     private static List<SupplierProduct> AdaptResponse(
         GetPricesResponse response,
         FavoriteSettings settings)
-        => response.Goods
+    {
+        return response.Goods
             .Select(good => new SupplierProduct
             {
                 Brand = good.Brand,
@@ -77,4 +80,5 @@ public class FavoritPartsSupplier(
                     .ToList()
             })
             .ToList();
+    }
 }

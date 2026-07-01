@@ -6,7 +6,7 @@ public record MarkupRangeDto
 {
     [JsonPropertyName("id")]
     public required int Id { get; init; }
-    
+
     [JsonPropertyName("rangeStart")]
     public required decimal RangeStart { get; init; }
 

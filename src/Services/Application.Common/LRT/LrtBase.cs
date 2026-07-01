@@ -7,7 +7,6 @@ using Application.Common.Interfaces.Repositories;
 using Attributes;
 using Contracts.Job;
 using Domain.CommonEntities;
-using Domain.CommonEnums;
 using MassTransit;
 using Microsoft.Extensions.Logging;
 
@@ -17,7 +16,8 @@ public abstract class LrtBase(
     IRepository<Job, Guid> jobRepository,
     IUnitOfWork unitOfWork,
     IPublishEndpoint publisher,
-    ILogger logger) : ILrt, ILrtDescriptor
+    ILogger logger
+) : ILrt, ILrtDescriptor
 {
     protected IUnitOfWork UnitOfWork => unitOfWork;
     protected IRepository<Job, Guid> JobRepository => jobRepository;
@@ -28,7 +28,7 @@ public abstract class LrtBase(
     protected Guid JobId { get; private set; }
     protected bool Initialized { get; private set; }
     protected abstract IServiceDefinition ServiceDefinition { get; }
-    
+
     public async Task ExecuteAsync(
         Guid jobId,
         CancellationToken cancellationToken = default)
@@ -43,7 +43,6 @@ public abstract class LrtBase(
             JobId);
 
         while (true)
-        {
             try
             {
                 if (!Initialized)
@@ -52,14 +51,13 @@ public abstract class LrtBase(
                     await ProcessingJobAsync();
                     Initialized = true;
                 }
-                
+
                 await DoWork();
                 await SucceedJobAsync();
                 logger.LogInformation(
                     "LRT execution completed. JobId: {JobId}",
                     JobId);
                 break;
-                
             }
             catch (OperationCanceledException) when (cancellationToken.IsCancellationRequested)
             {
@@ -99,24 +97,20 @@ public abstract class LrtBase(
                     Job.MaxAttempts);
                 break;
             }
-        }
     }
 
-    protected virtual Task InitJobAsync()
-    {
-        return GetJobAsync();
-    }
+    public abstract Type InputType { get; }
+    public abstract Type StateType { get; }
 
-    protected void Interrupt(string reason)
-    {
-        throw new LrtInterruptedException(reason);
-    }
+    protected virtual Task InitJobAsync() { return GetJobAsync(); }
+
+    protected void Interrupt(string reason) { throw new LrtInterruptedException(reason); }
 
     protected async Task<T?> GetStateAsync<T>()
     {
         await GetJobAsync();
-        return string.IsNullOrWhiteSpace(Job.State) 
-            ? default 
+        return string.IsNullOrWhiteSpace(Job.State)
+            ? default
             : JsonSerializer.Deserialize<T>(Job.State);
     }
 
@@ -137,9 +131,9 @@ public abstract class LrtBase(
     protected async Task GetJobAsync()
     {
         Job = await jobRepository.GetById(JobId, CancellationToken)
-            ?? throw new InvalidOperationException($"Job with id {JobId} not found");
+              ?? throw new InvalidOperationException($"Job with id {JobId} not found");
     }
-    
+
     protected virtual async Task ProcessingJobAsync()
     {
         await unitOfWork.ExecuteWithTransaction(
@@ -207,7 +201,8 @@ public abstract class LrtBase(
                 Job.Cancel();
                 await PublishStatusUpdatedEvent(Job);
                 await unitOfWork.SaveChangesAsync(CancellationToken);
-            }, CancellationToken);
+            },
+            CancellationToken);
     }
 
     protected async Task PublishStatusUpdatedEvent(Job job)
@@ -222,8 +217,6 @@ public abstract class LrtBase(
             conf => conf.SetRoutingKey(ServiceDefinition.ServiceName),
             CancellationToken);
     }
-    
+
     protected abstract Task DoWork();
-    public abstract Type InputType { get; }
-    public abstract Type StateType { get; }
 }

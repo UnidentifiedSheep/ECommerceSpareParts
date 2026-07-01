@@ -31,7 +31,8 @@ public class DeleteOtherNameTests : IntegrationTest
     public async Task DeleteOtherName_InvalidProducerId_ThrowsProducerNotFound()
     {
         var command = new DeleteOtherNameCommand(int.MaxValue, _otherName.OtherName);
-        await Assert.ThrowsAsync<ProducersOtherNameNotFoundException>(async () => await Mediator.Send(command));
+        await Assert.ThrowsAsync<ProducersOtherNameNotFoundException>(async () =>
+            await Mediator.Send(command));
     }
 
     [Fact]
@@ -39,7 +40,8 @@ public class DeleteOtherNameTests : IntegrationTest
     {
         var command =
             new DeleteOtherNameCommand(_otherName.ProducerId, Faker.Lorem.Letter(200));
-        await Assert.ThrowsAsync<ProducersOtherNameNotFoundException>(async () => await Mediator.Send(command));
+        await Assert.ThrowsAsync<ProducersOtherNameNotFoundException>(async () =>
+            await Mediator.Send(command));
     }
 
     [Fact]

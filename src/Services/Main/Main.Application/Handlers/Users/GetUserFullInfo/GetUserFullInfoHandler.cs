@@ -17,14 +17,18 @@ public record GetUserFullInfoResult(
     IReadOnlyList<UserEmailDto> Emails,
     IReadOnlyList<UserPhoneDto> Phones,
     IReadOnlyList<string> Roles,
-    IReadOnlyList<string> Permissions);
+    IReadOnlyList<string> Permissions
+);
 
 public class GetUserFullInfoHandler(
     IReadRepository<User, Guid> repository,
-    IUserCacheRepository userCache)
+    IUserCacheRepository userCache
+)
     : IQueryHandler<GetUserFullInfoQuery, GetUserFullInfoResult>
 {
-    public async Task<GetUserFullInfoResult> Handle(GetUserFullInfoQuery request, CancellationToken cancellationToken)
+    public async Task<GetUserFullInfoResult> Handle(
+        GetUserFullInfoQuery request,
+        CancellationToken cancellationToken)
     {
         var user = await repository.Query
                        .Where(x => x.Id == request.UserId)

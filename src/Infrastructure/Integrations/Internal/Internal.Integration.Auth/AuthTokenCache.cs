@@ -32,8 +32,7 @@ public sealed class AuthTokenCache : IAuthTokenCache
     {
         var key = AuthTokenCacheKey.Create(service, serviceSecret);
 
-        if (_cache.TryGetValue(key, out var cachedToken) && cachedToken.IsValid)
-            return cachedToken.Token;
+        if (_cache.TryGetValue(key, out var cachedToken) && cachedToken.IsValid) return cachedToken.Token;
 
         var semaphore = _locks.GetOrAdd(key, _ => new SemaphoreSlim(1, 1));
 
@@ -41,8 +40,7 @@ public sealed class AuthTokenCache : IAuthTokenCache
 
         try
         {
-            if (_cache.TryGetValue(key, out cachedToken) && cachedToken.IsValid)
-                return cachedToken.Token;
+            if (_cache.TryGetValue(key, out cachedToken) && cachedToken.IsValid) return cachedToken.Token;
 
             var newToken = await tokenFactory(cancellationToken);
 
@@ -56,10 +54,7 @@ public sealed class AuthTokenCache : IAuthTokenCache
 
             return newToken;
         }
-        finally
-        {
-            semaphore.Release();
-        }
+        finally { semaphore.Release(); }
     }
 
     private static DateTime GetExpiresAtUtc(string token)
@@ -71,15 +66,16 @@ public sealed class AuthTokenCache : IAuthTokenCache
 
     private sealed record CachedToken(
         string Token,
-        DateTime ExpiresAtUtc)
+        DateTime ExpiresAtUtc
+    )
     {
-        public bool IsValid =>
-            DateTime.UtcNow < ExpiresAtUtc.Subtract(RefreshBeforeExpiration);
+        public bool IsValid => DateTime.UtcNow < ExpiresAtUtc.Subtract(RefreshBeforeExpiration);
     }
 
     private sealed record AuthTokenCacheKey(
         string Service,
-        string SecretHash)
+        string SecretHash
+    )
     {
         public static AuthTokenCacheKey Create(string service, string secret)
         {

@@ -1,11 +1,7 @@
 using System.Linq.Expressions;
 using LinqKit;
 using Main.Application.Dtos.Balances;
-using Main.Application.Dtos.Users;
-using Main.Application.Extensions;
 using Main.Entities.Balance;
-using Main.Entities.User;
-using Main.Enums;
 
 namespace Main.Application.Projections;
 
@@ -29,7 +25,7 @@ public static class BalanceProjections
         x => new UserBalanceDto
         {
             Balance = x.Balance,
-            Currency = CurrencyProjections.ToDto.Invoke(x.Currency),
+            Currency = CurrencyProjections.ToDto.Invoke(x.Currency)
         };
 
     public static readonly Expression<Func<UserFinancialProfile, UserFinancialProfileDto>>

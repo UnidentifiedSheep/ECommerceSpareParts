@@ -6,7 +6,8 @@ using Microsoft.EntityFrameworkCore.Diagnostics;
 namespace Persistence.Interceptors;
 
 public class AuditableEntitySaveChangesInterceptor(
-    IUserContext userContext) : SaveChangesInterceptor
+    IUserContext userContext
+) : SaveChangesInterceptor
 {
     public override InterceptionResult<int> SavingChanges(
         DbContextEventData eventData,
@@ -22,7 +23,10 @@ public class AuditableEntitySaveChangesInterceptor(
         CancellationToken cancellationToken = default)
     {
         await UpdateAuditFields(eventData.Context, cancellationToken);
-        return await base.SavingChangesAsync(eventData, result, cancellationToken);
+        return await base.SavingChangesAsync(
+            eventData,
+            result,
+            cancellationToken);
     }
 
     private async Task UpdateAuditFields(DbContext? context, CancellationToken cancellationToken = default)
@@ -35,8 +39,7 @@ public class AuditableEntitySaveChangesInterceptor(
 
         foreach (var entry in modified)
         {
-            if (entry.State == EntityState.Added)
-                entry.Entity.SetCreatedUser(userContext.UserIdOrNull);
+            if (entry.State == EntityState.Added) entry.Entity.SetCreatedUser(userContext.UserIdOrNull);
             entry.Entity.Touch(userContext.UserIdOrNull);
         }
     }

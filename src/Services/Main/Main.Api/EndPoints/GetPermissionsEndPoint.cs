@@ -1,5 +1,4 @@
 ﻿using Api.Common.Extensions;
-using Api.Common.Models.Requests;
 using Carter;
 using Enums;
 using Main.Application.Dtos.Auth;
@@ -14,15 +13,18 @@ public class GetPermissionsEndPoint : ICarterModule
 {
     public void AddRoutes(IEndpointRouteBuilder app)
     {
-        app.MapGet("/permissions/", async (
-                ISender sender,
-                CancellationToken ct) =>
-            {
-                var query = new GetPermissionsQuery();
-                var result = await sender.Send(query, ct);
-                var response = new GetPermissionsResponse(result.Permissions);
-                return Results.Ok(response);
-            }).WithTags("Permissions")
+        app.MapGet(
+                "/permissions/",
+                async (
+                    ISender sender,
+                    CancellationToken ct) =>
+                {
+                    var query = new GetPermissionsQuery();
+                    var result = await sender.Send(query, ct);
+                    var response = new GetPermissionsResponse(result.Permissions);
+                    return Results.Ok(response);
+                })
+            .WithTags("Permissions")
             .WithName("GetPermissions")
             .WithSummary("Получить разрешения")
             .WithDescription("Получение разрешений")

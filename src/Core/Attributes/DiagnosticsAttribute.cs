@@ -3,9 +3,6 @@
 [AttributeUsage(AttributeTargets.Class)]
 public class DiagnosticsAttribute : Attribute
 {
-    public bool Enabled { get; }
-    public long MaxExecutionTimeMs { get; }
-    
     public DiagnosticsAttribute(
         bool enabled = true,
         long maxExecutionTimeMs = 3000)
@@ -13,4 +10,7 @@ public class DiagnosticsAttribute : Attribute
         Enabled = enabled;
         MaxExecutionTimeMs = maxExecutionTimeMs;
     }
+
+    public bool Enabled { get; }
+    public long MaxExecutionTimeMs { get; }
 }

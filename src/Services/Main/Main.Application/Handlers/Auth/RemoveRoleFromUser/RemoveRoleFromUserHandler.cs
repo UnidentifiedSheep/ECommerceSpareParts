@@ -11,13 +11,15 @@ using MediatR;
 namespace Main.Application.Handlers.Auth.RemoveRoleFromUser;
 
 [Diagnostics(maxExecutionTimeMs: 150)]
-[Transactional, AutoSave]
+[Transactional]
+[AutoSave]
 public record RemoveRoleFromUserCommand(Guid UserId, string RoleName) : ICommand;
 
 public class RemoveRoleFromUserHandler(
     IRepository<UserRole, (Guid, string)> repository,
     IUnitOfWork unitOfWork,
-    IIntegrationEventScope integrationEventScope) : ICommandHandler<RemoveRoleFromUserCommand>
+    IIntegrationEventScope integrationEventScope
+) : ICommandHandler<RemoveRoleFromUserCommand>
 {
     public async Task<Unit> Handle(
         RemoveRoleFromUserCommand request,
@@ -28,10 +30,11 @@ public class RemoveRoleFromUserHandler(
 
         unitOfWork.Remove(userRole);
 
-        integrationEventScope.Add(new UserUpdatedEvent
-        {
-            UserId = request.UserId
-        });
+        integrationEventScope.Add(
+            new UserUpdatedEvent
+            {
+                UserId = request.UserId
+            });
 
         return Unit.Value;
     }

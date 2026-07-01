@@ -6,14 +6,13 @@ namespace Tests.DataBuilders.Sale;
 
 public class SaleBuilder(Faker faker) : BuilderBase<Main.Entities.Sale.Sale>(faker)
 {
+    private readonly List<SaleContent> _contents = [];
     public Guid? BuyerId { get; private set; }
     public Guid? TransactionId { get; private set; }
     public int? CurrencyId { get; private set; }
     public string? StorageName { get; private set; }
     public DateTime? SaleDate { get; private set; }
     public bool CompleteSale { get; private set; }
-
-    private readonly List<SaleContent> _contents = [];
     public IReadOnlyList<SaleContent> Contents => _contents;
 
     public SaleBuilder WithBuyerId(Guid id)
@@ -58,7 +57,7 @@ public class SaleBuilder(Faker faker) : BuilderBase<Main.Entities.Sale.Sale>(fak
         CompleteSale = true;
         return this;
     }
-    
+
     public override Main.Entities.Sale.Sale Build()
     {
         var sale = Main.Entities.Sale.Sale.Create(
@@ -68,12 +67,10 @@ public class SaleBuilder(Faker faker) : BuilderBase<Main.Entities.Sale.Sale>(fak
             StorageName ?? Faker.Lorem.Letter(8),
             SaleDate ?? DateTime.Now);
 
-        foreach (var content in _contents)
-            sale.AddContent(content);
+        foreach (var content in _contents) sale.AddContent(content);
 
-        if (CompleteSale)
-            sale.Complete();
-        
+        if (CompleteSale) sale.Complete();
+
         return sale;
     }
 }

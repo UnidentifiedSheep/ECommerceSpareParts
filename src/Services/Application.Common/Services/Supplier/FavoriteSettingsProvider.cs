@@ -7,10 +7,11 @@ public class FavoriteSettingsProvider : ISupplierSettingsProvider<FavoriteSettin
 {
     public Task<FavoriteSettings> GetSettingsAsync(CancellationToken cancellationToken = default)
     {
-        return Task.FromResult(new FavoriteSettings
-        {
-            MaxDaysToDelivery = 7,
-            MinDaysToDelivery = 1
-        });//TODO: settings should be taken from main.
+        return Task.FromResult(
+            new FavoriteSettings
+            {
+                MaxDaysToDelivery = 7,
+                MinDaysToDelivery = 1
+            }); //TODO: settings should be taken from main.
     }
 }

@@ -9,7 +9,8 @@ namespace Tests.TestContexts;
 
 public class ProductMeasurementsTestContext(
     DContext context,
-    ProductTestContext productContext)
+    ProductTestContext productContext
+)
     : TestContextBase<DContext>(context), IDependentTestContext
 {
     public IReadOnlyCollection<ProductSize> Sizes { get; private set; } = null!;
@@ -26,11 +27,13 @@ public class ProductMeasurementsTestContext(
         var weightsBuilder = new List<ProductWeightBuilder>();
         foreach (var product in productContext.Products)
         {
-            sizeBuilders.Add(new ProductSizeBuilder(Faker)
-                .WithProductId(product.Id));
+            sizeBuilders.Add(
+                new ProductSizeBuilder(Faker)
+                    .WithProductId(product.Id));
 
-            weightsBuilder.Add(new ProductWeightBuilder(Faker)
-                .WithProductId(product.Id));
+            weightsBuilder.Add(
+                new ProductWeightBuilder(Faker)
+                    .WithProductId(product.Id));
         }
 
         Sizes = await sizeBuilders.BuildManyCombinedAndAddToDb(

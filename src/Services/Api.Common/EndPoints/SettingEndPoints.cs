@@ -1,4 +1,3 @@
-using System.Text.Json;
 using System.Text.Json.Serialization;
 using Api.Common.Extensions;
 using Application.Common.Dtos;
@@ -28,34 +27,39 @@ public class SettingEndPoints : ICarterModule
         var settings = app.MapGroup("/settings")
             .WithTags("Settings");
 
-        settings.MapGet("", async (
-                ISender sender,
-                CancellationToken ct) =>
-            {
-                var result = await sender.Send(new GetSettingsQuery(), ct);
-
-                return Results.Ok(new GetSettingsResponse
+        settings.MapGet(
+                "",
+                async (
+                    ISender sender,
+                    CancellationToken ct) =>
                 {
-                    Settings = result.Settings
-                });
-            })
+                    var result = await sender.Send(new GetSettingsQuery(), ct);
+
+                    return Results.Ok(
+                        new GetSettingsResponse
+                        {
+                            Settings = result.Settings
+                        });
+                })
             .WithName("GetSettings")
             .WithDisplayName("Get settings")
             .Produces<GetSettingsResponse>()
             .RequireAllPermissions(PermissionCodes.OPTIONS_GET);
 
-        settings.MapPut("{settingName}", async (
-                ISender sender,
-                string settingName,
-                UpdateSettingRequest request,
-                CancellationToken ct) =>
-            {
-                await sender.Send(
-                    new UpdateSettingCommand(settingName, request.Json),
-                    ct);
+        settings.MapPut(
+                "{settingName}",
+                async (
+                    ISender sender,
+                    string settingName,
+                    UpdateSettingRequest request,
+                    CancellationToken ct) =>
+                {
+                    await sender.Send(
+                        new UpdateSettingCommand(settingName, request.Json),
+                        ct);
 
-                return Results.NoContent();
-            })
+                    return Results.NoContent();
+                })
             .WithName("UpdateSetting")
             .WithDisplayName("Update setting")
             .Produces(StatusCodes.Status204NoContent)

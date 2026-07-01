@@ -5,11 +5,10 @@ using Domain.Interfaces;
 
 namespace Main.Entities.Storage;
 
-public class StorageOwner : AuditableEntity<StorageOwner, (string, Guid)>, ILinqEntity<StorageOwner, (string, Guid)>
+public class StorageOwner : AuditableEntity<StorageOwner, (string, Guid)>,
+    ILinqEntity<StorageOwner, (string, Guid)>
 {
-    private StorageOwner()
-    {
-    }
+    private StorageOwner() { }
 
     private StorageOwner(string storageName, Guid userId)
     {
@@ -43,8 +42,5 @@ public class StorageOwner : AuditableEntity<StorageOwner, (string, Guid)>, ILinq
         return new StorageOwner(storageName, ownerId);
     }
 
-    public override (string, Guid) GetId()
-    {
-        return (StorageName, UserId);
-    }
+    public override (string, Guid) GetId() { return (StorageName, UserId); }
 }

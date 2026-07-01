@@ -6,7 +6,8 @@ namespace Search.Application.Services.IndexSynchronizers;
 
 public class ProducerIndexSynchronizer(
     IProducerSearchDocumentProvider producerSearchDocumentProvider,
-    IProducerRepository producerRepository) : IIndexSynchronizer<Producer, int>
+    IProducerRepository producerRepository
+) : IIndexSynchronizer<Producer, int>
 {
     public async Task Reindex(
         int id,

@@ -1,5 +1,4 @@
 ﻿using System.Text.Json.Serialization;
-using Attributes;
 using Attributes.JsonAttributes;
 
 namespace Analytics.Entities.Metrics.JsonDataModels;

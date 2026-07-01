@@ -9,7 +9,10 @@ public class PerWeightPricing : LogisticsPricingStrategyBase
 
     public override LogisticsCalcResult Calculate(LogisticsContext context, IEnumerable<LogisticsItem> items)
     {
-        return Iterate(context, items, input => CalculatePrice(input.WeightKg, context),
+        return Iterate(
+            context,
+            items,
+            input => CalculatePrice(input.WeightKg, context),
             LogisticsDataRequirements.Weight);
     }
 

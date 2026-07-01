@@ -8,27 +8,77 @@ namespace Tests.Domain.Product;
 public class ProductSizeTests
 {
     [Theory]
-    [InlineData(10.1, 5.2, 3.3, DimensionUnit.Centimeter)]
-    [InlineData(1, 1, 1, DimensionUnit.Meter)]
-    [InlineData(0.99, 0.99, 0.99, DimensionUnit.Millimeter)]
-    public void CreateSize_ValidData_Succeeds(decimal length, decimal width, decimal height, DimensionUnit unit)
+    [InlineData(
+        10.1,
+        5.2,
+        3.3,
+        DimensionUnit.Centimeter)]
+    [InlineData(
+        1,
+        1,
+        1,
+        DimensionUnit.Meter)]
+    [InlineData(
+        0.99,
+        0.99,
+        0.99,
+        DimensionUnit.Millimeter)]
+    public void CreateSize_ValidData_Succeeds(
+        decimal length,
+        decimal width,
+        decimal height,
+        DimensionUnit unit)
     {
-        var act = () => ProductSize.Create(1, length, width, height, unit);
+        var act = () => ProductSize.Create(
+            1,
+            length,
+            width,
+            height,
+            unit);
         var model = act.Should().NotThrow().Subject;
 
-        ValidateModel(model, 1, length, width, height, unit);
+        ValidateModel(
+            model,
+            1,
+            length,
+            width,
+            height,
+            unit);
         model.VolumeM3.Should().BeGreaterThan(0);
     }
 
     [Theory]
-    [InlineData(-1, 1, 1)]
-    [InlineData(1, -1, 1)]
-    [InlineData(1, 1, -1)]
-    [InlineData(0, 1, 1)]
-    [InlineData(1000.324, 1, 1)]
-    public void CreateSize_InvalidLengthWidthHeight_Throws(decimal length, decimal width, decimal height)
+    [InlineData(
+        -1,
+        1,
+        1)]
+    [InlineData(
+        1,
+        -1,
+        1)]
+    [InlineData(
+        1,
+        1,
+        -1)]
+    [InlineData(
+        0,
+        1,
+        1)]
+    [InlineData(
+        1000.324,
+        1,
+        1)]
+    public void CreateSize_InvalidLengthWidthHeight_Throws(
+        decimal length,
+        decimal width,
+        decimal height)
     {
-        var act = () => ProductSize.Create(1, length, width, height, DimensionUnit.Centimeter);
+        var act = () => ProductSize.Create(
+            1,
+            length,
+            width,
+            height,
+            DimensionUnit.Centimeter);
         act.Should().Throw<InvalidInputException>();
     }
 
@@ -38,7 +88,12 @@ public class ProductSizeTests
     [InlineData(0.99)]
     public void SetLength_ValidData_Succeeds(decimal length)
     {
-        var model = ProductSize.Create(1, 1, 1, 1, DimensionUnit.Meter);
+        var model = ProductSize.Create(
+            1,
+            1,
+            1,
+            1,
+            DimensionUnit.Meter);
 
         var act = () => model.SetLength(length);
 
@@ -54,13 +109,24 @@ public class ProductSizeTests
     [InlineData(1000.324)]
     public void SetLength_InvalidData_Throws(decimal length)
     {
-        var model = ProductSize.Create(1, 1, 1, 1, DimensionUnit.Meter);
+        var model = ProductSize.Create(
+            1,
+            1,
+            1,
+            1,
+            DimensionUnit.Meter);
 
         var act = () => model.SetLength(length);
 
         act.Should().Throw<InvalidInputException>();
 
-        ValidateModel(model, 1, 1, 1, 1, DimensionUnit.Meter);
+        ValidateModel(
+            model,
+            1,
+            1,
+            1,
+            1,
+            DimensionUnit.Meter);
     }
 
     [Theory]
@@ -69,7 +135,12 @@ public class ProductSizeTests
     [InlineData(0.99)]
     public void SetWidth_ValidData_Succeeds(decimal width)
     {
-        var model = ProductSize.Create(1, 1, 1, 1, DimensionUnit.Meter);
+        var model = ProductSize.Create(
+            1,
+            1,
+            1,
+            1,
+            DimensionUnit.Meter);
 
         var act = () => model.SetWidth(width);
 
@@ -85,13 +156,24 @@ public class ProductSizeTests
     [InlineData(1000.324)]
     public void SetWidth_InvalidData_Throws(decimal width)
     {
-        var model = ProductSize.Create(1, 1, 1, 1, DimensionUnit.Meter);
+        var model = ProductSize.Create(
+            1,
+            1,
+            1,
+            1,
+            DimensionUnit.Meter);
 
         var act = () => model.SetWidth(width);
 
         act.Should().Throw<InvalidInputException>();
 
-        ValidateModel(model, 1, 1, 1, 1, DimensionUnit.Meter);
+        ValidateModel(
+            model,
+            1,
+            1,
+            1,
+            1,
+            DimensionUnit.Meter);
     }
 
     [Theory]
@@ -100,7 +182,12 @@ public class ProductSizeTests
     [InlineData(0.99)]
     public void SetHeight_ValidData_Succeeds(decimal height)
     {
-        var model = ProductSize.Create(1, 1, 1, 1, DimensionUnit.Meter);
+        var model = ProductSize.Create(
+            1,
+            1,
+            1,
+            1,
+            DimensionUnit.Meter);
 
         var act = () => model.SetHeight(height);
 
@@ -116,13 +203,24 @@ public class ProductSizeTests
     [InlineData(1000.324)]
     public void SetHeight_InvalidData_Throws(decimal height)
     {
-        var model = ProductSize.Create(1, 1, 1, 1, DimensionUnit.Meter);
+        var model = ProductSize.Create(
+            1,
+            1,
+            1,
+            1,
+            DimensionUnit.Meter);
 
         var act = () => model.SetHeight(height);
 
         act.Should().Throw<InvalidInputException>();
 
-        ValidateModel(model, 1, 1, 1, 1, DimensionUnit.Meter);
+        ValidateModel(
+            model,
+            1,
+            1,
+            1,
+            1,
+            DimensionUnit.Meter);
     }
 
     [Theory]
@@ -131,7 +229,12 @@ public class ProductSizeTests
     [InlineData(DimensionUnit.Millimeter)]
     public void SetUnit_ValidData_Succeeds(DimensionUnit unit)
     {
-        var model = ProductSize.Create(1, 1, 1, 1, DimensionUnit.Meter);
+        var model = ProductSize.Create(
+            1,
+            1,
+            1,
+            1,
+            DimensionUnit.Meter);
 
         var act = () => model.SetUnit(unit);
 

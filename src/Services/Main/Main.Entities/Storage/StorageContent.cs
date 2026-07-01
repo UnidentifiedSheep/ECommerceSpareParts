@@ -6,11 +6,10 @@ using Domain.Interfaces;
 
 namespace Main.Entities.Storage;
 
-public class StorageContent : AuditableEntity<StorageContent, int>, ILinqEntity<StorageContent, int>, IVersionable<uint>
+public class StorageContent : AuditableEntity<StorageContent, int>, ILinqEntity<StorageContent, int>,
+    IVersionable<uint>
 {
-    private StorageContent()
-    {
-    }
+    private StorageContent() { }
 
     private StorageContent(
         string storageName,
@@ -51,10 +50,7 @@ public class StorageContent : AuditableEntity<StorageContent, int>, ILinqEntity<
 
     public Currency.Currency Currency { get; private set; } = null!;
 
-    public static Expression<Func<StorageContent, int>> GetKeySelector()
-    {
-        return x => x.Id;
-    }
+    public static Expression<Func<StorageContent, int>> GetKeySelector() { return x => x.Id; }
 
     public static Expression<Func<StorageContent, bool>> GetEqualityExpression(int key)
     {
@@ -87,13 +83,15 @@ public class StorageContent : AuditableEntity<StorageContent, int>, ILinqEntity<
     public void SetCount(int count)
     {
         Count = count
-            .AgainstNegative(() => new InvalidOperationException("Count must be greater than or equal to zero."));
+            .AgainstNegative(() =>
+                new InvalidOperationException("Count must be greater than or equal to zero."));
     }
 
     public void IncreaseCount(int amount)
     {
         Count = (Count + amount)
-            .AgainstNegative(() => new InvalidOperationException("Count must be greater than or equal to zero."));
+            .AgainstNegative(() =>
+                new InvalidOperationException("Count must be greater than or equal to zero."));
     }
 
     public void SetBuyPrice(decimal buyPrice, decimal buyPriceInBaseCurrency)
@@ -115,10 +113,7 @@ public class StorageContent : AuditableEntity<StorageContent, int>, ILinqEntity<
         BuyPriceInBaseCurrency = buyPriceInBaseCurrency;
     }
 
-    public void SetCurrencyId(int currencyId)
-    {
-        CurrencyId = currencyId;
-    }
+    public void SetCurrencyId(int currencyId) { CurrencyId = currencyId; }
 
     public void AssignCurrency(Currency.Currency currency)
     {
@@ -126,18 +121,9 @@ public class StorageContent : AuditableEntity<StorageContent, int>, ILinqEntity<
         Currency = currency;
     }
 
-    public void SetBaseCurrencyId(int baseCurrencyId)
-    {
-        BaseCurrencyId = baseCurrencyId;
-    }
+    public void SetBaseCurrencyId(int baseCurrencyId) { BaseCurrencyId = baseCurrencyId; }
 
-    public void SetPurchaseDate(DateTime purchaseDate)
-    {
-        PurchaseDatetime = purchaseDate;
-    }
+    public void SetPurchaseDate(DateTime purchaseDate) { PurchaseDatetime = purchaseDate; }
 
-    public override int GetId()
-    {
-        return Id;
-    }
+    public override int GetId() { return Id; }
 }

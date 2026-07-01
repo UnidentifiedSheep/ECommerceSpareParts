@@ -1,5 +1,4 @@
 ﻿using Abstractions.Interfaces.Persistence;
-using Abstractions.Interfaces.Services;
 using Application.Common.Interfaces;
 using Application.Common.Interfaces.Cqrs;
 using Application.Common.Interfaces.Repositories;
@@ -16,7 +15,8 @@ public record DeleteProductWeightCommand(int ProductId) : ICommand;
 public class DeleteProductWeightHandler(
     IRepository<Entities.Product.ProductWeight, int> repository,
     IUnitOfWork unitOfWork,
-    IIntegrationEventScope integrationEventScope)
+    IIntegrationEventScope integrationEventScope
+)
     : ICommandHandler<DeleteProductWeightCommand>
 {
     public async Task<Unit> Handle(DeleteProductWeightCommand request, CancellationToken cancellationToken)

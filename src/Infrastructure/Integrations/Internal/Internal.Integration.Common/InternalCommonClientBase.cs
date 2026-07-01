@@ -10,7 +10,7 @@ public abstract class InternalCommonClientBase(
     IAuthClient authClient,
     IOptionsMonitor<InternalServiceCredentials> optionsMonitor,
     IOptionsMonitor<InternalServicesOptions> serviceOptions
-    ) : InternalClientBase(authClient, optionsMonitor)
+) : InternalClientBase(authClient, optionsMonitor)
 {
     protected async Task<HttpRequestMessage> GetRequest(
         IServiceDefinition serviceDefinition,
@@ -19,7 +19,7 @@ public abstract class InternalCommonClientBase(
         CancellationToken cancellationToken = default)
     {
         var options = serviceOptions.CurrentValue.GetOptionsForService(serviceDefinition);
-        
+
         return await GetRequest(
             method,
             new Uri(new Uri(options.Url), url).ToString(),

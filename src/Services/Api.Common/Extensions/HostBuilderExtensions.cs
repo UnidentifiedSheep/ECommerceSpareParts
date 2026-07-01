@@ -30,10 +30,11 @@ public static class HostBuilderExtensions
         string environment)
     {
         var logger = GetLoggerConfiguration(
-            configuration,
-            serviceName,
-            environment,
-            configuration["LokiUrl"]).CreateLogger();
+                configuration,
+                serviceName,
+                environment,
+                configuration["LokiUrl"])
+            .CreateLogger();
         builder.Logging.AddSerilog(logger);
 
         return builder;
@@ -54,7 +55,8 @@ public static class HostBuilderExtensions
                 wt => wt.LokiHttp(() => new LokiSinkConfiguration
                 {
                     LokiUrl = lokiUrl!,
-                    LogLabelProvider = new CustomLogLabelProvider([
+                    LogLabelProvider = new CustomLogLabelProvider(
+                    [
                         new LokiLabel("service", serviceName),
                         new LokiLabel("env", environment)
                     ])

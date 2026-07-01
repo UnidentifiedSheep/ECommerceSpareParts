@@ -30,7 +30,7 @@ public static class ServiceProvider
         collection
             .AddApplicationBase(
                 ServicesDefinitions.Analytics,
-                configuration, 
+                configuration,
                 typeof(TagsService).Assembly)
             .AddNamedObjects()
             .AddLrtLayer(typeof(MetricCalculationLrt).Assembly)
@@ -39,7 +39,7 @@ public static class ServiceProvider
             .WithRegisteredDistributedCache()
             .WithRegisteredBackplane()
             .WithSystemTextJsonSerializer();
-        
+
         collection.RegisterSettingsService<SettingFactory>();
 
         collection.AddSingleton<IJsonSerializer, JsonSerializer>();

@@ -4,7 +4,8 @@ using Pricing.Application.Interfaces.Cache;
 namespace Pricing.Application.Services;
 
 public class CurrencyRatesProvider(
-    ICurrencyCacheRepository currencyCacheRepository) : ICurrencyRatesProvider
+    ICurrencyCacheRepository currencyCacheRepository
+) : ICurrencyRatesProvider
 {
     public async Task<decimal> GetRate(int currencyId, CancellationToken cancellationToken = default)
     {

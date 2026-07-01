@@ -9,25 +9,13 @@ namespace Tests.HandlersTests.Currencies;
 
 public class CreateCurrencyTests(CombinedContainerFixture fixture) : IntegrationTest(fixture)
 {
-    private string GetValidName()
-    {
-        return Faker.Lorem.Letter(10);
-    }
+    private string GetValidName() { return Faker.Lorem.Letter(10); }
 
-    private string GetValidCurrencyCode()
-    {
-        return Faker.Lorem.Letter(2);
-    }
+    private string GetValidCurrencyCode() { return Faker.Lorem.Letter(2); }
 
-    private string GetValidCurrencySign()
-    {
-        return Faker.Lorem.Letter();
-    }
+    private string GetValidCurrencySign() { return Faker.Lorem.Letter(); }
 
-    private string GetValidShortName()
-    {
-        return Faker.Lorem.Letter(3);
-    }
+    private string GetValidShortName() { return Faker.Lorem.Letter(3); }
 
     [Theory]
     [InlineData("")]
@@ -37,7 +25,11 @@ public class CreateCurrencyTests(CombinedContainerFixture fixture) : Integration
     public async Task CreateCurrency_WithInvalidShortName_ThrowsValidationException(string shortName)
     {
         var command =
-            new CreateCurrencyCommand(shortName, GetValidName(), GetValidCurrencySign(), GetValidCurrencyCode());
+            new CreateCurrencyCommand(
+                shortName,
+                GetValidName(),
+                GetValidCurrencySign(),
+                GetValidCurrencyCode());
         await Assert.ThrowsAsync<ValidationException>(async () => await Mediator.Send(command));
     }
 
@@ -63,7 +55,11 @@ public class CreateCurrencyTests(CombinedContainerFixture fixture) : Integration
     [InlineData("sdfsddddd")]
     public async Task CreateCurrency_WithInvalidSign_ThrowsValidationException(string sign)
     {
-        var command = new CreateCurrencyCommand(GetValidShortName(), GetValidName(), sign, GetValidCurrencyCode());
+        var command = new CreateCurrencyCommand(
+            GetValidShortName(),
+            GetValidName(),
+            sign,
+            GetValidCurrencyCode());
         await Assert.ThrowsAsync<ValidationException>(async () => await Mediator.Send(command));
     }
 
@@ -74,7 +70,11 @@ public class CreateCurrencyTests(CombinedContainerFixture fixture) : Integration
     [InlineData("sdfsddiimimimimiimimiiimmmmmimimiimmmiiimim")]
     public async Task CreateCurrency_WithInvalidCode_ThrowsValidationException(string code)
     {
-        var command = new CreateCurrencyCommand(GetValidShortName(), GetValidName(), GetValidCurrencySign(), code);
+        var command = new CreateCurrencyCommand(
+            GetValidShortName(),
+            GetValidName(),
+            GetValidCurrencySign(),
+            code);
         await Assert.ThrowsAsync<ValidationException>(async () => await Mediator.Send(command));
     }
 
@@ -85,26 +85,42 @@ public class CreateCurrencyTests(CombinedContainerFixture fixture) : Integration
             .BuildAndAddToDb(Context);
 
         var exception = await Assert.ThrowsAsync<DbValidationException>(async () =>
-            await Mediator.Send(new CreateCurrencyCommand(GetValidShortName(), GetValidName(), GetValidCurrencySign(),
-                created.Code)));
+            await Mediator.Send(
+                new CreateCurrencyCommand(
+                    GetValidShortName(),
+                    GetValidName(),
+                    GetValidCurrencySign(),
+                    created.Code)));
 
         Assert.Equal(ApplicationErrors.CurrencyCodeAlreadyTaken, exception.Failures[0].ErrorName);
 
         exception = await Assert.ThrowsAsync<DbValidationException>(async () =>
-            await Mediator.Send(new CreateCurrencyCommand(GetValidShortName(), created.Name, GetValidCurrencySign(),
-                GetValidCurrencyCode())));
+            await Mediator.Send(
+                new CreateCurrencyCommand(
+                    GetValidShortName(),
+                    created.Name,
+                    GetValidCurrencySign(),
+                    GetValidCurrencyCode())));
 
         Assert.Equal(ApplicationErrors.CurrencyNameAlreadyTaken, exception.Failures[0].ErrorName);
 
         exception = await Assert.ThrowsAsync<DbValidationException>(async () =>
-            await Mediator.Send(new CreateCurrencyCommand(GetValidShortName(), GetValidName(), created.CurrencySign,
-                GetValidCurrencyCode())));
+            await Mediator.Send(
+                new CreateCurrencyCommand(
+                    GetValidShortName(),
+                    GetValidName(),
+                    created.CurrencySign,
+                    GetValidCurrencyCode())));
 
         Assert.Equal(ApplicationErrors.CurrencySignAlreadyTaken, exception.Failures[0].ErrorName);
 
         exception = await Assert.ThrowsAsync<DbValidationException>(async () =>
-            await Mediator.Send(new CreateCurrencyCommand(created.ShortName, GetValidName(), GetValidCurrencySign(),
-                GetValidCurrencyCode())));
+            await Mediator.Send(
+                new CreateCurrencyCommand(
+                    created.ShortName,
+                    GetValidName(),
+                    GetValidCurrencySign(),
+                    GetValidCurrencyCode())));
 
         Assert.Equal(ApplicationErrors.CurrencyShortNameAlreadyTaken, exception.Failures[0].ErrorName);
     }
@@ -117,7 +133,12 @@ public class CreateCurrencyTests(CombinedContainerFixture fixture) : Integration
         var code = GetValidCurrencyCode();
         var sign = GetValidCurrencySign();
 
-        await Mediator.Send(new CreateCurrencyCommand(shortName, name, sign, code));
+        await Mediator.Send(
+            new CreateCurrencyCommand(
+                shortName,
+                name,
+                sign,
+                code));
 
         var currencyInDb = await Context.Currencies.AsNoTracking().FirstOrDefaultAsync();
         Assert.NotNull(currencyInDb);

@@ -12,7 +12,10 @@ public class StorageContentReservationTests
     {
         var userId = Guid.NewGuid();
 
-        var reservation = StorageContentReservation.Create(userId, 10, 3);
+        var reservation = StorageContentReservation.Create(
+            userId,
+            10,
+            3);
 
         reservation.UserId.Should().Be(userId);
         reservation.ProductId.Should().Be(10);
@@ -29,7 +32,10 @@ public class StorageContentReservationTests
     [InlineData(-1)]
     public void Create_InvalidReservedCount_Throws(int reservedCount)
     {
-        var act = () => StorageContentReservation.Create(Guid.NewGuid(), 10, reservedCount);
+        var act = () => StorageContentReservation.Create(
+            Guid.NewGuid(),
+            10,
+            reservedCount);
 
         act.Should().Throw<InvalidInputException>();
     }
@@ -117,7 +123,7 @@ public class StorageContentReservationTests
     [Fact]
     public void AddCount_PartialCount_SetsLockedStatus()
     {
-        var reservation = Create(reservedCount: 3);
+        var reservation = Create(3);
 
         reservation.AddCount(2);
 
@@ -128,7 +134,7 @@ public class StorageContentReservationTests
     [Fact]
     public void AddCount_FullCount_SetsDoneStatus()
     {
-        var reservation = Create(reservedCount: 3);
+        var reservation = Create(3);
 
         reservation.AddCount(3);
 
@@ -139,7 +145,7 @@ public class StorageContentReservationTests
     [Fact]
     public void AddCount_DecreasedToZero_ReturnsToActiveStatus()
     {
-        var reservation = Create(reservedCount: 3);
+        var reservation = Create(3);
         reservation.AddCount(2);
 
         reservation.AddCount(-2);
@@ -153,7 +159,7 @@ public class StorageContentReservationTests
     [InlineData(-1)]
     public void AddCount_InvalidResult_Throws(int amount)
     {
-        var reservation = Create(reservedCount: 3);
+        var reservation = Create(3);
 
         var act = () => reservation.AddCount(amount);
 
@@ -163,7 +169,7 @@ public class StorageContentReservationTests
     [Fact]
     public void ProposePrice_LockedReservation_Succeeds()
     {
-        var reservation = Create(reservedCount: 3);
+        var reservation = Create(3);
         reservation.AddCount(1);
 
         reservation.ProposePrice(100m, 1);
@@ -176,7 +182,7 @@ public class StorageContentReservationTests
     [Fact]
     public void ProposePrice_DoneReservation_Throws()
     {
-        var reservation = Create(reservedCount: 3);
+        var reservation = Create(3);
         reservation.AddCount(3);
 
         var act = () => reservation.ProposePrice(100m, 1);
@@ -219,6 +225,9 @@ public class StorageContentReservationTests
 
     private static StorageContentReservation Create(int reservedCount = 3)
     {
-        return StorageContentReservation.Create(Guid.NewGuid(), 10, reservedCount);
+        return StorageContentReservation.Create(
+            Guid.NewGuid(),
+            10,
+            reservedCount);
     }
 }

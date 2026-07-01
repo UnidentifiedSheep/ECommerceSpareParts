@@ -1,5 +1,4 @@
 ﻿using Abstractions.Interfaces.Persistence;
-using Abstractions.Interfaces.Services;
 using Application.Common.Interfaces;
 using Application.Common.Interfaces.Cqrs;
 using Application.Common.Interfaces.Repositories;
@@ -18,7 +17,8 @@ public record DeleteArticleSizesCommand(int ProductId) : ICommand;
 public class DeleteProductSizesHandler(
     IRepository<ProductSize, int> repository,
     IUnitOfWork unitOfWork,
-    IIntegrationEventScope integrationEventScope)
+    IIntegrationEventScope integrationEventScope
+)
     : ICommandHandler<DeleteArticleSizesCommand>
 {
     public async Task<Unit> Handle(DeleteArticleSizesCommand request, CancellationToken cancellationToken)

@@ -7,7 +7,8 @@ namespace Application.Common.Behaviors;
 
 public class DbValidationBehavior<TRequest, TResponse>(
     IDbValidator dbValidator,
-    AbstractDbValidation<TRequest>? validation = null)
+    AbstractDbValidation<TRequest>? validation = null
+)
     : IPipelineBehavior<TRequest, TResponse> where TRequest : IRequest<TResponse> where TResponse : notnull
 {
     public async Task<TResponse> Handle(
@@ -22,7 +23,10 @@ public class DbValidationBehavior<TRequest, TResponse>(
         validation.Build(plan, request);
 
         if (plan.Build().Count > 0)
-            await dbValidator.Validate(plan, true, cancellationToken);
+            await dbValidator.Validate(
+                plan,
+                true,
+                cancellationToken);
 
 
         return await next(cancellationToken);

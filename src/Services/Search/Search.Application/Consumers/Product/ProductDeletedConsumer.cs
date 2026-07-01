@@ -1,12 +1,12 @@
 using Contracts.Products;
 using MassTransit;
 using Search.Application.Interfaces;
-using Search.Application.Interfaces.Product;
 
 namespace Search.Application.Consumers.Product;
 
 public class ProductDeletedConsumer(
-    IIndexSynchronizer<Entities.Product, int> productIndexSynchronizer) : IConsumer<ProductDeletedEvent>
+    IIndexSynchronizer<Entities.Product, int> productIndexSynchronizer
+) : IConsumer<ProductDeletedEvent>
 {
     public Task Consume(ConsumeContext<ProductDeletedEvent> context)
     {

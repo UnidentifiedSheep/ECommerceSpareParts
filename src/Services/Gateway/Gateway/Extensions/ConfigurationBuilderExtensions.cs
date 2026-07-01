@@ -2,15 +2,22 @@ namespace Gateway.Extensions;
 
 public static class ConfigurationBuilderExtensions
 {
-    public static IConfigurationBuilder AddJsonFromDirectory(this IConfigurationBuilder builder, string directoryPath)
+    public static IConfigurationBuilder AddJsonFromDirectory(
+        this IConfigurationBuilder builder,
+        string directoryPath)
     {
-        if (!Directory.Exists(directoryPath))
-            return builder;
+        if (!Directory.Exists(directoryPath)) return builder;
 
-        var jsonFiles = Directory.GetFiles(directoryPath, "*.json", SearchOption.AllDirectories);
+        var jsonFiles = Directory.GetFiles(
+            directoryPath,
+            "*.json",
+            SearchOption.AllDirectories);
 
         foreach (var jsonFile in jsonFiles)
-            builder.AddJsonFile(jsonFile, false, true);
+            builder.AddJsonFile(
+                jsonFile,
+                false,
+                true);
 
 
         return builder;

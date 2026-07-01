@@ -12,7 +12,7 @@ namespace Favorit.Integrations.Client;
 public class FavoritPartsClient(
     HttpClient client,
     IConnectionProvider<FavoritConnection> connectionProvider
-    ) : ClientBase, IFavoritPartsClient
+) : ClientBase, IFavoritPartsClient
 {
     public async Task<Response<GetPricesResponse>> GetPricesAsync(
         GetPricesRequest request,
@@ -26,21 +26,19 @@ public class FavoritPartsClient(
             Method = HttpMethod.Get,
             RequestUri = new Uri(new Uri(connection.BaseUrl), "/hs/hsprice")
         };
-        
-        var @params = new Dictionary<string, string?>()
+
+        var @params = new Dictionary<string, string?>
         {
             ["number"] = request.Number,
             ["key"] = connection.ApiKey
         };
 
-        if (!string.IsNullOrWhiteSpace(request.Brand))
-            @params.Add("brand", request.Brand);
-        if (request.ShowAnalogues)
-            @params.Add("analogues", "on");
-        if (request.ShowIsRefundable)
-            @params.Add("info", "on");
+        if (!string.IsNullOrWhiteSpace(request.Brand)) @params.Add("brand", request.Brand);
+        if (request.ShowAnalogues) @params.Add("analogues", "on");
+        if (request.ShowIsRefundable) @params.Add("info", "on");
 
-        httpRequest.RequestUri = new Uri(QueryHelpers.AddQueryString(httpRequest.RequestUri!.ToString(), @params));
+        httpRequest.RequestUri =
+            new Uri(QueryHelpers.AddQueryString(httpRequest.RequestUri!.ToString(), @params));
         var response = await client.SendAsync(httpRequest, token);
         return await ReadResponse<GetPricesResponse>(response, token);
     }

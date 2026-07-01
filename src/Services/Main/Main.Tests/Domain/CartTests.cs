@@ -11,7 +11,10 @@ public class CartTests
     {
         var userId = Guid.NewGuid();
 
-        var cart = Cart.Create(userId, 1, 2);
+        var cart = Cart.Create(
+            userId,
+            1,
+            2);
 
         cart.UserId.Should().Be(userId);
         cart.ProductId.Should().Be(1);
@@ -23,7 +26,10 @@ public class CartTests
     {
         var userId = Guid.NewGuid();
 
-        var act = () => Cart.Create(userId, 1, 0);
+        var act = () => Cart.Create(
+            userId,
+            1,
+            0);
 
         act.Should().Throw<InvalidInputException>();
     }
@@ -31,7 +37,10 @@ public class CartTests
     [Fact]
     public void SetCount_Valid_UpdatesValue()
     {
-        var cart = Cart.Create(Guid.NewGuid(), 1, 2);
+        var cart = Cart.Create(
+            Guid.NewGuid(),
+            1,
+            2);
 
         cart.SetCount(5);
 
@@ -41,7 +50,10 @@ public class CartTests
     [Fact]
     public void SetCount_LessThanOne_Throws()
     {
-        var cart = Cart.Create(Guid.NewGuid(), 1, 2);
+        var cart = Cart.Create(
+            Guid.NewGuid(),
+            1,
+            2);
 
         var act1 = () => cart.SetCount(0);
         var act2 = () => cart.SetCount(-10);
@@ -55,7 +67,10 @@ public class CartTests
     {
         var userId = Guid.NewGuid();
 
-        var cart = Cart.Create(userId, 99, 1);
+        var cart = Cart.Create(
+            userId,
+            99,
+            1);
 
         var id = cart.GetId();
 

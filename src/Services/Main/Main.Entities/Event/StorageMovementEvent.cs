@@ -6,13 +6,9 @@ namespace Main.Entities.Event;
 
 public class StorageMovementEvent : Event<StorageMovementEventData>
 {
-    public StorageMovementEvent(StorageMovementEventData data) : base(data)
-    {
-    }
+    public StorageMovementEvent(StorageMovementEventData data) : base(data) { }
 
-    private StorageMovementEvent()
-    {
-    }
+    private StorageMovementEvent() { }
 
     public static StorageMovementEvent Create(StorageMovementEventData data)
     {

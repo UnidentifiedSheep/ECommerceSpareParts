@@ -28,16 +28,18 @@ public class MarkupEndPoints : ICarterModule
     {
         var markups = app.MapGroup("/markups")
             .WithTags("Markups");
-        
-        markups.MapPost("", async (
-                ISender sender,
-                UpsertMarkupGroupRequest request,
-                CancellationToken cancellationToken) =>
-            {
-                var command = new UpsertMarkupGroupCommand(request.Group);
-                await sender.Send(command, cancellationToken);
-                return Results.NoContent();
-            })
+
+        markups.MapPost(
+                "",
+                async (
+                    ISender sender,
+                    UpsertMarkupGroupRequest request,
+                    CancellationToken cancellationToken) =>
+                {
+                    var command = new UpsertMarkupGroupCommand(request.Group);
+                    await sender.Send(command, cancellationToken);
+                    return Results.NoContent();
+                })
             .WithName("UpsertMarkupGroup")
             .WithSummary("Доюавление или редактирование группы наценок")
             .WithDescription("Доюавление или редактирование группы наценок")
@@ -47,19 +49,22 @@ public class MarkupEndPoints : ICarterModule
             .ProducesProblem(StatusCodes.Status400BadRequest)
             .ProducesProblem(StatusCodes.Status404NotFound)
             .RequireAnyPermission(PermissionCodes.MARKUP_CREATE);
-        
-        markups.MapGet("", async (
-                ISender sender,
-                [AsParameters] PaginationQueryModel request,
-                CancellationToken cancellationToken) =>
-            {
-                var command = new GetMarkupsQuery(request);
-                var result = await sender.Send(command, cancellationToken);
-                return Results.Ok(new GetMarkupGroupsResponse
+
+        markups.MapGet(
+                "",
+                async (
+                    ISender sender,
+                    [AsParameters] PaginationQueryModel request,
+                    CancellationToken cancellationToken) =>
                 {
-                    Groups = result.Groups
-                });
-            })
+                    var command = new GetMarkupsQuery(request);
+                    var result = await sender.Send(command, cancellationToken);
+                    return Results.Ok(
+                        new GetMarkupGroupsResponse
+                        {
+                            Groups = result.Groups
+                        });
+                })
             .WithName("GetMarkupGroups")
             .WithSummary("Получение групп наценок")
             .WithDescription("Получение групп наценок")

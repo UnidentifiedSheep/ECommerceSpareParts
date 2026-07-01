@@ -14,7 +14,9 @@ public record GetProductPairResult(ProductDto? Pair);
 public class GetProductPairHandler(IReadRepository<Product, int> context)
     : IQueryHandler<GetProductPairQuery, GetProductPairResult>
 {
-    public async Task<GetProductPairResult> Handle(GetProductPairQuery request, CancellationToken cancellationToken)
+    public async Task<GetProductPairResult> Handle(
+        GetProductPairQuery request,
+        CancellationToken cancellationToken)
     {
         var product = await context.Query
             .Where(x => x.Id == request.ProductId && x.PairId != null)

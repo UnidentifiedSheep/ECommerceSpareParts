@@ -7,6 +7,6 @@ public interface ISettingNode
 {
     Task<Response<string>> GetSetting(
         IServiceDefinition serviceDefinition,
-        string systemName, 
+        string systemName,
         CancellationToken cancellationToken = default);
 }

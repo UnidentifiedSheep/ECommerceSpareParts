@@ -15,15 +15,15 @@ public static class NamedObjectDiRegistry
     public static IServiceCollection AddNamedObjects(this IServiceCollection services)
     {
         services.AddSingleton<INamedObjectGroupRegistry, NamedObjectGroupRegistry>();
-        
+
         services.TryAddScoped<
             IRequestHandler<GetNamedObjectsQuery, GetNamedObjectsResult>,
             GetNamedObjectsHandler>();
-        
+
         return services
             .RegisterNamedObject<StorageContentExtractPolicyBase>(objectsLifetime: ServiceLifetime.Singleton)
             .RegisterNamedObject<SettingDefinitionNamedObjectBase>(
-                assembly: typeof(StorageContentExtractPolicyBase).Assembly, 
-                objectsLifetime: ServiceLifetime.Scoped);
+                typeof(StorageContentExtractPolicyBase).Assembly,
+                ServiceLifetime.Scoped);
     }
 }

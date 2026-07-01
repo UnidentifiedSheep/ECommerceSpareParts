@@ -11,7 +11,8 @@ public class RedisOptions
 
     public string? Password { get; init; }
 
-    public string ConnectionString => string.IsNullOrWhiteSpace(Password)
-        ? Url
-        : $"{Url},password={Password}";
+    public string ConnectionString =>
+        string.IsNullOrWhiteSpace(Password)
+            ? Url
+            : $"{Url},password={Password}";
 }

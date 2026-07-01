@@ -21,11 +21,14 @@ public class CurrencyTestContext(
         var created = await new CurrencyBuilder(Faker)
             .BuildManyAndAddToDb(DbContext, 3);
 
-        await settingsService.SetSetting(new CurrencySetting(new CurrencySettingData
-        {
-            BaseCurrencyId = created.First().Id,
-            RateProvider = ExchangeRateProvider.Cbr
-        }), cancellationToken);
+        await settingsService.SetSetting(
+            new CurrencySetting(
+                new CurrencySettingData
+                {
+                    BaseCurrencyId = created.First().Id,
+                    RateProvider = ExchangeRateProvider.Cbr
+                }),
+            cancellationToken);
 
         _currencies.AddRange(created);
     }

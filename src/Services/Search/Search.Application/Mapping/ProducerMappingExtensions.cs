@@ -6,26 +6,32 @@ namespace Search.Application.Mapping;
 public static class ProducerMappingExtensions
 {
     public static ProducerSearchDto ToProducerSearchDto(this Producer producer)
-        => new()
+    {
+        return new ProducerSearchDto
         {
             Id = producer.Id,
             Name = producer.Name,
             Description = producer.Description
         };
+    }
 
     public static ProducerDto ToProducerDto(this Producer producer)
-        => new()
+    {
+        return new ProducerDto
         {
             Id = producer.Id,
             Name = producer.Name,
             Description = producer.Description,
             OtherNames = producer.OtherNames.Select(x => x.ToProducerOtherNameDto())
         };
+    }
 
     public static ProducerOtherNameDto ToProducerOtherNameDto(this ProducerOtherName otherName)
-        => new()
+    {
+        return new ProducerOtherNameDto
         {
             OtherName = otherName.OtherName,
             WhereUsed = otherName.WhereUsed
         };
+    }
 }

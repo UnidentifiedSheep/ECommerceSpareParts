@@ -1,5 +1,3 @@
-using Contracts.Sale;
-
 namespace Main.Application.Interfaces.Services.Event;
 
 public interface ISaleEventService

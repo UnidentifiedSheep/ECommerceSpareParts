@@ -21,20 +21,23 @@ public static class InternalSettingEndPoints
             .WithGroupName("Internal Settings")
             .WithTags("InternalSettings");
 
-        settings.MapGet("{systemName}", async (
-                ISender sender,
-                string systemName,
-                CancellationToken cancellationToken) =>
-            {
-                var result = await sender.Send(
-                    new GetRawSettingQuery(systemName),
-                    cancellationToken);
-
-                return Results.Ok(new InternalGetRawSettingResponse
+        settings.MapGet(
+                "{systemName}",
+                async (
+                    ISender sender,
+                    string systemName,
+                    CancellationToken cancellationToken) =>
                 {
-                    Json = result.Value
-                });
-            })
+                    var result = await sender.Send(
+                        new GetRawSettingQuery(systemName),
+                        cancellationToken);
+
+                    return Results.Ok(
+                        new InternalGetRawSettingResponse
+                        {
+                            Json = result.Value
+                        });
+                })
             .WithName("InternalGetRawSetting")
             .WithDisplayName("Internal service raw setting")
             .WithSummary("Получить raw настройку для внутреннего сервиса")

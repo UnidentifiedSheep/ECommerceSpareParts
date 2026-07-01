@@ -8,32 +8,45 @@ namespace Main.Entities.Mailing;
 
 public class EmailOutBox : AuditableEntity<EmailOutBox, Guid>, ILinqEntity<EmailOutBox, Guid>
 {
+    private EmailOutBox(
+        string subject,
+        string to,
+        string body)
+    {
+        Subject = subject.AgainstNullOrWhiteSpace(() =>
+            new InvalidOperationException("Subject cannot be null or empty."));
+        To = to.AgainstNullOrWhiteSpace(() => new InvalidOperationException("To cannot be null or empty."));
+        Body = body.AgainstNullOrWhiteSpace(() =>
+            new InvalidOperationException("Body cannot be null or empty."));
+        Status = EmailStatus.Pending;
+    }
+
     public Guid Id { get; private set; }
-    public override Guid GetId() => Id;
-    
+
     public string Subject { get; private set; }
     public string To { get; private set; }
     public string Body { get; private set; }
     public EmailStatus Status { get; private set; }
     public DateTime? SentAt { get; private set; }
 
-    private EmailOutBox(
-        string subject,
-        string to,
-        string body)
+    public static Expression<Func<EmailOutBox, Guid>> GetKeySelector() { return x => x.Id; }
+
+    public static Expression<Func<EmailOutBox, bool>> GetEqualityExpression(Guid key)
     {
-        Subject = subject.AgainstNullOrWhiteSpace(() => new InvalidOperationException("Subject cannot be null or empty."));
-        To = to.AgainstNullOrWhiteSpace(() => new InvalidOperationException("To cannot be null or empty."));
-        Body = body.AgainstNullOrWhiteSpace(() => new InvalidOperationException("Body cannot be null or empty."));
-        Status = EmailStatus.Pending;
+        return x => x.Id == key;
     }
+
+    public override Guid GetId() { return Id; }
 
     public static EmailOutBox Create(
         string subject,
         string to,
         string body)
     {
-        return new EmailOutBox(subject, to, body);
+        return new EmailOutBox(
+            subject,
+            to,
+            body);
     }
 
     public void Sent()
@@ -51,10 +64,4 @@ public class EmailOutBox : AuditableEntity<EmailOutBox, Guid>, ILinqEntity<Email
             throw new InvalidOperationException("Not pending email can not be cancelled.");
         Status = EmailStatus.Cancelled;
     }
-    
-    public static Expression<Func<EmailOutBox, Guid>> GetKeySelector()
-        => x => x.Id;
-    
-    public static Expression<Func<EmailOutBox, bool>> GetEqualityExpression(Guid key)
-        => x => x.Id == key;
 }

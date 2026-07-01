@@ -18,7 +18,8 @@ public class UpdateCurrenciesRatesHandler(
     ILogger<UpdateCurrenciesRatesCommand> logger,
     ICurrencyRateUpdater updater,
     IIntegrationEventScope integrationEventScope,
-    ISettingsService settingsService) : ICommandHandler<UpdateCurrenciesRatesCommand>
+    ISettingsService settingsService
+) : ICommandHandler<UpdateCurrenciesRatesCommand>
 {
     public async Task<Unit> Handle(UpdateCurrenciesRatesCommand request, CancellationToken cancellationToken)
     {
@@ -26,8 +27,7 @@ public class UpdateCurrenciesRatesHandler(
 
         var result = await updater.UpdateAsync(settings, cancellationToken);
 
-        if (result.NotFound.Count > 0)
-            logger.LogWarning("Missing rates: {@Currencies}", result.NotFound);
+        if (result.NotFound.Count > 0) logger.LogWarning("Missing rates: {@Currencies}", result.NotFound);
 
         if (result.Changed.Count > 0)
             integrationEventScope.Add(new CurrencyRateChangedEvent { Rates = result.Changed });

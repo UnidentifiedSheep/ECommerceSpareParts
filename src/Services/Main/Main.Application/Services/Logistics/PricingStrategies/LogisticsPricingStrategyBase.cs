@@ -65,25 +65,54 @@ public abstract class LogisticsPricingStrategyBase : ILogisticsPricingStrategy
             var weight = weightPerItem * item.Quantity;
             var area = item.AreaM3 * item.Quantity;
 
-            var (skipped, reason) = ValidatePerItemData(weightPerItem, item.AreaM3, requirements);
+            var (skipped, reason) = ValidatePerItemData(
+                weightPerItem,
+                item.AreaM3,
+                requirements);
 
             if (skipped)
             {
-                resultItems.Add(new LogisticsCalcItemResult(item.Id, 0, item.Quantity, area, item.AreaM3, weight,
-                    weightPerItem, WeightUnit.Kilogram, skipped, reason));
+                resultItems.Add(
+                    new LogisticsCalcItemResult(
+                        item.Id,
+                        0,
+                        item.Quantity,
+                        area,
+                        item.AreaM3,
+                        weight,
+                        weightPerItem,
+                        WeightUnit.Kilogram,
+                        skipped,
+                        reason));
                 continue;
             }
 
             totalWeight += weight;
             totalArea += area;
 
-            var cost = Math.Round(calculateCost(new LogisticsChargeInput(area, weight, item.Quantity)), 2);
+            var cost = Math.Round(
+                calculateCost(
+                    new LogisticsChargeInput(
+                        area,
+                        weight,
+                        item.Quantity)),
+                2);
 
             if (cost < 0) throw new ArgumentException("Цена должна быть больше или равна 0");
 
             accumulatedCost += cost;
-            resultItems.Add(new LogisticsCalcItemResult(item.Id, cost, item.Quantity, area, item.AreaM3, weight,
-                weightPerItem, WeightUnit.Kilogram, skipped, reason));
+            resultItems.Add(
+                new LogisticsCalcItemResult(
+                    item.Id,
+                    cost,
+                    item.Quantity,
+                    area,
+                    item.AreaM3,
+                    weight,
+                    weightPerItem,
+                    WeightUnit.Kilogram,
+                    skipped,
+                    reason));
         }
 
         result.TotalAreaM3 = totalArea;

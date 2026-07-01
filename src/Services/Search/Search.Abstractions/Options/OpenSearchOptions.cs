@@ -14,7 +14,7 @@ public record OpenSearchOptions
     public string? Password { get; init; }
 
     public bool AllowInvalidCertificate { get; init; }
-    
+
     [Required]
     public required OpenSearchIndexOptions IndexOptions { get; init; }
 }

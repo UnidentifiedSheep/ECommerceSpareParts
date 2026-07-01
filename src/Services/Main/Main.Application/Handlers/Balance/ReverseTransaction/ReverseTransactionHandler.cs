@@ -12,11 +12,15 @@ using Main.Enums.Balances;
 namespace Main.Application.Handlers.Balance.ReverseTransaction;
 
 [AutoSave]
-[Transactional(IsolationLevel.ReadCommitted, 20, 3)]
+[Transactional(
+    IsolationLevel.ReadCommitted,
+    20,
+    3)]
 public record ReverseTransactionCommand(
     Guid TransactionId,
     TransactionReversalMode Mode = TransactionReversalMode.User,
-    bool ForcePayment = false)
+    bool ForcePayment = false
+)
     : ICommand<ReverseTransactionResult>;
 
 public record ReverseTransactionResult(Transaction Transaction);
@@ -24,7 +28,8 @@ public record ReverseTransactionResult(Transaction Transaction);
 public class ReverseTransactionHandler(
     ITransactionRepository transactionRepository,
     IUserContext userContext,
-    IBalanceService balanceService) : ICommandHandler<ReverseTransactionCommand, ReverseTransactionResult>
+    IBalanceService balanceService
+) : ICommandHandler<ReverseTransactionCommand, ReverseTransactionResult>
 {
     public async Task<ReverseTransactionResult> Handle(
         ReverseTransactionCommand request,
@@ -48,7 +53,7 @@ public class ReverseTransactionHandler(
         await balanceService.ChangeSenderReceiverBalancesAsync(
             transaction,
             request.ForcePayment,
-            cancellationToken: cancellationToken);
+            cancellationToken);
         return new ReverseTransactionResult(transaction);
     }
 }

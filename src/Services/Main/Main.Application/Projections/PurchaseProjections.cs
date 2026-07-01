@@ -20,7 +20,7 @@ public static class PurchaseProjections
             TotalSum = x.Transaction.Amount,
             TransactionId = x.TransactionId
         };
-    
+
     public static readonly Expression<Func<PurchaseLogistic, PurchaseLogisticDto>> ToPurchaseLogisticDto =
         x => new PurchaseLogisticDto
         {
@@ -35,7 +35,7 @@ public static class PurchaseProjections
             PricePerOrder = x.PricePerOrder,
             RouteType = x.RouteType
         };
-    
+
     public static readonly Expression<Func<PurchaseContent, PurchaseContentDto>> ToContentDto =
         x => new PurchaseContentDto
         {
@@ -45,16 +45,17 @@ public static class PurchaseProjections
             Price = x.Price,
             TotalSum = x.TotalSum,
             Product = ProductProjections.ToDto.Invoke(x.Product),
-            ContentLogistics = x.PurchaseContentLogistic == null 
-                ? null 
+            ContentLogistics = x.PurchaseContentLogistic == null
+                ? null
                 : ToContentLogisticDto.Invoke(x.PurchaseContentLogistic)
         };
-    
-    public static readonly Expression<Func<PurchaseContentLogistic, PurchaseContentLogisticDto>> ToContentLogisticDto =
-        x => new PurchaseContentLogisticDto
-        {
-            WeightKg = x.WeightKg,
-            AreaM3 = x.AreaM3,
-            Price = x.Price
-        };
+
+    public static readonly Expression<Func<PurchaseContentLogistic, PurchaseContentLogisticDto>>
+        ToContentLogisticDto =
+            x => new PurchaseContentLogisticDto
+            {
+                WeightKg = x.WeightKg,
+                AreaM3 = x.AreaM3,
+                Price = x.Price
+            };
 }

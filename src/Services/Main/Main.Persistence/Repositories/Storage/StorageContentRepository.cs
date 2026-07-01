@@ -46,8 +46,10 @@ public class StorageContentRepository(DContext context, IQueryableExtensions ext
                 ProductId = g.Key,
                 TotalCount = g.Sum(x => x.Count)
             })
-            .ToDictionaryAsync(x => x.ProductId,
-                x => x.TotalCount, cancellationToken);
+            .ToDictionaryAsync(
+                x => x.ProductId,
+                x => x.TotalCount,
+                cancellationToken);
     }
 
     private IQueryable<StorageContent> BuildStorageContentsForUpdateQuery(
@@ -63,14 +65,11 @@ public class StorageContentRepository(DContext context, IQueryableExtensions ext
         var query = Context.StorageContents
             .Where(x => x.Count > countGreaterThen);
 
-        if (productId != null)
-            query = query.Where(x => x.ProductId == productId);
+        if (productId != null) query = query.Where(x => x.ProductId == productId);
 
-        if (exceptProducts is { Count: > 0 })
-            query = query.Where(x => !exceptProducts.Contains(x.ProductId));
+        if (exceptProducts is { Count: > 0 }) query = query.Where(x => !exceptProducts.Contains(x.ProductId));
 
-        if (storageName != null)
-            query = query.Where(x => x.StorageName == storageName);
+        if (storageName != null) query = query.Where(x => x.StorageName == storageName);
 
         if (exceptStorageNames is { Count: > 0 })
             query = query.Where(x => !exceptStorageNames.Contains(x.StorageName));

@@ -16,11 +16,12 @@ public class ProductImage : Entity<ProductImage, (int, string)>, ILinqEntity<Pro
         ".webp"
     ];
 
-    private ProductImage()
-    {
-    }
+    private ProductImage() { }
 
-    private ProductImage(int productId, string path, string? description)
+    private ProductImage(
+        int productId,
+        string path,
+        string? description)
     {
         ProductId = productId;
         SetPath(path);
@@ -43,20 +44,24 @@ public class ProductImage : Entity<ProductImage, (int, string)>, ILinqEntity<Pro
         return x => x.ProductId == key.Item1 && x.Path == key.Item2;
     }
 
-    public static ProductImage Create(int productId, string path, string? description)
+    public static ProductImage Create(
+        int productId,
+        string path,
+        string? description)
     {
-        return new ProductImage(productId, path, description);
+        return new ProductImage(
+            productId,
+            path,
+            description);
     }
 
     public void SetPath(string path)
     {
-        if (string.IsNullOrWhiteSpace(path))
-            throw new InvalidInputException("article.image.path.empty");
+        if (string.IsNullOrWhiteSpace(path)) throw new InvalidInputException("article.image.path.empty");
 
         path = path.Trim();
 
-        if (!IsSupportedExtension(path))
-            throw new InvalidInputException("article.image.invalid.extension");
+        if (!IsSupportedExtension(path)) throw new InvalidInputException("article.image.invalid.extension");
 
         Path = path;
     }
@@ -70,10 +75,7 @@ public class ProductImage : Entity<ProductImage, (int, string)>, ILinqEntity<Pro
             : description;
     }
 
-    public override (int, string) GetId()
-    {
-        return (ProductId, Path);
-    }
+    public override (int, string) GetId() { return (ProductId, Path); }
 
     private static bool IsSupportedExtension(string path)
     {

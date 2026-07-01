@@ -1,6 +1,5 @@
 ﻿using Bogus;
 using Enums;
-using Main.Enums;
 
 namespace Tests.DataBuilders.User;
 

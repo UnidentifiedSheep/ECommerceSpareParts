@@ -33,8 +33,7 @@ public class CreateProductTests : IntegrationTest
 
         products.Should().HaveCount(dtos.Count);
 
-        for (var i = 0; i < dtos.Count; i++)
-            Validate(dtos[i], products[i]);
+        for (var i = 0; i < dtos.Count; i++) Validate(dtos[i], products[i]);
     }
 
     [Fact]
@@ -87,21 +86,24 @@ public class CreateProductTests : IntegrationTest
 
         await Mediator.Send(new CreateProductsCommand([existing]));
 
-        var result = await Mediator.Send(new CreateProductsCommand(
-            [existing, newProduct],
-            CreateProductsConflictPolicy.SkipExisting));
+        var result = await Mediator.Send(
+            new CreateProductsCommand(
+                [existing, newProduct],
+                CreateProductsConflictPolicy.SkipExisting));
 
         result.CreatedIds.Should().HaveCount(1);
         result.Skipped.Should().Be(1);
 
         var products = await GetProducts();
         products.Should().HaveCount(2);
-        products.Should().ContainSingle(x =>
-            x.Sku.NormalizedValue == new Sku(existing.Sku).NormalizedValue &&
-            x.ProducerId == existing.ProducerId);
-        products.Should().ContainSingle(x =>
-            x.Sku.NormalizedValue == new Sku(newProduct.Sku).NormalizedValue &&
-            x.ProducerId == newProduct.ProducerId);
+        products.Should()
+            .ContainSingle(x =>
+                x.Sku.NormalizedValue == new Sku(existing.Sku).NormalizedValue &&
+                x.ProducerId == existing.ProducerId);
+        products.Should()
+            .ContainSingle(x =>
+                x.Sku.NormalizedValue == new Sku(newProduct.Sku).NormalizedValue &&
+                x.ProducerId == newProduct.ProducerId);
     }
 
     [Fact]
@@ -109,17 +111,19 @@ public class CreateProductTests : IntegrationTest
     {
         var product = CreateDtos(1)[0];
 
-        var result = await Mediator.Send(new CreateProductsCommand(
-            [product, product with { Name = TestContext.Faker.Commerce.ProductName() }],
-            CreateProductsConflictPolicy.SkipExisting));
+        var result = await Mediator.Send(
+            new CreateProductsCommand(
+                [product, product with { Name = TestContext.Faker.Commerce.ProductName() }],
+                CreateProductsConflictPolicy.SkipExisting));
 
         result.CreatedIds.Should().HaveCount(1);
         result.Skipped.Should().Be(1);
 
         var products = await GetProducts();
-        products.Should().ContainSingle(x =>
-            x.Sku.NormalizedValue == new Sku(product.Sku).NormalizedValue &&
-            x.ProducerId == product.ProducerId);
+        products.Should()
+            .ContainSingle(x =>
+                x.Sku.NormalizedValue == new Sku(product.Sku).NormalizedValue &&
+                x.ProducerId == product.ProducerId);
     }
 
     [Fact]
@@ -141,9 +145,10 @@ public class CreateProductTests : IntegrationTest
 
         await Mediator.Send(new CreateProductsCommand([first]));
 
-        var result = await Mediator.Send(new CreateProductsCommand(
-            [second],
-            CreateProductsConflictPolicy.SkipExisting));
+        var result = await Mediator.Send(
+            new CreateProductsCommand(
+                [second],
+                CreateProductsConflictPolicy.SkipExisting));
 
         result.CreatedIds.Should().HaveCount(1);
         result.Skipped.Should().Be(0);
@@ -167,11 +172,13 @@ public class CreateProductTests : IntegrationTest
 
     private List<CreateProductDto> CreateDtos(int count)
     {
-        return Enumerable.Range(1, count).Select(_ => new CreateProductDto
-        {
-            Sku = TestContext.Faker.Lorem.Letter(30),
-            Name = TestContext.Faker.Commerce.ProductName(),
-            ProducerId = TestContext.Faker.PickRandom(TestContext.Producers.Select(p => p.Id).ToArray())
-        }).ToList();
+        return Enumerable.Range(1, count)
+            .Select(_ => new CreateProductDto
+            {
+                Sku = TestContext.Faker.Lorem.Letter(30),
+                Name = TestContext.Faker.Commerce.ProductName(),
+                ProducerId = TestContext.Faker.PickRandom(TestContext.Producers.Select(p => p.Id).ToArray())
+            })
+            .ToList();
     }
 }

@@ -8,7 +8,11 @@ public class CurrencyTests
     [Fact]
     public void Create_ValidData_Succeeds()
     {
-        var currency = CurrencyDomain.Create("US Dollar", "USD", "$", "USD");
+        var currency = CurrencyDomain.Create(
+            "US Dollar",
+            "USD",
+            "$",
+            "USD");
 
         currency.Name.Should().Be("US Dollar");
         currency.ShortName.Should().Be("USD");

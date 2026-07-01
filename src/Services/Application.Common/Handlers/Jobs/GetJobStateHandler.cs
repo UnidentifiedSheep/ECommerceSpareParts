@@ -7,10 +7,12 @@ using Microsoft.EntityFrameworkCore;
 namespace Application.Common.Handlers.Jobs;
 
 public record GetJobStateQuery(Guid JobId) : IQuery<GetJobStateResult>;
+
 public record GetJobStateResult(string State);
 
 public class GetJobStateHandler(
-    IReadRepository<Job, Guid> repository) : IQueryHandler<GetJobStateQuery, GetJobStateResult>
+    IReadRepository<Job, Guid> repository
+) : IQueryHandler<GetJobStateQuery, GetJobStateResult>
 {
     public async Task<GetJobStateResult> Handle(GetJobStateQuery request, CancellationToken cancellationToken)
     {

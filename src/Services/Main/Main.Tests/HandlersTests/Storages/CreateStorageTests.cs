@@ -41,7 +41,8 @@ public class CreateStorageTests(CombinedContainerFixture fixture) : IntegrationT
             storageModel.Description,
             storageModel.Location,
             storageModel.Type);
-        var exception = await Assert.ThrowsAsync<DbValidationException>(async () => await Mediator.Send(command));
+        var exception =
+            await Assert.ThrowsAsync<DbValidationException>(async () => await Mediator.Send(command));
         Assert.Equal(ApplicationErrors.StoragesNameAlreadyTaken, exception.Failures[0].ErrorName);
     }
 

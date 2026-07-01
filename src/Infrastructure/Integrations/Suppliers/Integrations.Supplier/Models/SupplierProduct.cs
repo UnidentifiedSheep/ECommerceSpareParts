@@ -6,6 +6,6 @@ public class SupplierProduct
     public required string Number { get; init; }
     public required string Brand { get; init; }
     public required string Name { get; init; }
-    
+
     public required IReadOnlyList<SupplierPosition> Positions { get; init; } = [];
 }

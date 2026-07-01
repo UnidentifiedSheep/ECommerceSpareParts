@@ -30,13 +30,17 @@ public static class ValidationConfiguration
 
     private static void ConfigureStorageContents()
     {
-        ConfigureDbValidation.AddConfig(ValidationFunctions.ValidateStorageContentExistsId, KeyValueType.Single,
+        ConfigureDbValidation.AddConfig(
+            ValidationFunctions.ValidateStorageContentExistsId,
+            KeyValueType.Single,
             config => config.WithErrorName(ApplicationErrors.StorageContentNotFound)
                 .WithMessageTemplate("storage.content.not.found")
                 .WithErrorType(typeof(NotFoundException))
                 .WithErrorCode((int)HttpStatusCode.NotFound));
 
-        ConfigureDbValidation.AddConfig(ValidationFunctions.ValidateStorageContentExistsId, KeyValueType.MultipleKeys,
+        ConfigureDbValidation.AddConfig(
+            ValidationFunctions.ValidateStorageContentExistsId,
+            KeyValueType.MultipleKeys,
             config => config.WithErrorName(ApplicationErrors.StorageContentNotFound)
                 .WithMessageTemplate("storage.content.not.found")
                 .WithErrorType(typeof(NotFoundException))
@@ -45,13 +49,17 @@ public static class ValidationConfiguration
 
     private static void ConfigureStorageOwners()
     {
-        ConfigureDbValidation.AddConfig(ValidationFunctions.ValidateStorageOwnerNotExistsPK, KeyValueType.Tuple,
+        ConfigureDbValidation.AddConfig(
+            ValidationFunctions.ValidateStorageOwnerNotExistsPK,
+            KeyValueType.Tuple,
             config => config.WithErrorName(ApplicationErrors.StorageOwnerAlreadyExist)
                 .WithMessageTemplate("storage.already.belongs.user")
                 .WithErrorType(typeof(ConflictException))
                 .WithErrorCode((int)HttpStatusCode.Conflict));
 
-        ConfigureDbValidation.AddConfig(ValidationFunctions.ValidateStorageOwnerExistsPK, KeyValueType.Tuple,
+        ConfigureDbValidation.AddConfig(
+            ValidationFunctions.ValidateStorageOwnerExistsPK,
+            KeyValueType.Tuple,
             config => config.WithErrorName(ApplicationErrors.StorageOwnerNotFound)
                 .WithMessageTemplate("storage.not.found.in.user")
                 .WithErrorType(typeof(NotFoundException))
@@ -60,25 +68,33 @@ public static class ValidationConfiguration
 
     private static void ConfigureStorageRoutes()
     {
-        ConfigureDbValidation.AddConfig(ValidationFunctions.ValidateStorageRouteExistsId, KeyValueType.Single,
+        ConfigureDbValidation.AddConfig(
+            ValidationFunctions.ValidateStorageRouteExistsId,
+            KeyValueType.Single,
             config => config.WithErrorName(ApplicationErrors.StorageRouteNotFound)
                 .WithMessageTemplate("storage.route.not.found.by.id")
                 .WithErrorType(typeof(NotFoundException))
                 .WithErrorCode((int)HttpStatusCode.NotFound));
 
-        ConfigureDbValidation.AddConfig(ValidationFunctions.ValidateStorageRouteExistsId, KeyValueType.MultipleKeys,
+        ConfigureDbValidation.AddConfig(
+            ValidationFunctions.ValidateStorageRouteExistsId,
+            KeyValueType.MultipleKeys,
             config => config.WithErrorName(ApplicationErrors.StorageRouteNotFound)
                 .WithMessageTemplate("storage.route.not.found.by.id")
                 .WithErrorType(typeof(NotFoundException))
                 .WithErrorCode((int)HttpStatusCode.NotFound));
 
-        ConfigureDbValidation.AddConfig(ValidationFunctions.ValidateStorageRouteExistsFromTo, KeyValueType.Tuple,
+        ConfigureDbValidation.AddConfig(
+            ValidationFunctions.ValidateStorageRouteExistsFromTo,
+            KeyValueType.Tuple,
             config => config.WithErrorName(ApplicationErrors.StorageRouteNotFound)
                 .WithMessageTemplate("storage.route.not.found.by.names")
                 .WithErrorType(typeof(NotFoundException))
                 .WithErrorCode((int)HttpStatusCode.NotFound));
 
-        ConfigureDbValidation.AddConfig(ValidationFunctions.ValidateStorageRouteNotExistsFromTo, KeyValueType.Tuple,
+        ConfigureDbValidation.AddConfig(
+            ValidationFunctions.ValidateStorageRouteNotExistsFromTo,
+            KeyValueType.Tuple,
             config => config.WithErrorName(ApplicationErrors.StorageRouteAlreadyExist)
                 .WithMessageTemplate("storage.route.already.exists")
                 .WithErrorType(typeof(ConflictException))
@@ -87,13 +103,17 @@ public static class ValidationConfiguration
 
     private static void ConfigureCart()
     {
-        ConfigureDbValidation.AddConfig(ValidationFunctions.ValidateCartExistsPK, KeyValueType.Tuple,
+        ConfigureDbValidation.AddConfig(
+            ValidationFunctions.ValidateCartExistsPK,
+            KeyValueType.Tuple,
             config => config.WithErrorName(ApplicationErrors.CartItemNotFound)
                 .WithMessageTemplate("cart.item.not.found")
                 .WithErrorType(typeof(NotFoundException))
                 .WithErrorCode((int)HttpStatusCode.NotFound));
 
-        ConfigureDbValidation.AddConfig(ValidationFunctions.ValidateCartNotExistsPK, KeyValueType.Tuple,
+        ConfigureDbValidation.AddConfig(
+            ValidationFunctions.ValidateCartNotExistsPK,
+            KeyValueType.Tuple,
             config => config.WithErrorName(ApplicationErrors.CartItemAlreadyExist)
                 .WithMessageTemplate("item.already.in.cart")
                 .WithErrorType(typeof(ConflictException))
@@ -102,13 +122,17 @@ public static class ValidationConfiguration
 
     private static void ConfigureProducerOtherNames()
     {
-        ConfigureDbValidation.AddConfig(ValidationFunctions.ValidateProducerOtherNameExistsOtherName, KeyValueType.Single,
+        ConfigureDbValidation.AddConfig(
+            ValidationFunctions.ValidateProducerOtherNameExistsOtherName,
+            KeyValueType.Single,
             config => config.WithErrorName(ApplicationErrors.ProducerOtherNameNotFound)
                 .WithMessageTemplate("producer.other.name.not.found")
                 .WithErrorType(typeof(NotFoundException))
                 .WithErrorCode((int)HttpStatusCode.NotFound));
 
-        ConfigureDbValidation.AddConfig(ValidationFunctions.ValidateProducerOtherNameNotExistsOtherName, KeyValueType.Single,
+        ConfigureDbValidation.AddConfig(
+            ValidationFunctions.ValidateProducerOtherNameNotExistsOtherName,
+            KeyValueType.Single,
             config => config.WithErrorName(ApplicationErrors.ProducerOtherNameAlreadyTaken)
                 .WithMessageTemplate("producer.other.name.already.taken")
                 .WithErrorType(typeof(ConflictException))
@@ -117,74 +141,96 @@ public static class ValidationConfiguration
 
     private static void ConfigureCurrency()
     {
-        ConfigureDbValidation.AddConfig(ValidationFunctions.ValidateCurrencyExistsId, KeyValueType.Single,
+        ConfigureDbValidation.AddConfig(
+            ValidationFunctions.ValidateCurrencyExistsId,
+            KeyValueType.Single,
             config => config.WithErrorName(ApplicationErrors.CurrencyNotFound)
                 .WithMessageTemplate("currency.not.found")
                 .WithErrorType(typeof(NotFoundException))
                 .WithErrorCode((int)HttpStatusCode.NotFound));
 
-        ConfigureDbValidation.AddConfig(ValidationFunctions.ValidateCurrencyExistsId, KeyValueType.MultipleKeys,
+        ConfigureDbValidation.AddConfig(
+            ValidationFunctions.ValidateCurrencyExistsId,
+            KeyValueType.MultipleKeys,
             config => config.WithErrorName(ApplicationErrors.CurrencyNotFound)
                 .WithMessageTemplate("currency.not.found")
                 .WithErrorType(typeof(NotFoundException))
                 .WithErrorCode((int)HttpStatusCode.NotFound));
 
-        ConfigureDbValidation.AddConfig(ValidationFunctions.ValidateCurrencyExistsCode, KeyValueType.Single,
+        ConfigureDbValidation.AddConfig(
+            ValidationFunctions.ValidateCurrencyExistsCode,
+            KeyValueType.Single,
             config => config.WithErrorName(ApplicationErrors.CurrencyNotFound)
                 .WithMessageTemplate("currency.not.found.by.code")
                 .WithErrorType(typeof(NotFoundException))
                 .WithErrorCode((int)HttpStatusCode.NotFound));
 
-        ConfigureDbValidation.AddConfig(ValidationFunctions.ValidateCurrencyExistsCode, KeyValueType.MultipleKeys,
+        ConfigureDbValidation.AddConfig(
+            ValidationFunctions.ValidateCurrencyExistsCode,
+            KeyValueType.MultipleKeys,
             config => config.WithErrorName(ApplicationErrors.CurrencyNotFound)
                 .WithMessageTemplate("currency.not.found.by.code")
                 .WithErrorType(typeof(NotFoundException))
                 .WithErrorCode((int)HttpStatusCode.NotFound));
 
-        ConfigureDbValidation.AddConfig(ValidationFunctions.ValidateCurrencyNotExistsCode, KeyValueType.Single,
+        ConfigureDbValidation.AddConfig(
+            ValidationFunctions.ValidateCurrencyNotExistsCode,
+            KeyValueType.Single,
             config => config.WithErrorName(ApplicationErrors.CurrencyCodeAlreadyTaken)
                 .WithMessageTemplate("currency.code.already.take")
                 .WithErrorType(typeof(ConflictException))
                 .WithErrorCode((int)HttpStatusCode.Conflict));
 
-        ConfigureDbValidation.AddConfig(ValidationFunctions.ValidateCurrencyNotExistsCode, KeyValueType.MultipleKeys,
+        ConfigureDbValidation.AddConfig(
+            ValidationFunctions.ValidateCurrencyNotExistsCode,
+            KeyValueType.MultipleKeys,
             config => config.WithErrorName(ApplicationErrors.CurrencyCodeAlreadyTaken)
                 .WithMessageTemplate("currency.code.already.take")
                 .WithErrorType(typeof(ConflictException))
                 .WithErrorCode((int)HttpStatusCode.Conflict));
 
-        ConfigureDbValidation.AddConfig(ValidationFunctions.ValidateCurrencyNotExistsName, KeyValueType.Single,
+        ConfigureDbValidation.AddConfig(
+            ValidationFunctions.ValidateCurrencyNotExistsName,
+            KeyValueType.Single,
             config => config.WithErrorName(ApplicationErrors.CurrencyNameAlreadyTaken)
                 .WithMessageTemplate("currency.name.already.take")
                 .WithErrorType(typeof(ConflictException))
                 .WithErrorCode((int)HttpStatusCode.Conflict));
 
-        ConfigureDbValidation.AddConfig(ValidationFunctions.ValidateCurrencyNotExistsName, KeyValueType.MultipleKeys,
+        ConfigureDbValidation.AddConfig(
+            ValidationFunctions.ValidateCurrencyNotExistsName,
+            KeyValueType.MultipleKeys,
             config => config.WithErrorName(ApplicationErrors.CurrencyNameAlreadyTaken)
                 .WithMessageTemplate("currency.name.already.take")
                 .WithErrorType(typeof(ConflictException))
                 .WithErrorCode((int)HttpStatusCode.Conflict));
 
-        ConfigureDbValidation.AddConfig(ValidationFunctions.ValidateCurrencyNotExistsShortName, KeyValueType.Single,
+        ConfigureDbValidation.AddConfig(
+            ValidationFunctions.ValidateCurrencyNotExistsShortName,
+            KeyValueType.Single,
             config => config.WithErrorName(ApplicationErrors.CurrencyShortNameAlreadyTaken)
                 .WithMessageTemplate("currency.short.name.already.take")
                 .WithErrorType(typeof(ConflictException))
                 .WithErrorCode((int)HttpStatusCode.Conflict));
 
-        ConfigureDbValidation.AddConfig(ValidationFunctions.ValidateCurrencyNotExistsShortName,
+        ConfigureDbValidation.AddConfig(
+            ValidationFunctions.ValidateCurrencyNotExistsShortName,
             KeyValueType.MultipleKeys,
             config => config.WithErrorName(ApplicationErrors.CurrencyShortNameAlreadyTaken)
                 .WithMessageTemplate("currency.short.name.already.take")
                 .WithErrorType(typeof(ConflictException))
                 .WithErrorCode((int)HttpStatusCode.Conflict));
 
-        ConfigureDbValidation.AddConfig(ValidationFunctions.ValidateCurrencyNotExistsCurrencySign, KeyValueType.Single,
+        ConfigureDbValidation.AddConfig(
+            ValidationFunctions.ValidateCurrencyNotExistsCurrencySign,
+            KeyValueType.Single,
             config => config.WithErrorName(ApplicationErrors.CurrencySignAlreadyTaken)
                 .WithMessageTemplate("currency.sign.already.take")
                 .WithErrorType(typeof(ConflictException))
                 .WithErrorCode((int)HttpStatusCode.Conflict));
 
-        ConfigureDbValidation.AddConfig(ValidationFunctions.ValidateCurrencyNotExistsCurrencySign,
+        ConfigureDbValidation.AddConfig(
+            ValidationFunctions.ValidateCurrencyNotExistsCurrencySign,
             KeyValueType.MultipleKeys,
             config => config.WithErrorName(ApplicationErrors.CurrencySignAlreadyTaken)
                 .WithMessageTemplate("currency.sign.already.take")
@@ -222,25 +268,33 @@ public static class ValidationConfiguration
 
     private static void ConfigurePermission()
     {
-        ConfigureDbValidation.AddConfig(ValidationFunctions.ValidatePermissionExistsName, KeyValueType.Single,
+        ConfigureDbValidation.AddConfig(
+            ValidationFunctions.ValidatePermissionExistsName,
+            KeyValueType.Single,
             config => config.WithErrorName(ApplicationErrors.PermissionNotFound)
                 .WithMessageTemplate("permission.not.found")
                 .WithErrorType(typeof(NotFoundException))
                 .WithErrorCode((int)HttpStatusCode.NotFound));
 
-        ConfigureDbValidation.AddConfig(ValidationFunctions.ValidatePermissionExistsName, KeyValueType.MultipleKeys,
+        ConfigureDbValidation.AddConfig(
+            ValidationFunctions.ValidatePermissionExistsName,
+            KeyValueType.MultipleKeys,
             config => config.WithErrorName(ApplicationErrors.PermissionNotFound)
                 .WithMessageTemplate("permission.not.found")
                 .WithErrorType(typeof(NotFoundException))
                 .WithErrorCode((int)HttpStatusCode.NotFound));
 
-        ConfigureDbValidation.AddConfig(ValidationFunctions.ValidatePermissionNotExistsName, KeyValueType.Single,
+        ConfigureDbValidation.AddConfig(
+            ValidationFunctions.ValidatePermissionNotExistsName,
+            KeyValueType.Single,
             config => config.WithErrorName(ApplicationErrors.PermissionAlreadyExists)
                 .WithMessageTemplate("permission.name.taken")
                 .WithErrorType(typeof(ConflictException))
                 .WithErrorCode((int)HttpStatusCode.Conflict));
 
-        ConfigureDbValidation.AddConfig(ValidationFunctions.ValidatePermissionNotExistsName, KeyValueType.MultipleKeys,
+        ConfigureDbValidation.AddConfig(
+            ValidationFunctions.ValidatePermissionNotExistsName,
+            KeyValueType.MultipleKeys,
             config => config.WithErrorName(ApplicationErrors.PermissionAlreadyExists)
                 .WithMessageTemplate("permission.name.taken")
                 .WithErrorType(typeof(ConflictException))
@@ -249,25 +303,33 @@ public static class ValidationConfiguration
 
     private static void ConfigureStorage()
     {
-        ConfigureDbValidation.AddConfig(ValidationFunctions.ValidateStorageExistsName, KeyValueType.Single,
+        ConfigureDbValidation.AddConfig(
+            ValidationFunctions.ValidateStorageExistsName,
+            KeyValueType.Single,
             config => config.WithErrorName(ApplicationErrors.StoragesNotFound)
                 .WithMessageTemplate("storage.not.found")
                 .WithErrorType(typeof(NotFoundException))
                 .WithErrorCode((int)HttpStatusCode.NotFound));
 
-        ConfigureDbValidation.AddConfig(ValidationFunctions.ValidateStorageExistsName, KeyValueType.MultipleKeys,
+        ConfigureDbValidation.AddConfig(
+            ValidationFunctions.ValidateStorageExistsName,
+            KeyValueType.MultipleKeys,
             config => config.WithErrorName(ApplicationErrors.StoragesNotFound)
                 .WithMessageTemplate("storage.not.found")
                 .WithErrorType(typeof(NotFoundException))
                 .WithErrorCode((int)HttpStatusCode.NotFound));
 
-        ConfigureDbValidation.AddConfig(ValidationFunctions.ValidateStorageNotExistsName, KeyValueType.Single,
+        ConfigureDbValidation.AddConfig(
+            ValidationFunctions.ValidateStorageNotExistsName,
+            KeyValueType.Single,
             config => config.WithErrorName(ApplicationErrors.StoragesNameAlreadyTaken)
                 .WithMessageTemplate("storage.name.taken")
                 .WithErrorType(typeof(ConflictException))
                 .WithErrorCode((int)HttpStatusCode.Conflict));
 
-        ConfigureDbValidation.AddConfig(ValidationFunctions.ValidateStorageNotExistsName, KeyValueType.MultipleKeys,
+        ConfigureDbValidation.AddConfig(
+            ValidationFunctions.ValidateStorageNotExistsName,
+            KeyValueType.MultipleKeys,
             config => config.WithErrorName(ApplicationErrors.StoragesNameAlreadyTaken)
                 .WithMessageTemplate("storage.name.taken")
                 .WithErrorType(typeof(ConflictException))
@@ -276,13 +338,17 @@ public static class ValidationConfiguration
 
     private static void ConfigureArticles()
     {
-        ConfigureDbValidation.AddConfig(ValidationFunctions.ValidateProductExistsId, KeyValueType.Single,
+        ConfigureDbValidation.AddConfig(
+            ValidationFunctions.ValidateProductExistsId,
+            KeyValueType.Single,
             config => config.WithErrorName(ApplicationErrors.ArticlesNotFound)
                 .WithMessageTemplate("article.not.found")
                 .WithErrorType(typeof(NotFoundException))
                 .WithErrorCode((int)HttpStatusCode.NotFound));
 
-        ConfigureDbValidation.AddConfig(ValidationFunctions.ValidateProductExistsId, KeyValueType.MultipleKeys,
+        ConfigureDbValidation.AddConfig(
+            ValidationFunctions.ValidateProductExistsId,
+            KeyValueType.MultipleKeys,
             config => config.WithErrorName(ApplicationErrors.ArticlesNotFound)
                 .WithMessageTemplate("articles.not.found")
                 .WithErrorType(typeof(NotFoundException))
@@ -291,25 +357,33 @@ public static class ValidationConfiguration
 
     private static void ConfigureProducer()
     {
-        ConfigureDbValidation.AddConfig(ValidationFunctions.ValidateProducerExistsId, KeyValueType.Single,
+        ConfigureDbValidation.AddConfig(
+            ValidationFunctions.ValidateProducerExistsId,
+            KeyValueType.Single,
             config => config.WithErrorName(ApplicationErrors.ProducersNotFound)
                 .WithMessageTemplate("producer.not.found")
                 .WithErrorCode((int)HttpStatusCode.NotFound)
                 .WithErrorType(typeof(NotFoundException)));
 
-        ConfigureDbValidation.AddConfig(ValidationFunctions.ValidateProducerExistsId, KeyValueType.MultipleKeys,
+        ConfigureDbValidation.AddConfig(
+            ValidationFunctions.ValidateProducerExistsId,
+            KeyValueType.MultipleKeys,
             config => config.WithErrorName(ApplicationErrors.ProducersNotFound)
                 .WithMessageTemplate("producers.not.found")
                 .WithErrorCode((int)HttpStatusCode.NotFound)
                 .WithErrorType(typeof(NotFoundException)));
 
-        ConfigureDbValidation.AddConfig(ValidationFunctions.ValidateProducerExistsName, KeyValueType.Single,
+        ConfigureDbValidation.AddConfig(
+            ValidationFunctions.ValidateProducerExistsName,
+            KeyValueType.Single,
             config => config.WithErrorName(ApplicationErrors.ProducersNotFound)
                 .WithMessageTemplate("producer.not.found")
                 .WithErrorCode((int)HttpStatusCode.NotFound)
                 .WithErrorType(typeof(NotFoundException)));
 
-        ConfigureDbValidation.AddConfig(ValidationFunctions.ValidateProducerExistsName, KeyValueType.MultipleKeys,
+        ConfigureDbValidation.AddConfig(
+            ValidationFunctions.ValidateProducerExistsName,
+            KeyValueType.MultipleKeys,
             config => config.WithErrorName(ApplicationErrors.ProducersNotFound)
                 .WithMessageTemplate("producers.not.found")
                 .WithErrorCode((int)HttpStatusCode.NotFound)
@@ -318,13 +392,17 @@ public static class ValidationConfiguration
 
     private static void ConfigureUser()
     {
-        ConfigureDbValidation.AddConfig(ValidationFunctions.ValidateUserExistsId, KeyValueType.Single,
+        ConfigureDbValidation.AddConfig(
+            ValidationFunctions.ValidateUserExistsId,
+            KeyValueType.Single,
             config => config.WithErrorName(ApplicationErrors.UsersNotFound)
                 .WithMessageTemplate("user.not.found")
                 .WithErrorCode((int)HttpStatusCode.NotFound)
                 .WithErrorType(typeof(NotFoundException)));
 
-        ConfigureDbValidation.AddConfig(ValidationFunctions.ValidateUserExistsId, KeyValueType.MultipleKeys,
+        ConfigureDbValidation.AddConfig(
+            ValidationFunctions.ValidateUserExistsId,
+            KeyValueType.MultipleKeys,
             config => config.WithErrorName(ApplicationErrors.UsersNotFound)
                 .WithMessageTemplate("user.not.found")
                 .WithErrorCode((int)HttpStatusCode.NotFound)
@@ -377,13 +455,17 @@ public static class ValidationConfiguration
 
     private static void ConfigureTransaction()
     {
-        ConfigureDbValidation.AddConfig(ValidationFunctions.ValidateTransactionExistsId, KeyValueType.Single,
+        ConfigureDbValidation.AddConfig(
+            ValidationFunctions.ValidateTransactionExistsId,
+            KeyValueType.Single,
             config => config.WithErrorName(ApplicationErrors.TransactionsNotFound)
                 .WithMessageTemplate("transaction.not.found")
                 .WithErrorCode((int)HttpStatusCode.NotFound)
                 .WithErrorType(typeof(NotFoundException)));
 
-        ConfigureDbValidation.AddConfig(ValidationFunctions.ValidateTransactionExistsId, KeyValueType.MultipleKeys,
+        ConfigureDbValidation.AddConfig(
+            ValidationFunctions.ValidateTransactionExistsId,
+            KeyValueType.MultipleKeys,
             config => config.WithErrorName(ApplicationErrors.TransactionsNotFound)
                 .WithMessageTemplate("transaction.not.found")
                 .WithErrorCode((int)HttpStatusCode.NotFound)

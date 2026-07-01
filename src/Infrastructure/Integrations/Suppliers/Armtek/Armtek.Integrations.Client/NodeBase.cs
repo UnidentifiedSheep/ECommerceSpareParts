@@ -1,9 +1,8 @@
-using System.Net.Http.Headers;
 using Armtek.Integrations.Core.Interfaces;
 
 namespace Armtek.Integrations.Client;
 
-public abstract class 
+public abstract class
     NodeBase(IArmtekConnectionProvider connectionProvider)
 {
     protected async Task<HttpRequestMessage> GetRequest(

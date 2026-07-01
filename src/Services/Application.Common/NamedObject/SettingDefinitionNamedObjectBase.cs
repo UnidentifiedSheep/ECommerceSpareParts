@@ -7,12 +7,15 @@ namespace Application.Common.NamedObject;
 
 public abstract class SettingDefinitionNamedObjectBase<TSetting>(
     ISettingsService settingsService
-    ) : SettingDefinitionNamedObjectBase 
+) : SettingDefinitionNamedObjectBase
     where TSetting : Setting, ISetting<TSetting>
 {
     protected ISettingsService SettingsService => settingsService;
+
     public override async Task<Setting> GetSettingAsync(CancellationToken cancellationToken)
-        => await settingsService.GetOrDefault<TSetting>(cancellationToken);
+    {
+        return await settingsService.GetOrDefault<TSetting>(cancellationToken);
+    }
 }
 
 public abstract class SettingDefinitionNamedObjectBase : LocalizableNameObject
@@ -23,7 +26,7 @@ public abstract class SettingDefinitionNamedObjectBase : LocalizableNameObject
     public abstract Task UpdateSettingAsync(
         string json,
         CancellationToken cancellationToken);
-    
+
     public abstract Task<string> GetOutputJsonAsync(CancellationToken cancellationToken);
     public abstract Task<Setting> GetSettingAsync(CancellationToken cancellationToken);
 }

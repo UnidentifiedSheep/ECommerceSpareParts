@@ -1,5 +1,4 @@
 using System.Text.Json.Serialization;
-using Carter;
 using Main.Application.Handlers.Auth;
 using MediatR;
 
@@ -27,21 +26,24 @@ public static class InternalAuthEndPoints
         var auth = group
             .MapGroup("/auth")
             .WithGroupName("Internal Authentication");
-        
-        auth.MapPost("/token", async (
-                ISender sender,
-                InternalServiceLoginRequest request,
-                CancellationToken cancellationToken) =>
-            {
-                var result = await sender.Send(
-                    new InternalServiceLoginCommand(request.Service, request.ServiceSecret),
-                    cancellationToken);
 
-                return Results.Ok(new InternalServiceLoginResponse
+        auth.MapPost(
+                "/token",
+                async (
+                    ISender sender,
+                    InternalServiceLoginRequest request,
+                    CancellationToken cancellationToken) =>
                 {
-                    Token = result.Token
-                });
-            })
+                    var result = await sender.Send(
+                        new InternalServiceLoginCommand(request.Service, request.ServiceSecret),
+                        cancellationToken);
+
+                    return Results.Ok(
+                        new InternalServiceLoginResponse
+                        {
+                            Token = result.Token
+                        });
+                })
             .WithDisplayName("Internal service login")
             .WithName("InternalServiceLogin")
             .WithSummary("Выпустить токен внутреннего сервиса")

@@ -14,9 +14,9 @@ public class DeleteProductReservationTests : IntegrationTest
     {
         RegisterBasicContext<StorageContentReservationTestContext>();
     }
-    
-    public StorageContentReservationTestContext TestContext 
-        => GetContext<StorageContentReservationTestContext>();
+
+    public StorageContentReservationTestContext TestContext =>
+        GetContext<StorageContentReservationTestContext>();
 
     [Fact]
     public async Task WhenInvalidId_ThrowsReservationNotFoundException()
@@ -32,30 +32,30 @@ public class DeleteProductReservationTests : IntegrationTest
     {
         var command = new DeleteProductReservationCommand(TestContext.ActiveReservations[0].Id);
         var act = () => Mediator.Send(command);
-        
+
         await act.Should().NotThrowAsync();
-        
+
         var dbValue = await Context.StorageContentReservations
             .AsNoTracking()
             .FirstOrDefaultAsync(x => x.Id == command.ReservationId);
-        
+
         dbValue.Should().NotBeNull();
         dbValue.Status.Should().Be(StorageContentReservationStatus.Canceled);
     }
-    
+
     [Fact]
     public async Task WhenCancelled_DoesntThrow()
     {
         var command = new DeleteProductReservationCommand(
             TestContext.CanceledReservation.Id);
         var act = () => Mediator.Send(command);
-        
+
         await act.Should().NotThrowAsync();
-        
+
         var dbValue = await Context.StorageContentReservations
             .AsNoTracking()
             .FirstOrDefaultAsync(x => x.Id == command.ReservationId);
-        
+
         dbValue.Should().NotBeNull();
         dbValue.Status.Should().Be(StorageContentReservationStatus.Canceled);
     }

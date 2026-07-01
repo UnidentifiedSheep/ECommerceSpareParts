@@ -12,7 +12,7 @@ public static class InputStateExtensions
     {
         if (JsonSerializer.Deserialize(state, lrt.InputType) is not IInputState inputState)
             throw new InvalidOperationException("Invalid input state");
-        
+
         inputState.ValidateState();
     }
 }

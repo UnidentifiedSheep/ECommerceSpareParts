@@ -9,9 +9,7 @@ namespace Analytics.Entities;
 
 public class PurchasesFact : Entity<PurchasesFact, Guid>, IDependency
 {
-    private PurchasesFact()
-    {
-    }
+    private PurchasesFact() { }
 
     [Validate]
     public Guid Id { get; private set; }
@@ -28,10 +26,9 @@ public class PurchasesFact : Entity<PurchasesFact, Guid>, IDependency
 
     public virtual ICollection<PurchaseContent> PurchaseContents { get; } = new List<PurchaseContent>();
 
-    public override Guid GetId()
-    {
-        return Id;
-    }
+    public static DependsOn DependsOn => DependsOn.Purchase;
+
+    public override Guid GetId() { return Id; }
 
     public static PurchasesFact Create(
         Guid id,
@@ -89,16 +86,16 @@ public class PurchasesFact : Entity<PurchasesFact, Guid>, IDependency
             totalSum += incomingContent.Count * incomingContent.Price;
 
             if (existingContents.TryGetValue(incomingContent.Id, out var existingContent))
-                existingContent.Update(incomingContent.ProductId, incomingContent.Price, incomingContent.Count);
+                existingContent.Update(
+                    incomingContent.ProductId,
+                    incomingContent.Price,
+                    incomingContent.Count);
             else
                 PurchaseContents.Add(incomingContent);
         }
 
-        foreach (var item in toRemove.Values)
-            PurchaseContents.Remove(item);
+        foreach (var item in toRemove.Values) PurchaseContents.Remove(item);
 
         TotalSum = totalSum;
     }
-
-    public static DependsOn DependsOn => DependsOn.Purchase;
 }

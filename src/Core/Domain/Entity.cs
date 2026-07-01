@@ -7,8 +7,5 @@ public abstract class Entity<TModel, TKey>
 {
     public abstract TKey GetId();
 
-    object IEntity.GetId()
-    {
-        return GetId();
-    }
+    object IEntity.GetId() { return GetId(); }
 }

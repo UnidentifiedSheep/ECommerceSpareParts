@@ -14,8 +14,5 @@ public class TokenHasher : ITokenHasher
         return Convert.ToHexString(hash);
     }
 
-    public bool VerifyToken(string token, string hash)
-    {
-        return HashToken(token) == hash;
-    }
+    public bool VerifyToken(string token, string hash) { return HashToken(token) == hash; }
 }

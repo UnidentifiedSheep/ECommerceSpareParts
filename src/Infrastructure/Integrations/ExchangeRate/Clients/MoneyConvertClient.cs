@@ -13,8 +13,7 @@ public class MoneyConvertClient(HttpClient client) : IExchangeRateClient
     public async Task<ExchangeRates> GetRates(CancellationToken cancellationToken = default)
     {
         var response = await client.GetAsync("", cancellationToken);
-        if (!response.IsSuccessStatusCode)
-            throw new Exception("Ошибка при получении курсов валют от ЦБР");
+        if (!response.IsSuccessStatusCode) throw new Exception("Ошибка при получении курсов валют от ЦБР");
 
         var json = await response.Content.ReadAsStringAsync(cancellationToken);
         var result = JsonSerializer.Deserialize<MoneyConvertRatesResponse>(json);

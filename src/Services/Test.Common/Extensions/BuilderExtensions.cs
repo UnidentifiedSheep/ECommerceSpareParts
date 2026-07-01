@@ -35,13 +35,11 @@ public static class BuilderExtensions
         params IBuilder<T>[] builders) where T : class
     {
         var entities = new List<T>();
-        foreach (var builder in builders)
-            entities.AddRange(builder.BuildMany(count));
+        foreach (var builder in builders) entities.AddRange(builder.BuildMany(count));
 
         await context.AddRangeAsync(entities);
 
-        if (saveChanges)
-            await context.SaveChangesAsync();
+        if (saveChanges) await context.SaveChangesAsync();
         return entities;
     }
 
@@ -51,6 +49,10 @@ public static class BuilderExtensions
         int count,
         bool saveChanges = true) where T : class
     {
-        return BuildManyCombinedAndAddToDb(context, count, saveChanges, builders.ToArray());
+        return BuildManyCombinedAndAddToDb(
+            context,
+            count,
+            saveChanges,
+            builders.ToArray());
     }
 }

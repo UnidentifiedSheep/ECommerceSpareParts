@@ -10,9 +10,7 @@ namespace Main.Entities.Purchase;
 
 public class PurchaseLogistic : Entity<PurchaseLogistic, Guid>, ILinqEntity<PurchaseLogistic, Guid>
 {
-    private PurchaseLogistic()
-    {
-    }
+    private PurchaseLogistic() { }
 
     private PurchaseLogistic(
         Guid purchaseId,
@@ -33,7 +31,10 @@ public class PurchaseLogistic : Entity<PurchaseLogistic, Guid>, ILinqEntity<Purc
         SetTransactionId(transactionId);
         SetPricingModel(pricingModel);
         SetRouteType(routeType);
-        SetPrices(priceKg, pricePerM3, pricePerOrder);
+        SetPrices(
+            priceKg,
+            pricePerM3,
+            pricePerOrder);
         SetMinimumPrice(minimumPrice);
         SetMinimumPriceApplied(minimumPriceApplied);
     }
@@ -65,10 +66,7 @@ public class PurchaseLogistic : Entity<PurchaseLogistic, Guid>, ILinqEntity<Purc
 
     public virtual Transaction? Transaction { get; private set; }
 
-    public static Expression<Func<PurchaseLogistic, Guid>> GetKeySelector()
-    {
-        return x => x.PurchaseId;
-    }
+    public static Expression<Func<PurchaseLogistic, Guid>> GetKeySelector() { return x => x.PurchaseId; }
 
     public static Expression<Func<PurchaseLogistic, bool>> GetEqualityExpression(Guid key)
     {
@@ -119,7 +117,10 @@ public class PurchaseLogistic : Entity<PurchaseLogistic, Guid>, ILinqEntity<Purc
         SetTransactionId(transactionId);
         SetPricingModel(pricingModel);
         SetRouteType(routeType);
-        SetPrices(priceKg, pricePerM3, pricePerOrder);
+        SetPrices(
+            priceKg,
+            pricePerM3,
+            pricePerOrder);
         SetMinimumPrice(minimumPrice);
         SetMinimumPriceApplied(minimumPriceApplied);
     }
@@ -136,56 +137,35 @@ public class PurchaseLogistic : Entity<PurchaseLogistic, Guid>, ILinqEntity<Purc
         SetCurrencyId(currencyId);
         SetPricingModel(pricingModel);
         SetRouteType(routeType);
-        SetPrices(priceKg, pricePerM3, pricePerOrder);
+        SetPrices(
+            priceKg,
+            pricePerM3,
+            pricePerOrder);
         SetMinimumPrice(minimumPrice);
     }
 
-    public void AssignTransaction(Guid transactionId)
-    {
-        SetTransactionId(transactionId);
-    }
+    public void AssignTransaction(Guid transactionId) { SetTransactionId(transactionId); }
 
-    public void ClearTransaction()
-    {
-        SetTransactionId(null);
-    }
+    public void ClearTransaction() { SetTransactionId(null); }
 
-    public void ApplyMinimumPrice()
-    {
-        SetMinimumPriceApplied(true);
-    }
+    public void ApplyMinimumPrice() { SetMinimumPriceApplied(true); }
 
-    public void CancelMinimumPrice()
-    {
-        SetMinimumPriceApplied(false);
-    }
+    public void CancelMinimumPrice() { SetMinimumPriceApplied(false); }
 
-    private void SetRouteId(Guid routeId)
-    {
-        RouteId = routeId;
-    }
+    private void SetRouteId(Guid routeId) { RouteId = routeId; }
 
-    private void SetCurrencyId(int currencyId)
-    {
-        CurrencyId = currencyId;
-    }
+    private void SetCurrencyId(int currencyId) { CurrencyId = currencyId; }
 
-    private void SetTransactionId(Guid? transactionId)
-    {
-        TransactionId = transactionId;
-    }
+    private void SetTransactionId(Guid? transactionId) { TransactionId = transactionId; }
 
-    private void SetPricingModel(LogisticPricingType pricingModel)
-    {
-        PricingModel = pricingModel;
-    }
+    private void SetPricingModel(LogisticPricingType pricingModel) { PricingModel = pricingModel; }
 
-    private void SetRouteType(RouteType routeType)
-    {
-        RouteType = routeType;
-    }
+    private void SetRouteType(RouteType routeType) { RouteType = routeType; }
 
-    private void SetPrices(decimal priceKg, decimal pricePerM3, decimal pricePerOrder)
+    private void SetPrices(
+        decimal priceKg,
+        decimal pricePerM3,
+        decimal pricePerOrder)
     {
         SetPriceKg(priceKg);
         SetPricePerM3(pricePerM3);
@@ -228,8 +208,5 @@ public class PurchaseLogistic : Entity<PurchaseLogistic, Guid>, ILinqEntity<Purc
         MinimumPriceApplied = minimumPriceApplied;
     }
 
-    public override Guid GetId()
-    {
-        return PurchaseId;
-    }
+    public override Guid GetId() { return PurchaseId; }
 }

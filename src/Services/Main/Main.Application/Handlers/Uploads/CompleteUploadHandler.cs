@@ -8,17 +8,18 @@ namespace Main.Application.Handlers.Uploads;
 public record CompleteUploadCommand(string FileName) : ICommand;
 
 public class CompleteUploadHandler(
-    IS3StorageService s3Service) : ICommandHandler<CompleteUploadCommand>
+    IS3StorageService s3Service
+) : ICommandHandler<CompleteUploadCommand>
 {
     public async Task<Unit> Handle(
-        CompleteUploadCommand request, 
+        CompleteUploadCommand request,
         CancellationToken cancellationToken)
     {
         await s3Service.CompletePresignedUploadUrl(
-            BucketNames.Uploads, 
-            request.FileName, 
+            BucketNames.Uploads,
+            request.FileName,
             cancellationToken);
-        
+
         return Unit.Value;
     }
 }

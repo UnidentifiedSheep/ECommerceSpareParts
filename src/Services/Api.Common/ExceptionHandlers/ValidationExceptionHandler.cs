@@ -1,5 +1,4 @@
 ﻿using Abstractions.Models.Validation;
-using Exceptions;
 using FluentValidation;
 using Localization.Abstractions.Interfaces;
 using Microsoft.AspNetCore.Mvc;
@@ -19,8 +18,14 @@ public class ValidationExceptionHandler(
 
         LogError(httpContext, exception);
 
-        var problemDetails = GetBaseDetails(validationException, httpContext, 400);
-        AddValidationErrors(httpContext, problemDetails, validationException);
+        var problemDetails = GetBaseDetails(
+            validationException,
+            httpContext,
+            400);
+        AddValidationErrors(
+            httpContext,
+            problemDetails,
+            validationException);
 
         httpContext.Response.StatusCode = 400;
         await httpContext.Response.WriteAsJsonAsync(problemDetails, cancellationToken);
@@ -38,8 +43,7 @@ public class ValidationExceptionHandler(
         foreach (var error in exception.Errors)
         {
             var state = error.CustomState as ValidationStateData;
-            if (!(state?.DisplayErrorToUser ?? true))
-                continue;
+            if (!(state?.DisplayErrorToUser ?? true)) continue;
 
             var errorCode = error.ErrorCode;
             var propertyName = error.PropertyName;
@@ -48,7 +52,11 @@ public class ValidationExceptionHandler(
 
             if (localizer == null || string.IsNullOrWhiteSpace(errorCode))
             {
-                errors.Add(new ValidationErrorModel(propertyName, errorMessage, attemptedValue));
+                errors.Add(
+                    new ValidationErrorModel(
+                        propertyName,
+                        errorMessage,
+                        attemptedValue));
                 continue;
             }
 
@@ -56,7 +64,11 @@ public class ValidationExceptionHandler(
                 ? localizer.Get(errorCode, arguments)
                 : localizer[errorCode];
 
-            errors.Add(new ValidationErrorModel(propertyName, message, attemptedValue));
+            errors.Add(
+                new ValidationErrorModel(
+                    propertyName,
+                    message,
+                    attemptedValue));
         }
 
         problemDetails.Extensions["validationErrors"] = errors;

@@ -1,5 +1,4 @@
 using Abstractions.Interfaces.Persistence;
-using Abstractions.Interfaces.Services;
 using Application.Common.Interfaces;
 using Application.Common.Interfaces.Cqrs;
 using Application.Common.Interfaces.Repositories;
@@ -18,22 +17,26 @@ public record DeleteOtherNameCommand(int ProducerId, string OtherName) : IComman
 public class DeleteOtherNameHandler(
     IRepository<ProducerOtherName, string> repository,
     IUnitOfWork unitOfWork,
-    IIntegrationEventScope integrationEventScope)
+    IIntegrationEventScope integrationEventScope
+)
     : ICommandHandler<DeleteOtherNameCommand>
 {
     public async Task<Unit> Handle(DeleteOtherNameCommand request, CancellationToken cancellationToken)
     {
-        var producerOtherName = await repository.GetById(Producer.ToNormalizedName(request.OtherName), cancellationToken)
+        var producerOtherName = await repository.GetById(
+                                    Producer.ToNormalizedName(request.OtherName),
+                                    cancellationToken)
                                 ?? throw new ProducersOtherNameNotFoundException(request.OtherName);
 
         if (producerOtherName.ProducerId != request.ProducerId)
             throw new ProducersOtherNameNotFoundException(request.OtherName);
 
         unitOfWork.Remove(producerOtherName);
-        integrationEventScope.Add(new ProducerUpdatedEvent
-        {
-            Id = request.ProducerId
-        });
+        integrationEventScope.Add(
+            new ProducerUpdatedEvent
+            {
+                Id = request.ProducerId
+            });
         return Unit.Value;
     }
 }

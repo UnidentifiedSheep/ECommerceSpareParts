@@ -11,15 +11,13 @@ public class UserVehicle : AuditableEntity<UserVehicle, Guid>, ILinqEntity<UserV
     public const int MaxVinLength = 50;
     public const int MaxCommentLength = 500;
 
-    private UserVehicle()
-    {
-    }
+    private UserVehicle() { }
 
     private UserVehicle(
-        Guid userId, 
-        Guid vehicleId, 
-        string plateNumber, 
-        string? vin, 
+        Guid userId,
+        Guid vehicleId,
+        string plateNumber,
+        string? vin,
         string? comment)
     {
         UserId = userId;
@@ -43,10 +41,7 @@ public class UserVehicle : AuditableEntity<UserVehicle, Guid>, ILinqEntity<UserV
 
     public User User { get; private set; } = null!;
 
-    public static Expression<Func<UserVehicle, Guid>> GetKeySelector()
-    {
-        return x => x.Id;
-    }
+    public static Expression<Func<UserVehicle, Guid>> GetKeySelector() { return x => x.Id; }
 
     public static Expression<Func<UserVehicle, bool>> GetEqualityExpression(Guid key)
     {
@@ -60,7 +55,12 @@ public class UserVehicle : AuditableEntity<UserVehicle, Guid>, ILinqEntity<UserV
         string? vin = null,
         string? comment = null)
     {
-        return new UserVehicle(userId, vehicleId, plateNumber, vin, comment);
+        return new UserVehicle(
+            userId,
+            vehicleId,
+            plateNumber,
+            vin,
+            comment);
     }
 
     public void SetVehicle(Guid vehicleId)
@@ -68,20 +68,15 @@ public class UserVehicle : AuditableEntity<UserVehicle, Guid>, ILinqEntity<UserV
         VehicleId = vehicleId.AgainstEqual(Guid.Empty, "user.vehicle.id.not.empty");
     }
 
-    public void SetPlateNumber(string plateNumber)
-    {
-        PlateNumber = NormalizePlateNumber(plateNumber);
-    }
+    public void SetPlateNumber(string plateNumber) { PlateNumber = NormalizePlateNumber(plateNumber); }
 
-    public void SetVin(string? vin)
-    {
-        Vin = NormalizeVin(vin);
-    }
+    public void SetVin(string? vin) { Vin = NormalizeVin(vin); }
 
     public void SetComment(string? comment)
     {
         Comment = comment
-            .NullIfWhiteSpace()?
+            .NullIfWhiteSpace()
+            ?
             .AgainstTooLong(MaxCommentLength, "user.vehicle.comment.max.length");
     }
 
@@ -97,13 +92,11 @@ public class UserVehicle : AuditableEntity<UserVehicle, Guid>, ILinqEntity<UserV
     public static string? NormalizeVin(string? vin)
     {
         return vin
-            .NullIfWhiteSpace()?
+            .NullIfWhiteSpace()
+            ?
             .AgainstTooLong(MaxVinLength, "user.vehicle.vin.code.max.length")
             .ToUpperInvariant();
     }
 
-    public override Guid GetId()
-    {
-        return Id;
-    }
+    public override Guid GetId() { return Id; }
 }

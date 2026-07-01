@@ -185,6 +185,13 @@ public class SaleTests
             1,
             100m,
             80m,
-            [SaleContentDetail.Create(1, 1, 10m, 2, DateTime.UtcNow)]);
+            [
+                SaleContentDetail.Create(
+                    1,
+                    1,
+                    10m,
+                    2,
+                    DateTime.UtcNow)
+            ]);
     }
 }

@@ -5,7 +5,6 @@ namespace Main.Entities.Event;
 
 public class ReservationManualChangeEvent : Event<ReservationManualChangeEventData>
 {
-    public int ReservationId { get; private set; }
     public ReservationManualChangeEvent(
         int reservationId,
         ReservationManualChangeEventData data) : base(data)
@@ -13,9 +12,9 @@ public class ReservationManualChangeEvent : Event<ReservationManualChangeEventDa
         ReservationId = reservationId;
     }
 
-    private ReservationManualChangeEvent()
-    {
-    }
+    private ReservationManualChangeEvent() { }
+
+    public int ReservationId { get; private set; }
 
     public static ReservationManualChangeEvent Create(
         int reservationId,
@@ -43,16 +42,16 @@ public record ReservationManualChangeEventData
 {
     [JsonPropertyName("comment")]
     public string? Comment { get; init; }
-    
+
     [JsonPropertyName("proposePrice")]
     public decimal? ProposePrice { get; init; }
-    
+
     [JsonPropertyName("proposedCurrencyId")]
     public int? ProposedCurrencyId { get; init; }
-    
+
     [JsonPropertyName("updatedBy")]
     public Guid? UpdatedBy { get; init; }
-    
+
     [JsonPropertyName("updatedAt")]
     public DateTime UpdatedAt { get; init; }
 }

@@ -16,7 +16,10 @@ public class ProductCrossTests
 
         var model = act.Should().NotThrow().Subject;
 
-        Validate(model, left, right);
+        Validate(
+            model,
+            left,
+            right);
     }
 
     [Fact]
@@ -28,10 +31,26 @@ public class ProductCrossTests
     }
 
     [Theory]
-    [InlineData(1, 2, 1, 2)]
-    [InlineData(10, 5, 5, 10)]
-    [InlineData(100, 101, 100, 101)]
-    public void Create_NormalizesOrder(int left, int right, int expectedLeft, int expectedRight)
+    [InlineData(
+        1,
+        2,
+        1,
+        2)]
+    [InlineData(
+        10,
+        5,
+        5,
+        10)]
+    [InlineData(
+        100,
+        101,
+        100,
+        101)]
+    public void Create_NormalizesOrder(
+        int left,
+        int right,
+        int expectedLeft,
+        int expectedRight)
     {
         var model = ProductCross.Create(left, right);
 
@@ -39,7 +58,10 @@ public class ProductCrossTests
         model.RightProductId.Should().Be(expectedRight);
     }
 
-    private static void Validate(ProductCross model, int left, int right)
+    private static void Validate(
+        ProductCross model,
+        int left,
+        int right)
     {
         model.Should().NotBeNull();
 

@@ -38,10 +38,11 @@ public class BalanceServiceTests : IntegrationTest
         var sender = UsersContext.Users.ElementAt(0);
         var receiver = UsersContext.Users.ElementAt(1);
         var currency = CurrencyContext.Currencies[0];
-        await Context.AddAsync(new UserFinancialProfileBuilder(Faker)
-            .WithUserId(sender.Id)
-            .WithBalance(700m)
-            .Build());
+        await Context.AddAsync(
+            new UserFinancialProfileBuilder(Faker)
+                .WithUserId(sender.Id)
+                .WithBalance(700m)
+                .Build());
         await Context.SaveChangesAsync();
 
         var transaction = new TransactionBuilder(Faker)
@@ -71,10 +72,11 @@ public class BalanceServiceTests : IntegrationTest
         var user = UsersContext.Users.ElementAt(0);
         var systemUser = UserContext.SystemUser;
         var currency = CurrencyContext.Currencies[0];
-        await Context.AddAsync(new UserFinancialProfileBuilder(Faker)
-            .WithUserId(user.Id)
-            .WithBalance(300m)
-            .Build());
+        await Context.AddAsync(
+            new UserFinancialProfileBuilder(Faker)
+                .WithUserId(user.Id)
+                .WithBalance(300m)
+                .Build());
         await Context.SaveChangesAsync();
 
         var transaction = new TransactionBuilder(Faker)
@@ -102,10 +104,11 @@ public class BalanceServiceTests : IntegrationTest
         var user = UsersContext.Users.ElementAt(0);
         var systemUser = UserContext.SystemUser;
         var currency = CurrencyContext.Currencies[0];
-        await Context.AddAsync(new UserFinancialProfileBuilder(Faker)
-            .WithUserId(user.Id)
-            .WithBalance(250m)
-            .Build());
+        await Context.AddAsync(
+            new UserFinancialProfileBuilder(Faker)
+                .WithUserId(user.Id)
+                .WithBalance(250m)
+                .Build());
         await Context.SaveChangesAsync();
 
         var transaction = new TransactionBuilder(Faker)
@@ -136,10 +139,11 @@ public class BalanceServiceTests : IntegrationTest
         var user = UsersContext.Users.ElementAt(0);
         var systemUser = UserContext.SystemUser;
         var currency = CurrencyContext.Currencies[0];
-        await Context.AddAsync(new UserFinancialProfileBuilder(Faker)
-            .WithUserId(user.Id)
-            .WithBalance(100m)
-            .Build());
+        await Context.AddAsync(
+            new UserFinancialProfileBuilder(Faker)
+                .WithUserId(user.Id)
+                .WithBalance(100m)
+                .Build());
         await Context.SaveChangesAsync();
 
         var transaction = new TransactionBuilder(Faker)
@@ -164,10 +168,11 @@ public class BalanceServiceTests : IntegrationTest
         var buyer = UsersContext.Users.ElementAt(0);
         var systemUser = UserContext.SystemUser;
         var currency = CurrencyContext.Currencies[0];
-        await Context.AddAsync(new UserFinancialProfileBuilder(Faker)
-            .WithUserId(buyer.Id)
-            .WithBalance(100m)
-            .Build());
+        await Context.AddAsync(
+            new UserFinancialProfileBuilder(Faker)
+                .WithUserId(buyer.Id)
+                .WithBalance(100m)
+                .Build());
         await Context.SaveChangesAsync();
 
         var transaction = new TransactionBuilder(Faker)
@@ -192,10 +197,11 @@ public class BalanceServiceTests : IntegrationTest
         var supplier = UsersContext.Users.ElementAt(0);
         var systemUser = UserContext.SystemUser;
         var currency = CurrencyContext.Currencies[0];
-        await Context.AddAsync(new UserFinancialProfileBuilder(Faker)
-            .WithUserId(supplier.Id)
-            .WithBalance(100m)
-            .Build());
+        await Context.AddAsync(
+            new UserFinancialProfileBuilder(Faker)
+                .WithUserId(supplier.Id)
+                .WithBalance(100m)
+                .Build());
         await Context.SaveChangesAsync();
         Context.ChangeTracker.Clear();
 
@@ -229,10 +235,11 @@ public class BalanceServiceTests : IntegrationTest
         var receiver = UsersContext.Users.ElementAt(1);
         var reversedBy = UsersContext.Users.ElementAt(2);
         var currency = CurrencyContext.Currencies[0];
-        await Context.AddAsync(new UserFinancialProfileBuilder(Faker)
-            .WithUserId(sender.Id)
-            .WithBalance(100m)
-            .Build());
+        await Context.AddAsync(
+            new UserFinancialProfileBuilder(Faker)
+                .WithUserId(sender.Id)
+                .WithBalance(100m)
+                .Build());
         await Context.SaveChangesAsync();
 
         var transaction = new TransactionBuilder(Faker)

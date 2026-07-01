@@ -12,7 +12,7 @@ public class SaleContentTests
         var details = new[]
         {
             CreateDetail(count: 2),
-            CreateDetail(storageContentId: 2, count: 3)
+            CreateDetail(2, 3)
         };
 
         var content = SaleContent.Create(
@@ -77,8 +77,8 @@ public class SaleContentTests
         var content = Create();
         var details = new[]
         {
-            CreateDetail(storageContentId: 2, count: 1),
-            CreateDetail(storageContentId: 3, count: 4)
+            CreateDetail(2, 1),
+            CreateDetail(3, 4)
         };
 
         content.SetPriceAndDetails(

@@ -14,13 +14,16 @@ public record GetFullProductQuery(int ProductId) : IQuery<GetFullProductResult>;
 public record GetFullProductResult(
     ProductDto Product,
     ProductWeightDto? ProductWeight,
-    ProductSizeDto? ProductSize);
+    ProductSizeDto? ProductSize
+);
 
 public class GetFullProductHandler(
     IReadRepository<Product, int> repository
 ) : IQueryHandler<GetFullProductQuery, GetFullProductResult>
 {
-    public async Task<GetFullProductResult> Handle(GetFullProductQuery request, CancellationToken cancellationToken)
+    public async Task<GetFullProductResult> Handle(
+        GetFullProductQuery request,
+        CancellationToken cancellationToken)
     {
         var result = await repository
             .Query
@@ -36,6 +39,9 @@ public class GetFullProductHandler(
 
         return result?.product == null
             ? throw new ProductNotFoundException(request.ProductId)
-            : new GetFullProductResult(result.product, result.weight, result.size);
+            : new GetFullProductResult(
+                result.product,
+                result.weight,
+                result.size);
     }
 }

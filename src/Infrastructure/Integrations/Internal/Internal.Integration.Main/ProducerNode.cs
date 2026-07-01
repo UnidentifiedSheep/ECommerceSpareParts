@@ -2,8 +2,6 @@ using Integrations.Common;
 using Internal.Integration.Core;
 using Internal.Integration.Core.Interfaces;
 using Internal.Integration.Core.Interfaces.Main;
-using Internal.Integration.Core.Models;
-using Internal.Integration.Core.Models.Main;
 using Internal.Integration.Core.Models.Main.Producer;
 using Microsoft.Extensions.Options;
 
@@ -12,7 +10,8 @@ namespace Internal.Integration.Main;
 internal sealed class ProducerNode(
     HttpClient httpClient,
     IAuthClient authClient,
-    IOptionsMonitor<InternalServiceCredentials> optionsMonitor)
+    IOptionsMonitor<InternalServiceCredentials> optionsMonitor
+)
     : InternalClientBase(authClient, optionsMonitor), IProducerNode
 {
     public async Task<Response<InternalFullProducer>> GetFullProducer(

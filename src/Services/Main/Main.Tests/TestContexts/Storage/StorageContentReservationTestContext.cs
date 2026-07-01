@@ -11,11 +11,12 @@ public class StorageContentReservationTestContext(
     DContext context,
     UsersTestContext usersTestContext,
     ProductTestContext productTestContext,
-    CurrencyTestContext currencyTestContext)
+    CurrencyTestContext currencyTestContext
+)
     : TestContextBase<DContext>(context), IDependentTestContext
 {
-    private readonly List<StorageContentReservation> _reservations = [];
     private readonly List<StorageContentReservation> _activeReservations = [];
+    private readonly List<StorageContentReservation> _reservations = [];
 
     public IReadOnlyList<StorageContentReservation> Reservations => _reservations;
     public IReadOnlyList<StorageContentReservation> ActiveReservations => _activeReservations;
@@ -36,13 +37,14 @@ public class StorageContentReservationTestContext(
         var products = productTestContext.Products;
         var currencyId = currencyTestContext.Currencies[0].Id;
 
-        _activeReservations.AddRange(new StorageContentReservationBuilder(Faker)
-            .WithUsers(users)
-            .WithProducts(products)
-            .WithReservedCount(Faker.Random.Int(1, 10))
-            .WithProposedPrice(100m, currencyId)
-            .WithComment("reservation")
-            .BuildMany(3));
+        _activeReservations.AddRange(
+            new StorageContentReservationBuilder(Faker)
+                .WithUsers(users)
+                .WithProducts(products)
+                .WithReservedCount(Faker.Random.Int(1, 10))
+                .WithProposedPrice(100m, currencyId)
+                .WithComment("reservation")
+                .BuildMany(3));
 
         LockedReservation = new StorageContentReservationBuilder(Faker)
             .WithUserId(users[0].Id)

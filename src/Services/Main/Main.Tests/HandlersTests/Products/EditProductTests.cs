@@ -1,6 +1,5 @@
 using Abstractions.Models;
 using FluentAssertions;
-using FluentValidation;
 using Main.Application.Dtos.Product;
 using Main.Application.Handlers.Products.PatchProduct;
 using Main.Entities.Exceptions;
@@ -24,7 +23,8 @@ public class EditProductTests : IntegrationTest
     public async Task EditArticle_NumberAndName_Succeeds()
     {
         var id = GetFirstId();
-        var command = new PatchProductCommand(id,
+        var command = new PatchProductCommand(
+            id,
             new PatchProductDto
             {
                 Sku = new PatchField<string> { IsSet = true, Value = "67890" },
@@ -97,10 +97,7 @@ public class EditProductTests : IntegrationTest
         await Assert.ThrowsAsync<ValidationException>(async () => await Mediator.Send(command));
     }
 
-    private int GetFirstId()
-    {
-        return TestContext.Products[0].Id;
-    }
+    private int GetFirstId() { return TestContext.Products[0].Id; }
 
     private async Task<Product?> GetProduct(int productId)
     {

@@ -24,10 +24,12 @@ public class AddOtherNameToProducerTests : IntegrationTest
     [InlineData("tooBig")]
     public async Task AddOtherProducerName_EmptyProducerName_FailsValidation(string otherName)
     {
-        if (otherName == "tooBig")
-            otherName = Faker.Lorem.Letter(200);
+        if (otherName == "tooBig") otherName = Faker.Lorem.Letter(200);
         var producer = TestContext.Producers[0];
-        var command = new AddOtherNameCommand(producer.Id, otherName, "null");
+        var command = new AddOtherNameCommand(
+            producer.Id,
+            otherName,
+            "null");
         await Assert.ThrowsAsync<ValidationException>(async () => await Mediator.Send(command));
     }
 
@@ -49,7 +51,8 @@ public class AddOtherNameToProducerTests : IntegrationTest
             int.MaxValue,
             Faker.Lorem.Letter(40),
             Faker.Lorem.Letter(10));
-        var exception = await Assert.ThrowsAsync<DbValidationException>(async () => await Mediator.Send(command));
+        var exception =
+            await Assert.ThrowsAsync<DbValidationException>(async () => await Mediator.Send(command));
         Assert.Equal(ApplicationErrors.ProducersNotFound, exception.Failures[0].ErrorName);
     }
 
@@ -84,8 +87,12 @@ public class AddOtherNameToProducerTests : IntegrationTest
             .WithProducerId(producer.Id)
             .BuildAndAddToDb(Context);
 
-        var command = new AddOtherNameCommand(producer.Id, existing.OtherName, existing.WhereUsed);
-        var exception = await Assert.ThrowsAsync<DbValidationException>(async () => await Mediator.Send(command));
+        var command = new AddOtherNameCommand(
+            producer.Id,
+            existing.OtherName,
+            existing.WhereUsed);
+        var exception =
+            await Assert.ThrowsAsync<DbValidationException>(async () => await Mediator.Send(command));
         Assert.Equal(ApplicationErrors.ProducerOtherNameAlreadyTaken, exception.Failures[0].ErrorName);
     }
 
@@ -101,7 +108,8 @@ public class AddOtherNameToProducerTests : IntegrationTest
             existing.OtherName,
             Faker.Lorem.Letter(10));
 
-        var exception = await Assert.ThrowsAsync<DbValidationException>(async () => await Mediator.Send(command));
+        var exception =
+            await Assert.ThrowsAsync<DbValidationException>(async () => await Mediator.Send(command));
 
         Assert.Equal(ApplicationErrors.ProducerOtherNameAlreadyTaken, exception.Failures[0].ErrorName);
     }

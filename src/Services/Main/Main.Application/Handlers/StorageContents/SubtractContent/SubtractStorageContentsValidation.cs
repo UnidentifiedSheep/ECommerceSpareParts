@@ -26,20 +26,23 @@ public class SubtractStorageContentsValidation : AbstractValidator<SubtractStora
                 switch (item)
                 {
                     case SubtractStorageContentItem { StorageContentId: <= 0 }:
-                        context.AddFailure(CreateFailure(
-                            nameof(SubtractStorageContentItem.StorageContentId),
-                            "storage.content.id.greater.than.zero"));
+                        context.AddFailure(
+                            CreateFailure(
+                                nameof(SubtractStorageContentItem.StorageContentId),
+                                "storage.content.id.greater.than.zero"));
                         break;
                     case SubtractProductFromStorageItem byProduct:
                         if (byProduct.ProductId <= 0)
-                            context.AddFailure(CreateFailure(
-                                nameof(SubtractProductFromStorageItem.ProductId),
-                                "article.id.greater.than.zero"));
+                            context.AddFailure(
+                                CreateFailure(
+                                    nameof(SubtractProductFromStorageItem.ProductId),
+                                    "article.id.greater.than.zero"));
 
                         if (string.IsNullOrWhiteSpace(byProduct.StorageName))
-                            context.AddFailure(CreateFailure(
-                                nameof(SubtractProductFromStorageItem.StorageName),
-                                "storage.name.not.empty"));
+                            context.AddFailure(
+                                CreateFailure(
+                                    nameof(SubtractProductFromStorageItem.StorageName),
+                                    "storage.name.not.empty"));
                         break;
                 }
             });

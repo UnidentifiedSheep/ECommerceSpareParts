@@ -14,7 +14,7 @@ public class JsonSigner : IJsonSigner
     private readonly byte[] _secretBytes;
 
     public JsonSigner(
-        IOptions<SecretEncryptionOptions> secretOptions, 
+        IOptions<SecretEncryptionOptions> secretOptions,
         IOptions<ProjectJsonOptions> jsonOptions)
     {
         ArgumentException.ThrowIfNullOrWhiteSpace(secretOptions.Value.Secret);
@@ -62,8 +62,7 @@ public class JsonSigner : IJsonSigner
             Encoding.UTF8.GetBytes(expectedSignature)
         );
 
-        if (valid)
-            json = Encoding.UTF8.GetString(jsonBytes);
+        if (valid) json = Encoding.UTF8.GetString(jsonBytes);
 
         return valid;
     }
@@ -73,8 +72,7 @@ public class JsonSigner : IJsonSigner
         obj = default;
         var valid = VerifyJson(signed, out var jsonString);
 
-        if (valid && jsonString != null)
-            obj = JsonSerializer.Deserialize<T>(jsonString, _options);
+        if (valid && jsonString != null) obj = JsonSerializer.Deserialize<T>(jsonString, _options);
 
         return valid;
     }

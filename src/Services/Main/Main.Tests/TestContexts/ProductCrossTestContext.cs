@@ -9,7 +9,8 @@ namespace Tests.TestContexts;
 
 public class ProductCrossTestContext(
     DContext context,
-    ProductTestContext productTestContext)
+    ProductTestContext productTestContext
+)
     : TestContextBase<DContext>(context), IDependentTestContext
 {
     private readonly List<ProductCross> _productCrosses = [];

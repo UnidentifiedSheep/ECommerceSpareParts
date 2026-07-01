@@ -1,3 +1,4 @@
+using System.Collections;
 using System.Collections.Concurrent;
 using System.Reflection;
 using System.Text.Json;
@@ -10,7 +11,7 @@ namespace Localization.Domain.Serialization;
 
 public sealed class ScopedLocalizedJsonSerializer(
     IScopedStringLocalizer localizer
-    ) : IScopedLocalizedJsonSerializer
+) : IScopedLocalizedJsonSerializer
 {
     private static readonly ConcurrentDictionary<Type, JsonFieldPlan[]> MetadataCache = new();
     private static readonly ConcurrentDictionary<Type, CsvColumnPlan[]?> CsvSchemaCache = new();
@@ -25,15 +26,9 @@ public sealed class ScopedLocalizedJsonSerializer(
         TypeInfoResolver = new LocalizableResolver(localizer)
     };
 
-    public string Serialize<T>(T value)
-    {
-        return JsonSerializer.Serialize(value, _options);
-    }
+    public string Serialize<T>(T value) { return JsonSerializer.Serialize(value, _options); }
 
-    public string SerializeMetadata<T>()
-    {
-        return SerializeMetadata(typeof(T));
-    }
+    public string SerializeMetadata<T>() { return SerializeMetadata(typeof(T)); }
 
     public string SerializeMetadata(Type type)
     {
@@ -42,7 +37,8 @@ public sealed class ScopedLocalizedJsonSerializer(
             .Select(ToFieldMetadata)
             .ToArray();
         var csvSchema = CsvSchemaCache
-            .GetOrAdd(type, BuildCsvSchemaPlan)?
+            .GetOrAdd(type, BuildCsvSchemaPlan)
+            ?
             .Select(ToCsvColumnMetadata)
             .ToArray();
 
@@ -82,15 +78,15 @@ public sealed class ScopedLocalizedJsonSerializer(
     private static CsvColumnPlan[]? BuildCsvSchemaPlan(Type type)
     {
         var schemaAttr = type.GetCustomAttribute<CsvSchemaAttribute>();
-        if (schemaAttr is null)
-            return null;
+        if (schemaAttr is null) return null;
 
         return schemaAttr.RowType
             .GetProperties(BindingFlags.Public | BindingFlags.Instance)
             .Select(prop =>
             {
                 var nameAttr = prop.GetCustomAttributes(true)
-                    .FirstOrDefault(x => x.GetType().FullName == "CsvHelper.Configuration.Attributes.NameAttribute");
+                    .FirstOrDefault(x =>
+                        x.GetType().FullName == "CsvHelper.Configuration.Attributes.NameAttribute");
                 var aliases = GetCsvNameAliases(nameAttr);
 
                 return new CsvColumnPlan(
@@ -131,8 +127,7 @@ public sealed class ScopedLocalizedJsonSerializer(
 
     private string? GetLocalizedOrDefault(string? key)
     {
-        if (string.IsNullOrWhiteSpace(key))
-            return null;
+        if (string.IsNullOrWhiteSpace(key)) return null;
 
         var value = localizer.GetOrDefault(key);
         return string.IsNullOrWhiteSpace(value) ? key : value;
@@ -149,11 +144,11 @@ public sealed class ScopedLocalizedJsonSerializer(
 
     private static string[] GetCsvNameAliases(object? nameAttribute)
     {
-        if (nameAttribute is null)
-            return [];
+        if (nameAttribute is null) return [];
 
         var names = nameAttribute.GetType()
-            .GetProperty("Names", BindingFlags.Public | BindingFlags.Instance)?
+            .GetProperty("Names", BindingFlags.Public | BindingFlags.Instance)
+            ?
             .GetValue(nameAttribute) as string[];
 
         return names ?? [];
@@ -172,17 +167,13 @@ public sealed class ScopedLocalizedJsonSerializer(
         if (type == typeof(string) || type == typeof(Guid) || type == typeof(DateTime) ||
             type == typeof(DateTimeOffset))
             return "string";
-        if (type == typeof(bool))
-            return "boolean";
-        if (type.IsEnum)
-            return "enum";
+        if (type == typeof(bool)) return "boolean";
+        if (type.IsEnum) return "enum";
         if (type == typeof(byte) || type == typeof(short) || type == typeof(int) || type == typeof(long) ||
             type == typeof(sbyte) || type == typeof(ushort) || type == typeof(uint) || type == typeof(ulong))
             return "integer";
-        if (type == typeof(float) || type == typeof(double) || type == typeof(decimal))
-            return "number";
-        if (type != typeof(string) && typeof(System.Collections.IEnumerable).IsAssignableFrom(type))
-            return "array";
+        if (type == typeof(float) || type == typeof(double) || type == typeof(decimal)) return "number";
+        if (type != typeof(string) && typeof(IEnumerable).IsAssignableFrom(type)) return "array";
 
         return "object";
     }
@@ -190,7 +181,8 @@ public sealed class ScopedLocalizedJsonSerializer(
     private sealed record JsonObjectMetadata(
         JsonFieldMetadata[] Fields,
         [property: JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
-        CsvColumnMetadata[]? CsvSchema);
+        CsvColumnMetadata[]? CsvSchema
+    );
 
     private sealed record JsonFieldPlan(
         string Name,
@@ -201,7 +193,8 @@ public sealed class ScopedLocalizedJsonSerializer(
         string? Control,
         string[] Accepts,
         string? DependsOnEntity,
-        string? DependsOnField);
+        string? DependsOnField
+    );
 
     private sealed record JsonFieldMetadata(
         string Name,
@@ -214,7 +207,8 @@ public sealed class ScopedLocalizedJsonSerializer(
         [property: JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
         string? DependsOnEntity,
         [property: JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
-        string? DependsOnField);
+        string? DependsOnField
+    );
 
     private sealed record CsvColumnPlan(
         string PropertyName,
@@ -222,7 +216,8 @@ public sealed class ScopedLocalizedJsonSerializer(
         string Type,
         bool Required,
         string? LabelKey,
-        string? DescriptionKey);
+        string? DescriptionKey
+    );
 
     private sealed record CsvColumnMetadata(
         string PropertyName,
@@ -230,5 +225,6 @@ public sealed class ScopedLocalizedJsonSerializer(
         string Type,
         bool Required,
         string? Label,
-        string? Description);
+        string? Description
+    );
 }

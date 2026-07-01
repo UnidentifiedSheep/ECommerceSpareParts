@@ -13,19 +13,19 @@
             <PrivateAssets>all</PrivateAssets>
             <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
         </PackageReference>
-        <PackageReference Include="Microsoft.Extensions.Hosting" Version="10.0.9" />
+        <PackageReference Include="Microsoft.Extensions.Hosting" Version="10.0.9"/>
     </ItemGroup>
 
     <ItemGroup>
         <ProjectReference Include="..\..\..\Infrastructure\Common\Common.csproj"/>
         <ProjectReference Include="..\..\..\Infrastructure\Security\Security.csproj"/>
-        <ProjectReference Include="..\..\Api.Common\Api.Common.csproj" />
+        <ProjectReference Include="..\..\Api.Common\Api.Common.csproj"/>
         <ProjectReference Include="..\Main.Persistence\Main.Persistence.csproj"/>
     </ItemGroup>
 
     <ItemGroup>
         <Content Include="..\..\..\..\.dockerignore">
-          <Link>.dockerignore</Link>
+            <Link>.dockerignore</Link>
         </Content>
         <Content Include="..\..\..\..\configs\**\*">
             <Link>configs\%(RecursiveDir)%(Filename)%(Extension)</Link>

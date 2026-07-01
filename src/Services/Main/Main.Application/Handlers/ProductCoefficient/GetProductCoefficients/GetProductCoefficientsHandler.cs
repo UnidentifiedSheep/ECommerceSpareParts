@@ -12,7 +12,8 @@ public record GetProductCoefficientsQuery(IEnumerable<int> ProductIds) : IQuery<
 public record GetProductCoefficientsResult(List<ProductCoefficientDto> Coefficients);
 
 public class GetProductCoefficientsHandler(
-    IReadRepository<Entities.Product.ProductCoefficient, (int, string)> repository)
+    IReadRepository<Entities.Product.ProductCoefficient, (int, string)> repository
+)
     : IQueryHandler<GetProductCoefficientsQuery, GetProductCoefficientsResult>
 {
     public async Task<GetProductCoefficientsResult> Handle(

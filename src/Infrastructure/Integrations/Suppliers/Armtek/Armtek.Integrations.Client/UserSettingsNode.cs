@@ -5,7 +5,7 @@ namespace Armtek.Integrations.Client;
 
 public class UserSettingsNode(
     IArmtekConnectionProvider armtekConnectionProvider
-    ) : NodeBase(armtekConnectionProvider), IUserSettingsNode
+) : NodeBase(armtekConnectionProvider), IUserSettingsNode
 {
     public async Task<GetBrandsResponse> GetBrandsAsync(CancellationToken cancellationToken = default)
     {
@@ -13,7 +13,7 @@ public class UserSettingsNode(
             HttpMethod.Get,
             "api/ws_user/getBrandList?format=json",
             cancellationToken);
-        
+
         throw new NotImplementedException();
     }
 }

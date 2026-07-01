@@ -7,9 +7,7 @@ namespace Main.Entities.Auth;
 public class UserPermission : AuditableEntity<UserPermission, (Guid, string)>,
     ILinqEntity<UserPermission, (Guid, string)>
 {
-    private UserPermission()
-    {
-    }
+    private UserPermission() { }
 
     private UserPermission(Guid userId, string permission)
     {
@@ -36,8 +34,5 @@ public class UserPermission : AuditableEntity<UserPermission, (Guid, string)>,
         return new UserPermission(userId, permission);
     }
 
-    public override (Guid, string) GetId()
-    {
-        return (UserId, Permission);
-    }
+    public override (Guid, string) GetId() { return (UserId, Permission); }
 }

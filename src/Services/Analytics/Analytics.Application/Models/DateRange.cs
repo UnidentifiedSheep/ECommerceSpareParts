@@ -8,7 +8,7 @@ public record DateRange
         From = from;
         To = to;
     }
-    
+
     public DateTime From { get; }
     public DateTime To { get; }
 }

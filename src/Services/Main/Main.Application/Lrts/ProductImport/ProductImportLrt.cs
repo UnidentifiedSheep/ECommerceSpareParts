@@ -9,7 +9,6 @@ using Localization.Domain;
 using Main.Application.Dtos.Product;
 using Main.Application.Handlers.Products.CreateProducts;
 using Main.Application.Interfaces.Persistence;
-using Main.Application.Lrts;
 using Main.Entities.Producer;
 using Main.Entities.Product;
 using Main.Entities.Product.ValueObjects;
@@ -32,8 +31,10 @@ public class ProductImportLrt(
     IPublishEndpoint publisher,
     ILogger<ProductImportLrt> logger,
     IScopedStringLocalizer stringLocalizer,
-    IOptions<LocalesOptions> localesOptions) 
-    : CsvImportLrtBase<ProductImportState, ProductImportError, ProductImportLrt.NewProductCsvDto, CreateProductDto>(
+    IOptions<LocalesOptions> localesOptions
+)
+    : CsvImportLrtBase<ProductImportState, ProductImportError, ProductImportLrt.NewProductCsvDto,
+        CreateProductDto>(
         jobRepository,
         unitOfWork,
         publisher,
@@ -42,6 +43,9 @@ public class ProductImportLrt(
         stringLocalizer,
         localesOptions)
 {
+    private readonly Dictionary<string, int> _otherNamesToIds = new();
+
+    private readonly Dictionary<string, int> _producerNamesToIds = new();
     protected override int BatchSize => 100;
     public override Type InputType => typeof(ProductImportInputState);
     public override Type StateType => typeof(ProductImportState);
@@ -49,14 +53,18 @@ public class ProductImportLrt(
     public override string NameLocalizationKey => "lrt.product.import.name";
     public override string DescriptionLocalizationKey => "lrt.product.import.description";
 
-    private readonly Dictionary<string, int> _producerNamesToIds = new();
-    private readonly Dictionary<string, int> _otherNamesToIds = new();
+    protected override Task BeforeRead(ProductImportState state) { return LoadProducers(); }
 
-    protected override Task BeforeRead(ProductImportState state) => LoadProducers();
-    protected override string GetFileName(ProductImportState state) => state.FileName;
-    protected override int GetCurrentLine(ProductImportState state) => state.CurrentLine;
-    protected override List<ProductImportError> GetErrors(ProductImportState state) => state.Errors;
-    protected override string GetTooManyErrorsLocalizationKey() => "article.import.too.many.errors.while.processing.batch";
+    protected override string GetFileName(ProductImportState state) { return state.FileName; }
+
+    protected override int GetCurrentLine(ProductImportState state) { return state.CurrentLine; }
+
+    protected override List<ProductImportError> GetErrors(ProductImportState state) { return state.Errors; }
+
+    protected override string GetTooManyErrorsLocalizationKey()
+    {
+        return "article.import.too.many.errors.while.processing.batch";
+    }
 
     protected override ProductImportError CreateError(int rowIdx, string message)
     {
@@ -87,7 +95,10 @@ public class ProductImportLrt(
         List<ProductImportError> errors,
         out CreateProductDto item)
     {
-        var product = ProcessDto(rowIdx, row, errors);
+        var product = ProcessDto(
+            rowIdx,
+            row,
+            errors);
         item = product!;
         return product is not null;
     }
@@ -98,18 +109,18 @@ public class ProductImportLrt(
         _otherNamesToIds.Clear();
 
         const int batchSize = 1000;
-        
+
         var baseQuery = producerReadRepository.Query
             .Select(x => new
             {
-                id = x.Id, 
+                id = x.Id,
                 name = x.Name,
                 otherNames = x.OtherNames.Select(z => z.OtherName)
             })
             .OrderBy(x => x.id);
-        
-        int lastId = 0;
-        
+
+        var lastId = 0;
+
         while (true)
         {
             var id = lastId;
@@ -121,14 +132,13 @@ public class ProductImportLrt(
             if (producers.Count == 0) break;
 
             lastId = producers.Last().id;
-            
+
             foreach (var item in producers)
             {
                 _producerNamesToIds.TryAdd(item.name, item.id);
-                foreach (var otherName in item.otherNames)
-                    _otherNamesToIds.TryAdd(otherName, item.id);
+                foreach (var otherName in item.otherNames) _otherNamesToIds.TryAdd(otherName, item.id);
             }
-            
+
             if (producers.Count != batchSize) break;
         }
     }
@@ -143,16 +153,21 @@ public class ProductImportLrt(
             var producerId = ResolveProducerId(row.Producer);
             if (producerId == null)
             {
-                errors.Add(new ProductImportError
-                {
-                    RowIdx = idx,
-                    Message = StringLocalizer.Get("article.import.producer.not.found", row.Producer)
-                });
+                errors.Add(
+                    new ProductImportError
+                    {
+                        RowIdx = idx,
+                        Message = StringLocalizer.Get("article.import.producer.not.found", row.Producer)
+                    });
 
                 return null;
             }
 
-            var product = Product.Create(row.Sku, row.Name, producerId.Value, row.Description);
+            var product = Product.Create(
+                row.Sku,
+                row.Name,
+                producerId.Value,
+                row.Description);
             product.SetIndicator(row.Indicator);
             product.SetCategory(row.CategoryId);
 
@@ -168,11 +183,12 @@ public class ProductImportLrt(
         }
         catch (Exception ex)
         {
-            errors.Add(new ProductImportError
-            {
-                RowIdx = idx,
-                Message = GetErrorMessage(ex)
-            });
+            errors.Add(
+                new ProductImportError
+                {
+                    RowIdx = idx,
+                    Message = GetErrorMessage(ex)
+                });
 
             return null;
         }
@@ -180,13 +196,11 @@ public class ProductImportLrt(
 
     private int? ResolveProducerId(string producer)
     {
-        if (string.IsNullOrWhiteSpace(producer))
-            return null;
+        if (string.IsNullOrWhiteSpace(producer)) return null;
 
         var normalizedProducer = Producer.ToNormalizedName(producer);
 
-        if (_producerNamesToIds.TryGetValue(normalizedProducer, out var producerId))
-            return producerId;
+        if (_producerNamesToIds.TryGetValue(normalizedProducer, out var producerId)) return producerId;
 
         return _otherNamesToIds.TryGetValue(normalizedProducer, out var otherNameProducerId)
             ? otherNameProducerId
@@ -276,12 +290,12 @@ public class ProductImportLrt(
 
         return ex.Message;
     }
-    
+
     public record NewProductCsvDto
     {
         [Name("Sku")]
         public required string Sku { get; init; }
-        
+
         [Name("Name")]
         public required string Name { get; init; }
 

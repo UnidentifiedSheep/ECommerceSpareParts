@@ -21,7 +21,7 @@ public static class ServiceProvider
             var dbOptions = sp.GetRequiredService<IOptions<DatabaseOptions>>().Value;
             options.UseNpgsql(dbOptions.ConnectionString);
         });
-        
+
         collection.AddScoped(typeof(IRepository<,>), typeof(BasicEfRepository<,>));
         collection.AddScoped(typeof(IReadRepository<,>), typeof(ReadRepository<,>));
 

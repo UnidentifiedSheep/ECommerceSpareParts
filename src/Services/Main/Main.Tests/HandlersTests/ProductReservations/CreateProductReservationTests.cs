@@ -1,5 +1,5 @@
-using FluentAssertions;
 using Exceptions;
+using FluentAssertions;
 using Main.Application.Dtos.Product.Reservation;
 using Main.Application.Handlers.ProductReservations.CreateProductReservation;
 using Main.Entities.Currency;
@@ -220,7 +220,8 @@ public class CreateProductReservationTests : IntegrationTest
         {
             ProductId = Faker.PickRandom<Product>(ProductContext.Products).Id,
             Comment = Faker.Lorem.Sentence(),
-            GivenCurrencyId = hasProposedPrice ? Faker.PickRandom<Currency>(CurrencyContext.Currencies).Id : null,
+            GivenCurrencyId =
+                hasProposedPrice ? Faker.PickRandom<Currency>(CurrencyContext.Currencies).Id : null,
             ReservedCount = reservedCount,
             CurrentCount = Faker.Random.Int(1, reservedCount - 1),
             ProposedPrice = hasProposedPrice ? Math.Round(Faker.Random.Decimal(1, 1000), 2) : null,

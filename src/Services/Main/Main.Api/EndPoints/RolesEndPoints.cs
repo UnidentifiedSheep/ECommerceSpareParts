@@ -22,7 +22,7 @@ public record GetRoleResponse
 {
     [JsonPropertyName("role")]
     public required RoleDto Role { get; init; }
-    
+
     [JsonPropertyName("permissions")]
     public required IReadOnlyList<PermissionDto> Permissions { get; init; }
 }
@@ -40,15 +40,17 @@ public class RolesEndPoints : ICarterModule
         var roles = app.MapGroup("/roles")
             .WithTags("Roles");
 
-        roles.MapPost("/{roleName}/permissions/", async (
-                ISender sender,
-                string roleName,
-                AddPermissionToRoleRequest request,
-                CancellationToken ct) =>
-            {
-                await sender.Send(new AddPermissionToRoleCommand(roleName, request.PermissionName), ct);
-                return Results.NoContent();
-            })
+        roles.MapPost(
+                "/{roleName}/permissions/",
+                async (
+                    ISender sender,
+                    string roleName,
+                    AddPermissionToRoleRequest request,
+                    CancellationToken ct) =>
+                {
+                    await sender.Send(new AddPermissionToRoleCommand(roleName, request.PermissionName), ct);
+                    return Results.NoContent();
+                })
             .WithName("AddPermissionToRole")
             .WithSummary("Добавить разрешение роли")
             .WithDescription("Добавление разрешения в роль")
@@ -58,11 +60,18 @@ public class RolesEndPoints : ICarterModule
             .ProducesProblem(404)
             .RequireAnyPermission(PermissionCodes.ROLES_PERMISSIONS_CREATE);
 
-        roles.MapPost("", async (ISender sender, CreateRoleRequest request, CancellationToken cancellationToken) =>
-            {
-                await sender.Send(new UpsertRoleCommand(request.Name, request.Description), cancellationToken);
-                return Results.Created();
-            })
+        roles.MapPost(
+                "",
+                async (
+                    ISender sender,
+                    CreateRoleRequest request,
+                    CancellationToken cancellationToken) =>
+                {
+                    await sender.Send(
+                        new UpsertRoleCommand(request.Name, request.Description),
+                        cancellationToken);
+                    return Results.Created();
+                })
             .WithName("CreateRole")
             .WithSummary("Создать роль")
             .WithDescription("Создание роли")
@@ -72,14 +81,18 @@ public class RolesEndPoints : ICarterModule
             .ProducesProblem(StatusCodes.Status400BadRequest)
             .RequireAnyPermission(PermissionCodes.ROLES_CREATE);
 
-        roles.MapGet("", async (
-                ISender sender,
-                [AsParameters] GetRolesRequest queryParams,
-                CancellationToken cancellationToken) =>
-            {
-                var result = await sender.Send(new GetRolesQuery(queryParams.SearchTerm, queryParams), cancellationToken);
-                return Results.Ok(new GetRolesResponse(result.Roles));
-            })
+        roles.MapGet(
+                "",
+                async (
+                    ISender sender,
+                    [AsParameters] GetRolesRequest queryParams,
+                    CancellationToken cancellationToken) =>
+                {
+                    var result = await sender.Send(
+                        new GetRolesQuery(queryParams.SearchTerm, queryParams),
+                        cancellationToken);
+                    return Results.Ok(new GetRolesResponse(result.Roles));
+                })
             .WithName("GetRoles")
             .WithSummary("Получить роли")
             .WithDescription("Получение ролей")
@@ -87,21 +100,24 @@ public class RolesEndPoints : ICarterModule
             .Produces<GetRolesResponse>()
             .ProducesProblem(StatusCodes.Status400BadRequest)
             .RequireAnyPermission(PermissionCodes.ROLES_GET);
-        
-        roles.MapGet("{roleName}", async (
-                ISender sender,
-                string roleName,
-                CancellationToken cancellationToken) =>
-            {
-                var result = await sender.Send(
-                    new GetRoleQuery(roleName), 
-                    cancellationToken);
-                return Results.Ok(new GetRoleResponse
+
+        roles.MapGet(
+                "{roleName}",
+                async (
+                    ISender sender,
+                    string roleName,
+                    CancellationToken cancellationToken) =>
                 {
-                    Role = result.Role,
-                    Permissions = result.Permissions
-                });
-            })
+                    var result = await sender.Send(
+                        new GetRoleQuery(roleName),
+                        cancellationToken);
+                    return Results.Ok(
+                        new GetRoleResponse
+                        {
+                            Role = result.Role,
+                            Permissions = result.Permissions
+                        });
+                })
             .WithName("GetRole")
             .WithSummary("Получить роль")
             .WithDescription("Получение роли")

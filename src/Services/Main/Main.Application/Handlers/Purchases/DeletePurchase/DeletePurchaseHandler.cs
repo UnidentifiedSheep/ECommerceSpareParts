@@ -1,6 +1,5 @@
 using System.Data;
 using Abstractions.Interfaces.Persistence;
-using Abstractions.Interfaces.Services;
 using Application.Common.Extensions;
 using Application.Common.Interfaces;
 using Application.Common.Interfaces.Cqrs;
@@ -18,14 +17,18 @@ using MediatR;
 namespace Main.Application.Handlers.Purchases.DeletePurchase;
 
 [AutoSave]
-[Transactional(IsolationLevel.Serializable, 20, 2)]
+[Transactional(
+    IsolationLevel.Serializable,
+    20,
+    2)]
 public record DeletePurchaseCommand(Guid PurchaseId) : ICommand<Unit>;
 
 public class DeletePurchaseHandler(
     IUnitOfWork unitOfWork,
     IRepository<Purchase, Guid> repository,
     IIntegrationEventScope interfaceScope,
-    ISender sender)
+    ISender sender
+)
     : ICommandHandler<DeletePurchaseCommand, Unit>
 {
     public async Task<Unit> Handle(DeletePurchaseCommand request, CancellationToken cancellationToken)
@@ -35,12 +38,13 @@ public class DeletePurchaseHandler(
         await RevertTransactions(purchase, cancellationToken);
 
         unitOfWork.Remove(purchase);
-        
-        interfaceScope.Add(new PurchaseDeleteEvent
-        {
-            PurchaseId = request.PurchaseId
-        });
-        
+
+        interfaceScope.Add(
+            new PurchaseDeleteEvent
+            {
+                PurchaseId = request.PurchaseId
+            });
+
         return Unit.Value;
     }
 
@@ -66,19 +70,22 @@ public class DeletePurchaseHandler(
     }
 
     private async Task RevertTransactions(
-        Purchase purchase, 
+        Purchase purchase,
         CancellationToken token)
     {
         await sender.Send(
-            new ReverseTransactionCommand(purchase.TransactionId, TransactionReversalMode.System, true),
+            new ReverseTransactionCommand(
+                purchase.TransactionId,
+                TransactionReversalMode.System,
+                true),
             token);
 
         if (purchase.PurchaseLogistic?.TransactionId != null)
             await sender.Send(
                 new ReverseTransactionCommand(
                     purchase.PurchaseLogistic.TransactionId.Value,
-                    TransactionReversalMode.System, 
-                    true), 
+                    TransactionReversalMode.System,
+                    true),
                 token);
     }
 }

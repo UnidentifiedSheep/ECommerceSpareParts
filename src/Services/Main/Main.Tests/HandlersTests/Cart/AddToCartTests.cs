@@ -33,7 +33,11 @@ public class AddToCartTests : IntegrationTest
         var (user, product) = GetUserAndProduct();
         var count = Faker.Random.Int(1, 100);
 
-        var act = () => Mediator.Send(new AddToCartCommand(user.Id, product.Id, count));
+        var act = () => Mediator.Send(
+            new AddToCartCommand(
+                user.Id,
+                product.Id,
+                count));
 
         await act.Should().NotThrowAsync();
 
@@ -48,7 +52,10 @@ public class AddToCartTests : IntegrationTest
     public async Task AddToCart_SameItem_ThrowsSameItemInCartException()
     {
         var (user, product) = GetUserAndProduct();
-        var command = new AddToCartCommand(user.Id, product.Id, 5);
+        var command = new AddToCartCommand(
+            user.Id,
+            product.Id,
+            5);
         await Mediator.Send(command);
 
         var exception = await Assert.ThrowsAsync<DbValidationException>(() => Mediator.Send(command));
@@ -61,7 +68,10 @@ public class AddToCartTests : IntegrationTest
     public async Task AddToCart_InvalidCount_ThrowsValidationException(int count)
     {
         var (user, product) = GetUserAndProduct();
-        var command = new AddToCartCommand(user.Id, product.Id, count);
+        var command = new AddToCartCommand(
+            user.Id,
+            product.Id,
+            count);
 
         await Assert.ThrowsAsync<ValidationException>(() => Mediator.Send(command));
     }
@@ -70,7 +80,10 @@ public class AddToCartTests : IntegrationTest
     public async Task AddToCart_UserNotFound_ThrowsUserNotFoundException()
     {
         var (_, product) = GetUserAndProduct();
-        var command = new AddToCartCommand(Guid.NewGuid(), product.Id, 1);
+        var command = new AddToCartCommand(
+            Guid.NewGuid(),
+            product.Id,
+            1);
 
         var exception = await Assert.ThrowsAsync<DbValidationException>(() => Mediator.Send(command));
         Assert.Equal(ApplicationErrors.UsersNotFound, exception.Failures[0].ErrorName);

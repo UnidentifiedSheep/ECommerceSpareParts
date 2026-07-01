@@ -16,6 +16,9 @@ public sealed class PgsqlDbValidator<TContext>(IDbValidator<TContext, NpgsqlPara
         bool throwOnError = true,
         CancellationToken cancellationToken = default)
     {
-        return await validator.Validate(plan, throwOnError, cancellationToken);
+        return await validator.Validate(
+            plan,
+            throwOnError,
+            cancellationToken);
     }
 }

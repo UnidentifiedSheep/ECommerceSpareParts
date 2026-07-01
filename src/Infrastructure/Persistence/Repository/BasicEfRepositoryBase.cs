@@ -1,12 +1,14 @@
-﻿using Abstractions.Interfaces.Services;
-using Application.Common.Interfaces.Repositories;
+﻿using Application.Common.Interfaces.Repositories;
 using Domain;
 using Microsoft.EntityFrameworkCore;
 using Persistence.Interfaces;
 
 namespace Persistence.Repository;
 
-public abstract class BasicEfRepositoryBase<TContext, TEntity, TKey>(TContext context, IQueryableExtensions extensions)
+public abstract class BasicEfRepositoryBase<TContext, TEntity, TKey>(
+    TContext context,
+    IQueryableExtensions extensions
+)
     : EfRepository<TEntity, TKey, TContext>(context, extensions)
     where TEntity : Entity<TEntity, TKey>
     where TKey : notnull

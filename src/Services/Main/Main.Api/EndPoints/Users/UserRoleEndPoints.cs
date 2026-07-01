@@ -1,7 +1,6 @@
 using System.Text.Json.Serialization;
 using Api.Common.Extensions;
 using Enums;
-using Main.Application.Handlers.Auth;
 using Main.Application.Handlers.Auth.AddRoleToUser;
 using Main.Application.Handlers.Auth.RemoveRoleFromUser;
 using MediatR;
@@ -18,15 +17,17 @@ public static class UserRoleEndPoints
 {
     public static RouteGroupBuilder MapUserRoleEndPoints(this RouteGroupBuilder users)
     {
-        users.MapPost("/{userId:guid}/roles/", async (
-                ISender sender,
-                Guid userId,
-                AddRoleToUserRequest request,
-                CancellationToken ct) =>
-            {
-                await sender.Send(new AddRoleToUserCommand(userId, request.RoleName), ct);
-                return Results.NoContent();
-            })
+        users.MapPost(
+                "/{userId:guid}/roles/",
+                async (
+                    ISender sender,
+                    Guid userId,
+                    AddRoleToUserRequest request,
+                    CancellationToken ct) =>
+                {
+                    await sender.Send(new AddRoleToUserCommand(userId, request.RoleName), ct);
+                    return Results.NoContent();
+                })
             .WithName("AddRoleToUser")
             .WithSummary("Добавить роли пользователю")
             .WithDescription("Добавление пользователю роли")
@@ -37,15 +38,17 @@ public static class UserRoleEndPoints
             .ProducesProblem(404)
             .RequireAnyPermission(PermissionCodes.USERS_ROLES_CREATE);
 
-        users.MapDelete("/{userId:guid}/roles/{roleName}", async (
-                ISender sender,
-                Guid userId,
-                string roleName,
-                CancellationToken ct) =>
-            {
-                await sender.Send(new RemoveRoleFromUserCommand(userId, roleName), ct);
-                return Results.NoContent();
-            })
+        users.MapDelete(
+                "/{userId:guid}/roles/{roleName}",
+                async (
+                    ISender sender,
+                    Guid userId,
+                    string roleName,
+                    CancellationToken ct) =>
+                {
+                    await sender.Send(new RemoveRoleFromUserCommand(userId, roleName), ct);
+                    return Results.NoContent();
+                })
             .WithName("RemoveRoleFromUser")
             .WithSummary("Удалить роль у пользователя")
             .WithDescription("Удаление роли у пользователя")
@@ -54,7 +57,7 @@ public static class UserRoleEndPoints
             .ProducesProblem(400)
             .ProducesProblem(404)
             .RequireAnyPermission(PermissionCodes.USERS_ROLES_CREATE);
-        
+
         return users;
     }
 }

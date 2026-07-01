@@ -15,7 +15,8 @@ public record ChangeUserDiscountCommand(Guid UserId, decimal Discount) : IComman
 
 public class ChangeUserDiscountHandler(
     IRepository<User, Guid> usersRepository,
-    IIntegrationEventScope integrationEventScope)
+    IIntegrationEventScope integrationEventScope
+)
     : ICommandHandler<ChangeUserDiscountCommand>
 {
     public async Task<Unit> Handle(ChangeUserDiscountCommand request, CancellationToken cancellationToken)
@@ -32,12 +33,13 @@ public class ChangeUserDiscountHandler(
 
         user.SetDiscount(request.Discount);
 
-        integrationEventScope.Add(new UserDiscountUpdatedEvent
-        {
-            UserId = userId,
-            Discount = request.Discount,
-            ChangedAt = DateTime.UtcNow
-        });
+        integrationEventScope.Add(
+            new UserDiscountUpdatedEvent
+            {
+                UserId = userId,
+                Discount = request.Discount,
+                ChangedAt = DateTime.UtcNow
+            });
 
         return Unit.Value;
     }

@@ -5,7 +5,8 @@ namespace Integrations.Common;
 
 public static class ResilenceExtensions
 {
-    public static IHttpStandardResiliencePipelineBuilder AddDefaultResilenceHandler(this IHttpClientBuilder clientBuilder)
+    public static IHttpStandardResiliencePipelineBuilder AddDefaultResilenceHandler(
+        this IHttpClientBuilder clientBuilder)
     {
         return clientBuilder.AddStandardResilienceHandler(options =>
         {

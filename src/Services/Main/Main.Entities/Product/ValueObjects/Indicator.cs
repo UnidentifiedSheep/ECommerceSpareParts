@@ -4,9 +4,7 @@ namespace Main.Entities.Product.ValueObjects;
 
 public record Indicator
 {
-    private Indicator()
-    {
-    }
+    private Indicator() { }
 
     public Indicator(string? value)
     {
@@ -18,13 +16,7 @@ public record Indicator
 
     public string? Value { get; }
 
-    public static implicit operator Indicator(string? value)
-    {
-        return new Indicator(value);
-    }
+    public static implicit operator Indicator(string? value) { return new Indicator(value); }
 
-    public static implicit operator string?(Indicator? indicator)
-    {
-        return indicator?.Value;
-    }
+    public static implicit operator string?(Indicator? indicator) { return indicator?.Value; }
 }

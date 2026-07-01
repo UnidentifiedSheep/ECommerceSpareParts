@@ -6,8 +6,5 @@ public record ProductLinkageUpdatedEvent : IKeyedEvent
 {
     public required int Id { get; init; }
 
-    public string GetKey()
-    {
-        return $"product-linkage-updated:{Id}";
-    }
+    public string GetKey() { return $"product-linkage-updated:{Id}"; }
 }

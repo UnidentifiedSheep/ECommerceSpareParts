@@ -12,9 +12,7 @@ namespace Analytics.Persistence.Context;
 
 public partial class DContext : DbContext
 {
-    public DContext()
-    {
-    }
+    public DContext() { }
 
     public DContext(DbContextOptions<DContext> options)
         : base(options)
@@ -24,7 +22,7 @@ public partial class DContext : DbContext
     public virtual DbSet<Metric> Metrics { get; set; }
 
     public virtual DbSet<MetricJob> MetricJobs { get; set; }
-    
+
     public virtual DbSet<Job> Jobs { get; set; }
 
     public virtual DbSet<JobSchedule> JobSchedules { get; set; }
@@ -64,7 +62,7 @@ public partial class DContext : DbContext
         modelBuilder.Entity<Setting>()
             .HasDiscriminator(e => e.Key)
             .HasValue<Setting>(nameof(Setting));
-        
+
         modelBuilder.AddFieldsForAuditableEntities();
 
         modelBuilder.AllDateTimesToUtc();

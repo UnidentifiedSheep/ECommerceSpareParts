@@ -21,18 +21,9 @@ public class Order : AuditableEntity<Order, Guid>, ILinqEntity<Order, Guid>
     public string SignedTotalPrice { get; set; } = null!;
     public bool IsCanceled { get; set; }
 
-    public static Expression<Func<Order, Guid>> GetKeySelector()
-    {
-        return x => x.Id;
-    }
+    public static Expression<Func<Order, Guid>> GetKeySelector() { return x => x.Id; }
 
-    public static Expression<Func<Order, bool>> GetEqualityExpression(Guid key)
-    {
-        return x => x.Id == key;
-    }
+    public static Expression<Func<Order, bool>> GetEqualityExpression(Guid key) { return x => x.Id == key; }
 
-    public override Guid GetId()
-    {
-        return Id;
-    }
+    public override Guid GetId() { return Id; }
 }

@@ -34,10 +34,7 @@ public sealed class SearchCursor
         return Convert.ToBase64String(Encoding.UTF8.GetBytes(json));
     }
 
-    public string EncodeCursor()
-    {
-        return EncodeCursor(this);
-    }
+    public string EncodeCursor() { return EncodeCursor(this); }
 
     /// <summary>
     ///     Decodes a base64-encoded cursor string into a <see cref="SearchCursor" /> object.
@@ -54,13 +51,7 @@ public sealed class SearchCursor
     {
         if (string.IsNullOrWhiteSpace(cursor)) return null;
         var json = Encoding.UTF8.GetString(Convert.FromBase64String(cursor));
-        try
-        {
-            return JsonSerializer.Deserialize<SearchCursor>(json);
-        }
-        catch (Exception)
-        {
-            return null;
-        }
+        try { return JsonSerializer.Deserialize<SearchCursor>(json); }
+        catch (Exception) { return null; }
     }
 }

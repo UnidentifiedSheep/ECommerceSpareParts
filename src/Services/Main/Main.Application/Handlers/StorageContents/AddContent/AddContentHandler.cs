@@ -1,13 +1,10 @@
 using System.Data;
 using Abstractions.Interfaces.Persistence;
-using Abstractions.Interfaces.Services;
 using Application.Common.Extensions;
-using Application.Common.Interfaces;
 using Application.Common.Interfaces.Cqrs;
 using Application.Common.Interfaces.Currency;
 using Application.Common.Interfaces.Settings;
 using Attributes;
-using Contracts.Products;
 using Main.Application.Dtos.Storage;
 using Main.Application.Interfaces.Persistence;
 using Main.Application.Interfaces.Services.Storage;
@@ -21,7 +18,10 @@ using Event = Main.Entities.Event.Event;
 namespace Main.Application.Handlers.StorageContents.AddContent;
 
 [AutoSave]
-[Transactional(IsolationLevel.ReadCommitted, 20, 2)]
+[Transactional(
+    IsolationLevel.ReadCommitted,
+    20,
+    2)]
 public record AddContentCommand(
     IEnumerable<NewStorageContentDto> StorageContent,
     string StorageName,
@@ -36,7 +36,8 @@ public class AddContentHandler(
     ISettingsService settingsService,
     ICurrencyRepository currencyRepository,
     IUnitOfWork unitOfWork,
-    IStorageContentChangeNotifier changeNotifier) : ICommandHandler<AddContentCommand, AddContentResult>
+    IStorageContentChangeNotifier changeNotifier
+) : ICommandHandler<AddContentCommand, AddContentResult>
 {
     public async Task<AddContentResult> Handle(AddContentCommand request, CancellationToken cancellationToken)
     {
@@ -75,7 +76,10 @@ public class AddContentHandler(
                 item.Count,
                 item.BuyPrice,
                 item.CurrencyId,
-                await converter.ConvertToBaseAsync(item.BuyPrice, item.CurrencyId, cancellationToken),
+                await converter.ConvertToBaseAsync(
+                    item.BuyPrice,
+                    item.CurrencyId,
+                    cancellationToken),
                 baseCurrencyId,
                 item.PurchaseDate);
 

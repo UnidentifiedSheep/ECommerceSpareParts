@@ -12,7 +12,10 @@ public class UserPhoneTests
     {
         var userId = Guid.NewGuid();
 
-        var phone = UserPhone.Create(userId, " +90 (555) 123-45-67 ", PhoneType.Mobile);
+        var phone = UserPhone.Create(
+            userId,
+            " +90 (555) 123-45-67 ",
+            PhoneType.Mobile);
 
         phone.UserId.Should().Be(userId);
         phone.PhoneNumber.Should().Be("+90 (555) 123-45-67");
@@ -29,7 +32,10 @@ public class UserPhoneTests
     [InlineData("1234567890123456")]
     public void Create_InvalidPhone_Throws(string phoneNumber)
     {
-        var act = () => UserPhone.Create(Guid.NewGuid(), phoneNumber, PhoneType.Unknown);
+        var act = () => UserPhone.Create(
+            Guid.NewGuid(),
+            phoneNumber,
+            PhoneType.Unknown);
 
         act.Should().Throw<InvalidInputException>();
     }
@@ -37,7 +43,10 @@ public class UserPhoneTests
     [Fact]
     public void Confirm_True_SetsConfirmedAt()
     {
-        var phone = UserPhone.Create(Guid.NewGuid(), "+1 555 123 4567", PhoneType.Mobile);
+        var phone = UserPhone.Create(
+            Guid.NewGuid(),
+            "+1 555 123 4567",
+            PhoneType.Mobile);
 
         phone.Confirm();
 
@@ -48,7 +57,10 @@ public class UserPhoneTests
     [Fact]
     public void Confirm_False_ClearsConfirmedAt()
     {
-        var phone = UserPhone.Create(Guid.NewGuid(), "+1 555 123 4567", PhoneType.Mobile);
+        var phone = UserPhone.Create(
+            Guid.NewGuid(),
+            "+1 555 123 4567",
+            PhoneType.Mobile);
         phone.Confirm();
 
         phone.Confirm(false);
@@ -60,7 +72,10 @@ public class UserPhoneTests
     [Fact]
     public void ChangeType_UpdatesPhoneType()
     {
-        var phone = UserPhone.Create(Guid.NewGuid(), "+1 555 123 4567", PhoneType.Mobile);
+        var phone = UserPhone.Create(
+            Guid.NewGuid(),
+            "+1 555 123 4567",
+            PhoneType.Mobile);
 
         phone.ChangeType(PhoneType.Work);
 
@@ -70,7 +85,10 @@ public class UserPhoneTests
     [Fact]
     public void MakePrimary_UpdatesPrimaryFlag()
     {
-        var phone = UserPhone.Create(Guid.NewGuid(), "+1 555 123 4567", PhoneType.Mobile);
+        var phone = UserPhone.Create(
+            Guid.NewGuid(),
+            "+1 555 123 4567",
+            PhoneType.Mobile);
 
         phone.MakePrimary();
 

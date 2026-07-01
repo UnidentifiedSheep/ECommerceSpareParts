@@ -1,11 +1,9 @@
 using System.Data;
 using Abstractions.Interfaces.Persistence;
 using Abstractions.Models.Options;
-using Application.Common.Interfaces;
 using Application.Common.Interfaces.Cqrs;
 using Application.Common.Interfaces.Repositories;
 using Attributes;
-using Contracts.Sale;
 using LinqKit;
 using Main.Application.Dtos.Sale;
 using Main.Application.Handlers.Balance.CreateTransaction;
@@ -21,7 +19,10 @@ using Microsoft.Extensions.Options;
 
 namespace Main.Application.Handlers.Sales.CreateSale;
 
-[Transactional(IsolationLevel.ReadCommitted, 30, 2)]
+[Transactional(
+    IsolationLevel.ReadCommitted,
+    30,
+    2)]
 [AutoSave]
 public record CreateSaleCommand(
     Guid BuyerId,
@@ -32,7 +33,8 @@ public record CreateSaleCommand(
     string? Comment,
     decimal? PayedSum,
     string? ConfirmationCode,
-    bool ForcePayment = false) : ICommand<CreateSaleResult>;
+    bool ForcePayment = false
+) : ICommand<CreateSaleResult>;
 
 public record CreateSaleResult(SaleDto Sale);
 
@@ -42,20 +44,21 @@ public class CreateSaleHandler(
     IReadRepository<Sale, Guid> readRepository,
     ISaleEventService saleEventService,
     IUnitOfWork unitOfWork,
-    ISaleService saleService) : ICommandHandler<CreateSaleCommand, CreateSaleResult>
+    ISaleService saleService
+) : ICommandHandler<CreateSaleCommand, CreateSaleResult>
 {
     public async Task<CreateSaleResult> Handle(CreateSaleCommand request, CancellationToken cancellationToken)
     {
         var contents = request.Contents.ToList();
-        
+
         await saleService.CheckReservations(
-            contents, 
-            request.BuyerId, 
+            contents,
+            request.BuyerId,
             request.StorageName,
             false,
-            request.ConfirmationCode, 
+            request.ConfirmationCode,
             cancellationToken);
-        
+
         var systemId = systemOptions.Value.SystemId;
 
         var totalSum = contents.Sum(x => x.PriceWithDiscount * x.Count);
@@ -84,7 +87,7 @@ public class CreateSaleHandler(
                 TransactionCreationMode.System,
                 request.ForcePayment),
             cancellationToken)).Transaction;
-        
+
         var sale = Sale.Create(
             request.BuyerId,
             saleTransaction.Id,
@@ -93,7 +96,7 @@ public class CreateSaleHandler(
             request.SaleDateTime);
 
         sale.SetComment(request.Comment);
-        
+
         var distributed = await saleService.TakeFromStorageAndDistributeDetails(
             request.StorageName,
             contents,
@@ -101,17 +104,19 @@ public class CreateSaleHandler(
             false,
             cancellationToken);
 
-        foreach (var content in distributed)
-            sale.AddContent(content);
-        
-        
+        foreach (var content in distributed) sale.AddContent(content);
+
+
         sale.Complete();
 
-        await saleService.SubtractCountFromReservations(sale, request.BuyerId, cancellationToken);
+        await saleService.SubtractCountFromReservations(
+            sale,
+            request.BuyerId,
+            cancellationToken);
 
         await unitOfWork.AddAsync(sale, cancellationToken);
         await unitOfWork.SaveChangesAsync(cancellationToken);
-        
+
         await saleEventService.NotifyUpdated(sale.Id, cancellationToken);
 
         return await ReturnAsync(sale.GetId(), cancellationToken);

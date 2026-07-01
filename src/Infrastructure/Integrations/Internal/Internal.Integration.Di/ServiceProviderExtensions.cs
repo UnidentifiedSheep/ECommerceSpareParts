@@ -30,24 +30,27 @@ public static class ServiceProviderExtensions
         services.AddSingleton<IAuthTokenCache, AuthTokenCache>();
 
         services.AddHttpClient<IAuthClient, CacheableAuthClient>((sp, client) =>
-        {
-            var options = sp.GetRequiredService<IOptions<InternalServicesOptions>>().Value;
-            client.BaseAddress = new Uri(options.Main.Url);
-            client.DefaultRequestHeaders.Add(InternalTokenHeader, options.InternalToken);
-        }).AddDefaultResilenceHandler();
+            {
+                var options = sp.GetRequiredService<IOptions<InternalServicesOptions>>().Value;
+                client.BaseAddress = new Uri(options.Main.Url);
+                client.DefaultRequestHeaders.Add(InternalTokenHeader, options.InternalToken);
+            })
+            .AddDefaultResilenceHandler();
 
         services.AddHttpClient<IMainClient, RootClient>((sp, client) =>
-        {
-            var options = sp.GetRequiredService<IOptions<InternalServicesOptions>>().Value;
-            client.BaseAddress = new Uri(options.Main.Url);
-            client.DefaultRequestHeaders.Add(InternalTokenHeader, options.InternalToken);
-        }).AddDefaultResilenceHandler();
+            {
+                var options = sp.GetRequiredService<IOptions<InternalServicesOptions>>().Value;
+                client.BaseAddress = new Uri(options.Main.Url);
+                client.DefaultRequestHeaders.Add(InternalTokenHeader, options.InternalToken);
+            })
+            .AddDefaultResilenceHandler();
 
         services.AddHttpClient<ICommonClient, Common.RootClient>((sp, client) =>
-        {
-            var options = sp.GetRequiredService<IOptions<InternalServicesOptions>>().Value;
-            client.DefaultRequestHeaders.Add(InternalTokenHeader, options.InternalToken);
-        }).AddDefaultResilenceHandler();
+            {
+                var options = sp.GetRequiredService<IOptions<InternalServicesOptions>>().Value;
+                client.DefaultRequestHeaders.Add(InternalTokenHeader, options.InternalToken);
+            })
+            .AddDefaultResilenceHandler();
 
         return services;
     }

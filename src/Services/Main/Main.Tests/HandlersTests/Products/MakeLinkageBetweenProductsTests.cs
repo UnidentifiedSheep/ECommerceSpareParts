@@ -1,9 +1,7 @@
 using FluentAssertions;
-using FluentValidation;
 using Main.Application.Dtos.Product;
 using Main.Application.Handlers.Products.MakeLinkageBetweenArticles;
 using Main.Entities.Product;
-using Main.Enums;
 using Main.Enums.Products;
 using Microsoft.EntityFrameworkCore;
 using Test.Common.TestContainers.Combined;
@@ -67,7 +65,8 @@ public class MakeLinkageBetweenProductsTests : IntegrationTest
         await Context.ProductCrosses.AddAsync(ProductCross.Create(p1, p3));
         await Context.SaveChangesAsync();
 
-        var command = new MakeLinkageBetweenProductsCommand([
+        var command = new MakeLinkageBetweenProductsCommand(
+        [
             new NewProductLinkageDto
             {
                 ProductId = p1,
@@ -83,11 +82,13 @@ public class MakeLinkageBetweenProductsTests : IntegrationTest
             .AsNoTracking()
             .ToListAsync();
 
-        crosses.Should().Contain(x => x.LeftProductId == Math.Min(p1, p2)
-                                      && x.RightProductId == Math.Max(p1, p2));
+        crosses.Should()
+            .Contain(x => x.LeftProductId == Math.Min(p1, p2)
+                          && x.RightProductId == Math.Max(p1, p2));
 
-        crosses.Should().Contain(x => x.LeftProductId == Math.Min(p3, p2)
-                                      && x.RightProductId == Math.Max(p3, p2));
+        crosses.Should()
+            .Contain(x => x.LeftProductId == Math.Min(p3, p2)
+                          && x.RightProductId == Math.Max(p3, p2));
     }
 
     [Fact]
@@ -100,7 +101,8 @@ public class MakeLinkageBetweenProductsTests : IntegrationTest
         await Context.ProductCrosses.AddAsync(ProductCross.Create(p1, p3));
         await Context.SaveChangesAsync();
 
-        var command = new MakeLinkageBetweenProductsCommand([
+        var command = new MakeLinkageBetweenProductsCommand(
+        [
             new NewProductLinkageDto
             {
                 ProductId = p1,
@@ -114,7 +116,8 @@ public class MakeLinkageBetweenProductsTests : IntegrationTest
         var crosses = await Context.ProductCrosses.AsNoTracking().ToListAsync();
 
         crosses.Should().Contain(x => x.RightProductId == p2 && x.LeftProductId == Math.Min(p1, p2));
-        crosses.Should().Contain(x => x.RightProductId == Math.Max(p3, p2) && x.LeftProductId == Math.Min(p3, p2));
+        crosses.Should()
+            .Contain(x => x.RightProductId == Math.Max(p3, p2) && x.LeftProductId == Math.Min(p3, p2));
     }
 
     [Fact]
@@ -127,7 +130,8 @@ public class MakeLinkageBetweenProductsTests : IntegrationTest
         await Context.ProductCrosses.AddAsync(ProductCross.Create(p2, p3));
         await Context.SaveChangesAsync();
 
-        var command = new MakeLinkageBetweenProductsCommand([
+        var command = new MakeLinkageBetweenProductsCommand(
+        [
             new NewProductLinkageDto
             {
                 ProductId = p1,
@@ -140,17 +144,20 @@ public class MakeLinkageBetweenProductsTests : IntegrationTest
 
         var crosses = await Context.ProductCrosses.AsNoTracking().ToListAsync();
 
-        crosses.Should().Contain(x => x.LeftProductId == Math.Min(p1, p2)
-                                      && x.RightProductId == Math.Max(p1, p2));
+        crosses.Should()
+            .Contain(x => x.LeftProductId == Math.Min(p1, p2)
+                          && x.RightProductId == Math.Max(p1, p2));
 
-        crosses.Should().Contain(x => x.LeftProductId == Math.Min(p1, p3)
-                                      && x.RightProductId == Math.Max(p1, p3));
+        crosses.Should()
+            .Contain(x => x.LeftProductId == Math.Min(p1, p3)
+                          && x.RightProductId == Math.Max(p1, p3));
     }
 
     [Fact]
     public async Task MakeLinkage_ProductNotFound_Throws()
     {
-        var command = new MakeLinkageBetweenProductsCommand([
+        var command = new MakeLinkageBetweenProductsCommand(
+        [
             new NewProductLinkageDto
             {
                 ProductId = 999999,
@@ -176,7 +183,8 @@ public class MakeLinkageBetweenProductsTests : IntegrationTest
 
         Context.Entry(n).State = EntityState.Detached;
 
-        var command = new MakeLinkageBetweenProductsCommand([
+        var command = new MakeLinkageBetweenProductsCommand(
+        [
             new NewProductLinkageDto
             {
                 ProductId = p1,
@@ -202,7 +210,8 @@ public class MakeLinkageBetweenProductsTests : IntegrationTest
         var p2 = TestContext.Products[1].Id;
         var p3 = TestContext.Products[2].Id;
 
-        var command = new MakeLinkageBetweenProductsCommand([
+        var command = new MakeLinkageBetweenProductsCommand(
+        [
             new NewProductLinkageDto
             {
                 ProductId = p1,

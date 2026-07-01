@@ -10,7 +10,8 @@ using Persistence.Repository;
 namespace Main.Persistence.Repositories.Storage;
 
 public class StorageContentReservationRepository(DContext context, IQueryableExtensions extensions)
-    : LinqRepositoryBase<DContext, StorageContentReservation, int>(context, extensions), IStorageContentReservationRepository
+    : LinqRepositoryBase<DContext, StorageContentReservation, int>(context, extensions),
+        IStorageContentReservationRepository
 {
     public Task<Dictionary<int, int>> GetReservationsCountForUserAsync(
         Guid userId,

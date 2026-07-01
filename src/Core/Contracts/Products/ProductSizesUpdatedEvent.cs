@@ -8,8 +8,5 @@ public class ProductSizesUpdatedEvent : IKeyedEvent
     [JsonPropertyName("productId")]
     public required int ProductId { get; init; }
 
-    public string GetKey()
-    {
-        return $"product-sizes-updated:{ProductId}";
-    }
+    public string GetKey() { return $"product-sizes-updated:{ProductId}"; }
 }

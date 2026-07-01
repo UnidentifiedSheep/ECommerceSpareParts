@@ -101,7 +101,8 @@ public class CurrencyCacheRepositoryTests : IntegrationTest
         var result = await repository.GetAllCurrencies();
 
         result.Single(x => x.Id == cachedCurrency.Id)
-            .Should().BeEquivalentTo(cachedBeforeUpdate);
+            .Should()
+            .BeEquivalentTo(cachedBeforeUpdate);
         result.Single(x => x.Id == cachedCurrency.Id).Name.Should().NotBe("Cached updated name");
         result.Single(x => x.Id == dbCurrency.Id).Name.Should().Be("Db updated name");
     }
@@ -149,10 +150,7 @@ public class CurrencyCacheRepositoryTests : IntegrationTest
         return Scope.ServiceProvider.GetRequiredService<ICurrencyCacheRepository>();
     }
 
-    private ICache GetCache()
-    {
-        return Scope.ServiceProvider.GetRequiredService<ICache>();
-    }
+    private ICache GetCache() { return Scope.ServiceProvider.GetRequiredService<ICache>(); }
 
     private async Task RemoveAllCachedCurrencies(IEnumerable<int> currencyIds)
     {

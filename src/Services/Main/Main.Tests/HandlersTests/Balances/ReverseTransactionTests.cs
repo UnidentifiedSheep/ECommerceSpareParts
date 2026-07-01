@@ -1,5 +1,6 @@
 using FluentAssertions;
 using Main.Application.Handlers.Balance.ReverseTransaction;
+using Main.Entities.Balance;
 using Main.Entities.Exceptions;
 using Main.Enums.Balances;
 using Microsoft.EntityFrameworkCore;
@@ -48,7 +49,8 @@ public class ReverseTransactionTests : IntegrationTest
     }
 
     [Fact]
-    public async Task ReverseTransaction_UserModeAndNotManualSource_ThrowsTransactionSourceCannotBeReversedByUserException()
+    public async Task
+        ReverseTransaction_UserModeAndNotManualSource_ThrowsTransactionSourceCannotBeReversedByUserException()
     {
         var transaction = await CreateAppliedTransaction(TransactionSourceType.Purchase);
 
@@ -61,10 +63,11 @@ public class ReverseTransactionTests : IntegrationTest
     {
         var transaction = await CreateAppliedTransaction(TransactionSourceType.Purchase);
 
-        await Mediator.Send(new ReverseTransactionCommand(
-            transaction.Id,
-            TransactionReversalMode.System, 
-true));
+        await Mediator.Send(
+            new ReverseTransactionCommand(
+                transaction.Id,
+                TransactionReversalMode.System,
+                true));
 
         var reversed = await Context.Transactions
             .AsNoTracking()
@@ -92,7 +95,7 @@ true));
             Mediator.Send(new ReverseTransactionCommand(Guid.Empty)));
     }
 
-    private async Task<Main.Entities.Balance.Transaction> CreateAppliedTransaction(
+    private async Task<Transaction> CreateAppliedTransaction(
         TransactionSourceType sourceType)
     {
         var currencyId = TestContext.Currencies[0].Id;

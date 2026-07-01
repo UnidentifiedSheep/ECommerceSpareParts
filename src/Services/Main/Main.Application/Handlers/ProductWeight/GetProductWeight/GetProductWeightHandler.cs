@@ -14,7 +14,9 @@ public record GetProductWeightResult(ProductWeightDto ProductWeight);
 public class GetProductWeightHandler(IReadRepository<Entities.Product.ProductWeight, int> context)
     : IQueryHandler<GetProductWeightQuery, GetProductWeightResult>
 {
-    public async Task<GetProductWeightResult> Handle(GetProductWeightQuery request, CancellationToken cancellationToken)
+    public async Task<GetProductWeightResult> Handle(
+        GetProductWeightQuery request,
+        CancellationToken cancellationToken)
     {
         var productWeight = await context.Query
                                 .Where(x => x.ProductId == request.ProductId)

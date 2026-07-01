@@ -7,7 +7,8 @@ using Tests.DataBuilders.User;
 namespace Tests.TestContexts;
 
 public class UsersTestContext(
-    DContext context) : TestContextBase<DContext>(context)
+    DContext context
+) : TestContextBase<DContext>(context)
 {
     public IReadOnlyCollection<User> Users { get; private set; } = null!;
 

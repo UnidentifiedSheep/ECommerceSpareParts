@@ -96,8 +96,14 @@ public class PurchaseContentTests
     {
         var item = Create();
 
-        item.SetLogistic(1, 2, 3);
-        item.SetLogistic(2, 3, 4);
+        item.SetLogistic(
+            1,
+            2,
+            3);
+        item.SetLogistic(
+            2,
+            3,
+            4);
 
         item.PurchaseContentLogistic!.WeightKg.Should().Be(2);
         item.PurchaseContentLogistic.AreaM3.Should().Be(3);
@@ -105,10 +111,22 @@ public class PurchaseContentTests
     }
 
     [Theory]
-    [InlineData(3, 5, 15)]
-    [InlineData(10, 2, 20)]
-    [InlineData(4, 7, 28)]
-    public void TotalSum_AfterUpdates_IsCorrect(int count, decimal price, decimal expected)
+    [InlineData(
+        3,
+        5,
+        15)]
+    [InlineData(
+        10,
+        2,
+        20)]
+    [InlineData(
+        4,
+        7,
+        28)]
+    public void TotalSum_AfterUpdates_IsCorrect(
+        int count,
+        decimal price,
+        decimal expected)
     {
         var item = Create();
 
@@ -135,8 +153,18 @@ public class PurchaseContentTests
     }
 
     [Theory]
-    [InlineData(2, 3, 4, 5, 20)]
-    [InlineData(1, 2, 3, 4, 12)]
+    [InlineData(
+        2,
+        3,
+        4,
+        5,
+        20)]
+    [InlineData(
+        1,
+        2,
+        3,
+        4,
+        12)]
     public void TotalSum_MultipleChanges_IsConsistent(
         decimal p1,
         int c1,
@@ -162,7 +190,10 @@ public class PurchaseContentTests
         item.SetPrice(2m);
         item.SetCount(3);
         item.SetComment("test");
-        item.SetLogistic(1, 2, 3);
+        item.SetLogistic(
+            1,
+            2,
+            3);
 
         item.TotalSum.Should().Be(6m);
         item.Comment.Should().Be("test");

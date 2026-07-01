@@ -9,17 +9,17 @@ public class CurrencySeed : ISeed<DContext>
 {
     public async Task SeedAsync(DContext context)
     {
-        if (await context.Currencies.AnyAsync(x => x.Code == "USD"))
-            return;
+        if (await context.Currencies.AnyAsync(x => x.Code == "USD")) return;
 
-        var usd = Currency.Create("Доллар США", "Дол.", "$", "USD");
+        var usd = Currency.Create(
+            "Доллар США",
+            "Дол.",
+            "$",
+            "USD");
 
         await context.Currencies.AddAsync(usd);
         await context.SaveChangesAsync();
     }
 
-    public int GetPriority()
-    {
-        return 0;
-    }
+    public int GetPriority() { return 0; }
 }

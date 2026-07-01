@@ -11,5 +11,6 @@ public class Coefficient
 
     public CoefficientType Type { get; set; }
 
-    public virtual ICollection<ProductCoefficient> ProductCoefficients { get; set; } = new List<ProductCoefficient>();
+    public virtual ICollection<ProductCoefficient> ProductCoefficients { get; set; } =
+        new List<ProductCoefficient>();
 }

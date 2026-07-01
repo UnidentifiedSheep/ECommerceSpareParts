@@ -8,7 +8,8 @@ public class MakeLinkageBetweenProductsDbValidation : AbstractDbValidation<MakeL
 {
     public override void Build(IValidationPlan plan, MakeLinkageBetweenProductsCommand request)
     {
-        plan.ValidateProductExistsId(request.Linkages
-            .SelectMany(x => new[] { x.ProductId, x.CrossProductId }));
+        plan.ValidateProductExistsId(
+            request.Linkages
+                .SelectMany(x => new[] { x.ProductId, x.CrossProductId }));
     }
 }

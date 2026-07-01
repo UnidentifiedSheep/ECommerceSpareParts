@@ -1,6 +1,5 @@
 using Abstractions;
 using Abstractions.Interfaces;
-using Microsoft.Extensions.Options;
 
 namespace Internal.Integration.Core.Extensions;
 

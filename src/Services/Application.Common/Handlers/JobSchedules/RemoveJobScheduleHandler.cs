@@ -8,12 +8,15 @@ using MediatR;
 
 namespace Application.Common.Handlers.JobSchedules;
 
-[Transactional, AutoSave, Diagnostics]
+[Transactional]
+[AutoSave]
+[Diagnostics]
 public record RemoveJobScheduleCommand(Guid JobScheduleId) : ICommand;
 
 public class RemoveJobScheduleHandler(
     IRepository<JobSchedule, Guid> repository,
-    IUnitOfWork unitOfWork) : ICommandHandler<RemoveJobScheduleCommand>
+    IUnitOfWork unitOfWork
+) : ICommandHandler<RemoveJobScheduleCommand>
 {
     public async Task<Unit> Handle(RemoveJobScheduleCommand request, CancellationToken cancellationToken)
     {

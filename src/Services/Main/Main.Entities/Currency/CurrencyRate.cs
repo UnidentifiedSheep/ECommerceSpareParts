@@ -9,11 +9,12 @@ public class CurrencyRate : AuditableEntity<CurrencyRate, (int, int)>, ILinqEnti
 {
     private readonly List<CurrencyRateHistory> _history = [];
 
-    private CurrencyRate()
-    {
-    }
+    private CurrencyRate() { }
 
-    private CurrencyRate(int fromCurrencyId, int toCurrencyId, decimal rate)
+    private CurrencyRate(
+        int fromCurrencyId,
+        int toCurrencyId,
+        decimal rate)
     {
         fromCurrencyId.AgainstEqual(
             toCurrencyId,
@@ -43,9 +44,15 @@ public class CurrencyRate : AuditableEntity<CurrencyRate, (int, int)>, ILinqEnti
         return x => x.FromCurrencyId == key.Item1 && x.ToCurrencyId == key.Item2;
     }
 
-    public static CurrencyRate Create(int fromCurrencyId, int toCurrencyId, decimal rate)
+    public static CurrencyRate Create(
+        int fromCurrencyId,
+        int toCurrencyId,
+        decimal rate)
     {
-        return new CurrencyRate(fromCurrencyId, toCurrencyId, rate);
+        return new CurrencyRate(
+            fromCurrencyId,
+            toCurrencyId,
+            rate);
     }
 
     public void SetRate(decimal rate)
@@ -57,11 +64,13 @@ public class CurrencyRate : AuditableEntity<CurrencyRate, (int, int)>, ILinqEnti
             0,
             () => new InvalidOperationException("Currency rate must be greater than 0"));
 
-        _history.Add(CurrencyRateHistory.Create(FromCurrencyId, ToCurrencyId, prev, rate));
+        _history.Add(
+            CurrencyRateHistory.Create(
+                FromCurrencyId,
+                ToCurrencyId,
+                prev,
+                rate));
     }
 
-    public override (int, int) GetId()
-    {
-        return (FromCurrencyId, ToCurrencyId);
-    }
+    public override (int, int) GetId() { return (FromCurrencyId, ToCurrencyId); }
 }

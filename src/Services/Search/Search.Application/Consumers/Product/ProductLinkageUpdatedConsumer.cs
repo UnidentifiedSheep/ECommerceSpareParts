@@ -1,12 +1,12 @@
 using Contracts.Products;
 using MassTransit;
 using Search.Application.Interfaces;
-using Search.Application.Interfaces.Product;
 
 namespace Search.Application.Consumers.Product;
 
 public class ProductLinkageUpdatedConsumer(
-    IIndexSynchronizer<Entities.Product, int> productIndexSynchronizer) : IConsumer<ProductLinkageUpdatedEvent>
+    IIndexSynchronizer<Entities.Product, int> productIndexSynchronizer
+) : IConsumer<ProductLinkageUpdatedEvent>
 {
     public Task Consume(ConsumeContext<ProductLinkageUpdatedEvent> context)
     {

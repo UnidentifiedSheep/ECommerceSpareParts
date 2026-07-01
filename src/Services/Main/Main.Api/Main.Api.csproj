@@ -12,13 +12,13 @@
 
     <ItemGroup>
         <PackageReference Include="Carter" Version="10.0.0"/>
-        <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="10.0.9" />
-        <PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="10.0.9" />
+        <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="10.0.9"/>
+        <PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="10.0.9"/>
         <PackageReference Include="OpenTelemetry.Exporter.Prometheus.AspNetCore" Version="1.14.0-beta.1"/>
-        <PackageReference Include="OpenTelemetry.Extensions.Hosting" Version="1.16.0" />
-        <PackageReference Include="OpenTelemetry.Instrumentation.AspNetCore" Version="1.16.0" />
+        <PackageReference Include="OpenTelemetry.Extensions.Hosting" Version="1.16.0"/>
+        <PackageReference Include="OpenTelemetry.Instrumentation.AspNetCore" Version="1.16.0"/>
         <PackageReference Include="OpenTelemetry.Instrumentation.Process" Version="1.14.0-beta.2"/>
-        <PackageReference Include="OpenTelemetry.Instrumentation.Runtime" Version="1.15.1" />
+        <PackageReference Include="OpenTelemetry.Instrumentation.Runtime" Version="1.15.1"/>
         <PackageReference Include="prometheus-net.AspNetCore" Version="8.2.1"/>
         <PackageReference Include="Serilog.Sinks.Loki" Version="4.0.0-beta3"/>
         <PackageReference Include="Swashbuckle.AspNetCore.Swagger" Version="10.0.1"/>
@@ -30,7 +30,7 @@
         <ProjectReference Include="..\..\..\Infrastructure\Cache\Cache.csproj"/>
         <ProjectReference Include="..\..\..\Infrastructure\Common\Common.csproj"/>
         <ProjectReference Include="..\..\..\Infrastructure\Integrations\ExchangeRate\ExchangeRate.csproj"/>
-        <ProjectReference Include="..\..\..\Infrastructure\Mailing\Mail\Mail.csproj" />
+        <ProjectReference Include="..\..\..\Infrastructure\Mailing\Mail\Mail.csproj"/>
         <ProjectReference Include="..\..\..\Infrastructure\RabbitMq\RabbitMq.csproj"/>
         <ProjectReference Include="..\..\..\Infrastructure\S3\S3.csproj"/>
         <ProjectReference Include="..\..\..\Infrastructure\Security\Security.csproj"/>
@@ -43,7 +43,7 @@
 
     <ItemGroup>
         <Content Include="..\..\..\..\.dockerignore">
-          <Link>.dockerignore</Link>
+            <Link>.dockerignore</Link>
         </Content>
         <Content Include="..\Main.Entities\Localization\**\*">
             <Link>Localization\%(RecursiveDir)%(Filename)%(Extension)</Link>
@@ -64,7 +64,7 @@
 
     <Target Name="AddEmailTemplatesToPublish" BeforeTargets="ComputeFilesToPublish">
         <ItemGroup>
-            <EmailTemplate Include="..\..\..\Infrastructure\Mailing\EmailTemplates\**\*.cshtml" />
+            <EmailTemplate Include="..\..\..\Infrastructure\Mailing\EmailTemplates\**\*.cshtml"/>
             <ResolvedFileToPublish Include="@(EmailTemplate)">
                 <RelativePath>Templates\Emails\%(EmailTemplate.RecursiveDir)%(EmailTemplate.Filename)%(EmailTemplate.Extension)</RelativePath>
                 <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>

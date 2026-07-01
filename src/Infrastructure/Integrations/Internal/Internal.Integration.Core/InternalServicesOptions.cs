@@ -8,16 +8,16 @@ public record InternalServicesOptions
 
     [Required]
     public required ServiceOptions Main { get; init; }
-    
+
     [Required]
     public required ServiceOptions Analytics { get; init; }
-    
+
     [Required]
     public required ServiceOptions Pricing { get; init; }
 
     [Required]
     public required ServiceOptions Search { get; init; }
-    
+
     [Required]
     public required string InternalToken { get; init; }
 }

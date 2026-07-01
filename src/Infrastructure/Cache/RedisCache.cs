@@ -6,7 +6,8 @@ namespace Cache;
 
 public class RedisCache(
     IDatabase redis,
-    string? prefix = null) : ICache
+    string? prefix = null
+) : ICache
 {
     public Task<T?> GetAsync<T>(
         string key,
@@ -36,7 +37,10 @@ public class RedisCache(
             {
                 ArgumentNullException.ThrowIfNull(x.value);
                 rawKeys.Add(x.key);
-                return new KeyPathValue(GetWithPrefixString(x.key), "$", x.value);
+                return new KeyPathValue(
+                    GetWithPrefixString(x.key),
+                    "$",
+                    x.value);
             })
             .ToArray();
 
@@ -49,7 +53,11 @@ public class RedisCache(
         TimeSpan? ttl = null,
         ExpireWhen when = ExpireWhen.Always)
     {
-        return SetExpireCore(redis, key, ttl, when);
+        return SetExpireCore(
+            redis,
+            key,
+            ttl,
+            when);
     }
 
     public async Task<Dictionary<string, bool>> SetExpireAsync(
@@ -60,7 +68,11 @@ public class RedisCache(
         var batch = redis.CreateBatch();
         var keyedTasks = keys
             .Distinct()
-            .Select(x => (x, SetExpireCore(batch, x, ttl, when)))
+            .Select(x => (x, SetExpireCore(
+                batch,
+                x,
+                ttl,
+                when)))
             .ToDictionary(x => x.x, x => x.Item2);
 
         batch.Execute();
@@ -75,16 +87,12 @@ public class RedisCache(
         string key,
         string path = "$[*]")
     {
-        if (!await redis.KeyExistsAsync(GetWithPrefix(key)))
-            return [];
+        if (!await redis.KeyExistsAsync(GetWithPrefix(key))) return [];
 
         return await redis.JSON().GetEnumerableAsync<T>(GetWithPrefix(key), path);
     }
 
-    public Task<bool> KeyExistsAsync(string key)
-    {
-        return redis.KeyExistsAsync(GetWithPrefix(key));
-    }
+    public Task<bool> KeyExistsAsync(string key) { return redis.KeyExistsAsync(GetWithPrefix(key)); }
 
     public async Task SetEnumerableAsync<T>(
         string key,
@@ -92,10 +100,11 @@ public class RedisCache(
         string path = "$",
         TimeSpan? ttl = null)
     {
-        await redis.JSON().SetAsync(
-            GetWithPrefix(key),
-            path,
-            values);
+        await redis.JSON()
+            .SetAsync(
+                GetWithPrefix(key),
+                path,
+                values);
 
         await SetExpireAsync(key, ttl);
     }
@@ -118,10 +127,7 @@ public class RedisCache(
         return redis.KeyDeleteAsync(GetWithPrefixes(keys));
     }
 
-    public Task RemoveKeyAsync(string key)
-    {
-        return redis.KeyDeleteAsync(GetWithPrefix(key));
-    }
+    public Task RemoveKeyAsync(string key) { return redis.KeyDeleteAsync(GetWithPrefix(key)); }
 
     public async Task<string[]> GetFromSetAsync(string key)
     {
@@ -141,13 +147,16 @@ public class RedisCache(
         var batch = redis.CreateBatch();
         var tasks = new List<Task>();
         foreach (var (key, values) in keyValues)
-            tasks.Add(AddToSetCore(batch, key, values));
+            tasks.Add(
+                AddToSetCore(
+                    batch,
+                    key,
+                    values));
 
         batch.Execute();
         await Task.WhenAll(tasks);
 
-        if (ttl.HasValue)
-            await SetExpireAsync(keyValues.Keys, ttl);
+        if (ttl.HasValue) await SetExpireAsync(keyValues.Keys, ttl);
     }
 
     private Task AddToSetCore(
@@ -177,10 +186,7 @@ public class RedisCache(
         return string.IsNullOrWhiteSpace(prefix) ? key : $"{prefix}:{key}";
     }
 
-    private RedisKey GetWithPrefix(string key)
-    {
-        return GetWithPrefixString(key);
-    }
+    private RedisKey GetWithPrefix(string key) { return GetWithPrefixString(key); }
 
     private RedisKey[] GetWithPrefixes(IEnumerable<string> keys)
     {

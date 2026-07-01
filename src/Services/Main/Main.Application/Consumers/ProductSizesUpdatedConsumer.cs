@@ -8,7 +8,8 @@ namespace Main.Application.Consumers;
 
 public class ProductSizesUpdatedConsumer(
     IFusionCache cache,
-    ICachePolicy<GetProductSizeQuery> cachePolicy) : IConsumer<ProductSizesUpdatedEvent>
+    ICachePolicy<GetProductSizeQuery> cachePolicy
+) : IConsumer<ProductSizesUpdatedEvent>
 {
     public async Task Consume(ConsumeContext<ProductSizesUpdatedEvent> context)
     {

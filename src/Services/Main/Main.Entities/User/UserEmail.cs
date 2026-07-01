@@ -8,11 +8,12 @@ namespace Main.Entities.User;
 
 public class UserEmail : AuditableEntity<UserEmail, string>, ILinqEntity<UserEmail, string>
 {
-    private UserEmail()
-    {
-    }
+    private UserEmail() { }
 
-    private UserEmail(Guid userId, Email email, EmailType emailType)
+    private UserEmail(
+        Guid userId,
+        Email email,
+        EmailType emailType)
     {
         UserId = userId;
         Email = email;
@@ -32,19 +33,22 @@ public class UserEmail : AuditableEntity<UserEmail, string>, ILinqEntity<UserEma
     public DateTime? ConfirmedAt { get; private set; }
     public User User { get; private set; } = null!;
 
-    public static Expression<Func<UserEmail, string>> GetKeySelector()
-    {
-        return x => x.Email.Value;
-    }
+    public static Expression<Func<UserEmail, string>> GetKeySelector() { return x => x.Email.Value; }
 
     public static Expression<Func<UserEmail, bool>> GetEqualityExpression(string key)
     {
         return x => x.Email == key;
     }
 
-    internal static UserEmail Create(Guid userId, Email email, EmailType emailType)
+    internal static UserEmail Create(
+        Guid userId,
+        Email email,
+        EmailType emailType)
     {
-        return new UserEmail(userId, email, emailType);
+        return new UserEmail(
+            userId,
+            email,
+            emailType);
     }
 
     public void Confirm(bool confirmed = true)
@@ -53,18 +57,9 @@ public class UserEmail : AuditableEntity<UserEmail, string>, ILinqEntity<UserEma
         ConfirmedAt = confirmed ? DateTime.UtcNow : null;
     }
 
-    public void ChangeType(EmailType emailType)
-    {
-        EmailType = emailType;
-    }
+    public void ChangeType(EmailType emailType) { EmailType = emailType; }
 
-    public void MakePrimary(bool isPrimary = true)
-    {
-        IsPrimary = isPrimary;
-    }
+    public void MakePrimary(bool isPrimary = true) { IsPrimary = isPrimary; }
 
-    public override string GetId()
-    {
-        return Email.Value;
-    }
+    public override string GetId() { return Email.Value; }
 }

@@ -1,6 +1,11 @@
 ﻿namespace Main.Application.Models.Logistics;
 
-public class LogisticsContext(decimal priceKg, decimal priceM3, decimal pricePerOrder, decimal? minimumPrice = null)
+public class LogisticsContext(
+    decimal priceKg,
+    decimal priceM3,
+    decimal pricePerOrder,
+    decimal? minimumPrice = null
+)
 {
     public decimal PriceKg { get; } = priceKg;
     public decimal PriceM3 { get; } = priceM3;

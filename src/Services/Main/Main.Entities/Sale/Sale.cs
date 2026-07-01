@@ -2,7 +2,6 @@ using System.Linq.Expressions;
 using Domain;
 using Domain.Extensions;
 using Domain.Interfaces;
-using Exceptions;
 using Main.Entities.Balance;
 using Main.Enums;
 
@@ -12,11 +11,14 @@ public class Sale : AuditableEntity<Sale, Guid>, ILinqEntity<Sale, Guid>, IVersi
 {
     private readonly List<SaleContent> _contents = [];
 
-    private Sale()
-    {
-    }
+    private Sale() { }
 
-    private Sale(Guid buyerId, Guid transactionId, int currencyId, string storageName, DateTime saleDate)
+    private Sale(
+        Guid buyerId,
+        Guid transactionId,
+        int currencyId,
+        string storageName,
+        DateTime saleDate)
     {
         TransactionId = transactionId;
         CurrencyId = currencyId;
@@ -38,26 +40,32 @@ public class Sale : AuditableEntity<Sale, Guid>, ILinqEntity<Sale, Guid>, IVersi
     public Currency.Currency Currency { get; private set; } = null!;
     public Transaction Transaction { get; private set; } = null!;
     public IReadOnlyList<SaleContent> Contents => _contents;
+
+    public static Expression<Func<Sale, Guid>> GetKeySelector() { return x => x.Id; }
+
+    public static Expression<Func<Sale, bool>> GetEqualityExpression(Guid key) { return x => x.Id == key; }
+
     public uint RowVersion { get; private set; }
 
-    public static Expression<Func<Sale, Guid>> GetKeySelector()
+    public static Sale Create(
+        Guid buyerId,
+        Guid transactionId,
+        int currencyId,
+        string storageName,
+        DateTime saleDate)
     {
-        return x => x.Id;
-    }
-
-    public static Expression<Func<Sale, bool>> GetEqualityExpression(Guid key)
-    {
-        return x => x.Id == key;
-    }
-
-    public static Sale Create(Guid buyerId, Guid transactionId, int currencyId, string storageName, DateTime saleDate)
-    {
-        return new Sale(buyerId, transactionId, currencyId, storageName, saleDate);
+        return new Sale(
+            buyerId,
+            transactionId,
+            currencyId,
+            storageName,
+            saleDate);
     }
 
     public void SetComment(string? comment)
     {
-        Comment = comment.NullIfWhiteSpace()?
+        Comment = comment.NullIfWhiteSpace()
+            ?
             .AgainstTooLong(256, "sale.comment.max");
     }
 
@@ -70,44 +78,31 @@ public class Sale : AuditableEntity<Sale, Guid>, ILinqEntity<Sale, Guid>, IVersi
 
     public void RemoveContent(SaleContent content)
     {
-        if (content.SaleId != GetId())
-            throw new InvalidOperationException("Invalid sale id in sale content");
+        if (content.SaleId != GetId()) throw new InvalidOperationException("Invalid sale id in sale content");
         _contents.Remove(content);
     }
 
-    public void SetDateTime(DateTime dateTime)
-    {
-        SaleDatetime = dateTime;
-    }
+    public void SetDateTime(DateTime dateTime) { SaleDatetime = dateTime; }
 
-    public void SetCurrency(int currencyId)
-    {
-        CurrencyId = currencyId;
-    }
+    public void SetCurrency(int currencyId) { CurrencyId = currencyId; }
 
-    public void SetTransactionId(Guid transactionId)
-    {
-        TransactionId = transactionId;
-    }
-    
+    public void SetTransactionId(Guid transactionId) { TransactionId = transactionId; }
+
     public void Complete()
     {
-        if (State == SaleState.Deleted)
-            throw new InvalidOperationException("Cannot complete deleted sale");
+        if (State == SaleState.Deleted) throw new InvalidOperationException("Cannot complete deleted sale");
 
-        if (Contents.Count == 0)
-            throw new InvalidOperationException("Cannot complete empty sale");
-        
+        if (Contents.Count == 0) throw new InvalidOperationException("Cannot complete empty sale");
+
         State = SaleState.Completed;
     }
 
     public void Delete()
     {
-        if (State == SaleState.Deleted)
-            return;
+        if (State == SaleState.Deleted) return;
 
         State = SaleState.Deleted;
     }
 
-    public override Guid GetId() => Id;
+    public override Guid GetId() { return Id; }
 }

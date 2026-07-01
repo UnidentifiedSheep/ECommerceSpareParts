@@ -19,7 +19,10 @@ public class ProductSizeBuilder(Faker faker) : BuilderBase<ProductSize>(faker)
         return this;
     }
 
-    public ProductSizeBuilder WithDimensions(decimal length, decimal width, decimal height)
+    public ProductSizeBuilder WithDimensions(
+        decimal length,
+        decimal width,
+        decimal height)
     {
         Length = length;
         Width = width;

@@ -6,4 +6,5 @@ public record ConnectionCheck<TConnection>(
     bool CanUse,
     TConnection? Connection,
     SupplierUnavailableReason? Reason = null,
-    string? Message = null);
+    string? Message = null
+);

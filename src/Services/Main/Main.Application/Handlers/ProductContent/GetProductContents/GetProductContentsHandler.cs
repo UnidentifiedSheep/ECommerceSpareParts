@@ -9,7 +9,9 @@ public record GetProductContentsQuery(int ProductId) : IQuery<GetProductContents
 
 public record GetProductContentsResult(IReadOnlyList<ProductContentDto> Contents);
 
-public class GetProductContentsHandler(IReadRepository<Entities.Product.ProductContent, (int, int)> repository)
+public class GetProductContentsHandler(
+    IReadRepository<Entities.Product.ProductContent, (int, int)> repository
+)
     : IQueryHandler<GetProductContentsQuery, GetProductContentsResult>
 {
     public async Task<GetProductContentsResult> Handle(
@@ -33,7 +35,8 @@ public class GetProductContentsHandler(IReadRepository<Entities.Product.ProductC
                     ProducerName = x.ChildProduct.Producer.Name,
                     Images = x.ChildProduct.Images.Select(z => z.Path).ToList()
                 }
-            }).ToListAsync(cancellationToken);
+            })
+            .ToListAsync(cancellationToken);
         return new GetProductContentsResult(result);
     }
 }

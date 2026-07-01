@@ -75,8 +75,7 @@ public class PurchaseBuilder(Faker faker) : BuilderBase<DomainPurchase>(faker)
             Storage ?? Faker.Lorem.Word(),
             PurchaseDateTime ?? DateTime.UtcNow);
 
-        foreach (var content in _contents)
-            purchase.AddContent(content);
+        foreach (var content in _contents) purchase.AddContent(content);
 
         if (LogisticRoute is not null)
             purchase.SetPurchaseLogistic(

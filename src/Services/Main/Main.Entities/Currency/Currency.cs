@@ -12,11 +12,13 @@ public class Currency : Entity<Currency, int>, ILinqEntity<Currency, int>
 
     private readonly List<CurrencyRate> _ratesTo = [];
 
-    private Currency()
-    {
-    }
+    private Currency() { }
 
-    private Currency(string name, string shortName, string currencySign, string code)
+    private Currency(
+        string name,
+        string shortName,
+        string currencySign,
+        string code)
     {
         SetName(name);
         SetShortName(shortName);
@@ -42,19 +44,21 @@ public class Currency : Entity<Currency, int>, ILinqEntity<Currency, int>
     public IReadOnlyCollection<CurrencyRate> RatesFrom => _ratesFrom;
     public IReadOnlyCollection<CurrencyRate> RatesTo => _ratesTo;
 
-    public static Expression<Func<Currency, int>> GetKeySelector()
-    {
-        return x => x.Id;
-    }
+    public static Expression<Func<Currency, int>> GetKeySelector() { return x => x.Id; }
 
-    public static Expression<Func<Currency, bool>> GetEqualityExpression(int key)
-    {
-        return x => x.Id == key;
-    }
+    public static Expression<Func<Currency, bool>> GetEqualityExpression(int key) { return x => x.Id == key; }
 
-    public static Currency Create(string name, string shortName, string currencySign, string code)
+    public static Currency Create(
+        string name,
+        string shortName,
+        string currencySign,
+        string code)
     {
-        return new Currency(name, shortName, currencySign, code);
+        return new Currency(
+            name,
+            shortName,
+            currencySign,
+            code);
     }
 
     private void SetName(string name)
@@ -93,8 +97,5 @@ public class Currency : Entity<Currency, int>, ILinqEntity<Currency, int>
             .AgainstTooShort(2, "currency.code.min.length");
     }
 
-    public override int GetId()
-    {
-        return Id;
-    }
+    public override int GetId() { return Id; }
 }

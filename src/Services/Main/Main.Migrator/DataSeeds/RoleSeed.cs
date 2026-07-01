@@ -32,8 +32,5 @@ public class RoleSeed : ISeed<DContext>
         await context.SaveChangesAsync();
     }
 
-    public int GetPriority()
-    {
-        return 0;
-    }
+    public int GetPriority() { return 0; }
 }

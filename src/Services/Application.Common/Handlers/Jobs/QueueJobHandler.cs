@@ -14,31 +14,39 @@ namespace Application.Common.Handlers.Jobs;
 public sealed record QueueJobCommand : ICommand<QueueJobResult>
 {
     public readonly IReadOnlyList<QueueJobItem> Jobs;
-    public QueueJobCommand(string systemName,
+
+    public QueueJobCommand(
+        string systemName,
         string inputState,
         int maxAttempts)
     {
-        Jobs = new List<QueueJobItem> { new(systemName, inputState, maxAttempts) };
+        Jobs = new List<QueueJobItem>
+        {
+            new(
+                systemName,
+                inputState,
+                maxAttempts)
+        };
     }
-    
-    public QueueJobCommand(IEnumerable<QueueJobItem> jobs)
-    {
-        Jobs = jobs.ToList();
-    }
-    
+
+    public QueueJobCommand(IEnumerable<QueueJobItem> jobs) { Jobs = jobs.ToList(); }
 }
 
-public sealed record QueueJobItem(string SystemName, string InputState, int MaxAttempts);
+public sealed record QueueJobItem(
+    string SystemName,
+    string InputState,
+    int MaxAttempts
+);
 
 public sealed record QueueJobResult(IReadOnlyList<JobDto> Jobs);
 
 public sealed class QueueJobHandler(
     INamedObjectRegistry<LrtNamedObjectBase> registry,
     IUnitOfWork unitOfWork
-    ) : ICommandHandler<QueueJobCommand, QueueJobResult>
+) : ICommandHandler<QueueJobCommand, QueueJobResult>
 {
     public async Task<QueueJobResult> Handle(
-        QueueJobCommand request, 
+        QueueJobCommand request,
         CancellationToken cancellationToken)
     {
         var toAdd = new List<Job>();
@@ -51,7 +59,7 @@ public sealed class QueueJobHandler(
             job.SetState(item.InputState);
             toAdd.Add(job);
         }
-        
+
         await unitOfWork.AddRangeAsync(toAdd, cancellationToken);
         await unitOfWork.SaveChangesAsync(cancellationToken);
         return new QueueJobResult(toAdd.Select(job => JobProjections.JobProjection.AsFunc()(job)).ToList());

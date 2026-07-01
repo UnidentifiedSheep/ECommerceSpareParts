@@ -6,7 +6,8 @@ namespace Search.Application.Mapping;
 public static class ProductMappingExtensions
 {
     public static ProductDto ToProductDto(this Product product)
-        => new()
+    {
+        return new ProductDto
         {
             Id = product.Id,
             Sku = product.Sku,
@@ -16,9 +17,11 @@ public static class ProductMappingExtensions
             Weight = product.Weight?.ToProductWeightDto(),
             Stock = product.Stock
         };
+    }
 
     private static ProductDimensionsDto ToProductDimensionsDto(this ProductDimensions dimensions)
-        => new()
+    {
+        return new ProductDimensionsDto
         {
             Length = dimensions.Length,
             Width = dimensions.Width,
@@ -26,12 +29,15 @@ public static class ProductMappingExtensions
             Unit = dimensions.Unit.ToString(),
             VolumeM3 = dimensions.VolumeM3
         };
+    }
 
     private static ProductWeightDto ToProductWeightDto(this ProductWeight weight)
-        => new()
+    {
+        return new ProductWeightDto
         {
             Value = weight.Value,
             Unit = weight.Unit.ToString(),
             WeightKg = weight.WeightKg
         };
+    }
 }

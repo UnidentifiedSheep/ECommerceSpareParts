@@ -21,7 +21,8 @@ public class SaleTestContext(
     UserContextTestContext userContext,
     ProductTestContext productContext,
     StorageContentTestContext storageContentContext,
-    CurrencyTestContext currencyContext) : TestContextBase<DContext>(context), IDependentTestContext
+    CurrencyTestContext currencyContext
+) : TestContextBase<DContext>(context), IDependentTestContext
 {
     public User Buyer { get; private set; } = null!;
     public Product Product { get; private set; } = null!;
@@ -32,6 +33,13 @@ public class SaleTestContext(
     public UserBalance ReceiverBalance { get; private set; } = null!;
     public int SoldCount { get; private set; }
 
+    public static Type[] DependsOn { get; } =
+    [
+        typeof(ProductTestContext),
+        typeof(CurrencyRatesTestContext),
+        typeof(StorageContentTestContext)
+    ];
+
     public override async Task InitializeAsync(CancellationToken cancellationToken = default)
     {
         var currencyId = currencyContext.Currencies[0].Id;
@@ -41,7 +49,7 @@ public class SaleTestContext(
         StorageContent = storageContentContext.StorageContents.First(x => x.Count > 0);
         Product = productContext.Products.Single(x => x.Id == StorageContent.ProductId);
         SoldCount = 1;
-        
+
         ReceiverBalance = new UserBalanceBuilder(Faker)
             .WithUserId(Buyer.Id)
             .WithCurrencyId(currencyId)
@@ -50,9 +58,9 @@ public class SaleTestContext(
             .WithUserId(userContext.SystemUser.Id)
             .WithCurrencyId(currencyId)
             .Build();
-        
+
         SenderBalance.IncrementBalance(20m);
-        
+
         Transaction = new TransactionBuilder(Faker)
             .WithSenderId(SenderBalance.UserId)
             .WithReceiverId(ReceiverBalance.UserId)
@@ -63,8 +71,12 @@ public class SaleTestContext(
             .Completed()
             .Applied()
             .Build();
-        
-        await DbContext.AddRangeAsync(Transaction, SenderBalance, ReceiverBalance, buyerProfile);
+
+        await DbContext.AddRangeAsync(
+            Transaction,
+            SenderBalance,
+            ReceiverBalance,
+            buyerProfile);
         await DbContext.SaveChangesAsync(cancellationToken);
 
         var saleContent = new SaleContentBuilder(Faker)
@@ -90,11 +102,4 @@ public class SaleTestContext(
         await DbContext.AddAsync(Sale, cancellationToken);
         await DbContext.SaveChangesAsync(cancellationToken);
     }
-
-    public static Type[] DependsOn { get; } =
-    [
-        typeof(ProductTestContext),
-        typeof(CurrencyRatesTestContext),
-        typeof(StorageContentTestContext)
-    ];
 }

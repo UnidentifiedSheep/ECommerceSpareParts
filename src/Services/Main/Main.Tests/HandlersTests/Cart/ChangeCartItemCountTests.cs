@@ -32,7 +32,10 @@ public class ChangeCartItemCountTests : IntegrationTest
     public async Task ChangeCartItemCount_ValidData_Succeeds()
     {
         var newCount = Faker.Random.Int(1, 100);
-        var command = new ChangeCartItemCountCommand(_cartItem.UserId, _cartItem.ProductId, newCount);
+        var command = new ChangeCartItemCountCommand(
+            _cartItem.UserId,
+            _cartItem.ProductId,
+            newCount);
 
         await Mediator.Send(command);
 
@@ -45,7 +48,10 @@ public class ChangeCartItemCountTests : IntegrationTest
     [Fact]
     public async Task ChangeCartItemCount_ItemNotFound_ThrowsCartItemNotFoundException()
     {
-        var command = new ChangeCartItemCountCommand(_cartItem.UserId, 999999, 10);
+        var command = new ChangeCartItemCountCommand(
+            _cartItem.UserId,
+            999999,
+            10);
 
         await Assert.ThrowsAsync<CartItemNotFoundException>(() => Mediator.Send(command));
     }
@@ -55,7 +61,10 @@ public class ChangeCartItemCountTests : IntegrationTest
     [InlineData(-1)]
     public async Task ChangeCartItemCount_InvalidCount_ThrowsValidationException(int newCount)
     {
-        var command = new ChangeCartItemCountCommand(_cartItem.UserId, _cartItem.ProductId, newCount);
+        var command = new ChangeCartItemCountCommand(
+            _cartItem.UserId,
+            _cartItem.ProductId,
+            newCount);
 
         await Assert.ThrowsAsync<ValidationException>(() => Mediator.Send(command));
     }

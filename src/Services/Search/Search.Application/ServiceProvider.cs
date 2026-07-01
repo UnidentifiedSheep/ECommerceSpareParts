@@ -5,9 +5,6 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Search.Application.Configs;
 using Search.Application.Interfaces;
-using Search.Application.Interfaces.Producer;
-using Search.Application.Interfaces.Product;
-using Search.Application.Services;
 using Search.Application.Services.IndexSynchronizers;
 using Search.Entities;
 
@@ -20,13 +17,12 @@ public static class ServiceProvider
         IConfiguration configuration)
     {
         SortByConfig.Configure();
-        
+
         services
             .AddApplicationBase(
-                serviceDefinition: ServicesDefinitions.Search,
-                configuration: configuration,
-                assembly: typeof(ServiceProvider).Assembly,
-                behaviorsToExclude:
+                ServicesDefinitions.Search,
+                configuration,
+                typeof(ServiceProvider).Assembly,
                 [
                     typeof(TransactionBehavior<,>),
                     typeof(SaveChangesBehavior<,>),

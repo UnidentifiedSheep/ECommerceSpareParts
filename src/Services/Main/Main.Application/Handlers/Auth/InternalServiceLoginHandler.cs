@@ -14,7 +14,8 @@ using Main.Entities.User.ValueObjects;
 namespace Main.Application.Handlers.Auth;
 
 [Diagnostics(maxExecutionTimeMs: 80)]
-public record InternalServiceLoginCommand(string Service, string ServiceSecret) : ICommand<InternalServiceLoginResult>;
+public record InternalServiceLoginCommand(string Service, string ServiceSecret)
+    : ICommand<InternalServiceLoginResult>;
 
 public record InternalServiceLoginResult(string Token);
 
@@ -22,9 +23,11 @@ public class InternalServiceLoginHandler(
     IPasswordManager passwordManager,
     IUserRepository userRepository,
     IJwtGenerator tokenGenerator,
-    IUserCacheRepository userCache) : ICommandHandler<InternalServiceLoginCommand, InternalServiceLoginResult>
+    IUserCacheRepository userCache
+) : ICommandHandler<InternalServiceLoginCommand, InternalServiceLoginResult>
 {
     private static readonly TimeSpan AdditionalValidDuration = TimeSpan.FromHours(1);
+
     public async Task<InternalServiceLoginResult> Handle(
         InternalServiceLoginCommand request,
         CancellationToken cancellationToken)
@@ -45,9 +48,9 @@ public class InternalServiceLoginHandler(
 
         var userDto = UserProjections.UserProjection.AsFunc()(user);
         var token = tokenGenerator.CreateToken(
-            userDto, 
-            request.Service, 
-            roles, 
+            userDto,
+            request.Service,
+            roles,
             permissions,
             AdditionalValidDuration);
         return new InternalServiceLoginResult(token);

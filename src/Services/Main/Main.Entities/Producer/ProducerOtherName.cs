@@ -9,11 +9,12 @@ namespace Main.Entities.Producer;
 public class ProducerOtherName : Entity<ProducerOtherName, string>,
     ILinqEntity<ProducerOtherName, string>
 {
-    private ProducerOtherName()
-    {
-    }
+    private ProducerOtherName() { }
 
-    private ProducerOtherName(int producerId, string otherName, string? whereUsed)
+    private ProducerOtherName(
+        int producerId,
+        string otherName,
+        string? whereUsed)
     {
         ProducerId = producerId;
         SetOtherName(otherName);
@@ -25,27 +26,27 @@ public class ProducerOtherName : Entity<ProducerOtherName, string>,
     [Validate]
     public string OtherName { get; private set; } = null!;
 
-    public string WhereUsed { get; private set; } = null!;//TODO: should be removed.
+    public string WhereUsed { get; private set; } = null!; //TODO: should be removed.
 
-    public static Expression<Func<ProducerOtherName, string>> GetKeySelector()
-    {
-        return x => x.OtherName;
-    }
+    public static Expression<Func<ProducerOtherName, string>> GetKeySelector() { return x => x.OtherName; }
 
     public static Expression<Func<ProducerOtherName, bool>> GetEqualityExpression(string key)
     {
         return x => x.OtherName == key;
     }
 
-    public static ProducerOtherName Create(int producerId, string otherName, string? whereUsed)
+    public static ProducerOtherName Create(
+        int producerId,
+        string otherName,
+        string? whereUsed)
     {
-        return new ProducerOtherName(producerId, otherName, whereUsed);
+        return new ProducerOtherName(
+            producerId,
+            otherName,
+            whereUsed);
     }
 
-    public void SetOtherName(string otherName)
-    {
-        OtherName = Producer.ToNormalizedName(otherName);
-    }
+    public void SetOtherName(string otherName) { OtherName = Producer.ToNormalizedName(otherName); }
 
     public void SetWhereUsed(string? whereUsed)
     {
@@ -55,8 +56,5 @@ public class ProducerOtherName : Entity<ProducerOtherName, string>,
         WhereUsed = whereUsed.ToUpperInvariant();
     }
 
-    public override string GetId()
-    {
-        return OtherName;
-    }
+    public override string GetId() { return OtherName; }
 }

@@ -20,13 +20,17 @@ public class JwtGenerator(IOptions<JwtOptions> options) : IJwtGenerator
         IEnumerable<string> permissions,
         TimeSpan? additionalValidDuration = null)
     {
-        TimeSpan validDuration = options.Value.ValidDuration + (additionalValidDuration ?? TimeSpan.Zero);
+        var validDuration = options.Value.ValidDuration + (additionalValidDuration ?? TimeSpan.Zero);
         var tokenDescriptor = new SecurityTokenDescriptor
         {
             SigningCredentials = options.Value.SigningCredentials,
             Issuer = options.Value.ValidIssuer,
             Expires = DateTime.UtcNow.Add(validDuration),
-            Subject = GetClaims(user, deviceId, roles, permissions)
+            Subject = GetClaims(
+                user,
+                deviceId,
+                roles,
+                permissions)
         };
         return _tokenHandler.WriteToken(_tokenHandler.CreateToken(tokenDescriptor));
     }
@@ -51,7 +55,10 @@ public class JwtGenerator(IOptions<JwtOptions> options) : IJwtGenerator
             ValidIssuer = options.Value.ValidIssuer,
             IssuerSigningKey = options.Value.SigningCredentials.Key
         };
-        return new JwtSecurityTokenHandler().ValidateToken(token, validation, out _);
+        return new JwtSecurityTokenHandler().ValidateToken(
+            token,
+            validation,
+            out _);
     }
 
     private ClaimsIdentity GetClaims(
@@ -65,10 +72,8 @@ public class JwtGenerator(IOptions<JwtOptions> options) : IJwtGenerator
         claims.AddClaim(new Claim(ClaimTypes.Name, user.UserName));
         claims.AddClaim(new Claim("device_id", deviceId));
         claims.AddClaim(new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()));
-        foreach (var role in roles)
-            claims.AddClaim(new Claim(ClaimTypes.Role, role));
-        foreach (var permission in permissions)
-            claims.AddClaim(new Claim("permission", permission));
+        foreach (var role in roles) claims.AddClaim(new Claim(ClaimTypes.Role, role));
+        foreach (var permission in permissions) claims.AddClaim(new Claim("permission", permission));
 
         return claims;
     }

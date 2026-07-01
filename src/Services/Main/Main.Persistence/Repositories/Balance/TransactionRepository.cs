@@ -1,4 +1,3 @@
-using Abstractions.Interfaces.Services;
 using Main.Application.Interfaces.Persistence;
 using Main.Entities.Balance;
 using Main.Persistence.Context;

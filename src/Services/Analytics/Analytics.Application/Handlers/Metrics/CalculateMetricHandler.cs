@@ -14,10 +14,13 @@ public record CalculateMetricResult(Metric CalculatedMetric);
 public class CalculateMetricHandler(
     IMetricCalculatorFactory calculatorFactory,
     IUnitOfWork unitOfWork,
-    IMetricRepository metricRepository)
+    IMetricRepository metricRepository
+)
     : ICommandHandler<CalculateMetricCommand, CalculateMetricResult>
 {
-    public async Task<CalculateMetricResult> Handle(CalculateMetricCommand request, CancellationToken cancellationToken)
+    public async Task<CalculateMetricResult> Handle(
+        CalculateMetricCommand request,
+        CancellationToken cancellationToken)
     {
         var metric = await metricRepository.GetById(
             request.MetricId,
@@ -28,7 +31,7 @@ public class CalculateMetricHandler(
         await calculator.CalculateMetric(metric, cancellationToken);
 
         await unitOfWork.SaveChangesAsync(cancellationToken);
-        
+
         return new CalculateMetricResult(metric);
     }
 }

@@ -7,19 +7,11 @@ public abstract class BaseValuedException : Exception, IValuedException, IStatus
 {
     private readonly object? _errorValues;
 
-    protected BaseValuedException(string? message, object key) : base(message)
-    {
-        _errorValues = key;
-    }
+    protected BaseValuedException(string? message, object key) : base(message) { _errorValues = key; }
 
-    protected BaseValuedException(string? message) : base(message)
-    {
-    }
+    protected BaseValuedException(string? message) : base(message) { }
 
     public abstract HttpStatusCode StatusCode { get; }
 
-    public object? GetErrorValues()
-    {
-        return _errorValues;
-    }
+    public object? GetErrorValues() { return _errorValues; }
 }

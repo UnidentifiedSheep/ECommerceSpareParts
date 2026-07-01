@@ -22,7 +22,10 @@ public class LocalizationTests : Test.Common.Tests.LocalizationTests
         var localesPath = Assembly.GetExecutingAssembly().GetDefaultLocalizationPath();
         var assembly = Assembly.GetAssembly(typeof(Metric))!;
 
-        await TestLocalizableExceptions(assembly, localesPath, locale);
+        await TestLocalizableExceptions(
+            assembly,
+            localesPath,
+            locale);
     }
 
     [Theory]
@@ -34,7 +37,10 @@ public class LocalizationTests : Test.Common.Tests.LocalizationTests
         var localesPath = Assembly.GetExecutingAssembly().GetDefaultLocalizationPath();
         var assembly = Assembly.GetAssembly(typeof(MetricInputBaseValidator))!;
 
-        await TestAbstractValidatorLocalization(assembly, localesPath, locale);
+        await TestAbstractValidatorLocalization(
+            assembly,
+            localesPath,
+            locale);
     }
 
     [Theory]
@@ -44,27 +50,29 @@ public class LocalizationTests : Test.Common.Tests.LocalizationTests
     public async Task All_MetricDefinitions_Should_Have_Valid_Localization(string locale)
     {
         using var localizer = await CreateLocalizer(locale);
-        
+
         var sp = new ServiceProviderBuilder()
-            .Build(new ServiceProviderArguments
-            {
-                PgsqlConnectionString = "",
-                CacheConnectionString = ""
-            });
-        
+            .Build(
+                new ServiceProviderArguments
+                {
+                    PgsqlConnectionString = "",
+                    CacheConnectionString = ""
+                });
+
         var registry = sp.GetRequiredService<INamedObjectRegistry<MetricDefinitionNamedObjectBase>>();
 
         foreach (var definition in registry.All)
         {
-            
             localizer.TryGet(definition.NameLocalizationKey, out _)
                 .Should()
-                .BeTrue($"Missing key '{definition.NameLocalizationKey}' " +
-                        $"for metric definition '{definition.MetricType}'");
+                .BeTrue(
+                    $"Missing key '{definition.NameLocalizationKey}' " +
+                    $"for metric definition '{definition.MetricType}'");
             localizer.TryGet(definition.DescriptionLocalizationKey, out _)
                 .Should()
-                .BeTrue($"Missing key '{definition.DescriptionLocalizationKey}' " +
-                        $"for metric '{definition.MetricType}'");
+                .BeTrue(
+                    $"Missing key '{definition.DescriptionLocalizationKey}' " +
+                    $"for metric '{definition.MetricType}'");
         }
     }
 

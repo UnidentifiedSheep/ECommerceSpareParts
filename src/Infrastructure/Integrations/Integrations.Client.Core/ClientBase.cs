@@ -22,12 +22,9 @@ public abstract class ClientBase
             var value = JsonSerializer.Deserialize<T>(json);
             return Response<T>.Ok(value);
         }
-        catch (JsonException ex)
-        {
-            return Response<T>.Fail(response.StatusCode, ex.Message);
-        }
+        catch (JsonException ex) { return Response<T>.Fail(response.StatusCode, ex.Message); }
     }
-    
+
     protected static async Task<Response<TValue>> ReadResponse<TResponse, TValue>(
         HttpResponseMessage response,
         Func<TResponse, TValue> selector,
@@ -44,7 +41,7 @@ public abstract class ClientBase
             ? Response<TValue>.Fail(response.StatusCode, "Response body is null")
             : Response<TValue>.Ok(selector(result.Value));
     }
-    
+
     private static string? GetError(HttpResponseMessage response, string body)
     {
         return string.IsNullOrWhiteSpace(body)

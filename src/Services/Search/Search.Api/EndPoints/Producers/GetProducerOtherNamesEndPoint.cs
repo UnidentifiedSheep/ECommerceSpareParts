@@ -17,20 +17,23 @@ public static class GetProducerOtherNamesEndPoint
 {
     public static RouteGroupBuilder GetProducerOtherNames(this RouteGroupBuilder producers)
     {
-        producers.MapGet("/{producerId:int}/other-names", async (
-                int producerId,
-                ISender sender,
-                CancellationToken cancellationToken) =>
-            {
-                var result = await sender.Send(
-                    new GetProducerOtherNamesQuery(producerId),
-                    cancellationToken);
-
-                return Results.Ok(new GetProducerOtherNamesResult
+        producers.MapGet(
+                "/{producerId:int}/other-names",
+                async (
+                    int producerId,
+                    ISender sender,
+                    CancellationToken cancellationToken) =>
                 {
-                    OtherNames = result.OtherNames
-                });
-            })
+                    var result = await sender.Send(
+                        new GetProducerOtherNamesQuery(producerId),
+                        cancellationToken);
+
+                    return Results.Ok(
+                        new GetProducerOtherNamesResult
+                        {
+                            OtherNames = result.OtherNames
+                        });
+                })
             .WithTags("Producers")
             .RequireAllPermissions(PermissionCodes.ARTICLES_GET_MAIN)
             .WithDisplayName("Get producer other names")

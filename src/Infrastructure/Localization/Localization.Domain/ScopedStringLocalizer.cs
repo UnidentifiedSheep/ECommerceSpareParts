@@ -8,8 +8,7 @@ public sealed class ScopedStringLocalizer(IStringLocalizer stringLocalizer) : IS
     private bool _disposed;
     private Locale? _locale;
 
-    public Locale Locale
-        => _locale ?? throw new ArgumentNullException(nameof(Locale));
+    public Locale Locale => _locale ?? throw new ArgumentNullException(nameof(Locale));
 
     public void SetLocale(Locale locale)
     {
@@ -30,7 +29,10 @@ public sealed class ScopedStringLocalizer(IStringLocalizer stringLocalizer) : IS
         ObjectDisposedException.ThrowIf(_disposed, this);
         ArgumentNullException.ThrowIfNull(_locale);
 
-        return stringLocalizer.Get(key, _locale.Value, arguments);
+        return stringLocalizer.Get(
+            key,
+            _locale.Value,
+            arguments);
     }
 
     public bool TryGet(string key, out string? value)
@@ -38,27 +40,40 @@ public sealed class ScopedStringLocalizer(IStringLocalizer stringLocalizer) : IS
         ObjectDisposedException.ThrowIf(_disposed, this);
         ArgumentNullException.ThrowIfNull(_locale);
 
-        return stringLocalizer.TryGet(key, _locale.Value, out value);
+        return stringLocalizer.TryGet(
+            key,
+            _locale.Value,
+            out value);
     }
 
-    public bool TryGet(string key, out string? value, params object[] arguments)
+    public bool TryGet(
+        string key,
+        out string? value,
+        params object[] arguments)
     {
         ObjectDisposedException.ThrowIf(_disposed, this);
         ArgumentNullException.ThrowIfNull(_locale);
 
-        return stringLocalizer.TryGet(key, _locale.Value, out value, arguments);
+        return stringLocalizer.TryGet(
+            key,
+            _locale.Value,
+            out value,
+            arguments);
     }
 
-    public string? GetOrDefault(string key)
-        => TryGet(key, out string? value) ? value : null;
+    public string? GetOrDefault(string key) { return TryGet(key, out var value) ? value : null; }
 
     public string? GetOrDefault(string key, params object[] arguments)
-        => TryGet(key, out string? value, arguments) ? value : null;
+    {
+        return TryGet(
+            key,
+            out var value,
+            arguments)
+            ? value
+            : null;
+    }
 
     public string this[string key] => Get(key);
 
-    public void Dispose()
-    {
-        _disposed = true;
-    }
+    public void Dispose() { _disposed = true; }
 }

@@ -24,8 +24,7 @@ public abstract class MetricDefinitionNamedObjectBase<TMetric, TInput>
 
     protected virtual TInput ValidateInput(string json)
     {
-        if (!json.TryDeserializeJson<TInput>(out var value))
-            throw new MetricInvalidInputException();
+        if (!json.TryDeserializeJson<TInput>(out var value)) throw new MetricInvalidInputException();
 
         var result = new MetricInputBaseValidator().Validate(value);
 
@@ -33,17 +32,14 @@ public abstract class MetricDefinitionNamedObjectBase<TMetric, TInput>
     }
 }
 
-public abstract class MetricDefinitionNamedObjectBase<TMetric> 
+public abstract class MetricDefinitionNamedObjectBase<TMetric>
     : MetricDefinitionNamedObjectBase where TMetric : Metric
 {
     public override Type MetricType => typeof(TMetric);
-    
+
     public abstract TMetric CreateMetric(string json);
-    
-    public override Metric CreateMetricUntyped(string json)
-    {
-        return CreateMetric(json);
-    }
+
+    public override Metric CreateMetricUntyped(string json) { return CreateMetric(json); }
 }
 
 public abstract class MetricDefinitionNamedObjectBase : LocalizableNameObject
@@ -58,7 +54,10 @@ public abstract class MetricDefinitionNamedObjectBase : LocalizableNameObject
         MetricInputBase input)
         where TMetric : Metric
     {
-        metric.ConfigurePeriod(input.CurrencyId, input.RangeStart, input.RangeEnd);
+        metric.ConfigurePeriod(
+            input.CurrencyId,
+            input.RangeStart,
+            input.RangeEnd);
         return metric;
     }
 }

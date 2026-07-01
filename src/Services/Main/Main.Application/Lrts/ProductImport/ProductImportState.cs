@@ -1,4 +1,3 @@
-using System.Text.Json;
 using System.Text.Json.Serialization;
 using Application.Common.Interfaces.Lrt;
 using Attributes.JsonAttributes;
@@ -35,8 +34,9 @@ public record ProductImportInputState : IInputState
     public void ValidateState()
     {
         if (!FileName.EndsWith(".csv"))
-            throw new InvalidOperationException("Product import state error. " +
-                                                "File name should end with .csv");
+            throw new InvalidOperationException(
+                "Product import state error. " +
+                "File name should end with .csv");
     }
 }
 

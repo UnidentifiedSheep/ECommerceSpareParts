@@ -5,7 +5,8 @@ using MassTransit;
 
 namespace Analytics.Application.Consumers;
 
-public class PurchaseUpdatedConsumer(IFactSynchronizer<PurchasesFact, Guid> synchronizer) : IConsumer<PurchaseUpdateEvent>
+public class PurchaseUpdatedConsumer(IFactSynchronizer<PurchasesFact, Guid> synchronizer)
+    : IConsumer<PurchaseUpdateEvent>
 {
     public async Task Consume(ConsumeContext<PurchaseUpdateEvent> context)
     {

@@ -1,5 +1,4 @@
 using System.Reflection;
-using Amazon.S3;
 using Abstractions;
 using Api.Common;
 using Api.Common.Consumers;
@@ -77,46 +76,50 @@ builder.Services.AddMassTransit(x =>
     {
         cfg.ConfigureRabbitMq(context);
 
-        cfg.ReceiveEndpoint(uniqQueueName, ep =>
-        {
-            ep.AutoDelete = true;
-            ep.Durable = false;
+        cfg.ReceiveEndpoint(
+            uniqQueueName,
+            ep =>
+            {
+                ep.AutoDelete = true;
+                ep.Durable = false;
 
-            ep.ConfigureConsumeTopology = false;
+                ep.ConfigureConsumeTopology = false;
 
-            ep.ConfigureConsumer<SettingUpdatedConsumer>(context);
-            ep.ConfigureConsumer<BackplaneConsumer>(context);
-            ep.ConfigureConsumer<JobStatusUpdatedConsumer>(context);
+                ep.ConfigureConsumer<SettingUpdatedConsumer>(context);
+                ep.ConfigureConsumer<BackplaneConsumer>(context);
+                ep.ConfigureConsumer<JobStatusUpdatedConsumer>(context);
 
-            ep.Bind<BackplaneMessage>();
-            ep.BindForService<JobStatusUpdatedEvent>(ServicesDefinitions.Main)
-                .BindForService<SettingUpdatedEvent>(ServicesDefinitions.Main);
-        });
+                ep.Bind<BackplaneMessage>();
+                ep.BindForService<JobStatusUpdatedEvent>(ServicesDefinitions.Main)
+                    .BindForService<SettingUpdatedEvent>(ServicesDefinitions.Main);
+            });
 
-        cfg.ReceiveEndpoint("main-queue", ep =>
-        {
-            ep.Durable = true;
+        cfg.ReceiveEndpoint(
+            "main-queue",
+            ep =>
+            {
+                ep.Durable = true;
 
-            ep.ConfigureConsumer<CurrencyRatesChangedConsumer>(context);
-            ep.ConfigureConsumer<CurrencyCreatedConsumer>(context);
-            ep.ConfigureConsumer<ProductSizesUpdatedConsumer>(context);
-            ep.ConfigureConsumer<ProductWeightUpdatedConsumer>(context);
-            ep.ConfigureConsumer<ProductUpdatedConsumer>(context);
-            ep.ConfigureConsumer<RoleUpdatedConsumer>(context);
-            ep.ConfigureConsumer<UserUpdatedConsumer>(context);
-            ep.ConfigureConsumer<UserDiscountUpdatedConsumer>(context);
-            ep.ConfigureConsumer<ProductLinkageUpdatedConsumer>(context);
+                ep.ConfigureConsumer<CurrencyRatesChangedConsumer>(context);
+                ep.ConfigureConsumer<CurrencyCreatedConsumer>(context);
+                ep.ConfigureConsumer<ProductSizesUpdatedConsumer>(context);
+                ep.ConfigureConsumer<ProductWeightUpdatedConsumer>(context);
+                ep.ConfigureConsumer<ProductUpdatedConsumer>(context);
+                ep.ConfigureConsumer<RoleUpdatedConsumer>(context);
+                ep.ConfigureConsumer<UserUpdatedConsumer>(context);
+                ep.ConfigureConsumer<UserDiscountUpdatedConsumer>(context);
+                ep.ConfigureConsumer<ProductLinkageUpdatedConsumer>(context);
 
-            ep.Bind<CurrencyCreatedEvent>();
-            ep.Bind<ProductSizesUpdatedEvent>();
-            ep.Bind<ProductWeightUpdatedEvent>();
-            ep.Bind<ProductUpdatedEvent>();
-            ep.Bind<RoleUpdatedEvent>();
-            ep.Bind<UserUpdatedEvent>();
-            ep.Bind<UserDiscountUpdatedEvent>();
-            ep.Bind<ProductLinkageUpdatedEvent>();
-            ep.Bind<CurrencyRateChangedEvent>();
-        });
+                ep.Bind<CurrencyCreatedEvent>();
+                ep.Bind<ProductSizesUpdatedEvent>();
+                ep.Bind<ProductWeightUpdatedEvent>();
+                ep.Bind<ProductUpdatedEvent>();
+                ep.Bind<RoleUpdatedEvent>();
+                ep.Bind<UserUpdatedEvent>();
+                ep.Bind<UserDiscountUpdatedEvent>();
+                ep.Bind<ProductLinkageUpdatedEvent>();
+                ep.Bind<CurrencyRateChangedEvent>();
+            });
     });
 });
 

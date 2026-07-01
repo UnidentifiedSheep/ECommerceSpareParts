@@ -1,5 +1,4 @@
 using Integrations.Common;
-using Internal.Integration.Core.Models;
 
 namespace Internal.Integration.Core.Interfaces.Main;
 

@@ -2,7 +2,6 @@ using Abstractions.Models;
 using Microsoft.Extensions.Options;
 using OpenSearch.Client;
 using Search.Abstractions.Options;
-using Search.Application.Interfaces;
 using Search.Application.Interfaces.Producer;
 using Search.Entities;
 using Search.Persistence.Interfaces;
@@ -12,7 +11,8 @@ namespace Search.Persistence;
 public class ProducerRepository(
     IOptionsMonitor<OpenSearchOptions> options,
     IOpenSearchClient client,
-    IIndexInitializer<Producer> idxInitializer) : IProducerRepository
+    IIndexInitializer<Producer> idxInitializer
+) : IProducerRepository
 {
     private static readonly Pagination DefaultPagination = new(0, 20);
 
@@ -101,8 +101,7 @@ public class ProducerRepository(
         CancellationToken token = default)
     {
         var idList = ids.ToArray();
-        if (idList.Length == 0)
-            return;
+        if (idList.Length == 0) return;
 
         var idx = await CheckInitAndGetIdx(token);
         await client.BulkAsync(
@@ -110,10 +109,7 @@ public class ProducerRepository(
             {
                 b.Index(idx);
 
-                foreach (var id in idList)
-                {
-                    b.Delete<Producer>(d => d.Id(id));
-                }
+                foreach (var id in idList) b.Delete<Producer>(d => d.Id(id));
 
                 return b;
             },
@@ -126,8 +122,5 @@ public class ProducerRepository(
         return options.CurrentValue.IndexOptions.Producers;
     }
 
-    private static int GetFrom(Pagination pagination)
-    {
-        return pagination.Page * pagination.Size;
-    }
+    private static int GetFrom(Pagination pagination) { return pagination.Page * pagination.Size; }
 }

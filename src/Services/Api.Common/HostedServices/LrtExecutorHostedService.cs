@@ -8,7 +8,8 @@ namespace Api.Common.HostedServices;
 public class LrtExecutorHostedService(
     IServiceScopeFactory scopeFactory,
     ILogger<LrtExecutorHostedService> logger,
-    IOptionsMonitor<LrtExecutorOptions> options) : BackgroundService
+    IOptionsMonitor<LrtExecutorOptions> options
+) : BackgroundService
 {
     protected override async Task ExecuteAsync(CancellationToken stoppingToken)
     {
@@ -18,7 +19,7 @@ public class LrtExecutorHostedService(
             await Iteration(currentValue, stoppingToken);
         }
     }
-    
+
     private async Task Iteration(
         LrtExecutorOptions opt,
         CancellationToken ct)
@@ -32,18 +33,8 @@ public class LrtExecutorHostedService(
                 new RunJobBatchCommand(opt.MaxParallelPerWorker),
                 ct);
         }
-        catch (OperationCanceledException) when (ct.IsCancellationRequested)
-        {
-            throw;
-        }
-        catch (Exception ex)
-        {
-            logger.LogError(ex, "Job batch execution failed.");
-        }
-        finally
-        {
-            await Task.Delay(opt.Delay, ct);
-        }
-        
+        catch (OperationCanceledException) when (ct.IsCancellationRequested) { throw; }
+        catch (Exception ex) { logger.LogError(ex, "Job batch execution failed."); }
+        finally { await Task.Delay(opt.Delay, ct); }
     }
 }

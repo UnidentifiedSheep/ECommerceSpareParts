@@ -16,7 +16,8 @@ public class MetricConfiguration : IEntityTypeConfiguration<Entities.Metrics.Met
         builder.HasIndex(e => e.Discriminator, "metrics_dirty_index")
             .HasFilter("(tags & 1) = 1");
 
-        builder.HasIndex(m => new { m.DependsOn, m.RangeStart, m.RangeEnd },
+        builder.HasIndex(
+            m => new { m.DependsOn, m.RangeStart, m.RangeEnd },
             "metrics_range_depends_index");
 
         builder.HasIndex(m => m.NaturalKey, "metrics_natural_key_index")
@@ -32,7 +33,7 @@ public class MetricConfiguration : IEntityTypeConfiguration<Entities.Metrics.Met
         builder.Property(e => e.NaturalKey)
             .HasColumnName("natural_key")
             .HasColumnType("bytea");
-        
+
         builder.Property(m => m.DependsOn)
             .HasConversion<long>()
             .HasColumnName("depends_on");

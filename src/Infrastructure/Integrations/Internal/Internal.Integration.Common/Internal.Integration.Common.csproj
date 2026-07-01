@@ -7,8 +7,8 @@
     </PropertyGroup>
 
     <ItemGroup>
-      <ProjectReference Include="..\..\..\..\Core\Abstractions\Abstractions.csproj" />
-      <ProjectReference Include="..\Internal.Integration.Core\Internal.Integration.Core.csproj" />
+        <ProjectReference Include="..\..\..\..\Core\Abstractions\Abstractions.csproj"/>
+        <ProjectReference Include="..\Internal.Integration.Core\Internal.Integration.Core.csproj"/>
     </ItemGroup>
 
 </Project>

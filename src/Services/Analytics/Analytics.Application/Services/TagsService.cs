@@ -6,7 +6,8 @@ using Analytics.Entities.Interfaces;
 namespace Analytics.Application.Services;
 
 public class TagsService(
-    IMetricRepository metricRepository) : ITagsService
+    IMetricRepository metricRepository
+) : ITagsService
 {
     public async Task UpdateTags<TEntity>(
         TagUpdateContext<TEntity> context,

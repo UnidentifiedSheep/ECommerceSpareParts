@@ -11,7 +11,7 @@ public class S3Options
 
     [Required]
     public required string ExternalUrl { get; init; }
-    
+
     [Required]
     public required string Login { get; init; }
 

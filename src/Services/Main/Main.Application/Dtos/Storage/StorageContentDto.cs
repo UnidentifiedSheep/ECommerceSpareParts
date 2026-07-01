@@ -22,7 +22,7 @@ public record StorageContentDto
 
     [JsonPropertyName("purchaseDatetime")]
     public required DateTime PurchaseDatetime { get; init; }
-    
+
     [JsonPropertyName("rowVersion")]
     public required uint RowVersion { get; init; }
 

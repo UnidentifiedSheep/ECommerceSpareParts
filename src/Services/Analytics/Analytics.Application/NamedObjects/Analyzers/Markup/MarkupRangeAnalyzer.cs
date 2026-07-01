@@ -5,16 +5,17 @@ using Microsoft.EntityFrameworkCore;
 namespace Analytics.Application.NamedObjects.Analyzers.Markup;
 
 public class MarkupRangeAnalyzer(
-    IReadRepository<SaleContent, int> repository) : MarkupAnalyzerNamedObjectBase
+    IReadRepository<SaleContent, int> repository
+) : MarkupAnalyzerNamedObjectBase
 {
     private const int BatchSize = 1000;
     private const double MaxStdDev = 0.08;
     private const decimal MaxCostRatio = 1.5m;
     private const decimal MinAllowedMarkup = 0.01m;
     private const decimal MaxAllowedMarkup = 3m;
-    
+
     public const string AnalyzerSystemName = nameof(MarkupRangeAnalyzer);
-    
+
     public override string NameLocalizationKey => "markup.range.analyzer.name";
     public override string DescriptionLocalizationKey => "markup.range.analyzer.description";
     public override string SystemName => AnalyzerSystemName;
@@ -29,19 +30,23 @@ public class MarkupRangeAnalyzer(
 
         while (true)
         {
-            var result = await LoadBatch(input, cursor, cancellationToken);
+            var result = await LoadBatch(
+                input,
+                cursor,
+                cancellationToken);
 
-            if (result.Count == 0)
-                break;
+            if (result.Count == 0) break;
 
             foreach (var row in result)
-                TryAddToRanges(row, ranges, ref currentBucket);
+                TryAddToRanges(
+                    row,
+                    ranges,
+                    ref currentBucket);
 
             cursor = MarkupRangeCursor.From(result[^1]);
         }
 
-        if (currentBucket.Count > 0)
-            ranges.Add(currentBucket.Build());
+        if (currentBucket.Count > 0) ranges.Add(currentBucket.Build());
 
         return ranges;
     }
@@ -56,7 +61,7 @@ public class MarkupRangeAnalyzer(
         if (cursor is not null)
             query = query.Where(x =>
                 x.AvgBuyPriceBase > cursor.AvgBuyPriceBase ||
-                x.AvgBuyPriceBase == cursor.AvgBuyPriceBase && x.Id > cursor.Id);
+                (x.AvgBuyPriceBase == cursor.AvgBuyPriceBase && x.Id > cursor.Id));
 
         return await query
             .OrderBy(x => x.AvgBuyPriceBase)
@@ -71,11 +76,9 @@ public class MarkupRangeAnalyzer(
             .AsNoTracking()
             .Where(x => x.Details.Any());
 
-        if (input.StartDate is not null)
-            query = query.Where(x => x.Sale.CreatedAt >= input.StartDate);
+        if (input.StartDate is not null) query = query.Where(x => x.Sale.CreatedAt >= input.StartDate);
 
-        if (input.EndDate is not null)
-            query = query.Where(x => x.Sale.CreatedAt <= input.EndDate);
+        if (input.EndDate is not null) query = query.Where(x => x.Sale.CreatedAt <= input.EndDate);
 
         return query.Select(x => new SaleContentMarkupRow
         {
@@ -92,8 +95,7 @@ public class MarkupRangeAnalyzer(
         List<MarkupRangeDraft> ranges,
         ref MarkupBucketBuilder currentBucket)
     {
-        if (!TryCalculateMarkup(row, out var markup))
-            return;
+        if (!TryCalculateMarkup(row, out var markup)) return;
 
         if (currentBucket.Count == 0)
         {
@@ -104,7 +106,10 @@ public class MarkupRangeAnalyzer(
         var testBucket = currentBucket.Copy();
         testBucket.Add(row.AvgBuyPriceBase, markup);
 
-        if (!ShouldStartNewBucket(row, currentBucket, testBucket) || currentBucket.Count <= 1)
+        if (!ShouldStartNewBucket(
+                row,
+                currentBucket,
+                testBucket) || currentBucket.Count <= 1)
         {
             currentBucket = testBucket;
             return;
@@ -122,8 +127,7 @@ public class MarkupRangeAnalyzer(
     {
         markup = 0;
 
-        if (row.AvgBuyPriceBase <= 0)
-            return false;
+        if (row.AvgBuyPriceBase <= 0) return false;
 
         markup = (row.SaleUnitPriceBase - row.AvgBuyPriceBase) / row.AvgBuyPriceBase;
         return markup is >= MinAllowedMarkup and <= MaxAllowedMarkup;
@@ -154,6 +158,8 @@ public class MarkupRangeAnalyzer(
     private sealed record MarkupRangeCursor(int Id, decimal AvgBuyPriceBase)
     {
         public static MarkupRangeCursor From(SaleContentMarkupRow row)
-            => new MarkupRangeCursor(row.Id, row.AvgBuyPriceBase);
+        {
+            return new MarkupRangeCursor(row.Id, row.AvgBuyPriceBase);
+        }
     }
 }

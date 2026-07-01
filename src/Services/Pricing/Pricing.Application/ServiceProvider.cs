@@ -19,9 +19,9 @@ public static class ServiceProvider
         IConfiguration configuration)
     {
         collection.AddApplicationBase(
-                serviceDefinition: ServicesDefinitions.Pricing,
-                configuration: configuration, 
-                assembly: typeof(Global).Assembly)
+                ServicesDefinitions.Pricing,
+                configuration,
+                typeof(Global).Assembly)
             .AddNamedObjects()
             .AddFusionCache()
             .WithRegisteredDistributedCache()
@@ -29,10 +29,10 @@ public static class ServiceProvider
             .WithSystemTextJsonSerializer();
 
         collection.RegisterSettingsService<SettingFactory>();
-        
+
         collection.AddScoped<ICurrencyConverter, CurrencyConverter>();
         collection.AddScoped<ICurrencyRatesProvider, CurrencyRatesProvider>();
-        
+
         collection.AddSingleton<IMarkupContainer, MarkupContainer>();
         collection.AddScoped<IMarkupCalculator, MarkupCalculator>();
         collection.AddScoped<IMarkupInitializer, MarkupInitializer>();

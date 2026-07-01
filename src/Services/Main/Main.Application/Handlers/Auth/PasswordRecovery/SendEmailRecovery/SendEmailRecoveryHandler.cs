@@ -16,7 +16,8 @@ using MediatR;
 
 namespace Main.Application.Handlers.Auth.PasswordRecovery.SendEmailRecovery;
 
-[Transactional, AutoSave]
+[Transactional]
+[AutoSave]
 public record SendEmailRecoveryCommand(string Email) : ICommand;
 
 public class SendEmailRecoveryHandler(
@@ -25,10 +26,11 @@ public class SendEmailRecoveryHandler(
     IMailingService mailingService,
     IScopedStringLocalizer localizer,
     IEmailMessageRenderer emailRenderer,
-    ISettingsService settingsService) : ICommandHandler<SendEmailRecoveryCommand>
+    ISettingsService settingsService
+) : ICommandHandler<SendEmailRecoveryCommand>
 {
     public async Task<Unit> Handle(
-        SendEmailRecoveryCommand request, 
+        SendEmailRecoveryCommand request,
         CancellationToken cancellationToken)
     {
         var user = await userRepository
@@ -38,28 +40,29 @@ public class SendEmailRecoveryHandler(
                 cancellationToken);
 
         if (user == null) return Unit.Value;
-        
+
         var setting = (await settingsService
                 .GetOrDefault<GlobalApplicationSetting>(cancellationToken))
             .Data;
 
-        var signed = jsonSigner.Sign(new ResetPayload
-        {
-            UserId = user.Id,
-            Type = ResetType.PasswordReset,
-            Expires = DateTime.UtcNow + TimeSpan.FromMinutes(30)
-        });
+        var signed = jsonSigner.Sign(
+            new ResetPayload
+            {
+                UserId = user.Id,
+                Type = ResetType.PasswordReset,
+                Expires = DateTime.UtcNow + TimeSpan.FromMinutes(30)
+            });
 
         var baseUri = new Uri(setting.AppServiceUrl.TrimEnd('/') + "/");
         var resetUrl = new Uri(baseUri, $"reset?token={Uri.EscapeDataString(signed)}");
-        
+
         var email = await emailRenderer.RenderAsync(
             new ResetPasswordData(
-                localizer.Locale, 
+                localizer.Locale,
                 resetUrl.ToString(),
-                request.Email), 
+                request.Email),
             cancellationToken);
-        
+
         await mailingService.QueueToOutbox(
             email,
             cancellationToken);

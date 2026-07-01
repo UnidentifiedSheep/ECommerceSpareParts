@@ -22,7 +22,10 @@ public class SetProductWeightTests : IntegrationTest
     public async Task SetProductWeight_WhenWeightDoesNotExist_CreatesWeight()
     {
         var product = TestContext.Products[0];
-        var command = new SetProductWeightCommand(product.Id, 12.34m, WeightUnit.Gram);
+        var command = new SetProductWeightCommand(
+            product.Id,
+            12.34m,
+            WeightUnit.Gram);
 
         await Mediator.Send(command);
 
@@ -44,7 +47,10 @@ public class SetProductWeightTests : IntegrationTest
             .WithUnit(WeightUnit.Kilogram)
             .BuildAndAddToDb(Context);
 
-        var command = new SetProductWeightCommand(product.Id, 750m, WeightUnit.Gram);
+        var command = new SetProductWeightCommand(
+            product.Id,
+            750m,
+            WeightUnit.Gram);
 
         await Mediator.Send(command);
 

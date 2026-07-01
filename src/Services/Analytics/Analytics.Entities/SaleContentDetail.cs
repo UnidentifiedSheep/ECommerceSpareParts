@@ -6,9 +6,7 @@ namespace Analytics.Entities;
 
 public class SaleContentDetail : Entity<SaleContentDetail, int>
 {
-    private SaleContentDetail()
-    {
-    }
+    private SaleContentDetail() { }
 
     public int Id { get; private set; }
 
@@ -42,7 +40,12 @@ public class SaleContentDetail : Entity<SaleContentDetail, int>
             CurrencyId = currencyId
         };
 
-        detail.Update(currencyId, buyPrice, buyPriceInBaseCurrency, count, purchaseDate);
+        detail.Update(
+            currencyId,
+            buyPrice,
+            buyPriceInBaseCurrency,
+            count,
+            purchaseDate);
         return detail;
     }
 
@@ -62,5 +65,5 @@ public class SaleContentDetail : Entity<SaleContentDetail, int>
         PurchaseDate = purchaseDate;
     }
 
-    public override int GetId() => Id;
+    public override int GetId() { return Id; }
 }

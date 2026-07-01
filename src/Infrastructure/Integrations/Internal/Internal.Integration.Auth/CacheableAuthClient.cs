@@ -2,7 +2,8 @@
 
 public class CacheableAuthClient(
     HttpClient client,
-    IAuthTokenCache tokenCache) : AuthClientBase(client)
+    IAuthTokenCache tokenCache
+) : AuthClientBase(client)
 {
     public override Task<string> GetAuthToken(
         string service,
@@ -12,7 +13,10 @@ public class CacheableAuthClient(
         return tokenCache.GetOrCreateAsync(
             service,
             serviceSecret,
-            ct => base.GetAuthToken(service, serviceSecret, ct),
+            ct => base.GetAuthToken(
+                service,
+                serviceSecret,
+                ct),
             cancellationToken);
     }
 }

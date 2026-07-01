@@ -27,23 +27,26 @@ public static class InternalProductEndPoints
             .MapGroup("/products")
             .WithGroupName("Internal Products")
             .WithTags("InternalProducts");
-        
-        products.MapGet("{id:int}/full", async (
-                ISender sender,
-                int id,
-                CancellationToken cancellationToken) =>
-            {
-                var result = await sender.Send(
-                    new GetFullProductQuery(id),
-                    cancellationToken);
 
-                return Results.Ok(new InternalGetFullProductResponse
+        products.MapGet(
+                "{id:int}/full",
+                async (
+                    ISender sender,
+                    int id,
+                    CancellationToken cancellationToken) =>
                 {
-                    Product = result.Product,
-                    ProductWeight = result.ProductWeight,
-                    ProductSize = result.ProductSize
-                });
-            })
+                    var result = await sender.Send(
+                        new GetFullProductQuery(id),
+                        cancellationToken);
+
+                    return Results.Ok(
+                        new InternalGetFullProductResponse
+                        {
+                            Product = result.Product,
+                            ProductWeight = result.ProductWeight,
+                            ProductSize = result.ProductSize
+                        });
+                })
             .RequireAllPermissions(PermissionCodes.ARTICLES_GET_MAIN)
             .WithGroupName("Internal Products")
             .WithDisplayName("Internal service full product")

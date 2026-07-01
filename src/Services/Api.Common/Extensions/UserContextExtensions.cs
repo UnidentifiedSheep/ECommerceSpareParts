@@ -4,11 +4,8 @@ namespace Api.Common.Extensions;
 
 public static class UserContextExtensions
 {
-    private static string NormalizeRole(string role)
-    {
-        return role.Trim().ToUpperInvariant();
-    }
-    
+    private static string NormalizeRole(string role) { return role.Trim().ToUpperInvariant(); }
+
     public static bool ContainsRole(this IUserContext userContext, string role)
     {
         return userContext.Roles.Contains(NormalizeRole(role));
