@@ -4,12 +4,14 @@ using Api.Common;
 using Api.Common.Extensions;
 using Application.Common.Backplane;
 using Application.Common.Consumer;
+using Application.Common.Services.Supplier;
 using Cache;
 using Carter;
 using Contracts.Analytics;
 using Contracts.Currency;
 using Contracts.Job;
 using Contracts.Settings;
+using Integrations.Supplier.DI;
 using Internal.Integration.Di;
 using Localization.Domain.Extensions;
 using MassTransit;
@@ -90,8 +92,10 @@ builder.Services
     .AddEComAuth(builder.Configuration)
     .AddPersistenceLayer()
     .AddApplicationCache()
+    .AddFavoriteIntegration<FavoriteCacheableConnectionProvider, FavoriteSettingsProvider>()
     .AddCacheLayer("pricing")
     .AddJsonSigner()
+    .AddSecretEncryptor()
     .AddMinimalSecurityLayer()
     .AddIntegrationClients()
     .AddCommonLayer()

@@ -22,6 +22,7 @@
         <ProjectReference Include="..\..\..\Infrastructure\Cache\Cache.csproj"/>
         <ProjectReference Include="..\..\..\Infrastructure\Common\Common.csproj"/>
         <ProjectReference Include="..\..\..\Infrastructure\Integrations\Internal\Internal.Integration.Di\Internal.Integration.Di.csproj"/>
+        <ProjectReference Include="..\..\..\Infrastructure\Integrations\Suppliers\Integrations.Supplier.DI\Integrations.Supplier.DI.csproj" />
         <ProjectReference Include="..\..\..\Infrastructure\RabbitMq\RabbitMq.csproj"/>
         <ProjectReference Include="..\..\..\Infrastructure\Security\Security.csproj"/>
         <ProjectReference Include="..\..\Api.Common\Api.Common.csproj"/>
