@@ -3,7 +3,8 @@ using Armtek.Integrations.Core.Interfaces;
 
 namespace Armtek.Integrations.Client;
 
-public abstract class NodeBase(IArmtekConnectionProvider connectionProvider)
+public abstract class 
+    NodeBase(IArmtekConnectionProvider connectionProvider)
 {
     protected async Task<HttpRequestMessage> GetRequest(
         HttpMethod method,

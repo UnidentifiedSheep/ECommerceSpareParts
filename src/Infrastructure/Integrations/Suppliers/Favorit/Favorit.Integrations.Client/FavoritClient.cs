@@ -1,5 +1,3 @@
-using System.Collections.Specialized;
-using System.Text.Json;
 using Favorit.Integrations.Core.Interfaces;
 using Favorit.Integrations.Core.Requests;
 using Favorit.Integrations.Core.Responses;
