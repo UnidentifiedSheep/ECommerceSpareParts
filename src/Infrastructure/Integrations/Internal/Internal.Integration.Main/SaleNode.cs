@@ -27,6 +27,6 @@ internal sealed class SaleNode(
             request,
             cancellationToken);
 
-        return await ReadInternalResponse<InternalFullSale>(response, cancellationToken);
+        return await ReadResponse<InternalFullSale>(response, cancellationToken);
     }
 }

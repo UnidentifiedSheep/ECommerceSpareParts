@@ -6,4 +6,11 @@
         <Nullable>enable</Nullable>
     </PropertyGroup>
 
+    <ItemGroup>
+      <ProjectReference Include="..\..\Integrations.Client.Core\Integrations.Client.Core.csproj" />
+      <ProjectReference Include="..\..\Integrations.Common\Integrations.Common.csproj" />
+      <ProjectReference Include="..\..\Integrations.Supplier\Integrations.Supplier.csproj" />
+      <ProjectReference Include="..\Favorit.Integrations.Core\Favorit.Integrations.Core.csproj" />
+    </ItemGroup>
+
 </Project>

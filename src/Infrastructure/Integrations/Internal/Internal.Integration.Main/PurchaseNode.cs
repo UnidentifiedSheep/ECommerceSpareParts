@@ -27,6 +27,6 @@ internal sealed class PurchaseNode(
             request,
             cancellationToken);
 
-        return await ReadInternalResponse<InternalFullPurchase>(response, cancellationToken);
+        return await ReadResponse<InternalFullPurchase>(response, cancellationToken);
     }
 }

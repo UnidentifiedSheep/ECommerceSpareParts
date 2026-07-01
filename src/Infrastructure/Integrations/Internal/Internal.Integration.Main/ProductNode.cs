@@ -27,6 +27,6 @@ internal sealed class ProductNode(
             request,
             cancellationToken);
 
-        return await ReadInternalResponse<InternalFullProduct>(response, cancellationToken);
+        return await ReadResponse<InternalFullProduct>(response, cancellationToken);
     }
 }

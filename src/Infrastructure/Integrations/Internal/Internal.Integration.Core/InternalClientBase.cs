@@ -1,6 +1,7 @@
 ﻿using System.Net.Http.Headers;
 using System.Text;
 using System.Text.Json;
+using Integrations.Client.Core;
 using Integrations.Common;
 using Internal.Integration.Core.Interfaces;
 using Internal.Integration.Core.Models;
@@ -10,7 +11,7 @@ namespace Internal.Integration.Core;
 
 public abstract class InternalClientBase(
     IAuthClient authClient,
-    IOptionsMonitor<InternalServiceCredentials> optionsMonitor)
+    IOptionsMonitor<InternalServiceCredentials> optionsMonitor) : ClientBase
 {
     protected async Task<HttpRequestMessage> GetRequest(
         HttpMethod method,
@@ -34,44 +35,12 @@ public abstract class InternalClientBase(
         request.Headers.Add("Accept-Language", locale);
     }
 
-    protected void SetJsonContent<TValue>(
-        HttpRequestMessage request,
-        TValue value)
-    {
-        request.Content = new StringContent(
-            JsonSerializer.Serialize(value),
-            Encoding.UTF8,
-            "application/json");
-    }
-
-    protected static async Task<Response<T>> ReadInternalResponse<T>(
-        HttpResponseMessage response,
-        CancellationToken cancellationToken = default)
-    {
-        var json = await response.Content.ReadAsStringAsync(cancellationToken);
-
-        if (!response.IsSuccessStatusCode)
-            return Response<T>.Fail(response.StatusCode, GetError(response, json));
-
-        try
-        {
-            var value = JsonSerializer.Deserialize<T>(json);
-            return value is null
-                ? Response<T>.Fail(response.StatusCode, "Empty response body")
-                : Response<T>.Ok(value);
-        }
-        catch (JsonException ex)
-        {
-            return Response<T>.Fail(response.StatusCode, ex.Message);
-        }
-    }
-
     protected static async Task<Response<TValue>> ReadInternalResponse<TResponse, TValue>(
         HttpResponseMessage response,
         Func<TResponse, TValue> selector,
         CancellationToken cancellationToken = default)
     {
-        var result = await ReadInternalResponse<TResponse>(response, cancellationToken);
+        var result = await ReadResponse<TResponse>(response, cancellationToken);
 
         if (!result.Success)
             return Response<TValue>.Fail(
@@ -79,14 +48,7 @@ public abstract class InternalClientBase(
                 result.Error);
 
         return result.Value is null
-            ? Response<TValue>.Fail(response.StatusCode, "Empty response body")
+            ? Response<TValue>.Fail(response.StatusCode, "Response body is null")
             : Response<TValue>.Ok(selector(result.Value));
-    }
-
-    private static string? GetError(HttpResponseMessage response, string body)
-    {
-        return string.IsNullOrWhiteSpace(body)
-            ? response.ReasonPhrase
-            : body;
     }
 }

@@ -18,8 +18,9 @@ public abstract class NodeBase(IArmtekConnectionProvider connectionProvider)
             RequestUri = new Uri(connection.BaseUri, relativeUrl)
         };
 
+        /*
         request.Headers.Authorization =
-            new AuthenticationHeaderValue("Basic", connection.Auth.GetToken());
+            new AuthenticationHeaderValue("Basic", connection.Auth.GetToken());*/
 
         return request;
     }

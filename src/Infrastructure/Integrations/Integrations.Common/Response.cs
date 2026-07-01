@@ -10,7 +10,7 @@ public record Response<T>
     public HttpStatusCode? StatusCode { get; init; }
     public string? Error { get; init; }
 
-    public static Response<T> Ok(T value) => new()
+    public static Response<T> Ok(T? value) => new()
     {
         Success = true,
         Value = value

@@ -27,6 +27,6 @@ internal sealed class ProducerNode(
             request,
             cancellationToken);
 
-        return await ReadInternalResponse<InternalFullProducer>(response, cancellationToken);
+        return await ReadResponse<InternalFullProducer>(response, cancellationToken);
     }
 }
