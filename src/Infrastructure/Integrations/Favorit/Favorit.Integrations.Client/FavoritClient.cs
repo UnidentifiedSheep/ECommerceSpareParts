@@ -1,5 +1,6 @@
 using System.Collections.Specialized;
 using System.Text.Json;
+using Favorit.Integrations.Core.Interfaces;
 using Favorit.Integrations.Core.Requests;
 using Favorit.Integrations.Core.Responses;
 using Integrations.Client.Core;
@@ -12,7 +13,8 @@ namespace Favorit.Integrations.Client;
 
 public class FavoritClient(
     HttpClient client,
-    IConnectionProvider<FavoritConnection> connectionProvider) : ClientBase
+    IConnectionProvider<FavoritConnection> connectionProvider
+    ) : ClientBase, IFavoritPartsClient
 {
     public async Task<Response<GetPricesResponse>> GetPricesAsync(
         GetPricesRequest request,
