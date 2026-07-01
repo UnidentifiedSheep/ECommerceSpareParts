@@ -8,7 +8,6 @@ using Main.Application.Handlers.StorageContents.EditContent;
 using Main.Application.Handlers.StorageContents.GetContents;
 using Main.Application.Handlers.StorageContents.SetToZeroContent;
 using Main.Enums;
-using Mapster;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
 
@@ -99,7 +98,7 @@ public static class StorageContentEndPoints
                     request,
                     request.ShowZeroCount);
                 var result = await sender.Send(query, token);
-                return Results.Ok(result.Adapt<GetStorageContentResponse>());
+                return Results.Ok(new GetStorageContentResponse(result.Content));
             })
             .WithName("GetStorageContent")
             .WithSummary("Получить содержимое склада")

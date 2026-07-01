@@ -5,7 +5,6 @@ using Main.Application.Handlers.Auth.ChangePassword;
 using Main.Application.Handlers.Auth.PasswordRecovery.ResetPassword;
 using Main.Application.Handlers.Auth.PasswordRecovery.SendEmailRecovery;
 using Main.Application.Handlers.Auth.Register;
-using Mapster;
 using MediatR;
 
 namespace Main.Api.EndPoints;
@@ -109,7 +108,7 @@ public class AuthEndPoints : ICarterModule
                 var result = await sender.Send(
                     new LoginCommand(request.Email, request.Password, ipAddress, userAgent),
                     cancellationToken);
-                return Results.Ok(result.Adapt<LoginResponse>());
+                return Results.Ok(new LoginResponse(result.Token, result.RefreshToken, result.DeviceId));
             })
             .WithName("Login")
             .WithDisplayName("Вход пользователя")
@@ -120,10 +119,10 @@ public class AuthEndPoints : ICarterModule
             .WithSummary("Login User")
             .WithDescription("Login User");
 
-        auth.MapPost("/refresh", async (ISender sender, RefreshTokenRequest request) =>
+        auth.MapPost("/refresh", async (ISender sender, RefreshTokenRequest request, CancellationToken ct) =>
             {
-                var result = await sender.Send(request.Adapt<RefreshTokenCommand>());
-                return Results.Ok(result.Adapt<RefreshTokenResponse>());
+                var result = await sender.Send(new RefreshTokenCommand(request.RefreshToken, request.DeviceId), ct);
+                return Results.Ok(new RefreshTokenResponse(result.Token, result.RefreshToken));
             })
             .WithName("RefreshToken")
             .WithDisplayName("Обновление токена")
@@ -133,9 +132,16 @@ public class AuthEndPoints : ICarterModule
             .WithSummary("Refresh Token")
             .WithDescription("Refresh Token");
 
-        auth.MapPost("/register/", async (RegisterRequest request, ISender sender) =>
+        auth.MapPost("/register/", async (RegisterRequest request, ISender sender, CancellationToken ct) =>
             {
-                await sender.Send(request.Adapt<RegisterCommand>());
+                await sender.Send(
+                    new RegisterCommand(
+                        request.Email, 
+                        request.UserName, 
+                        request.Password, 
+                        request.Name, 
+                        request.Surname), 
+                    ct);
                 return Results.Ok();
             })
             .WithName("RegisterUser")

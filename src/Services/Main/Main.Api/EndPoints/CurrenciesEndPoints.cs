@@ -7,7 +7,6 @@ using Main.Application.Handlers.Currencies;
 using Main.Application.Handlers.Currencies.CreateCurrency;
 using Main.Application.Handlers.Currencies.GetCurrencyHistory;
 using Main.Application.Handlers.Currencies.UpdateCurrenciesRates;
-using Mapster;
 using MediatR;
 
 namespace Main.Api.EndPoints;
@@ -34,7 +33,13 @@ public class CurrenciesEndPoints : ICarterModule
                 CreateCurrencyRequest request,
                 CancellationToken cancellationToken) =>
             {
-                var result = await sender.Send(request.Adapt<CreateCurrencyCommand>(), cancellationToken);
+                var result = await sender.Send(
+                    new CreateCurrencyCommand(
+                        request.ShortName, 
+                        request.Name, 
+                        request.CurrencySign, 
+                        request.Code), 
+                    cancellationToken);
                 return Results.Created($"currencies/{result.Id}", new CreateCurrencyResponse(result.Id));
             })
             .WithName("CreateCurrency")

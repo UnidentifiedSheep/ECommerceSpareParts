@@ -22,19 +22,14 @@ using Mail;
 using Main.Api;
 using Main.Api.EndPoints.Products;
 using Main.Application;
-using Main.Application.BackgroundServices;
 using Main.Application.Configs;
 using Main.Application.Consumers;
-using Main.Application.Models;
 using Main.Cache;
 using Main.Persistence;
 using Main.Persistence.Context;
 using MassTransit;
-using Microsoft.AspNetCore.DataProtection;
-using Microsoft.Extensions.Options;
 using OpenTelemetry.Metrics;
 using RabbitMq.Extensions;
-using RabbitMQ.Client;
 using S3;
 using Security;
 using ZiggyCreatures.Caching.Fusion.Backplane;
@@ -139,8 +134,6 @@ builder.Services
     .AddApplicationLayer(builder.Configuration)
     .AddLocalization(builder.Configuration)
     .AddExchangeRates();
-
-builder.Services.AddHostedService<SearchLogBackgroundWorker>();
 
 builder.Services.AddOpenTelemetry()
     .WithMetrics(metrics =>

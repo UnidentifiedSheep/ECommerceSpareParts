@@ -6,7 +6,6 @@ using Main.Application.Dtos.Product;
 using Main.Application.Handlers.Products;
 using Main.Application.Handlers.Products.GetProductCrosses;
 using Main.Application.Handlers.Products.MakeLinkageBetweenArticles;
-using Mapster;
 using MediatR;
 
 namespace Main.Api.EndPoints.Products;
@@ -62,7 +61,7 @@ public static class ProductRelationsEndPoints
                 MakeLinkageBetweenProductsRequest request,
                 CancellationToken token) =>
             {
-                var command = request.Adapt<MakeLinkageBetweenProductsCommand>();
+                var command = new MakeLinkageBetweenProductsCommand(request.Linkages);
                 await sender.Send(command, token);
                 return Results.Created();
             })

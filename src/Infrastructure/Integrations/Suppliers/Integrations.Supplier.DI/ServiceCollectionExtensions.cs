@@ -1,5 +1,6 @@
 using Favorit.Integrations.Client;
 using Favorit.Integrations.Core.Interfaces;
+using Integrations.Common;
 using Integrations.Supplier.Connections;
 using Integrations.Supplier.Interfaces;
 using Integrations.Supplier.Settings;
@@ -20,7 +21,8 @@ public static class ServiceCollectionExtensions
         services.AddScoped<IConnectionProvider<FavoritConnection>, TConnectionProvider>();
         services.AddScoped<ISupplierSettingsProvider<FavoriteSettings>, TSettingsProvider>();
 
-        services.AddHttpClient<IFavoritPartsClient, FavoritPartsClient>();
+        services.AddHttpClient<IFavoritPartsClient, FavoritPartsClient>()
+            .AddDefaultResilenceHandler();
 
         services.AddScoped<ISupplier, FavoritPartsSupplier>();
 

@@ -9,7 +9,6 @@ using Main.Application.Handlers.StorageRoutes.EditStorageRoute;
 using Main.Application.Handlers.StorageRoutes.GetStorageRouteById;
 using Main.Application.Handlers.StorageRoutes.GetStorageRoutes;
 using Main.Enums;
-using Mapster;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
 
@@ -53,7 +52,21 @@ public class StorageRoutesEndPoints : ICarterModule
 
         routes.MapPost("", async (ISender sender, AddStorageRouteRequest request, CancellationToken token) =>
             {
-                var result = await sender.Send(request.Adapt<AddStorageRouteCommand>(), token);
+                var result = await sender.Send(
+                    new AddStorageRouteCommand(
+                        request.StorageFrom,
+                        request.StorageTo,
+                        request.Distance,
+                        request.RouteType,
+                        request.PricingType,
+                        request.DeliveryTime,
+                        request.PriceKg,
+                        request.PriceM3,
+                        request.CurrencyId,
+                        request.PricePerOrder,
+                        request.MinimumPrice ?? 0,
+                        request.CarrierId), 
+                    token);
                 return Results.Created($"/storages/routes/{result.RouteId}", new AddStorageRouteResponse(result.RouteId));
             })
             .WithName("CreateStorageRoute")

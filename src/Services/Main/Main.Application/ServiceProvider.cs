@@ -77,18 +77,6 @@ public static class ServiceProvider
 
         collection.AddSingleton<IEmailValidator, EmailValidator>();
 
-        collection.Scan(scan => scan
-            .FromAssemblyOf<GetUserDiscountHandler>()
-            .AddClasses(classes => classes.Where(type =>
-                type.GetInterfaces()
-                    .Any(i => i.IsGenericType &&
-                              i.GetGenericTypeDefinition() == typeof(ILoggableRequest<>))))
-            .As(type => type.GetInterfaces()
-                .Where(i => i.IsGenericType &&
-                            i.GetGenericTypeDefinition() == typeof(ILoggableRequest<>)))
-            .WithScopedLifetime()
-        );
-
         ValidationConfiguration.Configure();
 
         return collection;

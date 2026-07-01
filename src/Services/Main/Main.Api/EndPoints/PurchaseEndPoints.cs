@@ -11,7 +11,6 @@ using Main.Application.Handlers.Purchases.EditPurchase;
 using Main.Application.Handlers.Purchases.GetPurchase;
 using Main.Application.Handlers.Purchases.GetPurchaseContent;
 using Main.Application.Handlers.Purchases.GetPurchases;
-using Mapster;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
 
@@ -214,7 +213,7 @@ public class PurchaseEndPoints : ICarterModule
                     request.SortBy,
                     request.SearchTerm);
                 var result = await sender.Send(query, token);
-                return Results.Ok(result.Adapt<GetPurchasesResponse>());
+                return Results.Ok(new GetPurchasesResponse(result.Purchases));
             })
             .WithName("GetPurchases")
             .WithSummary("Получить закупки")

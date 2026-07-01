@@ -11,7 +11,6 @@ using Main.Application.Handlers.Storages.GetStorage;
 using Main.Application.Handlers.Storages.GetStorageByName;
 using Main.Entities.Exceptions;
 using Main.Enums;
-using Mapster;
 using MediatR;
 
 namespace Main.Api.EndPoints.Storages;
@@ -70,7 +69,13 @@ public class StoragesEndPoints : ICarterModule
                 CreateStorageRequest request,
                 CancellationToken cancellationToken) =>
             {
-                var result = await sender.Send(request.Adapt<CreateStorageCommand>(), cancellationToken);
+                var result = await sender.Send(
+                    new CreateStorageCommand(
+                        request.Name, 
+                        request.Description, 
+                        request.Location, 
+                        request.Type), 
+                    cancellationToken);
                 return Results.Created("/storages/", new CreateStorageResponse
                 {
                     Name = result.Name

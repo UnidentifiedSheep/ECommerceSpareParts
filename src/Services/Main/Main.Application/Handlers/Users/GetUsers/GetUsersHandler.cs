@@ -31,7 +31,7 @@ public record GetUsersQuery(
     IEnumerable<string>? Roles,
     GeneralSearchStrategy SearchStrategy) : IQuery<GetUsersResult>;
 
-public record GetUsersResult(IEnumerable<UserDto> Users);
+public record GetUsersResult(IReadOnlyList<UserDto> Users);
 
 public class GetUsersHandler(IReadRepository<User, Guid> readRepository) : IQueryHandler<GetUsersQuery, GetUsersResult>
 {

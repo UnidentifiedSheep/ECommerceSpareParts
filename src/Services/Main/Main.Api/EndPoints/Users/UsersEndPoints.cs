@@ -11,7 +11,6 @@ using Main.Application.Handlers.Auth.AddPermissionToUser;
 using Main.Application.Handlers.Users.CreateUser;
 using Main.Application.Handlers.Users.GetUsers;
 using Main.Enums;
-using Mapster;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
 
@@ -111,7 +110,7 @@ public class UsersEndPoints : ICarterModule
                     request.Roles,
                     request.SearchMethod);
                 var result = await sender.Send(query, token);
-                return Results.Ok(result.Adapt<GetUsersResponse>());
+                return Results.Ok(new GetUsersResponse(result.Users));
             })
             .WithName("GetUsers")
             .WithSummary("Получить пользователей")

@@ -1,5 +1,6 @@
 using Abstractions.Models;
 using Api.Common.Extensions;
+using Api.Common.Models.Requests;
 using Carter;
 using Enums;
 using Main.Application.Dtos.Producer;
@@ -11,8 +12,8 @@ using Main.Application.Handlers.Producers.EditProducer;
 using Main.Application.Handlers.Producers.GetProducerById;
 using Main.Application.Handlers.Producers.GetProducerOtherNames;
 using Main.Application.Handlers.Producers.GetProducers;
-using Mapster;
 using MediatR;
+using Microsoft.AspNetCore.Mvc;
 
 namespace Main.Api.EndPoints;
 
@@ -31,6 +32,12 @@ public record GetProducersResponse(IEnumerable<ProducerDto> Producers);
 public record GetProducerByIdResponse(ProducerDto Producer);
 
 public record PatchProducerResponse(ProducerDto Producer);
+
+public record GetProducersRequest : PaginationQueryModel
+{
+    [FromQuery(Name = "searchTerm")]
+    public string? SearchTerm { get; init; }
+}
 
 public class ProducersEndPoints : ICarterModule
 {
@@ -78,13 +85,12 @@ public class ProducersEndPoints : ICarterModule
         producers.MapGet("/{producerId:int}/names", async (
                 ISender sender,
                 int producerId,
-                int page,
-                int limit,
+                [AsParameters] PaginationQueryModel request,
                 CancellationToken token) =>
             {
-                var query = new GetProducerOtherNamesQuery(producerId, new Pagination(page, limit));
+                var query = new GetProducerOtherNamesQuery(producerId, request);
                 var result = await sender.Send(query, token);
-                return Results.Ok(result.Adapt<GetProducerOtherNamesResponse>());
+                return Results.Ok(new GetProducerOtherNamesResponse(result.Names));
             })
             .WithName("GetProducerOtherNames")
             .WithSummary("Получить дополнительные имена производителя")
@@ -141,10 +147,13 @@ public class ProducersEndPoints : ICarterModule
             .ProducesProblem(StatusCodes.Status404NotFound)
             .RequireAnyPermission(PermissionCodes.PRODUCERS_DELETE);
 
-        producers.MapGet("", async (ISender sender, string? searchTerm, int page, int limit) =>
+        producers.MapGet("", async (
+                ISender sender, 
+                [AsParameters] GetProducersRequest request,
+                CancellationToken ct) =>
             {
-                var result = await sender.Send(new GetProducersQuery(searchTerm, new Pagination(page, limit)));
-                return Results.Ok(result.Adapt<GetProducersResponse>());
+                var result = await sender.Send(new GetProducersQuery(request.SearchTerm, request), ct);
+                return Results.Ok(new GetProducersResponse(result.Producers));
             })
             .WithName("GetProducers")
             .WithSummary("Получить производителей")
@@ -152,10 +161,10 @@ public class ProducersEndPoints : ICarterModule
             .Produces<GetProducersResponse>()
             .ProducesProblem(StatusCodes.Status400BadRequest);
 
-        producers.MapGet("/{id:int}", async (ISender sender, int id) =>
+        producers.MapGet("/{id:int}", async (ISender sender, int id, CancellationToken ct) =>
             {
-                var result = await sender.Send(new GetProducerByIdQuery(id));
-                return Results.Ok(result.Adapt<GetProducerByIdResponse>());
+                var result = await sender.Send(new GetProducerByIdQuery(id), ct);
+                return Results.Ok(new GetProducerByIdResponse(result.Producer));
             })
             .WithName("GetProducerById")
             .WithSummary("Получить производителя по id")

@@ -7,7 +7,6 @@ using Main.Application.Handlers.ProductCharacteristics.AddCharacteristics;
 using Main.Application.Handlers.ProductCharacteristics.DeleteCharacteristics;
 using Main.Application.Handlers.ProductCharacteristics.GetCharacteristics;
 using Main.Application.Handlers.ProductCharacteristics.PatchCharacteristics;
-using Mapster;
 using MediatR;
 
 namespace Main.Api.EndPoints;
@@ -85,7 +84,7 @@ public class ProductCharacteristicsEndPoints : ICarterModule
                 CancellationToken token) =>
             {
                 var result = await sender.Send(new GetCharacteristicsQuery(productId, queryParams), token);
-                return Results.Ok(result.Adapt<GetProductCharacteristicsResponse>());
+                return Results.Ok(new GetProductCharacteristicsResponse(result.Characteristics));
             })
             .WithName("GetProductCharacteristics")
             .WithDescription("Получить характеристики артикула")

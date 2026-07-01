@@ -1,4 +1,5 @@
-﻿using Internal.Integration.Auth;
+﻿using Integrations.Common;
+using Internal.Integration.Auth;
 using Internal.Integration.Core;
 using Internal.Integration.Core.Interfaces;
 using Internal.Integration.Core.Interfaces.Common;
@@ -33,20 +34,20 @@ public static class ServiceProviderExtensions
             var options = sp.GetRequiredService<IOptions<InternalServicesOptions>>().Value;
             client.BaseAddress = new Uri(options.Main.Url);
             client.DefaultRequestHeaders.Add(InternalTokenHeader, options.InternalToken);
-        });
+        }).AddDefaultResilenceHandler();
 
         services.AddHttpClient<IMainClient, RootClient>((sp, client) =>
         {
             var options = sp.GetRequiredService<IOptions<InternalServicesOptions>>().Value;
             client.BaseAddress = new Uri(options.Main.Url);
             client.DefaultRequestHeaders.Add(InternalTokenHeader, options.InternalToken);
-        });
+        }).AddDefaultResilenceHandler();
 
         services.AddHttpClient<ICommonClient, Common.RootClient>((sp, client) =>
         {
             var options = sp.GetRequiredService<IOptions<InternalServicesOptions>>().Value;
             client.DefaultRequestHeaders.Add(InternalTokenHeader, options.InternalToken);
-        });
+        }).AddDefaultResilenceHandler();
 
         return services;
     }
