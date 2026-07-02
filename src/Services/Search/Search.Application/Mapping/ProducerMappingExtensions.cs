@@ -1,5 +1,6 @@
 using Search.Application.Dtos.Producers;
 using Search.Entities;
+using ProducerAlias = Search.Application.Dtos.Producers.ProducerAlias;
 
 namespace Search.Application.Mapping;
 
@@ -22,13 +23,13 @@ public static class ProducerMappingExtensions
             Id = producer.Id,
             Name = producer.Name,
             Description = producer.Description,
-            OtherNames = producer.OtherNames.Select(x => x.ToProducerOtherNameDto())
+            Aliases = producer.Aliases.Select(x => x.ToProducerAliasDto())
         };
     }
 
-    public static ProducerOtherNameDto ToProducerOtherNameDto(this ProducerAlias alias)
+    public static ProducerAlias ToProducerAliasDto(this Entities.ProducerAlias alias)
     {
-        return new ProducerOtherNameDto
+        return new ProducerAlias
         {
             Alias = alias.Alias
         };

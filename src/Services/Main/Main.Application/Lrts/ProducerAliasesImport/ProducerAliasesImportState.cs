@@ -3,9 +3,9 @@ using Application.Common.Interfaces.Lrt;
 using Attributes.JsonAttributes;
 using Enums;
 
-namespace Main.Application.Lrts.ProducerOtherNamesImport;
+namespace Main.Application.Lrts.ProducerAliasesImport;
 
-public record ProducerOtherNamesImportState
+public record ProducerAliasesImportState
 {
     [JsonPropertyName("fileName")]
     public required string FileName { get; init; }
@@ -14,11 +14,11 @@ public record ProducerOtherNamesImportState
     public int CurrentLine { get; init; }
 
     [JsonPropertyName("errors")]
-    public List<ProducerOtherNamesImportError> Errors { get; init; } = [];
+    public List<ProducerAliasesImportError> Errors { get; init; } = [];
 }
 
-[CsvSchema(typeof(ProducerOtherNamesImportLrt.ProducerOtherNameCsvDto))]
-public record ProducerOtherNamesImportInputState : IInputState
+[CsvSchema(typeof(ProducerAliasImportLrt.ProducerAliasCsvDto))]
+public record ProducerAliasesImportInputState : IInputState
 {
     [Accepts(".csv")]
     [InputControl(InputControlType.UploadFile)]
@@ -37,7 +37,7 @@ public record ProducerOtherNamesImportInputState : IInputState
     }
 }
 
-public record ProducerOtherNamesImportError
+public record ProducerAliasesImportError
 {
     [JsonPropertyName("rowIdx")]
     public int RowIdx { get; init; }

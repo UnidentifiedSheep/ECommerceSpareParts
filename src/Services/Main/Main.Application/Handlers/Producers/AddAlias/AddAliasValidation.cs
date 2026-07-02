@@ -1,10 +1,9 @@
 using FluentValidation;
-using Localization.Domain.Extensions;
 using Main.Application.Handlers.Producers.BaseValidators;
 
-namespace Main.Application.Handlers.Producers.AddOtherName;
+namespace Main.Application.Handlers.Producers.AddAlias;
 
-public class AddAliasValidation : AbstractValidator<AddOtherNameCommand>
+public class AddAliasValidation : AbstractValidator<AddAliasCommand>
 {
     public AddAliasValidation()
     {

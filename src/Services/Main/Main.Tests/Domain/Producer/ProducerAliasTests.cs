@@ -39,7 +39,7 @@ public class ProducerAliasTests
     }
 
     [Fact]
-    public void SetOtherName_NormalizesValue()
+    public void SetAlias_NormalizesValue()
     {
         var entity = ProducerAlias.Create(
             1,
@@ -51,7 +51,7 @@ public class ProducerAliasTests
     }
 
     [Fact]
-    public void Key_IsNormalizedOtherName()
+    public void Key_IsNormalizedAlias()
     {
         var entity = ProducerAlias.Create(
             1,

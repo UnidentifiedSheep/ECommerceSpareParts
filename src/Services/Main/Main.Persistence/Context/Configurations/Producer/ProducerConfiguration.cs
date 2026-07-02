@@ -32,7 +32,7 @@ public class ProducerConfiguration : IEntityTypeConfiguration<Entities.Producer.
             .IsUnique();
 
         builder.Navigation(e => e.Aliases)
-            .HasField("_otherNames")
+            .HasField("_aliases")
             .UsePropertyAccessMode(PropertyAccessMode.Field);
     }
 }

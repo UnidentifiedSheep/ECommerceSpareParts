@@ -17,51 +17,51 @@ namespace Main.Application.Handlers.Producers;
     retryErrors: ["23505"],
     retryCount: 2,
     retryDelayMs: 20)]
-public record CreateProducerOtherNamesBatchCommand(
-    IEnumerable<CreateProducerOtherNamesBatchItem> Items
-) : ICommand<CreateProducerOtherNamesBatchResult>;
+public record CreateProducerAliasesBatchCommand(
+    IEnumerable<CreateProducerAliasesBatchItem> Items
+) : ICommand<CreateProducerAliasesBatchResult>;
 
-public record CreateProducerOtherNamesBatchResult(
+public record CreateProducerAliasesBatchResult(
     int Created,
     int Skipped,
-    IReadOnlyList<CreateProducerOtherNamesBatchError> Errors
+    IReadOnlyList<CreateProducerAliasesBatchError> Errors
 );
 
-public record CreateProducerOtherNamesBatchItem(
+public record CreateProducerAliasesBatchItem(
     string OriginalName,
     string Alias
 );
 
-public record CreateProducerOtherNamesBatchError(int Index, string Message);
+public record CreateProducerAliasesBatchError(int Index, string Message);
 
-internal record ProcessedProducerOtherNameBatchItem(
+internal record ProcessedProducerAliasBatchItem(
     int Index,
     string OriginalName,
     string Alias
 );
 
-public class CreateProducerOtherNamesBatchHandler(
+public class CreateProducerAliasesBatchHandler(
     IRepository<ProducerAlias, string> aliasRepository,
     IScopedStringLocalizer localizer,
     IProducerRepository producerRepository,
     IIntegrationEventScope integrationEventScope,
     IUnitOfWork unitOfWork
-) : ICommandHandler<CreateProducerOtherNamesBatchCommand, CreateProducerOtherNamesBatchResult>
+) : ICommandHandler<CreateProducerAliasesBatchCommand, CreateProducerAliasesBatchResult>
 {
-    public async Task<CreateProducerOtherNamesBatchResult> Handle(
-        CreateProducerOtherNamesBatchCommand request,
+    public async Task<CreateProducerAliasesBatchResult> Handle(
+        CreateProducerAliasesBatchCommand request,
         CancellationToken cancellationToken)
     {
         var items = request.Items.ToList();
         if (items.Count == 0)
-            return new CreateProducerOtherNamesBatchResult(
+            return new CreateProducerAliasesBatchResult(
                 0,
                 0,
                 []);
 
-        var processedItems = new List<ProcessedProducerOtherNameBatchItem>();
+        var processedItems = new List<ProcessedProducerAliasBatchItem>();
         var toAdd = new List<ProducerAlias>();
-        var errors = new List<CreateProducerOtherNamesBatchError>();
+        var errors = new List<CreateProducerAliasesBatchError>();
         var uniqOtherNames = new HashSet<string>();
 
         var idx = 0;
@@ -77,7 +77,7 @@ public class CreateProducerOtherNamesBatchHandler(
             if (!uniqOtherNames.Add(processed.Alias))
             {
                 errors.Add(
-                    new CreateProducerOtherNamesBatchError(
+                    new CreateProducerAliasesBatchError(
                         currentIdx,
                         localizer.Get("producer.other.name.duplicate.in.batch")));
                 continue;
@@ -86,7 +86,7 @@ public class CreateProducerOtherNamesBatchHandler(
             processedItems.Add(processed);
         }
 
-        var existingAliases = await GetOtherNames(processedItems, cancellationToken);
+        var existingAliases = await GetAliases(processedItems, cancellationToken);
         var existingProducers = await GetProducers(processedItems, cancellationToken);
 
         foreach (var item in processedItems)
@@ -94,7 +94,7 @@ public class CreateProducerOtherNamesBatchHandler(
             if (existingAliases.ContainsKey(item.Alias))
             {
                 errors.Add(
-                    new CreateProducerOtherNamesBatchError(
+                    new CreateProducerAliasesBatchError(
                         item.Index,
                         localizer.Get("producer.other.name.already.taken")));
                 continue;
@@ -103,7 +103,7 @@ public class CreateProducerOtherNamesBatchHandler(
             if (!existingProducers.TryGetValue(item.OriginalName, out var producer))
             {
                 errors.Add(
-                    new CreateProducerOtherNamesBatchError(
+                    new CreateProducerAliasesBatchError(
                         item.Index,
                         localizer.Get("producer.other.name.producer.not.found.in.batch")));
                 continue;
@@ -123,16 +123,16 @@ public class CreateProducerOtherNamesBatchHandler(
                     Id = producerId
                 });
 
-        return new CreateProducerOtherNamesBatchResult(
+        return new CreateProducerAliasesBatchResult(
             toAdd.Count,
             processedItems.Count - toAdd.Count,
             errors);
     }
 
-    private ProcessedProducerOtherNameBatchItem? ProcessDto(
+    private ProcessedProducerAliasBatchItem? ProcessDto(
         int idx,
-        CreateProducerOtherNamesBatchItem dto,
-        List<CreateProducerOtherNamesBatchError> errors)
+        CreateProducerAliasesBatchItem dto,
+        List<CreateProducerAliasesBatchError> errors)
     {
         try
         {
@@ -140,7 +140,7 @@ public class CreateProducerOtherNamesBatchHandler(
                 0,
                 dto.Alias);
 
-            return new ProcessedProducerOtherNameBatchItem(
+            return new ProcessedProducerAliasBatchItem(
                 idx,
                 Producer.ToNormalizedName(dto.OriginalName),
                 producerOtherName.Alias);
@@ -153,14 +153,14 @@ public class CreateProducerOtherNamesBatchHandler(
                     localizableException.Arguments ?? []) ?? ex.Message
                 : ex.Message;
 
-            errors.Add(new CreateProducerOtherNamesBatchError(idx, message));
+            errors.Add(new CreateProducerAliasesBatchError(idx, message));
 
             return null;
         }
     }
 
-    private async Task<Dictionary<string, ProducerAlias>> GetOtherNames(
-        List<ProcessedProducerOtherNameBatchItem> items,
+    private async Task<Dictionary<string, ProducerAlias>> GetAliases(
+        List<ProcessedProducerAliasBatchItem> items,
         CancellationToken cancellationToken)
     {
         var aliases = items
@@ -178,7 +178,7 @@ public class CreateProducerOtherNamesBatchHandler(
     }
 
     private async Task<Dictionary<string, Producer>> GetProducers(
-        List<ProcessedProducerOtherNameBatchItem> items,
+        List<ProcessedProducerAliasBatchItem> items,
         CancellationToken cancellationToken)
     {
         var producerNames = items

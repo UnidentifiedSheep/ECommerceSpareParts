@@ -21,7 +21,7 @@ public static class ValidationConfiguration
         ConfigurePermission();
         //ConfigureRole();
         ConfigureCurrency();
-        ConfigureProducerOtherNames();
+        ConfigureProducerAliases();
         ConfigureCart();
         ConfigureStorageRoutes();
         ConfigureStorageOwners();
@@ -120,12 +120,12 @@ public static class ValidationConfiguration
                 .WithErrorCode((int)HttpStatusCode.Conflict));
     }
 
-    private static void ConfigureProducerOtherNames()
+    private static void ConfigureProducerAliases()
     {
         ConfigureDbValidation.AddConfig(
             ValidationFunctions.ValidateProducerAliasExistsAlias,
             KeyValueType.Single,
-            config => config.WithErrorName(ApplicationErrors.ProducerOtherNameNotFound)
+            config => config.WithErrorName(ApplicationErrors.ProducerAliasNotFound)
                 .WithMessageTemplate("producer.other.name.not.found")
                 .WithErrorType(typeof(NotFoundException))
                 .WithErrorCode((int)HttpStatusCode.NotFound));
@@ -133,7 +133,7 @@ public static class ValidationConfiguration
         ConfigureDbValidation.AddConfig(
             ValidationFunctions.ValidateProducerAliasNotExistsAlias,
             KeyValueType.Single,
-            config => config.WithErrorName(ApplicationErrors.ProducerOtherNameAlreadyTaken)
+            config => config.WithErrorName(ApplicationErrors.ProducerAliasAlreadyTaken)
                 .WithMessageTemplate("producer.other.name.already.taken")
                 .WithErrorType(typeof(ConflictException))
                 .WithErrorCode((int)HttpStatusCode.Conflict));

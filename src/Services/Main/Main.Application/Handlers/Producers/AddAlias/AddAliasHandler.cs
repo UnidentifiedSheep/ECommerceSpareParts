@@ -6,11 +6,11 @@ using Contracts.Producer;
 using Main.Entities.Producer;
 using MediatR;
 
-namespace Main.Application.Handlers.Producers.AddOtherName;
+namespace Main.Application.Handlers.Producers.AddAlias;
 
 [AutoSave]
 [Transactional]
-public record AddOtherNameCommand(
+public record AddAliasCommand(
     int ProducerId,
     string Alias
 ) : ICommand<Unit>;
@@ -18,9 +18,9 @@ public record AddOtherNameCommand(
 public class AddAliasHandler(
     IUnitOfWork unitOfWork,
     IIntegrationEventScope integrationEventScope
-) : ICommandHandler<AddOtherNameCommand>
+) : ICommandHandler<AddAliasCommand>
 {
-    public async Task<Unit> Handle(AddOtherNameCommand request, CancellationToken cancellationToken)
+    public async Task<Unit> Handle(AddAliasCommand request, CancellationToken cancellationToken)
     {
         var model = ProducerAlias.Create(
             request.ProducerId,

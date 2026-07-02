@@ -9,6 +9,6 @@ public class SearchProducersEndPoints : ICarterModule
         app.MapGroup("/producers")
             .WithTags("Producers")
             .SearchProducers()
-            .GetProducerOtherNames();
+            .GetProducerAliases();
     }
 }

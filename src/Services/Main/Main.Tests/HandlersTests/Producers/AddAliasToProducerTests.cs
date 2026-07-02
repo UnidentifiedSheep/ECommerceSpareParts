@@ -1,5 +1,5 @@
 using FluentAssertions;
-using Main.Application.Handlers.Producers.AddOtherName;
+using Main.Application.Handlers.Producers.AddAlias;
 using Main.Application.Static;
 using Main.Entities.Producer;
 using Microsoft.EntityFrameworkCore;
@@ -22,20 +22,20 @@ public class AddAliasToProducerTests : IntegrationTest
     [Theory]
     [InlineData(" ")]
     [InlineData("tooBig")]
-    public async Task AddOtherProducerName_EmptyProducerName_FailsValidation(string otherName)
+    public async Task AddProducerAlias_EmptyProducerName_FailsValidation(string alias)
     {
-        if (otherName == "tooBig") otherName = Faker.Lorem.Letter(200);
+        if (alias == "tooBig") alias = Faker.Lorem.Letter(200);
         var producer = TestContext.Producers[0];
-        var command = new AddOtherNameCommand(
+        var command = new AddAliasCommand(
             producer.Id,
-            otherName);
+            alias);
         await Assert.ThrowsAsync<ValidationException>(async () => await Mediator.Send(command));
     }
 
     [Fact]
-    public async Task AddOtherProducerName_InvalidProducerId_ThrowsProducerNotFound()
+    public async Task AddProducerAlias_InvalidProducerId_ThrowsProducerNotFound()
     {
-        var command = new AddOtherNameCommand(
+        var command = new AddAliasCommand(
             int.MaxValue,
             Faker.Lorem.Letter(40));
         var exception =
@@ -44,11 +44,11 @@ public class AddAliasToProducerTests : IntegrationTest
     }
 
     [Fact]
-    public async Task AddOtherProducerName_Normal_Succeeds()
+    public async Task AddProducerAlias_Normal_Succeeds()
     {
         var producer = TestContext.Producers[0];
 
-        var command = new AddOtherNameCommand(
+        var command = new AddAliasCommand(
             producer.Id,
             Faker.Lorem.Letter(40));
 
@@ -56,44 +56,44 @@ public class AddAliasToProducerTests : IntegrationTest
 
         await act.Should().NotThrowAsync();
 
-        var otherName = await Context.ProducersOtherNames.AsNoTracking().FirstOrDefaultAsync();
+        var alias = await Context.ProducersAliases.AsNoTracking().FirstOrDefaultAsync();
 
-        otherName.Should().NotBeNull();
+        alias.Should().NotBeNull();
 
-        otherName.ProducerId.Should().Be(producer.Id);
-        otherName.Alias.Should().Be(Producer.ToNormalizedName(command.Alias));
+        alias.ProducerId.Should().Be(producer.Id);
+        alias.Alias.Should().Be(Producer.ToNormalizedName(command.Alias));
     }
 
     [Fact]
-    public async Task AddOtherProducerName_WithSameFields_ThrowsSameProducerOtherNameExists()
+    public async Task AddProducerAlias_WithSameFields_ThrowsSameProducerAliasExists()
     {
         var producer = TestContext.Producers[0];
-        var existing = await new ProducerOtherNameBuilder(Faker)
+        var existing = await new ProducerAliasBuilder(Faker)
             .WithProducerId(producer.Id)
             .BuildAndAddToDb(Context);
 
-        var command = new AddOtherNameCommand(
+        var command = new AddAliasCommand(
             producer.Id,
             existing.Alias);
         var exception =
             await Assert.ThrowsAsync<DbValidationException>(async () => await Mediator.Send(command));
-        Assert.Equal(ApplicationErrors.ProducerOtherNameAlreadyTaken, exception.Failures[0].ErrorName);
+        Assert.Equal(ApplicationErrors.ProducerAliasAlreadyTaken, exception.Failures[0].ErrorName);
     }
 
     [Fact]
-    public async Task AddOtherProducerName_WithSameOtherNameForAnotherProducer_ThrowsProducerOtherNameExists()
+    public async Task AddProducerAlias_WithSameAliasForAnotherProducer_ThrowsProducerAliasExists()
     {
-        var existing = await new ProducerOtherNameBuilder(Faker)
+        var existing = await new ProducerAliasBuilder(Faker)
             .WithProducerId(TestContext.Producers[0].Id)
             .BuildAndAddToDb(Context);
 
-        var command = new AddOtherNameCommand(
+        var command = new AddAliasCommand(
             TestContext.Producers[1].Id,
             existing.Alias);
 
         var exception =
             await Assert.ThrowsAsync<DbValidationException>(async () => await Mediator.Send(command));
 
-        Assert.Equal(ApplicationErrors.ProducerOtherNameAlreadyTaken, exception.Failures[0].ErrorName);
+        Assert.Equal(ApplicationErrors.ProducerAliasAlreadyTaken, exception.Failures[0].ErrorName);
     }
 }

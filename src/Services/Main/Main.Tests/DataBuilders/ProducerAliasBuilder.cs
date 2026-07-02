@@ -4,34 +4,34 @@ using Test.Common.Abstractions;
 
 namespace Tests.DataBuilders;
 
-public class ProducerOtherNameBuilder(Faker faker) : BuilderBase<ProducerAlias>(faker)
+public class ProducerAliasBuilder(Faker faker) : BuilderBase<ProducerAlias>(faker)
 {
     private readonly HashSet<int> _producerIds = [];
     public IReadOnlyCollection<int> ProducerIds => _producerIds.AsReadOnly();
 
-    public string? OtherName { get; private set; }
+    public string? Alias { get; private set; }
 
-    public ProducerOtherNameBuilder WithProducerId(int producerId)
+    public ProducerAliasBuilder WithProducerId(int producerId)
     {
         _producerIds.Add(producerId);
         return this;
     }
 
-    public ProducerOtherNameBuilder WithProducerIds(IEnumerable<int> producerIds)
+    public ProducerAliasBuilder WithProducerIds(IEnumerable<int> producerIds)
     {
         _producerIds.UnionWith(producerIds);
         return this;
     }
 
-    public ProducerOtherNameBuilder WithProducers(IEnumerable<Producer> producers)
+    public ProducerAliasBuilder WithProducers(IEnumerable<Producer> producers)
     {
         _producerIds.UnionWith(producers.Select(p => p.Id));
         return this;
     }
 
-    public ProducerOtherNameBuilder WithOtherName(string otherName)
+    public ProducerAliasBuilder WithAlias(string otherName)
     {
-        OtherName = otherName;
+        Alias = otherName;
         return this;
     }
 
@@ -39,6 +39,6 @@ public class ProducerOtherNameBuilder(Faker faker) : BuilderBase<ProducerAlias>(
     {
         return ProducerAlias.Create(
             Faker.PickRandom<int>(_producerIds),
-            OtherName ?? Faker.Lorem.Letter(20));
+            Alias ?? Faker.Lorem.Letter(20));
     }
 }

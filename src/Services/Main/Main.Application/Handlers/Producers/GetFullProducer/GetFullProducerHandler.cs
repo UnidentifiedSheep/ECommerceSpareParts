@@ -11,7 +11,7 @@ namespace Main.Application.Handlers.Producers.GetFullProducer;
 
 public record GetFullProducerQuery(int Id) : IQuery<GetFullProducerResult>;
 
-public record GetFullProducerResult(ProducerDto Producer, IReadOnlyList<ProducerAliasDto> OtherNames);
+public record GetFullProducerResult(ProducerDto Producer, IReadOnlyList<ProducerAliasDto> Aliases);
 
 public class GetFullProducerHandler(
     IReadRepository<Producer, int> repository
@@ -29,7 +29,7 @@ public class GetFullProducerHandler(
                          {
                              producer = ProducerProjections.ToDto.Invoke(x),
                              otherNames =
-                                 x.Aliases.Select(z => ProducerProjections.ToOtherNameDto.Invoke(z))
+                                 x.Aliases.Select(z => ProducerProjections.ToAliasDto.Invoke(z))
                          })
                          .FirstOrDefaultAsync(cancellationToken)
                      ?? throw new ProducerNotFoundException(request.Id);

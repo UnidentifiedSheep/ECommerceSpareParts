@@ -30,11 +30,11 @@ public class MainProducerSearchDocumentProvider(
             Id = fullProducer.Producer.Id,
             Name = fullProducer.Producer.Name,
             Description = fullProducer.Producer.Description,
-            OtherNames = fullProducer.Aliases.Select(MapOtherName).ToList()
+            Aliases = fullProducer.Aliases.Select(MapAlias).ToList()
         };
     }
 
-    private static ProducerAlias MapOtherName(InternalProducerAlias alias)
+    private static ProducerAlias MapAlias(InternalProducerAlias alias)
     {
         return new ProducerAlias
         {

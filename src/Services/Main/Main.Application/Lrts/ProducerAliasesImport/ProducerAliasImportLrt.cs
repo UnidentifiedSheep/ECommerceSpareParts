@@ -11,23 +11,23 @@ using MediatR;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 
-namespace Main.Application.Lrts.ProducerOtherNamesImport;
+namespace Main.Application.Lrts.ProducerAliasesImport;
 
-public class ProducerOtherNamesImportLrt(
+public class ProducerAliasImportLrt(
     IRepository<Job, Guid> jobRepository,
     IUnitOfWork unitOfWork,
     IS3StorageService s3Service,
     ISender sender,
-    ILogger<ProducerOtherNamesImportLrt> logger,
+    ILogger<ProducerAliasImportLrt> logger,
     IPublishEndpoint publisher,
     IScopedStringLocalizer stringLocalizer,
     IOptions<LocalesOptions> localesOptions
 )
     : CsvImportLrtBase<
-        ProducerOtherNamesImportState,
-        ProducerOtherNamesImportError,
-        ProducerOtherNamesImportLrt.ProducerOtherNameCsvDto,
-        CreateProducerOtherNamesBatchItem>(
+        ProducerAliasesImportState,
+        ProducerAliasesImportError,
+        ProducerAliasImportLrt.ProducerAliasCsvDto,
+        CreateProducerAliasesBatchItem>(
         jobRepository,
         unitOfWork,
         publisher,
@@ -36,17 +36,17 @@ public class ProducerOtherNamesImportLrt(
         stringLocalizer,
         localesOptions)
 {
-    public override string SystemName => nameof(ProducerOtherNamesImportLrt);
+    public override string SystemName => nameof(ProducerAliasImportLrt);
     public override string NameLocalizationKey => "lrt.producer.other.names.import.name";
     public override string DescriptionLocalizationKey => "lrt.producer.other.names.import.description";
-    public override Type InputType => typeof(ProducerOtherNamesImportInputState);
-    public override Type StateType => typeof(ProducerOtherNamesImportState);
+    public override Type InputType => typeof(ProducerAliasesImportInputState);
+    public override Type StateType => typeof(ProducerAliasesImportState);
 
-    protected override string GetFileName(ProducerOtherNamesImportState state) { return state.FileName; }
+    protected override string GetFileName(ProducerAliasesImportState state) { return state.FileName; }
 
-    protected override int GetCurrentLine(ProducerOtherNamesImportState state) { return state.CurrentLine; }
+    protected override int GetCurrentLine(ProducerAliasesImportState state) { return state.CurrentLine; }
 
-    protected override List<ProducerOtherNamesImportError> GetErrors(ProducerOtherNamesImportState state)
+    protected override List<ProducerAliasesImportError> GetErrors(ProducerAliasesImportState state)
     {
         return state.Errors;
     }
@@ -56,19 +56,19 @@ public class ProducerOtherNamesImportLrt(
         return "producer.too.many.errors.while.processing.batch";
     }
 
-    protected override ProducerOtherNamesImportError CreateError(int rowIdx, string message)
+    protected override ProducerAliasesImportError CreateError(int rowIdx, string message)
     {
-        return new ProducerOtherNamesImportError
+        return new ProducerAliasesImportError
         {
             RowIdx = rowIdx,
             Message = message
         };
     }
 
-    protected override ProducerOtherNamesImportState WithUpdatedState(
-        ProducerOtherNamesImportState state,
+    protected override ProducerAliasesImportState WithUpdatedState(
+        ProducerAliasesImportState state,
         int currentLine,
-        List<ProducerOtherNamesImportError> errors)
+        List<ProducerAliasesImportError> errors)
     {
         return state with
         {
@@ -79,32 +79,32 @@ public class ProducerOtherNamesImportLrt(
 
     protected override bool TryProcessRow(
         int rowIdx,
-        ProducerOtherNameCsvDto row,
-        ProducerOtherNamesImportState state,
-        List<ProducerOtherNamesImportError> errors,
-        out CreateProducerOtherNamesBatchItem item)
+        ProducerAliasCsvDto row,
+        ProducerAliasesImportState state,
+        List<ProducerAliasesImportError> errors,
+        out CreateProducerAliasesBatchItem item)
     {
-        item = new CreateProducerOtherNamesBatchItem(
+        item = new CreateProducerAliasesBatchItem(
             row.Name,
             row.Alias);
         return true;
     }
 
     protected override async Task ProcessBatch(
-        List<(int idx, CreateProducerOtherNamesBatchItem item)> otherNames,
-        ProducerOtherNamesImportState state,
-        List<ProducerOtherNamesImportError> errors)
+        List<(int idx, CreateProducerAliasesBatchItem item)> otherNames,
+        ProducerAliasesImportState state,
+        List<ProducerAliasesImportError> errors)
     {
         if (otherNames.Count == 0) return;
 
         var firstIdx = otherNames[0].idx;
         var result = await sender.Send(
-            new CreateProducerOtherNamesBatchCommand(otherNames.Select(x => x.item)),
+            new CreateProducerAliasesBatchCommand(otherNames.Select(x => x.item)),
             CancellationToken);
 
         foreach (var (idx, message) in result.Errors)
             errors.Add(
-                new ProducerOtherNamesImportError
+                new ProducerAliasesImportError
                 {
                     Message = message,
                     RowIdx = idx >= 0 && idx < otherNames.Count
@@ -126,7 +126,7 @@ public class ProducerOtherNamesImportLrt(
         otherNames.Clear();
     }
 
-    public record ProducerOtherNameCsvDto
+    public record ProducerAliasCsvDto
     {
         [Name("OriginalName", "Name")]
         public required string Name { get; init; }

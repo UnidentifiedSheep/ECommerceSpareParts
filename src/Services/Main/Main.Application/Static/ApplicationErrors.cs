@@ -28,8 +28,8 @@ public static class ApplicationErrors
     public const string CurrencyShortNameAlreadyTaken = "CurrencyShortNameAlreadyTaken";
     public const string CurrencySignAlreadyTaken = "CurrencySignAlreadyTaken";
 
-    public const string ProducerOtherNameNotFound = "ProducerOtherNameNotFound";
-    public const string ProducerOtherNameAlreadyTaken = "ProducerOtherNameAlreadyTaken";
+    public const string ProducerAliasNotFound = "ProducerAliasNotFound";
+    public const string ProducerAliasAlreadyTaken = "ProducerAliasAlreadyTaken";
 
     public const string CartItemNotFound = "CartItemNotFound";
     public const string CartItemAlreadyExist = "CartItemAlreadyExist";

@@ -5,16 +5,16 @@ using Main.Enums;
 
 namespace Main.Entities.Producer;
 
-public class SupplierProducerMapping : Entity<SupplierProducerMapping, int>, ILinqEntity<SupplierProducerMapping, int>
+public class ProducerSupplierMapping : Entity<ProducerSupplierMapping, int>, ILinqEntity<ProducerSupplierMapping, int>
 {
     public int Id { get; private set; }
     public int ProducerId { get; private set; }
     public Supplier Supplier { get; private set; }
     public string SupplierProducerName { get; private set; } = string.Empty;
     
-    private SupplierProducerMapping() { }
+    private ProducerSupplierMapping() { }
 
-    public static SupplierProducerMapping Create(
+    public static ProducerSupplierMapping Create(
         int producerId,
         string supplierProducerName,
         Supplier supplier) =>
@@ -27,9 +27,9 @@ public class SupplierProducerMapping : Entity<SupplierProducerMapping, int>, ILi
 
     public override int GetId() => Id;
 
-    public static Expression<Func<SupplierProducerMapping, int>> GetKeySelector() 
+    public static Expression<Func<ProducerSupplierMapping, int>> GetKeySelector() 
         => x => x.Id;
 
-    public static Expression<Func<SupplierProducerMapping, bool>> GetEqualityExpression(int key)
+    public static Expression<Func<ProducerSupplierMapping, bool>> GetEqualityExpression(int key)
         => x => x.Id == key;
 }

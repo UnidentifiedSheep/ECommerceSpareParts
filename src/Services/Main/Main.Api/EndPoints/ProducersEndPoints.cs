@@ -3,20 +3,20 @@ using Api.Common.Models.Requests;
 using Carter;
 using Enums;
 using Main.Application.Dtos.Producer;
-using Main.Application.Handlers.Producers.AddOtherName;
+using Main.Application.Handlers.Producers;
+using Main.Application.Handlers.Producers.AddAlias;
 using Main.Application.Handlers.Producers.CreateProducer;
-using Main.Application.Handlers.Producers.DeleteOtherName;
 using Main.Application.Handlers.Producers.DeleteProducer;
 using Main.Application.Handlers.Producers.EditProducer;
+using Main.Application.Handlers.Producers.GetProducerAliases;
 using Main.Application.Handlers.Producers.GetProducerById;
-using Main.Application.Handlers.Producers.GetProducerOtherNames;
 using Main.Application.Handlers.Producers.GetProducers;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Main.Api.EndPoints;
 
-public record AddOtherNameToProducerRequest(string Alias);
+public record AddAliasToProducerRequest(string Alias);
 
 public record CreateProducerRequest(NewProducerDto NewProducer);
 
@@ -24,7 +24,7 @@ public record CreateProducerResponse(ProducerDto Producer);
 
 public record EditProducerRequest(PatchProducerDto EditProducer);
 
-public record GetProducerOtherNamesResponse(IEnumerable<ProducerAliasDto> Names);
+public record GetProducerAliasesResponse(IEnumerable<ProducerAliasDto> Names);
 
 public record GetProducersResponse(IEnumerable<ProducerDto> Producers);
 
@@ -50,38 +50,38 @@ public class ProducersEndPoints : ICarterModule
                 async (
                     ISender sender,
                     int producerId,
-                    AddOtherNameToProducerRequest request,
+                    AddAliasToProducerRequest request,
                     CancellationToken token) =>
                 {
                     await sender.Send(
-                        new AddOtherNameCommand(
+                        new AddAliasCommand(
                             producerId,
                             request.Alias),
                         token);
                     return Results.Ok();
                 })
-            .WithName("AddProducerOtherName")
+            .WithName("AddProducerAAlias")
             .WithSummary("Добавить дополнительное имя производителя")
             .WithDisplayName("Добавление дополнительного имени")
             .WithDescription("Добавление дополнительного имени к производителю")
-            .Accepts<AddOtherNameToProducerRequest>(false, "application/json")
+            .Accepts<AddAliasToProducerRequest>(false, "application/json")
             .Produces(StatusCodes.Status200OK)
             .ProducesProblem(StatusCodes.Status400BadRequest)
             .ProducesProblem(StatusCodes.Status404NotFound)
             .RequireAnyPermission(PermissionCodes.PRODUCERS_EDIT);
 
         producers.MapDelete(
-                "/{producerId:int}/names/{otherName}",
+                "/{producerId:int}/aliases/{alias}",
                 async (
                     ISender sender,
                     int producerId,
-                    string otherName,
+                    string alias,
                     CancellationToken cancellationToken) =>
                 {
-                    await sender.Send(new DeleteOtherNameCommand(producerId, otherName), cancellationToken);
+                    await sender.Send(new DeleteAliasCommand(producerId, alias), cancellationToken);
                     return Results.NoContent();
                 })
-            .WithName("DeleteProducerOtherName")
+            .WithName("DeleteProducerAlias")
             .WithSummary("Удалить дополнительное имя производителя")
             .WithDisplayName("Удаление дополнительного имени")
             .WithDescription("Удаление дополнительного имени у производителя")
@@ -97,15 +97,15 @@ public class ProducersEndPoints : ICarterModule
                     [AsParameters] PaginationQueryModel request,
                     CancellationToken token) =>
                 {
-                    var query = new GetProducerOtherNamesQuery(producerId, request);
+                    var query = new GetProducerAliasesQuery(producerId, request);
                     var result = await sender.Send(query, token);
-                    return Results.Ok(new GetProducerOtherNamesResponse(result.Names));
+                    return Results.Ok(new GetProducerAliasesResponse(result.Names));
                 })
-            .WithName("GetProducerOtherNames")
+            .WithName("GetProducerAliases")
             .WithSummary("Получить дополнительные имена производителя")
             .WithDisplayName("Получение дополнительных имен производителя")
             .WithDescription("Дополнительные имена производителя")
-            .Produces<GetProducerOtherNamesResponse>()
+            .Produces<GetProducerAliasesResponse>()
             .ProducesProblem(StatusCodes.Status400BadRequest)
             .ProducesProblem(StatusCodes.Status404NotFound);
 

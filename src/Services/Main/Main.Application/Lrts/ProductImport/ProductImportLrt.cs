@@ -43,7 +43,7 @@ public class ProductImportLrt(
         stringLocalizer,
         localesOptions)
 {
-    private readonly Dictionary<string, int> _otherNamesToIds = new();
+    private readonly Dictionary<string, int> _aliasesToIds = new();
 
     private readonly Dictionary<string, int> _producerNamesToIds = new();
     protected override int BatchSize => 100;
@@ -106,7 +106,7 @@ public class ProductImportLrt(
     private async Task LoadProducers()
     {
         _producerNamesToIds.Clear();
-        _otherNamesToIds.Clear();
+        _aliasesToIds.Clear();
 
         const int batchSize = 1000;
 
@@ -136,7 +136,7 @@ public class ProductImportLrt(
             foreach (var item in producers)
             {
                 _producerNamesToIds.TryAdd(item.name, item.id);
-                foreach (var otherName in item.otherNames) _otherNamesToIds.TryAdd(otherName, item.id);
+                foreach (var alias in item.otherNames) _aliasesToIds.TryAdd(alias, item.id);
             }
 
             if (producers.Count != batchSize) break;
@@ -202,7 +202,7 @@ public class ProductImportLrt(
 
         if (_producerNamesToIds.TryGetValue(normalizedProducer, out var producerId)) return producerId;
 
-        return _otherNamesToIds.TryGetValue(normalizedProducer, out var otherNameProducerId)
+        return _aliasesToIds.TryGetValue(normalizedProducer, out var otherNameProducerId)
             ? otherNameProducerId
             : null;
     }

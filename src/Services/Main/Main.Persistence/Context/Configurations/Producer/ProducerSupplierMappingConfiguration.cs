@@ -4,14 +4,14 @@ using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
 namespace Main.Persistence.Context.Configurations.Producer;
 
-public class SupplierProducerMappingConfiguration : IEntityTypeConfiguration<SupplierProducerMapping>
+public class ProducerSupplierMappingConfiguration : IEntityTypeConfiguration<ProducerSupplierMapping>
 {
-    public void Configure(EntityTypeBuilder<SupplierProducerMapping> builder)
+    public void Configure(EntityTypeBuilder<ProducerSupplierMapping> builder)
     {
-        builder.ToTable("supplier_producer_mappings", "public");
+        builder.ToTable("producer_supplier_mappings", "public");
 
         builder.HasKey(e => e.Id)
-            .HasName("supplier_producer_mappings_pk");
+            .HasName("producer_supplier_mappings_pk");
         
         builder.Property(e => e.Id)
             .HasColumnName("id");
@@ -24,17 +24,17 @@ public class SupplierProducerMappingConfiguration : IEntityTypeConfiguration<Sup
             .HasColumnName("producer_id");
         
         builder.Property(e => e.SupplierProducerName)
-            .HasColumnName("supplier_producer_name")
+            .HasColumnName("producer_supplier_name")
             .HasMaxLength(128);
 
         builder.HasIndex(e => new { e.ProducerId, e.Supplier })
-            .HasDatabaseName("supplier_producer_mappings_uidx")
+            .HasDatabaseName("producer_supplier_mappings_uidx")
             .IsUnique();
         
         builder.HasOne<Entities.Producer.Producer>()
             .WithMany()
             .HasForeignKey(d => d.ProducerId)
             .OnDelete(DeleteBehavior.Restrict)
-            .HasConstraintName("supplier_producer_mappings_producer_id_fk");
+            .HasConstraintName("producer_supplier_mappings_producer_id_fk");
     }
 }

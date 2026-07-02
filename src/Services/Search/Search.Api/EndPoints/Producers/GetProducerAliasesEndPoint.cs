@@ -3,41 +3,41 @@ using Api.Common.Extensions;
 using Enums;
 using MediatR;
 using Search.Application.Dtos.Producers;
-using Search.Application.Handlers.Producers.GetProducerOtherNames;
+using Search.Application.Handlers.Producers;
 
 namespace Search.Api.EndPoints.Producers;
 
-public record GetProducerOtherNamesResult
+public record GetProducerAliasesResponse
 {
-    [JsonPropertyName("otherNames")]
-    public required IEnumerable<ProducerOtherNameDto> OtherNames { get; init; }
+    [JsonPropertyName("aliases")]
+    public required IEnumerable<ProducerAlias> Aliases { get; init; }
 }
 
-public static class GetProducerOtherNamesEndPoint
+public static class GetProducerAliasesEndPoint
 {
-    public static RouteGroupBuilder GetProducerOtherNames(this RouteGroupBuilder producers)
+    public static RouteGroupBuilder GetProducerAliases(this RouteGroupBuilder producers)
     {
         producers.MapGet(
-                "/{producerId:int}/other-names",
+                "/{producerId:int}/aliases",
                 async (
                     int producerId,
                     ISender sender,
                     CancellationToken cancellationToken) =>
                 {
                     var result = await sender.Send(
-                        new GetProducerOtherNamesQuery(producerId),
+                        new GetProducerAliasesQuery(producerId),
                         cancellationToken);
 
                     return Results.Ok(
-                        new GetProducerOtherNamesResult
+                        new GetProducerAliasesResponse
                         {
-                            OtherNames = result.OtherNames
+                            Aliases = result.Aliases
                         });
                 })
             .WithTags("Producers")
             .RequireAllPermissions(PermissionCodes.ARTICLES_GET_MAIN)
             .WithDisplayName("Get producer other names")
-            .Produces<GetProducerOtherNamesResult>();
+            .Produces<GetProducerAliasesResponse>();
 
         return producers;
     }

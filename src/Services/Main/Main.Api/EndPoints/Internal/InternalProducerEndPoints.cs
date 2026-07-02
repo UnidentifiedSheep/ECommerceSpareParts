@@ -35,7 +35,7 @@ public static class InternalProducerEndPoints
                         new InternalGetFullProducerResponse
                         {
                             Producer = result.Producer,
-                            Aliases = result.OtherNames
+                            Aliases = result.Aliases
                         });
                 })
             .WithDisplayName("Internal service full producer")

@@ -74,7 +74,7 @@ public class ProducerIndexInitializer(
                                 .Index(false)
                             )
                             .Object<ProducerAlias>(o => o
-                                .Name(x => x.OtherNames)
+                                .Name(x => x.Aliases)
                                 .Dynamic(false)
                                 .Properties(op => op
                                     .Text(t => t
