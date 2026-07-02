@@ -1,9 +1,11 @@
 using System.Net;
 using Favorit.Integrations.Core.Interfaces;
+using Favorit.Integrations.Core.Models;
 using Favorit.Integrations.Core.Requests;
 using Favorit.Integrations.Core.Responses;
 using Integrations.Common;
 using Integrations.Supplier;
+using Integrations.Supplier.Connections;
 using Integrations.Supplier.Interfaces;
 using Integrations.Supplier.Models;
 using Integrations.Supplier.Models.Requests;
@@ -13,7 +15,8 @@ namespace Favorit.Integrations.Client;
 
 public class FavoritPartsSupplier(
     IFavoritPartsClient client,
-    ISupplierSettingsProvider<FavoriteSettings> settingsProvider
+    ISupplierSettingsProvider<FavoriteSettings> settingsProvider,
+    IConnectionProvider<FavoritConnection> connectionProvider
 ) : ISupplier
 {
     public Supplier Supplier => Supplier.FavoritParts;
@@ -36,6 +39,10 @@ public class FavoritPartsSupplier(
             AdaptResponse(result.ValueOrThrow, settings));
     }
 
+    public async Task<ConnectionCheck> CheckConnectionAsync(
+        CancellationToken cancellationToken = default) 
+        => await connectionProvider.CheckConnectionAsync(cancellationToken);
+
     private static GetPricesRequest AdaptRequest(GetProductsRequest request)
     {
         return new GetPricesRequest
@@ -50,35 +57,37 @@ public class FavoritPartsSupplier(
     private static List<SupplierProduct> AdaptResponse(
         GetPricesResponse response,
         FavoriteSettings settings)
-    {
-        return response.Goods
-            .Select(good => new SupplierProduct
-            {
-                Brand = good.Brand,
-                Id = good.Id,
-                Name = good.Name,
-                Number = good.Number,
-                Positions = good.Warehouses.Select(x => new SupplierPosition
-                    {
-                        PurchaseInfo = new PurchaseInfo
-                        {
-                            AvailableQuantity = x.Stock,
-                            DaysToRefund = 0,
-                            PartnerWarehouse = !x.Own,
-                            QuantityCoefficient = good.Rate,
-                            MinimumPurchaseQuantity = 1,
-                            PriceInfo = new PriceInfo { CurrencyCode = "RUB", Price = x.Price }
-                        },
-                        DeliveryInfo = new DeliveryInfo
-                        {
-                            DeliveryDate = x.ShipmentDate.Date.AddDays(settings.MinDaysToDelivery),
-                            DeliveryProbability = 99,
-                            GuaranteedDeliveryDate = x.ShipmentDate.Date.AddDays(settings.MaxDaysToDelivery),
-                            OrderTill = DateTime.UtcNow.Date.Add(x.ShipmentDate.TimeOfDay)
-                        }
-                    })
-                    .ToList()
-            })
+        => response.Goods
+            .Select(good => AdaptGood(good, settings))
             .ToList();
-    }
+
+    private static SupplierProduct AdaptGood(Good good, FavoriteSettings settings) =>
+        new()
+        {
+            Brand = good.Brand,
+            Id = good.Id,
+            Name = good.Name,
+            Number = good.Number,
+            Analogues = good.Analogues.Select(x => AdaptGood(x, settings)).ToList(),
+            Positions = good.Warehouses.Select(x => new SupplierPosition
+                {
+                    PurchaseInfo = new PurchaseInfo
+                    {
+                        AvailableQuantity = x.Stock,
+                        DaysToRefund = 0,
+                        PartnerWarehouse = !x.Own,
+                        QuantityCoefficient = good.Rate,
+                        MinimumPurchaseQuantity = 1,
+                        PriceInfo = new PriceInfo { CurrencyCode = "RUB", Price = x.Price }
+                    },
+                    DeliveryInfo = new DeliveryInfo
+                    {
+                        DeliveryDate = x.ShipmentDate.Date.AddDays(settings.MinDaysToDelivery),
+                        DeliveryProbability = 99,
+                        GuaranteedDeliveryDate = x.ShipmentDate.Date.AddDays(settings.MaxDaysToDelivery),
+                        OrderTill = DateTime.UtcNow.Date.Add(x.ShipmentDate.TimeOfDay)
+                    }
+                })
+                .ToList()
+        };
 }

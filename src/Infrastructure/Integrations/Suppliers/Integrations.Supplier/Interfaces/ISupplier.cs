@@ -1,4 +1,5 @@
 using Integrations.Common;
+using Integrations.Supplier.Connections;
 using Integrations.Supplier.Models;
 using Integrations.Supplier.Models.Requests;
 
@@ -11,4 +12,6 @@ public interface ISupplier
     Task<Response<IReadOnlyList<SupplierProduct>>> GetProductsAsync(
         GetProductsRequest request,
         CancellationToken cancellationToken = default);
+    
+    Task<ConnectionCheck> CheckConnectionAsync(CancellationToken cancellationToken = default);
 }

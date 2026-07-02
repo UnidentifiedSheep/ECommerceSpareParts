@@ -7,4 +7,10 @@ public record ConnectionCheck<TConnection>(
     TConnection? Connection,
     SupplierUnavailableReason? Reason = null,
     string? Message = null
+) : ConnectionCheck(CanUse, Reason, Message);
+
+public record ConnectionCheck(
+    bool CanUse,
+    SupplierUnavailableReason? Reason = null,
+    string? Message = null
 );

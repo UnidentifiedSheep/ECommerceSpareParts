@@ -1,4 +1,7 @@
-﻿namespace Pricing.Application.Static;
+﻿using Integrations.Supplier;
+using Pricing.Enums;
+
+namespace Pricing.Application.Static;
 
 public static class CacheKeys
 {
@@ -7,5 +10,15 @@ public static class CacheKeys
         public static TimeSpan Ttl { get; } = TimeSpan.FromDays(1);
 
         public static string CurrencyRate(int currencyId) { return $"currency:{currencyId}:rate"; }
+    }
+
+    public static class PricingCache
+    {
+        public static class Lock
+        {
+            public static readonly TimeSpan Ttl = TimeSpan.FromSeconds(30);
+            public static string SupplierRequest(int productId, Supplier supplier) 
+                => $"supplier:{supplier.ToString()}:pricing:request:product:{productId}:lock";
+        }
     }
 }
