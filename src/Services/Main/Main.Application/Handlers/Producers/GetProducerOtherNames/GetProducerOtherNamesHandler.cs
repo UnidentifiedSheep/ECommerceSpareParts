@@ -15,7 +15,7 @@ public record GetProducerOtherNamesQuery(int ProducerId, Pagination Pagination)
 
 public record GetProducerOtherNamesResult(IReadOnlyList<ProducerOtherNameDto> Names);
 
-public class GetProducerOtherNamesHandler(IReadRepository<ProducerOtherName, string> repository)
+public class GetProducerOtherNamesHandler(IReadRepository<ProducerAlias, string> repository)
     : IQueryHandler<GetProducerOtherNamesQuery, GetProducerOtherNamesResult>
 {
     public async Task<GetProducerOtherNamesResult> Handle(

@@ -16,7 +16,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace Main.Api.EndPoints;
 
-public record AddOtherNameToProducerRequest(string OtherName, string WhereUsed);
+public record AddOtherNameToProducerRequest(string Alias);
 
 public record CreateProducerRequest(NewProducerDto NewProducer);
 
@@ -56,8 +56,7 @@ public class ProducersEndPoints : ICarterModule
                     await sender.Send(
                         new AddOtherNameCommand(
                             producerId,
-                            request.OtherName,
-                            request.WhereUsed),
+                            request.Alias),
                         token);
                     return Results.Ok();
                 })

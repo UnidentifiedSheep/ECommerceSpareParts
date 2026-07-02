@@ -4,13 +4,12 @@ using Test.Common.Abstractions;
 
 namespace Tests.DataBuilders;
 
-public class ProducerOtherNameBuilder(Faker faker) : BuilderBase<ProducerOtherName>(faker)
+public class ProducerOtherNameBuilder(Faker faker) : BuilderBase<ProducerAlias>(faker)
 {
     private readonly HashSet<int> _producerIds = [];
     public IReadOnlyCollection<int> ProducerIds => _producerIds.AsReadOnly();
 
     public string? OtherName { get; private set; }
-    public string? WhereUsed { get; private set; }
 
     public ProducerOtherNameBuilder WithProducerId(int producerId)
     {
@@ -36,17 +35,10 @@ public class ProducerOtherNameBuilder(Faker faker) : BuilderBase<ProducerOtherNa
         return this;
     }
 
-    public ProducerOtherNameBuilder WithWhereUsed(string whereUsed)
+    public override ProducerAlias Build()
     {
-        WhereUsed = whereUsed;
-        return this;
-    }
-
-    public override ProducerOtherName Build()
-    {
-        return ProducerOtherName.Create(
+        return ProducerAlias.Create(
             Faker.PickRandom<int>(_producerIds),
-            OtherName ?? Faker.Lorem.Letter(20),
-            WhereUsed ?? Faker.Lorem.Word());
+            OtherName ?? Faker.Lorem.Letter(20));
     }
 }

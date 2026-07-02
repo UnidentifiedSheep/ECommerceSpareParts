@@ -12,21 +12,19 @@ namespace Main.Application.Handlers.Producers.AddOtherName;
 [Transactional]
 public record AddOtherNameCommand(
     int ProducerId,
-    string OtherName,
-    string WhereUsed
+    string Alias
 ) : ICommand<Unit>;
 
-public class AddOtherNameHandler(
+public class AddAliasHandler(
     IUnitOfWork unitOfWork,
     IIntegrationEventScope integrationEventScope
 ) : ICommandHandler<AddOtherNameCommand>
 {
     public async Task<Unit> Handle(AddOtherNameCommand request, CancellationToken cancellationToken)
     {
-        var model = ProducerOtherName.Create(
+        var model = ProducerAlias.Create(
             request.ProducerId,
-            request.OtherName,
-            request.WhereUsed);
+            request.Alias);
         await unitOfWork.AddAsync(model, cancellationToken);
         integrationEventScope.Add(
             new ProducerUpdatedEvent

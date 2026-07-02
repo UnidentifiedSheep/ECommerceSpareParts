@@ -29,8 +29,7 @@ public record CreateProducerOtherNamesBatchResult(
 
 public record CreateProducerOtherNamesBatchItem(
     string OriginalName,
-    string OtherName,
-    string? WhereUsed
+    string Alias
 );
 
 public record CreateProducerOtherNamesBatchError(int Index, string Message);
@@ -38,12 +37,11 @@ public record CreateProducerOtherNamesBatchError(int Index, string Message);
 internal record ProcessedProducerOtherNameBatchItem(
     int Index,
     string OriginalName,
-    string OtherName,
-    string? WhereUsed
+    string Alias
 );
 
 public class CreateProducerOtherNamesBatchHandler(
-    IRepository<ProducerOtherName, string> aliasRepository,
+    IRepository<ProducerAlias, string> aliasRepository,
     IScopedStringLocalizer localizer,
     IProducerRepository producerRepository,
     IIntegrationEventScope integrationEventScope,
@@ -62,7 +60,7 @@ public class CreateProducerOtherNamesBatchHandler(
                 []);
 
         var processedItems = new List<ProcessedProducerOtherNameBatchItem>();
-        var toAdd = new List<ProducerOtherName>();
+        var toAdd = new List<ProducerAlias>();
         var errors = new List<CreateProducerOtherNamesBatchError>();
         var uniqOtherNames = new HashSet<string>();
 
@@ -76,7 +74,7 @@ public class CreateProducerOtherNamesBatchHandler(
                 errors);
             if (processed is null) continue;
 
-            if (!uniqOtherNames.Add(processed.OtherName))
+            if (!uniqOtherNames.Add(processed.Alias))
             {
                 errors.Add(
                     new CreateProducerOtherNamesBatchError(
@@ -93,7 +91,7 @@ public class CreateProducerOtherNamesBatchHandler(
 
         foreach (var item in processedItems)
         {
-            if (existingAliases.ContainsKey(item.OtherName))
+            if (existingAliases.ContainsKey(item.Alias))
             {
                 errors.Add(
                     new CreateProducerOtherNamesBatchError(
@@ -112,10 +110,9 @@ public class CreateProducerOtherNamesBatchHandler(
             }
 
             toAdd.Add(
-                ProducerOtherName.Create(
+                ProducerAlias.Create(
                     producer.Id,
-                    item.OtherName,
-                    item.WhereUsed));
+                    item.Alias));
         }
 
         await unitOfWork.AddRangeAsync(toAdd, cancellationToken);
@@ -139,16 +136,14 @@ public class CreateProducerOtherNamesBatchHandler(
     {
         try
         {
-            var producerOtherName = ProducerOtherName.Create(
+            var producerOtherName = ProducerAlias.Create(
                 0,
-                dto.OtherName,
-                dto.WhereUsed);
+                dto.Alias);
 
             return new ProcessedProducerOtherNameBatchItem(
                 idx,
                 Producer.ToNormalizedName(dto.OriginalName),
-                producerOtherName.OtherName,
-                producerOtherName.WhereUsed);
+                producerOtherName.Alias);
         }
         catch (Exception ex)
         {
@@ -164,22 +159,22 @@ public class CreateProducerOtherNamesBatchHandler(
         }
     }
 
-    private async Task<Dictionary<string, ProducerOtherName>> GetOtherNames(
+    private async Task<Dictionary<string, ProducerAlias>> GetOtherNames(
         List<ProcessedProducerOtherNameBatchItem> items,
         CancellationToken cancellationToken)
     {
         var aliases = items
-            .Select(x => x.OtherName)
+            .Select(x => x.Alias)
             .Distinct()
             .ToList();
 
         return (await aliasRepository.ListAsync(
-            Criteria<ProducerOtherName>.New()
-                .Where(x => aliases.Contains(x.OtherName))
+            Criteria<ProducerAlias>.New()
+                .Where(x => aliases.Contains(x.Alias))
                 .Track(false)
                 .Build(),
             cancellationToken
-        )).ToDictionary(x => x.OtherName);
+        )).ToDictionary(x => x.Alias);
     }
 
     private async Task<Dictionary<string, Producer>> GetProducers(

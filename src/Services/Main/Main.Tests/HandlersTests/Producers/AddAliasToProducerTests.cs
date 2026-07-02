@@ -10,9 +10,9 @@ using Tests.TestContexts;
 
 namespace Tests.HandlersTests.Producers;
 
-public class AddOtherNameToProducerTests : IntegrationTest
+public class AddAliasToProducerTests : IntegrationTest
 {
-    public AddOtherNameToProducerTests(CombinedContainerFixture fixture) : base(fixture)
+    public AddAliasToProducerTests(CombinedContainerFixture fixture) : base(fixture)
     {
         RegisterBasicContext<ProducerTestContext>();
     }
@@ -28,19 +28,7 @@ public class AddOtherNameToProducerTests : IntegrationTest
         var producer = TestContext.Producers[0];
         var command = new AddOtherNameCommand(
             producer.Id,
-            otherName,
-            "null");
-        await Assert.ThrowsAsync<ValidationException>(async () => await Mediator.Send(command));
-    }
-
-    [Fact]
-    public async Task AddOtherProducerName_TooLargeUsage_FailsValidation()
-    {
-        var producer = TestContext.Producers[0];
-        var command = new AddOtherNameCommand(
-            producer.Id,
-            Faker.Lorem.Letter(40),
-            Faker.Lorem.Letter(200));
+            otherName);
         await Assert.ThrowsAsync<ValidationException>(async () => await Mediator.Send(command));
     }
 
@@ -49,8 +37,7 @@ public class AddOtherNameToProducerTests : IntegrationTest
     {
         var command = new AddOtherNameCommand(
             int.MaxValue,
-            Faker.Lorem.Letter(40),
-            Faker.Lorem.Letter(10));
+            Faker.Lorem.Letter(40));
         var exception =
             await Assert.ThrowsAsync<DbValidationException>(async () => await Mediator.Send(command));
         Assert.Equal(ApplicationErrors.ProducersNotFound, exception.Failures[0].ErrorName);
@@ -63,8 +50,7 @@ public class AddOtherNameToProducerTests : IntegrationTest
 
         var command = new AddOtherNameCommand(
             producer.Id,
-            Faker.Lorem.Letter(40),
-            Faker.Lorem.Letter(10));
+            Faker.Lorem.Letter(40));
 
         var act = () => Mediator.Send(command);
 
@@ -75,8 +61,7 @@ public class AddOtherNameToProducerTests : IntegrationTest
         otherName.Should().NotBeNull();
 
         otherName.ProducerId.Should().Be(producer.Id);
-        otherName.OtherName.Should().Be(Producer.ToNormalizedName(command.OtherName));
-        otherName.WhereUsed.Should().Be(command.WhereUsed.ToUpperInvariant());
+        otherName.Alias.Should().Be(Producer.ToNormalizedName(command.Alias));
     }
 
     [Fact]
@@ -89,8 +74,7 @@ public class AddOtherNameToProducerTests : IntegrationTest
 
         var command = new AddOtherNameCommand(
             producer.Id,
-            existing.OtherName,
-            existing.WhereUsed);
+            existing.Alias);
         var exception =
             await Assert.ThrowsAsync<DbValidationException>(async () => await Mediator.Send(command));
         Assert.Equal(ApplicationErrors.ProducerOtherNameAlreadyTaken, exception.Failures[0].ErrorName);
@@ -105,8 +89,7 @@ public class AddOtherNameToProducerTests : IntegrationTest
 
         var command = new AddOtherNameCommand(
             TestContext.Producers[1].Id,
-            existing.OtherName,
-            Faker.Lorem.Letter(10));
+            existing.Alias);
 
         var exception =
             await Assert.ThrowsAsync<DbValidationException>(async () => await Mediator.Send(command));

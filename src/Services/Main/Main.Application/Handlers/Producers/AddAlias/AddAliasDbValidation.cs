@@ -5,11 +5,11 @@ using Main.Entities.Producer;
 
 namespace Main.Application.Handlers.Producers.AddOtherName;
 
-public class AddOtherNameDbValidation : AbstractDbValidation<AddOtherNameCommand>
+public class AddAliasDbValidation : AbstractDbValidation<AddOtherNameCommand>
 {
     public override void Build(IValidationPlan plan, AddOtherNameCommand request)
     {
         plan.ValidateProducerExistsId(request.ProducerId)
-            .ValidateProducerOtherNameNotExistsOtherName(Producer.ToNormalizedName(request.OtherName));
+            .ValidateProducerAliasNotExistsAlias(Producer.ToNormalizedName(request.Alias));
     }
 }

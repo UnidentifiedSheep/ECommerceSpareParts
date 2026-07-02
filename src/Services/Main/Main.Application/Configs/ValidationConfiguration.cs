@@ -123,7 +123,7 @@ public static class ValidationConfiguration
     private static void ConfigureProducerOtherNames()
     {
         ConfigureDbValidation.AddConfig(
-            ValidationFunctions.ValidateProducerOtherNameExistsOtherName,
+            ValidationFunctions.ValidateProducerAliasExistsAlias,
             KeyValueType.Single,
             config => config.WithErrorName(ApplicationErrors.ProducerOtherNameNotFound)
                 .WithMessageTemplate("producer.other.name.not.found")
@@ -131,7 +131,7 @@ public static class ValidationConfiguration
                 .WithErrorCode((int)HttpStatusCode.NotFound));
 
         ConfigureDbValidation.AddConfig(
-            ValidationFunctions.ValidateProducerOtherNameNotExistsOtherName,
+            ValidationFunctions.ValidateProducerAliasNotExistsAlias,
             KeyValueType.Single,
             config => config.WithErrorName(ApplicationErrors.ProducerOtherNameAlreadyTaken)
                 .WithMessageTemplate("producer.other.name.already.taken")

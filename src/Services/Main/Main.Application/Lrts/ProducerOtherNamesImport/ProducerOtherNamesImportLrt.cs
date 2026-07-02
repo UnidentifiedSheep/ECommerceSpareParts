@@ -86,8 +86,7 @@ public class ProducerOtherNamesImportLrt(
     {
         item = new CreateProducerOtherNamesBatchItem(
             row.Name,
-            row.OtherName,
-            row.WhereUsed);
+            row.Alias);
         return true;
     }
 
@@ -133,10 +132,6 @@ public class ProducerOtherNamesImportLrt(
         public required string Name { get; init; }
 
         [Name("OtherName", "Alias")]
-        public required string OtherName { get; init; }
-
-        [Name("WhereUsed", "WhereUsed")]
-        [Optional]
-        public string? WhereUsed { get; init; }
+        public required string Alias { get; init; }
     }
 }

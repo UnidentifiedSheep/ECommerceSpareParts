@@ -4,38 +4,29 @@ using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
 namespace Main.Persistence.Context.Configurations.Producer;
 
-public class ProducerOtherNameConfiguration : IEntityTypeConfiguration<ProducerOtherName>
+public class ProducerAliasConfiguration : IEntityTypeConfiguration<ProducerAlias>
 {
-    public void Configure(EntityTypeBuilder<ProducerOtherName> builder)
+    public void Configure(EntityTypeBuilder<ProducerAlias> builder)
     {
-        builder.ToTable("producers_other_names", "public");
+        builder.ToTable("producers_aliases", "public");
 
-        builder.HasKey(e => e.OtherName)
+        builder.HasKey(e => e.Alias)
             .HasName("producers_other_names_pk");
 
         builder.HasIndex(e => e.ProducerId)
             .HasDatabaseName("producers_other_names_producer_id_index");
 
-        builder.HasIndex(e => e.OtherName)
+        builder.HasIndex(e => e.Alias)
             .HasDatabaseName("producers_other_names_producer_other_name_index")
-            .HasMethod("gin")
-            .HasOperators("gin_trgm_ops");
-
-        builder.HasIndex(e => e.WhereUsed)
-            .HasDatabaseName("producers_other_names_where_used_index")
             .HasMethod("gin")
             .HasOperators("gin_trgm_ops");
 
         builder.Property(e => e.ProducerId)
             .HasColumnName("producer_id");
 
-        builder.Property(e => e.OtherName)
+        builder.Property(e => e.Alias)
             .HasMaxLength(64)
             .HasColumnName("other_name");
-
-        builder.Property(e => e.WhereUsed)
-            .HasMaxLength(64)
-            .HasColumnName("where_used");
 
         builder.HasOne<Entities.Producer.Producer>()
             .WithMany(x => x.OtherNames)

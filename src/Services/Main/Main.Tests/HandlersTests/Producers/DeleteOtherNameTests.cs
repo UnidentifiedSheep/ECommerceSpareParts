@@ -12,7 +12,7 @@ namespace Tests.HandlersTests.Producers;
 
 public class DeleteOtherNameTests : IntegrationTest
 {
-    private ProducerOtherName _otherName = null!;
+    private ProducerAlias _alias = null!;
 
     public DeleteOtherNameTests(CombinedContainerFixture fixture) : base(fixture)
     {
@@ -22,7 +22,7 @@ public class DeleteOtherNameTests : IntegrationTest
     public override async Task InitializeAsync()
     {
         await base.InitializeAsync();
-        _otherName = await new ProducerOtherNameBuilder(Faker)
+        _alias = await new ProducerOtherNameBuilder(Faker)
             .WithProducerId(GetContext<ProducerTestContext>().Producers[0].Id)
             .BuildAndAddToDb(Context);
     }
@@ -30,7 +30,7 @@ public class DeleteOtherNameTests : IntegrationTest
     [Fact]
     public async Task DeleteOtherName_InvalidProducerId_ThrowsProducerNotFound()
     {
-        var command = new DeleteOtherNameCommand(int.MaxValue, _otherName.OtherName);
+        var command = new DeleteOtherNameCommand(int.MaxValue, _alias.Alias);
         await Assert.ThrowsAsync<ProducersOtherNameNotFoundException>(async () =>
             await Mediator.Send(command));
     }
@@ -39,7 +39,7 @@ public class DeleteOtherNameTests : IntegrationTest
     public async Task DeleteOtherName_UnexistingProducerOtherName_ThrowsProducersOtherNameNotFoundException()
     {
         var command =
-            new DeleteOtherNameCommand(_otherName.ProducerId, Faker.Lorem.Letter(200));
+            new DeleteOtherNameCommand(_alias.ProducerId, Faker.Lorem.Letter(200));
         await Assert.ThrowsAsync<ProducersOtherNameNotFoundException>(async () =>
             await Mediator.Send(command));
     }
@@ -48,7 +48,7 @@ public class DeleteOtherNameTests : IntegrationTest
     public async Task DeleteOtherName_Normal_Succeeds()
     {
         var command =
-            new DeleteOtherNameCommand(_otherName.ProducerId, _otherName.OtherName);
+            new DeleteOtherNameCommand(_alias.ProducerId, _alias.Alias);
 
         var act = () => Mediator.Send(command);
         await act.Should().NotThrowAsync();

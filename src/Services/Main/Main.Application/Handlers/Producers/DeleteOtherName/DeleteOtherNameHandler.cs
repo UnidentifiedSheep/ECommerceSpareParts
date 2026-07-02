@@ -15,7 +15,7 @@ namespace Main.Application.Handlers.Producers.DeleteOtherName;
 public record DeleteOtherNameCommand(int ProducerId, string OtherName) : ICommand;
 
 public class DeleteOtherNameHandler(
-    IRepository<ProducerOtherName, string> repository,
+    IRepository<ProducerAlias, string> repository,
     IUnitOfWork unitOfWork,
     IIntegrationEventScope integrationEventScope
 )
