@@ -24,7 +24,7 @@ public record CreateProducerResponse(ProducerDto Producer);
 
 public record EditProducerRequest(PatchProducerDto EditProducer);
 
-public record GetProducerAliasesResponse(IEnumerable<ProducerAliasDto> Names);
+public record GetProducerAliasesResponse(IEnumerable<ProducerAliasDto> Aliases);
 
 public record GetProducersResponse(IEnumerable<ProducerDto> Producers);
 
@@ -46,7 +46,7 @@ public class ProducersEndPoints : ICarterModule
             .WithTags("Producers");
 
         producers.MapPost(
-                "/{producerId:int}/names",
+                "/{producerId:int}/aliases",
                 async (
                     ISender sender,
                     int producerId,
@@ -60,7 +60,7 @@ public class ProducersEndPoints : ICarterModule
                         token);
                     return Results.Ok();
                 })
-            .WithName("AddProducerAAlias")
+            .WithName("AddProducerAlias")
             .WithSummary("Добавить дополнительное имя производителя")
             .WithDisplayName("Добавление дополнительного имени")
             .WithDescription("Добавление дополнительного имени к производителю")
@@ -90,7 +90,7 @@ public class ProducersEndPoints : ICarterModule
             .RequireAnyPermission(PermissionCodes.PRODUCERS_EDIT);
 
         producers.MapGet(
-                "/{producerId:int}/names",
+                "/{producerId:int}/aliases",
                 async (
                     ISender sender,
                     int producerId,
@@ -99,7 +99,7 @@ public class ProducersEndPoints : ICarterModule
                 {
                     var query = new GetProducerAliasesQuery(producerId, request);
                     var result = await sender.Send(query, token);
-                    return Results.Ok(new GetProducerAliasesResponse(result.Names));
+                    return Results.Ok(new GetProducerAliasesResponse(result.Aliases));
                 })
             .WithName("GetProducerAliases")
             .WithSummary("Получить дополнительные имена производителя")

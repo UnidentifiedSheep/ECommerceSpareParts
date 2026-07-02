@@ -9,9 +9,19 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Main.Application.Handlers.Producers.GetFullProducer;
 
-public record GetFullProducerQuery(int Id) : IQuery<GetFullProducerResult>;
+public record GetFullProducerQuery : IQuery<GetFullProducerResult>
+{
+    public IReadOnlyList<int> Ids { get; }
+    public GetFullProducerQuery(IEnumerable<int> ids)
+    {
+        Ids = ids.ToList();
+    }
+    
+    public GetFullProducerQuery(int id) : this([id]) {}
+}
 
-public record GetFullProducerResult(ProducerDto Producer, IReadOnlyList<ProducerAliasDto> Aliases);
+public record GetFullProducerResult(IReadOnlyList<GetFullProducerResultItem> Producers);
+public record GetFullProducerResultItem(ProducerDto Producer, IReadOnlyList<ProducerAliasDto> Aliases);
 
 public class GetFullProducerHandler(
     IReadRepository<Producer, int> repository
@@ -21,19 +31,22 @@ public class GetFullProducerHandler(
         GetFullProducerQuery request,
         CancellationToken cancellationToken)
     {
-        var result = await repository
-                         .Query
-                         .Where(x => x.Id == request.Id)
-                         .AsExpandable()
-                         .Select(x => new
-                         {
-                             producer = ProducerProjections.ToDto.Invoke(x),
-                             otherNames =
-                                 x.Aliases.Select(z => ProducerProjections.ToAliasDto.Invoke(z))
-                         })
-                         .FirstOrDefaultAsync(cancellationToken)
-                     ?? throw new ProducerNotFoundException(request.Id);
+        if (request.Ids.Count == 0) return new GetFullProducerResult([]);
 
-        return new GetFullProducerResult(result.producer, result.otherNames.ToList());
+        var result = await repository
+            .Query
+            .Where(x => request.Ids.Contains(x.Id))
+            .AsExpandable()
+            .Select(x => new
+            {
+                producer = ProducerProjections.ToDto.Invoke(x),
+                otherNames =
+                    x.Aliases.Select(z => ProducerProjections.ToAliasDto.Invoke(z))
+            })
+            .ToListAsync(cancellationToken);
+        
+        return new GetFullProducerResult(result
+            .Select(x => new GetFullProducerResultItem(x.producer, x.otherNames.ToList()))
+            .ToList());
     }
 }

@@ -77,7 +77,7 @@ public class ProducerRepository(
                             .Query(searchQuery)
                             .Boost(2)),
                         sh => sh.Match(m => m
-                            .Field("otherNames.otherName")
+                            .Field("aliases.alias")
                             .Query(searchQuery)))
                     .MinimumShouldMatch(1))),
             token);

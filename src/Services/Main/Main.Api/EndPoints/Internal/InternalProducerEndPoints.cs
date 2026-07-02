@@ -2,16 +2,19 @@ using System.Text.Json.Serialization;
 using Main.Application.Dtos.Producer;
 using Main.Application.Handlers.Producers.GetFullProducer;
 using MediatR;
+using Microsoft.AspNetCore.Mvc;
 
 namespace Main.Api.EndPoints.Internal;
 
-public record InternalGetFullProducerResponse
+public record InternalGetFullProducersResponse
 {
-    [JsonPropertyName("producer")]
-    public required ProducerDto Producer { get; init; }
-
-    [JsonPropertyName("aliases")]
-    public required IReadOnlyList<ProducerAliasDto> Aliases { get; init; }
+    [JsonPropertyName("producers")]
+    public required IReadOnlyList<GetFullProducerResultItem> Producers { get; init; }
+}
+public record InternalGetFullProducersRequest
+{
+    [FromQuery(Name = "id")]
+    public int[] ProducerIds { get; init; } = [];
 }
 
 public static class InternalProducerEndPoints
@@ -24,25 +27,24 @@ public static class InternalProducerEndPoints
             .WithTags("InternalProducers");
 
         producers.MapGet(
-                "{id:int}",
+                "",
                 async (
-                    int id,
+                    [AsParameters] InternalGetFullProducersRequest request,
                     ISender sender,
                     CancellationToken cancellationToken) =>
                 {
-                    var result = await sender.Send(new GetFullProducerQuery(id), cancellationToken);
+                    var result = await sender.Send(new GetFullProducerQuery(request.ProducerIds), cancellationToken);
                     return Results.Ok(
-                        new InternalGetFullProducerResponse
+                        new InternalGetFullProducersResponse
                         {
-                            Producer = result.Producer,
-                            Aliases = result.Aliases
+                            Producers = result.Producers
                         });
                 })
             .WithDisplayName("Internal service full producer")
             .WithName("InternalFullProducer")
             .WithSummary("Получить полного производителя для внутреннего сервиса")
             .WithDescription("Получение полного производителя, с его доп именами для внутренних интеграций")
-            .Produces<InternalGetFullProducerResponse>()
+            .Produces<InternalGetFullProducersResponse>()
             .ProducesProblem(StatusCodes.Status404NotFound);
 
         return group;
