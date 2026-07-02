@@ -8,7 +8,7 @@ namespace Main.Entities.Producer;
 
 public class Producer : AuditableEntity<Producer, int>, ILinqEntity<Producer, int>
 {
-    private readonly List<ProducerAlias> _otherNames = [];
+    private readonly List<ProducerAlias> _aliases = [];
 
     private Producer() { }
 
@@ -31,7 +31,7 @@ public class Producer : AuditableEntity<Producer, int>, ILinqEntity<Producer, in
     public string? ImagePath { get; private set; }
 
     public string? Description { get; private set; }
-    public IReadOnlyCollection<ProducerAlias> OtherNames => _otherNames;
+    public IReadOnlyCollection<ProducerAlias> Aliases => _aliases;
 
     public static Expression<Func<Producer, int>> GetKeySelector() { return x => x.Id; }
 

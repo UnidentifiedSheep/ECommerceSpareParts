@@ -29,7 +29,7 @@ public class GetFullProducerHandler(
                          {
                              producer = ProducerProjections.ToDto.Invoke(x),
                              otherNames =
-                                 x.OtherNames.Select(z => ProducerProjections.ToOtherNameDto.Invoke(z))
+                                 x.Aliases.Select(z => ProducerProjections.ToOtherNameDto.Invoke(z))
                          })
                          .FirstOrDefaultAsync(cancellationToken)
                      ?? throw new ProducerNotFoundException(request.Id);

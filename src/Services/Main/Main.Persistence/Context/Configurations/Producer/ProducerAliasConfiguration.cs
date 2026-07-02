@@ -29,7 +29,7 @@ public class ProducerAliasConfiguration : IEntityTypeConfiguration<ProducerAlias
             .HasColumnName("other_name");
 
         builder.HasOne<Entities.Producer.Producer>()
-            .WithMany(x => x.OtherNames)
+            .WithMany(x => x.Aliases)
             .HasForeignKey(d => d.ProducerId)
             .HasConstraintName("producers_other_names_producer_id_fk");
     }

@@ -115,7 +115,7 @@ public class ProductImportLrt(
             {
                 id = x.Id,
                 name = x.Name,
-                otherNames = x.OtherNames.Select(z => z.Alias)
+                otherNames = x.Aliases.Select(z => z.Alias)
             })
             .OrderBy(x => x.id);
 
