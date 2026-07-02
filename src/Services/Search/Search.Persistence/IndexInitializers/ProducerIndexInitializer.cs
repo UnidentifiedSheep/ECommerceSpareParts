@@ -73,12 +73,12 @@ public class ProducerIndexInitializer(
                                 .Name(x => x.Description)
                                 .Index(false)
                             )
-                            .Object<ProducerOtherName>(o => o
+                            .Object<ProducerAlias>(o => o
                                 .Name(x => x.OtherNames)
                                 .Dynamic(false)
                                 .Properties(op => op
                                     .Text(t => t
-                                        .Name(x => x.OtherName)
+                                        .Name(x => x.Alias)
                                         .Analyzer("producer_ngram_analyzer")
                                         .SearchAnalyzer("standard")
                                         .Fields(f => f

@@ -24,7 +24,7 @@ public record CreateProducerResponse(ProducerDto Producer);
 
 public record EditProducerRequest(PatchProducerDto EditProducer);
 
-public record GetProducerOtherNamesResponse(IEnumerable<ProducerOtherNameDto> Names);
+public record GetProducerOtherNamesResponse(IEnumerable<ProducerAliasDto> Names);
 
 public record GetProducersResponse(IEnumerable<ProducerDto> Producers);
 

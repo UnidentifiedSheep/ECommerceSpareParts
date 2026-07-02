@@ -30,16 +30,15 @@ public class MainProducerSearchDocumentProvider(
             Id = fullProducer.Producer.Id,
             Name = fullProducer.Producer.Name,
             Description = fullProducer.Producer.Description,
-            OtherNames = fullProducer.OtherNames.Select(MapOtherName).ToList()
+            OtherNames = fullProducer.Aliases.Select(MapOtherName).ToList()
         };
     }
 
-    private static ProducerOtherName MapOtherName(InternalProducerOtherName otherName)
+    private static ProducerAlias MapOtherName(InternalProducerAlias alias)
     {
-        return new ProducerOtherName
+        return new ProducerAlias
         {
-            OtherName = otherName.OtherName,
-            WhereUsed = otherName.WhereUsed
+            Alias = alias.Alias
         };
     }
 }

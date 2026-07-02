@@ -14,10 +14,10 @@ public static class ProducerProjections
             Description = x.Description
         };
 
-    public static readonly Expression<Func<ProducerAlias, ProducerOtherNameDto>> ToOtherNameDto =
-        x => new ProducerOtherNameDto
+    public static readonly Expression<Func<ProducerAlias, ProducerAliasDto>> ToOtherNameDto =
+        x => new ProducerAliasDto
         {
             ProducerId = x.ProducerId,
-            OtherName = x.Alias
+            Alias = x.Alias
         };
 }

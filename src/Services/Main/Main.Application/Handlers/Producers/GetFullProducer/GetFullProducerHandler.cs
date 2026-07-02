@@ -11,7 +11,7 @@ namespace Main.Application.Handlers.Producers.GetFullProducer;
 
 public record GetFullProducerQuery(int Id) : IQuery<GetFullProducerResult>;
 
-public record GetFullProducerResult(ProducerDto Producer, IReadOnlyList<ProducerOtherNameDto> OtherNames);
+public record GetFullProducerResult(ProducerDto Producer, IReadOnlyList<ProducerAliasDto> OtherNames);
 
 public class GetFullProducerHandler(
     IReadRepository<Producer, int> repository

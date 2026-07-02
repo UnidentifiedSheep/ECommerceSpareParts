@@ -13,7 +13,7 @@ namespace Main.Application.Handlers.Producers.GetProducerOtherNames;
 public record GetProducerOtherNamesQuery(int ProducerId, Pagination Pagination)
     : IQuery<GetProducerOtherNamesResult>;
 
-public record GetProducerOtherNamesResult(IReadOnlyList<ProducerOtherNameDto> Names);
+public record GetProducerOtherNamesResult(IReadOnlyList<ProducerAliasDto> Names);
 
 public class GetProducerOtherNamesHandler(IReadRepository<ProducerAlias, string> repository)
     : IQueryHandler<GetProducerOtherNamesQuery, GetProducerOtherNamesResult>

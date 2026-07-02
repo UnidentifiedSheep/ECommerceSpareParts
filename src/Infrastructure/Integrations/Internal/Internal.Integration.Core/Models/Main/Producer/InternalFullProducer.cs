@@ -7,6 +7,6 @@ public record InternalFullProducer
     [JsonPropertyName("producer")]
     public required InternalProducer Producer { get; init; }
 
-    [JsonPropertyName("otherNames")]
-    public required IReadOnlyList<InternalProducerOtherName> OtherNames { get; init; }
+    [JsonPropertyName("aliases")]
+    public required IReadOnlyList<InternalProducerAlias> Aliases { get; init; }
 }

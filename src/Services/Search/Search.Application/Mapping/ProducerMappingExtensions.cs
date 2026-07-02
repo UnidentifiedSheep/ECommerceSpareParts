@@ -26,12 +26,11 @@ public static class ProducerMappingExtensions
         };
     }
 
-    public static ProducerOtherNameDto ToProducerOtherNameDto(this ProducerOtherName otherName)
+    public static ProducerOtherNameDto ToProducerOtherNameDto(this ProducerAlias alias)
     {
         return new ProducerOtherNameDto
         {
-            OtherName = otherName.OtherName,
-            WhereUsed = otherName.WhereUsed
+            Alias = alias.Alias
         };
     }
 }

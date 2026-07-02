@@ -10,8 +10,8 @@ public record InternalGetFullProducerResponse
     [JsonPropertyName("producer")]
     public required ProducerDto Producer { get; init; }
 
-    [JsonPropertyName("otherNames")]
-    public required IReadOnlyList<ProducerOtherNameDto> OtherNames { get; init; }
+    [JsonPropertyName("aliases")]
+    public required IReadOnlyList<ProducerAliasDto> Aliases { get; init; }
 }
 
 public static class InternalProducerEndPoints
@@ -35,7 +35,7 @@ public static class InternalProducerEndPoints
                         new InternalGetFullProducerResponse
                         {
                             Producer = result.Producer,
-                            OtherNames = result.OtherNames
+                            Aliases = result.OtherNames
                         });
                 })
             .WithDisplayName("Internal service full producer")
