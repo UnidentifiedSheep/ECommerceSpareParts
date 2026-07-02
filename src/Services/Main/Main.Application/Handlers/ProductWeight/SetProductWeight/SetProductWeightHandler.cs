@@ -1,10 +1,12 @@
 ﻿using Abstractions.Interfaces.Persistence;
 using Application.Common.Interfaces;
 using Application.Common.Interfaces.Cqrs;
+using Application.Common.Interfaces.Events;
 using Application.Common.Interfaces.Repositories;
 using Attributes;
 using Contracts.Products;
 using Enums;
+using Main.Application.Notifications;
 using MediatR;
 
 namespace Main.Application.Handlers.ProductWeight.SetProductWeight;
@@ -18,7 +20,7 @@ public record SetProductWeightCommand(
 ) : ICommand;
 
 public class SetProductWeightHandler(
-    IIntegrationEventScope integrationEventScope,
+    IDomainEventScope domainEventScope,
     IRepository<Entities.Product.ProductWeight, int> repository,
     IUnitOfWork unitOfWork
 ) : ICommandHandler<SetProductWeightCommand>
@@ -37,11 +39,7 @@ public class SetProductWeightHandler(
         }
         else { weight.Update(request.Weight, request.Unit); }
 
-        integrationEventScope.Add(
-            new ProductWeightUpdatedEvent
-            {
-                ProductId = request.ProductId
-            });
+        domainEventScope.Add(new ProductWeightUpdatedNotification(request.ProductId));
         return Unit.Value;
     }
 }

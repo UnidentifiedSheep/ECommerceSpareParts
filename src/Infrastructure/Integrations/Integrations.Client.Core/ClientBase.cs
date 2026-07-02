@@ -42,10 +42,22 @@ public abstract class ClientBase
             : Response<TValue>.Ok(selector(result.Value));
     }
 
+    protected static string IdsAsQueryString(
+        string[] ids,
+        string paramName,
+        bool isStart = true)
+    {
+        var start = isStart ? "?" : "&";
+        return ids.Length == 0
+            ? ""
+            : $"{start}{string.Join("&", ids.Select(x => $"{paramName}={Uri.EscapeDataString(x.ToString())}"))}";
+    }
+    
     private static string? GetError(HttpResponseMessage response, string body)
     {
         return string.IsNullOrWhiteSpace(body)
             ? response.ReasonPhrase
             : body;
     }
+    
 }

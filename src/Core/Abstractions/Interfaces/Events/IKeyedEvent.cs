@@ -1,4 +1,4 @@
-﻿namespace Abstractions.Interfaces;
+﻿namespace Abstractions.Interfaces.Events;
 
 public interface IKeyedEvent
 {

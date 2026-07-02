@@ -1,8 +1,6 @@
 using Abstractions.Models.Options;
 using Api.Common.ExceptionHandlers;
 using Api.Common.Models.Options;
-using Api.Common.Services;
-using Application.Common.Interfaces;
 using Cache;
 using Persistence;
 using RabbitMq;
@@ -15,7 +13,6 @@ public static class ServiceProvider
 {
     public static IServiceCollection AddCommonLayer(this IServiceCollection collection)
     {
-        collection.AddSingleton<ISearchLogger, SearchLogger>();
         return collection;
     }
 

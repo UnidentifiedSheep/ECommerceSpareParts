@@ -47,6 +47,7 @@ public interface ICache
     Task RemoveKeyAsync(string key);
 
     Task<string[]> GetFromSetAsync(string key);
+    Task<Dictionary<string, string[]>> GetFromManySetsAsync(IEnumerable<string> keys);
 
     Task AddToSetAsync(
         Dictionary<string, List<string>> keyValues,

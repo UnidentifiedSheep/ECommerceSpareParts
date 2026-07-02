@@ -30,6 +30,10 @@ builder.Services.AddCommonApiInfrastructure();
 
 builder.Services.AddMassTransit(x =>
 {
+    x.AddConsumer<ProducerUpdatedConsumer, ProducerUpdatedConsumerDefinition>();
+    x.AddConsumer<ProductUpdatedConsumer, ProductUpdatedConsumerDefinition>();
+    x.AddConsumer<ProductDeletedConsumer, ProductDeletedConsumerDefinition>();
+    
     x.AddConsumers(Assembly.GetAssembly(typeof(ProductUpdatedConsumer)));
 
     x.UsingRabbitMq((context, cfg) =>
@@ -44,9 +48,7 @@ builder.Services.AddMassTransit(x =>
 
                 ep.ConfigureConsumer<ProductUpdatedConsumer>(context);
                 ep.ConfigureConsumer<ProductDeletedConsumer>(context);
-                ep.ConfigureConsumer<ProductSizesUpdatedConsumer>(context);
-                ep.ConfigureConsumer<ProductWeightUpdatedConsumer>(context);
-                ep.ConfigureConsumer<ProductLinkageUpdatedConsumer>(context);
+
                 ep.ConfigureConsumer<ProducerUpdatedConsumer>(context);
             });
     });

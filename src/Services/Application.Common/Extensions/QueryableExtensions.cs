@@ -6,8 +6,9 @@ public static class QueryableExtensions
 {
     public static IQueryable<TModel> ApplyPagination<TModel>(
         this IQueryable<TModel> queryable,
-        Pagination pagination)
+        Pagination? pagination)
     {
+        if (pagination == null) return queryable;
         return queryable.Skip(pagination.Page * pagination.Size).Take(pagination.Size);
     }
 }

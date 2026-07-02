@@ -93,6 +93,15 @@ public class ProductCacheRepository(
         await rawCache.InvalidateByRelationsAsync(relationKey);
     }
 
+    public async Task InvalidateCrossesAsync(IEnumerable<int> productIds)
+    {
+        var keys = productIds
+            .Select(CacheKeys.ProductCache.ProductCrossRelations)
+            .ToList();
+        
+        if (keys.Count != 0) await rawCache.InvalidateByRelationsAsync(keys);
+    }
+
     public async Task<IReadOnlyList<ProductDto?>> GetProductsAsync(IEnumerable<int> ids)
     {
         return (await rawCache.GetAsync<ProductDto>(ids.Select(CacheKeys.ProductCache.Product)))

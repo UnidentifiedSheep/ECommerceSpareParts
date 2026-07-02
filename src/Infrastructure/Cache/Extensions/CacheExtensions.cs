@@ -119,7 +119,22 @@ public static class CacheExtensions
 
         if (keysToDelete.Count == 0) return;
 
+        keysToDelete.Add(relationKey);
         await cache.RemoveKeysAsync(keysToDelete);
-        await cache.RemoveKeyAsync(relationKey);
+    }
+    
+    public static async Task InvalidateByRelationsAsync(
+        this ICache cache,
+        IEnumerable<string> relationKeys)
+    {
+        var relationKeysList = relationKeys as string[] ?? relationKeys.ToArray();
+        var keysToDelete = (await cache.GetFromManySetsAsync(relationKeysList))
+            .Values
+            .SelectMany(x => x)
+            .ToList();
+        
+        if (keysToDelete.Count == 0) return;
+
+        await cache.RemoveKeysAsync(keysToDelete.Concat(relationKeysList));
     }
 }

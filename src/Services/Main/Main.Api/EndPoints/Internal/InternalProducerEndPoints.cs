@@ -1,6 +1,6 @@
 using System.Text.Json.Serialization;
 using Main.Application.Dtos.Producer;
-using Main.Application.Handlers.Producers.GetFullProducer;
+using Main.Application.Handlers.Producers;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
 
@@ -9,8 +9,9 @@ namespace Main.Api.EndPoints.Internal;
 public record InternalGetFullProducersResponse
 {
     [JsonPropertyName("producers")]
-    public required IReadOnlyList<GetFullProducerResultItem> Producers { get; init; }
+    public required IReadOnlyList<ProducerFullDto> Producers { get; init; }
 }
+
 public record InternalGetFullProducersRequest
 {
     [FromQuery(Name = "id")]
@@ -33,7 +34,7 @@ public static class InternalProducerEndPoints
                     ISender sender,
                     CancellationToken cancellationToken) =>
                 {
-                    var result = await sender.Send(new GetFullProducerQuery(request.ProducerIds), cancellationToken);
+                    var result = await sender.Send(new GetFullProducersQuery(request.ProducerIds), cancellationToken);
                     return Results.Ok(
                         new InternalGetFullProducersResponse
                         {

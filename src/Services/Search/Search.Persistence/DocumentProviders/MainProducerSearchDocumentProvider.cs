@@ -10,35 +10,37 @@ public class MainProducerSearchDocumentProvider(
     IMainClient mainClient
 ) : IProducerSearchDocumentProvider
 {
-    public async Task<Producer?> GetById(
-        int producerId,
+    public async Task<Dictionary<int, Producer?>> GetByIds(
+        IEnumerable<int> ids,
         CancellationToken cancellationToken = default)
     {
-        var response = await mainClient.ProducerNode.GetFullProducer(producerId, cancellationToken);
-        if (response is { StatusCode: HttpStatusCode.NotFound }) return null;
-
+        var idsList = ids.Distinct().ToList();
+        var response = await mainClient.ProducerNode.GetFullProducer(idsList, cancellationToken);
+        
         if (!response.Success)
             throw new InvalidOperationException(
-                $"Unable to get producer {producerId} from Main service. " +
+                $"Unable to get producers from Main service. " +
                 $"Status: {response.StatusCode}. " +
                 $"Error: {response.Error}");
 
-        var fullProducer = response.ValueOrThrow;
+        var dict = response.ValueOrThrow
+            .ToDictionary(x => x.Id);
 
+        return idsList.ToDictionary(
+            x => x, 
+            x => dict.TryGetValue(x, out var producer) 
+                ? MapProducer(producer) 
+                : null);
+    }
+    
+    private static Producer MapProducer(InternalFullProducer producer)
+    {
         return new Producer
         {
-            Id = fullProducer.Producer.Id,
-            Name = fullProducer.Producer.Name,
-            Description = fullProducer.Producer.Description,
-            Aliases = fullProducer.Aliases.Select(MapAlias).ToList()
-        };
-    }
-
-    private static ProducerAlias MapAlias(InternalProducerAlias alias)
-    {
-        return new ProducerAlias
-        {
-            Alias = alias.Alias
+            Id = producer.Id,
+            Name = producer.Name,
+            Description = producer.Description,
+            Aliases = producer.Aliases.Select(x => new ProducerAlias { Alias = x }).ToList()
         };
     }
 }

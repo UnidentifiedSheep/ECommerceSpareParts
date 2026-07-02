@@ -1,4 +1,5 @@
 using Application.Common.Interfaces;
+using Application.Common.Interfaces.Events;
 using Contracts.Products;
 using Main.Application.Interfaces.Services.Storage;
 

@@ -138,6 +138,26 @@ public class RedisCache(
             .ToArray();
     }
 
+    public async Task<Dictionary<string, string[]>> GetFromManySetsAsync(IEnumerable<string> keys)
+    {
+        var distinctKeys = keys.Distinct().ToArray();
+        var batch = redis.CreateBatch();
+        var tasks = distinctKeys
+            .Select(key => batch.SetMembersAsync(GetWithPrefix(key)))
+            .ToList();
+
+        batch.Execute();
+        await Task.WhenAll(tasks);
+        
+        return distinctKeys.Zip(tasks.Select(x => x.Result))
+            .ToDictionary(
+                x => x.First, 
+                x => x.Second
+                    .Where(z => z.HasValue)
+                    .Select(y => y.ToString())
+                    .ToArray());
+    }
+
     public async Task AddToSetAsync(
         Dictionary<string, List<string>> keyValues,
         TimeSpan? ttl = null)

@@ -1,5 +1,6 @@
 using System.Text.Json.Serialization;
 using Abstractions.Interfaces;
+using Abstractions.Interfaces.Events;
 
 namespace Contracts.Job;
 

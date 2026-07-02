@@ -2,14 +2,11 @@ using System.Text.Json.Serialization;
 
 namespace Internal.Integration.Core.Models.Main.Product;
 
-public record InternalFullProduct
+public record InternalFullProduct : InternalProduct
 {
-    [JsonPropertyName("product")]
-    public required InternalProduct Product { get; init; }
-
-    [JsonPropertyName("productWeight")]
+    [JsonPropertyName("weight")]
     public InternalProductWeight? ProductWeight { get; init; }
 
-    [JsonPropertyName("productSize")]
+    [JsonPropertyName("size")]
     public InternalProductSize? ProductSize { get; init; }
 }

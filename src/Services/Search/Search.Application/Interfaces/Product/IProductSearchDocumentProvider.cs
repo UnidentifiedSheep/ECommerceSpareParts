@@ -2,5 +2,7 @@ namespace Search.Application.Interfaces.Product;
 
 public interface IProductSearchDocumentProvider
 {
-    Task<Entities.Product?> GetById(int productId, CancellationToken cancellationToken = default);
+    Task<Dictionary<int, Entities.Product?>> GetByIds(
+        IEnumerable<int> ids, 
+        CancellationToken cancellationToken = default);
 }

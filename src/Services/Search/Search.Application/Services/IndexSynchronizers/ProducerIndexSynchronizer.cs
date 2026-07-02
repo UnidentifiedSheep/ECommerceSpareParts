@@ -9,25 +9,26 @@ public class ProducerIndexSynchronizer(
     IProducerRepository producerRepository
 ) : IIndexSynchronizer<Producer, int>
 {
-    public async Task Reindex(
-        int id,
-        CancellationToken cancellationToken = default)
+    public async Task Reindex(IEnumerable<int> ids, CancellationToken cancellationToken = default)
     {
-        var producer = await producerSearchDocumentProvider.GetById(id, cancellationToken);
-
-        if (producer == null)
+        var producers = await producerSearchDocumentProvider
+            .GetByIds(ids, cancellationToken);
+        
+        var toDelete = new List<int>();
+        var toUpsert = new List<Producer>();
+        
+        foreach (var (id, producer) in producers)
         {
-            await producerRepository.Delete(id, cancellationToken);
-            return;
+            if (producer == null)
+                toDelete.Add(id);
+            else
+                toUpsert.Add(producer);
         }
 
-        await producerRepository.Upsert(producer, cancellationToken);
+        await producerRepository.DeleteMany(toDelete, cancellationToken);
+        await producerRepository.UpsertMany(toUpsert, cancellationToken);
     }
 
-    public Task Delete(
-        int id,
-        CancellationToken cancellationToken = default)
-    {
-        return producerRepository.Delete(id, cancellationToken);
-    }
+    public Task Delete(IEnumerable<int> ids, CancellationToken cancellationToken = default)
+        => producerRepository.DeleteMany(ids, cancellationToken);
 }

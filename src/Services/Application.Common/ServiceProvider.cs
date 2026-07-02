@@ -30,6 +30,7 @@ public static class ServiceProvider
         services
             .RegisterIdCollector()
             .RegisterIntegrationEventScope()
+            .RegisterDomainEventScope()
             .RegisterCachePolicies(assembly)
             .RegisterDbValidations(assembly)
             .RegisterFluentValidations(assembly);
@@ -66,6 +67,10 @@ public static class ServiceProvider
                 .RegisterIfNotExcluded(
                     hs,
                     typeof(SaveChangesBehavior<,>),
+                    ServiceLifetime.Scoped)
+                .RegisterIfNotExcluded(
+                    hs, 
+                    typeof(DomainEventPublisherBehavior<,>), 
                     ServiceLifetime.Scoped)
                 .RegisterIfNotExcluded(
                     hs,

@@ -3,10 +3,12 @@ using Application.Common.Abstractions;
 using Application.Common.Handlers.Settings;
 using Application.Common.Interfaces;
 using Application.Common.Interfaces.Cqrs;
+using Application.Common.Interfaces.Events;
 using Application.Common.Interfaces.NamedObject;
 using Application.Common.Interfaces.Settings;
 using Application.Common.NamedObject;
 using Application.Common.Services;
+using Application.Common.Services.Events;
 using Application.Common.Services.Settings;
 using FluentValidation;
 using MediatR;
@@ -89,6 +91,12 @@ public static class ServiceCollectionExtensions
     public static IServiceCollection RegisterIntegrationEventScope(this IServiceCollection services)
     {
         services.AddScoped<IIntegrationEventScope, IntegrationEventScope>();
+        return services;
+    }
+    
+    public static IServiceCollection RegisterDomainEventScope(this IServiceCollection services)
+    {
+        services.AddScoped<IDomainEventScope, DomainEventScope>();
         return services;
     }
 

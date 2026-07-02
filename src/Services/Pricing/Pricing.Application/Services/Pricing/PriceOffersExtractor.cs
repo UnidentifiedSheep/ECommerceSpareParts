@@ -42,7 +42,7 @@ public class PriceOffersExtractor(
         CancellationToken token)
     {
         var product = await mainClient.ProductNode
-            .GetFullProduct(productId, token);
+            .GetFullProduct([productId], token);
 
         if (product.StatusCode == HttpStatusCode.NotFound)
             throw new InvalidInputException(""); //return to user.
@@ -57,8 +57,8 @@ public class PriceOffersExtractor(
             suppliers.Select(s => s.GetProductsAsync(
                 new GetProductsRequest
                 {
-                    Brand = product.ValueOrThrow.Product.ProducerName,
-                    Number = product.ValueOrThrow.Product.Sku,
+                    Brand = product.ValueOrThrow[0].ProducerName,
+                    Number = product.ValueOrThrow[0].Sku,
                     ShowAnalogues = true
                 },
                 token)));

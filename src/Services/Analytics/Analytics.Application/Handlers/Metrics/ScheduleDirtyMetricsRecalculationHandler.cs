@@ -7,6 +7,7 @@ using Analytics.Enums;
 using Application.Common.Handlers.Jobs;
 using Application.Common.Interfaces;
 using Application.Common.Interfaces.Cqrs;
+using Application.Common.Interfaces.Events;
 using Application.Common.Interfaces.Repositories;
 using Attributes;
 using Contracts.Analytics;

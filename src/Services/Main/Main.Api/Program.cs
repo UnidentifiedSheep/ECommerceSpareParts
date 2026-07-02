@@ -102,22 +102,16 @@ builder.Services.AddMassTransit(x =>
 
                 ep.ConfigureConsumer<CurrencyRatesChangedConsumer>(context);
                 ep.ConfigureConsumer<CurrencyCreatedConsumer>(context);
-                ep.ConfigureConsumer<ProductSizesUpdatedConsumer>(context);
-                ep.ConfigureConsumer<ProductWeightUpdatedConsumer>(context);
                 ep.ConfigureConsumer<ProductUpdatedConsumer>(context);
                 ep.ConfigureConsumer<RoleUpdatedConsumer>(context);
                 ep.ConfigureConsumer<UserUpdatedConsumer>(context);
                 ep.ConfigureConsumer<UserDiscountUpdatedConsumer>(context);
-                ep.ConfigureConsumer<ProductLinkageUpdatedConsumer>(context);
 
                 ep.Bind<CurrencyCreatedEvent>();
-                ep.Bind<ProductSizesUpdatedEvent>();
-                ep.Bind<ProductWeightUpdatedEvent>();
                 ep.Bind<ProductUpdatedEvent>();
                 ep.Bind<RoleUpdatedEvent>();
                 ep.Bind<UserUpdatedEvent>();
                 ep.Bind<UserDiscountUpdatedEvent>();
-                ep.Bind<ProductLinkageUpdatedEvent>();
                 ep.Bind<CurrencyRateChangedEvent>();
             });
     });

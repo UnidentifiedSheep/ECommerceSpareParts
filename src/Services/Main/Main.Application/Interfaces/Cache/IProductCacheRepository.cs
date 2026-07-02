@@ -29,4 +29,5 @@ public interface IProductCacheRepository
     Task InvalidateProductsAsync(IEnumerable<int> productIds);
 
     Task InvalidateCrossesAsync(int productId);
+    Task InvalidateCrossesAsync(IEnumerable<int> productIds);
 }

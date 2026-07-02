@@ -1,4 +1,5 @@
 ﻿using Application.Common.Interfaces;
+using Application.Common.Interfaces.Events;
 using MassTransit;
 using MediatR;
 

@@ -23,6 +23,22 @@ public static class ProductProjections
             Images = x.Images.Select(z => z.Path).ToList()
         };
 
+    public static readonly Expression<Func<Product, FullProductDto>> ToFullDto =
+        x => new FullProductDto
+        {
+            Id = x.Id,
+            Name = x.Name,
+            Sku = x.Sku,
+            Description = x.Description,
+            Stock = x.Stock,
+            ProducerId = x.ProducerId,
+            ProducerName = x.Producer.Name,
+            Indicator = x.Indicator,
+            Images = x.Images.Select(z => z.Path).ToList(),
+            ProductWeight = ToProductWeightDto.Invoke(x.ProductWeight),
+            ProductSize = ToProductSizeDto.Invoke(x.ProductSize)
+        };
+
     public static readonly Expression<Func<ProductCoefficient, ProductCoefficientDto>>
         ToProductCoefficientDto =
             x => new ProductCoefficientDto

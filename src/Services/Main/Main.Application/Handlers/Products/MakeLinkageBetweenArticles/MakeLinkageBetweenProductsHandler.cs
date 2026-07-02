@@ -1,10 +1,12 @@
 using Application.Common.Interfaces;
 using Application.Common.Interfaces.Cqrs;
+using Application.Common.Interfaces.Events;
 using Application.Common.Interfaces.Repositories;
 using Attributes;
 using Contracts.Products;
 using Main.Application.Dtos.Product;
 using Main.Application.Interfaces.Persistence;
+using Main.Application.Notifications;
 using Main.Entities.Exceptions;
 using Main.Entities.Product;
 using Main.Enums.Products;
@@ -17,8 +19,8 @@ namespace Main.Application.Handlers.Products.MakeLinkageBetweenArticles;
 public record MakeLinkageBetweenProductsCommand(List<NewProductLinkageDto> Linkages) : ICommand<Unit>;
 
 public class MakeLinkageBetweenProductsHandler(
-    IIntegrationEventScope integrationEventScope,
-    IProductRepository repository
+    IProductRepository repository,
+    IDomainEventScope domainEventScope
 ) : ICommandHandler<MakeLinkageBetweenProductsCommand, Unit>
 {
     public async Task<Unit> Handle(
@@ -33,8 +35,8 @@ public class MakeLinkageBetweenProductsHandler(
             var ids = await CreateLinkages(linkage, cancellationToken);
             updatedIds.UnionWith(ids);
         }
-
-        foreach (var id in updatedIds) integrationEventScope.Add(new ProductLinkageUpdatedEvent { Id = id });
+        
+        domainEventScope.Add(new ProductLinkageUpdatedNotification(updatedIds));
         return Unit.Value;
     }
 

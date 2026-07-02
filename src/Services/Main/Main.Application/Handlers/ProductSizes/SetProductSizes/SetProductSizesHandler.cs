@@ -1,10 +1,12 @@
 ﻿using Abstractions.Interfaces.Persistence;
 using Application.Common.Interfaces;
 using Application.Common.Interfaces.Cqrs;
+using Application.Common.Interfaces.Events;
 using Application.Common.Interfaces.Repositories;
 using Attributes;
 using Contracts.Products;
 using Enums;
+using Main.Application.Notifications;
 using Main.Entities.Product;
 using MediatR;
 
@@ -24,9 +26,8 @@ public record SetProductSizesCommand(
 public class SetProductSizesHandler(
     IRepository<ProductSize, int> repository,
     IUnitOfWork unitOfWork,
-    IIntegrationEventScope integrationEventScope
-)
-    : ICommandHandler<SetProductSizesCommand>
+    IDomainEventScope domainEventScope
+) : ICommandHandler<SetProductSizesCommand>
 {
     public async Task<Unit> Handle(SetProductSizesCommand request, CancellationToken cancellationToken)
     {
@@ -52,11 +53,7 @@ public class SetProductSizesHandler(
         sizes.SetHeight(height);
         sizes.SetUnit(unit);
 
-        integrationEventScope.Add(
-            new ProductSizesUpdatedEvent
-            {
-                ProductId = request.ProductId
-            });
+        domainEventScope.Add(new ProductSizeUpdatedNotification(request.ProductId));
 
         return Unit.Value;
     }
