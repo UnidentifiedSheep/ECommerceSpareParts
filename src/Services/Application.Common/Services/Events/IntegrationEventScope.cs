@@ -1,13 +1,12 @@
-﻿using Abstractions.Interfaces;
-using Abstractions.Interfaces.Events;
+﻿using Abstractions.Interfaces.Events;
 using Application.Common.Interfaces.Events;
 
 namespace Application.Common.Services.Events;
 
 public class IntegrationEventScope : IIntegrationEventScope
 {
-    private readonly Dictionary<string, object> _keyedEvents = new();
     private readonly List<object> _events = [];
+    private readonly Dictionary<string, object> _keyedEvents = new();
 
     public void Add<T>(T @event)
     {
@@ -28,7 +27,7 @@ public class IntegrationEventScope : IIntegrationEventScope
         var result = _keyedEvents.Values
             .Concat(_events)
             .ToList();
-        
+
         _keyedEvents.Clear();
         _events.Clear();
         return result;

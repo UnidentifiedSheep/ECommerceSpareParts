@@ -23,20 +23,20 @@ internal sealed class ProducerNode(
             HttpMethod.Get,
             $"/internal/producers{IdsAsQueryString(ids, "id")}",
             cancellationToken);
-        
+
         using var response = await httpClient.SendAsync(
             request,
             cancellationToken);
 
         return await ReadResponse<GetFullProducersResponse, IReadOnlyList<InternalFullProducer>>(
             response,
-            x => x.Producers, 
+            x => x.Producers,
             cancellationToken);
     }
 
     private record GetFullProducersResponse
     {
         [JsonPropertyName("producers")]
-        public IReadOnlyList<InternalFullProducer> Producers { get; init; } = [];
+        public IReadOnlyList<InternalFullProducer> Producers { get; } = [];
     }
 }

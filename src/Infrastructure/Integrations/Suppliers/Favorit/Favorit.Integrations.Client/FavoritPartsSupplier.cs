@@ -40,8 +40,10 @@ public class FavoritPartsSupplier(
     }
 
     public async Task<ConnectionCheck> CheckConnectionAsync(
-        CancellationToken cancellationToken = default) 
-        => await connectionProvider.CheckConnectionAsync(cancellationToken);
+        CancellationToken cancellationToken = default)
+    {
+        return await connectionProvider.CheckConnectionAsync(cancellationToken);
+    }
 
     private static GetPricesRequest AdaptRequest(GetProductsRequest request)
     {
@@ -57,12 +59,15 @@ public class FavoritPartsSupplier(
     private static List<SupplierProduct> AdaptResponse(
         GetPricesResponse response,
         FavoriteSettings settings)
-        => response.Goods
+    {
+        return response.Goods
             .Select(good => AdaptGood(good, settings))
             .ToList();
+    }
 
-    private static SupplierProduct AdaptGood(Good good, FavoriteSettings settings) =>
-        new()
+    private static SupplierProduct AdaptGood(Good good, FavoriteSettings settings)
+    {
+        return new SupplierProduct
         {
             Brand = good.Brand,
             Id = good.Id,
@@ -90,4 +95,5 @@ public class FavoritPartsSupplier(
                 })
                 .ToList()
         };
+    }
 }

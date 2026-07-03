@@ -98,7 +98,7 @@ public class ProductCacheRepository(
         var keys = productIds
             .Select(CacheKeys.ProductCache.ProductCrossRelations)
             .ToList();
-        
+
         if (keys.Count != 0) await rawCache.InvalidateByRelationsAsync(keys);
     }
 

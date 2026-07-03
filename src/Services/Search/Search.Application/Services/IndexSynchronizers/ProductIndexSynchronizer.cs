@@ -13,10 +13,10 @@ public class ProductIndexSynchronizer(
     {
         var products = await productSearchDocumentProvider
             .GetByIds(ids, cancellationToken);
-        
+
         var toDelete = new List<int>();
         var toUpsert = new List<Product>();
-        
+
         foreach (var (id, product) in products)
         {
             if (product == null)
@@ -30,5 +30,7 @@ public class ProductIndexSynchronizer(
     }
 
     public Task Delete(IEnumerable<int> ids, CancellationToken cancellationToken = default)
-        => productRepository.DeleteMany(ids, cancellationToken);
+    {
+        return productRepository.DeleteMany(ids, cancellationToken);
+    }
 }

@@ -33,7 +33,7 @@ builder.Services.AddMassTransit(x =>
     x.AddConsumer<ProducerUpdatedConsumer, ProducerUpdatedConsumerDefinition>();
     x.AddConsumer<ProductUpdatedConsumer, ProductUpdatedConsumerDefinition>();
     x.AddConsumer<ProductDeletedConsumer, ProductDeletedConsumerDefinition>();
-    
+
     x.AddConsumers(Assembly.GetAssembly(typeof(ProductUpdatedConsumer)));
 
     x.UsingRabbitMq((context, cfg) =>

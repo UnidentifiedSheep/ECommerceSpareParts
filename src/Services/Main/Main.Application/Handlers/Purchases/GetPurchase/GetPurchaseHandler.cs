@@ -31,8 +31,8 @@ public class GetPurchaseHandler(
 
         var dto = await repository.Query
             .Where(x =>
-                (purchaseId.HasValue && x.Id == purchaseId.Value) ||
-                (transactionId.HasValue && x.TransactionId == transactionId.Value))
+                purchaseId.HasValue && x.Id == purchaseId.Value ||
+                transactionId.HasValue && x.TransactionId == transactionId.Value)
             .OrderByDescending(x => purchaseId.HasValue && x.Id == purchaseId.Value)
             .AsExpandable()
             .Select(PurchaseProjections.ToPurchaseDto)

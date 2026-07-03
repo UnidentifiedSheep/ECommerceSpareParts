@@ -4,12 +4,15 @@ namespace Main.Entities.DomainEvents.Product;
 
 public class ProductWeightUpdatedDomainEvent : IKeyedDomainEvent, IBatchableDomainEvent
 {
-    public int ProductId { get; }
-    
+
     public ProductWeightUpdatedDomainEvent(int productId)
     {
         ProductId = productId;
     }
-    
-    public string GetKey() => $"product:{ProductId}:weight:updated";
+    public int ProductId { get; }
+
+    public string GetKey()
+    {
+        return $"product:{ProductId}:weight:updated";
+    }
 }

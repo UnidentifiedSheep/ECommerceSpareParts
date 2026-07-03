@@ -11,17 +11,7 @@ public abstract class Entity<TModel, TKey>
     public abstract TKey GetId();
 
     object IEntity.GetId() { return GetId(); }
-    
-    protected void AddDomainEvent(IDomainEvent domainEvent)
-    {
-        ArgumentNullException.ThrowIfNull(domainEvent);
 
-        if (domainEvent is IKeyedDomainEvent keyed)
-            _keyedDomainEvents[keyed.GetKey()] = domainEvent;
-        else
-            _domainEvents.Add(domainEvent);
-    }
-    
     public IReadOnlyCollection<IDomainEvent> FlushDomainEvents()
     {
         var result = new List<IDomainEvent>(
@@ -34,5 +24,15 @@ public abstract class Entity<TModel, TKey>
         _keyedDomainEvents.Clear();
 
         return result;
+    }
+
+    protected void AddDomainEvent(IDomainEvent domainEvent)
+    {
+        ArgumentNullException.ThrowIfNull(domainEvent);
+
+        if (domainEvent is IKeyedDomainEvent keyed)
+            _keyedDomainEvents[keyed.GetKey()] = domainEvent;
+        else
+            _domainEvents.Add(domainEvent);
     }
 }

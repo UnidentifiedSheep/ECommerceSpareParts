@@ -27,7 +27,10 @@ public class FavoriteConnectionProvider(
     }
 
     async Task<ConnectionCheck> IConnectionProvider.CheckConnectionAsync(
-        CancellationToken cancellationToken) => await CheckConnectionAsync(cancellationToken);
+        CancellationToken cancellationToken)
+    {
+        return await CheckConnectionAsync(cancellationToken);
+    }
 
     public virtual async Task<ConnectionCheck<FavoritConnection>> CheckConnectionAsync(
         CancellationToken cancellationToken = default)

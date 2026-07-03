@@ -61,7 +61,7 @@ public class MarkupRangeAnalyzer(
         if (cursor is not null)
             query = query.Where(x =>
                 x.AvgBuyPriceBase > cursor.AvgBuyPriceBase ||
-                (x.AvgBuyPriceBase == cursor.AvgBuyPriceBase && x.Id > cursor.Id));
+                x.AvgBuyPriceBase == cursor.AvgBuyPriceBase && x.Id > cursor.Id);
 
         return await query
             .OrderBy(x => x.AvgBuyPriceBase)

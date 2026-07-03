@@ -148,10 +148,10 @@ public class RedisCache(
 
         batch.Execute();
         await Task.WhenAll(tasks);
-        
+
         return distinctKeys.Zip(tasks.Select(x => x.Result))
             .ToDictionary(
-                x => x.First, 
+                x => x.First,
                 x => x.Second
                     .Where(z => z.HasValue)
                     .Select(y => y.ToString())

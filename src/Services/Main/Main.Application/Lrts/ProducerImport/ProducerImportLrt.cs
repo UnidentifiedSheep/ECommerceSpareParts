@@ -24,14 +24,14 @@ public class ProducerImportLrt(
     IScopedStringLocalizer stringLocalizer,
     IOptions<LocalesOptions> localesOptions
 ) : CsvImportLrtBase<ProducerImportState, ProducerImportError, ProducerImportLrt.NewProducerCsvDto,
-        NewProducerDto>(
-        jobRepository,
-        unitOfWork,
-        publisher,
-        logger,
-        s3Service,
-        stringLocalizer,
-        localesOptions)
+    NewProducerDto>(
+    jobRepository,
+    unitOfWork,
+    publisher,
+    logger,
+    s3Service,
+    stringLocalizer,
+    localesOptions)
 {
     public override string SystemName => nameof(ProducerImportLrt);
     public override string NameLocalizationKey => "lrt.producer.import.name";

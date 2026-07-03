@@ -5,7 +5,6 @@ using Integrations.Supplier.Interfaces;
 using Integrations.Supplier.Models.Requests;
 using Internal.Integration.Core.Interfaces.Main;
 using Microsoft.EntityFrameworkCore;
-using Pricing.Application.Extensions;
 using Pricing.Application.Interfaces.Cache;
 using Pricing.Entities;
 
@@ -38,7 +37,7 @@ public class PriceOffersExtractor(
     }
 
     private async Task<IReadOnlyList<PriceOffer>> GetOffersFromSuppliers(
-        int productId, 
+        int productId,
         CancellationToken token)
     {
         var product = await mainClient.ProductNode
@@ -49,7 +48,7 @@ public class PriceOffersExtractor(
 
         if (!product.Success)
             throw new InvalidOperationException("Unable to fetch product from main service.");
-        
+
         var suppliers = await GetSuppliers(productId, token);
         if (suppliers.Count == 0) return [];
 

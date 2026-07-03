@@ -24,8 +24,8 @@ public class MetricRepository(DContext context, IQueryableExtensions extensions)
 
         query = previousFactDatetime.HasValue
             ? query.Where(x =>
-                (x.RangeStart <= factDatetime && factDatetime <= x.RangeEnd) ||
-                (x.RangeStart <= previousFactDatetime.Value && previousFactDatetime.Value <= x.RangeEnd))
+                x.RangeStart <= factDatetime && factDatetime <= x.RangeEnd ||
+                x.RangeStart <= previousFactDatetime.Value && previousFactDatetime.Value <= x.RangeEnd)
             : query.Where(x => x.RangeStart <= factDatetime && factDatetime <= x.RangeEnd);
 
         return await query.ExecuteUpdateAsync(

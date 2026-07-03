@@ -93,7 +93,7 @@ public static class ServiceCollectionExtensions
         services.AddScoped<IIntegrationEventScope, IntegrationEventScope>();
         return services;
     }
-    
+
     public static IServiceCollection RegisterDomainEventScope(this IServiceCollection services)
     {
         services.AddScoped<IDomainEventScope, DomainEventScope>();

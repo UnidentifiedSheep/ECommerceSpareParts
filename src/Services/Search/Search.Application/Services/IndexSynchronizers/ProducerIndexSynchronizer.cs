@@ -13,10 +13,10 @@ public class ProducerIndexSynchronizer(
     {
         var producers = await producerSearchDocumentProvider
             .GetByIds(ids, cancellationToken);
-        
+
         var toDelete = new List<int>();
         var toUpsert = new List<Producer>();
-        
+
         foreach (var (id, producer) in producers)
         {
             if (producer == null)
@@ -30,5 +30,7 @@ public class ProducerIndexSynchronizer(
     }
 
     public Task Delete(IEnumerable<int> ids, CancellationToken cancellationToken = default)
-        => producerRepository.DeleteMany(ids, cancellationToken);
+    {
+        return producerRepository.DeleteMany(ids, cancellationToken);
+    }
 }

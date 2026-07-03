@@ -12,7 +12,7 @@ public class ProductLinkageUpdatedHandler(
     IIntegrationEventScope integrationEventScope) : BatchableDomainEventHandler<ProductLinkageUpdatedDomainEvent>
 {
     public override async Task Handle(
-        Batch<ProductLinkageUpdatedDomainEvent> notification, 
+        Batch<ProductLinkageUpdatedDomainEvent> notification,
         CancellationToken cancellationToken)
     {
         var ids = new List<int>(notification.Items.Count);
@@ -21,7 +21,7 @@ public class ProductLinkageUpdatedHandler(
             integrationEventScope.Add(new ProductUpdatedEvent { Id = @event.ProductId });
             ids.Add(@event.ProductId);
         }
-        
+
         await productCacheRepository.InvalidateCrossesAsync(ids);
     }
 }

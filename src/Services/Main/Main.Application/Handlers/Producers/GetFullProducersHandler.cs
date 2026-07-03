@@ -10,13 +10,13 @@ namespace Main.Application.Handlers.Producers;
 
 public record GetFullProducersQuery : IQuery<GetFullProducersResult>
 {
-    public IReadOnlyList<int> Ids { get; }
     public GetFullProducersQuery(IEnumerable<int> ids)
     {
         Ids = ids.Distinct().ToList();
     }
-    
-    public GetFullProducersQuery(int id) : this([id]) {}
+
+    public GetFullProducersQuery(int id) : this([id]) { }
+    public IReadOnlyList<int> Ids { get; }
 }
 
 public record GetFullProducersResult(IReadOnlyList<ProducerFullDto> Producers);
@@ -37,7 +37,7 @@ public class GetFullProducersHandler(
             .AsExpandable()
             .Select(ProducerProjections.ToFullDto)
             .ToListAsync(cancellationToken);
-        
+
         return new GetFullProducersResult(result);
     }
 }

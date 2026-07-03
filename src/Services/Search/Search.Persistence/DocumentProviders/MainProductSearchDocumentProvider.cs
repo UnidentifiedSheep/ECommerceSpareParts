@@ -1,4 +1,3 @@
-using System.Net;
 using Extensions;
 using Internal.Integration.Core.Interfaces.Main;
 using Internal.Integration.Core.Models.Main.Product;
@@ -11,6 +10,39 @@ public class MainProductSearchDocumentProvider(
     IMainClient mainClient
 ) : IProductSearchDocumentProvider
 {
+
+    public async Task<Dictionary<int, Product?>> GetByIds(
+        IEnumerable<int> ids,
+        CancellationToken cancellationToken = default)
+    {
+        var idsList = ids.Distinct().ToList();
+        var response = await mainClient.ProductNode.GetFullProduct(idsList, cancellationToken);
+
+        if (!response.Success)
+            throw new InvalidOperationException(
+                $"Unable to get products from Main service. " +
+                $"Status: {response.StatusCode}. " +
+                $"Error: {response.Error}");
+
+        var dict = response.ValueOrThrow
+            .ToDictionary(x => x.Id);
+
+        return idsList.ToDictionary(
+            x => x,
+            x => dict.TryGetValue(x, out var product)
+                ? new Product
+                {
+                    Id = product.Id,
+                    Sku = product.Sku,
+                    NormalizedSku = product.Sku.OnlyCharacterToLower(),
+                    Name = product.Name,
+                    ProducerId = product.ProducerId,
+                    Dimensions = MapDimensions(product.ProductSize),
+                    Weight = MapWeight(product.ProductWeight),
+                    Stock = product.Stock
+                }
+                : null);
+    }
     private static ProductDimensions? MapDimensions(InternalProductSize? size)
     {
         return size == null
@@ -38,38 +70,5 @@ public class MainProductSearchDocumentProvider(
                 Unit = weight.Unit,
                 WeightKg = weight.Weight.ToKg(weight.Unit)
             };
-    }
-
-    public async Task<Dictionary<int, Product?>> GetByIds(
-        IEnumerable<int> ids, 
-        CancellationToken cancellationToken = default)
-    {
-        var idsList = ids.Distinct().ToList();
-        var response = await mainClient.ProductNode.GetFullProduct(idsList, cancellationToken);
-
-        if (!response.Success)
-            throw new InvalidOperationException(
-                $"Unable to get products from Main service. " +
-                $"Status: {response.StatusCode}. " +
-                $"Error: {response.Error}");
-
-        var dict = response.ValueOrThrow
-            .ToDictionary(x => x.Id);
-
-        return idsList.ToDictionary(
-            x => x, 
-            x => dict.TryGetValue(x, out var product) 
-                ? new Product
-                {
-                    Id = product.Id,
-                    Sku = product.Sku,
-                    NormalizedSku = product.Sku.OnlyCharacterToLower(),
-                    Name = product.Name,
-                    ProducerId = product.ProducerId,
-                    Dimensions = MapDimensions(product.ProductSize),
-                    Weight = MapWeight(product.ProductWeight),
-                    Stock = product.Stock
-                } 
-                : null);
     }
 }

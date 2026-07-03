@@ -1,5 +1,4 @@
 using Abstractions.Models.Options;
-using Application.Common.Interfaces;
 using Application.Common.Interfaces.Cqrs;
 using Application.Common.Interfaces.Events;
 using Application.Common.Interfaces.Repositories;

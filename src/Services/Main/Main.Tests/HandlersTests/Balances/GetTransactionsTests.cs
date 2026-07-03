@@ -76,8 +76,8 @@ public class GetTransactionsTests : IntegrationTest
         result.Transactions.Should().NotBeEmpty();
         result.Transactions.Should()
             .OnlyContain(x =>
-                (x.Sender.User != null && x.Sender.User.Id == userId) ||
-                (x.Receiver.User != null && x.Receiver.User.Id == userId));
+                x.Sender.User != null && x.Sender.User.Id == userId ||
+                x.Receiver.User != null && x.Receiver.User.Id == userId);
     }
 
     [Fact]

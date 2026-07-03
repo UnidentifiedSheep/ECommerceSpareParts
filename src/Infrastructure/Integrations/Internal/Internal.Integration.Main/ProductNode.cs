@@ -29,13 +29,13 @@ internal sealed class ProductNode(
 
         return await ReadResponse<GetFullProductsResponse, IReadOnlyList<InternalFullProduct>>(
             response,
-            x => x.Products, 
+            x => x.Products,
             cancellationToken);
     }
-    
+
     private record GetFullProductsResponse
     {
         [JsonPropertyName("products")]
-        public IReadOnlyList<InternalFullProduct> Products { get; init; } = [];
+        public IReadOnlyList<InternalFullProduct> Products { get; } = [];
     }
 }

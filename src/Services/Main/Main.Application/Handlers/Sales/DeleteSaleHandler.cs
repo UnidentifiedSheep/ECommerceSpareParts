@@ -1,5 +1,4 @@
 using System.Data;
-using Application.Common.Interfaces;
 using Application.Common.Interfaces.Cqrs;
 using Application.Common.Interfaces.Events;
 using Attributes;

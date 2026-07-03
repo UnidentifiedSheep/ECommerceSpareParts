@@ -122,7 +122,7 @@ public static class CacheExtensions
         keysToDelete.Add(relationKey);
         await cache.RemoveKeysAsync(keysToDelete);
     }
-    
+
     public static async Task InvalidateByRelationsAsync(
         this ICache cache,
         IEnumerable<string> relationKeys)
@@ -132,7 +132,7 @@ public static class CacheExtensions
             .Values
             .SelectMany(x => x)
             .ToList();
-        
+
         if (keysToDelete.Count == 0) return;
 
         await cache.RemoveKeysAsync(keysToDelete.Concat(relationKeysList));

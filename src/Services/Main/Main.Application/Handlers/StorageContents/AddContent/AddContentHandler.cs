@@ -18,8 +18,7 @@ using Event = Main.Entities.Event.Event;
 namespace Main.Application.Handlers.StorageContents.AddContent;
 
 [AutoSave]
-[Transactional(
-    IsolationLevel.ReadCommitted,
+[Transactional(IsolationLevel.ReadCommitted,
     20,
     2)]
 public record AddContentCommand(

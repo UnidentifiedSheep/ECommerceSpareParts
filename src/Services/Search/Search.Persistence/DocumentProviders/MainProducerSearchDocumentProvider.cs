@@ -1,4 +1,3 @@
-using System.Net;
 using Internal.Integration.Core.Interfaces.Main;
 using Internal.Integration.Core.Models.Main.Producer;
 using Search.Application.Interfaces.Producer;
@@ -16,7 +15,7 @@ public class MainProducerSearchDocumentProvider(
     {
         var idsList = ids.Distinct().ToList();
         var response = await mainClient.ProducerNode.GetFullProducer(idsList, cancellationToken);
-        
+
         if (!response.Success)
             throw new InvalidOperationException(
                 $"Unable to get producers from Main service. " +
@@ -27,12 +26,12 @@ public class MainProducerSearchDocumentProvider(
             .ToDictionary(x => x.Id);
 
         return idsList.ToDictionary(
-            x => x, 
-            x => dict.TryGetValue(x, out var producer) 
-                ? MapProducer(producer) 
+            x => x,
+            x => dict.TryGetValue(x, out var producer)
+                ? MapProducer(producer)
                 : null);
     }
-    
+
     private static Producer MapProducer(InternalFullProducer producer)
     {
         return new Producer

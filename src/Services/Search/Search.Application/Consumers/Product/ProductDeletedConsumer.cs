@@ -16,7 +16,7 @@ public class ProductDeletedConsumer(
     }
 }
 
-public class ProductDeletedConsumerDefinition 
+public class ProductDeletedConsumerDefinition
     : ConsumerDefinition<ProductDeletedConsumer>
 {
     protected override void ConfigureConsumer(

@@ -16,7 +16,7 @@ public class ProducerUpdatedConsumer(
     }
 }
 
-public class ProducerUpdatedConsumerDefinition 
+public class ProducerUpdatedConsumerDefinition
     : ConsumerDefinition<ProducerUpdatedConsumer>
 {
     protected override void ConfigureConsumer(

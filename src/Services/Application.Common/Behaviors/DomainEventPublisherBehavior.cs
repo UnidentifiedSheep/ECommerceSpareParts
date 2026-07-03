@@ -18,7 +18,7 @@ public class DomainEventPublisherBehavior<TRequest, TResponse>(
         var response = await next(cancellationToken);
 
         var events = eventScope.Flush();
-        foreach (var @event in events) 
+        foreach (var @event in events)
             await publisher.Publish(@event, cancellationToken);
 
         return response;

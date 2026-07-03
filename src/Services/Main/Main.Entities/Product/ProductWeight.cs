@@ -22,7 +22,7 @@ public class ProductWeight : Entity<ProductWeight, int>, ILinqEntity<ProductWeig
         ProductId = productId;
         Weight = weight;
         Unit = unit;
-        
+
         AddDomainEvent(new ProductWeightUpdatedDomainEvent(productId));
     }
 

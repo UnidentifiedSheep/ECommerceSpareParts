@@ -1,9 +1,7 @@
-using Application.Common.Interfaces;
 using Application.Common.Interfaces.Cqrs;
 using Application.Common.Interfaces.Events;
 using Application.Common.Interfaces.Repositories;
 using Attributes;
-using Contracts.Products;
 using Main.Application.Dtos.Product;
 using Main.Application.Interfaces.Persistence;
 using Main.Entities.DomainEvents.Product;
@@ -38,7 +36,7 @@ public class MakeLinkageBetweenProductsHandler(
 
         foreach (var id in updatedIds)
             domainEventScope.Add(new ProductLinkageUpdatedDomainEvent(id));
-        
+
         return Unit.Value;
     }
 

@@ -1,5 +1,4 @@
 using System.Linq.Expressions;
-using Application.Common.Interfaces;
 using Application.Common.Interfaces.Currency;
 using Application.Common.Interfaces.Events;
 using Application.Common.Interfaces.Repositories;

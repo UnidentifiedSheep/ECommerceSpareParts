@@ -16,7 +16,7 @@ public class ProductUpdatedConsumer(
     }
 }
 
-public class ProductUpdatedConsumerDefinition 
+public class ProductUpdatedConsumerDefinition
     : ConsumerDefinition<ProductUpdatedConsumer>
 {
     protected override void ConfigureConsumer(

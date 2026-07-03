@@ -22,9 +22,9 @@ public class ProducerSupplierMappingImportLrt(
     IPublishEndpoint publisher,
     IScopedStringLocalizer stringLocalizer,
     IOptions<LocalesOptions> localesOptions
-) 
+)
 {
-    
+
     public record ProducerSupplierMappingCsvDto
     {
         [Name("ProducerName")]
@@ -32,7 +32,7 @@ public class ProducerSupplierMappingImportLrt(
 
         [Name("SupplierName", "Supplier")]
         public required Supplier Supplier { get; init; }
-        
+
         [Name("SupplierProducerName", "SupplierProducer")]
         public required string SupplierProducer { get; init; }
     }

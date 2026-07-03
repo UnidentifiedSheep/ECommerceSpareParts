@@ -69,8 +69,8 @@ public static class ServiceProvider
                     typeof(SaveChangesBehavior<,>),
                     ServiceLifetime.Scoped)
                 .RegisterIfNotExcluded(
-                    hs, 
-                    typeof(DomainEventPublisherBehavior<,>), 
+                    hs,
+                    typeof(DomainEventPublisherBehavior<,>),
                     ServiceLifetime.Scoped)
                 .RegisterIfNotExcluded(
                     hs,

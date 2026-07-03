@@ -12,6 +12,6 @@ public interface ISupplier
     Task<Response<IReadOnlyList<SupplierProduct>>> GetProductsAsync(
         GetProductsRequest request,
         CancellationToken cancellationToken = default);
-    
+
     Task<ConnectionCheck> CheckConnectionAsync(CancellationToken cancellationToken = default);
 }

@@ -1,5 +1,4 @@
-﻿using Abstractions.Interfaces;
-using Abstractions.Interfaces.Events;
+﻿using Abstractions.Interfaces.Events;
 
 namespace Contracts.Purchase;
 

@@ -32,8 +32,8 @@ public class GetSaleHandler(
 
         var dto = await repository.Query
             .Where(x =>
-                (saleId.HasValue && x.Id == saleId.Value) ||
-                (transactionId.HasValue && x.TransactionId == transactionId.Value))
+                saleId.HasValue && x.Id == saleId.Value ||
+                transactionId.HasValue && x.TransactionId == transactionId.Value)
             .OrderByDescending(x => saleId.HasValue && x.Id == saleId.Value)
             .AsExpandable()
             .Select(SaleProjections.ToSaleDto)

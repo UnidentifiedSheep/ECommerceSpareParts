@@ -23,7 +23,7 @@ public class ProductWeightUpdatedHandler(
             keys.Add(cachePolicy.GetCacheKey(new GetProductWeightQuery(i.ProductId)));
         }
 
-        foreach (var key in keys) 
+        foreach (var key in keys)
             await cache.RemoveAsync(key, token: cancellationToken);
     }
 }

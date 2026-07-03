@@ -64,7 +64,7 @@ public class GetTransactionsHandler(
         var res = await query
             .Where(x =>
                 x.TransactionDatetime > cursor.CursorValue.dt ||
-                (x.TransactionDatetime == cursor.CursorValue.dt && x.Id > cursor.CursorValue.id))
+                x.TransactionDatetime == cursor.CursorValue.dt && x.Id > cursor.CursorValue.id)
             .OrderByDescending(x => x.TransactionDatetime)
             .ThenByDescending(x => x.Id)
             .Take(cursor.Size)
@@ -101,8 +101,8 @@ public class GetTransactionsHandler(
         }
 
         return query.Where(e =>
-            (senderId.HasValue && (e.SenderId == senderId.Value || e.ReceiverId == senderId.Value)) ||
-            (receiverId.HasValue && (e.SenderId == receiverId.Value || e.ReceiverId == receiverId.Value)));
+            senderId.HasValue && (e.SenderId == senderId.Value || e.ReceiverId == senderId.Value) ||
+            receiverId.HasValue && (e.SenderId == receiverId.Value || e.ReceiverId == receiverId.Value));
     }
 
     private static TransactionStatus[] GetStatusesWithFlag(TransactionStatus flag)

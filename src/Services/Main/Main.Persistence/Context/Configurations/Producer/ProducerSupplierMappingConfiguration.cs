@@ -12,17 +12,17 @@ public class ProducerSupplierMappingConfiguration : IEntityTypeConfiguration<Pro
 
         builder.HasKey(e => e.Id)
             .HasName("producer_supplier_mappings_pk");
-        
+
         builder.Property(e => e.Id)
             .HasColumnName("id");
-        
+
         builder.Property(e => e.Supplier)
             .HasColumnName("supplier")
             .HasMaxLength(32);
-        
+
         builder.Property(e => e.ProducerId)
             .HasColumnName("producer_id");
-        
+
         builder.Property(e => e.SupplierProducerName)
             .HasColumnName("producer_supplier_name")
             .HasMaxLength(128);
@@ -30,7 +30,7 @@ public class ProducerSupplierMappingConfiguration : IEntityTypeConfiguration<Pro
         builder.HasIndex(e => new { e.ProducerId, e.Supplier })
             .HasDatabaseName("producer_supplier_mappings_uidx")
             .IsUnique();
-        
+
         builder.HasOne<Entities.Producer.Producer>()
             .WithMany()
             .HasForeignKey(d => d.ProducerId)

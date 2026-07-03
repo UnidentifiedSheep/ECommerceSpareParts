@@ -1,20 +1,21 @@
 using Application.Common.Interfaces.Cqrs;
 using Attributes;
 using Main.Enums;
-using MassTransit;
 
 namespace Main.Application.Handlers.Producers;
 
 [AutoSave]
 [Diagnostics]
-[Transactional(retryErrors: ["23505"], retryCount: 2, retryDelayMs: 20)]
+[Transactional(retryErrors: ["23505"],
+    retryCount: 2,
+    retryDelayMs: 20)]
 public record CreateProducerSupplierMappingBatchCommand(
     IEnumerable<CreateProducerSupplierMappingBatchItem> Items
-    ) : ICommand<CreateProducerSupplierMappingBatchResult>;
+) : ICommand<CreateProducerSupplierMappingBatchResult>;
 
 public record CreateProducerSupplierMappingBatchItem(
-    int ProducerId, 
-    Supplier Supplier, 
+    int ProducerId,
+    Supplier Supplier,
     string ProducerName);
 
 public record CreateProducerSupplierMappingBatchResult(
@@ -25,11 +26,11 @@ public record CreateProducerSupplierMappingBatchResult(
 
 public record CreateProducerSupplierMappingBatchError(int Index, string Message);
 
-public class CreateProducerSupplierMappingBatchHandler(
-    ) : ICommandHandler<CreateProducerSupplierMappingBatchCommand, CreateProducerSupplierMappingBatchResult>
+public class CreateProducerSupplierMappingBatchHandler : ICommandHandler<CreateProducerSupplierMappingBatchCommand,
+    CreateProducerSupplierMappingBatchResult>
 {
     public Task<CreateProducerSupplierMappingBatchResult> Handle(
-        CreateProducerSupplierMappingBatchCommand request, 
+        CreateProducerSupplierMappingBatchCommand request,
         CancellationToken cancellationToken)
     {
         throw new NotImplementedException();

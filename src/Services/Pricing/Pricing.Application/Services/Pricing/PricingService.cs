@@ -12,6 +12,6 @@ public class PricingService(
         int currencyId,
         CancellationToken token)
     {
-        
+
     }
 }

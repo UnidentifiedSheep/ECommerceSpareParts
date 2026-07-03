@@ -20,7 +20,7 @@
     </ItemGroup>
 
     <ItemGroup>
-        <Folder Include="DomainEventHandlers\" />
+        <Folder Include="DomainEventHandlers\"/>
         <Folder Include="Handlers\Auth\RemoveRoleFromUser\"/>
         <Folder Include="Handlers\Logistics\"/>
     </ItemGroup>

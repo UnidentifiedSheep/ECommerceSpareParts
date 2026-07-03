@@ -1,5 +1,4 @@
 using Abstractions.Interfaces.Persistence;
-using Application.Common.Interfaces;
 using Application.Common.Interfaces.Cqrs;
 using Application.Common.Interfaces.Events;
 using Application.Common.Interfaces.Repositories;
@@ -25,9 +24,9 @@ public class DeleteAliasHandler(
     public async Task<Unit> Handle(DeleteAliasCommand request, CancellationToken cancellationToken)
     {
         var producerAlias = await repository.GetById(
-                                    Producer.ToNormalizedName(request.Alias),
-                                    cancellationToken)
-                                ?? throw new ProducersAliasNotFoundException(request.Alias);
+                                Producer.ToNormalizedName(request.Alias),
+                                cancellationToken)
+                            ?? throw new ProducersAliasNotFoundException(request.Alias);
 
         if (producerAlias.ProducerId != request.ProducerId)
             throw new ProducersAliasNotFoundException(request.Alias);

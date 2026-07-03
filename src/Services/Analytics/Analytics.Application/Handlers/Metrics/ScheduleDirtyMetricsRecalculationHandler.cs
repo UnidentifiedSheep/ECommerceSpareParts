@@ -5,7 +5,6 @@ using Analytics.Application.Lrts.MetricCalculation;
 using Analytics.Entities.Metrics;
 using Analytics.Enums;
 using Application.Common.Handlers.Jobs;
-using Application.Common.Interfaces;
 using Application.Common.Interfaces.Cqrs;
 using Application.Common.Interfaces.Events;
 using Application.Common.Interfaces.Repositories;

@@ -206,7 +206,7 @@ public class LocalizationTests
             return dict;
         }
 
-        if (type.IsValueType || (!type.IsInterface && !type.IsAbstract))
+        if (type.IsValueType || !type.IsInterface && !type.IsAbstract)
             return type.IsValueType ? Activator.CreateInstance(type) : null;
         var mockType = typeof(Mock<>).MakeGenericType(type);
         var mock = Activator.CreateInstance(mockType);

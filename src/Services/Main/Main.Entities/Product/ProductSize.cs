@@ -25,7 +25,7 @@ public class ProductSize : Entity<ProductSize, int>, ILinqEntity<ProductSize, in
         SetWidth(width);
         SetHeight(height);
         SetUnit(unit);
-        
+
         AddDomainEvent(new ProductSizeUpdatedDomainEvent(productId));
     }
 
@@ -104,7 +104,7 @@ public class ProductSize : Entity<ProductSize, int>, ILinqEntity<ProductSize, in
             Width,
             Height,
             Unit);
-        
+
         AddDomainEvent(new ProductSizeUpdatedDomainEvent(ProductId));
     }
 

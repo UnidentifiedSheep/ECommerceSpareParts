@@ -1,4 +1,3 @@
-using Abstractions.Interfaces;
 using Abstractions.Interfaces.Events;
 
 namespace Contracts.Sale;

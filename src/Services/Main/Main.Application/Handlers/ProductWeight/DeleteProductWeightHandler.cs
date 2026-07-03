@@ -1,9 +1,7 @@
 ﻿using Abstractions.Interfaces.Persistence;
 using Application.Common.Interfaces.Cqrs;
-using Application.Common.Interfaces.Events;
 using Application.Common.Interfaces.Repositories;
 using Attributes;
-using Main.Entities.DomainEvents.Product;
 using MediatR;
 
 namespace Main.Application.Handlers.ProductWeight;
@@ -15,7 +13,7 @@ public record DeleteProductWeightCommand(int ProductId) : ICommand;
 public class DeleteProductWeightHandler(
     IRepository<Entities.Product.ProductWeight, int> repository,
     IUnitOfWork unitOfWork
-    ) : ICommandHandler<DeleteProductWeightCommand>
+) : ICommandHandler<DeleteProductWeightCommand>
 {
     public async Task<Unit> Handle(DeleteProductWeightCommand request, CancellationToken cancellationToken)
     {

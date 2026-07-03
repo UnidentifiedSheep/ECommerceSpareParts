@@ -1,7 +1,6 @@
 using System.Data;
 using Abstractions.Interfaces.Persistence;
 using Application.Common.Extensions;
-using Application.Common.Interfaces;
 using Application.Common.Interfaces.Cqrs;
 using Application.Common.Interfaces.Events;
 using Application.Common.Interfaces.Repositories;
