@@ -34,7 +34,6 @@ public class Job : AuditableEntity<Job, Guid>, ILinqEntity<Job, Guid>
 
     public bool IsTerminal => Status is JobStatus.Succeeded or JobStatus.Failed or JobStatus.Cancelled;
     public bool IsCancellationRequested => Status == JobStatus.CancellationRequested;
-    public bool HasActiveLease => LeaseExpiresAt is not null && LeaseExpiresAt > DateTime.UtcNow;
 
     public static Expression<Func<Job, Guid>> GetKeySelector() { return x => x.Id; }
 
@@ -155,18 +154,30 @@ public class Job : AuditableEntity<Job, Guid>, ILinqEntity<Job, Guid>
         Status = JobStatus.CancellationRequested;
     }
     
-    public void Lock(Guid leaseHolderId, TimeSpan leaseDuration)
+    public void AcquireLease(Guid leaseHolderId, TimeSpan leaseDuration)
     {
         if (IsTerminal)
-            throw new InvalidOperationException("Terminal job cannot be locked.");
-        
-        if (HasActiveLease)
-            throw new InvalidOperationException("Job already has active lease.");
+            throw new InvalidOperationException("Terminal job cannot be acquired.");
+
+        if (Status == JobStatus.CancellationRequested)
+            throw new InvalidOperationException("Cancellation requested job cannot be acquired.");
 
         var now = DateTime.UtcNow;
 
+        if (LeaseExpiresAt > now)
+            throw new InvalidOperationException("Job already has active lease.");
+
+        if (Status is JobStatus.Locked or JobStatus.Processing)
+        {
+            if (!CanRetry())
+                throw new InvalidOperationException("Maximum number of attempts exceeded.");
+
+            Attempts++;
+        }
+
         LockedAt = now;
         Status = JobStatus.Locked;
+        ErrorMessage = null;
         LeaseExpiresAt = now.Add(leaseDuration);
         LeaseHolderId = leaseHolderId;
     }

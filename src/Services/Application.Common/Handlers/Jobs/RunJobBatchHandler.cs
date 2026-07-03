@@ -8,6 +8,7 @@ using Domain.CommonEntities;
 using Domain.CommonEnums;
 using MediatR;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
 
 namespace Application.Common.Handlers.Jobs;
 
@@ -16,42 +17,57 @@ public record RunJobBatchCommand(int MaxBatchSize) : ICommand;
 public class RunJobBatchHandler(
     IServiceScopeFactory scopeFactory,
     IUnitOfWork unitOfWork,
+    ILogger<RunJobBatchHandler> logger,
     IRepository<Job, Guid> repository
 ) : ICommandHandler<RunJobBatchCommand>
 {
-    public async Task<Unit> Handle(RunJobBatchCommand request, CancellationToken cancellationToken)
+    private static readonly TimeSpan LeaseDuration = TimeSpan.FromMinutes(5);
+
+    public async Task<Unit> Handle(
+        RunJobBatchCommand request,
+        CancellationToken cancellationToken)
     {
         List<Job> jobs = [];
-        Dictionary<Guid, Guid> locks = new();
-        
+        Dictionary<Guid, Guid> leaseHolders = new();
+
+        var now = DateTime.UtcNow;
+
         await unitOfWork.ExecuteWithTransaction(
             TransactionalAttribute.ReadCommited(30, 3),
             async () =>
             {
-                jobs = await repository
-                    .ListAsync(
-                        Criteria<Job>.New()
-                            .Where(x => x.Status == JobStatus.Pending)
-                            .OrderByAsc(job => job.Id)
-                            .ForUpdate(true, true)
-                            .Track()
-                            .Size(request.MaxBatchSize)
-                            .Build(),
-                        cancellationToken);
+                var criteria = Criteria<Job>.New()
+                    .Where(x =>
+                        x.Status == JobStatus.Pending ||
+                        (
+                            (x.Status == JobStatus.Locked || x.Status == JobStatus.Processing)
+                            && x.LeaseExpiresAt != null
+                            && x.LeaseExpiresAt <= now
+                            && x.Attempts < x.MaxAttempts
+                        ))
+                    .OrderByAsc(job => job.Id)
+                    .ForUpdate(true, true)
+                    .Track()
+                    .Size(request.MaxBatchSize)
+                    .Build();
+                
+                jobs = await repository.ListAsync(criteria, cancellationToken);
 
-                jobs.ForEach(x =>
+                foreach (var job in jobs)
                 {
                     var holderId = Guid.NewGuid();
-                    locks.Add(x.Id, holderId);
-                    x.Lock(holderId, TimeSpan.FromMinutes(5));
-                });
+
+                    leaseHolders.Add(job.Id, holderId);
+                    job.AcquireLease(holderId, LeaseDuration);
+                }
+
                 await unitOfWork.SaveChangesAsync(cancellationToken);
             },
             cancellationToken);
 
         var tasks = jobs
             .Select(x => TakeScopeAndRun(
-                locks,
+                leaseHolders[x.Id],
                 x.Id,
                 x.SystemName,
                 cancellationToken))
@@ -63,18 +79,32 @@ public class RunJobBatchHandler(
     }
 
     private async Task TakeScopeAndRun(
-        Dictionary<Guid, Guid> locks,
+        Guid holderId,
         Guid jobId,
         string systemName,
         CancellationToken cancellationToken)
     {
-        await using var scope = scopeFactory.CreateAsyncScope();
+        try
+        {
+            await using var scope = scopeFactory.CreateAsyncScope();
 
-        var registry = scope.ServiceProvider
-            .GetRequiredService<INamedObjectRegistry<LrtNamedObjectBase>>();
+            var registry = scope.ServiceProvider
+                .GetRequiredService<INamedObjectRegistry<LrtNamedObjectBase>>();
 
-        await registry
-            .GetBySystemName(systemName)
-            .ExecuteAsync(jobId, locks[jobId], cancellationToken);
+            await registry
+                .GetBySystemName(systemName)
+                .ExecuteAsync(
+                    jobId,
+                    holderId,
+                    cancellationToken);
+        }
+        catch (Exception e)
+        {
+            logger.LogError(
+                e,
+                "Error while executing LRT {LrtSystemName}, JobId: {JobId}",
+                systemName,
+                jobId);
+        }
     }
 }
