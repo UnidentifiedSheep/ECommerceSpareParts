@@ -22,8 +22,7 @@ namespace Main.Application.Handlers.StorageContents.SetToZeroContent;
 public record SetToZeroContentCommand(int ContentId, uint RowVersion) : ICommand;
 
 public class SetToZeroContentHandler(
-    IRepository<StorageContent, int> repository,
-    IUnitOfWork unitOfWork
+    IRepository<StorageContent, int> repository
 ) : ICommandHandler<SetToZeroContentCommand>
 {
     public async Task<Unit> Handle(SetToZeroContentCommand request, CancellationToken cancellationToken)
@@ -33,11 +32,7 @@ public class SetToZeroContentHandler(
 
         content.ValidateVersion(request.RowVersion);
 
-        await unitOfWork.AddAsync(
-            StorageMovementEvent.Create(content, StorageMovementType.StorageContentDeletion),
-            cancellationToken);
-
-        content.IncreaseCount(-content.Count);
+        content.IncreaseCount(-content.Count, StorageMovementType.StorageContentDeletion);
 
         return Unit.Value;
     }

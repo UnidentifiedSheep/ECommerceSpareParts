@@ -136,7 +136,7 @@ public class EditPurchaseTests : IntegrationTest
         var content = purchase.Contents.Single();
         var storageContentId = content.StorageContentId;
         content.SetCount(10);
-        PurchaseContext.StorageContent.IncreaseCount(8);
+        PurchaseContext.StorageContent.IncreaseCount(8, StorageMovementType.PurchaseEditing);
         product.IncreaseStock(8);
         await Context.SaveChangesAsync();
 

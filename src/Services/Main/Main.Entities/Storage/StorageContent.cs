@@ -4,6 +4,7 @@ using Domain;
 using Domain.Extensions;
 using Domain.Interfaces;
 using Main.Entities.DomainEvents.StorageContent;
+using Main.Enums;
 
 namespace Main.Entities.Storage;
 
@@ -15,7 +16,6 @@ public class StorageContent : AuditableEntity<StorageContent, int>, ILinqEntity<
     private StorageContent(
         string storageName,
         int productId,
-        int count,
         decimal buyPrice,
         int currencyId,
         decimal buyPriceInBaseCurrency,
@@ -27,7 +27,6 @@ public class StorageContent : AuditableEntity<StorageContent, int>, ILinqEntity<
         PurchaseDatetime = purchaseDatetime;
         SetCurrencyId(currencyId);
         SetBaseCurrencyId(buyPriceInBaseCurrencyId);
-        SetCount(count);
         SetBuyPrice(buyPrice, buyPriceInBaseCurrency);
     }
 
@@ -63,7 +62,6 @@ public class StorageContent : AuditableEntity<StorageContent, int>, ILinqEntity<
     public static StorageContent Create(
         string storageName,
         int productId,
-        int count,
         decimal buyPrice,
         int currencyId,
         decimal buyPriceInBaseCurrency,
@@ -73,7 +71,6 @@ public class StorageContent : AuditableEntity<StorageContent, int>, ILinqEntity<
         return new StorageContent(
             storageName,
             productId,
-            count,
             buyPrice,
             currencyId,
             buyPriceInBaseCurrency,
@@ -81,7 +78,7 @@ public class StorageContent : AuditableEntity<StorageContent, int>, ILinqEntity<
             purchaseDatetime);
     }
 
-    public void SetCount(int count)
+    public void SetCount(int count, StorageMovementType movementType)
     {
         var newCount = count
             .AgainstNegative(() =>
@@ -93,14 +90,18 @@ public class StorageContent : AuditableEntity<StorageContent, int>, ILinqEntity<
         AddDomainEvent(new StorageContentCountUpdatedDomainEvent(
             ProductId,
             StorageName,
+            CurrencyId,
+            newCount,
+            BuyPrice,
+            movementType,
              newCount - Count));
         
         Count = newCount;
     }
 
-    public void IncreaseCount(int amount)
+    public void IncreaseCount(int amount, StorageMovementType movementType)
     {
-        SetCount(Count + amount);
+        SetCount(Count + amount, movementType);
     }
 
     public void SetBuyPrice(decimal buyPrice, decimal buyPriceInBaseCurrency)

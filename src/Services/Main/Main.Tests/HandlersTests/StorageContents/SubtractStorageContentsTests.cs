@@ -56,13 +56,13 @@ public class SubtractStorageContentsTests : IntegrationTest
             .Contain(x =>
                 x.Data.ProductId == product.Id &&
                 x.Data.StorageName == passedContent.StorageName &&
-                x.Data.Count == passedContentOriginalCount &&
+                x.Data.Count == 0 &&
                 x.Data.MovementType == StorageMovementType.Sale);
         events.Should()
             .Contain(x =>
                 x.Data.ProductId == product.Id &&
                 x.Data.StorageName == passedContent.StorageName &&
-                x.Data.Count == 1 &&
+                x.Data.Count == firstByDateOriginalCount - 1 &&
                 x.Data.MovementType == StorageMovementType.Sale);
     }
 
@@ -102,7 +102,7 @@ public class SubtractStorageContentsTests : IntegrationTest
         var product = await Context.Products.SingleAsync(x => x.Id == first.ProductId);
         var originalFirstCount = first.Count;
         var originalSecondCount = second.Count;
-        first.SetCount(0);
+        first.SetCount(0, StorageMovementType.StorageContentEditing);
         product.IncreaseStock(-originalFirstCount);
         await Context.SaveChangesAsync();
 
@@ -182,8 +182,10 @@ public class SubtractStorageContentsTests : IntegrationTest
             .OnlyContain(x =>
                 x.Data.ProductId == first.ProductId &&
                 x.Data.StorageName == first.StorageName &&
-                x.Data.Count == 1 &&
                 x.Data.MovementType == StorageMovementType.PurchaseEditing);
+        events.Select(x => x.Data.Count)
+            .Should()
+            .BeEquivalentTo([originalFirstCount - 1, originalSecondCount - 1]);
     }
 
     [Fact]

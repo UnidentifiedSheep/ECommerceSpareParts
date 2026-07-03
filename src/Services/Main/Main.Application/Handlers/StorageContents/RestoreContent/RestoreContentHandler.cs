@@ -23,50 +23,28 @@ public record RestoreContentCommand(
 ) : ICommand;
 
 public class RestoreContentHandler(
-    IStorageContentRepository contentRepository,
-    IUnitOfWork unitOfWork
+    IStorageContentRepository contentRepository
 ) : ICommandHandler<RestoreContentCommand>
 {
     public async Task<Unit> Handle(RestoreContentCommand request, CancellationToken cancellationToken)
     {
         var contentDetailsList = request.ContentDetails.ToList();
-        var productIds = new HashSet<int>();
-        var storageContentIds = new HashSet<int>();
-
-        foreach (var detail in contentDetailsList)
-        {
-            productIds.Add(detail.ProductId);
-            storageContentIds.Add(detail.StorageContentId);
-        }
-
+        var storageContentIds = contentDetailsList
+            .Select(x => x.StorageContentId)
+            .Distinct()
+            .ToList();
+        
         var storageContents = await contentRepository
             .EnsureExistsForUpdateAsync(
                 storageContentIds,
                 nf => new StorageContentNotFoundException(nf),
                 cancellationToken);
 
-        var events = new List<Event>();
-
         foreach (var detail in contentDetailsList)
         {
             var content = storageContents[detail.StorageContentId];
-
-            events.Add(
-                StorageMovementEvent.Create(
-                    new StorageMovementEventData
-                    {
-                        ProductId = content.ProductId,
-                        StorageName = content.StorageName,
-                        CurrencyId = content.CurrencyId,
-                        Count = detail.Count,
-                        BuyPrice = content.BuyPrice,
-                        MovementType = request.MovementType
-                    }));
-
-            content.IncreaseCount(detail.Count);
+            content.IncreaseCount(detail.Count, request.MovementType);
         }
-
-        await unitOfWork.AddRangeAsync(events, cancellationToken);
 
         return Unit.Value;
     }

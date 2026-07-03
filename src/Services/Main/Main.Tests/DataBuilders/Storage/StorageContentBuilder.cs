@@ -1,6 +1,7 @@
 ﻿using Bogus;
 using Main.Entities.Product;
 using Main.Entities.Storage;
+using Main.Enums;
 using Test.Common.Abstractions;
 
 namespace Tests.DataBuilders.Storage;
@@ -59,14 +60,19 @@ public class StorageContentBuilder(Faker faker) : BuilderBase<StorageContent>(fa
 
     public override StorageContent Build()
     {
-        return StorageContent.Create(
+        var content = StorageContent.Create(
             StorageName ?? Faker.Lorem.Word(),
             _productIds.Count > 0 ? Faker.PickRandom<int>(_productIds) : Faker.Random.Int(1),
-            Count ?? Faker.Random.Int(1, 100),
             BuyPrice ?? Math.Round(Faker.Random.Decimal(1, 1000), 2),
             CurrencyId ?? Faker.Random.Int(1),
             BuyPrice ?? Math.Round(Faker.Random.Decimal(1, 1000), 2),
             CurrencyId ?? Faker.Random.Int(1),
             PurchaseDate ?? Faker.Date.Future());
+
+        content.SetCount(
+            Count ?? Faker.Random.Int(1, 100),
+            StorageMovementType.StorageContentAddition);
+
+        return content;
     }
 }

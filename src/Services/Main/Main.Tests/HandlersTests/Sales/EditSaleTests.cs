@@ -378,7 +378,7 @@ public class EditSaleTests : IntegrationTest
         var storageContent = await Context.StorageContents.SingleAsync(x => x.Id == storageContentId);
         var product = await Context.Products.SingleAsync(x => x.Id == productId);
 
-        storageContent.IncreaseCount(count);
+        storageContent.IncreaseCount(count, StorageMovementType.SaleEditing);
         product.IncreaseStock(count);
 
         await Context.SaveChangesAsync();

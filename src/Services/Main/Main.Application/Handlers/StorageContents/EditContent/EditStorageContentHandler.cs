@@ -28,7 +28,6 @@ public record EditStorageContentCommand(
 
 public class EditStorageContentHandler(
     IStorageContentRepository storageContentRepository,
-    IUnitOfWork unitOfWork,
     ICurrencyConverter currencyConverter
 ) : ICommandHandler<EditStorageContentCommand>
 {
@@ -42,8 +41,6 @@ public class EditStorageContentHandler(
                 nf => new StorageContentNotFoundException(nf),
                 cancellationToken);
 
-        var storageMovements = new List<Event>();
-
         foreach (var item in editedFields)
         {
             var patch = item.Value.Model;
@@ -51,11 +48,7 @@ public class EditStorageContentHandler(
 
             content.ValidateVersion(item.Value.RowVersion);
 
-            var movementEvent = StorageMovementEvent.Create(
-                content,
-                StorageMovementType.StorageContentEditing);
-
-            patch.Count.Apply(content.SetCount);
+            patch.Count.Apply(x => content.SetCount(x, StorageMovementType.StorageContentEditing));
             patch.CurrencyId.Apply(content.SetCurrencyId);
 
             if (patch.BuyPrice.IsSet)
@@ -70,11 +63,7 @@ public class EditStorageContentHandler(
             }
 
             patch.PurchaseDatetime.Apply(content.SetPurchaseDate);
-
-            storageMovements.Add(movementEvent);
         }
-
-        await unitOfWork.AddRangeAsync(storageMovements, cancellationToken);
 
         return Unit.Value;
     }

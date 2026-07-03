@@ -108,7 +108,7 @@ public class CreateSaleTests : IntegrationTest
         var movement = await Context.Events.OfType<StorageMovementEvent>().AsNoTracking().SingleAsync();
         movement.Data.ProductId.Should().Be(storageContent.ProductId);
         movement.Data.StorageName.Should().Be(storageContent.StorageName);
-        movement.Data.Count.Should().Be(1);
+        movement.Data.Count.Should().Be(updatedContent.Count);
         movement.Data.MovementType.Should().Be(StorageMovementType.Sale);
     }
 

@@ -60,14 +60,12 @@ public class AddContentHandler(
             cancellationToken);
 
         var storageContents = new List<StorageContent>();
-        var events = new List<Event>();
 
         foreach (var item in request.StorageContent)
         {
             var content = StorageContent.Create(
                 request.StorageName,
                 item.ProductId,
-                item.Count,
                 item.BuyPrice,
                 item.CurrencyId,
                 await converter.ConvertToBaseAsync(
@@ -76,17 +74,13 @@ public class AddContentHandler(
                     cancellationToken),
                 baseCurrencyId,
                 item.PurchaseDate);
-
+            
+            content.SetCount(item.Count, request.MovementType);
             content.AssignCurrency(currencies[item.CurrencyId]);
-
             storageContents.Add(content);
-
-            var storageMovementEvent = StorageMovementEvent.Create(content, request.MovementType);
-            events.Add(storageMovementEvent);
         }
 
         await unitOfWork.AddRangeAsync(storageContents, cancellationToken);
-        await unitOfWork.AddRangeAsync(events, cancellationToken);
 
         return new AddContentResult(storageContents);
     }

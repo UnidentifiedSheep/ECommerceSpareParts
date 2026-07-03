@@ -2,6 +2,7 @@ using Main.Entities.Balance;
 using Main.Entities.Product;
 using Main.Entities.Storage;
 using Main.Entities.User;
+using Main.Enums;
 using Main.Enums.Balances;
 using Main.Persistence.Context;
 using Test.Common.Abstractions;
@@ -96,7 +97,7 @@ public class SaleTestContext(
             .Completed()
             .Build();
 
-        StorageContent.IncreaseCount(-SoldCount);
+        StorageContent.IncreaseCount(-SoldCount, StorageMovementType.Sale);
         Product.IncreaseStock(-SoldCount);
 
         await DbContext.AddAsync(Sale, cancellationToken);

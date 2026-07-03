@@ -84,7 +84,6 @@ public class SubtractStorageContentsHandler(
                     ids => new StorageContentNotFoundException(ids[0]),
                     cancellationToken);
         
-        var events = new List<Event>();
         var affected = new List<StorageLot>();
         var policy = await GetExtractionPolicy(cancellationToken);
 
@@ -92,7 +91,6 @@ public class SubtractStorageContentsHandler(
             byStorageContents,
             storageContents,
             affected,
-            events,
             request.MovementType,
             policy,
             cancellationToken);
@@ -100,12 +98,9 @@ public class SubtractStorageContentsHandler(
         await SubtractByProductAndStorageAsync(
             byProductAndStorage,
             affected,
-            events,
             request.MovementType,
             policy,
             cancellationToken);
-
-        await unitOfWork.AddRangeAsync(events, cancellationToken);
 
         return new SubtractStorageContentsResult(affected);
     }
@@ -114,7 +109,6 @@ public class SubtractStorageContentsHandler(
         Dictionary<int, int> byStorageContents,
         Dictionary<int, StorageContent> storageContents,
         List<StorageLot> affected,
-        List<Event> events,
         StorageMovementType movementType,
         StorageContentExtractPolicyBase policy,
         CancellationToken cancellationToken)
@@ -128,7 +122,6 @@ public class SubtractStorageContentsHandler(
                 content,
                 ref remaining,
                 affected,
-                events,
                 movementType);
             await SubtractFromStorageContentsAsync(
                 remaining,
@@ -136,7 +129,6 @@ public class SubtractStorageContentsHandler(
                 content.ProductId,
                 content.StorageName,
                 policy,
-                events,
                 affected,
                 movementType,
                 contentId,
@@ -147,7 +139,6 @@ public class SubtractStorageContentsHandler(
     private async Task SubtractByProductAndStorageAsync(
         Dictionary<(string storageName, int productId, bool takeFromOtherStorages), int> byProductAndStorage,
         List<StorageLot> affected,
-        List<Event> events,
         StorageMovementType movementType,
         StorageContentExtractPolicyBase policy,
         CancellationToken cancellationToken)
@@ -160,7 +151,6 @@ public class SubtractStorageContentsHandler(
                 productId,
                 takeFromOtherStorages ? null : storage,
                 policy,
-                events,
                 affected,
                 movementType,
                 null,
@@ -174,7 +164,6 @@ public class SubtractStorageContentsHandler(
         int productId,
         string? storageName,
         StorageContentExtractPolicyBase policy,
-        List<Event> events,
         List<StorageLot> affected,
         StorageMovementType movementType,
         int? skipStorageContentId = null,
@@ -196,7 +185,6 @@ public class SubtractStorageContentsHandler(
                     content,
                     ref remaining,
                     affected,
-                    events,
                     movementType);
                 if (remaining == 0) break;
             }
@@ -222,18 +210,12 @@ public class SubtractStorageContentsHandler(
         StorageContent content,
         ref int remaining,
         ICollection<StorageLot> affected,
-        ICollection<Event> events,
         StorageMovementType movementType)
     {
         if (remaining == 0 || content.Count == 0) return;
 
         var countToSubtract = Math.Min(content.Count, remaining);
-        events.Add(
-            CreateStorageMovementEvent(
-                content,
-                countToSubtract,
-                movementType));
-        content.IncreaseCount(-countToSubtract);
+        content.IncreaseCount(-countToSubtract, movementType);
         affected.Add(
             new StorageLot(
                 content.Id,
@@ -243,22 +225,5 @@ public class SubtractStorageContentsHandler(
                 countToSubtract,
                 content.PurchaseDatetime));
         remaining -= countToSubtract;
-    }
-
-    private static StorageMovementEvent CreateStorageMovementEvent(
-        StorageContent content,
-        int count,
-        StorageMovementType movementType)
-    {
-        return StorageMovementEvent.Create(
-            new StorageMovementEventData
-            {
-                ProductId = content.ProductId,
-                StorageName = content.StorageName,
-                CurrencyId = content.CurrencyId,
-                Count = count,
-                BuyPrice = content.BuyPrice,
-                MovementType = movementType
-            });
     }
 }
