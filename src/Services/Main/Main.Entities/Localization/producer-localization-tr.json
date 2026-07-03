@@ -20,6 +20,9 @@
     "producer.too.many.errors.while.processing.batch": "Paket işlenirken çok fazla hata oluştu.",
     "producer.duplicate.name.in.batch": "Pakette yinelenen ad var.",
     "producer.other.name.duplicate.in.batch": "Pakette yinelenen ek üretici adı var.",
-    "producer.other.name.producer.not.found.in.batch": "Ek ad için üretici bulunamadı."
+    "producer.other.name.producer.not.found.in.batch": "Ek ad için üretici bulunamadı.",
+    "producer.supplier.mapping.duplicate.in.batch": "Pakette yinelenen tedarikçi eşlemesi var.",
+    "producer.supplier.mapping.producer.not.found.in.batch": "Tedarikçi eşlemesi için üretici bulunamadı.",
+    "producer.supplier.mapping.supplier.producer.name.required": "Tedarikçideki üretici adı boş olmamalıdır."
   }
 }

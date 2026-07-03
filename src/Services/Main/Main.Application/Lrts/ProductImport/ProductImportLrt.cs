@@ -9,13 +9,13 @@ using Localization.Domain;
 using Main.Application.Dtos.Product;
 using Main.Application.Handlers.Products.CreateProducts;
 using Main.Application.Interfaces.Persistence;
-using Main.Entities.Producer;
+using Main.Application.Interfaces.Services;
+using Main.Application.Models.Producer;
 using Main.Entities.Product;
 using Main.Entities.Product.ValueObjects;
 using Main.Enums.Products;
 using MassTransit;
 using MediatR;
-using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 
@@ -23,7 +23,7 @@ namespace Main.Application.Lrts.ProductImport;
 
 public class ProductImportLrt(
     IRepository<Job, Guid> jobRepository,
-    IReadRepository<Producer, int> producerReadRepository,
+    IProducerLookupService producerLookupService,
     IProductRepository productRepository,
     IUnitOfWork unitOfWork,
     IS3StorageService s3Service,
@@ -43,9 +43,8 @@ public class ProductImportLrt(
         stringLocalizer,
         localesOptions)
 {
-    private readonly Dictionary<string, int> _aliasesToIds = new();
+    private ProducerLookup _producerLookup = ProducerLookup.Empty;
 
-    private readonly Dictionary<string, int> _producerNamesToIds = new();
     protected override int BatchSize => 100;
     public override Type InputType => typeof(ProductImportInputState);
     public override Type StateType => typeof(ProductImportState);
@@ -53,7 +52,10 @@ public class ProductImportLrt(
     public override string NameLocalizationKey => "lrt.product.import.name";
     public override string DescriptionLocalizationKey => "lrt.product.import.description";
 
-    protected override Task BeforeRead(ProductImportState state) { return LoadProducers(); }
+    protected override async Task BeforeRead(ProductImportState state)
+    {
+        _producerLookup = await producerLookupService.Load(CancellationToken);
+    }
 
     protected override string GetFileName(ProductImportState state) { return state.FileName; }
 
@@ -103,46 +105,6 @@ public class ProductImportLrt(
         return product is not null;
     }
 
-    private async Task LoadProducers()
-    {
-        _producerNamesToIds.Clear();
-        _aliasesToIds.Clear();
-
-        const int batchSize = 1000;
-
-        var baseQuery = producerReadRepository.Query
-            .Select(x => new
-            {
-                id = x.Id,
-                name = x.Name,
-                otherNames = x.Aliases.Select(z => z.Alias)
-            })
-            .OrderBy(x => x.id);
-
-        var lastId = 0;
-
-        while (true)
-        {
-            var id = lastId;
-            var producers = await baseQuery
-                .Where(x => x.id > id)
-                .Take(batchSize)
-                .ToListAsync(CancellationToken);
-
-            if (producers.Count == 0) break;
-
-            lastId = producers.Last().id;
-
-            foreach (var item in producers)
-            {
-                _producerNamesToIds.TryAdd(item.name, item.id);
-                foreach (var alias in item.otherNames) _aliasesToIds.TryAdd(alias, item.id);
-            }
-
-            if (producers.Count != batchSize) break;
-        }
-    }
-
     private CreateProductDto? ProcessDto(
         int idx,
         NewProductCsvDto row,
@@ -150,7 +112,7 @@ public class ProductImportLrt(
     {
         try
         {
-            var producerId = ResolveProducerId(row.Producer);
+            var producerId = _producerLookup.ResolveId(row.Producer);
             if (producerId == null)
             {
                 errors.Add(
@@ -192,19 +154,6 @@ public class ProductImportLrt(
 
             return null;
         }
-    }
-
-    private int? ResolveProducerId(string producer)
-    {
-        if (string.IsNullOrWhiteSpace(producer)) return null;
-
-        var normalizedProducer = Producer.ToNormalizedName(producer);
-
-        if (_producerNamesToIds.TryGetValue(normalizedProducer, out var producerId)) return producerId;
-
-        return _aliasesToIds.TryGetValue(normalizedProducer, out var otherNameProducerId)
-            ? otherNameProducerId
-            : null;
     }
 
     protected override async Task ProcessBatch(

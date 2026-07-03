@@ -75,6 +75,8 @@ public partial class DContext : DbContext
     public virtual DbSet<Producer> Producers { get; set; }
 
     public virtual DbSet<ProducerAlias> ProducersAliases { get; set; }
+    
+    public virtual DbSet<ProducerSupplierMapping> ProducerSupplierMappings { get; set; }
 
     public virtual DbSet<Purchase> Purchases { get; set; }
 

@@ -20,6 +20,9 @@
     "producer.too.many.errors.while.processing.batch": "Too many errors happened while batch was processing.",
     "producer.duplicate.name.in.batch": "Duplicate name in batch.",
     "producer.other.name.duplicate.in.batch": "Duplicate additional producer name in batch.",
-    "producer.other.name.producer.not.found.in.batch": "Producer for additional name was not found."
+    "producer.other.name.producer.not.found.in.batch": "Producer for additional name was not found.",
+    "producer.supplier.mapping.duplicate.in.batch": "Duplicate supplier mapping in batch.",
+    "producer.supplier.mapping.producer.not.found.in.batch": "Producer for supplier mapping was not found.",
+    "producer.supplier.mapping.supplier.producer.name.required": "Supplier producer name must not be empty."
   }
 }

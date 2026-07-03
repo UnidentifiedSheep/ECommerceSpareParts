@@ -6,4 +6,7 @@ namespace Main.Application.Interfaces.Persistence;
 public interface IProducerRepository : IRepository<Producer, int>
 {
     Task<bool> ProducerHasAnyArticle(int producerId, CancellationToken cancellationToken = default);
+    Task AddSupplierMappingsOnConflictDoNothingAsync(
+        IEnumerable<ProducerSupplierMapping> mappings,
+        CancellationToken cancellationToken = default);
 }
