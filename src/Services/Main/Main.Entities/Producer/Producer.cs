@@ -18,11 +18,9 @@ public class Producer : AuditableEntity<Producer, int>, ILinqEntity<Producer, in
         string? description = null,
         string? imagePath = null)
     {
-        SetName(name, false);
-        SetImagePath(imagePath, false);
-        SetDescription(description, false);
-        
-        AddDomainEvent(new ProducerCreatedDomainEvent(this));
+        SetName(name);
+        SetImagePath(imagePath);
+        SetDescription(description);
     }
 
     [Validate]
@@ -51,29 +49,23 @@ public class Producer : AuditableEntity<Producer, int>, ILinqEntity<Producer, in
             imagePath);
     }
 
-    public void SetImagePath(string? imagePath) => SetImagePath(imagePath, true);
-    private void SetImagePath(string? imagePath, bool addEvent)
+    public void SetImagePath(string? imagePath)
     {
         imagePath = imagePath?.Trim()
             .AgainstTooLong(255, "producer.image.too.long");
 
         ImagePath = string.IsNullOrEmpty(imagePath) ? null : imagePath;
-        if (addEvent) AddDomainEvent(new ProducerUpdatedDomainEvent(Id));
     }
 
-    public void SetDescription(string? description) => SetDescription(description, true);
-    private void SetDescription(string? description, bool addEvent)
+    public void SetDescription(string? description)
     {
         description = description?.Trim()
             .AgainstTooLong(500, "producer.description.max.length");
 
         Description = string.IsNullOrEmpty(description) ? null : description;
-        if (addEvent) AddDomainEvent(new ProducerUpdatedDomainEvent(Id));
     }
-
-    public void SetName(string name) => SetName(name, true);
     
-    private void SetName(string name, bool addEvent)
+    public void SetName(string name)
     {
         var value = name.Trim();
 
@@ -82,13 +74,13 @@ public class Producer : AuditableEntity<Producer, int>, ILinqEntity<Producer, in
             .AgainstTooLong(64, "producer.name.max.length");
 
         Name = ToNormalizedName(value);
-        if (addEvent) AddDomainEvent(new ProducerUpdatedDomainEvent(Id));
     }
 
-    public override void OnDeleted()
-    {
-        AddDomainEvent(new ProducerDeletedDomainEvent(Id));
-    }
+    public override void OnDeleted() => AddDomainEvent(new ProducerDeletedDomainEvent(Id));
+
+    public override void OnCreated() => AddDomainEvent(new ProducerCreatedDomainEvent(this));
+
+    public override void OnUpdated() => AddDomainEvent(new ProducerUpdatedDomainEvent(Id));
 
     public static string ToNormalizedName(string value) { return value.Trim().ToUpperInvariant(); }
 

@@ -17,7 +17,6 @@ public class ProducerAlias : Entity<ProducerAlias, string>,
     {
         ProducerId = producerId;
         SetAlias(otherName);
-        AddDomainEvent(new ProducerAliasCreatedDomainEvent(producerId, Alias));
     }
 
     public int ProducerId { get; }
@@ -41,10 +40,8 @@ public class ProducerAlias : Entity<ProducerAlias, string>,
             otherName);
     }
 
-    public override void OnDeleted()
-    {
-        AddDomainEvent(new ProducerAliasDeletedDomainEvent(ProducerId, Alias));
-    }
+    public override void OnDeleted() => AddDomainEvent(new ProducerAliasDeletedDomainEvent(ProducerId, Alias));
+    public override void OnCreated() => AddDomainEvent(new ProducerAliasCreatedDomainEvent(ProducerId, Alias));
 
     private void SetAlias(string otherName) { Alias = Producer.ToNormalizedName(otherName); }
 

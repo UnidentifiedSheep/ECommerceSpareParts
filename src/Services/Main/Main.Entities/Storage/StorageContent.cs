@@ -122,6 +122,17 @@ public class StorageContent : AuditableEntity<StorageContent, int>, ILinqEntity<
         BuyPrice = buyPrice;
         BuyPriceInBaseCurrency = buyPriceInBaseCurrency;
     }
+    public override void OnDeleted()
+    {
+        AddDomainEvent(new StorageContentCountUpdatedDomainEvent(
+            ProductId,
+            StorageName,
+            CurrencyId,
+            0,
+            BuyPrice,
+            StorageMovementType.StorageContentDeletion,
+            -Count));
+    }
 
     public void SetCurrencyId(int currencyId) { CurrencyId = currencyId; }
 

@@ -22,8 +22,6 @@ public class ProductWeight : Entity<ProductWeight, int>, ILinqEntity<ProductWeig
         ProductId = productId;
         Weight = weight;
         Unit = unit;
-
-        AddDomainEvent(new ProductWeightUpdatedDomainEvent(productId));
     }
 
     [Validate]
@@ -56,8 +54,11 @@ public class ProductWeight : Entity<ProductWeight, int>, ILinqEntity<ProductWeig
         ValidateWeight(weight);
         Weight = weight;
         Unit = unit;
-        AddDomainEvent(new ProductWeightUpdatedDomainEvent(ProductId));
     }
+
+    public override void OnCreated() => AddDomainEvent(new ProductWeightUpdatedDomainEvent(ProductId));
+    public override void OnUpdated() => OnCreated();
+    public override void OnDeleted() => OnCreated();
 
     public override int GetId() { return ProductId; }
 

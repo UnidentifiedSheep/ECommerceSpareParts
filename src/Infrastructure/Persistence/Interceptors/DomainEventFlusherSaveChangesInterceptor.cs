@@ -33,16 +33,28 @@ public class DomainEventFlusherSaveChangesInterceptor(
     {
         if (context is null) return;
 
-        var entities = context.ChangeTracker
-            .Entries<IEntity>()
-            .Select(x => (x.Entity, x))
-            .ToArray();
-
-        foreach (var (entity, entry) in entities)
+        foreach (var entry in context.ChangeTracker.Entries<IEntity>())
         {
-            if (entry.State == EntityState.Deleted) entity.OnDeleted();
+            switch (entry.State)
+            {
+                case EntityState.Added:
+                    entry.Entity.OnCreated();
+                    break;
+
+                case EntityState.Modified when entry.Properties.Any(p => p.IsModified):
+                    entry.Entity.OnUpdated();
+                    break;
+
+                case EntityState.Deleted:
+                    entry.Entity.OnDeleted();
+                    break;
+
+                case EntityState.Detached:
+                case EntityState.Unchanged: //no changes -> no events. Нету ручек - нет конфетки
+                    continue;
+            }
             
-            var events = entity.FlushDomainEvents();
+            var events = entry.Entity.FlushDomainEvents();
             if (domainEventScope.IsCollectionEnabled)
                 domainEventScope.AddRange(events);
         }

@@ -25,8 +25,6 @@ public class ProductSize : Entity<ProductSize, int>, ILinqEntity<ProductSize, in
         SetWidth(width);
         SetHeight(height);
         SetUnit(unit);
-
-        AddDomainEvent(new ProductSizeUpdatedDomainEvent(productId));
     }
 
     [Validate]
@@ -104,9 +102,11 @@ public class ProductSize : Entity<ProductSize, int>, ILinqEntity<ProductSize, in
             Width,
             Height,
             Unit);
-
-        AddDomainEvent(new ProductSizeUpdatedDomainEvent(ProductId));
     }
+
+    public override void OnUpdated() => AddDomainEvent(new ProductSizeUpdatedDomainEvent(ProductId));
+    public override void OnCreated() => OnUpdated();
+    public override void OnDeleted() => OnUpdated();
 
     public override int GetId() { return ProductId; }
 }

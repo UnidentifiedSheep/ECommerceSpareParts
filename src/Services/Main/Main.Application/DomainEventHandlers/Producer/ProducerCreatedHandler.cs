@@ -13,10 +13,12 @@ public class ProducerCreatedHandler(
     public override Task Handle(Batch<ProducerCreatedDomainEvent> notification, CancellationToken cancellationToken)
     {
         var events = notification.Items
-            .Select(x => x.Producer.Id == 0
+            .Select(x => x.Producer.Id)
+            .Distinct()
+            .Select(x => x == 0
                 ? throw new InvalidOperationException("Producer must have an Id before integration " +
                                                       "events are created. Call save changes before.")
-                : new ProducerUpdatedEvent { Id = x.Producer.Id }
+                : new ProducerUpdatedEvent { Id = x }
             )
             .ToList();
 

@@ -4,7 +4,6 @@ namespace Main.Entities.DomainEvents.Product;
 
 public class ProductSizeUpdatedDomainEvent : IKeyedDomainEvent, IBatchableDomainEvent
 {
-
     public ProductSizeUpdatedDomainEvent(int productId)
     {
         ProductId = productId;

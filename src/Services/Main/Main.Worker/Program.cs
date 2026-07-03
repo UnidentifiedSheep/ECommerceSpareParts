@@ -138,7 +138,6 @@ void AddMassTransit(IHostApplicationBuilder hostBuilder)
                     ep.PrefetchCount = 1;
 
                     ep.ConfigureConsumer<CurrencyCreatedConsumer>(context);
-                    ep.ConfigureConsumer<ProductUpdatedConsumer>(context);
                     ep.ConfigureConsumer<RoleUpdatedConsumer>(context);
                     ep.ConfigureConsumer<UserUpdatedConsumer>(context);
                     ep.ConfigureConsumer<UserDiscountUpdatedConsumer>(context);

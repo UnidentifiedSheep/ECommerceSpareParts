@@ -37,4 +37,6 @@ public abstract class Entity<TModel, TKey>
     }
 
     public virtual void OnDeleted() { }
+    public virtual void OnUpdated() { }
+    public virtual void OnCreated() { }
 }

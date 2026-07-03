@@ -4,7 +4,6 @@ namespace Main.Entities.DomainEvents.Product;
 
 public record ProductLinkageUpdatedDomainEvent : IKeyedDomainEvent, IBatchableDomainEvent
 {
-
     public ProductLinkageUpdatedDomainEvent(int productId)
     {
         ProductId = productId;

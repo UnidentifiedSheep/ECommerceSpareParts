@@ -1,10 +1,8 @@
 ﻿using Abstractions.Interfaces;
 using Abstractions.Interfaces.Persistence;
 using Application.Common.Interfaces.Cqrs;
-using Application.Common.Interfaces.Events;
 using Application.Common.Interfaces.Settings;
 using Attributes;
-using Contracts.Products;
 using Main.Application.Static;
 using Main.Entities.Product;
 using Main.Entities.Settings;
@@ -19,10 +17,8 @@ public record MapImgsToProductCommand(int ProductId, IEnumerable<IFile> Images) 
 public class MapImgsToProductHandler(
     IS3StorageService s3Storage,
     IUnitOfWork unitOfWork,
-    ISettingsService settingsService,
-    IIntegrationEventScope integrationEventScope
-)
-    : ICommandHandler<MapImgsToProductCommand, Unit>
+    ISettingsService settingsService 
+    ) : ICommandHandler<MapImgsToProductCommand, Unit>
 {
     public async Task<Unit> Handle(MapImgsToProductCommand request, CancellationToken cancellationToken)
     {
@@ -57,8 +53,7 @@ public class MapImgsToProductHandler(
             foreach (var key in keys) await s3Storage.DeleteFileAsync(BucketNames.Images, key);
             throw;
         }
-
-        integrationEventScope.Add(new ProductUpdatedEvent { Id = request.ProductId });
+        
         return Unit.Value;
     }
 }

@@ -79,65 +79,59 @@ public class Product : AuditableEntity<Product, int>, ILinqEntity<Product, int>
     {
         description = description?.Trim();
         Description = string.IsNullOrWhiteSpace(description) ? null : description;
-        AddDomainEvent(new ProductUpdatedDomainEvent(Id));
     }
 
     public void SetSku(Sku sku)
     {
         Sku = sku;
-        AddDomainEvent(new ProductUpdatedDomainEvent(Id));
     }
 
     public void SetName(Name name)
     {
         Name = name; 
-        AddDomainEvent(new ProductUpdatedDomainEvent(Id));
     }
 
     public void SetProducerId(int producerId)
     {
         ProducerId = producerId; 
-        AddDomainEvent(new ProductUpdatedDomainEvent(Id));
     }
 
     public void IncreaseStock(int value)
     {
         var newValue = Stock.Value + value;
         Stock = newValue;
-        AddDomainEvent(new ProductUpdatedDomainEvent(Id));
     }
 
     public void SetPackingUnit(int? packingUnit)
     {
         if (packingUnit.HasValue) ArgumentOutOfRangeException.ThrowIfNegative(packingUnit.Value);
         PackingUnit = packingUnit;
-        AddDomainEvent(new ProductUpdatedDomainEvent(Id));
     }
 
     public void SetIndicator(Indicator indicator)
     {
         Indicator = indicator; 
-        AddDomainEvent(new ProductUpdatedDomainEvent(Id));
     }
 
     public void SetCategory(int? categoryId)
     {
         CategoryId = categoryId; 
-        AddDomainEvent(new ProductUpdatedDomainEvent(Id));
     }
 
     public void SetPopularity(long popularity)
     {
         ArgumentOutOfRangeException.ThrowIfNegative(popularity);
         Popularity = popularity;
-        AddDomainEvent(new ProductUpdatedDomainEvent(Id));
     }
 
     public void SetPair(int? pairId)
     {
         PairId = pairId; 
-        AddDomainEvent(new ProductUpdatedDomainEvent(Id));
     }
+
+    public override void OnCreated() => AddDomainEvent(new ProductCreatedDomainEvent(this));
+    public override void OnUpdated() => AddDomainEvent(new ProductUpdatedDomainEvent(Id));
+    public override void OnDeleted() => OnUpdated();
 
     public override int GetId() { return Id; }
 }

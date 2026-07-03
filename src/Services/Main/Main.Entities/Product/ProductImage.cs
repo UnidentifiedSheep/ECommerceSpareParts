@@ -2,6 +2,7 @@ using System.Linq.Expressions;
 using Domain;
 using Domain.Interfaces;
 using Exceptions;
+using Main.Entities.DomainEvents.Product;
 
 namespace Main.Entities.Product;
 
@@ -75,11 +76,15 @@ public class ProductImage : Entity<ProductImage, (int, string)>, ILinqEntity<Pro
             : description;
     }
 
+    public override void OnCreated() => AddDomainEvent(new ProductImageUpdatedDomainEvent(ProductId));
+    public override void OnUpdated() => OnCreated();
+    public override void OnDeleted() => OnCreated();
+
     public override (int, string) GetId() { return (ProductId, Path); }
 
     private static bool IsSupportedExtension(string path)
     {
         var lower = path.ToLowerInvariant();
-        return SupportedExtensions.Any(ext => lower.EndsWith(ext));
+        return SupportedExtensions.Any(lower.EndsWith);
     }
 }

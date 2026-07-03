@@ -19,8 +19,7 @@ public record RemoveProductImageCommand(int ProductId, string ImagePath) : IComm
 public class RemoveProductImageHandler(
     IS3StorageService s3Storage,
     IUnitOfWork unitOfWork,
-    IRepository<ProductImage, (int, string)> repository,
-    IIntegrationEventScope integrationEventScope
+    IRepository<ProductImage, (int, string)> repository
 ) : ICommandHandler<RemoveProductImageCommand>
 {
     public async Task<Unit> Handle(RemoveProductImageCommand request, CancellationToken cancellationToken)
@@ -35,11 +34,6 @@ public class RemoveProductImageHandler(
         var objectKey = GetObjectKey(imageEntity);
         await s3Storage.DeleteFileAsync(BucketNames.Images, objectKey);
 
-        integrationEventScope.Add(
-            new ProductUpdatedEvent
-            {
-                Id = request.ProductId
-            });
         return Unit.Value;
     }
 

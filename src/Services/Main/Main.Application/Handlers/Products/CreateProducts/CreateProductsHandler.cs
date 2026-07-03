@@ -22,10 +22,8 @@ public record CreateProductsResult(List<int> CreatedIds, int Skipped = 0);
 
 public class CreateProductsHandler(
     IProductRepository productRepository,
-    IUnitOfWork unitOfWork,
-    IIntegrationEventScope integrationEventScope
-)
-    : ICommandHandler<CreateProductsCommand, CreateProductsResult>
+    IUnitOfWork unitOfWork
+    ) : ICommandHandler<CreateProductsCommand, CreateProductsResult>
 {
     public async Task<CreateProductsResult> Handle(
         CreateProductsCommand request,
@@ -48,8 +46,6 @@ public class CreateProductsHandler(
 
         await unitOfWork.AddRangeAsync(products, cancellationToken);
         await unitOfWork.SaveChangesAsync(cancellationToken);
-
-        await PublishEvent(products, cancellationToken);
 
         return new CreateProductsResult(
             products.Select(x => x.Id).ToList(),
@@ -90,17 +86,5 @@ public class CreateProductsHandler(
     private static (string NormalizedSku, int ProducerId) GetProductKey(CreateProductDto product)
     {
         return (new Sku(product.Sku).NormalizedValue, product.ProducerId);
-    }
-
-    private async Task PublishEvent(List<Product> products, CancellationToken cancellationToken)
-    {
-        foreach (var product in products)
-            integrationEventScope.Add(
-                new ProductUpdatedEvent
-                {
-                    Id = product.Id
-                });
-
-        await unitOfWork.SaveChangesAsync(cancellationToken);
     }
 }
