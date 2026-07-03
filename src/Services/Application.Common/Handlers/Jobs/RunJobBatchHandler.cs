@@ -22,6 +22,8 @@ public class RunJobBatchHandler(
     public async Task<Unit> Handle(RunJobBatchCommand request, CancellationToken cancellationToken)
     {
         List<Job> jobs = [];
+        Dictionary<Guid, Guid> locks = new();
+        
         await unitOfWork.ExecuteWithTransaction(
             TransactionalAttribute.ReadCommited(30, 3),
             async () =>
@@ -37,13 +39,19 @@ public class RunJobBatchHandler(
                             .Build(),
                         cancellationToken);
 
-                jobs.ForEach(x => x.Lock());
+                jobs.ForEach(x =>
+                {
+                    var holderId = Guid.NewGuid();
+                    locks.Add(x.Id, holderId);
+                    x.Lock(holderId, TimeSpan.FromMinutes(5));
+                });
                 await unitOfWork.SaveChangesAsync(cancellationToken);
             },
             cancellationToken);
 
         var tasks = jobs
             .Select(x => TakeScopeAndRun(
+                locks,
                 x.Id,
                 x.SystemName,
                 cancellationToken))
@@ -55,6 +63,7 @@ public class RunJobBatchHandler(
     }
 
     private async Task TakeScopeAndRun(
+        Dictionary<Guid, Guid> locks,
         Guid jobId,
         string systemName,
         CancellationToken cancellationToken)
@@ -66,6 +75,6 @@ public class RunJobBatchHandler(
 
         await registry
             .GetBySystemName(systemName)
-            .ExecuteAsync(jobId, cancellationToken);
+            .ExecuteAsync(jobId, locks[jobId], cancellationToken);
     }
 }

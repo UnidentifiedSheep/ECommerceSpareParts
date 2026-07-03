@@ -49,6 +49,9 @@ public class UnitOfWorkBase(DbContext context) : IUnitOfWork
     {
         await context.Set<T>().AddRangeAsync(entities, cancellationToken);
     }
+    
+    public Task ReloadAsync<T>(T entity, CancellationToken cancellationToken = default) where T : class
+        => context.Entry(entity ?? throw new ArgumentNullException(nameof(entity))).ReloadAsync(cancellationToken);
 
     public void Remove<T>(T entity)
     {

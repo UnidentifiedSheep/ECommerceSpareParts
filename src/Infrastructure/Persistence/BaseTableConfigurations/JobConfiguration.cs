@@ -36,6 +36,12 @@ public class JobConfiguration : IEntityTypeConfiguration<Job>
 
         builder.Property(e => e.LockedAt)
             .HasColumnName("locked_at");
+        
+        builder.Property(e => e.LeaseExpiresAt)
+            .HasColumnName("lease_expires_at");
+        
+        builder.Property(e => e.LeaseHolderId)
+            .HasColumnName("lease_holder_id");
 
         builder.Property(e => e.State)
             .HasColumnName("state");
