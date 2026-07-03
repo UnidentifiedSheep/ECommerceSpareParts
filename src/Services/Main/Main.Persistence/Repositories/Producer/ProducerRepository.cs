@@ -33,7 +33,7 @@ public class ProducerRepository(DContext context, QueryExtensions extensions)
                            ON CONFLICT (producer_id, supplier) DO NOTHING;
                            """;
 
-        await using var connection = Context.Database.GetDbConnection();
+        var connection = Context.Database.GetDbConnection();
         
         await connection.ExecuteAsync(
             new CommandDefinition(
