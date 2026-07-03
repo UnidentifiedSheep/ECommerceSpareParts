@@ -26,7 +26,7 @@ public class MarkupCalculationLrt(
     publisher,
     logger)
 {
-    protected override IServiceDefinition ServiceDefinition => ServicesDefinitions.Analytics;
+    public override IServiceDefinition ServiceDefinition => ServicesDefinitions.Analytics;
     public override Type InputType => typeof(MarkupCalculationInputState);
     public override Type StateType => typeof(MarkupCalculationState);
     public override string SystemName => nameof(MarkupCalculationLrt);

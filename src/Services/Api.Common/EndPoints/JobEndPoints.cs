@@ -110,6 +110,20 @@ public class JobEndPoints : ICarterModule
             .Produces<GetJobsResponse>()
             .RequireAllPermissions(PermissionCodes.JOBS_GET);
 
+        jobs.MapGet("{id:guid}/cancel",
+                async (
+                    ISender sender,
+                    Guid id,
+                    CancellationToken ct) =>
+                {
+                    await sender.Send(new CancelJobCommand(id), ct);
+                    return Results.Accepted();
+                })
+            .WithName("CancelJobState")
+            .WithDisplayName("Cancel job")
+            .Produces(202)
+            .RequireAllPermissions(PermissionCodes.JOBS_CREATE);
+        
         jobs.MapGet(
                 "{id:guid}/state",
                 async (

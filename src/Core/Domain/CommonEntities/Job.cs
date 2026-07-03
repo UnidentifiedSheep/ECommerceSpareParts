@@ -33,6 +33,7 @@ public class Job : AuditableEntity<Job, Guid>, ILinqEntity<Job, Guid>
     public Guid? LeaseHolderId { get; private set; }
 
     public bool IsTerminal => Status is JobStatus.Succeeded or JobStatus.Failed or JobStatus.Cancelled;
+    public bool IsCancellationRequested => Status == JobStatus.CancellationRequested;
     public bool HasActiveLease => LeaseExpiresAt is not null && LeaseExpiresAt > DateTime.UtcNow;
 
     public static Expression<Func<Job, Guid>> GetKeySelector() { return x => x.Id; }
@@ -69,6 +70,7 @@ public class Job : AuditableEntity<Job, Guid>, ILinqEntity<Job, Guid>
     {
         EnsureActiveLease(leaseHolderId);
         if (IsTerminal) throw new InvalidOperationException("Terminal job cannot have new state.");
+        if (IsCancellationRequested) throw new JobCancellationRequestedException(Id);
         State = state;
     }
 
@@ -89,7 +91,11 @@ public class Job : AuditableEntity<Job, Guid>, ILinqEntity<Job, Guid>
     public void Start(Guid leaseHolderId)
     {
         EnsureActiveLease(leaseHolderId);
+        
+        if (IsCancellationRequested) throw new JobCancellationRequestedException(Id);
+        
         EnsureStatus(JobStatus.Locked);
+        
         ErrorMessage = null;
         Status = JobStatus.Processing;
     }
@@ -97,7 +103,11 @@ public class Job : AuditableEntity<Job, Guid>, ILinqEntity<Job, Guid>
     public void Succeed(Guid leaseHolderId)
     {
         EnsureActiveLease(leaseHolderId);
+        
+        if (IsCancellationRequested) throw new JobCancellationRequestedException(Id);
+        
         EnsureStatus(JobStatus.Processing);
+        
         ErrorMessage = null;
         Status = JobStatus.Succeeded;
         ClearLease();
@@ -116,13 +126,35 @@ public class Job : AuditableEntity<Job, Guid>, ILinqEntity<Job, Guid>
     public void Cancel(Guid leaseHolderId, string? errorMessage = null)
     {
         EnsureActiveLease(leaseHolderId);
-        if (IsTerminal) throw new InvalidOperationException("Terminal job cannot be cancelled.");
 
-        ErrorMessage = errorMessage?.TrimOrNull();
+        if (IsTerminal)
+            throw new InvalidOperationException("Terminal job cannot be cancelled.");
+
+        if (!IsCancellationRequested)
+            throw new InvalidOperationException("Job cancellation was not requested.");
+
+        ErrorMessage = errorMessage?.TrimOrNull() ?? ErrorMessage;
         Status = JobStatus.Cancelled;
         ClearLease();
     }
+    
+    public void RequestCancellation(string? reason = null)
+    {
+        if (IsTerminal)
+            throw new InvalidOperationException("Terminal job cannot be cancelled.");
 
+        ErrorMessage = reason?.TrimOrNull();
+
+        if (Status == JobStatus.Pending)
+        {
+            Status = JobStatus.Cancelled;
+            ClearLease();
+            return;
+        }
+
+        Status = JobStatus.CancellationRequested;
+    }
+    
     public void Lock(Guid leaseHolderId, TimeSpan leaseDuration)
     {
         if (IsTerminal)
@@ -143,6 +175,7 @@ public class Job : AuditableEntity<Job, Guid>, ILinqEntity<Job, Guid>
     {
         EnsureActiveLease(leaseHolderId);
         if (IsTerminal) throw new InvalidOperationException("Terminal job cannot be updated.");
+        if (IsCancellationRequested) throw new JobCancellationRequestedException(Id);
         LeaseExpiresAt = DateTime.UtcNow.Add(leaseDuration);
     }
     

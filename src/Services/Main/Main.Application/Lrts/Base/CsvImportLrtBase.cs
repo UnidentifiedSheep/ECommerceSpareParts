@@ -34,7 +34,7 @@ public abstract class CsvImportLrtBase<TState, TError, TCsvRow, TBatchItem>(
     protected virtual int MaxErrors => 10_000;
     protected IScopedStringLocalizer StringLocalizer => stringLocalizer;
 
-    protected override IServiceDefinition ServiceDefinition => ServicesDefinitions.Main;
+    public override IServiceDefinition ServiceDefinition => ServicesDefinitions.Main;
 
     protected sealed override async Task DoWork()
     {

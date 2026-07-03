@@ -24,7 +24,7 @@ public class UpdateCurrencyRatesLrt(
     publisher,
     logger)
 {
-    protected override IServiceDefinition ServiceDefinition => ServicesDefinitions.Main;
+    public override IServiceDefinition ServiceDefinition => ServicesDefinitions.Main;
     public override Type InputType => typeof(NoneInputState);
     public override Type StateType => typeof(NoneInputState);
     public override string SystemName => nameof(UpdateCurrencyRatesLrt);

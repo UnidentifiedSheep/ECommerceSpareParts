@@ -1,4 +1,5 @@
-﻿using Abstractions.Interfaces.Persistence;
+﻿using Abstractions.Interfaces;
+using Abstractions.Interfaces.Persistence;
 using Application.Common.Interfaces.NamedObject;
 using Application.Common.Interfaces.Repositories;
 using Application.Common.LRT;

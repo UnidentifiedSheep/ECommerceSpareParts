@@ -30,8 +30,8 @@ public abstract class LrtBase(
     protected Guid JobId { get; private set; }
     protected Guid LeaseHolderId { get; private set; }
     protected bool Initialized { get; private set; }
-    protected abstract IServiceDefinition ServiceDefinition { get; }
     protected virtual TimeSpan LeaseDuration => TimeSpan.FromMinutes(5);
+    public abstract IServiceDefinition ServiceDefinition { get; }
 
     public async Task ExecuteAsync(
         Guid jobId,
@@ -83,6 +83,16 @@ public abstract class LrtBase(
             catch (JobLeaseLostException e)
             {
                 logger.LogWarning(e, "LRT stopped because lease was lost. JobId: {JobId}", JobId);
+                break;
+            }
+            catch (JobCancellationRequestedException e)
+            {
+                await CancelJobAsync();
+                logger.LogInformation(
+                    e,
+                    "LRT execution cancelled by request. JobId: {JobId}",
+                    JobId);
+
                 break;
             }
             catch (Exception e)
@@ -155,6 +165,7 @@ public abstract class LrtBase(
             {
                 await GetJobAsync();
                 Job.Start(LeaseHolderId);
+                Job.RenewLease(LeaseHolderId, LeaseDuration);
                 await PublishStatusUpdatedEvent(Job);
                 await unitOfWork.SaveChangesAsync(CancellationToken);
                 logger.LogInformation(

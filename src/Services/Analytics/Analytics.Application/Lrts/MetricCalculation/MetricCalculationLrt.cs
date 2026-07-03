@@ -30,7 +30,7 @@ public class MetricCalculationLrt(
     public override string SystemName => LrtSystemName;
     public override string NameLocalizationKey => "metric_calculation_lrt_name";
     public override string DescriptionLocalizationKey => "metric_calculation_lrt_description";
-    protected override IServiceDefinition ServiceDefinition => ServicesDefinitions.Analytics;
+    public override IServiceDefinition ServiceDefinition => ServicesDefinitions.Analytics;
 
     protected override async Task DoWork()
     {
