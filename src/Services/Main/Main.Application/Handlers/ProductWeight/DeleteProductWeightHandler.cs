@@ -1,14 +1,12 @@
 ﻿using Abstractions.Interfaces.Persistence;
-using Application.Common.Interfaces;
 using Application.Common.Interfaces.Cqrs;
 using Application.Common.Interfaces.Events;
 using Application.Common.Interfaces.Repositories;
 using Attributes;
-using Contracts.Products;
-using Main.Application.Notifications;
+using Main.Entities.DomainEvents.Product;
 using MediatR;
 
-namespace Main.Application.Handlers.ProductWeight.DeleteProductWeight;
+namespace Main.Application.Handlers.ProductWeight;
 
 [AutoSave]
 [Transactional]
@@ -24,7 +22,7 @@ public class DeleteProductWeightHandler(
     {
         var weight = await repository.GetById(request.ProductId, cancellationToken);
         unitOfWork.Remove(weight);
-        domainEventScope.Add(new ProductWeightUpdatedNotification(request.ProductId));
+        domainEventScope.Add(new ProductWeightUpdatedDomainEvent(request.ProductId));
         return Unit.Value;
     }
 }

@@ -6,7 +6,7 @@ using Application.Common.Interfaces.Repositories;
 using Attributes;
 using Contracts.Products;
 using Enums;
-using Main.Application.Notifications;
+using Main.Entities.DomainEvents.Product;
 using MediatR;
 
 namespace Main.Application.Handlers.ProductWeight.SetProductWeight;
@@ -39,7 +39,7 @@ public class SetProductWeightHandler(
         }
         else { weight.Update(request.Weight, request.Unit); }
 
-        domainEventScope.Add(new ProductWeightUpdatedNotification(request.ProductId));
+        domainEventScope.Add(new ProductWeightUpdatedDomainEvent(request.ProductId));
         return Unit.Value;
     }
 }

@@ -1,4 +1,3 @@
-using EFCore.BulkExtensions;
 using Main.Application.Interfaces.Persistence;
 using Main.Persistence.Context;
 using Microsoft.EntityFrameworkCore;
@@ -15,22 +14,5 @@ public class ProducerRepository(DContext context, QueryExtensions extensions)
         return Context.Products
             .AsNoTracking()
             .AnyAsync(x => x.ProducerId == producerId, cancellationToken);
-    }
-
-    public async Task BulkInsertOnConflictDoNothing(
-        IEnumerable<Entities.Producer.Producer> producers,
-        CancellationToken cancellationToken = default)
-    {
-        var producerList = producers.ToList();
-
-        if (producerList.Count == 0) return;
-
-        await Context.BulkInsertAsync(
-            producerList,
-            new BulkConfig
-            {
-                ConflictOption = ConflictOption.Ignore
-            },
-            cancellationToken: cancellationToken);
     }
 }

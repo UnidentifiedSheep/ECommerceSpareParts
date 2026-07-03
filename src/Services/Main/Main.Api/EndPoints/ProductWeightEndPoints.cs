@@ -2,7 +2,7 @@ using Api.Common.Extensions;
 using Carter;
 using Enums;
 using Main.Application.Dtos.Product;
-using Main.Application.Handlers.ProductWeight.DeleteProductWeight;
+using Main.Application.Handlers.ProductWeight;
 using Main.Application.Handlers.ProductWeight.GetProductWeight;
 using Main.Application.Handlers.ProductWeight.SetProductWeight;
 using MediatR;

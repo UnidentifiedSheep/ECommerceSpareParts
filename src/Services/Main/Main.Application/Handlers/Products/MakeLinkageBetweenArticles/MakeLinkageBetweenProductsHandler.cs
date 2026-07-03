@@ -6,7 +6,7 @@ using Attributes;
 using Contracts.Products;
 using Main.Application.Dtos.Product;
 using Main.Application.Interfaces.Persistence;
-using Main.Application.Notifications;
+using Main.Entities.DomainEvents.Product;
 using Main.Entities.Exceptions;
 using Main.Entities.Product;
 using Main.Enums.Products;
@@ -35,8 +35,10 @@ public class MakeLinkageBetweenProductsHandler(
             var ids = await CreateLinkages(linkage, cancellationToken);
             updatedIds.UnionWith(ids);
         }
+
+        foreach (var id in updatedIds)
+            domainEventScope.Add(new ProductLinkageUpdatedDomainEvent(id));
         
-        domainEventScope.Add(new ProductLinkageUpdatedNotification(updatedIds));
         return Unit.Value;
     }
 

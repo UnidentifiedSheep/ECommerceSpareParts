@@ -27,11 +27,13 @@ public static class ServiceProvider
     public static IServiceCollection AddPersistenceLayer(this IServiceCollection collection)
     {
         collection.AddScoped<AuditableEntitySaveChangesInterceptor>();
+        collection.AddScoped<DomainEventFlusherSaveChangesInterceptor>();
         collection.AddDbContext<DContext>((sp, options) =>
         {
             var dbOptions = sp.GetRequiredService<IOptions<DatabaseOptions>>().Value;
             options.UseNpgsql(dbOptions.ConnectionString);
             options.AddInterceptors(sp.GetRequiredService<AuditableEntitySaveChangesInterceptor>());
+            options.AddInterceptors(sp.GetRequiredService<DomainEventFlusherSaveChangesInterceptor>());
         });
 
         collection.AddScoped<IProductRepository, ProductRepository>();

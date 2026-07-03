@@ -14,10 +14,7 @@ namespace Main.Application.Handlers.Producers;
 
 [AutoSave]
 [Diagnostics]
-[Transactional(
-    retryErrors: ["23505"],
-    retryCount: 2,
-    retryDelayMs: 20)]
+[Transactional(retryErrors: ["23505"], retryCount: 2, retryDelayMs: 20)]
 public record CreateProducerAliasesBatchCommand(
     IEnumerable<CreateProducerAliasesBatchItem> Items
 ) : ICommand<CreateProducerAliasesBatchResult>;

@@ -1,4 +1,6 @@
-﻿namespace Domain.Interfaces;
+﻿using Domain.Interfaces.Events;
+
+namespace Domain.Interfaces;
 
 public interface IEntity<TKey> : IEntity
 {
@@ -8,4 +10,5 @@ public interface IEntity<TKey> : IEntity
 public interface IEntity
 {
     object GetId();
+    IReadOnlyCollection<IDomainEvent> FlushDomainEvents();
 }

@@ -5,7 +5,7 @@ using Application.Common.Interfaces.Events;
 using Application.Common.Interfaces.Repositories;
 using Attributes;
 using Contracts.Products;
-using Main.Application.Notifications;
+using Main.Entities.DomainEvents.Product;
 using Main.Entities.Exceptions;
 using Main.Entities.Product;
 using MediatR;
@@ -29,7 +29,7 @@ public class DeleteProductSizesHandler(
 
         unitOfWork.Remove(sizes);
 
-        domainEventScope.Add(new ProductSizeUpdatedNotification(request.ProductId));
+        domainEventScope.Add(new ProductSizeUpdatedDomainEvent(request.ProductId));
         return Unit.Value;
     }
 }

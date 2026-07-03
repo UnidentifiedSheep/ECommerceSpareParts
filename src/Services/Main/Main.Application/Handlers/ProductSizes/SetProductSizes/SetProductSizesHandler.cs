@@ -6,7 +6,7 @@ using Application.Common.Interfaces.Repositories;
 using Attributes;
 using Contracts.Products;
 using Enums;
-using Main.Application.Notifications;
+using Main.Entities.DomainEvents.Product;
 using Main.Entities.Product;
 using MediatR;
 
@@ -53,7 +53,7 @@ public class SetProductSizesHandler(
         sizes.SetHeight(height);
         sizes.SetUnit(unit);
 
-        domainEventScope.Add(new ProductSizeUpdatedNotification(request.ProductId));
+        domainEventScope.Add(new ProductSizeUpdatedDomainEvent(request.ProductId));
 
         return Unit.Value;
     }
