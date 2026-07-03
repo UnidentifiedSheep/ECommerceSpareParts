@@ -19,8 +19,12 @@ public record ProductDto
     [JsonPropertyName("stock")]
     public required int Stock { get; init; }
 
+    [JsonPropertyName("indicator")]
+    public required string? Indicator { get; init; }
+    
     [JsonPropertyName("dimensions")]
     public ProductDimensionsDto? Dimensions { get; init; }
+    
 
     [JsonPropertyName("weight")]
     public ProductWeightDto? Weight { get; init; }

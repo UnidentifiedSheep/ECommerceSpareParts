@@ -36,6 +36,6 @@ internal sealed class ProductNode(
     private record GetFullProductsResponse
     {
         [JsonPropertyName("products")]
-        public IReadOnlyList<InternalFullProduct> Products { get; } = [];
+        public IReadOnlyList<InternalFullProduct> Products { get; init; } = [];
     }
 }

@@ -15,7 +15,8 @@ public static class ProductMappingExtensions
             ProducerId = product.ProducerId,
             Dimensions = product.Dimensions?.ToProductDimensionsDto(),
             Weight = product.Weight?.ToProductWeightDto(),
-            Stock = product.Stock
+            Stock = product.Stock,
+            Indicator = product.Indicator
         };
     }
 

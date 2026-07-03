@@ -57,6 +57,10 @@ public class ProductIndexInitializer(
                                 .Name(x => x.ProducerId)
                                 .Type(NumberType.Integer)
                             )
+                            .Text(t => t
+                                .Name(x => x.Indicator)
+                                .Index(false)
+                            )
                             .Number(n => n
                                 .Name(x => x.Stock)
                                 .Type(NumberType.Integer))
