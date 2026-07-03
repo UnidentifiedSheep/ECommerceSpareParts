@@ -190,6 +190,32 @@ public class Job : AuditableEntity<Job, Guid>, ILinqEntity<Job, Guid>
         LeaseExpiresAt = DateTime.UtcNow.Add(leaseDuration);
     }
     
+    public bool CanBeFailedByExpiredLease(DateTime now)
+    {
+        if (IsTerminal)
+            return false;
+
+        if (Status is not JobStatus.Locked and not JobStatus.Processing)
+            return false;
+
+        if (LeaseExpiresAt is null || LeaseExpiresAt > now)
+            return false;
+
+        return Attempts >= MaxAttempts;
+    }
+
+    public void FailByExpiredLease(DateTime now, string? errorMessage = null)
+    {
+        if (!CanBeFailedByExpiredLease(now))
+            throw new InvalidOperationException("Job cannot be failed by expired lease.");
+
+        ErrorMessage = errorMessage?.TrimOrNull()
+                       ?? "Job lease expired and maximum number of attempts was exceeded.";
+
+        Status = JobStatus.Failed;
+        ClearLease();
+    }
+    
     public void EnsureActiveLease(Guid leaseHolderId)
     {
         if (LeaseHolderId != leaseHolderId)

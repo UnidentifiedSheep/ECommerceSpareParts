@@ -28,6 +28,10 @@ public class LrtExecutorHostedService(
         {
             await using var scope = scopeFactory.CreateAsyncScope();
             var sender = scope.ServiceProvider.GetRequiredService<ISender>();
+            
+            await sender.Send(
+                new FailExpiredJobLeasesCommand(opt.MaxExpiredLeaseFailBatchSize),
+                ct);
 
             await sender.Send(
                 new RunJobBatchCommand(opt.MaxParallelPerWorker),
