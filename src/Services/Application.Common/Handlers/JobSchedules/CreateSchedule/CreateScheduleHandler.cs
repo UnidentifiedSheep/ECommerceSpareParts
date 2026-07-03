@@ -28,13 +28,13 @@ public class CreateScheduleHandler(
         CancellationToken cancellationToken)
     {
         var lrt = registry.GetBySystemName(request.NewSchedule.JobSystemName);
-        lrt.ValidateState(request.NewSchedule.InputState);
+        var validatedState = lrt.ValidateState(request.NewSchedule.InputState);
 
         var schedule = JobSchedule.Create(
             request.NewSchedule.Name,
             request.NewSchedule.Description,
             lrt.SystemName,
-            request.NewSchedule.InputState,
+            validatedState,
             request.NewSchedule.MaxAttempts,
             request.NewSchedule.Cron);
 

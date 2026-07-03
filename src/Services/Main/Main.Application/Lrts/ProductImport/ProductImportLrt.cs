@@ -10,6 +10,7 @@ using Main.Application.Dtos.Product;
 using Main.Application.Handlers.Products.CreateProducts;
 using Main.Application.Interfaces.Persistence;
 using Main.Application.Interfaces.Services;
+using Main.Application.Lrts.Base;
 using Main.Application.Models.Producer;
 using Main.Entities.Product;
 using Main.Entities.Product.ValueObjects;

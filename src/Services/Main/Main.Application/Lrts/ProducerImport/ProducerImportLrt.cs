@@ -7,6 +7,7 @@ using Localization.Abstractions.Interfaces;
 using Localization.Domain;
 using Main.Application.Dtos.Producer;
 using Main.Application.Handlers.Producers;
+using Main.Application.Lrts.Base;
 using MassTransit;
 using MediatR;
 using Microsoft.Extensions.Logging;

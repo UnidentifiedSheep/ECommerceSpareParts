@@ -9,6 +9,10 @@
     "lrt.producer.supplier.mapping.import.description": "Tedarikçiye özgü üretici adlarını yüklenen bir dosyadan içe aktarır, verileri doğrular ve mevcut üreticilerle ilişkilendirir.",
     "lrt.product.import.name": "Ürün içe aktarma",
     "lrt.product.import.description": "Ürünleri yüklenen bir dosyadan içe aktarır, verileri doğrular ve mevcut kayıtları atlayarak yeni kayıtları ekler.",
+    "lrt.producer.synchronization.name": "Üretici senkronizasyonu",
+    "lrt.producer.synchronization.description": "İlgili servislerin üretici verilerini yenileyebilmesi için tüm üreticiler için güncelleme olayları yayınlar.",
+    "lrt.product.synchronization.name": "Ürün senkronizasyonu",
+    "lrt.product.synchronization.description": "İlgili servislerin ürün verilerini yenileyebilmesi için tüm ürünler için güncelleme olayları yayınlar.",
     "lrt.currency.rates.update.name": "Döviz kuru güncelleme",
     "lrt.currency.rates.update.description": "Döviz kurlarını güncel verilerle yeniler ve sistemdeki mevcut kur bilgilerini günceller."
   }

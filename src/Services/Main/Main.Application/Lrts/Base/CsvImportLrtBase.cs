@@ -14,7 +14,7 @@ using MassTransit;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 
-namespace Main.Application.Lrts;
+namespace Main.Application.Lrts.Base;
 
 public abstract class CsvImportLrtBase<TState, TError, TCsvRow, TBatchItem>(
     IRepository<Job, Guid> jobRepository,
@@ -24,8 +24,7 @@ public abstract class CsvImportLrtBase<TState, TError, TCsvRow, TBatchItem>(
     IS3StorageService s3Service,
     IScopedStringLocalizer stringLocalizer,
     IOptions<LocalesOptions> localesOptions
-)
-    : LrtNamedObjectBase(
+) : LrtNamedObjectBase(
         jobRepository,
         unitOfWork,
         publisher,

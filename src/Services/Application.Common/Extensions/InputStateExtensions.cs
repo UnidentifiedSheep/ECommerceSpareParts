@@ -6,7 +6,7 @@ namespace Application.Common.Extensions;
 
 public static class InputStateExtensions
 {
-    public static void ValidateState(
+    public static string ValidateState(
         this LrtNamedObjectBase lrt,
         string state)
     {
@@ -14,5 +14,6 @@ public static class InputStateExtensions
             throw new InvalidOperationException("Invalid input state");
 
         inputState.ValidateState();
+        return JsonSerializer.Serialize(inputState);
     }
 }

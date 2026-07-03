@@ -46,9 +46,9 @@ public class UpdateScheduleHandler(
         if (patch.InputState.IsSet)
         {
             var lrt = registry.GetBySystemName(schedule.JobSystemName);
-            lrt.ValidateState(patch.InputState.Value!);
+            var validatedState = lrt.ValidateState(patch.InputState.Value!);
 
-            schedule.SetInputState(patch.InputState.Value!);
+            schedule.SetInputState(validatedState);
         }
 
         if (patch.Cron.IsSet)
