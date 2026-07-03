@@ -1,5 +1,5 @@
 using FluentAssertions;
-using Main.Application.Handlers.Producers.DeleteProducer;
+using Main.Application.Handlers.Producers;
 using Main.Entities.Exceptions;
 using Microsoft.EntityFrameworkCore;
 using Test.Common.TestContainers.Combined;

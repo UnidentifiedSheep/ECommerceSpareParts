@@ -1,13 +1,11 @@
 using Abstractions.Interfaces.Persistence;
 using Application.Common.Interfaces.Cqrs;
-using Application.Common.Interfaces.Events;
 using Attributes;
-using Contracts.Producer;
 using Main.Application.Interfaces.Persistence;
 using Main.Entities.Exceptions;
 using MediatR;
 
-namespace Main.Application.Handlers.Producers.DeleteProducer;
+namespace Main.Application.Handlers.Producers;
 
 [AutoSave]
 [Transactional]
@@ -16,8 +14,7 @@ public record DeleteProducerCommand(int Id) : ICommand;
 public class DeleteProducerHandler(
     IProducerRepository repository,
     IUnitOfWork unitOfWork
-)
-    : ICommandHandler<DeleteProducerCommand>
+) : ICommandHandler<DeleteProducerCommand>
 {
     public async Task<Unit> Handle(DeleteProducerCommand request, CancellationToken cancellationToken)
     {

@@ -2,6 +2,7 @@ using System.Linq.Expressions;
 using BulkValidation.Core.Attributes;
 using Domain;
 using Domain.Interfaces;
+using Main.Entities.DomainEvents.Producer;
 
 namespace Main.Entities.Producer;
 
@@ -16,6 +17,7 @@ public class ProducerAlias : Entity<ProducerAlias, string>,
     {
         ProducerId = producerId;
         SetAlias(otherName);
+        AddDomainEvent(new ProducerAliasCreatedDomainEvent(producerId, Alias));
     }
 
     public int ProducerId { get; }
@@ -39,7 +41,12 @@ public class ProducerAlias : Entity<ProducerAlias, string>,
             otherName);
     }
 
-    public void SetAlias(string otherName) { Alias = Producer.ToNormalizedName(otherName); }
+    public override void OnDeleted()
+    {
+        AddDomainEvent(new ProducerAliasDeletedDomainEvent(ProducerId, Alias));
+    }
+
+    private void SetAlias(string otherName) { Alias = Producer.ToNormalizedName(otherName); }
 
     public override string GetId() { return Alias; }
 }

@@ -43,7 +43,6 @@ public class CreateProducerAliasesBatchHandler(
     IRepository<ProducerAlias, string> aliasRepository,
     IScopedStringLocalizer localizer,
     IProducerRepository producerRepository,
-    IIntegrationEventScope integrationEventScope,
     IUnitOfWork unitOfWork
 ) : ICommandHandler<CreateProducerAliasesBatchCommand, CreateProducerAliasesBatchResult>
 {
@@ -115,12 +114,6 @@ public class CreateProducerAliasesBatchHandler(
         }
 
         await unitOfWork.AddRangeAsync(toAdd, cancellationToken);
-        foreach (var producerId in toAdd.Select(x => x.ProducerId).Distinct())
-            integrationEventScope.Add(
-                new ProducerUpdatedEvent
-                {
-                    Id = producerId
-                });
 
         return new CreateProducerAliasesBatchResult(
             toAdd.Count,

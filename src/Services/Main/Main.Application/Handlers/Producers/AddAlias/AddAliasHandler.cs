@@ -16,9 +16,8 @@ public record AddAliasCommand(
 ) : ICommand<Unit>;
 
 public class AddAliasHandler(
-    IUnitOfWork unitOfWork,
-    IIntegrationEventScope integrationEventScope
-) : ICommandHandler<AddAliasCommand>
+    IUnitOfWork unitOfWork 
+    ) : ICommandHandler<AddAliasCommand>
 {
     public async Task<Unit> Handle(AddAliasCommand request, CancellationToken cancellationToken)
     {
@@ -26,11 +25,6 @@ public class AddAliasHandler(
             request.ProducerId,
             request.Alias);
         await unitOfWork.AddAsync(model, cancellationToken);
-        integrationEventScope.Add(
-            new ProducerUpdatedEvent
-            {
-                Id = request.ProducerId
-            });
         return Unit.Value;
     }
 }

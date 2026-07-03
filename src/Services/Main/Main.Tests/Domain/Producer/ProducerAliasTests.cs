@@ -39,18 +39,6 @@ public class ProducerAliasTests
     }
 
     [Fact]
-    public void SetAlias_NormalizesValue()
-    {
-        var entity = ProducerAlias.Create(
-            1,
-            "KSS");
-
-        entity.SetAlias("Samsung");
-
-        entity.Alias.Should().Be("SAMSUNG");
-    }
-
-    [Fact]
     public void Key_IsNormalizedAlias()
     {
         var entity = ProducerAlias.Create(

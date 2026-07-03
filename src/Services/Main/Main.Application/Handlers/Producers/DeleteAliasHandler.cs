@@ -16,9 +16,7 @@ public record DeleteAliasCommand(int ProducerId, string Alias) : ICommand;
 
 public class DeleteAliasHandler(
     IRepository<ProducerAlias, string> repository,
-    IUnitOfWork unitOfWork,
-    IIntegrationEventScope integrationEventScope
-)
+    IUnitOfWork unitOfWork)
     : ICommandHandler<DeleteAliasCommand>
 {
     public async Task<Unit> Handle(DeleteAliasCommand request, CancellationToken cancellationToken)
@@ -32,11 +30,6 @@ public class DeleteAliasHandler(
             throw new ProducersAliasNotFoundException(request.Alias);
 
         unitOfWork.Remove(producerAlias);
-        integrationEventScope.Add(
-            new ProducerUpdatedEvent
-            {
-                Id = request.ProducerId
-            });
         return Unit.Value;
     }
 }
