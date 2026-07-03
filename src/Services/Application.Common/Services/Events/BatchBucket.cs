@@ -3,18 +3,20 @@ using Domain.Interfaces.Events;
 
 namespace Application.Common.Services.Events;
 
-public sealed class BatchBucket<TEvent> : IBatchBucket<TEvent>
+public sealed class BatchBucket<TEvent> : IBatchBucket
     where TEvent : IBatchableDomainEvent
 {
     private readonly List<TEvent> _items = [];
     private readonly Dictionary<string, TEvent> _keyedEvents = new();
 
-    public void Add(TEvent item)
+    public void Add(IBatchableDomainEvent item)
     {
-        if (item is IKeyedDomainEvent ke)
-            _keyedEvents[ke.GetKey()] = item;
+        var typedItem = (TEvent)item;
+
+        if (typedItem is IKeyedDomainEvent ke)
+            _keyedEvents[ke.GetKey()] = typedItem;
         else
-            _items.Add(item);
+            _items.Add(typedItem);
     }
 
     public int Count => _items.Count + _keyedEvents.Count;

@@ -2,6 +2,7 @@ using System.Linq.Expressions;
 using BulkValidation.Core.Attributes;
 using Domain;
 using Domain.Interfaces;
+using Main.Entities.DomainEvents.Product;
 using Main.Entities.Product.ValueObjects;
 
 namespace Main.Entities.Product;
@@ -86,12 +87,11 @@ public class Product : AuditableEntity<Product, int>, ILinqEntity<Product, int>
 
     public void SetProducerId(int producerId) { ProducerId = producerId; }
 
-    public void UpdateStock(Stock stock) { Stock = stock; }
-
     public void IncreaseStock(int value)
     {
         var newValue = Stock.Value + value;
         Stock = newValue;
+        AddDomainEvent(new ProductStockUpdatedDomainEvent(Id));
     }
 
     public void SetPackingUnit(int? packingUnit)

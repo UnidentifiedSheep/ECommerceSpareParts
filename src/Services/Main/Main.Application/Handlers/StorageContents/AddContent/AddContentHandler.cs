@@ -7,7 +7,6 @@ using Application.Common.Interfaces.Settings;
 using Attributes;
 using Main.Application.Dtos.Storage;
 using Main.Application.Interfaces.Persistence;
-using Main.Application.Interfaces.Services.Storage;
 using Main.Entities.Event;
 using Main.Entities.Exceptions;
 using Main.Entities.Settings;
@@ -30,12 +29,11 @@ public record AddContentCommand(
 public record AddContentResult(IReadOnlyList<StorageContent> StorageContents);
 
 public class AddContentHandler(
-    IProductRepository productRepository,
     ICurrencyConverter converter,
     ISettingsService settingsService,
     ICurrencyRepository currencyRepository,
-    IUnitOfWork unitOfWork,
-    IStorageContentChangeNotifier changeNotifier
+    IProductRepository productRepository,
+    IUnitOfWork unitOfWork
 ) : ICommandHandler<AddContentCommand, AddContentResult>
 {
     public async Task<AddContentResult> Handle(AddContentCommand request, CancellationToken cancellationToken)
@@ -43,26 +41,23 @@ public class AddContentHandler(
         var baseCurrencyId = (await settingsService.GetOrDefault<CurrencySetting>(cancellationToken))
             .Data.BaseCurrencyId;
 
-        var productIds = new HashSet<int>();
         var currencyIds = new HashSet<int>();
 
         foreach (var item in request.StorageContent)
         {
-            productIds.Add(item.ProductId);
             currencyIds.Add(item.CurrencyId);
         }
-
-        var products = await productRepository
-            .EnsureExistsForUpdateAsync(
-                productIds,
-                notFound => new ProductNotFoundException(notFound),
-                cancellationToken);
 
         var currencies = await currencyRepository
             .EnsureExistsAsync(
                 currencyIds,
                 nf => new CurrencyNotFoundException(nf),
                 cancellationToken);
+        
+        await productRepository.EnsureExistsAsync(
+            request.StorageContent.Select(x => x.ProductId).Distinct(),
+            nf => new ProductNotFoundException(nf),
+            cancellationToken);
 
         var storageContents = new List<StorageContent>();
         var events = new List<Event>();
@@ -88,14 +83,10 @@ public class AddContentHandler(
 
             var storageMovementEvent = StorageMovementEvent.Create(content, request.MovementType);
             events.Add(storageMovementEvent);
-
-            products[item.ProductId].IncreaseStock(item.Count);
         }
 
         await unitOfWork.AddRangeAsync(storageContents, cancellationToken);
         await unitOfWork.AddRangeAsync(events, cancellationToken);
-
-        changeNotifier.NotifyChanged(productIds);
 
         return new AddContentResult(storageContents);
     }

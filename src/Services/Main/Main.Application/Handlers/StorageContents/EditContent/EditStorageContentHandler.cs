@@ -8,7 +8,6 @@ using Attributes;
 using Domain.Extensions;
 using Main.Application.Dtos.Storage;
 using Main.Application.Interfaces.Persistence;
-using Main.Application.Interfaces.Services.Storage;
 using Main.Entities.Event;
 using Main.Entities.Exceptions;
 using Main.Entities.Storage;
@@ -29,9 +28,7 @@ public record EditStorageContentCommand(
 
 public class EditStorageContentHandler(
     IStorageContentRepository storageContentRepository,
-    IProductRepository productRepository,
     IUnitOfWork unitOfWork,
-    IStorageContentChangeNotifier changeNotifier,
     ICurrencyConverter currencyConverter
 ) : ICommandHandler<EditStorageContentCommand>
 {
@@ -45,22 +42,14 @@ public class EditStorageContentHandler(
                 nf => new StorageContentNotFoundException(nf),
                 cancellationToken);
 
-        var products = await productRepository
-            .EnsureExistsForUpdateAsync(
-                storageContents.Select(x => x.Value.ProductId),
-                nf => new ProductNotFoundException(nf),
-                cancellationToken);
-
         var storageMovements = new List<Event>();
 
         foreach (var item in editedFields)
         {
             var patch = item.Value.Model;
             var content = storageContents[item.Key];
-            var product = products[content.ProductId];
 
             content.ValidateVersion(item.Value.RowVersion);
-            product.IncreaseStock(CalculateDiff(content, patch));
 
             var movementEvent = StorageMovementEvent.Create(
                 content,
@@ -87,16 +76,6 @@ public class EditStorageContentHandler(
 
         await unitOfWork.AddRangeAsync(storageMovements, cancellationToken);
 
-        changeNotifier.NotifyChanged(products.Keys);
-
         return Unit.Value;
-    }
-
-    private int CalculateDiff(
-        StorageContent content,
-        PatchStorageContentDto patch)
-    {
-        if (!patch.Count.IsSet || patch.Count.Value == content.Count) return 0;
-        return patch.Count.Value - content.Count;
     }
 }

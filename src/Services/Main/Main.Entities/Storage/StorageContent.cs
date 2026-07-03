@@ -3,6 +3,7 @@ using BulkValidation.Core.Attributes;
 using Domain;
 using Domain.Extensions;
 using Domain.Interfaces;
+using Main.Entities.DomainEvents.StorageContent;
 
 namespace Main.Entities.Storage;
 
@@ -82,16 +83,24 @@ public class StorageContent : AuditableEntity<StorageContent, int>, ILinqEntity<
 
     public void SetCount(int count)
     {
-        Count = count
+        var newCount = count
             .AgainstNegative(() =>
                 new InvalidOperationException("Count must be greater than or equal to zero."));
+        
+        if (Count == newCount)
+            return;
+
+        AddDomainEvent(new StorageContentCountUpdatedDomainEvent(
+            ProductId,
+            StorageName,
+             newCount - Count));
+        
+        Count = newCount;
     }
 
     public void IncreaseCount(int amount)
     {
-        Count = (Count + amount)
-            .AgainstNegative(() =>
-                new InvalidOperationException("Count must be greater than or equal to zero."));
+        SetCount(Count + amount);
     }
 
     public void SetBuyPrice(decimal buyPrice, decimal buyPriceInBaseCurrency)

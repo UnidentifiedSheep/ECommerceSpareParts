@@ -66,7 +66,11 @@ public static class ServiceProvider
                     ServiceLifetime.Scoped)
                 .RegisterIfNotExcluded(
                     hs,
-                    typeof(SaveChangesBehavior<,>),
+                    typeof(EventSideEffectsSaveChangesBehavior<,>),
+                    ServiceLifetime.Scoped)
+                .RegisterIfNotExcluded(
+                    hs,
+                    typeof(IntegrationEventPublisherBehavior<,>),
                     ServiceLifetime.Scoped)
                 .RegisterIfNotExcluded(
                     hs,
@@ -74,7 +78,7 @@ public static class ServiceProvider
                     ServiceLifetime.Scoped)
                 .RegisterIfNotExcluded(
                     hs,
-                    typeof(IntegrationEventPublisherBehavior<,>),
+                    typeof(SaveChangesBehavior<,>),
                     ServiceLifetime.Scoped);
         });
 

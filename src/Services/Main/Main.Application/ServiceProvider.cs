@@ -10,14 +10,12 @@ using Main.Application.Interfaces.Logistics;
 using Main.Application.Interfaces.Services;
 using Main.Application.Interfaces.Services.Currency;
 using Main.Application.Interfaces.Services.Event;
-using Main.Application.Interfaces.Services.Storage;
 using Main.Application.Lrts.ProducerImport;
 using Main.Application.Services;
 using Main.Application.Services.Currency;
 using Main.Application.Services.Event;
 using Main.Application.Services.Logistics;
 using Main.Application.Services.Logistics.PricingStrategies;
-using Main.Application.Services.Storage;
 using Main.Entities.Balance;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -54,7 +52,6 @@ public static class ServiceProvider
         collection.AddSingleton<ILogisticsCostService, LogisticsCostService>();
 
         collection.AddScoped<ISaleEventService, SaleEventService>();
-        collection.AddScoped<IStorageContentChangeNotifier, StorageContentChangeNotifier>();
 
         collection.AddScoped<IMailingService, MailingService>();
         collection.AddScoped<ITransactionFinancialProfileService, TransactionFinancialProfileService>();

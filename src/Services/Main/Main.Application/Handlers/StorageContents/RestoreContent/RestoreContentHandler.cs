@@ -4,7 +4,6 @@ using Application.Common.Extensions;
 using Application.Common.Interfaces.Cqrs;
 using Attributes;
 using Main.Application.Interfaces.Persistence;
-using Main.Application.Interfaces.Services.Storage;
 using Main.Application.Models;
 using Main.Entities.Event;
 using Main.Entities.Exceptions;
@@ -25,9 +24,7 @@ public record RestoreContentCommand(
 
 public class RestoreContentHandler(
     IStorageContentRepository contentRepository,
-    IProductRepository productRepository,
-    IUnitOfWork unitOfWork,
-    IStorageContentChangeNotifier changeNotifier
+    IUnitOfWork unitOfWork
 ) : ICommandHandler<RestoreContentCommand>
 {
     public async Task<Unit> Handle(RestoreContentCommand request, CancellationToken cancellationToken)
@@ -42,12 +39,6 @@ public class RestoreContentHandler(
             storageContentIds.Add(detail.StorageContentId);
         }
 
-        var products = await productRepository
-            .EnsureExistsForUpdateAsync(
-                productIds,
-                nf => new ProductNotFoundException(nf),
-                cancellationToken);
-
         var storageContents = await contentRepository
             .EnsureExistsForUpdateAsync(
                 storageContentIds,
@@ -58,7 +49,6 @@ public class RestoreContentHandler(
 
         foreach (var detail in contentDetailsList)
         {
-            var product = products[detail.ProductId];
             var content = storageContents[detail.StorageContentId];
 
             events.Add(
@@ -74,12 +64,9 @@ public class RestoreContentHandler(
                     }));
 
             content.IncreaseCount(detail.Count);
-            product.IncreaseStock(detail.Count);
         }
 
         await unitOfWork.AddRangeAsync(events, cancellationToken);
-
-        changeNotifier.NotifyChanged(productIds);
 
         return Unit.Value;
     }

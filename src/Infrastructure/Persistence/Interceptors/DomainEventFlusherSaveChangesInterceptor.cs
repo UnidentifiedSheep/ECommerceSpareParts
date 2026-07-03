@@ -41,7 +41,8 @@ public class DomainEventFlusherSaveChangesInterceptor(
         foreach (var entity in entities)
         {
             var events = entity.FlushDomainEvents();
-            domainEventScope.AddRange(events);
+            if (domainEventScope.IsCollectionEnabled)
+                domainEventScope.AddRange(events);
         }
     }
 }

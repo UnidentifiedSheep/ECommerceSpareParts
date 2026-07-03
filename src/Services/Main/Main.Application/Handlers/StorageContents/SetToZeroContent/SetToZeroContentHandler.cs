@@ -6,7 +6,6 @@ using Application.Common.Interfaces.Repositories;
 using Attributes;
 using Domain.Extensions;
 using Main.Application.Interfaces.Persistence;
-using Main.Application.Interfaces.Services.Storage;
 using Main.Entities.Event;
 using Main.Entities.Exceptions;
 using Main.Entities.Storage;
@@ -24,9 +23,7 @@ public record SetToZeroContentCommand(int ContentId, uint RowVersion) : ICommand
 
 public class SetToZeroContentHandler(
     IRepository<StorageContent, int> repository,
-    IUnitOfWork unitOfWork,
-    IProductRepository productRepository,
-    IStorageContentChangeNotifier changeNotifier
+    IUnitOfWork unitOfWork
 ) : ICommandHandler<SetToZeroContentCommand>
 {
     public async Task<Unit> Handle(SetToZeroContentCommand request, CancellationToken cancellationToken)
@@ -36,19 +33,11 @@ public class SetToZeroContentHandler(
 
         content.ValidateVersion(request.RowVersion);
 
-        var product = await productRepository.EnsureExistForUpdateAsync(
-            content.ProductId,
-            id => new ProductNotFoundException(id),
-            ct: cancellationToken);
-
         await unitOfWork.AddAsync(
             StorageMovementEvent.Create(content, StorageMovementType.StorageContentDeletion),
             cancellationToken);
 
-        product.IncreaseStock(-content.Count);
         content.IncreaseCount(-content.Count);
-
-        changeNotifier.NotifyChanged([content.ProductId]);
 
         return Unit.Value;
     }

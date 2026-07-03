@@ -1,6 +1,7 @@
 using System.Reflection;
 using Abstractions.Interfaces.Persistence;
 using Api.Common.Extensions;
+using Application.Common.Interfaces.Events;
 using Attributes;
 using Localization.Domain.Extensions;
 using Main.Persistence.Context;
@@ -42,6 +43,8 @@ public abstract class IntegrationTest(CombinedContainerFixture fixture)
         await unitOfWork.ExecuteWithTransaction(
             new TransactionalAttribute(),
             () => base.InitializeBasicContexts());
+        
+        Scope.ServiceProvider.GetRequiredService<IDomainEventScope>().Flush();
     }
 
     public override async Task DisposeAsync()
