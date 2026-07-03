@@ -5,6 +5,7 @@ using Domain.Extensions;
 using Domain.Interfaces;
 using Enums;
 using Extensions;
+using Main.Entities.DomainEvents.Product;
 
 namespace Main.Entities.Product;
 
@@ -24,6 +25,8 @@ public class ProductSize : Entity<ProductSize, int>, ILinqEntity<ProductSize, in
         SetWidth(width);
         SetHeight(height);
         SetUnit(unit);
+        
+        AddDomainEvent(new ProductSizeUpdatedDomainEvent(productId));
     }
 
     [Validate]
@@ -101,6 +104,8 @@ public class ProductSize : Entity<ProductSize, int>, ILinqEntity<ProductSize, in
             Width,
             Height,
             Unit);
+        
+        AddDomainEvent(new ProductSizeUpdatedDomainEvent(ProductId));
     }
 
     public override int GetId() { return ProductId; }

@@ -25,8 +25,7 @@ public record SetProductSizesCommand(
 
 public class SetProductSizesHandler(
     IRepository<ProductSize, int> repository,
-    IUnitOfWork unitOfWork,
-    IDomainEventScope domainEventScope
+    IUnitOfWork unitOfWork
 ) : ICommandHandler<SetProductSizesCommand>
 {
     public async Task<Unit> Handle(SetProductSizesCommand request, CancellationToken cancellationToken)
@@ -52,8 +51,6 @@ public class SetProductSizesHandler(
         sizes.SetWidth(width);
         sizes.SetHeight(height);
         sizes.SetUnit(unit);
-
-        domainEventScope.Add(new ProductSizeUpdatedDomainEvent(request.ProductId));
 
         return Unit.Value;
     }

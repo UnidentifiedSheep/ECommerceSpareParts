@@ -1,11 +1,7 @@
 ﻿using Abstractions.Interfaces.Persistence;
-using Application.Common.Interfaces;
 using Application.Common.Interfaces.Cqrs;
-using Application.Common.Interfaces.Events;
 using Application.Common.Interfaces.Repositories;
 using Attributes;
-using Contracts.Products;
-using Main.Entities.DomainEvents.Product;
 using Main.Entities.Exceptions;
 using Main.Entities.Product;
 using MediatR;
@@ -18,8 +14,7 @@ public record DeleteArticleSizesCommand(int ProductId) : ICommand;
 
 public class DeleteProductSizesHandler(
     IRepository<ProductSize, int> repository,
-    IUnitOfWork unitOfWork,
-    IDomainEventScope domainEventScope
+    IUnitOfWork unitOfWork
 ) : ICommandHandler<DeleteArticleSizesCommand>
 {
     public async Task<Unit> Handle(DeleteArticleSizesCommand request, CancellationToken cancellationToken)
@@ -28,8 +23,6 @@ public class DeleteProductSizesHandler(
                     ?? throw new ProductSizesNotFoundException(request.ProductId);
 
         unitOfWork.Remove(sizes);
-
-        domainEventScope.Add(new ProductSizeUpdatedDomainEvent(request.ProductId));
         return Unit.Value;
     }
 }
