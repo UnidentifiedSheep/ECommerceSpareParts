@@ -17,9 +17,8 @@ public record EditProducerCommand(int ProducerId, PatchProducerDto Producer) : I
 public record EditProducerResult(ProducerDto Producer);
 
 public class EditProducerHandler(
-    IProducerRepository repository,
-    IIntegrationEventScope integrationEventScope
-) : ICommandHandler<EditProducerCommand, EditProducerResult>
+    IProducerRepository repository
+    ) : ICommandHandler<EditProducerCommand, EditProducerResult>
 {
     public async Task<EditProducerResult> Handle(
         EditProducerCommand request,
@@ -29,16 +28,8 @@ public class EditProducerHandler(
                        ?? throw new ProducerNotFoundException(request.ProducerId);
 
         var patch = request.Producer;
-
-        if (patch.Name is { IsSet: true, Value: not null }) producer.SetName(patch.Name.Value);
-
-        if (patch.Description.IsSet) producer.SetDescription(patch.Description.Value);
-
-        integrationEventScope.Add(
-            new ProducerUpdatedEvent
-            {
-                Id = producer.Id
-            });
+        patch.Name.Apply(producer.SetName);
+        patch.Description.Apply(producer.SetDescription);
 
         return new EditProducerResult(ProducerProjections.ToDto.AsFunc()(producer));
     }

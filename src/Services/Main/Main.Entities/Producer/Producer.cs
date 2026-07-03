@@ -3,6 +3,7 @@ using BulkValidation.Core.Attributes;
 using Domain;
 using Domain.Extensions;
 using Domain.Interfaces;
+using Main.Entities.DomainEvents.Producer;
 
 namespace Main.Entities.Producer;
 
@@ -17,9 +18,11 @@ public class Producer : AuditableEntity<Producer, int>, ILinqEntity<Producer, in
         string? description = null,
         string? imagePath = null)
     {
-        SetName(name);
-        SetImagePath(imagePath);
-        SetDescription(description);
+        SetName(name, false);
+        SetImagePath(imagePath, false);
+        SetDescription(description, false);
+        
+        AddDomainEvent(new ProducerCreatedDomainEvent(this));
     }
 
     [Validate]
@@ -48,23 +51,29 @@ public class Producer : AuditableEntity<Producer, int>, ILinqEntity<Producer, in
             imagePath);
     }
 
-    public void SetImagePath(string? imagePath)
+    public void SetImagePath(string? imagePath) => SetImagePath(imagePath, true);
+    private void SetImagePath(string? imagePath, bool addEvent)
     {
         imagePath = imagePath?.Trim()
             .AgainstTooLong(255, "producer.image.too.long");
 
         ImagePath = string.IsNullOrEmpty(imagePath) ? null : imagePath;
+        if (addEvent) AddDomainEvent(new ProducerUpdatedDomainEvent(Id));
     }
 
-    public void SetDescription(string? description)
+    public void SetDescription(string? description) => SetDescription(description, true);
+    private void SetDescription(string? description, bool addEvent)
     {
         description = description?.Trim()
             .AgainstTooLong(500, "producer.description.max.length");
 
         Description = string.IsNullOrEmpty(description) ? null : description;
+        if (addEvent) AddDomainEvent(new ProducerUpdatedDomainEvent(Id));
     }
 
-    public void SetName(string name)
+    public void SetName(string name) => SetName(name, true);
+    
+    private void SetName(string name, bool addEvent)
     {
         var value = name.Trim();
 
@@ -73,6 +82,12 @@ public class Producer : AuditableEntity<Producer, int>, ILinqEntity<Producer, in
             .AgainstTooLong(64, "producer.name.max.length");
 
         Name = ToNormalizedName(value);
+        if (addEvent) AddDomainEvent(new ProducerUpdatedDomainEvent(Id));
+    }
+
+    public override void OnDeleted()
+    {
+        AddDomainEvent(new ProducerDeletedDomainEvent(Id));
     }
 
     public static string ToNormalizedName(string value) { return value.Trim().ToUpperInvariant(); }

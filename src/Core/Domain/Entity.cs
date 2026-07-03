@@ -35,4 +35,6 @@ public abstract class Entity<TModel, TKey>
         else
             _domainEvents.Add(domainEvent);
     }
+
+    public virtual void OnDeleted() { }
 }

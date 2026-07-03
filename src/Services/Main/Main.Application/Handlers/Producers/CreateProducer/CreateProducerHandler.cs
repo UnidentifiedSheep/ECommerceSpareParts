@@ -16,10 +16,7 @@ public record CreateProducerCommand(NewProducerDto NewProducer) : ICommand<Creat
 
 public record CreateProducerResult(ProducerDto Producer);
 
-public class CreateProducerHandler(
-    IUnitOfWork unitOfWork,
-    IIntegrationEventScope integrationEventScope
-)
+public class CreateProducerHandler(IUnitOfWork unitOfWork )
     : ICommandHandler<CreateProducerCommand, CreateProducerResult>
 {
     public async Task<CreateProducerResult> Handle(
@@ -30,12 +27,6 @@ public class CreateProducerHandler(
         var producer = Producer.Create(newProducer.Name, newProducer.Description);
         await unitOfWork.AddAsync(producer, cancellationToken);
         await unitOfWork.SaveChangesAsync(cancellationToken);
-
-        integrationEventScope.Add(
-            new ProducerUpdatedEvent
-            {
-                Id = producer.Id
-            });
 
         return new CreateProducerResult(ProducerProjections.ToDto.AsFunc()(producer));
     }

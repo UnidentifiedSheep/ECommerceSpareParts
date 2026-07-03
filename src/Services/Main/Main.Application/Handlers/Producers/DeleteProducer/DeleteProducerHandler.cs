@@ -15,8 +15,7 @@ public record DeleteProducerCommand(int Id) : ICommand;
 
 public class DeleteProducerHandler(
     IProducerRepository repository,
-    IUnitOfWork unitOfWork,
-    IIntegrationEventScope integrationEventScope
+    IUnitOfWork unitOfWork
 )
     : ICommandHandler<DeleteProducerCommand>
 {
@@ -29,11 +28,6 @@ public class DeleteProducerHandler(
         await ValidateData(producerId, cancellationToken);
 
         unitOfWork.Remove(producer);
-        integrationEventScope.Add(
-            new ProducerUpdatedEvent
-            {
-                Id = request.Id
-            });
         return Unit.Value;
     }
 

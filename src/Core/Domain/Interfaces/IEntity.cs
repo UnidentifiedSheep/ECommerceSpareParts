@@ -11,4 +11,5 @@ public interface IEntity
 {
     object GetId();
     IReadOnlyCollection<IDomainEvent> FlushDomainEvents();
+    void OnDeleted();
 }

@@ -35,8 +35,7 @@ public record CreateProducerBatchError(
 public class CreateProducerBatchHandler(
     IProducerRepository producerRepository,
     IScopedStringLocalizer stringLocalizer,
-    IUnitOfWork unitOfWork,
-    IIntegrationEventScope integrationEventScope
+    IUnitOfWork unitOfWork
 ) : ICommandHandler<CreateProducerBatchCommand, CreateProducerBatchResult>
 {
     public async Task<CreateProducerBatchResult> Handle(
@@ -78,12 +77,6 @@ public class CreateProducerBatchHandler(
 
         await unitOfWork.AddRangeAsync(toAdd, cancellationToken);
         await unitOfWork.SaveChangesAsync(cancellationToken);
-
-        toAdd.ForEach(x => integrationEventScope.Add(
-            new ProducerUpdatedEvent
-            {
-                Id = x.Id
-            }));
 
         return new CreateProducerBatchResult(
             toAdd.Count,
