@@ -6,11 +6,11 @@ using Main.Entities.DomainEvents.Product;
 
 namespace Main.Application.DomainEventHandlers.Product;
 
-public class ProductStockUpdatedHandler(
+public class ProductUpdatedHandler(
     IIntegrationEventScope integrationEventScope
-    ) : BatchableDomainEventHandler<ProductStockUpdatedDomainEvent>
+    ) : BatchableDomainEventHandler<ProductUpdatedDomainEvent>
 {
-    public override Task Handle(Batch<ProductStockUpdatedDomainEvent> notification, CancellationToken cancellationToken)
+    public override Task Handle(Batch<ProductUpdatedDomainEvent> notification, CancellationToken cancellationToken)
     {
         foreach (var @event in notification.Items)
             integrationEventScope.Add(new ProductUpdatedEvent
