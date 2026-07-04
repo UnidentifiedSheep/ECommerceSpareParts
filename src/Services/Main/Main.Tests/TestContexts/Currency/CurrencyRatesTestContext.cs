@@ -2,10 +2,10 @@
 using Main.Entities.Currency;
 using Main.Entities.Settings;
 using Main.Persistence.Context;
-using Test.Common.Abstractions;
-using Test.Common.Extensions;
-using Test.Common.Interfaces;
+using Tests.Abstractions;
 using Tests.DataBuilders.Currency;
+using Tests.Extensions;
+using Tests.Interfaces;
 
 namespace Tests.TestContexts.Currency;
 

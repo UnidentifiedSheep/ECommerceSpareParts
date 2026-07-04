@@ -5,9 +5,9 @@ using Main.Entities.Storage;
 using Main.Entities.User;
 using Main.Enums;
 using Microsoft.EntityFrameworkCore;
-using Test.Common.Extensions;
-using Test.Common.TestContainers.Combined;
 using Tests.DataBuilders.User;
+using Tests.Extensions;
+using Tests.TestContainers.Combined;
 using Tests.TestContexts.Currency;
 using Tests.TestContexts.Storage;
 

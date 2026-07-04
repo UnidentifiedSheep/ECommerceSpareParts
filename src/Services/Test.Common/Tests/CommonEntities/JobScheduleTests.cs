@@ -2,7 +2,7 @@
 using Exceptions;
 using FluentAssertions;
 
-namespace Test.Common.Tests.CommonEntities;
+namespace Tests.Tests.CommonEntities;
 
 public class JobScheduleTests
 {

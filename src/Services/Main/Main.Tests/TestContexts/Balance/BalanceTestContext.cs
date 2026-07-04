@@ -1,9 +1,9 @@
 using Main.Entities.Balance;
 using Main.Entities.User;
 using Main.Persistence.Context;
-using Test.Common.Abstractions;
-using Test.Common.Interfaces;
+using Tests.Abstractions;
 using Tests.DataBuilders.Balance;
+using Tests.Interfaces;
 using Tests.TestContexts.Currency;
 
 namespace Tests.TestContexts.Balance;

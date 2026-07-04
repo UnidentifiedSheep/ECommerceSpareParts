@@ -2,7 +2,7 @@ using Api.Common.Extensions;
 using Carter;
 using Enums;
 using Main.Application.Dtos.Product;
-using Main.Application.Handlers.ProductSizes.DeleteProductSizes;
+using Main.Application.Handlers.ProductSizes;
 using Main.Application.Handlers.ProductSizes.GetProductSizes;
 using Main.Application.Handlers.ProductSizes.SetProductSizes;
 using MediatR;

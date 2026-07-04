@@ -3,7 +3,7 @@ using Domain.Exceptions;
 using FluentAssertions;
 using JobDomain = Domain.CommonEntities.Job;
 
-namespace Test.Common.Tests.CommonEntities;
+namespace Tests.Tests.CommonEntities;
 
 public class JobTests
 {

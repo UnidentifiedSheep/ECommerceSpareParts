@@ -11,7 +11,7 @@ using Microsoft.Extensions.DependencyInjection;
 
 namespace Analytics.Integration.Tests;
 
-public class LocalizationTests : Test.Common.Tests.LocalizationTests
+public class LocalizationTests : global::Tests.Tests.LocalizationTests
 {
     [Theory]
     [InlineData("ru")]

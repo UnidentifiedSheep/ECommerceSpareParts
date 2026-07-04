@@ -6,7 +6,7 @@ using Main.Entities.Exceptions;
 using Main.Entities.Product;
 using MediatR;
 
-namespace Main.Application.Handlers.ProductSizes.DeleteProductSizes;
+namespace Main.Application.Handlers.ProductSizes;
 
 [AutoSave]
 [Transactional]

@@ -1,8 +1,8 @@
 ﻿using Main.Entities.Producer;
 using Main.Persistence.Context;
-using Test.Common.Abstractions;
-using Test.Common.Extensions;
+using Tests.Abstractions;
 using Tests.DataBuilders;
+using Tests.Extensions;
 
 namespace Tests.TestContexts;
 

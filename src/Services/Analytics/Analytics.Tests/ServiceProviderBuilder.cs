@@ -13,12 +13,11 @@ using Microsoft.Extensions.Options;
 using Npgsql;
 using Persistence;
 using Serilog;
-using Test.Common.Abstractions.Test;
-using Test.Common.Extensions;
-using Test.Common.Interfaces.ServiceProvider;
-using Test.Common.Stubs;
-using Test.Common.TestContexts;
+using Tests.Abstractions.Test;
+using Tests.Extensions;
+using Tests.Interfaces.ServiceProvider;
 using Tests.Stubs;
+using Tests.TestContexts;
 using ZiggyCreatures.Caching.Fusion.Backplane;
 using ApplicationServiceProvider = Analytics.Application.ServiceProvider;
 

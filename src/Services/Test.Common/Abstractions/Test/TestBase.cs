@@ -1,10 +1,9 @@
 ﻿using System.Reflection;
 using Bogus;
 using Microsoft.Extensions.DependencyInjection;
-using Test.Common.Interfaces;
-using Xunit;
+using Tests.Interfaces;
 
-namespace Test.Common.Abstractions.Test;
+namespace Tests.Abstractions.Test;
 
 public abstract class TestBase : IAsyncLifetime, ITest
 {

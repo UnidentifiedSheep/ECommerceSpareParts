@@ -11,7 +11,7 @@ using Localization.Abstractions.Models;
 using Localization.Domain;
 using Moq;
 
-namespace Test.Common.Tests;
+namespace Tests.Tests;
 
 public class LocalizationTests
 {

@@ -5,8 +5,8 @@ using Analytics.Enums;
 using Analytics.Integration.Tests.DataBuilders;
 using FluentAssertions;
 using Microsoft.Extensions.DependencyInjection;
-using Test.Common.Extensions;
-using Test.Common.TestContainers.Combined;
+using Tests.Extensions;
+using Tests.TestContainers.Combined;
 
 namespace Analytics.Integration.Tests.ServiceTests;
 

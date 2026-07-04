@@ -1,9 +1,9 @@
 ﻿using Main.Application.Handlers.Cart.ChangeCartItemCount;
 using Main.Entities.Exceptions;
 using Microsoft.EntityFrameworkCore;
-using Test.Common.Extensions;
-using Test.Common.TestContainers.Combined;
 using Tests.DataBuilders;
+using Tests.Extensions;
+using Tests.TestContainers.Combined;
 using Tests.TestContexts;
 
 namespace Tests.HandlersTests.Cart;

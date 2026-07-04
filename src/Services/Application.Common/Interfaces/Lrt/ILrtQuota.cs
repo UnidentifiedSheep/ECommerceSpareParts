@@ -1,4 +1,4 @@
-namespace Application.Common.LRT;
+namespace Application.Common.Interfaces.Lrt;
 
 public interface ILrtQuota : IDisposable
 {

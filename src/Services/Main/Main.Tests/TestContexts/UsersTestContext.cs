@@ -1,8 +1,8 @@
 ﻿using Main.Entities.User;
 using Main.Persistence.Context;
-using Test.Common.Abstractions;
-using Test.Common.Extensions;
+using Tests.Abstractions;
 using Tests.DataBuilders.User;
+using Tests.Extensions;
 
 namespace Tests.TestContexts;
 

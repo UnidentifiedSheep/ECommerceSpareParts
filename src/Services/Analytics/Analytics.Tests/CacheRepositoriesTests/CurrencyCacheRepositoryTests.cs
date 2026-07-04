@@ -6,7 +6,7 @@ using Integrations.Common;
 using Internal.Integration.Core.Interfaces.Main;
 using Microsoft.Extensions.DependencyInjection;
 using Moq;
-using Test.Common.TestContainers.Combined;
+using Tests.TestContainers.Combined;
 using ZiggyCreatures.Caching.Fusion;
 
 namespace Analytics.Integration.Tests.CacheRepositoriesTests;

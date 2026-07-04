@@ -1,7 +1,7 @@
 ﻿using Abstractions.Interfaces;
 using Application.Common.Interfaces.Settings;
 using Main.Persistence.Context;
-using Test.Common.Stubs;
+using Tests.Stubs;
 
 namespace Tests.TestContexts;
 

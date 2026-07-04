@@ -3,7 +3,7 @@ using Main.Application.Handlers.Balance;
 using Main.Entities.Balance;
 using Main.Enums.Balances;
 using Microsoft.EntityFrameworkCore;
-using Test.Common.TestContainers.Combined;
+using Tests.TestContainers.Combined;
 using Tests.TestContexts;
 using Tests.TestContexts.Currency;
 

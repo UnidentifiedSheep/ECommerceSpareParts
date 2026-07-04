@@ -1,8 +1,8 @@
 using Main.Entities.Storage;
 using Main.Persistence.Context;
-using Test.Common.Abstractions;
-using Test.Common.Interfaces;
+using Tests.Abstractions;
 using Tests.DataBuilders.Storage;
+using Tests.Interfaces;
 using Tests.TestContexts.Currency;
 
 namespace Tests.TestContexts.Storage;

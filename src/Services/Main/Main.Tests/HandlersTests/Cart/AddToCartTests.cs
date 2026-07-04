@@ -4,7 +4,7 @@ using Main.Application.Static;
 using Main.Entities.Product;
 using Main.Entities.User;
 using Microsoft.EntityFrameworkCore;
-using Test.Common.TestContainers.Combined;
+using Tests.TestContainers.Combined;
 using Tests.TestContexts;
 
 namespace Tests.HandlersTests.Cart;

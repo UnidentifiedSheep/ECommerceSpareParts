@@ -3,9 +3,9 @@ using Main.Application.Handlers.Producers.AddAlias;
 using Main.Application.Static;
 using Main.Entities.Producer;
 using Microsoft.EntityFrameworkCore;
-using Test.Common.Extensions;
-using Test.Common.TestContainers.Combined;
 using Tests.DataBuilders;
+using Tests.Extensions;
+using Tests.TestContainers.Combined;
 using Tests.TestContexts;
 
 namespace Tests.HandlersTests.Producers;

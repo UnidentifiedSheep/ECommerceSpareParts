@@ -1,9 +1,9 @@
 ﻿using Main.Entities.Auth;
 using Main.Persistence.Context;
-using Test.Common.Abstractions;
-using Test.Common.Extensions;
-using Test.Common.Interfaces;
+using Tests.Abstractions;
 using Tests.DataBuilders.Auth;
+using Tests.Extensions;
+using Tests.Interfaces;
 
 namespace Tests.TestContexts;
 

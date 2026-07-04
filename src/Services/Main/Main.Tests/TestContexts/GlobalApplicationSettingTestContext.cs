@@ -2,10 +2,10 @@
 using Main.Entities.Settings;
 using Main.Entities.User;
 using Main.Persistence.Context;
-using Test.Common.Abstractions;
-using Test.Common.Extensions;
-using Test.Common.Stubs;
+using Tests.Abstractions;
 using Tests.DataBuilders.User;
+using Tests.Extensions;
+using Tests.Stubs;
 
 namespace Tests.TestContexts;
 

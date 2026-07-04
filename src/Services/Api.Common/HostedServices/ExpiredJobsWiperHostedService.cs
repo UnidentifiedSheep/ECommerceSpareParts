@@ -1,5 +1,6 @@
 using Application.Common.Interfaces.Lrt;
 using Application.Common.Models;
+using Application.Common.Models.Options;
 using Microsoft.Extensions.Options;
 
 namespace Api.Common.HostedServices;

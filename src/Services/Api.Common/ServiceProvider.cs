@@ -3,6 +3,7 @@ using Api.Common.ExceptionHandlers;
 using Api.Common.HostedServices;
 using Api.Common.Models.Options;
 using Application.Common.Models;
+using Application.Common.Models.Options;
 using Cache;
 using Persistence;
 using RabbitMq;

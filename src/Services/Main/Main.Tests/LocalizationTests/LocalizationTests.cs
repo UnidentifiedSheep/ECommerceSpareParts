@@ -10,7 +10,7 @@ using Main.Entities.Product;
 
 namespace Tests.LocalizationTests;
 
-public class LocalizationTests : Test.Common.Tests.LocalizationTests
+public class LocalizationTests : Tests.LocalizationTests
 {
     [Theory]
     [InlineData("ru")]

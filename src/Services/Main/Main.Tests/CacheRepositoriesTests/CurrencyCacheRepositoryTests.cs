@@ -6,7 +6,7 @@ using Main.Application.Static;
 using Main.Entities.Currency;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
-using Test.Common.TestContainers.Combined;
+using Tests.TestContainers.Combined;
 using Tests.TestContexts.Currency;
 
 namespace Tests.CacheRepositoriesTests;

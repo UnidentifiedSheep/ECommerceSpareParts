@@ -1,4 +1,4 @@
-﻿namespace Test.Common.Interfaces.ServiceProvider;
+﻿namespace Tests.Interfaces.ServiceProvider;
 
 public abstract record IServiceProviderArgument
 {

@@ -7,7 +7,7 @@ using Main.Entities.Product;
 using Main.Entities.User;
 using Main.Enums;
 using Microsoft.EntityFrameworkCore;
-using Test.Common.TestContainers.Combined;
+using Tests.TestContainers.Combined;
 using Tests.TestContexts;
 using Tests.TestContexts.Currency;
 

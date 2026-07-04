@@ -4,7 +4,7 @@ using Main.Application.Dtos.Producer;
 using Main.Application.Handlers.Producers.EditProducer;
 using Main.Entities.Producer;
 using Microsoft.EntityFrameworkCore;
-using Test.Common.TestContainers.Combined;
+using Tests.TestContainers.Combined;
 using Tests.TestContexts;
 
 namespace Tests.HandlersTests.Producers;

@@ -1,4 +1,4 @@
-﻿namespace Test.Common.Extensions;
+﻿namespace Tests.Extensions;
 
 public static class ReadOnlyListExtensions
 {

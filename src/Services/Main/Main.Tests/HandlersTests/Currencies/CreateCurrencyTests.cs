@@ -1,9 +1,9 @@
 using Main.Application.Handlers.Currencies.CreateCurrency;
 using Main.Application.Static;
 using Microsoft.EntityFrameworkCore;
-using Test.Common.Extensions;
-using Test.Common.TestContainers.Combined;
 using Tests.DataBuilders.Currency;
+using Tests.Extensions;
+using Tests.TestContainers.Combined;
 
 namespace Tests.HandlersTests.Currencies;
 

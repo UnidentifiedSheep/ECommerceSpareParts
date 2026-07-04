@@ -1,7 +1,7 @@
 ﻿using Domain.CommonEntities;
 using FluentAssertions;
 
-namespace Test.Common.Tests.CommonEntities;
+namespace Tests.Tests.CommonEntities;
 
 public class JobScheduleRunTests
 {

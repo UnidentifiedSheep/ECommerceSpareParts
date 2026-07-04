@@ -1,6 +1,6 @@
 ﻿using Abstractions.Interfaces;
 
-namespace Test.Common.Stubs;
+namespace Tests.Stubs;
 
 public class UserContextMock : IUserContext
 {

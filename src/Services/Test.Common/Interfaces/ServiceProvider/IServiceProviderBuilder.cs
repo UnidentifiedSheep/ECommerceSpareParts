@@ -1,4 +1,4 @@
-﻿namespace Test.Common.Interfaces.ServiceProvider;
+﻿namespace Tests.Interfaces.ServiceProvider;
 
 public interface IServiceProviderBuilder<in TArgs> where TArgs : IServiceProviderArgument
 {

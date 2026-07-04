@@ -1,7 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using Test.Common.Interfaces;
+using Tests.Interfaces;
 
-namespace Test.Common.Extensions;
+namespace Tests.Extensions;
 
 public static class BuilderExtensions
 {

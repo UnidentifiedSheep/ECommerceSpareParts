@@ -1,6 +1,6 @@
 using Bogus;
 using Main.Entities.Auth;
-using Test.Common.Abstractions;
+using Tests.Abstractions;
 
 namespace Tests.DataBuilders.Auth;
 

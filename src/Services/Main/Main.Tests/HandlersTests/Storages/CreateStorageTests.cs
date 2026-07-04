@@ -1,9 +1,9 @@
 using Main.Application.Handlers.Storages.CreateStorage;
 using Main.Application.Static;
 using Microsoft.EntityFrameworkCore;
-using Test.Common.Extensions;
-using Test.Common.TestContainers.Combined;
 using Tests.DataBuilders.Storage;
+using Tests.Extensions;
+using Tests.TestContainers.Combined;
 
 namespace Tests.HandlersTests.Storages;
 

@@ -1,6 +1,7 @@
 using Api.Common.Models.Options;
 using Application.Common.Handlers.JobSchedules;
 using Application.Common.Models;
+using Application.Common.Models.Options;
 using MediatR;
 using Microsoft.Extensions.Options;
 

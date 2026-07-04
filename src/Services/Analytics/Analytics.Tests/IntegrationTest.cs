@@ -8,9 +8,9 @@ using MediatR;
 using Microsoft.Extensions.DependencyInjection;
 using Persistence.Extensions;
 using StackExchange.Redis;
-using Test.Common.Abstractions.Test;
-using Test.Common.Extensions;
-using Test.Common.TestContainers.Combined;
+using Tests.Abstractions.Test;
+using Tests.Extensions;
+using Tests.TestContainers.Combined;
 
 namespace Analytics.Integration.Tests;
 

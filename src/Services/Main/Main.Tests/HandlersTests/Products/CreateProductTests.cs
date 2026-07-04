@@ -5,7 +5,7 @@ using Main.Entities.Product;
 using Main.Entities.Product.ValueObjects;
 using Main.Enums.Products;
 using Microsoft.EntityFrameworkCore;
-using Test.Common.TestContainers.Combined;
+using Tests.TestContainers.Combined;
 using Tests.TestContexts;
 
 namespace Tests.HandlersTests.Products;

@@ -2,7 +2,7 @@ using FluentAssertions;
 using Main.Application.Handlers.StorageContents.SetToZeroContent;
 using Main.Entities.Exceptions;
 using Microsoft.EntityFrameworkCore;
-using Test.Common.TestContainers.Combined;
+using Tests.TestContainers.Combined;
 using Tests.TestContexts.Storage;
 
 namespace Tests.HandlersTests.StorageContents;

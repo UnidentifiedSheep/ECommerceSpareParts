@@ -1,4 +1,4 @@
-﻿namespace Test.Common.Interfaces;
+﻿namespace Tests.Interfaces;
 
 public interface IDependentTestContext
 {

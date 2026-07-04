@@ -2,7 +2,7 @@
 using Main.Entities.Producer;
 using Main.Entities.Product;
 using Main.Entities.Product.ValueObjects;
-using Test.Common.Abstractions;
+using Tests.Abstractions;
 
 namespace Tests.DataBuilders;
 

@@ -1,6 +1,6 @@
 using Bogus;
 using Main.Entities.User.ValueObjects;
-using Test.Common.Abstractions;
+using Tests.Abstractions;
 
 namespace Tests.DataBuilders.User;
 

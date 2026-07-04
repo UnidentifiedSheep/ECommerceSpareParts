@@ -1,7 +1,6 @@
 using Testcontainers.PostgreSql;
-using Xunit;
 
-namespace Test.Common.TestContainers.Pg;
+namespace Tests.TestContainers.Pg;
 
 public class PostgresContainerFixture : IAsyncLifetime
 {

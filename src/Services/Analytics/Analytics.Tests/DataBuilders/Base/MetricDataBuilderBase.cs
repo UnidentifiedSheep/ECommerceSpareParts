@@ -1,7 +1,7 @@
 ﻿using Analytics.Entities.Metrics;
 using Analytics.Enums;
 using Bogus;
-using Test.Common.Abstractions;
+using Tests.Abstractions;
 
 namespace Analytics.Integration.Tests.DataBuilders.Base;
 

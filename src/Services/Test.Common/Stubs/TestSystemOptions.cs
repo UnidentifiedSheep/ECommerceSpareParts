@@ -1,7 +1,7 @@
 using Abstractions.Models.Options;
 using Microsoft.Extensions.Options;
 
-namespace Test.Common.Stubs;
+namespace Tests.Stubs;
 
 public class TestSystemOptionsAccessor
 {

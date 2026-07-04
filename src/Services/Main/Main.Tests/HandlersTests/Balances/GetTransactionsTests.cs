@@ -5,7 +5,7 @@ using Main.Application.Handlers.Balance.GetTransactions;
 using Main.Entities.Balance;
 using Main.Enums.Balances;
 using Microsoft.EntityFrameworkCore;
-using Test.Common.TestContainers.Combined;
+using Tests.TestContainers.Combined;
 using Tests.TestContexts.Balance;
 
 namespace Tests.HandlersTests.Balances;

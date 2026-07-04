@@ -1,7 +1,7 @@
 ﻿using Bogus;
 using Main.Entities.Storage;
 using Main.Enums;
-using Test.Common.Abstractions;
+using Tests.Abstractions;
 
 namespace Tests.DataBuilders.Storage;
 

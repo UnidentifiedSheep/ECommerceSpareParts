@@ -2,9 +2,9 @@ using Enums;
 using FluentAssertions;
 using Main.Application.Handlers.ProductWeight.SetProductWeight;
 using Microsoft.EntityFrameworkCore;
-using Test.Common.Extensions;
-using Test.Common.TestContainers.Combined;
 using Tests.DataBuilders;
+using Tests.Extensions;
+using Tests.TestContainers.Combined;
 using Tests.TestContexts;
 
 namespace Tests.HandlersTests.Products;

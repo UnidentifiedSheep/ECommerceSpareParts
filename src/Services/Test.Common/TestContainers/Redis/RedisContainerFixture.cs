@@ -1,7 +1,6 @@
 using Testcontainers.Redis;
-using Xunit;
 
-namespace Test.Common.TestContainers.Redis;
+namespace Tests.TestContainers.Redis;
 
 public class RedisContainerFixture : IAsyncLifetime
 {

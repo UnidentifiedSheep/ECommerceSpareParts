@@ -1,7 +1,7 @@
 using ZiggyCreatures.Caching.Fusion;
 using ZiggyCreatures.Caching.Fusion.Backplane;
 
-namespace Test.Common.Stubs;
+namespace Tests.Stubs;
 
 public class FusionCacheBackplaneStub : IFusionCacheBackplane
 {

@@ -1,9 +1,9 @@
 ﻿using FluentAssertions;
 using Main.Application.Handlers.Auth.UpsertRole;
 using Microsoft.EntityFrameworkCore;
-using Test.Common.Extensions;
-using Test.Common.TestContainers.Combined;
 using Tests.DataBuilders.Auth;
+using Tests.Extensions;
+using Tests.TestContainers.Combined;
 
 namespace Tests.HandlersTests.Roles;
 

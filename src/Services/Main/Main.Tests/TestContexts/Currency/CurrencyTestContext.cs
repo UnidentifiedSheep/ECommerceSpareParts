@@ -2,9 +2,9 @@
 using Enums;
 using Main.Entities.Settings;
 using Main.Persistence.Context;
-using Test.Common.Abstractions;
-using Test.Common.Extensions;
+using Tests.Abstractions;
 using Tests.DataBuilders.Currency;
+using Tests.Extensions;
 
 namespace Tests.TestContexts.Currency;
 
