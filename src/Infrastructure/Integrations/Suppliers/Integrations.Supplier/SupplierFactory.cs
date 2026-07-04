@@ -6,8 +6,8 @@ public class SupplierFactory(
     IEnumerable<ISupplier> suppliers
 ) : ISupplierFactory
 {
-    private readonly Dictionary<Supplier, ISupplier> _suppliers = suppliers.ToDictionary(s => s.Supplier);
-    public ISupplier Create(Supplier supplier) { return _suppliers[supplier]; }
+    private readonly Dictionary<global::Enums.Supplier, ISupplier> _suppliers = suppliers.ToDictionary(s => s.Supplier);
+    public ISupplier Create(global::Enums.Supplier supplier) { return _suppliers[supplier]; }
     public async Task<IReadOnlyList<ISupplier>> GetAvailableSuppliers(
         CancellationToken cancellationToken = default)
     {

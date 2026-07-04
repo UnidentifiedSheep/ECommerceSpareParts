@@ -1,4 +1,5 @@
-﻿using Integrations.Supplier;
+﻿using Enums;
+using Integrations.Supplier;
 
 namespace Pricing.Application.Static;
 

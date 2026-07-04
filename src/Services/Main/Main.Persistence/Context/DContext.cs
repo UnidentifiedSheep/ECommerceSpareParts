@@ -39,8 +39,6 @@ public partial class DContext : DbContext
 
     public virtual DbSet<ProductCharacteristic> ProductCharacteristics { get; set; }
 
-    public virtual DbSet<ProductCoefficient> ProductCoefficients { get; set; }
-
     public virtual DbSet<ProductEan> ProductEans { get; set; }
 
     public virtual DbSet<ProductImage> ProductImages { get; set; }
@@ -55,8 +53,6 @@ public partial class DContext : DbContext
     public virtual DbSet<Cart> Carts { get; set; }
 
     public virtual DbSet<Category> Categories { get; set; }
-
-    public virtual DbSet<Coefficient> Coefficients { get; set; }
 
     public virtual DbSet<Currency> Currencies { get; set; }
 

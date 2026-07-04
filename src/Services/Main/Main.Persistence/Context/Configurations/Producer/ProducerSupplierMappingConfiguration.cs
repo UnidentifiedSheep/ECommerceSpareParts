@@ -32,7 +32,7 @@ public class ProducerSupplierMappingConfiguration : IEntityTypeConfiguration<Pro
             .IsUnique();
 
         builder.HasOne<Entities.Producer.Producer>()
-            .WithMany()
+            .WithMany(e => e.SupplierMappings)
             .HasForeignKey(d => d.ProducerId)
             .OnDelete(DeleteBehavior.Restrict)
             .HasConstraintName("producer_supplier_mappings_producer_id_fk");

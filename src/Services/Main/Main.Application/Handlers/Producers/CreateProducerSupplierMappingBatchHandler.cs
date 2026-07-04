@@ -2,6 +2,7 @@ using Application.Common.Interfaces.Cqrs;
 using Application.Common.Interfaces.Repositories;
 using Attributes;
 using Domain.Extensions;
+using Enums;
 using Localization.Abstractions.Interfaces;
 using Main.Application.Dtos.Producer;
 using Main.Application.Interfaces.Persistence;

@@ -7,6 +7,7 @@ using Main.Entities.Exceptions;
 using Main.Entities.Product;
 using Main.Entities.Storage;
 using Main.Entities.User;
+using Main.Enums;
 using Main.Enums.Balances;
 using Microsoft.EntityFrameworkCore;
 using Tests.DataBuilders.User;

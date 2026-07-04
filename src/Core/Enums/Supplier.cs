@@ -1,4 +1,4 @@
-namespace Integrations.Supplier;
+namespace Enums;
 
 public enum Supplier
 {

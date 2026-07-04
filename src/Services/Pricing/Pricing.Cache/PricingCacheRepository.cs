@@ -1,5 +1,6 @@
 using Cache;
 using Cache.Extensions;
+using Enums;
 using Integrations.Supplier;
 using Pricing.Application.Interfaces.Cache;
 using Pricing.Application.Static;

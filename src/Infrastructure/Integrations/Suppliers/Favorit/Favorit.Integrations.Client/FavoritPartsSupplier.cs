@@ -1,4 +1,5 @@
 using System.Net;
+using Enums;
 using Favorit.Integrations.Core.Interfaces;
 using Favorit.Integrations.Core.Models;
 using Favorit.Integrations.Core.Requests;

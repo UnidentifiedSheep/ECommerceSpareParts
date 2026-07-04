@@ -7,7 +7,7 @@ namespace Integrations.Supplier.Interfaces;
 
 public interface ISupplier
 {
-    Supplier Supplier { get; }
+    global::Enums.Supplier Supplier { get; }
 
     Task<Response<IReadOnlyList<SupplierProduct>>> GetProductsAsync(
         GetProductsRequest request,
