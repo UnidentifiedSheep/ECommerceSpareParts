@@ -1,9 +1,9 @@
-﻿namespace Api.Common.Models.Options;
+﻿namespace Application.Common.Models;
 
 public class LrtExecutorOptions
 {
     public const string SectionName = "LrtExecutor";
-    public int MaxParallelPerWorker { get; set; } = 1;
+    public int MaxParallelPerWorker { get; set; } = 3;
     public int MaxExpiredLeaseFailBatchSize { get; set; } = 100;
     public TimeSpan Delay { get; set; } = TimeSpan.FromSeconds(30);
 }

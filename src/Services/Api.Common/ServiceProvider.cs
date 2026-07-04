@@ -1,6 +1,8 @@
 using Abstractions.Models.Options;
 using Api.Common.ExceptionHandlers;
+using Api.Common.HostedServices;
 using Api.Common.Models.Options;
+using Application.Common.Models;
 using Cache;
 using Persistence;
 using RabbitMq;
@@ -90,6 +92,13 @@ public static class ServiceProvider
             .ValidateOnStart();
 
         return collection;
+    }
+
+    public static IServiceCollection AddLrtHostedServices(this IServiceCollection serviceCollection)
+    {
+        return serviceCollection.AddHostedService<LrtExecutorHostedService>()
+            .AddHostedService<ScheduledJobEnqueuerHostedService>()
+            .AddHostedService<ExpiredJobsWiperHostedService>();
     }
 
     public static IServiceCollection AddScheduledJobEnqueuerOptions(this IServiceCollection collection)

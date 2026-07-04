@@ -54,8 +54,7 @@ builder.Services
 AddHostedServiceOptions(builder.Services);
 builder.Services
     .AddHostedService<RecalculationCheckHostedService>()
-    .AddHostedService<LrtExecutorHostedService>()
-    .AddHostedService<ScheduledJobEnqueuerHostedService>();
+    .AddLrtHostedServices();
 
 AddMassTransit(builder);
 

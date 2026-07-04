@@ -1,16 +1,13 @@
-using Api.Common.Models.Options;
-using Application.Common.Handlers.JobSchedules;
+using Application.Common.Interfaces.Lrt;
 using Application.Common.Models;
-using MediatR;
 using Microsoft.Extensions.Options;
 
 namespace Api.Common.HostedServices;
 
-public class ScheduledJobEnqueuerHostedService(
+public class ExpiredJobsWiperHostedService(
     IServiceScopeFactory scopeFactory,
-    ILogger<ScheduledJobEnqueuerHostedService> logger,
-    IOptionsMonitor<ScheduledJobEnqueuerOptions> options
-) : BackgroundService
+    ILogger<ExpiredJobsWiperHostedService> logger,
+    IOptionsMonitor<LrtExecutorOptions> options) : BackgroundService
 {
     protected override async Task ExecuteAsync(CancellationToken stoppingToken)
     {
@@ -22,20 +19,25 @@ public class ScheduledJobEnqueuerHostedService(
     }
 
     private async Task Iteration(
-        ScheduledJobEnqueuerOptions opt,
+        LrtExecutorOptions opt,
         CancellationToken ct)
     {
         try
         {
             await using var scope = scopeFactory.CreateAsyncScope();
-            var sender = scope.ServiceProvider.GetRequiredService<ISender>();
-
-            await sender.Send(
-                new QueueScheduledJobsCommand(opt.BatchSize),
+            var leaseService = scope.ServiceProvider.GetRequiredService<IJobLeaseService>();
+            
+            var jobs = await leaseService.FailExpiredJobsWithoutAttempts(
+                opt.MaxExpiredLeaseFailBatchSize,
                 ct);
+
+            if (jobs.Count > 0)
+                logger.LogInformation(
+                    "Jobs with expired leases are made 'Failed'. Count: {Count}",
+                    jobs.Count);
         }
         catch (OperationCanceledException) when (ct.IsCancellationRequested) { throw; }
-        catch (Exception ex) { logger.LogError(ex, "Scheduled job enqueuer failed."); }
+        catch (Exception ex) { logger.LogError(ex, "Expired job wipe failed."); }
         finally { await Task.Delay(opt.Delay, ct); }
     }
 }

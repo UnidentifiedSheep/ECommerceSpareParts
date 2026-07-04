@@ -9,6 +9,8 @@ using Application.Common.Handlers.JobSchedules;
 using Application.Common.Handlers.JobSchedules.CreateSchedule;
 using Application.Common.Handlers.JobSchedules.GetSchedule;
 using Application.Common.Handlers.JobSchedules.UpdateSchedule;
+using Application.Common.Interfaces.Lrt;
+using Application.Common.LRT;
 using Application.Common.NamedObject;
 using MediatR;
 using Microsoft.Extensions.Configuration;
@@ -93,6 +95,9 @@ public static class ServiceProvider
         services.RegisterNamedObject<LrtNamedObjectBase>(assembly)
             .RegisterFluentValidations(typeof(GetAllAvailableJobsHandler).Assembly);
 
+        services.AddScoped<IJobLeaseService, JobLeaseService>();
+        services.AddSingleton<ILrtQuotaManager, LrtQuotaManager>();
+        
         services.AddScoped<
             IRequestHandler<GetAllAvailableJobsQuery, GetAllAvailableJobsResult>,
             GetAllAvailableJobsHandler>();
@@ -100,10 +105,6 @@ public static class ServiceProvider
         services.AddScoped<
             IRequestHandler<QueueJobCommand, QueueJobResult>,
             QueueJobHandler>();
-
-        services.AddScoped<
-            IRequestHandler<RunJobBatchCommand, Unit>,
-            RunJobBatchHandler>();
 
         services.AddScoped<
             IRequestHandler<GetJobsQuery, GetJobsResult>,

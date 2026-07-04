@@ -1,4 +1,4 @@
-namespace Api.Common.Models.Options;
+namespace Application.Common.Models;
 
 public record ScheduledJobEnqueuerOptions
 {

@@ -74,8 +74,7 @@ builder.Services
 AddHostedServiceOptions(builder.Services);
 builder.Services
     .AddHostedService<EmailWorkHostedService>()
-    .AddHostedService<LrtExecutorHostedService>()
-    .AddHostedService<ScheduledJobEnqueuerHostedService>();
+    .AddLrtHostedServices();
 
 var host = builder.Build();
 
