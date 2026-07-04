@@ -105,6 +105,10 @@ public static class ServiceProvider
         services.AddScoped<
             IRequestHandler<QueueJobCommand, QueueJobResult>,
             QueueJobHandler>();
+        
+        services.AddScoped<
+            IRequestHandler<CancelJobCommand, Unit>,
+            CancelJobHandler>();
 
         services.AddScoped<
             IRequestHandler<GetJobsQuery, GetJobsResult>,
