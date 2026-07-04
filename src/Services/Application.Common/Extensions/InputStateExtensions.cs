@@ -14,6 +14,6 @@ public static class InputStateExtensions
             throw new InvalidOperationException("Invalid input state");
 
         inputState.ValidateState();
-        return JsonSerializer.Serialize(inputState);
+        return JsonSerializer.Serialize(inputState, inputState.GetType());
     }
 }
