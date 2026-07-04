@@ -15,6 +15,9 @@ namespace Analytics.Migrator.Migrations
             migrationBuilder.EnsureSchema(
                 name: "msg");
 
+            migrationBuilder.EnsureSchema(
+                name: "job");
+
             migrationBuilder.AlterDatabase()
                 .Annotation("Npgsql:PostgresExtension:dblink", ",,")
                 .Annotation("Npgsql:PostgresExtension:pg_trgm", ",,")
@@ -45,7 +48,33 @@ namespace Analytics.Migrator.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "job_schedules",
+                schema: "job",
+                columns: table => new
+                {
+                    id = table.Column<Guid>(type: "uuid", nullable: false),
+                    name = table.Column<string>(type: "character varying(64)", maxLength: 64, nullable: false),
+                    description = table.Column<string>(type: "character varying(255)", maxLength: 255, nullable: true),
+                    job_system_name = table.Column<string>(type: "character varying(128)", maxLength: 128, nullable: false),
+                    input_state = table.Column<string>(type: "text", nullable: false),
+                    max_attempts = table.Column<int>(type: "integer", nullable: false),
+                    cron = table.Column<string>(type: "character varying(128)", maxLength: 128, nullable: false),
+                    enabled = table.Column<bool>(type: "boolean", nullable: false),
+                    last_queued_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
+                    next_run_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
+                    created_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
+                    updated_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
+                    who_created = table.Column<Guid>(type: "uuid", nullable: true),
+                    who_updated = table.Column<Guid>(type: "uuid", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("job_schedules_pk", x => x.id);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "jobs",
+                schema: "job",
                 columns: table => new
                 {
                     id = table.Column<Guid>(type: "uuid", nullable: false),
@@ -56,6 +85,8 @@ namespace Analytics.Migrator.Migrations
                     max_attempts = table.Column<int>(type: "integer", nullable: false),
                     error_message = table.Column<string>(type: "text", nullable: true),
                     locked_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
+                    lease_expires_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
+                    lease_holder_id = table.Column<Guid>(type: "uuid", nullable: true),
                     created_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
                     updated_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
                     who_created = table.Column<Guid>(type: "uuid", nullable: true),
@@ -126,26 +157,12 @@ namespace Analytics.Migrator.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "sale_content_detail",
-                columns: table => new
-                {
-                    id = table.Column<int>(type: "integer", nullable: false),
-                    currency_id = table.Column<int>(type: "integer", nullable: false),
-                    buy_price = table.Column<decimal>(type: "numeric", nullable: true),
-                    count = table.Column<int>(type: "integer", nullable: false),
-                    purchase_date = table.Column<DateTime>(type: "timestamp with time zone", nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("sale_content_detail_pk", x => x.id);
-                });
-
-            migrationBuilder.CreateTable(
                 name: "sales_fact",
                 columns: table => new
                 {
                     id = table.Column<Guid>(type: "uuid", maxLength: 128, nullable: false),
                     currency_id = table.Column<int>(type: "integer", nullable: false),
+                    base_currency_id = table.Column<int>(type: "integer", nullable: false),
                     buyer_id = table.Column<Guid>(type: "uuid", nullable: false),
                     created_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
                     processed_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
@@ -173,6 +190,36 @@ namespace Analytics.Migrator.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "job_schedule_runs",
+                schema: "job",
+                columns: table => new
+                {
+                    id = table.Column<Guid>(type: "uuid", nullable: false),
+                    job_schedule_id = table.Column<Guid>(type: "uuid", nullable: false),
+                    job_id = table.Column<Guid>(type: "uuid", nullable: false),
+                    scheduled_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
+                    queued_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("job_schedule_runs_pk", x => x.id);
+                    table.ForeignKey(
+                        name: "job_schedule_runs_job_id_fk",
+                        column: x => x.job_id,
+                        principalSchema: "job",
+                        principalTable: "jobs",
+                        principalColumn: "id",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "job_schedule_runs_job_schedule_id_fk",
+                        column: x => x.job_schedule_id,
+                        principalSchema: "job",
+                        principalTable: "job_schedules",
+                        principalColumn: "id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "metric_jobs",
                 columns: table => new
                 {
@@ -185,6 +232,7 @@ namespace Analytics.Migrator.Migrations
                     table.ForeignKey(
                         name: "metric_jobs_job_id_fk",
                         column: x => x.job_id,
+                        principalSchema: "job",
                         principalTable: "jobs",
                         principalColumn: "id",
                         onDelete: ReferentialAction.Cascade);
@@ -271,6 +319,7 @@ namespace Analytics.Migrator.Migrations
                     product_id = table.Column<int>(type: "integer", nullable: false),
                     count = table.Column<int>(type: "integer", nullable: false),
                     price = table.Column<decimal>(type: "numeric", nullable: false),
+                    price_in_base_currency = table.Column<decimal>(type: "numeric", nullable: false),
                     discount = table.Column<decimal>(type: "numeric", nullable: false)
                 },
                 constraints: table =>
@@ -284,6 +333,29 @@ namespace Analytics.Migrator.Migrations
                         onDelete: ReferentialAction.Cascade);
                 });
 
+            migrationBuilder.CreateTable(
+                name: "sale_content_detail",
+                columns: table => new
+                {
+                    id = table.Column<int>(type: "integer", nullable: false),
+                    sale_content_id = table.Column<int>(type: "integer", nullable: false),
+                    currency_id = table.Column<int>(type: "integer", nullable: false),
+                    buy_price = table.Column<decimal>(type: "numeric", nullable: false),
+                    buy_price_in_base_currency = table.Column<decimal>(type: "numeric", nullable: false),
+                    count = table.Column<int>(type: "integer", nullable: false),
+                    purchase_date = table.Column<DateTime>(type: "timestamp with time zone", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("sale_content_detail_pk", x => x.id);
+                    table.ForeignKey(
+                        name: "sale_content_detail_sale_content_id_fk",
+                        column: x => x.sale_content_id,
+                        principalTable: "sale_contents",
+                        principalColumn: "id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
             migrationBuilder.CreateIndex(
                 name: "IX_InboxState_Delivered",
                 schema: "msg",
@@ -291,27 +363,76 @@ namespace Analytics.Migrator.Migrations
                 column: "Delivered");
 
             migrationBuilder.CreateIndex(
+                name: "job_schedule_runs_job_id_idx",
+                schema: "job",
+                table: "job_schedule_runs",
+                column: "job_id",
+                unique: true);
+
+            migrationBuilder.CreateIndex(
+                name: "job_schedule_runs_job_schedule_id_scheduled_at_idx",
+                schema: "job",
+                table: "job_schedule_runs",
+                columns: new[] { "job_schedule_id", "scheduled_at" },
+                unique: true);
+
+            migrationBuilder.CreateIndex(
+                name: "domain.commonentities.jobschedule_who_created_idx",
+                schema: "job",
+                table: "job_schedules",
+                column: "who_created");
+
+            migrationBuilder.CreateIndex(
+                name: "domain.commonentities.jobschedule_who_updated_idx",
+                schema: "job",
+                table: "job_schedules",
+                column: "who_updated");
+
+            migrationBuilder.CreateIndex(
+                name: "job_schedules_enabled_next_run_at_id_idx",
+                schema: "job",
+                table: "job_schedules",
+                columns: new[] { "enabled", "next_run_at", "id" });
+
+            migrationBuilder.CreateIndex(
+                name: "job_schedules_job_system_name_idx",
+                schema: "job",
+                table: "job_schedules",
+                column: "job_system_name");
+
+            migrationBuilder.CreateIndex(
+                name: "job_schedules_name_idx",
+                schema: "job",
+                table: "job_schedules",
+                column: "name");
+
+            migrationBuilder.CreateIndex(
                 name: "domain.commonentities.job_who_created_idx",
+                schema: "job",
                 table: "jobs",
                 column: "who_created");
 
             migrationBuilder.CreateIndex(
                 name: "domain.commonentities.job_who_updated_idx",
+                schema: "job",
                 table: "jobs",
                 column: "who_updated");
 
             migrationBuilder.CreateIndex(
                 name: "jobs_locked_at_idx",
+                schema: "job",
                 table: "jobs",
                 column: "locked_at");
 
             migrationBuilder.CreateIndex(
                 name: "jobs_status_id_idx",
+                schema: "job",
                 table: "jobs",
                 columns: new[] { "status", "id" });
 
             migrationBuilder.CreateIndex(
                 name: "jobs_system_name_idx",
+                schema: "job",
                 table: "jobs",
                 column: "system_name");
 
@@ -425,6 +546,11 @@ namespace Analytics.Migrator.Migrations
                 column: "currency_id");
 
             migrationBuilder.CreateIndex(
+                name: "sale_content_detail_sale_content_id_index",
+                table: "sale_content_detail",
+                column: "sale_content_id");
+
+            migrationBuilder.CreateIndex(
                 name: "sale_contents_product_id_index",
                 table: "sale_contents",
                 column: "product_id");
@@ -464,6 +590,10 @@ namespace Analytics.Migrator.Migrations
         protected override void Down(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.DropTable(
+                name: "job_schedule_runs",
+                schema: "job");
+
+            migrationBuilder.DropTable(
                 name: "metric_jobs");
 
             migrationBuilder.DropTable(
@@ -477,13 +607,15 @@ namespace Analytics.Migrator.Migrations
                 name: "sale_content_detail");
 
             migrationBuilder.DropTable(
-                name: "sale_contents");
-
-            migrationBuilder.DropTable(
                 name: "settings");
 
             migrationBuilder.DropTable(
-                name: "jobs");
+                name: "job_schedules",
+                schema: "job");
+
+            migrationBuilder.DropTable(
+                name: "jobs",
+                schema: "job");
 
             migrationBuilder.DropTable(
                 name: "metrics");
@@ -498,6 +630,9 @@ namespace Analytics.Migrator.Migrations
 
             migrationBuilder.DropTable(
                 name: "purchases_fact");
+
+            migrationBuilder.DropTable(
+                name: "sale_contents");
 
             migrationBuilder.DropTable(
                 name: "sales_fact");

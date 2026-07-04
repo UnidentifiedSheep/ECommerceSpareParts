@@ -21,6 +21,9 @@ namespace Main.Migrator.Migrations
                 name: "msg");
 
             migrationBuilder.EnsureSchema(
+                name: "job");
+
+            migrationBuilder.EnsureSchema(
                 name: "auth");
 
             migrationBuilder.AlterDatabase()
@@ -119,8 +122,33 @@ namespace Main.Migrator.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "job_schedules",
+                schema: "job",
+                columns: table => new
+                {
+                    id = table.Column<Guid>(type: "uuid", nullable: false),
+                    name = table.Column<string>(type: "character varying(64)", maxLength: 64, nullable: false),
+                    description = table.Column<string>(type: "character varying(255)", maxLength: 255, nullable: true),
+                    job_system_name = table.Column<string>(type: "character varying(128)", maxLength: 128, nullable: false),
+                    input_state = table.Column<string>(type: "text", nullable: false),
+                    max_attempts = table.Column<int>(type: "integer", nullable: false),
+                    cron = table.Column<string>(type: "character varying(128)", maxLength: 128, nullable: false),
+                    enabled = table.Column<bool>(type: "boolean", nullable: false),
+                    last_queued_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
+                    next_run_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
+                    created_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
+                    updated_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
+                    who_created = table.Column<Guid>(type: "uuid", nullable: true),
+                    who_updated = table.Column<Guid>(type: "uuid", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("job_schedules_pk", x => x.id);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "jobs",
-                schema: "public",
+                schema: "job",
                 columns: table => new
                 {
                     id = table.Column<Guid>(type: "uuid", nullable: false),
@@ -131,6 +159,8 @@ namespace Main.Migrator.Migrations
                     max_attempts = table.Column<int>(type: "integer", nullable: false),
                     error_message = table.Column<string>(type: "text", nullable: true),
                     locked_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
+                    lease_expires_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
+                    lease_holder_id = table.Column<Guid>(type: "uuid", nullable: true),
                     created_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
                     updated_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
                     who_created = table.Column<Guid>(type: "uuid", nullable: true),
@@ -328,6 +358,36 @@ namespace Main.Migrator.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "job_schedule_runs",
+                schema: "job",
+                columns: table => new
+                {
+                    id = table.Column<Guid>(type: "uuid", nullable: false),
+                    job_schedule_id = table.Column<Guid>(type: "uuid", nullable: false),
+                    job_id = table.Column<Guid>(type: "uuid", nullable: false),
+                    scheduled_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
+                    queued_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("job_schedule_runs_pk", x => x.id);
+                    table.ForeignKey(
+                        name: "job_schedule_runs_job_id_fk",
+                        column: x => x.job_id,
+                        principalSchema: "job",
+                        principalTable: "jobs",
+                        principalColumn: "id",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "job_schedule_runs_job_schedule_id_fk",
+                        column: x => x.job_schedule_id,
+                        principalSchema: "job",
+                        principalTable: "job_schedules",
+                        principalColumn: "id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "OutboxMessage",
                 schema: "msg",
                 columns: table => new
@@ -373,13 +433,35 @@ namespace Main.Migrator.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "producers_other_names",
+                name: "producer_supplier_mappings",
+                schema: "public",
+                columns: table => new
+                {
+                    id = table.Column<int>(type: "integer", nullable: false)
+                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
+                    producer_id = table.Column<int>(type: "integer", nullable: false),
+                    supplier = table.Column<string>(type: "character varying(32)", maxLength: 32, nullable: false),
+                    producer_supplier_name = table.Column<string>(type: "character varying(128)", maxLength: 128, nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("producer_supplier_mappings_pk", x => x.id);
+                    table.ForeignKey(
+                        name: "producer_supplier_mappings_producer_id_fk",
+                        column: x => x.producer_id,
+                        principalSchema: "public",
+                        principalTable: "producer",
+                        principalColumn: "id",
+                        onDelete: ReferentialAction.Restrict);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "producers_aliases",
                 schema: "public",
                 columns: table => new
                 {
                     other_name = table.Column<string>(type: "character varying(64)", maxLength: 64, nullable: false),
-                    producer_id = table.Column<int>(type: "integer", nullable: false),
-                    where_used = table.Column<string>(type: "character varying(64)", maxLength: 64, nullable: false)
+                    producer_id = table.Column<int>(type: "integer", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -821,7 +903,7 @@ namespace Main.Migrator.Migrations
                     phone_number = table.Column<string>(type: "character varying(32)", maxLength: 32, nullable: false),
                     confirmed = table.Column<bool>(type: "boolean", nullable: false),
                     is_primary = table.Column<bool>(type: "boolean", nullable: false),
-                    phone_type = table.Column<string>(type: "character varying(32)", maxLength: 32, nullable: true),
+                    phone_type = table.Column<string>(type: "character varying(32)", maxLength: 32, nullable: false),
                     confirmed_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
                     created_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
                     updated_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
@@ -935,14 +1017,10 @@ namespace Main.Migrator.Migrations
                 {
                     id = table.Column<Guid>(type: "uuid", nullable: false, defaultValueSql: "gen_random_uuid()"),
                     user_id = table.Column<Guid>(type: "uuid", nullable: false),
+                    vehicle_id = table.Column<Guid>(type: "uuid", nullable: false),
                     vin = table.Column<string>(type: "character varying(50)", maxLength: 50, nullable: true),
-                    plate_number = table.Column<string>(type: "text", nullable: false),
-                    manufacture = table.Column<string>(type: "character varying(50)", maxLength: 50, nullable: false),
-                    model = table.Column<string>(type: "character varying(125)", maxLength: 125, nullable: false),
-                    modification = table.Column<string>(type: "text", nullable: true),
-                    engine_code = table.Column<string>(type: "text", nullable: true),
-                    production_year = table.Column<int>(type: "integer", nullable: true),
-                    comment = table.Column<string>(type: "text", nullable: true),
+                    plate_number = table.Column<string>(type: "character varying(32)", maxLength: 32, nullable: false),
+                    comment = table.Column<string>(type: "character varying(500)", maxLength: 500, nullable: true),
                     created_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
                     updated_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
                     who_created = table.Column<Guid>(type: "uuid", nullable: true),
@@ -1786,32 +1864,76 @@ namespace Main.Migrator.Migrations
                 column: "Delivered");
 
             migrationBuilder.CreateIndex(
+                name: "job_schedule_runs_job_id_idx",
+                schema: "job",
+                table: "job_schedule_runs",
+                column: "job_id",
+                unique: true);
+
+            migrationBuilder.CreateIndex(
+                name: "job_schedule_runs_job_schedule_id_scheduled_at_idx",
+                schema: "job",
+                table: "job_schedule_runs",
+                columns: new[] { "job_schedule_id", "scheduled_at" },
+                unique: true);
+
+            migrationBuilder.CreateIndex(
+                name: "domain.commonentities.jobschedule_who_created_idx",
+                schema: "job",
+                table: "job_schedules",
+                column: "who_created");
+
+            migrationBuilder.CreateIndex(
+                name: "domain.commonentities.jobschedule_who_updated_idx",
+                schema: "job",
+                table: "job_schedules",
+                column: "who_updated");
+
+            migrationBuilder.CreateIndex(
+                name: "job_schedules_enabled_next_run_at_id_idx",
+                schema: "job",
+                table: "job_schedules",
+                columns: new[] { "enabled", "next_run_at", "id" });
+
+            migrationBuilder.CreateIndex(
+                name: "job_schedules_job_system_name_idx",
+                schema: "job",
+                table: "job_schedules",
+                column: "job_system_name");
+
+            migrationBuilder.CreateIndex(
+                name: "job_schedules_name_idx",
+                schema: "job",
+                table: "job_schedules",
+                column: "name");
+
+            migrationBuilder.CreateIndex(
                 name: "domain.commonentities.job_who_created_idx",
-                schema: "public",
+                schema: "job",
                 table: "jobs",
                 column: "who_created");
 
             migrationBuilder.CreateIndex(
                 name: "domain.commonentities.job_who_updated_idx",
-                schema: "public",
+                schema: "job",
                 table: "jobs",
                 column: "who_updated");
 
             migrationBuilder.CreateIndex(
                 name: "jobs_locked_at_idx",
-                schema: "public",
+                schema: "job",
                 table: "jobs",
                 column: "locked_at");
 
             migrationBuilder.CreateIndex(
                 name: "jobs_status_id_idx",
-                schema: "public",
+                schema: "job",
                 table: "jobs",
                 columns: new[] { "status", "id" });
 
             migrationBuilder.CreateIndex(
                 name: "jobs_system_name_idx",
-                schema: "public",
+                schema: "job",
                 table: "jobs",
                 column: "system_name");
 
@@ -1939,24 +2061,23 @@ namespace Main.Migrator.Migrations
                 unique: true);
 
             migrationBuilder.CreateIndex(
+                name: "producer_supplier_mappings_uidx",
+                schema: "public",
+                table: "producer_supplier_mappings",
+                columns: new[] { "producer_id", "supplier" },
+                unique: true);
+
+            migrationBuilder.CreateIndex(
                 name: "producers_other_names_producer_id_index",
                 schema: "public",
-                table: "producers_other_names",
+                table: "producers_aliases",
                 column: "producer_id");
 
             migrationBuilder.CreateIndex(
                 name: "producers_other_names_producer_other_name_index",
                 schema: "public",
-                table: "producers_other_names",
+                table: "producers_aliases",
                 column: "other_name")
-                .Annotation("Npgsql:IndexMethod", "gin")
-                .Annotation("Npgsql:IndexOperators", new[] { "gin_trgm_ops" });
-
-            migrationBuilder.CreateIndex(
-                name: "producers_other_names_where_used_index",
-                schema: "public",
-                table: "producers_other_names",
-                column: "where_used")
                 .Annotation("Npgsql:IndexMethod", "gin")
                 .Annotation("Npgsql:IndexOperators", new[] { "gin_trgm_ops" });
 
@@ -2254,13 +2375,13 @@ namespace Main.Migrator.Migrations
                 column: "storage_content_id");
 
             migrationBuilder.CreateIndex(
-                name: "main.entities.setting.storagecontentsetting_who_created_idx",
+                name: "main.entities.settings.supplier.favoritsuppliersetting_who_created_idx",
                 schema: "public",
                 table: "settings",
                 column: "who_created");
 
             migrationBuilder.CreateIndex(
-                name: "main.entities.setting.storagecontentsetting_who_updated_idx",
+                name: "main.entities.settings.supplier.favoritsuppliersetting_who_updated_idx",
                 schema: "public",
                 table: "settings",
                 column: "who_updated");
@@ -2769,22 +2890,6 @@ namespace Main.Migrator.Migrations
                 .Annotation("Npgsql:IndexOperators", new[] { "gin_trgm_ops" });
 
             migrationBuilder.CreateIndex(
-                name: "user_vehicles_manufacture_index",
-                schema: "public",
-                table: "user_vehicles",
-                column: "manufacture")
-                .Annotation("Npgsql:IndexMethod", "gin")
-                .Annotation("Npgsql:IndexOperators", new[] { "gin_trgm_ops" });
-
-            migrationBuilder.CreateIndex(
-                name: "user_vehicles_model_index",
-                schema: "public",
-                table: "user_vehicles",
-                column: "model")
-                .Annotation("Npgsql:IndexMethod", "gin")
-                .Annotation("Npgsql:IndexOperators", new[] { "gin_trgm_ops" });
-
-            migrationBuilder.CreateIndex(
                 name: "user_vehicles_plate_number_uindex",
                 schema: "public",
                 table: "user_vehicles",
@@ -2796,6 +2901,12 @@ namespace Main.Migrator.Migrations
                 schema: "public",
                 table: "user_vehicles",
                 column: "user_id");
+
+            migrationBuilder.CreateIndex(
+                name: "user_vehicles_vehicle_id_index",
+                schema: "public",
+                table: "user_vehicles",
+                column: "vehicle_id");
 
             migrationBuilder.CreateIndex(
                 name: "user_vehicles_vin_uindex",
@@ -2870,8 +2981,8 @@ namespace Main.Migrator.Migrations
                 schema: "public");
 
             migrationBuilder.DropTable(
-                name: "jobs",
-                schema: "public");
+                name: "job_schedule_runs",
+                schema: "job");
 
             migrationBuilder.DropTable(
                 name: "order_items",
@@ -2882,7 +2993,11 @@ namespace Main.Migrator.Migrations
                 schema: "msg");
 
             migrationBuilder.DropTable(
-                name: "producers_other_names",
+                name: "producer_supplier_mappings",
+                schema: "public");
+
+            migrationBuilder.DropTable(
+                name: "producers_aliases",
                 schema: "public");
 
             migrationBuilder.DropTable(
@@ -2992,6 +3107,14 @@ namespace Main.Migrator.Migrations
             migrationBuilder.DropTable(
                 name: "storage_content_reservations",
                 schema: "public");
+
+            migrationBuilder.DropTable(
+                name: "jobs",
+                schema: "job");
+
+            migrationBuilder.DropTable(
+                name: "job_schedules",
+                schema: "job");
 
             migrationBuilder.DropTable(
                 name: "orders",

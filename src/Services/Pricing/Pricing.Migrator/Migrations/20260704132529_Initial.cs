@@ -217,12 +217,12 @@ namespace Pricing.Migrator.Migrations
                 column: "Created");
 
             migrationBuilder.CreateIndex(
-                name: "domain.commonentities.setting_who_created_idx",
+                name: "pricing.entities.settings.pricingsetting_who_created_idx",
                 table: "settings",
                 column: "who_created");
 
             migrationBuilder.CreateIndex(
-                name: "domain.commonentities.setting_who_updated_idx",
+                name: "pricing.entities.settings.pricingsetting_who_updated_idx",
                 table: "settings",
                 column: "who_updated");
         }
