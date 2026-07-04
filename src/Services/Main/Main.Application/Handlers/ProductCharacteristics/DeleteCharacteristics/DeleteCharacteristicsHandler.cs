@@ -1,5 +1,4 @@
 using Abstractions.Interfaces.Persistence;
-using Abstractions.Interfaces.Services;
 using Application.Common.Interfaces.Cqrs;
 using Application.Common.Interfaces.Repositories;
 using Attributes;
@@ -15,7 +14,8 @@ public record DeleteCharacteristicsCommand(int ProductId, string Name) : IComman
 
 public class DeleteCharacteristicsHandler(
     IRepository<ProductCharacteristic, (int, string)> repository,
-    IUnitOfWork unitOfWork) : ICommandHandler<DeleteCharacteristicsCommand>
+    IUnitOfWork unitOfWork
+) : ICommandHandler<DeleteCharacteristicsCommand>
 {
     public async Task<Unit> Handle(DeleteCharacteristicsCommand request, CancellationToken cancellationToken)
     {

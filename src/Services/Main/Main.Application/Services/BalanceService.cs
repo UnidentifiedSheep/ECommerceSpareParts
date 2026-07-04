@@ -1,5 +1,4 @@
 using Abstractions.Interfaces.Persistence;
-using Abstractions.Interfaces.Services;
 using Abstractions.Models.Options;
 using Application.Common.Interfaces.Currency;
 using Application.Common.Interfaces.Repositories;
@@ -15,7 +14,8 @@ public class BalanceService(
     ICurrencyConverter currencyConverter,
     IOptions<SystemOptions> systemOptions,
     ITransactionFinancialProfileService transactionFinancialProfileService,
-    IUnitOfWork unitOfWork) : IBalanceService
+    IUnitOfWork unitOfWork
+) : IBalanceService
 {
     public async Task ChangeSenderReceiverBalancesAsync(
         Transaction transaction,

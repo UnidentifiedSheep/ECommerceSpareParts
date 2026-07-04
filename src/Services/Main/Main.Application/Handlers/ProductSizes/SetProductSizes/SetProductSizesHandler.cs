@@ -1,10 +1,7 @@
 ﻿using Abstractions.Interfaces.Persistence;
-using Abstractions.Interfaces.Services;
-using Application.Common.Interfaces;
 using Application.Common.Interfaces.Cqrs;
 using Application.Common.Interfaces.Repositories;
 using Attributes;
-using Contracts.Products;
 using Enums;
 using Main.Entities.Product;
 using MediatR;
@@ -13,14 +10,19 @@ namespace Main.Application.Handlers.ProductSizes.SetProductSizes;
 
 [AutoSave]
 [Transactional]
-public record SetProductSizesCommand(int ProductId, decimal Length, decimal Width, decimal Height, DimensionUnit Unit)
+public record SetProductSizesCommand(
+    int ProductId,
+    decimal Length,
+    decimal Width,
+    decimal Height,
+    DimensionUnit Unit
+)
     : ICommand;
 
 public class SetProductSizesHandler(
     IRepository<ProductSize, int> repository,
-    IUnitOfWork unitOfWork,
-    IIntegrationEventScope integrationEventScope)
-    : ICommandHandler<SetProductSizesCommand>
+    IUnitOfWork unitOfWork
+) : ICommandHandler<SetProductSizesCommand>
 {
     public async Task<Unit> Handle(SetProductSizesCommand request, CancellationToken cancellationToken)
     {
@@ -32,7 +34,12 @@ public class SetProductSizesHandler(
 
         if (sizes == null)
         {
-            sizes = ProductSize.Create(request.ProductId, length, width, height, unit);
+            sizes = ProductSize.Create(
+                request.ProductId,
+                length,
+                width,
+                height,
+                unit);
             await unitOfWork.AddAsync(sizes, cancellationToken);
         }
 
@@ -40,11 +47,6 @@ public class SetProductSizesHandler(
         sizes.SetWidth(width);
         sizes.SetHeight(height);
         sizes.SetUnit(unit);
-
-        integrationEventScope.Add(new ProductSizesUpdatedEvent
-        {
-            ProductId = request.ProductId
-        });
 
         return Unit.Value;
     }

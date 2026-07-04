@@ -7,11 +7,13 @@ namespace Main.Entities.User;
 
 public class UserInfo : Entity<UserInfo, Guid>, ILinqEntity<UserInfo, Guid>
 {
-    private UserInfo()
-    {
-    }
+    private UserInfo() { }
 
-    private UserInfo(Guid userId, string name, string surname, string? description)
+    private UserInfo(
+        Guid userId,
+        string name,
+        string surname,
+        string? description)
     {
         UserId = userId;
         SetName(name);
@@ -25,19 +27,24 @@ public class UserInfo : Entity<UserInfo, Guid>, ILinqEntity<UserInfo, Guid>
     public string? Description { get; private set; }
     public string SearchColumn { get; private set; } = null!;
 
-    public static Expression<Func<UserInfo, Guid>> GetKeySelector()
-    {
-        return x => x.UserId;
-    }
+    public static Expression<Func<UserInfo, Guid>> GetKeySelector() { return x => x.UserId; }
 
     public static Expression<Func<UserInfo, bool>> GetEqualityExpression(Guid key)
     {
         return x => x.UserId == key;
     }
 
-    internal static UserInfo Create(Guid userId, string name, string surname, string? description)
+    internal static UserInfo Create(
+        Guid userId,
+        string name,
+        string surname,
+        string? description)
     {
-        return new UserInfo(userId, name, surname, description);
+        return new UserInfo(
+            userId,
+            name,
+            surname,
+            description);
     }
 
     public void SetName(string name)
@@ -68,20 +75,17 @@ public class UserInfo : Entity<UserInfo, Guid>, ILinqEntity<UserInfo, Guid>
         UpdateSearchColumn();
     }
 
-    internal void Update(string name, string surname, string? description)
+    internal void Update(
+        string name,
+        string surname,
+        string? description)
     {
         SetName(name);
         SetSurname(surname);
         SetDescription(description);
     }
 
-    private void UpdateSearchColumn()
-    {
-        SearchColumn = $"{Name} {Surname} {Description}".ToUpperInvariant();
-    }
+    private void UpdateSearchColumn() { SearchColumn = $"{Name} {Surname} {Description}".ToUpperInvariant(); }
 
-    public override Guid GetId()
-    {
-        return UserId;
-    }
+    public override Guid GetId() { return UserId; }
 }

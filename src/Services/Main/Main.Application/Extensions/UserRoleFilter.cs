@@ -1,7 +1,7 @@
 using System.Linq.Expressions;
 using Application.Common.Interfaces.Repositories;
 using Main.Entities.User;
-using RoleEnum = Main.Enums.Role;
+using RoleEnum = Enums.Role;
 
 namespace Main.Application.Extensions;
 
@@ -12,7 +12,10 @@ internal static class UserRoleFilter
         IEnumerable<RoleEnum> roles,
         bool include)
     {
-        return Apply(query, NormalizeMany(roles), include);
+        return Apply(
+            query,
+            NormalizeMany(roles),
+            include);
     }
 
     public static IQueryable<User> Apply(
@@ -20,7 +23,10 @@ internal static class UserRoleFilter
         IEnumerable<string> roles,
         bool include)
     {
-        return Apply(query, NormalizeMany(roles), include);
+        return Apply(
+            query,
+            NormalizeMany(roles),
+            include);
     }
 
     public static CriteriaBuilder<User> Apply(
@@ -28,7 +34,10 @@ internal static class UserRoleFilter
         IEnumerable<RoleEnum> roles,
         bool include)
     {
-        return Apply(criteria, NormalizeMany(roles), include);
+        return Apply(
+            criteria,
+            NormalizeMany(roles),
+            include);
     }
 
     public static CriteriaBuilder<User> Apply(
@@ -36,7 +45,10 @@ internal static class UserRoleFilter
         IEnumerable<string> roles,
         bool include)
     {
-        return Apply(criteria, NormalizeMany(roles), include);
+        return Apply(
+            criteria,
+            NormalizeMany(roles),
+            include);
     }
 
     private static IQueryable<User> Apply(

@@ -1,13 +1,12 @@
-using Application.Common.Interfaces;
 using Application.Common.Interfaces.Cqrs;
+using Application.Common.Interfaces.Events;
 using Application.Common.Interfaces.Repositories;
 using Attributes;
-using Contracts.Products;
 using Main.Application.Dtos.Product;
 using Main.Application.Interfaces.Persistence;
+using Main.Entities.DomainEvents.Product;
 using Main.Entities.Exceptions;
 using Main.Entities.Product;
-using Main.Enums;
 using Main.Enums.Products;
 using MediatR;
 
@@ -18,10 +17,13 @@ namespace Main.Application.Handlers.Products.MakeLinkageBetweenArticles;
 public record MakeLinkageBetweenProductsCommand(List<NewProductLinkageDto> Linkages) : ICommand<Unit>;
 
 public class MakeLinkageBetweenProductsHandler(
-    IIntegrationEventScope integrationEventScope,
-    IProductRepository repository) : ICommandHandler<MakeLinkageBetweenProductsCommand, Unit>
+    IProductRepository repository,
+    IDomainEventScope domainEventScope
+) : ICommandHandler<MakeLinkageBetweenProductsCommand, Unit>
 {
-    public async Task<Unit> Handle(MakeLinkageBetweenProductsCommand request, CancellationToken cancellationToken)
+    public async Task<Unit> Handle(
+        MakeLinkageBetweenProductsCommand request,
+        CancellationToken cancellationToken)
     {
         var linkages = request.Linkages;
         var updatedIds = new HashSet<int>();
@@ -33,7 +35,8 @@ public class MakeLinkageBetweenProductsHandler(
         }
 
         foreach (var id in updatedIds)
-            integrationEventScope.Add(new ProductLinkageUpdatedEvent { Id = id });
+            domainEventScope.Add(new ProductLinkageUpdatedDomainEvent(id));
+
         return Unit.Value;
     }
 
@@ -84,15 +87,13 @@ public class MakeLinkageBetweenProductsHandler(
             case ProductLinkageType.FullLeftToRightCross:
                 var leftCrossIds = await GetCrossIds(linkage.ProductId, cancellationToken);
                 leftCrossIds.Add(leftArticle.Id);
-                foreach (var l in leftCrossIds)
-                    toAdd.Add(ProductCross.Create(l, rightArticle.Id));
+                foreach (var l in leftCrossIds) toAdd.Add(ProductCross.Create(l, rightArticle.Id));
                 break;
 
             case ProductLinkageType.FullRightToLeftCross:
                 var rightCrossIds = await GetCrossIds(linkage.CrossProductId, cancellationToken);
                 rightCrossIds.Add(rightArticle.Id);
-                foreach (var r in rightCrossIds)
-                    toAdd.Add(ProductCross.Create(leftArticle.Id, r));
+                foreach (var r in rightCrossIds) toAdd.Add(ProductCross.Create(leftArticle.Id, r));
                 break;
 
             default:
@@ -115,7 +116,10 @@ public class MakeLinkageBetweenProductsHandler(
         var criteria = Criteria<Product>.New()
             .Track(false)
             .Build();
-        return (await repository.GetProductCrosses(productId, criteria, ct))
+        return (await repository.GetProductCrosses(
+                productId,
+                criteria,
+                ct))
             .Select(x => x.Id)
             .ToHashSet();
     }

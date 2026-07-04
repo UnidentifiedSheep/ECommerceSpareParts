@@ -13,7 +13,10 @@ public static class ServiceProvider
         {
             var options = sp.GetRequiredService<IOptions<S3Options>>().Value;
             var config = CreateConfig(options.InternalUrl, options.ForcePathStyle);
-            return new AmazonS3Client(options.Login, options.Password, config);
+            return new AmazonS3Client(
+                options.Login,
+                options.Password,
+                config);
         });
 
         collection.AddSingleton<IPresignedS3Client, PresignedS3Client>(sp =>
@@ -22,10 +25,13 @@ public static class ServiceProvider
             var config = CreateConfig(options.ExternalUrl, options.ForcePathStyle);
             var protocol = GetProtocol(options.ExternalUrl);
             return new PresignedS3Client(
-                new AmazonS3Client(options.Login, options.Password, config),
+                new AmazonS3Client(
+                    options.Login,
+                    options.Password,
+                    config),
                 protocol);
         });
-        
+
         collection.AddScoped<IS3StorageService, S3StorageService>();
         return collection;
     }

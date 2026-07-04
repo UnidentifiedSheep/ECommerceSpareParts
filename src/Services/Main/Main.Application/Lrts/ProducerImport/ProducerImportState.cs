@@ -1,5 +1,4 @@
-﻿using System.Text.Json;
-using System.Text.Json.Serialization;
+﻿using System.Text.Json.Serialization;
 using Application.Common.Interfaces.Lrt;
 using Attributes.JsonAttributes;
 using Enums;
@@ -32,8 +31,9 @@ public record ProducerImportInputState : IInputState
     public void ValidateState()
     {
         if (!FileName.EndsWith(".csv"))
-            throw new InvalidOperationException("Producer import state error. " +
-                                                "File name should end with .csv");
+            throw new InvalidOperationException(
+                "Producer import state error. " +
+                "File name should end with .csv");
     }
 }
 

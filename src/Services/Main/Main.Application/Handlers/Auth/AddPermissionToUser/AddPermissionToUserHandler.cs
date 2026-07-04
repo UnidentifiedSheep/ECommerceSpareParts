@@ -1,7 +1,6 @@
 ﻿using Abstractions.Interfaces.Persistence;
-using Abstractions.Interfaces.Services;
-using Application.Common.Interfaces;
 using Application.Common.Interfaces.Cqrs;
+using Application.Common.Interfaces.Events;
 using Attributes;
 using Contracts.User;
 using Main.Entities.Auth;
@@ -23,10 +22,11 @@ public class AddPermissionToUserHandler(
         var model = UserPermission.Create(request.UserId, request.PermissionName);
 
         await unitOfWork.AddAsync(model, cancellationToken);
-        interfaceScope.Add(new UserUpdatedEvent
-        {
-            UserId = request.UserId
-        });
+        interfaceScope.Add(
+            new UserUpdatedEvent
+            {
+                UserId = request.UserId
+            });
         return Unit.Value;
     }
 }

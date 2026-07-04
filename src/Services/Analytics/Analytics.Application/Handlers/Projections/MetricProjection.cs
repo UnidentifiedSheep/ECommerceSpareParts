@@ -10,8 +10,9 @@ public static class MetricProjection
 {
     public static Expression<Func<Metric, MetricDto>> ToDto(
         IReadOnlyDictionary<string, MetricInfoDto> infos,
-        IScopedLocalizedJsonSerializer serializer) =>
-        x => new MetricDto
+        IScopedLocalizedJsonSerializer serializer)
+    {
+        return x => new MetricDto
         {
             Id = x.Id,
             SystemName = x.Discriminator,
@@ -22,12 +23,14 @@ public static class MetricProjection
             RangeEnd = x.RangeEnd,
             RangeStart = x.RangeStart,
             CurrencyId = x.CurrencyId,
-            ProductId = x is ProductPurchasesMetric ? ((ProductPurchasesMetric)x).ProductId
-                : x is ProductSalesMetric ? ((ProductSalesMetric)x).ProductId : null,
+            ProductId = x is ProductPurchasesMetric ? ((ProductPurchasesMetric)x).ProductId :
+                x is ProductSalesMetric ? ((ProductSalesMetric)x).ProductId : null,
             LastMetricJob = MetricJobProjection
                 .ToDtoOrDefault
-                .Invoke(x.Jobs
-                    .OrderByDescending(z => z.Job.CreatedAt)
-                    .FirstOrDefault())
+                .Invoke(
+                    x.Jobs
+                        .OrderByDescending(z => z.Job.CreatedAt)
+                        .FirstOrDefault())
         };
+    }
 }

@@ -19,7 +19,8 @@ public record GetSalesQuery(
     IEnumerable<int> ProductIds,
     IEnumerable<SaleState> States,
     string? SortBy,
-    string? SearchTerm) : IQuery<GetSalesResult>;
+    string? SearchTerm
+) : IQuery<GetSalesResult>;
 
 public record GetSalesResult(IReadOnlyList<SaleDto> Sales);
 
@@ -31,8 +32,7 @@ public class GetSalesHandler(
     {
         var query = repository.Query;
 
-        if (request.States.Any())
-            query = query.Where(x => request.States.Contains(x.State));
+        if (request.States.Any()) query = query.Where(x => request.States.Contains(x.State));
 
         if (request.DateRange.Min.HasValue)
             query = query.Where(x => x.SaleDatetime >= request.DateRange.Min.Value);
@@ -40,11 +40,9 @@ public class GetSalesHandler(
         if (request.DateRange.Max.HasValue)
             query = query.Where(x => x.SaleDatetime <= request.DateRange.Max.Value);
 
-        if (request.CurrencyIds.Any())
-            query = query.Where(x => request.CurrencyIds.Contains(x.CurrencyId));
+        if (request.CurrencyIds.Any()) query = query.Where(x => request.CurrencyIds.Contains(x.CurrencyId));
 
-        if (request.BuyerIds.Any())
-            query = query.Where(x => request.BuyerIds.Contains(x.BuyerId));
+        if (request.BuyerIds.Any()) query = query.Where(x => request.BuyerIds.Contains(x.BuyerId));
 
         if (request.ProductIds.Any())
             query = query.Where(x => x.Contents.Any(z => request.ProductIds.Contains(z.ProductId)));

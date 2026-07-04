@@ -15,7 +15,7 @@ public class SalesFactConfiguration : IEntityTypeConfiguration<SalesFact>
         builder.HasIndex(e => e.BuyerId, "sales_fact_buyer_id_index");
 
         builder.HasIndex(e => e.CurrencyId, "sales_fact_currency_id_index");
-        
+
         builder.HasIndex(e => e.CreatedAt, "sales_fact_created_at_index");
 
         builder.Property(e => e.Id)

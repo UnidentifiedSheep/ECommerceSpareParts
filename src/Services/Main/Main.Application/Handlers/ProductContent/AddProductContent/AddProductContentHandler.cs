@@ -1,5 +1,4 @@
 using Abstractions.Interfaces.Persistence;
-using Abstractions.Interfaces.Services;
 using Application.Common.Interfaces.Cqrs;
 using Attributes;
 using MediatR;
@@ -16,8 +15,12 @@ public class AddProductContentHandler(IUnitOfWork unitOfWork) : ICommandHandler<
     {
         var contents = request.Contents
             .Select(x =>
-                Entities.Product.ProductContent.Create(request.ParentProductId, x.Key, x.Value)
-            ).ToList();
+                Entities.Product.ProductContent.Create(
+                    request.ParentProductId,
+                    x.Key,
+                    x.Value)
+            )
+            .ToList();
 
         await unitOfWork.AddRangeAsync(contents, cancellationToken);
         return Unit.Value;

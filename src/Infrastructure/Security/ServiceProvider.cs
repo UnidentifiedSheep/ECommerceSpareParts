@@ -1,10 +1,9 @@
-using System.Runtime.CompilerServices;
 using System.Text;
-using System.Text.Json;
 using Abstractions.Interfaces;
 using Abstractions.Interfaces.Services;
 using Abstractions.Interfaces.Validators;
 using Abstractions.Models;
+using Abstractions.Models.Options;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.Extensions.Configuration;
@@ -30,11 +29,17 @@ public static class ServiceProvider
     }
 
     public static IServiceCollection AddJsonSigner(
-        this IServiceCollection collection,
-        string secret,
-        JsonSerializerOptions? options = null)
+        this IServiceCollection collection)
     {
-        collection.AddSingleton<IJsonSigner, JsonSigner>(_ => new JsonSigner(secret, options));
+        collection.AddOptions<ProjectJsonOptions>();
+        collection.AddSingleton<IJsonSigner, JsonSigner>();
+        return collection;
+    }
+
+    public static IServiceCollection AddSecretEncryptor(
+        this IServiceCollection collection)
+    {
+        collection.AddSingleton<ISecretEncryptor, SecretEncryptor>();
         return collection;
     }
 
@@ -55,30 +60,33 @@ public static class ServiceProvider
         IConfiguration configuration)
     {
         collection.AddAuthentication(options =>
-        {
-            options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
-            options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
-            options.DefaultScheme = JwtBearerDefaults.AuthenticationScheme;
-        }).AddJwtBearer(options =>
-        {
-            var iss = configuration["JwtBearer:ValidIssuer"];
-            options.TokenValidationParameters = new TokenValidationParameters
             {
-                ValidateIssuer = true,
-                ValidateAudience = false,
-                ValidateLifetime = true,
-                ValidateIssuerSigningKey = true,
-                ValidIssuer = iss,
-                IssuerSigningKey =
-                    new SymmetricSecurityKey(Encoding.UTF8.GetBytes(configuration["JwtBearer:IssuerSigningKey"]!))
-            };
-        });
+                options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+                options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+                options.DefaultScheme = JwtBearerDefaults.AuthenticationScheme;
+            })
+            .AddJwtBearer(options =>
+            {
+                var iss = configuration["JwtBearer:ValidIssuer"];
+                options.TokenValidationParameters = new TokenValidationParameters
+                {
+                    ValidateIssuer = true,
+                    ValidateAudience = false,
+                    ValidateLifetime = true,
+                    ValidateIssuerSigningKey = true,
+                    ValidIssuer = iss,
+                    IssuerSigningKey =
+                        new SymmetricSecurityKey(
+                            Encoding.UTF8.GetBytes(configuration["JwtBearer:IssuerSigningKey"]!))
+                };
+            });
 
         collection.AddAuthorizationBuilder()
-            .SetDefaultPolicy(new AuthorizationPolicyBuilder(JwtBearerDefaults.AuthenticationScheme)
-                .RequireAuthenticatedUser()
-                .Build());
-        
+            .SetDefaultPolicy(
+                new AuthorizationPolicyBuilder(JwtBearerDefaults.AuthenticationScheme)
+                    .RequireAuthenticatedUser()
+                    .Build());
+
         return collection;
     }
 }

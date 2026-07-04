@@ -1,6 +1,6 @@
 using FluentAssertions;
-using Main.Application.Interfaces.Persistence;
 using Main.Application.Dtos.Sale;
+using Main.Application.Interfaces.Persistence;
 using Main.Application.Models.Storage;
 using Main.Application.Services;
 using MediatR;
@@ -17,16 +17,36 @@ public class SaleServiceTests
     [Fact]
     public void DistributeDetails_WithNewSaleContent_DistributesFromLargestLotsFirst()
     {
-        var purchaseDate = new DateTime(2026, 1, 1);
+        var purchaseDate = new DateTime(
+            2026,
+            1,
+            1);
         var storageLots = new[]
         {
-            Lot(1, productId: 10, count: 2, buyPrice: 100m, purchaseDate),
-            Lot(2, productId: 10, count: 5, buyPrice: 80m, purchaseDate),
-            Lot(3, productId: 10, count: 5, buyPrice: 120m, purchaseDate)
+            Lot(
+                1,
+                10,
+                2,
+                100m,
+                purchaseDate),
+            Lot(
+                2,
+                10,
+                5,
+                80m,
+                purchaseDate),
+            Lot(
+                3,
+                10,
+                5,
+                120m,
+                purchaseDate)
         };
         var saleContents = new[]
         {
-            NewSaleContent(productId: 10, count: 7, price: 200m, priceWithDiscount: 180m)
+            NewSaleContent(
+                10,
+                7)
         };
 
         var result = _service.DistributeDetails(storageLots, saleContents);
@@ -51,10 +71,18 @@ public class SaleServiceTests
     [Fact]
     public void DistributeDetails_WithEditSaleContent_DistributesDetails()
     {
-        var purchaseDate = new DateTime(2026, 1, 1);
+        var purchaseDate = new DateTime(
+            2026,
+            1,
+            1);
         var storageLots = new[]
         {
-            Lot(1, productId: 10, count: 3, buyPrice: 100m, purchaseDate)
+            Lot(
+                1,
+                10,
+                3,
+                100m,
+                purchaseDate)
         };
         var saleContents = new[]
         {
@@ -83,16 +111,29 @@ public class SaleServiceTests
     [Fact]
     public void DistributeDetails_WithMultipleSaleContents_DoesNotReuseTakenQuantity()
     {
-        var purchaseDate = new DateTime(2026, 1, 1);
+        var purchaseDate = new DateTime(
+            2026,
+            1,
+            1);
         var storageLots = new[]
         {
-            Lot(1, productId: 10, count: 5, buyPrice: 100m, purchaseDate),
-            Lot(2, productId: 10, count: 5, buyPrice: 90m, purchaseDate)
+            Lot(
+                1,
+                10,
+                5,
+                100m,
+                purchaseDate),
+            Lot(
+                2,
+                10,
+                5,
+                90m,
+                purchaseDate)
         };
         var saleContents = new[]
         {
-            NewSaleContent(productId: 10, count: 4),
-            NewSaleContent(productId: 10, count: 4)
+            NewSaleContent(10, 4),
+            NewSaleContent(10, 4)
         };
 
         var result = _service.DistributeDetails(storageLots, saleContents);
@@ -111,16 +152,29 @@ public class SaleServiceTests
     [Fact]
     public void DistributeDetails_WithMultipleSaleContents_DoesNotReuseFullyConsumedLot()
     {
-        var purchaseDate = new DateTime(2026, 1, 1);
+        var purchaseDate = new DateTime(
+            2026,
+            1,
+            1);
         var storageLots = new[]
         {
-            Lot(1, productId: 10, count: 1, buyPrice: 100m, purchaseDate),
-            Lot(2, productId: 10, count: 1, buyPrice: 90m, purchaseDate)
+            Lot(
+                1,
+                10,
+                1,
+                100m,
+                purchaseDate),
+            Lot(
+                2,
+                10,
+                1,
+                90m,
+                purchaseDate)
         };
         var saleContents = new[]
         {
-            NewSaleContent(productId: 10, count: 1),
-            NewSaleContent(productId: 10, count: 1)
+            NewSaleContent(10, 1),
+            NewSaleContent(10, 1)
         };
 
         var result = _service.DistributeDetails(storageLots, saleContents);
@@ -141,17 +195,35 @@ public class SaleServiceTests
     [Fact]
     public void DistributeDetails_WithMixedFullAndPartialConsumption_DistributesAllRequestedCounts()
     {
-        var purchaseDate = new DateTime(2026, 1, 1);
+        var purchaseDate = new DateTime(
+            2026,
+            1,
+            1);
         var storageLots = new[]
         {
-            Lot(1, productId: 10, count: 2, buyPrice: 100m, purchaseDate),
-            Lot(2, productId: 10, count: 2, buyPrice: 90m, purchaseDate),
-            Lot(3, productId: 10, count: 1, buyPrice: 80m, purchaseDate)
+            Lot(
+                1,
+                10,
+                2,
+                100m,
+                purchaseDate),
+            Lot(
+                2,
+                10,
+                2,
+                90m,
+                purchaseDate),
+            Lot(
+                3,
+                10,
+                1,
+                80m,
+                purchaseDate)
         };
         var saleContents = new[]
         {
-            NewSaleContent(productId: 10, count: 3),
-            NewSaleContent(productId: 10, count: 2)
+            NewSaleContent(10, 3),
+            NewSaleContent(10, 2)
         };
 
         var result = _service.DistributeDetails(storageLots, saleContents);
@@ -168,16 +240,29 @@ public class SaleServiceTests
     [Fact]
     public void DistributeDetails_WithMultipleProducts_DoesNotShareStorageBetweenProducts()
     {
-        var purchaseDate = new DateTime(2026, 1, 1);
+        var purchaseDate = new DateTime(
+            2026,
+            1,
+            1);
         var storageLots = new[]
         {
-            Lot(1, productId: 10, count: 1, buyPrice: 100m, purchaseDate),
-            Lot(2, productId: 20, count: 1, buyPrice: 90m, purchaseDate)
+            Lot(
+                1,
+                10,
+                1,
+                100m,
+                purchaseDate),
+            Lot(
+                2,
+                20,
+                1,
+                90m,
+                purchaseDate)
         };
         var saleContents = new[]
         {
-            NewSaleContent(productId: 10, count: 1),
-            NewSaleContent(productId: 20, count: 1)
+            NewSaleContent(10, 1),
+            NewSaleContent(20, 1)
         };
 
         var result = _service.DistributeDetails(storageLots, saleContents);
@@ -192,16 +277,20 @@ public class SaleServiceTests
     {
         var storageLots = new[]
         {
-            Lot(1, productId: 10, count: 0)
+            Lot(
+                1,
+                10,
+                0)
         };
         var saleContents = new[]
         {
-            NewSaleContent(productId: 10, count: 1)
+            NewSaleContent(10, 1)
         };
 
         var act = () => _service.DistributeDetails(storageLots, saleContents);
 
-        act.Should().Throw<InvalidOperationException>()
+        act.Should()
+            .Throw<InvalidOperationException>()
             .WithMessage("Invalid taken quantity");
     }
 
@@ -210,16 +299,20 @@ public class SaleServiceTests
     {
         var storageLots = new[]
         {
-            Lot(1, productId: 10, count: 1)
+            Lot(
+                1,
+                10,
+                1)
         };
         var saleContents = new[]
         {
-            NewSaleContent(productId: 20, count: 1)
+            NewSaleContent(20, 1)
         };
 
         var act = () => _service.DistributeDetails(storageLots, saleContents);
 
-        act.Should().Throw<InvalidOperationException>()
+        act.Should()
+            .Throw<InvalidOperationException>()
             .WithMessage("No storage for product 20");
     }
 
@@ -228,16 +321,20 @@ public class SaleServiceTests
     {
         var storageLots = new[]
         {
-            Lot(1, productId: 10, count: 2)
+            Lot(
+                1,
+                10,
+                2)
         };
         var saleContents = new[]
         {
-            NewSaleContent(productId: 10, count: 3)
+            NewSaleContent(10, 3)
         };
 
         var act = () => _service.DistributeDetails(storageLots, saleContents);
 
-        act.Should().Throw<InvalidOperationException>()
+        act.Should()
+            .Throw<InvalidOperationException>()
             .WithMessage("Unable to distribute details");
     }
 
@@ -254,7 +351,10 @@ public class SaleServiceTests
             1,
             buyPrice,
             count,
-            purchaseDate ?? new DateTime(2026, 1, 1));
+            purchaseDate ?? new DateTime(
+                2026,
+                1,
+                1));
     }
 
     private static NewSaleContentDto NewSaleContent(

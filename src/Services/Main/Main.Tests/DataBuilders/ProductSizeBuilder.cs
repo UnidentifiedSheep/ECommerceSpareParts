@@ -1,7 +1,7 @@
 using Bogus;
 using Enums;
 using Main.Entities.Product;
-using Test.Common.Abstractions;
+using Tests.Abstractions;
 
 namespace Tests.DataBuilders;
 
@@ -19,7 +19,10 @@ public class ProductSizeBuilder(Faker faker) : BuilderBase<ProductSize>(faker)
         return this;
     }
 
-    public ProductSizeBuilder WithDimensions(decimal length, decimal width, decimal height)
+    public ProductSizeBuilder WithDimensions(
+        decimal length,
+        decimal width,
+        decimal height)
     {
         Length = length;
         Width = width;

@@ -1,5 +1,5 @@
 using Main.Entities.User;
-using RoleEnum = Main.Enums.Role;
+using RoleEnum = Enums.Role;
 
 namespace Main.Application.Extensions;
 
@@ -15,14 +15,24 @@ public static class QueryableRepositoryExtensions
         return query.ExcludeUsersWithRoles([role]);
     }
 
-    public static IQueryable<User> ExcludeUsersWithRoles(this IQueryable<User> query, IEnumerable<RoleEnum> roles)
+    public static IQueryable<User> ExcludeUsersWithRoles(
+        this IQueryable<User> query,
+        IEnumerable<RoleEnum> roles)
     {
-        return UserRoleFilter.Apply(query, roles, false);
+        return UserRoleFilter.Apply(
+            query,
+            roles,
+            false);
     }
 
-    public static IQueryable<User> ExcludeUsersWithRoles(this IQueryable<User> query, IEnumerable<string> roles)
+    public static IQueryable<User> ExcludeUsersWithRoles(
+        this IQueryable<User> query,
+        IEnumerable<string> roles)
     {
-        return UserRoleFilter.Apply(query, roles, false);
+        return UserRoleFilter.Apply(
+            query,
+            roles,
+            false);
     }
 
     public static IQueryable<User> IncludeUsersWithRole(this IQueryable<User> query, RoleEnum role)
@@ -35,13 +45,23 @@ public static class QueryableRepositoryExtensions
         return query.IncludeUsersWithRoles([role]);
     }
 
-    public static IQueryable<User> IncludeUsersWithRoles(this IQueryable<User> query, IEnumerable<RoleEnum> roles)
+    public static IQueryable<User> IncludeUsersWithRoles(
+        this IQueryable<User> query,
+        IEnumerable<RoleEnum> roles)
     {
-        return UserRoleFilter.Apply(query, roles, true);
+        return UserRoleFilter.Apply(
+            query,
+            roles,
+            true);
     }
 
-    public static IQueryable<User> IncludeUsersWithRoles(this IQueryable<User> query, IEnumerable<string> roles)
+    public static IQueryable<User> IncludeUsersWithRoles(
+        this IQueryable<User> query,
+        IEnumerable<string> roles)
     {
-        return UserRoleFilter.Apply(query, roles, true);
+        return UserRoleFilter.Apply(
+            query,
+            roles,
+            true);
     }
 }

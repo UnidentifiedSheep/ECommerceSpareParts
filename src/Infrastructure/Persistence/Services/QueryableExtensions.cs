@@ -1,5 +1,4 @@
-﻿using Abstractions.Interfaces.Services;
-using Application.Common.Interfaces.Repositories;
+﻿using Application.Common.Interfaces.Repositories;
 using Microsoft.EntityFrameworkCore;
 using Persistence.Interfaces;
 
@@ -20,13 +19,12 @@ public class QueryableExtensions(IContextMetadata contextMetadata) : IQueryableE
     {
         var schema = contextMetadata.GetSchemaName<T>();
         var tableName = contextMetadata.GetTableName<T>();
-        
-        string fullQualifiedTableName = string.IsNullOrWhiteSpace(schema)
+
+        var fullQualifiedTableName = string.IsNullOrWhiteSpace(schema)
             ? $"{tableName}"
             : $"{schema}.{tableName}";
 
-        if (!forUpdate)
-            return query;
+        if (!forUpdate) return query;
 
         query = query.TagWith("ForUpdate")
             .TagWith($"ForUpdateOf:{fullQualifiedTableName}");
@@ -40,21 +38,20 @@ public class QueryableExtensions(IContextMetadata contextMetadata) : IQueryableE
     {
         if (criteria == null) return query;
         query = ConfigureTracking(query, criteria.Track);
-        query = ForUpdate(query, criteria.ForUpdate, criteria.SkipLocked);
+        query = ForUpdate(
+            query,
+            criteria.ForUpdate,
+            criteria.SkipLocked);
 
-        foreach (var where in criteria.Wheres)
-            query = query.Where(where);
+        foreach (var where in criteria.Wheres) query = query.Where(where);
 
-        foreach (var i in criteria.Includes)
-            query = query.Include(i);
+        foreach (var i in criteria.Includes) query = query.Include(i);
 
-        if (criteria.OrderBy is not null)
-            query = criteria.OrderBy(query);
+        if (criteria.OrderBy is not null) query = criteria.OrderBy(query);
 
         if (!criteria.Size.HasValue) return query;
 
-        if (criteria.Page.HasValue)
-            query = query.Skip(criteria.Page.Value * criteria.Size.Value);
+        if (criteria.Page.HasValue) query = query.Skip(criteria.Page.Value * criteria.Size.Value);
 
         query = query.Take(criteria.Size.Value);
         return query;

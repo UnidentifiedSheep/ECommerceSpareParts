@@ -1,7 +1,7 @@
 using FluentAssertions;
 using Main.Application.Handlers.Sales.GetSale;
 using Main.Entities.Exceptions;
-using Test.Common.TestContainers.Combined;
+using Tests.TestContainers.Combined;
 using Tests.TestContexts.Sale;
 
 namespace Tests.HandlersTests.Sales;

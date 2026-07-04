@@ -1,8 +1,8 @@
 ﻿using Main.Entities.Producer;
 using Main.Persistence.Context;
-using Test.Common.Abstractions;
-using Test.Common.Extensions;
+using Tests.Abstractions;
 using Tests.DataBuilders;
+using Tests.Extensions;
 
 namespace Tests.TestContexts;
 
@@ -15,7 +15,8 @@ public class ProducerTestContext(
 
     public override async Task InitializeAsync(CancellationToken cancellationToken = default)
     {
-        _producers.AddRange(await new ProducerBuilder(Faker)
-            .BuildManyAndAddToDb(DbContext, 5));
+        _producers.AddRange(
+            await new ProducerBuilder(Faker)
+                .BuildManyAndAddToDb(DbContext, 5));
     }
 }

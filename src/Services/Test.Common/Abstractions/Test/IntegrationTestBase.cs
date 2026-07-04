@@ -1,8 +1,8 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
-using Test.Common.Interfaces.ServiceProvider;
+using Tests.Interfaces.ServiceProvider;
 
-namespace Test.Common.Abstractions.Test;
+namespace Tests.Abstractions.Test;
 
 public abstract class IntegrationTestBase<TSp, TArgs, TContext> : TestBase
     where TSp : IServiceProviderBuilder<TArgs>, new()

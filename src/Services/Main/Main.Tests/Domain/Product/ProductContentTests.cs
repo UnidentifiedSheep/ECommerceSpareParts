@@ -7,22 +7,44 @@ namespace Tests.Domain.Product;
 public class ProductContentTests
 {
     [Theory]
-    [InlineData(1, 2, 5)]
-    [InlineData(10, 20, 0)]
-    [InlineData(100, 101, 999)]
-    public void Create_ValidData_Succeeds(int parentId, int childId, int quantity)
+    [InlineData(
+        1,
+        2,
+        5)]
+    [InlineData(
+        10,
+        20,
+        0)]
+    [InlineData(
+        100,
+        101,
+        999)]
+    public void Create_ValidData_Succeeds(
+        int parentId,
+        int childId,
+        int quantity)
     {
-        var act = () => ProductContent.Create(parentId, childId, quantity);
+        var act = () => ProductContent.Create(
+            parentId,
+            childId,
+            quantity);
 
         var model = act.Should().NotThrow().Subject;
 
-        Validate(model, parentId, childId, quantity);
+        Validate(
+            model,
+            parentId,
+            childId,
+            quantity);
     }
 
     [Fact]
     public void Create_SameProductIds_Throws()
     {
-        var act = () => ProductContent.Create(1, 1, 5);
+        var act = () => ProductContent.Create(
+            1,
+            1,
+            5);
 
         act.Should().Throw<InvalidInputException>();
     }
@@ -33,7 +55,10 @@ public class ProductContentTests
     [InlineData(100)]
     public void SetQuantity_Valid_Succeeds(int quantity)
     {
-        var model = ProductContent.Create(1, 2, 1);
+        var model = ProductContent.Create(
+            1,
+            2,
+            1);
 
         var act = () => model.SetQuantity(quantity);
 
@@ -47,7 +72,10 @@ public class ProductContentTests
     [InlineData(-100)]
     public void SetQuantity_Negative_Throws(int quantity)
     {
-        var model = ProductContent.Create(1, 2, 1);
+        var model = ProductContent.Create(
+            1,
+            2,
+            1);
 
         var act = () => model.SetQuantity(quantity);
 

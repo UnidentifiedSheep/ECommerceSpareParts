@@ -148,15 +148,15 @@ public enum PermissionCodes
 
     // ===== LOGISTICS =====
     LOGISTICS_CALCULATE,
-    
+
     // ===== UPLOADS =====
     UPLOADS_CREATE,
-    
+
     // ===== JOBS =====
     JOBS_GET,
     JOBS_CREATE,
-    
+
     // ===== METRICS =====
     METRICS_CREATE,
-    METRICS_GET,
+    METRICS_GET
 }

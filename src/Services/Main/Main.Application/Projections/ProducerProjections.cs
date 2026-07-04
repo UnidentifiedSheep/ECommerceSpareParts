@@ -13,12 +13,20 @@ public static class ProducerProjections
             Name = x.Name,
             Description = x.Description
         };
-    
-    public static readonly Expression<Func<ProducerOtherName, ProducerOtherNameDto>> ToOtherNameDto =
-        x => new ProducerOtherNameDto
+
+    public static readonly Expression<Func<Producer, ProducerFullDto>> ToFullDto =
+        x => new ProducerFullDto
+        {
+            Id = x.Id,
+            Name = x.Name,
+            Description = x.Description,
+            Aliases = x.Aliases.Select(z => z.Alias)
+        };
+
+    public static readonly Expression<Func<ProducerAlias, ProducerAliasDto>> ToAliasDto =
+        x => new ProducerAliasDto
         {
             ProducerId = x.ProducerId,
-            OtherName = x.OtherName,
-            WhereUsed = x.WhereUsed
+            Alias = x.Alias
         };
 }

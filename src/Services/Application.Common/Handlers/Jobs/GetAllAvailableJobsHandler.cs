@@ -6,16 +6,19 @@ using Localization.Abstractions.Interfaces;
 
 namespace Application.Common.Handlers.Jobs;
 
-public sealed record GetAllAvailableJobsQuery() : IQuery<GetAllAvailableJobsResult>;
+public sealed record GetAllAvailableJobsQuery : IQuery<GetAllAvailableJobsResult>;
+
 public sealed record GetAllAvailableJobsResult(IReadOnlyList<JobInfoDto> Jobs);
 
 public sealed class GetAllAvailableJobsHandler(
     IScopedStringLocalizer localizer,
     INamedObjectRegistry<LrtNamedObjectBase> registry,
     IScopedLocalizedJsonSerializer jsonSerializer
-    ) : IQueryHandler<GetAllAvailableJobsQuery, GetAllAvailableJobsResult>
+) : IQueryHandler<GetAllAvailableJobsQuery, GetAllAvailableJobsResult>
 {
-    public Task<GetAllAvailableJobsResult> Handle(GetAllAvailableJobsQuery request, CancellationToken cancellationToken)
+    public Task<GetAllAvailableJobsResult> Handle(
+        GetAllAvailableJobsQuery request,
+        CancellationToken cancellationToken)
     {
         var result = registry.All
             .Select(x => new JobInfoDto
@@ -24,7 +27,8 @@ public sealed class GetAllAvailableJobsHandler(
                 Name = localizer.Get(x.NameLocalizationKey),
                 Description = localizer.Get(x.DescriptionLocalizationKey),
                 InitStateSchema = jsonSerializer.SerializeMetadata(x.InputType)
-            }).ToList();
+            })
+            .ToList();
 
         return Task.FromResult(new GetAllAvailableJobsResult(result));
     }

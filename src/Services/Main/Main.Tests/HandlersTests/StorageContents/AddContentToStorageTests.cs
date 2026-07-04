@@ -8,8 +8,8 @@ using Main.Enums;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
-using Test.Common.TestContainers.Combined;
 using Tests.DataBuilders.Storage;
+using Tests.TestContainers.Combined;
 using Tests.TestContexts;
 using Tests.TestContexts.Currency;
 using Tests.TestContexts.Storage;
@@ -29,7 +29,10 @@ public class AddContentToStorageTests : IntegrationTest
     public async Task AddContentToStorage_WithEmptyContentList_ThrowsValidationException()
     {
         var storage = GetContext<StorageTestContext>().Storages.First();
-        var command = new AddContentCommand([], storage.Name, StorageMovementType.StorageContentAddition);
+        var command = new AddContentCommand(
+            [],
+            storage.Name,
+            StorageMovementType.StorageContentAddition);
         await Assert.ThrowsAsync<ValidationException>(async () => await Mediator.Send(command));
     }
 
@@ -44,20 +47,26 @@ public class AddContentToStorageTests : IntegrationTest
         var storage = GetContext<StorageTestContext>().Storages.First();
         var storageContent = GetNewStorageContents(3);
         storageContent[^1] = storageContent[^1] with { BuyPrice = price };
-        var command = new AddContentCommand(storageContent, storage.Name, StorageMovementType.StorageContentAddition);
+        var command = new AddContentCommand(
+            storageContent,
+            storage.Name,
+            StorageMovementType.StorageContentAddition);
         await Assert.ThrowsAsync<ValidationException>(async () => await Mediator.Send(command));
     }
 
     [Theory]
     [InlineData(0)]
     [InlineData(-1)]
-    public async Task AddContentToStorage_WithInvalidItemCount_ThrowsStorageContentCountCantBeNegativeException(
-        int count)
+    public async Task
+        AddContentToStorage_WithInvalidItemCount_ThrowsStorageContentCountCantBeNegativeException(
+            int count)
     {
         var storage = GetContext<StorageTestContext>().Storages.First();
         var storageContent = GetNewStorageContents(3);
         storageContent[^1] = storageContent[^1] with { Count = count };
-        var command = new AddContentCommand(storageContent, storage.Name,
+        var command = new AddContentCommand(
+            storageContent,
+            storage.Name,
             StorageMovementType.StorageContentAddition);
         await Assert.ThrowsAsync<ValidationException>(async () => await Mediator.Send(command));
     }
@@ -68,7 +77,9 @@ public class AddContentToStorageTests : IntegrationTest
         var storage = GetContext<StorageTestContext>().Storages.First();
         var storageContent = GetNewStorageContents(3);
         storageContent[^1] = storageContent[^1] with { CurrencyId = int.MaxValue };
-        var command = new AddContentCommand(storageContent, storage.Name,
+        var command = new AddContentCommand(
+            storageContent,
+            storage.Name,
             StorageMovementType.StorageContentAddition);
         await Assert.ThrowsAsync<DbValidationException>(async () => await Mediator.Send(command));
     }
@@ -77,9 +88,12 @@ public class AddContentToStorageTests : IntegrationTest
     public async Task AddContentToStorage_WithInvalidStorageName_ThrowsStorageNotFoundException()
     {
         var storageContent = GetNewStorageContents(3);
-        var command = new AddContentCommand(storageContent, Faker.Lorem.Letter(200),
+        var command = new AddContentCommand(
+            storageContent,
+            Faker.Lorem.Letter(200),
             StorageMovementType.StorageContentAddition);
-        var exception = await Assert.ThrowsAsync<DbValidationException>(async () => await Mediator.Send(command));
+        var exception =
+            await Assert.ThrowsAsync<DbValidationException>(async () => await Mediator.Send(command));
         Assert.Equal(ApplicationErrors.StoragesNotFound, exception.Failures[0].ErrorName);
     }
 
@@ -89,7 +103,9 @@ public class AddContentToStorageTests : IntegrationTest
         var storage = GetContext<StorageTestContext>().Storages.First();
         var storageContent = GetNewStorageContents(3);
         storageContent[^1] = storageContent[^1] with { ProductId = int.MaxValue };
-        var command = new AddContentCommand(storageContent, storage.Name,
+        var command = new AddContentCommand(
+            storageContent,
+            storage.Name,
             StorageMovementType.StorageContentAddition);
         await Assert.ThrowsAsync<ProductNotFoundException>(async () => await Mediator.Send(command));
     }
@@ -116,17 +132,24 @@ public class AddContentToStorageTests : IntegrationTest
         var res1 = results[0];
         var res2 = results[1];
 
-        await AssertCorrectResult(storage, res1, res2);
+        await AssertCorrectResult(
+            storage,
+            res1,
+            res2);
     }
 
-    private async Task<(List<NewStorageContentDto> Inputs, Dictionary<int, int> TotalPerProduct)> RunSingleAddAsync(
-        Storage storage,
-        IMediator mediator)
+    private async Task<(List<NewStorageContentDto> Inputs, Dictionary<int, int> TotalPerProduct)>
+        RunSingleAddAsync(
+            Storage storage,
+            IMediator mediator)
     {
         var storageContent = GetNewStorageContents(3);
 
         var command =
-            new AddContentCommand(storageContent, storage.Name, StorageMovementType.StorageContentAddition);
+            new AddContentCommand(
+                storageContent,
+                storage.Name,
+                StorageMovementType.StorageContentAddition);
         await mediator.Send(command);
 
         var totalPerArticle = storageContent

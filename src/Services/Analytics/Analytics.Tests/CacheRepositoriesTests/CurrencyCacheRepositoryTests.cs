@@ -1,13 +1,12 @@
 using System.Net;
 using Analytics.Application.Interfaces.Cache;
 using Analytics.Cache;
-using Cache;
 using FluentAssertions;
+using Integrations.Common;
 using Internal.Integration.Core.Interfaces.Main;
-using Internal.Integration.Core.Models;
 using Microsoft.Extensions.DependencyInjection;
 using Moq;
-using Test.Common.TestContainers.Combined;
+using Tests.TestContainers.Combined;
 using ZiggyCreatures.Caching.Fusion;
 
 namespace Analytics.Integration.Tests.CacheRepositoriesTests;
@@ -15,15 +14,16 @@ namespace Analytics.Integration.Tests.CacheRepositoriesTests;
 public class CurrencyCacheRepositoryTests(CombinedContainerFixture fixture) : IntegrationTest(fixture)
 {
     private IFusionCache _cache = null!;
-    private Mock<IMainClient> _mock = null!;
     private Mock<ICurrencyNode> _currencyMock = null!;
+    private Mock<IMainClient> _mock = null!;
+
     public override async Task InitializeAsync()
     {
         await base.InitializeAsync();
         _cache = Sp.GetRequiredService<IFusionCache>();
         _mock = new Mock<IMainClient>();
         _currencyMock = new Mock<ICurrencyNode>();
-        
+
         _mock.SetupGet(x => x.CurrencyNode).Returns(_currencyMock.Object);
     }
 
@@ -78,14 +78,17 @@ public class CurrencyCacheRepositoryTests(CombinedContainerFixture fixture) : In
         result.Should().Be(6.5m);
         VerifyCurrencyRateRequested(currencyId, Times.Exactly(2));
     }
-    
-    private ICurrencyCacheRepository Repository() => new CurrencyCacheRepository(_cache, _mock.Object);
+
+    private ICurrencyCacheRepository Repository()
+    {
+        return new CurrencyCacheRepository(_cache, _mock.Object);
+    }
 
     private void SetupCurrencyRate(int currencyId, decimal rate)
     {
         _currencyMock
             .Setup(x => x.GetCurrencyRate(currencyId, It.IsAny<CancellationToken>()))
-            .ReturnsAsync(InternalResponse<decimal>.Ok(rate));
+            .ReturnsAsync(Response<decimal>.Ok(rate));
     }
 
     private void SetupCurrencyRateNotFound(int currencyId)
@@ -100,7 +103,7 @@ public class CurrencyCacheRepositoryTests(CombinedContainerFixture fixture) : In
     {
         _currencyMock
             .Setup(x => x.GetCurrencyRate(currencyId, It.IsAny<CancellationToken>()))
-            .ReturnsAsync(InternalResponse<decimal>.Fail(statusCode, error));
+            .ReturnsAsync(Response<decimal>.Fail(statusCode, error));
     }
 
     private void VerifyCurrencyRateRequested(int currencyId, Times times)

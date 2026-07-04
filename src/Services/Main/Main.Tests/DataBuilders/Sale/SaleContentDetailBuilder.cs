@@ -1,6 +1,6 @@
 using Bogus;
 using Main.Entities.Sale;
-using Test.Common.Abstractions;
+using Tests.Abstractions;
 
 namespace Tests.DataBuilders.Sale;
 
@@ -10,11 +10,11 @@ public class SaleContentDetailBuilder(Faker faker) : BuilderBase<SaleContentDeta
     public IReadOnlyList<int> StorageContentIds => _storageContentIds;
 
     public int? CurrencyId { get; private set; }
-    
+
     public int? Count { get; private set; }
     public decimal? PurchasePrice { get; private set; }
     public DateTime? PurchaseDate { get; private set; }
-    
+
     public SaleContentDetailBuilder WithStorageContentIds(IEnumerable<int> storageContentIds)
     {
         _storageContentIds.Clear();
@@ -45,7 +45,7 @@ public class SaleContentDetailBuilder(Faker faker) : BuilderBase<SaleContentDeta
         PurchaseDate = purchaseDate;
         return this;
     }
-    
+
     public override SaleContentDetail Build()
     {
         return SaleContentDetail.Create(

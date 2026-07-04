@@ -1,9 +1,9 @@
 ﻿using Main.Entities.Product;
 using Main.Persistence.Context;
-using Test.Common.Abstractions;
-using Test.Common.Extensions;
-using Test.Common.Interfaces;
+using Tests.Abstractions;
 using Tests.DataBuilders;
+using Tests.Extensions;
+using Tests.Interfaces;
 
 namespace Tests.TestContexts;
 
@@ -23,8 +23,9 @@ public class ProductTestContext(
 
     public override async Task InitializeAsync(CancellationToken cancellationToken = default)
     {
-        _products.AddRange(await new ProductBuilder(Faker)
-            .WithProducers(producerTestContext.Producers)
-            .BuildManyAndAddToDb(DbContext, 10));
+        _products.AddRange(
+            await new ProductBuilder(Faker)
+                .WithProducers(producerTestContext.Producers)
+                .BuildManyAndAddToDb(DbContext, 10));
     }
 }

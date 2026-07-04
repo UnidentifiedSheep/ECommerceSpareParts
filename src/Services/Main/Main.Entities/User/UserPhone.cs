@@ -3,7 +3,6 @@ using System.Text.RegularExpressions;
 using Domain;
 using Domain.Extensions;
 using Domain.Interfaces;
-using Exceptions;
 using Extensions;
 using Main.Enums;
 
@@ -15,11 +14,12 @@ public partial class UserPhone : AuditableEntity<UserPhone, string>, ILinqEntity
     public const int MaxNormalizedPhoneLength = 15;
     public const int MaxPhoneNumberLength = 32;
 
-    private UserPhone()
-    {
-    }
+    private UserPhone() { }
 
-    private UserPhone(Guid userId, string phoneNumber, PhoneType phoneType)
+    private UserPhone(
+        Guid userId,
+        string phoneNumber,
+        PhoneType phoneType)
     {
         UserId = userId;
         SetPhoneNumber(phoneNumber);
@@ -41,19 +41,22 @@ public partial class UserPhone : AuditableEntity<UserPhone, string>, ILinqEntity
     public DateTime? ConfirmedAt { get; private set; }
     public User User { get; private set; } = null!;
 
-    public static Expression<Func<UserPhone, string>> GetKeySelector()
-    {
-        return x => x.NormalizedPhone;
-    }
+    public static Expression<Func<UserPhone, string>> GetKeySelector() { return x => x.NormalizedPhone; }
 
     public static Expression<Func<UserPhone, bool>> GetEqualityExpression(string key)
     {
         return x => x.NormalizedPhone == key;
     }
 
-    internal static UserPhone Create(Guid userId, string phoneNumber, PhoneType phoneType)
+    internal static UserPhone Create(
+        Guid userId,
+        string phoneNumber,
+        PhoneType phoneType)
     {
-        return new UserPhone(userId, phoneNumber, phoneType);
+        return new UserPhone(
+            userId,
+            phoneNumber,
+            phoneType);
     }
 
     public void SetPhoneNumber(string phoneNumber)
@@ -76,33 +79,24 @@ public partial class UserPhone : AuditableEntity<UserPhone, string>, ILinqEntity
         ConfirmedAt = confirmed ? DateTime.UtcNow : null;
     }
 
-    public void ChangeType(PhoneType phoneType)
-    {
-        PhoneType = phoneType;
-    }
+    public void ChangeType(PhoneType phoneType) { PhoneType = phoneType; }
 
-    public void MakePrimary(bool isPrimary = true)
-    {
-        IsPrimary = isPrimary;
-    }
+    public void MakePrimary(bool isPrimary = true) { IsPrimary = isPrimary; }
 
     public static string ToNormalizedPhone(string phoneNumber)
     {
         return phoneNumber.ToNormalizedPhoneNumber();
     }
-    
+
     public bool IsValidPhone(string phone)
     {
-        if (string.IsNullOrWhiteSpace(phone))
-            return false;
+        if (string.IsNullOrWhiteSpace(phone)) return false;
 
         phone = phone.Trim();
 
-        if (phone.Length is < 7 or > 20)
-            return false;
+        if (phone.Length is < 7 or > 20) return false;
 
-        if (!PhoneRegex().IsMatch(phone))
-            return false;
+        if (!PhoneRegex().IsMatch(phone)) return false;
 
         var digitsOnly = new string(phone.Where(char.IsDigit).ToArray());
         return digitsOnly.Length >= 7;
@@ -116,8 +110,5 @@ public partial class UserPhone : AuditableEntity<UserPhone, string>, ILinqEntity
     [GeneratedRegex(@"^\+?[0-9\s\-\(\)]{7,20}$")]
     private static partial Regex PhoneRegex();
 
-    public override string GetId()
-    {
-        return NormalizedPhone;
-    }
+    public override string GetId() { return NormalizedPhone; }
 }

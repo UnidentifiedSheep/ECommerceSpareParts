@@ -33,8 +33,9 @@ public record ProductCrossesImportInputState : IInputState
     public void ValidateState()
     {
         if (!FileName.EndsWith(".csv"))
-            throw new InvalidOperationException("Product crosses import state error. " +
-                                                "File name should end with .csv");
+            throw new InvalidOperationException(
+                "Product crosses import state error. " +
+                "File name should end with .csv");
     }
 }
 

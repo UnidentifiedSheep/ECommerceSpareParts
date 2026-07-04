@@ -5,9 +5,7 @@ namespace Main.Entities.Product.ValueObjects;
 
 public partial record Sku
 {
-    private Sku()
-    {
-    }
+    private Sku() { }
 
     public Sku(string value)
     {
@@ -32,13 +30,7 @@ public partial record Sku
         return OnlyCharacter().Replace(source, "").ToUpperInvariant();
     }
 
-    public static implicit operator Sku(string value)
-    {
-        return new Sku(value);
-    }
+    public static implicit operator Sku(string value) { return new Sku(value); }
 
-    public static implicit operator string(Sku sku)
-    {
-        return sku.Value;
-    }
+    public static implicit operator string(Sku sku) { return sku.Value; }
 }

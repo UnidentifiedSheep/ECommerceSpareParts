@@ -2,14 +2,9 @@
 
 public abstract class ProductMetric<TData> : Metric<TData> where TData : class
 {
-    protected ProductMetric()
-    {
-    }
+    protected ProductMetric() { }
 
-    protected ProductMetric(int productId)
-    {
-        SetProductId(productId);
-    }
+    protected ProductMetric(int productId) { SetProductId(productId); }
 
     public int ProductId { get; private set; }
 

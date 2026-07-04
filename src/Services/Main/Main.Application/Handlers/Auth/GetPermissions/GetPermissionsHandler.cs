@@ -13,10 +13,13 @@ public record GetPermissionsQuery : IQuery<GetPermissionsResult>;
 public record GetPermissionsResult(IReadOnlyList<PermissionDto> Permissions);
 
 public class GetPermissionsHandler(
-    IScopedStringLocalizer localizer)
+    IScopedStringLocalizer localizer
+)
     : IQueryHandler<GetPermissionsQuery, GetPermissionsResult>
 {
-    public async Task<GetPermissionsResult> Handle(GetPermissionsQuery request, CancellationToken cancellationToken)
+    public async Task<GetPermissionsResult> Handle(
+        GetPermissionsQuery request,
+        CancellationToken cancellationToken)
     {
         var permissions = Enum.GetValues<PermissionCodes>()
             .Select(x => new PermissionDto
@@ -26,7 +29,7 @@ public class GetPermissionsHandler(
                 Description = localizer.Get(Permission.GetLocalizationDescriptionKey(x))
             })
             .ToArray();
-        
+
         return new GetPermissionsResult(permissions);
     }
 }

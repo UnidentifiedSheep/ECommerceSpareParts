@@ -1,16 +1,16 @@
 using System.Linq.Expressions;
-using Abstractions.Interfaces.Services;
 using Application.Common.Interfaces.Repositories;
 using Domain;
 using Domain.Interfaces;
 using Microsoft.EntityFrameworkCore;
-using Persistence.Extensions;
 using Persistence.Interfaces;
 
 namespace Persistence.Repository;
 
-public abstract class LinqRepositoryBase<TContext, TEntity, TKey>(TContext context, IQueryableExtensions extensions)
-    : RepositoryBase<TContext, TEntity, TKey>(context, extensions)
+public abstract class LinqRepositoryBase<TContext, TEntity, TKey>(
+    TContext context,
+    IQueryableExtensions extensions
+) : RepositoryBase<TContext, TEntity, TKey>(context, extensions)
     where TEntity : Entity<TEntity, TKey>, ILinqEntity<TEntity, TKey>
     where TKey : notnull
     where TContext : DbContext

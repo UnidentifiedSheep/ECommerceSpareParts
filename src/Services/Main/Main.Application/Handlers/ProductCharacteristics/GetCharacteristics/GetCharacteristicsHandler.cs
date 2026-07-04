@@ -14,7 +14,8 @@ public record GetCharacteristicsQuery(int ProductId, Pagination Pagination)
 public record GetCharacteristicsResult(IReadOnlyList<ProductCharacteristicDto> Characteristics);
 
 public class GetCharacteristicsHandler(
-    IReadRepository<ProductCharacteristic, (int, string)> repository)
+    IReadRepository<ProductCharacteristic, (int, string)> repository
+)
     : IQueryHandler<GetCharacteristicsQuery, GetCharacteristicsResult>
 {
     public async Task<GetCharacteristicsResult> Handle(

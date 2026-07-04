@@ -1,4 +1,4 @@
-﻿using Test.Common.Interfaces.ServiceProvider;
+﻿using Tests.Interfaces.ServiceProvider;
 
 namespace Analytics.Integration.Tests;
 

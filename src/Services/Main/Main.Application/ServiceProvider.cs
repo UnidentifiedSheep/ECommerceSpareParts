@@ -1,28 +1,21 @@
 using Abstractions;
 using Abstractions.Interfaces.Validators;
-using Abstractions.Models;
 using Application.Common;
 using Application.Common.Extensions;
-using Application.Common.Interfaces;
 using Application.Common.Interfaces.Currency;
-using Application.Common.Interfaces.Settings;
 using Application.Common.Services.Currency;
-using Application.Common.Services.Settings;
 using Application.Common.Validators;
 using Main.Application.Configs;
-using Main.Application.Handlers.Users.GetUserDiscount;
 using Main.Application.Interfaces.Logistics;
 using Main.Application.Interfaces.Services;
 using Main.Application.Interfaces.Services.Currency;
 using Main.Application.Interfaces.Services.Event;
-using Main.Application.Interfaces.Services.Storage;
 using Main.Application.Lrts.ProducerImport;
 using Main.Application.Services;
 using Main.Application.Services.Currency;
 using Main.Application.Services.Event;
 using Main.Application.Services.Logistics;
 using Main.Application.Services.Logistics.PricingStrategies;
-using Main.Application.Services.Storage;
 using Main.Entities.Balance;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -59,7 +52,6 @@ public static class ServiceProvider
         collection.AddSingleton<ILogisticsCostService, LogisticsCostService>();
 
         collection.AddScoped<ISaleEventService, SaleEventService>();
-        collection.AddScoped<IStorageContentChangeNotifier, StorageContentChangeNotifier>();
 
         collection.AddScoped<IMailingService, MailingService>();
         collection.AddScoped<ITransactionFinancialProfileService, TransactionFinancialProfileService>();
@@ -67,27 +59,16 @@ public static class ServiceProvider
         collection.AddScoped<IPurchaseLogisticsService, PurchaseLogisticsService>();
         collection.AddScoped<ISaleService, SaleService>();
         collection.AddScoped<IUserTokenService, UserTokenService>();
+        collection.AddScoped<IProducerLookupService, ProducerLookupService>();
         collection.AddScoped<ICurrencyRateUpdater, CurrencyRateUpdater>();
         collection.AddScoped<ICurrencyRatesProvider, CurrencyRatesProvider>();
 
         collection.AddApplicationBase(
-            serviceDefinition: ServicesDefinitions.Main,
-            configuration: configuration, 
-            assembly: typeof(Global).Assembly);
+            ServicesDefinitions.Main,
+            configuration,
+            typeof(Global).Assembly);
 
         collection.AddSingleton<IEmailValidator, EmailValidator>();
-
-        collection.Scan(scan => scan
-            .FromAssemblyOf<GetUserDiscountHandler>()
-            .AddClasses(classes => classes.Where(type =>
-                type.GetInterfaces()
-                    .Any(i => i.IsGenericType &&
-                              i.GetGenericTypeDefinition() == typeof(ILoggableRequest<>))))
-            .As(type => type.GetInterfaces()
-                .Where(i => i.IsGenericType &&
-                            i.GetGenericTypeDefinition() == typeof(ILoggableRequest<>)))
-            .WithScopedLifetime()
-        );
 
         ValidationConfiguration.Configure();
 

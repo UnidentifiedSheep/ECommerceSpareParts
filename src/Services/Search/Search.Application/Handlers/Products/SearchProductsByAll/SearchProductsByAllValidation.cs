@@ -5,7 +5,7 @@ namespace Search.Application.Handlers.Products.SearchProductsByAll;
 
 public class SearchProductsByAllValidation : AbstractValidator<SearchProductsByAllQuery>
 {
-    public  SearchProductsByAllValidation()
+    public SearchProductsByAllValidation()
     {
         RuleFor(x => x.Pagination)
             .SetValidator(new PaginationValidator());

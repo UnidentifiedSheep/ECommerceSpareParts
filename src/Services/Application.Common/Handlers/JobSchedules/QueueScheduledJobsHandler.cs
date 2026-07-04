@@ -9,22 +9,23 @@ using MediatR;
 namespace Application.Common.Handlers.JobSchedules;
 
 [Diagnostics]
-[Transactional, AutoSave]
+[Transactional]
+[AutoSave]
 public record QueueScheduledJobsCommand(int BatchSize) : ICommand;
 
 public class QueueScheduledJobsHandler(
     IRepository<JobSchedule, Guid> repository,
-    ISender sender) : ICommandHandler<QueueScheduledJobsCommand>
+    ISender sender
+) : ICommandHandler<QueueScheduledJobsCommand>
 {
     public async Task<Unit> Handle(
-        QueueScheduledJobsCommand request, 
+        QueueScheduledJobsCommand request,
         CancellationToken cancellationToken)
     {
-        if (request.BatchSize <= 0)
-            return Unit.Value;
-        
+        if (request.BatchSize <= 0) return Unit.Value;
+
         var uncorrectedTime = DateTime.UtcNow;
-        
+
         var criteria = Criteria<JobSchedule>.New()
             .Where(x => x.Enabled)
             .Where(x => x.NextRunAt != null && x.NextRunAt <= uncorrectedTime)
@@ -35,12 +36,15 @@ public class QueueScheduledJobsHandler(
             .Build();
 
         var schedules = await repository.ListAsync(criteria, cancellationToken);
-        if (schedules.Count == 0)
-            return Unit.Value;
+        if (schedules.Count == 0) return Unit.Value;
 
-        var jobs = (await sender.Send(new QueueJobCommand(
+        var jobs = (await sender.Send(
+            new QueueJobCommand(
                 schedules
-                    .Select(x => new QueueJobItem(x.JobSystemName, x.InputState, x.MaxAttempts))
+                    .Select(x => new QueueJobItem(
+                        x.JobSystemName,
+                        x.InputState,
+                        x.MaxAttempts))
                     .ToList()),
             cancellationToken)).Jobs;
 
@@ -50,14 +54,17 @@ public class QueueScheduledJobsHandler(
             var job = jobs[i];
 
             var scheduledAt = schedule.NextRunAt!.Value;
-            
+
             var nextRunAt = CronExpression.Parse(schedule.Cron)
                 .GetNextOccurrence(
                     uncorrectedTime,
                     JobSchedule.TimeZone);
 
             schedule.MarkQueued(uncorrectedTime, nextRunAt);
-            schedule.AddScheduleRun(job.Id, scheduledAt, uncorrectedTime);
+            schedule.AddScheduleRun(
+                job.Id,
+                scheduledAt,
+                uncorrectedTime);
         }
 
         return Unit.Value;

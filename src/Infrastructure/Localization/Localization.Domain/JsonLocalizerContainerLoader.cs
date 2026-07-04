@@ -21,19 +21,19 @@ public class JsonLocalizerContainerLoader(string dirPath) : ILocalizerContainerL
             "*.json",
             SearchOption.AllDirectories);
 
-        await Parallel.ForEachAsync(files, async (file, _) =>
-        {
-            var model = await ReadFile(file);
-            var locale = model.Locale.ToUpperInvariant();
+        await Parallel.ForEachAsync(
+            files,
+            async (file, _) =>
+            {
+                var model = await ReadFile(file);
+                var locale = model.Locale.ToUpperInvariant();
 
-            if (!containersDict.ContainsKey(locale))
-                return;
+                if (!containersDict.ContainsKey(locale)) return;
 
-            var dict = localesValues.GetOrAdd(locale, _ => new ConcurrentDictionary<string, string>());
+                var dict = localesValues.GetOrAdd(locale, _ => new ConcurrentDictionary<string, string>());
 
-            foreach (var (key, value) in model.KeyValues)
-                dict.TryAdd(key, value);
-        });
+                foreach (var (key, value) in model.KeyValues) dict.TryAdd(key, value);
+            });
 
         foreach (var (locale, values) in localesValues)
         {

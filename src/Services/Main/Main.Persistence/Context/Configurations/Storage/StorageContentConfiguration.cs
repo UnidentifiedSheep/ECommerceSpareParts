@@ -12,15 +12,21 @@ public class StorageContentConfiguration : IEntityTypeConfiguration<StorageConte
 
         builder.HasKey(e => e.Id).HasName("storage_content_pk");
 
-        builder.HasIndex(e => new { e.ProductId, e.StorageName }, "storage_content_product_id_storage_name_index");
+        builder.HasIndex(
+            e => new { e.ProductId, e.StorageName },
+            "storage_content_product_id_storage_name_index");
 
-        builder.HasIndex(e => new { e.ProductId, e.StorageName }, "storage_content_product_storage_positive_count_idx")
+        builder.HasIndex(
+                e => new { e.ProductId, e.StorageName },
+                "storage_content_product_storage_positive_count_idx")
             .HasFilter("(count > 0)")
             .IncludeProperties(e => e.Count);
 
         builder.HasIndex(e => e.CurrencyId, "storage_content_currency_id_index");
 
-        builder.HasIndex(e => new { e.StorageName, e.ProductId }, "storage_content_storage_name_product_id_index");
+        builder.HasIndex(
+            e => new { e.StorageName, e.ProductId },
+            "storage_content_storage_name_product_id_index");
 
         builder.Property(e => e.Id)
             .HasColumnName("id");

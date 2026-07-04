@@ -5,7 +5,8 @@ namespace Application.Common.NamedObject;
 
 public class NamedObjectGroupResolver(
     INamedObjectGroupRegistry registry,
-    IServiceProvider serviceProvider) : INamedObjectGroupResolver
+    IServiceProvider serviceProvider
+) : INamedObjectGroupResolver
 {
     public INamedObjectRegistry GetByGroupName(string groupName)
     {

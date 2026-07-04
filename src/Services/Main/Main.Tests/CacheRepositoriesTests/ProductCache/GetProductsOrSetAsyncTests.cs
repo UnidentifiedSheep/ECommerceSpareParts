@@ -1,12 +1,11 @@
 using Cache;
 using FluentAssertions;
-using Main.Application;
 using Main.Application.Dtos.Product;
 using Main.Application.Interfaces.Cache;
 using Main.Application.Static;
 using Main.Entities.Product;
 using Microsoft.Extensions.DependencyInjection;
-using Test.Common.TestContainers.Combined;
+using Tests.TestContainers.Combined;
 using Tests.TestContexts;
 
 namespace Tests.CacheRepositoriesTests.ProductCache;
@@ -48,7 +47,8 @@ public class GetProductsOrSetAsyncTests : IntegrationTest
 
         await RemoveCachedProducts([cachedProduct.Id, dbProduct.Id]);
 
-        var cachedBeforeUpdate = (await repository.GetProductsOrSetAsync([cachedProduct.Id]))[cachedProduct.Id];
+        var cachedBeforeUpdate =
+            (await repository.GetProductsOrSetAsync([cachedProduct.Id]))[cachedProduct.Id];
 
         cachedProduct.SetName("Updated product name");
         await Context.SaveChangesAsync();
@@ -62,8 +62,10 @@ public class GetProductsOrSetAsyncTests : IntegrationTest
         AssertProduct(result[dbProduct.Id], dbProduct);
 
         var rawCached = await repository.GetProductsAsync([dbProduct.Id]);
-        rawCached.Should().ContainSingle()
-            .Which.Should().BeEquivalentTo(result[dbProduct.Id]);
+        rawCached.Should()
+            .ContainSingle()
+            .Which.Should()
+            .BeEquivalentTo(result[dbProduct.Id]);
     }
 
     [Fact]

@@ -10,7 +10,8 @@ using Main.Entities.Producer;
 using Main.Entities.Product;
 using Main.Entities.Purchase;
 using Main.Entities.Sale;
-using Main.Entities.Setting;
+using Main.Entities.Settings;
+using Main.Entities.Settings.Supplier;
 using Main.Entities.Storage;
 using Main.Entities.User;
 using MassTransit;
@@ -25,9 +26,7 @@ namespace Main.Persistence.Context;
 
 public partial class DContext : DbContext
 {
-    public DContext()
-    {
-    }
+    public DContext() { }
 
     public DContext(DbContextOptions<DContext> options)
         : base(options)
@@ -75,7 +74,9 @@ public partial class DContext : DbContext
 
     public virtual DbSet<Producer> Producers { get; set; }
 
-    public virtual DbSet<ProducerOtherName> ProducersOtherNames { get; set; }
+    public virtual DbSet<ProducerAlias> ProducersAliases { get; set; }
+    
+    public virtual DbSet<ProducerSupplierMapping> ProducerSupplierMappings { get; set; }
 
     public virtual DbSet<Purchase> Purchases { get; set; }
 
@@ -126,7 +127,7 @@ public partial class DContext : DbContext
     public virtual DbSet<UserToken> UserTokens { get; set; }
 
     public virtual DbSet<UserVehicle> UserVehicles { get; set; }
-    
+
     public virtual DbSet<Job> Jobs { get; set; }
 
     public virtual DbSet<JobSchedule> JobSchedules { get; set; }
@@ -166,7 +167,8 @@ public partial class DContext : DbContext
             .HasValue<Setting>(nameof(Setting))
             .HasValue<CurrencySetting>(CurrencySetting.SettingName)
             .HasValue<GlobalApplicationSetting>(GlobalApplicationSetting.SettingName)
-            .HasValue<StorageContentSetting>(StorageContentSetting.SettingName);
+            .HasValue<StorageContentSetting>(StorageContentSetting.SettingName)
+            .HasValue<FavoritSupplierSetting>(FavoritSupplierSetting.SettingName);
 
         modelBuilder.AddFieldsForAuditableEntities();
 

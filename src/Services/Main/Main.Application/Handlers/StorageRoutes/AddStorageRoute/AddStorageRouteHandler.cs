@@ -1,5 +1,4 @@
 ﻿using Abstractions.Interfaces.Persistence;
-using Abstractions.Interfaces.Services;
 using Application.Common.Interfaces.Cqrs;
 using Attributes;
 using Main.Entities.Storage;
@@ -32,14 +31,17 @@ public record AddStorageRouteCommand(
     int CurrencyId,
     decimal PricePerOrder,
     decimal MinimumPrice,
-    Guid? CarrierId) : ICommand<AddStorageRouteResult>;
+    Guid? CarrierId
+) : ICommand<AddStorageRouteResult>;
 
 public record AddStorageRouteResult(Guid RouteId);
 
 public class AddStorageRouteHandler(IUnitOfWork unitOfWork)
     : ICommandHandler<AddStorageRouteCommand, AddStorageRouteResult>
 {
-    public async Task<AddStorageRouteResult> Handle(AddStorageRouteCommand request, CancellationToken cancellationToken)
+    public async Task<AddStorageRouteResult> Handle(
+        AddStorageRouteCommand request,
+        CancellationToken cancellationToken)
     {
         var storageRoute = StorageRoute.Create(
             request.StorageFrom,

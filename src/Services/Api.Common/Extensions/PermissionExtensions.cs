@@ -7,10 +7,15 @@ namespace Api.Common.Extensions;
 
 public static class PermissionExtensions
 {
+    private static string NormalizeRole(string role) { return role.Trim().ToUpperInvariant(); }
+
     public static TBuilder RequireAnyPermission<TBuilder>(this TBuilder builder, params string[] permissions)
         where TBuilder : IEndpointConventionBuilder
     {
-        builder.Add(endpoint => { endpoint.Metadata.Add(new RequiredPermissionsMetadata(permissions, false)); });
+        builder.Add(endpoint =>
+        {
+            endpoint.Metadata.Add(new RequiredPermissionsMetadata(permissions, false));
+        });
 
         builder.AddEndpointFilter(new PermissionFilter(PermissionCheck.Any, permissions));
 
@@ -20,7 +25,10 @@ public static class PermissionExtensions
     public static TBuilder RequireAllPermissions<TBuilder>(this TBuilder builder, params string[] permissions)
         where TBuilder : IEndpointConventionBuilder
     {
-        builder.Add(endpoint => { endpoint.Metadata.Add(new RequiredPermissionsMetadata(permissions, true)); });
+        builder.Add(endpoint =>
+        {
+            endpoint.Metadata.Add(new RequiredPermissionsMetadata(permissions, true));
+        });
 
         builder.AddEndpointFilter(new PermissionFilter(PermissionCheck.All, permissions));
 
@@ -45,6 +53,56 @@ public static class PermissionExtensions
         builder.Add(endpoint => { endpoint.Metadata.Add(new RequiredPermissionsMetadata(perm, true)); });
 
         builder.AddEndpointFilter(new PermissionFilter(PermissionCheck.All, perm));
+
+        return builder;
+    }
+
+    public static TBuilder RequireAnyRole<TBuilder>(this TBuilder builder, params string[] roles)
+        where TBuilder : IEndpointConventionBuilder
+    {
+        var normalizedRoles = roles.Select(NormalizeRole).ToArray();
+        builder.Add(endpoint =>
+        {
+            endpoint.Metadata.Add(new RequiredRolesMetadata(normalizedRoles, false));
+        });
+
+        builder.AddEndpointFilter(new RoleFilter(PermissionCheck.Any, normalizedRoles));
+
+        return builder;
+    }
+
+    public static TBuilder RequireAllRoles<TBuilder>(this TBuilder builder, params string[] roles)
+        where TBuilder : IEndpointConventionBuilder
+    {
+        var normalizedRoles = roles.Select(NormalizeRole).ToArray();
+        builder.Add(endpoint => { endpoint.Metadata.Add(new RequiredRolesMetadata(normalizedRoles, true)); });
+
+        builder.AddEndpointFilter(new RoleFilter(PermissionCheck.All, normalizedRoles));
+
+        return builder;
+    }
+
+    public static TBuilder RequireAnyRole<TBuilder>(this TBuilder builder, params Enum[] roles)
+        where TBuilder : IEndpointConventionBuilder
+    {
+        var normalizedRoles = roles.Select(x => NormalizeRole(x.ToString())).ToArray();
+        builder.Add(endpoint =>
+        {
+            endpoint.Metadata.Add(new RequiredRolesMetadata(normalizedRoles, false));
+        });
+
+        builder.AddEndpointFilter(new RoleFilter(PermissionCheck.Any, normalizedRoles));
+
+        return builder;
+    }
+
+    public static TBuilder RequireAllRoles<TBuilder>(this TBuilder builder, params Enum[] roles)
+        where TBuilder : IEndpointConventionBuilder
+    {
+        var normalizedRoles = roles.Select(x => NormalizeRole(x.ToString())).ToArray();
+        builder.Add(endpoint => { endpoint.Metadata.Add(new RequiredRolesMetadata(normalizedRoles, true)); });
+
+        builder.AddEndpointFilter(new RoleFilter(PermissionCheck.All, normalizedRoles));
 
         return builder;
     }

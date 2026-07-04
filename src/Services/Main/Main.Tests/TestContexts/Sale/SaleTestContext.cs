@@ -2,14 +2,15 @@ using Main.Entities.Balance;
 using Main.Entities.Product;
 using Main.Entities.Storage;
 using Main.Entities.User;
+using Main.Enums;
 using Main.Enums.Balances;
 using Main.Persistence.Context;
-using Test.Common.Abstractions;
-using Test.Common.Extensions;
-using Test.Common.Interfaces;
+using Tests.Abstractions;
 using Tests.DataBuilders.Balance;
 using Tests.DataBuilders.Sale;
 using Tests.DataBuilders.User;
+using Tests.Extensions;
+using Tests.Interfaces;
 using Tests.TestContexts.Currency;
 using Tests.TestContexts.Storage;
 using DomainSale = Main.Entities.Sale.Sale;
@@ -21,7 +22,8 @@ public class SaleTestContext(
     UserContextTestContext userContext,
     ProductTestContext productContext,
     StorageContentTestContext storageContentContext,
-    CurrencyTestContext currencyContext) : TestContextBase<DContext>(context), IDependentTestContext
+    CurrencyTestContext currencyContext
+) : TestContextBase<DContext>(context), IDependentTestContext
 {
     public User Buyer { get; private set; } = null!;
     public Product Product { get; private set; } = null!;
@@ -32,6 +34,13 @@ public class SaleTestContext(
     public UserBalance ReceiverBalance { get; private set; } = null!;
     public int SoldCount { get; private set; }
 
+    public static Type[] DependsOn { get; } =
+    [
+        typeof(ProductTestContext),
+        typeof(CurrencyRatesTestContext),
+        typeof(StorageContentTestContext)
+    ];
+
     public override async Task InitializeAsync(CancellationToken cancellationToken = default)
     {
         var currencyId = currencyContext.Currencies[0].Id;
@@ -41,7 +50,7 @@ public class SaleTestContext(
         StorageContent = storageContentContext.StorageContents.First(x => x.Count > 0);
         Product = productContext.Products.Single(x => x.Id == StorageContent.ProductId);
         SoldCount = 1;
-        
+
         ReceiverBalance = new UserBalanceBuilder(Faker)
             .WithUserId(Buyer.Id)
             .WithCurrencyId(currencyId)
@@ -50,9 +59,9 @@ public class SaleTestContext(
             .WithUserId(userContext.SystemUser.Id)
             .WithCurrencyId(currencyId)
             .Build();
-        
+
         SenderBalance.IncrementBalance(20m);
-        
+
         Transaction = new TransactionBuilder(Faker)
             .WithSenderId(SenderBalance.UserId)
             .WithReceiverId(ReceiverBalance.UserId)
@@ -63,8 +72,12 @@ public class SaleTestContext(
             .Completed()
             .Applied()
             .Build();
-        
-        await DbContext.AddRangeAsync(Transaction, SenderBalance, ReceiverBalance, buyerProfile);
+
+        await DbContext.AddRangeAsync(
+            Transaction,
+            SenderBalance,
+            ReceiverBalance,
+            buyerProfile);
         await DbContext.SaveChangesAsync(cancellationToken);
 
         var saleContent = new SaleContentBuilder(Faker)
@@ -84,17 +97,10 @@ public class SaleTestContext(
             .Completed()
             .Build();
 
-        StorageContent.IncreaseCount(-SoldCount);
+        StorageContent.IncreaseCount(-SoldCount, StorageMovementType.Sale);
         Product.IncreaseStock(-SoldCount);
 
         await DbContext.AddAsync(Sale, cancellationToken);
         await DbContext.SaveChangesAsync(cancellationToken);
     }
-
-    public static Type[] DependsOn { get; } =
-    [
-        typeof(ProductTestContext),
-        typeof(CurrencyRatesTestContext),
-        typeof(StorageContentTestContext)
-    ];
 }

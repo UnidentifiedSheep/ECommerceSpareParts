@@ -2,7 +2,7 @@
 using Main.Persistence.Context;
 using Microsoft.EntityFrameworkCore;
 using Persistence.Interfaces;
-using RoleEnum = Main.Enums.Role;
+using RoleEnum = Enums.Role;
 
 namespace Main.Migrator.DataSeeds;
 
@@ -32,8 +32,5 @@ public class RoleSeed : ISeed<DContext>
         await context.SaveChangesAsync();
     }
 
-    public int GetPriority()
-    {
-        return 0;
-    }
+    public int GetPriority() { return 0; }
 }

@@ -14,7 +14,7 @@ public record CreateUploadRequest
 {
     [JsonPropertyName("fileName")]
     public required string FileName { get; init; }
-    
+
     [JsonPropertyName("contentType")]
     public required string ContentType { get; init; }
 }
@@ -47,23 +47,26 @@ public class UploadsEndPoints : ICarterModule
             .MapGroup("/uploads")
             .WithTags("Uploads");
 
-        uploads.MapGet("", async (
-                ISender sender,
-                string? cursor,
-                int size,
-                CancellationToken token) =>
-            {
-                var result = await sender.Send(
-                    new GetUploadsQuery(new Cursor<string?>(cursor, size)), 
-                    token);
-
-                return Results.Ok(new GetUploadsResponse
+        uploads.MapGet(
+                "",
+                async (
+                    ISender sender,
+                    string? cursor,
+                    int size,
+                    CancellationToken token) =>
                 {
-                    Files = result.Files,
-                    NextContinuationToken = result.NextContinuationToken,
-                    HasMore = result.HasMore
-                });
-            })
+                    var result = await sender.Send(
+                        new GetUploadsQuery(new Cursor<string?>(cursor, size)),
+                        token);
+
+                    return Results.Ok(
+                        new GetUploadsResponse
+                        {
+                            Files = result.Files,
+                            NextContinuationToken = result.NextContinuationToken,
+                            HasMore = result.HasMore
+                        });
+                })
             .WithName("GetUploads")
             .WithSummary("Get uploads")
             .WithDisplayName("Get Uploads")
@@ -71,17 +74,19 @@ public class UploadsEndPoints : ICarterModule
             .ProducesProblem(StatusCodes.Status400BadRequest)
             .RequireAnyPermission(PermissionCodes.UPLOADS_CREATE);
 
-        uploads.MapPost("/create", async (
-                ISender sender,
-                CreateUploadRequest request,
-                CancellationToken token) =>
-            {
-                var result = await sender.Send(
-                    new CreateUploadRequestCommand(request.FileName, request.ContentType),
-                    token);
+        uploads.MapPost(
+                "/create",
+                async (
+                    ISender sender,
+                    CreateUploadRequest request,
+                    CancellationToken token) =>
+                {
+                    var result = await sender.Send(
+                        new CreateUploadRequestCommand(request.FileName, request.ContentType),
+                        token);
 
-                return Results.Ok(new CreateUploadResponse(result.UploadUrl));
-            })
+                    return Results.Ok(new CreateUploadResponse(result.UploadUrl));
+                })
             .WithName("CreateUploadRequest")
             .WithSummary("Create upload request")
             .WithDisplayName("Create Upload Request")
@@ -90,14 +95,16 @@ public class UploadsEndPoints : ICarterModule
             .ProducesProblem(StatusCodes.Status400BadRequest)
             .RequireAnyPermission(PermissionCodes.UPLOADS_CREATE);
 
-        uploads.MapPost("/complete", async (
-                ISender sender,
-                CompleteUploadRequest request,
-                CancellationToken token) =>
-            {
-                await sender.Send(new CompleteUploadCommand(request.FileName), token);
-                return Results.Ok();
-            })
+        uploads.MapPost(
+                "/complete",
+                async (
+                    ISender sender,
+                    CompleteUploadRequest request,
+                    CancellationToken token) =>
+                {
+                    await sender.Send(new CompleteUploadCommand(request.FileName), token);
+                    return Results.Ok();
+                })
             .WithName("CompleteUpload")
             .WithSummary("Complete upload")
             .WithDisplayName("Complete Upload")

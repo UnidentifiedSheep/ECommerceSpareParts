@@ -5,11 +5,10 @@ using Domain.Interfaces;
 
 namespace Main.Entities.Balance;
 
-public class UserBalance : AuditableEntity<UserBalance, UserBalanceKey>, ILinqEntity<UserBalance, UserBalanceKey>
+public class UserBalance : AuditableEntity<UserBalance, UserBalanceKey>,
+    ILinqEntity<UserBalance, UserBalanceKey>
 {
-    private UserBalance()
-    {
-    }
+    private UserBalance() { }
 
     private UserBalance(Guid userId, int currencyId)
     {
@@ -48,10 +47,7 @@ public class UserBalance : AuditableEntity<UserBalance, UserBalanceKey>, ILinqEn
         Balance += amount;
     }
 
-    public override UserBalanceKey GetId()
-    {
-        return new UserBalanceKey(UserId, CurrencyId);
-    }
+    public override UserBalanceKey GetId() { return new UserBalanceKey(UserId, CurrencyId); }
 }
 
 public readonly struct UserBalanceKey(Guid userId, int currencyId) : ICompositeKey
@@ -59,8 +55,5 @@ public readonly struct UserBalanceKey(Guid userId, int currencyId) : ICompositeK
     public Guid UserId => userId;
     public int CurrencyId => currencyId;
 
-    public object[] ToArray()
-    {
-        return [userId, currencyId];
-    }
+    public object[] ToArray() { return [userId, currencyId]; }
 }

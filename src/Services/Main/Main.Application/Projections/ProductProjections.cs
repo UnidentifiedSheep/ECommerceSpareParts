@@ -1,11 +1,9 @@
 ﻿using System.Linq.Expressions;
 using LinqKit;
-using Main.Application.Dtos.Auth;
 using Main.Application.Dtos.Product;
 using Main.Application.Dtos.Product.Reservation;
 using Main.Entities.Product;
 using Main.Entities.Storage;
-using Main.Entities.User;
 
 namespace Main.Application.Projections;
 
@@ -25,7 +23,23 @@ public static class ProductProjections
             Images = x.Images.Select(z => z.Path).ToList()
         };
 
-    public static readonly Expression<Func<Entities.Product.ProductCoefficient, ProductCoefficientDto>>
+    public static readonly Expression<Func<Product, FullProductDto>> ToFullDto =
+        x => new FullProductDto
+        {
+            Id = x.Id,
+            Name = x.Name,
+            Sku = x.Sku,
+            Description = x.Description,
+            Stock = x.Stock,
+            ProducerId = x.ProducerId,
+            ProducerName = x.Producer.Name,
+            Indicator = x.Indicator,
+            Images = x.Images.Select(z => z.Path).ToList(),
+            ProductWeight = ToProductWeightDto.Invoke(x.ProductWeight),
+            ProductSize = ToProductSizeDto.Invoke(x.ProductSize)
+        };
+
+    public static readonly Expression<Func<ProductCoefficient, ProductCoefficientDto>>
         ToProductCoefficientDto =
             x => new ProductCoefficientDto
             {
@@ -36,9 +50,10 @@ public static class ProductProjections
                 Coefficient = CoefficientProjections.ToDto.Invoke(x.Coefficient)
             };
 
-    public static readonly Expression<Func<Entities.Product.ProductWeight?, ProductWeightDto?>>
+    public static readonly Expression<Func<ProductWeight?, ProductWeightDto?>>
         ToProductWeightDto =
-            x => x == null ? null 
+            x => x == null
+                ? null
                 : new ProductWeightDto
                 {
                     ProductId = x.ProductId,
@@ -46,7 +61,7 @@ public static class ProductProjections
                     Unit = x.Unit
                 };
 
-    public static readonly Expression<Func<Entities.Product.ProductSize?, ProductSizeDto?>>
+    public static readonly Expression<Func<ProductSize?, ProductSizeDto?>>
         ToProductSizeDto =
             x => x == null
                 ? null

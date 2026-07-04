@@ -24,17 +24,22 @@ public static class JobProjections
         };
 
     public static Expression<Func<JobSchedule, JobScheduleDto>> JobScheduleProjection(
-        IScopedStringLocalizer localizer) => schedule => new JobScheduleDto
+        IScopedStringLocalizer localizer)
+    {
+        return schedule => new JobScheduleDto
         {
             Id = schedule.Id,
             Name = schedule.Name,
             Description = schedule.Description,
             Cron = schedule.Cron,
-            LocalizedCron = ExpressionDescriptor.GetDescription(schedule.Cron, new Options(){
-                DayOfWeekStartIndexZero = false,
-                Use24HourTimeFormat = true,
-                Locale = localizer.Locale
-            }),
+            LocalizedCron = ExpressionDescriptor.GetDescription(
+                schedule.Cron,
+                new Options
+                {
+                    DayOfWeekStartIndexZero = false,
+                    Use24HourTimeFormat = true,
+                    Locale = localizer.Locale
+                }),
             InputState = schedule.InputState,
             LastQueuedAt = schedule.LastQueuedAt,
             MaxAttempts = schedule.MaxAttempts,
@@ -42,4 +47,5 @@ public static class JobProjections
             JobSystemName = schedule.JobSystemName,
             Enabled = schedule.Enabled
         };
+    }
 }

@@ -5,7 +5,8 @@ namespace Main.Application.Interfaces.Services;
 public record PurchaseLogisticsItem(
     PurchaseContent PurchaseContent,
     int ProductId,
-    int Quantity);
+    int Quantity
+);
 
 public interface IPurchaseLogisticsService
 {

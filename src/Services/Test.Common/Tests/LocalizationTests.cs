@@ -11,11 +11,14 @@ using Localization.Abstractions.Models;
 using Localization.Domain;
 using Moq;
 
-namespace Test.Common.Tests;
+namespace Tests.Tests;
 
 public class LocalizationTests
 {
-    public async Task TestLocalizableExceptions(Assembly exceptionsAssembly, string path, Locale locale)
+    public async Task TestLocalizableExceptions(
+        Assembly exceptionsAssembly,
+        string path,
+        Locale locale)
     {
         using var scoped = await CreateLocalizer(path, locale);
         scoped.SetLocale(locale);
@@ -43,7 +46,10 @@ public class LocalizationTests
         }
     }
 
-    public async Task TestAbstractValidatorLocalization(Assembly validatorsAssembly, string path, Locale locale)
+    public async Task TestAbstractValidatorLocalization(
+        Assembly validatorsAssembly,
+        string path,
+        Locale locale)
     {
         using var scoped = await CreateLocalizer(path, locale);
         scoped.SetLocale(locale);
@@ -67,8 +73,7 @@ public class LocalizationTests
             {
                 var errorCode = o.ErrorCode;
 
-                if (string.IsNullOrWhiteSpace(errorCode))
-                    continue;
+                if (string.IsNullOrWhiteSpace(errorCode)) continue;
 
                 var success = scoped.TryGet(errorCode, out _);
 
@@ -77,7 +82,10 @@ public class LocalizationTests
         }
     }
 
-    public async Task TestDbValidatorLocalization(IEnumerable<string> functionKeys, string path, Locale locale)
+    public async Task TestDbValidatorLocalization(
+        IEnumerable<string> functionKeys,
+        string path,
+        Locale locale)
     {
         using var scoped = await CreateLocalizer(path, locale);
         scoped.SetLocale(locale);
@@ -144,8 +152,7 @@ public class LocalizationTests
 
             try
             {
-                if (Activator.CreateInstance(type, args) is ILocalizableException ex)
-                    result.Add(ex);
+                if (Activator.CreateInstance(type, args) is ILocalizableException ex) result.Add(ex);
             }
             catch
             {
@@ -199,7 +206,7 @@ public class LocalizationTests
             return dict;
         }
 
-        if (type.IsValueType || (!type.IsInterface && !type.IsAbstract))
+        if (type.IsValueType || !type.IsInterface && !type.IsAbstract)
             return type.IsValueType ? Activator.CreateInstance(type) : null;
         var mockType = typeof(Mock<>).MakeGenericType(type);
         var mock = Activator.CreateInstance(mockType);

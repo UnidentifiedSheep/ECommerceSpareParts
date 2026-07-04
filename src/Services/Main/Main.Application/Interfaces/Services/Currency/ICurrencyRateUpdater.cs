@@ -1,5 +1,5 @@
 ﻿using Main.Application.Models.Currency;
-using Main.Entities.Setting;
+using Main.Entities.Settings;
 
 namespace Main.Application.Interfaces.Services.Currency;
 

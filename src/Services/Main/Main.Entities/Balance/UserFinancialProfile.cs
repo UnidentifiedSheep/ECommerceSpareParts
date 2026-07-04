@@ -6,13 +6,6 @@ namespace Main.Entities.Balance;
 
 public class UserFinancialProfile : AuditableEntity<UserFinancialProfile, Guid>, IVersionable<uint>
 {
-    public Guid UserId { get; private set; }
-    public decimal Balance { get; private set; }
-    public decimal MinAllowedBalance { get; private set; }
-    public uint RowVersion { get; private set; }
-
-    public override Guid GetId() => UserId;
-
     private UserFinancialProfile(Guid userId, decimal minAllowedBalance)
     {
         UserId = userId;
@@ -20,8 +13,17 @@ public class UserFinancialProfile : AuditableEntity<UserFinancialProfile, Guid>,
         SetMinAllowedBalance(minAllowedBalance);
     }
 
+    public Guid UserId { get; }
+    public decimal Balance { get; private set; }
+    public decimal MinAllowedBalance { get; private set; }
+    public uint RowVersion { get; private set; }
+
+    public override Guid GetId() { return UserId; }
+
     public static UserFinancialProfile Create(Guid userId, decimal minAllowedBalance = 0)
-        => new(userId, minAllowedBalance);
+    {
+        return new UserFinancialProfile(userId, minAllowedBalance);
+    }
 
     public void Credit(decimal amount)
     {
@@ -36,15 +38,17 @@ public class UserFinancialProfile : AuditableEntity<UserFinancialProfile, Guid>,
         var newBalance = Balance - amount;
         if (!force)
             newBalance.AgainstTooSmall(
-                min: MinAllowedBalance,
-                errorKey: "financial.profile.balance.must.not.be.less.than.minimum");
+                MinAllowedBalance,
+                "financial.profile.balance.must.not.be.less.than.minimum");
 
         Balance = newBalance;
     }
 
     public void SetMinAllowedBalance(decimal minAllowedBalance)
     {
-        minAllowedBalance.AgainstTooManyDecimalPlaces(2, "financial.profile.min.allowed.balance.max.two.decimal.places")
+        minAllowedBalance.AgainstTooManyDecimalPlaces(
+                2,
+                "financial.profile.min.allowed.balance.max.two.decimal.places")
             .AgainstPositive("financial.profile.min.allowed.balance.must.not.be.positive");
         MinAllowedBalance = minAllowedBalance;
     }

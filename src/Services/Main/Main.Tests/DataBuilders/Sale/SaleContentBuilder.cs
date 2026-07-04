@@ -1,21 +1,20 @@
 using Bogus;
 using Main.Entities.Sale;
-using Test.Common.Abstractions;
+using Tests.Abstractions;
 
 namespace Tests.DataBuilders.Sale;
 
 public class SaleContentBuilder(Faker faker) : BuilderBase<SaleContent>(faker)
 {
+    private readonly List<int> _storageContentIds = [];
     public int? ProductId { get; private set; }
-    
+
     public decimal? PriceWithDiscount { get; private set; }
     public decimal? PriceWithOutDiscount { get; private set; }
-    
-    private readonly List<int> _storageContentIds = [];
     public IReadOnlyList<int> StorageContentIds => _storageContentIds;
-    
+
     public int? CurrencyId { get; private set; }
-    
+
     public int? DetailsCount { get; private set; }
     public int? Count { get; private set; }
 
@@ -51,7 +50,7 @@ public class SaleContentBuilder(Faker faker) : BuilderBase<SaleContent>(faker)
         CurrencyId = currencyId;
         return this;
     }
-    
+
     public override SaleContent Build()
     {
         var price = PriceWithOutDiscount ?? Math.Round(Faker.Random.Decimal(1), 2);
@@ -68,15 +67,15 @@ public class SaleContentBuilder(Faker faker) : BuilderBase<SaleContent>(faker)
         Count ??= Faker.Random.Int(1, 100);
         DetailsCount ??= Faker.Random.Int(1, Math.Min(5, Count.Value));
 
-        int remaining = Count.Value;
+        var remaining = Count.Value;
         var detailsCount = Math.Min(DetailsCount.Value, Count.Value);
-        
+
         var builder = new SaleContentDetailBuilder(Faker)
             .WithPurchaseDate(Faker.Date.Recent())
             .WithPurchasePrice(Math.Round(Faker.Random.Decimal(1), 2))
             .WithStorageContentIds(_storageContentIds)
             .WithCurrencyId(CurrencyId ?? Faker.Random.Int(1));
-        
+
         for (var i = 0; i < detailsCount; i++)
         {
             var remainingDetails = detailsCount - i;
@@ -85,7 +84,7 @@ public class SaleContentBuilder(Faker faker) : BuilderBase<SaleContent>(faker)
                 : Faker.Random.Int(1, remaining - remainingDetails + 1);
 
             remaining -= toTake;
-            
+
             details.Add(builder.WithCount(toTake).Build());
         }
 

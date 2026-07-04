@@ -16,11 +16,17 @@ public class AnyExceptionHandler(
         LogError(httpContext, exception);
         var statusCode = GetStatusCode(exception);
 
-        var problemDetails = GetBaseDetails(exception, httpContext, statusCode);
+        var problemDetails = GetBaseDetails(
+            exception,
+            httpContext,
+            statusCode);
         if (statusCode == StatusCodes.Status500InternalServerError)
             problemDetails.Detail = nameof(InternalServerException);
-        
-        SetLocalizedDetail(problemDetails, httpContext, exception);
+
+        SetLocalizedDetail(
+            problemDetails,
+            httpContext,
+            exception);
         AddExceptionRelatedData(problemDetails, exception);
 
         httpContext.Response.StatusCode = statusCode;
@@ -28,12 +34,18 @@ public class AnyExceptionHandler(
         return true;
     }
 
-    private void SetLocalizedDetail(ProblemDetails problemDetails, HttpContext httpContext, Exception exception)
+    private void SetLocalizedDetail(
+        ProblemDetails problemDetails,
+        HttpContext httpContext,
+        Exception exception)
     {
         var localizer = httpContext.RequestServices.GetService<IScopedStringLocalizer>();
         if (localizer == null) return;
 
-        if (TryGetLocalizableMessageFromException(localizer, exception, out var localizedMessage))
+        if (TryGetLocalizableMessageFromException(
+                localizer,
+                exception,
+                out var localizedMessage))
             problemDetails.Detail = localizedMessage;
     }
 }

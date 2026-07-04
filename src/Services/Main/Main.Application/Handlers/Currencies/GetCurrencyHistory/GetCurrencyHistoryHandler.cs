@@ -10,12 +10,14 @@ using Microsoft.EntityFrameworkCore;
 namespace Main.Application.Handlers.Currencies.GetCurrencyHistory;
 
 [Diagnostics(maxExecutionTimeMs: 200)]
-public record GetCurrencyHistoryQuery(int CurrencyId, Pagination Pagination) : IQuery<GetCurrencyHistoryResult>;
+public record GetCurrencyHistoryQuery(int CurrencyId, Pagination Pagination)
+    : IQuery<GetCurrencyHistoryResult>;
 
 public record GetCurrencyHistoryResult(IReadOnlyList<CurrencyRateHistoryDto> History);
 
 public class GetCurrencyHistoryHandler(
-    IReadRepository<CurrencyRateHistory, int> repository)
+    IReadRepository<CurrencyRateHistory, int> repository
+)
     : IQueryHandler<GetCurrencyHistoryQuery, GetCurrencyHistoryResult>
 {
     public async Task<GetCurrencyHistoryResult> Handle(

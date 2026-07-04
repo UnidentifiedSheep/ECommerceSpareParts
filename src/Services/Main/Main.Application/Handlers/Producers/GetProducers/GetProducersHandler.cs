@@ -17,7 +17,9 @@ public record GetProducersResult(IEnumerable<ProducerDto> Producers);
 public class GetProducersHandler(IReadRepository<Producer, int> repository)
     : IQueryHandler<GetProducersQuery, GetProducersResult>
 {
-    public async Task<GetProducersResult> Handle(GetProducersQuery request, CancellationToken cancellationToken)
+    public async Task<GetProducersResult> Handle(
+        GetProducersQuery request,
+        CancellationToken cancellationToken)
     {
         var query = repository.Query;
         var searchTerm = request.SearchTerm;

@@ -3,10 +3,11 @@ using FluentAssertions;
 using Main.Application.Handlers.Sales;
 using Main.Entities.Event;
 using Main.Entities.Exceptions;
+using Main.Entities.Sale;
 using Main.Enums;
 using Main.Enums.Balances;
 using Microsoft.EntityFrameworkCore;
-using Test.Common.TestContainers.Combined;
+using Tests.TestContainers.Combined;
 using Tests.TestContexts.Sale;
 
 namespace Tests.HandlersTests.Sales;
@@ -120,7 +121,7 @@ public class DeleteSaleTests : IntegrationTest
         transaction.IsReversalApplied.Should().BeFalse();
     }
 
-    private Task<Main.Entities.Sale.Sale> ReloadSale()
+    private Task<Sale> ReloadSale()
     {
         return Context.Sales
             .Include(x => x.Contents)

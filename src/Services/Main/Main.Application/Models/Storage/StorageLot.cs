@@ -6,4 +6,5 @@ public record StorageLot(
     int CurrencyId,
     decimal BuyPrice,
     int Count,
-    DateTime PurchaseDatetime);
+    DateTime PurchaseDatetime
+);

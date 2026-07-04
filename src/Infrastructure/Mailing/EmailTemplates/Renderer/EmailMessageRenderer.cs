@@ -10,16 +10,16 @@ public class EmailMessageRenderer(IRazorLightEngine engine) : IEmailMessageRende
     public async Task<IEmailMessage> RenderAsync<TTemplate>(
         TTemplate templateData,
         CancellationToken cancellationToken = default)
-            where TTemplate : IEmailData
+        where TTemplate : IEmailData
     {
         var body = await engine.CompileRenderAsync(
-            key: $"{templateData.TemplateName}.cshtml",
-            model: templateData);
+            $"{templateData.TemplateName}.cshtml",
+            templateData);
 
         if (string.IsNullOrWhiteSpace(body))
             throw new InvalidOperationException(
                 $"Email template '{templateData.TemplateName}' rendered empty body.");
-        
+
 
         return new EmailMessage(
             templateData.Subject,

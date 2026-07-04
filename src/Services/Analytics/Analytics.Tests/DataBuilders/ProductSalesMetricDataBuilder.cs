@@ -4,7 +4,7 @@ using Bogus;
 
 namespace Analytics.Integration.Tests.DataBuilders;
 
-public class ProductSalesMetricDataBuilder(Faker faker) 
+public class ProductSalesMetricDataBuilder(Faker faker)
     : ProductMetricDataBuilderBase<ProductSalesMetricDataBuilder, ProductSalesMetric>(faker)
 {
     public override ProductSalesMetric Build()

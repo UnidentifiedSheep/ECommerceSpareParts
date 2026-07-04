@@ -1,6 +1,6 @@
 using FluentAssertions;
 using Main.Application.Handlers.Products;
-using Test.Common.TestContainers.Combined;
+using Tests.TestContainers.Combined;
 using Tests.TestContexts.Storage;
 
 namespace Tests.HandlersTests.Products;

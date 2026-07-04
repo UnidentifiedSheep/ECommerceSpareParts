@@ -10,10 +10,7 @@ public static partial class NormalizationExtensions
     [GeneratedRegex(@"\D")]
     public static partial Regex OnlyDigitsRegex();
 
-    public static string ToNormalizedEmail(this string email)
-    {
-        return email.Trim().ToUpperInvariant();
-    }
+    public static string ToNormalizedEmail(this string email) { return email.Trim().ToUpperInvariant(); }
 
     public static string ToNormalizedPhoneNumber(this string source)
     {
@@ -26,16 +23,13 @@ public static partial class NormalizationExtensions
         return permission.ToUpperInvariant().Replace('_', '.');
     }
 
-    public static string ToNormalized(this string source)
-    {
-        return source.Trim().ToUpperInvariant();
-    }
-    
+    public static string ToNormalized(this string source) { return source.Trim().ToUpperInvariant(); }
+
     public static string OnlyCharacterToUpper(this string source)
     {
         return OnlyCharacter().Replace(source, "").ToUpperInvariant();
     }
-    
+
     public static string OnlyCharacterToLower(this string source)
     {
         return OnlyCharacter().Replace(source, "").ToLowerInvariant();

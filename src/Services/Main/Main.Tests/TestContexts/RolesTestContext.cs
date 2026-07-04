@@ -1,9 +1,9 @@
 ﻿using Main.Entities.Auth;
 using Main.Persistence.Context;
-using Test.Common.Abstractions;
-using Test.Common.Extensions;
-using Test.Common.Interfaces;
+using Tests.Abstractions;
 using Tests.DataBuilders.Auth;
+using Tests.Extensions;
+using Tests.Interfaces;
 
 namespace Tests.TestContexts;
 
@@ -15,7 +15,7 @@ public class RolesTestContext(DContext ctx) : TestContextBase<DContext>(ctx)
     {
         var builders = new List<IBuilder<Role>>();
 
-        foreach (var value in Enum.GetValues<Main.Enums.Role>())
+        foreach (var value in Enum.GetValues<Enums.Role>())
             builders.Add(new RoleBuilder(Faker).WithName(value.ToString()));
 
         Roles = await BuilderExtensions.BuildManyCombinedAndAddToDb(

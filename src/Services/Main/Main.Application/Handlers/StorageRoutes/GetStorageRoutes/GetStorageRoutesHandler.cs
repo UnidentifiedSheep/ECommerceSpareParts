@@ -14,15 +14,19 @@ public record GetStorageRoutesQuery(
     string? StorageFrom,
     string? StorageTo,
     bool? IsActive,
-    Pagination Pagination) : IQuery<GetStorageRoutesResult>;
+    Pagination Pagination
+) : IQuery<GetStorageRoutesResult>;
 
 public record GetStorageRoutesResult(List<StorageRouteDto> StorageRoutes);
 
 public class GetStorageRoutesHandler(
-    IReadRepository<StorageRoute, Guid> repository)
+    IReadRepository<StorageRoute, Guid> repository
+)
     : IQueryHandler<GetStorageRoutesQuery, GetStorageRoutesResult>
 {
-    public async Task<GetStorageRoutesResult> Handle(GetStorageRoutesQuery request, CancellationToken cancellationToken)
+    public async Task<GetStorageRoutesResult> Handle(
+        GetStorageRoutesQuery request,
+        CancellationToken cancellationToken)
     {
         var query = repository.Query;
 
@@ -30,8 +34,7 @@ public class GetStorageRoutesHandler(
             query = query.Where(x => x.FromStorageName == request.StorageFrom);
         if (!string.IsNullOrWhiteSpace(request.StorageTo))
             query = query.Where(x => x.ToStorageName == request.StorageTo);
-        if (request.IsActive.HasValue)
-            query = query.Where(x => x.IsActive == request.IsActive);
+        if (request.IsActive.HasValue) query = query.Where(x => x.IsActive == request.IsActive);
 
         query = query.ApplyPagination(request.Pagination);
 

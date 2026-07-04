@@ -1,7 +1,7 @@
 using System.Text.Json.Serialization;
 using Api.Common.Extensions;
 using Application.Common.Dtos;
-using Application.Common.Handlers.NamedObjects.GetNamedObjects;
+using Application.Common.Handlers.NamedObjects;
 using Carter;
 using Enums;
 using MediatR;
@@ -21,18 +21,21 @@ public class NamedObjectEndPoints : ICarterModule
         var namedObjects = app.MapGroup("/named-objects")
             .WithTags("Named Objects");
 
-        namedObjects.MapGet("{groupName}", async (
-                ISender sender,
-                string groupName,
-                CancellationToken ct) =>
-            {
-                var result = await sender.Send(new GetNamedObjectsQuery(groupName), ct);
-
-                return Results.Ok(new GetNamedObjectsResponse
+        namedObjects.MapGet(
+                "{groupName}",
+                async (
+                    ISender sender,
+                    string groupName,
+                    CancellationToken ct) =>
                 {
-                    NamedObjects = result.NamedObjects
-                });
-            })
+                    var result = await sender.Send(new GetNamedObjectsQuery(groupName), ct);
+
+                    return Results.Ok(
+                        new GetNamedObjectsResponse
+                        {
+                            NamedObjects = result.NamedObjects
+                        });
+                })
             .WithName("GetNamedObjects")
             .WithDisplayName("Get named objects")
             .Produces<GetNamedObjectsResponse>()

@@ -47,16 +47,18 @@ public class ProductsEndPoints : ICarterModule
         products.MapProductImagesEndPoints();
         products.MapProductReservationsEndPoints();
 
-        products.MapPost("", async (
-                ISender sender,
-                CreateProductRequest request,
-                CancellationToken token) =>
-            {
-                var command = new CreateProductsCommand(request.NewProducts);
-                var result = await sender.Send(command, token);
-                var response = new CreateProductResponse(result.CreatedIds);
-                return Results.Created("/products", response);
-            })
+        products.MapPost(
+                "",
+                async (
+                    ISender sender,
+                    CreateProductRequest request,
+                    CancellationToken token) =>
+                {
+                    var command = new CreateProductsCommand(request.NewProducts);
+                    var result = await sender.Send(command, token);
+                    var response = new CreateProductResponse(result.CreatedIds);
+                    return Results.Created("/products", response);
+                })
             .WithName("CreateProducts")
             .WithSummary("Создать продукты")
             .WithDescription("Добавление новых артикулов")
@@ -66,17 +68,20 @@ public class ProductsEndPoints : ICarterModule
             .ProducesProblem(400)
             .RequireAnyPermission(PermissionCodes.ARTICLES_CREATE);
 
-        products.MapGet("", async (
-                ISender sender,
-                [AsParameters] GetProductByIdsRequest request,
-                CancellationToken token) =>
-            {
-                var result = await sender.Send(new GetProductByIdsQuery(request.Ids), token);
-                return Results.Ok(new GetProductByIdsResult
+        products.MapGet(
+                "",
+                async (
+                    ISender sender,
+                    [AsParameters] GetProductByIdsRequest request,
+                    CancellationToken token) =>
                 {
-                    Products = result.Products
-                });
-            })
+                    var result = await sender.Send(new GetProductByIdsQuery(request.Ids), token);
+                    return Results.Ok(
+                        new GetProductByIdsResult
+                        {
+                            Products = result.Products
+                        });
+                })
             .WithName("GetProductsByIds")
             .WithSummary("Получить продукты по идентификаторам")
             .WithDescription("Получение списка артикулов по идентификаторам")
@@ -85,21 +90,24 @@ public class ProductsEndPoints : ICarterModule
             .ProducesProblem(StatusCodes.Status400BadRequest)
             .RequireAnyPermission(PermissionCodes.ARTICLES_GET_MAIN);
 
-        products.MapGet("/{productId:int}/stock", async (
-                ISender sender,
-                int productId,
-                [FromQuery] string? storageName,
-                CancellationToken token) =>
-            {
-                var result = await sender.Send(
-                    new GetProductStockQuery(productId, storageName),
-                    token);
-
-                return Results.Ok(new GetProductStockResponse
+        products.MapGet(
+                "/{productId:int}/stock",
+                async (
+                    ISender sender,
+                    int productId,
+                    [FromQuery] string? storageName,
+                    CancellationToken token) =>
                 {
-                    Stock = result.Stock
-                });
-            })
+                    var result = await sender.Send(
+                        new GetProductStockQuery(productId, storageName),
+                        token);
+
+                    return Results.Ok(
+                        new GetProductStockResponse
+                        {
+                            Stock = result.Stock
+                        });
+                })
             .WithName("GetProductStock")
             .WithSummary("Получить остаток продукта")
             .WithDescription("Получение общего остатка артикула или остатка на конкретном складе")
@@ -108,16 +116,18 @@ public class ProductsEndPoints : ICarterModule
             .ProducesProblem(StatusCodes.Status400BadRequest)
             .RequireAnyPermission(PermissionCodes.ARTICLES_GET_MAIN);
 
-        products.MapPatch("/{productId:int}", async (
-                ISender sender,
-                int productId,
-                EditProductRequest request,
-                CancellationToken token) =>
-            {
-                var command = new PatchProductCommand(productId, request.PatchProduct);
-                await sender.Send(command, token);
-                return Results.NoContent();
-            })
+        products.MapPatch(
+                "/{productId:int}",
+                async (
+                    ISender sender,
+                    int productId,
+                    EditProductRequest request,
+                    CancellationToken token) =>
+                {
+                    var command = new PatchProductCommand(productId, request.PatchProduct);
+                    await sender.Send(command, token);
+                    return Results.NoContent();
+                })
             .WithName("EditProduct")
             .WithSummary("Редактировать продукт")
             .WithDescription("Редактирование артикула")

@@ -7,13 +7,18 @@ public class UpdateUserFinancialProfileValidation : AbstractValidator<UpdateUser
 {
     public UpdateUserFinancialProfileValidation()
     {
-        When(x => x.Patch.MinimalAllowedBalance.IsSet, () =>
-        {
-            RuleFor(x => x.Patch.MinimalAllowedBalance.Value)
-                .LessThanOrEqualTo(0)
-                .WithLocalizationKey("financial.profile.min.allowed.balance.must.not.be.positive")
-                .PrecisionScale(18, 2, true)
-                .WithLocalizationKey("financial.profile.min.allowed.balance.max.two.decimal.places");
-        });
+        When(
+            x => x.Patch.MinimalAllowedBalance.IsSet,
+            () =>
+            {
+                RuleFor(x => x.Patch.MinimalAllowedBalance.Value)
+                    .LessThanOrEqualTo(0)
+                    .WithLocalizationKey("financial.profile.min.allowed.balance.must.not.be.positive")
+                    .PrecisionScale(
+                        18,
+                        2,
+                        true)
+                    .WithLocalizationKey("financial.profile.min.allowed.balance.max.two.decimal.places");
+            });
     }
 }

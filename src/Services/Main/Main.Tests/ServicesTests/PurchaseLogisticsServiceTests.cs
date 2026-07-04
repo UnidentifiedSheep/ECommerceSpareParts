@@ -5,10 +5,10 @@ using Main.Enums;
 using Main.Enums.Balances;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
-using Test.Common.Extensions;
-using Test.Common.TestContainers.Combined;
 using Tests.DataBuilders.Purchase;
 using Tests.DataBuilders.Storage;
+using Tests.Extensions;
+using Tests.TestContainers.Combined;
 using Tests.TestContexts;
 using Tests.TestContexts.Currency;
 using Tests.TestContexts.Purchase;
@@ -108,7 +108,10 @@ public class PurchaseLogisticsServiceTests : IntegrationTest
         var oldRoute = GetContext<StorageRouteTestContext>().UnactiveRoute;
         var purchase = PurchaseContext.Purchase;
         var content = purchase.Contents.Single();
-        content.SetLogistic(99m, 99m, 99m);
+        content.SetLogistic(
+            99m,
+            99m,
+            99m);
         purchase.SetPurchaseLogistic(
             oldRoute.Id,
             oldRoute.CurrencyId,
@@ -174,8 +177,12 @@ public class PurchaseLogisticsServiceTests : IntegrationTest
         await Context.SaveChangesAsync();
 
         var updatedPurchase = await LoadPurchase();
-        updatedPurchase.Contents.Single(x => x.Id == firstContent.Id).PurchaseContentLogistic.Should().NotBeNull();
-        updatedPurchase.Contents.Single(x => x.Id == secondContent.Id).PurchaseContentLogistic.Should().BeNull();
+        updatedPurchase.Contents.Single(x => x.Id == firstContent.Id)
+            .PurchaseContentLogistic.Should()
+            .NotBeNull();
+        updatedPurchase.Contents.Single(x => x.Id == secondContent.Id)
+            .PurchaseContentLogistic.Should()
+            .BeNull();
     }
 
     [Fact]
@@ -232,6 +239,9 @@ public class PurchaseLogisticsServiceTests : IntegrationTest
 
     private static PurchaseLogisticsItem ToLogisticsItem(PurchaseContent content)
     {
-        return new PurchaseLogisticsItem(content, content.ProductId, content.Count);
+        return new PurchaseLogisticsItem(
+            content,
+            content.ProductId,
+            content.Count);
     }
 }

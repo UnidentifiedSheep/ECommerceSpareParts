@@ -1,10 +1,11 @@
-using Internal.Integration.Core.Models;
-using Internal.Integration.Core.Models.Main;
+using Integrations.Common;
 using Internal.Integration.Core.Models.Main.Product;
 
 namespace Internal.Integration.Core.Interfaces.Main;
 
 public interface IProductNode
 {
-    Task<InternalResponse<InternalFullProduct>> GetFullProduct(int productId, CancellationToken cancellationToken = default);
+    Task<Response<IReadOnlyList<InternalFullProduct>>> GetFullProduct(
+        IEnumerable<int> productIds,
+        CancellationToken cancellationToken = default);
 }

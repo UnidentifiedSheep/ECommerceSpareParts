@@ -1,6 +1,6 @@
 using Bogus;
 using Main.Entities.User.ValueObjects;
-using Test.Common.Abstractions;
+using Tests.Abstractions;
 
 namespace Tests.DataBuilders.User;
 
@@ -40,7 +40,10 @@ public class UserBuilder(Faker faker) : BuilderBase<Main.Entities.User.User>(fak
         return this;
     }
 
-    public UserBuilder WithUserInfo(string name, string surname, string? description)
+    public UserBuilder WithUserInfo(
+        string name,
+        string surname,
+        string? description)
     {
         Name = name;
         Surname = surname;
@@ -61,8 +64,7 @@ public class UserBuilder(Faker faker) : BuilderBase<Main.Entities.User.User>(fak
                 Surname ?? Faker.Lorem.Letter(12),
                 Description ?? Faker.Lorem.Sentence());
 
-        foreach (var role in Roles)
-            user.AddRole(role);
+        foreach (var role in Roles) user.AddRole(role);
 
         return user;
     }

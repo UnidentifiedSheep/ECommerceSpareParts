@@ -8,14 +8,9 @@ namespace Main.Entities.Event;
 
 public abstract class Event : AuditableEntity<Event, int>, ILinqEntity<Event, int>
 {
-    protected Event()
-    {
-    }
+    protected Event() { }
 
-    protected Event(string json)
-    {
-        Json = json;
-    }
+    protected Event(string json) { Json = json; }
 
     public int Id { get; protected set; }
 
@@ -23,20 +18,11 @@ public abstract class Event : AuditableEntity<Event, int>, ILinqEntity<Event, in
 
     public string Json { get; protected set; } = null!;
 
-    public static Expression<Func<Event, int>> GetKeySelector()
-    {
-        return x => x.Id;
-    }
+    public static Expression<Func<Event, int>> GetKeySelector() { return x => x.Id; }
 
-    public static Expression<Func<Event, bool>> GetEqualityExpression(int key)
-    {
-        return x => x.Id == key;
-    }
+    public static Expression<Func<Event, bool>> GetEqualityExpression(int key) { return x => x.Id == key; }
 
-    public override int GetId()
-    {
-        return Id;
-    }
+    public override int GetId() { return Id; }
 }
 
 public abstract class Event<T> : Event
@@ -44,13 +30,9 @@ public abstract class Event<T> : Event
 {
     private T? _data;
 
-    protected Event(string json) : base(json)
-    {
-    }
+    protected Event(string json) : base(json) { }
 
-    protected Event()
-    {
-    }
+    protected Event() { }
 
     protected Event(T data)
         : base(Serialize(data))
@@ -65,13 +47,7 @@ public abstract class Event<T> : Event
         init => _data = value;
     }
 
-    private static string Serialize(T data)
-    {
-        return JsonSerializer.Serialize(data);
-    }
+    private static string Serialize(T data) { return JsonSerializer.Serialize(data); }
 
-    private static T Deserialize(string json)
-    {
-        return JsonSerializer.Deserialize<T>(json)!;
-    }
+    private static T Deserialize(string json) { return JsonSerializer.Deserialize<T>(json)!; }
 }

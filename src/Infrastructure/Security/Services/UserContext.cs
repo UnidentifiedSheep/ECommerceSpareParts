@@ -30,9 +30,10 @@ public sealed class UserContext : IUserContext
 
     public bool IsAuthenticated { get; }
 
-    public Guid UserId => IsAuthenticated && _userId.HasValue
-        ? _userId.Value
-        : throw new UnauthorizedException("Пользователь не авторизован.");
+    public Guid UserId =>
+        IsAuthenticated && _userId.HasValue
+            ? _userId.Value
+            : throw new UnauthorizedException("Пользователь не авторизован.");
 
     public Guid? UserIdOrNull => _userId;
 
@@ -40,15 +41,9 @@ public sealed class UserContext : IUserContext
 
     public IReadOnlySet<string> Permissions { get; }
 
-    public bool HasRole(string role)
-    {
-        return Roles.Contains(role);
-    }
+    public bool HasRole(string role) { return Roles.Contains(role); }
 
-    public bool HasPermission(string permission)
-    {
-        return Permissions.Contains(permission);
-    }
+    public bool HasPermission(string permission) { return Permissions.Contains(permission); }
 
     private static Guid? GetUserId(ClaimsPrincipal principal)
     {

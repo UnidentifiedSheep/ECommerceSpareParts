@@ -2,10 +2,10 @@
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.Options;
-using Test.Common.Interfaces;
-using Test.Common.Stubs;
+using Tests.Interfaces;
+using Tests.Stubs;
 
-namespace Test.Common.Extensions;
+namespace Tests.Extensions;
 
 public static class ServiceCollectionExtensions
 {
@@ -18,8 +18,7 @@ public static class ServiceCollectionExtensions
             .Where(t => interfaceType.IsAssignableFrom(t)
                         && t is { IsInterface: false, IsAbstract: false });
 
-        foreach (var impl in implementations)
-            services.AddScoped(impl);
+        foreach (var impl in implementations) services.AddScoped(impl);
 
         return services;
     }

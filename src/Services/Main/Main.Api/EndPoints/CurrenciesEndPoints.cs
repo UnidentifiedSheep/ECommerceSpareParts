@@ -7,12 +7,16 @@ using Main.Application.Handlers.Currencies;
 using Main.Application.Handlers.Currencies.CreateCurrency;
 using Main.Application.Handlers.Currencies.GetCurrencyHistory;
 using Main.Application.Handlers.Currencies.UpdateCurrenciesRates;
-using Mapster;
 using MediatR;
 
 namespace Main.Api.EndPoints;
 
-public record CreateCurrencyRequest(string ShortName, string Name, string CurrencySign, string Code);
+public record CreateCurrencyRequest(
+    string ShortName,
+    string Name,
+    string CurrencySign,
+    string Code
+);
 
 public record CreateCurrencyResponse(int Id);
 
@@ -29,14 +33,22 @@ public class CurrenciesEndPoints : ICarterModule
         var currencies = app.MapGroup("/currencies")
             .WithTags("Currencies");
 
-        currencies.MapPost("", async (
-                ISender sender,
-                CreateCurrencyRequest request,
-                CancellationToken cancellationToken) =>
-            {
-                var result = await sender.Send(request.Adapt<CreateCurrencyCommand>(), cancellationToken);
-                return Results.Created($"currencies/{result.Id}", new CreateCurrencyResponse(result.Id));
-            })
+        currencies.MapPost(
+                "",
+                async (
+                    ISender sender,
+                    CreateCurrencyRequest request,
+                    CancellationToken cancellationToken) =>
+                {
+                    var result = await sender.Send(
+                        new CreateCurrencyCommand(
+                            request.ShortName,
+                            request.Name,
+                            request.CurrencySign,
+                            request.Code),
+                        cancellationToken);
+                    return Results.Created($"currencies/{result.Id}", new CreateCurrencyResponse(result.Id));
+                })
             .WithName("CreateCurrency")
             .WithSummary("Создать валюту")
             .WithDescription("Создание валюты")
@@ -46,13 +58,15 @@ public class CurrenciesEndPoints : ICarterModule
             .ProducesProblem(StatusCodes.Status400BadRequest)
             .RequireAnyPermission(PermissionCodes.CURRENCIES_CREATE);
 
-        currencies.MapGet("", async (
-                ISender sender,
-                CancellationToken cancellation) =>
-            {
-                var result = await sender.Send(new GetAllCurrenciesQuery(), cancellation);
-                return Results.Ok(new GetCurrenciesResponse(result.Currencies));
-            })
+        currencies.MapGet(
+                "",
+                async (
+                    ISender sender,
+                    CancellationToken cancellation) =>
+                {
+                    var result = await sender.Send(new GetAllCurrenciesQuery(), cancellation);
+                    return Results.Ok(new GetCurrenciesResponse(result.Currencies));
+                })
             .WithName("GetCurrencies")
             .WithSummary("Получить валюты")
             .WithDescription("Получение списка валют")
@@ -61,11 +75,16 @@ public class CurrenciesEndPoints : ICarterModule
             .ProducesProblem(StatusCodes.Status400BadRequest)
             .RequireAnyPermission(PermissionCodes.CURRENCIES_GET);
 
-        currencies.MapGet("/{id:int}", async (ISender sender, int id, CancellationToken cancellation) =>
-            {
-                var result = await sender.Send(new GetCurrencyByIdQuery(id), cancellation);
-                return Results.Ok(new GetCurrencyByIdResponse(result.Currency));
-            })
+        currencies.MapGet(
+                "/{id:int}",
+                async (
+                    ISender sender,
+                    int id,
+                    CancellationToken cancellation) =>
+                {
+                    var result = await sender.Send(new GetCurrencyByIdQuery(id), cancellation);
+                    return Results.Ok(new GetCurrencyByIdResponse(result.Currency));
+                })
             .WithName("GetCurrencyById")
             .WithSummary("Получить валюту по id")
             .WithDescription("Получение валюты по идентификатору")
@@ -74,15 +93,19 @@ public class CurrenciesEndPoints : ICarterModule
             .ProducesProblem(StatusCodes.Status404NotFound)
             .RequireAnyPermission(PermissionCodes.CURRENCIES_GET);
 
-        currencies.MapGet("/{id:int}/history", async (
-                ISender sender,
-                int id,
-                [AsParameters] PaginationQueryModel queryParams,
-                CancellationToken cancellation) =>
-            {
-                var result = await sender.Send(new GetCurrencyHistoryQuery(id, queryParams), cancellation);
-                return Results.Ok(new GetCurrencyHistoryResponse(result.History));
-            })
+        currencies.MapGet(
+                "/{id:int}/history",
+                async (
+                    ISender sender,
+                    int id,
+                    [AsParameters] PaginationQueryModel queryParams,
+                    CancellationToken cancellation) =>
+                {
+                    var result = await sender.Send(
+                        new GetCurrencyHistoryQuery(id, queryParams),
+                        cancellation);
+                    return Results.Ok(new GetCurrencyHistoryResponse(result.History));
+                })
             .WithName("GetCurrencyHistory")
             .WithSummary("Получить историю курса валюты")
             .WithDescription("Получение истории изменений курса валюты по id")
@@ -91,11 +114,14 @@ public class CurrenciesEndPoints : ICarterModule
             .ProducesProblem(StatusCodes.Status400BadRequest)
             .RequireAnyPermission(PermissionCodes.CURRENCIES_GET);
 
-        currencies.MapPost("/update", async (ISender sender, CancellationToken token) =>
-            {
-                await sender.Send(new UpdateCurrenciesRatesCommand(), token);
-                return Results.Ok();
-            }).WithName("UpdateCurrencyRates")
+        currencies.MapPost(
+                "/update",
+                async (ISender sender, CancellationToken token) =>
+                {
+                    await sender.Send(new UpdateCurrenciesRatesCommand(), token);
+                    return Results.Ok();
+                })
+            .WithName("UpdateCurrencyRates")
             .WithSummary("Обновление курсов валют")
             .WithDescription("Обновление курсов валют")
             .WithDisplayName("Обновление курсов валют")

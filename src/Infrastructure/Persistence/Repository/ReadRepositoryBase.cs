@@ -20,8 +20,7 @@ public abstract class ReadRepositoryBase<TContext, TEntity, TKey>(TContext ctx)
     {
         var connection = ctx.Database.GetDbConnection();
 
-        if (connection.State != ConnectionState.Open)
-            await connection.OpenAsync();
+        if (connection.State != ConnectionState.Open) await connection.OpenAsync();
 
         return await connection.QueryAsync<T>(sql, param);
     }

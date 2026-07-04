@@ -17,7 +17,10 @@ public class DbValidationExceptionHandler(
 
         LogError(httpContext, exception);
 
-        var problemDetails = GetBaseDetails(dbValidationException, httpContext, null);
+        var problemDetails = GetBaseDetails(
+            dbValidationException,
+            httpContext,
+            null);
         SetStatusCode(problemDetails, dbValidationException);
         AddDbValidationErrors(
             httpContext,
@@ -29,7 +32,10 @@ public class DbValidationExceptionHandler(
         return true;
     }
 
-    private void AddDbValidationErrors(HttpContext httpContext, ProblemDetails details, ValidationException bulkEx)
+    private void AddDbValidationErrors(
+        HttpContext httpContext,
+        ProblemDetails details,
+        ValidationException bulkEx)
     {
         var localizer = httpContext.RequestServices.GetService<IScopedStringLocalizer>();
 
@@ -41,12 +47,13 @@ public class DbValidationExceptionHandler(
             var errorCode = fail.ErrorCode;
             if (localizer == null)
             {
-                errors.Add(new ProblemDetails
-                {
-                    Title = errorName,
-                    Detail = fail.Message,
-                    Status = errorCode
-                });
+                errors.Add(
+                    new ProblemDetails
+                    {
+                        Title = errorName,
+                        Detail = fail.Message,
+                        Status = errorCode
+                    });
                 continue;
             }
 
@@ -57,20 +64,20 @@ public class DbValidationExceptionHandler(
                     .Where(x => x != null)
                     .Select(x => x!)
                     .ToArray();
-            else if (fail.AttemptedValue != null)
-                arguments = [fail.AttemptedValue];
+            else if (fail.AttemptedValue != null) arguments = [fail.AttemptedValue];
 
             var key = fail.Message;
             var message = arguments is { Length: > 0 }
                 ? localizer.GetOrDefault(key, arguments) ?? fail.Message
                 : localizer.GetOrDefault(key) ?? fail.Message;
 
-            errors.Add(new ProblemDetails
-            {
-                Title = errorName,
-                Detail = message,
-                Status = errorCode
-            });
+            errors.Add(
+                new ProblemDetails
+                {
+                    Title = errorName,
+                    Detail = message,
+                    Status = errorCode
+                });
         }
 
         details.Extensions["errors"] = errors;

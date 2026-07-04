@@ -6,6 +6,7 @@ namespace Attributes;
 public class TransactionalAttribute : Attribute
 {
     private static readonly string[] DefaultPgqlErrors = ["40001", "40P01", "55P03"];
+
     /// <param name="isolationLevel">Уровень изоляции транзакции</param>
     /// <param name="retryDelayMs">Задержка перед повторением не удавшейся транзакции</param>
     /// <param name="retryCount">Количество повторных попыток</param>
@@ -26,10 +27,20 @@ public class TransactionalAttribute : Attribute
     public int RetryDelayMs { get; }
     public int RetryCount { get; }
     public IEnumerable<string> RetryErrors { get; }
-    
-    public static TransactionalAttribute ReadCommited(int delay, int retryCount) =>
-        new(IsolationLevel.ReadCommitted, delay, retryCount);
-    
-    public static TransactionalAttribute Serializable(int delay, int retryCount) =>
-        new(IsolationLevel.Serializable, delay, retryCount);
+
+    public static TransactionalAttribute ReadCommited(int delay, int retryCount)
+    {
+        return new TransactionalAttribute(
+            IsolationLevel.ReadCommitted,
+            delay,
+            retryCount);
+    }
+
+    public static TransactionalAttribute Serializable(int delay, int retryCount)
+    {
+        return new TransactionalAttribute(
+            IsolationLevel.Serializable,
+            delay,
+            retryCount);
+    }
 }

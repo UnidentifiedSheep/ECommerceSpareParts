@@ -2,13 +2,13 @@ using Main.Entities.Product;
 using Main.Entities.Storage;
 using Main.Entities.User;
 using Main.Persistence.Context;
-using Test.Common.Abstractions;
-using Test.Common.Extensions;
-using Test.Common.Interfaces;
+using Tests.Abstractions;
 using Tests.DataBuilders.Balance;
 using Tests.DataBuilders.Purchase;
 using Tests.DataBuilders.Storage;
 using Tests.DataBuilders.User;
+using Tests.Extensions;
+using Tests.Interfaces;
 using Tests.TestContexts.Currency;
 using Tests.TestContexts.Storage;
 using DomainPurchase = Main.Entities.Purchase.Purchase;
@@ -20,7 +20,8 @@ public class PurchaseTestContext(
     UserContextTestContext userContext,
     ProductTestContext productContext,
     CurrencyTestContext currencyContext,
-    StorageRouteTestContext storageRouteContext)
+    StorageRouteTestContext storageRouteContext
+)
     : TestContextBase<DContext>(context), IDependentTestContext
 {
     public User Supplier { get; private set; } = null!;
@@ -62,7 +63,10 @@ public class PurchaseTestContext(
             .Applied()
             .Build();
 
-        await DbContext.AddRangeAsync(transaction, senderBalance, receiverBalance);
+        await DbContext.AddRangeAsync(
+            transaction,
+            senderBalance,
+            receiverBalance);
         await DbContext.SaveChangesAsync(cancellationToken);
 
         StorageContent = await new StorageContentBuilder(Faker)

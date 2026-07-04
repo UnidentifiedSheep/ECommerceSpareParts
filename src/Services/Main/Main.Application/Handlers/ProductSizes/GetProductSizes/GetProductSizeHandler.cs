@@ -15,7 +15,9 @@ public record GetProductSizesResult(ProductSizeDto ProductSize);
 public class GetProductSizeHandler(IReadRepository<ProductSize, int> context)
     : IQueryHandler<GetProductSizeQuery, GetProductSizesResult>
 {
-    public async Task<GetProductSizesResult> Handle(GetProductSizeQuery request, CancellationToken cancellationToken)
+    public async Task<GetProductSizesResult> Handle(
+        GetProductSizeQuery request,
+        CancellationToken cancellationToken)
     {
         var size = await context.Query
                        .Where(x => x.ProductId == request.ProductId)

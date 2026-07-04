@@ -1,6 +1,6 @@
 using System.Linq.Expressions;
-using Application.Common.Interfaces;
 using Application.Common.Interfaces.Currency;
+using Application.Common.Interfaces.Events;
 using Application.Common.Interfaces.Repositories;
 using Application.Common.Interfaces.Settings;
 using Contracts.Sale;
@@ -9,7 +9,7 @@ using LinqKit;
 using Main.Application.Interfaces.Services.Event;
 using Main.Entities.Exceptions;
 using Main.Entities.Sale;
-using Main.Entities.Setting;
+using Main.Entities.Settings;
 using Main.Enums;
 using Microsoft.EntityFrameworkCore;
 
@@ -19,42 +19,9 @@ public sealed class SaleEventService(
     IReadRepository<Sale, Guid> repository,
     IIntegrationEventScope integrationEventScope,
     ICurrencyConverter currencyConverter,
-    ISettingsService settingsService) : ISaleEventService
+    ISettingsService settingsService
+) : ISaleEventService
 {
-    public async Task NotifyUpdated(
-        Guid id, 
-        CancellationToken cancellationToken)
-    {
-        var baseCurrencyId = (await settingsService.GetOrDefault<CurrencySetting>(cancellationToken))
-            .Data.BaseCurrencyId;
-        
-        var fromDb = await repository.Query
-                         .Where(x => x.Id == id)
-                         .AsExpandable()
-                         .Select(ToSaleEvent)
-                         .FirstOrDefaultAsync(cancellationToken)
-                     ?? throw new SaleNotFoundException(id);
-        
-        var newContents = new List<SaleContentEventModel>();
-        foreach (var content in fromDb.Contents)
-            newContents.Add(content with
-            {
-                PriceInBaseCurrency = await currencyConverter.ConvertToBaseAsync(
-                    content.Price, 
-                    fromDb.CurrencyId, 
-                    cancellationToken)
-            });
-
-        fromDb = fromDb with { Contents = newContents };
-
-        integrationEventScope.Add(new SaleUpdatedEvent
-        {
-            BaseCurrencyId = baseCurrencyId,
-            OccurredAt = DateTime.UtcNow,
-            Sale = fromDb
-        });
-    }
-    
     public static readonly Expression<Func<Sale, SaleEventModel>> ToSaleEvent =
         x => new SaleEventModel
         {
@@ -70,7 +37,7 @@ public sealed class SaleEventService(
             Storage = x.StorageName,
             TotalSum = x.Transaction.Amount,
             TransactionId = x.TransactionId,
-            Contents = x.Contents.Select(z => ToSaleContentEvent.Invoke(z)).ToList(),
+            Contents = x.Contents.Select(z => ToSaleContentEvent.Invoke(z)).ToList()
         };
 
     private static readonly Expression<Func<SaleContent, SaleContentEventModel>> ToSaleContentEvent =
@@ -83,19 +50,56 @@ public sealed class SaleEventService(
             Id = x.Id,
             Price = x.Price,
             PriceInBaseCurrency = 0,
-            Details = x.Details.Select(z => ToSaleContentDetailEvent.Invoke(z)).ToList(),
+            Details = x.Details.Select(z => ToSaleContentDetailEvent.Invoke(z)).ToList()
         };
 
-    private static readonly Expression<Func<SaleContentDetail, SaleContentDetailEventModel>> ToSaleContentDetailEvent =
-        x => new SaleContentDetailEventModel
-        {
-            BuyPrice = x.BuyPrice,
-            BuyPriceInBaseCurrency = x.StorageContent.BuyPriceInBaseCurrency,
-            Count = x.Count,
-            CurrencyId = x.CurrencyId,
-            PurchaseDatetime = x.PurchaseDatetime,
-            SaleContentId = x.SaleContentId,
-            StorageContentId = x.StorageContentId,
-            Id = x.Id
-        };
+    private static readonly Expression<Func<SaleContentDetail, SaleContentDetailEventModel>>
+        ToSaleContentDetailEvent =
+            x => new SaleContentDetailEventModel
+            {
+                BuyPrice = x.BuyPrice,
+                BuyPriceInBaseCurrency = x.StorageContent.BuyPriceInBaseCurrency,
+                Count = x.Count,
+                CurrencyId = x.CurrencyId,
+                PurchaseDatetime = x.PurchaseDatetime,
+                SaleContentId = x.SaleContentId,
+                StorageContentId = x.StorageContentId,
+                Id = x.Id
+            };
+
+    public async Task NotifyUpdated(
+        Guid id,
+        CancellationToken cancellationToken)
+    {
+        var baseCurrencyId = (await settingsService.GetOrDefault<CurrencySetting>(cancellationToken))
+            .Data.BaseCurrencyId;
+
+        var fromDb = await repository.Query
+                         .Where(x => x.Id == id)
+                         .AsExpandable()
+                         .Select(ToSaleEvent)
+                         .FirstOrDefaultAsync(cancellationToken)
+                     ?? throw new SaleNotFoundException(id);
+
+        var newContents = new List<SaleContentEventModel>();
+        foreach (var content in fromDb.Contents)
+            newContents.Add(
+                content with
+                {
+                    PriceInBaseCurrency = await currencyConverter.ConvertToBaseAsync(
+                        content.Price,
+                        fromDb.CurrencyId,
+                        cancellationToken)
+                });
+
+        fromDb = fromDb with { Contents = newContents };
+
+        integrationEventScope.Add(
+            new SaleUpdatedEvent
+            {
+                BaseCurrencyId = baseCurrencyId,
+                OccurredAt = DateTime.UtcNow,
+                Sale = fromDb
+            });
+    }
 }

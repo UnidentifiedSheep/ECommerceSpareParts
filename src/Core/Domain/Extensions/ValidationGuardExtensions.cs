@@ -4,12 +4,18 @@ namespace Domain.Extensions;
 
 public static class ValidationGuardExtensions
 {
-    public static string AgainstTooShort(this string value, int min, string errorKey)
+    public static string AgainstTooShort(
+        this string value,
+        int min,
+        string errorKey)
     {
         return value.Length < min ? throw new InvalidInputException(errorKey) : value;
     }
 
-    public static string AgainstTooLong(this string value, int max, string errorKey)
+    public static string AgainstTooLong(
+        this string value,
+        int max,
+        string errorKey)
     {
         return value.Length > max ? throw new InvalidInputException(errorKey) : value;
     }
@@ -35,7 +41,11 @@ public static class ValidationGuardExtensions
         return value is null ? throw new InvalidInputException(errorKey) : value;
     }
 
-    public static T AgainstOutOfRange<T>(this T value, T min, T max, string errorKey)
+    public static T AgainstOutOfRange<T>(
+        this T value,
+        T min,
+        T max,
+        string errorKey)
         where T : IComparable<T>
     {
         return value.CompareTo(min) < 0 || value.CompareTo(max) > 0
@@ -43,38 +53,56 @@ public static class ValidationGuardExtensions
             : value;
     }
 
-    public static T Against<T>(this T value, Func<T, bool> predicate, string errorKey)
+    public static T Against<T>(
+        this T value,
+        Func<T, bool> predicate,
+        string errorKey)
     {
         return predicate(value)
             ? throw new InvalidInputException(errorKey)
             : value;
     }
 
-    public static T AgainstEqual<T>(this T value, T next, string errorKey)
+    public static T AgainstEqual<T>(
+        this T value,
+        T next,
+        string errorKey)
         where T : IComparable<T>
     {
         return value.CompareTo(next) == 0 ? throw new InvalidInputException(errorKey) : value;
     }
 
-    public static T AgainstTooBig<T>(this T value, T max, string errorKey)
+    public static T AgainstTooBig<T>(
+        this T value,
+        T max,
+        string errorKey)
         where T : IComparable<T>
     {
         return value.CompareTo(max) > 0 ? throw new InvalidInputException(errorKey) : value;
     }
 
-    public static T AgainstTooSmall<T>(this T value, T min, string errorKey)
+    public static T AgainstTooSmall<T>(
+        this T value,
+        T min,
+        string errorKey)
         where T : IComparable<T>
     {
         return value.CompareTo(min) < 0 ? throw new InvalidInputException(errorKey) : value;
     }
 
-    public static T AgainstLessOrEqual<T>(this T value, T min, string errorKey)
+    public static T AgainstLessOrEqual<T>(
+        this T value,
+        T min,
+        string errorKey)
         where T : IComparable<T>
     {
         return value.CompareTo(min) <= 0 ? throw new InvalidInputException(errorKey) : value;
     }
 
-    public static T AgainstGreaterOrEqual<T>(this T value, T max, string errorKey)
+    public static T AgainstGreaterOrEqual<T>(
+        this T value,
+        T max,
+        string errorKey)
         where T : IComparable<T>
     {
         return value.CompareTo(max) >= 0 ? throw new InvalidInputException(errorKey) : value;
@@ -92,7 +120,10 @@ public static class ValidationGuardExtensions
         return value.CompareTo(default) > 0 ? throw new InvalidInputException(errorKey) : value;
     }
 
-    public static decimal AgainstTooManyDecimalPlaces(this decimal value, int maxDecimals, string errorKey)
+    public static decimal AgainstTooManyDecimalPlaces(
+        this decimal value,
+        int maxDecimals,
+        string errorKey)
     {
         var decimalPlaces = BitConverter.GetBytes(decimal.GetBits(value)[3])[2];
 
@@ -107,12 +138,18 @@ public static class ValidationGuardExtensions
         return !value.Any() ? throw new InvalidInputException(errorKey) : value;
     }
 
-    public static string AgainstTooShort(this string value, int min, Func<Exception> exceptionFactory)
+    public static string AgainstTooShort(
+        this string value,
+        int min,
+        Func<Exception> exceptionFactory)
     {
         return value.Length < min ? throw exceptionFactory() : value;
     }
 
-    public static string AgainstTooLong(this string value, int max, Func<Exception> exceptionFactory)
+    public static string AgainstTooLong(
+        this string value,
+        int max,
+        Func<Exception> exceptionFactory)
     {
         return value.Length > max ? throw exceptionFactory() : value;
     }
@@ -138,7 +175,11 @@ public static class ValidationGuardExtensions
         return value is null ? throw exceptionFactory() : value;
     }
 
-    public static T AgainstOutOfRange<T>(this T value, T min, T max, Func<Exception> exceptionFactory)
+    public static T AgainstOutOfRange<T>(
+        this T value,
+        T min,
+        T max,
+        Func<Exception> exceptionFactory)
         where T : IComparable<T>
     {
         return value.CompareTo(min) < 0 || value.CompareTo(max) > 0
@@ -146,38 +187,56 @@ public static class ValidationGuardExtensions
             : value;
     }
 
-    public static T Against<T>(this T value, Func<T, bool> predicate, Func<Exception> exceptionFactory)
+    public static T Against<T>(
+        this T value,
+        Func<T, bool> predicate,
+        Func<Exception> exceptionFactory)
     {
         return predicate(value)
             ? throw exceptionFactory()
             : value;
     }
 
-    public static T AgainstEqual<T>(this T value, T next, Func<Exception> exceptionFactory)
+    public static T AgainstEqual<T>(
+        this T value,
+        T next,
+        Func<Exception> exceptionFactory)
         where T : IComparable<T>
     {
         return value.CompareTo(next) == 0 ? throw exceptionFactory() : value;
     }
 
-    public static T AgainstTooBig<T>(this T value, T max, Func<Exception> exceptionFactory)
+    public static T AgainstTooBig<T>(
+        this T value,
+        T max,
+        Func<Exception> exceptionFactory)
         where T : IComparable<T>
     {
         return value.CompareTo(max) > 0 ? throw exceptionFactory() : value;
     }
 
-    public static T AgainstTooSmall<T>(this T value, T min, Func<Exception> exceptionFactory)
+    public static T AgainstTooSmall<T>(
+        this T value,
+        T min,
+        Func<Exception> exceptionFactory)
         where T : IComparable<T>
     {
         return value.CompareTo(min) < 0 ? throw exceptionFactory() : value;
     }
 
-    public static T AgainstLessOrEqual<T>(this T value, T min, Func<Exception> exceptionFactory)
+    public static T AgainstLessOrEqual<T>(
+        this T value,
+        T min,
+        Func<Exception> exceptionFactory)
         where T : IComparable<T>
     {
         return value.CompareTo(min) <= 0 ? throw exceptionFactory() : value;
     }
 
-    public static T AgainstGreaterOrEqual<T>(this T value, T max, Func<Exception> exceptionFactory)
+    public static T AgainstGreaterOrEqual<T>(
+        this T value,
+        T max,
+        Func<Exception> exceptionFactory)
         where T : IComparable<T>
     {
         return value.CompareTo(max) >= 0 ? throw exceptionFactory() : value;

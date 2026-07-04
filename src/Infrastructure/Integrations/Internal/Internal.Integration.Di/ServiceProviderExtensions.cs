@@ -1,6 +1,8 @@
-﻿using Internal.Integration.Auth;
+﻿using Integrations.Common;
+using Internal.Integration.Auth;
 using Internal.Integration.Core;
 using Internal.Integration.Core.Interfaces;
+using Internal.Integration.Core.Interfaces.Common;
 using Internal.Integration.Core.Interfaces.Main;
 using Internal.Integration.Main;
 using Microsoft.Extensions.DependencyInjection;
@@ -28,24 +30,27 @@ public static class ServiceProviderExtensions
         services.AddSingleton<IAuthTokenCache, AuthTokenCache>();
 
         services.AddHttpClient<IAuthClient, CacheableAuthClient>((sp, client) =>
-        {
-            var options = sp.GetRequiredService<IOptions<InternalServicesOptions>>().Value;
-            client.BaseAddress = new Uri(options.Main.Url);
-            client.DefaultRequestHeaders.Add(InternalTokenHeader, options.InternalToken);
-        });
+            {
+                var options = sp.GetRequiredService<IOptions<InternalServicesOptions>>().Value;
+                client.BaseAddress = new Uri(options.Main.Url);
+                client.DefaultRequestHeaders.Add(InternalTokenHeader, options.InternalToken);
+            })
+            .AddDefaultResilenceHandler();
 
         services.AddHttpClient<IMainClient, RootClient>((sp, client) =>
-        {
-            var options = sp.GetRequiredService<IOptions<InternalServicesOptions>>().Value;
-            client.BaseAddress = new Uri(options.Main.Url);
-            client.DefaultRequestHeaders.Add(InternalTokenHeader, options.InternalToken);
-        });
+            {
+                var options = sp.GetRequiredService<IOptions<InternalServicesOptions>>().Value;
+                client.BaseAddress = new Uri(options.Main.Url);
+                client.DefaultRequestHeaders.Add(InternalTokenHeader, options.InternalToken);
+            })
+            .AddDefaultResilenceHandler();
 
         services.AddHttpClient<ICommonClient, Common.RootClient>((sp, client) =>
-        {
-            var options = sp.GetRequiredService<IOptions<InternalServicesOptions>>().Value;
-            client.DefaultRequestHeaders.Add(InternalTokenHeader, options.InternalToken);
-        });
+            {
+                var options = sp.GetRequiredService<IOptions<InternalServicesOptions>>().Value;
+                client.DefaultRequestHeaders.Add(InternalTokenHeader, options.InternalToken);
+            })
+            .AddDefaultResilenceHandler();
 
         return services;
     }

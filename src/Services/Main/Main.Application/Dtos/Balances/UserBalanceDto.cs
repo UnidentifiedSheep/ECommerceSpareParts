@@ -7,8 +7,7 @@ public record UserBalanceDto
 {
     [JsonPropertyName("balance")]
     public required decimal Balance { get; init; }
-    
+
     [JsonPropertyName("currency")]
     public required CurrencyDto Currency { get; init; }
-    
 }

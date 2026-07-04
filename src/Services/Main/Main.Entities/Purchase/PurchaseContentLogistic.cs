@@ -5,13 +5,15 @@ using Domain.Interfaces;
 
 namespace Main.Entities.Purchase;
 
-public class PurchaseContentLogistic : Entity<PurchaseContentLogistic, int>, ILinqEntity<PurchaseContentLogistic, int>
+public class PurchaseContentLogistic : Entity<PurchaseContentLogistic, int>,
+    ILinqEntity<PurchaseContentLogistic, int>
 {
-    private PurchaseContentLogistic()
-    {
-    }
+    private PurchaseContentLogistic() { }
 
-    private PurchaseContentLogistic(decimal weightKg, decimal areaM3, decimal price)
+    private PurchaseContentLogistic(
+        decimal weightKg,
+        decimal areaM3,
+        decimal price)
     {
         SetWeightKg(weightKg);
         SetAreaM3(areaM3);
@@ -33,12 +35,21 @@ public class PurchaseContentLogistic : Entity<PurchaseContentLogistic, int>, ILi
         return x => x.PurchaseContentId == key;
     }
 
-    internal static PurchaseContentLogistic Create(decimal weightKg, decimal areaM3, decimal price)
+    internal static PurchaseContentLogistic Create(
+        decimal weightKg,
+        decimal areaM3,
+        decimal price)
     {
-        return new PurchaseContentLogistic(weightKg, areaM3, price);
+        return new PurchaseContentLogistic(
+            weightKg,
+            areaM3,
+            price);
     }
 
-    internal void Update(decimal weightKg, decimal areaM3, decimal price)
+    internal void Update(
+        decimal weightKg,
+        decimal areaM3,
+        decimal price)
     {
         SetWeightKg(weightKg);
         SetAreaM3(areaM3);
@@ -63,8 +74,5 @@ public class PurchaseContentLogistic : Entity<PurchaseContentLogistic, int>, ILi
             throw new InvalidOperationException("Purchase content logistics price must be positive"));
     }
 
-    public override int GetId()
-    {
-        return PurchaseContentId;
-    }
+    public override int GetId() { return PurchaseContentId; }
 }

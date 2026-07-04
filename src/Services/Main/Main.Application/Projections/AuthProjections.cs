@@ -7,8 +7,9 @@ namespace Main.Application.Projections;
 
 public static class AuthProjections
 {
-    public static Expression<Func<Role, RoleDto>> ToRoleDto(IScopedStringLocalizer localizer) =>
-        x => new RoleDto
+    public static Expression<Func<Role, RoleDto>> ToRoleDto(IScopedStringLocalizer localizer)
+    {
+        return x => new RoleDto
         {
             SystemName = x.Name,
             LocalizedName = localizer.GetOrDefault($"role.{x.Name}.name") ?? x.Name,
@@ -18,4 +19,5 @@ public static class AuthProjections
             CreatedAt = x.UpdatedAt,
             UpdatedAt = x.UpdatedAt
         };
+    }
 }

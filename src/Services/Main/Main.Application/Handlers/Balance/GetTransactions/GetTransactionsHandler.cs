@@ -1,11 +1,11 @@
 using Abstractions.Models;
 using Application.Common.Interfaces.Cqrs;
 using Application.Common.Interfaces.Repositories;
+using Enums;
 using LinqKit;
 using Main.Application.Dtos.Balances;
-using Main.Entities.Balance;
-using Enums;
 using Main.Application.Projections;
+using Main.Entities.Balance;
 using Main.Enums.Balances;
 using Microsoft.EntityFrameworkCore;
 
@@ -19,29 +19,39 @@ public record GetTransactionsQuery(
     Guid? ReceiverId,
     LogicalOperation LogicalOperation,
     Cursor<(Guid id, DateTime dt)> Cursor,
-    bool SkipReversed) : IQuery<GetTransactionsResult>;
+    bool SkipReversed
+) : IQuery<GetTransactionsResult>;
 
 public record GetTransactionsResult(IReadOnlyList<TransactionDto> Transactions);
 
 public class GetTransactionsHandler(
-    IReadRepository<Transaction, Guid> repository)
+    IReadRepository<Transaction, Guid> repository
+)
     : IQueryHandler<GetTransactionsQuery, GetTransactionsResult>
 {
-    private static readonly List<TransactionStatus> ReversedStatuses = GetStatusesWithFlag(TransactionStatus.Reversed)
-        .ToList();
+    private static readonly List<TransactionStatus> ReversedStatuses =
+        GetStatusesWithFlag(TransactionStatus.Reversed)
+            .ToList();
 
-    public async Task<GetTransactionsResult> Handle(GetTransactionsQuery request, CancellationToken cancellationToken)
+    public async Task<GetTransactionsResult> Handle(
+        GetTransactionsQuery request,
+        CancellationToken cancellationToken)
     {
         var cursor = request.Cursor;
         var query = repository.Query;
 
-        if (request.CurrencyId.HasValue)
-            query = query.Where(e => e.CurrencyId == request.CurrencyId.Value);
+        if (request.CurrencyId.HasValue) query = query.Where(e => e.CurrencyId == request.CurrencyId.Value);
 
         query = request.LogicalOperation switch
         {
-            LogicalOperation.Or => ApplyOrUserFilter(query, request.SenderId, request.ReceiverId),
-            _ => ApplyAndUserFilter(query, request.SenderId, request.ReceiverId)
+            LogicalOperation.Or => ApplyOrUserFilter(
+                query,
+                request.SenderId,
+                request.ReceiverId),
+            _ => ApplyAndUserFilter(
+                query,
+                request.SenderId,
+                request.ReceiverId)
         };
 
         var fixedStart = request.RangeStart.Date;
@@ -49,13 +59,12 @@ public class GetTransactionsHandler(
         query = query.Where(x => x.TransactionDatetime >= fixedStart &&
                                  x.TransactionDatetime <= fixedEnd);
 
-        if (request.SkipReversed)
-            query = query.Where(x => !ReversedStatuses.Contains(x.Status));
+        if (request.SkipReversed) query = query.Where(x => !ReversedStatuses.Contains(x.Status));
 
         var res = await query
             .Where(x =>
                 x.TransactionDatetime > cursor.CursorValue.dt ||
-                (x.TransactionDatetime == cursor.CursorValue.dt && x.Id > cursor.CursorValue.id))
+                x.TransactionDatetime == cursor.CursorValue.dt && x.Id > cursor.CursorValue.id)
             .OrderByDescending(x => x.TransactionDatetime)
             .ThenByDescending(x => x.Id)
             .Take(cursor.Size)
@@ -71,11 +80,9 @@ public class GetTransactionsHandler(
         Guid? senderId,
         Guid? receiverId)
     {
-        if (senderId.HasValue)
-            query = query.Where(e => e.SenderId == senderId.Value);
+        if (senderId.HasValue) query = query.Where(e => e.SenderId == senderId.Value);
 
-        if (receiverId.HasValue)
-            query = query.Where(e => e.ReceiverId == receiverId.Value);
+        if (receiverId.HasValue) query = query.Where(e => e.ReceiverId == receiverId.Value);
 
         return query;
     }
@@ -85,8 +92,7 @@ public class GetTransactionsHandler(
         Guid? senderId,
         Guid? receiverId)
     {
-        if (!senderId.HasValue && !receiverId.HasValue)
-            return query;
+        if (!senderId.HasValue && !receiverId.HasValue) return query;
 
         if (senderId == receiverId)
         {

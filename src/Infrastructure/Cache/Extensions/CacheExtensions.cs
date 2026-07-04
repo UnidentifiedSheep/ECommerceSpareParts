@@ -2,30 +2,30 @@ namespace Cache.Extensions;
 
 public readonly record struct CacheArrayResult<T>(
     bool IsHit,
-    IReadOnlyList<T> Values);
+    IReadOnlyList<T> Values
+);
 
 public static class CacheExtensions
 {
     public static async Task<T?> GetOrSetAsync<T>(
         this ICache cache,
-        string key, 
+        string key,
         Func<Task<T?>> factory,
         TimeSpan? ttl = null)
     {
         var cached = await cache.GetAsync<T>(key);
-        if (cached != null)
-            return cached;
+        if (cached != null) return cached;
 
         var value = await factory();
         if (value == null) return default;
-        
+
         await cache.SetAsync<T>(
             [(key, value)],
             ttl);
-        
+
         return value;
     }
-    
+
     public static async Task<Dictionary<TKey, TValue>> GetOrSetManyAsync<TKey, TValue>(
         this ICache cache,
         IEnumerable<TKey> ids,
@@ -38,35 +38,30 @@ public static class CacheExtensions
         var idsSet = ids.ToHashSet();
         var result = new Dictionary<TKey, TValue>();
 
-        if (idsSet.Count == 0)
-            return result;
+        if (idsSet.Count == 0) return result;
 
         var cached = (await cache.GetAsync<TValue>(idsSet.Select(getKey)))
             .DeserializeMany<TValue>();
 
         foreach (var found in cached)
         {
-            if (found == null)
-                continue;
+            if (found == null) continue;
 
             var id = getId(found);
             result[id] = found;
             idsSet.Remove(id);
         }
 
-        if (idsSet.Count == 0)
-            return result;
+        if (idsSet.Count == 0) return result;
 
         var missing = await getMissing(idsSet);
-        if (missing.Count == 0)
-            return result;
+        if (missing.Count == 0) return result;
 
         await cache.SetAsync(
             missing.Values.Select(x => (getKey(getId(x)), x)),
             ttl);
 
-        foreach (var item in missing)
-            result[item.Key] = item.Value;
+        foreach (var item in missing) result[item.Key] = item.Value;
 
         return result;
     }
@@ -80,8 +75,7 @@ public static class CacheExtensions
             .Select(x => x!)
             .ToList();
 
-        if (values.Count != 0)
-            return new CacheArrayResult<T>(true, values);
+        if (values.Count != 0) return new CacheArrayResult<T>(true, values);
 
         var exists = await cache.KeyExistsAsync(key);
         return new CacheArrayResult<T>(exists, values);
@@ -123,10 +117,24 @@ public static class CacheExtensions
         var keysToDelete = (await cache.GetFromSetAsync(relationKey))
             .ToList();
 
-        if (keysToDelete.Count == 0)
-            return;
+        if (keysToDelete.Count == 0) return;
 
+        keysToDelete.Add(relationKey);
         await cache.RemoveKeysAsync(keysToDelete);
-        await cache.RemoveKeyAsync(relationKey);
+    }
+
+    public static async Task InvalidateByRelationsAsync(
+        this ICache cache,
+        IEnumerable<string> relationKeys)
+    {
+        var relationKeysList = relationKeys as string[] ?? relationKeys.ToArray();
+        var keysToDelete = (await cache.GetFromManySetsAsync(relationKeysList))
+            .Values
+            .SelectMany(x => x)
+            .ToList();
+
+        if (keysToDelete.Count == 0) return;
+
+        await cache.RemoveKeysAsync(keysToDelete.Concat(relationKeysList));
     }
 }

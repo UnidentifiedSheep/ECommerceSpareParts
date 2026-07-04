@@ -30,7 +30,8 @@ public class CalculateDeliveryCostHandler(
     IRepository<ProductSize, int> sizesRepository,
     IStorageRouteRepository storageRoutesRepository,
     IRepository<Entities.Product.ProductWeight, int> weightRepository,
-    ICurrencyConverter currencyConverter)
+    ICurrencyConverter currencyConverter
+)
     : IQueryHandler<CalculateDeliveryCostQuery, CalculateDeliveryCostResult>
 {
     public async Task<CalculateDeliveryCostResult> Handle(
@@ -40,7 +41,10 @@ public class CalculateDeliveryCostHandler(
         var from = request.StorageFrom;
         var to = request.StorageTo;
 
-        var route = await GetStorageRoute(from, to, cancellationToken);
+        var route = await GetStorageRoute(
+            from,
+            to,
+            cancellationToken);
         var usableProductIds = request.Items
             .Select(x => x.ProductId)
             .ToHashSet();
@@ -62,35 +66,45 @@ public class CalculateDeliveryCostHandler(
             TotalCost = calcResult.TotalCost,
             CurrencyId = route.CurrencyId,
             Items = calcResult.Items.Select(x => new DeliveryCostItemDto
-            {
-                AreaM3 = x.AreaM3,
-                AreaPerItem = x.AreaPerItem,
-                Cost = x.Cost,
-                ProductId = x.Id,
-                Quantity = x.Quantity,
-                Reasons = x.Reasons,
-                Skipped = x.Skipped,
-                Weight = x.Weight,
-                WeightPerItem = x.WeightPerItem,
-                WeightUnit = x.WeightUnit
-            }).ToList(),
+                {
+                    AreaM3 = x.AreaM3,
+                    AreaPerItem = x.AreaPerItem,
+                    Cost = x.Cost,
+                    ProductId = x.Id,
+                    Quantity = x.Quantity,
+                    Reasons = x.Reasons,
+                    Skipped = x.Skipped,
+                    Weight = x.Weight,
+                    WeightPerItem = x.WeightPerItem,
+                    WeightUnit = x.WeightUnit
+                })
+                .ToList(),
             MinimalPrice = calcResult.MinimalPrice,
             MinimalPriceApplied = calcResult.MinimalPriceApplied,
             PricingModel = calcResult.PricingModel,
             WeightUnit = calcResult.WeightUnit
         };
 
-        return new CalculateDeliveryCostResult(StorageProjections.StorageRouteProjection.AsFunc()(route), deliveryCost);
+        return new CalculateDeliveryCostResult(
+            StorageProjections.StorageRouteProjection.AsFunc()(route),
+            deliveryCost);
     }
 
-    private async Task<StorageRoute> GetStorageRoute(string from, string to, CancellationToken cancellationToken)
+    private async Task<StorageRoute> GetStorageRoute(
+        string from,
+        string to,
+        CancellationToken cancellationToken)
     {
         var criteria = Criteria<StorageRoute>.New()
             .Include(x => x.Currency)
             .Track(false)
             .Build();
 
-        return await storageRoutesRepository.GetActiveRouteAsync(from, to, criteria, cancellationToken)
+        return await storageRoutesRepository.GetActiveRouteAsync(
+                   from,
+                   to,
+                   criteria,
+                   cancellationToken)
                ?? throw new StorageRouteNotFound(from, to);
     }
 
@@ -128,27 +142,39 @@ public class CalculateDeliveryCostHandler(
         int currencyId,
         LogisticsCalculationMode mode)
     {
-        var priceKg = Math.Round(await currencyConverter
-            .ConvertAsync(
-                route.PriceKg,
+        var priceKg = Math.Round(
+            await currencyConverter
+                .ConvertAsync(
+                    route.PriceKg,
+                    route.CurrencyId,
+                    currencyId),
+            2);
+        var priceArea = Math.Round(
+            await currencyConverter
+                .ConvertAsync(
+                    route.PricePerM3,
+                    route.CurrencyId,
+                    currencyId),
+            2);
+        var priceOrder = Math.Round(
+            await currencyConverter
+                .ConvertAsync(
+                    route.PricePerOrder,
+                    route.CurrencyId,
+                    currencyId),
+            2);
+        var minimalPrice = Math.Round(
+            await currencyConverter.ConvertAsync(
+                route.MinimumPrice,
                 route.CurrencyId,
-                currencyId), 2);
-        var priceArea = Math.Round(await currencyConverter
-            .ConvertAsync(
-                route.PricePerM3,
-                route.CurrencyId,
-                currencyId), 2);
-        var priceOrder = Math.Round(await currencyConverter
-            .ConvertAsync(
-                route.PricePerOrder,
-                route.CurrencyId,
-                currencyId), 2);
-        var minimalPrice = Math.Round(await currencyConverter.ConvertAsync(
-            route.MinimumPrice,
-            route.CurrencyId,
-            currencyId), 2);
+                currencyId),
+            2);
 
-        var context = new LogisticsContext(priceKg, priceArea, priceOrder, minimalPrice);
+        var context = new LogisticsContext(
+            priceKg,
+            priceArea,
+            priceOrder,
+            minimalPrice);
         List<LogisticsItem> logisticsItems = [];
 
         foreach (var item in items)
@@ -162,12 +188,20 @@ public class CalculateDeliveryCostHandler(
                 if (!weightExists) throw new ProductWeightNotFoundException(item.ProductId);
             }
 
-            logisticsItems.Add(new LogisticsItem(item.ProductId, item.Quantity, weight?.Weight ?? 0,
-                weight?.Unit ?? WeightUnit.Kilogram, size?.VolumeM3 ?? 0));
+            logisticsItems.Add(
+                new LogisticsItem(
+                    item.ProductId,
+                    item.Quantity,
+                    weight?.Weight ?? 0,
+                    weight?.Unit ?? WeightUnit.Kilogram,
+                    size?.VolumeM3 ?? 0));
         }
 
         if (logisticsItems.Count == 0) throw new NoLogisticsItemsException();
 
-        return logisticsCostService.Calculate(route.PricingModel, context, logisticsItems);
+        return logisticsCostService.Calculate(
+            route.PricingModel,
+            context,
+            logisticsItems);
     }
 }

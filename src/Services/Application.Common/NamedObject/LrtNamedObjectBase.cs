@@ -1,4 +1,5 @@
-﻿using Abstractions.Interfaces.Persistence;
+﻿using Abstractions.Interfaces;
+using Abstractions.Interfaces.Persistence;
 using Application.Common.Interfaces.NamedObject;
 using Application.Common.Interfaces.Repositories;
 using Application.Common.LRT;
@@ -13,7 +14,11 @@ public abstract class LrtNamedObjectBase(
     IUnitOfWork unitOfWork,
     IPublishEndpoint publisher,
     ILogger logger
-    ) : LrtBase(jobRepository, unitOfWork, publisher, logger), ILocalizableNamedObject
+) : LrtBase(
+    jobRepository,
+    unitOfWork,
+    publisher,
+    logger), ILocalizableNamedObject
 {
     public abstract string SystemName { get; }
     public abstract string NameLocalizationKey { get; }

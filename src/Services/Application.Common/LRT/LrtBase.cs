@@ -7,7 +7,7 @@ using Application.Common.Interfaces.Repositories;
 using Attributes;
 using Contracts.Job;
 using Domain.CommonEntities;
-using Domain.CommonEnums;
+using Domain.Exceptions;
 using MassTransit;
 using Microsoft.Extensions.Logging;
 
@@ -17,25 +17,30 @@ public abstract class LrtBase(
     IRepository<Job, Guid> jobRepository,
     IUnitOfWork unitOfWork,
     IPublishEndpoint publisher,
-    ILogger logger) : ILrt, ILrtDescriptor
+    ILogger logger
+) : ILrt, ILrtDescriptor
 {
     protected IUnitOfWork UnitOfWork => unitOfWork;
     protected IRepository<Job, Guid> JobRepository => jobRepository;
     protected ILogger Logger => logger;
     protected IPublishEndpoint Publisher => publisher;
     protected CancellationToken CancellationToken { get; private set; }
-    protected Job Job { get; private set; } = null!;
+    private Job? _job;
+    protected Job Job => _job ?? throw new InvalidOperationException("Job is not initialized");
     protected Guid JobId { get; private set; }
+    protected Guid LeaseHolderId { get; private set; }
     protected bool Initialized { get; private set; }
-    protected abstract IServiceDefinition ServiceDefinition { get; }
-    
+    protected virtual TimeSpan LeaseDuration => TimeSpan.FromMinutes(5);
+    public abstract IServiceDefinition ServiceDefinition { get; }
+
     public async Task ExecuteAsync(
         Guid jobId,
+        Guid leaseHolderId,
         CancellationToken cancellationToken = default)
     {
         CancellationToken = cancellationToken;
         JobId = jobId;
-        Job = null!;
+        LeaseHolderId = leaseHolderId;
         Initialized = false;
 
         logger.LogInformation(
@@ -43,7 +48,6 @@ public abstract class LrtBase(
             JobId);
 
         while (true)
-        {
             try
             {
                 if (!Initialized)
@@ -52,18 +56,16 @@ public abstract class LrtBase(
                     await ProcessingJobAsync();
                     Initialized = true;
                 }
-                
+
                 await DoWork();
                 await SucceedJobAsync();
                 logger.LogInformation(
                     "LRT execution completed. JobId: {JobId}",
                     JobId);
                 break;
-                
             }
             catch (OperationCanceledException) when (cancellationToken.IsCancellationRequested)
             {
-                await CancelJobAsync();
                 logger.LogInformation(
                     "LRT execution cancelled. JobId: {JobId}",
                     JobId);
@@ -76,6 +78,21 @@ public abstract class LrtBase(
                     e,
                     "LRT execution interrupted. JobId: {JobId}",
                     JobId);
+                break;
+            }
+            catch (JobLeaseLostException e)
+            {
+                logger.LogWarning(e, "LRT stopped because lease was lost. JobId: {JobId}", JobId);
+                break;
+            }
+            catch (JobCancellationRequestedException e)
+            {
+                await CancelJobAsync();
+                logger.LogInformation(
+                    e,
+                    "LRT execution cancelled by request. JobId: {JobId}",
+                    JobId);
+
                 break;
             }
             catch (Exception e)
@@ -99,24 +116,20 @@ public abstract class LrtBase(
                     Job.MaxAttempts);
                 break;
             }
-        }
     }
 
-    protected virtual Task InitJobAsync()
-    {
-        return GetJobAsync();
-    }
+    public abstract Type InputType { get; }
+    public abstract Type StateType { get; }
 
-    protected void Interrupt(string reason)
-    {
-        throw new LrtInterruptedException(reason);
-    }
+    protected virtual Task InitJobAsync() { return GetJobAsync(); }
+
+    protected void Interrupt(string reason) { throw new LrtInterruptedException(reason); }
 
     protected async Task<T?> GetStateAsync<T>()
     {
         await GetJobAsync();
-        return string.IsNullOrWhiteSpace(Job.State) 
-            ? default 
+        return string.IsNullOrWhiteSpace(Job.State)
+            ? default
             : JsonSerializer.Deserialize<T>(Job.State);
     }
 
@@ -128,7 +141,8 @@ public abstract class LrtBase(
             async () =>
             {
                 await GetJobAsync();
-                Job.SetState(json);
+                Job.SetState(json, LeaseHolderId);
+                Job.RenewLease(LeaseHolderId, LeaseDuration);
                 await unitOfWork.SaveChangesAsync(CancellationToken);
             },
             CancellationToken);
@@ -136,10 +150,13 @@ public abstract class LrtBase(
 
     protected async Task GetJobAsync()
     {
-        Job = await jobRepository.GetById(JobId, CancellationToken)
-            ?? throw new InvalidOperationException($"Job with id {JobId} not found");
+        if (_job != null)
+            await unitOfWork.ReloadAsync(_job, CancellationToken);
+        else
+            _job = await jobRepository.GetById(JobId, CancellationToken)
+                   ?? throw new InvalidOperationException($"Job with id {JobId} not found");
     }
-    
+
     protected virtual async Task ProcessingJobAsync()
     {
         await unitOfWork.ExecuteWithTransaction(
@@ -147,7 +164,8 @@ public abstract class LrtBase(
             async () =>
             {
                 await GetJobAsync();
-                Job.Start();
+                Job.Start(LeaseHolderId);
+                Job.RenewLease(LeaseHolderId, LeaseDuration);
                 await PublishStatusUpdatedEvent(Job);
                 await unitOfWork.SaveChangesAsync(CancellationToken);
                 logger.LogInformation(
@@ -169,13 +187,13 @@ public abstract class LrtBase(
 
                 if (Job.CanRetry() && !forceFail)
                 {
-                    Job.RegisterAttempt();
+                    Job.RegisterAttempt(LeaseHolderId);
                     await PublishStatusUpdatedEvent(Job);
                     await unitOfWork.SaveChangesAsync(CancellationToken);
                     return true;
                 }
 
-                Job.Fail(exception.Message);
+                Job.Fail(LeaseHolderId, exception.Message);
                 await PublishStatusUpdatedEvent(Job);
                 await unitOfWork.SaveChangesAsync(CancellationToken);
                 return false;
@@ -190,7 +208,7 @@ public abstract class LrtBase(
             async () =>
             {
                 await GetJobAsync();
-                Job.Succeed();
+                Job.Succeed(LeaseHolderId);
                 await PublishStatusUpdatedEvent(Job);
                 await unitOfWork.SaveChangesAsync(CancellationToken);
             },
@@ -204,10 +222,24 @@ public abstract class LrtBase(
             async () =>
             {
                 await GetJobAsync();
-                Job.Cancel();
+                Job.Cancel(LeaseHolderId);
                 await PublishStatusUpdatedEvent(Job);
                 await unitOfWork.SaveChangesAsync(CancellationToken);
-            }, CancellationToken);
+            },
+            CancellationToken);
+    }
+
+    protected async Task RenewLeaseAsync(TimeSpan leaseDuration)
+    {
+        await unitOfWork.ExecuteWithTransaction(
+            TransactionalAttribute.ReadCommited(30, 3),
+            async () =>
+            {
+                await GetJobAsync();
+                Job.RenewLease(LeaseHolderId, leaseDuration);
+                await unitOfWork.SaveChangesAsync(CancellationToken);
+            },
+            CancellationToken);
     }
 
     protected async Task PublishStatusUpdatedEvent(Job job)
@@ -222,8 +254,6 @@ public abstract class LrtBase(
             conf => conf.SetRoutingKey(ServiceDefinition.ServiceName),
             CancellationToken);
     }
-    
+
     protected abstract Task DoWork();
-    public abstract Type InputType { get; }
-    public abstract Type StateType { get; }
 }

@@ -5,13 +5,13 @@ using System.Text;
 using System.Text.Json;
 using Analytics.Enums;
 using Domain;
-using Domain.CommonEntities;
 using Domain.Extensions;
 
 namespace Analytics.Entities.Metrics;
 
 public abstract class Metric : AuditableEntity<Metric, Guid>
 {
+    private readonly List<MetricJob> _jobs = [];
     public Guid Id { get; private set; }
 
     public int CurrencyId { get; private set; }
@@ -32,11 +32,13 @@ public abstract class Metric : AuditableEntity<Metric, Guid>
     public abstract DependsOn DependsOn { get; protected set; }
 
     public string? Json { get; protected set; }
-
-    private readonly List<MetricJob> _jobs = [];
     public IReadOnlyCollection<MetricJob> Jobs => _jobs;
+    public abstract Type DataType { get; }
 
-    public void ConfigurePeriod(int currencyId, DateTime rangeStart, DateTime rangeEnd)
+    public void ConfigurePeriod(
+        int currencyId,
+        DateTime rangeStart,
+        DateTime rangeEnd)
     {
         currencyId.AgainstLessOrEqual(
             0,
@@ -52,20 +54,11 @@ public abstract class Metric : AuditableEntity<Metric, Guid>
         MarkDirty();
     }
 
-    public void AddJob(Guid jobId)
-    {
-        _jobs.Add(MetricJob.Create(Id, jobId));
-    }
+    public void AddJob(Guid jobId) { _jobs.Add(MetricJob.Create(Id, jobId)); }
 
-    public void MarkDirty()
-    {
-        Tags |= RecalculationTags.RecalculationNeeded;
-    }
+    public void MarkDirty() { Tags |= RecalculationTags.RecalculationNeeded; }
 
-    public void Disable()
-    {
-        Tags |= RecalculationTags.Disabled;
-    }
+    public void Disable() { Tags |= RecalculationTags.Disabled; }
 
     public void CompleteRecalculation()
     {
@@ -83,18 +76,15 @@ public abstract class Metric : AuditableEntity<Metric, Guid>
         NaturalKey = ComputeNaturalKey();
     }
 
-    private byte[] ComputeNaturalKey()
-    {
-        return GetNaturalKey(this);
-    }
+    private byte[] ComputeNaturalKey() { return GetNaturalKey(this); }
 
     public static byte[] GetNaturalKey(Metric metric)
     {
         return GetNaturalKey(
-            metric.RangeStart, 
-            metric.RangeEnd, 
+            metric.RangeStart,
+            metric.RangeEnd,
             metric.GetType().Name,
-            metric.DimensionKey, 
+            metric.DimensionKey,
             metric.CurrencyId);
     }
 
@@ -107,7 +97,7 @@ public abstract class Metric : AuditableEntity<Metric, Guid>
     {
         start = start.ToUniversalTime();
         end = end.ToUniversalTime();
-        
+
         var key = string.Create(
             CultureInfo.InvariantCulture,
             $"{start:yyyy-MM-ddTHH:mm:ssZ}|{end:yyyy-MM-ddTHH:mm:ssZ}|{discriminator}|{dimensionKey}|{currencyId}");
@@ -117,13 +107,9 @@ public abstract class Metric : AuditableEntity<Metric, Guid>
                 .GetBytes(key));
     }
 
-    public override Guid GetId()
-    {
-        return Id;
-    }
-    
+    public override Guid GetId() { return Id; }
+
     public abstract object? GetData();
-    public abstract Type DataType { get; }
 }
 
 public abstract class Metric<T> : Metric where T : class
@@ -145,10 +131,7 @@ public abstract class Metric<T> : Metric where T : class
         }
     }
 
-    public void SetData(T? data)
-    {
-        Data = data;
-    }
+    public void SetData(T? data) { Data = data; }
 
-    public override object? GetData() => Data;
+    public override object? GetData() { return Data; }
 }

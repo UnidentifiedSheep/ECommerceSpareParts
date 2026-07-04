@@ -1,12 +1,14 @@
 using Abstractions.Models.Options;
 using Api.Common.ExceptionHandlers;
+using Api.Common.HostedServices;
 using Api.Common.Models.Options;
-using Api.Common.Services;
-using Application.Common.Interfaces;
+using Application.Common.Models;
+using Application.Common.Models.Options;
 using Cache;
 using Persistence;
 using RabbitMq;
 using S3;
+using Security;
 
 namespace Api.Common;
 
@@ -14,7 +16,15 @@ public static class ServiceProvider
 {
     public static IServiceCollection AddCommonLayer(this IServiceCollection collection)
     {
-        collection.AddSingleton<ISearchLogger, SearchLogger>();
+        return collection;
+    }
+
+    public static IServiceCollection AddProjectJsonSerialization(this IServiceCollection collection)
+    {
+        collection
+            .AddOptions<ProjectJsonOptions>()
+            .Configure(options => ProjectJsonOptions.Configure(options.SerializerOptions));
+
         return collection;
     }
 
@@ -81,8 +91,15 @@ public static class ServiceProvider
             .BindConfiguration(LrtExecutorOptions.SectionName)
             .ValidateDataAnnotations()
             .ValidateOnStart();
-        
+
         return collection;
+    }
+
+    public static IServiceCollection AddLrtHostedServices(this IServiceCollection serviceCollection)
+    {
+        return serviceCollection.AddHostedService<LrtExecutorHostedService>()
+            .AddHostedService<ScheduledJobEnqueuerHostedService>()
+            .AddHostedService<ExpiredJobsWiperHostedService>();
     }
 
     public static IServiceCollection AddScheduledJobEnqueuerOptions(this IServiceCollection collection)
@@ -91,7 +108,7 @@ public static class ServiceProvider
             .BindConfiguration(ScheduledJobEnqueuerOptions.SectionName)
             .ValidateDataAnnotations()
             .ValidateOnStart();
-        
+
         return collection;
     }
 
@@ -101,8 +118,22 @@ public static class ServiceProvider
             .BindConfiguration(SystemOptions.SectionName)
             .ValidateDataAnnotations()
             .ValidateOnStart();
-        
+
         return collection;
-            
+    }
+
+    public static IServiceCollection AddSecretEncryptionOptions(this IServiceCollection collection)
+    {
+        collection.AddOptions<SecretEncryptionOptions>()
+            .BindConfiguration(SecretEncryptionOptions.SectionName)
+            .Configure<IConfiguration>((options, configuration) =>
+            {
+                if (string.IsNullOrWhiteSpace(options.Secret))
+                    options.Secret = configuration["SignSecret"] ?? string.Empty;
+            })
+            .ValidateDataAnnotations()
+            .ValidateOnStart();
+
+        return collection;
     }
 }

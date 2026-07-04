@@ -6,7 +6,7 @@ using Main.Entities.Storage;
 using Main.Enums;
 using Main.Enums.Balances;
 using Microsoft.EntityFrameworkCore;
-using Test.Common.TestContainers.Combined;
+using Tests.TestContainers.Combined;
 using Tests.TestContexts;
 using Tests.TestContexts.Currency;
 using Tests.TestContexts.Purchase;
@@ -127,7 +127,8 @@ public class EditPurchaseTests : IntegrationTest
     }
 
     [Fact]
-    public async Task EditPurchase_WhenPartOfStorageContentAlreadyUsed_DecreaseSubtractsOnlyDeltaFromRemainingStock()
+    public async Task
+        EditPurchase_WhenPartOfStorageContentAlreadyUsed_DecreaseSubtractsOnlyDeltaFromRemainingStock()
     {
         var currency = GetContext<CurrencyTestContext>().Currencies[0];
         var purchase = PurchaseContext.Purchase;
@@ -135,31 +136,33 @@ public class EditPurchaseTests : IntegrationTest
         var content = purchase.Contents.Single();
         var storageContentId = content.StorageContentId;
         content.SetCount(10);
-        PurchaseContext.StorageContent.IncreaseCount(8);
+        PurchaseContext.StorageContent.IncreaseCount(8, StorageMovementType.PurchaseEditing);
         product.IncreaseStock(8);
         await Context.SaveChangesAsync();
 
-        await Mediator.Send(new SubtractStorageContentsCommand(
-            storageContentId,
-            5,
-            StorageMovementType.Sale));
+        await Mediator.Send(
+            new SubtractStorageContentsCommand(
+                storageContentId,
+                5,
+                StorageMovementType.Sale));
 
-        await Mediator.Send(new EditPurchaseCommand(
-            [
-                new EditPurchaseDto
-                {
-                    Id = content.Id,
-                    ProductId = product.Id,
-                    Count = 8,
-                    Price = 10m
-                }
-            ],
-            purchase.Id,
-            currency.Id,
-            null,
-            DateTime.UtcNow,
-            false,
-            null));
+        await Mediator.Send(
+            new EditPurchaseCommand(
+                [
+                    new EditPurchaseDto
+                    {
+                        Id = content.Id,
+                        ProductId = product.Id,
+                        Count = 8,
+                        Price = 10m
+                    }
+                ],
+                purchase.Id,
+                currency.Id,
+                null,
+                DateTime.UtcNow,
+                false,
+                null));
 
         var updatedPurchaseContent = await Context.PurchaseContents
             .AsNoTracking()
@@ -235,7 +238,10 @@ public class EditPurchaseTests : IntegrationTest
         var purchase = PurchaseContext.Purchase;
         var product = PurchaseContext.Product;
         var content = purchase.Contents.Single();
-        content.SetLogistic(1m, 1m, 1m);
+        content.SetLogistic(
+            1m,
+            1m,
+            1m);
         purchase.SetPurchaseLogistic(
             route.Id,
             route.CurrencyId,
@@ -249,23 +255,24 @@ public class EditPurchaseTests : IntegrationTest
             false);
         await Context.SaveChangesAsync();
 
-        await Mediator.Send(new EditPurchaseCommand(
-            [
-                new EditPurchaseDto
-                {
-                    Id = content.Id,
-                    ProductId = product.Id,
-                    Count = content.Count,
-                    Price = content.Price,
-                    CalculateLogistics = false
-                }
-            ],
-            purchase.Id,
-            currency.Id,
-            null,
-            DateTime.UtcNow,
-            false,
-            null));
+        await Mediator.Send(
+            new EditPurchaseCommand(
+                [
+                    new EditPurchaseDto
+                    {
+                        Id = content.Id,
+                        ProductId = product.Id,
+                        Count = content.Count,
+                        Price = content.Price,
+                        CalculateLogistics = false
+                    }
+                ],
+                purchase.Id,
+                currency.Id,
+                null,
+                DateTime.UtcNow,
+                false,
+                null));
 
         var updatedPurchase = await Context.Purchases
             .Include(x => x.PurchaseLogistic)

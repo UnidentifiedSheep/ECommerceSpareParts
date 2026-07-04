@@ -2,7 +2,8 @@ using Abstractions.Interfaces.Exceptions;
 
 namespace Exceptions.Base.Localized;
 
-public abstract class LocalizedPreconditionRequiredException : PreconditionRequiredException, ILocalizableException
+public abstract class LocalizedPreconditionRequiredException : PreconditionRequiredException,
+    ILocalizableException
 {
     protected LocalizedPreconditionRequiredException(
         string messageKey,

@@ -6,13 +6,12 @@ using Exceptions;
 using Main.Enums;
 
 namespace Main.Entities.Storage;
+
 //Product reservation. It should be renamed.
 public class StorageContentReservation : AuditableEntity<StorageContentReservation, int>,
     ILinqEntity<StorageContentReservation, int>
 {
-    private StorageContentReservation()
-    {
-    }
+    private StorageContentReservation() { }
 
     private StorageContentReservation(
         Guid userId,
@@ -46,10 +45,7 @@ public class StorageContentReservation : AuditableEntity<StorageContentReservati
 
     public User.User User { get; private set; } = null!;
 
-    public static Expression<Func<StorageContentReservation, int>> GetKeySelector()
-    {
-        return x => x.Id;
-    }
+    public static Expression<Func<StorageContentReservation, int>> GetKeySelector() { return x => x.Id; }
 
     public static Expression<Func<StorageContentReservation, bool>> GetEqualityExpression(int key)
     {
@@ -61,7 +57,10 @@ public class StorageContentReservation : AuditableEntity<StorageContentReservati
         int productId,
         int reservedCount)
     {
-        return new StorageContentReservation(userId, productId, reservedCount);
+        return new StorageContentReservation(
+            userId,
+            productId,
+            reservedCount);
     }
 
     private void SetReservedCount(int initialCount)
@@ -113,25 +112,19 @@ public class StorageContentReservation : AuditableEntity<StorageContentReservati
         ThrowIfCanceled();
 
         var summed = CurrentCount + amount;
-        if (summed > ReservedCount)
-            throw new InvalidOperationException("Can't increase reservation count");
-        if (summed < 0)
-            throw new InvalidOperationException("Can't decrease reservation count");
+        if (summed > ReservedCount) throw new InvalidOperationException("Can't increase reservation count");
+        if (summed < 0) throw new InvalidOperationException("Can't decrease reservation count");
 
         CurrentCount = summed;
 
         UpdateStatus();
     }
 
-    public void Cancel()
-    {
-        Status = StorageContentReservationStatus.Canceled;
-    }
+    public void Cancel() { Status = StorageContentReservationStatus.Canceled; }
 
     private void UpdateStatus()
     {
-        if (Status == StorageContentReservationStatus.Canceled)
-            return;
+        if (Status == StorageContentReservationStatus.Canceled) return;
 
         Status = CurrentCount switch
         {
@@ -159,8 +152,5 @@ public class StorageContentReservation : AuditableEntity<StorageContentReservati
             throw new InvalidInputException("article.reservation.is.canceled");
     }
 
-    public override int GetId()
-    {
-        return Id;
-    }
+    public override int GetId() { return Id; }
 }

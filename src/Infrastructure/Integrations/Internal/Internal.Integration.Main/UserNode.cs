@@ -1,8 +1,8 @@
 ﻿using System.Text.Json.Serialization;
+using Integrations.Common;
 using Internal.Integration.Core;
 using Internal.Integration.Core.Interfaces;
 using Internal.Integration.Core.Interfaces.Main;
-using Internal.Integration.Core.Models;
 using Microsoft.Extensions.Options;
 
 namespace Internal.Integration.Main;
@@ -10,10 +10,11 @@ namespace Internal.Integration.Main;
 internal sealed class UserNode(
     HttpClient httpClient,
     IAuthClient authClient,
-    IOptionsMonitor<InternalServiceCredentials> optionsMonitor) 
+    IOptionsMonitor<InternalServiceCredentials> optionsMonitor
+)
     : InternalClientBase(authClient, optionsMonitor), IUserNode
 {
-    public async Task<InternalResponse<decimal>> GetUserDiscount(
+    public async Task<Response<decimal>> GetUserDiscount(
         Guid userId,
         CancellationToken cancellationToken = default)
     {
@@ -25,12 +26,12 @@ internal sealed class UserNode(
             request,
             cancellationToken);
 
-        return await ReadInternalResponse<GetUserDiscountResponse, decimal>(
+        return await ReadResponse<GetUserDiscountResponse, decimal>(
             response,
             x => x.Discount,
             cancellationToken);
     }
-    
+
     private record GetUserDiscountResponse
     {
         [JsonPropertyName("discount")]

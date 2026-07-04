@@ -1,14 +1,14 @@
 using Bogus;
 using Main.Entities.Product;
 using Main.Entities.Storage;
-using Test.Common.Abstractions;
+using Tests.Abstractions;
 
 namespace Tests.DataBuilders.Storage;
 
 public class StorageContentReservationBuilder(Faker faker) : BuilderBase<StorageContentReservation>(faker)
 {
-    private readonly HashSet<Guid> _userIds = [];
     private readonly HashSet<int> _productIds = [];
+    private readonly HashSet<Guid> _userIds = [];
 
     public Guid? UserId { get; private set; }
     public int? ProductId { get; private set; }
@@ -89,8 +89,7 @@ public class StorageContentReservationBuilder(Faker faker) : BuilderBase<Storage
         reservation.ProposePrice(ProposedPrice, ProposedCurrencyId);
         reservation.SetComment(Comment);
 
-        if (CurrentCount is not null)
-            reservation.AddCount(CurrentCount.Value);
+        if (CurrentCount is not null) reservation.AddCount(CurrentCount.Value);
 
         return reservation;
     }

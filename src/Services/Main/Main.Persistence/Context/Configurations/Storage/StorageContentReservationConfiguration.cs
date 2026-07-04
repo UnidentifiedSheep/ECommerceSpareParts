@@ -14,7 +14,8 @@ public class StorageContentReservationConfiguration : IEntityTypeConfiguration<S
 
         builder.HasIndex(e => e.ProposedCurrencyId, "IX_storage_content_reservations_proposed_currency_id");
 
-        builder.HasIndex(e => new { e.ProductId, e.Status },
+        builder.HasIndex(
+            e => new { e.ProductId, e.Status },
             "storage_content_reservations_product_id_status_index");
 
         builder.HasIndex(e => e.Comment, "storage_content_reservations_comment_index")
@@ -23,7 +24,8 @@ public class StorageContentReservationConfiguration : IEntityTypeConfiguration<S
 
         builder.HasIndex(e => e.Status, "storage_content_reservations_status_index");
 
-        builder.HasIndex(e => new { e.UserId, e.Status },
+        builder.HasIndex(
+            e => new { e.UserId, e.Status },
             "storage_content_reservations_user_id_status_index");
 
         builder.Property(e => e.Id)

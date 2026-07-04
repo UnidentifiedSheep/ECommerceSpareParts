@@ -1,14 +1,9 @@
-using Abstractions.Interfaces.Services;
 using Analytics.Application.Interfaces.Repositories;
 using Analytics.Entities.Metrics;
 using Analytics.Enums;
 using Analytics.Persistence.Context;
 using Application.Common.Interfaces.Repositories;
 using Microsoft.EntityFrameworkCore;
-using Npgsql;
-using NpgsqlTypes;
-using Persistence;
-using Persistence.Extensions;
 using Persistence.Interfaces;
 using Persistence.Repository;
 

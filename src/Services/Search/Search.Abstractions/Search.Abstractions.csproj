@@ -12,7 +12,7 @@
         <ProjectReference Include="..\Search.Entities\Search.Entities.csproj"/>
         <ProjectReference Include="..\Search.Enums\Search.Enums.csproj"/>
     </ItemGroup>
-    
+
     <ItemGroup>
         <Content Include="..\..\Application.Common\Localization\**\*">
             <Link>Localization\%(RecursiveDir)%(Filename)%(Extension)</Link>

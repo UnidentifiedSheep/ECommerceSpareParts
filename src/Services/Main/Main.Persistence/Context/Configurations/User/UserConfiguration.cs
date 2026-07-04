@@ -33,7 +33,10 @@ public class UserConfiguration : IEntityTypeConfiguration<Entities.User.User>
                     .HasColumnName("user_name");
 
                 b.Property(e => e.NormalizedValue)
-                    .HasComplexIndex(true, null, "users_normalized_user_name_uindex");
+                    .HasComplexIndex(
+                        true,
+                        null,
+                        "users_normalized_user_name_uindex");
 
                 b.Property(e => e.NormalizedValue)
                     .HasMaxLength(36)
@@ -76,7 +79,7 @@ public class UserConfiguration : IEntityTypeConfiguration<Entities.User.User>
         builder.Navigation(e => e.CartItems)
             .HasField("_cartItems")
             .UsePropertyAccessMode(PropertyAccessMode.Field);
-        
+
         builder.Navigation(e => e.Balances)
             .HasField("_balances")
             .UsePropertyAccessMode(PropertyAccessMode.Field);

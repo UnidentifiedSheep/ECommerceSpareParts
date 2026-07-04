@@ -13,6 +13,7 @@
     "job.schedule.job.system.name.required": "Системное название задачи обязательно.",
     "job.schedule.input.state.required": "Входное состояние задачи обязательно.",
     "job.schedule.cron.required": "Cron-выражение расписания задачи обязательно.",
-    "job.schedule.cron.invalid": "Cron-выражение расписания задачи должно быть валидным."
+    "job.schedule.cron.invalid": "Cron-выражение расписания задачи должно быть валидным.",
+    "setting.not.found": "Не удалось найти настройку {0}."
   }
 }

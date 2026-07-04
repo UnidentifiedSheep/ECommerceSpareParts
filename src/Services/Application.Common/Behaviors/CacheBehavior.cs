@@ -8,7 +8,8 @@ namespace Application.Common.Behaviors;
 public class CacheBehavior<TRequest, TResponse>(
     IFusionCache cache,
     IIdsCollector idsCollector,
-    ICachePolicy<TRequest>? cachePolicy = null) : IPipelineBehavior<TRequest, TResponse>
+    ICachePolicy<TRequest>? cachePolicy = null
+) : IPipelineBehavior<TRequest, TResponse>
     where TRequest : IRequest<TResponse> where TResponse : notnull
 {
     public async Task<TResponse> Handle(
@@ -16,13 +17,11 @@ public class CacheBehavior<TRequest, TResponse>(
         RequestHandlerDelegate<TResponse> next,
         CancellationToken cancellationToken)
     {
-        if (cachePolicy == null)
-            return await next(cancellationToken);
+        if (cachePolicy == null) return await next(cancellationToken);
 
         var cacheKey = cachePolicy.GetCacheKey(request);
         var cached = await cache.TryGetAsync<TResponse>(cacheKey, token: cancellationToken);
-        if (cached.HasValue)
-            return cached.Value;
+        if (cached.HasValue) return cached.Value;
 
         using var _ = idsCollector.BeginScope();
         var response = await next(cancellationToken);
@@ -31,8 +30,7 @@ public class CacheBehavior<TRequest, TResponse>(
         if (cachePolicy.Tags is { Count: > 0 })
         {
             tags = [];
-            if (cachePolicy.BaseTag != null)
-                tags.Add(cachePolicy.BaseTag);
+            if (cachePolicy.BaseTag != null) tags.Add(cachePolicy.BaseTag);
             foreach (var id in idsCollector.CurrentIds)
                 tags.AddRange(cachePolicy.Tags.Select(tag => $"{tag}:{id}"));
         }

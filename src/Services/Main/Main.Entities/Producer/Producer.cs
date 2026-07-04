@@ -3,16 +3,20 @@ using BulkValidation.Core.Attributes;
 using Domain;
 using Domain.Extensions;
 using Domain.Interfaces;
+using Main.Entities.DomainEvents.Producer;
 
 namespace Main.Entities.Producer;
 
 public class Producer : AuditableEntity<Producer, int>, ILinqEntity<Producer, int>
 {
-    private Producer()
-    {
-    }
+    private readonly List<ProducerAlias> _aliases = [];
 
-    private Producer(string name, string? description = null, string? imagePath = null)
+    private Producer() { }
+
+    private Producer(
+        string name,
+        string? description = null,
+        string? imagePath = null)
     {
         SetName(name);
         SetImagePath(imagePath);
@@ -28,23 +32,21 @@ public class Producer : AuditableEntity<Producer, int>, ILinqEntity<Producer, in
     public string? ImagePath { get; private set; }
 
     public string? Description { get; private set; }
+    public IReadOnlyCollection<ProducerAlias> Aliases => _aliases;
 
-    private readonly List<ProducerOtherName> _otherNames = [];
-    public IReadOnlyCollection<ProducerOtherName> OtherNames => _otherNames;
+    public static Expression<Func<Producer, int>> GetKeySelector() { return x => x.Id; }
 
-    public static Expression<Func<Producer, int>> GetKeySelector()
+    public static Expression<Func<Producer, bool>> GetEqualityExpression(int key) { return x => x.Id == key; }
+
+    public static Producer Create(
+        string name,
+        string? description = null,
+        string? imagePath = null)
     {
-        return x => x.Id;
-    }
-
-    public static Expression<Func<Producer, bool>> GetEqualityExpression(int key)
-    {
-        return x => x.Id == key;
-    }
-
-    public static Producer Create(string name, string? description = null, string? imagePath = null)
-    {
-        return new Producer(name, description, imagePath);
+        return new Producer(
+            name,
+            description,
+            imagePath);
     }
 
     public void SetImagePath(string? imagePath)
@@ -62,7 +64,7 @@ public class Producer : AuditableEntity<Producer, int>, ILinqEntity<Producer, in
 
         Description = string.IsNullOrEmpty(description) ? null : description;
     }
-
+    
     public void SetName(string name)
     {
         var value = name.Trim();
@@ -74,13 +76,13 @@ public class Producer : AuditableEntity<Producer, int>, ILinqEntity<Producer, in
         Name = ToNormalizedName(value);
     }
 
-    public static string ToNormalizedName(string value)
-    {
-        return value.Trim().ToUpperInvariant();
-    }
+    public override void OnDeleted() => AddDomainEvent(new ProducerDeletedDomainEvent(Id));
 
-    public override int GetId()
-    {
-        return Id;
-    }
+    public override void OnCreated() => AddDomainEvent(new ProducerCreatedDomainEvent(this));
+
+    public override void OnUpdated() => AddDomainEvent(new ProducerUpdatedDomainEvent(Id));
+
+    public static string ToNormalizedName(string value) { return value.Trim().ToUpperInvariant(); }
+
+    public override int GetId() { return Id; }
 }

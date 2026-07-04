@@ -8,7 +8,10 @@ public class PurchaseContentLogisticTests
     [Fact]
     public void Create_ValidData_Succeeds()
     {
-        var log = PurchaseContentLogistic.Create(1, 2, 3);
+        var log = PurchaseContentLogistic.Create(
+            1,
+            2,
+            3);
 
         log.WeightKg.Should().Be(1);
         log.AreaM3.Should().Be(2);
@@ -18,7 +21,10 @@ public class PurchaseContentLogisticTests
     [Fact]
     public void Create_NegativeWeight_Throws()
     {
-        var act = () => PurchaseContentLogistic.Create(-1, 2, 3);
+        var act = () => PurchaseContentLogistic.Create(
+            -1,
+            2,
+            3);
 
         act.Should().Throw<InvalidOperationException>();
     }
@@ -26,9 +32,15 @@ public class PurchaseContentLogisticTests
     [Fact]
     public void Update_PartialConsistency_AllFieldsUpdatedAtomically()
     {
-        var log = PurchaseContentLogistic.Create(1, 2, 3);
+        var log = PurchaseContentLogistic.Create(
+            1,
+            2,
+            3);
 
-        log.Update(10, 20, 30);
+        log.Update(
+            10,
+            20,
+            30);
 
         log.WeightKg.Should().Be(10);
         log.AreaM3.Should().Be(20);
@@ -38,11 +50,23 @@ public class PurchaseContentLogisticTests
     [Fact]
     public void Update_MultipleCalls_KeepsConsistentState()
     {
-        var log = PurchaseContentLogistic.Create(1, 2, 3);
+        var log = PurchaseContentLogistic.Create(
+            1,
+            2,
+            3);
 
-        log.Update(5, 6, 7);
-        log.Update(8, 9, 10);
-        log.Update(11, 12, 13);
+        log.Update(
+            5,
+            6,
+            7);
+        log.Update(
+            8,
+            9,
+            10);
+        log.Update(
+            11,
+            12,
+            13);
 
         log.WeightKg.Should().Be(11);
         log.AreaM3.Should().Be(12);
@@ -52,7 +76,10 @@ public class PurchaseContentLogisticTests
     [Fact]
     public void Create_HighPrecisionValues_ShouldBehaveConsistently()
     {
-        var log = PurchaseContentLogistic.Create(1.123m, 2.456m, 3.789m);
+        var log = PurchaseContentLogistic.Create(
+            1.123m,
+            2.456m,
+            3.789m);
 
         log.WeightKg.Should().Be(1.123m);
         log.AreaM3.Should().Be(2.456m);
@@ -62,9 +89,15 @@ public class PurchaseContentLogisticTests
     [Fact]
     public void Update_ChangesValues()
     {
-        var log = PurchaseContentLogistic.Create(1, 2, 3);
+        var log = PurchaseContentLogistic.Create(
+            1,
+            2,
+            3);
 
-        log.Update(5, 6, 7);
+        log.Update(
+            5,
+            6,
+            7);
 
         log.WeightKg.Should().Be(5);
         log.AreaM3.Should().Be(6);

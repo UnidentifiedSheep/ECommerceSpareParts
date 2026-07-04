@@ -10,7 +10,7 @@
 
     <ItemGroup>
         <PackageReference Include="Carter" Version="10.0.0"/>
-        <PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="10.0.8"/>
+        <PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="10.0.9"/>
     </ItemGroup>
 
     <ItemGroup>
@@ -22,13 +22,13 @@
         <ProjectReference Include="..\..\..\Infrastructure\Security\Security.csproj"/>
         <ProjectReference Include="..\..\Api.Common\Api.Common.csproj"/>
         <ProjectReference Include="..\Analytics.Application\Analytics.Application.csproj"/>
-        <ProjectReference Include="..\Analytics.Cache\Analytics.Cache.csproj" />
+        <ProjectReference Include="..\Analytics.Cache\Analytics.Cache.csproj"/>
         <ProjectReference Include="..\Analytics.Persistence\Analytics.Persistence.csproj"/>
     </ItemGroup>
 
     <ItemGroup>
         <Content Include="..\..\..\..\.dockerignore">
-          <Link>.dockerignore</Link>
+            <Link>.dockerignore</Link>
         </Content>
         <Content Include="..\Analytics.Abstractions\Localization\**\*">
             <Link>Localization\%(RecursiveDir)%(Filename)%(Extension)</Link>

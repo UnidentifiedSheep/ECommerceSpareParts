@@ -28,7 +28,8 @@ public class SaleContentConfiguration : IEntityTypeConfiguration<SaleContent>
             .HasMaxLength(128)
             .HasColumnName("sale_id");
 
-        builder.HasOne(d => d.Sale).WithMany(p => p.SaleContents)
+        builder.HasOne(d => d.Sale)
+            .WithMany(p => p.SaleContents)
             .HasForeignKey(d => d.SaleId)
             .HasConstraintName("sale_contents_sales_fact_id_fk");
 

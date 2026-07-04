@@ -10,26 +10,29 @@ using Microsoft.EntityFrameworkCore;
 namespace Main.Application.Handlers.Purchases.GetFullPurchase;
 
 public record GetFullPurchaseQuery(Guid PurchaseId) : IQuery<GetFullPurchaseResult>;
+
 public record GetFullPurchaseResult(PurchaseDto Purchase, IEnumerable<PurchaseContentDto> Contents);
 
 public class GetFullPurchaseHandler(
     IReadRepository<Purchase, Guid> readRepository
-    ) : IQueryHandler<GetFullPurchaseQuery, GetFullPurchaseResult>
+) : IQueryHandler<GetFullPurchaseQuery, GetFullPurchaseResult>
 {
-    public async Task<GetFullPurchaseResult> Handle(GetFullPurchaseQuery request, CancellationToken cancellationToken)
+    public async Task<GetFullPurchaseResult> Handle(
+        GetFullPurchaseQuery request,
+        CancellationToken cancellationToken)
     {
         var result = await readRepository
-            .Query
-            .Where(x => x.Id == request.PurchaseId)
-            .AsExpandable()
-            .Select(x => new
-            {
-                purchase = PurchaseProjections.ToPurchaseDto.Invoke(x),
-                contents = x.Contents.Select(z => PurchaseProjections.ToContentDto.Invoke(z))
-            })
-            .FirstOrDefaultAsync(cancellationToken)
-            ?? throw new PurchaseNotFoundException(request.PurchaseId);
-        
+                         .Query
+                         .Where(x => x.Id == request.PurchaseId)
+                         .AsExpandable()
+                         .Select(x => new
+                         {
+                             purchase = PurchaseProjections.ToPurchaseDto.Invoke(x),
+                             contents = x.Contents.Select(z => PurchaseProjections.ToContentDto.Invoke(z))
+                         })
+                         .FirstOrDefaultAsync(cancellationToken)
+                     ?? throw new PurchaseNotFoundException(request.PurchaseId);
+
         return new GetFullPurchaseResult(result.purchase, result.contents);
     }
 }

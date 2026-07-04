@@ -1,6 +1,6 @@
 using Bogus;
 using Main.Entities.Storage;
-using Test.Common.Abstractions;
+using Tests.Abstractions;
 using DomainPurchase = Main.Entities.Purchase.Purchase;
 using PurchaseContent = Main.Entities.Purchase.PurchaseContent;
 
@@ -75,8 +75,7 @@ public class PurchaseBuilder(Faker faker) : BuilderBase<DomainPurchase>(faker)
             Storage ?? Faker.Lorem.Word(),
             PurchaseDateTime ?? DateTime.UtcNow);
 
-        foreach (var content in _contents)
-            purchase.AddContent(content);
+        foreach (var content in _contents) purchase.AddContent(content);
 
         if (LogisticRoute is not null)
             purchase.SetPurchaseLogistic(

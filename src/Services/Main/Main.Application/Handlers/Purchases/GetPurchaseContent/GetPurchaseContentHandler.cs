@@ -15,19 +15,19 @@ public record GetPurchaseContentResult(IReadOnlyList<PurchaseContentDto> Content
 
 public class GetPurchaseContentHandler(
     IReadRepository<Purchase, Guid> repository
-    ) : IQueryHandler<GetPurchaseContentQuery, GetPurchaseContentResult>
+) : IQueryHandler<GetPurchaseContentQuery, GetPurchaseContentResult>
 {
     public async Task<GetPurchaseContentResult> Handle(
         GetPurchaseContentQuery request,
         CancellationToken cancellationToken)
     {
         var result = await repository
-            .Query
-            .Where(x => x.Id == request.Id)
-            .AsExpandable()
-            .Select(x => x.Contents.Select(z => PurchaseProjections.ToContentDto.Invoke(z)))
-            .FirstOrDefaultAsync(cancellationToken)
-            ?? throw new PurchaseNotFoundException(request.Id);
+                         .Query
+                         .Where(x => x.Id == request.Id)
+                         .AsExpandable()
+                         .Select(x => x.Contents.Select(z => PurchaseProjections.ToContentDto.Invoke(z)))
+                         .FirstOrDefaultAsync(cancellationToken)
+                     ?? throw new PurchaseNotFoundException(request.Id);
         return new GetPurchaseContentResult(result.ToList());
     }
 }

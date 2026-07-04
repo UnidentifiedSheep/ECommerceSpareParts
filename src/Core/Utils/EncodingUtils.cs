@@ -15,8 +15,12 @@ public static class EncodingUtils
         str = str.Replace('-', '+').Replace('_', '/');
         switch (str.Length % 4)
         {
-            case 2: str += "=="; break;
-            case 3: str += "="; break;
+            case 2:
+                str += "==";
+                break;
+            case 3:
+                str += "=";
+                break;
         }
 
         return Convert.FromBase64String(str);

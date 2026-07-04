@@ -7,23 +7,19 @@ public static class RedisResultExtensions
 {
     public static T? Deserialize<T>(this RedisResult result)
     {
-        if (result.IsNull)
-            return default;
+        if (result.IsNull) return default;
 
         var json = result.ToString();
 
-        if (string.IsNullOrWhiteSpace(json))
-            return default;
+        if (string.IsNullOrWhiteSpace(json)) return default;
 
         using var document = JsonDocument.Parse(json);
 
         var root = document.RootElement;
 
-        if (root.ValueKind != JsonValueKind.Array)
-            return root.Deserialize<T>();
+        if (root.ValueKind != JsonValueKind.Array) return root.Deserialize<T>();
 
-        if (root.GetArrayLength() == 0)
-            return default;
+        if (root.GetArrayLength() == 0) return default;
 
         root = root[0];
 

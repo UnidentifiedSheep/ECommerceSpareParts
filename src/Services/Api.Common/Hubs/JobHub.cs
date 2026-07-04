@@ -4,5 +4,4 @@ namespace Api.Common.Hubs;
 
 public sealed class JobHub : Hub
 {
-    
 }

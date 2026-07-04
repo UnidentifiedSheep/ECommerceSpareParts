@@ -6,7 +6,6 @@ using Main.Application.Dtos.Product;
 using Main.Application.Handlers.Products;
 using Main.Application.Handlers.Products.GetProductCrosses;
 using Main.Application.Handlers.Products.MakeLinkageBetweenArticles;
-using Mapster;
 using MediatR;
 
 namespace Main.Api.EndPoints.Products;
@@ -21,18 +20,24 @@ public static class ProductRelationsEndPoints
 {
     public static RouteGroupBuilder MapProductRelationsEndPoints(this RouteGroupBuilder products)
     {
-        products.MapGet("/{productId:int}/crosses/", async (
-                ISender sender,
-                IUserContext user,
-                int productId,
-                [AsParameters] SortablePaginationQueryModel queryParams,
-                CancellationToken token) =>
-            {
-                var query = new GetProductCrossesQuery(productId, queryParams, queryParams.SortBy, user.UserId);
-                var result = await sender.Send(query, token);
-                var response = new GetProductCrossesResponse(result.Crosses, result.RequestedProduct);
-                return Results.Ok(response);
-            })
+        products.MapGet(
+                "/{productId:int}/crosses/",
+                async (
+                    ISender sender,
+                    IUserContext user,
+                    int productId,
+                    [AsParameters] SortablePaginationQueryModel queryParams,
+                    CancellationToken token) =>
+                {
+                    var query = new GetProductCrossesQuery(
+                        productId,
+                        queryParams,
+                        queryParams.SortBy,
+                        user.UserId);
+                    var result = await sender.Send(query, token);
+                    var response = new GetProductCrossesResponse(result.Crosses, result.RequestedProduct);
+                    return Results.Ok(response);
+                })
             .WithName("GetProductCrosses")
             .WithSummary("Получить кроссы продукта")
             .RequireAllPermissions(PermissionCodes.ARTICLE_CROSSES_GET)
@@ -42,30 +47,34 @@ public static class ProductRelationsEndPoints
             .ProducesProblem(StatusCodes.Status400BadRequest)
             .ProducesProblem(StatusCodes.Status404NotFound);
 
-        products.MapGet("/{productId:int}/pairs", async (
-                ISender sender,
-                int productId,
-                CancellationToken token) =>
-            {
-                var query = new GetProductPairQuery(productId);
-                var result = await sender.Send(query, token);
-                return Results.Ok(new GetProductPairResponse(result.Pair));
-            })
+        products.MapGet(
+                "/{productId:int}/pairs",
+                async (
+                    ISender sender,
+                    int productId,
+                    CancellationToken token) =>
+                {
+                    var query = new GetProductPairQuery(productId);
+                    var result = await sender.Send(query, token);
+                    return Results.Ok(new GetProductPairResponse(result.Pair));
+                })
             .WithName("GetProductPairs")
             .WithDescription("Поиск пар артикула")
             .WithSummary("Поиск пар артикула")
             .Produces<GetProductPairResponse>()
             .ProducesProblem(StatusCodes.Status404NotFound);
 
-        products.MapPost("/crosses", async (
-                ISender sender,
-                MakeLinkageBetweenProductsRequest request,
-                CancellationToken token) =>
-            {
-                var command = request.Adapt<MakeLinkageBetweenProductsCommand>();
-                await sender.Send(command, token);
-                return Results.Created();
-            })
+        products.MapPost(
+                "/crosses",
+                async (
+                    ISender sender,
+                    MakeLinkageBetweenProductsRequest request,
+                    CancellationToken token) =>
+                {
+                    var command = new MakeLinkageBetweenProductsCommand(request.Linkages);
+                    await sender.Send(command, token);
+                    return Results.Created();
+                })
             .WithName("CreateProductCrosses")
             .WithSummary("Создать кроссы продуктов")
             .WithDescription("Создание кроссировки между артикулами")

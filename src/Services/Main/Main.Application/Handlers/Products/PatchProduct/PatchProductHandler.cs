@@ -1,5 +1,6 @@
-using Application.Common.Interfaces;
+using Application.Common.Extensions;
 using Application.Common.Interfaces.Cqrs;
+using Application.Common.Interfaces.Events;
 using Attributes;
 using Contracts.Products;
 using Main.Application.Dtos.Product;
@@ -14,9 +15,8 @@ namespace Main.Application.Handlers.Products.PatchProduct;
 public record PatchProductCommand(int ProductId, PatchProductDto PatchProduct) : ICommand;
 
 public class PatchProductHandler(
-    IIntegrationEventScope integrationEventScope,
-    IProductRepository productRepository)
-    : ICommandHandler<PatchProductCommand>
+    IProductRepository productRepository
+    ) : ICommandHandler<PatchProductCommand>
 {
     public async Task<Unit> Handle(PatchProductCommand request, CancellationToken cancellationToken)
     {
@@ -24,27 +24,14 @@ public class PatchProductHandler(
         var product = await productRepository.GetById(request.ProductId, cancellationToken)
                       ?? throw new ProductNotFoundException(request.ProductId);
 
-        if (patch.Description.IsSet) product.SetDescription(patch.Description);
-        if (patch.CategoryId.IsSet) product.SetCategory(patch.CategoryId);
-
-        if (patch.Sku is { IsSet: true, Value: not null })
-            product.SetSku(patch.Sku.Value);
-
-        if (patch.Name is { IsSet: true, Value: not null })
-            product.SetName(patch.Name.Value);
-
-        if (patch.ProducerId.IsSet) product.SetProducerId(patch.ProducerId);
-
-        if (patch.Indicator.IsSet) product.SetIndicator(patch.Indicator.Value);
-
-        if (patch.PackingUnit.IsSet) product.SetPackingUnit(patch.PackingUnit.Value);
-
-        if (patch.PairId.IsSet) product.SetPair(patch.PairId.Value);
-
-        integrationEventScope.Add(new ProductUpdatedEvent
-        {
-            Id = product.Id
-        });
+        patch.Description.Apply(product.SetDescription);
+        patch.CategoryId.Apply(product.SetCategory);
+        patch.Sku.Apply(x => product.SetSku(x));
+        patch.ProducerId.Apply(product.SetProducerId);
+        patch.Indicator.Apply(x => product.SetIndicator(x));
+        patch.PackingUnit.Apply(product.SetPackingUnit);
+        patch.PairId.Apply(product.SetPair);
+        patch.Name.Apply(x => product.SetName(x));
 
         return Unit.Value;
     }

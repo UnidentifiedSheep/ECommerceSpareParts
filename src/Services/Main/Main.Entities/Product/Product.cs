@@ -2,6 +2,7 @@ using System.Linq.Expressions;
 using BulkValidation.Core.Attributes;
 using Domain;
 using Domain.Interfaces;
+using Main.Entities.DomainEvents.Product;
 using Main.Entities.Product.ValueObjects;
 
 namespace Main.Entities.Product;
@@ -28,9 +29,7 @@ public class Product : AuditableEntity<Product, int>, ILinqEntity<Product, int>
         Stock = 0;
     }
 
-    private Product()
-    {
-    }
+    private Product() { }
 
     [Validate]
     public int Id { get; private set; }
@@ -59,15 +58,9 @@ public class Product : AuditableEntity<Product, int>, ILinqEntity<Product, int>
 
     public Producer.Producer Producer { get; private set; } = null!;
 
-    public static Expression<Func<Product, int>> GetKeySelector()
-    {
-        return x => x.Id;
-    }
+    public static Expression<Func<Product, int>> GetKeySelector() { return x => x.Id; }
 
-    public static Expression<Func<Product, bool>> GetEqualityExpression(int key)
-    {
-        return x => x.Id == key;
-    }
+    public static Expression<Func<Product, bool>> GetEqualityExpression(int key) { return x => x.Id == key; }
 
     public static Product Create(
         Sku sku,
@@ -75,7 +68,11 @@ public class Product : AuditableEntity<Product, int>, ILinqEntity<Product, int>
         int producerId,
         string? description)
     {
-        return new Product(sku, name, producerId, description);
+        return new Product(
+            sku,
+            name,
+            producerId,
+            description);
     }
 
     public void SetDescription(string? description)
@@ -91,17 +88,12 @@ public class Product : AuditableEntity<Product, int>, ILinqEntity<Product, int>
 
     public void SetName(Name name)
     {
-        Name = name;
+        Name = name; 
     }
 
     public void SetProducerId(int producerId)
     {
-        ProducerId = producerId;
-    }
-
-    public void UpdateStock(Stock stock)
-    {
-        Stock = stock;
+        ProducerId = producerId; 
     }
 
     public void IncreaseStock(int value)
@@ -112,19 +104,18 @@ public class Product : AuditableEntity<Product, int>, ILinqEntity<Product, int>
 
     public void SetPackingUnit(int? packingUnit)
     {
-        if (packingUnit.HasValue)
-            ArgumentOutOfRangeException.ThrowIfNegative(packingUnit.Value);
+        if (packingUnit.HasValue) ArgumentOutOfRangeException.ThrowIfNegative(packingUnit.Value);
         PackingUnit = packingUnit;
     }
 
     public void SetIndicator(Indicator indicator)
     {
-        Indicator = indicator;
+        Indicator = indicator; 
     }
 
     public void SetCategory(int? categoryId)
     {
-        CategoryId = categoryId;
+        CategoryId = categoryId; 
     }
 
     public void SetPopularity(long popularity)
@@ -135,11 +126,12 @@ public class Product : AuditableEntity<Product, int>, ILinqEntity<Product, int>
 
     public void SetPair(int? pairId)
     {
-        PairId = pairId;
+        PairId = pairId; 
     }
 
-    public override int GetId()
-    {
-        return Id;
-    }
+    public override void OnCreated() => AddDomainEvent(new ProductCreatedDomainEvent(this));
+    public override void OnUpdated() => AddDomainEvent(new ProductUpdatedDomainEvent(Id));
+    public override void OnDeleted() => OnUpdated();
+
+    public override int GetId() { return Id; }
 }

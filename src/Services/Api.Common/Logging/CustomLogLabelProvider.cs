@@ -5,14 +5,12 @@ namespace Api.Common.Logging;
 
 public class CustomLogLabelProvider(IList<LokiLabel> lokiLabels) : ILogLabelProvider
 {
-    public IList<LokiLabel> GetLabels()
-    {
-        return lokiLabels;
-    }
+    public IList<LokiLabel> GetLabels() { return lokiLabels; }
 
     public IList<string> PropertiesAsLabels { get; } = new List<string> { "traceId", "level" };
 
     public IList<string> PropertiesToAppend { get; } = new List<string>();
 
-    public LokiFormatterStrategy FormatterStrategy => LokiFormatterStrategy.SpecificPropertiesAsLabelsOrAppended;
+    public LokiFormatterStrategy FormatterStrategy =>
+        LokiFormatterStrategy.SpecificPropertiesAsLabelsOrAppended;
 }

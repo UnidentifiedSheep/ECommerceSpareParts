@@ -12,7 +12,8 @@ public class StorageRouteConfiguration : IEntityTypeConfiguration<StorageRoute>
 
         builder.HasKey(e => e.Id).HasName("storage_routes_pk");
 
-        builder.HasIndex(e => new { e.FromStorageName, e.ToStorageName, e.IsActive },
+        builder.HasIndex(
+                e => new { e.FromStorageName, e.ToStorageName, e.IsActive },
                 "storage_from_to_active_uindex")
             .IsUnique()
             .HasFilter("(is_active = true)");

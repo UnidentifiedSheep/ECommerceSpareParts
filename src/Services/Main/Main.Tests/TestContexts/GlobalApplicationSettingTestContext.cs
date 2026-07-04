@@ -1,11 +1,11 @@
 ﻿using Application.Common.Interfaces.Settings;
-using Main.Entities.Setting;
+using Main.Entities.Settings;
 using Main.Entities.User;
 using Main.Persistence.Context;
-using Test.Common.Abstractions;
-using Test.Common.Extensions;
-using Test.Common.Stubs;
+using Tests.Abstractions;
 using Tests.DataBuilders.User;
+using Tests.Extensions;
+using Tests.Stubs;
 
 namespace Tests.TestContexts;
 
@@ -24,12 +24,13 @@ public abstract class GlobalApplicationSettingTestContext(
             .BuildAndAddToDb(DbContext);
         systemOptionsAccessor.SystemId = SystemUser.Id;
 
-        var setting = new GlobalApplicationSetting(new GlobalApplicationSettingData
-        {
-            S3ServiceUrl = "https://www.somewebsite.com",
-            ApiServiceUrl = "https://www.somewebsite.com",
-            AppServiceUrl = "https://www.somewebsite.com",
-        });
+        var setting = new GlobalApplicationSetting(
+            new GlobalApplicationSettingData
+            {
+                S3ServiceUrl = "https://www.somewebsite.com",
+                ApiServiceUrl = "https://www.somewebsite.com",
+                AppServiceUrl = "https://www.somewebsite.com"
+            });
 
         await settingsService.SetSetting(setting, cancellationToken);
     }

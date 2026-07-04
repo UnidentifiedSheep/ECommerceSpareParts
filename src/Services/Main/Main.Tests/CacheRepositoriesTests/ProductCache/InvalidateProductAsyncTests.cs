@@ -1,7 +1,7 @@
 using FluentAssertions;
 using Main.Application.Interfaces.Cache;
 using Microsoft.Extensions.DependencyInjection;
-using Test.Common.TestContainers.Combined;
+using Tests.TestContainers.Combined;
 using Tests.TestContexts;
 
 namespace Tests.CacheRepositoriesTests.ProductCache;

@@ -16,8 +16,7 @@ public class SettingsContainer : ISettingsContainer
             throw new InvalidOperationException(
                 "Настройки не инициализированы. Используйте ISettingsService.LoadAsync().");
 
-        if (_settings.TryGetValue(typeof(T), out var value))
-            return (T)value;
+        if (_settings.TryGetValue(typeof(T), out var value)) return (T)value;
 
         throw new KeyNotFoundException($"Настройка {typeof(T).Name} не найдена");
     }
@@ -37,7 +36,10 @@ public class SettingsContainer : ISettingsContainer
     public void Set<T>(T setting) where T : Setting
     {
         ArgumentNullException.ThrowIfNull(setting);
-        _settings.AddOrUpdate(typeof(T), setting, (_, _) => setting);
+        _settings.AddOrUpdate(
+            typeof(T),
+            setting,
+            (_, _) => setting);
         Loaded = true;
     }
 }

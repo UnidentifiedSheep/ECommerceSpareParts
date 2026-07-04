@@ -1,15 +1,11 @@
 using System.Data;
 using Abstractions.Interfaces.Persistence;
-using Abstractions.Interfaces.Services;
 using Application.Common.Extensions;
-using Application.Common.Interfaces;
 using Application.Common.Interfaces.Cqrs;
 using Application.Common.Interfaces.Repositories;
 using Attributes;
-using Contracts.Products;
 using Domain.Extensions;
 using Main.Application.Interfaces.Persistence;
-using Main.Application.Interfaces.Services.Storage;
 using Main.Entities.Event;
 using Main.Entities.Exceptions;
 using Main.Entities.Storage;
@@ -19,14 +15,15 @@ using MediatR;
 namespace Main.Application.Handlers.StorageContents.SetToZeroContent;
 
 [AutoSave]
-[Transactional(IsolationLevel.ReadCommitted, 20, 2)]
+[Transactional(
+    IsolationLevel.ReadCommitted,
+    20,
+    2)]
 public record SetToZeroContentCommand(int ContentId, uint RowVersion) : ICommand;
 
 public class SetToZeroContentHandler(
-    IRepository<StorageContent, int> repository,
-    IUnitOfWork unitOfWork,
-    IProductRepository productRepository,
-    IStorageContentChangeNotifier changeNotifier) : ICommandHandler<SetToZeroContentCommand>
+    IRepository<StorageContent, int> repository
+) : ICommandHandler<SetToZeroContentCommand>
 {
     public async Task<Unit> Handle(SetToZeroContentCommand request, CancellationToken cancellationToken)
     {
@@ -35,19 +32,7 @@ public class SetToZeroContentHandler(
 
         content.ValidateVersion(request.RowVersion);
 
-        var product = await productRepository.EnsureExistForUpdateAsync(
-            content.ProductId,
-            id => new ProductNotFoundException(id),
-            ct: cancellationToken);
-
-        await unitOfWork.AddAsync(
-            StorageMovementEvent.Create(content, StorageMovementType.StorageContentDeletion),
-            cancellationToken);
-
-        product.IncreaseStock(-content.Count);
-        content.IncreaseCount(-content.Count);
-
-        changeNotifier.NotifyChanged([content.ProductId]);
+        content.IncreaseCount(-content.Count, StorageMovementType.StorageContentDeletion);
 
         return Unit.Value;
     }

@@ -1,4 +1,4 @@
-using Analytics.Application.NamedObjects.Analyzers.Markup;
+using Analytics.Application.NamedObjects.Analyzers;
 using Analytics.Application.NamedObjects.Metrics;
 using Application.Common.Abstractions.NamedObjects;
 

@@ -15,7 +15,7 @@ var builder = Host.CreateDefaultBuilder(args)
 builder.ConfigureServices((_, services) =>
 {
     services.AddDatabaseOptions();
-    
+
     services.AddDbContext<DContext>((sp, options) =>
     {
         var connectionString = sp.GetRequiredService<IOptions<DatabaseOptions>>().Value.ConnectionString;

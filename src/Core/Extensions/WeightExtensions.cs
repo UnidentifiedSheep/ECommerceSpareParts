@@ -11,7 +11,10 @@ public static class WeightExtensions
             WeightUnit.Gram => value / 1000,
             WeightUnit.Kilogram => value,
             WeightUnit.Tonne => value * 1000,
-            _ => throw new ArgumentOutOfRangeException(nameof(unit), unit, null)
+            _ => throw new ArgumentOutOfRangeException(
+                nameof(unit),
+                unit,
+                null)
         };
     }
 }

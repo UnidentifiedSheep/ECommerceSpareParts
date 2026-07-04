@@ -1,21 +1,23 @@
 using System.Data;
 using Abstractions.Interfaces.Persistence;
-using Abstractions.Interfaces.Services;
 using Application.Common.Interfaces.Cqrs;
 using Application.Common.Interfaces.Repositories;
 using Attributes;
+using Enums;
 using Main.Application.Extensions;
 using Main.Application.Interfaces.Services;
 using Main.Entities.Balance;
 using Main.Entities.Exceptions;
 using Main.Entities.User;
-using Main.Enums;
 using Main.Enums.Balances;
 
 namespace Main.Application.Handlers.Balance.CreateTransaction;
 
 [AutoSave]
-[Transactional(IsolationLevel.ReadCommitted, 20, 3)]
+[Transactional(
+    IsolationLevel.ReadCommitted,
+    20,
+    3)]
 public record CreateTransactionCommand(
     Guid SenderId,
     Guid ReceiverId,
@@ -24,22 +26,23 @@ public record CreateTransactionCommand(
     DateTime TransactionDateTime,
     TransactionSourceType SourceType,
     TransactionCreationMode Mode = TransactionCreationMode.User,
-    bool ForcePayment = false) : ICommand<CreateTransactionResult>;
+    bool ForcePayment = false
+) : ICommand<CreateTransactionResult>;
 
 public record CreateTransactionResult(Transaction Transaction);
 
 public class CreateTransactionHandler(
     IBalanceService balanceService,
     IRepository<User, Guid> userRepository,
-    IUnitOfWork unitOfWork) : ICommandHandler<CreateTransactionCommand, CreateTransactionResult>
+    IUnitOfWork unitOfWork
+) : ICommandHandler<CreateTransactionCommand, CreateTransactionResult>
 {
     public async Task<CreateTransactionResult> Handle(
         CreateTransactionCommand request,
         CancellationToken cancellationToken)
     {
-        if (request.Mode == TransactionCreationMode.User)
-            await WhenUserCreates(request, cancellationToken);
-        
+        if (request.Mode == TransactionCreationMode.User) await WhenUserCreates(request, cancellationToken);
+
         var transaction = Transaction.Create(
             request.SenderId,
             request.ReceiverId,

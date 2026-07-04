@@ -7,7 +7,8 @@ public record RestoreContentItem(
     int ProductId,
     int CurrencyId,
     decimal BuyPrice,
-    int Count)
+    int Count
+)
 {
     public RestoreContentItem(SaleContentDetail detail, int productId)
         : this(

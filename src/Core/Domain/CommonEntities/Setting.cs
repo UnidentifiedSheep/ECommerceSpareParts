@@ -7,48 +7,31 @@ namespace Domain.CommonEntities;
 
 public class Setting : AuditableEntity<Setting, string>, ILinqEntity<Setting, string>
 {
-    private Setting()
-    {
-    }
+    private Setting() { }
 
-    protected Setting(string json)
-    {
-        Json = json;
-    }
+    protected Setting(string json) { Json = json; }
 
     public string Key { get; protected set; } = null!;
 
     public string Json { get; protected set; } = null!;
 
-    public static Expression<Func<Setting, string>> GetKeySelector()
-    {
-        return x => x.Key;
-    }
-
-    public void SetData(string json)
-    {
-        Json = json;
-    }
+    public static Expression<Func<Setting, string>> GetKeySelector() { return x => x.Key; }
 
     public static Expression<Func<Setting, bool>> GetEqualityExpression(string key)
     {
         return x => x.Key == key;
     }
 
-    public override string GetId()
-    {
-        return Key;
-    }
+    public void SetData(string json) { Json = json; }
+
+    public override string GetId() { return Key; }
 }
 
 public abstract class Setting<T> : Setting
 {
     private T? _data;
 
-    protected Setting(string key, string json) : base(json)
-    {
-        Key = key;
-    }
+    protected Setting(string key, string json) : base(json) { Key = key; }
 
     protected Setting(string key, T data) : base(Serialize(data))
     {
@@ -65,13 +48,7 @@ public abstract class Setting<T> : Setting
         _data = data;
     }
 
-    private static string Serialize(T data)
-    {
-        return JsonSerializer.Serialize(data);
-    }
+    private static string Serialize(T data) { return JsonSerializer.Serialize(data); }
 
-    private static T Deserialize(string json)
-    {
-        return JsonSerializer.Deserialize<T>(json)!;
-    }
+    private static T Deserialize(string json) { return JsonSerializer.Deserialize<T>(json)!; }
 }

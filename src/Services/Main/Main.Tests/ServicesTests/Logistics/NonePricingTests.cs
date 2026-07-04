@@ -12,10 +12,18 @@ public class NonePricingTests
     [Fact]
     public void Calculate_ShouldAlwaysReturnZeroCost()
     {
-        var context = new LogisticsContext(10, 100, 1000);
+        var context = new LogisticsContext(
+            10,
+            100,
+            1000);
         var items = new List<LogisticsItem>
         {
-            new(1, 10, 100, WeightUnit.Kilogram, 10)
+            new(
+                1,
+                10,
+                100,
+                WeightUnit.Kilogram,
+                10)
         };
 
         var result = _strategy.Calculate(context, items);

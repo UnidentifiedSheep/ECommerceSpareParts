@@ -1,6 +1,6 @@
 ﻿using Bogus;
 
-namespace Test.Common.Interfaces;
+namespace Tests.Interfaces;
 
 public interface IFakerContext<TEntity> where TEntity : class
 {

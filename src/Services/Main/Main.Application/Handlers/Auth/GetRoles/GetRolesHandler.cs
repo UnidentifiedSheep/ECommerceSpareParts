@@ -17,7 +17,8 @@ public record GetRolesResult(IReadOnlyList<RoleDto> Roles);
 
 public class GetRolesHandler(
     IReadRepository<Role, string> repository,
-    IScopedStringLocalizer localizer) : IQueryHandler<GetRolesQuery, GetRolesResult>
+    IScopedStringLocalizer localizer
+) : IQueryHandler<GetRolesQuery, GetRolesResult>
 {
     public async Task<GetRolesResult> Handle(GetRolesQuery request, CancellationToken cancellationToken)
     {

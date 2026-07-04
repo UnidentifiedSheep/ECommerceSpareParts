@@ -1,7 +1,6 @@
 using System.Net;
 using Abstractions.Interfaces;
 using Abstractions.Interfaces.Persistence;
-using Abstractions.Interfaces.Services;
 using Main.Application.Interfaces.Services;
 using Main.Entities.Auth;
 using Main.Enums;
@@ -10,7 +9,8 @@ namespace Main.Application.Services;
 
 public class UserTokenService(
     IUnitOfWork unitOfWork,
-    ITokenHasher tokenHasher) : IUserTokenService
+    ITokenHasher tokenHasher
+) : IUserTokenService
 {
     public async Task AddToken(
         string token,

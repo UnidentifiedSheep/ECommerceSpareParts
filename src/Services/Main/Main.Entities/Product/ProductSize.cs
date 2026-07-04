@@ -5,16 +5,20 @@ using Domain.Extensions;
 using Domain.Interfaces;
 using Enums;
 using Extensions;
+using Main.Entities.DomainEvents.Product;
 
 namespace Main.Entities.Product;
 
 public class ProductSize : Entity<ProductSize, int>, ILinqEntity<ProductSize, int>
 {
-    private ProductSize()
-    {
-    }
+    private ProductSize() { }
 
-    private ProductSize(int productId, decimal length, decimal width, decimal height, DimensionUnit unit)
+    private ProductSize(
+        int productId,
+        decimal length,
+        decimal width,
+        decimal height,
+        DimensionUnit unit)
     {
         ProductId = productId;
         SetLength(length);
@@ -36,19 +40,26 @@ public class ProductSize : Entity<ProductSize, int>, ILinqEntity<ProductSize, in
 
     public decimal VolumeM3 { get; private set; }
 
-    public static Expression<Func<ProductSize, int>> GetKeySelector()
-    {
-        return x => x.ProductId;
-    }
+    public static Expression<Func<ProductSize, int>> GetKeySelector() { return x => x.ProductId; }
 
     public static Expression<Func<ProductSize, bool>> GetEqualityExpression(int key)
     {
         return x => x.ProductId == key;
     }
 
-    public static ProductSize Create(int productId, decimal length, decimal width, decimal height, DimensionUnit unit)
+    public static ProductSize Create(
+        int productId,
+        decimal length,
+        decimal width,
+        decimal height,
+        DimensionUnit unit)
     {
-        var size = new ProductSize(productId, length, width, height, unit);
+        var size = new ProductSize(
+            productId,
+            length,
+            width,
+            height,
+            unit);
         return size;
     }
 
@@ -86,11 +97,16 @@ public class ProductSize : Entity<ProductSize, int>, ILinqEntity<ProductSize, in
 
     private void RecalculateVolume()
     {
-        VolumeM3 = DimensionExtensions.ToCubicMeters(Length, Width, Height, Unit);
+        VolumeM3 = DimensionExtensions.ToCubicMeters(
+            Length,
+            Width,
+            Height,
+            Unit);
     }
 
-    public override int GetId()
-    {
-        return ProductId;
-    }
+    public override void OnUpdated() => AddDomainEvent(new ProductSizeUpdatedDomainEvent(ProductId));
+    public override void OnCreated() => OnUpdated();
+    public override void OnDeleted() => OnUpdated();
+
+    public override int GetId() { return ProductId; }
 }

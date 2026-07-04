@@ -7,16 +7,16 @@
     </PropertyGroup>
 
     <ItemGroup>
-        <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="10.0.7"/>
-        <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="10.0.7"/>
-        <PackageReference Include="Microsoft.Extensions.Http" Version="10.0.7"/>
-        <PackageReference Include="Microsoft.Extensions.Options.ConfigurationExtensions" Version="10.0.7"/>
-        <PackageReference Include="Microsoft.Extensions.Options.DataAnnotations" Version="10.0.7"/>
+        <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="10.0.9"/>
+        <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="10.0.9"/>
+        <PackageReference Include="Microsoft.Extensions.Http" Version="10.0.9"/>
+        <PackageReference Include="Microsoft.Extensions.Options.ConfigurationExtensions" Version="10.0.9"/>
+        <PackageReference Include="Microsoft.Extensions.Options.DataAnnotations" Version="10.0.9"/>
     </ItemGroup>
 
     <ItemGroup>
         <ProjectReference Include="..\Internal.Integration.Auth\Internal.Integration.Auth.csproj"/>
-        <ProjectReference Include="..\Internal.Integration.Common\Internal.Integration.Common.csproj" />
+        <ProjectReference Include="..\Internal.Integration.Common\Internal.Integration.Common.csproj"/>
         <ProjectReference Include="..\Internal.Integration.Core\Internal.Integration.Core.csproj"/>
         <ProjectReference Include="..\Internal.Integration.Main\Internal.Integration.Main.csproj"/>
     </ItemGroup>

@@ -1,14 +1,13 @@
-﻿using FluentValidation;
-using Main.Application.Handlers.StorageRoutes.AddStorageRoute;
+﻿using Main.Application.Handlers.StorageRoutes.AddStorageRoute;
 using Main.Application.Static;
 using Main.Entities.Currency;
 using Main.Entities.Storage;
 using Main.Entities.User;
 using Main.Enums;
 using Microsoft.EntityFrameworkCore;
-using Test.Common.Extensions;
-using Test.Common.TestContainers.Combined;
 using Tests.DataBuilders.User;
+using Tests.Extensions;
+using Tests.TestContainers.Combined;
 using Tests.TestContexts.Currency;
 using Tests.TestContexts.Storage;
 
@@ -45,9 +44,19 @@ public class AddStorageRouteTests : IntegrationTest
     [Fact]
     public async Task AddStorageRoute_WithValidData_Succeeds()
     {
-        var command = new AddStorageRouteCommand(_toStorage.Name, _fromStorage.Name, 1000,
-            RouteType.IntraCity, LogisticPricingType.PerOrder, 60, 10.5m, 20.5m,
-            _currency.Id, 5.0m, 0, _carrier.Id);
+        var command = new AddStorageRouteCommand(
+            _toStorage.Name,
+            _fromStorage.Name,
+            1000,
+            RouteType.IntraCity,
+            LogisticPricingType.PerOrder,
+            60,
+            10.5m,
+            20.5m,
+            _currency.Id,
+            5.0m,
+            0,
+            _carrier.Id);
 
         var result = await Mediator.Send(command);
 
@@ -62,9 +71,19 @@ public class AddStorageRouteTests : IntegrationTest
     [Fact]
     public async Task AddStorageRoute_WithInvalidDistance_ThrowsValidationException()
     {
-        var command = new AddStorageRouteCommand(_fromStorage.Name, _toStorage.Name, 0, RouteType.IntraCity,
-            LogisticPricingType.PerOrder, 60, 10.5m, 20.5m, _currency.Id,
-            5.0m, 0, _carrier.Id);
+        var command = new AddStorageRouteCommand(
+            _fromStorage.Name,
+            _toStorage.Name,
+            0,
+            RouteType.IntraCity,
+            LogisticPricingType.PerOrder,
+            60,
+            10.5m,
+            20.5m,
+            _currency.Id,
+            5.0m,
+            0,
+            _carrier.Id);
 
         await Assert.ThrowsAsync<ValidationException>(async () => await Mediator.Send(command));
     }
@@ -72,9 +91,19 @@ public class AddStorageRouteTests : IntegrationTest
     [Fact]
     public async Task AddStorageRoute_WithInvalidPricePrecision_ThrowsValidationException()
     {
-        var command = new AddStorageRouteCommand(_fromStorage.Name, _toStorage.Name, 1000, RouteType.IntraCity,
-            LogisticPricingType.PerOrder, 60, 10.555m, 20.5m, _currency.Id, 5.0m,
-            0, _carrier.Id);
+        var command = new AddStorageRouteCommand(
+            _fromStorage.Name,
+            _toStorage.Name,
+            1000,
+            RouteType.IntraCity,
+            LogisticPricingType.PerOrder,
+            60,
+            10.555m,
+            20.5m,
+            _currency.Id,
+            5.0m,
+            0,
+            _carrier.Id);
 
         await Assert.ThrowsAsync<ValidationException>(async () => await Mediator.Send(command));
     }
@@ -82,9 +111,19 @@ public class AddStorageRouteTests : IntegrationTest
     [Fact]
     public async Task AddStorageRoute_WithNonExistentCurrency_ThrowsValidationException()
     {
-        var command = new AddStorageRouteCommand(_fromStorage.Name, _toStorage.Name, 1000, RouteType.IntraCity,
-            LogisticPricingType.PerOrder, 60, 10.5m, 20.5m, 9999, 5.0m,
-            0, _carrier.Id);
+        var command = new AddStorageRouteCommand(
+            _fromStorage.Name,
+            _toStorage.Name,
+            1000,
+            RouteType.IntraCity,
+            LogisticPricingType.PerOrder,
+            60,
+            10.5m,
+            20.5m,
+            9999,
+            5.0m,
+            0,
+            _carrier.Id);
 
         await Assert.ThrowsAsync<DbValidationException>(async () => await Mediator.Send(command));
     }
@@ -92,11 +131,22 @@ public class AddStorageRouteTests : IntegrationTest
     [Fact]
     public async Task AddStorageRoute_WithNonExistentStorage_ThrowsDbValidationException()
     {
-        var command = new AddStorageRouteCommand("NonExistentStorage", _toStorage.Name, 1000, RouteType.IntraCity,
-            LogisticPricingType.PerOrder, 60, 10.5m, 20.5m, _currency.Id, 5.0m,
-            0, _carrier.Id);
+        var command = new AddStorageRouteCommand(
+            "NonExistentStorage",
+            _toStorage.Name,
+            1000,
+            RouteType.IntraCity,
+            LogisticPricingType.PerOrder,
+            60,
+            10.5m,
+            20.5m,
+            _currency.Id,
+            5.0m,
+            0,
+            _carrier.Id);
 
-        var exception = await Assert.ThrowsAsync<DbValidationException>(async () => await Mediator.Send(command));
+        var exception =
+            await Assert.ThrowsAsync<DbValidationException>(async () => await Mediator.Send(command));
         Assert.Contains(exception.Failures, f => f.ErrorName == ApplicationErrors.StoragesNotFound);
     }
 }

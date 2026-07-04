@@ -16,15 +16,17 @@ public record GetProductReservationsQuery(
     Guid? UserId,
     string? SortBy,
     bool ShowDeleted,
-    Pagination Pagination) : IQuery<GetProductReservationsResult>;
+    Pagination Pagination
+) : IQuery<GetProductReservationsResult>;
+
 public record GetProductReservationsResult(IReadOnlyList<ProductReservationDto> Reservations);
 
 public class GetProductReservationsHandler(
     IReadRepository<StorageContentReservation, int> repository
-    ) : IQueryHandler<GetProductReservationsQuery, GetProductReservationsResult>
+) : IQueryHandler<GetProductReservationsQuery, GetProductReservationsResult>
 {
     public async Task<GetProductReservationsResult> Handle(
-        GetProductReservationsQuery request, 
+        GetProductReservationsQuery request,
         CancellationToken cancellationToken)
     {
         var result = await repository
@@ -37,7 +39,7 @@ public class GetProductReservationsHandler(
             .Select(ProductProjections.ToReservationDto)
             .ApplyPagination(request.Pagination)
             .ToListAsync(cancellationToken);
-        
+
         return new GetProductReservationsResult(result);
     }
 }

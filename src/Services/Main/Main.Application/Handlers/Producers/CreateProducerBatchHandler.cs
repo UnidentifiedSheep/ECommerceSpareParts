@@ -1,8 +1,7 @@
-﻿using Abstractions.Interfaces;
-using Abstractions.Interfaces.Exceptions;
+﻿using Abstractions.Interfaces.Exceptions;
 using Abstractions.Interfaces.Persistence;
-using Application.Common.Interfaces;
 using Application.Common.Interfaces.Cqrs;
+using Application.Common.Interfaces.Events;
 using Application.Common.Interfaces.Repositories;
 using Attributes;
 using Contracts.Producer;
@@ -14,81 +13,83 @@ using Main.Entities.Producer;
 namespace Main.Application.Handlers.Producers;
 
 [AutoSave]
-[Transactional(retryErrors: ["23505"], retryCount: 2, retryDelayMs: 20)]
+[Transactional(
+    retryErrors: ["23505"],
+    retryCount: 2,
+    retryDelayMs: 20)]
 public record CreateProducerBatchCommand(
-    IEnumerable<NewProducerDto> NewProducers) : ICommand<CreateProducerBatchResult>;
+    IEnumerable<NewProducerDto> NewProducers
+) : ICommand<CreateProducerBatchResult>;
 
 public record CreateProducerBatchResult(
     int Created,
     int Skipped,
-    IReadOnlyList<CreateProducerBatchError> Errors);
+    IReadOnlyList<CreateProducerBatchError> Errors
+);
 
 public record CreateProducerBatchError(
     int Index,
-    string Message);
+    string Message
+);
 
 public class CreateProducerBatchHandler(
     IProducerRepository producerRepository,
     IScopedStringLocalizer stringLocalizer,
-    IUnitOfWork unitOfWork,
-    IIntegrationEventScope integrationEventScope) : ICommandHandler<CreateProducerBatchCommand, CreateProducerBatchResult>
+    IUnitOfWork unitOfWork
+) : ICommandHandler<CreateProducerBatchCommand, CreateProducerBatchResult>
 {
     public async Task<CreateProducerBatchResult> Handle(
-        CreateProducerBatchCommand request, 
+        CreateProducerBatchCommand request,
         CancellationToken cancellationToken)
     {
         var errors = new List<CreateProducerBatchError>();
         var producers = new List<Producer>();
         var uniqNames = new HashSet<string>();
 
-        int idx = 0;
+        var idx = 0;
         foreach (var dto in request.NewProducers)
         {
             var currentIdx = idx++;
-            var pr = ProcessDto(currentIdx, dto, errors);
+            var pr = ProcessDto(
+                currentIdx,
+                dto,
+                errors);
 
             if (pr == null) continue;
             if (!uniqNames.Add(pr.Name))
             {
-                errors.Add(new CreateProducerBatchError(
-                    Index: currentIdx, 
-                    Message: stringLocalizer.Get("producer.duplicate.name.in.batch")));
+                errors.Add(
+                    new CreateProducerBatchError(
+                        currentIdx,
+                        stringLocalizer.Get("producer.duplicate.name.in.batch")));
                 continue;
             }
-            
+
             producers.Add(pr);
         }
-        
-        var existingProducers = 
+
+        var existingProducers =
             await GetExistingProducers(uniqNames, cancellationToken);
-        
+
         var toAdd = producers
             .Where(x => !existingProducers.ContainsKey(x.Name))
             .ToList();
-        
+
         await unitOfWork.AddRangeAsync(toAdd, cancellationToken);
         await unitOfWork.SaveChangesAsync(cancellationToken);
-        
-        toAdd.ForEach(x => integrationEventScope.Add(new ProducerUpdatedEvent
-        {
-            Id = x.Id
-        }));
-        
+
         return new CreateProducerBatchResult(
-            toAdd.Count, 
-            producers.Count - toAdd.Count, 
+            toAdd.Count,
+            producers.Count - toAdd.Count,
             errors);
     }
-    
+
     private Producer? ProcessDto(
         int idx,
         NewProducerDto dto,
         List<CreateProducerBatchError> errors)
     {
-        try
-        {
-            return Producer.Create(dto.Name, dto.Description);
-        }
+        try { return Producer.Create(dto.Name, dto.Description); }
         catch (Exception ex)
         {
             var message = ex is ILocalizableException localizableException

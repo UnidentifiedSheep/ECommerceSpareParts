@@ -3,7 +3,6 @@ using Microsoft.Extensions.Options;
 using OpenSearch.Client;
 using OpenSearch.Net;
 using Search.Abstractions.Options;
-using Search.Application.Interfaces;
 using Search.Application.Interfaces.Producer;
 using Search.Application.Interfaces.Product;
 using Search.Entities;
@@ -24,21 +23,17 @@ public static class ServiceProvider
 
             if (!string.IsNullOrWhiteSpace(options.Username) &&
                 !string.IsNullOrWhiteSpace(options.Password))
-            {
                 connectionSettings = connectionSettings.BasicAuthentication(
                     options.Username,
                     options.Password);
-            }
 
             if (options.AllowInvalidCertificate)
-            {
                 connectionSettings = connectionSettings.ServerCertificateValidationCallback(
                     CertificateValidations.AllowAll);
-            }
 
             return new OpenSearchClient(connectionSettings);
         });
-        
+
         services.AddSingleton<IProductRepository, ProductRepository>();
         services.AddSingleton<IProducerRepository, ProducerRepository>();
         services.AddSingleton<IProductSearchDocumentProvider, MainProductSearchDocumentProvider>();

@@ -1,18 +1,16 @@
-﻿using Abstractions.Interfaces.Services;
-using Application.Common.Interfaces.Repositories;
+﻿using Application.Common.Interfaces.Repositories;
 using LinqKit;
 using Main.Application.Interfaces.Persistence;
 using Main.Entities.Currency;
 using Main.Persistence.Context;
 using Microsoft.EntityFrameworkCore;
-using Persistence;
 using Persistence.Interfaces;
 using Persistence.Repository;
 
 namespace Main.Persistence.Repositories.Currency;
 
 public class CurrencyRateRepository(
-    DContext context, 
+    DContext context,
     IQueryableExtensions extensions
 ) : RepositoryBase<DContext, CurrencyRate, (int, int)>(context, extensions), ICurrencyRateRepository
 {
@@ -34,8 +32,7 @@ public class CurrencyRateRepository(
     {
         var keys = ids.Distinct().ToList();
 
-        if (keys.Count == 0)
-            return Task.FromResult(new Dictionary<(int, int), CurrencyRate>());
+        if (keys.Count == 0) return Task.FromResult(new Dictionary<(int, int), CurrencyRate>());
 
         var query = Context.CurrencyRates
             .AsExpandable();

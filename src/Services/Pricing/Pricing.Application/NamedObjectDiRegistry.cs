@@ -1,5 +1,5 @@
 ﻿using Application.Common.Extensions;
-using Application.Common.Handlers.NamedObjects.GetNamedObjects;
+using Application.Common.Handlers.NamedObjects;
 using Application.Common.Interfaces.NamedObject;
 using Application.Common.NamedObject;
 using MediatR;
@@ -14,11 +14,11 @@ public static class NamedObjectDiRegistry
     public static IServiceCollection AddNamedObjects(this IServiceCollection services)
     {
         services.AddSingleton<INamedObjectGroupRegistry, NamedObjectGroupRegistry>();
-        
+
         services.TryAddScoped<
             IRequestHandler<GetNamedObjectsQuery, GetNamedObjectsResult>,
             GetNamedObjectsHandler>();
-        
+
         return services
             .RegisterNamedObject<SettingDefinitionNamedObjectBase>(objectsLifetime: ServiceLifetime.Scoped);
     }

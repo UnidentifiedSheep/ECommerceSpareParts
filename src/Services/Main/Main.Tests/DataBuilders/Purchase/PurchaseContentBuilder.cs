@@ -1,6 +1,6 @@
 using Bogus;
 using Main.Entities.Purchase;
-using Test.Common.Abstractions;
+using Tests.Abstractions;
 
 namespace Tests.DataBuilders.Purchase;
 

@@ -1,6 +1,6 @@
 ﻿using Bogus;
 using Main.Entities.Currency;
-using Test.Common.Abstractions;
+using Tests.Abstractions;
 
 namespace Tests.DataBuilders.Currency;
 

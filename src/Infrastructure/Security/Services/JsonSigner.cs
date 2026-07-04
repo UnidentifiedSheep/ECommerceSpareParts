@@ -2,22 +2,25 @@
 using System.Text;
 using System.Text.Json;
 using Abstractions.Interfaces.Services;
+using Abstractions.Models.Options;
+using Microsoft.Extensions.Options;
 using Utils;
 
 namespace Security.Services;
 
 public class JsonSigner : IJsonSigner
 {
-    private readonly JsonSerializerOptions? _options;
+    private readonly JsonSerializerOptions _options;
     private readonly byte[] _secretBytes;
 
-    public JsonSigner(string secret, JsonSerializerOptions? options = null)
+    public JsonSigner(
+        IOptions<SecretEncryptionOptions> secretOptions,
+        IOptions<ProjectJsonOptions> jsonOptions)
     {
-        if (string.IsNullOrWhiteSpace(secret))
-            throw new ArgumentException("Secret cannot be null or empty", nameof(secret));
+        ArgumentException.ThrowIfNullOrWhiteSpace(secretOptions.Value.Secret);
 
-        _options = options;
-        _secretBytes = Encoding.UTF8.GetBytes(secret);
+        _options = new JsonSerializerOptions(jsonOptions.Value.SerializerOptions);
+        _secretBytes = Encoding.UTF8.GetBytes(secretOptions.Value.Secret);
     }
 
     public string Sign<T>(T data)
@@ -59,8 +62,7 @@ public class JsonSigner : IJsonSigner
             Encoding.UTF8.GetBytes(expectedSignature)
         );
 
-        if (valid)
-            json = Encoding.UTF8.GetString(jsonBytes);
+        if (valid) json = Encoding.UTF8.GetString(jsonBytes);
 
         return valid;
     }
@@ -70,8 +72,7 @@ public class JsonSigner : IJsonSigner
         obj = default;
         var valid = VerifyJson(signed, out var jsonString);
 
-        if (valid && jsonString != null)
-            obj = JsonSerializer.Deserialize<T>(jsonString, _options);
+        if (valid && jsonString != null) obj = JsonSerializer.Deserialize<T>(jsonString, _options);
 
         return valid;
     }

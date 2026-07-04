@@ -14,19 +14,19 @@ public sealed class PermissionFilter : IEndpointFilter
         _check = check;
     }
 
-    public async ValueTask<object?> InvokeAsync(EndpointFilterInvocationContext ctx, EndpointFilterDelegate next)
+    public async ValueTask<object?> InvokeAsync(
+        EndpointFilterInvocationContext ctx,
+        EndpointFilterDelegate next)
     {
         var user = ctx.HttpContext.RequestServices.GetRequiredService<IUserContext>();
 
-        if (!user.IsAuthenticated)
-            return Results.Unauthorized();
+        if (!user.IsAuthenticated) return Results.Unauthorized();
 
         var allowed = _check == PermissionCheck.Any
             ? _permissions.Any(p => user.Permissions.Contains(p))
             : _permissions.All(p => user.Permissions.Contains(p));
 
-        if (!allowed)
-            return Results.Forbid();
+        if (!allowed) return Results.Forbid();
 
         return await next(ctx);
     }

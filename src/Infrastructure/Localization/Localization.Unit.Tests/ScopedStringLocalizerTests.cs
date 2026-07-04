@@ -98,7 +98,10 @@ public class ScopedStringLocalizerTests
 
         scoped.SetLocale("en");
 
-        var success = scoped.TryGet("Formatted.Key", out var value, "World");
+        var success = scoped.TryGet(
+            "Formatted.Key",
+            out var value,
+            "World");
 
         success.Should().BeTrue();
         value.Should().Be("Hello, World.");
@@ -146,11 +149,12 @@ public class ScopedStringLocalizerTests
     private static StringLocalizer CreateBaseLocalizer()
     {
         var container = new LocalizerContainer("en");
-        container.Initialize(new Dictionary<string, string>
-        {
-            ["Test.Key"] = "value",
-            ["Formatted.Key"] = "Hello, {0}."
-        });
+        container.Initialize(
+            new Dictionary<string, string>
+            {
+                ["Test.Key"] = "value",
+                ["Formatted.Key"] = "Hello, {0}."
+            });
 
         return new StringLocalizer([container]);
     }

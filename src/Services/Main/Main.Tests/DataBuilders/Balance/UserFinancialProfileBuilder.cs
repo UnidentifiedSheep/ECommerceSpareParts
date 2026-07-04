@@ -1,6 +1,6 @@
 using Bogus;
 using Main.Entities.Balance;
-using Test.Common.Abstractions;
+using Tests.Abstractions;
 
 namespace Tests.DataBuilders.Balance;
 
@@ -34,8 +34,7 @@ public class UserFinancialProfileBuilder(Faker faker) : BuilderBase<UserFinancia
             UserId ?? Guid.NewGuid(),
             MinAllowedBalance ?? 0m);
 
-        if (!Balance.HasValue)
-            return profile;
+        if (!Balance.HasValue) return profile;
 
         if (Balance.Value >= 0)
             profile.Credit(Balance.Value);

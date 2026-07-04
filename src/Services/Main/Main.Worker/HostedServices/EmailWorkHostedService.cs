@@ -8,7 +8,7 @@ public class EmailWorkHostedService(
     IOptionsMonitor<HostedServiceOptions> options,
     IServiceScopeFactory scopeFactory,
     ILogger<EmailWorkHostedService> logger
-    ) : BackgroundService
+) : BackgroundService
 {
     protected override async Task ExecuteAsync(CancellationToken stoppingToken)
     {
@@ -34,13 +34,7 @@ public class EmailWorkHostedService(
 
             await Task.Delay(opt.Delay, ct);
         }
-        catch (OperationCanceledException) when (ct.IsCancellationRequested)
-        {
-            throw;
-        }
-        catch (Exception ex)
-        {
-            logger.LogError(ex, "Email batch sending failed.");
-        }
+        catch (OperationCanceledException) when (ct.IsCancellationRequested) { throw; }
+        catch (Exception ex) { logger.LogError(ex, "Email batch sending failed."); }
     }
 }

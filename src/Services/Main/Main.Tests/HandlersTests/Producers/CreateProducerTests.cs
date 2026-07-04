@@ -3,7 +3,7 @@ using Main.Application.Dtos.Producer;
 using Main.Application.Handlers.Producers.CreateProducer;
 using Main.Entities.Producer;
 using Microsoft.EntityFrameworkCore;
-using Test.Common.TestContainers.Combined;
+using Tests.TestContainers.Combined;
 
 namespace Tests.HandlersTests.Producers;
 

@@ -20,7 +20,7 @@ namespace Main.Migrator.Migrations
 #pragma warning disable 612, 618
             modelBuilder
                 .HasDefaultSchema("public")
-                .HasAnnotation("ProductVersion", "10.0.8")
+                .HasAnnotation("ProductVersion", "10.0.9")
                 .HasAnnotation("Relational:MaxIdentifierLength", 63);
 
             NpgsqlModelBuilderExtensions.HasPostgresExtension(modelBuilder, "dblink");
@@ -46,6 +46,14 @@ namespace Main.Migrator.Migrations
                     b.Property<string>("ErrorMessage")
                         .HasColumnType("text")
                         .HasColumnName("error_message");
+
+                    b.Property<DateTime?>("LeaseExpiresAt")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("lease_expires_at");
+
+                    b.Property<Guid?>("LeaseHolderId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("lease_holder_id");
 
                     b.Property<DateTime?>("LockedAt")
                         .HasColumnType("timestamp with time zone")
@@ -252,10 +260,10 @@ namespace Main.Migrator.Migrations
                         .HasName("settings_pk");
 
                     b.HasIndex("WhoCreated")
-                        .HasDatabaseName("main.entities.setting.storagecontentsetting_who_created_idx");
+                        .HasDatabaseName("main.entities.settings.supplier.favoritsuppliersetting_who_created_idx");
 
                     b.HasIndex("WhoUpdated")
-                        .HasDatabaseName("main.entities.setting.storagecontentsetting_who_updated_idx");
+                        .HasDatabaseName("main.entities.settings.supplier.favoritsuppliersetting_who_updated_idx");
 
                     b.ToTable("settings", "public");
 
@@ -1285,9 +1293,9 @@ namespace Main.Migrator.Migrations
                     b.ToTable("producer", "public");
                 });
 
-            modelBuilder.Entity("Main.Entities.Producer.ProducerOtherName", b =>
+            modelBuilder.Entity("Main.Entities.Producer.ProducerAlias", b =>
                 {
-                    b.Property<string>("OtherName")
+                    b.Property<string>("Alias")
                         .HasMaxLength(64)
                         .HasColumnType("character varying(64)")
                         .HasColumnName("other_name");
@@ -1296,31 +1304,54 @@ namespace Main.Migrator.Migrations
                         .HasColumnType("integer")
                         .HasColumnName("producer_id");
 
-                    b.Property<string>("WhereUsed")
-                        .IsRequired()
-                        .HasMaxLength(64)
-                        .HasColumnType("character varying(64)")
-                        .HasColumnName("where_used");
-
-                    b.HasKey("OtherName")
+                    b.HasKey("Alias")
                         .HasName("producers_other_names_pk");
 
-                    b.HasIndex("OtherName")
+                    b.HasIndex("Alias")
                         .HasDatabaseName("producers_other_names_producer_other_name_index");
 
-                    NpgsqlIndexBuilderExtensions.HasMethod(b.HasIndex("OtherName"), "gin");
-                    NpgsqlIndexBuilderExtensions.HasOperators(b.HasIndex("OtherName"), new[] { "gin_trgm_ops" });
+                    NpgsqlIndexBuilderExtensions.HasMethod(b.HasIndex("Alias"), "gin");
+                    NpgsqlIndexBuilderExtensions.HasOperators(b.HasIndex("Alias"), new[] { "gin_trgm_ops" });
 
                     b.HasIndex("ProducerId")
                         .HasDatabaseName("producers_other_names_producer_id_index");
 
-                    b.HasIndex("WhereUsed")
-                        .HasDatabaseName("producers_other_names_where_used_index");
+                    b.ToTable("producers_aliases", "public");
+                });
 
-                    NpgsqlIndexBuilderExtensions.HasMethod(b.HasIndex("WhereUsed"), "gin");
-                    NpgsqlIndexBuilderExtensions.HasOperators(b.HasIndex("WhereUsed"), new[] { "gin_trgm_ops" });
+            modelBuilder.Entity("Main.Entities.Producer.ProducerSupplierMapping", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer")
+                        .HasColumnName("id");
 
-                    b.ToTable("producers_other_names", "public");
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+
+                    b.Property<int>("ProducerId")
+                        .HasColumnType("integer")
+                        .HasColumnName("producer_id");
+
+                    b.Property<string>("Supplier")
+                        .IsRequired()
+                        .HasMaxLength(32)
+                        .HasColumnType("character varying(32)")
+                        .HasColumnName("supplier");
+
+                    b.Property<string>("SupplierProducerName")
+                        .IsRequired()
+                        .HasMaxLength(128)
+                        .HasColumnType("character varying(128)")
+                        .HasColumnName("producer_supplier_name");
+
+                    b.HasKey("Id")
+                        .HasName("producer_supplier_mappings_pk");
+
+                    b.HasIndex("ProducerId", "Supplier")
+                        .IsUnique()
+                        .HasDatabaseName("producer_supplier_mappings_uidx");
+
+                    b.ToTable("producer_supplier_mappings", "public");
                 });
 
             modelBuilder.Entity("Main.Entities.Product.Product", b =>
@@ -2703,6 +2734,7 @@ namespace Main.Migrator.Migrations
                         .HasColumnName("phone_number");
 
                     b.Property<string>("PhoneType")
+                        .IsRequired()
                         .HasMaxLength(32)
                         .HasColumnType("character varying(32)")
                         .HasColumnName("phone_type");
@@ -2795,41 +2827,19 @@ namespace Main.Migrator.Migrations
                         .HasDefaultValueSql("gen_random_uuid()");
 
                     b.Property<string>("Comment")
-                        .HasColumnType("text")
+                        .HasMaxLength(500)
+                        .HasColumnType("character varying(500)")
                         .HasColumnName("comment");
 
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("timestamp with time zone")
                         .HasColumnName("created_at");
 
-                    b.Property<string>("EngineCode")
-                        .HasColumnType("text")
-                        .HasColumnName("engine_code");
-
-                    b.Property<string>("Manufacture")
-                        .IsRequired()
-                        .HasMaxLength(50)
-                        .HasColumnType("character varying(50)")
-                        .HasColumnName("manufacture");
-
-                    b.Property<string>("Model")
-                        .IsRequired()
-                        .HasMaxLength(125)
-                        .HasColumnType("character varying(125)")
-                        .HasColumnName("model");
-
-                    b.Property<string>("Modification")
-                        .HasColumnType("text")
-                        .HasColumnName("modification");
-
                     b.Property<string>("PlateNumber")
                         .IsRequired()
-                        .HasColumnType("text")
+                        .HasMaxLength(32)
+                        .HasColumnType("character varying(32)")
                         .HasColumnName("plate_number");
-
-                    b.Property<int?>("ProductionYear")
-                        .HasColumnType("integer")
-                        .HasColumnName("production_year");
 
                     b.Property<DateTime>("UpdatedAt")
                         .HasColumnType("timestamp with time zone")
@@ -2838,6 +2848,10 @@ namespace Main.Migrator.Migrations
                     b.Property<Guid>("UserId")
                         .HasColumnType("uuid")
                         .HasColumnName("user_id");
+
+                    b.Property<Guid>("VehicleId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("vehicle_id");
 
                     b.Property<string>("Vin")
                         .HasMaxLength(50)
@@ -2861,24 +2875,15 @@ namespace Main.Migrator.Migrations
                     NpgsqlIndexBuilderExtensions.HasMethod(b.HasIndex("Comment"), "gin");
                     NpgsqlIndexBuilderExtensions.HasOperators(b.HasIndex("Comment"), new[] { "gin_trgm_ops" });
 
-                    b.HasIndex("Manufacture")
-                        .HasDatabaseName("user_vehicles_manufacture_index");
-
-                    NpgsqlIndexBuilderExtensions.HasMethod(b.HasIndex("Manufacture"), "gin");
-                    NpgsqlIndexBuilderExtensions.HasOperators(b.HasIndex("Manufacture"), new[] { "gin_trgm_ops" });
-
-                    b.HasIndex("Model")
-                        .HasDatabaseName("user_vehicles_model_index");
-
-                    NpgsqlIndexBuilderExtensions.HasMethod(b.HasIndex("Model"), "gin");
-                    NpgsqlIndexBuilderExtensions.HasOperators(b.HasIndex("Model"), new[] { "gin_trgm_ops" });
-
                     b.HasIndex("PlateNumber")
                         .IsUnique()
                         .HasDatabaseName("user_vehicles_plate_number_uindex");
 
                     b.HasIndex("UserId")
                         .HasDatabaseName("user_vehicles_user_id_index");
+
+                    b.HasIndex("VehicleId")
+                        .HasDatabaseName("user_vehicles_vehicle_id_index");
 
                     b.HasIndex("Vin")
                         .IsUnique()
@@ -3061,25 +3066,32 @@ namespace Main.Migrator.Migrations
                     b.ToTable("OutboxState", "msg");
                 });
 
-            modelBuilder.Entity("Main.Entities.Setting.CurrencySetting", b =>
+            modelBuilder.Entity("Main.Entities.Settings.CurrencySetting", b =>
                 {
                     b.HasBaseType("Domain.CommonEntities.Setting");
 
                     b.HasDiscriminator().HasValue("CurrencySetting");
                 });
 
-            modelBuilder.Entity("Main.Entities.Setting.GlobalApplicationSetting", b =>
+            modelBuilder.Entity("Main.Entities.Settings.GlobalApplicationSetting", b =>
                 {
                     b.HasBaseType("Domain.CommonEntities.Setting");
 
                     b.HasDiscriminator().HasValue("GlobalApplicationSetting");
                 });
 
-            modelBuilder.Entity("Main.Entities.Setting.StorageContentSetting", b =>
+            modelBuilder.Entity("Main.Entities.Settings.StorageContentSetting", b =>
                 {
                     b.HasBaseType("Domain.CommonEntities.Setting");
 
                     b.HasDiscriminator().HasValue("StorageContentSetting");
+                });
+
+            modelBuilder.Entity("Main.Entities.Settings.Supplier.FavoritSupplierSetting", b =>
+                {
+                    b.HasBaseType("Domain.CommonEntities.Setting");
+
+                    b.HasDiscriminator().HasValue("FavoritSupplierSetting");
                 });
 
             modelBuilder.Entity("Main.Entities.Event.ReservationManualChangeEvent", b =>
@@ -3335,14 +3347,24 @@ namespace Main.Migrator.Migrations
                         .HasConstraintName("order_items_articles_id_fk");
                 });
 
-            modelBuilder.Entity("Main.Entities.Producer.ProducerOtherName", b =>
+            modelBuilder.Entity("Main.Entities.Producer.ProducerAlias", b =>
                 {
                     b.HasOne("Main.Entities.Producer.Producer", null)
-                        .WithMany("OtherNames")
+                        .WithMany("Aliases")
                         .HasForeignKey("ProducerId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired()
                         .HasConstraintName("producers_other_names_producer_id_fk");
+                });
+
+            modelBuilder.Entity("Main.Entities.Producer.ProducerSupplierMapping", b =>
+                {
+                    b.HasOne("Main.Entities.Producer.Producer", null)
+                        .WithMany()
+                        .HasForeignKey("ProducerId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired()
+                        .HasConstraintName("producer_supplier_mappings_producer_id_fk");
                 });
 
             modelBuilder.Entity("Main.Entities.Product.Product", b =>
@@ -3677,7 +3699,7 @@ namespace Main.Migrator.Migrations
                         .IsRequired()
                         .HasConstraintName("sale_content_details_sale_content_id_fk");
 
-                    b.HasOne("Main.Entities.Storage.StorageContent", null)
+                    b.HasOne("Main.Entities.Storage.StorageContent", "StorageContent")
                         .WithMany()
                         .HasForeignKey("StorageContentId")
                         .OnDelete(DeleteBehavior.Restrict)
@@ -3685,6 +3707,8 @@ namespace Main.Migrator.Migrations
                         .HasConstraintName("sale_content_details_storage_content_id_fk");
 
                     b.Navigation("Currency");
+
+                    b.Navigation("StorageContent");
                 });
 
             modelBuilder.Entity("Main.Entities.Storage.StorageContent", b =>
@@ -3843,12 +3867,14 @@ namespace Main.Migrator.Migrations
 
             modelBuilder.Entity("Main.Entities.User.UserPhone", b =>
                 {
-                    b.HasOne("Main.Entities.User.User", null)
+                    b.HasOne("Main.Entities.User.User", "User")
                         .WithMany("Phones")
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired()
                         .HasConstraintName("user_phones_user_id_fkey");
+
+                    b.Navigation("User");
                 });
 
             modelBuilder.Entity("Main.Entities.User.UserSearchHistory", b =>
@@ -3863,12 +3889,14 @@ namespace Main.Migrator.Migrations
 
             modelBuilder.Entity("Main.Entities.User.UserVehicle", b =>
                 {
-                    b.HasOne("Main.Entities.User.User", null)
+                    b.HasOne("Main.Entities.User.User", "User")
                         .WithMany("Vehicles")
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired()
                         .HasConstraintName("user_vehicles_users_id_fk");
+
+                    b.Navigation("User");
                 });
 
             modelBuilder.Entity("MassTransit.EntityFrameworkCoreIntegration.OutboxMessage", b =>
@@ -3927,7 +3955,7 @@ namespace Main.Migrator.Migrations
 
             modelBuilder.Entity("Main.Entities.Producer.Producer", b =>
                 {
-                    b.Navigation("OtherNames");
+                    b.Navigation("Aliases");
                 });
 
             modelBuilder.Entity("Main.Entities.Product.Product", b =>

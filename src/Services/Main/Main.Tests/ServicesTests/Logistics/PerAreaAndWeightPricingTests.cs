@@ -12,13 +12,26 @@ public class PerAreaAndWeightPricingTests
     [Fact]
     public void Calculate_ShouldReturnCorrectCost_BasedOnAreaAndWeight()
     {
-        var context = new LogisticsContext(10, 100, 0);
+        var context = new LogisticsContext(
+            10,
+            100,
+            0);
         var items = new List<LogisticsItem>
         {
             // (0.1m3 * 100) + (1kg * 10) = 10 + 10 = 20
-            new(1, 1, 1, WeightUnit.Kilogram, 0.1m),
+            new(
+                1,
+                1,
+                1,
+                WeightUnit.Kilogram,
+                0.1m),
             // (0.05m3 * 2 * 100) + (0.5kg * 2 * 10) = 10 + 10 = 20
-            new(2, 2, 500, WeightUnit.Gram, 0.05m)
+            new(
+                2,
+                2,
+                500,
+                WeightUnit.Gram,
+                0.05m)
         };
 
         var result = _strategy.Calculate(context, items);

@@ -6,27 +6,31 @@ namespace Search.Application.Services.IndexSynchronizers;
 
 public class ProductIndexSynchronizer(
     IProductSearchDocumentProvider productSearchDocumentProvider,
-    IProductRepository productRepository) : IIndexSynchronizer<Product, int>
+    IProductRepository productRepository
+) : IIndexSynchronizer<Product, int>
 {
-    public async Task Reindex(
-        int id,
-        CancellationToken cancellationToken = default)
+    public async Task Reindex(IEnumerable<int> ids, CancellationToken cancellationToken = default)
     {
-        var product = await productSearchDocumentProvider.GetById(id, cancellationToken);
+        var products = await productSearchDocumentProvider
+            .GetByIds(ids, cancellationToken);
 
-        if (product == null)
+        var toDelete = new List<int>();
+        var toUpsert = new List<Product>();
+
+        foreach (var (id, product) in products)
         {
-            await productRepository.Delete(id, cancellationToken);
-            return;
+            if (product == null)
+                toDelete.Add(id);
+            else
+                toUpsert.Add(product);
         }
 
-        await productRepository.Upsert(product, cancellationToken);
+        await productRepository.DeleteMany(toDelete, cancellationToken);
+        await productRepository.UpsertMany(toUpsert, cancellationToken);
     }
 
-    public Task Delete(
-        int id,
-        CancellationToken cancellationToken = default)
+    public Task Delete(IEnumerable<int> ids, CancellationToken cancellationToken = default)
     {
-        return productRepository.Delete(id, cancellationToken);
+        return productRepository.DeleteMany(ids, cancellationToken);
     }
 }

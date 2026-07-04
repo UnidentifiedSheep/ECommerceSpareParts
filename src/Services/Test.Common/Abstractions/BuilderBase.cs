@@ -1,7 +1,7 @@
 ﻿using Bogus;
-using Test.Common.Interfaces;
+using Tests.Interfaces;
 
-namespace Test.Common.Abstractions;
+namespace Tests.Abstractions;
 
 public abstract class BuilderBase<T>(Faker faker)
     : IBuilder<T>

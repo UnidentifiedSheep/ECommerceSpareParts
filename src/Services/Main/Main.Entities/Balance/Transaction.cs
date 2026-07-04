@@ -10,9 +10,7 @@ namespace Main.Entities.Balance;
 
 public class Transaction : AuditableEntity<Transaction, Guid>, ILinqEntity<Transaction, Guid>
 {
-    private Transaction()
-    {
-    }
+    private Transaction() { }
 
     private Transaction(
         Guid senderId,
@@ -60,10 +58,7 @@ public class Transaction : AuditableEntity<Transaction, Guid>, ILinqEntity<Trans
     public User.User Receiver { get; private set; } = null!;
     public User.User Sender { get; private set; } = null!;
 
-    public static Expression<Func<Transaction, Guid>> GetKeySelector()
-    {
-        return x => x.Id;
-    }
+    public static Expression<Func<Transaction, Guid>> GetKeySelector() { return x => x.Id; }
 
     public static Expression<Func<Transaction, bool>> GetEqualityExpression(Guid key)
     {
@@ -103,10 +98,7 @@ public class Transaction : AuditableEntity<Transaction, Guid>, ILinqEntity<Trans
         CurrencyId = currencyId;
     }
 
-    private void SetTransactionDatetime(DateTime newDatetime)
-    {
-        TransactionDatetime = newDatetime;
-    }
+    private void SetTransactionDatetime(DateTime newDatetime) { TransactionDatetime = newDatetime; }
 
     public void Complete()
     {
@@ -122,8 +114,7 @@ public class Transaction : AuditableEntity<Transaction, Guid>, ILinqEntity<Trans
     {
         EnsureCanMutate();
 
-        if (!IsCompleted)
-            throw new InvalidOperationException("Only Completed transactions can be reversed");
+        if (!IsCompleted) throw new InvalidOperationException("Only Completed transactions can be reversed");
 
         if (!IsCompletionApplied)
             throw new InvalidOperationException("Cannot reverse before completion is applied");
@@ -138,8 +129,7 @@ public class Transaction : AuditableEntity<Transaction, Guid>, ILinqEntity<Trans
         if (IsCompleted && IsReversed)
             throw new InvalidOperationException("Invalid state: both Completed and Reversed");
 
-        if (IsReversed)
-            throw new InvalidOperationException("Transaction is in terminal state");
+        if (IsReversed) throw new InvalidOperationException("Transaction is in terminal state");
     }
 
     internal void EnsureCanApplyProfile(
@@ -169,8 +159,7 @@ public class Transaction : AuditableEntity<Transaction, Guid>, ILinqEntity<Trans
 
     internal void MarkCompletionProfileApplied()
     {
-        if (!IsCompletionApplied)
-            throw new InvalidOperationException("Completion is not applied");
+        if (!IsCompletionApplied) throw new InvalidOperationException("Completion is not applied");
         if (IsCompletionProfileApplied)
             throw new InvalidOperationException("Completion profile already applied");
 
@@ -179,10 +168,8 @@ public class Transaction : AuditableEntity<Transaction, Guid>, ILinqEntity<Trans
 
     internal void MarkReversalProfileApplied()
     {
-        if (!IsReversalApplied)
-            throw new InvalidOperationException("Reversal is not applied");
-        if (IsReversalProfileApplied)
-            throw new InvalidOperationException("Reversal profile already applied");
+        if (!IsReversalApplied) throw new InvalidOperationException("Reversal is not applied");
+        if (IsReversalProfileApplied) throw new InvalidOperationException("Reversal profile already applied");
 
         Status |= TransactionStatus.ReversalProfileApplied;
     }
@@ -203,23 +190,20 @@ public class Transaction : AuditableEntity<Transaction, Guid>, ILinqEntity<Trans
     {
         ValidateBalances(senderBalance, receiverBalance);
 
-        if (!IsCompleted && !IsReversed)
-            throw new InvalidOperationException("Nothing to apply");
+        if (!IsCompleted && !IsReversed) throw new InvalidOperationException("Nothing to apply");
 
         if (IsReversed)
         {
             if (!IsCompletionApplied)
                 throw new InvalidOperationException("Cannot reverse before completion is applied");
-            if (IsReversalApplied)
-                throw new InvalidOperationException("Reversed already applied.");
+            if (IsReversalApplied) throw new InvalidOperationException("Reversed already applied.");
             ApplyReversed(senderBalance, receiverBalance);
             return;
         }
 
         if (IsCompleted)
         {
-            if (IsCompletionApplied)
-                throw new InvalidOperationException("Completion already applied.");
+            if (IsCompletionApplied) throw new InvalidOperationException("Completion already applied.");
             ApplyCompleted(senderBalance, receiverBalance);
         }
     }
@@ -256,8 +240,5 @@ public class Transaction : AuditableEntity<Transaction, Guid>, ILinqEntity<Trans
         Status |= TransactionStatus.ReversedApplied;
     }
 
-    public override Guid GetId()
-    {
-        return Id;
-    }
+    public override Guid GetId() { return Id; }
 }

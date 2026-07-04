@@ -10,10 +10,11 @@ public class LocalizerContainerTests
     {
         var container = new LocalizerContainer("en");
 
-        container.Initialize(new Dictionary<string, string>
-        {
-            ["key"] = "value"
-        });
+        container.Initialize(
+            new Dictionary<string, string>
+            {
+                ["key"] = "value"
+            });
 
         container.KetMessages["key"].Should().Be("value");
     }

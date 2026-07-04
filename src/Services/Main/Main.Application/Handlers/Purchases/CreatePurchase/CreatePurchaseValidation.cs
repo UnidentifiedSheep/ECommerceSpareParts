@@ -31,7 +31,10 @@ public class CreatePurchaseValidation : AbstractValidator<CreatePurchaseCommand>
             .GreaterThanOrEqualTo(0)
             .When(x => x.PayedSum != null)
             .WithLocalizationKey("purchase.payed.sum.min.value")
-            .PrecisionScale(18, 2, true)
+            .PrecisionScale(
+                18,
+                2,
+                true)
             .When(x => x.PayedSum != null)
             .WithLocalizationKey("purchase.payed.sum.precision");
     }

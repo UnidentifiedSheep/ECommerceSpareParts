@@ -12,17 +12,19 @@ public static class TransactionPurchaseEndPoints
 {
     public static RouteGroupBuilder MapTransactionPurchaseEndPoints(this RouteGroupBuilder balances)
     {
-        balances.MapGet("{transactionId:guid}/purchase", async (
-                ISender sender,
-                Guid transactionId,
-                CancellationToken cancellationToken) =>
-            {
-                var result = await sender.Send(
-                    new GetPurchaseQuery(null, transactionId),
-                    cancellationToken);
+        balances.MapGet(
+                "{transactionId:guid}/purchase",
+                async (
+                    ISender sender,
+                    Guid transactionId,
+                    CancellationToken cancellationToken) =>
+                {
+                    var result = await sender.Send(
+                        new GetPurchaseQuery(null, transactionId),
+                        cancellationToken);
 
-                return Results.Ok(new GetTransactionPurchaseResponse(result.Purchase));
-            })
+                    return Results.Ok(new GetTransactionPurchaseResponse(result.Purchase));
+                })
             .WithTags("Transactions")
             .WithName("GetPurchaseByTransaction")
             .WithSummary("Получить закупку по транзакции")

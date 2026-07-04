@@ -1,4 +1,4 @@
-﻿using Application.Common.Interfaces;
+﻿using Application.Common.Interfaces.Events;
 using MassTransit;
 using MediatR;
 
@@ -6,7 +6,8 @@ namespace Application.Common.Behaviors;
 
 public class IntegrationEventPublisherBehavior<TRequest, TResponse>(
     IIntegrationEventScope eventScope,
-    IPublishEndpoint publishEndpoint) : IPipelineBehavior<TRequest, TResponse>
+    IPublishEndpoint publishEndpoint
+) : IPipelineBehavior<TRequest, TResponse>
     where TRequest : IRequest<TResponse>
     where TResponse : notnull
 {

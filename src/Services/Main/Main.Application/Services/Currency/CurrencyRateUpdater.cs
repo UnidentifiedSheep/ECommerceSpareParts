@@ -1,6 +1,5 @@
 ﻿using Abstractions.Interfaces.Integrations.ExchangeRate;
 using Abstractions.Interfaces.Persistence;
-using Abstractions.Interfaces.Services;
 using Abstractions.Models;
 using Application.Common.Interfaces.Currency;
 using Application.Common.Interfaces.Repositories;
@@ -9,7 +8,7 @@ using Main.Application.Interfaces.Services.Currency;
 using Main.Application.Models.Currency;
 using Main.Entities.Currency;
 using Main.Entities.Exceptions;
-using Main.Entities.Setting;
+using Main.Entities.Settings;
 
 namespace Main.Application.Services.Currency;
 
@@ -18,7 +17,8 @@ public class CurrencyRateUpdater(
     IRepository<Entities.Currency.Currency, int> currencyRepository,
     ICurrencyRateRepository rateRepository,
     ICurrencyConverter converter,
-    IUnitOfWork unitOfWork) : ICurrencyRateUpdater
+    IUnitOfWork unitOfWork
+) : ICurrencyRateUpdater
 {
     public async Task<UpdateRatesResult> UpdateAsync(CurrencySetting setting, CancellationToken ct)
     {
@@ -36,10 +36,18 @@ public class CurrencyRateUpdater(
         var currencies = await currencyRepository.ListAsync(ct: ct);
 
         var dbRates = (await rateRepository
-                .GetByBaseCurrency(baseCurrency.Id, null, ct))
+                .GetByBaseCurrency(
+                    baseCurrency.Id,
+                    null,
+                    ct))
             .ToDictionary(x => x.GetId());
 
-        return ApplyDiff(currencies, baseCurrency, normalized, dbRates, ct);
+        return ApplyDiff(
+            currencies,
+            baseCurrency,
+            normalized,
+            dbRates,
+            ct);
     }
 
     private UpdateRatesResult ApplyDiff(
@@ -55,8 +63,7 @@ public class CurrencyRateUpdater(
 
         foreach (var currency in currencies)
         {
-            if (currency.Id == baseCurrency.Id)
-                continue;
+            if (currency.Id == baseCurrency.Id) continue;
 
             if (!external.Rates.TryGetValue(currency.Code, out var rate))
             {
@@ -67,13 +74,16 @@ public class CurrencyRateUpdater(
             if (dbRates.TryGetValue((currency.Id, baseCurrency.Id), out var existing))
                 existing.SetRate(rate);
             else
-                toAdd.Add(CurrencyRate.Create(currency.Id, baseCurrency.Id, rate));
+                toAdd.Add(
+                    CurrencyRate.Create(
+                        currency.Id,
+                        baseCurrency.Id,
+                        rate));
 
             changed[currency.Id] = rate;
         }
 
-        if (toAdd.Count > 0)
-            unitOfWork.AddRangeAsync(toAdd, ct);
+        if (toAdd.Count > 0) unitOfWork.AddRangeAsync(toAdd, ct);
 
         return new UpdateRatesResult(changed, notFound);
     }

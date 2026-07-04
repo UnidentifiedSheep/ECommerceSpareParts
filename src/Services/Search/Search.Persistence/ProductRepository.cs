@@ -1,20 +1,21 @@
+using System.Linq.Expressions;
 using Abstractions.Models;
+using Extensions;
 using Microsoft.Extensions.Options;
 using OpenSearch.Client;
 using Search.Abstractions.Options;
+using Search.Application.Interfaces.Product;
 using Search.Entities;
 using Search.Persistence.Extensions;
 using Search.Persistence.Interfaces;
-using System.Linq.Expressions;
-using Extensions;
-using Search.Application.Interfaces.Product;
 
 namespace Search.Persistence;
 
 public class ProductRepository(
     IOptionsMonitor<OpenSearchOptions> options,
     IOpenSearchClient client,
-    IIndexInitializer<Product> idxInitializer) : IProductRepository
+    IIndexInitializer<Product> idxInitializer
+) : IProductRepository
 {
     private static readonly Pagination DefaultPagination = new(0, 20);
 
@@ -73,9 +74,18 @@ public class ProductRepository(
 
         AddProducerFilter(filters, producerId);
 
-        AddRangeFilter(filters, p => p.Dimensions!.LengthM, lengthM);
-        AddRangeFilter(filters, p => p.Dimensions!.WidthM, widthM);
-        AddRangeFilter(filters, p => p.Dimensions!.HeightM, heightM);
+        AddRangeFilter(
+            filters,
+            p => p.Dimensions!.LengthM,
+            lengthM);
+        AddRangeFilter(
+            filters,
+            p => p.Dimensions!.WidthM,
+            widthM);
+        AddRangeFilter(
+            filters,
+            p => p.Dimensions!.HeightM,
+            heightM);
 
         var page = pagination ?? DefaultPagination;
         var idx = await CheckInitAndGetIdx(token);
@@ -137,16 +147,13 @@ public class ProductRepository(
                 .SortBy(sortBy)
                 .Query(q =>
                 {
-                    if (should.Count == 0 && filters.Count == 0)
-                        return q.MatchAll();
+                    if (should.Count == 0 && filters.Count == 0) return q.MatchAll();
 
                     return q.Bool(b =>
                     {
                         if (should.Count > 0)
-                        {
                             b = b.Should(should.ToArray())
                                 .MinimumShouldMatch(1);
-                        }
 
                         return filters.Count > 0
                             ? b.Filter(filters)
@@ -157,14 +164,19 @@ public class ProductRepository(
 
         return response.Documents;
     }
-    
+
     public Task<IReadOnlyCollection<Product>> GetByWeightKgRange(
         RangeModel<decimal>? weightKg = null,
         Pagination? pagination = null,
         string? sortBy = null,
         CancellationToken token = default)
     {
-        return SearchByRange(p => p.Weight!.WeightKg, weightKg, pagination, sortBy, token);
+        return SearchByRange(
+            p => p.Weight!.WeightKg,
+            weightKg,
+            pagination,
+            sortBy,
+            token);
     }
 
     public Task<IReadOnlyCollection<Product>> GetByVolumeM3Range(
@@ -173,36 +185,12 @@ public class ProductRepository(
         string? sortBy = null,
         CancellationToken token = default)
     {
-        return SearchByRange(p => p.Dimensions!.VolumeM3, volumeM3, pagination, sortBy, token);
-    }
-
-    public async Task<IReadOnlyCollection<Product>> GetByDimensionsRange(
-        RangeModel<decimal>? length = null,
-        RangeModel<decimal>? width = null,
-        RangeModel<decimal>? height = null,
-        Pagination? pagination = null,
-        string? sortBy = null,
-        CancellationToken token = default)
-    {
-        var filters = new List<Func<QueryContainerDescriptor<Product>, QueryContainer>>();
-        AddRangeFilter(filters, p => p.Dimensions!.LengthM, length);
-        AddRangeFilter(filters, p => p.Dimensions!.WidthM, width);
-        AddRangeFilter(filters, p => p.Dimensions!.HeightM, height);
-
-        var page = pagination ?? DefaultPagination;
-        var idx = await CheckInitAndGetIdx(token);
-        var response = await client.SearchAsync<Product>(
-            s => s
-                .Index(idx)
-                .From(GetFrom(page))
-                .Size(page.Size)
-                .SortBy(sortBy)
-                .Query(q => filters.Count > 0
-                    ? q.Bool(b => b.Filter(filters))
-                    : q.MatchAll()),
+        return SearchByRange(
+            p => p.Dimensions!.VolumeM3,
+            volumeM3,
+            pagination,
+            sortBy,
             token);
-
-        return response.Documents;
     }
 
     public async Task Delete(
@@ -221,9 +209,8 @@ public class ProductRepository(
         CancellationToken token = default)
     {
         var idList = ids.ToArray();
-        if (idList.Length == 0)
-            return;
-        
+        if (idList.Length == 0) return;
+
 
         var idx = await CheckInitAndGetIdx(token);
         await client.BulkAsync(
@@ -231,14 +218,49 @@ public class ProductRepository(
             {
                 b.Index(idx);
 
-                foreach (var id in idList)
-                {
-                    b.Delete<Product>(d => d.Id(id));
-                }
+                foreach (var id in idList) b.Delete<Product>(d => d.Id(id));
 
                 return b;
             },
             token);
+    }
+
+    public async Task<IReadOnlyCollection<Product>> GetByDimensionsRange(
+        RangeModel<decimal>? length = null,
+        RangeModel<decimal>? width = null,
+        RangeModel<decimal>? height = null,
+        Pagination? pagination = null,
+        string? sortBy = null,
+        CancellationToken token = default)
+    {
+        var filters = new List<Func<QueryContainerDescriptor<Product>, QueryContainer>>();
+        AddRangeFilter(
+            filters,
+            p => p.Dimensions!.LengthM,
+            length);
+        AddRangeFilter(
+            filters,
+            p => p.Dimensions!.WidthM,
+            width);
+        AddRangeFilter(
+            filters,
+            p => p.Dimensions!.HeightM,
+            height);
+
+        var page = pagination ?? DefaultPagination;
+        var idx = await CheckInitAndGetIdx(token);
+        var response = await client.SearchAsync<Product>(
+            s => s
+                .Index(idx)
+                .From(GetFrom(page))
+                .Size(page.Size)
+                .SortBy(sortBy)
+                .Query(q => filters.Count > 0
+                    ? q.Bool(b => b.Filter(filters))
+                    : q.MatchAll()),
+            token);
+
+        return response.Documents;
     }
 
     private async Task<string> CheckInitAndGetIdx(CancellationToken token)
@@ -275,7 +297,7 @@ public class ProductRepository(
         int? producerId)
     {
         if (!producerId.HasValue) return;
-        
+
         filters.Add(f => f.Term(t => t
             .Field(p => p.ProducerId)
             .Value(producerId.Value)));
@@ -286,8 +308,7 @@ public class ProductRepository(
         Expression<Func<Product, object>> field,
         RangeModel<decimal>? range)
     {
-        if (range is not { HasBounds: true })
-            return;
+        if (range is not { HasBounds: true }) return;
 
         filters.Add(q => q.Range(r => ApplyRange(r.Field(field), range)));
     }
@@ -296,32 +317,20 @@ public class ProductRepository(
         NumericRangeQueryDescriptor<Product> descriptor,
         RangeModel<decimal> range)
     {
-        if (range.Min.HasValue)
-        {
-            descriptor = descriptor.GreaterThanOrEquals((double)range.Min.Value);
-        }
+        if (range.Min.HasValue) descriptor = descriptor.GreaterThanOrEquals((double)range.Min.Value);
 
-        if (range.Max.HasValue)
-        {
-            descriptor = descriptor.LessThanOrEquals((double)range.Max.Value);
-        }
+        if (range.Max.HasValue) descriptor = descriptor.LessThanOrEquals((double)range.Max.Value);
 
         return descriptor;
     }
 
-    private static int GetFrom(Pagination pagination)
-    {
-        return pagination.Page * pagination.Size;
-    }
+    private static int GetFrom(Pagination pagination) { return pagination.Page * pagination.Size; }
 
     private static void AddSkuQueries(
         List<Func<QueryContainerDescriptor<Product>, QueryContainer>> queries,
         string normalizedSku)
     {
-        if (string.IsNullOrEmpty(normalizedSku))
-        {
-            return;
-        }
+        if (string.IsNullOrEmpty(normalizedSku)) return;
 
         queries.Add(q => q.Term(t => t
             .Field(p => p.NormalizedSku)

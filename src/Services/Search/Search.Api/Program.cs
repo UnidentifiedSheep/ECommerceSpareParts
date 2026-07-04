@@ -1,7 +1,6 @@
 using System.Reflection;
 using Api.Common;
 using Api.Common.Extensions;
-using Api.Common.HostedServices;
 using Carter;
 using Internal.Integration.Di;
 using Localization.Domain.Extensions;
@@ -9,7 +8,6 @@ using MassTransit;
 using RabbitMq.Extensions;
 using Search.Abstractions.Options;
 using Search.Application;
-using Search.Application.Consumers;
 using Search.Application.Consumers.Producer;
 using Search.Application.Consumers.Product;
 using Search.Persistence;
@@ -32,23 +30,27 @@ builder.Services.AddCommonApiInfrastructure();
 
 builder.Services.AddMassTransit(x =>
 {
+    x.AddConsumer<ProducerUpdatedConsumer, ProducerUpdatedConsumerDefinition>();
+    x.AddConsumer<ProductUpdatedConsumer, ProductUpdatedConsumerDefinition>();
+    x.AddConsumer<ProductDeletedConsumer, ProductDeletedConsumerDefinition>();
+
     x.AddConsumers(Assembly.GetAssembly(typeof(ProductUpdatedConsumer)));
 
     x.UsingRabbitMq((context, cfg) =>
     {
         cfg.ConfigureRabbitMq(context);
 
-        cfg.ReceiveEndpoint("search-queue", ep =>
-        {
-            ep.Durable = true;
-            
-            ep.ConfigureConsumer<ProductUpdatedConsumer>(context);
-            ep.ConfigureConsumer<ProductDeletedConsumer>(context);
-            ep.ConfigureConsumer<ProductSizesUpdatedConsumer>(context);
-            ep.ConfigureConsumer<ProductWeightUpdatedConsumer>(context);
-            ep.ConfigureConsumer<ProductLinkageUpdatedConsumer>(context);
-            ep.ConfigureConsumer<ProducerUpdatedConsumer>(context);
-        });
+        cfg.ReceiveEndpoint(
+            "search-queue",
+            ep =>
+            {
+                ep.Durable = true;
+
+                ep.ConfigureConsumer<ProductUpdatedConsumer>(context);
+                ep.ConfigureConsumer<ProductDeletedConsumer>(context);
+
+                ep.ConfigureConsumer<ProducerUpdatedConsumer>(context);
+            });
     });
 });
 

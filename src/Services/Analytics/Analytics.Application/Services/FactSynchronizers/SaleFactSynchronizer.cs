@@ -19,7 +19,8 @@ public class SaleFactSynchronizer(
     ISaleFactRepository repository,
     IUnitOfWork unitOfWork,
     ITagsService tagsService,
-    ILogger<IFactSynchronizer<SalesFact, Guid>> logger) : ISaleFactSynchronizer
+    ILogger<IFactSynchronizer<SalesFact, Guid>> logger
+) : ISaleFactSynchronizer
 {
     public async Task<SalesFact?> SynchronizeAsync(
         Guid id,

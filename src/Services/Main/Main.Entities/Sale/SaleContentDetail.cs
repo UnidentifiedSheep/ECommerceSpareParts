@@ -8,9 +8,7 @@ namespace Main.Entities.Sale;
 
 public class SaleContentDetail : Entity<SaleContentDetail, int>, ILinqEntity<SaleContentDetail, int>
 {
-    private SaleContentDetail()
-    {
-    }
+    private SaleContentDetail() { }
 
     private SaleContentDetail(
         int storageContentId,
@@ -37,10 +35,7 @@ public class SaleContentDetail : Entity<SaleContentDetail, int>, ILinqEntity<Sal
     public Currency.Currency Currency { get; private set; } = null!;
     public StorageContent StorageContent { get; private set; } = null!;
 
-    public static Expression<Func<SaleContentDetail, int>> GetKeySelector()
-    {
-        return x => x.Id;
-    }
+    public static Expression<Func<SaleContentDetail, int>> GetKeySelector() { return x => x.Id; }
 
     public static Expression<Func<SaleContentDetail, bool>> GetEqualityExpression(int key)
     {
@@ -54,7 +49,12 @@ public class SaleContentDetail : Entity<SaleContentDetail, int>, ILinqEntity<Sal
         int count,
         DateTime purchaseDate)
     {
-        return new SaleContentDetail(storageContentId, currencyId, buyPrice, count, purchaseDate);
+        return new SaleContentDetail(
+            storageContentId,
+            currencyId,
+            buyPrice,
+            count,
+            purchaseDate);
     }
 
     private void SetPrice(decimal price)
@@ -71,8 +71,5 @@ public class SaleContentDetail : Entity<SaleContentDetail, int>, ILinqEntity<Sal
             () => new InvalidOperationException("Count must be greater than zero."));
     }
 
-    public override int GetId()
-    {
-        return Id;
-    }
+    public override int GetId() { return Id; }
 }

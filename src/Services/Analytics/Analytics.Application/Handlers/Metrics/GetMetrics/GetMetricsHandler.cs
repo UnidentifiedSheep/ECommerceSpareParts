@@ -17,14 +17,17 @@ namespace Analytics.Application.Handlers.Metrics.GetMetrics;
 [Diagnostics(maxExecutionTimeMs: 200)]
 public record GetMetricsQuery(
     string? MetricSystemName,
-    string? SortBy, 
-    Pagination Pagination) : IQuery<GetMetricsResult>;
+    string? SortBy,
+    Pagination Pagination
+) : IQuery<GetMetricsResult>;
+
 public record GetMetricsResult(IReadOnlyList<MetricDto> Metrics);
 
 public class GetMetricsHandler(
     IReadRepository<Metric, Guid> metricRepository,
     IScopedLocalizedJsonSerializer serializer,
-    ISender sender) : IQueryHandler<GetMetricsQuery, GetMetricsResult>
+    ISender sender
+) : IQueryHandler<GetMetricsQuery, GetMetricsResult>
 {
     public async Task<GetMetricsResult> Handle(GetMetricsQuery request, CancellationToken cancellationToken)
     {
@@ -32,18 +35,19 @@ public class GetMetricsHandler(
 
         if (!string.IsNullOrWhiteSpace(request.MetricSystemName))
             query = query.Where(x => x.Discriminator == request.MetricSystemName);
-        
+
         var metrics = await query
             .SortBy(request.SortBy)
             .AsExpandable()
             .Select(MetricProjection.ToDto(await GetMetricInfos(cancellationToken), serializer))
             .ApplyPagination(request.Pagination)
             .ToListAsync(cancellationToken);
-        
+
         return new GetMetricsResult(metrics);
     }
 
-    private async Task<IReadOnlyDictionary<string, MetricInfoDto>> GetMetricInfos(CancellationToken cancellationToken)
+    private async Task<IReadOnlyDictionary<string, MetricInfoDto>> GetMetricInfos(
+        CancellationToken cancellationToken)
     {
         return (await sender.Send(new ListAvailableMetricsQuery(), cancellationToken))
             .Metrics

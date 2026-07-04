@@ -1,10 +1,10 @@
 ﻿using Main.Entities.Storage;
 using Main.Enums;
 using Main.Persistence.Context;
-using Test.Common.Abstractions;
-using Test.Common.Extensions;
-using Test.Common.Interfaces;
+using Tests.Abstractions;
 using Tests.DataBuilders.Storage;
+using Tests.Extensions;
+using Tests.Interfaces;
 using Tests.TestContexts.Currency;
 
 namespace Tests.TestContexts.Storage;
@@ -13,7 +13,8 @@ public class StorageContentTestContext(
     DContext ctx,
     StorageTestContext storage,
     ProductTestContext product,
-    CurrencyTestContext currency)
+    CurrencyTestContext currency
+)
     : TestContextBase<DContext>(ctx), IDependentTestContext
 {
     public IReadOnlyCollection<StorageContent> StorageContents { get; private set; } = null!;
@@ -35,8 +36,7 @@ public class StorageContentTestContext(
 
         var products = product.Products.ToDictionary(k => k.Id);
 
-        foreach (var content in StorageContents)
-            products[content.ProductId].IncreaseStock(content.Count);
+        foreach (var content in StorageContents) products[content.ProductId].IncreaseStock(content.Count);
 
         await DbContext.SaveChangesAsync(cancellationToken);
     }

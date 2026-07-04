@@ -13,7 +13,8 @@ using Main.Enums;
 namespace Main.Application.Handlers.Auth;
 
 [Diagnostics(maxExecutionTimeMs: 300)]
-[Transactional, AutoSave]
+[Transactional]
+[AutoSave]
 public record RefreshTokenCommand(string RefreshToken, string DeviceId) : ICommand<RefreshTokenResult>;
 
 public record RefreshTokenResult(string Token, string RefreshToken);
@@ -24,9 +25,12 @@ public class RefreshTokenHandler(
     IJwtGenerator tokenGenerator,
     IUserTokenService userTokenService,
     ITokenHasher tokenHasher,
-    IUserCacheRepository userCache) : ICommandHandler<RefreshTokenCommand, RefreshTokenResult>
+    IUserCacheRepository userCache
+) : ICommandHandler<RefreshTokenCommand, RefreshTokenResult>
 {
-    public async Task<RefreshTokenResult> Handle(RefreshTokenCommand request, CancellationToken cancellationToken)
+    public async Task<RefreshTokenResult> Handle(
+        RefreshTokenCommand request,
+        CancellationToken cancellationToken)
     {
         var hashOfToken = tokenHasher.HashToken(request.RefreshToken);
         var criteria = Criteria<UserToken>.New()
@@ -48,11 +52,23 @@ public class RefreshTokenHandler(
                                        .GetUserRolesAndPermissionsAsync(userToken.UserId, cancellationToken)
                                    ?? throw new UserNotFoundException(userToken.UserId);
 
-        var token = tokenGenerator.CreateToken(user, request.DeviceId, roles, permissions);
+        var token = tokenGenerator.CreateToken(
+            user,
+            request.DeviceId,
+            roles,
+            permissions);
         var refreshToken = tokenGenerator.CreateRefreshToken();
 
-        await userTokenService.AddToken(refreshToken, user.Id, TokenType.RefreshToken, DateTime.UtcNow.AddMonths(1),
-            userToken.IpAddress, userToken.UserAgent, request.DeviceId, [], cancellationToken);
+        await userTokenService.AddToken(
+            refreshToken,
+            user.Id,
+            TokenType.RefreshToken,
+            DateTime.UtcNow.AddMonths(1),
+            userToken.IpAddress,
+            userToken.UserAgent,
+            request.DeviceId,
+            [],
+            cancellationToken);
 
         unitOfWork.Remove(userToken);
         return new RefreshTokenResult(token, refreshToken);

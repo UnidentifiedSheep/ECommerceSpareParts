@@ -7,9 +7,7 @@ namespace Main.Entities.Product;
 
 public class ProductCross : Entity<ProductCross, (int, int)>, ILinqEntity<ProductCross, (int, int)>
 {
-    private ProductCross()
-    {
-    }
+    private ProductCross() { }
 
     private ProductCross(int left, int right)
     {
@@ -38,13 +36,7 @@ public class ProductCross : Entity<ProductCross, (int, int)>, ILinqEntity<Produc
         return x => x.LeftProductId == key.Item1 && x.RightProductId == key.Item2;
     }
 
-    public static ProductCross Create(int id, int crossId)
-    {
-        return new ProductCross(id, crossId);
-    }
+    public static ProductCross Create(int id, int crossId) { return new ProductCross(id, crossId); }
 
-    public override (int, int) GetId()
-    {
-        return (LeftProductId, RightProductId);
-    }
+    public override (int, int) GetId() { return (LeftProductId, RightProductId); }
 }

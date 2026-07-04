@@ -1,8 +1,5 @@
-using System.Net;
 using Extensions;
-using Internal.Integration.Core.Interfaces;
 using Internal.Integration.Core.Interfaces.Main;
-using Internal.Integration.Core.Models.Main;
 using Internal.Integration.Core.Models.Main.Product;
 using Search.Application.Interfaces.Product;
 using Search.Entities;
@@ -10,37 +7,43 @@ using Search.Entities;
 namespace Search.Persistence.DocumentProviders;
 
 public class MainProductSearchDocumentProvider(
-    IMainClient mainClient) : IProductSearchDocumentProvider
+    IMainClient mainClient
+) : IProductSearchDocumentProvider
 {
-    public async Task<Product?> GetById(
-        int productId,
+
+    public async Task<Dictionary<int, Product?>> GetByIds(
+        IEnumerable<int> ids,
         CancellationToken cancellationToken = default)
     {
-        var response = await mainClient.ProductNode.GetFullProduct(productId, cancellationToken);
-        if (response is { StatusCode: HttpStatusCode.NotFound })
-            return null;
+        var idsList = ids.Distinct().ToList();
+        var response = await mainClient.ProductNode.GetFullProduct(idsList, cancellationToken);
 
         if (!response.Success)
             throw new InvalidOperationException(
-                $"Unable to get product {productId} from Main service. " +
+                $"Unable to get products from Main service. " +
                 $"Status: {response.StatusCode}. " +
                 $"Error: {response.Error}");
 
-        var fullProduct = response.ValueOrThrow;
+        var dict = response.ValueOrThrow
+            .ToDictionary(x => x.Id);
 
-        return new Product
-        {
-            Id = fullProduct.Product.Id,
-            Sku = fullProduct.Product.Sku,
-            NormalizedSku = fullProduct.Product.Sku.OnlyCharacterToLower(),
-            Name = fullProduct.Product.Name,
-            ProducerId = fullProduct.Product.ProducerId,
-            Dimensions = MapDimensions(fullProduct.ProductSize),
-            Weight = MapWeight(fullProduct.ProductWeight),
-            Stock = fullProduct.Product.Stock
-        };
+        return idsList.ToDictionary(
+            x => x,
+            x => dict.TryGetValue(x, out var product)
+                ? new Product
+                {
+                    Id = product.Id,
+                    Sku = product.Sku,
+                    NormalizedSku = product.Sku.OnlyCharacterToLower(),
+                    Name = product.Name,
+                    ProducerId = product.ProducerId,
+                    Dimensions = MapDimensions(product.ProductSize),
+                    Weight = MapWeight(product.ProductWeight),
+                    Stock = product.Stock,
+                    Indicator = product.Indicator
+                }
+                : null);
     }
-
     private static ProductDimensions? MapDimensions(InternalProductSize? size)
     {
         return size == null

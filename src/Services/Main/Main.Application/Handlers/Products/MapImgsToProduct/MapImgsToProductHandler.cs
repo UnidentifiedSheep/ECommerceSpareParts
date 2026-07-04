@@ -1,14 +1,11 @@
 ﻿using Abstractions.Interfaces;
 using Abstractions.Interfaces.Persistence;
-using Abstractions.Interfaces.Services;
-using Application.Common.Interfaces;
 using Application.Common.Interfaces.Cqrs;
 using Application.Common.Interfaces.Settings;
 using Attributes;
-using Contracts.Products;
 using Main.Application.Static;
 using Main.Entities.Product;
-using Main.Entities.Setting;
+using Main.Entities.Settings;
 using MediatR;
 
 namespace Main.Application.Handlers.Products.MapImgsToProduct;
@@ -20,9 +17,8 @@ public record MapImgsToProductCommand(int ProductId, IEnumerable<IFile> Images) 
 public class MapImgsToProductHandler(
     IS3StorageService s3Storage,
     IUnitOfWork unitOfWork,
-    ISettingsService settingsService,
-    IIntegrationEventScope integrationEventScope)
-    : ICommandHandler<MapImgsToProductCommand, Unit>
+    ISettingsService settingsService 
+    ) : ICommandHandler<MapImgsToProductCommand, Unit>
 {
     public async Task<Unit> Handle(MapImgsToProductCommand request, CancellationToken cancellationToken)
     {
@@ -36,13 +32,17 @@ public class MapImgsToProductHandler(
             {
                 await using var stream = img.OpenReadStream();
                 var path = $"imgs/articles/{request.ProductId}_{Guid.NewGuid()}{img.Extension}";
-                var key = await s3Storage.UploadFileAsync(BucketNames.Images,
-                    stream, path, "image/webp");
+                var key = await s3Storage.UploadFileAsync(
+                    BucketNames.Images,
+                    stream,
+                    path,
+                    "image/webp");
                 keys.Add(key);
-                toAdd.Add(ProductImage.Create(
-                    request.ProductId,
-                    $"{applicationSettings.S3ServiceUrl}/{BucketNames.Images}/{path}",
-                    key));
+                toAdd.Add(
+                    ProductImage.Create(
+                        request.ProductId,
+                        $"{applicationSettings.S3ServiceUrl}/{BucketNames.Images}/{path}",
+                        key));
             }
 
             await unitOfWork.AddRangeAsync(toAdd, cancellationToken);
@@ -50,12 +50,10 @@ public class MapImgsToProductHandler(
         }
         catch (Exception)
         {
-            foreach (var key in keys)
-                await s3Storage.DeleteFileAsync(BucketNames.Images, key);
+            foreach (var key in keys) await s3Storage.DeleteFileAsync(BucketNames.Images, key);
             throw;
         }
-
-        integrationEventScope.Add(new ProductUpdatedEvent { Id = request.ProductId });
+        
         return Unit.Value;
     }
 }

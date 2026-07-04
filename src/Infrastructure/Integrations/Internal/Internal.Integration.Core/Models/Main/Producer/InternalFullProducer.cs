@@ -2,11 +2,8 @@ using System.Text.Json.Serialization;
 
 namespace Internal.Integration.Core.Models.Main.Producer;
 
-public record InternalFullProducer
+public record InternalFullProducer : InternalProducer
 {
-    [JsonPropertyName("producer")]
-    public required InternalProducer Producer { get; init; }
-
-    [JsonPropertyName("otherNames")]
-    public required IReadOnlyList<InternalProducerOtherName> OtherNames { get; init; }
+    [JsonPropertyName("aliases")]
+    public required IReadOnlyList<string> Aliases { get; init; }
 }

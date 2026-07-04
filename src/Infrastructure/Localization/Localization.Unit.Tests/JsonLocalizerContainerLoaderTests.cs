@@ -49,15 +49,11 @@ public class JsonLocalizerContainerLoaderTests
     {
         public readonly string BaseDir;
 
-        private TempLocaleFile(string baseDir)
-        {
-            BaseDir = baseDir;
-        }
+        private TempLocaleFile(string baseDir) { BaseDir = baseDir; }
 
         public void Dispose()
         {
-            if (Directory.Exists(BaseDir))
-                Directory.Delete(BaseDir, true);
+            if (Directory.Exists(BaseDir)) Directory.Delete(BaseDir, true);
         }
 
         public static async Task<TempLocaleFile> Create(string locale, Dictionary<string, string> keyValues)

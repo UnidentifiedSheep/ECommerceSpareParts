@@ -16,8 +16,7 @@ public class TransactionConfig(DbContext context) : ICustomTransaction
 
     public ICustomTransaction WithRetries(int count)
     {
-        if (count < 0)
-            throw new ArgumentOutOfRangeException(nameof(count), "Must be non-negative");
+        if (count < 0) throw new ArgumentOutOfRangeException(nameof(count), "Must be non-negative");
         RetriesCount = count;
         return this;
     }
@@ -52,7 +51,9 @@ public class TransactionConfig(DbContext context) : ICustomTransaction
         return this;
     }
 
-    public async Task<T> ExecuteWithTransaction<T>(Func<Task<T>> action, CancellationToken cancellationToken = default)
+    public async Task<T> ExecuteWithTransaction<T>(
+        Func<Task<T>> action,
+        CancellationToken cancellationToken = default)
     {
         for (var attempt = 0; attempt <= RetriesCount; attempt++)
         {
@@ -62,14 +63,11 @@ public class TransactionConfig(DbContext context) : ICustomTransaction
 
             try
             {
-                if (isLocalTransaction)
-                    await SetIsolationLevelOfDbTransaction();
-                if (attempt > 0)
-                    context.ChangeTracker.Clear();
+                if (isLocalTransaction) await SetIsolationLevelOfDbTransaction();
+                if (attempt > 0) context.ChangeTracker.Clear();
                 var result = await action();
 
-                if (isLocalTransaction)
-                    await transaction.CommitAsync(cancellationToken);
+                if (isLocalTransaction) await transaction.CommitAsync(cancellationToken);
                 return result;
             }
             catch (DbUpdateConcurrencyException)
@@ -88,8 +86,7 @@ public class TransactionConfig(DbContext context) : ICustomTransaction
             }
             finally
             {
-                if (isLocalTransaction)
-                    await transaction.DisposeAsync();
+                if (isLocalTransaction) await transaction.DisposeAsync();
             }
         }
 
@@ -106,14 +103,11 @@ public class TransactionConfig(DbContext context) : ICustomTransaction
 
             try
             {
-                if (isLocalTransaction)
-                    await SetIsolationLevelOfDbTransaction();
-                if (attempt > 0)
-                    context.ChangeTracker.Clear();
+                if (isLocalTransaction) await SetIsolationLevelOfDbTransaction();
+                if (attempt > 0) context.ChangeTracker.Clear();
                 await action();
 
-                if (isLocalTransaction)
-                    await transaction.CommitAsync(cancellationToken);
+                if (isLocalTransaction) await transaction.CommitAsync(cancellationToken);
                 return;
             }
             catch (Exception ex)
@@ -127,8 +121,7 @@ public class TransactionConfig(DbContext context) : ICustomTransaction
             }
             finally
             {
-                if (isLocalTransaction)
-                    await transaction.DisposeAsync();
+                if (isLocalTransaction) await transaction.DisposeAsync();
             }
         }
 
@@ -157,8 +150,10 @@ public class TransactionConfig(DbContext context) : ICustomTransaction
     private async Task SetIsolationLevelOfDbTransaction()
     {
         var isolationLevelAsString = Enum.GetName(typeof(IsolationLevel), IsolationLevel)!;
-        var withSpaces = string.Concat(isolationLevelAsString.Select((c, i) =>
-            i > 0 && char.IsUpper(c) ? " " + c : c.ToString())).ToUpperInvariant();
+        var withSpaces = string.Concat(
+                isolationLevelAsString.Select((c, i) =>
+                    i > 0 && char.IsUpper(c) ? " " + c : c.ToString()))
+            .ToUpperInvariant();
         var sql = $"SET TRANSACTION ISOLATION LEVEL {withSpaces};";
         await context.Database.ExecuteSqlRawAsync(sql);
     }

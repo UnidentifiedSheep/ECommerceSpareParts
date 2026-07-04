@@ -7,9 +7,9 @@
     </PropertyGroup>
 
     <ItemGroup>
-      <ProjectReference Include="..\..\..\Infrastructure\Cache\Cache.csproj" />
-      <ProjectReference Include="..\..\..\Infrastructure\Integrations\Internal\Internal.Integration.Core\Internal.Integration.Core.csproj" />
-      <ProjectReference Include="..\Pricing.Application\Pricing.Application.csproj" />
+        <ProjectReference Include="..\..\..\Infrastructure\Cache\Cache.csproj"/>
+        <ProjectReference Include="..\..\..\Infrastructure\Integrations\Internal\Internal.Integration.Core\Internal.Integration.Core.csproj"/>
+        <ProjectReference Include="..\Pricing.Application\Pricing.Application.csproj"/>
     </ItemGroup>
 
 </Project>

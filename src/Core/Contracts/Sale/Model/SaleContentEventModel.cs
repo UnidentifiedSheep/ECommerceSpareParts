@@ -12,7 +12,7 @@ public record SaleContentEventModel
 
     [JsonPropertyName("price")]
     public required decimal Price { get; init; }
-    
+
     [JsonPropertyName("priceInBaseCurrency")]
     public required decimal PriceInBaseCurrency { get; init; }
 

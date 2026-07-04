@@ -24,18 +24,21 @@ public static class InternalSaleEndPoints
             .WithGroupName("Internal Sale")
             .WithTags("InternalSale");
 
-        sale.MapGet("{id:guid}", async (
-                Guid id,
-                ISender sender,
-                CancellationToken cancellationToken) =>
-            {
-                var result = await sender.Send(new GetFullSaleQuery(id), cancellationToken);
-                return Results.Ok(new InternalGetFullSaleResponse
+        sale.MapGet(
+                "{id:guid}",
+                async (
+                    Guid id,
+                    ISender sender,
+                    CancellationToken cancellationToken) =>
                 {
-                    Sale = result.Sale,
-                    Contents = result.Contents
-                });
-            })
+                    var result = await sender.Send(new GetFullSaleQuery(id), cancellationToken);
+                    return Results.Ok(
+                        new InternalGetFullSaleResponse
+                        {
+                            Sale = result.Sale,
+                            Contents = result.Contents
+                        });
+                })
             .RequireAllPermissions(PermissionCodes.SALES_GET)
             .WithName("InternalFullSale")
             .WithDisplayName("Internal service full sale")

@@ -6,7 +6,7 @@ public record RoleDto
 {
     [JsonPropertyName("systemName")]
     public required string SystemName { get; init; }
-    
+
     [JsonPropertyName("localizedName")]
     public required string? LocalizedName { get; init; }
 

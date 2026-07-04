@@ -2,7 +2,7 @@
 
 public interface IIndexSynchronizer<TEntity, in TKey>
 {
-    Task Reindex(TKey id, CancellationToken cancellationToken = default);
+    Task Reindex(IEnumerable<TKey> ids, CancellationToken cancellationToken = default);
 
-    Task Delete(TKey id, CancellationToken cancellationToken = default);
+    Task Delete(IEnumerable<TKey> ids, CancellationToken cancellationToken = default);
 }

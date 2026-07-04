@@ -1,5 +1,5 @@
+using Enums;
 using Exceptions.Base.Localized;
-using Main.Enums;
 
 namespace Main.Entities.Exceptions;
 
@@ -7,10 +7,16 @@ public class InvalidTokenException(string token)
     : LocalizedBadRequestException("invalid.token", new { Token = token });
 
 public class PermissionNotFoundException(string name)
-    : LocalizedNotFoundException("permission.not.found", new { Name = name }, [name]);
+    : LocalizedNotFoundException(
+        "permission.not.found",
+        new { Name = name },
+        [name]);
 
 public class RoleAlreadyExistsException(string roleName)
-    : LocalizedBadRequestException("role.already.exists", new { Name = roleName }, [roleName]);
+    : LocalizedBadRequestException(
+        "role.already.exists",
+        new { Name = roleName },
+        [roleName]);
 
 public class RoleNotFoundException : LocalizedNotFoundException
 {
@@ -20,16 +26,25 @@ public class RoleNotFoundException : LocalizedNotFoundException
     }
 
     public RoleNotFoundException(string roleName)
-        : base("role.not.found.with.role.name", new { Name = roleName }, [roleName])
+        : base(
+            "role.not.found.with.role.name",
+            new { Name = roleName },
+            [roleName])
     {
     }
 }
 
 public class UserAlreadyContainsRoleException(Guid userId, string role)
-    : LocalizedConflictException("user.already.have.this.role", new { UserId = userId, Role = role }, [role]);
+    : LocalizedConflictException(
+        "user.already.have.this.role",
+        new { UserId = userId, Role = role },
+        [role]);
 
 public class UserRoleNotFoundException(Guid userId, string role)
-    : LocalizedNotFoundException("user.role.not.found", new { UserId = userId, Role = role }, [role]);
+    : LocalizedNotFoundException(
+        "user.role.not.found",
+        new { UserId = userId, Role = role },
+        [role]);
 
 public class UserIsNotInNeededRole(Role role)
     : LocalizedBadRequestException(
@@ -45,11 +60,11 @@ public class WrongCredentialsException(string? email, string? password)
 
 public class CantCreateSystemUserException()
     : LocalizedBadRequestException("cant.create.system.user");
-    
-public class ResetTokenExpiredException() 
+
+public class ResetTokenExpiredException()
     : LocalizedBadRequestException("reset.token.expired");
-    
+
 public class UserPermissionNotFound(Guid id, string permission)
     : LocalizedNotFoundException(
         "user.permission.not.found",
-        new { UserId = id, Permission = permission }); 
+        new { UserId = id, Permission = permission });

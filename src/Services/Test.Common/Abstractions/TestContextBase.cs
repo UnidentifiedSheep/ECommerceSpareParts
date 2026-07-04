@@ -1,8 +1,8 @@
 ﻿using Bogus;
 using Microsoft.EntityFrameworkCore;
-using Test.Common.Interfaces;
+using Tests.Interfaces;
 
-namespace Test.Common.Abstractions;
+namespace Tests.Abstractions;
 
 public abstract class TestContextBase<TDbContext>(TDbContext ctx)
     : ITestContext where TDbContext : DbContext

@@ -2,7 +2,6 @@ using System.Text.Json.Serialization;
 using Abstractions.Models;
 using Api.Common.Extensions;
 using Api.Common.Models.Requests;
-using Carter;
 using Enums;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
@@ -15,7 +14,7 @@ public record SearchProductsByAllRequest : SortablePaginationQueryModel
 {
     [FromQuery(Name = "query")]
     public string? Query { get; init; }
-    
+
     [FromQuery(Name = "producerId")]
     public int? ProducerId { get; init; }
 
@@ -47,38 +46,40 @@ public record SearchProductsByAllResult
     public required IEnumerable<ProductDto> Products { get; init; }
 }
 
-
 public static class SearchProductsByAllEndPoint
 {
     public static RouteGroupBuilder AddSearchProductsByAll(this RouteGroupBuilder products)
     {
-        products.MapGet("/all", async (
-                ISender sender,
-                [AsParameters] SearchProductsByAllRequest request,
-                CancellationToken cancellationToken) =>
-            {
-                var result = await sender.Send(
-                    new SearchProductsByAllQuery(
-                        request.Query,
-                        request.ProducerId,
-                        request,
-                        request.SortBy,
-                        ToRange(request.LengthMin, request.LengthMax),
-                        ToRange(request.WidthMin, request.WidthMax),
-                        ToRange(request.HeightMin, request.HeightMax),
-                        request.DimensionUnit ?? DimensionUnit.Meter),
-                    cancellationToken);
-
-                return Results.Ok(new SearchProductsByAllResult
+        products.MapGet(
+                "/all",
+                async (
+                    ISender sender,
+                    [AsParameters] SearchProductsByAllRequest request,
+                    CancellationToken cancellationToken) =>
                 {
-                    Products = result.Products
-                });
-            })
+                    var result = await sender.Send(
+                        new SearchProductsByAllQuery(
+                            request.Query,
+                            request.ProducerId,
+                            request,
+                            request.SortBy,
+                            ToRange(request.LengthMin, request.LengthMax),
+                            ToRange(request.WidthMin, request.WidthMax),
+                            ToRange(request.HeightMin, request.HeightMax),
+                            request.DimensionUnit ?? DimensionUnit.Meter),
+                        cancellationToken);
+
+                    return Results.Ok(
+                        new SearchProductsByAllResult
+                        {
+                            Products = result.Products
+                        });
+                })
             .WithTags("Products")
             .RequireAllPermissions(PermissionCodes.ARTICLES_GET_MAIN)
             .WithDisplayName("Search products")
             .Produces<SearchProductsByAllResult>();
-        
+
         return products;
     }
 

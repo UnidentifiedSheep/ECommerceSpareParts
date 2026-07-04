@@ -4,7 +4,8 @@ using ZiggyCreatures.Caching.Fusion.Backplane;
 
 namespace Application.Common.Backplane;
 
-public class BackplaneConsumer(IBackplaneDispatcher dispatcher, IFusionCache cache) : IConsumer<BackplaneMessage>
+public class BackplaneConsumer(IBackplaneDispatcher dispatcher, IFusionCache cache)
+    : IConsumer<BackplaneMessage>
 {
     public async Task Consume(ConsumeContext<BackplaneMessage> context)
     {

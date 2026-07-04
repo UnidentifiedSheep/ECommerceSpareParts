@@ -5,7 +5,7 @@ using Main.Entities.Exceptions;
 using Main.Entities.Storage;
 using Main.Enums;
 using Microsoft.EntityFrameworkCore;
-using Test.Common.TestContainers.Combined;
+using Tests.TestContainers.Combined;
 using Tests.TestContexts.Storage;
 
 namespace Tests.HandlersTests.Storages;

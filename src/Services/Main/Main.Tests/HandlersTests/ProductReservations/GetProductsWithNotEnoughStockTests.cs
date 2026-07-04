@@ -4,9 +4,9 @@ using Main.Entities.Product;
 using Main.Entities.Storage;
 using Main.Entities.User;
 using Main.Enums;
-using Test.Common.Extensions;
-using Test.Common.TestContainers.Combined;
 using Tests.DataBuilders.Storage;
+using Tests.Extensions;
+using Tests.TestContainers.Combined;
 using Tests.TestContexts;
 using Tests.TestContexts.Currency;
 using Tests.TestContexts.Storage;
@@ -34,8 +34,15 @@ public class GetProductsWithNotEnoughStockTests : IntegrationTest
         var buyer = Buyer();
         var product = Product();
         var storage = Storage();
-        await AddStorageContent(product.Id, storage.Name, 5);
-        var query = Query(buyer.Id, storage.Name, product.Id, 5);
+        await AddStorageContent(
+            product.Id,
+            storage.Name,
+            5);
+        var query = Query(
+            buyer.Id,
+            storage.Name,
+            product.Id,
+            5);
 
         var result = await Mediator.Send(query);
 
@@ -49,13 +56,22 @@ public class GetProductsWithNotEnoughStockTests : IntegrationTest
         var buyer = Buyer();
         var product = Product();
         var storage = Storage();
-        await AddStorageContent(product.Id, storage.Name, 2);
-        var query = Query(buyer.Id, storage.Name, product.Id, 5);
+        await AddStorageContent(
+            product.Id,
+            storage.Name,
+            2);
+        var query = Query(
+            buyer.Id,
+            storage.Name,
+            product.Id,
+            5);
 
         var result = await Mediator.Send(query);
 
-        result.NotEnoughByStock.Should().ContainKey(product.Id)
-            .WhoseValue.Should().Be(3);
+        result.NotEnoughByStock.Should()
+            .ContainKey(product.Id)
+            .WhoseValue.Should()
+            .Be(3);
         result.NotEnoughByReservation.Should().BeEmpty();
     }
 
@@ -66,15 +82,28 @@ public class GetProductsWithNotEnoughStockTests : IntegrationTest
         var otherBuyer = OtherBuyer(buyer.Id);
         var product = Product();
         var storage = Storage();
-        await AddStorageContent(product.Id, storage.Name, 5);
-        await AddReservation(otherBuyer.Id, product.Id, reservedCount: 2, currentCount: 1);
-        var query = Query(buyer.Id, storage.Name, product.Id, 5);
+        await AddStorageContent(
+            product.Id,
+            storage.Name,
+            5);
+        await AddReservation(
+            otherBuyer.Id,
+            product.Id,
+            2,
+            1);
+        var query = Query(
+            buyer.Id,
+            storage.Name,
+            product.Id,
+            5);
 
         var result = await Mediator.Send(query);
 
         result.NotEnoughByStock.Should().BeEmpty();
-        result.NotEnoughByReservation.Should().ContainKey(product.Id)
-            .WhoseValue.Should().Be(1);
+        result.NotEnoughByReservation.Should()
+            .ContainKey(product.Id)
+            .WhoseValue.Should()
+            .Be(1);
     }
 
     [Fact]
@@ -84,10 +113,25 @@ public class GetProductsWithNotEnoughStockTests : IntegrationTest
         var otherBuyer = OtherBuyer(buyer.Id);
         var product = Product();
         var storage = Storage();
-        await AddStorageContent(product.Id, storage.Name, 5);
-        await AddReservation(otherBuyer.Id, product.Id, reservedCount: 3, currentCount: 2);
-        await AddReservation(buyer.Id, product.Id, reservedCount: 3, currentCount: 2);
-        var query = Query(buyer.Id, storage.Name, product.Id, 5);
+        await AddStorageContent(
+            product.Id,
+            storage.Name,
+            5);
+        await AddReservation(
+            otherBuyer.Id,
+            product.Id,
+            3,
+            2);
+        await AddReservation(
+            buyer.Id,
+            product.Id,
+            3,
+            2);
+        var query = Query(
+            buyer.Id,
+            storage.Name,
+            product.Id,
+            5);
 
         var result = await Mediator.Send(query);
 
@@ -102,14 +146,26 @@ public class GetProductsWithNotEnoughStockTests : IntegrationTest
         var product = Product();
         var storage = Storage();
         var otherStorage = OtherStorage(storage.Name);
-        await AddStorageContent(product.Id, storage.Name, 2);
-        await AddStorageContent(product.Id, otherStorage.Name, 4);
-        var query = Query(buyer.Id, storage.Name, product.Id, 5, takeFromOtherStorages: false);
+        await AddStorageContent(
+            product.Id,
+            storage.Name,
+            2);
+        await AddStorageContent(
+            product.Id,
+            otherStorage.Name,
+            4);
+        var query = Query(
+            buyer.Id,
+            storage.Name,
+            product.Id,
+            5);
 
         var result = await Mediator.Send(query);
 
-        result.NotEnoughByStock.Should().ContainKey(product.Id)
-            .WhoseValue.Should().Be(3);
+        result.NotEnoughByStock.Should()
+            .ContainKey(product.Id)
+            .WhoseValue.Should()
+            .Be(3);
         result.NotEnoughByReservation.Should().BeEmpty();
     }
 
@@ -120,9 +176,20 @@ public class GetProductsWithNotEnoughStockTests : IntegrationTest
         var product = Product();
         var storage = Storage();
         var otherStorage = OtherStorage(storage.Name);
-        await AddStorageContent(product.Id, storage.Name, 2);
-        await AddStorageContent(product.Id, otherStorage.Name, 4);
-        var query = Query(buyer.Id, storage.Name, product.Id, 5, takeFromOtherStorages: true);
+        await AddStorageContent(
+            product.Id,
+            storage.Name,
+            2);
+        await AddStorageContent(
+            product.Id,
+            otherStorage.Name,
+            4);
+        var query = Query(
+            buyer.Id,
+            storage.Name,
+            product.Id,
+            5,
+            true);
 
         var result = await Mediator.Send(query);
 
@@ -137,12 +204,27 @@ public class GetProductsWithNotEnoughStockTests : IntegrationTest
         var otherBuyer = OtherBuyer(buyer.Id);
         var product = Product();
         var storage = Storage();
-        await AddStorageContent(product.Id, storage.Name, 5);
-        await AddReservation(otherBuyer.Id, product.Id, reservedCount: 2, currentCount: 2);
-        var canceled = await AddReservation(otherBuyer.Id, product.Id, reservedCount: 3, currentCount: 1);
+        await AddStorageContent(
+            product.Id,
+            storage.Name,
+            5);
+        await AddReservation(
+            otherBuyer.Id,
+            product.Id,
+            2,
+            2);
+        var canceled = await AddReservation(
+            otherBuyer.Id,
+            product.Id,
+            3,
+            1);
         canceled.Cancel();
         await Context.SaveChangesAsync();
-        var query = Query(buyer.Id, storage.Name, product.Id, 5);
+        var query = Query(
+            buyer.Id,
+            storage.Name,
+            product.Id,
+            5);
 
         var result = await Mediator.Send(query);
 
@@ -155,7 +237,11 @@ public class GetProductsWithNotEnoughStockTests : IntegrationTest
     {
         var product = Product();
         var storage = Storage();
-        var query = Query(Guid.Empty, storage.Name, product.Id, 1);
+        var query = Query(
+            Guid.Empty,
+            storage.Name,
+            product.Id,
+            1);
 
         await Assert.ThrowsAsync<ValidationException>(() => Mediator.Send(query));
     }
@@ -163,7 +249,11 @@ public class GetProductsWithNotEnoughStockTests : IntegrationTest
     [Fact]
     public async Task WithEmptyStorageName_ThrowsValidationException()
     {
-        var query = Query(Buyer().Id, "", Product().Id, 1);
+        var query = Query(
+            Buyer().Id,
+            "",
+            Product().Id,
+            1);
 
         await Assert.ThrowsAsync<ValidationException>(() => Mediator.Send(query));
     }
@@ -173,7 +263,11 @@ public class GetProductsWithNotEnoughStockTests : IntegrationTest
     [InlineData(-1)]
     public async Task WithInvalidNeededCount_ThrowsValidationException(int neededCount)
     {
-        var query = Query(Buyer().Id, Storage().Name, Product().Id, neededCount);
+        var query = Query(
+            Buyer().Id,
+            Storage().Name,
+            Product().Id,
+            neededCount);
 
         await Assert.ThrowsAsync<ValidationException>(() => Mediator.Send(query));
     }
@@ -181,7 +275,11 @@ public class GetProductsWithNotEnoughStockTests : IntegrationTest
     [Fact]
     public async Task WithMissingStorage_ThrowsDbValidationException()
     {
-        var query = Query(Buyer().Id, "missing-storage", Product().Id, 1);
+        var query = Query(
+            Buyer().Id,
+            "missing-storage",
+            Product().Id,
+            1);
 
         await Assert.ThrowsAsync<DbValidationException>(() => Mediator.Send(query));
     }
@@ -189,7 +287,11 @@ public class GetProductsWithNotEnoughStockTests : IntegrationTest
     [Fact]
     public async Task WithMissingProduct_ThrowsDbValidationException()
     {
-        var query = Query(Buyer().Id, Storage().Name, 999999, 1);
+        var query = Query(
+            Buyer().Id,
+            Storage().Name,
+            999999,
+            1);
 
         await Assert.ThrowsAsync<DbValidationException>(() => Mediator.Send(query));
     }
@@ -211,7 +313,10 @@ public class GetProductsWithNotEnoughStockTests : IntegrationTest
             });
     }
 
-    private async Task AddStorageContent(int productId, string storageName, int count)
+    private async Task AddStorageContent(
+        int productId,
+        string storageName,
+        int count)
     {
         await new StorageContentBuilder(Faker)
             .WithProductIds(productId)
@@ -235,16 +340,16 @@ public class GetProductsWithNotEnoughStockTests : IntegrationTest
             .BuildAndAddToDb(Context);
     }
 
-    private User Buyer() => UsersContext.Users.First();
+    private User Buyer() { return UsersContext.Users.First(); }
 
-    private User OtherBuyer(Guid buyerId)
-        => UsersContext.Users.First(x => x.Id != buyerId);
+    private User OtherBuyer(Guid buyerId) { return UsersContext.Users.First(x => x.Id != buyerId); }
 
-    private Product Product() => ProductContext.Products[0];
+    private Product Product() { return ProductContext.Products[0]; }
 
-    private Storage Storage()
-        => StorageContext.Storages.First(x => x.Type == StorageType.Warehouse);
+    private Storage Storage() { return StorageContext.Storages.First(x => x.Type == StorageType.Warehouse); }
 
     private Storage OtherStorage(string storageName)
-        => StorageContext.Storages.First(x => x.Name != storageName);
+    {
+        return StorageContext.Storages.First(x => x.Name != storageName);
+    }
 }

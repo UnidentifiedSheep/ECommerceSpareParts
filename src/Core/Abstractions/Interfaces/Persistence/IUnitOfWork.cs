@@ -23,6 +23,8 @@ public interface IUnitOfWork
 
     Task AddRangeAsync<T>(IEnumerable<T> entities, CancellationToken cancellationToken = default)
         where T : class;
+    
+    Task ReloadAsync<T>(T entity, CancellationToken cancellationToken = default) where T : class;
 
     void Remove<T>(T entity);
     void RemoveRange<T>(IEnumerable<T> entities) where T : class;

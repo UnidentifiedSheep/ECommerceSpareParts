@@ -8,5 +8,8 @@ public class CannotDeleteProducerWithArticlesException()
 public class ProducerNotFoundException(int id)
     : LocalizedNotFoundException("producer.not.found", new { Id = id });
 
-public class ProducersOtherNameNotFoundException(string name)
-    : LocalizedNotFoundException("producer.additional.name.not.found", new { Name = name }, [name]);
+public class ProducersAliasNotFoundException(string name)
+    : LocalizedNotFoundException(
+        "producer.additional.name.not.found",
+        new { Name = name },
+        [name]);

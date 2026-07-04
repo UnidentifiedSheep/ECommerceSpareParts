@@ -13,9 +13,13 @@ public class UserRoleConfiguration : IEntityTypeConfiguration<UserRole>
         builder.HasIndex(e => e.RoleName).HasDatabaseName("IX_user_roles_role_id");
         builder.Property(e => e.UserId).HasColumnName("user_id");
         builder.Property(e => e.RoleName).HasColumnName("role_name");
-        builder.HasOne<Role>(x => x.Role).WithMany().HasForeignKey(d => d.RoleName)
+        builder.HasOne<Role>(x => x.Role)
+            .WithMany()
+            .HasForeignKey(d => d.RoleName)
             .HasConstraintName("user_roles_roles_name_fk");
-        builder.HasOne<Entities.User.User>().WithMany(p => p.Roles).HasForeignKey(d => d.UserId)
+        builder.HasOne<Entities.User.User>()
+            .WithMany(p => p.Roles)
+            .HasForeignKey(d => d.UserId)
             .HasConstraintName("user_roles_users_id_fk");
     }
 }

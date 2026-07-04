@@ -1,4 +1,4 @@
-﻿using Test.Common.TestContainers.Combined;
+﻿using Tests.TestContainers.Combined;
 
 namespace Tests;
 

@@ -1,5 +1,4 @@
 using Abstractions.Interfaces.Persistence;
-using Abstractions.Interfaces.Services;
 using Application.Common.Interfaces.Cqrs;
 using Attributes;
 using Main.Application.Dtos.Product;
@@ -22,7 +21,11 @@ public class AddCharacteristicsHandler(IUnitOfWork unitOfWork)
     {
         var toAdd = new List<ProductCharacteristic>();
         foreach (var @new in request.Characteristics)
-            toAdd.Add(ProductCharacteristic.Create(@new.ProductId, @new.Name, @new.Value));
+            toAdd.Add(
+                ProductCharacteristic.Create(
+                    @new.ProductId,
+                    @new.Name,
+                    @new.Value));
 
         await unitOfWork.AddRangeAsync(toAdd, cancellationToken);
         return Unit.Value;

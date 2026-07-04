@@ -1,6 +1,7 @@
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using Attributes.JsonAttributes;
+using CsvHelper.Configuration.Attributes;
 using Enums;
 using FluentAssertions;
 using Localization.Domain;
@@ -48,10 +49,11 @@ public class ScopedLocalizedJsonSerializerTests
         field.GetProperty("description").GetString().Should().Be("CSV file with producers");
         field.GetProperty("required").GetBoolean().Should().BeTrue();
         field.GetProperty("control").GetString().Should().Be(nameof(InputControlType.UploadFile));
-        field.GetProperty("accepts").EnumerateArray()
+        field.GetProperty("accepts")
+            .EnumerateArray()
             .Select(x => x.GetString())
             .Should()
-            .BeEquivalentTo([".csv"]);
+            .BeEquivalentTo(".csv");
         field.GetProperty("dependsOnEntity").GetString().Should().Be(nameof(TestEntity));
         field.TryGetProperty("dependsOnField", out _).Should().BeFalse();
     }
@@ -91,12 +93,16 @@ public class ScopedLocalizedJsonSerializerTests
         var sku = csvSchema.Single(x => x.GetProperty("propertyName").GetString() == nameof(TestCsvRow.Sku));
         sku.GetProperty("type").GetString().Should().Be("string");
         sku.GetProperty("required").GetBoolean().Should().BeTrue();
-        sku.GetProperty("names").EnumerateArray()
+        sku.GetProperty("names")
+            .EnumerateArray()
             .Select(x => x.GetString())
             .Should()
-            .BeEquivalentTo(["Sku", "Article"]);
+            .BeEquivalentTo(
+                "Sku",
+                "Article");
 
-        var description = csvSchema.Single(x => x.GetProperty("propertyName").GetString() == nameof(TestCsvRow.Description));
+        var description = csvSchema.Single(x =>
+            x.GetProperty("propertyName").GetString() == nameof(TestCsvRow.Description));
         description.GetProperty("required").GetBoolean().Should().BeFalse();
         description.GetProperty("label").GetString().Should().Be("Description");
         description.GetProperty("description").GetString().Should().Be("CSV row description");
@@ -122,13 +128,14 @@ public class ScopedLocalizedJsonSerializerTests
     private static ScopedLocalizedJsonSerializer CreateSerializer()
     {
         var container = new LocalizerContainer("en");
-        container.Initialize(new Dictionary<string, string>
-        {
-            ["file_name"] = "File",
-            ["file_name_description"] = "CSV file with producers",
-            ["csv_description_name"] = "Description",
-            ["csv_description_description"] = "CSV row description"
-        });
+        container.Initialize(
+            new Dictionary<string, string>
+            {
+                ["file_name"] = "File",
+                ["file_name_description"] = "CSV file with producers",
+                ["csv_description_name"] = "Description",
+                ["csv_description_description"] = "CSV row description"
+            });
 
         var baseLocalizer = new StringLocalizer([container]);
         var scopedLocalizer = new ScopedStringLocalizer(baseLocalizer);
@@ -170,11 +177,11 @@ public class ScopedLocalizedJsonSerializerTests
 
     private record TestCsvRow
     {
-        [CsvHelper.Configuration.Attributes.Name("Sku", "Article")]
+        [Name("Sku", "Article")]
         public required string Sku { get; init; }
 
-        [CsvHelper.Configuration.Attributes.Name("Description")]
-        [CsvHelper.Configuration.Attributes.Optional]
+        [Name("Description")]
+        [Optional]
         [LocalizedJsonFieldName("csv_description_name")]
         [LocalizedJsonFieldDescription("csv_description_description")]
         public string? Description { get; init; }

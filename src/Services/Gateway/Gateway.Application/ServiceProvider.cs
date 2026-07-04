@@ -17,19 +17,17 @@ public static class ServiceProvider
             .WithRegisteredDistributedCache()
             .WithRegisteredBackplane()
             .WithSystemTextJsonSerializer();
-        
+
         services
             .AddApplicationBase(
-                serviceDefinition: ServicesDefinitions.Gateway,
-                configuration: configuration,
-                assembly: typeof(ServiceProvider).Assembly,
-                behaviorsToExclude:
-                [
-                    typeof(TransactionBehavior<,>),
-                    typeof(SaveChangesBehavior<,>),
-                    typeof(IntegrationEventPublisherBehavior<,>),
-                    typeof(DbValidationBehavior<,>)
-                ]);
+                ServicesDefinitions.Gateway,
+                configuration,
+                typeof(ServiceProvider).Assembly,
+                typeof(TransactionBehavior<,>),
+                typeof(SaveChangesBehavior<,>),
+                typeof(EventSideEffectsSaveChangesBehavior<,>),
+                typeof(IntegrationEventPublisherBehavior<,>),
+                typeof(DbValidationBehavior<,>));
 
         return services;
     }

@@ -13,11 +13,13 @@ public record CreateSystemTransactionCommand(
     int CurrencyId,
     DateTime TransactionDateTime,
     SystemTransactionDirection Direction,
-    bool ForcePayment = false) : ICommand<CreateTransactionResult>;
+    bool ForcePayment = false
+) : ICommand<CreateTransactionResult>;
 
 public class CreateSystemTransactionHandler(
     ISender sender,
-    IOptions<SystemOptions> systemOptions) : ICommandHandler<CreateSystemTransactionCommand, CreateTransactionResult>
+    IOptions<SystemOptions> systemOptions
+) : ICommandHandler<CreateSystemTransactionCommand, CreateTransactionResult>
 {
     public async Task<CreateTransactionResult> Handle(
         CreateSystemTransactionCommand request,

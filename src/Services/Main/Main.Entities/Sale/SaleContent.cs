@@ -9,9 +9,7 @@ public class SaleContent : Entity<SaleContent, int>, ILinqEntity<SaleContent, in
 {
     private readonly List<SaleContentDetail> _details = [];
 
-    private SaleContent()
-    {
-    }
+    private SaleContent() { }
 
     private SaleContent(
         int productId,
@@ -20,7 +18,10 @@ public class SaleContent : Entity<SaleContent, int>, ILinqEntity<SaleContent, in
         IEnumerable<SaleContentDetail> details)
     {
         ProductId = productId;
-        SetPriceAndDetails(priceWithOutDiscount, priceWithDiscount, details);
+        SetPriceAndDetails(
+            priceWithOutDiscount,
+            priceWithDiscount,
+            details);
     }
 
     public int Id { get; private set; }
@@ -42,10 +43,7 @@ public class SaleContent : Entity<SaleContent, int>, ILinqEntity<SaleContent, in
     public Product.Product Product { get; private set; } = null!;
     public IReadOnlyList<SaleContentDetail> Details => _details;
 
-    public static Expression<Func<SaleContent, int>> GetKeySelector()
-    {
-        return x => x.Id;
-    }
+    public static Expression<Func<SaleContent, int>> GetKeySelector() { return x => x.Id; }
 
     public static Expression<Func<SaleContent, bool>> GetEqualityExpression(int key)
     {
@@ -58,13 +56,14 @@ public class SaleContent : Entity<SaleContent, int>, ILinqEntity<SaleContent, in
         decimal priceWithDiscount,
         IEnumerable<SaleContentDetail> details)
     {
-        return new SaleContent(productId, priceWithOutDiscount, priceWithDiscount, details);
+        return new SaleContent(
+            productId,
+            priceWithOutDiscount,
+            priceWithDiscount,
+            details);
     }
 
-    private void SetCount(int count)
-    {
-        Count = count.AgainstLessOrEqual(0, "sale.content.count.min");
-    }
+    private void SetCount(int count) { Count = count.AgainstLessOrEqual(0, "sale.content.count.min"); }
 
     public void SetPriceAndDetails(
         decimal withOutDiscount,
@@ -91,7 +90,7 @@ public class SaleContent : Entity<SaleContent, int>, ILinqEntity<SaleContent, in
         var detailsCount = list.Sum(detail => detail.Count);
 
         SetCount(detailsCount);
-        
+
         _details.Clear();
         _details.AddRange(list);
     }
@@ -99,12 +98,10 @@ public class SaleContent : Entity<SaleContent, int>, ILinqEntity<SaleContent, in
     public void SetComment(string? comment)
     {
         Comment = comment
-            .NullIfWhiteSpace()?
+            .NullIfWhiteSpace()
+            ?
             .AgainstTooLong(256, "sale.content.comment.max");
     }
 
-    public override int GetId()
-    {
-        return Id;
-    }
+    public override int GetId() { return Id; }
 }

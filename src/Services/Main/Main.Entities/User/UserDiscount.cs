@@ -7,9 +7,7 @@ namespace Main.Entities.User;
 
 public class UserDiscount : Entity<UserDiscount, Guid>, ILinqEntity<UserDiscount, Guid>
 {
-    private UserDiscount()
-    {
-    }
+    private UserDiscount() { }
 
     private UserDiscount(Guid userId, decimal discount)
     {
@@ -21,10 +19,7 @@ public class UserDiscount : Entity<UserDiscount, Guid>, ILinqEntity<UserDiscount
 
     public decimal Discount { get; set; }
 
-    public static Expression<Func<UserDiscount, Guid>> GetKeySelector()
-    {
-        return x => x.UserId;
-    }
+    public static Expression<Func<UserDiscount, Guid>> GetKeySelector() { return x => x.UserId; }
 
     public static Expression<Func<UserDiscount, bool>> GetEqualityExpression(Guid key)
     {
@@ -38,11 +33,11 @@ public class UserDiscount : Entity<UserDiscount, Guid>, ILinqEntity<UserDiscount
 
     internal void SetDiscount(decimal discount)
     {
-        Discount = discount.AgainstOutOfRange(0m, 0.99m, "user.discount.range");
+        Discount = discount.AgainstOutOfRange(
+            0m,
+            0.99m,
+            "user.discount.range");
     }
 
-    public override Guid GetId()
-    {
-        return UserId;
-    }
+    public override Guid GetId() { return UserId; }
 }

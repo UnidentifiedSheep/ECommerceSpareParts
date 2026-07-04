@@ -9,5 +9,5 @@ public enum TransactionStatus
     Reversed = 1 << 2,
     ReversedApplied = 1 << 3,
     CompletionProfileApplied = 1 << 4,
-    ReversalProfileApplied = 1 << 5,
+    ReversalProfileApplied = 1 << 5
 }

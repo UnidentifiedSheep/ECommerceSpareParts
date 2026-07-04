@@ -22,19 +22,31 @@ public class TransactionConfiguration : IEntityTypeConfiguration<Transaction>
 
         builder.HasIndex(e => new { e.SenderId, e.ReceiverId }, "transactions_sender_id_receiver_id_index");
 
-        builder.HasIndex(e => new { e.SenderId, e.TransactionDatetime, e.Id },
+        builder.HasIndex(
+                e => new { e.SenderId, e.TransactionDatetime, e.Id },
                 "transactions_sender_id_transaction_datetime_id_idx")
-            .IsDescending(false, true, true);
+            .IsDescending(
+                false,
+                true,
+                true);
 
-        builder.HasIndex(e => new { e.ReceiverId, e.TransactionDatetime, e.Id },
+        builder.HasIndex(
+                e => new { e.ReceiverId, e.TransactionDatetime, e.Id },
                 "transactions_receiver_id_transaction_datetime_id_idx")
-            .IsDescending(false, true, true);
+            .IsDescending(
+                false,
+                true,
+                true);
 
         builder.HasIndex(e => e.Type, "transactions_type_index");
 
-        builder.HasIndex(e => new { e.TransactionDatetime, e.Id }, "transactions_transaction_datetime_id_index");
+        builder.HasIndex(
+            e => new { e.TransactionDatetime, e.Id },
+            "transactions_transaction_datetime_id_index");
 
-        builder.HasIndex(e => e.TransactionDatetime, "transactions_transaction_datetime_sender_id_receiver_id_idx")
+        builder.HasIndex(
+                e => e.TransactionDatetime,
+                "transactions_transaction_datetime_sender_id_receiver_id_idx")
             .IsDescending();
 
         builder.Property(e => e.Id)
@@ -47,7 +59,7 @@ public class TransactionConfiguration : IEntityTypeConfiguration<Transaction>
 
         builder.Property(e => e.ReversedAt)
             .HasColumnName("reversed_at");
-        
+
         builder.Property(e => e.SourceType)
             .HasColumnName("source_type");
 

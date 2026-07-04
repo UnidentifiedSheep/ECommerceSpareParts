@@ -11,6 +11,6 @@ public class GetProductSizeCachePolicy : ICachePolicy<GetProductSizeQuery>
     }
 
     public TimeSpan TimeToLive => CacheKeys.ProductCache.Ttl;
-    public IReadOnlyCollection<string> Tags => ["product"];
+    public IReadOnlyCollection<string>? Tags => null;
     public string? BaseTag => null;
 }

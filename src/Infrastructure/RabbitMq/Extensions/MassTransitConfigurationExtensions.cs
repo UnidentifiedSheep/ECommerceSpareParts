@@ -15,21 +15,17 @@ public static class MassTransitConfigurationExtensions
         IBusRegistrationContext ctx)
     {
         var options = ctx.GetRequiredService<IOptions<MessageBrokerOptions>>().Value;
-        cfg.Host(options.Url, h =>
-        {
-            h.Username(options.Username);
-            h.Password(options.Password);
-        });
+        cfg.Host(
+            options.Url,
+            h =>
+            {
+                h.Username(options.Username);
+                h.Password(options.Password);
+            });
 
         cfg.UseMessageRetry(r => r.Interval(3, TimeSpan.FromSeconds(5)));
-        cfg.Publish<JobStatusUpdatedEvent>(p =>
-        {
-            p.ExchangeType = ExchangeType.Direct;
-        });
-        cfg.Publish<SettingUpdatedEvent>(p =>
-        {
-            p.ExchangeType = ExchangeType.Direct;
-        });
+        cfg.Publish<JobStatusUpdatedEvent>(p => { p.ExchangeType = ExchangeType.Direct; });
+        cfg.Publish<SettingUpdatedEvent>(p => { p.ExchangeType = ExchangeType.Direct; });
     }
 
     public static IRabbitMqReceiveEndpointConfigurator BindForService<TEvent>(
@@ -42,7 +38,7 @@ public static class MassTransitConfigurationExtensions
             bind.ExchangeType = exchangeType;
             bind.RoutingKey = serviceDefinition.ServiceName;
         });
-        
+
         return ep;
     }
 }

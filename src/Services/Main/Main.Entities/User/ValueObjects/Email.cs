@@ -5,9 +5,7 @@ namespace Main.Entities.User.ValueObjects;
 
 public record Email
 {
-    private Email()
-    {
-    }
+    private Email() { }
 
     public Email(string value)
     {
@@ -17,10 +15,7 @@ public record Email
 
     public string Value { get; } = null!;
 
-    public static string ToNormalized(string source)
-    {
-        return source.Trim().ToLowerInvariant();
-    }
+    public static string ToNormalized(string source) { return source.Trim().ToLowerInvariant(); }
 
     private static bool IsValid(string email)
     {
@@ -29,19 +24,10 @@ public record Email
             var addr = new MailAddress(email);
             return addr.Address == email;
         }
-        catch
-        {
-            return false;
-        }
+        catch { return false; }
     }
 
-    public static implicit operator Email(string value)
-    {
-        return new Email(value);
-    }
+    public static implicit operator Email(string value) { return new Email(value); }
 
-    public static implicit operator string(Email email)
-    {
-        return email.Value;
-    }
+    public static implicit operator string(Email email) { return email.Value; }
 }

@@ -12,8 +12,7 @@ public class TransactionDefaultSettings
 
     public TransactionDefaultSettings SetRetries(int count)
     {
-        if (count < 0)
-            throw new ArgumentOutOfRangeException(nameof(count), "Must be non-negative");
+        if (count < 0) throw new ArgumentOutOfRangeException(nameof(count), "Must be non-negative");
         RetriesCount = count;
         return this;
     }

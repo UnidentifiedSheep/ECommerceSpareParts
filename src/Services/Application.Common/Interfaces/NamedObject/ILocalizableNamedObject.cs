@@ -1,6 +1,4 @@
-﻿using Localization.Abstractions.Interfaces;
-
-namespace Application.Common.Interfaces.NamedObject;
+﻿namespace Application.Common.Interfaces.NamedObject;
 
 public interface ILocalizableNamedObject : INamedObject
 {

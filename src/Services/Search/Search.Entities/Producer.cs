@@ -8,5 +8,5 @@ public class Producer
 
     public string? Description { get; init; }
 
-    public List<ProducerOtherName> OtherNames { get; init; } = [];
+    public List<ProducerAlias> Aliases { get; init; } = [];
 }

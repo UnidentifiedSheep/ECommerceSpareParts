@@ -1,6 +1,5 @@
 using Exceptions;
 using FluentAssertions;
-using Main.Entities.User;
 using Main.Enums;
 
 namespace Tests.Domain.User;
@@ -12,7 +11,11 @@ public class UserPhoneAggregateTests
     {
         var user = Main.Entities.User.User.Create("test-user", "hash");
 
-        user.AddUserPhone("+1 555 123 4567", PhoneType.Mobile, true, true);
+        user.AddUserPhone(
+            "+1 555 123 4567",
+            PhoneType.Mobile,
+            true,
+            true);
 
         user.Phones.Should().ContainSingle();
         var phone = user.Phones.Single();
@@ -25,9 +28,17 @@ public class UserPhoneAggregateTests
     public void AddUserPhone_DuplicateNormalizedPhone_Throws()
     {
         var user = Main.Entities.User.User.Create("test-user", "hash");
-        user.AddUserPhone("+1 555 123 4567", PhoneType.Mobile, false, false);
+        user.AddUserPhone(
+            "+1 555 123 4567",
+            PhoneType.Mobile,
+            false,
+            false);
 
-        var act = () => user.AddUserPhone("1-555-123-4567", PhoneType.Work, false, false);
+        var act = () => user.AddUserPhone(
+            "1-555-123-4567",
+            PhoneType.Work,
+            false,
+            false);
 
         act.Should().Throw<InvalidInputException>();
         user.Phones.Should().ContainSingle();
@@ -37,9 +48,17 @@ public class UserPhoneAggregateTests
     public void AddUserPhone_SecondPrimaryPhone_Throws()
     {
         var user = Main.Entities.User.User.Create("test-user", "hash");
-        user.AddUserPhone("+1 555 123 4567", PhoneType.Mobile, true, false);
+        user.AddUserPhone(
+            "+1 555 123 4567",
+            PhoneType.Mobile,
+            true,
+            false);
 
-        var act = () => user.AddUserPhone("+1 555 765 4321", PhoneType.Work, true, false);
+        var act = () => user.AddUserPhone(
+            "+1 555 765 4321",
+            PhoneType.Work,
+            true,
+            false);
 
         act.Should().Throw<InvalidInputException>();
         user.Phones.Should().ContainSingle();
@@ -49,7 +68,11 @@ public class UserPhoneAggregateTests
     public void RemoveUserPhone_RemovesByNormalizedPhone()
     {
         var user = Main.Entities.User.User.Create("test-user", "hash");
-        user.AddUserPhone("+1 555 123 4567", PhoneType.Mobile, false, false);
+        user.AddUserPhone(
+            "+1 555 123 4567",
+            PhoneType.Mobile,
+            false,
+            false);
 
         user.RemoveUserPhone("1-555-123-4567");
 

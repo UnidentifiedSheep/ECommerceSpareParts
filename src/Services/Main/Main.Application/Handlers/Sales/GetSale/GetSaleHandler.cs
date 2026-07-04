@@ -13,12 +13,14 @@ namespace Main.Application.Handlers.Sales.GetSale;
 [Diagnostics(maxExecutionTimeMs: 30)]
 public record GetSaleQuery(
     Guid? SaleId,
-    Guid? TransactionId) : IQuery<GetSaleResult>;
+    Guid? TransactionId
+) : IQuery<GetSaleResult>;
 
 public record GetSaleResult(SaleDto Sale);
 
 public class GetSaleHandler(
-    IReadRepository<Sale, Guid> repository)
+    IReadRepository<Sale, Guid> repository
+)
     : IQueryHandler<GetSaleQuery, GetSaleResult>
 {
     public async Task<GetSaleResult> Handle(

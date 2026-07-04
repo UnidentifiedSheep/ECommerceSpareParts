@@ -2,11 +2,12 @@
 
 public class MarkupRange
 {
-    private MarkupRange()
-    {
-    }
+    private MarkupRange() { }
 
-    private MarkupRange(decimal rangeStart, decimal rangeEnd, decimal markup)
+    private MarkupRange(
+        decimal rangeStart,
+        decimal rangeEnd,
+        decimal markup)
     {
         RangeStart = rangeStart;
         RangeEnd = rangeEnd;
@@ -25,8 +26,14 @@ public class MarkupRange
 
     public MarkupGroup Group { get; private set; } = null!;
 
-    public static MarkupRange Create(decimal rangeStart, decimal rangeEnd, decimal markup)
+    public static MarkupRange Create(
+        decimal rangeStart,
+        decimal rangeEnd,
+        decimal markup)
     {
-        return new MarkupRange(rangeStart, rangeEnd, markup);
+        return new MarkupRange(
+            rangeStart,
+            rangeEnd,
+            markup);
     }
 }

@@ -1,11 +1,10 @@
 using System.Data;
 using Abstractions.Interfaces.Persistence;
-using Abstractions.Interfaces.Services;
 using Abstractions.Models.Options;
 using Application.Common.Extensions;
-using Application.Common.Interfaces;
 using Application.Common.Interfaces.Cqrs;
 using Application.Common.Interfaces.Currency;
+using Application.Common.Interfaces.Events;
 using Application.Common.Interfaces.Repositories;
 using Attributes;
 using Contracts.Purchase;
@@ -31,7 +30,10 @@ using Microsoft.Extensions.Options;
 namespace Main.Application.Handlers.Purchases.EditPurchase;
 
 [AutoSave]
-[Transactional(IsolationLevel.ReadCommitted, 20, 2)]
+[Transactional(
+    IsolationLevel.ReadCommitted,
+    20,
+    2)]
 public record EditPurchaseCommand(
     IEnumerable<EditPurchaseDto> Content,
     Guid PurchaseId,
@@ -39,7 +41,8 @@ public record EditPurchaseCommand(
     string? Comment,
     DateTime PurchaseDateTime,
     bool WithLogistics,
-    string? StorageFrom) : ICommand;
+    string? StorageFrom
+) : ICommand;
 
 public class EditPurchaseHandler(
     ISender sender,
@@ -50,7 +53,8 @@ public class EditPurchaseHandler(
     ICurrencyConverter currencyConverter,
     IPurchaseLogisticsService purchaseLogisticsService,
     IIntegrationEventScope integrationEventScope,
-    IUnitOfWork unitOfWork) : ICommandHandler<EditPurchaseCommand>
+    IUnitOfWork unitOfWork
+) : ICommandHandler<EditPurchaseCommand>
 {
     public async Task<Unit> Handle(EditPurchaseCommand request, CancellationToken cancellationToken)
     {
@@ -58,7 +62,10 @@ public class EditPurchaseHandler(
         var purchase = await GetPurchase(purchaseId, cancellationToken);
         var contentDtos = request.Content.ToList();
 
-        await EnsureStorageOwner(purchase, request, cancellationToken);
+        await EnsureStorageOwner(
+            purchase,
+            request,
+            cancellationToken);
         await ReversePurchaseTransactions(purchase, cancellationToken);
 
         var totalSum = contentDtos.Sum(x => x.Price * x.Count);
@@ -75,21 +82,27 @@ public class EditPurchaseHandler(
         purchase.SetPurchaseDate(request.PurchaseDateTime);
         purchase.SetComment(request.Comment);
 
-        await UpdateContents(purchase, contentDtos, request, cancellationToken);
-        await UpdateLogistics(purchase, contentDtos, request, cancellationToken);
+        await UpdateContents(
+            purchase,
+            contentDtos,
+            request,
+            cancellationToken);
+        await UpdateLogistics(
+            purchase,
+            contentDtos,
+            request,
+            cancellationToken);
 
-        integrationEventScope.Add(new PurchaseUpdateEvent
-        {
-            PurchaseId = purchase.Id 
-        });
-        
+        integrationEventScope.Add(
+            new PurchaseUpdateEvent
+            {
+                PurchaseId = purchase.Id
+            });
+
         return Unit.Value;
     }
 
-    private Guid GetSystemUserId()
-    {
-        return systemOptions.Value.SystemId;
-    }
+    private Guid GetSystemUserId() { return systemOptions.Value.SystemId; }
 
     private Task<Purchase> GetPurchase(Guid purchaseId, CancellationToken cancellationToken)
     {
@@ -122,7 +135,7 @@ public class EditPurchaseHandler(
         await sender.Send(
             new ReverseTransactionCommand(
                 purchase.TransactionId,
-                TransactionReversalMode.System, 
+                TransactionReversalMode.System,
                 true),
             cancellationToken);
 
@@ -130,7 +143,7 @@ public class EditPurchaseHandler(
             await sender.Send(
                 new ReverseTransactionCommand(
                     logisticsTransactionId,
-                    TransactionReversalMode.System, 
+                    TransactionReversalMode.System,
                     true),
                 cancellationToken);
     }
@@ -189,7 +202,10 @@ public class EditPurchaseHandler(
         var contentToAdd = new List<EditPurchaseDto>();
 
         foreach (var removed in purchase.Contents.Where(x => !requestedIds.Contains(x.Id)).ToList())
-            RemoveContent(purchase, removed, deletionSubtractions);
+            RemoveContent(
+                purchase,
+                removed,
+                deletionSubtractions);
 
         foreach (var dto in contentDtos)
         {
@@ -214,7 +230,7 @@ public class EditPurchaseHandler(
                 purchase,
                 contentToAdd,
                 cancellationToken);
-        
+
 
         if (deletionSubtractions.Count > 0)
             await sender.Send(
@@ -243,12 +259,12 @@ public class EditPurchaseHandler(
         PurchaseContent content,
         ICollection<SubtractStorageContentItem> subtractions)
     {
-        if (content.PurchaseContentLogistic is { } logistic)
-            unitOfWork.Remove(logistic);
+        if (content.PurchaseContentLogistic is { } logistic) unitOfWork.Remove(logistic);
 
-        subtractions.Add(new SubtractStorageContentItem(
-            content.StorageContentId,
-            content.Count));
+        subtractions.Add(
+            new SubtractStorageContentItem(
+                content.StorageContentId,
+                content.Count));
 
         purchase.RemoveContent(content);
         unitOfWork.Remove(content);
@@ -262,21 +278,23 @@ public class EditPurchaseHandler(
         var result = await sender.Send(
             new AddContentCommand(
                 newContents.Select(x => new NewStorageContentDto
-                {
-                    BuyPrice = x.Price,
-                    Count = x.Count,
-                    CurrencyId = purchase.CurrencyId,
-                    ProductId = x.ProductId,
-                    PurchaseDate = purchase.PurchaseDatetime
-                }).ToList(),
+                    {
+                        BuyPrice = x.Price,
+                        Count = x.Count,
+                        CurrencyId = purchase.CurrencyId,
+                        ProductId = x.ProductId,
+                        PurchaseDate = purchase.PurchaseDatetime
+                    })
+                    .ToList(),
                 purchase.Storage,
                 StorageMovementType.PurchaseEditing),
             cancellationToken);
 
         if (result.StorageContents.Count != newContents.Count)
-            throw new InvalidOperationException("AddContentCommand returned unexpected number of storage contents.");
-        
-        for (int i = 0; i < result.StorageContents.Count; i++)
+            throw new InvalidOperationException(
+                "AddContentCommand returned unexpected number of storage contents.");
+
+        for (var i = 0; i < result.StorageContents.Count; i++)
         {
             var storageContent = result.StorageContents[i];
             var newContent = newContents[i];
@@ -284,14 +302,15 @@ public class EditPurchaseHandler(
             if (storageContent.ProductId != newContent.ProductId ||
                 storageContent.Count != newContent.Count)
                 throw new InvalidOperationException("Unexpected storage content when updating purchase.");
-                
-            
-            purchase.AddContent(PurchaseContent.Create(
-                storageContent.ProductId,
-                storageContent.Count,
-                storageContent.BuyPrice,
-                storageContent.Id,
-                newContent.Comment));
+
+
+            purchase.AddContent(
+                PurchaseContent.Create(
+                    storageContent.ProductId,
+                    storageContent.Count,
+                    storageContent.BuyPrice,
+                    storageContent.Id,
+                    newContent.Comment));
         }
     }
 
@@ -304,8 +323,7 @@ public class EditPurchaseHandler(
         List<SubtractStorageContentItem> subtractions,
         CancellationToken cancellationToken)
     {
-        if (content.ProductId != dto.ProductId)
-            throw new ArticleDoesntMatchContentException(content.Id);
+        if (content.ProductId != dto.ProductId) throw new ArticleDoesntMatchContentException(content.Id);
 
         if (!storageContents.TryGetValue(content.StorageContentId, out var storageContent))
             throw new StorageContentNotFoundException(content.StorageContentId);
@@ -313,25 +331,25 @@ public class EditPurchaseHandler(
         var lotIsUntouched = storageContent.Count == content.Count;
         var countDelta = dto.Count - content.Count;
         if (countDelta < 0)
-        {
-            subtractions.Add(new SubtractStorageContentItem(
-                content.StorageContentId,
-                -countDelta));
-        }
+            subtractions.Add(
+                new SubtractStorageContentItem(
+                    content.StorageContentId,
+                    -countDelta));
         else if (countDelta > 0)
-            restorations.Add(new RestoreContentItem(
-                content.StorageContentId,
-                content.ProductId,
-                request.CurrencyId,
-                dto.Price,
-                countDelta));
+            restorations.Add(
+                new RestoreContentItem(
+                    content.StorageContentId,
+                    content.ProductId,
+                    request.CurrencyId,
+                    dto.Price,
+                    countDelta));
 
         content.SetCount(dto.Count);
         content.SetPrice(dto.Price);
         content.SetComment(dto.Comment);
 
         if (!lotIsUntouched) return;
-        
+
         await UpdateStorageContentMetadata(
             storageContent,
             dto,
@@ -349,7 +367,10 @@ public class EditPurchaseHandler(
         storageContent.SetPurchaseDate(request.PurchaseDateTime);
         storageContent.SetBuyPrice(
             dto.Price,
-            await currencyConverter.ConvertToBaseAsync(dto.Price, request.CurrencyId, cancellationToken));
+            await currencyConverter.ConvertToBaseAsync(
+                dto.Price,
+                request.CurrencyId,
+                cancellationToken));
     }
 
     private async Task UpdateLogistics(

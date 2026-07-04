@@ -8,7 +8,7 @@ public class RecalculationCheckHostedService(
     IOptionsMonitor<HostedServiceOptions> options,
     IServiceScopeFactory scopeFactory,
     ILogger<RecalculationCheckHostedService> logger
-    ) : BackgroundService
+) : BackgroundService
 {
     protected override async Task ExecuteAsync(CancellationToken stoppingToken)
     {
@@ -27,17 +27,11 @@ public class RecalculationCheckHostedService(
             var sender = scope.ServiceProvider.GetRequiredService<ISender>();
 
             await sender.Send(
-                new ScheduleDirtyMetricsRecalculationCommand(opt.ScheduleAtOnce), 
+                new ScheduleDirtyMetricsRecalculationCommand(opt.ScheduleAtOnce),
                 ct);
             await Task.Delay(opt.Delay, ct);
         }
-        catch (OperationCanceledException) when (ct.IsCancellationRequested)
-        {
-            throw;
-        }
-        catch (Exception ex)
-        {
-            logger.LogError(ex, "Recalculation check failed.");
-        }
+        catch (OperationCanceledException) when (ct.IsCancellationRequested) { throw; }
+        catch (Exception ex) { logger.LogError(ex, "Recalculation check failed."); }
     }
 }

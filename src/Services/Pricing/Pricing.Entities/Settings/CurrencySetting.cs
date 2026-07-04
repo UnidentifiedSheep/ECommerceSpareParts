@@ -5,13 +5,9 @@ namespace Pricing.Entities.Settings;
 
 public class CurrencySetting : Setting<CurrencySettingData>, ISetting<CurrencySetting>
 {
-    public CurrencySetting(string json) : base(SettingName, json)
-    {
-    }
+    public CurrencySetting(string json) : base(SettingName, json) { }
 
-    public CurrencySetting(CurrencySettingData data) : base(SettingName, data)
-    {
-    }
+    public CurrencySetting(CurrencySettingData data) : base(SettingName, data) { }
 
     public static string SettingName => "CurrencySetting";
     public static CurrencySetting Default => new(new CurrencySettingData());

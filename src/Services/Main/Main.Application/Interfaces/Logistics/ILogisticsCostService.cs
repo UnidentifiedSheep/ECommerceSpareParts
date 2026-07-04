@@ -5,5 +5,8 @@ namespace Main.Application.Interfaces.Logistics;
 
 public interface ILogisticsCostService
 {
-    LogisticsCalcResult Calculate(LogisticPricingType type, LogisticsContext context, IEnumerable<LogisticsItem> items);
+    LogisticsCalcResult Calculate(
+        LogisticPricingType type,
+        LogisticsContext context,
+        IEnumerable<LogisticsItem> items);
 }

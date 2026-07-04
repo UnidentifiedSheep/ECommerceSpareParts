@@ -8,15 +8,9 @@ public class JsonSerializer : IJsonSerializer
 {
     private static readonly SysJsonSerializerOptions Options = SysJsonSerializerOptions.Web;
 
-    public string Serialize<TValue>(TValue value)
-    {
-        return SysJsonSerializer.Serialize(value, Options);
-    }
+    public string Serialize<TValue>(TValue value) { return SysJsonSerializer.Serialize(value, Options); }
 
-    public string Serialize(object value)
-    {
-        return SysJsonSerializer.Serialize(value, Options);
-    }
+    public string Serialize(object value) { return SysJsonSerializer.Serialize(value, Options); }
 
     public TValue? Deserialize<TValue>(string value)
     {
@@ -25,6 +19,9 @@ public class JsonSerializer : IJsonSerializer
 
     public object? Deserialize(string value, Type type)
     {
-        return SysJsonSerializer.Deserialize(value, type, Options);
+        return SysJsonSerializer.Deserialize(
+            value,
+            type,
+            Options);
     }
 }

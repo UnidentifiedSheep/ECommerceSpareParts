@@ -6,7 +6,6 @@ using Analytics.Application.Models;
 using Analytics.Entities;
 using Application.Common.Interfaces.Repositories;
 using Attributes;
-using Internal.Integration.Core.Interfaces;
 using Internal.Integration.Core.Interfaces.Main;
 using Microsoft.Extensions.Logging;
 
@@ -17,10 +16,11 @@ public class PurchaseFactSynchronizer(
     IRepository<PurchasesFact, Guid> repository,
     IUnitOfWork unitOfWork,
     ITagsService tagsService,
-    ILogger<IFactSynchronizer<PurchasesFact, Guid>> logger) : IFactSynchronizer<PurchasesFact, Guid>
+    ILogger<IFactSynchronizer<PurchasesFact, Guid>> logger
+) : IFactSynchronizer<PurchasesFact, Guid>
 {
     public async Task<PurchasesFact?> SynchronizeAsync(
-        Guid id, 
+        Guid id,
         CancellationToken cancellationToken = default)
     {
         return await unitOfWork.ExecuteWithTransaction(
@@ -30,11 +30,11 @@ public class PurchaseFactSynchronizer(
     }
 
     private async Task<PurchasesFact?> ExecuteAsync(
-        Guid id, 
+        Guid id,
         CancellationToken cancellationToken)
     {
         var synchronizationStartedAt = DateTime.UtcNow;
-        
+
         var response = await mainClient.PurchaseNode.GetFullPurchase(id, cancellationToken);
         var dbFact = await repository.FirstOrDefaultAsync(
             Criteria<PurchasesFact>
@@ -44,7 +44,7 @@ public class PurchaseFactSynchronizer(
                 .Track()
                 .Build(),
             cancellationToken);
-         
+
         if (synchronizationStartedAt <= dbFact?.ProcessedAt)
         {
             logger.LogWarning(

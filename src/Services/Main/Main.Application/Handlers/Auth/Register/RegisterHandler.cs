@@ -1,5 +1,6 @@
 ﻿using Application.Common.Interfaces.Cqrs;
 using Attributes;
+using Enums;
 using Main.Application.Dtos.Emails;
 using Main.Application.Dtos.Users;
 using Main.Application.Handlers.Users.CreateUser;
@@ -9,7 +10,13 @@ using MediatR;
 namespace Main.Application.Handlers.Auth.Register;
 
 [Transactional]
-public record RegisterCommand(string Email, string UserName, string Password, string Name, string Surname)
+public record RegisterCommand(
+    string Email,
+    string UserName,
+    string Password,
+    string Name,
+    string Surname
+)
     : ICommand<Unit>;
 
 internal class RegisterHandler(IMediator mediator) : ICommandHandler<RegisterCommand, Unit>
@@ -28,8 +35,13 @@ internal class RegisterHandler(IMediator mediator) : ICommandHandler<RegisterCom
             IsPrimary = true,
             Type = EmailType.Unknown
         };
-        var command = new CreateUserCommand(request.UserName, request.Password, userInfo,
-            [email], [], [nameof(Role.Member)]);
+        var command = new CreateUserCommand(
+            request.UserName,
+            request.Password,
+            userInfo,
+            [email],
+            [],
+            [nameof(Role.Member)]);
         await mediator.Send(command, cancellationToken);
         return Unit.Value;
     }

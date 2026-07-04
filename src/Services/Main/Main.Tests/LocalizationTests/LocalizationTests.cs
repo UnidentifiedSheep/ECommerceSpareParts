@@ -2,7 +2,6 @@
 using Api.Common.Extensions;
 using Enums;
 using FluentAssertions;
-using LinqKit;
 using Main.Application;
 using Main.Application.Configs;
 using Main.Entities;
@@ -11,7 +10,7 @@ using Main.Entities.Product;
 
 namespace Tests.LocalizationTests;
 
-public class LocalizationTests : Test.Common.Tests.LocalizationTests
+public class LocalizationTests : Tests.LocalizationTests
 {
     [Theory]
     [InlineData("ru")]
@@ -22,7 +21,10 @@ public class LocalizationTests : Test.Common.Tests.LocalizationTests
         var localesPath = Assembly.GetExecutingAssembly().GetDefaultLocalizationPath();
         var assembly = Assembly.GetAssembly(typeof(Product))!;
 
-        await TestLocalizableExceptions(assembly, localesPath, locale);
+        await TestLocalizableExceptions(
+            assembly,
+            localesPath,
+            locale);
     }
 
     [Theory]
@@ -34,7 +36,10 @@ public class LocalizationTests : Test.Common.Tests.LocalizationTests
         var localesPath = Assembly.GetExecutingAssembly().GetDefaultLocalizationPath();
         var assembly = Assembly.GetAssembly(typeof(Global))!;
 
-        await TestAbstractValidatorLocalization(assembly, localesPath, locale);
+        await TestAbstractValidatorLocalization(
+            assembly,
+            localesPath,
+            locale);
     }
 
     [Theory]
@@ -52,7 +57,10 @@ public class LocalizationTests : Test.Common.Tests.LocalizationTests
             .Cast<string>()
             .ToList();
 
-        await TestDbValidatorLocalization(constants, localesPath, locale);
+        await TestDbValidatorLocalization(
+            constants,
+            localesPath,
+            locale);
     }
 
     [Theory]
@@ -70,9 +78,13 @@ public class LocalizationTests : Test.Common.Tests.LocalizationTests
             var systemName = Permission.ToNormalizedPermission(permission);
             var nameKey = Permission.GetLocalizationNameKey(permission);
             var descriptionKey = Permission.GetLocalizationDescriptionKey(permission);
-            
-            scoped.TryGet(nameKey, out _).Should().BeTrue($"Missing key '{nameKey}' for permission '{systemName}'");
-            scoped.TryGet(descriptionKey, out _).Should().BeTrue($"Missing key '{descriptionKey}' for permission '{systemName}'");
+
+            scoped.TryGet(nameKey, out _)
+                .Should()
+                .BeTrue($"Missing key '{nameKey}' for permission '{systemName}'");
+            scoped.TryGet(descriptionKey, out _)
+                .Should()
+                .BeTrue($"Missing key '{descriptionKey}' for permission '{systemName}'");
         }
     }
 }

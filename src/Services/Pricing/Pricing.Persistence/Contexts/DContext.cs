@@ -1,18 +1,18 @@
 ﻿using System.Reflection;
+using Domain.CommonEntities;
 using MassTransit;
 using MassTransit.EntityFrameworkCoreIntegration;
 using Microsoft.EntityFrameworkCore;
 using Persistence.BaseTableConfigurations;
 using Persistence.Extensions;
 using Pricing.Entities;
+using Pricing.Entities.Settings;
 
 namespace Pricing.Persistence.Contexts;
 
 public partial class DContext : DbContext
 {
-    public DContext()
-    {
-    }
+    public DContext() { }
 
     public DContext(DbContextOptions<DContext> options)
         : base(options)
@@ -35,6 +35,12 @@ public partial class DContext : DbContext
 
         modelBuilder.ApplyConfigurationsFromAssembly(Assembly.GetAssembly(GetType())!)
             .ApplyConfiguration(new SettingConfiguration());
+
+        modelBuilder.Entity<Setting>()
+            .HasDiscriminator(e => e.Key)
+            .HasValue<Setting>(nameof(Setting))
+            .HasValue<CurrencySetting>(CurrencySetting.SettingName)
+            .HasValue<PricingSetting>(PricingSetting.SettingName);
 
         modelBuilder.AddFieldsForAuditableEntities();
 

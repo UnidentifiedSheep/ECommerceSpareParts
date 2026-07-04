@@ -24,6 +24,8 @@
     "currency.setting.name": "Currency settings",
     "currency.setting.description": "Controls currency-related application settings, including the exchange rate provider.",
     "currency.setting.input.invalid": "Invalid currency settings data was provided.",
+    "currency.setting.base.currency.name": "Base currency",
+    "currency.setting.base.currency.description": "Currency used as the base for application exchange rates.",
     "currency.setting.rate.provider.name": "Exchange rate provider",
     "currency.setting.rate.provider.description": "Provider used to update currency exchange rates."
   }

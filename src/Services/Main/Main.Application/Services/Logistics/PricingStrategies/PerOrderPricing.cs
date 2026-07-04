@@ -9,7 +9,11 @@ public class PerOrderPricing : LogisticsPricingStrategyBase
 
     public override LogisticsCalcResult Calculate(LogisticsContext context, IEnumerable<LogisticsItem> items)
     {
-        var result = Iterate(context, items, _ => 0, LogisticsDataRequirements.None);
+        var result = Iterate(
+            context,
+            items,
+            _ => 0,
+            LogisticsDataRequirements.None);
         result.TotalCost = context.PricePerOrder;
         return result;
     }

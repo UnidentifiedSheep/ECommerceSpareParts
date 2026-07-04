@@ -5,8 +5,8 @@ using Main.Application.Handlers.ProductReservations.GetProductsWithNotEnoughStoc
 using Main.Application.Handlers.ProductReservations.UpdateReservationsCounts;
 using Main.Application.Handlers.StorageContents.RestoreContent;
 using Main.Application.Handlers.StorageContents.SubtractContent;
-using Main.Application.Interfaces.Services;
 using Main.Application.Interfaces.Persistence;
+using Main.Application.Interfaces.Services;
 using Main.Application.Models;
 using Main.Application.Models.Storage;
 using Main.Entities.Exceptions;
@@ -20,16 +20,9 @@ namespace Main.Application.Services;
 
 public class SaleService(
     ISender sender,
-    IProductRepository productRepository) : ISaleService
+    IProductRepository productRepository
+) : ISaleService
 {
-    private sealed record SaleContentInput(
-        int OriginalIndex,
-        int ProductId,
-        decimal Price,
-        decimal PriceWithDiscount,
-        int Count,
-        string? Comment);
-
     public List<SaleContent> DistributeDetails(
         IEnumerable<StorageLot> storageContentValues,
         IEnumerable<NewSaleContentDto> saleContents)
@@ -165,7 +158,10 @@ public class SaleService(
             .GroupBy(x => x.ProductId)
             .ToDictionary(x => x.Key, x => x.Sum(z => z.Count));
 
-        return UpdateReservationsCounts(buyerId, toSubtract, cancellationToken);
+        return UpdateReservationsCounts(
+            buyerId,
+            toSubtract,
+            cancellationToken);
     }
 
     public async Task RestoreContents(
@@ -192,8 +188,7 @@ public class SaleService(
         var storageByProduct = storageContentValues
             .Select(x =>
             {
-                if (x.Count <= 0)
-                    throw new InvalidOperationException("Invalid taken quantity");
+                if (x.Count <= 0) throw new InvalidOperationException("Invalid taken quantity");
 
                 return new
                 {
@@ -239,12 +234,13 @@ public class SaleService(
                 }
                 else
                 {
-                    details.Add(SaleContentDetail.Create(
-                        detail.StorageContentId,
-                        detail.CurrencyId,
-                        detail.BuyPrice,
-                        leftToDistribute,
-                        detail.PurchaseDatetime));
+                    details.Add(
+                        SaleContentDetail.Create(
+                            detail.StorageContentId,
+                            detail.CurrencyId,
+                            detail.BuyPrice,
+                            leftToDistribute,
+                            detail.PurchaseDatetime));
 
                     storage[i] = SaleContentDetail.Create(
                         detail.StorageContentId,
@@ -257,17 +253,16 @@ public class SaleService(
                 }
             }
 
-            if (leftToDistribute != 0)
-                throw new InvalidOperationException("Unable to distribute details");
+            if (leftToDistribute != 0) throw new InvalidOperationException("Unable to distribute details");
 
             var content = SaleContent.Create(
                 productId,
                 price,
                 priceWithDiscount,
                 details);
-            
+
             content.SetComment(comment);
-            
+
             result.Add((originalIndex, content));
         }
 
@@ -312,8 +307,7 @@ public class SaleService(
             takeFromOtherStorages,
             cancellationToken);
 
-        if (byStock.Count != 0)
-            throw new NotEnoughCountOnStorageException(byStock.Keys);
+        if (byStock.Count != 0) throw new NotEnoughCountOnStorageException(byStock.Keys);
 
         if (byReservation.Count == 0) return;
 
@@ -337,20 +331,21 @@ public class SaleService(
         }
 
         var currentCode = codeBuilder.ToString();
-        if (currentCode != confirmationCode)
-            throw new SaleSoftConfirmationNeededException(currentCode, res);
+        if (currentCode != confirmationCode) throw new SaleSoftConfirmationNeededException(currentCode, res);
     }
 
-    private async Task<(Dictionary<int, int> byReservation, Dictionary<int, int> byStock)> GetStockReservations(
-        IEnumerable<SaleContentInput> saleContents,
-        Guid buyerId,
-        string storageName,
-        bool takeFromOtherStorages,
-        CancellationToken cancellationToken = default)
+    private async Task<(Dictionary<int, int> byReservation, Dictionary<int, int> byStock)>
+        GetStockReservations(
+            IEnumerable<SaleContentInput> saleContents,
+            Guid buyerId,
+            string storageName,
+            bool takeFromOtherStorages,
+            CancellationToken cancellationToken = default)
     {
         var neededProductCounts = saleContents
             .GroupBy(x => x.ProductId)
-            .ToDictionary(x => x.Key,
+            .ToDictionary(
+                x => x.Key,
                 x => x.Sum(z => z.Count));
 
         var result = await sender.Send(
@@ -364,4 +359,12 @@ public class SaleService(
         return (result.NotEnoughByReservation, result.NotEnoughByStock);
     }
 
+    private sealed record SaleContentInput(
+        int OriginalIndex,
+        int ProductId,
+        decimal Price,
+        decimal PriceWithDiscount,
+        int Count,
+        string? Comment
+    );
 }

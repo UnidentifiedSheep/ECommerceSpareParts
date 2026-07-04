@@ -23,7 +23,10 @@ public abstract class AuthClientBase(HttpClient client) : IAuthClient
             Encoding.UTF8,
             "application/json");
 
-        using var response = await client.PostAsync("/internal/auth/token", content, cancellationToken);
+        using var response = await client.PostAsync(
+            "/internal/auth/token",
+            content,
+            cancellationToken);
 
         response.EnsureSuccessStatusCode();
 

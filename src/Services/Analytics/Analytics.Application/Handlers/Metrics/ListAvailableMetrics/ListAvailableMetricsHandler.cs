@@ -1,6 +1,5 @@
 ﻿using Analytics.Application.Dtos.Metric;
 using Analytics.Application.NamedObjects.Metrics;
-using Analytics.Entities.Metrics;
 using Application.Common.Interfaces.Cqrs;
 using Application.Common.Interfaces.NamedObject;
 using Attributes;
@@ -16,9 +15,12 @@ public sealed record ListAvailableMetricsResult(IReadOnlyList<MetricInfoDto> Met
 public class ListAvailableMetricsHandler(
     IScopedStringLocalizer localizer,
     INamedObjectRegistry<MetricDefinitionNamedObjectBase> registry,
-    IScopedLocalizedJsonSerializer jsonSerializer) : IQueryHandler<ListAvailableMetricsQuery, ListAvailableMetricsResult>
+    IScopedLocalizedJsonSerializer jsonSerializer
+) : IQueryHandler<ListAvailableMetricsQuery, ListAvailableMetricsResult>
 {
-    public Task<ListAvailableMetricsResult> Handle(ListAvailableMetricsQuery request, CancellationToken cancellationToken)
+    public Task<ListAvailableMetricsResult> Handle(
+        ListAvailableMetricsQuery request,
+        CancellationToken cancellationToken)
     {
         var result = registry.All
             .Select(x => new MetricInfoDto

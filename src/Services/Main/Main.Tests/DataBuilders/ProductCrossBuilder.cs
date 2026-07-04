@@ -1,6 +1,6 @@
 using Bogus;
 using Main.Entities.Product;
-using Test.Common.Abstractions;
+using Tests.Abstractions;
 
 namespace Tests.DataBuilders;
 
@@ -51,7 +51,8 @@ public class ProductCrossBuilder(Faker faker) : BuilderBase<ProductCross>(faker)
             return (LeftProductId.Value, RightProductId.Value);
 
         if (_productIds.Count < 2)
-            throw new InvalidOperationException("At least two product ids are required to build product crosses.");
+            throw new InvalidOperationException(
+                "At least two product ids are required to build product crosses.");
 
         var availablePairs = GetAvailablePairs().ToList();
         if (availablePairs.Count == 0)
@@ -68,8 +69,7 @@ public class ProductCrossBuilder(Faker faker) : BuilderBase<ProductCross>(faker)
         for (var j = i + 1; j < productIds.Length; j++)
         {
             var pair = (productIds[i], productIds[j]);
-            if (!_usedPairs.Contains(pair))
-                yield return pair;
+            if (!_usedPairs.Contains(pair)) yield return pair;
         }
     }
 }

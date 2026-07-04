@@ -18,8 +18,5 @@ public class BackplaneDispatcher : IBackplaneDispatcher
         Handler = options.IncomingMessageHandlerAsync;
     }
 
-    public void Unsubscribe()
-    {
-        Handler = null;
-    }
+    public void Unsubscribe() { Handler = null; }
 }

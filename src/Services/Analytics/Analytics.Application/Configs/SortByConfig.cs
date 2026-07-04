@@ -17,13 +17,13 @@ public static class SortByConfig
             .Map<Metric, DateTime?>("recalculatedAt", x => x.RecalculatedAt);
 
         QueryableSortBy.Value
-            .MapDefault<MetricJob, DateTime>(x => x.Job.CreatedAt, desc: true)
+            .MapDefault<MetricJob, DateTime>(x => x.Job.CreatedAt, true)
             .Map<MetricJob, Guid>("jobId", x => x.JobId)
             .Map<MetricJob, Guid>("metricId", x => x.MetricId)
             .Map<MetricJob, DateTime>("createdAt", x => x.Job.CreatedAt)
             .Map<MetricJob, DateTime>("updatedAt", x => x.Job.UpdatedAt)
             .Map<MetricJob, JobStatus>("status", x => x.Job.Status);
-        
+
         QueryableSortBy.Value.ConfigureForJob();
     }
 }

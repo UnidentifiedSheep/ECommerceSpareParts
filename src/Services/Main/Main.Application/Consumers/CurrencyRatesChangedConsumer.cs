@@ -1,7 +1,6 @@
 using Contracts.Currency;
 using Main.Application.Interfaces.Cache;
 using MassTransit;
-using ZiggyCreatures.Caching.Fusion;
 
 namespace Main.Application.Consumers;
 

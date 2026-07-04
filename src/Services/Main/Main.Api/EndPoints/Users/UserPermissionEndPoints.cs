@@ -17,15 +17,17 @@ public static class UserPermissionEndPoints
 {
     public static RouteGroupBuilder MapUserPermissionEndPoints(this RouteGroupBuilder users)
     {
-        users.MapPost("/{userId:guid}/permissions/", async (
-                ISender sender,
-                Guid userId,
-                AddPermissionToUserRequest request,
-                CancellationToken ct) =>
-            {
-                await sender.Send(new AddPermissionToUserCommand(userId, request.Permission), ct);
-                return Results.NoContent();
-            })
+        users.MapPost(
+                "/{userId:guid}/permissions/",
+                async (
+                    ISender sender,
+                    Guid userId,
+                    AddPermissionToUserRequest request,
+                    CancellationToken ct) =>
+                {
+                    await sender.Send(new AddPermissionToUserCommand(userId, request.Permission), ct);
+                    return Results.NoContent();
+                })
             .WithName("AddPermissionToUser")
             .WithSummary("Добавить разрешение пользователю")
             .WithDescription("Добавление пользователю разрешение")
@@ -34,16 +36,18 @@ public static class UserPermissionEndPoints
             .ProducesProblem(400)
             .ProducesProblem(404)
             .RequireAnyPermission(PermissionCodes.USERS_PERMISSIONS_CREATE);
-        
-        users.MapDelete("/{userId:guid}/permissions/{permission}", async (
-                ISender sender,
-                Guid userId,
-                string permission,
-                CancellationToken ct) =>
-            {
-                await sender.Send(new RemovePermissionFromUserCommand(userId, permission), ct);
-                return Results.Ok();
-            })
+
+        users.MapDelete(
+                "/{userId:guid}/permissions/{permission}",
+                async (
+                    ISender sender,
+                    Guid userId,
+                    string permission,
+                    CancellationToken ct) =>
+                {
+                    await sender.Send(new RemovePermissionFromUserCommand(userId, permission), ct);
+                    return Results.Ok();
+                })
             .WithName("RemovePermissionFromUser")
             .WithSummary("Удаление разрешения у пользователя")
             .WithDescription("Удаление разрешения у пользователя")
@@ -51,7 +55,7 @@ public static class UserPermissionEndPoints
             .Produces(200)
             .ProducesProblem(404)
             .RequireAnyPermission(PermissionCodes.USERS_PERMISSIONS_CREATE);
-        
+
         return users;
     }
 }

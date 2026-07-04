@@ -11,7 +11,8 @@ public record GetStorageContentCostsQuery(IEnumerable<int> ProductIds, bool Only
 public record GetStorageContentCostsResult(IEnumerable<StorageContentPriceDto> StorageContentCosts);
 
 public class GetStorageContentCostsHandler(
-    IReadRepository<StorageContent, int> repository)
+    IReadRepository<StorageContent, int> repository
+)
     : IQueryHandler<GetStorageContentCostsQuery, GetStorageContentCostsResult>
 {
     public async Task<GetStorageContentCostsResult> Handle(

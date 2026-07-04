@@ -3,7 +3,8 @@
 namespace Application.Common.Services.Currency;
 
 public class CurrencyConverter(
-    ICurrencyRatesProvider ratesProvider) : CurrencyConverterBase
+    ICurrencyRatesProvider ratesProvider
+) : CurrencyConverterBase
 {
     public override async Task<decimal> ConvertAsync(
         decimal value,
@@ -13,7 +14,10 @@ public class CurrencyConverter(
     {
         var fromRate = await ratesProvider.GetRate(fromCurrencyId, cancellationToken);
         var toRate = await ratesProvider.GetRate(toCurrencyId, cancellationToken);
-        return Convert(value, fromRate, toRate);
+        return Convert(
+            value,
+            fromRate,
+            toRate);
     }
 
     public override async Task<decimal> ConvertFromBaseAsync(

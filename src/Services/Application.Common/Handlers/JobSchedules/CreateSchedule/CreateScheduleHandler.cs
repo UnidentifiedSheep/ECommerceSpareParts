@@ -1,9 +1,7 @@
-using System.Text.Json;
 using Abstractions.Interfaces.Persistence;
 using Application.Common.Dtos;
 using Application.Common.Extensions;
 using Application.Common.Interfaces.Cqrs;
-using Application.Common.Interfaces.Lrt;
 using Application.Common.Interfaces.NamedObject;
 using Application.Common.NamedObject;
 using Application.Common.Projections;
@@ -22,31 +20,31 @@ public record CreateScheduleResult(JobScheduleDto Schedule);
 public class CreateScheduleHandler(
     IScopedStringLocalizer localizer,
     INamedObjectRegistry<LrtNamedObjectBase> registry,
-    IUnitOfWork unitOfWork) : IQueryHandler<CreateScheduleCommand, CreateScheduleResult>
+    IUnitOfWork unitOfWork
+) : IQueryHandler<CreateScheduleCommand, CreateScheduleResult>
 {
     public async Task<CreateScheduleResult> Handle(
-        CreateScheduleCommand request, 
+        CreateScheduleCommand request,
         CancellationToken cancellationToken)
     {
         var lrt = registry.GetBySystemName(request.NewSchedule.JobSystemName);
-        lrt.ValidateState(request.NewSchedule.InputState);
-        
+        var validatedState = lrt.ValidateState(request.NewSchedule.InputState);
+
         var schedule = JobSchedule.Create(
             request.NewSchedule.Name,
             request.NewSchedule.Description,
             lrt.SystemName,
-            request.NewSchedule.InputState,
-            maxAttempts: request.NewSchedule.MaxAttempts,
-            cron: request.NewSchedule.Cron);
+            validatedState,
+            request.NewSchedule.MaxAttempts,
+            request.NewSchedule.Cron);
 
-        if (request.NewSchedule.Enabled)
-            schedule.Enable();
-        
+        if (request.NewSchedule.Enabled) schedule.Enable();
+
         var nextRunAt = CronExpression.Parse(schedule.Cron)
             .GetNextOccurrence(
-                DateTime.UtcNow, 
+                DateTime.UtcNow,
                 JobSchedule.TimeZone);
-        
+
         schedule.SetNextRunAt(nextRunAt);
 
         await unitOfWork.AddAsync(schedule, cancellationToken);

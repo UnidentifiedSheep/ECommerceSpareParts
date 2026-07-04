@@ -21,17 +21,20 @@ public static class JobEndPoints
         var jobs = app.MapGroup("/jobs")
             .WithTags("Jobs");
 
-        jobs.MapGet("/available", async (
-                ISender sender,
-                IScopedStringLocalizer localizer,
-                CancellationToken ct) =>
-            {
-                var result = await sender.Send(new GetAggregatedAvailableJobsQuery(localizer.Locale), ct);
-                return Results.Ok(new GetAggregatedAvailableJobsResponse
+        jobs.MapGet(
+                "/available",
+                async (
+                    ISender sender,
+                    IScopedStringLocalizer localizer,
+                    CancellationToken ct) =>
                 {
-                    Jobs = result.Jobs
-                });
-            })
+                    var result = await sender.Send(new GetAggregatedAvailableJobsQuery(localizer.Locale), ct);
+                    return Results.Ok(
+                        new GetAggregatedAvailableJobsResponse
+                        {
+                            Jobs = result.Jobs
+                        });
+                })
             .WithName("GetAvailableGatewayJobs")
             .WithDisplayName("Get available jobs from all services")
             .Produces<GetAggregatedAvailableJobsResponse>()

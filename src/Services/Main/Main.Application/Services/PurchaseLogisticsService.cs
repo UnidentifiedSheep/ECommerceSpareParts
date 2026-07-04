@@ -1,5 +1,4 @@
 using Abstractions.Interfaces.Persistence;
-using Abstractions.Interfaces.Services;
 using Application.Common.Extensions;
 using Main.Application.Dtos.Logistics;
 using Main.Application.Handlers.Balance.CreateTransaction;
@@ -18,7 +17,8 @@ namespace Main.Application.Services;
 public class PurchaseLogisticsService(
     ISender sender,
     IUserRepository userRepository,
-    IUnitOfWork unitOfWork) : IPurchaseLogisticsService
+    IUnitOfWork unitOfWork
+) : IPurchaseLogisticsService
 {
     public async Task ApplyAsync(
         Purchase purchase,
@@ -54,13 +54,15 @@ public class PurchaseLogisticsService(
         for (var i = 0; i < selectedItems.Count; i++)
         {
             var calcResult = deliveryCost.DeliveryCost.Items[i];
-            selectedItems[i].PurchaseContent.SetLogistic(
-                calcResult.Weight,
-                calcResult.AreaM3,
-                calcResult.Cost);
+            selectedItems[i]
+                .PurchaseContent.SetLogistic(
+                    calcResult.Weight,
+                    calcResult.AreaM3,
+                    calcResult.Cost);
         }
 
-        foreach (var content in purchase.Contents.Except(selectedItems.Select(x => x.PurchaseContent)).ToList())
+        foreach (var content in purchase.Contents.Except(selectedItems.Select(x => x.PurchaseContent))
+                     .ToList())
             if (content.ClearLogistic() is { } logistic)
                 unitOfWork.Remove(logistic);
 
@@ -106,7 +108,6 @@ public class PurchaseLogisticsService(
             if (content.ClearLogistic() is { } logistic)
                 unitOfWork.Remove(logistic);
 
-        if (purchase.ClearPurchaseLogistic() is { } purchaseLogistic)
-            unitOfWork.Remove(purchaseLogistic);
+        if (purchase.ClearPurchaseLogistic() is { } purchaseLogistic) unitOfWork.Remove(purchaseLogistic);
     }
 }

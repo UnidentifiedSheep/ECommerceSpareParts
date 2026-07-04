@@ -4,9 +4,7 @@ namespace Main.Entities.Product.ValueObjects;
 
 public record Stock
 {
-    private Stock()
-    {
-    }
+    private Stock() { }
 
     public Stock(int value)
     {
@@ -17,13 +15,7 @@ public record Stock
 
     public int Value { get; }
 
-    public static implicit operator Stock(int value)
-    {
-        return new Stock(value);
-    }
+    public static implicit operator Stock(int value) { return new Stock(value); }
 
-    public static implicit operator int(Stock stock)
-    {
-        return stock.Value;
-    }
+    public static implicit operator int(Stock stock) { return stock.Value; }
 }

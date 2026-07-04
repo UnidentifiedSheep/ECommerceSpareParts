@@ -5,7 +5,7 @@ using Main.Entities.Balance;
 using Main.Entities.Exceptions;
 using Main.Enums.Balances;
 using Microsoft.EntityFrameworkCore;
-using Test.Common.TestContainers.Combined;
+using Tests.TestContainers.Combined;
 using Tests.TestContexts;
 using Tests.TestContexts.Currency;
 
@@ -34,13 +34,14 @@ public class CreateTransactionTests : IntegrationTest
 
         await CreditProfile(sender.Id, amount);
 
-        var result = await Mediator.Send(new CreateTransactionCommand(
-            sender.Id,
-            receiver.Id,
-            amount,
-            currency.Id,
-            transactionDateTime,
-            TransactionSourceType.Manual));
+        var result = await Mediator.Send(
+            new CreateTransactionCommand(
+                sender.Id,
+                receiver.Id,
+                amount,
+                currency.Id,
+                transactionDateTime,
+                TransactionSourceType.Manual));
 
         var transaction = await Context.Transactions
             .AsNoTracking()
@@ -116,7 +117,8 @@ public class CreateTransactionTests : IntegrationTest
     }
 
     [Fact]
-    public async Task CreateTransaction_UserModeAndSystemSender_ThrowsTransactionWithSystemUserCannotBeCreatedByUserException()
+    public async Task
+        CreateTransaction_UserModeAndSystemSender_ThrowsTransactionWithSystemUserCannotBeCreatedByUserException()
     {
         var command = GetValidCommand() with
         {
@@ -128,7 +130,8 @@ public class CreateTransactionTests : IntegrationTest
     }
 
     [Fact]
-    public async Task CreateTransaction_UserModeAndSystemReceiver_ThrowsTransactionWithSystemUserCannotBeCreatedByUserException()
+    public async Task
+        CreateTransaction_UserModeAndSystemReceiver_ThrowsTransactionWithSystemUserCannotBeCreatedByUserException()
     {
         var command = GetValidCommand() with
         {

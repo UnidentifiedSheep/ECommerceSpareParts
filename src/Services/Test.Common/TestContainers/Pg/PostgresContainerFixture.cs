@@ -1,7 +1,6 @@
 using Testcontainers.PostgreSql;
-using Xunit;
 
-namespace Test.Common.TestContainers.Pg;
+namespace Tests.TestContainers.Pg;
 
 public class PostgresContainerFixture : IAsyncLifetime
 {
@@ -16,8 +15,5 @@ public class PostgresContainerFixture : IAsyncLifetime
         Console.WriteLine("PostgreSQL container started");
     }
 
-    public async Task DisposeAsync()
-    {
-        await _postgresqlContainer.DisposeAsync().AsTask();
-    }
+    public async Task DisposeAsync() { await _postgresqlContainer.DisposeAsync().AsTask(); }
 }

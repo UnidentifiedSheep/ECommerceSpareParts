@@ -8,7 +8,8 @@ namespace Localization.Domain.Middlewares;
 public class ScopedLocalizationMiddleware(
     Locale defaultLocale,
     HashSet<Locale> locales,
-    IScopedStringLocalizer localizer) : IMiddleware
+    IScopedStringLocalizer localizer
+) : IMiddleware
 {
     private const int MaxCacheSize = 2000;
     private static readonly ConcurrentDictionary<string, Locale> Cache = new();
@@ -30,8 +31,7 @@ public class ScopedLocalizationMiddleware(
 
     private Locale ResolveLocale(string header)
     {
-        if (Cache.TryGetValue(header, out var cached))
-            return cached;
+        if (Cache.TryGetValue(header, out var cached)) return cached;
 
         var languages = header
             .Split(',', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);

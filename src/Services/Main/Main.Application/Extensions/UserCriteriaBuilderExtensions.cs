@@ -1,6 +1,6 @@
 using Application.Common.Interfaces.Repositories;
 using Main.Entities.User;
-using RoleEnum = Main.Enums.Role;
+using RoleEnum = Enums.Role;
 
 namespace Main.Application.Extensions;
 
@@ -24,14 +24,20 @@ public static class UserCriteriaBuilderExtensions
         this CriteriaBuilder<User> criteria,
         IEnumerable<RoleEnum> roles)
     {
-        return UserRoleFilter.Apply(criteria, roles, true);
+        return UserRoleFilter.Apply(
+            criteria,
+            roles,
+            true);
     }
 
     public static CriteriaBuilder<User> WhereHasAnyRole(
         this CriteriaBuilder<User> criteria,
         IEnumerable<string> roles)
     {
-        return UserRoleFilter.Apply(criteria, roles, true);
+        return UserRoleFilter.Apply(
+            criteria,
+            roles,
+            true);
     }
 
     public static CriteriaBuilder<User> WhereDoesNotHaveRole(
@@ -52,13 +58,19 @@ public static class UserCriteriaBuilderExtensions
         this CriteriaBuilder<User> criteria,
         IEnumerable<RoleEnum> roles)
     {
-        return UserRoleFilter.Apply(criteria, roles, false);
+        return UserRoleFilter.Apply(
+            criteria,
+            roles,
+            false);
     }
 
     public static CriteriaBuilder<User> WhereDoesNotHaveAnyRole(
         this CriteriaBuilder<User> criteria,
         IEnumerable<string> roles)
     {
-        return UserRoleFilter.Apply(criteria, roles, false);
+        return UserRoleFilter.Apply(
+            criteria,
+            roles,
+            false);
     }
 }

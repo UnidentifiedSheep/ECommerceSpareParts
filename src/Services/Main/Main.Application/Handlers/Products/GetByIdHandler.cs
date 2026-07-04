@@ -8,7 +8,8 @@ public record GetByIdQuery(int ProductId) : IQuery<GetByIdResult>;
 
 public record GetByIdResult(ProductDto Product);
 
-public class GetByIdHandler(IProductCacheRepository cacheRepository) : IQueryHandler<GetByIdQuery, GetByIdResult>
+public class GetByIdHandler(IProductCacheRepository cacheRepository)
+    : IQueryHandler<GetByIdQuery, GetByIdResult>
 {
     public async Task<GetByIdResult> Handle(GetByIdQuery request, CancellationToken cancellationToken)
     {

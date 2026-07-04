@@ -1,5 +1,5 @@
 ﻿using Bogus;
-using Test.Common.Abstractions;
+using Tests.Abstractions;
 
 namespace Tests.DataBuilders.Currency;
 

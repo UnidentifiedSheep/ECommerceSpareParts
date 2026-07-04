@@ -1,10 +1,10 @@
 ﻿using Application.Common.Interfaces.Settings;
 using Enums;
-using Main.Entities.Setting;
+using Main.Entities.Settings;
 using Main.Persistence.Context;
-using Test.Common.Abstractions;
-using Test.Common.Extensions;
+using Tests.Abstractions;
 using Tests.DataBuilders.Currency;
+using Tests.Extensions;
 
 namespace Tests.TestContexts.Currency;
 
@@ -21,11 +21,14 @@ public class CurrencyTestContext(
         var created = await new CurrencyBuilder(Faker)
             .BuildManyAndAddToDb(DbContext, 3);
 
-        await settingsService.SetSetting(new CurrencySetting(new CurrencySettingData
-        {
-            BaseCurrencyId = created.First().Id,
-            RateProvider = ExchangeRateProvider.Cbr
-        }), cancellationToken);
+        await settingsService.SetSetting(
+            new CurrencySetting(
+                new CurrencySettingData
+                {
+                    BaseCurrencyId = created.First().Id,
+                    RateProvider = ExchangeRateProvider.Cbr
+                }),
+            cancellationToken);
 
         _currencies.AddRange(created);
     }

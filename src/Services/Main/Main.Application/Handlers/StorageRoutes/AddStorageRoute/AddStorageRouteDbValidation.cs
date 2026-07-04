@@ -12,7 +12,6 @@ public class AddStorageRouteDbValidation : AbstractDbValidation<AddStorageRouteC
             .ValidateStorageExistsName(request.StorageFrom)
             .ValidateCurrencyExistsId(request.CurrencyId);
 
-        if (request.CarrierId != null)
-            plan.ValidateUserExistsId(request.CarrierId.Value);
+        if (request.CarrierId != null) plan.ValidateUserExistsId(request.CarrierId.Value);
     }
 }

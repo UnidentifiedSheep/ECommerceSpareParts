@@ -4,18 +4,30 @@ namespace Abstractions.Interfaces;
 
 public interface IS3StorageService
 {
-    Task<string> UploadFileAsync(string bucketName, IFile file, string keyName);
-    Task<string> UploadFileAsync(string bucketName, Stream stream, string keyName, string contentType);
+    Task<string> UploadFileAsync(
+        string bucketName,
+        IFile file,
+        string keyName);
+
+    Task<string> UploadFileAsync(
+        string bucketName,
+        Stream stream,
+        string keyName,
+        string contentType);
+
     Task<Stream> DownloadFileAsync(
-        string bucketName, 
+        string bucketName,
         string keyName,
         CancellationToken ct = default);
+
     Task<bool> DeleteFileAsync(string bucketName, string keyName);
+
     Task<S3ObjectListDto> ListFilesAsync(
         string bucketName,
         string? continuationToken,
         int size,
         CancellationToken ct = default);
+
     Task<string> CreatePresignedUploadUrl(
         string bucketName,
         string objectKey,

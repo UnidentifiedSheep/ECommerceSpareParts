@@ -1,10 +1,10 @@
 using Application.Common.Interfaces.Repositories;
 using Main.Application.Dtos.Users;
 using Main.Application.Interfaces.Persistence;
+using Main.Entities.Auth;
 using Main.Entities.User.ValueObjects;
 using Main.Persistence.Context;
 using Microsoft.EntityFrameworkCore;
-using Persistence.Extensions;
 using Persistence.Interfaces;
 using Persistence.Repository;
 
@@ -21,8 +21,7 @@ public class UserRepository(DContext context, IQueryableExtensions extensions)
             .AsNoTracking()
             .AnyAsync(u => u.Id == userId, cancellationToken);
 
-        if (!userExists)
-            return null;
+        if (!userExists) return null;
 
         var roles = await Context.UserRoles
             .AsNoTracking()
@@ -37,7 +36,7 @@ public class UserRepository(DContext context, IQueryableExtensions extensions)
 
         var rolePermissions =
             from userRole in Context.UserRoles.AsNoTracking()
-            join rolePermission in Context.Set<Entities.Auth.RolePermission>().AsNoTracking()
+            join rolePermission in Context.Set<RolePermission>().AsNoTracking()
                 on userRole.RoleName equals rolePermission.RoleName
             where userRole.UserId == userId
             select rolePermission.PermissionName;
@@ -53,7 +52,9 @@ public class UserRepository(DContext context, IQueryableExtensions extensions)
         };
     }
 
-    public async Task<decimal?> GetUsersDiscountAsync(Guid userId, CancellationToken cancellationToken = default)
+    public async Task<decimal?> GetUsersDiscountAsync(
+        Guid userId,
+        CancellationToken cancellationToken = default)
     {
         return await Context.UserDiscounts.AsNoTracking()
             .Where(x => x.UserId == userId)
@@ -73,8 +74,7 @@ public class UserRepository(DContext context, IQueryableExtensions extensions)
             where userEmail.Email == norm && userEmail.IsPrimary
             select user;
 
-        if (criteria != null)
-            query = QueryableExtensions.Apply(query, criteria);
+        if (criteria != null) query = QueryableExtensions.Apply(query, criteria);
 
         return query.FirstOrDefaultAsync(cancellationToken);
     }

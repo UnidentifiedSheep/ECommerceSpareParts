@@ -14,7 +14,6 @@ public class EditStorageContentDbValidation : AbstractDbValidation<EditStorageCo
             .Distinct()
             .ToArray();
 
-        if (currencyIds.Length != 0)
-            plan.ValidateCurrencyExistsId(currencyIds);
+        if (currencyIds.Length != 0) plan.ValidateCurrencyExistsId(currencyIds);
     }
 }

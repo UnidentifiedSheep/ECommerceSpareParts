@@ -20,7 +20,6 @@ using Contracts.Settings;
 using Internal.Integration.Di;
 using Localization.Domain.Extensions;
 using MassTransit;
-using RabbitMQ.Client;
 using RabbitMq.Extensions;
 using Security;
 using ZiggyCreatures.Caching.Fusion.Backplane;
@@ -74,36 +73,40 @@ builder.Services.AddMassTransit(x =>
     {
         cfg.ConfigureRabbitMq(context);
 
-        cfg.ReceiveEndpoint(uniqQueueName, ep =>
-        {
-            ep.AutoDelete = true;
-            ep.Durable = false;
-            ep.ConfigureConsumeTopology = false;
-            
-            ep.ConfigureConsumer<BackplaneConsumer>(context);
-            ep.Bind<BackplaneMessage>();
+        cfg.ReceiveEndpoint(
+            uniqQueueName,
+            ep =>
+            {
+                ep.AutoDelete = true;
+                ep.Durable = false;
+                ep.ConfigureConsumeTopology = false;
 
-            ep.ConfigureConsumer<MetricCalculationStatusUpdatedConsumer>(context);
-            ep.Bind<MetricCalculationStatusUpdatedConsumer>();
-            
-            ep.ConfigureConsumer<JobStatusUpdatedConsumer>(context);
-            ep.ConfigureConsumer<SettingUpdatedConsumer>(context);
-            
-            ep.BindForService<JobStatusUpdatedEvent>(ServicesDefinitions.Analytics)
-                .BindForService<SettingUpdatedEvent>(ServicesDefinitions.Analytics);
-        });
+                ep.ConfigureConsumer<BackplaneConsumer>(context);
+                ep.Bind<BackplaneMessage>();
 
-        cfg.ReceiveEndpoint("analytics-queue", ep =>
-        {
-            ep.Durable = true;
+                ep.ConfigureConsumer<MetricCalculationStatusUpdatedConsumer>(context);
+                ep.Bind<MetricCalculationStatusUpdatedConsumer>();
 
-            ep.ConfigureConsumer<CurrencyRatesChangedConsumer>(context);
-            ep.ConfigureConsumer<SaleDeletedConsumer>(context);
-            ep.ConfigureConsumer<SaleUpdatedConsumer>(context);
-            
-            ep.ConfigureConsumer<PurchaseDeletedConsumer>(context);
-            ep.ConfigureConsumer<PurchaseUpdatedConsumer>(context);
-        });
+                ep.ConfigureConsumer<JobStatusUpdatedConsumer>(context);
+                ep.ConfigureConsumer<SettingUpdatedConsumer>(context);
+
+                ep.BindForService<JobStatusUpdatedEvent>(ServicesDefinitions.Analytics)
+                    .BindForService<SettingUpdatedEvent>(ServicesDefinitions.Analytics);
+            });
+
+        cfg.ReceiveEndpoint(
+            "analytics-queue",
+            ep =>
+            {
+                ep.Durable = true;
+
+                ep.ConfigureConsumer<CurrencyRatesChangedConsumer>(context);
+                ep.ConfigureConsumer<SaleDeletedConsumer>(context);
+                ep.ConfigureConsumer<SaleUpdatedConsumer>(context);
+
+                ep.ConfigureConsumer<PurchaseDeletedConsumer>(context);
+                ep.ConfigureConsumer<PurchaseUpdatedConsumer>(context);
+            });
     });
 });
 

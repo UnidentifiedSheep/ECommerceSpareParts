@@ -1,8 +1,8 @@
+using System.Net.Sockets;
 using Abstractions.Interfaces.Mail;
 using MailKit.Net.Smtp;
 using Microsoft.Extensions.Options;
 using MimeKit;
-using System.Net.Sockets;
 using Polly;
 using Polly.Retry;
 
@@ -10,7 +10,7 @@ namespace Mail;
 
 public class EmailSender(
     IOptions<MailOptions> options
-    ) : IEmailSender
+) : IEmailSender
 {
     public async Task SendAsync(
         IEmailMessage message,
@@ -32,11 +32,17 @@ public class EmailSender(
 
         foreach (var chunk in chunks)
         {
-            await WithRconAsync(async client =>
-            {
-                foreach (var message in chunk)
-                    await SendWithRetryAsync(client, message, opt, token);
-            }, token);
+            await WithRconAsync(
+                async client =>
+                {
+                    foreach (var message in chunk)
+                        await SendWithRetryAsync(
+                            client,
+                            message,
+                            opt,
+                            token);
+                },
+                token);
 
             await Task.Delay(opt.BatchDelay, token);
         }
@@ -47,12 +53,14 @@ public class EmailSender(
         CancellationToken token = default)
     {
         using var client = new SmtpClient();
-        await EnsureConnectedAsync(client, options.Value, token);
+        await EnsureConnectedAsync(
+            client,
+            options.Value,
+            token);
 
         await func(client);
 
-        if (client.IsConnected)
-            await client.DisconnectAsync(true, token);
+        if (client.IsConnected) await client.DisconnectAsync(true, token);
     }
 
     private static async Task SendWithRetryAsync(
@@ -62,9 +70,15 @@ public class EmailSender(
         CancellationToken token)
     {
         var retryPipeline = BuildRetryPipeline(opt);
-        var state = new SendMessageState(client, message, opt);
+        var state = new SendMessageState(
+            client,
+            message,
+            opt);
 
-        await retryPipeline.ExecuteAsync(SendMessageAsync, state, token);
+        await retryPipeline.ExecuteAsync(
+            SendMessageAsync,
+            state,
+            token);
     }
 
     private static async ValueTask SendMessageAsync(
@@ -73,7 +87,10 @@ public class EmailSender(
     {
         try
         {
-            await EnsureConnectedAsync(state.Client, state.Options, token);
+            await EnsureConnectedAsync(
+                state.Client,
+                state.Options,
+                token);
             await state.Client.SendAsync(state.Message, token);
         }
         catch (Exception ex) when (IsTransient(ex))
@@ -86,14 +103,15 @@ public class EmailSender(
     private static ResiliencePipeline BuildRetryPipeline(MailOptions opt)
     {
         return new ResiliencePipelineBuilder()
-            .AddRetry(new RetryStrategyOptions
-            {
-                MaxRetryAttempts = Math.Max(0, opt.MaxRetryAttempts - 1),
-                Delay = opt.RetryDelay,
-                BackoffType = DelayBackoffType.Exponential,
-                ShouldHandle = new PredicateBuilder()
-                    .Handle<Exception>(IsTransient)
-            })
+            .AddRetry(
+                new RetryStrategyOptions
+                {
+                    MaxRetryAttempts = Math.Max(0, opt.MaxRetryAttempts - 1),
+                    Delay = opt.RetryDelay,
+                    BackoffType = DelayBackoffType.Exponential,
+                    ShouldHandle = new PredicateBuilder()
+                        .Handle<Exception>(IsTransient)
+                })
             .Build();
     }
 
@@ -102,11 +120,9 @@ public class EmailSender(
         MailOptions opt,
         CancellationToken token)
     {
-        if (client is { IsConnected: true, IsAuthenticated: true })
-            return;
+        if (client is { IsConnected: true, IsAuthenticated: true }) return;
 
-        if (client.IsConnected)
-            await client.DisconnectAsync(true, token);
+        if (client.IsConnected) await client.DisconnectAsync(true, token);
 
         await client.ConnectAsync(
             opt.Host,
@@ -114,7 +130,10 @@ public class EmailSender(
             opt.SecureSocket,
             token);
 
-        await client.AuthenticateAsync(opt.Username, opt.Password, token);
+        await client.AuthenticateAsync(
+            opt.Username,
+            opt.Password,
+            token);
     }
 
     private static bool IsTransient(Exception ex)
@@ -138,13 +157,9 @@ public class EmailSender(
 
     private static async Task DisconnectSilentlyAsync(SmtpClient client)
     {
-        if (!client.IsConnected)
-            return;
+        if (!client.IsConnected) return;
 
-        try
-        {
-            await client.DisconnectAsync(true, CancellationToken.None);
-        }
+        try { await client.DisconnectAsync(true, CancellationToken.None); }
         catch
         {
             // The next retry creates a fresh SMTP session.
@@ -173,5 +188,6 @@ public class EmailSender(
     private sealed record SendMessageState(
         SmtpClient Client,
         MimeMessage Message,
-        MailOptions Options);
+        MailOptions Options
+    );
 }

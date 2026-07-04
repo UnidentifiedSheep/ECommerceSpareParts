@@ -3,9 +3,9 @@ using Bogus;
 
 namespace Analytics.Integration.Tests.DataBuilders.Base;
 
-public abstract class ProductMetricDataBuilderBase<T, TMetric>(Faker faker) 
+public abstract class ProductMetricDataBuilderBase<T, TMetric>(Faker faker)
     : MetricDataBuilderBase<T, TMetric>(faker)
-    where T : ProductMetricDataBuilderBase<T, TMetric> 
+    where T : ProductMetricDataBuilderBase<T, TMetric>
     where TMetric : Metric
 {
     public int? ProductId { get; private set; }

@@ -2,5 +2,7 @@ namespace Search.Application.Interfaces.Producer;
 
 public interface IProducerSearchDocumentProvider
 {
-    Task<Entities.Producer?> GetById(int producerId, CancellationToken cancellationToken = default);
+    Task<Dictionary<int, Entities.Producer?>> GetByIds(
+        IEnumerable<int> ids,
+        CancellationToken cancellationToken = default);
 }

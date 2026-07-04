@@ -1,7 +1,7 @@
 ﻿using Localization.Abstractions.Interfaces;
-using Test.Common.Interfaces;
+using Tests.Interfaces;
 
-namespace Test.Common.TestContexts;
+namespace Tests.TestContexts;
 
 public class LocalizedTestContext(IScopedStringLocalizer localizer) : ITestContext
 {

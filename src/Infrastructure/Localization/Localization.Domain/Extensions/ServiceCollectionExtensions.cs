@@ -62,7 +62,8 @@ public static class ServiceCollectionExtensions
     public static IServiceCollection AddLocales(this IServiceCollection services, params Locale[] locales)
     {
         foreach (var locale in locales)
-            services.AddSingleton<ILocalizerContainer, LocalizerContainer>(_ => new LocalizerContainer(locale));
+            services.AddSingleton<ILocalizerContainer, LocalizerContainer>(_ =>
+                new LocalizerContainer(locale));
         return services;
     }
 

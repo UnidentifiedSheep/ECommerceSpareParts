@@ -8,12 +8,14 @@ namespace Search.Application.Handlers.Producers.SearchProducers;
 
 public record SearchProducersQuery(
     string? Query,
-    Pagination Pagination) : IQuery<SearchProducersResult>;
+    Pagination Pagination
+) : IQuery<SearchProducersResult>;
 
 public record SearchProducersResult(IEnumerable<ProducerSearchDto> Producers);
 
 public class SearchProducersHandler(
-    IProducerRepository producerRepository) : IQueryHandler<SearchProducersQuery, SearchProducersResult>
+    IProducerRepository producerRepository
+) : IQueryHandler<SearchProducersQuery, SearchProducersResult>
 {
     public async Task<SearchProducersResult> Handle(
         SearchProducersQuery request,

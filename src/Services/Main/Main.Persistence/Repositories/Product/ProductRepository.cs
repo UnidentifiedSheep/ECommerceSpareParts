@@ -5,7 +5,6 @@ using Main.Entities.Product;
 using Main.Persistence.Context;
 using Microsoft.EntityFrameworkCore;
 using Persistence.Repository;
-
 using QueryExtensions = Persistence.Interfaces.IQueryableExtensions;
 
 namespace Main.Persistence.Repositories.Product;
@@ -38,8 +37,7 @@ public class ProductRepository(DContext context, QueryExtensions extensions)
             .Distinct()
             .ToHashSet();
 
-        if (requestedKeys.Count == 0)
-            return [];
+        if (requestedKeys.Count == 0) return [];
 
         var normalizedSkus = requestedKeys
             .Select(x => x.NormalizedSku)

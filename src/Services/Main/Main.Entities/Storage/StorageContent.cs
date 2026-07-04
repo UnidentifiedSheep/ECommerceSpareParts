@@ -3,19 +3,19 @@ using BulkValidation.Core.Attributes;
 using Domain;
 using Domain.Extensions;
 using Domain.Interfaces;
+using Main.Entities.DomainEvents.StorageContent;
+using Main.Enums;
 
 namespace Main.Entities.Storage;
 
-public class StorageContent : AuditableEntity<StorageContent, int>, ILinqEntity<StorageContent, int>, IVersionable<uint>
+public class StorageContent : AuditableEntity<StorageContent, int>, ILinqEntity<StorageContent, int>,
+    IVersionable<uint>
 {
-    private StorageContent()
-    {
-    }
+    private StorageContent() { }
 
     private StorageContent(
         string storageName,
         int productId,
-        int count,
         decimal buyPrice,
         int currencyId,
         decimal buyPriceInBaseCurrency,
@@ -27,7 +27,6 @@ public class StorageContent : AuditableEntity<StorageContent, int>, ILinqEntity<
         PurchaseDatetime = purchaseDatetime;
         SetCurrencyId(currencyId);
         SetBaseCurrencyId(buyPriceInBaseCurrencyId);
-        SetCount(count);
         SetBuyPrice(buyPrice, buyPriceInBaseCurrency);
     }
 
@@ -51,10 +50,7 @@ public class StorageContent : AuditableEntity<StorageContent, int>, ILinqEntity<
 
     public Currency.Currency Currency { get; private set; } = null!;
 
-    public static Expression<Func<StorageContent, int>> GetKeySelector()
-    {
-        return x => x.Id;
-    }
+    public static Expression<Func<StorageContent, int>> GetKeySelector() { return x => x.Id; }
 
     public static Expression<Func<StorageContent, bool>> GetEqualityExpression(int key)
     {
@@ -66,7 +62,6 @@ public class StorageContent : AuditableEntity<StorageContent, int>, ILinqEntity<
     public static StorageContent Create(
         string storageName,
         int productId,
-        int count,
         decimal buyPrice,
         int currencyId,
         decimal buyPriceInBaseCurrency,
@@ -76,7 +71,6 @@ public class StorageContent : AuditableEntity<StorageContent, int>, ILinqEntity<
         return new StorageContent(
             storageName,
             productId,
-            count,
             buyPrice,
             currencyId,
             buyPriceInBaseCurrency,
@@ -84,16 +78,30 @@ public class StorageContent : AuditableEntity<StorageContent, int>, ILinqEntity<
             purchaseDatetime);
     }
 
-    public void SetCount(int count)
+    public void SetCount(int count, StorageMovementType movementType)
     {
-        Count = count
-            .AgainstNegative(() => new InvalidOperationException("Count must be greater than or equal to zero."));
+        var newCount = count
+            .AgainstNegative(() =>
+                new InvalidOperationException("Count must be greater than or equal to zero."));
+        
+        if (Count == newCount)
+            return;
+
+        AddDomainEvent(new StorageContentCountUpdatedDomainEvent(
+            ProductId,
+            StorageName,
+            CurrencyId,
+            newCount,
+            BuyPrice,
+            movementType,
+             newCount - Count));
+        
+        Count = newCount;
     }
 
-    public void IncreaseCount(int amount)
+    public void IncreaseCount(int amount, StorageMovementType movementType)
     {
-        Count = (Count + amount)
-            .AgainstNegative(() => new InvalidOperationException("Count must be greater than or equal to zero."));
+        SetCount(Count + amount, movementType);
     }
 
     public void SetBuyPrice(decimal buyPrice, decimal buyPriceInBaseCurrency)
@@ -114,11 +122,19 @@ public class StorageContent : AuditableEntity<StorageContent, int>, ILinqEntity<
         BuyPrice = buyPrice;
         BuyPriceInBaseCurrency = buyPriceInBaseCurrency;
     }
-
-    public void SetCurrencyId(int currencyId)
+    public override void OnDeleted()
     {
-        CurrencyId = currencyId;
+        AddDomainEvent(new StorageContentCountUpdatedDomainEvent(
+            ProductId,
+            StorageName,
+            CurrencyId,
+            0,
+            BuyPrice,
+            StorageMovementType.StorageContentDeletion,
+            -Count));
     }
+
+    public void SetCurrencyId(int currencyId) { CurrencyId = currencyId; }
 
     public void AssignCurrency(Currency.Currency currency)
     {
@@ -126,18 +142,9 @@ public class StorageContent : AuditableEntity<StorageContent, int>, ILinqEntity<
         Currency = currency;
     }
 
-    public void SetBaseCurrencyId(int baseCurrencyId)
-    {
-        BaseCurrencyId = baseCurrencyId;
-    }
+    public void SetBaseCurrencyId(int baseCurrencyId) { BaseCurrencyId = baseCurrencyId; }
 
-    public void SetPurchaseDate(DateTime purchaseDate)
-    {
-        PurchaseDatetime = purchaseDate;
-    }
+    public void SetPurchaseDate(DateTime purchaseDate) { PurchaseDatetime = purchaseDate; }
 
-    public override int GetId()
-    {
-        return Id;
-    }
+    public override int GetId() { return Id; }
 }

@@ -17,7 +17,7 @@ namespace Pricing.Migrator.Migrations
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasAnnotation("ProductVersion", "10.0.8")
+                .HasAnnotation("ProductVersion", "10.0.9")
                 .HasAnnotation("Relational:MaxIdentifierLength", 63);
 
             NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
@@ -53,14 +53,16 @@ namespace Pricing.Migrator.Migrations
                         .HasName("settings_pk");
 
                     b.HasIndex("WhoCreated")
-                        .HasDatabaseName("domain.commonentities.setting_who_created_idx");
+                        .HasDatabaseName("pricing.entities.settings.pricingsetting_who_created_idx");
 
                     b.HasIndex("WhoUpdated")
-                        .HasDatabaseName("domain.commonentities.setting_who_updated_idx");
+                        .HasDatabaseName("pricing.entities.settings.pricingsetting_who_updated_idx");
 
                     b.ToTable("settings", (string)null);
 
                     b.HasDiscriminator<string>("Key").HasValue("Setting");
+
+                    b.UseTphMappingStrategy();
                 });
 
             modelBuilder.Entity("MassTransit.EntityFrameworkCoreIntegration.InboxState", b =>
@@ -313,6 +315,20 @@ namespace Pricing.Migrator.Migrations
                     b.HasIndex(new[] { "GroupId" }, "IX_markup_ranges_group_id");
 
                     b.ToTable("markup_ranges", (string)null);
+                });
+
+            modelBuilder.Entity("Pricing.Entities.Settings.CurrencySetting", b =>
+                {
+                    b.HasBaseType("Domain.CommonEntities.Setting");
+
+                    b.HasDiscriminator().HasValue("CurrencySetting");
+                });
+
+            modelBuilder.Entity("Pricing.Entities.Settings.PricingSetting", b =>
+                {
+                    b.HasBaseType("Domain.CommonEntities.Setting");
+
+                    b.HasDiscriminator().HasValue("PricingSettings");
                 });
 
             modelBuilder.Entity("MassTransit.EntityFrameworkCoreIntegration.OutboxMessage", b =>

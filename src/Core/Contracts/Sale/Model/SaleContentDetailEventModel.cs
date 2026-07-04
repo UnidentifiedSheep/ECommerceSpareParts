@@ -18,7 +18,7 @@ public record SaleContentDetailEventModel
 
     [JsonPropertyName("buyPrice")]
     public required decimal BuyPrice { get; init; }
-    
+
     [JsonPropertyName("buyPriceInBaseCurrency")]
     public required decimal BuyPriceInBaseCurrency { get; init; }
 

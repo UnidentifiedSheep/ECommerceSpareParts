@@ -6,9 +6,7 @@ namespace Main.Entities.Auth;
 
 public class UserRole : AuditableEntity<UserRole, (Guid, string)>, ILinqEntity<UserRole, (Guid, string)>
 {
-    private UserRole()
-    {
-    }
+    private UserRole() { }
 
     private UserRole(Guid userId, string roleName)
     {
@@ -31,13 +29,7 @@ public class UserRole : AuditableEntity<UserRole, (Guid, string)>, ILinqEntity<U
         return x => x.UserId == key.Item1 && x.RoleName == normalized;
     }
 
-    public static UserRole Create(Guid userId, string roleName)
-    {
-        return new UserRole(userId, roleName);
-    }
+    public static UserRole Create(Guid userId, string roleName) { return new UserRole(userId, roleName); }
 
-    public override (Guid, string) GetId()
-    {
-        return (UserId, RoleName);
-    }
+    public override (Guid, string) GetId() { return (UserId, RoleName); }
 }

@@ -8,8 +8,7 @@ using Main.Application.Interfaces.Cache;
 using Main.Application.Projections;
 using Main.Application.Static;
 using Main.Entities.Currency;
-using Main.Entities.Exceptions;
-using Main.Entities.Setting;
+using Main.Entities.Settings;
 using Microsoft.EntityFrameworkCore;
 
 namespace Main.Cache;
@@ -18,34 +17,36 @@ public class CurrencyCacheRepository(
     ICache rawCache,
     ISettingsService settingsService,
     IRepository<CurrencyRate, (int, int)> rateRepository,
-    IReadRepository<Currency, int> repository) : ICurrencyCacheRepository
+    IReadRepository<Currency, int> repository
+) : ICurrencyCacheRepository
 {
     public async Task<CurrencyDto?> GetCurrency(
-        int id, 
+        int id,
         CancellationToken cancellationToken = default)
     {
         var key = CacheKeys.CurrencyCache.Currency(id);
         return await rawCache.GetOrSetAsync(
-            key: key, 
-            factory: () => GetCurrencyFromDb(id), 
-            ttl: CacheKeys.CurrencyCache.Ttl);
+            key,
+            () => GetCurrencyFromDb(id),
+            CacheKeys.CurrencyCache.Ttl);
     }
 
-    public async Task<IReadOnlyList<CurrencyDto>> GetAllCurrencies(CancellationToken cancellationToken = default)
+    public async Task<IReadOnlyList<CurrencyDto>> GetAllCurrencies(
+        CancellationToken cancellationToken = default)
     {
         var currenciesKey = CacheKeys.CurrencyCache.AllCurrencies();
         var allCurrencies = await rawCache.GetFromSetAsync(currenciesKey);
 
         if (allCurrencies.Length != 0)
             return (await rawCache.GetOrSetManyAsync(
-                ids: allCurrencies.Select(int.Parse),
-                CacheKeys.CurrencyCache.Currency,
-                currency => currency.Id,
-                GetMissingCurrenciesFromDb,
-                CacheKeys.CurrencyCache.Ttl))
+                    allCurrencies.Select(int.Parse),
+                    CacheKeys.CurrencyCache.Currency,
+                    currency => currency.Id,
+                    GetMissingCurrenciesFromDb,
+                    CacheKeys.CurrencyCache.Ttl))
                 .Select(x => x.Value)
                 .ToList();
-        
+
         var currencies = await repository.Query
             .AsExpandable()
             .Select(CurrencyProjections.ToDto)
@@ -56,10 +57,12 @@ public class CurrencyCacheRepository(
     }
 
     public Task<decimal?> GetCurrencyRate(int currencyId, CancellationToken cancellationToken = default)
-        => rawCache.GetOrSetAsync(
-            key: CacheKeys.CurrencyCache.CurrencyRate(currencyId),
-            factory: () => GetRateFromDb(currencyId),
-            ttl: CacheKeys.CurrencyCache.Ttl);
+    {
+        return rawCache.GetOrSetAsync(
+            CacheKeys.CurrencyCache.CurrencyRate(currencyId),
+            () => GetRateFromDb(currencyId),
+            CacheKeys.CurrencyCache.Ttl);
+    }
 
     public Task InvalidateCurrency(int id, CancellationToken cancellationToken = default)
     {
@@ -70,7 +73,7 @@ public class CurrencyCacheRepository(
     {
         var currenciesKey = CacheKeys.CurrencyCache.AllCurrencies();
         var currencyIds = await rawCache.GetFromSetAsync(currenciesKey);
-        
+
         var keys = currencyIds
             .Select(int.Parse)
             .Select(CacheKeys.CurrencyCache.Currency)
@@ -85,15 +88,21 @@ public class CurrencyCacheRepository(
     }
 
     private Task<CurrencyDto?> GetCurrencyFromDb(int id)
-        => repository.Query.Where(x => x.Id == id)
-            .AsExpandable().Select(CurrencyProjections.ToDto).FirstOrDefaultAsync();
+    {
+        return repository.Query.Where(x => x.Id == id)
+            .AsExpandable()
+            .Select(CurrencyProjections.ToDto)
+            .FirstOrDefaultAsync();
+    }
 
     private Task<Dictionary<int, CurrencyDto>> GetMissingCurrenciesFromDb(IEnumerable<int> ids)
-        => repository.Query
+    {
+        return repository.Query
             .Where(x => ids.Contains(x.Id))
             .AsExpandable()
             .Select(CurrencyProjections.ToDto)
             .ToDictionaryAsync(x => x.Id);
+    }
 
     private async Task<decimal?> GetRateFromDb(int currencyId)
     {

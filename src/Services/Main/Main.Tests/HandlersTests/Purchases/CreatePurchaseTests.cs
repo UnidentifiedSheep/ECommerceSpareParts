@@ -9,9 +9,9 @@ using Main.Entities.Storage;
 using Main.Entities.User;
 using Main.Enums.Balances;
 using Microsoft.EntityFrameworkCore;
-using Test.Common.Extensions;
-using Test.Common.TestContainers.Combined;
 using Tests.DataBuilders.User;
+using Tests.Extensions;
+using Tests.TestContainers.Combined;
 using Tests.TestContexts;
 using Tests.TestContexts.Currency;
 using Tests.TestContexts.Storage;
@@ -50,7 +50,10 @@ public class CreatePurchaseTests : IntegrationTest
             storage.Name,
             false,
             null,
-            products.Select((product, index) => NewContent(product, index + 1, false)));
+            products.Select((product, index) => NewContent(
+                product,
+                index + 1,
+                false)));
 
         await Mediator.Send(command);
 
@@ -71,12 +74,13 @@ public class CreatePurchaseTests : IntegrationTest
         var storageContents = await Context.StorageContents.AsNoTracking().ToListAsync();
         storageContents.Should().HaveCount(command.PurchaseContent.Count());
         foreach (var item in command.PurchaseContent)
-            storageContents.Should().Contain(x =>
-                x.ProductId == item.ProductId &&
-                x.Count == item.Count &&
-                x.BuyPrice == item.Price &&
-                x.CurrencyId == command.CurrencyId &&
-                x.StorageName == command.StorageName);
+            storageContents.Should()
+                .Contain(x =>
+                    x.ProductId == item.ProductId &&
+                    x.Count == item.Count &&
+                    x.BuyPrice == item.Price &&
+                    x.CurrencyId == command.CurrencyId &&
+                    x.StorageName == command.StorageName);
 
         var purchaseTransaction = await Context.Transactions
             .AsNoTracking()
@@ -100,7 +104,12 @@ public class CreatePurchaseTests : IntegrationTest
             storage.Name,
             false,
             null,
-            [NewContent(product, 1, false)]);
+            [
+                NewContent(
+                    product,
+                    1,
+                    false)
+            ]);
 
         await Assert.ThrowsAsync<UserIsNotInNeededRole>(() => Mediator.Send(command));
     }
@@ -111,7 +120,10 @@ public class CreatePurchaseTests : IntegrationTest
         var currency = GetContext<CurrencyTestContext>().Currencies[0];
         var route = GetContext<StorageRouteTestContext>().ActiveRoute;
         var product = GetContext<ProductTestContext>().Products.First();
-        await AddLogisticsDependencies(product, route, _supplier.Id);
+        await AddLogisticsDependencies(
+            product,
+            route,
+            _supplier.Id);
 
         var command = CreateCommand(
             _supplier.Id,
@@ -119,7 +131,12 @@ public class CreatePurchaseTests : IntegrationTest
             route.ToStorageName,
             true,
             route.FromStorageName,
-            [NewContent(product, 2, true)]);
+            [
+                NewContent(
+                    product,
+                    2,
+                    true)
+            ]);
 
         await Mediator.Send(command);
 
@@ -171,7 +188,12 @@ public class CreatePurchaseTests : IntegrationTest
             storage.Name,
             false,
             null,
-            [NewContent(product, 1, false)],
+            [
+                NewContent(
+                    product,
+                    1,
+                    false)
+            ],
             payedSum);
 
         await Mediator.Send(command);
@@ -198,7 +220,12 @@ public class CreatePurchaseTests : IntegrationTest
             storage.Name,
             false,
             null,
-            [NewContent(product, 1, false)],
+            [
+                NewContent(
+                    product,
+                    1,
+                    false)
+            ],
             0m);
 
         await Mediator.Send(command);
@@ -208,7 +235,8 @@ public class CreatePurchaseTests : IntegrationTest
     }
 
     [Fact]
-    public async Task CreatePurchase_WithLogisticsButNoContentMarkedForLogistics_DoesNotCreatePurchaseLogistic()
+    public async Task
+        CreatePurchase_WithLogisticsButNoContentMarkedForLogistics_DoesNotCreatePurchaseLogistic()
     {
         var currency = GetContext<CurrencyTestContext>().Currencies[0];
         var route = GetContext<StorageRouteTestContext>().ActiveRoute;
@@ -222,7 +250,12 @@ public class CreatePurchaseTests : IntegrationTest
             route.ToStorageName,
             true,
             route.FromStorageName,
-            [NewContent(product, 1, false)]);
+            [
+                NewContent(
+                    product,
+                    1,
+                    false)
+            ]);
 
         await Mediator.Send(command);
 
@@ -344,7 +377,11 @@ public class CreatePurchaseTests : IntegrationTest
     {
         var route = GetContext<StorageRouteTestContext>().ActiveRoute;
         var product = GetContext<ProductTestContext>().Products.First();
-        Context.ProductWeights.Add(ProductWeight.Create(product.Id, 2m, WeightUnit.Kilogram));
+        Context.ProductWeights.Add(
+            ProductWeight.Create(
+                product.Id,
+                2m,
+                WeightUnit.Kilogram));
         Context.StorageOwners.Add(StorageOwner.Create(route.FromStorageName, _supplier.Id));
         await Context.SaveChangesAsync();
 
@@ -354,17 +391,29 @@ public class CreatePurchaseTests : IntegrationTest
             route.ToStorageName,
             true,
             route.FromStorageName,
-            [NewContent(product, 1, true)]);
+            [
+                NewContent(
+                    product,
+                    1,
+                    true)
+            ]);
 
         await Assert.ThrowsAsync<ProductSizesNotFoundException>(() => Mediator.Send(command));
     }
 
     [Fact]
-    public async Task CreatePurchase_WithLogisticsAndMissingProductWeight_ThrowsProductWeightNotFoundException()
+    public async Task
+        CreatePurchase_WithLogisticsAndMissingProductWeight_ThrowsProductWeightNotFoundException()
     {
         var route = GetContext<StorageRouteTestContext>().ActiveRoute;
         var product = GetContext<ProductTestContext>().Products.First();
-        Context.ProductSizes.Add(ProductSize.Create(product.Id, 1m, 1m, 1m, DimensionUnit.Meter));
+        Context.ProductSizes.Add(
+            ProductSize.Create(
+                product.Id,
+                1m,
+                1m,
+                1m,
+                DimensionUnit.Meter));
         Context.StorageOwners.Add(StorageOwner.Create(route.FromStorageName, _supplier.Id));
         await Context.SaveChangesAsync();
 
@@ -374,7 +423,12 @@ public class CreatePurchaseTests : IntegrationTest
             route.ToStorageName,
             true,
             route.FromStorageName,
-            [NewContent(product, 1, true)]);
+            [
+                NewContent(
+                    product,
+                    1,
+                    true)
+            ]);
 
         await Assert.ThrowsAsync<ProductWeightNotFoundException>(() => Mediator.Send(command));
     }
@@ -412,10 +466,18 @@ public class CreatePurchaseTests : IntegrationTest
             storage.Name,
             false,
             null,
-            [NewContent(product, 1, false)]);
+            [
+                NewContent(
+                    product,
+                    1,
+                    false)
+            ]);
     }
 
-    private static NewPurchaseContentDto NewContent(Product product, int count, bool calculateLogistics)
+    private static NewPurchaseContentDto NewContent(
+        Product product,
+        int count,
+        bool calculateLogistics)
     {
         return new NewPurchaseContentDto
         {
@@ -427,10 +489,23 @@ public class CreatePurchaseTests : IntegrationTest
         };
     }
 
-    private async Task AddLogisticsDependencies(Product product, StorageRoute route, Guid supplierId)
+    private async Task AddLogisticsDependencies(
+        Product product,
+        StorageRoute route,
+        Guid supplierId)
     {
-        Context.ProductSizes.Add(ProductSize.Create(product.Id, 1m, 1m, 1m, DimensionUnit.Meter));
-        Context.ProductWeights.Add(ProductWeight.Create(product.Id, 2m, WeightUnit.Kilogram));
+        Context.ProductSizes.Add(
+            ProductSize.Create(
+                product.Id,
+                1m,
+                1m,
+                1m,
+                DimensionUnit.Meter));
+        Context.ProductWeights.Add(
+            ProductWeight.Create(
+                product.Id,
+                2m,
+                WeightUnit.Kilogram));
         Context.StorageOwners.Add(StorageOwner.Create(route.FromStorageName, supplierId));
         await Context.SaveChangesAsync();
     }

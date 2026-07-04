@@ -13,7 +13,8 @@ namespace Main.Application.Handlers.StorageRoutes.EditStorageRoute;
 public record EditStorageRouteCommand(Guid Id, PatchStorageRouteDto PatchStorageRoute) : ICommand;
 
 public class EditStorageRouteHandler(
-    IStorageRouteRepository repository)
+    IStorageRouteRepository repository
+)
     : ICommandHandler<EditStorageRouteCommand>
 {
     public async Task<Unit> Handle(EditStorageRouteCommand request, CancellationToken cancellationToken)
@@ -33,15 +34,13 @@ public class EditStorageRouteHandler(
                     cancellationToken);
 
                 if (isActiveExists)
-                    throw new StorageRouteActiveExistsException(storageRoute.FromStorageName,
+                    throw new StorageRouteActiveExistsException(
+                        storageRoute.FromStorageName,
                         storageRoute.ToStorageName);
 
                 storageRoute.Activate();
             }
-            else
-            {
-                storageRoute.Deactivate();
-            }
+            else { storageRoute.Deactivate(); }
         }
 
         patch.DistanceM.Apply(storageRoute.SetDistanceM);

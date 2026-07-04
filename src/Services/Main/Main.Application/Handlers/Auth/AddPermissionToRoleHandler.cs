@@ -1,5 +1,5 @@
-using Application.Common.Interfaces;
 using Application.Common.Interfaces.Cqrs;
+using Application.Common.Interfaces.Events;
 using Application.Common.Interfaces.Repositories;
 using Attributes;
 using Contracts.Auth;
@@ -15,7 +15,8 @@ public record AddPermissionToRoleCommand(string RoleName, string PermissionName)
 
 public class AddPermissionToRoleHandler(
     IRepository<Role, string> repository,
-    IIntegrationEventScope integrationEventScope) : ICommandHandler<AddPermissionToRoleCommand>
+    IIntegrationEventScope integrationEventScope
+) : ICommandHandler<AddPermissionToRoleCommand>
 {
     public async Task<Unit> Handle(AddPermissionToRoleCommand request, CancellationToken cancellationToken)
     {
@@ -30,10 +31,11 @@ public class AddPermissionToRoleHandler(
 
         role.AddPermission(request.PermissionName);
 
-        integrationEventScope.Add(new RoleUpdatedEvent
-        {
-            RoleName = request.RoleName
-        });
+        integrationEventScope.Add(
+            new RoleUpdatedEvent
+            {
+                RoleName = request.RoleName
+            });
 
         return Unit.Value;
     }

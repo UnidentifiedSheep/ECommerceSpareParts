@@ -18,7 +18,7 @@
       - redis
       - rabbitmq
     restart: unless-stopped
-    
+  
   main-worker:
     image: main-worker
     build:

@@ -7,16 +7,35 @@ namespace Tests.Domain.Product;
 public class ProductImageTests
 {
     [Theory]
-    [InlineData(1, "image.png", "desc")]
-    [InlineData(1, "image.jpg", null)]
-    [InlineData(1, "image.webp", "   ")]
-    public void Create_ValidData_Succeeds(int productId, string path, string? description)
+    [InlineData(
+        1,
+        "image.png",
+        "desc")]
+    [InlineData(
+        1,
+        "image.jpg",
+        null)]
+    [InlineData(
+        1,
+        "image.webp",
+        "   ")]
+    public void Create_ValidData_Succeeds(
+        int productId,
+        string path,
+        string? description)
     {
-        var act = () => ProductImage.Create(productId, path, description);
+        var act = () => ProductImage.Create(
+            productId,
+            path,
+            description);
 
         var model = act.Should().NotThrow().Subject;
 
-        Validate(model, productId, path, description);
+        Validate(
+            model,
+            productId,
+            path,
+            description);
     }
 
     [Theory]
@@ -25,7 +44,10 @@ public class ProductImageTests
     [InlineData("image")]
     public void Create_InvalidExtension_Throws(string path)
     {
-        var act = () => ProductImage.Create(1, path, "desc");
+        var act = () => ProductImage.Create(
+            1,
+            path,
+            "desc");
 
         act.Should().Throw<InvalidInputException>();
     }
@@ -36,7 +58,10 @@ public class ProductImageTests
     [InlineData("  image.webp  ")]
     public void SetPath_Valid_Succeeds(string path)
     {
-        var model = ProductImage.Create(1, "image.png", null);
+        var model = ProductImage.Create(
+            1,
+            "image.png",
+            null);
 
         var act = () => model.SetPath(path);
 
@@ -51,7 +76,10 @@ public class ProductImageTests
     [InlineData("   ")]
     public void SetPath_Invalid_Throws(string path)
     {
-        var model = ProductImage.Create(1, "image.png", null);
+        var model = ProductImage.Create(
+            1,
+            "image.png",
+            null);
 
         var act = () => model.SetPath(path);
 
@@ -64,7 +92,10 @@ public class ProductImageTests
     [InlineData("   ")]
     public void SetDescription_Normalization_Works(string? description)
     {
-        var model = ProductImage.Create(1, "image.png", "old");
+        var model = ProductImage.Create(
+            1,
+            "image.png",
+            "old");
 
         model.SetDescription(description);
 

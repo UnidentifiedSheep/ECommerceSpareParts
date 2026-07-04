@@ -1,8 +1,7 @@
 using Abstractions.Interfaces.Persistence;
-using Abstractions.Interfaces.Services;
 using Application.Common.Extensions;
-using Application.Common.Interfaces;
 using Application.Common.Interfaces.Cqrs;
+using Application.Common.Interfaces.Events;
 using Attributes;
 using Contracts.Producer;
 using Main.Application.Dtos.Producer;
@@ -17,22 +16,17 @@ public record CreateProducerCommand(NewProducerDto NewProducer) : ICommand<Creat
 
 public record CreateProducerResult(ProducerDto Producer);
 
-public class CreateProducerHandler(
-    IUnitOfWork unitOfWork,
-    IIntegrationEventScope integrationEventScope)
+public class CreateProducerHandler(IUnitOfWork unitOfWork )
     : ICommandHandler<CreateProducerCommand, CreateProducerResult>
 {
-    public async Task<CreateProducerResult> Handle(CreateProducerCommand request, CancellationToken cancellationToken)
+    public async Task<CreateProducerResult> Handle(
+        CreateProducerCommand request,
+        CancellationToken cancellationToken)
     {
         var newProducer = request.NewProducer;
         var producer = Producer.Create(newProducer.Name, newProducer.Description);
         await unitOfWork.AddAsync(producer, cancellationToken);
         await unitOfWork.SaveChangesAsync(cancellationToken);
-        
-        integrationEventScope.Add(new ProducerUpdatedEvent
-        {
-            Id = producer.Id
-        });
 
         return new CreateProducerResult(ProducerProjections.ToDto.AsFunc()(producer));
     }

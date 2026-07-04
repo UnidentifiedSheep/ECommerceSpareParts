@@ -13,7 +13,7 @@ public record SearchProductsBySkuRequest : SortablePaginationQueryModel
 {
     [FromQuery(Name = "sku")]
     public required string Sku { get; init; }
-    
+
     [FromQuery(Name = "producerId")]
     public int? ProducerId { get; init; }
 }
@@ -28,29 +28,32 @@ public static class SearchProductsBySkuEndPoint
 {
     public static RouteGroupBuilder SearchProductsBySku(this RouteGroupBuilder products)
     {
-        products.MapGet("/sku", async (
-                ISender sender,
-                [AsParameters] SearchProductsBySkuRequest request,
-                CancellationToken cancellationToken) =>
-            {
-                var result = await sender.Send(
-                    new SearchProductsBySkuQuery(
-                        request.Sku,
-                        request.ProducerId,
-                        request,
-                        request.SortBy),
-                    cancellationToken);
-
-                return Results.Ok(new SearchProductsBySkuResult
+        products.MapGet(
+                "/sku",
+                async (
+                    ISender sender,
+                    [AsParameters] SearchProductsBySkuRequest request,
+                    CancellationToken cancellationToken) =>
                 {
-                    Products = result.Products
-                });
-            })
+                    var result = await sender.Send(
+                        new SearchProductsBySkuQuery(
+                            request.Sku,
+                            request.ProducerId,
+                            request,
+                            request.SortBy),
+                        cancellationToken);
+
+                    return Results.Ok(
+                        new SearchProductsBySkuResult
+                        {
+                            Products = result.Products
+                        });
+                })
             .WithTags("Products")
             .RequireAllPermissions(PermissionCodes.ARTICLES_GET_MAIN)
             .WithDisplayName("Search products")
             .Produces<SearchProductsBySkuResult>();
-        
+
         return products;
     }
 }

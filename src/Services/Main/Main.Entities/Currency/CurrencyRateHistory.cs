@@ -4,11 +4,10 @@ using Domain.Interfaces;
 
 namespace Main.Entities.Currency;
 
-public class CurrencyRateHistory : AuditableEntity<CurrencyRateHistory, int>, ILinqEntity<CurrencyRateHistory, int>
+public class CurrencyRateHistory : AuditableEntity<CurrencyRateHistory, int>,
+    ILinqEntity<CurrencyRateHistory, int>
 {
-    private CurrencyRateHistory()
-    {
-    }
+    private CurrencyRateHistory() { }
 
     private CurrencyRateHistory(
         int from,
@@ -32,10 +31,7 @@ public class CurrencyRateHistory : AuditableEntity<CurrencyRateHistory, int>, IL
 
     public CurrencyRate CurrencyRate { get; private set; } = null!;
 
-    public static Expression<Func<CurrencyRateHistory, int>> GetKeySelector()
-    {
-        return x => x.Id;
-    }
+    public static Expression<Func<CurrencyRateHistory, int>> GetKeySelector() { return x => x.Id; }
 
     public static Expression<Func<CurrencyRateHistory, bool>> GetEqualityExpression(int key)
     {
@@ -48,11 +44,12 @@ public class CurrencyRateHistory : AuditableEntity<CurrencyRateHistory, int>, IL
         decimal prev,
         decimal next)
     {
-        return new CurrencyRateHistory(from, to, prev, next);
+        return new CurrencyRateHistory(
+            from,
+            to,
+            prev,
+            next);
     }
 
-    public override int GetId()
-    {
-        return Id;
-    }
+    public override int GetId() { return Id; }
 }

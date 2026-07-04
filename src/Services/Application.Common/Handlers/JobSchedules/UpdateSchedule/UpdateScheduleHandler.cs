@@ -17,7 +17,8 @@ namespace Application.Common.Handlers.JobSchedules.UpdateSchedule;
 [Transactional]
 public record UpdateScheduleCommand(
     Guid ScheduleId,
-    PatchJobScheduleDto Patch) : ICommand<UpdateScheduleResult>;
+    PatchJobScheduleDto Patch
+) : ICommand<UpdateScheduleResult>;
 
 public record UpdateScheduleResult(JobScheduleDto Schedule);
 
@@ -25,7 +26,8 @@ public class UpdateScheduleHandler(
     IRepository<JobSchedule, Guid> repository,
     INamedObjectRegistry<LrtNamedObjectBase> registry,
     IScopedStringLocalizer localizer,
-    IUnitOfWork unitOfWork) : ICommandHandler<UpdateScheduleCommand, UpdateScheduleResult>
+    IUnitOfWork unitOfWork
+) : ICommandHandler<UpdateScheduleCommand, UpdateScheduleResult>
 {
     public async Task<UpdateScheduleResult> Handle(
         UpdateScheduleCommand request,
@@ -44,9 +46,9 @@ public class UpdateScheduleHandler(
         if (patch.InputState.IsSet)
         {
             var lrt = registry.GetBySystemName(schedule.JobSystemName);
-            lrt.ValidateState(patch.InputState.Value!);
-            
-            schedule.SetInputState(patch.InputState.Value!);
+            var validatedState = lrt.ValidateState(patch.InputState.Value!);
+
+            schedule.SetInputState(validatedState);
         }
 
         if (patch.Cron.IsSet)
@@ -62,10 +64,7 @@ public class UpdateScheduleHandler(
                 schedule.Enable();
                 nextRunAtMustBeRecalculated = true;
             }
-            else
-            {
-                schedule.Disable();
-            }
+            else { schedule.Disable(); }
         }
 
         if (nextRunAtMustBeRecalculated)
@@ -74,7 +73,7 @@ public class UpdateScheduleHandler(
                 .GetNextOccurrence(
                     DateTime.UtcNow,
                     JobSchedule.TimeZone);
-            
+
             schedule.SetNextRunAt(nextRunAt);
         }
 

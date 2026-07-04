@@ -8,11 +8,12 @@ namespace S3;
 
 public class S3StorageService(
     IPresignedS3Client presignedS3Client,
-    IAmazonS3 s3Client) : IS3StorageService
+    IAmazonS3 s3Client
+) : IS3StorageService
 {
     public async Task<string> UploadFileAsync(
-        string bucketName, 
-        IFile file, 
+        string bucketName,
+        IFile file,
         string keyName)
     {
         using var memoryStream = new MemoryStream();
@@ -32,9 +33,9 @@ public class S3StorageService(
     }
 
     public async Task<string> UploadFileAsync(
-        string bucketName, 
-        Stream stream, 
-        string keyName, 
+        string bucketName,
+        Stream stream,
+        string keyName,
         string contentType)
     {
         var request = new PutObjectRequest
@@ -51,7 +52,7 @@ public class S3StorageService(
     }
 
     public async Task<Stream> DownloadFileAsync(
-        string bucketName, 
+        string bucketName,
         string keyName,
         CancellationToken ct = default)
     {
@@ -109,7 +110,7 @@ public class S3StorageService(
             HasMore = response.IsTruncated ?? false
         };
     }
-    
+
     public Task<string> CreatePresignedUploadUrl(
         string bucketName,
         string objectKey,

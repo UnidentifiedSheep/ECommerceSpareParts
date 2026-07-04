@@ -13,10 +13,17 @@ public class ProductWeightTests
     [InlineData(0.99, WeightUnit.Kilogram)]
     public void CreateWeight_ValidData_Succeeds(decimal weight, WeightUnit unit)
     {
-        var act = () => ProductWeight.Create(1, weight, unit);
+        var act = () => ProductWeight.Create(
+            1,
+            weight,
+            unit);
         var model = act.Should().NotThrow().Subject;
 
-        ValidateModel(model, 1, weight, unit);
+        ValidateModel(
+            model,
+            1,
+            weight,
+            unit);
     }
 
     [Theory]
@@ -26,7 +33,10 @@ public class ProductWeightTests
     [InlineData(1000.324)]
     public void CreateWeight_InvalidWeight_Throws(decimal weight)
     {
-        var act = () => ProductWeight.Create(1, weight, WeightUnit.Kilogram);
+        var act = () => ProductWeight.Create(
+            1,
+            weight,
+            WeightUnit.Kilogram);
         act.Should().Throw<InvalidInputException>();
     }
 
@@ -36,13 +46,20 @@ public class ProductWeightTests
     [InlineData(0.99, WeightUnit.Kilogram)]
     public void UpdateWeight_ValidData_Succeeds(decimal weight, WeightUnit unit)
     {
-        var model = ProductWeight.Create(1, 1, WeightUnit.Kilogram);
+        var model = ProductWeight.Create(
+            1,
+            1,
+            WeightUnit.Kilogram);
 
         var act = () => model.Update(weight, unit);
 
         act.Should().NotThrow();
 
-        ValidateModel(model, 1, weight, unit);
+        ValidateModel(
+            model,
+            1,
+            weight,
+            unit);
     }
 
     [Theory]
@@ -52,12 +69,19 @@ public class ProductWeightTests
     [InlineData(1000.324)]
     public void UpdateWeight_InvalidWeight_Throws(decimal weight)
     {
-        var model = ProductWeight.Create(1, 1, WeightUnit.Kilogram);
+        var model = ProductWeight.Create(
+            1,
+            1,
+            WeightUnit.Kilogram);
 
         var act = () => model.Update(weight, WeightUnit.Kilogram);
         act.Should().Throw<InvalidInputException>();
 
-        ValidateModel(model, 1, 1, WeightUnit.Kilogram);
+        ValidateModel(
+            model,
+            1,
+            1,
+            WeightUnit.Kilogram);
     }
 
     private static void ValidateModel(

@@ -31,7 +31,8 @@ public class ProductConfiguration : IEntityTypeConfiguration<Entities.Product.Pr
         builder.Property(e => e.Id)
             .HasColumnName("id");
 
-        builder.ComplexProperty(x => x.Sku,
+        builder.ComplexProperty(
+            x => x.Sku,
             b =>
             {
                 b.Property(e => e.Value)
@@ -41,7 +42,8 @@ public class ProductConfiguration : IEntityTypeConfiguration<Entities.Product.Pr
                     .HasColumnName("normalized_sku")
                     .HasComplexIndex(e =>
                     {
-                        e.UseGin().HasName("products_sku_index")
+                        e.UseGin()
+                            .HasName("products_sku_index")
                             .HasOperators("gin_trgm_ops");
                     });
             });

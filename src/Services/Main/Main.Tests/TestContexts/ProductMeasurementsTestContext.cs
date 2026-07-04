@@ -1,15 +1,16 @@
 using Main.Entities.Product;
 using Main.Persistence.Context;
-using Test.Common.Abstractions;
-using Test.Common.Extensions;
-using Test.Common.Interfaces;
+using Tests.Abstractions;
 using Tests.DataBuilders;
+using Tests.Extensions;
+using Tests.Interfaces;
 
 namespace Tests.TestContexts;
 
 public class ProductMeasurementsTestContext(
     DContext context,
-    ProductTestContext productContext)
+    ProductTestContext productContext
+)
     : TestContextBase<DContext>(context), IDependentTestContext
 {
     public IReadOnlyCollection<ProductSize> Sizes { get; private set; } = null!;
@@ -26,11 +27,13 @@ public class ProductMeasurementsTestContext(
         var weightsBuilder = new List<ProductWeightBuilder>();
         foreach (var product in productContext.Products)
         {
-            sizeBuilders.Add(new ProductSizeBuilder(Faker)
-                .WithProductId(product.Id));
+            sizeBuilders.Add(
+                new ProductSizeBuilder(Faker)
+                    .WithProductId(product.Id));
 
-            weightsBuilder.Add(new ProductWeightBuilder(Faker)
-                .WithProductId(product.Id));
+            weightsBuilder.Add(
+                new ProductWeightBuilder(Faker)
+                    .WithProductId(product.Id));
         }
 
         Sizes = await sizeBuilders.BuildManyCombinedAndAddToDb(

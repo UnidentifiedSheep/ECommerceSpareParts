@@ -7,11 +7,12 @@ namespace Main.Entities.Product;
 
 public class ProductContent : Entity<ProductContent, (int, int)>, ILinqEntity<ProductContent, (int, int)>
 {
-    private ProductContent()
-    {
-    }
+    private ProductContent() { }
 
-    private ProductContent(int parentProductId, int childProductId, int quantity)
+    private ProductContent(
+        int parentProductId,
+        int childProductId,
+        int quantity)
     {
         parentProductId.AgainstEqual(childProductId, "article.content.self.reference.not.allowed");
         ParentProductId = parentProductId;
@@ -36,9 +37,15 @@ public class ProductContent : Entity<ProductContent, (int, int)>, ILinqEntity<Pr
         return x => x.ParentProductId == key.Item1 && x.ChildProductId == key.Item2;
     }
 
-    public static ProductContent Create(int parentProductId, int childProductId, int quantity)
+    public static ProductContent Create(
+        int parentProductId,
+        int childProductId,
+        int quantity)
     {
-        return new ProductContent(parentProductId, childProductId, quantity);
+        return new ProductContent(
+            parentProductId,
+            childProductId,
+            quantity);
     }
 
     public void SetQuantity(int quantity)
@@ -47,8 +54,5 @@ public class ProductContent : Entity<ProductContent, (int, int)>, ILinqEntity<Pr
         Quantity = quantity;
     }
 
-    public override (int, int) GetId()
-    {
-        return (ParentProductId, ChildProductId);
-    }
+    public override (int, int) GetId() { return (ParentProductId, ChildProductId); }
 }

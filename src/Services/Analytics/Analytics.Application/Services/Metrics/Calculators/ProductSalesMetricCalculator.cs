@@ -1,5 +1,4 @@
-﻿using Analytics.Application.Interfaces.Repositories;
-using Analytics.Entities;
+﻿using Analytics.Entities;
 using Analytics.Entities.Metrics;
 using Analytics.Entities.Metrics.JsonDataModels;
 using Application.Common.Interfaces.Repositories;
@@ -7,12 +6,15 @@ using Application.Common.Interfaces.Repositories;
 namespace Analytics.Application.Services.Metrics.Calculators;
 
 public class ProductSalesMetricCalculator(
-    IRepository<SalesFact, Guid> salesRepository)
+    IRepository<SalesFact, Guid> salesRepository
+)
     : MetricCalculatorBase<ProductSalesMetric>
 {
     private const int BatchSize = 1000;
 
-    public override async Task CalculateMetric(ProductSalesMetric metric, CancellationToken cancellationToken = default)
+    public override async Task CalculateMetric(
+        ProductSalesMetric metric,
+        CancellationToken cancellationToken = default)
     {
         var minPrice = decimal.MaxValue;
         var maxPrice = decimal.MinValue;
@@ -30,21 +32,18 @@ public class ProductSalesMetricCalculator(
             while (true)
             {
                 var facts = await salesRepository.ListAsync(
-                    GetCriteria(metric, lastId), 
+                    GetCriteria(metric, lastId),
                     cancellationToken);
-                if (facts.Count == 0)
-                    break;
+                if (facts.Count == 0) break;
 
                 foreach (var item in facts.SelectMany(x => x.SaleContents))
                 {
-                    if (item.ProductId != metric.ProductId)
-                        continue;
+                    if (item.ProductId != metric.ProductId) continue;
 
                     var priceDecimal = item.PriceInBaseCurrency;
                     var quantity = item.Count;
 
-                    if (quantity <= 0)
-                        continue;
+                    if (quantity <= 0) continue;
 
                     var price = (double)priceDecimal;
 
@@ -62,8 +61,7 @@ public class ProductSalesMetricCalculator(
                     m2 += quantity * delta * delta2;
                 }
 
-                if (facts.Count < BatchSize)
-                    break;
+                if (facts.Count < BatchSize) break;
 
                 lastId = facts[^1].Id;
             }

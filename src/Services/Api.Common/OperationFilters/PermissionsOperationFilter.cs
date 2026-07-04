@@ -8,18 +8,30 @@ public class PermissionsOperationFilter : IOperationFilter
 {
     public void Apply(OpenApiOperation operation, OperationFilterContext context)
     {
-        var metadata = context.ApiDescription.ActionDescriptor.EndpointMetadata
+        var permissionsMetadata = context.ApiDescription.ActionDescriptor.EndpointMetadata
             .OfType<RequiredPermissionsMetadata>()
             .FirstOrDefault();
 
-        if (metadata == null)
-            return;
+        if (permissionsMetadata != null)
+        {
+            var permissions = string.Join(", ", permissionsMetadata.Permissions);
+            var type = permissionsMetadata.RequireAll ? "ALL" : "ANY";
 
-        var permissions = string.Join(", ", metadata.Permissions);
+            operation.Description +=
+                $"\n\n**Required Permissions ({type}):** {permissions}";
+        }
 
-        var type = metadata.RequireAll ? "ALL" : "ANY";
+        var rolesMetadata = context.ApiDescription.ActionDescriptor.EndpointMetadata
+            .OfType<RequiredRolesMetadata>()
+            .FirstOrDefault();
 
-        operation.Description +=
-            $"\n\n**Required Permissions ({type}):** {permissions}";
+        if (rolesMetadata != null)
+        {
+            var roles = string.Join(", ", rolesMetadata.Roles);
+            var type = rolesMetadata.RequireAll ? "ALL" : "ANY";
+
+            operation.Description +=
+                $"\n\n**Required Roles ({type}):** {roles}";
+        }
     }
 }

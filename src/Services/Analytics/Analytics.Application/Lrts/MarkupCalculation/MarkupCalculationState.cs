@@ -1,4 +1,3 @@
-using System.Text.Json;
 using System.Text.Json.Serialization;
 using Application.Common.Interfaces.Lrt;
 using Attributes.JsonAttributes;
@@ -11,7 +10,7 @@ public record MarkupCalculationState
 {
     [JsonPropertyName("rangeStart")]
     public DateTime? RangeStart { get; init; }
-    
+
     [JsonPropertyName("rangeEnd")]
     public DateTime? RangeEnd { get; init; }
 }
@@ -23,7 +22,7 @@ public record MarkupCalculationInputState : IInputState
     [LocalizedJsonFieldName("datetime.range.start.name")]
     [JsonPropertyName("rangeStart")]
     public DateTime? RangeStart { get; init; }
-    
+
     [InputControl(InputControlType.DatePicker)]
     [LocalizedJsonFieldDescription("datetime.range.end.description")]
     [LocalizedJsonFieldName("datetime.range.end.name")]

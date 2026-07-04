@@ -10,21 +10,30 @@ public class EditStorageRouteValidation : AbstractValidator<EditStorageRouteComm
         RuleFor(x => x.PatchStorageRoute.PriceKg.Value)
             .GreaterThanOrEqualTo(0)
             .WithLocalizationKey("storage.route.price.kg.min")
-            .PrecisionScale(18, 2, true)
+            .PrecisionScale(
+                18,
+                2,
+                true)
             .WithLocalizationKey("storage.route.price.kg.precision")
             .When(x => x.PatchStorageRoute.PriceKg.IsSet);
 
         RuleFor(x => x.PatchStorageRoute.PricePerM3.Value)
             .GreaterThanOrEqualTo(0)
             .WithLocalizationKey("storage.route.price.m3.min")
-            .PrecisionScale(18, 2, true)
+            .PrecisionScale(
+                18,
+                2,
+                true)
             .WithLocalizationKey("storage.route.price.m3.precision")
             .When(x => x.PatchStorageRoute.PricePerM3.IsSet);
 
         RuleFor(x => x.PatchStorageRoute.PricePerOrder.Value)
             .GreaterThanOrEqualTo(0)
             .WithLocalizationKey("storage.route.price.order.min")
-            .PrecisionScale(18, 2, true)
+            .PrecisionScale(
+                18,
+                2,
+                true)
             .WithLocalizationKey("storage.route.price.order.precision")
             .When(x => x.PatchStorageRoute.PricePerOrder.IsSet);
 

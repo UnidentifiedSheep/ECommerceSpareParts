@@ -50,75 +50,87 @@ public static class JobScheduleEndPoints
         var schedules = group.MapGroup("/schedules")
             .WithTags("Schedules");
 
-        schedules.MapGet("", async (
-                ISender sender,
-                [AsParameters] GetJobSchedulesRequest request,
-                CancellationToken ct) =>
-            {
-                var result = await sender.Send(new GetScheduleQuery(
-                    request.JobSystemNames,
-                    new RangeModel<DateTime>(request.NextRunFrom, request.NextRunTo),
-                    request.SortBy,
-                    request), ct);
-
-                return Results.Ok(new GetJobSchedulesResponse
+        schedules.MapGet(
+                "",
+                async (
+                    ISender sender,
+                    [AsParameters] GetJobSchedulesRequest request,
+                    CancellationToken ct) =>
                 {
-                    Schedules = result.Schedules
-                });
-            })
+                    var result = await sender.Send(
+                        new GetScheduleQuery(
+                            request.JobSystemNames,
+                            new RangeModel<DateTime>(request.NextRunFrom, request.NextRunTo),
+                            request.SortBy,
+                            request),
+                        ct);
+
+                    return Results.Ok(
+                        new GetJobSchedulesResponse
+                        {
+                            Schedules = result.Schedules
+                        });
+                })
             .WithName("GetJobSchedules")
             .WithDisplayName("Get job schedules")
             .Produces<GetJobSchedulesResponse>()
             .RequireAllPermissions(PermissionCodes.JOBS_GET);
 
-        schedules.MapPost("", async (
-                ISender sender,
-                NewJobScheduleDto schedule,
-                CancellationToken ct) =>
-            {
-                var result = await sender.Send(new CreateScheduleCommand(schedule), ct);
+        schedules.MapPost(
+                "",
+                async (
+                    ISender sender,
+                    NewJobScheduleDto schedule,
+                    CancellationToken ct) =>
+                {
+                    var result = await sender.Send(new CreateScheduleCommand(schedule), ct);
 
-                return Results.Created(
-                    $"/jobs/schedules/{result.Schedule.Id}",
-                    new CreateJobScheduleResponse
-                    {
-                        Schedule = result.Schedule
-                    });
-            })
+                    return Results.Created(
+                        $"/jobs/schedules/{result.Schedule.Id}",
+                        new CreateJobScheduleResponse
+                        {
+                            Schedule = result.Schedule
+                        });
+                })
             .WithName("CreateJobSchedule")
             .WithDisplayName("Create job schedule")
             .Produces<CreateJobScheduleResponse>(StatusCodes.Status201Created)
             .ProducesProblem(StatusCodes.Status400BadRequest)
             .RequireAllPermissions(PermissionCodes.JOBS_CREATE);
 
-        schedules.MapPatch("{scheduleId:guid}", async (
-                ISender sender,
-                Guid scheduleId,
-                PatchJobScheduleDto patch,
-                CancellationToken ct) =>
-            {
-                var result = await sender.Send(new UpdateScheduleCommand(scheduleId, patch), ct);
-
-                return Results.Ok(new UpdateJobScheduleResponse
+        schedules.MapPatch(
+                "{scheduleId:guid}",
+                async (
+                    ISender sender,
+                    Guid scheduleId,
+                    PatchJobScheduleDto patch,
+                    CancellationToken ct) =>
                 {
-                    Schedule = result.Schedule
-                });
-            })
+                    var result = await sender.Send(new UpdateScheduleCommand(scheduleId, patch), ct);
+
+                    return Results.Ok(
+                        new UpdateJobScheduleResponse
+                        {
+                            Schedule = result.Schedule
+                        });
+                })
             .WithName("UpdateJobSchedule")
             .WithDisplayName("Update job schedule")
             .Produces<UpdateJobScheduleResponse>()
             .ProducesProblem(StatusCodes.Status400BadRequest)
             .ProducesProblem(StatusCodes.Status404NotFound)
             .RequireAllPermissions(PermissionCodes.JOBS_CREATE);
-        
-        schedules.MapDelete("{scheduleId:guid}", async (
-                ISender sender,
-                Guid scheduleId,
-                CancellationToken ct) =>
-            {
-                await sender.Send(new RemoveJobScheduleCommand(scheduleId), ct);
-                return Results.NoContent();
-            })
+
+        schedules.MapDelete(
+                "{scheduleId:guid}",
+                async (
+                    ISender sender,
+                    Guid scheduleId,
+                    CancellationToken ct) =>
+                {
+                    await sender.Send(new RemoveJobScheduleCommand(scheduleId), ct);
+                    return Results.NoContent();
+                })
             .WithName("RemoveJobSchedule")
             .WithDisplayName("Remove job schedule")
             .Produces(204)

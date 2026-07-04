@@ -1,7 +1,7 @@
 using System.Reflection;
 using Abstractions.Interfaces.Persistence;
-using Abstractions.Interfaces.Services;
 using Api.Common.Extensions;
+using Application.Common.Interfaces.Events;
 using Attributes;
 using Localization.Domain.Extensions;
 using Main.Persistence.Context;
@@ -9,9 +9,9 @@ using MediatR;
 using Microsoft.Extensions.DependencyInjection;
 using Persistence.Extensions;
 using StackExchange.Redis;
-using Test.Common.Abstractions.Test;
-using Test.Common.Extensions;
-using Test.Common.TestContainers.Combined;
+using Tests.Abstractions.Test;
+using Tests.Extensions;
+using Tests.TestContainers.Combined;
 
 namespace Tests;
 
@@ -23,11 +23,12 @@ public abstract class IntegrationTest(CombinedContainerFixture fixture)
 
     public override async Task InitializeAsync()
     {
-        InitializeServiceProvider(new ServiceProviderArguments
-        {
-            PgsqlConnectionString = fixture.PostgresConnectionString,
-            CacheConnectionString = fixture.RedisConnectionString
-        });
+        InitializeServiceProvider(
+            new ServiceProviderArguments
+            {
+                PgsqlConnectionString = fixture.PostgresConnectionString,
+                CacheConnectionString = fixture.RedisConnectionString
+            });
         Mediator = Scope.ServiceProvider.GetRequiredService<IMediator>();
 
         await ResetCache();
@@ -39,7 +40,11 @@ public abstract class IntegrationTest(CombinedContainerFixture fixture)
     protected override async Task InitializeBasicContexts()
     {
         var unitOfWork = Scope.ServiceProvider.GetRequiredService<IUnitOfWork>();
-        await unitOfWork.ExecuteWithTransaction(new TransactionalAttribute(), () => base.InitializeBasicContexts());
+        await unitOfWork.ExecuteWithTransaction(
+            new TransactionalAttribute(),
+            () => base.InitializeBasicContexts());
+        
+        Scope.ServiceProvider.GetRequiredService<IDomainEventScope>().Flush();
     }
 
     public override async Task DisposeAsync()
@@ -61,10 +66,7 @@ public abstract class IntegrationTest(CombinedContainerFixture fixture)
         await scope.SeedAsync<DContext>();
     }
 
-    protected Task ResetDb()
-    {
-        return Context.ClearDatabase();
-    }
+    protected Task ResetDb() { return Context.ClearDatabase(); }
 
     protected async Task ResetCache()
     {
@@ -76,8 +78,7 @@ public abstract class IntegrationTest(CombinedContainerFixture fixture)
             var server = multiplexer.GetServer(endpoint);
             var keys = server.Keys(database.Database).ToArray();
 
-            if (keys.Length == 0)
-                continue;
+            if (keys.Length == 0) continue;
 
             await database.KeyDeleteAsync(keys);
         }

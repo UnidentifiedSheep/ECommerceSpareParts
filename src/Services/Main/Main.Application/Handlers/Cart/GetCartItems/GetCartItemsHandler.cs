@@ -14,10 +14,13 @@ public record GetCartItemsQuery(Guid UserId, Pagination Pagination) : IQuery<Get
 public record GetCartItemsResult(List<CartItemDto> CartItems);
 
 public class GetCartItemsHandler(
-    IReadRepository<Entities.Cart.Cart, (Guid, int)> repository)
+    IReadRepository<Entities.Cart.Cart, (Guid, int)> repository
+)
     : IQueryHandler<GetCartItemsQuery, GetCartItemsResult>
 {
-    public async Task<GetCartItemsResult> Handle(GetCartItemsQuery request, CancellationToken cancellationToken)
+    public async Task<GetCartItemsResult> Handle(
+        GetCartItemsQuery request,
+        CancellationToken cancellationToken)
     {
         var result = await repository
             .Query

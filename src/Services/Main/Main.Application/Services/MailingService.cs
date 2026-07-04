@@ -6,17 +6,18 @@ using Main.Entities.Mailing;
 namespace Main.Application.Services;
 
 public class MailingService(
-    IUnitOfWork unitOfWork) : IMailingService
+    IUnitOfWork unitOfWork
+) : IMailingService
 {
     public async Task QueueToOutbox(
-        IEmailMessage email, 
+        IEmailMessage email,
         CancellationToken ct = default)
     {
         var model = EmailOutBox.Create(
             email.Subject,
             email.To,
             email.GetHtmlBody());
-        
+
         await unitOfWork.AddAsync(model, ct);
     }
 }

@@ -14,15 +14,14 @@ public class MetricJob : Entity<MetricJob, (Guid, Guid)>, ILinqEntity<MetricJob,
         if (metricId == Guid.Empty)
             throw new ArgumentException("Metric id must be specified.", nameof(metricId));
 
-        if (jobId == Guid.Empty)
-            throw new ArgumentException("Job id must be specified.", nameof(jobId));
+        if (jobId == Guid.Empty) throw new ArgumentException("Job id must be specified.", nameof(jobId));
 
         MetricId = metricId;
         JobId = jobId;
     }
 
-    public Guid MetricId { get; private set; }
-    public Guid JobId { get; private set; }
+    public Guid MetricId { get; }
+    public Guid JobId { get; }
 
     public Metric Metric { get; private set; } = null!;
     public Job Job { get; private set; } = null!;
@@ -37,13 +36,7 @@ public class MetricJob : Entity<MetricJob, (Guid, Guid)>, ILinqEntity<MetricJob,
         return x => x.MetricId == key.Item1 && x.JobId == key.Item2;
     }
 
-    public static MetricJob Create(Guid metricId, Guid jobId)
-    {
-        return new MetricJob(metricId, jobId);
-    }
+    public static MetricJob Create(Guid metricId, Guid jobId) { return new MetricJob(metricId, jobId); }
 
-    public override (Guid, Guid) GetId()
-    {
-        return (MetricId, JobId);
-    }
+    public override (Guid, Guid) GetId() { return (MetricId, JobId); }
 }

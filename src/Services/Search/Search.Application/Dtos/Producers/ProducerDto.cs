@@ -13,6 +13,6 @@ public record ProducerDto
     [JsonPropertyName("description")]
     public string? Description { get; init; }
 
-    [JsonPropertyName("otherNames")]
-    public required IEnumerable<ProducerOtherNameDto> OtherNames { get; init; }
+    [JsonPropertyName("aliases")]
+    public required IEnumerable<ProducerAlias> Aliases { get; init; }
 }

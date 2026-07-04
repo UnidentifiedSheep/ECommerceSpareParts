@@ -12,17 +12,20 @@ public record GetProductsWithNotEnoughStockQuery(
     Guid BuyerId,
     string StorageName,
     bool TakeFromOtherStorages,
-    Dictionary<int, int> NeededCounts) : IQuery<GetProductsWithNotEnoughStockResult>;
+    Dictionary<int, int> NeededCounts
+) : IQuery<GetProductsWithNotEnoughStockResult>;
 
 /// <param name="NotEnoughByReservation">Список артикулов которых не хватает из-за резерваций</param>
 /// <param name="NotEnoughByStock">Список артикулов которых не хватает на складе для продажи без учета резерваций.</param>
 public record GetProductsWithNotEnoughStockResult(
     Dictionary<int, int> NotEnoughByReservation,
-    Dictionary<int, int> NotEnoughByStock);
+    Dictionary<int, int> NotEnoughByStock
+);
 
 public class GetProductsWithNotEnoughStockHandler(
     IStorageContentRepository storageContentRepository,
-    IStorageContentReservationRepository reservationRepository)
+    IStorageContentReservationRepository reservationRepository
+)
     : IQueryHandler<GetProductsWithNotEnoughStockQuery, GetProductsWithNotEnoughStockResult>
 {
     public async Task<GetProductsWithNotEnoughStockResult> Handle(
@@ -38,11 +41,20 @@ public class GetProductsWithNotEnoughStockHandler(
         var notEnoughStock = new Dictionary<int, int>();
 
         var userReservations =
-            await reservationRepository.GetReservationsCountForUserAsync(userId, articleIds, cancellationToken);
+            await reservationRepository.GetReservationsCountForUserAsync(
+                userId,
+                articleIds,
+                cancellationToken);
         var othersReservations =
-            await reservationRepository.GetReservationsCountForOthersAsync(userId, articleIds, cancellationToken);
-        var storageCounts = await storageContentRepository.GetStorageContentCounts(storageName, articleIds,
-            takeFromOtherStorages, cancellationToken);
+            await reservationRepository.GetReservationsCountForOthersAsync(
+                userId,
+                articleIds,
+                cancellationToken);
+        var storageCounts = await storageContentRepository.GetStorageContentCounts(
+            storageName,
+            articleIds,
+            takeFromOtherStorages,
+            cancellationToken);
 
         foreach (var (id, count) in request.NeededCounts)
         {

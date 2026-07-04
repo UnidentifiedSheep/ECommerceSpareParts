@@ -1,6 +1,6 @@
 ﻿using Abstractions.Interfaces.Persistence;
-using Application.Common.Interfaces;
 using Application.Common.Interfaces.Cqrs;
+using Application.Common.Interfaces.Events;
 using Attributes;
 using Contracts.Products;
 using Main.Application.Dtos.Product;
@@ -15,24 +15,30 @@ namespace Main.Application.Handlers.Products.CreateProducts;
 [Transactional]
 public record CreateProductsCommand(
     List<CreateProductDto> NewProducts,
-    CreateProductsConflictPolicy Policy = CreateProductsConflictPolicy.Fail) : ICommand<CreateProductsResult>;
+    CreateProductsConflictPolicy Policy = CreateProductsConflictPolicy.Fail
+) : ICommand<CreateProductsResult>;
 
 public record CreateProductsResult(List<int> CreatedIds, int Skipped = 0);
 
 public class CreateProductsHandler(
     IProductRepository productRepository,
-    IUnitOfWork unitOfWork,
-    IIntegrationEventScope integrationEventScope)
-    : ICommandHandler<CreateProductsCommand, CreateProductsResult>
+    IUnitOfWork unitOfWork
+    ) : ICommandHandler<CreateProductsCommand, CreateProductsResult>
 {
-    public async Task<CreateProductsResult> Handle(CreateProductsCommand request, CancellationToken cancellationToken)
+    public async Task<CreateProductsResult> Handle(
+        CreateProductsCommand request,
+        CancellationToken cancellationToken)
     {
         var newProducts = await GetProductsToCreate(request, cancellationToken);
         var products = new List<Product>();
 
         foreach (var @new in newProducts)
         {
-            var product = Product.Create(@new.Sku, @new.Name, @new.ProducerId, @new.Description);
+            var product = Product.Create(
+                @new.Sku,
+                @new.Name,
+                @new.ProducerId,
+                @new.Description);
             product.SetIndicator(@new.Indicator);
             product.SetCategory(@new.CategoryId);
             products.Add(product);
@@ -40,8 +46,6 @@ public class CreateProductsHandler(
 
         await unitOfWork.AddRangeAsync(products, cancellationToken);
         await unitOfWork.SaveChangesAsync(cancellationToken);
-
-        await PublishEvent(products, cancellationToken);
 
         return new CreateProductsResult(
             products.Select(x => x.Id).ToList(),
@@ -54,8 +58,7 @@ public class CreateProductsHandler(
         CreateProductsCommand request,
         CancellationToken cancellationToken)
     {
-        if (request.Policy == CreateProductsConflictPolicy.Fail)
-            return request.NewProducts;
+        if (request.Policy == CreateProductsConflictPolicy.Fail) return request.NewProducts;
 
         var keys = request.NewProducts
             .Select(GetProductKey)
@@ -70,11 +73,9 @@ public class CreateProductsHandler(
         {
             var key = GetProductKey(newProduct);
 
-            if (existingKeys.Contains(key))
-                continue;
+            if (existingKeys.Contains(key)) continue;
 
-            if (!currentBatchKeys.Add(key))
-                continue;
+            if (!currentBatchKeys.Add(key)) continue;
 
             products.Add(newProduct);
         }
@@ -85,16 +86,5 @@ public class CreateProductsHandler(
     private static (string NormalizedSku, int ProducerId) GetProductKey(CreateProductDto product)
     {
         return (new Sku(product.Sku).NormalizedValue, product.ProducerId);
-    }
-
-    private async Task PublishEvent(List<Product> products, CancellationToken cancellationToken)
-    {
-        foreach (var product in products)
-            integrationEventScope.Add(new ProductUpdatedEvent()
-            {
-                Id = product.Id
-            });
-
-        await unitOfWork.SaveChangesAsync(cancellationToken);
     }
 }

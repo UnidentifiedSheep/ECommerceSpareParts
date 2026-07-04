@@ -25,8 +25,5 @@ public class ProductCoefficient : AuditableEntity<ProductCoefficient, (int, stri
         return x => x.ProductId == key.Item1 && x.CoefficientName == key.Item2;
     }
 
-    public override (int, string) GetId()
-    {
-        return (ProductId, CoefficientName);
-    }
+    public override (int, string) GetId() { return (ProductId, CoefficientName); }
 }

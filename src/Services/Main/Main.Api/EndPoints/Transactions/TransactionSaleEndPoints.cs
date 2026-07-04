@@ -12,17 +12,19 @@ public static class TransactionSaleEndPoints
 {
     public static RouteGroupBuilder MapTransactionSaleEndPoints(this RouteGroupBuilder balances)
     {
-        balances.MapGet("{transactionId:guid}/sale", async (
-                ISender sender,
-                Guid transactionId,
-                CancellationToken cancellationToken) =>
-            {
-                var result = await sender.Send(
-                    new GetSaleQuery(null, transactionId),
-                    cancellationToken);
+        balances.MapGet(
+                "{transactionId:guid}/sale",
+                async (
+                    ISender sender,
+                    Guid transactionId,
+                    CancellationToken cancellationToken) =>
+                {
+                    var result = await sender.Send(
+                        new GetSaleQuery(null, transactionId),
+                        cancellationToken);
 
-                return Results.Ok(new GetTransactionSaleResponse(result.Sale));
-            })
+                    return Results.Ok(new GetTransactionSaleResponse(result.Sale));
+                })
             .WithTags("Transactions")
             .WithName("GetSaleByTransaction")
             .WithSummary("Получить продажу по транзакции")

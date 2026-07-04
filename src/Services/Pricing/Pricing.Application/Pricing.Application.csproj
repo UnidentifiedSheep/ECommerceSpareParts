@@ -10,13 +10,16 @@
         <ProjectReference Include="..\..\..\Core\Contracts\Contracts.csproj"/>
         <ProjectReference Include="..\..\..\Infrastructure\Integrations\Internal\Internal.Integration.Core\Internal.Integration.Core.csproj"/>
         <ProjectReference Include="..\..\Application.Common\Application.Common.csproj"/>
-        <ProjectReference Include="..\Pricing.Entities\Pricing.Entities.csproj" />
+        <ProjectReference Include="..\Pricing.Entities\Pricing.Entities.csproj"/>
     </ItemGroup>
 
     <ItemGroup>
         <PackageReference Include="IntervalMap" Version="1.0.3"/>
-        <PackageReference Include="Mapster" Version="10.0.8-pre06"/>
         <PackageReference Include="MassTransit" Version="8.5.8"/>
+    </ItemGroup>
+
+    <ItemGroup>
+        <Folder Include="NamedObjects\SettingDefinitions\"/>
     </ItemGroup>
 
 </Project>

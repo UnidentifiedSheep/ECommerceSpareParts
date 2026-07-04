@@ -1,5 +1,6 @@
 ﻿using System.Linq.Expressions;
 using Domain.CommonEnums;
+using Domain.Exceptions;
 using Domain.Extensions;
 using Domain.Interfaces;
 
@@ -7,112 +8,226 @@ namespace Domain.CommonEntities;
 
 public class Job : AuditableEntity<Job, Guid>, ILinqEntity<Job, Guid>
 {
+    private Job() { }
+    protected Job(
+        string systemName,
+        string initialState,
+        int maxAttempts)
+    {
+        Status = JobStatus.Pending;
+        SystemName = systemName;
+        Attempts = 1;
+        SetMaxAttempts(maxAttempts);
+        State = initialState;
+    }
+
     public Guid Id { get; private set; }
-    public string SystemName { get; private set; }
+    public string SystemName { get; private set; } = null!;
     public string State { get; protected set; } = string.Empty;
     public JobStatus Status { get; protected set; }
     public int Attempts { get; private set; }
     public int MaxAttempts { get; private set; }
     public string? ErrorMessage { get; private set; }
     public DateTime? LockedAt { get; private set; }
-    
-    public bool IsTerminal =>
-        Status is JobStatus.Succeeded or JobStatus.Failed or JobStatus.Cancelled;
-    
-    public override Guid GetId() => Id;
-    
-    public static Expression<Func<Job, Guid>> GetKeySelector()
-        => x => x.Id;
-    
-    public static Expression<Func<Job, bool>> GetEqualityExpression(Guid key)
-        => x => x.Id == key;
+    public DateTime? LeaseExpiresAt { get; private set; }
+    public Guid? LeaseHolderId { get; private set; }
 
-    protected Job(
+    public bool IsTerminal => Status is JobStatus.Succeeded or JobStatus.Failed or JobStatus.Cancelled;
+    public bool IsCancellationRequested => Status == JobStatus.CancellationRequested;
+
+    public static Expression<Func<Job, Guid>> GetKeySelector() { return x => x.Id; }
+
+    public static Expression<Func<Job, bool>> GetEqualityExpression(Guid key) { return x => x.Id == key; }
+
+    public override Guid GetId() { return Id; }
+
+    public static Job Create(
         string systemName,
-        int maxAttempts)
+        string initialState,
+        int maxAttempts = 3)
     {
-        Status = JobStatus.Pending;
-        SystemName = systemName;
-        SetMaxAttempts(maxAttempts);
+        return new Job(systemName, initialState, maxAttempts);
     }
-    
-    public static Job Create(string systemName, int maxAttempts = 3) => new(systemName, maxAttempts);
 
     public bool CanRetry()
     {
         if (IsTerminal) return false;
         return Attempts < MaxAttempts;
     }
-    
-    public void RegisterAttempt()
+
+    public void RegisterAttempt(Guid leaseHolderId)
     {
-        if (IsTerminal)
-            throw new InvalidOperationException("Terminal job cannot have new attempts.");
+        EnsureActiveLease(leaseHolderId);
+        if (IsTerminal) throw new InvalidOperationException("Terminal job cannot have new attempts.");
         if (Attempts >= MaxAttempts)
             throw new InvalidOperationException("Maximum number of attempts exceeded.");
-        
+
         Attempts++;
     }
 
-    public void SetState(string state)
+    public void SetState(string state, Guid leaseHolderId)
     {
-        if (IsTerminal)
-            throw new InvalidOperationException("Terminal job cannot have new state.");
+        EnsureActiveLease(leaseHolderId);
+        if (IsTerminal) throw new InvalidOperationException("Terminal job cannot have new state.");
+        if (IsCancellationRequested) throw new JobCancellationRequestedException(Id);
         State = state;
     }
-    
+
     public void EnsureStatus(JobStatus expected)
     {
         if (Status != expected)
             throw new InvalidOperationException(
                 $"Job must be in {expected} status, but current status is {Status}.");
     }
-    
-    public void SetMaxAttempts(int maxAttempts)
+
+    private void SetMaxAttempts(int maxAttempts)
     {
         MaxAttempts = maxAttempts.AgainstLessOrEqual(
             0,
             () => throw new InvalidOperationException("job.max.attempts.must.be.greater.than.zero"));
     }
-    
-    public void Start()
+
+    public void Start(Guid leaseHolderId)
     {
+        EnsureActiveLease(leaseHolderId);
+        
+        if (IsCancellationRequested) throw new JobCancellationRequestedException(Id);
+        
         EnsureStatus(JobStatus.Locked);
+        
         ErrorMessage = null;
         Status = JobStatus.Processing;
     }
 
-    public void Succeed()
+    public void Succeed(Guid leaseHolderId)
     {
+        EnsureActiveLease(leaseHolderId);
+        
+        if (IsCancellationRequested) throw new JobCancellationRequestedException(Id);
+        
         EnsureStatus(JobStatus.Processing);
+        
         ErrorMessage = null;
         Status = JobStatus.Succeeded;
+        ClearLease();
     }
 
-    public void Fail(string? errorMessage)
+    public void Fail(Guid leaseHolderId, string? errorMessage)
     {
-        if (IsTerminal)
-            throw new InvalidOperationException("Terminal job cannot be failed.");
+        EnsureActiveLease(leaseHolderId);
+        if (IsTerminal) throw new InvalidOperationException("Terminal job cannot be failed.");
 
         ErrorMessage = errorMessage?.TrimOrNull();
         Status = JobStatus.Failed;
+        ClearLease();
+    }
+
+    public void Cancel(Guid leaseHolderId, string? errorMessage = null)
+    {
+        EnsureActiveLease(leaseHolderId);
+
+        if (IsTerminal)
+            throw new InvalidOperationException("Terminal job cannot be cancelled.");
+
+        if (!IsCancellationRequested)
+            throw new InvalidOperationException("Job cancellation was not requested.");
+
+        ErrorMessage = errorMessage?.TrimOrNull() ?? ErrorMessage;
+        Status = JobStatus.Cancelled;
+        ClearLease();
     }
     
-    public void Cancel(string? errorMessage = null)
+    public void RequestCancellation(string? reason = null)
     {
         if (IsTerminal)
             throw new InvalidOperationException("Terminal job cannot be cancelled.");
 
-        ErrorMessage = errorMessage?.TrimOrNull();
-        Status = JobStatus.Cancelled;
+        ErrorMessage = reason?.TrimOrNull();
+
+        if (Status == JobStatus.Pending)
+        {
+            Status = JobStatus.Cancelled;
+            ClearLease();
+            return;
+        }
+
+        Status = JobStatus.CancellationRequested;
+    }
+    
+    public void AcquireLease(Guid leaseHolderId, TimeSpan leaseDuration)
+    {
+        if (IsTerminal)
+            throw new InvalidOperationException("Terminal job cannot be acquired.");
+
+        if (Status == JobStatus.CancellationRequested)
+            throw new InvalidOperationException("Cancellation requested job cannot be acquired.");
+
+        var now = DateTime.UtcNow;
+
+        if (LeaseExpiresAt > now)
+            throw new InvalidOperationException("Job already has active lease.");
+
+        if (Status is JobStatus.Locked or JobStatus.Processing)
+        {
+            if (!CanRetry())
+                throw new InvalidOperationException("Maximum number of attempts exceeded.");
+
+            Attempts++;
+        }
+
+        LockedAt = now;
+        Status = JobStatus.Locked;
+        ErrorMessage = null;
+        LeaseExpiresAt = now.Add(leaseDuration);
+        LeaseHolderId = leaseHolderId;
     }
 
-    public void Lock()
+    public void RenewLease(Guid leaseHolderId, TimeSpan leaseDuration)
     {
-        if (LockedAt != null)
-            throw new InvalidOperationException("Job is already locked.");
-        
-        LockedAt = DateTime.UtcNow;
-        Status = JobStatus.Locked;
+        EnsureActiveLease(leaseHolderId);
+        if (IsTerminal) throw new InvalidOperationException("Terminal job cannot be updated.");
+        if (IsCancellationRequested) throw new JobCancellationRequestedException(Id);
+        LeaseExpiresAt = DateTime.UtcNow.Add(leaseDuration);
+    }
+    
+    public bool CanBeFailedByExpiredLease(DateTime now)
+    {
+        if (IsTerminal)
+            return false;
+
+        if (Status is not JobStatus.Locked and not JobStatus.Processing)
+            return false;
+
+        if (LeaseExpiresAt is null || LeaseExpiresAt > now)
+            return false;
+
+        return Attempts >= MaxAttempts;
+    }
+
+    public void FailByExpiredLease(DateTime now, string? errorMessage = null)
+    {
+        if (!CanBeFailedByExpiredLease(now))
+            throw new InvalidOperationException("Job cannot be failed by expired lease.");
+
+        ErrorMessage = errorMessage?.TrimOrNull()
+                       ?? "Job lease expired and maximum number of attempts was exceeded.";
+
+        Status = JobStatus.Failed;
+        ClearLease();
+    }
+    
+    public void EnsureActiveLease(Guid leaseHolderId)
+    {
+        if (LeaseHolderId != leaseHolderId)
+            throw new JobLeaseLostException(Id);
+
+        if (LeaseExpiresAt is null || LeaseExpiresAt <= DateTime.UtcNow)
+            throw new JobLeaseLostException(Id);
+    }
+    
+    private void ClearLease()
+    {
+        LeaseHolderId = null;
+        LeaseExpiresAt = null;
     }
 }

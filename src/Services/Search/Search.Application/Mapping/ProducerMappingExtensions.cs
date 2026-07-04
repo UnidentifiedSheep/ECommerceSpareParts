@@ -1,31 +1,37 @@
 using Search.Application.Dtos.Producers;
 using Search.Entities;
+using ProducerAlias = Search.Application.Dtos.Producers.ProducerAlias;
 
 namespace Search.Application.Mapping;
 
 public static class ProducerMappingExtensions
 {
     public static ProducerSearchDto ToProducerSearchDto(this Producer producer)
-        => new()
+    {
+        return new ProducerSearchDto
         {
             Id = producer.Id,
             Name = producer.Name,
             Description = producer.Description
         };
+    }
 
     public static ProducerDto ToProducerDto(this Producer producer)
-        => new()
+    {
+        return new ProducerDto
         {
             Id = producer.Id,
             Name = producer.Name,
             Description = producer.Description,
-            OtherNames = producer.OtherNames.Select(x => x.ToProducerOtherNameDto())
+            Aliases = producer.Aliases.Select(x => x.ToProducerAliasDto())
         };
+    }
 
-    public static ProducerOtherNameDto ToProducerOtherNameDto(this ProducerOtherName otherName)
-        => new()
+    public static ProducerAlias ToProducerAliasDto(this Entities.ProducerAlias alias)
+    {
+        return new ProducerAlias
         {
-            OtherName = otherName.OtherName,
-            WhereUsed = otherName.WhereUsed
+            Alias = alias.Alias
         };
+    }
 }

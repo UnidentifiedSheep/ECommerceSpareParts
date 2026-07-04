@@ -1,4 +1,3 @@
-using Application.Common.Interfaces.Currency;
 using FluentValidation;
 using Localization.Domain.Extensions;
 using Main.Application.Handlers.BaseValidators;

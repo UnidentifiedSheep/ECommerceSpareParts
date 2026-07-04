@@ -5,9 +5,6 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Search.Application.Configs;
 using Search.Application.Interfaces;
-using Search.Application.Interfaces.Producer;
-using Search.Application.Interfaces.Product;
-using Search.Application.Services;
 using Search.Application.Services.IndexSynchronizers;
 using Search.Entities;
 
@@ -20,20 +17,18 @@ public static class ServiceProvider
         IConfiguration configuration)
     {
         SortByConfig.Configure();
-        
+
         services
             .AddApplicationBase(
-                serviceDefinition: ServicesDefinitions.Search,
-                configuration: configuration,
-                assembly: typeof(ServiceProvider).Assembly,
-                behaviorsToExclude:
-                [
-                    typeof(TransactionBehavior<,>),
-                    typeof(SaveChangesBehavior<,>),
-                    typeof(IntegrationEventPublisherBehavior<,>),
-                    typeof(DbValidationBehavior<,>),
-                    typeof(CacheBehavior<,>)
-                ]);
+                ServicesDefinitions.Search,
+                configuration,
+                typeof(ServiceProvider).Assembly,
+                typeof(TransactionBehavior<,>),
+                typeof(SaveChangesBehavior<,>),
+                typeof(EventSideEffectsSaveChangesBehavior<,>),
+                typeof(IntegrationEventPublisherBehavior<,>),
+                typeof(DbValidationBehavior<,>),
+                typeof(CacheBehavior<,>));
 
         services.AddSingleton<IIndexSynchronizer<Product, int>, ProductIndexSynchronizer>();
         services.AddSingleton<IIndexSynchronizer<Producer, int>, ProducerIndexSynchronizer>();

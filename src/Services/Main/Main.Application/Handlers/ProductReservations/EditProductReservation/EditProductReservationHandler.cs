@@ -27,7 +27,7 @@ public class EditProductReservationHandler(
 
         var @event = ReservationManualChangeEvent.Create(reservation);
         await unitOfWork.AddAsync(@event, cancellationToken);
-        
+
         reservation.SetComment(request.NewValue.Comment);
         reservation.ProposePrice(request.NewValue.GivenPrice, request.NewValue.GivenCurrencyId);
 
