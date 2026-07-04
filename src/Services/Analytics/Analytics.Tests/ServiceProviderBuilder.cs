@@ -18,6 +18,7 @@ using Test.Common.Extensions;
 using Test.Common.Interfaces.ServiceProvider;
 using Test.Common.Stubs;
 using Test.Common.TestContexts;
+using Tests.Stubs;
 using ZiggyCreatures.Caching.Fusion.Backplane;
 using ApplicationServiceProvider = Analytics.Application.ServiceProvider;
 

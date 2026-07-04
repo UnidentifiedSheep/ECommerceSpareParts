@@ -25,7 +25,7 @@ public class JobSchedule : AuditableEntity<JobSchedule, Guid>, ILinqEntity<JobSc
         SetName(name);
         SetDescription(description);
         JobSystemName = jobSystemName;
-        InputState = inputState;
+        SetInputState(inputState);
         SetMaxAttempts(maxAttempts);
         SetCron(cron);
     }
