@@ -55,12 +55,7 @@ public class SupplierOfferExtractorService(
                 supplier.Supplier, 
                 productId);
             await MarkAsFailed(supplier.Supplier, productId);
-            return new SupplierOfferExtractionResult
-            {
-                Supplier = supplier.Supplier,
-                Offers = [],
-                Status = SupplierOfferExtractionStatus.Failed
-            };
+            return SupplierOfferExtractionResult.Failed(supplier.Supplier);
         }
     }
 
@@ -70,12 +65,7 @@ public class SupplierOfferExtractorService(
         CancellationToken token)
     {
         if (await HasReFreshMarkerAsync(supplier.Supplier, productId, token))
-            return new SupplierOfferExtractionResult
-            {
-                Supplier = supplier.Supplier,
-                Offers = [],
-                Status = SupplierOfferExtractionStatus.SkippedByRefreshMarker
-            };
+            return SupplierOfferExtractionResult.SkippedByRefreshMarker(supplier.Supplier);
         
         var result = await distributedLockProvider.TryExecuteWithLock(
             CacheKeys.Offer.Lock.Key(supplier.Supplier, productId),
@@ -83,12 +73,7 @@ public class SupplierOfferExtractorService(
             async ct =>
             {
                 if (await HasReFreshMarkerAsync(supplier.Supplier, productId, ct))
-                    return new SupplierOfferExtractionResult
-                    {
-                        Supplier = supplier.Supplier,
-                        Offers = [],
-                        Status = SupplierOfferExtractionStatus.SkippedByRefreshMarker
-                    };
+                    return SupplierOfferExtractionResult.SkippedByRefreshMarker(supplier.Supplier);
                 
                 var mainResponse = await mainClient.ProductNode
                     .GetSupplierProductReferences([productId], supplier.Supplier, ct);
@@ -96,12 +81,7 @@ public class SupplierOfferExtractorService(
                 if (!mainResponse.Success || mainResponse.Value is { Count: 0 })
                 {
                     await MarkAsFailed(supplier.Supplier, productId);
-                    return new SupplierOfferExtractionResult
-                    {
-                        Offers = [],
-                        Supplier = supplier.Supplier,
-                        Status = SupplierOfferExtractionStatus.NoSupplierReference
-                    };
+                    return SupplierOfferExtractionResult.NoSupplierReference(supplier.Supplier);
                 }
 
                 var reference = mainResponse.ValueOrThrow[0];
@@ -116,30 +96,15 @@ public class SupplierOfferExtractorService(
                 if (!response.Success || response.Value == null)
                 {
                     await MarkAsFailed(supplier.Supplier, productId);
-                    return new SupplierOfferExtractionResult
-                    {
-                        Supplier = supplier.Supplier,
-                        Offers = [],
-                        Status = SupplierOfferExtractionStatus.SupplierRequestFailed
-                    };
+                    return SupplierOfferExtractionResult.SupplierRequestFailed(supplier.Supplier);
                 }
                 
                 await MarkAsOk(supplier.Supplier, productId, ct);
-                return new SupplierOfferExtractionResult
-                {
-                    Supplier = supplier.Supplier,
-                    Offers = response.ValueOrThrow.ToList(),
-                    Status = SupplierOfferExtractionStatus.Success
-                };
+                return SupplierOfferExtractionResult.Success(supplier.Supplier, response.ValueOrThrow);
             },
             token);
 
-        return result ?? new SupplierOfferExtractionResult
-        {
-            Supplier = supplier.Supplier,
-            Offers = [],
-            Status = SupplierOfferExtractionStatus.AlreadyRefreshing
-        };
+        return result ?? SupplierOfferExtractionResult.AlreadyRefreshing(supplier.Supplier);
     }
 
     private async Task<bool> HasReFreshMarkerAsync(
