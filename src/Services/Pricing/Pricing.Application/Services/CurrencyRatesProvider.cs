@@ -4,17 +4,17 @@ using Pricing.Application.Interfaces.Cache;
 namespace Pricing.Application.Services;
 
 public class CurrencyRatesProvider(
-    ICurrencyCacheRepository currencyCacheRepository
+    ICachedCurrencyProvider cachedCurrencyProvider
 ) : ICurrencyRatesProvider
 {
     public async Task<decimal> GetRate(int currencyId, CancellationToken cancellationToken = default)
     {
-        return await currencyCacheRepository.GetCurrencyRate(currencyId, cancellationToken) ??
+        return await cachedCurrencyProvider.GetCurrencyRate(currencyId, cancellationToken) ??
                throw new InvalidOperationException("Currency rate not found");
     }
 
     public Task<decimal?> GetRateOrDefault(int currencyId, CancellationToken cancellationToken = default)
     {
-        return currencyCacheRepository.GetCurrencyRate(currencyId, cancellationToken);
+        return cachedCurrencyProvider.GetCurrencyRate(currencyId, cancellationToken);
     }
 }

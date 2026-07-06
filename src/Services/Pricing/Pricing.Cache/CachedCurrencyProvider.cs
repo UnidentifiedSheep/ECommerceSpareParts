@@ -5,10 +5,10 @@ using ZiggyCreatures.Caching.Fusion;
 
 namespace Pricing.Cache;
 
-public class CurrencyCacheRepository(
+public class CachedCurrencyProvider(
     IFusionCache fusionCache,
     IMainClient mainClient
-) : ICurrencyCacheRepository
+) : ICachedCurrencyProvider
 {
     public async Task<decimal?> GetCurrencyRate(int currencyId, CancellationToken cancellationToken = default)
     {
@@ -33,5 +33,39 @@ public class CurrencyCacheRepository(
         await fusionCache.RemoveAsync(
             CacheKeys.Currency.CurrencyRate(currencyId),
             token: cancellationToken);
+    }
+
+    public async Task<int?> GetCurrencyIdAsync(string code, CancellationToken token = default)
+    {
+        var normalizedCode = code.Trim().ToUpperInvariant();
+
+        var fromCache = await fusionCache.TryGetAsync<int>(
+            CacheKeys.Currency.CurrencyIdByCode(normalizedCode),
+            token: token);
+
+        if (fromCache.HasValue)
+            return fromCache.Value;
+
+        var response = await mainClient.CurrencyNode.GetCurrencies(token);
+        if (!response.Success)
+            throw new InvalidOperationException("Unable to get currencies from main service");
+
+        int? result = null;
+
+        foreach (var item in response.ValueOrThrow)
+        {
+            var itemCode = item.Code.Trim().ToUpperInvariant();
+
+            if (itemCode == normalizedCode)
+                result = item.Id;
+
+            await fusionCache.SetAsync(
+                key: CacheKeys.Currency.CurrencyIdByCode(itemCode),
+                value: item.Id,
+                options: new FusionCacheEntryOptions(CacheKeys.Currency.Ttl),
+                token: token);
+        }
+
+        return result;
     }
 }

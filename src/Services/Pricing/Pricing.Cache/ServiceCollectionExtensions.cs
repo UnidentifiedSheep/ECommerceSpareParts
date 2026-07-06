@@ -7,8 +7,7 @@ public static class ServiceCollectionExtensions
 {
     public static IServiceCollection AddApplicationCache(this IServiceCollection services)
     {
-        services.AddScoped<ICurrencyCacheRepository, CurrencyCacheRepository>();
-        services.AddScoped<IPricingCacheRepository, PricingCacheRepository>();
+        services.AddScoped<ICachedCurrencyProvider, CachedCurrencyProvider>();
 
         return services;
     }

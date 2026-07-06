@@ -5,7 +5,7 @@ namespace Pricing.Application.Extensions;
 
 public static class PriceOfferSourceExtensions
 {
-    public static PriceOfferSource GetFromSupplier(this Supplier supplier)
+    public static PriceOfferSource ToSource(this Supplier supplier)
     {
         return supplier == Supplier.Armtek
             ? PriceOfferSource.Armtek

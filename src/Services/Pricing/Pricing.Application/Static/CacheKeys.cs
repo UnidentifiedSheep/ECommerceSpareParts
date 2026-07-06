@@ -1,5 +1,4 @@
 ﻿using Enums;
-using Integrations.Supplier;
 using Pricing.Entities.Settings;
 
 namespace Pricing.Application.Static;
@@ -11,6 +10,7 @@ public static class CacheKeys
         public static TimeSpan Ttl { get; } = TimeSpan.FromDays(1);
 
         public static string CurrencyRate(int currencyId) { return $"currency:{currencyId}:rate"; }
+        public static string CurrencyIdByCode(string code) => $"currency:code:{code}";
     }
 
     public static class Offer

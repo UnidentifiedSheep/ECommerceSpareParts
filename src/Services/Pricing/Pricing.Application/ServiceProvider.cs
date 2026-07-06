@@ -41,7 +41,8 @@ public static class ServiceProvider
         collection.AddScoped<IMarkupInitializer, MarkupInitializer>();
 
         collection.AddScoped<ISupplierOfferExtractorService, SupplierOfferExtractorService>();
-
+        collection.AddScoped<ISupplierOfferConverterService, SupplierOfferConverterService>();
+        
         return collection;
     }
 }
