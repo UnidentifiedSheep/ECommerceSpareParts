@@ -28,5 +28,5 @@ public record PricingSettingData
     public decimal DefaultMarkup { get; init; } = 0.2m;
     
     [JsonPropertyName("offerTtl")]
-    public TimeSpan? OfferTtl { get; init; }
+    public TimeSpan OfferTtl { get; init; } = TimeSpan.FromDays(1);
 }

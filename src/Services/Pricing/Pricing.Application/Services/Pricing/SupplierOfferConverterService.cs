@@ -1,3 +1,4 @@
+using Application.Common.Interfaces.Settings;
 using Enums;
 using Integrations.Supplier.Models;
 using Pricing.Application.Extensions;
@@ -5,11 +6,13 @@ using Pricing.Application.Interfaces.Cache;
 using Pricing.Application.Interfaces.Pricing;
 using Pricing.Application.Models;
 using Pricing.Entities;
+using Pricing.Entities.Settings;
 
 namespace Pricing.Application.Services.Pricing;
 
 public class SupplierOfferConverterService(
-    ICachedCurrencyProvider cachedCurrencyProvider) : ISupplierOfferConverterService
+    ICachedCurrencyProvider cachedCurrencyProvider,
+    ISettingsService settingsService) : ISupplierOfferConverterService
 {
     public async Task<IReadOnlyList<SupplierOfferConversionResult>> ConvertAsync(
         int productId,
@@ -31,6 +34,9 @@ public class SupplierOfferConverterService(
         IReadOnlyList<SupplierPosition> positions,
         CancellationToken token = default)
     {
+        var offerTtl = (await settingsService.GetOrDefault<PricingSetting>(token)).Data.OfferTtl;
+        var expiresAt = DateTime.UtcNow.Add(offerTtl);
+        
         var offers = new List<PriceOffer>();
         var notFoundCurrencies = new HashSet<string>();
         
@@ -62,7 +68,7 @@ public class SupplierOfferConverterService(
                 supplierOffer.DeliveryInfo.GuaranteedDeliveryDate,
                 supplierOffer.DeliveryInfo.DeliveryProbability,
                 supplierOffer.DeliveryInfo.OrderTill,
-                DateTime.UtcNow.AddDays(1))); //TODO this should be taken from settings, cuz depends on supplier
+                expiresAt));
         }
 
         return new SupplierOfferConversionResult

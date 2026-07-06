@@ -17,7 +17,7 @@ public static class CacheKeys
     {
         public static class Ok
         {
-            public static TimeSpan Ttl(PricingSettingData setting) => setting.OfferTtl ?? TimeSpan.FromDays(1);
+            public static TimeSpan Ttl(PricingSettingData setting) => setting.OfferTtl;
             
             public static string Key(Supplier supplier, int productId)
                 => $"offer:refresh:ok:{supplier.ToString()}:{productId}";
