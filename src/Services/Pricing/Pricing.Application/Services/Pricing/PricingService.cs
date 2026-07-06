@@ -1,5 +1,6 @@
 using Application.Common.Interfaces.Currency;
 using Pricing.Application.Interfaces;
+using Pricing.Application.Interfaces.Markup;
 
 namespace Pricing.Application.Services.Pricing;
 

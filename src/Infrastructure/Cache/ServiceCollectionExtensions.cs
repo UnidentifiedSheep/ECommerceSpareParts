@@ -1,4 +1,5 @@
 ﻿using Application.Common.Interfaces.Cache;
+using Cache.DistributedLock;
 using Microsoft.Extensions.Caching.StackExchangeRedis;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;

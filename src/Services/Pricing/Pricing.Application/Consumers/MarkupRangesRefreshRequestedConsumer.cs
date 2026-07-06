@@ -1,6 +1,7 @@
 using Contracts.Analytics;
 using MassTransit;
 using Pricing.Application.Interfaces;
+using Pricing.Application.Interfaces.Markup;
 
 namespace Pricing.Application.Consumers;
 

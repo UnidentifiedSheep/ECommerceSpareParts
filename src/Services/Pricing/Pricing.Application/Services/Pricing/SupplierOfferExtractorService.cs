@@ -5,6 +5,7 @@ using Integrations.Supplier.Interfaces;
 using Integrations.Supplier.Models.Requests;
 using Internal.Integration.Core.Interfaces.Main;
 using Microsoft.Extensions.Logging;
+using Pricing.Application.Interfaces.Pricing;
 using Pricing.Application.Models;
 using Pricing.Application.Static;
 using Pricing.Entities.Settings;
@@ -18,7 +19,7 @@ public class SupplierOfferExtractorService(
     IDistributedLockProvider distributedLockProvider,
     IMainClient mainClient,
     ICache cache,
-    ISupplierFactory supplierFactory)
+    ISupplierFactory supplierFactory) : ISupplierOfferExtractorService
 {
     public async Task<SupplierOfferExtractionResult[]> ExtractOffers(
         int productId,

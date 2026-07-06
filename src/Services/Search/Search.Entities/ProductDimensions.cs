@@ -1,4 +1,5 @@
 using Enums;
+using Enums.Units;
 
 namespace Search.Entities;
 

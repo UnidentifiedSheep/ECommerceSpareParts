@@ -6,8 +6,11 @@ using Application.Common.Services.Currency;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Pricing.Application.Interfaces;
+using Pricing.Application.Interfaces.Markup;
+using Pricing.Application.Interfaces.Pricing;
 using Pricing.Application.Services;
 using Pricing.Application.Services.Markup;
+using Pricing.Application.Services.Pricing;
 using ZiggyCreatures.Caching.Fusion;
 
 namespace Pricing.Application;
@@ -36,6 +39,8 @@ public static class ServiceProvider
         collection.AddSingleton<IMarkupContainer, MarkupContainer>();
         collection.AddScoped<IMarkupCalculator, MarkupCalculator>();
         collection.AddScoped<IMarkupInitializer, MarkupInitializer>();
+
+        collection.AddScoped<ISupplierOfferExtractorService, SupplierOfferExtractorService>();
 
         return collection;
     }

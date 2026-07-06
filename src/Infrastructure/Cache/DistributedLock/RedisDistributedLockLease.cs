@@ -1,7 +1,7 @@
 using Application.Common.Interfaces.Cache;
 using StackExchange.Redis;
 
-namespace Cache;
+namespace Cache.DistributedLock;
 
 public sealed class RedisDistributedLockLease(
     IDatabase db,

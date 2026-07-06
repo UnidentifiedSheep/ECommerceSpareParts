@@ -1,20 +1,19 @@
-using Pricing.Application.Models;
 using Pricing.Entities;
 
-namespace Pricing.Application.Interfaces;
+namespace Pricing.Application.Interfaces.Markup;
 
 public interface IMarkupContainer
 {
     bool Initialized { get; }
 
-    Markup DefaultMarkup { get; }
+    Models.Markup DefaultMarkup { get; }
     int DefaultCurrencyId { get; }
-    Markup? GetForDefaultOrNull(double value);
-    Markup? GetForCurrencyOrNull(int currencyId, double value);
+    Models.Markup? GetForDefaultOrNull(double value);
+    Models.Markup? GetForCurrencyOrNull(int currencyId, double value);
 
     void Initialize(
         int defaultCurrencyId,
-        Markup defaultMarkup,
+        Models.Markup defaultMarkup,
         IEnumerable<MarkupRange> @default,
         Dictionary<int, IEnumerable<MarkupRange>> other);
 }

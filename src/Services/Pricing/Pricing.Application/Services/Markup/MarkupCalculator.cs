@@ -1,4 +1,5 @@
 using Pricing.Application.Interfaces;
+using Pricing.Application.Interfaces.Markup;
 
 namespace Pricing.Application.Services.Markup;
 

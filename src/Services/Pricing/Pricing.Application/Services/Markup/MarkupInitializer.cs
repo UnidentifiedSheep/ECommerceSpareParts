@@ -4,6 +4,7 @@ using Application.Common.Interfaces.Settings;
 using Internal.Integration.Core.Interfaces.Main;
 using Microsoft.EntityFrameworkCore;
 using Pricing.Application.Interfaces;
+using Pricing.Application.Interfaces.Markup;
 using Pricing.Entities;
 using Pricing.Entities.Settings;
 

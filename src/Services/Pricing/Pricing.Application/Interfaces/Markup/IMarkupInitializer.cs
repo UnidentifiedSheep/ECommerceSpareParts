@@ -1,4 +1,4 @@
-namespace Pricing.Application.Interfaces;
+namespace Pricing.Application.Interfaces.Markup;
 
 public interface IMarkupInitializer
 {

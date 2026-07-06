@@ -3,6 +3,7 @@ using Abstractions.Models;
 using Api.Common.Extensions;
 using Api.Common.Models.Requests;
 using Enums;
+using Enums.Units;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
 using Search.Application.Dtos.Products;
