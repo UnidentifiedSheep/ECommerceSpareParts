@@ -1,15 +1,12 @@
 using System.Text.Json.Serialization;
 
-namespace Internal.Integration.Core.Models.Main.Product;
+namespace Main.Application.Dtos.Product.SupplierReferences;
 
-public record InternalSupplierProductReference
+public record SupplierProductReferenceDto
 {
-    [JsonPropertyName("productId")]
-    public required int ProductId { get; init; }
-
     [JsonPropertyName("sku")]
     public required string Sku { get; init; }
-
+    
     [JsonPropertyName("supplierProducerName")]
     public required string SupplierProducerName { get; init; }
 }

@@ -14,4 +14,9 @@ public interface IProductNode
         IEnumerable<int> productIds,
         Supplier supplier,
         CancellationToken cancellationToken = default);
+
+    Task<Response<IReadOnlyList<InternalSupplierProductReference>>> ResolveSupplierProductReferences(
+        IEnumerable<InternalSupplierProductReferenceRequest> references,
+        Supplier supplier,
+        CancellationToken cancellationToken = default);
 }

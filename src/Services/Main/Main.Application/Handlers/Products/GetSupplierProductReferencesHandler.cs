@@ -1,9 +1,8 @@
 using Application.Common.Interfaces.Cqrs;
 using Application.Common.Interfaces.Repositories;
 using Enums;
-using Main.Application.Dtos.Product;
+using Main.Application.Dtos.Product.SupplierReferences;
 using Main.Entities.Product;
-using Main.Enums;
 using Microsoft.EntityFrameworkCore;
 
 namespace Main.Application.Handlers.Products;
@@ -14,7 +13,7 @@ public record GetSupplierProductReferencesQuery(
     ) : IQuery<GetSupplierProductReferencesResult>;
 
 public record GetSupplierProductReferencesResult(
-    IReadOnlyList<SupplierProductReferenceDto> Products);
+    IReadOnlyList<ResolvedSupplierProductReferenceDto> Products);
 
 public class GetSupplierProductReferencesHandler(
     IReadRepository<Product, int> repository
@@ -31,8 +30,9 @@ public class GetSupplierProductReferencesHandler(
                 p => p.Producer.SupplierMappings
                     .Where(m => m.Supplier == request.Supplier)
                     .Take(1),
-                (p, m) => new SupplierProductReferenceDto
+                (p, m) => new ResolvedSupplierProductReferenceDto
                 {
+                    ProductId = p.Id,
                     Sku = p.Sku.NormalizedValue,
                     SupplierProducerName = m.SupplierProducerName
                 })
