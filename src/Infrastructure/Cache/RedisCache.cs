@@ -1,4 +1,6 @@
-﻿using NRedisStack.Json.DataTypes;
+﻿using Application.Common.Interfaces.Cache;
+using Cache.Extensions;
+using NRedisStack.Json.DataTypes;
 using NRedisStack.RedisStackCommands;
 using StackExchange.Redis;
 
@@ -9,24 +11,17 @@ public class RedisCache(
     string? prefix = null
 ) : ICache
 {
-    public Task<T?> GetAsync<T>(
-        string key,
-        string path = "$")
+    public Task<T?> GetAsync<T>(string key)
+        => redis.JSON().GetAsync<T>(GetWithPrefix(key));
+    public async Task<IReadOnlyList<T?>> GetAsync<T>(IEnumerable<string> keys)
     {
-        return redis.JSON()
-            .GetAsync<T>(GetWithPrefix(key), path);
-    }
-
-    public Task<RedisResult[]> GetAsync<T>(
-        IEnumerable<string> keys,
-        string path = "$")
-    {
-        return redis.JSON()
+        var redisResults = await redis.JSON()
             .MGetAsync(
                 GetWithPrefixes(keys),
-                path);
-    }
+                "$");
 
+        return redisResults.DeserializeMany<T>();
+    }
     public async Task SetAsync<T>(
         IEnumerable<(string key, T value)> keyValues,
         TimeSpan? ttl = null)
@@ -47,23 +42,26 @@ public class RedisCache(
         await redis.JSON().MSetAsync(values);
         await SetExpireAsync(rawKeys, ttl);
     }
+    public Task SetAsync<T>(
+        string key,
+        T value,
+        TimeSpan? ttl = null)
+        => SetAsync([(key, value)], ttl);
 
     public Task<bool> SetExpireAsync(
         string key,
-        TimeSpan? ttl = null,
-        ExpireWhen when = ExpireWhen.Always)
+        TimeSpan? ttl = null)
     {
         return SetExpireCore(
             redis,
             key,
             ttl,
-            when);
+            ExpireWhen.Always);
     }
 
     public async Task<Dictionary<string, bool>> SetExpireAsync(
         IEnumerable<string> keys,
-        TimeSpan? ttl = null,
-        ExpireWhen when = ExpireWhen.Always)
+        TimeSpan? ttl = null)
     {
         var batch = redis.CreateBatch();
         var keyedTasks = keys
@@ -72,7 +70,7 @@ public class RedisCache(
                 batch,
                 x,
                 ttl,
-                when)))
+                ExpireWhen.Always)))
             .ToDictionary(x => x.x, x => x.Item2);
 
         batch.Execute();
@@ -83,27 +81,41 @@ public class RedisCache(
             x => x.Value.Result);
     }
 
-    public async Task<IEnumerable<T?>> GetEnumerableAsync<T>(
-        string key,
-        string path = "$[*]")
+    public async Task<IEnumerable<T?>> GetEnumerableAsync<T>(string key)
     {
         if (!await redis.KeyExistsAsync(GetWithPrefix(key))) return [];
 
-        return await redis.JSON().GetEnumerableAsync<T>(GetWithPrefix(key), path);
+        return await redis.JSON().GetEnumerableAsync<T>(GetWithPrefix(key), "$[*]");
     }
 
     public Task<bool> KeyExistsAsync(string key) { return redis.KeyExistsAsync(GetWithPrefix(key)); }
+    public async Task<Dictionary<string, bool>> KeyExistsAsync(
+        IEnumerable<string> keys, 
+        CancellationToken token = default)
+    {
+        var batch = redis.CreateBatch();
 
-    public async Task SetEnumerableAsync<T>(
-        string key,
+        var tasks = keys
+            .Distinct()
+            .Select(x => (x, GetWithPrefix(x), batch.KeyExistsAsync(GetWithPrefix(x))))
+            .ToDictionary(x => x.x, x => x.Item3);
+        
+        batch.Execute();
+
+        await Task.WhenAll(tasks.Values);
+
+        return tasks.ToDictionary(
+            x => x.Key,
+            x => x.Value.Result);
+    }
+    public async Task SetEnumerableAsync<T>(string key,
         IEnumerable<T> values,
-        string path = "$",
         TimeSpan? ttl = null)
     {
         await redis.JSON()
             .SetAsync(
                 GetWithPrefix(key),
-                path,
+                "$",
                 values);
 
         await SetExpireAsync(key, ttl);

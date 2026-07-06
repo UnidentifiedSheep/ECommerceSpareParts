@@ -1,3 +1,4 @@
+using Application.Common.Interfaces.Cache;
 using Cache;
 using Cache.Extensions;
 using Enums;
@@ -11,15 +12,4 @@ public class PricingCacheRepository(
     ICache cache
 ) : IPricingCacheRepository
 {
-    public async Task<string> TryLockSupplierRequestAsync(
-        int productId,
-        Supplier supplier,
-        string lockKey,
-        CancellationToken cancellationToken = default)
-    {
-        return await cache.GetOrSetAsync(
-            CacheKeys.PricingCache.Lock.SupplierRequest(productId, supplier),
-            () => Task.FromResult<string?>(lockKey),
-            CacheKeys.PricingCache.Lock.Ttl) ?? lockKey;
-    }
 }

@@ -26,4 +26,7 @@ public record PricingSettingData
 
     [JsonPropertyName("defaultMarkup")]
     public decimal DefaultMarkup { get; init; } = 0.2m;
+    
+    [JsonPropertyName("offerTtl")]
+    public TimeSpan? OfferTtl { get; init; }
 }

@@ -12,7 +12,7 @@ public class CurrencyCacheRepository(
 {
     public async Task<decimal?> GetCurrencyRate(int currencyId, CancellationToken cancellationToken = default)
     {
-        var key = CacheKeys.CurrencyCache.CurrencyRate(currencyId);
+        var key = CacheKeys.Currency.CurrencyRate(currencyId);
         var cached = await fusionCache.TryGetAsync<decimal>(key, token: cancellationToken);
         if (cached.HasValue) return cached.Value;
 
@@ -23,7 +23,7 @@ public class CurrencyCacheRepository(
         await fusionCache.SetAsync(
             key,
             value,
-            CacheKeys.CurrencyCache.Ttl,
+            CacheKeys.Currency.Ttl,
             cancellationToken);
         return value;
     }
@@ -31,7 +31,7 @@ public class CurrencyCacheRepository(
     public async Task InvalidateCurrencyRate(int currencyId, CancellationToken cancellationToken = default)
     {
         await fusionCache.RemoveAsync(
-            CacheKeys.CurrencyCache.CurrencyRate(currencyId),
+            CacheKeys.Currency.CurrencyRate(currencyId),
             token: cancellationToken);
     }
 }

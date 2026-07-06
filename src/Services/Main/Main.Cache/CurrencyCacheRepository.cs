@@ -1,3 +1,4 @@
+using Application.Common.Interfaces.Cache;
 using Application.Common.Interfaces.Repositories;
 using Application.Common.Interfaces.Settings;
 using Cache;

@@ -77,6 +77,7 @@ public class FavoritPartsSupplier(
             Analogues = good.Analogues.Select(x => AdaptGood(x, settings)).ToList(),
             Positions = good.Warehouses.Select(x => new SupplierPosition
                 {
+                    Id = x.Id,
                     PurchaseInfo = new PurchaseInfo
                     {
                         AvailableQuantity = x.Stock,

@@ -1,3 +1,4 @@
+using Application.Common.Interfaces.Cache;
 using Cache;
 using FluentAssertions;
 using Main.Application.Interfaces.Cache;

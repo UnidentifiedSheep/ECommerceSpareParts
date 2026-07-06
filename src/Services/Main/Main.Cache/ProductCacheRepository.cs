@@ -1,6 +1,6 @@
 ﻿using Application.Common.Extensions;
+using Application.Common.Interfaces.Cache;
 using Application.Common.Interfaces.Repositories;
-using Cache;
 using Cache.Extensions;
 using Main.Application.Dtos.Product;
 using Main.Application.Extensions.QueryExtensions;
@@ -104,8 +104,7 @@ public class ProductCacheRepository(
 
     public async Task<IReadOnlyList<ProductDto?>> GetProductsAsync(IEnumerable<int> ids)
     {
-        return (await rawCache.GetAsync<ProductDto>(ids.Select(CacheKeys.ProductCache.Product)))
-            .DeserializeMany<ProductDto>();
+        return await rawCache.GetAsync<ProductDto>(ids.Select(CacheKeys.ProductCache.Product));
     }
 
     public Task InvalidateProductAsync(int productId)
