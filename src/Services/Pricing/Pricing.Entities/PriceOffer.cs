@@ -5,9 +5,8 @@ using Pricing.Enums;
 
 namespace Pricing.Entities;
 
-public class PriceOffer : Entity<PriceOffer, Guid>, ILinqEntity<PriceOffer, Guid>
+public class PriceOffer : AuditableEntity<PriceOffer, Guid>, ILinqEntity<PriceOffer, Guid>
 {
-
     private PriceOffer() { }
     public Guid Id { get; private set; }
     public int ProductId { get; private set; }
@@ -28,9 +27,8 @@ public class PriceOffer : Entity<PriceOffer, Guid>, ILinqEntity<PriceOffer, Guid
     public DateTime GuaranteedDeliveryDate { get; private set; }
     public int DeliveryProbability { get; private set; }
     public DateTime OrderTill { get; private set; }
-
-    public DateTime CreatedAt { get; private set; }
     public DateTime ExpiresAt { get; private set; }
+    
     public static Expression<Func<PriceOffer, Guid>> GetKeySelector()
     {
         return x => x.Id;
@@ -71,10 +69,10 @@ public class PriceOffer : Entity<PriceOffer, Guid>, ILinqEntity<PriceOffer, Guid
             GuaranteedDeliveryDate = guaranteedDeliveryDate,
             DeliveryProbability = deliveryProbability,
             OrderTill = orderTill,
-            ExpiresAt = expiresAt,
-            CreatedAt = DateTime.UtcNow
+            ExpiresAt = expiresAt
         };
     }
+    
     public override Guid GetId()
     {
         return Id;

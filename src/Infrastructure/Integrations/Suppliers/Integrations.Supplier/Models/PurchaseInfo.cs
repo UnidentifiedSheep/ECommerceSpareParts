@@ -9,5 +9,5 @@ public record PurchaseInfo
     public int DaysToRefund { get; init; }
     public bool PartnerWarehouse { get; init; } //Is the product in the partner warehouse
 
-    public PriceInfo? PriceInfo { get; init; }
+    public required PriceInfo PriceInfo { get; init; }
 }

@@ -39,7 +39,13 @@ public record InternalGetSupplierProductReferencesRequest
 public record InternalResolveSupplierProductReferencesRequest
 {
     [JsonPropertyName("references")]
-    public required IReadOnlyList<SupplierProductReferenceDto> References { get; init; }
+    public required Dictionary<Supplier, IEnumerable<SupplierProductReferenceDto>> References { get; init; }
+}
+
+public record InternalResolveSupplierProductReferencesResponse
+{
+    [JsonPropertyName("products")]
+    public required Dictionary<Supplier, IEnumerable<ResolvedSupplierProductReferenceDto>> Products { get; init; }
 }
 
 public static class InternalProductEndPoints
@@ -111,18 +117,15 @@ public static class InternalProductEndPoints
                 "resolve-supplier-references",
                 async (
                     ISender sender,
-                    [FromQuery(Name = "supplier")] Supplier supplier,
                     InternalResolveSupplierProductReferencesRequest request,
                     CancellationToken cancellationToken) =>
                 {
                     var result = await sender.Send(
-                        new ResolveSupplierProductReferencesQuery(
-                            request.References,
-                            supplier),
+                        new ResolveSupplierProductReferencesQuery(request.References),
                         cancellationToken);
 
                     return Results.Ok(
-                        new InternalGetSupplierProductReferencesResponse
+                        new InternalResolveSupplierProductReferencesResponse
                         {
                             Products = result.Products
                         });
@@ -134,7 +137,7 @@ public static class InternalProductEndPoints
             .WithSummary("Найти продукты по данным поставщика")
             .WithDescription("Получение продуктов по артикулу и названию производителя в терминах поставщика для внутренних интеграций")
             .Accepts<InternalResolveSupplierProductReferencesRequest>(false, "application/json")
-            .Produces<InternalGetSupplierProductReferencesResponse>()
+            .Produces<InternalResolveSupplierProductReferencesResponse>()
             .ProducesProblem(StatusCodes.Status400BadRequest)
             .ProducesProblem(StatusCodes.Status404NotFound);
 

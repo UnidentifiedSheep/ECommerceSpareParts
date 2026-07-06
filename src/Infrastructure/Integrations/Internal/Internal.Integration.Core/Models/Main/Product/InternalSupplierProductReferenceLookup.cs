@@ -2,11 +2,8 @@ using System.Text.Json.Serialization;
 
 namespace Internal.Integration.Core.Models.Main.Product;
 
-public record InternalSupplierProductReference
+public record InternalSupplierProductReferenceLookup
 {
-    [JsonPropertyName("productId")]
-    public required int ProductId { get; init; }
-
     [JsonPropertyName("sku")]
     public required string Sku { get; init; }
 

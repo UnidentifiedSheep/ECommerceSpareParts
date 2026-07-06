@@ -10,6 +10,8 @@ public enum SupplierOfferExtractionStatus
     NoSupplierReference,
 
     SupplierRequestFailed,
+    SupplierReturnedEmpty,
+    InvalidSupplierResponse,
 
     Failed
 }

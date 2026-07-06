@@ -2,6 +2,8 @@ namespace Pricing.Enums;
 
 public enum PriceOfferSource
 {
-    Supplier,
-    OurWarehouse
+    OurWarehouse,
+    
+    Armtek,
+    FavoriteParts,
 }

@@ -9,7 +9,6 @@ using Pricing.Application.Interfaces.Pricing;
 using Pricing.Application.Models;
 using Pricing.Application.Static;
 using Pricing.Entities.Settings;
-using Pricing.Enums;
 
 namespace Pricing.Application.Services.Pricing;
 
@@ -101,7 +100,13 @@ public class SupplierOfferExtractorService(
                 }
                 
                 await MarkAsOk(supplier.Supplier, productId, ct);
-                return SupplierOfferExtractionResult.Success(supplier.Supplier, response.ValueOrThrow);
+
+                return response.ValueOrThrow.Count switch
+                {
+                    1 => SupplierOfferExtractionResult.Success(supplier.Supplier, response.ValueOrThrow[0]),
+                    0 => SupplierOfferExtractionResult.SupplierReturnedEmpty(supplier.Supplier),
+                    _ => SupplierOfferExtractionResult.InvalidSupplierResponse(supplier.Supplier)
+                };
             },
             token);
 

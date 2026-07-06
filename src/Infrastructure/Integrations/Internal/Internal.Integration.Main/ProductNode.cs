@@ -35,7 +35,7 @@ internal sealed class ProductNode(
             cancellationToken);
     }
 
-    public async Task<Response<IReadOnlyList<InternalSupplierProductReference>>> GetSupplierProductReferences(
+    public async Task<Response<IReadOnlyList<InternalSupplierProductResolvedReference>>> GetSupplierProductReferences(
         IEnumerable<int> productIds,
         Supplier supplier,
         CancellationToken cancellationToken = default)
@@ -56,25 +56,20 @@ internal sealed class ProductNode(
 
         return await ReadResponse<
             GetSupplierProductReferencesResponse, 
-            IReadOnlyList<InternalSupplierProductReference>>(
+            IReadOnlyList<InternalSupplierProductResolvedReference>>(
             response,
             x => x.Products,
             cancellationToken);
     }
 
-    public async Task<Response<IReadOnlyList<InternalSupplierProductReference>>> ResolveSupplierProductReferences(
-        IEnumerable<InternalSupplierProductReferenceRequest> references,
-        Supplier supplier,
+    public async Task<Response<Dictionary<Supplier, IReadOnlyList<InternalSupplierProductResolvedReference>>>> ResolveSupplierProductReferences(
+        Dictionary<Supplier, IEnumerable<InternalSupplierProductReferenceLookup>> references,
         CancellationToken cancellationToken = default)
     {
         using var request = await GetRequest(
             HttpMethod.Post,
-            $"/internal/products/resolve-supplier-references?supplier={Uri.EscapeDataString(supplier.ToString())}",
+            "/internal/products/resolve-supplier-references",
             cancellationToken);
-        request.Content = JsonContent.Create(new ResolveSupplierProductReferencesRequest
-        {
-            References = references.ToList()
-        });
 
         using var response = await httpClient.SendAsync(
             request,
@@ -82,9 +77,13 @@ internal sealed class ProductNode(
 
         return await ReadResponse<
             ResolveSupplierProductReferencesResponse,
-            IReadOnlyList<InternalSupplierProductReference>>(
+            Dictionary<Supplier, IReadOnlyList<InternalSupplierProductResolvedReference>>>(
             response,
-            x => x.Products,
+            x => x.Products.ToDictionary(
+                z => z.Key, 
+                IReadOnlyList<InternalSupplierProductResolvedReference> (
+                    z) => z.Value.ToList()
+                ),
             cancellationToken);
     }
 
@@ -97,18 +96,18 @@ internal sealed class ProductNode(
     private record GetSupplierProductReferencesResponse
     {
         [JsonPropertyName("products")]
-        public IReadOnlyList<InternalSupplierProductReference> Products { get; init; } = [];
+        public IReadOnlyList<InternalSupplierProductResolvedReference> Products { get; init; } = [];
     }
 
     private record ResolveSupplierProductReferencesRequest
     {
         [JsonPropertyName("references")]
-        public required IReadOnlyList<InternalSupplierProductReferenceRequest> References { get; init; }
+        public required Dictionary<Supplier, IEnumerable<InternalSupplierProductReferenceLookup>> References { get; init; }
     }
 
     private record ResolveSupplierProductReferencesResponse
     {
         [JsonPropertyName("products")]
-        public IReadOnlyList<InternalSupplierProductReference> Products { get; init; } = [];
+        public Dictionary<Supplier, IEnumerable<InternalSupplierProductResolvedReference>> Products { get; init; } = [];
     }
 }

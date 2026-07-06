@@ -7,9 +7,9 @@ using Main.Entities.DomainEvents.StorageContent;
 using Main.Entities.Event;
 using Main.Entities.Exceptions;
 
-namespace Main.Application.DomainEventHandlers.Storage;
+namespace Main.Application.DomainEventHandlers.Storage.StorageContentCountUpdated;
 
-public class StorageContentCountUpdatedHandler(
+public class UpdateProductStock(
     IProductRepository productRepository,
     IUnitOfWork unitOfWork
     ) : BatchableDomainEventHandler<StorageContentCountUpdatedDomainEvent>

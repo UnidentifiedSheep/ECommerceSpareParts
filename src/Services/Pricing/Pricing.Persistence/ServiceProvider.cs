@@ -7,6 +7,7 @@ using Microsoft.Extensions.Options;
 using Persistence;
 using Persistence.DbValidator;
 using Persistence.Extensions;
+using Pricing.Application.Interfaces.Persistence;
 using Pricing.Persistence.Contexts;
 using Pricing.Persistence.Repositories;
 
@@ -24,6 +25,8 @@ public static class ServiceProvider
 
         collection.AddScoped(typeof(IRepository<,>), typeof(BasicEfRepository<,>));
         collection.AddScoped(typeof(IReadRepository<,>), typeof(ReadRepository<,>));
+        
+        collection.AddScoped<IPriceOfferRepository, PriceOfferRepository>();
 
         collection.AddUnitOfWork<DContext>();
 

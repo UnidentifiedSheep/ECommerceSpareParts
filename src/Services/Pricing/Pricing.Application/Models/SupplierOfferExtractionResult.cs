@@ -7,8 +7,10 @@ namespace Pricing.Application.Models;
 public sealed record SupplierOfferExtractionResult
 {
     public required Supplier Supplier { get; init; }
-    public required IReadOnlyList<SupplierProduct> Offers { get; init; }
+    public required SupplierProduct? Offer { get; init; }
     public SupplierOfferExtractionStatus Status { get; init; }
+    
+    public bool IsSuccess => Status == SupplierOfferExtractionStatus.Success;
 
     public static SupplierOfferExtractionResult SkippedByRefreshMarker(Supplier supplier)
         => EmptyCore(supplier, SupplierOfferExtractionStatus.SkippedByRefreshMarker);
@@ -24,12 +26,18 @@ public sealed record SupplierOfferExtractionResult
     
     public static SupplierOfferExtractionResult Failed(Supplier supplier)
         => EmptyCore(supplier, SupplierOfferExtractionStatus.Failed);
+    
+    public static SupplierOfferExtractionResult SupplierReturnedEmpty(Supplier supplier)
+        => EmptyCore(supplier, SupplierOfferExtractionStatus.SupplierReturnedEmpty);
 
-    public static SupplierOfferExtractionResult Success(Supplier supplier, IEnumerable<SupplierProduct> offers)
+    public static SupplierOfferExtractionResult InvalidSupplierResponse(Supplier supplier)
+        => EmptyCore(supplier, SupplierOfferExtractionStatus.InvalidSupplierResponse);
+    
+    public static SupplierOfferExtractionResult Success(Supplier supplier, SupplierProduct? offer)
         => new()
         {
             Supplier = supplier,
-            Offers = offers.ToList(),
+            Offer = offer,
             Status = SupplierOfferExtractionStatus.Success,
         };
     
@@ -38,6 +46,6 @@ public sealed record SupplierOfferExtractionResult
         {
             Supplier = supplier,
             Status = status,
-            Offers = [],
+            Offer = null,
         };
 }

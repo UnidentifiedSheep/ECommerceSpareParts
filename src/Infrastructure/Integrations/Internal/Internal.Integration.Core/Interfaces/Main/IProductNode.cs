@@ -10,13 +10,12 @@ public interface IProductNode
         IEnumerable<int> productIds,
         CancellationToken cancellationToken = default);
 
-    Task<Response<IReadOnlyList<InternalSupplierProductReference>>> GetSupplierProductReferences(
+    Task<Response<IReadOnlyList<InternalSupplierProductResolvedReference>>> GetSupplierProductReferences(
         IEnumerable<int> productIds,
         Supplier supplier,
         CancellationToken cancellationToken = default);
 
-    Task<Response<IReadOnlyList<InternalSupplierProductReference>>> ResolveSupplierProductReferences(
-        IEnumerable<InternalSupplierProductReferenceRequest> references,
-        Supplier supplier,
+    Task<Response<Dictionary<Supplier, IReadOnlyList<InternalSupplierProductResolvedReference>>>> ResolveSupplierProductReferences(
+        Dictionary<Supplier, IEnumerable<InternalSupplierProductReferenceLookup>> references,
         CancellationToken cancellationToken = default);
 }
