@@ -11,7 +11,7 @@ public record PatchProductDto
     [JsonPropertyName("name")]
     public PatchField<string> Name { get; set; } = PatchField<string>.NotSet();
 
-    [JsonPropertyName("productId")]
+    [JsonPropertyName("producerId")]
     public PatchField<int> ProducerId { get; set; } = PatchField<int>.NotSet();
 
     [JsonPropertyName("description")]

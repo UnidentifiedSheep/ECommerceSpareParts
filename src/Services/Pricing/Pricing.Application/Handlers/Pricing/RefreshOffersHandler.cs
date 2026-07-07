@@ -1,4 +1,8 @@
+using Application.Common.Extensions;
 using Application.Common.Interfaces.Cqrs;
+using Application.Common.Interfaces.Events;
+using Attributes;
+using Contracts.Supplier;
 using Integrations.Supplier.Models;
 using MediatR;
 using Microsoft.Extensions.Logging;
@@ -8,21 +12,35 @@ using Pricing.Entities;
 
 namespace Pricing.Application.Handlers.Pricing;
 
-public record RefreshOffersCommand(int ProductId) : ICommand;
+[Diagnostics(maxExecutionTimeMs: 400)]
+[Transactional, AutoSave]
+public record RefreshOffersCommand(int ProductId) : ICommand<RefreshOffersResult>;
+
+public record RefreshOffersResult(IReadOnlyList<PriceOffer> CreatedOffers);
 
 public class RefreshOffersHandler(
     ISupplierOfferExtractorService extractorService,
+    IIntegrationEventScope integrationEventScope,
     ILogger<RefreshOffersCommand> logger,
     ISupplierOfferConverterService converterService,
     IPriceOfferRepository offerRepository
-    ) : ICommandHandler<RefreshOffersCommand>
+    ) : ICommandHandler<RefreshOffersCommand, RefreshOffersResult>
 {
-    public async Task<Unit> Handle(RefreshOffersCommand request, CancellationToken cancellationToken)
+    public async Task<RefreshOffersResult> Handle(RefreshOffersCommand request, CancellationToken cancellationToken)
     {
         var extracted = await extractorService
             .ExtractOffers(
                 request.ProductId, 
                 cancellationToken);
+        
+        var events = extracted
+            .Where(x => x is { IsSuccess: true, Offer: not null })
+            .Select(x => new SupplierProductsRequestedEvent
+            {
+                Supplier = x.Supplier,
+                Products = [x.Offer!.ToContract()]
+            })
+            .ToList();
 
         var toRefresh = extracted
             .Where(x => x is { IsSuccess: true, Offer: not null })
@@ -50,8 +68,9 @@ public class RefreshOffersHandler(
         
         LogNotFoundCurrencies(notFoundCurrencies);
         await offerRepository.UpsertOffersAsync(offers, cancellationToken);
+        integrationEventScope.AddRange(events);
 
-        return Unit.Value;
+        return new RefreshOffersResult(offers);
     }
 
     private void LogNotFoundCurrencies(HashSet<string> notFoundCurrencies)
