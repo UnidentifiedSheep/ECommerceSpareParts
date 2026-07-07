@@ -2,8 +2,10 @@ using System.Reflection;
 using Abstractions;
 using Api.Common;
 using Api.Common.Extensions;
+using Api.Common.HostedServices;
 using Application.Common.Backplane;
 using Application.Common.Consumer;
+using Application.Common.Interfaces;
 using Application.Common.Services.Supplier;
 using Cache;
 using Carter;
@@ -15,8 +17,11 @@ using Internal.Integration.Di;
 using Localization.Domain.Extensions;
 using MassTransit;
 using OpenTelemetry.Metrics;
+using Pricing.Api;
+using Pricing.Api.Startup;
 using Pricing.Application;
 using Pricing.Application.Consumers;
+using Pricing.Application.Interfaces.Markup;
 using Pricing.Cache;
 using Pricing.Persistence;
 using Pricing.Persistence.Contexts;
@@ -105,6 +110,9 @@ builder.Services
     .AddApplicationLayer(builder.Configuration)
     .AddLocalization(builder.Configuration);
 
+builder.Services.AddScoped<IStartupTask, MarkupInitializationStartupTask>();
+builder.Services.AddHostedService<StartupTaskHostedService>();
+
 builder.Services.AddOpenTelemetry()
     .WithMetrics(metrics =>
     {
@@ -119,6 +127,7 @@ var endpointAssembly = typeof(Program).Assembly;
 builder.Services.AddCarter(
     new DependencyContextAssemblyCatalog(endpointAssembly),
     c => c.WithEmptyValidators());
+
 
 var app = builder.Build();
 
