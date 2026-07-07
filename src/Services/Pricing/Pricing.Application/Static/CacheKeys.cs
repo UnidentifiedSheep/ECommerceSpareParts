@@ -19,22 +19,22 @@ public static class CacheKeys
         {
             public static TimeSpan Ttl(PricingSettingData setting) => setting.OfferTtl;
             
-            public static string Key(Supplier supplier, int productId)
-                => $"offer:refresh:ok:{supplier.ToString()}:{productId}";
+            public static string Key(Supplier supplier, int productId, string storageName)
+                => $"offer:refresh:ok:{supplier.ToString()}:{productId}:{storageName}";
         }
         
         public static class Failed
         {
             public static readonly TimeSpan Ttl = TimeSpan.FromMinutes(5);
-            public static string Key(Supplier supplier, int productId)
-                => $"offer:refresh:failed:{supplier.ToString()}:{productId}";
+            public static string Key(Supplier supplier, int productId, string storageName)
+                => $"offer:refresh:failed:{supplier.ToString()}:{productId}:{storageName}";
         }
         
         public static class Lock
         {
             public static readonly TimeSpan Ttl = TimeSpan.FromSeconds(60);
-            public static string Key(Supplier supplier, int productId)
-                => $"offer:refresh:lock:{supplier.ToString()}:{productId}";
+            public static string Key(Supplier supplier, int productId, string storageName)
+                => $"offer:refresh:lock:{supplier.ToString()}:{productId}:{storageName}";
         }
     }
 }

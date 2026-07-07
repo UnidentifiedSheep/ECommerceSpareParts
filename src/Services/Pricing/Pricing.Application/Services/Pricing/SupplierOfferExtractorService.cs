@@ -21,6 +21,7 @@ public class SupplierOfferExtractorService(
     ISupplierFactory supplierFactory) : ISupplierOfferExtractorService
 {
     public async Task<SupplierOfferExtractionResult[]> ExtractOffers(
+        string storageName,
         int productId,
         CancellationToken token = default)
     {
@@ -28,7 +29,7 @@ public class SupplierOfferExtractorService(
         if (suppliers.Count == 0) return [];
         
         var tasks = suppliers
-            .Select(x => GetFromSupplier(x, productId, token))
+            .Select(x => GetFromSupplier(x, productId, storageName, token))
             .ToList();
 
         return await Task.WhenAll(tasks);
@@ -37,11 +38,12 @@ public class SupplierOfferExtractorService(
     private async Task<SupplierOfferExtractionResult> GetFromSupplier(
         ISupplier supplier,
         int productId,
+        string storageName,
         CancellationToken token)
     {
         try
         {
-            return await GetFromSupplierCore(supplier, productId, token);
+            return await GetFromSupplierCore(supplier, productId, storageName, token);
         }
         catch (OperationCanceledException) when (token.IsCancellationRequested)
         {
@@ -51,10 +53,11 @@ public class SupplierOfferExtractorService(
         {
             logger.LogWarning(
                 exception: ex, 
-                message: "Supplier offer extraction failed. Supplier: {Supplier}, ProductId: {ProductId}", 
+                message: "Supplier offer extraction failed. Supplier: {Supplier}, ProductId: {ProductId}, Storage: {StorageName}", 
                 supplier.Supplier, 
-                productId);
-            await MarkAsFailed(supplier.Supplier, productId);
+                productId,
+                storageName);
+            await MarkAsFailed(supplier.Supplier, productId, storageName);
             return SupplierOfferExtractionResult.Failed(supplier.Supplier);
         }
     }
@@ -62,17 +65,18 @@ public class SupplierOfferExtractorService(
     private async Task<SupplierOfferExtractionResult> GetFromSupplierCore(
         ISupplier supplier, 
         int productId,
+        string storageName,
         CancellationToken token)
     {
-        if (await HasReFreshMarkerAsync(supplier.Supplier, productId, token))
+        if (await HasReFreshMarkerAsync(supplier.Supplier, productId, storageName, token))
             return SupplierOfferExtractionResult.SkippedByRefreshMarker(supplier.Supplier);
         
         var result = await distributedLockProvider.TryExecuteWithLock(
-            CacheKeys.Offer.Lock.Key(supplier.Supplier, productId),
+            CacheKeys.Offer.Lock.Key(supplier.Supplier, productId, storageName),
             CacheKeys.Offer.Lock.Ttl,
             async ct =>
             {
-                if (await HasReFreshMarkerAsync(supplier.Supplier, productId, ct))
+                if (await HasReFreshMarkerAsync(supplier.Supplier, productId, storageName, ct))
                     return SupplierOfferExtractionResult.SkippedByRefreshMarker(supplier.Supplier);
                 
                 var mainResponse = await mainClient.ProductNode
@@ -80,7 +84,7 @@ public class SupplierOfferExtractorService(
 
                 if (!mainResponse.Success || mainResponse.Value is { Count: 0 })
                 {
-                    await MarkAsFailed(supplier.Supplier, productId);
+                    await MarkAsFailed(supplier.Supplier, productId, storageName);
                     return SupplierOfferExtractionResult.NoSupplierReference(supplier.Supplier);
                 }
 
@@ -88,6 +92,7 @@ public class SupplierOfferExtractorService(
                 
                 var response = await supplier.GetProductsAsync(new GetProductsRequest
                 {
+                    StorageName = storageName,
                     Brand = reference.SupplierProducerName,
                     Number = reference.Sku,
                     ShowAnalogues = true
@@ -95,11 +100,11 @@ public class SupplierOfferExtractorService(
 
                 if (!response.Success || response.Value == null)
                 {
-                    await MarkAsFailed(supplier.Supplier, productId);
+                    await MarkAsFailed(supplier.Supplier, productId, storageName);
                     return SupplierOfferExtractionResult.SupplierRequestFailed(supplier.Supplier);
                 }
                 
-                await MarkAsOk(supplier.Supplier, productId, ct);
+                await MarkAsOk(supplier.Supplier, productId, storageName, ct);
 
                 return response.ValueOrThrow.Count switch
                 {
@@ -116,12 +121,13 @@ public class SupplierOfferExtractorService(
     private async Task<bool> HasReFreshMarkerAsync(
         Supplier supplier,
         int productId,
+        string storageName,
         CancellationToken token)
         => (await cache.KeyExistsAsync(
                 keys:
                 [
-                    CacheKeys.Offer.Failed.Key(supplier, productId),
-                    CacheKeys.Offer.Ok.Key(supplier, productId)
+                    CacheKeys.Offer.Failed.Key(supplier, productId, storageName),
+                    CacheKeys.Offer.Ok.Key(supplier, productId, storageName)
                 ],
                 token))
             .Any(x => x.Value);
@@ -129,17 +135,19 @@ public class SupplierOfferExtractorService(
     private async Task MarkAsOk(
         Supplier supplier,
         int productId,
+        string storageName,
         CancellationToken token)
         => await cache.SetAsync(
-            CacheKeys.Offer.Ok.Key(supplier, productId),
+            CacheKeys.Offer.Ok.Key(supplier, productId, storageName),
             true,
             CacheKeys.Offer.Ok.Ttl((await settingsService.GetOrDefault<PricingSetting>(token)).Data));
 
     private async Task MarkAsFailed(
         Supplier supplier,
-        int productId)
+        int productId,
+        string storageName)
         => await cache.SetAsync(
-            CacheKeys.Offer.Failed.Key(supplier, productId),
+            CacheKeys.Offer.Failed.Key(supplier, productId, storageName),
             true,
             CacheKeys.Offer.Failed.Ttl);
 }

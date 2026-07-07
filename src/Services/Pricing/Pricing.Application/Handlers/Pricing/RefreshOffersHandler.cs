@@ -32,6 +32,7 @@ public class RefreshOffersHandler(
     {
         var extracted = await extractorService
             .ExtractOffers(
+                request.StorageName,
                 request.ProductId, 
                 cancellationToken);
         
