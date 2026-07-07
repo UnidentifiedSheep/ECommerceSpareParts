@@ -40,6 +40,10 @@ public static class ServiceCollectionExtensions
         collection.TryAddScoped<
             IRequestHandler<GetSettingsQuery, GetSettingsResult>,
             GetSettingsHandler>();
+        
+        collection.TryAddScoped<
+            IRequestHandler<GetRawSettingQuery, GetRawSettingResult>,
+            GetRawSettingHandler>();
 
         return collection;
     }

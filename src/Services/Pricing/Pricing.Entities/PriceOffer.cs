@@ -11,6 +11,7 @@ public class PriceOffer : AuditableEntity<PriceOffer, Guid>, ILinqEntity<PriceOf
     public Guid Id { get; private set; }
     public int ProductId { get; private set; }
     public int CurrencyId { get; private set; }
+    public string OfferForStorage { get; private set;  } = string.Empty;
 
     public decimal Price { get; private set; }
 
@@ -41,6 +42,7 @@ public class PriceOffer : AuditableEntity<PriceOffer, Guid>, ILinqEntity<PriceOf
     public static PriceOffer Create(
         int productId,
         int currencyId,
+        string offerForStorage,
         decimal price,
         PriceOfferSource source,
         string sourceKey,
@@ -56,7 +58,9 @@ public class PriceOffer : AuditableEntity<PriceOffer, Guid>, ILinqEntity<PriceOf
     {
         return new PriceOffer
         {
+            Id = Guid.NewGuid(),
             ProductId = productId,
+            OfferForStorage = offerForStorage,
             CurrencyId = currencyId,
             Price = price,
             Source = source,

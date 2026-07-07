@@ -23,6 +23,8 @@ public partial class DContext : DbContext
 
     public virtual DbSet<MarkupRange> MarkupRanges { get; set; }
 
+    public virtual DbSet<PriceOffer> PriceOffers { get; set; }
+
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         modelBuilder.AddOutboxMessageEntity();

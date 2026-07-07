@@ -5,7 +5,6 @@ using Favorit.Integrations.Core.Models;
 using Favorit.Integrations.Core.Requests;
 using Favorit.Integrations.Core.Responses;
 using Integrations.Common;
-using Integrations.Supplier;
 using Integrations.Supplier.Connections;
 using Integrations.Supplier.Interfaces;
 using Integrations.Supplier.Models;
@@ -89,10 +88,10 @@ public class FavoritPartsSupplier(
                     },
                     DeliveryInfo = new DeliveryInfo
                     {
-                        DeliveryDate = x.ShipmentDate.Date.AddDays(settings.MinDaysToDelivery),
+                        DeliveryDate = x.ShipmentDate.UtcDateTime.Date.AddDays(settings.MinDaysToDelivery),
                         DeliveryProbability = 99,
                         GuaranteedDeliveryDate = x.ShipmentDate.Date.AddDays(settings.MaxDaysToDelivery),
-                        OrderTill = DateTime.UtcNow.Date.Add(x.ShipmentDate.TimeOfDay)
+                        OrderTill = DateTime.UtcNow.Date.Add(x.ShipmentDate.UtcDateTime.TimeOfDay)
                     }
                 })
                 .ToList()

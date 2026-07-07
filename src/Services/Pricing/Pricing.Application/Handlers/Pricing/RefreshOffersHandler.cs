@@ -13,8 +13,10 @@ using Pricing.Entities;
 namespace Pricing.Application.Handlers.Pricing;
 
 [Diagnostics(maxExecutionTimeMs: 400)]
-[Transactional, AutoSave]
-public record RefreshOffersCommand(int ProductId) : ICommand<RefreshOffersResult>;
+[AutoSave]
+public record RefreshOffersCommand(
+    int ProductId,
+    string StorageName) : ICommand<RefreshOffersResult>;
 
 public record RefreshOffersResult(IReadOnlyList<PriceOffer> CreatedOffers);
 
@@ -54,6 +56,7 @@ public class RefreshOffersHandler(
         var result = await converterService
             .ConvertAsync(
                 request.ProductId, 
+                request.StorageName,
                 toRefresh, 
                 cancellationToken);
         
