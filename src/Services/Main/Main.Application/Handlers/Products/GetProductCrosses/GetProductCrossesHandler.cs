@@ -11,10 +11,9 @@ public record GetProductCrossesQuery(
     Pagination Pagination,
     string? SortBy,
     Guid? UserId
-)
-    : IQuery<GetProductCrossesResult>;
+) : IQuery<GetProductCrossesResult>;
 
-public record GetProductCrossesResult(IReadOnlyList<ProductDto> Crosses, ProductDto RequestedProduct);
+public record GetProductCrossesResult(IReadOnlyList<ProductDto> Crosses);
 
 public class GetProductCrossesHandler(
     IProductCacheRepository productCache
@@ -26,9 +25,6 @@ public class GetProductCrossesHandler(
         CancellationToken cancellationToken)
     {
         var pagination = request.Pagination;
-        var requestedArticle = await productCache.GetProductOrSetAsync(
-            request.ProductId,
-            cancellationToken);
 
         var crosses = await GetCrosses(
             request.ProductId,
@@ -36,7 +32,7 @@ public class GetProductCrossesHandler(
             request.SortBy,
             cancellationToken);
 
-        return new GetProductCrossesResult(crosses, requestedArticle);
+        return new GetProductCrossesResult(crosses);
     }
 
     private async Task<IReadOnlyList<ProductDto>> GetCrosses(

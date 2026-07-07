@@ -29,6 +29,12 @@ public record GetProductByIdsResult
     public required IReadOnlyList<ProductDto> Products { get; init; }
 }
 
+public record GetProductByIdResponse
+{
+    [JsonPropertyName("product")]
+    public required ProductDto Product { get; init; }
+}
+
 public record GetProductStockResponse
 {
     [JsonPropertyName("stock")]
@@ -88,6 +94,28 @@ public class ProductsEndPoints : ICarterModule
             .WithDisplayName("Получение артикулов по идентификаторам")
             .Produces<GetProductByIdsResult>()
             .ProducesProblem(StatusCodes.Status400BadRequest)
+            .RequireAnyPermission(PermissionCodes.ARTICLES_GET_MAIN);
+
+        products.MapGet(
+                "/{productId:int}",
+                async (
+                    ISender sender,
+                    int productId,
+                    CancellationToken token) =>
+                {
+                    var result = await sender.Send(new GetByIdQuery(productId), token);
+                    return Results.Ok(
+                        new GetProductByIdResponse
+                        {
+                            Product = result.Product
+                        });
+                })
+            .WithName("GetProductById")
+            .WithSummary("Получить продукт по идентификатору")
+            .WithDescription("Получение артикула по идентификатору")
+            .WithDisplayName("Получение артикула по идентификатору")
+            .Produces<GetProductByIdResponse>()
+            .ProducesProblem(StatusCodes.Status404NotFound)
             .RequireAnyPermission(PermissionCodes.ARTICLES_GET_MAIN);
 
         products.MapGet(
