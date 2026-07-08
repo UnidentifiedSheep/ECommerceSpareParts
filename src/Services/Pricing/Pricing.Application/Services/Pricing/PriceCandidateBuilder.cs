@@ -6,6 +6,7 @@ using Pricing.Application.Interfaces.Pricing;
 using Pricing.Application.Models.Pricing;
 using Pricing.Entities;
 using Pricing.Entities.Settings;
+using Pricing.Enums;
 
 namespace Pricing.Application.Services.Pricing;
 
@@ -23,17 +24,20 @@ public sealed class PriceCandidateBuilder(
 
         foreach (var offer in offers)
         {
+            var sourceType = offer.Source.GetSourceType();
             result.Add(new PriceCandidate(
                 PriceOfferId: offer.Id,
                 ProductId: offer.ProductId,
                 TargetStorageName: targetStorageName,
-                SourceType: offer.Source.GetSourceType(),
+                SourceType: sourceType,
                 Cost: offer.Price,
                 CostCurrencyId: offer.CurrencyId,
                 BaseCurrencyId: baseCurrency,
                 CostInBaseCurrency: await currencyConverter.ConvertToBaseAsync(offer.Price, offer.CurrencyId, cancellationToken),
                 AvailableQuantity: offer.AvailableQuantity,
-                Fulfillment: FulfillmentRouteInfo.SameStorage(targetStorageName)));
+                Fulfillment: sourceType == PriceOfferSourceType.OurWarehouse 
+                    ? FulfillmentRouteInfo.SameStorage(targetStorageName)
+                    : FulfillmentRouteInfo.FromSupplier(offer)));
         }
         
         return result;

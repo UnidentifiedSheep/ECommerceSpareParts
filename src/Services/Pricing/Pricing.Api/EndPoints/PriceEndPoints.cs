@@ -7,6 +7,7 @@ using MediatR;
 using Microsoft.AspNetCore.Mvc;
 using Pricing.Application.Dtos.Price;
 using Pricing.Application.Handlers.Pricing;
+using Pricing.Application.Models.Pricing;
 
 namespace Pricing.Api.EndPoints;
 
@@ -24,8 +25,8 @@ public record GetPriceOffersForProductRequest : PaginationQueryModel
 
 public record GetPriceOffersForProductResponse
 {
-    [JsonPropertyName("priceOffers")]
-    public required IReadOnlyList<PriceOfferDto> PriceOffers { get; init; }
+    [JsonPropertyName("candidates")]
+    public required IReadOnlyCollection<CalculatedPriceCandidate> Candidates { get; init; }
 }
 
 public class PriceEndPoints : ICarterModule
@@ -52,7 +53,7 @@ public class PriceEndPoints : ICarterModule
                     return Results.Ok(
                         new GetPriceOffersForProductResponse
                         {
-                            PriceOffers = result.PriceOffers
+                            Candidates = result.Candidates
                         });
                 })
             .WithName("GetPriceOffersForProduct")

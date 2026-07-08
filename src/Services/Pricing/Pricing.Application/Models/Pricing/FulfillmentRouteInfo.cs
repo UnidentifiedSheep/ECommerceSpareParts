@@ -1,3 +1,5 @@
+using Pricing.Entities;
+
 namespace Pricing.Application.Models.Pricing;
 
 public sealed record FulfillmentRouteInfo(
@@ -17,5 +19,16 @@ public sealed record FulfillmentRouteInfo(
             DeliveryTime: TimeSpan.Zero,
             GuaranteedDeliveryTime: TimeSpan.Zero,
             DeliveryProbability: 100);
+    }
+
+    public static FulfillmentRouteInfo FromSupplier(PriceOffer offer)
+    {
+        return new FulfillmentRouteInfo(
+            SourceStorageName: offer.OfferForStorage,
+            TargetStorageName: offer.OfferForStorage,
+            LogisticsCostInBaseCurrency: 0,
+            DeliveryTime: offer.DeliveryDate - offer.UpdatedAt,
+            GuaranteedDeliveryTime: offer.GuaranteedDeliveryDate - offer.UpdatedAt,
+            DeliveryProbability: offer.DeliveryProbability);
     }
 }

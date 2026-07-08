@@ -6,6 +6,8 @@ using LinqKit;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 using Pricing.Application.Dtos.Price;
+using Pricing.Application.Interfaces.Pricing;
+using Pricing.Application.Models.Pricing;
 using Pricing.Entities;
 
 namespace Pricing.Application.Handlers.Pricing;
@@ -16,11 +18,13 @@ public record GetPriceOffersForProductQuery(
     string StorageName,
     Pagination Pagination) : IQuery<GetPriceOffersForProductResult>;
 
-public record GetPriceOffersForProductResult(IReadOnlyList<PriceOfferDto> PriceOffers);
+public record GetPriceOffersForProductResult(IReadOnlyCollection<CalculatedPriceCandidate> Candidates);
 
 public class GetPriceOffersForProductHandler(
     ISender sender,
-    IReadRepository<PriceOffer, Guid> repository
+    IReadRepository<PriceOffer, Guid> repository,
+    IProductPriceCalculator calculator,
+    IPriceCandidateBuilder builder
     ) : IQueryHandler<GetPriceOffersForProductQuery, GetPriceOffersForProductResult>
 {
     public async Task<GetPriceOffersForProductResult> Handle(
@@ -35,29 +39,16 @@ public class GetPriceOffersForProductHandler(
             .AsExpandable()
             .Where(x => x.ProductId == request.ProductId)
             .Where(x => x.OfferForStorage == request.StorageName)
-            .Select(x => new PriceOfferDto
-            {
-                Id = x.Id,
-                AvailableQuantity = x.AvailableQuantity,
-                DaysToRefund = x.DaysToRefund,
-                DeliveryDate = x.DeliveryDate,
-                DeliveryProbability = x.DeliveryProbability,
-                ExpiresAt = x.ExpiresAt,
-                GuaranteedDeliveryDate = x.GuaranteedDeliveryDate,
-                MinimumPurchaseQuantity = x.MinimumPurchaseQuantity,
-                OfferForStorage = x.OfferForStorage,
-                OfferCurrencyId = x.CurrencyId,
-                ProductId = x.ProductId,
-                OfferPrice = x.Price,
-                QuantityCoefficient = x.QuantityCoefficient,
-                Source = x.Source,
-                SourceKey = x.SourceKey,
-                UpdatedAt = x.UpdatedAt,
-                OrderTill = x.OrderTill
-            })
-            .ApplyPagination(request.Pagination)
             .ToListAsync(cancellationToken);
 
-        return new GetPriceOffersForProductResult(result);
+        var candidates = await builder.Build(
+            result,
+            request.StorageName,
+            cancellationToken);
+        
+        var calculated = await calculator
+            .CalculateAsync(candidates, cancellationToken);
+
+        return new GetPriceOffersForProductResult(calculated);
     }
 }
