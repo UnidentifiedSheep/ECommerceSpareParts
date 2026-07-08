@@ -9,7 +9,7 @@ namespace Pricing.Application.Services.Pricing;
 public sealed class ProductPriceCalculator(
     ISupplierPricePolicy supplierPolicy,
     IInternalPricePolicy internalPolicy,
-    IMarketInfoFactory marketInfoFactory)
+    IMarketInfoFactory marketInfoFactory) : IProductPriceCalculator
 {
     public async Task<IReadOnlyCollection<CalculatedPriceCandidate>> CalculateAsync(
         IReadOnlyCollection<PriceCandidate> candidates,

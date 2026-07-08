@@ -7,7 +7,6 @@ using Pricing.Enums;
 namespace Pricing.Application.Services.Pricing;
 
 public sealed class MarketInfoFactory(
-    ISettingsService settingsService,
     IOfferScorer offerScorer) : IMarketInfoFactory
 {
     public async Task<MarketInfo> CreateFromSupplierPrices(
