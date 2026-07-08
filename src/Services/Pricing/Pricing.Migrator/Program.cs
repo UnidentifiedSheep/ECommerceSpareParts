@@ -5,6 +5,9 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Options;
 using Persistence;
+using Persistence.Extensions;
+using Persistence.Interfaces;
+using Pricing.Migrator.Seeds;
 using Pricing.Persistence.Contexts;
 
 var builder = Host.CreateDefaultBuilder(args)
@@ -23,6 +26,12 @@ builder.ConfigureServices((_, services) =>
     });
 });
 
+builder.ConfigureServices((_, services) =>
+{
+    services.AddScoped<ISeed<DContext>, MarkupGroupSeed>();
+});
+
+
 var host = builder.Build();
 
 using var scope = host.Services.CreateScope();
@@ -31,3 +40,9 @@ var db = scope.ServiceProvider.GetRequiredService<DContext>();
 await db.Database.MigrateAsync();
 
 Console.WriteLine("Pricing migrations applied successfully");
+
+Console.WriteLine("Seeding database...");
+
+await host.SeedAsync<DContext>();
+
+Console.WriteLine("Database seeded successfully");
