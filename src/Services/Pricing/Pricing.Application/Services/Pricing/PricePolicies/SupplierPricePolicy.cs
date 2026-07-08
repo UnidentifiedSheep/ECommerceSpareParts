@@ -40,7 +40,7 @@ public class SupplierPricePolicy(
                 DeliveryTime = candidate.Fulfillment.DeliveryTime,
                 DeliveryProbability = candidate.Fulfillment.DeliveryProbability,
                 GuaranteedDeliveryTime = candidate.Fulfillment.GuaranteedDeliveryTime,
-                Markup = state.Markup?.Proportion ?? 0,
+                Markup = state.BaseMarkup?.Proportion ?? 0,
                 PriceInBaseCurrency = state.SalePriceInBaseCurrency,
                 ProductId = candidate.ProductId,
                 PriceOfferId = candidate.PriceOfferId,

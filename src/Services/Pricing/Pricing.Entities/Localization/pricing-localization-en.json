@@ -7,6 +7,8 @@
     "price.applier.price.rounding.description": "Rounds the price according to the configured price rounding step.",
     "price.applier.minimum.supplier.price.name": "Minimum supplier price",
     "price.applier.minimum.supplier.price.description": "Raises the price to the minimum supplier offer price when market data is available.",
+    "price.applier.uniqueness.additional.markup.name": "Unique product additional markup",
+    "price.applier.uniqueness.additional.markup.description": "Applies an additional markup when the product has no market offers.",
     "pricing.setting.name": "Pricing settings",
     "pricing.setting.description": "Controls price calculation, markup selection, offer lifetime, and supplier delivery scoring.",
     "pricing.setting.input.invalid": "Invalid pricing settings data was provided.",
@@ -21,6 +23,8 @@
     "pricing.setting.price.rounding.step.name": "Price rounding step",
     "pricing.setting.price.rounding.step.description": "Step used to round calculated prices.",
     "pricing.setting.delivery.day.penalty.name": "Delivery day penalty",
-    "pricing.setting.delivery.day.penalty.description": "Cost penalty added per delivery day when supplier offers are scored."
+    "pricing.setting.delivery.day.penalty.description": "Cost penalty added per delivery day when supplier offers are scored.",
+    "pricing.setting.uniq.product.additional.markup.name": "Unique product additional markup",
+    "pricing.setting.uniq.product.additional.markup.description": "Additional markup applied to products that have no comparable market offers."
   }
 }

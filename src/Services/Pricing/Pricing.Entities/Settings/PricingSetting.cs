@@ -63,4 +63,11 @@ public record PricingSettingData
     [LocalizedJsonFieldName("pricing.setting.delivery.day.penalty.name")]
     [LocalizedJsonFieldDescription("pricing.setting.delivery.day.penalty.description")]
     public decimal DeliveryDayPenalty { get; init; } = 2m;
+    
+    [JsonPropertyName("uniqProductAdditionalMarkup")]
+    [RequiredJsonField]
+    [InputControl(InputControlType.TextField)]
+    [LocalizedJsonFieldName("pricing.setting.uniq.product.additional.markup.name")]
+    [LocalizedJsonFieldDescription("pricing.setting.uniq.product.additional.markup.description")]
+    public decimal UniqProductAdditionalMarkup { get; init; } = 0.2m;
 }

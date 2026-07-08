@@ -39,7 +39,8 @@ public class PricingSettingDefinition(
                     DefaultMarkup = deser.DefaultMarkup,
                     OfferTtl = deser.OfferTtl,
                     PriceRoundingStep = deser.PriceRoundingStep,
-                    DeliveryDayPenalty = deser.DeliveryDayPenalty
+                    DeliveryDayPenalty = deser.DeliveryDayPenalty,
+                    UniqProductAdditionalMarkup = deser.UniqProductAdditionalMarkup
                 }),
             cancellationToken);
     }
@@ -55,7 +56,8 @@ public class PricingSettingDefinition(
             input.DefaultMarkup < 0 ||
             input.OfferTtl <= TimeSpan.Zero ||
             input.PriceRoundingStep <= 0 ||
-            input.DeliveryDayPenalty < 0)
+            input.DeliveryDayPenalty < 0 ||
+            input.UniqProductAdditionalMarkup <= 0)
             throw new InvalidInputException(InvalidInputKey);
     }
 }
@@ -105,4 +107,11 @@ public record PricingSettingInputData
     [LocalizedJsonFieldName("pricing.setting.delivery.day.penalty.name")]
     [LocalizedJsonFieldDescription("pricing.setting.delivery.day.penalty.description")]
     public required decimal DeliveryDayPenalty { get; init; }
+    
+    [JsonPropertyName("uniqProductAdditionalMarkup")]
+    [RequiredJsonField]
+    [InputControl(InputControlType.TextField)]
+    [LocalizedJsonFieldName("pricing.setting.uniq.product.additional.markup.name")]
+    [LocalizedJsonFieldDescription("pricing.setting.uniq.product.additional.markup.description")]
+    public required decimal UniqProductAdditionalMarkup { get; init; }
 }

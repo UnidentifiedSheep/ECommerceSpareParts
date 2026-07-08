@@ -21,15 +21,15 @@ public sealed class MarkupApplier(
         
         var newState = state with
         {
-            Markup = markupResult,
-            SalePriceInBaseCurrency = markupResult.PriceInBaseCurrency,
+            BaseMarkup = markupResult,
+            SalePriceInBaseCurrency = markupResult.ResultingPrice,
             AppliedRules =
             [
                 ..state.AppliedRules,
                 new AppliedPriceRule(
                     Name: SystemName,
                     PriceBefore: state.SalePriceInBaseCurrency,
-                    PriceAfter: markupResult.PriceInBaseCurrency)
+                    PriceAfter: markupResult.ResultingPrice)
             ]
         };
         

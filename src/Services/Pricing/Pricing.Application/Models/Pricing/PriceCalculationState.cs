@@ -16,7 +16,7 @@ public sealed record PriceCalculationState
 
     public required int BaseCurrencyId { get; init; }
 
-    public MarkupResult? Markup { get; init; }
+    public MarkupResult? BaseMarkup { get; init; }
 
     public required IReadOnlyList<AppliedPriceRule> AppliedRules { get; init; }
 
@@ -31,7 +31,7 @@ public sealed record PriceCalculationState
             CostInBaseCurrency = candidate.CostInBaseCurrency,
             SalePriceInBaseCurrency = candidate.CostInBaseCurrency,
             BaseCurrencyId = candidate.BaseCurrencyId,
-            Markup = null,
+            BaseMarkup = null,
             AppliedRules = []
         };
     }

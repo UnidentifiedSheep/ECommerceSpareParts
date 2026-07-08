@@ -7,6 +7,8 @@
     "price.applier.price.rounding.description": "Fiyatı yapılandırılmış fiyat yuvarlama adımına göre yuvarlar.",
     "price.applier.minimum.supplier.price.name": "Minimum tedarikçi fiyatı",
     "price.applier.minimum.supplier.price.description": "Piyasa verisi mevcut olduğunda fiyatı minimum tedarikçi teklif fiyatına yükseltir.",
+    "price.applier.uniqueness.additional.markup.name": "Benzersiz ürün ek kâr marjı",
+    "price.applier.uniqueness.additional.markup.description": "Ürünün piyasa teklifi olmadığında ek kâr marjı uygular.",
     "pricing.setting.name": "Fiyatlandırma ayarları",
     "pricing.setting.description": "Fiyat hesaplamasını, kâr marjı seçimini, teklif ömrünü ve tedarikçi teslimat puanlamasını yönetir.",
     "pricing.setting.input.invalid": "Geçersiz fiyatlandırma ayarları verisi sağlandı.",
@@ -21,6 +23,8 @@
     "pricing.setting.price.rounding.step.name": "Fiyat yuvarlama adımı",
     "pricing.setting.price.rounding.step.description": "Hesaplanan fiyatları yuvarlamak için kullanılan adım.",
     "pricing.setting.delivery.day.penalty.name": "Teslimat günü cezası",
-    "pricing.setting.delivery.day.penalty.description": "Tedarikçi teklifleri puanlanırken her teslimat günü için eklenen maliyet cezası."
+    "pricing.setting.delivery.day.penalty.description": "Tedarikçi teklifleri puanlanırken her teslimat günü için eklenen maliyet cezası.",
+    "pricing.setting.uniq.product.additional.markup.name": "Benzersiz ürün ek kâr marjı",
+    "pricing.setting.uniq.product.additional.markup.description": "Karşılaştırılabilir piyasa teklifi olmayan ürünlere uygulanan ek kâr marjı."
   }
 }

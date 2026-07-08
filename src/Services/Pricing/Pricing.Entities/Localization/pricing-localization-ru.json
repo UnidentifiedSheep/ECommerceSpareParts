@@ -7,6 +7,8 @@
     "price.applier.price.rounding.description": "Округляет цену в соответствии с настроенным шагом округления.",
     "price.applier.minimum.supplier.price.name": "Минимальная цена поставщика",
     "price.applier.minimum.supplier.price.description": "Повышает цену до минимальной цены предложения поставщика, если доступны рыночные данные.",
+    "price.applier.uniqueness.additional.markup.name": "Дополнительная наценка для уникального товара",
+    "price.applier.uniqueness.additional.markup.description": "Применяет дополнительную наценку, если у товара нет рыночных предложений.",
     "pricing.setting.name": "Настройки ценообразования",
     "pricing.setting.description": "Управляют расчетом цен, выбором наценки, сроком жизни предложений и оценкой доставки поставщиков.",
     "pricing.setting.input.invalid": "Переданы некорректные данные настроек ценообразования.",
@@ -21,6 +23,8 @@
     "pricing.setting.price.rounding.step.name": "Шаг округления цены",
     "pricing.setting.price.rounding.step.description": "Шаг, используемый для округления рассчитанных цен.",
     "pricing.setting.delivery.day.penalty.name": "Штраф за день доставки",
-    "pricing.setting.delivery.day.penalty.description": "Штраф стоимости, добавляемый за каждый день доставки при оценке предложений поставщиков."
+    "pricing.setting.delivery.day.penalty.description": "Штраф стоимости, добавляемый за каждый день доставки при оценке предложений поставщиков.",
+    "pricing.setting.uniq.product.additional.markup.name": "Дополнительная наценка для уникального товара",
+    "pricing.setting.uniq.product.additional.markup.description": "Дополнительная наценка, применяемая к товарам без сопоставимых рыночных предложений."
   }
 }
