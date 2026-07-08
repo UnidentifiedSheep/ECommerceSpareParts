@@ -1,20 +1,25 @@
 using Pricing.Application.Interfaces;
 using Pricing.Application.Interfaces.Markup;
+using Pricing.Application.Models.Pricing;
 
 namespace Pricing.Application.Services.Markup;
 
-public class MarkupCalculator(
-    IMarkupContainer container
+public sealed class MarkupCalculator(
+    IMarkupContainer markupContainer
 ) : IMarkupCalculator
 {
-    public decimal GetMarkup(
-        decimal basePrice,
-        int currencyId)
+    public MarkupResult GetMarkup(decimal basePrice, int currencyId)
     {
-        if (currencyId == container.DefaultCurrencyId)
-            return container.GetForDefaultOrNull((double)basePrice)?.Value ?? container.DefaultMarkup.Value;
+        var proportion = GetMarkupProportion(basePrice, currencyId);
+        return MarkupResult.FromProportion(basePrice, proportion);
+    }
 
-        return container.GetForCurrencyOrNull(currencyId, (double)basePrice)?.Value ??
-               container.DefaultMarkup.Value;
+    private decimal GetMarkupProportion(decimal basePrice, int currencyId)
+    {
+        var basePriceValue = (double)basePrice;
+
+        return currencyId == markupContainer.DefaultCurrencyId
+            ? markupContainer.GetForDefaultOrNull(basePriceValue)?.Value ?? markupContainer.DefaultMarkup.Value
+            : markupContainer.GetForCurrencyOrNull(currencyId, basePriceValue)?.Value ?? markupContainer.DefaultMarkup.Value;
     }
 }

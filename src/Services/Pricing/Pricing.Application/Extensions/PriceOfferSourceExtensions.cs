@@ -11,4 +11,7 @@ public static class PriceOfferSourceExtensions
             ? PriceOfferSource.Armtek
             : PriceOfferSource.FavoriteParts;
     }
+
+    public static PriceOfferSourceType GetSourceType(this PriceOfferSource source)
+        => source == PriceOfferSource.OurWarehouse ? PriceOfferSourceType.OurWarehouse : PriceOfferSourceType.Supplier;
 }

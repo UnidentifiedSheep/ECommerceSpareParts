@@ -10,7 +10,7 @@ public class FavoriteSettingsProvider : ISupplierSettingsProvider<FavoriteSettin
         return Task.FromResult(
             new FavoriteSettings
             {
-                MaxDaysToDelivery = 7,
+                MaxDaysToDelivery = 2,
                 MinDaysToDelivery = 1
             }); //TODO: settings should be taken from main.
     }

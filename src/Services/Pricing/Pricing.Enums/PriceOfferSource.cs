@@ -7,3 +7,9 @@ public enum PriceOfferSource
     Armtek,
     FavoriteParts,
 }
+
+public enum PriceOfferSourceType
+{
+    Supplier,
+    OurWarehouse
+}

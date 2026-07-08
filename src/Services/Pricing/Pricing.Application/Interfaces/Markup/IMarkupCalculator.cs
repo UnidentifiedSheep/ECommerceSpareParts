@@ -1,6 +1,8 @@
+using Pricing.Application.Models.Pricing;
+
 namespace Pricing.Application.Interfaces.Markup;
 
 public interface IMarkupCalculator
 {
-    decimal GetMarkup(decimal basePrice, int currencyId);
+    MarkupResult GetMarkup(decimal basePrice, int currencyId);
 }

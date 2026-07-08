@@ -29,4 +29,10 @@ public record PricingSettingData
     
     [JsonPropertyName("offerTtl")]
     public TimeSpan OfferTtl { get; init; } = TimeSpan.FromDays(1);
+    
+    [JsonPropertyName("priceRoundingStep")]
+    public decimal PriceRoundingStep { get; init; } = 0.01m;
+    
+    [JsonPropertyName("deliveryDayPenalty")]
+    public decimal DeliveryDayPenalty { get; init; } = 2m;
 }
