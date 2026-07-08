@@ -1,0 +1,11 @@
+{
+  "locale": "tr",
+  "keyValues": {
+    "price.applier.markup.name": "Kâr marjı",
+    "price.applier.markup.description": "Yapılandırılmış kâr marjı aralıklarına göre fiyata kâr marjı uygular.",
+    "price.applier.price.rounding.name": "Fiyat yuvarlama",
+    "price.applier.price.rounding.description": "Fiyatı yapılandırılmış fiyat yuvarlama adımına göre yuvarlar.",
+    "price.applier.minimum.supplier.price.name": "Minimum tedarikçi fiyatı",
+    "price.applier.minimum.supplier.price.description": "Piyasa verisi mevcut olduğunda fiyatı minimum tedarikçi teklif fiyatına yükseltir."
+  }
+}

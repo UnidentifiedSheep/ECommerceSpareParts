@@ -7,8 +7,8 @@ public class MinimumSupplierPriceApplier : ApplierNamedObjectBase, IInternalPric
 {
     public override int Order => int.MinValue;
     public override string SystemName => nameof(MinimumSupplierPriceApplier);
-    public override string NameLocalizationKey { get; }
-    public override string DescriptionLocalizationKey { get; }
+    public override string NameLocalizationKey => "price.applier.minimum.supplier.price.name";
+    public override string DescriptionLocalizationKey => "price.applier.minimum.supplier.price.description";
 
     public override ValueTask<PriceCalculationState> ApplyAsync(
         PriceCalculationState state,

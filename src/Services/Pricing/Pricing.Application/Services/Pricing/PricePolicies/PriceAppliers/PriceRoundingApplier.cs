@@ -11,8 +11,8 @@ public class PriceRoundingApplier(
     ) : ApplierNamedObjectBase, IInternalPriceApplier, ISupplierPriceApplier
 {
     public override string SystemName => nameof(PriceRoundingApplier);
-    public override string NameLocalizationKey { get; }
-    public override string DescriptionLocalizationKey { get; }
+    public override string NameLocalizationKey => "price.applier.price.rounding.name";
+    public override string DescriptionLocalizationKey => "price.applier.price.rounding.description";
     public override int Order => int.MaxValue; //Rounding always the last step.
     public override async ValueTask<PriceCalculationState> ApplyAsync(
         PriceCalculationState state, 

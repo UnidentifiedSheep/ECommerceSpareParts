@@ -10,8 +10,8 @@ public sealed class MarkupApplier(
 {
     public override int Order => 0;
     public override string SystemName => nameof(MarkupApplier);
-    public override string NameLocalizationKey { get; }
-    public override string DescriptionLocalizationKey { get; }
+    public override string NameLocalizationKey => "price.applier.markup.name";
+    public override string DescriptionLocalizationKey => "price.applier.markup.description";
 
     public override ValueTask<PriceCalculationState> ApplyAsync(
         PriceCalculationState state,

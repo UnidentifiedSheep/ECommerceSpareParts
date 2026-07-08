@@ -1,0 +1,11 @@
+﻿{
+  "locale": "en",
+  "keyValues": {
+    "price.applier.markup.name": "Markup",
+    "price.applier.markup.description": "Applies a markup to the price according to the configured markup ranges.",
+    "price.applier.price.rounding.name": "Price rounding",
+    "price.applier.price.rounding.description": "Rounds the price according to the configured price rounding step.",
+    "price.applier.minimum.supplier.price.name": "Minimum supplier price",
+    "price.applier.minimum.supplier.price.description": "Raises the price to the minimum supplier offer price when market data is available."
+  }
+}

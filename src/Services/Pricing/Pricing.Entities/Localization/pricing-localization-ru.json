@@ -1,0 +1,11 @@
+﻿{
+  "locale": "ru",
+  "keyValues": {
+    "price.applier.markup.name": "Наценка",
+    "price.applier.markup.description": "Применяет наценку к цене в соответствии с настроенными диапазонами наценок.",
+    "price.applier.price.rounding.name": "Округление цены",
+    "price.applier.price.rounding.description": "Округляет цену в соответствии с настроенным шагом округления.",
+    "price.applier.minimum.supplier.price.name": "Минимальная цена поставщика",
+    "price.applier.minimum.supplier.price.description": "Повышает цену до минимальной цены предложения поставщика, если доступны рыночные данные."
+  }
+}
