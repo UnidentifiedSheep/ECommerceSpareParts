@@ -8,21 +8,28 @@ public class PriceOfferConfiguration : IEntityTypeConfiguration<PriceOffer>
 {
     public void Configure(EntityTypeBuilder<PriceOffer> builder)
     {
+        builder.ToTable("price_offers", "public");
+        
         builder.HasKey(e => e.Id)
             .HasName("price_offer_pk");
 
-        builder.ToTable("price_offers");
+        builder.HasAlternateKey(e => new
+            {
+                e.Source,
+                e.SourceKey,
+                e.OfferForStorage
+            })
+            .HasName("price_offer_source_source_key_uq");
 
-        builder.HasIndex(e => e.ProductId, "price_offer_product_id_index");
+        builder.HasIndex(
+            e => new { e.ProductId, e.OfferForStorage }, 
+            "price_offer_product_id_index");
 
         builder.HasIndex(e => e.CurrencyId, "price_offer_currency_id_index");
 
         builder.HasIndex(e => e.OfferForStorage, "price_offer_offer_for_storage_index");
 
         builder.HasIndex(e => e.ExpiresAt, "price_offer_expires_at_index");
-
-        builder.HasIndex(e => new { e.Source, e.SourceKey }, "price_offer_source_source_key_index")
-            .IsUnique();
 
         builder.Property(e => e.Id)
             .HasColumnName("id");

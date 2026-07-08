@@ -4,16 +4,16 @@ using Application.Common.Interfaces.Events;
 using Attributes;
 using Contracts.Supplier;
 using Integrations.Supplier.Models;
-using MediatR;
 using Microsoft.Extensions.Logging;
+using Pricing.Application.Extensions;
 using Pricing.Application.Interfaces.Persistence;
 using Pricing.Application.Interfaces.Pricing;
 using Pricing.Entities;
 
 namespace Pricing.Application.Handlers.Pricing;
 
-[Diagnostics(maxExecutionTimeMs: 400)]
-[AutoSave]
+[Diagnostics(maxExecutionTimeMs: 3000)]
+[Transactional, AutoSave]
 public record RefreshOffersCommand(
     int ProductId,
     string StorageName) : ICommand<RefreshOffersResult>;
@@ -71,6 +71,11 @@ public class RefreshOffersHandler(
         }
         
         LogNotFoundCurrencies(notFoundCurrencies);
+        await offerRepository.DeleteOffersAsync(
+            request.ProductId, 
+            request.StorageName,
+            toRefresh.Keys.Select(x => x.ToSource()),
+            cancellationToken);
         await offerRepository.UpsertOffersAsync(offers, cancellationToken);
         integrationEventScope.AddRange(events);
 

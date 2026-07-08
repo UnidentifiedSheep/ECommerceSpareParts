@@ -1,8 +1,10 @@
 using Abstractions.Interfaces;
 using EFCore.BulkExtensions;
+using Microsoft.EntityFrameworkCore;
 using Persistence.Repository;
 using Pricing.Application.Interfaces.Persistence;
 using Pricing.Entities;
+using Pricing.Enums;
 using Pricing.Persistence.Contexts;
 using IQueryableExtensions = Persistence.Interfaces.IQueryableExtensions;
 
@@ -18,11 +20,7 @@ public class PriceOfferRepository(
         IEnumerable<PriceOffer> offers,
         CancellationToken cancellationToken = default)
     {
-        var distinctOffers = offers
-            .GroupBy(x => new { x.Source, x.SourceKey })
-            .Select(x => x.Last())
-            .ToList();
-        
+        var distinctOffers = offers.ToList();
         if (distinctOffers.Count == 0) return;
 
         distinctOffers.ForEach(x => x.Touch(userContext.UserIdOrNull));
@@ -34,7 +32,8 @@ public class PriceOfferRepository(
                 UpdateByProperties =
                 [
                     nameof(PriceOffer.Source),
-                    nameof(PriceOffer.SourceKey)
+                    nameof(PriceOffer.SourceKey),
+                    nameof(PriceOffer.OfferForStorage)
                 ],
 
                 PropertiesToIncludeOnUpdate =
@@ -57,4 +56,14 @@ public class PriceOfferRepository(
             },
             cancellationToken: cancellationToken);
     }
+    public Task DeleteOffersAsync(
+        int productId,
+        string storageName,
+        IEnumerable<PriceOfferSource> sources,
+        CancellationToken cancellationToken = default)
+        => Context.PriceOffers
+            .Where(x => x.ProductId == productId)
+            .Where(x => x.OfferForStorage == storageName)
+            .Where(x => sources.Contains(x.Source))
+            .ExecuteDeleteAsync(cancellationToken);
 }
