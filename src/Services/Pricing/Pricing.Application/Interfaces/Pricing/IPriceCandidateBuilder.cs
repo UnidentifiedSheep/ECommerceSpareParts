@@ -1,4 +1,5 @@
 using Pricing.Application.Models.Pricing;
+using Pricing.Application.Models.Pricing.PriceCandidates;
 using Pricing.Entities;
 
 namespace Pricing.Application.Interfaces.Pricing;

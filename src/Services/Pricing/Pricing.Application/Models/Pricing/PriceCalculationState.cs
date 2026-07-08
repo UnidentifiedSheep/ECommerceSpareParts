@@ -1,3 +1,5 @@
+using Pricing.Application.Models.Pricing.PriceCandidates;
+
 namespace Pricing.Application.Models.Pricing;
 
 public sealed record PriceCalculationState

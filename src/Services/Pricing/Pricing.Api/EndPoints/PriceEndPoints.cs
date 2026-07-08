@@ -8,6 +8,7 @@ using Microsoft.AspNetCore.Mvc;
 using Pricing.Application.Dtos.Price;
 using Pricing.Application.Handlers.Pricing;
 using Pricing.Application.Models.Pricing;
+using Pricing.Application.Models.Pricing.PriceCandidates;
 
 namespace Pricing.Api.EndPoints;
 
@@ -26,7 +27,7 @@ public record GetPriceOffersForProductRequest : PaginationQueryModel
 public record GetPriceOffersForProductResponse
 {
     [JsonPropertyName("candidates")]
-    public required IReadOnlyCollection<CalculatedPriceCandidate> Candidates { get; init; }
+    public required IReadOnlyCollection<CalculatedScoredPriceCandidate> Candidates { get; init; }
 }
 
 public class PriceEndPoints : ICarterModule

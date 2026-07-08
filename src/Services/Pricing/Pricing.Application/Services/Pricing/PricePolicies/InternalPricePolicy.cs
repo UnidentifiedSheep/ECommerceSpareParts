@@ -4,6 +4,7 @@ using Pricing.Application.Interfaces.Pricing.PriceApplier;
 using Pricing.Application.Interfaces.Pricing.PricePolicy;
 using Pricing.Application.Models.Pricing;
 using Pricing.Application.Models.Pricing.MarketInfo;
+using Pricing.Application.Models.Pricing.PriceCandidates;
 using Pricing.Enums;
 
 namespace Pricing.Application.Services.Pricing.PricePolicies;
@@ -35,18 +36,20 @@ public class InternalPricePolicy(
                 state = await applier.ApplyAsync(state, ct);
             
 
-            result.Add(new CalculatedPriceCandidate(
-                candidate.PriceOfferId,
-                candidate.ProductId,
-                candidate.TargetStorageName,
-                candidate.SourceType,
-                candidate.CostInBaseCurrency,
-                state.SalePriceInBaseCurrency,
-                state.Markup?.Proportion ?? 0,
-                candidate.AvailableQuantity,
-                candidate.Fulfillment.DeliveryTime,
-                candidate.Fulfillment.GuaranteedDeliveryTime,
-                candidate.Fulfillment.DeliveryProbability));
+            result.Add(new CalculatedPriceCandidate
+            {
+                AvailableQuantity = candidate.AvailableQuantity,
+                CostInBaseCurrency = candidate.CostInBaseCurrency,
+                DeliveryTime = candidate.Fulfillment.DeliveryTime,
+                DeliveryProbability = candidate.Fulfillment.DeliveryProbability,
+                GuaranteedDeliveryTime = candidate.Fulfillment.GuaranteedDeliveryTime,
+                Markup = state.Markup?.Proportion ?? 0,
+                PriceInBaseCurrency = state.SalePriceInBaseCurrency,
+                ProductId = candidate.ProductId,
+                PriceOfferId = candidate.PriceOfferId,
+                SourceType = candidate.SourceType,
+                StorageName = candidate.TargetStorageName
+            });
         }
 
         return result;

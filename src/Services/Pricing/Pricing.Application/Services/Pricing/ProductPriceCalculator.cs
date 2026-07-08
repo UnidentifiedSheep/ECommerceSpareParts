@@ -2,6 +2,7 @@ using Pricing.Application.Interfaces.Pricing;
 using Pricing.Application.Interfaces.Pricing.PricePolicy;
 using Pricing.Application.Models.Pricing;
 using Pricing.Application.Models.Pricing.MarketInfo;
+using Pricing.Application.Models.Pricing.PriceCandidates;
 using Pricing.Enums;
 
 namespace Pricing.Application.Services.Pricing;
@@ -9,9 +10,10 @@ namespace Pricing.Application.Services.Pricing;
 public sealed class ProductPriceCalculator(
     ISupplierPricePolicy supplierPolicy,
     IInternalPricePolicy internalPolicy,
+    IOfferScorer offerScorer,
     IMarketInfoFactory marketInfoFactory) : IProductPriceCalculator
 {
-    public async Task<IReadOnlyCollection<CalculatedPriceCandidate>> CalculateAsync(
+    public async Task<IReadOnlyCollection<CalculatedScoredPriceCandidate>> CalculateAsync(
         IReadOnlyCollection<PriceCandidate> candidates,
         CancellationToken ct)
     {
@@ -35,8 +37,10 @@ public sealed class ProductPriceCalculator(
             market,
             ct);
 
-        return supplierCalculated
+        var all = supplierCalculated
             .Concat(internalCalculated)
-            .ToArray();
+            .ToList();
+
+        return await offerScorer.GetResultingScoreAsync(all, ct);
     }
 }

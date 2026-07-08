@@ -2,6 +2,7 @@ using Application.Common.Interfaces.Settings;
 using Pricing.Application.Interfaces.Pricing;
 using Pricing.Application.Models.Pricing;
 using Pricing.Application.Models.Pricing.MarketInfo;
+using Pricing.Application.Models.Pricing.PriceCandidates;
 using Pricing.Enums;
 
 namespace Pricing.Application.Services.Pricing;
@@ -41,7 +42,7 @@ public sealed class MarketInfoFactory(
             {
                 Cost = candidate.CostInBaseCurrency,
                 DeliveryTime = candidate.DeliveryTime,
-                Score = await offerScorer.GetScoreAsync(new OfferScoreContext
+                Score = await offerScorer.GetCostScoreAsync(new OfferCostScoreContext
                 {
                     Cost = candidate.CostInBaseCurrency,
                     DeliveryDays = (int)Math.Ceiling(candidate.DeliveryTime.TotalDays),

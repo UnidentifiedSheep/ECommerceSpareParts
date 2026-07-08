@@ -1,6 +1,6 @@
 namespace Pricing.Application.Models.Pricing;
 
-public record OfferScoreContext
+public record OfferCostScoreContext
 {
     public required decimal Cost { get; init; }
     public required int DeliveryDays { get; init; }

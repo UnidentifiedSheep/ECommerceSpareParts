@@ -1,6 +1,6 @@
 using Pricing.Enums;
 
-namespace Pricing.Application.Models.Pricing;
+namespace Pricing.Application.Models.Pricing.PriceCandidates;
 
 public sealed record PriceCandidate(
     Guid PriceOfferId,

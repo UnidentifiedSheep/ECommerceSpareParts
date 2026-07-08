@@ -8,6 +8,7 @@ using Microsoft.EntityFrameworkCore;
 using Pricing.Application.Dtos.Price;
 using Pricing.Application.Interfaces.Pricing;
 using Pricing.Application.Models.Pricing;
+using Pricing.Application.Models.Pricing.PriceCandidates;
 using Pricing.Entities;
 
 namespace Pricing.Application.Handlers.Pricing;
@@ -18,7 +19,7 @@ public record GetPriceOffersForProductQuery(
     string StorageName,
     Pagination Pagination) : IQuery<GetPriceOffersForProductResult>;
 
-public record GetPriceOffersForProductResult(IReadOnlyCollection<CalculatedPriceCandidate> Candidates);
+public record GetPriceOffersForProductResult(IReadOnlyCollection<CalculatedScoredPriceCandidate> Candidates);
 
 public class GetPriceOffersForProductHandler(
     ISender sender,

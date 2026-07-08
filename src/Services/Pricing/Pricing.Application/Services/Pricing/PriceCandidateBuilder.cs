@@ -4,6 +4,7 @@ using Pricing.Application.Extensions;
 using Pricing.Application.Handlers.Pricing;
 using Pricing.Application.Interfaces.Pricing;
 using Pricing.Application.Models.Pricing;
+using Pricing.Application.Models.Pricing.PriceCandidates;
 using Pricing.Entities;
 using Pricing.Entities.Settings;
 using Pricing.Enums;
