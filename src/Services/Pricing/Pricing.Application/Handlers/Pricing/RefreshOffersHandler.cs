@@ -71,11 +71,16 @@ public class RefreshOffersHandler(
         }
         
         LogNotFoundCurrencies(notFoundCurrencies);
-        await offerRepository.DeleteOffersAsync(
-            request.ProductId, 
-            request.StorageName,
-            toRefresh.Keys.Select(x => x.ToSource()),
-            cancellationToken);
+
+        var sourcesToRemove = toRefresh.Keys.Select(x => x.ToSource()).ToList();
+        
+        if (sourcesToRemove.Count > 0)
+            await offerRepository.DeleteOffersAsync(
+                request.ProductId, 
+                request.StorageName,
+                sourcesToRemove,
+                cancellationToken);
+        
         await offerRepository.UpsertOffersAsync(offers, cancellationToken);
         integrationEventScope.AddRange(events);
 
