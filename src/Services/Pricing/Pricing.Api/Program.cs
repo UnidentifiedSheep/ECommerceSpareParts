@@ -131,6 +131,7 @@ builder.Services.AddCarter(
 
 var app = builder.Build();
 
+await app.LoadLocalesFromJson(Assembly.GetExecutingAssembly().GetDefaultLocalizationPath());
 app.UseCommonApiPipeline();
 
 app.UseOpenTelemetryPrometheusScrapingEndpoint();
