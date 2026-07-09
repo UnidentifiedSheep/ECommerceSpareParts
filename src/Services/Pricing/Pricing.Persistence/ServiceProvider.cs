@@ -28,6 +28,7 @@ public static class ServiceProvider
         
         collection.AddScoped<IPriceOfferRepository, PriceOfferRepository>();
         collection.AddScoped<IProductPriceOptionRepository, ProductPriceOptionRepository>();
+        collection.AddScoped<IPriceOfferRefreshStateRepository, PriceOfferRefreshStateRepository>();
 
         collection.AddUnitOfWork<DContext>();
 

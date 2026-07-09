@@ -50,6 +50,7 @@ public static class ServiceProvider
 
         collection.AddScoped<ISupplierOfferExtractorService, SupplierOfferExtractorService>();
         collection.AddScoped<ISupplierOfferConverterService, SupplierOfferConverterService>();
+        collection.AddScoped<IOfferRefreshService, OfferRefreshService>();
 
         collection.AddPricingServices();
         
