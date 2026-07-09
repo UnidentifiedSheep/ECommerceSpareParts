@@ -9,7 +9,7 @@ public static class SortByConfig
 {
     public static void Configure()
     {
-        QueryableSortBy.Value.MapDefault<ProductPriceOption, decimal>(x => x.Score)
+        QueryableSortBy.Value.MapDefault<ProductPriceOption, decimal>(x => x.Score, true)
             .Map<ProductPriceOption, decimal>("score", x => x.Score);
         
         QueryableSortBy.Value.ConfigureForJob();

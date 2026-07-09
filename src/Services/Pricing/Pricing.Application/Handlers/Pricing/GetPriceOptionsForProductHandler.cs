@@ -7,6 +7,7 @@ using MediatR;
 using Microsoft.EntityFrameworkCore;
 using Pricing.Application.Dtos.Price;
 using Pricing.Entities;
+using Pricing.Enums;
 
 namespace Pricing.Application.Handlers.Pricing;
 
@@ -14,6 +15,7 @@ public record GetPriceOptionsForProductQuery(
     int ProductId,
     int CurrencyId,
     string StorageName,
+    IEnumerable<PriceOfferSource> Sources,
     Pagination Pagination,
     string? SortBy) : IQuery<GetPriceOptionsForProductResult>;
 
@@ -37,12 +39,17 @@ public class GetPriceOptionsForProductHandler(
             await sender.Send(
                 new CalculateCandidatesCommand(request.ProductId, request.StorageName), 
                 cancellationToken);
-        
-        var options = await repository.Query
+
+        var query = repository.Query
             .Include(x => x.PriceOffer)
             .Where(x => x.PriceOffer.ProductId == request.ProductId)
             .Where(x => x.PriceOffer.OfferForStorage == request.StorageName)
-            .Where(x => x.PriceOffer.ExpiresAt > DateTime.UtcNow)
+            .Where(x => x.PriceOffer.ExpiresAt > DateTime.UtcNow);
+
+        if (request.Sources.Any())
+            query = query.Where(x => request.Sources.Contains(x.PriceOffer.Source));
+            
+        var options = await query
             .SortBy(request.SortBy)
             .ApplyPagination(request.Pagination)
             .ToListAsync(cancellationToken);

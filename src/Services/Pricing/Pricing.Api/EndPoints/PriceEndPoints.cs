@@ -9,6 +9,7 @@ using Pricing.Application.Dtos.Price;
 using Pricing.Application.Handlers.Pricing;
 using Pricing.Application.Models.Pricing;
 using Pricing.Application.Models.Pricing.PriceCandidates;
+using Pricing.Enums;
 
 namespace Pricing.Api.EndPoints;
 
@@ -19,6 +20,9 @@ public record GetPriceOffersForProductRequest : SortablePaginationQueryModel
 
     [FromQuery(Name = "currencyId")]
     public int CurrencyId { get; init; }
+
+    [FromQuery(Name = "source")]
+    public PriceOfferSource[] Sources { get; init; } = [];
 
     [FromQuery(Name = "storageName")]
     public string StorageName { get; init; } = string.Empty;
@@ -34,11 +38,11 @@ public class PriceEndPoints : ICarterModule
 {
     public void AddRoutes(IEndpointRouteBuilder app)
     {
-        var prices = app.MapGroup("/prices")
-            .WithTags("Prices");
+        var prices = app.MapGroup("/offers")
+            .WithTags("Offers");
 
         prices.MapGet(
-                "/offers",
+                "",
                 async (
                     ISender sender,
                     [AsParameters] GetPriceOffersForProductRequest request,
@@ -48,6 +52,7 @@ public class PriceEndPoints : ICarterModule
                         request.ProductId,
                         request.CurrencyId,
                         request.StorageName,
+                        request.Sources,
                         request,
                         request.SortBy);
 
