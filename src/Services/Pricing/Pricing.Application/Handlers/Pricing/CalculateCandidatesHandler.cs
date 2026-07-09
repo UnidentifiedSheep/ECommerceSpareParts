@@ -44,6 +44,7 @@ public class CalculateCandidatesHandler(
             .Select(x => 
                 ProductPriceOption.Create(
                     x.PriceOfferId,
+                    x.StorageName,
                     x.Score,
                     x.Price,
                     x.CurrencyId,

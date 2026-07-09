@@ -5,6 +5,7 @@ using Application.Common.Interfaces.Currency;
 using Application.Common.Services.Currency;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Pricing.Application.Configuration;
 using Pricing.Application.Interfaces;
 using Pricing.Application.Interfaces.Markup;
 using Pricing.Application.Interfaces.Pricing;
@@ -27,6 +28,7 @@ public static class ServiceProvider
         this IServiceCollection collection,
         IConfiguration configuration)
     {
+        SortByConfig.Configure();
         collection.AddApplicationBase(
                 ServicesDefinitions.Pricing,
                 configuration,

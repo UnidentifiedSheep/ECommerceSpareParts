@@ -12,7 +12,7 @@ using Pricing.Application.Models.Pricing.PriceCandidates;
 
 namespace Pricing.Api.EndPoints;
 
-public record GetPriceOffersForProductRequest : PaginationQueryModel
+public record GetPriceOffersForProductRequest : SortablePaginationQueryModel
 {
     [FromQuery(Name = "productId")]
     public int ProductId { get; init; }
@@ -26,8 +26,8 @@ public record GetPriceOffersForProductRequest : PaginationQueryModel
 
 public record GetPriceOffersForProductResponse
 {
-    [JsonPropertyName("candidates")]
-    public required IReadOnlyCollection<CalculatedScoredPriceCandidate> Candidates { get; init; }
+    [JsonPropertyName("priceOptions")]
+    public required IReadOnlyCollection<PriceOptionDto> PriceOptions { get; init; }
 }
 
 public class PriceEndPoints : ICarterModule
@@ -44,17 +44,18 @@ public class PriceEndPoints : ICarterModule
                     [AsParameters] GetPriceOffersForProductRequest request,
                     CancellationToken cancellationToken) =>
                 {
-                    var query = new GetPriceOffersForProductQuery(
+                    var query = new GetPriceOptionsForProductQuery(
                         request.ProductId,
                         request.CurrencyId,
                         request.StorageName,
-                        request);
+                        request,
+                        request.SortBy);
 
                     var result = await sender.Send(query, cancellationToken);
                     return Results.Ok(
                         new GetPriceOffersForProductResponse
                         {
-                            Candidates = result.Candidates
+                            PriceOptions = result.PriceOptions
                         });
                 })
             .WithName("GetPriceOffersForProduct")

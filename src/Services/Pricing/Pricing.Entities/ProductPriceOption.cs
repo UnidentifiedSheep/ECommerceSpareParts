@@ -15,12 +15,15 @@ public class ProductPriceOption : AuditableEntity<ProductPriceOption, Guid>, ILi
     public decimal Price { get; private set; }
     public decimal Markup { get; private set; }
     
+    public string ForStorageName { get; private set; } = string.Empty;
     public TimeSpan DeliveryTime { get; private set; }
     public TimeSpan GuaranteedDeliveryTime { get; private set; }
     public int DeliveryProbability { get; private set; }
+    public PriceOffer PriceOffer { get; private set; } = null!;
 
     public static ProductPriceOption Create(
         Guid priceOfferId,
+        string storageName,
         decimal score,
         decimal price,
         int currencyId,
@@ -34,6 +37,7 @@ public class ProductPriceOption : AuditableEntity<ProductPriceOption, Guid>, ILi
             PriceOfferId = priceOfferId,
             CurrencyId = currencyId
         };
+        option.SetStorageName(storageName);
         option.SetScore(score);
         option.SetPrice(price);
         option.SetMarkup(markup);
@@ -71,6 +75,10 @@ public class ProductPriceOption : AuditableEntity<ProductPriceOption, Guid>, ILi
         GuaranteedDeliveryTime = guaranteedDeliveryTime;
         DeliveryProbability = deliveryProbability;
     }
+    
+    public void SetStorageName(string storageName) => ForStorageName = storageName
+        .TrimSafe()
+        .AgainstNullOrWhiteSpace(() => new InvalidOperationException("Storage name cannot be empty"));
     
     public override Guid GetId() => PriceOfferId;
     public static Expression<Func<ProductPriceOption, Guid>> GetKeySelector() => x => x.PriceOfferId;

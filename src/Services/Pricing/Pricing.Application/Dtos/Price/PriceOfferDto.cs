@@ -11,21 +11,18 @@ public record PriceOfferDto
     [JsonPropertyName("productId")]
     public required int ProductId { get; init; }
     
-    [JsonPropertyName("offerCurrencyId")]
-    public required int OfferCurrencyId { get; init; }
-    
-    [JsonPropertyName("offerPrice")]
-    public required decimal OfferPrice { get; init; }
+    [JsonPropertyName("currencyId")]
+    public required int CurrencyId { get; init; }
     
     [JsonPropertyName("offerForStorage")]
-    public required string OfferForStorage { get; init; }
+    public required string OfferForStorage { get; init;  }
+
+    [JsonPropertyName("purchasePrice")]
+    public required decimal PurchasePrice { get; init; }
 
     [JsonPropertyName("source")]
     [JsonConverter(typeof(JsonStringEnumConverter))]
     public required PriceOfferSource Source { get; init; }
-    
-    [JsonPropertyName("sourceKey")]
-    public required string SourceKey { get; init; }
 
     [JsonPropertyName("availableQuantity")]
     public required int AvailableQuantity { get; init; }
@@ -40,20 +37,17 @@ public record PriceOfferDto
     public required int DaysToRefund { get; init; }
 
     [JsonPropertyName("deliveryDate")]
-    public DateTime DeliveryDate { get; init; }
+    public required DateTime DeliveryDate { get; init; }
     
     [JsonPropertyName("guaranteedDeliveryDate")]
-    public DateTime GuaranteedDeliveryDate { get; init; }
+    public required DateTime GuaranteedDeliveryDate { get; init; }
     
     [JsonPropertyName("deliveryProbability")]
-    public int DeliveryProbability { get; init; }
+    public required int DeliveryProbability { get; init; }
     
     [JsonPropertyName("orderTill")]
-    public DateTime OrderTill { get; init; }
+    public required DateTime OrderTill { get; init; }
     
     [JsonPropertyName("expiresAt")]
-    public DateTime ExpiresAt { get; init; }
-    
-    [JsonPropertyName("updatedAt")]
-    public DateTime UpdatedAt { get; init; }
+    public required DateTime ExpiresAt { get; init; }
 }
