@@ -41,7 +41,6 @@ public partial class DContext : DbContext
         modelBuilder.Entity<Setting>()
             .HasDiscriminator(e => e.Key)
             .HasValue<Setting>(nameof(Setting))
-            .HasValue<CurrencySetting>(CurrencySetting.SettingName)
             .HasValue<PricingSetting>(PricingSetting.SettingName);
 
         modelBuilder.AddFieldsForAuditableEntities();

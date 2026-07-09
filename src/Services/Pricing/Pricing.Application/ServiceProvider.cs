@@ -74,6 +74,8 @@ public static class ServiceProvider
         
         collection.AddScoped<IInternalPriceApplier, MarkupApplier>();
         collection.AddScoped<IInternalPriceApplier, PriceRoundingApplier>();
+        collection.AddScoped<IInternalPriceApplier, UniquenessAdditionalMarkupApplier>();
+        
         collection.AddScoped<ISupplierPriceApplier, MarkupApplier>();
         collection.AddScoped<ISupplierPriceApplier, PriceRoundingApplier>();
         return collection;

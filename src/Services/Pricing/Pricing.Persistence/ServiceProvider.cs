@@ -27,6 +27,7 @@ public static class ServiceProvider
         collection.AddScoped(typeof(IReadRepository<,>), typeof(ReadRepository<,>));
         
         collection.AddScoped<IPriceOfferRepository, PriceOfferRepository>();
+        collection.AddScoped<IProductPriceOptionRepository, ProductPriceOptionRepository>();
 
         collection.AddUnitOfWork<DContext>();
 

@@ -10,10 +10,7 @@ public sealed record PriceCandidate(
     PriceOfferSourceType SourceType,
 
     decimal Cost,
-    int CostCurrencyId,
-    
-    decimal CostInBaseCurrency,
-    int BaseCurrencyId,
+    int CurrencyId,
     
     int AvailableQuantity,
     FulfillmentRouteInfo Fulfillment

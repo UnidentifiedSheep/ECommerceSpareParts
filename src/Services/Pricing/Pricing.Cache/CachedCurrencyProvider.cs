@@ -1,3 +1,7 @@
+using System.Text.Json;
+using System.Text.Json.Serialization;
+using Abstractions;
+using Internal.Integration.Core.Interfaces.Common;
 using Internal.Integration.Core.Interfaces.Main;
 using Pricing.Application.Interfaces.Cache;
 using Pricing.Application.Static;
@@ -7,7 +11,8 @@ namespace Pricing.Cache;
 
 public class CachedCurrencyProvider(
     IFusionCache fusionCache,
-    IMainClient mainClient
+    IMainClient mainClient,
+    ICommonClient commonClient
 ) : ICachedCurrencyProvider
 {
     public async Task<decimal?> GetCurrencyRate(int currencyId, CancellationToken cancellationToken = default)
@@ -67,5 +72,34 @@ public class CachedCurrencyProvider(
         }
 
         return result;
+    }
+    public ValueTask<int> GetBaseCurrencyIdAsync(CancellationToken token = default)
+    {
+        return fusionCache.GetOrSetAsync(
+            key: CacheKeys.Currency.BaseCurrencyId,
+            async ct =>
+            {
+                var setting = await commonClient.SettingNode.GetSetting(
+                    ServicesDefinitions.Main,
+                    "CurrencySetting",
+                    ct);
+                
+                if (!setting.Success)
+                    throw new InvalidOperationException("Unable to get base currency id");
+                
+                var data = JsonSerializer.Deserialize<CurrencySettingData>(setting.ValueOrThrow)
+                    ?? throw new InvalidOperationException("Unable to deserialize currency setting");
+
+                return data.BaseCurrencyId;
+            },
+            options: new FusionCacheEntryOptions(CacheKeys.Currency.Ttl),
+            token: token);
+        
+    }
+
+    private record CurrencySettingData
+    {
+        [JsonPropertyName("baseCurrencyId")]
+        public int BaseCurrencyId { get; init; }
     }
 }

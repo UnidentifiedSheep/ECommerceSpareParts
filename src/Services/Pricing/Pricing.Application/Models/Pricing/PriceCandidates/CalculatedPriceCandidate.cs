@@ -9,10 +9,11 @@ public record CalculatedPriceCandidate
     public required string StorageName { get; init; }
 
     public required PriceOfferSourceType SourceType { get; init; }
-
-    public required decimal CostInBaseCurrency { get; init; }
-    public required decimal PriceInBaseCurrency { get; init; }
-
+    
+    public required int CurrencyId { get; init; }
+    public required decimal Cost { get; init; }
+    public required decimal Price { get; init; }
+    
     public required decimal Markup { get; init; }
     public required int AvailableQuantity { get; init; }
 

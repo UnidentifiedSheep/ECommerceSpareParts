@@ -1,3 +1,4 @@
+using Application.Common.Interfaces.Currency;
 using Application.Common.Interfaces.Settings;
 using Pricing.Application.Interfaces.Pricing.PriceApplier;
 using Pricing.Application.Models.Pricing;
@@ -20,17 +21,17 @@ public class UniquenessAdditionalMarkupApplier(
         if (state.Market.HasMarket) return state;
         
         var priceSettings = (await settingsService.GetOrDefault<PricingSetting>(ct)).Data;
-        var applied = state.SalePriceInBaseCurrency * (1 + priceSettings.UniqProductAdditionalMarkup);
+        var applied = state.SalePrice * (1 + priceSettings.UniqProductAdditionalMarkup);
         
         return state with
         {
-            SalePriceInBaseCurrency = applied,
+            SalePrice = applied,
             AppliedRules =
             [
                 ..state.AppliedRules,
                 new AppliedPriceRule(
                     Name: SystemName,
-                    PriceBefore: state.SalePriceInBaseCurrency,
+                    PriceBefore: state.SalePrice,
                     PriceAfter: applied)
             ]
         };

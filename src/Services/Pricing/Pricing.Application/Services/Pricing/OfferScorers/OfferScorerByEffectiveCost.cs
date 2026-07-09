@@ -1,3 +1,4 @@
+using Application.Common.Interfaces.Currency;
 using Application.Common.Interfaces.Settings;
 using Pricing.Application.Interfaces.Pricing;
 using Pricing.Application.Models.Pricing;
@@ -7,6 +8,7 @@ using Pricing.Entities.Settings;
 namespace Pricing.Application.Services.Pricing.OfferScorers;
 
 public sealed class OfferScorerByEffectiveCost(
+    ICurrencyConverter currencyConverter,
     ISettingsService settingsService) : IOfferScorer
 {
     public async ValueTask<decimal> GetCostScoreAsync(
@@ -15,7 +17,7 @@ public sealed class OfferScorerByEffectiveCost(
     {
         var penaltyPerDay = await GetDeliveryDayPenaltyAsync(cancellationToken);
 
-        var effectiveCost = context.Cost + GetAverageDeliveryPenalty(
+        var effectiveCost = context.CostInBase + GetAverageDeliveryPenalty(
             context.DeliveryDays,
             context.GuaranteedDeliveryDays, 
             penaltyPerDay);
@@ -29,21 +31,28 @@ public sealed class OfferScorerByEffectiveCost(
         if (candidates.Count == 0) return [];
 
         var penaltyPerDay = await GetDeliveryDayPenaltyAsync(cancellationToken);
+        var scored = new List<(CalculatedScoredPriceCandidate candidate, decimal basePrice)>();
 
-        return candidates
-            .Select(candidate =>
-            {
-                var effect = candidate.CostInBaseCurrency + GetAverageDeliveryPenalty(
-                    (int)Math.Ceiling(candidate.DeliveryTime.TotalDays),
-                    (int)Math.Ceiling(candidate.GuaranteedDeliveryTime.TotalDays),
-                    penaltyPerDay);
-                return CalculatedScoredPriceCandidate.From(candidate, ToScore(effect));
-            })
-            .OrderByDescending(x => x.Score)
-            .ThenBy(x => x.CostInBaseCurrency)
-            .ThenBy(x => x.DeliveryTime)
-            .ThenBy(x => x.GuaranteedDeliveryTime)
-            .ThenByDescending(x => x.AvailableQuantity)
+        foreach (var candidate in candidates)
+        {
+            var costInBaseCurrency = await currencyConverter.ConvertToBaseAsync(
+                candidate.Cost,
+                candidate.CurrencyId,
+                cancellationToken);
+            var effect = costInBaseCurrency + GetAverageDeliveryPenalty(
+                (int)Math.Ceiling(candidate.DeliveryTime.TotalDays),
+                (int)Math.Ceiling(candidate.GuaranteedDeliveryTime.TotalDays),
+                penaltyPerDay);
+            scored.Add((CalculatedScoredPriceCandidate.From(candidate, ToScore(effect)), costInBaseCurrency));
+        }
+        
+        return scored
+            .OrderByDescending(x => x.candidate.Score)
+            .ThenBy(x => x.basePrice)
+            .ThenBy(x => x.candidate.DeliveryTime)
+            .ThenBy(x => x.candidate.GuaranteedDeliveryTime)
+            .ThenByDescending(x => x.candidate.AvailableQuantity)
+            .Select(x => x.candidate)
             .ToList();
     }
 

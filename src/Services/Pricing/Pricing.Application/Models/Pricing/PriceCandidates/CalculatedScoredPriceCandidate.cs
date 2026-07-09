@@ -14,12 +14,13 @@ public record CalculatedScoredPriceCandidate : CalculatedPriceCandidate
             GuaranteedDeliveryTime = candidate.GuaranteedDeliveryTime,
             DeliveryProbability = candidate.DeliveryProbability,
             Markup = candidate.Markup,
-            PriceInBaseCurrency = candidate.PriceInBaseCurrency,
+            Price = candidate.Price,
+            Cost = candidate.Cost,
+            CurrencyId = candidate.CurrencyId,
             ProductId = candidate.ProductId,
             PriceOfferId = candidate.PriceOfferId,
             SourceType = candidate.SourceType,
             StorageName = candidate.StorageName,
-            CostInBaseCurrency = candidate.CostInBaseCurrency
         };
     }
 }

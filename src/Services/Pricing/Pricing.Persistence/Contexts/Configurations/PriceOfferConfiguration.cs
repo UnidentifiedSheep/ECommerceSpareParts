@@ -44,7 +44,7 @@ public class PriceOfferConfiguration : IEntityTypeConfiguration<PriceOffer>
             .HasMaxLength(128)
             .HasColumnName("offer_for_storage");
 
-        builder.Property(e => e.Price)
+        builder.Property(e => e.PurchasePrice)
             .HasColumnName("price");
 
         builder.Property(e => e.Source)

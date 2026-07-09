@@ -11,6 +11,7 @@ public static class CacheKeys
 
         public static string CurrencyRate(int currencyId) { return $"currency:{currencyId}:rate"; }
         public static string CurrencyIdByCode(string code) => $"currency:code:{code}";
+        public static string BaseCurrencyId => "currency:base";
     }
 
     public static class Offer

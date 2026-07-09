@@ -6,15 +6,10 @@ public sealed record PriceCalculationState
 {
     public required PriceCandidate Candidate { get; init; }
     public required MarketInfo.MarketInfo Market { get; init; }
-
-    public required decimal CostInBaseCurrency { get; init; }
-
-    /// <summary>
-    /// Текущая продажная цена после применённых правил.
-    /// </summary>
-    public required decimal SalePriceInBaseCurrency { get; init; }
-
-    public required int BaseCurrencyId { get; init; }
+    
+    public required int CurrencyId { get; init; }
+    public required decimal Cost { get; init; }
+    public required decimal SalePrice { get; init; }
 
     public MarkupResult? BaseMarkup { get; init; }
 
@@ -28,9 +23,9 @@ public sealed record PriceCalculationState
         {
             Candidate = candidate,
             Market = market,
-            CostInBaseCurrency = candidate.CostInBaseCurrency,
-            SalePriceInBaseCurrency = candidate.CostInBaseCurrency,
-            BaseCurrencyId = candidate.BaseCurrencyId,
+            Cost = candidate.Cost,
+            SalePrice = candidate.Cost,
+            CurrencyId = candidate.CurrencyId,
             BaseMarkup = null,
             AppliedRules = []
         };

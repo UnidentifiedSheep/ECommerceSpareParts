@@ -1,33 +1,43 @@
+using Application.Common.Interfaces.Currency;
 using Pricing.Application.Interfaces.Pricing.PriceApplier;
 using Pricing.Application.Models.Pricing;
 
 namespace Pricing.Application.Services.Pricing.PricePolicies.PriceAppliers.Internal;
 
-public class MinimumSupplierPriceApplier : ApplierNamedObjectBase, IInternalPriceApplier
+public class MinimumSupplierPriceApplier(
+    ICurrencyConverter currencyConverter
+    ) : ApplierNamedObjectBase, IInternalPriceApplier
 {
     public override int Order => int.MinValue;
     public override string SystemName => nameof(MinimumSupplierPriceApplier);
     public override string NameLocalizationKey => "price.applier.minimum.supplier.price.name";
     public override string DescriptionLocalizationKey => "price.applier.minimum.supplier.price.description";
 
-    public override ValueTask<PriceCalculationState> ApplyAsync(
+    public override async ValueTask<PriceCalculationState> ApplyAsync(
         PriceCalculationState state,
         CancellationToken ct = default)
     {
-        if (!state.Market.HasMarket) return ValueTask.FromResult(state);
+        if (!state.Market.HasMarket) return state;
 
         var referenceOffer = state.Market.Items.Count > 0 
             ? state.Market.Items[0] 
             : null;
 
-        if (referenceOffer is null || state.SalePriceInBaseCurrency >= referenceOffer.Cost) 
-            return ValueTask.FromResult(state);
+        var salePriceInBase = await currencyConverter.ConvertToBaseAsync(
+            state.SalePrice,
+            state.CurrencyId,
+            ct);
+        
+        if (referenceOffer is null || salePriceInBase >= referenceOffer.CostInBaseCurrency) 
+            return state;
 
+        var fromBase = await currencyConverter.ConvertFromBaseAsync(referenceOffer.CostInBaseCurrency, state.CurrencyId, ct);
+        
         var newState = state with
         {
-            SalePriceInBaseCurrency = referenceOffer.Cost
+            SalePrice = fromBase
         };
 
-        return ValueTask.FromResult(newState);
+        return newState;
     }
 }

@@ -13,7 +13,7 @@ public class PriceOffer : AuditableEntity<PriceOffer, Guid>, ILinqEntity<PriceOf
     public int CurrencyId { get; private set; }
     public string OfferForStorage { get; private set;  } = string.Empty;
 
-    public decimal Price { get; private set; }
+    public decimal PurchasePrice { get; private set; }
 
     public PriceOfferSource Source { get; private set; }
     public string SourceKey { get; private set; } = string.Empty;
@@ -62,7 +62,7 @@ public class PriceOffer : AuditableEntity<PriceOffer, Guid>, ILinqEntity<PriceOf
             ProductId = productId,
             OfferForStorage = offerForStorage,
             CurrencyId = currencyId,
-            Price = price,
+            PurchasePrice = price,
             Source = source,
             SourceKey = sourceKey,
             AvailableQuantity = availableQuantity,

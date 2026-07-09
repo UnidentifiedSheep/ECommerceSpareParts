@@ -36,12 +36,13 @@ public class SupplierPricePolicy(
             result.Add(new CalculatedPriceCandidate
             {
                 AvailableQuantity = candidate.AvailableQuantity,
-                CostInBaseCurrency = candidate.CostInBaseCurrency,
                 DeliveryTime = candidate.Fulfillment.DeliveryTime,
                 DeliveryProbability = candidate.Fulfillment.DeliveryProbability,
                 GuaranteedDeliveryTime = candidate.Fulfillment.GuaranteedDeliveryTime,
                 Markup = state.BaseMarkup?.Proportion ?? 0,
-                PriceInBaseCurrency = state.SalePriceInBaseCurrency,
+                Price = state.SalePrice,
+                Cost = candidate.Cost,
+                CurrencyId = candidate.CurrencyId,
                 ProductId = candidate.ProductId,
                 PriceOfferId = candidate.PriceOfferId,
                 SourceType = candidate.SourceType,

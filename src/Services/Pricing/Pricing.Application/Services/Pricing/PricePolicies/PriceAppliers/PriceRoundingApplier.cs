@@ -19,16 +19,16 @@ public class PriceRoundingApplier(
         CancellationToken ct = default)
     {
         var roundingStep = (await settingsService.GetOrDefault<PricingSetting>(ct)).Data.PriceRoundingStep;
-        var roundedPrice = Rounding.RoundToStep(state.SalePriceInBaseCurrency, roundingStep);
+        var roundedPrice = Rounding.RoundToStep(state.SalePrice, roundingStep);
         return state with
         {
-            SalePriceInBaseCurrency = roundedPrice,
+            SalePrice = roundedPrice,
             AppliedRules =
             [
                 ..state.AppliedRules,
                 new AppliedPriceRule(
                     Name: SystemName,
-                    PriceBefore: state.SalePriceInBaseCurrency,
+                    PriceBefore: state.SalePrice,
                     PriceAfter: roundedPrice)
             ]
         };

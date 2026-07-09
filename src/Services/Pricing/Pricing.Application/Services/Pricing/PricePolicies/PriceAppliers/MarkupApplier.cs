@@ -17,18 +17,18 @@ public sealed class MarkupApplier(
         PriceCalculationState state,
         CancellationToken ct = default)
     {
-        var markupResult = calculator.GetMarkup(state.SalePriceInBaseCurrency, state.BaseCurrencyId);
+        var markupResult = calculator.GetMarkup(state.SalePrice, state.CurrencyId);
         
         var newState = state with
         {
             BaseMarkup = markupResult,
-            SalePriceInBaseCurrency = markupResult.ResultingPrice,
+            SalePrice = markupResult.ResultingPrice,
             AppliedRules =
             [
                 ..state.AppliedRules,
                 new AppliedPriceRule(
                     Name: SystemName,
-                    PriceBefore: state.SalePriceInBaseCurrency,
+                    PriceBefore: state.SalePrice,
                     PriceAfter: markupResult.ResultingPrice)
             ]
         };

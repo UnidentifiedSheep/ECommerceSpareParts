@@ -40,7 +40,7 @@ public class PriceOfferRepository(
                 [
                     nameof(PriceOffer.ProductId),
                     nameof(PriceOffer.CurrencyId),
-                    nameof(PriceOffer.Price),
+                    nameof(PriceOffer.PurchasePrice),
                     nameof(PriceOffer.AvailableQuantity),
                     nameof(PriceOffer.MinimumPurchaseQuantity),
                     nameof(PriceOffer.QuantityCoefficient),

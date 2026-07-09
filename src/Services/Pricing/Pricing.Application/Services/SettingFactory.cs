@@ -8,6 +8,5 @@ public class SettingFactory : SettingFactoryBase
     public SettingFactory()
     {
         Register(json => new PricingSetting(json));
-        Register(json => new CurrencySetting(json));
     }
 }
