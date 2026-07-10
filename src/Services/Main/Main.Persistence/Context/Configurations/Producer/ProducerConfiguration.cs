@@ -34,5 +34,9 @@ public class ProducerConfiguration : IEntityTypeConfiguration<Entities.Producer.
         builder.Navigation(e => e.Aliases)
             .HasField("_aliases")
             .UsePropertyAccessMode(PropertyAccessMode.Field);
+        
+        builder.Navigation(e => e.SupplierMappings)
+            .HasField("_supplierMappings")
+            .UsePropertyAccessMode(PropertyAccessMode.Field);
     }
 }

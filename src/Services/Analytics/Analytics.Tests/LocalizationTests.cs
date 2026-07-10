@@ -7,6 +7,7 @@ using Application.Common.Interfaces.NamedObject;
 using FluentAssertions;
 using Localization.Abstractions.Interfaces;
 using Localization.Abstractions.Models;
+using Localization.Domain.Extensions;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace Analytics.Integration.Tests;

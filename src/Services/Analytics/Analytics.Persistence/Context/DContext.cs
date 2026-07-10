@@ -5,7 +5,8 @@ using Domain.CommonEntities;
 using MassTransit;
 using MassTransit.EntityFrameworkCoreIntegration;
 using Microsoft.EntityFrameworkCore;
-using Persistence.BaseTableConfigurations;
+using Persistence.Common;
+using Persistence.Common.BaseTableConfigurations;
 using Persistence.Extensions;
 
 namespace Analytics.Persistence.Context;

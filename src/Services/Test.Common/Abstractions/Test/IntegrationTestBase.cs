@@ -1,4 +1,8 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using System.Reflection;
+using Localization.Abstractions.Interfaces;
+using Localization.Domain;
+using Localization.Domain.Extensions;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Tests.Interfaces.ServiceProvider;
 
@@ -21,5 +25,13 @@ public abstract class IntegrationTestBase<TSp, TArgs, TContext> : TestBase
         _sp = new TSp().Build(args);
         _scope = Sp.CreateScope();
         Context = _scope.ServiceProvider.GetRequiredService<TContext>();
+    }
+    
+    protected async Task LoadLocales()
+    {
+        var containers = Sp.GetRequiredService<IEnumerable<ILocalizerContainer>>();
+        var path = Assembly.GetExecutingAssembly().GetDefaultLocalizationPath();
+        var loader = new JsonLocalizerContainerLoader(path);
+        await loader.LoadAsync(containers);
     }
 }

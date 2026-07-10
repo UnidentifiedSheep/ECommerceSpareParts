@@ -2,6 +2,7 @@ using IntervalMap.Core.Abstractions;
 using IntervalMap.Core.Models;
 using IntervalMap.Variations;
 using Pricing.Application.Interfaces;
+using Pricing.Application.Interfaces.Markup;
 using Pricing.Entities;
 
 namespace Pricing.Application.Services.Markup;

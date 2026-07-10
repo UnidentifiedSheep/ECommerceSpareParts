@@ -22,6 +22,216 @@ namespace Pricing.Migrator.Migrations
 
             NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
 
+            modelBuilder.Entity("Domain.CommonEntities.Job", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid")
+                        .HasColumnName("id");
+
+                    b.Property<int>("Attempts")
+                        .HasColumnType("integer")
+                        .HasColumnName("attempts");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("created_at");
+
+                    b.Property<string>("ErrorMessage")
+                        .HasColumnType("text")
+                        .HasColumnName("error_message");
+
+                    b.Property<DateTime?>("LeaseExpiresAt")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("lease_expires_at");
+
+                    b.Property<Guid?>("LeaseHolderId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("lease_holder_id");
+
+                    b.Property<DateTime?>("LockedAt")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("locked_at");
+
+                    b.Property<int>("MaxAttempts")
+                        .HasColumnType("integer")
+                        .HasColumnName("max_attempts");
+
+                    b.Property<string>("State")
+                        .IsRequired()
+                        .HasColumnType("text")
+                        .HasColumnName("state");
+
+                    b.Property<string>("Status")
+                        .IsRequired()
+                        .HasColumnType("text")
+                        .HasColumnName("status");
+
+                    b.Property<string>("SystemName")
+                        .IsRequired()
+                        .HasMaxLength(128)
+                        .HasColumnType("character varying(128)")
+                        .HasColumnName("system_name");
+
+                    b.Property<DateTime>("UpdatedAt")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("updated_at");
+
+                    b.Property<Guid?>("WhoCreated")
+                        .HasColumnType("uuid")
+                        .HasColumnName("who_created");
+
+                    b.Property<Guid?>("WhoUpdated")
+                        .HasColumnType("uuid")
+                        .HasColumnName("who_updated");
+
+                    b.Property<string>("job_type")
+                        .IsRequired()
+                        .HasMaxLength(8)
+                        .HasColumnType("character varying(8)");
+
+                    b.HasKey("Id")
+                        .HasName("jobs_pk");
+
+                    b.HasIndex("WhoCreated")
+                        .HasDatabaseName("domain.commonentities.uniqjob_who_created_idx");
+
+                    b.HasIndex("WhoUpdated")
+                        .HasDatabaseName("domain.commonentities.uniqjob_who_updated_idx");
+
+                    b.HasIndex(new[] { "LockedAt" }, "jobs_locked_at_idx");
+
+                    b.HasIndex(new[] { "Status", "Id" }, "jobs_status_id_idx");
+
+                    b.HasIndex(new[] { "SystemName" }, "jobs_system_name_idx");
+
+                    b.ToTable("jobs", "job");
+
+                    b.HasDiscriminator<string>("job_type").HasValue("job");
+
+                    b.UseTphMappingStrategy();
+                });
+
+            modelBuilder.Entity("Domain.CommonEntities.JobSchedule", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid")
+                        .HasColumnName("id");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("created_at");
+
+                    b.Property<string>("Cron")
+                        .IsRequired()
+                        .HasMaxLength(128)
+                        .HasColumnType("character varying(128)")
+                        .HasColumnName("cron");
+
+                    b.Property<string>("Description")
+                        .HasMaxLength(255)
+                        .HasColumnType("character varying(255)")
+                        .HasColumnName("description");
+
+                    b.Property<bool>("Enabled")
+                        .HasColumnType("boolean")
+                        .HasColumnName("enabled");
+
+                    b.Property<string>("InputState")
+                        .IsRequired()
+                        .HasColumnType("text")
+                        .HasColumnName("input_state");
+
+                    b.Property<string>("JobSystemName")
+                        .IsRequired()
+                        .HasMaxLength(128)
+                        .HasColumnType("character varying(128)")
+                        .HasColumnName("job_system_name");
+
+                    b.Property<DateTime?>("LastQueuedAt")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("last_queued_at");
+
+                    b.Property<int>("MaxAttempts")
+                        .HasColumnType("integer")
+                        .HasColumnName("max_attempts");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasMaxLength(64)
+                        .HasColumnType("character varying(64)")
+                        .HasColumnName("name");
+
+                    b.Property<DateTime?>("NextRunAt")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("next_run_at");
+
+                    b.Property<DateTime>("UpdatedAt")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("updated_at");
+
+                    b.Property<Guid?>("WhoCreated")
+                        .HasColumnType("uuid")
+                        .HasColumnName("who_created");
+
+                    b.Property<Guid?>("WhoUpdated")
+                        .HasColumnType("uuid")
+                        .HasColumnName("who_updated");
+
+                    b.HasKey("Id")
+                        .HasName("job_schedules_pk");
+
+                    b.HasIndex("WhoCreated")
+                        .HasDatabaseName("domain.commonentities.jobschedule_who_created_idx");
+
+                    b.HasIndex("WhoUpdated")
+                        .HasDatabaseName("domain.commonentities.jobschedule_who_updated_idx");
+
+                    b.HasIndex(new[] { "Enabled", "NextRunAt", "Id" }, "job_schedules_enabled_next_run_at_id_idx");
+
+                    b.HasIndex(new[] { "JobSystemName" }, "job_schedules_job_system_name_idx");
+
+                    b.HasIndex(new[] { "Name" }, "job_schedules_name_idx");
+
+                    b.ToTable("job_schedules", "job");
+                });
+
+            modelBuilder.Entity("Domain.CommonEntities.JobScheduleRun", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid")
+                        .HasColumnName("id");
+
+                    b.Property<Guid>("JobId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("job_id");
+
+                    b.Property<Guid>("JobScheduleId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("job_schedule_id");
+
+                    b.Property<DateTime>("QueuedAt")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("queued_at");
+
+                    b.Property<DateTime>("ScheduledAt")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("scheduled_at");
+
+                    b.HasKey("Id")
+                        .HasName("job_schedule_runs_pk");
+
+                    b.HasIndex(new[] { "JobId" }, "job_schedule_runs_job_id_idx")
+                        .IsUnique();
+
+                    b.HasIndex(new[] { "JobScheduleId", "ScheduledAt" }, "job_schedule_runs_job_schedule_id_scheduled_at_idx")
+                        .IsUnique();
+
+                    b.ToTable("job_schedule_runs", "job");
+                });
+
             modelBuilder.Entity("Domain.CommonEntities.Setting", b =>
                 {
                     b.Property<string>("Key")
@@ -317,11 +527,235 @@ namespace Pricing.Migrator.Migrations
                     b.ToTable("markup_ranges", (string)null);
                 });
 
-            modelBuilder.Entity("Pricing.Entities.Settings.CurrencySetting", b =>
+            modelBuilder.Entity("Pricing.Entities.Offers.PriceOffer", b =>
                 {
-                    b.HasBaseType("Domain.CommonEntities.Setting");
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid")
+                        .HasColumnName("id");
 
-                    b.HasDiscriminator().HasValue("CurrencySetting");
+                    b.Property<int>("AvailableQuantity")
+                        .HasColumnType("integer")
+                        .HasColumnName("available_quantity");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("created_at");
+
+                    b.Property<int>("CurrencyId")
+                        .HasColumnType("integer")
+                        .HasColumnName("currency_id");
+
+                    b.Property<int>("DaysToRefund")
+                        .HasColumnType("integer")
+                        .HasColumnName("days_to_refund");
+
+                    b.Property<DateTime>("DeliveryDate")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("delivery_date");
+
+                    b.Property<int>("DeliveryProbability")
+                        .HasColumnType("integer")
+                        .HasColumnName("delivery_probability");
+
+                    b.Property<DateTime>("ExpiresAt")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("expires_at");
+
+                    b.Property<DateTime>("GuaranteedDeliveryDate")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("guaranteed_delivery_date");
+
+                    b.Property<int>("MinimumPurchaseQuantity")
+                        .HasColumnType("integer")
+                        .HasColumnName("minimum_purchase_quantity");
+
+                    b.Property<string>("OfferForStorage")
+                        .IsRequired()
+                        .HasMaxLength(128)
+                        .HasColumnType("character varying(128)")
+                        .HasColumnName("offer_for_storage");
+
+                    b.Property<DateTime>("OrderTill")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("order_till");
+
+                    b.Property<int>("ProductId")
+                        .HasColumnType("integer")
+                        .HasColumnName("product_id");
+
+                    b.Property<decimal>("PurchasePrice")
+                        .HasColumnType("numeric")
+                        .HasColumnName("price");
+
+                    b.Property<int>("QuantityCoefficient")
+                        .HasColumnType("integer")
+                        .HasColumnName("quantity_coefficient");
+
+                    b.Property<string>("Source")
+                        .IsRequired()
+                        .HasMaxLength(64)
+                        .HasColumnType("character varying(64)")
+                        .HasColumnName("source");
+
+                    b.Property<string>("SourceKey")
+                        .IsRequired()
+                        .HasMaxLength(256)
+                        .HasColumnType("character varying(256)")
+                        .HasColumnName("source_key");
+
+                    b.Property<DateTime>("UpdatedAt")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("updated_at");
+
+                    b.Property<Guid?>("WhoCreated")
+                        .HasColumnType("uuid")
+                        .HasColumnName("who_created");
+
+                    b.Property<Guid?>("WhoUpdated")
+                        .HasColumnType("uuid")
+                        .HasColumnName("who_updated");
+
+                    b.HasKey("Id")
+                        .HasName("price_offer_pk");
+
+                    b.HasAlternateKey("ProductId", "Source", "SourceKey", "OfferForStorage")
+                        .HasName("price_offer_source_source_key_uq");
+
+                    b.HasIndex("WhoCreated")
+                        .HasDatabaseName("pricing.entities.offers.priceoffer_who_created_idx");
+
+                    b.HasIndex("WhoUpdated")
+                        .HasDatabaseName("pricing.entities.offers.priceoffer_who_updated_idx");
+
+                    b.HasIndex(new[] { "CurrencyId" }, "price_offer_currency_id_index");
+
+                    b.HasIndex(new[] { "ExpiresAt" }, "price_offer_expires_at_index");
+
+                    b.HasIndex(new[] { "OfferForStorage" }, "price_offer_offer_for_storage_index");
+
+                    b.HasIndex(new[] { "ProductId", "OfferForStorage" }, "price_offer_product_id_index");
+
+                    b.ToTable("price_offers", "public");
+                });
+
+            modelBuilder.Entity("Pricing.Entities.Offers.PriceOfferRefreshState", b =>
+                {
+                    b.Property<int>("ProductId")
+                        .HasColumnType("integer")
+                        .HasColumnName("product_id");
+
+                    b.Property<string>("Source")
+                        .HasMaxLength(64)
+                        .HasColumnType("character varying(64)")
+                        .HasColumnName("source");
+
+                    b.Property<string>("StorageName")
+                        .HasMaxLength(128)
+                        .HasColumnType("character varying(128)")
+                        .HasColumnName("storage_name");
+
+                    b.Property<int>("LastOffersCount")
+                        .HasColumnType("integer")
+                        .HasColumnName("last_offers_count");
+
+                    b.Property<DateTime?>("LastOffersUpdatedAt")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("last_offers_updated_at");
+
+                    b.HasKey("ProductId", "Source", "StorageName")
+                        .HasName("price_offer_refresh_state_pk");
+
+                    b.ToTable("price_offer_refresh_states", "public");
+                });
+
+            modelBuilder.Entity("Pricing.Entities.Offers.ProductPriceOption", b =>
+                {
+                    b.Property<Guid>("PriceOfferId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("price_offer_id");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("created_at");
+
+                    b.Property<int>("CurrencyId")
+                        .HasColumnType("integer")
+                        .HasColumnName("currency_id");
+
+                    b.Property<int>("DeliveryProbability")
+                        .HasColumnType("integer")
+                        .HasColumnName("delivery_probability");
+
+                    b.Property<TimeSpan>("DeliveryTime")
+                        .HasColumnType("interval")
+                        .HasColumnName("delivery_time");
+
+                    b.Property<string>("ForStorageName")
+                        .IsRequired()
+                        .HasMaxLength(128)
+                        .HasColumnType("character varying(128)")
+                        .HasColumnName("for_storage_name");
+
+                    b.Property<TimeSpan>("GuaranteedDeliveryTime")
+                        .HasColumnType("interval")
+                        .HasColumnName("guaranteed_delivery_time");
+
+                    b.Property<decimal>("Markup")
+                        .HasColumnType("numeric")
+                        .HasColumnName("markup");
+
+                    b.Property<decimal>("Price")
+                        .HasColumnType("numeric")
+                        .HasColumnName("price");
+
+                    b.Property<decimal>("Score")
+                        .HasColumnType("numeric")
+                        .HasColumnName("score");
+
+                    b.Property<DateTime>("UpdatedAt")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("updated_at");
+
+                    b.Property<Guid?>("WhoCreated")
+                        .HasColumnType("uuid")
+                        .HasColumnName("who_created");
+
+                    b.Property<Guid?>("WhoUpdated")
+                        .HasColumnType("uuid")
+                        .HasColumnName("who_updated");
+
+                    b.HasKey("PriceOfferId")
+                        .HasName("product_price_option_pk");
+
+                    b.HasIndex("WhoCreated")
+                        .HasDatabaseName("pricing.entities.offers.productpriceoption_who_created_idx");
+
+                    b.HasIndex("WhoUpdated")
+                        .HasDatabaseName("pricing.entities.offers.productpriceoption_who_updated_idx");
+
+                    b.HasIndex(new[] { "CurrencyId" }, "product_price_option_currency_id_index");
+
+                    b.HasIndex(new[] { "Score" }, "product_price_option_score_index");
+
+                    b.ToTable("product_price_options", "public");
+                });
+
+            modelBuilder.Entity("Domain.CommonEntities.UniqJob", b =>
+                {
+                    b.HasBaseType("Domain.CommonEntities.Job");
+
+                    b.Property<string>("NaturalKey")
+                        .IsRequired()
+                        .HasMaxLength(256)
+                        .HasColumnType("character varying(256)")
+                        .HasColumnName("natural_key");
+
+                    b.HasIndex(new[] { "SystemName", "NaturalKey" }, "jobs_pending_system_name_natural_key_uq")
+                        .IsUnique()
+                        .HasFilter("status = 'Pending'");
+
+                    b.HasDiscriminator().HasValue("uniq_job");
                 });
 
             modelBuilder.Entity("Pricing.Entities.Settings.PricingSetting", b =>
@@ -329,6 +763,23 @@ namespace Pricing.Migrator.Migrations
                     b.HasBaseType("Domain.CommonEntities.Setting");
 
                     b.HasDiscriminator().HasValue("PricingSettings");
+                });
+
+            modelBuilder.Entity("Domain.CommonEntities.JobScheduleRun", b =>
+                {
+                    b.HasOne("Domain.CommonEntities.Job", null)
+                        .WithMany()
+                        .HasForeignKey("JobId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired()
+                        .HasConstraintName("job_schedule_runs_job_id_fk");
+
+                    b.HasOne("Domain.CommonEntities.JobSchedule", null)
+                        .WithMany("Runs")
+                        .HasForeignKey("JobScheduleId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired()
+                        .HasConstraintName("job_schedule_runs_job_schedule_id_fk");
                 });
 
             modelBuilder.Entity("MassTransit.EntityFrameworkCoreIntegration.OutboxMessage", b =>
@@ -353,6 +804,23 @@ namespace Pricing.Migrator.Migrations
                         .HasConstraintName("markup_ranges_markup_group_id_fk");
 
                     b.Navigation("Group");
+                });
+
+            modelBuilder.Entity("Pricing.Entities.Offers.ProductPriceOption", b =>
+                {
+                    b.HasOne("Pricing.Entities.Offers.PriceOffer", "PriceOffer")
+                        .WithOne()
+                        .HasForeignKey("Pricing.Entities.Offers.ProductPriceOption", "PriceOfferId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired()
+                        .HasConstraintName("product_price_options_price_offer_id_fk");
+
+                    b.Navigation("PriceOffer");
+                });
+
+            modelBuilder.Entity("Domain.CommonEntities.JobSchedule", b =>
+                {
+                    b.Navigation("Runs");
                 });
 
             modelBuilder.Entity("Pricing.Entities.MarkupGroup", b =>

@@ -1,6 +1,7 @@
 using Api.Common.Extensions;
 using Carter;
 using Enums;
+using Enums.Units;
 using Main.Application.Dtos.Product;
 using Main.Application.Handlers.ProductWeight;
 using Main.Application.Handlers.ProductWeight.GetProductWeight;

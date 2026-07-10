@@ -39,17 +39,6 @@ public static class ProductProjections
             ProductSize = ToProductSizeDto.Invoke(x.ProductSize)
         };
 
-    public static readonly Expression<Func<ProductCoefficient, ProductCoefficientDto>>
-        ToProductCoefficientDto =
-            x => new ProductCoefficientDto
-            {
-                ProductId = x.ProductId,
-                ValidTill = x.ValidTill,
-                CreatedAt = x.CreatedAt,
-                UpdatedAt = x.UpdatedAt,
-                Coefficient = CoefficientProjections.ToDto.Invoke(x.Coefficient)
-            };
-
     public static readonly Expression<Func<ProductWeight?, ProductWeightDto?>>
         ToProductWeightDto =
             x => x == null

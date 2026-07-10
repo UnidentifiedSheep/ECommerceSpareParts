@@ -2,6 +2,7 @@
 using Api.Common.Extensions;
 using Enums;
 using FluentAssertions;
+using Localization.Domain.Extensions;
 using Main.Application;
 using Main.Application.Configs;
 using Main.Entities;

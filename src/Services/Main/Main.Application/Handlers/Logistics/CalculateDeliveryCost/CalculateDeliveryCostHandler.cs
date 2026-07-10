@@ -3,6 +3,7 @@ using Application.Common.Interfaces.Cqrs;
 using Application.Common.Interfaces.Currency;
 using Application.Common.Interfaces.Repositories;
 using Enums;
+using Enums.Units;
 using Main.Application.Dtos.Logistics;
 using Main.Application.Dtos.Storage;
 using Main.Application.Interfaces.Logistics;

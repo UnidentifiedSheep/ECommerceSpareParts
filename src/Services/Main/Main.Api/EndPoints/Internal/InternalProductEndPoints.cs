@@ -2,6 +2,7 @@ using System.Text.Json.Serialization;
 using Api.Common.Extensions;
 using Enums;
 using Main.Application.Dtos.Product;
+using Main.Application.Dtos.Product.SupplierReferences;
 using Main.Application.Handlers.Products;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
@@ -18,6 +19,33 @@ public record InternalGetFullProductsRequest
 {
     [FromQuery(Name = "id")]
     public int[] ProductIds { get; init; } = [];
+}
+
+public record InternalGetSupplierProductReferencesResponse
+{
+    [JsonPropertyName("products")]
+    public required IReadOnlyList<ResolvedSupplierProductReferenceDto> Products { get; init; }
+}
+
+public record InternalGetSupplierProductReferencesRequest
+{
+    [FromQuery(Name = "id")]
+    public int[] ProductIds { get; init; } = [];
+
+    [FromQuery(Name = "supplier")]
+    public Supplier Supplier { get; init; }
+}
+
+public record InternalResolveSupplierProductReferencesRequest
+{
+    [JsonPropertyName("references")]
+    public required Dictionary<Supplier, IEnumerable<SupplierProductReferenceDto>> References { get; init; }
+}
+
+public record InternalResolveSupplierProductReferencesResponse
+{
+    [JsonPropertyName("products")]
+    public required Dictionary<Supplier, IEnumerable<ResolvedSupplierProductReferenceDto>> Products { get; init; }
 }
 
 public static class InternalProductEndPoints
@@ -54,6 +82,63 @@ public static class InternalProductEndPoints
             .WithDescription("Получение продукта, веса и размеров для внутренних интеграций")
             .Accepts<InternalGetFullProductsRequest>(true, "application/json")
             .Produces<InternalGetFullProductsResponse>()
+            .ProducesProblem(StatusCodes.Status404NotFound);
+
+        products.MapGet(
+                "supplier-references",
+                async (
+                    ISender sender,
+                    [AsParameters] InternalGetSupplierProductReferencesRequest request,
+                    CancellationToken cancellationToken) =>
+                {
+                    var result = await sender.Send(
+                        new GetSupplierProductReferencesQuery(
+                            request.ProductIds,
+                            request.Supplier),
+                        cancellationToken);
+
+                    return Results.Ok(
+                        new InternalGetSupplierProductReferencesResponse
+                        {
+                            Products = result.Products
+                        });
+                })
+            .RequireAllPermissions(PermissionCodes.ARTICLES_GET_MAIN)
+            .WithGroupName("Internal Products")
+            .WithDisplayName("Internal service supplier product references")
+            .WithName("InternalSupplierProductReferences")
+            .WithSummary("Получить данные продуктов для запроса к поставщику")
+            .WithDescription("Получение артикула и названия производителя в терминах поставщика для внутренних интеграций")
+            .Produces<InternalGetSupplierProductReferencesResponse>()
+            .ProducesProblem(StatusCodes.Status400BadRequest)
+            .ProducesProblem(StatusCodes.Status404NotFound);
+
+        products.MapPost(
+                "resolve-supplier-references",
+                async (
+                    ISender sender,
+                    InternalResolveSupplierProductReferencesRequest request,
+                    CancellationToken cancellationToken) =>
+                {
+                    var result = await sender.Send(
+                        new ResolveSupplierProductReferencesQuery(request.References),
+                        cancellationToken);
+
+                    return Results.Ok(
+                        new InternalResolveSupplierProductReferencesResponse
+                        {
+                            Products = result.Products
+                        });
+                })
+            .RequireAllPermissions(PermissionCodes.ARTICLES_GET_MAIN)
+            .WithGroupName("Internal Products")
+            .WithDisplayName("Internal service resolve supplier product references")
+            .WithName("InternalResolveSupplierProductReferences")
+            .WithSummary("Найти продукты по данным поставщика")
+            .WithDescription("Получение продуктов по артикулу и названию производителя в терминах поставщика для внутренних интеграций")
+            .Accepts<InternalResolveSupplierProductReferencesRequest>(false, "application/json")
+            .Produces<InternalResolveSupplierProductReferencesResponse>()
+            .ProducesProblem(StatusCodes.Status400BadRequest)
             .ProducesProblem(StatusCodes.Status404NotFound);
 
         return group;

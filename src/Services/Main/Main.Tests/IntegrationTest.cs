@@ -54,12 +54,6 @@ public abstract class IntegrationTest(CombinedContainerFixture fixture)
         Scope.Dispose();
     }
 
-    private async Task LoadLocales()
-    {
-        var localesPath = Assembly.GetExecutingAssembly().GetDefaultLocalizationPath();
-        await Sp.LoadLocalesFromJson(localesPath);
-    }
-
     private async Task SeedDb()
     {
         using var scope = Sp.CreateScope();

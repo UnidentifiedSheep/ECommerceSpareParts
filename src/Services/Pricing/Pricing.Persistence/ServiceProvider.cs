@@ -5,8 +5,10 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 using Persistence;
+using Persistence.Common;
 using Persistence.DbValidator;
 using Persistence.Extensions;
+using Pricing.Application.Interfaces.Persistence;
 using Pricing.Persistence.Contexts;
 using Pricing.Persistence.Repositories;
 
@@ -24,7 +26,13 @@ public static class ServiceProvider
 
         collection.AddScoped(typeof(IRepository<,>), typeof(BasicEfRepository<,>));
         collection.AddScoped(typeof(IReadRepository<,>), typeof(ReadRepository<,>));
+        
+        collection.AddScoped<IPriceOfferRepository, PriceOfferRepository>();
+        collection.AddScoped<IProductPriceOptionRepository, ProductPriceOptionRepository>();
+        collection.AddScoped<IPriceOfferRefreshStateRepository, PriceOfferRefreshStateRepository>();
 
+        collection.AddJobRepositories<DContext>();
+        
         collection.AddUnitOfWork<DContext>();
 
         collection.AddScoped<IDbValidator, PgsqlDbValidator<DContext>>();

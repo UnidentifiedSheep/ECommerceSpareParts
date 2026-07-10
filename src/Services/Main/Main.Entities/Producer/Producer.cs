@@ -10,6 +10,7 @@ namespace Main.Entities.Producer;
 public class Producer : AuditableEntity<Producer, int>, ILinqEntity<Producer, int>
 {
     private readonly List<ProducerAlias> _aliases = [];
+    private readonly List<ProducerSupplierMapping> _supplierMappings = [];
 
     private Producer() { }
 
@@ -33,6 +34,7 @@ public class Producer : AuditableEntity<Producer, int>, ILinqEntity<Producer, in
 
     public string? Description { get; private set; }
     public IReadOnlyCollection<ProducerAlias> Aliases => _aliases;
+    public IReadOnlyCollection<ProducerSupplierMapping> SupplierMappings => _supplierMappings;
 
     public static Expression<Func<Producer, int>> GetKeySelector() { return x => x.Id; }
 

@@ -17,7 +17,8 @@ using Main.Entities.User;
 using MassTransit;
 using MassTransit.EntityFrameworkCoreIntegration;
 using Microsoft.EntityFrameworkCore;
-using Persistence.BaseTableConfigurations;
+using Persistence.Common;
+using Persistence.Common.BaseTableConfigurations;
 using Persistence.Extensions;
 using Persistence.Interceptors;
 using Event = Main.Entities.Event.Event;
@@ -39,8 +40,6 @@ public partial class DContext : DbContext
 
     public virtual DbSet<ProductCharacteristic> ProductCharacteristics { get; set; }
 
-    public virtual DbSet<ProductCoefficient> ProductCoefficients { get; set; }
-
     public virtual DbSet<ProductEan> ProductEans { get; set; }
 
     public virtual DbSet<ProductImage> ProductImages { get; set; }
@@ -55,8 +54,6 @@ public partial class DContext : DbContext
     public virtual DbSet<Cart> Carts { get; set; }
 
     public virtual DbSet<Category> Categories { get; set; }
-
-    public virtual DbSet<Coefficient> Coefficients { get; set; }
 
     public virtual DbSet<Currency> Currencies { get; set; }
 

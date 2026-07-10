@@ -10,7 +10,7 @@ using MediatR;
 
 namespace Main.Api.EndPoints.Products;
 
-public record GetProductCrossesResponse(IReadOnlyList<ProductDto> Crosses, ProductDto RequestedArticle);
+public record GetProductCrossesResponse(IReadOnlyList<ProductDto> Crosses);
 
 public record GetProductPairResponse(ProductDto? Pair);
 
@@ -35,7 +35,7 @@ public static class ProductRelationsEndPoints
                         queryParams.SortBy,
                         user.UserId);
                     var result = await sender.Send(query, token);
-                    var response = new GetProductCrossesResponse(result.Crosses, result.RequestedProduct);
+                    var response = new GetProductCrossesResponse(result.Crosses);
                     return Results.Ok(response);
                 })
             .WithName("GetProductCrosses")

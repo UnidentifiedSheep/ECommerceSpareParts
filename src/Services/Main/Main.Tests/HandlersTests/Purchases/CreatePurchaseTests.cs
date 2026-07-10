@@ -1,4 +1,5 @@
 using Enums;
+using Enums.Units;
 using FluentAssertions;
 using Main.Application.Dtos.Purchase;
 using Main.Application.Handlers.Purchases.CreatePurchase;
@@ -7,6 +8,7 @@ using Main.Entities.Exceptions;
 using Main.Entities.Product;
 using Main.Entities.Storage;
 using Main.Entities.User;
+using Main.Enums;
 using Main.Enums.Balances;
 using Microsoft.EntityFrameworkCore;
 using Tests.DataBuilders.User;

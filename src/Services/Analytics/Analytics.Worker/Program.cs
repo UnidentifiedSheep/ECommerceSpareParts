@@ -9,8 +9,10 @@ using Analytics.Worker.HostedServices;
 using Api.Common;
 using Api.Common.Extensions;
 using Api.Common.HostedServices;
+using Api.Common.HostedServices.Startup;
 using Application.Common.Backplane;
 using Application.Common.Consumer;
+using Application.Common.Interfaces;
 using Cache;
 using Contracts.Job;
 using Contracts.Settings;
@@ -56,21 +58,16 @@ builder.Services
     .AddHostedService<RecalculationCheckHostedService>()
     .AddLrtHostedServices();
 
+builder.Services.AddScoped<IStartupTask, LoadLocalesStartupTask>();
+builder.Services.AddHostedService<StartupTaskHostedService>();
+
 AddMassTransit(builder);
 
 var host = builder.Build();
 
-await LoadLocalization(host);
-
 await host.RunAsync();
 
 return;
-
-async Task LoadLocalization(IHost hostApp)
-{
-    var localesPath = Assembly.GetExecutingAssembly().GetDefaultLocalizationPath();
-    await hostApp.LoadLocalesFromJson(localesPath);
-}
 
 void AddHostedServiceOptions(IServiceCollection collection)
 {

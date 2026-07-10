@@ -1,4 +1,5 @@
 using System.Text.Json.Serialization;
+using Enums;
 using Main.Enums;
 
 namespace Main.Application.Dtos.Producer;

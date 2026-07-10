@@ -1,3 +1,5 @@
+using Application.Common.Interfaces.Cache;
+
 namespace Cache.Extensions;
 
 public readonly record struct CacheArrayResult<T>(
@@ -40,8 +42,7 @@ public static class CacheExtensions
 
         if (idsSet.Count == 0) return result;
 
-        var cached = (await cache.GetAsync<TValue>(idsSet.Select(getKey)))
-            .DeserializeMany<TValue>();
+        var cached = await cache.GetAsync<TValue>(idsSet.Select(getKey));
 
         foreach (var found in cached)
         {

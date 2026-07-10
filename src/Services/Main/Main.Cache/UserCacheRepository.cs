@@ -1,4 +1,5 @@
 using Application.Common.Extensions;
+using Application.Common.Interfaces.Cache;
 using Application.Common.Interfaces.Repositories;
 using Cache;
 using Cache.Extensions;

@@ -4,6 +4,7 @@ using Domain;
 using Domain.Extensions;
 using Domain.Interfaces;
 using Enums;
+using Enums.Units;
 using Main.Entities.DomainEvents.Product;
 
 namespace Main.Entities.Product;

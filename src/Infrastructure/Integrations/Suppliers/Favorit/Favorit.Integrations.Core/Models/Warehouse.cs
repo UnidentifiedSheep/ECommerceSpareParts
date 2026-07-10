@@ -17,8 +17,7 @@ public record Warehouse
     public required decimal Price { get; init; }
 
     [JsonPropertyName("shipmentDate")]
-    public required DateTime
-        ShipmentDate { get; init; } //Date is shipment, Time till when order can be created.
+    public required DateTimeOffset ShipmentDate { get; init; } //Date is shipment, Time till when order can be created.
 
     [JsonPropertyName("stock")]
     public required int Stock { get; init; }

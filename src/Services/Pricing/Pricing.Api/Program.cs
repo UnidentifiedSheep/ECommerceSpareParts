@@ -1,9 +1,14 @@
 using System.Reflection;
 using Abstractions;
 using Api.Common;
+using Api.Common.Consumers;
 using Api.Common.Extensions;
+using Api.Common.HostedServices;
+using Api.Common.HostedServices.Startup;
+using Api.Common.Hubs;
 using Application.Common.Backplane;
 using Application.Common.Consumer;
+using Application.Common.Interfaces;
 using Application.Common.Services.Supplier;
 using Cache;
 using Carter;
@@ -15,8 +20,11 @@ using Internal.Integration.Di;
 using Localization.Domain.Extensions;
 using MassTransit;
 using OpenTelemetry.Metrics;
+using Pricing.Api;
+using Pricing.Api.Startup;
 using Pricing.Application;
 using Pricing.Application.Consumers;
+using Pricing.Application.Interfaces.Markup;
 using Pricing.Cache;
 using Pricing.Persistence;
 using Pricing.Persistence.Contexts;
@@ -48,6 +56,7 @@ builder.Services.AddMassTransit(x =>
     x.AddConsumers(Assembly.GetAssembly(typeof(Global)));
     x.AddConsumer<BackplaneConsumer>();
     x.AddConsumer<SettingUpdatedConsumer>();
+    x.AddConsumer<JobStatusUpdatedConsumer>();
 
     x.AddEntityFrameworkOutbox<DContext>(o =>
     {
@@ -71,6 +80,7 @@ builder.Services.AddMassTransit(x =>
                 ep.ConfigureConsumer<SettingUpdatedConsumer>(context);
 
                 ep.ConfigureConsumer<MarkupRangesRefreshRequestedConsumer>(context);
+                ep.ConfigureConsumer<JobStatusUpdatedConsumer>(context);
 
                 ep.Bind<BackplaneMessage>();
                 ep.Bind<MarkupRangesRefreshRequestedEvent>();
@@ -105,6 +115,11 @@ builder.Services
     .AddApplicationLayer(builder.Configuration)
     .AddLocalization(builder.Configuration);
 
+builder.Services.AddScoped<IStartupTask, MarkupInitializationStartupTask>();
+builder.Services.AddScoped<IStartupTask, LoadLocalesStartupTask>();
+builder.Services.AddHostedService<StartupTaskHostedService>();
+
+builder.Services.AddSignalR();
 builder.Services.AddOpenTelemetry()
     .WithMetrics(metrics =>
     {
@@ -120,10 +135,12 @@ builder.Services.AddCarter(
     new DependencyContextAssemblyCatalog(endpointAssembly),
     c => c.WithEmptyValidators());
 
+
 var app = builder.Build();
 
 app.UseCommonApiPipeline();
 
 app.UseOpenTelemetryPrometheusScrapingEndpoint();
+app.MapHub<JobHub>("/hubs/jobs");
 
 await app.RunAsync();

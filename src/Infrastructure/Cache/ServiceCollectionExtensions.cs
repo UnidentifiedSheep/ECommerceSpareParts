@@ -1,4 +1,6 @@
-﻿using Microsoft.Extensions.Caching.StackExchangeRedis;
+﻿using Application.Common.Interfaces.Cache;
+using Cache.DistributedLock;
+using Microsoft.Extensions.Caching.StackExchangeRedis;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 using StackExchange.Redis;
@@ -22,6 +24,7 @@ public static class ServiceCollectionExtensions
         serviceCollection.AddTransient<ICache, RedisCache>(sp => new RedisCache(
             sp.GetRequiredService<IDatabase>(),
             serviceName));
+        serviceCollection.AddTransient<IDistributedLockProvider, DistributedLockProvider>();
 
         serviceCollection.AddOptions<RedisCacheOptions>()
             .Configure<IOptions<RedisOptions>>((cacheOptions, redisOptions) =>

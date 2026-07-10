@@ -29,6 +29,16 @@ services:
       cache_to:
         - type=registry,ref=${ARTIFACT_REGISTRY_HOST}/pricing-api:buildcache,mode=min
 
+  pricing-worker:
+    image: ${ARTIFACT_REGISTRY_HOST}/pricing-worker:${IMAGE_TAG}
+    build:
+      tags:
+        - ${ARTIFACT_REGISTRY_HOST}/pricing-worker:${IMAGE_TAG}
+      cache_from:
+        - type=registry,ref=${ARTIFACT_REGISTRY_HOST}/pricing-worker:buildcache
+      cache_to:
+        - type=registry,ref=${ARTIFACT_REGISTRY_HOST}/pricing-worker:buildcache,mode=min
+
   gateway:
     image: ${ARTIFACT_REGISTRY_HOST}/gateway:${IMAGE_TAG}
     build:

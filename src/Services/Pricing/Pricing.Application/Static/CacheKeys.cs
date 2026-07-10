@@ -1,25 +1,41 @@
-﻿using Integrations.Supplier;
+﻿using Enums;
+using Pricing.Entities.Settings;
 
 namespace Pricing.Application.Static;
 
 public static class CacheKeys
 {
-    public static class CurrencyCache
+    public static class Currency
     {
         public static TimeSpan Ttl { get; } = TimeSpan.FromDays(1);
 
         public static string CurrencyRate(int currencyId) { return $"currency:{currencyId}:rate"; }
+        public static string CurrencyIdByCode(string code) => $"currency:code:{code}";
+        public static string BaseCurrencyId => "currency:base";
     }
 
-    public static class PricingCache
+    public static class Offer
     {
+        public static class Ok
+        {
+            public static TimeSpan Ttl(PricingSettingData setting) => setting.OfferTtl;
+            
+            public static string Key(Supplier supplier, int productId, string storageName)
+                => $"offer:refresh:ok:{supplier.ToString()}:{productId}:{storageName}";
+        }
+        
+        public static class Failed
+        {
+            public static readonly TimeSpan Ttl = TimeSpan.FromMinutes(5);
+            public static string Key(Supplier supplier, int productId, string storageName)
+                => $"offer:refresh:failed:{supplier.ToString()}:{productId}:{storageName}";
+        }
+        
         public static class Lock
         {
-            public static readonly TimeSpan Ttl = TimeSpan.FromSeconds(30);
-            public static string SupplierRequest(int productId, Supplier supplier)
-            {
-                return $"supplier:{supplier.ToString()}:pricing:request:product:{productId}:lock";
-            }
+            public static readonly TimeSpan Ttl = TimeSpan.FromSeconds(60);
+            public static string Key(Supplier supplier, int productId, string storageName)
+                => $"offer:refresh:lock:{supplier.ToString()}:{productId}:{storageName}";
         }
     }
 }

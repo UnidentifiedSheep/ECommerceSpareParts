@@ -6,6 +6,8 @@ using MediatR;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Pricing.Application.NamedObjects;
+using Pricing.Application.NamedObjects.SettingDefinitions;
+using Pricing.Application.Services.Pricing.PricePolicies.PriceAppliers;
 
 namespace Pricing.Application;
 
@@ -20,6 +22,9 @@ public static class NamedObjectDiRegistry
             GetNamedObjectsHandler>();
 
         return services
-            .RegisterNamedObject<SettingDefinitionNamedObjectBase>(objectsLifetime: ServiceLifetime.Scoped);
+            .RegisterNamedObject<SettingDefinitionNamedObjectBase>(
+                assembly: typeof(PricingSettingDefinition).Assembly,
+                objectsLifetime: ServiceLifetime.Scoped)
+            .RegisterNamedObject<ApplierNamedObjectBase>(objectsLifetime: ServiceLifetime.Scoped);
     }
 }

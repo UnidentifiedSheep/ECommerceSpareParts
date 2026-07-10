@@ -91,14 +91,19 @@ namespace Main.Migrator.Migrations
                         .HasColumnType("uuid")
                         .HasColumnName("who_updated");
 
+                    b.Property<string>("job_type")
+                        .IsRequired()
+                        .HasMaxLength(8)
+                        .HasColumnType("character varying(8)");
+
                     b.HasKey("Id")
                         .HasName("jobs_pk");
 
                     b.HasIndex("WhoCreated")
-                        .HasDatabaseName("domain.commonentities.job_who_created_idx");
+                        .HasDatabaseName("domain.commonentities.uniqjob_who_created_idx");
 
                     b.HasIndex("WhoUpdated")
-                        .HasDatabaseName("domain.commonentities.job_who_updated_idx");
+                        .HasDatabaseName("domain.commonentities.uniqjob_who_updated_idx");
 
                     b.HasIndex(new[] { "LockedAt" }, "jobs_locked_at_idx");
 
@@ -107,6 +112,10 @@ namespace Main.Migrator.Migrations
                     b.HasIndex(new[] { "SystemName" }, "jobs_system_name_idx");
 
                     b.ToTable("jobs", "job");
+
+                    b.HasDiscriminator<string>("job_type").HasValue("job");
+
+                    b.UseTphMappingStrategy();
                 });
 
             modelBuilder.Entity("Domain.CommonEntities.JobSchedule", b =>
@@ -829,29 +838,6 @@ namespace Main.Migrator.Migrations
                     b.ToTable("categories", "public");
                 });
 
-            modelBuilder.Entity("Main.Entities.Coefficient", b =>
-                {
-                    b.Property<string>("Name")
-                        .HasMaxLength(256)
-                        .HasColumnType("character varying(256)")
-                        .HasColumnName("name");
-
-                    b.Property<string>("Type")
-                        .IsRequired()
-                        .HasMaxLength(56)
-                        .HasColumnType("character varying(56)")
-                        .HasColumnName("type");
-
-                    b.Property<decimal>("Value")
-                        .HasColumnType("numeric")
-                        .HasColumnName("value");
-
-                    b.HasKey("Name")
-                        .HasName("coefficients_pk");
-
-                    b.ToTable("coefficients", "public");
-                });
-
             modelBuilder.Entity("Main.Entities.Currency.Currency", b =>
                 {
                     b.Property<int>("Id")
@@ -1497,51 +1483,6 @@ namespace Main.Migrator.Migrations
                         .HasDatabaseName("product_characteristics_name_value_index");
 
                     b.ToTable("product_characteristics", "public");
-                });
-
-            modelBuilder.Entity("Main.Entities.Product.ProductCoefficient", b =>
-                {
-                    b.Property<int>("ProductId")
-                        .HasColumnType("integer")
-                        .HasColumnName("product_id");
-
-                    b.Property<string>("CoefficientName")
-                        .HasMaxLength(50)
-                        .HasColumnType("character varying(50)")
-                        .HasColumnName("coefficient_name");
-
-                    b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("timestamp with time zone")
-                        .HasColumnName("created_at");
-
-                    b.Property<DateTime>("UpdatedAt")
-                        .HasColumnType("timestamp with time zone")
-                        .HasColumnName("updated_at");
-
-                    b.Property<DateTime>("ValidTill")
-                        .HasColumnType("timestamp with time zone")
-                        .HasColumnName("valid_till");
-
-                    b.Property<Guid?>("WhoCreated")
-                        .HasColumnType("uuid")
-                        .HasColumnName("who_created");
-
-                    b.Property<Guid?>("WhoUpdated")
-                        .HasColumnType("uuid")
-                        .HasColumnName("who_updated");
-
-                    b.HasKey("ProductId", "CoefficientName")
-                        .HasName("product_coefficients_pk");
-
-                    b.HasIndex("CoefficientName");
-
-                    b.HasIndex("WhoCreated")
-                        .HasDatabaseName("main.entities.product.productcoefficient_who_created_idx");
-
-                    b.HasIndex("WhoUpdated")
-                        .HasDatabaseName("main.entities.product.productcoefficient_who_updated_idx");
-
-                    b.ToTable("product_coefficients", "public");
                 });
 
             modelBuilder.Entity("Main.Entities.Product.ProductContent", b =>
@@ -3066,6 +3007,23 @@ namespace Main.Migrator.Migrations
                     b.ToTable("OutboxState", "msg");
                 });
 
+            modelBuilder.Entity("Domain.CommonEntities.UniqJob", b =>
+                {
+                    b.HasBaseType("Domain.CommonEntities.Job");
+
+                    b.Property<string>("NaturalKey")
+                        .IsRequired()
+                        .HasMaxLength(256)
+                        .HasColumnType("character varying(256)")
+                        .HasColumnName("natural_key");
+
+                    b.HasIndex(new[] { "SystemName", "NaturalKey" }, "jobs_pending_system_name_natural_key_uq")
+                        .IsUnique()
+                        .HasFilter("status = 'Pending'");
+
+                    b.HasDiscriminator().HasValue("uniq_job");
+                });
+
             modelBuilder.Entity("Main.Entities.Settings.CurrencySetting", b =>
                 {
                     b.HasBaseType("Domain.CommonEntities.Setting");
@@ -3360,7 +3318,7 @@ namespace Main.Migrator.Migrations
             modelBuilder.Entity("Main.Entities.Producer.ProducerSupplierMapping", b =>
                 {
                     b.HasOne("Main.Entities.Producer.Producer", null)
-                        .WithMany()
+                        .WithMany("SupplierMappings")
                         .HasForeignKey("ProducerId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired()
@@ -3424,18 +3382,6 @@ namespace Main.Migrator.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired()
                         .HasConstraintName("product_characteristics_product_id_fk");
-                });
-
-            modelBuilder.Entity("Main.Entities.Product.ProductCoefficient", b =>
-                {
-                    b.HasOne("Main.Entities.Coefficient", "Coefficient")
-                        .WithMany("ProductCoefficients")
-                        .HasForeignKey("CoefficientName")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired()
-                        .HasConstraintName("article_coefficients_coefficients_name_fk");
-
-                    b.Navigation("Coefficient");
                 });
 
             modelBuilder.Entity("Main.Entities.Product.ProductContent", b =>
@@ -3936,11 +3882,6 @@ namespace Main.Migrator.Migrations
                     b.Navigation("Articles");
                 });
 
-            modelBuilder.Entity("Main.Entities.Coefficient", b =>
-                {
-                    b.Navigation("ProductCoefficients");
-                });
-
             modelBuilder.Entity("Main.Entities.Currency.Currency", b =>
                 {
                     b.Navigation("RatesFrom");
@@ -3956,6 +3897,8 @@ namespace Main.Migrator.Migrations
             modelBuilder.Entity("Main.Entities.Producer.Producer", b =>
                 {
                     b.Navigation("Aliases");
+
+                    b.Navigation("SupplierMappings");
                 });
 
             modelBuilder.Entity("Main.Entities.Product.Product", b =>

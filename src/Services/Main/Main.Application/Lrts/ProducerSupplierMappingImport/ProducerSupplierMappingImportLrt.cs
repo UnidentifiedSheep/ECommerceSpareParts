@@ -4,6 +4,7 @@ using Abstractions.Interfaces.Persistence;
 using Application.Common.Interfaces.Repositories;
 using CsvHelper.Configuration.Attributes;
 using Domain.CommonEntities;
+using Enums;
 using Localization.Abstractions.Interfaces;
 using Localization.Domain;
 using Main.Application.Dtos.Producer;

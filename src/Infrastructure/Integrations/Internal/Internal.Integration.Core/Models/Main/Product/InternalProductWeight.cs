@@ -1,5 +1,6 @@
 using System.Text.Json.Serialization;
 using Enums;
+using Enums.Units;
 
 namespace Internal.Integration.Core.Models.Main.Product;
 

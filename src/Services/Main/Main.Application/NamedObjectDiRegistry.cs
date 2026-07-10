@@ -22,7 +22,6 @@ public static class NamedObjectDiRegistry
 
         return services
             .RegisterNamedObject<StorageContentExtractPolicyBase>(objectsLifetime: ServiceLifetime.Singleton)
-            .RegisterNamedObject<SettingDefinitionNamedObjectBase>(
-                typeof(StorageContentExtractPolicyBase).Assembly);
+            .RegisterNamedObject<SettingDefinitionNamedObjectBase>(typeof(StorageContentExtractPolicyBase).Assembly);
     }
 }

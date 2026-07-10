@@ -1,6 +1,7 @@
 using Abstractions.Models;
 using Application.Common.Interfaces.Cqrs;
 using Enums;
+using Enums.Units;
 using Extensions;
 using Search.Application.Dtos.Products;
 using Search.Application.Interfaces.Product;

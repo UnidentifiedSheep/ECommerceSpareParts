@@ -4,21 +4,22 @@ using MassTransit;
 using MediatR;
 using Pricing.Application.Dtos.Markup;
 using Pricing.Application.Handlers.Markup.UpsertMarkupGroup;
+using Pricing.Application.Interfaces.Cache;
 using Pricing.Entities.Settings;
 
 namespace Pricing.Application.Consumers;
 
 public class MarkupAnalyzedConsumer(
     ISender sender,
-    ISettingsService settingsService
+    ICachedCurrencyProvider cachedCurrencyProvider
 ) : IConsumer<MarkupAnalyzedEvent>
 {
     public async Task Consume(ConsumeContext<MarkupAnalyzedEvent> context)
     {
         if (context.Message.Ranges.Count == 0) return;
 
-        var baseCurrencyId = (await settingsService.GetOrDefault<CurrencySetting>())
-            .Data.BaseCurrencyId;
+        var baseCurrencyId = await cachedCurrencyProvider
+            .GetBaseCurrencyIdAsync(context.CancellationToken);
 
         await sender.Send(
             new UpsertMarkupGroupCommand(
