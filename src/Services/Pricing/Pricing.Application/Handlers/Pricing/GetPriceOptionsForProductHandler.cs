@@ -37,23 +37,12 @@ public class GetPriceOptionsForProductHandler(
             cancellationToken);
 
         if (refreshed.CreatedOffers.Count != 0)
-            await sender.Send(
-                new CalculateCandidatesCommand(request.ProductId, request.StorageName), 
-                cancellationToken);
+            await CalculateCandidates(request, cancellationToken);
+        
+        var options = await GetOptionsAsync(request, cancellationToken);
 
-        var query = repository.Query
-            .Include(x => x.PriceOffer)
-            .Where(x => x.PriceOffer.ProductId == request.ProductId)
-            .Where(x => x.PriceOffer.OfferForStorage == request.StorageName)
-            .Where(x => x.PriceOffer.ExpiresAt > DateTime.UtcNow);
-
-        if (request.Sources.Any())
-            query = query.Where(x => request.Sources.Contains(x.PriceOffer.Source));
-            
-        var options = await query
-            .SortBy(request.SortBy)
-            .ApplyPagination(request.Pagination)
-            .ToListAsync(cancellationToken);
+        if (options.Count == 0)
+            await CalculateCandidates(request, cancellationToken);
         
         var result = new List<PriceOptionDto>();
 
@@ -92,5 +81,33 @@ public class GetPriceOptionsForProductHandler(
         }
         
         return new GetPriceOptionsForProductResult(result);
+    }
+
+    private async Task CalculateCandidates(
+        GetPriceOptionsForProductQuery request,
+        CancellationToken cancellationToken)
+    {
+        await sender.Send(
+            new CalculateCandidatesCommand(request.ProductId, request.StorageName), 
+            cancellationToken);
+    }
+
+    private async Task<List<ProductPriceOption>> GetOptionsAsync(
+        GetPriceOptionsForProductQuery request,
+        CancellationToken cancellationToken)
+    {
+        var query = repository.Query
+            .Include(x => x.PriceOffer)
+            .Where(x => x.PriceOffer.ProductId == request.ProductId)
+            .Where(x => x.PriceOffer.OfferForStorage == request.StorageName)
+            .Where(x => x.PriceOffer.ExpiresAt > DateTime.UtcNow);
+
+        if (request.Sources.Any())
+            query = query.Where(x => request.Sources.Contains(x.PriceOffer.Source));
+            
+        return await query
+            .SortBy(request.SortBy)
+            .ApplyPagination(request.Pagination)
+            .ToListAsync(cancellationToken);
     }
 }
