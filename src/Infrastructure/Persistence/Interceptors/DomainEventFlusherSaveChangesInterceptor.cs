@@ -50,7 +50,6 @@ public class DomainEventFlusherSaveChangesInterceptor(
                     break;
 
                 case EntityState.Detached:
-                case EntityState.Unchanged: //no changes -> no events. Нету ручек - нет конфетки
                     continue;
             }
             

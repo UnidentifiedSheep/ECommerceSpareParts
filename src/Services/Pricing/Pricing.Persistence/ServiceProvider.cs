@@ -8,6 +8,7 @@ using Persistence;
 using Persistence.Common;
 using Persistence.DbValidator;
 using Persistence.Extensions;
+using Persistence.Interceptors;
 using Pricing.Application.Interfaces.Persistence;
 using Pricing.Persistence.Contexts;
 using Pricing.Persistence.Repositories;
@@ -18,10 +19,14 @@ public static class ServiceProvider
 {
     public static IServiceCollection AddPersistenceLayer(this IServiceCollection collection)
     {
+        collection.AddScoped<AuditableEntitySaveChangesInterceptor>();
+        collection.AddScoped<DomainEventFlusherSaveChangesInterceptor>();
         collection.AddDbContext<DContext>((sp, options) =>
         {
             var dbOptions = sp.GetRequiredService<IOptions<DatabaseOptions>>().Value;
             options.UseNpgsql(dbOptions.ConnectionString);
+            options.AddInterceptors(sp.GetRequiredService<AuditableEntitySaveChangesInterceptor>());
+            options.AddInterceptors(sp.GetRequiredService<DomainEventFlusherSaveChangesInterceptor>());
         });
 
         collection.AddScoped(typeof(IRepository<,>), typeof(BasicEfRepository<,>));

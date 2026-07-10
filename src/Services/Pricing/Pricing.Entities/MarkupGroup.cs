@@ -84,6 +84,7 @@ public class MarkupGroup : AuditableEntity<MarkupGroup, int>
 
         _markupRanges.Clear();
         _markupRanges.AddRange(ranges);
+        AddDomainEvent(new MarkupGroupUpdatedDomainEvent { Id = Id });
     }
 
     public override void OnUpdated() => AddDomainEvent(new MarkupGroupUpdatedDomainEvent { Id = Id });
