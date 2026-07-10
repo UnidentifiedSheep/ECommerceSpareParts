@@ -2,8 +2,10 @@ using System.Reflection;
 using Api.Common;
 using Api.Common.Extensions;
 using Api.Common.HostedServices;
+using Api.Common.HostedServices.Startup;
 using Application.Common.Backplane;
 using Application.Common.Consumer;
+using Application.Common.Interfaces;
 using Cache;
 using Contracts.Auth;
 using Contracts.Currency;
@@ -76,9 +78,10 @@ builder.Services
     .AddHostedService<EmailWorkHostedService>()
     .AddLrtHostedServices();
 
-var host = builder.Build();
+builder.Services.AddScoped<IStartupTask, LoadLocalesStartupTask>();
+builder.Services.AddHostedService<StartupTaskHostedService>();
 
-await host.LoadLocalesFromJson(Assembly.GetExecutingAssembly().GetDefaultLocalizationPath());
+var host = builder.Build();
 
 await host.RunAsync();
 

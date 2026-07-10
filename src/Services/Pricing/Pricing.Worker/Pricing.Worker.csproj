@@ -1,0 +1,41 @@
+<Project Sdk="Microsoft.NET.Sdk.Worker">
+
+    <PropertyGroup>
+        <TargetFramework>net10.0</TargetFramework>
+        <Nullable>enable</Nullable>
+        <ImplicitUsings>enable</ImplicitUsings>
+        <UserSecretsId>dotnet-Pricing.Worker-b5890a65-ba41-430c-ba77-6780dbf8cbc2</UserSecretsId>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <PackageReference Include="Microsoft.Extensions.Hosting" Version="10.0.9"/>
+    </ItemGroup>
+
+    <ItemGroup>
+        <Content Include="..\Pricing.Entities\Localization\**\*">
+            <Link>Localization\%(RecursiveDir)%(Filename)%(Extension)</Link>
+            <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+            <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+        </Content>
+        <Content Include="..\..\..\..\configs\**\*">
+            <Link>configs\%(RecursiveDir)%(Filename)%(Extension)</Link>
+            <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+            <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+        </Content>
+        <Content Include="..\..\Application.Common\Localization\**\*">
+            <Link>Localization\%(RecursiveDir)%(Filename)%(Extension)</Link>
+            <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+            <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+        </Content>
+    </ItemGroup>
+
+    <ItemGroup>
+      <ProjectReference Include="..\..\..\Infrastructure\Integrations\Internal\Internal.Integration.Di\Internal.Integration.Di.csproj" />
+      <ProjectReference Include="..\..\..\Infrastructure\Integrations\Suppliers\Integrations.Supplier.DI\Integrations.Supplier.DI.csproj" />
+      <ProjectReference Include="..\..\Api.Common\Api.Common.csproj" />
+      <ProjectReference Include="..\Pricing.Api\Pricing.Api.csproj" />
+      <ProjectReference Include="..\Pricing.Application\Pricing.Application.csproj" />
+      <ProjectReference Include="..\Pricing.Cache\Pricing.Cache.csproj" />
+      <ProjectReference Include="..\Pricing.Persistence\Pricing.Persistence.csproj" />
+    </ItemGroup>
+</Project>

@@ -1,19 +1,17 @@
-using System.Reflection;
 using Abstractions.Interfaces.Persistence;
 using Api.Common.Extensions;
-using Application.Common.Interfaces.Events;
 using Attributes;
 using Localization.Domain.Extensions;
-using Main.Persistence.Context;
 using MediatR;
 using Microsoft.Extensions.DependencyInjection;
 using Persistence.Extensions;
+using Pricing.Persistence.Contexts;
 using StackExchange.Redis;
 using Tests.Abstractions.Test;
 using Tests.Extensions;
 using Tests.TestContainers.Combined;
 
-namespace Tests;
+namespace Pricing.Integration.Tests;
 
 [Collection("Combined collection")]
 public abstract class IntegrationTest(CombinedContainerFixture fixture)
@@ -29,6 +27,7 @@ public abstract class IntegrationTest(CombinedContainerFixture fixture)
                 PgsqlConnectionString = fixture.PostgresConnectionString,
                 CacheConnectionString = fixture.RedisConnectionString
             });
+
         Mediator = Scope.ServiceProvider.GetRequiredService<IMediator>();
 
         await ResetCache();
@@ -43,8 +42,6 @@ public abstract class IntegrationTest(CombinedContainerFixture fixture)
         await unitOfWork.ExecuteWithTransaction(
             new TransactionalAttribute(),
             () => base.InitializeBasicContexts());
-        
-        Scope.ServiceProvider.GetRequiredService<IDomainEventScope>().Flush();
     }
 
     public override async Task DisposeAsync()

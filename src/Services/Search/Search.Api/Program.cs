@@ -1,6 +1,9 @@
 using System.Reflection;
 using Api.Common;
 using Api.Common.Extensions;
+using Api.Common.HostedServices;
+using Api.Common.HostedServices.Startup;
+using Application.Common.Interfaces;
 using Carter;
 using Internal.Integration.Di;
 using Localization.Domain.Extensions;
@@ -67,10 +70,10 @@ builder.Services.AddCarter(
     new DependencyContextAssemblyCatalog(endpointAssembly),
     c => c.WithEmptyValidators());
 
-var app = builder.Build();
+builder.Services.AddScoped<IStartupTask, LoadLocalesStartupTask>();
+builder.Services.AddHostedService<StartupTaskHostedService>();
 
-await app.LoadLocalesFromJson(
-    Assembly.GetExecutingAssembly().GetDefaultLocalizationPath());
+var app = builder.Build();
 
 app.UseCommonApiPipeline();
 

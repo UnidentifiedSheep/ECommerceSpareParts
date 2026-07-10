@@ -9,7 +9,6 @@ using Application.Common.Consumer;
 using Application.Common.Interfaces;
 using Application.Common.Services.Supplier;
 using Cache;
-using Carter;
 using Contracts.Analytics;
 using Contracts.Job;
 using Contracts.Settings;
@@ -17,12 +16,9 @@ using Integrations.Supplier.DI;
 using Internal.Integration.Di;
 using Localization.Domain.Extensions;
 using MassTransit;
-using OpenTelemetry.Metrics;
-using Pricing.Api;
 using Pricing.Api.Startup;
 using Pricing.Application;
 using Pricing.Application.Consumers;
-using Pricing.Application.Interfaces.Markup;
 using Pricing.Cache;
 using Pricing.Persistence;
 using Pricing.Persistence.Contexts;
@@ -30,22 +26,44 @@ using RabbitMq.Extensions;
 using Security;
 using ZiggyCreatures.Caching.Fusion.Backplane;
 
-var builder = WebApplication.CreateBuilder(args);
+var builder = Host.CreateApplicationBuilder(args);
 
 var env = builder.AddServiceConfiguration("pricing");
 
-builder.Host.AddLokiLogger(
-    builder.Configuration,
-    "pricing.api",
-    env);
-
-builder.Services.AddMessageBrokerOptions()
+builder.Services
+    .AddMessageBrokerOptions()
     .AddHeaderSecretsOptions()
     .AddRedisOptions()
     .AddDatabaseOptions()
+    .AddLrtOptions()
+    .AddScheduledJobEnqueuerOptions()
+    .AddSystemOptions()
     .AddSecretEncryptionOptions();
 
-builder.Services.AddCommonApiInfrastructure();
+builder.Services.AddCommonWorkerInfrastructure();
+
+builder.AddLokiLogger(
+    builder.Configuration,
+    "pricing.worker",
+    env);
+
+builder.Services.AddLocalization(builder.Configuration);
+
+builder.Services
+    .AddPersistenceLayer()
+    .AddApplicationCache()
+    .AddCacheLayer("pricing")
+    .AddIntegrationClients()
+    .AddApplicationLayer(builder.Configuration)
+    .AddCommonLayer()
+    .AddWorkerSecurityLayer()
+    .AddFavoriteIntegration<FavoriteCacheableConnectionProvider, FavoriteSettingsProvider>()
+    .AddJsonSigner()
+    .AddSecretEncryptor();
+
+builder.Services.AddScoped<IStartupTask, MarkupInitializationStartupTask>();
+builder.Services.AddScoped<IStartupTask, LoadLocalesStartupTask>();
+builder.Services.AddHostedService<StartupTaskHostedService>();
 
 var uniqQueueName = $"queue-of-pricing-{Environment.MachineName}";
 
@@ -54,6 +72,7 @@ builder.Services.AddMassTransit(x =>
     x.AddConsumers(Assembly.GetAssembly(typeof(Global)));
     x.AddConsumer<BackplaneConsumer>();
     x.AddConsumer<SettingUpdatedConsumer>();
+    x.AddConsumer<ProductPriceOffersUpdatedConsumer, ProductPriceOffersUpdatedDefinition>();
 
     x.AddEntityFrameworkOutbox<DContext>(o =>
     {
@@ -93,48 +112,10 @@ builder.Services.AddMassTransit(x =>
 
                 ep.ConfigureConsumer<CurrencyRatesChangedConsumer>(context);
                 ep.ConfigureConsumer<MarkupAnalyzedConsumer>(context);
+                ep.ConfigureConsumer<ProductPriceOffersUpdatedConsumer>(context);
             });
     });
 });
 
-builder.Services
-    .AddEComAuth(builder.Configuration)
-    .AddPersistenceLayer()
-    .AddApplicationCache()
-    .AddFavoriteIntegration<FavoriteCacheableConnectionProvider, FavoriteSettingsProvider>()
-    .AddCacheLayer("pricing")
-    .AddJsonSigner()
-    .AddSecretEncryptor()
-    .AddMinimalSecurityLayer()
-    .AddIntegrationClients()
-    .AddCommonLayer()
-    .AddApplicationLayer(builder.Configuration)
-    .AddLocalization(builder.Configuration);
-
-builder.Services.AddScoped<IStartupTask, MarkupInitializationStartupTask>();
-builder.Services.AddScoped<IStartupTask, LoadLocalesStartupTask>();
-builder.Services.AddHostedService<StartupTaskHostedService>();
-
-builder.Services.AddOpenTelemetry()
-    .WithMetrics(metrics =>
-    {
-        metrics
-            .AddAspNetCoreInstrumentation()
-            .AddProcessInstrumentation()
-            .AddRuntimeInstrumentation()
-            .AddPrometheusExporter();
-    });
-
-var endpointAssembly = typeof(Program).Assembly;
-builder.Services.AddCarter(
-    new DependencyContextAssemblyCatalog(endpointAssembly),
-    c => c.WithEmptyValidators());
-
-
-var app = builder.Build();
-
-app.UseCommonApiPipeline();
-
-app.UseOpenTelemetryPrometheusScrapingEndpoint();
-
-await app.RunAsync();
+var host = builder.Build();
+host.Run();

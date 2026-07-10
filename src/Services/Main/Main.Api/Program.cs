@@ -4,9 +4,12 @@ using Api.Common;
 using Api.Common.Consumers;
 using Api.Common.EndPoints;
 using Api.Common.Extensions;
+using Api.Common.HostedServices;
+using Api.Common.HostedServices.Startup;
 using Api.Common.Hubs;
 using Application.Common.Backplane;
 using Application.Common.Consumer;
+using Application.Common.Interfaces;
 using Cache;
 using Carter;
 using Contracts.Auth;
@@ -147,14 +150,14 @@ builder.Services.AddCarter(
         typeof(JobEndPoints).Assembly),
     c => c.WithEmptyValidators());
 
+builder.Services.AddScoped<IStartupTask, LoadLocalesStartupTask>();
+builder.Services.AddHostedService<StartupTaskHostedService>();
+
 var app = builder.Build();
 
 SortByConfig.Configure();
 
 app.UseCommonApiPipeline();
-
-var localesPath = Assembly.GetExecutingAssembly().GetDefaultLocalizationPath();
-await app.LoadLocalesFromJson(localesPath);
 
 app.UseOpenTelemetryPrometheusScrapingEndpoint();
 app.MapHub<JobHub>("/hubs/jobs");

@@ -1,6 +1,6 @@
 ﻿using System.Reflection;
 
-namespace Api.Common.Extensions;
+namespace Localization.Domain.Extensions;
 
 public static class AssemblyExtensions
 {
