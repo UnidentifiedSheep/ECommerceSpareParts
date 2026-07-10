@@ -74,6 +74,24 @@
       - redis
       - rabbitmq
     restart: unless-stopped
+    
+  pricing-worker:
+    image: pricing-worker
+    build:
+      context: .
+      dockerfile: src/Services/Pricing/Pricing.Worker/Dockerfile
+    volumes:
+      - ${CONFIGS_PATH:-./certs}:/app/configs:ro
+    environment:
+      - DOTNET_ENVIRONMENT=${DOTNET_ENVIRONMENT:-Development}
+      - ASPNETCORE_ENVIRONMENT=${ASPNETCORE_ENVIRONMENT:-Development}
+    networks:
+      - backend-network
+    depends_on:
+      - pgql
+      - redis
+      - rabbitmq
+    restart: unless-stopped
 
   gateway:
     image: gateway

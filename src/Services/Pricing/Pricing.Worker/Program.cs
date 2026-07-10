@@ -65,7 +65,7 @@ builder.Services.AddScoped<IStartupTask, MarkupInitializationStartupTask>();
 builder.Services.AddScoped<IStartupTask, LoadLocalesStartupTask>();
 builder.Services.AddHostedService<StartupTaskHostedService>();
 
-var uniqQueueName = $"queue-of-pricing-{Environment.MachineName}";
+var uniqQueueName = $"queue-of-pricing-worker-{Environment.MachineName}";
 
 builder.Services.AddMassTransit(x =>
 {
@@ -105,7 +105,7 @@ builder.Services.AddMassTransit(x =>
             });
 
         cfg.ReceiveEndpoint(
-            "pricing-queue",
+            "pricing-worker-queue",
             ep =>
             {
                 ep.Durable = true;

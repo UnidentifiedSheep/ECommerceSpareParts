@@ -5,6 +5,7 @@
         <Nullable>enable</Nullable>
         <ImplicitUsings>enable</ImplicitUsings>
         <UserSecretsId>dotnet-Pricing.Worker-b5890a65-ba41-430c-ba77-6780dbf8cbc2</UserSecretsId>
+        <DockerDefaultTargetOS>Linux</DockerDefaultTargetOS>
     </PropertyGroup>
 
     <ItemGroup>
@@ -12,6 +13,9 @@
     </ItemGroup>
 
     <ItemGroup>
+        <Content Include="..\..\..\..\.dockerignore">
+          <Link>.dockerignore</Link>
+        </Content>
         <Content Include="..\Pricing.Entities\Localization\**\*">
             <Link>Localization\%(RecursiveDir)%(Filename)%(Extension)</Link>
             <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>

@@ -5,6 +5,7 @@ APP_SERVICES=(
   gateway
   main-api
   pricing-api
+  pricing-worker
   search-api
   analytics-api
   analytics-worker
