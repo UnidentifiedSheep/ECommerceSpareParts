@@ -27,7 +27,7 @@ public class PriceOfferRefreshStateRepository(
              )
              VALUES (
                  {model.ProductId},
-                 {model.Source},
+                 {model.Source.ToString()},
                  {model.StorageName},
                  {model.LastOffersUpdatedAt},
                  {model.LastOffersCount}

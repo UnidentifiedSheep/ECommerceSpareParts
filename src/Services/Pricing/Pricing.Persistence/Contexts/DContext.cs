@@ -27,6 +27,10 @@ public partial class DContext : DbContext
 
     public virtual DbSet<ProductPriceOption> ProductPriceOptions { get; set; }
 
+    public virtual DbSet<PriceRecalculationRequest> PriceRecalculationRequests { get; set; }
+
+    public virtual DbSet<PriceOfferRefreshState> PriceOfferRefreshStates { get; set; }
+
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         modelBuilder.AddOutboxMessageEntity();

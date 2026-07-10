@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 using Pricing.Persistence.Contexts;
@@ -11,9 +12,11 @@ using Pricing.Persistence.Contexts;
 namespace Pricing.Migrator.Migrations
 {
     [DbContext(typeof(DContext))]
-    partial class DContextModelSnapshot : ModelSnapshot
+    [Migration("20260710085003_Conf")]
+    partial class Conf
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -469,10 +472,6 @@ namespace Pricing.Migrator.Migrations
                         .HasMaxLength(128)
                         .HasColumnType("character varying(128)")
                         .HasColumnName("storage_name");
-
-                    b.Property<DateTime>("UpdatedAt")
-                        .HasColumnType("timestamp with time zone")
-                        .HasColumnName("updated_at");
 
                     b.HasKey("ProductId", "StorageName")
                         .HasName("price_recalculation_request_pk");
