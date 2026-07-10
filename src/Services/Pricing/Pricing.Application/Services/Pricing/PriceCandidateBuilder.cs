@@ -19,6 +19,8 @@ public sealed class PriceCandidateBuilder() : IPriceCandidateBuilder
 
         foreach (var offer in offers)
         {
+            if (offer.AvailableQuantity <= 0)
+                continue;
             var sourceType = offer.Source.GetSourceType();
             result.Add(new PriceCandidate(
                 PriceOfferId: offer.Id,

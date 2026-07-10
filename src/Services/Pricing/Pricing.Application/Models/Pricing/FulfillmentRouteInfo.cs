@@ -28,8 +28,12 @@ public sealed record FulfillmentRouteInfo(
             SourceStorageName: offer.OfferForStorage,
             TargetStorageName: offer.OfferForStorage,
             LogisticsCostInBaseCurrency: 0,
-            DeliveryTime: offer.DeliveryDate - offer.UpdatedAt,
-            GuaranteedDeliveryTime: offer.GuaranteedDeliveryDate - offer.UpdatedAt,
+            DeliveryTime: offer.DeliveryDate == null 
+                ? TimeSpan.Zero 
+                : offer.DeliveryDate.Value - offer.UpdatedAt,
+            GuaranteedDeliveryTime: offer.GuaranteedDeliveryDate == null
+                ? TimeSpan.Zero 
+                : offer.GuaranteedDeliveryDate.Value - offer.UpdatedAt,
             DeliveryProbability: offer.DeliveryProbability);
     }
 }

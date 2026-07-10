@@ -66,10 +66,11 @@ public class GetPriceOptionsForProductHandler(
                     AvailableQuantity = option.PriceOffer.AvailableQuantity,
                     CurrencyId = option.PriceOffer.CurrencyId,
                     DaysToRefund = option.PriceOffer.DaysToRefund,
-                    DeliveryDate = option.PriceOffer.DeliveryDate,
                     DeliveryProbability = option.PriceOffer.DeliveryProbability,
                     ExpiresAt = option.PriceOffer.ExpiresAt,
+                    DeliveryDate = option.PriceOffer.DeliveryDate,
                     GuaranteedDeliveryDate = option.PriceOffer.GuaranteedDeliveryDate,
+                    OrderTill = option.PriceOffer.OrderTill,
                     Id = option.PriceOffer.Id,
                     MinimumPurchaseQuantity = option.PriceOffer.MinimumPurchaseQuantity,
                     OfferForStorage = option.PriceOffer.OfferForStorage,
@@ -77,7 +78,6 @@ public class GetPriceOptionsForProductHandler(
                     PurchasePrice = option.PriceOffer.PurchasePrice,
                     Source = option.PriceOffer.Source,
                     QuantityCoefficient = option.PriceOffer.QuantityCoefficient,
-                    OrderTill = option.PriceOffer.OrderTill
                 }
             });
         }

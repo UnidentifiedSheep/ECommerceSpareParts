@@ -37,16 +37,16 @@ public record PriceOfferDto
     public required int DaysToRefund { get; init; }
 
     [JsonPropertyName("deliveryDate")]
-    public required DateTime DeliveryDate { get; init; }
+    public required DateTime? DeliveryDate { get; init; }
     
     [JsonPropertyName("guaranteedDeliveryDate")]
-    public required DateTime GuaranteedDeliveryDate { get; init; }
+    public required DateTime? GuaranteedDeliveryDate { get; init; }
     
     [JsonPropertyName("deliveryProbability")]
     public required int DeliveryProbability { get; init; }
     
     [JsonPropertyName("orderTill")]
-    public required DateTime OrderTill { get; init; }
+    public required DateTime? OrderTill { get; init; }
     
     [JsonPropertyName("expiresAt")]
     public required DateTime ExpiresAt { get; init; }

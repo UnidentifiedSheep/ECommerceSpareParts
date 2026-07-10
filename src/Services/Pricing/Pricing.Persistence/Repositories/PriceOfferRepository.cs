@@ -39,7 +39,6 @@ public class PriceOfferRepository(
 
                 PropertiesToIncludeOnUpdate =
                 [
-                    nameof(PriceOffer.ProductId),
                     nameof(PriceOffer.CurrencyId),
                     nameof(PriceOffer.PurchasePrice),
                     nameof(PriceOffer.AvailableQuantity),
@@ -51,9 +50,15 @@ public class PriceOfferRepository(
                     nameof(PriceOffer.DeliveryProbability),
                     nameof(PriceOffer.OrderTill),
                     nameof(PriceOffer.ExpiresAt),
+                    nameof(PriceOffer.SourceOccurredAt),
                     nameof(PriceOffer.UpdatedAt),
                     nameof(PriceOffer.WhoUpdated)
-                ]
+                ],
+                
+                OnConflictUpdateWhereSql = (existingTable, insertedTable) =>
+                    $"{insertedTable}.source_occurred_at IS NULL " +
+                    $"OR {existingTable}.source_occurred_at IS NULL " +
+                    $"OR {insertedTable}.source_occurred_at > {existingTable}.source_occurred_at"
             },
             cancellationToken: cancellationToken);
     }

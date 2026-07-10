@@ -71,6 +71,9 @@ public class PriceOfferConfiguration : IEntityTypeConfiguration<PriceOffer>
 
         builder.Property(e => e.DeliveryDate)
             .HasColumnName("delivery_date");
+        
+        builder.Property(e => e.SourceOccurredAt)
+            .HasColumnName("source_occurred_at");
 
         builder.Property(e => e.GuaranteedDeliveryDate)
             .HasColumnName("guaranteed_delivery_date");

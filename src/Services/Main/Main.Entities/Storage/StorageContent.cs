@@ -132,7 +132,14 @@ public class StorageContent : AuditableEntity<StorageContent, int>, ILinqEntity<
             BuyPrice,
             StorageMovementType.StorageContentDeletion,
             -Count));
+        AddDomainEvent(new StorageContentUpdatedDomainEvent(this, true));
     }
+
+    public override void OnUpdated()
+        => AddDomainEvent(new StorageContentUpdatedDomainEvent(this, false));
+
+    public override void OnCreated() 
+        => AddDomainEvent(new StorageContentUpdatedDomainEvent(this, false));
 
     public void SetCurrencyId(int currencyId) { CurrencyId = currencyId; }
 
