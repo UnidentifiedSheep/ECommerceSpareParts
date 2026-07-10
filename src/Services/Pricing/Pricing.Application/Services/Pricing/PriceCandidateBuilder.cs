@@ -3,6 +3,7 @@ using Pricing.Application.Interfaces.Pricing;
 using Pricing.Application.Models.Pricing;
 using Pricing.Application.Models.Pricing.PriceCandidates;
 using Pricing.Entities;
+using Pricing.Entities.Offers;
 using Pricing.Enums;
 
 namespace Pricing.Application.Services.Pricing;

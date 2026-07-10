@@ -1,9 +1,9 @@
 ﻿using Domain.Interfaces;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
-using Persistence.BaseTableConfigurations;
+using Persistence.Common.BaseTableConfigurations;
 
-namespace Persistence.Extensions;
+namespace Persistence.Common;
 
 public static class ModelBuilderExtensions
 {
@@ -11,6 +11,7 @@ public static class ModelBuilderExtensions
     {
         return modelBuilder
             .ApplyConfiguration(new JobConfiguration())
+            .ApplyConfiguration(new UniqJobConfiguration())
             .ApplyConfiguration(new JobScheduleConfiguration())
             .ApplyConfiguration(new JobScheduleRunConfiguration());
     }

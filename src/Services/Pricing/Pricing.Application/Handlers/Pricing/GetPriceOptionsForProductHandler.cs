@@ -7,6 +7,7 @@ using MediatR;
 using Microsoft.EntityFrameworkCore;
 using Pricing.Application.Dtos.Price;
 using Pricing.Entities;
+using Pricing.Entities.Offers;
 using Pricing.Enums;
 
 namespace Pricing.Application.Handlers.Pricing;

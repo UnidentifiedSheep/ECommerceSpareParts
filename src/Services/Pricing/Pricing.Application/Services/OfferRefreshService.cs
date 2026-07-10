@@ -10,6 +10,7 @@ using Pricing.Application.Extensions;
 using Pricing.Application.Interfaces.Persistence;
 using Pricing.Application.Interfaces.Pricing;
 using Pricing.Entities;
+using Pricing.Entities.Offers;
 using Pricing.Enums;
 
 namespace Pricing.Application.Services;
@@ -20,7 +21,7 @@ public class OfferRefreshService(
     IPriceOfferRepository offerRepository,
     IIntegrationEventScope integrationEventScope,
     IPriceOfferRefreshStateRepository stateRepository,
-    IUnitOfWork unitOfWork,
+    ISupplierOfferRequestMarkerService markerService,
     ILogger<OfferRefreshService> logger) : IOfferRefreshService
 {
     public async Task<IReadOnlyList<PriceOffer>> RefreshOffersAsync(
@@ -175,6 +176,7 @@ public class OfferRefreshService(
         var events = new List<ProductPriceOffersUpdatedEvent>();
         var offers = new List<PriceOffer>();
         var notFoundCurrencies = new HashSet<string>();
+        var refreshed = new HashSet<int>();
 
         foreach (var (productId, positions) in supplierPositions)
         {
@@ -191,6 +193,7 @@ public class OfferRefreshService(
 
             if (!canRefresh) continue;
 
+            refreshed.Add(productId);
             events.Add(new ProductPriceOffersUpdatedEvent
             {
                 ProductId = productId,
@@ -223,6 +226,12 @@ public class OfferRefreshService(
 
         if (offers.Count != 0)
             await offerRepository.UpsertOffersAsync(offers, token);
+        
+        await markerService.MarkAsOkAsync(
+            refreshed, 
+            supplier, 
+            storageName, 
+            token);
 
         integrationEventScope.AddRange(events);
 

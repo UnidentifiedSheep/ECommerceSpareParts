@@ -1,6 +1,7 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using Pricing.Entities;
+using Pricing.Entities.Offers;
 
 namespace Pricing.Persistence.Contexts.Configurations;
 

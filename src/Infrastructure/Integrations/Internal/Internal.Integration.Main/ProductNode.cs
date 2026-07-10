@@ -70,6 +70,12 @@ internal sealed class ProductNode(
             HttpMethod.Post,
             "/internal/products/resolve-supplier-references",
             cancellationToken);
+        
+        request.Content = JsonContent.Create(
+            new ResolveSupplierProductReferencesRequest
+            {
+                References = references
+            });
 
         using var response = await httpClient.SendAsync(
             request,

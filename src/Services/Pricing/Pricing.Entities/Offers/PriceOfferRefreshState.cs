@@ -2,10 +2,9 @@ using System.Linq.Expressions;
 using Domain;
 using Domain.Extensions;
 using Domain.Interfaces;
-using Enums;
 using Pricing.Enums;
 
-namespace Pricing.Entities;
+namespace Pricing.Entities.Offers;
 
 public class PriceOfferRefreshState 
     : Entity<PriceOfferRefreshState, PriceOfferRefreshStateKey>, 

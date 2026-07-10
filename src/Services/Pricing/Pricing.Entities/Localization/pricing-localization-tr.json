@@ -25,6 +25,12 @@
     "pricing.setting.delivery.day.penalty.name": "Teslimat günü cezası",
     "pricing.setting.delivery.day.penalty.description": "Tedarikçi teklifleri puanlanırken her teslimat günü için eklenen maliyet cezası.",
     "pricing.setting.uniq.product.additional.markup.name": "Benzersiz ürün ek kâr marjı",
-    "pricing.setting.uniq.product.additional.markup.description": "Karşılaştırılabilir piyasa teklifi olmayan ürünlere uygulanan ek kâr marjı."
+    "pricing.setting.uniq.product.additional.markup.description": "Karşılaştırılabilir piyasa teklifi olmayan ürünlere uygulanan ek kâr marjı.",
+    "lrt.price.candidate.calculation.name": "Fiyat adayı hesaplama",
+    "lrt.price.candidate.calculation.description": "Seçilen ürün ve depo için fiyat adaylarını hesaplar ve kaydeder.",
+    "lrt.price.candidate.calculation.product.id.name": "Ürün",
+    "lrt.price.candidate.calculation.product.id.description": "Fiyat adayları hesaplanacak ürün.",
+    "lrt.price.candidate.calculation.storage.name.name": "Depo",
+    "lrt.price.candidate.calculation.storage.name.description": "Fiyat adayları hesaplanacak depo."
   }
 }

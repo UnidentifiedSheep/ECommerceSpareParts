@@ -9,6 +9,7 @@
 
     <ItemGroup>
         <ProjectReference Include="..\..\..\Infrastructure\Persistence\Persistence.csproj"/>
+        <ProjectReference Include="..\..\Persistence.Common\Persistence.Common.csproj" />
         <ProjectReference Include="..\Analytics.Abstractions\Analytics.Abstractions.csproj"/>
         <ProjectReference Include="..\Analytics.Application\Analytics.Application.csproj"/>
         <ProjectReference Include="..\Analytics.Entities\Analytics.Entities.csproj"/>

@@ -21,7 +21,7 @@ public class SupplierProductsRequestedConsumer(
             .ToList();
 
         await sender.Send(
-            new RefreshOffersCommand(context.Message.OccurredAt, supplier, storageName, products),
+            new ApplySupplierProductsCommand(context.Message.OccurredAt, supplier, storageName, products),
             context.CancellationToken);
     }
 }

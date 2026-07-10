@@ -91,14 +91,19 @@ namespace Main.Migrator.Migrations
                         .HasColumnType("uuid")
                         .HasColumnName("who_updated");
 
+                    b.Property<string>("job_type")
+                        .IsRequired()
+                        .HasMaxLength(8)
+                        .HasColumnType("character varying(8)");
+
                     b.HasKey("Id")
                         .HasName("jobs_pk");
 
                     b.HasIndex("WhoCreated")
-                        .HasDatabaseName("domain.commonentities.job_who_created_idx");
+                        .HasDatabaseName("domain.commonentities.uniqjob_who_created_idx");
 
                     b.HasIndex("WhoUpdated")
-                        .HasDatabaseName("domain.commonentities.job_who_updated_idx");
+                        .HasDatabaseName("domain.commonentities.uniqjob_who_updated_idx");
 
                     b.HasIndex(new[] { "LockedAt" }, "jobs_locked_at_idx");
 
@@ -107,6 +112,10 @@ namespace Main.Migrator.Migrations
                     b.HasIndex(new[] { "SystemName" }, "jobs_system_name_idx");
 
                     b.ToTable("jobs", "job");
+
+                    b.HasDiscriminator<string>("job_type").HasValue("job");
+
+                    b.UseTphMappingStrategy();
                 });
 
             modelBuilder.Entity("Domain.CommonEntities.JobSchedule", b =>
@@ -2996,6 +3005,23 @@ namespace Main.Migrator.Migrations
                     b.HasIndex("Created");
 
                     b.ToTable("OutboxState", "msg");
+                });
+
+            modelBuilder.Entity("Domain.CommonEntities.UniqJob", b =>
+                {
+                    b.HasBaseType("Domain.CommonEntities.Job");
+
+                    b.Property<string>("NaturalKey")
+                        .IsRequired()
+                        .HasMaxLength(256)
+                        .HasColumnType("character varying(256)")
+                        .HasColumnName("natural_key");
+
+                    b.HasIndex(new[] { "SystemName", "NaturalKey" }, "jobs_pending_system_name_natural_key_uq")
+                        .IsUnique()
+                        .HasFilter("status = 'Pending'");
+
+                    b.HasDiscriminator().HasValue("uniq_job");
                 });
 
             modelBuilder.Entity("Main.Entities.Settings.CurrencySetting", b =>

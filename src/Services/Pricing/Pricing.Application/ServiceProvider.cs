@@ -11,6 +11,7 @@ using Pricing.Application.Interfaces.Markup;
 using Pricing.Application.Interfaces.Pricing;
 using Pricing.Application.Interfaces.Pricing.PriceApplier;
 using Pricing.Application.Interfaces.Pricing.PricePolicy;
+using Pricing.Application.Lrts.PriceCandidateCalculationLrt;
 using Pricing.Application.Services;
 using Pricing.Application.Services.Markup;
 using Pricing.Application.Services.Pricing;
@@ -33,6 +34,7 @@ public static class ServiceProvider
                 ServicesDefinitions.Pricing,
                 configuration,
                 typeof(Global).Assembly)
+            .AddLrtLayer(typeof(PriceCandidateCalculationLrt).Assembly)
             .AddNamedObjects()
             .AddFusionCache()
             .WithRegisteredDistributedCache()
@@ -48,6 +50,7 @@ public static class ServiceProvider
         collection.AddScoped<IMarkupCalculator, MarkupCalculator>();
         collection.AddScoped<IMarkupInitializer, MarkupInitializer>();
 
+        collection.AddScoped<ISupplierOfferRequestMarkerService, SupplierOfferRequestMarkerService>();
         collection.AddScoped<ISupplierOfferExtractorService, SupplierOfferExtractorService>();
         collection.AddScoped<ISupplierOfferConverterService, SupplierOfferConverterService>();
         collection.AddScoped<IOfferRefreshService, OfferRefreshService>();

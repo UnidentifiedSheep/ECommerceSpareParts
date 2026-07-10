@@ -133,6 +133,10 @@ public static class ServiceProvider
         services.AddScoped<
             IRequestHandler<QueueScheduledJobsCommand, Unit>,
             QueueScheduledJobsHandler>();
+        
+        services.AddScoped<
+            IRequestHandler<TryEnqueueUniqJobCommand, Unit>,
+            TryEnqueueUniqJobHandler>();
 
         services.AddScoped<
             IRequestHandler<RemoveJobScheduleCommand, Unit>,

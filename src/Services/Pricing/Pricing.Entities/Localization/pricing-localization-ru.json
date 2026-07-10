@@ -25,6 +25,12 @@
     "pricing.setting.delivery.day.penalty.name": "Штраф за день доставки",
     "pricing.setting.delivery.day.penalty.description": "Штраф стоимости, добавляемый за каждый день доставки при оценке предложений поставщиков.",
     "pricing.setting.uniq.product.additional.markup.name": "Дополнительная наценка для уникального товара",
-    "pricing.setting.uniq.product.additional.markup.description": "Дополнительная наценка, применяемая к товарам без сопоставимых рыночных предложений."
+    "pricing.setting.uniq.product.additional.markup.description": "Дополнительная наценка, применяемая к товарам без сопоставимых рыночных предложений.",
+    "lrt.price.candidate.calculation.name": "Расчет вариантов цены",
+    "lrt.price.candidate.calculation.description": "Рассчитывает и сохраняет варианты цены для выбранного товара и склада.",
+    "lrt.price.candidate.calculation.product.id.name": "Товар",
+    "lrt.price.candidate.calculation.product.id.description": "Товар, для которого нужно рассчитать варианты цены.",
+    "lrt.price.candidate.calculation.storage.name.name": "Склад",
+    "lrt.price.candidate.calculation.storage.name.description": "Склад, для которого нужно рассчитать варианты цены."
   }
 }

@@ -3,7 +3,7 @@ using Domain;
 using Domain.Extensions;
 using Domain.Interfaces;
 
-namespace Pricing.Entities;
+namespace Pricing.Entities.Offers;
 
 public class ProductPriceOption : AuditableEntity<ProductPriceOption, Guid>, ILinqEntity<ProductPriceOption, Guid>
 {

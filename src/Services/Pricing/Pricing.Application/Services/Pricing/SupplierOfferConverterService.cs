@@ -6,6 +6,7 @@ using Pricing.Application.Interfaces.Cache;
 using Pricing.Application.Interfaces.Pricing;
 using Pricing.Application.Models;
 using Pricing.Entities;
+using Pricing.Entities.Offers;
 using Pricing.Entities.Settings;
 
 namespace Pricing.Application.Services.Pricing;

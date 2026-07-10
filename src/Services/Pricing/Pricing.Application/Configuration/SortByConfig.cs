@@ -2,6 +2,7 @@ using System.Linq.Expressions;
 using Abstractions;
 using Application.Common.Extensions;
 using Pricing.Entities;
+using Pricing.Entities.Offers;
 
 namespace Pricing.Application.Configuration;
 

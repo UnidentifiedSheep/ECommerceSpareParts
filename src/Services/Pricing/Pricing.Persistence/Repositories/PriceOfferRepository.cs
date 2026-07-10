@@ -4,6 +4,7 @@ using Microsoft.EntityFrameworkCore;
 using Persistence.Repository;
 using Pricing.Application.Interfaces.Persistence;
 using Pricing.Entities;
+using Pricing.Entities.Offers;
 using Pricing.Enums;
 using Pricing.Persistence.Contexts;
 using IQueryableExtensions = Persistence.Interfaces.IQueryableExtensions;
@@ -20,17 +21,17 @@ public class PriceOfferRepository(
         IEnumerable<PriceOffer> offers,
         CancellationToken cancellationToken = default)
     {
-        var distinctOffers = offers.ToList();
-        if (distinctOffers.Count == 0) return;
+        var allOffers = offers.ToList();
 
-        distinctOffers.ForEach(x => x.Touch(userContext.UserIdOrNull));
+        allOffers.ForEach(x => x.Touch(userContext.UserIdOrNull));
         
         await Context.BulkInsertOrUpdateAsync(
-            distinctOffers,
+            allOffers,
             new BulkConfig
             {
                 UpdateByProperties =
                 [
+                    nameof(PriceOffer.ProductId),
                     nameof(PriceOffer.Source),
                     nameof(PriceOffer.SourceKey),
                     nameof(PriceOffer.OfferForStorage)

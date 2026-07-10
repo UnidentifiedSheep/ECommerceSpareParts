@@ -25,6 +25,12 @@
     "pricing.setting.delivery.day.penalty.name": "Delivery day penalty",
     "pricing.setting.delivery.day.penalty.description": "Cost penalty added per delivery day when supplier offers are scored.",
     "pricing.setting.uniq.product.additional.markup.name": "Unique product additional markup",
-    "pricing.setting.uniq.product.additional.markup.description": "Additional markup applied to products that have no comparable market offers."
+    "pricing.setting.uniq.product.additional.markup.description": "Additional markup applied to products that have no comparable market offers.",
+    "lrt.price.candidate.calculation.name": "Price candidate calculation",
+    "lrt.price.candidate.calculation.description": "Calculates and stores price candidates for the selected product and storage.",
+    "lrt.price.candidate.calculation.product.id.name": "Product",
+    "lrt.price.candidate.calculation.product.id.description": "Product for which price candidates should be calculated.",
+    "lrt.price.candidate.calculation.storage.name.name": "Storage",
+    "lrt.price.candidate.calculation.storage.name.description": "Storage for which price candidates should be calculated."
   }
 }

@@ -6,6 +6,7 @@ using Microsoft.EntityFrameworkCore;
 using Pricing.Application.Interfaces.Persistence;
 using Pricing.Application.Interfaces.Pricing;
 using Pricing.Entities;
+using Pricing.Entities.Offers;
 
 namespace Pricing.Application.Handlers.Pricing;
 

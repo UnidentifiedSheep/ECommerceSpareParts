@@ -1,6 +1,7 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using Pricing.Entities;
+using Pricing.Entities.Offers;
 
 namespace Pricing.Persistence.Contexts.Configurations;
 
@@ -15,6 +16,7 @@ public class PriceOfferConfiguration : IEntityTypeConfiguration<PriceOffer>
 
         builder.HasAlternateKey(e => new
             {
+                e.ProductId,
                 e.Source,
                 e.SourceKey,
                 e.OfferForStorage

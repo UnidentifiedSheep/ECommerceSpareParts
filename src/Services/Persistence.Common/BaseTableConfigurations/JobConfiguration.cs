@@ -2,7 +2,7 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
-namespace Persistence.BaseTableConfigurations;
+namespace Persistence.Common.BaseTableConfigurations;
 
 public class JobConfiguration : IEntityTypeConfiguration<Job>
 {
@@ -49,5 +49,10 @@ public class JobConfiguration : IEntityTypeConfiguration<Job>
         builder.HasIndex(e => e.SystemName, "jobs_system_name_idx");
         builder.HasIndex(e => new { e.Status, e.Id }, "jobs_status_id_idx");
         builder.HasIndex(e => e.LockedAt, "jobs_locked_at_idx");
+        
+        builder
+            .HasDiscriminator<string>("job_type")
+            .HasValue<Job>("job")
+            .HasValue<UniqJob>("uniq_job");
     }
 }

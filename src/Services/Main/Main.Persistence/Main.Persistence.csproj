@@ -31,6 +31,7 @@
 
     <ItemGroup>
         <ProjectReference Include="..\..\..\Infrastructure\Persistence\Persistence.csproj"/>
+        <ProjectReference Include="..\..\Persistence.Common\Persistence.Common.csproj" />
         <ProjectReference Include="..\Main.Application\Main.Application.csproj"/>
         <ProjectReference Include="..\Main.Entities\Main.Entities.csproj"/>
     </ItemGroup>

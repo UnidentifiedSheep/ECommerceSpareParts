@@ -3,9 +3,11 @@ using Domain.CommonEntities;
 using MassTransit;
 using MassTransit.EntityFrameworkCoreIntegration;
 using Microsoft.EntityFrameworkCore;
-using Persistence.BaseTableConfigurations;
+using Persistence.Common;
+using Persistence.Common.BaseTableConfigurations;
 using Persistence.Extensions;
 using Pricing.Entities;
+using Pricing.Entities.Offers;
 using Pricing.Entities.Settings;
 
 namespace Pricing.Persistence.Contexts;
@@ -27,8 +29,6 @@ public partial class DContext : DbContext
 
     public virtual DbSet<ProductPriceOption> ProductPriceOptions { get; set; }
 
-    public virtual DbSet<PriceRecalculationRequest> PriceRecalculationRequests { get; set; }
-
     public virtual DbSet<PriceOfferRefreshState> PriceOfferRefreshStates { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
@@ -42,7 +42,8 @@ public partial class DContext : DbContext
         modelBuilder.Entity<InboxState>().ToTable("InboxState", "msg");
 
         modelBuilder.ApplyConfigurationsFromAssembly(Assembly.GetAssembly(GetType())!)
-            .ApplyConfiguration(new SettingConfiguration());
+            .ApplyConfiguration(new SettingConfiguration())
+            .ApplyJobConfigurations();
 
         modelBuilder.Entity<Setting>()
             .HasDiscriminator(e => e.Key)

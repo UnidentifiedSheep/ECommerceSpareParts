@@ -3,6 +3,7 @@ using EFCore.BulkExtensions;
 using Persistence.Repository;
 using Pricing.Application.Interfaces.Persistence;
 using Pricing.Entities;
+using Pricing.Entities.Offers;
 using Pricing.Persistence.Contexts;
 using IQueryableExtensions = Persistence.Interfaces.IQueryableExtensions;
 

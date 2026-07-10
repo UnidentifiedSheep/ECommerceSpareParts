@@ -61,9 +61,10 @@ builder.Services
     .AddJsonSigner()
     .AddSecretEncryptor();
 
-builder.Services.AddScoped<IStartupTask, MarkupInitializationStartupTask>();
-builder.Services.AddScoped<IStartupTask, LoadLocalesStartupTask>();
-builder.Services.AddHostedService<StartupTaskHostedService>();
+builder.Services.AddScoped<IStartupTask, MarkupInitializationStartupTask>()
+    .AddScoped<IStartupTask, LoadLocalesStartupTask>()
+    .AddHostedService<StartupTaskHostedService>()
+    .AddLrtHostedServices();
 
 var uniqQueueName = $"queue-of-pricing-worker-{Environment.MachineName}";
 
@@ -113,6 +114,7 @@ builder.Services.AddMassTransit(x =>
                 ep.ConfigureConsumer<CurrencyRatesChangedConsumer>(context);
                 ep.ConfigureConsumer<MarkupAnalyzedConsumer>(context);
                 ep.ConfigureConsumer<ProductPriceOffersUpdatedConsumer>(context);
+                ep.ConfigureConsumer<SupplierProductsRequestedConsumer>(context);
             });
     });
 });

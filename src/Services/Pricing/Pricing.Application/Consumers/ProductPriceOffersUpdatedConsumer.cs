@@ -21,7 +21,7 @@ public class ProductPriceOffersUpdatedConsumer(
             .ToList();
 
         return sender.Send(
-            new UpsertPriceRecalculationRequestsCommand(recalculationRequests),
+            new RequestPriceCandidateRecalculationCommand(recalculationRequests),
             context.CancellationToken);
     }
 }

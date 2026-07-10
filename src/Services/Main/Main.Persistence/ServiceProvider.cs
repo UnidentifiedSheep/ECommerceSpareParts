@@ -13,6 +13,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 using Persistence;
+using Persistence.Common;
 using Persistence.DbValidator;
 using Persistence.Extensions;
 using Persistence.Interceptors;
@@ -46,6 +47,8 @@ public static class ServiceProvider
         collection.AddScoped<ICurrencyRateRepository, CurrencyRateRepository>();
         collection.AddScoped<ICurrencyRepository, CurrencyRepository>();
         collection.AddScoped<ISaleRepository, SaleRepository>();
+        collection.AddJobRepositories<DContext>();
+        
 
         collection.AddScoped(typeof(IRepository<,>), typeof(BasicEfRepository<,>));
         collection.AddScoped(typeof(IReadRepository<,>), typeof(ReadRepository<,>));

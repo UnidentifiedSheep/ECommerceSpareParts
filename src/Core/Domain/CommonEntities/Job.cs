@@ -8,12 +8,13 @@ namespace Domain.CommonEntities;
 
 public class Job : AuditableEntity<Job, Guid>, ILinqEntity<Job, Guid>
 {
-    private Job() { }
+    protected Job() { }
     protected Job(
         string systemName,
         string initialState,
         int maxAttempts)
     {
+        Id = Guid.NewGuid();
         Status = JobStatus.Pending;
         SystemName = systemName;
         Attempts = 1;

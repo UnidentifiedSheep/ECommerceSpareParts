@@ -8,6 +8,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 using Persistence;
+using Persistence.Common;
 using Persistence.DbValidator;
 using Persistence.Extensions;
 
@@ -27,6 +28,7 @@ public static class ServiceProvider
 
         collection.AddScoped(typeof(IRepository<,>), typeof(BasicEfRepository<,>));
         collection.AddScoped(typeof(IReadRepository<,>), typeof(ReadRepository<,>));
+        collection.AddJobRepositories<DContext>();
 
         collection.AddScoped<IMetricRepository, MetricRepository>();
         collection.AddScoped<ISaleFactRepository, SaleFactRepository>();

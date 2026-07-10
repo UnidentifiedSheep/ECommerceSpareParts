@@ -42,4 +42,8 @@
       <ProjectReference Include="..\Pricing.Cache\Pricing.Cache.csproj" />
       <ProjectReference Include="..\Pricing.Persistence\Pricing.Persistence.csproj" />
     </ItemGroup>
+
+    <ItemGroup>
+      <Folder Include="HostedServices\" />
+    </ItemGroup>
 </Project>

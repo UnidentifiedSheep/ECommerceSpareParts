@@ -1,9 +1,11 @@
 using System.Reflection;
 using Abstractions;
 using Api.Common;
+using Api.Common.Consumers;
 using Api.Common.Extensions;
 using Api.Common.HostedServices;
 using Api.Common.HostedServices.Startup;
+using Api.Common.Hubs;
 using Application.Common.Backplane;
 using Application.Common.Consumer;
 using Application.Common.Interfaces;
@@ -54,6 +56,7 @@ builder.Services.AddMassTransit(x =>
     x.AddConsumers(Assembly.GetAssembly(typeof(Global)));
     x.AddConsumer<BackplaneConsumer>();
     x.AddConsumer<SettingUpdatedConsumer>();
+    x.AddConsumer<JobStatusUpdatedConsumer>();
 
     x.AddEntityFrameworkOutbox<DContext>(o =>
     {
@@ -77,6 +80,7 @@ builder.Services.AddMassTransit(x =>
                 ep.ConfigureConsumer<SettingUpdatedConsumer>(context);
 
                 ep.ConfigureConsumer<MarkupRangesRefreshRequestedConsumer>(context);
+                ep.ConfigureConsumer<JobStatusUpdatedConsumer>(context);
 
                 ep.Bind<BackplaneMessage>();
                 ep.Bind<MarkupRangesRefreshRequestedEvent>();
@@ -115,6 +119,7 @@ builder.Services.AddScoped<IStartupTask, MarkupInitializationStartupTask>();
 builder.Services.AddScoped<IStartupTask, LoadLocalesStartupTask>();
 builder.Services.AddHostedService<StartupTaskHostedService>();
 
+builder.Services.AddSignalR();
 builder.Services.AddOpenTelemetry()
     .WithMetrics(metrics =>
     {
@@ -136,5 +141,6 @@ var app = builder.Build();
 app.UseCommonApiPipeline();
 
 app.UseOpenTelemetryPrometheusScrapingEndpoint();
+app.MapHub<JobHub>("/hubs/jobs");
 
 await app.RunAsync();
