@@ -15,6 +15,7 @@ public class MarkupContainer : IMarkupContainer
     public bool Initialized { get; private set; }
     public Models.Markup DefaultMarkup { get; private set; } = null!;
     public int DefaultCurrencyId { get; private set; }
+    public string CurrentVersion { get; private set; }
 
     public Models.Markup? GetForDefaultOrNull(double value)
     {
@@ -38,11 +39,14 @@ public class MarkupContainer : IMarkupContainer
     {
         lock (_lock)
         {
+            var ls = @default.ToList();
+            
             Initialized = true;
             DefaultMarkup = defaultMarkup;
             DefaultCurrencyId = defaultCurrencyId;
-            _defaultMarkupMap = GenMap(@default);
+            _defaultMarkupMap = GenMap(ls);
             _markupMaps = other.ToDictionary(x => x.Key, x => GenMap(x.Value));
+            GenMarkupHash(ls, defaultCurrencyId);
         }
     }
 
@@ -58,6 +62,22 @@ public class MarkupContainer : IMarkupContainer
                     new Models.Markup(range.Markup)));
 
         return map;
+    }
+
+    private void GenMarkupHash(
+        List<MarkupRange> markupRanges,
+        int defaultCurrencyId)
+    {
+        var hc = new HashCode();
+        hc.Add(defaultCurrencyId);
+        foreach (var range in markupRanges)
+        {
+            hc.Add(range.RangeStart);
+            hc.Add(range.RangeEnd);
+            hc.Add(range.Markup);
+        }
+        
+        CurrentVersion = hc.ToHashCode().ToString("X8");
     }
 
     private void EnsureInitialized()

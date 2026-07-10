@@ -11,7 +11,7 @@ using Pricing.Application.Interfaces.Markup;
 using Pricing.Application.Interfaces.Pricing;
 using Pricing.Application.Interfaces.Pricing.PriceApplier;
 using Pricing.Application.Interfaces.Pricing.PricePolicy;
-using Pricing.Application.Lrts.PriceCandidateCalculationLrt;
+using Pricing.Application.Lrts.PriceCandidateCalculation;
 using Pricing.Application.Services;
 using Pricing.Application.Services.Markup;
 using Pricing.Application.Services.Pricing;

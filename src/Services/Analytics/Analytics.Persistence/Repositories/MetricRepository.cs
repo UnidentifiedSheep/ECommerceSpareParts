@@ -10,7 +10,7 @@ using Persistence.Repository;
 namespace Analytics.Persistence.Repositories;
 
 public class MetricRepository(DContext context, IQueryableExtensions extensions)
-    : RepositoryBase<DContext, Metric, Guid>(context, extensions), IMetricRepository
+    : LinqRepositoryBase<DContext, Metric, Guid>(context, extensions), IMetricRepository
 {
     public async Task<int> MarkDirtyAsync(
         DependsOn dependsOn,

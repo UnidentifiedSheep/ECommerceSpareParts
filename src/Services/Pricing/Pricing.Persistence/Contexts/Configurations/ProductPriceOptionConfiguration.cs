@@ -29,6 +29,9 @@ public class ProductPriceOptionConfiguration : IEntityTypeConfiguration<ProductP
 
         builder.Property(e => e.Price)
             .HasColumnName("price");
+        
+        builder.Property(x => x.MarkupVersion)
+            .HasColumnName("markup_version");
 
         builder.Property(e => e.Markup)
             .HasColumnName("markup");

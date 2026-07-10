@@ -1,6 +1,7 @@
 ﻿using BulkValidation.Core.Attributes;
 using Domain;
 using Domain.Extensions;
+using Pricing.Entities.DomainEvents;
 
 namespace Pricing.Entities;
 
@@ -84,6 +85,8 @@ public class MarkupGroup : AuditableEntity<MarkupGroup, int>
         _markupRanges.Clear();
         _markupRanges.AddRange(ranges);
     }
+
+    public override void OnUpdated() => AddDomainEvent(new MarkupGroupUpdatedDomainEvent { Id = Id });
 
     public override int GetId() { return Id; }
 }

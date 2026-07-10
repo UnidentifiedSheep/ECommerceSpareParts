@@ -12,7 +12,7 @@ namespace Main.Persistence.Repositories.Currency;
 public class CurrencyRateRepository(
     DContext context,
     IQueryableExtensions extensions
-) : RepositoryBase<DContext, CurrencyRate, (int, int)>(context, extensions), ICurrencyRateRepository
+) : LinqRepositoryBase<DContext, CurrencyRate, (int, int)>(context, extensions), ICurrencyRateRepository
 {
     public Task<List<CurrencyRate>> GetByBaseCurrency(
         int baseCurrencyId,

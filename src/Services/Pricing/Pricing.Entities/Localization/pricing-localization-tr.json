@@ -31,6 +31,8 @@
     "lrt.price.candidate.calculation.product.id.name": "Ürün",
     "lrt.price.candidate.calculation.product.id.description": "Fiyat adayları hesaplanacak ürün.",
     "lrt.price.candidate.calculation.storage.name.name": "Depo",
-    "lrt.price.candidate.calculation.storage.name.description": "Fiyat adayları hesaplanacak depo."
+    "lrt.price.candidate.calculation.storage.name.description": "Fiyat adayları hesaplanacak depo.",
+    "lrt.invalidate.stale.price.options.name": "Eski fiyat seçeneklerini geçersiz kıl",
+    "lrt.invalidate.stale.price.options.description": "Eski kâr marjı sürümüyle hesaplanan fiyat seçeneklerini siler ve yeniden hesaplama işleri kuyruğa alır."
   }
 }

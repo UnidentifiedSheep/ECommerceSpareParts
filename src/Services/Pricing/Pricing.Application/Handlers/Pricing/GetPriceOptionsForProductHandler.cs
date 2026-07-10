@@ -6,6 +6,7 @@ using Application.Common.Interfaces.Repositories;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 using Pricing.Application.Dtos.Price;
+using Pricing.Application.Interfaces.Markup;
 using Pricing.Entities;
 using Pricing.Entities.Offers;
 using Pricing.Enums;
@@ -25,7 +26,8 @@ public record GetPriceOptionsForProductResult(IReadOnlyCollection<PriceOptionDto
 public class GetPriceOptionsForProductHandler(
     ISender sender,
     IReadRepository<ProductPriceOption, Guid> repository,
-    ICurrencyConverter currencyConverter
+    ICurrencyConverter currencyConverter,
+    IMarkupContainer markupContainer
     ) : IQueryHandler<GetPriceOptionsForProductQuery, GetPriceOptionsForProductResult>
 {
     public async Task<GetPriceOptionsForProductResult> Handle(
@@ -41,7 +43,7 @@ public class GetPriceOptionsForProductHandler(
         
         var options = await GetOptionsAsync(request, cancellationToken);
 
-        if (options.Count == 0)
+        if (options.Count == 0 || options.Any(x => x.MarkupVersion != markupContainer.CurrentVersion))
             await CalculateCandidates(request, cancellationToken);
         
         var result = new List<PriceOptionDto>();

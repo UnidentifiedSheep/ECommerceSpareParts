@@ -19,10 +19,14 @@ public class ProductPriceOption : AuditableEntity<ProductPriceOption, Guid>, ILi
     public TimeSpan DeliveryTime { get; private set; }
     public TimeSpan GuaranteedDeliveryTime { get; private set; }
     public int DeliveryProbability { get; private set; }
+    
+    public string MarkupVersion { get; private set; } = string.Empty;
+    
     public PriceOffer PriceOffer { get; private set; } = null!;
 
     public static ProductPriceOption Create(
         Guid priceOfferId,
+        string markupVersion,
         string storageName,
         decimal score,
         decimal price,
@@ -42,6 +46,7 @@ public class ProductPriceOption : AuditableEntity<ProductPriceOption, Guid>, ILi
         option.SetPrice(price);
         option.SetMarkup(markup);
         option.SetDeliveryTime(deliveryTime, guaranteedDeliveryTime, deliveryProbability);
+        option.MarkupVersion = markupVersion;
         return option;
     }
     

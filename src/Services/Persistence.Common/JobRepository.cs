@@ -21,7 +21,7 @@ public class JobRepository<TContext>(
         IEnumerable<UniqJob> jobs,
         CancellationToken cancellationToken = default)
     {
-        var all = jobs.ToList();
+        var all = jobs.DistinctBy(x => x.NaturalKey).ToList();
         if (all.Count == 0) return 0;
         
         all.ForEach(x => x.Touch(userContext.UserIdOrNull));

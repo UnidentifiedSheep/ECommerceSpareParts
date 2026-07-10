@@ -21,4 +21,11 @@ public abstract class BasicEfRepositoryBase<TContext, TEntity, TKey>(
     {
         throw new InvalidOperationException("Find by ids is not implemented in BasicEfRepository.");
     }
+
+    public override Task DeleteManyAsync(
+        IEnumerable<TKey> ids, 
+        CancellationToken cancellationToken = default)
+    {
+        throw new InvalidOperationException("DeleteMany is not implemented in BasicEfRepository.");
+    }
 }

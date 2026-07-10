@@ -31,6 +31,8 @@
     "lrt.price.candidate.calculation.product.id.name": "Товар",
     "lrt.price.candidate.calculation.product.id.description": "Товар, для которого нужно рассчитать варианты цены.",
     "lrt.price.candidate.calculation.storage.name.name": "Склад",
-    "lrt.price.candidate.calculation.storage.name.description": "Склад, для которого нужно рассчитать варианты цены."
+    "lrt.price.candidate.calculation.storage.name.description": "Склад, для которого нужно рассчитать варианты цены.",
+    "lrt.invalidate.stale.price.options.name": "Инвалидация устаревших вариантов цены",
+    "lrt.invalidate.stale.price.options.description": "Удаляет варианты цены, рассчитанные с устаревшей версией наценок, и ставит задачи на перерасчет."
   }
 }

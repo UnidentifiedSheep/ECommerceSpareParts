@@ -30,6 +30,19 @@ public abstract class LinqRepositoryBase<TContext, TEntity, TKey>(
             .ToDictionaryAsync(keySelector.Compile(), ct);
     }
 
+    public override Task DeleteManyAsync(
+        IEnumerable<TKey> ids,
+        CancellationToken cancellationToken = default)
+    {
+        var keys = ids.ToList();
+        var keySelector = TEntity.GetKeySelector();
+        var containsExpression = BuildContainsExpression(keys, keySelector);
+
+        return DbSet.AsQueryable()
+            .Where(containsExpression)
+            .ExecuteDeleteAsync(cancellationToken);
+    }
+
     private static Expression<Func<TEntity, bool>> BuildContainsExpression(
         IReadOnlyCollection<TKey> keys,
         Expression<Func<TEntity, TKey>> keySelector)

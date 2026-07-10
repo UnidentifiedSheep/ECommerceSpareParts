@@ -8,7 +8,7 @@ using MediatR;
 using Microsoft.Extensions.Logging;
 using Pricing.Application.Handlers.Pricing;
 
-namespace Pricing.Application.Lrts.PriceCandidateCalculationLrt;
+namespace Pricing.Application.Lrts.PriceCandidateCalculation;
 
 public class PriceCandidateCalculationLrt(
     IJobRepository jobRepository,

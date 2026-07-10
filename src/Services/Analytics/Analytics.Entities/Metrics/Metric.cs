@@ -1,15 +1,17 @@
 ﻿using System.ComponentModel.DataAnnotations.Schema;
 using System.Globalization;
+using System.Linq.Expressions;
 using System.Security.Cryptography;
 using System.Text;
 using System.Text.Json;
 using Analytics.Enums;
 using Domain;
 using Domain.Extensions;
+using Domain.Interfaces;
 
 namespace Analytics.Entities.Metrics;
 
-public abstract class Metric : AuditableEntity<Metric, Guid>
+public abstract class Metric : AuditableEntity<Metric, Guid>, ILinqEntity<Metric, Guid>
 {
     private readonly List<MetricJob> _jobs = [];
     public Guid Id { get; private set; }
@@ -110,6 +112,8 @@ public abstract class Metric : AuditableEntity<Metric, Guid>
     public override Guid GetId() { return Id; }
 
     public abstract object? GetData();
+    public static Expression<Func<Metric, Guid>> GetKeySelector() => x => x.Id;
+    public static Expression<Func<Metric, bool>> GetEqualityExpression(Guid key) => x =>  x.Id == key;
 }
 
 public abstract class Metric<T> : Metric where T : class
