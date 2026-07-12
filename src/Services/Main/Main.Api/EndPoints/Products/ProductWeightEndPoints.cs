@@ -1,5 +1,4 @@
 using Api.Common.Extensions;
-using Carter;
 using Enums;
 using Enums.Units;
 using Main.Application.Dtos.Product;
@@ -8,17 +7,17 @@ using Main.Application.Handlers.ProductWeight.GetProductWeight;
 using Main.Application.Handlers.ProductWeight.SetProductWeight;
 using MediatR;
 
-namespace Main.Api.EndPoints;
+namespace Main.Api.EndPoints.Products;
 
 public record GetProductWeightResponse(ProductWeightDto ProductWeight);
 
 public record PutProductWeightRequest(decimal Weight, WeightUnit Unit);
 
-public class ProductWeightEndPoints : ICarterModule
+public static class ProductWeightEndPoints
 {
-    public void AddRoutes(IEndpointRouteBuilder app)
+    public static RouteGroupBuilder MapProductWeightEndPoints(this RouteGroupBuilder products)
     {
-        var weights = app.MapGroup("/products/{id:int}/weights")
+        var weights = products.MapGroup("/{id:int}/weights")
             .WithTags("Product Weight");
 
         weights.MapDelete(
@@ -81,5 +80,7 @@ public class ProductWeightEndPoints : ICarterModule
             .Produces(StatusCodes.Status201Created)
             .ProducesProblem(StatusCodes.Status400BadRequest)
             .RequireAnyPermission(PermissionCodes.ARTICLE_WEIGHT_CREATE);
+
+        return products;
     }
 }

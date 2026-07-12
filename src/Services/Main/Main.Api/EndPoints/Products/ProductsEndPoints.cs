@@ -52,6 +52,9 @@ public class ProductsEndPoints : ICarterModule
         products.MapProductRelationsEndPoints();
         products.MapProductImagesEndPoints();
         products.MapProductReservationsEndPoints();
+        products.MapProductCharacteristicsEndPoints();
+        products.MapProductSizeEndPoints();
+        products.MapProductWeightEndPoints();
 
         products.MapPost(
                 "",

@@ -1,5 +1,4 @@
 using Api.Common.Extensions;
-using Carter;
 using Enums;
 using Enums.Units;
 using Main.Application.Dtos.Product;
@@ -8,7 +7,7 @@ using Main.Application.Handlers.ProductSizes.GetProductSizes;
 using Main.Application.Handlers.ProductSizes.SetProductSizes;
 using MediatR;
 
-namespace Main.Api.EndPoints;
+namespace Main.Api.EndPoints.Products;
 
 public record GetProductSizeResponse(ProductSizeDto ProductSize);
 
@@ -19,11 +18,11 @@ public record PutProductSizeRequest(
     DimensionUnit Unit
 );
 
-public class ProductSizeEndPoints : ICarterModule
+public static class ProductSizeEndPoints
 {
-    public void AddRoutes(IEndpointRouteBuilder app)
+    public static RouteGroupBuilder MapProductSizeEndPoints(this RouteGroupBuilder products)
     {
-        var sizes = app.MapGroup("/products/{id:int}/sizes")
+        var sizes = products.MapGroup("/{id:int}/sizes")
             .WithTags("Product Size");
 
         sizes.MapDelete(
@@ -87,5 +86,7 @@ public class ProductSizeEndPoints : ICarterModule
             .Produces(StatusCodes.Status201Created)
             .ProducesProblem(StatusCodes.Status400BadRequest)
             .RequireAnyPermission(PermissionCodes.ARTICLE_SIZES_CREATE);
+
+        return products;
     }
 }

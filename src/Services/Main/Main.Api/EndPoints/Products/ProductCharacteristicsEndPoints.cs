@@ -1,6 +1,5 @@
 using Api.Common.Extensions;
 using Api.Common.Models.Requests;
-using Carter;
 using Enums;
 using Main.Application.Dtos.Product;
 using Main.Application.Handlers.ProductCharacteristics.AddCharacteristics;
@@ -9,7 +8,7 @@ using Main.Application.Handlers.ProductCharacteristics.GetCharacteristics;
 using Main.Application.Handlers.ProductCharacteristics.PatchCharacteristics;
 using MediatR;
 
-namespace Main.Api.EndPoints;
+namespace Main.Api.EndPoints.Products;
 
 public record AddCharacteristicsRequest(IEnumerable<NewCharacteristicsDto> Characteristics);
 
@@ -17,14 +16,11 @@ public record EditCharacteristicsRequest(PatchCharacteristicsDto Value);
 
 public record GetProductCharacteristicsResponse(IReadOnlyList<ProductCharacteristicDto> Characteristics);
 
-public class ProductCharacteristicsEndPoints : ICarterModule
+public static class ProductCharacteristicsEndPoints
 {
-    public void AddRoutes(IEndpointRouteBuilder app)
+    public static RouteGroupBuilder MapProductCharacteristicsEndPoints(this RouteGroupBuilder products)
     {
-        var characteristics = app.MapGroup("/products")
-            .WithTags("Product Characteristics");
-
-        characteristics.MapPost(
+        products.MapPost(
                 "/characteristics/",
                 async (
                     ISender sender,
@@ -43,7 +39,7 @@ public class ProductCharacteristicsEndPoints : ICarterModule
             .WithSummary("Создать характеристики продуктов")
             .RequireAnyPermission(PermissionCodes.ARTICLE_CHARACTERISTICS_CREATE);
 
-        characteristics.MapDelete(
+        products.MapDelete(
                 "/{productId:int}/characteristics/{name}",
                 async (
                     ISender sender,
@@ -62,7 +58,7 @@ public class ProductCharacteristicsEndPoints : ICarterModule
             .WithSummary("Удалить характеристику продукта")
             .RequireAnyPermission(PermissionCodes.ARTICLE_CHARACTERISTICS_DELETE);
 
-        characteristics.MapPatch(
+        products.MapPatch(
                 "/{productId:int}/characteristics/{name}",
                 async (
                     ISender sender,
@@ -88,7 +84,7 @@ public class ProductCharacteristicsEndPoints : ICarterModule
             .WithSummary("Редактировать характеристику продукта")
             .RequireAnyPermission(PermissionCodes.ARTICLE_CHARACTERISTICS_UPDATE);
 
-        characteristics.MapGet(
+        products.MapGet(
                 "/{productId:int}/characteristics",
                 async (
                     ISender sender,
@@ -107,5 +103,7 @@ public class ProductCharacteristicsEndPoints : ICarterModule
             .ProducesProblem(StatusCodes.Status400BadRequest)
             .ProducesProblem(StatusCodes.Status404NotFound)
             .WithSummary("Получить характеристики продукта");
+
+        return products;
     }
 }
