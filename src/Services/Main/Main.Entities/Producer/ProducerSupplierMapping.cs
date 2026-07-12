@@ -8,11 +8,13 @@ namespace Main.Entities.Producer;
 
 public class ProducerSupplierMapping : Entity<ProducerSupplierMapping, int>, ILinqEntity<ProducerSupplierMapping, int>
 {
-
     private ProducerSupplierMapping() { }
     public int Id { get; private set; }
+    
     public int ProducerId { get; private set; }
+    
     public Supplier Supplier { get; private set; }
+    
     public string SupplierProducerName { get; private set; } = string.Empty;
 
     public static Expression<Func<ProducerSupplierMapping, int>> GetKeySelector()

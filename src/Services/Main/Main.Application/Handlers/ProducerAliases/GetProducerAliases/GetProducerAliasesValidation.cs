@@ -1,7 +1,7 @@
 using Application.Common.Validators;
 using FluentValidation;
 
-namespace Main.Application.Handlers.Producers.GetProducerAliases;
+namespace Main.Application.Handlers.ProducerAliases.GetProducerAliases;
 
 public class GetProducerAliasesValidation : AbstractValidator<GetProducerAliasesQuery>
 {

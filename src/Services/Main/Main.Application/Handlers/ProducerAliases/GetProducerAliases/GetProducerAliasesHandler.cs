@@ -4,11 +4,12 @@ using Application.Common.Interfaces.Cqrs;
 using Application.Common.Interfaces.Repositories;
 using LinqKit;
 using Main.Application.Dtos.Producer;
+using Main.Application.Dtos.Producer.Aliases;
 using Main.Application.Projections;
 using Main.Entities.Producer;
 using Microsoft.EntityFrameworkCore;
 
-namespace Main.Application.Handlers.Producers.GetProducerAliases;
+namespace Main.Application.Handlers.ProducerAliases.GetProducerAliases;
 
 public record GetProducerAliasesQuery(int ProducerId, Pagination Pagination)
     : IQuery<GetProducerAliasesResult>;

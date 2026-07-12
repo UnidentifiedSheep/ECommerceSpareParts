@@ -4,12 +4,11 @@ using Attributes;
 using Domain.Extensions;
 using Enums;
 using Localization.Abstractions.Interfaces;
-using Main.Application.Dtos.Producer;
+using Main.Application.Dtos.Producer.SupplierMappings;
 using Main.Application.Interfaces.Persistence;
 using Main.Entities.Producer;
-using Main.Enums;
 
-namespace Main.Application.Handlers.Producers;
+namespace Main.Application.Handlers.ProducerSupplierMappings;
 
 [AutoSave]
 [Diagnostics]

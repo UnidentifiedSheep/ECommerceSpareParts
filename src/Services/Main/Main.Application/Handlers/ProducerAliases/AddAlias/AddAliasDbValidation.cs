@@ -3,7 +3,7 @@ using BulkValidation.Core.Interfaces;
 using Main.Entities;
 using Main.Entities.Producer;
 
-namespace Main.Application.Handlers.Producers.AddAlias;
+namespace Main.Application.Handlers.ProducerAliases.AddAlias;
 
 public class AddAliasDbValidation : AbstractDbValidation<AddAliasCommand>
 {

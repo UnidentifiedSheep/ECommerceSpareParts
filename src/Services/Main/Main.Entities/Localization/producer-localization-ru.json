@@ -21,6 +21,8 @@
     "producer.duplicate.name.in.batch": "Дубликат производителя в батче",
     "producer.other.name.duplicate.in.batch": "Дубликат дополнительного названия производителя в батче.",
     "producer.other.name.producer.not.found.in.batch": "Не удалось найти производителя для дополнительного названия.",
+    "producer.supplier.mapping.already.exists": "Для данного поставщика и производителя уже есть маппинг/референс.",
+    "producer.supplier.mapping.not.found": "Не удалось найти маппинг/референс поставщика для указанного производителя.",
     "producer.supplier.mapping.duplicate.in.batch": "Дубликат сопоставления поставщика в батче.",
     "producer.supplier.mapping.producer.not.found.in.batch": "Не удалось найти производителя для сопоставления с поставщиком.",
     "producer.supplier.mapping.supplier.producer.name.required": "Название производителя у поставщика не должно быть пустым."

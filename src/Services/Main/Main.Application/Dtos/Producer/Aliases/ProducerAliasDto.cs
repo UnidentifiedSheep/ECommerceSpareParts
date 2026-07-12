@@ -1,6 +1,6 @@
 using System.Text.Json.Serialization;
 
-namespace Main.Application.Dtos.Producer;
+namespace Main.Application.Dtos.Producer.Aliases;
 
 public record ProducerAliasDto
 {

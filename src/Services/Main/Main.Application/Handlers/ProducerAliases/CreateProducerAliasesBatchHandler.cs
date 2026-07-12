@@ -1,15 +1,13 @@
 using Abstractions.Interfaces.Exceptions;
 using Abstractions.Interfaces.Persistence;
 using Application.Common.Interfaces.Cqrs;
-using Application.Common.Interfaces.Events;
 using Application.Common.Interfaces.Repositories;
 using Attributes;
-using Contracts.Producer;
 using Localization.Abstractions.Interfaces;
 using Main.Application.Interfaces.Persistence;
 using Main.Entities.Producer;
 
-namespace Main.Application.Handlers.Producers;
+namespace Main.Application.Handlers.ProducerAliases;
 
 [AutoSave]
 [Diagnostics]

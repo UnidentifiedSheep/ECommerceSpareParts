@@ -1,4 +1,5 @@
 using FluentAssertions;
+using Main.Application.Handlers.ProducerAliases;
 using Main.Application.Handlers.Producers;
 using Main.Entities.Exceptions;
 using Main.Entities.Producer;
