@@ -1,297 +1,113 @@
 # ECommerceSpareParts
 
-Backend solution for an e-commerce spare parts platform.
+.NET backend for a spare-parts platform: catalog, warehouse operations, supplier offers, pricing, search, sales, and
+analytics.
 
-The system is built as a set of .NET services around product catalog, storage operations, purchases, sales, balances,
-pricing, search, and analytics. It is intended for a business domain where spare parts are bought, stored, priced,
-searched, sold, and analyzed.
-
-## Tech Stack
-
-- .NET 10
-- ASP.NET Core
-- Entity Framework Core
-- PostgreSQL
-- Redis
-- RabbitMQ / MassTransit
-- MinIO, S3-compatible object storage
-- Docker Compose
-- Loki, Prometheus, Grafana
-- xUnit and Testcontainers
-
-## Repository Structure
-
-```text
-src/
-  Core/
-    Abstractions
-    Attributes
-    Contracts
-    Domain
-    Enums
-    Exceptions
-    Extensions
-    Utils
-
-  Infrastructure/
-    Cache
-    Integrations
-    Localization
-    Mail
-    Persistence
-    RabbitMq
-    Security
-
-  Services/
-    Main
-    Search
-    Pricing
-    Analytics
-    Gateway
-    Api.Common
-    Application.Common
-    Test.Common
-```
+> The project is under active development. See the [roadmap](docs/TODO.md) for incomplete features.
 
 ## Services
 
-| Service              | Purpose                                                                                         |
-|----------------------|-------------------------------------------------------------------------------------------------|
-| `Main`               | Core business service: auth, users, products, storages, purchases, sales, balances, currencies. |
-| `Search`             | Search API and local search indexes.                                                            |
-| `Pricing`            | Pricing-related API and persistence.                                                            |
-| `Analytics`          | Analytics API, metrics, and background worker.                                                  |
-| `Gateway`            | Public entry point and reverse proxy.                                                           |
-| `Api.Common`         | Shared API configuration and helpers.                                                           |
-| `Application.Common` | Shared application contracts, validators, repository abstractions, and services.                |
-| `Test.Common`        | Shared integration testing infrastructure, fixtures, stubs, and test contexts.                  |
+| Service | Responsibility |
+| --- | --- |
+| `Gateway` | Public YARP reverse proxy and aggregated API documentation. |
+| `Main` | Catalog, users, WMS, purchases, sales, logistics, and files. |
+| `Pricing` | Supplier/internal offers, markup rules, price generation, and ranking. |
+| `Search` | Product and producer search backed by OpenSearch. |
+| `Analytics` | Metrics, sale analysis, and automatic markup generation. |
 
-## Infrastructure
+Main, Pricing, and Analytics have separate API, worker, persistence, test, and migrator projects where needed. Services
+exchange integration events through RabbitMQ and use the EF Core outbox pattern.
 
-The local Docker stack includes:
+## Core Features
 
-- PostgreSQL with `pg_cron`
-- Redis Stack
-- RabbitMQ with management UI
-- MinIO
-- Loki
-- Prometheus
-- Grafana
+- [Main service](docs/MAIN.md) — catalog, users, commercial operations, finances, currencies, imports, and files.
+- [Pricing and markup](docs/PRICING.md) — offer collection, price rules, automatic markups, and recalculation.
+- [Warehouse management](docs/WMS.md) — stock lots, purchases, sales, reservations, and logistics.
+- [Search service](docs/SEARCH.md) — product/SKU search, filters, producers, aliases, and index synchronization.
+- [Analytics service](docs/ANALYTICS.md) — purchase/sale facts, product metrics, and markup analysis.
+- Favorit supplier integration and Armtek client infrastructure.
+- Background and scheduled jobs with progress updates through SignalR.
 
-## Requirements
+## Stack
 
-- .NET SDK 10
-- Docker Desktop or Docker Engine
-- Docker Compose
-- Local TLS certificates for gateway/Grafana, or adjusted local configuration
+.NET 10, ASP.NET Core Minimal APIs, EF Core, PostgreSQL, RabbitMQ/MassTransit, Redis, OpenSearch, MinIO, YARP,
+OpenTelemetry, Prometheus, Loki, Grafana, xUnit, Testcontainers, and Docker Compose.
 
-Integration tests require Docker because they use Testcontainers.
+## Quick Start
 
-## Configuration
-
-Create a local `.env` from the example:
+Requirements: .NET 10 SDK, Docker, and Docker Compose v2.
 
 ```bash
 cp .env.example .env
-```
 
-The values in `.env.example` are development defaults. Do not use them in production and do not commit real secrets.
+# Start dependencies
+docker compose up -d pgql redis rabbitmq opensearch minio minio-init
 
-### Secrets
+# Apply migrations and seed data
+docker compose -f migrator-compose.yaml up --build --abort-on-container-exit
 
-The repository contains `.env.example` only as a local development template. Some values look like passwords or signing
-keys because Docker Compose needs complete defaults for a one-machine setup. Treat every value in `.env.example` as
-disposable development data.
-
-For real environments:
-
-- keep secrets outside Git;
-- use CI/CD variables, Docker secrets, Kubernetes secrets, Vault, cloud secret managers, or another environment-specific
-  secret provider;
-- rotate signing keys and service passwords per environment;
-- do not reuse local MinIO, PostgreSQL, Redis, RabbitMQ, Grafana, JWT, or signing secrets;
-- mount TLS certificates from infrastructure-managed storage, not from the repository.
-
-Main secret/config groups:
-
-| Group           | Variables                                                                                |
-|-----------------|------------------------------------------------------------------------------------------|
-| PostgreSQL      | `PGQL_USER`, `PGQL_PASSWORD`, `PGQL_MAIN_DB`, `PGQL_ANALYTICS_DB`, `PGQL_PRICING_DB`     |
-| Redis           | `REDIS_PASSWORD`, `REDIS_HOST`, `REDIS_PORT`                                             |
-| RabbitMQ        | `RABBITMQ_DEFAULT_USER`, `RABBITMQ_DEFAULT_PASS`                                         |
-| Gateway/JWT     | `GATEWAY_SUPER_KEY`, `VALID_ISSUER`, `ISSUER_SIGNING_KEY`                                |
-| Service signing | `MAIN_SIGN_SECRET`, `PRICING_SIGN_SECRET`                                                |
-| MinIO/S3        | `MINIO_ROOT_USER`, `MINIO_ROOT_PASSWORD`, `MINIO_SERVICE_USER`, `MINIO_SERVICE_PASSWORD` |
-| Grafana         | `GRAFANA_ADMIN_USER`, `GRAFANA_ADMIN_PASSWORD`                                           |
-| TLS             | `CERTS_PATH`, `CERT_PATH`, `CERT_KEYPATH`                                                |
-
-Important paths:
-
-| Variable       | Description                                                    |
-|----------------|----------------------------------------------------------------|
-| `CONFIGS_PATH` | Mounted application config directory. Defaults to `./configs`. |
-| `CERTS_PATH`   | Mounted certificate directory. Defaults to `./certs`.          |
-| `CERT_PATH`    | Certificate path inside the container.                         |
-| `CERT_KEYPATH` | Private key path inside the container.                         |
-
-## Running Locally
-
-Build and start the stack:
-
-```bash
+# Start the complete stack
 docker compose up -d --build
 ```
 
-Gateway is exposed on:
+Open the API documentation at <http://localhost:8080/docs>.
 
-```text
-https://localhost:443
-```
+Grafana uses HTTPS and requires `CERT_PATH` and `CERT_KEYPATH` pointing to certificate files mounted from `CERTS_PATH`.
 
-Useful local endpoints:
+Stop the stack with `docker compose down`. Add `-v` to remove development volumes as well.
 
-| Component     | Port    |
-|---------------|---------|
-| PostgreSQL    | `5432`  |
-| RabbitMQ UI   | `15672` |
-| MinIO Console | `9001`  |
-| Loki          | `3100`  |
-| Grafana       | `3000`  |
+## Local Endpoints
 
-Stop services:
+| Component | Address |
+| --- | --- |
+| Gateway | <http://localhost:8080> |
+| API documentation | <http://localhost:8080/docs> |
+| RabbitMQ UI | <http://localhost:15672> |
+| OpenSearch | <https://localhost:9200> |
+| OpenSearch Dashboards | <http://localhost:5601> |
+| MinIO Console | <http://localhost:9001> |
+| Grafana | <https://localhost:3000> |
 
-```bash
-docker compose down
-```
+PostgreSQL, Redis, RabbitMQ, MinIO, and Loki are exposed on their standard development ports. Prometheus receives a
+dynamic host port; find it with `docker compose port prometheus 9090`.
 
-Stop services and remove local volumes:
-
-```bash
-docker compose down -v
-```
-
-## Database Migrations
-
-Migrator containers are defined in `migrator-compose.yaml`.
-
-Run all migrators:
-
-```bash
-docker compose -f migrator-compose.yaml up --build
-```
-
-Run a single migrator:
-
-```bash
-docker compose -f migrator-compose.yaml up --build main.migrator
-docker compose -f migrator-compose.yaml up --build analytics.migrator
-docker compose -f migrator-compose.yaml up --build pricing.migrator
-```
-
-The migrator compose file connects to PostgreSQL through `host.docker.internal:5432`, so PostgreSQL must be available
-locally before running migrators.
-
-## Build
-
-Restore and build the solution:
+## Build and Test
 
 ```bash
 dotnet restore ECommerceSpareParts.sln
-dotnet build ECommerceSpareParts.sln
+dotnet build ECommerceSpareParts.sln --no-restore
+dotnet test ECommerceSpareParts.sln --no-build
 ```
 
-Build a specific project:
+Integration tests use Testcontainers and require Docker.
 
-```bash
-dotnet build src/Services/Main/Main.Tests/Main.Tests.csproj
-```
+## Configuration
 
-## Tests
+Copy `.env.example` to `.env`. Application settings are loaded from `configs/`, which is mounted into service
+containers through `CONFIGS_PATH`.
 
-Run all tests:
+Values in `.env.example` are development-only. Use an external secret provider and managed TLS certificates in deployed
+environments.
 
-```bash
-dotnet test ECommerceSpareParts.sln
-```
+## Compose Files
 
-Run Main service tests:
-
-```bash
-dotnet test src/Services/Main/Main.Tests/Main.Tests.csproj
-```
-
-Run Analytics integration tests:
-
-```bash
-dotnet test src/Services/Analytics/Analytics.Integration.Tests/Analytics.Integration.Tests.csproj
-```
-
-Notes:
-
-- Integration tests use Testcontainers.
-- Docker must be running.
-- Test projects may start PostgreSQL, Redis, or other dependency containers.
+- `compose.yaml` — local stack built from source;
+- `migrator-compose.yaml` — local database migrators;
+- `compose.registry.yaml` — registry image builds;
+- `compose.stack.yaml` — registry deployment with Traefik;
+- `compose.stack.database.yaml` — standalone PostgreSQL deployment.
 
 ## Documentation
 
-Development rules are kept outside the root README:
+- [Main service](docs/MAIN.md)
+- [Pricing and markup](docs/PRICING.md)
+- [Warehouse management](docs/WMS.md)
+- [Search service](docs/SEARCH.md)
+- [Analytics service](docs/ANALYTICS.md)
+- [Development guidelines](docs/DEVELOPMENT.md)
+- [Testing guidelines](docs/TESTING.md)
+- [Roadmap](docs/TODO.md)
 
-- [Development Guidelines](docs/DEVELOPMENT.md)
-- [Testing Guidelines](docs/TESTING.md)
-- [ToDo](docs/TODO.md)
+## License
 
-## Observability
-
-The compose stack includes:
-
-- Loki for logs
-- Prometheus for metrics
-- Grafana for dashboards
-
-Services receive `LOKI_URL` through environment variables. Grafana is configured to run over HTTPS using mounted
-certificates.
-
-## Storage
-
-MinIO is used as an S3-compatible storage service. The `minio-init` container creates the configured images bucket and
-service user during local startup.
-
-Search service index data is mounted at:
-
-```text
-./search_api_data
-```
-
-## Common Commands
-
-```bash
-# Start full local stack
-docker compose up -d --build
-
-# Stop stack
-docker compose down
-
-# Stop stack and remove volumes
-docker compose down -v
-
-# Run all migrators
-docker compose -f migrator-compose.yaml up --build
-
-# Build solution
-dotnet build ECommerceSpareParts.sln
-
-# Run all tests
-dotnet test ECommerceSpareParts.sln
-```
-
-## Production Notes
-
-Before production deployment:
-
-- Replace all development secrets.
-- Use a real secret provider or environment-specific secret management.
-- Configure TLS certificates outside the repository.
-- Review Docker volume and backup strategy.
-- Run migrations explicitly and verify database state.
-- Enable CI checks for build and tests.
-- Add health checks and deployment monitoring if they are not provided by the target platform.
+See [LICENSE](LICENSE).
