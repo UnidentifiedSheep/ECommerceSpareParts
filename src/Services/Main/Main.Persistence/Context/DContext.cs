@@ -8,6 +8,7 @@ using Main.Entities.Currency;
 using Main.Entities.Order;
 using Main.Entities.Producer;
 using Main.Entities.Product;
+using Main.Entities.Product.Supplier;
 using Main.Entities.Purchase;
 using Main.Entities.Sale;
 using Main.Entities.Settings;
@@ -49,6 +50,14 @@ public partial class DContext : DbContext
     public virtual DbSet<ProductWeight> ProductWeights { get; set; }
 
     public virtual DbSet<ProductContent> ProductContents { get; set; }
+
+    public virtual DbSet<SupplierProduct> SupplierProducts { get; set; }
+
+    public virtual DbSet<SupplierProductName> SupplierProductNames { get; set; }
+
+    public virtual DbSet<SupplierProductAnalogue> SupplierProductAnalogues { get; set; }
+
+    public virtual DbSet<SupplierProductMapping> SupplierProductMappings { get; set; }
 
     public virtual DbSet<Event> Events { get; set; }
     public virtual DbSet<Cart> Carts { get; set; }
