@@ -16,7 +16,7 @@ public class CurrencyRate : AuditableEntity<CurrencyRate, (int, int)>, ILinqEnti
         int toCurrencyId,
         decimal rate)
     {
-        fromCurrencyId.AgainstEqual(
+        fromCurrencyId.EnsureNotEqual(
             toCurrencyId,
             () => new InvalidOperationException("Currency rate self reference is not permitted."));
 
@@ -60,7 +60,7 @@ public class CurrencyRate : AuditableEntity<CurrencyRate, (int, int)>, ILinqEnti
         if (Rate == rate) return;
 
         var prev = Rate;
-        Rate = rate.AgainstLessOrEqual(
+        Rate = rate.EnsureGreaterThan(
             0,
             () => new InvalidOperationException("Currency rate must be greater than 0"));
 

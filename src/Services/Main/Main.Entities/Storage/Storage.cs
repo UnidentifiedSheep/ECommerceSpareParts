@@ -43,9 +43,9 @@ public class Storage : AuditableEntity<Storage, string>, ILinqEntity<Storage, st
     {
         Name = name
             .Trim()
-            .AgainstNullOrEmpty("storage.name.not.empty")
-            .AgainstTooShort(6, "storage.name.min.length")
-            .AgainstTooLong(128, "storage.name.max.length");
+            .EnsureNotNullOrEmpty("storage.name.not.empty")
+            .EnsureMinLength(6, "storage.name.min.length")
+            .EnsureMaxLength(128, "storage.name.max.length");
     }
 
     public void SetType(StorageType type)
@@ -63,7 +63,7 @@ public class Storage : AuditableEntity<Storage, string>, ILinqEntity<Storage, st
         Description = description
             .NullIfWhiteSpace()
             ?
-            .AgainstTooLong(256, "storage.description.max.length");
+            .EnsureMaxLength(256, "storage.description.max.length");
     }
 
     public void SetLocation(string? location)
@@ -71,7 +71,7 @@ public class Storage : AuditableEntity<Storage, string>, ILinqEntity<Storage, st
         Location = location
             .NullIfWhiteSpace()
             ?
-            .AgainstTooLong(256, "storage.location.max.length");
+            .EnsureMaxLength(256, "storage.location.max.length");
     }
 
     public void AddOwner(Guid userId)

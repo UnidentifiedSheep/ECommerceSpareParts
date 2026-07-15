@@ -27,17 +27,17 @@ public class UserFinancialProfile : AuditableEntity<UserFinancialProfile, Guid>,
 
     public void Credit(decimal amount)
     {
-        amount.AgainstNegative("financial.profile.amount.must.not.be.negative");
+        amount.EnsureNonNegative("financial.profile.amount.must.not.be.negative");
         Balance += amount;
     }
 
     public void Debit(decimal amount, bool force = false)
     {
-        amount.AgainstNegative("financial.profile.amount.must.not.be.negative");
+        amount.EnsureNonNegative("financial.profile.amount.must.not.be.negative");
 
         var newBalance = Balance - amount;
         if (!force)
-            newBalance.AgainstTooSmall(
+            newBalance.EnsureAtLeast(
                 MinAllowedBalance,
                 "financial.profile.balance.must.not.be.less.than.minimum");
 
@@ -46,10 +46,10 @@ public class UserFinancialProfile : AuditableEntity<UserFinancialProfile, Guid>,
 
     public void SetMinAllowedBalance(decimal minAllowedBalance)
     {
-        minAllowedBalance.AgainstTooManyDecimalPlaces(
+        minAllowedBalance.EnsureMaxDecimalPlaces(
                 2,
                 "financial.profile.min.allowed.balance.max.two.decimal.places")
-            .AgainstPositive("financial.profile.min.allowed.balance.must.not.be.positive");
+            .EnsureNonPositive("financial.profile.min.allowed.balance.must.not.be.positive");
         MinAllowedBalance = minAllowedBalance;
     }
 }

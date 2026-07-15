@@ -40,7 +40,7 @@ public class UserBalance : AuditableEntity<UserBalance, UserBalanceKey>,
 
     internal void IncrementBalance(decimal amount)
     {
-        amount.AgainstTooManyDecimalPlaces(
+        amount.EnsureMaxDecimalPlaces(
             2,
             () => new InvalidOperationException("Amount can not have more than 2 decimal places"));
 

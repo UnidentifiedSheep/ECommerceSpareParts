@@ -51,16 +51,16 @@ public class ProductPriceOption : AuditableEntity<ProductPriceOption, Guid>, ILi
     }
     
     public void SetScore(decimal score) 
-        => Score = score.AgainstNegative(() => new InvalidOperationException("Score cannot be negative"));
+        => Score = score.EnsureNonNegative(() => new InvalidOperationException("Score cannot be negative"));
 
     public void SetPrice(decimal priceInBaseCurrency)
         => Price = priceInBaseCurrency
-            .AgainstLessOrEqual(
+            .EnsureGreaterThan(
                 min: 0, 
                 exceptionFactory: () => new InvalidOperationException("Price cannot be negative"));
     
     public void SetMarkup(decimal markup)
-        => Markup = markup.AgainstNegative(
+        => Markup = markup.EnsureNonNegative(
             () => new InvalidOperationException("Markup cannot be negative"));
 
     public void SetDeliveryTime(
@@ -68,11 +68,11 @@ public class ProductPriceOption : AuditableEntity<ProductPriceOption, Guid>, ILi
         TimeSpan guaranteedDeliveryTime,
         int deliveryProbability)
     {
-        deliveryProbability.AgainstNegative(() => new InvalidOperationException("Delivery probability cannot be negative"));
-        deliveryTime.AgainstTooSmall(
+        deliveryProbability.EnsureNonNegative(() => new InvalidOperationException("Delivery probability cannot be negative"));
+        deliveryTime.EnsureAtLeast(
             min: TimeSpan.Zero, 
             exceptionFactory: () => new InvalidOperationException("Delivery time cannot be negative"));
-        guaranteedDeliveryTime.AgainstTooSmall(
+        guaranteedDeliveryTime.EnsureAtLeast(
             min: TimeSpan.Zero, 
             exceptionFactory: () => new InvalidOperationException("Guaranteed delivery time cannot be negative"));
         
@@ -83,7 +83,7 @@ public class ProductPriceOption : AuditableEntity<ProductPriceOption, Guid>, ILi
     
     public void SetStorageName(string storageName) => ForStorageName = storageName
         .TrimSafe()
-        .AgainstNullOrWhiteSpace(() => new InvalidOperationException("Storage name cannot be empty"));
+        .EnsureNotNullOrWhiteSpace(() => new InvalidOperationException("Storage name cannot be empty"));
     
     public override Guid GetId() => PriceOfferId;
     public static Expression<Func<ProductPriceOption, Guid>> GetKeySelector() => x => x.PriceOfferId;

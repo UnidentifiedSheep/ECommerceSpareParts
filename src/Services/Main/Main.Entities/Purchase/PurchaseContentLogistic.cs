@@ -58,19 +58,19 @@ public class PurchaseContentLogistic : Entity<PurchaseContentLogistic, int>,
 
     private void SetWeightKg(decimal weightKg)
     {
-        WeightKg = weightKg.AgainstNegative(() =>
+        WeightKg = weightKg.EnsureNonNegative(() =>
             throw new InvalidOperationException("Purchase content logistics weight must be positive"));
     }
 
     private void SetAreaM3(decimal areaM3)
     {
-        AreaM3 = areaM3.AgainstNegative(() =>
+        AreaM3 = areaM3.EnsureNonNegative(() =>
             throw new InvalidOperationException("Purchase content logistics area m3 must be positive"));
     }
 
     private void SetPrice(decimal price)
     {
-        Price = price.AgainstNegative(() =>
+        Price = price.EnsureNonNegative(() =>
             throw new InvalidOperationException("Purchase content logistics price must be positive"));
     }
 

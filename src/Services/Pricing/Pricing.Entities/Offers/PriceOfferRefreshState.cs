@@ -33,7 +33,7 @@ public class PriceOfferRefreshState
 
     public void OffersUpdated(DateTime offersUpdatedAt, int offersCount)
     {
-        LastOffersCount = offersCount.AgainstNegative(
+        LastOffersCount = offersCount.EnsureNonNegative(
             () => new InvalidOperationException("Offers count cannot be negative"));
 
         LastOffersUpdatedAt = offersUpdatedAt;

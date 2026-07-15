@@ -76,7 +76,7 @@ public class SaleContent : Entity<SaleContent, int>
     private void ApplyDetails(IEnumerable<SaleContentDetail> details)
     {
         var incomingDetails = details
-            .AgainstNull(() => new InvalidInputException("sale.fact.content.detail.required"))
+            .EnsureNotNull(() => new InvalidInputException("sale.fact.content.detail.required"))
             .ToList();
 
         var existingDetails = _details.ToDictionary(x => x.Id);
@@ -102,21 +102,21 @@ public class SaleContent : Entity<SaleContent, int>
 
     private static decimal ValidatePrice(decimal price)
     {
-        return price.AgainstLessOrEqual(
+        return price.EnsureGreaterThan(
             0m,
             () => new InvalidInputException("sale.fact.content.price.required"));
     }
 
     private static int ValidateCount(int count)
     {
-        return count.AgainstLessOrEqual(
+        return count.EnsureGreaterThan(
             0,
             () => new InvalidInputException("sale.fact.content.count.required"));
     }
 
     private static decimal ValidateDiscount(decimal discount)
     {
-        return discount.AgainstNegative(() =>
+        return discount.EnsureNonNegative(() =>
             new InvalidInputException("sale.fact.content.discount.must.not.be.negative"));
     }
 }

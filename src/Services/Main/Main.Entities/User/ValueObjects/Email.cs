@@ -9,7 +9,7 @@ public record Email
 
     public Email(string value)
     {
-        value = value.Trim().Against(z => !IsValid(z), "email.must.be.valid");
+        value = value.Trim().Ensure(IsValid, "email.must.be.valid");
         Value = ToNormalized(value);
     }
 

@@ -83,8 +83,8 @@ public class JobSchedule : AuditableEntity<JobSchedule, Guid>, ILinqEntity<JobSc
     {
         Name = name
             .TrimSafe()
-            .AgainstNullOrWhiteSpace("job.schedule.name.required")
-            .AgainstTooLong(NameMaxLength, "job.schedule.name.max.length");
+            .EnsureNotNullOrWhiteSpace("job.schedule.name.required")
+            .EnsureMaxLength(NameMaxLength, "job.schedule.name.max.length");
     }
 
     public void SetDescription(string? description)
@@ -92,7 +92,7 @@ public class JobSchedule : AuditableEntity<JobSchedule, Guid>, ILinqEntity<JobSc
         Description = description
             .NullIfWhiteSpace()
             ?
-            .AgainstTooLong(DescriptionMaxLength, "job.schedule.description.max.length");
+            .EnsureMaxLength(DescriptionMaxLength, "job.schedule.description.max.length");
     }
 
     public void SetCron(string cron)
@@ -100,7 +100,7 @@ public class JobSchedule : AuditableEntity<JobSchedule, Guid>, ILinqEntity<JobSc
         ArgumentException.ThrowIfNullOrWhiteSpace(cron);
         Cron = cron
             .TrimSafe()
-            .AgainstNullOrWhiteSpace(() =>
+            .EnsureNotNullOrWhiteSpace(() =>
                 throw new InvalidOperationException("Cron cannot be null or empty."));
     }
 
@@ -108,12 +108,12 @@ public class JobSchedule : AuditableEntity<JobSchedule, Guid>, ILinqEntity<JobSc
     {
         InputState = inputState
             .TrimSafe()
-            .AgainstNullOrWhiteSpace("job.schedule.input.state.required");
+            .EnsureNotNullOrWhiteSpace("job.schedule.input.state.required");
     }
 
     public void SetMaxAttempts(int maxAttempts)
     {
-        MaxAttempts = maxAttempts.AgainstLessOrEqual(
+        MaxAttempts = maxAttempts.EnsureGreaterThan(
             0,
             "job.max.attempts.must.be.greater.than.zero");
     }

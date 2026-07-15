@@ -11,9 +11,9 @@ public partial record Sku
     {
         value = value.Trim();
 
-        value.AgainstNullOrEmpty("article.articleNumber.must.not.be.empty")
-            .AgainstTooShort(3, "article.articleNumber.min.length.3")
-            .AgainstTooLong(128, "article.articleNumber.max.length.128");
+        value.EnsureNotNullOrEmpty("article.articleNumber.must.not.be.empty")
+            .EnsureMinLength(3, "article.articleNumber.min.length.3")
+            .EnsureMaxLength(128, "article.articleNumber.max.length.128");
 
         Value = value;
         NormalizedValue = ToNormalized(Value);
@@ -28,6 +28,14 @@ public partial record Sku
     public static string ToNormalized(string source)
     {
         return OnlyCharacter().Replace(source, "").ToUpperInvariant();
+    }
+
+    public static bool IsValid(string? sku, out Exception? exception)
+    {
+        exception = null;
+        var value = sku?.Trim();
+
+        return true;
     }
 
     public static implicit operator Sku(string value) { return new Sku(value); }

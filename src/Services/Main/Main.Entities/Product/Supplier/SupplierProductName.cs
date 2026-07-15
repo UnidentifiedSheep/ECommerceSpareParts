@@ -27,7 +27,7 @@ public class SupplierProductName :
             Supplier = supplier,
             Name = name
                 .TrimSafe()
-                .AgainstNullOrWhiteSpace(() => new InvalidOperationException(
+                .EnsureNotNullOrWhiteSpace(() => new InvalidOperationException(
                     "Supplier product name cannot be null or empty.")),
             SupplierProductId = supplierProductId
         };

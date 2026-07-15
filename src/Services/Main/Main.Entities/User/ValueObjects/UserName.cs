@@ -10,10 +10,10 @@ public record UserName
     {
         value = value.Trim();
 
-        value.AgainstNullOrEmpty("login.must.not.be.empty")
-            .AgainstTooShort(5, "login.min.length.5")
-            .AgainstTooLong(36, "login.max.length.36")
-            .AgainstSpaces("login.cannot.contain.spaces");
+        value.EnsureNotNullOrEmpty("login.must.not.be.empty")
+            .EnsureMinLength(5, "login.min.length.5")
+            .EnsureMaxLength(36, "login.max.length.36")
+            .EnsureNoSpaces("login.cannot.contain.spaces");
 
         Value = value;
         NormalizedValue = ToNormalized(Value);

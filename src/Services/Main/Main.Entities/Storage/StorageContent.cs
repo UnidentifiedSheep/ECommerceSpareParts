@@ -81,7 +81,7 @@ public class StorageContent : AuditableEntity<StorageContent, int>, ILinqEntity<
     public void SetCount(int count, StorageMovementType movementType)
     {
         var newCount = count
-            .AgainstNegative(() =>
+            .EnsureNonNegative(() =>
                 new InvalidOperationException("Count must be greater than or equal to zero."));
         
         if (Count == newCount)
@@ -107,15 +107,15 @@ public class StorageContent : AuditableEntity<StorageContent, int>, ILinqEntity<
     public void SetBuyPrice(decimal buyPrice, decimal buyPriceInBaseCurrency)
     {
         buyPrice
-            .AgainstTooManyDecimalPlaces(
+            .EnsureMaxDecimalPlaces(
                 2,
                 () => new InvalidOperationException("Buy price must have maximum 2 decimal places."))
-            .AgainstTooSmall(
+            .EnsureAtLeast(
                 0.001m,
                 () => new InvalidOperationException("Buy price must be grater then 0."));
 
         buyPriceInBaseCurrency
-            .AgainstLessOrEqual(
+            .EnsureGreaterThan(
                 0,
                 () => new InvalidOperationException("Buy price in base currency must be greater then 0."));
 

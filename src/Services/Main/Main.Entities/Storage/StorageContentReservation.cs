@@ -65,7 +65,7 @@ public class StorageContentReservation : AuditableEntity<StorageContentReservati
 
     private void SetReservedCount(int initialCount)
     {
-        initialCount.AgainstTooSmall(1, "article.reservation.initial.count.must.be.positive");
+        initialCount.EnsureAtLeast(1, "article.reservation.initial.count.must.be.positive");
         ReservedCount = initialCount;
     }
 
@@ -87,8 +87,8 @@ public class StorageContentReservation : AuditableEntity<StorageContentReservati
         }
 
         givenPrice.Value
-            .AgainstTooManyDecimalPlaces(2, "article.reservation.proposed.price.max.two.decimals")
-            .AgainstTooSmall(0, "article.reservation.given.price.must.be.positive");
+            .EnsureMaxDecimalPlaces(2, "article.reservation.proposed.price.max.two.decimals")
+            .EnsureAtLeast(0, "article.reservation.given.price.must.be.positive");
 
         ProposedPrice = givenPrice;
         ProposedCurrencyId = givenCurrencyId;
@@ -103,7 +103,7 @@ public class StorageContentReservation : AuditableEntity<StorageContentReservati
             return;
         }
 
-        comment.AgainstTooLong(500, "article.reservation.comment.max.length");
+        comment.EnsureMaxLength(500, "article.reservation.comment.max.length");
         Comment = comment;
     }
 

@@ -13,10 +13,10 @@ public class EmailOutBox : AuditableEntity<EmailOutBox, Guid>, ILinqEntity<Email
         string to,
         string body)
     {
-        Subject = subject.AgainstNullOrWhiteSpace(() =>
+        Subject = subject.EnsureNotNullOrWhiteSpace(() =>
             new InvalidOperationException("Subject cannot be null or empty."));
-        To = to.AgainstNullOrWhiteSpace(() => new InvalidOperationException("To cannot be null or empty."));
-        Body = body.AgainstNullOrWhiteSpace(() =>
+        To = to.EnsureNotNullOrWhiteSpace(() => new InvalidOperationException("To cannot be null or empty."));
+        Body = body.EnsureNotNullOrWhiteSpace(() =>
             new InvalidOperationException("Body cannot be null or empty."));
         Status = EmailStatus.Pending;
     }

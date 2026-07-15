@@ -80,7 +80,7 @@ public class MarkupGroup : AuditableEntity<MarkupGroup, int>
     {
         ArgumentNullException.ThrowIfNull(markupRanges);
         var ranges = markupRanges.ToList();
-        ranges.AgainstEmpty(() => new InvalidOperationException("Markup ranges are not empty"));
+        ranges.EnsureNotEmpty(() => new InvalidOperationException("Markup ranges are not empty"));
 
         _markupRanges.Clear();
         _markupRanges.AddRange(ranges);

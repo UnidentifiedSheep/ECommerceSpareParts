@@ -51,14 +51,14 @@ public class PurchaseContent : Entity<PurchaseContent, int>
 
     private static decimal ValidatePrice(decimal price)
     {
-        return price.AgainstLessOrEqual(
+        return price.EnsureGreaterThan(
             0m,
             () => new InvalidInputException("purchase.fact.content.price.required"));
     }
 
     private static int ValidateCount(int count)
     {
-        return count.AgainstLessOrEqual(
+        return count.EnsureGreaterThan(
             0,
             () => new InvalidInputException("purchase.fact.content.count.required"));
     }

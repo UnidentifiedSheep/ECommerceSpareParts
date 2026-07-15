@@ -42,7 +42,7 @@ public abstract class Metric : AuditableEntity<Metric, Guid>, ILinqEntity<Metric
         DateTime rangeStart,
         DateTime rangeEnd)
     {
-        currencyId.AgainstLessOrEqual(
+        currencyId.EnsureGreaterThan(
             0,
             () => new ArgumentException("Currency id must be greater than zero.", nameof(currencyId)));
 
@@ -72,8 +72,8 @@ public abstract class Metric : AuditableEntity<Metric, Guid>, ILinqEntity<Metric
     {
         DimensionKey = dimensionKey
             .TrimSafe()
-            .AgainstNullOrWhiteSpace("metric.dimension.key.required")
-            .AgainstTooLong(200, "metric.dimension.key.too.long");
+            .EnsureNotNullOrWhiteSpace("metric.dimension.key.required")
+            .EnsureMaxLength(200, "metric.dimension.key.too.long");
 
         NaturalKey = ComputeNaturalKey();
     }

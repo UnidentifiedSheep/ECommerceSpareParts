@@ -63,7 +63,7 @@ public class PurchaseContent : Entity<PurchaseContent, int>, ILinqEntity<Purchas
     public void SetCount(int count)
     {
         Count = count
-            .AgainstLessOrEqual(
+            .EnsureGreaterThan(
                 0,
                 () => new InvalidOperationException("Count must be greater than zero."));
         CalculateTotalSum();
@@ -72,10 +72,10 @@ public class PurchaseContent : Entity<PurchaseContent, int>, ILinqEntity<Purchas
     public void SetPrice(decimal price)
     {
         Price = price
-            .AgainstTooManyDecimalPlaces(
+            .EnsureMaxDecimalPlaces(
                 2,
                 () => new InvalidOperationException("Price must have maximum 2 decimal places."))
-            .AgainstLessOrEqual(
+            .EnsureGreaterThan(
                 0,
                 () => new InvalidOperationException("Price must be greater than zero."));
         CalculateTotalSum();
@@ -90,7 +90,7 @@ public class PurchaseContent : Entity<PurchaseContent, int>, ILinqEntity<Purchas
         Comment = comment
             .NullIfWhiteSpace()
             ?
-            .AgainstTooLong(
+            .EnsureMaxLength(
                 256,
                 "purchase.content.comment.too.long");
     }

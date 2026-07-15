@@ -59,14 +59,14 @@ public class SaleContentDetail : Entity<SaleContentDetail, int>, ILinqEntity<Sal
 
     private void SetPrice(decimal price)
     {
-        BuyPrice = price.AgainstLessOrEqual(
+        BuyPrice = price.EnsureGreaterThan(
             0,
             () => new InvalidOperationException("Price must be greater than zero."));
     }
 
     private void SetCount(int count)
     {
-        Count = count.AgainstLessOrEqual(
+        Count = count.EnsureGreaterThan(
             0,
             () => new InvalidOperationException("Count must be greater than zero."));
     }

@@ -65,7 +65,7 @@ public class ProductWeight : Entity<ProductWeight, int>, ILinqEntity<ProductWeig
 
     private static void ValidateWeight(decimal weight)
     {
-        weight.AgainstLessOrEqual(0, "article.weight.must.be.greater.than.zero")
-            .AgainstTooManyDecimalPlaces(2, "article.weight.max.two.decimals");
+        weight.EnsureGreaterThan(0, "article.weight.must.be.greater.than.zero")
+            .EnsureMaxDecimalPlaces(2, "article.weight.max.two.decimals");
     }
 }
