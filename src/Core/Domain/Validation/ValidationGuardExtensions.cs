@@ -9,7 +9,7 @@ public static class ValidationGuardExtensions
         int min,
         string errorKey)
     {
-        return value.Length < min ? throw new InvalidInputException(errorKey) : value;
+        return !value.HasMinLength(min) ? throw new InvalidInputException(errorKey) : value;
     }
 
     public static string EnsureMaxLength(
@@ -17,28 +17,28 @@ public static class ValidationGuardExtensions
         int max,
         string errorKey)
     {
-        return value.Length > max ? throw new InvalidInputException(errorKey) : value;
+        return !value.HasMaxLength(max) ? throw new InvalidInputException(errorKey) : value;
     }
 
     public static string EnsureNoSpaces(this string value, string errorKey)
     {
-        return value.Contains(' ') ? throw new InvalidInputException(errorKey) : value;
+        return !value.HasNoSpaces() ? throw new InvalidInputException(errorKey) : value;
     }
 
     public static string EnsureNotNullOrEmpty(this string value, string errorKey)
     {
-        return string.IsNullOrEmpty(value) ? throw new InvalidInputException(errorKey) : value;
+        return !value.IsNotNullOrEmpty() ? throw new InvalidInputException(errorKey) : value;
     }
 
     public static string EnsureNotNullOrWhiteSpace(this string value, string errorKey)
     {
-        return string.IsNullOrWhiteSpace(value) ? throw new InvalidInputException(errorKey) : value;
+        return !value.IsNotNullOrWhiteSpace() ? throw new InvalidInputException(errorKey) : value;
     }
 
     public static T EnsureNotNull<T>(this T value, string errorKey)
         where T : class
     {
-        return value is null ? throw new InvalidInputException(errorKey) : value;
+        return !value.IsNotNull() ? throw new InvalidInputException(errorKey) : value;
     }
 
     public static T EnsureInRange<T>(
@@ -48,7 +48,7 @@ public static class ValidationGuardExtensions
         string errorKey)
         where T : IComparable<T>
     {
-        return value.CompareTo(min) < 0 || value.CompareTo(max) > 0
+        return !value.IsInRange(min, max)
             ? throw new InvalidInputException(errorKey)
             : value;
     }
@@ -58,7 +58,7 @@ public static class ValidationGuardExtensions
         Func<T, bool> predicate,
         string errorKey)
     {
-        return !predicate(value)
+        return !value.IsValid(predicate)
             ? throw new InvalidInputException(errorKey)
             : value;
     }
@@ -69,7 +69,7 @@ public static class ValidationGuardExtensions
         string errorKey)
         where T : IComparable<T>
     {
-        return value.CompareTo(next) == 0 ? throw new InvalidInputException(errorKey) : value;
+        return !value.IsNotEqual(next) ? throw new InvalidInputException(errorKey) : value;
     }
 
     public static T EnsureAtMost<T>(
@@ -78,7 +78,7 @@ public static class ValidationGuardExtensions
         string errorKey)
         where T : IComparable<T>
     {
-        return value.CompareTo(max) > 0 ? throw new InvalidInputException(errorKey) : value;
+        return !value.IsAtMost(max) ? throw new InvalidInputException(errorKey) : value;
     }
 
     public static T EnsureAtLeast<T>(
@@ -87,7 +87,7 @@ public static class ValidationGuardExtensions
         string errorKey)
         where T : IComparable<T>
     {
-        return value.CompareTo(min) < 0 ? throw new InvalidInputException(errorKey) : value;
+        return !value.IsAtLeast(min) ? throw new InvalidInputException(errorKey) : value;
     }
 
     public static T EnsureGreaterThan<T>(
@@ -96,7 +96,7 @@ public static class ValidationGuardExtensions
         string errorKey)
         where T : IComparable<T>
     {
-        return value.CompareTo(min) <= 0 ? throw new InvalidInputException(errorKey) : value;
+        return !value.IsGreaterThan(min) ? throw new InvalidInputException(errorKey) : value;
     }
 
     public static T EnsureLessThan<T>(
@@ -105,19 +105,19 @@ public static class ValidationGuardExtensions
         string errorKey)
         where T : IComparable<T>
     {
-        return value.CompareTo(max) >= 0 ? throw new InvalidInputException(errorKey) : value;
+        return !value.IsLessThan(max) ? throw new InvalidInputException(errorKey) : value;
     }
 
     public static T EnsureNonNegative<T>(this T value, string errorKey)
         where T : struct, IComparable<T>
     {
-        return value.CompareTo(default) < 0 ? throw new InvalidInputException(errorKey) : value;
+        return !value.IsNonNegative() ? throw new InvalidInputException(errorKey) : value;
     }
 
     public static T EnsureNonPositive<T>(this T value, string errorKey)
         where T : struct, IComparable<T>
     {
-        return value.CompareTo(default) > 0 ? throw new InvalidInputException(errorKey) : value;
+        return !value.IsNonPositive() ? throw new InvalidInputException(errorKey) : value;
     }
 
     public static decimal EnsureMaxDecimalPlaces(
@@ -125,9 +125,7 @@ public static class ValidationGuardExtensions
         int maxDecimals,
         string errorKey)
     {
-        var decimalPlaces = BitConverter.GetBytes(decimal.GetBits(value)[3])[2];
-
-        return decimalPlaces > maxDecimals
+        return !value.HasAtMostDecimalPlaces(maxDecimals)
             ? throw new InvalidInputException(errorKey)
             : value;
     }
@@ -135,7 +133,7 @@ public static class ValidationGuardExtensions
     public static IEnumerable<T> EnsureNotEmpty<T>(this IEnumerable<T> value, string errorKey)
     {
         // ReSharper disable once PossibleMultipleEnumeration
-        return !value.Any() ? throw new InvalidInputException(errorKey) : value;
+        return !value.IsNotEmpty() ? throw new InvalidInputException(errorKey) : value;
     }
 
     public static string EnsureMinLength(
@@ -143,7 +141,7 @@ public static class ValidationGuardExtensions
         int min,
         Func<Exception> exceptionFactory)
     {
-        return value.Length < min ? throw exceptionFactory() : value;
+        return !value.HasMinLength(min) ? throw exceptionFactory() : value;
     }
 
     public static string EnsureMaxLength(
@@ -151,28 +149,28 @@ public static class ValidationGuardExtensions
         int max,
         Func<Exception> exceptionFactory)
     {
-        return value.Length > max ? throw exceptionFactory() : value;
+        return !value.HasMaxLength(max) ? throw exceptionFactory() : value;
     }
 
     public static string EnsureNoSpaces(this string value, Func<Exception> exceptionFactory)
     {
-        return value.Contains(' ') ? throw exceptionFactory() : value;
+        return !value.HasNoSpaces() ? throw exceptionFactory() : value;
     }
 
     public static string EnsureNotNullOrEmpty(this string value, Func<Exception> exceptionFactory)
     {
-        return string.IsNullOrEmpty(value) ? throw exceptionFactory() : value;
+        return !value.IsNotNullOrEmpty() ? throw exceptionFactory() : value;
     }
 
     public static string EnsureNotNullOrWhiteSpace(this string value, Func<Exception> exceptionFactory)
     {
-        return string.IsNullOrWhiteSpace(value) ? throw exceptionFactory() : value;
+        return !value.IsNotNullOrWhiteSpace() ? throw exceptionFactory() : value;
     }
 
     public static T EnsureNotNull<T>(this T value, Func<Exception> exceptionFactory)
         where T : class
     {
-        return value is null ? throw exceptionFactory() : value;
+        return !value.IsNotNull() ? throw exceptionFactory() : value;
     }
 
     public static T EnsureInRange<T>(
@@ -182,7 +180,7 @@ public static class ValidationGuardExtensions
         Func<Exception> exceptionFactory)
         where T : IComparable<T>
     {
-        return value.CompareTo(min) < 0 || value.CompareTo(max) > 0
+        return !value.IsInRange(min, max)
             ? throw exceptionFactory()
             : value;
     }
@@ -192,7 +190,7 @@ public static class ValidationGuardExtensions
         Func<T, bool> predicate,
         Func<Exception> exceptionFactory)
     {
-        return !predicate(value)
+        return !value.IsValid(predicate)
             ? throw exceptionFactory()
             : value;
     }
@@ -203,7 +201,7 @@ public static class ValidationGuardExtensions
         Func<Exception> exceptionFactory)
         where T : IComparable<T>
     {
-        return value.CompareTo(next) == 0 ? throw exceptionFactory() : value;
+        return !value.IsNotEqual(next) ? throw exceptionFactory() : value;
     }
 
     public static T EnsureAtMost<T>(
@@ -212,7 +210,7 @@ public static class ValidationGuardExtensions
         Func<Exception> exceptionFactory)
         where T : IComparable<T>
     {
-        return value.CompareTo(max) > 0 ? throw exceptionFactory() : value;
+        return !value.IsAtMost(max) ? throw exceptionFactory() : value;
     }
 
     public static T EnsureAtLeast<T>(
@@ -221,7 +219,7 @@ public static class ValidationGuardExtensions
         Func<Exception> exceptionFactory)
         where T : IComparable<T>
     {
-        return value.CompareTo(min) < 0 ? throw exceptionFactory() : value;
+        return !value.IsAtLeast(min) ? throw exceptionFactory() : value;
     }
 
     public static T EnsureGreaterThan<T>(
@@ -230,7 +228,7 @@ public static class ValidationGuardExtensions
         Func<Exception> exceptionFactory)
         where T : IComparable<T>
     {
-        return value.CompareTo(min) <= 0 ? throw exceptionFactory() : value;
+        return !value.IsGreaterThan(min) ? throw exceptionFactory() : value;
     }
 
     public static T EnsureLessThan<T>(
@@ -239,20 +237,20 @@ public static class ValidationGuardExtensions
         Func<Exception> exceptionFactory)
         where T : IComparable<T>
     {
-        return value.CompareTo(max) >= 0 ? throw exceptionFactory() : value;
+        return !value.IsLessThan(max) ? throw exceptionFactory() : value;
     }
 
 
     public static T EnsureNonNegative<T>(this T value, Func<Exception> exceptionFactory)
         where T : struct, IComparable<T>
     {
-        return value.CompareTo(default) < 0 ? throw exceptionFactory() : value;
+        return !value.IsNonNegative() ? throw exceptionFactory() : value;
     }
 
     public static T EnsureNonPositive<T>(this T value, Func<Exception> exceptionFactory)
         where T : struct, IComparable<T>
     {
-        return value.CompareTo(default) > 0 ? throw exceptionFactory() : value;
+        return !value.IsNonPositive() ? throw exceptionFactory() : value;
     }
 
     public static decimal EnsureMaxDecimalPlaces(
@@ -260,9 +258,7 @@ public static class ValidationGuardExtensions
         int maxDecimals,
         Func<Exception> exceptionFactory)
     {
-        var decimalPlaces = BitConverter.GetBytes(decimal.GetBits(value)[3])[2];
-
-        return decimalPlaces > maxDecimals
+        return !value.HasAtMostDecimalPlaces(maxDecimals)
             ? throw exceptionFactory()
             : value;
     }
@@ -270,6 +266,6 @@ public static class ValidationGuardExtensions
     public static IEnumerable<T> EnsureNotEmpty<T>(this IEnumerable<T> value, Func<Exception> exceptionFactory)
     {
         // ReSharper disable once PossibleMultipleEnumeration
-        return !value.Any() ? throw exceptionFactory() : value;
+        return !value.IsNotEmpty() ? throw exceptionFactory() : value;
     }
 }

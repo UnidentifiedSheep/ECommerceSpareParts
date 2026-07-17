@@ -1,5 +1,7 @@
-﻿using System.Text.RegularExpressions;
+﻿using System.Diagnostics.CodeAnalysis;
+using System.Text.RegularExpressions;
 using Domain.Extensions;
+using Exceptions;
 
 namespace Main.Entities.Product.ValueObjects;
 
@@ -11,9 +13,8 @@ public partial record Sku
     {
         value = value.Trim();
 
-        value.EnsureNotNullOrEmpty("article.articleNumber.must.not.be.empty")
-            .EnsureMinLength(3, "article.articleNumber.min.length.3")
-            .EnsureMaxLength(128, "article.articleNumber.max.length.128");
+        if (!IsValid(value, out var exception))
+            throw exception;
 
         Value = value;
         NormalizedValue = ToNormalized(Value);
@@ -30,11 +31,27 @@ public partial record Sku
         return OnlyCharacter().Replace(source, "").ToUpperInvariant();
     }
 
-    public static bool IsValid(string? sku, out Exception? exception)
+    public static bool IsValid(string? sku, [NotNullWhen(false)] out Exception? exception)
     {
         exception = null;
-        var value = sku?.Trim();
 
+        if (string.IsNullOrWhiteSpace(sku))
+        {
+            exception = new InvalidInputException("article.articleNumber.must.not.be.empty");
+            return false;
+        }
+
+        if (!sku.HasMinLength(3))
+        {
+            exception = new InvalidInputException("article.articleNumber.min.length.3");
+            return false;
+        }
+
+        if (sku.HasMaxLength(128))
+        {
+            exception = new InvalidInputException("article.articleNumber.max.length.128");
+            return false;
+        }
         return true;
     }
 
