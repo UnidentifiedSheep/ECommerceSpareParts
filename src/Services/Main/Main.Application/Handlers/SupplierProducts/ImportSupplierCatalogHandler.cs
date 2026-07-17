@@ -8,7 +8,7 @@ using Main.Entities.Product.ValueObjects;
 using MediatR;
 
 namespace Main.Application.Handlers.SupplierProducts;
-
+//TODO this should be implemented.
 public record ImportSupplierCatalogCommand(
     Supplier Supplier,
     IReadOnlyCollection<ContractSupplierProductDto> Products
@@ -42,6 +42,7 @@ public class ImportSupplierCatalogHandler(
             .Where(x => numbers.Contains(x.Sku.NormalizedValue))
             .Track(false)
             .Build();
+        
         throw new NotImplementedException();
     }
 
