@@ -23,9 +23,11 @@ public class UpsertPriceApplierTests(CombinedContainerFixture fixture) : Integra
     public async Task WithNewDynamicApplier_CreatesApplierAndStates()
     {
         var systemName = $"dynamic-{Faker.Random.Guid():N}";
+        const string name = "Dynamic price rule";
         const string dslLogic = """{"var":"salePrice"}""";
         var command = new UpsertPriceApplierCommand(
             systemName,
+            name,
             dslLogic,
             [
                 State(PriceOfferSourceType.Supplier, 10),
@@ -35,6 +37,7 @@ public class UpsertPriceApplierTests(CombinedContainerFixture fixture) : Integra
         var result = await Mediator.Send(command);
 
         result.Applier.SystemName.Should().Be(systemName);
+        result.Applier.Name.Should().Be(name);
         result.Applier.IsDynamic.Should().BeTrue();
         result.Applier.DslLogic.Should().Be(dslLogic);
         result.Applier.States.Should().BeEquivalentTo(
@@ -51,6 +54,7 @@ public class UpsertPriceApplierTests(CombinedContainerFixture fixture) : Integra
                 JsonNode.Parse(dslLogic))
             .Should()
             .BeTrue();
+        applier.Name.Should().Be(name);
         applier.States.Should().BeEquivalentTo(
             command.States,
             options => options.ExcludingMissingMembers());
@@ -65,6 +69,7 @@ public class UpsertPriceApplierTests(CombinedContainerFixture fixture) : Integra
         const string newDslLogic = """{"*":[{"var":"salePrice"},2]}""";
         var command = new UpsertPriceApplierCommand(
             existing.SystemName,
+            "Updated dynamic price rule",
             newDslLogic,
             [
                 State(PriceOfferSourceType.Supplier, 30, false),
@@ -83,6 +88,7 @@ public class UpsertPriceApplierTests(CombinedContainerFixture fixture) : Integra
                 JsonNode.Parse(newDslLogic))
             .Should()
             .BeTrue();
+        applier.Name.Should().Be(command.Name);
         applier.States.Should().BeEquivalentTo(
             command.States,
             options => options.ExcludingMissingMembers());
@@ -97,6 +103,7 @@ public class UpsertPriceApplierTests(CombinedContainerFixture fixture) : Integra
             .BuildAndAddToDb(Context);
         var command = new UpsertPriceApplierCommand(
             existing.SystemName,
+            "Dynamic price rule",
             """{"var":"salePrice"}""",
             [State(PriceOfferSourceType.Supplier, 30)]);
 
@@ -116,6 +123,7 @@ public class UpsertPriceApplierTests(CombinedContainerFixture fixture) : Integra
     {
         var command = new UpsertPriceApplierCommand(
             nameof(MarkupApplier),
+            null,
             "not-json",
             [
                 State(PriceOfferSourceType.Supplier, 999),
@@ -125,6 +133,8 @@ public class UpsertPriceApplierTests(CombinedContainerFixture fixture) : Integra
         var result = await Mediator.Send(command);
 
         result.Applier.IsDynamic.Should().BeFalse();
+        result.Applier.Name.Should().NotBeNullOrWhiteSpace();
+        result.Applier.Name.Should().NotBe(result.Applier.SystemName);
         result.Applier.DslLogic.Should().BeNull();
         result.Applier.States.Should().OnlyContain(x => x.Order == 0);
 
@@ -147,6 +157,7 @@ public class UpsertPriceApplierTests(CombinedContainerFixture fixture) : Integra
             .BuildAndAddToDb(Context);
         var command = new UpsertPriceApplierCommand(
             existing.SystemName,
+            null,
             null,
             [State(PriceOfferSourceType.Supplier, -1, false)]);
 
@@ -172,6 +183,7 @@ public class UpsertPriceApplierTests(CombinedContainerFixture fixture) : Integra
         var command = new UpsertPriceApplierCommand(
             existing.SystemName,
             null,
+            null,
             [State(PriceOfferSourceType.Supplier, null)]);
 
         await Mediator.Send(command);
@@ -195,6 +207,7 @@ public class UpsertPriceApplierTests(CombinedContainerFixture fixture) : Integra
     {
         var command = new UpsertPriceApplierCommand(
             $"dynamic-{Faker.Random.Guid():N}",
+            "Dynamic price rule",
             """{"var":"salePrice"}""",
             [
                 State(PriceOfferSourceType.Supplier, 10),
@@ -211,7 +224,11 @@ public class UpsertPriceApplierTests(CombinedContainerFixture fixture) : Integra
     public async Task WithDynamicApplierWithoutDslLogic_ThrowsInvalidInputException()
     {
         var systemName = $"dynamic-{Faker.Random.Guid():N}";
-        var command = new UpsertPriceApplierCommand(systemName, "  ", []);
+        var command = new UpsertPriceApplierCommand(
+            systemName,
+            "Dynamic price rule",
+            "  ",
+            []);
 
         var exception = await Assert.ThrowsAsync<InvalidInputException>(() => Mediator.Send(command));
 
@@ -220,6 +237,40 @@ public class UpsertPriceApplierTests(CombinedContainerFixture fixture) : Integra
             .AsNoTracking()
             .AnyAsync(x => x.SystemName == systemName);
         exists.Should().BeFalse();
+    }
+
+    [Fact]
+    public async Task WithDynamicApplierWithoutName_ThrowsInvalidInputException()
+    {
+        var systemName = $"dynamic-{Faker.Random.Guid():N}";
+        var command = new UpsertPriceApplierCommand(
+            systemName,
+            "  ",
+            """{"var":"salePrice"}""",
+            []);
+
+        var exception = await Assert.ThrowsAsync<InvalidInputException>(() => Mediator.Send(command));
+
+        exception.MessageKey.Should().Be("price.applier.name.required");
+        var exists = await Context.Set<PriceApplier>()
+            .AsNoTracking()
+            .AnyAsync(x => x.SystemName == systemName);
+        exists.Should().BeFalse();
+    }
+
+    [Fact]
+    public async Task WithDynamicApplierNameOverMaximumLength_ThrowsValidationException()
+    {
+        var command = new UpsertPriceApplierCommand(
+            $"dynamic-{Faker.Random.Guid():N}",
+            new string('a', 129),
+            """{"var":"salePrice"}""",
+            []);
+
+        var exception = await Assert.ThrowsAsync<ValidationException>(() => Mediator.Send(command));
+
+        exception.Errors.Should().ContainSingle(x =>
+            x.ErrorCode == "price.applier.name.max.length");
     }
 
     [Theory]
@@ -232,6 +283,7 @@ public class UpsertPriceApplierTests(CombinedContainerFixture fixture) : Integra
         var systemName = $"dynamic-{Faker.Random.Guid():N}";
         var command = new UpsertPriceApplierCommand(
             systemName,
+            "Dynamic price rule",
             dslLogic,
             [State(PriceOfferSourceType.Supplier, 10)]);
 
@@ -250,6 +302,7 @@ public class UpsertPriceApplierTests(CombinedContainerFixture fixture) : Integra
         var systemName = $"dynamic-{Faker.Random.Guid():N}";
         var command = new UpsertPriceApplierCommand(
             systemName,
+            "Dynamic price rule",
             """{"var":"salePrice"}""",
             [State(PriceOfferSourceType.Supplier, null)]);
 
@@ -268,6 +321,7 @@ public class UpsertPriceApplierTests(CombinedContainerFixture fixture) : Integra
         var command = new UpsertPriceApplierCommand(
             nameof(MinimumSupplierPriceApplier),
             null,
+            null,
             [State(PriceOfferSourceType.Supplier, null)]);
 
         var exception = await Assert.ThrowsAsync<InvalidInputException>(() => Mediator.Send(command));
@@ -281,7 +335,11 @@ public class UpsertPriceApplierTests(CombinedContainerFixture fixture) : Integra
         var existing = await new PriceApplierDataBuilder(Faker)
             .WithSystemName(nameof(MarkupApplier))
             .BuildAndAddToDb(Context);
-        var command = new UpsertPriceApplierCommand(existing.SystemName, null, []);
+        var command = new UpsertPriceApplierCommand(
+            existing.SystemName,
+            null,
+            null,
+            []);
 
         var exception = await Assert.ThrowsAsync<InvalidInputException>(() => Mediator.Send(command));
 
@@ -296,6 +354,7 @@ public class UpsertPriceApplierTests(CombinedContainerFixture fixture) : Integra
             .BuildAndAddToDb(Context);
         var command = new UpsertPriceApplierCommand(
             $"dynamic-{Faker.Random.Guid():N}",
+            "Dynamic price rule",
             """{"var":"salePrice"}""",
             [State(PriceOfferSourceType.Supplier, 10)]);
 
@@ -313,6 +372,7 @@ public class UpsertPriceApplierTests(CombinedContainerFixture fixture) : Integra
         var systemName = $"dynamic-{Faker.Random.Guid():N}";
         var command = new UpsertPriceApplierCommand(
             systemName,
+            "Dynamic price rule",
             """{"var":"salePrice"}""",
             [State(PriceOfferSourceType.OurWarehouse, 10)]);
 
@@ -333,6 +393,7 @@ public class UpsertPriceApplierTests(CombinedContainerFixture fixture) : Integra
         var systemName = $"dynamic-{Faker.Random.Guid():N}";
         var command = new UpsertPriceApplierCommand(
             systemName,
+            "Dynamic price rule",
             """{"var":"salePrice"}""",
             [State(PriceOfferSourceType.Supplier, 10)]);
 
@@ -353,6 +414,7 @@ public class UpsertPriceApplierTests(CombinedContainerFixture fixture) : Integra
         var systemName = $"dynamic-{Faker.Random.Guid():N}";
         var command = new UpsertPriceApplierCommand(
             systemName,
+            "Dynamic price rule",
             """{"var":"salePrice"}""",
             [State(PriceOfferSourceType.Supplier, 10, false)]);
 

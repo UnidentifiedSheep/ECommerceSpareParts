@@ -7,6 +7,10 @@ public class UpsertPriceApplierValidation : AbstractValidator<UpsertPriceApplier
 {
     public UpsertPriceApplierValidation()
     {
+        RuleFor(x => x.Name)
+            .MaximumLength(128)
+            .WithLocalizationKey("price.applier.name.max.length");
+
         RuleFor(x => x.States)
             .Must(states => states
                 .Select(x => x.Usage)

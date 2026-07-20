@@ -11,6 +11,7 @@ public class PriceApplier :
     ILinqEntity<PriceApplier, string>
 {
     public string SystemName { get; private set; } = null!;
+    public string? Name { get; private set; }
     public string? DslLogic { get; private set; }
 
     private readonly List<PriceApplierState> _states = [];
@@ -25,9 +26,13 @@ public class PriceApplier :
             .EnsureNotNullOrWhiteSpace(() => new InvalidOperationException("System name cannot be empty"));
     }
 
-    public static PriceApplier Create(string systemName, string dslLogic)
+    public static PriceApplier Create(
+        string systemName,
+        string name,
+        string dslLogic)
     {
         var applier = new PriceApplier(systemName);
+        applier.SetName(name);
         applier.SetDslLogic(dslLogic);
         return applier;
     }
@@ -42,6 +47,12 @@ public class PriceApplier :
         var usagesToKeep = usages.ToHashSet();
         _states.RemoveAll(x => !usagesToKeep.Contains(x.Usage));
     }
+
+    public void SetName(string name)
+        => Name = name
+            .TrimSafe()
+            .EnsureNotNullOrWhiteSpace(() => new InvalidOperationException("Name cannot be empty"))
+            .EnsureMaxLength(128, () => new InvalidOperationException("Name cannot exceed 128 characters"));
 
     public void SetDslLogic(string dslLogic)
         => DslLogic = dslLogic

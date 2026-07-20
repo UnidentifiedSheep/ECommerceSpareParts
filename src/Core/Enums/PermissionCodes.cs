@@ -82,6 +82,7 @@ public enum PermissionCodes
     // ===== PRICES =====
     PRICES_GET_DETAILED,
     PRICES_GET_STANDARD,
+    PRICE_APPLIERS_MANAGE,
 
     // ===== PURCHASE =====
     PURCHASE_CREATE,

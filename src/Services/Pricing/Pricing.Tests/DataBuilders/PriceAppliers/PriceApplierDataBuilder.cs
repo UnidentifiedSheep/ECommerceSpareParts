@@ -10,6 +10,7 @@ public class PriceApplierDataBuilder(Faker faker) : BuilderBase<PriceApplier>(fa
     private readonly List<(PriceOfferSourceType Usage, int Order, bool Enabled)> _states = [];
 
     public string? SystemName { get; private set; }
+    public string? Name { get; private set; }
     public string DslLogic { get; private set; } = """{"var":"salePrice"}""";
     public bool IsDynamic { get; private set; } = true;
 
@@ -23,6 +24,12 @@ public class PriceApplierDataBuilder(Faker faker) : BuilderBase<PriceApplier>(fa
     {
         DslLogic = dslLogic;
         IsDynamic = true;
+        return this;
+    }
+
+    public PriceApplierDataBuilder WithName(string name)
+    {
+        Name = name;
         return this;
     }
 
@@ -45,7 +52,10 @@ public class PriceApplierDataBuilder(Faker faker) : BuilderBase<PriceApplier>(fa
     {
         var systemName = SystemName ?? $"price-applier-{Faker.Random.Guid():N}";
         var applier = IsDynamic
-            ? PriceApplier.Create(systemName, DslLogic)
+            ? PriceApplier.Create(
+                systemName,
+                Name ?? Faker.Commerce.ProductName(),
+                DslLogic)
             : PriceApplier.CreateLocal(systemName);
 
         foreach (var state in _states)

@@ -5,6 +5,7 @@ using Application.Common.Interfaces.NamedObject;
 using Application.Common.Interfaces.Repositories;
 using Attributes;
 using Exceptions;
+using Localization.Abstractions.Interfaces;
 using Microsoft.EntityFrameworkCore;
 using Pricing.Application.Dtos.PriceApplier;
 using Pricing.Application.Interfaces.Pricing.PriceApplier;
@@ -19,6 +20,7 @@ namespace Pricing.Application.Handlers.PriceApplier.UpsertPriceApplier;
 [Transactional, AutoSave]
 public record UpsertPriceApplierCommand(
     string SystemName,
+    string? Name,
     string? DslLogic,
     IReadOnlyList<UpsertPriceApplierStateDto> States
     ) : ICommand<UpsertPriceApplierResult>;
@@ -28,6 +30,7 @@ public class UpsertPriceApplierHandler(
     INamedObjectRegistry<ApplierNamedObjectBase> registry,
     IRepository<Entities.Pricing.PriceApplier, string> repository,
     IReadRepository<PriceApplierState, PriceApplierStateKey> stateRepository,
+    IScopedStringLocalizer localizer,
     IUnitOfWork unitOfWork) : ICommandHandler<UpsertPriceApplierCommand, UpsertPriceApplierResult>
 {
     public async Task<UpsertPriceApplierResult> Handle(
@@ -46,6 +49,9 @@ public class UpsertPriceApplierHandler(
         var created = model is null;
         var dslLogic = local is null
             ? GetRequiredDslLogic(request.DslLogic)
+            : null;
+        var name = local is null
+            ? GetRequiredName(request.Name)
             : null;
 
         if (dslLogic is not null
@@ -68,6 +74,7 @@ public class UpsertPriceApplierHandler(
             model = local is null
                 ? Entities.Pricing.PriceApplier.Create(
                     request.SystemName,
+                    name!,
                     dslLogic!)
                 : Entities.Pricing.PriceApplier.CreateLocal(request.SystemName);
             
@@ -75,14 +82,21 @@ public class UpsertPriceApplierHandler(
         }
 
         if (!created && local is null)
+        {
+            model.SetName(name!);
             model.SetDslLogic(dslLogic!);
+        }
 
         foreach (var state in request.States)
             UpdateState(model, state, GetOrder(state, local));
 
         model.RemoveStatesExcept(request.States.Select(x => x.Usage));
         
-        return new UpsertPriceApplierResult(PriceApplierProjections.ToApplierDto.AsFunc()(model));
+        var result = PriceApplierProjections.ToApplierDto.AsFunc()(model);
+        if (local is not null)
+            result = result with { Name = local.GetLocalizedName(localizer) };
+
+        return new UpsertPriceApplierResult(result);
     }
 
     private static void UpdateState(
@@ -109,6 +123,13 @@ public class UpsertPriceApplierHandler(
         return string.IsNullOrWhiteSpace(dslLogic)
             ? throw new InvalidInputException("price.applier.dsl.logic.required")
             : dslLogic;
+    }
+
+    private static string GetRequiredName(string? name)
+    {
+        return string.IsNullOrWhiteSpace(name)
+            ? throw new InvalidInputException("price.applier.name.required")
+            : name;
     }
 
     private static int GetLocalOrder(

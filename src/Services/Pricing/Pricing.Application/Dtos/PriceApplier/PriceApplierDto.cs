@@ -7,6 +7,9 @@ public record PriceApplierDto
     [JsonPropertyName("systemName")]
     public required string SystemName { get; init; }
 
+    [JsonPropertyName("name")]
+    public required string Name { get; init; }
+
     [JsonPropertyName("isDynamic")]
     public required bool IsDynamic { get; init; }
     

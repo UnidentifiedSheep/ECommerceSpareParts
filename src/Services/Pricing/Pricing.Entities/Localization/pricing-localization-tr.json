@@ -10,6 +10,8 @@
     "price.applier.uniqueness.additional.markup.name": "Benzersiz ürün ek kâr marjı",
     "price.applier.uniqueness.additional.markup.description": "Ürünün piyasa teklifi olmadığında ek kâr marjı uygular.",
     "price.applier.order.required": "Fiyat uygulayıcı sırası zorunludur.",
+    "price.applier.name.required": "Fiyat uygulayıcı adı zorunludur.",
+    "price.applier.name.max.length": "Fiyat uygulayıcı adı 128 karakteri aşmamalıdır.",
     "price.applier.order.duplicate": "Bu sıra başka bir etkin fiyat uygulayıcı tarafından zaten kullanılıyor.",
     "price.applier.dsl.logic.required": "Dinamik fiyat uygulayıcı için DSL mantığı zorunludur.",
     "price.applier.dsl.logic.invalid": "DSL mantığı, negatif olmayan ondalık bir fiyat döndüren geçerli bir JSON Logic kuralı olmalıdır.",

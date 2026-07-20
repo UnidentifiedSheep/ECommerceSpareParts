@@ -103,6 +103,8 @@
     "permissions.prices.get.detailed.description": "Право на получение детальных цен.",
     "permissions.prices.get.standard.name": "Просмотр цен",
     "permissions.prices.get.standard.description": "Право на получение цен.",
+    "permissions.price.appliers.manage.name": "Управление правилами формирования цены",
+    "permissions.price.appliers.manage.description": "Право на управление правилами формирования цены.",
     "permissions.purchase.create.name": "Создание закупки",
     "permissions.purchase.create.description": "Право на создание закупки.",
     "permissions.purchase.edit.name": "Редактирование закупки",

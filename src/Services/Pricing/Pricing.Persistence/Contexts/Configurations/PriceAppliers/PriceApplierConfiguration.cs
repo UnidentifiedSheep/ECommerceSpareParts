@@ -17,6 +17,10 @@ public class PriceApplierConfiguration : IEntityTypeConfiguration<PriceApplier>
             .ValueGeneratedNever()
             .HasColumnName("system_name");
 
+        builder.Property(e => e.Name)
+            .HasMaxLength(128)
+            .HasColumnName("name");
+
         builder.Property(e => e.DslLogic)
             .HasColumnType("jsonb")
             .HasColumnName("dsl_logic");

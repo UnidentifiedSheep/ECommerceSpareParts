@@ -10,6 +10,8 @@
     "price.applier.uniqueness.additional.markup.name": "Unique product additional markup",
     "price.applier.uniqueness.additional.markup.description": "Applies an additional markup when the product has no market offers.",
     "price.applier.order.required": "Price applier order is required.",
+    "price.applier.name.required": "Price applier name is required.",
+    "price.applier.name.max.length": "Price applier name must not exceed 128 characters.",
     "price.applier.order.duplicate": "Another enabled price applier already uses this order.",
     "price.applier.dsl.logic.required": "DSL logic is required for a dynamic price applier.",
     "price.applier.dsl.logic.invalid": "DSL logic must be a valid JSON Logic rule that returns a non-negative decimal price.",
