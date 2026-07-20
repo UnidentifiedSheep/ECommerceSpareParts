@@ -28,9 +28,12 @@ public class PriceApplierState :
             PriceApplierSystemName = priceApplierSystemName
                 .EnsureNotNullOrWhiteSpace(() => new InvalidOperationException("Price applier system name cannot be empty"))
         };
-    
-    public void Enable() => Enabled = true;
-    public void Disable() => Enabled = false;
+
+    public void Update(int order, bool enabled = true)
+    {
+        Order = order;
+        Enabled = enabled;
+    }
     
     public override PriceApplierStateKey GetId() => new(PriceApplierSystemName, Usage);
     public static Expression<Func<PriceApplierState, PriceApplierStateKey>> GetKeySelector()

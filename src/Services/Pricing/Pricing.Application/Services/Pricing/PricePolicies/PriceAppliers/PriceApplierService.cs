@@ -13,7 +13,13 @@ public class PriceApplierService(
         PriceOfferSourceType usage, 
         CancellationToken ct = default)
     {
-        var allLocal = registry.All;
+        var allLocal = registry.All
+            .Where(x => usage switch
+            {
+                PriceOfferSourceType.OurWarehouse => x is IInternalPriceApplier,
+                PriceOfferSourceType.Supplier => x is ISupplierPriceApplier,
+                _ => false
+            });
         var appliers = (await priceApplierProvider
             .GetPriceAppliersAsync(ct))
             .ToDictionary(x => x.SystemName);

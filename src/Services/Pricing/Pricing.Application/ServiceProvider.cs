@@ -64,7 +64,6 @@ public static class ServiceProvider
     private static IServiceCollection AddPricingServices(this IServiceCollection collection)
     {
         collection
-            .AddPriceAppliers()
             .AddScoped<IOfferScorer, OfferScorerByEffectiveCost>()
             .AddScoped<IInternalPricePolicy, InternalPricePolicy>()
             .AddScoped<ISupplierPricePolicy, SupplierPricePolicy>()
@@ -72,19 +71,6 @@ public static class ServiceProvider
             .AddScoped<IPriceCandidateBuilder, PriceCandidateBuilder>()
             .AddScoped<IProductPriceCalculator, ProductPriceCalculator>();
         
-        return collection;
-    }
-
-    private static IServiceCollection AddPriceAppliers(this IServiceCollection collection)
-    {
-        collection.AddScoped<IInternalPriceApplier, MinimumSupplierPriceApplier>();
-        
-        collection.AddScoped<IInternalPriceApplier, MarkupApplier>();
-        collection.AddScoped<IInternalPriceApplier, PriceRoundingApplier>();
-        collection.AddScoped<IInternalPriceApplier, UniquenessAdditionalMarkupApplier>();
-        
-        collection.AddScoped<ISupplierPriceApplier, MarkupApplier>();
-        collection.AddScoped<ISupplierPriceApplier, PriceRoundingApplier>();
         return collection;
     }
 }
