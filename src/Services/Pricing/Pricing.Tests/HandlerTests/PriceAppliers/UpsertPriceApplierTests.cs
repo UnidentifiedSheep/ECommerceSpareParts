@@ -5,6 +5,7 @@ using Microsoft.Extensions.DependencyInjection;
 using System.Text.Json.Nodes;
 using Pricing.Application.Dtos.PriceApplier;
 using Pricing.Application.Handlers.PriceApplier;
+using Pricing.Application.Interfaces.Cache;
 using Pricing.Application.Interfaces.Pricing.PriceApplier;
 using Pricing.Application.Handlers.PriceApplier.UpsertPriceApplier;
 using Pricing.Application.Services.Pricing.PricePolicies.PriceAppliers;
@@ -424,6 +425,73 @@ public class UpsertPriceApplierTests(CombinedContainerFixture fixture) : Integra
             .AsNoTracking()
             .SingleAsync(x => x.PriceApplierSystemName == systemName);
         state.Enabled.Should().BeFalse();
+    }
+
+    [Fact]
+    public async Task WithCachedAppliers_CreatingApplierInvalidatesCache()
+    {
+        var provider = Scope.ServiceProvider.GetRequiredService<IPriceApplierProvider>();
+        var systemName = $"dynamic-{Faker.Random.Guid():N}";
+        await provider.GetPriceAppliersAsync();
+
+        await Mediator.Send(new UpsertPriceApplierCommand(
+            systemName,
+            "Created rule",
+            """{"var":"salePrice"}""",
+            [State(PriceOfferSourceType.Supplier, 10)]));
+
+        var appliers = await provider.GetPriceAppliersAsync();
+        appliers.Should().Contain(x =>
+            x.SystemName == systemName
+            && x.Name == "Created rule");
+    }
+
+    [Fact]
+    public async Task WithCachedAppliers_UpdatingApplierInvalidatesCache()
+    {
+        var existing = await new PriceApplierDataBuilder(Faker)
+            .WithName("Original rule")
+            .WithState(PriceOfferSourceType.Supplier, 10)
+            .BuildAndAddToDb(Context);
+        var provider = Scope.ServiceProvider.GetRequiredService<IPriceApplierProvider>();
+        await provider.GetPriceAppliersAsync();
+
+        await Mediator.Send(new UpsertPriceApplierCommand(
+            existing.SystemName,
+            "Updated rule",
+            """{"var":"cost"}""",
+            [State(PriceOfferSourceType.Supplier, 10)]));
+
+        var applier = (await provider.GetPriceAppliersAsync())
+            .Single(x => x.SystemName == existing.SystemName);
+        applier.Name.Should().Be("Updated rule");
+        JsonNode.DeepEquals(
+                JsonNode.Parse(applier.DslLogic!),
+                JsonNode.Parse("""{"var":"cost"}"""))
+            .Should()
+            .BeTrue();
+    }
+
+    [Fact]
+    public async Task WithCachedAppliers_UpdatingLocalStateInvalidatesCache()
+    {
+        var existing = await new PriceApplierDataBuilder(Faker)
+            .WithSystemName(nameof(MarkupApplier))
+            .AsLocal()
+            .WithState(PriceOfferSourceType.Supplier, 0, false)
+            .BuildAndAddToDb(Context);
+        var provider = Scope.ServiceProvider.GetRequiredService<IPriceApplierProvider>();
+        await provider.GetPriceAppliersAsync();
+
+        await Mediator.Send(new UpsertPriceApplierCommand(
+            existing.SystemName,
+            null,
+            null,
+            [State(PriceOfferSourceType.Supplier, null)]));
+
+        var applier = (await provider.GetPriceAppliersAsync())
+            .Single(x => x.SystemName == existing.SystemName);
+        applier.States.Single().Enabled.Should().BeTrue();
     }
 
     private static UpsertPriceApplierStateDto State(

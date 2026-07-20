@@ -2,6 +2,7 @@ using System.Linq.Expressions;
 using Domain;
 using Domain.Extensions;
 using Domain.Interfaces;
+using Pricing.Entities.DomainEvents;
 using Pricing.Enums;
 
 namespace Pricing.Entities.Pricing;
@@ -59,6 +60,16 @@ public class PriceApplier :
             .TrimSafe()
             .EnsureNotNullOrWhiteSpace(() => new InvalidOperationException("DSL logic cannot be empty"))
             .EnsureValidJson(() => new InvalidOperationException("DSL logic is not valid JSON"));
+
+    public override void OnCreated() => AddUpdatedDomainEvent();
+
+    public override void OnUpdated() => AddUpdatedDomainEvent();
+
+    private void AddUpdatedDomainEvent()
+        => AddDomainEvent(new PriceApplierUpdatedDomainEvent
+        {
+            SystemName = SystemName
+        });
     
     public override string GetId() => SystemName;
     public static Expression<Func<PriceApplier, string>> GetKeySelector()

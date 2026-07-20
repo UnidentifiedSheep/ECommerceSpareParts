@@ -2,6 +2,7 @@ using System.Linq.Expressions;
 using Domain;
 using Domain.Extensions;
 using Domain.Interfaces;
+using Pricing.Entities.DomainEvents;
 using Pricing.Enums;
 
 namespace Pricing.Entities.Pricing;
@@ -34,6 +35,18 @@ public class PriceApplierState :
         Order = order;
         Enabled = enabled;
     }
+
+    public override void OnCreated() => AddPriceApplierUpdatedDomainEvent();
+
+    public override void OnUpdated() => AddPriceApplierUpdatedDomainEvent();
+
+    public override void OnDeleted() => AddPriceApplierUpdatedDomainEvent();
+
+    private void AddPriceApplierUpdatedDomainEvent()
+        => AddDomainEvent(new PriceApplierUpdatedDomainEvent
+        {
+            SystemName = PriceApplierSystemName
+        });
     
     public override PriceApplierStateKey GetId() => new(PriceApplierSystemName, Usage);
     public static Expression<Func<PriceApplierState, PriceApplierStateKey>> GetKeySelector()
