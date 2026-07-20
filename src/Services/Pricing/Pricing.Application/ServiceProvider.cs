@@ -49,6 +49,7 @@ public static class ServiceProvider
         collection.AddSingleton<IMarkupContainer, MarkupContainer>();
         collection.AddScoped<IMarkupCalculator, MarkupCalculator>();
         collection.AddScoped<IMarkupInitializer, MarkupInitializer>();
+        collection.AddScoped<IPriceApplierService, PriceApplierService>();
 
         collection.AddScoped<ISupplierOfferRequestMarkerService, SupplierOfferRequestMarkerService>();
         collection.AddScoped<ISupplierOfferExtractorService, SupplierOfferExtractorService>();

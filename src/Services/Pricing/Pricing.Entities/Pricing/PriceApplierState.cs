@@ -11,13 +11,13 @@ public class PriceApplierState :
     ILinqEntity<PriceApplierState, PriceApplierStateKey>
 {
     public string PriceApplierSystemName { get; private set; } = null!;
-    public PriceApplierUsage Usage { get; private set; }
+    public PriceOfferSourceType Usage { get; private set; }
     public int Order { get; private set; }
     public bool Enabled { get; private set; }
 
     public static PriceApplierState Create(
         string priceApplierSystemName,
-        PriceApplierUsage usage,
+        PriceOfferSourceType usage,
         int order,
         bool enabled = true)
         => new()
@@ -41,9 +41,9 @@ public class PriceApplierState :
 
 public readonly struct PriceApplierStateKey(
     string priceApplierSystemName, 
-    PriceApplierUsage usage) : ICompositeKey
+    PriceOfferSourceType usage) : ICompositeKey
 {
     public string PriceApplierSystemName => priceApplierSystemName;
-    public PriceApplierUsage Usage => usage;
+    public PriceOfferSourceType Usage => usage;
     public object[] ToArray() => [priceApplierSystemName, usage];
 }

@@ -117,16 +117,20 @@ public static class ServiceCollectionExtensions
     public static IServiceCollection RegisterNamedObject<TBaseObject>(
         this IServiceCollection services,
         Assembly? assembly = null,
-        ServiceLifetime objectsLifetime = ServiceLifetime.Scoped)
+        ServiceLifetime objectsLifetime = ServiceLifetime.Scoped,
+        params Type[] objectsToExclude)
         where TBaseObject : class, INamedObject
     {
         assembly ??= typeof(TBaseObject).Assembly;
+        var excludedTypes = objectsToExclude.ToHashSet();
 
         services.Scan(scan =>
         {
             var registration = scan
                 .FromAssemblies(assembly)
-                .AddClasses(classes => classes.AssignableTo<TBaseObject>())
+                .AddClasses(classes => classes
+                    .AssignableTo<TBaseObject>()
+                    .Where(type => !excludedTypes.Contains(type)))
                 .As<TBaseObject>();
 
             switch (objectsLifetime)
