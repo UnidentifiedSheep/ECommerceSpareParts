@@ -34,6 +34,7 @@
         <ProjectReference Include="..\..\Api.Common\Api.Common.csproj"/>
         <ProjectReference Include="..\..\Test.Common\Test.Common.csproj"/>
         <ProjectReference Include="..\Pricing.Application\Pricing.Application.csproj"/>
+        <ProjectReference Include="..\Pricing.Cache\Pricing.Cache.csproj" />
         <ProjectReference Include="..\Pricing.Persistence\Pricing.Persistence.csproj"/>
     </ItemGroup>
 
@@ -48,6 +49,10 @@
             <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
             <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
         </Content>
+    </ItemGroup>
+
+    <ItemGroup>
+      <Folder Include="HandlerTests\" />
     </ItemGroup>
 
 </Project>

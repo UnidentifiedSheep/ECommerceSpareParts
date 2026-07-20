@@ -6,9 +6,12 @@ public record PriceApplierDto
 {
     [JsonPropertyName("systemName")]
     public required string SystemName { get; init; }
+
+    [JsonPropertyName("isDynamic")]
+    public required bool IsDynamic { get; init; }
     
     [JsonPropertyName("dslLogic")]
-    public required string DslLogic { get; init; }
+    public string? DslLogic { get; init; }
     
     [JsonPropertyName("states")]
     public required IReadOnlyList<PriceApplierStateDto> States { get; init; }

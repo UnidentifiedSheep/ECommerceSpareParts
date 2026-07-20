@@ -33,11 +33,12 @@ public class DynamicApplierNamedObject : ApplierNamedObjectBase
 
         var data = JsonSerializer.SerializeToNode(state)
                    ?? throw new InvalidOperationException("Failed to serialize price calculation state");
-
         var result = JsonLogic.Apply(_dslRule, data);
         var appliedPrice = result?.Deserialize<decimal>()
                            ?? throw new InvalidOperationException("DSL logic must return a price");
-        //TODO Negative staff gonna look stage
+
+        if (appliedPrice < 0)
+            throw new InvalidOperationException("DSL logic must return a non-negative price");
 
         return ValueTask.FromResult(state with
         {

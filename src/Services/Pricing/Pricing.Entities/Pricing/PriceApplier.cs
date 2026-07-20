@@ -2,6 +2,7 @@ using System.Linq.Expressions;
 using Domain;
 using Domain.Extensions;
 using Domain.Interfaces;
+using Pricing.Enums;
 
 namespace Pricing.Entities.Pricing;
 
@@ -10,25 +11,37 @@ public class PriceApplier :
     ILinqEntity<PriceApplier, string>
 {
     public string SystemName { get; private set; } = null!;
-    public string DslLogic { get; private set; } = null!;
+    public string? DslLogic { get; private set; }
 
     private readonly List<PriceApplierState> _states = [];
     public IReadOnlyList<PriceApplierState> States => _states;
     
     private PriceApplier() { }
 
-    private PriceApplier(string systemName, string dslLogic)
+    private PriceApplier(string systemName)
     {
         SystemName = systemName
             .TrimSafe()
             .EnsureNotNullOrWhiteSpace(() => new InvalidOperationException("System name cannot be empty"));
-        SetDslLogic(dslLogic);
     }
 
     public static PriceApplier Create(string systemName, string dslLogic)
-        => new(systemName, dslLogic);
+    {
+        var applier = new PriceApplier(systemName);
+        applier.SetDslLogic(dslLogic);
+        return applier;
+    }
+
+    public static PriceApplier CreateLocal(string systemName)
+        => new(systemName);
     
     public void AddState(PriceApplierState state) => _states.Add(state);
+
+    public void RemoveStatesExcept(IEnumerable<PriceOfferSourceType> usages)
+    {
+        var usagesToKeep = usages.ToHashSet();
+        _states.RemoveAll(x => !usagesToKeep.Contains(x.Usage));
+    }
 
     public void SetDslLogic(string dslLogic)
         => DslLogic = dslLogic

@@ -11,6 +11,7 @@ public static class PriceApplierProjections
         = x => new PriceApplierDto
         {
             SystemName = x.SystemName,
+            IsDynamic = x.DslLogic != null,
             DslLogic = x.DslLogic,
             States = x.States.Select(z => ToStateDto.Invoke(z)).ToList()
         };

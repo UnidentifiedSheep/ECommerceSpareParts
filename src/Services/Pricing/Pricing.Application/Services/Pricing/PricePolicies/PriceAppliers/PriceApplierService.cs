@@ -36,16 +36,16 @@ public class PriceApplierService(
             }
 
             var state = applier.States.FirstOrDefault(z => z.Usage == usage);
-            if (state is { Enabled: false }) continue;
+            if (state is not { Enabled: true }) continue;
             result.Add(local);
         }
 
         foreach (var (systemName, applier) in appliers)
         {
-            if (localSystemNames.Contains(systemName)) continue;
+            if (localSystemNames.Contains(systemName) || !applier.IsDynamic) continue;
             var state = applier.States
                 .FirstOrDefault(x => x.Usage == usage);
-            if (state == null || !state.Enabled) continue;
+            if (state == null || !state.Enabled || applier.DslLogic is null) continue;
             result.Add(new DynamicApplierNamedObject(
                 systemName,
                 state.Order,

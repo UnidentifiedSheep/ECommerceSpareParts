@@ -28,5 +28,11 @@ public class PriceApplierStateConfiguration : IEntityTypeConfiguration<PriceAppl
 
         builder.Property(e => e.Enabled)
             .HasColumnName("enabled");
+
+        builder.HasIndex(
+                e => new { e.Usage, e.Order },
+                "price_applier_states_enabled_usage_order_uq")
+            .IsUnique()
+            .HasFilter("enabled = true");
     }
 }
