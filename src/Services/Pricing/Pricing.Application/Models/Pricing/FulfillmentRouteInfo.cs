@@ -1,15 +1,16 @@
+using System.Text.Json.Serialization;
 using Pricing.Entities;
 using Pricing.Entities.Offers;
 
 namespace Pricing.Application.Models.Pricing;
 
 public sealed record FulfillmentRouteInfo(
-    string SourceStorageName,
-    string TargetStorageName,
-    decimal LogisticsCostInBaseCurrency,
-    TimeSpan DeliveryTime,
-    TimeSpan GuaranteedDeliveryTime,
-    int DeliveryProbability)
+    [property: JsonPropertyName("sourceStorageName")] string SourceStorageName,
+    [property: JsonPropertyName("targetStorageName")] string TargetStorageName,
+    [property: JsonPropertyName("logisticsCostInBaseCurrency")] decimal LogisticsCostInBaseCurrency,
+    [property: JsonPropertyName("deliveryTime")] TimeSpan DeliveryTime,
+    [property: JsonPropertyName("guaranteedDeliveryTime")] TimeSpan GuaranteedDeliveryTime,
+    [property: JsonPropertyName("deliveryProbability")] int DeliveryProbability)
 {
     public static FulfillmentRouteInfo SameStorage(string storageName)
     {

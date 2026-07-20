@@ -1,3 +1,5 @@
+using System.Text.Json.Serialization;
+
 namespace Pricing.Application.Models.Pricing.MarketInfo;
 
 public sealed record MarketInfo
@@ -13,10 +15,15 @@ public sealed record MarketInfo
         Items = items.OrderByDescending(x => x.Score).ToList();
     }
     
+    [JsonPropertyName("items")]
     public IReadOnlyList<MarketInfoItem> Items { get; }
 
+    [JsonPropertyName("offerCount")]
     public required int OfferCount { get; init; }
+
+    [JsonPropertyName("availableQuantity")]
     public required int AvailableQuantity { get; init; }
 
+    [JsonPropertyName("hasMarket")]
     public bool HasMarket => OfferCount > 0;
 }

@@ -1,6 +1,8 @@
+using System.Text.Json.Serialization;
+
 namespace Pricing.Application.Models.Pricing;
 
 public sealed record AppliedPriceRule(
-    string Name,
-    decimal PriceBefore,
-    decimal PriceAfter);
+    [property: JsonPropertyName("name")] string Name,
+    [property: JsonPropertyName("priceBefore")] decimal PriceBefore,
+    [property: JsonPropertyName("priceAfter")] decimal PriceAfter);

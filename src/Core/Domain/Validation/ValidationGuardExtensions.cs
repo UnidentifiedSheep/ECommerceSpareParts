@@ -167,6 +167,11 @@ public static class ValidationGuardExtensions
         return !value.IsNotNullOrWhiteSpace() ? throw exceptionFactory() : value;
     }
 
+    public static string EnsureValidJson(this string value, Func<Exception> exceptionFactory)
+    {
+        return !value.IsValidJson() ? throw exceptionFactory() : value;
+    }
+
     public static T EnsureNotNull<T>(this T value, Func<Exception> exceptionFactory)
         where T : class
     {

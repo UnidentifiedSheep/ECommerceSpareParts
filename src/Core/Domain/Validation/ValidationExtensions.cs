@@ -1,3 +1,6 @@
+using System.Text.Json;
+using System.Text.Json.Nodes;
+
 namespace Domain.Extensions;
 
 public static class ValidationExtensions
@@ -25,6 +28,19 @@ public static class ValidationExtensions
     public static bool IsNotNullOrWhiteSpace(this string? value)
     {
         return !string.IsNullOrWhiteSpace(value);
+    }
+
+    public static bool IsValidJson(this string value)
+    {
+        try
+        {
+            using var _ = JsonDocument.Parse(value);
+            return true;
+        }
+        catch (JsonException)
+        {
+            return false;
+        }
     }
 
     public static bool IsNotNull<T>(this T? value)
