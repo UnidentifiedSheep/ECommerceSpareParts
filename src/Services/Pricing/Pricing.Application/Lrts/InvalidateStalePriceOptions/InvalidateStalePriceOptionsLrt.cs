@@ -3,6 +3,7 @@ using Abstractions.Interfaces;
 using Abstractions.Interfaces.Persistence;
 using Application.Common.Handlers.Jobs;
 using Application.Common.Interfaces.Repositories;
+using Application.Common.Interfaces.Settings;
 using Application.Common.LRT;
 using Application.Common.NamedObject;
 using Attributes;
@@ -15,6 +16,7 @@ using Pricing.Application.Interfaces.Persistence;
 using Pricing.Application.Interfaces.Pricing.PriceApplier;
 using Pricing.Application.Models.Jobs;
 using Pricing.Entities.Offers;
+using Pricing.Entities.Settings;
 
 namespace Pricing.Application.Lrts.InvalidateStalePriceOptions;
 
@@ -27,7 +29,8 @@ public class InvalidateStalePriceOptionsLrt(
     IProductPriceOptionRepository productPriceOptionRepository,
     ISender sender,
     IMarkupContainer markupContainer,
-    IPriceApplierService priceApplierService
+    IPriceApplierService priceApplierService,
+    ISettingsService settingsService
 ) : LrtNamedObjectBase(
     jobRepository,
     unitOfWork,
@@ -58,10 +61,13 @@ public class InvalidateStalePriceOptionsLrt(
                     var currentVersion = markupContainer.CurrentVersion;
                     var currentAppliersVersion = await priceApplierService
                         .GetCurrentConfigurationVersionAsync(CancellationToken);
+                    var currentPricingSettingsVersion = (await settingsService
+                        .GetOrDefault<PricingSetting>(CancellationToken)).Data.Version;
 
                     var items = await readRepository.Query
                         .Where(x => x.MarkupVersion != currentVersion
-                                    || x.AppliersVersion != currentAppliersVersion)
+                                    || x.AppliersVersion != currentAppliersVersion
+                                    || x.PricingSettingsVersion != currentPricingSettingsVersion)
                         .Take(batchSize)
                         .Select(x => new
                         {

@@ -3,6 +3,7 @@ using Application.Common.Extensions;
 using Application.Common.Interfaces.Cqrs;
 using Application.Common.Interfaces.Currency;
 using Application.Common.Interfaces.Repositories;
+using Application.Common.Interfaces.Settings;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 using Pricing.Application.Dtos.Price;
@@ -10,6 +11,7 @@ using Pricing.Application.Interfaces.Markup;
 using Pricing.Application.Interfaces.Pricing.PriceApplier;
 using Pricing.Entities;
 using Pricing.Entities.Offers;
+using Pricing.Entities.Settings;
 using Pricing.Enums;
 
 namespace Pricing.Application.Handlers.Pricing;
@@ -29,7 +31,8 @@ public class GetPriceOptionsForProductHandler(
     IReadRepository<ProductPriceOption, Guid> repository,
     ICurrencyConverter currencyConverter,
     IMarkupContainer markupContainer,
-    IPriceApplierService priceApplierService
+    IPriceApplierService priceApplierService,
+    ISettingsService settingsService
     ) : IQueryHandler<GetPriceOptionsForProductQuery, GetPriceOptionsForProductResult>
 {
     public async Task<GetPriceOptionsForProductResult> Handle(
@@ -46,10 +49,13 @@ public class GetPriceOptionsForProductHandler(
         var options = await GetOptionsAsync(request, cancellationToken);
         var appliersVersion = await priceApplierService
             .GetCurrentConfigurationVersionAsync(cancellationToken);
+        var pricingSettingsVersion = (await settingsService
+            .GetOrDefault<PricingSetting>(cancellationToken)).Data.Version;
 
         if (options.Count == 0 || options.Any(x =>
                 x.MarkupVersion != markupContainer.CurrentVersion
-                || x.AppliersVersion != appliersVersion))
+                || x.AppliersVersion != appliersVersion
+                || x.PricingSettingsVersion != pricingSettingsVersion))
         {
             await CalculateCandidates(request, cancellationToken);
             options = await GetOptionsAsync(request, cancellationToken);

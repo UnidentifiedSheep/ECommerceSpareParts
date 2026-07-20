@@ -3,15 +3,18 @@ using System.Text.Json.Serialization;
 using Application.Common.Interfaces.Settings;
 using Application.Common.NamedObject;
 using Attributes.JsonAttributes;
+using Contracts.Analytics;
 using Enums;
 using Exceptions;
+using MassTransit;
 using Pricing.Entities;
 using Pricing.Entities.Settings;
 
 namespace Pricing.Application.NamedObjects.SettingDefinitions;
 
 public class PricingSettingDefinition(
-    ISettingsService settingsService
+    ISettingsService settingsService,
+    IPublishEndpoint publishEndpoint
 ) : SettingDefinitionNamedObjectBase<PricingSetting>(settingsService)
 {
     private const string InvalidInputKey = "pricing.setting.input.invalid";
@@ -33,6 +36,7 @@ public class PricingSettingDefinition(
             new PricingSetting(
                 new PricingSettingData
                 {
+                    Version = Guid.NewGuid(),
                     SelectedMarkupId = deser.SelectedMarkupId,
                     DefaultMarkup = deser.DefaultMarkup,
                     OfferTtl = deser.OfferTtl,
@@ -40,6 +44,10 @@ public class PricingSettingDefinition(
                     DeliveryDayPenalty = deser.DeliveryDayPenalty,
                     UniqProductAdditionalMarkup = deser.UniqProductAdditionalMarkup
                 }),
+            cancellationToken);
+
+        await publishEndpoint.Publish(
+            new MarkupRangesRefreshRequestedEvent(),
             cancellationToken);
     }
 

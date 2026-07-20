@@ -19,6 +19,9 @@ public class PricingSetting : Setting<PricingSettingData>, ISetting<PricingSetti
 
 public record PricingSettingData
 {
+    [JsonPropertyName("version")]
+    public Guid Version { get; init; } = Guid.Empty;
+
     [JsonPropertyName("selectedMarkupId")]
     [InputControl(InputControlType.EntitySelector)]
     [DependsOnEntity(nameof(MarkupGroup))]

@@ -43,6 +43,6 @@
     "lrt.price.candidate.calculation.storage.name.name": "Depo",
     "lrt.price.candidate.calculation.storage.name.description": "Fiyat adayları hesaplanacak depo.",
     "lrt.invalidate.stale.price.options.name": "Eski fiyat seçeneklerini geçersiz kıl",
-    "lrt.invalidate.stale.price.options.description": "Eski kâr marjı sürümüyle hesaplanan fiyat seçeneklerini siler ve yeniden hesaplama işleri kuyruğa alır."
+    "lrt.invalidate.stale.price.options.description": "Eski fiyatlandırma yapılandırmasıyla hesaplanan fiyat seçeneklerini siler ve yeniden hesaplama işleri kuyruğa alır."
   }
 }

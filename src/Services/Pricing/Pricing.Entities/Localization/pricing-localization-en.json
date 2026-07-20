@@ -43,6 +43,6 @@
     "lrt.price.candidate.calculation.storage.name.name": "Storage",
     "lrt.price.candidate.calculation.storage.name.description": "Storage for which price candidates should be calculated.",
     "lrt.invalidate.stale.price.options.name": "Invalidate stale price options",
-    "lrt.invalidate.stale.price.options.description": "Removes price options calculated with an outdated markup version and enqueues recalculation jobs."
+    "lrt.invalidate.stale.price.options.description": "Removes price options calculated with an outdated pricing configuration and enqueues recalculation jobs."
   }
 }

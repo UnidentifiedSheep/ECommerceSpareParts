@@ -41,6 +41,7 @@ public class ProductPriceOptionRepository(
                     nameof(ProductPriceOption.Markup),
                     nameof(ProductPriceOption.MarkupVersion),
                     nameof(ProductPriceOption.AppliersVersion),
+                    nameof(ProductPriceOption.PricingSettingsVersion),
                     nameof(ProductPriceOption.DeliveryTime),
                     nameof(ProductPriceOption.DeliveryProbability),
                     nameof(ProductPriceOption.GuaranteedDeliveryTime)
