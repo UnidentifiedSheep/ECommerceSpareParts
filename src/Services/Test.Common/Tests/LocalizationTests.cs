@@ -9,6 +9,7 @@ using FluentValidation;
 using Localization.Abstractions.Interfaces;
 using Localization.Abstractions.Models;
 using Localization.Domain;
+using Microsoft.Extensions.Options;
 using Moq;
 
 namespace Tests.Tests;
@@ -136,7 +137,13 @@ public class LocalizationTests
         await jsonLoader.LoadAsync([container]);
 
         var localizer = new StringLocalizer([container]);
-        return new ScopedStringLocalizer(localizer);
+        return new ScopedStringLocalizer(
+            localizer,
+            Options.Create(new LocalesOptions
+            {
+                Default = locale,
+                Supported = [locale]
+            }));
     }
 
     private static IEnumerable<ILocalizableException> CreateExceptionInstances(Type type)

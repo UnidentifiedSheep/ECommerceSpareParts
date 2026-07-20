@@ -6,6 +6,7 @@ using Enums;
 using FluentAssertions;
 using Localization.Domain;
 using Localization.Domain.Serialization;
+using Microsoft.Extensions.Options;
 
 namespace Localization.Unit.Tests;
 
@@ -138,7 +139,13 @@ public class ScopedLocalizedJsonSerializerTests
             });
 
         var baseLocalizer = new StringLocalizer([container]);
-        var scopedLocalizer = new ScopedStringLocalizer(baseLocalizer);
+        var scopedLocalizer = new ScopedStringLocalizer(
+            baseLocalizer,
+            Options.Create(new LocalesOptions
+            {
+                Default = "en",
+                Supported = ["en"]
+            }));
         scopedLocalizer.SetLocale("en");
 
         return new ScopedLocalizedJsonSerializer(scopedLocalizer);
