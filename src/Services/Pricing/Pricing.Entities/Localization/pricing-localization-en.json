@@ -24,8 +24,6 @@
     "pricing.setting.name": "Pricing settings",
     "pricing.setting.description": "Controls price calculation, markup selection, offer lifetime, and supplier delivery scoring.",
     "pricing.setting.input.invalid": "Invalid pricing settings data was provided.",
-    "pricing.setting.pricing.strategy.name": "Pricing strategy",
-    "pricing.setting.pricing.strategy.description": "Defines which supplier offer price is used as the base price.",
     "pricing.setting.selected.markup.id.name": "Selected markup group",
     "pricing.setting.selected.markup.id.description": "Markup group used for price calculation. Leave empty to use the latest auto-generated markup group.",
     "pricing.setting.default.markup.name": "Default markup",

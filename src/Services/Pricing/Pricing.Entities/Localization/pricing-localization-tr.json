@@ -24,8 +24,6 @@
     "pricing.setting.name": "Fiyatlandırma ayarları",
     "pricing.setting.description": "Fiyat hesaplamasını, kâr marjı seçimini, teklif ömrünü ve tedarikçi teslimat puanlamasını yönetir.",
     "pricing.setting.input.invalid": "Geçersiz fiyatlandırma ayarları verisi sağlandı.",
-    "pricing.setting.pricing.strategy.name": "Fiyatlandırma stratejisi",
-    "pricing.setting.pricing.strategy.description": "Hangi tedarikçi teklif fiyatının temel fiyat olarak kullanılacağını belirler.",
     "pricing.setting.selected.markup.id.name": "Seçili kâr marjı grubu",
     "pricing.setting.selected.markup.id.description": "Fiyat hesaplamasında kullanılan kâr marjı grubu. En son otomatik oluşturulan grubu kullanmak için boş bırakın.",
     "pricing.setting.default.markup.name": "Varsayılan kâr marjı",

@@ -4,7 +4,6 @@ using Domain.CommonEntities;
 using Domain.Interfaces;
 using Enums;
 using Pricing.Entities;
-using Pricing.Enums;
 
 namespace Pricing.Entities.Settings;
 
@@ -20,15 +19,6 @@ public class PricingSetting : Setting<PricingSettingData>, ISetting<PricingSetti
 
 public record PricingSettingData
 {
-    [JsonPropertyName("pricingStrategy")]
-    [RequiredJsonField]
-    [InputControl(InputControlType.EnumSelector)]
-    [DependsOnEntity(nameof(ProductPricingType))]
-    [LocalizedJsonFieldName("pricing.setting.pricing.strategy.name")]
-    [LocalizedJsonFieldDescription("pricing.setting.pricing.strategy.description")]
-    [JsonConverter(typeof(JsonStringEnumConverter))]
-    public ProductPricingType PricingStrategy { get; init; } = ProductPricingType.Average;
-
     [JsonPropertyName("selectedMarkupId")]
     [InputControl(InputControlType.EntitySelector)]
     [DependsOnEntity(nameof(MarkupGroup))]

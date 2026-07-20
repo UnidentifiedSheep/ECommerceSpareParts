@@ -7,7 +7,6 @@ using Enums;
 using Exceptions;
 using Pricing.Entities;
 using Pricing.Entities.Settings;
-using Pricing.Enums;
 
 namespace Pricing.Application.NamedObjects.SettingDefinitions;
 
@@ -34,7 +33,6 @@ public class PricingSettingDefinition(
             new PricingSetting(
                 new PricingSettingData
                 {
-                    PricingStrategy = deser.PricingStrategy,
                     SelectedMarkupId = deser.SelectedMarkupId,
                     DefaultMarkup = deser.DefaultMarkup,
                     OfferTtl = deser.OfferTtl,
@@ -64,15 +62,6 @@ public class PricingSettingDefinition(
 
 public record PricingSettingInputData
 {
-    [JsonPropertyName("pricingStrategy")]
-    [RequiredJsonField]
-    [InputControl(InputControlType.EnumSelector)]
-    [DependsOnEntity(nameof(ProductPricingType))]
-    [LocalizedJsonFieldName("pricing.setting.pricing.strategy.name")]
-    [LocalizedJsonFieldDescription("pricing.setting.pricing.strategy.description")]
-    [JsonConverter(typeof(JsonStringEnumConverter))]
-    public required ProductPricingType PricingStrategy { get; init; }
-
     [JsonPropertyName("selectedMarkupId")]
     [InputControl(InputControlType.EntitySelector)]
     [DependsOnEntity(typeof(MarkupGroup), "id")]
