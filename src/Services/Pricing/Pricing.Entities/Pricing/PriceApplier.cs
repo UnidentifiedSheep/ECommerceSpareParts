@@ -65,6 +65,8 @@ public class PriceApplier :
 
     public override void OnUpdated() => AddUpdatedDomainEvent();
 
+    public override void OnDeleted() => AddUpdatedDomainEvent();
+
     private void AddUpdatedDomainEvent()
         => AddDomainEvent(new PriceApplierUpdatedDomainEvent
         {

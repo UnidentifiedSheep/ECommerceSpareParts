@@ -6,6 +6,7 @@ using MediatR;
 using Microsoft.AspNetCore.Mvc;
 using Pricing.Application.Dtos.PriceApplier;
 using Pricing.Application.Handlers.PriceApplier;
+using Pricing.Application.Handlers.PriceApplier.DeletePriceApplier;
 using Pricing.Application.Handlers.PriceApplier.GetPriceAppliers;
 using Pricing.Application.Handlers.PriceApplier.UpsertPriceApplier;
 using Pricing.Enums;
@@ -103,6 +104,27 @@ public class PriceApplierEndPoints : ICarterModule
             .Accepts<UpsertPriceApplierRequest>(false, "application/json")
             .Produces<UpsertPriceApplierResponse>()
             .ProducesProblem(StatusCodes.Status400BadRequest)
+            .RequireAnyPermission(PermissionCodes.PRICE_APPLIERS_MANAGE);
+
+        priceAppliers.MapDelete(
+                "/{systemName}",
+                async (
+                    ISender sender,
+                    string systemName,
+                    CancellationToken cancellationToken) =>
+                {
+                    await sender.Send(
+                        new DeletePriceApplierCommand(systemName),
+                        cancellationToken);
+                    return Results.NoContent();
+                })
+            .WithName("DeletePriceApplier")
+            .WithSummary("Удаление динамического правила формирования цены")
+            .WithDescription("Удаляет динамическое правило; локальные правила можно только отключать")
+            .WithDisplayName("Удаление динамического правила формирования цены")
+            .Produces(StatusCodes.Status204NoContent)
+            .ProducesProblem(StatusCodes.Status400BadRequest)
+            .ProducesProblem(StatusCodes.Status404NotFound)
             .RequireAnyPermission(PermissionCodes.PRICE_APPLIERS_MANAGE);
     }
 }

@@ -1,4 +1,4 @@
-﻿namespace Utils;
+﻿namespace Extensions;
 
 public static class EncodingUtils
 {
