@@ -4,6 +4,7 @@ using IntervalMap.Core.Models;
 using IntervalMap.Variations;
 using Pricing.Application.Interfaces.Markup;
 using Pricing.Entities;
+using System.Text.Json;
 
 namespace Pricing.Application.Services.Markup;
 
@@ -39,14 +40,17 @@ public class MarkupContainer : IMarkupContainer
     {
         lock (_lock)
         {
-            var ls = @default.ToList();
+            var defaultRanges = @default.ToList();
+            var otherRanges = other.ToDictionary(
+                x => x.Key,
+                x => x.Value.ToList());
             
             Initialized = true;
             DefaultMarkup = defaultMarkup;
             DefaultCurrencyId = defaultCurrencyId;
-            _defaultMarkupMap = GenMap(ls);
-            _markupMaps = other.ToDictionary(x => x.Key, x => GenMap(x.Value));
-            GenMarkupHash(ls, defaultCurrencyId, defaultMarkup);
+            _defaultMarkupMap = GenMap(defaultRanges);
+            _markupMaps = otherRanges.ToDictionary(x => x.Key, x => GenMap(x.Value));
+            GenMarkupHash(defaultRanges, otherRanges, defaultCurrencyId, defaultMarkup);
         }
     }
 
@@ -65,7 +69,8 @@ public class MarkupContainer : IMarkupContainer
     }
 
     private void GenMarkupHash(
-        List<MarkupRange> markupRanges,
+        IReadOnlyCollection<MarkupRange> defaultRanges,
+        IReadOnlyDictionary<int, List<MarkupRange>> otherRanges,
         int defaultCurrencyId,
         Models.Markup defaultMarkup)
     {
@@ -74,23 +79,43 @@ public class MarkupContainer : IMarkupContainer
             writer.WriteStartObject();
             writer.WriteNumber("defaultCurrencyId", defaultCurrencyId);
             writer.WriteNumber("defaultMarkup", defaultMarkup.Value);
-            writer.WriteStartArray("ranges");
+            writer.WritePropertyName("defaultRanges");
+            WriteRanges(writer, defaultRanges);
+            writer.WriteStartArray("otherCurrencies");
 
-            foreach (var range in markupRanges
-                         .OrderBy(x => x.RangeStart)
-                         .ThenBy(x => x.RangeEnd)
-                         .ThenBy(x => x.Markup))
+            foreach (var (currencyId, ranges) in otherRanges.OrderBy(x => x.Key))
             {
                 writer.WriteStartObject();
-                writer.WriteNumber("rangeStart", range.RangeStart);
-                writer.WriteNumber("rangeEnd", range.RangeEnd);
-                writer.WriteNumber("markup", range.Markup);
+                writer.WriteNumber("currencyId", currencyId);
+                writer.WritePropertyName("ranges");
+                WriteRanges(writer, ranges);
                 writer.WriteEndObject();
             }
 
             writer.WriteEndArray();
             writer.WriteEndObject();
         });
+    }
+
+    private static void WriteRanges(
+        Utf8JsonWriter writer,
+        IEnumerable<MarkupRange> ranges)
+    {
+        writer.WriteStartArray();
+
+        foreach (var range in ranges
+                     .OrderBy(x => x.RangeStart)
+                     .ThenBy(x => x.RangeEnd)
+                     .ThenBy(x => x.Markup))
+        {
+            writer.WriteStartObject();
+            writer.WriteNumber("rangeStart", range.RangeStart);
+            writer.WriteNumber("rangeEnd", range.RangeEnd);
+            writer.WriteNumber("markup", range.Markup);
+            writer.WriteEndObject();
+        }
+
+        writer.WriteEndArray();
     }
 
     private void EnsureInitialized()

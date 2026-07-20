@@ -491,7 +491,7 @@ public class UpsertPriceApplierTests(CombinedContainerFixture fixture) : Integra
             .WithState(PriceOfferSourceType.Supplier, 0, false)
             .BuildAndAddToDb(Context);
         var provider = Scope.ServiceProvider.GetRequiredService<IPriceApplierProvider>();
-        await provider.GetConfigurationAsync();
+        var initialConfiguration = await provider.GetConfigurationAsync();
 
         await Mediator.Send(new UpsertPriceApplierCommand(
             existing.SystemName,
@@ -499,9 +499,15 @@ public class UpsertPriceApplierTests(CombinedContainerFixture fixture) : Integra
             null,
             [State(PriceOfferSourceType.Supplier, null)]));
 
-        var applier = (await provider.GetConfigurationAsync()).Appliers
+        var updatedConfiguration = await provider.GetConfigurationAsync();
+        updatedConfiguration.Version.Should().NotBe(initialConfiguration.Version);
+        var applier = updatedConfiguration.Appliers
             .Single(x => x.SystemName == existing.SystemName);
-        applier.States.Single().Enabled.Should().BeTrue();
+        applier.States
+            .Single(x => x.Usage == PriceOfferSourceType.Supplier)
+            .Enabled
+            .Should()
+            .BeTrue();
     }
 
     private static UpsertPriceApplierStateDto State(

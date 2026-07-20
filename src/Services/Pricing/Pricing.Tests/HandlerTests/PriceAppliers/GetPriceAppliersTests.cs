@@ -1,6 +1,8 @@
 using FluentAssertions;
+using Microsoft.Extensions.DependencyInjection;
 using Pricing.Application.Handlers.PriceApplier;
 using Pricing.Application.Handlers.PriceApplier.GetPriceAppliers;
+using Pricing.Application.Interfaces.Cache;
 using Pricing.Application.Services.Pricing.PricePolicies.PriceAppliers;
 using Pricing.Enums;
 using Pricing.Integration.Tests.DataBuilders.PriceAppliers;
@@ -11,6 +13,28 @@ namespace Pricing.Integration.Tests.HandlerTests.PriceAppliers;
 
 public class GetPriceAppliersTests(CombinedContainerFixture fixture) : IntegrationTest(fixture)
 {
+    [Fact]
+    public async Task ConfigurationSnapshot_IncludesRegistryOnlyLocalAppliers()
+    {
+        var provider = Scope.ServiceProvider
+            .GetRequiredService<IPriceApplierProvider>();
+
+        var configuration = await provider.GetConfigurationAsync();
+
+        var markup = configuration.Appliers.Single(x =>
+            x.SystemName == nameof(MarkupApplier));
+        markup.IsDynamic.Should().BeFalse();
+        markup.States.Should().HaveCount(2);
+        markup.States.Should().OnlyContain(x =>
+            x.Enabled && x.Order == 0);
+        markup.States.Select(x => x.Usage).Should().BeEquivalentTo(
+            [
+                PriceOfferSourceType.Supplier,
+                PriceOfferSourceType.OurWarehouse
+            ]);
+        configuration.Version.Should().HaveLength(64);
+    }
+
     [Fact]
     public async Task ForUsage_ReturnsLocalAndDynamicAppliersIncludingDisabled()
     {
