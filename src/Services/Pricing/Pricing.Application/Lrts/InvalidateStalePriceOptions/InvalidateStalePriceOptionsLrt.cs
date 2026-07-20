@@ -12,6 +12,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using Pricing.Application.Interfaces.Markup;
 using Pricing.Application.Interfaces.Persistence;
+using Pricing.Application.Interfaces.Pricing.PriceApplier;
 using Pricing.Application.Models.Jobs;
 using Pricing.Entities.Offers;
 
@@ -25,7 +26,8 @@ public class InvalidateStalePriceOptionsLrt(
     IReadRepository<ProductPriceOption, Guid> readRepository,
     IProductPriceOptionRepository productPriceOptionRepository,
     ISender sender,
-    IMarkupContainer markupContainer
+    IMarkupContainer markupContainer,
+    IPriceApplierService priceApplierService
 ) : LrtNamedObjectBase(
     jobRepository,
     unitOfWork,
@@ -54,9 +56,12 @@ public class InvalidateStalePriceOptionsLrt(
                                        ?? new InvalidateStalePriceOptionsState();
 
                     var currentVersion = markupContainer.CurrentVersion;
+                    var currentAppliersVersion = await priceApplierService
+                        .GetCurrentConfigurationVersionAsync(CancellationToken);
 
                     var items = await readRepository.Query
-                        .Where(x => x.MarkupVersion != currentVersion)
+                        .Where(x => x.MarkupVersion != currentVersion
+                                    || x.AppliersVersion != currentAppliersVersion)
                         .Take(batchSize)
                         .Select(x => new
                         {

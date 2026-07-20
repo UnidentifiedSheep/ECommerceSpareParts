@@ -1,5 +1,6 @@
 using Pricing.Application.Interfaces.Markup;
 using Pricing.Application.Interfaces.Pricing;
+using Pricing.Application.Interfaces.Pricing.PriceApplier;
 using Pricing.Application.Interfaces.Pricing.PricePolicy;
 using Pricing.Application.Models.Pricing;
 using Pricing.Application.Models.Pricing.MarketInfo;
@@ -13,12 +14,16 @@ public sealed class ProductPriceCalculator(
     IInternalPricePolicy internalPolicy,
     IOfferScorer offerScorer,
     IMarkupContainer markupContainer,
+    IPriceApplierService priceApplierService,
     IMarketInfoFactory marketInfoFactory) : IProductPriceCalculator
 {
     public async Task<ProductPriceCalculationResult> CalculateAsync(
         IReadOnlyCollection<PriceCandidate> candidates,
         CancellationToken ct)
     {
+        var appliersVersion = await priceApplierService
+            .GetCurrentConfigurationVersionAsync(ct);
+
         var supplierCandidates = candidates
             .Where(x => x.SourceType == PriceOfferSourceType.Supplier)
             .ToArray();
@@ -46,7 +51,8 @@ public sealed class ProductPriceCalculator(
         return new ProductPriceCalculationResult
         {
             Candidates = await offerScorer.GetResultingScoreAsync(all, ct),
-            MarkupVersion = markupContainer.CurrentVersion
+            MarkupVersion = markupContainer.CurrentVersion,
+            AppliersVersion = appliersVersion
         };
     }
 }

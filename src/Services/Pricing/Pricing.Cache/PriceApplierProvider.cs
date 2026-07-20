@@ -1,14 +1,11 @@
 using Application.Common.Interfaces.Repositories;
 using LinqKit;
 using Microsoft.EntityFrameworkCore;
-using Pricing.Application.Dtos.PriceApplier;
 using Pricing.Application.Interfaces.Cache;
-using Pricing.Application.Interfaces.Pricing.PriceApplier;
+using Pricing.Application.Models.Pricing;
 using Pricing.Application.Projections;
-using Pricing.Application.Services.Pricing.PricePolicies.PriceAppliers;
 using Pricing.Application.Static;
 using Pricing.Entities.Pricing;
-using Pricing.Enums;
 using ZiggyCreatures.Caching.Fusion;
 
 namespace Pricing.Cache;
@@ -17,28 +14,32 @@ public class PriceApplierProvider(
     IFusionCache cache,
     IReadRepository<PriceApplier, string> repository) : IPriceApplierProvider
 {
-    public async Task<IReadOnlyList<PriceApplierDto>> GetPriceAppliersAsync(
+    public async Task<PriceApplierConfigurationSnapshot> GetConfigurationAsync(
         CancellationToken ct = default)
     {
         return await cache.GetOrSetAsync(
-            key: CacheKeys.PriceAppliers.Key,
-            factory: GetPriceAppliersFromDbAsync,
+            key: CacheKeys.PriceAppliers.ConfigurationKey,
+            factory: GetConfigurationFromDbAsync,
             options: new FusionCacheEntryOptions(CacheKeys.PriceAppliers.Ttl),
             token: ct);
     }
 
-    public async Task InvalidatePriceAppliersAsync(
+    public async Task InvalidateConfigurationAsync(
         CancellationToken ct = default)
     {
         await cache.RemoveAsync(
-            CacheKeys.PriceAppliers.Key, 
+            CacheKeys.PriceAppliers.ConfigurationKey,
             token: ct);
     }
 
-    private Task<List<PriceApplierDto>> GetPriceAppliersFromDbAsync(
+    private async Task<PriceApplierConfigurationSnapshot> GetConfigurationFromDbAsync(
         CancellationToken ct = default)
-        => repository.Query
+    {
+        var appliers = await repository.Query
             .AsExpandable()
             .Select(PriceApplierProjections.ToApplierDto)
             .ToListAsync(ct);
+
+        return PriceApplierConfigurationSnapshot.Create(appliers);
+    }
 }

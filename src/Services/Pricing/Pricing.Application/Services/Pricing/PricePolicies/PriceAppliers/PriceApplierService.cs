@@ -12,6 +12,13 @@ public class PriceApplierService(
     INamedObjectRegistry<ApplierNamedObjectBase> registry,
     IScopedStringLocalizer localizer) : IPriceApplierService
 {
+    public async Task<string> GetCurrentConfigurationVersionAsync(
+        CancellationToken ct = default)
+    {
+        var configuration = await priceApplierProvider.GetConfigurationAsync(ct);
+        return configuration.Version;
+    }
+
     public async Task<IReadOnlyList<PriceApplierDto>> GetPriceApplierInfosAsync(
         PriceOfferSourceType usage,
         CancellationToken ct = default)
@@ -21,7 +28,8 @@ public class PriceApplierService(
             .Select(x => x.SystemName)
             .ToHashSet();
         var persistedAppliers = (await priceApplierProvider
-                .GetPriceAppliersAsync(ct))
+                .GetConfigurationAsync(ct))
+            .Appliers
             .ToDictionary(x => x.SystemName);
         var result = new List<PriceApplierDto>();
 

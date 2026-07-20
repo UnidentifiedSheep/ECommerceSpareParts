@@ -33,6 +33,9 @@ public class ProductPriceOptionConfiguration : IEntityTypeConfiguration<ProductP
         builder.Property(x => x.MarkupVersion)
             .HasColumnName("markup_version");
 
+        builder.Property(x => x.AppliersVersion)
+            .HasColumnName("appliers_version");
+
         builder.Property(e => e.Markup)
             .HasColumnName("markup");
 

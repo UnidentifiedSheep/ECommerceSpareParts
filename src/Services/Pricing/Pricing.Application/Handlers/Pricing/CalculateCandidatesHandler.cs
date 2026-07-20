@@ -47,6 +47,7 @@ public class CalculateCandidatesHandler(
                 ProductPriceOption.Create(
                     x.PriceOfferId,
                     calculated.MarkupVersion,
+                    calculated.AppliersVersion,
                     x.StorageName,
                     x.Score,
                     x.Price,

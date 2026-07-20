@@ -1,5 +1,6 @@
 using Exceptions;
 using FluentAssertions;
+using Domain.CommonEntities;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using System.Text.Json.Nodes;
@@ -7,6 +8,7 @@ using Pricing.Application.Dtos.PriceApplier;
 using Pricing.Application.Handlers.PriceApplier;
 using Pricing.Application.Interfaces.Cache;
 using Pricing.Application.Interfaces.Pricing.PriceApplier;
+using Pricing.Application.Lrts.InvalidateStalePriceOptions;
 using Pricing.Application.Handlers.PriceApplier.UpsertPriceApplier;
 using Pricing.Application.Services.Pricing.PricePolicies.PriceAppliers;
 using Pricing.Application.Services.Pricing.PricePolicies.PriceAppliers.Internal;
@@ -432,7 +434,7 @@ public class UpsertPriceApplierTests(CombinedContainerFixture fixture) : Integra
     {
         var provider = Scope.ServiceProvider.GetRequiredService<IPriceApplierProvider>();
         var systemName = $"dynamic-{Faker.Random.Guid():N}";
-        await provider.GetPriceAppliersAsync();
+        var initialConfiguration = await provider.GetConfigurationAsync();
 
         await Mediator.Send(new UpsertPriceApplierCommand(
             systemName,
@@ -440,10 +442,16 @@ public class UpsertPriceApplierTests(CombinedContainerFixture fixture) : Integra
             """{"var":"salePrice"}""",
             [State(PriceOfferSourceType.Supplier, 10)]));
 
-        var appliers = await provider.GetPriceAppliersAsync();
+        var updatedConfiguration = await provider.GetConfigurationAsync();
+        updatedConfiguration.Version.Should().NotBe(initialConfiguration.Version);
+        var appliers = updatedConfiguration.Appliers;
         appliers.Should().Contain(x =>
             x.SystemName == systemName
             && x.Name == "Created rule");
+        var recalculationJobExists = await Context.Set<UniqJob>()
+            .AsNoTracking()
+            .AnyAsync(x => x.SystemName == InvalidateStalePriceOptionsLrt.LrtName);
+        recalculationJobExists.Should().BeTrue();
     }
 
     [Fact]
@@ -454,7 +462,7 @@ public class UpsertPriceApplierTests(CombinedContainerFixture fixture) : Integra
             .WithState(PriceOfferSourceType.Supplier, 10)
             .BuildAndAddToDb(Context);
         var provider = Scope.ServiceProvider.GetRequiredService<IPriceApplierProvider>();
-        await provider.GetPriceAppliersAsync();
+        var initialConfiguration = await provider.GetConfigurationAsync();
 
         await Mediator.Send(new UpsertPriceApplierCommand(
             existing.SystemName,
@@ -462,7 +470,9 @@ public class UpsertPriceApplierTests(CombinedContainerFixture fixture) : Integra
             """{"var":"cost"}""",
             [State(PriceOfferSourceType.Supplier, 10)]));
 
-        var applier = (await provider.GetPriceAppliersAsync())
+        var updatedConfiguration = await provider.GetConfigurationAsync();
+        updatedConfiguration.Version.Should().NotBe(initialConfiguration.Version);
+        var applier = updatedConfiguration.Appliers
             .Single(x => x.SystemName == existing.SystemName);
         applier.Name.Should().Be("Updated rule");
         JsonNode.DeepEquals(
@@ -481,7 +491,7 @@ public class UpsertPriceApplierTests(CombinedContainerFixture fixture) : Integra
             .WithState(PriceOfferSourceType.Supplier, 0, false)
             .BuildAndAddToDb(Context);
         var provider = Scope.ServiceProvider.GetRequiredService<IPriceApplierProvider>();
-        await provider.GetPriceAppliersAsync();
+        await provider.GetConfigurationAsync();
 
         await Mediator.Send(new UpsertPriceApplierCommand(
             existing.SystemName,
@@ -489,7 +499,7 @@ public class UpsertPriceApplierTests(CombinedContainerFixture fixture) : Integra
             null,
             [State(PriceOfferSourceType.Supplier, null)]));
 
-        var applier = (await provider.GetPriceAppliersAsync())
+        var applier = (await provider.GetConfigurationAsync()).Appliers
             .Single(x => x.SystemName == existing.SystemName);
         applier.States.Single().Enabled.Should().BeTrue();
     }

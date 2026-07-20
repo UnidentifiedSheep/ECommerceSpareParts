@@ -1,7 +1,7 @@
+using Application.Common.Services;
 using IntervalMap.Core.Abstractions;
 using IntervalMap.Core.Models;
 using IntervalMap.Variations;
-using Pricing.Application.Interfaces;
 using Pricing.Application.Interfaces.Markup;
 using Pricing.Entities;
 
@@ -15,7 +15,7 @@ public class MarkupContainer : IMarkupContainer
     public bool Initialized { get; private set; }
     public Models.Markup DefaultMarkup { get; private set; } = null!;
     public int DefaultCurrencyId { get; private set; }
-    public string CurrentVersion { get; private set; }
+    public string CurrentVersion { get; private set; } = string.Empty;
 
     public Models.Markup? GetForDefaultOrNull(double value)
     {
@@ -46,7 +46,7 @@ public class MarkupContainer : IMarkupContainer
             DefaultCurrencyId = defaultCurrencyId;
             _defaultMarkupMap = GenMap(ls);
             _markupMaps = other.ToDictionary(x => x.Key, x => GenMap(x.Value));
-            GenMarkupHash(ls, defaultCurrencyId);
+            GenMarkupHash(ls, defaultCurrencyId, defaultMarkup);
         }
     }
 
@@ -66,18 +66,31 @@ public class MarkupContainer : IMarkupContainer
 
     private void GenMarkupHash(
         List<MarkupRange> markupRanges,
-        int defaultCurrencyId)
+        int defaultCurrencyId,
+        Models.Markup defaultMarkup)
     {
-        var hc = new HashCode();
-        hc.Add(defaultCurrencyId);
-        foreach (var range in markupRanges)
+        CurrentVersion = ConfigurationVersionGenerator.Generate(writer =>
         {
-            hc.Add(range.RangeStart);
-            hc.Add(range.RangeEnd);
-            hc.Add(range.Markup);
-        }
-        
-        CurrentVersion = hc.ToHashCode().ToString("X8");
+            writer.WriteStartObject();
+            writer.WriteNumber("defaultCurrencyId", defaultCurrencyId);
+            writer.WriteNumber("defaultMarkup", defaultMarkup.Value);
+            writer.WriteStartArray("ranges");
+
+            foreach (var range in markupRanges
+                         .OrderBy(x => x.RangeStart)
+                         .ThenBy(x => x.RangeEnd)
+                         .ThenBy(x => x.Markup))
+            {
+                writer.WriteStartObject();
+                writer.WriteNumber("rangeStart", range.RangeStart);
+                writer.WriteNumber("rangeEnd", range.RangeEnd);
+                writer.WriteNumber("markup", range.Markup);
+                writer.WriteEndObject();
+            }
+
+            writer.WriteEndArray();
+            writer.WriteEndObject();
+        });
     }
 
     private void EnsureInitialized()

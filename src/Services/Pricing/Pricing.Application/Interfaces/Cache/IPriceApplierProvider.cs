@@ -1,12 +1,12 @@
-using Pricing.Application.Dtos.PriceApplier;
+using Pricing.Application.Models.Pricing;
 
 namespace Pricing.Application.Interfaces.Cache;
 
 public interface IPriceApplierProvider
 {
-    Task<IReadOnlyList<PriceApplierDto>> GetPriceAppliersAsync(
+    Task<PriceApplierConfigurationSnapshot> GetConfigurationAsync(
         CancellationToken ct = default);
 
-    Task InvalidatePriceAppliersAsync(
+    Task InvalidateConfigurationAsync(
         CancellationToken ct = default);
 }

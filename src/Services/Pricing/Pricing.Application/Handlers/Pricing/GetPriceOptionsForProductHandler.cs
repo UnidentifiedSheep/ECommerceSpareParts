@@ -7,6 +7,7 @@ using MediatR;
 using Microsoft.EntityFrameworkCore;
 using Pricing.Application.Dtos.Price;
 using Pricing.Application.Interfaces.Markup;
+using Pricing.Application.Interfaces.Pricing.PriceApplier;
 using Pricing.Entities;
 using Pricing.Entities.Offers;
 using Pricing.Enums;
@@ -27,7 +28,8 @@ public class GetPriceOptionsForProductHandler(
     ISender sender,
     IReadRepository<ProductPriceOption, Guid> repository,
     ICurrencyConverter currencyConverter,
-    IMarkupContainer markupContainer
+    IMarkupContainer markupContainer,
+    IPriceApplierService priceApplierService
     ) : IQueryHandler<GetPriceOptionsForProductQuery, GetPriceOptionsForProductResult>
 {
     public async Task<GetPriceOptionsForProductResult> Handle(
@@ -42,9 +44,16 @@ public class GetPriceOptionsForProductHandler(
             await CalculateCandidates(request, cancellationToken);
         
         var options = await GetOptionsAsync(request, cancellationToken);
+        var appliersVersion = await priceApplierService
+            .GetCurrentConfigurationVersionAsync(cancellationToken);
 
-        if (options.Count == 0 || options.Any(x => x.MarkupVersion != markupContainer.CurrentVersion))
+        if (options.Count == 0 || options.Any(x =>
+                x.MarkupVersion != markupContainer.CurrentVersion
+                || x.AppliersVersion != appliersVersion))
+        {
             await CalculateCandidates(request, cancellationToken);
+            options = await GetOptionsAsync(request, cancellationToken);
+        }
         
         var result = new List<PriceOptionDto>();
 

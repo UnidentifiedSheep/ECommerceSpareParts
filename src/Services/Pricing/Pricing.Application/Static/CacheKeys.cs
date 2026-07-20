@@ -42,6 +42,6 @@ public static class CacheKeys
     public static class PriceAppliers
     {
         public static TimeSpan Ttl { get; } = TimeSpan.FromMinutes(60);
-        public static string Key => "price-appliers";
+        public static string ConfigurationKey => "price-appliers:configuration:v1";
     }
 }
