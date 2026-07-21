@@ -6,6 +6,7 @@ using Main.Entities.Balance;
 using Main.Entities.Cart;
 using Main.Entities.Currency;
 using Main.Entities.Order;
+using Main.Entities.Organization;
 using Main.Entities.Producer;
 using Main.Entities.Product;
 using Main.Entities.Product.Supplier;
@@ -75,6 +76,10 @@ public partial class DContext : DbContext
     public virtual DbSet<Order> Orders { get; set; }
 
     public virtual DbSet<OrderItem> OrderItems { get; set; }
+
+    public virtual DbSet<Organization> Organizations { get; set; }
+
+    public virtual DbSet<OrganizationMember> OrganizationMembers { get; set; }
 
     public virtual DbSet<Permission> Permissions { get; set; }
 

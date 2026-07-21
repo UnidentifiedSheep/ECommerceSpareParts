@@ -30,6 +30,7 @@ public class User : AuditableEntity<User, Guid>, ILinqEntity<User, Guid>
 
     private User(UserName userName, string passwordHash)
     {
+        Id = Guid.NewGuid();
         UserName = userName;
         PasswordHash = passwordHash;
     }

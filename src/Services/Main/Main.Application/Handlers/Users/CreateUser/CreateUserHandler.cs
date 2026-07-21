@@ -8,11 +8,13 @@ using Main.Application.Dtos.Users;
 using Main.Application.Projections;
 using Main.Entities.Auth;
 using Main.Entities.Exceptions;
+using Main.Entities.Organization;
 using Main.Entities.User;
 using Role = Enums.Role;
 
 namespace Main.Application.Handlers.Users.CreateUser;
 
+[AutoSave]
 [Transactional]
 public record CreateUserCommand(
     string UserName,
@@ -25,7 +27,9 @@ public record CreateUserCommand(
 
 public record CreateUserResult(UserDto User);
 
-public class CreateUserHandler(IUnitOfWork unitOfWork, IPasswordManager passwordManager)
+public class CreateUserHandler(
+    IUnitOfWork unitOfWork, 
+    IPasswordManager passwordManager)
     : ICommandHandler<CreateUserCommand, CreateUserResult>
 {
     public async Task<CreateUserResult> Handle(CreateUserCommand request, CancellationToken cancellationToken)
@@ -56,8 +60,13 @@ public class CreateUserHandler(IUnitOfWork unitOfWork, IPasswordManager password
                 phone.Type,
                 phone.IsPrimary,
                 phone.IsConfirmed);
+        
+        var organization = Organization.CreateIndividual(
+            $"{user.UserInfo!.Name} {user.UserInfo.Surname}",
+            user.Id);
 
         await unitOfWork.AddAsync(user, cancellationToken);
+        await unitOfWork.AddAsync(organization, cancellationToken);
         await unitOfWork.SaveChangesAsync(cancellationToken);
         return new CreateUserResult(UserProjections.UserProjection.AsFunc()(user));
     }

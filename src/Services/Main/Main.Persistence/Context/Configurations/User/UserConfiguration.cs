@@ -15,7 +15,6 @@ public class UserConfiguration : IEntityTypeConfiguration<Entities.User.User>
             .HasName("users_pk");
 
         builder.Property(e => e.Id)
-            .HasDefaultValueSql("gen_random_uuid()")
             .HasColumnName("id");
 
         builder.Property(e => e.AccessFailedCount)

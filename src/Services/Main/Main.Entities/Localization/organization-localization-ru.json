@@ -1,0 +1,15 @@
+{
+  "locale": "ru",
+  "keyValues": {
+    "organization.system.name.required": "Системное имя организации обязательно.",
+    "organization.name.required": "Название организации обязательно.",
+    "organization.name.min.length": "Название организации должно содержать не менее 3 символов.",
+    "organization.name.max.length": "Название организации должно содержать не более 128 символов.",
+    "organization.individual.only.owner.allowed": "Индивидуальная организация может содержать только своего владельца.",
+    "organization.member.already.exists": "Пользователь уже является участником организации.",
+    "organization.owner.already.exists": "У организации уже есть владелец.",
+    "organization.owner.cannot.be.removed": "Владельца организации нельзя удалить.",
+    "organization.member.not.found": "Участник организации не найден.",
+    "organization.owner.role.cannot.be.changed": "Роль владельца организации нельзя изменить."
+  }
+}
